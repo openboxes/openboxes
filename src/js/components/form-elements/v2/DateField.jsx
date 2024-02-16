@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 
-import moment from 'moment';
 import PropTypes from 'prop-types';
 import DatePicker from 'react-datepicker';
 
@@ -26,8 +25,6 @@ const DateField = ({
 }) => {
   const [date, setDate] = useState(defaultValue);
 
-  const onChange = (pickedDate) => setDate(moment(pickedDate, DateFormat.MMM_DD_YYYY));
-
   const onClear = () => setDate(null);
 
   return (
@@ -42,7 +39,6 @@ const DateField = ({
         customInput={<DateFieldInput onClear={onClear} />}
         className={`form-element-input ${errorMessage ? 'has-errors' : ''} ${className}`}
         dropdownMode="scroll"
-        onChange={onChange}
         dateFormat={DateFormat.MMM_DD_YYYY}
         timeFormat={TimeFormat.HH_MM}
         disabled={disabled}
@@ -54,6 +50,7 @@ const DateField = ({
         utcOffset={0}
         placeholderText={placeholder}
         {...fieldProps}
+        onChange={(val) => fieldProps?.onChange?.(val?.format(DateFormat.MM_DD_YYYY))}
       />
     </InputWrapper>
   );

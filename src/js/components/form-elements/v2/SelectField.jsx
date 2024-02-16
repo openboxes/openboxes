@@ -41,7 +41,7 @@ const SelectField = ({
     <InputWrapper
       title={title}
       errorMessage={errorMessage}
-      button={{ ...button, onClick: () => button.onClick(value) }}
+      button={{ ...button, onClick: () => button.onClick(fieldProps?.value?.id ?? value) }}
       tooltip={tooltip}
       required={required}
       className="select-wrapper-container"
