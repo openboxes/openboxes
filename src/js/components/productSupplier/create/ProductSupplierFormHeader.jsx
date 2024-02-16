@@ -1,5 +1,6 @@
 import React from 'react';
 
+import PropTypes from 'prop-types';
 import { useHistory } from 'react-router-dom';
 
 import Button from 'components/form-elements/Button';
@@ -11,7 +12,7 @@ import RedirectButton from 'utils/RedirectButton';
 import HeaderButtonsWrapper from 'wrappers/HeaderButtonsWrapper';
 import HeaderWrapper from 'wrappers/HeaderWrapper';
 
-const ProductSupplierFormHeader = () => {
+const ProductSupplierFormHeader = ({ isValid }) => {
   const history = useHistory();
   const { productSupplier } = useProductSupplierData();
 
@@ -51,7 +52,9 @@ const ProductSupplierFormHeader = () => {
               label="react.productSupplier.save.label"
               defaultLabel="Save"
               variant="primary"
-              disabled
+              // Save button should be disabled if there are any validation errors
+              disabled={!isValid}
+              type="submit"
             />
           </HeaderButtonsWrapper>
         </div>
@@ -62,3 +65,7 @@ const ProductSupplierFormHeader = () => {
 };
 
 export default ProductSupplierFormHeader;
+
+ProductSupplierFormHeader.propTypes = {
+  isValid: PropTypes.bool.isRequired,
+};

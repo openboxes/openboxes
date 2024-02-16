@@ -24,17 +24,17 @@ export const getInvoiceDescription = (rowValue) => {
   return rowValue?.description;
 };
 
-export const formatProductDisplayName = rowValue => (
+export const formatProductDisplayName = (rowValue) => (
   <div className="d-flex">
     <span className="text-truncate">
       {rowValue?.displayName || rowValue?.displayNames?.default || rowValue?.name}
     </span>
     {renderHandlingIcons(rowValue?.handlingIcons)}
-  </div>);
+  </div>
+);
 
-
-export const getReceivingPayloadContainers = formValues =>
-  _.map(formValues.containers, container => ({
+export const getReceivingPayloadContainers = (formValues) =>
+  _.map(formValues.containers, (container) => ({
     ...container,
     shipmentItems: _.map(container.shipmentItems, (item) => {
       if (!_.get(item, 'recipient.id')) {
@@ -70,7 +70,7 @@ export const showOutboundEditValidationErrors = ({ translate, errors }) => {
   const errorMessage = `${translate('react.stockMovement.errors.errorInLine.label', 'Error occurred in line')}:`;
   const errorDetails = errors.reduce((acc, message, key) => [
     ...acc,
-    `${message && `${key + 1} - ${_.map(message, val => translate(`${val}`))}`}`,
+    `${message && `${key + 1} - ${_.map(message, (val) => translate(`${val}`))}`}`,
   ], []);
 
   notification(NotificationType.ERROR_OUTLINED)({
@@ -78,3 +78,11 @@ export const showOutboundEditValidationErrors = ({ translate, errors }) => {
     detailsArray: errorDetails,
   });
 };
+
+export const omitEmptyValues = (values) => _.omitBy(values, (val) => {
+  // Do not omit boolean values no matter if they are true or false
+  if (typeof val === 'boolean') {
+    return false;
+  }
+  return _.isEmpty(val);
+});

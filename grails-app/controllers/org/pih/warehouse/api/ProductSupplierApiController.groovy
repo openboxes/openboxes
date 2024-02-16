@@ -21,7 +21,7 @@ class ProductSupplierApiController {
             throw new ObjectNotFoundException(params.id, ProductSupplier.class.toString())
         }
 
-        render([data: productSupplier] as JSON)
+        render([data: productSupplier.toJson()] as JSON)
     }
 
     def delete() {
