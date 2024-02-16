@@ -53,15 +53,12 @@ const FIELDS = {
     loadMoreRows: ({ loadMoreRows }) => loadMoreRows(),
     isFirstPageLoaded: ({ isFirstPageLoaded }) => isFirstPageLoaded,
     // eslint-disable-next-line react/prop-types
-    addButton: ({ values, loadMoreRows }) => (
+    addButton: ({ values, loadMoreRows, saveBeforeOpenInvoiceCandidates }) => (
       <InvoiceItemsModal
-        btnOpenText="react.default.button.addLines.label"
-        btnOpenDefaultText="Add lines"
+        onOpen={() => saveBeforeOpenInvoiceCandidates(values)}
         invoiceId={values.id}
         onResponse={loadMoreRows}
-      >
-        <Translate id="react.default.button.addLine.label" defaultMessage="Add line" />
-      </InvoiceItemsModal>
+      />
     ),
     fields: {
       orderNumber: {
@@ -204,6 +201,8 @@ class AddItemsPage extends Component {
     this.saveInvoiceItems = this.saveInvoiceItems.bind(this);
     this.validateInvoiceItem = this.validateInvoiceItem.bind(this);
     this.confirmSave = this.confirmSave.bind(this);
+    this.save = this.save.bind(this);
+    this.saveBeforeOpenInvoiceCandidates = this.saveBeforeOpenInvoiceCandidates.bind(this);
 
     this.debouncedInvoiceItemValidation = _.debounce(this.validateInvoiceItem, 1000);
   }
@@ -441,6 +440,20 @@ class AddItemsPage extends Component {
     }
   }
 
+  saveBeforeOpenInvoiceCandidates(values) {
+    return new Promise((resolve) => {
+      if (this.someItemsHaveZeroQuantity(values.invoiceItems)) {
+        return this.confirmSave(() => {
+          this.saveInvoiceItems(values).then(() => {
+            this.loadMoreRows({ startIndex: 0 });
+          }).finally(() => resolve());
+        });
+      } else {
+        return this.saveInvoiceItems(values).finally(() => resolve());
+      }
+    });
+  }
+
   save(values) {
     if (this.someItemsHaveZeroQuantity(values.invoiceItems)) {
       this.confirmSave(() => {
@@ -513,6 +526,7 @@ class AddItemsPage extends Component {
                     isFirstPageLoaded: this.state.isFirstPageLoaded,
                     updateTotalCount: this.updateTotalCount,
                     removeItem: this.removeItem,
+                    saveBeforeOpenInvoiceCandidates: this.saveBeforeOpenInvoiceCandidates,
                     updateRow: this.updateRow,
                     validateInvoiceItem: this.validateInvoiceItem,
                     debouncedInvoiceItemValidation: this.debouncedInvoiceItemValidation,
