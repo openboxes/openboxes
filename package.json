@@ -58,6 +58,7 @@
     "@fortawesome/free-regular-svg-icons": "5.14.0",
     "@fortawesome/free-solid-svg-icons": "5.14.0",
     "@fortawesome/react-fontawesome": "0.1.8",
+    "@hookform/resolvers": "3.3.4",
     "@material-ui/core": "4.9.3",
     "axios": "0.27.2",
     "bootstrap": "4.6.2",
@@ -82,6 +83,7 @@
     "react-dropzone": "4.3.0",
     "react-final-form": "3.6.5",
     "react-final-form-arrays": "1.0.6",
+    "react-hook-form": "7.48.2",
     "react-html-parser": "2.0.2",
     "react-icons": "4.7.1",
     "react-live-chat-loader": "2.4.1",
@@ -107,7 +109,8 @@
     "redux": "4.2.1",
     "redux-persist": "6.0.0",
     "redux-promise": "0.6.0",
-    "redux-thunk": "2.4.2"
+    "redux-thunk": "2.4.2",
+    "zod": "3.22.4"
   },
   "devDependencies": {
     "@babel/core": "7.21.8",
