@@ -3,8 +3,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import Section from 'components/Layout/v2/Section';
-import AdditionalDetails from 'components/productSupplier/create/AdditionalDetails';
-import BasicDetails from 'components/productSupplier/create/BasicDetails';
+import AdditionalDetails from 'components/productSupplier/create/subsections/AdditionalDetails';
+import BasicDetails from 'components/productSupplier/create/subsections/BasicDetails';
 
 const DetailsSection = ({ control, errors, mockedRatingTypeCodes }) => (
   <Section title={{ label: 'react.productSupplier.form.section.details', defaultMessage: 'Details' }}>

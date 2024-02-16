@@ -2,7 +2,7 @@ import React from 'react';
 
 import PropTypes from 'prop-types';
 
-import DetailsSection from 'components/productSupplier/create/DetailsSection';
+import DetailsSection from 'components/productSupplier/create/sections/DetailsSection';
 
 import 'components/form-elements/DateFilter/DateFilter.scss';
 import 'react-datepicker/dist/react-datepicker.css';
