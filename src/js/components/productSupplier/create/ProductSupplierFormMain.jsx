@@ -3,8 +3,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import DetailsSection from 'components/productSupplier/create/sections/DetailsSection';
-import PreferenceTypeSection
-  from 'components/productSupplier/create/sections/PreferenceTypeSection';
+import PreferenceTypeSection from 'components/productSupplier/create/sections/PreferenceTypeSection';
+import PricingSection from 'components/productSupplier/create/sections/PricingSection';
 
 import './styles.scss';
 
@@ -16,7 +16,7 @@ const ProductSupplierFormMain = ({ formProps }) => {
   } = formProps;
 
   return (
-    <div>
+    <div className="d-flex flex-column gap-8">
       <DetailsSection
         control={control}
         errors={errors}
@@ -26,6 +26,7 @@ const ProductSupplierFormMain = ({ formProps }) => {
         control={control}
         errors={errors.productSupplierPreferences}
       />
+      <PricingSection />
     </div>
   );
 };
