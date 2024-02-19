@@ -1,6 +1,7 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
+import grails.validation.ValidationException
 import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.data.ProductSupplierService
 import org.pih.warehouse.product.ProductSupplier
@@ -14,7 +15,7 @@ class ProductSupplierApiController {
 
     def list(ProductSupplierFilterCommand filterParams) {
         List<ProductSupplier> productSuppliers = productSupplierService.getProductSuppliers(filterParams)
-        render([data: productSuppliers.collect { it.toJson() }, totalCount: productSuppliers.totalCount] as JSON)
+        render([data: productSuppliers, totalCount: productSuppliers.totalCount] as JSON)
     }
 
     def read() {
@@ -32,15 +33,21 @@ class ProductSupplierApiController {
     }
 
     def create(ProductSupplierDetailsCommand productSupplierDetailsCommand) {
-        ProductSupplier productSupplier = productSupplierService.saveDetails(productSupplierDetailsCommand)
+        if (productSupplierDetailsCommand.hasErrors()) {
+            throw new ValidationException("Invalid product source", productSupplierDetailsCommand.errors)
+        }
+        ProductSupplier productSupplier = productSupplierService.saveProductSupplier(productSupplierDetailsCommand)
 
         response.status = HttpStatus.CREATED.value()
-        render([data: productSupplier.toJson()] as JSON)
+        render([data: productSupplier] as JSON)
     }
 
     def update(ProductSupplierDetailsCommand productSupplierDetailsCommand) {
-        ProductSupplier updatedProductSupplier = productSupplierService.updateDetails(productSupplierDetailsCommand, params.id)
+        if (productSupplierDetailsCommand.hasErrors()) {
+            throw new ValidationException("Invalid product source", productSupplierDetailsCommand.errors)
+        }
+        ProductSupplier updatedProductSupplier = productSupplierService.updateProductSupplier(productSupplierDetailsCommand, params.id)
 
-        render([data: updatedProductSupplier.toJson()] as JSON)
+        render([data: updatedProductSupplier] as JSON)
     }
 }

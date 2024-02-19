@@ -358,16 +358,8 @@ class ProductSupplierService {
         productSupplierGormService.delete(productSupplierId)
     }
 
-    private static void validateProductSupplierDetails(ProductSupplierDetailsCommand command) {
-        if (command.hasErrors()) {
-            throw new ValidationException("Invalid product source", command.errors)
-        }
-    }
-
-    ProductSupplier saveDetails(ProductSupplierDetailsCommand command) {
-        validateProductSupplierDetails(command)
+    ProductSupplier saveProductSupplier(ProductSupplierDetailsCommand command) {
         ProductSupplier productSupplier = new ProductSupplier(command.properties)
-        // TODO: To be replaced by a generic method created in OBPIH-6017 after merging into develop
         if (!productSupplier.code) {
             productSupplier.code =
                 identifierService.generateProductSupplierIdentifier(command?.product?.productCode, command?.supplier?.code)
@@ -375,14 +367,12 @@ class ProductSupplierService {
         return productSupplierGormService.save(productSupplier)
     }
 
-    ProductSupplier updateDetails(ProductSupplierDetailsCommand command, String productSupplierId) {
-        validateProductSupplierDetails(command)
+    ProductSupplier updateProductSupplier(ProductSupplierDetailsCommand command, String productSupplierId) {
         ProductSupplier productSupplier = productSupplierGormService.get(productSupplierId)
         if (!productSupplier) {
             throw new ObjectNotFoundException(productSupplierId, ProductSupplier.class.toString())
         }
         productSupplier.properties = command.properties
-        // TODO: To be replaced by a generic method created in OBPIH-6017 after merging into develop
         if (!productSupplier.code) {
             productSupplier.code =
                 identifierService.generateProductSupplierIdentifier(command?.product?.productCode, command?.supplier?.code)
