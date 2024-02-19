@@ -53,16 +53,12 @@ const FIELDS = {
     loadMoreRows: ({ loadMoreRows }) => loadMoreRows(),
     isFirstPageLoaded: ({ isFirstPageLoaded }) => isFirstPageLoaded,
     // eslint-disable-next-line react/prop-types
-    addButton: ({ values, loadMoreRows, saveInvoiceItems }) => (
+    addButton: ({ values, loadMoreRows, saveBeforeOpenInvoiceCandidates }) => (
       <InvoiceItemsModal
-        btnOpenText="react.default.button.addLines.label"
-        btnOpenDefaultText="Add lines"
-        onOpen={() => saveInvoiceItems(values)}
+        onOpen={() => saveBeforeOpenInvoiceCandidates(values)}
         invoiceId={values.id}
         onResponse={loadMoreRows}
-      >
-        <Translate id="react.default.button.addLine.label" defaultMessage="Add line" />
-      </InvoiceItemsModal>
+      />
     ),
     fields: {
       orderNumber: {
@@ -205,6 +201,8 @@ class AddItemsPage extends Component {
     this.saveInvoiceItems = this.saveInvoiceItems.bind(this);
     this.validateInvoiceItem = this.validateInvoiceItem.bind(this);
     this.confirmSave = this.confirmSave.bind(this);
+    this.save = this.save.bind(this);
+    this.saveBeforeOpenInvoiceCandidates = this.saveBeforeOpenInvoiceCandidates.bind(this);
 
     this.debouncedInvoiceItemValidation = _.debounce(this.validateInvoiceItem, 1000);
   }
@@ -341,8 +339,7 @@ class AddItemsPage extends Component {
    * @public
    */
   nextPage(values) {
-    const hasZeros = _.some(values.invoiceItems, (item) => _.parseInt(item.quantity) === 0);
-    if (hasZeros) {
+    if (this.someItemsHaveZeroQuantity(values.invoiceItems)) {
       this.confirmSave(() => {
         this.saveInvoiceItems(values).then(() => this.props.nextPage(values));
       });
@@ -357,9 +354,13 @@ class AddItemsPage extends Component {
    * @public
    */
   previousPage(values) {
-    this.saveInvoiceItems(values).then(() => {
-      this.props.previousPage(values);
-    });
+    if (this.someItemsHaveZeroQuantity(values.invoiceItems)) {
+      this.confirmSave(() => {
+        this.saveInvoiceItems(values).then(() => this.props.previousPage(values));
+      });
+    } else {
+      this.saveInvoiceItems(values).then(() => this.props.previousPage(values));
+    }
   }
 
   /**
@@ -439,12 +440,52 @@ class AddItemsPage extends Component {
     }
   }
 
+  saveBeforeOpenInvoiceCandidates(values) {
+    return new Promise((resolve) => {
+      if (this.someItemsHaveZeroQuantity(values.invoiceItems)) {
+        return this.confirmSave(() => {
+          this.saveInvoiceItems(values).then(() => {
+            this.loadMoreRows({ startIndex: 0 });
+          }).finally(() => resolve());
+        });
+      } else {
+        return this.saveInvoiceItems(values).finally(() => resolve());
+      }
+    });
+  }
+
+  save(values) {
+    if (this.someItemsHaveZeroQuantity(values.invoiceItems)) {
+      this.confirmSave(() => {
+        this.saveInvoiceItems(values).then(() => {
+          this.loadMoreRows({ startIndex: 0 });
+        });
+      });
+    } else {
+      return this.saveInvoiceItems(values);
+    }
+  }
+
   saveAndExit(formValues) {
-    this.saveInvoiceItems(formValues)
-      .then(() => {
+    if (this.someItemsHaveZeroQuantity(formValues.invoiceItems)) {
+      this.confirmSave(() => {
+        this.saveInvoiceItems(formValues).then(() => {
+          window.location = INVOICE_URL.show(formValues.id);
+        });
+      });
+    } else {
+      this.saveInvoiceItems(formValues).then(() => {
         window.location = INVOICE_URL.show(formValues.id);
-      })
-      .catch(() => this.props.hideSpinner());
+      });
+    }
+  }
+
+  someItemsHaveZeroQuantity(invoiceItems) {
+    return _.some(invoiceItems, (item) => _.parseInt(item.quantity) === 0);
+  }
+
+  allItemsHaveZeroQuantity(invoiceItems) {
+    return _.every(invoiceItems, (item) => _.parseInt(item.quantity) === 0);
   }
 
   render() {
@@ -461,7 +502,7 @@ class AddItemsPage extends Component {
                 type="button"
                 className="btn btn-outline-secondary float-right btn-form btn-xs"
                 disabled={invalid}
-                onClick={() => this.saveInvoiceItems(values)}
+                onClick={() => this.save(values)}
               >
                 <span><i className="fa fa-floppy-o pr-2" /><Translate id="react.default.button.save.label" defaultMessage="Save" /></span>
               </button>
@@ -485,8 +526,8 @@ class AddItemsPage extends Component {
                     isFirstPageLoaded: this.state.isFirstPageLoaded,
                     updateTotalCount: this.updateTotalCount,
                     removeItem: this.removeItem,
+                    saveBeforeOpenInvoiceCandidates: this.saveBeforeOpenInvoiceCandidates,
                     updateRow: this.updateRow,
-                    saveInvoiceItems: this.saveInvoiceItems,
                     validateInvoiceItem: this.validateInvoiceItem,
                     debouncedInvoiceItemValidation: this.debouncedInvoiceItemValidation,
                   }))}
@@ -504,7 +545,11 @@ class AddItemsPage extends Component {
                   <Translate id="react.default.button.previous.label" defaultMessage="Previous" />
                 </button>
                 <button
-                  disabled={invalid || !values.invoiceItems?.length}
+                  disabled={
+                    invalid
+                    || !values.invoiceItems?.length
+                    || this.allItemsHaveZeroQuantity(values.invoiceItems)
+                }
                   onClick={() => this.nextPage(values)}
                   className="btn btn-outline-primary btn-form float-right btn-xs"
                 >

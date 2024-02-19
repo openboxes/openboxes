@@ -17,7 +17,7 @@ import Checkbox from 'utils/Checkbox';
 import { getInvoiceDescription } from 'utils/form-values-utils';
 import accountingFormat from 'utils/number-utils';
 import Select from 'utils/Select';
-import { translateWithDefaultMessage } from 'utils/Translate';
+import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 
 const FIELDS = {
@@ -190,7 +190,7 @@ class InvoiceItemsModal extends Component {
   }
 
   onOpen() {
-    this.props.onOpen().then(() => {
+    return this.props.onOpen().then(() => {
       this.setState(INITIAL_STATE, () => {
         this.fetchInvoiceItemCandidates();
       });
@@ -397,7 +397,6 @@ class InvoiceItemsModal extends Component {
 
     return (
       <ModalWrapper
-        onOpen={this.onOpen}
         onSave={this.onSave}
         fields={FIELDS}
         validate={validate}
@@ -408,10 +407,23 @@ class InvoiceItemsModal extends Component {
           selectRow: this.selectRow,
           updateRow: this.updateRow,
         }}
+        renderButton={({ openModal }) => (
+          <button
+            type="button"
+            className="btn-xs"
+            disabled={btnOpenDisabled}
+            onClick={() => {
+              this.onOpen().then(() => openModal());
+            }}
+          >
+            <Translate
+              id="react.default.button.addLines.label"
+              defaultMessage="Add lines"
+            />
+          </button>
+        )}
         btnSaveText="react.invoice.addInvoiceItems.label"
         btnSaveDefaultText="Add invoice items"
-        btnOpenText={btnOpenText}
-        btnOpenDefaultText={btnOpenDefaultText}
         btnOpenDisabled={btnOpenDisabled}
         btnSaveDisabled={!_.find(formValues.invoiceItems, item => item.checked)}
       >

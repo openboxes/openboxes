@@ -44,22 +44,31 @@ class ModalWrapper extends Component {
 
     return (
       <div className={this.props.wrapperClassName}>
-        <button
-          type="button"
-          className={`btn-xs ${this.props.btnOpenClassName}`}
-          style={this.props.btnOpenStyle}
-          disabled={this.props.btnOpenDisabled}
-          onClick={() => this.openModal()}
-        >
-          {
-            this.props.btnOpenIcon &&
-            <i className={`fa ${this.props.btnOpenIcon} mr-1`} aria-hidden="true" />
-          }
-          {
-            this.props.btnOpenText && !this.props.btnOpenAsIcon &&
-            <Translate id={this.props.btnOpenText} defaultMessage={this.props.btnOpenDefaultText} />
-          }
-        </button>
+        {
+          this.props.renderButton
+            ? this.props.renderButton({ openModal: this.openModal })
+            : (
+              <button
+                type="button"
+                className={`btn-xs ${this.props.btnOpenClassName}`}
+                style={this.props.btnOpenStyle}
+                disabled={this.props.btnOpenDisabled}
+                onClick={() => this.openModal()}
+              >
+                {
+                  this.props.btnOpenIcon &&
+                  <i className={`fa ${this.props.btnOpenIcon} mr-1`} aria-hidden="true" />
+                }
+                {
+                  this.props.btnOpenText && !this.props.btnOpenAsIcon &&
+                  <Translate
+                    id={this.props.btnOpenText}
+                    defaultMessage={this.props.btnOpenDefaultText}
+                  />
+                }
+              </button>
+            )
+        }
         <Modal
           isOpen={this.props.showModal || this.state.showModal}
           onRequestClose={this.closeModal}
@@ -163,6 +172,7 @@ ModalWrapper.propTypes = {
   /** Button container properties */
   btnContainerClassName: PropTypes.string,
   btnContainerStyle: PropTypes.shape({}),
+  renderButton: PropTypes.func,
 
   /** Wrapper properties */
   wrapperClassName: PropTypes.string,
@@ -226,6 +236,7 @@ ModalWrapper.defaultProps = {
   btnCancelClassName: 'btn btn-outline-secondary',
   btnCancelStyle: {},
 
+  renderButton: undefined,
 
   onOpen: () => null,
   onSave: () => null,
