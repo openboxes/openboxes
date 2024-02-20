@@ -26,8 +26,11 @@ const PreferenceTypeVariations = ({ control, errors: { productSupplierPreference
 
   return (
     <Subsection
-      title={{ label: '', defaultMessage: 'Preference Type Variations' }}
       collapsable
+      title={{
+        label: 'react.productSupplier.subsection.preferenceTypeVariations.title',
+        defaultMessage: 'Preference Type Variations',
+      }}
     >
       <div className="preference-type-variations-subsection">
         <div className="d-flex justify-content-end align-items-center mb-3">

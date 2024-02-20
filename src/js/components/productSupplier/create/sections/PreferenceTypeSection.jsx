@@ -7,7 +7,7 @@ import PreferenceTypeVariations
   from 'components/productSupplier/create/subsections/PreferenceTypeVariations';
 
 const PreferenceTypeSection = ({ control, errors }) => (
-  <Section title={{ label: '', defaultMessage: 'Preference Type' }}>
+  <Section title={{ label: 'react.productSupplier.section.preferenceType.title', defaultMessage: 'Preference Type' }}>
     <PreferenceTypeVariations
       control={control}
       errors={errors}

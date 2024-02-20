@@ -3,13 +3,18 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { RiCheckboxCircleLine } from 'react-icons/all';
 
+import Translate from 'utils/Translate';
+
 const InvalidItemsIndicator = ({ className, errorsCounter }) => (
   <div className={`invalid-items-indicator ${className}`}>
     <span>
       <RiCheckboxCircleLine className="mr-1" />
       {errorsCounter}
       {' '}
-      Item(s) require attention
+      <Translate
+        id="react.productSupplier.form.invalidItemsIndicator.title"
+        defaultMessage="Item(s) require attention"
+      />
     </span>
   </div>
 );

@@ -8,15 +8,19 @@ import { fetchBuyers, fetchPreferenceTypes } from 'actions';
 import DateField from 'components/form-elements/v2/DateField';
 import SelectField from 'components/form-elements/v2/SelectField';
 import TextInput from 'components/form-elements/v2/TextInput';
+import { translateWithDefaultMessage } from 'utils/Translate';
+import { getTranslate } from 'react-localize-redux';
 
 const usePreferenceTypeVariationsColumns = ({ productSupplierPreferences, control, remove }) => {
   const dispatch = useDispatch();
   const {
     preferenceTypes,
     buyers,
+    translate,
   } = useSelector((state) => ({
     preferenceTypes: state.productSupplier.preferenceTypes,
     buyers: state.organizations.buyers,
+    translate: translateWithDefaultMessage(getTranslate(state.localize)),
   }));
 
   useEffect(() => {
@@ -26,7 +30,7 @@ const usePreferenceTypeVariationsColumns = ({ productSupplierPreferences, contro
 
   const columns = useMemo(() => [
     {
-      Header: 'Site Name',
+      Header: translate('react.productSupplier.table.siteName.label', 'Site Name'),
       sortable: false,
       accessor: 'destinationParty',
       minWidth: 300,
@@ -48,7 +52,7 @@ const usePreferenceTypeVariationsColumns = ({ productSupplierPreferences, contro
       ),
     },
     {
-      Header: 'Preference Type',
+      Header: translate('react.productSupplier.table.preferenceType.label', 'Preference Type'),
       sortable: false,
       accessor: 'preferenceType',
       minWidth: 300,
@@ -70,7 +74,7 @@ const usePreferenceTypeVariationsColumns = ({ productSupplierPreferences, contro
       ),
     },
     {
-      Header: 'Valid End Date',
+      Header: translate('react.productSupplier.table.validEndDate.label', 'Valid End Date'),
       sortable: false,
       accessor: 'validityEndDate',
       minWidth: 179,
@@ -91,7 +95,7 @@ const usePreferenceTypeVariationsColumns = ({ productSupplierPreferences, contro
       ),
     },
     {
-      Header: 'Valid Start Date',
+      Header: translate('react.productSupplier.table.validStartDate.label', 'Valid Start Date'),
       sortable: false,
       accessor: 'validityStartDate',
       style: { overflow: 'visible' },
@@ -113,7 +117,7 @@ const usePreferenceTypeVariationsColumns = ({ productSupplierPreferences, contro
       ),
     },
     {
-      Header: 'Bid Name',
+      Header: translate('react.productSupplier.table.bidName.label', 'Bid Name'),
       sortable: false,
       accessor: 'bidName',
       minWidth: 300,
@@ -134,7 +138,7 @@ const usePreferenceTypeVariationsColumns = ({ productSupplierPreferences, contro
       ),
     },
     {
-      Header: 'Actions',
+      Header: translate('react.productSupplier.table.actions.label', 'Actions'),
       sortable: false,
       minWidth: 70,
       headerClassName: 'justify-content-center',
