@@ -52,6 +52,26 @@ const useProductSupplierValidation = () => {
       brandName: z
         .string()
         .optional(),
+      productSupplierPreferences: z.array(z.object({
+        destinationParty: z.object({
+          id: z.string(),
+          value: z.string(),
+          label: z.string(),
+        }, {
+          invalid_type_error: 'Site name is required',
+          required_error: 'Site name is required',
+        }).required(),
+        preferenceType: z.object({
+          id: z.string(),
+          label: z.string(),
+        }, {
+          invalid_type_error: 'Preference type is required',
+          required_error: 'Preference type is required',
+        }).required(),
+        validityEndDate: z.string().optional().nullable(),
+        validityStartDate: z.string().optional().nullable(),
+        bidName: z.string().optional().nullable(),
+      })),
     });
 
   return {
