@@ -61,7 +61,10 @@ class ProductSupplierPreference {
         [
             id: id,
             destinationParty: destinationParty,
-            preferenceType: preferenceType
+            preferenceType: preferenceType,
+            validityStartDate: validityStartDate,
+            validityEndDate: validityEndDate,
+            bidName: comments,
         ]
     }
 }

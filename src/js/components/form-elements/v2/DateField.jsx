@@ -10,6 +10,7 @@ import InputWrapper from 'wrappers/InputWrapper';
 import 'react-datepicker/dist/react-datepicker.css';
 import 'components/form-elements/DateFilter/DateFilter.scss';
 import './style.scss';
+import moment from 'moment';
 
 const DateField = ({
   title,
@@ -50,7 +51,7 @@ const DateField = ({
         utcOffset={0}
         placeholderText={placeholder}
         {...fieldProps}
-        onChange={(val) => fieldProps?.onChange?.(val?.format(DateFormat.MM_DD_YYYY))}
+        onChange={(val) => fieldProps?.onChange?.(val?.format(DateFormat.MMM_DD_YYYY))}
       />
     </InputWrapper>
   );

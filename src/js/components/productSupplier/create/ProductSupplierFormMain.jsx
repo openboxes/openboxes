@@ -3,6 +3,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import DetailsSection from 'components/productSupplier/create/sections/DetailsSection';
+import PreferenceTypeSection
+  from 'components/productSupplier/create/sections/PreferenceTypeSection';
 
 import './styles.scss';
 
@@ -19,6 +21,10 @@ const ProductSupplierFormMain = ({ formProps }) => {
         control={control}
         errors={errors}
         mockedRatingTypeCodes={mockedRatingTypeCodes}
+      />
+      <PreferenceTypeSection
+        control={control}
+        errors={errors}
       />
     </div>
   );
