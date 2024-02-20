@@ -10,6 +10,7 @@ import DateField from 'components/form-elements/v2/DateField';
 import SelectField from 'components/form-elements/v2/SelectField';
 import TextInput from 'components/form-elements/v2/TextInput';
 import { translateWithDefaultMessage } from 'utils/Translate';
+import { getTranslate } from 'react-localize-redux';
 
 const usePreferenceTypeVariationsColumns = ({ errors, control, remove }) => {
   const dispatch = useDispatch();
