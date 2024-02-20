@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 
 import PropTypes from 'prop-types';
 
+import ProductSelect from 'components/product-select/ProductSelect';
 import Select from 'utils/Select';
 import InputWrapper from 'wrappers/InputWrapper';
 
 import './style.scss';
-import ProductSelect from 'components/product-select/ProductSelect';
 
 const SelectField = ({
   title,
@@ -104,6 +104,7 @@ SelectField.propTypes = {
   multiple: PropTypes.bool,
   // Function triggered on change
   onChange: PropTypes.func,
+  productSelect: PropTypes.bool,
 };
 
 SelectField.defaultProps = {
@@ -120,4 +121,5 @@ SelectField.defaultProps = {
   defaultValue: null,
   multiple: false,
   onChange: () => {},
+  productSelect: false,
 };

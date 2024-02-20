@@ -7,11 +7,11 @@ import DatePicker from 'react-datepicker';
 import DateFieldInput from 'components/form-elements/v2/DateFieldInput';
 import { DateFormat, TimeFormat } from 'consts/timeFormat';
 import InputWrapper from 'wrappers/InputWrapper';
+import RootPortalWrapper from 'wrappers/RootPortalWrapper';
 
 import 'react-datepicker/dist/react-datepicker.css';
 import 'components/form-elements/DateFilter/DateFilter.scss';
 import './style.scss';
-import RootPortalWrapper from 'wrappers/RootPortalWrapper';
 
 const DateField = ({
   title,
