@@ -34,6 +34,9 @@ const InputWrapper = ({
               )}
         >
           <RiQuestionLine className="ml-1" />
+          <span className="input-wrapper-tooltip">
+            <RiQuestionLine />
+          </span>
         </Tooltip>
         )}
         {required && <span className="input-wrapper-asterisk ml-1">&#42;</span>}

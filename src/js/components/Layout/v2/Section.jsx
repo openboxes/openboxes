@@ -8,7 +8,7 @@ import './styles.scss';
 
 const Section = ({ title, children }) => (
   <div className="v2-section">
-    <span className="text-uppercase">
+    <span className="v2-section-title text-uppercase">
       <Translate id={title.label} defaultMessage={title.defaultMessage} />
     </span>
     {children}

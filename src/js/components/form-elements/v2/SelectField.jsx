@@ -6,6 +6,7 @@ import Select from 'utils/Select';
 import InputWrapper from 'wrappers/InputWrapper';
 
 import './style.scss';
+import ProductSelect from 'components/product-select/ProductSelect';
 
 const SelectField = ({
   title,
@@ -21,6 +22,7 @@ const SelectField = ({
   defaultValue,
   multiple,
   onChange,
+  productSelect,
   ...fieldProps
 }) => {
   const [value, setValue] = useState(defaultValue);
@@ -37,6 +39,8 @@ const SelectField = ({
     setValue(selectedOption);
   };
 
+  const SelectComponent = productSelect ? ProductSelect : Select;
+
   return (
     <InputWrapper
       title={title}
@@ -46,7 +50,7 @@ const SelectField = ({
       required={required}
       className="select-wrapper-container"
     >
-      <Select
+      <SelectComponent
         className={`form-element-select ${errorMessage ? 'has-errors' : ''}`}
         disabled={disabled}
         placeholder={placeholder}

@@ -159,6 +159,11 @@ input, .date-field-input {
     .react-select__value-container {
       font-size: 14px;
       font-weight: 400;
+
+      span {
+        font-size: 14px;
+        color: var(--gray-600);
+      }
     }
 
     &.react-select__control--is-focused {
@@ -171,8 +176,12 @@ input, .date-field-input {
       background-color: var(--gray-400);
     }
 
-    svg {
-      color: var(--gray-400);
+    .react-select__indicators {
+
+      svg {
+        cursor: pointer;
+        color: var(--gray-400);
+      }
     }
   }
 
