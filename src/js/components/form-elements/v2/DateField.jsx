@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 import moment from 'moment';
 import PropTypes from 'prop-types';
@@ -11,6 +11,7 @@ import InputWrapper from 'wrappers/InputWrapper';
 import 'react-datepicker/dist/react-datepicker.css';
 import 'components/form-elements/DateFilter/DateFilter.scss';
 import './style.scss';
+import RootPortalWrapper from 'wrappers/RootPortalWrapper';
 
 const DateField = ({
   title,
@@ -56,6 +57,7 @@ const DateField = ({
         scrollableYearDropdown
         utcOffset={0}
         placeholderText={placeholder}
+        popperContainer={RootPortalWrapper}
         {...fieldProps}
         value={formatDate(value)}
         onChange={(val) => onChange?.(val?.format(DateFormat.LL))}
