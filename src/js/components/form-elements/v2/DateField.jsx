@@ -12,7 +12,6 @@ import RootPortalWrapper from 'wrappers/RootPortalWrapper';
 import 'react-datepicker/dist/react-datepicker.css';
 import 'components/form-elements/DateFilter/DateFilter.scss';
 import './style.scss';
-import RootPortalWrapper from 'wrappers/RootPortalWrapper';
 
 const DateField = ({
   title,
