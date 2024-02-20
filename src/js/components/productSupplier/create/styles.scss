@@ -1,5 +1,37 @@
+@mixin set-size($height, $width) {
+  width: $width;
+  height: $height;
+}
+
 .form-grid-3 {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
+  gap: 8px;
+}
+
+.preference-type-variations-bin {
+  @include set-size(20px, 20px);
+  color: var(--blue-primary);
+  cursor: pointer;
+}
+
+.button-add-icon {
+  @include set-size(16px, 16px);
+}
+
+.invalid-items-indicator > span {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-green);
+
+  svg {
+    @include set-size(16px, 16px);
+  }
+}
+
+.preference-type-variations-subsection {
+
+  .rt-tbody {
+    max-height: 244px;
+  }
 }

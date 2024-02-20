@@ -115,8 +115,15 @@ input, .date-field-input {
   }
 
   .form-element-input {
+    background-color: white;
     position: relative;
     display: flex;
+
+    span {
+      font-weight: 500;
+      font-size: 14px;
+      color: var(--gray-600);
+    }
 
     &.disabled {
       background-color: var(--blue-100);
