@@ -179,6 +179,8 @@ input, .date-field-input {
     .react-select__indicators {
 
       svg {
+        height: 16px;
+        width: 16px;
         cursor: pointer;
         color: var(--gray-400);
       }
