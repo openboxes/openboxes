@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 
+import moment from 'moment';
 import PropTypes from 'prop-types';
 import DatePicker from 'react-datepicker';
 
@@ -10,7 +11,6 @@ import InputWrapper from 'wrappers/InputWrapper';
 import 'react-datepicker/dist/react-datepicker.css';
 import 'components/form-elements/DateFilter/DateFilter.scss';
 import './style.scss';
-import moment from 'moment';
 
 const DateField = ({
   title,
@@ -21,12 +21,19 @@ const DateField = ({
   placeholder,
   button,
   className,
-  defaultValue,
+  value,
+  onChange,
   ...fieldProps
 }) => {
-  const [date, setDate] = useState(defaultValue);
+  const onClear = () => onChange(null);
 
-  const onClear = () => setDate(null);
+  const formatDate = (dateToFormat) => {
+    if (!dateToFormat) {
+      return null;
+    }
+
+    return moment(dateToFormat).format(DateFormat.LL);
+  };
 
   return (
     <InputWrapper
@@ -40,10 +47,9 @@ const DateField = ({
         customInput={<DateFieldInput onClear={onClear} />}
         className={`form-element-input ${errorMessage ? 'has-errors' : ''} ${className}`}
         dropdownMode="scroll"
-        dateFormat={DateFormat.MMM_DD_YYYY}
+        dateFormat={DateFormat.LL}
         timeFormat={TimeFormat.HH_MM}
         disabled={disabled}
-        selected={date}
         timeIntervals={15}
         yearDropdownItemNumber={3}
         showYearDropdown
@@ -51,7 +57,8 @@ const DateField = ({
         utcOffset={0}
         placeholderText={placeholder}
         {...fieldProps}
-        onChange={(val) => fieldProps?.onChange?.(val?.format(DateFormat.MMM_DD_YYYY))}
+        value={formatDate(value)}
+        onChange={(val) => onChange?.(val?.format(DateFormat.LL))}
       />
     </InputWrapper>
   );
@@ -86,7 +93,8 @@ DateField.propTypes = {
   // Text displayed within input field
   placeholder: PropTypes.string,
   className: PropTypes.string,
-  defaultValue: PropTypes.string,
+  value: PropTypes.string,
+  onChange: PropTypes.func,
 };
 
 DateField.defaultProps = {
@@ -98,5 +106,6 @@ DateField.defaultProps = {
   disabled: false,
   placeholder: '',
   className: '',
-  defaultValue: null,
+  value: null,
+  onChange: () => {},
 };
