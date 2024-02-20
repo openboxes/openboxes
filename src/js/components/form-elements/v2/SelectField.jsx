@@ -7,6 +7,7 @@ import Select from 'utils/Select';
 import InputWrapper from 'wrappers/InputWrapper';
 
 import './style.scss';
+import ProductSelect from 'components/product-select/ProductSelect';
 
 const SelectField = ({
   title,
