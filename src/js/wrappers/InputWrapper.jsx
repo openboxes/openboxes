@@ -16,11 +16,15 @@ const InputWrapper = ({
   title,
   errorMessage,
   className,
+  inputId,
+  labelPosition,
 }) => (
-  <div className={`input-wrapper-container ${className}`}>
-    <div>
-      <div className="input-wrapper-title">
-        {title && <Translate id={title?.id} defaultMessage={title?.defaultMessage} />}
+  <div className={`input-wrapper-container ${className} input-wrapper-label-position-${labelPosition}`}>
+    <div className="input-wrapper-title">
+      <div className="input-wrapper-label">
+        <label htmlFor={inputId} className="m-0">
+          {title && <Translate id={title?.id} defaultMessage={title?.defaultMessage} />}
+        </label>
         {tooltip && (
         <Tooltip
           html={(
@@ -29,10 +33,10 @@ const InputWrapper = ({
             </span>
               )}
         >
-          <RiQuestionLine />
+          <RiQuestionLine className="ml-1" />
         </Tooltip>
         )}
-        {required && <span className="input-wrapper-asterisk">&#42;</span>}
+        {required && <span className="input-wrapper-asterisk ml-1">&#42;</span>}
       </div>
       {button && (
       <div
@@ -77,6 +81,10 @@ InputWrapper.propTypes = {
   // Message displayed under the input
   errorMessage: PropTypes.string,
   className: PropTypes.string,
+  // id of an input element to be mapped to label tag
+  inputId: PropTypes.string,
+  // input label position
+  labelPosition: PropTypes.oneOf(['top', 'bottom', 'left', 'right']),
 };
 
 InputWrapper.defaultProps = {
@@ -86,4 +94,6 @@ InputWrapper.defaultProps = {
   button: null,
   errorMessage: null,
   className: '',
+  inputId: undefined,
+  labelPosition: 'top',
 };

@@ -1,4 +1,6 @@
 .input-wrapper-container {
+  display: flex;
+  flex-direction: column;
   width: 100%;
   font-weight: 600;
   font-size: 12px;
@@ -12,13 +14,16 @@
 
   & > div {
     display: flex;
-    justify-content: space-between;
+  }
+
+  .input-wrapper-label {
+    display: flex;
   }
 
   .input-wrapper-title {
     display: flex;
     flex-direction: row;
-    gap: 3px;
+    justify-content: space-between;
   }
 
   .input-wrapper-asterisk {
@@ -32,6 +37,40 @@
   }
 
   .input-wrapper-error-message {
+    order: 2;
     color: var(--color-red);
+  }
+}
+
+.input-wrapper-label-position {
+  &-top .input-wrapper-title {
+    order: 0;
+  }
+  &-bottom .input-wrapper-title {
+    order: 1;
+  }
+  &-left {
+    align-items: center;
+    flex-direction: row;
+    flex-wrap: wrap;
+    padding-top: 1rem;
+
+    .input-wrapper-error-message {
+      width: 100%;
+    }
+  }
+  &-right {
+    align-items: center;
+    flex-direction: row;
+    flex-wrap: wrap;
+    padding-top: 1rem;
+
+    .input-wrapper-title {
+      order: 1;
+    }
+
+    .input-wrapper-error-message {
+      width: 100%;
+    }
   }
 }
