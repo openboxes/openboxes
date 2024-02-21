@@ -102,6 +102,15 @@ const useProductSupplierValidation = () => {
       eachPrice: z
         .number()
         .optional(),
+      contractPriceEach: z
+        .number()
+        .optional(),
+      priceValidUntil: z
+        .number()
+        .optional(),
+      tieredPricing: z
+        .number()
+        .optional(),
     });
 
   return {
