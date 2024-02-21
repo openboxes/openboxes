@@ -52,6 +52,7 @@ import genericApi from 'api/services/GenericApi';
 import locationApi from 'api/services/LocationApi';
 import productSupplierApi from 'api/services/ProductSupplierApi';
 import purchaseOrderApi from 'api/services/PurchaseOrderApi';
+import unitOfMeasureApi from 'api/services/UnitOfMeasureApi';
 import userApi from 'api/services/UserApi';
 import { ORGANIZATION_API } from 'api/urls';
 import RoleType from 'consts/roleType';
@@ -106,9 +107,8 @@ export function fetchReasonCodes() {
 }
 
 export function fetchCurrencies() {
-  const url = '/api/unitOfMeasure/currencies';
   return (dispatch) => {
-    apiClient.get(url).then((res) => {
+    unitOfMeasureApi.getCurrenciesOptions().then((res) => {
       dispatch({
         type: FETCH_CURRENCIES,
         payload: res.data,
