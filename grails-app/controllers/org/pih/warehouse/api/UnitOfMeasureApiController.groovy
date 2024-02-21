@@ -10,13 +10,27 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
+import org.pih.warehouse.core.UnitOfMeasure
 
 class UnitOfMeasureApiController extends BaseDomainApiController {
 
     def uomService
+    GenericApiService genericApiService
 
     def currencies() {
         def currencies = uomService.getCurrencies()
         render ([data:currencies] as JSON)
      }
+
+    def uomOptions() {
+        List<Map<String, String>> uoms = genericApiService.getList(UnitOfMeasure.class.simpleName, [:]).collect {
+            [
+                id: it.id,
+                value: it.id,
+                label: it.name
+            ]
+        }
+
+        render([data: uoms] as JSON)
+    }
 }

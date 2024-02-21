@@ -446,6 +446,16 @@ class UrlMappings {
             action = [GET:"currencies"]
         }
 
+        "/api/unitOfMeasures/currencies" {
+            controller = "unitOfMeasureApi"
+            action = [GET: "currencies"]
+        }
+
+        "/api/unitOfMeasures/options" {
+            controller = "unitOfMeasureApi"
+            action = [GET: "uomOptions"]
+        }
+
         // Invoice API
         "/api/invoices/$id/items"(parseRequest: true) {
             controller = "invoiceApi"
