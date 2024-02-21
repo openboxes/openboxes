@@ -24,7 +24,7 @@ const ProductSupplierFormMain = ({ formProps }) => {
       />
       <PreferenceTypeSection
         control={control}
-        errors={errors}
+        errors={errors.productSupplierPreferences}
       />
     </div>
   );
@@ -49,6 +49,23 @@ ProductSupplierFormMain.propTypes = {
       product: PropTypes.shape({
         message: PropTypes.string,
       }),
+      productSupplierPreferences: PropTypes.arrayOf(PropTypes.shape({
+        destinationParty: PropTypes.shape({
+          message: PropTypes.string,
+        }),
+        preferenceType: PropTypes.shape({
+          message: PropTypes.string,
+        }),
+        validityStartDate: PropTypes.shape({
+          message: PropTypes.string,
+        }),
+        validityEndDate: PropTypes.shape({
+          message: PropTypes.string,
+        }),
+        bidName: PropTypes.shape({
+          message: PropTypes.string,
+        }),
+      })),
     }),
     mockedRatingTypeCodes: PropTypes.shape({
       id: PropTypes.string.isRequired,

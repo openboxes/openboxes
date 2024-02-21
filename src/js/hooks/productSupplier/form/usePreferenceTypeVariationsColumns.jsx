@@ -2,6 +2,7 @@ import React, { useEffect, useMemo } from 'react';
 
 import { Controller } from 'react-hook-form';
 import { RiDeleteBinLine } from 'react-icons/ri';
+import { getTranslate } from 'react-localize-redux';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { fetchBuyers, fetchPreferenceTypes } from 'actions';
@@ -9,9 +10,8 @@ import DateField from 'components/form-elements/v2/DateField';
 import SelectField from 'components/form-elements/v2/SelectField';
 import TextInput from 'components/form-elements/v2/TextInput';
 import { translateWithDefaultMessage } from 'utils/Translate';
-import { getTranslate } from 'react-localize-redux';
 
-const usePreferenceTypeVariationsColumns = ({ productSupplierPreferences, control, remove }) => {
+const usePreferenceTypeVariationsColumns = ({ errors, control, remove }) => {
   const dispatch = useDispatch();
   const {
     preferenceTypes,
@@ -43,7 +43,7 @@ const usePreferenceTypeVariationsColumns = ({ productSupplierPreferences, contro
             <SelectField
               options={buyers}
               errorMessage={
-                productSupplierPreferences?.[row.index]?.destinationParty?.message
+                errors?.[row.index]?.destinationParty?.message
               }
               {...field}
             />
@@ -65,7 +65,7 @@ const usePreferenceTypeVariationsColumns = ({ productSupplierPreferences, contro
             <SelectField
               options={preferenceTypes}
               errorMessage={
-                productSupplierPreferences?.[row.index]?.preferenceType?.message
+                errors?.[row.index]?.preferenceType?.message
               }
               {...field}
             />
@@ -86,7 +86,7 @@ const usePreferenceTypeVariationsColumns = ({ productSupplierPreferences, contro
           render={({ field }) => (
             <DateField
               errorMessage={
-                productSupplierPreferences?.[row.index]?.validityEndDate?.message
+                errors?.[row.index]?.validityEndDate?.message
               }
               {...field}
             />
@@ -108,7 +108,7 @@ const usePreferenceTypeVariationsColumns = ({ productSupplierPreferences, contro
           render={({ field }) => (
             <DateField
               errorMessage={
-                productSupplierPreferences?.[row.index]?.validityStartDate?.message
+                errors?.[row.index]?.validityStartDate?.message
               }
               {...field}
             />
@@ -129,7 +129,7 @@ const usePreferenceTypeVariationsColumns = ({ productSupplierPreferences, contro
           render={({ field }) => (
             <TextInput
               errorMessage={
-                productSupplierPreferences?.[row.index]?.bidName?.message
+                errors?.[row.index]?.bidName?.message
               }
               {...field}
             />
@@ -150,9 +150,9 @@ const usePreferenceTypeVariationsColumns = ({ productSupplierPreferences, contro
         />
       ),
     },
-  ], [productSupplierPreferences]);
+  ], [errors]);
 
-  return { columns };
+  return { columns, translate };
 };
 
 export default usePreferenceTypeVariationsColumns;

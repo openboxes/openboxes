@@ -19,8 +19,8 @@ export default PreferenceTypeSection;
 
 PreferenceTypeSection.propTypes = {
   control: PropTypes.shape({}).isRequired,
-  errors: PropTypes.shape({
-    productSupplierPreferences: PropTypes.arrayOf(PropTypes.shape({
+  errors: PropTypes.arrayOf(
+    PropTypes.shape({
       destinationParty: PropTypes.shape({
         message: PropTypes.string,
       }),
@@ -36,6 +36,6 @@ PreferenceTypeSection.propTypes = {
       bidName: PropTypes.shape({
         message: PropTypes.string,
       }),
-    })),
-  }).isRequired,
+    }),
+  ).isRequired,
 };

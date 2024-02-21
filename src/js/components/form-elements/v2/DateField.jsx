@@ -33,7 +33,7 @@ const DateField = ({
       return null;
     }
 
-    return moment(dateToFormat).format(DateFormat.LL);
+    return moment(dateToFormat).format(DateFormat.MMM_DD_YYYY);
   };
 
   return (
@@ -48,7 +48,7 @@ const DateField = ({
         customInput={<DateFieldInput onClear={onClear} />}
         className={`form-element-input ${errorMessage ? 'has-errors' : ''} ${className}`}
         dropdownMode="scroll"
-        dateFormat={DateFormat.LL}
+        dateFormat={DateFormat.MMM_DD_YYYY}
         timeFormat={TimeFormat.HH_MM}
         disabled={disabled}
         timeIntervals={15}
@@ -60,7 +60,7 @@ const DateField = ({
         popperContainer={RootPortalWrapper}
         {...fieldProps}
         value={formatDate(value)}
-        onChange={(val) => onChange?.(val?.format(DateFormat.LL))}
+        onChange={(val) => onChange?.(val?.format(DateFormat.MMM_DD_YYYY))}
       />
     </InputWrapper>
   );

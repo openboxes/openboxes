@@ -4,5 +4,5 @@ export const TimeFormat = {
 
 export const DateFormat = {
   MM_DD_YYYY: 'MM/DD/YYYY',
-  LL: 'll',
+  MMM_DD_YYYY: 'MMM DD, yyyy',
 };

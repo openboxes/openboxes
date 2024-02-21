@@ -12,17 +12,25 @@ import InvalidItemsIndicator from 'components/productSupplier/create/InvalidItem
 import usePreferenceTypeVariationsColumns
   from 'hooks/productSupplier/form/usePreferenceTypeVariationsColumns';
 
-const PreferenceTypeVariations = ({ control, errors: { productSupplierPreferences } }) => {
+const PreferenceTypeVariations = ({ control, errors }) => {
   const { fields, remove, append } = useFieldArray({
     control,
     name: 'productSupplierPreferences',
   });
 
-  const { columns } = usePreferenceTypeVariationsColumns({
-    productSupplierPreferences,
+  const { columns, translate } = usePreferenceTypeVariationsColumns({
+    errors,
     control,
     remove,
   });
+
+  const defualtTableRow = {
+    destinationParty: {},
+    preferenceType: {},
+    validityStartDate: '',
+    validityEndDate: '',
+    bidName: '',
+  };
 
   return (
     <Subsection
@@ -34,18 +42,12 @@ const PreferenceTypeVariations = ({ control, errors: { productSupplierPreference
     >
       <div className="preference-type-variations-subsection">
         <div className="d-flex justify-content-end align-items-center mb-3">
-          <InvalidItemsIndicator className="mr-3" errorsCounter={_.filter(productSupplierPreferences)?.length} />
+          <InvalidItemsIndicator className="mr-3" errorsCounter={_.filter(errors)?.length} />
           <Button
-            onClick={() => append({
-              destinationParty: {},
-              preferenceType: {},
-              validityStartDate: '',
-              validityEndDate: '',
-              bidName: '',
-            })}
+            onClick={() => append(defualtTableRow)}
             StartIcon={<RiAddLine className="button-add-icon" />}
             defaultLabel="Add new"
-            label="Add new"
+            label="react.productSupplier.table.addNew.label"
           />
         </div>
         <DataTable
@@ -54,7 +56,10 @@ const PreferenceTypeVariations = ({ control, errors: { productSupplierPreference
           defaultPageSize={4}
           pageSize={fields.length <= 4 ? 4 : fields.length}
           showPagination={false}
-          noDataText="No Preference Type Variations to display"
+          noDataText={translate(
+            'react.productSupplier.table.empty.label',
+            'No Preference Type Variations to display',
+          )}
           loading={false}
         />
       </div>
@@ -66,25 +71,23 @@ export default PreferenceTypeVariations;
 
 PreferenceTypeVariations.propTypes = {
   control: PropTypes.shape({}).isRequired,
-  errors: PropTypes.shape({
-    productSupplierPreferences: PropTypes.arrayOf(
-      PropTypes.shape({
-        destinationParty: PropTypes.shape({
-          message: PropTypes.string,
-        }),
-        preferenceType: PropTypes.shape({
-          message: PropTypes.string,
-        }),
-        validityStartDate: PropTypes.shape({
-          message: PropTypes.string,
-        }),
-        validityEndDate: PropTypes.shape({
-          message: PropTypes.string,
-        }),
-        bidName: PropTypes.shape({
-          message: PropTypes.string,
-        }),
+  errors: PropTypes.arrayOf(
+    PropTypes.shape({
+      destinationParty: PropTypes.shape({
+        message: PropTypes.string,
       }),
-    ),
-  }).isRequired,
+      preferenceType: PropTypes.shape({
+        message: PropTypes.string,
+      }),
+      validityStartDate: PropTypes.shape({
+        message: PropTypes.string,
+      }),
+      validityEndDate: PropTypes.shape({
+        message: PropTypes.string,
+      }),
+      bidName: PropTypes.shape({
+        message: PropTypes.string,
+      }),
+    }),
+  ).isRequired,
 };

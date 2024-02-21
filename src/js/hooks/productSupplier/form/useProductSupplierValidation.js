@@ -68,9 +68,18 @@ const useProductSupplierValidation = () => {
           invalid_type_error: 'Preference type is required',
           required_error: 'Preference type is required',
         }).required(),
-        validityEndDate: z.string().optional().nullable(),
-        validityStartDate: z.string().optional().nullable(),
-        bidName: z.string().optional().nullable(),
+        validityEndDate: z
+          .string()
+          .optional()
+          .nullable(),
+        validityStartDate: z
+          .string()
+          .optional()
+          .nullable(),
+        bidName: z
+          .string()
+          .optional()
+          .nullable(),
       })),
     });
 
