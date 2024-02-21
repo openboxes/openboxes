@@ -6,14 +6,13 @@ import InputWrapper from 'wrappers/InputWrapper';
 
 import './style.scss';
 
-const TextInput = ({
+const CheckBox = ({
   title,
   tooltip,
-  required,
   button,
   disabled,
   errorMessage,
-  placeholder,
+  labelPosition,
   id,
   name,
   ...fieldProps
@@ -21,32 +20,32 @@ const TextInput = ({
   <InputWrapper
     title={title}
     tooltip={tooltip}
-    required={required}
     button={button}
-    inputId={id || name}
     errorMessage={errorMessage}
+    inputId={id || name}
+    labelPosition={labelPosition}
   >
-    <input
-      id={id || name}
-      name={name}
-      disabled={disabled}
-      className={`form-element-input ${errorMessage ? 'has-errors' : ''}`}
-      placeholder={placeholder}
-      {...fieldProps}
-    />
+    <div className="form-element-checkbox ">
+      <input
+        id={id || name}
+        name={name}
+        type="checkbox"
+        disabled={disabled}
+        className={`${errorMessage ? 'has-errors' : ''}`}
+        {...fieldProps}
+      />
+    </div>
   </InputWrapper>
 );
 
-export default TextInput;
+export default CheckBox;
 
-TextInput.propTypes = {
+CheckBox.propTypes = {
   // Message which will be shown on the tooltip above the field
   tooltip: PropTypes.shape({
     id: PropTypes.string.isRequired,
     defaultMessage: PropTypes.string.isRequired,
   }),
-  // Indicator whether the red asterisk has to be shown
-  required: PropTypes.bool,
   // Title displayed above the field
   title: PropTypes.shape({
     id: PropTypes.string.isRequired,
@@ -63,22 +62,21 @@ TextInput.propTypes = {
   // If the errorMessage is not empty then the field is bordered
   // and the message is displayed under the input
   errorMessage: PropTypes.string,
-  // Text displayed within input field
-  placeholder: PropTypes.string,
+  // position of input label
+  labelPosition: PropTypes.oneOf(['top', 'bottom', 'left', 'right']),
   // html element id
   id: PropTypes.string,
   // html element name
   name: PropTypes.string,
 };
 
-TextInput.defaultProps = {
+CheckBox.defaultProps = {
   tooltip: null,
-  required: false,
   title: null,
   button: null,
   errorMessage: null,
   disabled: false,
-  placeholder: '',
   id: undefined,
   name: undefined,
+  labelPosition: 'right',
 };
