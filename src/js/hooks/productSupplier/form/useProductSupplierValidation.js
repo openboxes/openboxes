@@ -81,6 +81,27 @@ const useProductSupplierValidation = () => {
           .optional()
           .nullable(),
       })),
+      defaultSourcePackage: z
+        .object({
+          id: z.string(),
+          value: z.string(),
+          label: z.string(),
+        }, {
+          invalid_type_error: 'Default Source Package is required',
+          required_error: 'Default Source Package is required',
+        })
+        .required(),
+      packageSize: z
+        .string({ required_error: 'Package size is required' }),
+      minimumOrderQuantity: z
+        .number()
+        .optional(),
+      packagePrice: z
+        .number()
+        .optional(),
+      eachPrice: z
+        .number()
+        .optional(),
     });
 
   return {

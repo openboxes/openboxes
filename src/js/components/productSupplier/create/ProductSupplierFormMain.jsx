@@ -27,6 +27,10 @@ const ProductSupplierFormMain = ({ formProps }) => {
         errors={errors.productSupplierPreferences}
       />
       <PricingSection />
+      <PricingSection
+        control={control}
+        errors={errors}
+      />
     </div>
   );
 };
@@ -48,6 +52,21 @@ ProductSupplierFormMain.propTypes = {
         message: PropTypes.string,
       }),
       product: PropTypes.shape({
+        message: PropTypes.string,
+      }),
+      defaultSourcePackage: PropTypes.shape({
+        message: PropTypes.string,
+      }),
+      packageSize: PropTypes.shape({
+        message: PropTypes.string,
+      }),
+      minimumOrderQuantity: PropTypes.shape({
+        message: PropTypes.string,
+      }),
+      packagePrice: PropTypes.shape({
+        message: PropTypes.string,
+      }),
+      eachPrice: PropTypes.shape({
         message: PropTypes.string,
       }),
       productSupplierPreferences: PropTypes.arrayOf(PropTypes.shape({

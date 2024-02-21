@@ -3,17 +3,24 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import Section from 'components/Layout/v2/Section';
-import PackageSpecification from 'components/productSupplier/create/subsections/PackageSpecification';
+import PackageSpecification
+  from 'components/productSupplier/create/subsections/PackageSpecification';
 import FixedPrice from 'components/productSupplier/create/subsections/FixedPrice';
 
-const PricingSection = ({ control, errors, mockedRatingTypeCodes }) => (
+const PricingSection = ({ control, errors }) => (
   <Section title={{
     label: 'react.productSupplier.form.section.pricing',
     defaultMessage: 'Pricing',
   }}
   >
-    <PackageSpecification />
-    <FixedPrice />
+    <PackageSpecification
+      control={control}
+      errors={errors}
+    />
+    <FixedPrice
+      control={control}
+      errors={errors}
+    />
   </Section>
 );
 
@@ -22,22 +29,20 @@ export default PricingSection;
 PricingSection.propTypes = {
   control: PropTypes.shape({}).isRequired,
   errors: PropTypes.shape({
-    supplier: PropTypes.shape({
+    defaultSourcePackage: PropTypes.shape({
       message: PropTypes.string,
     }),
-    name: PropTypes.shape({
+    packageSize: PropTypes.shape({
       message: PropTypes.string,
     }),
-    supplierCode: PropTypes.shape({
+    minimumOrderQuantity: PropTypes.shape({
       message: PropTypes.string,
     }),
-    product: PropTypes.shape({
+    packagePrice: PropTypes.shape({
       message: PropTypes.string,
     }),
-  }).isRequired,
-  mockedRatingTypeCodes: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    value: PropTypes.string.isRequired,
-    label: PropTypes.string.isRequired,
+    eachPrice: PropTypes.shape({
+      message: PropTypes.string,
+    }),
   }).isRequired,
 };
