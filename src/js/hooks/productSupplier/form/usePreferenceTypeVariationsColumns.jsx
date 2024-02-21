@@ -150,7 +150,7 @@ const usePreferenceTypeVariationsColumns = ({ errors, control, remove }) => {
         />
       ),
     },
-  ], [errors]);
+  ], [errors, buyers, preferenceTypes]);
 
   return { columns, translate };
 };

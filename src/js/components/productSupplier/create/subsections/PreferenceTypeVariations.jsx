@@ -24,7 +24,7 @@ const PreferenceTypeVariations = ({ control, errors }) => {
     remove,
   });
 
-  const defualtTableRow = {
+  const defaultTableRow = {
     destinationParty: {},
     preferenceType: {},
     validityStartDate: '',
@@ -44,7 +44,7 @@ const PreferenceTypeVariations = ({ control, errors }) => {
         <div className="d-flex justify-content-end align-items-center mb-3">
           <InvalidItemsIndicator className="mr-3" errorsCounter={_.filter(errors)?.length} />
           <Button
-            onClick={() => append(defualtTableRow)}
+            onClick={() => append(defaultTableRow)}
             StartIcon={<RiAddLine className="button-add-icon" />}
             defaultLabel="Add new"
             label="react.productSupplier.table.addNew.label"
