@@ -9,9 +9,11 @@
 **/
 package org.pih.warehouse.core
 
+import grails.gorm.transactions.Transactional
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductPackage
 
+@Transactional(readOnly = true)
 class UomService {
 
     ProductPackage getProductPackage(Product product, UnitOfMeasure unitOfMeasure, Integer quantity) {
@@ -27,6 +29,14 @@ class UomService {
         return UnitOfMeasure.createCriteria().list {
             uomClass {
                 eq("type", UnitOfMeasureType.CURRENCY)
+            }
+        }
+    }
+
+    List<UnitOfMeasure> getUoms(UnitOfMeasureType type) {
+        return UnitOfMeasure.createCriteria().list {
+            uomClass {
+                eq("type", type)
             }
         }
     }

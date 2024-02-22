@@ -111,4 +111,5 @@ export const PRODUCT_SUPPLIER_BY_ID = (id) => `${PRODUCT_SUPPLIER_API}/${id}`;
 
 // UNIT OF MEASURE
 export const UNIT_OF_MEASURE_API = `${API}/unitOfMeasures`;
-export const CURRENCIES_OPTIONS = `${UNIT_OF_MEASURE_API}/currencies`;
+// Currencies don't use url in plural form, do not change it to UNIT_OF_MEASURE_API!
+export const CURRENCIES_OPTIONS = `${API}/unitOfMeasure/currencies`;

@@ -446,11 +446,6 @@ class UrlMappings {
             action = [GET:"currencies"]
         }
 
-        "/api/unitOfMeasures/currencies" {
-            controller = "unitOfMeasureApi"
-            action = [GET: "currencies"]
-        }
-
         "/api/unitOfMeasures/options" {
             controller = "unitOfMeasureApi"
             action = [GET: "uomOptions"]
