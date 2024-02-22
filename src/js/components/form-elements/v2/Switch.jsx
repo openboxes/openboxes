@@ -11,6 +11,7 @@ const Switch = ({
   defaultValue,
   titles,
   onChange,
+  className,
   ...fieldProps
 }) => {
   const [value, changeValue] = useState(fieldProps?.value ?? defaultValue);
@@ -30,7 +31,7 @@ const Switch = ({
   }, [fieldProps?.value]);
 
   return (
-    <div className="switch-container">
+    <div className={`switch-container ${className}`}>
       <label htmlFor={`toggle-${toggleId}`} className="switch">
         <input
           id={`toggle-${toggleId}`}
@@ -77,6 +78,7 @@ Switch.propTypes = {
     }),
   }),
   onChange: PropTypes.func,
+  className: PropTypes.string,
 };
 
 Switch.defaultProps = {
@@ -92,4 +94,5 @@ Switch.defaultProps = {
     },
   },
   onChange: () => {},
+  className: '',
 };

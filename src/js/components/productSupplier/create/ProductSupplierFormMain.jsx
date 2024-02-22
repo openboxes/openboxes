@@ -3,6 +3,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import DetailsSection from 'components/productSupplier/create/sections/DetailsSection';
+import PreferenceTypeSection
+  from 'components/productSupplier/create/sections/PreferenceTypeSection';
 
 import './styles.scss';
 
@@ -19,6 +21,10 @@ const ProductSupplierFormMain = ({ formProps }) => {
         control={control}
         errors={errors}
         mockedRatingTypeCodes={mockedRatingTypeCodes}
+      />
+      <PreferenceTypeSection
+        control={control}
+        errors={errors.productSupplierPreferences}
       />
     </div>
   );
@@ -43,6 +49,23 @@ ProductSupplierFormMain.propTypes = {
       product: PropTypes.shape({
         message: PropTypes.string,
       }),
+      productSupplierPreferences: PropTypes.arrayOf(PropTypes.shape({
+        destinationParty: PropTypes.shape({
+          message: PropTypes.string,
+        }),
+        preferenceType: PropTypes.shape({
+          message: PropTypes.string,
+        }),
+        validityStartDate: PropTypes.shape({
+          message: PropTypes.string,
+        }),
+        validityEndDate: PropTypes.shape({
+          message: PropTypes.string,
+        }),
+        bidName: PropTypes.shape({
+          message: PropTypes.string,
+        }),
+      })),
     }),
     mockedRatingTypeCodes: PropTypes.shape({
       id: PropTypes.string.isRequired,

@@ -5,6 +5,7 @@ import { useParams } from 'react-router-dom';
 import productSupplierApi from 'api/services/ProductSupplierApi';
 import useProductSupplierValidation from 'hooks/productSupplier/form/useProductSupplierValidation';
 import { omitEmptyValues } from 'utils/form-values-utils';
+import { splitPreferenceTypes } from 'utils/list-utils';
 
 const useProductSupplierForm = () => {
   const { validationSchema } = useProductSupplierValidation();
@@ -16,6 +17,7 @@ const useProductSupplierForm = () => {
     const response =
       await productSupplierApi.getProductSupplier(productSupplierId);
     const productSupplier = response?.data?.data;
+    const { preferenceTypes } = splitPreferenceTypes(productSupplier?.productSupplierPreferences);
     return {
       // Exclude null/empty values
       ...omitEmptyValues(productSupplier),
@@ -44,6 +46,19 @@ const useProductSupplierForm = () => {
           label: productSupplier?.ratingTypeCode,
         }
         : undefined,
+      productSupplierPreferences: preferenceTypes.map((preferenceType) => ({
+        ...preferenceType,
+        destinationParty: {
+          id: preferenceType.destinationParty?.id,
+          label: preferenceType.destinationParty?.name,
+          value: preferenceType.destinationParty?.id,
+        },
+        preferenceType: {
+          id: preferenceType.preferenceType?.id,
+          label: preferenceType.preferenceType?.name,
+          value: preferenceType.preferenceType?.id,
+        },
+      })),
     };
   };
 
@@ -86,6 +101,7 @@ const useProductSupplierForm = () => {
       supplier: values?.supplier ? values.supplier.id : null,
       manufacturer: values?.manufacturer ? values.manufacturer.id : null,
       ratingTypeCode: values?.ratingTypeCode ? values.ratingTypeCode.id : null,
+      productSupplierPreferences: values?.productSupplierPreferences,
     };
     // If values contain id, it means we are editing
     if (values?.id) {

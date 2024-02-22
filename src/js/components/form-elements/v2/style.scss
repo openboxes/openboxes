@@ -115,8 +115,15 @@ input, .date-field-input {
   }
 
   .form-element-input {
+    background-color: white;
     position: relative;
     display: flex;
+
+    span {
+      font-weight: 500;
+      font-size: 14px;
+      color: var(--gray-600);
+    }
 
     &.disabled {
       background-color: var(--blue-100);
@@ -152,6 +159,11 @@ input, .date-field-input {
     .react-select__value-container {
       font-size: 14px;
       font-weight: 400;
+
+      span {
+        font-size: 14px;
+        color: var(--gray-600);
+      }
     }
 
     &.react-select__control--is-focused {
@@ -164,8 +176,14 @@ input, .date-field-input {
       background-color: var(--gray-400);
     }
 
-    svg {
-      color: var(--gray-400);
+    .react-select__indicators {
+
+      svg {
+        height: 16px;
+        width: 16px;
+        cursor: pointer;
+        color: var(--gray-400);
+      }
     }
   }
 

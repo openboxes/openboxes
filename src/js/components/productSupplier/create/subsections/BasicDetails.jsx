@@ -55,9 +55,11 @@ const BasicDetails = ({ control, errors }) => {
           render={({ field }) => (
             <SelectField
               title={{ id: 'react.productSupplier.form.product.title', defaultMessage: 'Product Name' }}
+              productSelect
               placeholder="Search for a product"
               required
               async
+              showSelectedOptionColor
               errorMessage={errors.product?.message}
               button={product
                 ? {
@@ -163,6 +165,7 @@ const BasicDetails = ({ control, errors }) => {
           control={control}
           render={({ field }) => (
             <Switch
+              className="basic-details-active-switch"
               titles={{
                 checked: {
                   id: 'react.productSupplier.form.active.title',

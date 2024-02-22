@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 
 import PropTypes from 'prop-types';
 
+import ProductSelect from 'components/product-select/ProductSelect';
 import Select from 'utils/Select';
 import InputWrapper from 'wrappers/InputWrapper';
 
@@ -21,6 +22,7 @@ const SelectField = ({
   defaultValue,
   multiple,
   onChange,
+  productSelect,
   ...fieldProps
 }) => {
   const [value, setValue] = useState(defaultValue);
@@ -37,6 +39,8 @@ const SelectField = ({
     setValue(selectedOption);
   };
 
+  const SelectComponent = productSelect ? ProductSelect : Select;
+
   return (
     <InputWrapper
       title={title}
@@ -46,7 +50,7 @@ const SelectField = ({
       required={required}
       className="select-wrapper-container"
     >
-      <Select
+      <SelectComponent
         className={`form-element-select ${errorMessage ? 'has-errors' : ''}`}
         disabled={disabled}
         placeholder={placeholder}
@@ -100,6 +104,7 @@ SelectField.propTypes = {
   multiple: PropTypes.bool,
   // Function triggered on change
   onChange: PropTypes.func,
+  productSelect: PropTypes.bool,
 };
 
 SelectField.defaultProps = {
@@ -116,4 +121,5 @@ SelectField.defaultProps = {
   defaultValue: null,
   multiple: false,
   onChange: () => {},
+  productSelect: false,
 };

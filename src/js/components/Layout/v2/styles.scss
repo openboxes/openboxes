@@ -1,3 +1,9 @@
+@mixin section-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--blue-primary);
+}
+
 .v2-section {
   border-radius: 4px;
   padding: 24px;
@@ -7,10 +13,8 @@
   gap: 8px;
 
 
-  span {
-    font-size: 18px;
-    font-weight: 600;
-    color: var(--blue-primary);
+  .v2-section-title {
+    @include section-title;
   }
 
   .v2-subsection {
@@ -19,6 +23,7 @@
     .subsection-title-wrapper {
       padding: 16px 0 16px 0;
       border-bottom: 1px solid var(--gray-250);
+      @include section-title;
 
       > span {
         display: flex;
