@@ -33,9 +33,8 @@ const InputWrapper = ({
             </span>
               )}
         >
-          <RiQuestionLine className="ml-1" />
           <span className="input-wrapper-tooltip">
-            <RiQuestionLine />
+            <RiQuestionLine className="ml-1" />
           </span>
         </Tooltip>
         )}
