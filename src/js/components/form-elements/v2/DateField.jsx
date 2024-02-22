@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
+import React from 'react';
 
+import moment from 'moment';
 import PropTypes from 'prop-types';
 import DatePicker from 'react-datepicker';
 
 import DateFieldInput from 'components/form-elements/v2/DateFieldInput';
 import { DateFormat, TimeFormat } from 'consts/timeFormat';
 import InputWrapper from 'wrappers/InputWrapper';
+import RootPortalWrapper from 'wrappers/RootPortalWrapper';
 
 import 'react-datepicker/dist/react-datepicker.css';
 import 'components/form-elements/DateFilter/DateFilter.scss';
@@ -20,12 +22,19 @@ const DateField = ({
   placeholder,
   button,
   className,
-  defaultValue,
+  value,
+  onChange,
   ...fieldProps
 }) => {
-  const [date, setDate] = useState(defaultValue);
+  const onClear = () => onChange(null);
 
-  const onClear = () => setDate(null);
+  const formatDate = (dateToFormat) => {
+    if (!dateToFormat) {
+      return null;
+    }
+
+    return moment(dateToFormat).format(DateFormat.MMM_DD_YYYY);
+  };
 
   return (
     <InputWrapper
@@ -42,15 +51,16 @@ const DateField = ({
         dateFormat={DateFormat.MMM_DD_YYYY}
         timeFormat={TimeFormat.HH_MM}
         disabled={disabled}
-        selected={date}
         timeIntervals={15}
         yearDropdownItemNumber={3}
         showYearDropdown
         scrollableYearDropdown
         utcOffset={0}
         placeholderText={placeholder}
+        popperContainer={RootPortalWrapper}
         {...fieldProps}
-        onChange={(val) => fieldProps?.onChange?.(val?.format(DateFormat.MM_DD_YYYY))}
+        value={formatDate(value)}
+        onChange={(val) => onChange?.(val?.format(DateFormat.MMM_DD_YYYY))}
       />
     </InputWrapper>
   );
@@ -85,7 +95,8 @@ DateField.propTypes = {
   // Text displayed within input field
   placeholder: PropTypes.string,
   className: PropTypes.string,
-  defaultValue: PropTypes.string,
+  value: PropTypes.string,
+  onChange: PropTypes.func,
 };
 
 DateField.defaultProps = {
@@ -97,5 +108,6 @@ DateField.defaultProps = {
   disabled: false,
   placeholder: '',
   className: '',
-  defaultValue: null,
+  value: null,
+  onChange: () => {},
 };
