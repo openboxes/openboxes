@@ -10,12 +10,11 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
-import org.pih.warehouse.core.UnitOfMeasure
+import org.pih.warehouse.core.UnitOfMeasureType
 
 class UnitOfMeasureApiController extends BaseDomainApiController {
 
     def uomService
-    GenericApiService genericApiService
 
     def currencies() {
         def currencies = uomService.getCurrencies()
@@ -23,7 +22,8 @@ class UnitOfMeasureApiController extends BaseDomainApiController {
      }
 
     def uomOptions() {
-        List<Map<String, String>> uoms = genericApiService.getList(UnitOfMeasure.class.simpleName, [:]).collect {
+        UnitOfMeasureType uomType = UnitOfMeasureType.valueOf(params.type)
+        List<Map<String, String>> uoms = uomService.getUoms(uomType).collect {
             [
                 id: it.id,
                 value: it.id,
