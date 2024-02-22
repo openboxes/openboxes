@@ -30,6 +30,7 @@ import {
   FETCH_SHIPMENT_TYPES,
   FETCH_STOCK_TRANSFER_STATUSES,
   FETCH_SUPPLIERS,
+  FETCH_UNIT_OF_MEASURE,
   FETCH_USERS,
   FILTER_FORM_PARAMS_BUILT,
   HIDE_INFO_BAR,
@@ -112,6 +113,17 @@ export function fetchCurrencies() {
       dispatch({
         type: FETCH_CURRENCIES,
         payload: res.data,
+      });
+    });
+  };
+}
+
+export function fetchUoM() {
+  return (dispatch) => {
+    unitOfMeasureApi.getUnitOfMeasureOptions().then((res) => {
+      dispatch({
+        type: FETCH_UNIT_OF_MEASURE,
+        payload: res?.data,
       });
     });
   };

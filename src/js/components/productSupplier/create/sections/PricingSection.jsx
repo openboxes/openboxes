@@ -3,9 +3,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import Section from 'components/Layout/v2/Section';
+import FixedPrice from 'components/productSupplier/create/subsections/FixedPrice';
 import PackageSpecification
   from 'components/productSupplier/create/subsections/PackageSpecification';
-import FixedPrice from 'components/productSupplier/create/subsections/FixedPrice';
 
 const PricingSection = ({ control, errors }) => (
   <Section title={{
