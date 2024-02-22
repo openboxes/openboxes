@@ -2,26 +2,25 @@ import React, { useEffect } from 'react';
 
 import PropTypes from 'prop-types';
 import { Controller } from 'react-hook-form';
+import { useDispatch, useSelector } from 'react-redux';
 
+import { fetchQuantityUoM } from 'actions';
 import SelectField from 'components/form-elements/v2/SelectField';
 import TextInput from 'components/form-elements/v2/TextInput';
 import Subsection from 'components/Layout/v2/Subsection';
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchUoM } from 'actions';
 
 const PackageSpecification = ({ control, errors }) => {
   const dispatch = useDispatch();
 
   const {
-    unitsOfMeasure,
+    quantityUoM,
   } = useSelector(state => ({
-    unitsOfMeasure: state.unitOfMeasure.unitsOfMeasure,
+    quantityUoM: state.unitOfMeasure.quantity,
   }));
 
   useEffect(() => {
-    dispatch(fetchUoM());
+    dispatch(fetchQuantityUoM());
   }, []);
-
 
   return (
     <Subsection
@@ -43,7 +42,7 @@ const PackageSpecification = ({ control, errors }) => {
                 id: 'react.productSupplier.form.defaultSourcePackage.title',
                 defaultMessage: 'Default Source Package',
               }}
-              options={unitsOfMeasure}
+              options={quantityUoM}
               errorMessage={errors.defaultSourcePackage?.message}
             />
           )}

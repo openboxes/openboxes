@@ -30,7 +30,8 @@ import {
   FETCH_SHIPMENT_TYPES,
   FETCH_STOCK_TRANSFER_STATUSES,
   FETCH_SUPPLIERS,
-  FETCH_UNIT_OF_MEASURE,
+  FETCH_UNIT_OF_MEASURE_CURRENCY,
+  FETCH_UNIT_OF_MEASURE_QUANTITY,
   FETCH_USERS,
   FILTER_FORM_PARAMS_BUILT,
   HIDE_INFO_BAR,
@@ -57,6 +58,7 @@ import purchaseOrderApi from 'api/services/PurchaseOrderApi';
 import unitOfMeasureApi from 'api/services/UnitOfMeasureApi';
 import userApi from 'api/services/UserApi';
 import RoleType from 'consts/roleType';
+import { UoMType } from 'consts/UoMType';
 import apiClient, { parseResponse } from 'utils/apiClient';
 import { mapShipmentTypes } from 'utils/option-utils';
 
@@ -118,11 +120,22 @@ export function fetchCurrencies() {
   };
 }
 
-export function fetchUoM() {
+export function fetchCurrencyUoM() {
   return (dispatch) => {
-    unitOfMeasureApi.getUnitOfMeasureOptions().then((res) => {
+    unitOfMeasureApi.getUnitOfMeasureOptions(UoMType.CURRENCY).then((res) => {
       dispatch({
-        type: FETCH_UNIT_OF_MEASURE,
+        type: FETCH_UNIT_OF_MEASURE_CURRENCY,
+        payload: res?.data,
+      });
+    });
+  };
+}
+
+export function fetchQuantityUoM() {
+  return (dispatch) => {
+    unitOfMeasureApi.getUnitOfMeasureOptions(UoMType.QUANTITY).then((res) => {
+      dispatch({
+        type: FETCH_UNIT_OF_MEASURE_QUANTITY,
         payload: res?.data,
       });
     });

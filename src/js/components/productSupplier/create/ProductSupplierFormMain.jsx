@@ -26,7 +26,6 @@ const ProductSupplierFormMain = ({ formProps }) => {
         control={control}
         errors={errors.productSupplierPreferences}
       />
-      <PricingSection />
       <PricingSection
         control={control}
         errors={errors}

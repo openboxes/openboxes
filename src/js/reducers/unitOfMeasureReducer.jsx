@@ -1,17 +1,22 @@
-import _ from 'lodash';
-
-import { FETCH_UNIT_OF_MEASURE } from 'actions/types';
+import { FETCH_UNIT_OF_MEASURE_CURRENCY, FETCH_UNIT_OF_MEASURE_QUANTITY } from 'actions/types';
 
 const initialState = {
-  unitsOfMeasure: [],
+  currency: [],
+  quantity: [],
 };
 
 export default function (state = initialState, action) {
   switch (action.type) {
-    case FETCH_UNIT_OF_MEASURE:
+    case FETCH_UNIT_OF_MEASURE_CURRENCY:
       if (action.payload !== undefined) {
         const unitsOfMeasure = action.payload.data;
-        return { ...state, unitsOfMeasure };
+        return { ...state, currency: unitsOfMeasure };
+      }
+      return state;
+    case FETCH_UNIT_OF_MEASURE_QUANTITY:
+      if (action.payload !== undefined) {
+        const unitsOfMeasure = action.payload.data;
+        return { ...state, quantity: unitsOfMeasure };
       }
       return state;
     default:

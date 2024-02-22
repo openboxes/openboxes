@@ -3,5 +3,7 @@ import apiClient from 'utils/apiClient';
 
 export default {
   getCurrenciesOptions: () => apiClient.get(CURRENCIES_OPTIONS),
-  getUnitOfMeasureOptions: () => apiClient.get(UNIT_OF_MEASURE_OPTIONS),
+  getUnitOfMeasureOptions: (type) => apiClient.get(UNIT_OF_MEASURE_OPTIONS, {
+    params: { type },
+  }),
 };
