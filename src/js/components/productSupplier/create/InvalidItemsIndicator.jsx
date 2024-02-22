@@ -2,22 +2,38 @@ import React from 'react';
 
 import PropTypes from 'prop-types';
 import { RiCheckboxCircleLine } from 'react-icons/all';
+import { RiErrorWarningLine } from 'react-icons/ri';
 
-import Translate from 'utils/Translate';
+import Button from 'components/form-elements/Button';
 
-const InvalidItemsIndicator = ({ className, errorsCounter }) => (
-  <div className={`invalid-items-indicator ${className}`}>
-    <span>
-      <RiCheckboxCircleLine className="mr-1" />
-      {errorsCounter}
-      {' '}
-      <Translate
-        id="react.productSupplier.form.invalidItemsIndicator.title"
-        defaultMessage="Item(s) require attention"
-      />
-    </span>
-  </div>
-);
+const InvalidItemsIndicator = ({ className, errorsCounter, setFilterInvalid }) => {
+  const { Icon, wrapperClassName, variant } = errorsCounter ? {
+    Icon: RiErrorWarningLine,
+    variant: 'danger',
+    wrapperClassName: 'is-invalid',
+  } : {
+    Icon: RiCheckboxCircleLine,
+    variant: 'transparent',
+    wrapperClassName: 'is-valid',
+  };
+
+  return (
+    <Button
+      variant={variant}
+      className={`invalid-items-indicator ${wrapperClassName} ${className}`}
+      label="react.productSupplier.form.invalidItemsIndicator.title"
+      defaultLabel="Item(s) require attention"
+      onClick={() => setFilterInvalid(prev => !prev)}
+      StartIcon={(
+        <>
+          <Icon />
+          {errorsCounter}
+          {' '}
+        </>
+      )}
+    />
+  );
+};
 
 export default InvalidItemsIndicator;
 

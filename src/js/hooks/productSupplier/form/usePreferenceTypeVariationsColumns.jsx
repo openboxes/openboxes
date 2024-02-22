@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo } from 'react';
 
 import { Controller } from 'react-hook-form';
-import { RiDeleteBinLine } from 'react-icons/ri';
+import { RiDeleteBinLine, RiErrorWarningLine } from 'react-icons/ri';
 import { getTranslate } from 'react-localize-redux';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -9,8 +9,7 @@ import { fetchBuyers, fetchPreferenceTypes } from 'actions';
 import DateField from 'components/form-elements/v2/DateField';
 import SelectField from 'components/form-elements/v2/SelectField';
 import TextInput from 'components/form-elements/v2/TextInput';
-import { translateWithDefaultMessage } from 'utils/Translate';
-import { getTranslate } from 'react-localize-redux';
+import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 const usePreferenceTypeVariationsColumns = ({ errors, control, remove }) => {
   const dispatch = useDispatch();
@@ -29,6 +28,18 @@ const usePreferenceTypeVariationsColumns = ({ errors, control, remove }) => {
     dispatch(fetchBuyers());
   }, []);
 
+  const getCustomSelectErrorPlaceholder = (id, defaultMessage) => (
+    <div className="custom-select-error-placeholder">
+      <RiErrorWarningLine />
+      <span>
+        <Translate
+          id={id}
+          defaultMessage={defaultMessage}
+        />
+      </span>
+    </div>
+  );
+
   const columns = useMemo(() => [
     {
       Header: translate('react.productSupplier.table.siteName.label', 'Site Name'),
@@ -43,9 +54,12 @@ const usePreferenceTypeVariationsColumns = ({ errors, control, remove }) => {
           render={({ field }) => (
             <SelectField
               options={buyers}
-              errorMessage={
-                errors?.[row.index]?.destinationParty?.message
-              }
+              errorMessage={errors?.[row.index]?.destinationParty?.message}
+              placeholder={getCustomSelectErrorPlaceholder(
+                'react.productSupplier.table.selectSite.label',
+                'Select Site',
+              )}
+              displayErrorMessage={false}
               {...field}
             />
           )}
@@ -65,9 +79,12 @@ const usePreferenceTypeVariationsColumns = ({ errors, control, remove }) => {
           render={({ field }) => (
             <SelectField
               options={preferenceTypes}
-              errorMessage={
-                errors?.[row.index]?.preferenceType?.message
-              }
+              errorMessage={errors?.[row.index]?.preferenceType?.message}
+              placeholder={getCustomSelectErrorPlaceholder(
+                'react.productSupplier.table.selectPreferenceType.label',
+                'Select Preference Type',
+              )}
+              displayErrorMessage={false}
               {...field}
             />
           )}
@@ -86,9 +103,7 @@ const usePreferenceTypeVariationsColumns = ({ errors, control, remove }) => {
           key={row.original.id}
           render={({ field }) => (
             <DateField
-              errorMessage={
-                errors?.[row.index]?.validityEndDate?.message
-              }
+              errorMessage={errors?.[row.index]?.validityEndDate?.message}
               {...field}
             />
           )}
@@ -108,9 +123,7 @@ const usePreferenceTypeVariationsColumns = ({ errors, control, remove }) => {
           key={row.original.id}
           render={({ field }) => (
             <DateField
-              errorMessage={
-                errors?.[row.index]?.validityStartDate?.message
-              }
+              errorMessage={errors?.[row.index]?.validityStartDate?.message}
               {...field}
             />
           )}
@@ -129,9 +142,7 @@ const usePreferenceTypeVariationsColumns = ({ errors, control, remove }) => {
           key={row.original.id}
           render={({ field }) => (
             <TextInput
-              errorMessage={
-                errors?.[row.index]?.bidName?.message
-              }
+              errorMessage={errors?.[row.index]?.bidName?.message}
               {...field}
             />
           )}

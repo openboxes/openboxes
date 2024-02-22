@@ -23,6 +23,7 @@ const SelectField = ({
   multiple,
   onChange,
   productSelect,
+  displayErrorMessage,
   ...fieldProps
 }) => {
   const [value, setValue] = useState(defaultValue);
@@ -44,7 +45,7 @@ const SelectField = ({
   return (
     <InputWrapper
       title={title}
-      errorMessage={errorMessage}
+      errorMessage={displayErrorMessage ? errorMessage : null}
       button={{ ...button, onClick: () => button.onClick(fieldProps?.value?.id ?? value) }}
       tooltip={tooltip}
       required={required}
@@ -105,6 +106,9 @@ SelectField.propTypes = {
   // Function triggered on change
   onChange: PropTypes.func,
   productSelect: PropTypes.bool,
+  // indicator whether message has to be displayed
+  // (when set to false, only red border will be visible)
+  displayErrorMessage: PropTypes.bool,
 };
 
 SelectField.defaultProps = {
@@ -122,4 +126,5 @@ SelectField.defaultProps = {
   multiple: false,
   onChange: () => {},
   productSelect: false,
+  displayErrorMessage: true,
 };

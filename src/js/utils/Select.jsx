@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, isValidElement } from 'react';
 
 import _ from 'lodash';
 import PropTypes from 'prop-types';
@@ -289,17 +289,23 @@ class Select extends Component {
     }
 
     const getPlaceholder = () => {
-      if (attributes.placeholder) {
-        return (
-          <Translate
-            id={attributes.placeholder}
-            defaultMessage={attributes.defaultPlaceholder ?? attributes.placeholder}
-          />
-        );
+      if (!attributes.placeholder) {
+        return null;
       }
-      return null;
-    };
 
+      // If we are passing HTML element we would like to use it as placeholder
+      // otherwise it should be an object with attributes for translation
+      if (isValidElement(attributes.placeholder)) {
+        return attributes.placeholder;
+      }
+
+      return (
+        <Translate
+          id={attributes.placeholder}
+          defaultMessage={attributes.defaultPlaceholder ?? attributes.placeholder}
+        />
+      );
+    };
 
     /* We would like to see the tooltip when an item
       has displayName or when the showLabelTooltip

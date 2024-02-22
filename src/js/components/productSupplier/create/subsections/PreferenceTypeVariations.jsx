@@ -42,7 +42,11 @@ const PreferenceTypeVariations = ({ control, errors }) => {
     >
       <div className="preference-type-variations-subsection">
         <div className="d-flex justify-content-end align-items-center mb-3">
-          <InvalidItemsIndicator className="mr-3" errorsCounter={_.filter(errors)?.length} />
+          <InvalidItemsIndicator
+            className="mr-3"
+            setFilterInvalid={setFilterInvalid}
+            errorsCounter={_.filter(errors)?.length}
+          />
           <Button
             onClick={() => append(defaultTableRow)}
             StartIcon={<RiAddLine className="button-add-icon" />}
@@ -61,6 +65,12 @@ const PreferenceTypeVariations = ({ control, errors }) => {
             'No Preference Type Variations to display',
           )}
           loading={false}
+          filterable
+          filterAll
+          defaultFilterMethod={(filter, row, column) => {
+            console.log(row)
+            return true;
+          }}
         />
       </div>
     </Subsection>
