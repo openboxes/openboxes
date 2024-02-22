@@ -12,7 +12,6 @@ import {
   FETCH_BUYERS,
   FETCH_CONFIG,
   FETCH_CONFIG_AND_SET_ACTIVE,
-  FETCH_CURRENCIES,
   FETCH_GRAPHS,
   FETCH_INVOICE_STATUSES,
   FETCH_INVOICE_TYPE_CODES,
@@ -113,19 +112,8 @@ export function fetchCurrencies() {
   return (dispatch) => {
     unitOfMeasureApi.getCurrenciesOptions().then((res) => {
       dispatch({
-        type: FETCH_CURRENCIES,
-        payload: res.data,
-      });
-    });
-  };
-}
-
-export function fetchCurrencyUoM() {
-  return (dispatch) => {
-    unitOfMeasureApi.getUnitOfMeasureOptions(UoMType.CURRENCY).then((res) => {
-      dispatch({
         type: FETCH_UNIT_OF_MEASURE_CURRENCY,
-        payload: res?.data,
+        payload: res.data,
       });
     });
   };

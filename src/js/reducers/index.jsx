@@ -3,7 +3,6 @@ import { combineReducers } from 'redux';
 
 import approversReducer from 'reducers/approversReducer';
 import connectionReducer from 'reducers/connectionReducer';
-import currenciesReducer from 'reducers/currenciesReducer';
 import filterFormReducer from 'reducers/filterFormReducer';
 import indicatorsReducer from 'reducers/indicatorsReducer';
 import infoBarReducer from 'reducers/infoBarReducer';
@@ -34,7 +33,6 @@ const rootReducer = combineReducers({
   approvers: approversReducer,
   session: sessionReducer,
   indicators: indicatorsReducer,
-  currencies: currenciesReducer,
   organizations: organizationsReducer,
   purchaseOrder: purchaseOrderReducer,
   invoices: invoiceReducer,
