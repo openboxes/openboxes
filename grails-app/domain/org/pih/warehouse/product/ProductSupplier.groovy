@@ -164,13 +164,14 @@ class ProductSupplier implements Serializable, Comparable<ProductSupplier> {
                 productCode: product.productCode
             ],
             code: code,
-            supplier: [
+            supplier: supplier ? [
                 id: supplier?.id,
                 name: supplier?.name,
+                code: supplier?.code,
                 displayName: supplier?.name
                         ? supplier.name + (supplier?.code ? " (${supplier.code})" : "")
                         : ""
-            ],
+            ] : null,
             supplierCode: supplierCode,
             productSupplierPreferences: productSupplierPreferences.collect { it.toJson() },
             packageSize: defaultProductPackage ? "${defaultProductPackage?.uom?.code}/${defaultProductPackage?.quantity}" : null,
@@ -181,7 +182,7 @@ class ProductSupplier implements Serializable, Comparable<ProductSupplier> {
             dateCreated: dateCreated,
             lastUpdated: lastUpdated,
             active: active,
-            ratingTypeCode: ratingTypeCode,
+            ratingTypeCode: ratingTypeCode?.name,
             manufacturer: manufacturer ? [
                 id: manufacturer?.id,
                 name: manufacturer?.name,

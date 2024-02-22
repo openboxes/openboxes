@@ -33,6 +33,7 @@ class ProductSupplierDetailsCommand implements Validateable {
     static constraints = {
         importFrom ProductSupplier
         supplier(nullable: false)
-        supplierCode(nullable: false)
+        supplierCode(nullable: false, blank: false)
+        name(nullable: false, blank: false)
     }
 }

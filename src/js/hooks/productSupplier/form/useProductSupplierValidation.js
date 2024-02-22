@@ -38,12 +38,14 @@ const useProductSupplierValidation = () => {
         id: z.string(),
         value: z.string(),
         label: z.string(),
-      }).optional(),
+      }).optional()
+        .nullable(),
       ratingTypeCode: z.object({
         id: z.string(),
         value: z.string(),
         label: z.string(),
-      }).optional(),
+      }).optional()
+        .nullable(),
       manufacturerCode: z
         .string()
         .optional(),

@@ -24,11 +24,12 @@ const useProductSupplierForm = () => {
         value: productSupplier?.product?.id,
         label: productSupplier?.product?.name,
       },
-      supplier: {
-        id: productSupplier?.supplier?.id,
-        value: productSupplier?.supplier?.id,
-        label: productSupplier?.supplier?.name,
-      },
+      supplier: productSupplier?.supplier
+        ? {
+          id: productSupplier?.supplier?.id,
+          value: productSupplier?.supplier?.id,
+          label: `${productSupplier?.supplier?.code} ${productSupplier?.supplier?.name}`,
+        } : undefined,
       manufacturer: productSupplier?.manufacturer
         ? {
           id: productSupplier?.manufacturer.id,
@@ -36,7 +37,13 @@ const useProductSupplierForm = () => {
           label: productSupplier?.manufacturer.name,
         }
         : undefined,
-      active: true,
+      ratingTypeCode: productSupplier?.ratingTypeCode
+        ? {
+          id: productSupplier?.ratingTypeCode,
+          value: productSupplier?.ratingTypeCode,
+          label: productSupplier?.ratingTypeCode,
+        }
+        : undefined,
     };
   };
 
