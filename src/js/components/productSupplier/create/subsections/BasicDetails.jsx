@@ -37,6 +37,7 @@ const BasicDetails = ({ control, errors }) => {
           render={({ field }) => (
             <TextInput
               title={{ id: 'react.productSupplier.form.code.title', defaultMessage: 'Source Code' }}
+              errorMessage={errors.code?.message}
               tooltip={{
                 id: 'react.productSupplier.form.code.tooltip',
                 defaultMessage: 'Unique code that identifies this record. ' +
@@ -53,7 +54,8 @@ const BasicDetails = ({ control, errors }) => {
           control={control}
           render={({ field }) => (
             <SelectField
-              title={{ id: 'react.productSupplier.form.product.title', defaultMessage: 'Product' }}
+              title={{ id: 'react.productSupplier.form.product.title', defaultMessage: 'Product Name' }}
+              placeholder="Search for a product"
               required
               async
               errorMessage={errors.product?.message}
@@ -75,6 +77,7 @@ const BasicDetails = ({ control, errors }) => {
           render={({ field }) => (
             <TextInput
               title={{ id: 'react.productSupplier.form.legacyCode.title', defaultMessage: 'Legacy Code' }}
+              errorMessage={errors.legacyCode?.message}
               tooltip={{
                 id: 'react.productSupplier.form.legacyCode.tooltip',
                 defaultMessage: 'Reference to this record in a previous or parallel purchasing system',
@@ -89,6 +92,7 @@ const BasicDetails = ({ control, errors }) => {
           render={({ field }) => (
             <SelectField
               title={{ id: 'react.productSupplier.form.supplier.title', defaultMessage: 'Supplier' }}
+              placeholder="Select Supplier"
               required
               errorMessage={errors.supplier?.message}
               tooltip={{ id: 'react.productSupplier.form.supplier.tooltip', defaultMessage: 'The company that supplies the product' }}
@@ -136,6 +140,7 @@ const BasicDetails = ({ control, errors }) => {
           render={({ field }) => (
             <DateField
               title={{ id: 'react.productSupplier.form.dateCreated.title', defaultMessage: 'Source Creation Date' }}
+              errorMessage={errors.dateCreated?.message}
               {...field}
               disabled
             />
@@ -147,6 +152,7 @@ const BasicDetails = ({ control, errors }) => {
           render={({ field }) => (
             <DateField
               title={{ id: 'react.productSupplier.form.lastUpdated.title', defaultMessage: 'Last Update' }}
+              errorMessage={errors.lastUpdated?.message}
               {...field}
               disabled
             />
@@ -181,6 +187,18 @@ export default BasicDetails;
 BasicDetails.propTypes = {
   control: PropTypes.shape({}).isRequired,
   errors: PropTypes.shape({
+    code: PropTypes.shape({
+      message: PropTypes.string,
+    }),
+    legacyCode: PropTypes.shape({
+      message: PropTypes.string,
+    }),
+    dateCreated: PropTypes.shape({
+      message: PropTypes.string,
+    }),
+    lastUpdated: PropTypes.shape({
+      message: PropTypes.string,
+    }),
     supplier: PropTypes.shape({
       message: PropTypes.string,
     }),

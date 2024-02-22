@@ -15,6 +15,7 @@ const DetailsSection = ({ control, errors, mockedRatingTypeCodes }) => (
     <AdditionalDetails
       control={control}
       mockedRatingTypeCodes={mockedRatingTypeCodes}
+      errors={errors}
     />
   </Section>
 );

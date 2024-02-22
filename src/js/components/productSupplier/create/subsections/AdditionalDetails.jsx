@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 
 import PropTypes from 'prop-types';
 import { Controller } from 'react-hook-form';
@@ -7,9 +7,10 @@ import { useSelector } from 'react-redux';
 import SelectField from 'components/form-elements/v2/SelectField';
 import TextInput from 'components/form-elements/v2/TextInput';
 import Subsection from 'components/Layout/v2/Subsection';
+import RoleType from 'consts/roleType';
 import { debounceOrganizationsFetch } from 'utils/option-utils';
 
-const AdditionalDetails = ({ control, mockedRatingTypeCodes }) => {
+const AdditionalDetails = ({ control, mockedRatingTypeCodes, errors }) => {
   const {
     debounceTime,
     minSearchLength,
@@ -17,6 +18,12 @@ const AdditionalDetails = ({ control, mockedRatingTypeCodes }) => {
     debounceTime: state.session.searchConfig.debounceTime,
     minSearchLength: state.session.searchConfig.minSearchLength,
   }));
+  const debounceManufacturersFetch =
+    useCallback(
+      debounceOrganizationsFetch(debounceTime, minSearchLength, [RoleType.ROLE_MANUFACTURER]),
+      [debounceTime, minSearchLength],
+    );
+
   return (
     <Subsection
       title={{ label: 'react.productSupplier.form.subsection.additionalDetails', defaultMessage: 'Additional Details' }}
@@ -28,8 +35,10 @@ const AdditionalDetails = ({ control, mockedRatingTypeCodes }) => {
           render={({ field }) => (
             <SelectField
               title={{ id: 'react.productSupplier.form.manufacturer.title', defaultMessage: 'Manufacturer' }}
+              placeholder="Search for a manufacturer"
               async
-              loadOptions={debounceOrganizationsFetch(debounceTime, minSearchLength)}
+              loadOptions={debounceManufacturersFetch}
+              errorMessage={errors.manufacturer?.message}
               {...field}
             />
           )}
@@ -40,11 +49,13 @@ const AdditionalDetails = ({ control, mockedRatingTypeCodes }) => {
           render={({ field }) => (
             <SelectField
               title={{ id: 'react.productSupplier.form.ratingTypeCode.title', defaultMessage: 'Rating Type' }}
+              placeholder="Select an option"
               tooltip={{
                 id: 'react.productSupplier.form.ratingTypeCode.tooltip',
                 defaultMessage: 'Product quality rating based on user feedback or sample review',
               }}
               options={mockedRatingTypeCodes}
+              errorMessage={errors.ratingTypeCode?.message}
               {...field}
             />
           )}
@@ -55,6 +66,7 @@ const AdditionalDetails = ({ control, mockedRatingTypeCodes }) => {
           render={({ field }) => (
             <TextInput
               title={{ id: 'react.productSupplier.form.manufacturerCode.title', defaultMessage: 'Manufacturer Code' }}
+              errorMessage={errors.manufacturerCode?.message}
               {...field}
             />
           )}
@@ -65,9 +77,10 @@ const AdditionalDetails = ({ control, mockedRatingTypeCodes }) => {
           render={({ field }) => (
             <TextInput
               title={{ id: 'react.productSupplier.form.brandName.title', defaultMessage: 'Brand Name' }}
+              errorMessage={errors.brandName?.message}
               tooltip={{
                 id: 'react.productSupplier.form.brandName.tooltip',
-                defaultMessage: 'Product quality rating based on user feedback or sample review',
+                defaultMessage: 'The brand or product line',
               }}
               {...field}
             />
@@ -86,5 +99,19 @@ AdditionalDetails.propTypes = {
     id: PropTypes.string.isRequired,
     value: PropTypes.string.isRequired,
     label: PropTypes.string.isRequired,
+  }).isRequired,
+  errors: PropTypes.shape({
+    manufacturer: PropTypes.shape({
+      message: PropTypes.string,
+    }),
+    ratingTypeCode: PropTypes.shape({
+      message: PropTypes.string,
+    }),
+    manufacturerCode: PropTypes.shape({
+      message: PropTypes.string,
+    }),
+    brandName: PropTypes.shape({
+      message: PropTypes.string,
+    }),
   }).isRequired,
 };
