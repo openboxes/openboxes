@@ -60,3 +60,6 @@ export const HIDE_INFO_BAR_MODAL = 'HIDE_INFO_BAR_MODAL';
 
 // Product supplier
 export const FETCH_PREFERENCE_TYPES = 'FETCH_PREFERENCE_TYPES';
+
+// Rating type options
+export const FETCH_RATING_TYPE_OPTIONS = 'FETCH_RATING_TYPE_OPTIONS';

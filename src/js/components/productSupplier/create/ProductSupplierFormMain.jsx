@@ -12,7 +12,7 @@ const ProductSupplierFormMain = ({ formProps }) => {
   const {
     control,
     errors,
-    mockedRatingTypeCodes,
+    ratingTypeCodes,
   } = formProps;
 
   return (
@@ -20,7 +20,7 @@ const ProductSupplierFormMain = ({ formProps }) => {
       <DetailsSection
         control={control}
         errors={errors}
-        mockedRatingTypeCodes={mockedRatingTypeCodes}
+        ratingTypeCodes={ratingTypeCodes}
       />
       <PreferenceTypeSection
         control={control}
@@ -67,7 +67,7 @@ ProductSupplierFormMain.propTypes = {
         }),
       })),
     }),
-    mockedRatingTypeCodes: PropTypes.shape({
+    ratingTypeCodes: PropTypes.shape({
       id: PropTypes.string.isRequired,
       value: PropTypes.string.isRequired,
       label: PropTypes.string.isRequired,

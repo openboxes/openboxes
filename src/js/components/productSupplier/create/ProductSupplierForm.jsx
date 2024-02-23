@@ -15,7 +15,7 @@ const ProductSupplierForm = () => {
     control,
     handleSubmit,
     errors,
-    mockedRatingTypeCodes,
+    ratingTypeCodes,
     onSubmit,
   } = useProductSupplierForm();
 
@@ -30,7 +30,7 @@ const ProductSupplierForm = () => {
             control,
             handleSubmit,
             errors,
-            mockedRatingTypeCodes,
+            ratingTypeCodes,
           }}
         />
       </form>

@@ -10,7 +10,7 @@ import Subsection from 'components/Layout/v2/Subsection';
 import RoleType from 'consts/roleType';
 import { debounceOrganizationsFetch } from 'utils/option-utils';
 
-const AdditionalDetails = ({ control, mockedRatingTypeCodes, errors }) => {
+const AdditionalDetails = ({ control, ratingTypeCodes, errors }) => {
   const {
     debounceTime,
     minSearchLength,
@@ -54,7 +54,7 @@ const AdditionalDetails = ({ control, mockedRatingTypeCodes, errors }) => {
                 id: 'react.productSupplier.form.ratingTypeCode.tooltip',
                 defaultMessage: 'Product quality rating based on user feedback or sample review',
               }}
-              options={mockedRatingTypeCodes}
+              options={ratingTypeCodes}
               errorMessage={errors.ratingTypeCode?.message}
               {...field}
             />
@@ -95,7 +95,7 @@ export default AdditionalDetails;
 
 AdditionalDetails.propTypes = {
   control: PropTypes.shape({}).isRequired,
-  mockedRatingTypeCodes: PropTypes.shape({
+  ratingTypeCodes: PropTypes.shape({
     id: PropTypes.string.isRequired,
     value: PropTypes.string.isRequired,
     label: PropTypes.string.isRequired,
