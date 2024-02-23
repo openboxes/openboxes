@@ -13,6 +13,7 @@ import grails.converters.JSON
 import org.pih.warehouse.core.GlAccount
 import org.pih.warehouse.core.PaymentTerm
 import org.pih.warehouse.core.PreferenceType
+import org.pih.warehouse.core.RatingTypeCode
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.User
 import org.pih.warehouse.core.UserService
@@ -108,5 +109,12 @@ class SelectOptionsApiController {
         preferenceTypeOptions.addAll(preferenceTypes)
 
         render([data: preferenceTypeOptions] as JSON)
+    }
+
+    def ratingTypeCodeOptions() {
+        List ratingTypeCodeOptions = RatingTypeCode.list().collect {
+            [id: it.name, label: g.message(code: "enum.RatingTypeCode.$it.name", default: "$it.name")]
+        }
+        render([data: ratingTypeCodeOptions] as JSON)
     }
 }
