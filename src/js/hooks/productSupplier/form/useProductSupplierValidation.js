@@ -94,10 +94,12 @@ const useProductSupplierValidation = () => {
       packageSize: z
         .coerce
         .number({ required_error: 'Package size is required' })
+        .gte(1)
         .nullable(),
       minimumOrderQuantity: z
         .coerce
         .number()
+        .gte(1)
         .optional(),
       packagePrice: z
         .coerce

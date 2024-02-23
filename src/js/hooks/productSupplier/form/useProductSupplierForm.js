@@ -86,6 +86,11 @@ const useProductSupplierForm = () => {
     };
   };
 
+  const defaultValues = {
+    active: true,
+    tieredPricing: false,
+  };
+
   const {
     control,
     handleSubmit,
@@ -96,7 +101,7 @@ const useProductSupplierForm = () => {
     mode: 'onBlur',
     // If there is a productSupplier param, it means we are editing a product supplier, so fetch it,
     // otherwise the only default value should be the active field
-    defaultValues: productSupplierId ? getProductSupplier : { active: true },
+    defaultValues: productSupplierId ? getProductSupplier : defaultValues,
     resolver: zodResolver(validationSchema),
   });
 
