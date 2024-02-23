@@ -1080,6 +1080,14 @@ div.search-input:focus-within {
   }
 }
 
+.active-button {
+  @extend %button-base;
+
+  color: #fff;
+  background-color: #6c757d;
+  border-color: #6c757d;
+}
+
 // Status circles styling
 .status-circle {
   width: 10px;
