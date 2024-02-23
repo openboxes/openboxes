@@ -92,25 +92,19 @@ const useProductSupplierValidation = () => {
         })
         .required(),
       packageSize: z
-        .coerce
         .number({ required_error: 'Package size is required' })
-        .gte(1)
-        .nullable(),
+        .gte(1),
       minimumOrderQuantity: z
-        .coerce
         .number()
         .gte(1)
         .optional(),
       packagePrice: z
-        .coerce
         .number()
         .optional(),
       eachPrice: z
-        .coerce
         .number()
         .optional(),
       contractPriceEach: z
-        .coerce
         .number()
         .optional(),
       priceValidUntil: z

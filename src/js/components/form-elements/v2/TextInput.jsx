@@ -29,6 +29,20 @@ const TextInput = ({
     fieldProps.onBlur?.(e);
   };
 
+  const onChangeHandler = (e) => {
+    switch (type) {
+      case 'number': {
+        const valueAsNumber = Number.isNaN(e.target.valueAsNumber)
+          ? undefined
+          : e.target.valueAsNumber;
+        fieldProps.onChange?.(valueAsNumber);
+        break;
+      }
+      default:
+        fieldProps.onChange?.(e);
+    }
+  };
+
   const numberIncrementValue = type === 'number' && _.isNumber(decimal)
     ? 0.1 ** decimal
     : undefined;
@@ -51,6 +65,7 @@ const TextInput = ({
         type={type}
         step={numberIncrementValue}
         {...fieldProps}
+        onChange={onChangeHandler}
         onBlur={onBlurHandler}
       />
     </InputWrapper>
