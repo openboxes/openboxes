@@ -80,8 +80,8 @@ export const showOutboundEditValidationErrors = ({ translate, errors }) => {
 };
 
 export const omitEmptyValues = (values) => _.omitBy(values, (val) => {
-  // Do not omit boolean values no matter if they are true or false
-  if (typeof val === 'boolean') {
+  // Do not omit boolean, numbers and date values
+  if (typeof val === 'boolean' || typeof val === 'number' || val instanceof Date) {
     return false;
   }
   return _.isEmpty(val);
