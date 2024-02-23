@@ -1,6 +1,33 @@
 
-Please be patient as our documentation expert (a.k.a our lead developer) is busy making the software 
-not suck so he's had some trouble finding time to update these guides. 
+# Getting Started 
+
+## Knowledge Base
+
+Review our knowledge base for step-by-step instructions on the most common features.  
+
+<a href="https://help.openboxes.com">
+![img.png](../img/helpscout.png){height:20%}
+</a>
+
+## Discussion Forum
+
+Post your questions to our Community Forum and search for answers to common questions. 
+
+<a href="https://community.openboxes.com">
+![img.png](../img/discourse2.png)
+</a>
+
+## YouTube channel
+Subscribe to our YouTube Channel! Or ... ya know ... don't. It's up to you.
+<a href="https://www.youtube.com/channel/UC-e9K2wU9wZFQ11eF-vwu6Q">
+![img.png](../img/youtube2.png)
+</a>
+
+## Tutorials 
+Check out our tutorials page for the most up-to-date tutorials.
+<a href="https://openboxes.com/tutorials">
+![img.png](../img/tutorials.png)
+</a>
 
 ## Contributing
 If you would like to contribute to this User Guide, please refer to the 
@@ -15,20 +42,3 @@ If you're impatient, not good at words & stuff, and would prefer to see User Gui
 please feel free to light a fire under our documentation expert. The most effective way to do that 
 would be to shame him through any of the public support channels (i.e. Twitter, Slack, Google 
 Groups, highway billboards, etc). 
-
-## Discussion Forum
-Review our Community Forum for answers to common questions or to post your own question. 
-<https://discuss.openboxes.com/>
-
-
-## YouTube channel
-Subscribe to our YouTube Channel! Or ... ya know ... don't. It's up to you.
-<a href="https://www.youtube.com/channel/UC-e9K2wU9wZFQ11eF-vwu6Q">
-![img.png](../img/youtube.png)
-</a>
-
-## Tutorials 
-Check out our tutorials page for the most up-to-date tutorials.
-<a href="https://openboxes.com/tutorials">
-![img.png](../img/tutorials.png)
-</a>
