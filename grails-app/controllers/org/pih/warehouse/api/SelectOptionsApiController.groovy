@@ -13,6 +13,7 @@ import grails.converters.JSON
 import org.pih.warehouse.core.GlAccount
 import org.pih.warehouse.core.PaymentTerm
 import org.pih.warehouse.core.PreferenceType
+import org.pih.warehouse.core.RatingTypeCode
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.User
 import org.pih.warehouse.core.UserService
@@ -80,24 +81,43 @@ class SelectOptionsApiController {
     }
 
     def preferenceTypeOptions() {
-        List<Map<String, String>> defaultPreferenceTypes = [
-            [
+        List<Map<String, String>> preferenceTypeOptions = []
+
+        boolean includeMultiple = params.boolean("includeMultiple", false)
+        if (includeMultiple) {
+            preferenceTypeOptions.add([
                 id: ProductSupplierService.PREFERENCE_TYPE_MULTIPLE,
+                value: ProductSupplierService.PREFERENCE_TYPE_MULTIPLE,
                 label: g.message(code: "react.productSupplier.preferenceType.multiple.label", default: "Multiple")
-            ],
-            [
+            ])
+        }
+
+        boolean includeNone = params.boolean("includeNone", false)
+        if (includeNone) {
+            preferenceTypeOptions.add([
                 id: ProductSupplierService.PREFERENCE_TYPE_NONE,
+                value: ProductSupplierService.PREFERENCE_TYPE_NONE,
                 label: g.message(code: 'react.productSupplier.preferenceType.none.label', default: "None")
-            ],
-        ]
+            ])
+        }
+
         List<Map<String, String>> preferenceTypes = genericApiService.getList(PreferenceType.class.simpleName, [:]).collect {
             [
                 id: it.id,
+                value: it.id,
                 label: it.name
             ]
         }
-        defaultPreferenceTypes.addAll(preferenceTypes)
 
-        render([data: defaultPreferenceTypes] as JSON)
+        preferenceTypeOptions.addAll(preferenceTypes)
+
+        render([data: preferenceTypeOptions] as JSON)
+    }
+
+    def ratingTypeCodeOptions() {
+        List ratingTypeCodeOptions = RatingTypeCode.list().collect {
+            [id: it.name, value: it.name, label: g.message(code: "enum.RatingTypeCode.$it.name", default: it.name)]
+        }
+        render([data: ratingTypeCodeOptions] as JSON)
     }
 }

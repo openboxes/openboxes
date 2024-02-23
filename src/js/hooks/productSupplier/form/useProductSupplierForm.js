@@ -1,7 +1,11 @@
+import { useEffect } from 'react';
+
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
+import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 
+import { fetchRatingTypeCodes } from 'actions';
 import productSupplierApi from 'api/services/ProductSupplierApi';
 import useProductSupplierValidation from 'hooks/productSupplier/form/useProductSupplierValidation';
 import { omitEmptyValues } from 'utils/form-values-utils';
@@ -11,6 +15,25 @@ const useProductSupplierForm = () => {
   const { validationSchema } = useProductSupplierValidation();
   // Check if productSupplierId is provided in the URL (determine whether it is create or edit)
   const { productSupplierId } = useParams();
+  const dispatch = useDispatch();
+
+  const {
+    ratingTypeCodes,
+  } = useSelector((state) => ({
+    ratingTypeCodes: state.productSupplier.ratingTypeCodes,
+  }));
+
+  useEffect(() => {
+    const controller = new AbortController();
+    const config = {
+      signal: controller.signal,
+    };
+    dispatch(fetchRatingTypeCodes(config));
+
+    return () => {
+      controller.abort();
+    };
+  }, []);
 
   // Fetches product supplier to edit and returns default values that should be set
   const getProductSupplier = async () => {
@@ -75,25 +98,6 @@ const useProductSupplierForm = () => {
     resolver: zodResolver(validationSchema),
   });
 
-  // TODO: To be replaced by rating type codes returned from the API
-  const mockedRatingTypeCodes = [
-    {
-      id: 'OUTSTANDING',
-      value: 'OUTSTANDING',
-      label: 'OUTSTANDING',
-    },
-    {
-      id: 'GOOD',
-      value: 'GOOD',
-      label: 'GOOD',
-    },
-    {
-      id: 'FAIR',
-      value: 'FAIR',
-      label: 'FAIR',
-    },
-  ];
-
   const onSubmit = (values) => {
     const payload = {
       ...omitEmptyValues(values),
@@ -116,7 +120,7 @@ const useProductSupplierForm = () => {
     handleSubmit,
     errors,
     isValid,
-    mockedRatingTypeCodes,
+    ratingTypeCodes,
     onSubmit,
   };
 };

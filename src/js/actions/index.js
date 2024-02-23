@@ -22,6 +22,7 @@ import {
   FETCH_PAYMENT_TERMS,
   FETCH_PREFERENCE_TYPES,
   FETCH_PURCHASE_ORDER_STATUSES,
+  FETCH_RATING_TYPE_OPTIONS,
   FETCH_REASONCODES,
   FETCH_REQUISITION_STATUS_CODES,
   FETCH_SESSION_INFO,
@@ -689,5 +690,13 @@ export const fetchPreferenceTypes = (config) => async (dispatch) => {
   return dispatch({
     type: FETCH_PREFERENCE_TYPES,
     payload: preferenceTypes?.data?.data,
+  });
+};
+
+export const fetchRatingTypeCodes = (config) => async (dispatch) => {
+  const ratingTypeCodes = await productSupplierApi.getRatingTypeOptions(config);
+  return dispatch({
+    type: FETCH_RATING_TYPE_OPTIONS,
+    payload: ratingTypeCodes?.data?.data,
   });
 };
