@@ -35,8 +35,8 @@ const useProductSupplierFilters = (ignoreClearFilters) => {
       signal: controller.signal,
       params: {
         includeMultiple: true,
-        includeNone: true
-      }
+        includeNone: true,
+      },
     };
     dispatch(fetchPreferenceTypes(config));
 

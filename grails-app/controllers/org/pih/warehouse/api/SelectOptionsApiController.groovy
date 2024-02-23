@@ -87,6 +87,7 @@ class SelectOptionsApiController {
         if (includeMultiple) {
             preferenceTypeOptions.add([
                 id: ProductSupplierService.PREFERENCE_TYPE_MULTIPLE,
+                value: ProductSupplierService.PREFERENCE_TYPE_MULTIPLE,
                 label: g.message(code: "react.productSupplier.preferenceType.multiple.label", default: "Multiple")
             ])
         }
@@ -95,6 +96,7 @@ class SelectOptionsApiController {
         if (includeNone) {
             preferenceTypeOptions.add([
                 id: ProductSupplierService.PREFERENCE_TYPE_NONE,
+                value: ProductSupplierService.PREFERENCE_TYPE_NONE,
                 label: g.message(code: 'react.productSupplier.preferenceType.none.label', default: "None")
             ])
         }
@@ -102,6 +104,7 @@ class SelectOptionsApiController {
         List<Map<String, String>> preferenceTypes = genericApiService.getList(PreferenceType.class.simpleName, [:]).collect {
             [
                 id: it.id,
+                value: it.id,
                 label: it.name
             ]
         }
@@ -113,7 +116,7 @@ class SelectOptionsApiController {
 
     def ratingTypeCodeOptions() {
         List ratingTypeCodeOptions = RatingTypeCode.list().collect {
-            [id: it.name, label: g.message(code: "enum.RatingTypeCode.$it.name", default: it.name)]
+            [id: it.name, value: it.name, label: g.message(code: "enum.RatingTypeCode.$it.name", default: it.name)]
         }
         render([data: ratingTypeCodeOptions] as JSON)
     }
