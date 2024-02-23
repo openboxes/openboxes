@@ -1,13 +1,14 @@
 import { useEffect } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 
 import { fetchRatingTypeCodes } from 'actions';
 import productSupplierApi from 'api/services/ProductSupplierApi';
 import useProductSupplierValidation from 'hooks/productSupplier/form/useProductSupplierValidation';
+import { decimalParser } from 'utils/form-utils';
 import { omitEmptyValues } from 'utils/form-values-utils';
 import { splitPreferenceTypes } from 'utils/list-utils';
 
@@ -88,6 +89,7 @@ const useProductSupplierForm = () => {
   const {
     control,
     handleSubmit,
+    setValue,
     formState: { errors, isValid },
   } = useForm({
     // We want the validation errors to occur onBlur of any field
@@ -114,6 +116,19 @@ const useProductSupplierForm = () => {
     }
     console.log(payload);
   };
+
+  const packagePrice = useWatch({ control, name: 'packagePrice' });
+  const packageSize = useWatch({ control, name: 'packageSize' });
+
+  // eachPrice is a computed value from packagePrice and packageSize
+  useEffect(() => {
+    if (packagePrice && packageSize) {
+      setValue('eachPrice', decimalParser(packagePrice / packageSize, 4));
+    } else {
+      setValue('eachPrice', '');
+    }
+  },
+  [packagePrice, packageSize]);
 
   return {
     control,
