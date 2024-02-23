@@ -24,7 +24,12 @@ const useProductSupplierForm = () => {
   }));
 
   useEffect(() => {
+    const controller = new AbortController();
     dispatch(fetchRatingTypeCodes());
+
+    return () => {
+      controller.abort();
+    };
   }, []);
 
   // Fetches product supplier to edit and returns default values that should be set

@@ -55,7 +55,6 @@ import productSupplierApi from 'api/services/ProductSupplierApi';
 import purchaseOrderApi from 'api/services/PurchaseOrderApi';
 import unitOfMeasureApi from 'api/services/UnitOfMeasureApi';
 import userApi from 'api/services/UserApi';
-import { RATING_TYPE_OPTIONS } from 'api/urls';
 import RoleType from 'consts/roleType';
 import apiClient, { parseResponse } from 'utils/apiClient';
 import { mapShipmentTypes } from 'utils/option-utils';
