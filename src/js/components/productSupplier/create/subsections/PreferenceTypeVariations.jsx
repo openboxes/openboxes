@@ -2,7 +2,7 @@ import React from 'react';
 
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import { useFieldArray } from 'react-hook-form';
+import { useFieldArray, useWatch } from 'react-hook-form';
 import { RiAddLine } from 'react-icons/ri';
 
 import DataTable from 'components/DataTable';
@@ -11,22 +11,43 @@ import Subsection from 'components/Layout/v2/Subsection';
 import InvalidItemsIndicator from 'components/productSupplier/create/InvalidItemsIndicator';
 import usePreferenceTypeVariationsColumns
   from 'hooks/productSupplier/form/usePreferenceTypeVariationsColumns';
+import usePreferenceTypeVariationsFiltering
+  from 'hooks/productSupplier/form/usePreferenceTypeVariationsFiltering';
 
-const PreferenceTypeVariations = ({ control, errors }) => {
-  const { fields, remove, append } = useFieldArray({
+const PreferenceTypeVariations = ({
+  control,
+  errors,
+  trigger,
+}) => {
+  const { fields, remove, prepend } = useFieldArray({
     control,
     name: 'productSupplierPreferences',
   });
+
+  const updatedRows = useWatch({
+    name: 'productSupplierPreferences',
+    control,
+  });
+
+  const {
+    isFiltered,
+    setIsFiltered,
+    getFilterMethod,
+    triggerFiltering,
+    isRowValid,
+  } = usePreferenceTypeVariationsFiltering({ errors, updatedRows });
 
   const { columns, translate } = usePreferenceTypeVariationsColumns({
     errors,
     control,
     remove,
+    updatedRows,
+    trigger,
   });
 
   const defaultTableRow = {
-    destinationParty: {},
-    preferenceType: {},
+    destinationParty: '',
+    preferenceType: '',
     validityStartDate: '',
     validityEndDate: '',
     bidName: '',
@@ -44,11 +65,16 @@ const PreferenceTypeVariations = ({ control, errors }) => {
         <div className="d-flex justify-content-end align-items-center mb-3">
           <InvalidItemsIndicator
             className="mr-3"
-            setFilterInvalid={setFilterInvalid}
-            errorsCounter={_.filter(errors)?.length}
+            errorsCounter={Object.keys(errors).filter(isRowValid).length}
+            isFiltered={isFiltered}
+            setIsFiltered={setIsFiltered}
+            trigger={trigger}
           />
           <Button
-            onClick={() => append(defaultTableRow)}
+            onClick={() => {
+              prepend(defaultTableRow);
+              trigger();
+            }}
             StartIcon={<RiAddLine className="button-add-icon" />}
             defaultLabel="Add new"
             label="react.productSupplier.table.addNew.label"
@@ -60,17 +86,14 @@ const PreferenceTypeVariations = ({ control, errors }) => {
           defaultPageSize={4}
           pageSize={fields.length <= 4 ? 4 : fields.length}
           showPagination={false}
+          loading={false}
+          filterAll
+          defaultFilterMethod={getFilterMethod}
+          filtered={triggerFiltering()}
           noDataText={translate(
             'react.productSupplier.table.empty.label',
             'No Preference Type Variations to display',
           )}
-          loading={false}
-          filterable
-          filterAll
-          defaultFilterMethod={(filter, row, column) => {
-            console.log(row)
-            return true;
-          }}
         />
       </div>
     </Subsection>
@@ -99,5 +122,10 @@ PreferenceTypeVariations.propTypes = {
         message: PropTypes.string,
       }),
     }),
-  ).isRequired,
+  ),
+  trigger: PropTypes.func.isRequired,
+};
+
+PreferenceTypeVariations.defaultProps = {
+  errors: {},
 };

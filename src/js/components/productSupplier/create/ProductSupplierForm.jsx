@@ -16,6 +16,8 @@ const ProductSupplierForm = () => {
     handleSubmit,
     errors,
     ratingTypeCodes,
+    trigger,
+    dirtyFields,
     onSubmit,
   } = useProductSupplierForm();
 
@@ -30,6 +32,8 @@ const ProductSupplierForm = () => {
             control,
             handleSubmit,
             errors,
+            trigger,
+            dirtyFields,
             ratingTypeCodes,
           }}
         />

@@ -103,6 +103,7 @@ const useProductSupplierForm = () => {
   const {
     control,
     handleSubmit,
+    trigger,
     setValue,
     formState: { errors, isValid },
   } = useForm({
@@ -151,6 +152,7 @@ const useProductSupplierForm = () => {
     errors,
     isValid,
     ratingTypeCodes,
+    trigger,
     onSubmit,
   };
 };

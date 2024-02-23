@@ -6,11 +6,16 @@ import Section from 'components/Layout/v2/Section';
 import PreferenceTypeVariations
   from 'components/productSupplier/create/subsections/PreferenceTypeVariations';
 
-const PreferenceTypeSection = ({ control, errors }) => (
+const PreferenceTypeSection = ({
+  control,
+  errors,
+  trigger,
+}) => (
   <Section title={{ label: 'react.productSupplier.section.preferenceType.title', defaultMessage: 'Preference Type' }}>
     <PreferenceTypeVariations
       control={control}
       errors={errors}
+      trigger={trigger}
     />
   </Section>
 );
@@ -38,4 +43,5 @@ PreferenceTypeSection.propTypes = {
       }),
     }),
   ).isRequired,
+  trigger: PropTypes.func.isRequired,
 };

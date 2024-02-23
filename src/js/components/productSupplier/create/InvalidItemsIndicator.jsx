@@ -6,24 +6,51 @@ import { RiErrorWarningLine } from 'react-icons/ri';
 
 import Button from 'components/form-elements/Button';
 
-const InvalidItemsIndicator = ({ className, errorsCounter, setFilterInvalid }) => {
-  const { Icon, wrapperClassName, variant } = errorsCounter ? {
-    Icon: RiErrorWarningLine,
-    variant: 'danger',
-    wrapperClassName: 'is-invalid',
-  } : {
-    Icon: RiCheckboxCircleLine,
-    variant: 'transparent',
-    wrapperClassName: 'is-valid',
+const invalidLines = {
+  Icon: RiErrorWarningLine,
+  variant: 'danger',
+  wrapperClassName: 'is-invalid',
+};
+
+const validLines = {
+  Icon: RiCheckboxCircleLine,
+  variant: 'transparent',
+  wrapperClassName: 'is-valid',
+};
+
+const appliedFiltering = ({
+  buttonVariant,
+  isFiltered,
+}) => ({
+  ...buttonVariant,
+  variant: isFiltered ? 'active' : buttonVariant.variant,
+  wrapperClassName: isFiltered ? '' : buttonVariant.wrapperClassName,
+});
+
+const InvalidItemsIndicator = ({
+  className,
+  errorsCounter,
+  setIsFiltered,
+  isFiltered,
+  trigger,
+}) => {
+  const { Icon, variant, wrapperClassName } = appliedFiltering({
+    buttonVariant: errorsCounter ? invalidLines : validLines,
+    isFiltered,
+  });
+
+  const handleOnFilterButtonClick = () => {
+    trigger('productSupplierPreferences');
+    setIsFiltered((value) => !value);
   };
 
   return (
     <Button
       variant={variant}
-      className={`invalid-items-indicator ${wrapperClassName} ${className}`}
+      className={`invalid-items-indicator ${wrapperClassName} ${className} active`}
       label="react.productSupplier.form.invalidItemsIndicator.title"
       defaultLabel="Item(s) require attention"
-      onClick={() => setFilterInvalid(prev => !prev)}
+      onClick={handleOnFilterButtonClick}
       StartIcon={(
         <>
           <Icon />
@@ -40,9 +67,14 @@ export default InvalidItemsIndicator;
 InvalidItemsIndicator.propTypes = {
   className: PropTypes.string,
   errorsCounter: PropTypes.number,
+  setIsFiltered: PropTypes.func,
+  isFiltered: PropTypes.bool,
+  trigger: PropTypes.func.isRequired,
 };
 
 InvalidItemsIndicator.defaultProps = {
   className: '',
   errorsCounter: 0,
+  setIsFiltered: () => {},
+  isFiltered: false,
 };
