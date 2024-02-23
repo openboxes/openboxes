@@ -6,7 +6,7 @@ import InputWrapper from 'wrappers/InputWrapper';
 
 import './style.scss';
 
-const CheckBox = ({
+const Checkbox = ({
   title,
   tooltip,
   button,
@@ -25,7 +25,7 @@ const CheckBox = ({
     inputId={id || name}
     labelPosition={labelPosition}
   >
-    <div className="form-element-checkbox ">
+    <div className="form-element-checkbox">
       <input
         id={id || name}
         name={name}
@@ -33,14 +33,15 @@ const CheckBox = ({
         disabled={disabled}
         className={`${errorMessage ? 'has-errors' : ''}`}
         {...fieldProps}
+        checked={fieldProps.value}
       />
     </div>
   </InputWrapper>
 );
 
-export default CheckBox;
+export default Checkbox;
 
-CheckBox.propTypes = {
+Checkbox.propTypes = {
   // Message which will be shown on the tooltip above the field
   tooltip: PropTypes.shape({
     id: PropTypes.string.isRequired,
@@ -70,7 +71,7 @@ CheckBox.propTypes = {
   name: PropTypes.string,
 };
 
-CheckBox.defaultProps = {
+Checkbox.defaultProps = {
   tooltip: null,
   title: null,
   button: null,

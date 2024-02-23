@@ -48,27 +48,35 @@
   &-top .input-wrapper-title {
     order: 0;
   }
+
   &-bottom .input-wrapper-title {
     order: 1;
   }
+
   &-left {
     align-items: center;
     flex-direction: row;
     flex-wrap: wrap;
-    padding-top: 1rem;
+    padding-top: calc(1rem + 5px);
+
+    .input-wrapper-title {
+      margin: 0;
+    }
 
     .input-wrapper-error-message {
       width: 100%;
     }
   }
+
   &-right {
     align-items: center;
     flex-direction: row;
     flex-wrap: wrap;
-    padding-top: 1rem;
+    padding-top: calc(1rem + 5px);
 
     .input-wrapper-title {
       order: 1;
+      margin: 0;
     }
 
     .input-wrapper-error-message {
