@@ -42,6 +42,10 @@ const PackageSpecification = ({ control, errors }) => {
                 id: 'react.productSupplier.form.defaultSourcePackage.title',
                 defaultMessage: 'Default Source Package',
               }}
+              tooltip={{
+                id: 'react.productSupplier.form.defaultSourcePackage.tooltip',
+                defaultMessage: 'The most common package purchased for this product',
+              }}
               options={quantityUoM}
               errorMessage={errors.defaultSourcePackage?.message}
             />
@@ -54,6 +58,7 @@ const PackageSpecification = ({ control, errors }) => {
             <TextInput
               {...field}
               required
+              type="number"
               errorMessage={errors.packageSize?.message}
               title={{
                 id: 'react.productSupplier.form.packageSize.title',
@@ -73,6 +78,7 @@ const PackageSpecification = ({ control, errors }) => {
             <TextInput
               {...field}
               errorMessage={errors.minimumOrderQuantity?.message}
+              type="number"
               title={{
                 id: 'react.productSupplier.form.minimumOrderQuantity.title',
                 defaultMessage: 'MOQ',
@@ -90,7 +96,9 @@ const PackageSpecification = ({ control, errors }) => {
           render={({ field }) => (
             <TextInput
               {...field}
+              decimal={2}
               errorMessage={errors.packagePrice?.message}
+              type="number"
               title={{
                 id: 'react.productSupplier.form.packagePrice.title',
                 defaultMessage: 'Package Price',
@@ -109,7 +117,8 @@ const PackageSpecification = ({ control, errors }) => {
             <TextInput
               {...field}
               disabled
-              errorMessage={errors.eachPrice?.message}
+              decimal={4}
+              type="number"
               title={{
                 id: 'react.productSupplier.form.eachPrice.title',
                 defaultMessage: 'Each Price',
