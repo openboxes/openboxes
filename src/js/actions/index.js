@@ -681,8 +681,8 @@ export const fetchPreferenceTypes = (config) => async (dispatch) => {
   });
 };
 
-export const fetchRatingTypeCodes = () => async (dispatch) => {
-  const ratingTypeCodes = await productSupplierApi.getRatingTypeOptions();
+export const fetchRatingTypeCodes = (config) => async (dispatch) => {
+  const ratingTypeCodes = await productSupplierApi.getRatingTypeOptions(config);
   return dispatch({
     type: FETCH_RATING_TYPE_OPTIONS,
     payload: ratingTypeCodes?.data?.data,

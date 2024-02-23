@@ -25,7 +25,10 @@ const useProductSupplierForm = () => {
 
   useEffect(() => {
     const controller = new AbortController();
-    dispatch(fetchRatingTypeCodes());
+    const config = {
+      signal: controller.signal,
+    };
+    dispatch(fetchRatingTypeCodes(config));
 
     return () => {
       controller.abort();
