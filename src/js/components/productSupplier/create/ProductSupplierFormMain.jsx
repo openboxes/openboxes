@@ -53,7 +53,7 @@ ProductSupplierFormMain.propTypes = {
       product: PropTypes.shape({
         message: PropTypes.string,
       }),
-      defaultSourcePackage: PropTypes.shape({
+      uomCode: PropTypes.shape({
         message: PropTypes.string,
       }),
       packageSize: PropTypes.shape({

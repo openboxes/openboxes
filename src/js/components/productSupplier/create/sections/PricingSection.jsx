@@ -29,7 +29,7 @@ export default PricingSection;
 PricingSection.propTypes = {
   control: PropTypes.shape({}).isRequired,
   errors: PropTypes.shape({
-    defaultSourcePackage: PropTypes.shape({
+    uomCode: PropTypes.shape({
       message: PropTypes.string,
     }),
     packageSize: PropTypes.shape({

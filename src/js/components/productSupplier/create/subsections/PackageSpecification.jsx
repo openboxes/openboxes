@@ -32,22 +32,22 @@ const PackageSpecification = ({ control, errors }) => {
     >
       <div className="form-grid-3">
         <Controller
-          name="defaultSourcePackage"
+          name="uomCode"
           control={control}
           render={({ field }) => (
             <SelectField
               {...field}
               required
               title={{
-                id: 'react.productSupplier.form.defaultSourcePackage.title',
+                id: 'react.productSupplier.form.uomCode.title',
                 defaultMessage: 'Default Source Package',
               }}
               tooltip={{
-                id: 'react.productSupplier.form.defaultSourcePackage.tooltip',
+                id: 'react.productSupplier.form.uomCode.tooltip',
                 defaultMessage: 'The most common package purchased for this product',
               }}
               options={quantityUoM}
-              errorMessage={errors.defaultSourcePackage?.message}
+              errorMessage={errors.uomCode?.message}
             />
           )}
         />
@@ -140,7 +140,7 @@ export default PackageSpecification;
 PackageSpecification.propTypes = {
   control: PropTypes.shape({}).isRequired,
   errors: PropTypes.shape({
-    defaultSourcePackage: PropTypes.shape({
+    uomCode: PropTypes.shape({
       message: PropTypes.string,
     }),
     packageSize: PropTypes.shape({

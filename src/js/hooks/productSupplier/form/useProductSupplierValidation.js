@@ -81,7 +81,7 @@ const useProductSupplierValidation = () => {
           .optional()
           .nullable(),
       })),
-      defaultSourcePackage: z
+      uomCode: z
         .object({
           id: z.string(),
           value: z.string(),
