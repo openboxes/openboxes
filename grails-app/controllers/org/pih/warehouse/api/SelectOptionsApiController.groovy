@@ -80,24 +80,33 @@ class SelectOptionsApiController {
     }
 
     def preferenceTypeOptions() {
-        List<Map<String, String>> defaultPreferenceTypes = [
-            [
+        List<Map<String, String>> preferenceTypeOptions = []
+
+        boolean includeMultiple = params.boolean("includeMultiple") ?: false
+        if (includeMultiple) {
+            preferenceTypeOptions.add([
                 id: ProductSupplierService.PREFERENCE_TYPE_MULTIPLE,
                 label: g.message(code: "react.productSupplier.preferenceType.multiple.label", default: "Multiple")
-            ],
-            [
+            ])
+        }
+
+        boolean includeNone = params.boolean("includeNone") ?: false
+        if (includeNone) {
+            preferenceTypeOptions.add([
                 id: ProductSupplierService.PREFERENCE_TYPE_NONE,
                 label: g.message(code: 'react.productSupplier.preferenceType.none.label', default: "None")
-            ],
-        ]
+            ])
+        }
+
         List<Map<String, String>> preferenceTypes = genericApiService.getList(PreferenceType.class.simpleName, [:]).collect {
             [
                 id: it.id,
                 label: it.name
             ]
         }
-        defaultPreferenceTypes.addAll(preferenceTypes)
 
-        render([data: defaultPreferenceTypes] as JSON)
+        preferenceTypeOptions.addAll(preferenceTypes)
+
+        render([data: preferenceTypeOptions] as JSON)
     }
 }

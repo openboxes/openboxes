@@ -67,7 +67,7 @@ export const PAYMENT_TERMS_OPTION = `${API}/paymentTermOptions`;
 export const USERS_OPTIONS = `${API}/users`;
 
 // PREFERENCE TYPES
-export const PREFERENCE_TYPE_OPTIONS = `${API}/preferenceTypeOptions`;
+export const PREFERENCE_TYPE_OPTIONS = (params) => `${API}/preferenceTypeOptions${params}`;
 
 // LOCATIONS
 export const LOCATION_API = `${API}/locations`;
