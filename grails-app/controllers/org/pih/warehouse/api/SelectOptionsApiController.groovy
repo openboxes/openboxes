@@ -83,7 +83,7 @@ class SelectOptionsApiController {
     def preferenceTypeOptions() {
         List<Map<String, String>> preferenceTypeOptions = []
 
-        boolean includeMultiple = params.boolean("includeMultiple") ?: false
+        boolean includeMultiple = params.boolean("includeMultiple", false)
         if (includeMultiple) {
             preferenceTypeOptions.add([
                 id: ProductSupplierService.PREFERENCE_TYPE_MULTIPLE,
@@ -91,7 +91,7 @@ class SelectOptionsApiController {
             ])
         }
 
-        boolean includeNone = params.boolean("includeNone") ?: false
+        boolean includeNone = params.boolean("includeNone", false)
         if (includeNone) {
             preferenceTypeOptions.add([
                 id: ProductSupplierService.PREFERENCE_TYPE_NONE,
@@ -113,7 +113,7 @@ class SelectOptionsApiController {
 
     def ratingTypeCodeOptions() {
         List ratingTypeCodeOptions = RatingTypeCode.list().collect {
-            [id: it.name, label: g.message(code: "enum.RatingTypeCode.$it.name", default: "$it.name")]
+            [id: it.name, label: g.message(code: "enum.RatingTypeCode.$it.name", default: it.name)]
         }
         render([data: ratingTypeCodeOptions] as JSON)
     }
