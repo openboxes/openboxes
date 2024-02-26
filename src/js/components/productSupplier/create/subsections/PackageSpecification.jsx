@@ -72,19 +72,19 @@ const PackageSpecification = ({ control, errors }) => {
           )}
         />
         <Controller
-          name="minimumOrderQuantity"
+          name="minOrderQuantity"
           control={control}
           render={({ field }) => (
             <TextInput
               {...field}
-              errorMessage={errors.minimumOrderQuantity?.message}
+              errorMessage={errors.minOrderQuantity?.message}
               type="number"
               title={{
-                id: 'react.productSupplier.form.minimumOrderQuantity.title',
+                id: 'react.productSupplier.form.minOrderQuantity.title',
                 defaultMessage: 'MOQ',
               }}
               tooltip={{
-                id: 'react.productSupplier.form.minimumOrderQuantity.tooltip',
+                id: 'react.productSupplier.form.minOrderQuantity.tooltip',
                 defaultMessage: 'Minimum Order Quantity - the smallest order the vendor will accept for this product',
               }}
             />
@@ -146,7 +146,7 @@ PackageSpecification.propTypes = {
     packageSize: PropTypes.shape({
       message: PropTypes.string,
     }),
-    minimumOrderQuantity: PropTypes.shape({
+    minOrderQuantity: PropTypes.shape({
       message: PropTypes.string,
     }),
     packagePrice: PropTypes.shape({

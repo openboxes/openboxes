@@ -59,7 +59,7 @@ ProductSupplierFormMain.propTypes = {
       packageSize: PropTypes.shape({
         message: PropTypes.string,
       }),
-      minimumOrderQuantity: PropTypes.shape({
+      minOrderQuantity: PropTypes.shape({
         message: PropTypes.string,
       }),
       packagePrice: PropTypes.shape({

@@ -94,7 +94,7 @@ const useProductSupplierValidation = () => {
       packageSize: z
         .number({ required_error: 'Package size is required' })
         .gte(1),
-      minimumOrderQuantity: z
+      minOrderQuantity: z
         .number()
         .gte(1)
         .optional(),
