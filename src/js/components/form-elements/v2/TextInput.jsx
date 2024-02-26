@@ -1,7 +1,9 @@
 import React from 'react';
 
+import _ from 'lodash';
 import PropTypes from 'prop-types';
 
+import { decimalParser } from 'utils/form-utils';
 import InputWrapper from 'wrappers/InputWrapper';
 
 import './style.scss';
@@ -16,26 +18,59 @@ const TextInput = ({
   placeholder,
   id,
   name,
+  type,
+  decimal,
   ...fieldProps
-}) => (
-  <InputWrapper
-    title={title}
-    tooltip={tooltip}
-    required={required}
-    button={button}
-    inputId={id || name}
-    errorMessage={errorMessage}
-  >
-    <input
-      id={id || name}
-      name={name}
-      disabled={disabled}
-      className={`form-element-input ${errorMessage ? 'has-errors' : ''}`}
-      placeholder={placeholder}
-      {...fieldProps}
-    />
-  </InputWrapper>
-);
+}) => {
+  const onBlurHandler = (e) => {
+    if (type === 'number') {
+      e.target.value = decimalParser(e.target.value, decimal);
+    }
+    fieldProps.onBlur?.(e);
+  };
+
+  const onChangeHandler = (e) => {
+    switch (type) {
+      case 'number': {
+        const valueAsNumber = Number.isNaN(e.target.valueAsNumber)
+          ? undefined
+          : e.target.valueAsNumber;
+        fieldProps.onChange?.(valueAsNumber);
+        break;
+      }
+      default:
+        fieldProps.onChange?.(e);
+    }
+  };
+
+  const numberIncrementValue = type === 'number' && _.isNumber(decimal)
+    ? 0.1 ** decimal
+    : undefined;
+
+  return (
+    <InputWrapper
+      title={title}
+      tooltip={tooltip}
+      required={required}
+      button={button}
+      inputId={id || name}
+      errorMessage={errorMessage}
+    >
+      <input
+        id={id || name}
+        name={name}
+        disabled={disabled}
+        className={`form-element-input ${errorMessage ? 'has-errors' : ''}`}
+        placeholder={placeholder}
+        type={type}
+        step={numberIncrementValue}
+        {...fieldProps}
+        onChange={onChangeHandler}
+        onBlur={onBlurHandler}
+      />
+    </InputWrapper>
+  );
+};
 
 export default TextInput;
 
@@ -69,6 +104,8 @@ TextInput.propTypes = {
   id: PropTypes.string,
   // html element name
   name: PropTypes.string,
+  type: PropTypes.string,
+  decimal: PropTypes.number,
 };
 
 TextInput.defaultProps = {
@@ -81,4 +118,6 @@ TextInput.defaultProps = {
   placeholder: '',
   id: undefined,
   name: undefined,
+  type: 'text',
+  decimal: undefined,
 };

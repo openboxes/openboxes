@@ -1,5 +1,6 @@
 import React from 'react';
 
+import _ from 'lodash';
 import PropTypes from 'prop-types';
 import ReactHtmlParser from 'react-html-parser';
 import { getTranslate } from 'react-localize-redux';
@@ -133,4 +134,11 @@ renderFormFields.defaultProps = {
   arrayField: false,
   label: '',
   defaultMessage: '',
+};
+
+export const decimalParser = (value, precision) => {
+  if (!Number.isNaN(_.parseInt(value)) && _.isNumber(precision)) {
+    return _.round(value, precision);
+  }
+  return value;
 };
