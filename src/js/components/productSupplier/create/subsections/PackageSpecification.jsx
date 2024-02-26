@@ -10,7 +10,6 @@ import useQuantityUnitOfMeasureOptions from 'hooks/options-data/useQuantityUnitO
 
 const PackageSpecification = ({ control, errors }) => {
   const { quantityUom } = useQuantityUnitOfMeasureOptions();
-
   return (
     <Subsection
       title={{

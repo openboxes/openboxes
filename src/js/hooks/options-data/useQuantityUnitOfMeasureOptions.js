@@ -1,28 +1,17 @@
-import { useEffect } from 'react';
-
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 
 import { fetchQuantityUnitOfMeasure } from 'actions';
+import useOptionsFetch from 'hooks/options-data/useOptionsFetch';
 
 const useQuantityUnitOfMeasureOptions = () => {
-  const dispatch = useDispatch();
-
   const { quantityUom } = useSelector((state) => ({
     quantityUom: state.unitOfMeasure.quantity,
   }));
 
-  useEffect(() => {
-    const controller = new AbortController();
-    const config = {
-      signal: controller.signal,
-    };
-
-    dispatch(fetchQuantityUnitOfMeasure(config));
-
-    return () => {
-      controller.abort();
-    };
-  }, []);
+  useOptionsFetch(
+    [fetchQuantityUnitOfMeasure],
+    { refetchOnLocationChange: false },
+  );
 
   return { quantityUom };
 };
