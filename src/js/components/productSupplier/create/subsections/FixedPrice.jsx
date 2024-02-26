@@ -25,13 +25,13 @@ const FixedPrice = ({ control, errors }) => (
             {...field}
             decimal={2}
             type="number"
-            errorMessage={errors.contractPriceEach?.message}
+            errorMessage={errors.contractPricePrice?.message}
             title={{
-              id: 'react.productSupplier.form.contractPriceEach.title',
+              id: 'react.productSupplier.form.contractPricePrice.title',
               defaultMessage: 'Contract Price Each',
             }}
             tooltip={{
-              id: 'react.productSupplier.form.contractPriceEach.tooltip',
+              id: 'react.productSupplier.form.contractPricePrice.tooltip',
               defaultMessage: 'Fixed price per unit guaranteed by a contract with the supplier',
             }}
           />
@@ -77,7 +77,7 @@ export default FixedPrice;
 FixedPrice.propTypes = {
   control: PropTypes.shape({}).isRequired,
   errors: PropTypes.shape({
-    contractPriceEach: PropTypes.shape({
+    contractPricePrice: PropTypes.shape({
       message: PropTypes.string,
     }),
     contractPriceValidUntil: PropTypes.shape({

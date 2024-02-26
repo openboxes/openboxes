@@ -20,40 +20,40 @@ const PackageSpecification = ({ control, errors }) => {
     >
       <div className="form-grid-3">
         <Controller
-          name="uomCode"
+          name="uom"
           control={control}
           render={({ field }) => (
             <SelectField
               {...field}
               required
               title={{
-                id: 'react.productSupplier.form.uomCode.title',
+                id: 'react.productSupplier.form.uom.title',
                 defaultMessage: 'Default Source Package',
               }}
               tooltip={{
-                id: 'react.productSupplier.form.uomCode.tooltip',
+                id: 'react.productSupplier.form.uom.tooltip',
                 defaultMessage: 'The most common package purchased for this product',
               }}
               options={quantityUom}
-              errorMessage={errors.uomCode?.message}
+              errorMessage={errors.uom?.message}
             />
           )}
         />
         <Controller
-          name="packageSize"
+          name="productPackageQuantity"
           control={control}
           render={({ field }) => (
             <TextInput
               {...field}
               required
               type="number"
-              errorMessage={errors.packageSize?.message}
+              errorMessage={errors.productPackageQuantity?.message}
               title={{
-                id: 'react.productSupplier.form.packageSize.title',
+                id: 'react.productSupplier.form.productPackageQuantity.title',
                 defaultMessage: 'Package Size',
               }}
               tooltip={{
-                id: 'react.productSupplier.form.packageSize.tooltip',
+                id: 'react.productSupplier.form.productPackageQuantity.tooltip',
                 defaultMessage: 'The number of units per package',
               }}
             />
@@ -128,10 +128,10 @@ export default PackageSpecification;
 PackageSpecification.propTypes = {
   control: PropTypes.shape({}).isRequired,
   errors: PropTypes.shape({
-    uomCode: PropTypes.shape({
+    uom: PropTypes.shape({
       message: PropTypes.string,
     }),
-    packageSize: PropTypes.shape({
+    productPackageQuantity: PropTypes.shape({
       message: PropTypes.string,
     }),
     minOrderQuantity: PropTypes.shape({

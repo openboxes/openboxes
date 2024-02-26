@@ -113,7 +113,7 @@ const useProductSupplierForm = () => {
       manufacturer: values?.manufacturer ? values.manufacturer.id : null,
       ratingTypeCode: values?.ratingTypeCode ? values.ratingTypeCode.id : null,
       productSupplierPreferences: values?.productSupplierPreferences,
-      uomCode: values?.uomCode ? values.uomCode.id : null,
+      uom: values?.uom ? values.uom.id : null,
     };
     // If values contain id, it means we are editing
     if (values?.id) {
@@ -124,17 +124,17 @@ const useProductSupplierForm = () => {
   };
 
   const packagePrice = useWatch({ control, name: 'packagePrice' });
-  const packageSize = useWatch({ control, name: 'packageSize' });
+  const productPackageQuantity = useWatch({ control, name: 'productPackageQuantity' });
 
-  // eachPrice is a computed value from packagePrice and packageSize
+  // eachPrice is a computed value from packagePrice and productPackageQuantity
   useEffect(() => {
-    if (packagePrice && packageSize) {
-      setValue('eachPrice', decimalParser(packagePrice / packageSize, 4));
+    if (packagePrice && productPackageQuantity) {
+      setValue('eachPrice', decimalParser(packagePrice / productPackageQuantity, 4));
     } else {
       setValue('eachPrice', '');
     }
   },
-  [packagePrice, packageSize]);
+  [packagePrice, productPackageQuantity]);
 
   return {
     control,

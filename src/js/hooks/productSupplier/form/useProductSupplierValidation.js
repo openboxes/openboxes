@@ -81,7 +81,7 @@ const useProductSupplierValidation = () => {
           .optional()
           .nullable(),
       })),
-      uomCode: z
+      uom: z
         .object({
           id: z.string(),
           value: z.string(),
@@ -91,7 +91,7 @@ const useProductSupplierValidation = () => {
           required_error: 'Default Source Package is required',
         })
         .required(),
-      packageSize: z
+      productPackageQuantity: z
         .number({ required_error: 'Package size is required' })
         .gte(1),
       minOrderQuantity: z
@@ -104,7 +104,7 @@ const useProductSupplierValidation = () => {
       eachPrice: z
         .number()
         .optional(),
-      contractPriceEach: z
+      contractPricePrice: z
         .number()
         .optional(),
       contractPriceValidUntil: z

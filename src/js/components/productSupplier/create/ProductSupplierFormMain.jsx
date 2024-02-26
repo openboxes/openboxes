@@ -53,10 +53,10 @@ ProductSupplierFormMain.propTypes = {
       product: PropTypes.shape({
         message: PropTypes.string,
       }),
-      uomCode: PropTypes.shape({
+      uom: PropTypes.shape({
         message: PropTypes.string,
       }),
-      packageSize: PropTypes.shape({
+      productPackageQuantity: PropTypes.shape({
         message: PropTypes.string,
       }),
       minOrderQuantity: PropTypes.shape({
