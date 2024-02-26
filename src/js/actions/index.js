@@ -119,14 +119,17 @@ export function fetchCurrencies() {
   };
 }
 
-export function fetchQuantityUnitOfMeasure() {
+export function fetchQuantityUnitOfMeasure(config) {
+  const configSettings = { ...config };
+  configSettings.params = { ...configSettings?.params, type: UnitOfMeasureType.QUANTITY };
   return (dispatch) => {
-    unitOfMeasureApi.getUnitOfMeasureOptions(UnitOfMeasureType.QUANTITY).then((res) => {
-      dispatch({
-        type: FETCH_UNIT_OF_MEASURE_QUANTITY,
-        payload: res?.data,
+    unitOfMeasureApi.getUnitOfMeasureOptions(configSettings)
+      .then((res) => {
+        dispatch({
+          type: FETCH_UNIT_OF_MEASURE_QUANTITY,
+          payload: res?.data,
+        });
       });
-    });
   };
 }
 

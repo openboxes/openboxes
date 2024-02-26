@@ -1,26 +1,15 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 
 import PropTypes from 'prop-types';
 import { Controller } from 'react-hook-form';
-import { useDispatch, useSelector } from 'react-redux';
 
-import { fetchQuantityUnitOfMeasure } from 'actions';
 import SelectField from 'components/form-elements/v2/SelectField';
 import TextInput from 'components/form-elements/v2/TextInput';
 import Subsection from 'components/Layout/v2/Subsection';
+import useQuantityUnitOfMeasureOptions from 'hooks/options-data/useQuantityUnitOfMeasureOptions';
 
 const PackageSpecification = ({ control, errors }) => {
-  const dispatch = useDispatch();
-
-  const {
-    quantityUom,
-  } = useSelector(state => ({
-    quantityUom: state.unitOfMeasure.quantity,
-  }));
-
-  useEffect(() => {
-    dispatch(fetchQuantityUnitOfMeasure());
-  }, []);
+  const { quantityUom } = useQuantityUnitOfMeasureOptions();
 
   return (
     <Subsection
