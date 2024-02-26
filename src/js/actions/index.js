@@ -57,7 +57,7 @@ import purchaseOrderApi from 'api/services/PurchaseOrderApi';
 import unitOfMeasureApi from 'api/services/UnitOfMeasureApi';
 import userApi from 'api/services/UserApi';
 import RoleType from 'consts/roleType';
-import { UoMType } from 'consts/UoMType';
+import { UnitOfMeasureType } from 'consts/UnitOfMeasureType';
 import apiClient, { parseResponse } from 'utils/apiClient';
 import { mapShipmentTypes } from 'utils/option-utils';
 
@@ -119,9 +119,9 @@ export function fetchCurrencies() {
   };
 }
 
-export function fetchQuantityUoM() {
+export function fetchQuantityUnitOfMeasure() {
   return (dispatch) => {
-    unitOfMeasureApi.getUnitOfMeasureOptions(UoMType.QUANTITY).then((res) => {
+    unitOfMeasureApi.getUnitOfMeasureOptions(UnitOfMeasureType.QUANTITY).then((res) => {
       dispatch({
         type: FETCH_UNIT_OF_MEASURE_QUANTITY,
         payload: res?.data,

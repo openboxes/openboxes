@@ -18,7 +18,7 @@ const FixedPrice = ({ control, errors }) => (
   >
     <div className="form-grid-3">
       <Controller
-        name="contractPriceEach"
+        name="contractPricePrice"
         control={control}
         render={({ field }) => (
           <TextInput
@@ -38,15 +38,15 @@ const FixedPrice = ({ control, errors }) => (
         )}
       />
       <Controller
-        name="priceValidUntil"
+        name="contractPriceValidUntil"
         control={control}
         render={({ field }) => (
           <DateField
             title={{
-              id: 'react.productSupplier.form.priceValidUntil.title',
+              id: 'react.productSupplier.form.contractPriceValidUntil.title',
               defaultMessage: 'Price Valid Until',
             }}
-            errorMessage={errors.priceValidUntil?.message}
+            errorMessage={errors.contractPriceValidUntil?.message}
             {...field}
           />
         )}
@@ -80,7 +80,7 @@ FixedPrice.propTypes = {
     contractPriceEach: PropTypes.shape({
       message: PropTypes.string,
     }),
-    priceValidUntil: PropTypes.shape({
+    contractPriceValidUntil: PropTypes.shape({
       message: PropTypes.string,
     }),
     tieredPricing: PropTypes.shape({

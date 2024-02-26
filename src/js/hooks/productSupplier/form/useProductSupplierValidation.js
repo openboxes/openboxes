@@ -107,7 +107,7 @@ const useProductSupplierValidation = () => {
       contractPriceEach: z
         .number()
         .optional(),
-      priceValidUntil: z
+      contractPriceValidUntil: z
         .coerce
         .date()
         .optional(),

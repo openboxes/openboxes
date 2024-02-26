@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { Controller } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { fetchQuantityUoM } from 'actions';
+import { fetchQuantityUnitOfMeasure } from 'actions';
 import SelectField from 'components/form-elements/v2/SelectField';
 import TextInput from 'components/form-elements/v2/TextInput';
 import Subsection from 'components/Layout/v2/Subsection';
@@ -13,13 +13,13 @@ const PackageSpecification = ({ control, errors }) => {
   const dispatch = useDispatch();
 
   const {
-    quantityUoM,
+    quantityUom,
   } = useSelector(state => ({
-    quantityUoM: state.unitOfMeasure.quantity,
+    quantityUom: state.unitOfMeasure.quantity,
   }));
 
   useEffect(() => {
-    dispatch(fetchQuantityUoM());
+    dispatch(fetchQuantityUnitOfMeasure());
   }, []);
 
   return (
@@ -46,7 +46,7 @@ const PackageSpecification = ({ control, errors }) => {
                 id: 'react.productSupplier.form.uomCode.tooltip',
                 defaultMessage: 'The most common package purchased for this product',
               }}
-              options={quantityUoM}
+              options={quantityUom}
               errorMessage={errors.uomCode?.message}
             />
           )}
