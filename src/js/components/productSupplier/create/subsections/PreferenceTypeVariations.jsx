@@ -1,6 +1,5 @@
 import React from 'react';
 
-import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { useFieldArray, useWatch } from 'react-hook-form';
 import { RiAddLine } from 'react-icons/ri';
@@ -73,7 +72,7 @@ const PreferenceTypeVariations = ({
           <Button
             onClick={() => {
               prepend(defaultTableRow);
-              trigger();
+              trigger('productSupplierPreferences');
             }}
             StartIcon={<RiAddLine className="button-add-icon" />}
             defaultLabel="Add new"

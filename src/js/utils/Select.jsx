@@ -233,7 +233,7 @@ class Select extends Component {
       multi = false, delimiter = ';', async = false, showValueTooltip, showLabelTooltip,
       clearable = true, arrowLeft, arrowUp, arrowRight, arrowDown, fieldRef, onTabPress,
       onEnterPress, customSelectComponents, optionRenderer, classNamePrefix,
-      showSelectedOptionColor, ...attributes
+      showSelectedOptionColor, scrollableParentContainerClassName, ...attributes
     } = this.props;
     const { formatValue, className, showLabel = false } = attributes;
 
@@ -323,6 +323,14 @@ class Select extends Component {
       return !(showValueTooltip && hasFieldValue);
     };
 
+    const closeMenuOnScroll = (e) => {
+      if (scrollableParentContainerClassName) {
+        return e.target.className === scrollableParentContainerClassName;
+      }
+
+      return false;
+    };
+
     return (
       <div id={`${this.state.id}-container`}>
         <Tooltip
@@ -338,6 +346,7 @@ class Select extends Component {
         >
           <SelectType
             {...attributes}
+            closeMenuOnScroll={closeMenuOnScroll}
             placeholder={getPlaceholder()}
             isDisabled={attributes.disabled}
             options={(value?.length && this.state.sortedOptionsByChecked) || this.options}
@@ -458,6 +467,7 @@ Select.propTypes = {
   nullOption: PropTypes.bool,
   nullOptionLabel: PropTypes.string,
   nullOptionDefaultLabel: PropTypes.string,
+  scrollableParentContainerClassName: PropTypes.string,
 };
 
 Select.defaultProps = {

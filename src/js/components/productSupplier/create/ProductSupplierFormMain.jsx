@@ -17,7 +17,7 @@ const ProductSupplierFormMain = ({ formProps }) => {
   } = formProps;
 
   return (
-    <div className="d-flex flex-column gap-8">
+    <div className="d-flex gap-12 flex-column">
       <DetailsSection
         control={control}
         errors={errors}
