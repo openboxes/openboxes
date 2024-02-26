@@ -12,7 +12,6 @@ import {
   FETCH_BUYERS,
   FETCH_CONFIG,
   FETCH_CONFIG_AND_SET_ACTIVE,
-  FETCH_CURRENCIES,
   FETCH_GRAPHS,
   FETCH_INVOICE_STATUSES,
   FETCH_INVOICE_TYPE_CODES,
@@ -30,6 +29,8 @@ import {
   FETCH_SHIPMENT_TYPES,
   FETCH_STOCK_TRANSFER_STATUSES,
   FETCH_SUPPLIERS,
+  FETCH_UNIT_OF_MEASURE_CURRENCY,
+  FETCH_UNIT_OF_MEASURE_QUANTITY,
   FETCH_USERS,
   FILTER_FORM_PARAMS_BUILT,
   HIDE_INFO_BAR,
@@ -56,6 +57,7 @@ import purchaseOrderApi from 'api/services/PurchaseOrderApi';
 import unitOfMeasureApi from 'api/services/UnitOfMeasureApi';
 import userApi from 'api/services/UserApi';
 import RoleType from 'consts/roleType';
+import { UnitOfMeasureType } from 'consts/UnitOfMeasureType';
 import apiClient, { parseResponse } from 'utils/apiClient';
 import { mapShipmentTypes } from 'utils/option-utils';
 
@@ -110,10 +112,24 @@ export function fetchCurrencies() {
   return (dispatch) => {
     unitOfMeasureApi.getCurrenciesOptions().then((res) => {
       dispatch({
-        type: FETCH_CURRENCIES,
+        type: FETCH_UNIT_OF_MEASURE_CURRENCY,
         payload: res.data,
       });
     });
+  };
+}
+
+export function fetchQuantityUnitOfMeasure(config) {
+  const configSettings = { ...config };
+  configSettings.params = { ...configSettings?.params, type: UnitOfMeasureType.QUANTITY };
+  return (dispatch) => {
+    unitOfMeasureApi.getUnitOfMeasureOptions(configSettings)
+      .then((res) => {
+        dispatch({
+          type: FETCH_UNIT_OF_MEASURE_QUANTITY,
+          payload: res?.data,
+        });
+      });
   };
 }
 

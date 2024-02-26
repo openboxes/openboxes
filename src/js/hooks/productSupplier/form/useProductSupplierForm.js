@@ -1,13 +1,14 @@
 import { useEffect } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 
 import { fetchRatingTypeCodes } from 'actions';
 import productSupplierApi from 'api/services/ProductSupplierApi';
 import useProductSupplierValidation from 'hooks/productSupplier/form/useProductSupplierValidation';
+import { decimalParser } from 'utils/form-utils';
 import { omitEmptyValues } from 'utils/form-values-utils';
 import { splitPreferenceTypes } from 'utils/list-utils';
 
@@ -85,16 +86,22 @@ const useProductSupplierForm = () => {
     };
   };
 
+  const defaultValues = {
+    active: true,
+    tieredPricing: false,
+  };
+
   const {
     control,
     handleSubmit,
+    setValue,
     formState: { errors, isValid },
   } = useForm({
     // We want the validation errors to occur onBlur of any field
     mode: 'onBlur',
     // If there is a productSupplier param, it means we are editing a product supplier, so fetch it,
     // otherwise the only default value should be the active field
-    defaultValues: productSupplierId ? getProductSupplier : { active: true },
+    defaultValues: productSupplierId ? getProductSupplier : defaultValues,
     resolver: zodResolver(validationSchema),
   });
 
@@ -106,6 +113,7 @@ const useProductSupplierForm = () => {
       manufacturer: values?.manufacturer ? values.manufacturer.id : null,
       ratingTypeCode: values?.ratingTypeCode ? values.ratingTypeCode.id : null,
       productSupplierPreferences: values?.productSupplierPreferences,
+      uom: values?.uom ? values.uom.id : null,
     };
     // If values contain id, it means we are editing
     if (values?.id) {
@@ -114,6 +122,19 @@ const useProductSupplierForm = () => {
     }
     console.log(payload);
   };
+
+  const packagePrice = useWatch({ control, name: 'packagePrice' });
+  const productPackageQuantity = useWatch({ control, name: 'productPackageQuantity' });
+
+  // eachPrice is a computed value from packagePrice and productPackageQuantity
+  useEffect(() => {
+    if (packagePrice && productPackageQuantity) {
+      setValue('eachPrice', decimalParser(packagePrice / productPackageQuantity, 4));
+    } else {
+      setValue('eachPrice', '');
+    }
+  },
+  [packagePrice, productPackageQuantity]);
 
   return {
     control,

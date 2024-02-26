@@ -3,8 +3,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import DetailsSection from 'components/productSupplier/create/sections/DetailsSection';
-import PreferenceTypeSection
-  from 'components/productSupplier/create/sections/PreferenceTypeSection';
+import PreferenceTypeSection from 'components/productSupplier/create/sections/PreferenceTypeSection';
+import PricingSection from 'components/productSupplier/create/sections/PricingSection';
 
 import './styles.scss';
 
@@ -16,7 +16,7 @@ const ProductSupplierFormMain = ({ formProps }) => {
   } = formProps;
 
   return (
-    <div>
+    <div className="d-flex flex-column gap-8">
       <DetailsSection
         control={control}
         errors={errors}
@@ -25,6 +25,10 @@ const ProductSupplierFormMain = ({ formProps }) => {
       <PreferenceTypeSection
         control={control}
         errors={errors.productSupplierPreferences}
+      />
+      <PricingSection
+        control={control}
+        errors={errors}
       />
     </div>
   );
@@ -47,6 +51,21 @@ ProductSupplierFormMain.propTypes = {
         message: PropTypes.string,
       }),
       product: PropTypes.shape({
+        message: PropTypes.string,
+      }),
+      uom: PropTypes.shape({
+        message: PropTypes.string,
+      }),
+      productPackageQuantity: PropTypes.shape({
+        message: PropTypes.string,
+      }),
+      minOrderQuantity: PropTypes.shape({
+        message: PropTypes.string,
+      }),
+      packagePrice: PropTypes.shape({
+        message: PropTypes.string,
+      }),
+      eachPrice: PropTypes.shape({
         message: PropTypes.string,
       }),
       productSupplierPreferences: PropTypes.arrayOf(PropTypes.shape({

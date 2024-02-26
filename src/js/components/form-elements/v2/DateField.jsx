@@ -28,13 +28,18 @@ const DateField = ({
 }) => {
   const onClear = () => onChange(null);
 
+  const onChangeHandler = date => onChange(date?.format(DateFormat.MMM_DD_YYYY));
+
   const formatDate = (dateToFormat) => {
     if (!dateToFormat) {
       return null;
     }
 
-    return moment(dateToFormat).format(DateFormat.MMM_DD_YYYY);
+    return moment(new Date(dateToFormat), DateFormat.MMM_DD_YYYY);
   };
+
+  const selectedDate = formatDate(value);
+  const highlightedDates = [selectedDate || formatDate(new Date())];
 
   return (
     <InputWrapper
@@ -45,6 +50,7 @@ const DateField = ({
       button={button}
     >
       <DatePicker
+        {...fieldProps}
         customInput={<DateFieldInput onClear={onClear} />}
         className={`form-element-input ${errorMessage ? 'has-errors' : ''} ${className}`}
         dropdownMode="scroll"
@@ -55,12 +61,13 @@ const DateField = ({
         yearDropdownItemNumber={3}
         showYearDropdown
         scrollableYearDropdown
+        disabledKeyboardNavigation
         utcOffset={0}
         placeholderText={placeholder}
         popperContainer={RootPortalWrapper}
-        {...fieldProps}
-        value={formatDate(value)}
-        onChange={(val) => onChange?.(val?.format(DateFormat.MMM_DD_YYYY))}
+        selected={selectedDate}
+        highlightDates={highlightedDates}
+        onChange={onChangeHandler}
       />
     </InputWrapper>
   );

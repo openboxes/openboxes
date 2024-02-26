@@ -81,6 +81,39 @@ const useProductSupplierValidation = () => {
           .optional()
           .nullable(),
       })),
+      uom: z
+        .object({
+          id: z.string(),
+          value: z.string(),
+          label: z.string(),
+        }, {
+          invalid_type_error: 'Default Source Package is required',
+          required_error: 'Default Source Package is required',
+        })
+        .required(),
+      productPackageQuantity: z
+        .number({ required_error: 'Package size is required' })
+        .gte(1),
+      minOrderQuantity: z
+        .number()
+        .gte(1)
+        .optional(),
+      packagePrice: z
+        .number()
+        .optional(),
+      eachPrice: z
+        .number()
+        .optional(),
+      contractPricePrice: z
+        .number()
+        .optional(),
+      contractPriceValidUntil: z
+        .coerce
+        .date()
+        .optional(),
+      tieredPricing: z
+        .boolean()
+        .optional(),
     });
 
   return {

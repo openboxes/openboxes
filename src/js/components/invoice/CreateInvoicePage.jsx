@@ -249,7 +249,7 @@ class CreateInvoicePage extends Component {
 
 const mapStateToProps = state => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
-  currencies: state.currencies.data,
+  currencies: state.unitOfMeasure.currency,
   debounceTime: state.session.searchConfig.debounceTime,
   minSearchLength: state.session.searchConfig.minSearchLength,
 });

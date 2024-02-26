@@ -3,7 +3,6 @@ import { combineReducers } from 'redux';
 
 import approversReducer from 'reducers/approversReducer';
 import connectionReducer from 'reducers/connectionReducer';
-import currenciesReducer from 'reducers/currenciesReducer';
 import filterFormReducer from 'reducers/filterFormReducer';
 import indicatorsReducer from 'reducers/indicatorsReducer';
 import infoBarReducer from 'reducers/infoBarReducer';
@@ -21,6 +20,7 @@ import spinnerReducer from 'reducers/spinnerReducer';
 import stockMovementCommonReducer from 'reducers/stockMovementCommonReducer';
 import stockMovementDraftReducer from 'reducers/stockMovementDraftReducer';
 import stockTransferReducer from 'reducers/stockTransferReducer';
+import unitOfMeasureReducer from 'reducers/unitOfMeasureReducer';
 import usersReducer from 'reducers/usersReducer';
 
 
@@ -33,7 +33,6 @@ const rootReducer = combineReducers({
   approvers: approversReducer,
   session: sessionReducer,
   indicators: indicatorsReducer,
-  currencies: currenciesReducer,
   organizations: organizationsReducer,
   purchaseOrder: purchaseOrderReducer,
   invoices: invoiceReducer,
@@ -47,6 +46,7 @@ const rootReducer = combineReducers({
   infoBar: infoBarReducer,
   infoBarVisibility: infoBarVisibilityReducer,
   productSupplier: productSupplierReducer,
+  unitOfMeasure: unitOfMeasureReducer,
 });
 
 export default rootReducer;
