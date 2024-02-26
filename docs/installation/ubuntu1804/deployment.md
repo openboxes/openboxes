@@ -34,7 +34,7 @@ The deployment could take about 10-20 minutes the first time because the applica
 database migrations. Keep an eye out for any errors/exceptions that pop up in the `catalina.out` log file and check 
 the Troubleshooting section for details on how to handle these issues.
 ```
-$ sudo tail -f /opt/tomcat/apache-tomcat-7.0.94/logs/catalina.out
+$ sudo tail -f /opt/tomcat/logs/catalina.out
 ```
 
 !!! note
