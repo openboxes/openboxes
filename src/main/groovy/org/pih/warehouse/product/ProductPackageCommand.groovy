@@ -28,8 +28,11 @@ class ProductPackageCommand implements Validateable {
         productPackagePrice(nullable: true, min: 0.0)
         contractPricePrice(nullable: true, min: 0.0)
         contractPriceValidUntil(nullable: true, validator: { Date date ->
-            Date minDate = ConfigHelper.getMinimumExpirationDate()
-            return date > minDate
+            if (date) {
+                Date minDate = ConfigHelper.getMinimumExpirationDate()
+                return date > minDate
+            }
+            return true
         })
     }
 }
