@@ -153,7 +153,7 @@ const useProductSupplierForm = () => {
     errors,
     isValid,
     ratingTypeCodes,
-    trigger,
+    triggerValidation: trigger,
     onSubmit,
   };
 };

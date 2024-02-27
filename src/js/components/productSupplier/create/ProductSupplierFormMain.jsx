@@ -12,7 +12,7 @@ const ProductSupplierFormMain = ({ formProps }) => {
   const {
     control,
     errors,
-    trigger,
+    triggerValidation,
     ratingTypeCodes,
   } = formProps;
 
@@ -26,7 +26,7 @@ const ProductSupplierFormMain = ({ formProps }) => {
       <PreferenceTypeSection
         control={control}
         errors={errors.productSupplierPreferences}
-        trigger={trigger}
+        triggerValidation={triggerValidation}
       />
       <PricingSection
         control={control}
@@ -93,6 +93,6 @@ ProductSupplierFormMain.propTypes = {
       value: PropTypes.string.isRequired,
       label: PropTypes.string.isRequired,
     }).isRequired,
-    trigger: PropTypes.func.isRequired,
+    triggerValidation: PropTypes.func.isRequired,
   }).isRequired,
 };

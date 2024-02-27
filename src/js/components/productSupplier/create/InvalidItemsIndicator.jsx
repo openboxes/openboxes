@@ -6,19 +6,19 @@ import { RiErrorWarningLine } from 'react-icons/ri';
 
 import Button from 'components/form-elements/Button';
 
-const invalidLines = {
+const invalidLinesButton = {
   Icon: RiErrorWarningLine,
   variant: 'danger',
   wrapperClassName: 'is-invalid',
 };
 
-const validLines = {
+const validLinesButton = {
   Icon: RiCheckboxCircleLine,
   variant: 'transparent',
   wrapperClassName: 'is-valid',
 };
 
-const appliedFiltering = ({
+const getButtonVariant = ({
   buttonVariant,
   isFiltered,
 }) => ({
@@ -32,15 +32,15 @@ const InvalidItemsIndicator = ({
   errorsCounter,
   setIsFiltered,
   isFiltered,
-  trigger,
+  triggerValidation,
 }) => {
-  const { Icon, variant, wrapperClassName } = appliedFiltering({
-    buttonVariant: errorsCounter ? invalidLines : validLines,
+  const { Icon, variant, wrapperClassName } = getButtonVariant({
+    buttonVariant: errorsCounter ? invalidLinesButton : validLinesButton,
     isFiltered,
   });
 
   const handleOnFilterButtonClick = () => {
-    trigger('productSupplierPreferences');
+    triggerValidation('productSupplierPreferences');
     setIsFiltered((value) => !value);
   };
 
@@ -69,7 +69,7 @@ InvalidItemsIndicator.propTypes = {
   errorsCounter: PropTypes.number,
   setIsFiltered: PropTypes.func,
   isFiltered: PropTypes.bool,
-  trigger: PropTypes.func.isRequired,
+  triggerValidation: PropTypes.func.isRequired,
 };
 
 InvalidItemsIndicator.defaultProps = {

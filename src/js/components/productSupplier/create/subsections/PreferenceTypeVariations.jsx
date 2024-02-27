@@ -16,7 +16,7 @@ import usePreferenceTypeVariationsFiltering
 const PreferenceTypeVariations = ({
   control,
   errors,
-  trigger,
+  triggerValidation,
 }) => {
   const { fields, remove, prepend } = useFieldArray({
     control,
@@ -41,7 +41,7 @@ const PreferenceTypeVariations = ({
     control,
     remove,
     updatedRows,
-    trigger,
+    triggerValidation,
   });
 
   const defaultTableRow = {
@@ -67,12 +67,12 @@ const PreferenceTypeVariations = ({
             errorsCounter={Object.keys(errors).filter(isRowValid).length}
             isFiltered={isFiltered}
             setIsFiltered={setIsFiltered}
-            trigger={trigger}
+            triggerValidation={triggerValidation}
           />
           <Button
             onClick={() => {
               prepend(defaultTableRow);
-              trigger('productSupplierPreferences');
+              triggerValidation('productSupplierPreferences');
             }}
             StartIcon={<RiAddLine className="button-add-icon" />}
             defaultLabel="Add new"
@@ -122,7 +122,7 @@ PreferenceTypeVariations.propTypes = {
       }),
     }),
   ),
-  trigger: PropTypes.func.isRequired,
+  triggerValidation: PropTypes.func.isRequired,
 };
 
 PreferenceTypeVariations.defaultProps = {

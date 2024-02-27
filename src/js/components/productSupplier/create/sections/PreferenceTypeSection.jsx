@@ -9,13 +9,13 @@ import PreferenceTypeVariations
 const PreferenceTypeSection = ({
   control,
   errors,
-  trigger,
+  triggerValidation,
 }) => (
   <Section title={{ label: 'react.productSupplier.section.preferenceType.title', defaultMessage: 'Preference Type' }}>
     <PreferenceTypeVariations
       control={control}
       errors={errors}
-      trigger={trigger}
+      triggerValidation={triggerValidation}
     />
   </Section>
 );
@@ -43,5 +43,5 @@ PreferenceTypeSection.propTypes = {
       }),
     }),
   ).isRequired,
-  trigger: PropTypes.func.isRequired,
+  triggerValidation: PropTypes.func.isRequired,
 };

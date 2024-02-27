@@ -17,7 +17,7 @@ const usePreferenceTypeVariationsColumns = ({
   control,
   remove,
   updatedRows,
-  trigger,
+  triggerValidation,
 }) => {
   const dispatch = useDispatch();
   const {
@@ -93,7 +93,7 @@ const usePreferenceTypeVariationsColumns = ({
                 {...field}
                 onChange={(val) => {
                   field?.onChange(val);
-                  trigger('productSupplierPreferences');
+                  triggerValidation('productSupplierPreferences');
                 }}
               />
             );
@@ -127,7 +127,7 @@ const usePreferenceTypeVariationsColumns = ({
                 {...field}
                 onChange={(val) => {
                   field?.onChange(val);
-                  trigger('productSupplierPreferences');
+                  triggerValidation('productSupplierPreferences');
                 }}
               />
             )}
@@ -152,7 +152,7 @@ const usePreferenceTypeVariationsColumns = ({
               {...field}
               onChange={(val) => {
                 field?.onChange(val);
-                trigger('productSupplierPreferences');
+                triggerValidation('productSupplierPreferences');
               }}
             />
           )}
@@ -175,7 +175,7 @@ const usePreferenceTypeVariationsColumns = ({
               {...field}
               onChange={(val) => {
                 field?.onChange(val);
-                trigger('productSupplierPreferences');
+                triggerValidation('productSupplierPreferences');
               }}
             />
           )}
@@ -198,7 +198,7 @@ const usePreferenceTypeVariationsColumns = ({
               {...field}
               onChange={(val) => {
                 field?.onChange(val);
-                trigger('productSupplierPreferences');
+                triggerValidation('productSupplierPreferences');
               }}
             />
           )}
@@ -215,7 +215,7 @@ const usePreferenceTypeVariationsColumns = ({
         <RiDeleteBinLine
           onClick={() => {
             remove(row.index);
-            trigger('productSupplierPreferences');
+            triggerValidation('productSupplierPreferences');
           }}
           className="preference-type-variations-bin"
         />
