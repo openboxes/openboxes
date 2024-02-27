@@ -79,13 +79,13 @@ const PackageSpecification = ({ control, errors }) => {
           )}
         />
         <Controller
-          name="packagePrice"
+          name="productPackagePrice"
           control={control}
           render={({ field }) => (
             <TextInput
               {...field}
               decimal={2}
-              errorMessage={errors.packagePrice?.message}
+              errorMessage={errors.productPackagePrice?.message}
               type="number"
               title={{
                 id: 'react.productSupplier.form.packagePrice.title',
@@ -137,7 +137,7 @@ PackageSpecification.propTypes = {
     minOrderQuantity: PropTypes.shape({
       message: PropTypes.string,
     }),
-    packagePrice: PropTypes.shape({
+    productPackagePrice: PropTypes.shape({
       message: PropTypes.string,
     }),
     eachPrice: PropTypes.shape({
