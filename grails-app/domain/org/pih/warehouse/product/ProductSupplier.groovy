@@ -70,7 +70,10 @@ class ProductSupplier implements Serializable, Comparable<ProductSupplier> {
     @BindUsing({ productSupplier, source -> source["active"] != null ? source["active"] : true })
     Boolean active = Boolean.TRUE
 
-    static transients = ["defaultProductPackage", "globalProductSupplierPreference", "attributes"]
+    ProductPackage defaultProductPackage
+
+
+    static transients = ["defaultProductPackageDerived", "globalProductSupplierPreference", "attributes"]
 
     static hasMany = [productPackages: ProductPackage, productSupplierPreferences: ProductSupplierPreference]
 
@@ -79,7 +82,7 @@ class ProductSupplier implements Serializable, Comparable<ProductSupplier> {
     }
 
     static constraints = {
-
+        defaultProductPackage(nullable: true)
         code(nullable: true)
         name(nullable: false)
         description(nullable: true)
@@ -107,7 +110,7 @@ class ProductSupplier implements Serializable, Comparable<ProductSupplier> {
         active(nullable: true)
     }
 
-    ProductPackage getDefaultProductPackage() {
+    ProductPackage getDefaultProductPackageDerived() {
         return productPackages ? productPackages.sort { it.lastUpdated }.last() : null
     }
 
@@ -173,11 +176,18 @@ class ProductSupplier implements Serializable, Comparable<ProductSupplier> {
                         : ""
             ] : null,
             supplierCode: supplierCode,
+            defaultProductPackage: defaultProductPackage,
+            contractPrice: [
+                id: contractPrice?.id,
+                price: contractPrice?.price,
+                validUntil: contractPrice?.toDate,
+            ],
+            minOrderQuantity: minOrderQuantity,
             productSupplierPreferences: productSupplierPreferences.collect { it.toJson() },
-            packageSize: defaultProductPackage ? "${defaultProductPackage?.uom?.code}/${defaultProductPackage?.quantity}" : null,
-            packagePrice: defaultProductPackage?.productPrice?.price?.setScale(2, RoundingMode.HALF_UP) ?: 0.0,
-            unitPrice: defaultProductPackage?.productPrice
-                    ? (defaultProductPackage?.productPrice?.price / defaultProductPackage?.quantity)?.setScale(2, RoundingMode.HALF_UP)
+            packageSize: defaultProductPackageDerived ? "${defaultProductPackageDerived?.uom?.code}/${defaultProductPackageDerived?.quantity}" : null,
+            packagePrice: defaultProductPackageDerived?.productPrice?.price?.setScale(2, RoundingMode.HALF_UP) ?: 0.0,
+            unitPrice: defaultProductPackageDerived?.productPrice
+                    ? (defaultProductPackageDerived?.productPrice?.price / defaultProductPackageDerived?.quantity)?.setScale(2, RoundingMode.HALF_UP)
                     : 0.0,
             dateCreated: dateCreated,
             lastUpdated: lastUpdated,
