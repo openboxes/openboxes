@@ -1,3 +1,8 @@
+%{--\
+This is a copy of quartz/list template from the quartz-monitor-1.3
+Copied to modify it to link to the jobs/show action
+--}%
+
 <%@ page import="org.quartz.Trigger" %>
 <html>
 <head>

@@ -46,7 +46,8 @@ class RoleInterceptor {
         'transactionEntry'          : ['edit', 'delete', 'save', 'update'],
         'user'                      : ['impersonate'],
         'productsConfigurationApi'  : ['downloadCategories', 'importCategories'],
-        'quartz'                    : ['*']
+        'quartz'                    : ['*'],
+        'jobs'                      : ['*']
     ]
 
     def static invoiceActions = [
