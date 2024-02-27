@@ -66,6 +66,7 @@ import org.pih.warehouse.product.ProductAssociation
 import org.pih.warehouse.product.ProductCatalog
 import org.pih.warehouse.product.ProductGroup
 import org.pih.warehouse.product.ProductListItem
+import org.pih.warehouse.product.ProductPackage
 import org.pih.warehouse.product.ProductSearchDto
 import org.pih.warehouse.product.ProductSupplier
 import org.pih.warehouse.receiving.Receipt
@@ -599,6 +600,10 @@ class BootStrap {
 
         JSON.registerObjectMarshaller(ProductSupplier) { ProductSupplier productSupplier ->
             return productSupplier.toJson()
+        }
+
+        JSON.registerObjectMarshaller(ProductPackage) { ProductPackage productPackage ->
+            return productPackage.toJson()
         }
     }
 
