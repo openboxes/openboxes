@@ -11,21 +11,23 @@ const usePreferenceTypeVariationsFiltering = ({ errors, updatedRows }) => {
 
   // If row index is equal to index of invalid row and if the row is dirty
   // it means it's invalid
-  const isRowValid = (rowIndex) => {
+  const isRowInvalid = (rowIndex) => {
     const isRowDirty = _.some(Object.values(updatedRows?.[rowIndex] || {}));
     return errors?.[rowIndex] && isRowDirty;
   };
 
-  const filterForInvalidRows = (filter, row) => isRowValid(row._index);
+  const filterForInvalidRows = (filter, row) => isRowInvalid(row._index);
 
   const getFilterMethod = (filter, row) => (isFiltered ? filterForInvalidRows(filter, row) : true);
+
+  const invalidRowCount = Object.keys(errors).filter(isRowInvalid).length;
 
   return {
     isFiltered,
     setIsFiltered,
+    invalidRowCount,
     getFilterMethod,
     triggerFiltering,
-    isRowValid,
   };
 };
 

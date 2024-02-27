@@ -35,6 +35,7 @@ const PackageSpecification = ({ control, errors }) => {
                 defaultMessage: 'The most common package purchased for this product',
               }}
               options={quantityUom}
+              hasErrors={Boolean(errors.uom?.message)}
               errorMessage={errors.uom?.message}
             />
           )}

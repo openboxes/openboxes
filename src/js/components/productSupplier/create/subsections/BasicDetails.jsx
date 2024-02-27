@@ -60,6 +60,7 @@ const BasicDetails = ({ control, errors }) => {
               required
               async
               showSelectedOptionColor
+              hasErrors={Boolean(errors.product?.message)}
               errorMessage={errors.product?.message}
               button={product
                 ? {
@@ -96,6 +97,7 @@ const BasicDetails = ({ control, errors }) => {
               title={{ id: 'react.productSupplier.form.supplier.title', defaultMessage: 'Supplier' }}
               placeholder="Select Supplier"
               required
+              hasErrors={Boolean(errors.supplier?.message)}
               errorMessage={errors.supplier?.message}
               tooltip={{ id: 'react.productSupplier.form.supplier.tooltip', defaultMessage: 'The company that supplies the product' }}
               async

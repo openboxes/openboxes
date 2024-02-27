@@ -12,6 +12,7 @@ import usePreferenceTypeVariationsColumns
   from 'hooks/productSupplier/form/usePreferenceTypeVariationsColumns';
 import usePreferenceTypeVariationsFiltering
   from 'hooks/productSupplier/form/usePreferenceTypeVariationsFiltering';
+import useTranslate from 'hooks/useTranslate';
 
 const PreferenceTypeVariations = ({
   control,
@@ -31,12 +32,14 @@ const PreferenceTypeVariations = ({
   const {
     isFiltered,
     setIsFiltered,
+    invalidRowCount,
     getFilterMethod,
     triggerFiltering,
-    isRowValid,
   } = usePreferenceTypeVariationsFiltering({ errors, updatedRows });
 
-  const { columns, translate } = usePreferenceTypeVariationsColumns({
+  const translate = useTranslate();
+
+  const { columns } = usePreferenceTypeVariationsColumns({
     errors,
     control,
     remove,
@@ -52,6 +55,11 @@ const PreferenceTypeVariations = ({
     bidName: '',
   };
 
+  const addNewLine = () => {
+    prepend(defaultTableRow);
+    triggerValidation('productSupplierPreferences');
+  };
+
   return (
     <Subsection
       collapsable
@@ -64,16 +72,13 @@ const PreferenceTypeVariations = ({
         <div className="d-flex justify-content-end align-items-center mb-3">
           <InvalidItemsIndicator
             className="mr-3"
-            errorsCounter={Object.keys(errors).filter(isRowValid).length}
+            errorsCounter={invalidRowCount}
             isFiltered={isFiltered}
             setIsFiltered={setIsFiltered}
             triggerValidation={triggerValidation}
           />
           <Button
-            onClick={() => {
-              prepend(defaultTableRow);
-              triggerValidation('productSupplierPreferences');
-            }}
+            onClick={addNewLine}
             StartIcon={<RiAddLine className="button-add-icon" />}
             defaultLabel="Add new"
             label="react.productSupplier.table.addNew.label"

@@ -3,14 +3,14 @@ import React, { useEffect, useMemo } from 'react';
 import _ from 'lodash';
 import { Controller } from 'react-hook-form';
 import { RiDeleteBinLine, RiErrorWarningLine } from 'react-icons/ri';
-import { getTranslate } from 'react-localize-redux';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { fetchBuyers, fetchPreferenceTypes } from 'actions';
 import DateField from 'components/form-elements/v2/DateField';
 import SelectField from 'components/form-elements/v2/SelectField';
 import TextInput from 'components/form-elements/v2/TextInput';
-import Translate, { translateWithDefaultMessage } from 'utils/Translate';
+import useTranslate from 'hooks/useTranslate';
+import Translate from 'utils/Translate';
 
 const usePreferenceTypeVariationsColumns = ({
   errors,
@@ -23,12 +23,12 @@ const usePreferenceTypeVariationsColumns = ({
   const {
     preferenceTypes,
     buyers,
-    translate,
   } = useSelector((state) => ({
     preferenceTypes: state.productSupplier.preferenceTypes,
     buyers: state.organizations.buyers,
-    translate: translateWithDefaultMessage(getTranslate(state.localize)),
   }));
+
+  const translate = useTranslate();
 
   useEffect(() => {
     dispatch(fetchPreferenceTypes());
@@ -36,15 +36,15 @@ const usePreferenceTypeVariationsColumns = ({
   }, []);
 
   const isFieldValid = (index, property) => {
-    const hasFieldErrors = errors?.[index]?.[property]?.message
-                   || errors?.[index]?.[property]?.id?.message;
+    const fieldError = errors?.[index]?.[property];
+    const fieldErrorMessage = fieldError?.message || fieldError?.id.message;
     const isRowDirty = _.some(Object.values(updatedRows?.[index] || {}));
 
     if (!isRowDirty) {
       return true;
     }
 
-    return !hasFieldErrors;
+    return !fieldErrorMessage;
   };
 
   const getCustomSelectErrorPlaceholder = ({
@@ -79,8 +79,7 @@ const usePreferenceTypeVariationsColumns = ({
             return (
               <SelectField
                 options={buyers}
-                errorMessage={hasErrors}
-                displayErrorMessage={false}
+                hasErrors={hasErrors}
                 showValueTooltip
                 scrollableParentContainerClassName="rt-table"
                 placeholder={getCustomSelectErrorPlaceholder(
@@ -116,9 +115,8 @@ const usePreferenceTypeVariationsColumns = ({
             render={({ field }) => (
               <SelectField
                 options={preferenceTypes}
-                errorMessage={hasErrors}
+                hasErrors={hasErrors}
                 scrollableParentContainerClassName="rt-table"
-                displayErrorMessage={false}
                 placeholder={getCustomSelectErrorPlaceholder({
                   id: 'react.productSupplier.table.selectPreferenceType.label',
                   defaultMessage: 'Select Preference Type',
@@ -223,7 +221,7 @@ const usePreferenceTypeVariationsColumns = ({
     },
   ], [errors, buyers, preferenceTypes]);
 
-  return { columns, translate };
+  return { columns };
 };
 
 export default usePreferenceTypeVariationsColumns;
