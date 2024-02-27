@@ -34,12 +34,12 @@ class ProductPackageService {
             productSupplier.defaultProductPackage = defaultProductPackage
         }
         // If product package price is not provided, skip assigning pricing data
-        if (!command.productPackagePrice) {
+        if (command.productPackagePrice == null) {
             return
         }
         // If product package price is provided and default product package doesn't have
         // product price yet, create ProductPrice instance and assign it to the package
-        if (!defaultProductPackage.productPrice) {
+        if (defaultProductPackage.productPrice == null) {
             ProductPrice productPrice = new ProductPrice(price: command.productPackagePrice)
             defaultProductPackage.productPrice = productPrice
             return
