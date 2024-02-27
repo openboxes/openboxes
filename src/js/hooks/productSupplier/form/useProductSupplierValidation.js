@@ -70,6 +70,20 @@ const useProductSupplierValidation = () => {
         brandName: z
           .string()
           .optional(),
+        defaultPreferenceType: z
+          .string()
+          .optional(),
+        validFrom: z
+          .coerce
+          .date()
+          .optional(),
+        validUntil: z
+          .coerce
+          .date()
+          .optional(),
+        bidName: z
+          .string()
+          .optional(),
         productSupplierPreferences: z.array(z.object({
           destinationParty: z.object({
             id: z.string(),
@@ -78,8 +92,7 @@ const useProductSupplierValidation = () => {
           }, {
             invalid_type_error: 'Site name is required',
             required_error: 'Site name is required',
-          })
-            .required()
+          }).required()
             .refine(checkDestinationPartyUniqueness, {
               message: 'Destination party should be unique',
             }),

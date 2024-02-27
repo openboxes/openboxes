@@ -70,6 +70,18 @@ ProductSupplierFormMain.propTypes = {
       eachPrice: PropTypes.shape({
         message: PropTypes.string,
       }),
+      defaultPreferenceType: PropTypes.shape({
+        message: PropTypes.string,
+      }),
+      validFrom: PropTypes.shape({
+        message: PropTypes.string,
+      }),
+      validUntil: PropTypes.shape({
+        message: PropTypes.string,
+      }),
+      bidName: PropTypes.shape({
+        message: PropTypes.string,
+      }),
       productSupplierPreferences: PropTypes.arrayOf(PropTypes.shape({
         destinationParty: PropTypes.shape({
           message: PropTypes.string,
