@@ -130,6 +130,46 @@ class ProductSupplier implements Serializable, Comparable<ProductSupplier> {
                         id <=> obj.id
     }
 
+    String getPackageSize() {
+        // First we check for a default package assigned to 1:1 association
+        if (defaultProductPackage) {
+            return "${defaultProductPackage?.uom?.code}/${defaultProductPackage?.quantity}"
+        }
+        // If a default package of 1:1 association is not found, check for a default package "in an old way" (last updated)
+        if (defaultProductPackageDerived) {
+            return "${defaultProductPackageDerived?.uom?.code}/${defaultProductPackageDerived?.quantity}"
+        }
+        return null
+    }
+
+    BigDecimal getPackagePrice() {
+        // First we check for a default package assigned to 1:1 association
+        if (defaultProductPackage) {
+            return defaultProductPackage?.productPrice?.price?.setScale(2, RoundingMode.HALF_UP) ?: 0.0
+        }
+        // If a default package of 1:1 association is not found, check for a default package "in an old way" (last updated)
+        if (defaultProductPackageDerived) {
+            return defaultProductPackageDerived?.productPrice?.price?.setScale(2, RoundingMode.HALF_UP) ?: 0.0
+        }
+        return 0.0
+    }
+
+    BigDecimal getUnitPrice() {
+        // First we check for a default package assigned to 1:1 association
+        if (defaultProductPackage) {
+            return defaultProductPackage?.productPrice
+                    ? (defaultProductPackage?.productPrice?.price / defaultProductPackage?.quantity)?.setScale(2, RoundingMode.HALF_UP)
+                    : 0.0
+        }
+        // If a default package of 1:1 association is not found, check for a default package "in an old way" (last updated)
+        if (defaultProductPackageDerived) {
+            return defaultProductPackageDerived?.productPrice
+                    ? (defaultProductPackageDerived?.productPrice?.price / defaultProductPackageDerived?.quantity)?.setScale(2, RoundingMode.HALF_UP)
+                    : 0.0
+        }
+        return 0.0
+    }
+
     static PROPERTIES = [
             "active"                              : "active",
             "ID"                                  : "id",
@@ -176,7 +216,7 @@ class ProductSupplier implements Serializable, Comparable<ProductSupplier> {
                         : ""
             ] : null,
             supplierCode: supplierCode,
-            defaultProductPackage: defaultProductPackage,
+            defaultProductPackage: defaultProductPackage ?: defaultProductPackageDerived,
             contractPrice: [
                 id: contractPrice?.id,
                 price: contractPrice?.price,
@@ -184,11 +224,9 @@ class ProductSupplier implements Serializable, Comparable<ProductSupplier> {
             ],
             minOrderQuantity: minOrderQuantity,
             productSupplierPreferences: productSupplierPreferences.collect { it.toJson() },
-            packageSize: defaultProductPackageDerived ? "${defaultProductPackageDerived?.uom?.code}/${defaultProductPackageDerived?.quantity}" : null,
-            packagePrice: defaultProductPackageDerived?.productPrice?.price?.setScale(2, RoundingMode.HALF_UP) ?: 0.0,
-            unitPrice: defaultProductPackageDerived?.productPrice
-                    ? (defaultProductPackageDerived?.productPrice?.price / defaultProductPackageDerived?.quantity)?.setScale(2, RoundingMode.HALF_UP)
-                    : 0.0,
+            packageSize: packageSize,
+            packagePrice: packagePrice,
+            unitPrice: unitPrice,
             dateCreated: dateCreated,
             lastUpdated: lastUpdated,
             active: active,
