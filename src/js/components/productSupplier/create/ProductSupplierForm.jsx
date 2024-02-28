@@ -15,7 +15,6 @@ const ProductSupplierForm = () => {
     control,
     handleSubmit,
     errors,
-    ratingTypeCodes,
     triggerValidation,
     dirtyFields,
     onSubmit,
@@ -34,7 +33,6 @@ const ProductSupplierForm = () => {
             errors,
             triggerValidation,
             dirtyFields,
-            ratingTypeCodes,
           }}
         />
       </form>

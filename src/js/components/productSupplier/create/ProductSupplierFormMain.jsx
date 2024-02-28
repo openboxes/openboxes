@@ -13,7 +13,6 @@ const ProductSupplierFormMain = ({ formProps }) => {
     control,
     errors,
     triggerValidation,
-    ratingTypeCodes,
   } = formProps;
 
   return (
@@ -21,11 +20,10 @@ const ProductSupplierFormMain = ({ formProps }) => {
       <DetailsSection
         control={control}
         errors={errors}
-        ratingTypeCodes={ratingTypeCodes}
       />
       <PreferenceTypeSection
         control={control}
-        errors={errors.productSupplierPreferences}
+        errors={errors}
         triggerValidation={triggerValidation}
       />
       <PricingSection
@@ -70,6 +68,18 @@ ProductSupplierFormMain.propTypes = {
       eachPrice: PropTypes.shape({
         message: PropTypes.string,
       }),
+      defaultPreferenceType: PropTypes.shape({
+        message: PropTypes.string,
+      }),
+      validFrom: PropTypes.shape({
+        message: PropTypes.string,
+      }),
+      validUntil: PropTypes.shape({
+        message: PropTypes.string,
+      }),
+      bidName: PropTypes.shape({
+        message: PropTypes.string,
+      }),
       productSupplierPreferences: PropTypes.arrayOf(PropTypes.shape({
         destinationParty: PropTypes.shape({
           message: PropTypes.string,
@@ -88,11 +98,6 @@ ProductSupplierFormMain.propTypes = {
         }),
       })),
     }),
-    ratingTypeCodes: PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      value: PropTypes.string.isRequired,
-      label: PropTypes.string.isRequired,
-    }).isRequired,
     triggerValidation: PropTypes.func.isRequired,
   }).isRequired,
 };

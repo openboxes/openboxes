@@ -6,7 +6,7 @@ import Section from 'components/Layout/v2/Section';
 import AdditionalDetails from 'components/productSupplier/create/subsections/AdditionalDetails';
 import BasicDetails from 'components/productSupplier/create/subsections/BasicDetails';
 
-const DetailsSection = ({ control, errors, ratingTypeCodes }) => (
+const DetailsSection = ({ control, errors }) => (
   <Section title={{ label: 'react.productSupplier.form.section.details', defaultMessage: 'Details' }}>
     <BasicDetails
       control={control}
@@ -14,7 +14,6 @@ const DetailsSection = ({ control, errors, ratingTypeCodes }) => (
     />
     <AdditionalDetails
       control={control}
-      ratingTypeCodes={ratingTypeCodes}
       errors={errors}
     />
   </Section>
@@ -37,10 +36,5 @@ DetailsSection.propTypes = {
     product: PropTypes.shape({
       message: PropTypes.string,
     }),
-  }).isRequired,
-  ratingTypeCodes: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    value: PropTypes.string.isRequired,
-    label: PropTypes.string.isRequired,
   }).isRequired,
 };

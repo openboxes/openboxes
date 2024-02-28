@@ -118,16 +118,22 @@ input, .date-field-input {
     width: 100%;
   }
 
-  .form-element-input {
+  .date-field-input {
     background-color: white;
     position: relative;
     display: flex;
 
-    span {
+    &__placeholder {
+      font-size: 14px;
+      color: var(--gray-400);
+    }
+
+    &__value {
       font-weight: 500;
       font-size: 14px;
       color: var(--gray-600);
     }
+
 
     &.disabled {
       background-color: var(--blue-100);
