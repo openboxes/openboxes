@@ -2,7 +2,6 @@ import { useEffect } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, useWatch } from 'react-hook-form';
-import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 
 import { fetchPreferenceTypes, fetchRatingTypeCodes } from 'actions';
@@ -17,12 +16,6 @@ const useProductSupplierForm = () => {
   const { validationSchema } = useProductSupplierValidation();
   // Check if productSupplierId is provided in the URL (determine whether it is create or edit)
   const { productSupplierId } = useParams();
-
-  const {
-    ratingTypeCodes,
-  } = useSelector((state) => ({
-    ratingTypeCodes: state.productSupplier.ratingTypeCodes,
-  }));
 
   useOptionsFetch(
     [fetchRatingTypeCodes, fetchPreferenceTypes],
@@ -145,7 +138,6 @@ const useProductSupplierForm = () => {
     handleSubmit,
     errors,
     isValid,
-    ratingTypeCodes,
     triggerValidation: trigger,
     onSubmit,
   };

@@ -13,7 +13,6 @@ const ProductSupplierFormMain = ({ formProps }) => {
     control,
     errors,
     triggerValidation,
-    ratingTypeCodes,
   } = formProps;
 
   return (
@@ -21,11 +20,10 @@ const ProductSupplierFormMain = ({ formProps }) => {
       <DetailsSection
         control={control}
         errors={errors}
-        ratingTypeCodes={ratingTypeCodes}
       />
       <PreferenceTypeSection
         control={control}
-        errors={errors.productSupplierPreferences}
+        errors={errors}
         triggerValidation={triggerValidation}
       />
       <PricingSection
@@ -100,11 +98,6 @@ ProductSupplierFormMain.propTypes = {
         }),
       })),
     }),
-    ratingTypeCodes: PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      value: PropTypes.string.isRequired,
-      label: PropTypes.string.isRequired,
-    }).isRequired,
     triggerValidation: PropTypes.func.isRequired,
   }).isRequired,
 };
