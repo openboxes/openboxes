@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import _ from 'lodash';
 import { useForm, useWatch } from 'react-hook-form';
 import { useParams } from 'react-router-dom';
 
@@ -126,7 +127,11 @@ const useProductSupplierForm = () => {
 
   // eachPrice is a computed value from packagePrice and productPackageQuantity
   useEffect(() => {
-    if (packagePrice && productPackageQuantity) {
+    if (
+      !_.isNil(packagePrice) &&
+      !_.isNil(productPackageQuantity) &&
+      productPackageQuantity !== 0
+    ) {
       setValue('eachPrice', decimalParser(packagePrice / productPackageQuantity, 4));
     } else {
       setValue('eachPrice', '');
