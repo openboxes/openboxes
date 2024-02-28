@@ -10,14 +10,17 @@ import Subsection from 'components/Layout/v2/Subsection';
 import RoleType from 'consts/roleType';
 import { debounceOrganizationsFetch } from 'utils/option-utils';
 
-const AdditionalDetails = ({ control, ratingTypeCodes, errors }) => {
+const AdditionalDetails = ({ control, errors }) => {
   const {
+    ratingTypeCodes,
     debounceTime,
     minSearchLength,
   } = useSelector((state) => ({
     debounceTime: state.session.searchConfig.debounceTime,
     minSearchLength: state.session.searchConfig.minSearchLength,
+    ratingTypeCodes: state.productSupplier.ratingTypeCodes,
   }));
+
   const debounceManufacturersFetch =
     useCallback(
       debounceOrganizationsFetch(debounceTime, minSearchLength, [RoleType.ROLE_MANUFACTURER]),
@@ -97,11 +100,6 @@ export default AdditionalDetails;
 
 AdditionalDetails.propTypes = {
   control: PropTypes.shape({}).isRequired,
-  ratingTypeCodes: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    value: PropTypes.string.isRequired,
-    label: PropTypes.string.isRequired,
-  }).isRequired,
   errors: PropTypes.shape({
     manufacturer: PropTypes.shape({
       message: PropTypes.string,

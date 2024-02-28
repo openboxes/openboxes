@@ -2,11 +2,11 @@ import { useEffect } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, useWatch } from 'react-hook-form';
-import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 
-import { fetchRatingTypeCodes } from 'actions';
+import { fetchPreferenceTypes, fetchRatingTypeCodes } from 'actions';
 import productSupplierApi from 'api/services/ProductSupplierApi';
+import useOptionsFetch from 'hooks/options-data/useOptionsFetch';
 import useProductSupplierValidation from 'hooks/productSupplier/form/useProductSupplierValidation';
 import { decimalParser } from 'utils/form-utils';
 import { omitEmptyValues } from 'utils/form-values-utils';
@@ -16,25 +16,11 @@ const useProductSupplierForm = () => {
   const { validationSchema } = useProductSupplierValidation();
   // Check if productSupplierId is provided in the URL (determine whether it is create or edit)
   const { productSupplierId } = useParams();
-  const dispatch = useDispatch();
 
-  const {
-    ratingTypeCodes,
-  } = useSelector((state) => ({
-    ratingTypeCodes: state.productSupplier.ratingTypeCodes,
-  }));
-
-  useEffect(() => {
-    const controller = new AbortController();
-    const config = {
-      signal: controller.signal,
-    };
-    dispatch(fetchRatingTypeCodes(config));
-
-    return () => {
-      controller.abort();
-    };
-  }, []);
+  useOptionsFetch(
+    [fetchRatingTypeCodes, fetchPreferenceTypes],
+    { refetchOnLocaleChange: false },
+  );
 
   // Fetches product supplier to edit and returns default values that should be set
   const getProductSupplier = async () => {
@@ -125,6 +111,7 @@ const useProductSupplierForm = () => {
       ratingTypeCode: values?.ratingTypeCode ? values.ratingTypeCode.id : null,
       productSupplierPreferences: values?.productSupplierPreferences,
       uom: values?.uom ? values.uom.id : null,
+      defaultPreferenceType: values?.defaultPreferenceType ? values.defaultPreferenceType.id : null,
     };
     // If values contain id, it means we are editing
     if (values?.id) {
@@ -152,7 +139,6 @@ const useProductSupplierForm = () => {
     handleSubmit,
     errors,
     isValid,
-    ratingTypeCodes,
     triggerValidation: trigger,
     onSubmit,
   };

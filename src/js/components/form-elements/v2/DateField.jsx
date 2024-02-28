@@ -12,6 +12,7 @@ import RootPortalWrapper from 'wrappers/RootPortalWrapper';
 import 'react-datepicker/dist/react-datepicker.css';
 import 'components/form-elements/DateFilter/DateFilter.scss';
 import './style.scss';
+import useTranslate from 'hooks/useTranslate';
 
 const DateField = ({
   title,
@@ -26,6 +27,7 @@ const DateField = ({
   onChange,
   ...fieldProps
 }) => {
+  const translate = useTranslate();
   const onClear = () => onChange(null);
 
   const onChangeHandler = date => onChange(date?.format(DateFormat.MMM_DD_YYYY));
@@ -40,6 +42,10 @@ const DateField = ({
 
   const selectedDate = formatDate(value);
   const highlightedDates = [selectedDate || formatDate(new Date())];
+
+  const placeholderText = typeof placeholder === 'object'
+    ? translate(placeholder?.id, placeholder?.default)
+    : placeholder;
 
   return (
     <InputWrapper
@@ -63,7 +69,7 @@ const DateField = ({
         scrollableYearDropdown
         disabledKeyboardNavigation
         utcOffset={0}
-        placeholderText={placeholder}
+        placeholderText={placeholderText}
         popperContainer={RootPortalWrapper}
         selected={selectedDate}
         highlightDates={highlightedDates}
@@ -100,7 +106,13 @@ DateField.propTypes = {
   // and the message is displayed under the input
   errorMessage: PropTypes.string,
   // Text displayed within input field
-  placeholder: PropTypes.string,
+  placeholder: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      defaultMessage: PropTypes.string.isRequired,
+    }),
+  ]),
   className: PropTypes.string,
   value: PropTypes.string,
   onChange: PropTypes.func,
