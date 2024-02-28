@@ -24,74 +24,80 @@ const DefaultPreferenceType = ({ control, errors }) => {
         defaultMessage: 'Default Preference Type',
       }}
     >
-      <div className="form-grid-3">
-        <Controller
-          name="defaultPreferenceType"
-          control={control}
-          render={({ field }) => (
-            <SelectField
-              {...field}
-              title={{
-                id: 'react.productSupplier.form.defaultPreferenceType.title',
-                defaultMessage: 'Default Preference Type',
-              }}
-              tooltip={{
-                id: 'react.productSupplier.form.defaultPreferenceType.tooltip',
-                defaultMessage: 'Company-wide purchasing preference for this supplier established through a competitive bid',
-              }}
-              options={preferenceTypes}
-              errorMessage={errors.defaultPreferenceType?.message}
-            />
-          )}
-        />
-        <Controller
-          name="validFrom"
-          control={control}
-          render={({ field }) => (
-            <DateField
-              title={{
-                id: 'react.productSupplier.form.validFrom.title',
-                defaultMessage: 'Valid From',
-              }}
-              errorMessage={errors.validFrom?.message}
-              {...field}
-            />
-          )}
-        />
-        <Controller
-          name="validUntil"
-          control={control}
-          render={({ field }) => (
-            <DateField
-              title={{
-                id: 'react.productSupplier.form.validUntil.title',
-                defaultMessage: 'Valid Until',
-              }}
-              errorMessage={errors.validUntil?.message}
-              {...field}
-            />
-          )}
-        />
-        <Controller
-          name="bidName"
-          control={control}
-          render={({ field }) => (
-            <TextInput
-              {...field}
-              decimal={2}
-              type="number"
-              errorMessage={errors.bidName?.message}
-              title={{
-                id: 'react.productSupplier.form.bidName.title',
-                defaultMessage: 'Bid Name',
-              }}
-              tooltip={{
-                id: 'react.productSupplier.form.bidName.tooltip',
-                defaultMessage: 'The bid during which the purchasing preference was selected',
-              }}
-            />
-          )}
-        />
+      <div className="row">
+        <div className="col-lg col-md-6">
+          <Controller
+            name="defaultPreferenceType"
+            control={control}
+            render={({ field }) => (
+              <SelectField
+                {...field}
+                title={{
+                  id: 'react.productSupplier.form.defaultPreferenceType.title',
+                  defaultMessage: 'Default Preference Type',
+                }}
+                tooltip={{
+                  id: 'react.productSupplier.form.defaultPreferenceType.tooltip',
+                  defaultMessage: 'Company-wide purchasing preference for this supplier established through a competitive bid',
+                }}
+                options={preferenceTypes}
+                errorMessage={errors.defaultPreferenceType?.message}
+              />
+            )}
+          />
+        </div>
+        <div className="col-lg col-md-6">
+          <Controller
+            name="validFrom"
+            control={control}
+            render={({ field }) => (
+              <DateField
+                title={{
+                  id: 'react.productSupplier.form.validFrom.title',
+                  defaultMessage: 'Valid From',
+                }}
+                errorMessage={errors.validFrom?.message}
+                {...field}
+              />
+            )}
+          />
+        </div>
+        <div className="col-lg col-md-6">
+          <Controller
+            name="validUntil"
+            control={control}
+            render={({ field }) => (
+              <DateField
+                title={{
+                  id: 'react.productSupplier.form.validUntil.title',
+                  defaultMessage: 'Valid Until',
+                }}
+                errorMessage={errors.validUntil?.message}
+                {...field}
+              />
+            )}
+          />
+        </div>
+        <div className="col-lg col-md-6">
+          <Controller
+            name="bidName"
+            control={control}
+            render={({ field }) => (
+              <TextInput
+                {...field}
+                errorMessage={errors.bidName?.message}
+                title={{
+                  id: 'react.productSupplier.form.bidName.title',
+                  defaultMessage: 'Bid Name',
+                }}
+                tooltip={{
+                  id: 'react.productSupplier.form.bidName.tooltip',
+                  defaultMessage: 'The bid during which the purchasing preference was selected',
+                }}
+              />
+            )}
+          />
+        </div>
       </div>
     </Subsection>
   );
