@@ -77,6 +77,7 @@ const PackageSpecification = ({ control, errors }) => {
                 {...field}
                 errorMessage={errors.minOrderQuantity?.message}
                 type="number"
+                decimal={0}
                 title={{
                   id: 'react.productSupplier.form.minOrderQuantity.title',
                   defaultMessage: 'MOQ',
