@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, isValidElement } from 'react';
 
 import _ from 'lodash';
 import PropTypes from 'prop-types';
@@ -233,7 +233,7 @@ class Select extends Component {
       multi = false, delimiter = ';', async = false, showValueTooltip, showLabelTooltip,
       clearable = true, arrowLeft, arrowUp, arrowRight, arrowDown, fieldRef, onTabPress,
       onEnterPress, customSelectComponents, optionRenderer, classNamePrefix,
-      showSelectedOptionColor, ...attributes
+      showSelectedOptionColor, scrollableParentContainerClassName, ...attributes
     } = this.props;
     const { formatValue, className, showLabel = false } = attributes;
 
@@ -289,17 +289,23 @@ class Select extends Component {
     }
 
     const getPlaceholder = () => {
-      if (attributes.placeholder) {
-        return (
-          <Translate
-            id={attributes.placeholder}
-            defaultMessage={attributes.defaultPlaceholder ?? attributes.placeholder}
-          />
-        );
+      if (!attributes.placeholder) {
+        return null;
       }
-      return null;
-    };
 
+      // If we are passing HTML element we would like to use it as placeholder
+      // otherwise it should be an object with attributes for translation
+      if (isValidElement(attributes.placeholder)) {
+        return attributes.placeholder;
+      }
+
+      return (
+        <Translate
+          id={attributes.placeholder}
+          defaultMessage={attributes.defaultPlaceholder ?? attributes.placeholder}
+        />
+      );
+    };
 
     /* We would like to see the tooltip when an item
       has displayName or when the showLabelTooltip
@@ -317,6 +323,14 @@ class Select extends Component {
       return !(showValueTooltip && hasFieldValue);
     };
 
+    const closeMenuOnScroll = (e) => {
+      if (scrollableParentContainerClassName) {
+        return e.target.className === scrollableParentContainerClassName;
+      }
+
+      return false;
+    };
+
     return (
       <div id={`${this.state.id}-container`}>
         <Tooltip
@@ -332,6 +346,7 @@ class Select extends Component {
         >
           <SelectType
             {...attributes}
+            closeMenuOnScroll={closeMenuOnScroll}
             placeholder={getPlaceholder()}
             isDisabled={attributes.disabled}
             options={(value?.length && this.state.sortedOptionsByChecked) || this.options}
@@ -452,6 +467,7 @@ Select.propTypes = {
   nullOption: PropTypes.bool,
   nullOptionLabel: PropTypes.string,
   nullOptionDefaultLabel: PropTypes.string,
+  scrollableParentContainerClassName: PropTypes.string,
 };
 
 Select.defaultProps = {

@@ -220,6 +220,10 @@ body {
   gap: 8px;
 }
 
+.gap-12 {
+  gap: 12px;
+}
+
 .create-form {
   border: 1px solid $gray-alpha;
   padding-top: 50px;
@@ -1078,6 +1082,14 @@ div.search-input:focus-within {
     background-color: var(--blue-300) !important;
     color: var(--blue-400) !important;
   }
+}
+
+.active-button {
+  @extend %button-base;
+
+  color: #fff;
+  background-color: #6c757d;
+  border-color: #6c757d;
 }
 
 // Status circles styling

@@ -1,8 +1,7 @@
 import React from 'react';
 
-import _ from 'lodash';
 import PropTypes from 'prop-types';
-import { useFieldArray } from 'react-hook-form';
+import { useFieldArray, useWatch } from 'react-hook-form';
 import { RiAddLine } from 'react-icons/ri';
 
 import DataTable from 'components/DataTable';
@@ -11,25 +10,54 @@ import Subsection from 'components/Layout/v2/Subsection';
 import InvalidItemsIndicator from 'components/productSupplier/create/InvalidItemsIndicator';
 import usePreferenceTypeVariationsColumns
   from 'hooks/productSupplier/form/usePreferenceTypeVariationsColumns';
+import usePreferenceTypeVariationsFiltering
+  from 'hooks/productSupplier/form/usePreferenceTypeVariationsFiltering';
+import useTranslate from 'hooks/useTranslate';
 
-const PreferenceTypeVariations = ({ control, errors }) => {
-  const { fields, remove, append } = useFieldArray({
+const PreferenceTypeVariations = ({
+  control,
+  errors,
+  triggerValidation,
+}) => {
+  const { fields, remove, prepend } = useFieldArray({
     control,
     name: 'productSupplierPreferences',
   });
 
-  const { columns, translate } = usePreferenceTypeVariationsColumns({
+  const updatedRows = useWatch({
+    name: 'productSupplierPreferences',
+    control,
+  });
+
+  const {
+    isFiltered,
+    setIsFiltered,
+    invalidRowCount,
+    getFilterMethod,
+    triggerFiltering,
+  } = usePreferenceTypeVariationsFiltering({ errors, updatedRows });
+
+  const translate = useTranslate();
+
+  const { columns } = usePreferenceTypeVariationsColumns({
     errors,
     control,
     remove,
+    updatedRows,
+    triggerValidation,
   });
 
   const defaultTableRow = {
-    destinationParty: {},
-    preferenceType: {},
+    destinationParty: '',
+    preferenceType: '',
     validityStartDate: '',
     validityEndDate: '',
     bidName: '',
+  };
+
+  const addNewLine = () => {
+    prepend(defaultTableRow);
+    triggerValidation('productSupplierPreferences');
   };
 
   return (
@@ -42,9 +70,15 @@ const PreferenceTypeVariations = ({ control, errors }) => {
     >
       <div className="preference-type-variations-subsection">
         <div className="d-flex justify-content-end align-items-center mb-3">
-          <InvalidItemsIndicator className="mr-3" errorsCounter={_.filter(errors)?.length} />
+          <InvalidItemsIndicator
+            className="mr-3"
+            errorsCounter={invalidRowCount}
+            isFiltered={isFiltered}
+            setIsFiltered={setIsFiltered}
+            triggerValidation={triggerValidation}
+          />
           <Button
-            onClick={() => append(defaultTableRow)}
+            onClick={addNewLine}
             StartIcon={<RiAddLine className="button-add-icon" />}
             defaultLabel="Add new"
             label="react.productSupplier.table.addNew.label"
@@ -56,11 +90,14 @@ const PreferenceTypeVariations = ({ control, errors }) => {
           defaultPageSize={4}
           pageSize={fields.length <= 4 ? 4 : fields.length}
           showPagination={false}
+          loading={false}
+          filterAll
+          defaultFilterMethod={getFilterMethod}
+          filtered={triggerFiltering()}
           noDataText={translate(
             'react.productSupplier.table.empty.label',
             'No Preference Type Variations to display',
           )}
-          loading={false}
         />
       </div>
     </Subsection>
@@ -89,5 +126,10 @@ PreferenceTypeVariations.propTypes = {
         message: PropTypes.string,
       }),
     }),
-  ).isRequired,
+  ),
+  triggerValidation: PropTypes.func.isRequired,
+};
+
+PreferenceTypeVariations.defaultProps = {
+  errors: {},
 };

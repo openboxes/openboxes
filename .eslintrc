@@ -38,6 +38,7 @@
       "allowChildren": false
     }],
     "operator-linebreak": "off",
+    "no-underscore-dangle": "off",
     "simple-import-sort/imports": [
       "error",
       {

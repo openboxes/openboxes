@@ -23,6 +23,7 @@ const SelectField = ({
   multiple,
   onChange,
   productSelect,
+  hasErrors,
   ...fieldProps
 }) => {
   const [value, setValue] = useState(defaultValue);
@@ -51,7 +52,7 @@ const SelectField = ({
       className="select-wrapper-container"
     >
       <SelectComponent
-        className={`form-element-select ${errorMessage ? 'has-errors' : ''}`}
+        className={`form-element-select ${hasErrors ? 'has-errors' : ''}`}
         disabled={disabled}
         placeholder={placeholder}
         value={value}
@@ -87,8 +88,7 @@ SelectField.propTypes = {
   }),
   // Indicator whether the field should be disabled
   disabled: PropTypes.bool,
-  // If the errorMessage is not empty then the field is bordered
-  // and the message is displayed under the input
+  // The error message displayed under field
   errorMessage: PropTypes.string,
   // Text displayed within input field
   placeholder: PropTypes.string,
@@ -105,6 +105,8 @@ SelectField.propTypes = {
   // Function triggered on change
   onChange: PropTypes.func,
   productSelect: PropTypes.bool,
+  // indicator whether field should be marked as invalid
+  hasErrors: PropTypes.bool,
 };
 
 SelectField.defaultProps = {
@@ -122,4 +124,5 @@ SelectField.defaultProps = {
   multiple: false,
   onChange: () => {},
   productSelect: false,
+  hasErrors: false,
 };

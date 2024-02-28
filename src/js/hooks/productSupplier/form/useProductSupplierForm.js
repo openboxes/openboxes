@@ -48,7 +48,7 @@ const useProductSupplierForm = () => {
       product: {
         id: productSupplier?.product?.id,
         value: productSupplier?.product?.id,
-        label: productSupplier?.product?.name,
+        label: `${productSupplier?.product?.productCode} - ${productSupplier?.product?.name}`,
       },
       supplier: productSupplier?.supplier
         ? {
@@ -103,6 +103,7 @@ const useProductSupplierForm = () => {
   const {
     control,
     handleSubmit,
+    trigger,
     setValue,
     formState: { errors, isValid },
   } = useForm({
@@ -111,7 +112,8 @@ const useProductSupplierForm = () => {
     // If there is a productSupplier param, it means we are editing a product supplier, so fetch it,
     // otherwise the only default value should be the active field
     defaultValues: productSupplierId ? getProductSupplier : defaultValues,
-    resolver: zodResolver(validationSchema),
+    resolver: (values, context, options) =>
+      zodResolver(validationSchema(values))(values, context, options),
   });
 
   const onSubmit = (values) => {
@@ -151,6 +153,7 @@ const useProductSupplierForm = () => {
     errors,
     isValid,
     ratingTypeCodes,
+    triggerValidation: trigger,
     onSubmit,
   };
 };
