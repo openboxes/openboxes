@@ -8,4 +8,5 @@
     <include file="0.9.x/changelog-2023-09-08-1340-remove-product-price-fk-on-product-package-pointing-to-non-existing-record.xml" />
     <include file="0.9.x/changelog-2023-11-06-1230-add-missing-role-names.xml" />
     <include file="0.9.x/changelog-2024-01-10-1100-add-missing-foreign-keys-for-product-price.xml" />
+    <include file="0.9.x/changelog-2024-02-22-1300-add-default-product-package-to-product-supplier.xml" />
 </databaseChangeLog>

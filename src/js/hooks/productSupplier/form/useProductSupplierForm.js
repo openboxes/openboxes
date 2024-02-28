@@ -83,6 +83,15 @@ const useProductSupplierForm = () => {
           value: preferenceType.preferenceType?.id,
         },
       })),
+      uom: {
+        id: productSupplier?.defaultProductPackage?.uom?.id,
+        value: productSupplier?.defaultProductPackage?.uom?.id,
+        label: productSupplier?.defaultProductPackage?.uom?.name,
+      },
+      productPackageQuantity: productSupplier?.defaultProductPackage?.quantity,
+      productPackagePrice: productSupplier?.defaultProductPackage?.productPrice?.price,
+      contractPricePrice: productSupplier?.contractPrice?.price,
+      contractPriceValidUntil: productSupplier?.contractPrice?.validUntil,
     };
   };
 
@@ -123,7 +132,7 @@ const useProductSupplierForm = () => {
     console.log(payload);
   };
 
-  const packagePrice = useWatch({ control, name: 'packagePrice' });
+  const packagePrice = useWatch({ control, name: 'productPackagePrice' });
   const productPackageQuantity = useWatch({ control, name: 'productPackageQuantity' });
 
   // eachPrice is a computed value from packagePrice and productPackageQuantity

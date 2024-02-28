@@ -98,7 +98,7 @@ const useProductSupplierValidation = () => {
         .number()
         .gte(1)
         .optional(),
-      packagePrice: z
+      productPackagePrice: z
         .number()
         .optional(),
       eachPrice: z
