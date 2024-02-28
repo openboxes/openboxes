@@ -137,8 +137,10 @@ renderFormFields.defaultProps = {
 };
 
 export const decimalParser = (value, precision) => {
-  if (!Number.isNaN(_.parseInt(value)) && _.isNumber(precision)) {
+  const valueAsNumber = parseFloat(value);
+
+  if (!Number.isNaN(valueAsNumber) && _.isNumber(precision)) {
     return _.round(value, precision);
   }
-  return value;
+  return Number.isNaN(valueAsNumber) ? undefined : valueAsNumber;
 };

@@ -24,7 +24,9 @@ const TextInput = ({
 }) => {
   const onBlurHandler = (e) => {
     if (type === 'number') {
-      e.target.value = decimalParser(e.target.value, decimal);
+      const valueAsNumber = decimalParser(e.target.value, decimal);
+      e.target.value = valueAsNumber;
+      fieldProps.onChange?.(valueAsNumber);
     }
     fieldProps.onBlur?.(e);
   };
