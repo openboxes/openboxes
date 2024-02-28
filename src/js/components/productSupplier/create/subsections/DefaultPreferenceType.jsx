@@ -42,6 +42,7 @@ const DefaultPreferenceType = ({ control, errors }) => {
                   defaultMessage: 'Company-wide purchasing preference for this supplier established through a competitive bid',
                 }}
                 options={preferenceTypes}
+                hasErrors={Boolean(errors.defaultPreferenceType?.message)}
                 errorMessage={errors.defaultPreferenceType?.message}
               />
             )}

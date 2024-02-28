@@ -74,7 +74,9 @@ const useProductSupplierValidation = () => {
           id: z.string(),
           value: z.string(),
           label: z.string(),
-        }).optional(),
+        })
+          .optional()
+          .nullable(),
         validFrom: z
           .coerce
           .date()
