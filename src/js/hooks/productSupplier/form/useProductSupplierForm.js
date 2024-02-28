@@ -111,6 +111,7 @@ const useProductSupplierForm = () => {
       ratingTypeCode: values?.ratingTypeCode ? values.ratingTypeCode.id : null,
       productSupplierPreferences: values?.productSupplierPreferences,
       uom: values?.uom ? values.uom.id : null,
+      defaultPreferenceType: values?.defaultPreferenceType ? values.defaultPreferenceType.id : null,
     };
     // If values contain id, it means we are editing
     if (values?.id) {
