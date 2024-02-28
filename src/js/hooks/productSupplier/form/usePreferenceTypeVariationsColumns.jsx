@@ -5,7 +5,7 @@ import { Controller } from 'react-hook-form';
 import { RiDeleteBinLine, RiErrorWarningLine } from 'react-icons/ri';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { fetchBuyers, fetchPreferenceTypes } from 'actions';
+import { fetchBuyers } from 'actions';
 import DateField from 'components/form-elements/v2/DateField';
 import SelectField from 'components/form-elements/v2/SelectField';
 import TextInput from 'components/form-elements/v2/TextInput';
@@ -31,7 +31,6 @@ const usePreferenceTypeVariationsColumns = ({
   const translate = useTranslate();
 
   useEffect(() => {
-    dispatch(fetchPreferenceTypes());
     dispatch(fetchBuyers());
   }, []);
 

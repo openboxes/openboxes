@@ -7,8 +7,14 @@ import DateField from 'components/form-elements/v2/DateField';
 import SelectField from 'components/form-elements/v2/SelectField';
 import TextInput from 'components/form-elements/v2/TextInput';
 import Subsection from 'components/Layout/v2/Subsection';
+import { useSelector } from 'react-redux';
 
 const DefaultPreferenceType = ({ control, errors }) => {
+  const {
+    preferenceTypes,
+  } = useSelector((state) => ({
+    preferenceTypes: state.productSupplier.preferenceTypes,
+  }));
 
   return (
     <Subsection
@@ -33,7 +39,7 @@ const DefaultPreferenceType = ({ control, errors }) => {
                 id: 'react.productSupplier.form.defaultPreferenceType.tooltip',
                 defaultMessage: 'Company-wide purchasing preference for this supplier established through a competitive bid',
               }}
-              options={[]}
+              options={preferenceTypes}
               errorMessage={errors.defaultPreferenceType?.message}
             />
           )}
