@@ -1,53 +1,102 @@
 import React, { useEffect, useMemo } from 'react';
 
+import _ from 'lodash';
 import { Controller } from 'react-hook-form';
-import { RiDeleteBinLine } from 'react-icons/ri';
-import { getTranslate } from 'react-localize-redux';
+import { RiDeleteBinLine, RiErrorWarningLine } from 'react-icons/ri';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { fetchBuyers, fetchPreferenceTypes } from 'actions';
 import DateField from 'components/form-elements/v2/DateField';
 import SelectField from 'components/form-elements/v2/SelectField';
 import TextInput from 'components/form-elements/v2/TextInput';
-import { translateWithDefaultMessage } from 'utils/Translate';
+import useTranslate from 'hooks/useTranslate';
+import Translate from 'utils/Translate';
 
-const usePreferenceTypeVariationsColumns = ({ errors, control, remove }) => {
+const usePreferenceTypeVariationsColumns = ({
+  errors,
+  control,
+  remove,
+  updatedRows,
+  triggerValidation,
+}) => {
   const dispatch = useDispatch();
   const {
     preferenceTypes,
     buyers,
-    translate,
   } = useSelector((state) => ({
     preferenceTypes: state.productSupplier.preferenceTypes,
     buyers: state.organizations.buyers,
-    translate: translateWithDefaultMessage(getTranslate(state.localize)),
   }));
+
+  const translate = useTranslate();
 
   useEffect(() => {
     dispatch(fetchPreferenceTypes());
     dispatch(fetchBuyers());
   }, []);
 
+  const isFieldValid = (index, property) => {
+    const fieldError = errors?.[index]?.[property];
+    const fieldErrorMessage = fieldError?.message || fieldError?.id.message;
+    const isRowDirty = _.some(Object.values(updatedRows?.[index] || {}));
+
+    if (!isRowDirty) {
+      return true;
+    }
+
+    return !fieldErrorMessage;
+  };
+
+  const getCustomSelectErrorPlaceholder = ({
+    id,
+    defaultMessage,
+    displayIcon,
+  }) => (
+    <div className="custom-select-error-placeholder">
+      {displayIcon && <RiErrorWarningLine />}
+      <span>
+        <Translate
+          id={id}
+          defaultMessage={defaultMessage}
+        />
+      </span>
+    </div>
+  );
+
   const columns = useMemo(() => [
     {
       Header: translate('react.productSupplier.table.siteName.label', 'Site Name'),
       sortable: false,
       accessor: 'destinationParty',
-      minWidth: 300,
+      minWidth: 276,
       Cell: (row) => (
         <Controller
           key={row.original.id}
           name={`productSupplierPreferences.${row.index}.destinationParty`}
           control={control}
-          render={({ field }) => (
-            <SelectField
-              options={buyers}
-              errorMessage={
-                errors?.[row.index]?.destinationParty?.message
-              }
-              {...field}
-            />
-          )}
+          render={({ field }) => {
+            const hasErrors = !isFieldValid(row.index, 'destinationParty');
+            return (
+              <SelectField
+                options={buyers}
+                hasErrors={hasErrors}
+                showValueTooltip
+                scrollableParentContainerClassName="rt-table"
+                placeholder={getCustomSelectErrorPlaceholder(
+                  {
+                    id: 'react.productSupplier.table.selectSite.label',
+                    defaultMessage: 'Select Site',
+                    displayIcon: hasErrors,
+                  },
+                )}
+                {...field}
+                onChange={(val) => {
+                  field?.onChange(val);
+                  triggerValidation('productSupplierPreferences');
+                }}
+              />
+            );
+          }}
         />
       ),
     },
@@ -55,19 +104,54 @@ const usePreferenceTypeVariationsColumns = ({ errors, control, remove }) => {
       Header: translate('react.productSupplier.table.preferenceType.label', 'Preference Type'),
       sortable: false,
       accessor: 'preferenceType',
-      minWidth: 300,
+      minWidth: 276,
+      Cell: (row) => {
+        const hasErrors = !isFieldValid(row.index, 'preferenceType');
+        return (
+          <Controller
+            name={`productSupplierPreferences.${row.index}.preferenceType`}
+            control={control}
+            key={row.original.id}
+            render={({ field }) => (
+              <SelectField
+                options={preferenceTypes}
+                hasErrors={hasErrors}
+                scrollableParentContainerClassName="rt-table"
+                placeholder={getCustomSelectErrorPlaceholder({
+                  id: 'react.productSupplier.table.selectPreferenceType.label',
+                  defaultMessage: 'Select Preference Type',
+                  displayIcon: hasErrors,
+                })}
+                {...field}
+                onChange={(val) => {
+                  field?.onChange(val);
+                  triggerValidation('productSupplierPreferences');
+                }}
+              />
+            )}
+          />
+        );
+      },
+    },
+    {
+      Header: translate('react.productSupplier.table.validStartDate.label', 'Valid Start Date'),
+      sortable: false,
+      accessor: 'validityStartDate',
+      style: { overflow: 'visible' },
+      minWidth: 157,
       Cell: (row) => (
         <Controller
-          name={`productSupplierPreferences.${row.index}.preferenceType`}
+          name={`productSupplierPreferences.${row.index}.validityStartDate`}
           control={control}
           key={row.original.id}
           render={({ field }) => (
-            <SelectField
-              options={preferenceTypes}
-              errorMessage={
-                errors?.[row.index]?.preferenceType?.message
-              }
+            <DateField
+              errorMessage={errors?.[row.index]?.validityStartDate?.message}
               {...field}
+              onChange={(val) => {
+                field?.onChange(val);
+                triggerValidation('productSupplierPreferences');
+              }}
             />
           )}
         />
@@ -77,7 +161,7 @@ const usePreferenceTypeVariationsColumns = ({ errors, control, remove }) => {
       Header: translate('react.productSupplier.table.validEndDate.label', 'Valid End Date'),
       sortable: false,
       accessor: 'validityEndDate',
-      minWidth: 179,
+      minWidth: 157,
       Cell: (row) => (
         <Controller
           name={`productSupplierPreferences.${row.index}.validityEndDate`}
@@ -85,32 +169,12 @@ const usePreferenceTypeVariationsColumns = ({ errors, control, remove }) => {
           key={row.original.id}
           render={({ field }) => (
             <DateField
-              errorMessage={
-                errors?.[row.index]?.validityEndDate?.message
-              }
+              errorMessage={errors?.[row.index]?.validityEndDate?.message}
               {...field}
-            />
-          )}
-        />
-      ),
-    },
-    {
-      Header: translate('react.productSupplier.table.validStartDate.label', 'Valid Start Date'),
-      sortable: false,
-      accessor: 'validityStartDate',
-      style: { overflow: 'visible' },
-      minWidth: 179,
-      Cell: (row) => (
-        <Controller
-          name={`productSupplierPreferences.${row.index}.validityStartDate`}
-          control={control}
-          key={row.original.id}
-          render={({ field }) => (
-            <DateField
-              errorMessage={
-                errors?.[row.index]?.validityStartDate?.message
-              }
-              {...field}
+              onChange={(val) => {
+                field?.onChange(val);
+                triggerValidation('productSupplierPreferences');
+              }}
             />
           )}
         />
@@ -120,7 +184,7 @@ const usePreferenceTypeVariationsColumns = ({ errors, control, remove }) => {
       Header: translate('react.productSupplier.table.bidName.label', 'Bid Name'),
       sortable: false,
       accessor: 'bidName',
-      minWidth: 300,
+      minWidth: 276,
       Cell: (row) => (
         <Controller
           name={`productSupplierPreferences.${row.index}.bidName`}
@@ -128,10 +192,12 @@ const usePreferenceTypeVariationsColumns = ({ errors, control, remove }) => {
           key={row.original.id}
           render={({ field }) => (
             <TextInput
-              errorMessage={
-                errors?.[row.index]?.bidName?.message
-              }
+              errorMessage={errors?.[row.index]?.bidName?.message}
               {...field}
+              onChange={(val) => {
+                field?.onChange(val);
+                triggerValidation('productSupplierPreferences');
+              }}
             />
           )}
         />
@@ -145,14 +211,17 @@ const usePreferenceTypeVariationsColumns = ({ errors, control, remove }) => {
       className: 'd-flex justify-content-center align-items-center',
       Cell: (row) => (
         <RiDeleteBinLine
-          onClick={() => remove(row.index)}
+          onClick={() => {
+            remove(row.index);
+            triggerValidation('productSupplierPreferences');
+          }}
           className="preference-type-variations-bin"
         />
       ),
     },
   ], [errors, buyers, preferenceTypes]);
 
-  return { columns, translate };
+  return { columns };
 };
 
 export default usePreferenceTypeVariationsColumns;

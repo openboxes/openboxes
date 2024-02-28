@@ -12,11 +12,12 @@ const ProductSupplierFormMain = ({ formProps }) => {
   const {
     control,
     errors,
+    triggerValidation,
     ratingTypeCodes,
   } = formProps;
 
   return (
-    <div className="d-flex flex-column gap-8">
+    <div className="d-flex gap-12 flex-column">
       <DetailsSection
         control={control}
         errors={errors}
@@ -25,6 +26,7 @@ const ProductSupplierFormMain = ({ formProps }) => {
       <PreferenceTypeSection
         control={control}
         errors={errors.productSupplierPreferences}
+        triggerValidation={triggerValidation}
       />
       <PricingSection
         control={control}
@@ -91,5 +93,6 @@ ProductSupplierFormMain.propTypes = {
       value: PropTypes.string.isRequired,
       label: PropTypes.string.isRequired,
     }).isRequired,
+    triggerValidation: PropTypes.func.isRequired,
   }).isRequired,
 };

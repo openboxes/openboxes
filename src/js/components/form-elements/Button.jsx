@@ -5,7 +5,16 @@ import PropTypes from 'prop-types';
 import Translate from 'utils/Translate';
 
 const Button = ({
-  label, defaultLabel, disabled, variant, type, onClick, EndIcon, isDropdown, StartIcon,
+  label,
+  defaultLabel,
+  disabled,
+  variant,
+  type,
+  onClick,
+  EndIcon,
+  isDropdown,
+  StartIcon,
+  className,
 }) => {
   const buttonClass = 'd-flex justify-content-around align-items-center gap-8';
   const variantClass = `${variant}-button`;
@@ -13,7 +22,7 @@ const Button = ({
 
   return (
     <button
-      className={[variantClass, buttonClass, dropDownClass].join(' ')}
+      className={[variantClass, buttonClass, dropDownClass, className].join(' ')}
       disabled={disabled}
       type={type}
       onClick={onClick}
@@ -47,6 +56,7 @@ Button.propTypes = {
   EndIcon: PropTypes.element,
   StartIcon: PropTypes.element,
   isDropdown: PropTypes.bool,
+  className: PropTypes.string,
 };
 
 Button.defaultProps = {
@@ -57,4 +67,5 @@ Button.defaultProps = {
   onClick: undefined,
   EndIcon: null,
   StartIcon: null,
+  className: '',
 };

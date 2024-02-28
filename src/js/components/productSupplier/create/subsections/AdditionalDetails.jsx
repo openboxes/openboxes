@@ -38,6 +38,7 @@ const AdditionalDetails = ({ control, ratingTypeCodes, errors }) => {
               placeholder="Search for a manufacturer"
               async
               loadOptions={debounceManufacturersFetch}
+              hasErrors={Boolean(errors.manufacturer?.message)}
               errorMessage={errors.manufacturer?.message}
               {...field}
             />
@@ -55,6 +56,7 @@ const AdditionalDetails = ({ control, ratingTypeCodes, errors }) => {
                 defaultMessage: 'Product quality rating based on user feedback or sample review',
               }}
               options={ratingTypeCodes}
+              hasErrors={Boolean(errors.ratingTypeCode?.message)}
               errorMessage={errors.ratingTypeCode?.message}
               {...field}
             />
