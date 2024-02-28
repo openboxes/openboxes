@@ -48,6 +48,7 @@ const PackageSpecification = ({ control, errors }) => {
               {...field}
               required
               type="number"
+              decimal={0}
               errorMessage={errors.productPackageQuantity?.message}
               title={{
                 id: 'react.productSupplier.form.productPackageQuantity.title',
