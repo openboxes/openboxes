@@ -1799,7 +1799,7 @@ class JsonController {
 
     def productSupplierChanged() {
         ProductSupplier productSupplier = ProductSupplier.findById(params.productSupplierId)
-        ProductPackage productPackage = productSupplier?.defaultProductPackage
+        ProductPackage productPackage = productSupplier?.defaultProductPackageDerived
         Organization destinationParty = Organization.get(params.destinationPartyId)
         ProductSupplierPreference preference = productSupplier.productSupplierPreferences.find { it.destinationParty == destinationParty }
         render([

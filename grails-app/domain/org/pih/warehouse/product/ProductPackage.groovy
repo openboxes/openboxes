@@ -87,4 +87,21 @@ class ProductPackage implements Comparable<ProductPackage>, Serializable {
             "price"              : "productPrice.price"
     ]
 
+    Map toJson() {
+        [
+            id: id,
+            name: name,
+            description: description,
+            productPrice: [
+                id: productPrice?.id,
+                price: productPrice?.price,
+            ],
+            quantity: quantity,
+            uom: [
+                id: uom.id,
+                name: uom.name,
+                code: uom.code
+            ]
+        ]
+    }
 }
