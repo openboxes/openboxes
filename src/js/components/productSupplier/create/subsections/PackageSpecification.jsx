@@ -1,7 +1,7 @@
 import React from 'react';
 
 import PropTypes from 'prop-types';
-import { Controller } from 'react-hook-form';
+import { Controller, useWatch } from 'react-hook-form';
 
 import SelectField from 'components/form-elements/v2/SelectField';
 import TextInput from 'components/form-elements/v2/TextInput';
@@ -10,6 +10,8 @@ import useQuantityUnitOfMeasureOptions from 'hooks/options-data/useQuantityUnitO
 
 const PackageSpecification = ({ control, errors }) => {
   const { quantityUom } = useQuantityUnitOfMeasureOptions();
+  const uom = useWatch({ control, name: 'uom' });
+
   return (
     <Subsection
       title={{
@@ -46,6 +48,7 @@ const PackageSpecification = ({ control, errors }) => {
           render={({ field }) => (
             <TextInput
               {...field}
+              disabled={uom?.id === 'EA' || field.disabled}
               required
               type="number"
               decimal={0}
