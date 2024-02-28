@@ -25,7 +25,7 @@ const DefaultPreferenceType = ({ control, errors }) => {
       }}
     >
       <div className="row">
-        <div className="col-lg col-md-6">
+        <div className="col-lg col-md-6 p-2">
           <Controller
             name="defaultPreferenceType"
             control={control}
@@ -48,7 +48,7 @@ const DefaultPreferenceType = ({ control, errors }) => {
             )}
           />
         </div>
-        <div className="col-lg col-md-6">
+        <div className="col-lg col-md-6 p-2">
           <Controller
             name="validFrom"
             control={control}
@@ -68,7 +68,7 @@ const DefaultPreferenceType = ({ control, errors }) => {
             )}
           />
         </div>
-        <div className="col-lg col-md-6">
+        <div className="col-lg col-md-6 p-2">
           <Controller
             name="validUntil"
             control={control}
@@ -88,7 +88,7 @@ const DefaultPreferenceType = ({ control, errors }) => {
             )}
           />
         </div>
-        <div className="col-lg col-md-6">
+        <div className="col-lg col-md-6 p-2">
           <Controller
             name="bidName"
             control={control}
