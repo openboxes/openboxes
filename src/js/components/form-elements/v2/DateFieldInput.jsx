@@ -27,7 +27,8 @@ const DateFieldInput = forwardRef(({
       {...disabledProps}
       ref={ref}
     >
-      <span>{value || placeholder}</span>
+      <span className="date-field-input__value">{value}</span>
+      {!value && <span className="date-field-input__placeholder">{placeholder}</span>}
       {!disabled
         && (
           <span className="form-element-icons-wrapper">

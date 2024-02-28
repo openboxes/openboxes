@@ -32,6 +32,7 @@ const DefaultPreferenceType = ({ control, errors }) => {
             render={({ field }) => (
               <SelectField
                 {...field}
+                placeholder="Select"
                 title={{
                   id: 'react.productSupplier.form.defaultPreferenceType.title',
                   defaultMessage: 'Default Preference Type',
@@ -56,6 +57,10 @@ const DefaultPreferenceType = ({ control, errors }) => {
                   id: 'react.productSupplier.form.validFrom.title',
                   defaultMessage: 'Valid From',
                 }}
+                placeholder={{
+                  id: 'react.default.dateInput.placeholder.label',
+                  default: 'Select a date',
+                }}
                 errorMessage={errors.validFrom?.message}
                 {...field}
               />
@@ -71,6 +76,10 @@ const DefaultPreferenceType = ({ control, errors }) => {
                 title={{
                   id: 'react.productSupplier.form.validUntil.title',
                   defaultMessage: 'Valid Until',
+                }}
+                placeholder={{
+                  id: 'react.default.dateInput.placeholder.label',
+                  default: 'Select a date',
                 }}
                 errorMessage={errors.validUntil?.message}
                 {...field}
