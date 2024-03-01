@@ -8,6 +8,7 @@ import { useParams } from 'react-router-dom';
 import { fetchPreferenceTypes, fetchRatingTypeCodes } from 'actions';
 import productSupplierApi from 'api/services/ProductSupplierApi';
 import useOptionsFetch from 'hooks/options-data/useOptionsFetch';
+import useProductSupplierAttributes from 'hooks/productSupplier/form/useProductSupplierAttributes';
 import useProductSupplierValidation from 'hooks/productSupplier/form/useProductSupplierValidation';
 import { decimalParser } from 'utils/form-utils';
 import { omitEmptyValues } from 'utils/form-values-utils';
@@ -15,6 +16,7 @@ import { splitPreferenceTypes } from 'utils/list-utils';
 
 const useProductSupplierForm = () => {
   const { validationSchema } = useProductSupplierValidation();
+  const { mapFetchedAttributes } = useProductSupplierAttributes();
   // Check if productSupplierId is provided in the URL (determine whether it is create or edit)
   const { productSupplierId } = useParams();
 
@@ -28,6 +30,7 @@ const useProductSupplierForm = () => {
     const response =
       await productSupplierApi.getProductSupplier(productSupplierId);
     const productSupplier = response?.data?.data;
+    const attributes = mapFetchedAttributes(productSupplier?.attributes);
     const { preferenceTypes } = splitPreferenceTypes(productSupplier?.productSupplierPreferences);
     return {
       // Exclude null/empty values
@@ -79,7 +82,7 @@ const useProductSupplierForm = () => {
       productPackagePrice: productSupplier?.defaultProductPackage?.productPrice?.price,
       contractPricePrice: productSupplier?.contractPrice?.price,
       contractPriceValidUntil: productSupplier?.contractPrice?.validUntil,
-      attributes: productSupplier?.attributes,
+      attributes,
     };
   };
 

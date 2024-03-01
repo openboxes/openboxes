@@ -102,6 +102,27 @@ const useProductSupplierAttributes = () => {
       };
     });
 
+  const mapFetchedAttributes = (fetchedAttributes) => fetchedAttributes.reduce((acc, attribute) => {
+    const field = attributes.find((currentAttribute) =>
+      currentAttribute?.id === attribute?.attribute?.id);
+
+    if (isSelectType(field)) {
+      return {
+        ...acc,
+        [attribute?.attribute?.id]: {
+          id: attribute?.attribute?.id,
+          value: attribute?.value,
+          label: attribute?.value,
+        },
+      };
+    }
+
+    return {
+      ...acc,
+      [attribute?.attribute?.id]: attribute?.value,
+    };
+  }, {});
+
   return {
     attributes,
     attributesWithInputTypes: getAttributesWithInputTypes(attributes),
@@ -109,6 +130,7 @@ const useProductSupplierAttributes = () => {
     selectTypeSchema,
     isTextType,
     isSelectType,
+    mapFetchedAttributes,
   };
 };
 
