@@ -2,12 +2,12 @@ import React from 'react';
 
 import PropTypes from 'prop-types';
 import { Controller } from 'react-hook-form';
+import { useSelector } from 'react-redux';
 
 import DateField from 'components/form-elements/v2/DateField';
 import SelectField from 'components/form-elements/v2/SelectField';
 import TextInput from 'components/form-elements/v2/TextInput';
 import Subsection from 'components/Layout/v2/Subsection';
-import { useSelector } from 'react-redux';
 
 const DefaultPreferenceType = ({ control, errors }) => {
   const {
@@ -27,7 +27,7 @@ const DefaultPreferenceType = ({ control, errors }) => {
       <div className="row">
         <div className="col-lg col-md-6">
           <Controller
-            name="defaultPreferenceType"
+            name="preferenceType"
             control={control}
             render={({ field }) => (
               <SelectField
@@ -42,15 +42,15 @@ const DefaultPreferenceType = ({ control, errors }) => {
                   defaultMessage: 'Company-wide purchasing preference for this supplier established through a competitive bid',
                 }}
                 options={preferenceTypes}
-                hasErrors={Boolean(errors.defaultPreferenceType?.message)}
-                errorMessage={errors.defaultPreferenceType?.message}
+                hasErrors={Boolean(errors.preferenceType?.message)}
+                errorMessage={errors.preferenceType?.message}
               />
             )}
           />
         </div>
         <div className="col-lg col-md-6">
           <Controller
-            name="validFrom"
+            name="validityStartDate"
             control={control}
             render={({ field }) => (
               <DateField
@@ -62,7 +62,7 @@ const DefaultPreferenceType = ({ control, errors }) => {
                   id: 'react.default.dateInput.placeholder.label',
                   default: 'Select a date',
                 }}
-                errorMessage={errors.validFrom?.message}
+                errorMessage={errors.validityStartDate?.message}
                 {...field}
               />
             )}
@@ -70,7 +70,7 @@ const DefaultPreferenceType = ({ control, errors }) => {
         </div>
         <div className="col-lg col-md-6">
           <Controller
-            name="validUntil"
+            name="validityEndDate"
             control={control}
             render={({ field }) => (
               <DateField
@@ -82,7 +82,7 @@ const DefaultPreferenceType = ({ control, errors }) => {
                   id: 'react.default.dateInput.placeholder.label',
                   default: 'Select a date',
                 }}
-                errorMessage={errors.validUntil?.message}
+                errorMessage={errors.validityEndDate?.message}
                 {...field}
               />
             )}
@@ -118,13 +118,13 @@ export default DefaultPreferenceType;
 DefaultPreferenceType.propTypes = {
   control: PropTypes.shape({}).isRequired,
   errors: PropTypes.shape({
-    defaultPreferenceType: PropTypes.shape({
+    preferenceType: PropTypes.shape({
       message: PropTypes.string,
     }),
-    validFrom: PropTypes.shape({
+    validityStartDate: PropTypes.shape({
       message: PropTypes.string,
     }),
-    validUntil: PropTypes.shape({
+    validityEndDate: PropTypes.shape({
       message: PropTypes.string,
     }),
     bidName: PropTypes.shape({
