@@ -217,11 +217,11 @@ class ProductSupplier implements Serializable, Comparable<ProductSupplier> {
             ] : null,
             supplierCode: supplierCode,
             defaultProductPackage: defaultProductPackage ?: defaultProductPackageDerived,
-            contractPrice: [
+            contractPrice: contractPrice ? [
                 id: contractPrice?.id,
                 price: contractPrice?.price,
                 validUntil: contractPrice?.toDate,
-            ],
+            ] : null,
             minOrderQuantity: minOrderQuantity,
             productSupplierPreferences: productSupplierPreferences.collect { it.toJson() },
             packageSize: packageSize,
