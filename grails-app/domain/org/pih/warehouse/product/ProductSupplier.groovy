@@ -238,6 +238,7 @@ class ProductSupplier implements Serializable, Comparable<ProductSupplier> {
             description: description,
             manufacturerCode: manufacturerCode,
             brandName: brandName,
+            attributes: attributes,
         ]
     }
 }
