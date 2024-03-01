@@ -16,58 +16,64 @@ const FixedPrice = ({ control, errors }) => (
     }}
     collapsable={false}
   >
-    <div className="form-grid-3">
-      <Controller
-        name="contractPricePrice"
-        control={control}
-        render={({ field }) => (
-          <TextInput
-            {...field}
-            decimal={2}
-            type="number"
-            errorMessage={errors.contractPricePrice?.message}
-            title={{
-              id: 'react.productSupplier.form.contractPricePrice.title',
-              defaultMessage: 'Contract Price Each',
-            }}
-            tooltip={{
-              id: 'react.productSupplier.form.contractPricePrice.tooltip',
-              defaultMessage: 'Fixed price per unit guaranteed by a contract with the supplier',
-            }}
-          />
-        )}
-      />
-      <Controller
-        name="contractPriceValidUntil"
-        control={control}
-        render={({ field }) => (
-          <DateField
-            title={{
-              id: 'react.productSupplier.form.contractPriceValidUntil.title',
-              defaultMessage: 'Price Valid Until',
-            }}
-            errorMessage={errors.contractPriceValidUntil?.message}
-            {...field}
-          />
-        )}
-      />
-      <Controller
-        name="tieredPricing"
-        control={control}
-        render={({ field }) => (
-          <CheckBox
-            title={{
-              id: 'react.productSupplier.form.tieredPricing.title',
-              defaultMessage: 'Tiered Pricing',
-            }}
-            tooltip={{
-              id: 'react.productSupplier.form.tieredPricing.tooltip',
-              defaultMessage: 'Indicates whether the supplier offers lower pricing for meeting specific quantity targets',
-            }}
-            {...field}
-          />
-        )}
-      />
+    <div className="row">
+      <div className="col-lg-4 p-2">
+        <Controller
+          name="contractPricePrice"
+          control={control}
+          render={({ field }) => (
+            <TextInput
+              {...field}
+              decimal={2}
+              type="number"
+              errorMessage={errors.contractPricePrice?.message}
+              title={{
+                id: 'react.productSupplier.form.contractPricePrice.title',
+                defaultMessage: 'Contract Price Each',
+              }}
+              tooltip={{
+                id: 'react.productSupplier.form.contractPricePrice.tooltip',
+                defaultMessage: 'Fixed price per unit guaranteed by a contract with the supplier',
+              }}
+            />
+          )}
+        />
+      </div>
+      <div className="col-lg-4 p-2">
+        <Controller
+          name="contractPriceValidUntil"
+          control={control}
+          render={({ field }) => (
+            <DateField
+              title={{
+                id: 'react.productSupplier.form.contractPriceValidUntil.title',
+                defaultMessage: 'Price Valid Until',
+              }}
+              errorMessage={errors.contractPriceValidUntil?.message}
+              {...field}
+            />
+          )}
+        />
+      </div>
+      <div className="col-lg-4 p-2">
+        <Controller
+          name="tieredPricing"
+          control={control}
+          render={({ field }) => (
+            <CheckBox
+              title={{
+                id: 'react.productSupplier.form.tieredPricing.title',
+                defaultMessage: 'Tiered Pricing',
+              }}
+              tooltip={{
+                id: 'react.productSupplier.form.tieredPricing.tooltip',
+                defaultMessage: 'Indicates whether the supplier offers lower pricing for meeting specific quantity targets',
+              }}
+              {...field}
+            />
+          )}
+        />
+      </div>
     </div>
   </Subsection>
 );

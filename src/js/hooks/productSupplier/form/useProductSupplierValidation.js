@@ -141,8 +141,9 @@ const useProductSupplierValidation = () => {
         productPackagePrice: z
           .number()
           .optional(),
+        // since this is a computed field we want to skip validation by setting it to any
         eachPrice: z
-          .number()
+          .any()
           .optional(),
         contractPricePrice: z
           .number()
