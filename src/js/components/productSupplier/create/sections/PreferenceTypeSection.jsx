@@ -17,11 +17,11 @@ const PreferenceTypeSection = ({
     <DefaultPreferenceType
       control={control}
       errors={errors}
-      triggerValidation={triggerValidation}
     />
     <PreferenceTypeVariations
       control={control}
       errors={errors.productSupplierPreferences}
+      triggerValidation={triggerValidation}
     />
   </Section>
 );
