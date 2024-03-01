@@ -79,6 +79,7 @@ const useProductSupplierForm = () => {
       productPackagePrice: productSupplier?.defaultProductPackage?.productPrice?.price,
       contractPricePrice: productSupplier?.contractPrice?.price,
       contractPriceValidUntil: productSupplier?.contractPrice?.validUntil,
+      attributes: productSupplier?.attributes,
     };
   };
 
@@ -103,6 +104,12 @@ const useProductSupplierForm = () => {
       zodResolver(validationSchema(values))(values, context, options),
   });
 
+  useEffect(() => {
+    trigger();
+  }, []);
+
+  console.log(isValid, errors)
+
   const onSubmit = (values) => {
     const payload = {
       ...omitEmptyValues(values),
@@ -113,6 +120,8 @@ const useProductSupplierForm = () => {
       productSupplierPreferences: values?.productSupplierPreferences,
       uom: values?.uom ? values.uom.id : null,
       preferenceType: values?.preferenceType ? values.preferenceType.id : null,
+      defaultPreferenceType: values?.defaultPreferenceType ? values.defaultPreferenceType.id : null,
+      attributes: values?.attributes,
     };
     // If values contain id, it means we are editing
     if (values?.id) {
