@@ -104,12 +104,6 @@ const useProductSupplierForm = () => {
       zodResolver(validationSchema(values))(values, context, options),
   });
 
-  useEffect(() => {
-    trigger();
-  }, []);
-
-  console.log(isValid, errors)
-
   const onSubmit = (values) => {
     const payload = {
       ...omitEmptyValues(values),
@@ -121,7 +115,7 @@ const useProductSupplierForm = () => {
       uom: values?.uom ? values.uom.id : null,
       preferenceType: values?.preferenceType ? values.preferenceType.id : null,
       defaultPreferenceType: values?.defaultPreferenceType ? values.defaultPreferenceType.id : null,
-      attributes: values?.attributes,
+      attributes: omitEmptyValues(values?.attributes),
     };
     // If values contain id, it means we are editing
     if (values?.id) {
