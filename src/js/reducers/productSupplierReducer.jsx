@@ -1,8 +1,13 @@
-import { FETCH_PREFERENCE_TYPES, FETCH_RATING_TYPE_OPTIONS } from 'actions/types';
+import {
+  FETCH_ATTRIBUTES,
+  FETCH_PREFERENCE_TYPES,
+  FETCH_RATING_TYPE_OPTIONS,
+} from 'actions/types';
 
 const initialState = {
   preferenceTypes: [],
   ratingTypeCodes: [],
+  attributes: [],
 };
 
 export default function productSupplierReducer(state = initialState, action) {
@@ -16,6 +21,11 @@ export default function productSupplierReducer(state = initialState, action) {
       return {
         ...state,
         ratingTypeCodes: action.payload,
+      };
+    case FETCH_ATTRIBUTES:
+      return {
+        ...state,
+        attributes: action.payload,
       };
     default:
       return state;
