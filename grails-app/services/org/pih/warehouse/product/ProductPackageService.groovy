@@ -17,6 +17,7 @@ class ProductPackageService {
     private static void setPackageData(ProductPackageCommand command) {
         ProductSupplier productSupplier = command.productSupplier
         productSupplier.minOrderQuantity = command.minOrderQuantity
+        productSupplier.tieredPricing = command.tieredPricing
 
         ProductPackage defaultProductPackage = productSupplier?.productPackages?.find {
             it.uom == command.uom && it.quantity == command.productPackageQuantity

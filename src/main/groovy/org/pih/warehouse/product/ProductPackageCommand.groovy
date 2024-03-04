@@ -22,6 +22,8 @@ class ProductPackageCommand implements Validateable {
 
     Date contractPriceValidUntil
 
+    Boolean tieredPricing
+
     static constraints = {
         productPackageQuantity(min: 0)
         minOrderQuantity(nullable: true, min: 0.0)

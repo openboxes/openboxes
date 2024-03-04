@@ -63,6 +63,8 @@ class ProductSupplier implements Serializable, Comparable<ProductSupplier> {
     // Additional comments
     String comments
 
+    Boolean tieredPricing = false
+
     // Auditing fields
     Date dateCreated
     Date lastUpdated
@@ -239,6 +241,7 @@ class ProductSupplier implements Serializable, Comparable<ProductSupplier> {
             manufacturerCode: manufacturerCode,
             brandName: brandName,
             attributes: attributes,
+            tieredPricing: tieredPricing,
         ]
     }
 }
