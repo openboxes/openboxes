@@ -22,10 +22,16 @@ const usePreferenceTypeVariationsFiltering = ({ errors, updatedRows }) => {
 
   const invalidRowCount = Object.keys(errors).filter(isRowInvalid).length;
 
+  const getTablePageSize = (allRowsCount, invalidRowsCount, isFilteringApplied) => {
+    const dataCount = isFilteringApplied ? invalidRowsCount : allRowsCount;
+    return dataCount <= 4 ? 4 : dataCount;
+  };
+
   return {
     isFiltered,
     setIsFiltered,
     invalidRowCount,
+    tablePageSize: getTablePageSize(updatedRows?.length, invalidRowCount, isFiltered),
     getFilterMethod,
     triggerFiltering,
   };

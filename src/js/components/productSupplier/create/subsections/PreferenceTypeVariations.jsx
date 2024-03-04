@@ -12,6 +12,7 @@ import usePreferenceTypeVariationsColumns
   from 'hooks/productSupplier/form/usePreferenceTypeVariationsColumns';
 import usePreferenceTypeVariationsFiltering
   from 'hooks/productSupplier/form/usePreferenceTypeVariationsFiltering';
+import useResetScrollbar from 'hooks/useResetScrollbar';
 import useTranslate from 'hooks/useTranslate';
 
 const PreferenceTypeVariations = ({
@@ -29,10 +30,15 @@ const PreferenceTypeVariations = ({
     control,
   });
 
+  const { resetScrollbar } = useResetScrollbar({
+    scrollableComponentClassName: 'rt-table',
+  });
+
   const {
     isFiltered,
     setIsFiltered,
     invalidRowCount,
+    tablePageSize,
     getFilterMethod,
     triggerFiltering,
   } = usePreferenceTypeVariationsFiltering({ errors, updatedRows });
@@ -58,6 +64,7 @@ const PreferenceTypeVariations = ({
   const addNewLine = () => {
     prepend(defaultTableRow);
     triggerValidation('productSupplierPreferences');
+    resetScrollbar();
   };
 
   return (
@@ -88,7 +95,7 @@ const PreferenceTypeVariations = ({
           data={fields}
           columns={columns}
           defaultPageSize={4}
-          pageSize={fields.length <= 4 ? 4 : fields.length}
+          pageSize={tablePageSize}
           showPagination={false}
           loading={false}
           filterAll
