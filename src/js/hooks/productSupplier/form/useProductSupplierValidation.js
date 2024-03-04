@@ -70,18 +70,18 @@ const useProductSupplierValidation = () => {
         brandName: z
           .string()
           .optional(),
-        defaultPreferenceType: z.object({
+        preferenceType: z.object({
           id: z.string(),
           value: z.string(),
           label: z.string(),
         })
           .optional()
           .nullable(),
-        validFrom: z
+        validityStartDate: z
           .coerce
           .date()
           .optional(),
-        validUntil: z
+        validityEndDate: z
           .coerce
           .date()
           .optional(),
