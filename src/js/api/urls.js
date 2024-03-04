@@ -72,6 +72,9 @@ export const PREFERENCE_TYPE_OPTIONS = `${API}/preferenceTypeOptions`;
 // RATING TYPES
 export const RATING_TYPE_OPTIONS = `${API}/ratingTypeCodeOptions`;
 
+// ATTRIBUTES
+export const ATTRIBUTES = `${API}/attributes`;
+
 // LOCATIONS
 export const LOCATION_API = `${API}/locations`;
 export const LOCATION_TYPES = `${LOCATION_API}/locationTypes`;

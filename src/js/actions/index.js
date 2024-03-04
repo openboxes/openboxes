@@ -9,6 +9,7 @@ import {
   CHANGE_CURRENT_LOCATION,
   CLOSE_INFO_BAR,
   FETCH_APPROVERS,
+  FETCH_ATTRIBUTES,
   FETCH_BUYERS,
   FETCH_CONFIG,
   FETCH_CONFIG_AND_SET_ACTIVE,
@@ -702,5 +703,13 @@ export const fetchRatingTypeCodes = (config) => async (dispatch) => {
   return dispatch({
     type: FETCH_RATING_TYPE_OPTIONS,
     payload: ratingTypeCodes?.data?.data,
+  });
+};
+
+export const fetchAttributes = (config) => async (dispatch) => {
+  const attributes = await productSupplierApi.getAttributes(config);
+  return dispatch({
+    type: FETCH_ATTRIBUTES,
+    payload: attributes?.data?.data,
   });
 };

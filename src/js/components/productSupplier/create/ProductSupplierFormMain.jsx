@@ -2,6 +2,7 @@ import React from 'react';
 
 import PropTypes from 'prop-types';
 
+import AttributesSection from 'components/productSupplier/create/sections/AttributesSection';
 import DetailsSection from 'components/productSupplier/create/sections/DetailsSection';
 import PreferenceTypeSection from 'components/productSupplier/create/sections/PreferenceTypeSection';
 import PricingSection from 'components/productSupplier/create/sections/PricingSection';
@@ -29,6 +30,10 @@ const ProductSupplierFormMain = ({ formProps }) => {
       <PricingSection
         control={control}
         errors={errors}
+      />
+      <AttributesSection
+        control={control}
+        errors={errors.attributes}
       />
     </div>
   );
@@ -97,6 +102,11 @@ ProductSupplierFormMain.propTypes = {
           message: PropTypes.string,
         }),
       })),
+      attributes: PropTypes.objectOf(
+        PropTypes.shape({
+          message: PropTypes.string,
+        }),
+      ),
     }),
     triggerValidation: PropTypes.func.isRequired,
   }).isRequired,
