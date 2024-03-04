@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import PropTypes from 'prop-types';
 import { RiCheckboxCircleLine } from 'react-icons/all';
 import { RiErrorWarningLine } from 'react-icons/ri';
 
 import Button from 'components/form-elements/Button';
+import useResetScrollbar from 'hooks/useResetScrollbar';
 
 const invalidLinesButton = {
   Icon: RiErrorWarningLine,
@@ -39,9 +40,23 @@ const InvalidItemsIndicator = ({
     isFiltered,
   });
 
+  const { resetScrollbar } = useResetScrollbar({
+    scrollableComponentClassName: 'rt-table',
+  });
+
+  useEffect(() => {
+    if (!errorsCounter) {
+      setIsFiltered(false);
+      resetScrollbar();
+    }
+  }, [errorsCounter]);
+
   const handleOnFilterButtonClick = () => {
     triggerValidation('productSupplierPreferences');
-    setIsFiltered((value) => !value);
+    if (errorsCounter) {
+      setIsFiltered((value) => !value);
+      resetScrollbar();
+    }
   };
 
   return (
