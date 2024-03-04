@@ -804,6 +804,11 @@ class UrlMappings {
             action = [GET: "downloadCategories"]
         }
 
+        "/api/productSupplierPreferences/batch" {
+            controller = { "productSupplierPreferenceApi" }
+            action = [POST: "createOrUpdateBatch"]
+        }
+
         // Load Data
 
         "/api/loadData/listOfDemoData"(parseRequest: true) {
