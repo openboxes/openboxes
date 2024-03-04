@@ -1,7 +1,16 @@
 import _ from 'lodash';
 import { z } from 'zod';
 
+import useProductSupplierAttributes from 'hooks/productSupplier/form/useProductSupplierAttributes';
+
 const useProductSupplierValidation = () => {
+  const {
+    attributes,
+    isSelectType,
+    inputTypeSchema,
+    selectTypeSchema,
+  } = useProductSupplierAttributes();
+
   const validationSchema = (data) => {
     const checkDestinationPartyUniqueness = (destinationParty) => {
       const groupedData = _.groupBy(
@@ -10,6 +19,22 @@ const useProductSupplierValidation = () => {
 
       return groupedData[destinationParty?.id].length === 1;
     };
+
+    const attributesValidationSchema = attributes.reduce((acc, attribute) => {
+      const errorProps = {
+        required_error: `${attribute?.name} is required`,
+        invalid_type_error: `${attribute?.name} is required`,
+      };
+
+      const attributeSchema = isSelectType(attribute)
+        ? selectTypeSchema(attribute, errorProps)
+        : inputTypeSchema(attribute, errorProps);
+
+      return {
+        ...acc,
+        [attribute?.id]: attributeSchema,
+      };
+    }, {});
 
     // TODO: Add translations for the error messages
     return z
@@ -118,6 +143,7 @@ const useProductSupplierValidation = () => {
             .nullable(),
           bidName: z
             .string()
+            .max(255, 'Max length of bid name is 255')
             .optional()
             .nullable(),
         })),
@@ -155,6 +181,7 @@ const useProductSupplierValidation = () => {
         tieredPricing: z
           .boolean()
           .optional(),
+        attributes: z.object(attributesValidationSchema),
       });
   };
 
