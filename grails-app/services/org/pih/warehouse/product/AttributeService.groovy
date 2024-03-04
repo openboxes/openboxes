@@ -10,7 +10,7 @@ class AttributeService {
 
         if (entityTypeCode) {
             query += " join a.entityTypeCodes etc where etc = :entityTypeCode"
-            argumentsList += [entityTypeCode: EntityTypeCode.PRODUCT_SUPPLIER]
+            argumentsList += [entityTypeCode: entityTypeCode]
         }
 
         return Attribute.executeQuery(query, argumentsList)

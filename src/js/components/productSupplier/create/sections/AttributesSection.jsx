@@ -11,13 +11,14 @@ const AttributesSection = ({ control, errors }) => {
 
   return (
     <Section title={{ label: 'react.productSupplier.section.attributes.title', defaultMessage: 'Attributes' }}>
-      <div className="attributes-section gap-8 mt-4">
+      <div className="form-grid-3 mt-4">
         {
           attributesWithInputTypes.map(({ attribute, Input }) => {
             const errorMessage = errors?.[attribute?.id]?.message;
             return (
               <Controller
                 name={`attributes.${attribute?.id}`}
+                key={`attributes.${attribute?.id}`}
                 control={control}
                 render={({ field }) => (
                   <Input

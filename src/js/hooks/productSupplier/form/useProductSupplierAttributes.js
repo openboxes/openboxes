@@ -17,11 +17,17 @@ const useProductSupplierAttributes = () => {
   }));
 
   useEffect(() => {
+    const controller = new AbortController();
     dispatch(fetchAttributes({
+      signal: controller.signal,
       params: {
         entityType: entityTypeCode.PRODUCT_SUPPLIER,
       },
     }));
+
+    return () => {
+      controller.abort();
+    };
   }, []);
 
   // When we have at least one option, it has to be select type
