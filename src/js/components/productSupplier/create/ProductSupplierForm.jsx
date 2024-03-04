@@ -18,6 +18,7 @@ const ProductSupplierForm = () => {
     triggerValidation,
     dirtyFields,
     onSubmit,
+    setProductPackageQuantity,
   } = useProductSupplierForm();
 
   return (
@@ -33,6 +34,7 @@ const ProductSupplierForm = () => {
             errors,
             triggerValidation,
             dirtyFields,
+            setProductPackageQuantity,
           }}
         />
       </form>
