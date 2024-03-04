@@ -8,7 +8,7 @@ import TextInput from 'components/form-elements/v2/TextInput';
 import Subsection from 'components/Layout/v2/Subsection';
 import useQuantityUnitOfMeasureOptions from 'hooks/options-data/useQuantityUnitOfMeasureOptions';
 
-const PackageSpecification = ({ control, errors }) => {
+const PackageSpecification = ({ control, errors, setProductPackageQuantity }) => {
   const { quantityUom } = useQuantityUnitOfMeasureOptions();
   const uom = useWatch({ control, name: 'uom' });
 
@@ -28,6 +28,11 @@ const PackageSpecification = ({ control, errors }) => {
             render={({ field }) => (
               <SelectField
                 {...field}
+                onChange={(val) => {
+                  field?.onChange(val);
+                  // preselect value 1 when unit of measure Each is selected
+                  setProductPackageQuantity(val);
+                }}
                 required
                 title={{
                   id: 'react.productSupplier.form.uom.title',
@@ -160,4 +165,5 @@ PackageSpecification.propTypes = {
       message: PropTypes.string,
     }),
   }).isRequired,
+  setProductPackageQuantity: PropTypes.func.isRequired,
 };

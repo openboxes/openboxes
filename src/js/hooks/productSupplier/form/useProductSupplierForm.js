@@ -145,16 +145,14 @@ const useProductSupplierForm = () => {
   },
   [packagePrice, productPackageQuantity]);
 
-  const uom = useWatch({ control, name: 'uom' });
-
   // preselect value 1 when unit of measure Each is selected
-  useEffect(() => {
-    if (uom?.id === 'EA') {
+  const setProductPackageQuantity = (unitOfMeasure) => {
+    if (unitOfMeasure?.id === 'EA') {
       setValue('productPackageQuantity', 1, { shouldValidate: true });
-    } else {
-      setValue('productPackageQuantity', undefined);
+      return;
     }
-  }, [uom]);
+    setValue('productPackageQuantity', '');
+  };
 
   return {
     control,
@@ -163,6 +161,7 @@ const useProductSupplierForm = () => {
     isValid,
     triggerValidation: trigger,
     onSubmit,
+    setProductPackageQuantity,
   };
 };
 
