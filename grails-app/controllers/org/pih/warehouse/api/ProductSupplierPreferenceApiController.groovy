@@ -46,4 +46,10 @@ class ProductSupplierPreferenceApiController {
         response.status = HttpStatus.OK.value()
         render([data: updatedProductSupplierPreference] as JSON)
     }
+
+    def delete() {
+        productSupplierPreferenceService.delete(params.id)
+
+        render status: 204
+    }
 }
