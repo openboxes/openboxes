@@ -15,6 +15,7 @@ const ProductSupplierFormMain = ({ formProps }) => {
     errors,
     triggerValidation,
     setProductPackageQuantity,
+    reset,
   } = formProps;
 
   return (
@@ -27,6 +28,7 @@ const ProductSupplierFormMain = ({ formProps }) => {
         control={control}
         errors={errors}
         triggerValidation={triggerValidation}
+        reset={reset}
       />
       <PricingSection
         control={control}
