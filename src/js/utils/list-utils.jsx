@@ -80,5 +80,5 @@ export const splitPreferenceTypes = (data) => data.reduce((acc, preferenceType) 
     return { ...acc, preferenceTypes: [...acc.preferenceTypes, preferenceType] };
   }
 
-  return { ...acc, default: preferenceType };
-}, { preferenceTypes: [], default: {} });
+  return { ...acc, defaultPreferenceType: preferenceType };
+}, { preferenceTypes: [], defaultPreferenceType: {} });
