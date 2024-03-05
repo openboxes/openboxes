@@ -1,6 +1,7 @@
 /**
  * Definitions of APPLICATION URLs used for redirecting to pages
  * */
+import { stringifyUrl } from 'query-string';
 
 export const CONTEXT_PATH = window.CONTEXT_PATH ?? '/openboxes';
 
@@ -97,7 +98,10 @@ const PURCHASE_ORDER_URL = {
 
 const INVENTORY_ITEM_URL = {
   base: `${CONTEXT_PATH}/inventoryItem`,
-  showStockCard: (id) => `${INVENTORY_ITEM_URL.base}/showStockCard/${id}`,
+  showStockCard: (id, params = {}) => stringifyUrl({
+    url: `${INVENTORY_ITEM_URL.base}/showStockCard/${id}`,
+    query: { ...params },
+  }),
 };
 
 const REQUISITION_TEMPLATE_URL = {

@@ -66,7 +66,7 @@ const ProductSupplierListTable = ({ filterParams }) => {
             {...row}
             tooltip
             openLinkInNewTab
-            link={INVENTORY_ITEM_URL.showStockCard(row.original.product.id)}
+            link={INVENTORY_ITEM_URL.showStockCard(row.original.product.id, { activeTab: 4 })}
           />
         ),
     },
