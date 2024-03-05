@@ -31,7 +31,10 @@ const useProductSupplierForm = () => {
       await productSupplierApi.getProductSupplier(productSupplierId);
     const productSupplier = response?.data?.data;
     const attributes = mapFetchedAttributes(productSupplier?.attributes);
-    const { preferenceTypes } = splitPreferenceTypes(productSupplier?.productSupplierPreferences);
+    const {
+      preferenceTypes,
+      defaultPreferenceType,
+    } = splitPreferenceTypes(productSupplier?.productSupplierPreferences);
     return {
       // Exclude null/empty values
       ...omitEmptyValues(productSupplier),
@@ -60,6 +63,14 @@ const useProductSupplierForm = () => {
           label: productSupplier?.ratingTypeCode,
         }
         : undefined,
+      preferenceType: defaultPreferenceType?.preferenceType ? {
+        id: defaultPreferenceType.preferenceType.id,
+        label: defaultPreferenceType.preferenceType.name,
+        value: defaultPreferenceType.preferenceType.id,
+      } : undefined,
+      validityStartDate: defaultPreferenceType?.validityStartDate ?? undefined,
+      validityEndDate: defaultPreferenceType?.validityEndDate ?? undefined,
+      bidName: defaultPreferenceType?.bidName ?? undefined,
       productSupplierPreferences: preferenceTypes.map((preferenceType) => ({
         ...preferenceType,
         destinationParty: {

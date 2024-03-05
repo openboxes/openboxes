@@ -5,6 +5,8 @@ import grails.gorm.transactions.Transactional
 @Transactional
 class ProductSupplierPreferenceService {
 
+    ProductSupplierPreferenceDataService productSupplierPreferenceDataService
+
     ProductSupplierPreference save(ProductSupplierPreference productSupplierPreference) {
         // Add the product supplier preference instance to the productSupplier's preferences collection (OneToMany bidirectional)
         productSupplierPreference?.productSupplier?.addToProductSupplierPreferences(productSupplierPreference)
@@ -18,5 +20,9 @@ class ProductSupplierPreferenceService {
             persistedProductSupplierPreferences.add(persistedProductSupplierPreference)
         }
         return persistedProductSupplierPreferences
+    }
+
+    void delete(String id) {
+        productSupplierPreferenceDataService.delete(id)
     }
 }
