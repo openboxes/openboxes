@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import { Tooltip } from 'react-tippy';
 
 const TableCell = ({
-  value, children, tooltip, tooltipLabel, link, reactLink, defaultValue, className,
+  value, children, tooltip, tooltipLabel, link, reactLink, defaultValue, className, openLinkInNewTab,
 }) => {
   let cellValue = children || value || defaultValue;
 
@@ -33,7 +33,15 @@ const TableCell = ({
     if (reactLink) {
       cellElement = <Link className={elementClasses} to={link}>{cellValue}</Link>;
     } else {
-      cellElement = <a className={elementClasses} href={link}>{cellValue}</a>;
+      cellElement = (
+        <a
+          className={elementClasses}
+          target={openLinkInNewTab ? '_blank' : undefined}
+          href={link}
+        >
+          {cellValue}
+        </a>
+      );
     }
   }
 
@@ -44,6 +52,7 @@ TableCell.defaultProps = {
   defaultValue: undefined,
   className: '',
   reactLink: false,
+  openLinkInNewTab: false,
 };
 
 TableCell.propTypes = {
@@ -51,6 +60,7 @@ TableCell.propTypes = {
   reactLink: PropTypes.bool,
   className: PropTypes.string,
   tooltip: PropTypes.bool,
+  openLinkInNewTab: PropTypes.bool,
   tooltipLabel: PropTypes.string,
   children: PropTypes.oneOfType([
     PropTypes.arrayOf(PropTypes.node),
@@ -61,6 +71,5 @@ TableCell.propTypes = {
     PropTypes.number,
   ]),
 };
-
 
 export default TableCell;
