@@ -52,13 +52,15 @@ const ProductSupplierListTable = ({ filterParams }) => {
     {
       Header: <Translate id="react.productSupplier.column.productCode.label" defaultMessage="Product Code" />,
       accessor: 'product.productCode',
-      width: 160,
+      width: 80,
+      headerClassName: 'text-wrap text-left pl-1',
+      className: 'pl-1',
       fixed: 'left',
     },
     {
       Header: <Translate id="react.productSupplier.column.productName.label" defaultMessage="Product Name" />,
       accessor: 'product.name',
-      minWidth: 350,
+      minWidth: 400,
       fixed: 'left',
       Cell: (row) =>
         (
@@ -88,19 +90,24 @@ const ProductSupplierListTable = ({ filterParams }) => {
     {
       Header: <Translate id="react.productSupplier.column.defaultPackSize.label" defaultMessage="Default Pack Size" />,
       accessor: 'packageSize',
-      minWidth: 180,
+      width: 90,
+      headerClassName: 'text-wrap text-left',
       sortable: false,
     },
     {
       Header: <Translate id="react.productSupplier.column.packagePrice.label" defaultMessage="Package Price" />,
       accessor: 'packagePrice',
-      minWidth: 180,
+      width: 80,
+      className: 'text-right',
+      headerClassName: 'text-wrap text-left',
       sortable: false,
     },
     {
       Header: <Translate id="react.productSupplier.column.eachPrice.label" defaultMessage="Each Price" />,
       accessor: 'unitPrice',
-      minWidth: 180,
+      width: 80,
+      className: 'text-right',
+      headerClassName: 'text-wrap text-left',
       sortable: false,
     },
     {
