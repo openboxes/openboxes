@@ -214,7 +214,7 @@ const usePreferenceTypeVariationsColumns = ({
             remove(row.index);
             triggerValidation('productSupplierPreferences');
           }}
-          className="preference-type-variations-bin"
+          className="preference-type-bin"
         />
       ),
     },
