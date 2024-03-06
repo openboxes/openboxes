@@ -88,11 +88,11 @@ const useProductSupplierForm = () => {
       attributes,
       defaultPreferenceType: {
         ...defaultPreferenceType,
-        preferenceType: {
+        preferenceType: !_.isEmpty(defaultPreferenceType) ? {
           id: defaultPreferenceType?.preferenceType?.id,
           label: defaultPreferenceType?.preferenceType?.name,
           value: defaultPreferenceType?.preferenceType?.id,
-        },
+        } : undefined,
       },
     };
   };
@@ -107,7 +107,7 @@ const useProductSupplierForm = () => {
     handleSubmit,
     trigger,
     setValue,
-    reset,
+    resetField,
     formState: { errors, isValid },
   } = useForm({
     // We want the validation errors to occur onBlur of any field
@@ -174,7 +174,7 @@ const useProductSupplierForm = () => {
     triggerValidation: trigger,
     onSubmit,
     setProductPackageQuantity,
-    reset,
+    setValue,
   };
 };
 

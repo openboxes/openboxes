@@ -1,7 +1,7 @@
 import {
   ATTRIBUTES,
   PREFERENCE_TYPE_OPTIONS,
-  PRODUCT_SUPPLIER_BY_ID,
+  PRODUCT_SUPPLIER_BY_ID, PRODUCT_SUPPLIER_PREFERENCES_BY_ID,
   RATING_TYPE_OPTIONS,
 } from 'api/urls';
 import apiClient from 'utils/apiClient';
@@ -12,4 +12,5 @@ export default {
   deleteProductSupplier: (id) => apiClient.delete(PRODUCT_SUPPLIER_BY_ID(id)),
   getProductSupplier: (id) => apiClient.get(PRODUCT_SUPPLIER_BY_ID(id)),
   getAttributes: (config) => apiClient.get(ATTRIBUTES, config),
+  deleteProductSupplierPreference: (id) => apiClient.delete(PRODUCT_SUPPLIER_PREFERENCES_BY_ID(id)),
 };
