@@ -100,6 +100,8 @@
 </g:elseif>
 <script>
 	$(window).load(function(){
+		const urlParams = new URLSearchParams(window.location.search);
+
 		const container = document.querySelector('.tabs')
 		const primary = container.querySelector('.-primary')
 		const primaryItems = container.querySelectorAll('.-primary > li:not(.-more)')
@@ -197,6 +199,10 @@
 
 		// hide dropdown with items on new tab select
 		$(".tabs").tabs({
+			// If active tab parameter is not passed then we want tabs to have default behaviour (save last visited tab in cookies).
+			// If activeTab parameter does not exist on URL, then urlParams.get() returns null.
+			// We need to pass undefined instead of null, for tabs to have default behaviour
+			selected: urlParams.get('activeTab') || undefined,
 			select: function() {
 				container.classList.remove('--show-secondary')
 				moreBtn.setAttribute('aria-expanded', false)

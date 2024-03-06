@@ -7,7 +7,7 @@ import DataTable, { TableCell } from 'components/DataTable';
 import DateCell from 'components/DataTable/DateCell';
 import Button from 'components/form-elements/Button';
 import PreferenceTypeColumn from 'components/productSupplier/PreferenceTypeColumn';
-import { INVENTORY_ITEM_URL } from 'consts/applicationUrls';
+import { INVENTORY_ITEM_URL, PRODUCT_SUPPLIER_URL } from 'consts/applicationUrls';
 import useProductSupplierActions from 'hooks/list-pages/productSupplier/useProductSupplierActions';
 import useProductSupplierListTableData from 'hooks/list-pages/productSupplier/useProductSupplierListTableData';
 import ActionDots from 'utils/ActionDots';
@@ -65,7 +65,8 @@ const ProductSupplierListTable = ({ filterParams }) => {
           <TableCell
             {...row}
             tooltip
-            link={INVENTORY_ITEM_URL.showStockCard(row.original.product.id)}
+            openLinkInNewTab
+            link={INVENTORY_ITEM_URL.showStockCard(row.original.product.id, { activeTab: 4 })}
           />
         ),
     },
@@ -73,6 +74,13 @@ const ProductSupplierListTable = ({ filterParams }) => {
       Header: <Translate id="react.productSupplier.column.sourceCode.label" defaultMessage="Source Code" />,
       accessor: 'code',
       minWidth: 200,
+      Cell: (row) =>
+        (
+          <TableCell
+            {...row}
+            link={PRODUCT_SUPPLIER_URL.edit(row.original.id)}
+          />
+        ),
     },
     {
       Header: <Translate id="react.productSupplier.column.preferenceType.label" defaultMessage="Preference Type" />,
