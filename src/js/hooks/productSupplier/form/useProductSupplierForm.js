@@ -107,7 +107,6 @@ const useProductSupplierForm = () => {
     handleSubmit,
     trigger,
     setValue,
-    resetField,
     formState: { errors, isValid },
   } = useForm({
     // We want the validation errors to occur onBlur of any field
