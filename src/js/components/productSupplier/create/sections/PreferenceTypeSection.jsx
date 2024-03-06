@@ -12,13 +12,13 @@ const PreferenceTypeSection = ({
   control,
   errors,
   triggerValidation,
-  reset,
+  setValue,
 }) => (
   <Section title={{ label: 'react.productSupplier.section.preferenceType.title', defaultMessage: 'Preference Type' }}>
     <DefaultPreferenceType
       control={control}
       errors={errors}
-      reset={reset}
+      setValue={setValue}
     />
     <PreferenceTypeVariations
       control={control}
@@ -64,4 +64,5 @@ PreferenceTypeSection.propTypes = {
     })),
   }).isRequired,
   triggerValidation: PropTypes.func.isRequired,
+  setValue: PropTypes.func.isRequired,
 };

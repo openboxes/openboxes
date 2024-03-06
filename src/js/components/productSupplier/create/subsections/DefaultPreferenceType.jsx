@@ -16,7 +16,7 @@ import Translate from 'utils/Translate';
 const DefaultPreferenceType = ({
   control,
   errors,
-  reset,
+  setValue,
 }) => {
   const {
     preferenceTypes,
@@ -29,12 +29,24 @@ const DefaultPreferenceType = ({
     control,
   });
 
+  const emptyPreferenceType = {
+    bidName: '',
+    validityStartDate: '',
+    validityEndDate: '',
+    preferenceType: '',
+  };
+
+  const afterDelete = () => {
+    setValue('defaultPreferenceType', emptyPreferenceType);
+  };
+
   const {
     openConfirmationModal,
     isPreferenceTypeEmpty,
   } = useDeletePreferenceType({
     preferenceTypeData: updatedDefaultPreferenceType,
-    reset,
+    isDefaultPreferenceType: true,
+    afterDelete,
   });
 
   return (
@@ -169,4 +181,5 @@ DefaultPreferenceType.propTypes = {
       message: PropTypes.string,
     }),
   }).isRequired,
+  setValue: PropTypes.func.isRequired,
 };

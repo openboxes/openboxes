@@ -15,7 +15,7 @@ const ProductSupplierFormMain = ({ formProps }) => {
     errors,
     triggerValidation,
     setProductPackageQuantity,
-    reset,
+    setValue,
   } = formProps;
 
   return (
@@ -28,7 +28,7 @@ const ProductSupplierFormMain = ({ formProps }) => {
         control={control}
         errors={errors}
         triggerValidation={triggerValidation}
-        reset={reset}
+        setValue={setValue}
       />
       <PricingSection
         control={control}
@@ -114,5 +114,6 @@ ProductSupplierFormMain.propTypes = {
     }),
     triggerValidation: PropTypes.func.isRequired,
     setProductPackageQuantity: PropTypes.func.isRequired,
+    setValue: PropTypes.func.isRequired,
   }).isRequired,
 };
