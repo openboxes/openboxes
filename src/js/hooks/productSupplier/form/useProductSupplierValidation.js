@@ -20,6 +20,17 @@ const useProductSupplierValidation = () => {
       return groupedData[destinationParty?.id].length === 1;
     };
 
+    const requirePreferenceType = (subsectionData) => {
+      if (
+        subsectionData.validityStartDate
+        || subsectionData.validityEndDate
+        || subsectionData.bidName
+      ) {
+        return !!subsectionData.preferenceType;
+      }
+      return true;
+    };
+
     const attributesValidationSchema = attributes.reduce((acc, attribute) => {
       const errorProps = {
         required_error: `${attribute?.name} is required`,
@@ -116,7 +127,10 @@ const useProductSupplierValidation = () => {
       bidName: z
         .string()
         .optional(),
-    });
+    })
+      .refine(requirePreferenceType, {
+        message: 'Default preference type must also be selected', path: ['preferenceType'],
+      });
 
     const productSupplierPreferenceSchema = z.object({
       destinationParty: z.object({

@@ -11,8 +11,8 @@ import SelectField from 'components/form-elements/v2/SelectField';
 import TextInput from 'components/form-elements/v2/TextInput';
 import Subsection from 'components/Layout/v2/Subsection';
 import useDeletePreferenceType from 'hooks/productSupplier/form/useDeletePreferenceType';
-import Translate from 'utils/Translate';
 import { FormErrorPropType } from 'utils/propTypes';
+import Translate from 'utils/Translate';
 
 const DefaultPreferenceType = ({
   control,

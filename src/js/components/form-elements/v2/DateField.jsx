@@ -28,7 +28,7 @@ const DateField = ({
   ...fieldProps
 }) => {
   const translate = useTranslate();
-  const onClear = () => onChange(null);
+  const onClear = () => onChange(undefined);
 
   const onChangeHandler = date => onChange(date?.format(DateFormat.MMM_DD_YYYY));
 
