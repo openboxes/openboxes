@@ -41,6 +41,8 @@ const useProductSupplierAttributes = () => {
     ? z
       .string(errorProps)
       .max(255, `Max length of ${attribute?.name} is 255`)
+      .trim()
+      .min(1, errorProps?.required_error)
     : z
       .string()
       .max(255, `Max length of ${attribute?.name} is 255`)
