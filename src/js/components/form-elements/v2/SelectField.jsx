@@ -24,6 +24,7 @@ const SelectField = ({
   onChange,
   productSelect,
   hasErrors,
+  className,
   ...fieldProps
 }) => {
   const [value, setValue] = useState(defaultValue);
@@ -52,7 +53,7 @@ const SelectField = ({
       className="select-wrapper-container"
     >
       <SelectComponent
-        className={`form-element-select ${hasErrors ? 'has-errors' : ''}`}
+        className={`form-element-select ${className} ${hasErrors ? 'has-errors' : ''}`}
         disabled={disabled}
         placeholder={placeholder}
         value={value}
@@ -107,6 +108,7 @@ SelectField.propTypes = {
   productSelect: PropTypes.bool,
   // indicator whether field should be marked as invalid
   hasErrors: PropTypes.bool,
+  className: PropTypes.string,
 };
 
 SelectField.defaultProps = {
@@ -125,4 +127,5 @@ SelectField.defaultProps = {
   onChange: () => {},
   productSelect: false,
   hasErrors: false,
+  className: '',
 };

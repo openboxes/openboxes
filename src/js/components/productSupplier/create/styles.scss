@@ -9,10 +9,15 @@
   gap: 8px;
 }
 
-.preference-type-variations-bin {
+.preference-type-bin {
   @include set-size(20px, 20px);
   color: var(--blue-primary);
   cursor: pointer;
+
+  &.disabled {
+    color: var(--gray-400);
+    cursor: auto;
+  }
 }
 
 .button-add-icon {
@@ -73,5 +78,14 @@
     font-size: 14px;
     color: var(--gray-350);
     font-weight: 400;
+  }
+}
+
+.attributes-section {
+  padding-left: 12px;
+  padding-right: 12px;
+
+  .v2-section-title {
+    padding-left: 8px;
   }
 }

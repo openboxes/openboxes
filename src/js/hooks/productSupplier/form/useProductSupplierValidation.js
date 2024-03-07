@@ -95,24 +95,26 @@ const useProductSupplierValidation = () => {
         brandName: z
           .string()
           .optional(),
-        preferenceType: z.object({
-          id: z.string(),
-          value: z.string(),
-          label: z.string(),
-        })
-          .optional()
-          .nullable(),
-        validityStartDate: z
-          .coerce
-          .date()
-          .optional(),
-        validityEndDate: z
-          .coerce
-          .date()
-          .optional(),
-        bidName: z
-          .string()
-          .optional(),
+        defaultPreferenceType: z.object({
+          preferenceType: z.object({
+            id: z.string(),
+            value: z.string(),
+            label: z.string(),
+          })
+            .optional()
+            .nullable(),
+          validityStartDate: z
+            .coerce
+            .date()
+            .optional(),
+          validityEndDate: z
+            .coerce
+            .date()
+            .optional(),
+          bidName: z
+            .string()
+            .optional(),
+        }),
         productSupplierPreferences: z.array(z.object({
           destinationParty: z.object({
             id: z.string(),
