@@ -114,17 +114,19 @@ const PreferenceTypeVariations = ({
 
 export default PreferenceTypeVariations;
 
+export const preferenceTypeVariationsFormErrors = PropTypes.arrayOf(
+  PropTypes.shape({
+    destinationParty: FormErrorPropType,
+    preferenceType: FormErrorPropType,
+    validityStartDate: FormErrorPropType,
+    validityEndDate: FormErrorPropType,
+    bidName: FormErrorPropType,
+  }),
+);
+
 PreferenceTypeVariations.propTypes = {
   control: PropTypes.shape({}).isRequired,
-  errors: PropTypes.arrayOf(
-    PropTypes.shape({
-      destinationParty: FormErrorPropType,
-      preferenceType: FormErrorPropType,
-      validityStartDate: FormErrorPropType,
-      validityEndDate: FormErrorPropType,
-      bidName: FormErrorPropType,
-    }),
-  ),
+  errors: preferenceTypeVariationsFormErrors,
   triggerValidation: PropTypes.func.isRequired,
 };
 

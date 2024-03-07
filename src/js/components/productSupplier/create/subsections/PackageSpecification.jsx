@@ -147,15 +147,17 @@ const PackageSpecification = ({ control, errors, setProductPackageQuantity }) =>
 
 export default PackageSpecification;
 
+export const packageSpecificationFormErrors = PropTypes.shape({
+  uom: FormErrorPropType,
+  productPackageQuantity: FormErrorPropType,
+  minOrderQuantity: FormErrorPropType,
+  productPackagePrice: FormErrorPropType,
+  eachPrice: FormErrorPropType,
+});
+
 PackageSpecification.propTypes = {
   control: PropTypes.shape({}).isRequired,
-  errors: PropTypes.shape({
-    uom: FormErrorPropType,
-    productPackageQuantity: FormErrorPropType,
-    minOrderQuantity: FormErrorPropType,
-    productPackagePrice: FormErrorPropType,
-    eachPrice: FormErrorPropType,
-  }),
+  errors: packageSpecificationFormErrors,
   setProductPackageQuantity: PropTypes.func.isRequired,
 };
 

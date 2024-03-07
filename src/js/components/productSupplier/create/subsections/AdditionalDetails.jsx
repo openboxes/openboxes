@@ -107,14 +107,16 @@ const AdditionalDetails = ({ control, errors }) => {
 
 export default AdditionalDetails;
 
+export const additionalDetailsFormErrors = PropTypes.shape({
+  manufacturer: FormErrorPropType,
+  ratingTypeCode: FormErrorPropType,
+  manufacturerCode: FormErrorPropType,
+  brandName: FormErrorPropType,
+});
+
 AdditionalDetails.propTypes = {
   control: PropTypes.shape({}).isRequired,
-  errors: PropTypes.shape({
-    manufacturer: FormErrorPropType,
-    ratingTypeCode: FormErrorPropType,
-    manufacturerCode: FormErrorPropType,
-    brandName: FormErrorPropType,
-  }),
+  errors: additionalDetailsFormErrors,
 };
 
 AdditionalDetails.defaultProps = {

@@ -3,10 +3,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import Section from 'components/Layout/v2/Section';
-import FixedPrice from 'components/productSupplier/create/subsections/FixedPrice';
-import PackageSpecification
+import FixedPrice, { fixedPriceFormErrors }
+  from 'components/productSupplier/create/subsections/FixedPrice';
+import PackageSpecification, { packageSpecificationFormErrors }
   from 'components/productSupplier/create/subsections/PackageSpecification';
-import { FormErrorPropType } from 'utils/propTypes';
 
 const PricingSection = ({ control, errors, setProductPackageQuantity }) => (
   <Section title={{
@@ -31,18 +31,8 @@ export default PricingSection;
 PricingSection.propTypes = {
   control: PropTypes.shape({}).isRequired,
   errors: PropTypes.shape({
-    packageSpecification: PropTypes.shape({
-      uom: FormErrorPropType,
-      productPackageQuantity: FormErrorPropType,
-      minOrderQuantity: FormErrorPropType,
-      productPackagePrice: FormErrorPropType,
-      eachPrice: FormErrorPropType,
-    }),
-    fixedPrice: PropTypes.shape({
-      contractPricePrice: FormErrorPropType,
-      contractPriceValidUntil: FormErrorPropType,
-      tieredPricing: FormErrorPropType,
-    }),
+    packageSpecification: packageSpecificationFormErrors,
+    fixedPrice: fixedPriceFormErrors,
   }).isRequired,
   setProductPackageQuantity: PropTypes.func.isRequired,
 };

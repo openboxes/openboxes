@@ -208,19 +208,21 @@ const BasicDetails = ({ control, errors }) => {
 
 export default BasicDetails;
 
+export const basicDetailsFormErrors = PropTypes.shape({
+  code: FormErrorPropType,
+  product: FormErrorPropType,
+  legacyCode: FormErrorPropType,
+  supplier: FormErrorPropType,
+  supplierCode: FormErrorPropType,
+  name: FormErrorPropType,
+  active: FormErrorPropType,
+  dateCreated: FormErrorPropType,
+  lastUpdated: FormErrorPropType,
+});
+
 BasicDetails.propTypes = {
   control: PropTypes.shape({}).isRequired,
-  errors: PropTypes.shape({
-    code: FormErrorPropType,
-    product: FormErrorPropType,
-    legacyCode: FormErrorPropType,
-    supplier: FormErrorPropType,
-    supplierCode: FormErrorPropType,
-    name: FormErrorPropType,
-    active: FormErrorPropType,
-    dateCreated: FormErrorPropType,
-    lastUpdated: FormErrorPropType,
-  }),
+  errors: basicDetailsFormErrors,
 };
 
 BasicDetails.defaultProps = {

@@ -81,13 +81,15 @@ const FixedPrice = ({ control, errors }) => (
 
 export default FixedPrice;
 
+export const fixedPriceFormErrors = PropTypes.shape({
+  contractPricePrice: FormErrorPropType,
+  contractPriceValidUntil: FormErrorPropType,
+  tieredPricing: FormErrorPropType,
+});
+
 FixedPrice.propTypes = {
   control: PropTypes.shape({}).isRequired,
-  errors: PropTypes.shape({
-    contractPricePrice: FormErrorPropType,
-    contractPriceValidUntil: FormErrorPropType,
-    tieredPricing: FormErrorPropType,
-  }),
+  errors: fixedPriceFormErrors,
 };
 
 FixedPrice.defaultProps = {

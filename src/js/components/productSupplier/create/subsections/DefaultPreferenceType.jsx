@@ -166,14 +166,16 @@ const DefaultPreferenceType = ({
 
 export default DefaultPreferenceType;
 
+export const defaultPreferenceTypeFormErrors = PropTypes.shape({
+  preferenceType: FormErrorPropType,
+  validityStartDate: FormErrorPropType,
+  validityEndDate: FormErrorPropType,
+  bidName: FormErrorPropType,
+});
+
 DefaultPreferenceType.propTypes = {
   control: PropTypes.shape({}).isRequired,
-  errors: PropTypes.shape({
-    preferenceType: FormErrorPropType,
-    validityStartDate: FormErrorPropType,
-    validityEndDate: FormErrorPropType,
-    bidName: FormErrorPropType,
-  }),
+  errors: defaultPreferenceTypeFormErrors,
   setValue: PropTypes.func.isRequired,
 };
 

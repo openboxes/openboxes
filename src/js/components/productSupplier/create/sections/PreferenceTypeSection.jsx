@@ -3,11 +3,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import Section from 'components/Layout/v2/Section';
-import DefaultPreferenceType
+import DefaultPreferenceType, { defaultPreferenceTypeFormErrors }
   from 'components/productSupplier/create/subsections/DefaultPreferenceType';
-import PreferenceTypeVariations
+import PreferenceTypeVariations, { preferenceTypeVariationsFormErrors }
   from 'components/productSupplier/create/subsections/PreferenceTypeVariations';
-import { FormErrorPropType } from 'utils/propTypes';
 
 const PreferenceTypeSection = ({
   control,
@@ -34,19 +33,8 @@ export default PreferenceTypeSection;
 PreferenceTypeSection.propTypes = {
   control: PropTypes.shape({}).isRequired,
   errors: PropTypes.shape({
-    defaultPreferenceType: PropTypes.shape({
-      preferenceType: FormErrorPropType,
-      validityStartDate: FormErrorPropType,
-      validityEndDate: FormErrorPropType,
-      bidName: FormErrorPropType,
-    }),
-    productSupplierPreferences: PropTypes.arrayOf(PropTypes.shape({
-      destinationParty: FormErrorPropType,
-      preferenceType: FormErrorPropType,
-      validityStartDate: FormErrorPropType,
-      validityEndDate: FormErrorPropType,
-      bidName: FormErrorPropType,
-    })),
+    defaultPreferenceType: defaultPreferenceTypeFormErrors,
+    productSupplierPreferences: preferenceTypeVariationsFormErrors,
   }).isRequired,
   triggerValidation: PropTypes.func.isRequired,
   setValue: PropTypes.func.isRequired,

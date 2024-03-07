@@ -9,6 +9,20 @@ import PricingSection from 'components/productSupplier/create/sections/PricingSe
 import { FormErrorPropType } from 'utils/propTypes';
 
 import './styles.scss';
+import { basicDetailsFormErrors } from 'components/productSupplier/create/subsections/BasicDetails';
+import {
+  additionalDetailsFormErrors
+} from 'components/productSupplier/create/subsections/AdditionalDetails';
+import {
+  defaultPreferenceTypeFormErrors
+} from 'components/productSupplier/create/subsections/DefaultPreferenceType';
+import {
+  preferenceTypeVariationsFormErrors
+} from 'components/productSupplier/create/subsections/PreferenceTypeVariations';
+import {
+  packageSpecificationFormErrors
+} from 'components/productSupplier/create/subsections/PackageSpecification';
+import { fixedPriceFormErrors } from 'components/productSupplier/create/subsections/FixedPrice';
 
 const ProductSupplierFormMain = ({ formProps }) => {
   const {
@@ -60,46 +74,12 @@ ProductSupplierFormMain.propTypes = {
     control: PropTypes.shape({}).isRequired,
     handleSubmit: PropTypes.func.isRequired,
     errors: PropTypes.shape({
-      basicDetails: PropTypes.shape({
-        code: FormErrorPropType,
-        product: FormErrorPropType,
-        legacyCode: FormErrorPropType,
-        supplier: FormErrorPropType,
-        supplierCode: FormErrorPropType,
-        name: FormErrorPropType,
-        active: FormErrorPropType,
-      }),
-      additionalDetails: PropTypes.shape({
-        manufacturer: FormErrorPropType,
-        ratingTypeCode: FormErrorPropType,
-        manufacturerCode: FormErrorPropType,
-        brandName: FormErrorPropType,
-      }),
-      defaultPreferenceType: PropTypes.shape({
-        preferenceType: FormErrorPropType,
-        validityStartDate: FormErrorPropType,
-        validityEndDate: FormErrorPropType,
-        bidName: FormErrorPropType,
-      }),
-      productSupplierPreferences: PropTypes.arrayOf(PropTypes.shape({
-        destinationParty: FormErrorPropType,
-        preferenceType: FormErrorPropType,
-        validityStartDate: FormErrorPropType,
-        validityEndDate: FormErrorPropType,
-        bidName: FormErrorPropType,
-      })),
-      packageSpecification: PropTypes.shape({
-        uom: FormErrorPropType,
-        productPackageQuantity: FormErrorPropType,
-        minOrderQuantity: FormErrorPropType,
-        productPackagePrice: FormErrorPropType,
-        eachPrice: FormErrorPropType,
-      }),
-      fixedPrice: PropTypes.shape({
-        contractPricePrice: FormErrorPropType,
-        contractPriceValidUntil: FormErrorPropType,
-        tieredPricing: FormErrorPropType,
-      }),
+      basicDetails: basicDetailsFormErrors,
+      additionalDetails: additionalDetailsFormErrors,
+      defaultPreferenceType: defaultPreferenceTypeFormErrors,
+      productSupplierPreferences: preferenceTypeVariationsFormErrors,
+      packageSpecification: packageSpecificationFormErrors,
+      fixedPrice: fixedPriceFormErrors,
       attributes: PropTypes.objectOf(FormErrorPropType),
     }),
     triggerValidation: PropTypes.func.isRequired,
