@@ -20,7 +20,7 @@ const usePreferenceTypeVariationsColumns = ({
   updatedRows,
   triggerValidation,
 }) => {
-  const [selectedRow, setSelectedRow] = useState(null);
+  const [selectedRowIndex, setSelectedRowIndex] = useState(null);
   const dispatch = useDispatch();
   const {
     preferenceTypes,
@@ -65,28 +65,28 @@ const usePreferenceTypeVariationsColumns = ({
   );
 
   const afterDelete = () => {
-    remove(selectedRow);
+    remove(selectedRowIndex);
     triggerValidation('productSupplierPreferences');
-    setSelectedRow(null);
+    setSelectedRowIndex(null);
   };
 
   const onCancel = () => {
-    setSelectedRow(null);
+    setSelectedRowIndex(null);
   };
 
   const {
     openConfirmationModal,
   } = useDeletePreferenceType({
-    preferenceTypeData: updatedRows?.[selectedRow],
+    preferenceTypeData: updatedRows?.[selectedRowIndex],
     onCancel,
     afterDelete,
   });
 
   useEffect(() => {
-    if (selectedRow !== null) {
+    if (selectedRowIndex !== null) {
       openConfirmationModal();
     }
-  }, [selectedRow]);
+  }, [selectedRowIndex]);
 
   const columns = useMemo(() => [
     {
@@ -237,7 +237,7 @@ const usePreferenceTypeVariationsColumns = ({
       Cell: (row) => (
         <RiDeleteBinLine
           onClick={() => {
-            setSelectedRow(row.index);
+            setSelectedRowIndex(row.index);
           }}
           className="preference-type-bin"
         />

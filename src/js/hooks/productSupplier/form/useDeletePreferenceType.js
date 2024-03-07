@@ -89,9 +89,11 @@ useDeletePreferenceType.propTypes = {
   preferenceTypeData: PropTypes.shape({}),
   afterDelete: PropTypes.func.isRequired,
   isDefaultPreferenceType: PropTypes.bool,
+  onCancel: PropTypes.func,
 };
 
 useDeletePreferenceType.defaultProps = {
   preferenceTypeData: null,
   isDefaultPreferenceType: false,
+  onCancel: () => {},
 };
