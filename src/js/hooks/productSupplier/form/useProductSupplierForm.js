@@ -1,16 +1,14 @@
-import { useEffect } from 'react';
-
 import { zodResolver } from '@hookform/resolvers/zod';
 import _ from 'lodash';
-import { useForm, useWatch } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { useParams } from 'react-router-dom';
 
 import { fetchPreferenceTypes, fetchRatingTypeCodes } from 'actions';
 import productSupplierApi from 'api/services/ProductSupplierApi';
 import useOptionsFetch from 'hooks/options-data/useOptionsFetch';
+import useCalculateEachPrice from 'hooks/productSupplier/form/useCalculateEachPrice';
 import useProductSupplierAttributes from 'hooks/productSupplier/form/useProductSupplierAttributes';
 import useProductSupplierValidation from 'hooks/productSupplier/form/useProductSupplierValidation';
-import { decimalParser } from 'utils/form-utils';
 import { omitEmptyValues } from 'utils/form-values-utils';
 import { splitPreferenceTypes } from 'utils/list-utils';
 
@@ -140,6 +138,8 @@ const useProductSupplierForm = () => {
       zodResolver(validationSchema(values))(values, context, options),
   });
 
+  useCalculateEachPrice({ control, setValue });
+
   const onSubmit = (values) => {
     const payload = {
       ...omitEmptyValues(values.basicDetails),
@@ -163,23 +163,6 @@ const useProductSupplierForm = () => {
     }
     console.log(payload);
   };
-
-  const packagePrice = useWatch({ control, name: 'packageSpecification.productPackagePrice' });
-  const productPackageQuantity = useWatch({ control, name: 'packageSpecification.productPackageQuantity' });
-
-  // eachPrice is a computed value from packagePrice and productPackageQuantity
-  useEffect(() => {
-    if (
-      !_.isNil(packagePrice) &&
-      !_.isNil(productPackageQuantity) &&
-      productPackageQuantity !== 0
-    ) {
-      setValue('packageSpecification.eachPrice', decimalParser(packagePrice / productPackageQuantity, 4));
-    } else {
-      setValue('packageSpecification.eachPrice', '');
-    }
-  },
-  [packagePrice, productPackageQuantity]);
 
   // preselect value 1 when unit of measure Each is selected
   const setProductPackageQuantity = (unitOfMeasure) => {
