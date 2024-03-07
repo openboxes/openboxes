@@ -108,6 +108,8 @@ export const GLOBAL_SEARCH = term => `${CONTEXT_PATH}/dashboard/globalSearch?sea
 // PRODUCT SUPPLIER
 export const PRODUCT_SUPPLIER_API = `${API}/productSuppliers`;
 export const PRODUCT_SUPPLIER_BY_ID = (id) => `${PRODUCT_SUPPLIER_API}/${id}`;
+export const PRODUCT_SUPPLIER_PREFERENCES_API = `${API}/productSupplierPreferences`;
+export const PRODUCT_SUPPLIER_PREFERENCES_BY_ID = (id) => `${PRODUCT_SUPPLIER_PREFERENCES_API}/${id}`;
 
 // UNIT OF MEASURE
 export const UNIT_OF_MEASURE_API = `${API}/unitOfMeasures`;

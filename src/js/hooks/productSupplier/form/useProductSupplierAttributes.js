@@ -84,7 +84,7 @@ const useProductSupplierAttributes = () => {
    * other cases, it should be just a select field with the options fetched from the API.
    */
   const getAttributesWithInputTypes = (attributesToMap) =>
-    attributesToMap.map((attribute) => {
+    (attributesToMap || []).map((attribute) => {
       if (!attribute?.allowOther) {
         return {
           attribute: { ...attribute, options: mapAttributeOptions(attribute) },

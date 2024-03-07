@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import _ from 'lodash';
 import { Controller } from 'react-hook-form';
@@ -9,6 +9,7 @@ import { fetchBuyers } from 'actions';
 import DateField from 'components/form-elements/v2/DateField';
 import SelectField from 'components/form-elements/v2/SelectField';
 import TextInput from 'components/form-elements/v2/TextInput';
+import useDeletePreferenceType from 'hooks/productSupplier/form/useDeletePreferenceType';
 import useTranslate from 'hooks/useTranslate';
 import Translate from 'utils/Translate';
 
@@ -19,6 +20,7 @@ const usePreferenceTypeVariationsColumns = ({
   updatedRows,
   triggerValidation,
 }) => {
+  const [selectedRowIndex, setSelectedRowIndex] = useState(null);
   const dispatch = useDispatch();
   const {
     preferenceTypes,
@@ -61,6 +63,30 @@ const usePreferenceTypeVariationsColumns = ({
       </span>
     </div>
   );
+
+  const afterDelete = () => {
+    remove(selectedRowIndex);
+    triggerValidation('productSupplierPreferences');
+    setSelectedRowIndex(null);
+  };
+
+  const onCancel = () => {
+    setSelectedRowIndex(null);
+  };
+
+  const {
+    openConfirmationModal,
+  } = useDeletePreferenceType({
+    preferenceTypeData: updatedRows?.[selectedRowIndex],
+    onCancel,
+    afterDelete,
+  });
+
+  useEffect(() => {
+    if (selectedRowIndex !== null) {
+      openConfirmationModal();
+    }
+  }, [selectedRowIndex]);
 
   const columns = useMemo(() => [
     {
@@ -211,10 +237,9 @@ const usePreferenceTypeVariationsColumns = ({
       Cell: (row) => (
         <RiDeleteBinLine
           onClick={() => {
-            remove(row.index);
-            triggerValidation('productSupplierPreferences');
+            setSelectedRowIndex(row.index);
           }}
-          className="preference-type-variations-bin"
+          className="preference-type-bin"
         />
       ),
     },

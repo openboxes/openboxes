@@ -6,8 +6,8 @@ import Translate from 'utils/Translate';
 
 import './styles.scss';
 
-const Section = ({ title, children }) => (
-  <div className="v2-section">
+const Section = ({ title, children, className }) => (
+  <div className={`v2-section ${className}`}>
     <span className="v2-section-title text-uppercase">
       <Translate id={title.label} defaultMessage={title.defaultMessage} />
     </span>
@@ -23,4 +23,9 @@ Section.propTypes = {
     defaultMessage: PropTypes.string.isRequired,
   }).isRequired,
   children: PropTypes.node.isRequired,
+  className: PropTypes.string,
+};
+
+Section.defaultProps = {
+  className: '',
 };

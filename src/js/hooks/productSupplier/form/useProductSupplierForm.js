@@ -63,14 +63,6 @@ const useProductSupplierForm = () => {
           label: productSupplier?.ratingTypeCode,
         }
         : undefined,
-      preferenceType: defaultPreferenceType?.preferenceType ? {
-        id: defaultPreferenceType.preferenceType.id,
-        label: defaultPreferenceType.preferenceType.name,
-        value: defaultPreferenceType.preferenceType.id,
-      } : undefined,
-      validityStartDate: defaultPreferenceType?.validityStartDate ?? undefined,
-      validityEndDate: defaultPreferenceType?.validityEndDate ?? undefined,
-      bidName: defaultPreferenceType?.bidName ?? undefined,
       productSupplierPreferences: preferenceTypes.map((preferenceType) => ({
         ...preferenceType,
         destinationParty: {
@@ -94,6 +86,14 @@ const useProductSupplierForm = () => {
       contractPricePrice: productSupplier?.contractPrice?.price,
       contractPriceValidUntil: productSupplier?.contractPrice?.validUntil,
       attributes,
+      defaultPreferenceType: {
+        ...defaultPreferenceType,
+        preferenceType: !_.isEmpty(defaultPreferenceType) ? {
+          id: defaultPreferenceType?.preferenceType?.id,
+          label: defaultPreferenceType?.preferenceType?.name,
+          value: defaultPreferenceType?.preferenceType?.id,
+        } : undefined,
+      },
     };
   };
 
@@ -173,6 +173,7 @@ const useProductSupplierForm = () => {
     triggerValidation: trigger,
     onSubmit,
     setProductPackageQuantity,
+    setValue,
   };
 };
 

@@ -1,20 +1,53 @@
 import React from 'react';
 
 import PropTypes from 'prop-types';
-import { Controller } from 'react-hook-form';
+import { Controller, useWatch } from 'react-hook-form';
+import { RiDeleteBinLine } from 'react-icons/ri';
 import { useSelector } from 'react-redux';
+import { Tooltip } from 'react-tippy';
 
 import DateField from 'components/form-elements/v2/DateField';
 import SelectField from 'components/form-elements/v2/SelectField';
 import TextInput from 'components/form-elements/v2/TextInput';
 import Subsection from 'components/Layout/v2/Subsection';
+import useDeletePreferenceType from 'hooks/productSupplier/form/useDeletePreferenceType';
+import Translate from 'utils/Translate';
 
-const DefaultPreferenceType = ({ control, errors }) => {
+const DefaultPreferenceType = ({
+  control,
+  errors,
+  setValue,
+}) => {
   const {
     preferenceTypes,
   } = useSelector((state) => ({
     preferenceTypes: state.productSupplier.preferenceTypes,
   }));
+
+  const updatedDefaultPreferenceType = useWatch({
+    name: 'defaultPreferenceType',
+    control,
+  });
+
+  const emptyPreferenceType = {
+    bidName: '',
+    validityStartDate: '',
+    validityEndDate: '',
+    preferenceType: '',
+  };
+
+  const afterDelete = () => {
+    setValue('defaultPreferenceType', emptyPreferenceType);
+  };
+
+  const {
+    openConfirmationModal,
+    isPreferenceTypeEmpty,
+  } = useDeletePreferenceType({
+    preferenceTypeData: updatedDefaultPreferenceType,
+    isDefaultPreferenceType: true,
+    afterDelete,
+  });
 
   return (
     <Subsection
@@ -27,7 +60,7 @@ const DefaultPreferenceType = ({ control, errors }) => {
       <div className="row">
         <div className="col-lg col-md-6 p-2">
           <Controller
-            name="preferenceType"
+            name="defaultPreferenceType.preferenceType"
             control={control}
             render={({ field }) => (
               <SelectField
@@ -50,7 +83,7 @@ const DefaultPreferenceType = ({ control, errors }) => {
         </div>
         <div className="col-lg col-md-6 p-2">
           <Controller
-            name="validityStartDate"
+            name="defaultPreferenceType.validityStartDate"
             control={control}
             render={({ field }) => (
               <DateField
@@ -70,7 +103,7 @@ const DefaultPreferenceType = ({ control, errors }) => {
         </div>
         <div className="col-lg col-md-6 p-2">
           <Controller
-            name="validityEndDate"
+            name="defaultPreferenceType.validityEndDate"
             control={control}
             render={({ field }) => (
               <DateField
@@ -90,7 +123,7 @@ const DefaultPreferenceType = ({ control, errors }) => {
         </div>
         <div className="col-lg col-md-6 p-2">
           <Controller
-            name="bidName"
+            name="defaultPreferenceType.bidName"
             control={control}
             render={({ field }) => (
               <TextInput
@@ -107,6 +140,23 @@ const DefaultPreferenceType = ({ control, errors }) => {
               />
             )}
           />
+        </div>
+        <div className="p-2 d-flex align-items-center">
+          <Tooltip
+            html={(
+              <span className="p-1">
+                <Translate
+                  id="react.productSupplier.form.deleteGlobalPreference"
+                  defaultMessage="Delete global preference"
+                />
+              </span>
+            )}
+          >
+            <RiDeleteBinLine
+              onClick={() => !isPreferenceTypeEmpty && openConfirmationModal()}
+              className={`preference-type-bin mt-3 ${isPreferenceTypeEmpty ? 'disabled' : 'active'}`}
+            />
+          </Tooltip>
         </div>
       </div>
     </Subsection>
@@ -131,4 +181,5 @@ DefaultPreferenceType.propTypes = {
       message: PropTypes.string,
     }),
   }).isRequired,
+  setValue: PropTypes.func.isRequired,
 };
