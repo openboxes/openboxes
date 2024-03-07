@@ -14,6 +14,7 @@ import usePreferenceTypeVariationsFiltering
   from 'hooks/productSupplier/form/usePreferenceTypeVariationsFiltering';
 import useResetScrollbar from 'hooks/useResetScrollbar';
 import useTranslate from 'hooks/useTranslate';
+import { FormErrorPropType } from 'utils/propTypes';
 
 const PreferenceTypeVariations = ({
   control,
@@ -117,26 +118,16 @@ PreferenceTypeVariations.propTypes = {
   control: PropTypes.shape({}).isRequired,
   errors: PropTypes.arrayOf(
     PropTypes.shape({
-      destinationParty: PropTypes.shape({
-        message: PropTypes.string,
-      }),
-      preferenceType: PropTypes.shape({
-        message: PropTypes.string,
-      }),
-      validityStartDate: PropTypes.shape({
-        message: PropTypes.string,
-      }),
-      validityEndDate: PropTypes.shape({
-        message: PropTypes.string,
-      }),
-      bidName: PropTypes.shape({
-        message: PropTypes.string,
-      }),
+      destinationParty: FormErrorPropType,
+      preferenceType: FormErrorPropType,
+      validityStartDate: FormErrorPropType,
+      validityEndDate: FormErrorPropType,
+      bidName: FormErrorPropType,
     }),
   ),
   triggerValidation: PropTypes.func.isRequired,
 };
 
 PreferenceTypeVariations.defaultProps = {
-  errors: {},
+  errors: [],
 };

@@ -27,42 +27,54 @@ const useProductSupplierForm = () => {
 
   // Fetches product supplier to edit and returns default values that should be set
   const getProductSupplier = async () => {
-    const response =
-      await productSupplierApi.getProductSupplier(productSupplierId);
+    const response = await productSupplierApi.getProductSupplier(productSupplierId);
     const productSupplier = response?.data?.data;
     const attributes = mapFetchedAttributes(productSupplier?.attributes);
     const {
       preferenceTypes,
       defaultPreferenceType,
     } = splitPreferenceTypes(productSupplier?.productSupplierPreferences);
+
     return {
-      // Exclude null/empty values
-      ...omitEmptyValues(productSupplier),
-      product: {
-        id: productSupplier?.product?.id,
-        value: productSupplier?.product?.id,
-        label: `${productSupplier?.product?.productCode} - ${productSupplier?.product?.name}`,
+      id: productSupplier?.id ?? undefined,
+      basicDetails: {
+        code: productSupplier?.code ?? undefined,
+        product: {
+          id: productSupplier?.product?.id,
+          value: productSupplier?.product?.id,
+          label: `${productSupplier?.product?.productCode} - ${productSupplier?.product?.name}`,
+        },
+        legacyCode: productSupplier?.legacyCode ?? undefined,
+        supplier: productSupplier?.supplier
+          ? {
+            id: productSupplier?.supplier?.id,
+            value: productSupplier?.supplier?.id,
+            label: `${productSupplier?.supplier?.code} ${productSupplier?.supplier?.name}`,
+          } : undefined,
+        supplierCode: productSupplier?.supplierCode ?? undefined,
+        name: productSupplier?.name ?? undefined,
+        active: productSupplier?.active,
+        dateCreated: productSupplier?.dateCreated ?? undefined,
+        lastUpdated: productSupplier?.lastUpdated ?? undefined,
       },
-      supplier: productSupplier?.supplier
-        ? {
-          id: productSupplier?.supplier?.id,
-          value: productSupplier?.supplier?.id,
-          label: `${productSupplier?.supplier?.code} ${productSupplier?.supplier?.name}`,
-        } : undefined,
-      manufacturer: productSupplier?.manufacturer
-        ? {
-          id: productSupplier?.manufacturer.id,
-          value: productSupplier?.manufacturer.id,
-          label: productSupplier?.manufacturer.name,
-        }
-        : undefined,
-      ratingTypeCode: productSupplier?.ratingTypeCode
-        ? {
-          id: productSupplier?.ratingTypeCode,
-          value: productSupplier?.ratingTypeCode,
-          label: productSupplier?.ratingTypeCode,
-        }
-        : undefined,
+      additionalDetails: {
+        manufacturer: productSupplier?.manufacturer
+          ? {
+            id: productSupplier?.manufacturer.id,
+            value: productSupplier?.manufacturer.id,
+            label: productSupplier?.manufacturer.name,
+          }
+          : undefined,
+        ratingTypeCode: productSupplier?.ratingTypeCode
+          ? {
+            id: productSupplier?.ratingTypeCode,
+            value: productSupplier?.ratingTypeCode,
+            label: productSupplier?.ratingTypeCode,
+          }
+          : undefined,
+        manufacturerCode: productSupplier?.manufacturerCode ?? undefined,
+        brandName: productSupplier?.brandName ?? undefined,
+      },
       productSupplierPreferences: preferenceTypes.map((preferenceType) => ({
         ...preferenceType,
         destinationParty: {
@@ -76,15 +88,25 @@ const useProductSupplierForm = () => {
           value: preferenceType.preferenceType?.id,
         },
       })),
-      uom: {
-        id: productSupplier?.defaultProductPackage?.uom?.id,
-        value: productSupplier?.defaultProductPackage?.uom?.id,
-        label: productSupplier?.defaultProductPackage?.uom?.name,
+      packageSpecification: {
+        uom: productSupplier?.defaultProductPackage
+          ? {
+            id: productSupplier?.defaultProductPackage?.uom?.id,
+            value: productSupplier?.defaultProductPackage?.uom?.id,
+            label: productSupplier?.defaultProductPackage?.uom?.name,
+          }
+          : undefined,
+        productPackageQuantity: productSupplier?.defaultProductPackage?.quantity ?? undefined,
+        minOrderQuantity: productSupplier?.minOrderQuantity ?? undefined,
+        productPackagePrice: productSupplier?.defaultProductPackage?.productPrice?.price
+          ?? undefined,
+        eachPrice: productSupplier?.eachPrice ?? undefined,
       },
-      productPackageQuantity: productSupplier?.defaultProductPackage?.quantity,
-      productPackagePrice: productSupplier?.defaultProductPackage?.productPrice?.price,
-      contractPricePrice: productSupplier?.contractPrice?.price,
-      contractPriceValidUntil: productSupplier?.contractPrice?.validUntil,
+      fixedPrice: {
+        contractPricePrice: productSupplier?.contractPrice?.price ?? undefined,
+        contractPriceValidUntil: productSupplier?.contractPrice?.validUntil ?? undefined,
+        tieredPricing: productSupplier?.tieredPricing ?? undefined,
+      },
       attributes,
       defaultPreferenceType: {
         ...defaultPreferenceType,
@@ -120,16 +142,19 @@ const useProductSupplierForm = () => {
 
   const onSubmit = (values) => {
     const payload = {
-      ...omitEmptyValues(values),
+      ...omitEmptyValues(values.basicDetails),
+      ...omitEmptyValues(values.additionalDetails),
+      ...omitEmptyValues(values.defaultPreferenceType),
+      ...omitEmptyValues(values.packageSpecification),
+      ...omitEmptyValues(values.fixedPrice),
+      attributes: omitEmptyValues(values.attributes),
+      productSupplierPreferences: values?.productSupplierPreferences,
       product: values?.product ? values.product.id : null,
       supplier: values?.supplier ? values.supplier.id : null,
       manufacturer: values?.manufacturer ? values.manufacturer.id : null,
       ratingTypeCode: values?.ratingTypeCode ? values.ratingTypeCode.id : null,
-      productSupplierPreferences: values?.productSupplierPreferences,
       uom: values?.uom ? values.uom.id : null,
       preferenceType: values?.preferenceType ? values.preferenceType.id : null,
-      defaultPreferenceType: values?.defaultPreferenceType ? values.defaultPreferenceType.id : null,
-      attributes: omitEmptyValues(values?.attributes),
     };
     // If values contain id, it means we are editing
     if (values?.id) {
@@ -139,8 +164,8 @@ const useProductSupplierForm = () => {
     console.log(payload);
   };
 
-  const packagePrice = useWatch({ control, name: 'productPackagePrice' });
-  const productPackageQuantity = useWatch({ control, name: 'productPackageQuantity' });
+  const packagePrice = useWatch({ control, name: 'packageSpecification.productPackagePrice' });
+  const productPackageQuantity = useWatch({ control, name: 'packageSpecification.productPackageQuantity' });
 
   // eachPrice is a computed value from packagePrice and productPackageQuantity
   useEffect(() => {
@@ -149,9 +174,9 @@ const useProductSupplierForm = () => {
       !_.isNil(productPackageQuantity) &&
       productPackageQuantity !== 0
     ) {
-      setValue('eachPrice', decimalParser(packagePrice / productPackageQuantity, 4));
+      setValue('packageSpecification.eachPrice', decimalParser(packagePrice / productPackageQuantity, 4));
     } else {
-      setValue('eachPrice', '');
+      setValue('packageSpecification.eachPrice', '');
     }
   },
   [packagePrice, productPackageQuantity]);
@@ -159,10 +184,10 @@ const useProductSupplierForm = () => {
   // preselect value 1 when unit of measure Each is selected
   const setProductPackageQuantity = (unitOfMeasure) => {
     if (unitOfMeasure?.id === 'EA') {
-      setValue('productPackageQuantity', 1, { shouldValidate: true });
+      setValue('packageSpecification.productPackageQuantity', 1, { shouldValidate: true });
       return;
     }
-    setValue('productPackageQuantity', '');
+    setValue('packageSpecification.productPackageQuantity', '');
   };
 
   return {

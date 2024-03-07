@@ -7,6 +7,7 @@ import DefaultPreferenceType
   from 'components/productSupplier/create/subsections/DefaultPreferenceType';
 import PreferenceTypeVariations
   from 'components/productSupplier/create/subsections/PreferenceTypeVariations';
+import { FormErrorPropType } from 'utils/propTypes';
 
 const PreferenceTypeSection = ({
   control,
@@ -17,12 +18,12 @@ const PreferenceTypeSection = ({
   <Section title={{ label: 'react.productSupplier.section.preferenceType.title', defaultMessage: 'Preference Type' }}>
     <DefaultPreferenceType
       control={control}
-      errors={errors}
+      errors={errors?.defaultPreferenceType}
       setValue={setValue}
     />
     <PreferenceTypeVariations
       control={control}
-      errors={errors.productSupplierPreferences}
+      errors={errors?.productSupplierPreferences}
       triggerValidation={triggerValidation}
     />
   </Section>
@@ -34,33 +35,17 @@ PreferenceTypeSection.propTypes = {
   control: PropTypes.shape({}).isRequired,
   errors: PropTypes.shape({
     defaultPreferenceType: PropTypes.shape({
-      message: PropTypes.string,
-    }),
-    validFrom: PropTypes.shape({
-      message: PropTypes.string,
-    }),
-    validUntil: PropTypes.shape({
-      message: PropTypes.string,
-    }),
-    bidName: PropTypes.shape({
-      message: PropTypes.string,
+      preferenceType: FormErrorPropType,
+      validityStartDate: FormErrorPropType,
+      validityEndDate: FormErrorPropType,
+      bidName: FormErrorPropType,
     }),
     productSupplierPreferences: PropTypes.arrayOf(PropTypes.shape({
-      destinationParty: PropTypes.shape({
-        message: PropTypes.string,
-      }),
-      preferenceType: PropTypes.shape({
-        message: PropTypes.string,
-      }),
-      validityStartDate: PropTypes.shape({
-        message: PropTypes.string,
-      }),
-      validityEndDate: PropTypes.shape({
-        message: PropTypes.string,
-      }),
-      bidName: PropTypes.shape({
-        message: PropTypes.string,
-      }),
+      destinationParty: FormErrorPropType,
+      preferenceType: FormErrorPropType,
+      validityStartDate: FormErrorPropType,
+      validityEndDate: FormErrorPropType,
+      bidName: FormErrorPropType,
     })),
   }).isRequired,
   triggerValidation: PropTypes.func.isRequired,

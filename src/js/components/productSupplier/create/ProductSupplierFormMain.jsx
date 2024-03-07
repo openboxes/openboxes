@@ -6,6 +6,7 @@ import AttributesSection from 'components/productSupplier/create/sections/Attrib
 import DetailsSection from 'components/productSupplier/create/sections/DetailsSection';
 import PreferenceTypeSection from 'components/productSupplier/create/sections/PreferenceTypeSection';
 import PricingSection from 'components/productSupplier/create/sections/PricingSection';
+import { FormErrorPropType } from 'utils/propTypes';
 
 import './styles.scss';
 
@@ -22,17 +23,26 @@ const ProductSupplierFormMain = ({ formProps }) => {
     <div className="d-flex gap-12 flex-column">
       <DetailsSection
         control={control}
-        errors={errors}
+        errors={{
+          basicDetails: errors?.basicDetails,
+          additionalDetails: errors?.additionalDetails,
+        }}
       />
       <PreferenceTypeSection
         control={control}
-        errors={errors}
+        errors={{
+          defaultPreferenceType: errors?.defaultPreferenceType,
+          productSupplierPreferences: errors?.productSupplierPreferences,
+        }}
         triggerValidation={triggerValidation}
         setValue={setValue}
       />
       <PricingSection
         control={control}
-        errors={errors}
+        errors={{
+          packageSpecification: errors?.packageSpecification,
+          fixedPrice: errors?.fixedPrice,
+        }}
         setProductPackageQuantity={setProductPackageQuantity}
       />
       <AttributesSection
@@ -50,67 +60,47 @@ ProductSupplierFormMain.propTypes = {
     control: PropTypes.shape({}).isRequired,
     handleSubmit: PropTypes.func.isRequired,
     errors: PropTypes.shape({
-      supplier: PropTypes.shape({
-        message: PropTypes.string,
+      basicDetails: PropTypes.shape({
+        code: FormErrorPropType,
+        product: FormErrorPropType,
+        legacyCode: FormErrorPropType,
+        supplier: FormErrorPropType,
+        supplierCode: FormErrorPropType,
+        name: FormErrorPropType,
+        active: FormErrorPropType,
       }),
-      name: PropTypes.shape({
-        message: PropTypes.string,
-      }),
-      supplierCode: PropTypes.shape({
-        message: PropTypes.string,
-      }),
-      product: PropTypes.shape({
-        message: PropTypes.string,
-      }),
-      uom: PropTypes.shape({
-        message: PropTypes.string,
-      }),
-      productPackageQuantity: PropTypes.shape({
-        message: PropTypes.string,
-      }),
-      minOrderQuantity: PropTypes.shape({
-        message: PropTypes.string,
-      }),
-      productPackagePrice: PropTypes.shape({
-        message: PropTypes.string,
-      }),
-      eachPrice: PropTypes.shape({
-        message: PropTypes.string,
+      additionalDetails: PropTypes.shape({
+        manufacturer: FormErrorPropType,
+        ratingTypeCode: FormErrorPropType,
+        manufacturerCode: FormErrorPropType,
+        brandName: FormErrorPropType,
       }),
       defaultPreferenceType: PropTypes.shape({
-        message: PropTypes.string,
-      }),
-      validFrom: PropTypes.shape({
-        message: PropTypes.string,
-      }),
-      validUntil: PropTypes.shape({
-        message: PropTypes.string,
-      }),
-      bidName: PropTypes.shape({
-        message: PropTypes.string,
+        preferenceType: FormErrorPropType,
+        validityStartDate: FormErrorPropType,
+        validityEndDate: FormErrorPropType,
+        bidName: FormErrorPropType,
       }),
       productSupplierPreferences: PropTypes.arrayOf(PropTypes.shape({
-        destinationParty: PropTypes.shape({
-          message: PropTypes.string,
-        }),
-        preferenceType: PropTypes.shape({
-          message: PropTypes.string,
-        }),
-        validityStartDate: PropTypes.shape({
-          message: PropTypes.string,
-        }),
-        validityEndDate: PropTypes.shape({
-          message: PropTypes.string,
-        }),
-        bidName: PropTypes.shape({
-          message: PropTypes.string,
-        }),
+        destinationParty: FormErrorPropType,
+        preferenceType: FormErrorPropType,
+        validityStartDate: FormErrorPropType,
+        validityEndDate: FormErrorPropType,
+        bidName: FormErrorPropType,
       })),
-      attributes: PropTypes.objectOf(
-        PropTypes.shape({
-          message: PropTypes.string,
-        }),
-      ),
+      packageSpecification: PropTypes.shape({
+        uom: FormErrorPropType,
+        productPackageQuantity: FormErrorPropType,
+        minOrderQuantity: FormErrorPropType,
+        productPackagePrice: FormErrorPropType,
+        eachPrice: FormErrorPropType,
+      }),
+      fixedPrice: PropTypes.shape({
+        contractPricePrice: FormErrorPropType,
+        contractPriceValidUntil: FormErrorPropType,
+        tieredPricing: FormErrorPropType,
+      }),
+      attributes: PropTypes.objectOf(FormErrorPropType),
     }),
     triggerValidation: PropTypes.func.isRequired,
     setProductPackageQuantity: PropTypes.func.isRequired,

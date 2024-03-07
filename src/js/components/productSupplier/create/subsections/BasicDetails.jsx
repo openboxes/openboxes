@@ -11,6 +11,7 @@ import TextInput from 'components/form-elements/v2/TextInput';
 import Subsection from 'components/Layout/v2/Subsection';
 import { INVENTORY_ITEM_URL } from 'consts/applicationUrls';
 import { debounceOrganizationsFetch, debounceProductsFetch } from 'utils/option-utils';
+import { FormErrorPropType } from 'utils/propTypes';
 
 const BasicDetails = ({ control, errors }) => {
   const {
@@ -23,7 +24,7 @@ const BasicDetails = ({ control, errors }) => {
 
   // Watch product's input changes live, in order to display a "View Product" link
   // with a proper product id
-  const product = useWatch({ control, name: 'product' });
+  const product = useWatch({ control, name: 'basicDetails.product' });
 
   return (
     <Subsection
@@ -33,7 +34,7 @@ const BasicDetails = ({ control, errors }) => {
       <div className="row">
         <div className="col-lg-4 col-md-6 p-2">
           <Controller
-            name="code"
+            name="basicDetails.code"
             control={control}
             render={({ field }) => (
               <TextInput
@@ -53,7 +54,7 @@ const BasicDetails = ({ control, errors }) => {
         </div>
         <div className="col-lg-4 col-md-6 p-2">
           <Controller
-            name="product"
+            name="basicDetails.product"
             control={control}
             render={({ field }) => (
               <SelectField
@@ -80,7 +81,7 @@ const BasicDetails = ({ control, errors }) => {
         </div>
         <div className="col-lg-4 col-md-6 p-2">
           <Controller
-            name="legacyCode"
+            name="basicDetails.legacyCode"
             control={control}
             render={({ field }) => (
               <TextInput
@@ -97,7 +98,7 @@ const BasicDetails = ({ control, errors }) => {
         </div>
         <div className="col-lg-4 col-md-6 p-2">
           <Controller
-            name="supplier"
+            name="basicDetails.supplier"
             control={control}
             render={({ field }) => (
               <SelectField
@@ -116,7 +117,7 @@ const BasicDetails = ({ control, errors }) => {
         </div>
         <div className="col-lg-4 col-md-6 p-2">
           <Controller
-            name="supplierCode"
+            name="basicDetails.supplierCode"
             control={control}
             render={({ field }) => (
               <TextInput
@@ -134,7 +135,7 @@ const BasicDetails = ({ control, errors }) => {
         </div>
         <div className="col-lg-4 col-md-6 p-2">
           <Controller
-            name="name"
+            name="basicDetails.name"
             control={control}
             render={({ field }) => (
               <TextInput
@@ -152,7 +153,7 @@ const BasicDetails = ({ control, errors }) => {
         </div>
         <div className="col-lg-4 col-md-6 p-2">
           <Controller
-            name="dateCreated"
+            name="basicDetails.dateCreated"
             control={control}
             render={({ field }) => (
               <DateField
@@ -166,7 +167,7 @@ const BasicDetails = ({ control, errors }) => {
         </div>
         <div className="col-lg-4 col-md-6 p-2">
           <Controller
-            name="lastUpdated"
+            name="basicDetails.lastUpdated"
             control={control}
             render={({ field }) => (
               <DateField
@@ -180,7 +181,7 @@ const BasicDetails = ({ control, errors }) => {
         </div>
         <div className="col-lg-4 col-md-6 p-2">
           <Controller
-            name="active"
+            name="basicDetails.active"
             control={control}
             render={({ field }) => (
               <Switch
@@ -210,29 +211,18 @@ export default BasicDetails;
 BasicDetails.propTypes = {
   control: PropTypes.shape({}).isRequired,
   errors: PropTypes.shape({
-    code: PropTypes.shape({
-      message: PropTypes.string,
-    }),
-    legacyCode: PropTypes.shape({
-      message: PropTypes.string,
-    }),
-    dateCreated: PropTypes.shape({
-      message: PropTypes.string,
-    }),
-    lastUpdated: PropTypes.shape({
-      message: PropTypes.string,
-    }),
-    supplier: PropTypes.shape({
-      message: PropTypes.string,
-    }),
-    name: PropTypes.shape({
-      message: PropTypes.string,
-    }),
-    supplierCode: PropTypes.shape({
-      message: PropTypes.string,
-    }),
-    product: PropTypes.shape({
-      message: PropTypes.string,
-    }),
-  }).isRequired,
+    code: FormErrorPropType,
+    product: FormErrorPropType,
+    legacyCode: FormErrorPropType,
+    supplier: FormErrorPropType,
+    supplierCode: FormErrorPropType,
+    name: FormErrorPropType,
+    active: FormErrorPropType,
+    dateCreated: FormErrorPropType,
+    lastUpdated: FormErrorPropType,
+  }),
+};
+
+BasicDetails.defaultProps = {
+  errors: {},
 };

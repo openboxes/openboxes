@@ -12,6 +12,7 @@ import TextInput from 'components/form-elements/v2/TextInput';
 import Subsection from 'components/Layout/v2/Subsection';
 import useDeletePreferenceType from 'hooks/productSupplier/form/useDeletePreferenceType';
 import Translate from 'utils/Translate';
+import { FormErrorPropType } from 'utils/propTypes';
 
 const DefaultPreferenceType = ({
   control,
@@ -168,18 +169,14 @@ export default DefaultPreferenceType;
 DefaultPreferenceType.propTypes = {
   control: PropTypes.shape({}).isRequired,
   errors: PropTypes.shape({
-    preferenceType: PropTypes.shape({
-      message: PropTypes.string,
-    }),
-    validityStartDate: PropTypes.shape({
-      message: PropTypes.string,
-    }),
-    validityEndDate: PropTypes.shape({
-      message: PropTypes.string,
-    }),
-    bidName: PropTypes.shape({
-      message: PropTypes.string,
-    }),
-  }).isRequired,
+    preferenceType: FormErrorPropType,
+    validityStartDate: FormErrorPropType,
+    validityEndDate: FormErrorPropType,
+    bidName: FormErrorPropType,
+  }),
   setValue: PropTypes.func.isRequired,
+};
+
+DefaultPreferenceType.defaultProps = {
+  errors: {},
 };
