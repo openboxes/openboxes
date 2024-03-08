@@ -9,6 +9,7 @@ import TextInput from 'components/form-elements/v2/TextInput';
 import Subsection from 'components/Layout/v2/Subsection';
 import RoleType from 'consts/roleType';
 import { debounceOrganizationsFetch } from 'utils/option-utils';
+import { FormErrorPropType } from 'utils/propTypes';
 
 const AdditionalDetails = ({ control, errors }) => {
   const {
@@ -34,7 +35,7 @@ const AdditionalDetails = ({ control, errors }) => {
       <div className="row">
         <div className="col-lg-4 col-md-6 p-2">
           <Controller
-            name="manufacturer"
+            name="additionalDetails.manufacturer"
             control={control}
             render={({ field }) => (
               <SelectField
@@ -51,7 +52,7 @@ const AdditionalDetails = ({ control, errors }) => {
         </div>
         <div className="col-lg-4 col-md-6 p-2">
           <Controller
-            name="ratingTypeCode"
+            name="additionalDetails.ratingTypeCode"
             control={control}
             render={({ field }) => (
               <SelectField
@@ -71,7 +72,7 @@ const AdditionalDetails = ({ control, errors }) => {
         </div>
         <div className="col-lg-4 col-md-6 p-2">
           <Controller
-            name="manufacturerCode"
+            name="additionalDetails.manufacturerCode"
             control={control}
             render={({ field }) => (
               <TextInput
@@ -84,7 +85,7 @@ const AdditionalDetails = ({ control, errors }) => {
         </div>
         <div className="col-lg-4 col-md-6 p-2">
           <Controller
-            name="brandName"
+            name="additionalDetails.brandName"
             control={control}
             render={({ field }) => (
               <TextInput
@@ -106,20 +107,18 @@ const AdditionalDetails = ({ control, errors }) => {
 
 export default AdditionalDetails;
 
+export const additionalDetailsFormErrors = PropTypes.shape({
+  manufacturer: FormErrorPropType,
+  ratingTypeCode: FormErrorPropType,
+  manufacturerCode: FormErrorPropType,
+  brandName: FormErrorPropType,
+});
+
 AdditionalDetails.propTypes = {
   control: PropTypes.shape({}).isRequired,
-  errors: PropTypes.shape({
-    manufacturer: PropTypes.shape({
-      message: PropTypes.string,
-    }),
-    ratingTypeCode: PropTypes.shape({
-      message: PropTypes.string,
-    }),
-    manufacturerCode: PropTypes.shape({
-      message: PropTypes.string,
-    }),
-    brandName: PropTypes.shape({
-      message: PropTypes.string,
-    }),
-  }).isRequired,
+  errors: additionalDetailsFormErrors,
+};
+
+AdditionalDetails.defaultProps = {
+  errors: {},
 };

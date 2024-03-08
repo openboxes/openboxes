@@ -7,6 +7,7 @@ import CheckBox from 'components/form-elements/v2/Checkbox';
 import DateField from 'components/form-elements/v2/DateField';
 import TextInput from 'components/form-elements/v2/TextInput';
 import Subsection from 'components/Layout/v2/Subsection';
+import { FormErrorPropType } from 'utils/propTypes';
 
 const FixedPrice = ({ control, errors }) => (
   <Subsection
@@ -19,7 +20,7 @@ const FixedPrice = ({ control, errors }) => (
     <div className="row">
       <div className="col-lg-4 p-2">
         <Controller
-          name="contractPricePrice"
+          name="fixedPrice.contractPricePrice"
           control={control}
           render={({ field }) => (
             <TextInput
@@ -41,7 +42,7 @@ const FixedPrice = ({ control, errors }) => (
       </div>
       <div className="col-lg-4 p-2">
         <Controller
-          name="contractPriceValidUntil"
+          name="fixedPrice.contractPriceValidUntil"
           control={control}
           render={({ field }) => (
             <DateField
@@ -57,7 +58,7 @@ const FixedPrice = ({ control, errors }) => (
       </div>
       <div className="col-lg-4 p-2">
         <Controller
-          name="tieredPricing"
+          name="fixedPrice.tieredPricing"
           control={control}
           render={({ field }) => (
             <CheckBox
@@ -80,18 +81,17 @@ const FixedPrice = ({ control, errors }) => (
 
 export default FixedPrice;
 
+export const fixedPriceFormErrors = PropTypes.shape({
+  contractPricePrice: FormErrorPropType,
+  contractPriceValidUntil: FormErrorPropType,
+  tieredPricing: FormErrorPropType,
+});
+
 FixedPrice.propTypes = {
   control: PropTypes.shape({}).isRequired,
-  errors: PropTypes.shape({
-    contractPricePrice: PropTypes.shape({
-      message: PropTypes.string,
-    }),
-    contractPriceValidUntil: PropTypes.shape({
-      message: PropTypes.string,
-    }),
-    tieredPricing: PropTypes.shape({
-      message: PropTypes.string,
-    }),
+  errors: fixedPriceFormErrors,
+};
 
-  }).isRequired,
+FixedPrice.defaultProps = {
+  errors: {},
 };
