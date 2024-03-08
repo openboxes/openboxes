@@ -4,17 +4,18 @@ import _ from 'lodash';
 import { useSelector } from 'react-redux';
 
 import RoleType from 'consts/roleType';
-import { hasRole } from 'utils/permissionUtils';
 
 const useUserHasPermissions = ({ minRequiredRole, roles }) => {
   const {
     currentUser,
+    currentLocationRoles,
     isSuperuser,
     isAdmin,
     isApprover,
     isRequestApprover,
   } = useSelector((state) => ({
     currentUser: state.session.user,
+    currentLocationRoles: state.session.currentLocationRoles,
     isSuperuser: state.session.isSuperuser,
     isAdmin: state.session.isUserAdmin,
     isApprover: state.session.isUserApprover,
@@ -36,9 +37,14 @@ const useUserHasPermissions = ({ minRequiredRole, roles }) => {
     }
   }, [currentUser]);
 
-  const hasRequiredRoles = useMemo(() =>
-    _.every(roles, (role) => hasRole(currentUser, role)),
-  [currentUser]);
+  const hasRequiredRoles = useMemo(() => {
+    const userRoles = Array.isArray(currentUser?.roles) ? currentUser?.roles : [];
+    const userLocationRoles = Array.isArray(currentLocationRoles) ? currentLocationRoles : [];
+
+    const allUserRoles = new Set([...userRoles, ...userLocationRoles]);
+
+    return _.every(roles, (role) => allUserRoles.has(role));
+  }, [currentUser]);
 
   return hasMinimumRequiredRole && hasRequiredRoles;
 };
