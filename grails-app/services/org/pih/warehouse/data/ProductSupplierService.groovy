@@ -150,7 +150,7 @@ class ProductSupplierService {
     }
 
     private static Criterion getPreferenceTypeCriteria(List<String> preferenceTypes) {
-        if (preferenceTypes.contains("NONE")) {
+        if (preferenceTypes.contains(PREFERENCE_TYPE_NONE)) {
             return Restrictions.or(
                     getDefaultPreferenceTypeCriteria(preferenceTypes),
                     getEmptyDefaultPreferenceTypeCriteria(),
