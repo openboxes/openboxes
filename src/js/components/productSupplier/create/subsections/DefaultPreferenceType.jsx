@@ -34,7 +34,7 @@ const DefaultPreferenceType = ({
     bidName: '',
     validityStartDate: '',
     validityEndDate: '',
-    preferenceType: '',
+    preferenceType: null,
   };
 
   const afterDelete = () => {
