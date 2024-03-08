@@ -120,8 +120,12 @@ const useProductSupplierForm = () => {
   };
 
   const defaultValues = {
-    active: true,
-    tieredPricing: false,
+    basicDetails: {
+      active: true,
+    },
+    fixedPrice: {
+      tieredPricing: false,
+    },
   };
 
   const {
