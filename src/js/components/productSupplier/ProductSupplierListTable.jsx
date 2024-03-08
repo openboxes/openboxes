@@ -8,6 +8,7 @@ import DateCell from 'components/DataTable/DateCell';
 import Button from 'components/form-elements/Button';
 import PreferenceTypeColumn from 'components/productSupplier/PreferenceTypeColumn';
 import { INVENTORY_ITEM_URL, PRODUCT_SUPPLIER_URL } from 'consts/applicationUrls';
+import RoleType from 'consts/roleType';
 import useProductSupplierActions from 'hooks/list-pages/productSupplier/useProductSupplierActions';
 import useProductSupplierListTableData from 'hooks/list-pages/productSupplier/useProductSupplierListTableData';
 import ActionDots from 'utils/ActionDots';
@@ -15,6 +16,7 @@ import StatusIndicator from 'utils/StatusIndicator';
 import Translate from 'utils/Translate';
 import ListTableTitleWrapper from 'wrappers/ListTableTitleWrapper';
 import ListTableWrapper from 'wrappers/ListTableWrapper';
+import useUserHasPermissions from 'hooks/useUserHasPermissions';
 
 const ProductSupplierListTable = ({ filterParams }) => {
   const {
@@ -29,6 +31,11 @@ const ProductSupplierListTable = ({ filterParams }) => {
     getActions,
     exportProductSuppliers,
   } = useProductSupplierActions({ fireFetchData });
+
+  const isUserAdminWithProductManager = useUserHasPermissions({
+    minRequiredRole: RoleType.ROLE_ADMIN,
+    roles: [RoleType.ROLE_PRODUCT_MANAGER],
+  });
 
   const columns = useMemo(() => [
     {
@@ -80,7 +87,11 @@ const ProductSupplierListTable = ({ filterParams }) => {
         (
           <TableCell
             {...row}
-            link={PRODUCT_SUPPLIER_URL.edit(row.original.id)}
+            link={
+            isUserAdminWithProductManager
+              ? PRODUCT_SUPPLIER_URL.edit(row.original.id)
+              : undefined
+            }
           />
         ),
     },
