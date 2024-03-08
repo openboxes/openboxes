@@ -804,6 +804,11 @@ class UrlMappings {
             action = [POST: "createOrUpdateBatch"]
         }
 
+        "/api/productSupplierAttributes/batch" {
+            controller = { "productSupplierAttributeApi" }
+            action = [POST: "updateAttributes"]
+        }
+
         // Load Data
 
         "/api/loadData/listOfDemoData"(parseRequest: true) {
