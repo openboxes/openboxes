@@ -11,12 +11,14 @@ import SelectField from 'components/form-elements/v2/SelectField';
 import TextInput from 'components/form-elements/v2/TextInput';
 import Subsection from 'components/Layout/v2/Subsection';
 import useDeletePreferenceType from 'hooks/productSupplier/form/useDeletePreferenceType';
+import { FormErrorPropType } from 'utils/propTypes';
 import Translate from 'utils/Translate';
 
 const DefaultPreferenceType = ({
   control,
   errors,
   setValue,
+  triggerValidation,
 }) => {
   const {
     preferenceTypes,
@@ -33,11 +35,15 @@ const DefaultPreferenceType = ({
     bidName: '',
     validityStartDate: '',
     validityEndDate: '',
-    preferenceType: '',
+    preferenceType: null,
   };
 
   const afterDelete = () => {
     setValue('defaultPreferenceType', emptyPreferenceType);
+  };
+
+  const triggerValidationOnPreferenceType = () => {
+    triggerValidation('defaultPreferenceType.preferenceType');
   };
 
   const {
@@ -97,6 +103,10 @@ const DefaultPreferenceType = ({
                 }}
                 errorMessage={errors.validityStartDate?.message}
                 {...field}
+                onBlur={(e) => {
+                  field?.onBlur?.(e);
+                  triggerValidationOnPreferenceType();
+                }}
               />
             )}
           />
@@ -117,6 +127,10 @@ const DefaultPreferenceType = ({
                 }}
                 errorMessage={errors.validityEndDate?.message}
                 {...field}
+                onBlur={(e) => {
+                  field?.onBlur?.(e);
+                  triggerValidationOnPreferenceType();
+                }}
               />
             )}
           />
@@ -136,6 +150,10 @@ const DefaultPreferenceType = ({
                 tooltip={{
                   id: 'react.productSupplier.form.bidName.tooltip',
                   defaultMessage: 'The bid during which the purchasing preference was selected',
+                }}
+                onBlur={(e) => {
+                  field?.onBlur?.(e);
+                  triggerValidationOnPreferenceType();
                 }}
               />
             )}
@@ -165,21 +183,20 @@ const DefaultPreferenceType = ({
 
 export default DefaultPreferenceType;
 
+export const defaultPreferenceTypeFormErrors = PropTypes.shape({
+  preferenceType: FormErrorPropType,
+  validityStartDate: FormErrorPropType,
+  validityEndDate: FormErrorPropType,
+  bidName: FormErrorPropType,
+});
+
 DefaultPreferenceType.propTypes = {
   control: PropTypes.shape({}).isRequired,
-  errors: PropTypes.shape({
-    preferenceType: PropTypes.shape({
-      message: PropTypes.string,
-    }),
-    validityStartDate: PropTypes.shape({
-      message: PropTypes.string,
-    }),
-    validityEndDate: PropTypes.shape({
-      message: PropTypes.string,
-    }),
-    bidName: PropTypes.shape({
-      message: PropTypes.string,
-    }),
-  }).isRequired,
+  errors: defaultPreferenceTypeFormErrors,
   setValue: PropTypes.func.isRequired,
+  triggerValidation: PropTypes.func.isRequired,
+};
+
+DefaultPreferenceType.defaultProps = {
+  errors: {},
 };

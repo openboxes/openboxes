@@ -5,6 +5,7 @@ import { Controller } from 'react-hook-form';
 
 import Section from 'components/Layout/v2/Section';
 import useProductSupplierAttributes from 'hooks/productSupplier/form/useProductSupplierAttributes';
+import { FormErrorPropType } from 'utils/propTypes';
 
 const AttributesSection = ({ control, errors }) => {
   const { attributesWithInputTypes } = useProductSupplierAttributes();
@@ -50,11 +51,7 @@ export default AttributesSection;
 
 AttributesSection.propTypes = {
   control: PropTypes.shape({}).isRequired,
-  errors: PropTypes.objectOf(
-    PropTypes.shape({
-      message: PropTypes.string,
-    }),
-  ),
+  errors: PropTypes.objectOf(FormErrorPropType),
 };
 
 AttributesSection.defaultProps = {

@@ -7,10 +7,11 @@ import SelectField from 'components/form-elements/v2/SelectField';
 import TextInput from 'components/form-elements/v2/TextInput';
 import Subsection from 'components/Layout/v2/Subsection';
 import useQuantityUnitOfMeasureOptions from 'hooks/options-data/useQuantityUnitOfMeasureOptions';
+import { FormErrorPropType } from 'utils/propTypes';
 
 const PackageSpecification = ({ control, errors, setProductPackageQuantity }) => {
   const { quantityUom } = useQuantityUnitOfMeasureOptions();
-  const uom = useWatch({ control, name: 'uom' });
+  const uom = useWatch({ control, name: 'packageSpecification.uom' });
 
   return (
     <Subsection
@@ -23,7 +24,7 @@ const PackageSpecification = ({ control, errors, setProductPackageQuantity }) =>
       <div className="row">
         <div className="col-lg col-md-6 p-2">
           <Controller
-            name="uom"
+            name="packageSpecification.uom"
             control={control}
             render={({ field }) => (
               <SelectField
@@ -51,7 +52,7 @@ const PackageSpecification = ({ control, errors, setProductPackageQuantity }) =>
         </div>
         <div className="col-lg col-md-6 p-2">
           <Controller
-            name="productPackageQuantity"
+            name="packageSpecification.productPackageQuantity"
             control={control}
             render={({ field }) => (
               <TextInput
@@ -75,7 +76,7 @@ const PackageSpecification = ({ control, errors, setProductPackageQuantity }) =>
         </div>
         <div className="col-lg col-md-6 p-2">
           <Controller
-            name="minOrderQuantity"
+            name="packageSpecification.minOrderQuantity"
             control={control}
             render={({ field }) => (
               <TextInput
@@ -97,7 +98,7 @@ const PackageSpecification = ({ control, errors, setProductPackageQuantity }) =>
         </div>
         <div className="col-lg col-md-6 p-2">
           <Controller
-            name="productPackagePrice"
+            name="packageSpecification.productPackagePrice"
             control={control}
             render={({ field }) => (
               <TextInput
@@ -119,7 +120,7 @@ const PackageSpecification = ({ control, errors, setProductPackageQuantity }) =>
         </div>
         <div className="col-lg col-md-6 p-2">
           <Controller
-            name="eachPrice"
+            name="packageSpecification.eachPrice"
             control={control}
             render={({ field }) => (
               <TextInput
@@ -146,24 +147,20 @@ const PackageSpecification = ({ control, errors, setProductPackageQuantity }) =>
 
 export default PackageSpecification;
 
+export const packageSpecificationFormErrors = PropTypes.shape({
+  uom: FormErrorPropType,
+  productPackageQuantity: FormErrorPropType,
+  minOrderQuantity: FormErrorPropType,
+  productPackagePrice: FormErrorPropType,
+  eachPrice: FormErrorPropType,
+});
+
 PackageSpecification.propTypes = {
   control: PropTypes.shape({}).isRequired,
-  errors: PropTypes.shape({
-    uom: PropTypes.shape({
-      message: PropTypes.string,
-    }),
-    productPackageQuantity: PropTypes.shape({
-      message: PropTypes.string,
-    }),
-    minOrderQuantity: PropTypes.shape({
-      message: PropTypes.string,
-    }),
-    productPackagePrice: PropTypes.shape({
-      message: PropTypes.string,
-    }),
-    eachPrice: PropTypes.shape({
-      message: PropTypes.string,
-    }),
-  }).isRequired,
+  errors: packageSpecificationFormErrors,
   setProductPackageQuantity: PropTypes.func.isRequired,
+};
+
+PackageSpecification.defaultProps = {
+  errors: {},
 };
