@@ -85,8 +85,8 @@ class ProductSupplierService {
             if (command.supplier) {
                 eq("supplier.id", command.supplier)
             }
-            if (command.preferenceType) {
-                add(getPreferenceTypeCriteria(command.preferenceType))
+            if (command.defaultPreferenceTypes) {
+                add(getPreferenceTypeCriteria(command.defaultPreferenceTypes))
             }
             if (command.createdFrom) {
                 ge("dateCreated", command.createdFrom)
@@ -149,26 +149,42 @@ class ProductSupplierService {
         return Order.asc(sort)
     }
 
-    private static Criterion getPreferenceTypeCriteria(String preferenceType) {
-        if (preferenceType == PREFERENCE_TYPE_NONE) {
-            return Restrictions.isEmpty("productSupplierPreferences")
+    private static Criterion getPreferenceTypeCriteria(List<String> preferenceTypes) {
+        if (preferenceTypes.contains("NONE")) {
+            return Restrictions.or(
+                    getDefaultPreferenceTypeCriteria(preferenceTypes),
+                    getEmptyDefaultPreferenceTypeCriteria(),
+            )
         }
-        if (preferenceType == PREFERENCE_TYPE_MULTIPLE) {
-            return Restrictions.sizeGt("productSupplierPreferences", 1)
-        }
-        // If we are searching by a specific preference type, we want to search for a product supplier
-        // that has only one preference (first statement) and its id is equal to the provided id (second statement)
+
+        return getDefaultPreferenceTypeCriteria(preferenceTypes)
+    }
+
+    private static Criterion getDefaultPreferenceTypeCriteria(List<String> preferenceTypes) {
+        // If we are searching by a list of preference types, we want to search for a product supplier
+        // that has default preference type within the provided list (first statement). We are considering
+        // preference type as a default when the destination party is null (second statement)
         return Restrictions
-                .and(Restrictions.sizeEq("productSupplierPreferences", 1),
-                        Subqueries.exists(DetachedCriteria.forClass(ProductSupplierPreference, 'pp')
-                            .createAlias("pp.preferenceType", 'pt')
-                            .setProjection(Projections.property("pp.id"))
-                            .add(Restrictions.and(
-                                    Restrictions.eq("pt.id", preferenceType),
-                                    // Join the product supplier preferences table by productSupplier.id = productPreference.supplierId
-                                    Restrictions.eqProperty("pp.productSupplier.id", "this.id")))))
+                .and(Subqueries.exists(DetachedCriteria.forClass(ProductSupplierPreference, 'pp')
+                                .createAlias("pp.preferenceType", 'pt', JoinType.LEFT_OUTER_JOIN)
+                                .setProjection(Projections.property("pp.id"))
+                                .add(Restrictions.and(
+                                        Restrictions.in("pt.id", preferenceTypes),
+                                        Restrictions.isNull("pp.destinationParty"),
+                                        // Join the product supplier preferences table by productSupplier.id = productPreference.supplierId
+                                        Restrictions.eqProperty("pp.productSupplier.id", "this.id")))))
+    }
 
-
+    private static Criterion getEmptyDefaultPreferenceTypeCriteria() {
+        //  If we are searching for product suppliers without a default preference type, we are
+        //  checking whether exists preference type without a destination party for the exact supplier
+        return Restrictions
+                .and(Subqueries.notExists(DetachedCriteria.forClass(ProductSupplierPreference, 'pp')
+                        .createAlias("pp.preferenceType", 'pt', JoinType.LEFT_OUTER_JOIN)
+                        .setProjection(Projections.property("pp.id"))
+                        .add(Restrictions.and(
+                                Restrictions.isNull("pp.destinationParty"),
+                                Restrictions.eqProperty("pp.productSupplier.id", "this.id")))))
     }
 
     ProductSupplier createOrUpdate(Map params) {
