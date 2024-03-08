@@ -34,7 +34,6 @@ const useProductSupplierFilters = (ignoreClearFilters) => {
     const config = {
       signal: controller.signal,
       params: {
-        includeMultiple: true,
         includeNone: true,
       },
     };
@@ -108,7 +107,7 @@ const useProductSupplierFilters = (ignoreClearFilters) => {
       supplier: { name: 'supplier', accessor: 'id' },
       createdFrom: { name: 'createdFrom' },
       createdTo: { name: 'createdTo' },
-      preferenceType: { name: 'preferenceType', accessor: 'id' },
+      defaultPreferenceTypes: { name: 'defaultPreferenceTypes', accessor: 'id' },
       includeInactive: { name: 'includeInactive' },
     };
     const transformedParams = transformFilterParams(values, filterAccessors);
