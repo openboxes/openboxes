@@ -19,6 +19,7 @@ const PreferenceTypeSection = ({
       control={control}
       errors={errors?.defaultPreferenceType}
       setValue={setValue}
+      triggerValidation={triggerValidation}
     />
     <PreferenceTypeVariations
       control={control}

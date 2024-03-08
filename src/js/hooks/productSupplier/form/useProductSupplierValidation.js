@@ -20,14 +20,18 @@ const useProductSupplierValidation = () => {
       return groupedData[destinationParty?.id].length === 1;
     };
 
-    const requirePreferenceType = (subsectionData) => {
+    // preferenceType field should be required
+    // when any other field on default preference type subsection is not empty
+    const checkPreferenceTypeIsRequired = (subsectionData) => {
       if (
         subsectionData.validityStartDate
         || subsectionData.validityEndDate
         || subsectionData.bidName
       ) {
-        return !!subsectionData.preferenceType;
+        // if any other field is not empty in preferenceType field should be required
+        return Boolean(subsectionData.preferenceType);
       }
+      // preferenceType field is valid if all other fields are empty
       return true;
     };
 
@@ -128,7 +132,7 @@ const useProductSupplierValidation = () => {
         .string()
         .optional(),
     })
-      .refine(requirePreferenceType, {
+      .refine(checkPreferenceTypeIsRequired, {
         message: 'Default preference type must also be selected', path: ['preferenceType'],
       });
 

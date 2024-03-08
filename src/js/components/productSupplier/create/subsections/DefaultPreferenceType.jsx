@@ -18,6 +18,7 @@ const DefaultPreferenceType = ({
   control,
   errors,
   setValue,
+  triggerValidation,
 }) => {
   const {
     preferenceTypes,
@@ -39,6 +40,10 @@ const DefaultPreferenceType = ({
 
   const afterDelete = () => {
     setValue('defaultPreferenceType', emptyPreferenceType);
+  };
+
+  const triggerValidationOnPreferenceType = () => {
+    triggerValidation('defaultPreferenceType.preferenceType');
   };
 
   const {
@@ -98,6 +103,10 @@ const DefaultPreferenceType = ({
                 }}
                 errorMessage={errors.validityStartDate?.message}
                 {...field}
+                onBlur={(e) => {
+                  field?.onBlur?.(e);
+                  triggerValidationOnPreferenceType();
+                }}
               />
             )}
           />
@@ -118,6 +127,10 @@ const DefaultPreferenceType = ({
                 }}
                 errorMessage={errors.validityEndDate?.message}
                 {...field}
+                onBlur={(e) => {
+                  field?.onBlur?.(e);
+                  triggerValidationOnPreferenceType();
+                }}
               />
             )}
           />
@@ -137,6 +150,10 @@ const DefaultPreferenceType = ({
                 tooltip={{
                   id: 'react.productSupplier.form.bidName.tooltip',
                   defaultMessage: 'The bid during which the purchasing preference was selected',
+                }}
+                onBlur={(e) => {
+                  field?.onBlur?.(e);
+                  triggerValidationOnPreferenceType();
                 }}
               />
             )}
@@ -177,6 +194,7 @@ DefaultPreferenceType.propTypes = {
   control: PropTypes.shape({}).isRequired,
   errors: defaultPreferenceTypeFormErrors,
   setValue: PropTypes.func.isRequired,
+  triggerValidation: PropTypes.func.isRequired,
 };
 
 DefaultPreferenceType.defaultProps = {

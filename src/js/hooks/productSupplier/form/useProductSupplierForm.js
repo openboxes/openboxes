@@ -1,8 +1,6 @@
-import { useEffect } from 'react';
-
 import { zodResolver } from '@hookform/resolvers/zod';
 import _ from 'lodash';
-import { useForm, useWatch } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { useParams } from 'react-router-dom';
 
 import { fetchPreferenceTypes, fetchRatingTypeCodes } from 'actions';
@@ -145,13 +143,6 @@ const useProductSupplierForm = () => {
   });
 
   useCalculateEachPrice({ control, setValue });
-
-  /* immediately trigger validation on preferenceType fields
-  when any values on defaultPreferenceType have changed */
-  const defaultPreferenceType = useWatch({ control, name: 'defaultPreferenceType' });
-  useEffect(() => {
-    trigger('defaultPreferenceType.preferenceType');
-  }, [defaultPreferenceType]);
 
   const onSubmit = (values) => {
     const payload = {
