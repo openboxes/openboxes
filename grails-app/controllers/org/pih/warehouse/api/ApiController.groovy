@@ -144,6 +144,7 @@ class ApiController {
         User user = User.get(session?.user?.id)
         Location location = Location.get(session.warehouse?.id)
         String highestRole = user.getHighestRole(location)
+        List currentLocationRoles = user.getRolesByCurrentLocation(location)?.roleType*.name()
         boolean isSuperuser = userService.isSuperuser(session?.user)
         boolean isUserAdmin = userService.isUserAdmin(session?.user)
         boolean isUserApprover = userService.hasRolePurchaseApprover(session?.user)
@@ -188,6 +189,7 @@ class ApiController {
             data: [
                 user                 : user,
                 location             : location,
+                currentLocationRoles: currentLocationRoles,
                 isSuperuser          : isSuperuser,
                 isUserAdmin          : isUserAdmin,
                 isUserApprover       : isUserApprover,

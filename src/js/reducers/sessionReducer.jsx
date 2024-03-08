@@ -88,6 +88,7 @@ export default function (state = initialState, action) {
       return {
         ...state,
         currentLocation: _.get(action, 'payload.data.data.location'),
+        currentLocationRoles: _.get(action, 'payload.data.data.currentLocationRoles'),
         isSuperuser: _.get(action, 'payload.data.data.isSuperuser'),
         isUserAdmin: _.get(action, 'payload.data.data.isUserAdmin'),
         isUserApprover: _.get(action, 'payload.data.data.isUserApprover', false),
