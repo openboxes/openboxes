@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { z } from 'zod';
@@ -10,11 +10,15 @@ import entityTypeCode from 'consts/entityTypeCode';
 import useTranslate from 'hooks/useTranslate';
 
 const useProductSupplierAttributes = () => {
+  const [isAttributeModalOpen, setIsAttributeModalOpen] = useState(false);
+  const [selectedAttribute, setSelectedAttribute] = useState(null);
   const dispatch = useDispatch();
   const translate = useTranslate();
   const { attributes } = useSelector((state) => ({
     attributes: state.productSupplier.attributes,
   }));
+
+  const closeAttributeModal = () => setIsAttributeModalOpen(false);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -66,18 +70,8 @@ const useProductSupplierAttributes = () => {
    * Function for mapping attribute options to align them with attributes
    * validation schema
    */
-  const mapAttributeOptions = (attribute, includeOther) => {
-    const options = attribute?.options.map((option) =>
-      ({ id: attribute?.id, value: option, label: option }));
-
-    return includeOther
-      ? [...options, {
-        id: attribute?.id,
-        value: 'Other',
-        label: translate('react.productSupplier.form.selectOtherValue.label', 'Other'),
-      }]
-      : options;
-  };
+  const mapAttributeOptions = (attribute) => attribute?.options.map((option) =>
+    ({ id: attribute?.id, value: option, label: option }));
 
   /**
    * When the attribute has the allowOther property set to true and has no options, it should be
@@ -104,7 +98,18 @@ const useProductSupplierAttributes = () => {
       return {
         attribute: {
           ...attribute,
-          options: mapAttributeOptions(attribute, true),
+          options: mapAttributeOptions(attribute),
+        },
+        inputParams: {
+          createNewFromModalLabel: translate(
+            'react.productSupplier.form.selectOtherValue.label',
+            'Other',
+          ),
+          createNewFromModal: true,
+          newOptionModalOpen: () => {
+            setIsAttributeModalOpen(true);
+            setSelectedAttribute(attribute);
+          },
         },
         Input: SelectField,
       };
@@ -133,6 +138,9 @@ const useProductSupplierAttributes = () => {
 
   return {
     attributes,
+    isAttributeModalOpen,
+    selectedAttribute,
+    closeAttributeModal,
     attributesWithInputTypes: getAttributesWithInputTypes(attributes),
     inputTypeSchema,
     selectTypeSchema,

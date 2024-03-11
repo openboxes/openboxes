@@ -6,23 +6,23 @@ import AttributesSection from 'components/productSupplier/create/sections/Attrib
 import DetailsSection from 'components/productSupplier/create/sections/DetailsSection';
 import PreferenceTypeSection from 'components/productSupplier/create/sections/PreferenceTypeSection';
 import PricingSection from 'components/productSupplier/create/sections/PricingSection';
+import {
+  additionalDetailsFormErrors,
+} from 'components/productSupplier/create/subsections/AdditionalDetails';
+import { basicDetailsFormErrors } from 'components/productSupplier/create/subsections/BasicDetails';
+import {
+  defaultPreferenceTypeFormErrors,
+} from 'components/productSupplier/create/subsections/DefaultPreferenceType';
+import { fixedPriceFormErrors } from 'components/productSupplier/create/subsections/FixedPrice';
+import {
+  packageSpecificationFormErrors,
+} from 'components/productSupplier/create/subsections/PackageSpecification';
+import {
+  preferenceTypeVariationsFormErrors,
+} from 'components/productSupplier/create/subsections/PreferenceTypeVariations';
 import { FormErrorPropType } from 'utils/propTypes';
 
 import './styles.scss';
-import { basicDetailsFormErrors } from 'components/productSupplier/create/subsections/BasicDetails';
-import {
-  additionalDetailsFormErrors
-} from 'components/productSupplier/create/subsections/AdditionalDetails';
-import {
-  defaultPreferenceTypeFormErrors
-} from 'components/productSupplier/create/subsections/DefaultPreferenceType';
-import {
-  preferenceTypeVariationsFormErrors
-} from 'components/productSupplier/create/subsections/PreferenceTypeVariations';
-import {
-  packageSpecificationFormErrors
-} from 'components/productSupplier/create/subsections/PackageSpecification';
-import { fixedPriceFormErrors } from 'components/productSupplier/create/subsections/FixedPrice';
 
 const ProductSupplierFormMain = ({ formProps }) => {
   const {
@@ -62,6 +62,7 @@ const ProductSupplierFormMain = ({ formProps }) => {
       <AttributesSection
         control={control}
         errors={errors.attributes}
+        setValue={setValue}
       />
     </div>
   );
