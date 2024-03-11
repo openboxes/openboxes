@@ -15,6 +15,7 @@ import RoleType from 'consts/roleType';
 const useUserHasPermissions = ({ minRequiredRole, supplementalRoles = [] }) => {
   const {
     currentUser,
+    currentLocation,
     currentLocationRoles,
     isSuperuser,
     isAdmin,
@@ -27,6 +28,7 @@ const useUserHasPermissions = ({ minRequiredRole, supplementalRoles = [] }) => {
     isAdmin: state.session.isUserAdmin,
     isApprover: state.session.isUserApprover,
     isRequestApprover: state.session.isUserRequestApprover,
+    currentLocation: state.session.currentLocation,
   }));
 
   /**
@@ -40,7 +42,7 @@ const useUserHasPermissions = ({ minRequiredRole, supplementalRoles = [] }) => {
     const allUserRoles = new Set([...userRoles, ...userLocationRoles]);
 
     return _.every(roles, (role) => allUserRoles.has(role));
-  }, [currentUser]);
+  }, [currentUser?.id, currentLocation?.id]);
 
   /**
    * Returns true if user has minimum required role.
@@ -61,13 +63,14 @@ const useUserHasPermissions = ({ minRequiredRole, supplementalRoles = [] }) => {
       default:
         return hasEveryRole([minRequiredRole]);
     }
-  }, [currentUser]);
+  }, [currentUser?.id, currentLocation?.id]);
 
   /**
    * Returns true if user has all the supplemental roles
    * @returns {boolean}
    */
-  const hasRequiredRoles = useMemo(() => hasEveryRole(supplementalRoles), [currentUser]);
+  const hasRequiredRoles = useMemo(() => hasEveryRole(supplementalRoles),
+    [currentUser?.id, currentLocation?.id]);
 
   return hasMinimumRequiredRole && hasRequiredRoles;
 };
