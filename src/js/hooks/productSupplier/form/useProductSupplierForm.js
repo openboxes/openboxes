@@ -107,6 +107,7 @@ const useProductSupplierForm = () => {
       },
       attributes,
       defaultPreferenceType: {
+        id: defaultPreferenceType?.id ?? undefined,
         preferenceType: !_.isEmpty(defaultPreferenceType) ? {
           id: defaultPreferenceType?.preferenceType?.id,
           label: defaultPreferenceType?.preferenceType?.name,
