@@ -32,7 +32,7 @@ const BasicDetails = ({ control, errors }) => {
       collapsable={false}
     >
       <div className="row">
-        <div className="col-lg-4 col-md-6 p-2">
+        <div className="col-lg-4 col-md-6 px-2 pt-2">
           <Controller
             name="basicDetails.code"
             control={control}
@@ -52,7 +52,7 @@ const BasicDetails = ({ control, errors }) => {
             )}
           />
         </div>
-        <div className="col-lg-4 col-md-6 p-2">
+        <div className="col-lg-4 col-md-6 px-2 pt-2">
           <Controller
             name="basicDetails.product"
             control={control}
@@ -79,7 +79,7 @@ const BasicDetails = ({ control, errors }) => {
             )}
           />
         </div>
-        <div className="col-lg-4 col-md-6 p-2">
+        <div className="col-lg-4 col-md-6 px-2 pt-2">
           <Controller
             name="basicDetails.legacyCode"
             control={control}
@@ -96,7 +96,7 @@ const BasicDetails = ({ control, errors }) => {
             )}
           />
         </div>
-        <div className="col-lg-4 col-md-6 p-2">
+        <div className="col-lg-4 col-md-6 px-2 pt-2">
           <Controller
             name="basicDetails.supplier"
             control={control}
@@ -115,7 +115,7 @@ const BasicDetails = ({ control, errors }) => {
             )}
           />
         </div>
-        <div className="col-lg-4 col-md-6 p-2">
+        <div className="col-lg-4 col-md-6 px-2 pt-2">
           <Controller
             name="basicDetails.supplierCode"
             control={control}
@@ -133,7 +133,7 @@ const BasicDetails = ({ control, errors }) => {
             )}
           />
         </div>
-        <div className="col-lg-4 col-md-6 p-2">
+        <div className="col-lg-4 col-md-6 px-2 pt-2">
           <Controller
             name="basicDetails.name"
             control={control}
@@ -151,7 +151,7 @@ const BasicDetails = ({ control, errors }) => {
             )}
           />
         </div>
-        <div className="col-lg-4 col-md-6 p-2">
+        <div className="col-lg-4 col-md-6 px-2 pt-2">
           <Controller
             name="basicDetails.dateCreated"
             control={control}
@@ -165,7 +165,7 @@ const BasicDetails = ({ control, errors }) => {
             )}
           />
         </div>
-        <div className="col-lg-4 col-md-6 p-2">
+        <div className="col-lg-4 col-md-6 px-2 pt-2">
           <Controller
             name="basicDetails.lastUpdated"
             control={control}
@@ -179,7 +179,7 @@ const BasicDetails = ({ control, errors }) => {
             )}
           />
         </div>
-        <div className="col-lg-4 col-md-6 p-2">
+        <div className="col-lg-4 col-md-6 px-2 pt-2">
           <Controller
             name="basicDetails.active"
             control={control}
