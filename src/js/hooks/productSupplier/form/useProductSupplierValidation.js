@@ -129,7 +129,7 @@ const useProductSupplierValidation = () => {
         .nullish(),
       bidName: z
         .string()
-        .nullish()
+        .nullish(),
     })
       .refine(checkPreferenceTypeIsRequired, {
         message: 'Default preference type must also be selected', path: ['preferenceType'],
