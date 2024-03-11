@@ -36,7 +36,8 @@ const useProductSupplierAttributes = () => {
 
   // When we have at least one option, it has to be select type
   // (allowOther doesn't matter in this case)
-  const isSelectType = (attribute) => attribute?.options.length;
+  const isSelectType = (attribute) => attribute?.options.length
+    || (!attribute?.options.length && !attribute?.allowOther);
 
   // When we don't have options, and allowOther is set to true, it is text input
   const isTextType = (attribute) => attribute?.allowOther && !attribute?.options.length;
@@ -66,6 +67,18 @@ const useProductSupplierAttributes = () => {
       .nullish()
   );
 
+  const selectFieldProps = (attribute) => ({
+    createNewFromModalLabel: translate(
+      'react.productSupplier.form.selectOtherValue.label',
+      'Other',
+    ),
+    createNewFromModal: true,
+    newOptionModalOpen: () => {
+      setIsAttributeModalOpen(true);
+      setSelectedAttribute(attribute);
+    },
+  });
+
   /**
    * Function for mapping attribute options to align them with attributes
    * validation schema
@@ -78,9 +91,18 @@ const useProductSupplierAttributes = () => {
    * text input. When the attribute has the allowOther property set to true and has available
    * options, then it should be a select field, but with the additional option "Other". In all
    * other cases, it should be just a select field with the options fetched from the API.
+   * When field doesn't have options and allowOther then we create a select with "other" option.
    */
   const getAttributesWithInputTypes = (attributesToMap) =>
     (attributesToMap || []).map((attribute) => {
+      if (!attribute?.options.length && !attribute?.allowOther) {
+        return {
+          attribute,
+          inputParams: selectFieldProps(attribute),
+          Input: SelectField,
+        };
+      }
+
       if (!attribute?.allowOther) {
         return {
           attribute: { ...attribute, options: mapAttributeOptions(attribute) },
@@ -100,17 +122,7 @@ const useProductSupplierAttributes = () => {
           ...attribute,
           options: mapAttributeOptions(attribute),
         },
-        inputParams: {
-          createNewFromModalLabel: translate(
-            'react.productSupplier.form.selectOtherValue.label',
-            'Other',
-          ),
-          createNewFromModal: true,
-          newOptionModalOpen: () => {
-            setIsAttributeModalOpen(true);
-            setSelectedAttribute(attribute);
-          },
-        },
+        inputParams: selectFieldProps(attribute),
         Input: SelectField,
       };
     });
