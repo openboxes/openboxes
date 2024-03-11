@@ -12,7 +12,7 @@ const ProductSupplierHeader = () => {
 
   const isUserAdminWithProductManager = useUserHasPermissions({
     minRequiredRole: RoleType.ROLE_ADMIN,
-    roles: [RoleType.ROLE_PRODUCT_MANAGER],
+    supplementalRoles: [RoleType.ROLE_PRODUCT_MANAGER],
   });
 
   return (

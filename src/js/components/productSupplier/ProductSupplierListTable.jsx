@@ -34,7 +34,7 @@ const ProductSupplierListTable = ({ filterParams }) => {
 
   const isUserAdminWithProductManager = useUserHasPermissions({
     minRequiredRole: RoleType.ROLE_ADMIN,
-    roles: [RoleType.ROLE_PRODUCT_MANAGER],
+    supplementalRoles: [RoleType.ROLE_PRODUCT_MANAGER],
   });
 
   const columns = useMemo(() => [
