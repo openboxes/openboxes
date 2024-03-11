@@ -107,12 +107,14 @@ const useProductSupplierForm = () => {
       },
       attributes,
       defaultPreferenceType: {
-        ...defaultPreferenceType,
         preferenceType: !_.isEmpty(defaultPreferenceType) ? {
           id: defaultPreferenceType?.preferenceType?.id,
           label: defaultPreferenceType?.preferenceType?.name,
           value: defaultPreferenceType?.preferenceType?.id,
         } : undefined,
+        validityStartDate: defaultPreferenceType?.validityStartDate ?? undefined,
+        validityEndDate: defaultPreferenceType?.validityEndDate ?? undefined,
+        bidName: defaultPreferenceType?.bidName ?? undefined,
       },
     };
   };

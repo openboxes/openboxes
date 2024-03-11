@@ -118,19 +118,18 @@ const useProductSupplierValidation = () => {
         value: z.string(),
         label: z.string(),
       })
-        .optional()
-        .nullable(),
+        .nullish(),
       validityStartDate: z
         .coerce
         .date()
-        .optional(),
+        .nullish(),
       validityEndDate: z
         .coerce
         .date()
-        .optional(),
+        .nullish(),
       bidName: z
         .string()
-        .optional(),
+        .nullish()
     })
       .refine(checkPreferenceTypeIsRequired, {
         message: 'Default preference type must also be selected', path: ['preferenceType'],

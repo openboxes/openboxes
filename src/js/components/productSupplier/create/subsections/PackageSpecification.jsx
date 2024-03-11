@@ -22,7 +22,7 @@ const PackageSpecification = ({ control, errors, setProductPackageQuantity }) =>
       collapsable={false}
     >
       <div className="row">
-        <div className="col-lg col-md-6 p-2">
+        <div className="col-lg col-md-6 px-2 pt-2">
           <Controller
             name="packageSpecification.uom"
             control={control}
@@ -50,7 +50,7 @@ const PackageSpecification = ({ control, errors, setProductPackageQuantity }) =>
             )}
           />
         </div>
-        <div className="col-lg col-md-6 p-2">
+        <div className="col-lg col-md-6 px-2 pt-2">
           <Controller
             name="packageSpecification.productPackageQuantity"
             control={control}
@@ -74,7 +74,7 @@ const PackageSpecification = ({ control, errors, setProductPackageQuantity }) =>
             )}
           />
         </div>
-        <div className="col-lg col-md-6 p-2">
+        <div className="col-lg col-md-6 px-2 pt-2">
           <Controller
             name="packageSpecification.minOrderQuantity"
             control={control}
@@ -96,7 +96,7 @@ const PackageSpecification = ({ control, errors, setProductPackageQuantity }) =>
             )}
           />
         </div>
-        <div className="col-lg col-md-6 p-2">
+        <div className="col-lg col-md-6 px-2 pt-2">
           <Controller
             name="packageSpecification.productPackagePrice"
             control={control}
@@ -118,7 +118,7 @@ const PackageSpecification = ({ control, errors, setProductPackageQuantity }) =>
             )}
           />
         </div>
-        <div className="col-lg col-md-6 p-2">
+        <div className="col-lg col-md-6 px-2 pt-2">
           <Controller
             name="packageSpecification.eachPrice"
             control={control}
