@@ -20,7 +20,7 @@ const useProductSupplierListTableData = (filterParams) => {
     const {
       product,
       supplier,
-      preferenceType,
+      defaultPreferenceTypes,
     } = filterParams;
     return _.omitBy({
       offset: `${offset}`,
@@ -29,7 +29,7 @@ const useProductSupplierListTableData = (filterParams) => {
       ...filterParams,
       product: product?.id,
       supplier: supplier?.id,
-      preferenceType: preferenceType?.id,
+      defaultPreferenceTypes: defaultPreferenceTypes?.map?.(({ id }) => id),
     }, (val) => {
       if (typeof val === 'boolean') {
         return !val;

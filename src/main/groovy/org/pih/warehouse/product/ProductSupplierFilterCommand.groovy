@@ -9,7 +9,7 @@ class ProductSupplierFilterCommand extends PaginationCommand implements Validate
 
     String supplier
 
-    String preferenceType
+    List<String> defaultPreferenceTypes
 
     Date createdFrom
 
@@ -27,7 +27,7 @@ class ProductSupplierFilterCommand extends PaginationCommand implements Validate
     static constraints = {
         product nullable: true
         supplier nullable: true
-        preferenceType nullable: true
+        defaultPreferenceTypes nullable: true
         createdFrom nullable: true
         createdTo nullable: true
         includeInactive nullable: true

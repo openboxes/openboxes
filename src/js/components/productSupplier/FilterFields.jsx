@@ -47,14 +47,16 @@ export default {
       loadOptions: debouncedOrganizationsFetch,
     }),
   },
-  preferenceType: {
+  defaultPreferenceTypes: {
     type: FilterSelectField,
     attributes: {
+      multi: true,
       valueKey: 'id',
       filterElement: true,
-      placeholder: 'react.productSupplier.filters.preferenceType.placeholder.label',
-      defaultPlaceholder: 'Preference Type',
+      placeholder: 'react.productSupplier.filters.defaultPreferenceType.placeholder.label',
+      defaultPlaceholder: 'Default Preference Type',
       showLabelTooltip: true,
+      closeMenuOnSelect: false,
     },
     getDynamicAttr: ({ preferenceTypes }) => ({
       options: preferenceTypes,
