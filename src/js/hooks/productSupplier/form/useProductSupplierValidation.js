@@ -130,6 +130,7 @@ const useProductSupplierValidation = () => {
         .optional(),
       bidName: z
         .string()
+        .nullable()
         .optional(),
     })
       .refine(checkPreferenceTypeIsRequired, {

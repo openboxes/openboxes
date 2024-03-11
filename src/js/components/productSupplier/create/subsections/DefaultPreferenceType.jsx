@@ -33,17 +33,18 @@ const DefaultPreferenceType = ({
 
   const emptyPreferenceType = {
     bidName: '',
-    validityStartDate: '',
-    validityEndDate: '',
+    validityStartDate: undefined,
+    validityEndDate: undefined,
     preferenceType: null,
-  };
-
-  const afterDelete = () => {
-    setValue('defaultPreferenceType', emptyPreferenceType);
   };
 
   const triggerValidationOnPreferenceType = () => {
     triggerValidation('defaultPreferenceType.preferenceType');
+  };
+
+  const afterDelete = () => {
+    setValue('defaultPreferenceType', emptyPreferenceType);
+    triggerValidationOnPreferenceType();
   };
 
   const {
