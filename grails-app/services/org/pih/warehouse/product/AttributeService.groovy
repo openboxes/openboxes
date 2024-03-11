@@ -9,7 +9,7 @@ class AttributeService {
         Map<String, String> argumentsList = [:]
 
         if (entityTypeCode) {
-            query += " join a.entityTypeCodes etc where etc = :entityTypeCode and active = :active"
+            query += " join a.entityTypeCodes etc where etc = :entityTypeCode and a.active = :active"
             argumentsList += [entityTypeCode: entityTypeCode, active: active]
         }
 
