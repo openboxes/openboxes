@@ -18,7 +18,7 @@ const FixedPrice = ({ control, errors }) => (
     collapsable={false}
   >
     <div className="row">
-      <div className="col-lg-4 p-2">
+      <div className="col-lg-4 px-2 pt-2">
         <Controller
           name="fixedPrice.contractPricePrice"
           control={control}
@@ -40,7 +40,7 @@ const FixedPrice = ({ control, errors }) => (
           )}
         />
       </div>
-      <div className="col-lg-4 p-2">
+      <div className="col-lg-4 px-2 pt-2">
         <Controller
           name="fixedPrice.contractPriceValidUntil"
           control={control}
@@ -56,7 +56,7 @@ const FixedPrice = ({ control, errors }) => (
           )}
         />
       </div>
-      <div className="col-lg-4 p-2">
+      <div className="col-lg-4 px-2 pt-2">
         <Controller
           name="fixedPrice.tieredPricing"
           control={control}

@@ -33,17 +33,18 @@ const DefaultPreferenceType = ({
 
   const emptyPreferenceType = {
     bidName: '',
-    validityStartDate: '',
-    validityEndDate: '',
+    validityStartDate: undefined,
+    validityEndDate: undefined,
     preferenceType: null,
-  };
-
-  const afterDelete = () => {
-    setValue('defaultPreferenceType', emptyPreferenceType);
   };
 
   const triggerValidationOnPreferenceType = () => {
     triggerValidation('defaultPreferenceType.preferenceType');
+  };
+
+  const afterDelete = () => {
+    setValue('defaultPreferenceType', emptyPreferenceType);
+    triggerValidationOnPreferenceType();
   };
 
   const {
@@ -64,7 +65,7 @@ const DefaultPreferenceType = ({
       }}
     >
       <div className="row">
-        <div className="col-lg col-md-6 p-2">
+        <div className="col-lg col-md-6 px-2 pt-2">
           <Controller
             name="defaultPreferenceType.preferenceType"
             control={control}
@@ -87,7 +88,7 @@ const DefaultPreferenceType = ({
             )}
           />
         </div>
-        <div className="col-lg col-md-6 p-2">
+        <div className="col-lg col-md-6 px-2 pt-2">
           <Controller
             name="defaultPreferenceType.validityStartDate"
             control={control}
@@ -111,7 +112,7 @@ const DefaultPreferenceType = ({
             )}
           />
         </div>
-        <div className="col-lg col-md-6 p-2">
+        <div className="col-lg col-md-6 px-2 pt-2">
           <Controller
             name="defaultPreferenceType.validityEndDate"
             control={control}
@@ -161,6 +162,7 @@ const DefaultPreferenceType = ({
         </div>
         <div className="p-2 d-flex align-items-center">
           <Tooltip
+            className="d-flex align-items-center"
             html={(
               <span className="p-1">
                 <Translate
@@ -172,7 +174,7 @@ const DefaultPreferenceType = ({
           >
             <RiDeleteBinLine
               onClick={() => !isPreferenceTypeEmpty && openConfirmationModal()}
-              className={`preference-type-bin mt-3 ${isPreferenceTypeEmpty ? 'disabled' : 'active'}`}
+              className={`preference-type-bin ${isPreferenceTypeEmpty ? 'disabled' : 'active'}`}
             />
           </Tooltip>
         </div>

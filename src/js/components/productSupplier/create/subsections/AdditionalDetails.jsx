@@ -33,7 +33,7 @@ const AdditionalDetails = ({ control, errors }) => {
       title={{ label: 'react.productSupplier.form.subsection.additionalDetails', defaultMessage: 'Additional Details' }}
     >
       <div className="row">
-        <div className="col-lg-4 col-md-6 p-2">
+        <div className="col-lg-4 col-md-6 px-2 pt-2">
           <Controller
             name="additionalDetails.manufacturer"
             control={control}
@@ -50,7 +50,7 @@ const AdditionalDetails = ({ control, errors }) => {
             )}
           />
         </div>
-        <div className="col-lg-4 col-md-6 p-2">
+        <div className="col-lg-4 col-md-6 px-2 pt-2">
           <Controller
             name="additionalDetails.ratingTypeCode"
             control={control}
@@ -70,7 +70,7 @@ const AdditionalDetails = ({ control, errors }) => {
             )}
           />
         </div>
-        <div className="col-lg-4 col-md-6 p-2">
+        <div className="col-lg-4 col-md-6 px-2 pt-2">
           <Controller
             name="additionalDetails.manufacturerCode"
             control={control}
@@ -83,7 +83,7 @@ const AdditionalDetails = ({ control, errors }) => {
             )}
           />
         </div>
-        <div className="col-lg-4 col-md-6 p-2">
+        <div className="col-lg-4 col-md-6 px-2 pt-2">
           <Controller
             name="additionalDetails.brandName"
             control={control}
