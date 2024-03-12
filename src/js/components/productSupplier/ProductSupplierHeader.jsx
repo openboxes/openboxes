@@ -9,8 +9,7 @@ import HeaderButtonsWrapper from 'wrappers/HeaderButtonsWrapper';
 import HeaderWrapper from 'wrappers/HeaderWrapper';
 
 const ProductSupplierHeader = () => {
-
-  const isUserAdminWithProductManager = useUserHasPermissions({
+  const canManageProducts = useUserHasPermissions({
     minRequiredRole: RoleType.ROLE_ADMIN,
     supplementalRoles: [RoleType.ROLE_PRODUCT_MANAGER],
   });
@@ -23,7 +22,7 @@ const ProductSupplierHeader = () => {
       }}
       />
       <HeaderButtonsWrapper>
-        {isUserAdminWithProductManager && (
+        {canManageProducts && (
           <Button
             label="react.productSupplier.createProductSource.label"
             defaultLabel="Create Product Source"

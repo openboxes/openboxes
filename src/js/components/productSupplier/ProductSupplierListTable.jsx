@@ -11,12 +11,12 @@ import { INVENTORY_ITEM_URL, PRODUCT_SUPPLIER_URL } from 'consts/applicationUrls
 import RoleType from 'consts/roleType';
 import useProductSupplierActions from 'hooks/list-pages/productSupplier/useProductSupplierActions';
 import useProductSupplierListTableData from 'hooks/list-pages/productSupplier/useProductSupplierListTableData';
+import useUserHasPermissions from 'hooks/useUserHasPermissions';
 import ActionDots from 'utils/ActionDots';
 import StatusIndicator from 'utils/StatusIndicator';
 import Translate from 'utils/Translate';
 import ListTableTitleWrapper from 'wrappers/ListTableTitleWrapper';
 import ListTableWrapper from 'wrappers/ListTableWrapper';
-import useUserHasPermissions from 'hooks/useUserHasPermissions';
 
 const ProductSupplierListTable = ({ filterParams }) => {
   const {
@@ -32,7 +32,7 @@ const ProductSupplierListTable = ({ filterParams }) => {
     exportProductSuppliers,
   } = useProductSupplierActions({ fireFetchData });
 
-  const isUserAdminWithProductManager = useUserHasPermissions({
+  const canManageProducts = useUserHasPermissions({
     minRequiredRole: RoleType.ROLE_ADMIN,
     supplementalRoles: [RoleType.ROLE_PRODUCT_MANAGER],
   });
@@ -88,9 +88,9 @@ const ProductSupplierListTable = ({ filterParams }) => {
           <TableCell
             {...row}
             link={
-            isUserAdminWithProductManager
-              ? PRODUCT_SUPPLIER_URL.edit(row.original.id)
-              : undefined
+              canManageProducts
+                ? PRODUCT_SUPPLIER_URL.edit(row.original.id)
+                : undefined
             }
           />
         ),
