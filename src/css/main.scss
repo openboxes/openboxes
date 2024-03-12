@@ -220,6 +220,10 @@ body {
   gap: 8px;
 }
 
+.gap-12 {
+  gap: 12px;
+}
+
 .create-form {
   border: 1px solid $gray-alpha;
   padding-top: 50px;
@@ -1024,6 +1028,25 @@ div.search-input:focus-within {
   }
 }
 
+.danger-button {
+  @extend %button-base;
+
+  background-color: var(--color-red);
+  color: white;
+}
+
+.danger-outline-button {
+  @extend %button-base;
+
+  background-color: white;
+  color: var(--color-red);
+  border: solid 1px var(--color-red);
+
+  &:hover {
+    background: var(--red-100);
+  }
+}
+
 .secondary-button {
   @extend %button-base;
 
@@ -1059,6 +1082,14 @@ div.search-input:focus-within {
     background-color: var(--blue-300) !important;
     color: var(--blue-400) !important;
   }
+}
+
+.active-button {
+  @extend %button-base;
+
+  color: #fff;
+  background-color: #6c757d;
+  border-color: #6c757d;
 }
 
 // Status circles styling
@@ -1097,12 +1128,19 @@ div.search-input:focus-within {
   border-radius: 18px;
   color: var(--blue-primary);
   border: none;
-  &:focus {
-    outline: none;
-  }
+
   &:hover {
     background-color: var(--blue-primary);
     color: #FFFFFF;
+  }
+
+  &:disabled {
+    cursor: auto !important;
+    pointer-events: none;
+  }
+
+  &:focus {
+    outline: none;
   }
 
   .dropdown-menu {
@@ -1555,7 +1593,8 @@ div.search-input:focus-within {
 .modal-content {
   position: absolute;
   top: 20%;
-  left: 23%;
+  left: 50%;
+  transform: translate(-50%);
   background-color: #ffffff;
   width: 55vw;
   padding: 20px;

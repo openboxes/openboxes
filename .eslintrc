@@ -22,7 +22,10 @@
   ],
   "rules": {
     "arrow-parens": "warn",
-    "implicit-arrow-linebreak": "warn",
+    "implicit-arrow-linebreak": "off",
+    "react/destructuring-assignment": "warn",
+    "react/jsx-props-no-spreading": "warn",
+    "react/sort-comp": "off",
     "import/named": 2,
     "jsx-a11y/anchor-is-valid": [ "error", {
       "components": [ "Link" ],
@@ -34,7 +37,8 @@
       "required": "id",
       "allowChildren": false
     }],
-    "operator-linebreak": "warn",
+    "operator-linebreak": "off",
+    "no-underscore-dangle": "off",
     "simple-import-sort/imports": [
       "error",
       {

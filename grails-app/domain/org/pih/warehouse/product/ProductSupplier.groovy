@@ -14,6 +14,8 @@ import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.ProductPrice
 import org.pih.warehouse.core.RatingTypeCode
 
+import java.math.RoundingMode
+
 class ProductSupplier implements Serializable, Comparable<ProductSupplier> {
 
     String id
@@ -61,6 +63,8 @@ class ProductSupplier implements Serializable, Comparable<ProductSupplier> {
     // Additional comments
     String comments
 
+    Boolean tieredPricing = false
+
     // Auditing fields
     Date dateCreated
     Date lastUpdated
@@ -68,7 +72,10 @@ class ProductSupplier implements Serializable, Comparable<ProductSupplier> {
     @BindUsing({ productSupplier, source -> source["active"] != null ? source["active"] : true })
     Boolean active = Boolean.TRUE
 
-    static transients = ["defaultProductPackage", "globalProductSupplierPreference", "attributes"]
+    ProductPackage defaultProductPackage
+
+
+    static transients = ["defaultProductPackageDerived", "globalProductSupplierPreference", "attributes"]
 
     static hasMany = [productPackages: ProductPackage, productSupplierPreferences: ProductSupplierPreference]
 
@@ -77,7 +84,7 @@ class ProductSupplier implements Serializable, Comparable<ProductSupplier> {
     }
 
     static constraints = {
-
+        defaultProductPackage(nullable: true)
         code(nullable: true)
         name(nullable: false)
         description(nullable: true)
@@ -105,7 +112,7 @@ class ProductSupplier implements Serializable, Comparable<ProductSupplier> {
         active(nullable: true)
     }
 
-    ProductPackage getDefaultProductPackage() {
+    ProductPackage getDefaultProductPackageDerived() {
         return productPackages ? productPackages.sort { it.lastUpdated }.last() : null
     }
 
@@ -123,6 +130,46 @@ class ProductSupplier implements Serializable, Comparable<ProductSupplier> {
         return ratingTypeCode <=> obj.ratingTypeCode ?:
                 dateCreated <=> obj.dateCreated ?:
                         id <=> obj.id
+    }
+
+    String getPackageSize() {
+        // First we check for a default package assigned to 1:1 association
+        if (defaultProductPackage) {
+            return "${defaultProductPackage?.uom?.code}/${defaultProductPackage?.quantity}"
+        }
+        // If a default package of 1:1 association is not found, check for a default package "in an old way" (last updated)
+        if (defaultProductPackageDerived) {
+            return "${defaultProductPackageDerived?.uom?.code}/${defaultProductPackageDerived?.quantity}"
+        }
+        return null
+    }
+
+    BigDecimal getPackagePrice() {
+        // First we check for a default package assigned to 1:1 association
+        if (defaultProductPackage) {
+            return defaultProductPackage?.productPrice?.price?.setScale(2, RoundingMode.HALF_UP) ?: 0.0
+        }
+        // If a default package of 1:1 association is not found, check for a default package "in an old way" (last updated)
+        if (defaultProductPackageDerived) {
+            return defaultProductPackageDerived?.productPrice?.price?.setScale(2, RoundingMode.HALF_UP) ?: 0.0
+        }
+        return 0.0
+    }
+
+    BigDecimal getUnitPrice() {
+        // First we check for a default package assigned to 1:1 association
+        if (defaultProductPackage) {
+            return defaultProductPackage?.productPrice
+                    ? (defaultProductPackage?.productPrice?.price / defaultProductPackage?.quantity)?.setScale(2, RoundingMode.HALF_UP)
+                    : 0.0
+        }
+        // If a default package of 1:1 association is not found, check for a default package "in an old way" (last updated)
+        if (defaultProductPackageDerived) {
+            return defaultProductPackageDerived?.productPrice
+                    ? (defaultProductPackageDerived?.productPrice?.price / defaultProductPackageDerived?.quantity)?.setScale(2, RoundingMode.HALF_UP)
+                    : 0.0
+        }
+        return 0.0
     }
 
     static PROPERTIES = [
@@ -151,4 +198,50 @@ class ProductSupplier implements Serializable, Comparable<ProductSupplier> {
             "Date created"                        : ["property": "dateCreated", "dateFormat": "MM/dd/yyyy"],
             "Last updated"                        : ["property": "lastUpdated", "dateFormat": "MM/dd/yyyy"]
     ]
+
+    Map toJson() {
+        [
+            id: id,
+            name: name,
+            product: [
+                id: product.id,
+                name: product.name,
+                productCode: product.productCode
+            ],
+            code: code,
+            supplier: supplier ? [
+                id: supplier?.id,
+                name: supplier?.name,
+                code: supplier?.code,
+                displayName: supplier?.name
+                        ? supplier.name + (supplier?.code ? " (${supplier.code})" : "")
+                        : ""
+            ] : null,
+            supplierCode: supplierCode,
+            defaultProductPackage: defaultProductPackage ?: defaultProductPackageDerived,
+            contractPrice: contractPrice ? [
+                id: contractPrice?.id,
+                price: contractPrice?.price,
+                validUntil: contractPrice?.toDate,
+            ] : null,
+            minOrderQuantity: minOrderQuantity,
+            productSupplierPreferences: productSupplierPreferences.collect { it.toJson() },
+            packageSize: packageSize,
+            packagePrice: packagePrice,
+            unitPrice: unitPrice,
+            dateCreated: dateCreated,
+            lastUpdated: lastUpdated,
+            active: active,
+            ratingTypeCode: ratingTypeCode?.name,
+            manufacturer: manufacturer ? [
+                id: manufacturer?.id,
+                name: manufacturer?.name,
+            ] : null,
+            description: description,
+            manufacturerCode: manufacturerCode,
+            brandName: brandName,
+            attributes: attributes,
+            tieredPricing: tieredPricing,
+        ]
+    }
 }

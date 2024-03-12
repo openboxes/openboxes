@@ -11,6 +11,7 @@ exports[`action dots should match snapshot 1`] = `
     className="action-dots dropdown-toggle d-flex align-items-center justify-content-center"
     data-testid="dropdown-toggle"
     data-toggle="dropdown"
+    disabled={false}
   >
     <svg
       fill="currentColor"

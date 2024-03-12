@@ -9,28 +9,183 @@
  **/
 package org.pih.warehouse.data
 
-import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
+import grails.validation.ValidationException
 import groovy.sql.Sql
+import org.grails.datastore.mapping.query.api.Criteria
+import org.hibernate.ObjectNotFoundException
+import org.hibernate.criterion.Criterion
+import org.hibernate.criterion.DetachedCriteria
+import org.hibernate.criterion.Order
+import org.hibernate.criterion.Projections
+import org.hibernate.criterion.Restrictions
+import org.hibernate.criterion.Subqueries
+import org.hibernate.sql.JoinType
 import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.PreferenceType
 import org.pih.warehouse.core.ProductPrice
 import org.pih.warehouse.core.RatingTypeCode
 import org.pih.warehouse.core.UnitOfMeasure
-import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductPackage
 import org.pih.warehouse.product.ProductSupplier
+import org.pih.warehouse.product.ProductSupplierDataService
+
+import org.pih.warehouse.product.ProductSupplierFilterCommand
+import org.pih.warehouse.product.ProductSupplierDetailsCommand
 import org.pih.warehouse.product.ProductSupplierPreference
-import util.ConfigHelper
 
 import java.text.SimpleDateFormat
 
 @Transactional
 class ProductSupplierService {
 
+    public static final PREFERENCE_TYPE_NONE = "NONE"
+
+    public static final PREFERENCE_TYPE_MULTIPLE = "MULTIPLE"
+
     def identifierService
     def dataSource
+    ProductSupplierDataService productSupplierGormService
+
+
+    List<ProductSupplier> getProductSuppliers(ProductSupplierFilterCommand command) {
+        if (command.hasErrors()) {
+            throw new ValidationException("Invalid params", command.errors)
+        }
+        // Store added aliases to avoid duplicate alias exceptions for product and supplier
+        // This could happen when params.searchTerm and e.g. sort by productCode/productName is applied
+        Set<String> usedAliases = new HashSet<>()
+
+        return ProductSupplier.createCriteria().list(command.paginationParams) {
+            if (command.searchTerm) {
+                createAlias("product", "p", JoinType.LEFT_OUTER_JOIN)
+                createAlias("supplier", "s", JoinType.LEFT_OUTER_JOIN)
+                createAlias("manufacturer", "m", JoinType.LEFT_OUTER_JOIN)
+                usedAliases.addAll(["product", "supplier", "manufacturer"])
+                or {
+                    ilike("p.productCode", "%" + command.searchTerm + "%")
+                    ilike("code", "%" + command.searchTerm + "%")
+                    ilike("s.code", "%" + command.searchTerm + "%")
+                    ilike("name", "%" + command.searchTerm + "%")
+                    ilike("supplierCode", "%" + command.searchTerm + "%")
+                    ilike("supplierName", "%" + command.searchTerm + "%")
+                    ilike("manufacturerCode", "%" + command.searchTerm + "%")
+                    ilike("manufacturerName", "%" + command.searchTerm + "%")
+                    ilike("m.name", "%" + command.searchTerm + "%")
+                    ilike("productCode", "%" + command.searchTerm + "%")
+                }
+            }
+            if (command.product) {
+                eq("product.id", command.product)
+            }
+            if (!command.includeInactive) {
+                eq("active", true)
+            }
+            if (command.supplier) {
+                eq("supplier.id", command.supplier)
+            }
+            if (command.defaultPreferenceTypes) {
+                add(getPreferenceTypeCriteria(command.defaultPreferenceTypes))
+            }
+            if (command.createdFrom) {
+                ge("dateCreated", command.createdFrom)
+            }
+            if (command.createdTo) {
+                lte("dateCreated", command.createdTo)
+            }
+            if (command.sort) {
+                String orderDirection = command.order ?: "asc"
+                getSortOrder(command.sort, orderDirection, delegate, usedAliases)
+            }
+        }
+    }
+
+    private static void getSortOrder(String sort, String orderDirection, Criteria criteria, Set<String> usedAliases) {
+        switch (sort) {
+            case "product.productCode":
+                if (!usedAliases.contains("product")) {
+                    criteria.createAlias("product", "p", JoinType.LEFT_OUTER_JOIN)
+                    usedAliases.add("product")
+                }
+                criteria.addOrder(getOrderDirection("p.productCode", orderDirection))
+                break
+            case "product.name":
+                if (!usedAliases.contains("product")) {
+                    criteria.createAlias("product", "p", JoinType.LEFT_OUTER_JOIN)
+                    usedAliases.add("product")
+                }
+                criteria.addOrder(getOrderDirection("p.name", orderDirection))
+                break
+            case "code":
+                criteria.addOrder(getOrderDirection("code", orderDirection))
+                break
+            case "supplier.displayName":
+                if (!usedAliases.contains("supplier")) {
+                    criteria.createAlias("supplier", "s", JoinType.LEFT_OUTER_JOIN)
+                    usedAliases.add("supplier")
+                }
+                criteria.addOrder(getOrderDirection("s.name", orderDirection))
+                break
+            case "dateCreated":
+                criteria.addOrder(getOrderDirection("dateCreated", orderDirection))
+                break
+            case "active":
+                criteria.addOrder(getOrderDirection("active", orderDirection))
+                break
+            case "name":
+                criteria.addOrder(getOrderDirection("name", orderDirection))
+                break
+            default:
+                break
+
+        }
+    }
+
+    private static Order getOrderDirection(String sort, String order) {
+        if (order == "desc") {
+            return Order.desc(sort)
+        }
+        return Order.asc(sort)
+    }
+
+    private static Criterion getPreferenceTypeCriteria(List<String> preferenceTypes) {
+        if (preferenceTypes.contains(PREFERENCE_TYPE_NONE)) {
+            return Restrictions.or(
+                    getDefaultPreferenceTypeCriteria(preferenceTypes),
+                    getEmptyDefaultPreferenceTypeCriteria(),
+            )
+        }
+
+        return getDefaultPreferenceTypeCriteria(preferenceTypes)
+    }
+
+    private static Criterion getDefaultPreferenceTypeCriteria(List<String> preferenceTypes) {
+        // If we are searching by a list of preference types, we want to search for a product supplier
+        // that has default preference type within the provided list (first statement). We are considering
+        // preference type as a default when the destination party is null (second statement)
+        return Restrictions
+                .and(Subqueries.exists(DetachedCriteria.forClass(ProductSupplierPreference, 'pp')
+                                .createAlias("pp.preferenceType", 'pt', JoinType.LEFT_OUTER_JOIN)
+                                .setProjection(Projections.property("pp.id"))
+                                .add(Restrictions.and(
+                                        Restrictions.in("pt.id", preferenceTypes),
+                                        Restrictions.isNull("pp.destinationParty"),
+                                        // Join the product supplier preferences table by productSupplier.id = productPreference.supplierId
+                                        Restrictions.eqProperty("pp.productSupplier.id", "this.id")))))
+    }
+
+    private static Criterion getEmptyDefaultPreferenceTypeCriteria() {
+        //  If we are searching for product suppliers without a default preference type, we are
+        //  checking whether exists preference type without a destination party for the exact supplier
+        return Restrictions
+                .and(Subqueries.notExists(DetachedCriteria.forClass(ProductSupplierPreference, 'pp')
+                        .createAlias("pp.preferenceType", 'pt', JoinType.LEFT_OUTER_JOIN)
+                        .setProjection(Projections.property("pp.id"))
+                        .add(Restrictions.and(
+                                Restrictions.isNull("pp.destinationParty"),
+                                Restrictions.eqProperty("pp.productSupplier.id", "this.id")))))
+    }
 
     ProductSupplier createOrUpdate(Map params) {
         log.info("params: ${params}")
@@ -216,6 +371,32 @@ class ProductSupplierService {
 
         if (productSupplier.validate()) {
             productSupplier.save(failOnError: true)
+        }
+        return productSupplier
+    }
+
+    void delete(String productSupplierId) {
+        productSupplierGormService.delete(productSupplierId)
+    }
+
+    ProductSupplier saveProductSupplier(ProductSupplierDetailsCommand command) {
+        ProductSupplier productSupplier = new ProductSupplier(command.properties)
+        if (!productSupplier.code) {
+            productSupplier.code =
+                identifierService.generateProductSupplierIdentifier(command?.product?.productCode, command?.supplier?.code)
+        }
+        return productSupplierGormService.save(productSupplier)
+    }
+
+    ProductSupplier updateProductSupplier(ProductSupplierDetailsCommand command, String productSupplierId) {
+        ProductSupplier productSupplier = productSupplierGormService.get(productSupplierId)
+        if (!productSupplier) {
+            throw new ObjectNotFoundException(productSupplierId, ProductSupplier.class.toString())
+        }
+        productSupplier.properties = command.properties
+        if (!productSupplier.code) {
+            productSupplier.code =
+                identifierService.generateProductSupplierIdentifier(command?.product?.productCode, command?.supplier?.code)
         }
         return productSupplier
     }

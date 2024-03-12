@@ -1,6 +1,7 @@
 /**
  * Definitions of APPLICATION URLs used for redirecting to pages
  * */
+import { stringifyUrl } from 'query-string';
 
 export const CONTEXT_PATH = window.CONTEXT_PATH ?? '/openboxes';
 
@@ -97,7 +98,10 @@ const PURCHASE_ORDER_URL = {
 
 const INVENTORY_ITEM_URL = {
   base: `${CONTEXT_PATH}/inventoryItem`,
-  showStockCard: (id) => `${INVENTORY_ITEM_URL.base}/showStockCard/${id}`,
+  showStockCard: (id, params = {}) => stringifyUrl({
+    url: `${INVENTORY_ITEM_URL.base}/showStockCard/${id}`,
+    query: { ...params },
+  }),
 };
 
 const REQUISITION_TEMPLATE_URL = {
@@ -127,6 +131,14 @@ const CATEGORY_URL = {
   tree: () => `${CATEGORY_URL.base}/tree`,
 };
 
+const PRODUCT_SUPPLIER_URL = {
+  base: `${CONTEXT_PATH}/productSupplier`,
+  list: () => `${PRODUCT_SUPPLIER_URL.base}/list`,
+  create: () => `${PRODUCT_SUPPLIER_URL.base}/create`,
+  edit: (id) => `${PRODUCT_SUPPLIER_URL.base}/create/${id}`,
+  export: () => `${PRODUCT_SUPPLIER_URL.base}/export?format=xls`,
+};
+
 export {
   CATEGORY_URL,
   DASHBOARD_URL,
@@ -136,6 +148,7 @@ export {
   LOCATION_URL,
   ORDER_URL,
   PRODUCT_CONFIGURATION_URL,
+  PRODUCT_SUPPLIER_URL,
   PRODUCT_URL,
   PURCHASE_ORDER_URL,
   PUTAWAY_URL,

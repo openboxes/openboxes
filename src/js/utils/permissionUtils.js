@@ -41,4 +41,6 @@ const canEditRequest = (currentUser, request, location) => {
   return isLocationDestination && isUserRequestor;
 };
 
+export const hasRole = (user, role) => user?.roles?.includes(role);
+
 export default canEditRequest;

@@ -56,4 +56,15 @@ class ProductSupplierPreference {
             "Preference Type Validity End Date"    : ["property": "validityEndDate", "dateFormat": "MM/dd/yyyy"],
             "Preference Type Comment"              : "comments",
     ]
+
+    Map toJson() {
+        [
+            id: id,
+            destinationParty: destinationParty,
+            preferenceType: preferenceType,
+            validityStartDate: validityStartDate,
+            validityEndDate: validityEndDate,
+            bidName: comments,
+        ]
+    }
 }

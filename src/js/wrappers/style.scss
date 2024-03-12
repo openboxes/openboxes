@@ -1,0 +1,89 @@
+.input-wrapper-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  font-weight: 600;
+  font-size: 12px;
+  color: var(--gray-600);
+
+  .input-wrapper-tooltip > svg {
+    width: 16px;
+    height: 16px;
+    color: var(--blue-primary);
+  }
+
+  & > div {
+    display: flex;
+  }
+
+  .input-wrapper-label {
+    display: flex;
+  }
+
+  .input-wrapper-title {
+    display: flex;
+    flex-direction: row;
+    gap: 3px;
+    margin-bottom: 5px;
+    justify-content: space-between;
+  }
+
+  .input-wrapper-asterisk {
+    font-size: 12px;
+    color: var(--color-red);
+  }
+
+  .input-wrapper-button {
+    color: var(--blue-primary);
+    cursor: pointer;
+  }
+
+  .input-wrapper-error-message {
+    order: 2;
+    color: var(--color-red);
+    font-size: 12px;
+    line-height: 18px;
+    min-height: 18px;
+  }
+}
+
+.input-wrapper-label-position {
+  &-top .input-wrapper-title {
+    order: 0;
+  }
+
+  &-bottom .input-wrapper-title {
+    order: 1;
+  }
+
+  &-left {
+    align-items: center;
+    flex-direction: row;
+    flex-wrap: wrap;
+    padding-top: calc(1rem + 5px);
+
+    .input-wrapper-title {
+      margin: 0;
+    }
+
+    .input-wrapper-error-message {
+      width: 100%;
+    }
+  }
+
+  &-right {
+    align-items: center;
+    flex-direction: row;
+    flex-wrap: wrap;
+    padding-top: calc(1rem + 5px);
+
+    .input-wrapper-title {
+      order: 1;
+      margin: 0;
+    }
+
+    .input-wrapper-error-message {
+      width: 100%;
+    }
+  }
+}

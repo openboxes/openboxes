@@ -3,7 +3,7 @@
  * */
 
 const API = '/api';
-const GENERIC_API = `${API}/generic`;
+export const GENERIC_API = `${API}/generic`;
 const { CONTEXT_PATH } = window;
 
 // PURCHASE ORDER
@@ -69,6 +69,15 @@ export const PAYMENT_TERMS_OPTION = `${API}/paymentTermOptions`;
 // USERS
 export const USERS_OPTIONS = `${API}/users`;
 
+// PREFERENCE TYPES
+export const PREFERENCE_TYPE_OPTIONS = `${API}/preferenceTypeOptions`;
+
+// RATING TYPES
+export const RATING_TYPE_OPTIONS = `${API}/ratingTypeCodeOptions`;
+
+// ATTRIBUTES
+export const ATTRIBUTES = `${API}/attributes`;
+
 // LOCATIONS
 export const LOCATION_API = `${API}/locations`;
 export const LOCATION_TYPES = `${LOCATION_API}/locationTypes`;
@@ -101,3 +110,15 @@ export const GLOBAL_SEARCH = term => `${CONTEXT_PATH}/dashboard/globalSearch?sea
 
 // ORGANIZATIONS
 export const ORGANIZATION_API = `${API}/organizations`;
+
+// PRODUCT SUPPLIER
+export const PRODUCT_SUPPLIER_API = `${API}/productSuppliers`;
+export const PRODUCT_SUPPLIER_BY_ID = (id) => `${PRODUCT_SUPPLIER_API}/${id}`;
+export const PRODUCT_SUPPLIER_PREFERENCES_API = `${API}/productSupplierPreferences`;
+export const PRODUCT_SUPPLIER_PREFERENCES_BY_ID = (id) => `${PRODUCT_SUPPLIER_PREFERENCES_API}/${id}`;
+
+// UNIT OF MEASURE
+export const UNIT_OF_MEASURE_API = `${API}/unitOfMeasures`;
+export const UNIT_OF_MEASURE_OPTIONS = `${UNIT_OF_MEASURE_API}/options`;
+// Currencies don't use url in plural form, do not change it to UNIT_OF_MEASURE_API!
+export const CURRENCIES_OPTIONS = `${API}/unitOfMeasure/currencies`;

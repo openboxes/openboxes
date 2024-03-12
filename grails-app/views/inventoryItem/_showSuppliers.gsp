@@ -67,7 +67,7 @@
                 <g:hiddenField id="show-all" name="show-all" value="false" />
 
                 <g:each var="productSupplier" in="${productInstance?.productSuppliers.findAll{ it.active }.sort()}" status="status">
-                    <g:set var="defaultProductPackage" value="${productSupplier.defaultProductPackage}"/>
+                    <g:set var="defaultProductPackage" value="${productSupplier.defaultProductPackageDerived}"/>
                     <g:set var="defaultPreference" value="${productSupplier.productSupplierPreferences.find { it.destinationParty == currentLocation.organization }}"/>
                     <g:set var="globalPreference" value="${productSupplier.productSupplierPreferences.find { !it.destinationParty }}"/>
                     <tr class="prop ${status%2==0?'odd':'even'}

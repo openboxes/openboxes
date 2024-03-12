@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="kchelstowski" id="220220241300-0">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="product_supplier" columnName="default_product_package_id"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="product_supplier">
+            <column name="default_product_package_id" type="CHAR(38)">
+                <constraints nullable="true" />
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="kchelstowski" id="220220241300-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="fk_product_supplier_product_package"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint
+                baseColumnNames="default_product_package_id"
+                baseTableName="product_supplier"
+                constraintName="fk_product_supplier_product_package"
+                deferrable="false"
+                initiallyDeferred="false"
+                referencedColumnNames="id"
+                referencedTableName="product_package"
+        />
+    </changeSet>
+</databaseChangeLog>

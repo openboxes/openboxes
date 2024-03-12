@@ -31,7 +31,7 @@ class User extends Person {
     // indicates whether user would like for the system to remember where they last logged into
     byte[] photo                // profile photo
 
-    List locationRoles
+    List<LocationRole> locationRoles
 
     String dashboardConfig
 
@@ -73,7 +73,7 @@ class User extends Person {
     }
 
 
-    def getRolesByCurrentLocation(Location currentLocation) {
+    List<Role> getRolesByCurrentLocation(Location currentLocation) {
         if (!currentLocation) return []
         return locationRoles?.findAll { it.location == currentLocation }?.collect { it.role } ?: []
     }
@@ -89,6 +89,10 @@ class User extends Person {
         def defaultRoles = roles?.collect { it } ?: []
         defaultRoles.addAll(locationRoles?.collect { it.role } ?: [])
         return defaultRoles
+    }
+
+    List<String> getAllRoleNames() {
+        return roles?.roleType*.name()
     }
 
     boolean hasPrimaryRole(Location currentLocation) {
@@ -148,6 +152,7 @@ class User extends Person {
                 "lastName" : (anonymize) ? lastInitial : lastName,
                 "email"    : anonymize ? StringUtil.mask(email) : email,
                 "username" : anonymize ? StringUtil.mask(username) : username,
+                "roles"    : getAllRoleNames(),
         ]
     }
 

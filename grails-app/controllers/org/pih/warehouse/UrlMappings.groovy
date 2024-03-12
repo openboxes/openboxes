@@ -5,6 +5,8 @@ import org.apache.http.auth.AuthenticationException
 import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.requisition.RequisitionSourceType
 
+import java.sql.SQLIntegrityConstraintViolationException
+
 /**
  * Copyright (c) 2012 Partners In Health.  All rights reserved.
  * The use and distribution terms for this software are covered by the
@@ -87,6 +89,16 @@ class UrlMappings {
         "/api/users" {
             controller = { "selectOptionsApi" }
             action = [GET: "usersOptions"]
+        }
+
+        "/api/preferenceTypeOptions" {
+            controller = { "selectOptionsApi" }
+            action = [GET: "preferenceTypeOptions"]
+        }
+
+        "/api/ratingTypeCodeOptions" {
+            controller = { "selectOptionsApi" }
+            action = [GET: "ratingTypeCodeOptions"]
         }
 
         "/api/products"(parseRequest: true) {
@@ -439,6 +451,11 @@ class UrlMappings {
             action = [GET:"currencies"]
         }
 
+        "/api/unitOfMeasures/options" {
+            controller = "unitOfMeasureApi"
+            action = [GET: "uomOptions"]
+        }
+
         // Invoice API
         "/api/invoices/$id/items"(parseRequest: true) {
             controller = "invoiceApi"
@@ -787,6 +804,16 @@ class UrlMappings {
             action = [GET: "downloadCategories"]
         }
 
+        "/api/productSupplierPreferences/batch" {
+            controller = { "productSupplierPreferenceApi" }
+            action = [POST: "createOrUpdateBatch"]
+        }
+
+        "/api/productSupplierAttributes/batch" {
+            controller = { "productSupplierAttributeApi" }
+            action = [POST: "updateAttributes"]
+        }
+
         // Load Data
 
         "/api/loadData/listOfDemoData"(parseRequest: true) {
@@ -854,6 +881,7 @@ class UrlMappings {
         "500"(controller: "errors", action: "handleNotFound", exception: ObjectNotFoundException)
         "500"(controller: "errors", action: "handleValidationErrors", exception: ValidationException)
         "500"(controller: "errors", action: "handleUnauthorized", exception: AuthenticationException)
+        "500"(controller: "errors", action: "handleConstraintViolation", exception: SQLIntegrityConstraintViolationException)
         "/"(controller: "dashboard", action: "index")
     }
 

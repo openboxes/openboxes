@@ -1,0 +1,95 @@
+@mixin set-size($height, $width) {
+  width: $width;
+  height: $height;
+}
+
+.form-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.preference-type-bin {
+  @include set-size(20px, 20px);
+  color: var(--blue-primary);
+  cursor: pointer;
+
+  &.disabled {
+    color: var(--gray-400);
+    cursor: auto;
+  }
+}
+
+.button-add-icon {
+  @include set-size(16px, 16px);
+}
+
+.invalid-items-indicator {
+  font-size: 14px;
+  font-weight: 500;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 4px;
+  gap: 0 !important;
+  @include set-size(36px, 246px);
+
+  &.is-valid {
+    color: var(--color-green);
+
+    &:hover {
+      background-color: white;
+      color: var(--color-green);
+      cursor: auto;
+    }
+  }
+
+  &.is-invalid {
+    color: var(--color-red);
+    border: 1px solid var(--red-500);
+    background-color: white;
+  }
+
+  svg {
+    @include set-size(16px, 16px);
+  }
+}
+
+.preference-type-variations-subsection {
+
+  .rt-tbody {
+    max-height: 275px;
+  }
+
+  .input-wrapper-error-message {
+    min-height: unset;
+  }
+}
+
+.basic-details-active-switch {
+  margin-top: 24px;
+}
+
+.custom-select-error-placeholder {
+
+  svg {
+    color: var(--color-red);
+    margin-right: 5px;
+    @include set-size(16px, 16px);
+  }
+
+  span {
+    font-size: 14px;
+    color: var(--gray-350);
+    font-weight: 400;
+  }
+}
+
+.attributes-section {
+  padding-left: 12px;
+  padding-right: 12px;
+
+  .v2-section-title {
+    padding-left: 8px;
+  }
+}

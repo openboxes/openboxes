@@ -9,10 +9,10 @@ import {
   CHANGE_CURRENT_LOCATION,
   CLOSE_INFO_BAR,
   FETCH_APPROVERS,
+  FETCH_ATTRIBUTES,
   FETCH_BUYERS,
   FETCH_CONFIG,
   FETCH_CONFIG_AND_SET_ACTIVE,
-  FETCH_CURRENCIES,
   FETCH_GRAPHS,
   FETCH_INVOICE_STATUSES,
   FETCH_INVOICE_TYPE_CODES,
@@ -20,7 +20,9 @@ import {
   FETCH_MENU_CONFIG,
   FETCH_NUMBERS,
   FETCH_PAYMENT_TERMS,
+  FETCH_PREFERENCE_TYPES,
   FETCH_PURCHASE_ORDER_STATUSES,
+  FETCH_RATING_TYPE_OPTIONS,
   FETCH_REASONCODES,
   FETCH_REQUISITION_STATUS_CODES,
   FETCH_SESSION_INFO,
@@ -28,6 +30,8 @@ import {
   FETCH_SHIPMENT_TYPES,
   FETCH_STOCK_TRANSFER_STATUSES,
   FETCH_SUPPLIERS,
+  FETCH_UNIT_OF_MEASURE_CURRENCY,
+  FETCH_UNIT_OF_MEASURE_QUANTITY,
   FETCH_USERS,
   FILTER_FORM_PARAMS_BUILT,
   HIDE_INFO_BAR,
@@ -49,10 +53,13 @@ import {
 } from 'actions/types';
 import genericApi from 'api/services/GenericApi';
 import locationApi from 'api/services/LocationApi';
+import productSupplierApi from 'api/services/ProductSupplierApi';
 import purchaseOrderApi from 'api/services/PurchaseOrderApi';
+import unitOfMeasureApi from 'api/services/UnitOfMeasureApi';
 import userApi from 'api/services/UserApi';
 import { ORGANIZATION_API } from 'api/urls';
 import RoleType from 'consts/roleType';
+import { UnitOfMeasureType } from 'consts/UnitOfMeasureType';
 import apiClient, { parseResponse } from 'utils/apiClient';
 import { mapShipmentTypes } from 'utils/option-utils';
 
@@ -104,14 +111,27 @@ export function fetchReasonCodes() {
 }
 
 export function fetchCurrencies() {
-  const url = '/api/unitOfMeasure/currencies';
   return (dispatch) => {
-    apiClient.get(url).then((res) => {
+    unitOfMeasureApi.getCurrenciesOptions().then((res) => {
       dispatch({
-        type: FETCH_CURRENCIES,
+        type: FETCH_UNIT_OF_MEASURE_CURRENCY,
         payload: res.data,
       });
     });
+  };
+}
+
+export function fetchQuantityUnitOfMeasure(config) {
+  const configSettings = { ...config };
+  configSettings.params = { ...configSettings?.params, type: UnitOfMeasureType.QUANTITY };
+  return (dispatch) => {
+    unitOfMeasureApi.getUnitOfMeasureOptions(configSettings)
+      .then((res) => {
+        dispatch({
+          type: FETCH_UNIT_OF_MEASURE_QUANTITY,
+          payload: res?.data,
+        });
+      });
   };
 }
 
@@ -681,3 +701,27 @@ export const hideInfoBarModal = name => ({
     name,
   },
 });
+
+export const fetchPreferenceTypes = (config) => async (dispatch) => {
+  const preferenceTypes = await productSupplierApi.getPreferenceTypeOptions(config);
+  return dispatch({
+    type: FETCH_PREFERENCE_TYPES,
+    payload: preferenceTypes?.data?.data,
+  });
+};
+
+export const fetchRatingTypeCodes = (config) => async (dispatch) => {
+  const ratingTypeCodes = await productSupplierApi.getRatingTypeOptions(config);
+  return dispatch({
+    type: FETCH_RATING_TYPE_OPTIONS,
+    payload: ratingTypeCodes?.data?.data,
+  });
+};
+
+export const fetchAttributes = (config) => async (dispatch) => {
+  const attributes = await productSupplierApi.getAttributes(config);
+  return dispatch({
+    type: FETCH_ATTRIBUTES,
+    payload: attributes?.data?.data,
+  });
+};
