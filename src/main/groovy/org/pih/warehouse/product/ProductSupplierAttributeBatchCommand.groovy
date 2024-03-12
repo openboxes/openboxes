@@ -19,13 +19,7 @@ class ProductSupplierAttributeBatchCommand implements Validateable {
             // Search for required attributes and check if a user provided every required argument in the request
             List<Attribute> requiredAttributes =
                 Attribute.findAll("from Attribute a where :entityTypeCodes in elements(a.entityTypeCodes) and a.required = 1", [entityTypeCodes: EntityTypeCode.PRODUCT_SUPPLIER])
-            List<Attribute> missingRequiredAttributes = []
-            requiredAttributes.each { Attribute requiredAttribute ->
-                // If we don't find a required attribute in the provided list, add it to the missingRequiredAttributes list.
-                if (!productAttributes.any { it.attribute.id == requiredAttribute.id }) {
-                    missingRequiredAttributes.add(requiredAttribute)
-                }
-            }
+            List<String> missingRequiredAttributes = requiredAttributes?.id - productAttributes?.attribute?.id
             // If missing required attributes list is not empty, throw an exception and show user what attributes are missing
             if (missingRequiredAttributes.size()) {
                 return ['missing.required', missingRequiredAttributes.join(", ")]
