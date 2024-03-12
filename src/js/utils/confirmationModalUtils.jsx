@@ -6,7 +6,12 @@ import ConfirmModal from 'utils/ConfirmModal';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
-const confirmationModal = ({ title, content, buttons }) => {
+const confirmationModal = ({
+  title,
+  content,
+  buttons,
+  handleOnClose,
+}) => {
   confirmAlert({
     customUI: ({ onClose }) => (
       <ConfirmModal
@@ -14,7 +19,10 @@ const confirmationModal = ({ title, content, buttons }) => {
           title,
           content,
         }}
-        onClose={onClose}
+        onClose={() => {
+          onClose();
+          handleOnClose?.();
+        }}
         buttons={buttons(onClose)}
       />
     ),

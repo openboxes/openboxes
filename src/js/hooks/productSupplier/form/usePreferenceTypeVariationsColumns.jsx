@@ -4,6 +4,7 @@ import _ from 'lodash';
 import { Controller } from 'react-hook-form';
 import { RiDeleteBinLine, RiErrorWarningLine } from 'react-icons/ri';
 import { useDispatch, useSelector } from 'react-redux';
+import { Tooltip } from 'react-tippy';
 
 import { fetchBuyers } from 'actions';
 import DateField from 'components/form-elements/v2/DateField';
@@ -235,12 +236,24 @@ const usePreferenceTypeVariationsColumns = ({
       headerClassName: 'justify-content-center',
       className: 'd-flex justify-content-center align-items-center',
       Cell: (row) => (
-        <RiDeleteBinLine
-          onClick={() => {
-            setSelectedRowIndex(row.index);
-          }}
-          className="preference-type-bin"
-        />
+        <Tooltip
+          className="d-flex align-items-center"
+          html={(
+            <span className="p-1">
+              <Translate
+                id="react.productSupplier.form.delete"
+                defaultMessage="Delete"
+              />
+            </span>
+          )}
+        >
+          <RiDeleteBinLine
+            onClick={() => {
+              setSelectedRowIndex(row.index);
+            }}
+            className="preference-type-bin"
+          />
+        </Tooltip>
       ),
     },
   ], [errors, buyers, preferenceTypes]);

@@ -69,6 +69,7 @@ const useDeletePreferenceType = ({
     if (preferenceTypeData?.id) {
       confirmationModal({
         buttons: deleteConfirmationModalButtons,
+        handleOnClose: onCancel,
         ...modalLabels,
       });
       return;
