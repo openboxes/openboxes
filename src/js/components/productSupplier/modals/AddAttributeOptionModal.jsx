@@ -26,8 +26,8 @@ const AddAttributeOptionModal = ({
     close();
   };
 
-  const setAttributeValue = (attribute, value) => () => {
-    setValue(`attributes.${selectedAttribute?.id}`, { id: attribute?.id, value, label: value });
+  const setAttributeValue = () => {
+    setValue(`attributes.${selectedAttribute?.id}`, { id: selectedAttribute?.id, value: inputValue, label: inputValue });
     setInputValue(null);
     close();
   };
@@ -51,7 +51,10 @@ const AddAttributeOptionModal = ({
         <div>
           <TextInput
             required
-            title={{ id: '', defaultMessage: 'Other' }}
+            title={{
+              id: 'react.productSupplier.form.selectOtherValue.label',
+              defaultMessage: 'Other',
+            }}
             errorMessage={inputValue === '' && translate(
               'react.productSupplier.validation.otherIsRequired',
               'Other is required',
@@ -64,14 +67,14 @@ const AddAttributeOptionModal = ({
           <Button
             variant="transparent"
             defaultLabel="Cancel"
-            label=""
+            label="react.productSupplier.attributeModal.cancel.label"
             onClick={onClose}
           />
           <Button
             disabled={!inputValue}
             defaultLabel="Confirm"
-            label=""
-            onClick={setAttributeValue(selectedAttribute, inputValue)}
+            label="react.productSupplier.attributeModal.confirm.label"
+            onClick={setAttributeValue}
           />
         </div>
       </div>
