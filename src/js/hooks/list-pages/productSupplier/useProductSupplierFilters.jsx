@@ -90,9 +90,9 @@ const useProductSupplierFilters = (ignoreClearFilters) => {
     if (queryProps.active) {
       defaultValues.active = queryProps.active;
     }
-    if (queryProps.preferenceType) {
-      defaultValues.preferenceType = preferenceTypes
-        .find(({ id }) => id === queryProps.preferenceType);
+    if (queryProps.defaultPreferenceTypes) {
+      defaultValues.defaultPreferenceTypes = preferenceTypes
+        .filter(({ id }) => queryProps?.defaultPreferenceTypes?.includes(id));
     }
 
     setDefaultFilterValues(defaultValues);
