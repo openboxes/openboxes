@@ -1,5 +1,3 @@
-import _ from 'lodash';
-
 import ActivityCode from 'consts/activityCode';
 import StockMovementStatus from 'consts/stockMovementStatus';
 import { supports } from 'utils/supportedActivitiesUtils';
@@ -44,11 +42,5 @@ const canEditRequest = (currentUser, request, location) => {
 };
 
 export const hasRole = (user, role) => user?.roles?.includes(role);
-
-export const hasPermissions = ({
-  user,
-  minimumRequiredRole,
-  supplementalRoles,
-}) => _.every(supplementalRoles, (role) => hasRole(user, role)) && minimumRequiredRole;
 
 export default canEditRequest;

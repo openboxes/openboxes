@@ -1,22 +1,21 @@
 import React, { useCallback } from 'react';
 
 import { RiDeleteBinLine, RiPencilLine } from 'react-icons/ri';
-import { useSelector } from 'react-redux';
 
 import productSupplierApi from 'api/services/ProductSupplierApi';
 import notification from 'components/Layout/notifications/notification';
 import { PRODUCT_SUPPLIER_URL } from 'consts/applicationUrls';
 import NotificationType from 'consts/notificationTypes';
 import RoleType from 'consts/roleType';
+import useUserHasPermissions from 'hooks/useUserHasPermissions';
 import confirmationModal from 'utils/confirmationModalUtils';
-import { hasPermissions } from 'utils/permissionUtils';
 import translate from 'utils/Translate';
 
 const useProductSupplierActions = ({ fireFetchData }) => {
-  const { currentUser, isAdmin } = useSelector((state) => ({
-    currentUser: state.session.user,
-    isAdmin: state.session.isUserAdmin,
-  }));
+  const canManageProducts = useUserHasPermissions({
+    minRequiredRole: RoleType.ROLE_ADMIN,
+    supplementalRoles: [RoleType.ROLE_PRODUCT_MANAGER],
+  });
 
   const deleteProductSupplier = async (onClose, productSupplierId) => {
     try {
@@ -73,11 +72,8 @@ const useProductSupplierActions = ({ fireFetchData }) => {
     });
   };
 
-  const getActions = useCallback((productSupplierId) => (hasPermissions({
-    user: currentUser,
-    minimumRequiredRole: isAdmin,
-    supplementalRoles: [RoleType.ROLE_PRODUCT_MANAGER],
-  }) ? [
+  const getActions = useCallback((productSupplierId) => (canManageProducts ?
+    [
       {
         defaultLabel: 'Edit',
         label: 'react.productSupplier.edit.label',
@@ -93,7 +89,7 @@ const useProductSupplierActions = ({ fireFetchData }) => {
         variant: 'danger',
         onClick: () => openConfirmationModal(productSupplierId),
       },
-    ] : []), [currentUser, isAdmin]);
+    ] : []), [canManageProducts]);
 
   return {
     getActions,

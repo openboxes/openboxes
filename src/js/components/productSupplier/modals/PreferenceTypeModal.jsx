@@ -4,12 +4,11 @@ import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { RiCloseFill } from 'react-icons/all';
 import Modal from 'react-modal';
-import { useSelector } from 'react-redux';
 
 import Button from 'components/form-elements/Button';
 import { PRODUCT_SUPPLIER_URL } from 'consts/applicationUrls';
 import RoleType from 'consts/roleType';
-import { hasPermissions } from 'utils/permissionUtils';
+import useUserHasPermissions from 'hooks/useUserHasPermissions';
 import Translate from 'utils/Translate';
 
 const PreferenceTypeModal = ({
@@ -18,13 +17,10 @@ const PreferenceTypeModal = ({
   modalData,
   productSupplierId,
 }) => {
-  const {
-    currentUser,
-    isAdmin,
-  } = useSelector((state) => ({
-    currentUser: state.session.user,
-    isAdmin: state.session.isUserAdmin,
-  }));
+  const canManageProducts = useUserHasPermissions({
+    minRequiredRole: RoleType.ROLE_ADMIN,
+    supplementalRoles: [RoleType.ROLE_PRODUCT_MANAGER],
+  });
 
   useEffect(() => {
     if (isOpen) {
@@ -106,11 +102,7 @@ const PreferenceTypeModal = ({
           </div>
         </div>
         <div className="d-flex justify-content-end mt-3">
-          {hasPermissions({
-            user: currentUser,
-            minimumRequiredRole: isAdmin,
-            supplementalRoles: [RoleType.ROLE_PRODUCT_MANAGER],
-          }) && (
+          {canManageProducts && (
             <Button
               defaultLabel="Edit"
               label="react.productSupplier.edit.label"
