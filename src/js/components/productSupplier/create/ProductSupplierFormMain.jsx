@@ -62,6 +62,7 @@ const ProductSupplierFormMain = ({ formProps }) => {
       <AttributesSection
         control={control}
         errors={errors.attributes}
+        setValue={setValue}
       />
     </div>
   );

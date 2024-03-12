@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { z } from 'zod';
@@ -10,11 +10,15 @@ import entityTypeCode from 'consts/entityTypeCode';
 import useTranslate from 'hooks/useTranslate';
 
 const useProductSupplierAttributes = () => {
+  const [isAttributeModalOpen, setIsAttributeModalOpen] = useState(false);
+  const [selectedAttribute, setSelectedAttribute] = useState(null);
   const dispatch = useDispatch();
   const translate = useTranslate();
   const { attributes } = useSelector((state) => ({
     attributes: state.productSupplier.attributes,
   }));
+
+  const closeAttributeModal = () => setIsAttributeModalOpen(false);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -32,7 +36,8 @@ const useProductSupplierAttributes = () => {
 
   // When we have at least one option, it has to be select type
   // (allowOther doesn't matter in this case)
-  const isSelectType = (attribute) => attribute?.options.length;
+  const isSelectType = (attribute) => attribute?.options.length
+    || (!attribute?.options.length && !attribute?.allowOther);
 
   // When we don't have options, and allowOther is set to true, it is text input
   const isTextType = (attribute) => attribute?.allowOther && !attribute?.options.length;
@@ -41,6 +46,8 @@ const useProductSupplierAttributes = () => {
     ? z
       .string(errorProps)
       .max(255, `Max length of ${attribute?.name} is 255`)
+      .trim()
+      .min(1, errorProps?.required_error)
     : z
       .string()
       .max(255, `Max length of ${attribute?.name} is 255`)
@@ -60,31 +67,42 @@ const useProductSupplierAttributes = () => {
       .nullish()
   );
 
+  const selectFieldProps = (attribute) => ({
+    createNewFromModalLabel: translate(
+      'react.productSupplier.form.selectOtherValue.label',
+      'Other',
+    ),
+    createNewFromModal: true,
+    newOptionModalOpen: () => {
+      setIsAttributeModalOpen(true);
+      setSelectedAttribute(attribute);
+    },
+  });
+
   /**
    * Function for mapping attribute options to align them with attributes
    * validation schema
    */
-  const mapAttributeOptions = (attribute, includeOther) => {
-    const options = attribute?.options.map((option) =>
-      ({ id: attribute?.id, value: option, label: option }));
-
-    return includeOther
-      ? [...options, {
-        id: attribute?.id,
-        value: 'Other',
-        label: translate('react.productSupplier.form.selectOtherValue.label', 'Other'),
-      }]
-      : options;
-  };
+  const mapAttributeOptions = (attribute) => attribute?.options.map((option) =>
+    ({ id: attribute?.id, value: option, label: option }));
 
   /**
    * When the attribute has the allowOther property set to true and has no options, it should be
    * text input. When the attribute has the allowOther property set to true and has available
    * options, then it should be a select field, but with the additional option "Other". In all
    * other cases, it should be just a select field with the options fetched from the API.
+   * When field doesn't have options and allowOther then we create a select with "other" option.
    */
   const getAttributesWithInputTypes = (attributesToMap) =>
     (attributesToMap || []).map((attribute) => {
+      if (!attribute?.options.length && !attribute?.allowOther) {
+        return {
+          attribute,
+          inputParams: selectFieldProps(attribute),
+          Input: SelectField,
+        };
+      }
+
       if (!attribute?.allowOther) {
         return {
           attribute: { ...attribute, options: mapAttributeOptions(attribute) },
@@ -102,8 +120,9 @@ const useProductSupplierAttributes = () => {
       return {
         attribute: {
           ...attribute,
-          options: mapAttributeOptions(attribute, true),
+          options: mapAttributeOptions(attribute),
         },
+        inputParams: selectFieldProps(attribute),
         Input: SelectField,
       };
     });
@@ -131,6 +150,9 @@ const useProductSupplierAttributes = () => {
 
   return {
     attributes,
+    isAttributeModalOpen,
+    selectedAttribute,
+    closeAttributeModal,
     attributesWithInputTypes: getAttributesWithInputTypes(attributes),
     inputTypeSchema,
     selectTypeSchema,
