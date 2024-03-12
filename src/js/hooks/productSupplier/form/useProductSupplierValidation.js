@@ -141,8 +141,8 @@ const useProductSupplierValidation = () => {
         value: z.string(),
         label: z.string(),
       }, {
-        invalid_type_error: 'Site name is required',
-        required_error: 'Site name is required',
+        invalid_type_error: 'Organization is required',
+        required_error: 'Organization is required',
       }).required()
         .refine(checkDestinationPartyUniqueness, {
           message: 'Destination party should be unique',

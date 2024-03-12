@@ -91,7 +91,7 @@ const usePreferenceTypeVariationsColumns = ({
 
   const columns = useMemo(() => [
     {
-      Header: translate('react.productSupplier.table.siteName.label', 'Site Name'),
+      Header: translate('react.productSupplier.table.organization.label', 'Organization'),
       sortable: false,
       accessor: 'destinationParty',
       minWidth: 276,
@@ -110,8 +110,8 @@ const usePreferenceTypeVariationsColumns = ({
                 scrollableParentContainerClassName="rt-table"
                 placeholder={getCustomSelectErrorPlaceholder(
                   {
-                    id: 'react.productSupplier.table.selectSite.label',
-                    defaultMessage: 'Select Site',
+                    id: 'react.productSupplier.table.selectOrganization.label',
+                    defaultMessage: 'Select Organization',
                     displayIcon: hasErrors,
                   },
                 )}
