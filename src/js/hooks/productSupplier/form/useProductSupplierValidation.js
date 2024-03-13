@@ -2,8 +2,11 @@ import _ from 'lodash';
 import { z } from 'zod';
 
 import useProductSupplierAttributes from 'hooks/productSupplier/form/useProductSupplierAttributes';
+import useTranslate from 'hooks/useTranslate';
 
 const useProductSupplierValidation = () => {
+  const translate = useTranslate();
+
   const {
     attributes,
     isSelectType,
@@ -81,8 +84,22 @@ const useProductSupplierValidation = () => {
         .min(1, 'Supplier code is required')
         .max(255, 'Max length of supplier code is 255'),
       name: z
-        .string({ required_error: 'Supplier Product Name is required' })
-        .min(1, 'Supplier Product Name is required')
+        .string({
+          required_error: translate(
+            'react.default.form.field.required.label',
+            '(Source) Name is required',
+            [
+              translate('react.productSupplier.form.name.title', '(Source) Name'),
+            ],
+          ),
+        })
+        .min(1, translate(
+          'react.default.form.field.required.label',
+          '(Source) Name is required',
+          [
+            translate('react.productSupplier.form.name.title', '(Source) Name'),
+          ],
+        ))
         .max(255, 'Max length of supplier product name is 255'),
       active: z.boolean(),
     });
