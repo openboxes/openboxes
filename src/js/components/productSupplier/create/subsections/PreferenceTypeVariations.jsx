@@ -70,6 +70,7 @@ const PreferenceTypeVariations = ({
 
   return (
     <Subsection
+      expandedByDefault={false}
       collapsable
       title={{
         label: 'react.productSupplier.subsection.preferenceTypeVariations.title',
