@@ -2,9 +2,15 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import _ from 'lodash';
 import moment from 'moment';
 import { useForm } from 'react-hook-form';
+import { useDispatch } from 'react-redux';
 import { useHistory, useParams } from 'react-router-dom';
 
-import { fetchPreferenceTypes, fetchRatingTypeCodes } from 'actions';
+import {
+  fetchPreferenceTypes,
+  fetchRatingTypeCodes,
+  hideSpinner,
+  showSpinner,
+} from 'actions';
 import productPackageApi from 'api/services/ProductPackageApi';
 import productSupplierApi from 'api/services/ProductSupplierApi';
 import productSupplierAttributeApi from 'api/services/ProductSupplierAttributeApi';
@@ -29,6 +35,7 @@ const useProductSupplierForm = () => {
 
   const history = useHistory();
   const translate = useTranslate();
+  const dispatch = useDispatch();
 
   useOptionsFetch(
     [fetchRatingTypeCodes, fetchPreferenceTypes],
@@ -258,40 +265,45 @@ const useProductSupplierForm = () => {
     // First build payload for the details part
     const detailsPayload = buildDetailsPayload({ basicDetails, additionalDetails, tieredPricing });
     // Either create or update an existing product supplier details
-    const detailsResponse = productSupplierId
-      ? await productSupplierApi.updateDetails(detailsPayload, productSupplierId)
-      : await productSupplierApi.saveDetails(detailsPayload);
+    try {
+      dispatch(showSpinner());
+      const detailsResponse = productSupplierId
+        ? await productSupplierApi.updateDetails(detailsPayload, productSupplierId)
+        : await productSupplierApi.saveDetails(detailsPayload);
 
-    // Id of created/updated product supplier
-    const productSupplier = detailsResponse.data?.data?.id;
+      // Id of created/updated product supplier
+      const productSupplier = detailsResponse.data?.data?.id;
 
-    // Build package and pricing payload and send a request
-    const packagePayload =
-      buildPackagePayload({ packageSpecification, fixedPrice, productSupplier });
-    await productPackageApi.save(packagePayload);
+      // Build package and pricing payload and send a request
+      const packagePayload =
+        buildPackagePayload({ packageSpecification, fixedPrice, productSupplier });
+      await productPackageApi.save(packagePayload);
 
-    // Build preferences payload and if payload array is not empty, send a request
-    const preferencesPayload =
-      buildPreferencesPayload({
-        defaultPreferenceType,
-        productSupplierPreferences,
-        productSupplier,
-      });
+      // Build preferences payload and if payload array is not empty, send a request
+      const preferencesPayload =
+        buildPreferencesPayload({
+          defaultPreferenceType,
+          productSupplierPreferences,
+          productSupplier,
+        });
 
-    if (preferencesPayload.productSupplierPreferences?.length) {
-      await productSupplierPreferenceApi.saveOrUpdateBatch(preferencesPayload);
+      if (preferencesPayload.productSupplierPreferences?.length) {
+        await productSupplierPreferenceApi.saveOrUpdateBatch(preferencesPayload);
+      }
+
+      // Build attributes payload and send a request
+      const attributesPayload = buildAttributesPayload({ attributes, productSupplier });
+      await productSupplierAttributeApi.updateAttributes(attributesPayload);
+
+      // Show a success message and redirect to the list page
+      const successMessage = productSupplierId
+        ? translate('react.productSupplier.form.success.update', 'Product source has been updated successfully')
+        : translate('react.productSupplier.form.success.create', 'Product source has been created successfully');
+      notification(NotificationType.SUCCESS)({ message: successMessage });
+      history.push(PRODUCT_SUPPLIER_URL.list());
+    } finally {
+      dispatch(hideSpinner());
     }
-
-    // Build attributes payload and send a request
-    const attributesPayload = buildAttributesPayload({ attributes, productSupplier });
-    await productSupplierAttributeApi.updateAttributes(attributesPayload);
-
-    // Show a success message and redirect to the list page
-    const successMessage = productSupplierId
-      ? translate('react.productSupplier.form.success.update', 'Product source has been updated successfully')
-      : translate('react.productSupplier.form.success.create', 'Product source has been created successfully');
-    notification(NotificationType.SUCCESS)({ message: successMessage });
-    history.push(PRODUCT_SUPPLIER_URL.list());
   };
 
   // preselect value 1 when unit of measure Each is selected
