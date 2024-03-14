@@ -1,14 +1,29 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import _ from 'lodash';
+import moment from 'moment';
 import { useForm } from 'react-hook-form';
-import { useParams } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { useHistory, useParams } from 'react-router-dom';
 
-import { fetchPreferenceTypes, fetchRatingTypeCodes } from 'actions';
+import {
+  fetchPreferenceTypes,
+  fetchRatingTypeCodes,
+  hideSpinner,
+  showSpinner,
+} from 'actions';
+import productPackageApi from 'api/services/ProductPackageApi';
 import productSupplierApi from 'api/services/ProductSupplierApi';
+import productSupplierAttributeApi from 'api/services/ProductSupplierAttributeApi';
+import productSupplierPreferenceApi from 'api/services/ProductSupplierPreferenceApi';
+import notification from 'components/Layout/notifications/notification';
+import { PRODUCT_SUPPLIER_URL } from 'consts/applicationUrls';
+import NotificationType from 'consts/notificationTypes';
+import { DateFormat } from 'consts/timeFormat';
 import useOptionsFetch from 'hooks/options-data/useOptionsFetch';
 import useCalculateEachPrice from 'hooks/productSupplier/form/useCalculateEachPrice';
 import useProductSupplierAttributes from 'hooks/productSupplier/form/useProductSupplierAttributes';
 import useProductSupplierValidation from 'hooks/productSupplier/form/useProductSupplierValidation';
+import useTranslate from 'hooks/useTranslate';
 import { omitEmptyValues } from 'utils/form-values-utils';
 import { splitPreferenceTypes } from 'utils/list-utils';
 
@@ -17,6 +32,10 @@ const useProductSupplierForm = () => {
   const { mapFetchedAttributes } = useProductSupplierAttributes();
   // Check if productSupplierId is provided in the URL (determine whether it is create or edit)
   const { productSupplierId } = useParams();
+
+  const history = useHistory();
+  const translate = useTranslate();
+  const dispatch = useDispatch();
 
   useOptionsFetch(
     [fetchRatingTypeCodes, fetchPreferenceTypes],
@@ -147,28 +166,144 @@ const useProductSupplierForm = () => {
 
   useCalculateEachPrice({ control, setValue });
 
-  const onSubmit = (values) => {
-    const payload = {
-      ...omitEmptyValues(values.basicDetails),
-      ...omitEmptyValues(values.additionalDetails),
-      ...omitEmptyValues(values.defaultPreferenceType),
-      ...omitEmptyValues(values.packageSpecification),
-      ...omitEmptyValues(values.fixedPrice),
-      attributes: omitEmptyValues(values.attributes),
-      productSupplierPreferences: values?.productSupplierPreferences,
-      product: values?.product ? values.product.id : null,
-      supplier: values?.supplier ? values.supplier.id : null,
-      manufacturer: values?.manufacturer ? values.manufacturer.id : null,
-      ratingTypeCode: values?.ratingTypeCode ? values.ratingTypeCode.id : null,
-      uom: values?.uom ? values.uom.id : null,
-      preferenceType: values?.preferenceType ? values.preferenceType.id : null,
+  const buildDetailsPayload = ({ basicDetails, additionalDetails, tieredPricing }) => {
+    const { product, supplier } = basicDetails;
+    const { manufacturer, ratingTypeCode } = additionalDetails;
+
+    return {
+      ...omitEmptyValues(basicDetails),
+      ...omitEmptyValues(additionalDetails),
+      product: product ? product.id : null,
+      supplier: supplier ? supplier.id : null,
+      manufacturer: manufacturer ? manufacturer.id : null,
+      ratingTypeCode: ratingTypeCode ? ratingTypeCode.id : null,
+      tieredPricing,
     };
-    // If values contain id, it means we are editing
-    if (values?.id) {
-      console.log(payload);
-      return;
+  };
+
+  const buildPreferencesPayload = ({
+    defaultPreferenceType,
+    productSupplierPreferences,
+    productSupplier,
+  }) => {
+    // Map preference variations from the table
+    const preferenceVariations = productSupplierPreferences?.map((productSupplierPreference) => ({
+      ...productSupplierPreference,
+      validityStartDate: productSupplierPreference.validityStartDate
+        ? moment(productSupplierPreference.validityStartDate).format(DateFormat.MM_DD_YYYY)
+        : null,
+      validityEndDate: productSupplierPreference.validityEndDate
+        ? moment(productSupplierPreference.validityEndDate).format(DateFormat.MM_DD_YYYY)
+        : null,
+      preferenceType: productSupplierPreference?.preferenceType?.id,
+      productSupplier,
+    }));
+    // Map the default preference type
+    const defaultPreferenceTypeMapped = {
+      ...defaultPreferenceType,
+      validityStartDate: defaultPreferenceType.validityStartDate
+        ? moment(defaultPreferenceType.validityStartDate).format(DateFormat.MM_DD_YYYY)
+        : null,
+      validityEndDate: defaultPreferenceType.validityEndDate
+        ? moment(defaultPreferenceType.validityEndDate).format(DateFormat.MM_DD_YYYY)
+        : null,
+      preferenceType: defaultPreferenceType?.preferenceType?.id,
+      productSupplier,
+    };
+    // Combine the variations and the default preference type into a single list
+    // Filter out elements that do not have any value filled
+    // (do not take productSupplier and id into account,
+    // as they would be filled anyway, because they come from previous response)
+    const preferencesCombined = [
+      defaultPreferenceTypeMapped,
+      ...preferenceVariations,
+    ].filter((preference) => _.some(Object.values(_.omit(preference, 'productSupplier', 'id'))));
+
+    return {
+      productSupplierPreferences: preferencesCombined,
+    };
+  };
+
+  const buildPackagePayload = ({ packageSpecification, fixedPrice, productSupplier }) => {
+    const { uom } = packageSpecification;
+    return {
+      ...omitEmptyValues(packageSpecification),
+      ...omitEmptyValues(fixedPrice),
+      contractPriceValidUntil: fixedPrice?.contractPriceValidUntil
+        ? moment(fixedPrice?.contractPriceValidUntil).format(DateFormat.MM_DD_YYYY)
+        : null,
+      uom: uom ? uom.id : null,
+      productSupplier,
+    };
+  };
+
+  const buildAttributesPayload = ({ attributes, productSupplier }) => {
+    const attributesMapped = Object.entries(attributes).map(([attributeId, values]) => ({
+      attribute: attributeId,
+      productSupplier,
+      value: values?.value ?? values ?? '',
+    }));
+
+    return {
+      productAttributes: attributesMapped,
+    };
+  };
+
+  const onSubmit = async (values) => {
+    const {
+      basicDetails,
+      additionalDetails,
+      defaultPreferenceType,
+      packageSpecification,
+      fixedPrice,
+      attributes,
+      productSupplierPreferences,
+    } = values;
+
+    const { tieredPricing } = fixedPrice;
+
+    // First build payload for the details part
+    const detailsPayload = buildDetailsPayload({ basicDetails, additionalDetails, tieredPricing });
+    // Either create or update an existing product supplier details
+    try {
+      dispatch(showSpinner());
+      const detailsResponse = productSupplierId
+        ? await productSupplierApi.updateDetails(detailsPayload, productSupplierId)
+        : await productSupplierApi.saveDetails(detailsPayload);
+
+      // Id of created/updated product supplier
+      const productSupplier = detailsResponse.data?.data?.id;
+
+      // Build package and pricing payload and send a request
+      const packagePayload =
+        buildPackagePayload({ packageSpecification, fixedPrice, productSupplier });
+      await productPackageApi.save(packagePayload);
+
+      // Build preferences payload and if payload array is not empty, send a request
+      const preferencesPayload =
+        buildPreferencesPayload({
+          defaultPreferenceType,
+          productSupplierPreferences,
+          productSupplier,
+        });
+
+      if (preferencesPayload.productSupplierPreferences?.length) {
+        await productSupplierPreferenceApi.saveOrUpdateBatch(preferencesPayload);
+      }
+
+      // Build attributes payload and send a request
+      const attributesPayload = buildAttributesPayload({ attributes, productSupplier });
+      await productSupplierAttributeApi.updateAttributes(attributesPayload);
+
+      // Show a success message and redirect to the list page
+      const successMessage = productSupplierId
+        ? translate('react.productSupplier.form.success.update', 'Product source has been updated successfully')
+        : translate('react.productSupplier.form.success.create', 'Product source has been created successfully');
+      notification(NotificationType.SUCCESS)({ message: successMessage });
+      history.push(PRODUCT_SUPPLIER_URL.list());
+    } finally {
+      dispatch(hideSpinner());
     }
-    console.log(payload);
   };
 
   // preselect value 1 when unit of measure Each is selected

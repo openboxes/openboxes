@@ -113,6 +113,9 @@ const useProductSupplierValidation = () => {
     });
 
     const defaultPreferenceTypeSchema = z.object({
+      id: z
+        .string()
+        .nullish(),
       preferenceType: z.object({
         id: z.string(),
         value: z.string(),
@@ -136,6 +139,9 @@ const useProductSupplierValidation = () => {
       });
 
     const productSupplierPreferenceSchema = z.object({
+      id: z
+        .string()
+        .nullish(),
       destinationParty: z.object({
         id: z.string(),
         value: z.string(),
@@ -156,11 +162,13 @@ const useProductSupplierValidation = () => {
       })
         .required(),
       validityEndDate: z
-        .string()
+        .coerce
+        .date()
         .optional()
         .nullable(),
       validityStartDate: z
-        .string()
+        .coerce
+        .date()
         .optional()
         .nullable(),
       bidName: z
