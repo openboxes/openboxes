@@ -153,7 +153,7 @@ const ProductSupplierListTable = ({ filterParams }) => {
       ),
     },
     {
-      Header: <Translate id="react.productSupplier.column.supplierProductName.label" defaultMessage="Supplier Product Name" />,
+      Header: <Translate id="react.productSupplier.column.name.label" defaultMessage="(Source) Name" />,
       accessor: 'name',
       minWidth: 350,
       Cell: (row) => <TableCell {...row} tooltip />,

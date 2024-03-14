@@ -30,6 +30,8 @@ const AdditionalDetails = ({ control, errors }) => {
 
   return (
     <Subsection
+      expandedByDefault={false}
+      collapsable
       title={{ label: 'react.productSupplier.form.subsection.additionalDetails', defaultMessage: 'Additional Details' }}
     >
       <div className="row">
