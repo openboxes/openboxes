@@ -122,3 +122,14 @@ export const UNIT_OF_MEASURE_API = `${API}/unitOfMeasures`;
 export const UNIT_OF_MEASURE_OPTIONS = `${UNIT_OF_MEASURE_API}/options`;
 // Currencies don't use url in plural form, do not change it to UNIT_OF_MEASURE_API!
 export const CURRENCIES_OPTIONS = `${API}/unitOfMeasure/currencies`;
+
+// PRODUCT PACKAGE
+export const PRODUCT_PACKAGE_API = `${API}/productPackages`;
+
+// PRODUCT SUPPLIER PREFERENCE
+export const PRODUCT_SUPPLIER_PREFERENCE_API = `${API}/productSupplierPreferences`;
+export const PRODUCT_SUPPLIER_PREFERENCE_BATCH = `${PRODUCT_SUPPLIER_PREFERENCE_API}/batch`;
+
+// PRODUCT SUPPLIER ATTRIBUTE
+export const PRODUCT_SUPPLIER_ATTRIBUTE_API = `${API}/productSupplierAttributes`;
+export const PRODUCT_SUPPLIER_ATTRIBUTE_BATCH = `${PRODUCT_SUPPLIER_ATTRIBUTE_API}/batch`;
