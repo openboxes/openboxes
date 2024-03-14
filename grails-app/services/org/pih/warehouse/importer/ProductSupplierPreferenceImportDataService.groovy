@@ -12,6 +12,7 @@ package org.pih.warehouse.importer
 import grails.gorm.transactions.Transactional
 import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.PreferenceType
+import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.product.ProductSupplier
 import org.pih.warehouse.product.ProductSupplierPreference
 
@@ -36,8 +37,16 @@ class ProductSupplierPreferenceImportDataService implements ImportDataService {
 
             if (!organizationCode) {
                 command.errors.reject("Row ${index + 1}: Organization code is required")
-            } else if (organizationCode != DEFAULT && !Organization.findByCode(organizationCode)) {
-                command.errors.reject("Row ${index + 1}: Organization with code: ${organizationCode}  does not exist")
+            } else if (organizationCode != DEFAULT) {
+                Organization organization = Organization.findByCode(organizationCode)
+                if (!organization) {
+                    command.errors.reject("Row ${index + 1}: Organization with code: ${organizationCode} does not exist")
+                } else {
+                    Boolean isOrganizationRoleTypeBuyer = organization.roles?.find { it.roleType == RoleType.ROLE_BUYER }
+                    if (!isOrganizationRoleTypeBuyer) {
+                        command.errors.reject("Row ${index + 1}: Organization with code: ${organizationCode} is not a buyer organization")
+                    }
+                }
             }
 
             if (!preferenceTypeName) {
