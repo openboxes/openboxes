@@ -109,10 +109,10 @@ class OrganizationService {
         return findOrCreateOrganization(name, code, [RoleType.ROLE_SUPPLIER, RoleType.ROLE_MANUFACTURER])
     }
 
-    List getOrganizations(Map params) {
+    List<Organization> getOrganizations(Map params) {
         List roleTypes = params.list("roleType").collect { it as RoleType }
 
-        def organizations = Organization.createCriteria().list(params) {
+        List<Organization> organizations = Organization.createCriteria().list(params) {
             if (params.q) {
                 or {
                     ilike("id", "${params.q}%")
