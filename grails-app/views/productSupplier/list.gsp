@@ -140,13 +140,13 @@
                                     </g:else>
                                 </td>
                                 <td>
-                                    <g:if test="${productSupplierInstance?.defaultProductPackage}">
-                                        ${fieldValue(bean: productSupplierInstance?.defaultProductPackage?.uom, field: "code")}/${fieldValue(bean: productSupplierInstance?.defaultProductPackage, field: "quantity")}
+                                    <g:if test="${productSupplierInstance?.defaultProductPackageDerived}">
+                                        ${fieldValue(bean: productSupplierInstance?.defaultProductPackageDerived?.uom, field: "code")}/${fieldValue(bean: productSupplierInstance?.defaultProductPackage, field: "quantity")}
                                     </g:if>
                                 </td>
                                 <td>
                                     <g:hasRoleFinance onAccessDenied="${g.message(code:'errors.blurred.message', args: [g.message(code:'default.none.label')])}">
-                                        ${g.formatNumber(number: productSupplierInstance?.defaultProductPackage?.productPrice?.price?:0.0)}
+                                        ${g.formatNumber(number: productSupplierInstance?.defaultProductPackageDerived?.productPrice?.price?:0.0)}
                                     </g:hasRoleFinance>
                                 </td>
                                 <td><g:checkBox onclick="return false;" value="${productSupplierInstance.active}" name="active"/></td>
