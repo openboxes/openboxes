@@ -46,7 +46,7 @@
 
                     <g:each var="productSupplier" in="${productInstance?.productSuppliers.findAll{ it.active }.sort()}" status="status">
 
-                        <g:set var="defaultProductPackage" value="${productSupplier.defaultProductPackage}"/>
+                        <g:set var="defaultProductPackage" value="${productSupplier.defaultProductPackageDerived}"/>
 
                         <tr class="prop ${status%2==0?'odd':'even'}">
                             <td>${fieldValue(bean: productSupplier, field: "code")?:g.message(code:'default.none.label')}</td>
