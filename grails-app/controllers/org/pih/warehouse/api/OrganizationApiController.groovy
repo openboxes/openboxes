@@ -10,19 +10,15 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
-import grails.validation.ValidationException
-import org.grails.web.json.JSONObject
-import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Organization
-import org.pih.warehouse.core.PartyType
+import org.pih.warehouse.core.OrganizationService
 
 class OrganizationApiController extends BaseDomainApiController {
 
-    def organizationService
-    def identifierService
+    OrganizationService organizationService
 
     def list() {
-        def organizations = organizationService.getOrganizations(params)
+        List<Organization> organizations = organizationService.getOrganizations(params)
         render ([data:organizations] as JSON)
      }
 
