@@ -144,6 +144,7 @@ class EditLineModal extends Component {
     this.state.attr.saveEditLine(
       values.lines,
       this.state.attr.parentIndex,
+      this.props.values,
     );
   }
 
