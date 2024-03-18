@@ -282,6 +282,17 @@
                     },
                     ajaxOptions: {
                       error: function(xhr, status, index, anchor) {
+                        let errorMessage = "Error loading tab: " + xhr.status + " " + xhr.statusText;
+                        // Attempt to get more detailed error message
+                        if (xhr.responseText) {
+                          const json = JSON.parse(xhr.responseText);
+                          if (json.errorMessage) {
+                            errorMessage = json.errorMessage
+                          }
+                        }
+                        // Display error message
+                        $(anchor.hash).text(errorMessage);
+
                         // Reload the page if session has timed out
                         if (xhr.statusCode == 401) {
                           window.location.reload();
