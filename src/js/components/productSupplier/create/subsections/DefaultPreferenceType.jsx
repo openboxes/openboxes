@@ -32,7 +32,7 @@ const DefaultPreferenceType = ({
   });
 
   const emptyPreferenceType = {
-    bidName: '',
+    comments: '',
     validityStartDate: undefined,
     validityEndDate: undefined,
     preferenceType: null,
@@ -138,12 +138,12 @@ const DefaultPreferenceType = ({
         </div>
         <div className="col-lg col-md-6 p-2">
           <Controller
-            name="defaultPreferenceType.bidName"
+            name="defaultPreferenceType.comments"
             control={control}
             render={({ field }) => (
               <TextInput
                 {...field}
-                errorMessage={errors.bidName?.message}
+                errorMessage={errors.comments?.message}
                 title={{
                   id: 'react.productSupplier.form.bidName.title',
                   defaultMessage: 'Bid Name',
@@ -189,7 +189,7 @@ export const defaultPreferenceTypeFormErrors = PropTypes.shape({
   preferenceType: FormErrorPropType,
   validityStartDate: FormErrorPropType,
   validityEndDate: FormErrorPropType,
-  bidName: FormErrorPropType,
+  comments: FormErrorPropType,
 });
 
 DefaultPreferenceType.propTypes = {

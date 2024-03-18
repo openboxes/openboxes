@@ -209,16 +209,16 @@ const usePreferenceTypeVariationsColumns = ({
     {
       Header: translate('react.productSupplier.table.bidName.label', 'Bid Name'),
       sortable: false,
-      accessor: 'bidName',
+      accessor: 'comments',
       minWidth: 276,
       Cell: (row) => (
         <Controller
-          name={`productSupplierPreferences.${row.index}.bidName`}
+          name={`productSupplierPreferences.${row.index}.comments`}
           control={control}
           key={row.original.id}
           render={({ field }) => (
             <TextInput
-              errorMessage={errors?.[row.index]?.bidName?.message}
+              errorMessage={errors?.[row.index]?.comments?.message}
               {...field}
               onChange={(val) => {
                 field?.onChange(val);

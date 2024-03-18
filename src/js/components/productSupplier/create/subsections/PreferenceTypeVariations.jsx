@@ -59,7 +59,7 @@ const PreferenceTypeVariations = ({
     preferenceType: '',
     validityStartDate: undefined,
     validityEndDate: undefined,
-    bidName: '',
+    comments: '',
   };
 
   const addNewLine = () => {
@@ -121,7 +121,7 @@ export const preferenceTypeVariationsFormErrors = PropTypes.arrayOf(
     preferenceType: FormErrorPropType,
     validityStartDate: FormErrorPropType,
     validityEndDate: FormErrorPropType,
-    bidName: FormErrorPropType,
+    comments: FormErrorPropType,
   }),
 );
 

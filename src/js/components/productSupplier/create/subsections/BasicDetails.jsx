@@ -81,12 +81,12 @@ const BasicDetails = ({ control, errors }) => {
         </div>
         <div className="col-lg-4 col-md-6 px-2 pt-2">
           <Controller
-            name="basicDetails.legacyCode"
+            name="basicDetails.productCode"
             control={control}
             render={({ field }) => (
               <TextInput
                 title={{ id: 'react.productSupplier.form.legacyCode.title', defaultMessage: 'Legacy Code' }}
-                errorMessage={errors.legacyCode?.message}
+                errorMessage={errors.productCode?.message}
                 tooltip={{
                   id: 'react.productSupplier.form.legacyCode.tooltip',
                   defaultMessage: 'Reference to this record in a previous or parallel purchasing system',
@@ -211,7 +211,7 @@ export default BasicDetails;
 export const basicDetailsFormErrors = PropTypes.shape({
   code: FormErrorPropType,
   product: FormErrorPropType,
-  legacyCode: FormErrorPropType,
+  productCode: FormErrorPropType,
   supplier: FormErrorPropType,
   supplierCode: FormErrorPropType,
   name: FormErrorPropType,

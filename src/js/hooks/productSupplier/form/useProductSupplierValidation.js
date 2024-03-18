@@ -29,7 +29,7 @@ const useProductSupplierValidation = () => {
       if (
         subsectionData.validityStartDate
         || subsectionData.validityEndDate
-        || subsectionData.bidName
+        || subsectionData.comments
       ) {
         // if any other field is not empty in preferenceType field should be required
         return Boolean(subsectionData.preferenceType);
@@ -67,7 +67,7 @@ const useProductSupplierValidation = () => {
         required_error: 'Product is required',
       })
         .required(),
-      legacyCode: z
+      productCode: z
         .string()
         .optional(),
       supplier: z.object({
@@ -147,7 +147,7 @@ const useProductSupplierValidation = () => {
         .coerce
         .date()
         .nullish(),
-      bidName: z
+      comments: z
         .string()
         .nullish(),
     })
@@ -188,7 +188,7 @@ const useProductSupplierValidation = () => {
         .date()
         .optional()
         .nullable(),
-      bidName: z
+      comments: z
         .string()
         .max(255, 'Max length of bid name is 255')
         .optional()
