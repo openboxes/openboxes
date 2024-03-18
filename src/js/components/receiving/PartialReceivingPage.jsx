@@ -495,6 +495,7 @@ class PartialReceivingPage extends Component {
 
     const payload = {
       ...formValues,
+      recipient: formValues.recipient.id,
       containers: getReceivingPayloadContainers(formValues),
     };
     return apiClient.post(url, flattenRequest(payload));
@@ -598,7 +599,7 @@ class PartialReceivingPage extends Component {
         return { ...line, quantityRemaining };
       }));
 
-    // Join old rows with the new rows coming from modal
+    // Concat old rows with the new rows coming from modal
     return formValues.containers.map((container, idx) => ({
       ...container,
       shipmentItems: _.sortBy(
