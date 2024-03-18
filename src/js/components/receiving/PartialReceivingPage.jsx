@@ -24,7 +24,6 @@ import { formatProductDisplayName, getReceivingPayloadContainers } from 'utils/f
 import Select from 'utils/Select';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
-
 const isReceived = (subfield, fieldValue) => {
   if (!fieldValue) {
     return false;
@@ -39,7 +38,7 @@ const isReceived = (subfield, fieldValue) => {
     return true;
   }
 
-  return _.every(fieldValue && fieldValue.shipmentItems, item =>
+  return _.every(fieldValue && fieldValue.shipmentItems, (item) =>
     _.toInteger(item.quantityReceived) + _.toInteger(item.quantityCanceled) >=
       _.toInteger(item.quantityShipped));
 };
@@ -53,8 +52,8 @@ const isReceiving = (subfield, fieldValue) => {
     return false;
   }
 
-  return _.every(fieldValue && fieldValue.shipmentItems, item => (!_.isNil(item.quantityReceiving) && item.quantityReceiving !== '') || isReceived(true, item))
-    && _.some(fieldValue && fieldValue.shipmentItems, item => !_.isNil(item.quantityReceiving) && item.quantityReceiving !== '');
+  return _.every(fieldValue && fieldValue.shipmentItems, (item) => (!_.isNil(item.quantityReceiving) && item.quantityReceiving !== '') || isReceived(true, item))
+    && _.some(fieldValue && fieldValue.shipmentItems, (item) => !_.isNil(item.quantityReceiving) && item.quantityReceiving !== '');
 };
 
 const isIndeterminate = (subfield, fieldValue) => {
@@ -66,8 +65,8 @@ const isIndeterminate = (subfield, fieldValue) => {
     return false;
   }
 
-  return _.some(fieldValue && fieldValue.shipmentItems, item => !_.isNil(item.quantityReceiving) && item.quantityReceiving !== '')
-    && _.some(fieldValue && fieldValue.shipmentItems, item => (_.isNil(item.quantityReceiving) || item.quantityReceiving === '') && !isReceived(true, item));
+  return _.some(fieldValue && fieldValue.shipmentItems, (item) => !_.isNil(item.quantityReceiving) && item.quantityReceiving !== '')
+    && _.some(fieldValue && fieldValue.shipmentItems, (item) => (_.isNil(item.quantityReceiving) || item.quantityReceiving === '') && !isReceived(true, item));
 };
 
 const isAnyItemSelected = (containers) => {
@@ -75,7 +74,7 @@ const isAnyItemSelected = (containers) => {
     return false;
   }
 
-  return _.some(containers, cont => _.size(cont.shipmentItems) && _.some(cont.shipmentItems, item => !_.isNil(item.quantityReceiving) && item.quantityReceiving !== ''));
+  return _.some(containers, (cont) => _.size(cont.shipmentItems) && _.some(cont.shipmentItems, (item) => !_.isNil(item.quantityReceiving) && item.quantityReceiving !== ''));
 };
 
 const TABLE_FIELDS = {
@@ -125,31 +124,32 @@ const TABLE_FIELDS = {
                 autofillLines(values, !value, rowIndex);
               }
             }}
-          />),
+          />
+        ),
       },
       'parentContainer.name': {
         fieldKey: '',
-        type: params => (!params.subfield ? <LabelField {...params} /> : null),
+        type: (params) => (!params.subfield ? <LabelField {...params} /> : null),
         label: 'react.partialReceiving.packLevel1.label',
         defaultMessage: 'Pack level 1',
         flexWidth: '1',
         attributes: {
-          formatValue: fieldValue => (_.get(fieldValue, 'parentContainer.name') || _.get(fieldValue, 'container.name') || 'Unpacked'),
+          formatValue: (fieldValue) => (_.get(fieldValue, 'parentContainer.name') || _.get(fieldValue, 'container.name') || 'Unpacked'),
           showValueTooltip: true,
         },
       },
       'container.name': {
         fieldKey: '',
-        type: params => (!params.subfield ? <LabelField {...params} /> : null),
+        type: (params) => (!params.subfield ? <LabelField {...params} /> : null),
         label: 'react.partialReceiving.packLevel2.label',
         defaultMessage: 'Pack level 2',
         flexWidth: '1',
         attributes: {
-          formatValue: fieldValue => (_.get(fieldValue, 'parentContainer.name') ? _.get(fieldValue, 'container.name') || '' : ''),
+          formatValue: (fieldValue) => (_.get(fieldValue, 'parentContainer.name') ? _.get(fieldValue, 'container.name') || '' : ''),
         },
       },
       'product.productCode': {
-        type: params => (params.subfield ? <LabelField {...params} /> : null),
+        type: (params) => (params.subfield ? <LabelField {...params} /> : null),
         label: 'react.partialReceiving.code.label',
         defaultMessage: 'Code',
         headerAlign: 'left',
@@ -159,7 +159,7 @@ const TABLE_FIELDS = {
         },
       },
       product: {
-        type: params => (params.subfield ? <LabelField {...params} /> : null),
+        type: (params) => (params.subfield ? <LabelField {...params} /> : null),
         label: 'react.partialReceiving.product.label',
         defaultMessage: 'Product',
         headerAlign: 'left',
@@ -174,31 +174,32 @@ const TABLE_FIELDS = {
         }),
       },
       lotNumber: {
-        type: params => (params.subfield ? <LabelField {...params} /> : null),
+        type: (params) => (params.subfield ? <LabelField {...params} /> : null),
         label: 'react.partialReceiving.lotSerialNo.label',
         defaultMessage: 'Lot/Serial No.',
         flexWidth: '1',
       },
       expirationDate: {
-        type: params => (params.subfield ? <LabelField {...params} /> : null),
+        type: (params) => (params.subfield ? <LabelField {...params} /> : null),
         label: 'react.partialReceiving.expirationDate.label',
         defaultMessage: 'Expiration date',
         flexWidth: '1',
       },
       binLocation: {
-        type: params => (
+        type: (params) => (
           params.subfield ?
-            <SelectField {...params} /> :
-            <Select
-              disabled={!params.hasBinLocationSupport ||
+            <SelectField {...params} /> : (
+              <Select
+                disabled={!params.hasBinLocationSupport ||
               params.shipmentReceived || isReceived(false, params.fieldValue)}
-              options={params.bins}
-              onChange={value => params.setLocation(params.rowIndex, value)}
-              valueKey="id"
-              labelKey="name"
-              className="select-xs"
-              clearable={false}
-            />),
+                options={params.bins}
+                onChange={(value) => params.setLocation(params.rowIndex, value)}
+                valueKey="id"
+                labelKey="name"
+                className="select-xs"
+                clearable={false}
+              />
+            )),
         fieldKey: '',
         flexWidth: '2',
         label: 'react.partialReceiving.binLocation.label',
@@ -217,7 +218,7 @@ const TABLE_FIELDS = {
         },
       },
       'recipient.name': {
-        type: params => (params.subfield ? <LabelField {...params} /> : null),
+        type: (params) => (params.subfield ? <LabelField {...params} /> : null),
         label: 'react.partialReceiving.recipient.label',
         defaultMessage: 'Recipient',
         headerAlign: 'left',
@@ -228,28 +229,28 @@ const TABLE_FIELDS = {
         },
       },
       quantityShipped: {
-        type: params => (params.subfield ? <LabelField {...params} /> : null),
+        type: (params) => (params.subfield ? <LabelField {...params} /> : null),
         label: 'react.partialReceiving.shipped.label',
         defaultMessage: 'Shipped',
         flexWidth: '1',
         attributes: {
-          formatValue: value => (value ? (value.toLocaleString('en-US')) : value),
+          formatValue: (value) => (value ? (value.toLocaleString('en-US')) : value),
         },
       },
       quantityReceived: {
-        type: params => (params.subfield ? <LabelField {...params} /> : null),
+        type: (params) => (params.subfield ? <LabelField {...params} /> : null),
         label: 'react.partialReceiving.received.label',
         defaultMessage: 'Received',
         flexWidth: '1',
         attributes: {
-          formatValue: value => (value ? value.toLocaleString('en-US') : '0'),
+          formatValue: (value) => (value ? value.toLocaleString('en-US') : '0'),
         },
         getDynamicAttr: ({ hasPartialReceivingSupport }) => ({
           hide: !hasPartialReceivingSupport,
         }),
       },
       quantityRemaining: {
-        type: params => (params.subfield ? <LabelField {...params} /> : null),
+        type: (params) => (params.subfield ? <LabelField {...params} /> : null),
         label: 'react.partialReceiving.toReceive.label',
         defaultMessage: 'To receive',
         fieldKey: '',
@@ -274,7 +275,7 @@ const TABLE_FIELDS = {
         }),
       },
       quantityReceiving: {
-        type: params => (params.subfield ? <TextField {...params} /> : null),
+        type: (params) => (params.subfield ? <TextField {...params} /> : null),
         fieldKey: '',
         label: 'react.partialReceiving.receivingNow.label',
         defaultMessage: 'Receiving now',
@@ -287,7 +288,7 @@ const TABLE_FIELDS = {
         }),
       },
       edit: {
-        type: params => (params.subfield ? <EditLineModal {...params} wrapperClassName="edit-button-cell" /> : null),
+        type: (params) => (params.subfield ? <EditLineModal {...params} wrapperClassName="edit-button-cell" /> : null),
         fieldKey: '',
         flexWidth: '0.9',
         label: '',
@@ -309,7 +310,7 @@ const TABLE_FIELDS = {
         }),
       },
       comment: {
-        type: params => (params.subfield ? <TextField {...params} /> : null),
+        type: (params) => (params.subfield ? <TextField {...params} /> : null),
         fieldKey: '',
         flexWidth: '1',
         label: 'react.partialReceiving.comment.label',
@@ -404,6 +405,7 @@ class PartialReceivingPage extends Component {
     this.saveEditLine = this.saveEditLine.bind(this);
     this.exportTemplate = this.exportTemplate.bind(this);
     this.importTemplate = this.importTemplate.bind(this);
+    this.rewriteQuantitiesAfterSave = this.rewriteQuantitiesAfterSave.bind(this);
   }
 
   componentDidMount() {
@@ -421,7 +423,7 @@ class PartialReceivingPage extends Component {
   }
 
   onSubmit(formValues) {
-    const containers = _.map(formValues.containers, container => ({
+    const containers = _.map(formValues.containers, (container) => ({
       ...container,
       shipmentItems: _.chain(container.shipmentItems)
         .map((item) => {
@@ -433,7 +435,7 @@ class PartialReceivingPage extends Component {
 
           return item;
         })
-        .filter(item => !_.isNil(item.quantityReceiving) && item.quantityReceiving !== '').value(),
+        .filter((item) => !_.isNil(item.quantityReceiving) && item.quantityReceiving !== '').value(),
     }));
     const { values } = this.state;
     values.containers = containers;
@@ -453,7 +455,7 @@ class PartialReceivingPage extends Component {
       const containers = update(this.state.values.containers, {
         [rowIndex]: {
           shipmentItems: {
-            $apply: items => (!items ? [] : items.map((item) => {
+            $apply: (items) => (!items ? [] : items.map((item) => {
               if (isReceived(true, item)) {
                 return item;
               }
@@ -493,6 +495,7 @@ class PartialReceivingPage extends Component {
 
     const payload = {
       ...formValues,
+      recipient: formValues.recipient.id,
       containers: getReceivingPayloadContainers(formValues),
     };
     return apiClient.post(url, flattenRequest(payload));
@@ -540,9 +543,9 @@ class PartialReceivingPage extends Component {
 
       if (_.isNil(parentIndex)) {
         containers = update(values.containers, {
-          $apply: items => (!items ? [] : items.map(item => update(item, {
+          $apply: (items) => (!items ? [] : items.map((item) => update(item, {
             shipmentItems: {
-              $apply: shipmentItems => (!shipmentItems ? [] : shipmentItems.map(shipmentItem =>
+              $apply: (shipmentItems) => (!shipmentItems ? [] : shipmentItems.map((shipmentItem) =>
                 PartialReceivingPage.autofillLine(clearValue, shipmentItem))),
             },
           }))),
@@ -551,7 +554,7 @@ class PartialReceivingPage extends Component {
         containers = update(values.containers, {
           [parentIndex]: {
             shipmentItems: {
-              $apply: items => (!items ? [] : items.map(item =>
+              $apply: (items) => (!items ? [] : items.map((item) =>
                 PartialReceivingPage.autofillLine(clearValue, item))),
             },
           },
@@ -561,7 +564,7 @@ class PartialReceivingPage extends Component {
           [parentIndex]: {
             shipmentItems: {
               [rowIndex]: {
-                $apply: item => PartialReceivingPage.autofillLine(clearValue, item),
+                $apply: (item) => PartialReceivingPage.autofillLine(clearValue, item),
               },
             },
           },
@@ -575,18 +578,70 @@ class PartialReceivingPage extends Component {
     }
   }
 
-  /**
+  rewriteQuantitiesAfterSave({
+    formValues,
+    editLines,
+    containerIdx,
+    fetchedContainers,
+  }) {
+    // Get new recalculated quantity remaining for lines coming from edit modal
+    const newLinesFromEdit = editLines.map((line) => {
+      const quantityRemaining = fetchedContainers[containerIdx].shipmentItems
+        .find((item) => item.shipmentItemId === line.shipmentItemId)?.quantityRemaining;
+      return { ...line, quantityRemaining };
+    });
+
+    // Get new recalculated quantity remaining for the currently existing rows
+    const containersWithRecalculatedQuantityRemaining = formValues.containers.map((container) =>
+      container.shipmentItems.map((line) => {
+        const quantityRemaining = fetchedContainers[containerIdx].shipmentItems
+          .find((item) => item.shipmentItemId === line.shipmentItemId)?.quantityRemaining;
+        return { ...line, quantityRemaining };
+      }));
+
+    // Concat old rows with the new rows coming from modal
+    return formValues.containers.map((container, idx) => ({
+      ...container,
+      shipmentItems: _.sortBy(
+        containerIdx === idx
+          ? [
+            ..._.drop(newLinesFromEdit, 1),
+            ...containersWithRecalculatedQuantityRemaining[containerIdx],
+          ]
+          : container.shipmentItems,
+        ['shipmentItemId', 'quantityReceiving'],
+      ),
+    }));
+  }
+
+  /*
    * Saves changes made in edit line modal and updates data.
    * @param {object} editLines
    * @param {number} parentIndex
    * @public
    */
-  saveEditLine(editLines, parentIndex) {
-    const formValues = {
+  saveEditLine(editLines, parentIndex, formValues) {
+    this.props.showSpinner();
+    const editedLinesToSave = {
       ...this.state.values,
       containers: [{ ...this.state.values.containers[parentIndex], shipmentItems: editLines }],
     };
-    this.save(formValues);
+    this.saveValues(editedLinesToSave)
+      .then((response) => {
+        const containers = this.rewriteQuantitiesAfterSave({
+          formValues,
+          editLines,
+          containerIdx: parentIndex,
+          fetchedContainers: response.data.data.containers,
+        });
+        this.setState({
+          values: parseResponse({
+            ...response.data.data,
+            containers,
+          }),
+        });
+      })
+      .finally(() => this.props.hideSpinner());
   }
 
   exportTemplate() {
@@ -605,9 +660,9 @@ class PartialReceivingPage extends Component {
      * */
     const valuesWithoutDisplayNames = {
       ...values,
-      containers: values?.containers?.map?.(container => ({
+      containers: values?.containers?.map?.((container) => ({
         ...container,
-        shipmentItems: container?.shipmentItems?.map?.(item => _.omit(item, 'product.displayNames')),
+        shipmentItems: container?.shipmentItems?.map?.((item) => _.omit(item, 'product.displayNames')),
       })),
     };
     apiClient.post(url, flattenRequest(valuesWithoutDisplayNames))
@@ -665,7 +720,7 @@ class PartialReceivingPage extends Component {
     return (
       <div>
         <Form
-          onSubmit={values => this.onSubmit(values)}
+          onSubmit={(values) => this.onSubmit(values)}
           validate={validate}
           autofillLines={this.autofillLines}
           mutators={{
@@ -688,7 +743,10 @@ class PartialReceivingPage extends Component {
                         <Translate id="react.partialReceiving.autofillQuantities.label" defaultMessage="Autofill quantities" />
                       </button>
                       <button type="button" className="btn btn-outline-secondary float-right btn-form btn-xs" disabled={!isAnyItemSelected(values.containers) || values.shipmentStatus === 'RECEIVED'} onClick={() => this.saveAndExit(values)}>
-                        <span><i className="fa fa-sign-out pr-2" /><Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" /></span>
+                        <span>
+                          <i className="fa fa-sign-out pr-2" />
+                          <Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" />
+                        </span>
                       </button>
                       <button type="button" className="btn btn-outline-secondary float-right btn-form btn-xs" disabled={!isAnyItemSelected(values.containers) || values.shipmentStatus === 'RECEIVED'} onClick={() => this.save(values)}>
                         <Translate id="react.default.button.save.label" defaultMessage="Save" />
@@ -698,7 +756,8 @@ class PartialReceivingPage extends Component {
                         className="btn btn-outline-secondary btn-xs mr-3"
                         onClick={() => this.exportTemplate()}
                       >
-                        <span><i className="fa fa-upload pr-2" />
+                        <span>
+                          <i className="fa fa-upload pr-2" />
                           <Translate id="react.default.button.exportTemplate.label" defaultMessage="Export template" />
                         </span>
                       </button>
@@ -706,7 +765,8 @@ class PartialReceivingPage extends Component {
                         htmlFor="csvInput"
                         className="btn btn-outline-secondary btn-xs mr-3"
                       >
-                        <span><i className="fa fa-download pr-2" />
+                        <span>
+                          <i className="fa fa-download pr-2" />
                           <Translate id="react.default.button.importTemplate.label" defaultMessage="Import template" />
                         </span>
                         <input
@@ -753,7 +813,7 @@ class PartialReceivingPage extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   hasBinLocationSupport: state.session.currentLocation.hasBinLocationSupport,
   partialReceivingTranslationsFetched: state.session.fetchedTranslations.partialReceiving,
   hasPartialReceivingSupport: state.session.currentLocation.hasPartialReceivingSupport,
