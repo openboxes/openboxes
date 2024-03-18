@@ -14,6 +14,7 @@ import grails.gorm.transactions.Transactional
 import grails.plugins.csv.CSVWriter
 import grails.plugins.quartz.GrailsJobClassConstants
 import org.apache.commons.lang.StringEscapeUtils
+import org.grails.buffer.StreamCharBuffer
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementItem
 import org.pih.warehouse.auth.AuthService
@@ -166,9 +167,10 @@ class ReportController {
         Boolean hasRoleFinance = userService.hasRoleFinance(AuthService.getCurrentUser())
         Location location = Location.get(session.warehouse.id)
         List<BinLocationItem> binLocations = inventoryService.getQuantityByBinLocation(location)
-        List<String> products = binLocations.collect { it.product.productCode }.unique()
+        int productCount = binLocations.groupBy { it.product?.productCode }.size()
         List<Map> binLocationsEntries = binLocations.collect {
             BigDecimal unitCost = hasRoleFinance ? (it.product?.pricePerUnit ?: 0.0) : null
+            BigDecimal totalValue = hasRoleFinance ? (it.quantity * unitCost) : null
             Product product = Product.findByProductCode(it.product.productCode)
             [
                     productCode   : it.product.productCode,
@@ -178,7 +180,7 @@ class ReportController {
                     binLocation   : it?.binLocation?.name ?: "Default Bin",
                     quantity      : formatNumber(number: it.quantity),
                     unitCost      : hasRoleFinance ? formatNumber(number: unitCost) : null,
-                    totalValue    : hasRoleFinance ? formatNumber(number: it.quantity * unitCost) : null
+                    totalValue    : hasRoleFinance ? formatNumber(number: totalValue) : null,
             ]
         }
 
@@ -190,7 +192,7 @@ class ReportController {
             return
         }
 
-        render([elapsedTime: (System.currentTimeMillis() - startTime), binLocationCount: binLocationsEntries.size(), productCount: products.size(), binLocations: binLocationsEntries] as JSON)
+        render([elapsedTime: (System.currentTimeMillis() - startTime), binLocationCount: binLocationsEntries.size(), productCount: productCount, binLocations: binLocationsEntries] as JSON)
     }
 
     def exportDemandReport() {
