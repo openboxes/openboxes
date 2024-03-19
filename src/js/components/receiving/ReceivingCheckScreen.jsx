@@ -354,6 +354,7 @@ class ReceivingCheckScreen extends Component {
 
     const payload = {
       ...formValues,
+      recipient: formValues?.recipient?.id,
       containers: getReceivingPayloadContainers(formValues),
     };
 

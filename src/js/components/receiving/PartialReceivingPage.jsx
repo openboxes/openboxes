@@ -495,7 +495,7 @@ class PartialReceivingPage extends Component {
 
     const payload = {
       ...formValues,
-      recipient: formValues.recipient.id,
+      recipient: formValues?.recipient?.id,
       containers: getReceivingPayloadContainers(formValues),
     };
     return apiClient.post(url, flattenRequest(payload));
@@ -702,6 +702,7 @@ class PartialReceivingPage extends Component {
     const payload = {
       receiptStatus: 'CHECKING',
       ...formValues,
+      recipient: formValues?.recipient?.id,
       containers: getReceivingPayloadContainers(formValues),
     };
 

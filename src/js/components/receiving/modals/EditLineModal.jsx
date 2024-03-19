@@ -122,21 +122,33 @@ class EditLineModal extends Component {
     });
   }
 
+  // Erase receiving quantity when shipped quantity is equal to 0
+  eraseReceivingQuantity(items) {
+    return items.map((item) => {
+      if (!_.parseInt(item.quantityShipped)) {
+        return { ...item, quantityReceiving: null };
+      }
+
+      return item;
+    });
+  }
+
   /**
    * Sends all changes made by user in this modal to API and updates data.
    * @param {object} values
    * @public
    */
   onSave(values) {
-    if (_.some(values.lines, (line) => {
+    const lines = this.eraseReceivingQuantity(values.lines);
+    if (_.some(lines, (line) => {
       const oldItem = _.find(this.state.formValues.lines, item => line.product
         && line.product.id === item.product.id && line.lotNumber === item.lotNumber);
 
       return oldItem && oldItem.quantityOnHand && oldItem.expirationDate !== line.expirationDate;
     })) {
-      this.confirmInventoryItemExpirationDateUpdate(() => this.save(values));
+      this.confirmInventoryItemExpirationDateUpdate(() => this.save({ ...values, lines }));
     } else {
-      this.save(values);
+      this.save({ ...values, lines });
     }
   }
 
