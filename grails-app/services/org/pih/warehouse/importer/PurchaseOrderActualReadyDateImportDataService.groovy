@@ -31,17 +31,6 @@ class PurchaseOrderActualReadyDateImportDataService implements ImportDataService
             OrderItem orderItem
             Product product
 
-            // Order item validation
-            if (!params["orderItemId"]) {
-                command.errors.reject("Row ${index + 1}: 'Order item' is required")
-            }
-
-            if (params["orderItemId"]) {
-                orderItem = OrderItem.get(params['orderItemId'])
-                if (!orderItem) {
-                    command.errors.reject("Row ${index + 1}: order item with id '${params["orderItemId"]}' does not exists")
-                }
-            }
 
             // Product validation
             if (!params["productCode"]) {
@@ -52,27 +41,53 @@ class PurchaseOrderActualReadyDateImportDataService implements ImportDataService
                 if (!product) {
                     command.errors.reject("Row ${index + 1}: product with code '${params["productCode"]}' does not exists")
                 }
-
-                if (product && orderItem && orderItem.product.id != product.id) {
-                    command.errors.reject("Row ${index + 1}: Product code'${params["productCode"]}' is incorrect for order item ${orderItem.id}")
-                }
             }
 
             // Order Number validation
             if (!params["orderNumber"]) {
                 command.errors.reject("Row ${index + 1}: 'orderNumber' is required")
             }
-
             if (params["orderNumber"]) {
                 order = Order.findByOrderNumber(params["orderNumber"])
                 if (!order) {
                     command.errors.reject("Row ${index + 1}: order with Order Number '${params["orderNumber"]}' does not exists")
                 }
+            }
 
-                if (order && orderItem && orderItem.order.id != order.id) {
-                    command.errors.reject("Row ${index + 1}: Order Number '${params["orderNumber"]}' is incorrect for order item ${orderItem.id}")
+            // Order item validation
+            if (params["orderItemId"]) {
+                orderItem = OrderItem.get(params['orderItemId'])
+                if (!orderItem) {
+                    command.errors.reject("Row ${index + 1}: order item with id '${params["orderItemId"]}' does not exists")
                 }
             }
+
+            if (!params["orderItemId"] && order && product) {
+                List<OrderItem> matchedOrderItems = OrderItem.findAllByOrderAndProduct(order, product)
+                if (matchedOrderItems.size() > 1) {
+                    command.errors.reject("""
+                        Row ${index + 1}: there are multiple order items with product '${product.productCode}' on order ${order.id}.
+                        To differentiate between multiple order items sharing the same product within the same order, please include the order item id to each entry.
+                    """)
+                }
+                if (!matchedOrderItems) {
+                    command.errors.reject("Row ${index + 1}: Order Item with product ${params["productCode"]} does not exist on order '${params["orderNumber"]}'")
+                }
+                if (matchedOrderItems.size() == 1) {
+                    orderItem = matchedOrderItems.first();
+                }
+            }
+
+            // Validate that order matches order item
+            if (orderItem && order && orderItem.order.id != order.id) {
+                command.errors.reject("Row ${index + 1}: Order Number '${params["orderNumber"]}' is incorrect for order item ${orderItem.id}")
+            }
+
+            // Validate that product matches order item
+            if (orderItem && product && orderItem.product.id != product.id) {
+                command.errors.reject("Row ${index + 1}: Product code '${params["productCode"]}' is incorrect for order item ${orderItem.id}")
+            }
+
 
             // Actual Ready Date validation
             if (!params["actualReadyDate"]) {
