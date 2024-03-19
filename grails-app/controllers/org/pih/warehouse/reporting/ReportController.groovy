@@ -14,7 +14,6 @@ import grails.gorm.transactions.Transactional
 import grails.plugins.csv.CSVWriter
 import grails.plugins.quartz.GrailsJobClassConstants
 import org.apache.commons.lang.StringEscapeUtils
-import org.grails.buffer.StreamCharBuffer
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementItem
 import org.pih.warehouse.auth.AuthService
