@@ -31,18 +31,6 @@ class PurchaseOrderActualReadyDateImportDataService implements ImportDataService
             OrderItem orderItem
             Product product
 
-            // Order Number validation
-            if (!params["orderNumber"]) {
-                command.errors.reject("Row ${index + 1}: 'orderNumber' is required")
-            }
-
-            if (params["orderNumber"]) {
-                order = Order.findByOrderNumber(params["orderNumber"])
-                if (!order) {
-                    command.errors.reject("Row ${index + 1}: order with Order Number '${params["orderNumber"]}' does not exists")
-                }
-            }
-
             // Product validation
             if (!params["productCode"]) {
                 command.errors.reject("Row ${index + 1}: 'productCode' is required")
@@ -62,6 +50,22 @@ class PurchaseOrderActualReadyDateImportDataService implements ImportDataService
                 orderItem = OrderItem.get(params['orderItemId'])
                 if (!orderItem) {
                     command.errors.reject("Row ${index + 1}: order item with id '${params["orderItemId"]}' does not exists")
+                }
+            }
+
+            // Order Number validation
+            if (!params["orderNumber"]) {
+                command.errors.reject("Row ${index + 1}: 'orderNumber' is required")
+            }
+
+            if (params["orderNumber"]) {
+                order = Order.findByOrderNumber(params["orderNumber"])
+                if (!order) {
+                    command.errors.reject("Row ${index + 1}: order with Order Number '${params["orderNumber"]}' does not exists")
+                }
+
+                if (order && orderItem && orderItem.order.id != order.id) {
+                    command.errors.reject("Row ${index + 1}: Order Number '${params["orderNumber"]}' is incorrect for order item ${orderItem.id}")
                 }
             }
 
