@@ -16,9 +16,11 @@ import grails.plugins.quartz.GrailsJobClassConstants
 import org.apache.commons.lang.StringEscapeUtils
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementItem
+import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.importer.CSVUtils
+import org.pih.warehouse.inventory.BinLocationItem
 import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.order.OrderItem
@@ -161,10 +163,13 @@ class ReportController {
     def exportBinLocation() {
         long startTime = System.currentTimeMillis()
         log.info "Export by bin location " + params
+        Boolean hasRoleFinance = userService.hasRoleFinance(AuthService.getCurrentUser())
         Location location = Location.get(session.warehouse.id)
-        List binLocations = inventoryService.getQuantityByBinLocation(location)
-        def products = binLocations.collect { it.product.productCode }.unique()
-        binLocations = binLocations.collect {
+        List<BinLocationItem> binLocations = inventoryService.getQuantityByBinLocation(location)
+        int productCount = binLocations.groupBy { it.product?.productCode }.size()
+        List<Map> binLocationsEntries = binLocations.collect {
+            BigDecimal unitCost = hasRoleFinance ? (it.product?.pricePerUnit ?: 0.0) : null
+            BigDecimal totalValue = hasRoleFinance ? (it.quantity * unitCost) : null
             Product product = Product.findByProductCode(it.product.productCode)
             [
                     productCode   : it.product.productCode,
@@ -173,20 +178,20 @@ class ReportController {
                     expirationDate: it.inventoryItem.expirationDate,
                     binLocation   : it?.binLocation?.name ?: "Default Bin",
                     quantity      : formatNumber(number: it.quantity),
-                    unitCost      : formatNumber(number: it.unitCost),
-                    totalValue     : formatNumber(number: it.totalValue)
+                    unitCost      : hasRoleFinance ? formatNumber(number: unitCost) : null,
+                    totalValue    : hasRoleFinance ? formatNumber(number: totalValue) : null,
             ]
         }
 
         if (params.downloadFormat == "csv") {
-            String csv = ReportUtil.getCsvForListOfMapEntries(binLocations)
+            String csv = ReportUtil.getCsvForListOfMapEntries(binLocationsEntries)
             def filename = "Bin Locations - ${location.name}.csv"
             response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
             render(contentType: "text/csv", text: csv)
             return
         }
 
-        render([elapsedTime: (System.currentTimeMillis() - startTime), binLocationCount: binLocations.size(), productCount: products.size(), binLocations: binLocations] as JSON)
+        render([elapsedTime: (System.currentTimeMillis() - startTime), binLocationCount: binLocationsEntries.size(), productCount: productCount, binLocations: binLocationsEntries] as JSON)
     }
 
     def exportDemandReport() {
