@@ -61,7 +61,7 @@ const useProductSupplierForm = () => {
           value: productSupplier?.product?.id,
           label: `${productSupplier?.product?.productCode} - ${productSupplier?.product?.name}`,
         },
-        legacyCode: productSupplier?.legacyCode ?? undefined,
+        productCode: productSupplier?.productCode ?? undefined,
         supplier: productSupplier?.supplier
           ? {
             id: productSupplier?.supplier?.id,
@@ -134,7 +134,7 @@ const useProductSupplierForm = () => {
         } : undefined,
         validityStartDate: defaultPreferenceType?.validityStartDate ?? undefined,
         validityEndDate: defaultPreferenceType?.validityEndDate ?? undefined,
-        bidName: defaultPreferenceType?.bidName ?? undefined,
+        comments: defaultPreferenceType?.comments ?? undefined,
       },
     };
   };
