@@ -31,16 +31,6 @@ class PurchaseOrderActualReadyDateImportDataService implements ImportDataService
             OrderItem orderItem
             Product product
 
-            // Product validation
-            if (!params["productCode"]) {
-                command.errors.reject("Row ${index + 1}: 'productCode' is required")
-            }
-            if (params["orderNumber"]) {
-                product = Product.findByProductCode(params["productCode"])
-                if (!product) {
-                    command.errors.reject("Row ${index + 1}: product with code '${params["productCode"]}' does not exists")
-                }
-            }
             // Order item validation
             if (!params["orderItemId"]) {
                 command.errors.reject("Row ${index + 1}: 'Order item' is required")
@@ -50,6 +40,21 @@ class PurchaseOrderActualReadyDateImportDataService implements ImportDataService
                 orderItem = OrderItem.get(params['orderItemId'])
                 if (!orderItem) {
                     command.errors.reject("Row ${index + 1}: order item with id '${params["orderItemId"]}' does not exists")
+                }
+            }
+
+            // Product validation
+            if (!params["productCode"]) {
+                command.errors.reject("Row ${index + 1}: 'productCode' is required")
+            }
+            if (params["orderNumber"]) {
+                product = Product.findByProductCode(params["productCode"])
+                if (!product) {
+                    command.errors.reject("Row ${index + 1}: product with code '${params["productCode"]}' does not exists")
+                }
+
+                if (product && orderItem && orderItem.product.id != product.id) {
+                    command.errors.reject("Row ${index + 1}: Product code'${params["productCode"]}' is incorrect for order item ${orderItem.id}")
                 }
             }
 
