@@ -11,9 +11,12 @@ package org.pih.warehouse.importer
 
 import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.product.Product
+
+import java.text.ParseException
 
 @Transactional
 class PurchaseOrderActualReadyDateImportDataService implements ImportDataService {
@@ -66,6 +69,14 @@ class PurchaseOrderActualReadyDateImportDataService implements ImportDataService
             if (!params["actualReadyDate"]) {
                 command.errors.reject("Row ${index + 1}: 'Actual Ready Date' is required")
             }
+            if (params["actualReadyDate"]) {
+                try {
+                    Date.parse(Constants.EXPIRATION_DATE_FORMAT, params["actualReadyDate"])
+                } catch(ParseException) {
+                    command.errors.reject("Row ${index + 1}: Could not parse date ${params['actualReadyDate']} on 'Actual Ready Date'. Expected date format: ${Constants.EXPIRATION_DATE_FORMAT}")
+                }
+            }
+
         }
     }
 
