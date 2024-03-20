@@ -585,11 +585,17 @@ class PartialReceivingPage extends Component {
     editLinesIndex,
     parentIndex,
   }) {
+    // Get list of shipment items from all of containers
     const flattenedShipmentItems = formValues.containers.reduce((acc, container) => [
       ...acc,
       ...container.shipmentItems,
     ], []);
 
+    // Calculate index of line items coming from modal. When there are
+    // more than one container, the index is relative to the container, so as an example:
+    // There are two container: First has 3 shipment items, second has 2. When we are
+    // adding new lines to the second container at second index, the "editLinesIndex" is 2,
+    // so we have to add sizes of previous containers.
     const getContainerEditLineIndex = formValues.containers.reduce((acc, container, idx) => {
       if (idx < parentIndex) {
         return acc + container.shipmentItems.length;
@@ -598,26 +604,33 @@ class PartialReceivingPage extends Component {
       return acc;
     }, 0) + editLinesIndex;
 
+    // Get list of shipment items from all containers. It's fetched data with actual quantities etc.
     const flattenedFetchedShipmentItems = fetchedContainers.reduce((acc, container) => [
       ...acc,
       container.shipmentItems,
     ], []);
 
+    // Concatenated values from first table part (lines after those coming from modal),
+    // with those lines from modal and with values after that lines.
     const newTableValue = [
       ..._.take(flattenedShipmentItems, getContainerEditLineIndex),
       ...editLines,
       ..._.takeRight(
         flattenedShipmentItems,
-        flattenedShipmentItems.length - getContainerEditLineIndex - 1
+        flattenedShipmentItems.length - getContainerEditLineIndex - 1,
       ),
     ];
 
+    // Updating line items in the table. All values are taken from fetched
+    // items (updating all quantities) except the quantityReceiving which determines
+    // whether the line should be checked
     const rewroteTableValue = _.zip(newTableValue, _.flatten(flattenedFetchedShipmentItems))
       .map(([shipmentItem, fetchedShipmentItem]) => ({
         ...fetchedShipmentItem,
         quantityReceiving: shipmentItem?.quantityReceiving,
       }));
 
+    // Splitting values into containers
     const { shipmentItems } = fetchedContainers.reduce((acc, container) => ({
       shipmentItems: [
         ...acc.shipmentItems,
