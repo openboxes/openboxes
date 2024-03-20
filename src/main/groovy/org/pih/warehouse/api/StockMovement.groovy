@@ -512,4 +512,17 @@ class StockMovement implements Validateable{
         // The requisition status has to be lower than PICKING (so comparing them will return -1)
         return requisition?.approvalRequired && origin?.approvalRequired && RequisitionStatus.compare(requisition.status, RequisitionStatus.PICKING) == -1
     }
+
+    // Function for checking if user in exact location can edit request
+    // (with required approval)
+    Boolean canUserEdit(String userId, Location location) {
+        User user = User.get(userId)
+        Boolean isUserRequestor = user.id == requestedBy?.id
+        Boolean isLocationOrigin = origin?.id == location?.id
+        Boolean isLocationDestination = destination?.id == location?.id
+        return (isUserRequestor &&
+                requisition?.status == RequisitionStatus.PENDING_APPROVAL &&
+                (isLocationDestination || isLocationOrigin)) ||
+                (requisition?.status == RequisitionStatus.APPROVED && isLocationOrigin)
+    }
 }
