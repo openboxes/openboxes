@@ -495,7 +495,7 @@ class PartialReceivingPage extends Component {
 
     const payload = {
       ...formValues,
-      recipient: formValues.recipient.id,
+      recipient: formValues?.recipient?.id,
       containers: getReceivingPayloadContainers(formValues),
     };
     return apiClient.post(url, flattenRequest(payload));
@@ -581,36 +581,67 @@ class PartialReceivingPage extends Component {
   rewriteQuantitiesAfterSave({
     formValues,
     editLines,
-    containerIdx,
     fetchedContainers,
+    editLinesIndex,
+    parentIndex,
   }) {
-    // Get new recalculated quantity remaining for lines coming from edit modal
-    const newLinesFromEdit = editLines.map((line) => {
-      const quantityRemaining = fetchedContainers[containerIdx].shipmentItems
-        .find((item) => item.shipmentItemId === line.shipmentItemId)?.quantityRemaining;
-      return { ...line, quantityRemaining };
-    });
+    // Get list of shipment items from all of containers
+    const flattenedShipmentItems = formValues.containers.reduce((acc, container) => [
+      ...acc,
+      ...container.shipmentItems,
+    ], []);
 
-    // Get new recalculated quantity remaining for the currently existing rows
-    const containersWithRecalculatedQuantityRemaining = formValues.containers.map((container) =>
-      container.shipmentItems.map((line) => {
-        const quantityRemaining = fetchedContainers[containerIdx].shipmentItems
-          .find((item) => item.shipmentItemId === line.shipmentItemId)?.quantityRemaining;
-        return { ...line, quantityRemaining };
+    // Calculate index of line items coming from modal. When there are
+    // more than one container, the index is relative to the container, so as an example:
+    // There are two container: First has 3 shipment items, second has 2. When we are
+    // adding new lines to the second container at second index, the "editLinesIndex" is 2,
+    // so we have to add sizes of previous containers.
+    const getContainerEditLineIndex = formValues.containers.reduce((acc, container, idx) => {
+      if (idx < parentIndex) {
+        return acc + container.shipmentItems.length;
+      }
+
+      return acc;
+    }, 0) + editLinesIndex;
+
+    // Get list of shipment items from all containers. It's fetched data with actual quantities etc.
+    const flattenedFetchedShipmentItems = fetchedContainers.reduce((acc, container) => [
+      ...acc,
+      container.shipmentItems,
+    ], []);
+
+    // Concatenated values from first table part (lines after those coming from modal),
+    // with those lines from modal and with values after that lines.
+    const newTableValue = [
+      ..._.take(flattenedShipmentItems, getContainerEditLineIndex),
+      ...editLines,
+      ..._.takeRight(
+        flattenedShipmentItems,
+        flattenedShipmentItems.length - getContainerEditLineIndex - 1,
+      ),
+    ];
+
+    // Updating line items in the table. All values are taken from fetched
+    // items (updating all quantities) except the quantityReceiving which determines
+    // whether the line should be checked
+    const rewroteTableValue = _.zip(newTableValue, _.flatten(flattenedFetchedShipmentItems))
+      .map(([shipmentItem, fetchedShipmentItem]) => ({
+        ...fetchedShipmentItem,
+        quantityReceiving: shipmentItem?.quantityReceiving,
       }));
 
-    // Concat old rows with the new rows coming from modal
+    // Splitting values into containers
+    const { shipmentItems } = fetchedContainers.reduce((acc, container) => ({
+      shipmentItems: [
+        ...acc.shipmentItems,
+        _.slice(rewroteTableValue, acc.startIndex, acc.startIndex + container.shipmentItems.length),
+      ],
+      startIndex: acc.startIndex + container.shipmentItems.length,
+    }), { shipmentItems: [], startIndex: 0 });
+
     return formValues.containers.map((container, idx) => ({
       ...container,
-      shipmentItems: _.sortBy(
-        containerIdx === idx
-          ? [
-            ..._.drop(newLinesFromEdit, 1),
-            ...containersWithRecalculatedQuantityRemaining[containerIdx],
-          ]
-          : container.shipmentItems,
-        ['shipmentItemId', 'quantityReceiving'],
-      ),
+      shipmentItems: shipmentItems[idx],
     }));
   }
 
@@ -620,7 +651,7 @@ class PartialReceivingPage extends Component {
    * @param {number} parentIndex
    * @public
    */
-  saveEditLine(editLines, parentIndex, formValues) {
+  saveEditLine(editLines, parentIndex, formValues, rowIndex) {
     this.props.showSpinner();
     const editedLinesToSave = {
       ...this.state.values,
@@ -631,8 +662,9 @@ class PartialReceivingPage extends Component {
         const containers = this.rewriteQuantitiesAfterSave({
           formValues,
           editLines,
-          containerIdx: parentIndex,
+          parentIndex,
           fetchedContainers: response.data.data.containers,
+          editLinesIndex: rowIndex,
         });
         this.setState({
           values: parseResponse({
@@ -702,6 +734,7 @@ class PartialReceivingPage extends Component {
     const payload = {
       receiptStatus: 'CHECKING',
       ...formValues,
+      recipient: formValues?.recipient?.id,
       containers: getReceivingPayloadContainers(formValues),
     };
 
