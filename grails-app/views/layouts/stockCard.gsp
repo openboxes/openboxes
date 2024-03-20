@@ -98,10 +98,10 @@
 				},
                 ajaxOptions: {
                     error: function(xhr, status, index, anchor) {
-                        let errorMessage = "Error loading tab: " + xhr.status + " " + xhr.statusText;
+                        var errorMessage = "Error loading tab: " + xhr.status + " " + xhr.statusText;
                         // Attempt to get more detailed error message
                     	if (xhr.responseText) {
-                    	    const json = JSON.parse(xhr.responseText);
+                    	    var json = JSON.parse(xhr.responseText);
                     	    if (json.errorMessage) {
 								errorMessage = json.errorMessage
 							}
