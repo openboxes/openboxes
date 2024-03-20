@@ -14,6 +14,7 @@ import grails.gorm.transactions.Transactional
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
+import org.pih.warehouse.order.OrderService
 import org.pih.warehouse.product.Product
 
 import java.text.ParseException
@@ -21,22 +22,22 @@ import java.text.ParseException
 @Transactional
 class PurchaseOrderActualReadyDateImportDataService implements ImportDataService {
     GrailsApplication grailsApplication
+    OrderService orderService
 
     @Override
     void validateData(ImportDataCommand command) {
-        log.info "Validate data " + command.filename
+        log.info "Validate data ${command.filename}"
 
         command.data.eachWithIndex { params, index ->
             Order order
             OrderItem orderItem
             Product product
 
-
             // Product validation
             if (!params["productCode"]) {
                 command.errors.reject("Row ${index + 1}: 'productCode' is required")
             }
-            if (params["orderNumber"]) {
+            if (params["productCode"]) {
                 product = Product.findByProductCode(params["productCode"])
                 if (!product) {
                     command.errors.reject("Row ${index + 1}: product with code '${params["productCode"]}' does not exists")
@@ -106,7 +107,22 @@ class PurchaseOrderActualReadyDateImportDataService implements ImportDataService
 
     @Override
     void importData(ImportDataCommand command) {
-        log.info "Import data " + command.filename
+        log.info "Import data ${command.filename}"
 
+        command.data.each { params ->
+
+            OrderItem orderItem = params['orderItemId'] ? OrderItem.get(params['orderItemId']) : null
+
+            if (!orderItem) {
+                orderItem = orderService.getOrderItemByOrderAndProduct(params['orderNumber'], params['productCode'])
+            }
+
+            if (!orderItem) {
+                throw new IllegalArgumentException("Order Item is not found")
+            }
+
+            orderItem.actualReadyDate = Date.parse(Constants.EXPIRATION_DATE_FORMAT, params["actualReadyDate"])
+            orderItem.save(failOnError: true)
+        }
     }
 }
