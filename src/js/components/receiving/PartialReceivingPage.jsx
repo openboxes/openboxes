@@ -581,36 +581,54 @@ class PartialReceivingPage extends Component {
   rewriteQuantitiesAfterSave({
     formValues,
     editLines,
-    containerIdx,
     fetchedContainers,
+    editLinesIndex,
+    parentIndex,
   }) {
-    // Get new recalculated quantity remaining for lines coming from edit modal
-    const newLinesFromEdit = editLines.map((line) => {
-      const quantityRemaining = fetchedContainers[containerIdx].shipmentItems
-        .find((item) => item.shipmentItemId === line.shipmentItemId)?.quantityRemaining;
-      return { ...line, quantityRemaining };
-    });
+    const flattenedShipmentItems = formValues.containers.reduce((acc, container) => [
+      ...acc,
+      ...container.shipmentItems,
+    ], []);
 
-    // Get new recalculated quantity remaining for the currently existing rows
-    const containersWithRecalculatedQuantityRemaining = formValues.containers.map((container) =>
-      container.shipmentItems.map((line) => {
-        const quantityRemaining = fetchedContainers[containerIdx].shipmentItems
-          .find((item) => item.shipmentItemId === line.shipmentItemId)?.quantityRemaining;
-        return { ...line, quantityRemaining };
+    const getContainerEditLineIndex = formValues.containers.reduce((acc, container, idx) => {
+      if (idx < parentIndex) {
+        return acc + container.shipmentItems.length;
+      }
+
+      return acc;
+    }, 0) + editLinesIndex;
+
+    const flattenedFetchedShipmentItems = fetchedContainers.reduce((acc, container) => [
+      ...acc,
+      container.shipmentItems,
+    ], []);
+
+    const newTableValue = [
+      ..._.take(flattenedShipmentItems, getContainerEditLineIndex),
+      ...editLines,
+      ..._.takeRight(
+        flattenedShipmentItems,
+        flattenedShipmentItems.length - getContainerEditLineIndex - 1
+      ),
+    ];
+
+    const rewroteTableValue = _.zip(newTableValue, _.flatten(flattenedFetchedShipmentItems))
+      .map(([shipmentItem, fetchedShipmentItem]) => ({
+        ...fetchedShipmentItem,
+        quantityReceiving: shipmentItem?.quantityReceiving,
       }));
 
-    // Concat old rows with the new rows coming from modal
+    const { shipmentItems } = fetchedContainers.reduce((acc, container) => ({
+      shipmentItems: [
+        ...acc.shipmentItems,
+        _.slice(rewroteTableValue, acc.startIndex, acc.startIndex + container.shipmentItems.length),
+      ],
+      startIndex: acc.startIndex + container.shipmentItems.length,
+    }), { shipmentItems: [], startIndex: 0 });
+
     return formValues.containers.map((container, idx) => ({
       ...container,
-      shipmentItems: _.sortBy(
-        containerIdx === idx
-          ? [
-            ..._.drop(newLinesFromEdit, 1),
-            ...containersWithRecalculatedQuantityRemaining[containerIdx],
-          ]
-          : container.shipmentItems,
-        ['shipmentItemId', 'quantityReceiving'],
-      ),
+      shipmentItems: shipmentItems[idx],
     }));
   }
 
@@ -620,7 +638,7 @@ class PartialReceivingPage extends Component {
    * @param {number} parentIndex
    * @public
    */
-  saveEditLine(editLines, parentIndex, formValues) {
+  saveEditLine(editLines, parentIndex, formValues, rowIndex) {
     this.props.showSpinner();
     const editedLinesToSave = {
       ...this.state.values,
@@ -631,8 +649,9 @@ class PartialReceivingPage extends Component {
         const containers = this.rewriteQuantitiesAfterSave({
           formValues,
           editLines,
-          containerIdx: parentIndex,
+          parentIndex,
           fetchedContainers: response.data.data.containers,
+          editLinesIndex: rowIndex,
         });
         this.setState({
           values: parseResponse({

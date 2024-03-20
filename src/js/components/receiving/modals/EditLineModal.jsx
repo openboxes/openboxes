@@ -157,6 +157,7 @@ class EditLineModal extends Component {
       values.lines,
       this.state.attr.parentIndex,
       this.props.values,
+      this.props.rowIndex,
     );
   }
 
