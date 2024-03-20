@@ -29,6 +29,7 @@ import org.pih.warehouse.importer.ProductSupplierExcelImporter
 import org.pih.warehouse.importer.ProductSupplierPreferenceExcelImporter
 import org.pih.warehouse.importer.ProductAssociationExcelImporter
 import org.pih.warehouse.importer.ProductSynonymExcelImporter
+import org.pih.warehouse.importer.PurchaseOrderActualReadyDateExcelImporter
 import org.pih.warehouse.importer.TagExcelImporter
 import org.pih.warehouse.importer.UserExcelImporter
 import org.pih.warehouse.importer.UserLocationExcelImporter
@@ -188,6 +189,9 @@ class BatchController {
                             break
                         case "productSynonym":
                             dataImporter = new ProductSynonymExcelImporter(command?.filename)
+                            break
+                        case "purchaseOrderActualReadyDate":
+                            dataImporter = new PurchaseOrderActualReadyDateExcelImporter(command?.filename)
                             break
                         default:
                             command.errors.reject("importType", "${warehouse.message(code: 'import.invalidType.message', default: 'Please choose a valid import type')}")

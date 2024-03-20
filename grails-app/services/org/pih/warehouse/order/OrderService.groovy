@@ -1094,6 +1094,32 @@ class OrderService {
         }
     }
 
+    OrderItem getOrderItemByOrderAndProduct(String orderNumber, String productCode) {
+        Product product = productCode ? Product.findByProductCode(productCode) : null
+        Order order = orderNumber ? Order.findByOrderNumber(orderNumber) : null
+
+        getOrderItemByOrderAndProduct(order, product)
+    }
+
+    OrderItem getOrderItemByOrderAndProduct(Order order, Product product) {
+        if (!order) {
+            throw new IllegalArgumentException("Missing Order")
+        }
+
+        if (!product) {
+            throw new IllegalArgumentException("Missing Product")
+        }
+
+        List<OrderItem> matchedOrderItems = OrderItem.findAllByOrderAndProduct(order, product)
+
+        if (matchedOrderItems.size() > 1) {
+            throw new RuntimeException("Found more than one candidates for OrderItem")
+        }
+        if (matchedOrderItems.size() == 1) {
+            return matchedOrderItems.first();
+        }
+    }
+
     def getOrderItemSummaryList(Map params) {
         return OrderItemSummary.createCriteria().list(params) {
             if (params.orderNumber) {
