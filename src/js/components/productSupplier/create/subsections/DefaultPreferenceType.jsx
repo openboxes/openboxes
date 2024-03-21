@@ -33,8 +33,8 @@ const DefaultPreferenceType = ({
 
   const emptyPreferenceType = {
     comments: '',
-    validityStartDate: undefined,
-    validityEndDate: undefined,
+    validityStartDate: null,
+    validityEndDate: null,
     preferenceType: null,
   };
 

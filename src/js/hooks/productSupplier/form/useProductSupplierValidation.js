@@ -140,12 +140,10 @@ const useProductSupplierValidation = () => {
       })
         .nullish(),
       validityStartDate: z
-        .coerce
-        .date()
+        .string()
         .nullish(),
       validityEndDate: z
-        .coerce
-        .date()
+        .string()
         .nullish(),
       comments: z
         .string()
@@ -179,13 +177,11 @@ const useProductSupplierValidation = () => {
       })
         .required(),
       validityEndDate: z
-        .coerce
-        .date()
+        .string()
         .optional()
         .nullable(),
       validityStartDate: z
-        .coerce
-        .date()
+        .string()
         .optional()
         .nullable(),
       comments: z
@@ -227,9 +223,8 @@ const useProductSupplierValidation = () => {
         .number()
         .optional(),
       contractPriceValidUntil: z
-        .coerce
-        .date()
-        .optional(),
+        .string()
+        .nullish(),
       tieredPricing: z
         .boolean()
         .optional(),
