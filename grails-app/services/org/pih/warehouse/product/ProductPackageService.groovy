@@ -56,8 +56,6 @@ class ProductPackageService {
             productSupplier.contractPrice = new ProductPrice()
         }
         productSupplier.contractPrice.price = contractPricePrice
-        if (validUntil) {
-            productSupplier.contractPrice.toDate = validUntil
-        }
+        productSupplier.contractPrice.toDate = validUntil
     }
 }
