@@ -57,8 +57,8 @@ const PreferenceTypeVariations = ({
   const defaultTableRow = {
     destinationParty: '',
     preferenceType: '',
-    validityStartDate: undefined,
-    validityEndDate: undefined,
+    validityStartDate: null,
+    validityEndDate: null,
     comments: '',
   };
 
