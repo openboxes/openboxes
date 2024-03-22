@@ -122,7 +122,6 @@ const BasicDetails = ({ control, errors }) => {
             render={({ field }) => (
               <TextInput
                 title={{ id: 'react.productSupplier.form.supplierCode.title', defaultMessage: 'Supplier Code' }}
-                required
                 errorMessage={errors.supplierCode?.message}
                 tooltip={{
                   id: 'react.productSupplier.form.supplierCode.tooltip',
