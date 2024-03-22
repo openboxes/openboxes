@@ -867,6 +867,12 @@ class OrderService {
                     orderItem.budgetCode = budgetCode
 
                     order.addToOrderItems(orderItem)
+
+                    if (order.status >= OrderStatus.PLACED) {
+                        updateProductPackage(orderItem)
+                        updateProductUnitPrice(orderItem)
+                    }
+
                     count++
                 }
 
