@@ -56,6 +56,15 @@ const isReceiving = (subfield, fieldValue) => {
     && _.some(fieldValue && fieldValue.shipmentItems, (item) => !_.isNil(item.quantityReceiving) && item.quantityReceiving !== '');
 };
 
+const isLineDisabled = (subfield, fieldValue) => {
+  const { quantityReceiving, quantityShipped } = fieldValue;
+  if (quantityReceiving === 0 && quantityReceiving === quantityShipped) {
+    return false;
+  }
+
+  return isReceiving(subfield, fieldValue);
+};
+
 const isIndeterminate = (subfield, fieldValue) => {
   if (subfield) {
     return false;
@@ -115,7 +124,7 @@ const TABLE_FIELDS = {
           <Checkbox
             disabled={shipmentReceived || isReceived(subfield, fieldValue)}
             className={subfield ? 'ml-4' : 'mr-4'}
-            value={isReceiving(subfield, fieldValue)}
+            value={isLineDisabled(subfield, fieldValue)}
             indeterminate={isIndeterminate(subfield, fieldValue)}
             onChange={(value) => {
               if (subfield) {
@@ -285,6 +294,10 @@ const TABLE_FIELDS = {
         },
         getDynamicAttr: ({ shipmentReceived, fieldValue }) => ({
           disabled: shipmentReceived || isReceived(true, fieldValue),
+          formatValue: (val) => {
+            const { quantityShipped, quantityRemaining } = fieldValue;
+            return quantityShipped === 0 && quantityRemaining === quantityShipped ? null : val;
+          },
         }),
       },
       edit: {
