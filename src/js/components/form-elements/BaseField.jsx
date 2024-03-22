@@ -50,7 +50,7 @@ class BaseField extends Component {
 
     const attributes = {
       ...attr,
-      value: input.value,
+      value: attr.formatValue ? attr.formatValue(input.value) : input.value,
       onChange,
       onBlur,
     };
