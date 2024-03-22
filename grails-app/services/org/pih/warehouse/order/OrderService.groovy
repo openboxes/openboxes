@@ -636,23 +636,16 @@ class OrderService {
         BigDecimal packagePrice = orderItem.unitPrice * orderItem?.order?.lookupCurrentExchangeRate()
 
         // If there's no product package already or the existing one changed we create a new one (or update)
-        def uomChanged = orderItem.productPackage?.uom != orderItem.quantityUom
-        def quantityPerUomChanged = orderItem.productPackage?.quantity != orderItem.quantityPerUom
-        if (!orderItem.productPackage || uomChanged || quantityPerUomChanged) {
+        boolean uomChanged = orderItem.productPackage?.uom != orderItem.quantityUom
+        boolean quantityPerUomChanged = orderItem.productPackage?.quantity != orderItem.quantityPerUom
+        boolean productSupplierChanged = orderItem.productPackage?.productSupplier?.id != orderItem.productSupplier?.id
+
+        if (!orderItem.productPackage || productSupplierChanged || uomChanged || quantityPerUomChanged) {
             // Find an existing product package associated with a specific supplier
             ProductPackage productPackage = orderItem?.productSupplier?.productPackages.find { ProductPackage productPackage ->
                 return productPackage.product == orderItem.product &&
                         productPackage.uom == orderItem.quantityUom &&
                         productPackage.quantity == orderItem.quantityPerUom
-            }
-
-            // If not found, then we look for a product package associated with the product
-            if (!productPackage) {
-                productPackage = orderItem.product.packages.find { ProductPackage productPackage1 ->
-                    return productPackage1.product == orderItem.product &&
-                            productPackage1.uom == orderItem.quantityUom &&
-                            productPackage1.quantity == orderItem.quantityPerUom
-                }
             }
 
             // If we cannot find an existing product package, create a new one
