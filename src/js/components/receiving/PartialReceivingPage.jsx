@@ -5,6 +5,7 @@ import update from 'immutability-helper';
 import fileDownload from 'js-file-download';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
+import { confirmAlert } from 'react-confirm-alert';
 import { Form } from 'react-final-form';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
@@ -85,6 +86,15 @@ const isAnyItemSelected = (containers) => {
 
   return _.some(containers, (cont) => _.size(cont.shipmentItems) && _.some(cont.shipmentItems, (item) => !_.isNil(item.quantityReceiving) && item.quantityReceiving !== ''));
 };
+
+const emptyLinesCounter = (values) =>
+  values.containers.reduce((acc, container) => {
+    const { shipmentItems } = container;
+    if (shipmentItems.some((item) => !item.quantityReceiving && item.quantityReceiving !== 0)) {
+      return acc + 1;
+    }
+    return acc;
+  }, 0);
 
 const TABLE_FIELDS = {
   containers: {
@@ -435,28 +445,68 @@ class PartialReceivingPage extends Component {
     }
   }
 
-  onSubmit(formValues) {
-    const containers = _.map(formValues.containers, (container) => ({
+  confirmReceive(formValues, emptyLinesCount) {
+    const { translate } = this.props;
+    confirmAlert({
+      title: translate('react.partialReceiving.message.confirmReceive.label', 'Confirm receiving'),
+      message: translate(
+        'react.partialReceiving.confirmReceive.notSupportingPartialReceiving.message',
+        `You have not entered a value in the receiving quantity for ${emptyLinesCount} line/lines on this shipment. ` +
+        'These lines will be received as zero. ' +
+        'You will not be able to go back and receive them later. Do you want to continue?.',
+        {
+          count: emptyLinesCount,
+        },
+      ),
+      buttons: [
+        {
+          label: translate('react.default.yes.label', 'Yes'),
+          onClick: () => this.onSubmit(formValues),
+        },
+        {
+          label: translate('react.default.no.label', 'No'),
+        },
+      ],
+    });
+  }
+
+  buildShipmentItems(containers) {
+    if (!this.props.hasPartialReceivingSupport) {
+      return containers?.map((container) => ({
+        ...container,
+        shipmentItems: container?.shipmentItems
+          .map((item) => ({
+            ...item,
+            quantityReceiving: item.quantityReceiving ? item.quantityReceiving : 0,
+          })),
+      }));
+    }
+    return containers?.map((container) => ({
       ...container,
-      shipmentItems: _.chain(container.shipmentItems)
+      shipmentItems: container?.shipmentItems
         .map((item) => {
           if (item.receiptItemId) {
             return {
-              ...item, quantityReceiving: item.quantityReceiving ? item.quantityReceiving : 0,
+              ...item,
+              quantityReceiving: item.quantityReceiving ? item.quantityReceiving : 0,
             };
           }
-
           return item;
         })
-        .filter((item) => !_.isNil(item.quantityReceiving) && item.quantityReceiving !== '').value(),
+        .filter((item) => !_.isNil(item.quantityReceiving) && item.quantityReceiving !== ''),
     }));
-    const { values } = this.state;
-    values.containers = containers;
-    this.setState({
-      values,
-    });
+  }
 
-    this.nextPage(values);
+  onSubmit(formValues) {
+    const containers = this.buildShipmentItems(formValues.containers);
+    const { values } = this.state;
+    this.setState({
+      values: {
+        ...values,
+        containers,
+      },
+    });
+    this.nextPage({ ...values, containers });
   }
 
   /**
@@ -766,7 +816,15 @@ class PartialReceivingPage extends Component {
     return (
       <div>
         <Form
-          onSubmit={(values) => this.onSubmit(values)}
+          onSubmit={(values) => {
+            const { hasPartialReceivingSupport } = this.props;
+            const emptyLinesCount = emptyLinesCounter(values);
+            // If there are empty lines (any other value than 0 would be truthy),
+            // and the current location doesn't support partial receiving, show the confirm modal
+            return !hasPartialReceivingSupport && emptyLinesCount
+              ? this.confirmReceive(values, emptyLinesCount)
+              : this.onSubmit(values);
+          }}
           validate={validate}
           autofillLines={this.autofillLines}
           mutators={{
