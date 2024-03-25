@@ -759,6 +759,9 @@ class PartialReceivingPage extends Component {
         ...container,
         shipmentItems: container?.shipmentItems?.map?.((item) => _.omit(item, 'product.displayNames')),
       })),
+      recipient: {
+        id: values.recipient?.id,
+      },
     };
     apiClient.post(url, flattenRequest(valuesWithoutDisplayNames))
       .then((response) => {
