@@ -183,7 +183,12 @@
 
             <tr class="prop">
                 <td class="label">
-                    <label><warehouse:message code="product.pricePerUnit.label"/></label>
+                    <label title="${g.message(code: "product.lastPaid.label", default: "Last Paid")}">
+                        <g:message
+                                code="product.unitPrice.label"
+                                default="Unit Price"
+                        />
+                    </label>
                 </td>
                 <td class="value middle">
                     <g:hasRoleFinance onAccessDenied="${g.message(code:'errors.blurred.message', args: [g.message(code:'default.none.label')])}">

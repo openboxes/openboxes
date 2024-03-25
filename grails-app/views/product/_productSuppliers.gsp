@@ -32,7 +32,9 @@
 
             <th><g:message code="productPackage.price.label" default="Package Price" /></th>
 
-            <th><g:message code="product.pricePerUnit.label" default="Unit Price" /></th>
+            <th title="${g.message(code: "product.lastPaid.label", default: "Last Paid")}">
+                <g:message code="product.unitPrice.label" default="Unit Price" />
+            </th>
 
             <g:each var="attribute" in="${availableAttributes}">
                 <th>${attribute.name} (${attribute.code})</th>
