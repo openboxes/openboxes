@@ -81,8 +81,8 @@ const useProductSupplierValidation = () => {
         .required(),
       supplierCode: z
         .string({ required_error: 'Supplier code is required' })
-        .min(1, 'Supplier code is required')
-        .max(255, 'Max length of supplier code is 255'),
+        .max(255, 'Max length of supplier code is 255')
+        .optional(),
       name: z
         .string({
           required_error: translate(
