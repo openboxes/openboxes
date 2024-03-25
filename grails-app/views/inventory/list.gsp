@@ -106,7 +106,9 @@
                                 <th class="center"><warehouse:message code="inventoryLevel.maximumQuantity.label" default="inventoryLevel.maximumQuantity.label"/></th>
                                 <th class="center border-right"><warehouse:message code="inventoryLevel.currentQuantity.label" default="Current quantity"/></th>
                                 <th class="center border-right"><warehouse:message code="default.quantityAvailableToPromise.label" default="Quantity ATP"/></th>
-                                <th><warehouse:message code="product.pricePerUnit.label" default="Price per unit"/></th>
+                                <th title="${g.message(code: "product.lastPaid.label", default: "Last Paid")}">
+                                    <g:message code="product.unitPrice.label" default="Unit Price"/>
+                                </th>
                                 <th class="center"><warehouse:message code="product.totalValue.label" default="Total amount"/></th>
                             </tr>
                             </thead>

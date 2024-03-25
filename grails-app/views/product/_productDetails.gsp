@@ -98,10 +98,21 @@
                 </g:if>
                 <g:if test="${!productInstance?.productType || productInstance.productType.isFieldDisplayed(ProductField.PRICE_PER_UNIT)}">
                     <tr class="prop">
-                        <td class="name middle"><label id="pricePerUnitLabel" for="pricePerUnit"><warehouse:message
-                                code="product.pricePerUnit.label"/>
-                        <small class="fade">${grailsApplication.config.openboxes.locale.defaultCurrencyCode}</small>
-                        </label></td>
+                        <td class="name middle">
+                            <label
+                                    id="pricePerUnitLabel"
+                                    title="${g.message(code: "product.lastPaid.label", default: "Last Paid")}"
+                                    for="pricePerUnit"
+                            >
+                                <g:message
+                                    code="product.unitPrice.label"
+                                    default="Unit Price"
+                                />
+                                <small class="fade">
+                                    ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
+                                </small>
+                            </label>
+                        </td>
                         <td class="value middle ${hasErrors(bean: productInstance, field: 'pricePerUnit', 'errors')}">
                             <g:hasRoleFinance onAccessDenied="${g.message(code:'errors.userNotGrantedPermission.message', args: [session.user.username])}">
                                 <g:textField name="pricePerUnit" placeholder="Price per unit (${grailsApplication.config.openboxes.locale.defaultCurrencyCode})"
