@@ -10,6 +10,7 @@
 package org.pih.warehouse.report
 
 import grails.core.GrailsApplication
+import grails.util.GrailsWebMockUtil
 import org.apache.commons.mail.EmailException
 import org.apache.commons.validator.EmailValidator
 import org.grails.plugins.web.taglib.RenderTagLib
@@ -37,13 +38,11 @@ class NotificationService {
     def messageSource
 
     def renderTemplate(String template, Map model) {
-        // Hack to ensure that the GSP template engine has access to a request.
-        // FIXME Need to fix this when we migrate to grails 3
         def webRequest = RequestContextHolder.getRequestAttributes()
         if(!webRequest) {
             def servletContext = ServletContextHolder.getServletContext()
             def applicationContext = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext)
-            grails.util.GrailsWebUtil.bindMockWebRequest(applicationContext)
+            GrailsWebMockUtil.bindMockWebRequest(applicationContext)
         }
         return new RenderTagLib().render(template: template, model: model)
     }
