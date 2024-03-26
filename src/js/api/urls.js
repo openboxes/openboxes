@@ -32,6 +32,10 @@ export const STOCK_TRANSFER_API = `${API}/stockTransfers`;
 export const STOCK_TRANSFER_BY_ID = id => `${STOCK_TRANSFER_API}/${id}`;
 export const STOCK_TRANSFER_REMOVE_ALL_ITEMS = id => `${STOCK_TRANSFER_BY_ID(id)}/removeAllItems`;
 
+// STOCK TRANSFER ITEMS
+export const STOCK_TRANSFER_ITEM_API = `${API}/stockTransferItems`;
+export const STOCK_TRANSFER_ITEM_BY_ID = id => `${STOCK_TRANSFER_ITEM_API}/${id}`;
+
 // INVOICE
 export const INVOICE_API = `${API}/invoices`;
 export const INVOICE_ITEMS = id => `${INVOICE_API}/${id}/items`;
