@@ -90,10 +90,11 @@ const isAnyItemSelected = (containers) => {
 const emptyLinesCounter = (values) =>
   values.containers.reduce((acc, container) => {
     const { shipmentItems } = container;
-    if (shipmentItems.some((item) => !item.quantityReceiving && item.quantityReceiving !== 0)) {
-      return acc + 1;
-    }
-    return acc;
+    const amountOfEmptyLines = shipmentItems
+      .filter((item) => !item.quantityReceiving && item.quantityReceiving !== 0)
+      .length;
+
+    return acc + amountOfEmptyLines;
   }, 0);
 
 const TABLE_FIELDS = {
