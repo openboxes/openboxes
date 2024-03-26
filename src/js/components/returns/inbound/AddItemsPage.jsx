@@ -439,7 +439,7 @@ class AddItemsPage extends Component {
   }
 
   removeItem(itemId) {
-    return stockTransferApi.deleteStockTransfer(itemId)
+    return stockTransferApi.removeItem(itemId)
       .catch(() => {
         this.props.hideSpinner();
         return Promise.reject(new Error('react.inboundReturns.error.deleteOrderItem.label'));
