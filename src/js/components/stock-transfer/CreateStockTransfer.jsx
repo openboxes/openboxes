@@ -178,7 +178,7 @@ class CreateStockTransfer extends Component {
         const stockTransfer = parseResponse(response.data.data);
         this.props.hideSpinner();
 
-        this.props.history.push(STOCK_TRANSFER_URL.edit(stockTransfer.id));
+        this.props.history.push(STOCK_TRANSFER_URL.createById(stockTransfer.id));
         this.props.nextPage({ stockTransfer });
       })
       .catch(() => this.props.hideSpinner());
