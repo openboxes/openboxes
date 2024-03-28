@@ -37,7 +37,7 @@
       "required": "id",
       "allowChildren": false
     }],
-    "operator-linebreak": "off",
+    "operator-linebreak": "warn",
     "no-underscore-dangle": "off",
     "simple-import-sort/imports": [
       "error",
