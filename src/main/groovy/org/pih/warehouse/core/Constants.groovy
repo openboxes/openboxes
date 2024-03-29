@@ -154,4 +154,6 @@ class Constants {
 
     // Transaction types
     static final String ADJUSTMENT = "Adjustment"
+
+    static final String UOM_EACH_ID = "EA"
 }
