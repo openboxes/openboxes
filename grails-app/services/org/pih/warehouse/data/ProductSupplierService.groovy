@@ -208,7 +208,13 @@ class ProductSupplierService {
         if (!productSupplier) {
             productSupplier = new ProductSupplier(params)
         } else {
+            String sourceCode = productSupplier.code
             productSupplier.properties = params
+            // Do not allow to bind an empty source code, which caused the code to be re-generated for an existing product supplier (OBPIH-6288)
+            // The code could be overwritten by the binding, hence we'd like to bring back the existing code, if the one in params is null/empty
+            if (!params.code) {
+                productSupplier.code = sourceCode
+            }
         }
 
         productSupplier.ratingTypeCode = ratingTypeCode
@@ -290,7 +296,7 @@ class ProductSupplierService {
             }
         }
 
-        if (!productSupplier.code) {
+        if (!productSupplier.code && !productSupplier.id) {
             assignSourceCode(productSupplier, supplier)
         }
         return productSupplier
