@@ -489,6 +489,7 @@ class LocationService {
         def locations = Location.createCriteria().list() {
             eq("active", true)
             organization {
+                eq("active", true)
                 roles {
                     eq("roleType", RoleType.ROLE_SUPPLIER)
                 }
