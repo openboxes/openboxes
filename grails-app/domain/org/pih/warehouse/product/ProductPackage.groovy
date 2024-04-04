@@ -56,7 +56,15 @@ class ProductPackage implements Comparable<ProductPackage>, Serializable {
         description(nullable: true)
         gtin(nullable: true)
         uom(nullable: true)
-        product(nullable: true, unique: ['uom', 'quantity', 'productSupplier'])
+        product(nullable: true, validator: { Product product, ProductPackage obj ->
+            ProductPackage productPackage = findWhere(
+                    uom: obj.uom,
+                    product: product,
+                    quantity: obj.quantity,
+                    productSupplier: obj.productSupplier
+                    )
+            return !productPackage || productPackage?.id == obj?.id
+        })
         productPrice(nullable: true)
         quantity(nullable: false)
         createdBy(nullable: true)
