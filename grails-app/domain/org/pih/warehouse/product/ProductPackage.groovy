@@ -61,8 +61,9 @@ class ProductPackage implements Comparable<ProductPackage>, Serializable {
                     uom: obj.uom,
                     product: product,
                     quantity: obj.quantity,
-                    productSupplier: obj.productSupplier
-                    )
+                    productSupplier: obj.productSupplier)
+            // If the product package does not yet exist or the package that would be found is
+            // the one, that we are currently updating, the validation should pass
             return !productPackage || productPackage?.id == obj?.id
         })
         productPrice(nullable: true)
