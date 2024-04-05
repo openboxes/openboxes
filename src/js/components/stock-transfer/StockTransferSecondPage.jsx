@@ -332,8 +332,8 @@ class StockTransferSecondPage extends Component {
     const { referenceId, id } = items[indexToDelete];
 
     return items.filter((el, index) => {
-      // If it's the original line we have to delete all the children lines
-      // and the line itself
+      // If it's the original line we have to delete all the split lines
+      // coming from the original one line and the original line itself
       if (!referenceId) {
         return el.id !== id && el.referenceId !== id;
       }
