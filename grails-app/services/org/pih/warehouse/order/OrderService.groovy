@@ -648,6 +648,16 @@ class OrderService {
                         productPackage.quantity == orderItem.quantityPerUom
             }
 
+            // If not found, then we look for a product package associated with the product
+            if (!productPackage && !orderItem?.productSupplier) {
+                productPackage = orderItem.product.packages.find { ProductPackage productPackage1 ->
+                    return productPackage1.product == orderItem.product &&
+                            productPackage1.uom == orderItem.quantityUom &&
+                            productPackage1.quantity == orderItem.quantityPerUom &&
+                            !productPackage1.productSupplier
+                }
+            }
+
             // If we cannot find an existing product package, create a new one
             if (!productPackage) {
                 productPackage = new ProductPackage()
@@ -659,7 +669,7 @@ class OrderService {
                 ProductPrice productPrice = new ProductPrice()
                 productPrice.price = packagePrice
                 productPackage.productPrice = productPrice
-                productPackage.save()
+                productPackage.save(failOnError: true)
             }
             // Otherwise update the price
             else if (packagePrice > 0) {

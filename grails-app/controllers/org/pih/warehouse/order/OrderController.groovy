@@ -34,7 +34,6 @@ import org.pih.warehouse.core.User
 import org.springframework.web.multipart.MultipartFile
 import java.math.RoundingMode
 
-@Transactional
 class OrderController {
     OrderService orderService
     StockMovementService stockMovementService
@@ -220,6 +219,7 @@ class OrderController {
         redirect(controller: 'purchaseOrder', action: 'index')
     }
 
+    @Transactional
     def save() {
         def orderInstance = new Order(params)
         if (orderInstance.save(flush: true)) {
@@ -266,7 +266,7 @@ class OrderController {
         }
     }
 
-
+    @Transactional
     def update() {
         def orderInstance = Order.get(params.id)
         if (orderInstance) {
@@ -354,6 +354,7 @@ class OrderController {
         }
     }
 
+    @Transactional
     def saveAdjustment() {
         def orderInstance = Order.get(params?.order?.id)
         def currentLocation = Location.get(session?.warehouse.id)
@@ -443,6 +444,7 @@ class OrderController {
         }
     }
 
+    @Transactional
     def deleteComment() {
         def orderInstance = Order.get(params.order.id)
         if (!orderInstance) {
@@ -465,6 +467,7 @@ class OrderController {
         }
     }
 
+    @Transactional
     def saveComment() {
         log.info("params " + params)
 
@@ -521,6 +524,7 @@ class OrderController {
         }
     }
 
+    @Transactional
     def deleteDocument() {
         def orderInstance = Order.get(params.order.id)
         if (!orderInstance) {
@@ -580,6 +584,7 @@ class OrderController {
         }
     }
 
+    @Transactional
     def addOrderItemToShipment() {
 
         def orderInstance = Order.get(params?.id)
@@ -708,6 +713,7 @@ class OrderController {
         render (status: 200, text: "Successfully deleted order item")
     }
 
+    @Transactional
     def saveOrderItem() {
         Order order = Order.get(params.order.id)
         OrderItem orderItem = OrderItem.get(params.orderItem.id)
@@ -999,6 +1005,7 @@ class OrderController {
         }
     }
 
+    @Transactional
     def cancelOrderItem() {
         OrderItem orderItem = OrderItem.get(params.id)
         def canEdit = orderService.isOrderEditable(orderItem.order, session.user)
@@ -1011,6 +1018,7 @@ class OrderController {
         }
     }
 
+    @Transactional
     def restoreOrderItem() {
         OrderItem orderItem = OrderItem.get(params.id)
         def canEdit = orderService.isOrderEditable(orderItem.order, session.user)
@@ -1028,6 +1036,7 @@ class OrderController {
         render order.total
     }
 
+    @Transactional
     def cancelOrderAdjustment() {
         OrderAdjustment orderAdjustment = OrderAdjustment.get(params.id)
         User user = User.get(session?.user?.id)
@@ -1041,6 +1050,7 @@ class OrderController {
         }
     }
 
+    @Transactional
     def restoreOrderAdjustment() {
         OrderAdjustment orderAdjustment = OrderAdjustment.get(params.id)
         User user = User.get(session?.user?.id)
