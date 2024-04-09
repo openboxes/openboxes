@@ -327,7 +327,7 @@ class StockTransferSecondPage extends Component {
     this.setState({ stockTransfer });
   }
 
-  getFilteredStockTransferItems(items, indexToDelete) {
+  getItemsAfterDelete(items, indexToDelete) {
     // Reference of deleted line: (if line has referenceId it's not the original one)
     const { referenceId, id } = items[indexToDelete];
 
@@ -356,7 +356,7 @@ class StockTransferSecondPage extends Component {
           this.setState((previousState) => ({
             stockTransfer: {
               ...stockTransfer,
-              stockTransferItems: this.getFilteredStockTransferItems(
+              stockTransferItems: this.getItemsAfterDelete(
                 previousState.stockTransfer.stockTransferItems,
                 itemIndex,
               ),
