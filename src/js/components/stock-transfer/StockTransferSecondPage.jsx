@@ -327,22 +327,42 @@ class StockTransferSecondPage extends Component {
     this.setState({ stockTransfer });
   }
 
+  getItemsAfterDelete(items, indexToDelete) {
+    // Reference of deleted line: (if line has referenceId it's not the original one)
+    const { referenceId, id } = items[indexToDelete];
+
+    return items.filter((el, index) => {
+      // If it's the original line we have to delete all the split lines
+      // coming from the original one line and the original line itself
+      if (!referenceId) {
+        return el.id !== id && el.referenceId !== id;
+      }
+
+      // If it's not the original line we just deleting it
+      return index !== indexToDelete;
+    });
+  }
+
   deleteItem(itemIndex) {
     this.props.showSpinner();
 
     const itemToDelete = _.get(this.state.stockTransfer.stockTransferItems, `[${itemIndex}]`);
 
-    if (itemToDelete.id) {
+    if (itemToDelete?.id) {
       const url = `/api/stockTransferItems/${itemToDelete.id}`;
       apiClient.delete(url)
         .then((response) => {
           const stockTransfer = parseResponse(response.data.data);
-          const stockTransferItems = extractStockTransferItems(stockTransfer);
-
-          this.setState(
-            { stockTransfer: { ...stockTransfer, stockTransferItems } },
-            () => this.props.hideSpinner(),
-          );
+          this.setState((previousState) => ({
+            stockTransfer: {
+              ...stockTransfer,
+              stockTransferItems: this.getItemsAfterDelete(
+                previousState.stockTransfer.stockTransferItems,
+                itemIndex,
+              ),
+            },
+          }),
+          () => this.props.hideSpinner());
         })
         .catch(() => this.props.hideSpinner());
     } else {
