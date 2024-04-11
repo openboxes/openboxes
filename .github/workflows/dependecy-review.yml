@@ -1,0 +1,17 @@
+name: 'Dependency Review'
+on:
+  push:
+    branches: [ feature/upgrade-to-grails-3.3.10 ]
+  pull_request:
+    branches: [ feature/upgrade-to-grails-3.3.10 ]
+
+jobs:
+  dependency-review:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Checkout Repository'
+        uses: actions/checkout@v4
+      - name: 'Dependency Review'
+        uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: critical
