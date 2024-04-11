@@ -101,7 +101,7 @@
             <g:each var="substitutionItem" in="${requisitionItem.substitutionItems}">
                 <div>
                     <g:link controller="inventoryItem" action="showStockCard" id="${substitutionItem?.product?.id}">
-                        <cache:block key="${requisitionItem?.id}">
+                        <cache:block key="${substitutionItem?.id}">
                             <format:displayNameWithColor product="${substitutionItem?.product}" showTooltip="${true}" />
                             <g:renderHandlingIcons product="${substitutionItem?.product}" />
                         </cache:block>
