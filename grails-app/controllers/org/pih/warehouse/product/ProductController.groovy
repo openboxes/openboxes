@@ -689,7 +689,7 @@ class ProductController {
      * Export Synonym Template Excel
      */
     def exportSynonymTemplate() {
-        List<Map> objects = [[]]
+        List<Map> objects = [new HashMap<>()]
         // return a template with filled in product code
         if (params.productCode) {
             objects = [ ['product': [ 'productCode': params.productCode ]] ]
