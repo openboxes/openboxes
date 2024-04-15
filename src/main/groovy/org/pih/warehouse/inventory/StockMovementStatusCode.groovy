@@ -32,6 +32,9 @@ enum StockMovementStatusCode {
     CANCELED(10),
     REJECTED(10, REJECTED),
 
+    // Status on the requestor's dashboard representing verifying, checked, picking and picked
+    IN_PROGRESS(3, PENDING),
+
     int sortOrder
     StockMovementStatusCode displayStatusCode
 
