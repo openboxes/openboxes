@@ -11,10 +11,10 @@ class PersonSpec extends Specification implements DomainUnitTest<Person> {
 
     void 'Sort order'() {
         given:
-        def person1 = new Person(lastName: "Amiranda", firstName: "Austin", email: "amiranda@openboxes.com", id: 1)
-        def person2 = new Person(lastName: "Miranda", firstName: "Austin", email: "amiranda@openboxes.com", id: 2)
-        def person3 = new Person(lastName: "Miranda", firstName: "Justin", email: "amiranda@openboxes.com", id: 3)
-        def person4 = new Person(lastName: "Miranda", firstName: "Justin", email: "jmiranda@openboxes.com", id: 4)
+        Person person1 = new Person(lastName: "Amiranda", firstName: "Austin", email: "amiranda@openboxes.com", id: 1)
+        Person person2 = new Person(lastName: "Miranda", firstName: "Austin", email: "amiranda@openboxes.com", id: 2)
+        Person person3 = new Person(lastName: "Miranda", firstName: "Justin", email: "amiranda@openboxes.com", id: 3)
+        Person person4 = new Person(lastName: "Miranda", firstName: "Justin", email: "jmiranda@openboxes.com", id: 4)
 
         // Mock them in a random order to make sure sort actually does something
         mockDomain(Person, [person2, person4, person3, person1])
@@ -87,12 +87,12 @@ class PersonSpec extends Specification implements DomainUnitTest<Person> {
 
     void 'Person.toJson() should return as expected'(){
         given:
-        def person = new Person(id: id, firstName: firstName, lastName: lastName, email: email).save(validate: false)
+        Person person = new Person(id: id, firstName: firstName, lastName: lastName, email: email).save(validate: false)
 
         config.openboxes.anonymize.enabled = anonymize
 
         when:
-        def json = person.toJson()
+        Map json = person.toJson()
 
         then:
         json == [
