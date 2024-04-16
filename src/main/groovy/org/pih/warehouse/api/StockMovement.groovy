@@ -471,23 +471,34 @@ class StockMovement implements Validateable{
         ]
     }
 
+    static def getApplicationTagLib() {
+        return Holders.grailsApplication.mainContext.getBean('org.grails.plugins.web.taglib.ApplicationTagLib')
+    }
+
+    // Because this function needs to handle more than one enum, I left the argument's type as def
+    static String getTranslatedDisplayStatus(def status) {
+        return applicationTagLib.message(code: 'enum.' + status?.getClass()?.getSimpleName() + '.' + status)
+    }
+
+    // Mapping statuses for display for the requestor's dashboard
+    // We want to display all statuses from approval workflow (approved, rejected and pending approval)
+    // We want to map all statuses from depot side to "in progress".
     String getDisplayStatus() {
-        def status
         switch(requisition?.status) {
             case RequisitionStatus.APPROVED:
-                status =  StockMovementStatusCode.APPROVED
-                break
+                return getTranslatedDisplayStatus(StockMovementStatusCode.APPROVED)
             case RequisitionStatus.REJECTED:
-                status = StockMovementStatusCode.REJECTED
-                break
+                return getTranslatedDisplayStatus(StockMovementStatusCode.REJECTED)
             case RequisitionStatus.PENDING_APPROVAL:
-                status = StockMovementStatusCode.PENDING_APPROVAL
-                break
+                return getTranslatedDisplayStatus(StockMovementStatusCode.PENDING_APPROVAL)
+            case RequisitionStatus.VERIFYING:
+            case RequisitionStatus.PICKING:
+            case RequisitionStatus.PICKED:
+            case RequisitionStatus.CHECKING:
+                return getTranslatedDisplayStatus(StockMovementStatusCode.IN_PROGRESS)
             default:
-                status = shipment?.status?.code
+                return getTranslatedDisplayStatus(shipment?.status?.code)
         }
-        def g = Holders.grailsApplication.mainContext.getBean('org.grails.plugins.web.taglib.ApplicationTagLib')
-        return "${g.message(code: 'enum.' + status?.getClass()?.getSimpleName() + '.' + status)}"
     }
 
     Boolean canUserRollbackApproval(User user) {
