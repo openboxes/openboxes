@@ -6,7 +6,7 @@
     </head>
     <body>
         <div class="d-flex justify-content-center align-items-center h-100">
-            <div class="location-chooser location-chooser__login">
+            <div class="location-chooser location-chooser__login" data-testid="location-chooser-modal">
                 <div class="location-chooser__header">
                     <h2>${warehouse.message(code: 'dashboard.chooseLocation.label')}</h2>
                     <g:if test="${flash.message}">

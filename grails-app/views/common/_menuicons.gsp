@@ -1,6 +1,6 @@
 <%@page import="org.pih.warehouse.core.ActivityCode;"%>
 <div class="d-none d-${breakPoint}-flex">
-    <div class="menu-icon position-relative">
+    <div class="menu-icon position-relative" data-testid="navbar-icon" aria-label="search">
         <div class="tooltip2">
             <i class="ri-search-line" id="global-search-button"></i>
             <span class="tooltiptext2">
@@ -10,7 +10,7 @@
         <g:globalSearch buttonId="global-search-button" jsonUrl="${request.contextPath}/json/globalSearch"/>
     </div>
     <g:if test="${grailsApplication.config.openboxes.helpscout.widget.enabled}">
-    <div class="menu-icon">
+    <div class="menu-icon" data-testid="navbar-icon" aria-label="help">
         <div class="tooltip2">
             <g:if test="${grailsApplication.config.openboxes.helpscout.widget.enabled}">
                 <i class="ri-question-line" onclick="Beacon('toggle');"></i>
@@ -25,7 +25,7 @@
     </div>
     </g:if>
     <g:if test="${configurationSection}">
-    <div class="menu-icon">
+    <div class="menu-icon" data-testid="navbar-icon" aria-label="configuration">
         <div class="btn-group">
             <div class="tooltip2">
                 <i class="ri-settings-5-line dropdown-toggle"
@@ -54,7 +54,7 @@
         </div>
     </div>
     </g:if>
-    <div class="menu-icon">
+    <div class="menu-icon" data-testid="navbar-icon" aria-label="profile">
         <div class="btn-group">
             <div class="tooltip2">
                 <i class="ri-user-3-line dropdown-toggle"

@@ -21,6 +21,7 @@ const LocationChooserButton = ({ onToggle, location, envTag }) => {
     <button
       type="button"
       className="location-chooser__button"
+      aria-label="location-chooser"
       style={buttonStyle()}
       onClick={onToggle}
     >

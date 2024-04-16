@@ -123,7 +123,7 @@
 
     <!-- Header "hd" includes includes logo, global navigation -->
     <g:if test="${session?.user && session?.warehouse}">
-        <div id="main-wrapper" class="navbar navbar-expand-md navbar-light bg-light bg-white p-0 px-md-4">
+        <nav aria-label="main" id="main-wrapper" class="navbar navbar-expand-md navbar-light bg-light bg-white p-0 px-md-4">
             <div class="d-flex p-2 p-md-0 justify-content-between flex-grow-1">
                 <div class="d-flex align-items-center">
                 <g:displayLogo location="${session?.warehouse?.id}" includeLink="${true}" />
@@ -139,6 +139,7 @@
                     <button
                         class="btn-show-dialog location-chooser__button"
                         style="${locationColorVariable}"
+                        aria-label="location-chooser"
                         data-dialog-class="location-chooser"
                         data-resizable="false"
                         data-draggable="true"
@@ -173,7 +174,7 @@
             <div class="collapse navbar-collapse w-100" id="navbarToggler">
                 <g:include controller="dashboard" action="megamenu" />
             </div>
-        </div>
+        </nav>
     </g:if>
 
 
