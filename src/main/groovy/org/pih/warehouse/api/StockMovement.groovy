@@ -476,7 +476,7 @@ class StockMovement implements Validateable{
     }
 
     // Because this function needs to handle more than one enum, I left the argument's type as def
-    static String getTranslatedDisplayStatus(def status) {
+    String getTranslatedDisplayStatus(def status) {
         return applicationTagLib.message(code: 'enum.' + status?.getClass()?.getSimpleName() + '.' + status)
     }
 
