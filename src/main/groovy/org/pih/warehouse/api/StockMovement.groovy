@@ -63,6 +63,7 @@ class StockMovement implements Validateable{
 
     StockMovementDirection stockMovementDirection
     StockMovementStatusCode stockMovementStatusCode
+    StockMovementType stockMovementType
 
 
     List<StockMovementItem> lineItems =
@@ -109,6 +110,7 @@ class StockMovement implements Validateable{
 
         stockMovementDirection(nullable: true)
         stockMovementStatusCode(nullable: true)
+        stockMovementType(nullable: true)
         receiptStatusCode(nullable: true)
         dateShipped(nullable: true)
         expectedDeliveryDate(nullable: true)

@@ -1,5 +1,5 @@
 CREATE OR REPLACE VIEW stock_movement AS
-    SELECT 
+    SELECT
         r.id,
         r.name,
         r.request_number AS identifier,
@@ -42,7 +42,7 @@ CREATE OR REPLACE VIEW stock_movement AS
             LEFT JOIN
         shipment s ON s.requisition_id = r.id
             LEFT JOIN
-        (SELECT 
+        (SELECT
             requisition_id, COUNT(*) AS item_count
         FROM
             requisition_item
@@ -53,8 +53,8 @@ CREATE OR REPLACE VIEW stock_movement AS
         reference_number rn ON rn.id = sr.reference_number_id
             AND rn.reference_number_type_id = '10'
     WHERE
-        r.is_template IS FALSE 
-    UNION ALL SELECT 
+        r.is_template IS FALSE
+    UNION ALL SELECT
         o.id,
         o.name,
         o.order_number AS identifier,
@@ -77,27 +77,27 @@ CREATE OR REPLACE VIEW stock_movement AS
         s.current_status AS shipment_status,
         rn.identifier AS tracking_number,
         CASE
-            WHEN o.status IS NULL THEN 'PENDING'
-            WHEN o.status = 'PENDING' THEN 'PENDING'
-            WHEN o.status = 'PLACED' THEN 'REQUESTED'
+            WHEN o.status IS NULL THEN 'CREATED'
+            WHEN o.status = 'PENDING' THEN 'CREATED'
+            WHEN o.status = 'PLACED' THEN 'CREATED'
             WHEN o.status = 'APPROVED' THEN 'PICKING'
             WHEN o.status = 'CANCELED' THEN 'CANCELED'
-            WHEN o.status = 'PARTIALLY_RECEIVED' THEN 'DISPATCHED'
-            WHEN o.status = 'RECEIVED' THEN 'DISPATCHED'
-            WHEN o.status = 'COMPLETED' THEN 'DISPATCHED'
+            WHEN o.status = 'PARTIALLY_RECEIVED' THEN 'ISSUED'
+            WHEN o.status = 'RECEIVED' THEN 'ISSUED'
+            WHEN o.status = 'COMPLETED' THEN 'ISSUED'
             WHEN o.status = 'REJECTED' THEN 'CANCELED'
             ELSE 'PENDING'
         END AS status_code,
         NULL AS requisition_id,
         CASE
-            WHEN o.status IS NULL THEN 'PENDING'
-            WHEN o.status = 'PENDING' THEN 'PENDING'
-            WHEN o.status = 'PLACED' THEN 'REQUESTED'
+            WHEN o.status IS NULL THEN 'CREATED'
+            WHEN o.status = 'PENDING' THEN 'CREATED'
+            WHEN o.status = 'PLACED' THEN 'CREATED'
             WHEN o.status = 'APPROVED' THEN 'PICKING'
             WHEN o.status = 'CANCELED' THEN 'CANCELED'
-            WHEN o.status = 'PARTIALLY_RECEIVED' THEN 'DISPATCHED'
-            WHEN o.status = 'RECEIVED' THEN 'DISPATCHED'
-            WHEN o.status = 'COMPLETED' THEN 'DISPATCHED'
+            WHEN o.status = 'PARTIALLY_RECEIVED' THEN 'ISSUED'
+            WHEN o.status = 'RECEIVED' THEN 'ISSUED'
+            WHEN o.status = 'COMPLETED' THEN 'ISSUED'
             WHEN o.status = 'REJECTED' THEN 'CANCELED'
             ELSE 'PENDING'
         END AS status,

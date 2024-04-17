@@ -1,4 +1,4 @@
-<%@ page import="org.pih.warehouse.shipping.ShipmentStatusCode" %>
+<%@ page import="org.pih.warehouse.api.StockMovementType; org.pih.warehouse.shipping.ShipmentStatusCode" %>
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -130,7 +130,14 @@
                                 <g:message code="stockMovement.status.label"/>
                             </td>
                             <td class="value">
-                                <format:metadata obj="${stockMovement?.status ?: (stockMovement?.shipment?.status?.code ?: stockMovement?.statusCode)}"/>
+                                <g:set var="isInbound" value="${stockMovement?.destination == currentLocation}" />
+                                %{-- If it's an inbound return, we want to display a shipment status--}%
+                                <g:if test="${stockMovement?.stockMovementType == StockMovementType.RETURN_ORDER && isInbound}">
+                                    <format:metadata obj="${(stockMovement?.shipment?.status?.code ?: stockMovement?.statusCode)}"/>
+                                </g:if>
+                                <g:else>
+                                    <format:metadata obj="${stockMovement?.status ?: (stockMovement?.shipment?.status?.code ?: stockMovement?.statusCode)}"/>
+                                </g:else>
                             </td>
                         </tr>
                         <tr class="prop">
