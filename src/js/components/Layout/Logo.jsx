@@ -11,7 +11,7 @@ const Logo = ({
   logoUrl,
 }) => (
   <div className="d-flex align-items-center logo-wrapper" data-testid="logo-wrapper">
-    <div className="logo-square">
+    <div className="logo-square" aria-label="logo">
       <Link to={DASHBOARD_URL.base}>
         <img
           src={logoUrl}

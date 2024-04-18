@@ -44,7 +44,7 @@ const LocationChooserModal = ({
 
   const renderOrganizationTabs = locationGroups => (
     <Tabs className="react-tabs">
-      <TabList className="react-tabs__tab-list m-0 list-unstyled scrollbar">
+      <TabList data-testid="location-organization-list" className="react-tabs__tab-list m-0 list-unstyled scrollbar">
         {locations.map(({ organization }) => (
           <Tab
             key={`${organization}-org-tab`}
@@ -65,6 +65,7 @@ const LocationChooserModal = ({
           groups,
         }) => (
           <TabPanel
+            data-testid="location-list"
             className="react-tabs__tab-panel scrollbar w-100"
             key={`${organization}-org-panel`}
           >
@@ -80,28 +81,30 @@ const LocationChooserModal = ({
       onRequestClose={onClose}
       portalClassName="location-chooser__modal"
     >
-      <header
-        className="location-chooser__modal__header d-flex flex-row justify-content-between align-items-center"
-      >
-        <h1 className="location-chooser__modal__header__title m-0">
-          <Translate
-            id="react.dashboard.chooseLocation.label"
-            defaultMessage="Choose Location"
-          />
-        </h1>
-        <button
-          onClick={onClose}
-          type="button"
-          className="location-chooser__modal__header__close-button"
+      <div data-testid="location-chooser-modal">
+        <header
+          className="location-chooser__modal__header d-flex flex-row justify-content-between align-items-center"
         >
-          <RiCloseLine />
-        </button>
-      </header>
-      <section
-        className="location-chooser__modal__content d-flex flex-grow-1 justify-content-center"
-      >
-        {isLoading ? <Spinner /> : renderOrganizationTabs(locations)}
-      </section>
+          <h1 className="location-chooser__modal__header__title m-0">
+            <Translate
+              id="react.dashboard.chooseLocation.label"
+              defaultMessage="Choose Location"
+            />
+          </h1>
+          <button
+            onClick={onClose}
+            type="button"
+            className="location-chooser__modal__header__close-button"
+          >
+            <RiCloseLine />
+          </button>
+        </header>
+        <section
+          className="location-chooser__modal__content d-flex flex-grow-1 justify-content-center"
+        >
+          {isLoading ? <Spinner /> : renderOrganizationTabs(locations)}
+        </section>
+      </div>
     </Modal>);
 };
 LocationChooserModal.defaultProps = {

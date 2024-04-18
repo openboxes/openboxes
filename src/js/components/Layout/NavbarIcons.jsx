@@ -222,7 +222,7 @@ const NavbarIcons = ({
         {iconsList
           .filter(({ hide }) => !hide)
           .map(({ name, ...restProps }) =>
-            (<NavbarIcon key={name} {...restProps} />))}
+            (<NavbarIcon key={name} name={name} {...restProps} />))}
       </div>}
       </>
   );
