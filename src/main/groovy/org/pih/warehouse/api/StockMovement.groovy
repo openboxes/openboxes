@@ -477,7 +477,7 @@ class StockMovement implements Validateable{
 
     // Because this function needs to handle more than one enum, I left the argument's type as def
     String getTranslatedDisplayStatus(def status) {
-        return applicationTagLib.message(code: 'enum.' + status?.getClass()?.getSimpleName() + '.' + status)
+        return applicationTagLib.message(code: 'enum.' + status?.class?.simpleName + '.' + status)
     }
 
     // Mapping statuses for display for the requestor's dashboard
