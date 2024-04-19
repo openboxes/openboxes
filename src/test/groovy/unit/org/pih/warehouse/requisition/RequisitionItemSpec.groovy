@@ -59,8 +59,8 @@ class RequisitionItemSpec extends Specification implements DomainUnitTest<Requis
 
         where:
             quantity | quantityApproved || isApproved | status
-            2        | 2                || true | RequisitionItemStatus.APPROVED
-            1        | 0                || false | RequisitionItemStatus.PENDING
+            2        | 2                || true       | RequisitionItemStatus.APPROVED
+            1        | 0                || false      | RequisitionItemStatus.PENDING
     }
 
     void 'RequisitionItem.getDisplayStatus() should return: #status when item has child item and the quantity cancelled is #quantityCancelled and RequisitionItem.isChanged() is #isChanged'() {
