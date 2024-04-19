@@ -194,6 +194,37 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         }
     }
 
+    RequisitionItemStatus getDisplayStatus() {
+        if (isParentRequisitionPending()) {
+            return RequisitionItemStatus.PENDING
+        }
+
+        if (isParentRequisitionRejected()) {
+            return RequisitionItemStatus.CANCELED
+        }
+
+        if (isApproved() || parentRequisitionItem) {
+            return RequisitionItemStatus.APPROVED
+        }
+
+        if (isSubstituted()) {
+            return RequisitionItemStatus.SUBSTITUTED
+        }
+
+        if (isChanged()) {
+            return RequisitionItemStatus.CHANGED
+        }
+
+        if (isCanceled()) {
+            return RequisitionItemStatus.CANCELED
+        }
+
+        if (isCompleted()) {
+            return RequisitionItemStatus.COMPLETED
+        }
+
+        return RequisitionItemStatus.PENDING
+    }
 
     /**
      * We currently only support quantity change and substitution so there will be,
@@ -493,6 +524,13 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         return !(isApproved() || isSubstituted() || isChanged() || isCanceled())
     }
 
+    Boolean isParentRequisitionPending() {
+        return requisition.status in [RequisitionStatus.PENDING, RequisitionStatus.PENDING_APPROVAL]
+    }
+
+    Boolean isParentRequisitionRejected() {
+        return requisition.status == RequisitionStatus.REJECTED
+    }
 
     /**
      * @return true if this child requisition item's parent is canceled and the child product and product package is different from its parent
