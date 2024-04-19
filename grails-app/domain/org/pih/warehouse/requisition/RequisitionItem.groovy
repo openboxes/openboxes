@@ -181,30 +181,6 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
     def getStatus() {
         if (isApproved() || parentRequisitionItem) {
             return RequisitionItemStatus.APPROVED
-        } else if (isSubstituted()) {
-            return RequisitionItemStatus.SUBSTITUTED
-        } else if (isChanged()) {
-            return RequisitionItemStatus.CHANGED
-        } else if (isCanceled()) {
-            return RequisitionItemStatus.CANCELED
-        } else if (isCompleted()) {
-            return RequisitionItemStatus.COMPLETED
-        } else {
-            return RequisitionItemStatus.PENDING
-        }
-    }
-
-    RequisitionItemStatus getDisplayStatus() {
-        if (isParentRequisitionPending()) {
-            return RequisitionItemStatus.PENDING
-        }
-
-        if (isParentRequisitionRejected()) {
-            return RequisitionItemStatus.CANCELED
-        }
-
-        if (isApproved() || parentRequisitionItem) {
-            return RequisitionItemStatus.APPROVED
         }
 
         if (isSubstituted()) {
@@ -224,6 +200,18 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         }
 
         return RequisitionItemStatus.PENDING
+    }
+
+    RequisitionItemStatus getDisplayStatus() {
+        if (isParentRequisitionPending()) {
+            return RequisitionItemStatus.PENDING
+        }
+
+        if (isParentRequisitionRejected()) {
+            return RequisitionItemStatus.CANCELED
+        }
+
+        return getStatus()
     }
 
     /**
