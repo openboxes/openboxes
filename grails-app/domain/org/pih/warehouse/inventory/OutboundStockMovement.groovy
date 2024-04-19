@@ -20,6 +20,7 @@ import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.shipping.ShipmentStatusCode
 import org.pih.warehouse.shipping.ShipmentType
+import util.StockMovementStatusHelper
 
 class OutboundStockMovement implements Serializable, Validateable {
 
@@ -323,5 +324,18 @@ class OutboundStockMovement implements Serializable, Validateable {
     Boolean isApprovalRequired() {
         // The requisition status has to be lower than PICKING (so comparing them will return -1)
         return requisition?.approvalRequired && origin?.approvalRequired && RequisitionStatus.compare(requisition.status, RequisitionStatus.PICKING) == -1
+    }
+
+    def getDisplayStatus() {
+        StockMovementStatusHelper statusHelper = new StockMovementStatusHelper(
+                order: order,
+                shipment: shipment,
+                destination: destination,
+                origin: origin,
+                stockMovementType: stockMovementType,
+                defaultStatus: status,
+        )
+
+        return statusHelper.getDisplayStatus()
     }
 }
