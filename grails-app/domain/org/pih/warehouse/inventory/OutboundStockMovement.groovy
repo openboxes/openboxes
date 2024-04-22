@@ -229,6 +229,19 @@ class OutboundStockMovement implements Serializable, Validateable {
         return shipment?.currentStatus == ShipmentStatusCode.RECEIVED
     }
 
+    def getDisplayStatus() {
+        StockMovementStatusHelper statusHelper = new StockMovementStatusHelper(
+                order: order,
+                shipment: shipment,
+                destination: destination,
+                origin: origin,
+                stockMovementType: stockMovementType,
+                requisitionStatus: status,
+        )
+
+        return statusHelper.getDisplayStatus()
+    }
+
     Boolean isDeleteOrRollbackAuthorized(Location currentLocation) {
         Location origin = requisition?.origin?:shipment?.origin
         Location destination = requisition?.destination?:shipment?.destination

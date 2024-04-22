@@ -28,6 +28,7 @@ import org.pih.warehouse.shipping.ShipmentStatusCode
 import org.pih.warehouse.shipping.ShipmentType
 import org.pih.warehouse.auth.AuthService
 import util.ConfigHelper
+import util.StockMovementStatusHelper
 
 
 class StockMovement implements Validateable{
@@ -135,7 +136,7 @@ class StockMovement implements Validateable{
             name                : name,
             description         : description,
             statusCode          : statusCode,
-            displayStatus       : getDisplayStatus(),
+            displayStatus       : getDisplayStatus()?.name(),
             identifier          : identifier,
             origin              : [
                 id                  : origin?.id,
@@ -471,34 +472,18 @@ class StockMovement implements Validateable{
         ]
     }
 
-    static def getApplicationTagLib() {
-        return Holders.grailsApplication.mainContext.getBean('org.grails.plugins.web.taglib.ApplicationTagLib')
-    }
+    def getDisplayStatus() {
+        StockMovementStatusHelper statusHelper = new StockMovementStatusHelper(
+                order: order,
+                shipment: shipment,
+                destination: destination,
+                origin: origin,
+                stockMovementType: StockMovementType.STOCK_MOVEMENT,
+                requisitionStatus: status,
+        )
 
-    // Because this function needs to handle more than one enum, I left the argument's type as def
-    String getTranslatedDisplayStatus(def status) {
-        return applicationTagLib.message(code: 'enum.' + status?.class?.simpleName + '.' + status)
-    }
-
-    // Mapping statuses for display for the requestor's dashboard
-    // We want to display all statuses from approval workflow (approved, rejected and pending approval)
-    // We want to map all statuses from depot side to "in progress".
-    String getDisplayStatus() {
-        switch(requisition?.status) {
-            case RequisitionStatus.APPROVED:
-                return getTranslatedDisplayStatus(StockMovementStatusCode.APPROVED)
-            case RequisitionStatus.REJECTED:
-                return getTranslatedDisplayStatus(StockMovementStatusCode.REJECTED)
-            case RequisitionStatus.PENDING_APPROVAL:
-                return getTranslatedDisplayStatus(StockMovementStatusCode.PENDING_APPROVAL)
-            case RequisitionStatus.VERIFYING:
-            case RequisitionStatus.PICKING:
-            case RequisitionStatus.PICKED:
-            case RequisitionStatus.CHECKING:
-                return getTranslatedDisplayStatus(StockMovementStatusCode.IN_PROGRESS)
-            default:
-                return getTranslatedDisplayStatus(shipment?.status?.code)
-        }
+        // FIXME possible null throws an exception Property [displayStatus] of class [Stock Movement] cannot be null
+        return statusHelper?.getDisplayStatusListPage() ?: ""
     }
 
     Boolean canUserRollbackApproval(User user) {

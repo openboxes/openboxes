@@ -4,8 +4,10 @@ import org.pih.warehouse.api.StockMovementDirection
 import org.pih.warehouse.api.StockMovementType
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.inventory.StockMovementStatusCode
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderStatus
+import org.pih.warehouse.requisition.RequisitionSourceType
 import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentStatusCode
@@ -40,6 +42,11 @@ class StockMovementStatusHelper {
         return getStockMovementDirection(currentLocation) == StockMovementDirection.INBOUND
     }
 
+    boolean isOutbound() {
+        Location currentLocation = AuthService.currentLocation
+        return getStockMovementDirection(currentLocation) == StockMovementDirection.OUTBOUND
+    }
+
     boolean isReturn() {
         return stockMovementType == StockMovementType.RETURN_ORDER
     }
@@ -70,15 +77,66 @@ class StockMovementStatusHelper {
         }
     }
 
-    def getDisplayStatus() {
-        // TODO: Can be extended by another workflows (regular SMs, PO shipments etc)
+    def getDisplayStatusListPage() {
         if (isReturn()) {
             return isInbound()
                     ? getInboundReturnDisplayStatus(shipment)
                     : getOutboundReturnDisplayStatus(order)
         }
+
+        if (isInbound()) {
+            // Requests
+            // FIXME this applies for two cases (stock request dashboard) & (inbound list when we create a request)
+            // this if should apply for stock request dashboard but should not for inbound list (inb. list shoul have only shipment statuses)
+            if (shipment?.requisition?.sourceType == RequisitionSourceType.ELECTRONIC) {
+                // Approval request
+                // Mapping statuses for display for the requestor's dashboard
+                // We want to display all statuses from approval workflow (approved, rejected and pending approval)
+                if (requisitionStatus in RequisitionStatus.listApproval()) {
+                    switch(requisitionStatus) {
+                        case RequisitionStatus.APPROVED:
+                            return StockMovementStatusCode.APPROVED
+                        case RequisitionStatus.REJECTED:
+                            return StockMovementStatusCode.REJECTED
+                        case RequisitionStatus.PENDING_APPROVAL:
+                            return StockMovementStatusCode.PENDING_APPROVAL
+                    }
+                }
+
+                // Regular request
+                // We want to map all statuses from depot side to "in progress".
+                if (requisitionStatus in RequisitionStatus.listRequestOptions()) {
+                    return StockMovementStatusCode.IN_PROGRESS
+                }
+            }
+
+            return shipment?.status?.code
+        }
+
+        if (isOutbound()) {
+            return defaultStatus
+        }
+
+        return shipment?.status?.code ?: defaultStatus
+    }
+
+    def getDisplayStatus() {
+        if (isReturn()) {
+            return isInbound()
+                    ? getInboundReturnDisplayStatus(shipment)
+                    : getOutboundReturnDisplayStatus(order)
+        }
+
+        if (shipment?.isFromPurchaseOrder) {
+            return shipment?.status?.code
+        }
+
+
+        if (requisitionStatus >= RequisitionStatus.ISSUED && shipment?.hasShipped()) {
+            return shipment?.status?.code
+        }
+
+
         return defaultStatus
     }
 }
-
-

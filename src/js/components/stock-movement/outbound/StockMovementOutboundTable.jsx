@@ -230,7 +230,7 @@ const StockMovementOutboundTable = ({
     },
     {
       Header: <Translate id="react.stockMovement.column.status.label" defaultMessage="Status" />,
-      accessor: 'status',
+      accessor: 'displayStatus',
       fixed: 'left',
       width: 170,
       sortable: false,
