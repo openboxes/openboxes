@@ -181,19 +181,38 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
     def getStatus() {
         if (isApproved() || parentRequisitionItem) {
             return RequisitionItemStatus.APPROVED
-        } else if (isSubstituted()) {
-            return RequisitionItemStatus.SUBSTITUTED
-        } else if (isChanged()) {
-            return RequisitionItemStatus.CHANGED
-        } else if (isCanceled()) {
-            return RequisitionItemStatus.CANCELED
-        } else if (isCompleted()) {
-            return RequisitionItemStatus.COMPLETED
-        } else {
-            return RequisitionItemStatus.PENDING
         }
+
+        if (isSubstituted()) {
+            return RequisitionItemStatus.SUBSTITUTED
+        }
+
+        if (isChanged()) {
+            return RequisitionItemStatus.CHANGED
+        }
+
+        if (isCanceled()) {
+            return RequisitionItemStatus.CANCELED
+        }
+
+        if (isCompleted()) {
+            return RequisitionItemStatus.COMPLETED
+        }
+
+        return RequisitionItemStatus.PENDING
     }
 
+    RequisitionItemStatus getDisplayStatus() {
+        if (isParentRequisitionPending()) {
+            return RequisitionItemStatus.PENDING
+        }
+
+        if (isParentRequisitionRejected()) {
+            return RequisitionItemStatus.CANCELED
+        }
+
+        return getStatus()
+    }
 
     /**
      * We currently only support quantity change and substitution so there will be,
@@ -493,6 +512,13 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         return !(isApproved() || isSubstituted() || isChanged() || isCanceled())
     }
 
+    Boolean isParentRequisitionPending() {
+        return requisition.status in [RequisitionStatus.PENDING, RequisitionStatus.PENDING_APPROVAL]
+    }
+
+    Boolean isParentRequisitionRejected() {
+        return requisition.status == RequisitionStatus.REJECTED
+    }
 
     /**
      * @return true if this child requisition item's parent is canceled and the child product and product package is different from its parent

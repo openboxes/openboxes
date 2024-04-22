@@ -44,7 +44,7 @@
                 <format:metadata obj="${requisitionItem?.requisition?.status}"/>
             </g:elseif>
             <g:else>
-                <format:metadata obj="${requisitionItem?.status}"/>
+                <format:metadata obj="${requisitionItem?.displayStatus}"/>
             </g:else>
         </div>
     </td>
