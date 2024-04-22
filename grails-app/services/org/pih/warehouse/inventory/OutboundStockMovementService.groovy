@@ -122,6 +122,13 @@ class OutboundStockMovementService {
                     }
                 }
             } else {
+                // When we are on the outbound list, we don't want to see requests that are not submitted by the requestor
+                not {
+                    and {
+                        eq("sourceType", RequisitionSourceType.ELECTRONIC)
+                        eq("status", RequisitionStatus.CREATED)
+                    }
+                }
                 // If we are getting stock movements with default source type when approval is required
                 // we want to show stock movements just with APPROVED status
                 not {
