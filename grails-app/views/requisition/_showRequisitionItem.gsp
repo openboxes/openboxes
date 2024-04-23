@@ -29,7 +29,7 @@
         </td>
     </g:if>
     <td class="middle">
-        <div class="tag ${requisitionItem.isCanceled() || requisitionItem.isCanceledDuringPick() ? 'tag-danger' :
+        <div class="tag ${requisitionItem.isCanceled() || requisitionItem.isCanceledDuringPick() || requisitionItem.isRejected() ? 'tag-danger' :
                 requisitionItem.isSubstituted() || requisitionItem.isReduced() ? 'tag-warning' : 'tag-alert'}">
             <g:if test="${requisitionItem.isCanceled() || requisitionItem.isCanceledDuringPick()}">
                 <g:message code="enum.RequisitionItemStatus.CANCELED"/>
