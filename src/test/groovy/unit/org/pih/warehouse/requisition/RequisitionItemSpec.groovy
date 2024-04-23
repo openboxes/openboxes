@@ -25,6 +25,7 @@ class RequisitionItemSpec extends Specification implements DomainUnitTest<Requis
             requisitionStatus                   || requisitionItemStatus
             RequisitionStatus.PENDING_APPROVAL  || RequisitionItemStatus.PENDING
             RequisitionStatus.PENDING           || RequisitionItemStatus.PENDING
+            RequisitionStatus.CREATED           || RequisitionItemStatus.PENDING
             RequisitionStatus.REJECTED          || RequisitionItemStatus.CANCELED
     }
 
