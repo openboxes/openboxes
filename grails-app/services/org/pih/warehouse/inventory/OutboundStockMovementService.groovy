@@ -123,10 +123,11 @@ class OutboundStockMovementService {
                 }
             } else {
                 // When we are on the outbound list, we don't want to see requests that are not submitted by the requestor
-                not {
+                or {
+                    isNull("sourceType")
                     and {
-                        eq("sourceType", RequisitionSourceType.ELECTRONIC)
-                        eq("status", RequisitionStatus.CREATED)
+                        ne("sourceType", RequisitionSourceType.ELECTRONIC)
+                        ne("status", RequisitionStatus.CREATED)
                     }
                 }
                 // If we are getting stock movements with default source type when approval is required
