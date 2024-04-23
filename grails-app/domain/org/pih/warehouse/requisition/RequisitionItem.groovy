@@ -513,7 +513,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
     }
 
     Boolean isParentRequisitionPending() {
-        return requisition.status in [RequisitionStatus.PENDING, RequisitionStatus.PENDING_APPROVAL]
+        return requisition.status in [RequisitionStatus.CREATED, RequisitionStatus.PENDING, RequisitionStatus.PENDING_APPROVAL]
     }
 
     Boolean isParentRequisitionRejected() {
@@ -537,6 +537,10 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
 
     def isCompleted() {
         return calculatePercentageCompleted() >= 100
+    }
+
+    boolean isRejected() {
+        return requisition.status == RequisitionStatus.REJECTED
     }
 
     def isQuantityIssued() {
