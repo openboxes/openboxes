@@ -1,5 +1,5 @@
 <div id="merge-product-confirmation-dialog" class="p-2" title="${warehouse.message(code: 'product.mergeProducts.label')}">
-    <div id="merge-product-warning-message" class="message">
+    <div id="merge-product-warning-message" class="message"  aria-label="message">
       ${warehouse.message(code: 'product.mergeProducts.confirmation.warning.label')}
     </div>
   <div class="my-2">

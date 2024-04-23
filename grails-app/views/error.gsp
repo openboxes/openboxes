@@ -39,7 +39,7 @@
                             <g:renderException exception="${request.getAttribute('javax.servlet.error.exception')}" />
                         </g:elseif>
                         <g:else>
-                            <ul class="errors">
+                            <ul class="errors" role="alert" aria-label="error-message">
                                 <li>An error has occurred</li>
                                 <li>Exception: ${exception}</li>
                                 <li>Message: ${message}</li>

@@ -1,6 +1,6 @@
 <%@ page import="org.pih.warehouse.inventory.InventoryLevel" %>
 <g:hasErrors bean="${inventoryLevelInstance}">
-    <div class="errors">
+    <div class="errors" role="alert" aria-label="error-message">
         <g:renderErrors bean="${inventoryLevelInstance}" as="list" />
     </div>
 </g:hasErrors>

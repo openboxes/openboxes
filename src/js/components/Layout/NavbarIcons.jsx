@@ -82,6 +82,7 @@ const NavbarIcons = ({
             <RiSettings5Line />
           </div>
           <div
+            role="menu"
             className="dropdown-menu dropdown-menu-wrapper dropdown-menu-right nav-item padding-8"
             onMouseEnter={() => renderProps.setIsTooltipDisabled(true)}
             onMouseLeave={() => renderProps.setIsTooltipDisabled(false)}
@@ -112,6 +113,7 @@ const NavbarIcons = ({
             <RiUser3Line />
           </div>
           <div
+            role="menu"
             className="dropdown-menu dropdown-menu-wrapper dropdown-menu-right nav-item padding-8"
             onMouseEnter={() => renderProps.setIsTooltipDisabled(true)}
             onMouseLeave={() => renderProps.setIsTooltipDisabled(false)}
@@ -121,7 +123,7 @@ const NavbarIcons = ({
                 {username && username} {highestRole && `(${highestRole})`}
               </span>
               {menuItems && menuItems.map(item => (
-                <a className="dropdown-item" key={item.label} href={item.linkAction}>
+                <a role="menuitem" className="dropdown-item" key={item.label} href={item.linkAction}>
                   <span className="icon">
                     {findIcon(item.linkReactIcon)}
                   </span> {item.label}

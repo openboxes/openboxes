@@ -14,7 +14,7 @@
             	<div class="message">${flash.message}</div>
             </g:if>
             <g:hasErrors bean="${attributeInstance}">
-	            <div class="errors">
+	            <div class="errors" role="alert" aria-label="error-message">
 	                <g:renderErrors bean="${attributeInstance}" as="list" />
 	            </div>
             </g:hasErrors>

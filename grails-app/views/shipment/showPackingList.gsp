@@ -6,34 +6,34 @@
 	<title><warehouse:message code="default.edit.label" args="[entityName]" /></title>
 	<!-- Specify content to overload like global navigation links, page titles, etc. -->
 	<content tag="pageTitle"><warehouse:message code="shipping.packingList.label"/></content>
-	
+
 	<style>
 		.container { border-right: 1px solid lightgrey; background-color: f7f7f7; }
 		.newContainer { border-top: 1px solid lightgrey }
-	</style>	
+	</style>
 </head>
 
 <body>
 	<div class="body">
 		<g:if test="${flash.message}">
-			<div class="message">
+			<div class="message" role="status" aria-label="message">
 				${flash.message}
 			</div>
 		</g:if>
 		<g:hasErrors bean="${shipmentInstance}">
-			<div class="errors">
+			<div class="errors" role="alert" aria-label="error-message">
 				<g:renderErrors bean="${shipmentInstance}" as="list" />
 			</div>
-		</g:hasErrors>	
+		</g:hasErrors>
 		<table>
 			<tr>
 				<td>
-					<fieldset>						
+					<fieldset>
 						<g:render template="summary"/>
 						<g:if test="${shipmentInstance.shipmentItems}">
 							<g:set var="shipmentItemsByContainer" value="${shipmentInstance?.shipmentItems?.groupBy { it.container } }"/>
-							<div id="items" class="section">											
-								<table>		
+							<div id="items" class="section">
+								<table>
 									<tr>
 										<th><warehouse:message code="shipping.container.label"/></th>
 										<th><warehouse:message code="product.label"/></th>
@@ -50,7 +50,7 @@
 									<g:set var="previousContainer"/>
 									<g:set var="shipmentItems" value="${shipmentInstance.shipmentItems.sort()}"/>
 									<g:each var="shipmentItem" in="${shipmentItems}" status="i">
-										<g:set var="rowspan" value="${shipmentItemsByContainer[shipmentItem?.container]?.size() }"/>												
+										<g:set var="rowspan" value="${shipmentItemsByContainer[shipmentItem?.container]?.size() }"/>
 										<g:set var="newContainer" value="${previousContainer != shipmentItem?.container }"/>
 										<tr class="${(count++ % 2 == 0)?'odd':'even'} ${newContainer?'newContainer':''}">
 											<g:if test="${newContainer }">
@@ -74,10 +74,10 @@
 																${shipmentItem?.container.length} ${shipmentItem?.container?.volumeUnits}
 															</g:if>
 														</g:if>
-													</span>	
+													</span>
 												</td>
-											</g:if>												
-																								
+											</g:if>
+
 											<td>
 												<g:link controller="inventoryItem" action="showStockCard" id="${shipmentItem?.product?.id}">
 													<format:product product="${shipmentItem?.product}"/>
@@ -94,17 +94,17 @@
 											</td>
 											<g:if test="${shipmentInstance?.wasReceived()}">
                                                 ${shipmentItem?.quantityReceived() }
-											</g:if>														
+											</g:if>
 											<td>
 												${shipmentItem?.recipient?.name}
 											</td>
 										</tr>
 										<g:set var="previousContainer" value="${shipmentItem.container }"/>
 									</g:each>
-								</table>							
+								</table>
 							</div>
-						</g:if>							
-					</fieldset>		
+						</g:if>
+					</fieldset>
 				</td>
 			</tr>
 		</table>

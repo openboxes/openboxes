@@ -25,7 +25,7 @@
         <div class="warning">${raw(flash.warning)}</div>
     </g:if>
     <g:hasErrors bean="${locationInstance}">
-        <div class="errors">
+        <div class="errors" role="alert" aria-label="error-message">
             <g:renderErrors bean="${locationInstance}" as="list"/>
         </div>
     </g:hasErrors>

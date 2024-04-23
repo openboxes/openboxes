@@ -21,7 +21,7 @@
         <div id="list-role" class="box content scaffold-create" role="main">
             <h2><warehouse:message code="default.list.label" args="[entityName]" /></h2>
             <g:if test="${flash.message}">
-                <div class="message" role="status">${flash.message}</div>
+                <div class="message" role="status" aria-label="message">${flash.message}</div>
             </g:if>
             <f:table collection="${roleList}" properties="['id','name','roleType','description']" />
             <g:set var="totalCount" value="${roleCount ?: 0}"/>

@@ -9,10 +9,10 @@
 <body>
 <div class="body">
     <g:if test="${flash.message}">
-        <div class="message">${flash.message}</div>
+        <div class="message" role="status" aria-label="message">${flash.message}</div>
     </g:if>
     <g:hasErrors bean="${categoryInstance}">
-        <div class="errors"><g:renderErrors bean="${categoryInstance}" as="list" /></div>
+        <div class="errors" role="alert" aria-label="error-message"><g:renderErrors bean="${categoryInstance}" as="list" /></div>
     </g:hasErrors>
 
 

@@ -10,10 +10,10 @@
     <body>
         <div class="body">
             <g:if test="${flash.message}">
-            	<div class="message">${flash.message}</div>
+            	<div class="message" role="status" aria-label="message">${flash.message}</div>
             </g:if>
             <g:hasErrors bean="${partyInstance}">
-	            <div class="errors">
+	            <div class="errors" role="alert" aria-label="error-message">
 	                <g:renderErrors bean="${partyInstance}" as="list" />
 	            </div>
             </g:hasErrors>
@@ -30,7 +30,7 @@
 					<h2><warehouse:message code="default.edit.label" args="[entityName]" /></h2>
 					<table>
 						<tbody>
-						
+
 							<tr class="prop">
 								<td valign="top" class="name">
 								  <label for="partyType"><warehouse:message code="party.partyType.label" default="Party Type" /></label>
@@ -39,13 +39,13 @@
 									<g:select class="chzn-select-deselect" name="partyType.id" from="${org.pih.warehouse.core.PartyType.list()}" optionKey="id" value="${partyInstance?.partyType?.id}"  />
 								</td>
 							</tr>
-						
+
 							<tr class="prop">
 								<td valign="top" class="name">
 								  <label for="roles"><warehouse:message code="party.roles.label" default="Roles" /></label>
 								</td>
 								<td valign="top" class="value ${hasErrors(bean: partyInstance, field: 'roles', 'errors')}">
-									
+
 <ul>
 <g:each in="${partyInstance?.roles?}" var="r">
     <li><g:link controller="partyRole" action="show" id="${r.id}">${r}</g:link></li>
@@ -55,7 +55,7 @@
 
 								</td>
 							</tr>
-						
+
 							<tr class="prop">
 								<td valign="top"></td>
 								<td valign="top left">

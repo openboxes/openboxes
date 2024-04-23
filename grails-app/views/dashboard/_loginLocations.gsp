@@ -2,7 +2,7 @@
 
 </style>
 <g:if test="${loginLocationsMap && !loginLocationsMap.isEmpty() }">
-    <div class="tabs tabs-left">
+    <div data-testid="location-chooser-modal" class="tabs tabs-left">
         <ul class="scrollbar" data-testid="location-organization-list">
              <g:if test="${savedLocations}">
                 <li role="tab" class="organization-tab">

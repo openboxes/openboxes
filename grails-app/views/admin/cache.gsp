@@ -7,16 +7,16 @@
         <meta name="layout" content="custom" />
         <title><warehouse:message code="cache.title" default="Cache" /></title>
     </head>
-    <body>        
+    <body>
 		<div id="settings" role="main" class="yui-ga">
 
             <g:if test="${flash.message}">
-                <div class="message">${flash.message}</div>
+                <div class="message" role="status" aria-label="message">${flash.message}</div>
             </g:if>
 			<!-- the first child of a Grid needs the "first" class -->
 			<div class="yui-u first">
 
-            
+
                 <div class="box">
                     <h2><warehouse:message code="admin.cacheSettings.header" default="Cache settings"/></h2>
                     <table>

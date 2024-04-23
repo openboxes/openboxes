@@ -20,12 +20,12 @@
 				<div class="message">${flash.message}</div>
             </g:if>
             <g:hasErrors bean="${transactionInstance}">
-	            <div class="errors">
+	            <div class="errors" role="alert" aria-label="error-message">
 	                <g:renderErrors bean="${transactionInstance}" as="list" />
 	            </div>
             </g:hasErrors>
             <g:if test="${flash.errors}">
-	            <div class="errors">
+	            <div class="errors" role="alert" aria-label="error-message">
 	                <g:renderErrors bean="${flash.errors}" as="list" />
 	            </div>
             </g:if>

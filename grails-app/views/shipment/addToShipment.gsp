@@ -12,17 +12,17 @@
 
 	<div class="body">
 		<g:if test="${flash.message}">
-			<div class="message">
+			<div class="message" role="status" aria-label="message">
 				${flash.message}
 			</div>
 		</g:if>
 		<g:hasErrors bean="${flash.errors}">
-			<div class="errors">
+			<div class="errors" role="alert" aria-label="error-message">
 				<g:renderErrors bean="${flash.errors}" as="list" />
 			</div>
 		</g:hasErrors>
 		<g:hasErrors bean="${commandInstance.errors}">
-			<div class="errors">
+			<div class="errors" role="alert" aria-label="error-message">
 				<g:renderErrors bean="${commandInstance.errors}" as="list" />
 			</div>
 		</g:hasErrors>

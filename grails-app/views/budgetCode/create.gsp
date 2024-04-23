@@ -19,7 +19,7 @@
             	<div class="message">${flash.message}</div>
             </g:if>
             <g:hasErrors bean="${budgetCode}">
-	            <div class="errors">
+	            <div class="errors" role="alert" aria-label="error-message">
 	                <g:renderErrors bean="${budgetCode}" as="list" />
 	            </div>
             </g:hasErrors>
@@ -56,7 +56,7 @@
 									<g:textField class="text" size="80" name="code" value="${budgetCode?.code}" />
 								</td>
 							</tr>
-						
+
 							<tr class="prop">
 								<td valign="middle" class="name">
 									<label for="name"><warehouse:message code="budgetCode.name.label" default="Name" /></label>
@@ -65,7 +65,7 @@
 									<g:textField class="text" size="80" name="name" value="${budgetCode?.name}" />
 								</td>
 							</tr>
-						
+
 							<tr class="prop">
 								<td valign="middle" class="name">
 									<label for="description"><warehouse:message code="budgetCode.description.label" default="Description" /></label>
@@ -74,7 +74,7 @@
 									<g:textField class="text" size="80" name="description" value="${budgetCode?.description}" />
 								</td>
 							</tr>
-						
+
 							<tr class="prop">
 								<td valign="middle" class="name">
 									<label for="organization"><warehouse:message code="budgetCode.organization.label" default="Organization" /></label>
@@ -87,7 +87,7 @@
 														  class="chzn-select-deselect" />
 								</td>
 							</tr>
-						
+
 							<tr class="prop">
 								<td valign="middle"></td>
 								<td valign="middle">

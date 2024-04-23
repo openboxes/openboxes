@@ -10,7 +10,7 @@
 <body>
 	<div class="body">
 		<g:if test="${flash.message}">
-			<div class="message">
+			<div class="message" role="status" aria-label="message">
 				${flash.message}
 			</div>
 		</g:if>
