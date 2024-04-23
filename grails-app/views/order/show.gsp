@@ -17,7 +17,7 @@
     <body>
         <div class="body">
             <g:if test="${flash.message}">
-	            <div class="message">${flash.message}</div>
+	            <div class="message" role="status" aria-label="message">${flash.message}</div>
             </g:if>
             <div class="dialog">
 
@@ -25,7 +25,7 @@
                 <g:render template="summary" model="[orderInstance:orderInstance,currentState:'showOrder']"/>
 
                 <g:hasErrors bean="${orderInstance}">
-                    <div class="errors">
+                    <div class="errors" role="alert" aria-label="error-message">
                         <g:renderErrors bean="${orderInstance}" as="list" />
                     </div>
                 </g:hasErrors>

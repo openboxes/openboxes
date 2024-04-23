@@ -10,10 +10,10 @@
     <body>
         <div class="body">
             <g:if test="${flash.message}">
-            	<div class="message">${flash.message}</div>
+            	<div class="message" role="status" aria-label="message">${flash.message}</div>
             </g:if>
             <g:hasErrors bean="${documentInstance}">
-	            <div class="errors">
+	            <div class="errors" role="alert" aria-label="error-message">
 	                <g:renderErrors bean="${documentInstance}" as="list" />
 	            </div>
             </g:hasErrors>

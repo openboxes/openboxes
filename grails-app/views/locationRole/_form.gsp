@@ -26,7 +26,7 @@
                 <td valign="top" class="name">
                     <label for="location.id"><warehouse:message code="locationRole.location.label" default="Location" /></label>
                 </td>
-                <td valign="top" class="value ${hasErrors(bean: locationRoleInstance, field: 'location', 'errors')}">
+                <td data-testid="location-select" valign="top" class="value ${hasErrors(bean: locationRoleInstance, field: 'location', 'errors')}">
                     <g:selectLocation
                             class="chzn-select-deselect"
                             name="location.id"
@@ -38,7 +38,7 @@
                 <td valign="top" class="name">
                     <label for="role.id"><warehouse:message code="locationRole.role.label" default="Role" /></label>
                 </td>
-                <td valign="top" class="value ${hasErrors(bean: locationRoleInstance, field: 'role', 'errors')}">
+                <td data-testid="role-select" valign="top" class="value ${hasErrors(bean: locationRoleInstance, field: 'role', 'errors')}">
                     <g:if test="${!locationRoleInstance?.id}">
                         <g:select class="chzn-select-deselect" name="role.id" from="${org.pih.warehouse.core.Role.list()}" multiple="multiple"
                                   style="height: 30px" placeholder="words Words"

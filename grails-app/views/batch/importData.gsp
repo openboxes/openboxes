@@ -12,19 +12,19 @@
 		<div class="body">
 
 			<g:if test="${flash.message}">
-				<div class="message">
+				<div class="message" role="status" aria-label="message">
 					${flash.message}
 				</div>
 			</g:if>
 			<g:hasErrors bean="${commandInstance}">
-				<div class="errors">
+				<div class="errors" role="alert" aria-label="error-message">
                     <g:renderErrors bean="${commandInstance}" as="list" />
                 </div>
 			</g:hasErrors>
 
             <g:if test="${commandInstance?.data}">
                 <g:if test="${commandInstance?.importType == 'inventory' && commandInstance?.data?.any { it.quantity == null }}">
-                    <div class="message">
+                    <div class="message" role="status" aria-label="message">
                         <warehouse:message code="import.blankQuantities.label" />
                     </div>
                 </g:if>

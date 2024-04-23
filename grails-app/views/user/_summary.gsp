@@ -19,7 +19,7 @@
                 </td>
                 <td class="top right">
                     <div class="right">
-                        <span class="tag">
+                        <span class="tag" aria-label="active-status">
                             ${userInstance?.active ? warehouse.message(code:'user.active.label') : warehouse.message(code:'user.inactive.label')}
                         </span>
                     </div>

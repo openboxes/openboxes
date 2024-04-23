@@ -12,15 +12,15 @@
 
 	<div class="body">
 		<g:if test="${flash.message}">
-			<div class="message">
+			<div class="message" role="status" aria-label="message">
 				${flash.message}
 			</div>
 		</g:if>
 		<g:hasErrors bean="${shipmentInstance}">
-			<div class="errors">
+			<div class="errors" role="alert" aria-label="error-message">
 				<g:renderErrors bean="${shipmentInstance}" as="list" />
 			</div>
-		</g:hasErrors>	
+		</g:hasErrors>
 
 		<div class="dialog">
 			<g:form action="saveEvent" method="POST">

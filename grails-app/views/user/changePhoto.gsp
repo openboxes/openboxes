@@ -13,7 +13,7 @@
 	<div class="body">
 
 		<g:if test="${flash.message}">
-			<div class="message">
+			<div class="message" role="status" aria-label="message">
 				${flash.message}
 			</div>
 		</g:if>
@@ -43,22 +43,22 @@
 									<div class="buttons left">
 										<input class="positive"
 											type="submit"
-											value="${warehouse.message(code:'default.button.upload.label')}" />									
-										&nbsp;	
+											value="${warehouse.message(code:'default.button.upload.label')}" />
+										&nbsp;
 										<g:link class="show" action="show" id="${userInstance?.id}">
 											${warehouse.message(code: 'default.button.cancel.label')}
 										</g:link>
 									</div>
-	
+
 								</td>
 							</tr>
-	
+
 						</tbody>
 					</table>
 				</div>
 			</fieldset>
 		</g:form>
-		
+
 	</div>
 </body>
 </html>

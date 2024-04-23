@@ -94,6 +94,7 @@ const LocationChooserModal = ({
           <button
             onClick={onClose}
             type="button"
+            aria-label="close"
             className="location-chooser__modal__header__close-button"
           >
             <RiCloseLine />

@@ -77,7 +77,7 @@
         </div>
     </g:if>
     <g:if test="${session.impersonateUserId}">
-        <div class="impersonate-box d-flex justify-content-between align-items-center">
+        <div class="impersonate-box d-flex justify-content-between align-items-center" role="alert">
             <div class="info d-flex align-items-center">
                 <i class="ri-shield-user-line"></i>
                 <span>
@@ -399,6 +399,9 @@
                         .removeClass("ui-icon")
                         .addClass("ri-close-line")
                         .empty();
+
+                $(".ui-dialog-titlebar-close")
+                        .attr('aria-label', 'close');
             },
             close: function(event, ui) {
               if (reload) {

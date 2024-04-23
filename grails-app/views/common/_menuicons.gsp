@@ -33,7 +33,7 @@
                    aria-haspopup="true"
                    aria-expanded="false">
                 </i>
-                <div class="dropdown-menu dropdown-menu-right nav-item padding-8 margin-top-18">
+                <div role="menu" class="dropdown-menu dropdown-menu-right nav-item padding-8 margin-top-18">
                     <div class="dropdown-menu-subsections conf-subsections">
                         <g:each in="${configurationSection?.subsections}" var="subsection">
                             <div class="padding-8">
@@ -62,16 +62,16 @@
                    aria-haspopup="true"
                    aria-expanded="false">
                 </i>
-                <div class="dropdown-menu dropdown-menu-right nav-item padding-8 margin-top-18">
+                <div role="menu" class="dropdown-menu dropdown-menu-right nav-item padding-8 margin-top-18">
                     <span class="subsection-title">${session?.user?.username} (<g:userRole user="${session?.user}"/>)</span>
-                    <g:link controller="user" action="edit" id="${session?.user?.id }" class="dropdown-item">
+                    <g:link role="menuitem" controller="user" action="edit" id="${session?.user?.id }" class="dropdown-item">
                         <span class="icon">
                             <i class="ri-user-3-line"></i>
                         </span>
                         <g:message code="default.edit.label" args="[g.message(code:'user.profile.label')]" />
                     </g:link>
                     <g:if test="${session?.useDebugLocale}">
-                        <g:link controller="user" action="disableLocalizationMode" class="dropdown-item">
+                        <g:link role="menuitem" controller="user" action="disableLocalizationMode" class="dropdown-item">
                             <span class="icon">
                                 <i class="ri-map-pin-line"></i>
                             </span>
@@ -79,20 +79,20 @@
                         </g:link>
                     </g:if>
                     <g:else>
-                        <g:link controller="user" action="enableLocalizationMode" class="dropdown-item">
+                        <g:link role="menuitem" controller="user" action="enableLocalizationMode" class="dropdown-item">
                             <span class="icon">
                                 <i class="ri-map-pin-line"></i>
                             </span>
                             ${warehouse.message(code:'localization.enable.label', default: 'Enable translation mode')}
                         </g:link>
                     </g:else>
-                    <g:link controller="dashboard" action="flushCache" class="dropdown-item">
+                    <g:link role="menuitem" controller="dashboard" action="flushCache" class="dropdown-item">
                         <span class="icon">
                             <i class="ri-refresh-line"></i>
                         </span>
                         ${warehouse.message(code:'cache.flush.label', default: 'Refresh caches')}
                     </g:link>
-                    <g:link controller="auth" action="logout" class="dropdown-item">
+                    <g:link role="menuitem" controller="auth" action="logout" class="dropdown-item">
                         <span class="icon">
                             <i class="ri-login-box-line"></i>
                         </span>
