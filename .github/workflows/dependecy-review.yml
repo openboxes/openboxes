@@ -21,3 +21,5 @@ jobs:
           # from failing, but still, all the critical vulnerabilities will be listed.
           # https://docs.npmjs.com/cli/v8/configuring-npm/package-json#overrides
           warn-only: true
+          base-ref: ${{ github.event.pull_request.base.sha || 'feature/upgrade-to-grails-3.3.10' }}
+          head-ref: ${{ github.event.pull_request.head.sha || github.ref }}
