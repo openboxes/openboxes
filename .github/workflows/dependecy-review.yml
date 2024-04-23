@@ -1,7 +1,5 @@
 name: 'Dependency Review'
 on:
-  push:
-    branches: [ feature/upgrade-to-grails-3.3.10 ]
   pull_request:
     branches: [ feature/upgrade-to-grails-3.3.10 ]
 
