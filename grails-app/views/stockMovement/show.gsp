@@ -461,18 +461,15 @@
                         <tr class="prop">
                             <td class="name">
                                 <warehouse:message code="stockMovement.dateShipped.label"/>
-                                <g:if test="${stockMovement?.shipment?.status?.code==org.pih.warehouse.shipping.ShipmentStatusCode.PENDING}">
-                                    <small><warehouse:message code="default.expected.label"/></small>
-                                </g:if>
                             </td>
                             <td class="value">
-                                <g:if test="${stockMovement?.dateShipped}">
+                                <g:if test="${stockMovement?.shipment?.hasShipped()}">
                                     <span title="${g.formatDate(date:stockMovement?.dateShipped)}">
                                         <g:formatDate format="MMMM dd, yyyy" date="${stockMovement?.dateShipped}"/>
                                     </span>
-                                    <g:if test="${stockMovement?.shipment?.createdBy}">
+                                    <g:if test="${stockMovement?.shipment?.shippedBy || stockMovement?.shipment?.createdBy}">
                                         <warehouse:message code="default.by.label"/>
-                                        ${stockMovement?.shipment?.createdBy?.name}
+                                        ${stockMovement?.shipment?.shippedBy ?: stockMovement?.shipment?.createdBy}
                                     </g:if>
                                 </g:if>
                                 <g:else>

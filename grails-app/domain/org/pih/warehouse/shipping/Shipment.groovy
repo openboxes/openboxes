@@ -412,6 +412,11 @@ class Shipment implements Comparable, Serializable {
         return null
     }
 
+    User getShippedBy() {
+        Event shippedEvent = events?.find { it.eventType?.eventCode == EventCode.SHIPPED }
+        return shippedEvent?.createdBy
+    }
+
 
     Event getMostRecentEvent() {
         if (events && events.size() > 0) {
