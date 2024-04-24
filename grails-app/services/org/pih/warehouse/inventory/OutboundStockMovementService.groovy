@@ -126,7 +126,7 @@ class OutboundStockMovementService {
                 or {
                     isNull("sourceType")
                     and {
-                        ne("sourceType", RequisitionSourceType.ELECTRONIC)
+                        eq("sourceType", RequisitionSourceType.ELECTRONIC)
                         ne("status", RequisitionStatus.CREATED)
                     }
                 }
