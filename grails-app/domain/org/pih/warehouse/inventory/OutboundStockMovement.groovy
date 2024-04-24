@@ -230,22 +230,15 @@ class OutboundStockMovement implements Serializable, Validateable {
         return shipment?.currentStatus == ShipmentStatusCode.RECEIVED
     }
 
-    def getDisplayStatus() {
+    @Deprecated
+    Map<String, String> getDisplayStatus() {
         StockMovementContext stockMovementContext = new StockMovementContext(
                 order: order,
                 requisition: requisition,
                 shipment: shipment
         )
-        StockMovementStatusHelper statusHelper = new StockMovementStatusHelper(
-                order: order,
-                shipment: shipment,
-                destination: destination,
-                origin: origin,
-                stockMovementType: stockMovementType,
-                requisitionStatus: status,
-        )
-
-        return statusHelper.getDisplayStatus()
+        Enum status = StockMovementStatusHelper.getStatus(stockMovementContext)
+        return StockMovementStatusHelper.getStatusMetaData(status)
     }
 
     Boolean isDeleteOrRollbackAuthorized(Location currentLocation) {
@@ -345,16 +338,4 @@ class OutboundStockMovement implements Serializable, Validateable {
         return requisition?.approvalRequired && origin?.approvalRequired && RequisitionStatus.compare(requisition.status, RequisitionStatus.PICKING) == -1
     }
 
-    def getDisplayStatus() {
-        StockMovementStatusHelper statusHelper = new StockMovementStatusHelper(
-                order: order,
-                shipment: shipment,
-                destination: destination,
-                origin: origin,
-                stockMovementType: stockMovementType,
-                defaultStatus: status,
-        )
-
-        return statusHelper.getDisplayStatus()
-    }
 }

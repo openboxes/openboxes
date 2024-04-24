@@ -29,7 +29,6 @@ import org.pih.warehouse.shipping.ShipmentType
 import org.pih.warehouse.auth.AuthService
 import util.ConfigHelper
 import util.StockMovementContext
-import util.StockMovementDisplayStatusUtil
 import util.StockMovementStatusHelper
 
 
@@ -476,14 +475,15 @@ class StockMovement implements Validateable{
         ]
     }
 
-    Map getDisplayStatus() {
+    @Deprecated
+    Map<String, String> getDisplayStatus() {
         StockMovementContext stockMovementContext = new StockMovementContext(
                 order: order,
                 requisition: requisition,
                 shipment: shipment
         )
-        Enum status = StockMovementDisplayStatusUtil.getListStatus(stockMovementContext)
-        return StockMovementDisplayStatusUtil.getStatusMetaData(status)
+        Enum status = StockMovementStatusHelper.getListStatus(stockMovementContext)
+        return StockMovementStatusHelper.getStatusMetaData(status)
     }
 
     Boolean canUserRollbackApproval(User user) {

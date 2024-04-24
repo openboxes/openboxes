@@ -135,7 +135,7 @@
             </td>
             <td class="center" width="1%">
                 <div class="tag tag-alert">
-                    <format:metadata obj="${stockMovement?.displayStatus}"/>
+                    ${stockMovement?.displayStatus?.label}
                 </div>
             </td>
         </tr>

@@ -16,7 +16,7 @@ import org.pih.warehouse.requisition.RequisitionType
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentStatusCode
 import util.StockMovementContext
-import util.StockMovementDisplayStatusUtil
+import util.StockMovementStatusHelper
 
 class OutboundStockMovementListItem implements Serializable, Validateable {
 
@@ -103,14 +103,15 @@ class OutboundStockMovementListItem implements Serializable, Validateable {
         statusSortOrder(nullable: true)
     }
 
+    @Deprecated
     Map<String, String> getDisplayStatus() {
         StockMovementContext stockMovementContext = new StockMovementContext(
                 order: order,
                 requisition: requisition,
                 shipment: shipment
         )
-        Enum status = StockMovementDisplayStatusUtil.getListStatus(stockMovementContext)
-        return StockMovementDisplayStatusUtil.getStatusMetaData(status)
+        Enum status = StockMovementStatusHelper.getListStatus(stockMovementContext)
+        return StockMovementStatusHelper.getStatusMetaData(status)
     }
 
     Map toJson() {
@@ -121,7 +122,6 @@ class OutboundStockMovementListItem implements Serializable, Validateable {
                 statusCode          : statusCode?.toString(),
                 displayStatus       : displayStatus,
                 statusVariant       : status?.variant?.name,
-                statusLabel         : RequisitionStatus.mapToOption(displayStatus)?.label,
                 status              : status.toString(),
                 currentStatus       : shipment?.currentStatus?.toString(),
                 identifier          : identifier,

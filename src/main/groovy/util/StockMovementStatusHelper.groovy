@@ -1,62 +1,17 @@
 package util
 
-import org.pih.warehouse.api.StockMovementDirection
-import org.pih.warehouse.api.StockMovementType
-import org.pih.warehouse.auth.AuthService
-import org.pih.warehouse.core.Location
+import grails.util.Holders
+
 import org.pih.warehouse.inventory.StockMovementStatusCode
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderStatus
-import org.pih.warehouse.requisition.RequisitionSourceType
 import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentStatusCode
 
 class StockMovementStatusHelper {
 
-    Order order
-
-    Shipment shipment
-
-    StockMovementType stockMovementType
-
-    Location origin
-
-    Location destination
-
-    RequisitionStatus defaultStatus
-
-
-    StockMovementDirection getStockMovementDirection(Location currentLocation) {
-        if (currentLocation == origin) {
-            return StockMovementDirection.OUTBOUND
-        }
-        if (currentLocation == destination || origin?.isSupplier()) {
-            return StockMovementDirection.INBOUND
-        }
-        return null
-    }
-
-    boolean isInbound() {
-        Location currentLocation = AuthService.currentLocation
-        return getStockMovementDirection(currentLocation) == StockMovementDirection.INBOUND
-    }
-
-    boolean isOutbound() {
-        Location currentLocation = AuthService.currentLocation
-        return getStockMovementDirection(currentLocation) == StockMovementDirection.OUTBOUND
-    }
-
-    boolean isReturn() {
-        return stockMovementType == StockMovementType.RETURN_ORDER
-    }
-
-
-    static ShipmentStatusCode getInboundReturnDisplayStatus(Shipment shipment) {
-        return shipment?.status?.code ?: ShipmentStatusCode.PENDING
-    }
-
-    static RequisitionStatus getOutboundReturnDisplayStatus(Order order) {
+    private static RequisitionStatus getOutboundReturnDisplayStatus(Order order) {
         switch (order?.status) {
             case OrderStatus.PENDING:
                 return RequisitionStatus.CREATED
@@ -77,23 +32,43 @@ class StockMovementStatusHelper {
         }
     }
 
-    def getDisplayStatusListPage() {
-        if (isReturn()) {
-            return isInbound()
-                    ? getInboundReturnDisplayStatus(shipment)
-                    : getOutboundReturnDisplayStatus(order)
+    private static ShipmentStatusCode getInboundReturnDisplayStatus(Shipment shipment) {
+        return shipment?.status?.code ?: ShipmentStatusCode.PENDING
+    }
+
+    static def getStatus(StockMovementContext context) {
+        if (context.isReturn()) {
+            return context.isInbound()
+                    ? getInboundReturnDisplayStatus(context.shipment)
+                    : getOutboundReturnDisplayStatus(context.order)
         }
 
-        if (isInbound()) {
-            // Requests
-            // FIXME this applies for two cases (stock request dashboard) & (inbound list when we create a request)
-            // this if should apply for stock request dashboard but should not for inbound list (inb. list shoul have only shipment statuses)
-            if (shipment?.requisition?.sourceType == RequisitionSourceType.ELECTRONIC && destination.isDownstreamConsumer()) {
+        if (context?.shipment?.isFromPurchaseOrder) {
+            return context?.shipment?.status?.code
+        }
+
+        if (context?.requisition?.status >= RequisitionStatus.ISSUED && context?.shipment?.hasShipped()) {
+            return context?.shipment?.status?.code
+        }
+
+        return context?.requisition?.status
+    }
+
+    static def getListStatus(StockMovementContext context) {
+        if (context.isReturn()) {
+            return context.isInbound()
+                    ? getInboundReturnDisplayStatus(context.shipment)
+                    : getOutboundReturnDisplayStatus(context.order)
+        }
+
+        if (context.isInbound()) {
+            //Request
+            if (context.isElectronicType() && context?.shipment?.destination?.isDownstreamConsumer()) {
                 // Approval request
                 // Mapping statuses for display for the requestor's dashboard
                 // We want to display all statuses from approval workflow (approved, rejected and pending approval)
-                if (requisitionStatus in RequisitionStatus.listApproval()) {
-                    switch(requisitionStatus) {
+                if (context?.requisition?.status in RequisitionStatus.listApproval()) {
+                    switch(context?.requisition?.status) {
                         case RequisitionStatus.APPROVED:
                             return StockMovementStatusCode.APPROVED
                         case RequisitionStatus.REJECTED:
@@ -105,38 +80,30 @@ class StockMovementStatusHelper {
 
                 // Regular request
                 // We want to map all statuses from depot side to "in progress".
-                if (requisitionStatus in RequisitionStatus.listRequestOptions()) {
+                if (context?.requisition?.status in RequisitionStatus.listRequestOptions()) {
                     return StockMovementStatusCode.IN_PROGRESS
                 }
             }
 
-            return shipment?.status?.code
+            return context?.shipment?.status?.code
         }
 
-        if (isOutbound()) {
-            return defaultStatus
+        if (context.isOutbound()) {
+            return context?.requisition?.status
         }
 
-        return shipment?.status?.code ?: defaultStatus
+        return context?.shipment?.status?.code ?: context?.requisition?.status
     }
 
-    def getDisplayStatus() {
-        if (isReturn()) {
-            return isInbound()
-                    ? getInboundReturnDisplayStatus(shipment)
-                    : getOutboundReturnDisplayStatus(order)
-        }
+    static def getApplicationTagLib() {
+        return Holders.grailsApplication.mainContext.getBean('org.grails.plugins.web.taglib.ApplicationTagLib')
+    }
 
-        if (shipment?.isFromPurchaseOrder) {
-            return shipment?.status?.code
-        }
-
-
-        if (requisitionStatus >= RequisitionStatus.ISSUED && shipment?.hasShipped()) {
-            return shipment?.status?.code
-        }
-
-
-        return defaultStatus
+    static Map getStatusMetaData(Enum status) {
+        return [
+                name: status?.name(),
+                label: applicationTagLib.message(code: 'enum.' + status?.getClass()?.getSimpleName() + '.' + status),
+                variant: status.hasProperty('variant') ? status?.variant?.name : null,
+        ]
     }
 }
