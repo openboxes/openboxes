@@ -88,7 +88,7 @@ class StockMovementStatusHelper {
             // Requests
             // FIXME this applies for two cases (stock request dashboard) & (inbound list when we create a request)
             // this if should apply for stock request dashboard but should not for inbound list (inb. list shoul have only shipment statuses)
-            if (shipment?.requisition?.sourceType == RequisitionSourceType.ELECTRONIC) {
+            if (shipment?.requisition?.sourceType == RequisitionSourceType.ELECTRONIC && destination.isDownstreamConsumer()) {
                 // Approval request
                 // Mapping statuses for display for the requestor's dashboard
                 // We want to display all statuses from approval workflow (approved, rejected and pending approval)

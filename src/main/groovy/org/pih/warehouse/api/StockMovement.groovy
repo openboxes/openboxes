@@ -28,6 +28,8 @@ import org.pih.warehouse.shipping.ShipmentStatusCode
 import org.pih.warehouse.shipping.ShipmentType
 import org.pih.warehouse.auth.AuthService
 import util.ConfigHelper
+import util.StockMovementContext
+import util.StockMovementDisplayStatusUtil
 import util.StockMovementStatusHelper
 
 
@@ -89,7 +91,8 @@ class StockMovement implements Validateable{
 
     static transients = [
             "electronicType",
-            "pendingApproval"
+            "pendingApproval",
+            "displayStatus"
     ]
 
     static constraints = {
@@ -128,6 +131,7 @@ class StockMovement implements Validateable{
         lastUpdated(nullable: true)
         requestType(nullable: true)
         sourceType(nullable: true)
+        displayStatus(nullable: true)
     }
 
     Map toJson() {
@@ -136,7 +140,7 @@ class StockMovement implements Validateable{
             name                : name,
             description         : description,
             statusCode          : statusCode,
-            displayStatus       : getDisplayStatus()?.name(),
+            displayStatus       : displayStatus,
             identifier          : identifier,
             origin              : [
                 id                  : origin?.id,
@@ -472,18 +476,14 @@ class StockMovement implements Validateable{
         ]
     }
 
-    def getDisplayStatus() {
-        StockMovementStatusHelper statusHelper = new StockMovementStatusHelper(
+    Map getDisplayStatus() {
+        StockMovementContext stockMovementContext = new StockMovementContext(
                 order: order,
-                shipment: shipment,
-                destination: destination,
-                origin: origin,
-                stockMovementType: StockMovementType.STOCK_MOVEMENT,
-                requisitionStatus: status,
+                requisition: requisition,
+                shipment: shipment
         )
-
-        // FIXME possible null throws an exception Property [displayStatus] of class [Stock Movement] cannot be null
-        return statusHelper?.getDisplayStatusListPage() ?: ""
+        Enum status = StockMovementDisplayStatusUtil.getListStatus(stockMovementContext)
+        return StockMovementDisplayStatusUtil.getStatusMetaData(status)
     }
 
     Boolean canUserRollbackApproval(User user) {

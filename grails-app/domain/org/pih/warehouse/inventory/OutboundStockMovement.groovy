@@ -20,6 +20,7 @@ import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.shipping.ShipmentStatusCode
 import org.pih.warehouse.shipping.ShipmentType
+import util.StockMovementContext
 import util.StockMovementStatusHelper
 
 class OutboundStockMovement implements Serializable, Validateable {
@@ -230,6 +231,11 @@ class OutboundStockMovement implements Serializable, Validateable {
     }
 
     def getDisplayStatus() {
+        StockMovementContext stockMovementContext = new StockMovementContext(
+                order: order,
+                requisition: requisition,
+                shipment: shipment
+        )
         StockMovementStatusHelper statusHelper = new StockMovementStatusHelper(
                 order: order,
                 shipment: shipment,

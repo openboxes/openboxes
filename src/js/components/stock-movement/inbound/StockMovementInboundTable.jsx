@@ -135,11 +135,11 @@ const StockMovementInboundTable = ({
         <TableCell
           {...row}
           tooltip
-          tooltipLabel={getStatusTooltip(row.value)}
+          tooltipLabel={getStatusTooltip(row.value?.name)}
         >
           <StatusIndicator
-            status={shipmentStatuses.find(status => status.id === row.value)?.label}
-            variant={_.find(shipmentStatuses, _.matchesProperty('id', row.value))?.variant}
+            variant={row?.value?.variant}
+            status={row?.value?.label}
           />
         </TableCell>),
     },
@@ -217,7 +217,7 @@ const StockMovementInboundTable = ({
       width: 200,
       Cell: row => (<DateCell {...row} />),
     },
-  ], [shipmentStatuses]);
+  ], [shipmentStatuses, translate]);
 
   return (
     <div className="list-page-list-section">

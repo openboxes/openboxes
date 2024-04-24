@@ -238,11 +238,11 @@ const StockMovementOutboundTable = ({
         <TableCell
           {...row}
           tooltip
-          tooltipLabel={getStatusTooltip(row.value)}
+          tooltipLabel={getStatusTooltip(row.value?.name)}
         >
           <StatusIndicator
-            variant={row?.original?.statusVariant}
-            status={row?.original?.statusLabel}
+            variant={row?.value?.variant}
+            status={row?.value?.label}
           />
         </TableCell>
       ),
@@ -337,7 +337,7 @@ const StockMovementOutboundTable = ({
       width: 150,
       Cell: row => (<DateCell {...row} />),
     },
-  ], [requisitionStatuses]);
+  ], [requisitionStatuses, translate]);
 
   return (
     <>
