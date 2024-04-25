@@ -14,7 +14,7 @@ import util.StockMovementContext
 import util.StockMovementStatusHelper
 
 @Unroll
-class StockMovementSpec extends Specification {
+class StockMovementStatusSpec extends Specification {
 
     void "should return shipment status #expected for inbound stock movement returns"() {
         given:
