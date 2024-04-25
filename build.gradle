@@ -123,7 +123,7 @@ assets {
 
 bootRun {
     addResources = true
-    dependsOn 'npm_run_bundle'
+    //dependsOn 'npm_run_bundle'
     jvmArgs = [
         '-Dspring.output.ansi.enabled=never',
         '-Xdebug',
@@ -304,6 +304,10 @@ configurations {
     }
 }
 
+configurations.integrationTestImplementation {
+    extendsFrom(configurations.implementation)
+}
+
 // app servers, other than jetty, expose this api directly
 if (targetWebServer() != 'jetty') {
     configurations.configureEach {
@@ -356,7 +360,7 @@ node {
 }
 
 processResources {
-    dependsOn 'npm_run_bundle'
+    //dependsOn 'npm_run_bundle'
 }
 
 repositories {
@@ -382,6 +386,7 @@ sourceSets {
 springBoot {
     buildInfo()
     mainClass = 'org.pih.warehouse.Application'
+    executable = true
 }
 
 war {
@@ -609,7 +614,7 @@ dependencies {
     }
 
     // FIXME use commons-csv instead
-    implementation 'org.grails.plugins:excel-import:3.0.2'
+    compile 'org.grails.plugins:excel-import:3.0.2'
 
     // load config via files listed in application.yml::grails.config.locations
     implementation 'org.grails.plugins:external-config:1.4.0'

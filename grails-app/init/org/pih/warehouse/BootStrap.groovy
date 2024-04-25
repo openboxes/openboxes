@@ -658,53 +658,42 @@ class BootStrap {
             liquibase = new Liquibase(null as DatabaseChangeLog, new ClassLoaderResourceAccessor(), database)
             liquibase.checkLiquibaseTables(false, null, new Contexts(), new LabelExpression())
 
-            def executedChangelogVersions = LiquibaseUtil.getExecutedChangelogVersions()
-            log.info("executedChangelogVersions: " + executedChangelogVersions)
-
             log.info 'Dropping all views (will rebuild after migrations complete)...'
-            liquibase = new Liquibase('views/drop-all-views.xml', new ClassLoaderResourceAccessor(), database)
-            liquibase.update(null as Contexts, new LabelExpression());
+            LiquibaseUtil.executeChangeLog("views/drop-all-views.xml")
 
-            // Get all directories from /migrations
-            PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver()
-            Resource[] resources = resolver.getResources("file:grails-app/migrations/*")
+            def executedChangeLogVersions = LiquibaseUtil.getExecutedChangelogVersions()
+            log.info("executedChangelogVersions: " + executedChangeLogVersions)
 
-            // Find directories with names matching current versions pattern which
-            // will match to any version number between 0.0.x to 999.999.x
-            List<String> changelogVersions = resources
-                    .collect { it.filename }
-                    .findAll { it.matches("\\d{1,3}.\\d{1,3}.x") }
-                    .reverse()
-
-            // Exclude the newest changelog version, this one should be run separately
-            List<String> previousChangelogVersions = !changelogVersions.empty ? changelogVersions.tail() : []
-
-            //If nothing has been created yet, let's create all new database objects with the install scripts
-            if (!executedChangelogVersions) {
+            // If nothing has been created yet, let's create all new database objects with the install scripts
+            if (!executedChangeLogVersions) {
                 log.info("Running install changelog ...")
-                liquibase = new Liquibase("install/changelog.xml", new ClassLoaderResourceAccessor(), database)
-                liquibase.update(null as Contexts, new LabelExpression());
+                LiquibaseUtil.executeChangeLog("install/changelog.xml")
             }
 
             // Check if the executed changelog versions include one of the previous versions
             // and if so, then we need to keep running the old updates to catch up to 0.9.x
-            boolean hasExecutedAnyPreviousChangesets =
-                executedChangelogVersions.any { previousChangelogVersions.contains(it.version) }
+            Set<String> upgradeChangeLogVersions = LiquibaseUtil.upgradeChangeLogVersions
+            log.info("upgradeChangeLogVersions: " + upgradeChangeLogVersions)
+            if (upgradeChangeLogVersions?.empty) {
+                throw new RuntimeException("Unable to execute database migrations")
+            }
 
-            if (hasExecutedAnyPreviousChangesets) {
+            boolean hasExecuteUpgradeChangeLog =
+                executedChangeLogVersions.any { upgradeChangeLogVersions.contains(it.version) }
+
+            // Run through the upgrade changelog
+            // note: Liquibase does the hard work of determining what changesets need to be applied
+            if (hasExecuteUpgradeChangeLog) {
                 log.info("Running upgrade changelog ...")
-                liquibase = new Liquibase("upgrade/changelog.xml", new ClassLoaderResourceAccessor(), database)
-                liquibase.update(null as Contexts, new LabelExpression())
+                LiquibaseUtil.executeChangeLog("upgrade/changelog.xml")
             }
 
             // And now we need to run changelogs from 0.9.x and beyond
             log.info("Running latest updates")
-            liquibase = new Liquibase("changelog.groovy", new ClassLoaderResourceAccessor(), database)
-            liquibase.update(null as Contexts, new LabelExpression())
+            LiquibaseUtil.executeChangeLog("changelog.groovy")
 
             log.info 'Rebuilding views ...'
-            liquibase = new Liquibase('views/changelog.xml', new ClassLoaderResourceAccessor(), database)
-            liquibase.update(null as Contexts, new LabelExpression());
+            LiquibaseUtil.executeChangeLog("views/changelog.xml")
 
         } finally {
             log.info('Safely closing database')

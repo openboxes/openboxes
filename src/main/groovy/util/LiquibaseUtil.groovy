@@ -10,28 +10,35 @@
 package util
 
 import grails.util.Holders
+import liquibase.Contexts
+import liquibase.LabelExpression
+import liquibase.Liquibase
+import liquibase.changelog.ChangeSet
+import liquibase.changelog.ChangeSetStatus
+import liquibase.changelog.DatabaseChangeLog
 import liquibase.database.Database
 import liquibase.database.DatabaseFactory
 import liquibase.database.jvm.JdbcConnection
 import liquibase.lockservice.LockService
 import liquibase.lockservice.LockServiceFactory
+import liquibase.resource.ClassLoaderResourceAccessor
+
+import javax.sql.DataSource
+import java.nio.file.Paths
 
 class LiquibaseUtil {
 
     static getDatabase() {
-        def ctx = Holders.grailsApplication.mainContext
-        def dataSource = ctx.getBean("dataSource")
+        def dataSource = Holders.grailsApplication.mainContext.getBean("dataSource")
         def connection = new JdbcConnection(dataSource.connection)
-        def database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(connection)
-        return database
+        return DatabaseFactory.getInstance().findCorrectDatabaseImplementation(connection)
     }
 
     static synchronized isRunningMigrations() {
         try {
             Database database = getDatabase()
             LockService lockService = LockServiceFactory.getInstance().getLockService(database)
-            boolean hasChangeLogLock = lockService.hasChangeLogLock()
-            return hasChangeLogLock
+            return lockService.hasChangeLogLock()
         } catch (Exception e) {
             e.printStackTrace()
         }
@@ -41,6 +48,11 @@ class LiquibaseUtil {
         return false
     }
 
+    /**
+     * @deprecated Use databaseChangelogVersions
+     * @return
+     */
+    @Deprecated
     static getExecutedChangelogVersions() {
         def ctx = Holders.grailsApplication.mainContext
         def dataService = ctx.getBean("dataService")
@@ -49,5 +61,40 @@ class LiquibaseUtil {
             FROM DATABASECHANGELOG"""
         return dataService.executeQuery(sql);
     }
+
+    static Set<String> getChangeLogVersions() {
+        return getChangeLogVersions("changelog.groovy")
+    }
+
+    static Set<String> getUpgradeChangeLogVersions() {
+        return getChangeLogVersions("upgrade/changelog.xml")
+    }
+
+    static Set<String> getChangeLogVersions(String changeLogFile) {
+        Liquibase liquibase = new Liquibase(changeLogFile, new ClassLoaderResourceAccessor(), database)
+        println "changelogfile: " + liquibase.changeLogFile
+
+        // Retrieve the file path for all changeset in the given the changeLogFile
+        def changeSetFilePaths = liquibase.databaseChangeLog.rootChangeLog.changeSets.collect { ChangeSet changeSet ->
+            return changeSet.filePath
+        }
+
+        // Find all parent directories with names matching current versions pattern which
+        // will match to any version number between 0.0.x to 999.999.x
+        Set<String> changeLogVersions = changeSetFilePaths
+                    .collect { Paths.get(it).parent.toString() }
+                    .findAll { it.matches("\\d{1,3}.\\d{1,3}.x") }
+                    .sort()
+
+        println "changeLogVersions: " + changeLogVersions
+
+        return changeLogVersions
+    }
+
+    static executeChangeLog(String changeLogFile) {
+        Liquibase liquibase = new Liquibase(changeLogFile, new ClassLoaderResourceAccessor(), database)
+        liquibase.update(null as Contexts, new LabelExpression());
+    }
+
 
 }
