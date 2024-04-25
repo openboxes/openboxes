@@ -1,5 +1,6 @@
-# Installing Java 8
-OpenBoxes with Grails 3 now require Java 8 - you must install a Java 8 JRE/JDK. Unfortunately, the APT Repository on Ubuntu 16.04 does not include a version 
+
+OpenBoxes 0.9.x is now built using Grails 3 which requires Java 8 - you must install a Java 8 JRE/JDK. 
+Unfortunately, the APT Repository on Ubuntu 22.04 does not include a version 
 of the Java 8 JRE or JDK so we'll need to do some work to get this working. I would personally recommend 
 **Option 1** below.
 

@@ -1,8 +1,7 @@
 Whether you plan to install OpenBoxes on-premise or in the cloud, the installation instructions should be relatively 
 similar. 
 
-
-#### Cloud
+## Cloud
 Here are a few recommended options for hosting.
 
 | Hosting Provider | Instance Type | Memory | vCPU | Disk | Monthly Cost |
@@ -26,7 +25,7 @@ size and permgen memory allocated to Tomcat to something minimal (see Installing
 !!! note
     Please let us know if we missed a good hosting option.
 
-#### On-Premise
+## On-Premise
 Installing OpenBoxes on-premise requires a bit of work to install the appropriate Ubuntu version on a rack-mounted 
 server, desktop, or laptop that you've designated as your server. Our installation docs will not describe how to install 
 Ubuntu Desktop or Server, so you'll need to consult Ubuntu docs. Here are a few tutorials that might be helpful.

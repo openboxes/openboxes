@@ -23,8 +23,14 @@ theme:
 
   features:
     - navigation.tabs
+    - navigation.footer
+    - navigation.expand
+    - navigation.section
+    - navigation.index
+    - content.code.select
+    - content.code.annotate
 use_directory_urls: true
-copyright: Copyright &copy; 2010-2023, OpenBoxes
+copyright: Copyright &copy; 2010-2024, OpenBoxes
 extra:
   stylesheet: stylesheets/extra.css
   analytics:
@@ -35,72 +41,71 @@ markdown_extensions:
   - admonition
   - footnotes
   - tables
+  - toc:
+      toc_depth: 1
+  - pymdownx.critic
+  - pymdownx.caret
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.tilde
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
   - pymdownx.emoji:
       emoji_index: !!python/name:materialx.emoji.twemoji
       emoji_generator: !!python/name:materialx.emoji.to_svg
 nav:
-  - About:
-    - Introduction: index.md
-    - Architecture: about/architecture.md
+  - Introduction:
+    - About: index.md
     - Benefits: about/benefits.md
     - Considerations: about/considerations.md
     - Release Notes: about/release-notes.md
-  - Installation:
-    - Overview: installation/index.md
-    - Instructions:
-        - Ubuntu:
-          - Ubuntu 18.04:
-            - Overview: installation/ubuntu1804/index.md
-            - Requirements: installation/ubuntu1804/requirements.md
-            - Hosting: installation/ubuntu1804/hosting.md
-            - Ubuntu: installation/ubuntu1804/ubuntu.md
-            - Java: installation/ubuntu1804/java.md
-            - Tomcat: installation/ubuntu1804/tomcat.md
-            - MySQL: installation/ubuntu1804/mysql.md
-            - Apache: installation/ubuntu1804/apache.md
-            - Configuration: installation/ubuntu1804/configuration.md
-            - Deployment: installation/ubuntu1804/deployment.md
-            - Troubleshooting: installation/ubuntu1804/troubleshooting.md
-          - Ubuntu 18.04 (Grails v3):
-            - Overview: installation/ubuntu1804-grails3/index.md
-            - Hosting: installation/ubuntu1804-grails3/hosting.md
-            - Ubuntu: installation/ubuntu1804-grails3/ubuntu.md
-            - Java: installation/ubuntu1804-grails3/java.md
-            - MySQL: installation/ubuntu1804-grails3/mysql.md
-            - Application: installation/ubuntu1804-grails3/application.md
-            - Apache/Nginx: installation/ubuntu1804-grails3/webserver.md
-            - Deployment: installation/ubuntu1804-grails3/deployment.md
-            - Configuration: installation/ubuntu1804-grails3/configuration.md
-            - Troubleshooting: installation/ubuntu1804-grails3/troubleshooting.md
-          - Ubuntu 16.04:
-            - Instructions: installation/ubuntu1604.md
-            - Notes: installation/ubuntu1604-notes.md
-          - Ubuntu 14.04: installation/ubuntu1404.md
-        - Docker: installation/docker.md
-        - Mac OS: installation/macos.md
-        - Windows: installation/windows.md
-    - Advanced: installation/advanced.md
+  - Administrator Guide:
+    - Installation:
+      - Overview: admin-guide/installation/index.md
+      - Requirements: admin-guide/installation/requirements.md
+      - Ubuntu:
+          - Choose Hosting: admin-guide/installation/ubuntu2204/hosting.md
+          - Create Virtual Machine: admin-guide/installation/ubuntu2204/vm.md
+          - Install Dependencies: admin-guide/installation/ubuntu2204/ubuntu.md
+          - Install Java: admin-guide/installation/ubuntu2204/java.md
+          - Install MySQL: admin-guide/installation/ubuntu2204/mysql.md
+          - Install Application: admin-guide/installation/ubuntu2204/application.md
+          - Install Apache/Nginx: admin-guide/installation/ubuntu2204/webserver.md
+          - Deploy Application: admin-guide/installation/ubuntu2204/deployment.md
+          - Configuration: admin-guide/installation/ubuntu2204/configuration.md
+          - Troubleshooting: admin-guide/installation/ubuntu2204/troubleshooting.md
+      - Docker: admin-guide/installation/docker.md
+      - Mac OS: admin-guide/installation/macos.md
+      - Windows: admin-guide/installation/windows.md
+    - Configuration:
+      - Overview: configuration/index.md
+      - Database: configuration/database.md
+      - Email: configuration/email.md
+      - OpenBoxes: configuration/application.md
+      - Sentry: configuration/sentry.md
+      - Advanced: admin-guide/installation/advanced.md
+      - Advanced:
+        - Tomcat AJP: configuration/ajp.md
+        - Apache HTTPS: configuration/https.md
+      - Example: configuration/example.md
     - Upgrading: upgrading/index.md
-  - Configuration:
-    - Overview: configuration/index.md
-    - Database: configuration/database.md
-    - Email: configuration/email.md
-    - OpenBoxes: configuration/application.md
-    - Sentry: configuration/sentry.md
-    - Advanced:
-      - Tomcat AJP: configuration/ajp.md
-      - Apache HTTPS: configuration/https.md
-    - Example: configuration/example.md
-  - Getting Started:
-    - Overview: user-guide/index.md
+  - User Guide:
+    - Getting Started: user-guide/index.md
+    - Knowledge Base: user-guide/knowledge-base.md
+    - Community Support: user-guide/community-support.md
+    - YouTube Channel: user-guide/youtube.md
+    - Tutorial Videos: user-guide/tutorials.md
   - Developer Guide:
-#    - Introduction: developer-guide/index.md
+    - Introduction: developer-guide/index.md
+    - Architecture: about/architecture.md
     - Getting Started: developer-guide/getting-started.md
     - Contributing: developer-guide/contributing.md
-    - Syncing a Fork: developer-guide/syncing-a-fork.md
+    - Forking: developer-guide/syncing-a-fork.md
     - Tagging a Release: developer-guide/tagging.md
     - Troubleshooting: developer-guide/troubleshooting.md
-    - Release Lifecycle:
+    - Releasing:
       - Overview: developer-guide/release/index.md
       - Plan: developer-guide/release/plan.md
       - Develop: developer-guide/release/develop.md
@@ -111,29 +116,45 @@ nav:
       - Publish: developer-guide/release/publish.md
       - Deploy: developer-guide/release/deploy.md
       - Cleanup: developer-guide/release/cleanup.md
-    - Hotfix Lifecycle: developer-guide/hotfix/index.md
+    - Hotfixes: developer-guide/hotfix/index.md
   - API Guide:
-    - Overview: api-guide/index.md
     - Getting Started: api-guide/getting-started.md
-    - Searching: api-guide/lookup.md
-    - REST APIs:
-      - Generic API: api-guide/generic.md
-      - Core API:
-          - Identifiers: api-guide/identifier.md
-          - Internal Locations: api-guide/internalLocation.md
-          - Localizations: api-guide/localization.md
-          - Locations: api-guide/location.md
-          - Reason Codes: api-guide/reasonCode.md
-      - Products API:
-          - Categories: api-guide/category.md
-          - Products: api-guide/product.md
-      - Stock Movements API:
-          - Stock Movements: api-guide/stockMovement.md
-          - Stock Movement Items: api-guide/stockMovementItem.md
-          - Stock Movement Status: api-guide/stockMovementStatus.md
-          - Putaways: api-guide/putaway.md
-          - Receiving: api-guide/receiving.md
-  - Support:
-    - Overview: support/index.md
+    - Authentication: api-guide/authentication.md
+    - Pagination: api-guide/pagination.md
+    - Filtering: api-guide/lookup.md
+    - Formatting: api-guide/formatting.md
+    - Testing:
+      - OpenAPI/Swagger: apt-guide/openapi.md
+      - Postman: apt-guide/postman.md
+    - Core API:
+      - Locations: api-guide/core/location.md
+      - Identifiers: api-guide/core/identifier.md
+      - Internal Locations: api-guide/core/internalLocation.md
+      - Localizations: api-guide/core/localization.md
+      - Reason Codes: api-guide/core/reasonCode.md
+    - Products API:
+        - Categories: api-guide/products/category.md
+        - Products: api-guide/products/product.md
+    - Inbound API:
+        - Putaways: api-guide/inbound/putaway.md
+        - Receiving: api-guide/inbound/receiving.md
+    - Outbound API:
+        - Stock Movements: api-guide/outbound/stockMovement.md
+        - Stock Movement Items: api-guide/outbound/stockMovementItem.md
+        - Stock Movement Status: api-guide/outbound/stockMovementStatus.md
+    - Generic API:
+      - Overview: api-guide/generic/index.md
+      - Standard Actions:
+        - Get Resources: api-guide/generic/get-resources.md
+        - Get Resource: api-guide/generic/get-resource.md
+        - Create Resource: api-guide/generic/create-resource.md
+        - Update Resource: api-guide/generic/update-resource.md
+        - Delete Resource: api-guide/generic/delete-resource.md
+      - Bulk Actions:
+        - Create Resources: api-guide/generic/create-resources.md
+        - Update Resources: api-guide/generic/update-resources.md
+  - Community:
+    - Support:
+      - Overview: support/index.md
 
 
