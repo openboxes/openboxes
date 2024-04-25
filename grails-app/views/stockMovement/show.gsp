@@ -467,9 +467,9 @@
                                     <span title="${g.formatDate(date:stockMovement?.dateShipped)}">
                                         <g:formatDate format="MMMM dd, yyyy" date="${stockMovement?.dateShipped}"/>
                                     </span>
-                                    <g:if test="${stockMovement?.shipment?.shippedBy || stockMovement?.shipment?.createdBy}">
+                                    <g:if test="${stockMovement?.shipment?.shippedBy}">
                                         <warehouse:message code="default.by.label"/>
-                                        ${stockMovement?.shipment?.shippedBy ?: stockMovement?.shipment?.createdBy}
+                                        ${stockMovement?.shipment?.shippedBy}
                                     </g:if>
                                 </g:if>
                                 <g:else>

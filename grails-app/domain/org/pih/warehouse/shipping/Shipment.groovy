@@ -414,7 +414,12 @@ class Shipment implements Comparable, Serializable {
 
     User getShippedBy() {
         Event shippedEvent = events?.find { it.eventType?.eventCode == EventCode.SHIPPED }
-        return shippedEvent?.createdBy
+        if (shippedEvent) {
+            // The fallback for createdBy is done, because there was a bug at Event level,
+            // which didn't persist the event.createdBy, so for SMs from the past, we might not have the shippedEvent.createdBy
+            return shippedEvent?.createdBy ?: createdBy
+        }
+        return null
     }
 
 
