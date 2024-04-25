@@ -1,13 +1,11 @@
 package util
 
 import org.pih.warehouse.api.StockMovementDirection
-import org.pih.warehouse.api.StockMovementType
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionSourceType
-import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.shipping.Shipment
 
 class StockMovementContext {
@@ -17,11 +15,15 @@ class StockMovementContext {
 
     Requisition requisition
 
+    Location origin
+
+    Location destination
+
     StockMovementDirection getStockMovementDirection(Location currentLocation) {
-        if (currentLocation == shipment?.origin) {
+        if (currentLocation == origin) {
             return StockMovementDirection.OUTBOUND
         }
-        if (currentLocation == shipment?.destination || shipment?.origin?.isSupplier()) {
+        if (currentLocation == destination || origin?.isSupplier()) {
             return StockMovementDirection.INBOUND
         }
         return null
@@ -37,8 +39,17 @@ class StockMovementContext {
         return getStockMovementDirection(currentLocation) == StockMovementDirection.OUTBOUND
     }
 
+    boolean isCurrentLocationDownstreamConsumer() {
+        Location currentLocation = AuthService.currentLocation
+        return currentLocation.isDownstreamConsumer()
+    }
+
     boolean isReturn() {
         return order?.orderType?.isReturnOrder()
+    }
+
+    Boolean isFromPurchaseOrder() {
+        return shipment?.isFromPurchaseOrder
     }
 
     Boolean isElectronicType() {

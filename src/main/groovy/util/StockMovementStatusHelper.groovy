@@ -36,25 +36,25 @@ class StockMovementStatusHelper {
         return shipment?.status?.code ?: ShipmentStatusCode.PENDING
     }
 
-    static def getStatus(StockMovementContext context) {
+    static Enum getStatus(StockMovementContext context) {
         if (context.isReturn()) {
             return context.isInbound()
                     ? getInboundReturnDisplayStatus(context.shipment)
                     : getOutboundReturnDisplayStatus(context.order)
         }
 
-        if (context?.shipment?.isFromPurchaseOrder) {
+        if (context.isFromPurchaseOrder()) {
             return context?.shipment?.status?.code
         }
 
-        if (context?.requisition?.status >= RequisitionStatus.ISSUED && context?.shipment?.hasShipped()) {
+        if (context.requisition?.status == RequisitionStatus.ISSUED && context?.shipment?.hasShipped()) {
             return context?.shipment?.status?.code
         }
 
-        return context?.requisition?.status
+        return context.requisition?.status
     }
 
-    static def getListStatus(StockMovementContext context) {
+    static Enum getListStatus(StockMovementContext context) {
         if (context.isReturn()) {
             return context.isInbound()
                     ? getInboundReturnDisplayStatus(context.shipment)
@@ -63,7 +63,7 @@ class StockMovementStatusHelper {
 
         if (context.isInbound()) {
             //Request
-            if (context.isElectronicType() && context?.shipment?.destination?.isDownstreamConsumer()) {
+            if (context.isElectronicType() && context.isCurrentLocationDownstreamConsumer()) {
                 // Approval request
                 // Mapping statuses for display for the requestor's dashboard
                 // We want to display all statuses from approval workflow (approved, rejected and pending approval)

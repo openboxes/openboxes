@@ -235,7 +235,9 @@ class OutboundStockMovement implements Serializable, Validateable {
         StockMovementContext stockMovementContext = new StockMovementContext(
                 order: order,
                 requisition: requisition,
-                shipment: shipment
+                shipment: shipment,
+                origin: origin,
+                destination: destination
         )
         Enum status = StockMovementStatusHelper.getStatus(stockMovementContext)
         return StockMovementStatusHelper.getStatusMetaData(status)
