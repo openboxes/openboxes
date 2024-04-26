@@ -94,7 +94,7 @@ class StockTransferItem implements Validateable {
         stockTransferItem.inventoryItem = picklistItem?.inventoryItem
         stockTransferItem.location = picklistItem?.orderItem?.order?.origin
         stockTransferItem.originBinLocation  = picklistItem?.binLocation
-        stockTransferItem.quantity = picklistItem?.quantity
+        stockTransferItem.quantity = picklistItem?.quantityPicked
         stockTransferItem.status = getItemStatus(OrderItemStatusCode.COMPLETED)
 
         return stockTransferItem
@@ -143,7 +143,7 @@ class StockTransferItem implements Validateable {
                 }.collect { it?.toJson() },
                 picklistItems                   : picklistItems.sort { a, b ->
                     a.binLocation?.name <=> b.binLocation?.name ?:
-                            b.quantity <=> a.quantity
+                            b.quantityPicked <=> a.quantityPicked
                 }.collect { it?.toJson() },
                 sortOrder                       : orderIndex
         ]

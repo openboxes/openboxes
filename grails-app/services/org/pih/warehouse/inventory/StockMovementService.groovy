@@ -1325,7 +1325,7 @@ class StockMovementService {
             requisitionItem.addToPicklistItems(picklistItem)
             picklistItem.inventoryItem = inventoryItem
             picklistItem.binLocation = binLocation
-            picklistItem.quantity = quantity
+            picklistItem.quantityPicked = quantity
             picklistItem.reasonCode = reasonCode
             picklistItem.comment = comment
             picklistItem.sortOrder = requisitionItem.orderIndex
@@ -1353,7 +1353,7 @@ class StockMovementService {
                 }
 
                 // Remove from picklist
-                if (picklistItem.quantity <= 0) {
+                if (picklistItem.quantityPicked <= 0) {
                     picklist.removeFromPicklistItems(picklistItem)
                     picklistItem.requisitionItem?.removeFromPicklistItems(picklistItem)
                 }
@@ -1441,7 +1441,7 @@ class StockMovementService {
 
                 availableItems.add(availableItem)
             } else {
-                availableItem.quantityAvailable += picklistItem.quantity
+                availableItem.quantityAvailable += picklistItem.quantityPicked
             }
         }
 
@@ -2478,12 +2478,12 @@ class StockMovementService {
         }
 
         requisitionItem?.picklistItems?.each { PicklistItem picklistItem ->
-            if (picklistItem.quantity > 0) {
+            if (picklistItem.quantityPicked > 0) {
                 ShipmentItem shipmentItem = new ShipmentItem()
                 shipmentItem.lotNumber = picklistItem?.inventoryItem?.lotNumber
                 shipmentItem.expirationDate = picklistItem?.inventoryItem?.expirationDate
                 shipmentItem.product = picklistItem?.inventoryItem?.product
-                shipmentItem.quantity = picklistItem?.quantity
+                shipmentItem.quantity = picklistItem?.quantityPicked
                 shipmentItem.requisitionItem = picklistItem.requisitionItem
                 shipmentItem.recipient = picklistItem?.requisitionItem?.recipient ?:
                         picklistItem?.requisitionItem?.parentRequisitionItem?.recipient

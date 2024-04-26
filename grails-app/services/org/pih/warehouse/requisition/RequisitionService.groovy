@@ -419,7 +419,7 @@ class RequisitionService {
                 def transactionEntry = new TransactionEntry()
                 transactionEntry.binLocation = picklistItem.binLocation
                 transactionEntry.inventoryItem = picklistItem.inventoryItem
-                transactionEntry.quantity = picklistItem.quantity
+                transactionEntry.quantity = picklistItem.quantityPicked
                 outboundTransaction.addToTransactionEntries(transactionEntry)
             }
 

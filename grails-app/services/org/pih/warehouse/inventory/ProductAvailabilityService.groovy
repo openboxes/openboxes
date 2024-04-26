@@ -233,7 +233,7 @@ class ProductAvailabilityService {
                 SELECT
                     pli.bin_location_id as bin_location_id,
                     pli.inventory_item_id as inventory_item_id,
-                    sum(pli.quantity) as quantity_picked
+                    sum(pli.quantity_picked) as quantity_picked
                 FROM picklist_item pli
                     INNER JOIN picklist p ON pli.picklist_id = p.id
                     LEFT JOIN requisition_item ri ON pli.requisition_item_id = ri.id

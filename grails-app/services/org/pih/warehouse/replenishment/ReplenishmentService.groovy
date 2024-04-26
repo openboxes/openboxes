@@ -188,7 +188,7 @@ class ReplenishmentService {
     void validateReplenishmentItem(Location replenishingLocation, OrderItem orderItem) {
         if (orderItem.picklistItems) {
             orderItem.picklistItems.toArray().each { PicklistItem picklistItem ->
-                validateQuantityAvailable(replenishingLocation, picklistItem, picklistItem.quantity)
+                validateQuantityAvailable(replenishingLocation, picklistItem, picklistItem.quantityPicked)
             }
         }
     }

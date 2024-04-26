@@ -84,7 +84,7 @@ class Picklist implements Serializable {
     }
 
     def getPicklistItems(Product product) {
-        return picklistItems?.findAll { it.quantity && it.inventoryItem.product?.id == product?.id }
+        return picklistItems?.findAll { it.quantityPicked && it.inventoryItem.product?.id == product?.id }
     }
 
     def getPicklistItemsByLot(Product product)  {

@@ -2296,12 +2296,12 @@ class ShipmentService {
 
         if (orderItem?.order?.isOutbound(currentLocation)) {
             orderItem?.picklistItems?.each { PicklistItem picklistItem ->
-                if (picklistItem.quantity > 0) {
+                if (picklistItem.quantityPicked > 0) {
                     ShipmentItem shipmentItem = new ShipmentItem()
                     shipmentItem.lotNumber = picklistItem?.inventoryItem?.lotNumber
                     shipmentItem.expirationDate = picklistItem?.inventoryItem?.expirationDate
                     shipmentItem.product = picklistItem?.inventoryItem?.product
-                    shipmentItem.quantity = picklistItem?.quantity
+                    shipmentItem.quantity = picklistItem?.quantityPicked
                     shipmentItem.recipient = picklistItem?.orderItem?.recipient ?:
                             picklistItem?.orderItem?.parentOrderItem?.recipient
                     shipmentItem.inventoryItem = picklistItem?.inventoryItem

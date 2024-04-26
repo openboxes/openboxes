@@ -163,7 +163,7 @@ class PicklistService {
             orderItem.addToPicklistItems(picklistItem)
             picklistItem.inventoryItem = inventoryItem
             picklistItem.binLocation = binLocation
-            picklistItem.quantity = quantity
+            picklistItem.quantityPicked = quantity
             picklistItem.sortOrder = orderItem.orderIndex
             picklistItem.disableRefresh = Boolean.TRUE
         }
@@ -252,7 +252,7 @@ class PicklistService {
 
                 availableItems.add(availableItem)
             } else {
-                availableItem.quantityAvailable += picklistItem.quantity
+                availableItem.quantityAvailable += picklistItem.quantityPicked
             }
         }
 

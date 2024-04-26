@@ -373,7 +373,7 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
     }
 
     def totalQuantityPicked() {
-        return PicklistItem.findAllByOrderItem(this).sum { it.quantity }
+        return PicklistItem.findAllByOrderItem(this).sum { it.quantityPicked }
     }
 
     def retrievePicklistItems() {
