@@ -1,4 +1,4 @@
-package util
+package org.pih.warehouse.api
 
 import org.pih.warehouse.api.StockMovementDirection
 import org.pih.warehouse.auth.AuthService
@@ -8,7 +8,7 @@ import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionSourceType
 import org.pih.warehouse.shipping.Shipment
 
-class StockMovementContext {
+class StockMovementStatusContext {
     Order order
 
     Shipment shipment
@@ -18,6 +18,18 @@ class StockMovementContext {
     Location origin
 
     Location destination
+
+    Shipment getShipment() {
+        return shipment
+    }
+
+    Order getOrder() {
+        return order
+    }
+
+    Requisition getRequisition() {
+        return requisition
+    }
 
     StockMovementDirection getStockMovementDirection(Location currentLocation) {
         if (currentLocation == origin) {

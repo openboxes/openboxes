@@ -6,7 +6,6 @@ import org.pih.warehouse.api.StockMovementType
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
-import org.pih.warehouse.core.Role
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
 import org.pih.warehouse.order.Order
@@ -20,8 +19,8 @@ import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.shipping.ShipmentStatusCode
 import org.pih.warehouse.shipping.ShipmentType
-import util.StockMovementContext
-import util.StockMovementStatusHelper
+import org.pih.warehouse.api.StockMovementStatusContext
+import util.StockMovementStatusResolver
 
 class OutboundStockMovement implements Serializable, Validateable {
 
@@ -232,15 +231,15 @@ class OutboundStockMovement implements Serializable, Validateable {
 
     @Deprecated
     Map<String, String> getDisplayStatus() {
-        StockMovementContext stockMovementContext = new StockMovementContext(
+        StockMovementStatusContext stockMovementContext = new StockMovementStatusContext(
                 order: order,
                 requisition: requisition,
                 shipment: shipment,
                 origin: origin,
                 destination: destination
         )
-        Enum status = StockMovementStatusHelper.getStatus(stockMovementContext)
-        return StockMovementStatusHelper.getStatusMetaData(status)
+        Enum status = StockMovementStatusResolver.getStatus(stockMovementContext)
+        return StockMovementStatusResolver.getStatusMetaData(status)
     }
 
     Boolean isDeleteOrRollbackAuthorized(Location currentLocation) {

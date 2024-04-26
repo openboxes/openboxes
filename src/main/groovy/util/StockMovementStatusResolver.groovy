@@ -1,7 +1,7 @@
 package util
 
 import grails.util.Holders
-
+import org.pih.warehouse.api.StockMovementStatusContext
 import org.pih.warehouse.inventory.StockMovementStatusCode
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderStatus
@@ -9,7 +9,7 @@ import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentStatusCode
 
-class StockMovementStatusHelper {
+class StockMovementStatusResolver {
 
     private static RequisitionStatus getOutboundReturnDisplayStatus(Order order) {
         switch (order?.status) {
@@ -36,7 +36,7 @@ class StockMovementStatusHelper {
         return shipment?.status?.code ?: ShipmentStatusCode.PENDING
     }
 
-    static Enum getStatus(StockMovementContext context) {
+    static Enum getStatus(StockMovementStatusContext context) {
         if (context.isReturn()) {
             return context.isInbound()
                     ? getInboundReturnDisplayStatus(context.shipment)
@@ -54,7 +54,7 @@ class StockMovementStatusHelper {
         return context.requisition?.status
     }
 
-    static Enum getListStatus(StockMovementContext context) {
+    static Enum getListStatus(StockMovementStatusContext context) {
         if (context.isReturn()) {
             return context.isInbound()
                     ? getInboundReturnDisplayStatus(context.shipment)

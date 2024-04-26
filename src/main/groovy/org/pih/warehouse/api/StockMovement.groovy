@@ -5,14 +5,11 @@ import org.apache.commons.collections.list.LazyList
 import grails.util.Holders
 import grails.validation.Validateable
 import org.pih.warehouse.core.ActivityCode
-import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
-import org.pih.warehouse.core.Role
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
-import org.pih.warehouse.core.UserService
 import org.pih.warehouse.inventory.StockMovementStatusCode
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItemStatusCode
@@ -28,8 +25,7 @@ import org.pih.warehouse.shipping.ShipmentStatusCode
 import org.pih.warehouse.shipping.ShipmentType
 import org.pih.warehouse.auth.AuthService
 import util.ConfigHelper
-import util.StockMovementContext
-import util.StockMovementStatusHelper
+import util.StockMovementStatusResolver
 
 
 class StockMovement implements Validateable{
@@ -477,15 +473,15 @@ class StockMovement implements Validateable{
 
     @Deprecated
     Map<String, String> getDisplayStatus() {
-        StockMovementContext stockMovementContext = new StockMovementContext(
+        StockMovementStatusContext stockMovementContext = new StockMovementStatusContext(
                 order: order,
                 requisition: requisition,
                 shipment: shipment,
                 origin: origin,
                 destination: destination
         )
-        Enum status = StockMovementStatusHelper.getListStatus(stockMovementContext)
-        return StockMovementStatusHelper.getStatusMetaData(status)
+        Enum status = StockMovementStatusResolver.getListStatus(stockMovementContext)
+        return StockMovementStatusResolver.getStatusMetaData(status)
     }
 
     Boolean canUserRollbackApproval(User user) {
