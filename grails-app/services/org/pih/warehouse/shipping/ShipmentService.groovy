@@ -20,6 +20,7 @@ import org.apache.poi.ss.usermodel.Row
 import org.hibernate.FetchMode
 import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.api.StockTransfer
+import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.Constants
@@ -1186,7 +1187,8 @@ class ShipmentService {
         }
 
         // Attempt to add the event to the shipment
-        def eventInstance = new Event(eventDate: eventDate, eventType: eventType, eventLocation: location)
+        User currentUser = AuthService.currentUser
+        Event eventInstance = new Event(eventDate: eventDate, eventType: eventType, eventLocation: location, createdBy: currentUser)
         if (!eventInstance.hasErrors()) {
             shipmentInstance.addToEvents(eventInstance)
             shipmentInstance.save()
