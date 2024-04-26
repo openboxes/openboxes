@@ -92,7 +92,7 @@ class StockMovementStatusResolver {
             return context?.requisition?.status
         }
 
-        return context?.shipment?.status?.code ?: context?.requisition?.status
+        return context?.requisition?.status
     }
 
     static def getApplicationTagLib() {

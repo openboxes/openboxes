@@ -86,8 +86,7 @@ class StockMovement implements Validateable{
 
     static transients = [
             "electronicType",
-            "pendingApproval",
-            "displayStatus"
+            "pendingApproval"
     ]
 
     static constraints = {
@@ -126,7 +125,6 @@ class StockMovement implements Validateable{
         lastUpdated(nullable: true)
         requestType(nullable: true)
         sourceType(nullable: true)
-        displayStatus(nullable: true)
     }
 
     Map toJson() {
