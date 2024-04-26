@@ -52,8 +52,9 @@ class StockMovementStatusHelper {
     static RequisitionStatus getOutboundReturnDisplayStatus(Order order) {
         switch (order?.status) {
             case OrderStatus.PENDING:
-            case OrderStatus.PLACED:
                 return RequisitionStatus.CREATED
+            case OrderStatus.PLACED:
+                return RequisitionStatus.CHECKING
             case OrderStatus.APPROVED:
                 return RequisitionStatus.PICKING
             case OrderStatus.CANCELED:
