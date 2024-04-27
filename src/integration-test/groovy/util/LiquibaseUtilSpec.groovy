@@ -14,7 +14,7 @@ class LiquibaseUtilSpec extends Specification {
     def cleanup() {
     }
 
-    void "should include valid upgrade changelog versions"() {
+    void "should return valid upgrade changelog versions"() {
         when:
         Set<String> changeLogVersions = LiquibaseUtil.upgradeChangeLogVersions
         then:
