@@ -368,6 +368,7 @@ repositories {
     maven { url 'https://repo.grails.org/grails/core' }
     // deprecated; only used to fetch code-coverage plugin
     maven { url 'https://repo.grails.org/grails/plugins' }
+    maven { url 'https://jitpack.io' }
 }
 
 /*
@@ -751,6 +752,13 @@ dependencies {
     // security patch
     compile 'org.yaml:snakeyaml:1.33'
     console 'org.yaml:snakeyaml:1.33'
+
+    // testcontainers
+    // included to avoid a dependency conflict with another dependency
+    testCompile 'org.apache.commons:commons-compress:1.21'
+    testCompile "org.testcontainers:mysql:1.17.3"
+    testCompile "org.testcontainers:spock:1.17.3"
+
 }
 
 /*
@@ -834,5 +842,14 @@ tasks.withType(Test) {
     testLogging {
         events 'failed', 'passed', 'skipped'
         exceptionFormat 'full'
+    }
+}
+
+integrationTest {
+    testLogging {
+        events "passed", "skipped", "failed"
+        showStackTraces = true
+        showStandardStreams = true
+        //exceptionFormat = TestExceptionFormat.FULL
     }
 }
