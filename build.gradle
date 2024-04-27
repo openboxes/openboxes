@@ -38,6 +38,8 @@ buildscript {
         classpath "org.grails.plugins:database-migration:${databaseMigrationVersion}"
         classpath "org.grails.plugins:views-gradle:${grailsViewsVersion}"
         classpath "org.owasp:dependency-check-gradle:${owaspVersion}"
+        classpath "org.grails.plugins:hibernate5:${gormVersion - '.RELEASE'}"
+
     }
     repositories {
         mavenCentral()
