@@ -658,11 +658,17 @@ class BootStrap {
             liquibase = new Liquibase(null as DatabaseChangeLog, new ClassLoaderResourceAccessor(), database)
             liquibase.checkLiquibaseTables(false, null, new Contexts(), new LabelExpression())
 
+            // This needs to happen before we execute any changelogs in order to ensure that we
+            // FIXME could we ever be in a state where the install changelog has not been executed
+            //  but we have records in DATABASECHANGELOG
+            // FIXME, we should probably add some logic to look for an "install" changelog
+            List executedChangeLogVersions = LiquibaseUtil.getExecutedChangelogVersions()
+            log.info("executedChangelogVersions: " + executedChangeLogVersions)
+
+            // The process should always start with us dropping views (they are recreated at the end)
             log.info 'Dropping all views (will rebuild after migrations complete)...'
             LiquibaseUtil.executeChangeLog("views/drop-all-views.xml")
 
-            def executedChangeLogVersions = LiquibaseUtil.getExecutedChangelogVersions()
-            log.info("executedChangelogVersions: " + executedChangeLogVersions)
 
             // If nothing has been created yet, let's create all new database objects with the install scripts
             if (!executedChangeLogVersions) {
