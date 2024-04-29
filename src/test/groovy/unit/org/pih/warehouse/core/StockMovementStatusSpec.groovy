@@ -53,7 +53,7 @@ class StockMovementStatusSpec extends Specification {
         where:
         orderStatus                     ||  expected
         OrderStatus.PENDING             ||  RequisitionStatus.CREATED
-        OrderStatus.PLACED              ||  RequisitionStatus.CREATED
+        OrderStatus.PLACED              ||  RequisitionStatus.CHECKING
         OrderStatus.APPROVED            ||  RequisitionStatus.PICKING
         OrderStatus.CANCELED            ||  RequisitionStatus.CANCELED
         OrderStatus.PARTIALLY_RECEIVED  ||  RequisitionStatus.ISSUED
@@ -173,7 +173,7 @@ class StockMovementStatusSpec extends Specification {
         where:
         orderStatus                     || expected
         OrderStatus.PENDING             || RequisitionStatus.CREATED
-        OrderStatus.PLACED              || RequisitionStatus.CREATED
+        OrderStatus.PLACED              || RequisitionStatus.CHECKING
         OrderStatus.APPROVED            || RequisitionStatus.PICKING
         OrderStatus.CANCELED            || RequisitionStatus.CANCELED
         OrderStatus.CANCELED            || RequisitionStatus.CANCELED
