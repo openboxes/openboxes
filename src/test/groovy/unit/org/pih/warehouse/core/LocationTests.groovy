@@ -10,22 +10,31 @@
 package org.pih.warehouse.core
 
 import grails.test.*
+import grails.testing.gorm.DomainUnitTest
 import org.junit.Ignore
 import org.junit.Test
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationType
 import org.springframework.context.ApplicationEvent
+import spock.lang.Shared
+import spock.lang.Specification
+import static org.junit.Assert.*;
 
-@Ignore
-class LocationTests {
+
+//@Ignore
+class LocationTests extends Specification implements DomainUnitTest<Location> {
+    @Shared
     Location location1
+    @Shared
     Location location2
+    @Shared
     Location location3
+    @Shared
     Location location4
+    @Shared
     Location location5
 
-    protected void setUp() {
-        super.setUp()
+    protected void setup() {
         def depot = new LocationType(name: "Depot", description: "Depot", supportedActivities: [ActivityCode.MANAGE_INVENTORY])
         def supplier = new LocationType(name: "Supplier", description: "Supplier")
         def ward = new LocationType(name: "Ward", description: "Ward")
@@ -44,10 +53,12 @@ class LocationTests {
 
     void test_supports() {
 
+        when:
         assert location1.supports(ActivityCode.MANAGE_INVENTORY)
         assert location2.supports(ActivityCode.MANAGE_INVENTORY)
         assert !location3.supports(ActivityCode.MANAGE_INVENTORY)
 
+        then:
         // Test supports any
         assertTrue(location5.supportsAny([ActivityCode.RECEIVE_STOCK, ActivityCode.PUTAWAY_STOCK] as ActivityCode[]))
         assertFalse(location5.supportsAny([ActivityCode.SEND_STOCK, ActivityCode.RECEIVE_STOCK] as ActivityCode[]))
@@ -60,6 +71,7 @@ class LocationTests {
     }
 
     void test_shouldValidateOnNameUniqueConstraintIfSameNameButDifferentParentLocation() {
+        when:
         def locationType = new LocationType(locationTypeCode: LocationTypeCode.BIN_LOCATION, name: "Bin Location")
 
         def binLocation1 = new Location(name: "AA-01-01-01", parentLocation: location1, locationType: locationType)
@@ -67,6 +79,8 @@ class LocationTests {
         def binLocation3 = new Location(name: "AA-01-01-01", parentLocation: location2, locationType: locationType)
 
         mockDomain(Location, [binLocation1, binLocation2, binLocation3])
+
+        then:
         binLocation1.save()
         binLocation2.save()
 
@@ -75,6 +89,7 @@ class LocationTests {
 
     void test_shouldNotValidateNameUniqueConstraintIfSameName() {
 
+        when:
         def locationType = new LocationType(locationTypeCode: LocationTypeCode.BIN_LOCATION, name: "Bin Location")
 
         def binLocation1 = new Location(name: "AA-01-01-01", parentLocation: location1, locationType: locationType)
@@ -83,6 +98,8 @@ class LocationTests {
         def binLocation4 = new Location(name: "AA-01-01-01", parentLocation: location1, locationType: locationType)
 
         mockDomain(Location, [binLocation1, binLocation2, binLocation3])
+
+        then:
         binLocation1.save()
         binLocation2.save()
 
@@ -93,12 +110,14 @@ class LocationTests {
 
     void test_shouldNotValidateLocationNumberOnUniqueConstraintIfSame() {
 
+        when:
         def locationType = new LocationType(locationTypeCode: LocationTypeCode.BIN_LOCATION, name: "Bin Location")
 
         def binLocation1 = new Location(name: "AA-01-01-01", locationNumber: "My Bin", parentLocation: location1, locationType: locationType)
         def binLocation2 = new Location(name: "AA-01-01-02", locationNumber: "My Bin", parentLocation: location1, locationType: locationType)
 
         mockDomain(Location, [binLocation1])
+        then:
         binLocation1.save()
 
         // Should not validate with the same name and same parent location
@@ -108,6 +127,7 @@ class LocationTests {
 
     void test_shouldValidateLocationNumberOnUniqueConstraintIfNull() {
 
+        when:
         def locationType = new LocationType(locationTypeCode: LocationTypeCode.BIN_LOCATION, name: "Bin Location")
 
         def binLocation1 = new Location(name: "AA-01-01-01", locationNumber: null, parentLocation: location1, locationType: locationType)
@@ -117,6 +137,7 @@ class LocationTests {
         mockDomain(Location, [binLocation1, binLocation2])
 
         // Should validate if location number is null for multiple  and same parent location
+        then:
         assertTrue binLocation1.validate()
         assertTrue binLocation2.validate()
         assertTrue binLocation3.validate()
@@ -125,24 +146,29 @@ class LocationTests {
 
 
     void test_shouldSaveLocation() {
+        when:
         def location = new Location(name: "Default location", locationType: new LocationType(name: "Depot", description: "Depot"))
 
         if (!location.validate())
             location.errors.allErrors.each { println it }
 
+        then:
         assertTrue location.validate()
         location.save()
         assertFalse location.hasErrors()
     }
 
     void test_shouldHaveLocationType() {
+        when:
         def location = new Location()
+        then:
         assertFalse location.validate()
         println location.errors
-        assertEquals "nullable", location.errors["locationType"]
+        assertEquals "nullable", location.errors.getFieldError("locationType")?.getCode()
     }
 
     void test_isWardOrPharmacy() {
+        expect:
         assert location1.isWardOrPharmacy() == false
         assert location1.isDepotWardOrPharmacy() == true
         assert location4.isWardOrPharmacy() == true
@@ -160,8 +186,10 @@ class LocationTests {
 
     @Test
     void compareTo_shouldSortByName() {
+        when:
         def locations = [location3, location2, location1, location4]
         locations = locations.sort()
+        then:
         assertEquals locations[0], location1
         assertEquals locations[1], location2
         assertEquals locations[2], location3
@@ -172,13 +200,15 @@ class LocationTests {
 
     @Test
     void compareTo_shouldSortBySortOrderThenByName() {
+        when:
         def locations = [location3, location2, location1, location4]
         location1.sortOrder = 30
         location2.sortOrder = 30
         location3.sortOrder = 20
         location4.sortOrder = 10
-
         locations = locations.sort()
+
+        then:
         assertEquals locations[0], location4
         assertEquals locations[1], location3
         assertEquals locations[2], location1

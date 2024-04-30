@@ -1,5 +1,6 @@
 package org.pih.warehouse.requisition
 
+import grails.testing.gorm.DomainUnitTest
 import org.junit.After
 import org.junit.Before
 import org.junit.Ignore
@@ -9,16 +10,18 @@ import org.pih.warehouse.core.Person
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
+import spock.lang.Specification
 import testutils.DbHelper
+import static org.junit.Assert.*;
 
-@Ignore
-class RequisitionIntegrationTests extends GroovyTestCase {
+//@Ignore
+class RequisitionIntegrationTests extends Specification implements DomainUnitTest<Requisition> {
 
     def sessionFactory
 
 
     @Before
-    void setUp() {
+    void setup() {
         assertNotNull sessionFactory
         println sessionFactory.getStatistics()
     }
@@ -32,8 +35,10 @@ class RequisitionIntegrationTests extends GroovyTestCase {
 
     @Test
     void save_shouldReturnErrors() {
+        when:
         def requisition = new Requisition()
         requisition.save()
+        then:
         assertTrue requisition.hasErrors()
         println requisition.errors
         assertEquals 4, requisition.errors.errorCount
@@ -44,6 +49,7 @@ class RequisitionIntegrationTests extends GroovyTestCase {
 
     @Test
     void save_shouldSaveRequisition() {
+        when:
         def location = Location.list().first()
         def product1 = DbHelper.findOrCreateProduct('Advil 200mg')
         def product2 = DbHelper.findOrCreateProduct('Tylenol 325mg')
@@ -66,11 +72,13 @@ class RequisitionIntegrationTests extends GroovyTestCase {
         requisition.validate()
         requisition.errors.each{ println(it)}
 
+        then:
         assert requisition.save(flush:true)
     }
 
     @Test
     void save_shouldSaveRequisitionItemOnly() {
+        when:
         def person = DbHelper.findOrCreateUser('Axl', 'Rose', 'axl@hotmail.com', 'axl', 'Sw337_Ch1ld', false)
         def requisition = new Requisition(
                 name:'testRequisition'+ UUID.randomUUID().toString()[0..5],
@@ -82,12 +90,15 @@ class RequisitionIntegrationTests extends GroovyTestCase {
                 dateRequested: new Date(),
                 requestedDeliveryDate: new Date().plus(1))
 
+        then:
         assert requisition.save(flush:true)
 
+        when:
         def product = DbHelper.findOrCreateProduct('Advil 200mg')
         def item = new RequisitionItem(product: product, quantity: 10, requestedBy: person)
         requisition.addToRequisitionItems(item)
 
+        then:
         assert requisition.save(flush: true)
         assertEquals 1, requisition.requisitionItems.size()
     }
@@ -97,6 +108,7 @@ class RequisitionIntegrationTests extends GroovyTestCase {
      */
     @Ignore
     void getStockRequisition() {
+        when:
         def startTime = System.currentTimeMillis()
 
         def requisition = Requisition.findByRequestNumber("508BSK")
@@ -106,7 +118,8 @@ class RequisitionIntegrationTests extends GroovyTestCase {
                 println " \t* " + grandchild.toJson()
             }
         }
-
+        then:
+        assertNotNull(requisition)
 
         println "Response time: " + (System.currentTimeMillis() - startTime) + " ms"
 

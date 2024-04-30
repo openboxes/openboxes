@@ -9,6 +9,7 @@
 **/ 
 package org.pih.warehouse.user
 
+import grails.testing.gorm.DomainUnitTest
 import org.junit.After
 import org.junit.Before
 import org.junit.Ignore
@@ -17,14 +18,16 @@ import org.pih.warehouse.core.User;
 // import java.util.Locale;
 
 import grails.test.*
+import spock.lang.Specification
+import static org.junit.Assert.*;
 
-@Ignore
-class UserTests {
+//@Ignore
+class UserTests extends Specification implements DomainUnitTest<User>{
 
 
 	@Before
-	void setUp() {
-		super.setUp()
+	void setup() {
+//		super.setUp()
 
 		// Set up default user, so we can easily test single properties.
 		def user1 = new User(username: 'tester', password: 'password', firstName: 'Tester', lastName: 'Testerson', locale: new Locale("en", "EN") )
@@ -36,12 +39,14 @@ class UserTests {
 
 	@After
 	void tearDown() {
-		super.tearDown()
+//		super.tearDown()
 	}
 
     @Test
 	void testNullable_shouldPassWhenNullableErrorsDetected() {
+		when:
 		def user = new User()
+		then:
 		assertFalse user.validate()
 		assertEquals "nullable", user.errors["username"]
 		assertEquals "nullable", user.errors["password"]	
@@ -56,7 +61,9 @@ class UserTests {
 		//def user1 = new User(username: 'tester', password: 'password', firstName: 'Tester', lastName: 'Testerson', locale: new Locale("en", "EN"))
 		//mockForConstraintsTests(User, [user1])
 
+		when:
 		def user2 = new User(username: 'tester', password: 'password', firstName: 'Tester', lastName: 'Testerson Jr', locale: new Locale("en", "EN"))
+		then:
 		assertFalse user2.validate()
 		assertEquals 'Username is not unique.', 'unique', user2.errors['username']
 
@@ -67,18 +74,22 @@ class UserTests {
 		//def user1 = new User(username: 'tester', password: 'password', firstName: 'Tester', lastName: 'Testerson', locale: new Locale("en", "EN"))
 		//mockForConstraintsTests(User, [user1])
 
+		when:
 		def user3 = new User(username: 'otherTester', password: 'password', email: "valid@email.com", firstName: 'Tester', lastName: 'Testerson III', locale: new Locale("en", "EN"))
 		user3.validate();
 
 		println user3.errors
+		then:
 		assertTrue user3.validate()
 	}
 
     @Test
 	void testList_shouldReturnOneUser() {
+		when:
 		mockDomain(User, [new User(username: "username", password: "password", firstName: "First", lastName: "Last", locale: new Locale("en", "EN"))])
 		def users = User.list()
 		println users
+		then:
 		assertEquals 1, users.size()
 		
 	}

@@ -9,12 +9,15 @@
 **/ 
 package org.pih.warehouse.shipping
 
+import grails.testing.gorm.DomainUnitTest
 import org.junit.Ignore
 import org.pih.warehouse.shipping.Container
 import org.pih.warehouse.shipping.ContainerType
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.shipping.ShipmentType
+import spock.lang.Shared
+import spock.lang.Specification
 import testutils.DbHelper
 
 import static org.junit.Assert.*
@@ -25,19 +28,26 @@ import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
+import static org.junit.Assert.*;
 
 @Ignore
-class ShipmentItemTests extends GroovyTestCase {
-	
+class ShipmentItemTests extends Specification implements DomainUnitTest<ShipmentItem> {
+
+	@Shared
 	def shipmentItem1
+	@Shared
 	def shipmentItem2
+	@Shared
 	def shipmentItem3
+	@Shared
 	def shipmentItem4
+	@Shared
 	def shipmentItem5
+	@Shared
 	def shipmentItem6
 	
-	protected void setUp() {
-		super.setUp()
+	protected void setup() {
+//		super.setUp()
 		
 		new Category(name: "Medicines").save(flush:true)
 		def productType = DbHelper.findOrCreateProductType("Default")
@@ -105,17 +115,21 @@ class ShipmentItemTests extends GroovyTestCase {
 	}
 
 
-	void test_compareTo_shouldShipmentItem1BeforeShipmentItem2() { 
+	void test_compareTo_shouldShipmentItem1BeforeShipmentItem2() {
+		when:
 		def expectedValue = -1
 		def actualValue = shipmentItem1.compareTo(shipmentItem2)
+		then:
 		assertEquals expectedValue, actualValue
 	}
 	
 	void test_sort_shouldSortProperly() {
+		when:
 		def expectedValue = [shipmentItem5, shipmentItem1, shipmentItem4, shipmentItem6, shipmentItem3, shipmentItem2]
 		def actualValue = [shipmentItem1, shipmentItem2, shipmentItem3, shipmentItem4, shipmentItem5, shipmentItem6]
 		actualValue = actualValue.sort()
 		println actualValue
+		then:
 		assertEquals expectedValue, actualValue
 	}
 

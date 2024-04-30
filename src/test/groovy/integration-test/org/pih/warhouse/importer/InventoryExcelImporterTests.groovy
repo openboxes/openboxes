@@ -3,30 +3,37 @@ package org.pih.warehouse.importer
 import org.junit.Ignore
 import org.junit.Test
 import org.springframework.core.io.ClassPathResource
+import spock.lang.Specification
+import static org.junit.Assert.*;
 
-@Ignore
-class InventoryExcelImporterTests extends GroovyTestCase {
+//@Ignore
+class InventoryExcelImporterTests extends Specification {
 
-    protected void setUp() {
-        super.setUp()
+    protected void setup() {
+//        super.setUp()
     }
 
     protected void tearDown() {
-        super.tearDown()
+//        super.tearDown()
     }
 
     @Test
     void testSomething() {
+        when:
         def resource = new ClassPathResource('resources/inventory3.xls')
         def file = resource.getFile()
+        then:
         assert file.exists()
 
+        when:
         def importer = new InventoryExcelImporter(file.absolutePath)
         def actualData = importer.data
 
         println "Data: ${actualData}"
+        then:
         assert actualData != null
 
+        when:
         def expectedData = [
                 [productCode:"00001", product:"Advil 200mg", lotNumber:"M18", expirationDate:"15-11", binLocation:"Salle 1", quantityOnHand:252.0, quantity:2520.0, comments:"Comment 1"],
                 [productCode:"00001", product:"Advil 200mg", lotNumber:"M21", expirationDate:"16-02", binLocation:"Salle 1", quantityOnHand:1654.0, quantity:16540.0, comments:"Comment 2"],
@@ -48,6 +55,7 @@ class InventoryExcelImporterTests extends GroovyTestCase {
                 [productCode:"00008", product:"Print Paper A4", lotNumber:"7518", expirationDate:"16-04", binLocation:"Salle 3", quantityOnHand:680.0, quantity:6800.0, comments:"Comment 18"]
         ]
 
+        then:
         assert actualData.size() == 18
         for (i in 0 .. 17) {
             assert actualData[i].productCode == expectedData[i].productCode

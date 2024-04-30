@@ -1,54 +1,69 @@
 package org.pih.warehouse.core
 
+import grails.core.DefaultGrailsApplication
+import grails.testing.gorm.DataTest
+import grails.testing.services.ServiceUnitTest
+import grails.util.Holders
 import org.apache.commons.lang.StringUtils
-import org.junit.Ignore;
 import org.junit.Test
+import spock.lang.Specification
+import static org.junit.Assert.*;
 
-@Ignore
-class IdentifierServiceTests extends GroovyTestCase{
+//@Ignore
+@SuppressWarnings('MethodName')
+class IdentifierServiceTests  extends Specification implements ServiceUnitTest<IdentifierService>, DataTest {
   
-	def identifierService
+	def setup() {
+		Holders.grailsApplication = new DefaultGrailsApplication()
+		Holders.grailsApplication.config.openboxes.identifier.alphanumeric = Constants.RANDOM_IDENTIFIER_NUMERIC_CHARACTERS
+	}
 		
 	@Test
-	void generateIdentifier() {
-		def identifier = identifierService.generateIdentifier(4)
-		assertNotNull identifier
-		assertEquals 4, identifier.length()
+	void test_generateIdentifier() {
+		when:
+		def identifier = service.generateIdentifier(4)
+		then:
+		assert identifier != null
+		assert  4 == identifier.length()
 	}
 
 	@Test
 	void generateIdentifier_shouldReturnFormattedIdentifier() {
-		def identifier = identifierService.generateIdentifier("LLL-NNN-AAA-NNN")
-		assertNotNull identifier
-		assertEquals 15, identifier.length()
-		assertTrue StringUtils.isAlpha(identifier[0])
-		assertTrue StringUtils.isAlpha(identifier[1])
-		assertTrue StringUtils.isAlpha(identifier[2])
-		assertEquals "-", identifier[3]
-		assertTrue StringUtils.isNumeric(identifier[4])
-		assertTrue StringUtils.isNumeric(identifier[5])
-		assertTrue StringUtils.isNumeric(identifier[6])
-		assertEquals "-", identifier[7]
-		assertTrue StringUtils.isAlphanumeric(identifier[8])
-		assertTrue StringUtils.isAlphanumeric(identifier[9])
-		assertTrue StringUtils.isAlphanumeric(identifier[10])
-		assertEquals "-", identifier[11]
-		assertTrue StringUtils.isNumeric(identifier[12])
-		assertTrue StringUtils.isNumeric(identifier[13])
-		assertTrue StringUtils.isNumeric(identifier[14])
+		when:
+		def identifier = service.generateIdentifier("LLL-NNN-AAA-NNN")
+		then:
+		assert identifier != null
+		assert 15 == identifier.length()
+		assert StringUtils.isAlpha(identifier[0])
+		assert StringUtils.isAlpha(identifier[1])
+		assert StringUtils.isAlpha(identifier[2])
+		assert "-" == identifier[3]
+		assert StringUtils.isNumeric(identifier[4])
+		assert StringUtils.isNumeric(identifier[5])
+		assert StringUtils.isNumeric(identifier[6])
+		assert "-" == identifier[7]
+		assert StringUtils.isAlphanumeric(identifier[8])
+		assert StringUtils.isAlphanumeric(identifier[9])
+		assert StringUtils.isAlphanumeric(identifier[10])
+		assert "-" ==  identifier[11]
+		assert StringUtils.isNumeric(identifier[12])
+		assert StringUtils.isNumeric(identifier[13])
+		assert StringUtils.isNumeric(identifier[14])
 	}
 
 	@Test
 	void generateIdentifier_shouldFailOnEmptyString() {
-		def message = shouldFail(IllegalArgumentException) {
-			def identifier = identifierService.generateIdentifier("")
-		}
+		when:
+		def identifier = service.generateIdentifier("")
+		then:
+		thrown(IllegalArgumentException)
 	}
 
 	@Test
 	void generateIdentifier_shouldFailOnNull() {
-		def message = shouldFail(IllegalArgumentException) {
-			def identifier = identifierService.generateIdentifier(null)
-		}
+		when:
+		def identifier = service.generateIdentifier(null)
+		then:
+		thrown(IllegalArgumentException)
 	}
 }

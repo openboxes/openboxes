@@ -9,7 +9,7 @@
 **/
 package org.pih.warehouse.data
 
-
+import grails.testing.services.ServiceUnitTest
 import org.junit.Ignore
 import org.junit.Test
 import org.pih.warehouse.core.Location
@@ -17,24 +17,28 @@ import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.product.Product
 import org.springframework.core.io.ClassPathResource
 import org.springframework.core.io.Resource
+import spock.lang.Specification
 import testutils.DbHelper
+import static org.junit.Assert.*;
 
-@Ignore
-class DataServiceTests extends GroovyTestCase {
+//@Ignore
+class DataServiceTests extends Specification implements ServiceUnitTest<DataService> {
 
-
-    def dataService
 
     @Test
     void findOrCreateCategory() {
-        def category = dataService.findOrCreateCategory("New Category")
+        when:
+        def category = service.findOrCreateCategory("New Category")
+        then:
         assertNotNull category
         assertEquals "New Category", category.name
     }
 
     @Test
     void findOrCreateProduct() {
-        def product = dataService.findOrCreateProduct([productCode: "AB12", productName: "New product", category: "New category", productTypeName: "Default", manufacturer: "Mfg", manufacturerCode: "Mfgcode", vendor: "Vendor", vendorCode: "Vendor code", unitOfMeasure: "each"])
+        when:
+        def product = service.findOrCreateProduct([productCode: "AB12", productName: "New product", category: "New category", productTypeName: "Default", manufacturer: "Mfg", manufacturerCode: "Mfgcode", vendor: "Vendor", vendorCode: "Vendor code", unitOfMeasure: "each"])
+        then:
         assertNotNull product
         assertEquals "AB12", product.productCode
         assertEquals "New product", product.name
@@ -47,15 +51,19 @@ class DataServiceTests extends GroovyTestCase {
 
     @Test
     void findOrCreateUnitOfMeasure() {
-        def unitOfMeasure = dataService.findOrCreateUnitOfMeasure("EA")
+        when:
+        def unitOfMeasure = service.findOrCreateUnitOfMeasure("EA")
+        then:
         assertNotNull unitOfMeasure
         assertEquals "EA", unitOfMeasure.code
     }
 
     @Test
     void findOrCreateProductPackage() {
-        def product = dataService.findOrCreateProduct([productCode: "AB12", productName: "New product", category: "New category", productTypeName: "Default", manufacturer: "Mfg", manufacturerCode: "Mfgcode", vendor: "Vendor", vendorCode: "Vendor code", unitOfMeasure: "each"])
-        def productPackage = dataService.findOrCreateProductPackage(product, "EA", 1, 1.50)
+        when:
+        def product = service.findOrCreateProduct([productCode: "AB12", productName: "New product", category: "New category", productTypeName: "Default", manufacturer: "Mfg", manufacturerCode: "Mfgcode", vendor: "Vendor", vendorCode: "Vendor code", unitOfMeasure: "each"])
+        def productPackage = service.findOrCreateProductPackage(product, "EA", 1, 1.50)
+        then:
         assertNotNull productPackage
         assertEquals "EA/1", productPackage.name
         assertEquals "EA/1", productPackage.description
@@ -66,11 +74,13 @@ class DataServiceTests extends GroovyTestCase {
 
     @Test
     void findOrCreateInventoryLevel() {
+        when:
         def location = DbHelper.findOrCreateLocationWithInventory("Boston Headquarters");
-        def product = dataService.findOrCreateProduct([productCode: "AB12", productName: "New product", category: "New category", productTypeName: "Default", manufacturer: "Mfg", manufacturerCode: "Mfgcode", vendor: "Vendor", vendorCode: "Vendor code", unitOfMeasure: "each"])
+        def product = service.findOrCreateProduct([productCode: "AB12", productName: "New product", category: "New category", productTypeName: "Default", manufacturer: "Mfg", manufacturerCode: "Mfgcode", vendor: "Vendor", vendorCode: "Vendor code", unitOfMeasure: "each"])
         def row = [minQuantity: 0, reorderQuantity: 10, maxQuantity: 100, expectedLeadTimeDays: 120, replenishmentPeriodDays: 7, preferredForReorder: true]
-        def inventoryLevel = dataService.findOrCreateInventoryLevel(product, location.inventory, null, row)
+        def inventoryLevel = service.findOrCreateInventoryLevel(product, location.inventory, null, row)
 
+        then:
         assertNotNull inventoryLevel
         //assertEquals "AB-12-12", inventoryLevel.binLocation
         assertEquals 0, inventoryLevel.minQuantity
@@ -84,26 +94,35 @@ class DataServiceTests extends GroovyTestCase {
 
 
 
-    @Ignore
+//    @Ignore
+    @Test
     void importInventoryLevels() {
+        when:
         def startTime = System.currentTimeMillis()
 
         // Get the
         def location = Location.findByName("Boston Headquarters");
+        then:
         assertNotNull location
         if (!location.inventory) {
             location.inventory = new Inventory();
             location.save(flush: true, failOnError: true)
         }
 
+        when:
         Resource resource = new ClassPathResource("resources/inventoryLevelImportData-partial.xls")
         def file = resource.getFile()
+        then:
         assert file.exists()
 
-        def inventoryLevelList = dataService.importInventoryLevels(location, file.getAbsolutePath())
+        when:
+        def inventoryLevelList = service.importInventoryLevels(location, file.getAbsolutePath())
+        then:
         assertNotNull inventoryLevelList
 
+        when:
         def product = Product.findByProductCode("NM89")
+        then:
         assertNotNull product
         assertEquals "X- Ray Digitizer", product.name
         assertEquals "Diagnostic imaging products", product.category.name
@@ -112,7 +131,9 @@ class DataServiceTests extends GroovyTestCase {
         assertEquals "3D Systems Corporation", product.vendor
         assertEquals "each", product.unitOfMeasure
 
+        when:
         product = Product.findByProductCode("PK77")
+        then:
         assertNotNull product
         assertEquals "Burette Set (micro dropper), 150ml, w/ automatic shutoff", product.name
         assertEquals "Intravenous (IV) and arterial administration products", product.category.name
@@ -125,7 +146,9 @@ class DataServiceTests extends GroovyTestCase {
         assertEquals "each", product.unitOfMeasure
         assertEquals "BP2-02", product.getInventoryLevel(location.id).binLocation
 
+        when:
         product = Product.findByProductCode("NT75")
+        then:
         assertNotNull product
         assertEquals "Applicator stick", product.name
         assertEquals "Laboratory supplies", product.category.name
@@ -151,17 +174,23 @@ class DataServiceTests extends GroovyTestCase {
 
 
         // Testing the new preferred for reorder flag
+        when:
         product = Product.findByProductCode("NT75")
+        then:
         assertNotNull product
         assertEquals "Applicator stick", product.name
         assertTrue product.getInventoryLevel(location.id).preferred
 
+        when:
         product = Product.findByProductCode("VV07")
+        then:
         assertNotNull product
         assertEquals "Applicator, Cotton tipped, Nonsterile", product.name
         assertFalse product.getInventoryLevel(location.id).preferred
 
+        when:
         product = Product.findByProductCode("SD08")
+        then:
         assertNotNull product
         assertEquals "Bag, Biohazard, Autoclave, 14in x 19in", product.name
         assertFalse product.getInventoryLevel(location.id).preferred
@@ -188,26 +217,35 @@ class DataServiceTests extends GroovyTestCase {
         println "Time to import ${inventoryLevelList.size()} items: " + (System.currentTimeMillis() - startTime) + " ms"
      }
 
-    @Ignore
+//    @Ignore
+    @Test
     void importProductGroups() {
+        when:
         def startTime = System.currentTimeMillis()
 
         // Get the
         def location = Location.findByName("Boston Headquarters");
+        then:
         assertNotNull location
         if (!location.inventory) {
             location.inventory = new Inventory();
             location.save(flush: true, failOnError: true)
         }
 
+        when:
         Resource resource = new ClassPathResource("resources/inventoryLevelImportData-partial.xls")
         def file = resource.getFile()
+        then:
         assert file.exists()
 
-        def inventoryLevelList = dataService.importInventoryLevels(location, file.getAbsolutePath())
+        when:
+        def inventoryLevelList = service.importInventoryLevels(location, file.getAbsolutePath())
+        then:
         assertNotNull inventoryLevelList
 
+        when:
         def product = Product.findByProductCode("NM89")
+        then:
         assertNotNull product
         assertEquals "X- Ray Digitizer", product.name
         assertEquals "Diagnostic imaging products", product.category.name
@@ -216,7 +254,9 @@ class DataServiceTests extends GroovyTestCase {
         assertEquals "3D Systems Corporation", product.vendor
         assertEquals "each", product.unitOfMeasure
 
+        when:
         product = Product.findByProductCode("PK77")
+        then:
         assertNotNull product
         assertEquals "Burette Set (micro dropper), 150ml, w/ automatic shutoff", product.name
         assertEquals "Intravenous (IV) and arterial administration products", product.category.name
@@ -229,7 +269,9 @@ class DataServiceTests extends GroovyTestCase {
         assertEquals "each", product.unitOfMeasure
         assertEquals "BP2-02", product.getInventoryLevel(location.id).binLocation
 
+        when:
         product = Product.findByProductCode("NT75")
+        then:
         assertNotNull product
         assertEquals "Applicator stick", product.name
         assertEquals "Laboratory supplies", product.category.name
@@ -248,7 +290,9 @@ class DataServiceTests extends GroovyTestCase {
         assertEquals 10000, product.getInventoryLevel(location.id).reorderQuantity
         assertEquals 20000, product.getInventoryLevel(location.id).maxQuantity
 
+        when:
         def productPackage = product.getProductPackage("CS")
+        then:
         assertNotNull productPackage
         assertEquals 1000, productPackage.quantity
         assertEquals 85.91, productPackage.productPrice.price, 0.0001

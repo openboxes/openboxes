@@ -10,22 +10,29 @@
 package org.pih.warehouse.core
 
 import grails.test.*
+import grails.testing.gorm.DomainUnitTest
 import org.junit.Ignore
 import org.junit.Test
 import org.pih.warehouse.core.LocationGroup
+import spock.lang.Shared
+import spock.lang.Specification
+import static org.junit.Assert.*;
 
-@Ignore
-class LocationGroupTests {
+//@Ignore
+class LocationGroupTests  extends Specification implements DomainUnitTest<LocationGroup> {
+    @Shared
     def bos = new LocationGroup(name: "Boston")
+    @Shared
     def pap = new LocationGroup(name: "Port au Prince")
+    @Shared
     def hum = new LocationGroup(name: "HUM")
 
-    protected void setUp() {
-        super.setUp()
+    protected void setup() {
+//        super.setup()
         mockDomain(LocationGroup, [bos, pap, hum])
     }
 
-    @Ignore
+//    @Ignore
     void validate() {
         def locationGroup = new LocationGroup()
         assertFalse locationGroup.validate()
@@ -34,8 +41,10 @@ class LocationGroupTests {
 
     @Test
     void compareTo_shouldSortByName() {
+        when:
         def locations = [pap, bos, hum]
         locations = locations.sort()
+        then:
         assertEquals locations[0].name, "Boston"
         assertEquals locations[1].name, "HUM"
         assertEquals locations[2].name, "Port au Prince"

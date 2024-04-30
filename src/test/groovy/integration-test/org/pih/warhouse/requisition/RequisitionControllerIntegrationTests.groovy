@@ -1,5 +1,7 @@
 package org.pih.warehouse.requisition
 
+import grails.testing.web.controllers.ControllerUnitTest
+import org.hibernate.SessionFactory
 import org.junit.After
 import org.junit.Before
 import org.junit.Ignore
@@ -7,23 +9,34 @@ import org.junit.Test
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.User
+import org.pih.warehouse.data.DataService
+import org.pih.warehouse.inventory.InventoryService
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.product.ProductService
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionController
 import org.pih.warehouse.requisition.RequisitionItem
+import org.springframework.beans.factory.annotation.Autowired
+import spock.lang.Specification
 import testutils.DbHelper
+import static org.junit.Assert.*;
 
-@Ignore
-class RequisitionControllerIntegrationTests extends GroovyTestCase {
+//@Ignore
+class RequisitionControllerIntegrationTests extends Specification implements ControllerUnitTest<RequisitionController> {
 
-    def sessionFactory
-    def dataService
-    def inventoryService
-    def requisitionService
-    def productService
+    @Autowired
+    SessionFactory sessionFactory
+    @Autowired
+    DataService dataService
+    @Autowired
+    InventoryService inventoryService
+    @Autowired
+    RequisitionService requisitionService
+    @Autowired
+    ProductService productService
 
     @Before
-    void setUp() {
+    void setup() {
         assertNotNull sessionFactory
         println sessionFactory.getStatistics()
     }
@@ -36,6 +49,7 @@ class RequisitionControllerIntegrationTests extends GroovyTestCase {
 
     @Test
     void list_shouldListRequisitions() {
+        when:
         Location location = DbHelper.findOrCreateLocation('Boston Headquarters')
 
         def product1 = DbHelper.findOrCreateProduct('Advil 200mg')
@@ -57,11 +71,12 @@ class RequisitionControllerIntegrationTests extends GroovyTestCase {
         requisition.addToRequisitionItems(item2)
         requisition.save(flush:true, failOnError: true)
 
-        def controller = new RequisitionController();
+//        def controller = new RequisitionController();
         controller.session.warehouse = location
         controller.session.user = User.list().first()
         controller.list()
 
+        then:
         assertTrue controller.modelAndView.viewName.contains("list")
         assertEquals 1, controller.modelAndView.model.requisitions.size()
 
@@ -72,12 +87,14 @@ class RequisitionControllerIntegrationTests extends GroovyTestCase {
     /**
      * Temporary unit test created for performance tuning that should be @Ignored when committed to github.
      */
-    @Ignore
+//    @Ignore
+    @Test
     void reviewRequisition() {
 
+        when:
         println sessionFactory.getStatistics()
         def startTime = System.currentTimeMillis()
-        def controller = new RequisitionController()
+//        def controller = new RequisitionController()
 
         controller.requisitionService = requisitionService
         controller.inventoryService = inventoryService
@@ -90,7 +107,8 @@ class RequisitionControllerIntegrationTests extends GroovyTestCase {
         controller.params.putAll(params)
         controller.review()
 
-        println controller.response
+        then:
+        assertNotNull controller.response
 
         println "Response time: " + (System.currentTimeMillis() - startTime) + " ms"
 

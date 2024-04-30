@@ -10,21 +10,25 @@
 package org.pih.warehouse.product
 
 import grails.test.*
+import grails.testing.gorm.DomainUnitTest
 import groovy.sql.Sql
 import org.junit.Ignore
 import org.junit.Test
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductGroup
+import spock.lang.Specification
 import testutils.DbHelper
+import static org.junit.Assert.*;
 
-@Ignore
-class ProductGroupIntegrationTests extends GroovyTestCase {
+
+//@Ignore
+class ProductGroupIntegrationTests extends Specification implements DomainUnitTest<ProductGroup> {
 	
 	def dataSource
 	
-	protected void setUp() {
-		super.setUp()
+	protected void setup() {
+//		super.setUp()
 		
 		def category = new Category(name: "Medicines")
 		category.save(flush:true)
@@ -52,16 +56,16 @@ class ProductGroupIntegrationTests extends GroovyTestCase {
 	}
 
 	protected void tearDown() {
-		super.tearDown()
+//		super.tearDown()
 	}
 
 
     @Test
 	void testProductGroupHasManyProducts() {
-		
-			
+		when:
 		def productGroup = ProductGroup.findByName("Ibuprofen")
 		println productGroup
+		then:
 		assertNotNull productGroup
 		assertNotNull productGroup.products
 		assertEquals 1, productGroup.products.size()		
@@ -70,13 +74,17 @@ class ProductGroupIntegrationTests extends GroovyTestCase {
 
     @Test
 	void test_productGroup_hasManyProducts() {
-		
+
+		when:
 		def product = Product.findByName("Ibuprofen, 200 mg, tablet")
 		println product
+		then:
 		assertNotNull product
-		
+
+		when:
 		def productGroup = ProductGroup.findByName("Ibuprofen")
 		println productGroup
+		then:
 		assertNotNull productGroup
 
 		
@@ -90,21 +98,27 @@ class ProductGroupIntegrationTests extends GroovyTestCase {
 	}
 
     // This test doesn't fail any longer.
-    @Ignore
+//    @Ignore
 	void test_delete_shouldFail() {
+		when:
 		def product = Product.findByName("Ibuprofen, 200 mg, tablet")
+		then:
 		assertNotNull product
-		
+
+		when:
 		def productGroup = ProductGroup.findByName("Ibuprofen")
+		then:
 		assertNotNull productGroup
 
 		def message = shouldFail(Exception) { 
 			productGroup.delete(flush:true)
 		}
 		assertNotNull message
-		assertTrue message.contains("deleted object would be re-saved by cascade") 
-		
+		assertTrue message.contains("deleted object would be re-saved by cascade")
+
+		when:
 		product = Product.findByName("Ibuprofen, 200 mg, tablet")
+		then:
 		assertEquals 1, product.productGroups.size()
 		assertEquals 1, productGroup.products.size()
 
@@ -112,36 +126,46 @@ class ProductGroupIntegrationTests extends GroovyTestCase {
 
     @Test
 	void test_delete_shouldDeleteProductGroupAndProductAssociation() {
-		
+
+		when:
 		def product = Product.findByName("Ibuprofen, 200 mg, tablet")
+		then:
 		assertNotNull product
         println product.category
         println product.category.categories
 
+		when:
 		def productGroup = ProductGroup.findByName("Ibuprofen")
+		then:
 		assertNotNull productGroup
 
-		product.removeFromProductGroups(productGroup)		
+		when:
+		product.removeFromProductGroups(productGroup)
 		productGroup.delete()
 		
-		product = Product.findByName("Ibuprofen, 200 mg, tablet")		
+		product = Product.findByName("Ibuprofen, 200 mg, tablet")
+		then:
 		assertEquals 0, product.productGroups.size()
 		assertEquals 0, productGroup.products.size()
 	}
 	
-	void test_productGroup_shouldNotPersistNonOwningAssociation() { 
+	void test_productGroup_shouldNotPersistNonOwningAssociation() {
+		when:
 		printAllProducts()
 		def product = Product.findByName("Tylenol, 325 mg, tablet")
+		then:
 		assertNotNull product
-				
+
+		when:
 		def productGroup = ProductGroup.findByName("Tylenol")
+		then:
 		assertNotNull productGroup
 		assertNotNull productGroup.products
 		assertEquals 1, productGroup.products.size()
 		assertTrue productGroup.products.contains(product)
 	}
 	
-	void printAllProducts() { 
+	void printAllProducts() {
 		println "PRINT ALL PRODUCTS"
 		def products = Product.list()
 		products.each {
@@ -149,7 +173,7 @@ class ProductGroupIntegrationTests extends GroovyTestCase {
 		}
 	}
 	
-	List getProductGroupProducts() { 		
+	List getProductGroupProducts() {
 		println "PRINT ALL PRODUCT GROUP PRODUCTS"
 		def orphans = []
 

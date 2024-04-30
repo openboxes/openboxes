@@ -1,5 +1,7 @@
 package org.pih.warehouse.requisition
 
+import grails.testing.gorm.DomainUnitTest
+
 // import grails.test.GrailsUnitTestCase
 import grails.validation.ValidationException
 import org.junit.Ignore
@@ -14,9 +16,11 @@ import org.pih.warehouse.product.ProductPackage
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
 import org.springframework.context.ApplicationEvent
+import spock.lang.Specification
+import static org.junit.Assert.*;
 
-@Ignore
-class RequisitionItemTests {
+//@Ignore
+class RequisitionItemTests extends Specification implements DomainUnitTest<Requisition> {
 
     Requisition requisition
     Picklist picklist
@@ -26,8 +30,8 @@ class RequisitionItemTests {
     ProductPackage bottle1000
     InventoryItem abc123
 
-    protected void setUp() {
-        super.setUp();
+    protected void setup() {
+//        super.setUp();
         UnitOfMeasureClass quantityClass = new UnitOfMeasureClass(name: "Quantity", code: "QTY")
         UnitOfMeasure bottle = new UnitOfMeasure(name: "Bottle", code: "BTL", uomClass: quantityClass)
 
@@ -49,28 +53,34 @@ class RequisitionItemTests {
     }
 
     protected void tearDown() {
-        super.tearDown()
+//        super.tearDown()
     }
 
     @Test
     void constructor() {
+        when:
         def requisitionItem = new RequisitionItem()
+        then:
         assertEquals RequisitionItemType.ORIGINAL, requisitionItem.requisitionItemType
     }
 
     @Test
     void validate_shouldSucceedWhenCanceledRequisitionItemHasCancelReasonCode() {
+        when:
         def requisitionItem = new RequisitionItem(product: ibuprofen200mg, productPackage: null, quantity: 100, quantityCanceled: 50, cancelReasonCode: "Because.", requisition: new Requisition())
         mockDomain(RequisitionItem, [requisitionItem])
         requisitionItem.save(failOnError: true)
+        then:
         assertTrue requisitionItem.validate()
         assertEquals 0, requisitionItem.errors.errorCount
     }
 
     @Test
     void validate_shouldFailWhenCanceledRequisitionItemDoesNotHaveCancelReasonCode() {
+        when:
         def requisitionItem = new RequisitionItem(product: ibuprofen200mg, productPackage: null, quantity: 100, quantityCanceled: 50, requisition: new Requisition())
         mockDomain(RequisitionItem, [requisitionItem])
+        then:
         assertFalse requisitionItem.validate()
         println requisitionItem.errors.getFieldError("quantityCanceled")
         assertNotNull requisitionItem.errors.getFieldError("quantityCanceled")
@@ -78,10 +88,12 @@ class RequisitionItemTests {
 
     @Test
     void cancelQuantity() {
+        when:
         def requisitionItem = new RequisitionItem(product: ibuprofen200mg, productPackage: null, quantity: 100, quantityCanceled: 0, requisition: new Requisition())
         mockDomain(RequisitionItem, [requisitionItem])
         mockDomain(PicklistItem)
         requisitionItem.cancelQuantity("Not needed", "Because I said so")
+        then:
         assertEquals "Because I said so", requisitionItem.cancelComments
         assertEquals "Not needed", requisitionItem.cancelReasonCode
         assertEquals 100, requisitionItem.quantityCanceled
@@ -98,6 +110,7 @@ class RequisitionItemTests {
 
     @Test
     void cancelQuantity_shouldRemovePicklistItems() {
+        when:
         def requisition = new Requisition()
         def picklist = new Picklist()
         def requisitionItem = new RequisitionItem(product: ibuprofen200mg, productPackage: null, quantity: 100, quantityCanceled: 0, requisition: requisition)
@@ -113,6 +126,7 @@ class RequisitionItemTests {
         requisitionItem.addToPicklistItems(picklistItem)
         requisition.addToRequisitionItems(requisitionItem)
 
+        then:
         assertEquals 1, requisitionItem.getPicklistItems().size()
         requisitionItem.cancelQuantity("Not needed", "Because I said so")
         assertEquals 0, requisitionItem.getPicklistItems().size()
@@ -121,10 +135,12 @@ class RequisitionItemTests {
 
     @Test
     void cancelQuantity_shouldFailCannotCancelTwice() {
+        when:
         def requisitionItem = new RequisitionItem(product: ibuprofen200mg, productPackage: null, quantity: 100, quantityCanceled: 0, requisition: new Requisition())
         mockDomain(RequisitionItem, [requisitionItem])
         mockDomain(PicklistItem)
         requisitionItem.cancelQuantity("Not needed", "Because I said so")
+        then:
         shouldFail(ValidationException) {
             requisitionItem.cancelQuantity("Not needed", "Because I'm impatient")
         }
@@ -132,10 +148,12 @@ class RequisitionItemTests {
 
     @Test
     void getStatus() {
+        when:
         def requisitionItem = new RequisitionItem(product: ibuprofen200mg, productPackage: null, quantity: 100, quantityCanceled: 0, requisition: new Requisition())
         mockDomain(RequisitionItem, [requisitionItem])
         mockDomain(PicklistItem)
 
+        then:
         assertEquals RequisitionItemStatus.PENDING, requisitionItem.getStatus()
 
         requisitionItem.cancelQuantity("Not needed", "Because I said so")
@@ -153,16 +171,19 @@ class RequisitionItemTests {
 
     @Test
     void approveQuantity() {
+        when:
         def requisitionItem = new RequisitionItem(product: ibuprofen200mg, productPackage: null, quantity: 100, quantityCanceled: 0, requisition: new Requisition())
         mockDomain(RequisitionItem, [requisitionItem])
         mockDomain(PicklistItem)
         requisitionItem.approveQuantity()
+        then:
         assertEquals 100, requisitionItem.quantityApproved
         assertTrue requisitionItem.isApproved()
     }
 
     @Test
     void approveQuantity_shouldFailWhenAlreadyCancelled() {
+        when:
         def requisitionItem = new RequisitionItem(product: ibuprofen200mg, productPackage: null, quantity: 100, quantityCanceled: 0, requisition: new Requisition())
         mockDomain(RequisitionItem, [requisitionItem])
         mockDomain(PicklistItem)
@@ -172,6 +193,7 @@ class RequisitionItemTests {
             requisitionItem.approveQuantity()
         }
 
+        then:
         assertEquals null, requisitionItem.quantityApproved
         assertFalse requisitionItem.isApproved()
         assertTrue requisitionItem.isCanceled()
@@ -180,37 +202,45 @@ class RequisitionItemTests {
 
     @Test
     void getChange_shouldReturnNullWhenChangesNotExist() {
+        when:
         def requisitionItem = new RequisitionItem(product: ibuprofen200mg, productPackage: null, quantity: 100, quantityCanceled: 0, requisition: new Requisition())
         mockDomain(RequisitionItem, [requisitionItem])
+        then:
         assertNull requisitionItem.change
     }
 
     @Ignore
     void getChange_shouldReturnFirstChangeWhenOneChangeExists() {
+        when:
         def requisitionItem = new RequisitionItem(product: ibuprofen200mg, productPackage: null, quantity: 100, quantityCanceled: 0, requisition: new Requisition())
         def requisitionItem2 = new RequisitionItem(product: ibuprofen800mg, productPackage: null, quantity: 25, quantityCanceled: 0, requisition: new Requisition())
         mockDomain(RequisitionItem, [requisitionItem, requisitionItem2])
         requisitionItem.addToRequisitionItems(requisitionItem2)
+        then:
         assertEquals requisitionItem2, requisitionItem.change
     }
 
     @Ignore
     void getChange_shouldReturnFirstChangeWhenMultipleChangesExist() {
+        when:
         def requisitionItem = new RequisitionItem(product: ibuprofen200mg, productPackage: null, quantity: 100, quantityCanceled: 0, requisition: new Requisition())
         def requisitionItem2 = new RequisitionItem(product: ibuprofen800mg, productPackage: null, quantity: 25, quantityCanceled: 0, requisition: new Requisition())
         def requisitionItem3 = new RequisitionItem(product: ibuprofen200mg, productPackage: null, quantity: 100, quantityCanceled: 0, requisition: new Requisition())
         mockDomain(RequisitionItem, [requisitionItem, requisitionItem2, requisitionItem3])
         requisitionItem.addToRequisitionItems(requisitionItem3)
+        then:
         assertEquals requisitionItem3, requisitionItem.change
     }
 
 
     @Test
     void changeQuantity() {
+        when:
         def requisitionItem = new RequisitionItem(product: ibuprofen200mg, productPackage: null, quantity: 100, quantityCanceled: 0, requisition: new Requisition())
         mockDomain(RequisitionItem)
         mockDomain(PicklistItem)
         requisitionItem.changeQuantity(10, "Change", "Because I said so")
+        then:
         assertNotNull requisitionItem.change
         assertEquals 10, requisitionItem.change.quantity
         assertEquals "Because I said so", requisitionItem.cancelComments
@@ -230,10 +260,12 @@ class RequisitionItemTests {
 
     @Test
     void changePackageSize() {
+        when:
         def requisitionItem = new RequisitionItem(product: ibuprofen200mg, productPackage: null, quantity: 100, quantityCanceled: 0, requisition: new Requisition())
         mockDomain(RequisitionItem)
         mockDomain(PicklistItem)
         requisitionItem.changeQuantity(1, bottle200, "Package size", "Because I said so")
+        then:
         assertNotNull requisitionItem.change
         assertEquals 1, requisitionItem.change.quantity
         assertEquals "Because I said so", requisitionItem.cancelComments
@@ -253,10 +285,12 @@ class RequisitionItemTests {
 
     @Test
     void changeQuantity_shouldFailOnEmptyOrNullReasonCode() {
+        when:
         def requisitionItem = new RequisitionItem(product: ibuprofen200mg, productPackage: null, quantity: 100, quantityCanceled: 0, requisition: new Requisition())
         mockDomain(RequisitionItem, [requisitionItem])
         mockDomain(PicklistItem)
 
+        then:
         shouldFail(ValidationException) {
             requisitionItem.changeQuantity(10, "", "Because I said so")
         }
@@ -269,10 +303,12 @@ class RequisitionItemTests {
 
     @Test
     void changeQuantity_shouldFailOnNegativeQuantity() {
+        when:
         def requisitionItem = new RequisitionItem(product: ibuprofen200mg, productPackage: null, quantity: 100, quantityCanceled: 0, requisition: new Requisition())
         mockDomain(RequisitionItem, [requisitionItem])
         mockDomain(PicklistItem)
 
+        then:
         shouldFail(ValidationException) {
             requisitionItem.changeQuantity(-1, "Change", "Because I said so")
         }
@@ -285,10 +321,12 @@ class RequisitionItemTests {
 
     @Test
     void changeQuantity_shouldFailOnSameQuantity() {
+        when:
         def requisitionItem = new RequisitionItem(product: ibuprofen200mg, productPackage: null, quantity: 100, quantityCanceled: 0, requisition: new Requisition())
         mockDomain(RequisitionItem, [requisitionItem])
         mockDomain(PicklistItem)
 
+        then:
         shouldFail(ValidationException) {
             requisitionItem.changeQuantity(100, "Change", "Because I said so")
         }
@@ -302,11 +340,13 @@ class RequisitionItemTests {
 
     @Test
     void changeQuantity_shouldCancelOnQuantityEqualsZero() {
+        when:
         def requisitionItem = new RequisitionItem(product: ibuprofen200mg, productPackage: null, quantity: 100, quantityCanceled: 0, requisition: new Requisition())
         mockDomain(RequisitionItem, [requisitionItem])
         mockDomain(PicklistItem)
 
         requisitionItem.changeQuantity(0, "Not needed", "Because I said so")
+        then:
         assertEquals "Because I said so", requisitionItem.cancelComments
         assertEquals "Not needed", requisitionItem.cancelReasonCode
         assertEquals 100, requisitionItem.quantityCanceled
@@ -323,12 +363,14 @@ class RequisitionItemTests {
 
     @Test
     void undoChanges() {
+        when:
         def requisitionItem = new RequisitionItem(product: ibuprofen200mg, productPackage: null, quantity: 100, quantityCanceled: 0, requisition: new Requisition())
         mockDomain(RequisitionItem, [requisitionItem])
         mockDomain(PicklistItem)
 
         requisitionItem.changeQuantity(10, "Change", "Because I said so")
 
+        then:
         assertNotNull requisitionItem.change
         assertEquals 10, requisitionItem.change.quantity
         assertEquals RequisitionItemType.QUANTITY_CHANGE, requisitionItem.change.requisitionItemType
@@ -345,8 +387,10 @@ class RequisitionItemTests {
         assertFalse requisitionItem.isApproved()
         assertTrue requisitionItem.validate()
 
+        when:
         requisitionItem.undoChanges()
         //assertEquals 0, requisitionItem?.requisitionItems?.size()
+        then:
         assertNull requisitionItem.change
         assertNull requisitionItem.cancelComments
         assertNull requisitionItem.cancelReasonCode
@@ -366,18 +410,22 @@ class RequisitionItemTests {
 
     @Test
     void chooseSubstitute() {
+        when:
         def requisitionItem = new RequisitionItem(product: ibuprofen200mg, productPackage: null, quantity: 100, quantityCanceled: 0, requisition: new Requisition())
         mockDomain(RequisitionItem, [requisitionItem])
         mockDomain(PicklistItem)
         requisitionItem.chooseSubstitute(ibuprofen800mg, null, 25, "Availability", "Only dosage remaining")
 
+        then:
         assertEquals 100, requisitionItem.quantityCanceled
         assertEquals "Availability", requisitionItem.cancelReasonCode
         assertEquals "Only dosage remaining", requisitionItem.cancelComments
         assertFalse requisitionItem.isCanceled()
         assertTrue requisitionItem.hasSubstitution()
 
+        when:
         def substitution = requisitionItem.getSubstitution()
+        then:
         assertNotNull substitution
         assertEquals RequisitionItemType.SUBSTITUTION, substitution.requisitionItemType
         assertEquals 25, substitution.quantity
@@ -394,87 +442,121 @@ class RequisitionItemTests {
 
     @Test
     void totalQuantityNotCanceled() {
+        when:
         def requisitionItem = new RequisitionItem(product: ibuprofen200mg, productPackage: null, quantity: 100, quantityCanceled: 50)
+        then:
         assertEquals 50, requisitionItem.totalQuantityNotCanceled()
 
+        when:
         requisitionItem = new RequisitionItem(product: ibuprofen200mg, productPackage: bottle200, quantity: 10, quantityCanceled: 9)
+        then:
         assertEquals 200, requisitionItem.totalQuantityNotCanceled()
     }
 
     @Test
     void quantityNotCanceled() {
+        when:
         def requisitionItem = new RequisitionItem(product: ibuprofen200mg, productPackage: null, quantity: 100, quantityCanceled: 50)
+        then:
         assertEquals 50, requisitionItem.quantityNotCanceled()
 
+        when:
         requisitionItem = new RequisitionItem(product: ibuprofen200mg, productPackage: bottle200, quantity: 10, quantityCanceled: 9)
+        then:
         assertEquals 1, requisitionItem.quantityNotCanceled()
 
+        when:
         requisitionItem = new RequisitionItem(product: ibuprofen200mg, productPackage: bottle200, quantity: 0, quantityCanceled: 10)
+        then:
         assertEquals 0, requisitionItem.quantityNotCanceled()
 
+        when:
         requisitionItem = new RequisitionItem(product: ibuprofen200mg, productPackage: bottle200, quantity: 0, quantityCanceled: 0)
+        then:
         assertEquals 0, requisitionItem.quantityNotCanceled()
 
+        when:
         requisitionItem = new RequisitionItem(product: ibuprofen200mg, productPackage: bottle200, quantity: 0, quantityCanceled: 0)
+        then:
         assertEquals 0, requisitionItem.quantityNotCanceled()
 
+        when:
         requisitionItem = new RequisitionItem(product: ibuprofen200mg, productPackage: bottle200, quantity: 0, quantityCanceled: null)
+        then:
         assertEquals 0, requisitionItem.quantityNotCanceled()
 
+        when:
         requisitionItem = new RequisitionItem(product: ibuprofen200mg, productPackage: bottle200, quantity: null, quantityCanceled: null)
+        then:
         assertEquals 0, requisitionItem.quantityNotCanceled()
 
+        when:
         requisitionItem = new RequisitionItem(product: ibuprofen200mg, productPackage: bottle200, quantity: null, quantityCanceled: 0)
+        then:
         assertEquals 0, requisitionItem.quantityNotCanceled()
 
     }
 
     @Test
     void totalQuantity() {
+        when:
         def requisitionItem1 = new RequisitionItem(product: ibuprofen200mg, productPackage: null, quantity: 100)
+        then:
         assertEquals 100, requisitionItem1.totalQuantity()
 
+        when:
         def requisitionItem2 = new RequisitionItem(product: ibuprofen200mg, productPackage: bottle200, quantity: 10)
+        then:
         assertEquals 2000, requisitionItem2.totalQuantity()
     }
 
     @Test
     void totalQuantityCanceled() {
+        when:
         def requisitionItem1 = new RequisitionItem(product: ibuprofen200mg, productPackage: null, quantity: 100, quantityCanceled: 100)
         requisition.addToRequisitionItems(requisitionItem1)
 
+        then:
         assertEquals 100, requisitionItem1.totalQuantityCanceled()
 
+        when:
         def requisitionItem2 = new RequisitionItem(product: ibuprofen200mg, productPackage: bottle200, quantity: 10, quantityCanceled: 9)
 
+        then:
         assertEquals 2000, requisitionItem2.totalQuantity()
         assertEquals 1800, requisitionItem2.totalQuantityCanceled()
     }
 
     @Test
     void totalQuantityApproved() {
+        when:
         def requisitionItem = new RequisitionItem(product: ibuprofen200mg, productPackage: null, quantity: 100, quantityCanceled: 0)
         requisition.addToRequisitionItems(requisitionItem)
         requisitionItem.quantityApproved = 50
         requisitionItem.quantityCanceled = 50
+        then:
         assertEquals 50, requisitionItem.totalQuantityApproved()
     }
 
     @Test
     void totalQuantityApproved_usingPackage() {
+        when:
         def requisitionItem = new RequisitionItem(product: ibuprofen200mg, productPackage: bottle200, quantity: 3, quantityCanceled: 0)
         requisition.addToRequisitionItems(requisitionItem)
         requisitionItem.quantityApproved = 2
         requisitionItem.quantityCanceled = 1
+        then:
         assertEquals 400, requisitionItem.totalQuantityApproved()
     }
 
     @Test
     void calculatePercentagesBeforeItemPicked() {
+        when:
         def requisitionItem = new RequisitionItem(product: ibuprofen200mg, productPackage: bottle200, quantity: 10, quantityCanceled: 9)
         mockDomain(RequisitionItem, [requisitionItem])
         mockDomain(PicklistItem)
 
+        then:
         assertEquals 2000, requisitionItem.totalQuantity()
         assertEquals 1800, requisitionItem.totalQuantityCanceled()
         assertEquals 90, requisitionItem.calculatePercentageCompleted()
@@ -485,12 +567,14 @@ class RequisitionItemTests {
 
     @Test
     void calculatePercentageAfterItemPicked() {
+        when:
         def requisitionItem = new RequisitionItem(product: ibuprofen200mg, productPackage: bottle200, quantity: 10, quantityCanceled: 9)
         mockDomain(RequisitionItem, [requisitionItem])
 
         def picklistItem = new PicklistItem(inventoryItem: abc123, quantity: 200, requisitionItem: requisitionItem)
         mockDomain(PicklistItem, [picklistItem])
 
+        then:
         assertEquals 0, requisitionItem.calculateQuantityRemaining()
         assertEquals 90, requisitionItem.calculatePercentageCompleted()
         assertEquals 90, requisitionItem.calculatePercentageCanceled()
@@ -500,16 +584,19 @@ class RequisitionItemTests {
 
     @Test
     void calculateQuantityPickedBeforeItemPicked() {
+        when:
         def requisitionItem = new RequisitionItem(product: ibuprofen200mg, productPackage: bottle200, quantity: 10, quantityCanceled: 9)
         mockDomain(RequisitionItem, [requisitionItem])
         mockDomain(PicklistItem)
 
+        then:
         assertEquals 0, requisitionItem.totalQuantityPicked()
         assertEquals 200, requisitionItem.totalQuantityRemaining()
     }
 
     @Test
     void calculateQuantityPickedAfterItemPicked() {
+        when:
         def requisitionItem = new RequisitionItem(product: ibuprofen200mg, productPackage: bottle200, quantity: 10, quantityCanceled: 9)
         mockDomain(RequisitionItem, [requisitionItem])
 
@@ -518,6 +605,7 @@ class RequisitionItemTests {
 
         println requisitionItem.retrievePicklistItems()
 
+        then:
         assertEquals 200, requisitionItem.calculateQuantityPicked()
         assertEquals 200, requisitionItem.totalQuantityPicked()
         assertEquals 0, requisitionItem.totalQuantityRemaining()
@@ -526,27 +614,37 @@ class RequisitionItemTests {
 
     @Test
     void isCanceled() {
+        when:
         def requisitionItem = new RequisitionItem(product: ibuprofen200mg, productPackage: bottle200, quantity: 10, quantityCanceled: 0)
         mockDomain(RequisitionItem, [requisitionItem])
         mockDomain(PicklistItem)
+        then:
         assertFalse requisitionItem.isCanceled()
 
+        when:
         requisitionItem.quantityCanceled = 9
+        then:
         assertFalse requisitionItem.isCanceled()
 
+        when:
         requisitionItem.quantityCanceled = 10
+        then:
         assertTrue requisitionItem.isCanceled()
 
     }
 
     @Test
     void isCompleted() {
+        when:
         def requisitionItem = new RequisitionItem(product: ibuprofen200mg, productPackage: bottle200, quantity: 10, quantityCanceled: 0)
         mockDomain(RequisitionItem, [requisitionItem])
         mockDomain(PicklistItem)
+        then:
         assertFalse requisitionItem.isCompleted()
 
+        when:
         requisitionItem.quantityCanceled = 10
+        then:
         assertTrue requisitionItem.isCompleted()
 
 
@@ -560,40 +658,52 @@ class RequisitionItemTests {
 
     @Test
     void isFulfilled() {
+        when:
         def requisitionItem = new RequisitionItem(product: ibuprofen200mg, productPackage: bottle200, quantity: 10, quantityCanceled: 10)
         mockDomain(RequisitionItem, [requisitionItem])
         mockDomain(PicklistItem)
+        then:
         assertFalse requisitionItem.isFulfilled()
 
+        when:
         def picklistItem = new PicklistItem(inventoryItem: abc123, quantity: 2000, requisitionItem: requisitionItem)
         mockDomain(PicklistItem, [picklistItem])
         requisitionItem.quantityCanceled = 0
+        then:
         assertTrue requisitionItem.isFulfilled()
 
     }
 
     @Test
     void isPartiallyFulfilled() {
+        when:
         def requisitionItem = new RequisitionItem(product: ibuprofen200mg, productPackage: bottle200, quantity: 10, quantityCanceled: 0)
         mockDomain(RequisitionItem, [requisitionItem])
         mockDomain(PicklistItem)
+        then:
         assertFalse requisitionItem.isPartiallyFulfilled()
 
         // Pick all 2000
+        when:
         def picklistItem = new PicklistItem(inventoryItem: abc123, quantity: 2000, requisitionItem: requisitionItem)
         mockDomain(PicklistItem, [picklistItem])
         requisitionItem.quantityCanceled = 0
+        then:
         assertEquals 0, requisitionItem.totalQuantityRemaining()
         assertEquals 2000, requisitionItem.totalQuantityPicked()
         assertFalse requisitionItem.isPartiallyFulfilled()
 
         // Pick just 1000
+        when:
         picklistItem.quantity = 1000
         requisitionItem.quantityCanceled = 0
+        then:
         assertTrue requisitionItem.isPartiallyFulfilled()
 
         // Cancel the other 1000 (5 x 200)
+        when:
         requisitionItem.quantityCanceled = 5
+        then:
         assertEquals 2000, requisitionItem.totalQuantity()
         assertEquals 1000, requisitionItem.totalQuantityPicked()
         assertEquals 1000, requisitionItem.totalQuantityCanceled()
@@ -642,8 +752,10 @@ class RequisitionItemTests {
 
     @Test
     void testNotNullableConstraints() {
+        when:
         mockForConstraintsTests(RequisitionItem)
         def requisitionItem = new RequisitionItem(quantity: null)
+        then:
         assertFalse requisitionItem.validate()
         assertEquals "nullable", requisitionItem.errors["product"]
         assertEquals "nullable", requisitionItem.errors["quantity"]
@@ -651,15 +763,18 @@ class RequisitionItemTests {
 
     @Test
     void testQuantityConstraint() {
-        mockForConstraintsTests(RequisitionItem)
+        when:
+//        mockForConstraintsTests(RequisitionItem)
         def requisitionItem = new RequisitionItem(quantity: 0)
+        then:
         assertFalse requisitionItem.validate()
-        println requisitionItem.errors["quantity"]
+//        println requisitionItem.errors["quantity"]
     }
 
     @Test
     void testToJsonData(){
-      def product = new Product(id: "prod1", productCode: "ASP", name:"aspin")
+        when:
+        def product = new Product(id: "prod1", productCode: "ASP", name:"aspin")
       def requisitionItem = new RequisitionItem(
         id: "1234",
         product: product,
@@ -675,7 +790,8 @@ class RequisitionItemTests {
 	  
       Map json = requisitionItem.toJson()	 
 	  
-	  println json 
+	  println json
+        then:
       assert json.id == requisitionItem.id
       assert json.productId == requisitionItem.product.id
       assert json.productName == "ASP " + requisitionItem.product.name + " (EA/1)"
@@ -689,6 +805,7 @@ class RequisitionItemTests {
     @Test
     void testcalculateQuantityPicked() {
 
+        when:
         def requisitionItem = new RequisitionItem(id: "reqItem1")
         mockDomain(RequisitionItem, [requisitionItem])
 
@@ -701,6 +818,7 @@ class RequisitionItemTests {
         picklistItem2.requisitionItem = requisitionItem
         picklistItem3.requisitionItem = requisitionItem
 
+        then:
         assert requisitionItem.calculateQuantityPicked() == (30 + 100 + 205)
 
     }
@@ -708,6 +826,7 @@ class RequisitionItemTests {
     @Test
     void testcalcuateNumInventoryItem()
     {
+        when:
         def inventoryItem1 = new InventoryItem(id: "invent1")
         def inventoryItem2 = new InventoryItem(id: "invent2")
         def inventoryItem3 = new InventoryItem(id: "invent3")
@@ -725,11 +844,13 @@ class RequisitionItemTests {
 
         requisitionItem.product = product
 
+        then:
         assert requisitionItem.calculateNumInventoryItem() == 3
     }
 
     @Test
     void testRetrievePicklistItems() {
+        when:
         def requisitionItem = new RequisitionItem(id: "reqItem1")
         def picklistItem1 = new PicklistItem(id: "pickItem1", requisitionItem: requisitionItem, quantity: 30)
         def picklistItem2 = new PicklistItem(id: "pickItem2", requisitionItem: requisitionItem, quantity: 50)
@@ -738,6 +859,7 @@ class RequisitionItemTests {
         mockDomain(PicklistItem, [picklistItem1, picklistItem2, picklistItem3])
 
         def list = requisitionItem.retrievePicklistItems()
+        then:
         assert list.contains(picklistItem1)
         assert list.contains(picklistItem2)
         assert list.contains(picklistItem3)

@@ -1,5 +1,6 @@
 package org.pih.warehouse.product
 
+import grails.testing.gorm.DomainUnitTest
 import org.junit.Ignore
 import org.junit.Test
 import org.pih.warehouse.core.Constants
@@ -11,37 +12,50 @@ import org.pih.warehouse.inventory.InventoryStatus
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductGroup
+import spock.lang.Specification
 import testutils.DbHelper
+import static org.junit.Assert.*;
 
-@Ignore
-class ProductIntegrationTests extends GroovyTestCase {
+//@Ignore
+class ProductIntegrationTests extends Specification implements DomainUnitTest<Product> {
 
     @Test
     void getInventoryLevels_shouldNotFailOnNonPersistedProduct() {
+        when:
         def product = new Product();
-        product.getInventoryLevels()
+        then:
+        assert product.getInventoryLevels()
     }
 
     @Test
     void getInventoryLevel_shouldNotFailOnNonPersistedProduct() {
+        when:
         def bostonLocation = DbHelper.findOrCreateLocationWithInventory('Boston Location')
         def product = new Product()
+        then:
         product.getInventoryLevel(bostonLocation.id)
     }
 
 
     @Test
     void testSaveProductProductGroup(){
+        when:
         def suppliers = DbHelper.findOrCreateCategory('Supplies')
         def name = "Test" + UUID.randomUUID().toString()[0..5]
         def group = new ProductGroup(name: name + "group", category: suppliers)
+        then:
         assert group.save(flush:true, failOnError:true)
+
+        when:
         def productType = DbHelper.findOrCreateProductType("Default")
         def product = new Product(name: name, category: suppliers, productType: productType)
         product.addToProductGroups(group)
+        then:
         assert product.save(flush:true, failOnError:true)
 
+        when:
         group.addToProducts(product)
+        then:
         assert group.save(flush:true, failOnError:true)
         assert product.productGroups.contains(group)
         assert group.products.contains(product)

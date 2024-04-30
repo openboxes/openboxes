@@ -9,6 +9,8 @@
  * */
 package org.pih.warehouse.inventory
 
+import grails.test.mixin.Mock
+import grails.testing.services.ServiceUnitTest
 import org.hibernate.SessionFactory
 import org.junit.Ignore
 import org.junit.Test
@@ -25,45 +27,79 @@ import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.product.Product
 import org.springframework.core.io.ClassPathResource
+import spock.lang.Shared
+import spock.lang.Specification
 import testutils.DbHelper
+import static org.junit.Assert.*;
 
-@Ignore
-class InventoryServiceTests extends GroovyTestCase {
+//@Ignore
+@Mock([InventoryImportDataService])
+class InventoryServiceTests extends Specification implements ServiceUnitTest<InventoryService>  {
 
-    def inventoryService
+//    def service
     InventoryImportDataService inventoryImportDataService
     SessionFactory sessionFactory
 
+    @Shared
     protected def transactionType_consumptionDebit
+    @Shared
     protected def  transactionType_inventory
+    @Shared
     protected def  transactionType_productInventory
+    @Shared
     protected def  transactionType_transferIn
+    @Shared
     protected def  transactionType_transferOut
+    @Shared
     protected def  bostonLocation
+    @Shared
     protected def  haitiLocation
+    @Shared
     protected def  warehouseLocationType
+    @Shared
     protected def  supplierLocationType
+    @Shared
     protected def  acmeLocation
+    @Shared
     protected def  bostonInventory
+    @Shared
     protected def  haitiInventory
+    @Shared
     protected def  aspirinProduct
+    @Shared
     protected def  tylenolProduct
+    @Shared
 	protected def  ibuprofenProduct
+    @Shared
     protected def  advilProduct
+    @Shared
     protected def  aspirinItem1
+    @Shared
     protected def  aspirinItem2
+    @Shared
     protected def tylenolItem
+    @Shared
     def transaction1
+    @Shared
     def transaction2
+    @Shared
     def transaction3
+    @Shared
     def transaction4
+    @Shared
     def transaction5
 
+    @Shared
     def level1
+    @Shared
     def level2
+    @Shared
     def level3
+    @Shared
     def level4
+    @Shared
     def level5
+    @Shared
 	def level6
 
     private void basicTestFixture(){
@@ -247,95 +283,123 @@ class InventoryServiceTests extends GroovyTestCase {
 
     @Ignore // FIXME We removed the showHidden feature awhile back
     void test_getProductsByTermsAndCategoriesWithoutHiddenProductsNoInventoryLevelsAtCurrentInventory() {
+        when:
         inventoryLevelTestFixture()
-        //def inventoryService = new InventoryService()
+        //def service = new InventoryService()
         def terms = ["Tylenol"]
-        def result = inventoryService.getProductsByTermsAndCategories(terms, null, false, haitiInventory, 25, 0)
+        def result = service.getProductsByTermsAndCategories(terms, null, false, haitiInventory, 25, 0)
+        then:
         assert result.contains(tylenolProduct)
 
+        when:
         terms = ["Advil"]
-        result = inventoryService.getProductsByTermsAndCategories(terms, null, false, haitiInventory, 25, 0)
+        result = service.getProductsByTermsAndCategories(terms, null, false, haitiInventory, 25, 0)
+        then:
         assert result.contains(advilProduct)
     }
 
     @Ignore // FIXME We removed the showHidden feature awhile back
     void test_getProductsByTermsAndCategoriesWithoutHiddenProductsWithInventoryLevelsNotSupported() {
+        when:
         inventoryLevelTestFixture()
-        //def inventoryService = new InventoryService()
+        //def service = new InventoryService()
         def terms = ["Tylenol"]
-        def result = inventoryService.getProductsByTermsAndCategories(terms, null, false, bostonInventory, 25, 0)
+        def result = service.getProductsByTermsAndCategories(terms, null, false, bostonInventory, 25, 0)
+        then:
         assert !result.contains(tylenolProduct)
 
+        when:
         terms = ["Ibuprofen"]
-        result = inventoryService.getProductsByTermsAndCategories(terms, null, false, bostonInventory, 25, 0)
+        result = service.getProductsByTermsAndCategories(terms, null, false, bostonInventory, 25, 0)
+        then:
         assert !result.contains(ibuprofenProduct)
     }
 
     @Ignore // FIXME We removed the showHidden feature awhile back
     void test_getProductsByTermsAndCategoriesWithoutHiddenProductsWithInventoryLevelsSupported() {
+        when:
         inventoryLevelTestFixture()
-        //def inventoryService = new InventoryService()
+        //def service = new InventoryService()
         def terms = ["Aspirin"]
-        def result = inventoryService.getProductsByTermsAndCategories(terms, null, false, bostonInventory, 25, 0)
+        def result = service.getProductsByTermsAndCategories(terms, null, false, bostonInventory, 25, 0)
+        then:
         assert result.contains(aspirinProduct)
 
+        when:
         terms = ["Ibuprofen"]
-        result = inventoryService.getProductsByTermsAndCategories(terms, null, false, bostonInventory, 25, 0)
+        result = service.getProductsByTermsAndCategories(terms, null, false, bostonInventory, 25, 0)
+        then:
         assert !result.contains(ibuprofenProduct)
     }
 
 	@Test
 	void getProductsByTermsAndCategories_shouldFindByBrand() {
+        when:
 		inventoryLevelTestFixture()
 		def terms = ["TYLENOL®"]
-		def result = inventoryService.getProductsByTermsAndCategories(terms, null, false, haitiInventory, 25, 0)
+		def result = service.getProductsByTermsAndCategories(terms, null, false, haitiInventory, 25, 0)
 		println result
+        then:
 		assert result.contains(tylenolProduct)
 	}
 
 	@Test
 	void getProductsByTermsAndCategories_shouldFindByManufacturer() {
+        when:
 		inventoryLevelTestFixture()
 		def terms = ["McNeil"]
-		def result = inventoryService.getProductsByTermsAndCategories(terms, null, false, haitiInventory, 25, 0)
+		def result = service.getProductsByTermsAndCategories(terms, null, false, haitiInventory, 25, 0)
 		println result
-		assert result.contains(tylenolProduct)
+        then:
+        assert result.contains(tylenolProduct)
 
+        when:
 		terms = ["TYL325"]
-		result = inventoryService.getProductsByTermsAndCategories(terms, null, false, haitiInventory, 25, 0)
+		result = service.getProductsByTermsAndCategories(terms, null, false, haitiInventory, 25, 0)
 		println result
+        then:
 		assert result.contains(tylenolProduct)
 	}
 
 	@Test
 	void getProductsByTermsAndCategories_shouldFindByVendor() {
+        when:
 		inventoryLevelTestFixture()
 		def terms = ["IDA"]
-		def result = inventoryService.getProductsByTermsAndCategories(terms, null, false, haitiInventory, 25, 0)
+		def result = service.getProductsByTermsAndCategories(terms, null, false, haitiInventory, 25, 0)
 		println result
-		assert result.contains(tylenolProduct)
+        then:
+        assert result.contains(tylenolProduct)
 
+        when:
 		terms = ["025200"]
-		result = inventoryService.getProductsByTermsAndCategories(terms, null, false, haitiInventory, 25, 0)
+		result = service.getProductsByTermsAndCategories(terms, null, false, haitiInventory, 25, 0)
 		println result
+        then:
 		assert result.contains(tylenolProduct)
 
+        when:
 		terms = ["Extra Strength"]
-		result = inventoryService.getProductsByTermsAndCategories(terms, null, false, haitiInventory, 25, 0)
+		result = service.getProductsByTermsAndCategories(terms, null, false, haitiInventory, 25, 0)
 		println result
+        then:
 		assert result.contains(tylenolProduct)
 
 	}
 
     private void productTagTestFixture() {
+        when:
 		basicTestFixture()
 		User user = User.get(1)
+        then:
 		assertNotNull user
 		println user
+        when:
 		aspirinProduct.addToTags(new Tag(tag: "thistag"))
 		aspirinProduct.save(flush:true, failOnError:true)
 		tylenolProduct.addToTags(new Tag(tag: "thattag"))
 		tylenolProduct.save(flush:true, failOnError:true)
+        then:
 		assertEquals 1, aspirinProduct.tags.size()
 		assertEquals 1, tylenolProduct.tags.size()
 		assertEquals 2, Tag.list().size()
@@ -344,9 +408,11 @@ class InventoryServiceTests extends GroovyTestCase {
 
     @Test
     void test_getQuantityByProductMap() {
+        when:
         transactionEntryTestFixture()
-        def map = inventoryService.getQuantityByProductMap(TransactionEntry.list())
+        def map = service.getQuantityByProductMap(TransactionEntry.list())
 
+        then:
         assert map[aspirinProduct] == 97
         assert map[tylenolProduct] == 25
     }
@@ -354,45 +420,55 @@ class InventoryServiceTests extends GroovyTestCase {
     @Test
     //todo: getQuantity is broken now, need to know why
     void getQuantity(){
+        when:
         transactionEntryTestFixture()
 
-        assert inventoryService.getQuantity(bostonInventory, (Location) null, aspirinItem1) == 94
-        assert inventoryService.getQuantity(bostonInventory, (Location) null, aspirinItem2) == 3
-        assert inventoryService.getQuantity(bostonInventory, (Location) null, tylenolItem) == 25
+        then:
+        assert service.getQuantity(bostonInventory, (Location) null, aspirinItem1) == 94
+        assert service.getQuantity(bostonInventory, (Location) null, aspirinItem2) == 3
+        assert service.getQuantity(bostonInventory, (Location) null, tylenolItem) == 25
     }
 
     @Test
     void getQuantity_shouldHandleTransactionsForSameDay(){
+        when:
         transactionEntryTestFixture2()
 
-        assert inventoryService.getQuantity(bostonInventory, (Location) null, aspirinItem1) == 94
-        assert inventoryService.getQuantity(bostonInventory, (Location) null, aspirinItem2) == 3
-        assert inventoryService.getQuantity(bostonInventory, (Location) null, tylenolItem) == 25
+        then:
+        assert service.getQuantity(bostonInventory, (Location) null, aspirinItem1) == 94
+        assert service.getQuantity(bostonInventory, (Location) null, aspirinItem2) == 3
+        assert service.getQuantity(bostonInventory, (Location) null, tylenolItem) == 25
     }
 
 
 
     @Test
     void test_getProductsQuantityForInventory(){
+        when:
         transactionEntryTestFixture()
-        def results = inventoryService.getQuantityForProducts(bostonInventory, [tylenolProduct.id])
+        def results = service.getQuantityForProducts(bostonInventory, [tylenolProduct.id])
+        then:
         assert results[tylenolProduct.id] == 25
         assert results.keySet().size() == 1
     }
 
     @Test
 	void test_getProductsQuantityForInventoryWithEmptyProductArray(){
+        when:
 		transactionEntryTestFixture()
-		def results = inventoryService.getQuantityForProducts(bostonInventory, [])
+		def results = service.getQuantityForProducts(bostonInventory, [])
+        then:
 		assert results == [:]
 	}
 
 
     @Test
     void test_getQuantityByInventoryItemMap() {
+        when:
         transactionEntryTestFixture()
-        def map = inventoryService.getQuantityByInventoryItemMap(TransactionEntry.list())
+        def map = service.getQuantityByInventoryItemMap(TransactionEntry.list())
 
+        then:
         assert map[aspirinItem1] == 94
         assert map[aspirinItem2] == 3
         assert map[tylenolItem] == 25
@@ -400,10 +476,12 @@ class InventoryServiceTests extends GroovyTestCase {
 
     void test_getInventoryItemsWithQuantity() {
 
+        when:
         transactionEntryTestFixture()
 
         def products = [aspirinProduct, tylenolProduct]
-        def inventoryItems = inventoryService.getInventoryItemsWithQuantity(products, bostonInventory)
+        def inventoryItems = service.getInventoryItemsWithQuantity(products, bostonInventory)
+        then:
         assert inventoryItems.size() == 2
         assert inventoryItems[aspirinProduct]
         assert inventoryItems[tylenolProduct]
@@ -419,55 +497,76 @@ class InventoryServiceTests extends GroovyTestCase {
     }
 
     void test_isValidForLocalTransfer_shouldCheckIfTransactionSupportsLocalTransfer() {
+        when:
         localTransferTestFixture()
 
         // a transaction that isn't of transfer in or transfer out type shouldn't be marked as valid
-        inventoryService.validateForLocalTransfer(transaction1)
+        service.validateForLocalTransfer(transaction1)
+        then:
         assert transaction1.errors.hasFieldErrors("transactionType")
 
         // a transaction that's source or destination isn't a warehouse shouldn't pass validation //todo: need revist later; by Peter
-//        assert inventoryService.isValidForLocalTransfer(transaction2) == false
-//        assert inventoryService.isValidForLocalTransfer(transaction3) == false
+//        assert service.isValidForLocalTransfer(transaction2) == false
+//        assert service.isValidForLocalTransfer(transaction3) == false
 
         // transfer in/transfer out transactions associated with warehouses should pass validation
-        inventoryService.validateForLocalTransfer(transaction4)
+        when:
+        service.validateForLocalTransfer(transaction4)
+        then:
         assert !transaction4.hasErrors()
-        inventoryService.validateForLocalTransfer(transaction5)
+        when:
+        service.validateForLocalTransfer(transaction5)
+        then:
         assert !transaction5.hasErrors()
     }
 
     void test_saveLocalTransfer_shouldCreateNewLocalTransfer() {
+        when:
         localTransferTestFixture()
         def warehouse = bostonLocation
 
+        then:
         assert warehouse.inventory != null
         assert transaction4.inventory != null
 
         // save a local transaction based on a Transfer In Transaction
-        inventoryService.saveLocalTransfer(transaction4)
+        when:
+        service.saveLocalTransfer(transaction4)
 
         // confirm that this transaction is now associated with a local transfer
-        assert inventoryService.isLocalTransfer(transaction4) == true
-        def localTransfer = inventoryService.getLocalTransfer(transaction4)
+        then:
+        assert service.isLocalTransfer(transaction4) == true
+        when:
+        def localTransfer = service.getLocalTransfer(transaction4)
 
         // confirm that the local transfer has the appropriate source and destination transaction
+        then:
         assert localTransfer.destinationTransaction == transaction4
+
+        when:
         def newTransaction = localTransfer.sourceTransaction
+        then:
         assert newTransaction.transactionType ==  transactionType_transferOut
         assert newTransaction.inventory == haitiInventory
         assert newTransaction.source == null
         assert newTransaction.destination == bostonLocation
 
         // now try a local transaction based on a Transfer Out Transaction
-        inventoryService.saveLocalTransfer(transaction5)
+        when:
+        service.saveLocalTransfer(transaction5)
 
         // confirm that this transaction is now associated with a local transfer
-        assert inventoryService.isLocalTransfer(transaction5) == true
-        localTransfer = inventoryService.getLocalTransfer(transaction5)
+        then:
+        assert service.isLocalTransfer(transaction5) == true
+        when:
+        localTransfer = service.getLocalTransfer(transaction5)
 
         // confirm that the local transfer has the appropriate source and destination transaction
+        then:
         assert localTransfer.sourceTransaction == transaction5
+        when:
         newTransaction = localTransfer.destinationTransaction
+        then:
         assert newTransaction.transactionType == transactionType_transferIn
         assert newTransaction.inventory == haitiInventory
         assert newTransaction.source == bostonLocation
@@ -476,23 +575,28 @@ class InventoryServiceTests extends GroovyTestCase {
     }
 
     void test_saveLocalTransfer_shouldEditExistingLocalTransfer() {
+        when:
         localTransferTestFixture()
         def baseTransaction = transaction4
 
         // first create a local transfer
-        inventoryService.saveLocalTransfer(baseTransaction)
+        service.saveLocalTransfer(baseTransaction)
 
         // now modify the base transaction
         baseTransaction.inventory = haitiInventory
         baseTransaction.source = bostonLocation
 
         // resave the local transfer
-        inventoryService.saveLocalTransfer(baseTransaction)
+        service.saveLocalTransfer(baseTransaction)
 
         // now check that the local transfer transactions have been updated accordingly
-        def localTransfer = inventoryService.getLocalTransfer(baseTransaction)
+        def localTransfer = service.getLocalTransfer(baseTransaction)
+        then:
         assert localTransfer.destinationTransaction == baseTransaction
+
+        when:
         def newTransaction = localTransfer.sourceTransaction
+        then:
         assert newTransaction.transactionType == transactionType_transferOut
         assert newTransaction.inventory == bostonInventory
         assert newTransaction.source == null
@@ -502,68 +606,88 @@ class InventoryServiceTests extends GroovyTestCase {
 
 
     void test_getProductsByTags() {
+        when:
         productTagTestFixture()
         def tags = ["thistag", "thattag"].collect { Tag.findByTag(it).id }
 
-        def results = inventoryService.getProductsByTags(tags, 10, 0)
+        def results = service.getProductsByTags(tags, 10, 0)
+        then:
         assertEquals 2, results.size()
     }
 
 
     void test_getProductsByTag() {
+        when:
         productTagTestFixture()
         def tags = Tag.list()
+        then:
         assertEquals 2, tags.size()
-        def results = inventoryService.getProductsByTag("thistag")
+        when:
+        def results = service.getProductsByTag("thistag")
+        then:
         assertEquals 1, results.size()
     }
 
     @Test
     void getProductsByTag_shouldNotFailDueToSQLGrammarException() {
+        when:
         productTagTestFixture()
         def tags = ["thistag"].collect { Tag.findByTag(it).id }
-        def results = inventoryService.getProductsByTags(tags, -1, 0)
+        def results = service.getProductsByTags(tags, -1, 0)
+        then:
         assertEquals 1, results.size()
     }
 
 
     void test_getProductsByTermsAndCategoriesAndLotNumberWithProductSearchTerm() {
+        when:
         transactionEntryTestFixture()
         def terms = ["Asp", "rin"]
-        def results = inventoryService.getProductsByTermsAndCategories(terms, null, true, bostonInventory,  25, 0)
+        def results = service.getProductsByTermsAndCategories(terms, null, true, bostonInventory,  25, 0)
+        then:
         assert results.contains(aspirinProduct)
     }
 
 
     void test_getProductsByTermsAndCategoriesAndLotNumberWithLotNumberSearchTerm() {
+        when:
         basicTestFixture()
         def terms = ["lot9383"]
-        def results = inventoryService.getProductsByTermsAndCategories(terms, null, true, bostonInventory, 1000, 0)
+        def results = service.getProductsByTermsAndCategories(terms, null, true, bostonInventory, 1000, 0)
+        then:
         assert results.contains(tylenolProduct)
     }
 
 	void test_getProductsByTermsAndCategoriesWithProductName() {
+        when:
 		basicTestFixture()
 		def terms = ["Ibuprofen"]
-		def results = inventoryService.getProductsByTermsAndCategories(terms, null, true, bostonInventory, 25, 0)
+		def results = service.getProductsByTermsAndCategories(terms, null, true, bostonInventory, 25, 0)
+        then:
 		assert results.contains(ibuprofenProduct)
 	}
 
 	void test_getProductsByTermsAndCategoriesWithDescription() {
+        when:
 		basicTestFixture()
 		def terms = ["NSAID"]
-		def results = inventoryService.getProductsByTermsAndCategories(terms, null, true, bostonInventory, 25, 0)
+		def results = service.getProductsByTermsAndCategories(terms, null, true, bostonInventory, 25, 0)
+        then:
 		assert results.contains(ibuprofenProduct)
 	}
 
     @Test
     void importInventory_shouldSaveRecordInventoryTransaction() {
 
+        when:
         def location = Location.list()[0]
         def resource = new ClassPathResource("resources/inventory2.xls")
         def file = resource.getFile()
+
+        then:
         assert file.exists()
 
+        when:
         def command = new ImportDataCommand()
         command.location = location
         command.importFile = file
@@ -575,9 +699,11 @@ class InventoryServiceTests extends GroovyTestCase {
         productCodes.each {
             def product = Product.findByProductCode(it)
             if (product) {
-                def quantityOnHand = inventoryService.getQuantityOnHand(location, product)
+                def quantityOnHand = service.getQuantityOnHand(location, product)
                 println "Product ${product.productCode} ${product.name}: ${quantityOnHand}"
             }
         }
+        then:
+        assert true
     }
 }

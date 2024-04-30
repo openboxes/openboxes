@@ -10,6 +10,7 @@
 package org.pih.warehouse.product
 
 import grails.test.*
+import grails.testing.gorm.DomainUnitTest
 import org.junit.Ignore
 import org.junit.Test
 import org.pih.warehouse.core.Synonym
@@ -18,15 +19,18 @@ import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductGroup
-
-@Ignore
-class ProductTests {
-
-    protected void setUp() {
-        super.setUp()
+import spock.lang.Specification
+import static org.junit.Assert.*;
 
 
-        def productMock = mockFor(Product)
+//@Ignore
+class ProductTests extends Specification implements DomainUnitTest<Product> {
+
+    protected void setup() {
+//        super.setUp()
+
+
+        def productMock = mockDomain(Product)
         productMock.demand.static.getApplicationTagLib() { -> [:] }
         Product.metaClass.getColor = { -> return "blue" }
 
@@ -70,13 +74,15 @@ class ProductTests {
     }
 
     protected void tearDown() {
-        super.tearDown()
+//        super.tearDown()
     }
 
     @Test
     void toJson() {
+        when:
         def product = Product.findById("prod1")
         def map = product.toJson()
+        then:
         assert map.id == product.id
         assert map.name == product.name
 //        assert map.inventoryItems.any { it.inventoryItemId == item1.id }
@@ -88,24 +94,30 @@ class ProductTests {
 
     @Test
     void addToSynonyms_shouldAddNewSynonym() {
+        when:
         def product = new Product(name: "Product 1")
         product.addToSynonyms(new Synonym(synonym: "synonym", synonymTypeCode: SynonymTypeCode.DISPLAY_NAME))
         product.save(flush: true)
+        then:
         assertEquals 1, product.synonyms.size()
     }
 
 
     @Ignore
     void alternativeProducts_shouldReturnAlternativeProducts() {
+        when:
         def product1 = Product.findByName("product1")
         def product2 = Product.findByName("product2")
         def product3 = Product.findByName("product3")
         def product4 = Product.findByName("product4")
 
         def productGroup1 = ProductGroup.findByName("productGroup1")
+        then:
         assert productGroup1.products.size() == 3
 
+        when:
         def productGroup2 = ProductGroup.findByName("productGroup2")
+        then:
         assert productGroup2.products.size() == 3
 
         assert product1.alternativeProducts().size() == 3

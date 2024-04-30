@@ -9,6 +9,8 @@
  * */
 package org.pih.warehouse.core
 
+import grails.testing.gorm.DomainUnitTest
+
 // import grails.test.GrailsMock
 import org.junit.Before
 import org.junit.Ignore
@@ -19,13 +21,14 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.LocalizationUtil
 import org.springframework.context.ApplicationEvent
+import spock.lang.Specification
+import static org.junit.Assert.*;
 
-@Ignore
-class SynonymTests {
+//@Ignore
+class SynonymTests extends Specification implements DomainUnitTest<Product> {
 
     // TODO: fix mocking
-    protected void setUp() {
-        super.setUp()
+    protected void setup() {
         // mockForConstraintsTests(Synonym)
         // mockConfig("openboxes.locale.supportedLocales = ['ar','ach','de','en','es','fr','it','pt','fi','zh']")
         def product1 = new Product(name: "new product", category: new Category(name: "new category"))
@@ -54,7 +57,9 @@ class SynonymTests {
 
     @Test
     void validate_shouldPassValidation() {
+        when:
         def synonym = new Synonym(name: "a synonym", product: new Product(), synonymTypeCode: SynonymTypeCode.DISPLAY_NAME, locale: new Locale("en"))
+        then:
         assertTrue synonym.validate()
         println synonym.errors
         assertTrue !synonym.hasErrors()
@@ -62,7 +67,9 @@ class SynonymTests {
 
     @Test
     void validate_shouldFailValidation() {
+        when:
         def synonym = new Synonym()
+        then:
         assertTrue !synonym.validate()
         println synonym.errors
         assertTrue synonym.hasErrors()
@@ -71,7 +78,9 @@ class SynonymTests {
 
     @Test
     void addSynonym() {
+        when:
         def product = Product.findByName("new product")
+        then:
         assertNotNull(product)
         product.addToSynonyms(new Synonym(name: "new synonym", synonymTypeCode: SynonymTypeCode.DISPLAY_NAME))
         product.save(flush: true)
@@ -79,11 +88,14 @@ class SynonymTests {
 
     }
 
-    @Ignore
+//    @Ignore
+    @Test
     void deleteSynonym() {
+        when:
         def product = Product.findByName("new product")
         //product.addToSynonyms(new Synonym(name: "new synonym"))
         //product.save(flush: true)
+        then:
         assertEquals 2, product.synonyms.size()
 
         def synonym = Synonym.findByName("new synonym")
@@ -97,9 +109,13 @@ class SynonymTests {
         //assertEquals "new synonym", result.name
     }
 
-    @Ignore
+//    @Ignore
+    @Test
     void deleteProduct_shouldCascadeDeleteSynonyms() {
+        when:
         def product = Product.findByName("new product")
+
+        then:
         assertEquals 2, product.synonyms.size()
 
         // Doesn't work for some reason
@@ -119,39 +135,49 @@ class SynonymTests {
 
     @Test
     void test_shouldReturnDisplayNameWhenAccessingByDefaultKey() {
+        when:
         Product product = Product.findByName("new product")
         Synonym synonym = new Synonym(name: "test synonym", synonymTypeCode: SynonymTypeCode.DISPLAY_NAME, locale: new Locale("en"))
         product.addToSynonyms(synonym)
         String displayName = product.displayNames.default
+        then:
         assertEquals("test synonym", displayName)
     }
 
     @Test
     void test_shouldReturnDisplayNameWhenAccessingByLocaleKey() {
+        when:
         Product product = Product.findByName("new product")
         Synonym synonym = new Synonym(name: "test synonym de", synonymTypeCode: SynonymTypeCode.DISPLAY_NAME, locale: new Locale("de"))
         product.addToSynonyms(synonym)
         String displayName = product.displayNames.de
+        then:
         assertEquals("test synonym de", displayName)
     }
 
     @Test
     void test_shouldReturnNullWhenNoDisplayNameForGivenLocale() {
+        when:
         Product product = Product.findByName("new product")
         Synonym synonym = new Synonym(name: "test synonym de", synonymTypeCode: SynonymTypeCode.DISPLAY_NAME, locale: new Locale("de"))
         product.addToSynonyms(synonym)
         String displayName = product.displayNames.ach
+
+        then:
         assertNull(displayName)
     }
 
     @Test
     void test_shouldReturnCorrectPropertiesOfDisplayNamesMapIncludingDefaultKey() {
+        when:
         Product product = Product.findByName("new product")
         Synonym synonym = new Synonym(name: "test synonym de", synonymTypeCode: SynonymTypeCode.DISPLAY_NAME, locale: new Locale("de"))
         Synonym synonym2 = new Synonym(name: "test synonym en", synonymTypeCode: SynonymTypeCode.DISPLAY_NAME, locale: new Locale("en"))
         product.addToSynonyms(synonym)
         product.addToSynonyms(synonym2)
         Map<String, String> displayNames = product.displayNames
+
+        then:
         assertEquals(3, displayNames.size())
         List<String> expectedKeys = ["default", "de", "en"]
         assertTrue(expectedKeys.containsAll(displayNames.keySet()))
