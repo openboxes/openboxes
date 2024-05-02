@@ -6,17 +6,17 @@
        - Most of Sentry's configuration is done programmatically;
        - cf. SentryInterceptor and SentryServletContainerInitializer.
       -->
-    <appender name="sentry" class="io.sentry.logback.SentryAppender">
-        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-            <level>info</level>
-        </filter>
-        <!--
-           - When we log an error or exception, send recent log entries
-           - at level 'info' or higher to Sentry for additional context.
-          -->
-        <minimumEventLevel>error</minimumEventLevel>
-        <minimumBreadcrumbLevel>info</minimumBreadcrumbLevel>
-    </appender>
+<!--    <appender name="sentry" class="io.sentry.logback.SentryAppender">-->
+<!--        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">-->
+<!--            <level>info</level>-->
+<!--        </filter>-->
+<!--        &lt;!&ndash;-->
+<!--           - When we log an error or exception, send recent log entries-->
+<!--           - at level 'info' or higher to Sentry for additional context.-->
+<!--          &ndash;&gt;-->
+<!--        <minimumEventLevel>error</minimumEventLevel>-->
+<!--        <minimumBreadcrumbLevel>info</minimumBreadcrumbLevel>-->
+<!--    </appender>-->
 
     <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
@@ -120,7 +120,7 @@
     <logger name="quartz" level="debug" /><!-- use 'info' to hide quartz scheduler notifications -->
 
     <root level="debug">
-        <appender-ref ref="sentry" />
+<!--        <appender-ref ref="sentry" />-->
         <appender-ref ref="stdout" />
     </root>
 

@@ -460,18 +460,18 @@ dependencies {
 
     compile 'commons-lang:commons-lang:2.6'  // FIXME migrate to commons-lang3
 
-    implementation "fr.opensagres.xdocreport:fr.opensagres.xdocreport.converter.docx.docx4j:${xDocReportVersion}"
-    implementation "fr.opensagres.xdocreport:fr.opensagres.xdocreport.document:${xDocReportVersion}"
-    implementation "fr.opensagres.xdocreport:fr.opensagres.xdocreport.template:${xDocReportVersion}"
-    implementation "fr.opensagres.xdocreport:fr.opensagres.xdocreport.converter:${xDocReportVersion}"
-    implementation("fr.opensagres.xdocreport:fr.opensagres.xdocreport.converter.docx.xwpf:${xDocReportVersion}") {
+    compile "fr.opensagres.xdocreport:fr.opensagres.xdocreport.converter.docx.docx4j:${xDocReportVersion}"
+    compile "fr.opensagres.xdocreport:fr.opensagres.xdocreport.document:${xDocReportVersion}"
+    compile "fr.opensagres.xdocreport:fr.opensagres.xdocreport.template:${xDocReportVersion}"
+    compile "fr.opensagres.xdocreport:fr.opensagres.xdocreport.converter:${xDocReportVersion}"
+    compile("fr.opensagres.xdocreport:fr.opensagres.xdocreport.converter.docx.xwpf:${xDocReportVersion}") {
         exclude group: "org.apache.poi", module: "poi-ooxml"
     }
-    implementation "fr.opensagres.xdocreport:fr.opensagres.xdocreport.converter.odt.odfdom:${xDocReportVersion}"
-    implementation "fr.opensagres.xdocreport:fr.opensagres.xdocreport.document.docx:${xDocReportVersion}"
-    implementation "fr.opensagres.xdocreport:fr.opensagres.xdocreport.document.odt:${xDocReportVersion}"
-    implementation "fr.opensagres.xdocreport:fr.opensagres.xdocreport.template.freemarker:${xDocReportVersion}"
-    implementation "fr.opensagres.xdocreport:fr.opensagres.xdocreport.template.velocity:${xDocReportVersion}"
+    compile "fr.opensagres.xdocreport:fr.opensagres.xdocreport.converter.odt.odfdom:${xDocReportVersion}"
+    compile "fr.opensagres.xdocreport:fr.opensagres.xdocreport.document.docx:${xDocReportVersion}"
+    compile "fr.opensagres.xdocreport:fr.opensagres.xdocreport.document.odt:${xDocReportVersion}"
+    compile "fr.opensagres.xdocreport:fr.opensagres.xdocreport.template.freemarker:${xDocReportVersion}"
+    compile "fr.opensagres.xdocreport:fr.opensagres.xdocreport.template.velocity:${xDocReportVersion}"
 
     implementation 'fr.w3blog:zebra-zpl:0.0.4'  // ZebraUtils.printZpl(), Labelary API, etc.
 
@@ -494,7 +494,7 @@ dependencies {
 
     testRuntime "net.sourceforge.htmlunit:htmlunit:${htmlUnitVersion}"
 
-    implementation 'org.apache.commons:commons-csv:1.10.0'
+    compile 'org.apache.commons:commons-csv:1.10.0'
     compile 'org.apache.commons:commons-email:1.5'
 
     implementation 'org.apache.httpcomponents:fluent-hc'
@@ -507,7 +507,7 @@ dependencies {
     implementation "org.apache.poi:poi:${poiVersion}"
 
     // enable `import groovyx.gpars.GParsPool`, but consider grails-async-gpars?
-    implementation 'org.codehaus.gpars:gpars:1.2.1'
+    compile 'org.codehaus.gpars:gpars:1.2.1'
 
     // enable `import groovy.sql.Sql`
     implementation 'org.codehaus.groovy:groovy-sql'
@@ -609,7 +609,7 @@ dependencies {
     }
 
     // FIXME use commons-csv instead
-    implementation 'org.grails.plugins:excel-import:3.0.2'
+    compile 'org.grails.plugins:excel-import:3.0.2'
 
     // load config via files listed in application.yml::grails.config.locations
     implementation 'org.grails.plugins:external-config:1.4.0'
@@ -738,14 +738,19 @@ dependencies {
     // set up Spring log framework (slf4j under the hood)
     implementation 'org.springframework.boot:spring-boot-starter-logging'
 
-    implementation "org.xhtmlrenderer:flying-saucer-core:${flyingSaucerVersion}"
-    implementation "org.xhtmlrenderer:flying-saucer-pdf-openpdf:${flyingSaucerVersion}"
+    compile "org.xhtmlrenderer:flying-saucer-core:${flyingSaucerVersion}"
+    compile "org.xhtmlrenderer:flying-saucer-pdf-openpdf:${flyingSaucerVersion}"
 
     implementation 'com.github.albfernandez:juniversalchardet:2.4.0'
 
     // security patch
     compile 'org.yaml:snakeyaml:1.33'
     console 'org.yaml:snakeyaml:1.33'
+
+    // For integration tests
+    testCompile 'org.springframework:spring-test'
+    testCompile 'io.rest-assured:rest-assured:3.2.0'
+    testCompile "org.grails.plugins:build-test-data:3.3.1"
 }
 
 /*
@@ -791,6 +796,15 @@ buildProperties.doLast {
     grailsBuildInfoFile.withOutputStream {
         properties.store(it, null)
     }
+}
+
+/**
+ * Used when running integration tests. Can be defined at the commandline level by our build and
+ * test pipelines (which use secrets, not plaintext passwords).
+ */
+test {
+    systemProperty "username", System.getProperty("username")
+    systemProperty "password", System.getProperty("password")
 }
 
 /*

@@ -23,10 +23,10 @@ class SentryInterceptor {
     // this interceptor depends on SecurityInterceptor setting user/location
     int order = LOWEST_PRECEDENCE
 
-    AuthService authService
+//    AuthService authService
 
     public SentryInterceptor() {
-        matchAll().except(uri: '/static/**').except(uri: "/info").except(uri: "/health")
+//        matchAll().except(uri: '/static/**').except(uri: "/info").except(uri: "/health")
     }
 
     @Override
@@ -42,50 +42,50 @@ class SentryInterceptor {
      * from Tomcat (see SentryServletContainerInitializer).
      */
     boolean before() {
-        def startTime = System.currentTimeMillis()
-        try {
-            User user = authService.currentUser
-            Location location = authService.currentLocation
-            Map<String, String> additionalData = [:]
-
-            Sentry.user = new SentryUser().with {
-                if (user?.email) {
-                    email = user.email
-                }
-                if (user?.id) {
-                    id = user.id
-                }
-                if (user?.username) {
-                    username = user.username
-                }
-                if (Environment?.current) {
-                    additionalData['environment'] = Environment.current.name
-                }
-                if (user?.locale) {
-                    additionalData['locale'] = user.locale.toString()
-                }
-                if (location?.name) {
-                    additionalData['location'] = location.name
-                }
-                if (location?.id) {
-                    additionalData['locationId'] = location.id
-                }
-                if (session?.id) {
-                    additionalData['sessionId'] = session.id
-                }
-                if (user?.timezone) {
-                    additionalData['timezone'] = user.timezone
-                }
-
-                data = additionalData
-                delegate
-            }
-
-        } catch (Exception e) {
-            log.warn("Error setting Sentry user data for ${request.requestURI}", e)
-        }
-
-        log.debug "updated Sentry context for ${request.requestURI} in ${System.currentTimeMillis() - startTime} ms"
-        return true
+//        def startTime = System.currentTimeMillis()
+//        try {
+//            User user = authService.currentUser
+//            Location location = authService.currentLocation
+//            Map<String, String> additionalData = [:]
+//
+//            Sentry.user = new SentryUser().with {
+//                if (user?.email) {
+//                    email = user.email
+//                }
+//                if (user?.id) {
+//                    id = user.id
+//                }
+//                if (user?.username) {
+//                    username = user.username
+//                }
+//                if (Environment?.current) {
+//                    additionalData['environment'] = Environment.current.name
+//                }
+//                if (user?.locale) {
+//                    additionalData['locale'] = user.locale.toString()
+//                }
+//                if (location?.name) {
+//                    additionalData['location'] = location.name
+//                }
+//                if (location?.id) {
+//                    additionalData['locationId'] = location.id
+//                }
+//                if (session?.id) {
+//                    additionalData['sessionId'] = session.id
+//                }
+//                if (user?.timezone) {
+//                    additionalData['timezone'] = user.timezone
+//                }
+//
+//                data = additionalData
+//                delegate
+//            }
+//
+//        } catch (Exception e) {
+//            log.warn("Error setting Sentry user data for ${request.requestURI}", e)
+//        }
+//
+//        log.debug "updated Sentry context for ${request.requestURI} in ${System.currentTimeMillis() - startTime} ms"
+//        return true
     }
 }
