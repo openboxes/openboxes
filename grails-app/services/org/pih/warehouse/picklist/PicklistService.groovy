@@ -11,21 +11,25 @@ package org.pih.warehouse.picklist
 
 import grails.gorm.transactions.Transactional
 import org.pih.warehouse.api.AvailableItem
+import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.SuggestedItem
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryLevel
+import org.pih.warehouse.inventory.StockMovementService
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductAvailability
 import org.pih.warehouse.requisition.Requisition
+import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.requisition.RequisitionStatus
 
 @Transactional
 class PicklistService {
 
     def productAvailabilityService
+    StockMovementService stockMovementService
 
     Picklist save(Map data) {
         def itemsData = data.picklistItems ?: []
@@ -84,6 +88,30 @@ class PicklistService {
         }
 
         productAvailabilityService.refreshProductsAvailability(orderItem?.order?.origin?.id, [orderItem?.product?.id], binLocations?.unique(), false)
+    }
+
+    void clearPicklist(String stockMovementId) {
+        StockMovement stockMovement = stockMovementService.getStockMovement(stockMovementId)
+        Picklist picklist = stockMovement?.requisition?.picklist
+        List<String> binLocations = []
+        if (picklist) {
+            Set<RequisitionItem> requisitionItems = stockMovement.requisition.requisitionItems
+            Map<String, List<PicklistItem>> picklistItems = picklist.picklistItems.groupBy { it.requisitionItem?.id }
+            requisitionItems.each { RequisitionItem requisitionItem ->
+                List<PicklistItem> matchingPicklistItems = picklistItems.get(requisitionItem.id)
+                matchingPicklistItems.each { PicklistItem picklistItem ->
+                    picklist.removeFromPicklistItems(picklistItem)
+                    binLocations.add(picklistItem.binLocation?.id)
+                }
+            }
+        }
+
+        // TODO: Remove it (not needed, since PicklistItem afterDelete's event triggers it)
+        productAvailabilityService.refreshProductsAvailability(
+                stockMovement?.origin?.id,
+                stockMovement?.requisition?.requisitionItems?.product?.id,
+                binLocations.unique(),
+                false)
     }
 
     void createPicklist(Order order) {

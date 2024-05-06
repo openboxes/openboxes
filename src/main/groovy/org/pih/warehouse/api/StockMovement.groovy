@@ -204,6 +204,7 @@ class StockMovement implements Validateable{
             received            : isReceived,
             requestType         : requestType,
             sourceType          : sourceType?.name,
+            picklist            : requisition?.picklist,
         ]
     }
 

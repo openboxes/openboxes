@@ -176,6 +176,7 @@ class OutboundStockMovement implements Serializable, Validateable {
                 received            : isReceived,
                 requestType         : requestType,
                 sourceType          : sourceType?.name,
+                picklist            : requisition?.picklist
         ]
     }
 

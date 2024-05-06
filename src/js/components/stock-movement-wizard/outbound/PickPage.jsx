@@ -31,6 +31,7 @@ import { formatProductDisplayName, matchesProductCodeOrName } from 'utils/form-v
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
+import picklistApi from "api/services/PicklistApi";
 
 const FIELDS = {
   pickPageItems: {
@@ -128,7 +129,13 @@ const FIELDS = {
         defaultMessage: 'Qty picked',
         flexWidth: '0.7',
         attributes: {
-          formatValue: value => (value ? (value.toLocaleString('en-US')) : value),
+          formatValue: value => {
+            return (
+              <div className={!value ? 'text-danger' : null}>
+                {value.toLocaleString('en-US')}
+              </div>
+            );
+          },
         },
       },
       buttonEditPick: {
@@ -617,6 +624,26 @@ class PickPage extends Component {
     });
   }
 
+  async clearPicklist() {
+    const { values } = this.state;
+    const { stockMovementId } = values;
+    const { showSpinner, hideSpinner } = this.props;
+    showSpinner();
+    try {
+      await picklistApi.clearPicklist(stockMovementId);
+      const picklistItems = this.state.values.pickPageItems;
+      this.setState((prevState) => ({
+        values: ({
+          ...prevState.values,
+          pickPageItems: picklistItems
+            .map((item) => ({ ...item, picklistItems: [], quantityPicked: 0 })),
+        }),
+      }));
+    } finally {
+      hideSpinner();
+    }
+  }
+
   render() {
     const { itemFilter } = this.state;
     const { showOnly } = this.props;
@@ -639,6 +666,9 @@ class PickPage extends Component {
                   htmlFor="csvInput"
                   className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
                 >
+                  <button onClick={() => this.clearPicklist()}>
+                    clear
+                  </button>
                   <span><i className="fa fa-download pr-2" /><Translate id="react.default.button.importTemplate.label" defaultMessage="Import template" /></span>
                   <input
                     id="csvInput"
