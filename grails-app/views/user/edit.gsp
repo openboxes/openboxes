@@ -198,7 +198,9 @@
 
                                                 <div class="fade">
                                                     <g:checkBox name="rememberLastLocation" value="${userInstance?.rememberLastLocation}" />
-                                                    <warehouse:message code="user.rememberLastLocation.label" />
+                                                    <label class="fade font-weight-normal" for="rememberLastLocation">
+                                                        <warehouse:message code="user.rememberLastLocation.label" />
+                                                    </label>
                                                 </div>
 
                                             </td>
