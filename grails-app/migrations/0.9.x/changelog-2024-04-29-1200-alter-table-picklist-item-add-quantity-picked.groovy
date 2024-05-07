@@ -39,14 +39,14 @@ databaseChangeLog = {
     changeSet(author: "anadolny", id: "290420241230-4", objectQuotingStrategy: "LEGACY") {
         preConditions(onError: "HALT", onFail: "MARK_RAN", onSqlOutput: "IGNORE") {
             not {
-                foreignKeyConstraintExists(foreignKeyName: "fk_picker_person")
+                foreignKeyConstraintExists(foreignKeyName: "fk_picklist_item_picker_id_person")
             }
         }
 
         addForeignKeyConstraint(
                 baseColumnNames: "picker_id",
                 baseTableName: "picklist_item",
-                constraintName: "fk_picker_person",
+                constraintName: "fk_picklist_item_picker_id_person",
                 deferrable: "false",
                 initiallyDeferred: "false",
                 referencedColumnNames: "id",
