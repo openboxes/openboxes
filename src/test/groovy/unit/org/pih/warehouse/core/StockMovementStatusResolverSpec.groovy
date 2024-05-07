@@ -14,7 +14,7 @@ import org.pih.warehouse.api.StockMovementStatusContext
 import util.StockMovementStatusResolver
 
 @Unroll
-class StockMovementStatusSpec extends Specification {
+class StockMovementStatusResolverSpec extends Specification {
 
     void "should return shipment status #expected for inbound stock movement returns"() {
         given:
