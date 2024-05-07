@@ -219,6 +219,7 @@ class PickPage extends Component {
       showAlert: false,
       alertMessage: '',
       itemFilter: '',
+      showOnlyErroredItems: false,
     };
 
     this.revertUserPick = this.revertUserPick.bind(this);
@@ -468,6 +469,11 @@ class PickPage extends Component {
    * @public
    */
   nextPage(formValues) {
+    if (!this.validateEmptyPicks(formValues)) {
+      this.showEmptyPicksErrorMessage(formValues);
+      return;
+    }
+
     if (this.validateReasonCodes(formValues)) {
       this.props.showSpinner();
       this.validatePicklist()
@@ -523,6 +529,60 @@ class PickPage extends Component {
           .catch(() => { this.props.hideSpinner(); });
       })
       .catch(() => { this.props.hideSpinner(); });
+  }
+
+  // Calculating which rows have quantity picked 0, and don't have subitems
+  getRowsWithEmptyPicks(pickPageItems) {
+    return pickPageItems.reduce((acc, item, index) => {
+      // When the quantity picked is equal to 0 we have to check its subitems,
+      // because the item can be edited to 0, not cleared.
+      if (!item.quantityPicked && !item.picklistItems.length) {
+        return [...acc, index + 1];
+      }
+
+      return acc;
+    }, []);
+  }
+
+  // Displaying an error message when an item with a quantity picked equal to 0 exists
+  showEmptyPicksErrorMessage(formValues) {
+    const emptyPicks = this.getRowsWithEmptyPicks(formValues.pickPageItems);
+    const emptyPickLinesNumber = emptyPicks.join(', ');
+    const alertMessage = this.props.translate(
+      'react.stockMovement.missingPickedLot.label',
+      `The picked lot is missing at rows: ${emptyPickLinesNumber}`,
+      {
+        rows: emptyPickLinesNumber,
+      },
+    );
+
+    this.setState({
+      alertMessage,
+      showAlert: emptyPicks.length,
+    });
+  }
+
+  // Managing hasError property depending on the value of quantity
+  // picked and on the existing subitems
+  validateEmptyPicks(formValues) {
+    const emptyPicks = this.getRowsWithEmptyPicks(formValues.pickPageItems);
+
+    const pickPageItems = this.state.values.pickPageItems.map((item, index) => {
+      if (emptyPicks.includes(index + 1)) {
+        return { ...item, hasError: true };
+      }
+
+      return { ...item, hasError: false };
+    });
+
+    this.setState({
+      values: {
+        ...this.state.values,
+        pickPageItems,
+      },
+    });
+
+    return !emptyPicks.length;
   }
 
   sortByBins() {
@@ -640,9 +700,24 @@ class PickPage extends Component {
     }
   }
 
+  onSaveAndExit(values) {
+    if (!this.validateEmptyPicks(values)) {
+      this.showEmptyPicksErrorMessage(values);
+      return;
+    }
+
+    window.location = STOCK_MOVEMENT_URL.show(values.stockMovementId);
+  }
+
   render() {
-    const { itemFilter } = this.state;
+    const {
+      showOnlyErroredItems,
+      itemFilter,
+      showAlert,
+      alertMessage,
+    } = this.state;
     const { showOnly } = this.props;
+
     return (
       <Form
         onSubmit={values => this.nextPage(values)}
@@ -650,7 +725,7 @@ class PickPage extends Component {
         initialValues={this.state.values}
         render={({ handleSubmit, values }) => (
           <div className="d-flex flex-column">
-            <AlertMessage show={this.state.showAlert} message={this.state.alertMessage} danger />
+            <AlertMessage show={showAlert} message={alertMessage} danger />
             { !showOnly ?
               <span className="buttons-container">
                 <FilterInput
@@ -660,19 +735,39 @@ class PickPage extends Component {
                 />
                 <button
                   type="button"
+                  onClick={() => {
+                    this.validateEmptyPicks(values);
+                    this.setState({ showOnlyErroredItems: !showOnlyErroredItems });
+                  }}
+                  className={`float-right mb-1 btn btn-outline-secondary align-self-end btn-xs ml-3 ${showOnlyErroredItems ? 'active' : ''}`}
+                >
+                    <span>
+                      {this.getRowsWithEmptyPicks(values?.pickPageItems).length}
+                      {' '}
+                      <Translate
+                        id="react.stockMovement.erroredItemsCount.label"
+                        defaultMessage="item(s) require your attention"
+                      />
+                    </span>
+                </button>
+                <button
+                  type="button"
                   onClick={() => this.clearPicklist()}
                   className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs ml-1"
                 >
                   <span>
-                    <i className="fa fa-refresh pr-2" />
-                    <Translate id="react.stockMovement.clearPick.label" defaultMessage="Clear pick" />
+                    <i className="fa fa-refresh pr-2"/>
+                    <Translate id="react.stockMovement.clearPick.label"
+                               defaultMessage="Clear pick"/>
                   </span>
                 </button>
                 <label
                   htmlFor="csvInput"
                   className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
                 >
-                  <span><i className="fa fa-download pr-2" /><Translate id="react.default.button.importTemplate.label" defaultMessage="Import template" /></span>
+                  <span><i className="fa fa-download pr-2"/><Translate
+                    id="react.default.button.importTemplate.label"
+                    defaultMessage="Import template"/></span>
                   <input
                     id="csvInput"
                     type="file"
@@ -690,7 +785,9 @@ class PickPage extends Component {
                   onClick={() => this.exportTemplate(values)}
                   className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
                 >
-                  <span><i className="fa fa-upload pr-2" /><Translate id="react.default.button.exportTemplate.label" defaultMessage="Export template" /></span>
+                  <span><i className="fa fa-upload pr-2"/><Translate
+                    id="react.default.button.exportTemplate.label"
+                    defaultMessage="Export template"/></span>
                 </button>
                 <a
                   href={`${this.state.printPicksUrl}${this.state.sorted ? '?sorted=true' : ''}`}
@@ -698,39 +795,49 @@ class PickPage extends Component {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  <span><i className="fa fa-print pr-2" /><Translate id="react.stockMovement.printPicklist.label" defaultMessage="Print picklist" /></span>
+                  <span><i className="fa fa-print pr-2"/><Translate
+                    id="react.stockMovement.printPicklist.label"
+                    defaultMessage="Print picklist"/></span>
                 </a>
                 <button
                   type="button"
                   onClick={() => this.refresh()}
                   className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs ml-1"
                 >
-                  <span><i className="fa fa-refresh pr-2" /><Translate id="react.default.button.refresh.label" defaultMessage="Reload" /></span>
+                  <span><i className="fa fa-refresh pr-2"/><Translate
+                    id="react.default.button.refresh.label" defaultMessage="Reload"/></span>
                 </button>
                 <button
                   type="button"
-                  onClick={() => { window.location = STOCK_MOVEMENT_URL.show(values.stockMovementId); }}
+                  onClick={() => this.onSaveAndExit(values)}
                   className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs ml-1"
                 >
-                  <span><i className="fa fa-sign-out pr-2" /><Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" /></span>
+                  <span><i className="fa fa-sign-out pr-2"/><Translate
+                    id="react.default.button.saveAndExit.label"
+                    defaultMessage="Save and exit"/></span>
                 </button>
                 <button
                   type="button"
                   onClick={() => this.sortByBins()}
-                  className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs"
+                  className="float-right ml-1 mb-1 btn btn-outline-secondary align-self-end btn-xs"
                 >
-                  {this.state.sorted && <span><i className="fa fa-sort pr-2" /><Translate id="react.stockMovement.originalOrder.label" defaultMessage="Original order" /></span>}
-                  {!this.state.sorted && <span><i className="fa fa-sort pr-2" /><Translate id="react.stockMovement.sortByBins.label" defaultMessage="Sort by bins" /></span>}
+                  {this.state.sorted && <span><i className="fa fa-sort pr-2"/><Translate
+                    id="react.stockMovement.originalOrder.label"
+                    defaultMessage="Original order"/></span>}
+                  {!this.state.sorted && <span><i className="fa fa-sort pr-2"/><Translate
+                    id="react.stockMovement.sortByBins.label"
+                    defaultMessage="Sort by bins"/></span>}
                 </button>
               </span>
-                :
+              :
               <button
                 type="button"
                 onClick={() => this.props.history.push(STOCK_MOVEMENT_URL.listRequest())}
                 className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs mr-2"
               >
-                <span><i className="fa fa-sign-out pr-2" /> <Translate id="react.default.button.exit.label" defaultMessage="Exit" /> </span>
-              </button> }
+                <span><i className="fa fa-sign-out pr-2"/> <Translate
+                  id="react.default.button.exit.label" defaultMessage="Exit"/> </span>
+              </button>}
             <form onSubmit={handleSubmit} className="print-mt">
               <div className="table-form">
                 {_.map(FIELDS, (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
@@ -746,6 +853,7 @@ class PickPage extends Component {
                   loadMoreRows: this.loadMoreRows,
                   isRowLoaded: this.isRowLoaded,
                   isPaginated: this.props.isPaginated,
+                  showOnlyErroredItems,
                   showOnly,
                   isFirstPageLoaded: this.state.isFirstPageLoaded,
                   itemFilter,
