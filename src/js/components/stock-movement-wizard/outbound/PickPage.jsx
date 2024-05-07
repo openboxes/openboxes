@@ -623,8 +623,7 @@ class PickPage extends Component {
   }
 
   async clearPicklist() {
-    const { values } = this.state;
-    const { picklist } = values;
+    const { picklist } = this.state.values;
     this.props.showSpinner();
     try {
       await picklistApi.clearPicklist(picklist?.id);

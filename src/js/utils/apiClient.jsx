@@ -65,10 +65,7 @@ export const handleError = (error) => {
   const errorMessage = _.get(error, 'response.data.errorMessage', '');
   const errorMessages = _.get(error, 'response.data.errorMessages', []).join(', ');
   switch (error.response.status) {
-
     case 400: {
-      console.log("error message", errorMessage)
-      console.log("error messages", errorMessages)
       notification(NotificationType.ERROR_OUTLINED)({
         message: 'Bad request',
         details: errorMessages || errorMessage,
