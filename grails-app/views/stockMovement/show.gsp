@@ -234,7 +234,7 @@
                                 <warehouse:message code="stockMovement.status.label"/>
                             </td>
                             <td class="value">
-                                <format:metadata obj="${stockMovement?.status ?: (stockMovement?.shipment?.status?.code ?: stockMovement?.statusCode)}"/>
+                                ${stockMovement?.displayStatus?.label}
                             </td>
                         </tr>
                         <tr class="prop">

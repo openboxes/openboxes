@@ -6,7 +6,6 @@ import org.pih.warehouse.api.StockMovementType
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
-import org.pih.warehouse.core.Role
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
 import org.pih.warehouse.order.Order
@@ -20,7 +19,8 @@ import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.shipping.ShipmentStatusCode
 import org.pih.warehouse.shipping.ShipmentType
-import util.StockMovementStatusHelper
+import org.pih.warehouse.api.StockMovementStatusContext
+import util.StockMovementStatusResolver
 
 class OutboundStockMovement implements Serializable, Validateable {
 
@@ -229,6 +229,19 @@ class OutboundStockMovement implements Serializable, Validateable {
         return shipment?.currentStatus == ShipmentStatusCode.RECEIVED
     }
 
+    @Deprecated
+    Map<String, String> getDisplayStatus() {
+        StockMovementStatusContext stockMovementContext = new StockMovementStatusContext(
+                order: order,
+                requisition: requisition,
+                shipment: shipment,
+                origin: origin,
+                destination: destination
+        )
+        Enum status = StockMovementStatusResolver.getStatus(stockMovementContext)
+        return StockMovementStatusResolver.getStatusMetaData(status)
+    }
+
     Boolean isDeleteOrRollbackAuthorized(Location currentLocation) {
         Location origin = requisition?.origin?:shipment?.origin
         Location destination = requisition?.destination?:shipment?.destination
@@ -326,16 +339,4 @@ class OutboundStockMovement implements Serializable, Validateable {
         return requisition?.approvalRequired && origin?.approvalRequired && RequisitionStatus.compare(requisition.status, RequisitionStatus.PICKING) == -1
     }
 
-    def getDisplayStatus() {
-        StockMovementStatusHelper statusHelper = new StockMovementStatusHelper(
-                order: order,
-                shipment: shipment,
-                destination: destination,
-                origin: origin,
-                stockMovementType: stockMovementType,
-                defaultStatus: status,
-        )
-
-        return statusHelper.getDisplayStatus()
-    }
 }
