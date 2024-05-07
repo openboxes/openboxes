@@ -348,7 +348,7 @@ class PickPage extends Component {
     return apiClient.get(url)
       .then((resp) => {
         const { totalCount } = resp.data;
-        const { associations } = resp.data.data;
+        const { associations, picklist } = resp.data.data;
         const printPicks = _.find(
           associations.documents,
           doc => doc.documentType === 'PICKLIST' && doc.uri.includes('print'),
@@ -357,6 +357,10 @@ class PickPage extends Component {
           totalCount,
           printPicksUrl: printPicks ? printPicks.uri : '/',
           sorted: false,
+          values: {
+            ...this.state.values,
+            picklist,
+          },
         }, () => this.props.hideSpinner());
       })
       .catch(() => this.props.hideSpinner());
@@ -567,7 +571,7 @@ class PickPage extends Component {
   validateEmptyPicks(formValues) {
     const emptyPicks = this.getRowsWithEmptyPicks(formValues.pickPageItems);
 
-    const pickPageItems = this.state.values.pickPageItems.map((item, index) => {
+    const pickPageItems = formValues.pickPageItems.map((item, index) => {
       if (emptyPicks.includes(index + 1)) {
         return { ...item, hasError: true };
       }
@@ -756,18 +760,24 @@ class PickPage extends Component {
                   className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs ml-1"
                 >
                   <span>
-                    <i className="fa fa-refresh pr-2"/>
-                    <Translate id="react.stockMovement.clearPick.label"
-                               defaultMessage="Clear pick"/>
+                    <i className="fa fa-refresh pr-2" />
+                    <Translate
+                      id="react.stockMovement.clearPick.label"
+                      defaultMessage="Clear pick"
+                    />
                   </span>
                 </button>
                 <label
                   htmlFor="csvInput"
                   className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
                 >
-                  <span><i className="fa fa-download pr-2"/><Translate
-                    id="react.default.button.importTemplate.label"
-                    defaultMessage="Import template"/></span>
+                  <span>
+                    <i className="fa fa-download pr-2" />
+                    <Translate
+                      id="react.default.button.importTemplate.label"
+                      defaultMessage="Import template"
+                    />
+                  </span>
                   <input
                     id="csvInput"
                     type="file"
@@ -785,9 +795,13 @@ class PickPage extends Component {
                   onClick={() => this.exportTemplate(values)}
                   className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
                 >
-                  <span><i className="fa fa-upload pr-2"/><Translate
-                    id="react.default.button.exportTemplate.label"
-                    defaultMessage="Export template"/></span>
+                  <span>
+                    <i className="fa fa-upload pr-2" />
+                    <Translate
+                      id="react.default.button.exportTemplate.label"
+                      defaultMessage="Export template"
+                    />
+                  </span>
                 </button>
                 <a
                   href={`${this.state.printPicksUrl}${this.state.sorted ? '?sorted=true' : ''}`}
@@ -795,38 +809,63 @@ class PickPage extends Component {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  <span><i className="fa fa-print pr-2"/><Translate
-                    id="react.stockMovement.printPicklist.label"
-                    defaultMessage="Print picklist"/></span>
+                  <span>
+                    <i className="fa fa-print pr-2" />
+                    <Translate
+                      id="react.stockMovement.printPicklist.label"
+                      defaultMessage="Print picklist"
+                    />
+                  </span>
                 </a>
                 <button
                   type="button"
                   onClick={() => this.refresh()}
                   className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs ml-1"
                 >
-                  <span><i className="fa fa-refresh pr-2"/><Translate
-                    id="react.default.button.refresh.label" defaultMessage="Reload"/></span>
+                  <span>
+                    <i className="fa fa-refresh pr-2" />
+                    <Translate
+                      id="react.default.button.refresh.label"
+                      defaultMessage="Reload"
+                    />
+                  </span>
                 </button>
                 <button
                   type="button"
                   onClick={() => this.onSaveAndExit(values)}
                   className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs ml-1"
                 >
-                  <span><i className="fa fa-sign-out pr-2"/><Translate
-                    id="react.default.button.saveAndExit.label"
-                    defaultMessage="Save and exit"/></span>
+                  <span>
+                    <i className="fa fa-sign-out pr-2" />
+                    <Translate
+                      id="react.default.button.saveAndExit.label"
+                      defaultMessage="Save and exit"
+                    />
+                  </span>
                 </button>
                 <button
                   type="button"
                   onClick={() => this.sortByBins()}
                   className="float-right ml-1 mb-1 btn btn-outline-secondary align-self-end btn-xs"
                 >
-                  {this.state.sorted && <span><i className="fa fa-sort pr-2"/><Translate
-                    id="react.stockMovement.originalOrder.label"
-                    defaultMessage="Original order"/></span>}
-                  {!this.state.sorted && <span><i className="fa fa-sort pr-2"/><Translate
-                    id="react.stockMovement.sortByBins.label"
-                    defaultMessage="Sort by bins"/></span>}
+                  {this.state.sorted && (
+                    <span>
+                      <i className="fa fa-sort pr-2" />
+                      <Translate
+                        id="react.stockMovement.originalOrder.label"
+                        defaultMessage="Original order"
+                      />
+                    </span>
+                  )}
+                  {!this.state.sorted && (
+                    <span>
+                      <i className="fa fa-sort pr-2" />
+                      <Translate
+                        id="react.stockMovement.sortByBins.label"
+                        defaultMessage="Sort by bins"
+                      />
+                    </span>
+                  )}
                 </button>
               </span>
               :
@@ -835,8 +874,13 @@ class PickPage extends Component {
                 onClick={() => this.props.history.push(STOCK_MOVEMENT_URL.listRequest())}
                 className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs mr-2"
               >
-                <span><i className="fa fa-sign-out pr-2"/> <Translate
-                  id="react.default.button.exit.label" defaultMessage="Exit"/> </span>
+                <span>
+                  <i className="fa fa-sign-out pr-2" />
+                  <Translate
+                    id="react.default.button.exit.label"
+                    defaultMessage="Exit"
+                  />
+                </span>
               </button>}
             <form onSubmit={handleSubmit} className="print-mt">
               <div className="table-form">
