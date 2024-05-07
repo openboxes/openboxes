@@ -12,6 +12,7 @@ import { connect } from 'react-redux';
 import Alert from 'react-s-alert';
 
 import { fetchReasonCodes, hideSpinner, showSpinner } from 'actions';
+import picklistApi from 'api/services/PicklistApi';
 import ArrayField from 'components/form-elements/ArrayField';
 import ButtonField from 'components/form-elements/ButtonField';
 import FilterInput from 'components/form-elements/FilterInput';
@@ -31,7 +32,6 @@ import { formatProductDisplayName, matchesProductCodeOrName } from 'utils/form-v
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
-import picklistApi from "api/services/PicklistApi";
 
 const FIELDS = {
   pickPageItems: {
@@ -129,24 +129,22 @@ const FIELDS = {
         defaultMessage: 'Qty picked',
         flexWidth: '0.7',
         attributes: {
-          formatValue: value => {
-            return (
-              <div className={!value ? 'text-danger' : null}>
-                {value.toLocaleString('en-US')}
-              </div>
-            );
-          },
+          formatValue: value => (
+            <div className={!value ? 'text-danger' : null}>
+              {value.toLocaleString('en-US')}
+            </div>
+          ),
         },
       },
       buttonEditPick: {
-        label: 'react.stockMovement.editPick.label',
-        defaultMessage: 'Edit pick',
+        label: 'react.stockMovement.pick.label',
+        defaultMessage: 'Pick',
         type: EditPickModal,
         fieldKey: '',
         flexWidth: '0.7',
         attributes: {
-          title: 'react.stockMovement.editPick.label',
-          defaultTitleMessage: 'Edit Pick',
+          title: 'react.stockMovement.pick.label',
+          defaultTitleMessage: 'Pick',
         },
         getDynamicAttr: ({
           fieldValue, subfield, updatePickPageItem,
@@ -155,8 +153,8 @@ const FIELDS = {
           itemId: _.get(fieldValue, 'requisitionItem.id'),
           btnOpenDisabled: showOnly,
           subfield,
-          btnOpenText: fieldValue && fieldValue.hasChangedPick ? '' : 'react.default.button.edit.label',
-          btnOpenDefaultText: fieldValue && fieldValue.hasChangedPick ? '' : 'Edit',
+          btnOpenText: fieldValue && fieldValue.hasChangedPick ? '' : 'react.stockMovement.pick.label',
+          btnOpenDefaultText: fieldValue && fieldValue.hasChangedPick ? '' : 'Pick',
           btnOpenClassName: fieldValue && fieldValue.hasChangedPick ? ' btn fa fa-check btn-outline-success' : 'btn btn-outline-primary',
           onResponse: updatePickPageItem,
           reasonCodes,
@@ -626,11 +624,10 @@ class PickPage extends Component {
 
   async clearPicklist() {
     const { values } = this.state;
-    const { stockMovementId } = values;
-    const { showSpinner, hideSpinner } = this.props;
-    showSpinner();
+    const { picklist } = values;
+    this.props.showSpinner();
     try {
-      await picklistApi.clearPicklist(stockMovementId);
+      await picklistApi.clearPicklist(picklist?.id);
       const picklistItems = this.state.values.pickPageItems;
       this.setState((prevState) => ({
         values: ({
@@ -640,7 +637,7 @@ class PickPage extends Component {
         }),
       }));
     } finally {
-      hideSpinner();
+      this.props.hideSpinner();
     }
   }
 
@@ -662,13 +659,20 @@ class PickPage extends Component {
                   onChange={e => this.setState({ itemFilter: e.target.value })}
                   onClear={() => this.setState({ itemFilter: '' })}
                 />
+                <button
+                  type="button"
+                  onClick={() => this.clearPicklist()}
+                  className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs ml-1"
+                >
+                  <span>
+                    <i className="fa fa-refresh pr-2" />
+                    <Translate id="react.stockMovement.clearPick.label" defaultMessage="Clear pick" />
+                  </span>
+                </button>
                 <label
                   htmlFor="csvInput"
                   className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
                 >
-                  <button onClick={() => this.clearPicklist()}>
-                    clear
-                  </button>
                   <span><i className="fa fa-download pr-2" /><Translate id="react.default.button.importTemplate.label" defaultMessage="Import template" /></span>
                   <input
                     id="csvInput"

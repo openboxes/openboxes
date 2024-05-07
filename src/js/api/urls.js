@@ -139,4 +139,4 @@ export const PRODUCT_SUPPLIER_ATTRIBUTE_API = `${API}/productSupplierAttributes`
 export const PRODUCT_SUPPLIER_ATTRIBUTE_BATCH = `${PRODUCT_SUPPLIER_ATTRIBUTE_API}/batch`;
 
 export const PICKLIST_API = `${API}/picklists`;
-export const PICKLIST_CLEAR = id => `${PICKLIST_API}/${id}/picklistItems`;
+export const PICKLIST_CLEAR = id => `${PICKLIST_API}/${id}/items`;

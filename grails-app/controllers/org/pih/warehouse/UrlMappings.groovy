@@ -329,8 +329,8 @@ class UrlMappings {
             action = [PUT: "rollbackApproval"]
         }
 
-        "/api/picklists/$stockMovementId/picklistItems" {
-            controller = "stockMovementApi"
+        "/api/picklists/$id/items" {
+            controller = "picklistApi"
             action = [DELETE: "clearPicklist"]
         }
 
