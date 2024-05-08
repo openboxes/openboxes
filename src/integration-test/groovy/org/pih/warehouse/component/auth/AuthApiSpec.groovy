@@ -8,6 +8,9 @@ import org.pih.warehouse.component.base.ApiSpec
 import spock.lang.Ignore
 import spock.lang.Shared
 
+/**
+ * Test our authentication endpoints.
+ */
 class AuthApiSpec extends ApiSpec {
 
     @Shared
@@ -18,7 +21,7 @@ class AuthApiSpec extends ApiSpec {
         // The base class already creates a test location so nothing to do here.
     }
 
-    void "login successful"() {
+    void "login should succeed for a valid user"() {
         given:
         JSONObject body = buildAuthRequestBody(username, password, location.id)
 
@@ -26,7 +29,7 @@ class AuthApiSpec extends ApiSpec {
         authApiWrapper.login(body, HttpStatus.SC_OK)
     }
 
-    void "login fails with invalid username"() {
+    void "login should fail when given an invalid username"() {
         given:
         JSONObject body = buildAuthRequestBody("invalid", password, location.id)
 
@@ -34,7 +37,7 @@ class AuthApiSpec extends ApiSpec {
         authApiWrapper.login(body, HttpStatus.SC_UNAUTHORIZED)
     }
 
-    void "login fails with invalid password"() {
+    void "login should fail when given an invalid password"() {
         given:
         JSONObject body = buildAuthRequestBody(username, "invalid", location.id)
 
@@ -43,7 +46,7 @@ class AuthApiSpec extends ApiSpec {
     }
 
     @Ignore("This actually succeeds, even though the location doesn't exist. Re-enable this test when that's fixed.")
-    void "login fails with invalid location"() {
+    void "login should fail when given an invalid location"() {
         given:
         JSONObject body = buildAuthRequestBody(username, password, INVALID_ID)
 

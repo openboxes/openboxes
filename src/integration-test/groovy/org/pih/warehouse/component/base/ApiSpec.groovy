@@ -1,6 +1,7 @@
 package org.pih.warehouse.component.base
 
 import grails.buildtestdata.TestDataBuilder
+import grails.buildtestdata.TestDataConfigurationHolder
 import grails.test.mixin.integration.Integration
 import io.restassured.RestAssured
 import io.restassured.builder.RequestSpecBuilder
@@ -19,10 +20,10 @@ import org.pih.warehouse.util.common.RandomUtil
 import org.pih.warehouse.util.common.ResponseSpecUtil
 
 /**
- * Base class for all of our API tests.
+ * Base class for all of our API/component tests.
  *
- * Note that while we're using the @Integration annotation, because we're making restful API calls into our server,
- * these tests are more like API tests, hence the name ApiSpec. Confusingly, Grails refers to this type of API testing
+ * Note that even though we use the @Integration annotation, these tests are more like API tests because we're making
+ * restful API calls into our server (hence the name ApiSpec). Confusingly, Grails refers to this type of API testing
  * as "functional testing", but we're going to ignore that term for our purposes because Grails "functional tests"
  * expect us to extend from GebSpec, which isn't supported for APIs that return JSON. Instead we use RestAssured.
  *
@@ -110,6 +111,7 @@ abstract class ApiSpec extends Specification implements TestDataBuilder {
     @Transactional
     void setup() {
         setupRestAssuredGlobalConfig()
+        TestDataConfigurationHolder.reset()  // Needed so that we can regenerate new values for our random fields
 
         baseUnauthenticatedRequestSpec = buildDefaultUnauthenticatedRequestSpec()
 
