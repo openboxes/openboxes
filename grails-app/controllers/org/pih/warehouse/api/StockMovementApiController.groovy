@@ -18,6 +18,7 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
+import org.pih.warehouse.exporter.PickListItemExcelExporter
 import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.core.Person
@@ -341,30 +342,32 @@ class StockMovementApiController {
     }
 
     def exportPickListItems() {
+        Boolean isTemplate = params.boolean("template", false)
+
         List<PickPageItem> pickPageItems = stockMovementService.getPickPageItems(params.id, null, null )
-        List<PicklistItem> picklistItems = pickPageItems.inject([]) { result, pickPageItem ->
-            result.addAll(pickPageItem.picklistItems)
-            result
-        }
+        List<PicklistItem> picklistItems = pickPageItems.picklistItems?.flatten()
         // We need to create at least one row to ensure an empty template
         if (picklistItems?.empty) {
             picklistItems.add(new PicklistItem())
         }
 
-        def lineItems = picklistItems.collect {
+        List lineItems = picklistItems.collect {
             [
-                    "${g.message(code: 'default.id.label')}": it?.requisitionItem?.id ?: "",
-                    "${g.message(code: 'product.productCode.label')}": it?.requisitionItem?.product?.productCode ?: "",
-                    "${g.message(code: 'product.name.label')}": it?.requisitionItem?.product?.name ?: "",
-                    "${g.message(code: 'inventoryItem.lotNumber.label')}": it?.inventoryItem?.lotNumber ?: "",
-                    "${g.message(code: 'inventoryItem.expirationDate.label')}": it?.inventoryItem?.expirationDate ? it.inventoryItem.expirationDate.format(Constants.EXPIRATION_DATE_FORMAT) : "",
-                    "${g.message(code: 'inventoryItem.binLocation.label')}": it?.binLocation?.name ?: "",
-                    "${g.message(code: 'default.quantity.label')}": it?.quantity ?: "",
+                    id: it?.requisitionItem?.id,
+                    code: it?.requisitionItem?.product?.productCode,
+                    name: it?.requisitionItem?.product?.name,
+                    lot: isTemplate ? null : it?.inventoryItem?.lotNumber,
+                    expiration: isTemplate ? null : it.inventoryItem.expirationDate?.format(Constants.EXPIRATION_DATE_FORMAT),
+                    binLocation: isTemplate ? null : it?.binLocation?.name,
+                    quantity: isTemplate ? it?.requisitionItem?.quantity : it?.quantity,
             ]
         }
-        String csv = dataService.generateCsv(lineItems)
-        response.setHeader("Content-disposition", "attachment; filename=\"StockMovementItems-${params.id}.csv\"")
-        render(contentType: "text/csv", text: csv.toString(), encoding: "UTF-8")
+
+        response.contentType = "application/vnd.ms-excel"
+        response.setHeader("Content-disposition", "attachment; filename=\"StockMovementItems-${params.id}.xls\"")
+        PickListItemExcelExporter pickListItemExcelExporter = new PickListItemExcelExporter(lineItems)
+        pickListItemExcelExporter.exportData(response.outputStream)
+        response.outputStream.flush()
     }
 
     def importPickListItems(ImportDataCommand command) {
