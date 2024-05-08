@@ -536,12 +536,12 @@ class PickPage extends Component {
   }
 
   // Returns indexes of rows with quantity picked 0, and without subitems.
-  getRowsWithEmptyPicks(pickPageItems) {
+  getIndexesOfRowsWithEmptyPicks(pickPageItems) {
     return pickPageItems.reduce((acc, item, index) => {
       // When the quantity picked is equal to 0 we have to check its subitems,
       // because the item can be edited to 0, not cleared.
       if (!item.quantityPicked && !item.picklistItems.length) {
-        return [...acc, index + 1];
+        return [...acc, index];
       }
 
       return acc;
@@ -550,8 +550,8 @@ class PickPage extends Component {
 
   // Displaying an error message when an item with a quantity picked equal to 0 exists
   showEmptyPicksErrorMessage(formValues) {
-    const emptyPicks = this.getRowsWithEmptyPicks(formValues.pickPageItems);
-    const emptyPickLinesNumber = emptyPicks.join(', ');
+    const emptyPicks = this.getIndexesOfRowsWithEmptyPicks(formValues.pickPageItems);
+    const emptyPickLinesNumber = emptyPicks.map((index) => index + 1).join(', ');
     const alertMessage = this.props.translate(
       'react.stockMovement.missingPickedLot.label',
       `The picked lot is missing at rows: ${emptyPickLinesNumber}`,
@@ -569,10 +569,10 @@ class PickPage extends Component {
   // Managing hasError property depending on the value of quantity
   // picked and on the existing subitems
   validateEmptyPicks(formValues) {
-    const emptyPicks = this.getRowsWithEmptyPicks(formValues.pickPageItems);
+    const emptyPicks = this.getIndexesOfRowsWithEmptyPicks(formValues.pickPageItems);
 
     const pickPageItems = formValues.pickPageItems.map((item, index) => {
-      if (emptyPicks.includes(index + 1)) {
+      if (emptyPicks.includes(index)) {
         return { ...item, hasError: true };
       }
 
@@ -746,7 +746,7 @@ class PickPage extends Component {
                   className={`float-right mb-1 btn btn-outline-secondary align-self-end btn-xs ml-3 ${showOnlyErroredItems ? 'active' : ''}`}
                 >
                     <span>
-                      {this.getRowsWithEmptyPicks(values?.pickPageItems).length}
+                      {this.getIndexesOfRowsWithEmptyPicks(values?.pickPageItems).length}
                       {' '}
                       <Translate
                         id="react.stockMovement.erroredItemsCount.label"
