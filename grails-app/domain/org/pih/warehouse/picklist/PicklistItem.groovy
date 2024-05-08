@@ -42,7 +42,7 @@ class PicklistItem implements Serializable {
     Location binLocation
 
     Integer quantityPicked
-    Person picker
+    Person pickedBy
     Date datePicked
 
     Integer quantity
@@ -71,7 +71,7 @@ class PicklistItem implements Serializable {
         requisitionItem(nullable: true)
         orderItem(nullable: true)
         quantityPicked(nullable: true)
-        picker(nullable: true)
+        pickedBy(nullable: true)
         datePicked(nullable: true)
         quantity(nullable: false)
         status(nullable: true)
@@ -107,7 +107,7 @@ class PicklistItem implements Serializable {
             inventoryItemId     : inventoryItem?.id,
             quantity            : quantity,
             quantityPicked      : quantityPicked,
-            pickerId            : picker?.id,
+            pickedBy            : pickedBy?.id,
             datePicked          : datePicked,
             reasonCode          : reasonCode,
             comment             : comment,
