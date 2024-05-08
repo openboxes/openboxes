@@ -32,6 +32,7 @@ import { formatProductDisplayName, matchesProductCodeOrName } from 'utils/form-v
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
+import { PICK_LIST_ITEMS_EXPORT } from 'api/urls';
 
 const FIELDS = {
   pickPageItems: {
@@ -617,11 +618,23 @@ class PickPage extends Component {
     this.props.showSpinner();
 
     const { movementNumber, stockMovementId } = formValues;
-    const url = `/api/stockMovements/exportPickListItems/${stockMovementId}`;
 
-    apiClient.get(url, { responseType: 'blob' })
+    apiClient.get(PICK_LIST_ITEMS_EXPORT(stockMovementId), { responseType: 'blob', params: { template: true } })
       .then((response) => {
-        fileDownload(response.data, `PickListItems${movementNumber ? `-${movementNumber}` : ''}.csv`, 'text/csv');
+        fileDownload(response.data, `PickListItems${movementNumber ? `-${movementNumber}` : ''}-template.xls`, 'application/vnd.ms-excel');
+        this.props.hideSpinner();
+      })
+      .catch(() => this.props.hideSpinner());
+  }
+
+  exportPick(formValues) {
+    this.props.showSpinner();
+
+    const { movementNumber, stockMovementId } = formValues;
+
+    apiClient.get(PICK_LIST_ITEMS_EXPORT(stockMovementId), { responseType: 'blob' })
+      .then((response) => {
+        fileDownload(response.data, `PickListItems${movementNumber ? `-${movementNumber}` : ''}.xls`, 'application/vnd.ms-excel');
         this.props.hideSpinner();
       })
       .catch(() => this.props.hideSpinner());
@@ -802,6 +815,13 @@ class PickPage extends Component {
                       defaultMessage="Export template"
                     />
                   </span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => this.exportPick(values)}
+                  className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
+                >
+                  <span><i className="fa fa-upload pr-2" /><Translate id="react.stockMovement.pickListItem.export.label" defaultMessage="Export Pick" /></span>
                 </button>
                 <a
                   href={`${this.state.printPicksUrl}${this.state.sorted ? '?sorted=true' : ''}`}
