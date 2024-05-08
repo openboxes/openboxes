@@ -535,7 +535,7 @@ class PickPage extends Component {
       .catch(() => { this.props.hideSpinner(); });
   }
 
-  // Calculating which rows have quantity picked 0, and don't have subitems
+  // Returns indexes of rows with quantity picked 0, and without subitems.
   getRowsWithEmptyPicks(pickPageItems) {
     return pickPageItems.reduce((acc, item, index) => {
       // When the quantity picked is equal to 0 we have to check its subitems,
