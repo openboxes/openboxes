@@ -1107,6 +1107,7 @@ class StockMovementService {
         return receiptItems
     }
 
+    // It expects to receive a stock movement id
     void clearPicklist(String id) {
         StockMovement stockMovement = getStockMovement(id)
         clearPicklist(stockMovement)

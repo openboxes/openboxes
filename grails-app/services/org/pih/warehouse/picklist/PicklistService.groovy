@@ -87,6 +87,7 @@ class PicklistService {
         productAvailabilityService.refreshProductsAvailability(orderItem?.order?.origin?.id, [orderItem?.product?.id], binLocations?.unique(), false)
     }
 
+    // It expects to receive a picklist id
     void clearPicklist(String id) {
         Picklist picklist = Picklist.get(id)
 
@@ -105,12 +106,14 @@ class PicklistService {
         }
         itemsToRemove.each {
             picklist.removeFromPicklistItems(it)
+            it.delete(flush: true)
         }
 
 
+        List<String> productIds = picklist?.requisition?.requisitionItems?.collect { it.product?.id }?.unique()
         productAvailabilityService.refreshProductsAvailability(
                 picklist?.requisition?.origin?.id,
-                picklist?.requisition?.requisitionItems?.product?.id,
+                productIds,
                 binLocations.unique(),
                 false)
     }

@@ -24,7 +24,6 @@ import org.pih.warehouse.core.Person
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.StockMovementService
 import org.pih.warehouse.picklist.PicklistItem
-import org.pih.warehouse.picklist.PicklistService
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
@@ -42,7 +41,6 @@ class StockMovementApiController {
     def stockMovementService
     def stockTransferService
     def userService
-    PicklistService picklistService
 
     def list() {
         Location destination = params.destination ? Location.get(params.destination) : null
@@ -863,11 +861,5 @@ class StockMovementApiController {
             render([errorMessage: errorMessage] as JSON)
         }
         render(status: 200)
-    }
-
-    def clearPicklist() {
-        picklistService.clearPicklist(params.stockMovementId)
-
-        render(status: 204)
     }
 }
