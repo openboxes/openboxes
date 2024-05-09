@@ -33,6 +33,7 @@ import { formatProductDisplayName, matchesProductCodeOrName } from 'utils/form-v
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
+import exportFileFromAPI from 'utils/file-download-util';
 
 const FIELDS = {
   pickPageItems: {
@@ -616,28 +617,27 @@ class PickPage extends Component {
 
   exportTemplate(formValues) {
     this.props.showSpinner();
-
     const { movementNumber, stockMovementId } = formValues;
 
-    apiClient.get(PICK_LIST_ITEMS_EXPORT(stockMovementId), { responseType: 'blob', params: { template: true, format: 'xls' } })
-      .then((response) => {
-        fileDownload(response.data, `PickListItems${movementNumber ? `-${movementNumber}` : ''}-template.xls`, 'application/vnd.ms-excel');
-        this.props.hideSpinner();
-      })
-      .catch(() => this.props.hideSpinner());
+    exportFileFromAPI({
+      url: PICK_LIST_ITEMS_EXPORT(stockMovementId),
+      filename: `PickListItems${movementNumber ? `-${movementNumber}` : ''}-template`,
+      format: 'xls',
+      params: {
+        template: true,
+      },
+    }).finally(() => this.props.hideSpinner());
   }
 
   exportPick(formValues) {
     this.props.showSpinner();
-
     const { movementNumber, stockMovementId } = formValues;
 
-    apiClient.get(PICK_LIST_ITEMS_EXPORT(stockMovementId), { responseType: 'blob', params: { format: 'xls' } })
-      .then((response) => {
-        fileDownload(response.data, `PickListItems${movementNumber ? `-${movementNumber}` : ''}.xls`, 'application/vnd.ms-excel');
-        this.props.hideSpinner();
-      })
-      .catch(() => this.props.hideSpinner());
+    exportFileFromAPI({
+      url: PICK_LIST_ITEMS_EXPORT(stockMovementId),
+      filename: `PickListItems${movementNumber ? `-${movementNumber}` : ''}`,
+      format: 'csv',
+    }).finally(() => this.props.hideSpinner());
   }
 
   importTemplate(event) {

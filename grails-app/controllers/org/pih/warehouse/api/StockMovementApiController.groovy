@@ -368,7 +368,7 @@ class StockMovementApiController {
 
         if (format == "xls") {
             response.contentType = "application/vnd.ms-excel"
-            response.setHeader("Content-disposition", "attachment; filename=\"StockMovementItems-${params.id}.xls\"")
+            response.setHeader("Content-disposition", "attachment; filename=\"PickListItems-${params.id}.xls\"")
             PickListItemExcelExporter pickListItemExcelExporter = new PickListItemExcelExporter(lineItems)
             pickListItemExcelExporter.exportData(response.outputStream)
             response.outputStream.flush()
@@ -377,7 +377,7 @@ class StockMovementApiController {
 
         PickListItemCsvExporter pickListItemCsvExporter = new PickListItemCsvExporter(lineItems)
         String csv = pickListItemCsvExporter.exportData()
-        response.setHeader("Content-disposition", "attachment; filename=\"StockMovementItems-${params.id}.csv\"")
+        response.setHeader("Content-disposition", "attachment; filename=\"PickListItems\$-${params.id}.csv\"")
         render(contentType: "text/csv", text: csv.toString(), encoding: "UTF-8")
     }
 
