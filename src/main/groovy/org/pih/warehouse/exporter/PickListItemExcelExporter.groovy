@@ -14,10 +14,10 @@ import org.apache.poi.ss.usermodel.Workbook
 import org.grails.plugins.web.taglib.ApplicationTagLib
 import util.ExcelUtil
 
-class PickListItemExcelExporter {
+class PickListItemExcelExporter implements DataExporter {
 
-    List<Map> data
-    ApplicationTagLib applicationTagLib
+    private List<Map> data
+    private ApplicationTagLib applicationTagLib
 
     Map documentProperties = [
             sheet: 'Sheet1',
@@ -46,6 +46,7 @@ class PickListItemExcelExporter {
         this.applicationTagLib = Holders.grailsApplication.mainContext.getBean(ApplicationTagLib.class)
     }
 
+    @Override
     void exportData(OutputStream outputStream) {
         Map<String, String> translatedHeadings = this.documentProperties.headerLabels.collectEntries { key, it ->
             [key, applicationTagLib.message(code: it, default: key)]
@@ -60,5 +61,4 @@ class PickListItemExcelExporter {
             log.error("IO exception while generating excel file")
         }
     }
-
 }

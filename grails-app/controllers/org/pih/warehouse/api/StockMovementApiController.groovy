@@ -18,6 +18,7 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
+import org.pih.warehouse.exporter.DataExporter
 import org.pih.warehouse.exporter.PickListItemCsvExporter
 import org.pih.warehouse.exporter.PickListItemExcelExporter
 import org.pih.warehouse.importer.CSVUtils
@@ -369,16 +370,16 @@ class StockMovementApiController {
         if (format == "xls") {
             response.contentType = "application/vnd.ms-excel"
             response.setHeader("Content-disposition", "attachment; filename=\"PickListItems-${params.id}.xls\"")
-            PickListItemExcelExporter pickListItemExcelExporter = new PickListItemExcelExporter(lineItems)
+            DataExporter pickListItemExcelExporter = new PickListItemExcelExporter(lineItems)
             pickListItemExcelExporter.exportData(response.outputStream)
             response.outputStream.flush()
             return
         }
-
-        PickListItemCsvExporter pickListItemCsvExporter = new PickListItemCsvExporter(lineItems)
-        String csv = pickListItemCsvExporter.exportData()
+        OutputStream outputStream = new ByteArrayOutputStream()
+        DataExporter pickListItemCsvExporter = new PickListItemCsvExporter(lineItems)
+        pickListItemCsvExporter.exportData(outputStream)
         response.setHeader("Content-disposition", "attachment; filename=\"PickListItems\$-${params.id}.csv\"")
-        render(contentType: "text/csv", text: csv.toString(), encoding: "UTF-8")
+        render(contentType: "text/csv", text: outputStream, encoding: "UTF-8")
     }
 
     def importPickListItems(ImportDataCommand command) {

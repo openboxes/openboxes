@@ -13,10 +13,10 @@ import grails.util.Holders
 import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.pih.warehouse.importer.CSVUtils
 
-class PickListItemCsvExporter {
+class PickListItemCsvExporter implements DataExporter {
 
-    List<Map> data
-    ApplicationTagLib applicationTagLib
+    private List<Map> data
+    private ApplicationTagLib applicationTagLib
 
     Map documentProperties = [
             columns: [
@@ -44,7 +44,8 @@ class PickListItemCsvExporter {
         this.applicationTagLib = Holders.grailsApplication.mainContext.getBean(ApplicationTagLib.class)
     }
 
-    String exportData() {
+    @Override
+    void exportData(OutputStream outputStream) {
         Map<String, String> translatedHeadings = this.documentProperties.headerLabels.collectEntries { key, it ->
             [key, applicationTagLib.message(code: it, default: key)]
         }
@@ -52,7 +53,8 @@ class PickListItemCsvExporter {
         this.documentProperties.headerLabels = translatedHeadings
 
         try {
-            return CSVUtils.generateCsv(this.data, this.documentProperties)
+            byte[] csvBytes = CSVUtils.generateCsv(this.data, this.documentProperties).getBytes("UTF-8")
+            outputStream.write(csvBytes)
         } catch (IOException e) {
             log.error("IO exception while generating csv file")
         }
