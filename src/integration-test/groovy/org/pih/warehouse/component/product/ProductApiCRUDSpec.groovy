@@ -4,7 +4,7 @@ import grails.gorm.transactions.Transactional
 import io.restassured.builder.ResponseSpecBuilder
 import org.apache.http.HttpStatus
 import org.hamcrest.Matchers
-import org.json.JSONObject
+import org.grails.web.json.JSONObject
 import spock.lang.Shared
 
 import org.pih.warehouse.component.api.generic.GenercApiWrapper

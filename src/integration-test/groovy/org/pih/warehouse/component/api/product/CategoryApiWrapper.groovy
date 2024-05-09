@@ -2,6 +2,7 @@ package org.pih.warehouse.component.api.product
 
 import io.restassured.path.json.JsonPath
 import io.restassured.specification.RequestSpecification
+import org.grails.web.json.JSONObject
 
 import org.pih.warehouse.component.api.base.ApiWrapper
 
@@ -23,8 +24,8 @@ class CategoryApiWrapper extends ApiWrapper {
         return categoryApi.get(categoryId, responseSpecUtil.OK_RESPONSE_SPEC).jsonPath()
     }
 
-    String createOK(String body) {
-        JsonPath json = categoryApi.create(body, responseSpecUtil.OK_RESPONSE_SPEC).jsonPath()
+    String createOK(JSONObject body) {
+        JsonPath json = categoryApi.create(body.toString(), responseSpecUtil.OK_RESPONSE_SPEC).jsonPath()
         return json.getString('id')
     }
 

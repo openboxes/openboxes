@@ -2,7 +2,7 @@ package org.pih.warehouse.component.auth
 
 import grails.gorm.transactions.Transactional
 import org.apache.http.HttpStatus
-import org.json.JSONObject
+import org.grails.web.json.JSONObject
 import org.pih.warehouse.component.api.auth.AuthApiWrapper
 import org.pih.warehouse.component.base.ApiSpec
 import spock.lang.Ignore
