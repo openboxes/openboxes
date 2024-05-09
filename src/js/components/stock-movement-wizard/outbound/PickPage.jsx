@@ -13,6 +13,7 @@ import Alert from 'react-s-alert';
 
 import { fetchReasonCodes, hideSpinner, showSpinner } from 'actions';
 import picklistApi from 'api/services/PicklistApi';
+import { PICK_LIST_ITEMS_EXPORT } from 'api/urls';
 import ArrayField from 'components/form-elements/ArrayField';
 import ButtonField from 'components/form-elements/ButtonField';
 import FilterInput from 'components/form-elements/FilterInput';
@@ -32,7 +33,6 @@ import { formatProductDisplayName, matchesProductCodeOrName } from 'utils/form-v
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
-import { PICK_LIST_ITEMS_EXPORT } from 'api/urls';
 
 const FIELDS = {
   pickPageItems: {
@@ -619,7 +619,7 @@ class PickPage extends Component {
 
     const { movementNumber, stockMovementId } = formValues;
 
-    apiClient.get(PICK_LIST_ITEMS_EXPORT(stockMovementId), { responseType: 'blob', params: { template: true } })
+    apiClient.get(PICK_LIST_ITEMS_EXPORT(stockMovementId), { responseType: 'blob', params: { template: true, format: 'xls' } })
       .then((response) => {
         fileDownload(response.data, `PickListItems${movementNumber ? `-${movementNumber}` : ''}-template.xls`, 'application/vnd.ms-excel');
         this.props.hideSpinner();
@@ -632,7 +632,7 @@ class PickPage extends Component {
 
     const { movementNumber, stockMovementId } = formValues;
 
-    apiClient.get(PICK_LIST_ITEMS_EXPORT(stockMovementId), { responseType: 'blob' })
+    apiClient.get(PICK_LIST_ITEMS_EXPORT(stockMovementId), { responseType: 'blob', params: { format: 'xls' } })
       .then((response) => {
         fileDownload(response.data, `PickListItems${movementNumber ? `-${movementNumber}` : ''}.xls`, 'application/vnd.ms-excel');
         this.props.hideSpinner();

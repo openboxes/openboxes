@@ -18,6 +18,7 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
+import org.pih.warehouse.exporter.PickListItemCsvExporter
 import org.pih.warehouse.exporter.PickListItemExcelExporter
 import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.importer.ImportDataCommand
@@ -343,6 +344,7 @@ class StockMovementApiController {
 
     def exportPickListItems() {
         Boolean isTemplate = params.boolean("template", false)
+        String format = params.get("format", "csv")
 
         List<PickPageItem> pickPageItems = stockMovementService.getPickPageItems(params.id, null, null )
         List<PicklistItem> picklistItems = pickPageItems.picklistItems?.flatten()
@@ -363,11 +365,20 @@ class StockMovementApiController {
             ]
         }
 
-        response.contentType = "application/vnd.ms-excel"
-        response.setHeader("Content-disposition", "attachment; filename=\"StockMovementItems-${params.id}.xls\"")
-        PickListItemExcelExporter pickListItemExcelExporter = new PickListItemExcelExporter(lineItems)
-        pickListItemExcelExporter.exportData(response.outputStream)
-        response.outputStream.flush()
+
+        if (format == "xls") {
+            response.contentType = "application/vnd.ms-excel"
+            response.setHeader("Content-disposition", "attachment; filename=\"StockMovementItems-${params.id}.xls\"")
+            PickListItemExcelExporter pickListItemExcelExporter = new PickListItemExcelExporter(lineItems)
+            pickListItemExcelExporter.exportData(response.outputStream)
+            response.outputStream.flush()
+            return
+        }
+
+        PickListItemCsvExporter pickListItemCsvExporter = new PickListItemCsvExporter(lineItems)
+        String csv = pickListItemCsvExporter.exportData()
+        response.setHeader("Content-disposition", "attachment; filename=\"StockMovementItems-${params.id}.csv\"")
+        render(contentType: "text/csv", text: csv.toString(), encoding: "UTF-8")
     }
 
     def importPickListItems(ImportDataCommand command) {
