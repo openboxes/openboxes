@@ -304,6 +304,10 @@ configurations {
     }
 }
 
+configurations.integrationTestImplementation {
+    extendsFrom(configurations.implementation)
+}
+
 // app servers, other than jetty, expose this api directly
 if (targetWebServer() != 'jetty') {
     configurations.configureEach {
@@ -746,6 +750,11 @@ dependencies {
     // security patch
     compile 'org.yaml:snakeyaml:1.33'
     console 'org.yaml:snakeyaml:1.33'
+
+    // For integration tests
+    testCompile 'org.springframework:spring-test'
+    testCompile 'io.rest-assured:rest-assured:3.2.0'
+    testCompile "org.grails.plugins:build-test-data:3.3.1"
 }
 
 /*
@@ -829,5 +838,22 @@ tasks.withType(Test) {
     testLogging {
         events 'failed', 'passed', 'skipped'
         exceptionFormat 'full'
+    }
+}
+
+/**
+ * Used when running integration tests. Can be defined at the commandline by our build and
+ * test pipelines (which use secrets, not plaintext passwords).
+ */
+test {
+    systemProperty "username", System.getProperty("username")
+    systemProperty "password", System.getProperty("password")
+}
+
+integrationTest {
+    testLogging {
+        events "passed", "skipped", "failed"
+        showStackTraces = true
+        showStandardStreams = true
     }
 }
