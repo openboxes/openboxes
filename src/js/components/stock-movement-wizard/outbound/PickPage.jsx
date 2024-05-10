@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 
 import arrayMutators from 'final-form-arrays';
 import update from 'immutability-helper';
-import fileDownload from 'js-file-download';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { confirmAlert } from 'react-confirm-alert';
@@ -28,12 +27,12 @@ import {
   handleValidationErrors,
   parseResponse,
 } from 'utils/apiClient';
+import exportFileFromAPI from 'utils/file-download-util';
 import { renderFormField } from 'utils/form-utils';
 import { formatProductDisplayName, matchesProductCodeOrName } from 'utils/form-values-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
-import exportFileFromAPI from 'utils/file-download-util';
 
 const FIELDS = {
   pickPageItems: {
