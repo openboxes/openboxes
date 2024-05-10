@@ -622,7 +622,7 @@ class PickPage extends Component {
     exportFileFromAPI({
       url: PICK_LIST_ITEMS_EXPORT(stockMovementId),
       filename: `PickListItems${movementNumber ? `-${movementNumber}` : ''}-template`,
-      format: 'xls',
+      format: 'csv',
       params: {
         template: true,
       },
