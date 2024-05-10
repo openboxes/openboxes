@@ -329,6 +329,11 @@ class UrlMappings {
             action = [PUT: "rollbackApproval"]
         }
 
+        "/api/picklists/$id/items" {
+            controller = "picklistApi"
+            action = [DELETE: "clearPicklist"]
+        }
+
         // Partial Receiving API
 
         "/api/partialReceiving"(parseRequest: true) {

@@ -137,3 +137,6 @@ export const PRODUCT_SUPPLIER_PREFERENCE_BATCH = `${PRODUCT_SUPPLIER_PREFERENCE_
 // PRODUCT SUPPLIER ATTRIBUTE
 export const PRODUCT_SUPPLIER_ATTRIBUTE_API = `${API}/productSupplierAttributes`;
 export const PRODUCT_SUPPLIER_ATTRIBUTE_BATCH = `${PRODUCT_SUPPLIER_ATTRIBUTE_API}/batch`;
+
+export const PICKLIST_API = `${API}/picklists`;
+export const PICKLIST_CLEAR = id => `${PICKLIST_API}/${id}/items`;
