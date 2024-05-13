@@ -1032,7 +1032,7 @@
 	</td>
 	<td class="left middle" style="color: {{= product.color }}">
         {{= product.productCode }}
-        {{= product.name }}
+        {{= product.displayNames.default || product.name }}
 	</td>
 	<td class="center middle">
     	{{if productSupplier }}
