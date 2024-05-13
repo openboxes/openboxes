@@ -19,7 +19,14 @@
                     <tr class="${i%2?'even':'odd'}">
                         <td>${invoiceItem?.orderItem?.id}</td>
                         <td>${invoiceItem?.product?.productCode}</td>
-                        <td>${invoiceItem?.description}</td>
+                        <td>
+                            <g:if test="${invoiceItem?.orderAdjustment}">
+                                ${invoiceItem?.description}
+                            </g:if>
+                            <g:else>
+                                <format:displayName product="${invoiceItem?.product}" showTooltip="${true}" />
+                            </g:else>
+                        </td>
                         <td>
                             <g:link controller="invoice" action="show" id="${invoiceItem?.invoice?.id }">${invoiceItem?.invoice?.invoiceNumber}</g:link>
                         </td>
