@@ -727,7 +727,7 @@ class PickPage extends Component {
       alertMessage,
     } = this.state;
     const { showOnly } = this.props;
-    const emptyPicksQuantity =
+    const emptyPicksCount =
       this.getIndexesOfRowsWithEmptyPicks(this.state.values?.pickPageItems).length;
 
     return (
@@ -748,7 +748,7 @@ class PickPage extends Component {
                 <button
                   type="button"
                   onClick={() => {
-                    if (emptyPicksQuantity) {
+                    if (emptyPicksCount) {
                       this.validateEmptyPicks(values);
                       this.setState({ showOnlyErroredItems: !showOnlyErroredItems });
                     }
@@ -756,7 +756,7 @@ class PickPage extends Component {
                   className={`float-right mb-1 btn btn-outline-secondary align-self-end btn-xs ml-3 ${showOnlyErroredItems ? 'active' : ''}`}
                 >
                     <span>
-                      {emptyPicksQuantity}
+                      {emptyPicksCount}
                       {' '}
                       <Translate
                         id="react.stockMovement.erroredItemsCount.label"
