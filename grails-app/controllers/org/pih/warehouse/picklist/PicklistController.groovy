@@ -11,14 +11,21 @@ package org.pih.warehouse.picklist
 
 import grails.converters.JSON
 import grails.gorm.transactions.Transactional
+import org.pih.warehouse.api.PickPageItem
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.exporter.DataExporter
+import org.pih.warehouse.exporter.PicklistItemCsvExporter
+import org.pih.warehouse.exporter.PicklistItemExcelExporter
+import org.pih.warehouse.inventory.StockMovementService
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.requisition.Requisition
 
 @Transactional
 class PicklistController {
 
-    def picklistService
+    PicklistService picklistService
+    StockMovementService stockMovementService
 
     def save() {
         def jsonRequest = request.JSON
@@ -81,5 +88,84 @@ class PicklistController {
 
         println location
         render(template: "/picklist/print", model: [requisition: requisition, picklist: picklist, location: location, order: params.order])
+    }
+
+    def exportPicklistItems() {
+        String format = params.get("format", "csv")
+
+        List<PickPageItem> pickPageItems = stockMovementService.getPickPageItems(params.id, null, null )
+        List<PicklistItem> picklistItems = pickPageItems.picklistItems?.flatten()
+
+        List lineItems = picklistItems.collect {
+            [
+                    id: it?.requisitionItem?.id,
+                    code: it?.requisitionItem?.product?.productCode,
+                    name: it?.requisitionItem?.product?.name,
+                    lot: it?.inventoryItem?.lotNumber,
+                    expiration: it.inventoryItem.expirationDate?.format(Constants.EXPIRATION_DATE_FORMAT),
+                    binLocation: it?.binLocation?.name,
+                    quantity: it?.quantity,
+            ]
+        }
+
+        String fileName = "PickListItems\$-${params.id}"
+
+        switch (format) {
+            case "csv":
+                OutputStream outputStream = new ByteArrayOutputStream()
+                DataExporter pickListItemCsvExporter = new PicklistItemCsvExporter(lineItems)
+                pickListItemCsvExporter.exportData(outputStream)
+                response.setHeader("Content-disposition", "attachment; filename=\"${fileName}.csv\"")
+                render(contentType: "text/csv", text: outputStream, encoding: "UTF-8")
+                break
+            case "xls":
+                response.contentType = "application/vnd.ms-excel"
+                response.setHeader("Content-disposition", "attachment; filename=\"${fileName}.xls\"")
+                DataExporter picklistItemExcelExporter = new PicklistItemExcelExporter(lineItems)
+                picklistItemExcelExporter.exportData(response.outputStream)
+                response.outputStream.flush()
+                break
+            default:
+                throw new IllegalFormatException("Unable to determine the proper rendering format for request for format ${format}")
+        }
+    }
+
+    def exportPicklistTemplate() {
+        String format = params.get("format", "csv")
+
+        List<PickPageItem> pickPageItems = stockMovementService.getPickPageItems(params.id, null, null)
+        List<PicklistItem> picklistItems = pickPageItems.picklistItems?.flatten()
+
+        List lineItems = picklistItems.collect {
+            [
+                    id: it?.requisitionItem?.id,
+                    code: it?.requisitionItem?.product?.productCode,
+                    name: it?.requisitionItem?.product?.name,
+                    lot: null,
+                    expiration: null,
+                    binLocation: null,
+                    quantity: it?.requisitionItem?.quantity,
+            ]
+        }
+
+        String fileName = "PickListItems\$-${params.id}-template"
+        switch (format) {
+            case "csv":
+                OutputStream outputStream = new ByteArrayOutputStream()
+                DataExporter pickListItemCsvExporter = new PicklistItemCsvExporter(lineItems)
+                pickListItemCsvExporter.exportData(outputStream)
+                response.setHeader("Content-disposition", "attachment; filename=\"${fileName}.csv\"")
+                render(contentType: "text/csv", text: outputStream, encoding: "UTF-8")
+                break
+            case "xls":
+                response.contentType = "application/vnd.ms-excel"
+                response.setHeader("Content-disposition", "attachment; filename=\"${fileName}.xls\"")
+                DataExporter pickListItemExcelExporter = new PicklistItemExcelExporter(lineItems)
+                pickListItemExcelExporter.exportData(response.outputStream)
+                response.outputStream.flush()
+                break
+            default:
+                throw new IllegalFormatException("Unable to determine the proper rendering format for request for format ${format}")
+        }
     }
 }

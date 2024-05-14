@@ -15,17 +15,12 @@ import org.grails.web.json.JSONObject
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
-import org.pih.warehouse.exporter.DataExporter
-import org.pih.warehouse.exporter.PickListItemCsvExporter
-import org.pih.warehouse.exporter.PickListItemExcelExporter
 import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.inventory.InventoryItem
-import org.pih.warehouse.inventory.StockMovementService
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.requisition.Requisition
@@ -39,7 +34,6 @@ import org.pih.warehouse.shipping.ShipmentStatusCode
 
 class StockMovementApiController {
 
-    def dataService
     def outboundStockMovementService
     def stockMovementService
     def stockTransferService
@@ -341,45 +335,6 @@ class StockMovementApiController {
         stockMovementService.validatePicklist(params.id)
 
         render status: 200
-    }
-
-    def exportPickListItems() {
-        Boolean isTemplate = params.boolean("template", false)
-        String format = params.get("format", "csv")
-
-        List<PickPageItem> pickPageItems = stockMovementService.getPickPageItems(params.id, null, null )
-        List<PicklistItem> picklistItems = pickPageItems.picklistItems?.flatten()
-        // We need to create at least one row to ensure an empty template
-        if (picklistItems?.empty) {
-            picklistItems.add(new PicklistItem())
-        }
-
-        List lineItems = picklistItems.collect {
-            [
-                    id: it?.requisitionItem?.id,
-                    code: it?.requisitionItem?.product?.productCode,
-                    name: it?.requisitionItem?.product?.name,
-                    lot: isTemplate ? null : it?.inventoryItem?.lotNumber,
-                    expiration: isTemplate ? null : it.inventoryItem.expirationDate?.format(Constants.EXPIRATION_DATE_FORMAT),
-                    binLocation: isTemplate ? null : it?.binLocation?.name,
-                    quantity: isTemplate ? it?.requisitionItem?.quantity : it?.quantity,
-            ]
-        }
-
-
-        if (format == "xls") {
-            response.contentType = "application/vnd.ms-excel"
-            response.setHeader("Content-disposition", "attachment; filename=\"PickListItems-${params.id}.xls\"")
-            DataExporter pickListItemExcelExporter = new PickListItemExcelExporter(lineItems)
-            pickListItemExcelExporter.exportData(response.outputStream)
-            response.outputStream.flush()
-            return
-        }
-        OutputStream outputStream = new ByteArrayOutputStream()
-        DataExporter pickListItemCsvExporter = new PickListItemCsvExporter(lineItems)
-        pickListItemCsvExporter.exportData(outputStream)
-        response.setHeader("Content-disposition", "attachment; filename=\"PickListItems\$-${params.id}.csv\"")
-        render(contentType: "text/csv", text: outputStream, encoding: "UTF-8")
     }
 
     def importPickListItems(ImportDataCommand command) {

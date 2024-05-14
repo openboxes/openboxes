@@ -12,7 +12,7 @@ import Alert from 'react-s-alert';
 
 import { fetchReasonCodes, hideSpinner, showSpinner } from 'actions';
 import picklistApi from 'api/services/PicklistApi';
-import { PICK_LIST_ITEMS_EXPORT } from 'api/urls';
+import { PICKLIST_ITEMS_EXPORT, PICKLIST_TEMPLATE_EXPORT } from 'api/urls';
 import ArrayField from 'components/form-elements/ArrayField';
 import ButtonField from 'components/form-elements/ButtonField';
 import FilterInput from 'components/form-elements/FilterInput';
@@ -619,12 +619,9 @@ class PickPage extends Component {
     const { movementNumber, stockMovementId } = formValues;
 
     exportFileFromAPI({
-      url: PICK_LIST_ITEMS_EXPORT(stockMovementId),
+      url: PICKLIST_TEMPLATE_EXPORT(stockMovementId),
       filename: `PickListItems${movementNumber ? `-${movementNumber}` : ''}-template`,
       format: 'csv',
-      params: {
-        template: true,
-      },
     }).finally(() => this.props.hideSpinner());
   }
 
@@ -633,7 +630,7 @@ class PickPage extends Component {
     const { movementNumber, stockMovementId } = formValues;
 
     exportFileFromAPI({
-      url: PICK_LIST_ITEMS_EXPORT(stockMovementId),
+      url: PICKLIST_ITEMS_EXPORT(stockMovementId),
       filename: `PickListItems${movementNumber ? `-${movementNumber}` : ''}`,
       format: 'csv',
     }).finally(() => this.props.hideSpinner());

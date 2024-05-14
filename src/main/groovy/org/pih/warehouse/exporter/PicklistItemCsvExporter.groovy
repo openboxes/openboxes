@@ -13,7 +13,7 @@ import grails.util.Holders
 import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.pih.warehouse.importer.CSVUtils
 
-class PickListItemCsvExporter implements DataExporter {
+class PicklistItemCsvExporter implements DataExporter {
 
     private List<Map> data
     private ApplicationTagLib applicationTagLib
@@ -39,7 +39,7 @@ class PickListItemCsvExporter implements DataExporter {
             ]
     ]
 
-    PickListItemCsvExporter(List<Map> data) {
+    PicklistItemCsvExporter(List<Map> data) {
         this.data = data
         this.applicationTagLib = Holders.grailsApplication.mainContext.getBean(ApplicationTagLib.class)
     }

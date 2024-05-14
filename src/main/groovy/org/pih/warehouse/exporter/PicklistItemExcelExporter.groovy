@@ -14,7 +14,7 @@ import org.apache.poi.ss.usermodel.Workbook
 import org.grails.plugins.web.taglib.ApplicationTagLib
 import util.ExcelUtil
 
-class PickListItemExcelExporter implements DataExporter {
+class PicklistItemExcelExporter implements DataExporter {
 
     private List<Map> data
     private ApplicationTagLib applicationTagLib
@@ -41,7 +41,7 @@ class PickListItemExcelExporter implements DataExporter {
             ]
     ]
 
-    PickListItemExcelExporter(List<Map> data) {
+    PicklistItemExcelExporter(List<Map> data) {
         this.data = data
         this.applicationTagLib = Holders.grailsApplication.mainContext.getBean(ApplicationTagLib.class)
     }
