@@ -1299,6 +1299,7 @@ class StockMovementService {
         if (!picklist) {
             picklist = new Picklist()
             picklist.requisition = requisition
+            requisition.picklist = picklist
         }
 
         // If one does not exist create it and add it to the list
