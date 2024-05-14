@@ -507,6 +507,12 @@ class PickPage extends Component {
           },
         }),
       },
+    }, () => {
+      const { values, showOnlyErroredItems } = this.state;
+      const indexesOfEmptyPicks = this.getIndexesOfRowsWithEmptyPicks(values.pickPageItems);
+      this.setState({
+        showOnlyErroredItems: indexesOfEmptyPicks.length ? showOnlyErroredItems : false,
+      });
     });
   }
 
@@ -721,6 +727,8 @@ class PickPage extends Component {
       alertMessage,
     } = this.state;
     const { showOnly } = this.props;
+    const emptyPicksCount =
+      this.getIndexesOfRowsWithEmptyPicks(this.state.values?.pickPageItems).length;
 
     return (
       <Form
@@ -740,13 +748,15 @@ class PickPage extends Component {
                 <button
                   type="button"
                   onClick={() => {
-                    this.validateEmptyPicks(values);
-                    this.setState({ showOnlyErroredItems: !showOnlyErroredItems });
+                    if (emptyPicksCount) {
+                      this.validateEmptyPicks(values);
+                      this.setState({ showOnlyErroredItems: !showOnlyErroredItems });
+                    }
                   }}
                   className={`float-right mb-1 btn btn-outline-secondary align-self-end btn-xs ml-3 ${showOnlyErroredItems ? 'active' : ''}`}
                 >
                     <span>
-                      {this.getIndexesOfRowsWithEmptyPicks(values?.pickPageItems).length}
+                      {emptyPicksCount}
                       {' '}
                       <Translate
                         id="react.stockMovement.erroredItemsCount.label"
