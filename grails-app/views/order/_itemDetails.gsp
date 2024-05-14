@@ -54,7 +54,7 @@
                         </td>
                         <td class="order-item-product">
                             <g:link controller="inventoryItem" action="showStockCard" params="['product.id':orderItem?.product?.id]">
-                                <format:product product="${orderItem?.product}"/>
+                                <format:displayName product="${orderItem?.product}" showTooltip="${true}" />
                                 <g:renderHandlingIcons product="${orderItem?.product}" />
                             </g:link>
                         </td>
