@@ -329,6 +329,10 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
         return product?.name
     }
 
+    String getProductDisplayName() {
+        return product?.displayName ?: product?.name
+    }
+
     int compareTo(OrderItem orderItem) {
         def sortOrder =
                 dateCreated <=> orderItem?.dateCreated ?:

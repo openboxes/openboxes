@@ -1032,7 +1032,13 @@
 	</td>
 	<td class="left middle" style="color: {{= product.color }}">
         {{= product.productCode }}
-        {{= product.displayNames.default || product.name }}
+        {{if product.displayNames.default}}
+            <span title="{{= product.name}}">
+                {{= product.displayNames.default}}
+            </span>
+        {{else}}
+            {{= product.name}}
+        {{/if}}
 	</td>
 	<td class="center middle">
     	{{if productSupplier }}
@@ -1131,8 +1137,14 @@
         {{= type.name }}
 	</td>
 	<td>
-    	{{if orderItem }}
-	    {{= orderItem.product.name }}
+    	{{if orderItem}}
+    	    {{if orderItem.product.displayNames.default}}
+                <span title="{{= orderItem.product.name}}">
+                    {{= orderItem.product.displayNames.default}}
+                </span>
+    	    {{else}}
+    	            {{= orderItem.product.name}}
+    	    {{/if}}
 	    {{else}}
         ALL
 	    {{/if}}
