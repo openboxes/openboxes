@@ -14,8 +14,6 @@ import liquibase.Contexts
 import liquibase.LabelExpression
 import liquibase.Liquibase
 import liquibase.changelog.ChangeSet
-import liquibase.changelog.ChangeSetStatus
-import liquibase.changelog.DatabaseChangeLog
 import liquibase.database.Database
 import liquibase.database.DatabaseFactory
 import liquibase.database.jvm.JdbcConnection
@@ -23,7 +21,6 @@ import liquibase.lockservice.LockService
 import liquibase.lockservice.LockServiceFactory
 import liquibase.resource.ClassLoaderResourceAccessor
 
-import javax.sql.DataSource
 import java.nio.file.Paths
 
 class LiquibaseUtil {
@@ -72,7 +69,6 @@ class LiquibaseUtil {
 
     static Set<String> getChangeLogVersions(String changeLogFile) {
         Liquibase liquibase = new Liquibase(changeLogFile, new ClassLoaderResourceAccessor(), database)
-        println "changelogfile: " + liquibase.changeLogFile
 
         // Retrieve the file path for all changeset in the given the changeLogFile
         def changeSetFilePaths = liquibase.databaseChangeLog.rootChangeLog.changeSets.collect { ChangeSet changeSet ->
@@ -85,8 +81,6 @@ class LiquibaseUtil {
                     .collect { Paths.get(it).parent.toString() }
                     .findAll { it.matches("\\d{1,3}.\\d{1,3}.x") }
                     .sort()
-
-        println "changeLogVersions: " + changeLogVersions
 
         return changeLogVersions
     }

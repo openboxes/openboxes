@@ -123,7 +123,7 @@ assets {
 
 bootRun {
     addResources = true
-    //dependsOn 'npm_run_bundle'
+    dependsOn 'npm_run_bundle'
     jvmArgs = [
         '-Dspring.output.ansi.enabled=never',
         '-Xdebug',
@@ -360,7 +360,7 @@ node {
 }
 
 processResources {
-    //dependsOn 'npm_run_bundle'
+    dependsOn 'npm_run_bundle'
 }
 
 repositories {
@@ -615,7 +615,7 @@ dependencies {
     }
 
     // FIXME use commons-csv instead
-    compile 'org.grails.plugins:excel-import:3.0.2'
+    implementation 'org.grails.plugins:excel-import:3.0.2'
 
     // load config via files listed in application.yml::grails.config.locations
     implementation 'org.grails.plugins:external-config:1.4.0'
