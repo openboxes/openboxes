@@ -12,7 +12,6 @@ package org.pih.warehouse.importer
 import grails.plugins.csv.CSVMapReader
 import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVPrinter
-import org.apache.commons.lang.StringEscapeUtils
 import org.apache.commons.lang.StringUtils
 import org.mozilla.universalchardet.UniversalDetector
 import org.pih.warehouse.core.Constants
@@ -200,36 +199,5 @@ class CSVUtils {
         detector.handleData(fileBytes, 0, fileBytes.length - 1);
         detector.dataEnd();
         return detector.getDetectedCharset() ?: 'MacRoman';
-    }
-
-    static String generateCsv(List<Map> data, Map properties = [:]) {
-        StringWriter sw = new StringWriter()
-
-        List<String> columns = properties.columns ?: data.get(0).keySet().toList()
-        Map<String, String> headerLabels = properties.headerLabels ?: columns.collect{[it,it]}
-
-        // create headers
-        sw.append(createCsvRow(headerLabels, columns))
-
-        // create data
-        data.eachWithIndex { Map rowValues, index ->
-            sw.append(createCsvRow(rowValues, columns))
-        }
-
-        return prependBomToCsvString(sw.toString())
-    }
-
-    static String createCsvRow(Map rowValues, List<String> columns) {
-        StringWriter sw = new StringWriter()
-
-        String row = columns.collect { columnName ->
-            String cellValue = rowValues[columnName]?.toString() ?: ""
-            return StringEscapeUtils.escapeCsv(cellValue)
-        }.join(",")
-
-        sw.append(row)
-        sw.append("\n")
-
-        return sw.toString()
     }
 }

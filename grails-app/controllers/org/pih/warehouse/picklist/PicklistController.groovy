@@ -13,10 +13,9 @@ import grails.converters.JSON
 import grails.gorm.transactions.Transactional
 import org.pih.warehouse.api.PickPageItem
 import org.pih.warehouse.core.Constants
+import org.pih.warehouse.core.DocumentService
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.exporter.DataExporter
-import org.pih.warehouse.exporter.PicklistItemCsvExporter
-import org.pih.warehouse.exporter.PicklistItemExcelExporter
+import org.pih.warehouse.data.DataService
 import org.pih.warehouse.inventory.StockMovementService
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.requisition.Requisition
@@ -26,6 +25,8 @@ class PicklistController {
 
     PicklistService picklistService
     StockMovementService stockMovementService
+    DataService dataService
+    DocumentService documentService
 
     def save() {
         def jsonRequest = request.JSON
@@ -96,15 +97,20 @@ class PicklistController {
         List<PickPageItem> pickPageItems = stockMovementService.getPickPageItems(params.id, null, null )
         List<PicklistItem> picklistItems = pickPageItems.picklistItems?.flatten()
 
-        List lineItems = picklistItems.collect {
+        // We need to create at least one row to ensure an empty template
+        if (picklistItems?.empty) {
+            picklistItems.add(new PicklistItem())
+        }
+
+        def lineItems = picklistItems.collect {
             [
-                    id: it?.requisitionItem?.id,
-                    code: it?.requisitionItem?.product?.productCode,
-                    name: it?.requisitionItem?.product?.name,
-                    lot: it?.inventoryItem?.lotNumber,
-                    expiration: it.inventoryItem.expirationDate?.format(Constants.EXPIRATION_DATE_FORMAT),
-                    binLocation: it?.binLocation?.name,
-                    quantity: it?.quantity,
+                "${g.message(code: 'default.id.label')}": it?.requisitionItem?.id ?: "",
+                "${g.message(code: 'product.productCode.label')}": it?.requisitionItem?.product?.productCode ?: "",
+                "${g.message(code: 'product.name.label')}": it?.requisitionItem?.product?.name ?: "",
+                "${g.message(code: 'inventoryItem.lotNumber.label')}": it?.inventoryItem?.lotNumber ?: "",
+                "${g.message(code: 'inventoryItem.expirationDate.label')}": it?.inventoryItem?.expirationDate ? it.inventoryItem.expirationDate.format(Constants.EXPIRATION_DATE_FORMAT) : "",
+                "${g.message(code: 'inventoryItem.binLocation.label')}": it?.binLocation?.name ?: "",
+                "${g.message(code: 'default.quantity.label')}": it?.quantity ?: "",
             ]
         }
 
@@ -112,17 +118,14 @@ class PicklistController {
 
         switch (format) {
             case "csv":
-                OutputStream outputStream = new ByteArrayOutputStream()
-                DataExporter pickListItemCsvExporter = new PicklistItemCsvExporter(lineItems)
-                pickListItemCsvExporter.exportData(outputStream)
+                String csv = dataService.generateCsv(lineItems)
                 response.setHeader("Content-disposition", "attachment; filename=\"${fileName}.csv\"")
-                render(contentType: "text/csv", text: outputStream, encoding: "UTF-8")
+                render(contentType: "text/csv", text: csv, encoding: "UTF-8")
                 break
             case "xls":
                 response.contentType = "application/vnd.ms-excel"
                 response.setHeader("Content-disposition", "attachment; filename=\"${fileName}.xls\"")
-                DataExporter picklistItemExcelExporter = new PicklistItemExcelExporter(lineItems)
-                picklistItemExcelExporter.exportData(response.outputStream)
+                documentService.generateExcel(response.outputStream, lineItems)
                 response.outputStream.flush()
                 break
             default:
@@ -130,38 +133,42 @@ class PicklistController {
         }
     }
 
+
     def exportPicklistTemplate() {
         String format = params.get("format", "csv")
 
-        List<PickPageItem> pickPageItems = stockMovementService.getPickPageItems(params.id, null, null)
+        List<PickPageItem> pickPageItems = stockMovementService.getPickPageItems(params.id, null, null )
         List<PicklistItem> picklistItems = pickPageItems.picklistItems?.flatten()
 
-        List lineItems = picklistItems.collect {
+        // We need to create at least one row to ensure an empty template
+        if (picklistItems?.empty) {
+            picklistItems.add(new PicklistItem())
+        }
+
+        def lineItems = picklistItems.collect {
             [
-                    id: it?.requisitionItem?.id,
-                    code: it?.requisitionItem?.product?.productCode,
-                    name: it?.requisitionItem?.product?.name,
-                    lot: null,
-                    expiration: null,
-                    binLocation: null,
-                    quantity: it?.requisitionItem?.quantity,
+                    "${g.message(code: 'default.id.label')}": it?.requisitionItem?.id ?: "",
+                    "${g.message(code: 'product.productCode.label')}": it?.requisitionItem?.product?.productCode ?: "",
+                    "${g.message(code: 'product.name.label')}": it?.requisitionItem?.product?.name ?: "",
+                    "${g.message(code: 'inventoryItem.lotNumber.label')}": "",
+                    "${g.message(code: 'inventoryItem.expirationDate.label')}": "",
+                    "${g.message(code: 'inventoryItem.binLocation.label')}": "",
+                    "${g.message(code: 'default.quantity.label')}": it?.requisitionItem?.quantity ?: "",
             ]
         }
 
         String fileName = "PickListItems\$-${params.id}-template"
+
         switch (format) {
             case "csv":
-                OutputStream outputStream = new ByteArrayOutputStream()
-                DataExporter pickListItemCsvExporter = new PicklistItemCsvExporter(lineItems)
-                pickListItemCsvExporter.exportData(outputStream)
+                String csv = dataService.generateCsv(lineItems)
                 response.setHeader("Content-disposition", "attachment; filename=\"${fileName}.csv\"")
-                render(contentType: "text/csv", text: outputStream, encoding: "UTF-8")
+                render(contentType: "text/csv", text: csv, encoding: "UTF-8")
                 break
             case "xls":
                 response.contentType = "application/vnd.ms-excel"
                 response.setHeader("Content-disposition", "attachment; filename=\"${fileName}.xls\"")
-                DataExporter pickListItemExcelExporter = new PicklistItemExcelExporter(lineItems)
-                pickListItemExcelExporter.exportData(response.outputStream)
+                documentService.generateExcel(response.outputStream, lineItems)
                 response.outputStream.flush()
                 break
             default:
