@@ -73,7 +73,7 @@ const usePurchaseOrderListTableData = (filterParams) => {
   const downloadOrders = (orderItems) => {
     exportFileFromAPI({
       url: PURCHASE_ORDER_API,
-      filename: orderItems ? 'OrdersLineDetails.csv' : 'Orders',
+      filename: orderItems ? 'OrdersLineDetails' : 'Orders',
       params: {
         ..._.omit(tableData.currentParams, 'offset', 'max'),
         orderItems,

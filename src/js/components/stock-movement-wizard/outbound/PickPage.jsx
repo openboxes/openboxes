@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 
 import arrayMutators from 'final-form-arrays';
 import update from 'immutability-helper';
-import fileDownload from 'js-file-download';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { confirmAlert } from 'react-confirm-alert';
@@ -13,6 +12,7 @@ import Alert from 'react-s-alert';
 
 import { fetchReasonCodes, hideSpinner, showSpinner } from 'actions';
 import picklistApi from 'api/services/PicklistApi';
+import { PICKLIST_ITEMS_EXPORT, PICKLIST_TEMPLATE_EXPORT } from 'api/urls';
 import ArrayField from 'components/form-elements/ArrayField';
 import ButtonField from 'components/form-elements/ButtonField';
 import FilterInput from 'components/form-elements/FilterInput';
@@ -27,6 +27,7 @@ import {
   handleValidationErrors,
   parseResponse,
 } from 'utils/apiClient';
+import exportFileFromAPI from 'utils/file-download-util';
 import { renderFormField } from 'utils/form-utils';
 import { formatProductDisplayName, matchesProductCodeOrName } from 'utils/form-values-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
@@ -621,16 +622,24 @@ class PickPage extends Component {
 
   exportTemplate(formValues) {
     this.props.showSpinner();
-
     const { movementNumber, stockMovementId } = formValues;
-    const url = `/api/stockMovements/exportPickListItems/${stockMovementId}`;
 
-    apiClient.get(url, { responseType: 'blob' })
-      .then((response) => {
-        fileDownload(response.data, `PickListItems${movementNumber ? `-${movementNumber}` : ''}.csv`, 'text/csv');
-        this.props.hideSpinner();
-      })
-      .catch(() => this.props.hideSpinner());
+    exportFileFromAPI({
+      url: PICKLIST_TEMPLATE_EXPORT(stockMovementId),
+      filename: `PickListItems${movementNumber ? `-${movementNumber}` : ''}-template`,
+      format: 'csv',
+    }).finally(() => this.props.hideSpinner());
+  }
+
+  exportPick(formValues) {
+    this.props.showSpinner();
+    const { movementNumber, stockMovementId } = formValues;
+
+    exportFileFromAPI({
+      url: PICKLIST_ITEMS_EXPORT(stockMovementId),
+      filename: `PickListItems${movementNumber ? `-${movementNumber}` : ''}`,
+      format: 'csv',
+    }).finally(() => this.props.hideSpinner());
   }
 
   importTemplate(event) {
@@ -812,6 +821,13 @@ class PickPage extends Component {
                       defaultMessage="Export template"
                     />
                   </span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => this.exportPick(values)}
+                  className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
+                >
+                  <span><i className="fa fa-upload pr-2" /><Translate id="react.stockMovement.pickListItem.export.label" defaultMessage="Export Pick" /></span>
                 </button>
                 <a
                   href={`${this.state.printPicksUrl}${this.state.sorted ? '?sorted=true' : ''}`}

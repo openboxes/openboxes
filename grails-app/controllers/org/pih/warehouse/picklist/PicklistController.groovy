@@ -11,14 +11,22 @@ package org.pih.warehouse.picklist
 
 import grails.converters.JSON
 import grails.gorm.transactions.Transactional
+import org.pih.warehouse.api.PickPageItem
+import org.pih.warehouse.core.Constants
+import org.pih.warehouse.core.DocumentService
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.data.DataService
+import org.pih.warehouse.inventory.StockMovementService
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.requisition.Requisition
 
 @Transactional
 class PicklistController {
 
-    def picklistService
+    PicklistService picklistService
+    StockMovementService stockMovementService
+    DataService dataService
+    DocumentService documentService
 
     def save() {
         def jsonRequest = request.JSON
@@ -81,5 +89,90 @@ class PicklistController {
 
         println location
         render(template: "/picklist/print", model: [requisition: requisition, picklist: picklist, location: location, order: params.order])
+    }
+
+    def exportPicklistItems() {
+        String format = params.get("format", "csv")
+
+        List<PickPageItem> pickPageItems = stockMovementService.getPickPageItems(params.id, null, null )
+        List<PicklistItem> picklistItems = pickPageItems.picklistItems?.flatten()
+
+        // We need to create at least one row to ensure an empty template
+        if (picklistItems?.empty) {
+            picklistItems.add(new PicklistItem())
+        }
+
+        def lineItems = picklistItems.collect {
+            [
+                "${g.message(code: 'default.id.label')}": it?.requisitionItem?.id ?: "",
+                "${g.message(code: 'product.productCode.label')}": it?.requisitionItem?.product?.productCode ?: "",
+                "${g.message(code: 'product.name.label')}": it?.requisitionItem?.product?.name ?: "",
+                "${g.message(code: 'inventoryItem.lotNumber.label')}": it?.inventoryItem?.lotNumber ?: "",
+                "${g.message(code: 'inventoryItem.expirationDate.label')}": it?.inventoryItem?.expirationDate ? it.inventoryItem.expirationDate.format(Constants.EXPIRATION_DATE_FORMAT) : "",
+                "${g.message(code: 'inventoryItem.binLocation.label')}": it?.binLocation?.name ?: "",
+                "${g.message(code: 'default.quantity.label')}": it?.quantity ?: "",
+            ]
+        }
+
+        String fileName = "PickListItems\$-${params.id}"
+
+        switch (format) {
+            case "csv":
+                String csv = dataService.generateCsv(lineItems)
+                response.setHeader("Content-disposition", "attachment; filename=\"${fileName}.csv\"")
+                render(contentType: "text/csv", text: csv, encoding: "UTF-8")
+                break
+            case "xls":
+                response.contentType = "application/vnd.ms-excel"
+                response.setHeader("Content-disposition", "attachment; filename=\"${fileName}.xls\"")
+                documentService.generateExcel(response.outputStream, lineItems)
+                response.outputStream.flush()
+                break
+            default:
+                throw new IllegalFormatException("Unable to determine the proper rendering format for request for format ${format}")
+        }
+    }
+
+
+    def exportPicklistTemplate() {
+        String format = params.get("format", "csv")
+
+        List<PickPageItem> pickPageItems = stockMovementService.getPickPageItems(params.id, null, null )
+        List<PicklistItem> picklistItems = pickPageItems.picklistItems?.flatten()
+
+        // We need to create at least one row to ensure an empty template
+        if (picklistItems?.empty) {
+            picklistItems.add(new PicklistItem())
+        }
+
+        def lineItems = picklistItems.collect {
+            [
+                    "${g.message(code: 'default.id.label')}": it?.requisitionItem?.id ?: "",
+                    "${g.message(code: 'product.productCode.label')}": it?.requisitionItem?.product?.productCode ?: "",
+                    "${g.message(code: 'product.name.label')}": it?.requisitionItem?.product?.name ?: "",
+                    "${g.message(code: 'inventoryItem.lotNumber.label')}": "",
+                    "${g.message(code: 'inventoryItem.expirationDate.label')}": "",
+                    "${g.message(code: 'inventoryItem.binLocation.label')}": "",
+                    "${g.message(code: 'default.quantity.label')}": it?.requisitionItem?.quantity ?: "",
+            ]
+        }
+
+        String fileName = "PickListItems\$-${params.id}-template"
+
+        switch (format) {
+            case "csv":
+                String csv = dataService.generateCsv(lineItems)
+                response.setHeader("Content-disposition", "attachment; filename=\"${fileName}.csv\"")
+                render(contentType: "text/csv", text: csv, encoding: "UTF-8")
+                break
+            case "xls":
+                response.contentType = "application/vnd.ms-excel"
+                response.setHeader("Content-disposition", "attachment; filename=\"${fileName}.xls\"")
+                documentService.generateExcel(response.outputStream, lineItems)
+                response.outputStream.flush()
+                break
+            default:
+                throw new IllegalFormatException("Unable to determine the proper rendering format for request for format ${format}")
+        }
     }
 }
