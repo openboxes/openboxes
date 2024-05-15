@@ -36,16 +36,21 @@ final class SentryServletContainerInitializer implements ServletContainerInitial
         } catch (Exception e) {
             log.warn 'Unable to load git.properties file', e
         }
-        Sentry.init {
-            it.with {
-                addInAppInclude('org.pih.warehouse')
-                attachServerName = true
-                enableAutoSessionTracking = true
-                // without this setting, SENTRY_DSN env. var is ignored
-                enableExternalConfiguration = true
-                release = properties.getProperty('git.commit.id', 'unknown')
-                sendDefaultPii = false
+
+        try {
+            Sentry.init {
+                it.with {
+                    addInAppInclude('org.pih.warehouse')
+                    attachServerName = true
+                    enableAutoSessionTracking = true
+                    // without this setting, SENTRY_DSN env. var is ignored
+                    enableExternalConfiguration = true
+                    release = properties.getProperty('git.commit.id', 'unknown')
+                    sendDefaultPii = false
+                }
             }
+        } catch (IllegalArgumentException e) {
+            log.warn "Unable to initialize Sentry " + e.message, e
         }
     }
 }
