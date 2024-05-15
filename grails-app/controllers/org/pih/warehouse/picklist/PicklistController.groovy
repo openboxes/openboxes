@@ -138,14 +138,13 @@ class PicklistController {
         String format = params.get("format", "csv")
 
         List<PickPageItem> pickPageItems = stockMovementService.getPickPageItems(params.id, null, null )
-        List<PicklistItem> picklistItems = pickPageItems.picklistItems?.flatten()
 
         // We need to create at least one row to ensure an empty template
-        if (picklistItems?.empty) {
-            picklistItems.add(new PicklistItem())
+        if (pickPageItems?.empty) {
+            pickPageItems.add(new PickPageItem())
         }
 
-        def lineItems = picklistItems.collect {
+        def lineItems = pickPageItems.collect {
             [
                     "${g.message(code: 'default.id.label')}": it?.requisitionItem?.id ?: "",
                     "${g.message(code: 'product.productCode.label')}": it?.requisitionItem?.product?.productCode ?: "",
