@@ -306,7 +306,7 @@ class SelectTagLib {
         }
         attrs.from = order.listOrderItems()
         attrs.optionKey = 'id'
-        attrs.optionValue = { it.productDisplayName }
+        attrs.optionValue = { it.product?.displayNameOrDefaultName }
         out << g.select(attrs)
     }
 
