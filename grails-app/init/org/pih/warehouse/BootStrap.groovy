@@ -676,20 +676,25 @@ class BootStrap {
                 LiquibaseUtil.executeChangeLog("install/changelog.xml")
             }
 
-            // Check if the executed changelog versions include one of the previous versions
-            // and if so, then we need to keep running the old updates to catch up to 0.9.x
+            // Get all possible "upgrade to latest" versions. Currently, 0.9.x is the "install",
+            // version while 0.8.x, 0.7.x, 0.6.x, 0.5.x are considered "upgrade" versions.
             Set<String> upgradeChangeLogVersions = LiquibaseUtil.upgradeChangeLogVersions
             log.info("upgradeChangeLogVersions: " + upgradeChangeLogVersions)
+
+            // This should be removed if we ever reset changelogs so there are no "upgrade" versions
+            // in the source code (although this will probably never happen)
             if (upgradeChangeLogVersions?.empty) {
-                throw new RuntimeException("Unable to execute database migrations")
+                throw new RuntimeException("Unable to determine whether there are database migrations to be executed")
             }
 
-            boolean hasExecuteUpgradeChangeLog =
+            // Check if any of the executed changelog versions include one of the "upgrade" versions
+            // and if so, then we need to keep running the upgrade changelogs to catch up to 0.9.x
+            boolean hasExecutedAnyUpgradeChangeLog =
                 executedChangeLogVersions.any { upgradeChangeLogVersions.contains(it.version) }
 
             // Run through the upgrade changelog
             // note: Liquibase does the hard work of determining what changesets need to be applied
-            if (hasExecuteUpgradeChangeLog) {
+            if (hasExecutedAnyUpgradeChangeLog) {
                 log.info("Running upgrade changelog ...")
                 LiquibaseUtil.executeChangeLog("upgrade/changelog.xml")
             }
