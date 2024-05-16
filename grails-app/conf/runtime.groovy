@@ -1105,6 +1105,17 @@ openboxes {
                 type = 'number'
                 endpoint = "/api/dashboard/openPurchaseOrdersCount"
             }
+            backdatedOutboundShipments {
+                enabled = true
+                title = "react.dashboard.backdatedOutboundShipments.title.label"
+                info = "react.dashboard.backdatedOutboundShipments.info.label"
+                graphType = "bar"
+                type = 'graph'
+                endpoint = "/api/dashboard/backdatedOutboundShipments"
+                timeFilter = true
+                timeLimit = 6
+                datalabel = true
+            }
         }
     }
 }
