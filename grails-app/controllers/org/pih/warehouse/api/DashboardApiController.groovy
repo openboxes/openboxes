@@ -6,13 +6,14 @@ import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Location
 import grails.gorm.transactions.Transactional
 import org.pih.warehouse.core.User
+import org.pih.warehouse.dashboard.IndicatorDataService
 import org.pih.warehouse.dashboard.NumberData
 
 @Transactional
 class DashboardApiController {
 
     def numberDataService
-    def indicatorDataService
+    IndicatorDataService indicatorDataService
     def userService
     def messageService
     GrailsApplication grailsApplication
@@ -213,5 +214,11 @@ class DashboardApiController {
     def getOpenPurchaseOrdersCount() {
         NumberData numberData = numberDataService.getOpenPurchaseOrdersCount(params)
         render(numberData as JSON)
+    }
+
+    def getBackdatedOutboundShipments() {
+        Integer monthsLimit = (params.querySize as Integer) ?: 6
+        Map backdatedShipments = indicatorDataService.getBackdatedOutboundShipmentsData(params.locationId, monthsLimit)
+        render(backdatedShipments as JSON)
     }
 }
