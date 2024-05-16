@@ -1111,6 +1111,47 @@ class IndicatorDataService {
         return graphData.toJson()
     }
 
+    Map getBackdatedOutboundShipmentsData(String locationId, Integer monthsLimit) {
+        Map<String, Integer> data = [
+                '2 days': 0,
+                '3 days': 0,
+                '4 days': 0,
+                '5 days': 0,
+                '6 days': 0,
+                '7 days': 0,
+                '7+ days': 0,
+        ]
+        Date timeLimit = LocalDate.now().minusMonths(monthsLimit).toDate()
+        List queryData = dataService.executeQuery("""
+        SELECT (
+            CASE 
+                WHEN DATEDIFF(t.date_created, t.transaction_date) > 7 THEN '7+ days'
+                ELSE CONCAT(DATEDIFF(t.date_created, t.transaction_date), ' days')
+            END
+        ) as days_backdated, COUNT(t.id) as shipments  FROM shipment s
+        INNER JOIN transaction t ON t.outgoing_shipment_id  = s.id
+        WHERE s.origin_id = :locationId 
+        AND t.date_created > :timeLimit
+        GROUP BY days_backdated
+        HAVING days_backdated > 1
+        """, [
+                locationId: locationId,
+                timeLimit: timeLimit,
+        ])
+
+        queryData.each {
+            data[it[0]] = it[1]
+        }
+
+        List<IndicatorDatasets> datasets = [
+                new IndicatorDatasets('Backdated shipments', data*.value.toList())
+        ]
+        IndicatorData indicatorData = new IndicatorData(datasets, data*.key.toList())
+        GraphData graphData = new GraphData(indicatorData)
+
+        return graphData.toJson()
+    }
+
     private List fillLabels(int querySize) {
         Date today = new Date()
         today.clearTime()
