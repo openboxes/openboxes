@@ -1,5 +1,5 @@
 CREATE OR REPLACE VIEW stock_movement_list_item AS
-    SELECT 
+    SELECT
         r.id,
         r.name,
         r.request_number AS identifier,
@@ -34,8 +34,8 @@ CREATE OR REPLACE VIEW stock_movement_list_item AS
             LEFT JOIN
         shipment s ON s.requisition_id = r.id
     WHERE
-        r.is_template IS FALSE 
-    UNION ALL SELECT 
+        r.is_template IS FALSE
+    UNION ALL SELECT
         o.id,
         o.name,
         o.order_number AS identifier,
@@ -65,15 +65,15 @@ CREATE OR REPLACE VIEW stock_movement_list_item AS
         END AS status_code,
         NULL AS requisition_id,
         CASE
-            WHEN o.status IS NULL THEN 'PENDING'
-            WHEN o.status = 'PENDING' THEN 'PENDING'
-            WHEN o.status = 'PLACED' THEN 'REQUESTED'
+            WHEN o.status IS NULL THEN 'CREATED'
+            WHEN o.status = 'PENDING' THEN 'CREATED'
+            WHEN o.status = 'PLACED' THEN 'CHECKING'
             WHEN o.status = 'APPROVED' THEN 'PICKING'
             WHEN o.status = 'CANCELED' THEN 'CANCELED'
             # These probably won't be used but we want to cover them just in case
-            WHEN o.status = 'PARTIALLY_RECEIVED' THEN 'DISPATCHED'
-            WHEN o.status = 'RECEIVED' THEN 'DISPATCHED'
-            WHEN o.status = 'COMPLETED' THEN 'DISPATCHED'
+            WHEN o.status = 'PARTIALLY_RECEIVED' THEN 'ISSUED'
+            WHEN o.status = 'RECEIVED' THEN 'ISSUED'
+            WHEN o.status = 'COMPLETED' THEN 'ISSUED'
             WHEN o.status = 'REJECTED' THEN 'CANCELED'
             ELSE 'PENDING'
         END AS status,
