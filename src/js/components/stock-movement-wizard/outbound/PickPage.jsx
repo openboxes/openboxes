@@ -12,7 +12,7 @@ import Alert from 'react-s-alert';
 
 import { fetchReasonCodes, hideSpinner, showSpinner } from 'actions';
 import picklistApi from 'api/services/PicklistApi';
-import { PICKLIST_ITEMS_EXPORT, PICKLIST_TEMPLATE_EXPORT } from 'api/urls';
+import { PICKLIST_IMPORT, PICKLIST_ITEMS_EXPORT, PICKLIST_TEMPLATE_EXPORT } from 'api/urls';
 import ArrayField from 'components/form-elements/ArrayField';
 import ButtonField from 'components/form-elements/ButtonField';
 import FilterInput from 'components/form-elements/FilterInput';
@@ -644,6 +644,9 @@ class PickPage extends Component {
 
   importTemplate(event) {
     this.props.showSpinner();
+    if (this.state.showAlert) {
+      this.setState({ alertMessage: null, showAlert: false });
+    }
     const formData = new FormData();
     const file = event.target.files[0];
     const { stockMovementId } = this.state.values;
@@ -655,9 +658,7 @@ class PickPage extends Component {
       },
     };
 
-    const url = `/api/stockMovements/importPickListItems/${stockMovementId}`;
-
-    return apiClient.post(url, formData, config)
+    return apiClient.post(PICKLIST_IMPORT(stockMovementId), formData, config)
       .then(() => {
         this.props.hideSpinner();
         this.fetchItemsAfterImport();

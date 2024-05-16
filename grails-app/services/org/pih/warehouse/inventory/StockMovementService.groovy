@@ -12,7 +12,10 @@ package org.pih.warehouse.inventory
 import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import grails.orm.PagedResultList
+import grails.plugins.csv.CSVMapReader
+import grails.util.Holders
 import grails.validation.ValidationException
+import org.apache.commons.lang.math.NumberUtils
 import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.grails.web.json.JSONObject
 import org.hibernate.ObjectNotFoundException
@@ -40,6 +43,7 @@ import org.pih.warehouse.core.LocationTypeCode
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
 import org.pih.warehouse.core.UserService
+import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.RefreshOrderSummaryEvent
@@ -1087,6 +1091,103 @@ class StockMovementService {
         }
 
         return packPageItems
+    }
+
+    List<Map> parsePickCsvTemplateImport(String text) {
+        try {
+            def csvMapReader = new CSVMapReader(new StringReader(text), [skipLines: 1])
+            csvMapReader.fieldKeys = [
+                    'id',
+                    'code',
+                    'name',
+                    'lot',
+                    'expiration',
+                    'binLocation',
+                    'quantity',
+            ]
+            return csvMapReader.toList()
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error parsing order item CSV: " + e.message, e)
+        }
+    }
+
+    List validatePicklistListImport(List<Map> data, List<PickPageItem> pickPageItems) {
+        List errors = new ArrayList()
+        data?.eachWithIndex { Map params, index ->
+            if (!params.id) {
+                errors.push("Row ${index + 1}: Requisition item id is required")
+            }
+            if (params.quantity == null) {
+                errors.push("Row ${index + 1}: Quantity picked are required")
+            }
+            if (params.lot?.contains("E") && NumberUtils.isNumber(params.lot)) {
+                errors.push("Row ${index + 1}: Lot numbers must not be specified in scientific notation. " +
+                        "Please reformat field with Lot Number: \"${params.lot}\" to a number format")
+            }
+
+            PickPageItem pickPageItem = pickPageItems.find { it.requisitionItem?.id == params.id }
+            if (!pickPageItem) {
+                errors.push("Row ${index + 1}: Requisition item id: ${params.id} not found")
+            }
+            if (pickPageItem) {
+                AvailableItem availableItem = pickPageItem.availableItems?.find { item ->
+                    Boolean binLocationMatches = params.binLocation ? item.binLocation?.name == params.binLocation : !item.binLocation
+                    Boolean lotMatches = params.lot == item.inventoryItem?.lotNumber
+                    binLocationMatches && lotMatches
+                }
+
+                if (!availableItem) {
+                    errors.push("Row ${index + 1}: There is no item available with: ${params.lot ? "lot ${params.lot}" : ""} ${params.binLocation ? "bin ${params.binLocation}" : ""}")
+                }
+            }
+        }
+
+        Boolean isUnderPickAllowed = Holders.config.openboxes.picklist.underpick.enabled
+        Boolean isOverPickAllowed = Holders.config.openboxes.picklist.overpick.enabled
+
+        data.groupBy { it.id }.each { itemId, params ->
+            PickPageItem pickPageItem = pickPageItems.find { it.requisitionItem?.id == itemId }
+            Integer itemQuantitySum = params.sum { Integer.parseInt(it.quantity) }
+            if (!isOverPickAllowed && pickPageItem && itemQuantitySum > pickPageItem.requisitionItem.quantity) {
+                errors.push("Item ${itemId} is overpicked, expedted quantity ${pickPageItem.requisitionItem.quantity}, received ${itemsSum}")
+            }
+            if (!isUnderPickAllowed && pickPageItem && itemQuantitySum < pickPageItem.requisitionItem.quantity) {
+                errors.push("Item ${itemId} is underpicked, expedted quantity ${pickPageItem.requisitionItem.quantity}, received ${itemsSum}")
+            }
+        }
+
+        return errors
+    }
+
+    void importPicklistTemplate(List<Map> data, StockMovement stockMovement, List<PickPageItem> pickPageItems) {
+        data.each { params ->
+            PickPageItem pickPageItem = pickPageItems.find {
+                it.requisitionItem?.id == params.id
+            }
+
+            AvailableItem availableItem = pickPageItem.availableItems?.find { item ->
+                Boolean binLocationMatches = params.binLocation ? item.binLocation?.name == params.binLocation : !item.binLocation
+                Boolean lotMatches = params.lot == item.inventoryItem?.lotNumber
+                binLocationMatches && lotMatches
+            }
+
+            RequisitionItem requisitionItem = pickPageItem.requisitionItem?.modificationItem ?: pickPageItem.requisitionItem
+
+            pickPageItem.picklistItems.each {
+                if (it.id) {
+                    it.quantity = 0
+                }
+            }
+            pickPageItem.picklistItems.add(new PicklistItem(
+                    requisitionItem: requisitionItem,
+                    inventoryItem: availableItem.inventoryItem,
+                    binLocation: availableItem.binLocation,
+                    quantity: params.quantity,
+                    sortOrder: pickPageItem.sortOrder
+            ))
+        }
+        createOrUpdatePicklistItem(stockMovement, pickPageItems)
     }
 
     List<ReceiptItem> getStockMovementReceiptItems(def stockMovement) {
