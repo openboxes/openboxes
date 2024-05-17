@@ -804,7 +804,7 @@ class OrderController {
                     dateCreated: it.dateCreated,
                     canEdit: canEditOrder,
                     manufacturerName: it.productSupplier?.manufacturer?.name,
-                    text: it.toString(),
+                    text: it.product?.displayNameOrDefaultName,
                     orderItemStatusCode: it.orderItemStatusCode.name(),
                     hasShipmentAssociated: it.hasShipmentAssociated(),
                     budgetCode: it.budgetCode,
