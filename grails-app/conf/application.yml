@@ -39,9 +39,6 @@ grails:
         databasemigration:
             updateOnStart: false
             updateOnStartFileName: changelog.groovy
-        sentry:
-            active: false
-            dsn: https://{PUBLIC_KEY}:{SECRET_KEY}@app.getsentry.com/{PATH}{PROJECT_ID}
 
 info:
     app:
@@ -615,11 +612,3 @@ grails:
     logging:
         jul:
             usebridge: true
-#    validateable:
-#        packages: [
-#        'org.pih.warehouse.inventory',
-#        'org.pih.warehouse.fulfillment',
-#        'org.pih.warehouse.order',
-#        'org.pih.warehouse.request',
-#        'org.pih.warehouse.shipment',
-#]

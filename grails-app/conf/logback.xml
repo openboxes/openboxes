@@ -53,12 +53,14 @@
     <logger name="liquibase.servicelocator" level="info" />
     <logger name="liquibase.util" level="info" />
     <logger name="net.sf.ehcache" level="info" />
+    <logger name="org.apache.catalina" level="info" />
     <logger name="org.apache.catalina.authenticator" level="info" />
     <logger name="org.apache.catalina.connector" level="info" /><!-- use 'debug' to log cookie data -->
     <logger name="org.apache.catalina.core" level="info" />
     <logger name="org.apache.catalina.loader" level="info" />
     <logger name="org.apache.catalina.realm" level="info" />
     <logger name="org.apache.catalina.session" level="info" />
+    <logger name="org.apache.catalina.util" level="info" />
     <logger name="org.apache.coyote" level="info" /><!-- use 'debug' to see header logs, socket info, GET calls -->
     <logger name="org.apache.jasper" level="warn" />
     <logger name="org.apache.tomcat.pool" level="debug" /><!-- use 'info' to hide logs about pool management -->
@@ -87,6 +89,7 @@
     <logger name="org.hibernate.id" level="info" />
     <logger name="org.hibernate.integrator" level="info" />
     <logger name="org.hibernate.internal" level="warn" />
+    <logger name="org.hibernate.engine.internal.StatisticalLoggingSessionEventListener" level="OFF"/>
     <logger name="org.hibernate.loader" level="info" /><!-- use 'debug' to see every select call -->
     <logger name="org.hibernate.mapping" level="info" />
     <logger name="org.hibernate.orm.deprecation" level="error" /> <!-- use 'error' to hide all warnings, see: OBGM-358 -->
@@ -117,7 +120,8 @@
     <logger name="org.springframework.jndi" level="info" />
     <logger name="org.springframework.ui" level="info" />
     <logger name="org.springframework.web" level="info" />
-    <logger name="quartz" level="debug" /><!-- use 'info' to hide quartz scheduler notifications -->
+    <logger name="quartz" level="info" /><!-- use 'info' to hide quartz scheduler notifications -->
+    <logger name="io.sentry" level="info" />
 
     <root level="debug">
         <appender-ref ref="sentry" />
