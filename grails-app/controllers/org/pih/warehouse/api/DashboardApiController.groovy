@@ -2,6 +2,7 @@ package org.pih.warehouse.api
 
 import grails.converters.JSON
 import grails.core.GrailsApplication
+import grails.util.Holders
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Location
 import grails.gorm.transactions.Transactional
@@ -217,14 +218,22 @@ class DashboardApiController {
     }
 
     def getBackdatedOutboundShipments() {
-        Integer monthsLimit = (params.querySize as Integer) ?: 6
-        Map backdatedShipments = indicatorDataService.getBackdatedOutboundShipmentsData(params.locationId, monthsLimit)
+        Integer defaultMonthsLimit = Holders.config.openboxes.dashboard.backdate.monthsLimit
+        Integer monthsLimit = params.int('querySize', defaultMonthsLimit)
+        Map backdatedShipments = indicatorDataService.getBackdatedOutboundShipmentsData(
+                params.locationId,
+                monthsLimit > defaultMonthsLimit ? defaultMonthsLimit : monthsLimit
+        )
         render(backdatedShipments as JSON)
     }
 
     def getBackdatedInboundShipments() {
-        Integer monthsLimit = (params.querySize as Integer) ?: 6
-        Map backdatedShipments = indicatorDataService.getBackdatedInboundShipmentsData(params.locationId, monthsLimit)
+        Integer defaultMonthsLimit = Holders.config.openboxes.dashboard.backdate.monthsLimit
+        Integer monthsLimit = params.int('querySize', defaultMonthsLimit)
+        Map backdatedShipments = indicatorDataService.getBackdatedInboundShipmentsData(
+                params.locationId,
+                monthsLimit > defaultMonthsLimit ? defaultMonthsLimit : monthsLimit
+        )
         render(backdatedShipments as JSON)
     }
 }

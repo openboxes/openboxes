@@ -1113,15 +1113,7 @@ class IndicatorDataService {
     }
 
     Map getBackdatedShipmentsChart(String query, String locationId, Integer monthsLimit) {
-        Map<String, Integer> data = [
-                '2 days': 0,
-                '3 days': 0,
-                '4 days': 0,
-                '5 days': 0,
-                '6 days': 0,
-                '7 days': 0,
-                '7+ days': 0,
-        ]
+        Map<String, Integer> data = Constants.backdataAxes
         Date timeLimit = LocalDate.now().minusMonths(monthsLimit).toDate()
         List queryData = dataService.executeQuery(query, [
                 locationId: locationId,
@@ -1145,17 +1137,17 @@ class IndicatorDataService {
     @Cacheable(value = "dashboardCache", key = { "getBackdatedOutboundShipments-${locationId}${monthsLimit}" })
     Map getBackdatedOutboundShipmentsData(String locationId, Integer monthsLimit) {
         String query = """
-        SELECT (
-            CASE 
-                WHEN DATEDIFF(t.date_created, t.transaction_date) > 7 THEN '7+ days'
-                ELSE CONCAT(DATEDIFF(t.date_created, t.transaction_date), ' days')
-            END
-        ) as days_backdated, COUNT(t.id) as shipments  FROM shipment s
-        INNER JOIN transaction t ON t.outgoing_shipment_id  = s.id
-        WHERE s.origin_id = :locationId 
-        AND t.date_created > :timeLimit
-        GROUP BY days_backdated
-        HAVING days_backdated > :daysOffset
+            SELECT (
+                CASE 
+                    WHEN DATEDIFF(t.date_created, t.transaction_date) > 7 THEN '7+ days'
+                    ELSE CONCAT(DATEDIFF(t.date_created, t.transaction_date), ' days')
+                END
+            ) as days_backdated, COUNT(t.id) as shipments  FROM shipment s
+            INNER JOIN transaction t ON t.outgoing_shipment_id  = s.id
+            WHERE s.origin_id = :locationId 
+            AND t.date_created > :timeLimit
+            GROUP BY days_backdated
+            HAVING days_backdated > :daysOffset
         """
 
         return getBackdatedShipmentsChart(query, locationId, monthsLimit)
@@ -1164,17 +1156,17 @@ class IndicatorDataService {
     @Cacheable(value = "dashboardCache", key = { "getBackdatedInboundShipments-${locationId}${monthsLimit}" })
     Map getBackdatedInboundShipmentsData(String locationId, Integer monthsLimit) {
         String query = """
-        SELECT (
-            CASE 
-                WHEN DATEDIFF(t.date_created, t.transaction_date) > 7 THEN '7+ days'
-                ELSE CONCAT(DATEDIFF(t.date_created, t.transaction_date), ' days')
-            END
-        ) as days_backdated, COUNT(t.id) as shipments  FROM shipment s
-        INNER JOIN transaction t ON t.incoming_shipment_id  = s.id
-        WHERE s.destination_id = :locationId 
-        AND t.date_created > :timeLimit
-        GROUP BY days_backdated
-        HAVING days_backdated > :daysOffset
+            SELECT (
+                CASE 
+                    WHEN DATEDIFF(t.date_created, t.transaction_date) > 7 THEN '7+ days'
+                    ELSE CONCAT(DATEDIFF(t.date_created, t.transaction_date), ' days')
+                END
+            ) as days_backdated, COUNT(t.id) as shipments  FROM shipment s
+            INNER JOIN transaction t ON t.incoming_shipment_id  = s.id
+            WHERE s.destination_id = :locationId 
+            AND t.date_created > :timeLimit
+            GROUP BY days_backdated
+            HAVING days_backdated > :daysOffset
         """
 
         return getBackdatedShipmentsChart(query, locationId, monthsLimit)
