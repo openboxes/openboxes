@@ -347,16 +347,19 @@ class StockMovementApiController {
         String csv = new String(importFile.bytes)
         List<Map> importedLines = stockMovementService.parsePickCsvTemplateImport(csv)
 
-        List errors = stockMovementService.validatePicklistListImport(importedLines, pickPageItems)
-        if (!errors.isEmpty()) {
-            response.status = 400
-            render([errorMessages: errors] as JSON)
-            return
-        }
+        stockMovementService.validatePicklistListImport(importedLines, pickPageItems)
+
+        List errors = importedLines*.errors.withIndex().collect { errors, index ->
+            errors.collect { "Row ${1}: ${it}" }
+        }.flatten()
 
         stockMovementService.importPicklistTemplate(importedLines, stockMovement, pickPageItems)
 
-        render([data: "Data will be imported successfully"] as JSON)
+        if (!errors.isEmpty()) {
+            render([message: "Data imported with errors", errors: errors] as JSON)
+        }
+
+        render([message: "Data imported successfully"] as JSON)
     }
 
     def getPendingRequisitionDetails() {

@@ -1112,23 +1112,23 @@ class StockMovementService {
         }
     }
 
-    List validatePicklistListImport(List<Map> data, List<PickPageItem> pickPageItems) {
-        List errors = new ArrayList()
+    void validatePicklistListImport(List<Map> data, List<PickPageItem> pickPageItems) {
         data?.eachWithIndex { Map params, index ->
+            params.errors = new ArrayList()
             if (!params.id) {
-                errors.push("Row ${index + 1}: Requisition item id is required")
+                params.errors.push("Requisition item id is required")
             }
             if (params.quantity == null) {
-                errors.push("Row ${index + 1}: Quantity picked are required")
+                params.errors.push("Quantity picked are required")
             }
             if (params.lot?.contains("E") && NumberUtils.isNumber(params.lot)) {
-                errors.push("Row ${index + 1}: Lot numbers must not be specified in scientific notation. " +
+                params.errors.push("Lot numbers must not be specified in scientific notation. " +
                         "Please reformat field with Lot Number: \"${params.lot}\" to a number format")
             }
 
             PickPageItem pickPageItem = pickPageItems.find { it.requisitionItem?.id == params.id }
             if (!pickPageItem) {
-                errors.push("Row ${index + 1}: Requisition item id: ${params.id} not found")
+                params.errors.push("Requisition item id: ${params.id} not found")
             }
             if (pickPageItem) {
                 AvailableItem availableItem = pickPageItem.availableItems?.find { item ->
@@ -1138,7 +1138,7 @@ class StockMovementService {
                 }
 
                 if (!availableItem) {
-                    errors.push("Row ${index + 1}: There is no item available with: ${params.lot ? "lot ${params.lot}" : ""} ${params.binLocation ? "bin ${params.binLocation}" : ""}")
+                    params.errors.push("There is no item available with: ${params.lot ? "lot ${params.lot}" : ""} ${params.binLocation ? "bin ${params.binLocation}" : ""}")
                 }
             }
         }
@@ -1156,12 +1156,15 @@ class StockMovementService {
                 errors.push("Item ${itemId} is underpicked, expedted quantity ${pickPageItem.requisitionItem.quantity}, received ${itemsSum}")
             }
         }
-
-        return errors
     }
 
     void importPicklistTemplate(List<Map> data, StockMovement stockMovement, List<PickPageItem> pickPageItems) {
         data.each { params ->
+            // skip rows with errors
+            if (params.errors) {
+                return
+            }
+
             PickPageItem pickPageItem = pickPageItems.find {
                 it.requisitionItem?.id == params.id
             }
@@ -1688,9 +1691,11 @@ class StockMovementService {
      * @return
      */
     PickPageItem buildPickPageItem(RequisitionItem requisitionItem, Integer sortOrder, Boolean showDetails) {
+        Boolean hasPicklistItems = requisitionItem.picklistItems
+        Boolean isQuantityPickedOtherThanRequested = requisitionItem.totalQuantityPicked() != requisitionItem.quantity
+        Boolean hasReasonCode = requisitionItem.picklistItems.reasonCode
 
-        if (!requisitionItem.picklistItems || (requisitionItem.picklistItems && requisitionItem.totalQuantityPicked() != requisitionItem.quantity &&
-                !requisitionItem.picklistItems.reasonCode)) {
+        if (!hasPicklistItems || (hasPicklistItems && isQuantityPickedOtherThanRequested && !hasReasonCode)) {
             createPicklist(requisitionItem, false)
         }
         PickPageItem pickPageItem = new PickPageItem(requisitionItem: requisitionItem,
