@@ -664,7 +664,15 @@ class PickPage extends Component {
     };
 
     return apiClient.post(PICKLIST_IMPORT(stockMovementId), formData, config)
-      .then(() => {
+      .then((resp) => {
+        const { errors } = resp.data;
+        if (errors) {
+          this.setState({
+            showAlert: true,
+            alertMessage: errors,
+          });
+        }
+
         this.props.hideSpinner();
         this.fetchItemsAfterImport();
       })
