@@ -1,37 +1,33 @@
 package org.pih.warehouse.inventory
 
-import spock.lang.Unroll
-
 import grails.testing.gorm.DomainUnitTest
-import org.junit.Before
-import org.junit.Ignore
-import org.junit.Test
 import spock.lang.Specification
 import spock.lang.Unroll
 
 class TransactionTypeSpec  extends Specification implements DomainUnitTest<TransactionType> {
 
-
-    @Test
-    @Unroll('TransactionType.validate() with name: #value should return #expected with errorCode: #expectedErrorCode')
-    void 'name field validation'() {
-        when:
+    @Unroll
+    def 'should return #expected with error code #expectedErrorCode when validating transaction type given name #value'() {
+        given: "the name is #value"
         domain.name = value
 
-        then:
-        assert domain.validate(['name']) == expected
-        assert domain.errors.getFieldError("name")?.getCode() == expectedErrorCode
+        when: "the transaction type is validated"
+        boolean actual = domain.validate(["name"])
+
+        then: "the name property should be valid or invalid with the expected error code"
+        actual == expected
+        domain.errors["name"]?.code == expectedErrorCode
 
         where:
-        value                                             || expected | expectedErrorCode
-        null                                              || false    | 'nullable'
-        'this_is_big_string_to_test_max_length_255' * 255 || false    | 'maxSize.exceeded'
-        'Dummy Name'                                      || true     | null
+        value        || expected | expectedErrorCode
+        null         || false    | 'nullable'
+        'a' * 256    || false    | 'maxSize.exceeded'
+        'b' * 255    || true     | null
+        'Dummy Name' || true     | null
     }
 
-    @Test
-    @Unroll('TransactionType.validate() with description: #value should return #expected with errorCode: #expectedErrorCode')
-    void 'description field validation'() {
+    @Unroll
+    void 'should return #expected with error code #expectedErrorCode when validating transaction type given name #value'() {
         when:
         domain.description = value
 
@@ -40,31 +36,47 @@ class TransactionTypeSpec  extends Specification implements DomainUnitTest<Trans
         assert domain.errors.getFieldError("description")?.getCode() == expectedErrorCode
 
         where:
-        value                                             || expected | expectedErrorCode
-        null                                              || true     | null
-        'this_is_big_string_to_test_max_length_255' * 255 || false    | 'maxSize.exceeded'
-        'Dummy description'                               || true     | null
+        value               || expected | expectedErrorCode
+        null                || true     | null
+        'a' * 256           || false    | 'maxSize.exceeded'
+        'Dummy description' || true     | null
     }
 
-    @Test
-    void 'all fields validation'() {
-        when:
+    void 'should expect two validation errors when validating given an empty transaction type'() {
+        given:
         domain
 
+        when:
+        boolean isValid = domain.validate()
+
         then:
-        assert !domain.validate()
-        assert domain.errors.allErrors.size() == 2
+        assert !isValid
+        assert domain.errors.errorCount == 2
     }
 
-    @Test
-    @Unroll('TransactionType.validate() with transactionCode: #value should return #expected with errorCode: #expectedErrorCode')
-    void 'transactionCode field validation'() {
-        when:
+    void 'should expect the names to be the same'() {
+        given: "a valid transaction type with multiple"
+        TransactionType transactionType =
+                new TransactionType(name: "Debit|sp:Débito|fr:Débit", transactionCode: TransactionCode.DEBIT)
+
+        when: "the name is compared with debit"
+        boolean nameIsSame = transactionType.compareName("Debit")
+
+        then: "the name is the same"
+        assert nameIsSame
+    }
+
+    @Unroll
+    void 'should return #expected with error code #expectedErrorCode when validating transaction type given name #value'() {
+        given:
         domain.transactionCode = value
 
+        when:
+        boolean actual = domain.validate(['transactionCode'])
+
         then:
-        assert domain.validate(['transactionCode']) == expected
-        assert domain.errors.getFieldError("transactionCode")?.getCode() == expectedErrorCode
+        actual == expected
+        domain.errors.getFieldError("transactionCode")?.code == expectedErrorCode
 
         where:
         value                 || expected | expectedErrorCode
@@ -72,20 +84,21 @@ class TransactionTypeSpec  extends Specification implements DomainUnitTest<Trans
         TransactionCode.DEBIT || true     | null
     }
 
-    @Test
-    @Unroll('TransactionType.isAdjustment() with isAdjustment: #value should return #expected')
-    void 'isAdjustment field validation'() {
-        when:
+    @Unroll
+    void 'should return #expected when given name #value'() {
+        given:
         domain.name = value
 
+        when:
+        boolean isAdjustment = domain.isAdjustment()
+
         then:
-        domain.isAdjustment() == expected
+        isAdjustment == expected
 
         where:
-        value           || expected
-        'NO_Adjustment' || false
-        'Adjustment'    || true
+        value                                      || expected
+        'Adjustment|fr:Ajustement|es:Ajustamiento' || true
+        'NO_Adjustment'                            || false
+        'Adjustment'                               || true
     }
-
-
 }
