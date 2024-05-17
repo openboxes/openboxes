@@ -1,5 +1,5 @@
 CREATE OR REPLACE VIEW stock_movement_list_item AS
-    SELECT 
+    SELECT
         r.id,
         r.name,
         r.request_number AS identifier,
@@ -14,6 +14,7 @@ CREATE OR REPLACE VIEW stock_movement_list_item AS
         r.updated_by_id,
         s.id AS shipment_id,
         s.current_status AS shipment_status,
+        # Depreacted, could be removed in a cleanup ticket
         CASE
             WHEN r.status IS NULL THEN 'REQUESTING'
             WHEN r.status = 'EDITING' THEN 'REQUESTING'
@@ -34,8 +35,8 @@ CREATE OR REPLACE VIEW stock_movement_list_item AS
             LEFT JOIN
         shipment s ON s.requisition_id = r.id
     WHERE
-        r.is_template IS FALSE 
-    UNION ALL SELECT 
+        r.is_template IS FALSE
+    UNION ALL SELECT
         o.id,
         o.name,
         o.order_number AS identifier,
@@ -50,6 +51,9 @@ CREATE OR REPLACE VIEW stock_movement_list_item AS
         o.updated_by_id,
         s.id AS shipment_id,
         s.current_status AS shipment_status,
+        # At point of refactoring status below, (OBPIH-6368) the statusCode seems not to be used anywhere
+        # It is marked as deprecated and would be removed soon in a cleanup ticket
+        # This is the reason it differs from the status - there was no point to refactor it along with the status in OBPIH-6368
         CASE
             WHEN o.status IS NULL THEN 'PENDING'
             WHEN o.status = 'PENDING' THEN 'PENDING'
@@ -64,16 +68,18 @@ CREATE OR REPLACE VIEW stock_movement_list_item AS
             ELSE 'PENDING'
         END AS status_code,
         NULL AS requisition_id,
+        # This one differs from the deprecated statusCode, because after refactoring the state machine (displayStatus), this property (status)
+        # is used to filter the data on outbound list page, so those statuses (displayStatus) and status have to be aligned in order for filtering to work properly (OBPIH-6368)
         CASE
-            WHEN o.status IS NULL THEN 'PENDING'
-            WHEN o.status = 'PENDING' THEN 'PENDING'
-            WHEN o.status = 'PLACED' THEN 'REQUESTED'
+            WHEN o.status IS NULL THEN 'CREATED'
+            WHEN o.status = 'PENDING' THEN 'CREATED'
+            WHEN o.status = 'PLACED' THEN 'CHECKING'
             WHEN o.status = 'APPROVED' THEN 'PICKING'
             WHEN o.status = 'CANCELED' THEN 'CANCELED'
             # These probably won't be used but we want to cover them just in case
-            WHEN o.status = 'PARTIALLY_RECEIVED' THEN 'DISPATCHED'
-            WHEN o.status = 'RECEIVED' THEN 'DISPATCHED'
-            WHEN o.status = 'COMPLETED' THEN 'DISPATCHED'
+            WHEN o.status = 'PARTIALLY_RECEIVED' THEN 'ISSUED'
+            WHEN o.status = 'RECEIVED' THEN 'ISSUED'
+            WHEN o.status = 'COMPLETED' THEN 'ISSUED'
             WHEN o.status = 'REJECTED' THEN 'CANCELED'
             ELSE 'PENDING'
         END AS status,
