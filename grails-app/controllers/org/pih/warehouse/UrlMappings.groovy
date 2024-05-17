@@ -746,6 +746,11 @@ class UrlMappings {
             action = [GET: "getBackdatedOutboundShipments"]
         }
 
+        "/api/dashboard/backdatedInboundShipments" {
+            controller = { "dashboardApi" }
+            action = [GET: "getBackdatedInboundShipments"]
+        }
+
         /**
         * Purchase Orders API endpoints
         */
