@@ -221,4 +221,10 @@ class DashboardApiController {
         Map backdatedShipments = indicatorDataService.getBackdatedOutboundShipmentsData(params.locationId, monthsLimit)
         render(backdatedShipments as JSON)
     }
+
+    def getBackdatedInboundShipments() {
+        Integer monthsLimit = (params.querySize as Integer) ?: 6
+        Map backdatedShipments = indicatorDataService.getBackdatedInboundShipmentsData(params.locationId, monthsLimit)
+        render(backdatedShipments as JSON)
+    }
 }

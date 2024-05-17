@@ -4,6 +4,7 @@ import grails.compiler.GrailsTypeChecked
 import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import grails.plugin.cache.Cacheable
+import grails.util.Holders
 import groovy.transform.TypeCheckingMode
 import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.grails.web.json.JSONObject
@@ -1111,7 +1112,7 @@ class IndicatorDataService {
         return graphData.toJson()
     }
 
-    Map getBackdatedOutboundShipmentsData(String locationId, Integer monthsLimit) {
+    Map getBackdatedShipmentsChart(String query, String locationId, Integer monthsLimit) {
         Map<String, Integer> data = [
                 '2 days': 0,
                 '3 days': 0,
@@ -1122,21 +1123,10 @@ class IndicatorDataService {
                 '7+ days': 0,
         ]
         Date timeLimit = LocalDate.now().minusMonths(monthsLimit).toDate()
-        List queryData = dataService.executeQuery("""
-        SELECT (
-            CASE 
-                WHEN DATEDIFF(t.date_created, t.transaction_date) > 7 THEN '7+ days'
-                ELSE CONCAT(DATEDIFF(t.date_created, t.transaction_date), ' days')
-            END
-        ) as days_backdated, COUNT(t.id) as shipments  FROM shipment s
-        INNER JOIN transaction t ON t.outgoing_shipment_id  = s.id
-        WHERE s.origin_id = :locationId 
-        AND t.date_created > :timeLimit
-        GROUP BY days_backdated
-        HAVING days_backdated > 1
-        """, [
+        List queryData = dataService.executeQuery(query, [
                 locationId: locationId,
                 timeLimit: timeLimit,
+                daysOffset: Holders.config.openboxes.dashboard.backdate.daysOffset
         ])
 
         queryData.each {
@@ -1150,6 +1140,44 @@ class IndicatorDataService {
         GraphData graphData = new GraphData(indicatorData)
 
         return graphData.toJson()
+    }
+
+    @Cacheable(value = "dashboardCache", key = { "getBackdatedOutboundShipments-${locationId}${monthsLimit}" })
+    Map getBackdatedOutboundShipmentsData(String locationId, Integer monthsLimit) {
+        String query = """
+        SELECT (
+            CASE 
+                WHEN DATEDIFF(t.date_created, t.transaction_date) > 7 THEN '7+ days'
+                ELSE CONCAT(DATEDIFF(t.date_created, t.transaction_date), ' days')
+            END
+        ) as days_backdated, COUNT(t.id) as shipments  FROM shipment s
+        INNER JOIN transaction t ON t.outgoing_shipment_id  = s.id
+        WHERE s.origin_id = :locationId 
+        AND t.date_created > :timeLimit
+        GROUP BY days_backdated
+        HAVING days_backdated > :daysOffset
+        """
+
+        return getBackdatedShipmentsChart(query, locationId, monthsLimit)
+    }
+
+    @Cacheable(value = "dashboardCache", key = { "getBackdatedInboundShipments-${locationId}${monthsLimit}" })
+    Map getBackdatedInboundShipmentsData(String locationId, Integer monthsLimit) {
+        String query = """
+        SELECT (
+            CASE 
+                WHEN DATEDIFF(t.date_created, t.transaction_date) > 7 THEN '7+ days'
+                ELSE CONCAT(DATEDIFF(t.date_created, t.transaction_date), ' days')
+            END
+        ) as days_backdated, COUNT(t.id) as shipments  FROM shipment s
+        INNER JOIN transaction t ON t.incoming_shipment_id  = s.id
+        WHERE s.destination_id = :locationId 
+        AND t.date_created > :timeLimit
+        GROUP BY days_backdated
+        HAVING days_backdated > :daysOffset
+        """
+
+        return getBackdatedShipmentsChart(query, locationId, monthsLimit)
     }
 
     private List fillLabels(int querySize) {
