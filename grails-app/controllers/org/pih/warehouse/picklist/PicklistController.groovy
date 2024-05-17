@@ -94,7 +94,7 @@ class PicklistController {
     def exportPicklistItems() {
         String format = params.get("format", "csv")
 
-        List<PickPageItem> pickPageItems = stockMovementService.getPickPageItems(params.id, null, null )
+        List<PickPageItem> pickPageItems = stockMovementService.getPickPageItems(params.id, null, null, false)
         List<PicklistItem> picklistItems = pickPageItems.picklistItems?.flatten()
 
         // We need to create at least one row to ensure an empty template
@@ -137,7 +137,7 @@ class PicklistController {
     def exportPicklistTemplate() {
         String format = params.get("format", "csv")
 
-        List<PickPageItem> pickPageItems = stockMovementService.getPickPageItems(params.id, null, null )
+        List<PickPageItem> pickPageItems = stockMovementService.getPickPageItems(params.id, null, null, false)
 
         // We need to create at least one row to ensure an empty template
         if (pickPageItems?.empty) {

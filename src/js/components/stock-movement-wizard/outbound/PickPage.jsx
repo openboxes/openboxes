@@ -12,7 +12,12 @@ import Alert from 'react-s-alert';
 
 import { fetchReasonCodes, hideSpinner, showSpinner } from 'actions';
 import picklistApi from 'api/services/PicklistApi';
-import { PICKLIST_IMPORT, PICKLIST_ITEMS_EXPORT, PICKLIST_TEMPLATE_EXPORT } from 'api/urls';
+import {
+  PICKLIST_IMPORT,
+  PICKLIST_ITEMS_EXPORT,
+  PICKLIST_TEMPLATE_EXPORT,
+  STOCK_MOVEMENT_ITEMS
+} from 'api/urls';
 import ArrayField from 'components/form-elements/ArrayField';
 import ButtonField from 'components/form-elements/ButtonField';
 import FilterInput from 'components/form-elements/FilterInput';
@@ -368,29 +373,29 @@ class PickPage extends Component {
   }
 
   fetchPickPageItems() {
-    const url = `/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?stepNumber=4`;
-    apiClient.get(url)
-      .then((response) => {
-        this.setPickPageItems(response, null);
-      });
+    apiClient.get(STOCK_MOVEMENT_ITEMS(this.state.values.stockMovementId), {
+      params: { stepNumber: 4 },
+    }).then((response) => {
+      this.setPickPageItems(response, null);
+    });
   }
 
   fetchItemsAfterImport() {
-    const url = `/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?stepNumber=4`;
-    apiClient.get(url)
-      .then((response) => {
-        const { data } = response.data;
-        this.setState({
-          values: {
-            ...this.state.values,
-            pickPageItems: _.map(
-              parseResponse(data),
-              item => this.checkForInitialPicksChanges(item),
-            ),
-          },
-          sorted: false,
-        });
+    apiClient.get(STOCK_MOVEMENT_ITEMS(this.state.values.stockMovementId), {
+      params: { stepNumber: 4, createNew: false },
+    }).then((response) => {
+      const { data } = response.data;
+      this.setState({
+        values: {
+          ...this.state.values,
+          pickPageItems: _.map(
+            parseResponse(data),
+            item => this.checkForInitialPicksChanges(item),
+          ),
+        },
+        sorted: false,
       });
+    });
   }
 
   loadMoreRows({ startIndex }) {
@@ -398,11 +403,11 @@ class PickPage extends Component {
       this.setState({
         isFirstPageLoaded: true,
       });
-      const url = `/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?offset=${startIndex}&max=${this.props.pageSize}&stepNumber=4`;
-      apiClient.get(url)
-        .then((response) => {
-          this.setPickPageItems(response, startIndex);
-        });
+      apiClient.get(STOCK_MOVEMENT_ITEMS(this.state.values.stockMovementId), {
+        params: { offset: startIndex, max: this.props.pageSize, stepNumber: 4 },
+      }).then((response) => {
+        this.setPickPageItems(response, startIndex);
+      });
     }
   }
 
@@ -707,14 +712,7 @@ class PickPage extends Component {
     this.props.showSpinner();
     try {
       await picklistApi.clearPicklist(picklist?.id);
-      const picklistItems = this.state.values.pickPageItems;
-      this.setState((prevState) => ({
-        values: ({
-          ...prevState.values,
-          pickPageItems: picklistItems
-            .map((item) => ({ ...item, picklistItems: [], quantityPicked: 0 })),
-        }),
-      }));
+      this.fetchItemsAfterImport();
     } finally {
       this.props.hideSpinner();
     }

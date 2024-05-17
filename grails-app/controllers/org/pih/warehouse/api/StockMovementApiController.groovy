@@ -337,7 +337,7 @@ class StockMovementApiController {
 
     def importPickListItems(ImportDataCommand command) {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
-        List<PickPageItem> pickPageItems = stockMovementService.getPickPageItems(params.id, null, null )
+        List<PickPageItem> pickPageItems = stockMovementService.getPickPageItems(params.id, null, null, false)
 
         MultipartFile importFile = command.importFile
         if (importFile.isEmpty()) {

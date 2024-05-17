@@ -40,7 +40,13 @@ class StockMovementItemApiController {
     }
 
     def getStockMovementItems() {
-        List<StockMovementItem> stockMovementItems = stockMovementService.getStockMovementItems(params.id, params.stepNumber, params.max, params.offset)
+        String stockMovementId = params.get("id")
+        String stepNumber = params.get("stepNumber")
+        String max = params.get("max")
+        String offset = params.get("offset")
+        Boolean createNew = params.boolean("createNew", true)
+
+        List<StockMovementItem> stockMovementItems = stockMovementService.getStockMovementItems(stockMovementId, stepNumber, max, offset, createNew)
         render([data: stockMovementItems] as JSON)
     }
 
