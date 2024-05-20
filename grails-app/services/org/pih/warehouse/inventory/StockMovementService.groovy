@@ -1151,10 +1151,10 @@ class StockMovementService {
             PickPageItem pickPageItem = pickPageItems.find { it.requisitionItem?.id == itemId }
             Integer itemQuantitySum = params.sum { Integer.parseInt(it.quantity) }
             if (!isOverPickAllowed && pickPageItem && itemQuantitySum > pickPageItem.requisitionItem.quantity) {
-                errors.push("Item ${itemId} is overpicked, expedted quantity ${pickPageItem.requisitionItem.quantity}, received ${itemsSum}")
+                errors.push("Item ${itemId} is overpicked, expected quantity ${pickPageItem.requisitionItem.quantity}, received ${itemsSum}")
             }
             if (!isUnderPickAllowed && pickPageItem && itemQuantitySum < pickPageItem.requisitionItem.quantity) {
-                errors.push("Item ${itemId} is underpicked, expedted quantity ${pickPageItem.requisitionItem.quantity}, received ${itemsSum}")
+                errors.push("Item ${itemId} is underpicked, expected quantity ${pickPageItem.requisitionItem.quantity}, received ${itemsSum}")
             }
         }
     }
@@ -1672,9 +1672,8 @@ class StockMovementService {
             pickPageItems = requisitionItem.substitutionItems.sort { it.orderIndex }. collect {
                 if (createNewPicklistItems) {
                     return generatePickPageItem(it, stockMovementItem.sortOrder)
-                } else {
-                    return buildPickPageItem(it, stockMovementItem.sortOrder)
                 }
+                return buildPickPageItem(it, stockMovementItem.sortOrder)
             }
         } else if (requisitionItem.modificationItem) {
             if (createNewPicklistItems) {
