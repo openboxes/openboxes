@@ -218,7 +218,7 @@ class DashboardApiController {
     }
 
     def getBackdatedOutboundShipments() {
-        Integer defaultMonthsLimit = Holders.config.openboxes.dashboard.backdate.monthsLimit
+        Integer defaultMonthsLimit = Holders.config.openboxes.dashboard.backdatedShipments.monthsLimit
         Integer monthsLimit = params.int('querySize', defaultMonthsLimit)
         Map backdatedShipments = indicatorDataService.getBackdatedOutboundShipmentsData(
                 params.locationId,
@@ -228,7 +228,7 @@ class DashboardApiController {
     }
 
     def getBackdatedInboundShipments() {
-        Integer defaultMonthsLimit = Holders.config.openboxes.dashboard.backdate.monthsLimit
+        Integer defaultMonthsLimit = Holders.config.openboxes.dashboard.backdatedShipments.monthsLimit
         Integer monthsLimit = params.int('querySize', defaultMonthsLimit)
         Map backdatedShipments = indicatorDataService.getBackdatedInboundShipmentsData(
                 params.locationId,

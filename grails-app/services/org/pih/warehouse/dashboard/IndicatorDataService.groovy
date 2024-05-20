@@ -1134,7 +1134,7 @@ class IndicatorDataService {
         List queryData = dataService.executeQuery(query, [
                 locationId: locationId,
                 timeLimit: timeLimit,
-                daysOffset: Holders.config.openboxes.dashboard.backdate.daysOffset
+                daysOffset: Holders.config.openboxes.dashboard.backdatedShipments.daysOffset
         ])
 
         queryData.each {

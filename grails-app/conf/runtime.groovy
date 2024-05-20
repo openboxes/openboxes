@@ -74,8 +74,8 @@ openboxes.client.notification.autohide.delay = 8000
 openboxes.client.autosave.enabled = false
 
 // Backdata configuration (OBPIH-6332)
-openboxes.dashboard.backdate.daysOffset = 1
-openboxes.dashboard.backdate.monthsLimit = 6
+openboxes.dashboard.backdatedShipments.daysOffset = 1
+openboxes.dashboard.backdatedShipments.monthsLimit = 6
 
 // Merge Products (OBPIH-5453)
 openboxes.products.merge.enabled = false
