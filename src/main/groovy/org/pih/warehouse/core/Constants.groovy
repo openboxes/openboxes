@@ -156,4 +156,15 @@ class Constants {
     static final String ADJUSTMENT = "Adjustment"
 
     static final String UOM_EACH_ID = "EA"
+
+    // Dashboard indicator axes
+    static final Map<String, Integer> backdataAxes = [
+            '2 days': 0,
+            '3 days': 0,
+            '4 days': 0,
+            '5 days': 0,
+            '6 days': 0,
+            '7 days': 0,
+            '7+ days': 0,
+    ]
 }

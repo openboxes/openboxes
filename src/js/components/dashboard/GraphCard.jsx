@@ -124,16 +124,18 @@ class FilterComponent extends Component {
                 },
               )}
             </option>
-            <option value="12">
-              {this.props.translate(
-                this.props.label[0],
-                this.props.label[1],
-                {
-                  number: '',
-                  timeUnit: this.props.translate('react.dashboard.timeFilter.year.label', 'Year'),
-                },
-              )}
-            </option>
+            {
+              (this.props.timeLimit >= 12 || !this.props.timeLimit) && <option value="12">
+                {this.props.translate(
+                  this.props.label[0],
+                  this.props.label[1],
+                  {
+                    number: '',
+                    timeUnit: this.props.translate('react.dashboard.timeFilter.year.label', 'Year'),
+                  },
+                )}
+              </option>
+            }
             {
               this.props.timeLimit === 24 &&
               <option value="24">

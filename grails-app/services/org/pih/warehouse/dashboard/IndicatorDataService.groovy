@@ -4,11 +4,13 @@ import grails.compiler.GrailsTypeChecked
 import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import grails.plugin.cache.Cacheable
+import grails.util.Holders
 import groovy.transform.TypeCheckingMode
 import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.grails.web.json.JSONObject
 import org.joda.time.LocalDate
 import org.pih.warehouse.LocalizationUtil
+import org.pih.warehouse.api.StockMovementDirection
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.InventorySnapshot
 import org.pih.warehouse.inventory.TransactionCode
@@ -1109,6 +1111,53 @@ class IndicatorDataService {
         // It is moved here because grails-cache parsing it's value to
         // LinkedHashMap instead of IndicatorData, so we can't use toJSON in the controller
         return graphData.toJson()
+    }
+
+    Map getBackdatedShipmentsChart(String locationId, Integer monthsLimit, StockMovementDirection direction) {
+        Map<String, Integer> data = Constants.backdataAxes
+        Date timeLimit = LocalDate.now().minusMonths(monthsLimit).toDate()
+        String transactionProperty = direction == StockMovementDirection.OUTBOUND ? 'outgoing_shipment_id' : 'incoming_shipment_id'
+        String shipmentLocationProperty = direction == StockMovementDirection.OUTBOUND ? 'origin_id' : 'destination_id'
+        String query = """
+            SELECT (
+                CASE 
+                    WHEN DATEDIFF(t.date_created, t.transaction_date) > 7 THEN '7+ days'
+                    ELSE CONCAT(DATEDIFF(t.date_created, t.transaction_date), ' days')
+                END
+            ) as days_backdated, COUNT(t.id) as shipments FROM shipment s
+            INNER JOIN transaction t ON t.${transactionProperty} = s.id
+            WHERE s.${shipmentLocationProperty} = :locationId 
+            AND t.date_created > :timeLimit
+            GROUP BY days_backdated
+            HAVING days_backdated > :daysOffset
+        """
+        List queryData = dataService.executeQuery(query, [
+                locationId: locationId,
+                timeLimit: timeLimit,
+                daysOffset: Holders.config.openboxes.dashboard.backdatedShipments.daysOffset
+        ])
+
+        queryData.each {
+            data[it[0]] = it[1]
+        }
+
+        List<IndicatorDatasets> datasets = [
+                new IndicatorDatasets('Backdated shipments', data*.value.toList())
+        ]
+        IndicatorData indicatorData = new IndicatorData(datasets, data*.key.toList())
+        GraphData graphData = new GraphData(indicatorData)
+
+        return graphData.toJson()
+    }
+
+    @Cacheable(value = "dashboardCache", key = { "getBackdatedOutboundShipments-${locationId}${monthsLimit}" })
+    Map getBackdatedOutboundShipmentsData(String locationId, Integer monthsLimit) {
+        return getBackdatedShipmentsChart(locationId, monthsLimit, StockMovementDirection.OUTBOUND)
+    }
+
+    @Cacheable(value = "dashboardCache", key = { "getBackdatedInboundShipments-${locationId}${monthsLimit}" })
+    Map getBackdatedInboundShipmentsData(String locationId, Integer monthsLimit) {
+        return getBackdatedShipmentsChart(locationId, monthsLimit, StockMovementDirection.INBOUND)
     }
 
     private List fillLabels(int querySize) {
