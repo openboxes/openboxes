@@ -1,5 +1,7 @@
 package org.pih.warehouse.component.api.base
 
+import org.pih.warehouse.component.util.ResponseSpecUtil
+
 /**
  * API wrappers enhance our base API classes, providing shortcuts for utilizing their endpoints in our
  * tests so that the API classes can stay small.
@@ -11,18 +13,13 @@ package org.pih.warehouse.component.api.base
  * Additionally, avoid adding methods to a wrapper that are too specific to any individual test scenario. These classes
  * are meant for helper methods that will be useful generally, across test specs.
  */
-abstract class ApiWrapper <T> {
+abstract class ApiWrapper<T> {
 
-    /**
-     * The API class that we're wrapping.
-     *
-     * Note that we can't autowire a generic field like this because if we add a constructor, it tries to load in
-     * the abstract Api class, which errors. This is fine, it just means we need to leave it to the child class to
-     * provide the autowired constructor.
-     */
     final T api
+    final ResponseSpecUtil responseSpecUtil
 
-    ApiWrapper(T api) {
+    ApiWrapper(T api, ResponseSpecUtil responseSpecUtil) {
         this.api = api
+        this.responseSpecUtil = responseSpecUtil
     }
 }

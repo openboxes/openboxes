@@ -1,21 +1,15 @@
 package org.pih.warehouse.component.api.product
 
+import groovy.transform.InheritConstructors
 import io.restassured.path.json.JsonPath
 import io.restassured.response.Response
 import org.springframework.boot.test.context.TestComponent
 
 import org.pih.warehouse.component.api.base.ApiWrapper
-import org.pih.warehouse.component.util.ResponseSpecUtil
 
 @TestComponent
+@InheritConstructors
 class ProductApiWrapper extends ApiWrapper<ProductApi> {
-
-    final ResponseSpecUtil responseSpecUtil
-
-    ProductApiWrapper(ProductApi api, ResponseSpecUtil responseSpecUtil) {
-        super(api)
-        this.responseSpecUtil = responseSpecUtil
-    }
 
     JsonPath listOK() {
         return api.list(responseSpecUtil.OK_RESPONSE_SPEC).jsonPath()

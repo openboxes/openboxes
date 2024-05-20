@@ -1,23 +1,18 @@
 package org.pih.warehouse.component.api.generic
 
+import groovy.transform.InheritConstructors
 import io.restassured.path.json.JsonPath
 import io.restassured.response.Response
 import org.grails.web.json.JSONObject
 import org.springframework.boot.test.context.TestComponent
 
 import org.pih.warehouse.component.api.base.ApiWrapper
-import org.pih.warehouse.component.util.ResponseSpecUtil
 import org.pih.warehouse.util.generic.GenericResource
 
 @TestComponent
+@InheritConstructors
 class GenericApiWrapper extends ApiWrapper<GenericApi> {
 
-    final ResponseSpecUtil responseSpecUtil
-
-    GenericApiWrapper(GenericApi api, ResponseSpecUtil responseSpecUtil) {
-        super(api)
-        this.responseSpecUtil = responseSpecUtil
-    }
 
     JsonPath listOK(GenericResource resource) {
         return api.list(resource, responseSpecUtil.OK_RESPONSE_SPEC).jsonPath()

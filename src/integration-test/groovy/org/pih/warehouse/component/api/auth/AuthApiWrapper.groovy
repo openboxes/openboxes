@@ -1,22 +1,16 @@
 package org.pih.warehouse.component.api.auth
 
+import groovy.transform.InheritConstructors
 import io.restassured.response.Response
 import org.apache.http.HttpStatus
 import org.grails.web.json.JSONObject
 import org.springframework.boot.test.context.TestComponent
 
 import org.pih.warehouse.component.api.base.ApiWrapper
-import org.pih.warehouse.component.util.ResponseSpecUtil
 
 @TestComponent
+@InheritConstructors
 class AuthApiWrapper extends ApiWrapper<AuthApi> {
-
-    final ResponseSpecUtil responseSpecUtil
-
-    AuthApiWrapper(AuthApi api, ResponseSpecUtil responseSpecUtil) {
-        super(api)
-        this.responseSpecUtil = responseSpecUtil
-    }
 
     /**
      * Expects to successfully authenticate into the app with the provided user.
