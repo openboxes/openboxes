@@ -10,18 +10,15 @@ import static io.restassured.RestAssured.given
 
 /**
  * For issuing Restful API calls to the server from our tests.
+ * Avoid using API classes directly in your tests. If a wrapper class exists for the API, use that instead.
  */
 abstract class Api {
 
     /**
-     * Contains the base specification that should be common to all our API calls.
-     * This saves us from having to define the full spec for each individual API call.
+     * The default request specification to apply to all API calls. If a field is not specified in the
+     * request spec when making an API call, the value in the base spec is used.
      */
-    RequestSpecification defaultRequestSpec
-
-    Api(RequestSpecification defaultRequestSpec) {
-        this.defaultRequestSpec = defaultRequestSpec
-    }
+    abstract RequestSpecification getBaseRequestSpec()
 
     /**
      * Issue a Restful API request to the server using the provided request and response specifications.
@@ -39,8 +36,9 @@ abstract class Api {
     }
 
     private RequestSpecification mergeRequestSpecWithDefault(RequestSpecification requestSpec) {
-        return requestSpec == null ? defaultRequestSpec : new RequestSpecBuilder()
-                .addRequestSpecification(defaultRequestSpec)
+        RequestSpecification baseRequestSpec = getBaseRequestSpec()
+        return requestSpec == null ? baseRequestSpec : new RequestSpecBuilder()
+                .addRequestSpecification(baseRequestSpec)
                 .addRequestSpecification(requestSpec)  // Add the custom spec second so it overrides the default.
                 .build()
     }

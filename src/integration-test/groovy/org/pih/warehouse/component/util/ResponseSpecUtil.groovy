@@ -1,10 +1,13 @@
-package org.pih.warehouse.util.common
+package org.pih.warehouse.component.util
 
 import io.restassured.builder.ResponseSpecBuilder
 import io.restassured.specification.ResponseSpecification
 import org.apache.http.HttpStatus
+import org.springframework.boot.test.context.TestComponent
 
+@TestComponent
 class ResponseSpecUtil {
+
     /**
      * We define some response specs here for the most common response codes for easy re-use.
      */

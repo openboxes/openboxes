@@ -5,9 +5,10 @@ import io.restassured.builder.ResponseSpecBuilder
 import org.apache.http.HttpStatus
 import org.hamcrest.Matchers
 import org.grails.web.json.JSONObject
+import org.springframework.beans.factory.annotation.Autowired
 import spock.lang.Shared
 
-import org.pih.warehouse.component.api.generic.GenercApiWrapper
+import org.pih.warehouse.component.api.generic.GenericApiWrapper
 import org.pih.warehouse.component.api.product.ProductApi
 import org.pih.warehouse.component.base.ApiSpec
 import org.pih.warehouse.product.Category
@@ -20,10 +21,10 @@ import org.pih.warehouse.util.generic.GenericResource
  */
 class ProductApiCRUDSpec extends ApiSpec {
 
-    @Shared
-    GenercApiWrapper genericApiWrapper
+    @Autowired
+    GenericApiWrapper genericApiWrapper
 
-    @Shared
+    @Autowired
     ProductApi productApi
 
     @Shared
@@ -34,11 +35,6 @@ class ProductApiCRUDSpec extends ApiSpec {
 
     @Shared
     Product product
-
-    void setup() {
-        genericApiWrapper = new GenercApiWrapper(baseRequestSpec)
-        productApi = new ProductApi(baseRequestSpec)
-    }
 
     @Transactional
     void setupData() {

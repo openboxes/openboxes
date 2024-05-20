@@ -1,7 +1,9 @@
-package org.pih.warehouse.util.common
+package org.pih.warehouse.component.util
 
 import io.restassured.path.json.JsonPath
+import org.springframework.boot.test.context.TestComponent
 
+@TestComponent
 class JsonPathUtil {
 
     /**

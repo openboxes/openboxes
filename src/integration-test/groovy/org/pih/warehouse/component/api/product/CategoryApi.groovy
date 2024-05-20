@@ -6,10 +6,13 @@ import io.restassured.http.Method
 import io.restassured.response.Response
 import io.restassured.specification.RequestSpecification
 import io.restassured.specification.ResponseSpecification
-import org.pih.warehouse.component.api.base.Api
+import org.springframework.boot.test.context.TestComponent
 
+import org.pih.warehouse.component.api.base.AuthenticatedApi
+
+@TestComponent
 @InheritConstructors
-class CategoryApi extends Api {
+class CategoryApi extends AuthenticatedApi {
 
     Response list(ResponseSpecification responseSpec) {
         return request(null, responseSpec, Method.GET, "/categories")

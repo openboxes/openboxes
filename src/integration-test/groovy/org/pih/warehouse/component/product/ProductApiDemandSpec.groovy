@@ -4,9 +4,9 @@ import grails.gorm.transactions.Transactional
 import io.restassured.builder.ResponseSpecBuilder
 import org.apache.http.HttpStatus
 import org.hamcrest.Matchers
+import org.springframework.beans.factory.annotation.Autowired
 import spock.lang.Shared
 
-import org.pih.warehouse.component.api.generic.GenercApiWrapper
 import org.pih.warehouse.component.api.product.ProductApi
 import org.pih.warehouse.component.base.ApiSpec
 import org.pih.warehouse.product.Product
@@ -16,19 +16,11 @@ import org.pih.warehouse.product.Product
  */
 class ProductApiDemandSpec extends ApiSpec {
 
-    @Shared
-    GenercApiWrapper genericApiWrapper
-
-    @Shared
+    @Autowired
     ProductApi productApi
 
     @Shared
     Product product
-
-    void setup() {
-        genericApiWrapper = new GenercApiWrapper(baseRequestSpec)
-        productApi = new ProductApi(baseRequestSpec)
-    }
 
     @Transactional
     void setupData() {
