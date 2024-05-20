@@ -749,19 +749,19 @@ class StockMovementService {
         }
     }
 
-    def getStockMovementItems(String id, String stepNumber, String max, String offset, Boolean createNewPicklist = true) {
+    def getStockMovementItems(String id, Integer stepNumber, Integer max, Integer offset, Boolean createNewPicklist = true) {
         // FIXME should get stock movement instead of requisition
         Requisition requisition = Requisition.get(id)
         List<StockMovementItem> stockMovementItems = []
 
-        if (stepNumber == '3') {
+        if (stepNumber == 3) {
             return getEditPageItems(requisition, max, offset)
         }
 
         if (requisition) {
             List <RequisitionItem> requisitionItems = []
             if (max != null && offset != null) {
-                requisitionItems = RequisitionItem.createCriteria().list(max: max.toInteger(), offset: offset.toInteger()) {
+                requisitionItems = RequisitionItem.createCriteria().list(max: max, offset: offset) {
                     eq("requisition", requisition)
                     isNull("parentRequisitionItem")
                     order("orderIndex", 'asc')
@@ -786,7 +786,7 @@ class StockMovementService {
             Shipment shipment = Shipment.get(id)
             List <ShipmentItem> shipmentItems = []
             if (max != null && offset != null) {
-                shipmentItems = ShipmentItem.createCriteria().list(max: max.toInteger(), offset: offset.toInteger()) {
+                shipmentItems = ShipmentItem.createCriteria().list(max: max, offset: offset) {
                     eq("shipment", shipment)
                     order("sortOrder", 'asc')
                 }
@@ -807,13 +807,13 @@ class StockMovementService {
         }
 
         switch(stepNumber) {
-            case "2":
+            case 2:
                 return getAddPageItems(requisition, stockMovementItems)
-            case "4":
+            case 4:
                 return getPickPageItems(id, max, offset, createNewPicklist)
-            case "5":
+            case 5:
                 return getPackPageItems(id, max, offset)
-            case "6":
+            case 6:
                 if (requisition && !requisition.origin.isSupplier() && requisition.origin.supports(ActivityCode.MANAGE_INVENTORY)) {
                     return getPackPageItems(id, max, offset)
                 }
@@ -922,15 +922,15 @@ class StockMovementService {
         return editPageItem
     }
 
-    List getEditPageItems(Requisition requisition, String max, String offset) {
+    List getEditPageItems(Requisition requisition, Integer max, Integer offset) {
         def query = offset ?
                 """ select * FROM edit_page_item where requisition_id = :requisition and requisition_item_type = 'ORIGINAL' ORDER BY sort_order limit :offset, :max; """ :
                 """ select * FROM edit_page_item where requisition_id = :requisition and requisition_item_type = 'ORIGINAL' ORDER BY sort_order """
 
         def data = dataService.executeQuery(query, [
                 'requisition': requisition.id,
-                'offset'     : offset ? offset.toInteger() : null,
-                'max'        : max ? max.toInteger() : null,
+                'offset'     : offset,
+                'max'        : max,
         ])
 
         List editPageItems = buildEditPageItems(data)
@@ -1056,7 +1056,7 @@ class StockMovementService {
         return editPageItems
     }
 
-    List<PickPageItem> getPickPageItems(String id, String max, String offset, Boolean createNewPicklistItems = true) {
+    List<PickPageItem> getPickPageItems(String id, Integer max, Integer offset, Boolean createNewPicklistItems = true) {
         List<PickPageItem> pickPageItems = []
 
         StockMovement stockMovement = getStockMovement(id)
@@ -1067,14 +1067,14 @@ class StockMovementService {
         }
 
         if (max != null && offset != null) {
-            return pickPageItems.subList(offset.toInteger(), offset.toInteger() + max.toInteger() > pickPageItems.size() ? pickPageItems.size() : offset.toInteger() + max.toInteger());
+            return pickPageItems.subList(offset, offset + max > pickPageItems.size() ? pickPageItems.size() : offset + max);
         }
 
         return pickPageItems
     }
 
 
-    List<PackPageItem> getPackPageItems(String id, String max, String offset) {
+    List<PackPageItem> getPackPageItems(String id, Integer max, Integer offset) {
         Set<PackPageItem> items = new LinkedHashSet<PackPageItem>()
 
         StockMovement stockMovement = getStockMovement(id)
@@ -1088,7 +1088,7 @@ class StockMovementService {
         List<PackPageItem> packPageItems = new ArrayList<PackPageItem>(items)
 
         if (max != null && offset != null) {
-            return packPageItems.subList(offset.toInteger(), offset.toInteger() + max.toInteger() > packPageItems.size() ? packPageItems.size() : offset.toInteger() + max.toInteger())
+            return packPageItems.subList(offset, offset + max > packPageItems.size() ? packPageItems.size() : offset + max)
         }
 
         return packPageItems
