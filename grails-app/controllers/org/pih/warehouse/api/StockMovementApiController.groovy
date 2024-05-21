@@ -335,33 +335,6 @@ class StockMovementApiController {
         render status: 200
     }
 
-    def importPickListItems(ImportDataCommand command) {
-        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
-        List<PickPageItem> pickPageItems = stockMovementService.getPickPageItems(params.id, null, null, false)
-
-        MultipartFile importFile = command.importFile
-        if (importFile.isEmpty()) {
-            throw new IllegalArgumentException("File cannot be empty")
-        }
-
-        String csv = new String(importFile.bytes)
-        List<Map> importedLines = stockMovementService.parsePickCsvTemplateImport(csv)
-
-        stockMovementService.validatePicklistListImport(importedLines, pickPageItems)
-
-        List errors = importedLines*.errors.withIndex().collect { errors, index ->
-            errors.collect { "Row ${1}: ${it}" }
-        }.flatten()
-
-        stockMovementService.importPicklistTemplate(importedLines, stockMovement, pickPageItems)
-
-        if (!errors.isEmpty()) {
-            render([message: "Data imported with errors", errors: errors] as JSON)
-        }
-
-        render([message: "Data imported successfully"] as JSON)
-    }
-
     def getPendingRequisitionDetails() {
         Location origin = Location.get(params.origin.id)
         Product product = Product.get(params.product.id)
