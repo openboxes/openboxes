@@ -13,7 +13,6 @@ import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import grails.orm.PagedResultList
 import grails.plugins.csv.CSVMapReader
-import grails.util.Holders
 import grails.validation.ValidationException
 import org.apache.commons.lang.math.NumberUtils
 import org.grails.plugins.web.taglib.ApplicationTagLib
@@ -1113,7 +1112,9 @@ class StockMovementService {
         }
     }
 
-    void validatePicklistListImport(List<Map> data, List<PickPageItem> pickPageItems) {
+    void validatePicklistListImport(List<Map> data, List<PickPageItem> pickPageItems, Boolean supportsOverPick = false) {
+        Map<String, List> groupedItems = data.groupBy { it.id }
+
         data?.eachWithIndex { Map params, index ->
             params.errors = new ArrayList()
             if (!params.id) {
@@ -1142,19 +1143,14 @@ class StockMovementService {
                     params.errors.push("There is no item available with: ${params.lot ? "lot ${params.lot}" : ""} ${params.binLocation ? "bin ${params.binLocation}" : ""}")
                 }
             }
-        }
 
-        Boolean isUnderPickAllowed = Holders.config.openboxes.picklist.underpick.enabled
-        Boolean isOverPickAllowed = Holders.config.openboxes.picklist.overpick.enabled
-
-        data.groupBy { it.id }.each { itemId, params ->
-            PickPageItem pickPageItem = pickPageItems.find { it.requisitionItem?.id == itemId }
-            Integer itemQuantitySum = params.sum { Integer.parseInt(it.quantity) }
-            if (!isOverPickAllowed && pickPageItem && itemQuantitySum > pickPageItem.requisitionItem.quantity) {
-                errors.push("Item ${itemId} is overpicked, expected quantity ${pickPageItem.requisitionItem.quantity}, received ${itemsSum}")
-            }
-            if (!isUnderPickAllowed && pickPageItem && itemQuantitySum < pickPageItem.requisitionItem.quantity) {
-                errors.push("Item ${itemId} is underpicked, expected quantity ${pickPageItem.requisitionItem.quantity}, received ${itemsSum}")
+            Integer itemQuantitySum = groupedItems[params.id].sum { Integer.parseInt(it.quantity) }
+            if (pickPageItem && itemQuantitySum > pickPageItem.requisitionItem.quantity) {
+                if (!supportsOverPick) {
+                    params.errors.push("Item ${params.id} is overpicked, expected quantity ${pickPageItem.requisitionItem.quantity}, received ${itemQuantitySum}")
+                }
+            } else if (itemQuantitySum != pickPageItem.requisitionItem.quantity) {
+                params.errors.push("Item ${params.id} expected quantity is ${pickPageItem.requisitionItem.quantity}, received ${itemQuantitySum}")
             }
         }
     }

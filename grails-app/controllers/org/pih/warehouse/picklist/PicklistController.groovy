@@ -13,6 +13,7 @@ import grails.converters.JSON
 import grails.gorm.transactions.Transactional
 import org.pih.warehouse.api.PickPageItem
 import org.pih.warehouse.api.StockMovement
+import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.DocumentService
 import org.pih.warehouse.core.Location
@@ -179,6 +180,8 @@ class PicklistController {
     }
 
     def importPickListItems(ImportDataCommand command) {
+        Location location = Location.get(session.warehouse.id)
+
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
         List<PickPageItem> pickPageItems = stockMovementService.getPickPageItems(params.id, null, null, false)
 
@@ -190,10 +193,11 @@ class PicklistController {
         String csv = new String(importFile.bytes)
         List<Map> importedLines = stockMovementService.parsePickCsvTemplateImport(csv)
 
-        stockMovementService.validatePicklistListImport(importedLines, pickPageItems)
+        Boolean supportsOverPick = location.supports(ActivityCode.PICKLIST_OVER_PICK)
+        stockMovementService.validatePicklistListImport(importedLines, pickPageItems, supportsOverPick)
 
         List errors = importedLines*.errors.withIndex().collect { errors, index ->
-            errors.collect { "Row ${1}: ${it}" }
+            errors.collect { "Row ${index + 1}: ${it}" }
         }.flatten()
 
         stockMovementService.importPicklistTemplate(importedLines, stockMovement, pickPageItems)

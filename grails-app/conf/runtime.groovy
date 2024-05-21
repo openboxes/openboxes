@@ -80,10 +80,6 @@ openboxes.dashboard.backdatedShipments.monthsLimit = 6
 // Merge Products (OBPIH-5453)
 openboxes.products.merge.enabled = false
 
-// Configure under-pick and over-pick (OBPIH-6155)
-openboxes.picklist.underpick.enabled = false
-openboxes.picklist.overpick.enabled = false
-
 openboxes.security.rbac.rules = [
     [controller: '*', actions: ['delete'], accessRules: [ minimumRequiredRole: RoleType.ROLE_SUPERUSER ]],
     [controller: '*', actions: ['remove'], accessRules: [ minimumRequiredRole: RoleType.ROLE_SUPERUSER ]],
