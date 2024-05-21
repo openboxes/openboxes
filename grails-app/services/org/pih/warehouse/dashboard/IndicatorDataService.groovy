@@ -1114,7 +1114,15 @@ class IndicatorDataService {
     }
 
     Map getBackdatedShipmentsChart(String locationId, Integer monthsLimit, StockMovementDirection direction) {
-        Map<String, Integer> data = Constants.backdataAxes
+        Map<String, Integer> data = [
+                (Constants.TWO_DAYS)        : 0,
+                (Constants.THREE_DAYS)      : 0,
+                (Constants.FOUR_DAYS)       : 0,
+                (Constants.FIVE_DAYS)       : 0,
+                (Constants.SIX_DAYS)        : 0,
+                (Constants.SEVEN_DAYS)      : 0,
+                (Constants.SEVEN_MORE_DAYS) : 0,
+        ]
         Date timeLimit = LocalDate.now().minusMonths(monthsLimit).toDate()
         String transactionProperty = direction == StockMovementDirection.OUTBOUND ? 'outgoing_shipment_id' : 'incoming_shipment_id'
         String shipmentLocationProperty = direction == StockMovementDirection.OUTBOUND ? 'origin_id' : 'destination_id'

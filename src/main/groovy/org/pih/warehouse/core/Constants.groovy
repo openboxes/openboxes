@@ -157,14 +157,12 @@ class Constants {
 
     static final String UOM_EACH_ID = "EA"
 
-    // Dashboard indicator axes
-    static final Map<String, Integer> backdataAxes = [
-            '2 days': 0,
-            '3 days': 0,
-            '4 days': 0,
-            '5 days': 0,
-            '6 days': 0,
-            '7 days': 0,
-            '7+ days': 0,
-    ]
+    // Dashboard indicator labels
+    static final String TWO_DAYS = "2 days"
+    static final String THREE_DAYS = "3 days"
+    static final String FOUR_DAYS = "4 days"
+    static final String FIVE_DAYS = "5 days"
+    static final String SIX_DAYS = "6 days"
+    static final String SEVEN_DAYS = "7 days"
+    static final String SEVEN_MORE_DAYS = "7+ days"
 }
