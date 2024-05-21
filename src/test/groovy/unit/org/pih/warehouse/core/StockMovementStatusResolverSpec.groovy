@@ -16,35 +16,16 @@ import util.StockMovementStatusResolver
 @Unroll
 class StockMovementStatusResolverSpec extends Specification {
 
-    void "should return shipment status #expected for inbound stock movement returns"() {
-        given:
-        StockMovementStatusContext context = Stub(StockMovementStatusContext) {
-            isReturn() >> true
-            isInbound() >> true
-            isOutbound() >> false
-            getShipment() >> Stub(Shipment) {
-                getStatus() >> new ShipmentStatus(code: status)
-            }
-        }
-
-        expect:
-        StockMovementStatusResolver.getStatus(context) == expected
-
-        where:
-        status                                  ||  expected
-        ShipmentStatusCode.PENDING              ||  ShipmentStatusCode.PENDING
-        ShipmentStatusCode.SHIPPED              ||  ShipmentStatusCode.SHIPPED
-        ShipmentStatusCode.PARTIALLY_RECEIVED   ||  ShipmentStatusCode.PARTIALLY_RECEIVED
-        ShipmentStatusCode.RECEIVED             ||  ShipmentStatusCode.RECEIVED
-    }
-
-    void "should return requisition status #expected for outbound stock movement returns"() {
+    void "should return requisition status #expected for stock movement returns if shipment is not shipped yet"() {
         given:
         StockMovementStatusContext context = Stub(StockMovementStatusContext) {
             isReturn() >> true
             isInbound() >> false
             isOutbound() >> true
             getOrder() >> new Order(status: orderStatus)
+            getShipment() >> Stub(Shipment) {
+                hasShipped() >> false
+            }
         }
 
         expect:
@@ -56,12 +37,35 @@ class StockMovementStatusResolverSpec extends Specification {
         OrderStatus.PLACED              ||  RequisitionStatus.CHECKING
         OrderStatus.APPROVED            ||  RequisitionStatus.PICKING
         OrderStatus.CANCELED            ||  RequisitionStatus.CANCELED
-        OrderStatus.PARTIALLY_RECEIVED  ||  RequisitionStatus.ISSUED
-        OrderStatus.RECEIVED            ||  RequisitionStatus.ISSUED
-        OrderStatus.COMPLETED           ||  RequisitionStatus.ISSUED
         OrderStatus.REJECTED            ||  RequisitionStatus.CANCELED
 
     }
+
+    void "should return shipment status #expected for stock movement returns if shipment is shipped"() {
+        given:
+        StockMovementStatusContext context = Stub(StockMovementStatusContext) {
+            isReturn() >> true
+            isInbound() >> false
+            isOutbound() >> true
+            getOrder() >> new Order(status: orderStatus)
+            getShipment() >> Stub(Shipment) {
+                getStatus() >> new ShipmentStatus(code: shipmentStatus)
+                hasShipped() >> true
+            }
+        }
+
+        expect:
+        StockMovementStatusResolver.getStatus(context) == expected
+
+        where:
+        orderStatus                     ||  shipmentStatus                          || expected
+        OrderStatus.PARTIALLY_RECEIVED  ||  ShipmentStatusCode.PARTIALLY_RECEIVED   || ShipmentStatusCode.PARTIALLY_RECEIVED
+        OrderStatus.RECEIVED            ||  ShipmentStatusCode.RECEIVED             || ShipmentStatusCode.RECEIVED
+        OrderStatus.COMPLETED           ||  ShipmentStatusCode.SHIPPED              || ShipmentStatusCode.SHIPPED
+
+    }
+
+
 
     void "should return shipment status #expected for stock movements from purchase order"() {
         given:
