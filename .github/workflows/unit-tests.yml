@@ -2,9 +2,9 @@ name: Unit tests
 
 on:
   pull_request:
-    branches: [ 'feature/upgrade-to-grails-3.3.10', '0.9.x', 'release/**' ]
+    branches: [ 'feature/upgrade-to-grails-3.3.10', '0.9.x', 'release/**', 'develop' ]
   push:
-    branches: [ 'feature/upgrade-to-grails-3.3.10', '0.9.x', 'release/**' ]
+    branches: [ 'feature/upgrade-to-grails-3.3.10', '0.9.x', 'release/**', 'develop' ]
 
 jobs:
   build:
