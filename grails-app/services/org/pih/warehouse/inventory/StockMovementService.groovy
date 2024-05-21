@@ -1451,6 +1451,7 @@ class StockMovementService {
         if (!picklist) {
             picklist = new Picklist()
             picklist.requisition = requisition
+            requisition.picklist = picklist
         }
         pickPageItems.each { pickPageItem ->
             pickPageItem.picklistItems?.toArray()?.each { PicklistItem picklistItem ->

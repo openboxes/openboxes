@@ -12,7 +12,6 @@ class StockMovementItemsRequestCommand extends PaginationCommand implements Vali
     Boolean createNew = true
 
     static constraints = {
-        id nullable: false
         stepNumber nullable: true
         createNew nullable: true
     }

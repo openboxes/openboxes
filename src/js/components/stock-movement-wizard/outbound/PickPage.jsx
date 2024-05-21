@@ -13,10 +13,7 @@ import Alert from 'react-s-alert';
 import { fetchReasonCodes, hideSpinner, showSpinner } from 'actions';
 import picklistApi from 'api/services/PicklistApi';
 import {
-  PICKLIST_IMPORT,
-  PICKLIST_ITEMS_EXPORT,
-  PICKLIST_TEMPLATE_EXPORT,
-  STOCK_MOVEMENT_ITEMS
+  STOCK_MOVEMENT_ITEMS,
 } from 'api/urls';
 import ArrayField from 'components/form-elements/ArrayField';
 import ButtonField from 'components/form-elements/ButtonField';
@@ -32,7 +29,6 @@ import {
   handleValidationErrors,
   parseResponse,
 } from 'utils/apiClient';
-import exportFileFromAPI from 'utils/file-download-util';
 import { renderFormField } from 'utils/form-utils';
 import { formatProductDisplayName, matchesProductCodeOrName } from 'utils/form-values-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
@@ -629,22 +625,18 @@ class PickPage extends Component {
     this.props.showSpinner();
     const { movementNumber, stockMovementId } = formValues;
 
-    exportFileFromAPI({
-      url: PICKLIST_TEMPLATE_EXPORT(stockMovementId),
-      filename: `PickListItems${movementNumber ? `-${movementNumber}` : ''}-template`,
-      format: 'csv',
-    }).finally(() => this.props.hideSpinner());
+    const fileName = `PickListItems${movementNumber ? `-${movementNumber}` : ''}-template`;
+    picklistApi.exportPicklistTemplate(stockMovementId, { fileName })
+      .finally(() => this.props.hideSpinner());
   }
 
   exportPick(formValues) {
     this.props.showSpinner();
     const { movementNumber, stockMovementId } = formValues;
 
-    exportFileFromAPI({
-      url: PICKLIST_ITEMS_EXPORT(stockMovementId),
-      filename: `PickListItems${movementNumber ? `-${movementNumber}` : ''}`,
-      format: 'csv',
-    }).finally(() => this.props.hideSpinner());
+    const fileName = `PickListItems${movementNumber ? `-${movementNumber}` : ''}`;
+    picklistApi.exportPicklistItems(stockMovementId, { fileName })
+      .finally(() => this.props.hideSpinner());
   }
 
   importTemplate(event) {
@@ -652,18 +644,10 @@ class PickPage extends Component {
     if (this.state.showAlert) {
       this.setState({ alertMessage: null, showAlert: false });
     }
-    const formData = new FormData();
     const file = event.target.files[0];
     const { stockMovementId } = this.state.values;
 
-    formData.append('importFile', file.slice(0, file.size, 'text/csv'));
-    const config = {
-      headers: {
-        'content-type': 'multipart/form-data',
-      },
-    };
-
-    return apiClient.post(PICKLIST_IMPORT(stockMovementId), formData, config)
+    return picklistApi.importPicklist(stockMovementId, file)
       .then((resp) => {
         const { errors } = resp.data;
         if (errors) {
@@ -720,7 +704,14 @@ class PickPage extends Component {
     this.props.showSpinner();
     try {
       await picklistApi.clearPicklist(picklist?.id);
-      this.fetchItemsAfterImport();
+      const picklistItems = this.state.values.pickPageItems;
+      this.setState((prevState) => ({
+        values: ({
+          ...prevState.values,
+          pickPageItems: picklistItems
+            .map((item) => ({ ...item, picklistItems: [], quantityPicked: 0 })),
+        }),
+      }));
     } finally {
       this.props.hideSpinner();
     }
