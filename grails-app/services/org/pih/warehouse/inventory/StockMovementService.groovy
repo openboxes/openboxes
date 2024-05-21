@@ -1107,6 +1107,7 @@ class StockMovementService {
         return receiptItems
     }
 
+    // It expects to receive a stock movement id
     void clearPicklist(String id) {
         StockMovement stockMovement = getStockMovement(id)
         clearPicklist(stockMovement)
@@ -1298,6 +1299,7 @@ class StockMovementService {
         if (!picklist) {
             picklist = new Picklist()
             picklist.requisition = requisition
+            requisition.picklist = picklist
         }
 
         // If one does not exist create it and add it to the list

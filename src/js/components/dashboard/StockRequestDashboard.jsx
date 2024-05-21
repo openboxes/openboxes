@@ -39,7 +39,7 @@ const COLUMNS = [
       return (
         <span className="d-flex align-items-center">
           <span className="d-inline-block text-overflow-ellipsis">
-            {row.original.displayStatus}
+            {row.original.displayStatus?.label}
           </span>
           {comment && (
             <Tooltip

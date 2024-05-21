@@ -22,6 +22,8 @@ export const STOCK_MOVEMENT_ITEMS = id => `${STOCK_MOVEMENT_BY_ID(id)}/stockMove
 export const STOCK_MOVEMENT_UPDATE_ITEMS = id => `${STOCK_MOVEMENT_BY_ID(id)}/updateItems`;
 export const STOCK_MOVEMENT_REMOVE_ALL_ITEMS = id => `${STOCK_MOVEMENT_BY_ID(id)}/removeAllItems`;
 export const STOCK_MOVEMENT_STATUS = id => `${STOCK_MOVEMENT_BY_ID(id)}/status`;
+export const PICKLIST_ITEMS_EXPORT = id => `${STOCK_MOVEMENT_API}/exportPickListItems/${id}`;
+export const PICKLIST_TEMPLATE_EXPORT = id => `${STOCK_MOVEMENT_API}/picklistTemplate/${id}`;
 
 // STOCK MOVEMENT ITEMS
 export const STOCK_MOVEMENT_ITEM_API = `${API}/stockMovementItems`;
@@ -137,3 +139,6 @@ export const PRODUCT_SUPPLIER_PREFERENCE_BATCH = `${PRODUCT_SUPPLIER_PREFERENCE_
 // PRODUCT SUPPLIER ATTRIBUTE
 export const PRODUCT_SUPPLIER_ATTRIBUTE_API = `${API}/productSupplierAttributes`;
 export const PRODUCT_SUPPLIER_ATTRIBUTE_BATCH = `${PRODUCT_SUPPLIER_ATTRIBUTE_API}/batch`;
+
+export const PICKLIST_API = `${API}/picklists`;
+export const PICKLIST_CLEAR = id => `${PICKLIST_API}/${id}/items`;

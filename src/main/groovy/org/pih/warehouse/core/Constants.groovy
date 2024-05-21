@@ -156,4 +156,13 @@ class Constants {
     static final String ADJUSTMENT = "Adjustment"
 
     static final String UOM_EACH_ID = "EA"
+
+    // Dashboard indicator labels
+    static final String TWO_DAYS = "2 days"
+    static final String THREE_DAYS = "3 days"
+    static final String FOUR_DAYS = "4 days"
+    static final String FIVE_DAYS = "5 days"
+    static final String SIX_DAYS = "6 days"
+    static final String SEVEN_DAYS = "7 days"
+    static final String SEVEN_MORE_DAYS = "7+ days"
 }

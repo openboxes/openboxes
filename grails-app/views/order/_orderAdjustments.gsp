@@ -21,7 +21,12 @@
                 <g:set var="isAdjustmentCanceled" value="${orderAdjustment.canceled}"/>
                 <tr class="${status % 2 == 0 ? 'odd' : 'even'}" style="${isAdjustmentCanceled ? 'background-color: #ffcccb;' : ''}">
                     <td>
-                        ${orderAdjustment?.orderItem?.product?:g.message(code:'default.all.label')}
+                        <g:if test="${orderAdjustment?.orderItem?.product}">
+                            <format:displayName product="${orderAdjustment?.orderItem?.product}" showTooltip="${true}" />
+                        </g:if>
+                        <g:else>
+                            <g:message code="default.all.label" default="All" />
+                        </g:else>
                     </td>
                     <td>
                         ${orderAdjustment?.orderAdjustmentType?.name}

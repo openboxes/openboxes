@@ -10,4 +10,6 @@
     <include file="0.9.x/changelog-2024-01-10-1100-add-missing-foreign-keys-for-product-price.xml" />
     <include file="0.9.x/changelog-2024-02-22-1300-add-default-product-package-to-product-supplier.xml" />
     <include file="0.9.x/changelog-2024-02-27-1630-add-tiered-pricing-to-product-supplier.groovy" />
+    <include file="0.9.x/changelog-2024-04-29-1200-alter-table-picklist-item-add-quantity-picked.groovy" />
+    <include file="0.9.x/changelog-2024-05-08-1110-rename-picker-to-pickedBy-column.groovy" />
 </databaseChangeLog>

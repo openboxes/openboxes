@@ -15,7 +15,8 @@ import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.requisition.RequisitionType
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentStatusCode
-import util.StockMovementStatusHelper
+import org.pih.warehouse.api.StockMovementStatusContext
+import util.StockMovementStatusResolver
 
 class OutboundStockMovementListItem implements Serializable, Validateable {
 
@@ -45,6 +46,8 @@ class OutboundStockMovementListItem implements Serializable, Validateable {
     RequisitionSourceType sourceType // temporary sourceType field for ELECTRONIC and PAPER types
 
     StockMovementType stockMovementType
+
+    @Deprecated
     StockMovementStatusCode statusCode
 
     Requisition requisition
@@ -102,17 +105,17 @@ class OutboundStockMovementListItem implements Serializable, Validateable {
         statusSortOrder(nullable: true)
     }
 
-    def getDisplayStatus() {
-        StockMovementStatusHelper statusHelper = new StockMovementStatusHelper(
+    @Deprecated
+    Map<String, String> getDisplayStatus() {
+        StockMovementStatusContext stockMovementContext = new StockMovementStatusContext(
                 order: order,
+                requisition: requisition,
                 shipment: shipment,
-                destination: destination,
                 origin: origin,
-                stockMovementType: stockMovementType,
-                defaultStatus: status,
+                destination: destination
         )
-
-        return statusHelper.getDisplayStatus()
+        Enum status = StockMovementStatusResolver.getListStatus(stockMovementContext)
+        return StockMovementStatusResolver.getStatusMetaData(status)
     }
 
     Map toJson() {
@@ -121,8 +124,8 @@ class OutboundStockMovementListItem implements Serializable, Validateable {
                 name                : name,
                 description         : description,
                 statusCode          : statusCode?.toString(),
+                displayStatus       : displayStatus,
                 statusVariant       : status?.variant?.name,
-                statusLabel         : RequisitionStatus.mapToOption(displayStatus)?.label,
                 status              : status.toString(),
                 currentStatus       : shipment?.currentStatus?.toString(),
                 identifier          : identifier,
