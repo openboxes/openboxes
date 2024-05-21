@@ -1,0 +1,68 @@
+name: Build and Publish Release
+
+on:
+
+  # We want releases to be triggered automatically whenever we push a new tag that starts with vX.Y.Z
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+**'
+
+  # And let us trigger this manually if we ever need to.
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: The tag associated with the release
+        required: true
+        default: v0.0.0
+
+env:
+  JAVA_VERSION: 8
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  TAG_NAME: ${{ (contains(github.ref, 'tag') && github.ref_name) || github.event.inputs.tag }}
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write  # Needed for publishing the release
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{env.JAVA_VERSION}}
+          distribution: zulu
+
+      - name: Cache gradle
+        uses: actions/cache@v4
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      # TODO: Remove the "-unit" once we use test containers in our integration tests.
+      - name: Run all tests
+        run: ./grailsw test-app -unit --no-daemon
+
+      - name: Build WAR file
+        run: ./grailsw war --info --no-daemon --plain-output
+
+      # Takes the artifacts generated from the build and creates a release. Releases only contain the most
+      # recently uploaded artifacts for that version, so old artifacts of the same version will be removed.
+      # This avoids confusion about which artifacts should be used when deploying any given version.
+      - uses: ncipollo/release-action@v1
+        with:
+          name: Release ${{env.TAG_NAME}}
+          tag: ${{env.TAG_NAME}}
+          artifacts: ./build/libs/openboxes.war
+          artifactContentType: application/java-archive
+          artifactErrorsFailBuild: true
+          bodyFile: ./.github/release-notes-template.md
+          replacesArtifacts: true
+          allowUpdates: true
+          generateReleaseNotes: true  # Adds the "Full Changelog" line at the end of the release notes.
