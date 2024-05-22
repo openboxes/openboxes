@@ -19,6 +19,7 @@ import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.grails.web.json.JSONObject
 import org.hibernate.ObjectNotFoundException
 import org.hibernate.sql.JoinType
+import org.pih.warehouse.OutboundWorkflowState
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.api.AvailableItemStatus
 import org.pih.warehouse.api.DocumentGroupCode
@@ -753,7 +754,7 @@ class StockMovementService {
         Requisition requisition = Requisition.get(id)
         List<StockMovementItem> stockMovementItems = []
 
-        if (stepNumber == 3) {
+        if (OutboundWorkflowState.fromStepNumber(stepNumber) == OutboundWorkflowState.REVISE_ITEMS) {
             return getEditPageItems(requisition, max, offset)
         }
 
@@ -805,14 +806,14 @@ class StockMovementService {
             }
         }
 
-        switch(stepNumber) {
-            case 2:
+        switch(OutboundWorkflowState.fromStepNumber(stepNumber)) {
+            case OutboundWorkflowState.ADD_ITEMS:
                 return getAddPageItems(requisition, stockMovementItems)
-            case 4:
+            case OutboundWorkflowState.PICK_ITEMS:
                 return getPickPageItems(id, max, offset, createNewPicklist)
-            case 5:
+            case OutboundWorkflowState.PACK_ITEMS:
                 return getPackPageItems(id, max, offset)
-            case 6:
+            case OutboundWorkflowState.SEND_SHIPMENT:
                 if (requisition && !requisition.origin.isSupplier() && requisition.origin.supports(ActivityCode.MANAGE_INVENTORY)) {
                     return getPackPageItems(id, max, offset)
                 }

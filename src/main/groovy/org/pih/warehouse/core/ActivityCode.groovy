@@ -67,7 +67,7 @@ enum ActivityCode {
 
     AUTOSAVE('AUTOSAVE'),
 
-    PICKLIST_OVER_PICK('PICKLIST_OVER_PICK'),
+    ALLOW_OVERPICK('ALLOW_OVERPICK'),
 
     NONE('NONE')
 
@@ -104,7 +104,7 @@ enum ActivityCode {
                 SUBMIT_REQUEST,
                 DYNAMIC_CREATION,
                 AUTOSAVE,
-                PICKLIST_OVER_PICK,
+                ALLOW_OVERPICK,
                 NONE,
         ]
     }
