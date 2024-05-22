@@ -1113,10 +1113,10 @@ class StockMovementService {
         }
     }
 
-    void validatePicklistListImport(List<Map> data, List<PickPageItem> pickPageItems, Boolean supportsOverPick = false) {
-        Map<String, List> groupedItems = data.groupBy { it.id }
+    void validatePicklistListImport(List<PickPageItem> pickPageItems, Boolean supportsOverPick, List<Map> picklistItems) {
+        Map<String, List> groupedItems = picklistItems.groupBy { it.id }
 
-        data?.eachWithIndex { Map params, index ->
+        picklistItems?.eachWithIndex { Map params, index ->
             params.errors = new ArrayList()
             if (!params.id) {
                 params.errors.push("Requisition item id is required")
@@ -1134,11 +1134,7 @@ class StockMovementService {
                 params.errors.push("Requisition item id: ${params.id} not found")
             }
             if (pickPageItem) {
-                AvailableItem availableItem = pickPageItem.availableItems?.find { item ->
-                    Boolean binLocationMatches = params.binLocation ? item.binLocation?.name == params.binLocation : !item.binLocation
-                    Boolean lotMatches = params.lot == item.inventoryItem?.lotNumber
-                    binLocationMatches && lotMatches
-                }
+                AvailableItem availableItem = pickPageItem.getAvailableItem(params.binLocation, params.lot)
 
                 if (!availableItem) {
                     params.errors.push("There is no item available with: ${params.lot ? "lot ${params.lot}" : ""} ${params.binLocation ? "bin ${params.binLocation}" : ""}")
@@ -1156,8 +1152,8 @@ class StockMovementService {
         }
     }
 
-    void importPicklistTemplate(List<Map> data, StockMovement stockMovement, List<PickPageItem> pickPageItems) {
-        data.each { params ->
+    void importPicklistItems(StockMovement stockMovement, List<PickPageItem> pickPageItems, List<Map> picklistItems) {
+        picklistItems.each { params ->
             // skip rows with errors
             if (params.errors) {
                 return
@@ -1167,11 +1163,7 @@ class StockMovementService {
                 it.requisitionItem?.id == params.id
             }
 
-            AvailableItem availableItem = pickPageItem.availableItems?.find { item ->
-                Boolean binLocationMatches = params.binLocation ? item.binLocation?.name == params.binLocation : !item.binLocation
-                Boolean lotMatches = params.lot == item.inventoryItem?.lotNumber
-                binLocationMatches && lotMatches
-            }
+            AvailableItem availableItem = pickPageItem.getAvailableItem(params.binLocation, params.lot)
 
             RequisitionItem requisitionItem = pickPageItem.requisitionItem?.modificationItem ?: pickPageItem.requisitionItem
 

@@ -180,7 +180,7 @@ class PicklistController {
     def importPickListItems(ImportDataCommand command) {
         Location location = command.location ?: Location.get(session.warehouse.id)
 
-        StockMovement stockMovement = stockMovementService.getStockMovement(params.id, 3)
+        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
         List<PickPageItem> pickPageItems = stockMovementService.getPickPageItems(params.id, null, null, false)
 
         MultipartFile importFile = command.importFile
@@ -192,13 +192,13 @@ class PicklistController {
         List<Map> importedLines = stockMovementService.parsePickCsvTemplateImport(csv)
 
         Boolean supportsOverPick = location.supports(ActivityCode.ALLOW_OVERPICK)
-        stockMovementService.validatePicklistListImport(importedLines, pickPageItems, supportsOverPick)
+        stockMovementService.validatePicklistListImport(pickPageItems, supportsOverPick, importedLines)
 
         List errors = importedLines*.errors.withIndex().collect { errors, index ->
             errors.collect { "Row ${index + 1}: ${it}" }
         }.flatten()
 
-        stockMovementService.importPicklistTemplate(importedLines, stockMovement, pickPageItems)
+        stockMovementService.importPicklistItems(stockMovement, pickPageItems, importedLines)
 
         if (!errors.isEmpty()) {
             render([message: "Data imported with errors", errors: errors] as JSON)
