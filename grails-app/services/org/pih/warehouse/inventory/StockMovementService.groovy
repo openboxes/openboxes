@@ -1094,7 +1094,7 @@ class StockMovementService {
         return packPageItems
     }
 
-    List<Map> parsePickCsvTemplateImport(String text) {
+    List<ImportPickCommand> parsePickCsvTemplateImport(String text) {
         try {
             def csvMapReader = new CSVMapReader(new StringReader(text), [skipLines: 1])
             csvMapReader.fieldKeys = [
@@ -1106,48 +1106,64 @@ class StockMovementService {
                     'binLocation',
                     'quantity',
             ]
-            return csvMapReader.toList()
+            List<Map> dataList = csvMapReader.toList()
+            return dataList*.asType(ImportPickCommand)
 
         } catch (Exception e) {
             throw new RuntimeException("Error parsing order item CSV: " + e.message, e)
         }
     }
 
-    void validatePicklistListImport(List<PickPageItem> pickPageItems, Boolean supportsOverPick, List<Map> picklistItems) {
+    void validatePicklistListImport(List<PickPageItem> pickPageItems, Boolean supportsOverPick, List<ImportPickCommand> picklistItems) {
         Map<String, List> groupedItems = picklistItems.groupBy { it.id }
 
-        picklistItems?.eachWithIndex { Map params, index ->
-            params.errors = new ArrayList()
-            if (!params.id) {
-                params.errors.push("Requisition item id is required")
+        picklistItems?.each { ImportPickCommand data ->
+            data.validate()
+            // skip validation if id is empty since mos tof the validation relies on an exisitng requisition id
+            if (!data.id) {
+                return
             }
-            if (params.quantity == null) {
-                params.errors.push("Quantity picked are required")
-            }
-            if (params.lot?.contains("E") && NumberUtils.isNumber(params.lot)) {
-                params.errors.push("Lot numbers must not be specified in scientific notation. " +
-                        "Please reformat field with Lot Number: \"${params.lot}\" to a number format")
-            }
-
-            PickPageItem pickPageItem = pickPageItems.find { it.requisitionItem?.id == params.id }
+            PickPageItem pickPageItem = pickPageItems.find { it.requisitionItem?.id == data.id }
             if (!pickPageItem) {
-                params.errors.push("Requisition item id: ${params.id} not found")
+                data.errors.rejectValue(
+                        "id",
+                        "importPickCommand.requisitionItem.notFound.error",
+                        [data.id] as Object[],
+                        "Requisition item id: ${data.id} not found"
+                )
             }
             if (pickPageItem) {
-                AvailableItem availableItem = pickPageItem.getAvailableItem(params.binLocation, params.lot)
+                AvailableItem availableItem = pickPageItem.getAvailableItem(data.binLocation, data.lot)
 
                 if (!availableItem) {
-                    params.errors.push("There is no item available with: ${params.lot ? "lot ${params.lot}" : ""} ${params.binLocation ? "bin ${params.binLocation}" : ""}")
+                    String lotNumberErrorMessage = data.lot ?: "empty"
+                    String binLocationErrorMessage = data.binLocation ?: "empty"
+                    data.errors.rejectValue(
+                            "id",
+                            "importPickCommand.availableItem.notFound.error",
+                            [lotNumberErrorMessage, binLocationErrorMessage] as Object[],
+                            "There is no item available with: lot \"${lotNumberErrorMessage}\" and bin location \"${binLocationErrorMessage}\""
+                    )
                 }
-            }
 
-            Integer itemQuantitySum = groupedItems[params.id].sum { Integer.parseInt(it.quantity) }
-            if (pickPageItem && itemQuantitySum > pickPageItem.requisitionItem.quantity) {
-                if (!supportsOverPick) {
-                    params.errors.push("Item ${params.id} is overpicked, expected quantity ${pickPageItem.requisitionItem.quantity}, received ${itemQuantitySum}")
+                Integer itemQuantitySum = groupedItems[data.id].sum { Integer.parseInt(it.quantity) }
+                if (itemQuantitySum > pickPageItem.requisitionItem.quantity) {
+                    if (!supportsOverPick) {
+                        data.errors.rejectValue(
+                                "quantity",
+                                "importPickCommand.quantity.overpick.error",
+                                [pickPageItem.requisitionItem.quantity] as Object[],
+                                "Item is overpicked, expected quantity to not exceed ${pickPageItem.requisitionItem.quantity}"
+                        )
+                    }
+                } else if (itemQuantitySum != pickPageItem.requisitionItem.quantity) {
+                    data.errors.rejectValue(
+                            "quantity",
+                            "importPickCommand.quantity.error",
+                            [pickPageItem.requisitionItem.quantity] as Object[],
+                            "Item expected quantity to equal ${pickPageItem.requisitionItem.quantity}"
+                    )
                 }
-            } else if (itemQuantitySum != pickPageItem.requisitionItem.quantity) {
-                params.errors.push("Item ${params.id} expected quantity is ${pickPageItem.requisitionItem.quantity}, received ${itemQuantitySum}")
             }
         }
     }
@@ -1155,7 +1171,7 @@ class StockMovementService {
     void importPicklistItems(StockMovement stockMovement, List<PickPageItem> pickPageItems, List<Map> picklistItems) {
         picklistItems.each { params ->
             // skip rows with errors
-            if (params.errors) {
+            if (params.hasErrors) {
                 return
             }
 

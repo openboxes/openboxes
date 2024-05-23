@@ -18,6 +18,7 @@ import org.pih.warehouse.core.DocumentService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.data.DataService
 import org.pih.warehouse.importer.ImportDataCommand
+import org.pih.warehouse.inventory.ImportPickCommand
 import org.pih.warehouse.inventory.StockMovementService
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.requisition.Requisition
@@ -189,14 +190,21 @@ class PicklistController {
         }
 
         String csv = new String(importFile.bytes)
-        List<Map> importedLines = stockMovementService.parsePickCsvTemplateImport(csv)
+        List<ImportPickCommand> importedLines = stockMovementService.parsePickCsvTemplateImport(csv)
 
         Boolean supportsOverPick = location.supports(ActivityCode.ALLOW_OVERPICK)
         stockMovementService.validatePicklistListImport(pickPageItems, supportsOverPick, importedLines)
 
-        List errors = importedLines*.errors.withIndex().collect { errors, index ->
-            errors.collect { "Row ${index + 1}: ${it}" }
-        }.flatten()
+
+        List<String> errors = []
+        importedLines.eachWithIndex { importPickCommand, index ->
+            if (importPickCommand.hasErrors()) {
+                List<String> localizedErrors = importPickCommand.errors.allErrors.collect { g.message(error: it) }
+                if (!localizedErrors.isEmpty()) {
+                    errors.addAll(localizedErrors.collect { "Row ${index + 1}: ${it}" })
+                }
+            }
+        }
 
         stockMovementService.importPicklistItems(stockMovement, pickPageItems, importedLines)
 
