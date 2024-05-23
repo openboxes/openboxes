@@ -378,7 +378,7 @@ class PickPage extends Component {
 
   fetchItemsAfterImport() {
     apiClient.get(STOCK_MOVEMENT_ITEMS(this.state.values.stockMovementId), {
-      params: { stepNumber: 4, createNew: false },
+      params: { stepNumber: 4, refresh: false },
     }).then((response) => {
       const { data } = response.data;
       this.setState({

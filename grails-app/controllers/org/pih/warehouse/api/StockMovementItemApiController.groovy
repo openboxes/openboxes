@@ -30,18 +30,24 @@ class StockMovementItemApiController {
         render([data: stockMovement.lineItems] as JSON)
     }
 
-    def read() {
-        def stockMovementItem = stockMovementService.getStockMovementItem(params.id, params.stepNumber)
+    def read(StockMovementItemsRequestCommand command) {
+        def stockMovementItem = stockMovementService.getStockMovementItem(
+                command.id, command.stepNumber, false, command.refresh
+        )
         render([data: stockMovementItem] as JSON)
     }
 
-    def details() {
-        def stockMovementItem = stockMovementService.getStockMovementItem(params.id, params.stepNumber, true)
+    def details(StockMovementItemsRequestCommand command) {
+        def stockMovementItem = stockMovementService.getStockMovementItem(
+                command.id, command.stepNumber, true, command.refresh
+        )
         render([data: stockMovementItem] as JSON)
     }
 
     def getStockMovementItems(StockMovementItemsRequestCommand command) {
-        List<StockMovementItem> stockMovementItems = stockMovementService.getStockMovementItems(command.id, command.stepNumber, command.max, command.offset)
+        List<StockMovementItem> stockMovementItems = stockMovementService.getStockMovementItems(
+                command.id, command.stepNumber, command.max, command.offset, command.refresh
+        )
         render([data: stockMovementItems] as JSON)
     }
 
