@@ -27,7 +27,8 @@ export const PICKLIST_TEMPLATE_EXPORT = id => `${STOCK_MOVEMENT_API}/picklistTem
 export const PICKLIST_IMPORT = id => `${STOCK_MOVEMENT_API}/importPickListItems/${id}`;
 // STOCK MOVEMENT ITEMS
 export const STOCK_MOVEMENT_ITEM_API = `${API}/stockMovementItems`;
-export const STOCK_MOVEMENT_ITEM_REMOVE = id => `${STOCK_MOVEMENT_ITEM_API}/${id}/removeItem`;
+export const STOCK_MOVEMENT_ITEM_BY_ID = id => `${STOCK_MOVEMENT_ITEM_API}/${id}`;
+export const STOCK_MOVEMENT_ITEM_REMOVE = id => `${STOCK_MOVEMENT_ITEM_BY_ID(id)}/removeItem`;
 
 // STOCK TRANSFER
 export const STOCK_TRANSFER_API = `${API}/stockTransfers`;

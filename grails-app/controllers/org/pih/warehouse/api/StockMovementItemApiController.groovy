@@ -14,7 +14,8 @@ import grails.gorm.transactions.Transactional
 import org.grails.web.json.JSONObject
 import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.core.StockMovementItemsRequestCommand
+import org.pih.warehouse.core.StockMovementItemParamsCommand
+import org.pih.warehouse.core.StockMovementItemsParamsCommand
 import org.pih.warehouse.requisition.RequisitionItem
 
 @Transactional
@@ -30,24 +31,23 @@ class StockMovementItemApiController {
         render([data: stockMovement.lineItems] as JSON)
     }
 
-    def read(StockMovementItemsRequestCommand command) {
-        def stockMovementItem = stockMovementService.getStockMovementItem(
-                command.id, command.stepNumber, false, command.refresh
-        )
+    def read(StockMovementItemParamsCommand command) {
+        def stockMovementItem = stockMovementService.getStockMovementItem(command)
         render([data: stockMovementItem] as JSON)
     }
 
-    def details(StockMovementItemsRequestCommand command) {
-        def stockMovementItem = stockMovementService.getStockMovementItem(
-                command.id, command.stepNumber, true, command.refresh
-        )
+    /**
+     * @deprecated As of release 9.2, replaced by {@link #read()} with showDetails query parameter
+     */
+    @Deprecated
+    def details(StockMovementItemParamsCommand command) {
+        command.showDetails = true
+        def stockMovementItem = stockMovementService.getStockMovementItem(command)
         render([data: stockMovementItem] as JSON)
     }
 
-    def getStockMovementItems(StockMovementItemsRequestCommand command) {
-        List<StockMovementItem> stockMovementItems = stockMovementService.getStockMovementItems(
-                command.id, command.stepNumber, command.max, command.offset, command.refresh
-        )
+    def getStockMovementItems(StockMovementItemsParamsCommand command) {
+        List<StockMovementItem> stockMovementItems = stockMovementService.getStockMovementItems(command)
         render([data: stockMovementItems] as JSON)
     }
 

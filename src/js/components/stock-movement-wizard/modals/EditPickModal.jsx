@@ -7,6 +7,7 @@ import { connect } from 'react-redux';
 import { Tooltip } from 'react-tippy';
 
 import { hideSpinner, showSpinner } from 'actions';
+import { STOCK_MOVEMENT_ITEM_BY_ID } from 'api/urls';
 import ArrayField from 'components/form-elements/ArrayField';
 import LabelField from 'components/form-elements/LabelField';
 import ModalWrapper from 'components/form-elements/ModalWrapper';
@@ -245,52 +246,51 @@ class EditPickModal extends Component {
   }
 
   fetchPickPageItem() {
-    const itemsUrl = `/api/stockMovementItems/${this.state.attr.itemId}/details?stepNumber=4`;
+    apiClient.get(STOCK_MOVEMENT_ITEM_BY_ID(this.state.attr.itemId), {
+      params: { stepNumber: 4, showDetails: true },
+    }).then((resp) => {
+      const pickPageItem = resp.data.data;
 
-    apiClient.get(itemsUrl)
-      .then((resp) => {
-        const pickPageItem = resp.data.data;
+      const availableItems = _.map(pickPageItem.availableItems, (avItem) => {
+        // check if this picklist item already exists
+        const picklistItem = _.find(pickPageItem.picklistItems, item => item['inventoryItem.id'] === avItem['inventoryItem.id'] && item['binLocation.id'] === avItem['binLocation.id']);
 
-        const availableItems = _.map(pickPageItem.availableItems, (avItem) => {
-          // check if this picklist item already exists
-          const picklistItem = _.find(pickPageItem.picklistItems, item => item['inventoryItem.id'] === avItem['inventoryItem.id'] && item['binLocation.id'] === avItem['binLocation.id']);
-
-          if (picklistItem) {
-            return {
-              ...avItem,
-              id: picklistItem.id,
-              quantityPicked: picklistItem.quantityPicked,
-              binLocation: {
-                id: picklistItem['binLocation.id'],
-                name: picklistItem['binLocation.name'],
-                zoneName: picklistItem['binLocation.zoneName'],
-              },
-            };
-          }
-
+        if (picklistItem) {
           return {
             ...avItem,
+            id: picklistItem.id,
+            quantityPicked: picklistItem.quantityPicked,
             binLocation: {
-              id: avItem['binLocation.id'],
-              name: avItem['binLocation.name'],
-              zoneName: avItem['binLocation.zoneName'],
+              id: picklistItem['binLocation.id'],
+              name: picklistItem['binLocation.name'],
+              zoneName: picklistItem['binLocation.zoneName'],
             },
           };
-        });
+        }
 
-        this.setState({
-          formValues: {
-            availableItems,
-            reasonCode: '',
-            quantityRequired: pickPageItem.quantityRequired,
-            productCode: pickPageItem.productCode,
-            productName: pickPageItem.product.name,
-            displayName: pickPageItem.product?.displayNames?.default,
+        return {
+          ...avItem,
+          binLocation: {
+            id: avItem['binLocation.id'],
+            name: avItem['binLocation.name'],
+            zoneName: avItem['binLocation.zoneName'],
           },
-        });
+        };
+      });
 
-        this.props.hideSpinner();
-      })
+      this.setState({
+        formValues: {
+          availableItems,
+          reasonCode: '',
+          quantityRequired: pickPageItem.quantityRequired,
+          productCode: pickPageItem.productCode,
+          productName: pickPageItem.product.name,
+          displayName: pickPageItem.product?.displayNames?.default,
+        },
+      });
+
+      this.props.hideSpinner();
+    })
       .catch(() => { this.props.hideSpinner(); });
   }
 

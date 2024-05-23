@@ -41,6 +41,8 @@ import org.pih.warehouse.core.EventCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationTypeCode
 import org.pih.warehouse.core.RoleType
+import org.pih.warehouse.core.StockMovementItemParamsCommand
+import org.pih.warehouse.core.StockMovementItemsParamsCommand
 import org.pih.warehouse.core.User
 import org.pih.warehouse.core.UserService
 import org.pih.warehouse.importer.ImportDataCommand
@@ -704,6 +706,10 @@ class StockMovementService {
         return results
     }
 
+    def getStockMovementItem(StockMovementItemParamsCommand command) {
+        getStockMovementItem(command.id, command.stepNumber, command.showDetails, command.refresh)
+    }
+
     def getStockMovementItem(String id, Integer stepNumber, Boolean showDetails, Boolean refresh) {
         RequisitionItem requisitionItem = RequisitionItem.get(id)
         StockMovementItem stockMovementItem = null
@@ -746,6 +752,10 @@ class StockMovementService {
             default:
                 return stockMovementItem
         }
+    }
+
+    def getStockMovementItems(StockMovementItemsParamsCommand command) {
+        getStockMovementItems(command.id, command.stepNumber, command.max, command.offset, command.refresh)
     }
 
     def getStockMovementItems(String id, Integer stepNumber, Integer max, Integer offset, Boolean refresh) {

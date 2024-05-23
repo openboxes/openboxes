@@ -1,9 +1,8 @@
 package org.pih.warehouse.core
 
 import grails.validation.Validateable
-import org.pih.warehouse.api.PaginationCommand
 
-class StockMovementItemsRequestCommand extends PaginationCommand implements Validateable {
+class StockMovementItemParamsCommand implements Validateable {
 
     String id
 
@@ -11,9 +10,12 @@ class StockMovementItemsRequestCommand extends PaginationCommand implements Vali
 
     Boolean refresh = true
 
+    Boolean showDetails = false
+
     static constraints = {
         stepNumber nullable: true
         refresh nullable: true
+        showDetails nullable: true
     }
 
 }
