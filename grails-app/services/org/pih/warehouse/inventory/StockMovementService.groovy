@@ -737,7 +737,7 @@ class StockMovementService {
             case "2":
                 return getAddPageItem(requisition, stockMovementItem)
             case "4":
-                return generatePickPageItem(requisitionItem, stockMovementItem.sortOrder, showDetails)
+                return buildPickPageItem(requisitionItem, stockMovementItem.sortOrder, showDetails)
             case "5":
                 return buildPackPageItem(shipmentItem)
             case "6":
@@ -749,7 +749,7 @@ class StockMovementService {
         }
     }
 
-    def getStockMovementItems(String id, Integer stepNumber, Integer max, Integer offset, Boolean createNewPicklist = true) {
+    def getStockMovementItems(String id, Integer stepNumber, Integer max, Integer offset) {
         // FIXME should get stock movement instead of requisition
         Requisition requisition = Requisition.get(id)
         List<StockMovementItem> stockMovementItems = []
@@ -810,7 +810,7 @@ class StockMovementService {
             case OutboundWorkflowState.ADD_ITEMS:
                 return getAddPageItems(requisition, stockMovementItems)
             case OutboundWorkflowState.PICK_ITEMS:
-                return getPickPageItems(id, max, offset, createNewPicklist)
+                return getPickPageItems(id, max, offset)
             case OutboundWorkflowState.PACK_ITEMS:
                 return getPackPageItems(id, max, offset)
             case OutboundWorkflowState.SEND_SHIPMENT:
@@ -1056,13 +1056,13 @@ class StockMovementService {
         return editPageItems
     }
 
-    List<PickPageItem> getPickPageItems(String id, Integer max, Integer offset, Boolean createNewPicklistItems = true) {
+    List<PickPageItem> getPickPageItems(String id, Integer max, Integer offset) {
         List<PickPageItem> pickPageItems = []
 
         StockMovement stockMovement = getStockMovement(id)
 
         stockMovement.lineItems.each { stockMovementItem ->
-            def items = getPickPageItems(stockMovementItem, createNewPicklistItems)
+            def items = getPickPageItems(stockMovementItem)
             pickPageItems.addAll(items)
         }
 
@@ -1072,7 +1072,6 @@ class StockMovementService {
 
         return pickPageItems
     }
-
 
     List<PackPageItem> getPackPageItems(String id, Integer max, Integer offset) {
         Set<PackPageItem> items = new LinkedHashSet<PackPageItem>()
@@ -1119,7 +1118,7 @@ class StockMovementService {
 
         picklistItems?.each { ImportPickCommand data ->
             data.validate()
-            // skip validation if id is empty since mos tof the validation relies on an exisitng requisition id
+            // skip validation if id is empty since mos tof the validation relies on an existing requisition id
             if (!data.id) {
                 return
             }
@@ -1171,7 +1170,7 @@ class StockMovementService {
     void importPicklistItems(StockMovement stockMovement, List<PickPageItem> pickPageItems, List<Map> picklistItems) {
         picklistItems.each { params ->
             // skip rows with errors
-            if (params.hasErrors) {
+            if (params.hasErrors()) {
                 return
             }
 
@@ -1671,36 +1670,26 @@ class StockMovementService {
      * @param stockMovementItem
      * @return
      */
-    List getPickPageItems(StockMovementItem stockMovementItem, Boolean createNewPicklistItems = true) {
+    List getPickPageItems(StockMovementItem stockMovementItem) {
         List pickPageItems = []
         RequisitionItem requisitionItem = RequisitionItem.load(stockMovementItem.id)
         if (requisitionItem.isSubstituted()) {
             pickPageItems = requisitionItem.substitutionItems.sort { it.orderIndex }. collect {
-                if (createNewPicklistItems) {
-                    return generatePickPageItem(it, stockMovementItem.sortOrder)
-                }
                 return buildPickPageItem(it, stockMovementItem.sortOrder)
             }
         } else if (requisitionItem.modificationItem) {
-            if (createNewPicklistItems) {
-                pickPageItems << generatePickPageItem(requisitionItem.modificationItem, stockMovementItem.sortOrder)
-            } else {
-                pickPageItems << buildPickPageItem(requisitionItem.modificationItem, stockMovementItem.sortOrder)
-            }
+            pickPageItems << buildPickPageItem(requisitionItem.modificationItem, stockMovementItem.sortOrder)
+
         } else {
             if (!requisitionItem.isCanceled()) {
-                if (createNewPicklistItems) {
-                    pickPageItems << generatePickPageItem(requisitionItem, stockMovementItem.sortOrder)
-                } else {
-                    pickPageItems << buildPickPageItem(requisitionItem, stockMovementItem.sortOrder)
-                }
+                pickPageItems << buildPickPageItem(requisitionItem, stockMovementItem.sortOrder)
             }
         }
         return pickPageItems
     }
 
-    PickPageItem generatePickPageItem(RequisitionItem requisitionItem, Integer sortOrder) {
-        return generatePickPageItem(requisitionItem, sortOrder, false)
+    PickPageItem buildPickPageItem(RequisitionItem requisitionItem, Integer sortOrder) {
+        return buildPickPageItem(requisitionItem, sortOrder, false)
     }
 
     /**
@@ -1708,7 +1697,7 @@ class StockMovementService {
      * @param requisitionItem
      * @return
      */
-    PickPageItem generatePickPageItem(RequisitionItem requisitionItem, Integer sortOrder, Boolean showDetails) {
+    PickPageItem buildPickPageItem(RequisitionItem requisitionItem, Integer sortOrder, Boolean showDetails) {
         Boolean hasPicklistItems = requisitionItem.picklistItems
         Boolean isQuantityPickedOtherThanRequested = requisitionItem.totalQuantityPicked() != requisitionItem.quantity
         Boolean hasReasonCode = requisitionItem.picklistItems.reasonCode
@@ -1716,14 +1705,7 @@ class StockMovementService {
         if (!hasPicklistItems || (hasPicklistItems && isQuantityPickedOtherThanRequested && !hasReasonCode)) {
             createPicklist(requisitionItem, false)
         }
-       return buildPickPageItem(requisitionItem, sortOrder, showDetails)
-    }
 
-    PickPageItem buildPickPageItem(RequisitionItem requisitionItem, Integer sortOrder) {
-        return buildPickPageItem(requisitionItem, sortOrder, false)
-    }
-
-    PickPageItem buildPickPageItem(RequisitionItem requisitionItem, Integer sortOrder, Boolean showDetails) {
         PickPageItem pickPageItem = new PickPageItem(requisitionItem: requisitionItem,
                 picklistItems: requisitionItem.picklistItems)
         Location location = requisitionItem?.requisition?.origin

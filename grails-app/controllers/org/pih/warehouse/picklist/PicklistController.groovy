@@ -97,7 +97,7 @@ class PicklistController {
     def exportPicklistItems() {
         String format = params.get("format", "csv")
 
-        List<PickPageItem> pickPageItems = stockMovementService.getPickPageItems(params.id, null, null, false)
+        List<PickPageItem> pickPageItems = stockMovementService.getPickPageItems(params.id, null, null)
         List<PicklistItem> picklistItems = pickPageItems.picklistItems?.flatten()
 
         // We need to create at least one row to ensure an empty template
@@ -140,7 +140,7 @@ class PicklistController {
     def exportPicklistTemplate() {
         String format = params.get("format", "csv")
 
-        List<PickPageItem> pickPageItems = stockMovementService.getPickPageItems(params.id, null, null, false)
+        List<PickPageItem> pickPageItems = stockMovementService.getPickPageItems(params.id, null, null)
 
         // We need to create at least one row to ensure an empty template
         if (pickPageItems?.empty) {
@@ -182,7 +182,7 @@ class PicklistController {
         Location location = command.location ?: Location.get(session.warehouse.id)
 
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
-        List<PickPageItem> pickPageItems = stockMovementService.getPickPageItems(params.id, null, null, false)
+        List<PickPageItem> pickPageItems = stockMovementService.getPickPageItems(params.id, null, null)
 
         MultipartFile importFile = command.importFile
         if (importFile.isEmpty()) {

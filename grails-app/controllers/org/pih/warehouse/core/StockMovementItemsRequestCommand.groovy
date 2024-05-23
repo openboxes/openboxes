@@ -9,11 +9,8 @@ class StockMovementItemsRequestCommand extends PaginationCommand implements Vali
 
     Integer stepNumber
 
-    Boolean createNew = true
-
     static constraints = {
         stepNumber nullable: true
-        createNew nullable: true
     }
 
 }

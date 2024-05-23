@@ -41,7 +41,7 @@ class StockMovementItemApiController {
     }
 
     def getStockMovementItems(StockMovementItemsRequestCommand command) {
-        List<StockMovementItem> stockMovementItems = stockMovementService.getStockMovementItems(command.id, command.stepNumber, command.max, command.offset, command.createNew)
+        List<StockMovementItem> stockMovementItems = stockMovementService.getStockMovementItems(command.id, command.stepNumber, command.max, command.offset)
         render([data: stockMovementItems] as JSON)
     }
 
