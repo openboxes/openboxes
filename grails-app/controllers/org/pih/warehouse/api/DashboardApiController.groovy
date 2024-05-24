@@ -240,7 +240,7 @@ class DashboardApiController {
 
     def getItemsWithBackdatedShipments() {
         Location location = Location.get(params.locationId)
-        GraphData delayedShipments = indicatorDataService.getItemsWithBackdatedShipments(location)
-        render(delayedShipments as JSON)
+        GraphData graphData = indicatorDataService.getItemsWithBackdatedShipments(location)
+        render(graphData as JSON)
     }
 }

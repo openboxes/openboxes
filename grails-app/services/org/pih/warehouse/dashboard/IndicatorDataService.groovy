@@ -1173,7 +1173,7 @@ class IndicatorDataService {
     GraphData getItemsWithBackdatedShipments(Location location) {
         Integer monthsLimit = Holders.config.openboxes.dashboard.backdatedShipments.monthsLimit
         Date timeLimit = LocalDate.now().minusMonths(monthsLimit).toDate()
-        Map<String, Integer> numbersDelayed = [
+        Map<String, Integer> amountOfItemsWithBackdatedShipments = [
             (Constants.ONE)            : 0,
             (Constants.TWO)            : 0,
             (Constants.THREE)          : 0,
@@ -1218,19 +1218,19 @@ class IndicatorDataService {
 
         results.each {
             if (it[1] >= 4) {
-                numbersDelayed[Constants.FOUR_OR_MORE] += 1
+                amountOfItemsWithBackdatedShipments[Constants.FOUR_OR_MORE] += 1
                 return
             }
 
-            numbersDelayed[it[1] as String] += 1
+            amountOfItemsWithBackdatedShipments[it[1] as String] += 1
         }
 
         Table table = new Table("Item", "Shipments", "Last Count", tableData.toList())
 
-        ColorNumber oneDelayedShipment = new ColorNumber(value: numbersDelayed[Constants.ONE], subtitle: '1 shipment', order: 1)
-        ColorNumber twoDelayedShipments = new ColorNumber(value: numbersDelayed[Constants.TWO], subtitle: '2 shipments', order: 2)
-        ColorNumber threeDelayedShipments = new ColorNumber(value: numbersDelayed[Constants.THREE], subtitle: '3 shipments', order: 3)
-        ColorNumber fourOrMoreDelayedShipments = new ColorNumber(value: numbersDelayed[Constants.FOUR_OR_MORE], subtitle: '4 or more shipments', order: 4)
+        ColorNumber oneDelayedShipment = new ColorNumber(value: amountOfItemsWithBackdatedShipments[Constants.ONE], subtitle: '1 shipment', order: 1)
+        ColorNumber twoDelayedShipments = new ColorNumber(value: amountOfItemsWithBackdatedShipments[Constants.TWO], subtitle: '2 shipments', order: 2)
+        ColorNumber threeDelayedShipments = new ColorNumber(value: amountOfItemsWithBackdatedShipments[Constants.THREE], subtitle: '3 shipments', order: 3)
+        ColorNumber fourOrMoreDelayedShipments = new ColorNumber(value: amountOfItemsWithBackdatedShipments[Constants.FOUR_OR_MORE], subtitle: '4 or more shipments', order: 4)
 
         NumbersIndicator numbersIndicator = new NumbersIndicator(
                 oneDelayedShipment,
