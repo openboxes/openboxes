@@ -1131,6 +1131,22 @@ openboxes {
                 timeLimit = 6
                 datalabel = true
             }
+            itemsWithBackdatedShipments {
+                enabled = true
+                title = "react.dashboard.itemsWithBackdatedShipments.title.label"
+                info = "react.dashboard.itemsWithBackdatedShipments.info.label"
+                graphType = "numberTable"
+                type = "graph"
+                endpoint = "/api/dashboard/itemsWithBackdatedShipments"
+                colors {
+                    datasets {
+                        state5 = ["first"]
+                        state4 = ["second"]
+                        state3 = ["third"]
+                        state2 = ["fourth"]
+                    }
+                }
+            }
         }
     }
 }
