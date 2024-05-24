@@ -1146,6 +1146,13 @@ openboxes {
                         state2 = ["fourth"]
                     }
                 }
+                columnsSize {
+                    name = '100px'
+                }
+                truncationLength {
+                    value = 100
+                    number = 5
+                }
             }
         }
     }

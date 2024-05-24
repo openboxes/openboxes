@@ -648,6 +648,8 @@
       height: 100%;
 
       .numbers-left {
+        max-width: 100px;
+
         .gyr-indicator {
           flex-direction: column;
 
