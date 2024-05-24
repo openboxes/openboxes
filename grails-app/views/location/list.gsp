@@ -32,41 +32,47 @@
                 <div class="yui-gf">
                     <div class="yui-u first">
 
-                        <div class="dialog box">
+                        <section class="dialog box" aria-label="Filters">
                             <h2>Filters</h2>
                             <g:form action="list" method="get">
                                 <div>
                                     <div class="filter-list-item">
-                                        <label><warehouse:message code="location.name.label"/></label>
+                                        <label for="q"><warehouse:message code="location.name.label"/></label>
                                         <g:textField name="q" value="${params.q }" class="text" style="width:100%"/>
                                     </div>
                                     <div class="filter-list-item">
                                         <label><warehouse:message code="organization.label"/></label>
-                                        <g:selectOrganization name="organization.id" class="chzn-select-deselect"
-                                                  value="${params?.organization?.id}" noSelection="['null':'']" />
+                                        <div data-testid="organization-select">
+                                            <g:selectOrganization name="organization.id" class="chzn-select-deselect"
+                                                                  value="${params?.organization?.id}" noSelection="['null':'']" />
+                                        </div>
                                     </div>
                                     <div class="filter-list-item">
                                         <label><warehouse:message code="location.locationType.label"/></label>
-                                        <g:select name="locationType.id" from="${org.pih.warehouse.core.LocationType.list()}"
-                                                  optionKey="id" optionValue="${{format.metadata(obj:it)}}" class="chzn-select-deselect"
-                                                  value="${params?.locationType?.id?:defaultLocationType?.id}" noSelection="['null':'']" />
+                                        <div data-testid="location-type-select">
+                                            <g:select name="locationType.id" from="${org.pih.warehouse.core.LocationType.list()}"
+                                                      optionKey="id" optionValue="${{format.metadata(obj:it)}}" class="chzn-select-deselect"
+                                                      value="${params?.locationType?.id?:defaultLocationType?.id}" noSelection="['null':'']" />
+                                        </div>
                                     </div>
                                     <div class="filter-list-item">
                                         <label><warehouse:message code="location.locationGroup.label"/></label>
-                                        <g:select name="locationGroup.id" from="${org.pih.warehouse.core.LocationGroup.list()}"
-                                                  optionKey="id" optionValue="${{format.metadata(obj:it)}}" class="chzn-select-deselect"
-                                                  value="${params?.locationGroup?.id}" noSelection="['null':'']" />
+                                        <div data-testid="location-group-select">
+                                            <g:select name="locationGroup.id" from="${org.pih.warehouse.core.LocationGroup.list()}"
+                                                      optionKey="id" optionValue="${{format.metadata(obj:it)}}" class="chzn-select-deselect"
+                                                      value="${params?.locationGroup?.id}" noSelection="['null':'']" />
+                                        </div>
                                     </div>
 
                                     <div class="filter-list-item">
                                         <button type="submit" class="button block">
-                                            <img class="middle" src="${resource(dir: 'images/icons/silk', file: 'find.png')}" alt="${warehouse.message(code: 'default.no.label') }" title="${warehouse.message(code: 'default.no.label') }"/>
+                                            <img class="middle" src="${resource(dir: 'images/icons/silk', file: 'find.png')}" />
                                             ${warehouse.message(code: 'default.button.find.label')}
                                         </button>
                                     </div>
                                 </div>
                             </g:form>
-                        </div>
+                        </section>
 
                     </div>
                     <div class="yui-u">
@@ -97,23 +103,23 @@
                                 <tbody>
                                     <g:each in="${locationInstanceList}" status="i" var="locationInstance">
                                         <tr class="prop ${(i % 2) == 0 ? 'odd' : 'even'}">
-                                            <td class="middle">
+                                            <td class="middle" aria-label="Actions">
                                                 <g:render template="actions" model="[locationInstance:locationInstance]"/>
                                             </td>
-                                            <td class="middle">
+                                            <td class="middle" aria-label="Name">
                                                 <g:link action="edit" id="${locationInstance.id}">${fieldValue(bean: locationInstance, field: "name")}</g:link>
                                             </td>
-                                            <td class="middle">
+                                            <td class="middle" aria-label="Location number">
                                                 <g:link action="edit" id="${locationInstance.id}">${fieldValue(bean: locationInstance, field: "locationNumber")}</g:link>
                                             </td>
-                                            <td class="left middle"><format:metadata obj="${locationInstance?.locationType}"/></td>
-                                            <td class="left middle">${locationInstance?.locationGroup?:warehouse.message(code:'default.none.label')}</td>
-                                            <td class="middle">
+                                            <td class="left middle" aria-label="Location type"><format:metadata obj="${locationInstance?.locationType}"/></td>
+                                            <td class="left middle" aria-label="Location group">${locationInstance?.locationGroup?:warehouse.message(code:'default.none.label')}</td>
+                                            <td class="middle" aria-label="Status">
                                                 <span class="${locationInstance?.status == LocationStatus.ENABLED ? 'active' : 'inactive' }">
                                                     <format:metadata obj="${locationInstance?.status}"/>
                                                 </span>
                                             </td>
-                                            <td class="left middle">
+                                            <td class="left middle" aria-label="Active">
                                                 <g:if test="${locationInstance.active }">
                                                     <img class="middle" src="${resource(dir:'images/icons/silk',file:'tick.png')}" alt="${warehouse.message(code: 'default.yes.label') }" title="${warehouse.message(code: 'default.yes.label') }"/>
                                                 </g:if>
@@ -123,7 +129,7 @@
 
                                             </td>
                                             <g:each var="activity" in="${ActivityCode.list()}">
-                                                <td class="left middle">
+                                                <td class="left middle" aria-label="${activity}">
                                                     <g:if test="${locationInstance?.supports(activity) }">
                                                         <img class="middle" src="${resource(dir:'images/icons/silk',file:'tick.png')}" alt="${warehouse.message(code: 'default.yes.label') }" title="${warehouse.message(code: 'default.yes.label') }"/>
                                                     </g:if>
@@ -133,7 +139,7 @@
 
                                                 </td>
                                             </g:each>
-                                            <td class="center middle border-right">
+                                            <td class="center middle border-right" aria-label="Color">
                                                 <div style="border: 1px solid lightgrey; color:${locationInstance?.fgColor?:'black' }; background-color: ${locationInstance?.bgColor?:'white' }; padding: 5px;">
                                                     ${locationInstance?.name }
                                                 </div>

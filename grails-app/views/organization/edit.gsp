@@ -10,10 +10,10 @@
     <body>
         <div class="body">
             <g:if test="${flash.message}">
-            	<div class="message">${flash.message}</div>
+            	<div class="message" role="status" aria-label="message">${flash.message}</div>
             </g:if>
             <g:hasErrors bean="${organizationInstance}">
-	            <div class="errors">
+	            <div class="errors" role="alert" aria-label="error-message">
 	                <g:renderErrors bean="${organizationInstance}" as="list" />
 	            </div>
             </g:hasErrors>
@@ -86,7 +86,7 @@
 								  <label for="roles"><warehouse:message code="organization.roles.label" default="Roles" /></label>
 								</td>
 								<td valign="top" class="value ${hasErrors(bean: organizationInstance, field: 'roles', 'errors')}">
-									<ul>
+									<ul aria-label="Added Roles">
 										<g:each in="${organizationInstance?.roles?}" var="r">
 											<li><g:link controller="partyRole" action="show" id="${r.id}">${r}</g:link></li>
 										</g:each>
@@ -99,7 +99,9 @@
 								  <label for="partyType.id"><warehouse:message code="organization.partyType.label" default="Party Type" /></label>
 								</td>
 								<td valign="top" class="value ${hasErrors(bean: organizationInstance, field: 'partyType', 'errors')}">
-									<g:select class="chzn-select-deselect" name="partyType.id" from="${org.pih.warehouse.core.PartyType.list()}" optionKey="id" value="${organizationInstance?.partyType?.id}"  />
+									<div data-testid="party-type-select">
+										<g:select class="chzn-select-deselect" name="partyType.id" from="${org.pih.warehouse.core.PartyType.list()}" optionKey="id" value="${organizationInstance?.partyType?.id}"  />
+									</div>
 								</td>
 							</tr>
 							<tr class="prop">
@@ -107,12 +109,14 @@
 									<label for="defaultLocation"><warehouse:message code="organization.defaultLocation.label" default="Default Location" /></label>
 								</td>
 								<td valign="top" class="value ${hasErrors(bean: organizationInstance, field: 'defaultLocation', 'errors')}">
-									<g:selectLocation name="defaultLocation"
-													  from="${organizationInstance?.locations}"
-													  class="chzn-select-deselect"
-													  value="${organizationInstance?.defaultLocation?.id}"
-													  noSelection="['':'']"
-									/>
+									<div data-testid="default-location-select">
+										<g:selectLocation name="defaultLocation"
+														  from="${organizationInstance?.locations}"
+														  class="chzn-select-deselect"
+														  value="${organizationInstance?.defaultLocation?.id}"
+														  noSelection="['':'']"
+										/>
+									</div>
 								</td>
 							</tr>
 							<tr class="prop">
@@ -126,9 +130,9 @@
 
 							<tr class="prop">
 								<td valign="top" class="name">
-								  	<label for="description"><warehouse:message code="organization.maxPurchaseOrderNumber.label" default="Last PO Number" /></label>
+								  	<label for="maxPurchaseOrderNumber"><warehouse:message code="organization.maxPurchaseOrderNumber.label" default="Last PO Number" /></label>
 								</td>
-								<td valign="top" class="value ${hasErrors(bean: organizationInstance, field: 'description', 'errors')}">
+								<td valign="top" class="value ${hasErrors(bean: organizationInstance, field: 'maxPurchaseOrderNumber', 'errors')}">
 									<g:textField name="maxPurchaseOrderNumber" value="${organizationInstance?.maxPurchaseOrderNumber()?:message(code:'default.none.label')}" class="text large readonly" disabled="disabled"/>
 								</td>
 							</tr>
