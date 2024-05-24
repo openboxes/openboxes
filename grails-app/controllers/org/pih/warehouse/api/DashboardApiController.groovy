@@ -7,6 +7,7 @@ import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Location
 import grails.gorm.transactions.Transactional
 import org.pih.warehouse.core.User
+import org.pih.warehouse.dashboard.GraphData
 import org.pih.warehouse.dashboard.IndicatorDataService
 import org.pih.warehouse.dashboard.NumberData
 
@@ -235,5 +236,11 @@ class DashboardApiController {
                 monthsLimit > defaultMonthsLimit ? defaultMonthsLimit : monthsLimit
         )
         render(backdatedShipments as JSON)
+    }
+
+    def getItemsWithBackdatedShipments() {
+        Location location = Location.get(params.locationId)
+        GraphData delayedShipments = indicatorDataService.getItemsWithBackdatedShipments(location)
+        render(delayedShipments as JSON)
     }
 }
