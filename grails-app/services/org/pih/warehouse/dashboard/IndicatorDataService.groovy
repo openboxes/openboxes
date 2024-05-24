@@ -1169,18 +1169,19 @@ class IndicatorDataService {
         return getBackdatedShipmentsChart(locationId, monthsLimit, StockMovementDirection.INBOUND)
     }
 
+    @Cacheable(value = "dashboardCache", key = { "getItemsWithBackdatedShipments-${location?.id}" })
     GraphData getItemsWithBackdatedShipments(Location location) {
         Integer monthsLimit = Holders.config.openboxes.dashboard.backdatedShipments.monthsLimit
         Date timeLimit = LocalDate.now().minusMonths(monthsLimit).toDate()
         Map<String, Integer> numbersDelayed = [
-            '1'    : 0,
-            '2'    : 0,
-            '3'    : 0,
-            '4+'   : 0,
+            (Constants.ONE)            : 0,
+            (Constants.TWO)            : 0,
+            (Constants.THREE)          : 0,
+            (Constants.FOUR_OR_MORE)   : 0,
         ]
 
         String query = '''
-            SELECT ii.product_id, COUNT(ii.product_id) as products, GROUP_CONCAT(bt.shipment_number SEPARATOR '; ') as shipments, sc.last_stock_count FROM (
+            SELECT ii.product_id, COUNT(ii.product_id) as products, GROUP_CONCAT(bt.shipment_number SEPARATOR ' ') as shipments, DATE_FORMAT(sc.last_stock_count, "%d-%M-%Y") FROM (
                 SELECT t.id as transaction_id, s.shipment_number FROM shipment s
                 INNER JOIN `transaction` t ON t.outgoing_shipment_id  = s.id
                 WHERE DATE_ADD(t.transaction_date, INTERVAL :daysOffset DAY) < t.date_created
@@ -1209,25 +1210,34 @@ class IndicatorDataService {
                 timeLimit: timeLimit,
         ])
 
-        List<TableData> results2 = results.collect { new TableData(it[0] as String, it[2] as String, it[3] as String ?: "None") }
+        List<TableData> tableData = results.collect { new TableData(
+                it[0] as String,          // Item
+                it[2] as String,          // Shipments
+                it[3] as String ?: "None" // Last count
+        ) }
 
         results.each {
             if (it[1] >= 4) {
-                numbersDelayed["4+"] += 1
+                numbersDelayed[Constants.FOUR_OR_MORE] += 1
                 return
             }
 
             numbersDelayed[it[1] as String] += 1
         }
 
-        Table table = new Table("Item", "Shipments", "Last Count", results2.toList())
+        Table table = new Table("Item", "Shipments", "Last Count", tableData.toList())
 
-        ColorNumber oneDelayedShipment = new ColorNumber(value: numbersDelayed['1'], subtitle: '1 shipment', order: 1)
-        ColorNumber twoDelayedShipments = new ColorNumber(value: numbersDelayed['2'], subtitle: '2 shipments', order: 2)
-        ColorNumber threeDelayedShipments = new ColorNumber(value: numbersDelayed['3'], subtitle: '3 shipments', order: 3)
-        ColorNumber fourOrMoreDelayedShipments = new ColorNumber(value: numbersDelayed['4+'], subtitle: '4 or more shipments', order: 4)
+        ColorNumber oneDelayedShipment = new ColorNumber(value: numbersDelayed[Constants.ONE], subtitle: '1 shipment', order: 1)
+        ColorNumber twoDelayedShipments = new ColorNumber(value: numbersDelayed[Constants.TWO], subtitle: '2 shipments', order: 2)
+        ColorNumber threeDelayedShipments = new ColorNumber(value: numbersDelayed[Constants.THREE], subtitle: '3 shipments', order: 3)
+        ColorNumber fourOrMoreDelayedShipments = new ColorNumber(value: numbersDelayed[Constants.FOUR_OR_MORE], subtitle: '4 or more shipments', order: 4)
 
-        NumbersIndicator numbersIndicator = new NumbersIndicator(oneDelayedShipment, twoDelayedShipments, threeDelayedShipments, fourOrMoreDelayedShipments)
+        NumbersIndicator numbersIndicator = new NumbersIndicator(
+                oneDelayedShipment,
+                twoDelayedShipments,
+                threeDelayedShipments,
+                fourOrMoreDelayedShipments
+        )
 
         NumberTableData numberTableData = new NumberTableData(table, numbersIndicator)
 
