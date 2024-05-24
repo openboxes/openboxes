@@ -5,6 +5,7 @@ import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import grails.plugin.cache.Cacheable
 import grails.util.Holders
+import groovy.sql.GroovyRowResult
 import groovy.transform.TypeCheckingMode
 import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.grails.web.json.JSONObject
@@ -1166,6 +1167,73 @@ class IndicatorDataService {
     @Cacheable(value = "dashboardCache", key = { "getBackdatedInboundShipments-${locationId}${monthsLimit}" })
     Map getBackdatedInboundShipmentsData(String locationId, Integer monthsLimit) {
         return getBackdatedShipmentsChart(locationId, monthsLimit, StockMovementDirection.INBOUND)
+    }
+
+    GraphData getItemsWithBackdatedShipments(Location location) {
+        Integer monthsLimit = Holders.config.openboxes.dashboard.backdatedShipments.monthsLimit
+        Date timeLimit = LocalDate.now().minusMonths(monthsLimit).toDate()
+        Map<String, Integer> numbersDelayed = [
+            '1'    : 0,
+            '2'    : 0,
+            '3'    : 0,
+            '4+'   : 0,
+        ]
+
+        String query = '''
+            SELECT ii.product_id, COUNT(ii.product_id) as products, GROUP_CONCAT(bt.shipment_number SEPARATOR '; ') as shipments, sc.last_stock_count FROM (
+                SELECT t.id as transaction_id, s.shipment_number FROM shipment s
+                INNER JOIN `transaction` t ON t.outgoing_shipment_id  = s.id
+                WHERE DATE_ADD(t.transaction_date, INTERVAL :daysOffset DAY) < t.date_created
+                AND t.date_created > :timeLimit
+                AND s.origin_id = :locationId
+            ) AS bt
+            INNER JOIN transaction_entry te ON te.transaction_id = bt.transaction_id
+            INNER JOIN inventory_item ii ON te.inventory_item_id = ii.id
+            LEFT JOIN (
+                SELECT ii.product_id, MAX(t.transaction_date) as last_stock_count from transaction_entry te 
+                LEFT JOIN inventory_item ii ON te.inventory_item_id = ii.id 
+                LEFT JOIN `transaction` t ON t.id = te.transaction_id
+                LEFT JOIN transaction_type tt ON tt.id = t.transaction_type_id 
+                WHERE t.inventory_id = :inventoryId
+                AND tt.transaction_code = :transactionCode
+                GROUP BY ii.product_id 
+            ) as sc ON sc.product_id = ii.product_id
+            GROUP BY ii.product_id, sc.last_stock_count
+        '''
+
+        List<GroovyRowResult> results = dataService.executeQuery(query, [
+                locationId: location?.id,
+                inventoryId: location?.inventory?.id,
+                transactionCode: TransactionCode.PRODUCT_INVENTORY.name(),
+                daysOffset: Holders.config.openboxes.dashboard.backdatedShipments.daysOffset,
+                timeLimit: timeLimit,
+        ])
+
+        List<TableData> results2 = results.collect { new TableData(it[0] as String, it[2] as String, it[3] as String ?: "None") }
+
+        results.each {
+            if (it[1] >= 4) {
+                numbersDelayed["4+"] += 1
+                return
+            }
+
+            numbersDelayed[it[1] as String] += 1
+        }
+
+        Table table = new Table("Item", "Shipments", "Last Count", results2.toList())
+
+        ColorNumber oneDelayedShipment = new ColorNumber(value: numbersDelayed['1'], subtitle: '1 shipment', order: 1)
+        ColorNumber twoDelayedShipments = new ColorNumber(value: numbersDelayed['2'], subtitle: '2 shipments', order: 2)
+        ColorNumber threeDelayedShipments = new ColorNumber(value: numbersDelayed['3'], subtitle: '3 shipments', order: 3)
+        ColorNumber fourOrMoreDelayedShipments = new ColorNumber(value: numbersDelayed['4+'], subtitle: '4 or more shipments', order: 4)
+
+        NumbersIndicator numbersIndicator = new NumbersIndicator(oneDelayedShipment, twoDelayedShipments, threeDelayedShipments, fourOrMoreDelayedShipments)
+
+        NumberTableData numberTableData = new NumberTableData(table, numbersIndicator)
+
+        GraphData graphData = new GraphData(numberTableData)
+
+        return graphData
     }
 
     private List fillLabels(int querySize) {
