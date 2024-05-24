@@ -627,7 +627,7 @@ class PickPageItem {
     AvailableItem getAvailableItem(String binLocationName, String lotNumber) {
         return availableItems?.find { item ->
             Boolean binLocationMatches = binLocationName ? item.binLocation?.name == binLocationName : !item.binLocation
-            Boolean lotMatches = lotNumber == item.inventoryItem?.lotNumber
+            Boolean lotMatches = item.inventoryItem?.lotNumber == (lotNumber ?: null)
             binLocationMatches && lotMatches
         }
     }

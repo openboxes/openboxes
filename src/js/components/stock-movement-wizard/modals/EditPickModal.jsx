@@ -7,15 +7,15 @@ import { connect } from 'react-redux';
 import { Tooltip } from 'react-tippy';
 
 import { hideSpinner, showSpinner } from 'actions';
-import { STOCK_MOVEMENT_ITEM_BY_ID } from 'api/urls';
+import { STOCK_MOVEMENT_ITEM_DETAILS } from 'api/urls';
 import ArrayField from 'components/form-elements/ArrayField';
 import LabelField from 'components/form-elements/LabelField';
 import ModalWrapper from 'components/form-elements/ModalWrapper';
 import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
+import { OutboundWorkflowState } from 'consts/WorkflowState';
 import apiClient from 'utils/apiClient';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
-
 
 const FIELDS = {
   reasonCode: {
@@ -246,8 +246,8 @@ class EditPickModal extends Component {
   }
 
   fetchPickPageItem() {
-    apiClient.get(STOCK_MOVEMENT_ITEM_BY_ID(this.state.attr.itemId), {
-      params: { stepNumber: 4, showDetails: true },
+    apiClient.get(STOCK_MOVEMENT_ITEM_DETAILS(this.state.attr.itemId), {
+      params: { stepNumber: OutboundWorkflowState.PICK_ITEMS, refreshPicklistItems: false },
     }).then((resp) => {
       const pickPageItem = resp.data.data;
 

@@ -13,6 +13,7 @@ import Alert from 'react-s-alert';
 import { fetchReasonCodes, hideSpinner, showSpinner } from 'actions';
 import picklistApi from 'api/services/PicklistApi';
 import {
+  STOCK_MOVEMENT_BY_ID,
   STOCK_MOVEMENT_ITEMS,
 } from 'api/urls';
 import ArrayField from 'components/form-elements/ArrayField';
@@ -22,6 +23,7 @@ import LabelField from 'components/form-elements/LabelField';
 import TableRowWithSubfields from 'components/form-elements/TableRowWithSubfields';
 import EditPickModal from 'components/stock-movement-wizard/modals/EditPickModal';
 import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
+import { OutboundWorkflowState } from 'consts/WorkflowState';
 import AlertMessage from 'utils/AlertMessage';
 import {
   apiClientCustomResponseHandler as apiClient,
@@ -345,9 +347,9 @@ class PickPage extends Component {
    * @public
    */
   fetchPickPageData() {
-    const url = `/api/stockMovements/${this.state.values.stockMovementId}?stepNumber=4`;
-
-    return apiClient.get(url)
+    return apiClient.get(STOCK_MOVEMENT_BY_ID(this.state.values.stockMovementId), {
+      params: { stepNumber: OutboundWorkflowState.PICK_ITEMS },
+    })
       .then((resp) => {
         const { totalCount } = resp.data;
         const { associations, picklist } = resp.data.data;
@@ -370,7 +372,7 @@ class PickPage extends Component {
 
   fetchPickPageItems() {
     apiClient.get(STOCK_MOVEMENT_ITEMS(this.state.values.stockMovementId), {
-      params: { stepNumber: 4 },
+      params: { stepNumber: OutboundWorkflowState.PICK_ITEMS },
     }).then((response) => {
       this.setPickPageItems(response, null);
     });
@@ -378,7 +380,7 @@ class PickPage extends Component {
 
   fetchItemsAfterImport() {
     apiClient.get(STOCK_MOVEMENT_ITEMS(this.state.values.stockMovementId), {
-      params: { stepNumber: 4, refresh: false },
+      params: { stepNumber: OutboundWorkflowState.PICK_ITEMS, refreshPicklistItems: false },
     }).then((response) => {
       const { data } = response.data;
       this.setState({
@@ -400,7 +402,11 @@ class PickPage extends Component {
         isFirstPageLoaded: true,
       });
       apiClient.get(STOCK_MOVEMENT_ITEMS(this.state.values.stockMovementId), {
-        params: { offset: startIndex, max: this.props.pageSize, stepNumber: 4 },
+        params: {
+          offset: startIndex,
+          max: this.props.pageSize,
+          stepNumber: OutboundWorkflowState.PICK_ITEMS,
+        },
       }).then((response) => {
         this.setPickPageItems(response, startIndex);
       });
@@ -701,6 +707,9 @@ class PickPage extends Component {
 
   async clearPicklist() {
     const { picklist } = this.state.values;
+    if (this.state.showAlert) {
+      this.setState({ alertMessage: null, showAlert: false });
+    }
     this.props.showSpinner();
     try {
       await picklistApi.clearPicklist(picklist?.id);

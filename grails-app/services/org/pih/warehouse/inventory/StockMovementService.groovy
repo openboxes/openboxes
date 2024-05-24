@@ -14,12 +14,11 @@ import grails.gorm.transactions.Transactional
 import grails.orm.PagedResultList
 import grails.plugins.csv.CSVMapReader
 import grails.validation.ValidationException
-import org.apache.commons.lang.math.NumberUtils
 import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.grails.web.json.JSONObject
 import org.hibernate.ObjectNotFoundException
 import org.hibernate.sql.JoinType
-import org.pih.warehouse.OutboundWorkflowState
+import org.pih.warehouse.api.OutboundWorkflowState
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.api.AvailableItemStatus
 import org.pih.warehouse.api.DocumentGroupCode
@@ -45,10 +44,8 @@ import org.pih.warehouse.core.StockMovementItemParamsCommand
 import org.pih.warehouse.core.StockMovementItemsParamsCommand
 import org.pih.warehouse.core.User
 import org.pih.warehouse.core.UserService
-import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
-import org.pih.warehouse.order.RefreshOrderSummaryEvent
 import org.pih.warehouse.order.ShipOrderCommand
 import org.pih.warehouse.order.ShipOrderItemCommand
 import org.pih.warehouse.picklist.Picklist
@@ -707,10 +704,10 @@ class StockMovementService {
     }
 
     def getStockMovementItem(StockMovementItemParamsCommand command) {
-        getStockMovementItem(command.id, command.stepNumber, command.showDetails, command.refresh)
+        getStockMovementItem(command.id, command.stepNumber, command.showDetails, command.refreshPicklistItems)
     }
 
-    def getStockMovementItem(String id, Integer stepNumber, Boolean showDetails, Boolean refresh) {
+    def getStockMovementItem(String id, Integer stepNumber, Boolean showDetails, Boolean refreshPicklistItems) {
         RequisitionItem requisitionItem = RequisitionItem.get(id)
         StockMovementItem stockMovementItem = null
         Requisition requisition = null
@@ -739,8 +736,8 @@ class StockMovementService {
             case OutboundWorkflowState.ADD_ITEMS:
                 return getAddPageItem(requisition, stockMovementItem)
             case OutboundWorkflowState.PICK_ITEMS:
-                if (refresh) {
-                    allocatePicklists(requisition.requisitionItems?.asList())
+                if (refreshPicklistItems) {
+                    allocatePicklistItems(requisition.requisitionItems?.asList())
                 }
                 return buildPickPageItem(requisitionItem, stockMovementItem.sortOrder, showDetails)
             case OutboundWorkflowState.PACK_ITEMS:
@@ -755,10 +752,10 @@ class StockMovementService {
     }
 
     def getStockMovementItems(StockMovementItemsParamsCommand command) {
-        getStockMovementItems(command.id, command.stepNumber, command.max, command.offset, command.refresh)
+        getStockMovementItems(command.id, command.stepNumber, command.max, command.offset, command.refreshPicklistItems)
     }
 
-    def getStockMovementItems(String id, Integer stepNumber, Integer max, Integer offset, Boolean refresh) {
+    def getStockMovementItems(String id, Integer stepNumber, Integer max, Integer offset, Boolean refreshPicklistItems) {
         // FIXME should get stock movement instead of requisition
         Requisition requisition = Requisition.get(id)
         List<StockMovementItem> stockMovementItems = []
@@ -819,8 +816,8 @@ class StockMovementService {
             case OutboundWorkflowState.ADD_ITEMS:
                 return getAddPageItems(requisition, stockMovementItems)
             case OutboundWorkflowState.PICK_ITEMS:
-                if (refresh) {
-                    allocatePicklists(requisition.requisitionItems?.asList())
+                if (refreshPicklistItems) {
+                    allocatePicklistItems(requisition.requisitionItems?.asList())
                 }
                 return getPickPageItems(id, max, offset)
             case OutboundWorkflowState.PACK_ITEMS:
@@ -1676,7 +1673,7 @@ class StockMovementService {
         return availableSubstitutions.findAll { availableItems -> availableItems.quantityAvailable > 0 }
     }
 
-    void allocatePicklists(List<RequisitionItem> requisitionItems) {
+    void allocatePicklistItems(List<RequisitionItem> requisitionItems) {
         requisitionItems.each { RequisitionItem requisitionItem ->
             if (requisitionItem.isSubstituted()) {
                 requisitionItem.substitutionItems.collect { allocateMissingPicklistItems(it) }

@@ -27,7 +27,6 @@ import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.requisition.RequisitionType
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentStatusCode
-import org.springframework.web.multipart.MultipartFile
 
 
 class StockMovementApiController {

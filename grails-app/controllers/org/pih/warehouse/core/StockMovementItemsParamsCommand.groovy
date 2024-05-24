@@ -9,11 +9,11 @@ class StockMovementItemsParamsCommand extends PaginationCommand implements Valid
 
     Integer stepNumber
 
-    Boolean refresh = true
+    Boolean refreshPicklistItems = true
 
     static constraints = {
         stepNumber nullable: true
-        refresh nullable: true
+        refreshPicklistItems nullable: true
     }
 
 }

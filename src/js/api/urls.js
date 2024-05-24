@@ -28,6 +28,7 @@ export const PICKLIST_IMPORT = id => `${STOCK_MOVEMENT_API}/importPickListItems/
 // STOCK MOVEMENT ITEMS
 export const STOCK_MOVEMENT_ITEM_API = `${API}/stockMovementItems`;
 export const STOCK_MOVEMENT_ITEM_BY_ID = id => `${STOCK_MOVEMENT_ITEM_API}/${id}`;
+export const STOCK_MOVEMENT_ITEM_DETAILS = id => `${STOCK_MOVEMENT_ITEM_BY_ID(id)}/details`;
 export const STOCK_MOVEMENT_ITEM_REMOVE = id => `${STOCK_MOVEMENT_ITEM_BY_ID(id)}/removeItem`;
 
 // STOCK TRANSFER

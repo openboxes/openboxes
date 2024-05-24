@@ -1,4 +1,4 @@
-package org.pih.warehouse
+package org.pih.warehouse.api
 
 enum OutboundWorkflowState {
 

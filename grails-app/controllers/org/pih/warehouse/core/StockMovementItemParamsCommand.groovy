@@ -8,13 +8,13 @@ class StockMovementItemParamsCommand implements Validateable {
 
     Integer stepNumber
 
-    Boolean refresh = true
+    Boolean refreshPicklistItems = true
 
     Boolean showDetails = false
 
     static constraints = {
         stepNumber nullable: true
-        refresh nullable: true
+        refreshPicklistItems nullable: true
         showDetails nullable: true
     }
 

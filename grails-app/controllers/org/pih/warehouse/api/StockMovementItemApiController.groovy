@@ -36,10 +36,6 @@ class StockMovementItemApiController {
         render([data: stockMovementItem] as JSON)
     }
 
-    /**
-     * @deprecated As of release 9.2, replaced by {@link #read()} with showDetails query parameter
-     */
-    @Deprecated
     def details(StockMovementItemParamsCommand command) {
         command.showDetails = true
         def stockMovementItem = stockMovementService.getStockMovementItem(command)
