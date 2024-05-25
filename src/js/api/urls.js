@@ -24,10 +24,12 @@ export const STOCK_MOVEMENT_REMOVE_ALL_ITEMS = id => `${STOCK_MOVEMENT_BY_ID(id)
 export const STOCK_MOVEMENT_STATUS = id => `${STOCK_MOVEMENT_BY_ID(id)}/status`;
 export const PICKLIST_ITEMS_EXPORT = id => `${STOCK_MOVEMENT_API}/exportPickListItems/${id}`;
 export const PICKLIST_TEMPLATE_EXPORT = id => `${STOCK_MOVEMENT_API}/picklistTemplate/${id}`;
-
+export const PICKLIST_IMPORT = id => `${STOCK_MOVEMENT_API}/importPickListItems/${id}`;
 // STOCK MOVEMENT ITEMS
 export const STOCK_MOVEMENT_ITEM_API = `${API}/stockMovementItems`;
-export const STOCK_MOVEMENT_ITEM_REMOVE = id => `${STOCK_MOVEMENT_ITEM_API}/${id}/removeItem`;
+export const STOCK_MOVEMENT_ITEM_BY_ID = id => `${STOCK_MOVEMENT_ITEM_API}/${id}`;
+export const STOCK_MOVEMENT_ITEM_DETAILS = id => `${STOCK_MOVEMENT_ITEM_BY_ID(id)}/details`;
+export const STOCK_MOVEMENT_ITEM_REMOVE = id => `${STOCK_MOVEMENT_ITEM_BY_ID(id)}/removeItem`;
 
 // STOCK TRANSFER
 export const STOCK_TRANSFER_API = `${API}/stockTransfers`;

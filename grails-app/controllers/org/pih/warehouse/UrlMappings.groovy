@@ -269,7 +269,7 @@ class UrlMappings {
         }
 
         "/api/stockMovements/importPickListItems/$id"(parseRequest: true) {
-            controller = "stockMovementApi"
+            controller = "picklist"
             action = [POST: "importPickListItems"]
         }
 

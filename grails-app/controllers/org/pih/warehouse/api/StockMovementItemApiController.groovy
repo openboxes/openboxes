@@ -14,6 +14,8 @@ import grails.gorm.transactions.Transactional
 import org.grails.web.json.JSONObject
 import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.StockMovementItemParamsCommand
+import org.pih.warehouse.core.StockMovementItemsParamsCommand
 import org.pih.warehouse.requisition.RequisitionItem
 
 @Transactional
@@ -29,18 +31,19 @@ class StockMovementItemApiController {
         render([data: stockMovement.lineItems] as JSON)
     }
 
-    def read() {
-        def stockMovementItem = stockMovementService.getStockMovementItem(params.id, params.stepNumber)
+    def read(StockMovementItemParamsCommand command) {
+        def stockMovementItem = stockMovementService.getStockMovementItem(command)
         render([data: stockMovementItem] as JSON)
     }
 
-    def details() {
-        def stockMovementItem = stockMovementService.getStockMovementItem(params.id, params.stepNumber, true)
+    def details(StockMovementItemParamsCommand command) {
+        command.showDetails = true
+        def stockMovementItem = stockMovementService.getStockMovementItem(command)
         render([data: stockMovementItem] as JSON)
     }
 
-    def getStockMovementItems() {
-        List<StockMovementItem> stockMovementItems = stockMovementService.getStockMovementItems(params.id, params.stepNumber, params.max, params.offset)
+    def getStockMovementItems(StockMovementItemsParamsCommand command) {
+        List<StockMovementItem> stockMovementItems = stockMovementService.getStockMovementItems(command)
         render([data: stockMovementItems] as JSON)
     }
 

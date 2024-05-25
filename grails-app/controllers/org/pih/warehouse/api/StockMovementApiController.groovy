@@ -10,7 +10,6 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
-import org.apache.commons.lang.math.NumberUtils
 import org.grails.web.json.JSONObject
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
@@ -21,10 +20,8 @@ import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.inventory.InventoryItem
-import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.requisition.Requisition
-import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.requisition.RequisitionSourceType
 import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.requisition.RequisitionType
@@ -335,80 +332,6 @@ class StockMovementApiController {
         stockMovementService.validatePicklist(params.id)
 
         render status: 200
-    }
-
-    def importPickListItems(ImportDataCommand command) {
-
-        try {
-            StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
-            List<PickPageItem> pickPageItems = stockMovementService.getPickPageItems(params.id, null, null )
-
-            def importFile = command.importFile
-
-            String csv = new String(importFile.bytes)
-            def settings = [separatorChar: ',', skipLines: 1]
-            csv.toCsvReader(settings).eachLine { tokens ->
-                String requisitionItemId = tokens[0]
-                String lotNumber = tokens[3] ?: null
-                String expirationDate = tokens[4] ?: null
-                String binLocation = tokens[5] ?: null
-                Integer quantityPicked = tokens[6] ? tokens[6].toInteger() : null
-
-                if (!requisitionItemId || quantityPicked == null) {
-                    throw new IllegalArgumentException("Requisition item id and quantity picked are required")
-                }
-
-                if (lotNumber?.contains("E") && NumberUtils.isNumber(lotNumber)) {
-                    throw new IllegalArgumentException("Lot numbers must not be specified in scientific notation. " +
-                            "Please reformat field with Lot Number: \"${lotNumber}\" to a number format")
-                }
-
-                PickPageItem pickPageItem = pickPageItems.find {
-                    it.requisitionItem?.id == requisitionItemId
-                }
-
-                if (!pickPageItem) {
-                    throw new IllegalArgumentException("Requisition item id: ${requisitionItemId} not found")
-                }
-
-                // FIXME Should find bin location by name and parent and inventory item by lot number and expiration date
-                // and compare object equality (or at least PK equality) rather than comparing various components
-                AvailableItem availableItem = pickPageItem.availableItems?.find {
-                    (binLocation ? it.binLocation?.name == binLocation : !it.binLocation) && lotNumber == (it.inventoryItem?.lotNumber ?: null) &&
-                            expirationDate == (it?.inventoryItem?.expirationDate ? it.inventoryItem.expirationDate.format(Constants.EXPIRATION_DATE_FORMAT) : null)
-                }
-
-                if (!availableItem) {
-                    throw new IllegalArgumentException("There is no item available with lot: ${lotNumber ?: ""}, expiration date: ${tokens[2] ?: ""} and bin: ${binLocation ?: ""}")
-                }
-
-                RequisitionItem requisitionItem = pickPageItem.requisitionItem?.modificationItem ?: pickPageItem.requisitionItem
-
-                pickPageItem.picklistItems.each {
-                    if (it.id) {
-                        it.quantity = 0
-                    }
-                }
-                pickPageItem.picklistItems.add(new PicklistItem(
-                        requisitionItem: requisitionItem,
-                        inventoryItem: availableItem.inventoryItem,
-                        binLocation: availableItem.binLocation,
-                        quantity: quantityPicked,
-                        sortOrder: pickPageItem.sortOrder
-                ))
-            }
-
-            stockMovementService.createOrUpdatePicklistItem(stockMovement, pickPageItems)
-
-        } catch (Exception e) {
-            // FIXME The global error handler does not return JSON for multipart uploads
-            log.warn("Error occurred while importing CSV: " + e.message, e)
-            response.status = 500
-            render([errorCode: 500, errorMessage: e?.message ?: "An unknown error occurred during import"] as JSON)
-            return
-        }
-
-        render([data: "Data will be imported successfully"] as JSON)
     }
 
     def getPendingRequisitionDetails() {

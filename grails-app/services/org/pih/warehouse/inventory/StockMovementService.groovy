@@ -12,11 +12,13 @@ package org.pih.warehouse.inventory
 import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import grails.orm.PagedResultList
+import grails.plugins.csv.CSVMapReader
 import grails.validation.ValidationException
 import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.grails.web.json.JSONObject
 import org.hibernate.ObjectNotFoundException
 import org.hibernate.sql.JoinType
+import org.pih.warehouse.api.OutboundWorkflowState
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.api.AvailableItemStatus
 import org.pih.warehouse.api.DocumentGroupCode
@@ -38,11 +40,12 @@ import org.pih.warehouse.core.EventCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationTypeCode
 import org.pih.warehouse.core.RoleType
+import org.pih.warehouse.core.StockMovementItemParamsCommand
+import org.pih.warehouse.core.StockMovementItemsParamsCommand
 import org.pih.warehouse.core.User
 import org.pih.warehouse.core.UserService
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
-import org.pih.warehouse.order.RefreshOrderSummaryEvent
 import org.pih.warehouse.order.ShipOrderCommand
 import org.pih.warehouse.order.ShipOrderItemCommand
 import org.pih.warehouse.picklist.Picklist
@@ -700,17 +703,17 @@ class StockMovementService {
         return results
     }
 
-    def getStockMovementItem(String id, String stepNumber) {
-        return getStockMovementItem(id, stepNumber, false)
+    def getStockMovementItem(StockMovementItemParamsCommand command) {
+        getStockMovementItem(command.id, command.stepNumber, command.showDetails, command.refreshPicklistItems)
     }
 
-    def getStockMovementItem(String id, String stepNumber, Boolean showDetails) {
+    def getStockMovementItem(String id, Integer stepNumber, Boolean showDetails, Boolean refreshPicklistItems) {
         RequisitionItem requisitionItem = RequisitionItem.get(id)
         StockMovementItem stockMovementItem = null
         Requisition requisition = null
         ShipmentItem shipmentItem = null
 
-        if (stepNumber == '3') {
+        if (OutboundWorkflowState.fromStepNumber(stepNumber) == OutboundWorkflowState.REVISE_ITEMS) {
             return getEditPageItem(requisitionItem)
         }
 
@@ -729,14 +732,17 @@ class StockMovementService {
             }
         }
 
-        switch(stepNumber) {
-            case "2":
+        switch(OutboundWorkflowState.fromStepNumber(stepNumber)) {
+            case OutboundWorkflowState.ADD_ITEMS:
                 return getAddPageItem(requisition, stockMovementItem)
-            case "4":
+            case OutboundWorkflowState.PICK_ITEMS:
+                if (refreshPicklistItems) {
+                    allocatePicklistItems(requisition.requisitionItems?.asList())
+                }
                 return buildPickPageItem(requisitionItem, stockMovementItem.sortOrder, showDetails)
-            case "5":
+            case OutboundWorkflowState.PACK_ITEMS:
                 return buildPackPageItem(shipmentItem)
-            case "6":
+            case OutboundWorkflowState.SEND_SHIPMENT:
                 if (requisition && !requisition.origin.isSupplier() && requisition.origin.supports(ActivityCode.MANAGE_INVENTORY)) {
                     return buildPackPageItem(shipmentItem)
                 }
@@ -745,19 +751,23 @@ class StockMovementService {
         }
     }
 
-    def getStockMovementItems(String id, String stepNumber, String max, String offset) {
+    def getStockMovementItems(StockMovementItemsParamsCommand command) {
+        getStockMovementItems(command.id, command.stepNumber, command.max, command.offset, command.refreshPicklistItems)
+    }
+
+    def getStockMovementItems(String id, Integer stepNumber, Integer max, Integer offset, Boolean refreshPicklistItems) {
         // FIXME should get stock movement instead of requisition
         Requisition requisition = Requisition.get(id)
         List<StockMovementItem> stockMovementItems = []
 
-        if (stepNumber == '3') {
+        if (OutboundWorkflowState.fromStepNumber(stepNumber) == OutboundWorkflowState.REVISE_ITEMS) {
             return getEditPageItems(requisition, max, offset)
         }
 
         if (requisition) {
             List <RequisitionItem> requisitionItems = []
             if (max != null && offset != null) {
-                requisitionItems = RequisitionItem.createCriteria().list(max: max.toInteger(), offset: offset.toInteger()) {
+                requisitionItems = RequisitionItem.createCriteria().list(max: max, offset: offset) {
                     eq("requisition", requisition)
                     isNull("parentRequisitionItem")
                     order("orderIndex", 'asc')
@@ -782,7 +792,7 @@ class StockMovementService {
             Shipment shipment = Shipment.get(id)
             List <ShipmentItem> shipmentItems = []
             if (max != null && offset != null) {
-                shipmentItems = ShipmentItem.createCriteria().list(max: max.toInteger(), offset: offset.toInteger()) {
+                shipmentItems = ShipmentItem.createCriteria().list(max: max, offset: offset) {
                     eq("shipment", shipment)
                     order("sortOrder", 'asc')
                 }
@@ -802,14 +812,17 @@ class StockMovementService {
             }
         }
 
-        switch(stepNumber) {
-            case "2":
+        switch(OutboundWorkflowState.fromStepNumber(stepNumber)) {
+            case OutboundWorkflowState.ADD_ITEMS:
                 return getAddPageItems(requisition, stockMovementItems)
-            case "4":
+            case OutboundWorkflowState.PICK_ITEMS:
+                if (refreshPicklistItems) {
+                    allocatePicklistItems(requisition.requisitionItems?.asList())
+                }
                 return getPickPageItems(id, max, offset)
-            case "5":
+            case OutboundWorkflowState.PACK_ITEMS:
                 return getPackPageItems(id, max, offset)
-            case "6":
+            case OutboundWorkflowState.SEND_SHIPMENT:
                 if (requisition && !requisition.origin.isSupplier() && requisition.origin.supports(ActivityCode.MANAGE_INVENTORY)) {
                     return getPackPageItems(id, max, offset)
                 }
@@ -918,15 +931,15 @@ class StockMovementService {
         return editPageItem
     }
 
-    List getEditPageItems(Requisition requisition, String max, String offset) {
+    List getEditPageItems(Requisition requisition, Integer max, Integer offset) {
         def query = offset ?
                 """ select * FROM edit_page_item where requisition_id = :requisition and requisition_item_type = 'ORIGINAL' ORDER BY sort_order limit :offset, :max; """ :
                 """ select * FROM edit_page_item where requisition_id = :requisition and requisition_item_type = 'ORIGINAL' ORDER BY sort_order """
 
         def data = dataService.executeQuery(query, [
                 'requisition': requisition.id,
-                'offset'     : offset ? offset.toInteger() : null,
-                'max'        : max ? max.toInteger() : null,
+                'offset'     : offset,
+                'max'        : max,
         ])
 
         List editPageItems = buildEditPageItems(data)
@@ -1052,7 +1065,7 @@ class StockMovementService {
         return editPageItems
     }
 
-    List<PickPageItem> getPickPageItems(String id, String max, String offset) {
+    List<PickPageItem> getPickPageItems(String id, Integer max, Integer offset) {
         List<PickPageItem> pickPageItems = []
 
         StockMovement stockMovement = getStockMovement(id)
@@ -1063,13 +1076,13 @@ class StockMovementService {
         }
 
         if (max != null && offset != null) {
-            return pickPageItems.subList(offset.toInteger(), offset.toInteger() + max.toInteger() > pickPageItems.size() ? pickPageItems.size() : offset.toInteger() + max.toInteger());
+            return pickPageItems.subList(offset, offset + max > pickPageItems.size() ? pickPageItems.size() : offset + max);
         }
 
         return pickPageItems
     }
 
-    List<PackPageItem> getPackPageItems(String id, String max, String offset) {
+    List<PackPageItem> getPackPageItems(String id, Integer max, Integer offset) {
         Set<PackPageItem> items = new LinkedHashSet<PackPageItem>()
 
         StockMovement stockMovement = getStockMovement(id)
@@ -1083,10 +1096,115 @@ class StockMovementService {
         List<PackPageItem> packPageItems = new ArrayList<PackPageItem>(items)
 
         if (max != null && offset != null) {
-            return packPageItems.subList(offset.toInteger(), offset.toInteger() + max.toInteger() > packPageItems.size() ? packPageItems.size() : offset.toInteger() + max.toInteger())
+            return packPageItems.subList(offset, offset + max > packPageItems.size() ? packPageItems.size() : offset + max)
         }
 
         return packPageItems
+    }
+
+    List<ImportPickCommand> parsePickCsvTemplateImport(String text) {
+        try {
+            def csvMapReader = new CSVMapReader(new StringReader(text), [skipLines: 1])
+            csvMapReader.fieldKeys = [
+                    'id',
+                    'code',
+                    'name',
+                    'lot',
+                    'expiration',
+                    'binLocation',
+                    'quantity',
+            ]
+            List<Map> dataList = csvMapReader.toList()
+            return dataList*.asType(ImportPickCommand)
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error parsing order item CSV: " + e.message, e)
+        }
+    }
+
+    void validatePicklistListImport(List<PickPageItem> pickPageItems, Boolean supportsOverPick, List<ImportPickCommand> picklistItems) {
+        Map<String, List> groupedItems = picklistItems.groupBy { it.id }
+
+        picklistItems?.each { ImportPickCommand data ->
+            data.validate()
+            // skip validation if id is empty since mos tof the validation relies on an existing requisition id
+            if (!data.id) {
+                return
+            }
+            PickPageItem pickPageItem = pickPageItems.find { it.requisitionItem?.id == data.id }
+            if (!pickPageItem) {
+                data.errors.rejectValue(
+                        "id",
+                        "importPickCommand.requisitionItem.notFound.error",
+                        [data.id] as Object[],
+                        "Requisition item id: ${data.id} not found"
+                )
+            }
+            if (pickPageItem) {
+                AvailableItem availableItem = pickPageItem.getAvailableItem(data.binLocation, data.lot)
+
+                if (!availableItem) {
+                    String lotNumberErrorMessage = data.lot ?: "empty"
+                    String binLocationErrorMessage = data.binLocation ?: "empty"
+                    data.errors.rejectValue(
+                            "id",
+                            "importPickCommand.availableItem.notFound.error",
+                            [lotNumberErrorMessage, binLocationErrorMessage] as Object[],
+                            "There is no item available with: lot \"${lotNumberErrorMessage}\" and bin location \"${binLocationErrorMessage}\""
+                    )
+                }
+
+                Integer itemQuantitySum = groupedItems[data.id].sum { Integer.parseInt(it.quantity) }
+                if (itemQuantitySum > pickPageItem.requisitionItem.quantity) {
+                    if (!supportsOverPick) {
+                        data.errors.rejectValue(
+                                "quantity",
+                                "importPickCommand.quantity.overpick.error",
+                                [pickPageItem.requisitionItem.quantity] as Object[],
+                                "Item is overpicked, expected quantity to not exceed ${pickPageItem.requisitionItem.quantity}"
+                        )
+                    }
+                } else if (itemQuantitySum != pickPageItem.requisitionItem.quantity) {
+                    data.errors.rejectValue(
+                            "quantity",
+                            "importPickCommand.quantity.error",
+                            [pickPageItem.requisitionItem.quantity] as Object[],
+                            "Item expected quantity to equal ${pickPageItem.requisitionItem.quantity}"
+                    )
+                }
+            }
+        }
+    }
+
+    void importPicklistItems(StockMovement stockMovement, List<PickPageItem> pickPageItems, List<Map> picklistItems) {
+        picklistItems.each { params ->
+            // skip rows with errors
+            if (params.hasErrors()) {
+                return
+            }
+
+            PickPageItem pickPageItem = pickPageItems.find {
+                it.requisitionItem?.id == params.id
+            }
+
+            AvailableItem availableItem = pickPageItem.getAvailableItem(params.binLocation, params.lot)
+
+            RequisitionItem requisitionItem = pickPageItem.requisitionItem?.modificationItem ?: pickPageItem.requisitionItem
+
+            pickPageItem.picklistItems.each {
+                if (it.id) {
+                    it.quantity = 0
+                }
+            }
+            pickPageItem.picklistItems.add(new PicklistItem(
+                    requisitionItem: requisitionItem,
+                    inventoryItem: availableItem.inventoryItem,
+                    binLocation: availableItem.binLocation,
+                    quantity: params.quantity,
+                    sortOrder: pickPageItem.sortOrder
+            ))
+        }
+        createOrUpdatePicklistItem(stockMovement, pickPageItems)
     }
 
     List<ReceiptItem> getStockMovementReceiptItems(def stockMovement) {
@@ -1346,6 +1464,7 @@ class StockMovementService {
         if (!picklist) {
             picklist = new Picklist()
             picklist.requisition = requisition
+            requisition.picklist = picklist
         }
         pickPageItems.each { pickPageItem ->
             pickPageItem.picklistItems?.toArray()?.each { PicklistItem picklistItem ->
@@ -1554,6 +1673,20 @@ class StockMovementService {
         return availableSubstitutions.findAll { availableItems -> availableItems.quantityAvailable > 0 }
     }
 
+    void allocatePicklistItems(List<RequisitionItem> requisitionItems) {
+        requisitionItems.each { RequisitionItem requisitionItem ->
+            if (requisitionItem.isSubstituted()) {
+                requisitionItem.substitutionItems.collect { allocateMissingPicklistItems(it) }
+            } else if (requisitionItem.modificationItem) {
+                allocateMissingPicklistItems(requisitionItem.modificationItem)
+            } else {
+                if (!requisitionItem.isCanceled()) {
+                    allocateMissingPicklistItems(requisitionItem)
+                }
+            }
+        }
+    }
+
     /**
      * Get a list of pick page items for the given stock movement item.
      *
@@ -1587,11 +1720,6 @@ class StockMovementService {
      * @return
      */
     PickPageItem buildPickPageItem(RequisitionItem requisitionItem, Integer sortOrder, Boolean showDetails) {
-
-        if (!requisitionItem.picklistItems || (requisitionItem.picklistItems && requisitionItem.totalQuantityPicked() != requisitionItem.quantity &&
-                !requisitionItem.picklistItems.reasonCode)) {
-            createPicklist(requisitionItem, false)
-        }
         PickPageItem pickPageItem = new PickPageItem(requisitionItem: requisitionItem,
                 picklistItems: requisitionItem.picklistItems)
         Location location = requisitionItem?.requisition?.origin
@@ -1606,6 +1734,15 @@ class StockMovementService {
         return pickPageItem
     }
 
+    void allocateMissingPicklistItems(RequisitionItem requisitionItem) {
+        Boolean hasPicklistItems = requisitionItem.picklistItems
+        Boolean isQuantityPickedOtherThanRequested = requisitionItem.totalQuantityPicked() != requisitionItem.quantity
+        Boolean hasReasonCode = requisitionItem.picklistItems.reasonCode
+
+        if (!hasPicklistItems || (hasPicklistItems && isQuantityPickedOtherThanRequested && !hasReasonCode)) {
+            createPicklist(requisitionItem, false)
+        }
+    }
 
     List getPackPageItems(PicklistItem picklistItem) {
         List packPageItems = []

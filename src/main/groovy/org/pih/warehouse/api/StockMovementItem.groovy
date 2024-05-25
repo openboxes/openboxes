@@ -624,6 +624,13 @@ class PickPageItem {
         return availableItems ? availableItems?.sum { it.quantityAvailable } : null
     }
 
+    AvailableItem getAvailableItem(String binLocationName, String lotNumber) {
+        return availableItems?.find { item ->
+            Boolean binLocationMatches = binLocationName ? item.binLocation?.name == binLocationName : !item.binLocation
+            Boolean lotMatches = item.inventoryItem?.lotNumber == (lotNumber ?: null)
+            binLocationMatches && lotMatches
+        }
+    }
 
     String getStatusCode() {
 

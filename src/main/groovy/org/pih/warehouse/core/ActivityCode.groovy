@@ -67,6 +67,8 @@ enum ActivityCode {
 
     AUTOSAVE('AUTOSAVE'),
 
+    ALLOW_OVERPICK('ALLOW_OVERPICK'),
+
     NONE('NONE')
 
     final String id
@@ -102,6 +104,7 @@ enum ActivityCode {
                 SUBMIT_REQUEST,
                 DYNAMIC_CREATION,
                 AUTOSAVE,
+                ALLOW_OVERPICK,
                 NONE,
         ]
     }

@@ -12,7 +12,10 @@ import Alert from 'react-s-alert';
 
 import { fetchReasonCodes, hideSpinner, showSpinner } from 'actions';
 import picklistApi from 'api/services/PicklistApi';
-import { PICKLIST_ITEMS_EXPORT, PICKLIST_TEMPLATE_EXPORT } from 'api/urls';
+import {
+  STOCK_MOVEMENT_BY_ID,
+  STOCK_MOVEMENT_ITEMS,
+} from 'api/urls';
 import ArrayField from 'components/form-elements/ArrayField';
 import ButtonField from 'components/form-elements/ButtonField';
 import FilterInput from 'components/form-elements/FilterInput';
@@ -20,6 +23,7 @@ import LabelField from 'components/form-elements/LabelField';
 import TableRowWithSubfields from 'components/form-elements/TableRowWithSubfields';
 import EditPickModal from 'components/stock-movement-wizard/modals/EditPickModal';
 import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
+import { OutboundWorkflowState } from 'consts/WorkflowState';
 import AlertMessage from 'utils/AlertMessage';
 import {
   apiClientCustomResponseHandler as apiClient,
@@ -27,7 +31,6 @@ import {
   handleValidationErrors,
   parseResponse,
 } from 'utils/apiClient';
-import exportFileFromAPI from 'utils/file-download-util';
 import { renderFormField } from 'utils/form-utils';
 import { formatProductDisplayName, matchesProductCodeOrName } from 'utils/form-values-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
@@ -344,9 +347,9 @@ class PickPage extends Component {
    * @public
    */
   fetchPickPageData() {
-    const url = `/api/stockMovements/${this.state.values.stockMovementId}?stepNumber=4`;
-
-    return apiClient.get(url)
+    return apiClient.get(STOCK_MOVEMENT_BY_ID(this.state.values.stockMovementId), {
+      params: { stepNumber: OutboundWorkflowState.PICK_ITEMS },
+    })
       .then((resp) => {
         const { totalCount } = resp.data;
         const { associations, picklist } = resp.data.data;
@@ -368,29 +371,29 @@ class PickPage extends Component {
   }
 
   fetchPickPageItems() {
-    const url = `/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?stepNumber=4`;
-    apiClient.get(url)
-      .then((response) => {
-        this.setPickPageItems(response, null);
-      });
+    apiClient.get(STOCK_MOVEMENT_ITEMS(this.state.values.stockMovementId), {
+      params: { stepNumber: OutboundWorkflowState.PICK_ITEMS },
+    }).then((response) => {
+      this.setPickPageItems(response, null);
+    });
   }
 
   fetchItemsAfterImport() {
-    const url = `/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?stepNumber=4`;
-    apiClient.get(url)
-      .then((response) => {
-        const { data } = response.data;
-        this.setState({
-          values: {
-            ...this.state.values,
-            pickPageItems: _.map(
-              parseResponse(data),
-              item => this.checkForInitialPicksChanges(item),
-            ),
-          },
-          sorted: false,
-        });
+    apiClient.get(STOCK_MOVEMENT_ITEMS(this.state.values.stockMovementId), {
+      params: { stepNumber: OutboundWorkflowState.PICK_ITEMS, refreshPicklistItems: false },
+    }).then((response) => {
+      const { data } = response.data;
+      this.setState({
+        values: {
+          ...this.state.values,
+          pickPageItems: _.map(
+            parseResponse(data),
+            item => this.checkForInitialPicksChanges(item),
+          ),
+        },
+        sorted: false,
       });
+    });
   }
 
   loadMoreRows({ startIndex }) {
@@ -398,11 +401,15 @@ class PickPage extends Component {
       this.setState({
         isFirstPageLoaded: true,
       });
-      const url = `/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?offset=${startIndex}&max=${this.props.pageSize}&stepNumber=4`;
-      apiClient.get(url)
-        .then((response) => {
-          this.setPickPageItems(response, startIndex);
-        });
+      apiClient.get(STOCK_MOVEMENT_ITEMS(this.state.values.stockMovementId), {
+        params: {
+          offset: startIndex,
+          max: this.props.pageSize,
+          stepNumber: OutboundWorkflowState.PICK_ITEMS,
+        },
+      }).then((response) => {
+        this.setPickPageItems(response, startIndex);
+      });
     }
   }
 
@@ -624,41 +631,38 @@ class PickPage extends Component {
     this.props.showSpinner();
     const { movementNumber, stockMovementId } = formValues;
 
-    exportFileFromAPI({
-      url: PICKLIST_TEMPLATE_EXPORT(stockMovementId),
-      filename: `PickListItems${movementNumber ? `-${movementNumber}` : ''}-template`,
-      format: 'csv',
-    }).finally(() => this.props.hideSpinner());
+    const fileName = `PickListItems${movementNumber ? `-${movementNumber}` : ''}-template`;
+    picklistApi.exportPicklistTemplate(stockMovementId, { fileName })
+      .finally(() => this.props.hideSpinner());
   }
 
   exportPick(formValues) {
     this.props.showSpinner();
     const { movementNumber, stockMovementId } = formValues;
 
-    exportFileFromAPI({
-      url: PICKLIST_ITEMS_EXPORT(stockMovementId),
-      filename: `PickListItems${movementNumber ? `-${movementNumber}` : ''}`,
-      format: 'csv',
-    }).finally(() => this.props.hideSpinner());
+    const fileName = `PickListItems${movementNumber ? `-${movementNumber}` : ''}`;
+    picklistApi.exportPicklistItems(stockMovementId, { fileName })
+      .finally(() => this.props.hideSpinner());
   }
 
   importTemplate(event) {
     this.props.showSpinner();
-    const formData = new FormData();
+    if (this.state.showAlert) {
+      this.setState({ alertMessage: null, showAlert: false });
+    }
     const file = event.target.files[0];
     const { stockMovementId } = this.state.values;
 
-    formData.append('importFile', file.slice(0, file.size, 'text/csv'));
-    const config = {
-      headers: {
-        'content-type': 'multipart/form-data',
-      },
-    };
+    return picklistApi.importPicklist(stockMovementId, file)
+      .then((resp) => {
+        const { errors } = resp.data;
+        if (errors) {
+          this.setState({
+            showAlert: true,
+            alertMessage: errors,
+          });
+        }
 
-    const url = `/api/stockMovements/importPickListItems/${stockMovementId}`;
-
-    return apiClient.post(url, formData, config)
-      .then(() => {
         this.props.hideSpinner();
         this.fetchItemsAfterImport();
       })
@@ -703,6 +707,9 @@ class PickPage extends Component {
 
   async clearPicklist() {
     const { picklist } = this.state.values;
+    if (this.state.showAlert) {
+      this.setState({ alertMessage: null, showAlert: false });
+    }
     this.props.showSpinner();
     try {
       await picklistApi.clearPicklist(picklist?.id);
