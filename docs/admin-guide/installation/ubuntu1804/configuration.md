@@ -31,4 +31,4 @@ grails.serverURL=http://localhost:8080/openboxes
 
 
 !!! note 
-    Documentation for all available configuration properties is provided in the [Configuration](/configuration) section.
+    Documentation for all available configuration properties is provided in the [Configuration](configuration) section.

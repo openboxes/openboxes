@@ -22,12 +22,12 @@ grails.plugins.raven.dsn = http://<client-dsn-key>:<client-secret>@sentry.openbo
 ### Getting a Sentry DSN
 
 1. Go to [sentry.io](https://sentry.io) and click the **Get started** button.
-![Signup for Sentry](/img/sentry-signup.png)
+![Signup for Sentry](img/sentry-signup.png)
 
 1. Create a new project
-![Create Project](/img/sentry-create-project.png)
+![Create Project](img/sentry-create-project.png)
 
 1. Go to Settings > Projects > My Project > Client Keys (DSN)
-![Create Sentry Account](/img/sentry-client-keys.png)
+![Create Sentry Account](img/sentry-client-keys.png)
 
 1. Copy DSN Deprecated

@@ -13,7 +13,7 @@ resolves to your server. It's probably best to have Apache running so you can te
 * Open a web browser
 * Enter your domain in the address bar (e.g. openboxes.example.com)
 * If you see content like the Apache default page then it's working
-![It works](/img/apache-it-works.png "Apache It Works")
+![It works](img/apache-it-works.png "Apache It Works")
 
 
 ### Test with nslookup

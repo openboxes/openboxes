@@ -17,4 +17,4 @@ sudo service openboxes restart
     Change `grails.serverURL` to the IP address or domain name you plan to use for your server.
 
 !!! note 
-    Documentation for all available configuration properties is provided in the [Configuration](/configuration) section.
+    Documentation for all available configuration properties is provided in the [Configuration](configuration) section.
