@@ -2,10 +2,15 @@
 In order to authenticate, you need a valid user account. In order to get the full benefits of the API your user should 
 probably be in role Superuser. Once you have created a Superuser <cough> user, you can attempt to authenticate 
 using your username and password.
-```
-$ curl -i -c cookies.txt -X POST -H "Content-Type: application/json" \
--d '{"username":"jmiranda","password":"password"}' https://openboxes.ngrok.io/openboxes/api/login
 
+Request
+```shell
+curl -i -c cookies.txt -X POST -H "Conent-Type: application/json" \
+-d '{"username":"jmiranda","password":"password"}' \
+https://openboxes.ngrok.io/openboxes/api/login
+```
+Response
+```
 HTTP/1.1 200 OK
 Server: Apache-Coyote/1.1
 Set-Cookie: JSESSIONID=062F3CF6129FC12B6BDD4D02E15BA531; Path=/openboxes

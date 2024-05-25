@@ -1,4 +1,6 @@
-mkdocs==1.2.3
-mkdocs-material
+mkdocs==1.6.0
+mkdocs-material==9.5.23
 mkdocs-material-extensions
+mkdocs-awesome-pages-plugin
+mkdocs-glightbox
 materialx
