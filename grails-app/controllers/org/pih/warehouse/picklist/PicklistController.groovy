@@ -123,24 +123,21 @@ class PicklistController {
             if (pickPageItem.picklistItems.size() > 0) {
                 return pickPageItem.picklistItems.collect { picklistItem ->
                     return [
-                            id: picklistItem?.requisitionItem?.id ?: "",
-                            productCode: picklistItem?.requisitionItem?.product?.productCode ?: "",
-                            productName: picklistItem?.requisitionItem?.product?.name ?: "",
-                            lotNumber: picklistItem?.inventoryItem?.lotNumber ?: "",
+                            id: picklistItem?.requisitionItem?.id,
+                            productCode: picklistItem?.requisitionItem?.product?.productCode,
+                            productName: picklistItem?.requisitionItem?.product?.name,
+                            lotNumber: picklistItem?.inventoryItem?.lotNumber,
                             expirationDate: picklistItem?.inventoryItem?.expirationDate,
-                            binLocation: picklistItem?.binLocation?.name ?: "",
-                            quantity: picklistItem?.quantity ?: "",
+                            binLocation: picklistItem?.binLocation?.name,
+                            quantity: picklistItem?.quantity,
                     ]
                 }
             }
             return [
                     [
-                            id: pickPageItem?.requisitionItem?.id ?: "",
-                            productCode: pickPageItem?.requisitionItem?.product?.productCode ?: "",
-                            productName: pickPageItem?.requisitionItem?.product?.name ?: "",
-                            lotNumber: "",
-                            expirationDate: "",
-                            binLocation: "",
+                            id: pickPageItem?.requisitionItem?.id,
+                            productCode: pickPageItem?.requisitionItem?.product?.productCode,
+                            productName: pickPageItem?.requisitionItem?.product?.name,
                             quantity: 0
                     ]
             ]
