@@ -94,6 +94,20 @@ class PicklistController {
         render(template: "/picklist/print", model: [requisition: requisition, picklist: picklist, location: location, order: params.order])
     }
 
+    private static Map formatPicklistItemPickExport(Map item) {
+        return [
+                "${g.message(code: 'default.id.label')}": item?.id ?: "",
+                "${g.message(code: 'product.productCode.label')}": item?.productCode ?: "",
+                "${g.message(code: 'product.name.label')}": item?.productName ?: "",
+                "${g.message(code: 'inventoryItem.lotNumber.label')}": item?.lotNumber ?: "",
+                "${g.message(code: 'inventoryItem.expirationDate.label')}": item?.expirationDate
+                        ? item.expirationDate?.format(Constants.EXPIRATION_DATE_FORMAT)
+                        : "",
+                "${g.message(code: 'inventoryItem.binLocation.label')}": item?.binLocation ?: "",
+                "${g.message(code: 'picklist.quantity.label')}": item?.quantity == null ? "" : item?.quantity,
+        ]
+    }
+
     def exportPicklistItems() {
         String format = params.get("format", "csv")
 
@@ -105,34 +119,32 @@ class PicklistController {
         }
 
 
-        List lineItems = pickPageItems.collectMany { pickPageItem ->
+        List<Map> lineItems = pickPageItems.collectMany { pickPageItem ->
             if (pickPageItem.picklistItems.size() > 0) {
                 return pickPageItem.picklistItems.collect { picklistItem ->
                     return [
-                            "${g.message(code: 'default.id.label')}": picklistItem?.requisitionItem?.id ?: "",
-                            "${g.message(code: 'product.productCode.label')}": picklistItem?.requisitionItem?.product?.productCode ?: "",
-                            "${g.message(code: 'product.name.label')}": picklistItem?.requisitionItem?.product?.name ?: "",
-                            "${g.message(code: 'inventoryItem.lotNumber.label')}": picklistItem?.inventoryItem?.lotNumber ?: "",
-                            "${g.message(code: 'inventoryItem.expirationDate.label')}": picklistItem?.inventoryItem?.expirationDate
-                                    ? picklistItem.inventoryItem.expirationDate.format(Constants.EXPIRATION_DATE_FORMAT)
-                                    : "",
-                            "${g.message(code: 'inventoryItem.binLocation.label')}": picklistItem?.binLocation?.name ?: "",
-                            "${g.message(code: 'picklist.quantity.label')}": picklistItem?.quantity ?: "",
+                            id: picklistItem?.requisitionItem?.id ?: "",
+                            productCode: picklistItem?.requisitionItem?.product?.productCode ?: "",
+                            productName: picklistItem?.requisitionItem?.product?.name ?: "",
+                            lotNumber: picklistItem?.inventoryItem?.lotNumber ?: "",
+                            expirationDate: picklistItem?.inventoryItem?.expirationDate,
+                            binLocation: picklistItem?.binLocation?.name ?: "",
+                            quantity: picklistItem?.quantity ?: "",
                     ]
                 }
             }
             return [
                     [
-                            "${g.message(code: 'default.id.label')}": pickPageItem?.requisitionItem?.id ?: "",
-                            "${g.message(code: 'product.productCode.label')}": pickPageItem?.requisitionItem?.product?.productCode ?: "",
-                            "${g.message(code: 'product.name.label')}": pickPageItem?.requisitionItem?.product?.name ?: "",
-                            "${g.message(code: 'inventoryItem.lotNumber.label')}": "",
-                            "${g.message(code: 'inventoryItem.expirationDate.label')}": "",
-                            "${g.message(code: 'inventoryItem.binLocation.label')}": "",
-                            "${g.message(code: 'picklist.quantity.label')}": 0
+                            id: pickPageItem?.requisitionItem?.id ?: "",
+                            productCode: pickPageItem?.requisitionItem?.product?.productCode ?: "",
+                            productName: pickPageItem?.requisitionItem?.product?.name ?: "",
+                            lotNumber: "",
+                            expirationDate: "",
+                            binLocation: "",
+                            quantity: 0
                     ]
             ]
-        }
+        }.collect { formatPicklistItemPickExport(it) }
 
         String fileName = "PickListItems\$-${params.id}"
 
