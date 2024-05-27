@@ -1181,14 +1181,14 @@ class IndicatorDataService {
         ]
 
         String query = '''
-            SELECT ii.product_id, COUNT(ii.product_id) as products, GROUP_CONCAT(bt.shipment_number SEPARATOR ' ') as shipments, DATE_FORMAT(sc.last_stock_count, "%d-%M-%Y") FROM (
+            SELECT ii.product_id, COUNT(ii.product_id) as products, GROUP_CONCAT(backdated_transaction.shipment_number SEPARATOR ' ') as shipments, DATE_FORMAT(stock_count.last_stock_count, "%d-%M-%Y") FROM (
                 SELECT t.id as transaction_id, s.shipment_number FROM shipment s
                 INNER JOIN `transaction` t ON t.outgoing_shipment_id  = s.id
                 WHERE DATE_ADD(t.transaction_date, INTERVAL :daysOffset DAY) < t.date_created
                 AND t.date_created > :timeLimit
                 AND s.origin_id = :locationId
-            ) AS bt
-            INNER JOIN transaction_entry te ON te.transaction_id = bt.transaction_id
+            ) AS backdated_transaction
+            INNER JOIN transaction_entry te ON te.transaction_id = backdated_transaction.transaction_id
             INNER JOIN inventory_item ii ON te.inventory_item_id = ii.id
             LEFT JOIN (
                 SELECT ii.product_id, MAX(t.transaction_date) as last_stock_count from transaction_entry te 
@@ -1196,16 +1196,17 @@ class IndicatorDataService {
                 LEFT JOIN `transaction` t ON t.id = te.transaction_id
                 LEFT JOIN transaction_type tt ON tt.id = t.transaction_type_id 
                 WHERE t.inventory_id = :inventoryId
-                AND tt.transaction_code = :transactionCode
+                AND tt.transaction_code IN (:productInventoryTransactionCode, :inventoryTransactionCode)
                 GROUP BY ii.product_id 
-            ) as sc ON sc.product_id = ii.product_id
-            GROUP BY ii.product_id, sc.last_stock_count
+            ) as stock_count ON stock_count.product_id = ii.product_id
+            GROUP BY ii.product_id, stock_count.last_stock_count
         '''
 
         List<GroovyRowResult> results = dataService.executeQuery(query, [
                 locationId: location?.id,
                 inventoryId: location?.inventory?.id,
-                transactionCode: TransactionCode.PRODUCT_INVENTORY.name(),
+                productInventoryTransactionCode: TransactionCode.PRODUCT_INVENTORY.name(),
+                inventoryTransactionCode: TransactionCode.INVENTORY.name(),
                 daysOffset: Holders.config.openboxes.dashboard.backdatedShipments.daysOffset,
                 timeLimit: timeLimit,
         ])
