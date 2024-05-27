@@ -94,7 +94,7 @@ class PicklistController {
         render(template: "/picklist/print", model: [requisition: requisition, picklist: picklist, location: location, order: params.order])
     }
 
-    private static Map formatPicklistItemPickExport(Map item) {
+    private Map formatPicklistItemPickExport(Map item) {
         return [
                 "${g.message(code: 'default.id.label')}": item?.id ?: "",
                 "${g.message(code: 'product.productCode.label')}": item?.productCode ?: "",
