@@ -98,22 +98,39 @@ class PicklistController {
         String format = params.get("format", "csv")
 
         List<PickPageItem> pickPageItems = stockMovementService.getPickPageItems(params.id, null, null)
-        List<PicklistItem> picklistItems = pickPageItems.picklistItems?.flatten()
 
         // We need to create at least one row to ensure an empty template
-        if (picklistItems?.empty) {
-            picklistItems.add(new PicklistItem())
+        if (pickPageItems?.empty) {
+            pickPageItems.add(new PickPageItem())
         }
 
-        def lineItems = picklistItems.collect {
-            [
-                "${g.message(code: 'default.id.label')}": it?.requisitionItem?.id ?: "",
-                "${g.message(code: 'product.productCode.label')}": it?.requisitionItem?.product?.productCode ?: "",
-                "${g.message(code: 'product.name.label')}": it?.requisitionItem?.product?.name ?: "",
-                "${g.message(code: 'inventoryItem.lotNumber.label')}": it?.inventoryItem?.lotNumber ?: "",
-                "${g.message(code: 'inventoryItem.expirationDate.label')}": it?.inventoryItem?.expirationDate ? it.inventoryItem.expirationDate.format(Constants.EXPIRATION_DATE_FORMAT) : "",
-                "${g.message(code: 'inventoryItem.binLocation.label')}": it?.binLocation?.name ?: "",
-                "${g.message(code: 'picklist.quantity.label')}": it?.quantity ?: "",
+
+        List lineItems = pickPageItems.collectMany { pickPageItem ->
+            if (pickPageItem.picklistItems.size() > 0) {
+                return pickPageItem.picklistItems.collect { picklistItem ->
+                    return [
+                            "${g.message(code: 'default.id.label')}": picklistItem?.requisitionItem?.id ?: "",
+                            "${g.message(code: 'product.productCode.label')}": picklistItem?.requisitionItem?.product?.productCode ?: "",
+                            "${g.message(code: 'product.name.label')}": picklistItem?.requisitionItem?.product?.name ?: "",
+                            "${g.message(code: 'inventoryItem.lotNumber.label')}": picklistItem?.inventoryItem?.lotNumber ?: "",
+                            "${g.message(code: 'inventoryItem.expirationDate.label')}": picklistItem?.inventoryItem?.expirationDate
+                                    ? picklistItem.inventoryItem.expirationDate.format(Constants.EXPIRATION_DATE_FORMAT)
+                                    : "",
+                            "${g.message(code: 'inventoryItem.binLocation.label')}": picklistItem?.binLocation?.name ?: "",
+                            "${g.message(code: 'picklist.quantity.label')}": picklistItem?.quantity ?: "",
+                    ]
+                }
+            }
+            return [
+                    [
+                            "${g.message(code: 'default.id.label')}": pickPageItem?.requisitionItem?.id ?: "",
+                            "${g.message(code: 'product.productCode.label')}": pickPageItem?.requisitionItem?.product?.productCode ?: "",
+                            "${g.message(code: 'product.name.label')}": pickPageItem?.requisitionItem?.product?.name ?: "",
+                            "${g.message(code: 'inventoryItem.lotNumber.label')}": "",
+                            "${g.message(code: 'inventoryItem.expirationDate.label')}": "",
+                            "${g.message(code: 'inventoryItem.binLocation.label')}": "",
+                            "${g.message(code: 'picklist.quantity.label')}": 0
+                    ]
             ]
         }
 
@@ -147,7 +164,7 @@ class PicklistController {
             pickPageItems.add(new PickPageItem())
         }
 
-        def lineItems = pickPageItems.collect {
+        List lineItems = pickPageItems.collect {
             [
                     "${g.message(code: 'default.id.label')}": it?.requisitionItem?.id ?: "",
                     "${g.message(code: 'product.productCode.label')}": it?.requisitionItem?.product?.productCode ?: "",
