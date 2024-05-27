@@ -113,7 +113,7 @@ class PicklistController {
                 "${g.message(code: 'inventoryItem.lotNumber.label')}": it?.inventoryItem?.lotNumber ?: "",
                 "${g.message(code: 'inventoryItem.expirationDate.label')}": it?.inventoryItem?.expirationDate ? it.inventoryItem.expirationDate.format(Constants.EXPIRATION_DATE_FORMAT) : "",
                 "${g.message(code: 'inventoryItem.binLocation.label')}": it?.binLocation?.name ?: "",
-                "${g.message(code: 'default.quantity.label')}": it?.quantity ?: "",
+                "${g.message(code: 'picklist.quantity.label')}": it?.quantity ?: "",
             ]
         }
 
@@ -155,7 +155,7 @@ class PicklistController {
                     "${g.message(code: 'inventoryItem.lotNumber.label')}": "",
                     "${g.message(code: 'inventoryItem.expirationDate.label')}": "",
                     "${g.message(code: 'inventoryItem.binLocation.label')}": "",
-                    "${g.message(code: 'default.quantity.label')}": it?.requisitionItem?.quantity ?: "",
+                    "${g.message(code: 'picklist.quantityToPick.label')}": it?.requisitionItem?.quantity ?: "",
             ]
         }
 
