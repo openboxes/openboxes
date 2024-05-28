@@ -48,6 +48,7 @@ import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.ShipOrderCommand
 import org.pih.warehouse.order.ShipOrderItemCommand
+import org.pih.warehouse.picklist.ImportPickCommand
 import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Product
@@ -1109,13 +1110,22 @@ class StockMovementService {
                     'id',
                     'code',
                     'name',
-                    'lot',
-                    'expiration',
+                    'lotNumber',
+                    'expirationDate',
                     'binLocation',
                     'quantity',
             ]
-            List<Map> dataList = csvMapReader.toList()
-            return dataList*.asType(ImportPickCommand)
+            return csvMapReader.toList().collect { it ->
+                new ImportPickCommand(
+                        id: it.id,
+                        code: it.code,
+                        name: it.name,
+                        lotNumber: it.lotNumber,
+                        expirationDate: new Date(it.expirationDate),
+                        binLocation: it.binLocation,
+                        quantity: Integer.parseInt(it.quantity)
+                )
+            }
 
         } catch (Exception e) {
             throw new RuntimeException("Error parsing order item CSV: " + e.message, e)
@@ -1141,10 +1151,10 @@ class StockMovementService {
                 )
             }
             if (pickPageItem) {
-                AvailableItem availableItem = pickPageItem.getAvailableItem(data.binLocation, data.lot)
+                AvailableItem availableItem = pickPageItem.getAvailableItem(data.binLocation, data.lotNumber)
 
                 if (!availableItem) {
-                    String lotNumberErrorMessage = data.lot ?: "empty"
+                    String lotNumberErrorMessage = data.lotNumber ?: "empty"
                     String binLocationErrorMessage = data.binLocation ?: "empty"
                     data.errors.rejectValue(
                             "id",
@@ -1154,7 +1164,7 @@ class StockMovementService {
                     )
                 }
 
-                Integer itemQuantitySum = groupedItems[data.id].sum { Integer.parseInt(it.quantity) }
+                Integer itemQuantitySum = groupedItems[data.id].sum { it.quantity }
                 if (itemQuantitySum > pickPageItem.requisitionItem.quantity) {
                     if (!supportsOverPick) {
                         data.errors.rejectValue(
@@ -1187,7 +1197,7 @@ class StockMovementService {
                 it.requisitionItem?.id == params.id
             }
 
-            AvailableItem availableItem = pickPageItem.getAvailableItem(params.binLocation, params.lot)
+            AvailableItem availableItem = pickPageItem.getAvailableItem(params.binLocation, params.lotNumber)
 
             RequisitionItem requisitionItem = pickPageItem.requisitionItem?.modificationItem ?: pickPageItem.requisitionItem
 
