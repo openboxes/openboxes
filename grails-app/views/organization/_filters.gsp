@@ -1,20 +1,22 @@
 <%@ page import="org.pih.warehouse.core.ActivityCode" %>
-<div class="box">
+<section class="box" aria-label="filters">
     <h2><warehouse:message code="default.filters.label"/></h2>
     <g:form id="searchForm" action="search" method="GET">
         <g:hiddenField name="type" value="${params.type}"/>
         <g:hiddenField name="max" value="${params.max ?: 10}"/>
         <div class="filter-list">
             <div class="filter-list-item">
-                <label>${warehouse.message(code: 'default.search.label')}</label>
+                <label for="q">${warehouse.message(code: 'default.search.label')}</label>
                 <g:textField class="text" id="q" name="q" value="${params.q}" style="width:100%"/>
             </div>
             <div class="filter-list-item">
                 <label>${warehouse.message(code: 'role.roleType.label')}</label>
-                <g:select class="chzn-select-deselect" multiple="true"
-											  name="roleType"
-											  from="${org.pih.warehouse.core.RoleType?.listOrganizationRoleTypes()}"
-											  value="${params?.roleType}"  />
+                <div data-testid="role-type-select" >
+                    <g:select class="chzn-select-deselect" multiple="true"
+                              name="roleType"
+                              from="${org.pih.warehouse.core.RoleType?.listOrganizationRoleTypes()}"
+                              value="${params?.roleType}"  />
+                </div>
             </div>
             <div class="buttons center">
                 <button type="submit" class="button" name="search" value="true">
@@ -28,4 +30,4 @@
             </div>
         </div>
     </g:form>
-</div>
+</section>
