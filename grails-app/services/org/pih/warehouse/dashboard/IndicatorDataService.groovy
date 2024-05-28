@@ -5,6 +5,7 @@ import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import grails.plugin.cache.Cacheable
 import grails.util.Holders
+import groovy.sql.GroovyRowResult
 import groovy.transform.TypeCheckingMode
 import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.grails.web.json.JSONObject
@@ -1166,6 +1167,83 @@ class IndicatorDataService {
     @Cacheable(value = "dashboardCache", key = { "getBackdatedInboundShipments-${locationId}${monthsLimit}" })
     Map getBackdatedInboundShipmentsData(String locationId, Integer monthsLimit) {
         return getBackdatedShipmentsChart(locationId, monthsLimit, StockMovementDirection.INBOUND)
+    }
+
+    @Cacheable(value = "dashboardCache", key = { "getItemsWithBackdatedShipments-${location?.id}" })
+    GraphData getItemsWithBackdatedShipments(Location location) {
+        Integer monthsLimit = Holders.config.openboxes.dashboard.backdatedShipments.monthsLimit
+        Date timeLimit = LocalDate.now().minusMonths(monthsLimit).toDate()
+        Map<String, Integer> amountOfItemsWithBackdatedShipments = [
+            (Constants.ONE)            : 0,
+            (Constants.TWO)            : 0,
+            (Constants.THREE)          : 0,
+            (Constants.FOUR_OR_MORE)   : 0,
+        ]
+
+        String query = '''
+            SELECT ii.product_id, COUNT(ii.product_id) as products, GROUP_CONCAT(backdated_transaction.shipment_number SEPARATOR ' ') as shipments, DATE_FORMAT(stock_count.last_stock_count, "%d-%M-%Y") FROM (
+                SELECT t.id as transaction_id, s.shipment_number FROM shipment s
+                INNER JOIN `transaction` t ON t.outgoing_shipment_id  = s.id
+                WHERE DATE_ADD(t.transaction_date, INTERVAL :daysOffset DAY) < t.date_created
+                AND t.date_created > :timeLimit
+                AND s.origin_id = :locationId
+            ) AS backdated_transaction
+            INNER JOIN transaction_entry te ON te.transaction_id = backdated_transaction.transaction_id
+            INNER JOIN inventory_item ii ON te.inventory_item_id = ii.id
+            LEFT JOIN (
+                SELECT ii.product_id, MAX(t.transaction_date) as last_stock_count from transaction_entry te 
+                LEFT JOIN inventory_item ii ON te.inventory_item_id = ii.id 
+                LEFT JOIN `transaction` t ON t.id = te.transaction_id
+                LEFT JOIN transaction_type tt ON tt.id = t.transaction_type_id 
+                WHERE t.inventory_id = :inventoryId
+                AND tt.transaction_code = :transactionCode
+                GROUP BY ii.product_id 
+            ) as stock_count ON stock_count.product_id = ii.product_id
+            GROUP BY ii.product_id, stock_count.last_stock_count
+        '''
+
+        List<GroovyRowResult> results = dataService.executeQuery(query, [
+                locationId: location?.id,
+                inventoryId: location?.inventory?.id,
+                transactionCode: TransactionCode.PRODUCT_INVENTORY.name(),
+                daysOffset: Holders.config.openboxes.dashboard.backdatedShipments.daysOffset,
+                timeLimit: timeLimit,
+        ])
+
+        List<TableData> tableData = results.collect { new TableData(
+                it[0] as String,                  // Item
+                it[2] as String,                  // Shipments
+                it[3] as String ?: Constants.NONE // Last count
+        ) }
+
+        results.each {
+            if (it[1] >= 4) {
+                amountOfItemsWithBackdatedShipments[Constants.FOUR_OR_MORE] += 1
+                return
+            }
+
+            amountOfItemsWithBackdatedShipments[it[1] as String] += 1
+        }
+
+        Table table = new Table("Item", "Shipments", "Last Count", tableData.toList())
+
+        ColorNumber oneDelayedShipment = new ColorNumber(value: amountOfItemsWithBackdatedShipments[Constants.ONE], subtitle: '1 shipment', order: 1)
+        ColorNumber twoDelayedShipments = new ColorNumber(value: amountOfItemsWithBackdatedShipments[Constants.TWO], subtitle: '2 shipments', order: 2)
+        ColorNumber threeDelayedShipments = new ColorNumber(value: amountOfItemsWithBackdatedShipments[Constants.THREE], subtitle: '3 shipments', order: 3)
+        ColorNumber fourOrMoreDelayedShipments = new ColorNumber(value: amountOfItemsWithBackdatedShipments[Constants.FOUR_OR_MORE], subtitle: '4 or more shipments', order: 4)
+
+        NumbersIndicator numbersIndicator = new NumbersIndicator(
+                oneDelayedShipment,
+                twoDelayedShipments,
+                threeDelayedShipments,
+                fourOrMoreDelayedShipments
+        )
+
+        NumberTableData numberTableData = new NumberTableData(table, numbersIndicator)
+
+        GraphData graphData = new GraphData(numberTableData)
+
+        return graphData
     }
 
     private List fillLabels(int querySize) {

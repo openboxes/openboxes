@@ -7,13 +7,24 @@ class ColorNumber implements Serializable {
     String link
     String color
     def value2
+    Integer order
 
-    ColorNumber(def value, String subtitle = null, String link = null, String color = null, def value2 = null) {
+    ColorNumber(def value, String subtitle = null, String link = null, String color = null, def value2 = null, Integer order = null) {
         this.value = value
         this.subtitle = subtitle
         this.link = link
         this.color = color
         this.value2 = value2
+        this.order = order
+    }
+
+    ColorNumber(Map args) {
+        this.value = args.value
+        this.subtitle = args.subtitle
+        this.link = args.link
+        this.color = args.color
+        this.value2 = args.value2
+        this.order = args.order
     }
 
     def setConditionalColors(def errorCondition, def successCondition) {
@@ -32,6 +43,7 @@ class ColorNumber implements Serializable {
                 "link"    : link,
                 "color"   : color,
                 "value2"  : value2,
+                "order"   : order,
         ]
     }
 }

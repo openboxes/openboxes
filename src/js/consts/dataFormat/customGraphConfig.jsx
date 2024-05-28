@@ -1,8 +1,8 @@
 import { getColorByName } from 'consts/dataFormat/colorMapping';
 
 function loadNumbersOptions(payload) {
-  const palette = (payload.config.colors && payload.config.colors.palette) ?
-    payload.config.colors.palette : 'default';
+  const { colors, columnsSize, truncationLength } = payload.config;
+  const palette = (colors && colors.palette) ? colors.palette : 'default';
 
   const options = {
     colors: {
@@ -10,10 +10,12 @@ function loadNumbersOptions(payload) {
       second: getColorByName('default'),
       third: getColorByName('default'),
     },
+    columnsSize,
+    truncationLength,
   };
 
-  if (payload.config.colors && payload.config.colors.datasets) {
-    Object.entries(payload.config.colors.datasets).forEach(([key, value]) => {
+  if (colors && colors.datasets) {
+    Object.entries(colors.datasets).forEach(([key, value]) => {
       options.colors[value] = getColorByName(key, palette);
     });
   }

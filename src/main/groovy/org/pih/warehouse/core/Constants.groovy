@@ -165,4 +165,11 @@ class Constants {
     static final String SIX_DAYS = "6 days"
     static final String SEVEN_DAYS = "7 days"
     static final String SEVEN_MORE_DAYS = "7+ days"
+
+    static final String ONE = "1"
+    static final String TWO = "2"
+    static final String THREE = "3"
+    static final String FOUR_OR_MORE = "4+"
+
+    static final String NONE = 'None'
 }
