@@ -98,22 +98,53 @@ class PicklistController {
         String format = params.get("format", "csv")
 
         List<PickPageItem> pickPageItems = stockMovementService.getPickPageItems(params.id, null, null)
-        List<PicklistItem> picklistItems = pickPageItems.picklistItems?.flatten()
 
         // We need to create at least one row to ensure an empty template
-        if (picklistItems?.empty) {
-            picklistItems.add(new PicklistItem())
+        if (pickPageItems?.empty) {
+            pickPageItems.add(new PickPageItem())
         }
 
-        def lineItems = picklistItems.collect {
+        Map<String, String> csvHeadings = [
+                id: g.message(code: 'default.id.label', default: 'Id'),
+                productCode: g.message(code: 'product.productCode.label', default: 'Code'),
+                productName: g.message(code: 'product.name.label', default: 'Name'),
+                lotNumber: g.message(code: 'inventoryItem.lotNumber.label', default: 'Serial / Lot Number'),
+                expirationDate: g.message(code: 'inventoryItem.expirationDate.label', default: 'Expiration date'),
+                binLocation: g.message(code: 'inventoryItem.binLocation.label', default: 'Bin Location'),
+                quantity: g.message(code: 'picklist.quantity.label', default: 'Quantity picked'),
+        ]
+
+        List<Map> lineItems = pickPageItems.collectMany { pickPageItem ->
+            if (pickPageItem.picklistItems.size() > 0) {
+                return pickPageItem.picklistItems.collect { picklistItem ->
+                    return [
+                            id: picklistItem?.requisitionItem?.id,
+                            productCode: picklistItem?.requisitionItem?.product?.productCode,
+                            productName: picklistItem?.requisitionItem?.product?.displayNameWithLocaleCode,
+                            lotNumber: picklistItem?.inventoryItem?.lotNumber,
+                            expirationDate: picklistItem?.inventoryItem?.expirationDate,
+                            binLocation: picklistItem?.binLocation?.name,
+                            quantity: picklistItem?.quantity,
+                    ]
+                }
+            }
+            return [
+                    [
+                            id: pickPageItem?.requisitionItem?.id,
+                            productCode: pickPageItem?.requisitionItem?.product?.productCode,
+                            productName: pickPageItem?.requisitionItem?.product?.displayNameWithLocaleCode,
+                            quantity: 0
+                    ]
+            ]
+        }.collect {
             [
-                "${g.message(code: 'default.id.label')}": it?.requisitionItem?.id ?: "",
-                "${g.message(code: 'product.productCode.label')}": it?.requisitionItem?.product?.productCode ?: "",
-                "${g.message(code: 'product.name.label')}": it?.requisitionItem?.product?.name ?: "",
-                "${g.message(code: 'inventoryItem.lotNumber.label')}": it?.inventoryItem?.lotNumber ?: "",
-                "${g.message(code: 'inventoryItem.expirationDate.label')}": it?.inventoryItem?.expirationDate ? it.inventoryItem.expirationDate.format(Constants.EXPIRATION_DATE_FORMAT) : "",
-                "${g.message(code: 'inventoryItem.binLocation.label')}": it?.binLocation?.name ?: "",
-                "${g.message(code: 'default.quantity.label')}": it?.quantity ?: "",
+                    "${csvHeadings.id}": it?.id ?: "",
+                    "${csvHeadings.productCode}": it?.productCode ?: "",
+                    "${csvHeadings.productName}": it?.productName ?: "",
+                    "${csvHeadings.lotNumber}": it?.lotNumber ?: "",
+                    "${csvHeadings.expirationDate}": it?.expirationDate ? it.expirationDate?.format(Constants.EXPIRATION_DATE_FORMAT) : "",
+                    "${csvHeadings.binLocation}": it?.binLocation ?: "",
+                    "${csvHeadings.quantity}": it?.quantity == null ? "" : it?.quantity,
             ]
         }
 
@@ -147,15 +178,25 @@ class PicklistController {
             pickPageItems.add(new PickPageItem())
         }
 
-        def lineItems = pickPageItems.collect {
+        Map<String, String> csvHeadings = [
+                id: g.message(code: 'default.id.label', default: 'Id'),
+                productCode: g.message(code: 'product.productCode.label', default: 'Code'),
+                productName: g.message(code: 'product.name.label', default: 'Name'),
+                lotNumber: g.message(code: 'inventoryItem.lotNumber.label', default: 'Serial / Lot Number'),
+                expirationDate: g.message(code: 'inventoryItem.expirationDate.label', default: 'Expiration date'),
+                binLocation: g.message(code: 'inventoryItem.binLocation.label', default: 'Bin Location'),
+                quantity: g.message(code: 'picklist.quantityToPick.label', default: 'Quantity to pick'),
+        ]
+
+        List lineItems = pickPageItems.collect {
             [
-                    "${g.message(code: 'default.id.label')}": it?.requisitionItem?.id ?: "",
-                    "${g.message(code: 'product.productCode.label')}": it?.requisitionItem?.product?.productCode ?: "",
-                    "${g.message(code: 'product.name.label')}": it?.requisitionItem?.product?.name ?: "",
-                    "${g.message(code: 'inventoryItem.lotNumber.label')}": "",
-                    "${g.message(code: 'inventoryItem.expirationDate.label')}": "",
-                    "${g.message(code: 'inventoryItem.binLocation.label')}": "",
-                    "${g.message(code: 'default.quantity.label')}": it?.requisitionItem?.quantity ?: "",
+                    "${csvHeadings.id}": it?.requisitionItem?.id ?: "",
+                    "${csvHeadings.productCode}": it?.requisitionItem?.product?.productCode ?: "",
+                    "${csvHeadings.productName}": it?.requisitionItem?.product?.displayNameWithLocaleCode ?: "",
+                    "${csvHeadings.lotNumber}": "",
+                    "${csvHeadings.expirationDate}": "",
+                    "${csvHeadings.binLocation}": "",
+                    "${csvHeadings.quantity}": it?.requisitionItem?.quantity ?: "",
             ]
         }
 
