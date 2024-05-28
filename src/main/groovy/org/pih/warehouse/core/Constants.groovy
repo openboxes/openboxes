@@ -170,4 +170,6 @@ class Constants {
     static final String TWO = "2"
     static final String THREE = "3"
     static final String FOUR_OR_MORE = "4+"
+
+    static final String NONE = 'None'
 }

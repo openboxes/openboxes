@@ -1196,7 +1196,7 @@ class IndicatorDataService {
                 LEFT JOIN `transaction` t ON t.id = te.transaction_id
                 LEFT JOIN transaction_type tt ON tt.id = t.transaction_type_id 
                 WHERE t.inventory_id = :inventoryId
-                AND tt.transaction_code IN (:productInventoryTransactionCode, :inventoryTransactionCode)
+                AND tt.transaction_code = :transactionCode
                 GROUP BY ii.product_id 
             ) as stock_count ON stock_count.product_id = ii.product_id
             GROUP BY ii.product_id, stock_count.last_stock_count
@@ -1205,16 +1205,15 @@ class IndicatorDataService {
         List<GroovyRowResult> results = dataService.executeQuery(query, [
                 locationId: location?.id,
                 inventoryId: location?.inventory?.id,
-                productInventoryTransactionCode: TransactionCode.PRODUCT_INVENTORY.name(),
-                inventoryTransactionCode: TransactionCode.INVENTORY.name(),
+                transactionCode: TransactionCode.PRODUCT_INVENTORY.name(),
                 daysOffset: Holders.config.openboxes.dashboard.backdatedShipments.daysOffset,
                 timeLimit: timeLimit,
         ])
 
         List<TableData> tableData = results.collect { new TableData(
-                it[0] as String,          // Item
-                it[2] as String,          // Shipments
-                it[3] as String ?: "None" // Last count
+                it[0] as String,                  // Item
+                it[2] as String,                  // Shipments
+                it[3] as String ?: Constants.NONE // Last count
         ) }
 
         results.each {
