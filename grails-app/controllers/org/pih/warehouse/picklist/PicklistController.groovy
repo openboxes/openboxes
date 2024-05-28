@@ -125,7 +125,7 @@ class PicklistController {
                     return [
                             id: picklistItem?.requisitionItem?.id,
                             productCode: picklistItem?.requisitionItem?.product?.productCode,
-                            productName: picklistItem?.requisitionItem?.product?.name,
+                            productName: picklistItem?.requisitionItem?.product?.displayNameWithLocaleCode,
                             lotNumber: picklistItem?.inventoryItem?.lotNumber,
                             expirationDate: picklistItem?.inventoryItem?.expirationDate,
                             binLocation: picklistItem?.binLocation?.name,
@@ -137,7 +137,7 @@ class PicklistController {
                     [
                             id: pickPageItem?.requisitionItem?.id,
                             productCode: pickPageItem?.requisitionItem?.product?.productCode,
-                            productName: pickPageItem?.requisitionItem?.product?.name,
+                            productName: pickPageItem?.requisitionItem?.product?.displayNameWithLocaleCode,
                             quantity: 0
                     ]
             ]
@@ -177,7 +177,7 @@ class PicklistController {
             [
                     "${g.message(code: 'default.id.label')}": it?.requisitionItem?.id ?: "",
                     "${g.message(code: 'product.productCode.label')}": it?.requisitionItem?.product?.productCode ?: "",
-                    "${g.message(code: 'product.name.label')}": it?.requisitionItem?.product?.name ?: "",
+                    "${g.message(code: 'product.name.label')}": it?.requisitionItem?.product?.displayNameWithLocaleCode ?: "",
                     "${g.message(code: 'inventoryItem.lotNumber.label')}": "",
                     "${g.message(code: 'inventoryItem.expirationDate.label')}": "",
                     "${g.message(code: 'inventoryItem.binLocation.label')}": "",
