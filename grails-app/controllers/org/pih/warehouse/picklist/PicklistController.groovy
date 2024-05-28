@@ -94,20 +94,6 @@ class PicklistController {
         render(template: "/picklist/print", model: [requisition: requisition, picklist: picklist, location: location, order: params.order])
     }
 
-    private Map formatPicklistItemPickExport(Map item) {
-        return [
-                "${g.message(code: 'default.id.label')}": item?.id ?: "",
-                "${g.message(code: 'product.productCode.label')}": item?.productCode ?: "",
-                "${g.message(code: 'product.name.label')}": item?.productName ?: "",
-                "${g.message(code: 'inventoryItem.lotNumber.label')}": item?.lotNumber ?: "",
-                "${g.message(code: 'inventoryItem.expirationDate.label')}": item?.expirationDate
-                        ? item.expirationDate?.format(Constants.EXPIRATION_DATE_FORMAT)
-                        : "",
-                "${g.message(code: 'inventoryItem.binLocation.label')}": item?.binLocation ?: "",
-                "${g.message(code: 'picklist.quantity.label')}": item?.quantity == null ? "" : item?.quantity,
-        ]
-    }
-
     def exportPicklistItems() {
         String format = params.get("format", "csv")
 
@@ -118,6 +104,15 @@ class PicklistController {
             pickPageItems.add(new PickPageItem())
         }
 
+        Map<String, String> csvHeadings = [
+                id: g.message(code: 'default.id.label', default: 'Id'),
+                productCode: g.message(code: 'product.productCode.label', default: 'Code'),
+                productName: g.message(code: 'product.name.label', default: 'Name'),
+                lotNumber: g.message(code: 'inventoryItem.lotNumber.label', default: 'Serial / Lot Number'),
+                expirationDate: g.message(code: 'inventoryItem.expirationDate.label', default: 'Expiration date'),
+                binLocation: g.message(code: 'inventoryItem.binLocation.label', default: 'Bin Location'),
+                quantity: g.message(code: 'picklist.quantity.label', default: 'Quantity picked'),
+        ]
 
         List<Map> lineItems = pickPageItems.collectMany { pickPageItem ->
             if (pickPageItem.picklistItems.size() > 0) {
@@ -141,7 +136,17 @@ class PicklistController {
                             quantity: 0
                     ]
             ]
-        }.collect { formatPicklistItemPickExport(it) }
+        }.collect {
+            [
+                    "${csvHeadings.id}": it?.id ?: "",
+                    "${csvHeadings.productCode}": it?.productCode ?: "",
+                    "${csvHeadings.productName}": it?.productName ?: "",
+                    "${csvHeadings.lotNumber}": it?.lotNumber ?: "",
+                    "${csvHeadings.expirationDate}": it?.expirationDate ? it.expirationDate?.format(Constants.EXPIRATION_DATE_FORMAT) : "",
+                    "${csvHeadings.binLocation}": it?.binLocation ?: "",
+                    "${csvHeadings.quantity}": it?.quantity == null ? "" : it?.quantity,
+            ]
+        }
 
         String fileName = "PickListItems\$-${params.id}"
 
@@ -173,15 +178,25 @@ class PicklistController {
             pickPageItems.add(new PickPageItem())
         }
 
+        Map<String, String> csvHeadings = [
+                id: g.message(code: 'default.id.label', default: 'Id'),
+                productCode: g.message(code: 'product.productCode.label', default: 'Code'),
+                productName: g.message(code: 'product.name.label', default: 'Name'),
+                lotNumber: g.message(code: 'inventoryItem.lotNumber.label', default: 'Serial / Lot Number'),
+                expirationDate: g.message(code: 'inventoryItem.expirationDate.label', default: 'Expiration date'),
+                binLocation: g.message(code: 'inventoryItem.binLocation.label', default: 'Bin Location'),
+                quantity: g.message(code: 'picklist.quantityToPick.label', default: 'Quantity to pick'),
+        ]
+
         List lineItems = pickPageItems.collect {
             [
-                    "${g.message(code: 'default.id.label')}": it?.requisitionItem?.id ?: "",
-                    "${g.message(code: 'product.productCode.label')}": it?.requisitionItem?.product?.productCode ?: "",
-                    "${g.message(code: 'product.name.label')}": it?.requisitionItem?.product?.displayNameWithLocaleCode ?: "",
-                    "${g.message(code: 'inventoryItem.lotNumber.label')}": "",
-                    "${g.message(code: 'inventoryItem.expirationDate.label')}": "",
-                    "${g.message(code: 'inventoryItem.binLocation.label')}": "",
-                    "${g.message(code: 'picklist.quantityToPick.label')}": it?.requisitionItem?.quantity ?: "",
+                    "${csvHeadings.id}": it?.requisitionItem?.id ?: "",
+                    "${csvHeadings.productCode}": it?.requisitionItem?.product?.productCode ?: "",
+                    "${csvHeadings.productName}": it?.requisitionItem?.product?.displayNameWithLocaleCode ?: "",
+                    "${csvHeadings.lotNumber}": "",
+                    "${csvHeadings.expirationDate}": "",
+                    "${csvHeadings.binLocation}": "",
+                    "${csvHeadings.quantity}": it?.requisitionItem?.quantity ?: "",
             ]
         }
 
