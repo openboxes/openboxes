@@ -535,7 +535,7 @@ class PickPage extends Component {
     apiClient.post(STOCK_MOVEMENT_CREATE_PICKLIST(itemId))
       .then(() => {
         apiClient.get(STOCK_MOVEMENT_ITEM_BY_ID(itemId), {
-          params: { stepNumber: OutboundWorkflowState.PICK_ITEMS },
+          params: { stepNumber: OutboundWorkflowState.PICK_ITEMS, refreshPicklistItems: false  },
         })
           .then((resp) => {
             const pickPageItem = resp.data.data;
