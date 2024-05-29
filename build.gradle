@@ -753,13 +753,10 @@ dependencies {
     compile 'org.yaml:snakeyaml:1.33'
     console 'org.yaml:snakeyaml:1.33'
 
-    // testcontainers
-    // included to avoid a dependency conflict with another dependency
-    testCompile 'org.apache.commons:commons-compress:1.21'
+    // For integration tests
+    testCompile 'org.apache.commons:commons-compress:1.21'  // Needed to avoid a dependency conflict
     testCompile "org.testcontainers:mysql:1.17.3"
     testCompile "org.testcontainers:spock:1.17.3"
-
-    // For integration tests
     testCompile 'org.springframework:spring-test'
     testCompile 'io.rest-assured:rest-assured:3.2.0'
     testCompile "org.grails.plugins:build-test-data:3.3.1"

@@ -271,7 +271,8 @@ environments:
             logSlowQueries: false
             username: "openboxes"
             password: "openboxes"
-            url: jdbc:mysql://localhost:3306/openboxes?serverTimezone=UTC&useSSL=false
+            url: jdbc:tc:mysql:///openboxes?serverTimezone=UTC&useSSL=false  # https://java.testcontainers.org/modules/databases/jdbc/
+            driverClassName: org.testcontainers.jdbc.ContainerDatabaseDriver
     production:
         dataSource:
             dumpQueriesOnException: false

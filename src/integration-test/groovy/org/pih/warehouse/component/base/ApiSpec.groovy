@@ -40,9 +40,6 @@ import org.pih.warehouse.util.common.ResponseSpecUtil
  * As such, it's important to note that tests do *not* automatically cleanup their data. While we should try to add a
  * clean up step to our test suites, it's not enforceable that this actually happens, and so tests should always assume
  * the database is in a dirty state before running.
- *
- * This will hopefully become simpler once we introduce testcontainers, where we can more easily bring the db to
- * a clean, known state for each test.
  */
 @Integration
 abstract class ApiSpec extends Specification implements TestDataBuilder {
