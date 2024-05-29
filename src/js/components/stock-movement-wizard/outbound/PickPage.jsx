@@ -13,7 +13,7 @@ import Alert from 'react-s-alert';
 import { fetchReasonCodes, hideSpinner, showSpinner } from 'actions';
 import picklistApi from 'api/services/PicklistApi';
 import {
-  STOCK_MOVEMENT_BY_ID,
+  STOCK_MOVEMENT_BY_ID, STOCK_MOVEMENT_CREATE_PICKLIST, STOCK_MOVEMENT_ITEM_BY_ID,
   STOCK_MOVEMENT_ITEMS,
 } from 'api/urls';
 import ArrayField from 'components/form-elements/ArrayField';
@@ -532,12 +532,11 @@ class PickPage extends Component {
   revertUserPick(itemId) {
     this.props.showSpinner();
 
-    const createPicklistUrl = `/api/stockMovementItems/${itemId}/createPicklist`;
-    const itemsUrl = `/api/stockMovementItems/${itemId}?stepNumber=4`;
-
-    apiClient.post(createPicklistUrl)
+    apiClient.post(STOCK_MOVEMENT_CREATE_PICKLIST(itemId))
       .then(() => {
-        apiClient.get(itemsUrl)
+        apiClient.get(STOCK_MOVEMENT_ITEM_BY_ID(itemId), {
+          params: { stepNumber: OutboundWorkflowState.PICK_ITEMS, refreshPicklistItems: false  },
+        })
           .then((resp) => {
             const pickPageItem = resp.data.data;
 
