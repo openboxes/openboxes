@@ -30,6 +30,8 @@ export const STOCK_MOVEMENT_ITEM_API = `${API}/stockMovementItems`;
 export const STOCK_MOVEMENT_ITEM_BY_ID = id => `${STOCK_MOVEMENT_ITEM_API}/${id}`;
 export const STOCK_MOVEMENT_ITEM_DETAILS = id => `${STOCK_MOVEMENT_ITEM_BY_ID(id)}/details`;
 export const STOCK_MOVEMENT_ITEM_REMOVE = id => `${STOCK_MOVEMENT_ITEM_BY_ID(id)}/removeItem`;
+export const STOCK_MOVEMENT_UPDATE_PICKLIST = id => `${STOCK_MOVEMENT_ITEM_BY_ID(id)}/updatePicklist`;
+export const STOCK_MOVEMENT_CREATE_PICKLIST = id => `${STOCK_MOVEMENT_ITEM_BY_ID(id)}/createPicklist`;
 
 // STOCK TRANSFER
 export const STOCK_TRANSFER_API = `${API}/stockTransfers`;

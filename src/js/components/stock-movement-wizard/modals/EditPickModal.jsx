@@ -7,7 +7,11 @@ import { connect } from 'react-redux';
 import { Tooltip } from 'react-tippy';
 
 import { hideSpinner, showSpinner } from 'actions';
-import { STOCK_MOVEMENT_ITEM_DETAILS } from 'api/urls';
+import {
+  STOCK_MOVEMENT_ITEM_BY_ID,
+  STOCK_MOVEMENT_ITEM_DETAILS,
+  STOCK_MOVEMENT_UPDATE_PICKLIST,
+} from 'api/urls';
 import ArrayField from 'components/form-elements/ArrayField';
 import LabelField from 'components/form-elements/LabelField';
 import ModalWrapper from 'components/form-elements/ModalWrapper';
@@ -201,8 +205,6 @@ class EditPickModal extends Component {
   onSave(values) {
     this.props.showSpinner();
 
-    const picklistUrl = `/api/stockMovementItems/${this.state.attr.itemId}/updatePicklist`;
-    const itemsUrl = `/api/stockMovementItems/${this.state.attr.itemId}?stepNumber=4`;
     const payload = {
       picklistItems: _.map(values.availableItems, avItem => ({
         id: avItem.id || '',
@@ -213,9 +215,11 @@ class EditPickModal extends Component {
       reasonCode: values.reasonCode.value || '',
     };
 
-    apiClient.post(picklistUrl, payload)
+    apiClient.post(STOCK_MOVEMENT_UPDATE_PICKLIST(this.state.attr.itemId), payload)
       .then(() => {
-        apiClient.get(itemsUrl)
+        apiClient.get(STOCK_MOVEMENT_ITEM_BY_ID(this.state.attr.itemId), {
+          params: { stepNumber: OutboundWorkflowState.PICK_ITEMS, refreshPicklistItems: false },
+        })
           .then((resp) => {
             const pickPageItem = resp.data.data;
 
