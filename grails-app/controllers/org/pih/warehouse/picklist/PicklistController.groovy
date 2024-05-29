@@ -18,7 +18,6 @@ import org.pih.warehouse.core.DocumentService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.data.DataService
 import org.pih.warehouse.importer.ImportDataCommand
-import org.pih.warehouse.inventory.ImportPickCommand
 import org.pih.warehouse.inventory.StockMovementService
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.requisition.Requisition

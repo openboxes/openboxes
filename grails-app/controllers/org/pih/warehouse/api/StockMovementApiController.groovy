@@ -15,9 +15,9 @@ import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.RoleType
+import org.pih.warehouse.core.StockMovementParamsCommand
 import org.pih.warehouse.core.User
 import org.pih.warehouse.importer.CSVUtils
-import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.product.Product
@@ -85,20 +85,26 @@ class StockMovementApiController {
         render([data: stockMovements, totalCount: stockMovements?.totalCount] as JSON)
     }
 
-    def read() {
-        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
-        String stepNumber = params.stepNumber
-        def totalCount = stockMovement.lineItems.size()
+    def read(StockMovementParamsCommand command) {
+        StockMovement stockMovement = stockMovementService.getStockMovement(command.id)
+        Integer totalCount = stockMovement.lineItems.size()
 
         // FIXME this should happen in the service
-        if (params.stepNumber == "4") {
-            totalCount = stockMovementService.getPickPageItems(params.id, null, null).size()
-        }
-        if (params.stepNumber == "5") {
-            totalCount = stockMovementService.getPackPageItems(params.id, null, null).size()
-        }
-        if (params.stepNumber == "6" && !stockMovement.origin.isSupplier() && stockMovement.origin.supports(ActivityCode.MANAGE_INVENTORY)) {
-            totalCount = stockMovementService.getPackPageItems(params.id, null, null).size()
+        switch (OutboundWorkflowState.fromStepNumber(command.stepNumber)) {
+            case OutboundWorkflowState.PICK_ITEMS:
+                if (command.refreshPicklistItems) {
+                    stockMovementService.allocatePicklistItems(stockMovement.requisition.requisitionItems?.asList())
+                }
+                totalCount = stockMovementService.getPickPageItems(command.id, null, null).size()
+                break
+            case OutboundWorkflowState.PACK_ITEMS:
+                totalCount = stockMovementService.getPackPageItems(command.id, null, null).size()
+                break
+            case OutboundWorkflowState.SEND_SHIPMENT:
+                if (!stockMovement.origin.isSupplier() && stockMovement.origin.supports(ActivityCode.MANAGE_INVENTORY)) {
+                    totalCount = stockMovementService.getPackPageItems(command.id, null, null).size()
+                }
+                break
         }
 
         // FIXME Debugging
