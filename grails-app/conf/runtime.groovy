@@ -257,6 +257,7 @@ openboxes {
                     defaultLabel: "Stock Movement",
                     menuItems: [
                         [label: "outbound.create.label", defaultLabel: "Create Outbound Movements", href: "/stockMovement/createOutbound?direction=OUTBOUND"],
+                        [label: "outbound.fullOutbound.import.label", defaultLabel: "Import Completed Outbound", href: "/stockMovement/fullOutboundImport"],
                         [label: "outbound.list.label", defaultLabel: "List Outbound Movements", href: "/stockMovement/list?direction=OUTBOUND"],
                         [label: "requests.list.label", defaultLabel: "List Requests", href: "/stockMovement/list?direction=OUTBOUND&sourceType=ELECTRONIC"],
                         [label: "outboundReturns.create.label", defaultLabel: "Create Outbound Return", href: "/stockTransfer/createOutboundReturn"]

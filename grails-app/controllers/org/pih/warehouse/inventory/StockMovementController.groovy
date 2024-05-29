@@ -66,6 +66,10 @@ class StockMovementController {
         render(view: "/common/react", params: params)
     }
 
+    def fullOutboundImport() {
+        render(view: "/common/react", params: params)
+    }
+
     def createInbound() {
         render(view: "/common/react", params: params)
     }

@@ -2,6 +2,8 @@ import React from 'react';
 
 import PropTypes from 'prop-types';
 
+import 'components/wizard/WizardSteps.scss';
+
 const WizardStepsV2 = ({ steps, currentStepKey }) => {
   const isCurrentStep = (iteratedStep) => iteratedStep.key === currentStepKey;
   return (
