@@ -5,6 +5,7 @@ import io.restassured.builder.ResponseSpecBuilder
 import org.apache.http.HttpStatus
 import org.hamcrest.Matchers
 import org.grails.web.json.JSONObject
+import org.springframework.beans.factory.annotation.Autowired
 import spock.lang.Ignore
 import spock.lang.Shared
 
@@ -17,15 +18,11 @@ import org.pih.warehouse.product.Category
  */
 class CategoryApiCRUDSpec extends ApiSpec {
 
-    @Shared
+    @Autowired
     CategoryApi categoryApi
 
     @Shared
     Category category
-
-    void setup() {
-        categoryApi = new CategoryApi(baseRequestSpec)
-    }
 
     @Transactional
     void setupData() {

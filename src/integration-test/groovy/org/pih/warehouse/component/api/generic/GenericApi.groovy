@@ -6,12 +6,14 @@ import io.restassured.http.Method
 import io.restassured.response.Response
 import io.restassured.specification.RequestSpecification
 import io.restassured.specification.ResponseSpecification
+import org.springframework.boot.test.context.TestComponent
 
-import org.pih.warehouse.component.api.base.Api
+import org.pih.warehouse.component.api.base.AuthenticatedApi
 import org.pih.warehouse.util.generic.GenericResource
 
+@TestComponent
 @InheritConstructors
-class GenericApi extends Api {
+class GenericApi extends AuthenticatedApi {
 
     Response list(GenericResource resource, ResponseSpecification responseSpec) {
         RequestSpecification requestSpec = new RequestSpecBuilder()

@@ -10,14 +10,18 @@ import io.restassured.http.Cookie
 import io.restassured.response.Response
 import io.restassured.specification.RequestSpecification
 import grails.gorm.transactions.Transactional
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.context.annotation.Import
 import spock.lang.Shared
 import spock.lang.Specification
 
+import org.pih.warehouse.component.api.base.AuthenticatedApiContext
+import org.pih.warehouse.component.api.base.UnauthenticatedApiContext
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.component.api.auth.AuthApiWrapper
-import org.pih.warehouse.util.common.JsonPathUtil
+import org.pih.warehouse.component.util.JsonPathUtil
 import org.pih.warehouse.util.common.RandomUtil
-import org.pih.warehouse.util.common.ResponseSpecUtil
+import org.pih.warehouse.component.util.ResponseSpecUtil
 
 /**
  * Base class for all of our API/component tests.
@@ -45,6 +49,7 @@ import org.pih.warehouse.util.common.ResponseSpecUtil
  * a clean, known state for each test.
  */
 @Integration
+@Import(ComponentTestConfig.class)
 abstract class ApiSpec extends Specification implements TestDataBuilder {
 
     static final String INVALID_ID = "-1"
@@ -58,25 +63,25 @@ abstract class ApiSpec extends Specification implements TestDataBuilder {
     @Shared
     Cookie cookie
 
+    @Autowired
+    AuthenticatedApiContext authenticatedApiContext
+
+    @Autowired
+    UnauthenticatedApiContext unauthenticatedApiContext
+
     @Shared
     Location location
 
-    @Shared
-    RequestSpecification baseRequestSpec
-
-    @Shared
-    RequestSpecification baseUnauthenticatedRequestSpec
-
-    @Shared
+    @Autowired
     AuthApiWrapper authApiWrapper
 
     @Shared
     RandomUtil randomUtil
 
-    @Shared
+    @Autowired
     ResponseSpecUtil responseSpecUtil
 
-    @Shared
+    @Autowired
     JsonPathUtil jsonPathUtil
 
     /**
@@ -113,16 +118,16 @@ abstract class ApiSpec extends Specification implements TestDataBuilder {
         setupRestAssuredGlobalConfig()
         TestDataConfigurationHolder.reset()  // Needed so that we can regenerate new values for our random fields
 
-        baseUnauthenticatedRequestSpec = buildDefaultUnauthenticatedRequestSpec()
-
-        authApiWrapper = new AuthApiWrapper(baseUnauthenticatedRequestSpec)
         randomUtil = new RandomUtil()
-        responseSpecUtil = new ResponseSpecUtil()
-        jsonPathUtil = new JsonPathUtil()
+
+        // Initialize the API Contexts
+        RequestSpecification baseUnauthenticatedRequestSpec = buildDefaultUnauthenticatedRequestSpec()
+        unauthenticatedApiContext.loadContext(baseUnauthenticatedRequestSpec)
 
         location = createTestLocation()
         cookie = createTestUser(location)
-        baseRequestSpec = buildDefaultRequestSpec(cookie)
+        RequestSpecification baseRequestSpec = buildDefaultRequestSpec(cookie)
+        authenticatedApiContext.loadContext(baseRequestSpec)
 
         setupData()
     }

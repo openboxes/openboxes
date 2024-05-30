@@ -4,11 +4,12 @@ import grails.gorm.transactions.Transactional
 import io.restassured.builder.ResponseSpecBuilder
 import org.apache.http.HttpStatus
 import org.hamcrest.Matchers
+import org.springframework.beans.factory.annotation.Autowired
+
 import org.pih.warehouse.product.ProductAvailability
 import spock.lang.Ignore
 import spock.lang.Shared
 
-import org.pih.warehouse.component.api.generic.GenercApiWrapper
 import org.pih.warehouse.component.api.product.ProductApi
 import org.pih.warehouse.component.base.ApiSpec
 import org.pih.warehouse.product.Product
@@ -21,10 +22,7 @@ class ProductApiSummarySpec extends ApiSpec {
 
     private static final int QUANTITY_ON_HAND = 10
 
-    @Shared
-    GenercApiWrapper genericApiWrapper
-
-    @Shared
+    @Autowired
     ProductApi productApi
 
     @Shared
@@ -32,11 +30,6 @@ class ProductApiSummarySpec extends ApiSpec {
 
     @Shared
     Product product
-
-    void setup() {
-        genericApiWrapper = new GenercApiWrapper(baseRequestSpec)
-        productApi = new ProductApi(baseRequestSpec)
-    }
 
     @Transactional
     void setupData() {

@@ -1,36 +1,25 @@
 package org.pih.warehouse.component.api.base
 
-import io.restassured.specification.RequestSpecification
-
-import org.pih.warehouse.util.common.RandomUtil
-import org.pih.warehouse.util.common.ResponseSpecUtil
+import org.pih.warehouse.component.util.ResponseSpecUtil
 
 /**
  * API wrappers enhance our base API classes, providing shortcuts for utilizing their endpoints in our
  * tests so that the API classes can stay small.
  *
- * Wrappers are meant to wrap only a single API class, or a group of very tightly coupled API classes, and so should
- * not need to ever be called by other wrappers, only from individual tests themselves. If you find the need to call
- * a wrapper from another one, consider breaking out the common logic to some test helper.
+ * Wrappers are meant to wrap only a single API class, and should not need to ever be called by other wrappers,
+ * only from individual tests themselves. If you find the need to call a wrapper from another one, consider breaking
+ * out the common logic to some test helper.
  *
- * Additionally, avoid putting helper methods that are too specific to any individual test scenario. These classes
+ * Additionally, avoid adding methods to a wrapper that are too specific to any individual test scenario. These classes
  * are meant for helper methods that will be useful generally, across test specs.
  */
-abstract class ApiWrapper {
+abstract class ApiWrapper<T> {
 
-    /**
-     * Contains the specification that should be common to all our authenticated APIs.
-     * This saves us from having to define the full spec for each individual API call.
-     */
-    RequestSpecification defaultRequestSpec
+    final T api
+    final ResponseSpecUtil responseSpecUtil
 
-    RandomUtil randomUtil
-    ResponseSpecUtil responseSpecUtil
-
-    ApiWrapper(RequestSpecification defaultRequestSpec) {
-        this.defaultRequestSpec = defaultRequestSpec
-
-        randomUtil = new RandomUtil()
-        responseSpecUtil = new ResponseSpecUtil()
+    ApiWrapper(T api, ResponseSpecUtil responseSpecUtil) {
+        this.api = api
+        this.responseSpecUtil = responseSpecUtil
     }
 }

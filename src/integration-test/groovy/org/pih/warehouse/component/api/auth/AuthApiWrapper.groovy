@@ -1,21 +1,16 @@
 package org.pih.warehouse.component.api.auth
 
+import groovy.transform.InheritConstructors
 import io.restassured.response.Response
-import io.restassured.specification.RequestSpecification
 import org.apache.http.HttpStatus
 import org.grails.web.json.JSONObject
+import org.springframework.boot.test.context.TestComponent
 
 import org.pih.warehouse.component.api.base.ApiWrapper
 
-class AuthApiWrapper extends ApiWrapper {
-
-    private AuthApi authApi
-
-    AuthApiWrapper(RequestSpecification defaultRequestSpec) {
-        super(defaultRequestSpec)
-
-        authApi = new AuthApi(defaultRequestSpec)
-    }
+@TestComponent
+@InheritConstructors
+class AuthApiWrapper extends ApiWrapper<AuthApi> {
 
     /**
      * Expects to successfully authenticate into the app with the provided user.
@@ -33,6 +28,6 @@ class AuthApiWrapper extends ApiWrapper {
      * Expects the given status code is returned when authenticating into the app with the provided user.
      */
     Response login(JSONObject body, int statusCode) {
-        return authApi.login(body.toString(), responseSpecUtil.buildStatusCodeResponseSpec(statusCode))
+        return api.login(body.toString(), responseSpecUtil.buildStatusCodeResponseSpec(statusCode))
     }
 }
