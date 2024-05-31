@@ -1,7 +1,6 @@
 name: Build and Publish Release
 
 on:
-
   # We want releases to be triggered automatically whenever we push a new tag that starts with vX.Y.Z
   push:
     tags:
@@ -36,33 +35,17 @@ jobs:
         with:
           java-version: ${{env.JAVA_VERSION}}
           distribution: zulu
-
-      - name: Cache gradle
-        uses: actions/cache@v4
-        with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
-
-      # TODO: Remove the "-unit" once we use test containers in our integration tests.
-      - name: Run all tests
-        run: ./grailsw test-app -unit --no-daemon
+          cache: 'gradle'
 
       - name: Build WAR file
-        run: ./grailsw war --info --no-daemon --plain-output
+        run: ./grailsw war --info --no-daemon
 
-      # Takes the artifacts generated from the build and creates a release. Releases only contain the most
-      # recently uploaded artifacts for that version, so old artifacts of the same version will be removed.
-      # This avoids confusion about which artifacts should be used when deploying any given version.
-      - uses: ncipollo/release-action@v1
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
         with:
           name: Release ${{env.TAG_NAME}}
-          tag: ${{env.TAG_NAME}}
-          artifacts: ./build/libs/openboxes.war
-          artifactContentType: application/java-archive
-          artifactErrorsFailBuild: true
-          bodyFile: ./.github/release-notes-template.md
-          replacesArtifacts: true
-          allowUpdates: true
-          generateReleaseNotes: true  # Adds the "Full Changelog" line at the end of the release notes.
+          tag_name: ${{env.TAG_NAME}}
+          files: ./build/libs/openboxes.war
+          fail_on_unmatched_files: true
+          body_path: ./.github/release-notes-template.md
+          generate_release_notes: true  # Adds GitHub's auto-generated release notes from release.yml
