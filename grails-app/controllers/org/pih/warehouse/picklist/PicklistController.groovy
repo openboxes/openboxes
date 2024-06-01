@@ -228,6 +228,7 @@ class PicklistController {
         command.importType = "PicklistItems"
         command.location = command.location ?: Location.get(session.warehouse.id)
 
+        // TODO Test that this actually captures all of the validation errors on the input file
         // Validate provided properties of the data import, including the import file
         if(!command.validate()) {
             throw new ValidationException("Failed to import due to errors", command.errors)
@@ -245,7 +246,10 @@ class PicklistController {
 
         stockMovementService.validatePicklistImport(command)
 
-        // TODO Errors should be added to a command class within the validate method
+        // TODO Errors should be added to a command class within the validate method, but the
+        //  you cannot add another command classes errors to a parent command class. Instead
+        //  we probably need a custom validator for the picklistItems association on
+        //  PicklistDataImportCommand
         List<String> errors = []
         command.picklistItems.eachWithIndex { importPickCommand, index ->
             if (importPickCommand.hasErrors()) {
