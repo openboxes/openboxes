@@ -269,9 +269,10 @@ environments:
             logAbandoned: true
             logSql: false
             logSlowQueries: false
-            username: "openboxes"
-            password: "openboxes"
-            url: jdbc:mysql://localhost:3306/openboxes?serverTimezone=UTC&useSSL=false
+            # https://java.testcontainers.org/modules/databases/jdbc/
+            # Note that testcontainers auto-disable SSL when connecting via jdbc https://github.com/testcontainers/testcontainers-java/pull/561
+            url: jdbc:tc:mysql:5.7.44:///openboxes?TC_MY_CNF=testcontainers
+            driverClassName: org.testcontainers.jdbc.ContainerDatabaseDriver
     production:
         dataSource:
             dumpQueriesOnException: false
