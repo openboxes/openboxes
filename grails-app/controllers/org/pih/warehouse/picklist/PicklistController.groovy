@@ -10,6 +10,7 @@
 package org.pih.warehouse.picklist
 
 import grails.converters.JSON
+import grails.validation.ValidationException
 import org.pih.warehouse.api.PickPageItem
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.core.ActivityCode
@@ -218,26 +219,35 @@ class PicklistController {
         }
     }
 
-    def importPickListItems(ImportDataCommand command) {
-        Location location = command.location ?: Location.get(session.warehouse.id)
+    def importPickListItems(PicklistImportDataCommand command) {
 
-        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
-        List<PickPageItem> pickPageItems = stockMovementService.getPickPageItems(params.id, null, null)
+        // Bind stock movement based on provided id
+        command.stockMovement = stockMovementService.getStockMovement(params.id)
 
-        MultipartFile importFile = command.importFile
-        if (importFile.isEmpty()) {
-            throw new IllegalArgumentException("File cannot be empty")
+        // Bind basic properties not provided by request
+        command.importType = "PicklistItems"
+        command.location = command.location ?: Location.get(session.warehouse.id)
+
+        // Validate provided properties of the data import, including the import file
+        if(!command.validate()) {
+            throw new ValidationException("Failed to import due to errors", command.errors)
         }
 
-        String csv = new String(importFile.bytes)
-        List<ImportPickCommand> importedLines = stockMovementService.parsePickCsvTemplateImport(csv)
+        // TODO There should probably be one driver method importPicklist() and all of the following
+        // should go into that method. The only things we need to do in the controller is validate
+        // the input and handle the errors.
 
-        Boolean supportsOverPick = location.supports(ActivityCode.ALLOW_OVERPICK)
-        stockMovementService.validatePicklistListImport(pickPageItems, supportsOverPick, importedLines)
+        // Bind the imported line items to the command class
+        command.picklistItems = stockMovementService.parsePicklistImport(command)
 
+        // Bind the parent requisition items to the command class
+        command.pickPageItems = stockMovementService.getPickPageItems(params.id, null, null)
 
+        stockMovementService.validatePicklistImport(command)
+
+        // TODO Errors should be added to a command class within the validate method
         List<String> errors = []
-        importedLines.eachWithIndex { importPickCommand, index ->
+        command.picklistItems.eachWithIndex { importPickCommand, index ->
             if (importPickCommand.hasErrors()) {
                 List<String> localizedErrors = importPickCommand.errors.allErrors.collect { g.message(error: it) }
                 if (!localizedErrors.isEmpty()) {
@@ -246,12 +256,34 @@ class PicklistController {
             }
         }
 
-        stockMovementService.importPicklistItems(stockMovement, pickPageItems, importedLines)
+        // FIXME Just pass the command object
+        stockMovementService.importPicklistItems(command.stockMovement, command.pickPageItems, command.picklistItems)
 
-        if (!errors.isEmpty()) {
+        if (!command.hasErrors()) {
             render([message: "Data imported with errors", errors: errors] as JSON)
         }
 
         render([message: "Data imported successfully"] as JSON)
     }
+}
+
+
+class PicklistImportDataCommand extends ImportDataCommand {
+
+    Location location
+    StockMovement stockMovement
+    List<PickPageItem> pickPageItems
+    List<ImportPickCommand> picklistItems
+
+    PicklistImportDataCommand() {
+        importType = "picklistItems"
+    }
+
+    static constraints = {
+        // FIXME need to figure out if we can / want to bind stock movement and therefore make this nullable:false
+        stockMovement nullable: true
+        pickPageItems nullable: true
+        picklistItems nullable: true
+    }
+
 }

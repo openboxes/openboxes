@@ -624,12 +624,53 @@ class PickPageItem {
         return availableItems ? availableItems?.sum { it.quantityAvailable } : null
     }
 
-    AvailableItem getAvailableItem(String binLocationName, String lotNumber) {
-        return availableItems?.find { item ->
-            Boolean binLocationMatches = binLocationName ? item.binLocation?.name == binLocationName : !item.binLocation
-            Boolean lotMatches = item.inventoryItem?.lotNumber == (lotNumber ?: null)
-            binLocationMatches && lotMatches
+    /**
+     *
+     * @param inventoryItem
+     * @return
+     */
+    List<SuggestedItem> getSuggestedItems(InventoryItem inventoryItem) {
+
+        Integer quantityRequired = requisitionItem.quantity
+
+        List<AvailableItem> availableItems = getAvailableItems(inventoryItem)
+
+        // We've determined that bin location is null, so we need to suggest items from
+        // default or receiving bins, or throw an exception
+
+        // So I think we need to get the available items that match the requirements,
+        // sort them, then return the recommended amount
+
+        return new ArrayList<SuggestedItem>()
+    }
+
+    /**
+     * Get all available items for the given inventory item.
+     * @param inventoryItem
+     * @return
+     */
+    List<AvailableItem> getAvailableItems(InventoryItem inventoryItem) {
+        return availableItems.findAll { availableItem ->
+            return availableItem.inventoryItem == inventoryItem
         }
+    }
+
+    /**
+     * Get all available items for the given inventory item and internal location.
+     * @param inventoryItem
+     * @param internalLocation
+     * @return
+     */
+    AvailableItem getAvailableItem(InventoryItem inventoryItem, Location internalLocation) {
+        // Return only exact matches on inventory item and internal location
+        return availableItems?.find { availableItem ->
+            return availableItem.inventoryItem == inventoryItem && availableItem.binLocation == internalLocation
+        }
+//        return availableItems?.find { item ->
+//            Boolean binLocationMatches = binLocationName ? item.binLocation?.name == binLocationName : !item.binLocation
+//            Boolean lotMatches = item.inventoryItem?.lotNumber == (lotNumber ?: null)
+//            binLocationMatches && lotMatches
+//        }
     }
 
     String getStatusCode() {

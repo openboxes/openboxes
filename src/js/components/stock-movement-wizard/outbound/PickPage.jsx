@@ -797,10 +797,10 @@ class PickPage extends Component {
                   className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
                 >
                   <span>
-                    <i className="fa fa-download pr-2" />
+                    <i className="fa fa-upload pr-2" />
                     <Translate
-                      id="react.default.button.importTemplate.label"
-                      defaultMessage="Import template"
+                      id="react.stockMovement.importPicklist.label"
+                      defaultMessage="Import Picklist"
                     />
                   </span>
                   <input
@@ -821,7 +821,7 @@ class PickPage extends Component {
                   className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
                 >
                   <span>
-                    <i className="fa fa-upload pr-2" />
+                    <i className="fa fa-download pr-2" />
                     <Translate
                       id="react.default.button.exportTemplate.label"
                       defaultMessage="Export template"
@@ -833,7 +833,7 @@ class PickPage extends Component {
                   onClick={() => this.exportPick(values)}
                   className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
                 >
-                  <span><i className="fa fa-upload pr-2" /><Translate id="react.stockMovement.pickListItem.export.label" defaultMessage="Export Pick" /></span>
+                  <span><i className="fa fa-download pr-2" /><Translate id="react.stockMovement.exportPicklist.label" defaultMessage="Export Pick" /></span>
                 </button>
                 <a
                   href={`${this.state.printPicksUrl}${this.state.sorted ? '?sorted=true' : ''}`}

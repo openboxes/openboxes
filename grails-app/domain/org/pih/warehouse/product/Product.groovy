@@ -453,6 +453,36 @@ class Product implements Comparable, Serializable {
         }
     }
 
+    InventoryItem getDefaultInventoryItem() {
+        return getInventoryItem(null)
+    }
+
+
+    InventoryItem getInventoryItem(String lotNumber) {
+        return getInventoryItem(lotNumber, null)
+    }
+
+    // FIXME we could also just traverse the inventoryItems association rather than making an extra query
+    // FIXME but i wanted to move towards a detached criteria / named query fetch
+    // FIXME the expiration date should be involved here, but we don't require it in other places
+    //  so i'll leave that for as a problem for future me
+    InventoryItem getInventoryItem(String lotNumber, Date expirationDate) {
+        InventoryItem.createCriteria().get() {
+            and {
+                eq("product", this)
+                if (lotNumber) {
+                    eq("lotNumber", lotNumber)
+                } else {
+                    or {
+                        isNull("lotNumber")
+                        eq("lotNumber", "")
+                    }
+                }
+            }
+        }
+    }
+
+
     /**
      * Get ABC classification for this product at the given location.
      * @param locationId

@@ -50,6 +50,7 @@ import org.pih.warehouse.order.ShipOrderCommand
 import org.pih.warehouse.order.ShipOrderItemCommand
 import org.pih.warehouse.picklist.ImportPickCommand
 import org.pih.warehouse.picklist.Picklist
+import org.pih.warehouse.picklist.PicklistImportDataCommand
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductAssociationTypeCode
@@ -1103,13 +1104,17 @@ class StockMovementService {
         return packPageItems
     }
 
-    List<ImportPickCommand> parsePickCsvTemplateImport(String text) {
+    List<ImportPickCommand> parsePicklistImport(PicklistImportDataCommand command) {
+
+        // FIXME We should probably do some additional validation on the import file here or
+        // at least catch any exceptions that might happen
+        String text = new String(command.importFile.bytes)
         try {
             def csvMapReader = new CSVMapReader(new StringReader(text), [skipLines: 1])
             csvMapReader.fieldKeys = [
                     'id',
-                    'code',
-                    'name',
+                    'code', // code => productCode
+                    'name', // name => productName
                     'lotNumber',
                     'expirationDate',
                     'binLocation',
@@ -1132,15 +1137,38 @@ class StockMovementService {
         }
     }
 
-    void validatePicklistListImport(List<PickPageItem> pickPageItems, Boolean supportsOverPick, List<ImportPickCommand> picklistItems) {
+    /**
+     * This method needs to be broken down into multiple smaller methods.
+     *
+     * @param command
+     */
+    void validatePicklistImport(PicklistImportDataCommand command) {
+
+        // The parent requisition items that picklist items are associated with
+        List<PickPageItem> pickPageItems = command.pickPageItems
+
+        // The allocated picklist items to validate
+        List<ImportPickCommand> picklistItems = command.picklistItems
+
+        // Configuration property that allows overpick for a given location
+        Boolean supportsOverpick = command.location.supports(ActivityCode.ALLOW_OVERPICK)
+
+        // TODO Do we handle the case where ID is null?
+        // Group the picklist items from the CSV by requisition item ID
         Map<String, List> groupedItems = picklistItems.groupBy { it.id }
 
         picklistItems?.each { ImportPickCommand data ->
+
+            // Base validation, creates errors object
             data.validate()
-            // skip validation if id is empty since mos tof the validation relies on an existing requisition id
+
+            // TODO What happens if ID is null
+            // skip validation if id is empty since most of the validation relies on an existing requisition id
             if (!data.id) {
                 return
             }
+
+
             PickPageItem pickPageItem = pickPageItems.find { it.requisitionItem?.id == data.id }
             if (!pickPageItem) {
                 data.errors.rejectValue(
@@ -1151,9 +1179,30 @@ class StockMovementService {
                 )
             }
             if (pickPageItem) {
-                AvailableItem availableItem = pickPageItem.getAvailableItem(data.binLocation, data.lotNumber)
+
+                // Resolve given lot number to an inventory item
+                InventoryItem inventoryItem =
+                        pickPageItem.requisitionItem.product.getInventoryItem(data.lotNumber, data.expirationDate)
+
+                // OBPIH-6331 Resolve bin location
+                //  if given bin location is null or ambiguous then we need to do some special rules
+                Location internalLocation = command.location.getInternalLocation(data.binLocation)
+
+                // FIXME It's ok to use the available items if we ensure that we are validating against
+                //  calculated inventory items before the stock movement is shipped / transactions created
+                //  otherwise we could encounter a situation where the picklist item is valid based on
+                //  the product availability, but this data might be stale for some reason
+                //AvailableItem availableItem = pickPageItem.getAvailableItems(inventoryItem)
+                AvailableItem availableItem = pickPageItem.getAvailableItem(inventoryItem, internalLocation)
+
+                // FIXME In a comment on ticket OBPIH-6331, Manon requested that we return
+                //  multiple items based on certain conditions. This breaks the "contract" for
+                //  the import and turns this from a manual import into an allocation algorithm
+                //  but if it's actually required we can base the whole thing on allocation rules.
+                // List<SuggestedItem> suggestedItems = pickPageItem.getSuggestedItems(inventoryItem)
 
                 if (!availableItem) {
+                    // FIXME I don't like the way this is working but haven't had time to think of a better solution yet
                     String lotNumberErrorMessage = data.lotNumber ?: "empty"
                     String binLocationErrorMessage = data.binLocation ?: "empty"
                     data.errors.rejectValue(
@@ -1166,7 +1215,7 @@ class StockMovementService {
 
                 Integer itemQuantitySum = groupedItems[data.id].sum { it.quantity }
                 if (itemQuantitySum > pickPageItem.requisitionItem.quantity) {
-                    if (!supportsOverPick) {
+                    if (!supportsOverpick) {
                         data.errors.rejectValue(
                                 "quantity",
                                 "importPickCommand.quantity.overpick.error",
