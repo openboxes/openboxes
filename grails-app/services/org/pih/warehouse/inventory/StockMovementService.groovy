@@ -1154,13 +1154,15 @@ class StockMovementService {
                 AvailableItem availableItem = pickPageItem.getAvailableItem(data.binLocation, data.lotNumber)
 
                 if (!availableItem) {
-                    String lotNumberErrorMessage = data.lotNumber ?: "empty"
-                    String binLocationErrorMessage = data.binLocation ?: "empty"
+                    ApplicationTagLib g = grailsApplication.mainContext.getBean(ApplicationTagLib.class)
+
+                    String lotNumberName = data.lotNumber ?: g.message(code: "default.label", default: "Default")
+                    String binLocationName = data.binLocation ?: g.message(code: "default.label", default: "Default")
                     data.errors.rejectValue(
                             "id",
                             "importPickCommand.availableItem.notFound.error",
-                            [lotNumberErrorMessage, binLocationErrorMessage] as Object[],
-                            "There is no item available with: lot \"${lotNumberErrorMessage}\" and bin location \"${binLocationErrorMessage}\""
+                            [lotNumberName, binLocationName] as Object[],
+                            "There is no item available with: lot \"${lotNumberName}\" and bin location \"${binLocationName}\""
                     )
                 }
 
