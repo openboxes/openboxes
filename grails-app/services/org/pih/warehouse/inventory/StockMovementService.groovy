@@ -1189,9 +1189,11 @@ class StockMovementService {
     }
 
     void importPicklistItems(StockMovement stockMovement, List<PickPageItem> pickPageItems, List<Map> picklistItems) {
+        Map<String, List> groupedItems = picklistItems.groupBy { it.id }
+
         picklistItems.each { params ->
             // skip rows with errors
-            if (params.hasErrors()) {
+            if (params.hasErrors() || groupedItems[params.id].any{ it.hasErrors() }) {
                 return
             }
 
