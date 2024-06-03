@@ -666,11 +666,6 @@ class PickPageItem {
         return availableItems?.find { availableItem ->
             return availableItem.inventoryItem == inventoryItem && availableItem.binLocation == internalLocation
         }
-//        return availableItems?.find { item ->
-//            Boolean binLocationMatches = binLocationName ? item.binLocation?.name == binLocationName : !item.binLocation
-//            Boolean lotMatches = item.inventoryItem?.lotNumber == (lotNumber ?: null)
-//            binLocationMatches && lotMatches
-//        }
     }
 
     String getStatusCode() {

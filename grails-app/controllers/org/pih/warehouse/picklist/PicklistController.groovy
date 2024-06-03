@@ -246,10 +246,13 @@ class PicklistController {
 
         stockMovementService.validatePicklistImport(command)
 
-        // TODO Errors should be added to a command class within the validate method, but the
+        // TODO Errors should be added to a command class within the validate method, but
         //  you cannot add another command classes errors to a parent command class. Instead
         //  we probably need a custom validator for the picklistItems association on
-        //  PicklistDataImportCommand
+        //  PicklistDataImportCommand and just call validate on the parent.
+        //
+        // TODO If nothing else, the code below should be cleaned up and added to a utility
+        //  ErrorsUtil.copyAllErrors(source, destination)
         List<String> errors = []
         command.picklistItems.eachWithIndex { importPickCommand, index ->
             if (importPickCommand.hasErrors()) {

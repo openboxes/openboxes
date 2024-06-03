@@ -1162,8 +1162,8 @@ class StockMovementService {
             // Base validation, creates errors object
             data.validate()
 
-            // TODO What happens if ID is null
-            // skip validation if id is empty since most of the validation relies on an existing requisition id
+            // TODO What happens if ID is null. We should throw an exception if we don't have a good answer.
+            //  skip validation if id is empty since most of the validation relies on an existing requisition id
             if (!data.id) {
                 return
             }
@@ -1188,12 +1188,64 @@ class StockMovementService {
                 //  if given bin location is null or ambiguous then we need to do some special rules
                 Location internalLocation = command.location.getInternalLocation(data.binLocation)
 
-                // FIXME It's ok to use the available items if we ensure that we are validating against
-                //  calculated inventory items before the stock movement is shipped / transactions created
-                //  otherwise we could encounter a situation where the picklist item is valid based on
+                // TODO It's probably ok to use proudct availability data here. However, we
+                //  probably want to validate against actual inventory items (calculated from
+                //  transactions) before the stock movement is shipped (i.e. transactions created).
+                //  Otherwise we could encounter a situation where the picklist item is valid based on
                 //  the product availability, but this data might be stale for some reason
-                //AvailableItem availableItem = pickPageItem.getAvailableItems(inventoryItem)
+
+                // TODO Need to test whether this satisfies the requirement when passing a NULL
+                //  bin location. We also probably want to deal with the case where the provided
+                //  bin location is provided, but not found.
+
+                // Let's try to determine whether there's a specific available inventory item
+                //  associated with the data provided by the user
+
                 AvailableItem availableItem = pickPageItem.getAvailableItem(inventoryItem, internalLocation)
+
+                // FIXME Need to move the following code to an allocation service.
+                // If there is no available item for the provided data, then we need to allocate an
+                // item based on the requirements specified in the ticket (OBPIH-6331).
+                if (!availableItem) {
+                    Integer quantityRequired = data.quantity
+                    List<AvailableItem> availableItems = pickPageItem.getAvailableItems(inventoryItem)
+                    List<SuggestedItem> suggestedItems = getSuggestedItems(availableItems, quantityRequired)
+
+                    // Scenario 1: All stock in default (no bin)
+                    // TODO If there's enough available quantity in the default bin, then allocate
+                    //  quantity from the default location
+
+                    // Scenario 2: All stock in one bin
+                    // TODO If there's enough available quantity in one internal location, then
+                    //  then allocate stock from that location
+
+                    // Scenario 3a: if lot has stock entries in receiving bins
+                    // TODO Are receiving locations configured to be picking locations?
+                    // TODO If there's available quantity in default + receiving locations, then
+                    //  allocate using FIFO algorithm. Need to check with Manon if this is what is
+                    //  expected.
+
+                    // Scenario 3b: if lot has stock entries in default bin
+                    // TODO If there's enough quantity available in default location, then
+                    //  allocate from default location.
+
+                    // Scenario 3c: if lot has stock entries only in hold bins
+                    // TODO If lot has stock entries only in hold bin, then throw an exception.
+
+                    // Scenario 4: Any other scenario (stock in “real” bin and virtual bin, stock in multiple real bins)
+                    // TODO If there's not enough available quantity in default + receiving
+                    //  locations, then throw an exception
+
+
+                }
+
+                // TODO At the end of this we need to determine if we have enough available quantity
+                //  to actually allocate items. If not we should throw an exception.
+
+                // TODO The weird thing here is that we're doing this as a pre-allocation activity
+                //  just to satisfy the validation requirements. We'll then need to do the same
+                //  thing within the importPicklistItems method, so technically this code should
+                //  be pulled out into its own method
 
                 // FIXME In a comment on ticket OBPIH-6331, Manon requested that we return
                 //  multiple items based on certain conditions. This breaks the "contract" for
