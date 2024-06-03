@@ -1015,6 +1015,18 @@ div.search-input:focus-within {
   }
 }
 
+.grayed-button {
+  @extend %button-base;
+
+  color: $black-alpha;
+  font-weight: 700;
+  border: 1px solid $black-alpha !important;
+
+  &:hover {
+    background-color: var(--gray-200);
+  }
+}
+
 .transparent-button {
   @extend %button-base;
 
