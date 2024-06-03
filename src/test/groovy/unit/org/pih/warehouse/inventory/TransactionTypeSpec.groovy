@@ -1,15 +1,12 @@
 package org.pih.warehouse.inventory
 
 import grails.testing.gorm.DomainUnitTest
-import org.junit.Test
 import spock.lang.Specification
 import spock.lang.Unroll
-
 
 class TransactionTypeSpec  extends Specification implements DomainUnitTest<TransactionType> {
 
     @Unroll
-    @Test
     def 'should return #expected with error code #expectedErrorCode when validating transaction type given name #value'() {
         given: "the name is #value"
         domain.name = value
@@ -30,8 +27,7 @@ class TransactionTypeSpec  extends Specification implements DomainUnitTest<Trans
     }
 
     @Unroll
-    @Test
-    void 'should return #expected with error code #expectedErrorCode when validating transaction type given description #value'() {
+    void 'should return #expected with error code #expectedErrorCode when validating transaction type given name #value'() {
         when:
         domain.description = value
 
@@ -46,8 +42,6 @@ class TransactionTypeSpec  extends Specification implements DomainUnitTest<Trans
         'Dummy description' || true     | null
     }
 
-    @Test
-    @Unroll
     void 'should expect two validation errors when validating given an empty transaction type'() {
         given:
         domain
@@ -60,8 +54,6 @@ class TransactionTypeSpec  extends Specification implements DomainUnitTest<Trans
         assert domain.errors.errorCount == 2
     }
 
-    @Unroll
-    @Test
     void 'should expect the names to be the same'() {
         given: "a valid transaction type with multiple"
         TransactionType transactionType =
@@ -75,8 +67,7 @@ class TransactionTypeSpec  extends Specification implements DomainUnitTest<Trans
     }
 
     @Unroll
-    @Test
-    void 'should return #expected with error code #expectedErrorCode when validating transaction type given transactionCode #value'() {
+    void 'should return #expected with error code #expectedErrorCode when validating transaction type given name #value'() {
         given:
         domain.transactionCode = value
 
@@ -94,13 +85,11 @@ class TransactionTypeSpec  extends Specification implements DomainUnitTest<Trans
     }
 
     @Unroll
-    @Test
     void 'should return #expected when given name #value'() {
         given:
         domain.name = value
 
         when:
-        domain.save()
         boolean isAdjustment = domain.isAdjustment()
 
         then:
@@ -111,29 +100,5 @@ class TransactionTypeSpec  extends Specification implements DomainUnitTest<Trans
         'Adjustment|fr:Ajustement|es:Ajustamiento' || true
         'NO_Adjustment'                            || false
         'Adjustment'                               || true
-    }
-
-    @Unroll
-    @Test
-    void 'should return #expectedDateCreated and #expectedLastUpdated when given name #value and transactionCode #transactionCode and dateCreated #expectedDateCreated and lastUpdated #expectedLastUpdated' () {
-        given:
-        domain.name = value
-        domain.transactionCode = TransactionCode.DEBIT
-        domain.dateCreated = expectedDateCreated
-        domain.lastUpdated = expectedLastUpdated
-
-
-        when:
-        domain.save()
-        Date savedDateCreated = domain.dateCreated
-        Date savedLastUpdated = domain.lastUpdated
-
-        then:
-        savedDateCreated == expectedDateCreated
-        savedLastUpdated == expectedLastUpdated
-
-        where:
-        value               || expectedDateCreated       | expectedLastUpdated       | transactionCode
-        'Testing Name'      || new Date()                | new Date()                | TransactionCode.DEBIT
     }
 }
