@@ -1121,9 +1121,9 @@ class StockMovementService {
                         code: it.code,
                         name: it.name,
                         lotNumber: it.lotNumber,
-                        expirationDate: new Date(it.expirationDate),
+                        expirationDate: it.expirationDate ? new Date(it.expirationDate) : null,
                         binLocation: it.binLocation,
-                        quantity: Integer.parseInt(it.quantity)
+                        quantity: it.quantity.isNumber() ? Integer.parseInt(it.quantity) : null
                 )
             }
 
