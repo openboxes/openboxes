@@ -169,6 +169,11 @@ const AsyncProductSupplierCreatePage = Loadable({
   loading: Loading,
 });
 
+const AsyncOutboundImport = Loadable({
+  loader: () => import('components/stock-movement-wizard/outboundImport/OutboundImport'),
+  loading: Loading,
+});
+
 const StockMovementList = (props) => {
   const parsedSearchQuery = queryString.parse(props?.location?.search);
   const direction = parsedSearchQuery?.direction?.toUpperCase();
@@ -208,6 +213,7 @@ const Router = (props) => {
             <MainLayoutRoute path="**/putAway/create/:putAwayId?" component={AsyncPutAwayMainPage} />
             <MainLayoutRoute path="**/stockMovement/list" component={StockMovementList} />
             <MainLayoutRoute path="**/stockMovement/createOutbound/:stockMovementId?" component={AsyncStockMovement} />
+            <MainLayoutRoute path="**/stockMovement/importOutboundStockMovement" component={AsyncOutboundImport} />
             <MainLayoutRoute path="**/stockMovement/createInbound/:stockMovementId?" component={AsyncStockMovementInbound} />
             <MainLayoutRoute path="**/stockMovement/createCombinedShipments/:stockMovementId?" component={AsyncStockMovementCombinedShipments} />
             <MainLayoutRoute path="**/stockMovement/createRequest/:stockMovementId?" component={AsyncStockMovementRequest} />
