@@ -7,10 +7,10 @@ import { connect } from 'react-redux';
 import Alert from 'react-s-alert';
 
 import { hideSpinner, showSpinner } from 'actions';
-import FileDrop from 'components/form-elements/FileDrop';
 import ModalWrapper from 'components/form-elements/ModalWrapper';
 import apiClient from 'utils/apiClient';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
+import FileSelect from 'components/form-elements/v2/FileSelect';
 
 
 class ImportBinModal extends Component {
@@ -115,7 +115,7 @@ class ImportBinModal extends Component {
             data={this.state.supportLinks}
             options={{ renderInnerHtml: true }}
           />
-          <FileDrop className="my-3" onDrop={this.onDrop} file={this.state.file} />
+          <FileSelect className="my-3" onChange={this.onDrop} />
         </div>
       </ModalWrapper>
     );
