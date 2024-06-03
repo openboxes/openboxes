@@ -13,7 +13,8 @@ const WizardStepsV2 = ({ steps, currentStepKey }) => {
           <div
             key={step.key}
             className={`step-container ${isCurrentStep(step) ? 'active' : ''}`}
-            data-testid={isCurrentStep(step) ? 'active' : 'inactive'}
+            data-testid="wizard-step"
+            data-stepstate={isCurrentStep(step) ? 'active' : 'inactive'}
           >
             <div
               className="circle"

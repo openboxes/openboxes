@@ -28,13 +28,13 @@ describe('Changing steps', () => {
     },
   ];
 
-  it('wizard will start with the initial key', () => {
+  it('should start with the initial key', () => {
     const { result } = renderHook(() => useWizard({ initialKey: 3, steps }));
 
     expect(result.current[0].key).toEqual(3);
   });
 
-  it('wizard goes to next step', () => {
+  it('should go to next step', () => {
     const { result } = renderHook(() => useWizard({ initialKey: 2, steps }));
 
     act(() => {
@@ -44,7 +44,7 @@ describe('Changing steps', () => {
     expect(result.current[0].key).toEqual(3);
   });
 
-  it('wizard goes to previous step', () => {
+  it('should go to previous step', () => {
     const { result } = renderHook(() => useWizard({ initialKey: 4, steps }));
 
     act(() => {
@@ -54,7 +54,7 @@ describe('Changing steps', () => {
     expect(result.current[0].key).toEqual(3);
   });
 
-  it('wizard goes to specific step', () => {
+  it('should go to specific step', () => {
     const { result } = renderHook(() => useWizard({ initialKey: 1, steps }));
 
     act(() => {
@@ -64,7 +64,7 @@ describe('Changing steps', () => {
     expect(result.current[0].key).toEqual(4);
   });
 
-  it('wizard goes to last step', () => {
+  it('should go to last step', () => {
     const { result } = renderHook(() => useWizard({ initialKey: 1, steps }));
 
     act(() => {
@@ -74,7 +74,7 @@ describe('Changing steps', () => {
     expect(result.current[0].key).toEqual(4);
   });
 
-  it('wizard goes to first step', () => {
+  it('should go to first step', () => {
     const { result } = renderHook(() => useWizard({ initialKey: 3, steps }));
 
     act(() => {

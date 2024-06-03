@@ -169,8 +169,8 @@ const AsyncProductSupplierCreatePage = Loadable({
   loading: Loading,
 });
 
-const AsyncFullOutboundImport = Loadable({
-  loader: () => import('components/stock-movement-wizard/fullOutbound/FullOutboundImport'),
+const AsyncOutboundImport = Loadable({
+  loader: () => import('components/stock-movement-wizard/outboundImport/OutboundImport'),
   loading: Loading,
 });
 
@@ -213,7 +213,7 @@ const Router = (props) => {
             <MainLayoutRoute path="**/putAway/create/:putAwayId?" component={AsyncPutAwayMainPage} />
             <MainLayoutRoute path="**/stockMovement/list" component={StockMovementList} />
             <MainLayoutRoute path="**/stockMovement/createOutbound/:stockMovementId?" component={AsyncStockMovement} />
-            <MainLayoutRoute path="**/stockMovement/fullOutboundImport" component={AsyncFullOutboundImport} />
+            <MainLayoutRoute path="**/stockMovement/importOutboundStockMovement" component={AsyncOutboundImport} />
             <MainLayoutRoute path="**/stockMovement/createInbound/:stockMovementId?" component={AsyncStockMovementInbound} />
             <MainLayoutRoute path="**/stockMovement/createCombinedShipments/:stockMovementId?" component={AsyncStockMovementCombinedShipments} />
             <MainLayoutRoute path="**/stockMovement/createRequest/:stockMovementId?" component={AsyncStockMovementRequest} />

@@ -5,9 +5,17 @@ import PropTypes from 'prop-types';
 const useWizard = ({ initialKey, steps }) => {
   const [key, setKey] = useState(initialKey);
 
-  const set = (val) => {
-    setKey(val);
-  };
+  const stepProperties = useMemo(() => {
+    const foundStepIdx = steps.findIndex((s) => s.key === key);
+    // findIndex returns -1 if the index is not found for given predicate
+    if (foundStepIdx === -1) {
+      throw new Error('Wizard step has not been found!');
+    }
+    return {
+      Step: steps[foundStepIdx],
+      currentStepIdx: foundStepIdx,
+    };
+  }, [key, initialKey]);
 
   const first = () => {
     setKey(steps[0]?.key);
@@ -19,7 +27,7 @@ const useWizard = ({ initialKey, steps }) => {
   };
 
   const next = () => {
-    const nextStepIdx = steps.findIndex((s) => s.key === key) + 1;
+    const nextStepIdx = stepProperties.currentStepIdx + 1;
     const nextStep = steps[nextStepIdx];
     if (nextStep) {
       setKey(nextStep.key);
@@ -27,24 +35,18 @@ const useWizard = ({ initialKey, steps }) => {
   };
 
   const previous = () => {
-    const previousStepIdx = steps.findIndex((s) => s.key === key) - 1;
+    const previousStepIdx = stepProperties.currentStepIdx - 1;
     if (previousStepIdx >= 0) {
       setKey(steps[previousStepIdx]?.key);
     }
   };
 
-  const Step = useMemo(() => {
-    const foundStep = steps.find((s) => s.key === key);
-    if (!foundStep) {
-      throw new Error('Wizard step has not been found!');
-    }
-    return foundStep;
-  }, [key, initialKey]);
+  const { Step } = stepProperties;
 
   return [
     Step,
     {
-      set,
+      set: setKey,
       first,
       next,
       previous,

@@ -66,7 +66,7 @@ class StockMovementController {
         render(view: "/common/react", params: params)
     }
 
-    def fullOutboundImport() {
+    def importOutboundStockMovement() {
         render(view: "/common/react", params: params)
     }
 

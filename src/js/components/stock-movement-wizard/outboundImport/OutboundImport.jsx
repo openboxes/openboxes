@@ -1,12 +1,12 @@
 import React, { useMemo } from 'react';
 
-import FullOutboundImportConfirm from 'components/stock-movement-wizard/fullOutbound/FullOutboundImportConfirm';
-import FullOutboundImportDetails from 'components/stock-movement-wizard/fullOutbound/FullOutboundImportDetails';
+import OutboundImportConfirm from 'components/stock-movement-wizard/outboundImport/OutboundImportConfirm';
+import OutboundImportDetails from 'components/stock-movement-wizard/outboundImport/OutboundImportDetails';
 import WizardStepsV2 from 'components/wizard/v2/WizardStepsV2';
 import useWizard from 'hooks/useWizard';
 
-const FullOutboundImport = () => {
-  const FullOutboundImportStep = {
+const OutboundImport = () => {
+  const OutboundImportStep = {
     DETAILS: {
       key: 'DETAILS',
       // TODO: Make titles translatable in OBPIH-6329
@@ -19,14 +19,14 @@ const FullOutboundImport = () => {
   };
   const steps = useMemo(() => [
     {
-      key: FullOutboundImportStep.DETAILS.key,
-      title: FullOutboundImportStep.DETAILS.title,
-      Component: () => (<FullOutboundImportDetails />),
+      key: OutboundImportStep.DETAILS.key,
+      title: OutboundImportStep.DETAILS.title,
+      Component: () => (<OutboundImportDetails />),
     },
     {
-      key: FullOutboundImportStep.CONFIRM.key,
-      title: FullOutboundImportStep.CONFIRM.title,
-      Component: () => (<FullOutboundImportConfirm />),
+      key: OutboundImportStep.CONFIRM.key,
+      title: OutboundImportStep.CONFIRM.title,
+      Component: () => (<OutboundImportConfirm />),
     },
   ], []);
 
@@ -41,7 +41,7 @@ const FullOutboundImport = () => {
       next,
       previous,
     },
-  ] = useWizard({ initialKey: FullOutboundImportStep.DETAILS.key, steps });
+  ] = useWizard({ initialKey: OutboundImportStep.DETAILS.key, steps });
 
   return (
     <div>
@@ -53,4 +53,4 @@ const FullOutboundImport = () => {
   );
 };
 
-export default FullOutboundImport;
+export default OutboundImport;
