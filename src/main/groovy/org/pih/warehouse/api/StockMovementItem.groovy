@@ -379,6 +379,14 @@ class AvailableItem {
 
 enum AvailableItemStatus {
     AVAILABLE, PICKED, RECALLED, HOLD, NOT_AVAILABLE
+
+    static getList() {
+        [AVAILABLE, PICKED, RECALLED, HOLD, NOT_AVAILABLE]
+    }
+
+    static getListNotAvailable() {
+        [RECALLED, HOLD, NOT_AVAILABLE]
+    }
 }
 
 class SuggestedItem extends AvailableItem {

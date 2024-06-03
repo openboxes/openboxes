@@ -1152,9 +1152,9 @@ class StockMovementService {
             }
             if (pickPageItem) {
                 AvailableItem availableItem = pickPageItem.getAvailableItem(data.binLocation, data.lotNumber)
+                ApplicationTagLib g = grailsApplication.mainContext.getBean(ApplicationTagLib.class)
 
                 if (!availableItem) {
-                    ApplicationTagLib g = grailsApplication.mainContext.getBean(ApplicationTagLib.class)
 
                     String lotNumberName = data.lotNumber ?: g.message(code: "default.label", default: "Default")
                     String binLocationName = data.binLocation ?: g.message(code: "default.label", default: "Default")
@@ -1166,14 +1166,26 @@ class StockMovementService {
                     )
                 }
 
+                if (AvailableItemStatus.listNotAvailable.contains(availableItem.status)) {
+                    String lotNumberName = data.lotNumber ?: g.message(code: "default.label", default: "Default")
+                    String binLocationName = data.binLocation ?: g.message(code: "default.label", default: "Default")
+
+                    data.errors.rejectValue(
+                            "id",
+                            "importPickCommand.availableItem.notAvailable.error",
+                            [lotNumberName, binLocationName] as Object[],
+                            "The stock entry you selected: lot \"${lotNumberName}\" and bin location \"${binLocationName}\" is not available. Please review pick."
+                    )
+                }
+
                 Integer itemQuantitySum = groupedItems[data.id].sum { it.quantity }
                 if (itemQuantitySum > pickPageItem.requisitionItem.quantity) {
                     if (!supportsOverPick) {
                         data.errors.rejectValue(
                                 "quantity",
-                                "importPickCommand.quantity.overpick.error",
+                                "importPickCommand.quantity.error",
                                 [pickPageItem.requisitionItem.quantity] as Object[],
-                                "Item is overpicked, expected quantity to not exceed ${pickPageItem.requisitionItem.quantity}"
+                                "The quantity you selected for item ${pickPageItem.requisitionItem.id} is different to the expected revised quantity. Please review pick."
                         )
                     }
                 } else if (itemQuantitySum != pickPageItem.requisitionItem.quantity) {
@@ -1181,7 +1193,7 @@ class StockMovementService {
                             "quantity",
                             "importPickCommand.quantity.error",
                             [pickPageItem.requisitionItem.quantity] as Object[],
-                            "Item expected quantity to equal ${pickPageItem.requisitionItem.quantity}"
+                            "The quantity you selected for item ${pickPageItem.requisitionItem.id} is different to the expected revised quantity. Please review pick."
                     )
                 }
             }
