@@ -1,7 +1,12 @@
 import { getColorByName } from 'consts/dataFormat/colorMapping';
 
 function loadNumbersOptions(payload) {
-  const { colors, columnsSize, truncationLength } = payload.config;
+  const {
+    colors,
+    columnsSize,
+    truncationLength,
+    disableTruncation,
+  } = payload.config;
   const palette = (colors && colors.palette) ? colors.palette : 'default';
 
   const options = {
@@ -12,6 +17,7 @@ function loadNumbersOptions(payload) {
     },
     columnsSize,
     truncationLength,
+    disableTruncation,
   };
 
   if (colors && colors.datasets) {

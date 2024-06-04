@@ -308,6 +308,7 @@ function fetchGraphIndicator(
           colors: indicatorConfig.colors,
           columnsSize: indicatorConfig.columnsSize,
           truncationLength: indicatorConfig.truncationLength,
+          disableTruncation: indicatorConfig.disableTruncation,
         },
         size: indicatorConfig.size,
       },

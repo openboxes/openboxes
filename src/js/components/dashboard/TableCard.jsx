@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 
 /* global _ */
 const TableCard = (props) => {
-  const { columnsSize, truncationLength } = props;
+  const { columnsSize, truncationLength, disableTruncation } = props;
 
   return (
     <div className="table-card">
@@ -35,14 +35,20 @@ const TableCard = (props) => {
               className={item.link ? 'table-link' : ''}
             >
               <td style={{ width: columnsSize?.number }}>
-                {_.truncate(item.number, { length: truncationLength?.number ?? 80 })}
+                {disableTruncation?.number ? item.number : _.truncate(item.number, {
+                  length: truncationLength?.number ?? 80,
+                })}
               </td>
               { item.icon ? <td><img alt="" src={item.icon} width="20" height="20" /></td> : null }
               <td className="mid" style={{ width: columnsSize?.name }}>
-                {_.truncate(item.name, { length: truncationLength?.name ?? 80 })}
+                {disableTruncation?.name ? item.name : _.truncate(item.name, {
+                  length: truncationLength?.name ?? 80,
+                })}
               </td>
               <td style={{ width: columnsSize?.value }}>
-                {_.truncate(item.value, { length: truncationLength?.value ?? 10 })}
+                {disableTruncation?.value ? item.value : _.truncate(item.value, {
+                  length: truncationLength?.value ?? 10,
+                })}
               </td>
             </tr>
           ))}
@@ -69,6 +75,11 @@ TableCard.propTypes = {
     number: PropTypes.number,
     value: PropTypes.number,
   }),
+  disableTruncation: PropTypes.shape({
+    name: PropTypes.bool,
+    number: PropTypes.bool,
+    value: PropTypes.bool,
+  }),
 };
 
 TableCard.defaultProps = {
@@ -81,6 +92,11 @@ TableCard.defaultProps = {
     name: null,
     number: null,
     value: null,
+  },
+  disableTruncation: {
+    name: undefined,
+    number: undefined,
+    value: undefined,
   },
 };
 

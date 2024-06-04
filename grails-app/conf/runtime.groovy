@@ -1154,6 +1154,9 @@ openboxes {
                     value = 100
                     number = 5
                 }
+                disableTruncation {
+                    name = true
+                }
             }
         }
     }
