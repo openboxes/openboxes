@@ -4,7 +4,44 @@ import PropTypes from 'prop-types';
 
 /* global _ */
 const TableCard = (props) => {
-  const { columnsSize, truncationLength, disableTruncation } = props;
+  const {
+    columnsSize,
+    truncationLength,
+    disableTruncation,
+    data,
+  } = props;
+
+  const displayItemData = ({
+    truncate,
+    item,
+    link,
+    defaultTruncationLength,
+  }) => (
+    <a
+      href={link}
+      className={link ? 'indicator-item-href' : 'disabled-indicator-item-href'}
+      rel="noreferrer"
+      target="_blank"
+    >
+      {!truncate ? item : _.truncate(item, {
+        length: truncationLength ?? defaultTruncationLength,
+      })}
+    </a>
+  );
+
+  const displayListItemsData = (items, links) =>
+    items?.map((item, index) => (
+      <a
+        href={links[index]}
+        className="indicator-item-href"
+        rel="noreferrer"
+        target="_blank"
+      >
+        {item}
+        {' '}
+        <br />
+      </a>
+    ));
 
   return (
     <div className="table-card">
@@ -12,19 +49,19 @@ const TableCard = (props) => {
         <thead>
           <tr>
             <th style={{ width: columnsSize?.number }}>
-              {props.data.number}
+              {data.number}
             </th>
-            { props.data.body.find((item) => item.icon) ? <td /> : null }
+            {data.body.find((item) => item.icon) ? <td /> : null }
             <th style={{ width: columnsSize?.name }} className="mid">
-              {_.truncate(props.data.name, { length: 50 })}
+              {_.truncate(data.name, { length: 50 })}
             </th>
             <th style={{ width: columnsSize?.value }}>
-              {_.truncate(props.data.value, { length: 50 })}
+              {_.truncate(data.value, { length: 50 })}
             </th>
           </tr>
         </thead>
         <tbody>
-          {props.data.body.map((item) => (
+          {data.body.map((item) => (
             <tr
               onClick={() => {
                 if (item.link) {
@@ -35,19 +72,30 @@ const TableCard = (props) => {
               className={item.link ? 'table-link' : ''}
             >
               <td style={{ width: columnsSize?.number }}>
-                {disableTruncation?.number ? item.number : _.truncate(item.number, {
-                  length: truncationLength?.number ?? 80,
+                {displayItemData({
+                  truncate: disableTruncation?.number,
+                  item: item.number,
+                  link: item?.numberLink,
+                  defaultTruncationLength: 80,
                 })}
               </td>
               { item.icon ? <td><img alt="" src={item.icon} width="20" height="20" /></td> : null }
               <td className="mid" style={{ width: columnsSize?.name }}>
-                {disableTruncation?.name ? item.name : _.truncate(item.name, {
-                  length: truncationLength?.name ?? 80,
-                })}
+                {item.name
+                  ? displayItemData({
+                    truncate: disableTruncation?.name,
+                    item: item.name,
+                    link: item?.nameLink,
+                    defaultTruncationLength: 80,
+                  })
+                  : displayListItemsData(item.nameDataList, item.nameLinksList)}
               </td>
               <td style={{ width: columnsSize?.value }}>
-                {disableTruncation?.value ? item.value : _.truncate(item.value, {
-                  length: truncationLength?.value ?? 10,
+                {displayItemData({
+                  truncate: disableTruncation?.value,
+                  item: item.value,
+                  link: item?.valueLink,
+                  defaultTruncationLength: 10,
                 })}
               </td>
             </tr>
@@ -64,6 +112,11 @@ TableCard.propTypes = {
     name: PropTypes.string,
     value: PropTypes.string,
     body: PropTypes.arrayOf(PropTypes.shape({})),
+    numberLink: PropTypes.string,
+    valueLink: PropTypes.string,
+    nameLink: PropTypes.string,
+    nameDataList: PropTypes.arrayOf(PropTypes.string),
+    nameLinksList: PropTypes.arrayOf(PropTypes.string),
   }).isRequired,
   columnsSize: PropTypes.shape({
     name: PropTypes.string,

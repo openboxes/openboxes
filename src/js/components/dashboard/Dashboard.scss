@@ -678,6 +678,16 @@
       }
     }
   }
+
+  .indicator-item-href {
+    color: inherit;
+  }
+
+  .disabled-indicator-item-href {
+    color: inherit;
+    pointer-events: none;
+    cursor: default;
+  }
 }
 
 @media (min-width: 460px) {

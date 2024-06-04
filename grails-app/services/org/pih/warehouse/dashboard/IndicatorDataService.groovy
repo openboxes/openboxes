@@ -1171,6 +1171,7 @@ class IndicatorDataService {
 
     @Cacheable(value = "dashboardCache", key = { "getItemsWithBackdatedShipments-${location?.id}" })
     GraphData getItemsWithBackdatedShipments(Location location) {
+        String urlContextPath = ConfigHelper.contextPath
         Integer monthsLimit = Holders.config.openboxes.dashboard.backdatedShipments.monthsLimit
         Date timeLimit = LocalDate.now().minusMonths(monthsLimit).toDate()
         Map<String, Integer> amountOfItemsWithBackdatedShipments = [
@@ -1184,15 +1185,16 @@ class IndicatorDataService {
             SELECT p.product_code,
             COUNT(DISTINCT backdated_transaction.shipment_number) as products,
             GROUP_CONCAT(DISTINCT backdated_transaction.shipment_number SEPARATOR ' ') as shipments,
-            DATE_FORMAT(stock_count.last_stock_count, "%d-%M-%Y") FROM (
-            (
-                SELECT t.id as transaction_id, s.shipment_number FROM shipment s
+            DATE_FORMAT(stock_count.last_stock_count, "%d-%b-%Y"),
+            GROUP_CONCAT(DISTINCT backdated_transaction.shipment_number, ' ', backdated_transaction.id SEPARATOR ';') as shipment_ids
+            FROM ((
+                SELECT t.id as transaction_id, s.shipment_number, s.id FROM shipment s
                 INNER JOIN `transaction` t ON t.outgoing_shipment_id  = s.id
                 WHERE DATE_ADD(t.transaction_date, INTERVAL :daysOffset DAY) < t.date_created
                 AND t.date_created > :timeLimit
                 AND s.origin_id = :locationId
             ) UNION (
-                SELECT t.id as transaction_id, s.shipment_number FROM shipment s
+                SELECT t.id as transaction_id, s.shipment_number, s.id FROM shipment s
                 INNER JOIN `transaction` t ON t.incoming_shipment_id  = s.id
                 WHERE DATE_ADD(t.transaction_date, INTERVAL :daysOffset DAY) < t.date_created
                 AND t.date_created > :timeLimit
@@ -1211,6 +1213,7 @@ class IndicatorDataService {
                 GROUP BY ii.product_id 
             ) as stock_count ON stock_count.product_id = ii.product_id
             GROUP BY ii.product_id, stock_count.last_stock_count
+            ORDER BY products DESC
         '''
 
         List<GroovyRowResult> results = dataService.executeQuery(query, [
@@ -1221,10 +1224,15 @@ class IndicatorDataService {
                 timeLimit: timeLimit,
         ])
 
-        List<TableData> tableData = results.collect { new TableData(
-                it[0] as String,                  // Item
-                it[2] as String,                  // Shipments
-                it[3] as String ?: Constants.NONE // Last count
+        List<TableData> tableData = results.collect {
+            List<String> shipmentNumbers = it[2].split(' ')
+            List<String> shipmentUrls = it[4].split(';').collect { result -> "${urlContextPath}/stockMovement/show/${result.split(' ')[1]}" }
+            new TableData(
+                number: it[0] as String,                  // Item
+                listNameData: shipmentNumbers,            // Shipments
+                value: it[3] as String ?: Constants.NONE, // Last count
+                numberLink: "${urlContextPath}/inventoryItem/showStockCard/${it[0]}",
+                nameLinksList: shipmentUrls,
         ) }
 
         results.each {
