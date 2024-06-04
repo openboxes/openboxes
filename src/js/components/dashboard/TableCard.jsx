@@ -39,7 +39,6 @@ const TableCard = (props) => {
       >
         {item}
         {' '}
-        <br />
       </a>
     ));
 
@@ -90,7 +89,7 @@ const TableCard = (props) => {
                   })
                   : displayListItemsData(item.nameDataList, item.nameLinksList)}
               </td>
-              <td style={{ width: columnsSize?.value }}>
+              <td className="last" style={{ width: columnsSize?.value }}>
                 {displayItemData({
                   truncate: disableTruncation?.value,
                   item: item.value,

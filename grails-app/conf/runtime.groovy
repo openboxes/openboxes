@@ -1148,7 +1148,7 @@ openboxes {
                     }
                 }
                 columnsSize {
-                    name = '100px'
+                    name = 'auto'
                 }
                 truncationLength {
                     value = 100

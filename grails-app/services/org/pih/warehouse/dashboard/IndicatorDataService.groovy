@@ -1249,7 +1249,7 @@ class IndicatorDataService {
         ColorNumber oneDelayedShipment = new ColorNumber(value: amountOfItemsWithBackdatedShipments[Constants.ONE], subtitle: '1 shipment', order: 1)
         ColorNumber twoDelayedShipments = new ColorNumber(value: amountOfItemsWithBackdatedShipments[Constants.TWO], subtitle: '2 shipments', order: 2)
         ColorNumber threeDelayedShipments = new ColorNumber(value: amountOfItemsWithBackdatedShipments[Constants.THREE], subtitle: '3 shipments', order: 3)
-        ColorNumber fourOrMoreDelayedShipments = new ColorNumber(value: amountOfItemsWithBackdatedShipments[Constants.FOUR_OR_MORE], subtitle: '4 or more shipments', order: 4)
+        ColorNumber fourOrMoreDelayedShipments = new ColorNumber(value: amountOfItemsWithBackdatedShipments[Constants.FOUR_OR_MORE], subtitle: '4 or more', order: 4)
 
         NumbersIndicator numbersIndicator = new NumbersIndicator(
                 oneDelayedShipment,
