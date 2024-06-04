@@ -219,8 +219,6 @@ class PicklistController {
     }
 
     def importPickListItems(ImportDataCommand command) {
-        Location location = command.location ?: Location.get(session.warehouse.id)
-
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
         List<PickPageItem> pickPageItems = stockMovementService.getPickPageItems(params.id, null, null)
 
@@ -232,9 +230,7 @@ class PicklistController {
         String csv = new String(importFile.bytes)
         List<ImportPickCommand> importedLines = stockMovementService.parsePickCsvTemplateImport(csv)
 
-        Boolean supportsOverPick = location.supports(ActivityCode.ALLOW_OVERPICK)
-        stockMovementService.validatePicklistListImport(pickPageItems, supportsOverPick, importedLines)
-
+        stockMovementService.validatePicklistListImport(stockMovement, pickPageItems, importedLines)
 
         List<String> errors = []
         importedLines.eachWithIndex { importPickCommand, index ->

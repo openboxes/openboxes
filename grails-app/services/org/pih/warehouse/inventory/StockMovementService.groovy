@@ -1132,8 +1132,8 @@ class StockMovementService {
         }
     }
 
-    void validatePicklistListImport(List<PickPageItem> pickPageItems, Boolean supportsOverPick, List<ImportPickCommand> picklistItems) {
-        Map<String, List> groupedItems = picklistItems.groupBy { it.id }
+    void validatePicklistListImport(StockMovement stockMovement, List<PickPageItem> pickPageItems, List<ImportPickCommand> picklistItems) {
+        Map<String, List> picklistItemsGroupedByRequisitionItem = picklistItems.groupBy { it.id }
 
         picklistItems?.each { ImportPickCommand data ->
             data.validate()
@@ -1178,21 +1178,22 @@ class StockMovementService {
                     )
                 }
 
-                Integer itemQuantitySum = groupedItems[data.id].sum { it.quantity }
+                Integer itemQuantitySum = picklistItemsGroupedByRequisitionItem[data.id].sum { it.quantity }
                 if (itemQuantitySum > pickPageItem.requisitionItem.quantity) {
-                    if (!supportsOverPick) {
+                    Boolean allowsOverPick = stockMovement.origin.supports(ActivityCode.ALLOW_OVERPICK)
+                    if (!allowsOverPick) {
                         data.errors.rejectValue(
                                 "quantity",
                                 "importPickCommand.quantity.error",
-                                [pickPageItem.requisitionItem.quantity] as Object[],
-                                "The quantity you selected for item ${pickPageItem.requisitionItem.id} is different to the expected revised quantity. Please review pick."
+                                [pickPageItem.requisitionItem.id] as Object[],
+                                "The quantity you selected for item \"${pickPageItem.requisitionItem.id}\" is different to the expected revised quantity. Please review pick."
                         )
                     }
                 } else if (itemQuantitySum != pickPageItem.requisitionItem.quantity) {
                     data.errors.rejectValue(
                             "quantity",
                             "importPickCommand.quantity.error",
-                            [pickPageItem.requisitionItem.quantity] as Object[],
+                            [pickPageItem.requisitionItem.id] as Object[],
                             "The quantity you selected for item ${pickPageItem.requisitionItem.id} is different to the expected revised quantity. Please review pick."
                     )
                 }
@@ -1201,36 +1202,40 @@ class StockMovementService {
     }
 
     void importPicklistItems(StockMovement stockMovement, List<PickPageItem> pickPageItems, List<Map> picklistItems) {
-        Map<String, List> groupedItems = picklistItems.groupBy { it.id }
+        Map<String, List> picklistItemEntriesGroupedByRequisitionItem = picklistItems.groupBy { it.id }
 
-        picklistItems.each { params ->
+        picklistItemEntriesGroupedByRequisitionItem.each { requisitionItemId, picklistsToImport  ->
             // skip rows with errors
-            if (params.hasErrors() || groupedItems[params.id].any{ it.hasErrors() }) {
+            if (picklistsToImport.any{ it.hasErrors() }) {
                 return
             }
 
             PickPageItem pickPageItem = pickPageItems.find {
-                it.requisitionItem?.id == params.id
+                it.requisitionItem?.id == requisitionItemId
             }
 
-            AvailableItem availableItem = pickPageItem.getAvailableItem(params.binLocation, params.lotNumber)
+            removeShipmentItemsForModifiedRequisitionItem(pickPageItem.requisitionItem)
 
-            RequisitionItem requisitionItem = pickPageItem.requisitionItem?.modificationItem ?: pickPageItem.requisitionItem
-
-            pickPageItem.picklistItems.each {
-                if (it.id) {
-                    it.quantity = 0
+            picklistsToImport.each { params ->
+                AvailableItem availableItem = pickPageItem.getAvailableItem(params.binLocation, params.lotNumber)
+                Picklist picklist = stockMovement.requisition?.picklist
+                // find existing picklist to update
+                PicklistItem picklistItem = picklist.picklistItems.find {
+                    it.inventoryItem?.id == availableItem.inventoryItem?.id &&
+                            it.binLocation?.id == availableItem.binLocation?.id
                 }
+                createOrUpdatePicklistItem(
+                        pickPageItem.requisitionItem,
+                        picklistItem,
+                        availableItem.inventoryItem,
+                        availableItem.binLocation,
+                        params.quantity,
+                        null,
+                        null
+                )
             }
-            pickPageItem.picklistItems.add(new PicklistItem(
-                    requisitionItem: requisitionItem,
-                    inventoryItem: availableItem.inventoryItem,
-                    binLocation: availableItem.binLocation,
-                    quantity: params.quantity,
-                    sortOrder: pickPageItem.sortOrder
-            ))
+            createMissingShipmentItem(pickPageItem.requisitionItem)
         }
-        createOrUpdatePicklistItem(stockMovement, pickPageItems)
     }
 
     List<ReceiptItem> getStockMovementReceiptItems(def stockMovement) {
