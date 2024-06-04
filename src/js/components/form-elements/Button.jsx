@@ -51,6 +51,7 @@ Button.propTypes = {
     'secondary',
     'transparent',
     'primary-outline',
+    'grayed',
   ]),
   onClick: PropTypes.func,
   EndIcon: PropTypes.element,

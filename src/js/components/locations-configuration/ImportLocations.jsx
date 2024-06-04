@@ -11,7 +11,7 @@ import Alert from 'react-s-alert';
 
 import { hideSpinner, showSpinner } from 'actions';
 import { LOCATION_IMPORT, LOCATION_TEMPLATE, SUPPORT_LINKS } from 'api/urls';
-import FileDrop from 'components/form-elements/FileDrop';
+import FileSelect from 'components/form-elements/v2/FileSelect';
 import { DASHBOARD_URL, LOCATION_URL, PRODUCT_CONFIGURATION_URL } from 'consts/applicationUrls';
 import AlertMessage from 'utils/AlertMessage';
 import { handleError, handleSuccess } from 'utils/apiClient';
@@ -165,8 +165,8 @@ class ImportLocations extends Component {
                   defaultMessage="to read more about location creation."
                 />
               </div>
-              <FileDrop className="my-3" onDrop={this.onDrop} file={this.state.file} />
-              <AlertMessage className="mt-2" show={this.state.showAlert} message={this.state.alertMessage} danger />
+              <FileSelect className="my-2 p-5" onChange={this.onDrop} allowedExtensions={['csv']} />
+              <AlertMessage className="m-3" show={this.state.showAlert} message={this.state.alertMessage} danger />
               <div className="align-self-end mt-5">
                 <button
                   type="button"

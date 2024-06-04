@@ -716,22 +716,25 @@ class SendMovementPage extends Component {
                       onDrop={this.onDrop}
                       multiple
                     >
-                      <span><i className="fa fa-upload pr-2" /><Translate id="react.stockMovement.uploadDocuments.label" defaultMessage="Upload Documents" /></span>
-                      {_.map(this.state.files, file => (
-                        <div key={file.name} className="chosen-file d-flex justify-content-center align-items-center">
-                          <div className="text-truncate">{file.name}</div>
-                          <a
-                            href="#"
-                            className="remove-button"
-                            onClick={(event) => {
-                              this.removeFile(file.name);
-                              event.stopPropagation();
-                            }}
-                          >
-                            <span className="fa fa-remove" />
-                          </a>
-                        </div>
-                      ))}
+                      {({ getRootProps }) => (
+                        <div {...getRootProps()}>
+                          <span><i className="fa fa-upload pr-2" /><Translate id="react.stockMovement.uploadDocuments.label" defaultMessage="Upload Documents" /></span>
+                          {_.map(this.state.files, file => (
+                            <div key={file.name} className="chosen-file d-flex justify-content-center align-items-center">
+                              <div className="text-truncate">{file.name}</div>
+                              <a
+                                href="#"
+                                className="remove-button"
+                                onClick={(event) => {
+                                  this.removeFile(file.name);
+                                  event.stopPropagation();
+                                }}
+                              >
+                                <span className="fa fa-remove" />
+                              </a>
+                            </div>
+                          ))}
+                        </div>)}
                     </Dropzone>
                   </div>
                   <div className="dropdown">

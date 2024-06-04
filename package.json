@@ -82,7 +82,7 @@
     "react-confirm-alert": "2.6.1",
     "react-datepicker": "1.8.0",
     "react-dom": "16.8.6",
-    "react-dropzone": "4.3.0",
+    "react-dropzone": "14.2.3",
     "react-final-form": "3.6.5",
     "react-final-form-arrays": "1.0.6",
     "react-hook-form": "7.48.2",
