@@ -379,6 +379,14 @@ class AvailableItem {
 
 enum AvailableItemStatus {
     AVAILABLE, PICKED, RECALLED, HOLD, NOT_AVAILABLE
+
+    static getList() {
+        [AVAILABLE, PICKED, RECALLED, HOLD, NOT_AVAILABLE]
+    }
+
+    static getListNotAvailable() {
+        [RECALLED, HOLD, NOT_AVAILABLE]
+    }
 }
 
 class SuggestedItem extends AvailableItem {
@@ -627,7 +635,7 @@ class PickPageItem {
     AvailableItem getAvailableItem(String binLocationName, String lotNumber) {
         return availableItems?.find { item ->
             Boolean binLocationMatches = binLocationName ? item.binLocation?.name == binLocationName : !item.binLocation
-            Boolean lotMatches = item.inventoryItem?.lotNumber == (lotNumber ?: null)
+            Boolean lotMatches = lotNumber ? item.inventoryItem?.lotNumber == lotNumber : !item.inventoryItem?.lotNumber
             binLocationMatches && lotMatches
         }
     }

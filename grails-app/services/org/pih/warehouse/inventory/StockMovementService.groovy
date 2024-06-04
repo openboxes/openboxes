@@ -1121,9 +1121,9 @@ class StockMovementService {
                         code: it.code,
                         name: it.name,
                         lotNumber: it.lotNumber,
-                        expirationDate: new Date(it.expirationDate),
+                        expirationDate: it.expirationDate ? new Date(it.expirationDate) : null,
                         binLocation: it.binLocation,
-                        quantity: Integer.parseInt(it.quantity)
+                        quantity: it.quantity.isNumber() ? Integer.parseInt(it.quantity) : null
                 )
             }
 
@@ -1132,8 +1132,8 @@ class StockMovementService {
         }
     }
 
-    void validatePicklistListImport(List<PickPageItem> pickPageItems, Boolean supportsOverPick, List<ImportPickCommand> picklistItems) {
-        Map<String, List> groupedItems = picklistItems.groupBy { it.id }
+    void validatePicklistListImport(StockMovement stockMovement, List<PickPageItem> pickPageItems, List<ImportPickCommand> picklistItems) {
+        Map<String, List> picklistItemsGroupedByRequisitionItem = picklistItems.groupBy { it.id }
 
         picklistItems?.each { ImportPickCommand data ->
             data.validate()
@@ -1152,34 +1152,49 @@ class StockMovementService {
             }
             if (pickPageItem) {
                 AvailableItem availableItem = pickPageItem.getAvailableItem(data.binLocation, data.lotNumber)
+                ApplicationTagLib g = grailsApplication.mainContext.getBean(ApplicationTagLib.class)
 
                 if (!availableItem) {
-                    String lotNumberErrorMessage = data.lotNumber ?: "empty"
-                    String binLocationErrorMessage = data.binLocation ?: "empty"
+
+                    String lotNumberName = data.lotNumber ?: g.message(code: "default.label", default: "Default")
+                    String binLocationName = data.binLocation ?: g.message(code: "default.label", default: "Default")
                     data.errors.rejectValue(
                             "id",
                             "importPickCommand.availableItem.notFound.error",
-                            [lotNumberErrorMessage, binLocationErrorMessage] as Object[],
-                            "There is no item available with: lot \"${lotNumberErrorMessage}\" and bin location \"${binLocationErrorMessage}\""
+                            [lotNumberName, binLocationName] as Object[],
+                            "There is no item available with: lot \"${lotNumberName}\" and bin location \"${binLocationName}\""
                     )
                 }
 
-                Integer itemQuantitySum = groupedItems[data.id].sum { it.quantity }
+                if (AvailableItemStatus.listNotAvailable.contains(availableItem.status)) {
+                    String lotNumberName = data.lotNumber ?: g.message(code: "default.label", default: "Default")
+                    String binLocationName = data.binLocation ?: g.message(code: "default.label", default: "Default")
+
+                    data.errors.rejectValue(
+                            "id",
+                            "importPickCommand.availableItem.notAvailable.error",
+                            [lotNumberName, binLocationName] as Object[],
+                            "The stock entry you selected: lot \"${lotNumberName}\" and bin location \"${binLocationName}\" is not available. Please review pick."
+                    )
+                }
+
+                Integer itemQuantitySum = picklistItemsGroupedByRequisitionItem[data.id].sum { it.quantity }
                 if (itemQuantitySum > pickPageItem.requisitionItem.quantity) {
-                    if (!supportsOverPick) {
+                    Boolean allowsOverPick = stockMovement.origin.supports(ActivityCode.ALLOW_OVERPICK)
+                    if (!allowsOverPick) {
                         data.errors.rejectValue(
                                 "quantity",
-                                "importPickCommand.quantity.overpick.error",
-                                [pickPageItem.requisitionItem.quantity] as Object[],
-                                "Item is overpicked, expected quantity to not exceed ${pickPageItem.requisitionItem.quantity}"
+                                "importPickCommand.quantity.error",
+                                [pickPageItem.requisitionItem.id] as Object[],
+                                "The quantity you selected for item \"${pickPageItem.requisitionItem.id}\" is different to the expected revised quantity. Please review pick."
                         )
                     }
                 } else if (itemQuantitySum != pickPageItem.requisitionItem.quantity) {
                     data.errors.rejectValue(
                             "quantity",
                             "importPickCommand.quantity.error",
-                            [pickPageItem.requisitionItem.quantity] as Object[],
-                            "Item expected quantity to equal ${pickPageItem.requisitionItem.quantity}"
+                            [pickPageItem.requisitionItem.id] as Object[],
+                            "The quantity you selected for item ${pickPageItem.requisitionItem.id} is different to the expected revised quantity. Please review pick."
                     )
                 }
             }
@@ -1187,34 +1202,40 @@ class StockMovementService {
     }
 
     void importPicklistItems(StockMovement stockMovement, List<PickPageItem> pickPageItems, List<Map> picklistItems) {
-        picklistItems.each { params ->
+        Map<String, List> picklistItemEntriesGroupedByRequisitionItem = picklistItems.groupBy { it.id }
+
+        picklistItemEntriesGroupedByRequisitionItem.each { requisitionItemId, picklistsToImport  ->
             // skip rows with errors
-            if (params.hasErrors()) {
+            if (picklistsToImport.any{ it.hasErrors() }) {
                 return
             }
 
             PickPageItem pickPageItem = pickPageItems.find {
-                it.requisitionItem?.id == params.id
+                it.requisitionItem?.id == requisitionItemId
             }
 
-            AvailableItem availableItem = pickPageItem.getAvailableItem(params.binLocation, params.lotNumber)
+            removeShipmentItemsForModifiedRequisitionItem(pickPageItem.requisitionItem)
 
-            RequisitionItem requisitionItem = pickPageItem.requisitionItem?.modificationItem ?: pickPageItem.requisitionItem
-
-            pickPageItem.picklistItems.each {
-                if (it.id) {
-                    it.quantity = 0
+            picklistsToImport.each { params ->
+                AvailableItem availableItem = pickPageItem.getAvailableItem(params.binLocation, params.lotNumber)
+                Picklist picklist = stockMovement.requisition?.picklist
+                // find existing picklist to update
+                PicklistItem picklistItem = picklist.picklistItems.find {
+                    it.inventoryItem?.id == availableItem.inventoryItem?.id &&
+                            it.binLocation?.id == availableItem.binLocation?.id
                 }
+                createOrUpdatePicklistItem(
+                        pickPageItem.requisitionItem,
+                        picklistItem,
+                        availableItem.inventoryItem,
+                        availableItem.binLocation,
+                        params.quantity,
+                        null,
+                        null
+                )
             }
-            pickPageItem.picklistItems.add(new PicklistItem(
-                    requisitionItem: requisitionItem,
-                    inventoryItem: availableItem.inventoryItem,
-                    binLocation: availableItem.binLocation,
-                    quantity: params.quantity,
-                    sortOrder: pickPageItem.sortOrder
-            ))
+            createMissingShipmentItem(pickPageItem.requisitionItem)
         }
-        createOrUpdatePicklistItem(stockMovement, pickPageItems)
     }
 
     List<ReceiptItem> getStockMovementReceiptItems(def stockMovement) {
