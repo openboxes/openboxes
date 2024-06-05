@@ -1123,7 +1123,7 @@ class StockMovementService {
                         lotNumber: it.lotNumber,
                         expirationDate: it.expirationDate ? new Date(it.expirationDate) : null,
                         binLocation: it.binLocation,
-                        quantity: it.quantity.isNumber() ? Integer.parseInt(it.quantity) : null
+                        quantity: it.quantity
                 )
             }
 
@@ -1155,9 +1155,8 @@ class StockMovementService {
                 ApplicationTagLib g = grailsApplication.mainContext.getBean(ApplicationTagLib.class)
 
                 if (!availableItem) {
-
-                    String lotNumberName = data.lotNumber ?: g.message(code: "default.label", default: "Default")
-                    String binLocationName = data.binLocation ?: g.message(code: "default.label", default: "Default")
+                    String lotNumberName = data.lotNumber ?: g.message(code: "default.noLotNumber.label", default: Constants.DEFAULT_LOT_NUMBER)
+                    String binLocationName = data.binLocation ?: g.message(code: "default.noBinLocation.label", default: Constants.DEFAULT_BIN_LOCATION_NAME)
                     data.errors.rejectValue(
                             "id",
                             "importPickCommand.availableItem.notFound.error",
@@ -1166,9 +1165,9 @@ class StockMovementService {
                     )
                 }
 
-                if (availableItem && AvailableItemStatus.listNotAvailable.contains(availableItem.status)) {
-                    String lotNumberName = data.lotNumber ?: g.message(code: "default.label", default: "Default")
-                    String binLocationName = data.binLocation ?: g.message(code: "default.label", default: "Default")
+                if (availableItem && AvailableItemStatus.listUnavailable().contains(availableItem.status)) {
+                    String lotNumberName = data.lotNumber ?: g.message(code: "default.noLotNumber.label", default: Constants.DEFAULT_LOT_NUMBER)
+                    String binLocationName = data.binLocation ?: g.message(code: "default.noBinLocation.label", default: Constants.DEFAULT_BIN_LOCATION_NAME)
 
                     data.errors.rejectValue(
                             "id",
@@ -1178,7 +1177,7 @@ class StockMovementService {
                     )
                 }
 
-                Integer itemQuantitySum = picklistItemsGroupedByRequisitionItem[data.id].sum { it.quantity }
+                Integer itemQuantitySum = picklistItemsGroupedByRequisitionItem[data.id].sum { it.quantityAsNumber }
                 if (itemQuantitySum > pickPageItem.requisitionItem.quantity) {
                     Boolean allowsOverPick = stockMovement.origin.supports(ActivityCode.ALLOW_OVERPICK)
                     if (!allowsOverPick) {
@@ -1229,7 +1228,7 @@ class StockMovementService {
                         picklistItem,
                         availableItem.inventoryItem,
                         availableItem.binLocation,
-                        params.quantity,
+                        params.quantityAsNumber,
                         null,
                         null
                 )

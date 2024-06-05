@@ -380,11 +380,11 @@ class AvailableItem {
 enum AvailableItemStatus {
     AVAILABLE, PICKED, RECALLED, HOLD, NOT_AVAILABLE
 
-    static getList() {
+    static list() {
         [AVAILABLE, PICKED, RECALLED, HOLD, NOT_AVAILABLE]
     }
 
-    static getListNotAvailable() {
+    static listUnavailable() {
         [RECALLED, HOLD, NOT_AVAILABLE]
     }
 }
