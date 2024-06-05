@@ -1166,7 +1166,7 @@ class StockMovementService {
                     )
                 }
 
-                if (AvailableItemStatus.listNotAvailable.contains(availableItem.status)) {
+                if (availableItem && AvailableItemStatus.listNotAvailable.contains(availableItem.status)) {
                     String lotNumberName = data.lotNumber ?: g.message(code: "default.label", default: "Default")
                     String binLocationName = data.binLocation ?: g.message(code: "default.label", default: "Default")
 
