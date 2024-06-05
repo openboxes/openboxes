@@ -508,6 +508,10 @@
           overflow-wrap: anywhere;
         }
 
+        .last {
+          text-wrap: nowrap;
+        }
+
         td,
         th {
           border-bottom: 1px solid #dddddd;
@@ -677,6 +681,20 @@
         }
       }
     }
+  }
+
+  .indicator-item-href {
+    color: inherit;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  .disabled-indicator-item-href {
+    color: inherit;
+    pointer-events: none;
+    cursor: default;
   }
 }
 

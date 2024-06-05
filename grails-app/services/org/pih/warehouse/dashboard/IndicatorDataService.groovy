@@ -36,6 +36,10 @@ class IndicatorDataService {
     GrailsApplication grailsApplication
     def messageService
 
+    ApplicationTagLib getApplicationTagLib() {
+        return Holders.grailsApplication.mainContext.getBean(ApplicationTagLib)
+    }
+
     @Cacheable(value = "dashboardCache", key = { "getExpirationSummaryData-${location?.id}${params?.querySize}" })
     Map getExpirationSummaryData(Location location, def params) {
         // querySize = value of the date filter (1 month, 3 months, etc.)
@@ -1171,6 +1175,7 @@ class IndicatorDataService {
 
     @Cacheable(value = "dashboardCache", key = { "getItemsWithBackdatedShipments-${location?.id}" })
     GraphData getItemsWithBackdatedShipments(Location location) {
+        String urlContextPath = ConfigHelper.contextPath
         Integer monthsLimit = Holders.config.openboxes.dashboard.backdatedShipments.monthsLimit
         Date timeLimit = LocalDate.now().minusMonths(monthsLimit).toDate()
         Map<String, Integer> amountOfItemsWithBackdatedShipments = [
@@ -1184,15 +1189,16 @@ class IndicatorDataService {
             SELECT p.product_code,
             COUNT(DISTINCT backdated_transaction.shipment_number) as products,
             GROUP_CONCAT(DISTINCT backdated_transaction.shipment_number SEPARATOR ' ') as shipments,
-            DATE_FORMAT(stock_count.last_stock_count, "%d-%M-%Y") FROM (
-            (
-                SELECT t.id as transaction_id, s.shipment_number FROM shipment s
+            DATE_FORMAT(stock_count.last_stock_count, "%d-%b-%Y"),
+            GROUP_CONCAT(DISTINCT backdated_transaction.shipment_number, ' ', backdated_transaction.id SEPARATOR ';') as shipment_ids
+            FROM ((
+                SELECT t.id as transaction_id, s.shipment_number, s.id FROM shipment s
                 INNER JOIN `transaction` t ON t.outgoing_shipment_id  = s.id
                 WHERE DATE_ADD(t.transaction_date, INTERVAL :daysOffset DAY) < t.date_created
                 AND t.date_created > :timeLimit
                 AND s.origin_id = :locationId
             ) UNION (
-                SELECT t.id as transaction_id, s.shipment_number FROM shipment s
+                SELECT t.id as transaction_id, s.shipment_number, s.id FROM shipment s
                 INNER JOIN `transaction` t ON t.incoming_shipment_id  = s.id
                 WHERE DATE_ADD(t.transaction_date, INTERVAL :daysOffset DAY) < t.date_created
                 AND t.date_created > :timeLimit
@@ -1211,6 +1217,7 @@ class IndicatorDataService {
                 GROUP BY ii.product_id 
             ) as stock_count ON stock_count.product_id = ii.product_id
             GROUP BY ii.product_id, stock_count.last_stock_count
+            ORDER BY products DESC
         '''
 
         List<GroovyRowResult> results = dataService.executeQuery(query, [
@@ -1221,10 +1228,15 @@ class IndicatorDataService {
                 timeLimit: timeLimit,
         ])
 
-        List<TableData> tableData = results.collect { new TableData(
-                it[0] as String,                  // Item
-                it[2] as String,                  // Shipments
-                it[3] as String ?: Constants.NONE // Last count
+        List<TableData> tableData = results.collect {
+            List<String> shipmentNumbers = it[2].split(' ')
+            List<String> shipmentUrls = it[4].split(';').collect { result -> "${urlContextPath}/stockMovement/show/${result.split(' ')[1]}" }
+            new TableData(
+                number: it[0] as String,                  // Item
+                listNameData: shipmentNumbers,            // Shipments
+                value: it[3] as String ?: Constants.NONE, // Last count
+                numberLink: "${urlContextPath}/inventoryItem/showStockCard/${it[0]}",
+                nameLinksList: shipmentUrls,
         ) }
 
         results.each {
@@ -1236,12 +1248,49 @@ class IndicatorDataService {
             amountOfItemsWithBackdatedShipments[it[1] as String] += 1
         }
 
-        Table table = new Table("Item", "Shipments", "Last Count", tableData.toList())
+        Table table = new Table(
+                applicationTagLib.message(code: 'indicator.itemsWithBackdatedShipments.item.label', default: 'Item'),
+                applicationTagLib.message(code: 'indicator.itemsWithBackdatedShipments.shipments.label', default: 'Shipments'),
+                applicationTagLib.message(code: 'indicator.itemsWithBackdatedShipments.lastCount.label', default: 'Last Count'),
+                tableData.toList()
+        )
 
-        ColorNumber oneDelayedShipment = new ColorNumber(value: amountOfItemsWithBackdatedShipments[Constants.ONE], subtitle: '1 shipment', order: 1)
-        ColorNumber twoDelayedShipments = new ColorNumber(value: amountOfItemsWithBackdatedShipments[Constants.TWO], subtitle: '2 shipments', order: 2)
-        ColorNumber threeDelayedShipments = new ColorNumber(value: amountOfItemsWithBackdatedShipments[Constants.THREE], subtitle: '3 shipments', order: 3)
-        ColorNumber fourOrMoreDelayedShipments = new ColorNumber(value: amountOfItemsWithBackdatedShipments[Constants.FOUR_OR_MORE], subtitle: '4 or more shipments', order: 4)
+        ColorNumber oneDelayedShipment = new ColorNumber(
+                value: amountOfItemsWithBackdatedShipments[Constants.ONE],
+                subtitle: applicationTagLib.message(
+                        code: 'indicator.itemsWithBackdatedShipments.shipment.subtitle',
+                        default: '1 shipment',
+                        args: ['1']
+                ),
+                order: 1
+        )
+        ColorNumber twoDelayedShipments = new ColorNumber(
+                value: amountOfItemsWithBackdatedShipments[Constants.TWO],
+                subtitle: applicationTagLib.message(
+                        code: 'indicator.itemsWithBackdatedShipments.shipments.subtitle',
+                        default:'2 shipments',
+                        args: ['2']
+                ),
+                order: 2
+        )
+        ColorNumber threeDelayedShipments = new ColorNumber(
+                value: amountOfItemsWithBackdatedShipments[Constants.THREE],
+                subtitle: applicationTagLib.message(
+                        code: 'indicator.itemsWithBackdatedShipments.shipments.subtitle',
+                        default: '3 shipments',
+                        args: [3]
+                ),
+                order: 3
+        )
+        ColorNumber fourOrMoreDelayedShipments = new ColorNumber(
+                value: amountOfItemsWithBackdatedShipments[Constants.FOUR_OR_MORE],
+                subtitle: applicationTagLib.message(
+                        code: 'indicator.itemsWithBackdatedShipments.moreShipment.subtitle',
+                        default: '4 or more',
+                        args: ['4']
+                ),
+                order: 4
+        )
 
         NumbersIndicator numbersIndicator = new NumbersIndicator(
                 oneDelayedShipment,

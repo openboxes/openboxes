@@ -15,6 +15,7 @@ const NumbersTableCard = props => (
         data={props.data.tableData}
         columnsSize={props.options.columnsSize}
         truncationLength={props.options.truncationLength}
+        disableTruncation={props.options.disableTruncation}
       />
     </div>
   </div>
@@ -56,6 +57,11 @@ NumbersTableCard.propTypes = {
       name: PropTypes.number,
       number: PropTypes.number,
       value: PropTypes.number,
+    }),
+    disableTruncation: PropTypes.shape({
+      name: PropTypes.bool,
+      number: PropTypes.bool,
+      value: PropTypes.bool,
     }),
   }).isRequired,
 };

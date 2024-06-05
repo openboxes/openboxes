@@ -1141,18 +1141,21 @@ openboxes {
                 endpoint = "/api/dashboard/itemsWithBackdatedShipments"
                 colors {
                     datasets {
-                        state5 = ["first"]
-                        state4 = ["second"]
-                        state3 = ["third"]
-                        state2 = ["fourth"]
+                        state3 = ["first"]
+                        state5 = ["second"]
+                        state1 = ["third"]
+                        state9 = ["fourth"]
                     }
                 }
                 columnsSize {
-                    name = '100px'
+                    name = 'auto'
                 }
                 truncationLength {
                     value = 100
                     number = 5
+                }
+                disableTruncation {
+                    name = true
                 }
             }
         }
