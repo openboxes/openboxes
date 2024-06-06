@@ -339,6 +339,11 @@ class UrlMappings {
             action = [DELETE: "clearPicklist"]
         }
 
+        "/api/picklists/$id/items/$itemId" {
+            controller = "picklistApi"
+            action = [DELETE: "revertPick"]
+        }
+
         // Partial Receiving API
 
         "/api/partialReceiving"(parseRequest: true) {

@@ -2,6 +2,7 @@ import {
   PICKLIST_CLEAR,
   PICKLIST_IMPORT,
   PICKLIST_ITEMS_EXPORT,
+  PICKLIST_REVERT_PICK,
   PICKLIST_TEMPLATE_EXPORT,
 } from 'api/urls';
 import apiClient from 'utils/apiClient';
@@ -9,6 +10,7 @@ import exportFileFromAPI from 'utils/file-download-util';
 
 export default {
   clearPicklist: (id) => apiClient.delete(PICKLIST_CLEAR(id)),
+  revertPick: (id, itemId) => apiClient.delete(PICKLIST_REVERT_PICK(id, itemId)),
   exportPicklistItems: (id, { format, fileName }) =>
     exportFileFromAPI({
       url: PICKLIST_ITEMS_EXPORT(id),
