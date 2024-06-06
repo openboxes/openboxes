@@ -1123,7 +1123,7 @@ class StockMovementService {
                         lotNumber: it.lotNumber,
                         expirationDate: it.expirationDate ? new Date(it.expirationDate) : null,
                         binLocation: it.binLocation,
-                        quantity: it.quantity
+                        quantityAsText: it.quantity
                 )
             }
 
@@ -1177,7 +1177,7 @@ class StockMovementService {
                     )
                 }
 
-                Integer itemQuantitySum = picklistItemsGroupedByRequisitionItem[data.id].sum { it.quantityAsNumber }
+                Integer itemQuantitySum = picklistItemsGroupedByRequisitionItem[data.id].sum { it.quantity }
                 if (itemQuantitySum > pickPageItem.requisitionItem.quantity) {
                     Boolean allowsOverPick = stockMovement.origin.supports(ActivityCode.ALLOW_OVERPICK)
                     if (!allowsOverPick) {
@@ -1228,7 +1228,7 @@ class StockMovementService {
                         picklistItem,
                         availableItem.inventoryItem,
                         availableItem.binLocation,
-                        params.quantityAsNumber,
+                        params.quantity,
                         null,
                         null
                 )
