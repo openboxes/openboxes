@@ -12,6 +12,7 @@ package org.pih.warehouse.picklist
 import grails.gorm.transactions.Transactional
 import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.api.AvailableItem
+import org.pih.warehouse.api.StockMovementItem
 import org.pih.warehouse.api.SuggestedItem
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.InventoryItem
@@ -21,6 +22,7 @@ import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductAvailability
 import org.pih.warehouse.requisition.Requisition
+import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.requisition.RequisitionStatus
 
 @Transactional
@@ -321,5 +323,33 @@ class PicklistService {
             eq("inventory", warehouse.inventory)
             order("lastUpdated", "desc")
         }
+    }
+
+    void revertPick(String id, String itemId) {
+        Picklist picklist = Picklist.get(id)
+        RequisitionItem requisitionItem = RequisitionItem.get(itemId)
+        List<PicklistItem> picklistItemsToRemove = PicklistItem.findAllByRequisitionItem(requisitionItem)
+
+        if (!picklist) {
+            throw new ObjectNotFoundException(id, Picklist.class.toString())
+        }
+
+        if (!picklistItemsToRemove?.size()) {
+            throw new ObjectNotFoundException(itemId, PicklistItem.class.toString())
+        }
+
+        List<String> binLocations = []
+        picklistItemsToRemove.each {
+            picklist.removeFromPicklistItems(it)
+            binLocations.add(it.binLocation?.id)
+            it.delete(flush: true)
+        }
+
+        productAvailabilityService.refreshProductsAvailability(
+                picklist?.requisition?.origin?.id,
+                picklistItemsToRemove?.requisitionItem?.product?.id?.unique(),
+                binLocations,
+                false
+        )
     }
 }

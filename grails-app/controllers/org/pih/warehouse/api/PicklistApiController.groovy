@@ -11,4 +11,10 @@ class PicklistApiController extends BaseDomainApiController {
 
         render status: 204
     }
+
+    def revertPick() {
+        picklistService.revertPick(params.id, params.itemId)
+
+        render status: 204
+    }
 }
