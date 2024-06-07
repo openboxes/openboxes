@@ -7,7 +7,7 @@ import 'components/wizard/WizardSteps.scss';
 const WizardStepsV2 = ({ steps, currentStepKey }) => {
   const isCurrentStep = (iteratedStep) => iteratedStep.key === currentStepKey;
   return (
-    <div className="steps-main-box">
+    <div className="steps-main-box ml-0 mr-0">
       <div className="steps-inside-wrapper">
         {steps.map((step) => (
           <div
