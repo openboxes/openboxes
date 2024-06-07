@@ -703,7 +703,9 @@ class SendMovementPage extends Component {
             <form onSubmit={handleSubmit}>
               <div className="classic-form classic-form-condensed">
                 <span className="buttons-container classic-form-buttons">
-                  <div className="dropzone float-right mb-1 btn btn-outline-secondary align-self-end btn-xs">
+                  <div
+                    className={`dropzone float-right mb-1 btn btn-outline-secondary ${values.statusCode === 'DISPATCHED' ? 'disabled' : ''} align-self-end btn-xs mr-1`}
+                  >
                     <Dropzone
                       disabled={values.statusCode === 'DISPATCHED'}
                       onDrop={this.onDrop}
@@ -736,7 +738,7 @@ class SendMovementPage extends Component {
                     <button
                       type="button"
                       onClick={this.toggleDropdown}
-                      className="dropdown-button float-right mb-1 btn btn-outline-secondary align-self-end btn-xs"
+                      className="dropdown-button float-right mb-1 btn btn-outline-secondary align-self-end btn-xs mr-1"
                     >
                       <span><i className="fa fa-sign-out pr-2" /><Translate id="react.default.button.download.label" defaultMessage="Download" /></span>
                     </button>
@@ -763,7 +765,7 @@ class SendMovementPage extends Component {
                     <button
                       type="button"
                       onClick={() => this.onSave(values)}
-                      className="btn btn-outline-secondary float-right btn-form btn-xs"
+                      className="btn btn-outline-secondary float-right btn-form btn-xs ml-1"
                       disabled={invalid}
                     >
                       <span><i className="fa fa-save pr-2" /><Translate id="react.default.button.save.label" defaultMessage="Save" /></span>
