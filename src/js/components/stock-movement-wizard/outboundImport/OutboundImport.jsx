@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 
-import OutboundImportConfirm from 'components/stock-movement-wizard/outboundImport/OutboundImportConfirm';
 import OutboundImportHeader from 'components/stock-movement-wizard/outboundImport/OutboundImportHeader';
+import OutboundImportConfirm from 'components/stock-movement-wizard/outboundImport/sections/OutboundImportConfirm';
 import OutboundImportDetails from 'components/stock-movement-wizard/outboundImport/sections/OutboundImportDetails';
 import WizardStepsV2 from 'components/wizard/v2/WizardStepsV2';
 import useOutboundImportForm from 'hooks/outboundImport/useOutboundImportForm';
@@ -13,7 +13,8 @@ import PageWrapper from 'wrappers/PageWrapper';
 import 'utils/utils.scss';
 
 const OutboundImport = () => {
-  useTranslation('outboundImport');
+  useTranslation('outboundImport', 'stockMovement');
+
   const translate = useTranslate();
 
   const OutboundImportStep = {
@@ -77,7 +78,8 @@ const OutboundImport = () => {
       <OutboundImportHeader />
       <form onSubmit={handleSubmit(onSubmit)}>
         {is(OutboundImportStep.DETAILS.key) && (<Step.Component {...detailsComponentProps} />)}
-        {is(OutboundImportStep.CONFIRM.key) && (<Step.Component previous={previous} />)}
+        {/* eslint-disable-next-line max-len */}
+        {is(OutboundImportStep.CONFIRM.key) && (<Step.Component previous={previous} {...detailsComponentProps} />)}
       </form>
     </PageWrapper>
   );
