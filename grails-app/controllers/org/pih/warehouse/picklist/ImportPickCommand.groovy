@@ -11,7 +11,9 @@ class ImportPickCommand implements Validateable {
     String lotNumber
     Date expirationDate
     String binLocation
-    Integer quantity
+    String quantityAsText
+
+    static transients = ['quantity']
 
     static constraints = {
         id(nullable: false, blank: false)
@@ -25,6 +27,18 @@ class ImportPickCommand implements Validateable {
         })
         expirationDate(nullable: true)
         binLocation(nullable: true)
-        quantity(nullable: false, min: 0)
+        quantityAsText(nullable: false, validator: { val, obj ->
+            if (!NumberUtils.isNumber(val)) {
+                return ['invalid.error']
+            }
+            if (Integer.parseInt(val) < 0) {
+                return ['negative.error']
+            }
+            return true
+        })
+    }
+
+    Integer getQuantity() {
+        return NumberUtils.isNumber(this.quantityAsText) ? Integer.parseInt(this.quantityAsText) : null
     }
 }
