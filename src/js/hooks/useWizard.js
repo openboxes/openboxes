@@ -41,6 +41,8 @@ const useWizard = ({ initialKey, steps }) => {
     }
   };
 
+  const is = (stepKey) => key === stepKey;
+
   const { Step } = stepProperties;
 
   return [
@@ -51,6 +53,7 @@ const useWizard = ({ initialKey, steps }) => {
       next,
       previous,
       last,
+      is,
     },
   ];
 };
