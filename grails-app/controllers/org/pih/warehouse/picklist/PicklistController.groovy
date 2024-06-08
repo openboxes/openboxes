@@ -10,9 +10,9 @@
 package org.pih.warehouse.picklist
 
 import grails.converters.JSON
+import grails.validation.ValidationException
 import org.pih.warehouse.api.PickPageItem
 import org.pih.warehouse.api.StockMovement
-import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.DocumentService
 import org.pih.warehouse.core.Location
@@ -21,6 +21,7 @@ import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.inventory.StockMovementService
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.requisition.Requisition
+import org.pih.warehouse.picklist.PicklistImportDataCommand
 import org.springframework.web.multipart.MultipartFile
 
 class PicklistController {
@@ -218,22 +219,46 @@ class PicklistController {
         }
     }
 
-    def importPickListItems(ImportDataCommand command) {
-        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
-        List<PickPageItem> pickPageItems = stockMovementService.getPickPageItems(params.id, null, null)
+    def importPickListItems(PicklistImportDataCommand command) {
 
-        MultipartFile importFile = command.importFile
-        if (importFile.isEmpty()) {
-            throw new IllegalArgumentException("File cannot be empty")
+        // Bind stock movement based on provided ID
+        command.stockMovement = stockMovementService.getStockMovement(params.id)
+
+        // Bind user-provided location or current location
+        command.location = command.location ?: Location.get(session.warehouse.id)
+
+        // Bind the parent requisition items to the command class
+        command.pickPageItems = stockMovementService.getPickPageItems(params.id, null, null)
+
+        // TODO Test that this actually captures all of the validation errors on the input file.
+        //  We could also postpone this until the
+        // Validate provided properties of the data import, including the import file
+        if(!command.validate()) {
+            throw new ValidationException("Import failed due to errors", command.errors)
         }
 
-        String csv = new String(importFile.bytes)
-        List<ImportPickCommand> importedLines = stockMovementService.parsePickCsvTemplateImport(csv)
+//        MultipartFile importFile = command.importFile
+//        if (importFile.isEmpty()) {
+//            throw new IllegalArgumentException("File cannot be empty")
+//        }
 
-        stockMovementService.validatePicklistListImport(stockMovement, pickPageItems, importedLines)
+//        String csv = new String(importFile.bytes)
 
+        // Bind the parent requisition items to the command class
+        command.picklistItems = stockMovementService.parsePickCsvTemplateImport(command)
+
+        // Validate the imported picklist data
+        stockMovementService.validatePicklistListImport(command)
+
+        // TODO Errors should be added to a command class within the validate method, but
+        //  you cannot add another command classes errors to a parent command class. Instead
+        //  we probably need a custom validator for the picklistItems association on
+        //  PicklistDataImportCommand and just call validate on the parent. If nothing else,
+        //  we should instantiate our own BeanPropertyBindingResult and populate it with errors.
+        //  Or the code below should be cleaned up and added to a utility.
+        //  ErrorsUtil.copyAllErrors(source, destination).
         List<String> errors = []
-        importedLines.eachWithIndex { importPickCommand, index ->
+        command.picklistItems.eachWithIndex { importPickCommand, index ->
             if (importPickCommand.hasErrors()) {
                 List<String> localizedErrors = importPickCommand.errors.allErrors.collect { g.message(error: it) }
                 if (!localizedErrors.isEmpty()) {
@@ -242,7 +267,7 @@ class PicklistController {
             }
         }
 
-        stockMovementService.importPicklistItems(stockMovement, pickPageItems, importedLines)
+        stockMovementService.importPicklistItems(command)
 
         if (!errors.isEmpty()) {
             render([message: "Data imported with errors", errors: errors] as JSON)

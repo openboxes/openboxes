@@ -285,6 +285,16 @@ class Location implements Comparable<Location>, java.io.Serializable {
         Location.list().findAll { it.isDepotWardOrPharmacy() }.sort { it.name }
     }
 
+    /**
+     * Find any internal location with the given name.
+     * @param name
+     * @return
+     */
+    Location getInternalLocation(String name) {
+        // FIXME If location.name is not unique then we need to do some error handling
+        return locations.find { it.name.equalsIgnoreCase(name) }
+    }
+
     List<Location> getInternalLocations() {
         return locations?.toList()?.findAll { it.isInternalLocation() }
     }

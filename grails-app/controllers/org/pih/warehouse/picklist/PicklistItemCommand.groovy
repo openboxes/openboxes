@@ -3,7 +3,7 @@ package org.pih.warehouse.picklist
 import grails.validation.Validateable
 import org.apache.commons.lang.math.NumberUtils
 
-class ImportPickCommand implements Validateable {
+class PicklistItemCommand implements Validateable {
 
     String id
     String code
