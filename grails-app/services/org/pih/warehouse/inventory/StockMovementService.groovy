@@ -48,7 +48,8 @@ import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.ShipOrderCommand
 import org.pih.warehouse.order.ShipOrderItemCommand
-import org.pih.warehouse.picklist.ImportPickCommand
+import org.pih.warehouse.picklist.PicklistImportDataCommand
+import org.pih.warehouse.picklist.PicklistItemCommand
 import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Product
@@ -1103,20 +1104,24 @@ class StockMovementService {
         return packPageItems
     }
 
-    List<ImportPickCommand> parsePickCsvTemplateImport(String text) {
+    List<PicklistItemCommand> parsePickCsvTemplateImport(PicklistImportDataCommand command) {
+
         try {
+            // FIXME We should probably do some additional validation on the import file here or
+            //  at least catch any exceptions that might happen
+            String text = new String(command.importFile.bytes)
             def csvMapReader = new CSVMapReader(new StringReader(text), [skipLines: 1])
             csvMapReader.fieldKeys = [
                     'id',
-                    'code',
-                    'name',
+                    'code', // code => productCode
+                    'name', // name => productName
                     'lotNumber',
                     'expirationDate',
                     'binLocation',
                     'quantity',
             ]
             return csvMapReader.toList().collect { it ->
-                new ImportPickCommand(
+                new PicklistItemCommand(
                         id: it.id,
                         code: it.code,
                         name: it.name,
@@ -1132,80 +1137,273 @@ class StockMovementService {
         }
     }
 
-    void validatePicklistListImport(StockMovement stockMovement, List<PickPageItem> pickPageItems, List<ImportPickCommand> picklistItems) {
-        Map<String, List> picklistItemsGroupedByRequisitionItem = picklistItems.groupBy { it.id }
+    /**
+     * This method needs to be broken down into multiple smaller methods.
+     *
+     * @param command
+     */
+    // FIXME Args should be passed in via command class
+    void validatePicklistListImport(PicklistImportDataCommand command) {
 
-        picklistItems?.each { ImportPickCommand data ->
-            data.validate()
-            // skip validation if id is empty since mos tof the validation relies on an existing requisition id
-            if (!data.id) {
-                return
-            }
-            PickPageItem pickPageItem = pickPageItems.find { it.requisitionItem?.id == data.id }
-            if (!pickPageItem) {
-                data.errors.rejectValue(
-                        "id",
-                        "importPickCommand.requisitionItem.notFound.error",
-                        [data.id] as Object[],
-                        "Requisition item id: ${data.id} not found"
-                )
-            }
-            if (pickPageItem) {
-                AvailableItem availableItem = pickPageItem.getAvailableItem(data.binLocation, data.lotNumber)
-                ApplicationTagLib g = grailsApplication.mainContext.getBean(ApplicationTagLib.class)
+        // The parent requisition items that picklist items are associated with
+        List<PickPageItem> pickPageItems = command.pickPageItems
 
-                if (!availableItem) {
-                    String lotNumberName = data.lotNumber ?: g.message(code: "default.noLotNumber.label", default: Constants.DEFAULT_LOT_NUMBER)
-                    String binLocationName = data.binLocation ?: g.message(code: "default.noBinLocation.label", default: Constants.DEFAULT_BIN_LOCATION_NAME)
+        // TODO Remove if not needed
+        // The allocated picklist items to validate
+        //List<PicklistItemCommand> picklistItems = command.picklistItems
+
+        // FIXME Remove this if it's no longer being used
+        // Configuration property that allows overpick for a given location
+        Boolean supportsOverpick = command.location.supports(ActivityCode.ALLOW_OVERPICK)
+
+        // TODO Do we handle the case where ID is null?
+        // Group the picklist items from the CSV by requisition item ID
+        Map<String, List> picklistItemsGroupedByRequisitionItem = command.picklistItems.groupBy { it.id }
+
+        // Iterate over the parent requisition items
+        picklistItemsGroupedByRequisitionItem.each { requisitionItemId, picklistItems ->
+
+            // TODO Move total quantity picked validation per requisition item so we only need
+            //  to display it once per requisition item
+
+            picklistItems.each { PicklistItemCommand data ->
+
+                // FIXME Make sure we also check that the quantity provided is not greater than the
+                //  quantity requested. Should add this to the ImportPickCommand validator.
+                Integer quantityRequired = data.quantity
+
+                // FIXME Add proper comment to explain what this is for
+                // Base validation, creates errors object?
+                data.validate()
+
+                // TODO What happens if ID is null. We should throw an exception if we don't have a good answer.
+                //  skip validation if id is empty since most of the validation relies on an existing requisition id
+                // skip validation if id is empty since mos tof the validation relies on an existing requisition id
+                if (!data.id) {
+                    return
+                }
+                PickPageItem pickPageItem = pickPageItems.find { it.requisitionItem?.id == data.id }
+                if (!pickPageItem) {
                     data.errors.rejectValue(
                             "id",
-                            "importPickCommand.availableItem.notFound.error",
-                            [lotNumberName, binLocationName] as Object[],
-                            "There is no item available with: lot \"${lotNumberName}\" and bin location \"${binLocationName}\""
+                            "importPickCommand.requisitionItem.notFound.error",
+                            [data.id] as Object[],
+                            "Requisition item id: ${data.id} not found"
                     )
                 }
+                if (pickPageItem) {
 
-                if (availableItem && AvailableItemStatus.listUnavailable().contains(availableItem.status)) {
-                    String lotNumberName = data.lotNumber ?: g.message(code: "default.noLotNumber.label", default: Constants.DEFAULT_LOT_NUMBER)
-                    String binLocationName = data.binLocation ?: g.message(code: "default.noBinLocation.label", default: Constants.DEFAULT_BIN_LOCATION_NAME)
+                    // TODO Add guidance for developers - we ALWAYS need to resolve to an inventory
+                    //  item when we're working with a lot number.
+                    // Resolve given lot number to an inventory item
+                    InventoryItem inventoryItem =
+                            pickPageItem.requisitionItem.product.getInventoryItem(data.lotNumber, data.expirationDate)
 
-                    data.errors.rejectValue(
-                            "id",
-                            "importPickCommand.availableItem.notAvailable.error",
-                            [lotNumberName, binLocationName] as Object[],
-                            "The stock entry you selected: lot \"${lotNumberName}\" and bin location \"${binLocationName}\" is not available. Please review pick."
-                    )
-                }
+                    // If there's no inventory item for the provide lot number, we throw a validation error
+                    if (!inventoryItem) {
+                        // FIXME Add error code to messages.properties
+                        data.errors.rejectValue(
+                                "lotNumber",
+                                "importPickCommand.inventoryItem.notFound.error",
+                                [data.lotNumber] as Object[],
+                                "Unable to find inventory item with lot number ${data.lotNumber}")
+                    }
 
-                Integer itemQuantitySum = picklistItemsGroupedByRequisitionItem[data.id].sum { it.quantity }
-                if (itemQuantitySum > pickPageItem.requisitionItem.quantity) {
-                    Boolean allowsOverPick = stockMovement.origin.supports(ActivityCode.ALLOW_OVERPICK)
-                    if (!allowsOverPick) {
+                    // OBPIH-6331 Resolve bin location, if a bin location value was provided. Otherwise,
+                    // if the user-provided bin location is null or ambiguous then we need to apply
+                    // allocation rules
+                    Location internalLocation = command.location.getInternalLocation(data.binLocation)
+
+                    // If a bin location value is provided, but not found then this is a validation error
+                    if (data.binLocation && !internalLocation) {
+                        // FIXME Add error code to messages.properties
+                        data.errors.rejectValue(
+                                "binLocation",
+                                "importPickCommand.binLocation.notFound.error",
+                                [data.binLocation] as Object[],
+                                "Unable to find inventory item with lot number ${data.binLocation}")
+                    }
+
+                    // FIXME It's probably ok to use product availability data here. However, we
+                    //  probably want to validate against actual inventory items (calculated from
+                    //  transactions) before the stock movement is shipped (i.e. transactions created).
+                    //  Otherwise we could encounter a situation where the picklist item is valid based on
+                    //  the product availability, but this data might be stale for some reason
+
+                    // TODO Need to test whether this satisfies the requirement when passing a NULL
+                    //  bin location. We also probably want to deal with the case where the provided
+                    //  bin location is provided, but not found.
+
+
+                    // If there was a bin location provided then we'll want to check if there's an
+                    // available item at that location
+                    if (data.binLocation) {
+
+                        // Let's try to determine whether there's a specific available inventory item
+                        //  associated with the lot number and bin data provided by the user.
+                        AvailableItem availableItem = pickPageItem.getAvailableItem(inventoryItem, internalLocation)
+                        log.info "available item " + availableItem
+
+                        // FIXME This is only necessary if we cannot find a happy case from OBPIH-6331
+                        if (!availableItem) {
+                            ApplicationTagLib g = grailsApplication.mainContext.getBean(ApplicationTagLib.class)
+                            String lotNumberName = data.lotNumber ?: g.message(code: "default.noLotNumber.label", default: Constants.DEFAULT_LOT_NUMBER)
+                            String binLocationName = data.binLocation ?: g.message(code: "default.noBinLocation.label", default: Constants.DEFAULT_BIN_LOCATION_NAME)
+                            data.errors.rejectValue(
+                                    "id",
+                                    "importPickCommand.availableItem.notFound.error",
+                                    [lotNumberName, binLocationName] as Object[],
+                                    "There is no item available with: lot \"${lotNumberName}\" and bin location \"${binLocationName}\""
+                            )
+                        }
+
+                        // If there is an available item for the location but it's unavailable
+                        if (availableItem && AvailableItemStatus.listUnavailable().contains(availableItem.status)) {
+                            String lotNumberName = data.lotNumber ?: g.message(code: "default.noLotNumber.label", default: Constants.DEFAULT_LOT_NUMBER)
+                            String binLocationName = data.binLocation ?: g.message(code: "default.noBinLocation.label", default: Constants.DEFAULT_BIN_LOCATION_NAME)
+                            data.errors.rejectValue(
+                                    "id",
+                                    "importPickCommand.availableItem.notAvailable.error",
+                                    [lotNumberName, binLocationName] as Object[],
+                                    "The stock entry you selected: lot \"${lotNumberName}\" and bin location \"${binLocationName}\" is not available. Please review pick."
+                            )
+                        }
+                    }
+
+                    // If the internal location is NULL at this point, that means the user left
+                    // the cell blank and would like the system to allocate based on our rules
+                    if (!internalLocation) {
+                        log.info "Attempting to infer bin locations based on available items"
+                        List<AvailableItem> availableItems = pickPageItem.getAvailableItems(inventoryItem)
+                        availableItems = applyAllocationRulesOnAvailableItems(availableItems, quantityRequired)
+                        boolean isAllocationPossible = validateQuantityAvailable(availableItems, quantityRequired)
+                        if (!isAllocationPossible) {
+                            Integer quantityAvailable = availableItems.sum { it?.quantityAvailable?:0 }
+                            data.errors.rejectValue(
+                                "quantity",
+                                "importPickCommand.quantity.insuffientQuantityAvailable",
+                                [data.code, data.lotNumber, quantityAvailable, quantityRequired] as Object[],
+                                "Insufficient quantity available for product code {0} and lot number {1}. " +
+                                    "Available: {2}, Requested: {3}")
+                        }
+                    }
+
+                    // FIXME This validation should happen only on the first line for the requisition item
+                    Integer itemQuantitySum = picklistItemsGroupedByRequisitionItem[data.id].sum { it.quantity }
+                    if (itemQuantitySum > pickPageItem.requisitionItem.quantity) {
+                        Boolean allowsOverPick = stockMovement.origin.supports(ActivityCode.ALLOW_OVERPICK)
+                        if (!allowsOverPick) {
+                            data.errors.rejectValue(
+                                    "quantity",
+                                    "importPickCommand.quantity.error",
+                                    [pickPageItem.requisitionItem.id] as Object[],
+                                    "The quantity you selected for item \"${pickPageItem.requisitionItem.id}\" is different to the expected revised quantity. Please review pick."
+                            )
+                        }
+                    } else if (itemQuantitySum != pickPageItem.requisitionItem.quantity) {
                         data.errors.rejectValue(
                                 "quantity",
                                 "importPickCommand.quantity.error",
                                 [pickPageItem.requisitionItem.id] as Object[],
-                                "The quantity you selected for item \"${pickPageItem.requisitionItem.id}\" is different to the expected revised quantity. Please review pick."
+                                "The quantity you selected for item ${pickPageItem.requisitionItem.id} is different to the expected revised quantity. Please review pick."
                         )
                     }
-                } else if (itemQuantitySum != pickPageItem.requisitionItem.quantity) {
-                    data.errors.rejectValue(
-                            "quantity",
-                            "importPickCommand.quantity.error",
-                            [pickPageItem.requisitionItem.id] as Object[],
-                            "The quantity you selected for item ${pickPageItem.requisitionItem.id} is different to the expected revised quantity. Please review pick."
-                    )
                 }
             }
         }
     }
 
-    void importPicklistItems(StockMovement stockMovement, List<PickPageItem> pickPageItems, List<Map> picklistItems) {
-        Map<String, List> picklistItemEntriesGroupedByRequisitionItem = picklistItems.groupBy { it.id }
+    // TODO Test whether the sum of an empty available items list returns 0
+    boolean validateQuantityAvailable(List<AvailableItem> availableItems, Integer quantityRequired) {
+        log.info "validate quantity available "
+        availableItems.each { AvailableItem availableItem ->
+            log.info "availableItem " + availableItem.toJson()
+        }
+        Integer quantityAvailable = availableItems?.sum { it?.quantityAvailable?:0 }
+        log.info "quantityAvailable ${quantityAvailable} >= quantityRequired ${quantityRequired}"
+        return quantityAvailable >= quantityRequired
+    }
 
-        picklistItemEntriesGroupedByRequisitionItem.each { requisitionItemId, picklistsToImport  ->
+    // FIXME not sure if we should return available items or suggested items
+    // TODO SO the idea here is that we want to first apply filtering rules to the available items
+    //  according to the ticket (OBPIH-6331) and then have another method actually check whether
+    //  there's enough quantity in these locations. I was initially trying to do everything at once
+    //  but it got really confusing because we would have to apply a rule and then check, apply
+    //  the next rule and check, on and on. Eventually I want these to be implemented using the
+    //  Strategy pattern but I was trying hard not to implement that here.
+    // FIXME One other issue here is that it would be much easier to implement if we had a parent
+    //  parent object above available items that was responsible for answering questions
+    List<AvailableItem> applyAllocationRulesOnAvailableItems(List<AvailableItem> availableItems, Integer quantityRequired) {
+
+        log.info "Apply allocation rules on available items "
+        log.info "Quantity Required = " + quantityRequired
+        log.info "Available items = " + availableItems.size()
+
+        availableItems.each {
+            log.info " - Available item " + it.toJson()
+        }
+
+        // If there's only one pickable bin location
+        if (availableItems.count { it.pickable } == 1) {
+
+            // Scenario 1: All stock in default (no bin)
+            // TODO Could we have more than one available items in a default location?
+            // TODO If there's enough available quantity in the default bin, then allocate
+            //  quantity from the default location
+            boolean isAllStockInDefault = availableItems.every { it.isDefaultLocation }
+            if (isAllStockInDefault) {
+                return availableItems
+            }
+
+            // Scenario 2: All stock in one bin
+            // TODO If there's enough available quantity in one internal location, then
+            //  then allocate stock from that location. Otherwise return an error?
+            boolean isAllStockInSingleBinLocation = availableItems.every { it.isBinLocation }
+            if (isAllStockInSingleBinLocation) {
+                return availableItems
+            }
+        }
+        // If there are more than one internal locations, then we apply the following rules
+        else {
+
+            // Scenario 3a: if lot has stock entries in receiving bins
+            // TODO Are receiving locations configured to be picking locations?
+            // TODO If there's available quantity in default + receiving locations, then
+            //  allocate using FIFO algorithm. Need to check with Manon if this is what is
+            //  expected.
+            boolean isAllStockInReceivingLocations = availableItems.every { it.isReceivingLocation }
+            if (isAllStockInReceivingLocations) {
+                return availableItems
+            }
+            // Scenario 3b: if lot has stock entries in default bin
+            // TODO If there's enough quantity available in default location, then
+            //  allocate from default location.
+
+            // Scenario 3c: if lot has stock entries only in hold bins
+            // TODO If lot has stock entries only in hold bin, then throw an exception.
+
+            // Scenario 4: Any other scenario (stock in “real” bin and virtual bin, stock in multiple real bins)
+            // TODO If there's not enough available quantity in default + receiving
+            //  locations, then throw an exception
+            boolean isAllStockInReceivingOrDefault = availableItems.every { it.isReceivingLocation || it.isDefaultLocation }
+            if (isAllStockInReceivingOrDefault) {
+                return availableItems
+            }
+        }
+        return []
+    }
+
+    void importPicklistItems(PicklistImportDataCommand command) {
+
+        StockMovement stockMovement = command.stockMovement
+        List<PickPageItem> pickPageItems = command.pickPageItems
+        List<PicklistItemCommand> picklistItems = command.picklistItems
+
+        Map<String, List<PicklistItemCommand>> picklistItemsGroupedByRequisitionItem = picklistItems.groupBy { it.id }
+
+        picklistItemsGroupedByRequisitionItem.each { String requisitionItemId, List<PicklistItemCommand> picklistItemsToImport  ->
             // skip rows with errors
-            if (picklistsToImport.any{ it.hasErrors() }) {
+            if (picklistItemsToImport.any{ it.hasErrors() }) {
                 return
             }
 
@@ -1213,25 +1411,58 @@ class StockMovementService {
                 it.requisitionItem?.id == requisitionItemId
             }
 
+            // TODO Does the order of operations matter (remove shipment items vs picklist items)
+            // Remove existing shipment items and picklist items
             removeShipmentItemsForModifiedRequisitionItem(pickPageItem.requisitionItem)
 
-            picklistsToImport.each { params ->
-                AvailableItem availableItem = pickPageItem.getAvailableItem(params.binLocation, params.lotNumber)
-                Picklist picklist = stockMovement.requisition?.picklist
-                // find existing picklist to update
-                PicklistItem picklistItem = picklist.picklistItems.find {
-                    it.inventoryItem?.id == availableItem.inventoryItem?.id &&
-                            it.binLocation?.id == availableItem.binLocation?.id
+            // TODO Need to test this thoroughly as it does not feel like a good idea. For example,
+            //  we don't necessarily want to clear picklist if there's no picklist items to import
+            //  so this might need to go inside a check on !picklistItemsToImport.empty
+            clearPicklist(pickPageItem.requisitionItem)
+
+            // Iterate over all of the picklist items to import and attempt to create a picklist item
+            picklistItemsToImport.each { params ->
+
+
+                InventoryItem inventoryItem = pickPageItem.requisitionItem.product.getInventoryItem(params.lotNumber, params.expirationDate)
+                Location internalLocation = command.location.getInternalLocation(params.binLocation)
+
+                // Get the available item for the provide lot number and bin location
+                AvailableItem availableItem = pickPageItem.getAvailableItem(inventoryItem, internalLocation)
+
+                // If there is an available item we allocate that item to the outbound order
+                if (availableItem) {
+                    Picklist picklist = stockMovement.requisition?.picklist
+                    // find existing picklist to update
+                    PicklistItem picklistItem = picklist.picklistItems.find {
+                        it.inventoryItem?.id == availableItem.inventoryItem?.id &&
+                                it.binLocation?.id == availableItem.binLocation?.id
+                    }
+                    createOrUpdatePicklistItem(
+                            pickPageItem.requisitionItem,
+                            picklistItem,
+                            availableItem.inventoryItem,
+                            availableItem.binLocation,
+                            params.quantity,
+                            null,
+                            null
+                    )
+
                 }
-                createOrUpdatePicklistItem(
-                        pickPageItem.requisitionItem,
-                        picklistItem,
-                        availableItem.inventoryItem,
-                        availableItem.binLocation,
-                        params.quantity,
-                        null,
-                        null
-                )
+                // Otherwise we may need to allocate a new item based on the rules
+                else {
+                    // If there's no internal location then we should apply allocation rules to find
+                    // any available items that might satisfy the quantity required
+                    if (!internalLocation) {
+
+                        // TODO This allocation deserves its own method somewhere, probably on
+                        //  a separate service.
+                        List<AvailableItem> availableItems = pickPageItem.getAvailableItems(inventoryItem)
+                        availableItems = applyAllocationRulesOnAvailableItems(availableItems, params.quantity)
+                        List<SuggestedItem> suggestedItems = getSuggestedItems(availableItems, params.quantity)
+                        allocateSuggestedItems(pickPageItem.requisitionItem, suggestedItems)
+                    }
+                }
             }
             createMissingShipmentItem(pickPageItem.requisitionItem)
         }
@@ -1701,6 +1932,21 @@ class StockMovementService {
         }
 
         return availableSubstitutions.findAll { availableItems -> availableItems.quantityAvailable > 0 }
+    }
+
+
+    void allocateSuggestedItems(RequisitionItem requisitionItem, List<SuggestedItem> suggestedItems) {
+
+        for (SuggestedItem suggestedItem : suggestedItems) {
+            createOrUpdatePicklistItem(
+                    requisitionItem,
+                    null,
+                    suggestedItem.inventoryItem,
+                    suggestedItem.binLocation,
+                    suggestedItem.quantityPicked?.intValueExact(),
+                    null,
+                    null)
+        }
     }
 
     void allocatePicklistItems(List<RequisitionItem> requisitionItems) {

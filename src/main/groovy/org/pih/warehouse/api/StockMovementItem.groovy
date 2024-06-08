@@ -2,6 +2,7 @@ package org.pih.warehouse.api
 
 import grails.util.Holders
 import org.apache.commons.lang.math.NumberUtils
+import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
@@ -355,6 +356,25 @@ class AvailableItem {
         return inventoryItem?.recalled
     }
 
+    Boolean getIsDefaultInventoryItem() {
+        return inventoryItem?.isDefault
+    }
+
+    Boolean getIsDefaultLocation() {
+        return !binLocation
+    }
+
+    // TODO Need to test this thoroughly to make sure it works as expected
+    Boolean getIsBinLocation() {
+        return !(isDefaultLocation && isReceivingLocation && isOnHold())
+    }
+
+    // TODO This may not actually be the correct logic, but it's all we have for now. The
+    //  side effect of this is that it may return true in cases that we don't want it to.
+    Boolean getIsReceivingLocation() {
+        return binLocation?.supports(ActivityCode.RECEIVE_STOCK)
+    }
+
     Map toJson() {
         return [
                 "inventoryItem.id"      : inventoryItem?.id,
@@ -628,15 +648,53 @@ class PickPageItem {
         return picklistItems ? picklistItems?.sum { it.quantity } : 0
     }
 
+    // TODO Document the reason why the default value is null instead of 0? See OBPIH-912.
     Integer getQuantityAvailable() {
         return availableItems ? availableItems?.sum { it.quantityAvailable } : null
     }
 
-    AvailableItem getAvailableItem(String binLocationName, String lotNumber) {
-        return availableItems?.find { item ->
-            Boolean binLocationMatches = binLocationName ? item.binLocation?.name == binLocationName : !item.binLocation
-            Boolean lotMatches = lotNumber ? item.inventoryItem?.lotNumber == lotNumber : !item.inventoryItem?.lotNumber
-            binLocationMatches && lotMatches
+    /**
+     *
+     * @param inventoryItem
+     * @return
+     */
+    List<SuggestedItem> getSuggestedItems(InventoryItem inventoryItem) {
+
+        Integer quantityRequired = requisitionItem.quantity
+
+        List<AvailableItem> availableItems = getAvailableItems(inventoryItem)
+
+        // We've determined that bin location is null, so we need to suggest items from
+        // default or receiving bins, or throw an exception
+
+        // So I think we need to get the available items that match the requirements,
+        // sort them, then return the recommended amount
+
+        return new ArrayList<SuggestedItem>()
+    }
+
+    /**
+     * Get all available items for the given inventory item.
+     * @param inventoryItem
+     * @return
+     */
+    List<AvailableItem> getAvailableItems(InventoryItem inventoryItem) {
+        return availableItems.findAll { availableItem ->
+            availableItem.inventoryItem == inventoryItem
+        }
+    }
+
+    /**
+     * Get all available items for the given inventory item and internal location.
+     * @param inventoryItem
+     * @param internalLocation
+     * @return
+     */
+    AvailableItem getAvailableItem(InventoryItem inventoryItem, Location internalLocation) {
+        // Return only exact matches on inventory item and internal location
+        return availableItems?.find { availableItem ->
+            availableItem.inventoryItem == inventoryItem &&
+                    availableItem.binLocation == internalLocation
         }
     }
 
