@@ -324,6 +324,10 @@ class AvailableItem {
         quantityAvailable(nullable: true)
     }
 
+    String getBinLocationName() {
+        binLocation?.name?:Constants.DEFAULT_BIN_LOCATION_NAME
+    }
+
     AvailableItemStatus getStatus() {
         if (recalled) {
             return AvailableItemStatus.RECALLED
@@ -366,7 +370,16 @@ class AvailableItem {
 
     // TODO Need to test this thoroughly to make sure it works as expected
     Boolean getIsBinLocation() {
-        return !(isDefaultLocation && isReceivingLocation && isOnHold())
+        return !isVirtualLocation && !isOnHold()
+    }
+
+    /**
+     * Virtual locations are the default or receiving locations.
+     *
+     * @return
+     */
+    Boolean getIsVirtualLocation() {
+        return isDefaultLocation || isReceivingLocation
     }
 
     // TODO This may not actually be the correct logic, but it's all we have for now. The
@@ -703,6 +716,12 @@ class PickPageItem {
     List<AvailableItem> getAvailableItems(InventoryItem inventoryItem) {
         return availableItems.findAll { availableItem ->
             availableItem.inventoryItem == inventoryItem
+        }
+    }
+
+    List<AvailableItem> getAvailableItemsInDefaultLocation(InventoryItem inventoryItem) {
+        return availableItems.findAll { availableItem ->
+            availableItem.inventoryItem == inventoryItem && availableItem.binLocation == null
         }
     }
 

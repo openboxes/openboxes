@@ -16,6 +16,7 @@ import org.apache.commons.lang.NotImplementedException
 import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.pih.warehouse.MessageTagLib
 import org.pih.warehouse.auth.AuthService
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.GlAccount
 import org.pih.warehouse.core.Location
@@ -454,7 +455,7 @@ class Product implements Comparable, Serializable {
     }
 
     InventoryItem getDefaultInventoryItem() {
-        return getInventoryItem(null)
+        return getInventoryItem(Constants.DEFAULT_LOT_NUMBER)
     }
 
 
@@ -467,7 +468,13 @@ class Product implements Comparable, Serializable {
     // FIXME the expiration date should be involved here, but we don't require it in other places
     //  so i'll leave that for as a problem for future me
     InventoryItem getInventoryItem(String lotNumber, Date expirationDate) {
-        InventoryItem.createCriteria().get() {
+
+        // Treat the default lot number (DEFAULT) as null
+        if (Constants.DEFAULT_LOT_NUMBER.equalsIgnoreCase(lotNumber)) {
+            lotNumber = null
+        }
+
+        InventoryItem.createCriteria().get {
             and {
                 eq("product", this)
                 if (lotNumber) {
@@ -479,7 +486,7 @@ class Product implements Comparable, Serializable {
                     }
                 }
             }
-        }
+        } as InventoryItem
     }
 
 
