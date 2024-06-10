@@ -2,6 +2,7 @@ package org.pih.warehouse.picklist
 
 import grails.validation.Validateable
 import org.apache.commons.lang.math.NumberUtils
+import org.pih.warehouse.core.Constants
 
 class PicklistItemCommand implements Validateable {
 
@@ -36,6 +37,10 @@ class PicklistItemCommand implements Validateable {
             }
             return true
         })
+    }
+
+    boolean getIsDefaultBinLocation() {
+        return !binLocation || binLocation?.equalsIgnoreCase(Constants.DEFAULT_BIN_LOCATION_NAME)
     }
 
     Integer getQuantity() {
