@@ -11,39 +11,42 @@ import OutboundImportShipmentDetails
 import { FormErrorPropType } from 'utils/propTypes';
 
 const OutboundImportConfirm = ({
-  control, errors, previous, data,
-}) => {
-  return (
-    <Section
-      title={{
-        label: 'react.outboundImport.form.confirmation.label',
-        defaultMessage: 'Confirmation',
-      }}
-    >
-      <OutboundImportShipmentDetails control={control} errors={errors} />
-      <div className="d-flex flex-row justify-content-between">
-        <Button
-          label="react.outboundImport.form.redoImport.label"
-          defaultLabel="Redo import"
-          variant="secondary"
-          onClick={previous}
-        />
-        <Button
-          label="react.outboundImport.form.finish.label"
-          defaultLabel="Finish"
-          variant="primary"
-        />
-      </div>
-      <OutboundImportItems data={data} />
-    </Section>
-  );
-};
+  control, errors, previous, data, tableErrors,
+}) => (
+  <Section
+    title={{
+      label: 'react.outboundImport.form.confirmation.label',
+      defaultMessage: 'Confirmation',
+    }}
+  >
+    <OutboundImportShipmentDetails control={control} errors={errors} />
+    <div className="d-flex flex-row justify-content-between">
+      <Button
+        label="react.outboundImport.form.redoImport.label"
+        defaultLabel="Redo import"
+        variant="secondary"
+        onClick={previous}
+      />
+      <Button
+        label="react.outboundImport.form.finish.label"
+        defaultLabel="Finish"
+        variant="primary"
+      />
+    </div>
+    <OutboundImportItems data={data} errors={tableErrors} />
+  </Section>
+);
 
 export default OutboundImportConfirm;
+
+OutboundImportConfirm.defaultProps = {
+  tableErrors: {},
+};
 
 OutboundImportConfirm.propTypes = {
   data: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   previous: PropTypes.func.isRequired,
+  tableErrors: PropTypes.shape({}),
   errors: PropTypes.shape({
     origin: FormErrorPropType,
     destination: FormErrorPropType,

@@ -57,6 +57,7 @@ const OutboundImport = () => {
 
   const {
     lineItems,
+    lineItemErrors,
     errors,
     control,
     isValid,
@@ -80,7 +81,7 @@ const OutboundImport = () => {
       <form onSubmit={handleSubmit(onSubmit)}>
         {is(OutboundImportStep.DETAILS.key) && (<Step.Component {...detailsComponentProps} />)}
         {/* eslint-disable-next-line max-len */}
-        {is(OutboundImportStep.CONFIRM.key) && (<Step.Component previous={previous} data={lineItems} {...detailsComponentProps} />)}
+        {is(OutboundImportStep.CONFIRM.key) && (<Step.Component previous={previous} data={lineItems} tableErrors={lineItemErrors} {...detailsComponentProps} />)}
       </form>
     </PageWrapper>
   );

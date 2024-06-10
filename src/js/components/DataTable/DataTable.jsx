@@ -1,5 +1,6 @@
 import React from 'react';
 
+import _ from 'lodash';
 import PropTypes from 'prop-types';
 import ReactTable from 'react-table';
 import ReactTablePropTypes from 'react-table/lib/propTypes';
@@ -7,6 +8,7 @@ import withFixedColumns from 'react-table-hoc-fixed-columns';
 
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
 import TablePagination from 'components/DataTable/TablePagination';
+import TableRow from 'components/DataTable/TableRow';
 
 import 'react-table/react-table.css';
 // important: this line must be placed after react-table css import
@@ -17,7 +19,7 @@ const ReactTableFixedColumns = withFixedColumns(ReactTable);
 
 const DataTable = React.forwardRef((props, ref) => {
   const {
-    data, footerComponent, headerComponent, columns, className, totalData,
+    data, footerComponent, headerComponent, columns, className, totalData, errors,
   } = props;
 
   const PaginationComponent = paginationProps => (
@@ -45,6 +47,14 @@ const DataTable = React.forwardRef((props, ref) => {
         columns={columns}
         PaginationComponent={PaginationComponent}
         ThComponent={TableHeaderCell}
+        TrComponent={TableRow}
+        getTrProps={(state, rowInfo) => ({
+          row: rowInfo?.row,
+          error: _.get(errors, `${rowInfo?.index}`, undefined),
+        })}
+        getTdProps={(state, rowInfo, columnInfo) => ({
+          error: _.get(errors, `['${rowInfo?.index}']['${columnInfo?.id}']`, undefined),
+        })}
       />
     </div>
   );
@@ -58,6 +68,7 @@ DataTable.defaultProps = {
   className: '',
   multiSort: false,
   totalData: undefined,
+  errors: {},
 };
 
 DataTable.propTypes = {
@@ -69,6 +80,7 @@ DataTable.propTypes = {
   multiSort: PropTypes.bool,
   className: PropTypes.string,
   totalData: PropTypes.number,
+  errors: PropTypes.shape({}),
 };
 
 

@@ -8,6 +8,7 @@ import { useSelector } from 'react-redux';
 import { DateFormat } from 'consts/timeFormat';
 import useOutboundImportValidation from 'hooks/outboundImport/useOutboundImportValidation';
 
+// TODO: Remove this before feature is finished
 const testRow = {
   product: {
     id: 'someId',
@@ -33,7 +34,12 @@ const testRow = {
     name: 'first last',
   },
 };
-
+// TODO: Remove this before feature is finished
+const tableErrors = {
+  3: { 'product.productCode': 'product with this product code does not exist', lotNumber: 'lot number doe snot exist' },
+  4: { lotNumber: 'lot number doe snot exist', quantityPicked: 'qty cant be this value' },
+};
+// TODO: Remove this before feature is finished
 const otherData = [...Array(250).keys()].map(it => ({
   ...testRow,
   quantityPicked: it,
@@ -63,6 +69,7 @@ const useOutboundImportForm = ({ next }) => {
   });
 
   const [lineItems, setLineItems] = useState([]);
+  const [lineItemErrors, setLineItemErrors] = useState({});
 
   const {
     control,
@@ -84,6 +91,7 @@ const useOutboundImportForm = ({ next }) => {
     // if from confirm page - save & validate
     console.log(values);
     setLineItems(otherData);
+    setLineItemErrors(tableErrors);
     next();
   };
 
@@ -104,6 +112,7 @@ const useOutboundImportForm = ({ next }) => {
     isValid,
     onSubmit,
     trigger,
+    lineItemErrors,
     lineItems,
   };
 };
