@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 
+import _ from 'lodash';
 import PropTypes from 'prop-types';
 
 import Button from 'components/form-elements/Button';
@@ -12,30 +13,35 @@ import { FormErrorPropType } from 'utils/propTypes';
 
 const OutboundImportConfirm = ({
   control, errors, previous, data, tableErrors,
-}) => (
-  <Section
-    title={{
-      label: 'react.outboundImport.form.confirmation.label',
-      defaultMessage: 'Confirmation',
-    }}
-  >
-    <OutboundImportShipmentDetails control={control} errors={errors} />
-    <div className="d-flex flex-row justify-content-between">
-      <Button
-        label="react.outboundImport.form.redoImport.label"
-        defaultLabel="Redo import"
-        variant="secondary"
-        onClick={previous}
-      />
-      <Button
-        label="react.outboundImport.form.finish.label"
-        defaultLabel="Finish"
-        variant="primary"
-      />
-    </div>
-    <OutboundImportItems data={data} errors={tableErrors} />
-  </Section>
-);
+}) => {
+  const hasErrors = useMemo(() => !_.isEmpty(tableErrors), tableErrors);
+
+  return (
+    <Section
+      title={{
+        label: 'react.outboundImport.form.confirmation.label',
+        defaultMessage: 'Confirmation',
+      }}
+    >
+      <OutboundImportShipmentDetails control={control} errors={errors} />
+      <div className="d-flex flex-row justify-content-between">
+        <Button
+          label="react.outboundImport.form.redoImport.label"
+          defaultLabel="Redo import"
+          variant={hasErrors ? 'primary' : 'secondary'}
+          onClick={previous}
+        />
+        <Button
+          label="react.outboundImport.form.finish.label"
+          defaultLabel="Finish"
+          disabled={hasErrors}
+          variant="primary"
+        />
+      </div>
+      <OutboundImportItems data={data} errors={tableErrors} />
+    </Section>
+  )
+};
 
 export default OutboundImportConfirm;
 
