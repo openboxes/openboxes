@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import moment from 'moment/moment';
@@ -7,6 +7,37 @@ import { useSelector } from 'react-redux';
 
 import { DateFormat } from 'consts/timeFormat';
 import useOutboundImportValidation from 'hooks/outboundImport/useOutboundImportValidation';
+
+const testRow = {
+  product: {
+    id: 'someId',
+    name: 'Some produc tname',
+    productCode: '10002',
+  },
+  lotNumber: 'TE!11',
+  expirationDate: '09/16/2027',
+  quantityPicked: 2,
+  binLocation: {
+    id: 'someBinId',
+    name: 'CUB1C',
+    zone: {
+      id: 'zoneId',
+      name: 'someZone',
+    },
+  },
+  recipient: {
+    id: 'someuserId',
+    firstName: 'first',
+    lastName: 'last',
+    username: 'someusername',
+    name: 'first last',
+  },
+};
+
+const otherData = [...Array(250).keys()].map(it => ({
+  ...testRow,
+  quantityPicked: it,
+}));
 
 const useOutboundImportForm = ({ next }) => {
   const { validationSchema } = useOutboundImportValidation();
@@ -31,6 +62,8 @@ const useOutboundImportForm = ({ next }) => {
     packingList: undefined,
   });
 
+  const [lineItems, setLineItems] = useState([]);
+
   const {
     control,
     getValues,
@@ -50,6 +83,7 @@ const useOutboundImportForm = ({ next }) => {
     // if it happens from details step, send an endpoint to validate the data,
     // if from confirm page - save & validate
     console.log(values);
+    setLineItems(otherData);
     next();
   };
 
@@ -70,6 +104,7 @@ const useOutboundImportForm = ({ next }) => {
     isValid,
     onSubmit,
     trigger,
+    lineItems,
   };
 };
 

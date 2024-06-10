@@ -4,11 +4,15 @@ import PropTypes from 'prop-types';
 
 import Button from 'components/form-elements/Button';
 import Section from 'components/Layout/v2/Section';
+import OutboundImportItems
+  from 'components/stock-movement-wizard/outboundImport/subsections/OutboundImportItems';
 import OutboundImportShipmentDetails
   from 'components/stock-movement-wizard/outboundImport/subsections/OutboundImportShipmentDetails';
 import { FormErrorPropType } from 'utils/propTypes';
 
-const OutboundImportConfirm = ({ control, errors, previous }) => {
+const OutboundImportConfirm = ({
+  control, errors, previous, data,
+}) => {
   return (
     <Section
       title={{
@@ -30,6 +34,7 @@ const OutboundImportConfirm = ({ control, errors, previous }) => {
           variant="primary"
         />
       </div>
+      <OutboundImportItems data={data} />
     </Section>
   );
 };
@@ -37,6 +42,7 @@ const OutboundImportConfirm = ({ control, errors, previous }) => {
 export default OutboundImportConfirm;
 
 OutboundImportConfirm.propTypes = {
+  data: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   previous: PropTypes.func.isRequired,
   errors: PropTypes.shape({
     origin: FormErrorPropType,

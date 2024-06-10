@@ -56,6 +56,7 @@ const OutboundImport = () => {
   ] = useWizard({ initialKey: OutboundImportStep.DETAILS.key, steps });
 
   const {
+    lineItems,
     errors,
     control,
     isValid,
@@ -79,7 +80,7 @@ const OutboundImport = () => {
       <form onSubmit={handleSubmit(onSubmit)}>
         {is(OutboundImportStep.DETAILS.key) && (<Step.Component {...detailsComponentProps} />)}
         {/* eslint-disable-next-line max-len */}
-        {is(OutboundImportStep.CONFIRM.key) && (<Step.Component previous={previous} {...detailsComponentProps} />)}
+        {is(OutboundImportStep.CONFIRM.key) && (<Step.Component previous={previous} data={lineItems} {...detailsComponentProps} />)}
       </form>
     </PageWrapper>
   );
