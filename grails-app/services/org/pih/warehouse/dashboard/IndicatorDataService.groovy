@@ -1186,37 +1186,61 @@ class IndicatorDataService {
         ]
 
         String query = '''
-            SELECT p.product_code,
-            COUNT(DISTINCT backdated_transaction.shipment_number) as products,
-            GROUP_CONCAT(DISTINCT backdated_transaction.shipment_number SEPARATOR ' ') as shipments,
-            DATE_FORMAT(stock_count.last_stock_count, "%d-%b-%Y"),
-            GROUP_CONCAT(DISTINCT backdated_transaction.shipment_number, ' ', backdated_transaction.id SEPARATOR ';') as shipment_ids
-            FROM ((
-                SELECT t.id as transaction_id, s.shipment_number, s.id FROM shipment s
-                INNER JOIN `transaction` t ON t.outgoing_shipment_id  = s.id
-                WHERE DATE_ADD(t.transaction_date, INTERVAL :daysOffset DAY) < t.date_created
-                AND t.date_created > :timeLimit
-                AND s.origin_id = :locationId
-            ) UNION (
-                SELECT t.id as transaction_id, s.shipment_number, s.id FROM shipment s
-                INNER JOIN `transaction` t ON t.incoming_shipment_id  = s.id
-                WHERE DATE_ADD(t.transaction_date, INTERVAL :daysOffset DAY) < t.date_created
-                AND t.date_created > :timeLimit
-                AND s.destination_id = :locationId
-            )) AS backdated_transaction
-            INNER JOIN transaction_entry te ON te.transaction_id = backdated_transaction.transaction_id
-            INNER JOIN inventory_item ii ON te.inventory_item_id = ii.id
-            INNER JOIN product p ON ii.product_id = p.id 
-            LEFT JOIN (
-                SELECT ii.product_id, MAX(t.transaction_date) as last_stock_count from transaction_entry te 
-                LEFT JOIN inventory_item ii ON te.inventory_item_id = ii.id 
-                LEFT JOIN `transaction` t ON t.id = te.transaction_id
-                LEFT JOIN transaction_type tt ON tt.id = t.transaction_type_id 
-                WHERE t.inventory_id = :inventoryId
-                AND tt.transaction_code = :transactionCode
-                GROUP BY ii.product_id 
-            ) as stock_count ON stock_count.product_id = ii.product_id
-            GROUP BY ii.product_id, stock_count.last_stock_count
+            SELECT 
+                product_code,
+                COUNT(product_code) as products,
+                GROUP_CONCAT(DISTINCT backdated_shipment SEPARATOR " "),
+                DATE_FORMAT(last_stock_count, "%d-%b-%Y"),
+                GROUP_CONCAT(DISTINCT backdated_shipment, ' ', shipment_id SEPARATOR ';') as shipment_ids
+            FROM (
+                SELECT 
+                    p.product_code,
+                    backdated_transaction.shipment_number as backdated_shipment,
+                    backdated_transaction.date_created,
+                    stock_count.last_stock_count,
+                    backdated_transaction.shipment_id
+                FROM (
+                (
+                    SELECT 
+                        t.id as transaction_id,
+                        s.shipment_number,
+                        t.date_created,
+                        s.id as shipment_id 
+                    FROM shipment s
+                    INNER JOIN `transaction` t ON t.outgoing_shipment_id  = s.id
+                    WHERE DATE_ADD(t.transaction_date, INTERVAL :daysOffset DAY) < t.date_created
+                    AND t.date_created > :timeLimit
+                    AND s.origin_id = :locationId
+                ) UNION (
+                    SELECT 
+                        t.id as transaction_id,
+                        s.shipment_number,
+                        t.date_created,
+                        s.id as shipment_id
+                    FROM shipment s
+                    INNER JOIN `transaction` t ON t.incoming_shipment_id  = s.id
+                    WHERE DATE_ADD(t.transaction_date, INTERVAL :daysOffset DAY) < t.date_created
+                    AND t.date_created > :timeLimit
+                    AND s.destination_id = :locationId
+                )) AS backdated_transaction
+                INNER JOIN transaction_entry te ON te.transaction_id = backdated_transaction.transaction_id
+                INNER JOIN inventory_item ii ON te.inventory_item_id = ii.id
+                INNER JOIN product p ON ii.product_id = p.id 
+                LEFT JOIN (
+                    SELECT 
+                        ii.product_id,
+                        MAX(t.transaction_date) as last_stock_count 
+                    FROM transaction_entry te 
+                    LEFT JOIN inventory_item ii ON te.inventory_item_id = ii.id 
+                    LEFT JOIN `transaction` t ON t.id = te.transaction_id
+                    LEFT JOIN transaction_type tt ON tt.id = t.transaction_type_id 
+                    WHERE t.inventory_id = :inventoryId
+                    AND tt.transaction_code = :transactionCode
+                    GROUP BY ii.product_id 
+                ) as stock_count ON stock_count.product_id = ii.product_id
+            ) as dashboard_data
+            WHERE dashboard_data.date_created > dashboard_data.last_stock_count OR dashboard_data.last_stock_count IS NULL
+            GROUP BY product_code, last_stock_count
             ORDER BY products DESC
         '''
 
