@@ -40,7 +40,7 @@ const OutboundImportConfirm = ({
       </div>
       <OutboundImportItems data={data} errors={tableErrors} />
     </Section>
-  )
+  );
 };
 
 export default OutboundImportConfirm;

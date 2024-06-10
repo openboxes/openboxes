@@ -58,7 +58,7 @@ const OutboundImportItems = ({ data, errors }) => {
   return (
     <Subsection
       title={{
-        label: 'react.outboundImport.form.sendingOptions.labeld',
+        label: 'react.outboundImport.steps.items.label',
         defaultMessage: 'Items',
       }}
       collapsable={false}
