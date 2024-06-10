@@ -36,6 +36,7 @@ import { formatProductDisplayName, matchesProductCodeOrName } from 'utils/form-v
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
+import stockMovementItemApi from 'api/services/StockMovementItemApi';
 
 const FIELDS = {
   pickPageItems: {
@@ -526,9 +527,9 @@ class PickPage extends Component {
     });
   }
 
-  async revertToClearedPick(picklistId, itemId) {
+  async revertToClearedPick(itemId) {
     try {
-      await picklistApi.revertPick(picklistId, itemId);
+      await stockMovementItemApi.revertPick(itemId);
       await this.fetchRevertedItem(itemId);
     } finally {
       this.props.hideSpinner();
@@ -558,8 +559,7 @@ class PickPage extends Component {
    */
   revertUserPick(itemId, quantityPicked) {
     this.props.showSpinner();
-    const { values, isPicklistCleared } = this.state;
-    const { picklist } = values;
+    const { isPicklistCleared } = this.state;
 
     // When the picklist is not cleared we always want to revert
     // the line to the auto-picked value. When the picklist is cleared
@@ -571,7 +571,7 @@ class PickPage extends Component {
 
     isRevertingToAutoPick
       ? this.revertToAutoPick(itemId)
-      : this.revertToClearedPick(picklist?.id, itemId);
+      : this.revertToClearedPick(itemId);
   }
 
   // Returns indexes of rows with quantity picked 0, and without subitems.

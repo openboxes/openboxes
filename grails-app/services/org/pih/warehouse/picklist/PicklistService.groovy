@@ -325,29 +325,32 @@ class PicklistService {
         }
     }
 
-    void revertPick(String id, String itemId) {
-        Picklist picklist = Picklist.get(id)
+    void revertPick(String itemId) {
         RequisitionItem requisitionItem = RequisitionItem.get(itemId)
-        List<PicklistItem> picklistItemsToRemove = PicklistItem.findAllByRequisitionItem(requisitionItem)
 
-        if (!picklist) {
-            throw new ObjectNotFoundException(id, Picklist.class.toString())
+        if (!requisitionItem) {
+            throw new ObjectNotFoundException(itemId, RequisitionItem.class.toString())
         }
 
-        if (!picklistItemsToRemove?.size()) {
-            throw new ObjectNotFoundException(itemId, PicklistItem.class.toString())
-        }
-
+        Set<PicklistItem> picklistItemsToRemove = []
         List<String> binLocations = []
+
+        requisitionItem?.picklistItems?.each { PicklistItem picklistItem ->
+            picklistItem.disableRefresh = true
+            picklistItemsToRemove.add(picklistItem)
+            binLocations.add(picklistItem.binLocation?.id)
+        }
+
         picklistItemsToRemove.each {
-            picklist.removeFromPicklistItems(it)
-            binLocations.add(it.binLocation?.id)
+            it.disableRefresh = true
+            it.picklist?.removeFromPicklistItems(it)
+            requisitionItem?.removeFromPicklistItems(it)
             it.delete(flush: true)
         }
 
         productAvailabilityService.refreshProductsAvailability(
-                picklist?.requisition?.origin?.id,
-                picklistItemsToRemove?.requisitionItem?.product?.id?.unique(),
+                requisitionItem?.requisition?.origin?.id,
+                [requisitionItem?.product?.id],
                 binLocations,
                 false
         )

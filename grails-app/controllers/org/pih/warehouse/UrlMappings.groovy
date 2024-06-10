@@ -186,6 +186,11 @@ class UrlMappings {
             action = [POST: "updatePicklist"]
         }
 
+        "/api/stockMovementItems/$id/picklistItems" {
+            controller = "stockMovementItemApi"
+            action = [DELETE: "revertPick"]
+        }
+
         "/api/stockMovementItems/$id/createPicklist"(parseRequest: true) {
             controller = "stockMovementItemApi"
             action = [POST: "createPicklist"]
@@ -337,11 +342,6 @@ class UrlMappings {
         "/api/picklists/$id/items" {
             controller = "picklistApi"
             action = [DELETE: "clearPicklist"]
-        }
-
-        "/api/picklists/$id/items/$itemId" {
-            controller = "picklistApi"
-            action = [DELETE: "revertPick"]
         }
 
         // Partial Receiving API
