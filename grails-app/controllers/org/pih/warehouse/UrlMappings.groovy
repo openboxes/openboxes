@@ -186,6 +186,11 @@ class UrlMappings {
             action = [POST: "updatePicklist"]
         }
 
+        "/api/stockMovementItems/$id/picklistItems" {
+            controller = "stockMovementItemApi"
+            action = [DELETE: "revertPick"]
+        }
+
         "/api/stockMovementItems/$id/createPicklist"(parseRequest: true) {
             controller = "stockMovementItemApi"
             action = [POST: "createPicklist"]

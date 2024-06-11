@@ -36,6 +36,7 @@ import { formatProductDisplayName, matchesProductCodeOrName } from 'utils/form-v
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
+import stockMovementItemApi from 'api/services/StockMovementItemApi';
 
 const FIELDS = {
   pickPageItems: {
@@ -193,7 +194,7 @@ const FIELDS = {
         getDynamicAttr: ({
           fieldValue, revertUserPick, subfield, showOnly,
         }) => ({
-          onClick: _.get(fieldValue, 'requisitionItem.id') ? () => revertUserPick(_.get(fieldValue, 'requisitionItem.id')) : () => null,
+          onClick: _.get(fieldValue, 'requisitionItem.id') ? () => revertUserPick(fieldValue?.requisitionItem?.id, fieldValue?.quantityPicked) : () => null,
           hidden: subfield,
           disabled: showOnly,
         }),
@@ -225,6 +226,7 @@ class PickPage extends Component {
       itemFilter: '',
       showOnlyErroredItems: false,
       isExportDropdownVisible: false,
+      isPicklistCleared: false,
     };
 
     this.revertUserPick = this.revertUserPick.bind(this);
@@ -525,28 +527,51 @@ class PickPage extends Component {
     });
   }
 
+  async revertToClearedPick(itemId) {
+    try {
+      await stockMovementItemApi.revertPick(itemId);
+      await this.fetchRevertedItem(itemId);
+    } finally {
+      this.props.hideSpinner();
+    }
+  }
+
+  async revertToAutoPick(itemId) {
+    try {
+      await apiClient.post(STOCK_MOVEMENT_CREATE_PICKLIST(itemId));
+      await this.fetchRevertedItem(itemId);
+    } finally {
+      this.props.hideSpinner();
+    }
+  }
+
+  async fetchRevertedItem(itemId) {
+    const { data } = await apiClient.get(STOCK_MOVEMENT_ITEM_BY_ID(itemId), {
+      params: { stepNumber: OutboundWorkflowState.PICK_ITEMS, refreshPicklistItems: false },
+    });
+    this.updatePickPageItem(data.data);
+  }
+
   /**
    * Reverts to previous state of picks for requisition item
    * @param {string} itemId
    * @public
    */
-  revertUserPick(itemId) {
+  revertUserPick(itemId, quantityPicked) {
     this.props.showSpinner();
+    const { isPicklistCleared } = this.state;
 
-    apiClient.post(STOCK_MOVEMENT_CREATE_PICKLIST(itemId))
-      .then(() => {
-        apiClient.get(STOCK_MOVEMENT_ITEM_BY_ID(itemId), {
-          params: { stepNumber: OutboundWorkflowState.PICK_ITEMS, refreshPicklistItems: false  },
-        })
-          .then((resp) => {
-            const pickPageItem = resp.data.data;
+    // When the picklist is not cleared we always want to revert
+    // the line to the auto-picked value. When the picklist is cleared
+    // and the quantity is 0 then we want to revert it to the auto pick
+    // (it means that any picklist item does not exist for that line).
+    // In every other case, we want to remove the pick for a chosen line.
+    const isRevertingToAutoPick = !isPicklistCleared
+      || (isPicklistCleared && quantityPicked === 0);
 
-            this.updatePickPageItem(pickPageItem);
-            this.props.hideSpinner();
-          })
-          .catch(() => { this.props.hideSpinner(); });
-      })
-      .catch(() => { this.props.hideSpinner(); });
+    isRevertingToAutoPick
+      ? this.revertToAutoPick(itemId)
+      : this.revertToClearedPick(itemId);
   }
 
   // Returns indexes of rows with quantity picked 0, and without subitems.
@@ -713,6 +738,7 @@ class PickPage extends Component {
     this.props.showSpinner();
     try {
       await picklistApi.clearPicklist(picklist?.id);
+      this.setState({ isPicklistCleared: true });
       const picklistItems = this.state.values.pickPageItems;
       this.setState((prevState) => ({
         values: ({
@@ -799,7 +825,7 @@ class PickPage extends Component {
                   )}
                   <label
                     htmlFor="csvInput"
-                    className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
+                    className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs mr-1"
                   >
                     <span>
                       <i className="fa fa-download pr-2"/>
