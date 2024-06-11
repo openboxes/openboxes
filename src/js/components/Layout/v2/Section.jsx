@@ -9,7 +9,7 @@ import './styles.scss';
 const Section = ({ title, children, className }) => (
   <div className={`v2-section ${className}`}>
     <span className="v2-section-title text-uppercase">
-      <Translate id={title.label} defaultMessage={title.defaultMessage} />
+      <Translate id={title?.label} defaultMessage={title?.defaultMessage} />
     </span>
     {children}
   </div>

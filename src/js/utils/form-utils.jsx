@@ -1,6 +1,7 @@
 import React from 'react';
 
 import _ from 'lodash';
+import moment from 'moment';
 import PropTypes from 'prop-types';
 import ReactHtmlParser from 'react-html-parser';
 import { getTranslate } from 'react-localize-redux';
@@ -143,4 +144,15 @@ export const decimalParser = (value, precision) => {
     return _.round(value, precision);
   }
   return Number.isNaN(valueAsNumber) ? undefined : valueAsNumber;
+};
+
+/**
+ * Method to if picked date is from the future
+ * @return true if the date is not from the future; false if the date is from the future
+ * @param pickedDate
+ */
+export const validateFutureDate = (pickedDate) => {
+  const date = moment(pickedDate);
+  const today = moment(new Date());
+  return date.startOf('day').isSameOrBefore(today.startOf('day'));
 };
