@@ -18,12 +18,12 @@ class AllocationRequest implements Validateable {
     PicklistItemCommand picklistItemCommand
 
     static constraints = {
-        product nullable:false
-        inventoryItem nullable:true
-        requisitionItem nullable:true
-        availableItems nullable:false
-        suggestedItems nullable:true
-        quantityRequired nullable:false
-        picklistItemCommand nullable:false
+        product(nullable: false)
+        inventoryItem(nullable: true)
+        requisitionItem(nullable: true)
+        availableItems(nullable: false)
+        suggestedItems(nullable: true)
+        quantityRequired(nullable: false)
+        picklistItemCommand(nullable: false)
     }
 }

@@ -365,7 +365,7 @@ class AvailableItem {
     }
 
     Boolean getIsDefaultLocation() {
-        return !binLocation
+        return binLocation == null
     }
 
     // TODO Need to test this thoroughly to make sure it works as expected
@@ -664,26 +664,6 @@ class PickPageItem {
     // TODO Document the reason why the default value is null instead of 0? See OBPIH-912.
     Integer getQuantityAvailable() {
         return availableItems ? availableItems?.sum { it.quantityAvailable } : null
-    }
-
-    /**
-     *
-     * @param inventoryItem
-     * @return
-     */
-    List<SuggestedItem> getSuggestedItems(InventoryItem inventoryItem) {
-
-        Integer quantityRequired = requisitionItem.quantity
-
-        List<AvailableItem> availableItems = getAvailableItems(inventoryItem)
-
-        // We've determined that bin location is null, so we need to suggest items from
-        // default or receiving bins, or throw an exception
-
-        // So I think we need to get the available items that match the requirements,
-        // sort them, then return the recommended amount
-
-        return new ArrayList<SuggestedItem>()
     }
 
     /**

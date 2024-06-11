@@ -1145,17 +1145,12 @@ class StockMovementService {
      *
      * @param command
      */
-    // FIXME Args should be passed in via command class
     void validatePicklistListImport(PicklistImportDataCommand command) {
-
-        // The parent requisition items that picklist items are associated with
-        List<PickPageItem> pickPageItems = command.pickPageItems
 
         StockMovement stockMovement = command.stockMovement
 
-        // TODO Remove if not needed
-        // The allocated picklist items to validate
-        //List<PicklistItemCommand> picklistItems = command.picklistItems
+        // The parent requisition items that picklist items are associated with
+        List<PickPageItem> pickPageItems = command.pickPageItems
 
         // FIXME Remove this if it's no longer being used
         // Configuration property that allows overpick for a given location
@@ -1165,14 +1160,10 @@ class StockMovementService {
         // Group the picklist items from the CSV by requisition item ID
         Map<String, List> picklistItemsGroupedByRequisitionItem = command.picklistItems.groupBy { it.id }
 
-        Errors errors = new BeanPropertyBindingResult(command, "picklistImportDataCommand")
-
         // Iterate over the parent requisition items
         picklistItemsGroupedByRequisitionItem.each { requisitionItemId, picklistItems ->
 
-            // TODO Move total quantity picked validation per requisition item so we only need
-            //  to display it once per requisition item
-
+            // Iterate over each separate pick
             picklistItems.each { PicklistItemCommand data ->
 
                 // FIXME Make sure we also check that the quantity provided is not greater than the
@@ -1189,6 +1180,8 @@ class StockMovementService {
                 if (!data.id) {
                     return
                 }
+
+                // Pick page item represents the requisiton item
                 PickPageItem pickPageItem = pickPageItems.find { it.requisitionItem?.id == data.id }
                 if (!pickPageItem) {
                     data.errors.rejectValue(
@@ -1214,6 +1207,20 @@ class StockMovementService {
                                 "importPickCommand.inventoryItem.notFound.error",
                                 [data.lotNumber] as Object[],
                                 "Unable to find inventory item with lot number {0}")
+                    }
+                    else {
+
+                        // If there is an inventory item found, let's check to see if there's more
+                        // than one picklist item with an empty bin
+                        Integer countEmptyBinLocations = picklistItems.findAll { it.lotNumber == inventoryItem.lotNumber }.count { !it.binLocation }
+                        if (countEmptyBinLocations > 1) {
+                            data.errors.rejectValue(
+                                    "binLocation",
+                                    "importPickCommand.binLocation.multipleEmpty.error",
+                                    [data.lotNumber] as Object[],
+                                    "Bin location cannot be empty for multiple rows with the same lot number {0}"
+                            )
+                        }
                     }
 
                     // OBPIH-6331 Resolve bin location, if a bin location value was provided. Otherwise,
@@ -1244,7 +1251,6 @@ class StockMovementService {
                     //  bin location. We also probably want to deal with the case where the provided
                     //  bin location is provided, but not found.
 
-
                     // If there was a bin location provided then we'll want to check if there's an
                     // available item at that location
                     if (data.binLocation) {
@@ -1252,7 +1258,6 @@ class StockMovementService {
                         // Let's try to determine whether there's a specific available inventory item
                         //  associated with the lot number and bin data provided by the user.
                         AvailableItem availableItem = pickPageItem.getAvailableItem(inventoryItem, internalLocation)
-                        log.info "available item " + availableItem
 
                         // FIXME This is only necessary if we cannot find a happy case from OBPIH-6331
                         if (!availableItem) {
@@ -1263,7 +1268,7 @@ class StockMovementService {
                                     "id",
                                     "importPickCommand.availableItem.notFound.error",
                                     [lotNumberName, binLocationName] as Object[],
-                                    "There is no item available with: lot \"{0}\" and bin location \"{1}\""
+                                    "There is no available item for lot number {0} and bin location {1}"
                             )
                         }
 
@@ -1275,7 +1280,7 @@ class StockMovementService {
                                     "id",
                                     "importPickCommand.availableItem.notAvailable.error",
                                     [lotNumberName, binLocationName] as Object[],
-                                    "The stock entry you selected: lot \"{0}\" and bin location \"{1}\" is not available. Please review pick."
+                                    "The stock entry you selected: lot number {0} and bin location {1} is not available. Please review pick."
                             )
                         }
                     }
@@ -1285,15 +1290,17 @@ class StockMovementService {
                     // the cell blank and would like the system to allocate based on our rules
                     if (!internalLocation) {
 
-                        log.info "Attempting to infer bin locations based on available items"
-
                         // FIXME THis feels a bit weird because we should allow the allocation
                         //  algorithm to sort and decide which location is best
                         // First attempt to get the available items in the default location
-                        List<AvailableItem> availableItems = pickPageItem.getAvailableItemsInDefaultLocation(inventoryItem)
+                        //List<AvailableItem> availableItems = pickPageItem.getAvailableItemsInDefaultLocation(inventoryItem)
+
+                        // It was in fact premature to be doing the above filtering as it was
+                        // causing some major issues when there were available items in multiple locations
+                        List<AvailableItem> availableItems = []
 
                         // If there are no available items in the default location, find all
-                        // available items for the provide lot number
+                        // available items for the provided lot number
                         if (availableItems?.empty) {
                             availableItems = pickPageItem.getAvailableItems(inventoryItem)
                         }
@@ -1309,21 +1316,7 @@ class StockMovementService {
                         // Validate allocation request
                         validateAllocationRequest(allocationRequest)
 
-                        // TODO Move this into the validateAllocationRequest?
-                        // Validate the quantity available for all available items
-                        boolean isAllocationPossible = validateQuantityAvailable(availableItems, quantityRequired)
-                        if (!isAllocationPossible) {
-                            Integer quantityAvailable = availableItems.quantityAvailable.sum()?:0
-                            data.errors.rejectValue(
-                                "quantity",
-                                "importPickCommand.quantity.insuffientQuantityAvailable",
-                                [data.code, data.lotNumber, quantityAvailable, quantityRequired] as Object[],
-                                "Insufficient quantity available for product code {0} and lot number {1}. " +
-                                    "Available: {2}, Required: {3}")
-                        }
-
-
-                        //availableItems = applyAllocationRulesOnAvailableItems(availableItems, quantityRequired)
+                        // Add validation errors to command object
                         if (allocationRequest.hasErrors()) {
                             allocationRequest.errors.allErrors.each { it
                                 data.errors.reject(it.code)
@@ -1333,6 +1326,8 @@ class StockMovementService {
 
                     // FIXME This validation should happen only on the first line for the requisition item
                     Integer totalQuantityPicked = picklistItemsGroupedByRequisitionItem[data.id].sum { it.quantity }
+
+                    // TODO Should we really be using requisitonItem.quantity here?
                     if (totalQuantityPicked > pickPageItem.requisitionItem.quantity) {
                         Boolean allowsOverPick = stockMovement.origin.supports(ActivityCode.ALLOW_OVERPICK)
                         if (!allowsOverPick) {
@@ -1358,15 +1353,9 @@ class StockMovementService {
 
     // TODO Test whether the sum of an empty available items list returns 0
     boolean validateQuantityAvailable(List<AvailableItem> availableItems, Integer quantityRequired) {
-        log.info "validate quantity available "
-        availableItems.each { AvailableItem availableItem ->
-            log.info "availableItem " + availableItem.toJson()
-        }
         Integer quantityAvailable = availableItems?.sum { it?.quantityAvailable?:0 }
-        log.info "quantityAvailable ${quantityAvailable} >= quantityRequired ${quantityRequired}"
         return quantityAvailable >= quantityRequired
     }
-
 
     void validateAllocationRequest(AllocationRequest allocationRequest) {
 
@@ -1382,6 +1371,7 @@ class StockMovementService {
         Integer countInBinLocations = availableItems.findAll { it.isBinLocation }?.size()
 
         // Scenario 2: All stock in one bin (or in one real bin and 1 or more hold bins - ignore hold bins)
+        log.info "\n\n\n\n\n\ncountInBinLocation " + countInBinLocations
         if (countInBinLocations > 1) {
             picklistItemCommand.errors.rejectValue("binLocation",
                     "importPickCommand.availableItems.inMultipleLocations",
@@ -1411,6 +1401,35 @@ class StockMovementService {
                     [product.productCode, inventoryItem?.lotNumber, availableItems.binLocationName] as Object [],
                     "Product {0} with lot number {1} only has stock in hold locations."
             )
+        }
+
+        // Scenario 4: Any other scenario (stock in “real” bin and virtual bin, stock in multiple real bins)
+        log.info "Available items " + availableItems.size()
+        availableItems.each {
+            log.info "Available items " + it.toJson()
+        }
+        Integer countInVirtualAndBinLocations = availableItems?.findAll { it?.isVirtualLocation || it?.isBinLocation }?.size()
+        log.info "123countInVirtualAndBinLocations " + countInVirtualAndBinLocations
+        Integer countInBinLocations2 = availableItems?.findAll { it?.isBinLocation }?.size()
+        log.info "countInBinLocations " + countInBinLocations2
+        Integer countInVirtualLocations = availableItems?.findAll { it?.isVirtualLocation }?.size()
+        log.info "countInVirtualLocations " + countInVirtualLocations
+
+
+        // FIXME This might need to be moved to the code that actually filters the available item
+        //  otherwise it probably doesn't make sense in this context. It's probably not hurting
+        //  anything, but it's definitely not doing what I originally intended for it to do.
+
+        // Validate the quantity available for all available items
+        boolean isAllocationPossible = validateQuantityAvailable(availableItems, quantityRequired)
+        if (!isAllocationPossible) {
+            Integer quantityAvailable = availableItems.quantityAvailable.sum()?:0
+            picklistItemCommand.errors.rejectValue(
+                "quantity",
+                "importPickCommand.quantity.insuffientQuantityAvailable",
+                [picklistItemCommand.code, picklistItemCommand.lotNumber?:Constants.DEFAULT_LOT_NUMBER, quantityAvailable, quantityRequired] as Object[],
+                "Insufficient quantity available for product code {0} and lot number {1}. " +
+                    "Available: {2}, Required: {3}")
         }
 
     }
@@ -1513,7 +1532,6 @@ class StockMovementService {
 
             // Iterate over all of the picklist items to import and attempt to create a picklist item
             picklistItemsToImport.each { params ->
-
 
                 InventoryItem inventoryItem = pickPageItem.requisitionItem.product.getInventoryItem(params.lotNumber, params.expirationDate)
                 Location internalLocation = command.location.getInternalLocation(params.binLocation)

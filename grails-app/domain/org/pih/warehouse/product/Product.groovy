@@ -474,7 +474,8 @@ class Product implements Comparable, Serializable {
             lotNumber = null
         }
 
-        InventoryItem.createCriteria().get {
+        // Find an inventory that matches the provided lot number
+        return InventoryItem.createCriteria().get {
             and {
                 eq("product", this)
                 if (lotNumber) {
