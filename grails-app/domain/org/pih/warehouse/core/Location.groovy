@@ -295,7 +295,6 @@ class Location implements Comparable<Location>, java.io.Serializable {
      * @return
      */
     Location getInternalLocation(String name) {
-
         if (name?.equalsIgnoreCase(Constants.DEFAULT_BIN_LOCATION_NAME)) {
             return defaultLocation
         }

@@ -230,20 +230,6 @@ class PicklistController {
         // Bind the parent requisition items to the command class
         command.pickPageItems = stockMovementService.getPickPageItems(params.id, null, null)
 
-        // TODO Test that this actually captures all of the validation errors on the input file.
-        //  We could also postpone this until the
-        // Validate provided properties of the data import, including the import file
-        if(!command.validate()) {
-            throw new ValidationException("Import failed due to errors", command.errors)
-        }
-
-//        MultipartFile importFile = command.importFile
-//        if (importFile.isEmpty()) {
-//            throw new IllegalArgumentException("File cannot be empty")
-//        }
-
-//        String csv = new String(importFile.bytes)
-
         // Bind the parent requisition items to the command class
         command.picklistItems = stockMovementService.parsePickCsvTemplateImport(command)
 
@@ -258,6 +244,16 @@ class PicklistController {
         //  Or the code below should be cleaned up and added to a utility.
         //  ErrorsUtil.copyAllErrors(source, destination).
         List<String> errors = []
+
+        // Add errors from the parent picklist import command
+        if (command.hasErrors()) {
+            List<String> localizedErrors = command.errors.allErrors.collect { g.message(error: it) }
+            if (!localizedErrors.isEmpty()) {
+                errors.addAll(localizedErrors)
+            }
+        }
+
+        // Add errors from each picklist item in the data import
         command.picklistItems.eachWithIndex { importPickCommand, index ->
             if (importPickCommand.hasErrors()) {
                 List<String> localizedErrors = importPickCommand.errors.allErrors.collect { g.message(error: it) }
@@ -267,7 +263,13 @@ class PicklistController {
             }
         }
 
-        stockMovementService.importPicklistItems(command)
+        // FIXME This probably goes against the requirements, but I would
+        //  like to get everything working properly before we allow this
+        //  behavior
+        // Only allow import if there are no validation errors
+        if (errors.isEmpty()) {
+            stockMovementService.importPicklistItems(command)
+        }
 
         if (!errors.isEmpty()) {
             render([message: "Data imported with errors", errors: errors] as JSON)

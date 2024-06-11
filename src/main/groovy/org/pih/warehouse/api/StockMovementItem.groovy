@@ -365,7 +365,7 @@ class AvailableItem {
     }
 
     Boolean getIsDefaultLocation() {
-        return !binLocation
+        return binLocation == null
     }
 
     // TODO Need to test this thoroughly to make sure it works as expected
