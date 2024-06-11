@@ -13,13 +13,17 @@ import grails.converters.JSON
 import org.grails.web.json.JSONObject
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
+import org.pih.warehouse.core.DocumentService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.StockMovementParamsCommand
 import org.pih.warehouse.core.User
+import org.pih.warehouse.core.UserService
 import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.inventory.OutboundStockMovementService
+import org.pih.warehouse.inventory.StockMovementService
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionSourceType
@@ -27,14 +31,16 @@ import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.requisition.RequisitionType
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentStatusCode
+import org.pih.warehouse.stockTransfer.StockTransferService
 
 
 class StockMovementApiController {
 
-    def outboundStockMovementService
-    def stockMovementService
-    def stockTransferService
-    def userService
+    OutboundStockMovementService outboundStockMovementService
+    StockMovementService stockMovementService
+    StockTransferService stockTransferService
+    UserService userService
+    DocumentService documentService
 
     def list() {
         Location destination = params.destination ? Location.get(params.destination) : null
@@ -760,5 +766,17 @@ class StockMovementApiController {
             render([errorMessage: errorMessage] as JSON)
         }
         render(status: 200)
+    }
+
+    def downloadPackingListTemplate() {
+        try {
+            String filename = "completedPackingList.xls"
+            File file = documentService.findFile("templates/" + filename)
+            response.setHeader('Content-disposition', "attachment; filename=\"${filename}\"")
+            response.outputStream << file.bytes
+            response.outputStream.flush()
+        } catch (FileNotFoundException e) {
+            render status: 404
+        }
     }
 }
