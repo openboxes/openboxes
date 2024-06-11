@@ -62,7 +62,8 @@ const OutboundImport = () => {
     control,
     isValid,
     handleSubmit,
-    onSubmit,
+    onSubmitStockMovementDetails,
+    onConfirmImport,
     trigger,
   } = useOutboundImportForm({ next });
 
@@ -78,10 +79,19 @@ const OutboundImport = () => {
     <PageWrapper>
       <WizardStepsV2 steps={stepsTitles} currentStepKey={Step.key} />
       <OutboundImportHeader />
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={handleSubmit(onSubmitStockMovementDetails)}>
         {is(OutboundImportStep.DETAILS.key) && (<Step.Component {...detailsComponentProps} />)}
-        {/* eslint-disable-next-line max-len */}
-        {is(OutboundImportStep.CONFIRM.key) && (<Step.Component previous={previous} data={lineItems} tableErrors={lineItemErrors} {...detailsComponentProps} />)}
+      </form>
+      <form onSubmit={handleSubmit(onConfirmImport)}>
+        {is(OutboundImportStep.CONFIRM.key)
+          && (
+          <Step.Component
+            {...detailsComponentProps}
+            previous={previous}
+            data={lineItems}
+            tableErrors={lineItemErrors}
+          />
+          )}
       </form>
     </PageWrapper>
   );

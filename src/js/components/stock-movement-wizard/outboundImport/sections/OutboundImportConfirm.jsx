@@ -34,6 +34,7 @@ const OutboundImportConfirm = ({
         <Button
           label="react.outboundImport.form.finish.label"
           defaultLabel="Finish"
+          type="submit"
           disabled={hasErrors}
           variant="primary"
         />
