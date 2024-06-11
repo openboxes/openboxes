@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 import useTranslate from 'hooks/useTranslate';
-import validateFutureDate from 'utils/zodUtils';
+import { validateFutureDate } from 'utils/form-utils';
 
 const useOutboundImportValidation = () => {
   const translate = useTranslate();

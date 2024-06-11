@@ -46,8 +46,9 @@ const DateField = ({
     if (showTimeSelect) {
       return moment(new Date(dateToFormat), DateFormat.MMM_DD_YYYY_HH_MM_SS);
     }
-
-    return moment(new Date(dateToFormat), DateFormat.MMM_DD_YYYY);
+    return showTimeSelect
+      ? moment(new Date(dateToFormat), DateFormat.MMM_DD_YYYY_HH_MM_SS)
+      : moment(new Date(dateToFormat), DateFormat.MMM_DD_YYYY);
   };
 
   const selectedDate = formatDate(value);
