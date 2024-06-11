@@ -325,11 +325,11 @@ class PicklistService {
         }
     }
 
-    void revertPick(String itemId) {
-        RequisitionItem requisitionItem = RequisitionItem.get(itemId)
+    void revertPick(String requisitionItemId) {
+        RequisitionItem requisitionItem = RequisitionItem.get(requisitionItemId)
 
         if (!requisitionItem) {
-            throw new ObjectNotFoundException(itemId, RequisitionItem.class.toString())
+            throw new ObjectNotFoundException(requisitionItemId, RequisitionItem.class.toString())
         }
 
         Set<PicklistItem> picklistItemsToRemove = []
