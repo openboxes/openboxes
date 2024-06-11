@@ -1,7 +1,5 @@
 import React, { useMemo } from 'react';
 
-import { useDispatch } from 'react-redux';
-
 import OutboundImportConfirm from 'components/stock-movement-wizard/outboundImport/OutboundImportConfirm';
 import OutboundImportHeader from 'components/stock-movement-wizard/outboundImport/OutboundImportHeader';
 import OutboundImportDetails from 'components/stock-movement-wizard/outboundImport/sections/OutboundImportDetails';
