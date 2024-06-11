@@ -6,6 +6,8 @@ import Button from 'components/form-elements/Button';
 import Section from 'components/Layout/v2/Section';
 import OutboundImportBasicDetails
   from 'components/stock-movement-wizard/outboundImport/subsections/OutboundImportBasicDetails';
+import OutboundImportDropzone
+  from 'components/stock-movement-wizard/outboundImport/subsections/OutboundImportDropzone';
 import OutboundImportSendingOptions
   from 'components/stock-movement-wizard/outboundImport/subsections/OutboundImportSendingOptions';
 import { FormErrorPropType } from 'utils/propTypes';
@@ -19,6 +21,7 @@ const OutboundImportDetails = ({ control, errors, isValid }) => (
   >
     <OutboundImportBasicDetails control={control} errors={errors} />
     <OutboundImportSendingOptions control={control} errors={errors} />
+    <OutboundImportDropzone control={control} errors={errors} />
     <Button
       label="react.outboundImport.form.next.label"
       defaultLabel="Next"

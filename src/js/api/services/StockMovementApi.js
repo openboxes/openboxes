@@ -1,5 +1,4 @@
 import {
-  PACKING_LIST_TEMPLATE,
   STOCK_MOVEMENT_API,
   STOCK_MOVEMENT_BY_ID,
   STOCK_MOVEMENT_ROLLBACK_APPROVAL,
@@ -25,5 +24,4 @@ export default {
       comment,
     }),
   rollbackApproval: id => apiClient.put(STOCK_MOVEMENT_ROLLBACK_APPROVAL(id)),
-  downloadPackingListTemplate: () => apiClient.get(PACKING_LIST_TEMPLATE, { responseType: 'blob' }),
 };
