@@ -158,12 +158,12 @@ export const validateFutureDate = (pickedDate) => {
 };
 
 /**
- * Method to check if first date is later than the second date
- * @return true if the first date is later than the second date
+ * Method to check if first date is later or same as the second date
+ * @return true if the first date is later or same as the second date
  * @param laterDate
  * @param earlierDate
  */
-export const validateOneAfterAnotherDate = (laterDate, earlierDate) => {
+export const validateDateIsSameOrAfter = (laterDate, earlierDate) => {
   const laterDateParsed = moment(laterDate);
   const earlierDateParsed = moment(earlierDate);
   return laterDateParsed.startOf('day').isSameOrAfter(earlierDateParsed.startOf('day'));

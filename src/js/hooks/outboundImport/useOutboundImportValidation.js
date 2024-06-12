@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 import useTranslate from 'hooks/useTranslate';
-import { validateFutureDate, validateOneAfterAnotherDate } from 'utils/form-utils';
+import { validateDateIsSameOrAfter, validateFutureDate } from 'utils/form-utils';
 
 const useOutboundImportValidation = () => {
   const translate = useTranslate();
@@ -62,7 +62,7 @@ const useOutboundImportValidation = () => {
       invalid_type_error: translate('react.outboundImport.validation.expectedDeliveryDate.required.label', 'Expected delivery date is required'),
     }).refine(() => {
       const { expectedDeliveryDate, dateShipped } = data;
-      return validateOneAfterAnotherDate(expectedDeliveryDate, dateShipped);
+      return validateDateIsSameOrAfter(expectedDeliveryDate, dateShipped);
     }, {
       message: translate('react.outboundImport.validation.expectedDeliveryDate.afterDateShipped.label',
         'Please verify timeline. Delivery date cannot be before Ship date.'),
