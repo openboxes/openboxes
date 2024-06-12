@@ -50,7 +50,7 @@ const DataTable = React.forwardRef((props, ref) => {
         TrComponent={TableRow}
         getTrProps={(state, rowInfo) => ({
           row: rowInfo?.row,
-          error: _.get(errors, `${rowInfo?.index}`, undefined),
+          error: errors[rowInfo?.index],
         })}
         getTdProps={(state, rowInfo, columnInfo) => ({
           error: _.get(errors, `['${rowInfo?.index}']['${columnInfo?.id}']`, undefined),

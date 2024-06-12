@@ -15,11 +15,13 @@ const OutboundImportItems = ({ data, errors }) => {
     {
       Header: translate('react.outboundImport.table.column.productCode.label', 'Code'),
       accessor: 'product.productCode',
+      width: 90,
       Cell: (row) => <TableCell {...row} showError />,
     },
     {
       Header: translate('react.outboundImport.table.column.productName.label', 'Product'),
       accessor: 'product.name',
+      minWidth: 150,
       Cell: (row) => (
         <TableCell
           {...row}
@@ -31,11 +33,13 @@ const OutboundImportItems = ({ data, errors }) => {
     {
       Header: translate('react.outboundImport.table.column.lotNumber.label', 'Lot'),
       accessor: 'lotNumber',
+      minWidth: 120,
       Cell: (row) => <TableCell {...row} showError />,
     },
     {
       Header: translate('react.outboundImport.table.column.expirationDate.label', 'Expiry'),
       accessor: 'expirationDate',
+      width: 120,
       Cell: (row) => <DateCell {...row} />,
     },
     {
