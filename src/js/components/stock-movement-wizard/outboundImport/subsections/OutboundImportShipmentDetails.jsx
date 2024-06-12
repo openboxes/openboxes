@@ -59,7 +59,7 @@ const OutboundImportShipmentDetails = ({ control, errors }) => {
         </div>
         <div className="col-lg-3 col-md-6 px-2 pt-2">
           <Controller
-            name="shipDate"
+            name="dateShipped"
             control={control}
             render={({ field }) => (
               <DateField
@@ -73,6 +73,7 @@ const OutboundImportShipmentDetails = ({ control, errors }) => {
                   id: 'react.default.dateInput.placeholder.label',
                   default: 'Select a date',
                 }}
+                showTimeSelect
                 errorMessage={errors.dateShipped?.message}
               />
             )}
