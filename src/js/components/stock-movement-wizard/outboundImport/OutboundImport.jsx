@@ -60,6 +60,7 @@ const OutboundImport = () => {
     isValid,
     handleSubmit,
     onSubmit,
+    trigger,
   } = useOutboundImportForm({ next });
 
   const detailsComponentProps = {
@@ -67,6 +68,7 @@ const OutboundImport = () => {
     errors,
     isValid,
     next,
+    trigger,
   };
 
   return (

@@ -147,7 +147,7 @@ export const decimalParser = (value, precision) => {
 };
 
 /**
- * Method to if picked date is from the future
+ * Method to check if picked date is from the future
  * @return true if the date is not from the future; false if the date is from the future
  * @param pickedDate
  */
@@ -155,4 +155,16 @@ export const validateFutureDate = (pickedDate) => {
   const date = moment(pickedDate);
   const today = moment(new Date());
   return date.startOf('day').isSameOrBefore(today.startOf('day'));
+};
+
+/**
+ * Method to check if first date is later than the second date
+ * @return true if the first date is later than the second date
+ * @param laterDate
+ * @param earlierDate
+ */
+export const validateOneAfterAnotherDate = (laterDate, earlierDate) => {
+  const laterDateParsed = moment(laterDate);
+  const earlierDateParsed = moment(earlierDate);
+  return laterDateParsed.startOf('day').isSameOrAfter(earlierDateParsed.startOf('day'));
 };

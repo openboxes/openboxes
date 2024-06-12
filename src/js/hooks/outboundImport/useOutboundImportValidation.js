@@ -1,11 +1,11 @@
 import { z } from 'zod';
 
 import useTranslate from 'hooks/useTranslate';
-import { validateFutureDate } from 'utils/form-utils';
+import { validateFutureDate, validateOneAfterAnotherDate } from 'utils/form-utils';
 
 const useOutboundImportValidation = () => {
   const translate = useTranslate();
-  const validationSchema = z.object({
+  const validationSchema = (data) => z.object({
     description: z
       .string({
         required_error: translate('react.outboundImport.validation.description.required.label', 'Description is required'),
@@ -41,6 +41,9 @@ const useOutboundImportValidation = () => {
     dateShipped: z.string({
       required_error: translate('react.outboundImport.validation.dateShipped.required.label', 'Date shipped is required'),
       invalid_type_error: translate('react.outboundImport.validation.dateShipped.required.label', 'Date shipped is required'),
+    }).refine((pickedDate) =>
+      validateFutureDate(pickedDate), {
+      message: translate('react.outboundImport.validation.dateRequested.futureDate.label', 'The date cannot be in the future'),
     }),
     shipmentType: z.object({
       id: z.string(),
@@ -57,7 +60,10 @@ const useOutboundImportValidation = () => {
     expectedDeliveryDate: z.string({
       required_error: translate('react.outboundImport.validation.expectedDeliveryDate.required.label', 'Expected delivery date is required'),
       invalid_type_error: translate('react.outboundImport.validation.expectedDeliveryDate.required.label', 'Expected delivery date is required'),
-    }),
+    }).refine(() => {
+      const { expectedDeliveryDate, dateShipped } = data;
+      return validateOneAfterAnotherDate(expectedDeliveryDate, dateShipped);
+    }, { message: 'Please verify timeline. Delivery date cannot be before Ship date.' }),
     packingList: z.instanceof(File),
   });
 

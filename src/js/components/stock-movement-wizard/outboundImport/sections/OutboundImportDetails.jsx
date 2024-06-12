@@ -12,7 +12,12 @@ import OutboundImportSendingOptions
   from 'components/stock-movement-wizard/outboundImport/subsections/OutboundImportSendingOptions';
 import { FormErrorPropType } from 'utils/propTypes';
 
-const OutboundImportDetails = ({ control, errors, isValid }) => (
+const OutboundImportDetails = ({
+  control,
+  errors,
+  isValid,
+  trigger,
+}) => (
   <Section
     title={{
       label: 'react.outboundImport.form.details.label',
@@ -50,4 +55,5 @@ OutboundImportDetails.propTypes = {
   }).isRequired,
   control: PropTypes.shape({}).isRequired,
   isValid: PropTypes.bool.isRequired,
+  trigger: PropTypes.func.isRequired,
 };
