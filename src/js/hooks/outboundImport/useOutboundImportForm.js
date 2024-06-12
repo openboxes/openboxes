@@ -1,14 +1,55 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import moment from 'moment/moment';
 import { useForm } from 'react-hook-form';
 import { useSelector } from 'react-redux';
 
+import notification from 'components/Layout/notifications/notification';
+import NotificationType from 'consts/notificationTypes';
 import { DateFormat } from 'consts/timeFormat';
 import useOutboundImportValidation from 'hooks/outboundImport/useOutboundImportValidation';
+import useTranslate from 'hooks/useTranslate';
+
+// TODO: Remove this before feature is finished
+const testRow = {
+  product: {
+    id: 'someId',
+    name: 'Some produc tname',
+    productCode: '10002',
+  },
+  lotNumber: 'TE11',
+  expirationDate: '09/16/2027',
+  quantityPicked: 2,
+  binLocation: {
+    id: 'someBinId',
+    name: 'CUB1C',
+    zone: {
+      id: 'zoneId',
+      name: 'someZone',
+    },
+  },
+  recipient: {
+    id: 'someuserId',
+    firstName: 'first',
+    lastName: 'last',
+    username: 'someusername',
+    name: 'first last',
+  },
+};
+// TODO: Remove this before feature is finished
+const tableErrors = {
+  3: { 'product.productCode': 'product with this product code does not exist', lotNumber: 'lot number doe snot exist' },
+  4: { lotNumber: 'lot number doe snot exist', quantityPicked: 'qty cant be this value' },
+};
+// TODO: Remove this before feature is finished
+const otherData = [...Array(250).keys()].map(it => ({
+  ...testRow,
+  quantityPicked: it,
+}));
 
 const useOutboundImportForm = ({ next }) => {
+  const translate = useTranslate();
   const { validationSchema } = useOutboundImportValidation();
   const { currentLocation } = useSelector((state) => ({
     currentLocation: state.session.currentLocation,
@@ -31,6 +72,9 @@ const useOutboundImportForm = ({ next }) => {
     packingList: undefined,
   });
 
+  const [lineItems, setLineItems] = useState([]);
+  const [lineItemErrors, setLineItemErrors] = useState({});
+
   const {
     control,
     getValues,
@@ -45,12 +89,27 @@ const useOutboundImportForm = ({ next }) => {
       zodResolver(validationSchema(values))(values, context, options),
   });
 
-  const onSubmit = (values) => {
+  // TODO: implement data validation request
+  const onSubmitStockMovementDetails = (values) => {
     // here distinguish whether the onSubmit happens from detalis step or confirm page.
     // if it happens from details step, send an endpoint to validate the data,
     // if from confirm page - save & validate
-    console.log(values);
+    console.log('Sending values for validation', values);
+    setLineItems(otherData);
+    setLineItemErrors(tableErrors);
     next();
+  };
+
+  // TODO: implement confirm import logic
+  const onConfirmImport = (values) => {
+    // here distinguish whether the onSubmit happens from detalis step or confirm page.
+    // if it happens from details step, send an endpoint to validate the data,
+    // if from confirm page - save & validate
+    console.log('Sending values for saving import', values, lineItems);
+    notification(NotificationType.SUCCESS)({
+      message: translate('react.outboundImport.form.created.success.label', 'Stock Movement has been created successfully'),
+    });
+    // TODO: redirect to created stockMovement show page
   };
 
   useEffect(() => {
@@ -68,8 +127,11 @@ const useOutboundImportForm = ({ next }) => {
     handleSubmit,
     errors,
     isValid,
-    onSubmit,
+    onSubmitStockMovementDetails,
+    onConfirmImport,
     trigger,
+    lineItemErrors,
+    lineItems,
   };
 };
 

@@ -115,6 +115,17 @@
         &:hover, &:hover .rt-td {
           background-color: #F8FAFF;
         }
+
+        &.rt-invalid {
+
+          .rt-td {
+            background: var(--red-100);
+          }
+
+          .invalid-cell {
+            color: var(--red-500);
+          }
+        }
       }
 
     }

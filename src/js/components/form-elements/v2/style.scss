@@ -164,6 +164,10 @@ input, .date-field-input {
     width: 100%;
   }
 
+  .react-select--is-disabled .react-select__control {
+    background-color: var(--blue-100);
+  }
+
   .react-select__control {
     border: 1px solid var(--gray-200);
     color: var(--gray-600);
