@@ -12,7 +12,7 @@ import Subsection from 'components/Layout/v2/Subsection';
 import useOptionsFetch from 'hooks/options-data/useOptionsFetch';
 import { FormErrorPropType } from 'utils/propTypes';
 
-const OutboundImportSendingOptions = ({ control, errors }) => {
+const OutboundImportSendingOptions = ({ control, errors, trigger }) => {
   useOptionsFetch([fetchShipmentTypes]);
   const {
     shipmentTypes,
@@ -70,6 +70,10 @@ const OutboundImportSendingOptions = ({ control, errors }) => {
                 required
                 showTimeSelect
                 {...field}
+                onBlur={() => {
+                  field.onBlur();
+                  trigger('expectedDeliveryDate');
+                }}
               />
             )}
           />
@@ -111,4 +115,5 @@ OutboundImportSendingOptions.propTypes = {
     packingList: FormErrorPropType,
   }).isRequired,
   control: PropTypes.shape({}).isRequired,
+  trigger: PropTypes.func.isRequired,
 };

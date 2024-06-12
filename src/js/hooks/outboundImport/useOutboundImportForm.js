@@ -1,15 +1,25 @@
+import { useEffect } from 'react';
+
 import { zodResolver } from '@hookform/resolvers/zod';
 import moment from 'moment/moment';
 import { useForm } from 'react-hook-form';
+import { useSelector } from 'react-redux';
 
 import { DateFormat } from 'consts/timeFormat';
 import useOutboundImportValidation from 'hooks/outboundImport/useOutboundImportValidation';
 
 const useOutboundImportForm = ({ next }) => {
   const { validationSchema } = useOutboundImportValidation();
+  const { currentLocation } = useSelector((state) => ({
+    currentLocation: state.session.currentLocation,
+  }));
+
   const getDefaultValues = () => ({
     description: undefined,
-    origin: undefined,
+    origin: {
+      id: currentLocation?.id,
+      label: `${currentLocation?.name} [${currentLocation?.locationType?.description}]`,
+    },
     destination: undefined,
     requestedBy: undefined,
     dateRequested: undefined,
@@ -26,10 +36,13 @@ const useOutboundImportForm = ({ next }) => {
     getValues,
     handleSubmit,
     formState: { errors, isValid },
+    trigger,
+    setValue,
   } = useForm({
     mode: 'onBlur',
     defaultValues: getDefaultValues(),
-    resolver: zodResolver(validationSchema),
+    resolver: (values, context, options) =>
+      zodResolver(validationSchema(values))(values, context, options),
   });
 
   const onSubmit = (values) => {
@@ -40,6 +53,15 @@ const useOutboundImportForm = ({ next }) => {
     next();
   };
 
+  useEffect(() => {
+    if (currentLocation) {
+      setValue('origin', {
+        id: currentLocation?.id,
+        label: `${currentLocation?.name} [${currentLocation?.locationType?.description}]`,
+      });
+    }
+  }, [currentLocation?.id]);
+
   return {
     control,
     getValues,
@@ -47,6 +69,7 @@ const useOutboundImportForm = ({ next }) => {
     errors,
     isValid,
     onSubmit,
+    trigger,
   };
 };
 
