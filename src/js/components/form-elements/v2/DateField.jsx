@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 
 import moment from 'moment';
 import PropTypes from 'prop-types';
@@ -58,6 +58,8 @@ const DateField = ({
     ? translate(placeholder?.id, placeholder?.default)
     : placeholder;
 
+  const datePickerRef = useRef(null);
+
   return (
     <InputWrapper
       title={title}
@@ -86,6 +88,15 @@ const DateField = ({
         selected={selectedDate}
         highlightDates={highlightedDates}
         onChange={onChangeHandler}
+        onSelect={() => {
+          // Close date picker on select - this is somewhat a workaround to close the datepicker
+          // when using showTimeSelect, when we are expecting to close the datepicker
+          // after picking the date without picking the time.
+          datePickerRef.current?.setOpen(false);
+        }}
+        ref={(el) => {
+          datePickerRef.current = el;
+        }}
       />
     </InputWrapper>
   );
