@@ -63,7 +63,10 @@ const useOutboundImportValidation = () => {
     }).refine(() => {
       const { expectedDeliveryDate, dateShipped } = data;
       return validateOneAfterAnotherDate(expectedDeliveryDate, dateShipped);
-    }, { message: 'Please verify timeline. Delivery date cannot be before Ship date.' }),
+    }, {
+      message: translate('react.outboundImport.validation.expectedDeliveryDate.afterDateShipped.label',
+        'Please verify timeline. Delivery date cannot be before Ship date.'),
+    }),
     packingList: z.instanceof(File),
   });
 
