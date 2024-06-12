@@ -347,6 +347,10 @@ class AvailableItem {
         return (inventoryItem ? inventoryItem.pickable : true) && (binLocation ? binLocation.pickable : true)
     }
 
+    Boolean isPickable(BigDecimal quantityRequested) {
+        return isPickable() && quantityRequested <= quantityAvailable
+    }
+
     Boolean isOnHold() {
         return binLocation?.onHold
     }
