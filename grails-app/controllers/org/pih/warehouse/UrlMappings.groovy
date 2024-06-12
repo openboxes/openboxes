@@ -339,6 +339,11 @@ class UrlMappings {
             action = [PUT: "rollbackApproval"]
         }
 
+        "/api/stockMovements/packingList/template" {
+            controller = "stockMovementApi"
+            action = [GET: "downloadPackingListTemplate"]
+        }
+
         "/api/picklists/$id/items" {
             controller = "picklistApi"
             action = [DELETE: "clearPicklist"]

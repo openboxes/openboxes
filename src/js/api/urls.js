@@ -25,6 +25,8 @@ export const STOCK_MOVEMENT_STATUS = id => `${STOCK_MOVEMENT_BY_ID(id)}/status`;
 export const PICKLIST_ITEMS_EXPORT = id => `${STOCK_MOVEMENT_API}/exportPickListItems/${id}`;
 export const PICKLIST_TEMPLATE_EXPORT = id => `${STOCK_MOVEMENT_API}/picklistTemplate/${id}`;
 export const PICKLIST_IMPORT = id => `${STOCK_MOVEMENT_API}/importPickListItems/${id}`;
+export const PACKING_LIST_TEMPLATE = `${STOCK_MOVEMENT_API}/packingList/template`;
+
 // STOCK MOVEMENT ITEMS
 export const STOCK_MOVEMENT_ITEM_API = `${API}/stockMovementItems`;
 export const STOCK_MOVEMENT_ITEM_BY_ID = id => `${STOCK_MOVEMENT_ITEM_API}/${id}`;

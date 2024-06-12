@@ -6,7 +6,6 @@ import { useSelector } from 'react-redux';
 
 import { fetchShipmentTypes } from 'actions';
 import DateField from 'components/form-elements/v2/DateField';
-import FileSelect from 'components/form-elements/v2/FileSelect';
 import SelectField from 'components/form-elements/v2/SelectField';
 import TextInput from 'components/form-elements/v2/TextInput';
 import Subsection from 'components/Layout/v2/Subsection';
@@ -91,23 +90,6 @@ const OutboundImportSendingOptions = ({ control, errors }) => {
                 }}
                 errorMessage={errors.expectedDeliveryDate?.message}
                 required
-                {...field}
-              />
-            )}
-          />
-        </div>
-        <div className="col-12 px-2 pt-2">
-          <Controller
-            name="packingList"
-            control={control}
-            render={({ field }) => (
-              <FileSelect
-                allowedExtensions={['xls']}
-                errorMessage={errors.packingList?.message}
-                dropzoneText={{
-                  id: 'react.outboundImport.form.importPackingList.title',
-                  defaultMessage: 'Import packing list',
-                }}
                 {...field}
               />
             )}
