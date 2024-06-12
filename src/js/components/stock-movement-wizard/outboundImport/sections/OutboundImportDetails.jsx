@@ -25,7 +25,7 @@ const OutboundImportDetails = ({
     }}
   >
     <OutboundImportBasicDetails control={control} errors={errors} />
-    <OutboundImportSendingOptions control={control} errors={errors} />
+    <OutboundImportSendingOptions control={control} errors={errors} trigger={trigger} />
     <OutboundImportDropzone control={control} errors={errors} />
     <Button
       label="react.outboundImport.form.next.label"
