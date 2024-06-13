@@ -324,16 +324,16 @@ class AvailableItem {
     }
 
     AvailableItemStatus getStatus() {
-        if (inventoryItem?.recalled) {
+        if (recalled) {
             return AvailableItemStatus.RECALLED
         }
-        if (binLocation?.onHold) {
+        if (onHold) {
             return AvailableItemStatus.HOLD
         }
-        if (quantityAvailable > 0 && quantityAvailable < quantityOnHand) {
+        if (available && quantityAvailable < quantityOnHand) {
             return AvailableItemStatus.PICKED
         }
-        if (quantityAvailable > 0) {
+        if (available) {
             return AvailableItemStatus.AVAILABLE
         }
         if (quantityOnHand <= 0) {
@@ -347,16 +347,20 @@ class AvailableItem {
         return (inventoryItem ? inventoryItem.pickable : true) && (binLocation ? binLocation.pickable : true)
     }
 
-    Boolean isPickable(BigDecimal quantityRequested) {
-        return isPickable() && quantityRequested <= quantityAvailable
-    }
-
     Boolean isOnHold() {
         return binLocation?.onHold
     }
 
     Boolean isRecalled() {
         return inventoryItem?.recalled
+    }
+
+    Boolean isAvailable() {
+        return quantityAvailable > 0
+    }
+
+    Boolean isQuantityPickable(Integer quantity) {
+        return available && pickable && quantity <= quantityAvailable
     }
 
     Map toJson() {
