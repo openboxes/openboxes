@@ -1217,10 +1217,12 @@ class StockMovementService {
                 return
             }
 
-            picklistService.revertPick(requisitionItemId)
-
             PickPageItem pickPageItem = pickPageItems.find {
                 it.requisitionItem?.id == requisitionItemId
+            }
+
+            if (pickPageItem?.requisitionItem?.picklistItems?.size()) {
+                picklistService.revertPick(requisitionItemId)
             }
 
             removeShipmentItemsForModifiedRequisitionItem(pickPageItem.requisitionItem)
