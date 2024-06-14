@@ -1173,7 +1173,7 @@ class StockMovementService {
                     )
                 }
 
-                if (availableItem && AvailableItemStatus.listUnavailable().contains(availableItem.status)) {
+                if (availableItem && !availableItem.isQuantityPickable(data?.quantityAsNumber)) {
                     String lotNumberName = data.lotNumber ?: g.message(code: "default.noLotNumber.label", default: Constants.DEFAULT_LOT_NUMBER)
                     String binLocationName = data.binLocation ?: g.message(code: "default.noBinLocation.label", default: Constants.DEFAULT_BIN_LOCATION_NAME)
 
