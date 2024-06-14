@@ -57,7 +57,7 @@ export const renderFormFields = ({
         duration="250"
         hideDelay="50"
       >
-        <div className={className}>
+        <div className={className} data-testid="form-field">
           {renderInput(input, otherAttr)}
         </div>
       </Tooltip>
@@ -65,7 +65,7 @@ export const renderFormFields = ({
   }
 
   return (
-    <div className={`${!filterElement ? 'mt-2' : ''} ${className}`}>
+    <div className={`${!filterElement ? 'mt-2' : ''} ${className}`} data-testid="form-field">
       <div className={`${filterElement ? 'd-flex flex-wrap flex-1' : 'row'}`}>
         {
           typeof FieldLabel === 'string' ?
@@ -94,7 +94,7 @@ export const renderFormFields = ({
           {renderInput(input, otherAttr)}
         </div>
       </div>
-      <div className="row">
+      <div className="row" aria-label="subtext">
         <div className="col-md-2 hidden" />
         <div className="help-block" style={{ float: 'left' }}>
           {

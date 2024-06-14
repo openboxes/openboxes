@@ -39,7 +39,7 @@ const Menu = (props) => {
       container={document.getElementById('root')}
     >
       <Dropdown width={target.offsetWidth.toString()}>
-        <div className="custom-option" {...props.innerProps}>
+        <div role="list" className="custom-option" {...props.innerProps}>
           {props.selectProps.createNewFromModal &&
             <div
               className="add-new-button"
@@ -73,11 +73,13 @@ Menu.propTypes = {
 
 const Option = props => (
   <components.Option {...props}>
-    {props.selectProps.optionRenderer ? (
-      props.selectProps.optionRenderer(props.data)
-    ) : (
-      <div>{props.data.label}</div>
-    )}
+    <div role="listitem">
+      {props.selectProps.optionRenderer ? (
+        props.selectProps.optionRenderer(props.data)
+      ) : (
+        <div>{props.data.label}</div>
+      )}
+    </div>
   </components.Option>
 );
 
@@ -332,7 +334,7 @@ class Select extends Component {
     };
 
     return (
-      <div id={`${this.state.id}-container`}>
+      <div id={`${this.state.id}-container`} data-testid="custom-select-element">
         <Tooltip
           html={this.getTooltipHtml()}
           disabled={isTooltipDisabled()}
