@@ -37,13 +37,17 @@ import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.DocumentCode
 import org.pih.warehouse.core.DocumentType
 import org.pih.warehouse.core.EventCode
+import org.pih.warehouse.core.IdentifierService
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.LocationService
 import org.pih.warehouse.core.LocationTypeCode
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.StockMovementItemParamsCommand
 import org.pih.warehouse.core.StockMovementItemsParamsCommand
 import org.pih.warehouse.core.User
 import org.pih.warehouse.core.UserService
+import org.pih.warehouse.data.DataService
+import org.pih.warehouse.forecasting.ForecastingService
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.ShipOrderCommand
@@ -51,8 +55,10 @@ import org.pih.warehouse.order.ShipOrderItemCommand
 import org.pih.warehouse.picklist.ImportPickCommand
 import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.picklist.PicklistItem
+import org.pih.warehouse.picklist.PicklistService
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductAssociationTypeCode
+import org.pih.warehouse.product.ProductService
 import org.pih.warehouse.receiving.ReceiptItem
 import org.pih.warehouse.requisition.ReplenishmentTypeCode
 import org.pih.warehouse.requisition.Requisition
@@ -61,6 +67,7 @@ import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.requisition.RequisitionItemSortByCode
 import org.pih.warehouse.requisition.RequisitionItemStatus
 import org.pih.warehouse.requisition.RequisitionItemType
+import org.pih.warehouse.requisition.RequisitionService
 import org.pih.warehouse.requisition.RequisitionSourceType
 import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.requisition.RequisitionStatusTransitionEvent
@@ -68,6 +75,7 @@ import org.pih.warehouse.requisition.RequisitionType
 import org.pih.warehouse.shipping.Container
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
+import org.pih.warehouse.shipping.ShipmentService
 import org.pih.warehouse.shipping.ShipmentStatusCode
 import org.pih.warehouse.shipping.ShipmentType
 import org.pih.warehouse.shipping.ShipmentWorkflow
@@ -79,20 +87,20 @@ import org.springframework.web.multipart.MultipartFile
 @Transactional
 class StockMovementService {
 
-    def authService
-    def productService
-    def identifierService
-    def requisitionService
-    def shipmentService
-    def inventoryService
-    def productAvailabilityService
-    def locationService
-    def dataService
-    def forecastingService
-    def outboundStockMovementService
+    AuthService authService
+    ProductService productService
+    IdentifierService identifierService
+    RequisitionService requisitionService
+    ShipmentService shipmentService
+    InventoryService inventoryService
+    ProductAvailabilityService productAvailabilityService
+    LocationService locationService
+    DataService dataService
+    ForecastingService forecastingService
+    OutboundStockMovementService outboundStockMovementService
     UserService userService
     RequisitionDataService requisitionDataService
-
+    PicklistService picklistService
     GrailsApplication grailsApplication
 
     def createStockMovement(StockMovement stockMovement) {
@@ -1211,6 +1219,10 @@ class StockMovementService {
 
             PickPageItem pickPageItem = pickPageItems.find {
                 it.requisitionItem?.id == requisitionItemId
+            }
+
+            if (pickPageItem?.requisitionItem?.picklistItems?.size()) {
+                picklistService.revertPick(requisitionItemId)
             }
 
             removeShipmentItemsForModifiedRequisitionItem(pickPageItem.requisitionItem)
