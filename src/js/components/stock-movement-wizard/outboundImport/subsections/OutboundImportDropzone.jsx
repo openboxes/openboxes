@@ -22,7 +22,7 @@ const OutboundImportDropzone = ({ control, errors }) => {
       await exportFileFromAPI({
         url: PACKING_LIST_TEMPLATE,
         format: FileFormat.XLS,
-        filename: 'Completed Packing List',
+        filename: 'Import Packing List',
       });
     } finally {
       dispatch(hideSpinner());
