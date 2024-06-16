@@ -52,7 +52,7 @@ import org.pih.warehouse.forecasting.ForecastingService
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.ShipOrderCommand
-impog.pih.warehouse.order.ShipOrderItemCommand
+import org.pih.warehouse.order.ShipOrderItemCommand
 import org.pih.warehouse.picklist.PicklistImportDataCommand
 import org.pih.warehouse.picklist.PicklistItemCommand
 import org.pih.warehouse.picklist.Picklist
