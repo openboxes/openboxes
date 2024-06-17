@@ -1379,7 +1379,6 @@ class StockMovementService {
         Integer countInBinLocations = availableItems.findAll { it.isBinLocation }?.size()
 
         // Scenario 2: All stock in one bin (or in one real bin and 1 or more hold bins - ignore hold bins)
-        log.info "\n\n\n\n\n\ncountInBinLocation " + countInBinLocations
         if (countInBinLocations > 1) {
             picklistItemCommand.errors.rejectValue("binLocation",
                     "importPickCommand.availableItems.inMultipleLocations",
@@ -1412,17 +1411,14 @@ class StockMovementService {
         }
 
         // Scenario 4: Any other scenario (stock in “real” bin and virtual bin, stock in multiple real bins)
-        log.info "Available items " + availableItems.size()
-        availableItems.each {
-            log.info "Available items " + it.toJson()
-        }
         Integer countInVirtualAndBinLocations = availableItems?.findAll { it?.isVirtualLocation || it?.isBinLocation }?.size()
-        log.info "123countInVirtualAndBinLocations " + countInVirtualAndBinLocations
-        Integer countInBinLocations2 = availableItems?.findAll { it?.isBinLocation }?.size()
-        log.info "countInBinLocations " + countInBinLocations2
-        Integer countInVirtualLocations = availableItems?.findAll { it?.isVirtualLocation }?.size()
-        log.info "countInVirtualLocations " + countInVirtualLocations
-
+        if (countInVirtualAndBinLocations > 1) {
+            picklistItemCommand.errors.rejectValue("binLocation",
+                    "importPickCommand.availableItems.inMultipleLocations",
+                    [product.productCode, inventoryItem?.lotNumber, availableItems.binLocationName] as Object [],
+                    "Product {0} with lot number {1} has stock in multiple bin locations {2}. Please indicate the bin location to pick from."
+            )
+        }
 
         // FIXME This might need to be moved to the code that actually filters the available item
         //  otherwise it probably doesn't make sense in this context. It's probably not hurting
