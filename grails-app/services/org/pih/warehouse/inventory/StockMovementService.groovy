@@ -1449,6 +1449,8 @@ class StockMovementService {
     //  parent object above available items that was responsible for answering questions
     List<AvailableItem> applyAllocationRulesOnAvailableItems(List<AvailableItem> availableItems, Integer quantityRequired) {
 
+
+        // TODO Remove unnecessary logging before merging
         log.info "Apply allocation rules on available items "
         log.info "Quantity Required = " + quantityRequired
         log.info "Available items = " + availableItems.size()

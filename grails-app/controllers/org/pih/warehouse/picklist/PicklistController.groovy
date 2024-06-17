@@ -263,13 +263,8 @@ class PicklistController {
             }
         }
 
-        // FIXME This probably goes against the requirements, but I would
-        //  like to get everything working properly before we allow this
-        //  behavior
-        // Only allow import if there are no validation errors
-        if (errors.isEmpty()) {
-            stockMovementService.importPicklistItems(command)
-        }
+        // TODO Add a supported activity to prevent importing picklist with validation errors
+        stockMovementService.importPicklistItems(command)
 
         if (!errors.isEmpty()) {
             render([message: "Data imported with errors", errors: errors] as JSON)
