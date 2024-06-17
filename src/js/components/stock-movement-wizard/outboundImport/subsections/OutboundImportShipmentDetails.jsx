@@ -57,28 +57,8 @@ const OutboundImportShipmentDetails = ({ control, errors }) => {
             )}
           />
         </div>
-        <div className="col-lg-3 col-md-6 px-2 pt-2">
-          <Controller
-            name="dateShipped"
-            control={control}
-            render={({ field }) => (
-              <DateField
-                {...field}
-                disabled
-                title={{
-                  id: 'react.stockMovement.shipDate.label',
-                  defaultMessage: 'Ship date',
-                }}
-                placeholder={{
-                  id: 'react.default.dateInput.placeholder.label',
-                  default: 'Select a date',
-                }}
-                showTimeSelect
-                errorMessage={errors.dateShipped?.message}
-              />
-            )}
-          />
-        </div>
+        <div className="col-lg-3 px-2 pt-2 d-lg-block d-md-none" />
+        <div className="col-lg-3 px-2 pt-2 d-lg-block d-md-none" />
         <div className="col-lg-3 col-md-6 px-2 pt-2">
           <Controller
             name="shipmentType"
@@ -115,8 +95,28 @@ const OutboundImportShipmentDetails = ({ control, errors }) => {
             )}
           />
         </div>
-        <div className="col-lg-3 px-2 pt-2 d-lg-block d-md-none" />
-        <div className="col-lg-3 px-2 pt-2 d-lg-block d-md-none" />
+        <div className="col-lg-3 col-md-6 px-2 pt-2">
+          <Controller
+            name="dateShipped"
+            control={control}
+            render={({ field }) => (
+              <DateField
+                {...field}
+                disabled
+                title={{
+                  id: 'react.stockMovement.shipDate.label',
+                  defaultMessage: 'Ship date',
+                }}
+                placeholder={{
+                  id: 'react.default.dateInput.placeholder.label',
+                  default: 'Select a date',
+                }}
+                showTimeSelect
+                errorMessage={errors.dateShipped?.message}
+              />
+            )}
+          />
+        </div>
         <div className="col-lg-3 col-md-6 px-2 pt-2">
           <Controller
             name="expectedDeliveryDate"
