@@ -1,5 +1,5 @@
 import org.pih.warehouse.product.ProductTypeCode
-import org.pih.warehouse.util.common.RandomUtil
+import org.pih.warehouse.common.util.RandomUtil
 
 RandomUtil randomUtil = new RandomUtil()
 
