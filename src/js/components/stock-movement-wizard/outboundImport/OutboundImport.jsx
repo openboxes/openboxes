@@ -62,6 +62,7 @@ const OutboundImport = () => {
     control,
     isValid,
     handleSubmit,
+    headerDetailsData,
     onSubmitStockMovementDetails,
     onConfirmImport,
     trigger,
@@ -78,7 +79,7 @@ const OutboundImport = () => {
   return (
     <PageWrapper>
       <WizardStepsV2 steps={stepsTitles} currentStepKey={Step.key} />
-      <OutboundImportHeader />
+      <OutboundImportHeader stockMovementDetails={headerDetailsData} />
       <form onSubmit={handleSubmit(onSubmitStockMovementDetails)}>
         {is(OutboundImportStep.DETAILS.key) && (<Step.Component {...detailsComponentProps} />)}
       </form>

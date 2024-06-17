@@ -74,6 +74,7 @@ const useOutboundImportForm = ({ next }) => {
 
   const [lineItems, setLineItems] = useState([]);
   const [lineItemErrors, setLineItemErrors] = useState({});
+  const [headerDetailsData, setHeaderDetailsData] = useState({});
 
   const {
     control,
@@ -97,6 +98,15 @@ const useOutboundImportForm = ({ next }) => {
     console.log('Sending values for validation', values);
     setLineItems(otherData);
     setLineItemErrors(tableErrors);
+
+    /** we want to display header info only after a successful outbound upload of create step */
+    setHeaderDetailsData({
+      origin: values.origin?.name,
+      destination: values.destination?.name,
+      dateRequested: values.dateRequested,
+      description: values.description,
+    });
+
     next();
   };
 
@@ -116,6 +126,7 @@ const useOutboundImportForm = ({ next }) => {
     if (currentLocation) {
       setValue('origin', {
         id: currentLocation?.id,
+        name: currentLocation?.name,
         label: `${currentLocation?.name} [${currentLocation?.locationType?.description}]`,
       });
     }
@@ -129,6 +140,7 @@ const useOutboundImportForm = ({ next }) => {
     isValid,
     onSubmitStockMovementDetails,
     onConfirmImport,
+    headerDetailsData,
     trigger,
     lineItemErrors,
     lineItems,

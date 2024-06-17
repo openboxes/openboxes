@@ -14,6 +14,7 @@ const useOutboundImportValidation = () => {
     origin: z.object({
       id: z.string(),
       label: z.string(),
+      name: z.string(),
     }, {
       invalid_type_error: translate('react.outboundImport.validation.origin.required.label', 'Origin is required'),
       required_error: translate('react.outboundImport.validation.origin.required.label', 'Origin is required'),
@@ -21,6 +22,7 @@ const useOutboundImportValidation = () => {
     destination: z.object({
       id: z.string(),
       label: z.string(),
+      name: z.string(),
     }, {
       invalid_type_error: translate('react.outboundImport.validation.destination.required.label', 'Destination is required'),
       required_error: translate('react.outboundImport.validation.destination.required.label', 'Destination is required'),
