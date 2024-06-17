@@ -675,26 +675,6 @@ class PickPageItem {
     }
 
     /**
-     *
-     * @param inventoryItem
-     * @return
-     */
-    List<SuggestedItem> getSuggestedItems(InventoryItem inventoryItem) {
-
-        Integer quantityRequired = requisitionItem.quantity
-
-        List<AvailableItem> availableItems = getAvailableItems(inventoryItem)
-
-        // We've determined that bin location is null, so we need to suggest items from
-        // default or receiving bins, or throw an exception
-
-        // So I think we need to get the available items that match the requirements,
-        // sort them, then return the recommended amount
-
-        return new ArrayList<SuggestedItem>()
-    }
-
-    /**
      * @deprecated Not the correct way to find available items.
      * @param binLocationName
      * @param lotNumber
