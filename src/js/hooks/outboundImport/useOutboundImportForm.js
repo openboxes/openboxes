@@ -36,6 +36,8 @@ const testRow = {
     username: 'someusername',
     name: 'first last',
   },
+  palletName: 'test 1',
+  boxName: undefined,
 };
 // TODO: Remove this before feature is finished
 const tableErrors = {

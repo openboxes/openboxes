@@ -11,6 +11,9 @@ import useTranslate from 'hooks/useTranslate';
 const OutboundImportItems = ({ data, errors }) => {
   const translate = useTranslate();
 
+  const isPalletColumnHasAnyValues = useMemo(() => data.some((it) => it.palletName), data);
+  const isBoxColumnHasAnyValues = useMemo(() => data.some((it) => it.boxName), data);
+
   const columns = useMemo(() => [
     {
       Header: translate('react.outboundImport.table.column.productCode.label', 'Code'),
@@ -56,6 +59,18 @@ const OutboundImportItems = ({ data, errors }) => {
       Header: translate('react.outboundImport.table.column.recipient.label', 'Recipient'),
       accessor: 'recipient.name',
       Cell: (row) => <TableCell {...row} showError />,
+    },
+    {
+      Header: translate('react.outboundImport.table.column.palletName.label', 'Pack level 1'),
+      accessor: 'palletName',
+      Cell: (row) => <TableCell {...row} showError />,
+      show: isPalletColumnHasAnyValues,
+    },
+    {
+      Header: translate('react.outboundImport.table.column.boxName.label', 'Pack level 2'),
+      accessor: 'boxName',
+      Cell: (row) => <TableCell {...row} showError />,
+      show: isBoxColumnHasAnyValues,
     },
   ], [translate]);
 
