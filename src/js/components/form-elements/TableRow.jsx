@@ -84,7 +84,7 @@ class TableRow extends Component {
     }
 
     return (
-      <div {...dynamicRowAttr} className={className}>
+      <div {...dynamicRowAttr} className={className} role="row">
         {tooltip && (
           <Tooltip
             title={tooltip}

@@ -39,7 +39,7 @@ const Menu = (props) => {
       container={document.getElementById('root')}
     >
       <Dropdown width={target.offsetWidth.toString()}>
-        <div role="list" className="custom-option" {...props.innerProps}>
+        <div role="list" data-testid="custom-select-dropdown-menu" className="custom-option" {...props.innerProps}>
           {props.selectProps.createNewFromModal &&
             <div
               className="add-new-button"
