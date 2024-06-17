@@ -1527,10 +1527,10 @@ class StockMovementService {
                 it.requisitionItem?.id == requisitionItemId
             }
 
-            // FIXME Decide whether we want to use revert pick or clear picklist (below)
-            if (pickPageItem?.requisitionItem?.picklistItems?.size()) {
-                picklistService.revertPick(requisitionItemId)
-            }
+            // TODO Decide whether we want to use revert pick or clear picklist (below)
+            //if (pickPageItem?.requisitionItem?.picklistItems?.size()) {
+            //    picklistService.revertPick(requisitionItemId)
+            //}
 
             // TODO Does the order of operations matter (remove shipment items vs picklist items)
             // Remove existing shipment items and picklist items
