@@ -18,6 +18,7 @@ to ensure that they run against a clean database, which requires Docker to be in
 > [!WARNING]  
 > If you have a ~/.grails/openboxes-config.properties or ~/.grails/openboxes.yml file, make sure you remove or comment
 > out any lines relating to dataSource before running tests to avoid running them against a non-testcontainer database.
+
 To run all integration tests, use the following command: `grails test-app -integration`
 
 To run only a single test, use: `grails test-app AuthApiSpec -integration`
