@@ -680,6 +680,10 @@ class PickPageItem {
      * @param lotNumber
      * @return
      */
+    // TODO Remove this method if we decide that it's no longer required. There's logic here
+    //  that I don't fully understand so I want to make sure the alternate solution takes what I
+    //  assume is the "default" bin and lot number logic into account.
+    //  i.e. (!item.binLocation and !item.inventoryItem?.lotNumber)
     AvailableItem getAvailableItem(String binLocationName, String lotNumber) {
         return availableItems?.find { item ->
             Boolean binLocationMatches = binLocationName ? item.binLocation?.name == binLocationName : !item.binLocation
