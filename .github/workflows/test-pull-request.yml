@@ -1,0 +1,12 @@
+name: Test Pull Request
+
+# Runs all tests whenever a pull request is created or updated.
+on:
+  pull_request:
+
+jobs:
+  run-frontend-tests:
+    uses: ./.github/workflows/frontend-tests.yml
+
+  run-backend-tests:
+    uses: ./.github/workflows/backend-tests.yml
