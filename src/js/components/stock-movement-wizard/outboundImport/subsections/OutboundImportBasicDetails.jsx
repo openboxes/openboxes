@@ -40,7 +40,7 @@ const OutboundImportBasicDetails = ({ control, errors }) => {
             )}
           />
         </div>
-        <div className="col-6 px-2 pt-2">
+        <div className="col-lg-6 col-md-12 px-2 pt-2">
           <Controller
             name="origin"
             control={control}
@@ -58,7 +58,7 @@ const OutboundImportBasicDetails = ({ control, errors }) => {
             )}
           />
         </div>
-        <div className="col-6 px-2 pt-2">
+        <div className="col-lg-6 col-md-12 px-2 pt-2">
           <Controller
             name="destination"
             control={control}
@@ -76,7 +76,7 @@ const OutboundImportBasicDetails = ({ control, errors }) => {
             )}
           />
         </div>
-        <div className="col-6 px-2 pt-2">
+        <div className="col-lg-6 col-md-12 px-2 pt-2">
           <Controller
             name="requestedBy"
             control={control}
@@ -96,7 +96,7 @@ const OutboundImportBasicDetails = ({ control, errors }) => {
             )}
           />
         </div>
-        <div className="col-6 px-2 pt-2">
+        <div className="col-lg-6 col-md-12 px-2 pt-2">
           <Controller
             name="dateRequested"
             control={control}

@@ -22,7 +22,7 @@ const OutboundImportSendingOptions = ({ control, errors, trigger }) => {
   return (
     <Subsection title={{ label: 'react.outboundImport.form.sendingOptions.label', defaultMessage: 'Sending options' }} collapsable={false}>
       <div className="row">
-        <div className="col-3 px-2 pt-2">
+        <div className="col-lg-3 col-md-6 px-2 pt-2">
           <Controller
             name="shipmentType"
             control={control}
@@ -39,7 +39,7 @@ const OutboundImportSendingOptions = ({ control, errors, trigger }) => {
             )}
           />
         </div>
-        <div className="col-3 px-2 pt-2">
+        <div className="col-lg-3 col-md-6 px-2 pt-2">
           <Controller
             name="trackingNumber"
             control={control}
@@ -52,7 +52,7 @@ const OutboundImportSendingOptions = ({ control, errors, trigger }) => {
             )}
           />
         </div>
-        <div className="col-3 px-2 pt-2">
+        <div className="col-lg-3 col-md-6 px-2 pt-2">
           <Controller
             name="dateShipped"
             control={control}
@@ -78,7 +78,7 @@ const OutboundImportSendingOptions = ({ control, errors, trigger }) => {
             )}
           />
         </div>
-        <div className="col-3 px-2 pt-2">
+        <div className="col-lg-3 col-md-6 px-2 pt-2">
           <Controller
             name="expectedDeliveryDate"
             control={control}
