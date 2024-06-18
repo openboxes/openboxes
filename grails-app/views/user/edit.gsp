@@ -225,7 +225,7 @@
                                                     <label><warehouse:message code="user.locationRoles.label"/></label>
                                                 </td>
                                                 <td valign="top" class="value" style="padding: 0px">
-                                                    <table>
+                                                    <table aria-label="Location Roles">
                                                         <thead>
                                                             <tr class="odd">
                                                                 <th><warehouse:message code="location.label"/></th>
