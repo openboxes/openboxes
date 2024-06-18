@@ -52,7 +52,7 @@ class LocalizationService {
      * @return
      */
     Locale getLocale(String languageCode) {
-        return languageCode ? new Locale(languageCode) : currentLocale
+        return languageCode ? LocalizationUtil.getLocale(languageCode) : currentLocale
     }
 
     /**
@@ -69,51 +69,11 @@ class LocalizationService {
      */
     Properties getMessagesProperties(Locale locale) {
         Properties messagesProperties = new Properties()
-        def messagesPropertiesFilename = (locale && locale.language != "en" && locale.language != 'null') ? "messages_${locale.language}.properties" : "messages.properties"
+        def messagesPropertiesFilename = (locale && locale.language != "en" && locale.language != 'null') ? "messages_${locale.toString()}.properties" : "messages.properties"
 
         def resource = grailsResourceLocator.findResourceForURI('classpath:' + messagesPropertiesFilename)
         messagesProperties.load(resource.inputStream)
 
         return messagesProperties
-    }
-
-    Properties getMessagesPropertiesWithPrefix(String prefix, Locale locale) {
-        return getMessagesProperties(locale).findAll {
-            it.key.startsWith(prefix)
-        }
-    }
-
-    /**
-     * Get messages properties while running app using deployed WAR.
-     *
-     * @param messagesPropertiesUrl
-     * @return
-     */
-    Properties getMessagesPropertiesFromResource(String messagesPropertiesUrl) {
-        Properties properties = new Properties()
-        def inputStream = ServletContextHolder.servletContext.getResourceAsStream(messagesPropertiesUrl)
-        if (inputStream) {
-            String messagesPropertiesString = IOUtils.toString(inputStream)
-            properties.load(new StringReader(messagesPropertiesString))
-            inputStream.close()
-        }
-        return properties
-    }
-
-    /**
-     * Get messages properties while running app using grails run-app.
-     *
-     * @param messagesPropertiesUrl
-     * @return
-     */
-    Properties getMessagesPropertiesFromClasspath(String messagesPropertiesUrl) {
-        Properties properties = new Properties()
-        File messagesPropertiesFile = new ClassPathResource(messagesPropertiesUrl)?.getFile()
-        if (messagesPropertiesFile.exists()) {
-            InputStream messagesPropertiesStream = new FileInputStream(messagesPropertiesFile)
-            properties.load(messagesPropertiesStream)
-            messagesPropertiesStream.close()
-        }
-        return properties
     }
 }

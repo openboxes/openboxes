@@ -516,7 +516,7 @@ openboxes:
             enabled: false
         defaultLocale: 'en'
         localizationModeLocale: 'ach'
-        supportedLocales: ['ar','ach','de','en','es','fr', 'ht', 'it','pt','fi','zh']
+        supportedLocales: ['ar', 'ach', 'de', 'en', 'es', 'es_MX', 'fr', 'ht', 'it', 'pt', 'fi', 'zh']
         # Currency configuration
         defaultCurrencyCode: "USD"
         defaultCurrencySymbol: '\$'

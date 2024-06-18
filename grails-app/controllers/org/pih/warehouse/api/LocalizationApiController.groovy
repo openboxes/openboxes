@@ -10,6 +10,7 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
+import org.pih.warehouse.LocalizationUtil
 import org.pih.warehouse.core.Localization
 import grails.core.GrailsApplication
 
@@ -25,9 +26,9 @@ class LocalizationApiController {
 
         String[] supportedLocales = grailsApplication.config.openboxes.locale.supportedLocales
 
-        Locale defaultLocale = Locale.default
         Locale currentLocale = localizationService.getCurrentLocale()
-        Locale selectedLocale = languageCode ? localizationService.getLocale(languageCode) : currentLocale
+        Locale defaultLocale = currentLocale.getDefault()
+        Locale selectedLocale = languageCode ? LocalizationUtil.getLocale(languageCode) : currentLocale
 
         // Get the default message properties as well as the message properties for the selected locale
         Properties defaultMessageProperties = localizationService.getMessagesProperties(defaultLocale)

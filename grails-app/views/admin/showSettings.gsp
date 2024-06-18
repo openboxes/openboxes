@@ -1,4 +1,4 @@
-<%@ page import="org.pih.warehouse.core.RoleType" %>
+<%@ page import="org.pih.warehouse.LocalizationUtil; org.pih.warehouse.core.RoleType" %>
 <%@ page import="org.pih.warehouse.core.User" %>
 <%@ page import="org.pih.warehouse.core.Role" %>
 <%@ page import="util.ConfigHelper" %>
@@ -139,7 +139,7 @@
                                     <ul>
                                     <g:each in="${grailsApplication.config.openboxes.locale.supportedLocales}" var="l">
                                         <li>
-                                        <g:set var="locale" value="${new Locale(l)}"/>
+                                        <g:set var="locale" value="${LocalizationUtil.getLocale(l)}"/>
                                         <g:set var="defaultLocale" value="${new Locale(grailsApplication.config.openboxes.locale.defaultLocale)}"/>
                                         <g:if test="${session?.user?.locale==locale}">
                                             ${locale?.getDisplayName(locale ?: defaultLocale)}

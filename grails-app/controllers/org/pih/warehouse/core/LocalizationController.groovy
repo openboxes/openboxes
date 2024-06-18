@@ -11,6 +11,7 @@ package org.pih.warehouse.core
 
 import grails.gorm.transactions.Transactional
 import grails.validation.Validateable
+import org.pih.warehouse.LocalizationUtil
 import org.springframework.web.multipart.MultipartFile
 import java.nio.charset.Charset
 
@@ -154,7 +155,7 @@ class LocalizationController {
 
     def export() {
         log.info("Locale: " + session.user.locale)
-        Locale locale = params.locale ? new Locale(params.locale) : session.user.locale
+        Locale locale = params.locale ? LocalizationUtil.getLocale(params.locale) : session.user.locale
         def filename = locale.language == 'en' ? "messages.properties" : "messages_${locale.language}.properties"
         def localizationInstanceList = Localization.findAllByLocale(locale.language)
         response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
