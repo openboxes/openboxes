@@ -17,6 +17,12 @@ const testRow = {
     id: 'someId',
     name: 'Some produc tname',
     productCode: '10002',
+    color: 'dodgerblue',
+    handlingIcons: [{
+      color: '#3bafda',
+      icon: 'fa-snowflake',
+      label: 'Cold chain',
+    }],
   },
   lotNumber: 'TE11',
   expirationDate: '09/16/2027',
