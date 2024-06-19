@@ -269,9 +269,10 @@ environments:
             logAbandoned: true
             logSql: false
             logSlowQueries: false
-            # https://java.testcontainers.org/modules/databases/jdbc/
-            # Note that testcontainers auto-disable SSL when connecting via jdbc https://github.com/testcontainers/testcontainers-java/pull/561
-            url: jdbc:tc:mysql:5.7.44:///openboxes?TC_MY_CNF=testcontainers
+            # Our integration tests run against a containerized database: https://java.testcontainers.org/modules/databases/jdbc/.
+            # Note that testcontainers auto-disable SSL when connecting via jdbc: https://github.com/testcontainers/testcontainers-java/pull/561
+            # For more information, see /src/integration-test/README.md
+            url: jdbc:tc:${TEST_DATABASE:mysql:5.7.44}:///openboxes?TC_MY_CNF=testcontainers
             driverClassName: org.testcontainers.jdbc.ContainerDatabaseDriver
     production:
         dataSource:

@@ -496,7 +496,9 @@ dependencies {
 
     testCompile 'junit:junit:4.13.2'
 
+    // Database jdbc connectors (Connector/J)
     compile "mysql:mysql-connector-java:${mySqlConnectorVersion}"
+    implementation 'org.mariadb.jdbc:mariadb-java-client'
 
     testRuntime "net.sourceforge.htmlunit:htmlunit:${htmlUnitVersion}"
 
@@ -756,6 +758,7 @@ dependencies {
     // For integration tests
     testCompile 'org.apache.commons:commons-compress:1.21'  // Needed to avoid a dependency conflict
     testCompile "org.testcontainers:mysql:1.17.3"
+    testCompile "org.testcontainers:mariadb:1.17.3"
     testCompile "org.testcontainers:spock:1.17.3"
     testCompile 'org.springframework:spring-test'
     testCompile 'io.rest-assured:rest-assured:3.2.0'
