@@ -1,6 +1,7 @@
-<%@ page import="org.pih.warehouse.LocalizationUtil; org.pih.warehouse.core.RoleType" %>
-<%@ page import="org.pih.warehouse.core.User" %>
 <%@ page import="org.pih.warehouse.core.Role" %>
+<%@ page import="org.pih.warehouse.core.RoleType" %>
+<%@ page import="org.pih.warehouse.core.User" %>
+<%@ page import="org.pih.warehouse.LocalizationUtil" %>
 <%@ page import="util.ConfigHelper" %>
 <html>
     <head>

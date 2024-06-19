@@ -1,5 +1,6 @@
+<%@ page import="org.pih.warehouse.core.User" %>
+<%@ page import="org.pih.warehouse.LocalizationUtil" %>
 
-<%@ page import="org.pih.warehouse.LocalizationUtil; org.pih.warehouse.core.User" %>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />

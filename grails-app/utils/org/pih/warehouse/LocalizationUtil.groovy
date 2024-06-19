@@ -17,6 +17,7 @@ class LocalizationUtil {
 
     static final def delimiter = '\\|'
     static final def localeDelimiter = ':'
+    static final String UNDERSCORE = '_'
 
     static LocalizationService getLocalizationService() {
         return Holders.getGrailsApplication().getParentContext().getBean("localizationService")
@@ -44,8 +45,8 @@ class LocalizationUtil {
     static Locale getLocale(String localeCode) {
         Locale locale
 
-        if (localeCode?.contains("_")) {
-            String[] localeCodeParts = localeCode.split("_")
+        if (localeCode?.contains(UNDERSCORE)) {
+            String[] localeCodeParts = localeCode.split(UNDERSCORE)
             String language = localeCodeParts[0]
             String country = localeCodeParts[1]
             locale = new Locale(language, country)
@@ -54,7 +55,9 @@ class LocalizationUtil {
         }
 
         locale = new Locale(localeCode)
-        locale.setDefault(new Locale(Holders.config.openboxes.locale.defaultLocale ?: "en"))
+        String defaultLocaleCode = Holders.config.openboxes.locale.defaultLocale
+        Locale defaultLocale = defaultLocaleCode ? new Locale(defaultLocaleCode) : Locale.ENGLISH
+        locale.setDefault(defaultLocale)
         return locale
     }
 

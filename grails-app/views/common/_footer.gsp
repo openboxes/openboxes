@@ -1,4 +1,8 @@
-<%@ page import="org.pih.warehouse.LocalizationUtil; org.pih.warehouse.core.Constants; org.pih.warehouse.core.RoleType; util.ConfigHelper" %>
+<%@ page import="org.pih.warehouse.core.Constants" %>
+<%@ page import="org.pih.warehouse.core.RoleType" %>
+<%@ page import="org.pih.warehouse.LocalizationUtil" %>
+<%@ page import="util.ConfigHelper" %>
+
 <div id="footer">
 	<div style="line-height: 2em;" class="center middle">
 		&copy; <g:copyrightYear/>
