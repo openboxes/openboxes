@@ -15,6 +15,7 @@ const TableCell = ({
   className,
   openLinkInNewTab,
   tdProps,
+  style,
   showError,
 }) => {
   let cellValue = children || value || defaultValue;
@@ -57,15 +58,24 @@ const TableCell = ({
   const cellErrorClasses = showError && errorMessage ? 'invalid-cell' : '';
   const elementClasses = `${className} text-overflow-ellipsis ${cellErrorClasses}`;
 
-  let cellElement = <div className={elementClasses} data-testid="table-cell">{cellValue}</div>;
+  let cellElement = (
+    <div
+      className={elementClasses}
+      style={style}
+      data-testid="table-cell"
+    >
+      {cellValue}
+    </div>
+  );
 
   if (link && typeof link === 'string') {
     if (reactLink) {
-      cellElement = <Link className={elementClasses} to={link}>{cellValue}</Link>;
+      cellElement = <Link className={elementClasses} style={style} to={link}>{cellValue}</Link>;
     } else {
       cellElement = (
         <a
           className={elementClasses}
+          style={style}
           target={openLinkInNewTab ? '_blank' : undefined}
           href={link}
         >
@@ -95,6 +105,7 @@ TableCell.propTypes = {
   tooltip: PropTypes.bool,
   openLinkInNewTab: PropTypes.bool,
   tooltipLabel: PropTypes.string,
+  style: PropTypes.shape({}),
   tdProps: PropTypes.shape({
     rest: PropTypes.shape({
       error: PropTypes.string,

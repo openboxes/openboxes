@@ -1,15 +1,25 @@
 import React, { useMemo } from 'react';
 
 import PropTypes from 'prop-types';
+import { useSelector } from 'react-redux';
 
 import DataTable, { TableCell } from 'components/DataTable';
 import DateCell from 'components/DataTable/DateCell';
 import Subsection from 'components/Layout/v2/Subsection';
-import { INVENTORY_ITEM_URL } from 'consts/applicationUrls';
 import useTranslate from 'hooks/useTranslate';
+import { formatProductDisplayName } from 'utils/form-values-utils';
 
 const OutboundImportItems = ({ data, errors }) => {
   const translate = useTranslate();
+
+  const isPalletColumnEmpty = useMemo(() => !data.some((it) => it.palletName), data);
+  const isBoxColumnEmpty = useMemo(() => !data.some((it) => it.boxName), data);
+
+  const {
+    hasBinLocationSupport,
+  } = useSelector((state) => ({
+    hasBinLocationSupport: state.session.currentLocation.hasBinLocationSupport,
+  }));
 
   const columns = useMemo(() => [
     {
@@ -25,8 +35,10 @@ const OutboundImportItems = ({ data, errors }) => {
       Cell: (row) => (
         <TableCell
           {...row}
+          style={{ color: row.original?.product?.color }}
+          tooltip={row.original?.product?.name}
+          value={formatProductDisplayName(row.original?.product)}
           showError
-          link={INVENTORY_ITEM_URL.showStockCard(row.original.product?.id)}
         />
       ),
     },
@@ -50,6 +62,7 @@ const OutboundImportItems = ({ data, errors }) => {
     {
       Header: translate('react.outboundImport.table.column.binLocation.label', 'Bin Location'),
       accessor: 'binLocation.name',
+      show: hasBinLocationSupport,
       Cell: (row) => <TableCell {...row} showError />,
     },
     {
@@ -57,7 +70,19 @@ const OutboundImportItems = ({ data, errors }) => {
       accessor: 'recipient.name',
       Cell: (row) => <TableCell {...row} showError />,
     },
-  ], [translate]);
+    {
+      Header: translate('react.outboundImport.table.column.palletName.label', 'Pack level 1'),
+      accessor: 'palletName',
+      Cell: (row) => <TableCell {...row} showError />,
+      show: !isPalletColumnEmpty,
+    },
+    {
+      Header: translate('react.outboundImport.table.column.boxName.label', 'Pack level 2'),
+      accessor: 'boxName',
+      Cell: (row) => <TableCell {...row} showError />,
+      show: !isBoxColumnEmpty,
+    },
+  ], [translate, isPalletColumnEmpty, isBoxColumnEmpty, hasBinLocationSupport]);
 
   return (
     <Subsection

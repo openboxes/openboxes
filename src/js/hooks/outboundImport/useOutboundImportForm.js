@@ -17,6 +17,12 @@ const testRow = {
     id: 'someId',
     name: 'Some produc tname',
     productCode: '10002',
+    color: 'dodgerblue',
+    handlingIcons: [{
+      color: '#3bafda',
+      icon: 'fa-snowflake',
+      label: 'Cold chain',
+    }],
   },
   lotNumber: 'TE11',
   expirationDate: '09/16/2027',
@@ -36,6 +42,8 @@ const testRow = {
     username: 'someusername',
     name: 'first last',
   },
+  palletName: 'test 1',
+  boxName: 'test 2',
 };
 // TODO: Remove this before feature is finished
 const tableErrors = {
@@ -74,6 +82,7 @@ const useOutboundImportForm = ({ next }) => {
 
   const [lineItems, setLineItems] = useState([]);
   const [lineItemErrors, setLineItemErrors] = useState({});
+  const [headerDetailsData, setHeaderDetailsData] = useState({});
 
   const {
     control,
@@ -95,14 +104,35 @@ const useOutboundImportForm = ({ next }) => {
     // if it happens from details step, send an endpoint to validate the data,
     // if from confirm page - save & validate
     console.log('Sending values for validation', values);
-    setLineItems(otherData);
-    setLineItemErrors(tableErrors);
+
+    // TODO: remove this hardcoded data cases
+    //  (meant for testing only before back and front integrations)
+    if (values.description === 'ERROR') {
+      setLineItemErrors(tableErrors);
+    } else if (values.description === 'NO_PACK_1') {
+      setLineItems(otherData.map((it) => ({ ...it, palletName: undefined })));
+    } else if (values.description === 'NO_PACK_2') {
+      setLineItems(otherData.map((it) => ({ ...it, boxName: undefined })));
+    } else if (values.description === 'NO_PACK') {
+      setLineItems(otherData.map((it) => ({ ...it, boxName: undefined, palletName: undefined })));
+    } else {
+      setLineItems(otherData);
+    }
+
+    /** we want to display header info only after a successful outbound upload of create step */
+    setHeaderDetailsData({
+      origin: values.origin?.name,
+      destination: values.destination?.name,
+      dateRequested: values.dateRequested,
+      description: values.description,
+    });
+
     next();
   };
 
   // TODO: implement confirm import logic
   const onConfirmImport = (values) => {
-    // here distinguish whether the onSubmit happens from detalis step or confirm page.
+    // here distinguish whether the onSubmit happens from details step or confirm page.
     // if it happens from details step, send an endpoint to validate the data,
     // if from confirm page - save & validate
     console.log('Sending values for saving import', values, lineItems);
@@ -116,6 +146,7 @@ const useOutboundImportForm = ({ next }) => {
     if (currentLocation) {
       setValue('origin', {
         id: currentLocation?.id,
+        name: currentLocation?.name,
         label: `${currentLocation?.name} [${currentLocation?.locationType?.description}]`,
       });
     }
@@ -129,6 +160,7 @@ const useOutboundImportForm = ({ next }) => {
     isValid,
     onSubmitStockMovementDetails,
     onConfirmImport,
+    headerDetailsData,
     trigger,
     lineItemErrors,
     lineItems,
