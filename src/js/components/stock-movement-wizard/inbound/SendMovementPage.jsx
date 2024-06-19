@@ -824,7 +824,7 @@ class SendMovementPage extends Component {
                     </button> : null
                   }
                 </div>
-                <div className="my-2 table-form">
+                <div className="my-2 table-form" data-testid="items-table">
                   {_.map(SUPPLIER_FIELDS, (fieldConfig, fieldName) =>
                       renderFormField(fieldConfig, fieldName, {
                         hasBinLocationSupport: this.props.hasBinLocationSupport,
