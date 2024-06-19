@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 
 import PropTypes from 'prop-types';
-import { shallowEqual, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 
 import DataTable, { TableCell } from 'components/DataTable';
 import DateCell from 'components/DataTable/DateCell';
@@ -12,14 +12,14 @@ import { formatProductDisplayName } from 'utils/form-values-utils';
 const OutboundImportItems = ({ data, errors }) => {
   const translate = useTranslate();
 
-  const isPalletColumnHasAnyValues = useMemo(() => data.some((it) => it.palletName), data);
-  const isBoxColumnHasAnyValues = useMemo(() => data.some((it) => it.boxName), data);
+  const isPalletColumnEmpty = useMemo(() => !data.some((it) => it.palletName), data);
+  const isBoxColumnEmpty = useMemo(() => !data.some((it) => it.boxName), data);
 
   const {
     hasBinLocationSupport,
   } = useSelector((state) => ({
     hasBinLocationSupport: state.session.currentLocation.hasBinLocationSupport,
-  }), shallowEqual);
+  }));
 
   const columns = useMemo(() => [
     {
@@ -74,15 +74,15 @@ const OutboundImportItems = ({ data, errors }) => {
       Header: translate('react.outboundImport.table.column.palletName.label', 'Pack level 1'),
       accessor: 'palletName',
       Cell: (row) => <TableCell {...row} showError />,
-      show: isPalletColumnHasAnyValues,
+      show: !isPalletColumnEmpty,
     },
     {
       Header: translate('react.outboundImport.table.column.boxName.label', 'Pack level 2'),
       accessor: 'boxName',
       Cell: (row) => <TableCell {...row} showError />,
-      show: isBoxColumnHasAnyValues,
+      show: !isBoxColumnEmpty,
     },
-  ], [translate]);
+  ], [translate, isPalletColumnEmpty, isBoxColumnEmpty, hasBinLocationSupport]);
 
   return (
     <Subsection

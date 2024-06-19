@@ -132,7 +132,7 @@ const useOutboundImportForm = ({ next }) => {
 
   // TODO: implement confirm import logic
   const onConfirmImport = (values) => {
-    // here distinguish whether the onSubmit happens from detalis step or confirm page.
+    // here distinguish whether the onSubmit happens from details step or confirm page.
     // if it happens from details step, send an endpoint to validate the data,
     // if from confirm page - save & validate
     console.log('Sending values for saving import', values, lineItems);
