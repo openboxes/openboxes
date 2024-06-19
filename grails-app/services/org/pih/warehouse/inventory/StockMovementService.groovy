@@ -1400,9 +1400,8 @@ class StockMovementService {
 //        }
 
         // Scenario 3: All stock in receiving or default bin > if lot has stock entries only in hold bin > invalid
-        boolean isAllStockInHoldLocations = !availableItems.empty ? availableItems.every { it.onHold } : false
-        log.info "\n\nisAllStockInHoldLocations: " + isAllStockInHoldLocations
-        if (isAllStockInHoldLocations) {
+        boolean hasAllHoldLocations = !availableItems.empty ? availableItems.every { it.onHold } : false
+        if (hasAllHoldLocations) {
             picklistItemCommand.errors.rejectValue("binLocation",
                     "allocationRequest.availableItems.inHoldLocations",
                     [product.productCode, inventoryItem?.lotNumber, availableItems.binLocationName] as Object [],
@@ -1411,12 +1410,13 @@ class StockMovementService {
         }
 
         // Scenario 4: Any other scenario (stock in “real” bin and virtual bin, stock in multiple real bins)
-        Integer countInVirtualAndBinLocations = availableItems?.findAll { it?.isVirtualLocation || it?.isBinLocation }?.size()
-        if (countInVirtualAndBinLocations > 1) {
+        boolean hasAnyBinLocations = availableItems?.any { it?.isBinLocation }
+        boolean hasAnyVirtualLocations = availableItems?.any { it?.isVirtualLocation }
+        if (hasAnyBinLocations && hasAnyVirtualLocations) {
             picklistItemCommand.errors.rejectValue("binLocation",
-                    "importPickCommand.availableItems.inMultipleLocations",
+                    "importPickCommand.availableItems.inMultipleBinLocations",
                     [product.productCode, inventoryItem?.lotNumber, availableItems.binLocationName] as Object [],
-                    "Product {0} with lot number {1} has stock in multiple bin locations {2}. Please indicate the bin location to pick from."
+                    "Product {0} with lot number {1} has stock in multiple internal locations {2}. Please indicate the bin location to pick from."
             )
         }
 
