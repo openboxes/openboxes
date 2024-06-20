@@ -1,7 +1,7 @@
 <%@ page import="org.pih.warehouse.core.Constants" %>
 <%@ page import="org.pih.warehouse.requisition.RequisitionStatus" %>
 <%@ page import="org.pih.warehouse.shipping.ShipmentStatusCode" %>
-<div class="summary">
+<section class="summary" aria-label="summary">
     <table id="stockMovement-summary">
         <tbody>
         <tr>
@@ -28,12 +28,12 @@
             <td class="middle">
                 <g:if test="${stockMovement?.id}">
 
-                    <div class="title">
+                    <div class="title" data-testid="title">
                         <small class="font-weight-bold">${stockMovement?.identifier}</small>
                         <g:link controller="stockMovement" action="show" id="${stockMovement?.id }">
                             ${stockMovement?.name}
                         </g:link>
-                        <small class="fade uppercase font-weight-bold">
+                        <small class="fade uppercase font-weight-bold" data-testid="direction-tag">
                             <g:if test="${shipmentInstance?.origin?.id == session?.warehouse?.id}">
                                 <warehouse:message code="default.outbound.label" default="outbound"/>
                             </g:if>
@@ -158,11 +158,11 @@
                 </g:if>
             </td>
             <td class="center" width="1%">
-                <div class="tag tag-alert">
+                <div class="tag tag-alert" data-testid="status-tag">
                     ${stockMovement?.displayStatus?.label}
                 </div>
             </td>
         </tr>
         </tbody>
     </table>
-</div>
+</section>
