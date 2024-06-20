@@ -18,6 +18,7 @@ import groovy.sql.Sql
 import org.apache.commons.collections.ListUtils
 import org.apache.http.auth.AuthenticationException
 import org.hibernate.sql.JoinType
+import org.pih.warehouse.LocalizationUtil
 import org.pih.warehouse.auth.AuthService
 import org.grails.plugins.web.taglib.ApplicationTagLib
 
@@ -56,7 +57,7 @@ class UserService {
         userInstance.passwordConfirm = userInstance.password
         // Do not allow user to set his/her locale to translation mode locale
         def localizationModeLocale = new Locale(grailsApplication.config.openboxes.locale.localizationModeLocale)
-        if (params.locale && new Locale(params.locale) == localizationModeLocale) {
+        if (params.locale && LocalizationUtil.getLocale(params.locale) == localizationModeLocale) {
             userInstance.errors.rejectValue("locale", "user.errors.cannotSetLocaleToTranslationLocale.message", "You cannot set your default locale for translation mode locale")
             throw new ValidationException("user.errors.cannotSetLocaleToTranslationLocale.message", userInstance.errors)
         }

@@ -1,5 +1,6 @@
-
 <%@ page import="org.pih.warehouse.core.User" %>
+<%@ page import="org.pih.warehouse.LocalizationUtil" %>
+
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -85,7 +86,7 @@
 	                                  <label for="locale"><warehouse:message code="default.locale.label"/></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: userInstance, field: 'locale', 'errors')}">
-	                                    <g:select name="locale" from="${ grailsApplication.config.openboxes.locale.supportedLocales.collect{ new Locale(it) } }" optionValue="displayName" value="${userInstance?.locale}" noSelection="['':'']"/>
+	                                    <g:select name="locale" from="${ grailsApplication.config.openboxes.locale.supportedLocales.collect{ LocalizationUtil.getLocale(it) } }" optionValue="displayName" value="${userInstance?.locale}" noSelection="['':'']"/>
 	                                </td>
 	                         </tr>
 	                         <tr class="prop">

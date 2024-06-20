@@ -11,6 +11,7 @@ package org.pih.warehouse.user
 
 import grails.validation.ValidationException
 import org.apache.http.auth.AuthenticationException
+import org.pih.warehouse.LocalizationUtil
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationRole
 import org.pih.warehouse.core.LocationRoleDataService
@@ -300,7 +301,7 @@ class UserController {
         // If we are in localization mode and want to change the language through the footer on React side
         // we want to make sure we set the language to the clicked one, not for the previous locale
         // we want to set the prev locale only if we disable localization mode through "Disable localization mode" button
-        Locale locale = params?.locale ? new Locale(params.locale) : session?.previousLocale
+        Locale locale = params?.locale ? LocalizationUtil.getLocale(params.locale) : session?.previousLocale
         session.locale = locale
         def referer = request.getHeader("Referer")
         if (referer) {
@@ -334,7 +335,7 @@ class UserController {
 
         if (params.locale) {
             // convert the passed locale parameter to an actual locale
-            Locale locale = new Locale(params.locale)
+            Locale locale = LocalizationUtil.getLocale(params.locale)
 
             // if this isn't a valid locale, do nothing
             if (locale) {

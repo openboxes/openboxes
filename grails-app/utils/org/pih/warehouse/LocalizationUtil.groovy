@@ -17,6 +17,7 @@ class LocalizationUtil {
 
     static final def delimiter = '\\|'
     static final def localeDelimiter = ':'
+    static final String UNDERSCORE = '_'
 
     static LocalizationService getLocalizationService() {
         return Holders.getGrailsApplication().getParentContext().getBean("localizationService")
@@ -26,9 +27,43 @@ class LocalizationUtil {
         return localizationService.currentLocale
     }
 
+    /**
+     * Convenience util to handle country specific language (for example Mexican Spanish). As we
+     * used to provide supported locales in config as a language code in ISO 639 alpha-2 or
+     * ISO 639 alpha-3 format, to support country specific languages we have to add a country
+     * code in ISO 3166 alpha-2 or UN M.49 numeric-3 format to it.
+     * As there is no Locale constructor that handles `<languageCode>_<countryCode>` for now we
+     * have to handle it here. If it is a country specific language, then the <languageCode>
+     * will be used to determine the fallback (default) locale for missing translations.
+     * TODO: Improve the supportedLocales config structure to fully support all locale options.
+     *       (see context here: https://pihemr.atlassian.net/browse/OBPIH-6410?focusedCommentId=153567)
+     * @param localeCode String with locale code represented as single language code (ex.: "en", "es"),
+     *                   or combined with country code (ex.: "en_GB", "es_MX").
+     * @return Locale
+     * @exception NullPointerException (Locale throws NPE when all params passed to constructor are null)
+     * */
+    static Locale getLocale(String localeCode) {
+        Locale locale
+
+        if (localeCode?.contains(UNDERSCORE)) {
+            String[] localeCodeParts = localeCode.split(UNDERSCORE)
+            String language = localeCodeParts[0]
+            String country = localeCodeParts[1]
+            locale = new Locale(language, country)
+            locale.setDefault(new Locale(language))
+            return locale
+        }
+
+        locale = new Locale(localeCode)
+        String defaultLocaleCode = Holders.config.openboxes.locale.defaultLocale
+        Locale defaultLocale = defaultLocaleCode ? new Locale(defaultLocaleCode) : Locale.ENGLISH
+        locale.setDefault(defaultLocale)
+        return locale
+    }
+
     static List<Locale> getSupportedLocales() {
         def supportedLocales = Holders.config.openboxes.locale.supportedLocales
-        return supportedLocales.collect { new Locale(it) }
+        return supportedLocales.collect { getLocale(it) }
     }
 
     static String getLocalizedString(Transaction transaction) {

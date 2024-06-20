@@ -1449,7 +1449,7 @@ class ProductService {
 
     Product addSynonymToProduct(String productId, String synonymTypeCodeName, String synonymValue, String localeName) {
         Product product = Product.get(productId)
-        Locale locale = localeName ? new Locale(localeName) : null
+        Locale locale = localeName ? LocalizationUtil.getLocale(localeName) : null
         SynonymTypeCode synonymTypeCode = synonymTypeCodeName ? SynonymTypeCode.valueOf(synonymTypeCodeName) : SynonymTypeCode.ALTERNATE_NAME
         Synonym synonym = new Synonym(name: synonymValue, locale: locale, synonymTypeCode: synonymTypeCode)
         product.addToSynonyms(synonym)
@@ -1461,7 +1461,7 @@ class ProductService {
 
     Synonym editProductSynonym(String synonymId, String synonymTypeCodeName, String synonymValue, String localeName) {
         Synonym synonym = Synonym.get(synonymId)
-        Locale locale = localeName ? new Locale(localeName) : null
+        Locale locale = localeName ? LocalizationUtil.getLocale(localeName) : null
         SynonymTypeCode synonymTypeCode = null
         try {
             if (synonymTypeCodeName) {
