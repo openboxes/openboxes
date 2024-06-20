@@ -1300,7 +1300,7 @@ class StockMovementService {
                     // OBPIH-6331 This is the main driver for the infer bin location mechanism
                     // If the internal location is NULL at this point, that means the user left
                     // the cell blank and would like the system to allocate based on our rules
-                    if (!internalLocation) {
+                    if (!data.binLocation && !internalLocation) {
 
                         // FIXME THis feels a bit weird because we should allow the allocation
                         //  algorithm to sort and decide which location is best
@@ -1309,13 +1309,8 @@ class StockMovementService {
 
                         // It was in fact premature to be doing the above filtering as it was
                         // causing some major issues when there were available items in multiple locations
-                        List<AvailableItem> availableItems = []
-
-                        // If there are no available items in the default location, find all
-                        // available items for the provided lot number
-                        if (availableItems?.empty) {
-                            availableItems = pickPageItem.getAvailableItems(inventoryItem)
-                        }
+                        List<AvailableItem> availableItems =
+                                pickPageItem.getAvailableItems(inventoryItem)
 
                         // Create an allocation request and validate that it
                         AllocationRequest allocationRequest = new AllocationRequest(
@@ -1382,13 +1377,27 @@ class StockMovementService {
         List<AvailableItem> availableItems = allocationRequest.availableItems
         PicklistItemCommand picklistItemCommand = allocationRequest.picklistItemCommand
 
+        // Building blocks for validation logic
+        // FIXME Could probably move these to custom validators on AllocationRequest
+        Integer countInBinLocations = availableItems.findAll { it.isPhysicalLocation }?.size()
         boolean isInDefaultLocation = availableItems.every { it.isDefaultLocation }
         boolean isInReceivingLocations = availableItems.every { it.isReceivingLocation }
-        boolean isInBinLocations = availableItems.every { it.isBinLocation && !it.isDefaultLocation }
-        Integer countInBinLocations = availableItems.findAll { it.isBinLocation }?.size()
+        boolean isInBinLocations = availableItems.every { it.isPhysicalLocation && !it.isDefaultLocation }
+        boolean hasAllHoldLocations = !availableItems.empty ? availableItems.every { it.onHold } : false
+        boolean hasAnyPhysicalLocations = availableItems?.any { it?.isPhysicalLocation }
+        boolean hasAnyVirtualLocations = availableItems?.any { it?.isVirtualLocation }
+
+        // Scenario 4: Any other scenario (stock in “real” bin and virtual bin, stock in multiple real bins)
+        if (hasAnyPhysicalLocations && hasAnyVirtualLocations) {
+            picklistItemCommand.errors.rejectValue("binLocation",
+                    "importPickCommand.availableItems.inMultipleBinLocations",
+                    [product.productCode, inventoryItem?.lotNumber, availableItems.binLocationName] as Object [],
+                    "Product {0} with lot number {1} has stock in multiple physical and virtual locations {2}. Please indicate the bin location to pick from."
+            )
+        }
 
         // Scenario 2: All stock in one bin (or in one real bin and 1 or more hold bins - ignore hold bins)
-        if (countInBinLocations > 1) {
+        else if (countInBinLocations > 1) {
             picklistItemCommand.errors.rejectValue("binLocation",
                     "importPickCommand.availableItems.inMultipleLocations",
                     [product.productCode, inventoryItem?.lotNumber, availableItems.binLocationName] as Object [],
@@ -1409,23 +1418,11 @@ class StockMovementService {
 //        }
 
         // Scenario 3: All stock in receiving or default bin > if lot has stock entries only in hold bin > invalid
-        boolean hasAllHoldLocations = !availableItems.empty ? availableItems.every { it.onHold } : false
-        if (hasAllHoldLocations) {
+        else if (hasAllHoldLocations) {
             picklistItemCommand.errors.rejectValue("binLocation",
                     "allocationRequest.availableItems.inHoldLocations",
                     [product.productCode, inventoryItem?.lotNumber, availableItems.binLocationName] as Object [],
                     "Product {0} with lot number {1} only has stock in hold locations."
-            )
-        }
-
-        // Scenario 4: Any other scenario (stock in “real” bin and virtual bin, stock in multiple real bins)
-        boolean hasAnyBinLocations = availableItems?.any { it?.isBinLocation }
-        boolean hasAnyVirtualLocations = availableItems?.any { it?.isVirtualLocation }
-        if (hasAnyBinLocations && hasAnyVirtualLocations) {
-            picklistItemCommand.errors.rejectValue("binLocation",
-                    "importPickCommand.availableItems.inMultipleBinLocations",
-                    [product.productCode, inventoryItem?.lotNumber, availableItems.binLocationName] as Object [],
-                    "Product {0} with lot number {1} has stock in multiple internal locations {2}. Please indicate the bin location to pick from."
             )
         }
 
@@ -1434,15 +1431,15 @@ class StockMovementService {
         //  anything, but it's definitely not doing what I originally intended for it to do.
 
         // Validate the quantity available for all available items
-        boolean isAllocationPossible = validateQuantityAvailable(availableItems, quantityRequired)
-        if (!isAllocationPossible) {
-            Integer quantityAvailable = availableItems.quantityAvailable.sum()?:0
+        boolean canAllocateQuantity = validateQuantityAvailable(availableItems, quantityRequired)
+        if (!canAllocateQuantity) {
+            Integer quantityAvailable = availableItems.quantityAvailable.max()?:0
             picklistItemCommand.errors.rejectValue(
                 "quantity",
                 "importPickCommand.quantity.insuffientQuantityAvailable",
                 [picklistItemCommand.code, picklistItemCommand.lotNumber?:Constants.DEFAULT_LOT_NUMBER, quantityAvailable, quantityRequired] as Object[],
-                "Insufficient quantity available for product code {0} and lot number {1}. " +
-                    "Available: {2}, Required: {3}")
+                "Insufficient quantity available for product code {0} and lot number {1} " +
+                    "[Maximum Available: {2}, Required: {3}]. Please review pick.")
         }
 
     }
@@ -1457,7 +1454,6 @@ class StockMovementService {
     // FIXME One other issue here is that it would be much easier to implement if we had a parent
     //  parent object above available items that was responsible for answering questions
     List<AvailableItem> applyAllocationRulesOnAvailableItems(List<AvailableItem> availableItems, Integer quantityRequired) {
-
 
         // TODO Remove unnecessary logging before merging
         log.info "Apply allocation rules on available items "
@@ -1475,16 +1471,16 @@ class StockMovementService {
             // TODO Could we have more than one available items in a default location?
             // TODO If there's enough available quantity in the default bin, then allocate
             //  quantity from the default location
-            boolean isAllStockInDefault = availableItems.every { it.isDefaultLocation }
-            if (isAllStockInDefault) {
+            boolean isAllStockInDefaultLocation = availableItems.every { it.isDefaultLocation }
+            if (isAllStockInDefaultLocation) {
                 return availableItems
             }
 
             // Scenario 2: All stock in one bin
             // TODO If there's enough available quantity in one internal location, then
             //  then allocate stock from that location. Otherwise return an error?
-            boolean isAllStockInSingleBinLocation = availableItems.every { it.isBinLocation }
-            if (isAllStockInSingleBinLocation) {
+            boolean isAllStockInSinglePhysicalLocation = availableItems.every { it.isPhysicalLocation }
+            if (isAllStockInSinglePhysicalLocation) {
                 return availableItems
             }
         }
@@ -1559,7 +1555,7 @@ class StockMovementService {
                 // Get the available item for the provide lot number and bin location
                 AvailableItem availableItem = pickPageItem.getAvailableItem(inventoryItem, internalLocation)
 
-                // If there is an available item we allocate that item to the outbound order
+                // If there is an available item with enough we allocate that item to the outbound order
                 if (availableItem) {
                     Picklist picklist = stockMovement.requisition?.picklist
                     // find existing picklist to update

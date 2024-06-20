@@ -369,7 +369,7 @@ class AvailableItem {
     }
 
     // TODO Need to test this thoroughly to make sure it works as expected
-    Boolean getIsBinLocation() {
+    Boolean getIsPhysicalLocation() {
         return !isVirtualLocation && !isOnHold()
     }
 
