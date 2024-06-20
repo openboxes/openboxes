@@ -1189,7 +1189,7 @@ class StockMovementService {
                     return
                 }
 
-                // Pick page item represents the requisiton item
+                // Find the pick page item by ID (pick page item represents the requisition item)
                 PickPageItem pickPageItem = pickPageItems.find { it.requisitionItem?.id == data.id }
                 if (!pickPageItem) {
                     data.errors.rejectValue(
@@ -1226,7 +1226,7 @@ class StockMovementService {
                                     "binLocation",
                                     "importPickCommand.binLocation.multipleEmpty.error",
                                     [data.lotNumber] as Object[],
-                                    "Bin location cannot be empty for multiple rows with the same lot number {0}"
+                                    "Bin location cannot be empty for the same lot number {0} across multiple rows."
                             )
                         }
                     }
@@ -1237,8 +1237,11 @@ class StockMovementService {
                     Location internalLocation = command.location.getInternalLocation(data.binLocation)
 
                     // If a bin location value is provided and it not the default bin location name
+                    // FIXME Could add this logic to the command class but I'm not sure what to call
+                    //  the method (isUserProvidedButNotDefault is a bit of a mouthful). Open to
+                    //  suggestions.
                     if (data.binLocation && !data.binLocation?.equalsIgnoreCase(Constants.DEFAULT_BIN_LOCATION_NAME)) {
-                        // But the internal location is not found
+                        // ... but the internal location is not found
                         if (!internalLocation) {
                             // FIXME Add error code to messages.properties
                             data.errors.rejectValue(
@@ -1286,14 +1289,15 @@ class StockMovementService {
                             String binLocationName = data.binLocation ?: g.message(code: "default.noBinLocation.label", default: Constants.DEFAULT_BIN_LOCATION_NAME)
                             data.errors.rejectValue(
                                     "id",
-                                    "importPickCommand.availableItem.notAvailable.error",
-                                    [lotNumberName, binLocationName] as Object[],
-                                    "The stock entry you selected: lot number {0} and bin location {1} is not available. Please review pick."
+                                    "importPickCommand.quantity.insuffientQuantityAvailable",
+                                    [lotNumberName, binLocationName, availableItem.quantityAvailable, data.quantity] as Object[],
+                                    "Insufficient quantity available for lot number {0} " +
+                                            "and bin location {1} [Available: {2}, Required: {3}]. Please review pick."
                             )
                         }
                     }
 
-                    // OBPIH-6331 This the main driver for the infer bin location mechanism
+                    // OBPIH-6331 This is the main driver for the infer bin location mechanism
                     // If the internal location is NULL at this point, that means the user left
                     // the cell blank and would like the system to allocate based on our rules
                     if (!internalLocation) {
@@ -1332,7 +1336,11 @@ class StockMovementService {
                         }
                     }
 
-                    // FIXME This validation should happen only on the first line for the requisition item
+                    // FIXME This validation should happen only on the first line for the
+                    //  requisition item. I tried to implement it in the outer loop but had trouble
+                    //  with adding errors to command object. The side-effect of not fixing this
+                    //  is that we have to see this error for every row which is infinitely better
+                    //  than not seeing it.
                     Integer totalQuantityPicked = picklistItemsGroupedByRequisitionItem[data.id].sum { it.quantity }
 
                     // TODO Should we really be using requisitonItem.quantity here?
