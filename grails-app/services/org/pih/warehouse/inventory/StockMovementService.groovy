@@ -1464,7 +1464,10 @@ class StockMovementService {
             log.info " - Available item " + it.toJson()
         }
 
-        // If there's only one pickable bin location
+        // filter out hold locations
+        availableItems = availableItems.findAll { !it.isOnHold() }
+
+        // If there's only one pickable location, it should either be a default location or
         if (availableItems.count { it.pickable } == 1) {
 
             // Scenario 1: All stock in default (no bin)
