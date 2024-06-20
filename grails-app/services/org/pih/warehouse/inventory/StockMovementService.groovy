@@ -1360,9 +1360,10 @@ class StockMovementService {
     }
 
     // TODO Test whether the sum of an empty available items list returns 0
+    //  If we want to be more strict we can check to see if there's enough quantity in at least
+    //  one item
     boolean validateQuantityAvailable(List<AvailableItem> availableItems, Integer quantityRequired) {
-        Integer quantityAvailable = availableItems?.sum { it?.quantityAvailable?:0 }
-        return quantityAvailable >= quantityRequired
+        return availableItems?.any { it.quantityAvailable >= quantityRequired }
     }
 
     void validateAllocationRequest(AllocationRequest allocationRequest) {
