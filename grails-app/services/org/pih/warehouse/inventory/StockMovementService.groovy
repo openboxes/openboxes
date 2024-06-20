@@ -1474,16 +1474,16 @@ class StockMovementService {
             // TODO Could we have more than one available items in a default location?
             // TODO If there's enough available quantity in the default bin, then allocate
             //  quantity from the default location
-            boolean isAllStockInDefaultLocation = availableItems.every { it.isDefaultLocation }
-            if (isAllStockInDefaultLocation) {
+            boolean isInDefaultLocationOrReceivingLocation = availableItems.every { it.isDefaultLocation || it.isReceivingLocation }
+            if (isInDefaultLocationOrReceivingLocation) {
                 return availableItems
             }
 
             // Scenario 2: All stock in one bin
             // TODO If there's enough available quantity in one internal location, then
             //  then allocate stock from that location. Otherwise return an error?
-            boolean isAllStockInSinglePhysicalLocation = availableItems.every { it.isPhysicalLocation }
-            if (isAllStockInSinglePhysicalLocation) {
+            boolean isInPhysicalLocation = availableItems.every { it.isPhysicalLocation }
+            if (isInPhysicalLocation) {
                 return availableItems
             }
         }
@@ -1514,6 +1514,9 @@ class StockMovementService {
                 return availableItems
             }
         }
+
+        // FIXME Consider throwing an exception here because we've fallen through all
+        //  of the expected scenarios
         return []
     }
 
