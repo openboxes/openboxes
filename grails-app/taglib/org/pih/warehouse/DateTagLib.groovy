@@ -25,7 +25,7 @@ class DateTagLib {
     Closure formatDate = { attrs, body ->
         def formatTagLib = grailsApplication.mainContext.getBean('org.grails.plugins.web.taglib.FormatTagLib')
 
-        if (!attrs.format) {
+        if (!attrs.format && !attrs.formatName) {
             attrs.format = Constants.DEFAULT_DATE_TIME_FORMAT
         }
         if (!attrs.timeZone && session.timezone) {
