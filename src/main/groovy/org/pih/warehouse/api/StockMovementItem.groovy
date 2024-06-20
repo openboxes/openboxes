@@ -684,13 +684,13 @@ class PickPageItem {
     //  that I don't fully understand so I want to make sure the alternate solution takes what I
     //  assume is the "default" bin and lot number logic into account.
     //  i.e. (!item.binLocation and !item.inventoryItem?.lotNumber)
-    AvailableItem getAvailableItem(String binLocationName, String lotNumber) {
-        return availableItems?.find { item ->
-            Boolean binLocationMatches = binLocationName ? item.binLocation?.name == binLocationName : !item.binLocation
-            Boolean lotMatches = lotNumber ? item.inventoryItem?.lotNumber == lotNumber : !item.inventoryItem?.lotNumber
-            binLocationMatches && lotMatches
-        }
-    }
+//    AvailableItem getAvailableItem(String binLocationName, String lotNumber) {
+//        return availableItems?.find { item ->
+//            Boolean binLocationMatches = binLocationName ? item.binLocation?.name == binLocationName : !item.binLocation
+//            Boolean lotMatches = lotNumber ? item.inventoryItem?.lotNumber == lotNumber : !item.inventoryItem?.lotNumber
+//            binLocationMatches && lotMatches
+//        }
+//    }
 
     /**
      * Get all available items for the given inventory item.
