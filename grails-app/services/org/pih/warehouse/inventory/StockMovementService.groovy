@@ -1266,10 +1266,10 @@ class StockMovementService {
                         // Let's try to determine whether there's a specific available inventory item
                         //  associated with the lot number and bin data provided by the user.
                         AvailableItem availableItem = pickPageItem.getAvailableItem(inventoryItem, internalLocation)
+                        ApplicationTagLib g = grailsApplication.mainContext.getBean(ApplicationTagLib.class)
 
                         // FIXME This is only necessary if we cannot find a happy case from OBPIH-6331
                         if (!availableItem) {
-                            ApplicationTagLib g = grailsApplication.mainContext.getBean(ApplicationTagLib.class)
                             String lotNumberName = data.lotNumber ?: g.message(code: "default.noLotNumber.label", default: Constants.DEFAULT_LOT_NUMBER)
                             String binLocationName = data.binLocation ?: g.message(code: "default.noBinLocation.label", default: Constants.DEFAULT_BIN_LOCATION_NAME)
                             data.errors.rejectValue(
