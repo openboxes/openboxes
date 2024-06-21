@@ -156,7 +156,7 @@ class LocalizationUtil {
 
     /**
      * @param date
-     * @param formatName
+     * @param formatName (property of DateFormatName enum, indicating the desired format of the date)
      * @return return localized date in passed formatName (name of the property in i18n/*.properties file).
      */
     static String formatDate(Date date, DateFormatName formatName = DateFormatName.DEFAULT) {
