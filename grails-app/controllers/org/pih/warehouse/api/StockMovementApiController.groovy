@@ -143,7 +143,7 @@ class StockMovementApiController {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
         bindStockMovement(stockMovement, request.JSON)
         stockMovementService.updateStockMovement(stockMovement)
-        forward(action: "read")
+        redirect(action: "read", params: params)
     }
 
     /**
