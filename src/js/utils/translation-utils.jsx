@@ -7,8 +7,14 @@ const splitTranslation = (data, locale) => {
   return locale === 'fr' && fr ? fr : en;
 };
 
+export const getDateFormat = (localize, formatName) =>
+  getTranslate(localize)(formatName);
+
+export const getLocaleCode = (localize) =>
+  localize.languages.find(lang => lang.active)?.code;
+
 export const formatDate = (localize) => (date, formatName) => {
-  const localeCode = localize.languages.find(lang => lang.active)?.code;
+  const localeCode = getLocaleCode(localize);
   const dateFormat = getTranslate(localize)(formatName);
   return moment(date).locale(localeCode).format(dateFormat);
 };

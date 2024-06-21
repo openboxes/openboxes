@@ -137,9 +137,8 @@ const VENDOR_FIELDS = {
         defaultMessage: 'Expiry',
         flexWidth: '1.5',
         attributes: {
-          dateFormat: 'MM/DD/YYYY',
+          localizeDate: true,
           autoComplete: 'off',
-          placeholderText: 'MM/DD/YYYY',
         },
         getDynamicAttr: ({ rowIndex, values, updateRow }) => ({
           onBlur: () => updateRow(values, rowIndex),
