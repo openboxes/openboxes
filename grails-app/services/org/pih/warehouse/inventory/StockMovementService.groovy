@@ -42,6 +42,7 @@ import org.pih.warehouse.core.IdentifierService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationService
 import org.pih.warehouse.core.LocationTypeCode
+import org.pih.warehouse.core.PickType
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.StockMovementItemParamsCommand
 import org.pih.warehouse.core.StockMovementItemsParamsCommand
@@ -1576,6 +1577,7 @@ class StockMovementService {
                             availableItem.binLocation,
                             params.quantity,
                             null,
+                            PickType.IMPORT,
                             null
                     )
 
@@ -1776,6 +1778,7 @@ class StockMovementService {
                             suggestedItem.binLocation,
                             suggestedItem.quantityPicked.intValueExact(),
                             null,
+                            PickType.AUTO,
                             null)
                 }
             }
@@ -1793,15 +1796,15 @@ class StockMovementService {
 
     void createOrUpdatePicklistItem(StockMovementItem stockMovementItem, PicklistItem picklistItem,
                                     InventoryItem inventoryItem, Location binLocation,
-                                    Integer quantity, String reasonCode, String comment) {
+                                    Integer quantity, String reasonCode, PickType pickType, String comment) {
 
         RequisitionItem requisitionItem = RequisitionItem.get(stockMovementItem.id)
-        createOrUpdatePicklistItem(requisitionItem, picklistItem, inventoryItem, binLocation, quantity, reasonCode, comment)
+        createOrUpdatePicklistItem(requisitionItem, picklistItem, inventoryItem, binLocation, quantity, reasonCode, pickType, comment)
     }
 
     void createOrUpdatePicklistItem(RequisitionItem requisitionItem, PicklistItem picklistItem,
                                     InventoryItem inventoryItem, Location binLocation,
-                                    Integer quantity, String reasonCode, String comment) {
+                                    Integer quantity, String reasonCode, PickType pickType, String comment) {
 
         Requisition requisition = requisitionItem.requisition
 
@@ -1839,6 +1842,7 @@ class StockMovementService {
             picklistItem.binLocation = binLocation
             picklistItem.quantity = quantity
             picklistItem.reasonCode = reasonCode
+            picklistItem.pickType = pickType
             picklistItem.comment = comment
             picklistItem.sortOrder = requisitionItem.orderIndex
             picklistItem.disableRefresh = Boolean.TRUE
@@ -1916,7 +1920,7 @@ class StockMovementService {
             String comment = picklistItemMap.comment
 
             createOrUpdatePicklistItem(requisitionItem, picklistItem, inventoryItem, binLocation,
-                    quantityPicked?.intValueExact(), reasonCode, comment)
+                    quantityPicked?.intValueExact(), reasonCode, PickType.MANUAL, comment)
         }
     }
 
