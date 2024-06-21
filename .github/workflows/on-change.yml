@@ -11,5 +11,3 @@ jobs:
 
   run-backend-tests:
     uses: ./.github/workflows/backend-tests.yml
-
-#TODO: Send a email or slack notification if either job fails: https://pihemr.atlassian.net/browse/OBPIH-6455
