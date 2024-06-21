@@ -27,5 +27,5 @@ FormatDate.propTypes = {
 
 FormatDate.defaultProps = {
   date: new Date(),
-  formatName: DateFormatName.DEFAULT,
+  formatName: DateFormatName.DATE_TIME,
 };

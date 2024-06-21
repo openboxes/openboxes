@@ -159,10 +159,10 @@ class LocalizationUtil {
      * @param formatName (property of DateFormatName enum, indicating the desired format of the date)
      * @return return localized date in passed formatName (name of the property in i18n/*.properties file).
      */
-    static String formatDate(Date date, DateFormatName formatName = DateFormatName.DEFAULT) {
+    static String formatDate(Date date, DateFormatName formatName = DateFormatName.DATE_TIME) {
         return applicationTagLib.formatDate(
                 date: date,
-                formatName: formatName.id,
+                formatName: formatName.property,
                 locale: currentLocale
         )
     }

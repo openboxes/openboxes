@@ -9,13 +9,13 @@ package org.pih.warehouse
 // 2. LocalizationUtil.formatDate(your date, id of enum property)
 
 enum DateFormatName {
-    DEFAULT('default.date.format'),
-    CUSTOM('custom.date.format'),
-    EXPIRY('expiry.date.format'),
+    DATE_TIME('default.date.format'),
+    FULL_DATE('custom.date.format'),
+    MONTH_YEAR('expiry.date.format'),
 
-    final String id
+    final String property
 
-    DateFormatName(String id) {
-        this.id = id
+    DateFormatName(String property) {
+        this.property = property
     }
 }
