@@ -13,6 +13,8 @@ import apiClient from 'utils/apiClient';
 import { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'components/stock-movement-wizard/StockMovement.scss';
+import { formatDate } from 'utils/translation-utils';
+import DateFormat from 'consts/dateFormat';
 
 // TODO: Cleanup not required code
 // TODO: Revise docs
@@ -82,7 +84,10 @@ class StockMovements extends Component {
         delimeter: ', ',
       },
       {
-        text: values.dateRequested,
+        text: this.props.formatLocalizedDate(
+          values.dateRequested,
+          DateFormat.COMMON,
+        ),
         color: '#4a148c',
         delimeter: ', ',
       },
@@ -209,6 +214,7 @@ const mapStateToProps = state => ({
   locale: state.session.activeLanguage,
   stockMovementTranslationsFetched: state.session.fetchedTranslations.stockMovement,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
+  formatLocalizedDate: formatDate(state.localize),
 });
 
 export default connect(mapStateToProps, {
@@ -232,6 +238,7 @@ StockMovements.propTypes = {
   stockMovementTranslationsFetched: PropTypes.bool.isRequired,
   fetchTranslations: PropTypes.func.isRequired,
   translate: PropTypes.func.isRequired,
+  formatLocalizedDate: PropTypes.func.isRequired,
 };
 
 StockMovements.defaultProps = {

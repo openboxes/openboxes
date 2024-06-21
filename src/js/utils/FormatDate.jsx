@@ -3,7 +3,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
 
-import DateFormatName from 'consts/dateFormatName';
+import DateFormat from 'consts/dateFormat';
 import { formatDate } from 'utils/translation-utils';
 
 const FormatDate = ({ date, formatName }) => {
@@ -27,5 +27,5 @@ FormatDate.propTypes = {
 
 FormatDate.defaultProps = {
   date: new Date(),
-  formatName: DateFormatName.DATE_TIME,
+  formatName: DateFormat.DEFAULT,
 };

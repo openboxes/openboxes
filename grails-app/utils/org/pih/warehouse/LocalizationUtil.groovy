@@ -11,6 +11,7 @@ package org.pih.warehouse
 
 import grails.util.Holders
 import org.grails.plugins.web.taglib.ApplicationTagLib
+import org.pih.warehouse.core.DateFormat
 import org.pih.warehouse.core.LocalizationService
 import org.pih.warehouse.inventory.Transaction
 
@@ -159,7 +160,7 @@ class LocalizationUtil {
      * @param formatName (property of DateFormatName enum, indicating the desired format of the date)
      * @return return localized date in passed formatName (name of the property in i18n/*.properties file).
      */
-    static String formatDate(Date date, DateFormatName formatName = DateFormatName.DATE_TIME) {
+    static String formatDate(Date date, DateFormat formatName = DateFormat.DEFAULT) {
         return applicationTagLib.formatDate(
                 date: date,
                 formatName: formatName.property,

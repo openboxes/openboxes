@@ -4,8 +4,11 @@ import React, { Component } from 'react';
 import moment from 'moment';
 import DatePicker from 'react-datepicker';
 import { Portal } from 'react-overlays';
+import { connect } from 'react-redux';
 
 import BaseField from 'components/form-elements/BaseField';
+import DateFormat from 'consts/dateFormat';
+import { formatDate, getDateFormat, getLocaleCode } from 'utils/translation-utils';
 
 import 'react-datepicker/dist/react-datepicker.css';
 
@@ -29,7 +32,8 @@ class DateField extends Component {
 
   renderInput({
     value, dateFormat = 'MM/DD/YYYY', timeFormat = 'HH:mm', className = '',
-    arrowLeft, arrowUp, arrowRight, arrowDown, fieldRef, onTabPress, ...attributes
+    arrowLeft, arrowUp, arrowRight, arrowDown, fieldRef, onTabPress, localizeDate,
+    localizedDateFormat = DateFormat.COMMON, showLocalizedPlaceholder, ...attributes
   }) {
     const onChange = (date) => {
       const val = !date || typeof date === 'string' ? date : date.format(dateFormat);
@@ -40,11 +44,36 @@ class DateField extends Component {
       attributes.onChange(e.target.value);
     };
 
+    const getPlaceholder = () => {
+      if (localizeDate && showLocalizedPlaceholder) {
+        return this.props.dateFormat(localizedDateFormat);
+      }
+
+      return attributes.placeholder;
+    };
+
+    const getFormat = () => {
+      if (localizeDate) {
+        return this.props.dateFormat(localizedDateFormat);
+      }
+
+      return dateFormat;
+    };
+
+    const getLocale = () => {
+      if (localizeDate) {
+        return this.props.localeCode;
+      }
+
+      return null;
+    };
+
     return (
       <div className="date-field">
         <DatePicker
           className={`form-control form-control-xs ${className}`}
           {...attributes}
+          placeholderText={getPlaceholder()}
           selected={moment(value, dateFormat).isValid() ? moment(value, dateFormat) : null}
           highlightDates={[!moment(value, dateFormat).isValid() ?
             moment(new Date(), dateFormat) : {}]}
@@ -101,7 +130,8 @@ class DateField extends Component {
           popperClassName="force-on-top"
           showYearDropdown
           scrollableYearDropdown
-          dateFormat={dateFormat}
+          dateFormat={getFormat()}
+          locale={getLocale()}
           timeFormat={timeFormat}
           timeIntervals={15}
           yearDropdownItemNumber={3}
@@ -127,4 +157,10 @@ class DateField extends Component {
   }
 }
 
-export default DateField;
+const mapStateToProps = (state) => ({
+  formatDate: formatDate(state.localize),
+  dateFormat: getDateFormat(state.localize),
+  localeCode: getLocaleCode(state.localize),
+});
+
+export default connect(mapStateToProps)(DateField);

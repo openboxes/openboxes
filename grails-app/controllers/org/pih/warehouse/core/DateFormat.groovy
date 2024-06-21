@@ -1,4 +1,4 @@
-package org.pih.warehouse
+package org.pih.warehouse.core
 
 // Enum for storing labels used in dates formatting.
 // In case of adding new format we have to:
@@ -8,14 +8,16 @@ package org.pih.warehouse
 // 1. G tag - <g:formatDate date={your date} formatName={enum property} />
 // 2. LocalizationUtil.formatDate(your date, enum property)
 
-enum DateFormatName {
-    DATE_TIME('datetime.format'),
-    FULL_DATE('date.format'),
-    MONTH_YEAR('monthyear.format'),
+enum DateFormat {
+    DEFAULT('default.date.format'),
+    COMMON('common.date.format'),
+    EXPIRY('expiry.date.format'),
+    FULL_MONTH('fullmonth.date.format'),
+    ABBREVIATED_MONTH('abbreviatedmonth.date.format'),
 
     final String property
 
-    DateFormatName(String property) {
+    DateFormat(String property) {
         this.property = property
     }
 }

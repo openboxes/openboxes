@@ -5,10 +5,10 @@
 // This enum is used in:
 // 1. <FormatDate date={your date} formatName={property of this enum} /> component
 
-const DateFormatName = {
-  DATE_TIME: 'react.default.datetime.format',
-  FULL_DATE: 'react.default.date.format',
-  MONTH_YEAR: 'react.default.monthyear.format',
+const DateFormat = {
+  DEFAULT: 'react.default.defaultDate.format',
+  COMMON: 'react.default.commonDate.format',
+  EXPIRY: 'react.default.expiryDate.format',
 };
 
-export default DateFormatName;
+export default DateFormat;
