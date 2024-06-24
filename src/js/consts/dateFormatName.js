@@ -6,9 +6,9 @@
 // 1. <FormatDate date={your date} formatName={property of this enum} /> component
 
 const DateFormatName = {
-  DATE_TIME: 'react.default.defaultDate.format',
-  FULL_DATE: 'react.default.customDate.format',
-  MONTH_YEAR: 'react.default.expiryDate.format',
+  DATE_TIME: 'react.default.datetime.format',
+  FULL_DATE: 'react.default.date.format',
+  MONTH_YEAR: 'react.default.monthyear.format',
 };
 
 export default DateFormatName;
