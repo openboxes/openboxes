@@ -1,7 +1,6 @@
 # Automatically adds labels to a pull request.
 # https://github.com/actions/labeler
 
-# Labels based on branch name
 "type: bug":
   - head-branch: ['^bug/', '^bugfix/']
 
@@ -14,42 +13,52 @@
 "type: release":
   - head-branch: ['^release/']
 
-# Labels based on files changes
+"domain: l10n":
+  - head-branch: ['l10n']
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'grails-app/i18n/**/*'
+
+"flag: ignore in release notes":
+  - head-branch: ['l10n']
+
 "domain: backend":
-- all:
-    - changed-files:
-        - any-glob-to-any-file:
-          - 'src/main/groovy/**/*'
-          - 'grails-app/**/*.groovy'
-        - all-globs-to-all-files:
-          - '!grails-app/taglib/**/*'
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'src/main/groovy/**/*'
+      - 'grails-app/controllers/**/*'
+      - 'grails-app/domain/**/*'
+      - 'grails-app/jobs/**/*'
+      - 'grails-app/services/**/*'
 
 "domain: frontend":
-- changed-files:
-  - any-glob-to-any-file:
-    - 'grails-app/taglib/**/*'
-    - '**/*.js'
-    - '**/*.jsx'
-    - '**/*.scss'
-    - '**/*.css'
-    - '**/*.html'
-    - '**/*.gsp'
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'grails-app/taglib/**/*'
+      - '**/*.js'
+      - '**/*.jsx'
+      - '**/*.scss'
+      - '**/*.css'
+      - '**/*.html'
+      - '**/*.gsp'
 
 "domain: devops":
-- changed-files:
-  - any-glob-to-any-file:
-    - '.github/**/*'
-    - 'docker/**/*'
+  - changed-files:
+    - any-glob-to-any-file:
+      - '.github/**/*'
+      - 'docker/**/*'
 
 "flag: config change":
   - changed-files:
-      - any-glob-to-any-file:
-          - 'grails-app/conf/**/*'
-          - '**/*.gradle'
-          - 'package.json'
-          - 'package-lock.json'
+    - any-glob-to-any-file:
+      - 'grails-app/conf/**/*'
+      - 'grails-app/init/**/*'
+      - '**/*.gradle'
+      - '**/*.properties'
+      - 'package.json'
+      - 'package-lock.json'
 
 "flag: schema change":
-- changed-files:
-  - any-glob-to-any-file:
+  - changed-files:
+    - any-glob-to-any-file:
       - 'grails-app/migrations/**/*'
