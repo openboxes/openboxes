@@ -3,21 +3,32 @@
 changelog:
   exclude:
     labels:
-      - ignore-for-release
+      - 'flag: ignore in release notes'
+      - 'type: release'
 
   categories:
     - title: 🚀 Features
       labels:
-        - 'type:feature'
+        - 'type: feature'
 
     - title: 🐛 Bugfixes
       labels:
-        - 'type:bug'
+        - 'type: bug'
 
     - title: 🛠️ Maintenance
       labels:
-        - 'type:maintenance'
+        - 'type: maintenance'
+
+    - title: ⬆️ Dependencies
+      labels:
+        - 'dependencies'
 
     - title: 🎈 Miscellaneous
       labels:
         - '*'
+      exclude:
+        labels:
+          - 'type: feature'
+          - 'type: bug'
+          - 'type: maintenance'
+          - 'dependencies'
