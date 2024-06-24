@@ -12,6 +12,8 @@ enum DateFormatName {
     DATE_TIME('datetime.format'),
     FULL_DATE('date.format'),
     MONTH_YEAR('monthyear.format'),
+    FULL_MONTH('fullmonth.date.format'),
+    ABBREVIATED_MONTH('abbreviatedmonth.date.format'),
 
     final String property
 

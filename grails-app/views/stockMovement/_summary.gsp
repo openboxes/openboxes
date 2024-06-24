@@ -1,3 +1,4 @@
+<%@ page import="org.pih.warehouse.DateFormatName" %>
 <%@ page import="org.pih.warehouse.requisition.RequisitionStatus" %>
 <%@ page import="org.pih.warehouse.shipping.ShipmentStatusCode" %>
 <div class="summary">
@@ -91,21 +92,36 @@
                         <g:if test="${!stockMovement?.dateRequested }">
                             <span class="dateRequested">
                                 <warehouse:message code="stockMovement.dateRequested.label"/>:
-                                <label><format:date obj="${stockMovement?.dateRequested}"/></label>
+                                <label>
+                                    <g:formatDate
+                                            formatName="${DateFormatName.ABBREVIATED_MONTH.property}"
+                                            date="${stockMovement?.dateRequested}"
+                                    />
+                                </label>
                             </span>
                         </g:if>
                         <g:if test="${!shipmentInstance?.hasShipped() }">
                             <g:if test="${shipmentInstance?.expectedShippingDate }">
                                 <span class="expectedShippingDate">
                                     <warehouse:message code="shipping.expectedShippingDate.label"/>:
-                                    <label><format:date obj="${shipmentInstance?.expectedShippingDate}"/></label>
+                                    <label>
+                                        <g:formatDate
+                                                formatName="${DateFormatName.ABBREVIATED_MONTH.property}"
+                                                date="${shipmentInstance?.expectedShippingDate}"
+                                        />
+                                    </label>
                                 </span>
                             </g:if>
                         </g:if>
                         <g:else>
                             <span class="actualShippingDate">
                                 <warehouse:message code="shipping.actualShippingDate.label"/>:
-                                <label><format:date obj="${shipmentInstance?.actualShippingDate}"/></label>
+                                <label>
+                                    <g:formatDate
+                                        formatName="${DateFormatName.ABBREVIATED_MONTH.property}"
+                                        date="${shipmentInstance?.actualShippingDate}"
+                                    />
+                                </label>
                             </span>
                         </g:else>
                         <g:if test="${!shipmentInstance?.wasReceived() }">
@@ -113,7 +129,10 @@
                                 <span class="expectedDeliveryDate">
                                     <warehouse:message code="shipping.expectedDeliveryDate.label"/>:
                                     <label>
-                                        <format:date obj="${shipmentInstance?.expectedDeliveryDate}"/>
+                                        <g:formatDate
+                                                formatName="${DateFormatName.ABBREVIATED_MONTH.property}"
+                                                date="${shipmentInstance?.expectedDeliveryDate}"
+                                        />
                                     </label>
                                 </span>
                             </g:if>
@@ -121,7 +140,12 @@
                         <g:else>
                             <span class="actualDeliveryDate">
                                 <warehouse:message code="shipping.actualDeliveryDate.label"/>
-                                <label><format:date obj="${shipmentInstance?.actualDeliveryDate}"/></label>
+                                <label>
+                                    <g:formatDate
+                                            formatName="${DateFormatName.ABBREVIATED_MONTH.property}"
+                                            date="${shipmentInstance?.actualDeliveryDate}"
+                                    />
+                                </label>
                             </span>
                         </g:else>
                         <g:if test="${stockMovement.lastUpdated}">
