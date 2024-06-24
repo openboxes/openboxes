@@ -7,7 +7,7 @@ const splitTranslation = (data, locale) => {
   return locale === 'fr' && fr ? fr : en;
 };
 
-export const getDateFormat = (localize, formatName) =>
+export const getDateFormat = (localize) => (formatName) =>
   getTranslate(localize)(formatName);
 
 export const getLocaleCode = (localize) =>

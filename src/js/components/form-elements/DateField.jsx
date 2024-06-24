@@ -32,7 +32,8 @@ class DateField extends Component {
 
   renderInput({
     value, dateFormat = 'MM/DD/YYYY', timeFormat = 'HH:mm', className = '',
-    arrowLeft, arrowUp, arrowRight, arrowDown, fieldRef, onTabPress, localizeDate, ...attributes
+    arrowLeft, arrowUp, arrowRight, arrowDown, fieldRef, onTabPress, localizeDate,
+    localizedDateFormat = DateFormatName.FULL_DATE, ...attributes
   }) {
     const onChange = (date) => {
       const val = !date || typeof date === 'string' ? date : date.format(dateFormat);
@@ -45,7 +46,7 @@ class DateField extends Component {
 
     const getPlaceholder = () => {
       if (localizeDate || !attributes.placeholder) {
-        return this.props.dateFormat;
+        return this.props.dateFormat(localizedDateFormat);
       }
 
       return attributes.placeholder;
@@ -53,7 +54,7 @@ class DateField extends Component {
 
     const getFormat = () => {
       if (localizeDate) {
-        return this.props.dateFormat;
+        return this.props.dateFormat(localizedDateFormat);
       }
 
       return dateFormat;
@@ -158,7 +159,7 @@ class DateField extends Component {
 
 const mapStateToProps = (state) => ({
   formatDate: formatDate(state.localize),
-  dateFormat: getDateFormat(state.localize, DateFormatName.CUSTOM),
+  dateFormat: getDateFormat(state.localize),
   localeCode: getLocaleCode(state.localize),
 });
 
