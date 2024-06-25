@@ -138,6 +138,7 @@ const VENDOR_FIELDS = {
         flexWidth: '1.5',
         attributes: {
           localizeDate: true,
+          showLocalizedPlaceholder: true,
           autoComplete: 'off',
         },
         getDynamicAttr: ({ rowIndex, values, updateRow }) => ({
