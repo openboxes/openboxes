@@ -12,6 +12,7 @@ import Alert from 'react-s-alert';
 
 import { fetchReasonCodes, hideSpinner, showSpinner } from 'actions';
 import picklistApi from 'api/services/PicklistApi';
+import stockMovementItemApi from 'api/services/StockMovementItemApi';
 import {
   STOCK_MOVEMENT_BY_ID, STOCK_MOVEMENT_CREATE_PICKLIST, STOCK_MOVEMENT_ITEM_BY_ID,
   STOCK_MOVEMENT_ITEMS,
@@ -36,7 +37,6 @@ import { formatProductDisplayName, matchesProductCodeOrName } from 'utils/form-v
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
-import stockMovementItemApi from 'api/services/StockMovementItemApi';
 
 const FIELDS = {
   pickPageItems: {
@@ -730,6 +730,51 @@ class PickPage extends Component {
     });
   }
 
+  confirmClearPicklist() {
+    confirmAlert({
+      title: this.props.translate('react.stockMovement.confirmAlert.clearPick.title.label', 'Confirm clear pick'),
+      message: this.props.translate(
+        'react.stockMovement.confirmAlert.clearPick.label',
+        'Clear pick will make all the pick lines on this page empty. You will have to enter the pick information manually. You should use this option when you have already picked or sent the items physically. Are you sure you want to proceed?',
+      ),
+      buttons: [
+        {
+          label: this.props.translate('react.default.yes.label', 'Yes'),
+          onClick: () => {
+            this.clearPicklist();
+          },
+        },
+        {
+          label: this.props.translate('react.default.no.label', 'No'),
+        },
+      ],
+    });
+  }
+
+  confirmPreviousPage(values, emptyPicksCount) {
+    confirmAlert({
+      title: this.props.translate('react.default.areYouSure.label', 'Are you sure?'),
+      message: this.props.translate(
+        'react.stockMovement.confirmAlert.pickPage.previousPage.label',
+        `You have ${emptyPicksCount} line/lines with an empty pick. If you go back, autopick will be generated for all empty lines. All other edits will remain saved. Are you sure you want to proceed?`,
+        {
+          emptyPicksCount,
+        },
+      ),
+      buttons: [
+        {
+          label: this.props.translate('react.default.yes.label', 'Yes'),
+          onClick: () => {
+            this.props.previousPage(values);
+          },
+        },
+        {
+          label: this.props.translate('react.default.no.label', 'No'),
+        },
+      ],
+    });
+  }
+
   async clearPicklist() {
     const { picklist } = this.state.values;
     if (this.state.showAlert) {
@@ -906,7 +951,7 @@ class PickPage extends Component {
                   </a>
                   <button
                     type="button"
-                    onClick={() => this.clearPicklist()}
+                    onClick={() => this.confirmClearPicklist()}
                     className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs ml-1"
                   >
                     <span>
@@ -925,8 +970,8 @@ class PickPage extends Component {
                     <span>
                       <i className="fa fa-refresh pr-2" />
                       <Translate
-                        id="react.stockMovement.button.reloadAutopick.label"
-                        defaultMessage="Reload Autopick"
+                        id="react.stockMovement.button.redoAutopick.label"
+                        defaultMessage="Redo Autopick"
                       />
                     </span>
                   </button>
@@ -1007,7 +1052,14 @@ class PickPage extends Component {
                 }))}
               </div>
               <div className="d-print-none submit-buttons">
-                <button type="button" disabled={showOnly} className="btn btn-outline-primary btn-form btn-xs" onClick={() => this.props.previousPage(values)}>
+                <button
+                  type="button"
+                  disabled={showOnly}
+                  className="btn btn-outline-primary btn-form btn-xs"
+                  onClick={() => (emptyPicksCount
+                    ? this.confirmPreviousPage(values, emptyPicksCount)
+                    : this.props.previousPage(values))}
+                >
                   <Translate id="react.default.button.previous.label" defaultMessage="Previous" />
                 </button>
                 <button type="submit" disabled={showOnly} className="btn btn-outline-primary btn-form float-right btn-xs">
