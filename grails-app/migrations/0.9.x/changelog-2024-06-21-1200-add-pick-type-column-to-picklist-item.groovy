@@ -1,6 +1,6 @@
 databaseChangeLog = {
 
-    changeSet(author: "anadolny", id: "210620241200-0", objectQuotingStrategy: "LEGACY") {
+    changeSet(author: "drodzewicz", id: "210620241200-0", objectQuotingStrategy: "LEGACY") {
         preConditions(onError: "HALT", onFail: "MARK_RAN", onSqlOutput: "IGNORE") {
             not {
                 columnExists(columnName: "pick_type", tableName: "picklist_item")

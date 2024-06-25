@@ -11,6 +11,7 @@ enum PickType {
         this.name = name
     }
 
+    @Override
     String toString() {
         return name()
     }
