@@ -22,6 +22,10 @@ class PaginationCommand implements Validateable {
         return Math.max(offset ?: 0, 0)
     }
 
+    Integer getOriginalMax() {
+        return max
+    }
+
     Map<String, Integer> getPaginationParams() {
         return [
             max: getMax(),
