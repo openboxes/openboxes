@@ -1898,15 +1898,14 @@ class StockMovementService {
         return []
     }
 
-    void updatePicklistItem(StockMovementItem stockMovementItem, List picklistItems, String reasonCode) {
+    void updatePicklistItem(StockMovementItem stockMovementItem, List picklistItemsParams, String reasonCode) {
         RequisitionItem requisitionItem = RequisitionItem.get(stockMovementItem.id)
+        Boolean hasExistingPicklist = requisitionItem.picklistItems
 
-        clearPicklist(requisitionItem)
+        List<Map<String, Object>> picklistItems = picklistItemsParams.collect { picklistItemMap ->
 
-        picklistItems.each { picklistItemMap ->
-
-            PicklistItem picklistItem = picklistItemMap.id ?
-                    PicklistItem.get(picklistItemMap.id) : null
+            BigDecimal quantityPicked = (picklistItemMap.quantityPicked != null && picklistItemMap.quantityPicked != "") ?
+                    new BigDecimal(picklistItemMap.quantityPicked) : null
 
             InventoryItem inventoryItem = picklistItemMap.inventoryItem?.id ?
                     InventoryItem.get(picklistItemMap.inventoryItem?.id) : null
@@ -1914,13 +1913,33 @@ class StockMovementService {
             Location binLocation = picklistItemMap.binLocation?.id ?
                     Location.get(picklistItemMap.binLocation?.id) : null
 
-            BigDecimal quantityPicked = (picklistItemMap.quantityPicked != null && picklistItemMap.quantityPicked != "") ?
-                    new BigDecimal(picklistItemMap.quantityPicked) : null
+            // When editing a picklistItem we want to retain the initial pick type
+            // Otherwise if we have cleared the pick and manually picking it we set it to MANUAL
+            PickType pickType = hasExistingPicklist ? requisitionItem.pickType() : PickType.MANUAL
 
-            String comment = picklistItemMap.comment
+            return [
+                    inventoryItem   : inventoryItem,
+                    binLocation     : binLocation,
+                    quantityPicked  : quantityPicked?.intValueExact(),
+                    pickType        : pickType,
+                    comment         : picklistItemMap.comment,
 
-            createOrUpdatePicklistItem(requisitionItem, picklistItem, inventoryItem, binLocation,
-                    quantityPicked?.intValueExact(), reasonCode, PickType.MANUAL, comment)
+            ]
+        }
+
+        clearPicklist(requisitionItem)
+
+        picklistItems.each { it ->
+            createOrUpdatePicklistItem(
+                    requisitionItem,
+                    null,
+                    it.inventoryItem as InventoryItem,
+                    it.binLocation as Location,
+                    it.quantityPicked as Integer,
+                    reasonCode,
+                    it.pickType as PickType,
+                    it.comment as String
+            )
         }
     }
 

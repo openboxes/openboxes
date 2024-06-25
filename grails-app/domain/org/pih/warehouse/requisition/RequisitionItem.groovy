@@ -12,13 +12,11 @@ package org.pih.warehouse.requisition
 import grails.validation.ValidationException
 import org.pih.warehouse.api.StockMovementItem
 import org.pih.warehouse.auth.AuthService
-import org.pih.warehouse.core.Person
+import org.pih.warehouse.core.PickType
 import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.Inventory
-import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Category
-import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductGroup
 import org.pih.warehouse.product.ProductPackage
 import org.pih.warehouse.core.Person
@@ -173,6 +171,15 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
                 recipient: stockMovementItem.recipient,
                 orderIndex: stockMovementItem.sortOrder
         )
+    }
+
+    /**
+     * All picklistItems should have the same pickType in the context of RequisitionItem
+     * @return {PickType} of picklistItems belonging to requisitionItem
+     */
+    PickType pickType() {
+        // return a first value on potentially empty list of picklistItems
+        return picklistItems.find { true }?.pickType
     }
 
     /**
