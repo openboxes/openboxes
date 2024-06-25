@@ -415,6 +415,7 @@ class Shipment implements Comparable, Serializable {
     User getShippedBy() {
         Event shippedEvent = events?.find { it.eventType?.eventCode == EventCode.SHIPPED }
         if (shippedEvent) {
+            // For the e-requests we want to have the fallback to the user, who last updated the shipment
             if (requisition?.electronicType) {
                 return shippedEvent.createdBy ?: updatedBy
             }
