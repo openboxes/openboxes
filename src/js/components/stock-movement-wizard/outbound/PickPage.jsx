@@ -696,6 +696,9 @@ class PickPage extends Component {
     const url = `/api/stockMovements/createPickList/${this.state.values.stockMovementId}`;
     this.props.showSpinner();
 
+    if (this.state.showAlert) {
+      this.setState({ alertMessage: null, showAlert: false });
+    }
     apiClient.get(url)
       .then(() => this.fetchAllData(true))
       .finally(() => {
