@@ -417,7 +417,7 @@ class Shipment implements Comparable, Serializable {
         if (shippedEvent) {
             // For the e-requests we want to have the fallback to the user, who last updated the shipment
             if (requisition?.electronicType) {
-                return shippedEvent.createdBy ?: updatedBy
+                return shippedEvent.createdBy ?: requisition.updatedBy
             }
             // The fallback for createdBy is done, because there was a bug at Event level,
             // which didn't persist the event.createdBy, so for SMs from the past, we might not have the shippedEvent.createdBy
