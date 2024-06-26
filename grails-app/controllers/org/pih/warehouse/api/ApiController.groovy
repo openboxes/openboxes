@@ -209,6 +209,7 @@ class ApiController {
                 timezone             : timezone,
                 minimumExpirationDate: minimumExpirationDate,
                 activeLanguage       : currentLocale.toString(),
+                activeLanguageTag    : currentLocale.toLanguageTag(),
                 isPaginated          : isPaginated,
                 logoLabel            : logoLabel,
                 menuItems            : menuItems,
