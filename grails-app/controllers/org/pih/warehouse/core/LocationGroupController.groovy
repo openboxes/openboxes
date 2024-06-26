@@ -22,7 +22,8 @@ class LocationGroupController {
 
     def list() {
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
-        [locationGroupInstanceList: LocationGroup.list(params), locationGroupInstanceTotal: LocationGroup.count()]
+        List<LocationGroup> locationGroups = LocationGroup.list(params).sort { it.dateCreated }
+        [locationGroupInstanceList: locationGroups, locationGroupInstanceTotal: LocationGroup.count()]
     }
 
     def create() {
