@@ -413,6 +413,10 @@ class Requisition implements Comparable<Requisition>, Serializable {
         return false
     }
 
+    boolean isElectronicType() {
+        return sourceType == RequisitionSourceType.ELECTRONIC
+    }
+
     Map toJson() {
         [
                 id                   : id,
