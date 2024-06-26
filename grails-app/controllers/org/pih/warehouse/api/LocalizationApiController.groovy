@@ -21,7 +21,7 @@ class LocalizationApiController {
     GrailsApplication grailsApplication
 
     def list() {
-        String languageCode = params.lang
+        String languageCode = params.languageCode
         String prefix = params.prefix
 
         String[] supportedLocales = grailsApplication.config.openboxes.locale.supportedLocales

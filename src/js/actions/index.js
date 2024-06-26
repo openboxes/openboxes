@@ -197,9 +197,9 @@ export function changeCurrentLocation(location) {
   };
 }
 
-export function fetchTranslations(lang, prefix) {
+export function fetchTranslations(languageCode, prefix) {
   return (dispatch) => {
-    const url = `/api/localizations?lang=${lang ||
+    const url = `/api/localizations?languageCode=${languageCode ||
       ''}&prefix=react.${prefix || ''}`;
 
     apiClient.get(url).then((response) => {
