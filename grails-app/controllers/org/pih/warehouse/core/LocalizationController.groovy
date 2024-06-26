@@ -156,7 +156,7 @@ class LocalizationController {
     def export() {
         log.info("Locale: " + session.user.locale)
         Locale locale = params.locale ? LocalizationUtil.getLocale(params.locale) : session.user.locale
-        def filename = locale.language == 'en' ? "messages.properties" : "messages_${locale.language}.properties"
+        def filename = locale.language == 'en' ? "messages.properties" : "messages_${locale.toString()}.properties"
         def localizationInstanceList = Localization.findAllByLocale(locale.language)
         response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
         response.contentType = 'text/plain'
