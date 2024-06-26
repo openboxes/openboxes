@@ -16,6 +16,7 @@ import org.apache.commons.lang.NotImplementedException
 import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.pih.warehouse.MessageTagLib
 import org.pih.warehouse.auth.AuthService
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.GlAccount
 import org.pih.warehouse.core.Location
@@ -452,6 +453,43 @@ class Product implements Comparable, Serializable {
             return InventoryLevel.findByProductAndInventory(this, location.inventory)
         }
     }
+
+    InventoryItem getDefaultInventoryItem() {
+        return getInventoryItem(Constants.DEFAULT_LOT_NUMBER)
+    }
+
+
+    InventoryItem getInventoryItem(String lotNumber) {
+        return getInventoryItem(lotNumber, null)
+    }
+
+    // FIXME we could also just traverse the inventoryItems association rather than making an extra query
+    // FIXME but i wanted to move towards a detached criteria / named query fetch
+    // FIXME the expiration date should be involved here, but we don't require it in other places
+    //  so i'll leave that for as a problem for future me
+    InventoryItem getInventoryItem(String lotNumber, Date expirationDate) {
+
+        // Treat the default lot number (DEFAULT) as null
+        if (Constants.DEFAULT_LOT_NUMBER.equalsIgnoreCase(lotNumber)) {
+            lotNumber = null
+        }
+
+        // Find an inventory that matches the provided lot number
+        return InventoryItem.createCriteria().get {
+            and {
+                eq("product", this)
+                if (lotNumber) {
+                    eq("lotNumber", lotNumber)
+                } else {
+                    or {
+                        isNull("lotNumber")
+                        eq("lotNumber", "")
+                    }
+                }
+            }
+        } as InventoryItem
+    }
+
 
     /**
      * Get ABC classification for this product at the given location.

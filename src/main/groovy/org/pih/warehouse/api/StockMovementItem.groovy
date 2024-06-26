@@ -2,6 +2,7 @@ package org.pih.warehouse.api
 
 import grails.util.Holders
 import org.apache.commons.lang.math.NumberUtils
+import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
@@ -323,6 +324,10 @@ class AvailableItem {
         quantityAvailable(nullable: true)
     }
 
+    String getBinLocationName() {
+        binLocation?.name?:Constants.DEFAULT_BIN_LOCATION_NAME
+    }
+
     AvailableItemStatus getStatus() {
         if (recalled) {
             return AvailableItemStatus.RECALLED
@@ -353,6 +358,34 @@ class AvailableItem {
 
     Boolean isRecalled() {
         return inventoryItem?.recalled
+    }
+
+    Boolean getIsDefaultInventoryItem() {
+        return inventoryItem?.isDefault
+    }
+
+    Boolean getIsDefaultLocation() {
+        return binLocation == null
+    }
+
+    // TODO Need to test this thoroughly to make sure it works as expected
+    Boolean getIsPhysicalLocation() {
+        return !isVirtualLocation && !isOnHold()
+    }
+
+    /**
+     * Virtual locations are the default or receiving locations.
+     *
+     * @return
+     */
+    Boolean getIsVirtualLocation() {
+        return isDefaultLocation || isReceivingLocation
+    }
+
+    // TODO This may not actually be the correct logic, but it's all we have for now. The
+    //  side effect of this is that it may return true in cases that we don't want it to.
+    Boolean getIsReceivingLocation() {
+        return binLocation?.supports(ActivityCode.RECEIVE_STOCK)
     }
 
     Boolean isAvailable() {
@@ -636,15 +669,57 @@ class PickPageItem {
         return picklistItems ? picklistItems?.sum { it.quantity } : 0
     }
 
+    // TODO Document the reason why the default value is null instead of 0? See OBPIH-912.
     Integer getQuantityAvailable() {
         return availableItems ? availableItems?.sum { it.quantityAvailable } : null
     }
 
-    AvailableItem getAvailableItem(String binLocationName, String lotNumber) {
-        return availableItems?.find { item ->
-            Boolean binLocationMatches = binLocationName ? item.binLocation?.name == binLocationName : !item.binLocation
-            Boolean lotMatches = lotNumber ? item.inventoryItem?.lotNumber == lotNumber : !item.inventoryItem?.lotNumber
-            binLocationMatches && lotMatches
+    /**
+     * @deprecated Not the correct way to find available items.
+     * @param binLocationName
+     * @param lotNumber
+     * @return
+     */
+    // TODO Remove this method if we decide that it's no longer required. There's logic here
+    //  that I don't fully understand so I want to make sure the alternate solution takes what I
+    //  assume is the "default" bin and lot number logic into account.
+    //  i.e. (!item.binLocation and !item.inventoryItem?.lotNumber)
+//    AvailableItem getAvailableItem(String binLocationName, String lotNumber) {
+//        return availableItems?.find { item ->
+//            Boolean binLocationMatches = binLocationName ? item.binLocation?.name == binLocationName : !item.binLocation
+//            Boolean lotMatches = lotNumber ? item.inventoryItem?.lotNumber == lotNumber : !item.inventoryItem?.lotNumber
+//            binLocationMatches && lotMatches
+//        }
+//    }
+
+    /**
+     * Get all available items for the given inventory item.
+     * @param inventoryItem
+     * @return
+     */
+    List<AvailableItem> getAvailableItems(InventoryItem inventoryItem) {
+        return availableItems.findAll { availableItem ->
+            availableItem.inventoryItem == inventoryItem
+        }
+    }
+
+    List<AvailableItem> getAvailableItemsInDefaultLocation(InventoryItem inventoryItem) {
+        return availableItems.findAll { availableItem ->
+            availableItem.inventoryItem == inventoryItem && availableItem.binLocation == null
+        }
+    }
+
+    /**
+     * Get all available items for the given inventory item and internal location.
+     * @param inventoryItem
+     * @param internalLocation
+     * @return
+     */
+    AvailableItem getAvailableItem(InventoryItem inventoryItem, Location internalLocation) {
+        // Return only exact matches on inventory item and internal location
+        return availableItems?.find { availableItem ->
+            availableItem.inventoryItem == inventoryItem &&
+                    availableItem.binLocation == internalLocation
         }
     }
 

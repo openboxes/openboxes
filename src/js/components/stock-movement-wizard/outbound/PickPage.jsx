@@ -194,7 +194,7 @@ const FIELDS = {
         getDynamicAttr: ({
           fieldValue, revertUserPick, subfield, showOnly,
         }) => ({
-          onClick: _.get(fieldValue, 'requisitionItem.id') ? () => revertUserPick(fieldValue?.requisitionItem?.id, fieldValue?.quantityPicked) : () => null,
+          onClick: _.get(fieldValue, 'requisitionItem.id') ? () => revertUserPick(fieldValue?.requisitionItem?.id) : () => null,
           hidden: subfield,
           disabled: showOnly,
         }),
@@ -557,21 +557,16 @@ class PickPage extends Component {
    * @param {string} itemId
    * @public
    */
-  revertUserPick(itemId, quantityPicked) {
+  revertUserPick(itemId) {
     this.props.showSpinner();
     const { isPicklistCleared } = this.state;
 
-    // When the picklist is not cleared we always want to revert
-    // the line to the auto-picked value. When the picklist is cleared
-    // and the quantity is 0 then we want to revert it to the auto pick
-    // (it means that any picklist item does not exist for that line).
-    // In every other case, we want to remove the pick for a chosen line.
-    const isRevertingToAutoPick = !isPicklistCleared
-      || (isPicklistCleared && quantityPicked === 0);
+    if (isPicklistCleared) {
+      this.revertToClearedPick(itemId);
+      return;
+    }
 
-    isRevertingToAutoPick
-      ? this.revertToAutoPick(itemId)
-      : this.revertToClearedPick(itemId);
+    this.revertToAutoPick(itemId);
   }
 
   // Returns indexes of rows with quantity picked 0, and without subitems.
@@ -702,7 +697,10 @@ class PickPage extends Component {
 
     apiClient.get(url)
       .then(() => this.fetchAllData(true))
-      .catch(() => this.props.hideSpinner());
+      .finally(() => {
+        this.setState({ isPicklistCleared: false });
+        this.props.hideSpinner();
+      });
   }
 
   /**
