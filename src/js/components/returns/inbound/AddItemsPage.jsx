@@ -27,6 +27,7 @@ import { renderFormField } from 'utils/form-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
+import DateFormat from 'consts/dateFormat';
 
 const DELETE_BUTTON_FIELD = {
   type: ButtonField,
@@ -93,9 +94,10 @@ const FIELDS = {
         defaultMessage: 'Expiry',
         flexWidth: '1.5',
         attributes: {
-          dateFormat: 'MM/DD/YYYY',
+          localizeDate: true,
+          showLocalizedPlaceholder: true,
+          localizedDateFormat: DateFormat.COMMON,
           autoComplete: 'off',
-          placeholderText: 'MM/DD/YYYY',
         },
       },
       quantity: {
