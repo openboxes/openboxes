@@ -17,6 +17,7 @@ import ArrayField from 'components/form-elements/ArrayField';
 import LabelField from 'components/form-elements/LabelField';
 import TextField from 'components/form-elements/TextField';
 import ProductSelect from 'components/product-select/ProductSelect';
+import DateFormat from 'consts/dateFormat';
 import apiClient, { flattenRequest, parseResponse } from 'utils/apiClient';
 import Checkbox from 'utils/Checkbox';
 import { renderFormField } from 'utils/form-utils';
@@ -24,6 +25,7 @@ import { formatProductDisplayName } from 'utils/form-values-utils';
 import { debounceAvailableItemsFetch } from 'utils/option-utils';
 import Select from 'utils/Select';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
+import { formatDate, getDateFormat, getLocaleCode } from 'utils/translation-utils';
 
 import 'react-table/react-table.css';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -96,6 +98,9 @@ const FIELDS = {
         label: 'react.outboundReturns.expiry.label',
         defaultMessage: 'Expiry',
         flexWidth: '1',
+        getDynamicAttr: ({ formatLocalizedDate }) => ({
+          formatValue: (value) => formatLocalizedDate(value, DateFormat.COMMON),
+        }),
       },
       quantityOnHand: {
         type: LabelField,
@@ -492,10 +497,11 @@ class AddItemsPage extends Component {
                   popperClassName="force-on-top"
                   showYearDropdown
                   scrollableYearDropdown
-                  dateFormat="MM/DD/YYYY"
+                  dateFormat={this.props.dateFormat(DateFormat.COMMON)}
                   yearDropdownItemNumber={3}
                   utcOffset={0}
                   placeholderText={this.props.translate('react.outboundReturns.selectExpirationDate.label', 'Select expiration date...')}
+                  locale={this.props.localeCode}
                 />
               </div>
               &nbsp;
@@ -516,6 +522,7 @@ class AddItemsPage extends Component {
                   translate: this.props.translate,
                   selectRow: this.selectRow,
                   updateRow: this.updateRow,
+                  formatLocalizedDate: this.props.formatLocalizedDate,
                   values,
                 }))}
               </div>
@@ -548,6 +555,9 @@ const mapStateToProps = state => ({
   minSearchLength: state.session.searchConfig.minSearchLength,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
   outboundReturnsTranslationsFetched: state.session.fetchedTranslations.outboundReturns,
+  formatLocalizedDate: formatDate(state.localize),
+  localeCode: getLocaleCode(state.localize),
+  dateFormat: getDateFormat(state.localize),
 });
 
 export default (connect(mapStateToProps, {
@@ -569,4 +579,7 @@ AddItemsPage.propTypes = {
       outboundReturnId: PropTypes.string,
     }),
   }).isRequired,
+  formatLocalizedDate: PropTypes.func.isRequired,
+  localeCode: PropTypes.string.isRequired,
+  dateFormat: PropTypes.string.isRequired,
 };
