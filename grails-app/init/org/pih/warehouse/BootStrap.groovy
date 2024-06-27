@@ -306,8 +306,6 @@ class BootStrap {
                 "binLocation.zoneName"  : picklistItem?.binLocation?.zone?.name,
                 quantityPicked          : picklistItem.quantity,
                 reasonCode              : picklistItem.reasonCode,
-                pickType                : picklistItem.pickType?.name,
-                autoPicked              : picklistItem.autoPicked,
                 comment                 : picklistItem.comment
             ]
         }

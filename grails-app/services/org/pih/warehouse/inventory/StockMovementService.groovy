@@ -42,7 +42,7 @@ import org.pih.warehouse.core.IdentifierService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationService
 import org.pih.warehouse.core.LocationTypeCode
-import org.pih.warehouse.core.PickType
+
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.StockMovementItemParamsCommand
 import org.pih.warehouse.core.StockMovementItemsParamsCommand
@@ -83,8 +83,6 @@ import org.pih.warehouse.shipping.ShipmentStatusCode
 import org.pih.warehouse.shipping.ShipmentType
 import org.pih.warehouse.shipping.ShipmentWorkflow
 import org.pih.warehouse.PaginatedList
-import org.springframework.validation.BeanPropertyBindingResult
-import org.springframework.validation.Errors
 import org.springframework.web.multipart.MultipartFile
 
 
@@ -1796,15 +1794,15 @@ class StockMovementService {
 
     void createOrUpdatePicklistItem(StockMovementItem stockMovementItem, PicklistItem picklistItem,
                                     InventoryItem inventoryItem, Location binLocation,
-                                    Integer quantity, String reasonCode, PickType pickType, String comment) {
+                                    Integer quantity, String reasonCode, String comment) {
 
         RequisitionItem requisitionItem = RequisitionItem.get(stockMovementItem.id)
-        createOrUpdatePicklistItem(requisitionItem, picklistItem, inventoryItem, binLocation, quantity, reasonCode, pickType, comment)
+        createOrUpdatePicklistItem(requisitionItem, picklistItem, inventoryItem, binLocation, quantity, reasonCode, comment)
     }
 
     void createOrUpdatePicklistItem(RequisitionItem requisitionItem, PicklistItem picklistItem,
                                     InventoryItem inventoryItem, Location binLocation,
-                                    Integer quantity, String reasonCode, PickType pickType, String comment) {
+                                    Integer quantity, String reasonCode, String comment) {
 
         Requisition requisition = requisitionItem.requisition
 
@@ -1842,7 +1840,6 @@ class StockMovementService {
             picklistItem.binLocation = binLocation
             picklistItem.quantity = quantity
             picklistItem.reasonCode = reasonCode
-            picklistItem.pickType = pickType
             picklistItem.comment = comment
             picklistItem.sortOrder = requisitionItem.orderIndex
             picklistItem.disableRefresh = Boolean.TRUE
@@ -1915,13 +1912,11 @@ class StockMovementService {
 
             // When editing a picklistItem we want to retain the initial pick type
             // Otherwise if we have cleared the pick and manually picking it we set it to MANUAL
-            PickType pickType = hasExistingPicklist ? requisitionItem.pickType() : PickType.MANUAL
 
             return [
                     inventoryItem   : inventoryItem,
                     binLocation     : binLocation,
                     quantityPicked  : quantityPicked?.intValueExact(),
-                    pickType        : pickType,
                     comment         : picklistItemMap.comment,
 
             ]
@@ -1937,7 +1932,6 @@ class StockMovementService {
                     it.binLocation as Location,
                     it.quantityPicked as Integer,
                     reasonCode,
-                    it.pickType as PickType,
                     it.comment as String
             )
         }

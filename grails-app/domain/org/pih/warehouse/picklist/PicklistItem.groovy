@@ -12,7 +12,7 @@ package org.pih.warehouse.picklist
 import grails.util.Holders
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
-import org.pih.warehouse.core.PickType
+
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.RefreshProductAvailabilityEvent
 import org.pih.warehouse.order.OrderItem
@@ -52,8 +52,6 @@ class PicklistItem implements Serializable {
     String reasonCode
     String comment
 
-    PickType pickType
-
     // Audit fields
     Date dateCreated
     Date lastUpdated
@@ -79,7 +77,6 @@ class PicklistItem implements Serializable {
         quantity(nullable: false)
         status(nullable: true)
         reasonCode(nullable: true)
-        pickType(nullable: true)
         comment(nullable: true)
         sortOrder(nullable: true)
     }
@@ -98,10 +95,6 @@ class PicklistItem implements Serializable {
 
     Boolean isPickable() {
         return (inventoryItem ? inventoryItem.pickable : true) && (binLocation ? binLocation.pickable : true)
-    }
-
-    Boolean isAutoPicked() {
-        return pickType == null || pickType == PickType.AUTO
     }
 
     Map toJson() {
