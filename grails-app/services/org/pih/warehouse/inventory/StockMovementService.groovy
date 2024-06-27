@@ -434,6 +434,14 @@ class StockMovementService {
         List<ShipmentType> shipmentTypes = params.list("shipmentType") ? params.list("shipmentType").collect{ ShipmentType.read(it) } : null
 
         PagedResultList shipments = Shipment.createCriteria().list(max: max, offset: offset) {
+            // OBPIH-6403: We want to hide SMs with requisition of status REJECTED from the inbound list
+            // The "or" is needed, because otherwise, SMs without requisition were also filtered out from the list (e.g. shipment from PO)
+            or {
+                requisition(JoinType.LEFT_OUTER_JOIN.joinTypeValue) {
+                    ne("status", RequisitionStatus.REJECTED)
+                }
+                isNull("requisition")
+            }
 
             if (criteria?.identifier || criteria.name || criteria?.description) {
                 or {
