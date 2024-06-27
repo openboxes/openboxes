@@ -1,9 +1,8 @@
 package org.pih.warehouse.core
 
 import grails.validation.Validateable
-import org.pih.warehouse.api.PaginationCommand
 
-class StockMovementItemsParamsCommand extends PaginationCommand implements Validateable {
+class StockMovementItemsParamsCommand extends PaginationParams implements Validateable {
 
     String id
 
@@ -15,5 +14,4 @@ class StockMovementItemsParamsCommand extends PaginationCommand implements Valid
         stepNumber nullable: true
         refreshPicklistItems nullable: true
     }
-
 }
