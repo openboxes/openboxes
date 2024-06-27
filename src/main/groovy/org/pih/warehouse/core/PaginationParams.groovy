@@ -8,14 +8,6 @@ abstract class PaginationParams implements Validateable {
 
     Integer offset
 
-    Integer getMax() {
-        return max
-    }
-
-    Integer getOffset() {
-        return offset
-    }
-
     static constraints = {
         offset min: 0, nullable: true
         max min: 0, nullable: true
