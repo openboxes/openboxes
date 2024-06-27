@@ -432,15 +432,18 @@ class StockMovementService {
         Date createdAfter = params.createdAfter ? Date.parse("MM/dd/yyyy", params.createdAfter) : null
         Date createdBefore = params.createdBefore ? Date.parse("MM/dd/yyyy", params.createdBefore) : null
         List<ShipmentType> shipmentTypes = params.list("shipmentType") ? params.list("shipmentType").collect{ ShipmentType.read(it) } : null
+        Location currentLocation = AuthService.currentLocation
 
         PagedResultList shipments = Shipment.createCriteria().list(max: max, offset: offset) {
-            // OBPIH-6403: We want to hide SMs with requisition of status REJECTED from the inbound list
+            // OBPIH-6403: We want to hide SMs with requisition of status REJECTED from the inbound list (only for the depot-depot case!!)
             // The "or" is needed, because otherwise, SMs without requisition were also filtered out from the list (e.g. shipment from PO)
-            or {
-                requisition(JoinType.LEFT_OUTER_JOIN.joinTypeValue) {
-                    ne("status", RequisitionStatus.REJECTED)
+            if (!currentLocation?.downstreamConsumer) {
+                or {
+                    requisition(JoinType.LEFT_OUTER_JOIN.joinTypeValue) {
+                        ne("status", RequisitionStatus.REJECTED)
+                    }
+                    isNull("requisition")
                 }
-                isNull("requisition")
             }
 
             if (criteria?.identifier || criteria.name || criteria?.description) {
