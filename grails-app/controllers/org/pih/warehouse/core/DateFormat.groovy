@@ -9,7 +9,6 @@ package org.pih.warehouse.core
 // 2. LocalizationUtil.formatDate(your date, enum property)
 
 enum DateFormat {
-    DEFAULT('default.date.format'),
     COMMON('common.date.format'),
     EXPIRY('expiry.date.format'),
     FULL_MONTH('fullmonth.date.format'),

@@ -49,7 +49,7 @@ class DateField extends Component {
         return this.props.dateFormat(localizedDateFormat);
       }
 
-      return attributes.placeholder;
+      return attributes.placeholderText;
     };
 
     const getFormat = () => {
