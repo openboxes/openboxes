@@ -1,3 +1,4 @@
+<%@ page import="org.pih.warehouse.core.DateFormat" %>
 <%@ page import="org.pih.warehouse.requisition.RequisitionStatus" %>
 <%@ page import="org.pih.warehouse.core.Role" %>
 <%@ page import="org.pih.warehouse.shipping.ShipmentStatusCode" %>
@@ -422,7 +423,10 @@
                             <td class="value">
                                 <g:if test="${stockMovement?.dateRequested}">
                                     <span title="${g.formatDate(date:stockMovement?.dateRequested)}">
-                                        <g:formatDate format="MMMM dd, yyyy" date="${stockMovement.dateRequested}"/>
+                                        <g:formatDate
+                                                formatName="${DateFormat.FULL_MONTH.property}"
+                                                date="${stockMovement.dateRequested}"
+                                        />
                                     </span>
                                     <g:if test="${stockMovement?.requestedBy}">
                                         <warehouse:message code="default.by.label"/>
@@ -464,8 +468,11 @@
                             </td>
                             <td class="value">
                                 <g:if test="${stockMovement?.shipment?.hasShipped()}">
-                                    <span title="${g.formatDate(date:stockMovement?.dateShipped)}">
-                                        <g:formatDate format="MMMM dd, yyyy" date="${stockMovement?.dateShipped}"/>
+                                    <span title="${g.formatDate(date: stockMovement?.dateShipped, formatName: DateFormat.FULL_MONTH.property)}">
+                                        <g:formatDate
+                                                formatName="${DateFormat.FULL_MONTH.property}"
+                                                date="${stockMovement?.dateShipped}"
+                                        />
                                     </span>
                                     <g:if test="${stockMovement?.shipment?.shippedBy}">
                                         <warehouse:message code="default.by.label"/>
@@ -484,8 +491,11 @@
                             <td class="value">
                                 <g:if test="${stockMovement?.shipment?.receipts}">
                                     <g:each var="receipt" in="${stockMovement?.shipment?.receipts}">
-                                        <span title="${g.formatDate(date:receipt?.actualDeliveryDate)}">
-                                            <g:formatDate format="MMMM dd, yyyy" date="${receipt?.actualDeliveryDate}"/>
+                                        <span title="${g.formatDate(date: receipt?.actualDeliveryDate, formatName: DateFormat.FULL_MONTH.property)}">
+                                            <g:formatDate
+                                                    formatName="${DateFormat.FULL_MONTH.property}"
+                                                    date="${receipt?.actualDeliveryDate}"
+                                            />
                                         </span>
                                         <g:if test="${receipt.recipient}">
                                             <warehouse:message code="default.by.label"/>
@@ -505,8 +515,11 @@
                             </td>
                             <td class="value">
                                 <g:if test="${stockMovement?.dateCreated}">
-                                    <span title="${g.formatDate(date:stockMovement?.dateCreated)}">
-                                        <g:formatDate format="MMMM dd, yyyy" date="${stockMovement?.dateCreated}"/>
+                                    <span title="${g.formatDate(date: stockMovement?.dateCreated, formatName: DateFormat.FULL_MONTH.property)}">
+                                        <g:formatDate
+                                                formatName="${DateFormat.FULL_MONTH.property}"
+                                                date="${stockMovement?.dateCreated}"
+                                        />
                                     </span>
                                     <g:if test="${stockMovement?.createdBy}">
                                         <warehouse:message code="default.by.label"/>
@@ -524,8 +537,11 @@
                             </td>
                             <td class="value">
                                 <g:if test="${stockMovement?.lastUpdated}">
-                                    <span title="${g.formatDate(date:stockMovement?.lastUpdated)}">
-                                        <g:formatDate format="MMMM dd, yyyy" date="${stockMovement?.lastUpdated}"/>
+                                    <span title="${g.formatDate(date: stockMovement?.lastUpdated, formatName: DateFormat.FULL_MONTH.property)}">
+                                        <g:formatDate
+                                                formatName="${DateFormat.FULL_MONTH.property}"
+                                                date="${stockMovement?.lastUpdated}"
+                                        />
                                     </span>
                                     <g:if test="${stockMovement?.updatedBy}">
                                         <warehouse:message code="default.by.label"/>
