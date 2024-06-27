@@ -627,6 +627,7 @@ class PickPageItem {
                 productId           : requisitionItem?.product?.id,
                 product             : requisitionItem?.product,
                 reasonCode          : requisitionItem?.cancelReasonCode,
+                autoAllocated       : requisitionItem?.autoAllocated,
                 comments            : requisitionItem?.cancelComments,
                 quantityRequested   : requisitionItem.quantity,
                 quantityRequired    : quantityRequired,
