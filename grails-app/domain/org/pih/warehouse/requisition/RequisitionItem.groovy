@@ -68,6 +68,8 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
     String comment
     Integer orderIndex = 0
 
+    Boolean autoAllocated
+
     // Used only with supplier stock movements
     String palletName
     String boxName
@@ -158,6 +160,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         pickReasonCode(nullable: true)
         substitutionItem(nullable: true)
         modificationItem(nullable: true)
+        autoAllocated(nullable: true)
     }
 
     static RequisitionItem createFromStockMovementItem(StockMovementItem stockMovementItem) {

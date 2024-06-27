@@ -1575,8 +1575,8 @@ class StockMovementService {
                             availableItem.binLocation,
                             params.quantity,
                             null,
-                            PickType.IMPORT,
-                            null
+                            null,
+                            false,
                     )
 
                 }
@@ -1776,8 +1776,9 @@ class StockMovementService {
                             suggestedItem.binLocation,
                             suggestedItem.quantityPicked.intValueExact(),
                             null,
-                            PickType.AUTO,
-                            null)
+                            null,
+                            true
+                    )
                 }
             }
             if (validateQtyAvailable && !suggestedItems) {
@@ -1802,7 +1803,7 @@ class StockMovementService {
 
     void createOrUpdatePicklistItem(RequisitionItem requisitionItem, PicklistItem picklistItem,
                                     InventoryItem inventoryItem, Location binLocation,
-                                    Integer quantity, String reasonCode, String comment) {
+                                    Integer quantity, String reasonCode, String comment, Boolean isAutoAllocated = true) {
 
         Requisition requisition = requisitionItem.requisition
 
@@ -1823,6 +1824,8 @@ class StockMovementService {
         if (reasonCode && requisitionItem.pickReasonCode != reasonCode) {
             requisitionItem.pickReasonCode = reasonCode
         }
+
+        requisitionItem.autoAllocated = isAutoAllocated
 
         // Remove from picklist
         if (quantity == null) {
@@ -1897,7 +1900,7 @@ class StockMovementService {
 
     void updatePicklistItem(StockMovementItem stockMovementItem, List picklistItemsParams, String reasonCode) {
         RequisitionItem requisitionItem = RequisitionItem.get(stockMovementItem.id)
-        Boolean hasExistingPicklist = requisitionItem.picklistItems
+        Boolean isAutoAllocated = requisitionItem.autoAllocated ?: false
 
         List<Map<String, Object>> picklistItems = picklistItemsParams.collect { picklistItemMap ->
 
@@ -1909,9 +1912,6 @@ class StockMovementService {
 
             Location binLocation = picklistItemMap.binLocation?.id ?
                     Location.get(picklistItemMap.binLocation?.id) : null
-
-            // When editing a picklistItem we want to retain the initial pick type
-            // Otherwise if we have cleared the pick and manually picking it we set it to MANUAL
 
             return [
                     inventoryItem   : inventoryItem,
@@ -1932,7 +1932,8 @@ class StockMovementService {
                     it.binLocation as Location,
                     it.quantityPicked as Integer,
                     reasonCode,
-                    it.comment as String
+                    it.comment as String,
+                    isAutoAllocated
             )
         }
     }
@@ -2093,7 +2094,9 @@ class StockMovementService {
                     suggestedItem.binLocation,
                     suggestedItem.quantityPicked?.intValueExact(),
                     null,
-                    null)
+                    null,
+                    true
+            )
         }
     }
 
