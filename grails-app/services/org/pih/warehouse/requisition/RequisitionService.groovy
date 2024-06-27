@@ -661,7 +661,7 @@ class RequisitionService {
                     eq("origin", origin)
                 }
                 not {
-                    'in'("status", [RequisitionStatus.ISSUED, RequisitionStatus.CANCELED])
+                    'in'("status", [RequisitionStatus.ISSUED, RequisitionStatus.CANCELED, RequisitionStatus.REJECTED])
                 }
             }
             eq("product", product)
