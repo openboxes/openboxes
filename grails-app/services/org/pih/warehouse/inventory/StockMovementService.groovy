@@ -42,7 +42,6 @@ import org.pih.warehouse.core.IdentifierService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationService
 import org.pih.warehouse.core.LocationTypeCode
-
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.StockMovementItemParamsCommand
 import org.pih.warehouse.core.StockMovementItemsParamsCommand
@@ -1898,14 +1897,16 @@ class StockMovementService {
         return []
     }
 
-    void updatePicklistItem(StockMovementItem stockMovementItem, List picklistItemsParams, String reasonCode) {
+    void updatePicklistItem(StockMovementItem stockMovementItem, List picklistItems, String reasonCode) {
         RequisitionItem requisitionItem = RequisitionItem.get(stockMovementItem.id)
         Boolean isAutoAllocated = requisitionItem.autoAllocated ?: false
 
-        List<Map<String, Object>> picklistItems = picklistItemsParams.collect { picklistItemMap ->
+        clearPicklist(requisitionItem)
 
-            BigDecimal quantityPicked = (picklistItemMap.quantityPicked != null && picklistItemMap.quantityPicked != "") ?
-                    new BigDecimal(picklistItemMap.quantityPicked) : null
+        picklistItems.each { picklistItemMap ->
+
+            PicklistItem picklistItem = picklistItemMap.id ?
+                    PicklistItem.get(picklistItemMap.id) : null
 
             InventoryItem inventoryItem = picklistItemMap.inventoryItem?.id ?
                     InventoryItem.get(picklistItemMap.inventoryItem?.id) : null
@@ -1913,28 +1914,13 @@ class StockMovementService {
             Location binLocation = picklistItemMap.binLocation?.id ?
                     Location.get(picklistItemMap.binLocation?.id) : null
 
-            return [
-                    inventoryItem   : inventoryItem,
-                    binLocation     : binLocation,
-                    quantityPicked  : quantityPicked?.intValueExact(),
-                    comment         : picklistItemMap.comment,
+            BigDecimal quantityPicked = (picklistItemMap.quantityPicked != null && picklistItemMap.quantityPicked != "") ?
+                    new BigDecimal(picklistItemMap.quantityPicked) : null
 
-            ]
-        }
+            String comment = picklistItemMap.comment
 
-        clearPicklist(requisitionItem)
-
-        picklistItems.each { it ->
-            createOrUpdatePicklistItem(
-                    requisitionItem,
-                    null,
-                    it.inventoryItem as InventoryItem,
-                    it.binLocation as Location,
-                    it.quantityPicked as Integer,
-                    reasonCode,
-                    it.comment as String,
-                    isAutoAllocated
-            )
+            createOrUpdatePicklistItem(requisitionItem, picklistItem, inventoryItem, binLocation,
+                    quantityPicked?.intValueExact(), reasonCode, comment, isAutoAllocated)
         }
     }
 

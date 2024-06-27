@@ -12,7 +12,6 @@ package org.pih.warehouse.requisition
 import grails.validation.ValidationException
 import org.pih.warehouse.api.StockMovementItem
 import org.pih.warehouse.auth.AuthService
-
 import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.picklist.PicklistItem
