@@ -321,8 +321,7 @@ class PickPage extends Component {
    * @public
    */
   checkForInitialPicksChanges(pickPageItem) {
-    const isAutoPicked = pickPageItem.picklistItems?.some(it => it?.autoPicked);
-    if (pickPageItem.picklistItems.length && isAutoPicked) {
+    if (pickPageItem.picklistItems.length && pickPageItem.autoAllocated) {
       const initialPicks = [];
       _.forEach(pickPageItem.suggestedItems, (suggestion) => {
         // search if suggested picks are inside picklist
