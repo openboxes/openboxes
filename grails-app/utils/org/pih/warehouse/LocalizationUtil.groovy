@@ -10,6 +10,8 @@
 package org.pih.warehouse
 
 import grails.util.Holders
+import org.grails.plugins.web.taglib.ApplicationTagLib
+import org.pih.warehouse.core.DateFormat
 import org.pih.warehouse.core.LocalizationService
 import org.pih.warehouse.inventory.Transaction
 import org.springframework.util.StringUtils
@@ -46,6 +48,10 @@ class LocalizationUtil {
         }
 
         return StringUtils.parseLocaleString(localeCode)
+    }
+
+    static ApplicationTagLib getApplicationTagLib() {
+        return Holders.grailsApplication.mainContext.getBean(ApplicationTagLib)
     }
 
     static List<Locale> getSupportedLocales() {
@@ -134,5 +140,17 @@ class LocalizationUtil {
      */
     static String getDefaultString(String str) {
         return getLocalizedString(str, null)
+    }
+
+    /**
+     * @param date
+     * @param formatName (property of DateFormatName enum, indicating the desired format of the date)
+     * @return return localized date in passed formatName (name of the property in i18n/*.properties file).
+     */
+    static String formatDate(Date date, DateFormat formatName = null) {
+        return applicationTagLib.formatDate(
+                date: date,
+                formatName: formatName?.property,
+        )
     }
 }
