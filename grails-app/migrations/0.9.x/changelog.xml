@@ -12,5 +12,4 @@
     <include file="0.9.x/changelog-2024-02-27-1630-add-tiered-pricing-to-product-supplier.groovy" />
     <include file="0.9.x/changelog-2024-04-29-1200-alter-table-picklist-item-add-quantity-picked.groovy" />
     <include file="0.9.x/changelog-2024-05-08-1110-rename-picker-to-pickedBy-column.groovy" />
-    <include file="0.9.x/changelog-2024-06-21-1200-add-pick-type-column-to-picklist-item.groovy" />
 </databaseChangeLog>
