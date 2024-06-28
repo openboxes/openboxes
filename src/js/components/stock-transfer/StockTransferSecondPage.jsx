@@ -19,6 +19,8 @@ import Select from 'utils/Select';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-table/react-table.css';
+import { formatDate } from 'utils/translation-utils';
+import DateFormat from 'consts/dateFormat';
 
 
 const SelectTreeTable = (customTreeTableHOC(ReactTable));
@@ -89,6 +91,15 @@ class StockTransferSecondPage extends Component {
       Header: <Translate id="react.stockTransfer.expiry.label" defaultMessage="Expiry" />,
       accessor: 'expirationDate',
       style: { whiteSpace: 'normal' },
+      Cell: (props) => (
+        <span>
+          {
+            props?.value
+              ? this.props.formatLocalizedDate(props.value, DateFormat.COMMON)
+              : props.value
+          }
+        </span>
+      ),
       Filter,
     }, {
       Header: <Translate id="react.stockTransfer.quantityAvailableToTransfer.label" defaultMessage="Quantity Available to Transfer" />,
@@ -561,6 +572,7 @@ class StockTransferSecondPage extends Component {
 const mapStateToProps = state => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
   stockTransferTranslationsFetched: state.session.fetchedTranslations.stockTransfer,
+  formatLocalizedDate: formatDate(state.localize),
 });
 
 export default connect(
@@ -593,4 +605,5 @@ StockTransferSecondPage.propTypes = {
     id: PropTypes.string,
   }).isRequired,
   stockTransferTranslationsFetched: PropTypes.bool.isRequired,
+  formatLocalizedDate: PropTypes.func.isRequired,
 };
