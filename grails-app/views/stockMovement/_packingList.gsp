@@ -1,4 +1,6 @@
-<%@page import="org.pih.warehouse.inventory.LotStatusCode" %>
+<%@ page import="org.pih.warehouse.inventory.LotStatusCode" %>
+<%@ page import="org.pih.warehouse.core.Constants" %>
+
 <g:set var="shipmentInstance" value="${stockMovement?.shipment}"/>
 <g:set var="shipmentItemsByContainer" value="${shipmentInstance?.shipmentItems?.groupBy { it.container } }"/>
 <style>
@@ -127,7 +129,10 @@
                                 <div style="margin-bottom: 10px;" title="${receiptItem?.quantityReceived} ${receiptItem?.inventoryItem?.product?.unitOfMeasure?:'EA'}">
                                     <g:if test="${receiptItem?.expirationDate}">
                                         <span class="expirationDate">
-                                            <g:formatDate date="${receiptItem?.expirationDate}" format="d MMM yyyy"/>
+                                            <g:formatDate
+                                                    date="${receiptItem?.expirationDate}"
+                                                    format="${Constants.DEFAULT_MONTH_YEAR_DATE_FORMAT}"
+                                            />
                                         </span>
                                     </g:if>
                                     <g:else>
@@ -140,7 +145,10 @@
                         </g:if>
                         <g:elseif test="${shipmentItem?.inventoryItem?.expirationDate}">
                             <span class="expirationDate">
-                                <g:formatDate date="${shipmentItem?.inventoryItem?.expirationDate}" format="d MMM yyyy"/>
+                                <g:formatDate
+                                        date="${shipmentItem?.inventoryItem?.expirationDate}"
+                                        format="${Constants.DEFAULT_MONTH_YEAR_DATE_FORMAT}"
+                                />
                             </span>
                         </g:elseif>
                         <g:else>

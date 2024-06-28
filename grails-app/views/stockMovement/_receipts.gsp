@@ -1,3 +1,5 @@
+<%@ page import="org.pih.warehouse.core.Constants" %>
+
 <div id="receipt" class="dialog box">
     <h2>
         <img src="${resource(dir:'images/icons',file:'handtruck.png')}" />
@@ -57,7 +59,10 @@
                     ${receiptItem?.inventoryItem?.lotNumber?:"Default"}
                 </td>
                 <td>
-                    <g:expirationDate date="${receiptItem?.inventoryItem?.expirationDate}"/>
+                    <g:formatDate
+                            format="${Constants.DEFAULT_MONTH_YEAR_DATE_FORMAT}"
+                            date="${receiptItem?.inventoryItem?.expirationDate}"
+                    />
                 </td>
                 <td>
                     ${receiptItem?.binLocation?.name}
