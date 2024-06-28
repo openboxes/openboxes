@@ -321,7 +321,7 @@ class PickPage extends Component {
    * @public
    */
   checkForInitialPicksChanges(pickPageItem) {
-    if (pickPageItem.picklistItems.length) {
+    if (pickPageItem.picklistItems.length && pickPageItem.autoAllocated) {
       const initialPicks = [];
       _.forEach(pickPageItem.suggestedItems, (suggestion) => {
         // search if suggested picks are inside picklist
@@ -695,6 +695,9 @@ class PickPage extends Component {
     const url = `/api/stockMovements/createPickList/${this.state.values.stockMovementId}`;
     this.props.showSpinner();
 
+    if (this.state.showAlert) {
+      this.setState({ alertMessage: null, showAlert: false });
+    }
     apiClient.get(url)
       .then(() => this.fetchAllData(true))
       .finally(() => {

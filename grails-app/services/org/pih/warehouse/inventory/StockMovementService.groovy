@@ -82,8 +82,6 @@ import org.pih.warehouse.shipping.ShipmentStatusCode
 import org.pih.warehouse.shipping.ShipmentType
 import org.pih.warehouse.shipping.ShipmentWorkflow
 import org.pih.warehouse.PaginatedList
-import org.springframework.validation.BeanPropertyBindingResult
-import org.springframework.validation.Errors
 import org.springframework.web.multipart.MultipartFile
 
 
@@ -1587,7 +1585,8 @@ class StockMovementService {
                             availableItem.binLocation,
                             params.quantity,
                             null,
-                            null
+                            null,
+                            false,
                     )
 
                 }
@@ -1787,7 +1786,9 @@ class StockMovementService {
                             suggestedItem.binLocation,
                             suggestedItem.quantityPicked.intValueExact(),
                             null,
-                            null)
+                            null,
+                            true
+                    )
                 }
             }
             if (validateQtyAvailable && !suggestedItems) {
@@ -1812,7 +1813,7 @@ class StockMovementService {
 
     void createOrUpdatePicklistItem(RequisitionItem requisitionItem, PicklistItem picklistItem,
                                     InventoryItem inventoryItem, Location binLocation,
-                                    Integer quantity, String reasonCode, String comment) {
+                                    Integer quantity, String reasonCode, String comment, Boolean isAutoAllocated = true) {
 
         Requisition requisition = requisitionItem.requisition
 
@@ -1833,6 +1834,8 @@ class StockMovementService {
         if (reasonCode && requisitionItem.pickReasonCode != reasonCode) {
             requisitionItem.pickReasonCode = reasonCode
         }
+
+        requisitionItem.autoAllocated = isAutoAllocated
 
         // Remove from picklist
         if (quantity == null) {
@@ -1907,6 +1910,7 @@ class StockMovementService {
 
     void updatePicklistItem(StockMovementItem stockMovementItem, List picklistItems, String reasonCode) {
         RequisitionItem requisitionItem = RequisitionItem.get(stockMovementItem.id)
+        Boolean isAutoAllocated = requisitionItem.autoAllocated ?: false
 
         clearPicklist(requisitionItem)
 
@@ -1927,7 +1931,7 @@ class StockMovementService {
             String comment = picklistItemMap.comment
 
             createOrUpdatePicklistItem(requisitionItem, picklistItem, inventoryItem, binLocation,
-                    quantityPicked?.intValueExact(), reasonCode, comment)
+                    quantityPicked?.intValueExact(), reasonCode, comment, isAutoAllocated)
         }
     }
 
@@ -2087,7 +2091,9 @@ class StockMovementService {
                     suggestedItem.binLocation,
                     suggestedItem.quantityPicked?.intValueExact(),
                     null,
-                    null)
+                    null,
+                    true
+            )
         }
     }
 

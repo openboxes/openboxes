@@ -108,6 +108,7 @@ class PicklistService {
         }
         itemsToRemove.each {
             picklist.removeFromPicklistItems(it)
+            it.requisitionItem.autoAllocated = null
             it.delete(flush: true)
         }
 
