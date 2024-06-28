@@ -73,7 +73,7 @@ const DateFilter = (props) => {
       return formatLocalizedDate(date, localizedDateFormat);
     }
 
-    return date ? moment(date).format(dateFormat) : null;
+    return moment(date).format(dateFormat);
   };
 
   const onBlur = () => setIsFocused(false);
