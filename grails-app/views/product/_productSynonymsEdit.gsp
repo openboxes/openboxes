@@ -13,7 +13,7 @@
                     id="locale-dlg"
                     name="locale"
                     noSelection="['':'']"
-                    value="${synonym?.locale?.language}"
+                    value="${synonym?.locale}"
                     class="chzn-select-deselect"
                     data-placeholder="${g.message(code: 'synonym.selectLocale.placeholder.label', default: 'Select a locale')}"
                 />
