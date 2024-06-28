@@ -11,12 +11,14 @@ export const getDateFormat = (localize) => (formatName) =>
   getTranslate(localize)(formatName);
 
 export const getLocaleCode = (localize) =>
-  localize.languages.find(lang => lang.active)?.code;
+  localize.languages.find((lang) => lang.active)?.code;
 
 export const formatDate = (localize) => (date, formatName) => {
   const localeCode = getLocaleCode(localize);
   const dateFormat = getTranslate(localize)(formatName);
-  return moment(date).locale(localeCode).format(dateFormat);
+  return (date && localeCode && dateFormat)
+    ? moment(date).locale(localeCode).format(dateFormat)
+    : null;
 };
 
 export default splitTranslation;
