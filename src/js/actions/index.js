@@ -219,10 +219,10 @@ export function changeCurrentLocale(locale) {
   return (dispatch) => {
     const url = `/api/chooseLocale/${locale}`;
 
-    apiClient.put(url).then(() => {
+    apiClient.put(url).then((response) => {
       dispatch({
         type: CHANGE_CURRENT_LOCALE,
-        payload: locale,
+        payload: response,
       });
     });
   };
