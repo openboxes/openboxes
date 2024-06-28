@@ -67,7 +67,12 @@ class ApiController {
             throw new ObjectNotFoundException(params.id, Locale.class.toString())
         }
         session.locale = locale
-        render([status: 200, text: "Current language is ${locale}"])
+        render([
+            data: [
+                activeLanguage: locale.toString(),
+                activeLanguageTag: locale.toLanguageTag()
+            ]
+        ] as JSON)
     }
 
     def getMenuConfig() {
