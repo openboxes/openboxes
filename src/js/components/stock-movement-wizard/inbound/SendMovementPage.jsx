@@ -19,12 +19,13 @@ import LabelField from 'components/form-elements/LabelField';
 import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
 import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
+import DateFormat from 'consts/dateFormat';
 import apiClient from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import { formatProductDisplayName } from 'utils/form-values-utils';
 import { debounceLocationsFetch } from 'utils/option-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
-import splitTranslation from 'utils/translation-utils';
+import splitTranslation, { formatDate } from 'utils/translation-utils';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
@@ -83,6 +84,9 @@ const SHIPMENT_FIELDS = {
     label: 'react.stockMovement.shipDate.label',
     defaultMessage: 'Shipment date',
     attributes: {
+      localizeDate: true,
+      localizedDateFormat: DateFormat.DEFAULT,
+      // It's necessary for properly setting up the time part of the localized date format
       dateFormat: 'MM/DD/YYYY HH:mm Z',
       required: true,
       showTimeSelect: true,
@@ -137,7 +141,7 @@ const SHIPMENT_FIELDS = {
     label: 'react.stockMovement.expectedDeliveryDate.label',
     defaultMessage: 'Expected receipt date',
     attributes: {
-      dateFormat: 'MM/DD/YYYY',
+      localizeDate: true,
       required: true,
       showTimeSelect: false,
       autoComplete: 'off',
@@ -195,6 +199,9 @@ const SUPPLIER_FIELDS = {
         type: LabelField,
         label: 'react.stockMovement.expiry.label',
         defaultMessage: 'Expiry',
+        getDynamicAttr: ({ formatLocalizedDate }) => ({
+          formatValue: (value) => formatLocalizedDate(value, DateFormat.COMMON),
+        }),
       },
       quantityRequested: {
         type: LabelField,
@@ -824,6 +831,7 @@ class SendMovementPage extends Component {
                         totalCount: this.state.totalCount,
                         loadMoreRows: this.loadMoreRows,
                         isRowLoaded: this.isRowLoaded,
+                        formatLocalizedDate: this.props.formatLocalizedDate,
                         isPaginated: this.props.isPaginated,
                         isFirstPageLoaded: this.state.isFirstPageLoaded,
                         // eslint-disable-next-line max-len
@@ -853,6 +861,7 @@ const mapStateToProps = state => ({
   isPaginated: state.session.isPaginated,
   pageSize: state.session.pageSize,
   minimumExpirationDate: state.session.minimumExpirationDate,
+  formatLocalizedDate: formatDate(state.localize),
 });
 
 export default connect(mapStateToProps, { showSpinner, hideSpinner })(SendMovementPage);
@@ -881,4 +890,5 @@ SendMovementPage.propTypes = {
   isPaginated: PropTypes.bool.isRequired,
   pageSize: PropTypes.number.isRequired,
   minimumExpirationDate: PropTypes.string.isRequired,
+  formatLocalizedDate: PropTypes.func.isRequired,
 };
