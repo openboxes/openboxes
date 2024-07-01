@@ -10,6 +10,7 @@
 package org.pih.warehouse
 
 import grails.util.Holders
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.LocalizationService
 import org.pih.warehouse.inventory.Transaction
 
@@ -147,5 +148,17 @@ class LocalizationUtil {
      */
     static String getDefaultString(String str) {
         return getLocalizedString(str, null)
+    }
+
+
+    static boolean isSpanishMexico(Locale locale) {
+        return locale.language == "es" && locale.country == "MX"
+    }
+
+    static String getLocalizedOrderImportDateFormat(Locale locale) {
+        if (isSpanishMexico(locale)) {
+            return Constants.EUROPEAN_DATE_FORMAT
+        }
+        return Constants.EXPIRATION_DATE_FORMAT
     }
 }
