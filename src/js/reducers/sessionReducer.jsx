@@ -27,6 +27,7 @@ const initialState = {
   menuConfig: [],
   menuSectionsUrlParts: {},
   activeLanguage: '',
+  activeLanguageTag: '',
   fetchedTranslations: {
     default: false,
     invoice: false,
@@ -96,6 +97,7 @@ export default function (state = initialState, action) {
         isUserManager: _.get(action, 'payload.data.data.isUserManager', false),
         supportedActivities: _.get(action, 'payload.data.data.supportedActivities'),
         activeLanguage: _.get(action, 'payload.data.data.activeLanguage'),
+        activeLanguageTag: _.get(action, 'payload.data.data.activeLanguageTag'),
         user: _.get(action, 'payload.data.data.user'),
         isImpersonated: _.get(action, 'payload.data.data.isImpersonated'),
         grailsVersion: _.get(action, 'payload.data.data.grailsVersion'),
@@ -136,7 +138,11 @@ export default function (state = initialState, action) {
     case CHANGE_CURRENT_LOCATION:
       return { ...state, currentLocation: action.payload, loading: true };
     case CHANGE_CURRENT_LOCALE:
-      return { ...state, activeLanguage: action.payload };
+      return {
+        ...state,
+        activeLanguage: action.payload.data.data.activeLanguage,
+        activeLanguageTag: action.payload.data.data.activeLanguageTag,
+      };
     case TRANSLATIONS_FETCHED:
       return {
         ...state,

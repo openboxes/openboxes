@@ -1286,7 +1286,7 @@ class ProductService {
     }
 
     def searchProductDtos(String[] terms) {
-        String locale = LocalizationUtil.localizationService.getCurrentLocale().toLanguageTag()
+        String locale = LocalizationUtil.localizationService.getCurrentLocale().toString()
 
         def query = """
             select distinct

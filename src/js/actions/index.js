@@ -197,9 +197,9 @@ export function changeCurrentLocation(location) {
   };
 }
 
-export function fetchTranslations(lang, prefix) {
+export function fetchTranslations(languageCode, prefix) {
   return (dispatch) => {
-    const url = `/api/localizations?lang=${lang ||
+    const url = `/api/localizations?languageCode=${languageCode ||
       ''}&prefix=react.${prefix || ''}`;
 
     apiClient.get(url).then((response) => {
@@ -219,10 +219,10 @@ export function changeCurrentLocale(locale) {
   return (dispatch) => {
     const url = `/api/chooseLocale/${locale}`;
 
-    apiClient.put(url).then(() => {
+    apiClient.put(url).then((response) => {
       dispatch({
         type: CHANGE_CURRENT_LOCALE,
-        payload: locale,
+        payload: response,
       });
     });
   };
