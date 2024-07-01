@@ -14,14 +14,15 @@ import {
   showSpinner,
 } from 'actions';
 import { STOCK_TRANSFER_URL } from 'consts/applicationUrls';
+import DateFormat from 'consts/dateFormat';
 import { InfoBar, InfoBarConfigs } from 'consts/infoBar';
 import apiClient, { flattenRequest, parseResponse } from 'utils/apiClient';
 import customTreeTableHOC from 'utils/CustomTreeTable';
 import Filter from 'utils/Filter';
 import Translate from 'utils/Translate';
+import { formatDate } from 'utils/translation-utils';
 
 import 'react-table/react-table.css';
-
 
 const SelectTreeTable = selectTableHOC(customTreeTableHOC(ReactTable));
 
@@ -104,6 +105,15 @@ class CreateStockTransfer extends Component {
       Header: <Translate id="react.stockTransfer.expiry.label" defaultMessage="Expiry" />,
       accessor: 'expirationDate',
       style: { whiteSpace: 'normal' },
+      Cell: (props) => (
+        <span>
+          {
+            props?.value
+              ? this.props.formatLocalizedDate(props.value, DateFormat.COMMON)
+              : props.value
+          }
+        </span>
+      ),
       Filter,
     }, {
       Header: <Translate id="react.stockTransfer.zone.label" defaultMessage="Zone" />,
@@ -155,7 +165,10 @@ class CreateStockTransfer extends Component {
   }
 
   filterMethod = (filter, row) => {
-    const val = row[filter.id];
+    const rowData = row[filter.id];
+    const val = filter.id === 'expirationDate'
+      ? this.props.formatLocalizedDate(rowData, DateFormat.COMMON)
+      : rowData;
     return _.toString(val).toLowerCase().includes(filter.value.toLowerCase());
   };
 
@@ -322,6 +335,7 @@ class CreateStockTransfer extends Component {
 
 const mapStateToProps = state => ({
   stockTransferTranslationsFetched: state.session.fetchedTranslations.stockTransfer,
+  formatLocalizedDate: formatDate(state.localize),
 });
 
 const mapDispatchToProps = {
@@ -348,4 +362,5 @@ CreateStockTransfer.propTypes = {
   /** React router's object used to manage session history */
   history: PropTypes.shape({ push: PropTypes.func }).isRequired,
   stockTransferTranslationsFetched: PropTypes.bool.isRequired,
+  formatLocalizedDate: PropTypes.func.isRequired,
 };
