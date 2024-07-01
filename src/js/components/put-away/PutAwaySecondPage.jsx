@@ -115,7 +115,8 @@ class PutAwaySecondPage extends Component {
       Filter,
     }, {
       Header: <Translate id="react.putAway.name.label" defaultMessage="Name" />,
-      accessor: 'product.displayNameOrDefaultName',
+      accessor: 'product',
+      Cell: props => props.value?.displayNameOrDefaultName,
       style: { whiteSpace: 'normal' },
       Filter,
     }, {
@@ -360,6 +361,9 @@ class PutAwaySecondPage extends Component {
     let val = row[filter.id];
     if (filter.id === 'putawayLocation') {
       val = _.get(val, 'name');
+    }
+    if (filter.id === 'product') {
+      val = val ? `${val.name} ${val.displayNameOrDefaultName}` : null;
     }
     if (filter.id === 'inventoryItem.expirationDate') {
       val = this.props.formatLocalizedDate(val, DateFormat.COMMON);

@@ -106,7 +106,8 @@ class PutAwayPage extends Component {
       Filter,
     }, {
       Header: <Translate id="react.putAway.name.label" defaultMessage="Name" />,
-      accessor: 'product.displayNameOrDefaultName',
+      accessor: 'product',
+      Cell: props => props.value?.displayNameOrDefaultName,
       style: { whiteSpace: 'normal' },
       Filter,
     }, {
@@ -369,10 +370,13 @@ class PutAwayPage extends Component {
    */
   // eslint-disable-next-line no-underscore-dangle
   filterMethod = (filter, row) => {
-    const rowData = row[filter.id];
-    const val = filter.id === 'inventoryItem.expirationDate'
-      ? this.props.formatLocalizedDate(rowData, DateFormat.COMMON)
-      : rowData;
+    let val = row[filter.id];
+    if (filter.id === 'inventoryItem.expirationDate') {
+      val = this.props.formatLocalizedDate(val, DateFormat.COMMON);
+    }
+    if (filter.id === 'product') {
+      val = val ? `${val.name} ${val.displayNameOrDefaultName}` : null;
+    }
     return row._aggregated || row._groupedByPivot ||
       _.toString(val).toLowerCase().includes(filter.value.toLowerCase());
   };
