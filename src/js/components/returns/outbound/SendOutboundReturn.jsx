@@ -17,11 +17,12 @@ import LabelField from 'components/form-elements/LabelField';
 import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
 import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
+import DateFormat from 'consts/dateFormat';
 import apiClient, { flattenRequest, parseResponse } from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import { formatProductDisplayName } from 'utils/form-values-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
-import splitTranslation from 'utils/translation-utils';
+import splitTranslation, { formatDate } from 'utils/translation-utils';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
@@ -47,7 +48,8 @@ const SHIPMENT_FIELDS = {
     label: 'react.stockMovement.shipDate.label',
     defaultMessage: 'Shipment date',
     attributes: {
-      dateFormat: 'MM/DD/YYYY',
+      localizeDate: true,
+      localizedDateFormat: DateFormat.COMMON,
       required: true,
       autoComplete: 'off',
       showError: true,
@@ -100,7 +102,8 @@ const SHIPMENT_FIELDS = {
     label: 'react.stockMovement.expectedDeliveryDate.label',
     defaultMessage: 'Expected receipt date',
     attributes: {
-      dateFormat: 'MM/DD/YYYY',
+      localizeDate: true,
+      localizedDateFormat: DateFormat.COMMON,
       required: true,
       autoComplete: 'off',
     },
@@ -182,6 +185,9 @@ const FIELDS = {
         label: 'react.outboundReturn.expiry.label',
         defaultMessage: 'Expiry',
         flexWidth: '1',
+        getDynamicAttr: ({ formatLocalizedDate }) => ({
+          formatValue: (value) => formatLocalizedDate(value, DateFormat.COMMON),
+        }),
       },
       quantity: {
         type: LabelField,
@@ -500,6 +506,7 @@ class SendMovementPage extends Component {
                 {_.map(FIELDS, (fieldConfig, fieldName) =>
                   renderFormField(fieldConfig, fieldName, {
                     translate: this.props.translate,
+                    formatLocalizedDate: this.props.formatLocalizedDate,
                     values,
                   }))}
               </div>
@@ -518,6 +525,7 @@ const mapStateToProps = state => ({
   locale: state.session.activeLanguage,
   isUserAdmin: state.session.isUserAdmin,
   currentLocationId: state.session.currentLocation.id,
+  formatLocalizedDate: formatDate(state.localize),
 });
 
 export default connect(mapStateToProps, { showSpinner, hideSpinner })(SendMovementPage);
@@ -538,4 +546,5 @@ SendMovementPage.propTypes = {
   locale: PropTypes.string.isRequired,
   isUserAdmin: PropTypes.bool.isRequired,
   currentLocationId: PropTypes.string.isRequired,
+  formatLocalizedDate: PropTypes.func.isRequired,
 };
