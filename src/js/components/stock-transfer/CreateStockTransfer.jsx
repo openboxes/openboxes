@@ -165,7 +165,10 @@ class CreateStockTransfer extends Component {
   }
 
   filterMethod = (filter, row) => {
-    const val = row[filter.id];
+    const rowData = row[filter.id];
+    const val = filter.id === 'expirationDate'
+      ? this.props.formatLocalizedDate(rowData, DateFormat.COMMON)
+      : rowData;
     return _.toString(val).toLowerCase().includes(filter.value.toLowerCase());
   };
 
