@@ -361,7 +361,9 @@ class PutAwaySecondPage extends Component {
     if (filter.id === 'putawayLocation') {
       val = _.get(val, 'name');
     }
-
+    if (filter.id === 'inventoryItem.expirationDate') {
+      val = this.props.formatLocalizedDate(val, DateFormat.COMMON);
+    }
     return _.toString(val).toLowerCase().includes(filter.value.toLowerCase());
   };
 

@@ -368,8 +368,14 @@ class PutAwayPage extends Component {
    * @public
    */
   // eslint-disable-next-line no-underscore-dangle
-  filterMethod = (filter, row) => (row._aggregated || row._groupedByPivot
-    || _.toString(row[filter.id]).toLowerCase().includes(filter.value.toLowerCase()));
+  filterMethod = (filter, row) => {
+    const rowData = row[filter.id];
+    const val = filter.id === 'inventoryItem.expirationDate'
+      ? this.props.formatLocalizedDate(rowData, DateFormat.COMMON)
+      : rowData;
+    return row._aggregated || row._groupedByPivot ||
+      _.toString(val).toLowerCase().includes(filter.value.toLowerCase());
+  };
 
   render() {
     const {
