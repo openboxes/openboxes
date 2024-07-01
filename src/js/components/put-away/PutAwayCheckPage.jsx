@@ -124,7 +124,7 @@ class PutAwayCheckPage extends Component {
       Filter,
     }, {
       Header: <Translate id="react.putAway.name.label" defaultMessage="Name" />,
-      accessor: 'product.name',
+      accessor: 'product.displayNameOrDefaultName',
       style: { whiteSpace: 'normal' },
       Filter,
     }, {
@@ -301,7 +301,7 @@ class PutAwayCheckPage extends Component {
       message: _.map(items, item =>
         (
           <p>Qty {item.quantityAvailable - item.quantity} {this.props.translate('react.putAway.alert.lowerQty1.label', 'of item')} {' '}
-            {item.product.name} {this.props.translate('react.putAway.alert.lowerQty2.label', 'is still in the receiving bin. Do you want to continue?')}
+            {item.product.displayNameOrDefaultName} {this.props.translate('react.putAway.alert.lowerQty2.label', 'is still in the receiving bin. Do you want to continue?')}
           </p>)),
       buttons: [
         {

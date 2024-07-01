@@ -113,7 +113,7 @@ class PutAwaySecondPage extends Component {
       Filter,
     }, {
       Header: <Translate id="react.putAway.name.label" defaultMessage="Name" />,
-      accessor: 'product.name',
+      accessor: 'product.displayNameOrDefaultName',
       style: { whiteSpace: 'normal' },
       Filter,
     }, {
