@@ -1,3 +1,5 @@
+<%@ page import="org.pih.warehouse.core.Constants" %>
+
 <div id="tab-content" class="box">
     <h2>
         <warehouse:message code="order.itemStatus.label" default="Item Status"/>
@@ -92,7 +94,10 @@
                         ${orderItem?.inventoryItem?.lotNumber}
                     </td>
                     <td>
-                        <g:formatDate date="${orderItem?.inventoryItem?.expirationDate}" format="MM/dd/yyyy"/>
+                        <g:formatDate
+                                date="${orderItem?.inventoryItem?.expirationDate}"
+                                format="${Constants.DEFAULT_MONTH_YEAR_DATE_FORMAT}"
+                        />
                     </td>
                     <td>
                         ${orderItem?.originBinLocation}

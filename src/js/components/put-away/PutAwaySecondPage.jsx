@@ -23,6 +23,8 @@ import Select from 'utils/Select';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-table/react-table.css';
+import DateFormat from 'consts/dateFormat';
+import { formatDate } from 'utils/translation-utils';
 
 const SelectTreeTable = (customTreeTableHOC(ReactTable));
 
@@ -125,6 +127,15 @@ class PutAwaySecondPage extends Component {
       Header: <Translate id="react.putAway.expiry.label" defaultMessage="Expiry" />,
       accessor: 'inventoryItem.expirationDate',
       style: { whiteSpace: 'normal' },
+      Cell: (props) => (
+        <span>
+          {
+            props?.value
+              ? this.props.formatLocalizedDate(props.value, DateFormat.COMMON)
+              : props.value
+          }
+        </span>
+      ),
       Filter,
     }, {
       Header: <Translate id="react.putAway.recipient.label" defaultMessage="Recipient" />,
@@ -666,6 +677,7 @@ class PutAwaySecondPage extends Component {
 
 const mapStateToProps = state => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
+  formatLocalizedDate: formatDate(state.localize),
   putAwayTranslationsFetched: state.session.fetchedTranslations.putAway,
 });
 
@@ -679,7 +691,6 @@ export default connect(
 PutAwaySecondPage.defaultProps = {
   original: {},
 };
-
 
 PutAwaySecondPage.propTypes = {
   /** Function called when data is loading */
@@ -708,4 +719,5 @@ PutAwaySecondPage.propTypes = {
     id: PropTypes.string,
   }).isRequired,
   putAwayTranslationsFetched: PropTypes.bool.isRequired,
+  formatLocalizedDate: PropTypes.func.isRequired,
 };
