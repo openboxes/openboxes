@@ -200,7 +200,7 @@ class SplitLineModal extends Component {
           shouldCloseOnOverlayClick={false}
         >
           <div>
-            <h3 className="font-weight-bold">{`${this.props.putawayItem.product.productCode} ${this.props.putawayItem.product.name}`}</h3>
+            <h3 className="font-weight-bold">{`${this.props.putawayItem.product.productCode} ${this.props.putawayItem.product.displayNameOrDefaultName}`}</h3>
             <div className="font-weight-bold">
               <Translate id="react.putAway.expiry.label" defaultMessage="Expiry" />: {this.props.putawayItem.inventoryItem.expirationDate}
             </div>
@@ -358,6 +358,7 @@ SplitLineModal.propTypes = {
       id: PropTypes.string,
       productCode: PropTypes.string,
       name: PropTypes.string,
+      displayNameOrDefaultName: PropTypes.string,
     }),
     /** Inventory's data */
     inventoryItem: PropTypes.shape({
