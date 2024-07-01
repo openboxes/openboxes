@@ -18,6 +18,7 @@ import org.hibernate.sql.JoinType
 
 import grails.plugins.csv.CSVMapReader
 import org.hibernate.criterion.CriteriaSpecification
+import org.pih.warehouse.LocalizationUtil
 import org.pih.warehouse.core.BudgetCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Event
@@ -53,6 +54,8 @@ import org.pih.warehouse.shipping.ShipmentException
 import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.shipping.ShipmentService
 import util.ReportUtil
+
+import java.text.SimpleDateFormat
 
 @Transactional
 class OrderService {
@@ -840,9 +843,11 @@ class OrderService {
                     orderItem.recipient = recipient ? personService.getPersonByNames(recipient) : null
 
                     def estReadyDate = null
+                    Locale locale = LocalizationUtil.currentLocale
+                    SimpleDateFormat readyDateFormat = new SimpleDateFormat(LocalizationUtil.getLocalizedOrderImportDateFormat(locale))
                     if (estimatedReadyDate) {
                         try {
-                            estReadyDate = new Date(estimatedReadyDate)
+                            estReadyDate = readyDateFormat.parse(estimatedReadyDate)
                         } catch (Exception e) {
                             log.error("Unable to parse date: " + e.message, e)
                             throw new IllegalArgumentException("Could not parse estimated ready date with value: ${estimatedReadyDate}.")
@@ -853,7 +858,7 @@ class OrderService {
                     def actReadyDate = null
                     if (actualReadyDate) {
                         try {
-                            actReadyDate = new Date(actualReadyDate)
+                            actReadyDate = readyDateFormat.parse(actualReadyDate)
                         } catch (Exception e) {
                             log.error("Unable to parse date: " + e.message, e)
                             throw new IllegalArgumentException("Could not parse actual ready date with value: ${actualReadyDate}.")

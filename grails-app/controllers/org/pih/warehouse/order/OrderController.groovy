@@ -13,6 +13,7 @@ import fr.opensagres.xdocreport.converter.ConverterTypeTo
 import grails.converters.JSON
 import grails.validation.ValidationException
 import grails.gorm.transactions.Transactional
+import org.pih.warehouse.LocalizationUtil
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.BudgetCode
@@ -825,7 +826,8 @@ class OrderController {
             def date = new Date()
             response.setHeader("Content-disposition", "attachment; filename=\"${orderInstance.orderNumber}-${date.format("MM-dd-yyyy")}.csv\"")
             response.contentType = "text/csv"
-
+            Locale currentLocale = LocalizationUtil.currentLocale
+            String dateFormat = LocalizationUtil.getLocalizedOrderImportDateFormat(currentLocale)
             def csv = CSVUtils.getCSVPrinter()
             csv.printRecord(
                     warehouse.message(code: 'orderItem.id.label'),
@@ -841,8 +843,8 @@ class OrderController {
                     warehouse.message(code: 'default.cost.label'),
                     warehouse.message(code: 'orderItem.totalCost.label'),
                     warehouse.message(code: 'order.recipient.label'),
-                    warehouse.message(code: 'orderItem.estimatedReadyDate.label'),
-                    warehouse.message(code: 'orderItem.actualReadyDate.label'),
+                    "${warehouse.message(code: 'orderItem.estimatedReadyDate.label')} (${dateFormat})",
+                    "${warehouse.message(code: 'orderItem.actualReadyDate.label')} (${dateFormat})",
                     warehouse.message(code: 'orderItem.budgetCode.label')
             )
 
@@ -850,7 +852,7 @@ class OrderController {
                 csv.printRecord(
                         orderItem?.id,
                         orderItem?.product?.productCode,
-                        orderItem?.product?.name,
+                        orderItem?.product?.displayNameOrDefaultName,
                         orderItem?.productSupplier?.code,
                         orderItem?.productSupplier?.name,
                         orderItem?.productSupplier?.supplierCode,
@@ -861,8 +863,8 @@ class OrderController {
                         CSVUtils.formatCurrency(number: orderItem?.unitPrice, currencyCode: orderItem?.currencyCode, isUnitPrice: true),
                         CSVUtils.formatCurrency(number: orderItem?.totalPrice(), currencyCode: orderItem?.currencyCode),
                         orderItem?.recipient?.name,
-                        orderItem?.estimatedReadyDate?.format("MM/dd/yyyy"),
-                        orderItem?.actualReadyDate?.format("MM/dd/yyyy"),
+                        orderItem?.estimatedReadyDate?.format(dateFormat),
+                        orderItem?.actualReadyDate?.format(dateFormat),
                         orderItem?.budgetCode?.code
                 )
             }
