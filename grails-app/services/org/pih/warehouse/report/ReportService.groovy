@@ -662,7 +662,7 @@ class ReportService implements ApplicationContextAware {
     }
 
     List getOnOrderSummary(Location location) {
-        String locale = LocalizationUtil.localizationService.getCurrentLocale().toLanguageTag()
+        String locale = LocalizationUtil.localizationService.getCurrentLocale().toString()
 
         String query = """
             select 

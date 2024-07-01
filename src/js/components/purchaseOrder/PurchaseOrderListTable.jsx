@@ -376,7 +376,7 @@ const mapStateToProps = state => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
   currencyCode: state.session.currencyCode,
   allStatuses: state.purchaseOrder.statuses,
-  locale: state.session.activeLanguage,
+  locale: state.session.activeLanguageTag,
 });
 
 export default connect(mapStateToProps)(PurchaseOrderListTable);

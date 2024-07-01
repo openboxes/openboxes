@@ -11,10 +11,8 @@ package org.pih.warehouse.core
 
 import grails.core.GrailsApplication
 import org.grails.core.io.ResourceLocator
-import org.grails.io.support.ClassPathResource
 import org.pih.warehouse.LocalizationUtil
 import org.springframework.context.i18n.LocaleContextHolder
-import org.springframework.web.context.request.RequestContextHolder
 
 class LocalizationService {
 

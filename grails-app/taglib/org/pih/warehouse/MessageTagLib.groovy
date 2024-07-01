@@ -11,7 +11,6 @@ package org.pih.warehouse
 
 import grails.core.GrailsApplication
 import org.pih.warehouse.core.Localization
-import org.pih.warehouse.LocalizationUtil
 
 import java.text.MessageFormat
 

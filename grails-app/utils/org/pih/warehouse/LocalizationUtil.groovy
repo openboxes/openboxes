@@ -12,12 +12,13 @@ package org.pih.warehouse
 import grails.util.Holders
 import org.pih.warehouse.core.LocalizationService
 import org.pih.warehouse.inventory.Transaction
+import org.springframework.util.StringUtils
 
 class LocalizationUtil {
 
     static final def delimiter = '\\|'
     static final def localeDelimiter = ':'
-    static final String UNDERSCORE = '_'
+    static final String DASH = '-'
 
     static LocalizationService getLocalizationService() {
         return Holders.getGrailsApplication().getParentContext().getBean("localizationService")
@@ -32,33 +33,19 @@ class LocalizationUtil {
      * used to provide supported locales in config as a language code in ISO 639 alpha-2 or
      * ISO 639 alpha-3 format, to support country specific languages we have to add a country
      * code in ISO 3166 alpha-2 or UN M.49 numeric-3 format to it.
-     * As there is no Locale constructor that handles `<languageCode>_<countryCode>` for now we
-     * have to handle it here. If it is a country specific language, then the <languageCode>
-     * will be used to determine the fallback (default) locale for missing translations.
-     * TODO: Improve the supportedLocales config structure to fully support all locale options.
-     *       (see context here: https://pihemr.atlassian.net/browse/OBPIH-6410?focusedCommentId=153567)
+     * As there is no Locale constructor that handles `<languageCode>_<countryCode>` or
+     * `<languageCode>-<countryCode>` we have to handle it here.
      * @param localeCode String with locale code represented as single language code (ex.: "en", "es"),
-     *                   or combined with country code (ex.: "en_GB", "es_MX").
+     *                   or combined with country code (ex.: "en_GB", "es_MX", "en-GB", "es-MX")
      * @return Locale
-     * @exception NullPointerException (Locale throws NPE when all params passed to constructor are null)
      * */
     static Locale getLocale(String localeCode) {
-        Locale locale
-
-        if (localeCode?.contains(UNDERSCORE)) {
-            String[] localeCodeParts = localeCode.split(UNDERSCORE)
-            String language = localeCodeParts[0]
-            String country = localeCodeParts[1]
-            locale = new Locale(language, country)
-            locale.setDefault(new Locale(language))
-            return locale
+        // Since spring 5.0.4 StringUtils.parseLocale(localeCode) could be used to handle both cases
+        if (localeCode?.contains(DASH)) {
+            return Locale.forLanguageTag(localeCode)
         }
 
-        locale = new Locale(localeCode)
-        String defaultLocaleCode = Holders.config.openboxes.locale.defaultLocale
-        Locale defaultLocale = defaultLocaleCode ? new Locale(defaultLocaleCode) : Locale.ENGLISH
-        locale.setDefault(defaultLocale)
-        return locale
+        return StringUtils.parseLocaleString(localeCode)
     }
 
     static List<Locale> getSupportedLocales() {
