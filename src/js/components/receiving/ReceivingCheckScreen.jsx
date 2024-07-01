@@ -17,10 +17,12 @@ import LabelField from 'components/form-elements/LabelField';
 import TableRowWithSubfields from 'components/form-elements/TableRowWithSubfields';
 import TextField from 'components/form-elements/TextField';
 import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
+import DateFormat from 'consts/dateFormat';
 import apiClient, { flattenRequest, parseResponse } from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import { formatProductDisplayName, getReceivingPayloadContainers } from 'utils/form-values-utils';
 import Translate from 'utils/Translate';
+import { formatDate } from 'utils/translation-utils';
 
 
 const SHIPMENT_FIELDS = {
@@ -45,6 +47,8 @@ const SHIPMENT_FIELDS = {
     defaultMessage: 'Shipped on',
     type: params => <DateField {...params} />,
     attributes: {
+      localizeDate: true,
+      localizedDateFormat: DateFormat.COMMON,
       disabled: true,
     },
   },
@@ -53,6 +57,9 @@ const SHIPMENT_FIELDS = {
     defaultMessage: 'Delivered on',
     type: params => <DateField {...params} />,
     attributes: {
+      localizeDate: true,
+      localizedDateFormat: DateFormat.DEFAULT,
+      // It's necessary for properly setting up the time part of the localized date format
       dateFormat: 'MM/DD/YYYY HH:mm Z',
       required: true,
       showTimeSelect: true,
@@ -124,6 +131,9 @@ const TABLE_FIELDS = {
         label: 'react.partialReceiving.expirationDate.label',
         defaultMessage: 'Expiration date',
         flexWidth: '1',
+        getDynamicAttr: ({ formatLocalizedDate }) => ({
+          formatValue: (value) => (value ? formatLocalizedDate(value, DateFormat.COMMON) : value),
+        }),
       },
       binLocation: {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
@@ -458,6 +468,7 @@ class ReceivingCheckScreen extends Component {
                     hasBinLocationSupport: this.props.hasBinLocationSupport,
                     cancelAllRemaining: this.cancelAllRemaining,
                     hasPartialReceivingSupport: this.props.hasPartialReceivingSupport,
+                    formatLocalizedDate: this.props.formatLocalizedDate,
                     values,
                 }))}
               </div>
@@ -484,6 +495,7 @@ class ReceivingCheckScreen extends Component {
 const mapStateToProps = state => ({
   hasBinLocationSupport: state.session.currentLocation.hasBinLocationSupport,
   hasPartialReceivingSupport: state.session.currentLocation.hasPartialReceivingSupport,
+  formatLocalizedDate: formatDate(state.localize),
 });
 
 export default connect(mapStateToProps, {
@@ -509,6 +521,7 @@ ReceivingCheckScreen.propTypes = {
   }).isRequired,
   translate: PropTypes.func.isRequired,
   previousPage: PropTypes.func.isRequired,
+  formatLocalizedDate: PropTypes.func.isRequired,
 };
 
 ReceivingCheckScreen.defaultProps = {

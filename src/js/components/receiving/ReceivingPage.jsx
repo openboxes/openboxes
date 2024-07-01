@@ -11,8 +11,10 @@ import { fetchTranslations, hideSpinner, showSpinner } from 'actions';
 import PartialReceivingPage from 'components/receiving/PartialReceivingPage';
 import ReceivingCheckScreen from 'components/receiving/ReceivingCheckScreen';
 import Wizard from 'components/wizard/Wizard';
+import DateFormat from 'consts/dateFormat';
 import apiClient, { parseResponse } from 'utils/apiClient';
 import { translateWithDefaultMessage } from 'utils/Translate';
+import { formatDate } from 'utils/translation-utils';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 import 'components/stock-movement-wizard/StockMovement.scss';
@@ -101,7 +103,10 @@ class ReceivingPage extends Component {
         delimeter: ', ',
       },
       {
-        text: dateShipped,
+        text: this.props.formatLocalizedDate(
+          dateShipped,
+          DateFormat.COMMON,
+        ),
         color: '#4a148c',
         delimeter: ', ',
       },
@@ -203,6 +208,7 @@ const mapStateToProps = state => ({
   locale: state.session.activeLanguage,
   partialReceivingTranslationsFetched: state.session.fetchedTranslations.partialReceiving,
   hasPartialReceivingSupport: state.session.currentLocation.hasPartialReceivingSupport,
+  formatLocalizedDate: formatDate(state.localize),
 });
 
 export default connect(mapStateToProps, {
@@ -222,4 +228,5 @@ ReceivingPage.propTypes = {
   locale: PropTypes.string.isRequired,
   partialReceivingTranslationsFetched: PropTypes.bool.isRequired,
   fetchTranslations: PropTypes.func.isRequired,
+  formatLocalizedDate: PropTypes.func.isRequired,
 };
