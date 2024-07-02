@@ -37,6 +37,9 @@ class Constants {
     static final String DISPLAY_DATE_FORMAT = "MMM DD, yyyy"
     static final String DISPLAY_DATE_DEFAULT_VALUE = "-"
 
+    static final String SPANISH_MEXICO_ORDER_IMPORT_DATE_FORMAT = "dd/MM/yyyy"
+    static final String DEFAULT_ORDER_IMPORT_DATE_FORMAT = "MM/dd/yyyy"
+
 
     static final DateFormat DEFAULT_DATE_FORMATTER = new SimpleDateFormat(DEFAULT_DATE_FORMAT)
     static final DateFormat EXPIRATION_DATE_FORMATTER = new SimpleDateFormat(EXPIRATION_DATE_FORMAT)
