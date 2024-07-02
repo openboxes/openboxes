@@ -152,13 +152,13 @@ class LocalizationUtil {
 
 
     static boolean isSpanishMexico(Locale locale) {
-        return locale.language == "es" && locale.country == "MX"
+        return locale == new Locale("es", "MX")
     }
 
     static String getLocalizedOrderImportDateFormat(Locale locale) {
         if (isSpanishMexico(locale)) {
-            return Constants.EUROPEAN_DATE_FORMAT
+            return Constants.SPANISH_MEXICO_ORDER_IMPORT_DATE_FORMAT
         }
-        return Constants.EXPIRATION_DATE_FORMAT
+        return Constants.DEFAULT_ORDER_IMPORT_DATE_FORMAT
     }
 }
