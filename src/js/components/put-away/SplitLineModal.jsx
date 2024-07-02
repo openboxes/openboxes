@@ -9,15 +9,14 @@ import Modal from 'react-modal';
 import connect from 'react-redux/es/connect/connect';
 import { Tooltip } from 'react-tippy';
 
+import DateFormat from 'consts/dateFormat';
 import Input from 'utils/Input';
 import Select from 'utils/Select';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
+import { formatDate } from 'utils/translation-utils';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 import 'react-tippy/dist/tippy.css';
-import { formatDate } from 'utils/translation-utils';
-import DateFormat from 'consts/dateFormat';
-
 
 /**
  * Modal window where user can split put-away's line. It has details of the line
@@ -202,7 +201,22 @@ class SplitLineModal extends Component {
           shouldCloseOnOverlayClick={false}
         >
           <div>
-            <h3 className="font-weight-bold">{`${this.props.putawayItem.product.productCode} ${this.props.putawayItem.product.displayNameOrDefaultName}`}</h3>
+            <h3 className="font-weight-bold">
+              <span>{this.props.putawayItem.product.productCode}</span>
+              <Tooltip
+                arrow="true"
+                delay="150"
+                duration="250"
+                hideDelay="50"
+                className="text-overflow-ellipsis"
+                disabled={this.props.putawayItem.product?.name ===
+                  this.props.putawayItem.product?.displayNameOrDefaultName}
+                html={this.props.putawayItem.product?.name}
+              >
+                {' '}
+                {this.props.putawayItem.product.displayNameOrDefaultName}
+              </Tooltip>
+            </h3>
             <div className="font-weight-bold">
               <Translate id="react.putAway.expiry.label" defaultMessage="Expiry" />:
               {

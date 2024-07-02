@@ -20,6 +20,7 @@ import DateFormat from 'consts/dateFormat';
 
 import 'react-table/react-table.css';
 import 'react-confirm-alert/src/react-confirm-alert.css';
+import { TableCell } from 'components/DataTable';
 
 const SelectTreeTable = (customTreeTableHOC(ReactTable));
 
@@ -127,7 +128,14 @@ class PutAwayCheckPage extends Component {
     }, {
       Header: <Translate id="react.putAway.name.label" defaultMessage="Name" />,
       accessor: 'product',
-      Cell: props => props.value?.displayNameOrDefaultName,
+      Cell: row => (
+        <TableCell
+          {...row}
+          value={row.value?.displayNameOrDefaultName}
+          tooltip={row.value?.name !== row.value?.displayNameOrDefaultName}
+          tooltipLabel={row.value?.name}
+        />
+      ),
       style: { whiteSpace: 'normal' },
       Filter,
     }, {
