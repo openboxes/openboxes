@@ -183,7 +183,7 @@ class ApiController {
         def defaultLocale = new Locale(grailsApplication.config.openboxes.locale.defaultLocale ?: "en")
         def supportedLocales = locales.collect {
             def defaultName = LocalizationUtil.getLocale(it)?.getDisplayName(currentLocale ?: defaultLocale)
-            def name =  messageSource.getMessage("locale.${it}.label", null,  defaultName, (currentLocale ?: defaultLocale))
+            def name =  "${warehouse.message(code: "locale.${it}.label", default: defaultName)}"
             [code: it, name: name]
         }
         String currencyCode = grailsApplication.config.openboxes.locale.defaultCurrencyCode
