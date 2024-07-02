@@ -9,11 +9,13 @@ import selectTableHOC from 'react-table/lib/hoc/selectTable';
 
 import { hideSpinner, showSpinner } from 'actions';
 import { PUTAWAY_URL } from 'consts/applicationUrls';
+import DateFormat from 'consts/dateFormat';
 import apiClient, { parseResponse } from 'utils/apiClient';
 import customTreeTableHOC from 'utils/CustomTreeTable';
 import Filter from 'utils/Filter';
 import Select from 'utils/Select';
 import Translate from 'utils/Translate';
+import { formatDate } from 'utils/translation-utils';
 
 import 'react-table/react-table.css';
 
@@ -116,6 +118,15 @@ class PutAwayPage extends Component {
       Header: <Translate id="react.putAway.expiry.label" defaultMessage="Expiry" />,
       accessor: 'inventoryItem.expirationDate',
       style: { whiteSpace: 'normal' },
+      Cell: (props) => (
+        <span>
+          {
+            props?.value
+              ? this.props.formatLocalizedDate(props.value, DateFormat.COMMON)
+              : props.value
+          }
+        </span>
+      ),
       Filter,
     }, {
       Header: <Translate id="react.putAway.recipient.label" defaultMessage="Recipient" />,
@@ -357,8 +368,14 @@ class PutAwayPage extends Component {
    * @public
    */
   // eslint-disable-next-line no-underscore-dangle
-  filterMethod = (filter, row) => (row._aggregated || row._groupedByPivot
-    || _.toString(row[filter.id]).toLowerCase().includes(filter.value.toLowerCase()));
+  filterMethod = (filter, row) => {
+    const rowData = row[filter.id];
+    const val = filter.id === 'inventoryItem.expirationDate'
+      ? this.props.formatLocalizedDate(rowData, DateFormat.COMMON)
+      : rowData;
+    return row._aggregated || row._groupedByPivot ||
+      _.toString(val).toLowerCase().includes(filter.value.toLowerCase());
+  };
 
   render() {
     const {
@@ -477,6 +494,7 @@ class PutAwayPage extends Component {
 
 const mapStateToProps = state => ({
   putAwayTranslationsFetched: state.session.fetchedTranslations.putAway,
+  formatLocalizedDate: formatDate(state.localize),
 });
 
 export default withRouter(connect(
@@ -498,4 +516,5 @@ PutAwayPage.propTypes = {
   /** React router's object used to manage session history */
   history: PropTypes.shape({ push: PropTypes.func }).isRequired,
   putAwayTranslationsFetched: PropTypes.bool.isRequired,
+  formatLocalizedDate: PropTypes.func.isRequired,
 };

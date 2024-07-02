@@ -15,6 +15,8 @@ import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 import 'react-tippy/dist/tippy.css';
+import { formatDate } from 'utils/translation-utils';
+import DateFormat from 'consts/dateFormat';
 
 
 /**
@@ -202,7 +204,15 @@ class SplitLineModal extends Component {
           <div>
             <h3 className="font-weight-bold">{`${this.props.putawayItem.product.productCode} ${this.props.putawayItem.product.displayNameOrDefaultName}`}</h3>
             <div className="font-weight-bold">
-              <Translate id="react.putAway.expiry.label" defaultMessage="Expiry" />: {this.props.putawayItem.inventoryItem.expirationDate}
+              <Translate id="react.putAway.expiry.label" defaultMessage="Expiry" />:
+              {
+                this.props.putawayItem.inventoryItem.expirationDate ?
+                  this.props.formatLocalizedDate(
+                    this.props.putawayItem.inventoryItem.expirationDate,
+                    DateFormat.COMMON,
+                  )
+                  : this.props.putawayItem.inventoryItem.expirationDate
+              }
             </div>
             <div className="font-weight-bold">
               <Translate id="react.putAway.totalQty.label" defaultMessage="Total QTY" />: {this.props.putawayItem.quantity}
@@ -344,6 +354,7 @@ class SplitLineModal extends Component {
 
 const mapStateToProps = state => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
+  formatLocalizedDate: formatDate(state.localize),
 });
 
 export default connect(mapStateToProps)(SplitLineModal);
@@ -390,6 +401,7 @@ SplitLineModal.propTypes = {
   /** An array of available bin locations */
   bins: PropTypes.arrayOf(PropTypes.shape({})),
   translate: PropTypes.func.isRequired,
+  formatLocalizedDate: PropTypes.func.isRequired,
 };
 
 SplitLineModal.defaultProps = {

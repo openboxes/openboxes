@@ -15,6 +15,8 @@ import customTreeTableHOC from 'utils/CustomTreeTable';
 import Filter from 'utils/Filter';
 import showLocationChangedAlert from 'utils/location-change-alert';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
+import { formatDate } from 'utils/translation-utils';
+import DateFormat from 'consts/dateFormat';
 
 import 'react-table/react-table.css';
 import 'react-confirm-alert/src/react-confirm-alert.css';
@@ -136,6 +138,15 @@ class PutAwayCheckPage extends Component {
       Header: <Translate id="react.putAway.expiry.label" defaultMessage="Expiry" />,
       accessor: 'inventoryItem.expirationDate',
       style: { whiteSpace: 'normal' },
+      Cell: (props) => (
+        <span>
+          {
+            props?.value
+              ? this.props.formatLocalizedDate(props.value, DateFormat.COMMON)
+              : props.value
+          }
+        </span>
+      ),
       Filter,
     }, {
       Header: <Translate id="react.putAway.recipient.label" defaultMessage="Recipient" />,
@@ -210,9 +221,14 @@ class PutAwayCheckPage extends Component {
    * @public
    */
   // eslint-disable-next-line no-underscore-dangle
-  filterMethod = (filter, row) => (row._aggregated || row._groupedByPivot
-    || _.toString(row[filter.id]).toLowerCase().includes(filter.value.toLowerCase()));
-
+  filterMethod = (filter, row) => {
+    const rowData = row[filter.id];
+    const val = filter.id === 'inventoryItem.expirationDate'
+      ? this.props.formatLocalizedDate(rowData, DateFormat.COMMON)
+      : rowData;
+    return row._aggregated || row._groupedByPivot ||
+      _.toString(val).toLowerCase().includes(filter.value.toLowerCase());
+  };
   /**
    * Sends all changes made by user in this step of put-away to API and updates data.
    * @public
@@ -426,6 +442,7 @@ class PutAwayCheckPage extends Component {
 
 const mapStateToProps = state => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
+  formatLocalizedDate: formatDate(state.localize),
 });
 
 export default connect(mapStateToProps, { showSpinner, hideSpinner })(PutAwayCheckPage);
@@ -450,6 +467,7 @@ PutAwayCheckPage.propTypes = {
   translate: PropTypes.func.isRequired,
   previousPage: PropTypes.func.isRequired,
   goToPage: PropTypes.func.isRequired,
+  formatLocalizedDate: PropTypes.func.isRequired,
 };
 
 PutAwayCheckPage.defaultProps = {};
