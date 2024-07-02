@@ -18,12 +18,14 @@ import TableRowWithSubfields from 'components/form-elements/TableRowWithSubfield
 import TextField from 'components/form-elements/TextField';
 import EditLineModal from 'components/receiving/modals/EditLineModal';
 import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
+import DateFormat from 'consts/dateFormat';
 import apiClient, { flattenRequest, parseResponse } from 'utils/apiClient';
 import Checkbox from 'utils/Checkbox';
 import { renderFormField } from 'utils/form-utils';
 import { formatProductDisplayName, getReceivingPayloadContainers } from 'utils/form-values-utils';
 import Select from 'utils/Select';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
+import { formatDate } from 'utils/translation-utils';
 
 const isReceived = (subfield, fieldValue) => {
   if (!fieldValue) {
@@ -204,6 +206,9 @@ const TABLE_FIELDS = {
         label: 'react.partialReceiving.expirationDate.label',
         defaultMessage: 'Expiration date',
         flexWidth: '1',
+        getDynamicAttr: ({ formatLocalizedDate }) => ({
+          formatValue: (value) => (value ? formatLocalizedDate(value, DateFormat.COMMON) : value),
+        }),
       },
       binLocation: {
         type: (params) => (
@@ -904,6 +909,7 @@ class PartialReceivingPage extends Component {
                         values,
                         hasPartialReceivingSupport: this.props.hasPartialReceivingSupport,
                         translate: this.props.translate,
+                        formatLocalizedDate: this.props.formatLocalizedDate,
                       }))}
                   </div>
                   <div className="submit-buttons">
@@ -926,6 +932,7 @@ const mapStateToProps = (state) => ({
   partialReceivingTranslationsFetched: state.session.fetchedTranslations.partialReceiving,
   hasPartialReceivingSupport: state.session.currentLocation.hasPartialReceivingSupport,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
+  formatLocalizedDate: formatDate(state.localize),
 });
 
 export default connect(mapStateToProps, {
@@ -952,6 +959,7 @@ PartialReceivingPage.propTypes = {
   /** Is true when currently selected location supports partial receiving */
   hasPartialReceivingSupport: PropTypes.bool.isRequired,
   translate: PropTypes.func.isRequired,
+  formatLocalizedDate: PropTypes.func.isRequired,
 };
 
 PartialReceivingPage.defaultProps = {
