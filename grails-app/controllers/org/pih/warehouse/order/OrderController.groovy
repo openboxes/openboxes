@@ -852,7 +852,7 @@ class OrderController {
                 csv.printRecord(
                         orderItem?.id,
                         orderItem?.product?.productCode,
-                        orderItem?.product?.displayNameOrDefaultName,
+                        orderItem?.product?.displayNameWithLocaleCode,
                         orderItem?.productSupplier?.code,
                         orderItem?.productSupplier?.name,
                         orderItem?.productSupplier?.supplierCode,
