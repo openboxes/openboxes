@@ -13,6 +13,7 @@ import DateField from 'components/form-elements/DateField';
 import ModalWrapper from 'components/form-elements/ModalWrapper';
 import ProductSelectField from 'components/form-elements/ProductSelectField';
 import TextField from 'components/form-elements/TextField';
+import DateFormat from 'consts/dateFormat';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 
@@ -56,7 +57,8 @@ const FIELDS = {
         label: 'react.partialReceiving.expiry.label',
         defaultMessage: 'Expiry',
         attributes: {
-          dateFormat: 'MM/DD/YYYY',
+          localizeDate: true,
+          localizedDateFormat: DateFormat.COMMON,
           autoComplete: 'off',
         },
       },
