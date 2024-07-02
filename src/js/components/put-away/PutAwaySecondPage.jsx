@@ -25,6 +25,7 @@ import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 import 'react-table/react-table.css';
 import DateFormat from 'consts/dateFormat';
 import { formatDate } from 'utils/translation-utils';
+import { TableCell } from 'components/DataTable';
 
 const SelectTreeTable = (customTreeTableHOC(ReactTable));
 
@@ -115,7 +116,15 @@ class PutAwaySecondPage extends Component {
       Filter,
     }, {
       Header: <Translate id="react.putAway.name.label" defaultMessage="Name" />,
-      accessor: 'product.displayNameOrDefaultName',
+      accessor: 'product',
+      Cell: row => (
+        <TableCell
+          {...row}
+          value={row.value?.displayNameOrDefaultName}
+          tooltip={row.value?.name !== row.value?.displayNameOrDefaultName}
+          tooltipLabel={row.value?.name}
+        />
+      ),
       style: { whiteSpace: 'normal' },
       Filter,
     }, {
@@ -360,6 +369,9 @@ class PutAwaySecondPage extends Component {
     let val = row[filter.id];
     if (filter.id === 'putawayLocation') {
       val = _.get(val, 'name');
+    }
+    if (filter.id === 'product') {
+      val = val ? `${val.name} ${val.displayNameOrDefaultName}` : null;
     }
     if (filter.id === 'inventoryItem.expirationDate') {
       val = this.props.formatLocalizedDate(val, DateFormat.COMMON);
