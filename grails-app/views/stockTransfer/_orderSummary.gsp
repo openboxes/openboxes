@@ -42,7 +42,7 @@
                     <td>
                         <g:link controller="inventoryItem" action="showStockCard"
                                 style="color: ${orderItem?.product?.color}"  params="['product.id':orderItem?.product?.id]">
-                            <format:product product="${orderItem?.product}"/>
+                            <format:displayName product="${orderItem?.product}" showTooltip="${true}" />
                         </g:link>
                     </td>
                     <td>

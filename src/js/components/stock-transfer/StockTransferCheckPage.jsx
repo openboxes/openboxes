@@ -9,18 +9,18 @@ import Alert from 'react-s-alert';
 import ReactTable from 'react-table';
 
 import { hideSpinner, showSpinner } from 'actions';
+import { TableCell } from 'components/DataTable';
 import { extractNonCanceledItems } from 'components/stock-transfer/utils';
 import { STOCK_TRANSFER_URL } from 'consts/applicationUrls';
+import DateFormat from 'consts/dateFormat';
 import apiClient, { flattenRequest, parseResponse } from 'utils/apiClient';
 import customTreeTableHOC from 'utils/CustomTreeTable';
 import Filter from 'utils/Filter';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
+import { formatDate } from 'utils/translation-utils';
 
 import 'react-table/react-table.css';
 import 'react-confirm-alert/src/react-confirm-alert.css';
-import { formatDate } from 'utils/translation-utils';
-import DateFormat from 'consts/dateFormat';
-
 
 const SelectTreeTable = (customTreeTableHOC(ReactTable));
 
@@ -76,8 +76,16 @@ class StockTransferSecondPage extends Component {
       Filter,
     }, {
       Header: <Translate id="react.stockTransfer.product.label" defaultMessage="Product" />,
-      accessor: 'product.name',
+      accessor: 'product',
       style: { whiteSpace: 'normal' },
+      Cell: row => (
+        <TableCell
+          {...row}
+          value={row.value?.displayName ?? row.value?.name}
+          tooltip={row.value?.displayName && row.value?.name !== row.value?.displayName}
+          tooltipLabel={row.value?.name}
+        />
+      ),
       Filter,
     }, {
       Header: <Translate id="react.stockTransfer.lot.label" defaultMessage="Lot" />,

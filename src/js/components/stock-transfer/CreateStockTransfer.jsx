@@ -13,6 +13,7 @@ import {
   hideSpinner,
   showSpinner,
 } from 'actions';
+import { TableCell } from 'components/DataTable';
 import { STOCK_TRANSFER_URL } from 'consts/applicationUrls';
 import DateFormat from 'consts/dateFormat';
 import { InfoBar, InfoBarConfigs } from 'consts/infoBar';
@@ -93,8 +94,16 @@ class CreateStockTransfer extends Component {
       Filter,
     }, {
       Header: <Translate id="react.stockTransfer.product.label" defaultMessage="Product" />,
-      accessor: 'product.name',
+      accessor: 'product',
       style: { whiteSpace: 'normal' },
+      Cell: row => (
+        <TableCell
+          {...row}
+          value={row.value?.displayName ?? row.value?.name}
+          tooltip={row.value?.displayName && row.value?.name !== row.value?.displayName}
+          tooltipLabel={row.value?.name}
+        />
+      ),
       Filter,
     }, {
       Header: <Translate id="react.stockTransfer.lot.label" defaultMessage="Lot" />,
