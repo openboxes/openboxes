@@ -164,7 +164,10 @@ class StockTransferSecondPage extends Component {
   }
 
   filterMethod = (filter, row) => {
-    const val = row[filter.id];
+    let val = row[filter.id];
+    if (filter.id === 'product') {
+      val = val ? `${val.name} ${val.displayName}` : null;
+    }
     return _.toString(val).toLowerCase().includes(filter.value.toLowerCase());
   };
 
