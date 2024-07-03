@@ -33,7 +33,7 @@
             <g:set var="defaultLocale" value="${new Locale(grailsApplication.config.openboxes.locale.defaultLocale)}"/>
 			<a class="${selected?'selected':''}" href="${link}">
 				<!-- fetch the display for locale based on the current locale -->
-				${g.message(code: "locale." + l + ".label", default: locale?.getDisplayName(locale ?: defaultLocale))}
+				${warehouse.message(code: "locale." + l + ".label", default: locale?.getDisplayName(locale ?: defaultLocale))}
 			</a>
 		</g:each>
 		<g:isUserInRole roles="[RoleType.ROLE_ADMIN]">
