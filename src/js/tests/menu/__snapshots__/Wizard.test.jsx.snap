@@ -106,6 +106,7 @@ exports[`wizard component should match snapshot 1`] = `
           className="classic-form with-description"
         >
           <div
+            aria-label="Invoice number"
             className="mt-2  mb-0 mx-1 form-group   "
             data-testid="form-field"
           >
@@ -157,6 +158,7 @@ exports[`wizard component should match snapshot 1`] = `
             </div>
           </div>
           <div
+            aria-label="Vendor"
             className="mt-2  mb-0 mx-1 form-group required  "
             data-testid="form-field"
           >
@@ -314,6 +316,7 @@ exports[`wizard component should match snapshot 1`] = `
             </div>
           </div>
           <div
+            aria-label="Vendor Invoice Number"
             className="mt-2  mb-0 mx-1 form-group required  "
             data-testid="form-field"
           >
@@ -364,6 +367,7 @@ exports[`wizard component should match snapshot 1`] = `
             </div>
           </div>
           <div
+            aria-label="Invoice Date"
             className="mt-2  mb-0 mx-1 form-group required  "
             data-testid="form-field"
           >
@@ -425,6 +429,7 @@ exports[`wizard component should match snapshot 1`] = `
             </div>
           </div>
           <div
+            aria-label="Currency"
             className="mt-2  mb-0 mx-1 form-group required  "
             data-testid="form-field"
           >
@@ -610,6 +615,7 @@ exports[`wizardPage component should match snapshot 1`] = `
       className="classic-form with-description"
     >
       <div
+        aria-label="Invoice number"
         className="mt-2  mb-0 mx-1 form-group   "
         data-testid="form-field"
       >
@@ -661,6 +667,7 @@ exports[`wizardPage component should match snapshot 1`] = `
         </div>
       </div>
       <div
+        aria-label="Vendor"
         className="mt-2  mb-0 mx-1 form-group required  "
         data-testid="form-field"
       >
@@ -818,6 +825,7 @@ exports[`wizardPage component should match snapshot 1`] = `
         </div>
       </div>
       <div
+        aria-label="Vendor Invoice Number"
         className="mt-2  mb-0 mx-1 form-group required  "
         data-testid="form-field"
       >
@@ -868,6 +876,7 @@ exports[`wizardPage component should match snapshot 1`] = `
         </div>
       </div>
       <div
+        aria-label="Invoice Date"
         className="mt-2  mb-0 mx-1 form-group required  "
         data-testid="form-field"
       >
@@ -929,6 +938,7 @@ exports[`wizardPage component should match snapshot 1`] = `
         </div>
       </div>
       <div
+        aria-label="Currency"
         className="mt-2  mb-0 mx-1 form-group required  "
         data-testid="form-field"
       >
