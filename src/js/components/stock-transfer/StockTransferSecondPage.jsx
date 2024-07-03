@@ -279,7 +279,9 @@ class StockTransferSecondPage extends Component {
     if (filter.id === 'destinationBinLocation') {
       val = _.get(val, 'name');
     }
-
+    if (filter.id === 'product') {
+      val = val ? `${val.name} ${val.displayName}` : null;
+    }
     return _.toString(val).toLowerCase().includes(filter.value.toLowerCase());
   };
 
