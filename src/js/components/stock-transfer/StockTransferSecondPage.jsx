@@ -21,6 +21,7 @@ import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 import 'react-table/react-table.css';
 import { formatDate } from 'utils/translation-utils';
 import DateFormat from 'consts/dateFormat';
+import { TableCell } from 'components/DataTable';
 
 
 const SelectTreeTable = (customTreeTableHOC(ReactTable));
@@ -79,8 +80,16 @@ class StockTransferSecondPage extends Component {
       Filter,
     }, {
       Header: <Translate id="react.stockTransfer.product.label" defaultMessage="Product" />,
-      accessor: 'product.name',
+      accessor: 'product',
       style: { whiteSpace: 'normal' },
+      Cell: row => (
+        <TableCell
+          {...row}
+          value={row.value?.displayName ?? row.value?.name}
+          tooltip={row.value?.displayName && row.value?.name !== row.value?.displayName}
+          tooltipLabel={row.value?.name}
+        />
+      ),
       Filter,
     }, {
       Header: <Translate id="react.stockTransfer.lot.label" defaultMessage="Lot" />,
