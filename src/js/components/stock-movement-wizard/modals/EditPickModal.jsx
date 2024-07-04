@@ -17,9 +17,11 @@ import LabelField from 'components/form-elements/LabelField';
 import ModalWrapper from 'components/form-elements/ModalWrapper';
 import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
+import DateFormat from 'consts/dateFormat';
 import { OutboundWorkflowState } from 'consts/WorkflowState';
 import apiClient from 'utils/apiClient';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
+import { formatDate } from 'utils/translation-utils';
 
 const FIELDS = {
   reasonCode: {
@@ -76,6 +78,9 @@ const FIELDS = {
         label: 'react.stockMovement.expiry.label',
         defaultMessage: 'Expiry',
         fixedWidth: '120px',
+        getDynamicAttr: ({ formatLocalizedDate }) => ({
+          formatValue: (value) => formatLocalizedDate(value, DateFormat.COMMON),
+        }),
       },
       binLocation: {
         type: LabelField,
@@ -315,6 +320,7 @@ class EditPickModal extends Component {
           reasonCodes: this.state.attr.reasonCodes,
           hasBinLocationSupport: this.props.hasBinLocationSupport,
           translate: this.props.translate,
+          formatLocalizedDate: this.props.formatLocalizedDate,
         }}
         renderBodyWithValues={this.calculatePicked}
       >
@@ -346,6 +352,7 @@ class EditPickModal extends Component {
 
 const mapStateToProps = state => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
+  formatLocalizedDate: formatDate(state.localize),
 });
 
 export default connect(mapStateToProps, { showSpinner, hideSpinner })(EditPickModal);
@@ -364,4 +371,5 @@ EditPickModal.propTypes = {
   /** Is true when currently selected location supports bins */
   hasBinLocationSupport: PropTypes.bool.isRequired,
   translate: PropTypes.func.isRequired,
+  formatLocalizedDate: PropTypes.func.isRequired,
 };

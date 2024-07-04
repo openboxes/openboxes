@@ -9,7 +9,7 @@ import Dropzone from 'react-dropzone';
 import { Form } from 'react-final-form';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
-import { withRouter } from "react-router-dom";
+import { withRouter } from 'react-router-dom';
 import Alert from 'react-s-alert';
 import { Tooltip } from 'react-tippy';
 
@@ -21,6 +21,7 @@ import LabelField from 'components/form-elements/LabelField';
 import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
 import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
+import DateFormat from 'consts/dateFormat';
 import AlertMessage from 'utils/AlertMessage';
 import {
   apiClientCustomResponseHandler as apiClient,
@@ -32,7 +33,7 @@ import { renderFormField } from 'utils/form-utils';
 import { formatProductDisplayName } from 'utils/form-values-utils';
 import { debounceLocationsFetch } from 'utils/option-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
-import splitTranslation from 'utils/translation-utils';
+import splitTranslation, { formatDate } from 'utils/translation-utils';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
@@ -91,7 +92,8 @@ const SHIPMENT_FIELDS = {
     label: 'react.stockMovement.shipDate.label',
     defaultMessage: 'Shipment date',
     attributes: {
-      dateFormat: 'MM/DD/YYYY HH:mm Z',
+      localizeDate: true,
+      localizedDateFormat: DateFormat.DEFAULT,
       required: true,
       showTimeSelect: true,
       autoComplete: 'off',
@@ -145,7 +147,7 @@ const SHIPMENT_FIELDS = {
     label: 'react.stockMovement.expectedDeliveryDate.label',
     defaultMessage: 'Expected receipt date',
     attributes: {
-      dateFormat: 'MM/DD/YYYY',
+      localizeDate: true,
       required: true,
       showTimeSelect: false,
       autoComplete: 'off',
@@ -234,6 +236,9 @@ const FIELDS = {
         label: 'react.stockMovement.expiry.label',
         defaultMessage: 'Expiry',
         flexWidth: '3.5',
+        getDynamicAttr: ({ formatLocalizedDate }) => ({
+          formatValue: (value) => formatLocalizedDate(value, DateFormat.COMMON),
+        }),
       },
       quantityShipped: {
         type: LabelField,
@@ -951,6 +956,7 @@ class SendMovementPage extends Component {
                         isBoxNameEmpty: _.every(this.state.values.tableItems, ({ boxName }) => !boxName),
                         // eslint-disable-next-line max-len
                         isPalletNameEmpty: _.every(this.state.values.tableItems, ({ palletName }) => !palletName),
+                        formatLocalizedDate: this.props.formatLocalizedDate,
                       }))}
                 </div>
               </div>
@@ -974,6 +980,7 @@ const mapStateToProps = state => ({
   isPaginated: state.session.isPaginated,
   pageSize: state.session.pageSize,
   minimumExpirationDate: state.session.minimumExpirationDate,
+  formatLocalizedDate: formatDate(state.localize),
 });
 
 export default withRouter(connect(mapStateToProps, { showSpinner, hideSpinner })(SendMovementPage));
@@ -1007,4 +1014,5 @@ SendMovementPage.propTypes = {
   history: PropTypes.shape({
     push: PropTypes.func,
   }).isRequired,
+  formatLocalizedDate: PropTypes.func.isRequired,
 };

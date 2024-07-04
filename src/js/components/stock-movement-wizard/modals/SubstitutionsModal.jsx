@@ -12,9 +12,11 @@ import ModalWrapper from 'components/form-elements/ModalWrapper';
 import ProductSelectField from 'components/form-elements/ProductSelectField';
 import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
+import DateFormat from 'consts/dateFormat';
 import apiClient from 'utils/apiClient';
 import { debounceAvailableItemsFetch } from 'utils/option-utils';
 import Translate from 'utils/Translate';
+import { formatDate } from 'utils/translation-utils';
 
 
 const FIELDS = {
@@ -83,6 +85,9 @@ const FIELDS = {
         attributes: {
           showValueTooltip: true,
         },
+        getDynamicAttr: ({ formatLocalizedDate }) => ({
+          formatValue: (value) => formatLocalizedDate(value, DateFormat.COMMON),
+        }),
       },
       'product.quantityAvailable': {
         type: LabelField,
@@ -335,6 +340,7 @@ class SubstitutionsModal extends Component {
           reasonCodes: this.state.attr.reasonCodes,
           originalItem: this.state.originalItem,
           debouncedAvailableItemsFetch: this.debouncedAvailableItemsFetch,
+          formatLocalizedDate: this.props.formatLocalizedDate,
         }}
         renderBodyWithValues={this.calculateSelected}
       >
@@ -376,6 +382,7 @@ class SubstitutionsModal extends Component {
 const mapStateToProps = state => ({
   debounceTime: state.session.searchConfig.debounceTime,
   minSearchLength: state.session.searchConfig.minSearchLength,
+  formatLocalizedDate: formatDate(state.localize),
 });
 
 export default connect(mapStateToProps, {
@@ -400,4 +407,5 @@ SubstitutionsModal.propTypes = {
   onResponse: PropTypes.func.isRequired,
   debounceTime: PropTypes.number.isRequired,
   minSearchLength: PropTypes.number.isRequired,
+  formatLocalizedDate: PropTypes.func.isRequired,
 };
