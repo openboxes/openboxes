@@ -1,5 +1,6 @@
 import DateFilter from 'components/form-elements/DateFilter/DateFilter';
 import FilterSelectField from 'components/form-elements/FilterSelectField';
+import DateFormat from 'consts/dateFormat';
 
 export default isRequest => ({
   requisitionStatusCode: {
@@ -181,7 +182,8 @@ export default isRequest => ({
     attributes: {
       label: 'react.stockMovement.filter.createdAfter.label',
       defaultMessage: 'Created after',
-      dateFormat: 'MM/DD/YYYY',
+      localizeDate: true,
+      localizedDateFormat: DateFormat.COMMON,
       filterElement: true,
     },
   },
@@ -190,7 +192,8 @@ export default isRequest => ({
     attributes: {
       label: 'react.stockMovement.filter.createdBefore.label',
       defaultMessage: 'Created before',
-      dateFormat: 'MM/DD/YYYY',
+      localizeDate: true,
+      localizedDateFormat: DateFormat.COMMON,
       filterElement: true,
     },
   },

@@ -24,6 +24,7 @@ import LabelField from 'components/form-elements/LabelField';
 import TableRowWithSubfields from 'components/form-elements/TableRowWithSubfields';
 import EditPickModal from 'components/stock-movement-wizard/modals/EditPickModal';
 import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
+import DateFormat from 'consts/dateFormat';
 import { OutboundWorkflowState } from 'consts/WorkflowState';
 import AlertMessage from 'utils/AlertMessage';
 import {
@@ -35,6 +36,7 @@ import {
 import { renderFormField } from 'utils/form-utils';
 import { formatProductDisplayName, matchesProductCodeOrName } from 'utils/form-values-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
+import { formatDate } from 'utils/translation-utils';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
@@ -101,6 +103,9 @@ const FIELDS = {
         flexWidth: '0.9',
         label: 'react.stockMovement.expiry.label',
         defaultMessage: 'Expiry',
+        getDynamicAttr: ({ formatLocalizedDate }) => ({
+          formatValue: (value) => formatLocalizedDate(value, DateFormat.COMMON),
+        }),
       },
       binLocation: {
         type: LabelField,
@@ -1050,6 +1055,7 @@ class PickPage extends Component {
                   showOnly,
                   isFirstPageLoaded: this.state.isFirstPageLoaded,
                   itemFilter,
+                  formatLocalizedDate: this.props.formatLocalizedDate,
                 }))}
               </div>
               <div className="d-print-none submit-buttons">
@@ -1083,6 +1089,7 @@ const mapStateToProps = (state) => ({
   isPaginated: state.session.isPaginated,
   pageSize: state.session.pageSize,
   currentLocale: state.session.activeLanguage,
+  formatLocalizedDate: formatDate(state.localize),
 });
 
 export default connect(mapStateToProps, { showSpinner, hideSpinner, fetchReasonCodes })(PickPage);
@@ -1118,4 +1125,5 @@ PickPage.propTypes = {
   history: PropTypes.shape({
     push: PropTypes.func,
   }).isRequired,
+  formatLocalizedDate: PropTypes.func.isRequired,
 };

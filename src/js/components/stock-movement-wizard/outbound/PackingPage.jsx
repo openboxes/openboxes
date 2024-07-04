@@ -18,6 +18,7 @@ import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
 import PackingSplitLineModal from 'components/stock-movement-wizard/modals/PackingSplitLineModal';
 import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
+import DateFormat from 'consts/dateFormat';
 import AlertMessage from 'utils/AlertMessage';
 import {
   apiClientCustomResponseHandler as apiClient,
@@ -29,6 +30,7 @@ import { renderFormField } from 'utils/form-utils';
 import { formatProductDisplayName, matchesProductCodeOrName } from 'utils/form-values-utils';
 import { debouncePeopleFetch } from 'utils/option-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
+import { formatDate } from 'utils/translation-utils';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
@@ -103,6 +105,9 @@ const FIELDS = {
         label: 'react.stockMovement.expiry.label',
         defaultMessage: 'Expiry',
         flexWidth: '1',
+        getDynamicAttr: ({ formatLocalizedDate }) => ({
+          formatValue: (value) => formatLocalizedDate(value, DateFormat.COMMON),
+        }),
       },
       quantityShipped: {
         type: LabelField,
@@ -554,6 +559,7 @@ class PackingPage extends Component {
                   isFirstPageLoaded: this.state.isFirstPageLoaded,
                   showOnly,
                   itemFilter,
+                  formatLocalizedDate: this.props.formatLocalizedDate,
                 }))}
               </div>
               <div className="submit-buttons">
@@ -588,6 +594,7 @@ const mapStateToProps = state => ({
   hasBinLocationSupport: state.session.currentLocation.hasBinLocationSupport,
   isPaginated: state.session.isPaginated,
   pageSize: state.session.pageSize,
+  formatLocalizedDate: formatDate(state.localize),
 });
 
 export default (connect(mapStateToProps, {
@@ -622,4 +629,5 @@ PackingPage.propTypes = {
   history: PropTypes.shape({
     push: PropTypes.func,
   }).isRequired,
+  formatLocalizedDate: PropTypes.func.isRequired,
 };

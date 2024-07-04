@@ -145,7 +145,7 @@ const FIELDS = {
     defaultMessage: 'Date requested',
     attributes: {
       required: true,
-      dateFormat: 'MM/DD/YYYY',
+      localizeDate: true,
       autoComplete: 'off',
     },
   },

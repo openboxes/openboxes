@@ -25,6 +25,7 @@ import { debounceLocationsFetch, debouncePeopleFetch } from 'utils/option-utils'
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
+import DateFormat from "consts/dateFormat";
 
 
 function validate(values) {
@@ -144,7 +145,8 @@ const DEFAULT_FIELDS = {
     defaultMessage: 'Date requested',
     attributes: {
       required: true,
-      dateFormat: 'MM/DD/YYYY',
+      localizeDate: true,
+      localizedDateFormat: DateFormat.COMMON,
       autoComplete: 'off',
     },
   },
