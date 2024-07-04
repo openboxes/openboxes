@@ -144,12 +144,12 @@
                         <wordwrap:td>${putawayItem?.quantity}</wordwrap:td>
                         <wordwrap:td>
                             ${(putawayItem["preferredBin.zoneName"] ? putawayItem["preferredBin.zoneName"] + ": " : '') +
-                                    (putawayItem["preferredBin.name"] ?: g.message(code: "default.null.label", default: "null"))}
+                                    (putawayItem["preferredBin.name"] ?: "")}
                         </wordwrap:td>
                         <wordwrap:td>${putawayItem["currentBins"]}</wordwrap:td>
                         <wordwrap:td>
                             ${(putawayItem["putawayLocation.zoneName"] ? putawayItem["putawayLocation.zoneName"] + ": " : '') +
-                                    (putawayItem["putawayLocation.name"] ?: g.message(code: "default.null.label", default: "null"))}
+                                    (putawayItem["putawayLocation.name"] ?: "")}
                         </wordwrap:td>
                     </tr>
                 </g:if>

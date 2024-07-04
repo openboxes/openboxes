@@ -8,7 +8,7 @@
         <td>
             <div class="header">
                 <div style="font-size: 25px; margin-bottom: 10px; font-weight: bold;">
-                    <g:message code="enum.ShipmentStatusCode.${shipment?.status}" default="${shipment?.status}" />
+                    <g:message code="enum.ShipmentStatusCode.${shipment?.status?.code?.name}" default="${shipment?.status?.code?.name}" />
                 </div>
                 <h1>${title}</h1>
                 <h3>${shipment?.shipmentNumber} - ${shipment?.name }
