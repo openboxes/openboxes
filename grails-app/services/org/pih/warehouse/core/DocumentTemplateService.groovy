@@ -111,6 +111,7 @@ class DocumentTemplateService {
                     unitOfMeasure       : orderItem?.unitOfMeasure ?: "",
                     unitPrice           : orderItem?.unitPrice ?: "",
                     totalPrice          : orderItem?.totalPrice() ?: "",
+                    budgetCode          : orderItem?.budgetCode?.code ?: "",
                     expectedShippingDate: orderItem?.estimatedReadyDate ? orderItem?.estimatedReadyDate?.format("MMM dd, yyyy") : ""
             ]
         }
@@ -127,6 +128,7 @@ class DocumentTemplateService {
                     unitOfMeasure       : "",
                     unitPrice           : "",
                     totalPrice          : orderAdjustment?.totalAdjustments ?: "",
+                    budgetCode          : orderAdjustment?.budgetCode?.code ?: "",
                     expectedShippingDate: ""
             ]
         }
@@ -146,7 +148,18 @@ class DocumentTemplateService {
                 unitOfMeasure: k.unitOfMeasure,
                 unitPrice: v?.unitPrice?.first(),
                 quantity: v?.sum { it.quantity },
-                totalPrice: v?.sum { it.totalPrice() }
+                totalPrice: v?.sum { it.totalPrice() },
+                budgetCode: v?.budgetCode?.first()?.code ?: "",
+                expectedShippingDate: v?.estimatedReadyDate?.first() ? v?.estimatedReadyDate?.first()?.format(Constants.EUROPEAN_DATE_FORMAT) : ""
+            ]
+        }
+
+        List<Map<String, Object>> orderItemsAndAdjustmentsGroupedByBudgetCode = [*orderItems, *orderAdjustments].groupBy {
+            it.budgetCode
+        }.collect { budgetCode, items ->
+            return [
+                    budgetCode: budgetCode,
+                    totalPrice: items.sum { it.totalPrice ?: 0 }
             ]
         }
 
@@ -189,6 +202,8 @@ class DocumentTemplateService {
         order['origin.stateOrProvince'] = order?.origin?.address?.stateOrProvince ?: ""
         order['origin.postalCode'] = order?.origin?.address?.postalCode ?: ""
         order['origin.country'] = order?.origin?.address?.country ?: ""
+        order['origin.address.description'] = order?.origin?.address?.description ?: ""
+        order['paymentMethod'] = order?.paymentMethodType?.name ?: ""
 
         // Add order item fields to metadata
         FieldsMetadata metadata = report.createFieldsMetadata()
@@ -212,17 +227,32 @@ class DocumentTemplateService {
         metadata.addFieldAsList("orderItemsGroupedByProductAndUom.unitOfMeasure")
         metadata.addFieldAsList("orderItemsGroupedByProductAndUom.unitPrice")
         metadata.addFieldAsList("orderItemsGroupedByProductAndUom.totalPrice")
+        metadata.addFieldAsList("orderItemsGroupedByProductAndUom.expectedShippingDate")
+        metadata.addFieldAsList("orderItemsGroupedByProductAndUom.budgetCode")
 
         // Add order adjustment fields to metadata
         metadata.addFieldAsList("orderAdjustments.code")
         metadata.addFieldAsList("orderAdjustments.description")
         metadata.addFieldAsList("orderAdjustments.totalPrice")
+        metadata.addFieldAsList("orderAdjustments.budgetCode")
+
+        metadata.addFieldAsList("orderItemsAndAdjustmentsGroupedByBudgetCode.budgetCode")
+        metadata.addFieldAsList("orderItemsAndAdjustmentsGroupedByBudgetCode.totalPrice")
+
+        Date maxExpectedReadyDate = orderItems.any { it.expectedShippingDate }
+            ? new Date(
+                orderItems?.max {
+                    it?.expectedShippingDate
+                }?.expectedShippingDate
+            ) : null
 
         IContext context = report.createContext()
         context.put("order", order)
         context.put("orderItems", orderItems)
         context.put("orderItemsGroupedByProductAndUom", orderItemsGroupedByProductAndUom)
         context.put("orderAdjustments", orderAdjustments)
+        context.put("maxExpectedReadyDate", maxExpectedReadyDate)
+        context.put("orderItemsAndAdjustmentsGroupedByBudgetCode", orderItemsAndAdjustmentsGroupedByBudgetCode)
         context.put("today", new Date())
         return context
     }
