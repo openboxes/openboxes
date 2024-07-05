@@ -131,7 +131,7 @@
                 </tr>
                 <tr>
                     <td style="white-space: nowrap;">
-                        <label><warehouse:message code="picklist.datePrinted.label" default="Date printed"/>:</label>
+                        <label><g:message code="picklist.datePrinted.label" default="Date printed"/>:</label>
                     </td>
                     <td style="white-space: nowrap;">
                         <g:formatDate
