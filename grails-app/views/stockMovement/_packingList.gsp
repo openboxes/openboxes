@@ -86,7 +86,7 @@
                     </td>
                     <td class="product">
                         <g:link controller="inventoryItem" action="showStockCard" id="${shipmentItem?.inventoryItem?.product?.id}">
-                            <cache:block key="${shipmentItem?.id}">
+                            <cache:block key="${shipmentItem?.id} ${session.locale}">
                                 <format:displayNameWithColor product="${shipmentItem?.inventoryItem?.product}" showTooltip="${true}" />
                                 <g:renderHandlingIcons product="${shipmentItem?.inventoryItem?.product}" />
                             </cache:block>
