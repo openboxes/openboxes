@@ -1,3 +1,4 @@
+<%@ page import="org.pih.warehouse.LocalizationUtil" %>
 <%@ page import="org.pih.warehouse.inventory.LotStatusCode" %>
 <%@ page import="org.pih.warehouse.core.Constants" %>
 
@@ -86,7 +87,7 @@
                     </td>
                     <td aria-label="Product" class="product">
                         <g:link controller="inventoryItem" action="showStockCard" id="${shipmentItem?.inventoryItem?.product?.id}">
-                            <cache:block key="${shipmentItem?.id}">
+                            <cache:block key="${shipmentItem?.id} ${LocalizationUtil.currentLocale}">
                                 <format:displayNameWithColor product="${shipmentItem?.inventoryItem?.product}" showTooltip="${true}" />
                                 <g:renderHandlingIcons product="${shipmentItem?.inventoryItem?.product}" />
                             </cache:block>
