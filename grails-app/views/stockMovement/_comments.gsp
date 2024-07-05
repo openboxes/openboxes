@@ -1,4 +1,4 @@
-<div class="box">
+<section class="box" aria-label="Comments">
     <h2><warehouse:message code="comments.label"/></h2>
     <g:if test="${requisition?.comments}">
         <table>
@@ -50,4 +50,4 @@
     <g:else>
         <div class="fade center empty"><warehouse:message code="default.noComments.label" /></div>
     </g:else>
-</div>
+</section>

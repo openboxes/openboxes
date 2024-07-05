@@ -217,7 +217,7 @@
     </div>
     <div class="yui-gf">
         <div class="yui-u first">
-            <div class="box">
+            <aside class="box" aria-label="Details">
                 <h2><warehouse:message code="default.details.label" /></h2>
                 <div class="dialog">
 
@@ -410,8 +410,8 @@
                         </g:isSuperuser>
                     </table>
                 </div>
-            </div>
-            <div class="box">
+            </aside>
+            <aside class="box" aria-label="Auditing">
                 <h2><warehouse:message code="default.auditing.label"/></h2>
                 <div class="dialog">
 
@@ -556,29 +556,29 @@
                     </table>
 
                 </div>
-            </div>
+            </aside>
         </div>
         <div class="yui-u">
             <div class="tabs">
-                <ul>
+                <ul aria-label="tabs">
                     <g:if test="${!stockMovement?.origin?.isSupplier()}">
-                        <li>
+                        <li role="tab">
                             <g:link controller="stockMovement" action="requisition" params="${[ id: stockMovement?.id ]}">
                                 <warehouse:message code="requestDetails.label"/>
                             </g:link>
                         </li>
                     </g:if>
-                    <li>
+                    <li role="tab">
                         <g:link controller="stockMovement" action="packingList" params="${[ id: stockMovement?.id ]}">
                             <warehouse:message code="shipping.packingList.label" />
                         </g:link>
                     </li>
-                    <li>
+                    <li role="tab">
                         <g:link controller="stockMovement" action="receipts" params="${[ id: stockMovement?.id ]}">
                             <warehouse:message code="receipts.label" default="Receipts"/>
                         </g:link>
                     </li>
-                    <li>
+                    <li role="tab">
                         <g:link controller="stockMovement" action="documents" params="${[ id: stockMovement?.id ]}">
                             <warehouse:message code="documents.label" default="Documents"/>
                         </g:link>
@@ -586,6 +586,7 @@
                     <g:if test="${stockMovement.electronicType}">
                         <g:set var="commentCount" value="${stockMovement?.requisition?.comments?.size()}" />
                         <li
+                            role="tab"
                             data-count="${commentCount < 1000 ? commentCount : '999+' }"
                             class="${commentCount > 0 ? 'tab-badge' : ''}"
                         >

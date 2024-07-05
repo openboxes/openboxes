@@ -27,7 +27,7 @@ const LabelField = (props) => {
   }
 
   const renderField = ({ input: { value } }) => (
-    <div className="form-group my-0">
+    <div className="form-group my-0" data-testid="label-field" aria-label={defaultMessage}>
       <div className="row">
         {
             typeof FieldLabel === 'string' ?
@@ -50,7 +50,7 @@ const LabelField = (props) => {
   if (arrayField) {
     const formattedValue = formatValue ? formatValue(fieldValue) : fieldValue;
     return (
-      <div className="form-group my-0">
+      <div className="form-group my-0" data-testid="label-field" aria-label={defaultMessage}>
         <Tooltip
           html={tooltipValue || (<div className="text-truncate">{formattedValue}</div>)}
           disabled={!showValueTooltip}

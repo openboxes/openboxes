@@ -1,6 +1,6 @@
 <%@ page import="org.pih.warehouse.core.Constants" %>
 
-<div id="receipt" class="dialog box">
+<section id="receipt" class="dialog box" aria-label="Receipt">
     <h2>
         <img src="${resource(dir:'images/icons',file:'handtruck.png')}" />
         <label><warehouse:message code="shipping.receipt.label"/></label>
@@ -59,10 +59,7 @@
                     ${receiptItem?.inventoryItem?.lotNumber?:"Default"}
                 </td>
                 <td>
-                    <g:formatDate
-                            format="${Constants.DEFAULT_MONTH_YEAR_DATE_FORMAT}"
-                            date="${receiptItem?.inventoryItem?.expirationDate}"
-                    />
+                    <g:expirationDate date="${receiptItem?.inventoryItem?.expirationDate}"/>
                 </td>
                 <td>
                     ${receiptItem?.binLocation?.name}
@@ -98,4 +95,4 @@
         </div>
     </g:unless>
 
-</div>
+</section>

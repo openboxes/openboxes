@@ -1004,7 +1004,7 @@ class AddItemsPage extends Component {
               </button>
             </span>
             <form onSubmit={handleSubmit}>
-              <div className="table-form">
+              <div className="table-form" data-testid="items-table">
                 {_.map(VENDOR_FIELDS, (fieldConfig, fieldName) =>
                 renderFormField(fieldConfig, fieldName, {
                   stocklist: values.stocklist,

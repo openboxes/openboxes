@@ -87,12 +87,12 @@ describe('wizardSteps component', () => {
   });
 
   it('should have an active element', () => {
-    expect(renderedWizardSteps.root.findByProps({ 'data-testid': 'active' }))
+    expect(renderedWizardSteps.root.findByProps({ 'data-stepstate': 'active' }))
       .toBeTruthy();
   });
 
   it('should have an inactive element', () => {
-    expect(renderedWizardSteps.root.findByProps({ 'data-testid': 'inactive' }))
+    expect(renderedWizardSteps.root.findByProps({ 'data-stepstate': 'inactive' }))
       .toBeTruthy();
   });
 });

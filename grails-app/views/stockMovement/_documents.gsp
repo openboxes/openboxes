@@ -1,4 +1,4 @@
-<div id="documents-tab">
+<section id="documents-tab" aria-label="Documents">
 
     <div class="box">
         <h2>
@@ -109,4 +109,4 @@
             </table>
         </div>
     </g:if>
-</div>
+</section>
