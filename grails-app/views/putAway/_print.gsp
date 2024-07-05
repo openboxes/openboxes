@@ -117,10 +117,10 @@
                         <g:message code="putawayOrder.expiry.label" default="Expiry" />
                     </th>
                     <th style="width: 30px;">
-                        <g:message code="putawayOrder.totalQty.label" default="Total Quantity" />
+                        <g:message code="putawayOrder.totalQuantity.label" default="Total Quantity" />
                     </th>
                     <th style="width: 50px;">
-                        <g:message code="putawayOrder.putawayQty.label" default="Putaway Quantity" />
+                        <g:message code="putawayOrder.putawayQuantity.label" default="Putaway Quantity" />
                     </th>
                     <th style="white-space: nowrap; width: 50px;">
                         <g:message code="putawayOrder.preferredBin.label" default="Preferred Bin" />
