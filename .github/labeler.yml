@@ -5,13 +5,16 @@
   - head-branch: ['^bug/', '^bugfix/']
 
 "type: feature":
-  - head-branch: ['^feature/', '^feat/']
+  - head-branch: ['^feature/', '^feat/', '^ft/']
 
 "type: maintenance":
   - head-branch: ['^maintenance/', '^techdebt/', '^chore/']
 
 "type: release":
   - head-branch: ['^release/']
+
+"warn: do not squash":
+  - head-branch: ['^release/', 'develop', 'master', 'main']
 
 "domain: l10n":
   - head-branch: ['l10n']
