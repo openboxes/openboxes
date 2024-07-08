@@ -10,10 +10,11 @@ import LabelField from 'components/form-elements/LabelField';
 import ModalWrapper from 'components/form-elements/ModalWrapper';
 import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
+import DateFormat from 'consts/dateFormat';
 import { formatProductDisplayName } from 'utils/form-values-utils';
 import { debouncePeopleFetch } from 'utils/option-utils';
 import Translate from 'utils/Translate';
-
+import { formatDate } from 'utils/translation-utils';
 
 const FIELDS = {
   splitLineItems: {
@@ -55,6 +56,9 @@ const FIELDS = {
         type: LabelField,
         label: 'react.stockMovement.expiry.label',
         defaultMessage: 'Expiry',
+        getDynamicAttr: ({ formatLocalizedDate }) => ({
+          formatValue: (value) => formatLocalizedDate(value, DateFormat.COMMON),
+        }),
       },
       binLocation: {
         type: LabelField,
@@ -228,6 +232,7 @@ class PackingSplitLineModal extends Component {
           lineItem: this.state.attr.lineItem,
           debouncedPeopleFetch: this.debouncedPeopleFetch,
           hasBinLocationSupport: this.props.hasBinLocationSupport,
+          formatLocalizedDate: this.props.formatLocalizedDate,
         }}
         validate={this.validate}
         renderBodyWithValues={PackingSplitLineModal.displayPackedSum}
@@ -246,6 +251,7 @@ const mapStateToProps = state => ({
   debounceTime: state.session.searchConfig.debounceTime,
   minSearchLength: state.session.searchConfig.minSearchLength,
   hasBinLocationSupport: state.session.currentLocation.hasBinLocationSupport,
+  formatLocalizedDate: formatDate(state.localize),
 });
 
 export default connect(mapStateToProps, { showSpinner, hideSpinner })(PackingSplitLineModal);
@@ -265,4 +271,5 @@ PackingSplitLineModal.propTypes = {
   minSearchLength: PropTypes.number.isRequired,
   /** Is true when currently selected location supports bins */
   hasBinLocationSupport: PropTypes.bool.isRequired,
+  formatLocalizedDate: PropTypes.func.isRequired,
 };
