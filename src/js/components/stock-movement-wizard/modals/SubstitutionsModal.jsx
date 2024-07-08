@@ -232,7 +232,7 @@ class SubstitutionsModal extends Component {
               productCode: `${val.productCode}`,
               name: `${val.productName}`,
               displayName: val.product.displayNames?.default,
-              minExpirationDate: `${val.minExpirationDate}`,
+              minExpirationDate: val.minExpirationDate,
               quantityAvailable: `${val.quantityAvailable}`,
               handlingIcons: val.product.handlingIcons,
             },
