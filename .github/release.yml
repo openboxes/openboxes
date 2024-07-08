@@ -22,6 +22,7 @@ changelog:
     - title: ⬆️ Dependencies
       labels:
         - 'dependencies'
+        - 'type: dependency'
 
     - title: 🎈 Miscellaneous
       labels:
@@ -32,3 +33,4 @@ changelog:
           - 'type: bug'
           - 'type: maintenance'
           - 'dependencies'
+          - 'type: dependency'
