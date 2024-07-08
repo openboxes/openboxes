@@ -323,7 +323,7 @@ const TABLE_FIELDS = {
         label: '',
         attributes: {
           btnOpenText: 'react.default.button.edit.label',
-          btnOpenDefaultText: 'Edit line',
+          btnOpenDefaultText: 'Edit',
           title: 'react.default.button.edit.label',
           className: 'btn btn-outline-primary',
           defaultTitleMessage: 'Edit',
