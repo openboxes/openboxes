@@ -185,6 +185,8 @@ export default isRequest => ({
       localizeDate: true,
       localizedDateFormat: DateFormat.COMMON,
       filterElement: true,
+      // date format in which the date will be sent to the API
+      dateFormat: 'MM/DD/YYYY',
     },
   },
   createdBefore: {
@@ -195,6 +197,8 @@ export default isRequest => ({
       localizeDate: true,
       localizedDateFormat: DateFormat.COMMON,
       filterElement: true,
+      // date format in which the date will be sent to the API
+      dateFormat: 'MM/DD/YYYY',
     },
   },
 });
