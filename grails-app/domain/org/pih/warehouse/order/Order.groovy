@@ -505,13 +505,16 @@ class Order implements Serializable {
 
     Map toJson() {
         return [
-                id         : id,
-                orderNumber: orderNumber,
-                name       : name,
-                status     : status,
-                origin     : origin,
-                destination: destination,
-                orderItems : orderItems,
+                id                : id,
+                orderNumber       : orderNumber,
+                name              : name,
+                status            : status,
+                origin            : origin,
+                destination       : destination,
+                paymentMethodType : paymentMethodType ? [
+                        name: paymentMethodType?.name
+                ] : null,
+                orderItems        : orderItems,
         ]
     }
 
