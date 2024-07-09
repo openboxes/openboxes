@@ -511,7 +511,9 @@ class Order implements Serializable {
                 status            : status,
                 origin            : origin,
                 destination       : destination,
-                paymentMethodType : paymentMethodType?.name,
+                paymentMethodType : paymentMethodType ? [
+                        name: paymentMethodType?.name
+                ] : null,
                 orderItems        : orderItems,
         ]
     }

@@ -203,7 +203,7 @@ class DocumentTemplateService {
         order['origin.postalCode'] = order?.origin?.address?.postalCode ?: ""
         order['origin.country'] = order?.origin?.address?.country ?: ""
         order['origin.address.description'] = order?.origin?.address?.description ?: ""
-        order['paymentMethod'] = order?.paymentMethodType ?: ""
+        order['paymentMethod'] = order?.paymentMethodType?.name ?: ""
 
         // Add order item fields to metadata
         FieldsMetadata metadata = report.createFieldsMetadata()
