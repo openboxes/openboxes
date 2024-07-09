@@ -49,6 +49,7 @@ import org.pih.warehouse.core.User
 import org.pih.warehouse.core.UserService
 import org.pih.warehouse.data.DataService
 import org.pih.warehouse.forecasting.ForecastingService
+import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.ShipOrderCommand
@@ -1130,8 +1131,8 @@ class StockMovementService {
             // FIXME We should probably do some additional validation on the import file here or
             //  at least catch any exceptions that might happen
             String text = new String(command.importFile.bytes)
-            def csvMapReader = new CSVMapReader(new StringReader(text), [skipLines: 1])
-            csvMapReader.fieldKeys = [
+
+            List<String> fieldKeys = [
                     'id',
                     'code', // code => productCode
                     'name', // name => productName
@@ -1140,6 +1141,13 @@ class StockMovementService {
                     'binLocation',
                     'quantity',
             ]
+            char separatorChar = CSVUtils.getSeparator(text, fieldKeys.size())
+
+            CSVMapReader csvMapReader = new CSVMapReader(
+                    new StringReader(text),
+                    [skipLines: 1, separatorChar: separatorChar]
+            )
+            csvMapReader.fieldKeys = fieldKeys
             return csvMapReader.toList().collect { it ->
                 new PicklistItemCommand(
                         id: it.id,
