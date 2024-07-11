@@ -86,8 +86,10 @@
                         ${shipmentItem?.inventoryItem?.product?.productCode}
                     </td>
                     <td aria-label="Product" class="product">
-                        <g:link controller="inventoryItem" action="showStockCard" id="${shipmentItem?.inventoryItem?.product?.id}">
-                            <cache:block key="${shipmentItem?.id} ${LocalizationUtil.currentLocale}">
+                        <g:set var="productId" value="${shipmentItem?.inventoryItem?.product?.id}" />
+                        <g:set var="cacheKey" value="${shipmentItem?.id}-${productId}-${LocalizationUtil.currentLocale}" />
+                        <g:link controller="inventoryItem" action="showStockCard" id="${productId}">
+                            <cache:block key="${cacheKey}">
                                 <format:displayNameWithColor product="${shipmentItem?.inventoryItem?.product}" showTooltip="${true}" />
                                 <g:renderHandlingIcons product="${shipmentItem?.inventoryItem?.product}" />
                             </cache:block>

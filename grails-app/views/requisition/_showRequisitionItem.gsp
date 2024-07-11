@@ -80,10 +80,12 @@
         </td>
     </g:if>
     <td class="middle">
+        <g:set var="productId" value="${requisitionItem?.product?.id}" />
+        <g:set var="cacheKey" value="${requisitionItem?.id}-${productId}-${LocalizationUtil.currentLocale}" />
         <g:if test="${requisitionItem?.isCanceled()}">
             <div class="canceled">
-                <g:link controller="inventoryItem" action="showStockCard" id="${requisitionItem?.product?.id}">
-                    <cache:block key="${requisitionItem?.id} ${LocalizationUtil.currentLocale}">
+                <g:link controller="inventoryItem" action="showStockCard" id="${productId}">
+                    <cache:block key="${cacheKey}">
                         <format:displayNameWithColor product="${requisitionItem?.product}" showTooltip="${true}" />
                         <g:renderHandlingIcons product="${requisitionItem?.product}" />
                     </cache:block>
@@ -92,8 +94,8 @@
         </g:if>
         <g:elseif test="${requisitionItem?.isSubstituted()}">
             <div class="canceled">
-            <g:link controller="inventoryItem" action="showStockCard" id="${requisitionItem?.product?.id}">
-                <cache:block key="${requisitionItem?.id} ${LocalizationUtil.currentLocale}">
+            <g:link controller="inventoryItem" action="showStockCard" id="${productId}">
+                <cache:block key="${cacheKey}">
                     <format:displayNameWithColor product="${requisitionItem?.product}" showTooltip="${true}" />
                     <g:renderHandlingIcons product="${requisitionItem?.product}" />
                 </cache:block>
@@ -101,8 +103,8 @@
             </div>
             <g:each var="substitutionItem" in="${requisitionItem.substitutionItems}">
                 <div>
-                    <g:link controller="inventoryItem" action="showStockCard" id="${substitutionItem?.product?.id}">
-                        <cache:block key="${substitutionItem?.id} ${LocalizationUtil.currentLocale}">
+                    <g:link controller="inventoryItem" action="showStockCard" id="${productId}">
+                        <cache:block key="${cacheKey}">
                             <format:displayNameWithColor product="${substitutionItem?.product}" showTooltip="${true}" />
                             <g:renderHandlingIcons product="${substitutionItem?.product}" />
                         </cache:block>
@@ -111,8 +113,8 @@
             </g:each>
         </g:elseif>
         <g:else>
-            <g:link controller="inventoryItem" action="showStockCard" id="${requisitionItem?.product?.id}">
-                <cache:block key="${requisitionItem?.id} ${LocalizationUtil.currentLocale}">
+            <g:link controller="inventoryItem" action="showStockCard" id="${productId}">
+                <cache:block key="${cacheKey}">
                     <format:displayNameWithColor product="${requisitionItem?.product}" showTooltip="${true}" />
                     <g:renderHandlingIcons product="${requisitionItem?.product}" />
                 </cache:block>
