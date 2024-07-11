@@ -1609,7 +1609,7 @@ class StockMovementService {
                         List<AvailableItem> availableItems = pickPageItem.getAvailableItems(inventoryItem)
                         availableItems = applyAllocationRulesOnAvailableItems(availableItems, params.quantity)
                         List<SuggestedItem> suggestedItems = getSuggestedItems(availableItems, params.quantity)
-                        allocateSuggestedItems(pickPageItem.requisitionItem, suggestedItems)
+                        allocateSuggestedItems(pickPageItem.requisitionItem, suggestedItems, false)
                     }
                 }
             }
@@ -2089,7 +2089,7 @@ class StockMovementService {
     }
 
 
-    void allocateSuggestedItems(RequisitionItem requisitionItem, List<SuggestedItem> suggestedItems) {
+    void allocateSuggestedItems(RequisitionItem requisitionItem, List<SuggestedItem> suggestedItems, Boolean isAutoAllocated = true) {
 
         for (SuggestedItem suggestedItem : suggestedItems) {
             createOrUpdatePicklistItem(
@@ -2100,7 +2100,7 @@ class StockMovementService {
                     suggestedItem.quantityPicked?.intValueExact(),
                     null,
                     null,
-                    true
+                    isAutoAllocated
             )
         }
     }
