@@ -107,7 +107,7 @@ class LocationImportDataService implements ImportDataService {
             }
 
             // Do not allow to change internal type location to non-internal
-            if (params.locationType && location && (location.locationType.isInternalLocation() || location.locationType.isZone()) && !(LocationType.findByNameLike(params.locationType + "%").isInternalLocation() || LocationType.findByNameLike(params.locationType + "%").isZone())) {
+            if (params.locationType && location && (location?.locationType?.isInternalLocation() || location?.locationType?.isZone()) && !(LocationType.findByNameLike(params.locationType + "%")?.isInternalLocation() || LocationType.findByNameLike(params.locationType + "%")?.isZone())) {
                 command.errors.reject("Row ${index + 1}: Changing Location Type from internal to '${params.locationType}' is not possible")
             }
         }
