@@ -18,6 +18,7 @@ import LabelField from 'components/form-elements/LabelField';
 import TextField from 'components/form-elements/TextField';
 import ProductSelect from 'components/product-select/ProductSelect';
 import DateFormat from 'consts/dateFormat';
+import StockMovementStatus from 'consts/stockMovementStatus';
 import apiClient, { flattenRequest, parseResponse } from 'utils/apiClient';
 import Checkbox from 'utils/Checkbox';
 import { renderFormField } from 'utils/form-utils';
@@ -323,7 +324,7 @@ class AddItemsPage extends Component {
 
   dataFetched = false;
 
-  saveAndTransition(callback) {
+  saveAndTransition(callback, status) {
     const errors = validate({ returnItems: _.values(this.state.selectedItems) });
     if (errors && errors.returnItems.length) {
       Alert.error(this.props.translate('react.outboundReturns.errors.quantityToReturn.label'));
@@ -337,9 +338,14 @@ class AddItemsPage extends Component {
     }
 
     this.props.showSpinner();
+
+    const statusPayload = status ? {
+      status,
+    } : {};
+
     const payload = {
       ...this.state.outboundReturn,
-      status: 'APPROVED',
+      ...statusPayload,
       stockTransferItems: _.values(this.state.selectedItems),
     };
     const url = `/api/stockTransfers/${this.props.match.params.outboundReturnId}`;
@@ -464,7 +470,7 @@ class AddItemsPage extends Component {
 
     return (
       <Form
-        onSubmit={() => this.saveAndTransition(this.props.nextPage)}
+        onSubmit={() => this.saveAndTransition(this.props.nextPage, StockMovementStatus.APPROVED)}
         mutators={{ ...arrayMutators }}
         initialValues={formValues}
         validate={validate}
