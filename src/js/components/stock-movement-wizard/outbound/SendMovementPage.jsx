@@ -94,6 +94,8 @@ const SHIPMENT_FIELDS = {
     attributes: {
       localizeDate: true,
       localizedDateFormat: DateFormat.DEFAULT,
+      // It's necessary for properly setting up the time part of the localized date format
+      dateFormat: 'MM/DD/YYYY HH:mm Z',
       required: true,
       showTimeSelect: true,
       autoComplete: 'off',
