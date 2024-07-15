@@ -286,7 +286,11 @@ class Order implements Serializable {
     }
 
     def getShipments() {
-        return orderItems.collect { it.listShipments() }.flatten().unique() { it?.id }
+        return orderItems
+                .collect { it.listShipments() }
+                .flatten()
+                .unique() { it?.id }
+                .findAll { it?.id }
     }
 
     List getShipmentsByStatus(ShipmentStatusCode statusCode) {
