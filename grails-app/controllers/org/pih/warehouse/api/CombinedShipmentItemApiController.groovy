@@ -184,7 +184,7 @@ class CombinedShipmentItemApiController {
             }
         }
 
-        String filename = g.message(code: "orderItem.template.header.label", default: "Order-items-template")
+        String filename = g.message(code: "orderItem.template.fileName.label", default: "Order-items-template")
 
         response.setHeader("Content-disposition", "attachment; filename=\"${filename}.csv\"")
         render(contentType: "text/csv", text: sw.toString(), encoding: "UTF-8")

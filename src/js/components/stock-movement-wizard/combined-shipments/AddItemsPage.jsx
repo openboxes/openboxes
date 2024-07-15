@@ -1023,7 +1023,7 @@ class AddItemsPage extends Component {
     const url = `${COMBINED_SHIPMENT_ITEMS_EXPORT_TEMPLATE}?vendor=${this.state.values.origin.id}&destination=${this.state.values.destination.id}${blank ? '&blank=true' : ''}`;
     apiClient.get(url, { responseType: 'blob' })
       .then((response) => {
-        fileDownload(response.data, `${this.props.translate('react.combinedShipments.template.header.label', 'Order-items-template')}.csv`, 'text/csv');
+        fileDownload(response.data, `${this.props.translate('react.combinedShipments.template.fileName.label', 'Order-items-template')}.csv`, 'text/csv');
         this.props.hideSpinner();
       })
       .catch(() => this.props.hideSpinner());
