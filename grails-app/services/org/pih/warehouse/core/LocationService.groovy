@@ -19,6 +19,7 @@ import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.Row
 import grails.plugins.csv.CSVMapReader
 import org.hibernate.sql.JoinType
+import org.pih.warehouse.api.StockMovementDirection
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.importer.LocationImportDataService
 import util.ConfigHelper
@@ -148,29 +149,15 @@ class LocationService {
                 }
             }
         }
-
-        def outboundMovementLocations = locations.findAll {
-            (it.locationGroup == currentLocation.locationGroup) ||
-                    (it.locationGroup != currentLocation.locationGroup && it.locationType.locationTypeCode == LocationTypeCode.DEPOT)
+        if (direction == StockMovementDirection.INBOUND.name()) {
+            return locations.findAll {
+                it.locationType.locationTypeCode == LocationTypeCode.SUPPLIER
+            }
         }
-
-        if (!isSuperuser) {
-            if (direction == "INBOUND") {
-                return locations.findAll {
-                    it.locationType.locationTypeCode == LocationTypeCode.SUPPLIER
-                }
-            }
-            if (direction == "OUTBOUND") {
-                return outboundMovementLocations
-            }
-        } else {
-            if (direction == "INBOUND") {
-                return locations.findAll {
-                    it.locationType.locationTypeCode == LocationTypeCode.SUPPLIER || !it.supports(ActivityCode.MANAGE_INVENTORY)
-                }
-            }
-            if (direction == "OUTBOUND") {
-                return outboundMovementLocations
+        if (direction == StockMovementDirection.OUTBOUND.name()) {
+            return locations.findAll {
+                (it.locationGroup == currentLocation.locationGroup) ||
+                        (it.locationGroup != currentLocation.locationGroup && it.locationType.locationTypeCode == LocationTypeCode.DEPOT)
             }
         }
 
