@@ -18,7 +18,9 @@ import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.BudgetCode
 import org.pih.warehouse.core.Constants
+import org.pih.warehouse.core.DocumentService
 import org.pih.warehouse.core.DocumentTemplateService
+import org.pih.warehouse.core.DocumentType
 import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.ValidationCode
 import org.pih.warehouse.data.ProductSupplierService
@@ -40,6 +42,7 @@ class OrderController {
     StockMovementService stockMovementService
     ProductSupplierService productSupplierService
     DocumentTemplateService documentTemplateService
+    DocumentService documentService
 
     static allowedMethods = [save: "POST", update: "POST"]
 
@@ -501,27 +504,35 @@ class OrderController {
     }
 
     def addDocument() {
-        def orderInstance = Order.get(params.id)
+        Order orderInstance = Order.get(params.id)
+        List<DocumentType> documentTypes = documentService.getNonTemplateDocumentTypes()
+
         if (!orderInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
             redirect(action: "list")
         } else {
-            return [orderInstance: orderInstance]
+            return [orderInstance: orderInstance, documentTypes: documentTypes]
         }
     }
 
     def editDocument() {
-        def orderInstance = Order.get(params?.order?.id)
+        Order orderInstance = Order.get(params?.order?.id)
+        List<DocumentType> documentTypes = documentService.getNonTemplateDocumentTypes()
+
         if (!orderInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
             redirect(action: "list")
         } else {
-            def documentInstance = Document.get(params?.id)
+            Document documentInstance = Document.get(params?.id)
             if (!documentInstance) {
                 flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'document.label', default: 'Document'), documentInstance.id])}"
                 redirect(action: "show", id: orderInstance?.id)
             }
-            render(view: "addDocument", model: [orderInstance: orderInstance, documentInstance: documentInstance])
+            render(view: "addDocument", model: [
+                    orderInstance: orderInstance,
+                    documentInstance: documentInstance,
+                    documentTypes: documentTypes
+            ])
         }
     }
 

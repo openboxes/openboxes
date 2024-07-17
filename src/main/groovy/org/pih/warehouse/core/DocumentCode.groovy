@@ -25,7 +25,6 @@ enum DocumentCode {
 
     static list() {
         [
-                SHIPPING_TEMPLATE,
                 THUMBNAIL,
                 PRODUCT_MANUAL,
                 PURCHASE_ORDER_TEMPLATE,
@@ -34,6 +33,17 @@ enum DocumentCode {
                 ZEBRA_TEMPLATE,
                 EMAIL_TEMPLATE,
                 DATA_EXPORT,
+                INVOICE_TEMPLATE,
+                REQUISITION_TEMPLATE,
+        ]
+    }
+
+    static templateList() {
+        [
+                PURCHASE_ORDER_TEMPLATE,
+                SHIPPING_TEMPLATE,
+                ZEBRA_TEMPLATE,
+                EMAIL_TEMPLATE,
                 INVOICE_TEMPLATE,
                 REQUISITION_TEMPLATE,
         ]

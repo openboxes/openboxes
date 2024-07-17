@@ -58,7 +58,7 @@
 											name="typeId"
 											class="chzn-select-deselect"
 											noSelection="['':'']"
-											from="${org.pih.warehouse.core.DocumentType.list().sort { it.name }}"
+											from="${documentTypes}"
 											value="${documentInstance?.documentType?.id}"
 											optionKey="id" optionValue="${{format.metadata(obj:it)}}"
 											data-placeholder="${g.message(code: 'default.selectAnOption.label', default: 'Select an Option')}"
