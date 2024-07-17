@@ -286,6 +286,8 @@ class Order implements Serializable {
     }
 
     def getShipments() {
+        // .findAll { it?.id } is supposed to filter out null objects that might be in the list,
+        // when we would attempt to call this method before a shipment item is associated with a shipment (OBPIH-6559)
         return orderItems
                 .collect { it.listShipments() }
                 .flatten()
