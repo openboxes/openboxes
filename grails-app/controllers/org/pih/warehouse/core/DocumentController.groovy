@@ -36,6 +36,7 @@ class DocumentController {
     def shipmentService
     GrailsApplication grailsApplication
     TemplateService templateService
+    DocumentService documentService
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
@@ -197,7 +198,9 @@ class DocumentController {
         } else if (file.size < 10 * 1024 * 1000) {
             log.info "Creating new document "
             // Document type with id 9 is "Other" and it's default in case there's no document type chosen
-            def typeId = command?.typeId ?: Constants.DEFAULT_DOCUMENT_TYPE_ID;
+            String typeId = command?.typeId ?: Constants.DEFAULT_DOCUMENT_TYPE_ID;
+            DocumentType documentType = DocumentType.get(typeId)
+
             Document documentInstance = new Document(
                     size: file.size,
                     name: command.name ?: file.originalFilename,
@@ -207,10 +210,17 @@ class DocumentController {
                     contentType: file.contentType,
                     extension: FileUtil.getExtension(file.originalFilename),
                     documentNumber: command.documentNumber,
-                    documentType: DocumentType.get(typeId))
+                    documentType: documentType)
+
+            documentInstance.validate()
+
+            List<DocumentType> nonTemplateDocumentTypes = documentService.getNonTemplateDocumentTypes()
+            if (!nonTemplateDocumentTypes.contains(documentType)) {
+                documentInstance.errors.reject("documentType", "Template types are not allowed for this document upload")
+            }
 
             // Check to see if there are any errors
-            if (documentInstance.validate() && !documentInstance.hasErrors()) {
+            if (!documentInstance.hasErrors()) {
                 log.info "Saving document " + documentInstance
                 if (shipmentInstance) {
                     shipmentInstance.addToDocuments(documentInstance).save(flush: true)
@@ -578,8 +588,8 @@ class DocumentController {
         Map model = [document: document, inventoryItem: inventoryItem, location: location]
         String body = templateService.renderTemplate(document, model)
 
-        response.contentType = 'image/png'    
-        // TODO Move labelary URL to application.yml 
+        response.contentType = 'image/png'
+        // TODO Move labelary URL to application.yml
         response.outputStream << Request.Post('http://api.labelary.com/v1/printers/8dpmm/labels/4x6/0/')
             .bodyString(body, ContentType.APPLICATION_FORM_URLENCODED)
             .execute()
@@ -594,7 +604,7 @@ class DocumentController {
         Location location = Location.load(session.warehouse.id)
         Map model = [document: document, inventoryItem: inventoryItem, location: location]
         String renderedContent = templateService.renderTemplate(document, model)
-        // TODO Move labelary URL to application.yml 
+        // TODO Move labelary URL to application.yml
         String url = "http://labelary.com/viewer.html?zpl=" + renderedContent
         redirect(url: url)
     }
