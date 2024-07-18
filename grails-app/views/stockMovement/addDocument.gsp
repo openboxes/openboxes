@@ -23,6 +23,7 @@
 		<h2><warehouse:message code="shipping.addDocument.label" /></h2>
 	<!-- process an upload or save depending on whether we are adding a new doc or modifying a previous one -->
 		<g:uploadForm controller="document" action="uploadDocument">
+			<g:hiddenField name="stockMovementId" value="${stockMovementInstance?.id}" />
 			<g:hiddenField name="shipmentId" value="${shipmentInstance?.id}" />
 			<g:hiddenField name="documentId" value="${documentInstance?.id}" />
 			<table>

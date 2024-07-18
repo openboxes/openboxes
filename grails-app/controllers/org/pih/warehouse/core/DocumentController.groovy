@@ -17,6 +17,8 @@ import grails.validation.Validateable
 import org.apache.http.client.fluent.Request
 import org.apache.http.entity.ContentType
 import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.inventory.OutboundStockMovementService
+import org.pih.warehouse.inventory.StockMovementService
 import org.pih.warehouse.invoice.Invoice
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.product.Product
@@ -36,6 +38,8 @@ class DocumentController {
     def shipmentService
     GrailsApplication grailsApplication
     TemplateService templateService
+    StockMovementService stockMovementService
+    OutboundStockMovementService outboundStockMovementService
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
@@ -189,6 +193,10 @@ class DocumentController {
         def requestInstance = Requisition.get(command.requestId)
         def productInstance = Product.get(command.productId)
         def invoiceInstance = Invoice.get(command.invoiceId)
+        def stockMovement = outboundStockMovementService.getStockMovement(command.stockMovementId)
+        if (!stockMovement) {
+            stockMovement =  stockMovementService.getStockMovement(command.stockMovementId)
+        }
 
         // file must not be empty and must be less than 10MB
         // FIXME The size limit needs to go somewhere
@@ -257,6 +265,10 @@ class DocumentController {
         } else {
             log.info "Document is too large"
             flash.message = "${warehouse.message(code: 'document.documentTooLarge.message')}"
+            if (stockMovement) {
+                redirect(controller: 'stockMovement', action: 'show', id: stockMovement.id)
+                return
+            }
             if (shipmentInstance) {
                 redirect(controller: 'stockMovement', action: 'show', id: command.shipmentId)
                 return
@@ -278,6 +290,10 @@ class DocumentController {
         // This is, admittedly, a hack but I wanted to avoid having to add this code to each of
         // these controllers.
         log.info("Redirecting to appropriate show details page")
+        if (stockMovement) {
+            redirect(controller: 'stockMovement', action: 'show', id: stockMovement.id)
+            return
+        }
         if (shipmentInstance) {
             redirect(controller: 'stockMovement', action: 'show', id: command.shipmentId)
             return
@@ -578,8 +594,8 @@ class DocumentController {
         Map model = [document: document, inventoryItem: inventoryItem, location: location]
         String body = templateService.renderTemplate(document, model)
 
-        response.contentType = 'image/png'    
-        // TODO Move labelary URL to application.yml 
+        response.contentType = 'image/png'
+        // TODO Move labelary URL to application.yml
         response.outputStream << Request.Post('http://api.labelary.com/v1/printers/8dpmm/labels/4x6/0/')
             .bodyString(body, ContentType.APPLICATION_FORM_URLENCODED)
             .execute()
@@ -594,7 +610,7 @@ class DocumentController {
         Location location = Location.load(session.warehouse.id)
         Map model = [document: document, inventoryItem: inventoryItem, location: location]
         String renderedContent = templateService.renderTemplate(document, model)
-        // TODO Move labelary URL to application.yml 
+        // TODO Move labelary URL to application.yml
         String url = "http://labelary.com/viewer.html?zpl=" + renderedContent
         redirect(url: url)
     }
@@ -615,10 +631,12 @@ class DocumentCommand implements Validateable {
     String documentNumber
     MultipartFile fileContents
     String fileUri
+    String stockMovementId
 
     static constraints = {
         name(nullable: true)
         fileContents(nullable: true)
+        stockMovementId(nullable: true)
     }
 }
 
