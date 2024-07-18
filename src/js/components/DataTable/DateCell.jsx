@@ -5,24 +5,55 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 import TableCell from 'components/DataTable/TableCell';
+import DateFormat from 'consts/dateFormat';
+import { formatDate } from 'utils/translation-utils';
 
-const DateCell = ({ displayDateFormat, displayDateDefaultValue, ...row }) => (
-  <TableCell
-    {...row}
-    value={row.value && moment(row.value).format(displayDateFormat)}
-    defaultValue={displayDateDefaultValue}
-  />
-);
+const DateCell = ({
+  displayDateFormat,
+  displayDateDefaultValue,
+  localizeDate,
+  formatLocalizedDate,
+  formatLocalizedDateToDisplay,
+  ...row
+}) => {
+  const getValue = () => {
+    if (!row.value) {
+      return null;
+    }
 
-const mapStateToProps = state => ({
+    if (localizeDate) {
+      return formatLocalizedDateToDisplay(row.value, formatLocalizedDate);
+    }
+
+    return moment(row.value).format(displayDateFormat);
+  };
+
+  return (
+    <TableCell
+      {...row}
+      value={getValue()}
+      defaultValue={displayDateDefaultValue}
+    />
+  );
+};
+
+const mapStateToProps = (state) => ({
   displayDateFormat: state.session.displayDateFormat,
   displayDateDefaultValue: state.session.displayDateDefaultValue,
+  formatLocalizedDateToDisplay: formatDate(state.localize),
 });
 
 export default connect(mapStateToProps)(DateCell);
 
+DateCell.defaultProps = {
+  localizeDate: false,
+  formatLocalizedDate: DateFormat.COMMON,
+};
 
 DateCell.propTypes = {
   displayDateFormat: PropTypes.string.isRequired,
   displayDateDefaultValue: PropTypes.string.isRequired,
+  localizeDate: PropTypes.bool,
+  formatLocalizedDate: PropTypes.string,
+  formatLocalizedDateToDisplay: PropTypes.func.isRequired,
 };

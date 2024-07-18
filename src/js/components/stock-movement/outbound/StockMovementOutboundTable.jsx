@@ -31,6 +31,7 @@ import { supports } from 'utils/supportedActivitiesUtils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
+import DateFormat from 'consts/dateFormat';
 
 const StockMovementOutboundTable = ({
   filterParams,
@@ -329,13 +330,25 @@ const StockMovementOutboundTable = ({
       Header: <Translate id="react.stockMovement.outbound.column.dateRequested.label" defaultMessage="Date Requested" />,
       accessor: 'dateRequested',
       width: 150,
-      Cell: row => (<DateCell {...row} />),
+      Cell: row => (
+        <DateCell
+          localizeDate
+          formatLocalizedDate={DateFormat.DISPLAY}
+          {...row}
+        />
+      ),
     },
     {
       Header: <Translate id="react.stockMovement.column.dateCreated.label" defaultMessage="Date Created" />,
       accessor: 'dateCreated',
       width: 150,
-      Cell: row => (<DateCell {...row} />),
+      Cell: row => (
+        <DateCell
+          localizeDate
+          formatLocalizedDate={DateFormat.DISPLAY}
+          {...row}
+        />
+      ),
     },
   ], [requisitionStatuses, translate]);
 
