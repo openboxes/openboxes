@@ -1188,7 +1188,7 @@ class IndicatorDataService {
         String query = '''
             SELECT 
                 product_code,
-                COUNT(product_code) as products,
+                COUNT(DISTINCT backdated_shipment) as products,
                 GROUP_CONCAT(DISTINCT backdated_shipment SEPARATOR " "),
                 DATE_FORMAT(last_stock_count, "%d-%b-%Y"),
                 GROUP_CONCAT(DISTINCT backdated_shipment, ' ', shipment_id SEPARATOR ';') as shipment_ids
