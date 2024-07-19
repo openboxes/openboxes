@@ -1188,7 +1188,7 @@ class IndicatorDataService {
         String query = '''
             SELECT 
                 product_code,
-                COUNT(DISTINCT backdated_shipment) as products,
+                COUNT(DISTINCT backdated_shipment) as shipments_with_backdated_product,
                 GROUP_CONCAT(DISTINCT backdated_shipment SEPARATOR " "),
                 DATE_FORMAT(last_stock_count, "%d-%b-%Y"),
                 GROUP_CONCAT(DISTINCT backdated_shipment, ' ', shipment_id SEPARATOR ';') as shipment_ids
@@ -1241,7 +1241,7 @@ class IndicatorDataService {
             ) as dashboard_data
             WHERE dashboard_data.date_created > dashboard_data.last_stock_count OR dashboard_data.last_stock_count IS NULL
             GROUP BY product_code, last_stock_count
-            ORDER BY products DESC
+            ORDER BY shipments_with_backdated_product DESC
         '''
 
         List<GroovyRowResult> results = dataService.executeQuery(query, [
