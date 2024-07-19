@@ -1,5 +1,6 @@
 import DateFilter from 'components/form-elements/DateFilter/DateFilter';
 import FilterSelectField from 'components/form-elements/FilterSelectField';
+import DateFormat from 'consts/dateFormat';
 
 export default {
   receiptStatusCode: {
@@ -139,8 +140,11 @@ export default {
   createdAfter: {
     type: DateFilter,
     attributes: {
+      localizeDate: true,
+      localizedDateFormat: DateFormat.COMMON,
       label: 'react.stockMovement.filter.createdAfter.label',
       defaultMessage: 'Created after',
+      // date format in which the date will be sent to the API
       dateFormat: 'MM/DD/YYYY',
       filterElement: true,
     },
@@ -148,8 +152,11 @@ export default {
   createdBefore: {
     type: DateFilter,
     attributes: {
+      localizeDate: true,
+      localizedDateFormat: DateFormat.COMMON,
       label: 'react.stockMovement.filter.createdBefore.label',
       defaultMessage: 'Created before',
+      // date format in which the date will be sent to the API
       dateFormat: 'MM/DD/YYYY',
       filterElement: true,
     },

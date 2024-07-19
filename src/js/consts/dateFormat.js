@@ -9,6 +9,7 @@ const DateFormat = {
   DEFAULT: 'react.default.defaultDate.format',
   COMMON: 'react.default.commonDate.format',
   EXPIRY: 'react.default.expiryDate.format',
+  DISPLAY: 'react.default.displayDate.format',
 };
 
 export default DateFormat;
