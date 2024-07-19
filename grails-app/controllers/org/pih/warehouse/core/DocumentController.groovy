@@ -17,6 +17,8 @@ import grails.validation.Validateable
 import org.apache.http.client.fluent.Request
 import org.apache.http.entity.ContentType
 import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.inventory.OutboundStockMovementService
+import org.pih.warehouse.inventory.StockMovementService
 import org.pih.warehouse.invoice.Invoice
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.product.Product
@@ -37,6 +39,8 @@ class DocumentController {
     GrailsApplication grailsApplication
     TemplateService templateService
     DocumentService documentService
+    StockMovementService stockMovementService
+    OutboundStockMovementService outboundStockMovementService
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
@@ -190,6 +194,10 @@ class DocumentController {
         def requestInstance = Requisition.get(command.requestId)
         def productInstance = Product.get(command.productId)
         def invoiceInstance = Invoice.get(command.invoiceId)
+        def stockMovement = outboundStockMovementService.getStockMovement(command.stockMovementId)
+        if (!stockMovement) {
+            stockMovement =  stockMovementService.getStockMovement(command.stockMovementId)
+        }
 
         // file must not be empty and must be less than 10MB
         // FIXME The size limit needs to go somewhere
@@ -267,6 +275,10 @@ class DocumentController {
         } else {
             log.info "Document is too large"
             flash.message = "${warehouse.message(code: 'document.documentTooLarge.message')}"
+            if (stockMovement) {
+                redirect(controller: 'stockMovement', action: 'show', id: stockMovement.id)
+                return
+            }
             if (shipmentInstance) {
                 redirect(controller: 'stockMovement', action: 'show', id: command.shipmentId)
                 return
@@ -288,6 +300,10 @@ class DocumentController {
         // This is, admittedly, a hack but I wanted to avoid having to add this code to each of
         // these controllers.
         log.info("Redirecting to appropriate show details page")
+        if (stockMovement) {
+            redirect(controller: 'stockMovement', action: 'show', id: stockMovement.id)
+            return
+        }
         if (shipmentInstance) {
             redirect(controller: 'stockMovement', action: 'show', id: command.shipmentId)
             return
@@ -625,10 +641,12 @@ class DocumentCommand implements Validateable {
     String documentNumber
     MultipartFile fileContents
     String fileUri
+    String stockMovementId
 
     static constraints = {
         name(nullable: true)
         fileContents(nullable: true)
+        stockMovementId(nullable: true)
     }
 }
 

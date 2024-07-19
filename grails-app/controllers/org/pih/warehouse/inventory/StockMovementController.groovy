@@ -357,8 +357,10 @@ class StockMovementController {
     }
 
     def addComment() {
-        Requisition requisition = Requisition.get(params.id)
-        StockMovement stockMovement = StockMovement.createFromRequisition(requisition)
+        def stockMovement = outboundStockMovementService.getStockMovement(params.id)
+        if (!stockMovement) {
+            stockMovementService.getStockMovement(params.id)
+        }
         [stockMovement: stockMovement, comment: new Comment()]
     }
 
@@ -371,8 +373,10 @@ class StockMovementController {
     }
 
     def editComment() {
-        Requisition requisition = Requisition.get(params.requisition)
-        StockMovement stockMovement = StockMovement.createFromRequisition(requisition)
+        def stockMovement = outboundStockMovementService.getStockMovement(params.requisition)
+        if (!stockMovement) {
+            stockMovementService.getStockMovement(params.requisition)
+        }
 
         Comment comment = Comment.get(params?.id)
         if (!comment) {

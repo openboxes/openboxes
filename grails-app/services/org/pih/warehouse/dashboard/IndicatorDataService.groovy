@@ -1137,7 +1137,7 @@ class IndicatorDataService {
                     WHEN DATEDIFF(t.date_created, t.transaction_date) > 7 THEN '7+ days'
                     ELSE CONCAT(DATEDIFF(t.date_created, t.transaction_date), ' days')
                 END
-            ) as days_backdated, COUNT(t.id) as shipments FROM shipment s
+            ) as days_backdated, COUNT(DISTINCT s.id) as shipments FROM shipment s
             INNER JOIN transaction t ON t.${transactionProperty} = s.id
             WHERE s.${shipmentLocationProperty} = :locationId 
             AND t.date_created > :timeLimit
