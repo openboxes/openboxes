@@ -16,6 +16,8 @@ import grails.validation.ValidationException
 import groovy.sql.Sql
 import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.Document
+import org.pih.warehouse.core.DocumentService
+import org.pih.warehouse.core.DocumentType
 import org.pih.warehouse.core.Event
 import org.pih.warehouse.core.EventType
 import org.pih.warehouse.core.Location
@@ -38,11 +40,9 @@ class ShipmentController {
     def identifierService
     def inventoryService
     MailService mailService
-
     def barcodeService
-
     def sessionFactory
-
+    DocumentService documentService
 
     def redirect() {
         redirect(controller: "shipment", action: "showDetails", id: params.id)
@@ -812,9 +812,10 @@ class ShipmentController {
 
 
     def addDocument() {
+        Shipment shipmentInstance = Shipment.get(params.id)
+        Document documentInstance = Document.get(params?.document?.id)
+        List<DocumentType> documentTypes = documentService.getNonTemplateDocumentTypes()
 
-        def shipmentInstance = Shipment.get(params.id)
-        def documentInstance = Document.get(params?.document?.id)
         if (!documentInstance) {
             documentInstance = new Document()
         }
@@ -822,12 +823,18 @@ class ShipmentController {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), params.id])}"
             redirect(action: "list")
         }
-        render(view: "addDocument", model: [shipmentInstance: shipmentInstance, documentInstance: documentInstance])
+        render(view: "addDocument", model: [
+                shipmentInstance: shipmentInstance,
+                documentInstance: documentInstance,
+                documentTypes: documentTypes
+        ])
     }
 
     def editDocument() {
-        def shipmentInstance = Shipment.get(params?.shipmentId)
-        def documentInstance = Document.get(params?.documentId)
+        Shipment shipmentInstance = Shipment.get(params?.shipmentId)
+        Document documentInstance = Document.get(params?.documentId)
+        List<DocumentType> documentTypes = documentService.getNonTemplateDocumentTypes()
+
         if (!shipmentInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), params.shipmentId])}"
             redirect(action: "list")
@@ -836,7 +843,11 @@ class ShipmentController {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'document.label', default: 'Document'), params.documentId])}"
             redirect(action: "showDetails", id: shipmentInstance?.id)
         }
-        render(view: "addDocument", model: [shipmentInstance: shipmentInstance, documentInstance: documentInstance])
+        render(view: "addDocument", model: [
+                shipmentInstance: shipmentInstance,
+                documentInstance: documentInstance,
+                documentTypes: documentTypes
+        ])
     }
 
 

@@ -38,6 +38,7 @@ class DocumentController {
     def shipmentService
     GrailsApplication grailsApplication
     TemplateService templateService
+    DocumentService documentService
     StockMovementService stockMovementService
     OutboundStockMovementService outboundStockMovementService
 
@@ -205,7 +206,9 @@ class DocumentController {
         } else if (file.size < 10 * 1024 * 1000) {
             log.info "Creating new document "
             // Document type with id 9 is "Other" and it's default in case there's no document type chosen
-            def typeId = command?.typeId ?: Constants.DEFAULT_DOCUMENT_TYPE_ID;
+            String typeId = command?.typeId ?: Constants.DEFAULT_DOCUMENT_TYPE_ID;
+            DocumentType documentType = DocumentType.get(typeId)
+
             Document documentInstance = new Document(
                     size: file.size,
                     name: command.name ?: file.originalFilename,
@@ -215,10 +218,17 @@ class DocumentController {
                     contentType: file.contentType,
                     extension: FileUtil.getExtension(file.originalFilename),
                     documentNumber: command.documentNumber,
-                    documentType: DocumentType.get(typeId))
+                    documentType: documentType)
+
+            documentInstance.validate()
+
+            List<DocumentType> nonTemplateDocumentTypes = documentService.getNonTemplateDocumentTypes()
+            if (!nonTemplateDocumentTypes.contains(documentType)) {
+                documentInstance.errors.reject("documentType", "Template types are not allowed for this document upload")
+            }
 
             // Check to see if there are any errors
-            if (documentInstance.validate() && !documentInstance.hasErrors()) {
+            if (!documentInstance.hasErrors()) {
                 log.info "Saving document " + documentInstance
                 if (shipmentInstance) {
                     shipmentInstance.addToDocuments(documentInstance).save(flush: true)

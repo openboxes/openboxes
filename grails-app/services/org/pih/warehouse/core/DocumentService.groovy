@@ -1618,4 +1618,16 @@ class DocumentService {
 
         return documents
     }
+
+    List<DocumentType> getNonTemplateDocumentTypes() {
+        return DocumentType.createCriteria().list() {
+            or {
+                isNull("documentCode")
+                not {
+                    'in'('documentCode', DocumentCode.templateList())
+                }
+            }
+        }.sort { it.name }
+    }
+
 }
