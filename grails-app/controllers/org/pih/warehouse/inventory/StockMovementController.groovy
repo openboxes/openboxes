@@ -354,8 +354,7 @@ class StockMovementController {
     }
 
     def addComment() {
-        def stockMovement
-        stockMovement = outboundStockMovementService.getStockMovement(params.id)
+        def stockMovement = outboundStockMovementService.getStockMovement(params.id)
         if (!stockMovement) {
             stockMovementService.getStockMovement(params.id)
         }
@@ -371,8 +370,7 @@ class StockMovementController {
     }
 
     def editComment() {
-        def stockMovement
-        stockMovement = outboundStockMovementService.getStockMovement(params.requisition)
+        def stockMovement = outboundStockMovementService.getStockMovement(params.requisition)
         if (!stockMovement) {
             stockMovementService.getStockMovement(params.requisition)
         }
