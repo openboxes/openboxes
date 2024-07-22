@@ -103,8 +103,12 @@
             </div>
             <g:each var="substitutionItem" in="${requisitionItem.substitutionItems}">
                 <div>
-                    <g:link controller="inventoryItem" action="showStockCard" id="${productId}">
-                        <cache:block key="${cacheKey}">
+                    <g:link controller="inventoryItem" action="showStockCard" id="${substitutionItem?.product?.id}">
+                        <g:set
+                                var="substitutionCacheKey"
+                                value="${substitutionItem?.id}-${LocalizationUtil.currentLocale}"
+                        />
+                        <cache:block key="${substitutionCacheKey}">
                             <format:displayNameWithColor product="${substitutionItem?.product}" showTooltip="${true}" />
                             <g:renderHandlingIcons product="${substitutionItem?.product}" />
                         </cache:block>
