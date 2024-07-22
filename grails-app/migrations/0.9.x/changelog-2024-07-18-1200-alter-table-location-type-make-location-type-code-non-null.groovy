@@ -11,7 +11,7 @@ databaseChangeLog = {
         // bad records instead, but this is the safer option in case those location types are accidentally being used.
         update(tableName: "location_type") {
             column(name: "location_type_code", value: "DEPOT")
-            where("location_type IS NULL")
+            where("location_type_code IS NULL")
         }
 
         addNotNullConstraint(columnDataType: "VARCHAR(100)", columnName: "location_type_code", tableName: "location_type")
