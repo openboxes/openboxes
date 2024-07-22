@@ -450,7 +450,7 @@
                                 <td class="value">
                                     <g:if test="${date && person}">
                                         <span title="${g.formatDate(date: date)}">
-                                            <g:formatDate format="MMMM dd, yyyy" date="${date}"/>
+                                            <g:formatDate format="${Constants.DEFAULT_MONTH_YEAR_DATE_FORMAT}" date="${date}"/>
                                         </span>
                                         <g:message code="default.by.label"/>
                                         ${person}
