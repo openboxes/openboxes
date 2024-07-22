@@ -141,7 +141,7 @@ class DocumentTemplateService {
                 code: k.product.productCode,
                 type: "Item",
                 status: v?.orderItemStatusCode?.first() ?: "",
-                description: k.product.name ?: "",
+                description: k.product.displayNameOrDefaultName ?: "",
                 supplierCode: productSuppliers?.size() > 0 ? productSuppliers.first()?.supplierCode: "",
                 manufacturer: productSuppliers?.size() > 0 ? productSuppliers.first()?.manufacturer?.name: "",
                 manufacturerCode: productSuppliers?.size() > 0 ? productSuppliers.first()?.manufacturerCode: "",
