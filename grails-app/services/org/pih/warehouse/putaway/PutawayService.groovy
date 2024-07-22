@@ -216,6 +216,7 @@ class PutawayService {
                 } else if (childOrderItem) {
                     childOrderItem = updateOrderItem(splitItem, childOrderItem)
                     childOrderItem.parentOrderItem = orderItem
+                    orderItem.addToOrderItems(childOrderItem)
                 }
             }
         }
