@@ -38,7 +38,6 @@ class DocumentController {
     def shipmentService
     GrailsApplication grailsApplication
     TemplateService templateService
-    DocumentService documentService
     StockMovementService stockMovementService
     OutboundStockMovementService outboundStockMovementService
 
@@ -194,9 +193,12 @@ class DocumentController {
         def requestInstance = Requisition.get(command.requestId)
         def productInstance = Product.get(command.productId)
         def invoiceInstance = Invoice.get(command.invoiceId)
-        def stockMovement = outboundStockMovementService.getStockMovement(command.stockMovementId)
-        if (!stockMovement) {
-            stockMovement =  stockMovementService.getStockMovement(command.stockMovementId)
+        def stockMovement = null
+        if (command.stockMovementId) {
+            stockMovement = outboundStockMovementService.getStockMovement(command.stockMovementId)
+            if (!stockMovement) {
+                stockMovement =  stockMovementService.getStockMovement(command.stockMovementId)
+            }
         }
 
         // file must not be empty and must be less than 10MB
@@ -222,8 +224,8 @@ class DocumentController {
 
             documentInstance.validate()
 
-            List<DocumentType> nonTemplateDocumentTypes = documentService.getNonTemplateDocumentTypes()
-            if (!nonTemplateDocumentTypes.contains(documentType)) {
+            List<DocumentCode> forbiddenDocumentCodes = DocumentCode.templateList()
+            if (documentType && forbiddenDocumentCodes.contains(documentType.documentCode)) {
                 documentInstance.errors.reject("documentType", "Template types are not allowed for this document upload")
             }
 
