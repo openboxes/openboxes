@@ -9,10 +9,12 @@
 **/
 package unit.org.pih.warehouse.core
 
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
-import grails.test.mixin.TestMixin
-import grails.test.mixin.domain.DomainClassUnitTestMixin
+import grails.gorm.PagedResultList
+import grails.testing.gorm.DataTest
+import grails.testing.web.controllers.ControllerUnitTest
+import spock.lang.Ignore
+import spock.lang.Shared
+import spock.lang.Specification
 
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationController
@@ -21,102 +23,133 @@ import org.pih.warehouse.core.LocationService
 import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.core.Organization
 import org.pih.warehouse.inventory.InventoryService
-import spock.lang.Ignore
-import spock.lang.Specification
 
-@TestFor(LocationController)
-@Mock([Location, LocationService, InventoryService])
-@TestMixin(DomainClassUnitTestMixin)
-class LocationControllerTests extends Specification {
-	def stubMessager = new Expando()
+class LocationControllerTests extends Specification implements ControllerUnitTest<LocationController>, DataTest {
 
-	void setup() {
-		def depot = new LocationType(id: "1", name: "Depot")
-		def ward = new LocationType(id: "2", name: "Ward")
-		def boston = new LocationGroup(id: "boston", name: "Boston")
-		def mirebalais = new LocationGroup(id: "boston", name: "Mirebalais")
+	@Shared
+	LocationType depot
 
-		def main = new Organization(id: "MAIN", code: "MAIN", name: "Main Org")
-		def sister = new Organization(id: "SIS", code: "SIS", name: "Sister Org")
+	@Shared
+	LocationGroup bostonGroup
 
-		// FIXME this is the old GrailsUnitTestCase API
-//		mockConfig """
-//		openboxes {
-//			identifier {
-//				organization {
-//					minSize = 2
-//					maxSize = 4
-//				}
-//			}
-//		}"""
+	@Shared
+	Location bostonDepot
+
+	@Shared
+	Location miamiDepot
+
+	@Shared
+	Organization mainOrg
 
 
-		mockDomain(Location, [
-			new Location(id: "1", name: "Boston", locationType: depot, locationGroup: boston, organization: main),
-			new Location(id: "2", name: "Miami", locationType: depot, locationGroup: boston, organization: main),
-			new Location(id: "3", name: "Mirebalais", locationType: depot, locationGroup: mirebalais, organization: sister),
-			new Location(id: "4", name: "Mirebalais > Pediatrics", locationType: ward, locationGroup: mirebalais, organization: sister)
-		])
-		mockDomain(LocationType, [depot, ward])
-		mockDomain(LocationGroup, [boston, mirebalais])
-		mockDomain(Organization, [main, sister])
-
-		controller.inventoryService = [
-				getLocation: { locationId -> Location.get(locationId) },
-				saveLocation: { location -> location }
-		]
-
-//		def locationServiceMock = mockFor(LocationService)
-//		locationServiceMock.demand.getLocations { organization, locationType, locationGroup, query, max, offset ->
-//			if (query=="Bos") {
-//				return new PagedResultList([Location.get(1)], 1)
-//			}
-//			return new PagedResultList(Location.list(), 4)
-//		}
-//
-//		controller.locationService = locationServiceMock.createMock()
-
-		depot = LocationType.get("1")
-		assert depot != null
+	void setupSpec() {
+		mockDomains(LocationType, LocationGroup, Organization, Location)
 	}
 
-	void "index should redirect to list page"() {
+	void setup() {
+		controller.inventoryService = Stub(InventoryService)
+		controller.locationService = Stub(LocationService)
+
+		depot = createLocationType("Depot")
+
+		bostonGroup = createLocationGroup("Boston")
+
+		mainOrg = createOrganization("MAIN", "Main Org")
+
+		bostonDepot = createLocation("Boston", depot, bostonGroup, mainOrg)
+		miamiDepot = createLocation("Miami", depot, bostonGroup, mainOrg)
+	}
+
+	void "expect index to redirect to list page"() {
 		when:
 		controller.index()
 
 		then:
-		response.redirectedUrl == '/location/list'
+		assert response.redirectedUrl == '/location/list'
 	}
 
-	void "should list all locations"() {
+	@Ignore("Fix stubbing the PagedResultList")
+	void "when fetching locations with no filter expect some locations can be returned"() {
+		given:
+		params.max = 10
+		params.offset = 0
+
+		and:
+		controller.locationService.getLocations(_, _, _, _, params.max, params.offset) >>
+				buildStubbedPagedResultList([bostonDepot, miamiDepot])
+
 		when:
 		def model = controller.list()
 
 		then:
-		model.locationInstanceList.size() == 4
-		model.locationInstanceTotal == 4
+		assert model.locationInstanceList.size() == 2
+		assert model.locationInstanceTotal == 2
 	}
 
-	void "should list locations matching LocationType 1 and query param"() {
+	@Ignore("Fix stubbing the PagedResultList")
+	void "when fetching locations by some filter criteria expect some locations can be returned"() {
+		given:
+		params.q = "Bos"
+		params.locationGroup = bostonGroup
+		params.organization = mainOrg.id
+		params.locationType = depot.id
+		params.max = 10
+		params.offset = 0
+
+		and:
+		controller.locationService.getLocations(mainOrg, depot, bostonGroup, params.q, params.max, params.offset) >>
+				buildStubbedPagedResultList([bostonDepot])
+
+
 		when:
-		controller.params.q = "Bos"
-		controller.params.locationType = "1"
 		def model = controller.list()
 
 		then:
-		model.locationInstanceList.size() == 1
-		model.locationInstanceTotal == 1
+		assert model.locationInstanceList.size() == 1
+		assert model.locationInstanceTotal == 1
 	}
 
-	// Show action redirects to edit action
-	@Ignore("Fix this test")
-	void test_edit_shouldIncludeLocationInModel() {
+	void "when loading the edit page expect the correct location is returned"() {
+		given:
+		controller.inventoryService.getLocation(bostonDepot.id) >> bostonDepot
+
+		and:
+		controller.params.id = bostonDepot.id
+
 		when:
-		controller.params.id = "1"
 		def model = controller.edit()
 
 		then:
-		view == '/location/edit'
-		model.locationInstance.name == "Boston"
+		assert view == '/location/edit.gsp'
+		assert model.locationInstance.name == "Boston"
+	}
+
+	// TODO: Move this to a common util once it starts working
+	PagedResultList buildStubbedPagedResultList(ArrayList expectedList) {
+		return new PagedResultList(null).tap {
+			resultList = expectedList
+			totalCount = expectedList.size()
+		}
+	}
+
+	LocationGroup createLocationGroup(String name) {
+		return new LocationGroup(name: name).save(validate:false)
+	}
+
+	LocationType createLocationType(String name) {
+		return new LocationType(name: name).save(validate:false)
+	}
+
+	Organization createOrganization(String code, String name) {
+		return new Organization(code: code, name: name).save(validate:false)
+	}
+
+	Location createLocation(String name, LocationType locationType, LocationGroup locationGroup, Organization organization) {
+		return new Location(
+				name: name,
+				locationType: locationType,
+				locationGroup: locationGroup,
+				organization: organization)
+				.save(validate:false)
 	}
 }
