@@ -279,85 +279,83 @@ class RequisitionItemSpec extends Specification implements DomainUnitTest<Requis
 
     void "RequisitionItem.isCanceled() should return: #isCanceled when #quantity and #quantityCanceled and #modificationItem and #substitutionItem and #requisitionItems are passed"() {
         given:
-            RequisitionItem requisitionItem = Spy(RequisitionItem) {
-                totalQuantityCanceled() >> quantityCanceled
-                totalQuantity() >> quantity
-            }
+        RequisitionItem requisitionItem = Spy(RequisitionItem) {
+            totalQuantityCanceled() >> quantityCanceled
+            totalQuantity() >> quantity
+        }
 
-            requisitionItem.modificationItem >> modificationItem
-            requisitionItem.substitutionItem >> substitutionItem
-            requisitionItem.requisitionItems >> requisitionItems
+        requisitionItem.modificationItem >> modificationItem
+        requisitionItem.substitutionItem >> substitutionItem
+        requisitionItem.requisitionItems >> requisitionItems
 
         when:
-            Boolean isRequisitionCanceled = requisitionItem.isCanceled()
+        Boolean isRequisitionCanceled = requisitionItem.isCanceled()
 
         then:
-            isCanceled == isRequisitionCanceled
+        isCanceled == isRequisitionCanceled
 
         where:
-            quantityCanceled          | quantity      | modificationItem      | substitutionItem      | requisitionItems        || isCanceled
-                3                     | 3             | null                  | null                  | null                    || true
-                3                     | 2             | null                  | null                  | null                    || false
-                3                     | 2             | Mock(RequisitionItem) | null                  | null                    || false
-                3                     | 2             | null                  | Mock(RequisitionItem) | null                    || false
-                3                     | 2             | null                  | null                  | [Mock(RequisitionItem)] || false
+        quantityCanceled | quantity | modificationItem      | substitutionItem      | requisitionItems        || isCanceled
+        3                | 3        | null                  | null                  | null                    || true
+        3                | 2        | null                  | null                  | null                    || false
+        3                | 2        | Mock(RequisitionItem) | null                  | null                    || false
+        3                | 2        | null                  | Mock(RequisitionItem) | null                    || false
+        3                | 2        | null                  | null                  | [Mock(RequisitionItem)] || false
     }
 
     void "RequisitionItem.isCanceledDuringPick() should return: #isCanceled when requisition status is #status and quantityPicked of modificationItem is #modificationItemQuantityPicked"() {
         given:
-            RequisitionItem modificationItem = Stub(RequisitionItem) {
-                calculateQuantityPicked() >> modificationItemQuantityPicked
-            }
+        RequisitionItem modificationItem = Stub(RequisitionItem) {
+            calculateQuantityPicked() >> modificationItemQuantityPicked
+        }
 
-            domain.modificationItem = modificationItem
-            domain.requisition.status = status
+        domain.modificationItem = modificationItem
+        domain.requisition.status = status
 
         when:
-            Boolean isCanceledDuringPick = domain.isCanceledDuringPick()
+        Boolean isCanceledDuringPick = domain.isCanceledDuringPick()
 
         then:
-            isCanceledDuringPick == isCanceled
+        isCanceledDuringPick == isCanceled
 
         where:
-            status                      | modificationItemQuantityPicked || isCanceled
-            RequisitionStatus.PICKING   | 0                              || true
-            RequisitionStatus.ISSUED    | 0                              || true
-            RequisitionStatus.VERIFYING | null                           || false
-            RequisitionStatus.PICKING   | null                           || false
+        status                      | modificationItemQuantityPicked || isCanceled
+        RequisitionStatus.PICKING   | 0                              || true
+        RequisitionStatus.ISSUED    | 0                              || true
+        RequisitionStatus.VERIFYING | null                           || false
+        RequisitionStatus.PICKING   | null                           || false
     }
 
     void "RequisitionItem.isSubstitute() should return: #isSubstituted when quantityCanceled #quantityCanceled and substitutionItem #substitutionItem"() {
         given:
-            domain.quantityCanceled = quantityCanceled
-            domain.substitutionItem = substitutionItem
-            domain.requisitionItems = []
+        domain.quantityCanceled = quantityCanceled
+        domain.substitutionItem = substitutionItem
+        domain.requisitionItems = []
 
         when:
-            Boolean isItemSubstituted = domain.isSubstituted()
+        Boolean isItemSubstituted = domain.isSubstituted()
 
         then:
-            isSubstituted == isItemSubstituted
+        isSubstituted == isItemSubstituted
 
         where:
-            quantityCanceled | substitutionItem       || isSubstituted
-            0                | null                   || false
-            1                | Mock(RequisitionItem)  || true
+        quantityCanceled | substitutionItem      || isSubstituted
+        0                | null                  || false
+        1                | Mock(RequisitionItem) || true
     }
 
     void "RequisitionItem.isSubstituted() should return true when at least one requisitionItem is substituted"() {
         given:
-            RequisitionItem requisitionItem = Stub(RequisitionItem)
-            requisitionItem.requisitionItemType >> RequisitionItemType.SUBSTITUTION
-            domain.requisitionItems = [
-                    Mock(RequisitionItem),
-                    requisitionItem,
-                    Mock(RequisitionItem),
-            ]
+        RequisitionItem requisitionItem = Stub(RequisitionItem)
+        requisitionItem.requisitionItemType >> RequisitionItemType.SUBSTITUTION
+        domain.requisitionItems = [Mock(RequisitionItem),
+                                   requisitionItem,
+                                   Mock(RequisitionItem),]
 
         when:
-            Boolean isSubstituted = domain.isSubstituted()
+        Boolean isSubstituted = domain.isSubstituted()
 
         then:
-            isSubstituted == true
+        isSubstituted == true
     }
 }

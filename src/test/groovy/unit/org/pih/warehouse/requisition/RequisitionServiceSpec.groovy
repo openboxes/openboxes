@@ -47,119 +47,113 @@ class RequisitionServiceSpec extends Specification implements ServiceUnitTest<Re
 
     void 'saveRequisition saves the given requisition'() {
         given:
-            Requisition requisition = new Requisition(id: 1)
+        Requisition requisition = new Requisition(id: 1)
 
         when:
-            Requisition savedRequisition = service.saveRequisition(requisition)
+        Requisition savedRequisition = service.saveRequisition(requisition)
 
         then:
-            savedRequisition != null
+        savedRequisition != null
     }
 
     void 'issueRequisition should throw an exception when picklist is missing'() {
         given:
-            Requisition requisition = new Requisition(id: 1)
-            String comment = "Comment to requisition with errors"
+        Requisition requisition = new Requisition(id: 1)
+        String comment = "Comment to requisition with errors"
 
         and:
-            Requisition persistedRequisition = service.saveRequisition(requisition)
+        Requisition persistedRequisition = service.saveRequisition(requisition)
 
         when:
-            service.issueRequisition(persistedRequisition, Mock(User), Mock(Person), comment)
+        service.issueRequisition(persistedRequisition, Mock(User), Mock(Person), comment)
 
         then:
-            thrown(ValidationException)
+        thrown(ValidationException)
     }
 
     void 'issueRequisition should throw an exception when inventory service is unable to save local transfer'() {
         given:
-            Requisition requisition = new Requisition(id: 1)
-            String comment = "Comment to requisition with errors"
+        Requisition requisition = new Requisition(id: 1)
+        String comment = "Comment to requisition with errors"
 
         and:
-            Picklist.metaClass.static.findByRequisition = { Requisition foundRequisition ->
-                return new Picklist(requisition: foundRequisition)
-            }
-            Requisition persistedRequisition = service.saveRequisition(requisition)
+        Picklist.metaClass.static.findByRequisition = { Requisition foundRequisition -> return new Picklist(requisition: foundRequisition)
+        }
+        Requisition persistedRequisition = service.saveRequisition(requisition)
 
         when:
-            service.issueRequisition(persistedRequisition, Mock(User), Mock(Person), comment)
+        service.issueRequisition(persistedRequisition, Mock(User), Mock(Person), comment)
 
         then:
-            thrown(ValidationException)
+        thrown(ValidationException)
     }
 
     void 'issueRequisition should change the requisition status to issued'() {
         given:
-            Requisition requisition = new Requisition(id: 1)
-            String comment = "Comment to issued requisition"
+        Requisition requisition = new Requisition(id: 1)
+        String comment = "Comment to issued requisition"
 
         and:
-            Picklist.metaClass.static.findByRequisition = { Requisition foundRequisition ->
-                return new Picklist(requisition: foundRequisition)
-            }
-            Requisition persistedRequisition = service.saveRequisition(requisition)
+        Picklist.metaClass.static.findByRequisition = { Requisition foundRequisition -> return new Picklist(requisition: foundRequisition)
+        }
+        Requisition persistedRequisition = service.saveRequisition(requisition)
 
         and:
-            service.inventoryService.saveLocalTransfer(_ as Transaction) >> true
+        service.inventoryService.saveLocalTransfer(_ as Transaction) >> true
 
         when:
-            service.issueRequisition(persistedRequisition, Mock(User), Mock(Person), comment)
+        service.issueRequisition(persistedRequisition, Mock(User), Mock(Person), comment)
 
         then:
-            notThrown(ValidationException)
-            1 * inventoryService.generateTransactionNumber()
-            persistedRequisition.status == RequisitionStatus.ISSUED
+        notThrown(ValidationException)
+        1 * inventoryService.generateTransactionNumber()
+        persistedRequisition.status == RequisitionStatus.ISSUED
     }
 
     void 'rollbackRequisition should change requisition status to #requisitionStatus when requisition has status #currentStatus'() {
         given:
-            Requisition requisition = new Requisition(
-                    id: 1,
-                    status: currentStatus as RequisitionStatus,
-                    issuedBy: issuedBy as Person,
-                    dateIssued: dateIssued as Date,
-            )
+        Requisition requisition = new Requisition(id: 1,
+                status: currentStatus as RequisitionStatus,
+                issuedBy: issuedBy as Person,
+                dateIssued: dateIssued as Date,)
 
         when:
-            service.rollbackRequisition(requisition)
+        service.rollbackRequisition(requisition)
 
         then:
-            requisition.status == requisitionStatus
-            requisition.issuedBy == null
-            requisition.dateIssued == null
+        requisition.status == requisitionStatus
+        requisition.issuedBy == null
+        requisition.dateIssued == null
 
         where:
-        currentStatus                || requisitionStatus          | issuedBy     | dateIssued
-        RequisitionStatus.CHECKING   || RequisitionStatus.CHECKING | null         | null
-        RequisitionStatus.ISSUED     || RequisitionStatus.CHECKING | Mock(Person) | new Date()
+        currentStatus              || requisitionStatus          | issuedBy     | dateIssued
+        RequisitionStatus.CHECKING || RequisitionStatus.CHECKING | null         | null
+        RequisitionStatus.ISSUED   || RequisitionStatus.CHECKING | Mock(Person) | new Date()
     }
 
     void 'cloneRequisition should return copy of the passed requisition'() {
         given:
-            Requisition requisition = new Requisition(
-                    id: 1,
-                    name: 'Requisition',
-                    version: 1,
-                    requestedBy: Mock(Person),
-                    description: 'Description',
-                    dateRequested: new Date(),
-                    requestedDeliveryDate: new Date(),
-                    lastUpdated: new Date(),
-                    status: RequisitionStatus.CHECKING,
-                    type: RequisitionType.ADHOC,
-                    origin: Mock(Location),
-            )
+        Requisition requisition = new Requisition(id: 1,
+                name: 'Requisition',
+                version: 1,
+                requestedBy: Mock(Person),
+                description: 'Description',
+                dateRequested: new Date(),
+                requestedDeliveryDate: new Date(),
+                lastUpdated: new Date(),
+                status: RequisitionStatus.CHECKING,
+                type: RequisitionType.ADHOC,
+                origin: Mock(Location),)
 
         when:
-            Requisition copyOfRequisition = service.cloneRequisition(requisition)
-            Map jsonOfOriginalRequisition = requisition.toJson()
-            Map jsonOfCopiedRequisition = copyOfRequisition.toJson()
+        Requisition copyOfRequisition = service.cloneRequisition(requisition)
+        Map jsonOfOriginalRequisition = requisition.toJson()
+        Map jsonOfCopiedRequisition = copyOfRequisition.toJson()
 
         then:
-            'Copy of ' + jsonOfOriginalRequisition['name'] == jsonOfCopiedRequisition['name']
-            jsonOfOriginalRequisition.remove('name')
-            jsonOfCopiedRequisition.remove('name')
-            jsonOfOriginalRequisition == jsonOfCopiedRequisition
+        'Copy of ' + jsonOfOriginalRequisition['name'] == jsonOfCopiedRequisition['name']
+        jsonOfOriginalRequisition.remove('name')
+        jsonOfCopiedRequisition.remove('name')
+        jsonOfOriginalRequisition == jsonOfCopiedRequisition
     }
 }
