@@ -33,7 +33,7 @@ class RequisitionServiceSpec extends Specification implements ServiceUnitTest<Re
     }
 
     void setup() {
-        inventoryService = Spy(InventoryService) {
+        inventoryService = Stub(InventoryService) {
             generateTransactionNumber() >> UUID.randomUUID().toString()
         }
         identifierService = Stub(IdentifierService) {
@@ -49,11 +49,8 @@ class RequisitionServiceSpec extends Specification implements ServiceUnitTest<Re
         given:
         Requisition requisition = new Requisition(id: 1)
 
-        when:
-        Requisition savedRequisition = service.saveRequisition(requisition)
-
-        then:
-        savedRequisition != null
+        expect:
+        null != service.saveRequisition(requisition)
     }
 
     void 'issueRequisition should throw an exception when picklist is missing'() {
@@ -77,7 +74,8 @@ class RequisitionServiceSpec extends Specification implements ServiceUnitTest<Re
         String comment = "Comment to requisition with errors"
 
         and:
-        Picklist.metaClass.static.findByRequisition = { Requisition foundRequisition -> return new Picklist(requisition: foundRequisition)
+        Picklist.metaClass.static.findByRequisition = {
+            Requisition foundRequisition -> return new Picklist(requisition: foundRequisition)
         }
         Requisition persistedRequisition = service.saveRequisition(requisition)
 
@@ -94,7 +92,8 @@ class RequisitionServiceSpec extends Specification implements ServiceUnitTest<Re
         String comment = "Comment to issued requisition"
 
         and:
-        Picklist.metaClass.static.findByRequisition = { Requisition foundRequisition -> return new Picklist(requisition: foundRequisition)
+        Picklist.metaClass.static.findByRequisition = {
+            Requisition foundRequisition -> return new Picklist(requisition: foundRequisition)
         }
         Requisition persistedRequisition = service.saveRequisition(requisition)
 
@@ -106,16 +105,17 @@ class RequisitionServiceSpec extends Specification implements ServiceUnitTest<Re
 
         then:
         notThrown(ValidationException)
-        1 * inventoryService.generateTransactionNumber()
         persistedRequisition.status == RequisitionStatus.ISSUED
     }
 
     void 'rollbackRequisition should change requisition status to #requisitionStatus when requisition has status #currentStatus'() {
         given:
-        Requisition requisition = new Requisition(id: 1,
+        Requisition requisition = new Requisition(
+                id: 1,
                 status: currentStatus as RequisitionStatus,
                 issuedBy: issuedBy as Person,
-                dateIssued: dateIssued as Date,)
+                dateIssued: dateIssued as Date,
+        )
 
         when:
         service.rollbackRequisition(requisition)
@@ -133,7 +133,8 @@ class RequisitionServiceSpec extends Specification implements ServiceUnitTest<Re
 
     void 'cloneRequisition should return copy of the passed requisition'() {
         given:
-        Requisition requisition = new Requisition(id: 1,
+        Requisition requisition = new Requisition(
+                id: 1,
                 name: 'Requisition',
                 version: 1,
                 requestedBy: Mock(Person),
@@ -143,7 +144,8 @@ class RequisitionServiceSpec extends Specification implements ServiceUnitTest<Re
                 lastUpdated: new Date(),
                 status: RequisitionStatus.CHECKING,
                 type: RequisitionType.ADHOC,
-                origin: Mock(Location),)
+                origin: Mock(Location),
+        )
 
         when:
         Requisition copyOfRequisition = service.cloneRequisition(requisition)

@@ -156,6 +156,7 @@ class RequisitionItemSpec extends Specification implements DomainUnitTest<Requis
         quantity | quantityCanceled || quantityApproved
         2        | 1                || 1
         10       | 5                || 5
+        0        | null             || 0
     }
 
     void "RequisitionItem.approveQuantity() should throw validation exception when #quantity and #quantityCanceled are passed"() {
@@ -174,6 +175,7 @@ class RequisitionItemSpec extends Specification implements DomainUnitTest<Requis
         10       | 11
         20       | 20
         21       | 50
+        0        | 0
     }
 
     void "RequisitionItem.quantityNotCanceled() should calculate #quantityNotCanceled when #quantity and #quantityCanceled are passed"() {
@@ -181,11 +183,8 @@ class RequisitionItemSpec extends Specification implements DomainUnitTest<Requis
         domain.quantity = quantity
         domain.quantityCanceled = quantityCanceled
 
-        when:
-        Integer calculatedQuantityNotCanceled = domain.quantityNotCanceled()
-
-        then:
-        calculatedQuantityNotCanceled == quantityNotCanceled
+        expect:
+        quantityNotCanceled == domain.quantityNotCanceled()
 
         where:
         quantity | quantityCanceled || quantityNotCanceled
@@ -201,11 +200,8 @@ class RequisitionItemSpec extends Specification implements DomainUnitTest<Requis
         domain.productPackage = Stub(ProductPackage)
         domain.productPackage.quantity >> productPackageQuantity
 
-        when:
-        Integer calculatedTotalQuantity = domain.totalQuantity()
-
-        then:
-        calculatedTotalQuantity == totalQuantity
+        expect:
+        totalQuantity == domain.totalQuantity()
 
         where:
         quantity | productPackageQuantity || totalQuantity
@@ -221,11 +217,8 @@ class RequisitionItemSpec extends Specification implements DomainUnitTest<Requis
         domain.productPackage = Stub(ProductPackage)
         domain.productPackage.quantity >> productPackageQuantity
 
-        when:
-        Integer calculatedTotalQuantityCanceled = domain.totalQuantityCanceled()
-
-        then:
-        calculatedTotalQuantityCanceled == totalQuantityCanceled
+        expect:
+        totalQuantityCanceled == domain.totalQuantityCanceled()
 
         where:
         quantityCanceled | productPackageQuantity || totalQuantityCanceled
@@ -241,11 +234,8 @@ class RequisitionItemSpec extends Specification implements DomainUnitTest<Requis
         domain.productPackage = Stub(ProductPackage)
         domain.productPackage.quantity >> productPackageQuantity
 
-        when:
-        Integer calculatedTotalQuantityApproved = domain.totalQuantityApproved()
-
-        then:
-        calculatedTotalQuantityApproved == totalQuantityApproved
+        expect:
+        totalQuantityApproved == domain.totalQuantityApproved()
 
         where:
         quantityApproved | productPackageQuantity || totalQuantityApproved
@@ -263,11 +253,8 @@ class RequisitionItemSpec extends Specification implements DomainUnitTest<Requis
         requisitionItem.productPackage = Stub(ProductPackage)
         requisitionItem.productPackage.quantity >> productPackageQuantity
 
-        when:
-        Integer calculatedTotalQuantityNotCanceled = requisitionItem.totalQuantityNotCanceled()
-
-        then:
-        calculatedTotalQuantityNotCanceled == totalNotCanceledQuantity
+        expect:
+        totalNotCanceledQuantity == requisitionItem.totalQuantityNotCanceled()
 
         where:
         notCanceledQuantity | productPackageQuantity || totalNotCanceledQuantity
@@ -284,23 +271,20 @@ class RequisitionItemSpec extends Specification implements DomainUnitTest<Requis
             totalQuantity() >> quantity
         }
 
-        requisitionItem.modificationItem >> modificationItem
-        requisitionItem.substitutionItem >> substitutionItem
-        requisitionItem.requisitionItems >> requisitionItems
+        requisitionItem.modificationItem = modificationItem
+        requisitionItem.substitutionItem = substitutionItem
+        requisitionItem.setRequisitionItems(requisitionItems as Set)
 
-        when:
-        Boolean isRequisitionCanceled = requisitionItem.isCanceled()
-
-        then:
-        isCanceled == isRequisitionCanceled
+        expect:
+        isCanceled == requisitionItem.isCanceled()
 
         where:
         quantityCanceled | quantity | modificationItem      | substitutionItem      | requisitionItems        || isCanceled
         3                | 3        | null                  | null                  | null                    || true
+        3                | 3        | Mock(RequisitionItem) | null                  | null                    || false
+        3                | 3        | null                  | Mock(RequisitionItem) | null                    || false
+        3                | 3        | null                  | null                  | [Mock(RequisitionItem)] || false
         3                | 2        | null                  | null                  | null                    || false
-        3                | 2        | Mock(RequisitionItem) | null                  | null                    || false
-        3                | 2        | null                  | Mock(RequisitionItem) | null                    || false
-        3                | 2        | null                  | null                  | [Mock(RequisitionItem)] || false
     }
 
     void "RequisitionItem.isCanceledDuringPick() should return: #isCanceled when requisition status is #status and quantityPicked of modificationItem is #modificationItemQuantityPicked"() {
@@ -312,15 +296,12 @@ class RequisitionItemSpec extends Specification implements DomainUnitTest<Requis
         domain.modificationItem = modificationItem
         domain.requisition.status = status
 
-        when:
-        Boolean isCanceledDuringPick = domain.isCanceledDuringPick()
-
-        then:
-        isCanceledDuringPick == isCanceled
+        expect:
+        isCanceled == domain.isCanceledDuringPick()
 
         where:
         status                      | modificationItemQuantityPicked || isCanceled
-        RequisitionStatus.PICKING   | 0                              || true
+        RequisitionStatus.PICKED    | 0                              || true
         RequisitionStatus.ISSUED    | 0                              || true
         RequisitionStatus.VERIFYING | null                           || false
         RequisitionStatus.PICKING   | null                           || false
@@ -332,16 +313,14 @@ class RequisitionItemSpec extends Specification implements DomainUnitTest<Requis
         domain.substitutionItem = substitutionItem
         domain.requisitionItems = []
 
-        when:
-        Boolean isItemSubstituted = domain.isSubstituted()
-
-        then:
-        isSubstituted == isItemSubstituted
+        expect:
+        isSubstituted == domain.isSubstituted()
 
         where:
         quantityCanceled | substitutionItem      || isSubstituted
         0                | null                  || false
         1                | Mock(RequisitionItem) || true
+        1                | null                  || false
     }
 
     void "RequisitionItem.isSubstituted() should return true when at least one requisitionItem is substituted"() {
@@ -352,10 +331,7 @@ class RequisitionItemSpec extends Specification implements DomainUnitTest<Requis
                                    requisitionItem,
                                    Mock(RequisitionItem),]
 
-        when:
-        Boolean isSubstituted = domain.isSubstituted()
-
-        then:
-        isSubstituted == true
+        expect:
+        true == domain.isSubstituted()
     }
 }
