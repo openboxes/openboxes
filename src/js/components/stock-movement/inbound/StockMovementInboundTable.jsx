@@ -24,6 +24,7 @@ import StatusIndicator from 'utils/StatusIndicator';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
+import DateFormat from 'consts/dateFormat';
 
 const StockMovementInboundTable = ({
   filterParams,
@@ -209,13 +210,25 @@ const StockMovementInboundTable = ({
       Header: <Translate id="react.stockMovement.column.dateCreated.label" defaultMessage="Date Created" />,
       accessor: 'dateCreated',
       width: 150,
-      Cell: row => (<DateCell {...row} />),
+      Cell: row => (
+        <DateCell
+          localizeDate
+          formatLocalizedDate={DateFormat.DISPLAY}
+          {...row}
+        />
+      ),
     },
     {
       Header: <Translate id="react.stockMovement.column.expectedReceiptDate" defaultMessage="Expected Receipt Date" />,
       accessor: 'expectedDeliveryDate',
       width: 200,
-      Cell: row => (<DateCell {...row} />),
+      Cell: row => (
+        <DateCell
+          localizeDate
+          formatLocalizedDate={DateFormat.DISPLAY}
+          {...row}
+        />
+      ),
     },
   ], [shipmentStatuses, translate]);
 

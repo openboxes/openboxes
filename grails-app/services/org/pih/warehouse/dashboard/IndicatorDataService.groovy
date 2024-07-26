@@ -1137,7 +1137,7 @@ class IndicatorDataService {
                     WHEN DATEDIFF(t.date_created, t.transaction_date) > 7 THEN '7+ days'
                     ELSE CONCAT(DATEDIFF(t.date_created, t.transaction_date), ' days')
                 END
-            ) as days_backdated, COUNT(t.id) as shipments FROM shipment s
+            ) as days_backdated, COUNT(DISTINCT s.id) as shipments FROM shipment s
             INNER JOIN transaction t ON t.${transactionProperty} = s.id
             WHERE s.${shipmentLocationProperty} = :locationId 
             AND t.date_created > :timeLimit
@@ -1188,7 +1188,7 @@ class IndicatorDataService {
         String query = '''
             SELECT 
                 product_code,
-                COUNT(product_code) as products,
+                COUNT(DISTINCT backdated_shipment) as shipments_with_backdated_product,
                 GROUP_CONCAT(DISTINCT backdated_shipment SEPARATOR " "),
                 DATE_FORMAT(last_stock_count, "%d-%b-%Y"),
                 GROUP_CONCAT(DISTINCT backdated_shipment, ' ', shipment_id SEPARATOR ';') as shipment_ids
@@ -1241,7 +1241,7 @@ class IndicatorDataService {
             ) as dashboard_data
             WHERE dashboard_data.date_created > dashboard_data.last_stock_count OR dashboard_data.last_stock_count IS NULL
             GROUP BY product_code, last_stock_count
-            ORDER BY products DESC
+            ORDER BY shipments_with_backdated_product DESC
         '''
 
         List<GroovyRowResult> results = dataService.executeQuery(query, [

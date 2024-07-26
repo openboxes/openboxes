@@ -1626,3 +1626,7 @@ div.search-input:focus-within {
 .fit-content {
   width: fit-content;
 }
+
+.ReactVirtualized__List {
+  overflow: auto !important;
+}

@@ -417,7 +417,7 @@ class StockTransferService {
 
     def setQuantityOnHand(StockTransfer stockTransfer) {
         stockTransfer?.stockTransferItems?.each { StockTransferItem stockTransferItem ->
-            ProductAvailability pa = ProductAvailability.findByInventoryItemAndBinLocation(stockTransferItem.inventoryItem, stockTransferItem.originBinLocation)
+            ProductAvailability pa = ProductAvailability.findByInventoryItemAndBinLocationAndLocation(stockTransferItem.inventoryItem, stockTransferItem.originBinLocation, stockTransferItem.location)
             stockTransferItem.quantityOnHand = pa ? pa.quantityOnHand : 0
             stockTransferItem.quantityNotPicked = pa && pa.quantityNotPicked > 0 ? pa.quantityNotPicked: 0
             stockTransferItem.productAvailabilityId = pa ? pa.id : stockTransferItem.id

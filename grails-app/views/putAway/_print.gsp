@@ -122,13 +122,13 @@
                     <th style="width: 50px;">
                         <g:message code="putawayOrder.putawayQuantity.label" default="Putaway Quantity" />
                     </th>
-                    <th style="white-space: nowrap; width: 50px;">
+                    <th style="width: 50px;">
                         <g:message code="putawayOrder.preferredBin.label" default="Preferred Bin" />
                     </th>
-                    <th style="white-space: nowrap; width: 70px;">
+                    <th style="width: 70px">
                         <g:message code="putawayOrder.currentBins.label" default="Current Bins" />
                     </th>
-                    <th style="white-space: nowrap; width: 130px;">
+                    <th style="width: 130px;">
                         <g:message code="putawayOrder.putAwayBin.label" default="Putaway Bin" />
                     </th>
                 </tr>
