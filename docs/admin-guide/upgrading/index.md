@@ -1,52 +1,98 @@
-### To upgrade using the command line
-1. SSH into your server
+# Upgrading 
 
-        ssh openboxes.example.com
+Once you have migrated from 0.8.x to 0.9.x, the upgrade process for subsequent releases will 
+go back to being straightforward. 
 
-1. Download WAR file from [latest release](https://github.com/openboxes/openboxes/releases/latest) page on GitHub
+!!! danger
+        If you have not completed the migration from 0.8.x to 0.9.x, please complete this 
+        process before continuing with the upgrade.
 
-        wget `curl -s https://api.github.com/repos/openboxes/openboxes/releases/latest | grep browser_download_url | cut -d '"' -f 4`
+## Assumptions / Constraints
+These upgrade instructions assume the following 
 
-1. Shutdown tomcat 
+* :fontawesome-regular-circle-check: You have already migrated to OpenBoxes v0.9.x  
+* :fontawesome-regular-circle-check: You are upgrading from v0.8.x to another v0.8.x release 
+* :fontawesome-regular-circle-check: You have deployed the application to Tomcat 9 
+* :fontawesome-regular-circle-cross: Do not use this page if you are upgrading from 0.8.x to 0.9.x
 
-        sudo service tomcat stop
+!!! note
+        You can still use Tomcat 8.5, but the commands below assume that you are using Tomcat 9.
 
-1. Remove existing deployment
+!!! tip
+        Whether you're upgrading or migrating ALWAYS backup your database just in case something 
+        goes awry.
 
-        sudo rm -rf TOMCAT_HOME/webapps/openboxes*
 
-1. Copy WAR file to Tomcat webapps directory (NOTE: we need to change the name of the WAR file)
+## Step-by-step Instructions
 
-        sudo cp openboxes.war TOMCAT_HOME/webapps/openboxes.war
+### 1. Backup Database
 
-1. Start Tomcat (NOTE: this may take awhile if there are lots of data migrations)
+1. SSH to your application server (or database server if you're using distributed deployment)
+
+        ssh db.openboxes.com
+
+2. Backup the database
     
-        sudo service tomcat start
+        mysqldump openboxes > openboxes.sql 
 
-1. Check the logs 
+3. Copy database backup to safe place
 
-        sudo tail -f TOMCAT_HOME/logs/tomcat7/catalina.out
+        scp openboxes.sql backups.openboxes.com
 
-### To upgrade using Tomcat Manager 
-1. Install Tomcat manager
 
-        sudo apt-get install tomcat-admin
+### 2. Upgrade Application
+
+=== "Using command line"
+
+    1. SSH into your server
+
+            ssh app.openboxes.com
+
+    1. Download WAR file from [latest release](https://github.com/openboxes/openboxes/releases/latest) page on GitHub
+
+            wget `curl -s https://api.github.com/repos/openboxes/openboxes/releases/latest | grep browser_download_url | cut -d '"' -f 4`
+
+    1. Shutdown tomcat 
+
+            sudo service tomcat9 stop
+
+    1. Remove existing deployment
+
+            sudo rm -rf /var/lib/tomcat9/webapps/openboxes*
+
+    1. Copy WAR file to Tomcat webapps directory (NOTE: we need to change the name of the WAR file)
+
+            sudo cp openboxes.war /var/lib/tomcat9/webapps/openboxes.war
+
+    1. Start Tomcat (NOTE: this may take a while if there are lots of data migrations)
+    
+            sudo service tomcat9 start
+
+    1. Check the logs 
+
+            sudo tail -f /var/lib/tomcat9/logs/catalina.out
+
+=== "Using Tomcat Manager"
+
+    2. Install Tomcat manager
+    
+            sudo apt-get install tomcat9-admin
+            
+    1. Edit tomcat-users.xml to add a new user (`TOMCAT_HOME/conf/tomcat-users.xml`)
         
-1. Edit tomcat-users.xml to add a new user (`TOMCAT_HOME/conf/tomcat-users.xml`)
+            <user username="<username>" password="<password>" roles="manager-gui"/>
     
-        <user username="<username>" password="<password>" roles="manager-gui"/>
-
-1. Restart Tomcat
-
-        sudo service tomcat restart
-
-1. Download WAR file from [latest release](https://github.com/openboxes/openboxes/releases/latest) page on GitHub
-
-        wget `curl -s https://api.github.com/repos/openboxes/openboxes/releases/latest | grep browser_download_url | cut -d '"' -f 4`
-
-1. Log into Tomcat Manager 
-1. Undeploy all existing OpenBoxes applications 
-1. Upload WAR file to Tomcat Manager (under WAR file to deploy)
-1. Restart Tomcat from the command line (optional, but hightly recommended)
-
-        sudo service tomcat restart
+    1. Restart Tomcat
+    
+            sudo service tomcat9 restart
+    
+    1. Download WAR file from [latest release](https://github.com/openboxes/openboxes/releases/latest) page on GitHub
+    
+            wget `curl -s https://api.github.com/repos/openboxes/openboxes/releases/latest | grep browser_download_url | cut -d '"' -f 4`
+    
+    1. Log into Tomcat Manager 
+    1. Undeploy all existing OpenBoxes applications 
+    1. Upload WAR file to Tomcat Manager (under WAR file to deploy)
+    1. Restart Tomcat from the command line (optional, but hightly recommended)
+    
+            sudo service tomcat9 restart
