@@ -4,4 +4,5 @@ mkdocs-material-extensions
 mkdocs-macros-plugin
 mkdocs-awesome-pages-plugin
 mkdocs-glightbox
+markdown-include
 materialx
