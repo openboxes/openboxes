@@ -1,7 +1,7 @@
-name: Build and Publish Release
+name: Create GitHub Release With Artifacts
 
 on:
-  # We want releases to be triggered automatically whenever we push a new tag that starts with vX.Y.Z
+  # We want releases to be triggered automatically whenever we push a new tag that starts with "vX.Y.Z"
   push:
     tags:
       - 'v[0-9]+.[0-9]+.[0-9]+**'
@@ -24,11 +24,13 @@ jobs:
     runs-on: ubuntu-latest
 
     permissions:
-      contents: write  # Needed for publishing the release
+      contents: write  # Needed for publishing the release notes
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          ref: ${{env.TAG_NAME}}  # Needed for manual runs to ensure we build from the tagged commit
 
       - name: Set up JDK
         uses: actions/setup-java@v4
@@ -49,3 +51,4 @@ jobs:
           fail_on_unmatched_files: true
           body_path: ./.github/release-notes-template.md
           generate_release_notes: true  # Adds GitHub's auto-generated release notes from release.yml
+          draft: true  # Require manual validation before publishing
