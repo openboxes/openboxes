@@ -1,4 +1,4 @@
-Certainly! Below are the step-by-step installation instructions for OpenBoxes on macOS with Java 8, Tomcat 9, and MySQL 8.
+# Quickstart on Mac OS
 
 ### Step 1: Install Homebrew (if not already installed)
 Homebrew is a package manager for macOS which makes installing software easier.

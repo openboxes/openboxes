@@ -1,4 +1,4 @@
-# Ubuntu 22.04
+# Quickstart on Ubuntu 22.04
 
 ## Preconditions
 
@@ -6,8 +6,6 @@ The following assumptions must be met before proceeding
 * You must have a created an account with a hosting provider. 
 * You must have provisioned a virtual machine within your hosting provider.
 * You must have installed Ubuntu 22.04 on the aforementioned virtual machine.
-* 
-* 
 
 ## Step 1: Update System Packages
 First, ensure that your system is up to date by running:
@@ -28,14 +26,11 @@ java -version
 ```
 
 ## Step 3: Install Tomcat
+```shell
+sudo apt install tomcat9
 ```
 
-```
-
-## Step 3: Install MySQL 
-
-### MySQL 8 (recommended)
-Install MySQL server and client.
+## Step 3: Install MySQL
 
 ```shell
 sudo apt install mysql-server-8.0
