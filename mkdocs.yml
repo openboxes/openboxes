@@ -212,9 +212,10 @@ nav:
       - Overview: admin-guide/migration/index.md
       - Parallel Upgrade: admin-guide/migration/parallel/index.md
       - In-Place Upgrade: admin-guide/migration/in-place/index.md
-    - Troubleshooting:
-      - Known Issues: admin-guide/migration/known-issues/index.md
-      - Support: support/index.md
+#     - Troubleshooting:
+#       - Known Issues: admin-guide/migration/known-issues/index.md
+#       - Support: support/index.md
+
 #     # Create a GH label to capture migration issues and link them here
 #     #- Troubleshooting
 #     - Community:
