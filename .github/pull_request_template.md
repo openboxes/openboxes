@@ -19,8 +19,8 @@
 > *We require that all code changes come paired with a method of testing them. Please select which of the following testing approaches you've included with this change:*
 
 - [ ] Frontend automation tests (unit)
-- [ ] Backend automation tests (unit, API, smoke)
-- [ ] End-to-end tests (Playwright)
+- [ ] Backend automation tests ([unit](https://pihemr.atlassian.net/wiki/spaces/OB/pages/3013869579/Backend+Unit+Testing+Standards), [API](https://pihemr.atlassian.net/wiki/spaces/OB/pages/3013738522/Backend+Integration+Testing+Standards), smoke)
+- [ ] End-to-end tests ([Playwright](https://pihemr.atlassian.net/wiki/spaces/OB/pages/2942828546/Knowledge+Transfer+on+automated+testing+with+Playwright))
 - [ ] Manual tests (please describe below)
 - [ ] Not Applicable
 
