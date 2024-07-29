@@ -49,6 +49,6 @@ jobs:
           tag_name: ${{env.TAG_NAME}}
           files: ./build/libs/openboxes.war
           fail_on_unmatched_files: true
-          body_path: ./.github/release-notes-template.md
+          body_path: ./.github/templates/release-notes-template.md
           generate_release_notes: true  # Adds GitHub's auto-generated release notes from release.yml
           draft: true  # Require manual validation before publishing
