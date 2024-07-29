@@ -19,7 +19,7 @@
 > *We require that all code changes come paired with a method of testing them. Please select which of the following testing approaches you've included with this change:*
 
 - [ ] Frontend automation tests (unit)
-- [ ] Backend automation tests (unit, API, domain slice)
+- [ ] Backend automation tests (unit, API, smoke)
 - [ ] End-to-end tests (Playwright)
 - [ ] Manual tests (please describe below)
 - [ ] Not Applicable
