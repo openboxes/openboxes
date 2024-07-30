@@ -2,21 +2,41 @@ package unit.org.pih.warehouse.order
 
 import grails.testing.gorm.DomainUnitTest
 import org.pih.warehouse.order.Order
+import org.pih.warehouse.order.OrderAdjustment
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.OrderItemStatusCode
 import spock.lang.Specification
 
 class OrderSpec extends Specification implements DomainUnitTest<Order> {
+    void "Order.getCanGenerateInvoice() should return true when there is an order adjustment not tied to any order item that hasn't already been invoiced"() {
+        given:
+        Order order = Spy(Order) {
+            getHasPrepaymentInvoice() >> hasPrepaymentInvoice
+        }
+        Set<OrderAdjustment> orderAdjustments = [
+                Mock(OrderAdjustment),
+        ]
+        order.setOrderAdjustments(orderAdjustments)
+
+        expect:
+        order.canGenerateInvoice == canGenerateInvoice
+
+        where:
+        hasPrepaymentInvoice || canGenerateInvoice
+        false                || false
+        true                 || false
+    }
+
     void "Order.getCanGenerateInvoice() should return true when there is an order adjustment that hasn't already been invoiced"() {
         given:
         Order order = Spy(Order) {
             getHasPrepaymentInvoice() >> hasPrepaymentInvoice
         }
+        OrderItem orderItem = Stub(OrderItem)
+        orderItem.hasNotInvoicedAdjustment() >> hasNotInvoicedAdjustment
         Set<OrderItem> orderItems = [
                 Mock(OrderItem),
-                Stub(OrderItem) {
-                    getHasNotInvoicedAdjustment() >> hasNotInvoicedAdjustment
-                },
+                orderItem,
                 Mock(OrderItem)
         ]
         order.setOrderItems(orderItems)
@@ -37,9 +57,9 @@ class OrderSpec extends Specification implements DomainUnitTest<Order> {
             getHasPrepaymentInvoice() >> hasPrepaymentInvoice
         }
         OrderItem orderItem = Spy(OrderItem) {
-            getIsEncumbered() >> isEncumbered
             getAllInvoiceItems() >> []
         }
+        orderItem.isEncumbered() >> isEncumbered
         orderItem.orderItemStatusCode = orderItemStatusCode
         Set<OrderItem> orderItems = [
                 Mock(OrderItem),
@@ -64,10 +84,9 @@ class OrderSpec extends Specification implements DomainUnitTest<Order> {
         Order order = Spy(Order) {
             getHasPrepaymentInvoice() >> hasPrepaymentInvoice
         }
-        OrderItem orderItem = Spy(OrderItem) {
-            getIsEncumbered() >> isEncumbered
-            getIsInvoiceable() >> isInvoiceable
-        }
+        OrderItem orderItem = Spy(OrderItem)
+        orderItem.isEncumbered() >> isEncumbered
+        orderItem.isInvoiceable() >> isInvoiceable
         Set<OrderItem> orderItems = [
                 Mock(OrderItem),
                 orderItem,

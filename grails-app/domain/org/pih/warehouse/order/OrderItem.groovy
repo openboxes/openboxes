@@ -117,9 +117,6 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
             "hasInvoices",
             "hasPrepaymentInvoice",
             "hasRegularInvoice",
-            "isInvoiceable",
-            "isEncumbered",
-            "hasNotInvoicedAdjustment",
             "disableRefresh",
             // Statuses
             "partiallyFulfilled",
@@ -293,19 +290,19 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
                 : quantityShippedInStandardUom - quantityInvoicedInStandardUom
     }
 
-    Boolean getIsInvoiceable() {
+    Boolean isInvoiceable() {
         return quantityAvailableToInvoice > 0
     }
 
-    Boolean getIsEncumbered() {
-        return !isCompletelyInvoiced()
+    Boolean isEncumbered() {
+        return !completelyInvoiced
     }
 
     Boolean isPending() {
         return !isCompletelyFulfilled()
     }
 
-    Boolean getHasNotInvoicedAdjustment() {
+    Boolean hasNotInvoicedAdjustment() {
         return orderAdjustments.any { !it.isInvoiced }
     }
 

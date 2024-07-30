@@ -18,7 +18,7 @@ class OrderAdjustmentSpec extends Specification implements DomainUnitTest<OrderA
         orderAdjustment.order.status = orderStatus
 
         expect:
-        orderAdjustment.isInvoiceable == isInvoiceable
+        orderAdjustment.invoiceable == isInvoiceable
 
         where:
         isInvoiced | orderStatus         || isInvoiceable
@@ -35,8 +35,12 @@ class OrderAdjustmentSpec extends Specification implements DomainUnitTest<OrderA
             getHasPrepaymentInvoice() >> hasPrepaymentInvoice
         }
 
+        Order order = Spy(Order)
+        order.status = OrderStatus.PLACED
+        orderAdjustment.order = order
+
         expect:
-        orderAdjustment.isEncumbered == isEncumbered
+        orderAdjustment.encumbered == isEncumbered
 
         where:
         isInvoiced | hasPrepaymentInvoice || isEncumbered

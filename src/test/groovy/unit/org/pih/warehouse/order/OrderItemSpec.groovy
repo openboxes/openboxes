@@ -15,7 +15,7 @@ class OrderItemSpec extends Specification implements DomainUnitTest<OrderItem> {
         orderItem.quantity = quantity
 
         expect:
-        orderItem.isCompletelyInvoiced() == isCompletelyInvoiced
+        orderItem.completelyInvoiced == isCompletelyInvoiced
 
         where:
         quantityInvoicedInStandardUom | quantity || isCompletelyInvoiced
@@ -48,7 +48,7 @@ class OrderItemSpec extends Specification implements DomainUnitTest<OrderItem> {
         }
 
         expect:
-        orderItem.isInvoiceable == isInvoiceable
+        orderItem.invoiceable == isInvoiceable
 
         where:
         quantityAvailableToInvoice || isInvoiceable
@@ -66,7 +66,7 @@ class OrderItemSpec extends Specification implements DomainUnitTest<OrderItem> {
         orderItem.quantity = quantity
 
         expect:
-        orderItem.isEncumbered == isEncumbered
+        orderItem.encumbered == isEncumbered
 
         where:
         quantityInvoicedInStandardUom | quantity || isEncumbered
