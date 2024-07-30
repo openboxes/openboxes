@@ -7,6 +7,7 @@ const TableRow = ({
   children, className, error,
 }) => (
   <div
+    role="row"
     className={`rt-tr ${className} ${!_.isEmpty(error) ? 'rt-invalid' : ''}`}
   >
     {children}

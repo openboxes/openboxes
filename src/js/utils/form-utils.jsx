@@ -29,7 +29,7 @@ export const renderFormField = (fieldConfig, fieldName, props = {}) => {
 export const renderFormFields = ({
   renderInput,
   attributes: {
-    required, hidden, showError, subtext, tooltip, injectionData, trigger = 'click', ...otherAttributes
+    required, hidden, showError, subtext, tooltip, injectionData, ariaLabel, trigger = 'click', ...otherAttributes
   },
   label: FieldLabel,
   defaultMessage,
@@ -46,6 +46,7 @@ export const renderFormFields = ({
   const hiddenClass = hidden ? 'd-none' : '';
   const hasErrorClass = (touched || fieldTouched || showError) && error ? 'has-error' : '';
   const className = [supplementClass, filterElementClass, requiredClass, hiddenClass, hasErrorClass].join(' ');
+  const fieldAriaLabel = ariaLabel || translate(FieldLabel, defaultMessage);
 
   if (arrayField) {
     return (
@@ -57,7 +58,7 @@ export const renderFormFields = ({
         duration="250"
         hideDelay="50"
       >
-        <div className={className} data-testid="form-field" aria-label={defaultMessage}>
+        <div className={className} data-testid="form-field" aria-label={fieldAriaLabel}>
           {renderInput(input, otherAttr)}
         </div>
       </Tooltip>
@@ -65,7 +66,7 @@ export const renderFormFields = ({
   }
 
   return (
-    <div className={`${!filterElement ? 'mt-2' : ''} ${className}`} data-testid="form-field" aria-label={defaultMessage}>
+    <div className={`${!filterElement ? 'mt-2' : ''} ${className}`} data-testid="form-field" aria-label={fieldAriaLabel}>
       <div className={`${filterElement ? 'd-flex flex-wrap flex-1' : 'row'}`}>
         {
           typeof FieldLabel === 'string' ?

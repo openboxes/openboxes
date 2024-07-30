@@ -33,7 +33,7 @@ const DataTable = React.forwardRef((props, ref) => {
     </React.Fragment>);
 
   return (
-    <div className="app-react-table-wrapper">
+    <div className="app-react-table-wrapper" data-testid="data-table">
       { headerComponent && (
         <div className="app-react-table-header d-flex p-2">
           {headerComponent()}

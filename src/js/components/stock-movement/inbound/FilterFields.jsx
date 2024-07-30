@@ -10,6 +10,7 @@ export default {
       filterElement: true,
       placeholder: 'react.stockMovement.inbound.filters.receiptStatus.label',
       defaultPlaceholder: 'Receipt Status',
+      ariaLabel: 'Receipt Status',
       showLabelTooltip: true,
       options: [],
       closeMenuOnSelect: false,
@@ -33,6 +34,7 @@ export default {
       filterElement: true,
       placeholder: 'react.stockMovement.origin.label',
       defaultPlaceholder: 'Origin',
+      ariaLabel: 'Origin',
       showLabelTooltip: true,
     },
     getDynamicAttr: ({
@@ -49,6 +51,7 @@ export default {
       filterElement: true,
       placeholder: 'react.stockMovement.destination.label',
       defaultPlaceholder: 'Destination',
+      ariaLabel: 'Destination',
       showLabelTooltip: true,
       disabled: true,
     },
@@ -60,6 +63,7 @@ export default {
       filterElement: true,
       placeholder: 'react.stockMovement.shipmentType.label',
       defaultPlaceholder: 'Shipment type',
+      ariaLabel: 'Shipment type',
       showLabelTooltip: true,
       options: [],
       blurInputOnSelect: false,
@@ -85,6 +89,7 @@ export default {
       filterElement: true,
       placeholder: 'react.stockMovement.requestedBy.label',
       defaultPlaceholder: 'Requested By',
+      ariaLabel: 'Requested By',
       showLabelTooltip: true,
     },
     getDynamicAttr: ({
@@ -107,6 +112,7 @@ export default {
       filterElement: true,
       placeholder: 'react.stockMovement.createdBy.label',
       defaultPlaceholder: 'Created By',
+      ariaLabel: 'Created By',
       showLabelTooltip: true,
     },
     getDynamicAttr: ({
@@ -129,6 +135,7 @@ export default {
       filterElement: true,
       placeholder: 'react.stockMovement.updatedBy.label',
       defaultPlaceholder: 'Updated By',
+      ariaLabel: 'Updated By',
       showLabelTooltip: true,
     },
     getDynamicAttr: ({
@@ -146,6 +153,7 @@ export default {
       defaultMessage: 'Created after',
       // date format in which the date will be sent to the API
       dateFormat: 'MM/DD/YYYY',
+      ariaLabel: 'Created after',
       filterElement: true,
     },
   },
@@ -158,6 +166,7 @@ export default {
       defaultMessage: 'Created before',
       // date format in which the date will be sent to the API
       dateFormat: 'MM/DD/YYYY',
+      ariaLabel: 'Created before',
       filterElement: true,
     },
   },
