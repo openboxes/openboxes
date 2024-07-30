@@ -6,38 +6,34 @@ is a relatively simple process: drop a new WAR file into the Tomcat webapps dire
 restart the application server, watch the logs to make sure database migrations are executed 
 properly, and you're done.
 
-OpenBoxes 0.8.x releases were tied to the following tech stack
+OpenBoxes 0.8.x releases were tied to the following tech stack. This upcoming 0.9.x release(s) support a bit more variability.
 
-| Dependency         | Supported Versions | 
-|:-------------------|:-------------------| 
-| Operating System   | Ubuntu 18.04       | 
-| Java               | Java 7             |
-| Application Server | Tomcat 7           | 
-| Database           | MySQL 5.7          |
-| Web Server         | Apache 2           |
+| Dependency         | 0.8.x Supported Versions | 0.9.x Supported Versions   |
+|:-------------------|:-------------------------|----------------------------|
+| Operating System   | Ubuntu 18.04             | Ubuntu 22.04               |
+| Java               | Java 7                   | Java 8                     |
+| Application Server | Tomcat 7                 | Tomcat 8.5, **Tomcat 9**   |
+| Database           | MySQL 5.7                | **MySQL 8**, MariaDB 10.11 |
+| Web Server         | Apache 2                 | **Apache 2.2**, nginx 1.23 |
 
-This upcoming 0.9.x release(s) support a bit more variability.
 
-| Dependency         | Supported Versions     | 
-|:-------------------|:-----------------------|
-| Operating System   | Ubuntu 22.04           |
-| Java               | Java 8                 |
-| Application Server | Tomcat 8.5, Tomcat 9   | 
-| Database           | MySQL 8, MariaDB 10.11 |
-| Web Server         | Apache 2.2, nginx 1.23 |
-
-With the latest releases (0.9.x) the technical dependencies have changed significantly, so you'll 
-need to upgrade those dependencies before proceeding with the application upgrade. In general, this 
-process is also fairly simple. But given the number of moving parts involved with dependencies and their 
-configuration, there are more opportunities for errors. So we recommend that you plan your migration
-including a mitigation and rollback strategy in the case that the upgrade fails. 
+With the latest releases (0.9.x) the technical dependencies have changed, so you'll need to upgrade 
+those dependencies before proceeding with the application upgrade. In general, this process is also 
+fairly straightforward. But given the number of moving parts involved with dependencies and their 
+configuration, there are more many opportunities for errors, some of which we cannot foresee. 
+Therefore, we recommend that you create your own migration plan and include a mitigation and 
+rollback strategy in the case that the upgrade fails. 
 
 ## Approaches
-There are mainly two approaches available for migrating. 
+There are primarily two approaches available for migrating. 
 
-* Parallel Upgrade: Provision a new VM and install dependencies 
-* In-Place Upgrade: Upgrade dependencies on your existing VM
-* Assisted Upgrade: Request assistance from the OpenBoxes team to complete the migration process for you.
+* **Parallel Upgrade**: Provision a new VM, install dependencies, migrate database 
+* **In-Place Upgrade**: Upgrade dependencies on your existing VM
+
+!!! tip
+    
+    If you don't feel comfortable completing the migration process on your own, you can request 
+    assistance from the OpenBoxes support team.
 
 ## Decision Factors
 

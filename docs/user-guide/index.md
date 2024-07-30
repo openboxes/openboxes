@@ -1,32 +1,58 @@
 
-# Getting Started 
+# User Guide
 
 ## Knowledge Base
-
-Review our knowledge base for step-by-step instructions on the most common features.  
+Search our knowledge base for information and step-by-step instructions on the most common features.
 
 <a href="https://help.openboxes.com">
-![img.png](../img/helpscout.png){height:20%}
+![img.png](../assets/img/helpscout.png)
 </a>
+
+
+/// html | div[style='float: left; width: 50%;']
+
+Search our knowledge base for information and step-by-step instructions on the most common features.
+
+///
+
+
+/// html | div[style='float: right;width: 50%;']
+
+<a href="https://help.openboxes.com">
+
+![img.png](../assets/img/helpscout.png)
+
+</a>
+
+///
+
+
+/// html | div[style='clear: both;']
+
+///
+
+
+
+
 
 ## Discussion Forum
 
 Post your questions to our Community Forum and search for answers to common questions. 
 
 <a href="https://community.openboxes.com">
-![img.png](../img/discourse2.png)
+![img.png](../assets/img/discourse2.png)
 </a>
 
 ## YouTube channel
 Subscribe to our YouTube Channel! Or ... ya know ... don't. It's up to you.
 <a href="https://www.youtube.com/channel/UC-e9K2wU9wZFQ11eF-vwu6Q">
-![img.png](../img/youtube2.png)
+![img.png](../assets/img/youtube.png)
 </a>
 
 ## Tutorials 
 Check out our tutorials page for the most up-to-date tutorials.
 <a href="https://openboxes.com/tutorials">
-![img.png](../img/tutorials.png)
+![img.png](../assets/img/tutorials.png)
 </a>
 
 ## Contributing

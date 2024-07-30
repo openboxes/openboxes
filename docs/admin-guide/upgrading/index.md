@@ -3,24 +3,27 @@
 Once you have migrated from 0.8.x to 0.9.x, the upgrade process for subsequent releases will 
 go back to being straightforward. 
 
-!!! danger
-        If you have not completed the migration from 0.8.x to 0.9.x, please complete this 
-        process before continuing with the upgrade.
 
-## Assumptions / Constraints
-These upgrade instructions assume the following 
+## Prerequisites
+These upgrade instructions make the following assumptions
 
-* :fontawesome-regular-circle-check: You have already migrated to OpenBoxes v0.9.x  
-* :fontawesome-regular-circle-check: You are upgrading from v0.8.x to another v0.8.x release 
-* :fontawesome-regular-circle-check: You have deployed the application to Tomcat 9 
-* :fontawesome-regular-circle-cross: Do not use this page if you are upgrading from 0.8.x to 0.9.x
+* You have already migrated to OpenBoxes v0.9.x   :material-check-bold: 
+* You are upgrading from v0.8.x to another v0.8.x release  :material-check-bold: 
+* You have deployed the application to Tomcat 9 :material-check-bold: 
+
+!!! danger 
+    
+    Do NOTE use this page if you are upgrading from 0.8.x to 0.9.x. Instead
+    please review the [Migration Guide](../migration)
 
 !!! note
-        You can still use Tomcat 8.5, but the commands below assume that you are using Tomcat 9.
+    
+    You can still use Tomcat 8.5, but the commands below assume that you are using Tomcat 9.
 
 !!! tip
-        Whether you're upgrading or migrating ALWAYS backup your database just in case something 
-        goes awry.
+    
+    Whether you're upgrading or migrating ALWAYS backup your database just in case something 
+    goes awry.
 
 
 ## Step-by-step Instructions

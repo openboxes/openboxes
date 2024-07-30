@@ -27,7 +27,8 @@ theme:
     - content.code.select
     - header.autohide
 #     - navigation.indexes
-    - navigation.instant
+#     - navigation.instant
+#     - navigation.instant.progress
     - navigation.expand
     - navigation.footer
     - navigation.header
@@ -102,112 +103,77 @@ markdown_extensions:
       emoji_index: !!python/name:materialx.emoji.twemoji
       emoji_generator: !!python/name:materialx.emoji.to_svg
 nav:
-#    - Home:
-#      - index.md
-#    - Getting Started:
-#      - Installation Guide: admin-guide/installation/index.md
-#      - Configuration Guide: admin-guide/configuration/index.md
 
-# Keep these commented out for now
-#     - Features: about/features.md
-#     - Benefits: about/benefits.md
-#     - Considerations: about/considerations.md
-#     - Release Notes: about/release-notes.md
+  - Home:
+    - index.md
+    - Features: about/features.md
+    - Benefits: about/benefits.md
+    - Considerations: about/considerations.md
+    - Release Notes: about/release-notes.md
 
-#   - Quickstart:
-#       - Overview: admin-guide/quickstart/index.md
-
-# Quickstart - Not enough content
-#       - Ubuntu 22.04: admin-guide/quickstart/ubuntu2204/
+  # Quickstart Guide
+  - Quickstart:
+      - Requirements: admin-guide/quickstart/requirements.md
+      - Options:
+        - Ubuntu 22.04: admin-guide/quickstart/ubuntu2204/index.md
+        - Mac OS: admin-guide/quickstart/macos/index.md
 #       - Docker: admin-guide/quickstart/docker/
-#       - Mac OS: admin-guide/quickstart/macos/
 #       - Windows: admin-guide/quickstart/windows/
+      - Next Steps:
+        - Onboarding: admin-guide/onboarding/index.md
 
   # Installation Guide
-  # Discussion re: self-hosted on-premise vs cloud vs managed hosting
-
-#   - Install:
-#     - admin-guide/installation/index.md
-#     - Methods: admin-guide/installation/methods.md
-#     - Basic Instructions: admin-guide/installation/basic-instructions.md
-#     - Requirements: admin-guide/installation/requirements.md
-#     - Choose Hosting:
-#         - Cloud: admin-guide/installation/ubuntu2204/vm.md
-#         - On-Premise: admin-guide/installation/ubuntu2204/vm.md
-#     - Provision Server: admin-guide/installation/ubuntu2204/vm.md
-#     - Deployment Options:
-#       - Ubuntu 22.04:
-#         - Dependencies:
-#           - Install Java: admin-guide/installation/ubuntu2204/java.md
-#           - Install Tomcat: admin-guide/installation/ubuntu2204/tomcat.md
-#           - Install MySQL/MariaDB: admin-guide/installation/ubuntu2204/mysql.md
-#         - Configuration:
-#           - Configure Application: admin-guide/installation/ubuntu2204/configuration.md
-#           - Configure Application: admin-guide/installation/ubuntu2204/application.md
-#           - Configure HTTPS: admin-guide/installation/ubuntu2204/webserver.md
-#         - Deployment:
-#           - Create Database: admin-guide/installation/ubuntu2204/database.md
-#           - Deploy Application: admin-guide/installation/ubuntu2204/deployment.md
-#         - Troubleshooting:
-#           - admin-guide/installation/ubuntu2204/troubleshooting.md
-#       - Alternatives:
-#         - Ubuntu 20.04: admin-guide/installation/ubuntu.md
-#         - Mac OS: admin-guide/installation/macos.md
-#         - Windows: admin-guide/installation/windows.md
-#         - Docker: admin-guide/installation/docker.md
+  # Need to add a discussion re: self-hosted on-premise vs cloud vs managed hosting
+  - Install:
+    - Overview: admin-guide/installation/index.md
+    #- Basic Instructions: admin-guide/installation/basic-instructions.md
+    - Preparation:
+      # Does not exist yet
+      - Requirements: admin-guide/installation/requirements.md
+      - Hosting: admin-guide/installation/hosting.md
+      - Deployment Options: admin-guide/installation/deployment.md
+    - Installation:
+      - Create Virtual Machine: admin-guide/installation/ubuntu2204/vm.md
+      - Configure: admin-guide/installation/ubuntu2204/configuration.md
+      - Install Dependencies:
+          - Install Java: admin-guide/installation/ubuntu2204/java.md
+          - Install Tomcat: admin-guide/installation/ubuntu2204/tomcat.md
+          - Install MySQL: admin-guide/installation/ubuntu2204/mysql.md
+      - Deploy Application: admin-guide/installation/ubuntu2204/application.md
+    - Post-Installation:
+      - Enable HTTPS: admin-guide/installation/advanced.md
+      - Configure HTTPS: admin-guide/installation/ubuntu2204/webserver.md
+    - Troubleshooting:
+      - admin-guide/installation/ubuntu2204/troubleshooting.md
 
   # Configuration Guide - needs a lot of work
-#   - Configure: admin-guide/configuration/index.md
-
-#     - Configuration:
-#       - Overview: admin-guide/configuration/index.md
-#       #- Context Path:
-#       - Database: admin-guide/configuration/database.md
-#       - Email: admin-guide/configuration/email.md
-#       - OpenBoxes: admin-guide/configuration/application.md
-#       - Sentry: admin-guide/configuration/sentry.md
-#       - Advanced: admin-guide/installation/advanced.md
+  - Configure:
+    - Config Files: admin-guide/configuration/index.md
+    - Database: admin-guide/configuration/database.md
+    - Email: admin-guide/configuration/email.md
+    - Application: admin-guide/configuration/application.md
+    - Sentry: admin-guide/configuration/sentry.md
+    - Monitoring: placeholder.md
+    - Analytics: placeholder.md
+    - Advanced:
+      - admin-guide/installation/advanced.md
+      - Tomcat AJP: admin-guide/configuration/ajp.md
+      - Apache HTTPS: admin-guide/configuration/https.md
 #       - Advanced:
-#         - Tomcat AJP: admin-guide/configuration/ajp.md
-#         - Apache HTTPS: admin-guide/configuration/https.md
 #       - Example: admin-guide/configuration/example.md
 #     #- Onboarding: admin-guide/onboarding/index.md
 #       #- Locations:
 #       #- :
 #       #- Lanugage:
-#     #- Monitoring: admin-guide/monitoring/index.md
-#     #- Analytics: admin-guide/amalytics/index.md
 #     #- Data Model:
 
 
-  # Developer Guide - needs a lot of work
-#   - Develop:
-#     - Introduction: developer-guide/index.md
-#     - Architecture: developer-guide/architecture/index.md
-#     - Getting Started: developer-guide/getting-started.md
-#     - Contributing: developer-guide/contributing.md
-#     - Forking: developer-guide/syncing-a-fork.md
-#     - Tagging a Release: developer-guide/tagging.md
-#     - Troubleshooting: developer-guide/troubleshooting.md
-#     - Release:
-#       - Overview: developer-guide/release/index.md
-#       - Plan: developer-guide/release/plan.md
-#       - Develop: developer-guide/release/develop.md
-#       - Prepare: developer-guide/release/prepare.md
-#       - Test: developer-guide/release/testing.md
-#       - Finalize: developer-guide/release/finalize.md
-#       - Document: developer-guide/release/document.md
-#       - Publish: developer-guide/release/publish.md
-#       - Deploy: developer-guide/release/deploy.md
-#       - Cleanup: developer-guide/release/cleanup.md
-#       - Hotfix: developer-guide/hotfix/index.md
-
-
-#   - Support: support/index.md
-
-  - Home: index.md
+  # Upgrade Guide
   - Upgrade:
     - Upgrading: admin-guide/upgrading/index.md
+
+  # Migration Guide
+  - Migration:
     - Upgrading from 0.8.x to 0.9.x:
       - Overview: admin-guide/migration/index.md
       - Parallel Upgrade: admin-guide/migration/parallel/index.md
@@ -216,53 +182,89 @@ nav:
 #       - Known Issues: admin-guide/migration/known-issues/index.md
 #       - Support: support/index.md
 
+
+  # Onboarding Guide
+  - Onboarding:
+      - Overview: admin-guide/onboarding/index.md
+
+
+  # Developer Guide - needs a lot of work
+  - Developer Guide:
+    - Getting Started: developer-guide/getting-started.md
+    - Architecture: developer-guide/architecture/index.md
+    - Contributing: developer-guide/contributing.md
+    - Forking: developer-guide/syncing-a-fork.md
+    - Tagging a Release: developer-guide/tagging.md
+    - Troubleshooting: developer-guide/troubleshooting.md
+    - Release:
+      - Process:
+        - Overview: developer-guide/release/index.md
+        - Plan: developer-guide/release/plan.md
+        - Develop: developer-guide/release/develop.md
+        - Prepare: developer-guide/release/prepare.md
+        - Test: developer-guide/release/testing.md
+        - Finalize: developer-guide/release/finalize.md
+        - Document: developer-guide/release/document.md
+        - Publish: developer-guide/release/publish.md
+        - Deploy: developer-guide/release/deploy.md
+        - Cleanup: developer-guide/release/cleanup.md
+      - Hotfix: developer-guide/hotfix/index.md
+
+
+
 #     # Create a GH label to capture migration issues and link them here
 #     #- Troubleshooting
-#     - Community:
-#       - Support:
-#         - Overview: support/index.md
-#   - User Guide:
-#     - Getting Started: user-guide/index.md
-#     - Knowledge Base: user-guide/knowledge-base.md
-#     - Community Support: user-guide/community-support.md
-#     - YouTube Channel: user-guide/youtube.md
-#     - Tutorial Videos: user-guide/tutorials.md
-#   - Contributing Guide:
-#   - API Guide:
-#     - Getting Started: api-guide/getting-started.md
-#     - Authentication: api-guide/authentication.md
-#     - Pagination: api-guide/pagination.md
-#     - Filtering: api-guide/lookup.md
-#     - Formatting: api-guide/formatting.md
-#     - Testing:
-#       - OpenAPI/Swagger: apt-guide/openapi.md
-#       - Postman: apt-guide/postman.md
-#     - Core API:
-#       - Locations: api-guide/core/location.md
-#       - Identifiers: api-guide/core/identifier.md
-#       - Internal Locations: api-guide/core/internalLocation.md
-#       - Localizations: api-guide/core/localization.md
-#       - Reason Codes: api-guide/core/reasonCode.md
-#     - Products API:
-#         - Categories: api-guide/products/category.md
-#         - Products: api-guide/products/product.md
-#     - Inbound API:
-#         - Putaways: api-guide/inbound/putaway.md
-#         - Receiving: api-guide/inbound/receiving.md
-#     - Outbound API:
-#         - Stock Movements: api-guide/outbound/stockMovement.md
-#         - Stock Movement Items: api-guide/outbound/stockMovementItem.md
-#         - Stock Movement Status: api-guide/outbound/stockMovementStatus.md
-#     - Generic API:
-#       - Overview: api-guide/generic/index.md
-#       - Standard Actions:
-#         - Get Resources: api-guide/generic/get-resources.md
-#         - Get Resource: api-guide/generic/get-resource.md
-#         - Create Resource: api-guide/generic/create-resource.md
-#         - Update Resource: api-guide/generic/update-resource.md
-#         - Delete Resource: api-guide/generic/delete-resource.md
-#       - Bulk Actions:
-#         - Create Resources: api-guide/generic/create-resources.md
-#         - Update Resources: api-guide/generic/update-resources.md
+    - Community:
+      - Support:
+        - Overview: support/index.md
 
+  # User Guide
+  - User Guide:
+    - Getting Started: user-guide/index.md
+    - Knowledge Base: user-guide/knowledge-base.md
+    - Community Support: user-guide/community-support.md
+    - YouTube Channel: user-guide/youtube.md
+    - Tutorial Videos: user-guide/tutorials.md
+  # - Contributing Guide:
+
+
+  # API Guide
+  - API Guide:
+    - Getting Started: api-guide/getting-started.md
+    - Authentication: api-guide/authentication.md
+    - Pagination: api-guide/pagination.md
+    - Filtering: api-guide/lookup.md
+    - Formatting: api-guide/formatting.md
+    - Testing:
+      - OpenAPI/Swagger: apt-guide/openapi.md
+      - Postman: apt-guide/postman.md
+    - Core API:
+      - Locations: api-guide/core/location.md
+      - Identifiers: api-guide/core/identifier.md
+      - Internal Locations: api-guide/core/internalLocation.md
+      - Localizations: api-guide/core/localization.md
+      - Reason Codes: api-guide/core/reasonCode.md
+    - Products API:
+        - Categories: api-guide/products/category.md
+        - Products: api-guide/products/product.md
+    - Inbound API:
+        - Putaways: api-guide/inbound/putaway.md
+        - Receiving: api-guide/inbound/receiving.md
+    - Outbound API:
+        - Stock Movements: api-guide/outbound/stockMovement.md
+        - Stock Movement Items: api-guide/outbound/stockMovementItem.md
+        - Stock Movement Status: api-guide/outbound/stockMovementStatus.md
+    - Generic API:
+      - Overview: api-guide/generic/index.md
+      - Standard Actions:
+        - Get Resources: api-guide/generic/get-resources.md
+        - Get Resource: api-guide/generic/get-resource.md
+        - Create Resource: api-guide/generic/create-resource.md
+        - Update Resource: api-guide/generic/update-resource.md
+        - Delete Resource: api-guide/generic/delete-resource.md
+      - Bulk Actions:
+        - Create Resources: api-guide/generic/create-resources.md
+        - Update Resources: api-guide/generic/update-resources.md
+
+  - Ideal Sitemap: sitemap.md
 

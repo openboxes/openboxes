@@ -1,3 +1,4 @@
+# Hosting
 Whether you plan to install OpenBoxes on-premise or in the cloud, the installation instructions should be relatively 
 similar. 
 

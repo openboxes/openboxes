@@ -3,6 +3,6 @@ mkdocs-material==9.5.23
 mkdocs-material-extensions
 mkdocs-macros-plugin
 mkdocs-awesome-pages-plugin
-mkdocs-glightbox
+mkdocs-glightbox==0.4.0
 markdown-include
 materialx

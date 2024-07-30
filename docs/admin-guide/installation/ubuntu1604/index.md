@@ -1,3 +1,7 @@
+---
+status: deprecated
+---
+
 # Installing OpenBoxes on Ubuntu 16.04
 
 ## 1. Check Requirements
