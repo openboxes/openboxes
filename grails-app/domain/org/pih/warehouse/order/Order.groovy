@@ -462,8 +462,36 @@ class Order implements Serializable {
         return !hasInvoice && isPrepaymentRequired && hasActiveItemsOrAdjustments
     }
 
+    /**
+        Should return true if at least one PO item is invoiceable.
+        A PO item is invoiceable if the order has a prepayment invoice and at least one of those requirements are fulfilled:
+            1. There is an order adjustment which hasn’t already been invoiced (can be not tied with order item)
+            2. The item’s shipment has been cancelled and that cancellation hasn’t already been invoiced
+            3. Quantity greater than 0 of the item has been shipped and not all of that quantity has already been invoiced.
+    **/
     Boolean getCanGenerateInvoice() {
-        return hasPrepaymentInvoice && isShipped() && !hasRegularInvoice
+        // If prepayment invoice doesn't exist we can't generate invoice
+        if (!hasPrepaymentInvoice) {
+            return false
+        }
+
+        // If any order adjustment is invoiceable we can generate invoice
+        if (hasInvoiceableOrderAdjustment()) {
+            return true
+        }
+
+        // If any order item is invoiceable we can generate invoice
+        return hasInvoiceableOrderItem()
+    }
+
+    Boolean hasInvoiceableOrderItem() {
+        return orderItems.any { it.invoiceable }
+    }
+
+    Boolean hasInvoiceableOrderAdjustment() {
+        return orderAdjustments.any {
+            it.invoiceable
+        }
     }
 
     def getActiveOrderItems() {

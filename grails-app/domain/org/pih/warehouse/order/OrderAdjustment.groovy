@@ -64,7 +64,7 @@ class OrderAdjustment implements Serializable, Comparable<OrderAdjustment> {
         "hasInvoices",
         "hasPrepaymentInvoice",
         "hasRegularInvoice",
-        "disableRefresh"
+        "disableRefresh",
     ]
 
     static belongsTo = [order: Order, orderItem: OrderItem]
@@ -106,6 +106,14 @@ class OrderAdjustment implements Serializable, Comparable<OrderAdjustment> {
 
     def getInvoices() {
         return invoiceItems*.invoice.unique()
+    }
+
+    Boolean isInvoiceable() {
+        return !isInvoiced && order.placed
+    }
+
+    Boolean isEncumbered() {
+        return !isInvoiced && hasPrepaymentInvoice && order.placed
     }
 
     Boolean getHasInvoices() {

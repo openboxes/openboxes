@@ -106,6 +106,7 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
             "quantityShippedInStandardUom",
             "quantityInShipments",
             "quantityInShipmentsInStandardUom",
+            "quantityAvailableToInvoice",
             "total",
             "pendingShipmentItems",
             "shippedShipmentItems",
@@ -281,6 +282,20 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
 
     Boolean isCompletelyInvoiced() {
         return quantityInvoicedInStandardUom >= quantity
+    }
+
+    Integer getQuantityAvailableToInvoice() {
+        return canceled
+                ? null
+                : quantityShippedInStandardUom - quantityInvoicedInStandardUom
+    }
+
+    Boolean isInvoiceable() {
+        return encumbered && (canceled || quantityAvailableToInvoice > 0)
+    }
+
+    Boolean isEncumbered() {
+        return !completelyInvoiced
     }
 
     Boolean isPending() {
