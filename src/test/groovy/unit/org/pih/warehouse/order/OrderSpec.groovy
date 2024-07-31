@@ -10,13 +10,16 @@ import spock.lang.Specification
 class OrderSpec extends Specification implements DomainUnitTest<Order> {
     void "Order.getCanGenerateInvoice() should return true when there is an order adjustment not tied to any order item that hasn't already been invoiced"() {
         given:
-        Order order = Spy(Order) {
-            getHasPrepaymentInvoice() >> hasPrepaymentInvoice
+        OrderAdjustment orderAdjustment = Stub(OrderAdjustment) {
+            isInvoiceable() >> true
         }
         Set<OrderAdjustment> orderAdjustments = [
-                Mock(OrderAdjustment),
+                orderAdjustment
         ]
-        order.setOrderAdjustments(orderAdjustments)
+        Order order = Spy(Order) {
+            getHasPrepaymentInvoice() >> hasPrepaymentInvoice
+            getAdjustmentsWithoutOrderItems() >> orderAdjustments
+        }
 
         expect:
         order.canGenerateInvoice == canGenerateInvoice
@@ -24,7 +27,7 @@ class OrderSpec extends Specification implements DomainUnitTest<Order> {
         where:
         hasPrepaymentInvoice || canGenerateInvoice
         false                || false
-        true                 || false
+        true                 || true
     }
 
     void "Order.getCanGenerateInvoice() should return true when there is an order adjustment that hasn't already been invoiced"() {
