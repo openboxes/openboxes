@@ -291,7 +291,7 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
     }
 
     Boolean isInvoiceable() {
-        return quantityAvailableToInvoice > 0
+        return encumbered && (canceled || quantityAvailableToInvoice > 0)
     }
 
     Boolean isEncumbered() {
@@ -300,10 +300,6 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
 
     Boolean isPending() {
         return !isCompletelyFulfilled()
-    }
-
-    Boolean hasNotInvoicedAdjustment() {
-        return orderAdjustments.any { !it.isInvoiced }
     }
 
     /**

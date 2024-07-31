@@ -41,10 +41,11 @@ class OrderItemSpec extends Specification implements DomainUnitTest<OrderItem> {
             2               | 1                | false    || 1
     }
 
-    void 'OrderItem.isInoiceable() should return: #isInoviceable when quantity available to invoice is #quantityAvailableToInvoice'() {
+    void 'OrderItem.isInvoiceable() should return: #isInoviceable when quantity available to invoice is #quantityAvailableToInvoice'() {
         given:
         OrderItem orderItem = Spy(OrderItem) {
             getQuantityAvailableToInvoice() >> quantityAvailableToInvoice
+            isEncumbered() >> true
         }
 
         expect:

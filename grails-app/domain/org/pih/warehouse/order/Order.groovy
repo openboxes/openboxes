@@ -97,7 +97,6 @@ class Order implements Serializable {
             "totalAdjustments",
             "totalOrderAdjustments",
             "totalOrderItemAdjustments",
-            "adjustmentsWithoutOrderItems",
             "total",
             "totalNormalized",
             "invoices",
@@ -460,7 +459,7 @@ class Order implements Serializable {
     /**
         Should return true if at least one PO item is invoiceable.
         A PO item is invoiceable if the order has a prepayment invoice and at least one of those requirements are fulfilled:
-            1. There is an order adjustment on that item that hasn’t already been invoiced
+            1. There is an order adjustment which hasn’t already been invoiced (can be not tied with order item)
             2. The item’s shipment has been cancelled and that cancellation hasn’t already been invoiced
             3. Quantity greater than 0 of the item has been shipped and not all of that quantity has already been invoiced.
     **/
@@ -470,24 +469,23 @@ class Order implements Serializable {
             return false
         }
 
-        // If we have invoicable order adjustments not tied to any order item
-        // we can generate invoices for them
-        Boolean hasNotInvoicedAdjustmentsWithoutOrderItem =
-                adjustmentsWithoutOrderItems.any { it.invoiceable }
-
-        if (hasNotInvoicedAdjustmentsWithoutOrderItem) {
+        // If any order adjustment is invoiceable we can generate invoice
+        if (hasInvoiceableOrderAdjustment()) {
             return true
         }
 
-        return orderItems.any {
-            (it.hasNotInvoicedAdjustment()) || // condition related to first point
-            (it.canceled && it.encumbered) || // condition related to second point
-            (it.invoiceable && it.encumbered) // condition related to third point
-        }
+        // If any order item is invoiceable we can generate invoice
+        return hasInvoiceableOrderItem()
     }
 
-    Set<OrderAdjustment> getAdjustmentsWithoutOrderItems() {
-        return orderAdjustments.findAll { !it.orderItem }
+    Boolean hasInvoiceableOrderItem() {
+        return orderItems.any { it.invoiceable }
+    }
+
+    Boolean hasInvoiceableOrderAdjustment() {
+        return orderAdjustments.any {
+            it.invoiceable
+        }
     }
 
     def getActiveOrderItems() {
