@@ -518,6 +518,10 @@ class Order implements Serializable {
         return orderType?.isTransferOrder()
     }
 
+    Boolean isFullyInvoiceable() {
+        return orderItems.every{ it -> it.invoiceable }
+    }
+
     // isInbound is temporary distinction between outbound and inbound used only for Outbound and Inbound Returns
     Boolean isInbound(Location currentLocation) {
         return isReturnOrder && destination == currentLocation && origin != currentLocation
