@@ -519,7 +519,7 @@ class Order implements Serializable {
     }
 
     Boolean isFullyInvoiceable() {
-        Set encumberedOrderItems = orderItems.findAll{ it -> it.encumbered }
+        Set<OrderItem> encumberedOrderItems = orderItems.findAll{ it -> it.encumbered }
         return encumberedOrderItems && encumberedOrderItems.every{ it -> it.invoiceable }
     }
 
