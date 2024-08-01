@@ -519,7 +519,8 @@ class Order implements Serializable {
     }
 
     Boolean isFullyInvoiceable() {
-        return orderItems.every{ it -> it.invoiceable }
+        Set encumberedOrderItems = orderItems.findAll{ it -> it.encumbered }
+        return encumberedOrderItems && encumberedOrderItems.every{ it -> it.invoiceable }
     }
 
     // isInbound is temporary distinction between outbound and inbound used only for Outbound and Inbound Returns

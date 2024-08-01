@@ -360,8 +360,8 @@
           }
 
           if (${!orderInstance.fullyInvoiceable}) {
-            const dialogmessage = '${warehouse.message(code: 'invoice.partialInvoice.message',default: 'Not all lines on this purchase order are available to invoice. Generate partial invoice?')}';
-            if(!confirm(dialogmessage)) {
+            const dialogMessage = '${warehouse.message(code: 'invoice.partialInvoice.message', default: 'Not all lines on this purchase order are available to invoice. Generate partial invoice?')}';
+            if(!confirm(dialogMessage)) {
               return
             }
           }

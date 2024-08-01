@@ -6,7 +6,9 @@ import org.pih.warehouse.order.OrderAdjustment
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.OrderItemStatusCode
 import spock.lang.Specification
+import spock.lang.Unroll
 
+@Unroll
 class OrderSpec extends Specification implements DomainUnitTest<Order> {
     void "Order.getCanGenerateInvoice() should return true when there is an order adjustment not tied to any order item that hasn't already been invoiced"() {
         given:
@@ -108,5 +110,30 @@ class OrderSpec extends Specification implements DomainUnitTest<Order> {
             true                 | false        | 1                          || false
             true                 | true         | 0                          || false
             true                 | true         | 1                          || true
+    }
+
+    void "Order.isFullyInvoiceable() should return #expected when item1 is #item1 and item2 is #item2"() {
+        given:
+        Order order = new Order(orderItems: [item1, item2])
+
+        expect:
+        order.isFullyInvoiceable() == expected
+
+        where:
+        item1                       | item2                         || expected
+        mockOrderItem(true, true)   | mockOrderItem(true, true)     || true
+        mockOrderItem(true, false)  | mockOrderItem(true, false)    || false
+        mockOrderItem(false, true)  | mockOrderItem(true, true)     || true
+        mockOrderItem(true, false)  | mockOrderItem(true, true)     || false
+        mockOrderItem(false, true)  | mockOrderItem(false, true)    || false
+        mockOrderItem(false, false) | mockOrderItem(false, false)   || false
+    }
+
+    private OrderItem mockOrderItem(boolean encumbered, boolean invoiceable) {
+        return Mock(OrderItem) {
+            isEncumbered() >> encumbered
+            isInvoiceable() >> invoiceable
+            toString() >> "encumbered: $encumbered, invoiceable: $invoiceable"
+        }
     }
 }
