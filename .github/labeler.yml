@@ -51,7 +51,16 @@
       - '.github/**/*'
       - 'docker/**/*'
 
+"domain: documentation":
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'docs/**/*'
+      - '**/*.md'
+      - 'readthedocs.yml'
+      - 'mkdocs.yml'
+
 "flag: config change":
+- all:
   - changed-files:
     - any-glob-to-any-file:
       - 'grails-app/conf/**/*'
@@ -60,6 +69,8 @@
       - '**/*.properties'
       - 'package.json'
       - 'package-lock.json'
+    - all-globs-to-all-files:
+      - '!grails-app/i18n/**/*'
 
 "flag: schema change":
   - changed-files:
