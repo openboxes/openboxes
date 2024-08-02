@@ -518,9 +518,26 @@ class Order implements Serializable {
         return orderType?.isTransferOrder()
     }
 
+    Set<OrderItem> getFullyInvoiceableOrderItems() {
+        return orderItems.findAll{ it.invoiceable && it.quantityRemaining == 0 }
+    }
+
+    Set<OrderAdjustment> getFullyInvoiceableAdjustments() {
+        return orderAdjustments.findAll{ it.invoiceable }
+    }
+
     Boolean isFullyInvoiceable() {
-        Set<OrderItem> encumberedOrderItems = orderItems.findAll{ it -> it.encumbered }
-        return encumberedOrderItems && !encumberedOrderItems.any{ it -> !it.invoiceable }
+        Boolean areItemsFullyInvoiceable = false
+
+        if (orderItems) {
+            areItemsFullyInvoiceable = orderItems.size() == fullyInvoiceableOrderItems.size()
+        }
+
+        if (orderAdjustments) {
+            areItemsFullyInvoiceable = orderAdjustments.size() == fullyInvoiceableAdjustments.size()
+        }
+
+        return areItemsFullyInvoiceable
     }
 
     // isInbound is temporary distinction between outbound and inbound used only for Outbound and Inbound Returns
