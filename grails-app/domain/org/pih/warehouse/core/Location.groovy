@@ -437,4 +437,11 @@ class Location implements Comparable<Location>, java.io.Serializable {
             "country"         : "address.country",
             "description"     : "address.description",
     ]
+
+    static Location findByNameOrDefault(String name) {
+        if (name && !name.equalsIgnoreCase(Constants.DEFAULT_BIN_LOCATION_NAME)) {
+            return findByName(name)
+        }
+        return null
+    }
 }
