@@ -346,8 +346,6 @@ class InvoiceService {
 
     InvoiceItem createFromShipmentItem(ShipmentItem shipmentItem) {
         OrderItem orderItem = shipmentItem.orderItems?.find { it }
-        println("quantity to invoice: " + shipmentItem.quantityToInvoice)
-        println("orderItem?.quantityPerUom: " + orderItem?.quantityPerUom)
         InvoiceItem invoiceItem = new InvoiceItem(
             quantity: shipmentItem.quantityToInvoice ? (shipmentItem.quantityToInvoice / orderItem?.quantityPerUom) : 0,
             product: shipmentItem.product,
