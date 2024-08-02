@@ -112,6 +112,7 @@ class Constants {
     static final String SEMICOLON_COLUMN_SEPARATOR = ";"
     static final String TAB_COLUMN_SEPARATOR = "\t";
     static final String DEFAULT_LINE_SEPARATOR = "\n"
+    static final String SPACE_SEPARATOR = " "
 
     // Characters that should be included with each of the random number types
     static final String RANDOM_IDENTIFIER_ALPHABETIC_CHARACTERS = "ABCDEFGHJKMNPQRSTUVXYZ"
