@@ -15,7 +15,7 @@ import spock.lang.Unroll
 class InvoiceServiceSpec extends Specification implements ServiceUnitTest<InvoiceService>, DataTest {
 
     @Override
-    Class<?>[] getDomainClassesToMock(){
+    Class<?>[] getDomainClassesToMock() {
         return [ShipmentItem, InvoiceItem] as Class[]
     }
 
@@ -30,16 +30,16 @@ class InvoiceServiceSpec extends Specification implements ServiceUnitTest<Invoic
         shipmentItem.addToOrderItems(new OrderItem())
 
         when:
-            InvoiceItem invoiceItem = service.createFromShipmentItem(shipmentItem)
+        InvoiceItem invoiceItem = service.createFromShipmentItem(shipmentItem)
 
         then:
-            invoiceItem.quantity == quantityToInvoice
+        invoiceItem.quantity == quantityToInvoice
 
         where:
-            quantity | quantityInvoiced || quantityToInvoice
-            1        | 1                || 0
-            5        | 2                || 3
-            6        | 0                || 6
-            0        | 0                || 0
+        quantity | quantityInvoiced || quantityToInvoice
+        1        | 1                || 0
+        5        | 2                || 3
+        6        | 0                || 6
+        0        | 0                || 0
     }
 }
