@@ -107,6 +107,7 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
             "quantityInShipments",
             "quantityInShipmentsInStandardUom",
             "quantityAvailableToInvoice",
+            "invoiceableShipmentItems",
             "total",
             "pendingShipmentItems",
             "shippedShipmentItems",
@@ -385,6 +386,10 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
 
     Integer getQuantityInvoiced() {
         return quantityInvoicedInStandardUom / (quantityPerUom?:1)
+    }
+
+    Set<ShipmentItem> getInvoiceableShipmentItems() {
+        return shipmentItems.findAll { it.invoiceable }
     }
 
     def totalQuantityPicked() {
