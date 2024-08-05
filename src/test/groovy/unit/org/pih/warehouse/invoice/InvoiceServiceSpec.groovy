@@ -14,13 +14,10 @@ import spock.lang.Unroll
 @Unroll
 class InvoiceServiceSpec extends Specification implements ServiceUnitTest<InvoiceService>, DataTest {
 
-    @Override
-    Class<?>[] getDomainClassesToMock() {
-        return [ShipmentItem, InvoiceItem] as Class[]
-    }
-
     void 'InvoiceService.createFromShipmentItem() should return quantity to invoice: #quantityToInvoice when quantity is: #quantity and quantity invoiced: #quantityInvoiced'() {
         given:
+        mockDomain(ShipmentItem)
+        mockDomain(InvoiceItem)
         ShipmentItem shipmentItem = Spy(ShipmentItem) {
             getQuantityInvoiced() >> quantityInvoiced
         }

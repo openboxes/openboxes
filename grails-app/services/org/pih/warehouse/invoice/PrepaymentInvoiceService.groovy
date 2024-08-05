@@ -33,7 +33,7 @@ class PrepaymentInvoiceService {
             }
         }
 
-        order.invoiceableAdjustment.each { OrderAdjustment orderAdjustment ->
+        order.invoiceableAdjustments.each { OrderAdjustment orderAdjustment ->
             InvoiceItem invoiceItem = invoiceService.createFromOrderAdjustment(orderAdjustment)
             invoice.addToInvoiceItems(invoiceItem)
         }

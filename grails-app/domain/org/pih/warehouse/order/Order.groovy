@@ -103,7 +103,7 @@ class Order implements Serializable {
             "hasInvoice",
             "invoiceItems",
             "invoiceableOrderItems",
-            "invoiceableAdjustment",
+            "invoiceableAdjustments",
             "invoicedOrderItems",
             "hasPrepaymentInvoice",
             "hasRegularInvoice",
@@ -468,7 +468,7 @@ class Order implements Serializable {
         return orderItems.findAll { it.invoiceable }
     }
 
-    Set<OrderAdjustment> getInvoiceableAdjustment() {
+    Set<OrderAdjustment> getInvoiceableAdjustments() {
         return orderAdjustments.findAll { it.invoiceable }
     }
 
