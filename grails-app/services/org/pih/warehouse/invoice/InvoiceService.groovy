@@ -249,60 +249,6 @@ class InvoiceService {
         invoice.save()
     }
 
-    Invoice generatePrepaymentInvoice(Order order) {
-        if (order.orderItems.any { it.hasInvoices } || order.orderAdjustments.any { it.hasInvoices }) {
-            throw new Exception("Some order items or order adjustments for this order already have been invoiced")
-        }
-
-        Invoice invoice = createFromOrder(order)
-        invoice.invoiceType = InvoiceType.findByCode(InvoiceTypeCode.PREPAYMENT_INVOICE)
-        createOrUpdateVendorInvoiceNumber(invoice, order.orderNumber + Constants.PREPAYMENT_INVOICE_SUFFIX)
-
-        if (order?.orderItems?.empty && order?.orderAdjustments?.empty) {
-            throw new Exception("No order items or order adjustments found for given order")
-        }
-
-        order.activeOrderItems.each { OrderItem orderItem ->
-            InvoiceItem invoiceItem = createFromOrderItem(orderItem)
-            invoice.addToInvoiceItems(invoiceItem)
-        }
-
-        order.activeOrderAdjustments.each { OrderAdjustment orderAdjustment ->
-            InvoiceItem invoiceItem = createFromOrderAdjustment(orderAdjustment)
-            invoice.addToInvoiceItems(invoiceItem)
-        }
-
-        return invoice.save()
-    }
-
-    Invoice generateInvoice(Order order) {
-        if (!order.hasPrepaymentInvoice) {
-            throw new Exception("This order has no prepayment invoice")
-        }
-
-        Invoice invoice = createFromOrder(order)
-        createOrUpdateVendorInvoiceNumber(invoice, order.orderNumber)
-
-        order.orderItems.each { OrderItem orderItem ->
-            if (orderItem.orderItemStatusCode == OrderItemStatusCode.CANCELED) {
-                InvoiceItem invoiceItem = createFromOrderItem(orderItem)
-                invoice.addToInvoiceItems(invoiceItem)
-            } else {
-                orderItem?.shipmentItems?.each { ShipmentItem shipmentItem ->
-                    InvoiceItem invoiceItem = createFromShipmentItem(shipmentItem)
-                    invoice.addToInvoiceItems(invoiceItem)
-                }
-            }
-        }
-
-        order.orderAdjustments.each { OrderAdjustment orderAdjustment ->
-            InvoiceItem invoiceItem = createFromOrderAdjustment(orderAdjustment)
-            invoice.addToInvoiceItems(invoiceItem)
-        }
-
-        return invoice.save()
-    }
-
     Invoice createFromOrder(Order order) {
         Invoice invoice = new Invoice()
         invoice.invoiceNumber = identifierService.generateInvoiceIdentifier()
@@ -401,7 +347,7 @@ class InvoiceService {
     InvoiceItem createFromShipmentItem(ShipmentItem shipmentItem) {
         OrderItem orderItem = shipmentItem.orderItems?.find { it }
         InvoiceItem invoiceItem = new InvoiceItem(
-            quantity: shipmentItem.quantity ? shipmentItem.quantity/orderItem.quantityPerUom : 0,
+            quantity: shipmentItem.quantityToInvoice ? (shipmentItem.quantityToInvoice / orderItem?.quantityPerUom) : 0,
             product: shipmentItem.product,
             glAccount: shipmentItem.product.glAccount,
             budgetCode: orderItem?.budgetCode,
