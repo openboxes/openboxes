@@ -21,7 +21,6 @@ import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
-
 function validate(values) {
   const errors = {};
 

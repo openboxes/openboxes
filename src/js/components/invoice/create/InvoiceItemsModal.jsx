@@ -19,7 +19,6 @@ import accountingFormat from 'utils/number-utils';
 import Select from 'utils/Select';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
-
 const FIELDS = {
   invoiceItems: {
     type: ArrayField,

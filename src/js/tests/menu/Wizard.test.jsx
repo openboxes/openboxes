@@ -5,7 +5,7 @@ import { Provider } from 'react-redux';
 import { BrowserRouter as Router } from 'react-router-dom';
 import renderer from 'react-test-renderer';
 
-import CreateInvoicePage from 'components/invoice/CreateInvoicePage';
+import CreateInvoicePage from 'components/invoice/create/CreateInvoicePage';
 import Wizard from 'components/wizard/Wizard';
 import WizardPage from 'components/wizard/WizardPage';
 import WizardSteps from 'components/wizard/WizardSteps';

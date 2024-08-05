@@ -5,15 +5,14 @@ import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 
 import { fetchTranslations, hideSpinner, showSpinner } from 'actions';
-import AddItemsPage from 'components/invoice/AddItemsPage';
-import ConfirmInvoicePage from 'components/invoice/ConfirmInvoicePage';
-import CreateInvoicePage from 'components/invoice/CreateInvoicePage';
+import AddItemsPage from 'components/invoice/create/AddItemsPage';
+import ConfirmInvoicePage from 'components/invoice/create/ConfirmInvoicePage';
+import CreateInvoicePage from 'components/invoice/create/CreateInvoicePage';
 import Wizard from 'components/wizard/Wizard';
 import apiClient from 'utils/apiClient';
 import { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'components/invoice/Invoice.scss';
-
 
 class InvoiceWizard extends Component {
   constructor(props) {
