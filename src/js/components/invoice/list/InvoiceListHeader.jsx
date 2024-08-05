@@ -13,4 +13,3 @@ const InvoiceListHeader = () => (
 );
 
 export default withRouter(InvoiceListHeader);
-

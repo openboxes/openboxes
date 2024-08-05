@@ -11,7 +11,7 @@ import { connect } from 'react-redux';
 
 import DataTable, { TableCell } from 'components/DataTable';
 import Button from 'components/form-elements/Button';
-import InvoiceStatus from 'components/invoice/InvoiceStatus';
+import InvoiceStatus from 'components/invoice/list/InvoiceStatus';
 import { INVOICE_URL } from 'consts/applicationUrls';
 import useInvoiceListTableData from 'hooks/list-pages/invoice/useInvoiceListTableData';
 import ActionDots from 'utils/ActionDots';
@@ -19,7 +19,6 @@ import { findActions } from 'utils/list-utils';
 import Translate from 'utils/Translate';
 
 import 'react-table/react-table.css';
-
 
 const InvoiceListTable = ({
   filterParams,
@@ -188,9 +187,7 @@ const mapStateToProps = state => ({
   invoiceStatuses: state.invoices.statuses,
 });
 
-
 export default connect(mapStateToProps)(InvoiceListTable);
-
 
 InvoiceListTable.propTypes = {
   filterParams: PropTypes.shape({}).isRequired,

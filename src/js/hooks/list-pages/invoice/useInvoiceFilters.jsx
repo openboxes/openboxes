@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
 import { fetchInvoiceStatuses, fetchInvoiceTypeCodes, fetchSuppliers } from 'actions';
-import filterFields from 'components/invoice/FilterFields';
+import filterFields from 'components/invoice/list/FilterFields';
 import useCommonFiltersCleaner from 'hooks/list-pages/useCommonFiltersCleaner';
 import { transformFilterParams } from 'utils/list-utils';
 import { fetchUserById } from 'utils/option-utils';

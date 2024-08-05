@@ -79,7 +79,7 @@ const AsyncInvoice = Loadable({
 });
 
 const AsyncInvoiceList = Loadable({
-  loader: () => import('components/invoice/InvoiceList'),
+  loader: () => import('components/invoice/list/InvoiceList'),
   loading: Loading,
 });
 
