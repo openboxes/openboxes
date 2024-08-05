@@ -7,12 +7,12 @@ import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 
 import { hideSpinner, showSpinner } from 'actions';
+import invoiceApi from 'api/services/InvoiceApi';
 import ArrayField from 'components/form-elements/ArrayField';
 import LabelField from 'components/form-elements/LabelField';
 import ModalWrapper from 'components/form-elements/ModalWrapper';
 import TextField from 'components/form-elements/TextField';
 import { ORDER_URL, STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
-import apiClient from 'utils/apiClient';
 import Checkbox from 'utils/Checkbox';
 import { getInvoiceDescription } from 'utils/form-values-utils';
 import accountingFormat from 'utils/number-utils';
@@ -39,7 +39,7 @@ const FIELDS = {
             disabled={false}
             className="ml-1"
             value={fieldValue.checked}
-            onChange={value => selectRow(value, rowIndex)}
+            onChange={(value) => selectRow(value, rowIndex)}
           />
         ),
       },
@@ -93,7 +93,7 @@ const FIELDS = {
         attributes: {
           className: 'text-left',
         },
-        getDynamicAttr: params => ({
+        getDynamicAttr: (params) => ({
           formatValue: () => {
             const { values, rowIndex } = params;
             const rowValue = values?.invoiceItems?.[rowIndex];
@@ -141,7 +141,7 @@ const FIELDS = {
         defaultMessage: 'Unit Price',
         flexWidth: '1',
         attributes: {
-          formatValue: value => (value ? accountingFormat(value) : value),
+          formatValue: (value) => (value ? accountingFormat(value) : value),
         },
       },
     },
@@ -154,10 +154,10 @@ function validate(values) {
 
   _.forEach(values.invoiceItems, (item, key) => {
     if (
-      item.checked &&
-      (
-        (_.toInteger(item.quantityToInvoice) > item.quantity) ||
-        _.toInteger(item.quantityToInvoice) <= 0
+      item.checked
+      && (
+        (_.toInteger(item.quantityToInvoice) > item.quantity)
+        || _.toInteger(item.quantityToInvoice) <= 0
       )
     ) {
       errors.invoiceItems[key] = { quantityToInvoice: 'react.invoice.errors.quantityToInvoice.label' };
@@ -207,9 +207,8 @@ class InvoiceItemsModal extends Component {
         quantityToInvoice: _.toInteger(item.quantityToInvoice),
       })),
     };
-    const url = `/api/invoices/${invoiceId}/items`;
 
-    apiClient.post(url, payload)
+    invoiceApi.saveInvoiceItems(invoiceId, payload)
       .then(() => {
         this.setState(INITIAL_STATE, () => {
           this.props.hideSpinner();
@@ -293,37 +292,35 @@ class InvoiceItemsModal extends Component {
     const { selectedOrderNumbers, selectedShipmentNumbers, selectedInvoiceItems } = this.state;
     const { invoiceId } = this.props;
 
-    const url = `/api/invoices/${invoiceId}/invoiceItemCandidates`;
-
     const payload = {
-      orderNumbers: _.map(selectedOrderNumbers, orderNumber => orderNumber.value),
-      shipmentNumbers: _.map(selectedShipmentNumbers, shipmentNumber => shipmentNumber.value),
+      orderNumbers: _.map(selectedOrderNumbers, (orderNumber) => orderNumber.value),
+      shipmentNumbers: _.map(selectedShipmentNumbers, (shipmentNumber) => shipmentNumber.value),
     };
 
-    return apiClient.post(url, payload).then((resp) => {
-      this.setState({
-        formValues: {
-          invoiceItems: _.map(resp.data.data, item => ({
-            ...item,
-            checked: selectedInvoiceItems && !!selectedInvoiceItems[item.id],
-            quantityToInvoice: selectedInvoiceItems && selectedInvoiceItems[item.id] ? selectedInvoiceItems[item.id].quantityToInvoice : '',
-            sortOrder: this.getSortOrder(),
-          })),
-        },
-      }, () => {
-        this.fetchOrderNumbers(invoiceId);
-        this.fetchShipmentNumbers(invoiceId);
+    return invoiceApi.saveInvoiceItemsCandidates(invoiceId, payload)
+      .then((resp) => {
+        this.setState({
+          formValues: {
+            invoiceItems: _.map(resp.data.data, (item) => ({
+              ...item,
+              checked: selectedInvoiceItems && !!selectedInvoiceItems[item.id],
+              quantityToInvoice: selectedInvoiceItems && selectedInvoiceItems[item.id] ? selectedInvoiceItems[item.id].quantityToInvoice : '',
+              sortOrder: this.getSortOrder(),
+            })),
+          },
+        }, () => {
+          this.fetchOrderNumbers(invoiceId);
+          this.fetchShipmentNumbers(invoiceId);
+        });
       });
-    });
   }
 
   fetchOrderNumbers(invoiceId) {
     if (this.state.orderNumberOptions.length === 0) {
-      const url = `/api/invoices/${invoiceId}/orders`;
-      apiClient.get(url)
+      invoiceApi.getInvoiceOrders(invoiceId)
         .then((resp) => {
           this.setState({
-            orderNumberOptions: _.map(resp.data.data, orderNumber => (
+            orderNumberOptions: _.map(resp.data.data, (orderNumber) => (
               { value: orderNumber, label: orderNumber }
             )),
           });
@@ -333,11 +330,10 @@ class InvoiceItemsModal extends Component {
 
   fetchShipmentNumbers(invoiceId) {
     if (this.state.shipmentNumberOptions.length === 0) {
-      const url = `/api/invoices/${invoiceId}/shipments`;
-      apiClient.get(url)
+      invoiceApi.getInvoiceShipments(invoiceId)
         .then((resp) => {
           this.setState({
-            shipmentNumberOptions: _.map(resp.data.data, shipmentNumber => (
+            shipmentNumberOptions: _.map(resp.data.data, (shipmentNumber) => (
               { value: shipmentNumber, label: shipmentNumber }
             )),
           });
@@ -348,7 +344,7 @@ class InvoiceItemsModal extends Component {
   checkAllVisibleItems(value) {
     const formValues = update(this.state.formValues, {
       invoiceItems: {
-        $apply: items => items.map(invoiceItem => (
+        $apply: (items) => items.map((invoiceItem) => (
           {
             ...invoiceItem,
             checked: value,
@@ -362,12 +358,11 @@ class InvoiceItemsModal extends Component {
     if (value) {
       // eslint-disable-next-line no-return-assign
       _.map(formValues.invoiceItems, (invoiceItem, key) =>
-        selectedItems[invoiceItem.id] =
-            {
-              ...formValues.invoiceItems[key],
-              quantityToInvoice: value ? formValues.invoiceItems[key].quantity : '',
-              sortOrder: value ? formValues.invoiceItems[key].sortOrder : '',
-            });
+        selectedItems[invoiceItem.id] = {
+          ...formValues.invoiceItems[key],
+          quantityToInvoice: value ? formValues.invoiceItems[key].quantity : '',
+          sortOrder: value ? formValues.invoiceItems[key].sortOrder : '',
+        });
     } else {
       _.map(formValues.invoiceItems, (invoiceItem, key) => {
         delete selectedItems[formValues.invoiceItems[key].id];
@@ -378,7 +373,7 @@ class InvoiceItemsModal extends Component {
   }
 
   checkSelected() {
-    return _.every(this.state.formValues.invoiceItems, item =>
+    return _.every(this.state.formValues.invoiceItems, (item) =>
       _.includes(_.keys(this.state.selectedInvoiceItems), item.id));
   }
 
@@ -424,7 +419,7 @@ class InvoiceItemsModal extends Component {
         btnSaveText="react.invoice.addInvoiceItems.label"
         btnSaveDefaultText="Add invoice items"
         btnOpenDisabled={btnOpenDisabled}
-        btnSaveDisabled={!_.find(formValues.invoiceItems, item => item.checked)}
+        btnSaveDisabled={!_.find(formValues.invoiceItems, (item) => item.checked)}
       >
         <div className="d-flex mb-3 justify-content-start align-items-center w-100 combined-shipment-filter">
           <Select
@@ -434,7 +429,7 @@ class InvoiceItemsModal extends Component {
             multi
             options={orderNumberOptions}
             showValueTooltip
-            onChange={value => this.setSelectedOrders(value)}
+            onChange={(value) => this.setSelectedOrders(value)}
             classes=""
             cache={false}
           />
@@ -446,7 +441,7 @@ class InvoiceItemsModal extends Component {
             multi
             options={shipmentNumberOptions}
             showValueTooltip
-            onChange={value => this.setSelectedShipments(value)}
+            onChange={(value) => this.setSelectedShipments(value)}
             classes=""
             cache={false}
           />
@@ -456,7 +451,7 @@ class InvoiceItemsModal extends Component {
             disabled={false}
             className="m-3"
             checked={this.checkSelected()}
-            onChange={value => this.checkAllVisibleItems(value)}
+            onChange={(value) => this.checkAllVisibleItems(value)}
           />
         </div>
       </ModalWrapper>
@@ -464,7 +459,7 @@ class InvoiceItemsModal extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
 });
 

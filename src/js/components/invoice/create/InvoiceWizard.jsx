@@ -5,11 +5,11 @@ import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 
 import { fetchTranslations, hideSpinner, showSpinner } from 'actions';
+import invoiceApi from 'api/services/InvoiceApi';
 import AddItemsPage from 'components/invoice/create/AddItemsPage';
 import ConfirmInvoicePage from 'components/invoice/create/ConfirmInvoicePage';
 import CreateInvoicePage from 'components/invoice/create/CreateInvoicePage';
 import Wizard from 'components/wizard/Wizard';
-import apiClient from 'utils/apiClient';
 import { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'components/invoice/Invoice.scss';
@@ -96,8 +96,7 @@ class InvoiceWizard extends Component {
   fetchInitialValues() {
     if (this.props.match.params.invoiceId) {
       this.props.showSpinner();
-      const url = `/api/invoices/${this.props.match.params.invoiceId}`;
-      apiClient.get(url)
+      invoiceApi.getInvoice(this.props.match.params.invoiceId)
         .then((response) => {
           const values = {
             ...response.data.data,
@@ -135,7 +134,7 @@ class InvoiceWizard extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   locale: state.session.activeLanguage,
   invoiceTranslationsFetched: state.session.fetchedTranslations.invoice,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
