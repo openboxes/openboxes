@@ -74,7 +74,7 @@ const AsyncStockRequestDashboard = Loadable({
 
 // TODO add megamenu and menu config
 const AsyncInvoice = Loadable({
-  loader: () => import('components/invoice/InvoiceWizard'),
+  loader: () => import('components/invoice/create/InvoiceWizard'),
   loading: Loading,
 });
 
