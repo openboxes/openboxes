@@ -47,12 +47,19 @@ export const STOCK_TRANSFER_ITEM_BY_ID = id => `${STOCK_TRANSFER_ITEM_API}/${id}
 
 // INVOICE
 export const INVOICE_API = `${API}/invoices`;
-export const INVOICE_ITEMS = id => `${INVOICE_API}/${id}/items`;
-export const REMOVE_INVOICE_ITEM = id => `${INVOICE_API}/${id}/removeItem`;
+export const INVOICE_BY_ID = (id) => `${INVOICE_API}/${id}`;
+export const INVOICE_ITEMS = (id) => `${INVOICE_BY_ID(id)}/items`;
+export const INVOICE_ITEM_CANDIDATES = (id) => `${INVOICE_BY_ID(id)}/invoiceItemCandidates`;
+export const INVOICE_PREPAYMENT_ITEMS = (id) => `${INVOICE_BY_ID(id)}/prepaymentItems`;
+export const INVOICE_POST = (id) => `${INVOICE_BY_ID(id)}/post`;
+export const INVOICE_SUBMIT = (id) => `${INVOICE_BY_ID(id)}/submit`;
+export const INVOICE_ORDERS = (id) => `${INVOICE_BY_ID(id)}/orders`;
+export const INVOICE_SHIPMENTS = (id) => `${INVOICE_BY_ID(id)}/shipments`;
+export const REMOVE_INVOICE_ITEM = (id) => `${INVOICE_API}/${id}/removeItem`;
 
 // INVOICE ITEM
 export const INVOICE_ITEM_API = `${API}/invoiceItems`;
-export const VALIDATE_INVOICE_ITEM = id => `${INVOICE_ITEM_API}/${id}/validation`;
+export const VALIDATE_INVOICE_ITEM = (id) => `${INVOICE_ITEM_API}/${id}/validation`;
 
 // PRODUCT
 export const PRODUCT_API = `${API}/products`;

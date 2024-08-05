@@ -8,13 +8,13 @@ import { connect } from 'react-redux';
 import { Tooltip } from 'react-tippy';
 
 import { hideSpinner, showSpinner } from 'actions';
+import invoiceApi from 'api/services/InvoiceApi';
 import DocumentButton from 'components/DocumentButton';
 import ArrayField from 'components/form-elements/ArrayField';
 import DateField from 'components/form-elements/DateField';
 import LabelField from 'components/form-elements/LabelField';
 import TextField from 'components/form-elements/TextField';
 import { INVOICE_URL, ORDER_URL, STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
-import apiClient from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import { getInvoiceDescription } from 'utils/form-values-utils';
 import accountingFormat from 'utils/number-utils';
@@ -276,8 +276,7 @@ class ConfirmInvoicePage extends Component {
   fetchInvoiceData() {
     if (this.state.values.id) {
       this.props.showSpinner();
-      const url = `/api/invoices/${this.state.values.id}`;
-      apiClient.get(url)
+      invoiceApi.getInvoice(this.state.values.id)
         .then((response) => {
           const values = {
             ...this.state.values,
@@ -307,16 +306,16 @@ class ConfirmInvoicePage extends Component {
     this.setState({
       isFirstPageLoaded: true,
     });
-    const url = `/api/invoices/${this.state.values.id}/items?offset=${startIndex}&max=${this.props.pageSize}`;
-    apiClient.get(url)
+    invoiceApi.getInvoiceItems(this.state.values.id, {
+      params: { offset: startIndex, max: this.props.pageSize },
+    })
       .then((response) => {
         this.setInvoiceItems(response, startIndex);
       });
   }
 
   submitInvoice() {
-    const url = `/api/invoices/${this.state.values.id}/submit`;
-    apiClient.post(url)
+    invoiceApi.submitInvoice(this.state.values.id)
       .then(() => {
         window.location = INVOICE_URL.show(this.state.values.id);
       })
@@ -324,8 +323,7 @@ class ConfirmInvoicePage extends Component {
   }
 
   postInvoice() {
-    const url = `/api/invoices/${this.state.values.id}/post`;
-    apiClient.post(url)
+    invoiceApi.postInvoice(this.state.values.id)
       .then(() => {
         window.location = INVOICE_URL.show(this.state.values.id);
       })
@@ -333,8 +331,7 @@ class ConfirmInvoicePage extends Component {
   }
 
   fetchPrepaymentItems() {
-    const url = `/api/invoices/${this.state.values.id}/prepaymentItems`;
-    apiClient.get(url)
+    invoiceApi.getInvoicePrepaymentItems(this.state.values.id)
       .then((response) => {
         const { data } = response.data;
         const lineItemsData = _.map(
