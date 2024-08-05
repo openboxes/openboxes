@@ -459,7 +459,7 @@ class ReceivingCheckScreen extends Component {
                   hasPartialReceivingSupport: this.props.hasPartialReceivingSupport,
                 }))}
               </div>
-              <div className="my-2 table-form">
+              <div className="my-2 table-form" data-testid="items-table">
                 {_.map(TABLE_FIELDS, (fieldConfig, fieldName) =>
                 renderFormField(fieldConfig, fieldName, {
                   saveDisabled: this.state.completed ||

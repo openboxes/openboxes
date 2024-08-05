@@ -89,7 +89,7 @@ const DateFilter = (props) => {
   const localeCodeToDisplay = localizeDate ? localeCode : null;
 
   return (
-    <div className={`date-picker__wrapper ${isFocusedClass} ${isValidClass}`}>
+    <div className={`date-picker__wrapper ${isFocusedClass} ${isValidClass}`} data-testid="date-filter">
       <DatePicker
         {...props}
         customInput={(

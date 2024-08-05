@@ -16,7 +16,6 @@ import { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'components/Filter/FilterStyles.scss';
 
-
 const FilterForm = ({
   filterFields,
   updateFilterParams,
@@ -50,6 +49,7 @@ const FilterForm = ({
     type: SearchField,
     attributes: {
       placeholder: translate(searchFieldPlaceholder, searchFieldDefaultPlaceholder),
+      ariaLabel: 'Search',
       filterElement: true,
       onKeyPress: submitOnEnter,
     },

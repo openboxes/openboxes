@@ -32,6 +32,7 @@ const Dropdown = ({
   return (
     <div
       ref={dropdownRef}
+      data-testid="custom-select-dropdown-menu"
       className="filter-select__dropdown"
       style={{
         ...style,
@@ -98,7 +99,7 @@ Menu.propTypes = {
 
 const Option = props => (
   <components.Option {...props}>
-    <div className="d-flex flex-row align-items-center">
+    <div role="listitem" className="d-flex flex-row align-items-center">
       {props.isMulti &&
         <input
           type="checkbox"
@@ -125,7 +126,7 @@ const IndicatorsContainer = ({ children, ...props }) => (
   <components.IndicatorsContainer {...props}>
     {props.selectProps.isMulti && props.selectProps.value?.length > 0 &&
       <div className="d-flex flex-column justify-content-center align-items-center selected-count-indicator-container">
-        <div className="selected-count-indicator-inner">
+        <div className="selected-count-indicator-inner" data-testid="filter-count-indicator">
           { props.selectProps.value.length }
         </div>
       </div>
