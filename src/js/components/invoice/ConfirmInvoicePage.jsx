@@ -20,7 +20,6 @@ import { getInvoiceDescription } from 'utils/form-values-utils';
 import accountingFormat from 'utils/number-utils';
 import Translate from 'utils/Translate';
 
-
 const INVOICE_HEADER_FIELDS = {
   invoiceNumber: {
     type: TextField,

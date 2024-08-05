@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 
-import InvoiceListFilters from 'components/invoice/InvoiceListFilters';
-import InvoiceListHeader from 'components/invoice/InvoiceListHeader';
-import InvoiceListTable from 'components/invoice/InvoiceListTable';
+import InvoiceListFilters from 'components/invoice/list/InvoiceListFilters';
+import InvoiceListHeader from 'components/invoice/list/InvoiceListHeader';
+import InvoiceListTable from 'components/invoice/list/InvoiceListTable';
 import useTranslation from 'hooks/useTranslation';
-
 
 const InvoiceList = () => {
   // Filter params are stored here, to be able to pass them to table component
