@@ -112,28 +112,151 @@ class OrderSpec extends Specification implements DomainUnitTest<Order> {
             true                 | true         | 1                          || true
     }
 
-    void "Order.isFullyInvoiceable() should return #expected when item1 is #item1 and item2 is #item2"() {
-        given:
-        Order order = new Order(orderItems: [item1, item2])
+    void "Order.isFullyInvoiceable() should return FALSE when there are no order items and no order adjustments"() {
+        given: "An order with no order adjustments and no order items"
+        Order order = new Order(orderItems: [], orderAdjustments: [])
 
         expect:
-        order.isFullyInvoiceable() == expected
-
-        where:
-        item1                       | item2                         || expected
-        mockOrderItem(true, true)   | mockOrderItem(true, true)     || true
-        mockOrderItem(true, false)  | mockOrderItem(true, false)    || false
-        mockOrderItem(false, true)  | mockOrderItem(true, true)     || true
-        mockOrderItem(true, false)  | mockOrderItem(true, true)     || false
-        mockOrderItem(false, true)  | mockOrderItem(false, true)    || false
-        mockOrderItem(false, false) | mockOrderItem(false, false)   || false
+        order.isFullyInvoiceable() == false
     }
 
-    private OrderItem mockOrderItem(boolean encumbered, boolean invoiceable) {
-        return Mock(OrderItem) {
-            isEncumbered() >> encumbered
-            isInvoiceable() >> invoiceable
-            toString() >> "encumbered: $encumbered, invoiceable: $invoiceable"
+    void "Order.isFullyInvoiceable() should return TRUE when there are no order adjustments with all order items fully invoiceable"() {
+        given: "An order with no order adjustments and all order items fully invoiceable"
+        OrderItem item1 = Stub(OrderItem) {
+            isInvoiceable() >> true
+            getQuantityRemaining() >> 0
         }
+        OrderItem item2 = Stub(OrderItem) {
+            isInvoiceable() >> true
+            getQuantityRemaining() >> 0
+        }
+        Order order = new Order(orderItems: [item1, item2], orderAdjustments: [])
+
+        expect:
+        order.isFullyInvoiceable() == true
+    }
+
+    void "Order.isFullyInvoiceable() should return TRUE when there are no order items with all order adjustments fully invoiceable"() {
+        given: "An order with no order items and all order adjustments fully invoiceable"
+        OrderAdjustment item1 = Stub(OrderAdjustment) {
+            isInvoiceable() >> true
+        }
+        OrderAdjustment item2 = Stub(OrderAdjustment) {
+            isInvoiceable() >> true
+        }
+        Order order = new Order(orderItems: [], orderAdjustments: [item1, item2])
+
+        expect:
+        order.isFullyInvoiceable() == true
+    }
+
+    void "Order.isFullyInvoiceable() should return FALSE when all order items are invoiceable and all adjustments are not"() {
+        given: "An order with fully invoicebale order items and all order adjustments not invoiceable"
+        OrderItem orderItem1 = Stub(OrderItem) {
+            isInvoiceable() >> true
+            getQuantityRemaining() >> 0
+        }
+        OrderItem orderItem2 = Stub(OrderItem) {
+            isInvoiceable() >> true
+            getQuantityRemaining() >> 0
+        }
+        OrderAdjustment adjustmentItem1 = Stub(OrderAdjustment) {
+            isInvoiceable() >> false
+        }
+        OrderAdjustment adjustmentItem2 = Stub(OrderAdjustment) {
+            isInvoiceable() >> false
+        }
+        Order order = new Order(orderItems: [orderItem1, orderItem2], orderAdjustments: [adjustmentItem1, adjustmentItem2])
+
+        expect:
+        order.isFullyInvoiceable() == false
+    }
+
+    void "Order.isFullyInvoiceable() should return FALSE when all order items are invoiceable and one adjustment are not"() {
+        given: "An order with fully invoicebale order items and one order adjustment not invoiceable"
+        OrderItem orderItem1 = Stub(OrderItem) {
+            isInvoiceable() >> true
+            getQuantityRemaining() >> 0
+        }
+        OrderItem orderItem2 = Stub(OrderItem) {
+            isInvoiceable() >> true
+            getQuantityRemaining() >> 0
+        }
+        OrderAdjustment adjustmentItem1 = Stub(OrderAdjustment) {
+            isInvoiceable() >> true
+        }
+        OrderAdjustment adjustmentItem2 = Stub(OrderAdjustment) {
+            isInvoiceable() >> false
+        }
+        Order order = new Order(orderItems: [orderItem1, orderItem2], orderAdjustments: [adjustmentItem1, adjustmentItem2])
+
+        expect:
+        order.isFullyInvoiceable() == false
+    }
+
+    void "Order.isFullyInvoiceable() should return FALSE when all order adjustments are invoiceable and all order items are not"() {
+        given: "An order with fully invoicebale order adjustments and all order items not invoiceable"
+        OrderItem orderItem1 = Stub(OrderItem) {
+            isInvoiceable() >> false
+            getQuantityRemaining() >> 0
+        }
+        OrderItem orderItem2 = Stub(OrderItem) {
+            isInvoiceable() >> false
+            getQuantityRemaining() >> 0
+        }
+        OrderAdjustment adjustmentItem1 = Stub(OrderAdjustment) {
+            isInvoiceable() >> true
+        }
+        OrderAdjustment adjustmentItem2 = Stub(OrderAdjustment) {
+            isInvoiceable() >> true
+        }
+        Order order = new Order(orderItems: [orderItem1, orderItem2], orderAdjustments: [adjustmentItem1, adjustmentItem2])
+
+        expect:
+        order.isFullyInvoiceable() == false
+    }
+
+    void "Order.isFullyInvoiceable() should return FALSE when all order adjustments are invoiceable and one order item is not"() {
+        given: "An order with fully invoicebale order adjustments and one order item not invoiceable"
+        OrderItem orderItem1 = Stub(OrderItem) {
+            isInvoiceable() >> false
+            getQuantityRemaining() >> 0
+        }
+        OrderItem orderItem2 = Stub(OrderItem) {
+            isInvoiceable() >> true
+            getQuantityRemaining() >> 0
+        }
+        OrderAdjustment adjustmentItem1 = Stub(OrderAdjustment) {
+            isInvoiceable() >> true
+        }
+        OrderAdjustment adjustmentItem2 = Stub(OrderAdjustment) {
+            isInvoiceable() >> true
+        }
+        Order order = new Order(orderItems: [orderItem1, orderItem2], orderAdjustments: [adjustmentItem1, adjustmentItem2])
+
+        expect:
+        order.isFullyInvoiceable() == false
+    }
+
+    void "Order.isFullyInvoiceable() should return FALSE when at least one order item has quantity remaining is greater than 0"() {
+        given: "An order with fully invoiceable items and one order items with quantity remaining more than 0"
+        OrderItem orderItem1 = Stub(OrderItem) {
+            isInvoiceable() >> true
+            getQuantityRemaining() >> 1
+        }
+        OrderItem orderItem2 = Stub(OrderItem) {
+            isInvoiceable() >> true
+            getQuantityRemaining() >> 0
+        }
+        OrderAdjustment adjustmentItem1 = Stub(OrderAdjustment) {
+            isInvoiceable() >> true
+        }
+        OrderAdjustment adjustmentItem2 = Stub(OrderAdjustment) {
+            isInvoiceable() >> true
+        }
+        Order order = new Order(orderItems: [orderItem1, orderItem2], orderAdjustments: [adjustmentItem1, adjustmentItem2])
+
+        expect:
+        order.isFullyInvoiceable() == false
     }
 }
