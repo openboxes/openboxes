@@ -1,10 +1,16 @@
 package org.pih.warehouse.invoice
 
+import org.apache.commons.lang.SerializationUtils
+import org.pih.warehouse.core.BudgetCode
 import org.pih.warehouse.core.Constants
+import org.pih.warehouse.core.GlAccount
+import org.pih.warehouse.core.UnitOfMeasure
+import org.pih.warehouse.core.User
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderAdjustment
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.OrderItemStatusCode
+import org.pih.warehouse.product.Product
 import org.pih.warehouse.shipping.ShipmentItem
 import grails.gorm.transactions.Transactional
 
@@ -24,18 +30,19 @@ class PrepaymentInvoiceService {
         order.invoiceableOrderItems.each { OrderItem orderItem ->
             if (orderItem.orderItemStatusCode == OrderItemStatusCode.CANCELED) {
                 InvoiceItem invoiceItem = invoiceService.createFromOrderItem(orderItem)
-                invoice.addToInvoiceItems(invoiceItem)
-            } else {
-                orderItem?.invoiceableShipmentItems?.each { ShipmentItem shipmentItem ->
-                    InvoiceItem invoiceItem = invoiceService.createFromShipmentItem(shipmentItem)
-                    invoice.addToInvoiceItems(invoiceItem)
-                }
+                addInvoiceItemsToInvoice(invoice, invoiceItem)
+                return
+            }
+
+            orderItem?.invoiceableShipmentItems?.each { ShipmentItem shipmentItem ->
+                InvoiceItem invoiceItem = invoiceService.createFromShipmentItem(shipmentItem)
+                addInvoiceItemsToInvoice(invoice, invoiceItem)
             }
         }
 
         order.invoiceableAdjustments.each { OrderAdjustment orderAdjustment ->
             InvoiceItem invoiceItem = invoiceService.createFromOrderAdjustment(orderAdjustment)
-            invoice.addToInvoiceItems(invoiceItem)
+            addInvoiceItemsToInvoice(invoice, invoiceItem)
         }
 
         return invoice.save()
@@ -65,5 +72,18 @@ class PrepaymentInvoiceService {
         }
 
         return invoice.save()
+    }
+
+    InvoiceItem createInverseInvoiceItem(InvoiceItem invoiceItem) {
+        InvoiceItem copiedInvoiceItem = new InvoiceItem(invoiceItem)
+        copiedInvoiceItem.invoiceItemType = InvoiceItemType.INVERSE
+        return copiedInvoiceItem
+    }
+
+    void addInvoiceItemsToInvoice(Invoice invoice, InvoiceItem invoiceItem) {
+        InvoiceItem inverseItem = createInverseInvoiceItem(invoiceItem)
+        invoiceItem.invoiceItemType = InvoiceItemType.REGULAR
+        invoice.addToInvoiceItems(invoiceItem)
+        invoice.addToInvoiceItems(inverseItem)
     }
 }
