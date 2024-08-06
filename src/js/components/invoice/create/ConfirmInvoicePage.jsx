@@ -1,212 +1,176 @@
-import React, { Component } from 'react';
+import React, {
+  useCallback, useEffect, useMemo, useState,
+} from 'react';
 
 import arrayMutators from 'final-form-arrays';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
-import { connect } from 'react-redux';
+import { useSelector } from 'react-redux';
 
-import { hideSpinner, showSpinner } from 'actions';
 import invoiceApi from 'api/services/InvoiceApi';
 import InvoiceItemsTable from 'components/invoice/create/InvoiceItemsTable';
 import InvoiceOptionsForm from 'components/invoice/create/InvoiceOptionsForm';
 import { INVOICE_URL } from 'consts/applicationUrls';
+import useSpinner from 'hooks/useSpinner';
 import accountingFormat from 'utils/number-utils';
 import Translate from 'utils/Translate';
 
 const PREPAYMENT_INVOICE = 'PREPAYMENT_INVOICE';
 
-class ConfirmInvoicePage extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      values: { ...this.props.initialValues, invoiceItems: [], totalValue: 0 },
-    };
+const ConfirmInvoicePage = ({ initialValues, previousPage }) => {
+  const spinner = useSpinner();
 
-    this.loadMoreRows = this.loadMoreRows.bind(this);
-  }
+  const {
+    pageSize,
+    isSuperuser,
+  } = useSelector((state) => ({
+    pageSize: state.session.pageSize,
+    isSuperuser: state.session.isSuperuser,
+  }));
 
-  componentDidMount() {
-    this.fetchInvoiceData();
-  }
+  const [stateValues, setStateValues] = useState({
+    ...initialValues,
+    invoiceItems: [],
+  });
+
+  /**
+   * Fetches invoice values from API.
+   * @public
+   */
+  const fetchInvoiceData = useCallback(() => {
+    spinner.show();
+    invoiceApi.getInvoice(stateValues.id)
+      .then((response) => {
+        setStateValues((state) => ({
+          ...state,
+          documents: response.data.data.documents,
+        }));
+      })
+      .finally(() => spinner.hide());
+  }, [stateValues.id]);
+
+  useEffect(() => {
+    if (stateValues.id) {
+      fetchInvoiceData();
+    }
+  }, [stateValues.id]);
+
+  const totalValue = useMemo(() => {
+    const value = _.reduce(stateValues.invoiceItems, (sum, val) =>
+      (sum + (val.totalAmount ? parseFloat(val.totalAmount) : 0.0)), 0);
+    return accountingFormat(value.toFixed(2));
+  }, [stateValues.invoiceItems]);
+
+  const submitInvoice = () => {
+    invoiceApi.submitInvoice(stateValues.id)
+      .then(() => {
+        window.location = INVOICE_URL.show(stateValues.id);
+      })
+      .finally(() => spinner.hide());
+  };
+
+  const postInvoice = () => {
+    invoiceApi.postInvoice(stateValues.id)
+      .then(() => {
+        window.location = INVOICE_URL.show(stateValues.id);
+      })
+      .finally(() => spinner.hide());
+  };
 
   /**
    * Sets state of invoice items after fetch and calls method to fetch next items
    * @param {string} startIndex
    * @public
    */
-  setInvoiceItems(response, startIndex) {
-    this.props.showSpinner();
+  const setInvoiceItems = (response) => {
+    spinner.show();
     const { data, totalCount } = response.data;
 
-    const invoiceItems = _.isNull(startIndex) || startIndex === 0 ? data : _.uniqBy(_.concat(this.state.values.invoiceItems, data), 'id');
-    const totalValue = _.reduce(invoiceItems, (sum, val) =>
-      (sum + (val.totalAmount ? parseFloat(val.totalAmount) : 0.0)), 0);
+    setStateValues((state) => ({
+      ...state,
+      invoiceItems: [...state.invoiceItems, ...data],
+      totalCount,
+    }));
 
-    this.setState({
-      values: {
-        ...this.state.values,
-        invoiceItems,
-        totalCount,
-        totalValue: accountingFormat(totalValue.toFixed(2)),
-      },
-    }, () => {
-      if (!_.isNull(startIndex) &&
-          this.state.values.invoiceItems.length !== this.state.values.totalCount) {
-        this.loadMoreRows({ startIndex: startIndex + this.props.pageSize });
-      } else if (this.state.values.invoiceItems.length === this.state.values.totalCount
-        && !this.state.values.isPrepaymentInvoice && !_.find(this.state.values.invoiceItems, ii => ii.type === 'INVERSE')) {
-        this.fetchPrepaymentItems();
-      }
-      this.props.hideSpinner();
-    });
-  }
-
-  /**
-   * Fetches invoice values from API.
-   * @public
-   */
-  fetchInvoiceData() {
-    if (this.state.values.id) {
-      this.props.showSpinner();
-      invoiceApi.getInvoice(this.state.values.id)
-        .then((response) => {
-          const values = {
-            ...this.state.values,
-            documents: response.data.data.documents,
-          };
-
-          this.setState({ values }, () => this.props.hideSpinner());
-        });
-    }
-  }
+    spinner.hide();
+  };
 
   /**
    * Loads more rows, needed for pagination
    * @param {index} startIndex
    * @public
    */
-  loadMoreRows({ startIndex }) {
-    invoiceApi.getInvoiceItems(this.state.values.id, {
-      params: { offset: startIndex, max: this.props.pageSize },
+  const loadMoreRows = useCallback(
+    ({ startIndex }) => invoiceApi.getInvoiceItems(stateValues.id, {
+      params: { offset: startIndex, max: pageSize },
     })
       .then((response) => {
-        this.setInvoiceItems(response, startIndex);
-      });
-  }
+        setInvoiceItems(response);
+      }),
+    [stateValues.id, pageSize],
+  );
 
-  submitInvoice() {
-    this.props.showSpinner();
-    invoiceApi.submitInvoice(this.state.values.id);
-      .then(() => {
-        window.location = INVOICE_URL.show(this.state.values.id);
-      })
-      .finally(() => this.props.hideSpinner());
-  }
-
-  postInvoice() {
-    this.props.showSpinner();
-    invoiceApi.postInvoice(this.state.values.id)
-      .then(() => {
-        window.location = INVOICE_URL.show(this.state.values.id);
-      })
-      .finally(() => this.props.hideSpinner());
-  }
-
-  fetchPrepaymentItems() {
-    invoiceApi.getInvoicePrepaymentItems(this.state.values.id)
-      .then((response) => {
-        const { data } = response.data;
-        const lineItemsData = _.map(
-          _.filter(data, val => val.orderNumber === this.state.values.vendorInvoiceNumber),
-          val => ({
-            ...val,
-            totalAmount: val.totalPrepaymentAmount,
-            isPrepaymentItem: true,
-          }),
-        );
-        const invoiceItems = _.concat(this.state.values.invoiceItems, lineItemsData);
-        const updatedTotalCount = this.state.values.totalCount + lineItemsData.length;
-        const totalValue = _.reduce(invoiceItems, (sum, val) =>
-          (sum + (val.totalAmount ? parseFloat(val.totalAmount) : 0.0)), 0);
-
-        this.setState({
-          values: {
-            ...this.state.values,
-            invoiceItems,
-            totalCount: updatedTotalCount,
-            totalValue: accountingFormat(totalValue.toFixed(2)),
-          },
-        });
-      });
-  }
-
-  render() {
-    return (
-      <div>
-        <Form
-          onSubmit={() => {}}
-          validate={this.validate}
-          initialValues={this.state.values}
-          mutators={{ ...arrayMutators }}
-          render={({ handleSubmit, values }) => (
-            <form onSubmit={handleSubmit}>
-              <InvoiceOptionsForm values={values} />
-              <div className="submit-buttons">
-                <button
-                  className="btn btn-outline-primary btn-form btn-xs"
-                  onClick={() => this.props.previousPage(values)}
-                  disabled={values.datePosted
+  return (
+    <div>
+      <Form
+        onSubmit={() => {}}
+        initialValues={{
+          ...stateValues,
+          totalValue,
+        }}
+        mutators={{ ...arrayMutators }}
+        render={({ handleSubmit, values }) => (
+          <form onSubmit={handleSubmit}>
+            <InvoiceOptionsForm values={values} />
+            <div className="submit-buttons">
+              <button
+                type="button"
+                className="btn btn-outline-primary btn-form btn-xs"
+                onClick={() => previousPage(values)}
+                disabled={values.datePosted
                     || values.invoiceType === PREPAYMENT_INVOICE || values.hasPrepaymentInvoice}
-                >
-                  <Translate id="react.default.button.previous.label" defaultMessage="Previous" />
-                </button>
-                <button
-                  type="submit"
-                  onClick={() => { this.submitInvoice(); }}
-                  className="btn btn-outline-success float-right btn-form btn-xs"
-                  disabled={values.dateSubmitted || values.datePosted}
-                >
-                  <Translate id="react.invoice.submit.label" defaultMessage="Submit for Approval" />
-                </button>
-                {this.props.isSuperuser &&
+              >
+                <Translate id="react.default.button.previous.label" defaultMessage="Previous" />
+              </button>
+              <button
+                type="submit"
+                onClick={() => submitInvoice()}
+                className="btn btn-outline-success float-right btn-form btn-xs"
+                disabled={values.dateSubmitted || values.datePosted}
+              >
+                <Translate id="react.invoice.submit.label" defaultMessage="Submit for Approval" />
+              </button>
+              {isSuperuser
+                  && (
                   <button
                     type="submit"
-                    onClick={() => { this.postInvoice(); }}
+                    onClick={() => postInvoice()}
                     className="btn btn-outline-success float-right btn-form btn-xs"
                     disabled={values.datePosted}
                   >
                     <Translate id="react.invoice.post.label" defaultMessage="Post Invoice" />
-                  </button>}
-              </div>
-              <InvoiceItemsTable
-                values={values}
-                loadMoreRows={this.loadMoreRows}
-              />
-            </form>
-          )}
-        />
-      </div>
-    );
-  }
-}
+                  </button>
+                  )}
+            </div>
+            <InvoiceItemsTable
+              invoiceId={values.id}
+              totalCount={stateValues.totalCount}
+              invoiceItems={stateValues.invoiceItems}
+              loadMoreRows={loadMoreRows}
+            />
+          </form>
+        )}
+      />
+    </div>
+  );
+};
 
-const mapStateToProps = (state) => ({
-  pageSize: state.session.pageSize,
-  isSuperuser: state.session.isSuperuser,
-});
-
-export default connect(mapStateToProps, { showSpinner, hideSpinner })(ConfirmInvoicePage);
+export default ConfirmInvoicePage;
 
 ConfirmInvoicePage.propTypes = {
   /** Initial component's data */
   initialValues: PropTypes.shape({}).isRequired,
   /** Function returning user to the previous page */
   previousPage: PropTypes.func.isRequired,
-  /** Function called when data is loading */
-  showSpinner: PropTypes.func.isRequired,
-  /** Function called when data has loaded */
-  hideSpinner: PropTypes.func.isRequired,
-  pageSize: PropTypes.number.isRequired,
-  isSuperuser: PropTypes.bool.isRequired,
 };

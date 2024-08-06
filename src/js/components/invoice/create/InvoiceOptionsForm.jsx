@@ -141,8 +141,6 @@ const InvoiceOptionsForm = ({ values }) => {
 InvoiceOptionsForm.propTypes = {
   values: PropTypes.shape({
     id: PropTypes.string.isRequired,
-    invoiceItems: PropTypes.shape({}).isRequired,
-    totalCount: PropTypes.number.isRequired,
     documents: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   }).isRequired,
 };

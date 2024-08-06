@@ -18,15 +18,14 @@ const INVOICE_ITEMS = {
     totalCount: ({ totalCount }) => totalCount,
     isRowLoaded: ({ isRowLoaded }) => isRowLoaded,
     loadMoreRows: ({ loadMoreRows }) => loadMoreRows(),
-    isFirstPageLoaded: ({ isFirstPageLoaded }) => isFirstPageLoaded,
     getDynamicRowAttr: ({ rowValues }) => ({ className: rowValues && rowValues.totalAmount && rowValues.totalAmount < 0 ? 'negative-row-value' : '' }),
     fields: {
       prepaymentIcon: {
         type: (params) => {
-          const { values } = params;
-          const hasItems = values && values.invoiceItems;
-          const isPrepLine = hasItems && (values.isPrepaymentInvoice
-            || values.invoiceItems[params.rowIndex].isPrepaymentItem);
+          const { invoiceItems, rowIndex, isPrepaymentInvoice } = params;
+          const hasItems = !!invoiceItems;
+          const isPrepLine = hasItems && (isPrepaymentInvoice
+            || invoiceItems[rowIndex]?.isPrepaymentItem);
           if (isPrepLine) {
             return (
               <div className="d-flex align-items-center justify-content-center">
@@ -54,10 +53,11 @@ const INVOICE_ITEMS = {
         label: 'react.invoice.orderNumber.label',
         defaultMessage: 'PO Number',
         flexWidth: '1',
-        getDynamicAttr: ({ values, rowIndex }) => {
-          const orderId = values && values.invoiceItems
-            && values.invoiceItems[rowIndex]
-            && values.invoiceItems[rowIndex].orderId;
+        getDynamicAttr: (params) => {
+          const { invoiceItems, rowIndex } = params;
+          const orderId = invoiceItems
+            && invoiceItems[rowIndex]
+            && invoiceItems[rowIndex].orderId;
           return { url: orderId ? ORDER_URL.show(orderId) : '' };
         },
       },
@@ -66,10 +66,11 @@ const INVOICE_ITEMS = {
         label: 'react.invoice.shipmentNumber.label',
         defaultMessage: 'Shipment Number',
         flexWidth: '1',
-        getDynamicAttr: ({ values, rowIndex }) => {
-          const shipmentId = values && values.invoiceItems
-            && values.invoiceItems[rowIndex]
-            && values.invoiceItems[rowIndex].shipmentId;
+        getDynamicAttr: (params) => {
+          const { invoiceItems, rowIndex } = params;
+          const shipmentId = invoiceItems
+            && invoiceItems[rowIndex]
+            && invoiceItems[rowIndex].shipmentId;
           return { url: shipmentId ? STOCK_MOVEMENT_URL.show(shipmentId) : '' };
         },
       },
@@ -116,9 +117,9 @@ const INVOICE_ITEMS = {
         flexWidth: '1',
         getDynamicAttr: (params) => ({
           formatValue: () => {
-            const { values } = params;
-            const hasItems = values && values.invoiceItems;
-            const isPrepLine = hasItems && values.invoiceItems[params.rowIndex].isPrepaymentItem;
+            const { invoiceItems } = params;
+            const hasItems = invoiceItems;
+            const isPrepLine = hasItems && invoiceItems[params.rowIndex]?.isPrepaymentItem;
             if (isPrepLine) {
               return params.fieldValue * (-1);
             }
@@ -154,43 +155,34 @@ const INVOICE_ITEMS = {
   },
 };
 
-const InvoiceItemsTable = ({ values, loadMoreRows }) => {
-  const [isFirstPageLoaded, setIsFirstPageLoaded] = useState(false);
-
+const InvoiceItemsTable = ({
+  invoiceItems, invoiceId, totalCount, loadMoreRows,
+}) => {
   const isRowLoaded = useCallback(
-    ({ index }) => !!values.invoiceItems[index],
-    [values.invoiceItems],
+    ({ index }) => !!invoiceItems[index],
+    [invoiceItems],
   );
-
-  const loadRows = (loadRowProps) => {
-    if (!isFirstPageLoaded) {
-      setIsFirstPageLoaded(true);
-    }
-
-    loadMoreRows(loadRowProps);
-  };
 
   return (
     <div className="my-2 table-form">
       {_.map(INVOICE_ITEMS, (fieldConfig, fieldName) =>
         renderFormField(fieldConfig, fieldName, {
-          values,
-          totalCount: values.totalCount,
-          loadMoreRows: loadRows,
+          invoiceId,
+          invoiceItems,
+          totalCount,
+          loadMoreRows,
           isRowLoaded,
-          isFirstPageLoaded,
+          isPrepaymentInvoice: false,
         }))}
     </div>
   );
 };
 
 InvoiceItemsTable.propTypes = {
+  invoiceId: PropTypes.string.isRequired,
+  invoiceItems: PropTypes.shape({}).isRequired,
+  totalCount: PropTypes.number.isRequired,
   loadMoreRows: PropTypes.func.isRequired,
-  values: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    invoiceItems: PropTypes.shape({}).isRequired,
-    totalCount: PropTypes.number.isRequired,
-  }).isRequired,
 };
 
 export default InvoiceItemsTable;
