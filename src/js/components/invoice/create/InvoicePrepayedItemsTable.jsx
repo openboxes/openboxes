@@ -1,7 +1,8 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 
 import _ from 'lodash';
 import PropTypes from 'prop-types';
+import { Tooltip } from 'react-tippy';
 
 import ArrayField from 'components/form-elements/ArrayField';
 import LabelField from 'components/form-elements/LabelField';
@@ -19,6 +20,34 @@ const INVOICE_ITEMS = {
     loadMoreRows: ({ loadMoreRows }) => loadMoreRows(),
     getDynamicRowAttr: ({ rowValues }) => ({ className: rowValues && rowValues.totalAmount && rowValues.totalAmount < 0 ? 'negative-row-value' : '' }),
     fields: {
+      prepaymentIcon: {
+        type: (params) => {
+          const { invoiceItems, rowIndex, isPrepaymentInvoice } = params;
+          const hasItems = !!invoiceItems;
+          const isPrepLine = hasItems && (isPrepaymentInvoice
+            || invoiceItems[rowIndex]?.isPrepaymentItem);
+          if (isPrepLine) {
+            return (
+              <div className="d-flex align-items-center justify-content-center">
+                <Tooltip
+                  html="Prepayment"
+                  theme="transparent"
+                  delay="150"
+                  duration="250"
+                  hideDelay="50"
+                >
+                  {/* &#x24C5; = hexadecimal circled letter P */}
+                  <b>&#x24C5;</b>
+                </Tooltip>
+              </div>
+            );
+          }
+          return null;
+        },
+        label: '',
+        defaultMessage: '',
+        flexWidth: '0.25',
+      },
       orderNumber: {
         type: LabelField,
         label: 'react.invoice.orderNumber.label',
@@ -86,6 +115,17 @@ const INVOICE_ITEMS = {
         label: 'react.invoice.qty.label',
         defaultMessage: 'Qty',
         flexWidth: '1',
+        getDynamicAttr: (params) => ({
+          formatValue: () => {
+            const { invoiceItems } = params;
+            const hasItems = invoiceItems;
+            const isPrepLine = hasItems && invoiceItems[params.rowIndex]?.isPrepaymentItem;
+            if (isPrepLine) {
+              return params.fieldValue * (-1);
+            }
+            return params.fieldValue;
+          },
+        }),
       },
       uom: {
         type: LabelField,
@@ -115,9 +155,12 @@ const INVOICE_ITEMS = {
   },
 };
 
-const InvoiceItemsTable = ({
-  invoiceItems, invoiceId, totalCount, loadMoreRows,
+const InvoicePrepayedItemsTable = ({
+  invoiceItems, inverseItems, invoiceId, totalCount, loadMoreRows, isPrepaymentInvoice,
 }) => {
+  const items = useMemo(() =>
+    _.concat(invoiceItems, inverseItems), [invoiceItems, inverseItems]);
+
   const isRowLoaded = useCallback(
     ({ index }) => !!invoiceItems[index],
     [invoiceItems],
@@ -128,20 +171,23 @@ const InvoiceItemsTable = ({
       {_.map(INVOICE_ITEMS, (fieldConfig, fieldName) =>
         renderFormField(fieldConfig, fieldName, {
           invoiceId,
-          invoiceItems,
+          invoiceItems: items,
           totalCount,
           loadMoreRows,
           isRowLoaded,
+          isPrepaymentInvoice,
         }))}
     </div>
   );
 };
 
-InvoiceItemsTable.propTypes = {
+InvoicePrepayedItemsTable.propTypes = {
   invoiceId: PropTypes.string.isRequired,
+  isPrepaymentInvoice: PropTypes.bool.isRequired,
   invoiceItems: PropTypes.shape({}).isRequired,
+  inverseItems: PropTypes.shape({}).isRequired,
   totalCount: PropTypes.number.isRequired,
   loadMoreRows: PropTypes.func.isRequired,
 };
 
-export default InvoiceItemsTable;
+export default InvoicePrepayedItemsTable;
