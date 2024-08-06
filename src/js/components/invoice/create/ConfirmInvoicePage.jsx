@@ -11,6 +11,7 @@ import { useSelector } from 'react-redux';
 import invoiceApi from 'api/services/InvoiceApi';
 import InvoiceItemsTable from 'components/invoice/create/InvoiceItemsTable';
 import InvoiceOptionsForm from 'components/invoice/create/InvoiceOptionsForm';
+import InvoicePrepayedItemsTable from 'components/invoice/create/InvoicePrepayedItemsTable';
 import { INVOICE_URL } from 'consts/applicationUrls';
 import useSpinner from 'hooks/useSpinner';
 import accountingFormat from 'utils/number-utils';
@@ -153,12 +154,28 @@ const ConfirmInvoicePage = ({ initialValues, previousPage }) => {
                   </button>
                   )}
             </div>
-            <InvoiceItemsTable
-              invoiceId={values.id}
-              totalCount={stateValues.totalCount}
-              invoiceItems={stateValues.invoiceItems}
-              loadMoreRows={loadMoreRows}
-            />
+            {
+              stateValues.hasPrepaymentInvoice || stateValues.isPrepaymentInvoice ? (
+                <InvoicePrepayedItemsTable
+                  invoiceId={values.id}
+                  totalCount={stateValues.totalCount}
+                  invoiceItems={stateValues.invoiceItems}
+                  loadMoreRows={loadMoreRows}
+                  isPrepaymentInvoice={stateValues.isPrepaymentInvoice}
+                  // TODO: this is an example, get inverse items from endpoint
+                  inverseItems={stateValues.invoiceItems?.map(it =>
+                    ({ ...it, isPrepaymentItem: true }))}
+                />
+              )
+                : (
+                  <InvoiceItemsTable
+                    invoiceId={values.id}
+                    totalCount={stateValues.totalCount}
+                    invoiceItems={stateValues.invoiceItems}
+                    loadMoreRows={loadMoreRows}
+                  />
+                )
+            }
           </form>
         )}
       />
