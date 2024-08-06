@@ -63,6 +63,8 @@ class OrderSpec extends Specification implements DomainUnitTest<Order> {
             getHasPrepaymentInvoice() >> hasPrepaymentInvoice
         }
         OrderItem orderItem = Spy(OrderItem) {
+            getHasPrepaymentInvoice() >> hasPrepaymentInvoice
+            getHasRegularInvoice() >> false
             getAllInvoiceItems() >> []
         }
         orderItem.isEncumbered() >> isEncumbered
@@ -91,6 +93,8 @@ class OrderSpec extends Specification implements DomainUnitTest<Order> {
             getHasPrepaymentInvoice() >> hasPrepaymentInvoice
         }
         OrderItem orderItem = Spy(OrderItem) {
+            getHasPrepaymentInvoice() >> hasPrepaymentInvoice
+            getHasRegularInvoice() >> false
             getQuantityAvailableToInvoice() >> quantityAvailableToInvoice
         }
         orderItem.isEncumbered() >> isEncumbered

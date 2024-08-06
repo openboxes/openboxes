@@ -24,26 +24,28 @@ class OrderItemSpec extends Specification implements DomainUnitTest<OrderItem> {
         0                             | 1        || false
     }
 
-    void 'OrderItem.getQuantityAvailableToInvoice() should return: #quantity when quantityShipped: #quantityShipped and quantityInvoiced: #quantityInvoiced and canceled: #canceled'() {
+    void 'OrderItem.getQuantityAvailableToInvoice() should return: #quantity when quantityInvoiced: #quantityInvoiced and getQuantityShipped: #quantityShipped and canceled: #canceled'() {
         given:
             OrderItem orderItem = Spy(OrderItem) {
                 isCanceled() >> canceled
+                getInvoicedQuantity() >> quantityInvoiced
                 getQuantityShippedInStandardUom() >> quantityShipped
-                getQuantityInvoicedInStandardUom() >> quantityInvoiced
             }
 
         expect:
             orderItem.quantityAvailableToInvoice == quantity
 
         where:
-            quantityShipped | quantityInvoiced | canceled || quantity
-            1               | 1                | true     || null
-            2               | 1                | false    || 1
+           quantityShipped | quantityInvoiced | canceled || quantity
+           1               | 1                | true     || null
+           2               | 1                | false    || 1
     }
 
-    void 'OrderItem.isInvoiceable() should return: #isInoviceable when quantity available to invoice is #quantityAvailableToInvoice'() {
+    void 'OrderItem.isInvoiceable() should return: #isInoviceable when quantity available to invoice is #quantityAvailableToInvoice and hasRegularInvoice: #hasRegularInvoice'() {
         given:
         OrderItem orderItem = Spy(OrderItem) {
+            getHasPrepaymentInvoice() >> true
+            getHasRegularInvoice() >> hasRegularInvoice
             getQuantityAvailableToInvoice() >> quantityAvailableToInvoice
             isEncumbered() >> true
         }
@@ -52,11 +54,12 @@ class OrderItemSpec extends Specification implements DomainUnitTest<OrderItem> {
         orderItem.invoiceable == isInvoiceable
 
         where:
-        quantityAvailableToInvoice || isInvoiceable
-        1                          || true
-        0                          || false
-        -10                        || false
-        100                        || true
+        quantityAvailableToInvoice | hasRegularInvoice || isInvoiceable
+        1                          | false             || true
+        0                          | false             || false
+        -10                        | false             || false
+        100                        | false             || true
+        1                          | true              || false
     }
 
     void 'OrderItem.isEncumbered() should return: #isEncumbered when quantityInvoicedInStandardUom: #quantityInvoicedInStandardUom and quantity: #quantity'() {
