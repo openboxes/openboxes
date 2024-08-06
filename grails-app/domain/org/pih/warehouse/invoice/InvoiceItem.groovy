@@ -36,6 +36,7 @@ class InvoiceItem implements Serializable {
 
     String id
     Invoice invoice
+    InvoiceItemType invoiceItemType
 
     Product product
     GlAccount glAccount
@@ -113,6 +114,23 @@ class InvoiceItem implements Serializable {
 
         updatedBy(nullable: true)
         createdBy(nullable: true)
+        invoiceItemType(nullable: true)
+    }
+
+    InvoiceItem(InvoiceItem invoiceItem) {
+        this.invoiceItemType = invoiceItem.invoiceItemType
+        this.product = invoiceItem.product
+        this.glAccount = invoiceItem.glAccount
+        this.budgetCode = invoiceItem.budgetCode
+        this.quantity = invoiceItem.quantity
+        this.quantityUom = invoiceItem.quantityUom
+        this.quantityPerUom = invoiceItem.quantityPerUom
+        this.amount = invoiceItem.amount
+        this.unitPrice = invoiceItem.unitPrice
+        this.dateCreated = invoiceItem.dateCreated
+        this.lastUpdated = invoiceItem.lastUpdated
+        this.createdBy = invoiceItem.createdBy
+        this.updatedBy = invoiceItem.updatedBy
     }
 
     OrderItem getOrderItem() {
