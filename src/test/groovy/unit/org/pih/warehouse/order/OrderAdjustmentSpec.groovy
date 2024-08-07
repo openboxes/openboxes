@@ -28,26 +28,4 @@ class OrderAdjustmentSpec extends Specification implements DomainUnitTest<OrderA
         OrderStatus.PENDING | false              || false
         OrderStatus.PLACED  | true               || false
     }
-
-    void 'OrderAdjustment.getIsEncumbered() should return: #isEncumbered when isInvoiced: #isInvoiced and hasPrepaymentInvoice: #hasPrepaymentInvoice'() {
-        given:
-        OrderAdjustment orderAdjustment = Spy(OrderAdjustment) {
-            getIsInvoiced() >> isInvoiced
-            getHasPrepaymentInvoice() >> hasPrepaymentInvoice
-        }
-
-        Order order = Spy(Order)
-        order.status = OrderStatus.PLACED
-        orderAdjustment.order = order
-
-        expect:
-        orderAdjustment.encumbered == isEncumbered
-
-        where:
-        isInvoiced | hasPrepaymentInvoice || isEncumbered
-        true       | true                 || false
-        true       | false                || false
-        false      | true                 || true
-        false      | false                || false
-    }
 }

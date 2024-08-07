@@ -10,7 +10,6 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
-import org.pih.warehouse.core.Location
 import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
@@ -219,7 +218,7 @@ class PurchaseOrderApiController {
                     orderItem?.quantity,
                     orderItem?.quantityShipped,
                     orderItem?.quantityReceived,
-                    orderItem?.quantityInvoicedInStandardUom,
+                    orderItem?.postedQuantityInvoicedInStandardUom,
                     orderItem?.unitPrice,
                     orderItem?.total,
                     orderItem?.order?.currencyCode,

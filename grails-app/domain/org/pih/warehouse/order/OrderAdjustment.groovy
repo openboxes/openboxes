@@ -112,10 +112,6 @@ class OrderAdjustment implements Serializable, Comparable<OrderAdjustment> {
         return hasPrepaymentInvoice && !hasRegularInvoice && order.placed
     }
 
-    Boolean isEncumbered() {
-        return !isInvoiced && hasPrepaymentInvoice && order.placed
-    }
-
     Boolean getHasInvoices() {
         return !invoices.empty
     }

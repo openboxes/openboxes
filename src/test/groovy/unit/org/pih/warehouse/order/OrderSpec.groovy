@@ -65,9 +65,11 @@ class OrderSpec extends Specification implements DomainUnitTest<Order> {
         OrderItem orderItem = Spy(OrderItem) {
             getHasPrepaymentInvoice() >> hasPrepaymentInvoice
             getHasRegularInvoice() >> false
+            isFullyInvoiced() >> false
+            getQuantityInvoiced() >> 0
+            getQuantityAvailableToInvoice() >> 1
             getAllInvoiceItems() >> []
         }
-        orderItem.isEncumbered() >> isEncumbered
         orderItem.orderItemStatusCode = orderItemStatusCode
         Set<OrderItem> orderItems = [
                 Mock(OrderItem),
@@ -80,11 +82,11 @@ class OrderSpec extends Specification implements DomainUnitTest<Order> {
         order.canGenerateInvoice == canGenerateInvoice
 
         where:
-        hasPrepaymentInvoice | orderItemStatusCode          | isEncumbered || canGenerateInvoice
-        false                | OrderItemStatusCode.CANCELED | false        || false
-        true                 | OrderItemStatusCode.CANCELED | false        || false
-        true                 | OrderItemStatusCode.PENDING  | true         || false
-        true                 | OrderItemStatusCode.CANCELED | true         || true
+        hasPrepaymentInvoice | orderItemStatusCode          || canGenerateInvoice
+        false                | OrderItemStatusCode.CANCELED || false
+        false                | OrderItemStatusCode.PENDING  || false
+        true                 | OrderItemStatusCode.CANCELED || true
+        true                 | OrderItemStatusCode.PENDING  || true
     }
 
     void "Order.getCanGenerateInvoice() should return true when when not all of the quantity has been invoiced"() {
@@ -94,10 +96,9 @@ class OrderSpec extends Specification implements DomainUnitTest<Order> {
         }
         OrderItem orderItem = Spy(OrderItem) {
             getHasPrepaymentInvoice() >> hasPrepaymentInvoice
-            getHasRegularInvoice() >> false
             getQuantityAvailableToInvoice() >> quantityAvailableToInvoice
         }
-        orderItem.isEncumbered() >> isEncumbered
+        orderItem.isFullyInvoiced() >> isFullyInvoiced
         Set<OrderItem> orderItems = [
                 Mock(OrderItem),
                 orderItem,
@@ -109,11 +110,11 @@ class OrderSpec extends Specification implements DomainUnitTest<Order> {
             order.canGenerateInvoice == canGenerateInvoice
 
         where:
-            hasPrepaymentInvoice | isEncumbered | quantityAvailableToInvoice || canGenerateInvoice
-            false                | true         | 1                          || false
-            true                 | false        | 1                          || false
-            true                 | true         | 0                          || false
-            true                 | true         | 1                          || true
+            hasPrepaymentInvoice | isFullyInvoiced | quantityAvailableToInvoice || canGenerateInvoice
+            false                | false           | 1                          || false
+            true                 | true            | 0                          || false
+            true                 | false           | 0                          || false
+            true                 | false           | 1                          || true
     }
 
     void "Order.isFullyInvoiceable() should return FALSE when there are no order items and no order adjustments"() {
