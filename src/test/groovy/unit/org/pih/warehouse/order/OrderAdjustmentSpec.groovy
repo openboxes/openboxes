@@ -9,10 +9,11 @@ import spock.lang.Unroll
 
 @Unroll
 class OrderAdjustmentSpec extends Specification implements DomainUnitTest<OrderAdjustment> {
-    void 'OrderAdjustment.getIsInvoiceable() should return #isInvoiceable when isInvoiced: #isInvoiced and the status of order is: #orderStatus'() {
+    void 'OrderAdjustment.getIsInvoiceable() should return #isInvoiceable when the status of order is: #orderStatus and has regular invoice: #hasRegularInvoice'() {
         given:
         OrderAdjustment orderAdjustment = Spy(OrderAdjustment) {
-            getIsInvoiced() >> isInvoiced
+            getHasRegularInvoice() >> hasRegularInvoice
+            getHasPrepaymentInvoice() >> true
         }
         orderAdjustment.order = Spy(Order)
         orderAdjustment.order.status = orderStatus
@@ -21,32 +22,10 @@ class OrderAdjustmentSpec extends Specification implements DomainUnitTest<OrderA
         orderAdjustment.invoiceable == isInvoiceable
 
         where:
-        isInvoiced | orderStatus         || isInvoiceable
-        true       | OrderStatus.PENDING || false
-        false      | OrderStatus.PLACED  || true
-        true       | OrderStatus.PLACED  || false
-        false      | OrderStatus.PENDING || false
-    }
-
-    void 'OrderAdjustment.getIsEncumbered() should return: #isEncumbered when isInvoiced: #isInvoiced and hasPrepaymentInvoice: #hasPrepaymentInvoice'() {
-        given:
-        OrderAdjustment orderAdjustment = Spy(OrderAdjustment) {
-            getIsInvoiced() >> isInvoiced
-            getHasPrepaymentInvoice() >> hasPrepaymentInvoice
-        }
-
-        Order order = Spy(Order)
-        order.status = OrderStatus.PLACED
-        orderAdjustment.order = order
-
-        expect:
-        orderAdjustment.encumbered == isEncumbered
-
-        where:
-        isInvoiced | hasPrepaymentInvoice || isEncumbered
-        true       | true                 || false
-        true       | false                || false
-        false      | true                 || true
-        false      | false                || false
+        orderStatus         | hasRegularInvoice  || isInvoiceable
+        OrderStatus.PENDING | false              || false
+        OrderStatus.PLACED  | false              || true
+        OrderStatus.PENDING | false              || false
+        OrderStatus.PLACED  | true               || false
     }
 }

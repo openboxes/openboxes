@@ -10,7 +10,7 @@ class OrderItemSpec extends Specification implements DomainUnitTest<OrderItem> {
     void 'OrderItem.isCompletelyInvoiced() should return: #isCompletelyInvoiced when quantity is: #quantity and quantityInvoicedInStandardUom is: #quantityInvoicedInStandardUom'() {
         given:
         OrderItem orderItem = Spy(OrderItem) {
-            getQuantityInvoicedInStandardUom() >> quantityInvoicedInStandardUom
+            getPostedQuantityInvoicedInStandardUom() >> quantityInvoicedInStandardUom
         }
         orderItem.quantity = quantity
 
@@ -24,28 +24,29 @@ class OrderItemSpec extends Specification implements DomainUnitTest<OrderItem> {
         0                             | 1        || false
     }
 
-    void 'OrderItem.getQuantityAvailableToInvoice() should return: #quantity when quantityShipped: #quantityShipped and quantityInvoiced: #quantityInvoiced and canceled: #canceled'() {
+    void 'OrderItem.getQuantityAvailableToInvoice() should return: #quantity when quantityInvoiced: #quantityInvoiced and getQuantityShipped: #quantityShipped and canceled: #canceled'() {
         given:
             OrderItem orderItem = Spy(OrderItem) {
                 isCanceled() >> canceled
-                getQuantityShippedInStandardUom() >> quantityShipped
                 getQuantityInvoicedInStandardUom() >> quantityInvoiced
+                getQuantityShippedInStandardUom() >> quantityShipped
             }
 
         expect:
             orderItem.quantityAvailableToInvoice == quantity
 
         where:
-            quantityShipped | quantityInvoiced | canceled || quantity
-            1               | 1                | true     || null
-            2               | 1                | false    || 1
+           quantityShipped | quantityInvoiced | canceled || quantity
+           1               | 1                | true     || null
+           2               | 1                | false    || 1
     }
 
     void 'OrderItem.isInvoiceable() should return: #isInoviceable when quantity available to invoice is #quantityAvailableToInvoice'() {
         given:
         OrderItem orderItem = Spy(OrderItem) {
+            getHasPrepaymentInvoice() >> true
+            isFullyInvoiced() >> false
             getQuantityAvailableToInvoice() >> quantityAvailableToInvoice
-            isEncumbered() >> true
         }
 
         expect:
@@ -59,20 +60,20 @@ class OrderItemSpec extends Specification implements DomainUnitTest<OrderItem> {
         100                        || true
     }
 
-    void 'OrderItem.isEncumbered() should return: #isEncumbered when quantityInvoicedInStandardUom: #quantityInvoicedInStandardUom and quantity: #quantity'() {
+    void 'OrderItem.isFullyInvoiced() should return: #isFullyInvoiced when quantityInvoicedInStandardUom: #quantityInvoicedInStandardUom and quantity: #quantity'() {
         given:
         OrderItem orderItem = Spy(OrderItem) {
-            getQuantityInvoicedInStandardUom() >> quantityInvoicedInStandardUom
+            getQuantityInvoiced() >> quantityInvoiced
         }
         orderItem.quantity = quantity
 
         expect:
-        orderItem.encumbered == isEncumbered
+        orderItem.isFullyInvoiced() == isFullyInvoiced
 
         where:
-        quantityInvoicedInStandardUom | quantity || isEncumbered
-        2                             | 1        || false
-        1                             | 1        || false
-        0                             | 1        || true
+        quantityInvoiced | quantity || isFullyInvoiced
+        2                | 1        || true
+        1                | 1        || true
+        0                | 1        || false
     }
 }
