@@ -14,6 +14,7 @@ class OrderSpec extends Specification implements DomainUnitTest<Order> {
         given:
         OrderAdjustment orderAdjustment = Stub(OrderAdjustment) {
             isInvoiceable() >> true
+            canBeOnRegularInvoice() >> true
         }
         Order order = Spy(Order) {
             getHasPrepaymentInvoice() >> hasPrepaymentInvoice
@@ -37,6 +38,7 @@ class OrderSpec extends Specification implements DomainUnitTest<Order> {
         }
         OrderItem orderItem = Stub(OrderItem)
         OrderAdjustment orderAdjustment = Stub(OrderAdjustment)
+        orderAdjustment.canBeOnRegularInvoice() >> true
         orderAdjustment.isInvoiceable() >> isAdjustmentInvoiceable
         orderItem.addToOrderAdjustments(orderAdjustment)
         order.addToOrderAdjustments(orderAdjustment)
@@ -166,9 +168,11 @@ class OrderSpec extends Specification implements DomainUnitTest<Order> {
             getQuantityRemaining() >> 0
         }
         OrderAdjustment adjustmentItem1 = Stub(OrderAdjustment) {
+            canBeOnRegularInvoice() >> true
             isInvoiceable() >> false
         }
         OrderAdjustment adjustmentItem2 = Stub(OrderAdjustment) {
+            canBeOnRegularInvoice() >> true
             isInvoiceable() >> false
         }
         Order order = new Order(orderItems: [orderItem1, orderItem2], orderAdjustments: [adjustmentItem1, adjustmentItem2])
@@ -180,17 +184,21 @@ class OrderSpec extends Specification implements DomainUnitTest<Order> {
     void "Order.isFullyInvoiceable() should return FALSE when all order items are invoiceable and one adjustment are not"() {
         given: "An order with fully invoicebale order items and one order adjustment not invoiceable"
         OrderItem orderItem1 = Stub(OrderItem) {
+            canBeOnRegularInvoice() >> true
             isInvoiceable() >> true
             getQuantityRemaining() >> 0
         }
         OrderItem orderItem2 = Stub(OrderItem) {
+            canBeOnRegularInvoice() >> true
             isInvoiceable() >> true
             getQuantityRemaining() >> 0
         }
         OrderAdjustment adjustmentItem1 = Stub(OrderAdjustment) {
+            canBeOnRegularInvoice() >> true
             isInvoiceable() >> true
         }
         OrderAdjustment adjustmentItem2 = Stub(OrderAdjustment) {
+            canBeOnRegularInvoice() >> true
             isInvoiceable() >> false
         }
         Order order = new Order(orderItems: [orderItem1, orderItem2], orderAdjustments: [adjustmentItem1, adjustmentItem2])
@@ -202,17 +210,21 @@ class OrderSpec extends Specification implements DomainUnitTest<Order> {
     void "Order.isFullyInvoiceable() should return FALSE when all order adjustments are invoiceable and all order items are not"() {
         given: "An order with fully invoicebale order adjustments and all order items not invoiceable"
         OrderItem orderItem1 = Stub(OrderItem) {
+            canBeOnRegularInvoice() >> true
             isInvoiceable() >> false
             getQuantityRemaining() >> 0
         }
         OrderItem orderItem2 = Stub(OrderItem) {
+            canBeOnRegularInvoice() >> true
             isInvoiceable() >> false
             getQuantityRemaining() >> 0
         }
         OrderAdjustment adjustmentItem1 = Stub(OrderAdjustment) {
+            canBeOnRegularInvoice() >> true
             isInvoiceable() >> true
         }
         OrderAdjustment adjustmentItem2 = Stub(OrderAdjustment) {
+            canBeOnRegularInvoice() >> true
             isInvoiceable() >> true
         }
         Order order = new Order(orderItems: [orderItem1, orderItem2], orderAdjustments: [adjustmentItem1, adjustmentItem2])
@@ -224,17 +236,21 @@ class OrderSpec extends Specification implements DomainUnitTest<Order> {
     void "Order.isFullyInvoiceable() should return FALSE when all order adjustments are invoiceable and one order item is not"() {
         given: "An order with fully invoicebale order adjustments and one order item not invoiceable"
         OrderItem orderItem1 = Stub(OrderItem) {
+            canBeOnRegularInvoice() >> true
             isInvoiceable() >> false
             getQuantityRemaining() >> 0
         }
         OrderItem orderItem2 = Stub(OrderItem) {
+            canBeOnRegularInvoice() >> true
             isInvoiceable() >> true
             getQuantityRemaining() >> 0
         }
         OrderAdjustment adjustmentItem1 = Stub(OrderAdjustment) {
+            canBeOnRegularInvoice() >> true
             isInvoiceable() >> true
         }
         OrderAdjustment adjustmentItem2 = Stub(OrderAdjustment) {
+            canBeOnRegularInvoice() >> true
             isInvoiceable() >> true
         }
         Order order = new Order(orderItems: [orderItem1, orderItem2], orderAdjustments: [adjustmentItem1, adjustmentItem2])
@@ -246,17 +262,21 @@ class OrderSpec extends Specification implements DomainUnitTest<Order> {
     void "Order.isFullyInvoiceable() should return FALSE when at least one order item has quantity remaining is greater than 0"() {
         given: "An order with fully invoiceable items and one order items with quantity remaining more than 0"
         OrderItem orderItem1 = Stub(OrderItem) {
+            canBeOnRegularInvoice() >> true
             isInvoiceable() >> true
             getQuantityRemaining() >> 1
         }
         OrderItem orderItem2 = Stub(OrderItem) {
+            canBeOnRegularInvoice() >> true
             isInvoiceable() >> true
             getQuantityRemaining() >> 0
         }
         OrderAdjustment adjustmentItem1 = Stub(OrderAdjustment) {
+            canBeOnRegularInvoice() >> true
             isInvoiceable() >> true
         }
         OrderAdjustment adjustmentItem2 = Stub(OrderAdjustment) {
+            canBeOnRegularInvoice() >> true
             isInvoiceable() >> true
         }
         Order order = new Order(orderItems: [orderItem1, orderItem2], orderAdjustments: [adjustmentItem1, adjustmentItem2])

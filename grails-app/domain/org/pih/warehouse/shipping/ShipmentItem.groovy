@@ -65,7 +65,7 @@ class ShipmentItem implements Comparable, Serializable {
             "purchaseOrders",
             "orderName",
             "quantityRemainingToShip",
-            "quantityToInvoice",
+            "quantityToInvoiceInStandardUom",
             "quantityPerUom",
             "hasRecalledLot",
             "quantityPicked",
@@ -274,16 +274,22 @@ class ShipmentItem implements Comparable, Serializable {
         return inventoryItem?.lotStatus == LotStatusCode.RECALLED
     }
 
+    // quantity invoiced in uom
     Integer getQuantityInvoiced() {
         return invoiceItems?.sum { it.quantity ?: 0 } ?: 0
     }
 
-    Integer getQuantityToInvoice() {
-        return quantity - quantityInvoiced
+    Integer getQuantityInvoicedInStandardUom() {
+        return quantityInvoiced * quantityPerUom
+    }
+
+    Integer getQuantityToInvoiceInStandardUom() {
+        // ShipmentItem.quantity is in standard uom
+        return quantity - quantityInvoicedInStandardUom
     }
 
     Boolean isInvoiceable() {
-        return quantityToInvoice > 0
+        return quantityToInvoiceInStandardUom > 0
     }
 
     /**
