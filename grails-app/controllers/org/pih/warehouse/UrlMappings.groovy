@@ -856,6 +856,11 @@ class UrlMappings {
             action = [GET: "listOfDemoData"]
         }
 
+        "/api/fulfillments" {
+            controller = { "fulfillmentApi" }
+            action = [POST: "createOutbound"]
+        }
+
         "/api/fulfillments/validate" {
             controller = { "fulfillmentApi" }
             action = [POST: "validate"]

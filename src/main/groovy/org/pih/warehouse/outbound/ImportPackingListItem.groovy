@@ -2,7 +2,6 @@ package org.pih.warehouse.outbound
 
 import grails.databinding.BindUsing
 import grails.util.Holders
-import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
@@ -27,16 +26,18 @@ class ImportPackingListItem implements Validateable {
 
     Date expirationDate
 
+    Location origin
+
     @BindUsing({ obj, source ->
-        Location location = Location.findByNameOrDefault(source['binLocation'])
+        Location internalLocation = Location.findByNameAndParentLocation(source['binLocation'], obj.origin)
         // If location is not found, but we provided bin location name, it means, the location was not found,
         // and we want to indicate that, instead of falling back to default (null)
         // without this, we would then search e.g. for quantity available to promise for a product in the default bin location
-        if (!location && source['binLocation'] && !source['binLocation'].equalsIgnoreCase(Constants.DEFAULT_BIN_LOCATION_NAME)) {
+        if (!internalLocation && source['binLocation'] && !source['binLocation'].equalsIgnoreCase(Constants.DEFAULT_BIN_LOCATION_NAME)) {
             // We want to indicate, that a bin location for given name has not been found.
             obj.binLocationFound = false
         }
-        return location
+        return internalLocation
      })
     Location binLocation
 
@@ -83,13 +84,12 @@ class ImportPackingListItem implements Validateable {
             if (!inventoryItem) {
                 return ['inventoryItemNotFound']
             }
-            Location currentLocation = AuthService.currentLocation
-            Integer quantity = productAvailabilityService.getQuantityAvailableToPromiseForProductInBin(inventoryItem, currentLocation, item.binLocation)
-            if (!quantity) {
-                return ['noStock']
+            Integer quantity = productAvailabilityService.getQuantityAvailableToPromiseForProductInBin(item.origin, item.binLocation, inventoryItem)
+            if (quantity <= 0) {
+                return ['stockout']
             }
             if (quantityPicked > quantity) {
-                return ['overPick', quantityPicked]
+                return ['overpick', quantityPicked]
             }
             return true
         })

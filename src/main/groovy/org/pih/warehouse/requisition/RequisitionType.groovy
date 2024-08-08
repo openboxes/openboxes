@@ -13,8 +13,9 @@ enum RequisitionType {
 
     STOCK(0),
     ADHOC(1),
-    NON_STOCK(2),
-    DEFAULT(3),
+    IMPORT(2),
+    NON_STOCK(3),
+    DEFAULT(4),
 
     int sortOrder
 

@@ -36,6 +36,7 @@ class Constants {
     static final String EUROPEAN_DATE_FORMAT = "dd/MM/yyyy"
     static final String DISPLAY_DATE_FORMAT = "MMM DD, yyyy"
     static final String DISPLAY_DATE_DEFAULT_VALUE = "-"
+    static final String GENERATE_NAME_DATE_FORMAT = "ddMMMyyyy"
 
     static final String SPANISH_MEXICO_ORDER_IMPORT_DATE_FORMAT = "dd/MM/yyyy"
     static final String DEFAULT_ORDER_IMPORT_DATE_FORMAT = "MM/dd/yyyy"

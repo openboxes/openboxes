@@ -1025,18 +1025,18 @@ class ProductAvailabilityService {
         return quantityAvailableToPromiseByProductNotInBin ?: 0
     }
 
-    Integer getQuantityAvailableToPromiseForProductInBin(InventoryItem inventoryItem, Location location, Location binLocation) {
+    Integer getQuantityAvailableToPromiseForProductInBin(Location origin, Location binLocation, InventoryItem inventoryItem) {
         return ProductAvailability.createCriteria().get {
             projections {
                 property("quantityAvailableToPromise")
             }
             eq("inventoryItem", inventoryItem)
-            eq("location", location)
+            eq("location", origin)
             if (binLocation) {
                 eq("binLocation", binLocation)
-                return
+            } else {
+                isNull("binLocation")
             }
-            isNull("binLocation")
         }
     }
 

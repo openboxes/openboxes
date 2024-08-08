@@ -35,6 +35,6 @@ class CommandUtils {
         ApplicationTagLib g = Holders.grailsApplication.mainContext.getBean(ApplicationTagLib)
         errors.allErrors
                 .groupBy { FieldError error -> error.field }
-                .collectEntries { [it.key, it.value.collect{ error -> g.message(error: error)}] } as Map<String, List<String>>
+                .collectEntries { [it.key, it.value.collect { error -> g.message(error: error)}] } as Map<String, List<String>>
     }
 }

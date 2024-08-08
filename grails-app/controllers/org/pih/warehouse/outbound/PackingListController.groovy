@@ -18,6 +18,5 @@ class PackingListController {
         DataImporter packingListImporter = new PackingListExcelImporter(localFile.absolutePath)
 
         render([data: packingListImporter.toJson() ] as JSON)
-
     }
 }
