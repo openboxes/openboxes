@@ -218,7 +218,7 @@ class PurchaseOrderApiController {
                     orderItem?.quantity,
                     orderItem?.quantityShipped,
                     orderItem?.quantityReceived,
-                    orderItem?.postedQuantityInvoicedInStandardUom,
+                    orderItem?.postedQuantityInvoiced,
                     orderItem?.unitPrice,
                     orderItem?.total,
                     orderItem?.order?.currencyCode,

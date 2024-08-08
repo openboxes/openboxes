@@ -317,20 +317,22 @@ class ConfirmInvoicePage extends Component {
 
   submitInvoice() {
     const url = `/api/invoices/${this.state.values.id}/submit`;
+    this.props.showSpinner();
     apiClient.post(url)
       .then(() => {
         window.location = INVOICE_URL.show(this.state.values.id);
       })
-      .catch(() => this.props.hideSpinner());
+      .finally(() => this.props.hideSpinner());
   }
 
   postInvoice() {
     const url = `/api/invoices/${this.state.values.id}/post`;
+    this.props.showSpinner();
     apiClient.post(url)
       .then(() => {
         window.location = INVOICE_URL.show(this.state.values.id);
       })
-      .catch(() => this.props.hideSpinner());
+      .finally(() => this.props.hideSpinner());
   }
 
   fetchPrepaymentItems() {

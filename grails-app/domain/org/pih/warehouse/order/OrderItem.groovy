@@ -303,15 +303,16 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
         return quantityInvoiced >= quantity
     }
 
+    // Including not yet posted invoices
     Integer getQuantityInvoiced() {
-        return quantityInvoicedInStandardUom / (quantityPerUom?:1)
+        return allInvoiceItems
+                ?.findAll { !it?.invoice?.isPrepaymentInvoice }
+                ?.sum { it.quantity } ?: 0
     }
 
     // Including not yet posted invoices
     Integer getQuantityInvoicedInStandardUom() {
-        return allInvoiceItems
-                ?.findAll { !it?.invoice?.isPrepaymentInvoice }
-                ?.sum { it.quantity } ?: 0
+        return quantityInvoiced * (quantityPerUom ?: 1)
     }
 
     Integer getQuantityAvailableToInvoice() {
@@ -321,15 +322,28 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
     }
 
     /**
+     * Item can be on a regular invoice if it is not canceled or if it is canceled, but has prepayment
+     * */
+    Boolean canBeOnRegularInvoice() {
+        if (canceled) {
+            return hasPrepaymentInvoice
+        }
+
+        return true
+    }
+
+    /**
      * Used in final invoices for prepaid invoices. Item is invoiceable if:
-     *  - has prepayment invoice,
-     *  - is not yet fully invoiced (even on not yet posted invoices),
-     *  - is canceled or still have quantity available to invoice
+     *  - is canceled and this item has prepayment invoice item (and was not yet invoiced),
+     *  - is not canceled and is not yet fully invoiced and has quantity available to invoice
+     *      (even on not yet posted invoices, >> and does not have to have prepaymnent invoice item <<),
      * */
     Boolean isInvoiceable() {
-        return hasPrepaymentInvoice &&
-                !fullyInvoiced &&
-                (canceled || quantityAvailableToInvoice > 0)
+        if (canceled) {
+            return hasPrepaymentInvoice && !fullyInvoiced
+        }
+
+        return !fullyInvoiced && quantityAvailableToInvoice > 0
     }
 
     Boolean isPending() {
@@ -397,9 +411,7 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
 
     // Check quantity (standard uom) in posted invoices
     Integer getPostedQuantityInvoicedInStandardUom() {
-        allInvoiceItems?.findAll {
-            it?.invoice?.datePosted != null && !it?.invoice?.isPrepaymentInvoice
-        }?.collect {  it.quantity }?.sum() ?: 0
+        return postedQuantityInvoiced * (quantityPerUom?:1)
     }
 
     def getInvoices() {
@@ -419,7 +431,9 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
     }
 
     Integer getPostedQuantityInvoiced() {
-        return postedQuantityInvoicedInStandardUom / (quantityPerUom?:1)
+        return allInvoiceItems?.findAll {
+            it?.invoice?.datePosted != null && !it?.invoice?.isPrepaymentInvoice
+        }?.collect {  it.quantity }?.sum() ?: 0
     }
 
     Set<ShipmentItem> getInvoiceableShipmentItems() {

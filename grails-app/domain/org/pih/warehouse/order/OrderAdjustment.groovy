@@ -108,8 +108,23 @@ class OrderAdjustment implements Serializable, Comparable<OrderAdjustment> {
         return invoiceItems*.invoice.unique()
     }
 
+    /**
+     * Adjustment can be on a regular invoice if it is not canceled or if it is canceled, but has prepayment
+     * */
+    Boolean canBeOnRegularInvoice() {
+        if (canceled) {
+            return hasPrepaymentInvoice
+        }
+
+        return true
+    }
+
     Boolean isInvoiceable() {
-        return hasPrepaymentInvoice && !hasRegularInvoice && order.placed
+        if (canceled) {
+            return hasPrepaymentInvoice && !hasRegularInvoice && order.placed
+        }
+
+        return !hasRegularInvoice && order.placed
     }
 
     Boolean getHasInvoices() {

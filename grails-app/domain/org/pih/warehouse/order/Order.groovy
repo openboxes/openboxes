@@ -480,7 +480,7 @@ class Order implements Serializable {
             3. Quantity greater than 0 of the item has been shipped and not all of that quantity has already been invoiced.
     **/
     Boolean getCanGenerateInvoice() {
-        // If prepayment invoice doesn't exist we can't generate invoice
+        // If prepayment invoice for this order doesn't exist we can't generate invoice
         if (!hasPrepaymentInvoice) {
             return false
         }
@@ -495,13 +495,11 @@ class Order implements Serializable {
     }
 
     Boolean hasInvoiceableOrderItem() {
-        return orderItems.any { it.invoiceable }
+        return orderItems.any { it.canBeOnRegularInvoice() && it.invoiceable }
     }
 
     Boolean hasInvoiceableOrderAdjustment() {
-        return orderAdjustments.any {
-            it.invoiceable
-        }
+        return orderAdjustments.any { it.canBeOnRegularInvoice() && it.invoiceable }
     }
 
     def getActiveOrderItems() {
@@ -528,14 +526,22 @@ class Order implements Serializable {
         return orderType?.isTransferOrder()
     }
 
+    /**
+     * Order is fully invoiceable if all items and adjustment that can be added to regular invoice,
+     *  that are not yet fully invoiced are fully invoiceable.
+     * */
     Boolean isFullyInvoiceable() {
         if (!orderItems && !orderAdjustments) {
             return false
         }
 
-        Boolean areAllOrderItemsInvoiceable = !orderItems ?: orderItems.every{ it.invoiceable && it.quantityRemaining == 0 }
+        Boolean areAllOrderItemsInvoiceable = !orderItems ?: orderItems
+                .findAll { it.canBeOnRegularInvoice() && !it.fullyInvoiced }
+                .every { it.invoiceable && it.quantityRemaining == 0 }
 
-        Boolean areAllOrderAdjustmentsInvoiceable = !orderAdjustments ?: orderAdjustments.every{ it.invoiceable }
+        Boolean areAllOrderAdjustmentsInvoiceable = !orderAdjustments ?: orderAdjustments
+                .findAll { it.canBeOnRegularInvoice() && !it.hasRegularInvoice }
+                .every { it.invoiceable }
 
         return areAllOrderItemsInvoiceable && areAllOrderAdjustmentsInvoiceable
     }
