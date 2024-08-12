@@ -19,13 +19,13 @@ class FulfillmentRequest implements Validateable {
         description(nullable: true)
         origin(validator: { Location origin, FulfillmentRequest obj ->
             if (origin?.id == obj.destination?.id) {
-                return ['invalid']
+                return ['sameAsDestination']
             }
             return true
         })
         destination(validator: { Location destination, FulfillmentRequest obj ->
             if (destination?.id == obj.origin?.id) {
-                return ['invalid']
+                return ['sameAsOrigin']
             }
             return true
         })

@@ -73,7 +73,7 @@ class PackingListExcelImporter extends AbstractExcelImporter implements DataImpo
         return data.collect { [
                 palletName: it?.palletName,
                 boxName: it?.boxName,
-                productCode: it["productCode"],
+                productCode: it?.productCode,
                 lotNumber: it?.lotNumber,
                 expirationDate: it?.expirationDate,
                 binLocation: it?.binLocation,

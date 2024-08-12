@@ -39,6 +39,7 @@ import org.pih.warehouse.requisition.RequisitionType
 import org.pih.warehouse.shipping.Container
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
+import util.StringUtil
 
 
 @Transactional
@@ -138,9 +139,7 @@ class FulfillmentService {
         if (description) {
             name.append("${separator}${description}")
         }
-        return name
-                .toString()
-                .replace(Constants.SPACE_SEPARATOR, "")
+        return StringUtil.removeWhiteSpace(name.toString())
     }
 
     Requisition createRequisition(FulfillmentRequest fulfillmentRequest) {
