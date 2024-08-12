@@ -2,6 +2,7 @@ package unit.org.pih.warehouse.invoice
 
 import grails.testing.gorm.DataTest
 import grails.testing.services.ServiceUnitTest
+import org.pih.warehouse.core.GlAccount
 import org.pih.warehouse.core.IdentifierService
 import org.pih.warehouse.invoice.Invoice
 import org.pih.warehouse.invoice.InvoiceItem
@@ -11,6 +12,7 @@ import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderAdjustment
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.OrderItemStatusCode
+import org.pih.warehouse.product.Product
 import org.pih.warehouse.shipping.ShipmentItem
 import spock.lang.FailsWith
 import spock.lang.Shared
@@ -50,52 +52,29 @@ class PrepaymentInvoiceServiceSpec extends Specification implements ServiceUnitT
         null != service.generateInvoice(order)
     }
 
-    void 'PrepaymentInvoiceService.generateInvoice() should create invoice not including already invoiced items'() {
+    void 'PrepaymentInvoiceService.createFromShipmentItem() should calculate quantity to invoice: #quantityToInvoice when quantity is: #quantity and quantity invoiced: #quantityInvoiced'() {
         given:
-        // Already invoiced canceled item shouldn't be invoiced again
-        OrderItem canceledItem = Stub(OrderItem) {
-            isInvoiceable() >> false
+        mockDomain(ShipmentItem)
+        mockDomain(InvoiceItem)
+        ShipmentItem shipmentItem = Spy(ShipmentItem) {
+            getQuantityInvoiced() >> quantityInvoiced
         }
-        canceledItem.orderItemStatusCode = OrderItemStatusCode.CANCELED
-        // Already invoiced item without qty shouldn't be invoiced again
-        OrderItem notCanceledItem = Stub(OrderItem) {
-            isInvoiceable() >> false
-        }
-        // Already invoiced adjustment shouldn't be invoiced again
-        OrderAdjustment alreadyInvoicedAdjustment = Stub(OrderAdjustment) {
-            isInvoiceable() >> false
-        }
-        // Invoiceable order item, should be visible on invoice
-        OrderItem invoiceableOrderItem = Stub(OrderItem) {
-            isInvoiceable() >> true
-            getInvoiceableShipmentItems() >> [Mock(ShipmentItem)]
-        }
-        // Invoiceable order adjustment, should be visible on invoice
-        OrderAdjustment invoiceableOrderAdjustment = Stub(OrderAdjustment) {
-            isInvoiceable() >> true
-        }
-
-        and:
-        Set<OrderAdjustment> orderAdjustments = [
-                alreadyInvoicedAdjustment,
-                invoiceableOrderAdjustment
-        ]
-        Set<OrderItem> orderItems = [
-                notCanceledItem,
-                canceledItem,
-                invoiceableOrderItem,
-        ]
-        Order order = Spy(Order) {
-            getHasPrepaymentInvoice() >> true
-        }
-        order.orderItems = orderItems
-        order.orderAdjustments = orderAdjustments
+        shipmentItem.quantity = quantity
+        shipmentItem.product = Stub(Product)
+        shipmentItem.product.glAccount = Mock(GlAccount)
+        shipmentItem.addToOrderItems(new OrderItem())
 
         when:
-        Invoice generatedInvoice = service.generateInvoice(order)
+        InvoiceItem invoiceItem = service.createFromShipmentItem(shipmentItem)
 
         then:
-        generatedInvoice != null
-        generatedInvoice.invoiceItems.size() == 2
+        invoiceItem.quantity == quantityToInvoice
+
+        where:
+        quantity | quantityInvoiced || quantityToInvoice
+        1        | 1                || 0
+        5        | 2                || 3
+        6        | 0                || 6
+        0        | 0                || 0
     }
 }

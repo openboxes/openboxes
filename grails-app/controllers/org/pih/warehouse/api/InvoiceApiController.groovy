@@ -192,7 +192,7 @@ class InvoiceApiController {
         render([data: invoice?.toJson()] as JSON)
     }
 
-
+    @Deprecated
     def getPrepaymentItems() {
         Invoice invoice = Invoice.get(params.id)
         List<InvoiceItem> prepaymentItems = invoice.prepaymentItems

@@ -2,8 +2,9 @@ package org.pih.warehouse.invoice
 
 enum InvoiceItemType {
 
-    REGULAR('Regular'),
-    INVERSE('Inverse')
+    INVERSE('Inverse'),
+    PREPAYMENT('Prepayment'),
+    REGULAR('Regular')
 
     String type
 

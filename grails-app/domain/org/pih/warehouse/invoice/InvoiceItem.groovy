@@ -18,7 +18,6 @@ import org.pih.warehouse.core.User
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderAdjustment
 import org.pih.warehouse.order.OrderItem
-import org.pih.warehouse.order.RefreshOrderSummaryEvent
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
@@ -83,7 +82,8 @@ class InvoiceItem implements Serializable {
         product(nullable: true)
         glAccount(nullable: true)
         budgetCode(nullable: true)
-        quantity(nullable: false, min: 0, validator: { Integer quantity, InvoiceItem obj ->
+        // TODO: Temporarily allowing negative quantities (once we start using amount field this should be beck to min 0)
+        quantity(nullable: false, validator: { Integer quantity, InvoiceItem obj ->
             // If the invoice is a prepayment or the item is an order adjustment,
             // the validation below doesn't make sense, because
             // we do not have shipmentItem at this point.
@@ -115,22 +115,6 @@ class InvoiceItem implements Serializable {
         updatedBy(nullable: true)
         createdBy(nullable: true)
         invoiceItemType(nullable: true)
-    }
-
-    InvoiceItem(InvoiceItem invoiceItem) {
-        this.invoiceItemType = invoiceItem.invoiceItemType
-        this.product = invoiceItem.product
-        this.glAccount = invoiceItem.glAccount
-        this.budgetCode = invoiceItem.budgetCode
-        this.quantity = invoiceItem.quantity
-        this.quantityUom = invoiceItem.quantityUom
-        this.quantityPerUom = invoiceItem.quantityPerUom
-        this.amount = invoiceItem.amount
-        this.unitPrice = invoiceItem.unitPrice
-        this.dateCreated = invoiceItem.dateCreated
-        this.lastUpdated = invoiceItem.lastUpdated
-        this.createdBy = invoiceItem.createdBy
-        this.updatedBy = invoiceItem.updatedBy
     }
 
     OrderItem getOrderItem() {
@@ -166,7 +150,7 @@ class InvoiceItem implements Serializable {
     // Total shipment item value
     def getTotalAmount() {
         def total = (quantity ?: 0.0) * (unitPrice ?: 0.0)
-        if (isPrepaymentInvoice) {
+        if (isPrepaymentInvoice || inverseItem) {
             return total * ((order.paymentTerm?.prepaymentPercent?:100) / 100)
         }
 
@@ -188,7 +172,11 @@ class InvoiceItem implements Serializable {
     }
 
     boolean getIsPrepaymentInvoice() {
-        return invoice.isPrepaymentInvoice
+        return invoice?.isPrepaymentInvoice
+    }
+
+    boolean isInverseItem() {
+        return invoiceItemType == InvoiceItemType.INVERSE
     }
 
     Map toJson() {
@@ -210,7 +198,8 @@ class InvoiceItem implements Serializable {
                 totalPrepaymentAmount: totalPrepaymentAmount,
                 orderAdjustment: orderAdjustment,
                 productName: product?.name,
-                displayNames: product?.displayNames
+                displayNames: product?.displayNames,
+                type: invoiceItemType?.name()
         ]
     }
 }
