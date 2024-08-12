@@ -26,11 +26,7 @@ import { formatDate } from 'utils/translation-utils';
 const FIELDS = {
   reasonCode: {
     type: SelectField,
-    label: () => (
-      <label htmlFor="reasonCode" className="ml-3 text-center">
-        <Translate id="react.stockMovement.reasonCode.label" defaultMessage="Reason code" />
-      </label>
-    ),
+    label: 'react.stockMovement.reasonCode.label',
     defaultMessage: 'Reason code',
     attributes: {
       className: 'mb-2',
