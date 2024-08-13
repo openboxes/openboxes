@@ -95,4 +95,25 @@ class ImportPackingListItem implements Validateable {
         })
         binLocationFound(bindable: false)
     }
+
+    Map toTableJson() {
+        [
+            rowId: rowId,
+            product: [
+                id: product?.id,
+                name: product?.name,
+                productCode: product?.productCode
+            ],
+            binLocation: binLocation?.name,
+            palletName: palletName,
+            boxName: boxName,
+            lotNumber: lotNumber,
+            quantityPicked: quantityPicked,
+            recipient: recipient?.name,
+            expirationDate: expirationDate,
+            origin: [
+                id: origin?.id,
+            ],
+        ]
+    }
 }
