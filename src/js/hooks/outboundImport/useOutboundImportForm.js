@@ -1,23 +1,22 @@
 import { useEffect, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { HttpStatusCode } from 'axios';
 import _ from 'lodash';
 import moment from 'moment/moment';
 import { useForm } from 'react-hook-form';
 import { useSelector } from 'react-redux';
 
+import fulfillmentApi from 'api/services/FulfillmentApi';
+import packingListApi from 'api/services/PackingListApi';
 import notification from 'components/Layout/notifications/notification';
 import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
 import NotificationType from 'consts/notificationTypes';
 import { DateFormat } from 'consts/timeFormat';
 import useOutboundImportValidation from 'hooks/outboundImport/useOutboundImportValidation';
 import useTranslate from 'hooks/useTranslate';
-import apiClient from 'utils/apiClient';
 
-// TODO: Remove this before feature is finished
-// TODO: Remove this before feature is finished
-
-const useOutboundImportForm = () => {
+const useOutboundImportForm = ({ next }) => {
   const translate = useTranslate();
   const { validationSchema } = useOutboundImportValidation();
   const { currentLocation } = useSelector((state) => ({
@@ -41,9 +40,33 @@ const useOutboundImportForm = () => {
     packingList: undefined,
   });
 
-  const [lineItems] = useState([]);
-  const [lineItemErrors] = useState({});
-  const [headerDetailsData] = useState({});
+  /**
+   * State to store data that is displayed in the table
+   * (this data is a bit different than the one sent to the backend for save)
+   * Do not use this one to send the data for save/validation, but use the packingListData
+   */
+  const [tableData, setTableData] = useState([]);
+  // State to store data that is sent to the API for validation/save
+  const [packingListData, setPackingListData] = useState([]);
+  const [errorsData, setErrorsData] = useState({
+    errors: {},
+    // Store validation status to easily maintain the disabled prop of the Finish button
+    validateStatus: HttpStatusCode.Ok,
+  });
+
+  const buildDetailsPayload = (values) => {
+    const basicDetails = {
+      // Omit values from sending options
+      ..._.omit(values, 'shipmentType', 'trackingNumber', 'dateShipped', 'expectedDeliveryDate', 'packingList'),
+      dateRequested: moment(values.dateRequested).format(DateFormat.MM_DD_YYYY),
+    };
+    const sendingOptions = {
+      ..._.pick(values, ['shipmentType', 'trackingNumber']),
+      expectedShippingDate: moment(values.dateShipped).format(DateFormat.MM_DD_YYYY),
+      expectedDeliveryDate: moment(values.expectedDeliveryDate).format(DateFormat.MM_DD_YYYY),
+    };
+    return { basicDetails, sendingOptions };
+  };
 
   const {
     control,
@@ -59,13 +82,25 @@ const useOutboundImportForm = () => {
       zodResolver(validationSchema(values))(values, context, options),
   });
 
-  // TODO: implement data validation request
-  // TODO: implement data validation request
-  const onSubmitStockMovementDetails = (values) => {
-    // here distinguish whether the onSubmit happens from detalis step or confirm page.
-    // if it happens from details step, send an endpoint to validate the data,
-    // if from confirm page - save & validate
-    console.log(values.packingList);
+  /**
+   * Method to group items to two arrays - first - containing items that have validation errors,
+   * and second - containing the items without validation errors
+   */
+  const groupTableDataByErrors = (data) => data?.reduce?.((acc, item) => {
+    if (data?.errors?.packingList?.[item.rowId]) {
+      return {
+        ...acc,
+        itemsWithErrors: [...acc.itemsWithErrors, item],
+      };
+    }
+    return {
+      ...acc,
+      itemsWithoutErrors: [...acc.itemsWithoutErrors, item],
+    };
+  }, { itemsWithErrors: [], itemsWithoutErrors: [] });
+
+  // onSubmit method that is run on the first step (import file + validation of outbound)
+  const onSubmitStockMovementDetails = async (values) => {
     const formData = new FormData();
     formData.append('importFile', values.packingList);
     const config = {
@@ -73,49 +108,56 @@ const useOutboundImportForm = () => {
         'content-type': 'multipart/form-data',
       },
     };
-    apiClient.post('/packingList/importPackingList', formData, config).then((res) => {
-      console.log(res);
-      const basicDetails = {
-        ..._.omit(values, 'shipmentType', 'trackingNumber', 'dateShipped', 'expectedDeliveryDate', 'packingList'),
-        dateRequested: moment(values.dateRequested).format(DateFormat.MM_DD_YYYY),
-      };
-      const sendingOptions = {
-        ..._.pick(values, ['shipmentType', 'trackingNumber']),
-        expectedShippingDate: moment(values.dateShipped).format(DateFormat.MM_DD_YYYY),
-        expectedDeliveryDate: moment(values.expectedDeliveryDate).format(DateFormat.MM_DD_YYYY),
-      };
+    const importPackingListResponse = await packingListApi.importPackingList(formData, config);
+    const { basicDetails, sendingOptions } = buildDetailsPayload(values);
 
-      const items = res.data.data.map((item) => ({
-        origin: basicDetails.origin.id,
-        ...item,
-        product: item.productCode,
-        rowId: _.uniqueId(),
-      }));
-
-      apiClient.post('/api/fulfillments/validate', {
+    const packingList = importPackingListResponse.data.data.map((item) => ({
+      // !!! A hack to make the origin being bound first in the command object on backend !!!
+      // Origin needs to be bound first, as the binLocation is bound using the just bound origin
+      // Do not remove this
+      origin: basicDetails.origin.id,
+      ...item,
+      product: item.productCode,
+      rowId: _.uniqueId(),
+    }));
+    // Set the packing list data that is sent to API
+    setPackingListData(packingList);
+    try {
+      const validationResponse = await fulfillmentApi.validateOutbound({
         fulfillmentDetails: basicDetails,
-        packingList: items,
+        packingList,
         sendingOptions,
-      }).then(() => apiClient.post('/api/fulfillments', {
-        fulfillmentDetails: basicDetails,
-        packingList: items,
-        sendingOptions,
-      })).then((response) => {
-        window.location = STOCK_MOVEMENT_URL.show(response.data.data.id);
       });
-    });
+      // Set the table data that is used to display the items in the React table
+      setTableData(validationResponse.data.data);
+      setErrorsData({ errors: {}, validateStatus: validationResponse.status });
+    } catch (e) {
+      setErrorsData({ errors: e.response.data.errors, validateStatus: e.response.status });
+      // Group errors by errors and make the items with errors appear at the top,
+      // by merging two grouped arrays
+      const tableDataGrouped = groupTableDataByErrors(e.response.data);
+      setTableData([...tableDataGrouped.itemsWithErrors, ...tableDataGrouped.itemsWithoutErrors]);
+    }
+
+    next();
   };
 
-  // TODO: implement confirm import logic
-  const onConfirmImport = (values) => {
-    // here distinguish whether the onSubmit happens from details step or confirm page.
-    // if it happens from details step, send an endpoint to validate the data,
-    // if from confirm page - save & validate
-    console.log('Sending values for saving import', values, lineItems);
+  /**
+   * Method that is run on confirm step when attempting to save the outbound (Finish button)
+   */
+  const onConfirmImport = async (values) => {
+    const { basicDetails, sendingOptions } = buildDetailsPayload(values);
+
+    const response = await fulfillmentApi.createOutbound({
+      fulfillmentDetails: basicDetails,
+      packingList: packingListData,
+      sendingOptions,
+    });
     notification(NotificationType.SUCCESS)({
       message: translate('react.outboundImport.form.created.success.label', 'Stock Movement has been created successfully'),
     });
-    // TODO: redirect to created stockMovement show page
+    // If the save went sucessfully, redirect to the stock movement view page
+    window.location = STOCK_MOVEMENT_URL.show(response.data?.data?.id);
   };
 
   useEffect(() => {
@@ -136,10 +178,10 @@ const useOutboundImportForm = () => {
     isValid,
     onSubmitStockMovementDetails,
     onConfirmImport,
-    headerDetailsData,
     trigger,
-    lineItemErrors,
-    lineItems,
+    lineItemErrors: errorsData.errors,
+    lineItems: tableData,
+    validateStatus: errorsData.validateStatus,
   };
 };
 
