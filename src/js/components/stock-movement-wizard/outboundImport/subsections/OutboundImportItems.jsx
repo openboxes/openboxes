@@ -26,12 +26,18 @@ const OutboundImportItems = ({ data, errors }) => {
       Header: translate('react.outboundImport.table.column.productCode.label', 'Code'),
       accessor: 'product.productCode',
       width: 90,
+      getProps: () => ({
+        errorAccessor: 'product',
+      }),
       Cell: (row) => <TableCell {...row} showError />,
     },
     {
       Header: translate('react.outboundImport.table.column.productName.label', 'Product'),
       accessor: 'product.name',
       minWidth: 150,
+      getProps: () => ({
+        errorAccessor: 'product',
+      }),
       Cell: (row) => (
         <TableCell
           {...row}
@@ -61,13 +67,13 @@ const OutboundImportItems = ({ data, errors }) => {
     },
     {
       Header: translate('react.outboundImport.table.column.binLocation.label', 'Bin Location'),
-      accessor: 'binLocation.name',
+      accessor: 'binLocation',
       show: hasBinLocationSupport,
       Cell: (row) => <TableCell {...row} showError />,
     },
     {
       Header: translate('react.outboundImport.table.column.recipient.label', 'Recipient'),
-      accessor: 'recipient.name',
+      accessor: 'recipient',
       Cell: (row) => <TableCell {...row} showError />,
     },
     {
