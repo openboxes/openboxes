@@ -52,9 +52,12 @@ const DataTable = React.forwardRef((props, ref) => {
           row: rowInfo?.row,
           error: errors[rowInfo?.index],
         })}
-        getTdProps={(state, rowInfo, columnInfo) => ({
-          error: _.get(errors, `['${rowInfo?.index}']['${columnInfo?.id}']`, undefined),
-        })}
+        getTdProps={(state, rowInfo, columnInfo) => {
+          const columnErrorAccessor = columnInfo?.getProps()?.errorAccessor ?? columnInfo?.id;
+          return {
+            error: _.get(errors.packingList, `['${rowInfo?.original?.rowId}']['${columnErrorAccessor}']`, undefined),
+          };
+        }}
       />
     </div>
   );
@@ -83,6 +86,4 @@ DataTable.propTypes = {
   errors: PropTypes.shape({}),
 };
 
-
 export default DataTable;
-
