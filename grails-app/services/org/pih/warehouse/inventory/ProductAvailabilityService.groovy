@@ -1025,6 +1025,21 @@ class ProductAvailabilityService {
         return quantityAvailableToPromiseByProductNotInBin ?: 0
     }
 
+    Integer getQuantityAvailableToPromiseForProductInBin(Location origin, Location binLocation, InventoryItem inventoryItem) {
+        return ProductAvailability.createCriteria().get {
+            projections {
+                property("quantityAvailableToPromise")
+            }
+            eq("inventoryItem", inventoryItem)
+            eq("location", origin)
+            if (binLocation) {
+                eq("binLocation", binLocation)
+            } else {
+                isNull("binLocation")
+            }
+        }
+    }
+
     /**
      * Used for product merge feature (when primary product *had not*
      * the same lot as obsolete product). Change product to primary for rows
