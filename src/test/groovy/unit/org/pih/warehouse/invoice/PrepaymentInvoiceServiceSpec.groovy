@@ -62,7 +62,9 @@ class PrepaymentInvoiceServiceSpec extends Specification implements ServiceUnitT
         shipmentItem.quantity = quantity
         shipmentItem.product = Stub(Product)
         shipmentItem.product.glAccount = Mock(GlAccount)
-        shipmentItem.addToOrderItems(new OrderItem())
+        OrderItem orderItem = Spy(OrderItem)
+        orderItem.unitPrice = 1
+        shipmentItem.addToOrderItems(orderItem)
 
         when:
         InvoiceItem invoiceItem = service.createFromShipmentItem(shipmentItem)

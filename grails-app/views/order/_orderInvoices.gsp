@@ -9,6 +9,7 @@
                 <th><warehouse:message code="default.description.label" default="Description"/></th>
                 <th><warehouse:message code="invoice.invoiceNumber.label" default="Invoice Number"/></th>
                 <th><warehouse:message code="default.invoiceType.label" default="Invoice Type"/></th>
+                <th><warehouse:message code="default.invoiceItemType.label" default="Invoice Item Type"/></th>
                 <th><warehouse:message code="default.invoiceStatus.label" default="Invoice Status"/></th>
                 <th><warehouse:message code="default.quantity.label" default="Quantity"/></th>
                 <th><warehouse:message code="default.uom.label" default="UoM"/></th>
@@ -31,6 +32,7 @@
                             <g:link controller="invoice" action="show" id="${invoiceItem?.invoice?.id }">${invoiceItem?.invoice?.invoiceNumber}</g:link>
                         </td>
                         <td>${invoiceItem?.invoice?.invoiceType?.name}</td>
+                        <td>${invoiceItem?.invoiceItemType?.name()}</td>
                         <td>${invoiceItem?.invoice?.status}</td>
                         <td>${invoiceItem?.quantity}</td>
                         <td>${invoiceItem?.unitOfMeasure}</td>

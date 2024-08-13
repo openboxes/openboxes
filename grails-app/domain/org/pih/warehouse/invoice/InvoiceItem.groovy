@@ -82,8 +82,7 @@ class InvoiceItem implements Serializable {
         product(nullable: true)
         glAccount(nullable: true)
         budgetCode(nullable: true)
-        // TODO: Temporarily allowing negative quantities (once we start using amount field this should be beck to min 0)
-        quantity(nullable: false, validator: { Integer quantity, InvoiceItem obj ->
+        quantity(nullable: false, min: 0, validator: { Integer quantity, InvoiceItem obj ->
             // If the invoice is a prepayment or the item is an order adjustment,
             // the validation below doesn't make sense, because
             // we do not have shipmentItem at this point.
@@ -148,7 +147,16 @@ class InvoiceItem implements Serializable {
     }
 
     // Total shipment item value
+    @Deprecated
     def getTotalAmount() {
+        // After implementing the Partial invoicing for prepaid POs (OBPIH-6398)
+        // the total amount calculated below is kept in the amount field.
+        // For now until fully implemented and all old data is migrated, let's keep
+        // the old calculation here too (to be done as a part of OBPIH-6612)
+        if (amount) {
+            return amount
+        }
+
         def total = (quantity ?: 0.0) * (unitPrice ?: 0.0)
         if (isPrepaymentInvoice || inverseItem) {
             return total * ((order.paymentTerm?.prepaymentPercent?:100) / 100)
@@ -157,6 +165,7 @@ class InvoiceItem implements Serializable {
         return total
     }
 
+    @Deprecated
     def getTotalPrepaymentAmount() {
         return isPrepaymentInvoice ? totalAmount * (-1) : 0.0
     }
@@ -194,12 +203,14 @@ class InvoiceItem implements Serializable {
                 uom: unitOfMeasure,
                 amount: amount,
                 unitPrice: unitPrice,
-                totalAmount: totalAmount,
-                totalPrepaymentAmount: totalPrepaymentAmount,
                 orderAdjustment: orderAdjustment,
                 productName: product?.name,
                 displayNames: product?.displayNames,
-                type: invoiceItemType?.name()
+                type: invoiceItemType?.name(),
+                // Total amount and total prepayment amount are deprecated and amount field
+                // should be used instead (OBPIH-6398, OBPIH-6499)
+                totalAmount: totalAmount,
+                totalPrepaymentAmount: totalPrepaymentAmount
         ]
     }
 }
