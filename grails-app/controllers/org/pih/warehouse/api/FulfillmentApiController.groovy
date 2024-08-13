@@ -17,7 +17,8 @@ class FulfillmentApiController {
             response.status = 400
             buildErrors(command, errors)
         }
-        render([errors: errors] as JSON)
+        List<Map> tableData = command.packingList.collect { ImportPackingListItem item -> item.toTableJson() }
+        render([errors: errors, data: tableData] as JSON)
     }
 
     def createOutbound(ImportPackingListCommand command) {

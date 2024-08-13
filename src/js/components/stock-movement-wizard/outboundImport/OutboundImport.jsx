@@ -1,5 +1,7 @@
 import React, { useMemo } from 'react';
 
+import { HttpStatusCode } from 'axios';
+
 import OutboundImportHeader from 'components/stock-movement-wizard/outboundImport/OutboundImportHeader';
 import OutboundImportConfirm from 'components/stock-movement-wizard/outboundImport/sections/OutboundImportConfirm';
 import OutboundImportDetails from 'components/stock-movement-wizard/outboundImport/sections/OutboundImportDetails';
@@ -58,11 +60,11 @@ const OutboundImport = () => {
   const {
     lineItems,
     lineItemErrors,
+    validateStatus,
     errors,
     control,
     isValid,
     handleSubmit,
-    headerDetailsData,
     onSubmitStockMovementDetails,
     onConfirmImport,
     trigger,
@@ -79,7 +81,7 @@ const OutboundImport = () => {
   return (
     <PageWrapper>
       <WizardStepsV2 steps={stepsTitles} currentStepKey={Step.key} />
-      <OutboundImportHeader stockMovementDetails={headerDetailsData} />
+      <OutboundImportHeader />
       <form onSubmit={handleSubmit(onSubmitStockMovementDetails)}>
         {is(OutboundImportStep.DETAILS.key) && (<Step.Component {...detailsComponentProps} />)}
       </form>
@@ -91,6 +93,7 @@ const OutboundImport = () => {
             previous={previous}
             data={lineItems}
             tableErrors={lineItemErrors}
+            hasErrors={validateStatus === HttpStatusCode.BadRequest}
           />
           )}
       </form>
