@@ -86,7 +86,7 @@ const useOutboundImportForm = ({ next }) => {
    * Method to group items to two arrays - first - containing items that have validation errors,
    * and second - containing the items without validation errors
    */
-  const groupTableDataByErrors = (data) => data?.reduce?.((acc, item) => {
+  const groupTableDataByErrors = (data) => data?.data?.reduce?.((acc, item) => {
     if (data?.errors?.packingList?.[item.rowId]) {
       return {
         ...acc,
