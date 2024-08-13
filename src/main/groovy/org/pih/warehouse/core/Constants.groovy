@@ -36,6 +36,7 @@ class Constants {
     static final String EUROPEAN_DATE_FORMAT = "dd/MM/yyyy"
     static final String DISPLAY_DATE_FORMAT = "MMM DD, yyyy"
     static final String DISPLAY_DATE_DEFAULT_VALUE = "-"
+    static final String GENERATE_NAME_DATE_FORMAT = "ddMMMyyyy"
 
     static final String SPANISH_MEXICO_ORDER_IMPORT_DATE_FORMAT = "dd/MM/yyyy"
     static final String DEFAULT_ORDER_IMPORT_DATE_FORMAT = "MM/dd/yyyy"
@@ -112,6 +113,7 @@ class Constants {
     static final String SEMICOLON_COLUMN_SEPARATOR = ";"
     static final String TAB_COLUMN_SEPARATOR = "\t";
     static final String DEFAULT_LINE_SEPARATOR = "\n"
+    static final String SPACE_SEPARATOR = " "
 
     // Characters that should be included with each of the random number types
     static final String RANDOM_IDENTIFIER_ALPHABETIC_CHARACTERS = "ABCDEFGHJKMNPQRSTUVXYZ"

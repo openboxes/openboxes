@@ -64,6 +64,18 @@ class Person implements Comparable, Serializable {
         return "$firstName ${anonymize ? lastInitial : lastName}"
     }
 
+    static Person findPersonByNameOrEmail(String regex) {
+        String[] searchTerm = regex?.split(Constants.SPACE_SEPARATOR)
+        // If search term contains two words, try to search by first name or last name first
+        if (searchTerm?.length == 2) {
+            return findByFirstNameAndLastName(searchTerm[0], searchTerm[1])
+        }
+        if (searchTerm?.length == 1) {
+            return findByEmail(searchTerm[0])
+        }
+        return null
+    }
+
     Map toJson() {
         Boolean anonymize = Holders.config.getProperty("openboxes.anonymize.enabled", Boolean.class, Boolean.FALSE)
         return [

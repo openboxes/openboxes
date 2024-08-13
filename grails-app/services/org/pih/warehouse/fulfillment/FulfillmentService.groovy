@@ -10,11 +10,43 @@
 package org.pih.warehouse.fulfillment
 
 import grails.gorm.transactions.Transactional
+import grails.util.Holders
+import grails.validation.ValidationException
+import org.pih.warehouse.api.StockMovement
+import org.pih.warehouse.auth.AuthService
+import org.pih.warehouse.core.Constants
+import org.pih.warehouse.core.Event
+import org.pih.warehouse.core.EventCode
+import org.pih.warehouse.core.EventType
+import org.pih.warehouse.core.IdentifierService
+import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
+import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.inventory.ProductAvailabilityService
+import org.pih.warehouse.inventory.Transaction
+import org.pih.warehouse.inventory.TransactionEntry
+import org.pih.warehouse.inventory.TransactionType
+import org.pih.warehouse.outbound.FulfillmentRequest
+import org.pih.warehouse.outbound.ImportPackingListCommand
+import org.pih.warehouse.outbound.ImportPackingListItem
+import org.pih.warehouse.outbound.ShippingRequest
+import org.pih.warehouse.picklist.Picklist
+import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.requisition.Requisition
+import org.pih.warehouse.requisition.RequisitionItem
+import org.pih.warehouse.requisition.RequisitionStatus
+import org.pih.warehouse.requisition.RequisitionType
+import org.pih.warehouse.shipping.Container
+import org.pih.warehouse.shipping.Shipment
+import org.pih.warehouse.shipping.ShipmentItem
+import util.StringUtil
+
 
 @Transactional
 class FulfillmentService {
+
+    IdentifierService identifierService
+    ProductAvailabilityService productAvailabilityService
 
     /**
      * Adds a fulfillment item to a fulfillment object and saves the parent.
@@ -69,5 +101,251 @@ class FulfillmentService {
         command.fulfillment = fulfillment
 
         return command
+    }
+
+    StockMovement createOutbound(ImportPackingListCommand command) {
+        // First create a requisition
+        Requisition requisition = createRequisition(command.fulfillmentDetails)
+        // Having a requisition we can create a shipment
+        Shipment shipment = createShipment(command.sendingOptions, requisition)
+        // Create requisition items and group them with the corresponding packing list item, to be able to indicate when creating a picklist item, what bin location
+        // corresponds to a particular requisition item
+        Map<RequisitionItem, ImportPackingListItem> requisitionItemsGrouped = createRequisitionItems(command.packingList, requisition)
+        // Having requisition items, we can build a picklist
+        createPicklist(requisition, requisitionItemsGrouped)
+        // Build shipment items looking at picklist items associated with requisition items
+        createShipmentItems(shipment, requisition)
+        // Create a shipped event, associate it with the shipment, and issue the requisition
+        sendShipment(shipment)
+        // In the end create a debit transaction with its entries
+        createOutboundTransaction(shipment)
+
+        return StockMovement.createFromRequisition(requisition)
+    }
+
+    String generateName(Location origin, Location destination, Date dateRequested, String trackingNumber, String description) {
+        final String separator =
+                Holders.getConfig().getProperty("openboxes.generateName.separator") ?: Constants.DEFAULT_NAME_SEPARATOR
+
+        String originIdentifier = origin?.locationNumber ?: origin?.name
+        String destinationIdentifier = destination?.locationNumber ?: destination?.name
+        StringBuilder name = new StringBuilder("${originIdentifier}${separator}${destinationIdentifier}")
+        if (dateRequested) {
+            name.append("${separator}${dateRequested?.format(Constants.GENERATE_NAME_DATE_FORMAT)}")
+        }
+        if (trackingNumber) {
+            name.append("${separator}${trackingNumber}")
+        }
+        if (description) {
+            name.append("${separator}${description}")
+        }
+        return StringUtil.removeWhiteSpace(name.toString())
+    }
+
+    Requisition createRequisition(FulfillmentRequest fulfillmentRequest) {
+        Requisition requisition = new Requisition(
+                status: RequisitionStatus.CREATED,
+                requestNumber: identifierService.generateRequisitionIdentifier(),
+                type: RequisitionType.IMPORT,
+                description: fulfillmentRequest.description,
+                destination: fulfillmentRequest.destination,
+                origin: fulfillmentRequest.origin,
+                requestedBy: fulfillmentRequest.requestedBy,
+                dateRequested: fulfillmentRequest.dateRequested,
+                name: generateName(fulfillmentRequest.origin, fulfillmentRequest.destination, fulfillmentRequest.dateRequested, null, fulfillmentRequest.description),
+        )
+        if (!requisition.validate()) {
+            throw new ValidationException("Invalid requisition", requisition.errors)
+        }
+        return requisition.save()
+    }
+
+    Shipment createShipment(ShippingRequest shippingRequest, Requisition requisition) {
+        Shipment shipment = new Shipment(
+                requisition: requisition,
+                shipmentNumber: requisition.requestNumber,
+                origin: requisition.origin,
+                destination: requisition.destination,
+                description: requisition.description,
+                expectedShippingDate: shippingRequest.expectedShippingDate,
+                expectedDeliveryDate: shippingRequest.expectedDeliveryDate,
+                shipmentType: shippingRequest.shipmentType,
+                name: generateName(requisition.origin, requisition.destination, requisition.dateRequested, shippingRequest.trackingNumber, requisition.description),
+        )
+        if (!shipment.validate()) {
+            throw new ValidationException("Invalid shipment", shipment.errors)
+        }
+        return shipment.save()
+    }
+
+    Map<RequisitionItem, ImportPackingListItem> createRequisitionItems(List<ImportPackingListItem> packItems, Requisition requisition) {
+        Map<RequisitionItem, ImportPackingListItem> requisitionItemsGrouped = new HashMap<>()
+        List<RequisitionItem> requisitionItems = packItems.collect { ImportPackingListItem packItem ->
+            InventoryItem inventoryItem = packItem?.product?.getInventoryItem(packItem?.lotNumber)
+            RequisitionItem requisitionItem = new RequisitionItem(
+                    product: packItem?.product,
+                    inventoryItem: inventoryItem,
+                    quantity: packItem?.quantityPicked,
+                    quantityApproved: packItem?.quantityPicked,
+                    recipient: packItem?.recipient,
+                    requisition: requisition,
+                    palletName: packItem?.palletName,
+                    boxName: packItem?.boxName,
+                    lotNumber: packItem?.lotNumber,
+                    expirationDate: packItem?.expirationDate,
+            )
+            if (requisitionItem.validate()){
+                requisitionItemsGrouped.put(requisitionItem, packItem)
+            }
+            return requisitionItem
+        }
+        requisitionItems.each { RequisitionItem requisitionItem ->
+            if (!requisitionItem.validate()) {
+                throw new ValidationException("Invalid requisition item", requisitionItem.errors)
+            }
+            requisition.addToRequisitionItems(requisitionItem)
+            requisitionItem.save()
+        }
+
+        return requisitionItemsGrouped
+    }
+
+    void createShipmentItems(Shipment shipment, Requisition requisition) {
+        requisition.requisitionItems?.each { RequisitionItem requisitionItem ->
+            List<ShipmentItem> shipmentItems = createShipmentItems(requisitionItem, shipment)
+            shipmentItems.each { ShipmentItem shipmentItem ->
+                shipmentItem.save()
+                shipment.addToShipmentItems(shipmentItem)
+            }
+        }
+    }
+
+    Container createOrUpdateContainer(Shipment shipment, String palletName, String boxName) {
+        if (boxName && !palletName) {
+            throw new IllegalArgumentException("Please enter Pack level 1 before Pack level 2. A box must be contained within a pallet")
+        }
+        Container pallet = palletName ? shipment.findOrCreatePallet(palletName) : null
+        if (pallet) {
+            pallet.save()
+        }
+        Container box = boxName ? pallet.findOrCreateBox(boxName) : null
+        return box ?: pallet ?: null
+    }
+
+
+    List<ShipmentItem> createShipmentItems(RequisitionItem requisitionItem, Shipment shipment) {
+        List<ShipmentItem> shipmentItems = []
+
+        requisitionItem?.picklistItems?.each { PicklistItem picklistItem ->
+            if (picklistItem.quantity > 0) {
+                ShipmentItem shipmentItem = new ShipmentItem(
+                        lotNumber: picklistItem?.inventoryItem?.lotNumber,
+                        expirationDate: picklistItem?.inventoryItem?.expirationDate,
+                        product: picklistItem?.inventoryItem?.product,
+                        quantity: picklistItem?.quantity,
+                        requisitionItem: picklistItem.requisitionItem,
+                        recipient: picklistItem?.requisitionItem?.recipient ?:
+                                picklistItem?.requisitionItem?.parentRequisitionItem?.recipient,
+                        inventoryItem: picklistItem?.inventoryItem,
+                        binLocation: picklistItem?.binLocation,
+                        sortOrder: shipmentItems.size(),
+                        shipment: shipment,
+                        container: createOrUpdateContainer(shipment, picklistItem?.requisitionItem?.palletName, picklistItem?.requisitionItem?.boxName),
+                )
+                shipmentItems.add(shipmentItem)
+            }
+        }
+        return shipmentItems
+    }
+
+    Picklist createPicklist(Requisition requisition, Map<RequisitionItem, ImportPackingListItem> requisitionItemsGrouped) {
+        Picklist picklist = new Picklist(requisition: requisition)
+        requisition.picklist = picklist
+        picklist.save()
+
+        requisition.requisitionItems.each { RequisitionItem requisitionItem ->
+            // Find corresponding packing list item to indicate what bin location belongs to a particular requisition item
+            ImportPackingListItem correspondingPackListItem = requisitionItemsGrouped[requisitionItem]
+            // Confirm again, that the quantity picked is in stock (the line below covers a case when someone adds the same item in a few lines)
+            Integer quantity = productAvailabilityService.getQuantityAvailableToPromiseForProductInBin(requisition.origin, correspondingPackListItem.binLocation, requisitionItem.inventoryItem)
+            if (requisitionItem.quantity > quantity) {
+                // This needs to be type of Object[] in order for rejectValue to work
+                Object[] errorArgs = [requisitionItem.quantity, requisitionItem.product?.productCode]
+                requisitionItem.errors.rejectValue("quantity", "requisitionItem.quantity.overpick", errorArgs, "The quantity you have picked ({0}) for product ({1}) is not available in stock")
+                throw new ValidationException("Invalid requisition item", requisitionItem.errors)
+            }
+            PicklistItem picklistItem = new PicklistItem(
+                    inventoryItem: requisitionItem.inventoryItem,
+                    binLocation: correspondingPackListItem.binLocation,
+                    quantity: requisitionItem.quantity,
+                    disableRefresh: true,
+                    picklist: picklist,
+                    requisitionItem: requisitionItem
+            )
+            requisitionItem.addToPicklistItems(picklistItem)
+            picklist.addToPicklistItems(picklistItem)
+            // Flush is needed in order for the product availability refresh method, to know about the persistence of the picklist item,
+            // because the PA method runs in a separate session
+            picklistItem.save(flush: true)
+            productAvailabilityService.refreshProductsAvailability(
+                    requisitionItem?.requisition?.origin?.id,
+                    [requisitionItem?.inventoryItem?.product?.id],
+                    [correspondingPackListItem?.binLocation?.id],
+                    false)
+        }
+
+        return picklist
+    }
+
+    void sendShipment(Shipment shipment) {
+        shipment.requisition.status = RequisitionStatus.ISSUED
+        EventType eventType = EventType.findByEventCode(EventCode.SHIPPED)
+
+        Event shippedEvent = new Event(
+                createdBy: AuthService.currentUser,
+                eventType: eventType,
+                eventDate: new Date(),
+                eventLocation: AuthService.currentLocation,
+        )
+        if (!shippedEvent.validate()) {
+            throw new ValidationException("Invalid event", shippedEvent.errors)
+        }
+        shipment.addToEvents(shippedEvent)
+        shippedEvent.save()
+    }
+
+    Transaction createOutboundTransaction(Shipment shipment) {
+        TransactionType debitTransactionType = TransactionType.read(Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID)
+        Transaction debitTransaction = new Transaction(
+                source: null,
+                destination: shipment?.destination,
+                inventory: shipment?.origin?.inventory,
+                transactionDate: shipment.actualShippingDate,
+                requisition: shipment.requisition,
+                transactionNumber: identifierService.generateTransactionIdentifier(),
+                outgoingShipment: shipment,
+                transactionType: debitTransactionType,
+        )
+        if (!debitTransaction.validate()) {
+            throw new ValidationException("Invalid transaction", debitTransaction.errors)
+        }
+        debitTransaction.save()
+
+        shipment.shipmentItems.each { ShipmentItem shipmentItem ->
+            TransactionEntry transactionEntry = new TransactionEntry(
+                    quantity: shipmentItem.quantity,
+                    inventoryItem: shipmentItem.inventoryItem,
+                    binLocation: shipmentItem.binLocation,
+                    transaction: debitTransaction
+            )
+            if (!transactionEntry.validate()) {
+                throw new ValidationException("Invalid transaction entry", transactionEntry.errors)
+            }
+            transactionEntry.save()
+            debitTransaction.addToTransactionEntries(transactionEntry)
+        }
+        shipment.addToOutgoingTransactions(debitTransaction)
+
+        return debitTransaction
     }
 }
