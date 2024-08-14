@@ -37,6 +37,8 @@ import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.requisition.RequisitionType
 import org.pih.warehouse.shipping.Container
+import org.pih.warehouse.shipping.ReferenceNumber
+import org.pih.warehouse.shipping.ReferenceNumberType
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 import util.StringUtil
@@ -172,10 +174,33 @@ class FulfillmentService {
                 shipmentType: shippingRequest.shipmentType,
                 name: generateName(requisition.origin, requisition.destination, requisition.dateRequested, shippingRequest.trackingNumber, requisition.description),
         )
+        createTrackingNumber(shipment, shippingRequest.trackingNumber)
         if (!shipment.validate()) {
             throw new ValidationException("Invalid shipment", shipment.errors)
         }
         return shipment.save()
+    }
+
+
+    ReferenceNumber createTrackingNumber(Shipment shipment, String trackingNumber) {
+        ReferenceNumberType trackingNumberType = ReferenceNumberType.findById(Constants.TRACKING_NUMBER_TYPE_ID)
+        if (!trackingNumberType) {
+            throw new IllegalStateException("Must configure reference number type for Tracking Number with ID '${Constants.TRACKING_NUMBER_TYPE_ID}'")
+        }
+        ReferenceNumber referenceNumber = shipment.referenceNumbers.find { ReferenceNumber refNum ->
+            trackingNumberType?.id?.equals(refNum.referenceNumberType?.id)
+        }
+        if (trackingNumber) {
+            if (!referenceNumber) {
+                referenceNumber = new ReferenceNumber()
+                referenceNumber.identifier = trackingNumber
+                referenceNumber.referenceNumberType = trackingNumberType
+                shipment.addToReferenceNumbers(referenceNumber)
+            } else {
+                referenceNumber.identifier = trackingNumber
+            }
+        }
+        return referenceNumber
     }
 
     Map<RequisitionItem, ImportPackingListItem> createRequisitionItems(List<ImportPackingListItem> packItems, Requisition requisition) {
@@ -192,7 +217,7 @@ class FulfillmentService {
                     palletName: packItem?.palletName,
                     boxName: packItem?.boxName,
                     lotNumber: packItem?.lotNumber,
-                    expirationDate: packItem?.expirationDate,
+                    expirationDate: inventoryItem?.expirationDate,
             )
             if (requisitionItem.validate()){
                 requisitionItemsGrouped.put(requisitionItem, packItem)
@@ -341,8 +366,8 @@ class FulfillmentService {
             if (!transactionEntry.validate()) {
                 throw new ValidationException("Invalid transaction entry", transactionEntry.errors)
             }
-            transactionEntry.save()
             debitTransaction.addToTransactionEntries(transactionEntry)
+            transactionEntry.save()
         }
         shipment.addToOutgoingTransactions(debitTransaction)
 

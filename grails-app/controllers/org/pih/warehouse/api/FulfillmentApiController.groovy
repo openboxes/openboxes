@@ -1,6 +1,8 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
+import grails.util.Holders
+import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.pih.warehouse.CommandUtils
 import org.pih.warehouse.fulfillment.FulfillmentService
 import org.pih.warehouse.outbound.ImportPackingListCommand
@@ -26,7 +28,8 @@ class FulfillmentApiController {
         if (command.hasErrors()) {
             response.status = 400
             buildErrors(command, errors)
-            render([errors: errors] as JSON)
+            List<Map> tableData = command.packingList.collect { ImportPackingListItem item -> item.toTableJson() }
+            render([errors: errors, data: tableData] as JSON)
             return
         }
         StockMovement stockMovement = fulfillmentService.createOutbound(command)
@@ -39,7 +42,12 @@ class FulfillmentApiController {
         // Errors will be grouped by the sub-step and by fields, e.g.: { fulfillmentDetails: { origin: ["Cannot be null"] } }
         errors.fulfillmentDetails = CommandUtils.buildErrorsGroupedByField(command.fulfillmentDetails.errors)
         errors.sendingOptions = CommandUtils.buildErrorsGroupedByField(command.sendingOptions.errors)
-
+        // If the packing list is empty and validator has detected it, return generalErrors that will contain the info of packingList being empty
+        if (command.packingList.empty && command.errors.hasFieldErrors("packingList")) {
+            ApplicationTagLib g = Holders.grailsApplication.mainContext.getBean(ApplicationTagLib)
+            errors.packingList["generalErrors"] = command.errors.getFieldErrors("packingList").collect { g.message(error: it) }
+            return
+        }
         command.packingList.each { ImportPackingListItem item ->
             if (item.hasErrors()) {
                 // Build errors for each row separately. Row id is the key.

@@ -24,8 +24,6 @@ class ImportPackingListItem implements Validateable {
 
     String lotNumber
 
-    Date expirationDate
-
     Location origin
 
     @BindUsing({ obj, source ->
@@ -43,7 +41,14 @@ class ImportPackingListItem implements Validateable {
 
     Integer quantityPicked
 
-    @BindUsing({ obj, source -> Person.findPersonByNameOrEmail(source['recipient'])})
+    @BindUsing({ obj, source ->
+        Person person = Person.findPersonByNameOrEmail(source['recipient'])
+        if (!person && source['recipient']) {
+            // We want to indicate if a recipient was not found, but the search term was given
+            obj.recipientFound = false
+        }
+        return person
+    })
     Person recipient
 
     /**
@@ -55,6 +60,15 @@ class ImportPackingListItem implements Validateable {
      * The flag is set to false if a bin location is not found for given name in the BindUsing of binLocation
      */
     boolean binLocationFound = true
+
+    /**
+     * Flag to indicate a reason why recipient is potentially null - if it has not been provided or
+     * it has been provided, but no person with given search term was found
+     */
+    boolean recipientFound = true
+
+    // Helper field to return expiration date for inventory item found in the quantityPicked validation, to display it in the table
+    Date expirationDateToDisplay
 
 
     static constraints = {
@@ -73,9 +87,8 @@ class ImportPackingListItem implements Validateable {
             }
             return ['inventoryItemNotFound', lotNumber, item.product?.productCode]
         })
-        expirationDate(nullable: true)
         binLocation(nullable: true)
-        quantityPicked(min: 0, validator: { Integer quantityPicked, ImportPackingListItem item ->
+        quantityPicked(min: 1, validator: { Integer quantityPicked, ImportPackingListItem item ->
             if (!item.binLocationFound) {
                 return ['binLocationNotFound']
             }
@@ -84,6 +97,8 @@ class ImportPackingListItem implements Validateable {
             if (!inventoryItem) {
                 return ['inventoryItemNotFound']
             }
+            // Associate inventory item's expiration date with expirationDateToDisplay, to display the date in the table
+            item.expirationDateToDisplay = inventoryItem.expirationDate
             Integer quantity = productAvailabilityService.getQuantityAvailableToPromiseForProductInBin(item.origin, item.binLocation, inventoryItem)
             if (quantity <= 0) {
                 return ['stockout']
@@ -93,7 +108,14 @@ class ImportPackingListItem implements Validateable {
             }
             return true
         })
+        recipient(nullable: true, validator: { Person recipient, ImportPackingListItem item ->
+            if (!item.recipientFound) {
+                return ['recipientNotFound']
+            }
+        })
         binLocationFound(bindable: false)
+        recipientFound(bindable: false)
+        expirationDateToDisplay(nullable: true, bindable: false)
     }
 
     Map toTableJson() {
@@ -110,7 +132,7 @@ class ImportPackingListItem implements Validateable {
             lotNumber: lotNumber,
             quantityPicked: quantityPicked,
             recipient: recipient?.name,
-            expirationDate: expirationDate,
+            expirationDate: expirationDateToDisplay,
             origin: [
                 id: origin?.id,
             ],
