@@ -1,10 +1,13 @@
 package org.pih.warehouse.outbound
 
+import grails.databinding.BindUsing
 import grails.validation.Validateable
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.shipping.ShipmentType
 
 class ShippingRequest implements Validateable {
 
+    @BindUsing({ obj, source -> Constants.DELIVERY_DATE_FORMATTER.parse(source['expectedShippingDate']) })
     Date expectedShippingDate
 
     ShipmentType shipmentType

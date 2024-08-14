@@ -62,7 +62,7 @@ const useOutboundImportForm = ({ next }) => {
     };
     const sendingOptions = {
       ..._.pick(values, ['shipmentType', 'trackingNumber']),
-      expectedShippingDate: moment(values.dateShipped).format(DateFormat.MM_DD_YYYY),
+      expectedShippingDate: moment(values.dateShipped).format(DateFormat.MM_DD_YYYY_HH_MM_Z),
       expectedDeliveryDate: moment(values.expectedDeliveryDate).format(DateFormat.MM_DD_YYYY),
     };
     return { basicDetails, sendingOptions };
@@ -120,6 +120,12 @@ const useOutboundImportForm = ({ next }) => {
       product: item.productCode,
       rowId: _.uniqueId(),
     }));
+    if (!packingList.length) {
+      notification(NotificationType.ERROR_OUTLINED)({
+        message: translate('react.outboundImport.packingList.empty.label', 'Packing list cannot be empty'),
+      });
+      return;
+    }
     // Set the packing list data that is sent to API
     setPackingListData(packingList);
     try {
@@ -148,16 +154,38 @@ const useOutboundImportForm = ({ next }) => {
   const onConfirmImport = async (values) => {
     const { basicDetails, sendingOptions } = buildDetailsPayload(values);
 
-    const response = await fulfillmentApi.createOutbound({
-      fulfillmentDetails: basicDetails,
-      packingList: packingListData,
-      sendingOptions,
-    });
-    notification(NotificationType.SUCCESS)({
-      message: translate('react.outboundImport.form.created.success.label', 'Stock Movement has been created successfully'),
-    });
-    // If the save went sucessfully, redirect to the stock movement view page
-    window.location = STOCK_MOVEMENT_URL.show(response.data?.data?.id);
+    try {
+      const response = await fulfillmentApi.createOutbound({
+        fulfillmentDetails: basicDetails,
+        packingList: packingListData,
+        sendingOptions,
+      });
+      notification(NotificationType.SUCCESS)({
+        message: translate('react.outboundImport.form.created.success.label', 'Stock Movement has been created successfully'),
+      });
+      // If the save went sucessfully, redirect to the stock movement view page
+      window.location = STOCK_MOVEMENT_URL.show(response.data?.data?.id);
+    } catch (e) {
+      // If in response there is errors property, it means we want to populate errors with the table
+      if (e.response.data?.errors) {
+        setErrorsData({ errors: e.response?.data?.errors, validateStatus: e.response?.status });
+        // Group errors by errors and make the items with errors appear at the top,
+        // by merging two grouped arrays
+        const tableDataGrouped = groupTableDataByErrors(e.response?.data);
+        setTableData([...tableDataGrouped.itemsWithErrors, ...tableDataGrouped.itemsWithoutErrors]);
+        notification(NotificationType.ERROR_OUTLINED)({
+          message: translate('react.outboundImport.validationException.label', 'Validation exception'),
+          details: translate('react.outboundImport.validationException.details.label', 'Check out the table for the validation exceptions'),
+        });
+        return;
+      }
+      // If there is not errors property in the error response, this means we got an unexpected,
+      // not caught validation error
+      notification(NotificationType.ERROR_OUTLINED)({
+        message: 'Bad request',
+        details: e.response?.data?.errorMessages?.join(', '),
+      });
+    }
   };
 
   useEffect(() => {
