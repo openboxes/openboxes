@@ -146,8 +146,10 @@ class InvoiceItem implements Serializable {
         return orderAdjustment ? orderAdjustment.description : product?.name
     }
 
-    // Total shipment item value
-    @Deprecated
+    /**
+     * Total shipment item value
+     * @deprecated From now should rely on the amount field instead always calculating it
+     */
     def getTotalAmount() {
         // After implementing the Partial invoicing for prepaid POs (OBPIH-6398)
         // the total amount calculated below is kept in the amount field.
@@ -165,7 +167,9 @@ class InvoiceItem implements Serializable {
         return total
     }
 
-    @Deprecated
+    /**
+     * @deprecated From now should rely on the amount field instead always calculating it
+     */
     def getTotalPrepaymentAmount() {
         return isPrepaymentInvoice ? totalAmount * (-1) : 0.0
     }
@@ -206,7 +210,7 @@ class InvoiceItem implements Serializable {
                 orderAdjustment: orderAdjustment,
                 productName: product?.name,
                 displayNames: product?.displayNames,
-                type: invoiceItemType?.name(),
+                type: invoiceItemType?.toString(),
                 // Total amount and total prepayment amount are deprecated and amount field
                 // should be used instead (OBPIH-6398, OBPIH-6499)
                 totalAmount: totalAmount,

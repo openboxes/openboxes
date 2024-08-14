@@ -192,7 +192,9 @@ class InvoiceApiController {
         render([data: invoice?.toJson()] as JSON)
     }
 
-    @Deprecated
+    /**
+     * @deprecated Inverse items are now stored in the final invoice, no longer need to pull these
+     */
     def getPrepaymentItems() {
         Invoice invoice = Invoice.get(params.id)
         List<InvoiceItem> prepaymentItems = invoice.prepaymentItems

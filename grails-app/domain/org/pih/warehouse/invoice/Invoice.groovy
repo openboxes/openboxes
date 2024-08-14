@@ -217,6 +217,10 @@ class Invoice implements Serializable {
         return orders?.invoices?.flatten()?.findAll { it.invoiceType?.code == InvoiceTypeCode.PREPAYMENT_INVOICE }?.unique()
     }
 
+    /**
+     * @deprecated Inverse items are now stored on the final invoice (and this transient used to return
+     * prepayment items to display them as inverse items on the final invoice confirm page
+     * */
     List<InvoiceItem> getPrepaymentItems() {
         // Avoid returning prepayment items for PREPAYMENT_INVOICE (these are only for 'final' invoice)
         if (invoiceType?.code == InvoiceTypeCode.PREPAYMENT_INVOICE) {

@@ -26,12 +26,12 @@ class PrepaymentInvoiceService {
             throw new Exception("No order items or order adjustments found for given order")
         }
 
-        BigDecimal prepaymentPercent = order.paymentTerm?.prepaymentPercent?:100
+        BigDecimal prepaymentPercent = (order.paymentTerm?.prepaymentPercent ?: Constants.DEFAULT_PAYMENT_PERCENT) / 100
 
         order.activeOrderItems.each { OrderItem orderItem ->
             InvoiceItem invoiceItem = createFromOrderItem(orderItem)
             // This is prepayment item, we need to adjust the amount according to the payment terms
-            invoiceItem.amount = invoiceItem.amount * (prepaymentPercent / 100)
+            invoiceItem.amount = invoiceItem.amount * prepaymentPercent
             invoiceItem.invoiceItemType = InvoiceItemType.PREPAYMENT
             invoice.addToInvoiceItems(invoiceItem)
         }
@@ -39,7 +39,7 @@ class PrepaymentInvoiceService {
         order.activeOrderAdjustments.each { OrderAdjustment orderAdjustment ->
             InvoiceItem invoiceItem = createFromOrderAdjustment(orderAdjustment)
             // This is prepayment item, we need to adjust the amount according to the payment terms
-            invoiceItem.amount = invoiceItem.amount * (prepaymentPercent / 100)
+            invoiceItem.amount = invoiceItem.amount * prepaymentPercent
             invoiceItem.invoiceItemType = InvoiceItemType.PREPAYMENT
             invoice.addToInvoiceItems(invoiceItem)
         }
@@ -58,7 +58,7 @@ class PrepaymentInvoiceService {
         order.invoiceableOrderItems.each { OrderItem orderItem ->
             if (orderItem.orderItemStatusCode == OrderItemStatusCode.CANCELED) {
                 InvoiceItem invoiceItem = createFromOrderItem(orderItem)
-                InvoiceItem inverseItem = createInverseItemForOrderItem(orderItem)
+                InvoiceItem inverseItem = createInverseItemForCanceledOrderItem(orderItem)
                 invoice.addToInvoiceItems(invoiceItem)
                 invoice.addToInvoiceItems(inverseItem)
                 return
@@ -84,7 +84,7 @@ class PrepaymentInvoiceService {
         return invoice.save()
     }
 
-    InvoiceItem createFromOrderItem(OrderItem orderItem) {
+    private InvoiceItem createFromOrderItem(OrderItem orderItem) {
         if (orderItem.orderItemStatusCode == OrderItemStatusCode.CANCELED) {
             InvoiceItem invoiceItem = new InvoiceItem(
                     quantity: 0,
@@ -118,7 +118,7 @@ class PrepaymentInvoiceService {
         return invoiceItem
     }
 
-    InvoiceItem createFromShipmentItem(ShipmentItem shipmentItem) {
+    private InvoiceItem createFromShipmentItem(ShipmentItem shipmentItem) {
         OrderItem orderItem = shipmentItem.orderItems?.find { it }
         Integer quantity = shipmentItem.quantityToInvoiceInStandardUom ? (shipmentItem.quantityToInvoiceInStandardUom / orderItem?.quantityPerUom) : 0
         InvoiceItem invoiceItem = new InvoiceItem(
@@ -138,7 +138,7 @@ class PrepaymentInvoiceService {
         return invoiceItem
     }
 
-    InvoiceItem createFromOrderAdjustment(OrderAdjustment orderAdjustment) {
+    private InvoiceItem createFromOrderAdjustment(OrderAdjustment orderAdjustment) {
         InvoiceItem invoiceItem = new InvoiceItem(
                 budgetCode: orderAdjustment.budgetCode,
                 product: orderAdjustment.orderItem?.product,
@@ -155,7 +155,7 @@ class PrepaymentInvoiceService {
         return invoiceItem
     }
 
-    InvoiceItem createInverseItemForOrderItem(OrderItem orderItem) {
+    private InvoiceItem createInverseItemForCanceledOrderItem(OrderItem orderItem) {
         InvoiceItem prepaymentItem = orderItem.invoiceItems.find { it.isPrepaymentInvoice }
         InvoiceItem inverseItem = createFromOrderItem(orderItem)
         // For canceled order item take quantity from prepayment item
@@ -167,9 +167,9 @@ class PrepaymentInvoiceService {
         return inverseItem
     }
 
-    InvoiceItem createInverseItemForShipmentItem(ShipmentItem shipmentItem, InvoiceItem invoiceItem) {
+    private InvoiceItem createInverseItemForShipmentItem(ShipmentItem shipmentItem, InvoiceItem invoiceItem) {
         OrderItem orderItem = shipmentItem.orderItems?.find { it }
-        BigDecimal prepaymentPercent = orderItem.order.paymentTerm?.prepaymentPercent ?: 100
+        BigDecimal prepaymentPercent = (orderItem.order.paymentTerm?.prepaymentPercent ?: Constants.DEFAULT_PAYMENT_PERCENT) / 100
         InvoiceItem prepaymentItem = orderItem.invoiceItems.find { it.isPrepaymentInvoice }
         InvoiceItem inverseItem = createFromShipmentItem(shipmentItem)
         // For shipment items we have to check if the ordered quantity was edited after prepayment was generated.
@@ -183,11 +183,11 @@ class PrepaymentInvoiceService {
         inverseItem.invoiceItemType = InvoiceItemType.INVERSE
         inverseItem.unitPrice = prepaymentItem.unitPrice
         // Multiplied by (-1) to keep inverse items as negative amount
-        inverseItem.amount = quantity * prepaymentItem.unitPrice * (prepaymentPercent / 100) * (-1)
+        inverseItem.amount = quantity * prepaymentItem.unitPrice * prepaymentPercent * (-1)
         return inverseItem
     }
 
-    InvoiceItem createInverseItemForOrderAdjustment(OrderAdjustment orderAdjustment) {
+    private InvoiceItem createInverseItemForOrderAdjustment(OrderAdjustment orderAdjustment) {
         InvoiceItem prepaymentItem = orderAdjustment.invoiceItems.find { it.isPrepaymentInvoice }
         InvoiceItem inverseItem = createFromOrderAdjustment(orderAdjustment)
         // For order adjustment invoiceItem.quantity is 1 or 0, but for inverse should be for now 1
@@ -199,7 +199,7 @@ class PrepaymentInvoiceService {
         return inverseItem
     }
 
-    Integer getQuantityAvailableToInverse(OrderItem orderItem, InvoiceItem prepaymentItem) {
+    private Integer getQuantityAvailableToInverse(OrderItem orderItem, InvoiceItem prepaymentItem) {
         Integer quantityInversed = orderItem.allInvoiceItems.findAll { it.inverseItem }.sum { it.quantity } ?: 0
         return prepaymentItem.quantity > quantityInversed ? prepaymentItem.quantity - quantityInversed : 0
     }

@@ -8,6 +8,10 @@ enum InvoiceItemType {
 
     String type
 
+    String toString() {
+        return name()
+    }
+
     InvoiceItemType(String type) {
         this.type = type
     }

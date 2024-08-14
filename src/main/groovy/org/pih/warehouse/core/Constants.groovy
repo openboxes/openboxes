@@ -140,6 +140,7 @@ class Constants {
 
     static final String DEFAULT_DOCUMENT_TYPE_ID = "9"
     static final String PREPAYMENT_INVOICE_SUFFIX = "-PREPAYMENT"
+    static final Integer DEFAULT_PAYMENT_PERCENT = 100
 
     static final String DEFAULT_LOT_NUMBER = "DEFAULT" // default product availability lot number
     static final String DEFAULT_BIN_LOCATION_NAME = "DEFAULT" // default product availability bin location name
