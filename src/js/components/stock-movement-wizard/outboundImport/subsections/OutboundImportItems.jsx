@@ -63,7 +63,7 @@ const OutboundImportItems = ({ data, errors }) => {
     {
       Header: translate('react.outboundImport.table.column.quantityPicked.label', 'Qty Picked'),
       accessor: 'quantityPicked',
-      Cell: (row) => <TableCell {...row} showError />,
+      Cell: (row) => <TableCell {...row} value={`${row.original.quantityPicked}`} showError />,
     },
     {
       Header: translate('react.outboundImport.table.column.binLocation.label', 'Bin Location'),
