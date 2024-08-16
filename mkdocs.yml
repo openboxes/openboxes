@@ -63,6 +63,7 @@ plugins:
   - search
   - macros
   - glightbox
+  - open-in-new-tab
 markdown_extensions:
   - admonition
   - attr_list

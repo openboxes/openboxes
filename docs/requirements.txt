@@ -4,5 +4,6 @@ mkdocs-material-extensions
 mkdocs-macros-plugin
 mkdocs-awesome-pages-plugin
 mkdocs-glightbox==0.4.0
+mkdocs-open-in-new-tab
 markdown-include
 materialx
