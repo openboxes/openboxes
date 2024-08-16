@@ -6,7 +6,7 @@ OpenBoxes is a powerful open-source warehouse management system (WMS) designed t
 
 <div class="grid cards" markdown>
 
-- :material-monitor-dashboard: Take actions from the main __dashboard__
+- :material-monitor-dashboard: Review real-time data and take actions from the __Main Dashboard__
 
     ---
     ![Dashboard](https://d33v4339jhl8k0.cloudfront.net/docs/assets/621534e39abf1f1c40400945/images/6229297bc1688a6d26a737f4/file-gkJAvvPo0X.png)
