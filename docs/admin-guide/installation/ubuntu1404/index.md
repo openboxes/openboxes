@@ -1,3 +1,8 @@
+---
+status: deprecated
+---
+
+
 # Installing OpenBoxes on Ubuntu 14.04
 
 ## 1. Watch the Video

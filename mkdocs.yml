@@ -8,6 +8,7 @@ theme:
   custom_dir: docs/overrides
   language: en
   logo: assets/img/logo.svg
+#  favicon: assets/img/logo.ico
   palette:
     # Palette toggle for light mode
     - scheme: default
@@ -127,18 +128,21 @@ nav:
   - Install:
     - Overview: admin-guide/installation/index.md
     #- Basic Instructions: admin-guide/installation/basic-instructions.md
-    - Preparation:
-      # Does not exist yet
-      - Requirements: admin-guide/installation/requirements.md
-      - Hosting: admin-guide/installation/hosting.md
-      - Deployment Options: admin-guide/installation/deployment.md
+    - Getting Started:
+      - System Requirements: admin-guide/installation/requirements.md
+      - Knowledge Requirements: admin-guide/installation/getting-started.md
+#      - Deployment Strategy: admin-guide/installation/deployment.md
+      - Hosting Providers: admin-guide/installation/hosting.md
     - Installation:
-      - Create Virtual Machine: admin-guide/installation/ubuntu2204/vm.md
-      - Configure: admin-guide/installation/ubuntu2204/configuration.md
-      - Install Dependencies:
-          - Install Java: admin-guide/installation/ubuntu2204/java.md
-          - Install Tomcat: admin-guide/installation/ubuntu2204/tomcat.md
-          - Install MySQL: admin-guide/installation/ubuntu2204/mysql.md
+      - Create Server:
+        - Overview: admin-guide/hosting/index.md
+        - Digital Ocean: admin-guide/hosting/digital-ocean/droplet.md
+      - Install Java: admin-guide/installation/ubuntu2204/java.md
+      - Install Tomcat: admin-guide/installation/ubuntu2204/tomcat.md
+      - Install MySQL/MariaDB: admin-guide/installation/ubuntu2204/mysql.md
+      - Install Apache/Nginx: admin-guide/installation/ubuntu2204/webserver.md
+    - Deployment:
+      - Configure Application: admin-guide/installation/ubuntu2204/configuration.md
       - Deploy Application: admin-guide/installation/ubuntu2204/application.md
     - Post-Installation:
       - Enable HTTPS: admin-guide/installation/advanced.md
@@ -148,13 +152,15 @@ nav:
 
   # Configuration Guide - needs a lot of work
   - Configure:
-    - Config Files: admin-guide/configuration/index.md
-    - Database: admin-guide/configuration/database.md
-    - Email: admin-guide/configuration/email.md
-    - Application: admin-guide/configuration/application.md
-    - Sentry: admin-guide/configuration/sentry.md
-    - Monitoring: placeholder.md
-    - Analytics: placeholder.md
+    - Overview: admin-guide/configuration/index.md
+    - Config Locations: admin-guide/configuration/config-locations.md
+    - Config Properties:
+      - Database: admin-guide/configuration/database.md
+      - Email: admin-guide/configuration/email.md
+      - Application: admin-guide/configuration/application.md
+      - Sentry: admin-guide/configuration/sentry.md
+      - Monitoring: placeholder.md
+      - Analytics: placeholder.md
     - Advanced:
       - admin-guide/installation/advanced.md
       - Tomcat AJP: admin-guide/configuration/ajp.md
@@ -176,11 +182,11 @@ nav:
   - Migration:
     - Upgrading from 0.8.x to 0.9.x:
       - Overview: admin-guide/migration/index.md
-      - Parallel Upgrade: admin-guide/migration/parallel/index.md
-      - In-Place Upgrade: admin-guide/migration/in-place/index.md
-#     - Troubleshooting:
-#       - Known Issues: admin-guide/migration/known-issues/index.md
-#       - Support: support/index.md
+      - Upgrading in Parallel: admin-guide/migration/parallel/index.md
+      - Upgrading In-Place: admin-guide/migration/in-place/index.md
+    - Troubleshooting:
+      - Known Issues: admin-guide/migration/known-issues/index.md
+      - Support: support/index.md
 
 
   # Onboarding Guide

@@ -13,7 +13,7 @@ This guide provides a step-by-step introduction to get you started quickly.
     These quickstart instructions are not recommended for production 
     environments. Please use the installation guide. 
 
-## Step-by-Step Instructions
+## Instructions
 
 ### Step 1: Install dependencies
 

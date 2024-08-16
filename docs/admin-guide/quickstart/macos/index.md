@@ -1,5 +1,7 @@
 # Quickstart on Mac OS
 
+## Instructions
+
 ### Step 1: Install Homebrew (if not already installed)
 Homebrew is a package manager for macOS which makes installing software easier.
 
