@@ -4,7 +4,7 @@
 * python3 
 * pip
 
-## Installation
+## Installation Instructions
 
 1. Verify **python 3** and **python-pip** is installed. 
     ```sh
@@ -31,13 +31,16 @@
 
 [<img src="./assets/img/mkdocs.png">](http://localhost:8000)
 
-## Contributing to Documentation
+## Contributing Instructions
 
-1. Create a new branch 
+1. Create a new branch for your documentation changes
+```shell
+git checkout -b docs/1234-fix-typo
+```
 
 > [!TIP]
->   Use the issue number and summary in your branch name.
-
+>   Branching naming should follow convention above. If possible, use the GitHub issue number 
+>   and summary in your branch name.
 
 2. Make documentation changes in an editor of your choice
 3. Commit changes to branch with meaningful commit message 
@@ -45,5 +48,5 @@
 #1234: fixed typo in docs
 ```
 4. Push changes to GitHub
-5. Create a pull request 
-6. 
+5. Create a pull request
+6. Assign `jmiranda` as a reviewer
