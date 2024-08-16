@@ -90,7 +90,10 @@ const ConfirmInvoicePage = ({ initialValues, previousPage }) => {
 
     setStateValues((state) => ({
       ...state,
-      invoiceItems: [...state.invoiceItems, ...data],
+      invoiceItems: _.uniqBy([
+        ...state.invoiceItems,
+        ...data,
+      ], 'id'),
       totalCount,
     }));
 
@@ -162,9 +165,6 @@ const ConfirmInvoicePage = ({ initialValues, previousPage }) => {
                   invoiceItems={stateValues.invoiceItems}
                   loadMoreRows={loadMoreRows}
                   isPrepaymentInvoice={stateValues.isPrepaymentInvoice}
-                  // TODO: this is an example, get inverse items from endpoint
-                  inverseItems={stateValues.invoiceItems?.map(it =>
-                    ({ ...it, isPrepaymentItem: true }))}
                 />
               )
                 : (

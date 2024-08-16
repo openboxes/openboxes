@@ -1,15 +1,25 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback } from 'react';
 
 import _ from 'lodash';
 import PropTypes from 'prop-types';
+import { RiCloseCircleLine } from 'react-icons/all';
 import { Tooltip } from 'react-tippy';
 
 import ArrayField from 'components/form-elements/ArrayField';
 import LabelField from 'components/form-elements/LabelField';
 import { ORDER_URL, STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
+import InvoiceItemType from 'consts/invoiceItemType';
 import { renderFormField } from 'utils/form-utils';
 import { getInvoiceDescription } from 'utils/form-values-utils';
 import accountingFormat from 'utils/number-utils';
+
+const getRowColouring = (canceled, type) => {
+  const isInverseItem = type === InvoiceItemType.INVERSE;
+  if (canceled) {
+    return 'disabled-row';
+  }
+  return isInverseItem ? 'negative-row-value' : null;
+};
 
 const INVOICE_ITEMS = {
   invoiceItems: {
@@ -18,14 +28,23 @@ const INVOICE_ITEMS = {
     totalCount: ({ totalCount }) => totalCount,
     isRowLoaded: ({ isRowLoaded }) => isRowLoaded,
     loadMoreRows: ({ loadMoreRows }) => loadMoreRows(),
-    getDynamicRowAttr: ({ rowValues }) => ({ className: rowValues && rowValues.totalAmount && rowValues.totalAmount < 0 ? 'negative-row-value' : '' }),
+    getDynamicRowAttr: ({ rowValues }) => ({
+      className: getRowColouring(rowValues?.isCanceled, rowValues?.type),
+    }),
     fields: {
-      prepaymentIcon: {
+      rowIcon: {
         type: (params) => {
-          const { invoiceItems, rowIndex, isPrepaymentInvoice } = params;
+          const {
+            invoiceItems,
+            rowIndex,
+            isPrepaymentInvoice,
+          } = params;
           const hasItems = !!invoiceItems;
+          const invoiceItem = invoiceItems[rowIndex];
           const isPrepLine = hasItems && (isPrepaymentInvoice
-            || invoiceItems[rowIndex]?.isPrepaymentItem);
+            || invoiceItem?.isPrepaymentItem
+          );
+
           if (isPrepLine) {
             return (
               <div className="d-flex align-items-center justify-content-center">
@@ -42,6 +61,11 @@ const INVOICE_ITEMS = {
               </div>
             );
           }
+
+          if (invoiceItem?.isCanceled) {
+            return <RiCloseCircleLine size="23px" color="black" />;
+          }
+
           return null;
         },
         label: '',
@@ -142,7 +166,7 @@ const INVOICE_ITEMS = {
           formatValue: (value) => (value ? accountingFormat(value) : value),
         },
       },
-      totalAmount: {
+      amount: {
         type: LabelField,
         label: 'react.invoice.totalPrice.label',
         defaultMessage: 'Total Price',
@@ -156,11 +180,8 @@ const INVOICE_ITEMS = {
 };
 
 const InvoicePrepayedItemsTable = ({
-  invoiceItems, inverseItems, invoiceId, totalCount, loadMoreRows, isPrepaymentInvoice,
+  invoiceItems, invoiceId, totalCount, loadMoreRows, isPrepaymentInvoice,
 }) => {
-  const items = useMemo(() =>
-    _.concat(invoiceItems, inverseItems), [invoiceItems, inverseItems]);
-
   const isRowLoaded = useCallback(
     ({ index }) => !!invoiceItems[index],
     [invoiceItems],
@@ -171,7 +192,7 @@ const InvoicePrepayedItemsTable = ({
       {_.map(INVOICE_ITEMS, (fieldConfig, fieldName) =>
         renderFormField(fieldConfig, fieldName, {
           invoiceId,
-          invoiceItems: items,
+          invoiceItems,
           totalCount,
           loadMoreRows,
           isRowLoaded,
@@ -185,7 +206,6 @@ InvoicePrepayedItemsTable.propTypes = {
   invoiceId: PropTypes.string.isRequired,
   isPrepaymentInvoice: PropTypes.bool.isRequired,
   invoiceItems: PropTypes.shape({}).isRequired,
-  inverseItems: PropTypes.shape({}).isRequired,
   totalCount: PropTypes.number.isRequired,
   loadMoreRows: PropTypes.func.isRequired,
 };
