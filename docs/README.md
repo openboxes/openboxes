@@ -29,10 +29,7 @@
     ```
 1. Open docs in browser
 
-<a href="http://localhost:8000">
-![image info](./assets/img/mkdocs.png)
-</a>
-
+[<img src="./assets/img/mkdocs.png">](http://localhost:8000)
 
 ## Contributing to Documentation
 
