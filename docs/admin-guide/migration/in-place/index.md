@@ -1,5 +1,5 @@
 
-# In-Place Upgrade 
+# Migrating In-Place 
 This approach requires you to upgrade the application and its dependencies directly on the existing server.
 
 !!! danger
@@ -21,8 +21,11 @@ This approach requires you to upgrade the application and its dependencies direc
     reviewing your environment (Step 2) to make sure you understand the migration steps you will 
     need to execute in order to upgrade the application. In addition, you should plan for 
     contingencies and document your own rollback plan as you are about to embark on a migration
-    that is not officially supported. You may also feel free to reach out to us on our 
-    [Community discussion forum](https://community.openboxes.com), if you would like advice.
+    that is not officially supported. 
+
+!!! tip 
+    If you would like advice or support, please feel free to reach out to us on our 
+    [Community discussion forum](https://community.openboxes.com).
 
 ## Considerations
 * :white_check_mark: Minimal changes to the infrastructure
@@ -37,7 +40,7 @@ This approach requires you to upgrade the application and its dependencies direc
 
 * [ ] Backup Database: Ensure you have a complete backup of the application data and configuration.
 * [ ] Environment Assessment: Check compatibility of new dependencies with the current server environment.
-* [ ] Perform Upgrade: Perform the upgrade of dependencies and the application.
+* [ ] Perform Migration: Perform the upgrade of dependencies and the application.
 * [ ] Testing: Test the application thoroughly in the upgraded environment.
 * [ ] Rollback Plan: Have a rollback plan in case issues arise during or after the upgrade.
 * [ ] Monitoring: Keep an eye on the server to ensure there's no funny business.
@@ -81,6 +84,18 @@ when you install the latest dependencies.
 
 ## Perform Migration
 
+### Operating System (optional)
+If you are currently on an older distribution of Ubuntu (14.04 or 16.04) we would highly recommend
+aborting the in-place upgrade and 
+
+If you are running a more recent LTS distribution like Ubuntu 18.04 or 20.04, it might be possible 
+to perform a dist-upgrade to migrate to upgrade your dependencies.  
+
+
+
+```
+sudo dist-upgrade
+```
 
 ### Java 
 

@@ -2,11 +2,17 @@
 
 ## Introduction
 Generally speaking, upgrading a version of OpenBoxes (or any application packaed as a Java WAR file) 
-is a relatively simple process: drop a new WAR file into the Tomcat webapps directory, 
-restart the application server, watch the logs to make sure database migrations are executed 
-properly, and you're done.
+is a relatively simple process: 
 
-OpenBoxes 0.8.x releases were tied to the following tech stack. This upcoming 0.9.x release(s) support a bit more variability.
+* [ ] Backup your database
+* [ ] Download the latest version of the application
+* [ ] Copy the .war file into the Tomcat webapps directory 
+* [ ] Restart Tomcat
+* [ ] Tail the logs to make sure database migrations are executed properly, and you're done.
+
+In previous version of OpenBoxes (v0.8.x and earlier) releases were tied to a static tech stack 
+with very specific requirements. Only the operating system changed over time because 
+This upcoming 0.9.x release(s) support a bit more variability.
 
 | Dependency         | 0.8.x Supported Versions | 0.9.x Supported Versions   |
 |:-------------------|:-------------------------|----------------------------|
@@ -17,6 +23,14 @@ OpenBoxes 0.8.x releases were tied to the following tech stack. This upcoming 0.
 | Web Server         | Apache 2                 | **Apache 2.2**, nginx 1.23 |
 
 
+| Dependency  | 0.8.x Supported Versions | 0.9.x Supported Versions   |
+|:------------|:-------------------------|----------------------------|
+| Grails      | Grail 1.3.x              | Grails 3.3.x               |
+| Spring      | Grail 1.3.x              | Grails 3.3.x               |
+| Spring Boot | Not Applicable           | Grails 3.3.x               |
+| Hibernate   | Grail 1.3.x              | Grails 3.3.x               |
+
+
 With the latest releases (0.9.x) the technical dependencies have changed, so you'll need to upgrade 
 those dependencies before proceeding with the application upgrade. In general, this process is also 
 fairly straightforward. But given the number of moving parts involved with dependencies and their 
@@ -24,19 +38,39 @@ configuration, there are more many opportunities for errors, some of which we ca
 Therefore, we recommend that you create your own migration plan and include a mitigation and 
 rollback strategy in the case that the upgrade fails. 
 
-## Approaches
+## Differences between in-place and parallel migration paths
 There are primarily two approaches available for migrating. 
 
-* **Parallel Upgrade**: Provision a new VM, install dependencies, migrate database 
-* **In-Place Upgrade**: Upgrade dependencies on your existing VM
+### Upgrading in Parallel (recommended)
+A parallel migration is almost always recommended. This requires you to 
+
+* [ ] Backup your database
+* [ ] Provision new server environment (Ubuntu 22.04)
+* [ ] Install dependencies (MySQL 8, Tomcat 9)
+* [ ] Migrate database 
+* [ ] Deploy latest version of OpenBoxes (v0.9.x)
+* [ ] Validate the new environment
+* [ ] Switch over (usually requires a DNS change)
+
+### Upgrading In-Place
+Upgrading in-place would 
+
+* [ ] Backup your database
+* [ ] Upgrade dependencies (MySQL 8, Tomcat 9)
+* [ ] Deploy latest version of OpenBoxes (v0.9.x)
+* [ ] Configure web server (load balancer) to direct traffic to Tomcat 9 
+* [ ] Validate the new environment
+* [ ] Remove old software dependencies (optional)
 
 !!! tip
     
     If you don't feel comfortable completing the migration process on your own, you can request 
     assistance from the OpenBoxes support team.
 
-## Decision Factors
+### Decision Factors
 
+* Server Accessibility: The ability to provision resources on the hosting provider may not be available 
+* Cost : (even for a short period of time) may incur additional costs that are prohibitive.
 * Downtime Tolerance: If downtime is a significant concern, a parallel migration might be safer.
 * Testing and Rollback: A new server deployment allows for better testing and easier rollback options.
 * Resource Availability: In-place upgrades require fewer resources but can be riskier in terms of service disruption.
@@ -44,7 +78,7 @@ There are primarily two approaches available for migrating.
 
 
 
-## Next Steps
+### Next Steps
 // todo turn these into links 
 
 * If you are upgrading to a new version in the latest release line (0.8.x to 0.9.x)

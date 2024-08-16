@@ -1,4 +1,4 @@
-# Parallel Upgrade
+# Migrating in Parallel
 This approach allows you to set up a new server environment with the updated dependencies, migrate 
 the existing database to this new environment, and apply the application upgrade to this new server. 
 The main advantage of this approach is that can perform the migration on your own timeline with 
