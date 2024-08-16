@@ -29,33 +29,24 @@
     ```
 1. Open docs in browser
 
-![image info](./pictures/image.png)
-
-(http://localhost:8000)
+<a href="http://localhost:8000">
+![image info](./assets/img/mkdocs.png)
+</a>
 
 
 ## Contributing to Documentation
 
 1. Create a new branch 
-```shell
-git checkout -b 1234-troubleshooting-guide 
-```
 
 > [!TIP]
 >   Use the issue number and summary in your branch name.
 
 
-2. Make documentation changes
-```shell
-touch docs/troubleshooting/index.md
-
+2. Make documentation changes in an editor of your choice
+3. Commit changes to branch with meaningful commit message 
 ```
-
-3. Add commit changes 
-3. Commit changes to branch
-```shell
-git commit -m ""
+#1234: fixed typo in docs
 ```
-4. 
+4. Push changes to GitHub
 5. Create a pull request 
-4. Profit 
+6. 
