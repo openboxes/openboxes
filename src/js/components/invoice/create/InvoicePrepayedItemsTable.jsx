@@ -126,8 +126,8 @@ const INVOICE_ITEMS = {
         },
         getDynamicAttr: (params) => ({
           formatValue: () => {
-            const { values, rowIndex } = params;
-            const rowValue = values?.invoiceItems?.[rowIndex];
+            const { invoiceItems, rowIndex } = params;
+            const rowValue = invoiceItems?.[rowIndex];
             // If it's not an adjustment, but product, and it has a synonym, display it
             // with a tooltip with the original name of the product
             return getInvoiceDescription(rowValue);
