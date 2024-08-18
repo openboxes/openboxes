@@ -54,7 +54,7 @@ const ActionDots = ({
   };
 
   return (
-    <div className={`btn-group ${getPositionClass()}`} data-testid="action-dots-component">
+    <div className={`btn-group action-dots ${getPositionClass()}`} data-testid="action-dots-component">
       <button
         data-testid="dropdown-toggle"
         className="action-dots dropdown-toggle d-flex align-items-center justify-content-center"

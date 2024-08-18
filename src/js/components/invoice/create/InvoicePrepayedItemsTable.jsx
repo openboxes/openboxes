@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React from 'react';
 
 import _ from 'lodash';
 import PropTypes from 'prop-types';
@@ -8,6 +8,8 @@ import { Tooltip } from 'react-tippy';
 import ArrayField from 'components/form-elements/ArrayField';
 import LabelField from 'components/form-elements/LabelField';
 import { ORDER_URL, STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
+import useInvoicePrepaidItemsTable from 'hooks/invoice/useInvoicePrepaidItemsTable';
+import ActionDots from 'utils/ActionDots';
 import { renderFormField } from 'utils/form-utils';
 import { getInvoiceDescription } from 'utils/form-values-utils';
 import accountingFormat from 'utils/number-utils';
@@ -171,6 +173,25 @@ const INVOICE_ITEMS = {
           formatValue: (value) => (value ? accountingFormat(value) : value),
         },
       },
+      actionDots: {
+        // eslint-disable-next-line consistent-return
+        type: (params) => {
+          const invoiceItem = params?.invoiceItems?.[params.rowIndex];
+          if (invoiceItem.type !== InvoiceItemType.INVERSE) {
+            return (
+              <ActionDots
+                {...params}
+                dropdownPlacement="right"
+                dropdownClasses="action-dropdown-offset"
+                actions={params.actions(invoiceItem)}
+              />
+            );
+          }
+
+          return null;
+        },
+        flexWidth: '1',
+      },
     },
   },
 };
@@ -178,10 +199,13 @@ const INVOICE_ITEMS = {
 const InvoicePrepayedItemsTable = ({
   invoiceItems, invoiceId, totalCount, loadMoreRows, isPrepaymentInvoice,
 }) => {
-  const isRowLoaded = useCallback(
-    ({ index }) => !!invoiceItems[index],
-    [invoiceItems],
-  );
+  const {
+    actions,
+    isRowLoaded,
+  } = useInvoicePrepaidItemsTable({
+    loadMoreRows,
+    invoiceItems,
+  });
 
   return (
     <div className="my-2 table-form">
@@ -193,6 +217,7 @@ const InvoicePrepayedItemsTable = ({
           loadMoreRows,
           isRowLoaded,
           isPrepaymentInvoice,
+          actions,
         }))}
     </div>
   );
