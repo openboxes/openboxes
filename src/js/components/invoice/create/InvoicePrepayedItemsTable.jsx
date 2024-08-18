@@ -176,7 +176,7 @@ const INVOICE_ITEMS = {
       actionDots: {
         type: (params) => {
           const invoiceItem = params?.invoiceItems?.[params.rowIndex];
-          if (invoiceItem.type !== InvoiceItemType.INVERSE) {
+          if (!invoiceItem.inverse) {
             return (
               <ActionDots
                 {...params}

@@ -2,7 +2,7 @@
 
 exports[`action dots should match snapshot 1`] = `
 <div
-  className="btn-group "
+  className="btn-group action-dots "
   data-testid="action-dots-component"
 >
   <button
