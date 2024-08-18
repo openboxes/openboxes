@@ -5,13 +5,23 @@ OpenBoxes is an open-source supply chain management system designed to manage su
 
 <div class="grid cards" markdown>
 
--   :material-rocket:{ .lg .middle } [__Getting Started__](admin-guide/installation/index.md)
+-   :material-rocket-launch-outline:{ .lg .middle } [__Getting Started__](admin-guide/installation/index.md)
 
     ---
 
     You've already made the decision to implement OpenBoxes and you just want to get started.
 
     [:octicons-arrow-right-24: Installation Guide](admin-guide/installation/index.md)
+
+
+-   :material-cloud-upload-outline:{ .lg .middle } [__Upgrading__](admin-guide/upgrading/index.md)
+
+    ---
+
+    You've already made the decision to implement OpenBoxes and you just want to get started.
+
+    [:octicons-arrow-right-24: Upgrade Guide](admin-guide/upgrading/index.md)
+
 
 
 -   :material-clipboard-check:{ .lg .middle } [__Software Evaluation__](https://calendly.com/openboxes/discussion)

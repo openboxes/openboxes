@@ -1,12 +1,15 @@
+??? warning
+
+    Please do NOT use this page if you are upgrading from 0.8.x to 0.9.x. 
+    Review the [Migration Guide](../migration) if you need more information.
+
+
 # Upgrading
+
 
 Once you have migrated from 0.8.x to 0.9.x, the upgrade process for subsequent releases will
 go back to being straightforward.
 
-!!! danger
-
-    Please do NOT use this page if you are upgrading from 0.8.x to 0.9.x. 
-    Review the [Migration Guide](../migration) if you need more information.
 
 ## Assumptions
 These upgrade instructions make the following assumptions
@@ -14,24 +17,23 @@ These upgrade instructions make the following assumptions
 * [x] You are NOT upgrading from v0.8.x to v0.9.x release 
 * [x] You have deployed the application to Tomcat 9  
 
-
-!!! note
+    ??? note
     
-    You can still use Tomcat 8.5, but the commands below assume that you are using Tomcat 9.
-
-!!! tip
-    
-    Whether you're upgrading or migrating ALWAYS backup your database just in case something 
-    goes awry.
+          You can still use Tomcat 8.5, but the commands below assume that you are using Tomcat 9.
 
 
 ## Instructions
 
 ### 1. Backup Database
 
+!!! important
+
+    Whether you're upgrading or migrating ALWAYS backup your database just in case something 
+    goes awry.
+
 === "SSH/SCP"
 
-    !!!note "Assumptions"
+    ??? note "Assumptions"
         * Credentials are configured in ~/.my.cnf (otherwise include credentials as arguments)
 
     1. SSH to your application server (or database server if you're using distributed deployment)
@@ -48,7 +50,7 @@ These upgrade instructions make the following assumptions
     ```
 === "Remote Backup"
     
-    !!!note "Assumptions"
+    ??? note "Assumptions"
         * MySQL/MariaDB is configured to listen for external connections
         * Credentials are configured in ~/.my.cnf (otherwise include credentials as arguments)
 
