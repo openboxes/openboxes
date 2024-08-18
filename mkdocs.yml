@@ -27,7 +27,7 @@ theme:
     - content.code.copy
     - content.code.select
     - header.autohide
-#     - navigation.indexes
+     - navigation.indexes
 #     - navigation.instant
 #     - navigation.instant.progress
     - navigation.expand
@@ -127,45 +127,49 @@ nav:
   # Installation Guide
   # Need to add a discussion re: self-hosted on-premise vs cloud vs managed hosting
   - Install:
-    - Overview: admin-guide/installation/index.md
-    #- Basic Instructions: admin-guide/installation/basic-instructions.md
+    - Introduction: admin-guide/installation/index.md
+    - Basic Instructions: admin-guide/installation/basic-instructions.md
     - Getting Started:
       - System Requirements: admin-guide/installation/requirements.md
       - Knowledge Requirements: admin-guide/installation/getting-started.md
-#      - Deployment Strategy: admin-guide/installation/deployment.md
       - Hosting Providers: admin-guide/installation/hosting.md
+      #- Deployment Strategy: admin-guide/installation/deployment.md
     - Installation:
-      - Create Server:
-        - Overview: admin-guide/hosting/index.md
-        - Digital Ocean: admin-guide/hosting/digital-ocean/droplet.md
-      - Install Java: admin-guide/installation/ubuntu2204/java.md
-      - Install Tomcat: admin-guide/installation/ubuntu2204/tomcat.md
-      - Install MySQL/MariaDB: admin-guide/installation/ubuntu2204/mysql.md
-      - Install Apache/Nginx: admin-guide/installation/ubuntu2204/webserver.md
-    - Deployment:
-      - Configure Application: admin-guide/installation/ubuntu2204/configuration.md
-      - Deploy Application: admin-guide/installation/ubuntu2204/application.md
-    - Post-Installation:
-      - Enable HTTPS: admin-guide/installation/advanced.md
-      - Configure HTTPS: admin-guide/installation/ubuntu2204/webserver.md
+      - Provision Resources: admin-guide/hosting/provisioning.md
+      - Install Dependencies: admin-guide/installation/ubuntu2204/dependencies.md
+      - Create Database: admin-guide/installation/ubuntu2204/database.md
+      - Configure Basics: admin-guide/installation/ubuntu2204/configuration.md
+      - Deploy Application: admin-guide/installation/ubuntu2204/deployment.md
+      - Verify Deployment: admin-guide/installation/ubuntu2204/verification.md
+      # Should delete this version of the deployment instructions
+      #- Deploy Application: admin-guide/installation/ubuntu2204/application.md
+    - Post-Deployment:
+      - Introduction:  admin-guide/installation/ubuntu2204/post-deployment.md
+      - Configure Reverse Proxy: admin-guide/installation/ubuntu2204/reverse-proxy.md
+      - Enable HTTPS: admin-guide/installation/ubuntu2204/https.md
+      # Other post-deployment topics to document
+      #- Configure Tomcat:
+      #- Secure Database:
+      #- Configure Database:
     - Troubleshooting:
       - admin-guide/installation/ubuntu2204/troubleshooting.md
 
   # Configuration Guide - needs a lot of work
   - Configure:
-    - Overview: admin-guide/configuration/index.md
-    - Config Locations: admin-guide/configuration/config-locations.md
-    - Config Properties:
+    - Introduction: admin-guide/configuration/index.md
+    - Configuration Files: admin-guide/configuration/configuration-files.md
+    - Configuration Properties:
       - Database: admin-guide/configuration/database.md
-      - Email: admin-guide/configuration/email.md
       - Application: admin-guide/configuration/application.md
+      - Hibernate: admin-guide/configuration/hibernate.md
+      - Email: admin-guide/configuration/email.md
       - Sentry: admin-guide/configuration/sentry.md
       - Monitoring: placeholder.md
       - Analytics: placeholder.md
-    - Advanced:
-      - admin-guide/installation/advanced.md
-      - Tomcat AJP: admin-guide/configuration/ajp.md
-      - Apache HTTPS: admin-guide/configuration/https.md
+#    - Advanced:
+#      - admin-guide/installation/advanced.md
+#      - Tomcat AJP: admin-guide/configuration/ajp.md
+#      - Apache HTTPS: admin-guide/configuration/https.md
 #       - Advanced:
 #       - Example: admin-guide/configuration/example.md
 #     #- Onboarding: admin-guide/onboarding/index.md

@@ -1,9 +1,6 @@
 
 
 
-!!! todo
-    TBD
-
 # Operating Systems
 * Ubuntu 22.04 
 

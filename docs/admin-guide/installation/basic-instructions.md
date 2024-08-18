@@ -1,5 +1,7 @@
 # Basic Instructions
-1. Install dependencies
+1. Review requirements
+2. Provision resources
+3. Install dependencies
 1. Download latest release
 1. Create new database in MySQL
 1. Grant permissions to new database user 

@@ -1,6 +1,6 @@
 # Overview
 
-## Getting Started
+## Step 1: Getting Started 
 
 <div class="grid cards" markdown>
 
@@ -38,7 +38,7 @@
 
 [//]: # (2. Choose Hosting Provider &#40;Digital Ocean, Amazon, Azure&#41;)
 
-## Installation 
+## Step 2: Installation 
 
 <div class="grid cards" markdown>
 
@@ -68,7 +68,7 @@
 </div>
 
 
-## Configuration
+## Step 3. Configuration
 
 <div class="grid cards" markdown>
 
@@ -97,14 +97,14 @@
 </div>
 
 
-## Deployment
+## Step 4. Deployment
 3. Download the latest release
 1. Copy WAR file to Tomcat
 1. Restart Tomcat
 1. Watch the Tomcat logs during startup
 1. Open application using Chrome browser 
 
-## Onboarding
+## Step 5. Onboarding
 1. Authenticate
 1. Change admin password
 2. Create a product

@@ -1,38 +1,68 @@
-# Hosting
-Whether you plan to install OpenBoxes on-premise or in the cloud, the installation instructions should be relatively 
-similar. 
 
-## Cloud Hosting Providers
-Here are a few recommended options for hosting.
-
-### Recommended
-
-The following 
-
-| Hosting Provider / Instance Type                                                                 | Memory | vCPU | Disk | Monthly Cost | Comments                           |
-|--------------------------------------------------------------------------------------------------| -- | --- | --- |--------------|------------------------------------|
-| [Digital Ocean](https://m.do.co/c/da4712a483b4) Droplet                                          | 4GB | 2 | 80GB | $20          | Very easy to get started.          |
-| [RimuHosting](https://rimuhosting.com/vps-servers?r=d91cf2bcee5396e721c700ded9a22481) Custom VPS |  4GB | 8 | 50GB | $15 | Highly recommended, great support. |
+Here are some popular cloud hosting providers where you can provision a virtual machine for OpenBoxes:
 
 
-[//]: # (### Various Others)
+<div class="grid cards" markdown>
 
-[//]: # ()
-[//]: # (| Hosting Provider                                                     | Instance Type | Memory | vCPU | Disk | Monthly Cost | Comments                      |     |)
+- :material-aws:{ .lg .middle } __Amazon Web Services (AWS)__
+    
+    ---
+    [AWS EC2](https://aws.amazon.com/ec2/) offers flexible computing resources and a wide range of instance types.
+    
+    **Recommended Instance:** t3.medium or larger
 
-[//]: # (|----------------------------------------------------------------------| ------ | --- | --- | --- |--------------|------------------------------------| --- |)
+    [Launching an EC2 Instance](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EC2_GetStarted.html)
 
-[//]: # (| [Amazon Web Services EC2]&#40;http://www.ec2instances.info/&#41; | t3.medium | 4GB | 2 | 8GB | $30          | |)
+- :material-microsoft-azure:{ .lg .middle } __Microsoft Azure__
 
-[//]: # (| [Azure VM]&#40;https://cloud.google.com/compute/pricing&#41;                 | B2S | 4GB | 2 | 8GB | $30          ||)
+    ---
+    [Azure Virtual Machines](https://azure.microsoft.com/en-us/services/virtual-machines/) provide a variety of Linux and Windows VMs.
 
-[//]: # (| [Google Compute Engine]&#40;https://cloud.google.com/compute/pricing&#41;    | n1-standard-1 | 3.75GB | 1 | 30GB | $25          | |)
+    **Recommended Instance:** B2ms or larger
+    [Create a Linux VM in the Azure Portal](https://learn.microsoft.com/en-us/azure/virtual-machines/linux/quick-create-portal)
 
-[//]: # (| [Google Compute Engine]&#40;https://cloud.google.com/compute/pricing&#41;    | n1-standard-2 | 7.5GB | 2 | 30GB | $50          | |)
+- :material-google-cloud: __Google Cloud Platform (GCP)__
 
-[//]: # (| [Linode]&#40;https://www.linode.com/pricing&#41;                             | Linode 4GB | 4GB | 2 | 80GB | $20          ||)
+    ---
+    [Compute Engine](https://cloud.google.com/compute) offers customizable virtual machines and supports automatic scaling.
+    
+    **Recommended Instance:** e2-medium or larger
 
-[//]: # (| [Linode]&#40;https://www.linode.com/pricing&#41;                             | Dedicated 4GB | 4GB | 2 | 25GB | $30          ||)
+    [Creating a VM Instance](https://cloud.google.com/compute/docs/instances/create-start-instance)
+
+- :material-digital-ocean: __DigitalOcean__
+
+    ---
+    [Droplets](https://www.digitalocean.com/products/droplets/) are scalable virtual machines with a simple pricing model.
+
+    **Recommended Plan:** Basic Droplet with 4 GB RAM, 2 vCPUs
+    
+    [Creating a Droplet](https://docs.digitalocean.com/products/droplets/how-to/create/)
+
+- :fontawesome-brands-linode: __Linode__
+
+    ---
+    [Linode](https://www.linode.com/) offers simple, affordable, and powerful cloud computing.
+
+    **Recommended Plan:** Linode 8GB
+
+    [Deploy a Linode](https://www.linode.com/docs/guides/getting-started/)
+
+- :material-tree: __RimuHosting__
+
+    ---
+    [RimuHosting](https://rimuhosting.com/) provides flexible and customizable VPS and dedicated servers.
+
+    **Recommended Plan:** VPS with 8 GB RAM, 2 vCPUs, SSD storage
+
+    [Provisioning a VPS on RimuHosting](https://rimuhosting.com/order/startorder.jsp)
+
+
+</div>
+
+
+
+
 
 
 [//]: # (NOTE: AWS has a free-tier that includes a free year of 750 hours per month for t2.micro EC2 instances &#40;as well as other )

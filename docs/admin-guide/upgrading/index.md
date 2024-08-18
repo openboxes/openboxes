@@ -7,9 +7,9 @@ go back to being straightforward.
 ## Prerequisites
 These upgrade instructions make the following assumptions
 
-* You have already migrated to OpenBoxes v0.9.x   :material-check-bold: 
-* You are upgrading from v0.8.x to another v0.8.x release  :material-check-bold: 
-* You have deployed the application to Tomcat 9 :material-check-bold: 
+* [x] You have already migrated to OpenBoxes v0.9.x  
+* [x] You are upgrading from v0.8.x to another v0.8.x release  
+* [x] You have deployed the application to Tomcat 9  
 
 !!! danger 
     
@@ -26,21 +26,41 @@ These upgrade instructions make the following assumptions
     goes awry.
 
 
-## Step-by-step Instructions
+## Instructions
 
 ### 1. Backup Database
 
-1. SSH to your application server (or database server if you're using distributed deployment)
+=== "SSH/SCP"
 
-        ssh db.openboxes.com
+    !!!note "Assumptions"
+        * Credentials are configured in ~/.my.cnf (otherwise include credentials as arguments)
 
-2. Backup the database
+    1. SSH to your application server (or database server if you're using distributed deployment)
+    ```shell
+    ssh <database-server-ip>
+    ```
+    2. Backup the database
+    ```shell
+    mysqldump openboxes > openboxes.sql 
+    ```
+    3. Copy database backup to safe place
+    ```shell
+    scp openboxes.sql <backup-server-ip>:<backup-directory>
+    ```
+=== "Remote Backup"
     
-        mysqldump openboxes > openboxes.sql 
+    !!!note "Assumptions"
+        * MySQL/MariaDB is configured to listen for external connections
+        * Credentials are configured in ~/.my.cnf (otherwise include credentials as arguments)
 
-3. Copy database backup to safe place
-
-        scp openboxes.sql backups.openboxes.com
+    1. Execute mysqldump from your local machine
+        ```
+        mysqldump -h <database-server-ip> openboxes > openboxes.sql
+        ```
+    2. Copy database backup to long-term storage
+        ```
+        scp openboxes.sql <backup-server-ip>
+        ```
 
 
 ### 2. Upgrade Application
