@@ -5,15 +5,34 @@ OpenBoxes is an open-source supply chain management system designed to manage su
 
 <div class="grid cards" markdown>
 
--   :material-tools:{ .lg .middle } __Install OpenBoxes__
+-   :material-rocket:{ .lg .middle } [__Getting Started__](admin-guide/installation/index.md)
 
     ---
 
-    Get started with OpenBoxes to streamline your inventory workflows.
+    You've already made the decision to implement OpenBoxes and you just want to get started.
 
     [:octicons-arrow-right-24: Installation Guide](admin-guide/installation/index.md)
 
--   :material-account-group:{ .lg .middle } __Join the Community__
+
+-   :material-clipboard-check:{ .lg .middle } [__Software Evaluation__](https://calendly.com/openboxes/discussion)
+
+    ---
+
+    Schedule a discovery session to see OpenBoxes in action and explore whether
+    it can meet the needs of your organization.
+
+    [:octicons-arrow-right-24: Schedule a Discussion](https://calendly.com/openboxes/discussion)
+
+-   :material-calculator:{ .lg .middle } [__Cost Estimate__](https://calendly.com/openboxes/cost-analysis)
+
+    ---
+
+    Request a cost estimate to find the better understand the potential costs of implementing 
+    OpenBoxes. 
+
+    [:octicons-arrow-right-24: Schedule a Cost Estimate](https://calendly.com/openboxes/cost-analysis)
+
+-   :material-account-group:{ .lg .middle } [__Join the Community__](https://community.openboxes.com)
 
     ---
 
@@ -21,6 +40,13 @@ OpenBoxes is an open-source supply chain management system designed to manage su
 
     [:octicons-arrow-right-24: Join the Community](https://community.openboxes.com)
 
+-   :material-lifebuoy:{ .lg .middle } __Something else?__
+
+    ---
+
+    Reach out to the community or our support team for assistance— we're here to help with any questions or issues.
+
+    [:octicons-arrow-right-24: Get Support](support)
 
 [//]: # (-   :material-bug-check:{ .lg .middle } __Report a Bug__)
 
@@ -49,23 +75,7 @@ OpenBoxes is an open-source supply chain management system designed to manage su
 
 [//]: # (    )
 
--   :octicons-checklist-24:{ .lg .middle } __Evaluate OpenBoxes__
 
-    ---
-
-    Schedule a discovery session to see OpenBoxes in action and explore whether 
-    it can meet the needs of your organization.
-
-    [:octicons-arrow-right-24: Schedule a Discussion](https://calendly.com/openboxes/discussion)
-
-
--   :material-lifebuoy:{ .lg .middle } __Get Support__
-
-    ---
-
-    Reach out to our support team for assistance— we're here to help with any questions or issues.
-
-    [:octicons-arrow-right-24: Get Support](support)
 
 
 </div>
