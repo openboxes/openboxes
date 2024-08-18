@@ -59,7 +59,6 @@ export const REMOVE_INVOICE_ITEM = (id) => `${INVOICE_API}/${id}/removeItem`;
 // INVOICE ITEM
 export const INVOICE_ITEM_API = `${API}/invoiceItems`;
 export const VALIDATE_INVOICE_ITEM = (id) => `${INVOICE_ITEM_API}/${id}/validation`;
-export const INVOICE_ITEM_DELETE = (id) => `${INVOICE_ITEM_API}/${id}`;
 
 // PREPAYMENT INVOICE ITEM
 export const PREPAYMENT_INVOICE_ITEM_API = `${API}/prepaymentInvoiceItems`;

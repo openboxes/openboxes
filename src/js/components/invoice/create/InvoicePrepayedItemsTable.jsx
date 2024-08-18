@@ -174,7 +174,6 @@ const INVOICE_ITEMS = {
         },
       },
       actionDots: {
-        // eslint-disable-next-line consistent-return
         type: (params) => {
           const invoiceItem = params?.invoiceItems?.[params.rowIndex];
           if (invoiceItem.type !== InvoiceItemType.INVERSE) {
