@@ -1,7 +1,7 @@
 
 # Onboarding
 
-## Configuration
+## Basic Setup
 
 <div class="grid cards" markdown>
 

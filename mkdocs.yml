@@ -121,8 +121,6 @@ nav:
         - Mac OS: admin-guide/quickstart/macos/index.md
 #       - Docker: admin-guide/quickstart/docker/
 #       - Windows: admin-guide/quickstart/windows/
-      - Next Steps:
-        - Onboarding: admin-guide/onboarding/index.md
 
   # Installation Guide
   # Need to add a discussion re: self-hosted on-premise vs cloud vs managed hosting
@@ -147,9 +145,11 @@ nav:
       - Introduction:  admin-guide/installation/ubuntu2204/post-deployment.md
       - Configure Reverse Proxy: admin-guide/installation/ubuntu2204/reverse-proxy.md
       - Enable HTTPS: admin-guide/installation/ubuntu2204/https.md
-      # Other post-deployment topics to document
-      #- Configure Tomcat:
+      # Other post-deployment topics to document which should also go in Configuration Guide
+      #- Rotate Logs:
+      #- Tune Performance:
       #- Secure Database:
+      #- Configure Tomcat:
       #- Configure Database:
     - Troubleshooting:
       - admin-guide/installation/ubuntu2204/troubleshooting.md
@@ -164,8 +164,9 @@ nav:
       - Hibernate: admin-guide/configuration/hibernate.md
       - Email: admin-guide/configuration/email.md
       - Sentry: admin-guide/configuration/sentry.md
-      - Monitoring: placeholder.md
-      - Analytics: placeholder.md
+#      - Monitoring:
+#      - Analytics:
+#      - Logrotate.d:
 #    - Advanced:
 #      - admin-guide/installation/advanced.md
 #      - Tomcat AJP: admin-guide/configuration/ajp.md
@@ -188,53 +189,45 @@ nav:
       - In-Place Migration: admin-guide/migration/in-place/index.md
     - Troubleshooting:
       - Known Issues: admin-guide/migration/known-issues/index.md
-      - Support: support/index.md
-
 
   # Onboarding Guide
-  - Onboarding:
-      - Overview: admin-guide/onboarding/index.md
-
+  - Onboarding: admin-guide/onboarding/index.md
 
   # Developer Guide - needs a lot of work
-  - Developer Guide:
-    - Getting Started: developer-guide/getting-started.md
-    - Architecture: developer-guide/architecture/index.md
-    - Contributing: developer-guide/contributing.md
-    - Forking: developer-guide/syncing-a-fork.md
-    - Tagging a Release: developer-guide/tagging.md
-    - Troubleshooting: developer-guide/troubleshooting.md
-    - Release:
-      - Process:
-        - Overview: developer-guide/release/index.md
-        - Plan: developer-guide/release/plan.md
-        - Develop: developer-guide/release/develop.md
-        - Prepare: developer-guide/release/prepare.md
-        - Test: developer-guide/release/testing.md
-        - Finalize: developer-guide/release/finalize.md
-        - Document: developer-guide/release/document.md
-        - Publish: developer-guide/release/publish.md
-        - Deploy: developer-guide/release/deploy.md
-        - Cleanup: developer-guide/release/cleanup.md
-      - Hotfix: developer-guide/hotfix/index.md
-
+#  - Developer Guide:
+#    - Getting Started: developer-guide/getting-started.md
+#    - Architecture: developer-guide/architecture/index.md
+#    - Contributing: developer-guide/contributing.md
+#    - Forking: developer-guide/syncing-a-fork.md
+#    - Tagging a Release: developer-guide/tagging.md
+#    - Troubleshooting: developer-guide/troubleshooting.md
+#    - Release:
+#      - Process:
+#        - Overview: developer-guide/release/index.md
+#        - Plan: developer-guide/release/plan.md
+#        - Develop: developer-guide/release/develop.md
+#        - Prepare: developer-guide/release/prepare.md
+#        - Test: developer-guide/release/testing.md
+#        - Finalize: developer-guide/release/finalize.md
+#        - Document: developer-guide/release/document.md
+#        - Publish: developer-guide/release/publish.md
+#        - Deploy: developer-guide/release/deploy.md
+#        - Cleanup: developer-guide/release/cleanup.md
+#      - Hotfix: developer-guide/hotfix/index.md
 
 
 #     # Create a GH label to capture migration issues and link them here
 #     #- Troubleshooting
-    - Community:
-      - Support:
-        - Overview: support/index.md
+  - Support: support/index.md
 
   # User Guide
   - User Guide:
-    - Getting Started: user-guide/index.md
-    - Knowledge Base: user-guide/knowledge-base.md
-    - Community Support: user-guide/community-support.md
-    - YouTube Channel: user-guide/youtube.md
-    - Tutorial Videos: user-guide/tutorials.md
-  # - Contributing Guide:
-
+    - Introduction: user-guide/index.md
+    - Glossary: user-guide/glossary.md
+    - Knowledge Base: user-guide/#knowledge-base
+    - Community Support: user-guide/#community-support
+    - YouTube Channel: user-guide/#youtube
+    - Tutorial Videos: user-guide/#tutorials
 
   # API Guide
   - API Guide:
@@ -273,6 +266,3 @@ nav:
       - Bulk Actions:
         - Create Resources: api-guide/generic/create-resources.md
         - Update Resources: api-guide/generic/update-resources.md
-
-  - Ideal Sitemap: sitemap.md
-

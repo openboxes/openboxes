@@ -1,59 +1,63 @@
-
+<style>
+.md-content img {
+  border-width: 1px;
+  border-style: solid;
+  border-color: lightgrey;
+}
+</style>
 # User Guide
 
-## Knowledge Base
-Search our knowledge base for information and step-by-step instructions on the most common features.
+## Resources
 
-<a href="https://help.openboxes.com">
-![img.png](../assets/img/helpscout.png)
-</a>
+<div class="grid cards" markdown>
 
+-   :material-book-open-page-variant:{ .lg .middle } __Glossary__
 
-/// html | div[style='float: left; width: 50%;']
+    ---
 
-Search our knowledge base for information and step-by-step instructions on the most common features.
+    The glossary serves as a quick reference resource to help understand terminology used in
+    OpenBoxes that may be unfamiliar.
 
-///
+    [![img_2.png](img_2.png)](glossary.md)
 
+-   :material-head-lightbulb:{ .lg .middle } __Knowledge Base__
 
-/// html | div[style='float: right;width: 50%;']
+    ---
+    
+    Search our self-service knowledge base for information and step-by-step instructions 
+    on the most common features.
 
-<a href="https://help.openboxes.com">
-
-![img.png](../assets/img/helpscout.png)
-
-</a>
-
-///
+    [![img.png](../assets/img/helpscout.png)](https://help.openboxes.com)
 
 
-/// html | div[style='clear: both;']
+-   :material-chat-question:{ .lg .middle } __Community Support__
 
-///
+    ---
+
+    Post your questions to our Community Support discussion forum and search for answers to common questions.
+
+    [![img_1.png](img_1.png)](https://community.openboxes.com)
 
 
+-   :material-youtube:{ .lg .middle } __YouTube Channel__
+
+    ---
+
+    Subscribe to our YouTube Channel! Or ... ya know ... don't. It's up to you.
+
+    [![img.png](../assets/img/youtube.png)](https://www.youtube.com/@openboxes)
 
 
+-   :material-presentation-play:{ .lg .middle } __Tutorials__
 
-## Discussion Forum
+    ---
 
-Post your questions to our Community Forum and search for answers to common questions. 
+    Check out our tutorials page for very outdated tutorials.
 
-<a href="https://community.openboxes.com">
-![img.png](../assets/img/discourse2.png)
-</a>
+    [![img.png](../assets/img/tutorials.png)](https://openboxes.com/tutorials)
 
-## YouTube channel
-Subscribe to our YouTube Channel! Or ... ya know ... don't. It's up to you.
-<a href="https://www.youtube.com/channel/UC-e9K2wU9wZFQ11eF-vwu6Q">
-![img.png](../assets/img/youtube.png)
-</a>
+</div>
 
-## Tutorials 
-Check out our tutorials page for the most up-to-date tutorials.
-<a href="https://openboxes.com/tutorials">
-![img.png](../assets/img/tutorials.png)
-</a>
 
 ## Contributing
 If you would like to contribute to this User Guide, please refer to the 

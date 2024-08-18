@@ -42,9 +42,10 @@ http://<your-subdomain>.<your-domain-name>.com:8080/openboxes
 ```
 
 !!! note
-The astute observer will notice that after entering the domain name in the browser search bar
-and clicking enter, the browser redirects us back to the IP address. This is due to the `grails.serverURL`
-configuration still pointing to the IP address. We'll fix that later.
+
+    The astute observer will notice that after entering the domain name in the browser search bar
+    and clicking enter, the browser redirects us back to the IP address. This is due to the `grails.serverURL`
+    configuration still pointing to the IP address. We'll fix that later.
 
     ![img_10.png](img_10.png)
 
