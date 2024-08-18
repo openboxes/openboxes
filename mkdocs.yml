@@ -181,14 +181,11 @@ nav:
 
   # Upgrade Guide
   - Upgrade:
-    - Upgrading: admin-guide/upgrading/index.md
-
-  # Migration Guide
-  - Migration:
+    - Introduction: admin-guide/upgrading/index.md
     - Upgrading from 0.8.x to 0.9.x:
-      - Overview: admin-guide/migration/index.md
-      - Upgrading in Parallel: admin-guide/migration/parallel/index.md
-      - Upgrading In-Place: admin-guide/migration/in-place/index.md
+      - Introduction: admin-guide/migration/index.md
+      - Parallel Migration: admin-guide/migration/parallel/index.md
+      - In-Place Migration: admin-guide/migration/in-place/index.md
     - Troubleshooting:
       - Known Issues: admin-guide/migration/known-issues/index.md
       - Support: support/index.md

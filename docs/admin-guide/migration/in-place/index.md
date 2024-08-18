@@ -162,7 +162,7 @@ instructions are included.
         sudo touch /etc/nginx/conf.d/default.conf
         cat 9_nginx_config.template > /etc/nginx/conf.d/default.conf
         echo "Bruteforce creating missing files in the /etc/letsencrypt"
-        curl https://raw.githubusercontent.com/certbot/certbot/master/certbot-nginx/certbot_nginx/_internal/tls_configs/options-ssl-nginx.config > /etc/letsencrypt/options-ssl-nginx.conf
+        curl https://raw.githubusercontent.com/certbot/certbot/master/certbot-nginx/certbot_nginx/_internal/tls_configs/options-ssl-nginx.conf
         curl https://raw.githubusercontent.com/certbot/certbot/master/certbot/certbot/ssl-dhparams.pem > /etc/letsencrypt/ssl-dhparams.pem
     
     #### Disable Apache2 
