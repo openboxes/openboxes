@@ -1,4 +1,8 @@
-# Migrating in Parallel
+
+!!! reminder
+
+    Document step for copying configuration for migration process.
+
 This approach allows you to set up a new server environment with the updated dependencies, migrate 
 the existing database to this new environment, and apply the application upgrade to this new server. 
 The main advantage of this approach is that can perform the migration on your own timeline with 
@@ -13,14 +17,16 @@ significantly less downtime and dependency and configuration intermingling.
 
 ## Procedure
 
-### Basic Procedure
+### Basic Steps
 * [ ] Backup Database: Backup your database. Copy the backup somewhere safe.
 * [ ] Provision Resources: Provision virtual machines for the new environment.
 * [ ] Configure Server(s): Configure a new server environment with the necessary updates and dependencies.
-* [ ] Migrate Database: Migrate database backup to new server
+* [ ] Migrate Configuration: Migrate your existing configuration files to the new server.
+* [ ] Migrate Database: Migrate database to new server.
 * [ ] Deploy Application: Deploy the updated application on the new server.
 * [ ] Verify Deployment: Check whether the server boots up properly and that there are no errors in database migrations.
 * [ ] Testing: Conduct extensive testing to ensure the application works correctly in the new environment.
+* [ ] Migrate Database: Migrate the database to the new server again (in case new data was stored since previous migration)
 * [ ] Switch Over: Redirect traffic to the new server once testing is successful.
 * [ ] Monitoring: Monitor the new server for any issues and validate that everything is functioning as expected.
 

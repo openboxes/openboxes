@@ -183,10 +183,14 @@ nav:
   # Upgrade Guide
   - Upgrade:
     - Introduction: admin-guide/upgrading/index.md
-    - Upgrading from 0.8.x to 0.9.x:
+    - Migration Primer:
       - Introduction: admin-guide/migration/index.md
+      - Migration Strategies: admin-guide/migration/strategies.md
+      - Decision Factors: admin-guide/migration/factors.md
+      - Comparison: admin-guide/migration/differences.md
+    - Migration Guide:
       - Parallel Migration: admin-guide/migration/parallel/index.md
-      - In-Place Migration: admin-guide/migration/in-place/index.md
+      - In-Place Upgrade: admin-guide/migration/in-place/index.md
     - Troubleshooting:
       - Known Issues: admin-guide/migration/known-issues/index.md
 

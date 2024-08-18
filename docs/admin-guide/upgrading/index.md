@@ -1,20 +1,19 @@
-# Upgrading 
+# Upgrading
 
-Once you have migrated from 0.8.x to 0.9.x, the upgrade process for subsequent releases will 
-go back to being straightforward. 
+Once you have migrated from 0.8.x to 0.9.x, the upgrade process for subsequent releases will
+go back to being straightforward.
 
+!!! danger
 
-## Prerequisites
+    Please do NOT use this page if you are upgrading from 0.8.x to 0.9.x. 
+    Review the [Migration Guide](../migration) if you need more information.
+
+## Assumptions
 These upgrade instructions make the following assumptions
 
-* [x] You have already migrated to OpenBoxes v0.9.x  
-* [x] You are upgrading from v0.8.x to another v0.8.x release  
+* [x] You are NOT upgrading from v0.8.x to v0.9.x release 
 * [x] You have deployed the application to Tomcat 9  
 
-!!! danger 
-    
-    Do NOTE use this page if you are upgrading from 0.8.x to 0.9.x. Instead
-    please review the [Migration Guide](../migration)
 
 !!! note
     
