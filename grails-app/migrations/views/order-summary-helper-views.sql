@@ -84,8 +84,10 @@ CREATE OR REPLACE VIEW order_item_payment_status AS
             LEFT OUTER JOIN invoice ON invoice.id = invoice_item.invoice_id
         WHERE `order`.order_type_id = 'PURCHASE_ORDER'
           AND order_item.order_item_status_code != 'CANCELLED'
+          -- invoice type id 5 is for PREPAYMENT_INVOICE
           AND (invoice.invoice_type_id != '5' OR invoice.invoice_type_id IS NULL)
           AND invoice.date_posted IS NOT NULL
+          AND (invoice_item.inverse IS NULL OR invoice_item.inverse = FALSE)
         GROUP BY `order`.id, order_item.id, invoice_item.id, shipment_item.id
     )
 AS order_item_payment_status
@@ -121,7 +123,9 @@ CREATE OR REPLACE VIEW order_adjustment_payment_status AS
             LEFT OUTER JOIN invoice_item ON invoice_item.id = order_adjustment_invoice.invoice_item_id
             LEFT OUTER JOIN invoice ON invoice.id = invoice_item.invoice_id
         WHERE `order`.order_type_id = 'PURCHASE_ORDER'
+          -- invoice type id 5 is for PREPAYMENT_INVOICE
           AND (invoice.invoice_type_id != '5' OR invoice.invoice_type_id IS NULL)
+          AND (invoice_item.inverse IS NULL OR invoice_item.inverse = FALSE)
         GROUP BY `order`.id, `order`.order_number, invoice_item.id, order_adjustment.id
     )
 AS order_adjustment_payment_status;
