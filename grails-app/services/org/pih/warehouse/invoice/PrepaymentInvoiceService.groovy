@@ -32,7 +32,6 @@ class PrepaymentInvoiceService {
             InvoiceItem invoiceItem = createFromOrderItem(orderItem)
             // This is prepayment item, we need to adjust the amount according to the payment terms
             invoiceItem.amount = invoiceItem.amount * prepaymentPercent
-            invoiceItem.invoiceItemType = InvoiceItemType.PREPAYMENT
             invoice.addToInvoiceItems(invoiceItem)
         }
 
@@ -40,7 +39,6 @@ class PrepaymentInvoiceService {
             InvoiceItem invoiceItem = createFromOrderAdjustment(orderAdjustment)
             // This is prepayment item, we need to adjust the amount according to the payment terms
             invoiceItem.amount = invoiceItem.amount * prepaymentPercent
-            invoiceItem.invoiceItemType = InvoiceItemType.PREPAYMENT
             invoice.addToInvoiceItems(invoiceItem)
         }
 
@@ -95,8 +93,7 @@ class PrepaymentInvoiceService {
                     quantityPerUom: orderItem.quantityPerUom ?: 1,
                     unitPrice: orderItem.unitPrice,
                     // canceled invoice items amount is 0
-                    amount: 0,
-                    invoiceItemType: InvoiceItemType.REGULAR
+                    amount: 0
             )
             invoiceItem.addToOrderItems(orderItem)
             return invoiceItem
@@ -111,8 +108,7 @@ class PrepaymentInvoiceService {
                 quantityPerUom: orderItem.quantityPerUom ?: 1,
                 unitPrice: orderItem.unitPrice,
                 // For non-canceled order items invoice item amount is equal to (order item quantity * unit price)
-                amount: (orderItem.quantity ?: 0) * (orderItem.unitPrice ?: 0.0),
-                invoiceItemType: InvoiceItemType.REGULAR
+                amount: (orderItem.quantity ?: 0) * (orderItem.unitPrice ?: 0.0)
         )
         invoiceItem.addToOrderItems(orderItem)
         return invoiceItem
@@ -131,8 +127,8 @@ class PrepaymentInvoiceService {
                 quantityPerUom: orderItem?.quantityPerUom ?: 1,
                 unitPrice: orderItem?.unitPrice,
                 // For shipment items invoice item amount is equal to (shipped item quantity * unit price) in UoM quantity
-                amount: quantity * orderItem?.unitPrice,
-                invoiceItemType: InvoiceItemType.REGULAR
+                // and unit price is take from order item (in case it was updated)
+                amount: quantity * orderItem?.unitPrice
         )
         invoiceItem.addToShipmentItems(shipmentItem)
         return invoiceItem
@@ -148,8 +144,7 @@ class PrepaymentInvoiceService {
                 quantityPerUom: orderAdjustment.orderItem?.quantityPerUom ?: 1,
                 unitPrice: orderAdjustment.totalAdjustments,
                 // For non-canceled order adjustments amount is equal to the total adjustments
-                amount: orderAdjustment?.canceled ? 0 : orderAdjustment.totalAdjustments,
-                invoiceItemType: InvoiceItemType.REGULAR
+                amount: orderAdjustment?.canceled ? 0 : orderAdjustment.totalAdjustments
         )
         invoiceItem.addToOrderAdjustments(orderAdjustment)
         return invoiceItem
@@ -163,7 +158,7 @@ class PrepaymentInvoiceService {
         inverseItem.unitPrice = prepaymentItem.unitPrice
         // Multiplied by (-1) to keep inverse items as negative amount
         inverseItem.amount = prepaymentItem.amount * (-1)
-        inverseItem.invoiceItemType = InvoiceItemType.INVERSE
+        inverseItem.inverse = true
         return inverseItem
     }
 
@@ -180,9 +175,10 @@ class PrepaymentInvoiceService {
         }
         Integer quantity = invoiceItem.quantity >= quantityInverseable ? quantityInverseable : invoiceItem.quantity
         inverseItem.quantity = quantity
-        inverseItem.invoiceItemType = InvoiceItemType.INVERSE
+        inverseItem.inverse = true
         inverseItem.unitPrice = prepaymentItem.unitPrice
         // Multiplied by (-1) to keep inverse items as negative amount
+        // unit price is taken from prepayment item (to not accidentally overwrite inverse with changed unit price)
         inverseItem.amount = quantity * prepaymentItem.unitPrice * prepaymentPercent * (-1)
         return inverseItem
     }
@@ -192,15 +188,16 @@ class PrepaymentInvoiceService {
         InvoiceItem inverseItem = createFromOrderAdjustment(orderAdjustment)
         // For order adjustment invoiceItem.quantity is 1 or 0, but for inverse should be for now 1
         inverseItem.quantity = 1
-        inverseItem.invoiceItemType = InvoiceItemType.INVERSE
+        inverseItem.inverse = true
         inverseItem.unitPrice = prepaymentItem.unitPrice
         // Multiplied by (-1) to keep inverse items as negative amount
+        // unit price is taken from prepayment item (to not accidentally overwrite inverse with changed unit price)
         inverseItem.amount = prepaymentItem.amount * (-1)
         return inverseItem
     }
 
     private Integer getQuantityAvailableToInverse(OrderItem orderItem, InvoiceItem prepaymentItem) {
-        Integer quantityInversed = orderItem.allInvoiceItems.findAll { it.inverseItem }.sum { it.quantity } ?: 0
+        Integer quantityInversed = orderItem.allInvoiceItems.findAll { it.inverse }.sum { it.quantity } ?: 0
         return prepaymentItem.quantity > quantityInversed ? prepaymentItem.quantity - quantityInversed : 0
     }
 }

@@ -35,7 +35,6 @@ class InvoiceItem implements Serializable {
 
     String id
     Invoice invoice
-    InvoiceItemType invoiceItemType
 
     Product product
     GlAccount glAccount
@@ -46,6 +45,7 @@ class InvoiceItem implements Serializable {
     BigDecimal quantityPerUom = 1
     BigDecimal amount
     BigDecimal unitPrice
+    Boolean inverse = false
 
     // Audit fields
     Date dateCreated
@@ -110,10 +110,10 @@ class InvoiceItem implements Serializable {
         quantityPerUom(nullable: false)
         amount(nullable: true)
         unitPrice(nullable: true)
+        inverse(nullable: true)
 
         updatedBy(nullable: true)
         createdBy(nullable: true)
-        invoiceItemType(nullable: true)
     }
 
     OrderItem getOrderItem() {
@@ -160,7 +160,7 @@ class InvoiceItem implements Serializable {
         }
 
         def total = (quantity ?: 0.0) * (unitPrice ?: 0.0)
-        if (isPrepaymentInvoice || inverseItem) {
+        if (isPrepaymentInvoice || inverse) {
             return total * ((order.paymentTerm?.prepaymentPercent?:100) / 100)
         }
 
@@ -188,10 +188,6 @@ class InvoiceItem implements Serializable {
         return invoice?.isPrepaymentInvoice
     }
 
-    boolean isInverseItem() {
-        return invoiceItemType == InvoiceItemType.INVERSE
-    }
-
     Map toJson() {
         return [
                 id: id,
@@ -210,7 +206,7 @@ class InvoiceItem implements Serializable {
                 orderAdjustment: orderAdjustment,
                 productName: product?.name,
                 displayNames: product?.displayNames,
-                type: invoiceItemType?.toString(),
+                inverse: inverse,
                 // Total amount and total prepayment amount are deprecated and amount field
                 // should be used instead (OBPIH-6398, OBPIH-6499)
                 totalAmount: totalAmount,

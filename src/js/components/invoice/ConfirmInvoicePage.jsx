@@ -92,7 +92,7 @@ const INVOICE_ITEMS = {
           const hasItems = values && values.invoiceItems;
           const isPrepLine = hasItems && (values.isPrepaymentInvoice ||
               values.invoiceItems[params.rowIndex].isPrepaymentItem) ||
-              values.invoiceItems[params.rowIndex].type === 'INVERSE';
+              values.invoiceItems[params.rowIndex].inverse;
           if (isPrepLine) {
             return (
               <div className="d-flex align-items-center justify-content-center">
@@ -264,7 +264,7 @@ class ConfirmInvoicePage extends Component {
           this.state.values.invoiceItems.length !== this.state.values.totalCount) {
         this.loadMoreRows({ startIndex: startIndex + this.props.pageSize });
       } else if (this.state.values.invoiceItems.length === this.state.values.totalCount
-        && !this.state.values.isPrepaymentInvoice && !_.find(this.state.values.invoiceItems, ii => ii.type === 'INVERSE')) {
+        && !this.state.values.isPrepaymentInvoice && !_.find(this.state.values.invoiceItems, ii => ii.inverse)) {
         this.fetchPrepaymentItems();
       }
       this.props.hideSpinner();

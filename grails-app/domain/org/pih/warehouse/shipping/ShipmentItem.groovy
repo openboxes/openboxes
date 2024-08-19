@@ -276,7 +276,7 @@ class ShipmentItem implements Comparable, Serializable {
 
     // quantity invoiced in uom
     Integer getQuantityInvoiced() {
-        return invoiceItems?.findAll { !it.inverseItem } ?.sum { it.quantity ?: 0 } ?: 0
+        return invoiceItems?.findAll { !it.inverse } ?.sum { it.quantity ?: 0 } ?: 0
     }
 
     Integer getQuantityInvoicedInStandardUom() {
