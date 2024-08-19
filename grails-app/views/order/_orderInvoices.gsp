@@ -12,11 +12,13 @@
                 <th><warehouse:message code="default.invoiceStatus.label" default="Invoice Status"/></th>
                 <th><warehouse:message code="default.quantity.label" default="Quantity"/></th>
                 <th><warehouse:message code="default.uom.label" default="UoM"/></th>
+                <th><warehouse:message code="default.unitPrice.label" default="Unit Price"/></th>
+                <th><warehouse:message code="default.amount.label" default="Amount"/></th>
             </tr>
             </thead>
             <tbody>
                 <g:each var="invoiceItem" in="${orderInstance?.getSortedInvoiceItems()}" status="i">
-                    <tr class="${i%2?'even':'odd'}">
+                    <tr class="${i%2 ? 'even' : 'odd'}" style="${invoiceItem.inverse ? 'background-color: #fcc' : ''}">
                         <td>${invoiceItem?.orderItem?.id}</td>
                         <td>${invoiceItem?.product?.productCode}</td>
                         <td>
@@ -34,6 +36,8 @@
                         <td>${invoiceItem?.invoice?.status}</td>
                         <td>${invoiceItem?.quantity}</td>
                         <td>${invoiceItem?.unitOfMeasure}</td>
+                        <td>${invoiceItem?.unitPrice}</td>
+                        <td><g:formatNumber number="${invoiceItem?.amount}"/></td>
                     </tr>
                 </g:each>
             </tbody>

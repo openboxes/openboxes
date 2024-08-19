@@ -316,64 +316,6 @@ class InvoiceService {
         return invoiceItem
     }
 
-    InvoiceItem createFromOrderItem(OrderItem orderItem) {
-        if (orderItem.orderItemStatusCode == OrderItemStatusCode.CANCELED) {
-            InvoiceItem invoiceItem = new InvoiceItem(
-                    quantity: 0,
-                    product: orderItem.product,
-                    glAccount: orderItem.glAccount ?: orderItem.product.glAccount,
-                    budgetCode: orderItem?.budgetCode,
-                    quantityUom: orderItem?.quantityUom,
-                    quantityPerUom: orderItem.quantityPerUom ?: 1,
-                    unitPrice: orderItem.unitPrice
-            )
-            invoiceItem.addToOrderItems(orderItem)
-            return invoiceItem
-        }
-
-        InvoiceItem invoiceItem = new InvoiceItem(
-            quantity: orderItem.quantity,
-            product: orderItem.product,
-            glAccount: orderItem.glAccount ?: orderItem.product.glAccount,
-            budgetCode: orderItem?.budgetCode,
-            quantityUom: orderItem?.quantityUom,
-            quantityPerUom: orderItem.quantityPerUom ?: 1,
-            unitPrice: orderItem.unitPrice
-        )
-        invoiceItem.addToOrderItems(orderItem)
-        return invoiceItem
-    }
-
-    InvoiceItem createFromShipmentItem(ShipmentItem shipmentItem) {
-        OrderItem orderItem = shipmentItem.orderItems?.find { it }
-        InvoiceItem invoiceItem = new InvoiceItem(
-            // InvoiceItem quantity is in UoM not in standard UoM
-            quantity: shipmentItem.quantityToInvoiceInStandardUom ? (shipmentItem.quantityToInvoiceInStandardUom / orderItem?.quantityPerUom) : 0,
-            product: shipmentItem.product,
-            glAccount: shipmentItem.product.glAccount,
-            budgetCode: orderItem?.budgetCode,
-            quantityUom: orderItem?.quantityUom,
-            quantityPerUom: orderItem?.quantityPerUom ?: 1,
-            unitPrice: orderItem?.unitPrice
-        )
-        invoiceItem.addToShipmentItems(shipmentItem)
-        return invoiceItem
-    }
-
-    InvoiceItem createFromOrderAdjustment(OrderAdjustment orderAdjustment) {
-        InvoiceItem invoiceItem = new InvoiceItem(
-            budgetCode: orderAdjustment.budgetCode,
-            product: orderAdjustment.orderItem?.product,
-            glAccount: orderAdjustment.glAccount ?: orderAdjustment.orderItem?.glAccount ?: orderAdjustment.orderAdjustmentType?.glAccount,
-            quantity: orderAdjustment?.canceled ? 0 : 1,
-            quantityUom: orderAdjustment.orderItem?.quantityUom,
-            quantityPerUom: orderAdjustment.orderItem?.quantityPerUom ?: 1,
-            unitPrice: orderAdjustment.totalAdjustments
-        )
-        invoiceItem.addToOrderAdjustments(orderAdjustment)
-        return invoiceItem
-    }
-
     List<InvoiceItem> getPendingInvoiceItems(Product product) {
         return InvoiceItem.createCriteria().list() {
             invoice {
