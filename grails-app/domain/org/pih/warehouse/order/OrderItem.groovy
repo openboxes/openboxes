@@ -306,7 +306,7 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
     // Including not yet posted invoices
     Integer getQuantityInvoiced() {
         return allInvoiceItems
-                ?.findAll { !it?.invoice?.isPrepaymentInvoice }
+                ?.findAll { !it?.invoice?.isPrepaymentInvoice && !it.inverse }
                 ?.sum { it.quantity } ?: 0
     }
 
@@ -432,7 +432,7 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
 
     Integer getPostedQuantityInvoiced() {
         return allInvoiceItems?.findAll {
-            it?.invoice?.datePosted != null && !it?.invoice?.isPrepaymentInvoice
+            it?.invoice?.datePosted != null && !it?.invoice?.isPrepaymentInvoice && !it.inverse
         }?.collect {  it.quantity }?.sum() ?: 0
     }
 
