@@ -14,10 +14,13 @@ import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
 import NotificationType from 'consts/notificationTypes';
 import { DateFormat } from 'consts/timeFormat';
 import useOutboundImportValidation from 'hooks/outboundImport/useOutboundImportValidation';
+import useSpinner from 'hooks/useSpinner';
 import useTranslate from 'hooks/useTranslate';
 
 const useOutboundImportForm = ({ next }) => {
   const translate = useTranslate();
+  const spinner = useSpinner();
+
   const { validationSchema } = useOutboundImportValidation();
   const { currentLocation } = useSelector((state) => ({
     currentLocation: state.session.currentLocation,
@@ -108,6 +111,7 @@ const useOutboundImportForm = ({ next }) => {
         'content-type': 'multipart/form-data',
       },
     };
+    spinner.show();
     const importPackingListResponse = await packingListApi.importPackingList(formData, config);
     const { basicDetails, sendingOptions } = buildDetailsPayload(values);
 
@@ -144,7 +148,7 @@ const useOutboundImportForm = ({ next }) => {
       const tableDataGrouped = groupTableDataByErrors(e.response.data);
       setTableData([...tableDataGrouped.itemsWithErrors, ...tableDataGrouped.itemsWithoutErrors]);
     }
-
+    spinner.hide();
     next();
   };
 
@@ -154,6 +158,7 @@ const useOutboundImportForm = ({ next }) => {
   const onConfirmImport = async (values) => {
     const { basicDetails, sendingOptions } = buildDetailsPayload(values);
 
+    spinner.show();
     try {
       const response = await fulfillmentApi.createOutbound({
         fulfillmentDetails: basicDetails,
@@ -166,6 +171,7 @@ const useOutboundImportForm = ({ next }) => {
       // If the save went sucessfully, redirect to the stock movement view page
       window.location = STOCK_MOVEMENT_URL.show(response.data?.data?.id);
     } catch (e) {
+      spinner.hide();
       // If in response there is errors property, it means we want to populate errors with the table
       if (e.response.data?.errors) {
         setErrorsData({ errors: e.response?.data?.errors, validateStatus: e.response?.status });
