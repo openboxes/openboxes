@@ -150,7 +150,7 @@ class PrepaymentInvoiceService {
         return invoiceItem
     }
 
-    private InvoiceItem createInverseItemForCanceledOrderItem(OrderItem orderItem) {
+    InvoiceItem createInverseItemForCanceledOrderItem(OrderItem orderItem) {
         InvoiceItem prepaymentItem = orderItem.invoiceItems.find { it.isPrepaymentInvoice }
         InvoiceItem inverseItem = createFromOrderItem(orderItem)
         // For canceled order item take quantity from prepayment item
@@ -162,7 +162,7 @@ class PrepaymentInvoiceService {
         return inverseItem
     }
 
-    private InvoiceItem createInverseItemForShipmentItem(ShipmentItem shipmentItem, InvoiceItem invoiceItem) {
+    InvoiceItem createInverseItemForShipmentItem(ShipmentItem shipmentItem, InvoiceItem invoiceItem) {
         OrderItem orderItem = shipmentItem.orderItems?.find { it }
         BigDecimal prepaymentPercent = (orderItem.order.paymentTerm?.prepaymentPercent ?: Constants.DEFAULT_PAYMENT_PERCENT) / 100
         InvoiceItem prepaymentItem = orderItem.invoiceItems.find { it.isPrepaymentInvoice }
@@ -183,7 +183,7 @@ class PrepaymentInvoiceService {
         return inverseItem
     }
 
-    private InvoiceItem createInverseItemForOrderAdjustment(OrderAdjustment orderAdjustment) {
+    InvoiceItem createInverseItemForOrderAdjustment(OrderAdjustment orderAdjustment) {
         InvoiceItem prepaymentItem = orderAdjustment.invoiceItems.find { it.isPrepaymentInvoice }
         InvoiceItem inverseItem = createFromOrderAdjustment(orderAdjustment)
         // For order adjustment invoiceItem.quantity is 1 or 0, but for inverse should be for now 1
