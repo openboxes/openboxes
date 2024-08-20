@@ -11,6 +11,7 @@ import { formatDate } from 'utils/translation-utils';
 const DateCell = ({
   displayDateFormat,
   displayDateDefaultValue,
+  defaultValue,
   localizeDate,
   formatLocalizedDate,
   formatLocalizedDateToDisplay,
@@ -32,7 +33,7 @@ const DateCell = ({
     <TableCell
       {...row}
       value={getValue()}
-      defaultValue={displayDateDefaultValue}
+      defaultValue={defaultValue ?? displayDateDefaultValue}
     />
   );
 };
@@ -48,11 +49,13 @@ export default connect(mapStateToProps)(DateCell);
 DateCell.defaultProps = {
   localizeDate: false,
   formatLocalizedDate: DateFormat.COMMON,
+  defaultValue: undefined,
 };
 
 DateCell.propTypes = {
   displayDateFormat: PropTypes.string.isRequired,
   displayDateDefaultValue: PropTypes.string.isRequired,
+  defaultValue: PropTypes.string,
   localizeDate: PropTypes.bool,
   formatLocalizedDate: PropTypes.string,
   formatLocalizedDateToDisplay: PropTypes.func.isRequired,

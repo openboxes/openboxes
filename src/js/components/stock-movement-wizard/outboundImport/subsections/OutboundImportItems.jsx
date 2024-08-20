@@ -58,7 +58,7 @@ const OutboundImportItems = ({ data, errors }) => {
       Header: translate('react.outboundImport.table.column.expirationDate.label', 'Expiry'),
       accessor: 'expirationDate',
       width: 120,
-      Cell: (row) => <DateCell {...row} />,
+      Cell: (row) => <DateCell {...row} defaultValue="" />,
     },
     {
       Header: translate('react.outboundImport.table.column.quantityPicked.label', 'Qty Picked'),
