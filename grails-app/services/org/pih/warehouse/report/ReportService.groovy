@@ -912,6 +912,7 @@ class ReportService implements ApplicationContextAware {
                 WHERE o.order_type_id = 'PURCHASE_ORDER'
                     AND order_item.order_item_status_code != 'CANCELED'
                     AND (invoice.invoice_type_id != :prepaymentInvoiceId OR invoice.invoice_type_id IS NULL)
+                    AND (invoice_item.inverse IS NULL OR invoice_item.inverse = FALSE)
                     ${additionalFilter}
                 GROUP BY o.id, order_item.id, shipment_item.id, invoice_item.id
             ) AS order_item_invoice_summary 
@@ -939,6 +940,7 @@ class ReportService implements ApplicationContextAware {
                     LEFT OUTER JOIN invoice ON invoice_item.invoice_id = invoice.id
                 WHERE o.order_type_id = 'PURCHASE_ORDER'
                     AND order_adjustment.canceled IS NOT TRUE
+                    AND (invoice_item.inverse IS NULL OR invoice_item.inverse = FALSE)
                     ${additionalFilter}
                 GROUP BY o.id, order_adjustment.id, invoice_item.id
             ) AS order_adjustment_invoice_summary
