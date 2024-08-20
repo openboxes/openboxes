@@ -8,17 +8,15 @@ import { Tooltip } from 'react-tippy';
 import ArrayField from 'components/form-elements/ArrayField';
 import LabelField from 'components/form-elements/LabelField';
 import { ORDER_URL, STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
-import InvoiceItemType from 'consts/invoiceItemType';
 import { renderFormField } from 'utils/form-utils';
 import { getInvoiceDescription } from 'utils/form-values-utils';
 import accountingFormat from 'utils/number-utils';
 
-const getRowColouring = (canceled, type) => {
-  const isInverseItem = type === InvoiceItemType.INVERSE;
+const getRowColouring = (canceled, inverse) => {
   if (canceled) {
     return 'disabled-row';
   }
-  return isInverseItem ? 'negative-row-value' : null;
+  return inverse ? 'negative-row-value' : null;
 };
 
 const INVOICE_ITEMS = {
@@ -29,7 +27,7 @@ const INVOICE_ITEMS = {
     isRowLoaded: ({ isRowLoaded }) => isRowLoaded,
     loadMoreRows: ({ loadMoreRows }) => loadMoreRows(),
     getDynamicRowAttr: ({ rowValues }) => ({
-      className: getRowColouring(rowValues?.isCanceled, rowValues?.type),
+      className: getRowColouring(rowValues?.isCanceled, rowValues?.inverse),
     }),
     fields: {
       rowIcon: {

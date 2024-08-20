@@ -50,7 +50,6 @@ export const INVOICE_API = `${API}/invoices`;
 export const INVOICE_BY_ID = (id) => `${INVOICE_API}/${id}`;
 export const INVOICE_ITEMS = (id) => `${INVOICE_BY_ID(id)}/items`;
 export const INVOICE_ITEM_CANDIDATES = (id) => `${INVOICE_BY_ID(id)}/invoiceItemCandidates`;
-export const INVOICE_PREPAYMENT_ITEMS = (id) => `${INVOICE_BY_ID(id)}/prepaymentItems`;
 export const INVOICE_POST = (id) => `${INVOICE_BY_ID(id)}/post`;
 export const INVOICE_SUBMIT = (id) => `${INVOICE_BY_ID(id)}/submit`;
 export const INVOICE_ORDERS = (id) => `${INVOICE_BY_ID(id)}/orders`;

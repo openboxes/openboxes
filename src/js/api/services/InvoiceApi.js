@@ -4,7 +4,7 @@ import {
   INVOICE_ITEM_CANDIDATES,
   INVOICE_ITEMS, INVOICE_ORDERS,
   INVOICE_POST,
-  INVOICE_PREPAYMENT_ITEMS, INVOICE_SHIPMENTS,
+  INVOICE_SHIPMENTS,
   INVOICE_SUBMIT,
   REMOVE_INVOICE_ITEM,
 } from 'api/urls';
@@ -24,8 +24,6 @@ export default {
   getInvoiceShipments: (invoiceId, config) => apiClient.get(INVOICE_SHIPMENTS(invoiceId), config),
   saveInvoiceItemsCandidates: (invoiceId, config) =>
     apiClient.post(INVOICE_ITEM_CANDIDATES(invoiceId), config),
-  getInvoicePrepaymentItems: (invoiceId, config) =>
-    apiClient.get(INVOICE_PREPAYMENT_ITEMS(invoiceId), config),
   downloadInvoices: (params) => exportFileFromAPI({
     url: INVOICE_API,
     params,

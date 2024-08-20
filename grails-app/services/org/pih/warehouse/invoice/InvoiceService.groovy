@@ -100,12 +100,12 @@ class InvoiceService {
         if (max != null && offset != null) {
             invoiceItems = InvoiceItem.createCriteria().list(max: max.toInteger(), offset: offset.toInteger()) {
                 eq("invoice", invoice)
-                order("invoiceItemType", "desc")
+                order("inverse", "asc")
             }
         } else {
             invoiceItems = InvoiceItem.createCriteria().list() {
                 eq("invoice", invoice)
-                order("invoiceItemType", "desc")
+                order("inverse", "asc")
             }
         }
 
