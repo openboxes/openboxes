@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 import FilterForm from 'components/Filter/FilterForm';
-import filterFields from 'components/invoice/FilterFields';
+import filterFields from 'components/invoice/list/FilterFields';
 import useInvoiceFilters from 'hooks/list-pages/invoice/useInvoiceFilters';
 import { debouncePeopleFetch } from 'utils/option-utils';
 
@@ -57,7 +57,6 @@ const mapStateToProps = state => ({
   suppliers: state.organizations.suppliers,
   typeCodes: state.invoices.typeCodes,
 });
-
 
 export default connect(mapStateToProps)(InvoiceListFilters);
 
