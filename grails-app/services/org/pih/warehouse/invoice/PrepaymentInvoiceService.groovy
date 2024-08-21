@@ -228,10 +228,7 @@ class PrepaymentInvoiceService {
         invoiceItem.orderAdjustments?.each { OrderAdjustment oa -> oa.removeFromInvoiceItems(invoiceItem) }
         invoiceItem.orderItems?.each { OrderItem oi -> oi.removeFromInvoiceItems(invoiceItem) }
         invoiceItem.shipmentItems?.each { ShipmentItem si -> si.removeFromInvoiceItems(invoiceItem) }
-
-        Invoice invoice = invoiceItem.invoice
-        invoice.removeFromInvoiceItems(invoiceItem)
-
+        invoiceItem.invoice.removeFromInvoiceItems(invoiceItem)
         invoiceItem.delete()
     }
 
@@ -239,7 +236,7 @@ class PrepaymentInvoiceService {
         Invoice invoice = invoiceItem.invoice
 
         // Since we can have only one of the three options I am doing this in this way (at least for now)
-        def relatedObject = invoiceItem.orderAdjustment ?: invoiceItem.orderItem ?: invoiceItem.shipmentItem ?: null
+        def relatedObject = invoiceItem.orderAdjustment ?: invoiceItem.orderItem ?: invoiceItem.shipmentItem
 
         // To be checked - If one invoice can have more inverse items for the same shipment item - IMHO it should not
         // be possible, because there is only one invoice item per shipment item in that case and we don't have an option
