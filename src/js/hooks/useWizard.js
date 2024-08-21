@@ -1,54 +1,72 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 
 import PropTypes from 'prop-types';
+import queryString from 'query-string';
+import { useHistory, useLocation } from 'react-router-dom';
+
+import useQueryParams from 'hooks/useQueryParams';
 
 const useWizard = ({ initialKey, steps }) => {
-  const [key, setKey] = useState(initialKey);
+  const parsedQueryParams = useQueryParams();
+  const history = useHistory();
+  const location = useLocation();
+
+  const navigateToStep = (step) => {
+    history.push(queryString.stringifyUrl({
+      url: location.pathname,
+      query: { ...parsedQueryParams, step },
+    }));
+  };
+
+  const currentStepKey = useMemo(() =>
+    parsedQueryParams.step || steps[0]?.key,
+  [parsedQueryParams.step, steps]);
 
   const stepProperties = useMemo(() => {
-    const foundStepIdx = steps.findIndex((s) => s.key === key);
+    let foundStepIdx = steps.findIndex((s) => s.key === currentStepKey);
     // findIndex returns -1 if the index is not found for given predicate
     if (foundStepIdx === -1) {
-      throw new Error('Wizard step has not been found!');
+      foundStepIdx = 0;
     }
     return {
+      key: steps[foundStepIdx]?.key,
       Step: steps[foundStepIdx],
       currentStepIdx: foundStepIdx,
     };
-  }, [key, initialKey]);
+  }, [currentStepKey, initialKey]);
 
   const first = () => {
-    setKey(steps[0]?.key);
+    navigateToStep(steps[0]?.key);
   };
 
   const last = () => {
     const lastIdx = steps.length - 1;
-    setKey(steps[lastIdx]?.key);
+    navigateToStep(steps[lastIdx]?.key);
   };
 
   const next = () => {
     const nextStepIdx = stepProperties.currentStepIdx + 1;
     const nextStep = steps[nextStepIdx];
     if (nextStep) {
-      setKey(nextStep.key);
+      navigateToStep(nextStep.key);
     }
   };
 
   const previous = () => {
     const previousStepIdx = stepProperties.currentStepIdx - 1;
     if (previousStepIdx >= 0) {
-      setKey(steps[previousStepIdx]?.key);
+      navigateToStep(steps[previousStepIdx]?.key);
     }
   };
 
-  const is = (stepKey) => key === stepKey;
+  const is = (stepKey) => stepProperties?.key === stepKey;
 
   const { Step } = stepProperties;
 
   return [
     Step,
     {
-      set: setKey,
+      // set: setKey,
       first,
       next,
       previous,
