@@ -58,7 +58,9 @@ class PrepaymentInvoiceService {
                 InvoiceItem invoiceItem = createFromOrderItem(orderItem)
                 InvoiceItem inverseItem = createInverseItemForCanceledOrderItem(orderItem)
                 invoice.addToInvoiceItems(invoiceItem)
-                invoice.addToInvoiceItems(inverseItem)
+                if (inverseItem) {
+                    invoice.addToInvoiceItems(inverseItem)
+                }
                 return
             }
 
@@ -76,7 +78,9 @@ class PrepaymentInvoiceService {
             InvoiceItem invoiceItem = createFromOrderAdjustment(orderAdjustment)
             InvoiceItem inverseItem = createInverseItemForOrderAdjustment(orderAdjustment)
             invoice.addToInvoiceItems(invoiceItem)
-            invoice.addToInvoiceItems(inverseItem)
+            if (inverseItem) {
+                invoice.addToInvoiceItems(inverseItem)
+            }
         }
 
         return invoice.save()
@@ -152,6 +156,9 @@ class PrepaymentInvoiceService {
 
     private InvoiceItem createInverseItemForCanceledOrderItem(OrderItem orderItem) {
         InvoiceItem prepaymentItem = orderItem.invoiceItems.find { it.isPrepaymentInvoice }
+        if (!prepaymentItem) {
+            return null
+        }
         InvoiceItem inverseItem = createFromOrderItem(orderItem)
         // For canceled order item take quantity from prepayment item
         inverseItem.quantity = prepaymentItem.quantity
@@ -166,6 +173,9 @@ class PrepaymentInvoiceService {
         OrderItem orderItem = shipmentItem.orderItems?.find { it }
         BigDecimal prepaymentPercent = (orderItem.order.paymentTerm?.prepaymentPercent ?: Constants.DEFAULT_PAYMENT_PERCENT) / 100
         InvoiceItem prepaymentItem = orderItem.invoiceItems.find { it.isPrepaymentInvoice }
+        if (!prepaymentItem) {
+            return null
+        }
         InvoiceItem inverseItem = createFromShipmentItem(shipmentItem)
         // For shipment items we have to check if the ordered quantity was edited after prepayment was generated.
         // If that was the case we have to check maximum quantity available to inverse
@@ -185,6 +195,9 @@ class PrepaymentInvoiceService {
 
     private InvoiceItem createInverseItemForOrderAdjustment(OrderAdjustment orderAdjustment) {
         InvoiceItem prepaymentItem = orderAdjustment.invoiceItems.find { it.isPrepaymentInvoice }
+        if (!prepaymentItem) {
+            return null
+        }
         InvoiceItem inverseItem = createFromOrderAdjustment(orderAdjustment)
         // For order adjustment invoiceItem.quantity is 1 or 0, but for inverse should be for now 1
         inverseItem.quantity = 1
