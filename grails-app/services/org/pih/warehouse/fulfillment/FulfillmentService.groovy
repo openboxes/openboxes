@@ -41,6 +41,8 @@ import org.pih.warehouse.shipping.ReferenceNumber
 import org.pih.warehouse.shipping.ReferenceNumberType
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
+import org.pih.warehouse.shipping.ShipmentStatusCode
+import org.pih.warehouse.shipping.ShipmentStatusTransitionEvent
 import util.StringUtil
 
 
@@ -337,6 +339,8 @@ class FulfillmentService {
         }
         shipment.addToEvents(shippedEvent)
         shippedEvent.save()
+
+        Holders.grailsApplication.mainContext.publishEvent(new ShipmentStatusTransitionEvent(shipment, ShipmentStatusCode.SHIPPED))
     }
 
     Transaction createOutboundTransaction(Shipment shipment) {
