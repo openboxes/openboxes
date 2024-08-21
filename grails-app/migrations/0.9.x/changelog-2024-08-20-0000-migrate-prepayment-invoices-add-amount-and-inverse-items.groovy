@@ -55,12 +55,14 @@ databaseChangeLog = {
                  * was not being used.)
                  */
                 Invoice.findAllByInvoiceType(prepaymentInvoiceType).each { prepaymentInvoice ->
-                    prepaymentInvoice.invoiceItems.each { invoiceItem ->
-                        // TODO: This should probably be put in a helper method in PrepaymentInvoiceService
-                        BigDecimal prepaymentPercent = (invoiceItem.order.paymentTerm?.prepaymentPercent ?: Constants.DEFAULT_PAYMENT_PERCENT) / 100
-                        invoiceItem.amount = invoiceItem.quantity * invoiceItem.unitPrice * prepaymentPercent
-                        invoiceItem.save(failOnError: true, flush: true)
-                    }
+                    prepaymentInvoice.invoiceItems
+                            .find { prepaymentInvoiceItem -> prepaymentInvoiceItem.amount == null }
+                            .each { prepaymentInvoiceItem ->
+                                // TODO: This should probably be put in a helper method in PrepaymentInvoiceService
+                                BigDecimal prepaymentPercent = (prepaymentInvoiceItem.order.paymentTerm?.prepaymentPercent ?: Constants.DEFAULT_PAYMENT_PERCENT) / 100
+                                prepaymentInvoiceItem.amount = prepaymentInvoiceItem.quantity * prepaymentInvoiceItem.unitPrice * prepaymentPercent
+                                prepaymentInvoiceItem.save(failOnError: true, flush: true)
+                            }
                 }
 
                 /*
@@ -92,27 +94,33 @@ databaseChangeLog = {
                     // flow for generating invoices.
                     // TODO: Try to move this code to PrepaymentInvoiceService and integrate it with the existing code.
                     //       Ideally we can just call prepaymentInvoiceService.createInverseItemsForOrder(order) and
-                    //       does everything for us. Alternatively, just
+                    //       does everything for us. Alternatively, create a new PrepaymentInvoiceMigrationService
+                    //       and move the logic there so that it can be thoroughly unit tested.
                     order.orderItems.each { OrderItem orderItem ->
                         if (orderItem.orderItemStatusCode == OrderItemStatusCode.CANCELED) {
-                            InvoiceItem inverseItem = prepaymentInvoiceService.createInverseItemForCanceledOrderItem(orderItem)
+                            InvoiceItem inverseItem = prepaymentInvoiceService.createInverseItemForCanceledOrderItem(
+                                    orderItem)
                             if (inverseItem) {
                                 regularInvoice.addToInvoiceItems(inverseItem)
                             }
-                            return
                         }
-
-                        orderItem?.invoiceableShipmentItems?.each { ShipmentItem shipmentItem ->
-                            InvoiceItem regularItem = regularInvoice.invoiceItems.find {ii -> ii.shipmentItem == shipmentItem}  // TODO: does this work?
-                            InvoiceItem inverseItem = prepaymentInvoiceService.createInverseItemForShipmentItem(shipmentItem, regularItem)
-                            if (inverseItem) {
-                                regularInvoice.addToInvoiceItems(inverseItem)
+                        else {
+                            orderItem?.invoiceableShipmentItems?.each { ShipmentItem shipmentItem ->
+                                InvoiceItem regularItem = regularInvoice.invoiceItems.find { regularInvoiceItem ->
+                                    regularInvoiceItem.shipmentItem == shipmentItem  // TODO: does this even work?
+                                }
+                                InvoiceItem inverseItem = prepaymentInvoiceService.createInverseItemForShipmentItem(
+                                        shipmentItem, regularItem)
+                                if (inverseItem) {
+                                    regularInvoice.addToInvoiceItems(inverseItem)
+                                }
                             }
                         }
                     }
 
                     order.invoiceableAdjustments.each { OrderAdjustment orderAdjustment ->
-                        InvoiceItem inverseItem = prepaymentInvoiceService.createInverseItemForOrderAdjustment(orderAdjustment)
+                        InvoiceItem inverseItem = prepaymentInvoiceService.createInverseItemForOrderAdjustment(
+                                orderAdjustment)
                         if (inverseItem) {
                             regularInvoice.addToInvoiceItems(inverseItem)
                         }
