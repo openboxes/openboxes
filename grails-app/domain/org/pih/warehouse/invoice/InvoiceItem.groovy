@@ -207,7 +207,7 @@ class InvoiceItem implements Serializable {
                 productName: product?.name,
                 displayNames: product?.displayNames,
                 inverse: inverse,
-                isCanceled: orderItem?.canceled,
+                isCanceled: orderItem?.canceled ?: orderAdjustment?.canceled,
                 // Total amount and total prepayment amount are deprecated and amount field
                 // should be used instead (OBPIH-6398, OBPIH-6499)
                 totalAmount: totalAmount,
