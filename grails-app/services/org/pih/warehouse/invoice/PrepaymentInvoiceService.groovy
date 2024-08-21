@@ -176,13 +176,13 @@ class PrepaymentInvoiceService {
         if (!prepaymentItem) {
             return null
         }
-        InvoiceItem inverseItem = createFromShipmentItem(shipmentItem)
         // For shipment items we have to check if the ordered quantity was edited after prepayment was generated.
         // If that was the case we have to check maximum quantity available to inverse
         Integer quantityInverseable = getQuantityAvailableToInverse(orderItem, prepaymentItem)
         if (!quantityInverseable || quantityInverseable < 0) {
             return null
         }
+        InvoiceItem inverseItem = createFromShipmentItem(shipmentItem)
         Integer quantity = invoiceItem.quantity >= quantityInverseable ? quantityInverseable : invoiceItem.quantity
         inverseItem.quantity = quantity
         inverseItem.inverse = true
