@@ -533,6 +533,11 @@ class UrlMappings {
             action = [POST: "validateInvoiceItem"]
         }
 
+        "/api/prepaymentInvoiceItems/$id/" {
+            controller = "prepaymentInvoiceItemApi"
+            action = [DELETE: "delete"]
+        }
+
         // Stock Transfer API
 
         "/api/stockTransfers/statusOptions"(parseRequest: true) {

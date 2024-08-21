@@ -213,4 +213,47 @@ class PrepaymentInvoiceService {
         Integer quantityInversed = orderItem.allInvoiceItems.findAll { it.inverse }.sum { it.quantity } ?: 0
         return prepaymentItem.quantity > quantityInversed ? prepaymentItem.quantity - quantityInversed : 0
     }
+
+    /**
+     * Removes invoice item for the itemId and finds related inverse item and removes it too
+     * */
+    void removeInvoiceItem(String itemId) {
+        InvoiceItem invoiceItem = InvoiceItem.get(itemId)
+        if (!invoiceItem) {
+            throw new IllegalArgumentException("Missing invoice item to delete")
+        }
+        if (invoiceItem.isPrepaymentInvoice || invoiceItem.inverse) {
+            throw new IllegalArgumentException("Cannot delete prepayment or inverse items")
+        }
+
+        InvoiceItem inverseItem = findInverseItem(invoiceItem)
+        if (inverseItem) {
+            deleteInvoiceItem(inverseItem)
+        }
+        deleteInvoiceItem(invoiceItem)
+    }
+
+    /**
+     * Clean up related objects and delete item (due to many-to-many relation, we have to clean this to not get it
+     * overwritten by the "InvalidDataAccessApiUsageException: deleted object would be re-saved by cascade")
+     * */
+    private void deleteInvoiceItem(InvoiceItem invoiceItem) {
+        invoiceItem.orderAdjustments?.each { OrderAdjustment oa -> oa.removeFromInvoiceItems(invoiceItem) }
+        invoiceItem.orderItems?.each { OrderItem oi -> oi.removeFromInvoiceItems(invoiceItem) }
+        invoiceItem.shipmentItems?.each { ShipmentItem si -> si.removeFromInvoiceItems(invoiceItem) }
+        invoiceItem.invoice.removeFromInvoiceItems(invoiceItem)
+        invoiceItem.delete()
+    }
+
+    private InvoiceItem findInverseItem(InvoiceItem invoiceItem) {
+        Invoice invoice = invoiceItem.invoice
+
+        // Since we can have only one of the three options I am doing this in this way (at least for now)
+        def relatedObject = invoiceItem.orderAdjustment ?: invoiceItem.orderItem ?: invoiceItem.shipmentItem
+
+        // To be checked - If one invoice can have more inverse items for the same shipment item - IMHO it should not
+        // be possible, because there is only one invoice item per shipment item in that case and we don't have an option
+        // to generate invoice item partially for the same invoice
+        return relatedObject?.invoiceItems?.find { InvoiceItem it -> it.inverse && it.invoice == invoice }
+    }
 }
