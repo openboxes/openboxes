@@ -10,17 +10,16 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 
 import { fetchCurrencies, hideSpinner, showSpinner } from 'actions';
+import invoiceApi from 'api/services/InvoiceApi';
 import DateField from 'components/form-elements/DateField';
 import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
 import { INVOICE_URL } from 'consts/applicationUrls';
-import apiClient from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import { debounceOrganizationsFetch } from 'utils/option-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
-
 
 function validate(values) {
   const errors = {};
@@ -151,18 +150,16 @@ class CreateInvoicePage extends Component {
     if (values.vendor && values.vendorInvoiceNumber && values.dateInvoiced && values.currencyUom) {
       this.props.showSpinner();
 
-      const invoiceUrl = `/api/invoices/${values.id || ''}`;
-
       const payload = {
         vendor: values.vendor.id,
         vendorInvoiceNumber: values.vendorInvoiceNumber,
         dateInvoiced: values.dateInvoiced,
         currencyUom: {
-          id: values.currencyUom.id
+          id: values.currencyUom.id,
         },
       };
 
-      apiClient.post(invoiceUrl, payload)
+      invoiceApi.saveInvoice(values.id || '', payload)
         .then((response) => {
           if (response.data) {
             const resp = response.data.data;

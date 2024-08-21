@@ -859,6 +859,11 @@ div.crossed-out .table-inner-row:before {
   background-color: $red-delta !important;
 }
 
+.disabled-row {
+  background-color: $gray-beta !important;
+  color: $white-alpha !important;
+}
+
 .returns-date-picker {
   > div {
     > .react-datepicker-wrapper {
