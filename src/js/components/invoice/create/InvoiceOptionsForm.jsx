@@ -65,7 +65,7 @@ const INVOICE_HEADER_FIELDS = {
   },
 };
 
-const InvoiceOptionsForm = ({ values }) => {
+const InvoiceOptionsForm = ({ values, disableSaveButton }) => {
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
 
   const toggleDropdown = () => {
@@ -78,6 +78,7 @@ const InvoiceOptionsForm = ({ values }) => {
         <button
           type="button"
           className="btn btn-outline-secondary float-right btn-form btn-xs"
+          disabled={disableSaveButton}
           onClick={() => {
             window.location = INVOICE_URL.show(values.id);
           }}
@@ -143,6 +144,7 @@ InvoiceOptionsForm.propTypes = {
     id: PropTypes.string.isRequired,
     documents: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   }).isRequired,
+  disableSaveButton: PropTypes.bool.isRequired,
 };
 
 export default InvoiceOptionsForm;
