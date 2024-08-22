@@ -288,6 +288,10 @@ class ShipmentItem implements Comparable, Serializable {
         return quantity - quantityInvoicedInStandardUom
     }
 
+    Integer getQuantityToInvoice() {
+        return quantityToInvoiceInStandardUom / quantityPerUom
+    }
+
     Boolean isInvoiceable() {
         return quantityToInvoiceInStandardUom > 0
     }
