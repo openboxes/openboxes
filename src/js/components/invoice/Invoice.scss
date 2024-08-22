@@ -331,3 +331,11 @@
 .footer>div:first-child {
     display: none !important;
 }
+
+.prepayment-invoice-table {
+    .form-element-input {
+        height: 25px;
+        position: relative;
+        top: 6px;
+    }
+}

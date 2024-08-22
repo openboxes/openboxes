@@ -7,8 +7,8 @@ import { Tooltip } from 'react-tippy';
 
 import ArrayField from 'components/form-elements/ArrayField';
 import LabelField from 'components/form-elements/LabelField';
+import TextInput from 'components/form-elements/v2/TextInput';
 import { ORDER_URL, STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
-import useInvoicePrepaidItemsTable from 'hooks/invoice/useInvoicePrepaidItemsTable';
 import ActionDots from 'utils/ActionDots';
 import { renderFormField } from 'utils/form-utils';
 import { getInvoiceDescription } from 'utils/form-values-utils';
@@ -133,7 +133,31 @@ const INVOICE_ITEMS = {
         }),
       },
       quantity: {
-        type: LabelField,
+        type: (params) => {
+          const invoiceItem = params?.invoiceItems[params?.rowIndex];
+          const errors = params.validate(invoiceItem);
+          return (
+            params.isEditable(invoiceItem?.id)
+              ? (
+                <Tooltip
+                  html={<div className="custom-tooltip">{errors}</div>}
+                  theme="transparent"
+                  disabled={!errors}
+                >
+                  <TextInput
+                    type="number"
+                    value={params.fieldValue}
+                    showErrorBorder={!!errors}
+                    onChange={
+                    params.updateInvoiceItemQuantity(invoiceItem?.id)
+                  }
+                    {...params}
+                  />
+                </Tooltip>
+              )
+              : <LabelField {...params} />
+          );
+        },
         label: 'react.invoice.qty.label',
         defaultMessage: 'Qty',
         flexWidth: '1',
@@ -176,7 +200,7 @@ const INVOICE_ITEMS = {
       actionDots: {
         type: (params) => {
           const invoiceItem = params?.invoiceItems?.[params.rowIndex];
-          if (!invoiceItem.inverse) {
+          if (!invoiceItem?.inverse && !params.isPrepaymentInvoice) {
             return (
               <ActionDots
                 {...params}
@@ -196,18 +220,24 @@ const INVOICE_ITEMS = {
 };
 
 const InvoicePrepayedItemsTable = ({
-  invoiceItems, invoiceId, totalCount, loadMoreRows, isPrepaymentInvoice,
+  invoiceItems,
+  updateInvoiceItemQuantity,
+  invoiceId,
+  totalCount,
+  loadMoreRows,
+  isPrepaymentInvoice,
+  invoicePrepaidItemsTableData,
 }) => {
   const {
     actions,
     isRowLoaded,
-  } = useInvoicePrepaidItemsTable({
-    loadMoreRows,
-    invoiceItems,
-  });
+    isEditable,
+    editableRows,
+    validate,
+  } = invoicePrepaidItemsTableData;
 
   return (
-    <div className="my-2 table-form">
+    <div className="my-2 table-form prepayment-invoice-table">
       {_.map(INVOICE_ITEMS, (fieldConfig, fieldName) =>
         renderFormField(fieldConfig, fieldName, {
           invoiceId,
@@ -216,6 +246,10 @@ const InvoicePrepayedItemsTable = ({
           loadMoreRows,
           isRowLoaded,
           isPrepaymentInvoice,
+          editableRows,
+          updateInvoiceItemQuantity,
+          validate,
+          isEditable,
           actions,
         }))}
     </div>
@@ -228,6 +262,18 @@ InvoicePrepayedItemsTable.propTypes = {
   invoiceItems: PropTypes.shape({}).isRequired,
   totalCount: PropTypes.number.isRequired,
   loadMoreRows: PropTypes.func.isRequired,
+  updateInvoiceItemQuantity: PropTypes.func.isRequired,
+  invoicePrepaidItemsTableData: PropTypes.shape({
+    actions: PropTypes.arrayOf(
+      PropTypes.shape({}),
+    ).isRequired,
+    isRowLoaded: PropTypes.func.isRequired,
+    isEditable: PropTypes.func.isRequired,
+    editableRows: PropTypes.arrayOf(
+      PropTypes.shape({}),
+    ).isRequired,
+    validate: PropTypes.func.isRequired,
+  }).isRequired,
 };
 
 export default InvoicePrepayedItemsTable;
