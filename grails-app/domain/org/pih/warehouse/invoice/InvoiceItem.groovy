@@ -110,7 +110,7 @@ class InvoiceItem implements Serializable {
         quantityPerUom(nullable: false)
         amount(nullable: true)
         unitPrice(nullable: true)
-        inverse(nullable: true)
+        inverse(nullable: false)
 
         updatedBy(nullable: true)
         createdBy(nullable: true)

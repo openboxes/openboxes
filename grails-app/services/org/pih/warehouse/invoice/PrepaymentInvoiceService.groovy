@@ -196,7 +196,7 @@ class PrepaymentInvoiceService {
         return inverseItem
     }
 
-    private Integer getQuantityAvailableToInverse(OrderItem orderItem, InvoiceItem prepaymentItem) {
+    Integer getQuantityAvailableToInverse(OrderItem orderItem, InvoiceItem prepaymentItem) {
         Integer quantityInversed = orderItem.allInvoiceItems.findAll { it.inverse }.sum { it.quantity } ?: 0
         return prepaymentItem.quantity > quantityInversed ? prepaymentItem.quantity - quantityInversed : 0
     }
