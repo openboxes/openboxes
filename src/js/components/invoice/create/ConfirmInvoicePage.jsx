@@ -13,6 +13,7 @@ import InvoiceItemsTable from 'components/invoice/create/InvoiceItemsTable';
 import InvoiceOptionsForm from 'components/invoice/create/InvoiceOptionsForm';
 import InvoicePrepayedItemsTable from 'components/invoice/create/InvoicePrepayedItemsTable';
 import { INVOICE_URL } from 'consts/applicationUrls';
+import useInvoicePrepaidItemsTable from 'hooks/invoice/useInvoicePrepaidItemsTable';
 import useSpinner from 'hooks/useSpinner';
 import accountingFormat from 'utils/number-utils';
 import Translate from 'utils/Translate';
@@ -117,6 +118,26 @@ const ConfirmInvoicePage = ({ initialValues, previousPage }) => {
     [stateValues.id, pageSize],
   );
 
+  const updateInvoiceItemQuantity = (updateRowQuantity) => (invoiceItemId) => (quantity) => {
+    updateRowQuantity?.(invoiceItemId, quantity);
+    setStateValues((state) => ({
+      ...state,
+      invoiceItems: state.invoiceItems.map((item) => {
+        if (item.id === invoiceItemId) {
+          return { ...item, quantity };
+        }
+
+        return item;
+      }),
+    }));
+  };
+
+  const invoicePrepaidItemsTableData = useInvoicePrepaidItemsTable({
+    loadMoreRows,
+    invoiceItems: stateValues.invoiceItems,
+    updateInvoiceItemQuantity,
+  });
+
   return (
     <div>
       <Form
@@ -128,7 +149,11 @@ const ConfirmInvoicePage = ({ initialValues, previousPage }) => {
         mutators={{ ...arrayMutators }}
         render={({ handleSubmit, values }) => (
           <form onSubmit={handleSubmit}>
-            <InvoiceOptionsForm values={values} />
+            <InvoiceOptionsForm
+              values={values}
+              disableSaveButton={!invoicePrepaidItemsTableData.isValid
+                && values.invoiceType !== PREPAYMENT_INVOICE}
+            />
             <div className="submit-buttons">
               <button
                 type="button"
@@ -147,6 +172,8 @@ const ConfirmInvoicePage = ({ initialValues, previousPage }) => {
                 values.dateSubmitted
                 || values.datePosted
                 || !stateValues.invoiceItems.length
+                || (!invoicePrepaidItemsTableData.isValid
+                    && values.invoiceType !== PREPAYMENT_INVOICE)
               }
               >
                 <Translate id="react.invoice.submit.label" defaultMessage="Submit for Approval" />
@@ -160,6 +187,8 @@ const ConfirmInvoicePage = ({ initialValues, previousPage }) => {
                     disabled={
                     values.datePosted
                     || !stateValues.invoiceItems.length
+                    || (!invoicePrepaidItemsTableData.isValid
+                        && values.invoiceType !== PREPAYMENT_INVOICE)
                   }
                   >
                     <Translate id="react.invoice.post.label" defaultMessage="Post Invoice" />
@@ -174,6 +203,10 @@ const ConfirmInvoicePage = ({ initialValues, previousPage }) => {
                   invoiceItems={stateValues.invoiceItems}
                   loadMoreRows={loadMoreRows}
                   isPrepaymentInvoice={stateValues.isPrepaymentInvoice}
+                  updateInvoiceItemQuantity={
+                    updateInvoiceItemQuantity(invoicePrepaidItemsTableData.updateRowQuantity)
+                  }
+                  invoicePrepaidItemsTableData={invoicePrepaidItemsTableData}
                 />
               )
                 : (
