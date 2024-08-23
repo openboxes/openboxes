@@ -10,10 +10,11 @@
 package org.pih.warehouse.api
 
 import org.grails.web.json.JSONObject
+import org.pih.warehouse.invoice.PrepaymentInvoiceService
 
 class PrepaymentInvoiceItemApiController {
 
-    def prepaymentInvoiceService
+    PrepaymentInvoiceService prepaymentInvoiceService
 
     def delete() {
         prepaymentInvoiceService.removeInvoiceItem(params.id)

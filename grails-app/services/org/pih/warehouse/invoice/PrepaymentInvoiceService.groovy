@@ -1,5 +1,6 @@
 package org.pih.warehouse.invoice
 
+import grails.core.GrailsApplication
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderAdjustment
@@ -11,6 +12,7 @@ import grails.gorm.transactions.Transactional
 @Transactional
 class PrepaymentInvoiceService {
 
+    GrailsApplication grailsApplication
     InvoiceService invoiceService
 
     Invoice generatePrepaymentInvoice(Order order) {
@@ -260,13 +262,16 @@ class PrepaymentInvoiceService {
      * change quantity on the corresponding inverse item.
      *
      * */
-    void updateItemsQuantity(String invoiceId, List items) {
+    void updateItems(String invoiceId, List items) {
+        def g = grailsApplication.mainContext.getBean('org.grails.plugins.web.taglib.ApplicationTagLib')
         Invoice invoice = Invoice.get(invoiceId)
         if (!invoice) {
-            throw new IllegalArgumentException("Cannot find invoice with id: ${invoiceId}")
+            String defaultMessage = "Cannot find invoice with id: ${invoiceId}"
+            throw new IllegalArgumentException(g.message(code: "invoice.cannotFind.label", args: [invoiceId], default: defaultMessage))
         }
         if (invoice.isPrepaymentInvoice || !invoice.hasPrepaymentInvoice) {
-            throw new IllegalArgumentException("Cannot update quantities on prepayment or non prepaid invoices")
+            String defaultMessage = "Cannot update quantities on prepayment or non prepaid invoices"
+            throw new IllegalArgumentException(g.message(code: "invoice.cannotUpdate.label", default: defaultMessage))
         }
 
         items.each { Map item ->
@@ -278,19 +283,28 @@ class PrepaymentInvoiceService {
      * Updates invoice item's quantity and amount and finds related inverse item and updates quantity and amount
      * */
     void updateInvoiceItemQuantity(String itemId, Integer quantity) {
+        def g = grailsApplication.mainContext.getBean('org.grails.plugins.web.taglib.ApplicationTagLib')
         InvoiceItem invoiceItem = InvoiceItem.get(itemId)
         if (!invoiceItem) {
-            throw new IllegalArgumentException("Cannot find invoice with id: ${itemId}")
+            String defaultMessage = "Cannot find invoice item with id: ${itemId}"
+            throw new IllegalArgumentException(g.message(code: "invoiceItem.cannotFind.error", args: [itemId], default: defaultMessage))
         }
         if (quantity <= 0) {
-            throw new IllegalArgumentException("Quantity to change needs to be higher than 0")
+            String defaultMessage = "Quantity to change needs to be higher than 0"
+            throw new IllegalArgumentException(g.message(code: "invoiceItem.quantityTooLow.error", default: defaultMessage))
+        }
+        if (invoiceItem?.inverse) {
+            String defaultMessage = "Cannot edit inverse invoice items directly"
+            throw new IllegalArgumentException(g.message(code: "invoiceItem.cannotEditInverse.error", default: defaultMessage))
         }
         if (!invoiceItem?.shipmentItem) {
-            throw new IllegalArgumentException("Invoice item is missing shipment item. Cannot edit quantity.")
+            String defaultMessage = "Invoice item is missing shipment item. Cannot edit quantity."
+            throw new IllegalArgumentException(g.message(code: "invoiceItem.missingShipment.error", default: defaultMessage))
         }
         Integer quantityAvailableToInvoice = invoiceItem.shipmentItem.quantityToInvoice
         if (quantity > quantityAvailableToInvoice + invoiceItem.quantity) {
-            throw new IllegalArgumentException("Cannot update quantity to higher value than available to invoice")
+            String defaultMessage = "Cannot update quantity to higher value than available to invoice"
+            throw new IllegalArgumentException(g.message(code: "invoiceItem.quantityTooHigh.error", default: defaultMessage))
         }
         // update invoice item's quantity (and adjust amount)
         invoiceItem.quantity = quantity

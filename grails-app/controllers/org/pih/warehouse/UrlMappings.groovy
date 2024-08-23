@@ -538,7 +538,7 @@ class UrlMappings {
             action = [POST: "updateItems"]
         }
 
-        "/api/prepaymentInvoiceItems/$id/" {
+        "/api/prepaymentInvoiceItems/$id" {
             controller = "prepaymentInvoiceItemApi"
             action = [POST: "update", DELETE: "delete"]
         }
