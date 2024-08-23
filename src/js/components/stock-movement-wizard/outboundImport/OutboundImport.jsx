@@ -3,6 +3,7 @@ import React, { useMemo } from 'react';
 import { HttpStatusCode } from 'axios';
 
 import OutboundImportHeader from 'components/stock-movement-wizard/outboundImport/OutboundImportHeader';
+import OutboundImportStep from 'components/stock-movement-wizard/outboundImport/OutboundImportStep';
 import OutboundImportConfirm from 'components/stock-movement-wizard/outboundImport/sections/OutboundImportConfirm';
 import OutboundImportDetails from 'components/stock-movement-wizard/outboundImport/sections/OutboundImportDetails';
 import WizardStepsV2 from 'components/wizard/v2/WizardStepsV2';
@@ -19,26 +20,15 @@ const OutboundImport = () => {
 
   const translate = useTranslate();
 
-  const OutboundImportStep = {
-    DETAILS: {
-      key: 'DETAILS',
-      title: translate('react.outboundImport.steps.details.label', 'Create'),
-    },
-    CONFIRM: {
-      key: 'CONFIRM',
-      title: translate('react.outboundImport.steps.confirm.label', 'Confirm'),
-    },
-  };
-
   const steps = useMemo(() => [
     {
-      key: OutboundImportStep.DETAILS.key,
-      title: OutboundImportStep.DETAILS.title,
+      key: OutboundImportStep.DETAILS,
+      title: translate('react.outboundImport.steps.details.label', 'Create'),
       Component: (props) => (<OutboundImportDetails {...props} />),
     },
     {
-      key: OutboundImportStep.CONFIRM.key,
-      title: OutboundImportStep.CONFIRM.title,
+      key: OutboundImportStep.CONFIRM,
+      title: translate('react.outboundImport.steps.confirm.label', 'Confirm'),
       Component: (props) => (<OutboundImportConfirm {...props} />),
     },
   ], [translate]);
@@ -55,7 +45,7 @@ const OutboundImport = () => {
       previous,
       is,
     },
-  ] = useWizard({ initialKey: OutboundImportStep.DETAILS.key, steps });
+  ] = useWizard({ initialKey: OutboundImportStep.DETAILS, steps });
 
   const {
     lineItems,
