@@ -97,6 +97,9 @@ const FIELDS = {
         flexWidth: '1.1',
         label: 'react.stockMovement.lot.label',
         defaultMessage: 'Lot',
+        attributes: {
+          showValueTooltip: true,
+        },
       },
       expirationDate: {
         type: LabelField,

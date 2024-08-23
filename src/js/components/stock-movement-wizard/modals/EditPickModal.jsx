@@ -68,6 +68,9 @@ const FIELDS = {
         type: LabelField,
         label: 'react.stockMovement.lot.label',
         defaultMessage: 'Lot',
+        attributes: {
+          showValueTooltip: true,
+        },
       },
       expirationDate: {
         type: LabelField,
