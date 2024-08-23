@@ -51,6 +51,7 @@ const OutboundImport = () => {
     lineItems,
     lineItemErrors,
     validateStatus,
+    getValues,
     errors,
     control,
     isValid,
@@ -68,15 +69,27 @@ const OutboundImport = () => {
     trigger,
   };
 
+  /**
+   * Skips validation to allow form submission after a page refresh,
+   * where the required XLS file is lost. The file was already validated earlier,
+   * so we bypass validation and submit the form directly to retain progress.
+   *
+   * Related ticket OBPIH-6627 (Keep filled form progress when refreshing the page)
+   */
+  const handleConfirmSubmitForm = (submitMethod) => (event) => {
+    event.preventDefault();
+    submitMethod(getValues());
+  };
+
   return (
     <PageWrapper>
       <WizardStepsV2 steps={stepsTitles} currentStepKey={Step.key} />
       <OutboundImportHeader />
       <form onSubmit={handleSubmit(onSubmitStockMovementDetails)}>
-        {is(OutboundImportStep.DETAILS.key) && (<Step.Component {...detailsComponentProps} />)}
+        {is(OutboundImportStep.DETAILS) && (<Step.Component {...detailsComponentProps} />)}
       </form>
-      <form onSubmit={handleSubmit(onConfirmImport)}>
-        {is(OutboundImportStep.CONFIRM.key)
+      <form onSubmit={handleConfirmSubmitForm(onConfirmImport)}>
+        {is(OutboundImportStep.CONFIRM)
           && (
           <Step.Component
             {...detailsComponentProps}
