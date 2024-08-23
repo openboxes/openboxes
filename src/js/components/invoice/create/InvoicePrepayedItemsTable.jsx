@@ -2,7 +2,7 @@ import React, { useCallback } from 'react';
 
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import { RiCloseCircleLine } from 'react-icons/all';
+import { RiCloseCircleLine, RiCopyrightLine } from 'react-icons/all';
 import { Tooltip } from 'react-tippy';
 
 import ArrayField from 'components/form-elements/ArrayField';
@@ -12,13 +12,6 @@ import { renderFormField } from 'utils/form-utils';
 import { getInvoiceDescription } from 'utils/form-values-utils';
 import accountingFormat from 'utils/number-utils';
 
-const getRowColouring = (canceled, inverse) => {
-  if (canceled) {
-    return 'disabled-row';
-  }
-  return inverse ? 'negative-row-value' : null;
-};
-
 const INVOICE_ITEMS = {
   invoiceItems: {
     type: ArrayField,
@@ -27,7 +20,7 @@ const INVOICE_ITEMS = {
     isRowLoaded: ({ isRowLoaded }) => isRowLoaded,
     loadMoreRows: ({ loadMoreRows }) => loadMoreRows(),
     getDynamicRowAttr: ({ rowValues }) => ({
-      className: getRowColouring(rowValues?.isCanceled, rowValues?.inverse),
+      className: rowValues?.amount < 0 ? 'negative-row-value' : '',
     }),
     fields: {
       rowIcon: {
@@ -41,6 +34,7 @@ const INVOICE_ITEMS = {
           const invoiceItem = invoiceItems[rowIndex];
           const isPrepLine = hasItems && (isPrepaymentInvoice
             || invoiceItem?.isPrepaymentItem
+            || invoiceItem?.inverse
           );
 
           if (isPrepLine) {
@@ -61,7 +55,7 @@ const INVOICE_ITEMS = {
           }
 
           if (invoiceItem?.isCanceled) {
-            return <RiCloseCircleLine size="23px" color="black" />;
+            return <RiCopyrightLine size="23px" color="black" />;
           }
 
           return null;
@@ -90,10 +84,14 @@ const INVOICE_ITEMS = {
         flexWidth: '1',
         getDynamicAttr: (params) => {
           const { invoiceItems, rowIndex } = params;
+          const invoiceItem = invoiceItems[rowIndex];
           const shipmentId = invoiceItems
             && invoiceItems[rowIndex]
             && invoiceItems[rowIndex].shipmentId;
-          return { url: shipmentId ? STOCK_MOVEMENT_URL.show(shipmentId) : '' };
+          return {
+            url: shipmentId ? STOCK_MOVEMENT_URL.show(shipmentId) : '',
+            formatValue: (value) => (invoiceItem?.inverse ? '' : value),
+          };
         },
       },
       budgetCode: {
