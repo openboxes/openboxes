@@ -81,19 +81,21 @@ const ConfirmInvoicePage = ({ initialValues, previousPage }) => {
 
   /**
    * Sets state of invoice items after fetch and calls method to fetch next items
-   * @param {string} startIndex
+   * @param response
+   * @param {boolean} overrideInvoiceItems
    * @public
    */
-  const setInvoiceItems = (response) => {
+  const setInvoiceItems = (response, overrideInvoiceItems = true) => {
     spinner.show();
     const { data, totalCount } = response.data;
-
     setStateValues((state) => ({
       ...state,
-      invoiceItems: [
-        ...state.invoiceItems,
-        ...data,
-      ],
+      invoiceItems: overrideInvoiceItems
+        ? data
+        : [
+          ...state.invoiceItems,
+          ...data,
+        ],
       totalCount,
     }));
 
@@ -106,11 +108,11 @@ const ConfirmInvoicePage = ({ initialValues, previousPage }) => {
    * @public
    */
   const loadMoreRows = useCallback(
-    ({ startIndex }) => invoiceApi.getInvoiceItems(stateValues.id, {
+    ({ startIndex, overrideInvoiceItems = false }) => invoiceApi.getInvoiceItems(stateValues.id, {
       params: { offset: startIndex, max: pageSize },
     })
       .then((response) => {
-        setInvoiceItems(response);
+        setInvoiceItems(response, overrideInvoiceItems);
       }),
     [stateValues.id, pageSize],
   );
@@ -141,7 +143,11 @@ const ConfirmInvoicePage = ({ initialValues, previousPage }) => {
                 type="submit"
                 onClick={() => submitInvoice()}
                 className="btn btn-outline-success float-right btn-form btn-xs"
-                disabled={values.dateSubmitted || values.datePosted}
+                disabled={
+                values.dateSubmitted
+                || values.datePosted
+                || !stateValues.invoiceItems.length
+              }
               >
                 <Translate id="react.invoice.submit.label" defaultMessage="Submit for Approval" />
               </button>
@@ -151,7 +157,10 @@ const ConfirmInvoicePage = ({ initialValues, previousPage }) => {
                     type="submit"
                     onClick={() => postInvoice()}
                     className="btn btn-outline-success float-right btn-form btn-xs"
-                    disabled={values.datePosted}
+                    disabled={
+                    values.datePosted
+                    || !stateValues.invoiceItems.length
+                  }
                   >
                     <Translate id="react.invoice.post.label" defaultMessage="Post Invoice" />
                   </button>
