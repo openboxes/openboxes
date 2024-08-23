@@ -2,7 +2,7 @@ import React from 'react';
 
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import { RiCloseCircleLine, RiCopyrightLine } from 'react-icons/all';
+import { RiCopyrightLine } from 'react-icons/all';
 import { Tooltip } from 'react-tippy';
 
 import ArrayField from 'components/form-elements/ArrayField';

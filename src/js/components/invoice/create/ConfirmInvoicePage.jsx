@@ -135,8 +135,15 @@ const ConfirmInvoicePage = ({ initialValues, previousPage }) => {
   const invoicePrepaidItemsTableData = useInvoicePrepaidItemsTable({
     loadMoreRows,
     invoiceItems: stateValues.invoiceItems,
+    invoiceId: stateValues.id,
     updateInvoiceItemQuantity,
   });
+
+  const {
+    isValid,
+    updateRowQuantity,
+    updateInvoiceItem,
+  } = invoicePrepaidItemsTableData;
 
   return (
     <div>
@@ -151,7 +158,12 @@ const ConfirmInvoicePage = ({ initialValues, previousPage }) => {
           <form onSubmit={handleSubmit}>
             <InvoiceOptionsForm
               values={values}
-              disableSaveButton={!invoicePrepaidItemsTableData.isValid
+              updateInvoiceItem={updateInvoiceItem}
+              canUpdateInvoiceItems={
+                values.invoiceType !== PREPAYMENT_INVOICE
+                && stateValues.hasPrepaymentInvoice
+              }
+              disableSaveButton={!isValid
                 && values.invoiceType !== PREPAYMENT_INVOICE}
             />
             <div className="submit-buttons">
@@ -166,13 +178,22 @@ const ConfirmInvoicePage = ({ initialValues, previousPage }) => {
               </button>
               <button
                 type="submit"
-                onClick={() => submitInvoice()}
+                onClick={() => {
+                  if (
+                    values.invoiceType !== PREPAYMENT_INVOICE
+                    && stateValues.hasPrepaymentInvoice
+                  ) {
+                    updateInvoiceItem(submitInvoice);
+                    return;
+                  }
+                  submitInvoice();
+                }}
                 className="btn btn-outline-success float-right btn-form btn-xs"
                 disabled={
                 values.dateSubmitted
                 || values.datePosted
                 || !stateValues.invoiceItems.length
-                || (!invoicePrepaidItemsTableData.isValid
+                || (!isValid
                     && values.invoiceType !== PREPAYMENT_INVOICE)
               }
               >
@@ -182,12 +203,21 @@ const ConfirmInvoicePage = ({ initialValues, previousPage }) => {
                   && (
                   <button
                     type="submit"
-                    onClick={() => postInvoice()}
+                    onClick={() => {
+                      if (
+                        values.invoiceType !== PREPAYMENT_INVOICE
+                        && stateValues.hasPrepaymentInvoice
+                      ) {
+                        updateInvoiceItem(postInvoice);
+                        return;
+                      }
+                      postInvoice();
+                    }}
                     className="btn btn-outline-success float-right btn-form btn-xs"
                     disabled={
                     values.datePosted
                     || !stateValues.invoiceItems.length
-                    || (!invoicePrepaidItemsTableData.isValid
+                    || (!isValid
                         && values.invoiceType !== PREPAYMENT_INVOICE)
                   }
                   >
@@ -204,7 +234,7 @@ const ConfirmInvoicePage = ({ initialValues, previousPage }) => {
                   loadMoreRows={loadMoreRows}
                   isPrepaymentInvoice={stateValues.isPrepaymentInvoice}
                   updateInvoiceItemQuantity={
-                    updateInvoiceItemQuantity(invoicePrepaidItemsTableData.updateRowQuantity)
+                    updateInvoiceItemQuantity(updateRowQuantity)
                   }
                   invoicePrepaidItemsTableData={invoicePrepaidItemsTableData}
                 />

@@ -65,11 +65,20 @@ const INVOICE_HEADER_FIELDS = {
   },
 };
 
-const InvoiceOptionsForm = ({ values, disableSaveButton }) => {
+const InvoiceOptionsForm = ({
+  values,
+  disableSaveButton,
+  updateInvoiceItem,
+  canUpdateInvoiceItems,
+}) => {
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
 
   const toggleDropdown = () => {
     setIsDropdownVisible((state) => !state);
+  };
+
+  const redirectToShowPage = () => {
+    window.location = INVOICE_URL.show(values.id);
   };
 
   return (
@@ -80,7 +89,11 @@ const InvoiceOptionsForm = ({ values, disableSaveButton }) => {
           className="btn btn-outline-secondary float-right btn-form btn-xs"
           disabled={disableSaveButton}
           onClick={() => {
-            window.location = INVOICE_URL.show(values.id);
+            if (canUpdateInvoiceItems) {
+              updateInvoiceItem(redirectToShowPage);
+              return;
+            }
+            redirectToShowPage();
           }}
         >
           <span>
@@ -145,6 +158,8 @@ InvoiceOptionsForm.propTypes = {
     documents: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   }).isRequired,
   disableSaveButton: PropTypes.bool.isRequired,
+  updateInvoiceItem: PropTypes.func.isRequired,
+  canUpdateInvoiceItems: PropTypes.bool.isRequired,
 };
 
 export default InvoiceOptionsForm;
