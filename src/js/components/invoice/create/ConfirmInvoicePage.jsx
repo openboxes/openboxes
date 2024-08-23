@@ -90,10 +90,10 @@ const ConfirmInvoicePage = ({ initialValues, previousPage }) => {
 
     setStateValues((state) => ({
       ...state,
-      invoiceItems: _.uniqBy([
+      invoiceItems: [
         ...state.invoiceItems,
         ...data,
-      ], 'id'),
+      ],
       totalCount,
     }));
 
