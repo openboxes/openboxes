@@ -18,13 +18,19 @@ const useWizard = ({ initialKey, steps }) => {
     }));
   };
 
+  /** Compute current active wizard step
+   * Determine current wizard step based on URl query "step" parameter
+   * Otherwise use provided initial key
+   * Or default to the first step
+   */
   const currentStepKey = useMemo(() =>
-    parsedQueryParams.step || steps[0]?.key,
-  [parsedQueryParams.step, steps]);
+    parsedQueryParams.step || initialKey || steps[0]?.key,
+  [parsedQueryParams.step, steps, initialKey]);
 
   const stepProperties = useMemo(() => {
     let foundStepIdx = steps.findIndex((s) => s.key === currentStepKey);
     // findIndex returns -1 if the index is not found for given predicate
+    // default to first step on index 0
     if (foundStepIdx === -1) {
       foundStepIdx = 0;
     }
@@ -33,7 +39,7 @@ const useWizard = ({ initialKey, steps }) => {
       Step: steps[foundStepIdx],
       currentStepIdx: foundStepIdx,
     };
-  }, [currentStepKey, initialKey]);
+  }, [currentStepKey]);
 
   const first = () => {
     navigateToStep(steps[0]?.key);
@@ -66,7 +72,7 @@ const useWizard = ({ initialKey, steps }) => {
   return [
     Step,
     {
-      // set: setKey,
+      navigateToStep,
       first,
       next,
       previous,

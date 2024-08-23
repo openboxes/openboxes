@@ -1,6 +1,7 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 
 import { HttpStatusCode } from 'axios';
+import _ from 'lodash';
 
 import OutboundImportHeader from 'components/stock-movement-wizard/outboundImport/OutboundImportHeader';
 import OutboundImportStep from 'components/stock-movement-wizard/outboundImport/OutboundImportStep';
@@ -8,6 +9,7 @@ import OutboundImportConfirm from 'components/stock-movement-wizard/outboundImpo
 import OutboundImportDetails from 'components/stock-movement-wizard/outboundImport/sections/OutboundImportDetails';
 import WizardStepsV2 from 'components/wizard/v2/WizardStepsV2';
 import useOutboundImportForm from 'hooks/outboundImport/useOutboundImportForm';
+import useSessionStorage from 'hooks/useSessionStorage';
 import useTranslate from 'hooks/useTranslate';
 import useTranslation from 'hooks/useTranslation';
 import useWizard from 'hooks/useWizard';
@@ -17,6 +19,7 @@ import 'utils/utils.scss';
 
 const OutboundImport = () => {
   useTranslation('outboundImport', 'stockMovement');
+  const [cachedData,] = useSessionStorage('outbound-import', {});
 
   const translate = useTranslate();
 
@@ -41,6 +44,7 @@ const OutboundImport = () => {
   const [
     Step,
     {
+      navigateToStep,
       next,
       previous,
       is,
@@ -60,6 +64,13 @@ const OutboundImport = () => {
     onConfirmImport,
     trigger,
   } = useOutboundImportForm({ next });
+
+  /** Redirect to first step if there is no cached data */
+  useEffect(() => {
+    if (_.isEmpty(cachedData) && !is(OutboundImportStep.DETAILS)) {
+      navigateToStep(OutboundImportStep.DETAILS);
+    }
+  }, []);
 
   const detailsComponentProps = {
     control,
