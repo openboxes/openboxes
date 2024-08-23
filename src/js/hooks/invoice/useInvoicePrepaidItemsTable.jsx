@@ -19,6 +19,8 @@ const useInvoicePrepaidItemsTable = ({
   const [editableRows, setEditableRows] = useState({});
   const [invalidRows, setInvalidRows] = useState([]);
 
+  // Function reverting quantity to the version stored in editableRows state.
+  // Used for reverting changed quantity after fetching new data.
   const revertQuantityToEdited = () => {
     Object.entries(editableRows)
       .forEach(([id, quantity]) => {
@@ -26,12 +28,15 @@ const useInvoicePrepaidItemsTable = ({
       });
   };
 
+  // Triggering revertQuantityToEdited after delete (delete action needs refetch
+  // because of the need for removing appropriate inverse item)
   useEffect(() => {
     revertQuantityToEdited();
   }, [invoiceItems.length]);
 
   const isEditable = (rowId) => rowId in editableRows;
 
+  // Returns quantity which should be sent for updating invoice items
   const getEditedInvoiceItems = () => invoiceItems
     .filter((item) => isEditable(item.id))
     .map((item) => ({
@@ -54,6 +59,7 @@ const useInvoicePrepaidItemsTable = ({
     }
   };
 
+  // Sending a request for updating invoice items quantity (batch update)
   const updateInvoiceItem = async (callback) => {
     const invoiceItemsToUpdate = getEditedInvoiceItems();
     spinner.show();

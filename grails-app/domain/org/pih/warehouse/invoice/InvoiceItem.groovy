@@ -189,12 +189,7 @@ class InvoiceItem implements Serializable {
     }
 
     Integer getQuantityAvailableToInvoice() {
-        if (!shipmentItem) {
-            return null
-        }
-        Integer quantityInvoicedOutside = shipmentItem.quantityInvoiced - quantity
-        Integer quantityShippedInUom = (shipmentItem.quantity / shipmentItem.quantityPerUom) as Integer
-        return quantityShippedInUom - quantityInvoicedOutside
+        return shipmentItem ? (shipmentItem.quantityToInvoiceInStandardUom / quantityPerUom) + quantity : null
     }
 
     Map toJson() {
