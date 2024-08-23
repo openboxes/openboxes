@@ -60,6 +60,10 @@ export const REMOVE_INVOICE_ITEM = (id) => `${INVOICE_API}/${id}/removeItem`;
 export const INVOICE_ITEM_API = `${API}/invoiceItems`;
 export const VALIDATE_INVOICE_ITEM = (id) => `${INVOICE_ITEM_API}/${id}/validation`;
 
+// PREPAYMENT INVOICE ITEM
+export const PREPAYMENT_INVOICE_ITEM_API = `${API}/prepaymentInvoiceItems`;
+export const PREPAYMENT_INVOICE_ITEM_DELETE = (id) => `${PREPAYMENT_INVOICE_ITEM_API}/${id}`;
+
 // PRODUCT
 export const PRODUCT_API = `${API}/products`;
 export const INVENTORY_ITEM = (productCode, lotNumber) => `${CONTEXT_PATH}/${PRODUCT_API}/${productCode}/inventoryItems/${lotNumber}`;
