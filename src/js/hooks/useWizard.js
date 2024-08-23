@@ -91,7 +91,6 @@ useWizard.propTypes = {
   ]).isRequired,
   steps: PropTypes.arrayOf(
     PropTypes.shape({
-      title: PropTypes.string.isRequired,
       key: PropTypes.oneOfType([
         PropTypes.number,
         PropTypes.string,
