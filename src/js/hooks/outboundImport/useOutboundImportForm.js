@@ -150,15 +150,8 @@ const useOutboundImportForm = ({ next }) => {
 
   // onSubmit method that is run on the first step (import file + validation of outbound)
   const onSubmitStockMovementDetails = async (values) => {
-    const formData = new FormData();
-    formData.append('importFile', values.packingList);
-    const config = {
-      headers: {
-        'content-type': 'multipart/form-data',
-      },
-    };
     spinner.show();
-    const importPackingListResponse = await packingListApi.importPackingList(formData, config);
+    const importPackingListResponse = await packingListApi.importPackingList(values.packingList);
     const { basicDetails, sendingOptions } = buildDetailsPayload(values);
 
     const packingList = importPackingListResponse.data.data.map((item) => ({
@@ -171,6 +164,7 @@ const useOutboundImportForm = ({ next }) => {
       rowId: _.uniqueId(),
     }));
     if (!packingList.length) {
+      spinner.hide();
       notification(NotificationType.ERROR_OUTLINED)({
         message: translate('react.outboundImport.packingList.empty.label', 'Packing list cannot be empty'),
       });
