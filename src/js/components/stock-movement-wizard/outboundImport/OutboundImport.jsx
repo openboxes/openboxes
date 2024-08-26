@@ -62,6 +62,7 @@ const OutboundImport = () => {
     handleSubmit,
     onSubmitStockMovementDetails,
     onConfirmImport,
+    getValues,
     trigger,
   } = useOutboundImportForm({ next });
 
@@ -95,7 +96,12 @@ const OutboundImport = () => {
   return (
     <PageWrapper>
       <WizardStepsV2 steps={stepsTitles} currentStepKey={Step.key} />
-      <OutboundImportHeader />
+      <OutboundImportHeader
+        origin={getValues('origin.label')}
+        destination={getValues('destination.label')}
+        description={getValues('description')}
+        dateRequested={getValues('dateRequested')}
+      />
       <form onSubmit={handleSubmit(onSubmitStockMovementDetails)}>
         {is(OutboundImportStep.DETAILS) && (<Step.Component {...detailsComponentProps} />)}
       </form>

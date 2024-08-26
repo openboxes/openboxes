@@ -6,7 +6,7 @@ import PropTypes from 'prop-types';
 import useTranslate from 'hooks/useTranslate';
 import HeaderWrapper from 'wrappers/HeaderWrapper';
 
-const OutboundImportHeader = ({ stockMovementDetails }) => {
+const OutboundImportHeader = ({ origin, destination, description, dateRequested }) => {
   const translate = useTranslate();
   return (
     <HeaderWrapper className="align-items-center h-100 py-3">
@@ -14,18 +14,18 @@ const OutboundImportHeader = ({ stockMovementDetails }) => {
         <h5 className="create-page-tile-main-content m-0">
           <strong>{translate('react.outboundImport.header.title', 'Import completed outbound')}</strong>
           {
-            !_.isEmpty(stockMovementDetails) && (
+            origin && destination && description && dateRequested && (
             <>
               <span>{' | '}</span>
               <span className="text-blue-primary text-nowrap">
-                {stockMovementDetails.origin}
+                {origin}
               </span>
               <span>{` ${translate('react.default.to.label', 'to')} `}</span>
               <span className="text-blue-400 text-nowrap">
-                {stockMovementDetails.destination}
+                {destination}
               </span>
-              <span>{`, ${stockMovementDetails.dateRequested}`}</span>
-              <span>{`, ${stockMovementDetails.description}`}</span>
+              <span>{`, ${dateRequested}`}</span>
+              <span>{`, ${description}`}</span>
             </>
             )
           }
@@ -36,16 +36,17 @@ const OutboundImportHeader = ({ stockMovementDetails }) => {
 };
 
 OutboundImportHeader.defaultProps = {
-  stockMovementDetails: {},
+  origin: undefined,
+  destination: undefined,
+  description: undefined,
+  dateRequested: undefined,
 };
 
 OutboundImportHeader.propTypes = {
-  stockMovementDetails: PropTypes.shape({
-    origin: PropTypes.string,
-    destination: PropTypes.string,
-    description: PropTypes.string,
-    dateRequested: PropTypes.string,
-  }),
+  origin: PropTypes.string,
+  destination: PropTypes.string,
+  description: PropTypes.string,
+  dateRequested: PropTypes.string,
 };
 
 export default OutboundImportHeader;
