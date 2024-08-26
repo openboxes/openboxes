@@ -392,6 +392,10 @@ class Order implements Serializable {
         return name
     }
 
+    BigDecimal getPrepaymentPercent() {
+        return (paymentTerm?.prepaymentPercent ?: Constants.DEFAULT_PAYMENT_PERCENT) / 100
+    }
+
     /**
      * Should only use in the context of displaying a single order (i.e. do not invoke on a list of orders).
      *

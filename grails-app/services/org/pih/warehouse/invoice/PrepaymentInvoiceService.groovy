@@ -1,5 +1,6 @@
 package org.pih.warehouse.invoice
 
+import grails.core.GrailsApplication
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderAdjustment
@@ -11,6 +12,7 @@ import grails.gorm.transactions.Transactional
 @Transactional
 class PrepaymentInvoiceService {
 
+    GrailsApplication grailsApplication
     InvoiceService invoiceService
 
     Invoice generatePrepaymentInvoice(Order order) {
@@ -26,19 +28,17 @@ class PrepaymentInvoiceService {
             throw new Exception("No order items or order adjustments found for given order")
         }
 
-        BigDecimal prepaymentPercent = (order.paymentTerm?.prepaymentPercent ?: Constants.DEFAULT_PAYMENT_PERCENT) / 100
-
         order.activeOrderItems.each { OrderItem orderItem ->
             InvoiceItem invoiceItem = createFromOrderItem(orderItem)
             // This is prepayment item, we need to adjust the amount according to the payment terms
-            invoiceItem.amount = invoiceItem.amount * prepaymentPercent
+            invoiceItem.amount = invoiceItem.amount * order.prepaymentPercent
             invoice.addToInvoiceItems(invoiceItem)
         }
 
         order.activeOrderAdjustments.each { OrderAdjustment orderAdjustment ->
             InvoiceItem invoiceItem = createFromOrderAdjustment(orderAdjustment)
             // This is prepayment item, we need to adjust the amount according to the payment terms
-            invoiceItem.amount = invoiceItem.amount * prepaymentPercent
+            invoiceItem.amount = invoiceItem.amount * order.prepaymentPercent
             invoice.addToInvoiceItems(invoiceItem)
         }
 
@@ -171,7 +171,6 @@ class PrepaymentInvoiceService {
 
     private InvoiceItem createInverseItemForShipmentItem(ShipmentItem shipmentItem, InvoiceItem invoiceItem) {
         OrderItem orderItem = shipmentItem.orderItems?.find { it }
-        BigDecimal prepaymentPercent = (orderItem.order.paymentTerm?.prepaymentPercent ?: Constants.DEFAULT_PAYMENT_PERCENT) / 100
         InvoiceItem prepaymentItem = orderItem.invoiceItems.find { it.isPrepaymentInvoice }
         if (!prepaymentItem) {
             return null
@@ -189,7 +188,7 @@ class PrepaymentInvoiceService {
         inverseItem.unitPrice = prepaymentItem.unitPrice
         // Multiplied by (-1) to keep inverse items as negative amount
         // unit price is taken from prepayment item (to not accidentally overwrite inverse with changed unit price)
-        inverseItem.amount = quantity * prepaymentItem.unitPrice * prepaymentPercent * (-1)
+        inverseItem.amount = quantity * prepaymentItem.unitPrice * orderItem.order.prepaymentPercent * (-1)
         return inverseItem
     }
 
@@ -218,12 +217,17 @@ class PrepaymentInvoiceService {
      * Removes invoice item for the itemId and finds related inverse item and removes it too
      * */
     void removeInvoiceItem(String itemId) {
+        def g = grailsApplication.mainContext.getBean('org.grails.plugins.web.taglib.ApplicationTagLib')
         InvoiceItem invoiceItem = InvoiceItem.get(itemId)
         if (!invoiceItem) {
             throw new IllegalArgumentException("Missing invoice item to delete")
         }
         if (invoiceItem.isPrepaymentInvoice || invoiceItem.inverse) {
             throw new IllegalArgumentException("Cannot delete prepayment or inverse items")
+        }
+        if (invoiceItem.invoice.datePosted) {
+            String defaultMessage = "Cannot update posted invoices"
+            throw new IllegalArgumentException(g.message(code: "invoice.cannotUpdatePosted.error", default: defaultMessage))
         }
 
         InvoiceItem inverseItem = findInverseItem(invoiceItem)
@@ -255,5 +259,84 @@ class PrepaymentInvoiceService {
         // be possible, because there is only one invoice item per shipment item in that case and we don't have an option
         // to generate invoice item partially for the same invoice
         return relatedObject?.invoiceItems?.find { InvoiceItem it -> it.inverse && it.invoice == invoice }
+    }
+
+    /**
+     * Bulk editing invoice items quantity on final invoice for prepaid POs.
+     * We are allowing to edit only the quantity here. After editing invoice items quantity we have to
+     * change quantity on the corresponding inverse item.
+     *
+     * */
+    void updateItems(String invoiceId, List items) {
+        def g = grailsApplication.mainContext.getBean('org.grails.plugins.web.taglib.ApplicationTagLib')
+        Invoice invoice = Invoice.get(invoiceId)
+        if (!invoice) {
+            String defaultMessage = "Cannot find invoice with id: ${invoiceId}"
+            throw new IllegalArgumentException(g.message(code: "invoice.cannotFind.label", args: [invoiceId], default: defaultMessage))
+        }
+        if (invoice.isPrepaymentInvoice || !invoice.hasPrepaymentInvoice) {
+            String defaultMessage = "Cannot update quantities on prepayment or non prepaid invoices"
+            throw new IllegalArgumentException(g.message(code: "invoice.cannotUpdate.label", default: defaultMessage))
+        }
+
+        items.each { Map item ->
+            updateInvoiceItemQuantity(item.id, item.quantity)
+        }
+    }
+
+    /**
+     * Updates invoice item's quantity and amount and finds related inverse item and updates quantity and amount
+     * */
+    void updateInvoiceItemQuantity(String itemId, Integer quantity) {
+        def g = grailsApplication.mainContext.getBean('org.grails.plugins.web.taglib.ApplicationTagLib')
+        InvoiceItem invoiceItem = InvoiceItem.get(itemId)
+        if (!invoiceItem) {
+            String defaultMessage = "Cannot find invoice item with id: ${itemId}"
+            throw new IllegalArgumentException(g.message(code: "invoiceItem.cannotFind.error", args: [itemId], default: defaultMessage))
+        }
+        if (invoiceItem.invoice.datePosted) {
+            String defaultMessage = "Cannot update posted invoices"
+            throw new IllegalArgumentException(g.message(code: "invoice.cannotUpdatePosted.error", default: defaultMessage))
+        }
+        if (quantity <= 0) {
+            String defaultMessage = "Quantity to change needs to be higher than 0"
+            throw new IllegalArgumentException(g.message(code: "invoiceItem.quantityTooLow.error", default: defaultMessage))
+        }
+        if (invoiceItem?.inverse) {
+            String defaultMessage = "Cannot edit inverse invoice items directly"
+            throw new IllegalArgumentException(g.message(code: "invoiceItem.cannotEditInverse.error", default: defaultMessage))
+        }
+        if (!invoiceItem?.shipmentItem) {
+            String defaultMessage = "Invoice item is missing shipment item. Cannot edit quantity."
+            throw new IllegalArgumentException(g.message(code: "invoiceItem.missingShipment.error", default: defaultMessage))
+        }
+        Integer quantityAvailableToInvoice = invoiceItem.shipmentItem.quantityToInvoice
+        if (quantity > quantityAvailableToInvoice + invoiceItem.quantity) {
+            String defaultMessage = "Cannot update quantity to higher value than available to invoice"
+            throw new IllegalArgumentException(g.message(code: "invoiceItem.quantityTooHigh.error", default: defaultMessage))
+        }
+        // update invoice item's quantity (and adjust amount)
+        invoiceItem.quantity = quantity
+        invoiceItem.amount = quantity * invoiceItem.unitPrice
+        // update inverse item's quantity if there is inverse item (and adjust amount)
+        InvoiceItem inverseItem = findInverseItem(invoiceItem)
+        if (inverseItem) {
+            OrderItem orderItem = invoiceItem?.shipmentItem?.orderItems?.find { it }
+            InvoiceItem prepaymentItem = orderItem.invoiceItems.find { it.isPrepaymentInvoice }
+            // find quantity that is still available to inverse and add to the current quantity from this inverse item
+            // this needs to be checked because we can also increase invoiced quantity here
+            Integer quantityAvailableToInverse = inverseItem.quantity + getQuantityAvailableToInverse(orderItem, prepaymentItem)
+            Integer quantityToInverse = quantity > quantityAvailableToInverse ? quantityAvailableToInverse : quantity
+            inverseItem.quantity = quantityToInverse
+            inverseItem.amount = quantityToInverse * prepaymentItem.unitPrice * orderItem.order.prepaymentPercent * (-1)
+            return
+        }
+
+        // If there is a case that we did not found inverse item, but it was made available to inverse now after
+        // editing or removing invoice items on invoices, lets try to create it here
+        inverseItem = createInverseItemForShipmentItem(invoiceItem?.shipmentItem, invoiceItem)
+        if (inverseItem) {
+            invoiceItem.invoice.addToInvoiceItems(inverseItem)
+        }
     }
 }
