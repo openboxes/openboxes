@@ -72,7 +72,7 @@ const useOutboundImportForm = ({ next }) => {
     }
 
     return values;
-  }, [currentLocation]);
+  }, [currentLocation?.id]);
 
   /**
    * State to store data that is displayed in the table
@@ -133,7 +133,7 @@ const useOutboundImportForm = ({ next }) => {
     };
   }, { itemsWithErrors: [], itemsWithoutErrors: [] });
 
-  const validatePackingListItems = async (fulfilmentPayload) => {
+  const validateOutboundData = async (fulfilmentPayload) => {
     try {
       const validationResponse = await fulfillmentApi.validateOutbound(fulfilmentPayload);
       // Set the table data that is used to display the items in the React table
@@ -178,7 +178,7 @@ const useOutboundImportForm = ({ next }) => {
       sendingOptions,
     };
     setCachedData(fulfilmentPayload);
-    await validatePackingListItems(fulfilmentPayload);
+    await validateOutboundData(fulfilmentPayload);
     spinner.hide();
     next();
   };
@@ -232,7 +232,7 @@ const useOutboundImportForm = ({ next }) => {
     if (!_.isEmpty(cachedData)) {
       spinner.show();
       setPackingListData(cachedData.packingList);
-      await validatePackingListItems(cachedData);
+      await validateOutboundData(cachedData);
       spinner.hide();
     }
   };
