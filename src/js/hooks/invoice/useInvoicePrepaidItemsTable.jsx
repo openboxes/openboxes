@@ -5,6 +5,7 @@ import { RiDeleteBinLine, RiPencilLine } from 'react-icons/ri';
 
 import prepaymentInvoiceApi from 'api/services/PrepaymentInvoiceApi';
 import prepaymentInvoiceItemApi from 'api/services/PrepaymentInvoiceItemApi';
+import InvoiceStatus from 'consts/invoiceStatus';
 import useSpinner from 'hooks/useSpinner';
 import useTranslate from 'hooks/useTranslate';
 
@@ -105,6 +106,10 @@ const useInvoicePrepaidItemsTable = ({
   );
 
   const validate = (row) => {
+    if (row?.inverse || row?.orderAdjustment) {
+      return null;
+    }
+
     if (
       _.toInteger(row?.quantityAvailableToInvoice) < row?.quantity
       || _.toInteger(row?.quantity) <= 0
@@ -123,12 +128,18 @@ const useInvoicePrepaidItemsTable = ({
       [rowId]: quantity,
     }));
 
+  const isActionMenuVisible = (invoiceStatus, isPrepaymentInvoice, isInverseItem) =>
+    !isInverseItem && !isPrepaymentInvoice && (
+      invoiceStatus === InvoiceStatus.PENDING || invoiceStatus === InvoiceStatus.SUBMITTED
+    );
+
   return {
     actions,
     isEditable,
     validate,
     updateRowQuantity,
     updateInvoiceItem,
+    isActionMenuVisible,
     editableRows,
     isRowLoaded,
     isValid: !invalidRows.length,

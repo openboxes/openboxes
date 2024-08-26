@@ -237,6 +237,7 @@ const ConfirmInvoicePage = ({ initialValues, previousPage }) => {
                     updateInvoiceItemQuantity(updateRowQuantity)
                   }
                   invoicePrepaidItemsTableData={invoicePrepaidItemsTableData}
+                  invoiceStatus={stateValues.status}
                 />
               )
                 : (

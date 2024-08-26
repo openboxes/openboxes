@@ -200,7 +200,12 @@ const INVOICE_ITEMS = {
       actionDots: {
         type: (params) => {
           const invoiceItem = params?.invoiceItems?.[params.rowIndex];
-          if (!invoiceItem?.inverse && !params.isPrepaymentInvoice) {
+          const canUseActionDots = params.isActionMenuVisible(
+            params.invoiceStatus,
+            invoiceItem?.inverse,
+            params.isPrepaymentInvoice,
+          );
+          if (canUseActionDots) {
             return (
               <ActionDots
                 {...params}
@@ -227,6 +232,7 @@ const InvoicePrepayedItemsTable = ({
   loadMoreRows,
   isPrepaymentInvoice,
   invoicePrepaidItemsTableData,
+  invoiceStatus,
 }) => {
   const {
     actions,
@@ -234,6 +240,7 @@ const InvoicePrepayedItemsTable = ({
     isEditable,
     editableRows,
     validate,
+    isActionMenuVisible,
   } = invoicePrepaidItemsTableData;
 
   return (
@@ -251,6 +258,8 @@ const InvoicePrepayedItemsTable = ({
           validate,
           isEditable,
           actions,
+          invoiceStatus,
+          isActionMenuVisible,
         }))}
     </div>
   );
@@ -273,7 +282,9 @@ InvoicePrepayedItemsTable.propTypes = {
       PropTypes.shape({}),
     ).isRequired,
     validate: PropTypes.func.isRequired,
+    isActionMenuVisible: PropTypes.func.isRequired,
   }).isRequired,
+  invoiceStatus: PropTypes.string.isRequired,
 };
 
 export default InvoicePrepayedItemsTable;
