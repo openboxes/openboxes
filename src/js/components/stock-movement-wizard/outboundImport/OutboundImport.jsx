@@ -4,10 +4,10 @@ import { HttpStatusCode } from 'axios';
 import _ from 'lodash';
 
 import OutboundImportHeader from 'components/stock-movement-wizard/outboundImport/OutboundImportHeader';
-import OutboundImportStep from 'components/stock-movement-wizard/outboundImport/OutboundImportStep';
 import OutboundImportConfirm from 'components/stock-movement-wizard/outboundImport/sections/OutboundImportConfirm';
 import OutboundImportDetails from 'components/stock-movement-wizard/outboundImport/sections/OutboundImportDetails';
 import WizardStepsV2 from 'components/wizard/v2/WizardStepsV2';
+import OutboundImportStep from 'consts/OutboundImportStep';
 import useOutboundImportForm from 'hooks/outboundImport/useOutboundImportForm';
 import useSessionStorage from 'hooks/useSessionStorage';
 import useTranslate from 'hooks/useTranslate';
