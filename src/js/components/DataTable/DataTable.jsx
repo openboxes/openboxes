@@ -48,6 +48,9 @@ const DataTable = React.forwardRef((props, ref) => {
         PaginationComponent={PaginationComponent}
         ThComponent={TableHeaderCell}
         TrComponent={TableRow}
+        getTheadThProps={(state, _row, columnInfo) => ({
+          sortable: columnInfo?.sortable || state?.sortable,
+        })}
         getTrProps={(state, rowInfo) => ({
           row: rowInfo?.row,
           error: _.get(errors.packingList, `['${rowInfo?.original?.rowId}']`, undefined),
