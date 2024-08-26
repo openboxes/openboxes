@@ -9,22 +9,19 @@
  **/
 package org.pih.warehouse.api
 
-import org.grails.web.json.JSONObject
+import org.grails.web.json.JSONArray
 import org.pih.warehouse.invoice.PrepaymentInvoiceService
 
-class PrepaymentInvoiceItemApiController {
+class PrepaymentInvoiceApiController {
 
     PrepaymentInvoiceService prepaymentInvoiceService
 
-    def delete() {
-        prepaymentInvoiceService.removeInvoiceItem(params.id)
-        render status: 204
-    }
-
-    def update() {
-        JSONObject jsonObject = request.JSON
-        Integer quantity = jsonObject.get('quantity')
-        prepaymentInvoiceService.updateInvoiceItemQuantity(params.id, quantity)
+    /**
+     * Bulk prepaid invoice items edit. Only can change quantity of given item
+     * */
+    def updateItems() {
+        JSONArray invoiceItems = request.JSON
+        prepaymentInvoiceService.updateItems(params.id, invoiceItems)
         render status: 200
     }
 }
