@@ -217,12 +217,17 @@ class PrepaymentInvoiceService {
      * Removes invoice item for the itemId and finds related inverse item and removes it too
      * */
     void removeInvoiceItem(String itemId) {
+        def g = grailsApplication.mainContext.getBean('org.grails.plugins.web.taglib.ApplicationTagLib')
         InvoiceItem invoiceItem = InvoiceItem.get(itemId)
         if (!invoiceItem) {
             throw new IllegalArgumentException("Missing invoice item to delete")
         }
         if (invoiceItem.isPrepaymentInvoice || invoiceItem.inverse) {
             throw new IllegalArgumentException("Cannot delete prepayment or inverse items")
+        }
+        if (invoiceItem.invoice.datePosted) {
+            String defaultMessage = "Cannot update posted invoices"
+            throw new IllegalArgumentException(g.message(code: "invoice.cannotUpdatePosted.error", default: defaultMessage))
         }
 
         InvoiceItem inverseItem = findInverseItem(invoiceItem)
@@ -288,6 +293,10 @@ class PrepaymentInvoiceService {
         if (!invoiceItem) {
             String defaultMessage = "Cannot find invoice item with id: ${itemId}"
             throw new IllegalArgumentException(g.message(code: "invoiceItem.cannotFind.error", args: [itemId], default: defaultMessage))
+        }
+        if (invoiceItem.invoice.datePosted) {
+            String defaultMessage = "Cannot update posted invoices"
+            throw new IllegalArgumentException(g.message(code: "invoice.cannotUpdatePosted.error", default: defaultMessage))
         }
         if (quantity <= 0) {
             String defaultMessage = "Quantity to change needs to be higher than 0"
