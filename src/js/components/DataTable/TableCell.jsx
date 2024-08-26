@@ -23,7 +23,7 @@ const TableCell = ({
 
   if (showError && errorMessage) {
     cellValue = (
-      <div className="d-flex flex-row align-items-center error-cell">
+      <div className="d-flex flex-row align-items-center">
         <Tooltip
           arrow="true"
           delay="150"
