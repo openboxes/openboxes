@@ -101,11 +101,13 @@ class InvoiceService {
             invoiceItems = InvoiceItem.createCriteria().list(max: max.toInteger(), offset: offset.toInteger()) {
                 eq("invoice", invoice)
                 order("inverse", "asc")
+                order("id", "asc")
             }
         } else {
             invoiceItems = InvoiceItem.createCriteria().list() {
                 eq("invoice", invoice)
                 order("inverse", "asc")
+                order("id", "asc")
             }
         }
 
