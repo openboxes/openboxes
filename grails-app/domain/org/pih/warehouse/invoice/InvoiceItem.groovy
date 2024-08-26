@@ -188,6 +188,10 @@ class InvoiceItem implements Serializable {
         return invoice?.isPrepaymentInvoice
     }
 
+    Integer getQuantityAvailableToInvoice() {
+        return shipmentItem ? (shipmentItem.quantityToInvoiceInStandardUom / quantityPerUom) + quantity : null
+    }
+
     Map toJson() {
         return [
                 id: id,
@@ -208,6 +212,7 @@ class InvoiceItem implements Serializable {
                 displayNames: product?.displayNames,
                 inverse: inverse,
                 isCanceled: orderItem?.canceled ?: orderAdjustment?.canceled,
+                quantityAvailableToInvoice: quantityAvailableToInvoice,
                 // Total amount and total prepayment amount are deprecated and amount field
                 // should be used instead (OBPIH-6398, OBPIH-6499)
                 totalAmount: totalAmount,
