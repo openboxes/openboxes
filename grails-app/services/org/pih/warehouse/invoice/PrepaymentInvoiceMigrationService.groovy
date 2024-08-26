@@ -2,10 +2,14 @@ package org.pih.warehouse.invoice
 
 import grails.gorm.transactions.Transactional
 
+import org.pih.warehouse.core.BudgetCode
 import org.pih.warehouse.core.Constants
+import org.pih.warehouse.core.GlAccount
+import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.order.OrderAdjustment
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.OrderItemStatusCode
+import org.pih.warehouse.product.Product
 import org.pih.warehouse.shipping.ShipmentItem
 
 /**
@@ -15,15 +19,13 @@ import org.pih.warehouse.shipping.ShipmentItem
 @Transactional
 class PrepaymentInvoiceMigrationService {
 
-    PrepaymentInvoiceService prepaymentInvoiceService
-
     /**
      * For STEP 1 of the migration.
      *
      * Set the amount field for all prepayment invoice items that existed before the partial invoicing
      * feature was introduced.
      */
-    void updateAmountFieldForPrepaymentInvoiceItems() {
+    void updateAmountForPrepaymentInvoiceItems() {
         InvoiceType prepaymentInvoiceType = InvoiceType.findByCode(InvoiceTypeCode.PREPAYMENT_INVOICE)
 
         Invoice.findAllByInvoiceType(prepaymentInvoiceType).each { Invoice prepaymentInvoice ->
@@ -35,7 +37,7 @@ class PrepaymentInvoiceMigrationService {
         }
     }
 
-    // TODO: Can we merge this with PrepaymentInvoiceService? That way if the amount calculation ever changes, it will get picked up automatically here.
+    // TODO: use transient field on order instead of this once that code is merged
     private BigDecimal computePrepaymentInvoiceItemAmount(InvoiceItem prepaymentInvoiceItem) {
         BigDecimal prepaymentPercent = (prepaymentInvoiceItem.order.paymentTerm?.prepaymentPercent ?: Constants.DEFAULT_PAYMENT_PERCENT) / 100
 
@@ -65,44 +67,36 @@ class PrepaymentInvoiceMigrationService {
      * associated with both invoices has been fully invoiced, and so there's no need to check each item of the
      * prepayment invoice individually, they should ALL need to have inverse items created for them.
      */
-    void generateInverseInvoiceItems(Invoice prepaymentInvoice, Invoice finalInvoice) {
+    Invoice generateInverseInvoiceItems(Invoice prepaymentInvoice, Invoice finalInvoice) {
         prepaymentInvoice.invoiceItems.each { InvoiceItem prepaymentInvoiceItem ->
-            List<InvoiceItem> inverseItems = createInverseInvoiceItems(prepaymentInvoiceItem, finalInvoice)
-            inverseItems?.each { finalInvoice.addToInvoiceItems(it) }
+            InvoiceItem inverseItem = createInverseInvoiceItem(prepaymentInvoiceItem)
+            finalInvoice.addToInvoiceItems(inverseItem)
         }
-        finalInvoice.save(failOnError: true, flush: true)
+        return finalInvoice.save(failOnError: true, flush: true)
     }
 
-    private List<InvoiceItem> createInverseInvoiceItems(InvoiceItem prepaymentInvoiceItem, Invoice finalInvoice) {
-        // If the invoice item is for an adjustment.
-        OrderAdjustment orderAdjustment = prepaymentInvoiceItem.orderAdjustment
-        if (orderAdjustment) {
-            InvoiceItem inverseItem = prepaymentInvoiceService.createInverseItemForOrderAdjustment(orderAdjustment)
-            return inverseItem ? [inverseItem] : []
-        }
+    private InvoiceItem createInverseInvoiceItem(InvoiceItem prepaymentInvoiceItem) {
+        // Because we already computed the amount field for prepayment invoice items in step 1, and because for
+        // existing data there will always be a one-to-one mapping of prepayment invoice item to final invoice item,
+        // all we need to do to create the inverse item is copy the prepayment invoice item and inverse the amount.
+        InvoiceItem inverseItem = new InvoiceItem()
 
-        // Else if the invoice item is for a canceled order item.
-        OrderItem orderItem = prepaymentInvoiceItem.orderItem
-        if (orderItem.orderItemStatusCode == OrderItemStatusCode.CANCELED) {
-            InvoiceItem inverseItem = prepaymentInvoiceService.createInverseItemForCanceledOrderItem(orderItem)
-            return inverseItem ? [inverseItem] : []
-        }
+        inverseItem.inverse = true
+        inverseItem.amount = prepaymentInvoiceItem.amount * -1
 
-        // Else the invoice item is for a non-canceled order item. The item might be split across multiple shipments
-        // so we need to loop the shipment items and generate an inverse for each.
-        // TODO: This was copied from PrepaymentInvoiceService. Why do we need to do this? Shouldn't it be a single inverse for each prepay, regardless of if it was split over multiple shipments?
-        List<InvoiceItem> inverseItems = []
-        orderItem.shipmentItems?.each { ShipmentItem shipmentItem ->
-            // Find the regular invoice item associated with the shipment
-            InvoiceItem finalInvoiceItem = finalInvoice.invoiceItems.find{ it.shipmentItem == shipmentItem}
+        inverseItem.invoice = prepaymentInvoiceItem.invoice
+        inverseItem.shipmentItems = prepaymentInvoiceItem.shipmentItems
+        inverseItem.orderItems = prepaymentInvoiceItem.orderItems
+        inverseItem.orderAdjustments = prepaymentInvoiceItem.orderAdjustments
+        inverseItem.product = prepaymentInvoiceItem.product
 
-            InvoiceItem inverseItem = prepaymentInvoiceService.createInverseItemForShipmentItem(
-                    shipmentItem, finalInvoiceItem)
-            if (inverseItem) {
-                inverseItems.add(inverseItem)
-            }
-        }
+        inverseItem.glAccount = prepaymentInvoiceItem.glAccount
+        inverseItem.budgetCode = prepaymentInvoiceItem.budgetCode
+        inverseItem.quantity = prepaymentInvoiceItem.quantity
+        inverseItem.quantityUom = prepaymentInvoiceItem.quantityUom
+        inverseItem.quantityPerUom = prepaymentInvoiceItem.quantityPerUom
+        inverseItem.unitPrice = prepaymentInvoiceItem.unitPrice
 
-        return inverseItems
+        return inverseItem
     }
 }

@@ -26,12 +26,12 @@ databaseChangeLog = {
             change {
 
                 PrepaymentInvoiceMigrationService prepaymentInvoiceMigrationService =
-                        ctx.getBean("PrepaymentInvoiceMigrationService") as PrepaymentInvoiceMigrationService
+                        ctx.getBean("prepaymentInvoiceMigrationService") as PrepaymentInvoiceMigrationService
 
                 /*
                  * STEP 1: Set the amount field for all prepayment invoice items.
                  */
-                prepaymentInvoiceMigrationService.updateAmountFieldForPrepaymentInvoiceItems()
+                prepaymentInvoiceMigrationService.updateAmountForPrepaymentInvoiceItems()
 
                 /*
                  * STEP 2: For every pre-existing prepayment invoice, for every invoice item, add an inverse invoice
@@ -41,18 +41,22 @@ databaseChangeLog = {
                  * invoices will ALWAYS be the final invoice, meaning every order will have one prepayment invoice
                  * and one non-prepayment (aka final) invoices.
                  */
-                int totalInvoicesMigrated = 0
-                int totalInvoicesAlreadyMigrated = 0
-                int totalInvoicesWithBadOrder = 0
+                int totalOrdersMigrated = 0
+                int totalOrdersAlreadyMigrated = 0
+                int totalOrdersNotYetFinalInvoiced = 0
+                int totalBadOrders = 0
                 int totalOrdersWithBadRegInvoice = 0
 
                 InvoiceType prepaymentInvoiceType = InvoiceType.findByCode(InvoiceTypeCode.PREPAYMENT_INVOICE)
-                Invoice.findAllByInvoiceType(prepaymentInvoiceType).each { Invoice prepaymentInvoice ->
+                List<Invoice> prepaymentInvoices = Invoice.findAllByInvoiceType(prepaymentInvoiceType)
+
+                int totalPrepaymentOrders = prepaymentInvoices.size()
+                prepaymentInvoices.each { Invoice prepaymentInvoice ->
                     // While the domains are structured to allow for multiple orders per invoice, this flow only
                     // makes sense if there's a single order.
                     List<Order> orders = prepaymentInvoice.orders
                     if (!orders || orders.size() != 1) {
-                        totalInvoicesWithBadOrder++
+                        totalBadOrders++
                         return
                     }
                     Order order = orders[0]
@@ -61,25 +65,30 @@ databaseChangeLog = {
                     // there is always only a single (final) invoice. If there is no regular invoice, or it already
                     // has inverse items, skip it.
                     List<Invoice> regularInvoices = order.invoices.findAll { it.isRegularInvoice}
-                    if (!regularInvoices || regularInvoices.size() != 1) {
+                    if (!regularInvoices) {
+                        totalOrdersNotYetFinalInvoiced++
+                        return
+                    }
+                    if (regularInvoices.size() != 1) {
                         totalOrdersWithBadRegInvoice++
                         return
                     }
                     Invoice regularInvoice = regularInvoices[0]
                     if (regularInvoice.invoiceItems.any { it.inverse}) {
-                        totalInvoicesAlreadyMigrated++
+                        totalOrdersAlreadyMigrated++
                         return
                     }
 
                     prepaymentInvoiceMigrationService.generateInverseInvoiceItems(prepaymentInvoice, regularInvoice)
 
-                    totalInvoicesMigrated++
+                    totalOrdersMigrated++
                 }
 
-                println("Invoice migration complete!")
-                println("${totalInvoicesMigrated} invoices were migrated.")
-                println("${totalInvoicesAlreadyMigrated} were skipped due to already having been migrated.")
-                println("${totalInvoicesWithBadOrder} were skipped due to a bad order.")
+                println("Prepayment Invoice migration complete!")
+                println("${totalPrepaymentOrders} prepayment invoices/orders were found.")
+                println("${totalOrdersMigrated} orders were migrated.")
+                println("${totalOrdersAlreadyMigrated} were skipped due to already having been migrated.")
+                println("${totalBadOrders} were skipped due to a bad order.")
                 println("${totalOrdersWithBadRegInvoice} were skipped due to a bad regular (final) invoice.")
             }
         }
