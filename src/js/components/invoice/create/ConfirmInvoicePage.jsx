@@ -13,6 +13,7 @@ import InvoiceItemsTable from 'components/invoice/create/InvoiceItemsTable';
 import InvoiceOptionsForm from 'components/invoice/create/InvoiceOptionsForm';
 import InvoicePrepayedItemsTable from 'components/invoice/create/InvoicePrepayedItemsTable';
 import { INVOICE_URL } from 'consts/applicationUrls';
+import useInvoicePrepaidItemsTable from 'hooks/invoice/useInvoicePrepaidItemsTable';
 import useSpinner from 'hooks/useSpinner';
 import accountingFormat from 'utils/number-utils';
 import Translate from 'utils/Translate';
@@ -117,6 +118,33 @@ const ConfirmInvoicePage = ({ initialValues, previousPage }) => {
     [stateValues.id, pageSize],
   );
 
+  const updateInvoiceItemQuantity = (updateRowQuantity) => (invoiceItemId) => (quantity) => {
+    updateRowQuantity?.(invoiceItemId, quantity);
+    setStateValues((state) => ({
+      ...state,
+      invoiceItems: state.invoiceItems.map((item) => {
+        if (item.id === invoiceItemId) {
+          return { ...item, quantity };
+        }
+
+        return item;
+      }),
+    }));
+  };
+
+  const invoicePrepaidItemsTableData = useInvoicePrepaidItemsTable({
+    loadMoreRows,
+    invoiceItems: stateValues.invoiceItems,
+    invoiceId: stateValues.id,
+    updateInvoiceItemQuantity,
+  });
+
+  const {
+    isValid,
+    updateRowQuantity,
+    updateInvoiceItem,
+  } = invoicePrepaidItemsTableData;
+
   return (
     <div>
       <Form
@@ -128,7 +156,16 @@ const ConfirmInvoicePage = ({ initialValues, previousPage }) => {
         mutators={{ ...arrayMutators }}
         render={({ handleSubmit, values }) => (
           <form onSubmit={handleSubmit}>
-            <InvoiceOptionsForm values={values} />
+            <InvoiceOptionsForm
+              values={values}
+              updateInvoiceItem={updateInvoiceItem}
+              canUpdateInvoiceItems={
+                values.invoiceType !== PREPAYMENT_INVOICE
+                && stateValues.hasPrepaymentInvoice
+              }
+              disableSaveButton={!isValid
+                && values.invoiceType !== PREPAYMENT_INVOICE}
+            />
             <div className="submit-buttons">
               <button
                 type="button"
@@ -141,12 +178,23 @@ const ConfirmInvoicePage = ({ initialValues, previousPage }) => {
               </button>
               <button
                 type="submit"
-                onClick={() => submitInvoice()}
+                onClick={() => {
+                  if (
+                    values.invoiceType !== PREPAYMENT_INVOICE
+                    && stateValues.hasPrepaymentInvoice
+                  ) {
+                    updateInvoiceItem(submitInvoice);
+                    return;
+                  }
+                  submitInvoice();
+                }}
                 className="btn btn-outline-success float-right btn-form btn-xs"
                 disabled={
                 values.dateSubmitted
                 || values.datePosted
                 || !stateValues.invoiceItems.length
+                || (!isValid
+                    && values.invoiceType !== PREPAYMENT_INVOICE)
               }
               >
                 <Translate id="react.invoice.submit.label" defaultMessage="Submit for Approval" />
@@ -155,11 +203,22 @@ const ConfirmInvoicePage = ({ initialValues, previousPage }) => {
                   && (
                   <button
                     type="submit"
-                    onClick={() => postInvoice()}
+                    onClick={() => {
+                      if (
+                        values.invoiceType !== PREPAYMENT_INVOICE
+                        && stateValues.hasPrepaymentInvoice
+                      ) {
+                        updateInvoiceItem(postInvoice);
+                        return;
+                      }
+                      postInvoice();
+                    }}
                     className="btn btn-outline-success float-right btn-form btn-xs"
                     disabled={
                     values.datePosted
                     || !stateValues.invoiceItems.length
+                    || (!isValid
+                        && values.invoiceType !== PREPAYMENT_INVOICE)
                   }
                   >
                     <Translate id="react.invoice.post.label" defaultMessage="Post Invoice" />
@@ -174,6 +233,11 @@ const ConfirmInvoicePage = ({ initialValues, previousPage }) => {
                   invoiceItems={stateValues.invoiceItems}
                   loadMoreRows={loadMoreRows}
                   isPrepaymentInvoice={stateValues.isPrepaymentInvoice}
+                  updateInvoiceItemQuantity={
+                    updateInvoiceItemQuantity(updateRowQuantity)
+                  }
+                  invoicePrepaidItemsTableData={invoicePrepaidItemsTableData}
+                  invoiceStatus={stateValues.status}
                 />
               )
                 : (
