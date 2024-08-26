@@ -69,12 +69,12 @@ const OutboundImportItems = ({ data, errors }) => {
       Header: translate('react.outboundImport.table.column.binLocation.label', 'Bin Location'),
       accessor: 'binLocation',
       show: hasBinLocationSupport,
-      Cell: (row) => <TableCell {...row} showError />,
+      Cell: (row) => <TableCell {...row} showError tooltip />,
     },
     {
       Header: translate('react.outboundImport.table.column.recipient.label', 'Recipient'),
       accessor: 'recipient',
-      Cell: (row) => <TableCell {...row} showError />,
+      Cell: (row) => <TableCell {...row} showError tooltip />,
     },
     {
       Header: translate('react.outboundImport.table.column.palletName.label', 'Pack level 1'),
