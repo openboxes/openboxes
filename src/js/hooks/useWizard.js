@@ -5,6 +5,7 @@ import queryString from 'query-string';
 import { useHistory, useLocation } from 'react-router-dom';
 
 import useQueryParams from 'hooks/useQueryParams';
+import useScrollToTop from 'hooks/useScrollToTop';
 
 const useWizard = ({ initialKey, steps }) => {
   const parsedQueryParams = useQueryParams();
@@ -26,6 +27,8 @@ const useWizard = ({ initialKey, steps }) => {
   const currentStepKey = useMemo(() =>
     parsedQueryParams.step || initialKey || steps[0]?.key,
   [parsedQueryParams.step, steps, initialKey]);
+
+  useScrollToTop([currentStepKey]);
 
   const stepProperties = useMemo(() => {
     let foundStepIdx = steps.findIndex((s) => s.key === currentStepKey);
