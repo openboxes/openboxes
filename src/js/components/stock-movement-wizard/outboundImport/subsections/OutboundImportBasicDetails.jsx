@@ -32,7 +32,10 @@ const OutboundImportBasicDetails = ({ control, errors }) => {
             control={control}
             render={({ field }) => (
               <TextInput
-                title={{ id: 'react.outboundImport.form.description.title', defaultMessage: 'Description' }}
+                title={{
+                  id: 'react.outboundImport.form.description.title',
+                  defaultMessage: 'Description',
+                }}
                 errorMessage={errors.description?.message}
                 required
                 {...field}
@@ -46,7 +49,10 @@ const OutboundImportBasicDetails = ({ control, errors }) => {
             control={control}
             render={({ field }) => (
               <SelectField
-                title={{ id: 'react.outboundImport.form.origin.title', defaultMessage: 'Origin' }}
+                title={{
+                  id: 'react.outboundImport.form.origin.title',
+                  defaultMessage: 'Origin',
+                }}
                 placeholder="Select Origin"
                 required
                 hasErrors={Boolean(errors.origin?.message)}
@@ -64,7 +70,10 @@ const OutboundImportBasicDetails = ({ control, errors }) => {
             control={control}
             render={({ field }) => (
               <SelectField
-                title={{ id: 'react.outboundImport.form.destination.title', defaultMessage: 'Destination' }}
+                title={{
+                  id: 'react.outboundImport.form.destination.title',
+                  defaultMessage: 'Destination',
+                }}
                 placeholder="Select Destination"
                 required
                 hasErrors={Boolean(errors.destination?.message)}
