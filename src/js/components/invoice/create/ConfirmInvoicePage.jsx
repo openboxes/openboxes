@@ -3,7 +3,6 @@ import React, {
 } from 'react';
 
 import arrayMutators from 'final-form-arrays';
-import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import { useSelector } from 'react-redux';
@@ -58,11 +57,8 @@ const ConfirmInvoicePage = ({ initialValues, previousPage }) => {
     }
   }, [stateValues.id]);
 
-  const totalValue = useMemo(() => {
-    const value = _.reduce(stateValues.invoiceItems, (sum, val) =>
-      (sum + (val.totalAmount ? parseFloat(val.totalAmount) : 0.0)), 0);
-    return accountingFormat(value.toFixed(2));
-  }, [stateValues.invoiceItems]);
+  const totalValue = useMemo(() =>
+    accountingFormat(stateValues.totalValue.toFixed(2)), [stateValues.totalValue]);
 
   const submitInvoice = () => {
     invoiceApi.submitInvoice(stateValues.id)

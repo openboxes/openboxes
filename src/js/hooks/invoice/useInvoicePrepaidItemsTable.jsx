@@ -106,7 +106,7 @@ const useInvoicePrepaidItemsTable = ({
   );
 
   const validate = (row) => {
-    if (row?.inverse || row?.orderAdjustment) {
+    if (!isEditable(row?.id)) {
       return null;
     }
 

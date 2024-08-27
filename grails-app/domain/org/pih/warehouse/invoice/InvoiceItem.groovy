@@ -153,8 +153,8 @@ class InvoiceItem implements Serializable {
     def getTotalAmount() {
         // After implementing the Partial invoicing for prepaid POs (OBPIH-6398)
         // the total amount calculated below is kept in the amount field.
-        // For now until fully implemented and all old data is migrated, let's keep
-        // the old calculation here too (to be done as a part of OBPIH-6612)
+        // For non prepaid invoices we have to use this deprecated calculations,
+        // but for the prepaid invoices we can get it from the amount property.
         if (amount) {
             return amount
         }
