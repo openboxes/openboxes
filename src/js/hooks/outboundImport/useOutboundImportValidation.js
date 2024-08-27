@@ -29,6 +29,8 @@ const useOutboundImportValidation = () => {
     }).required(),
     requestedBy: z.object({
       id: z.string(),
+      label: z.string(),
+      name: z.string(),
     }, {
       invalid_type_error: translate('react.outboundImport.validation.requestedBy.required.label', 'Requested by is required'),
       required_error: translate('react.outboundImport.validation.requestedBy.required.label', 'Requested by is required'),

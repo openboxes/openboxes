@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { HttpStatusCode } from 'axios';
@@ -12,36 +12,67 @@ import packingListApi from 'api/services/PackingListApi';
 import notification from 'components/Layout/notifications/notification';
 import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
 import NotificationType from 'consts/notificationTypes';
+import OutboundImportStep from 'consts/OutboundImportStep';
 import { DateFormat } from 'consts/timeFormat';
 import useOutboundImportValidation from 'hooks/outboundImport/useOutboundImportValidation';
+import useQueryParams from 'hooks/useQueryParams';
+import useSessionStorage from 'hooks/useSessionStorage';
 import useSpinner from 'hooks/useSpinner';
 import useTranslate from 'hooks/useTranslate';
 
 const useOutboundImportForm = ({ next }) => {
   const translate = useTranslate();
   const spinner = useSpinner();
+  const queryParams = useQueryParams();
 
   const { validationSchema } = useOutboundImportValidation();
   const { currentLocation } = useSelector((state) => ({
     currentLocation: state.session.currentLocation,
   }));
+  const [cachedData, setCachedData, clearCachedData] = useSessionStorage('outbound-import', {});
 
-  const getDefaultValues = () => ({
-    description: undefined,
-    origin: {
-      id: currentLocation?.id,
-      label: `${currentLocation?.name} [${currentLocation?.locationType?.description}]`,
-    },
-    destination: undefined,
-    requestedBy: undefined,
-    dateRequested: undefined,
-    dateShipped: moment(new Date()).format(DateFormat.MMM_DD_YYYY_HH_MM_SS),
-    shipmentType: undefined,
-    trackingNumber: undefined,
-    comments: undefined,
-    expectedDeliveryDate: undefined,
-    packingList: undefined,
-  });
+  const defaultValues = useMemo(() => {
+    const values = {
+      description: undefined,
+      origin: {
+        id: currentLocation?.id,
+        label: `${currentLocation?.name} [${currentLocation?.locationType?.description}]`,
+      },
+      destination: undefined,
+      requestedBy: undefined,
+      dateRequested: undefined,
+      dateShipped: moment(new Date()).format(DateFormat.MMM_DD_YYYY_HH_MM_SS),
+      shipmentType: undefined,
+      trackingNumber: undefined,
+      comments: undefined,
+      expectedDeliveryDate: undefined,
+      packingList: undefined,
+    };
+
+    /** Load cached data:
+     * If we have saved cached data in the session-storage
+     * we want to load cached data only on CONFIRM step,
+     * otherwise we clear the session-storage data since that means that user has abandoned the form
+     * and that cached data is not relevant anymore
+    * */
+    if (!_.isEmpty(cachedData)) {
+      if (OutboundImportStep.CONFIRM === queryParams?.step) {
+        const { fulfillmentDetails, sendingOptions } = cachedData;
+        values.description = fulfillmentDetails?.description;
+        values.destination = fulfillmentDetails?.destination;
+        values.requestedBy = fulfillmentDetails?.requestedBy;
+        values.dateRequested = fulfillmentDetails?.dateRequested;
+        values.shipmentType = sendingOptions?.shipmentType;
+        values.trackingNumber = sendingOptions?.trackingNumber;
+        values.comments = sendingOptions?.comments;
+        values.expectedDeliveryDate = sendingOptions?.expectedDeliveryDate;
+      } else {
+        clearCachedData();
+      }
+    }
+
+    return values;
+  }, [currentLocation?.id]);
 
   /**
    * State to store data that is displayed in the table
@@ -80,7 +111,7 @@ const useOutboundImportForm = ({ next }) => {
     setValue,
   } = useForm({
     mode: 'onBlur',
-    defaultValues: getDefaultValues(),
+    defaultValues,
     resolver: (values, context, options) =>
       zodResolver(validationSchema(values))(values, context, options),
   });
@@ -102,17 +133,25 @@ const useOutboundImportForm = ({ next }) => {
     };
   }, { itemsWithErrors: [], itemsWithoutErrors: [] });
 
+  const validateOutboundData = async (fulfilmentPayload) => {
+    try {
+      const validationResponse = await fulfillmentApi.validateOutbound(fulfilmentPayload);
+      // Set the table data that is used to display the items in the React table
+      setTableData(validationResponse.data.data);
+      setErrorsData({ errors: {}, validateStatus: validationResponse.status });
+    } catch (e) {
+      setErrorsData({ errors: e.response.data.errors, validateStatus: e.response.status });
+      // Group errors by errors and make the items with errors appear at the top,
+      // by merging two grouped arrays
+      const tableDataGrouped = groupTableDataByErrors(e.response.data);
+      setTableData([...tableDataGrouped.itemsWithErrors, ...tableDataGrouped.itemsWithoutErrors]);
+    }
+  };
+
   // onSubmit method that is run on the first step (import file + validation of outbound)
   const onSubmitStockMovementDetails = async (values) => {
-    const formData = new FormData();
-    formData.append('importFile', values.packingList);
-    const config = {
-      headers: {
-        'content-type': 'multipart/form-data',
-      },
-    };
     spinner.show();
-    const importPackingListResponse = await packingListApi.importPackingList(formData, config);
+    const importPackingListResponse = await packingListApi.importPackingList(values.packingList);
     const { basicDetails, sendingOptions } = buildDetailsPayload(values);
 
     const packingList = importPackingListResponse.data.data.map((item) => ({
@@ -125,6 +164,7 @@ const useOutboundImportForm = ({ next }) => {
       rowId: _.uniqueId(),
     }));
     if (!packingList.length) {
+      spinner.hide();
       notification(NotificationType.ERROR_OUTLINED)({
         message: translate('react.outboundImport.packingList.empty.label', 'Packing list cannot be empty'),
       });
@@ -132,22 +172,13 @@ const useOutboundImportForm = ({ next }) => {
     }
     // Set the packing list data that is sent to API
     setPackingListData(packingList);
-    try {
-      const validationResponse = await fulfillmentApi.validateOutbound({
-        fulfillmentDetails: basicDetails,
-        packingList,
-        sendingOptions,
-      });
-      // Set the table data that is used to display the items in the React table
-      setTableData(validationResponse.data.data);
-      setErrorsData({ errors: {}, validateStatus: validationResponse.status });
-    } catch (e) {
-      setErrorsData({ errors: e.response.data.errors, validateStatus: e.response.status });
-      // Group errors by errors and make the items with errors appear at the top,
-      // by merging two grouped arrays
-      const tableDataGrouped = groupTableDataByErrors(e.response.data);
-      setTableData([...tableDataGrouped.itemsWithErrors, ...tableDataGrouped.itemsWithoutErrors]);
-    }
+    const fulfilmentPayload = {
+      fulfillmentDetails: basicDetails,
+      packingList,
+      sendingOptions,
+    };
+    setCachedData(fulfilmentPayload);
+    await validateOutboundData(fulfilmentPayload);
     spinner.hide();
     next();
   };
@@ -168,6 +199,9 @@ const useOutboundImportForm = ({ next }) => {
       notification(NotificationType.SUCCESS)({
         message: translate('react.outboundImport.form.created.success.label', 'Stock Movement has been created successfully'),
       });
+      // after a successful creation of outbound stock movement,
+      // this cached data is no longer relevant and can be cleared
+      clearCachedData();
       // If the save went sucessfully, redirect to the stock movement view page
       window.location = STOCK_MOVEMENT_URL.show(response.data?.data?.id);
     } catch (e) {
@@ -194,7 +228,18 @@ const useOutboundImportForm = ({ next }) => {
     }
   };
 
+  const loadCachedData = async () => {
+    if (!_.isEmpty(cachedData)) {
+      spinner.show();
+      setPackingListData(cachedData.packingList);
+      await validateOutboundData(cachedData);
+      spinner.hide();
+    }
+  };
+
   useEffect(() => {
+    loadCachedData();
+
     if (currentLocation) {
       setValue('origin', {
         id: currentLocation?.id,
