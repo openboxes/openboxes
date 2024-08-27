@@ -62,7 +62,6 @@ const OutboundImport = () => {
     handleSubmit,
     onSubmitStockMovementDetails,
     onConfirmImport,
-    getValues,
     trigger,
   } = useOutboundImportForm({ next });
 
