@@ -250,6 +250,7 @@ class Invoice implements Serializable {
             invoiceType: invoiceType?.code?.name(),
             hasPrepaymentInvoice: hasPrepaymentInvoice,
             isPrepaymentInvoice: isPrepaymentInvoice,
+            status: getStatus()?.name(),
             documents: documents ? documents?.collect {it.toJson()} + getOrderDocuments() : getOrderDocuments(),
         ]
     }

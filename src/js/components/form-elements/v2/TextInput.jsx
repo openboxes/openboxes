@@ -21,6 +21,7 @@ const TextInput = ({
   type,
   decimal,
   className,
+  showErrorBorder,
   ...fieldProps
 }) => {
   const onBlurHandler = (e) => {
@@ -63,7 +64,7 @@ const TextInput = ({
         id={id || name}
         name={name}
         disabled={disabled}
-        className={`form-element-input ${className} ${errorMessage ? 'has-errors' : ''}`}
+        className={`form-element-input ${className} ${(errorMessage || showErrorBorder) ? 'has-errors' : ''}`}
         placeholder={placeholder}
         type={type}
         step={numberIncrementValue}
@@ -110,6 +111,7 @@ TextInput.propTypes = {
   type: PropTypes.string,
   decimal: PropTypes.number,
   className: PropTypes.string,
+  showErrorBorder: PropTypes.bool,
 };
 
 TextInput.defaultProps = {
@@ -125,4 +127,5 @@ TextInput.defaultProps = {
   type: 'text',
   decimal: undefined,
   className: '',
+  showErrorBorder: false,
 };

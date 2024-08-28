@@ -16,7 +16,7 @@ import ArrayField from 'components/form-elements/ArrayField';
 import ButtonField from 'components/form-elements/ButtonField';
 import LabelField from 'components/form-elements/LabelField';
 import TextField from 'components/form-elements/TextField';
-import InvoiceItemsModal from 'components/invoice/InvoiceItemsModal';
+import InvoiceItemsModal from 'components/invoice/create/InvoiceItemsModal';
 import { INVOICE_URL, ORDER_URL, STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
 import { renderFormField } from 'utils/form-utils';
 import { getInvoiceDescription } from 'utils/form-values-utils';
