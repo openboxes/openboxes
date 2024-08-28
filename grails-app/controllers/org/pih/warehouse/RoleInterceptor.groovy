@@ -16,8 +16,24 @@ class RoleInterceptor {
 
     // this interceptor depends on SecurityInterceptor
     int order = LOWEST_PRECEDENCE
-    def static changeActions = ['delete', 'create', 'add', 'process', 'save',
-                                'update', 'importData', 'receive', 'showRecordInventory', 'withdraw', 'cancel', 'change', 'toggle', 'exportAsCsv']
+    def static changeActions = [
+            'delete',
+            'create',
+            'add',
+            'process',
+            'save',
+            'update',
+            'importData',
+            'receive',
+            'showRecordInventory',
+            'withdraw',
+            'cancel',
+            'change',
+            'toggle',
+            'exportAsCsv',
+            'importOutboundStockMovement'
+    ]
+
     def static changeControllers = ['createProductFromTemplate']
 
     def static managerActions = [
