@@ -193,6 +193,7 @@ class PrepaymentInvoiceMigrationServiceSpec extends Specification implements Ser
         1        | 2.0       | 100               | 100               | 1                || 1
         1        | 1.0       | 50                | 100               | 1                || 0.5
         1        | 1.0       | 100               | 50                | 1                || 1
+        1        | 1.0       | null              | 100               | 1                || 1
 
         1        | 1.0       | 100               | 100               | null             || 1
         2        | 1.0       | 100               | 100               | null             || 2

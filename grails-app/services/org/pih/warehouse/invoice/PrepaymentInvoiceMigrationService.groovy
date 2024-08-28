@@ -32,9 +32,8 @@ class PrepaymentInvoiceMigrationService {
         }
     }
 
-    // TODO: use transient field on order instead of this once that code is merged
     private BigDecimal computePrepaymentInvoiceItemAmount(InvoiceItem prepaymentInvoiceItem) {
-        BigDecimal prepaymentPercent = (prepaymentInvoiceItem.order.paymentTerm?.prepaymentPercent ?: Constants.DEFAULT_PAYMENT_PERCENT) / 100
+        BigDecimal prepaymentPercent = prepaymentInvoiceItem.order.prepaymentPercent
 
         // If the invoice item is for an adjustment.
         OrderAdjustment orderAdjustment = prepaymentInvoiceItem.orderAdjustment
