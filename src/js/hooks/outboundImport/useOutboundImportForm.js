@@ -62,6 +62,7 @@ const useOutboundImportForm = ({ next }) => {
         values.destination = fulfillmentDetails?.destination;
         values.requestedBy = fulfillmentDetails?.requestedBy;
         values.dateRequested = fulfillmentDetails?.dateRequested;
+        values.dateShipped = sendingOptions?.expectedShippingDate;
         values.shipmentType = sendingOptions?.shipmentType;
         values.trackingNumber = sendingOptions?.trackingNumber;
         values.comments = sendingOptions?.comments;
@@ -252,6 +253,7 @@ const useOutboundImportForm = ({ next }) => {
   return {
     control,
     getValues,
+    setValue,
     handleSubmit,
     errors,
     isValid,
