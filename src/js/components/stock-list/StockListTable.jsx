@@ -21,7 +21,7 @@ import DataTable, { TableCell } from 'components/DataTable';
 import Button from 'components/form-elements/Button';
 import { REQUISITION_TEMPLATE_URL } from 'consts/applicationUrls';
 import useStockListTableData from 'hooks/list-pages/stock-list/useStockListTableData';
-import ActionDots from 'utils/ActionDots';
+import ContextMenu from 'utils/ContextMenu';
 import { findActions } from 'utils/list-utils';
 import StatusIndicator from 'utils/StatusIndicator';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
@@ -140,12 +140,13 @@ const StockListTable = ({
       style: { overflow: 'visible', zIndex: 1 },
       fixed: 'left',
       Cell: row => (
-        <ActionDots
-          dropdownPlacement="right"
+        <ContextMenu
+          positions={['right']}
           dropdownClasses="action-dropdown-offset"
           actions={findActions(actions, row, { customFilter: customActionFilter, highestRole })}
           id={row.original.id}
-        />),
+        />
+      ),
     },
     {
       Header: <Translate id="react.stocklists.column.status.label" defaultMessage="Status" />,

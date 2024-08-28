@@ -12,7 +12,7 @@ import DateCell from 'components/DataTable/DateCell';
 import StockTransferStatus from 'components/stock-transfer/list/StockTransferStatus';
 import { STOCK_TRANSFER_URL } from 'consts/applicationUrls';
 import useStockTransferListTableData from 'hooks/list-pages/stock-transfer/useStockTransferListTableData';
-import ActionDots from 'utils/ActionDots';
+import ContextMenu from 'utils/ContextMenu';
 import { findActions } from 'utils/list-utils';
 import Translate from 'utils/Translate';
 
@@ -60,12 +60,13 @@ const StockTransferListTable = ({
       className: 'active-circle d-flex align-items-center',
       style: { overflow: 'visible', zIndex: 1 },
       Cell: row => (
-        <ActionDots
-          dropdownPlacement="right"
+        <ContextMenu
+          positions={['right']}
           dropdownClasses="action-dropdown-offset"
           actions={findActions(actions, row, { highestRole })}
           id={row.original.id}
-        />),
+        />
+      ),
     },
     {
       Header: <Translate id="react.stockTransfer.column.lineItems.label" defaultMessage="Line items" />,

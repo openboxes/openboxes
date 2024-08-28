@@ -23,7 +23,7 @@ import Button from 'components/form-elements/Button';
 import PurchaseOrderStatus from 'components/purchaseOrder/PurchaseOrderStatus';
 import { ORDER_URL, PURCHASE_ORDER_URL } from 'consts/applicationUrls';
 import usePurchaseOrderListTableData from 'hooks/list-pages/purchase-order/usePurchaseOrderListTableData';
-import ActionDots from 'utils/ActionDots';
+import ContextMenu from 'utils/ContextMenu';
 import { findActions } from 'utils/list-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
@@ -150,15 +150,16 @@ const PurchaseOrderListTable = ({
         zIndex: 1,
       },
       Cell: row => (
-        <ActionDots
-          dropdownPlacement="right"
+        <ContextMenu
+          positions={['right']}
           dropdownClasses="action-dropdown-offset"
           actions={findActions(actions, row, {
             supportedActivities,
             highestRole,
           })}
           id={row.original.id}
-        />),
+        />
+      ),
     },
     {
       Header: <Translate id="react.purchaseOrder.column.status.label" defaultMessage="Status" />,
