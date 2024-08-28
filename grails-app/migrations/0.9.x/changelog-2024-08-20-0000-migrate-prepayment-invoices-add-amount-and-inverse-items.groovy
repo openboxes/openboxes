@@ -24,6 +24,7 @@ databaseChangeLog = {
         grailsChange {
             //noinspection GroovyAssignabilityCheck
             change {
+                long startTime = System.currentTimeMillis()
 
                 PrepaymentInvoiceMigrationService prepaymentInvoiceMigrationService =
                         ctx.getBean("prepaymentInvoiceMigrationService") as PrepaymentInvoiceMigrationService
@@ -45,7 +46,6 @@ databaseChangeLog = {
                 int totalOrdersAlreadyMigrated = 0
                 int totalOrdersNotYetFinalInvoiced = 0
                 int totalBadOrders = 0
-                int totalOrdersWithBadRegInvoice = 0
 
                 InvoiceType prepaymentInvoiceType = InvoiceType.findByCode(InvoiceTypeCode.PREPAYMENT_INVOICE)
                 List<Invoice> prepaymentInvoices = Invoice.findAllByInvoiceType(prepaymentInvoiceType)
@@ -61,20 +61,16 @@ databaseChangeLog = {
                     }
                     Order order = orders[0]
 
-                    // Find the regular invoice that we will be populating with the inverse items. We expect that
-                    // there is always only a single (final) invoice. If there is no regular invoice, or it already
-                    // has inverse items, skip it.
+                    // Find the regular invoice that we will be populating with the inverse items. For pre-exisitng
+                    // data, there is always only a single (final) invoice. If there is no regular invoice, or it
+                    // already has inverse items, skip it.
                     List<Invoice> regularInvoices = order.invoices.findAll { it.isRegularInvoice}
                     if (!regularInvoices) {
                         totalOrdersNotYetFinalInvoiced++
                         return
                     }
-                    if (regularInvoices.size() != 1) {
-                        totalOrdersWithBadRegInvoice++
-                        return
-                    }
                     Invoice regularInvoice = regularInvoices[0]
-                    if (regularInvoice.invoiceItems.any { it.inverse}) {
+                    if (regularInvoices.size() > 1 || regularInvoice.invoiceItems.any { it.inverse}) {
                         totalOrdersAlreadyMigrated++
                         return
                     }
@@ -84,12 +80,13 @@ databaseChangeLog = {
                     totalOrdersMigrated++
                 }
 
-                println("Prepayment Invoice migration complete!")
+                long durationInMillis = System.currentTimeMillis() - startTime
+
+                println("Prepayment Invoice migration completed in ${durationInMillis} milliseconds!")
                 println("${totalPrepaymentOrders} prepayment invoices/orders were found.")
                 println("${totalOrdersMigrated} orders were migrated.")
-                println("${totalOrdersAlreadyMigrated} were skipped due to already having been migrated.")
+                println("${totalOrdersAlreadyMigrated} were skipped due to no migration being needed")
                 println("${totalBadOrders} were skipped due to a bad order.")
-                println("${totalOrdersWithBadRegInvoice} were skipped due to a bad regular (final) invoice.")
             }
         }
     }

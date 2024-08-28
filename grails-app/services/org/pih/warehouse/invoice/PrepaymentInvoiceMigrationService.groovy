@@ -2,15 +2,10 @@ package org.pih.warehouse.invoice
 
 import grails.gorm.transactions.Transactional
 
-import org.pih.warehouse.core.BudgetCode
 import org.pih.warehouse.core.Constants
-import org.pih.warehouse.core.GlAccount
-import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.order.OrderAdjustment
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.OrderItemStatusCode
-import org.pih.warehouse.product.Product
-import org.pih.warehouse.shipping.ShipmentItem
 
 /**
  * This service exists for the sole purpose of performing data migrations for changelog 0.9.x/2024-08-20-0000.
@@ -76,26 +71,13 @@ class PrepaymentInvoiceMigrationService {
     }
 
     private InvoiceItem createInverseInvoiceItem(InvoiceItem prepaymentInvoiceItem) {
-        // Because we already computed the amount field for prepayment invoice items in step 1, and because for
-        // existing data there will always be a one-to-one mapping of prepayment invoice item to final invoice item,
+        // Because we already computed the amount field for prepayment invoice items in step 1, and because there will
+        // always be a one-to-one mapping of prepayment invoice item to final invoice item for pre-existing data,
         // all we need to do to create the inverse item is copy the prepayment invoice item and inverse the amount.
-        InvoiceItem inverseItem = new InvoiceItem()
+        InvoiceItem inverseItem = prepaymentInvoiceItem.clone()
 
         inverseItem.inverse = true
         inverseItem.amount = prepaymentInvoiceItem.amount * -1
-
-        inverseItem.invoice = prepaymentInvoiceItem.invoice
-        inverseItem.shipmentItems = prepaymentInvoiceItem.shipmentItems
-        inverseItem.orderItems = prepaymentInvoiceItem.orderItems
-        inverseItem.orderAdjustments = prepaymentInvoiceItem.orderAdjustments
-        inverseItem.product = prepaymentInvoiceItem.product
-
-        inverseItem.glAccount = prepaymentInvoiceItem.glAccount
-        inverseItem.budgetCode = prepaymentInvoiceItem.budgetCode
-        inverseItem.quantity = prepaymentInvoiceItem.quantity
-        inverseItem.quantityUom = prepaymentInvoiceItem.quantityUom
-        inverseItem.quantityPerUom = prepaymentInvoiceItem.quantityPerUom
-        inverseItem.unitPrice = prepaymentInvoiceItem.unitPrice
 
         return inverseItem
     }

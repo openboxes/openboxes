@@ -235,10 +235,6 @@ class PrepaymentInvoiceMigrationServiceSpec extends Specification implements Ser
         assert InvoiceItem.findById(invoiceItemId).amount == 0
     }
 
-    void 'generateInverseInvoiceItems successfully creates inverse items for prepayment adjustments'() {
-
-    }
-
     void 'generateInverseInvoiceItems successfully creates inverse items for prepayment items'() {
         given:
         InvoiceItem prepaymentInvoiceItem = new InvoiceItem(
