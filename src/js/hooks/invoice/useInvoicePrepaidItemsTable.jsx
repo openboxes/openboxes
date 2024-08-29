@@ -65,7 +65,9 @@ const useInvoicePrepaidItemsTable = ({
     const invoiceItemsToUpdate = getEditedInvoiceItems();
     spinner.show();
     try {
-      await prepaymentInvoiceApi.updateInvoiceItems(invoiceId, invoiceItemsToUpdate);
+      if (invoiceItemsToUpdate.length) {
+        await prepaymentInvoiceApi.updateInvoiceItems(invoiceId, invoiceItemsToUpdate);
+      }
       callback?.();
     } finally {
       spinner.hide();
@@ -106,7 +108,7 @@ const useInvoicePrepaidItemsTable = ({
   );
 
   const validate = (row) => {
-    if (row?.inverse || row?.orderAdjustment) {
+    if (!isEditable(row?.id)) {
       return null;
     }
 

@@ -1,6 +1,5 @@
 import React, { useCallback, useMemo } from 'react';
 
-import _ from 'lodash';
 import PropTypes from 'prop-types';
 import {
   RiDeleteBinLine,
@@ -16,15 +15,15 @@ import DateCell from 'components/DataTable/DateCell';
 import Button from 'components/form-elements/Button';
 import ShipmentIdentifier from 'components/stock-movement/common/ShipmentIdentifier';
 import { STOCK_MOVEMENT_URL, STOCK_TRANSFER_URL } from 'consts/applicationUrls';
+import DateFormat from 'consts/dateFormat';
 import useInboundListTableData from 'hooks/list-pages/inbound/useInboundListTableData';
-import ActionDots from 'utils/ActionDots';
+import ContextMenu from 'utils/ContextMenu';
 import { getShipmentTypeTooltip } from 'utils/list-utils';
 import { mapShipmentTypes } from 'utils/option-utils';
 import StatusIndicator from 'utils/StatusIndicator';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
-import DateFormat from 'consts/dateFormat';
 
 const StockMovementInboundTable = ({
   filterParams,
@@ -109,8 +108,8 @@ const StockMovementInboundTable = ({
       style: { overflow: 'visible', zIndex: 1 },
       fixed: 'left',
       Cell: row => (
-        <ActionDots
-          dropdownPlacement="right"
+        <ContextMenu
+          positions={['right']}
           dropdownClasses="action-dropdown-offset"
           actions={getActions(row)}
           id={row.original.id}

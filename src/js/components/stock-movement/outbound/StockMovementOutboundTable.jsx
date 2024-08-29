@@ -19,10 +19,11 @@ import Button from 'components/form-elements/Button';
 import ShipmentIdentifier from 'components/stock-movement/common/ShipmentIdentifier';
 import RejectRequestModal from 'components/stock-movement/modals/RejectRequestModal';
 import ActivityCode from 'consts/activityCode';
-import RequisitionStatus from 'consts/requisitionStatus';
 import { STOCK_MOVEMENT_URL, STOCK_TRANSFER_URL } from 'consts/applicationUrls';
+import DateFormat from 'consts/dateFormat';
+import RequisitionStatus from 'consts/requisitionStatus';
 import useOutboundListTableData from 'hooks/list-pages/outbound/useOutboundListTableData';
-import ActionDots from 'utils/ActionDots';
+import ContextMenu from 'utils/ContextMenu';
 import { getShipmentTypeTooltip } from 'utils/list-utils';
 import { mapShipmentTypes } from 'utils/option-utils';
 import canEditRequest from 'utils/permissionUtils';
@@ -31,7 +32,6 @@ import { supports } from 'utils/supportedActivitiesUtils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
-import DateFormat from 'consts/dateFormat';
 
 const StockMovementOutboundTable = ({
   filterParams,
@@ -211,12 +211,13 @@ const StockMovementOutboundTable = ({
       style: { overflow: 'visible', zIndex: 1 },
       fixed: 'left',
       Cell: row => (
-        <ActionDots
-          dropdownPlacement="right"
+        <ContextMenu
+          positions={['right']}
           dropdownClasses="action-dropdown-offset"
           actions={getActions(row)}
           id={row.original.id}
-        />),
+        />
+      ),
     },
     {
       Header: <Translate id="react.stockMovement.column.itemsCount.label" defaultMessage="# items" />,

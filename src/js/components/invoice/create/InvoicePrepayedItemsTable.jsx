@@ -9,7 +9,7 @@ import ArrayField from 'components/form-elements/ArrayField';
 import LabelField from 'components/form-elements/LabelField';
 import TextInput from 'components/form-elements/v2/TextInput';
 import { ORDER_URL, STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
-import ActionDots from 'utils/ActionDots';
+import ContextMenu from 'utils/ContextMenu';
 import { renderFormField } from 'utils/form-utils';
 import { getInvoiceDescription } from 'utils/form-values-utils';
 import accountingFormat from 'utils/number-utils';
@@ -207,11 +207,10 @@ const INVOICE_ITEMS = {
           );
           if (canUseActionDots) {
             return (
-              <ActionDots
-                {...params}
-                dropdownPlacement="right"
-                dropdownClasses="action-dropdown-offset"
+              <ContextMenu
+                positions={['left']}
                 actions={params.actions(invoiceItem)}
+                id={params?.rowIndex}
               />
             );
           }
