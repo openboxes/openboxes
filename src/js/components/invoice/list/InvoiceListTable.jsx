@@ -14,7 +14,7 @@ import Button from 'components/form-elements/Button';
 import InvoiceStatus from 'components/invoice/list/InvoiceStatus';
 import { INVOICE_URL } from 'consts/applicationUrls';
 import useInvoiceListTableData from 'hooks/list-pages/invoice/useInvoiceListTableData';
-import ActionDots from 'utils/ActionDots';
+import ContextMenu from 'utils/ContextMenu';
 import { findActions } from 'utils/list-utils';
 import Translate from 'utils/Translate';
 
@@ -64,12 +64,13 @@ const InvoiceListTable = ({
       sortable: false,
       style: { overflow: 'visible', zIndex: 1 },
       Cell: row => (
-        <ActionDots
-          dropdownPlacement="right"
+        <ContextMenu
+          positions={['right']}
           dropdownClasses="action-dropdown-offset"
           actions={findActions(actions, row, { supportedActivities, highestRole })}
           id={row.original.id}
-        />),
+        />
+      ),
     },
     {
       Header: <Translate id="react.invoice.column.itemCount.label" defaultMessage="# items" />,

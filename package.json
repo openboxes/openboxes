@@ -104,6 +104,7 @@
     "react-table": "6.8.6",
     "react-table-hoc-fixed-columns": "2.3.4",
     "react-tabs": "2.3.1",
+    "react-tiny-popover": "6.0.5",
     "react-tippy": "1.2.8",
     "react-virtualized": "9.21.2",
     "redux": "4.2.1",

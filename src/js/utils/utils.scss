@@ -64,3 +64,25 @@
 .text-blue-400 {
   color: var(--blue-400);
 }
+
+.context-menu {
+  background-color: white;
+  box-shadow: 0 0 4px 1px rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+
+  .dropdown-item {
+    color: var(--blue-700) !important;;
+
+    &:hover {
+      background-color: var(--blue-300) !important;
+    }
+  }
+
+  .font-red-ob {
+    color: var(--color-red) !important;
+  }
+}
+
+.react-tiny-popover-container {
+  z-index: 999;
+}
