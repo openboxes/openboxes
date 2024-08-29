@@ -18,7 +18,32 @@ import org.pih.warehouse.order.Order
  */
 databaseChangeLog = {
 
+    /*
+     * STEP 1: Set the amount field for all prepayment invoice items.
+     */
     changeSet(author: "ewaterman", id: "200820240000-0") {
+
+        //noinspection GroovyAssignabilityCheck
+        grailsChange {
+            //noinspection GroovyAssignabilityCheck
+            change {
+                PrepaymentInvoiceMigrationService prepaymentInvoiceMigrationService =
+                        ctx.getBean("prepaymentInvoiceMigrationService") as PrepaymentInvoiceMigrationService
+
+                prepaymentInvoiceMigrationService.updateAmountForPrepaymentInvoiceItems()
+            }
+        }
+    }
+
+    /*
+     * STEP 2: For every pre-existing prepayment invoice, for every invoice item, add an inverse invoice
+     *         item to the final invoice of the order.
+     *
+     * For existing data from before the partial invoicing feature was introduced, ALL non-prepayment
+     * invoices will ALWAYS be the final invoice, meaning every order will have one prepayment invoice
+     * and one non-prepayment (aka final) invoices.
+     */
+    changeSet(author: "ewaterman", id: "200820240000-1") {
 
         //noinspection GroovyAssignabilityCheck
         grailsChange {
@@ -29,19 +54,6 @@ databaseChangeLog = {
                 PrepaymentInvoiceMigrationService prepaymentInvoiceMigrationService =
                         ctx.getBean("prepaymentInvoiceMigrationService") as PrepaymentInvoiceMigrationService
 
-                /*
-                 * STEP 1: Set the amount field for all prepayment invoice items.
-                 */
-                prepaymentInvoiceMigrationService.updateAmountForPrepaymentInvoiceItems()
-
-                /*
-                 * STEP 2: For every pre-existing prepayment invoice, for every invoice item, add an inverse invoice
-                 *         item to the final invoice of the order.
-                 *
-                 * For existing data from before the partial invoicing feature was introduced, ALL non-prepayment
-                 * invoices will ALWAYS be the final invoice, meaning every order will have one prepayment invoice
-                 * and one non-prepayment (aka final) invoices.
-                 */
                 int totalOrdersMigrated = 0
                 int totalOrdersAlreadyMigrated = 0
                 int totalOrdersNotYetFinalInvoiced = 0
@@ -64,13 +76,13 @@ databaseChangeLog = {
                     // Find the regular invoice that we will be populating with the inverse items. For pre-exisitng
                     // data, there is always only a single (final) invoice. If there is no regular invoice, or it
                     // already has inverse items, skip it.
-                    List<Invoice> regularInvoices = order.invoices.findAll { it.isRegularInvoice}
+                    List<Invoice> regularInvoices = order.invoices.findAll { it.isRegularInvoice }
                     if (!regularInvoices) {
                         totalOrdersNotYetFinalInvoiced++
                         return
                     }
                     Invoice regularInvoice = regularInvoices[0]
-                    if (regularInvoices.size() > 1 || regularInvoice.invoiceItems.any { it.inverse}) {
+                    if (regularInvoices.size() > 1 || regularInvoice.invoiceItems.any { it.inverse }) {
                         totalOrdersAlreadyMigrated++
                         return
                     }

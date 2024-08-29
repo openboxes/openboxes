@@ -2,7 +2,6 @@ package org.pih.warehouse.invoice
 
 import grails.gorm.transactions.Transactional
 
-import org.pih.warehouse.core.Constants
 import org.pih.warehouse.order.OrderAdjustment
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.OrderItemStatusCode
@@ -25,9 +24,12 @@ class PrepaymentInvoiceMigrationService {
 
         Invoice.findAllByInvoiceType(prepaymentInvoiceType).each { Invoice prepaymentInvoice ->
             // The amount field will be null for all pre-existing invoices since the field was not being used.
-            prepaymentInvoice.invoiceItems.find { it.amount == null }.each { InvoiceItem prepaymentInvoiceItem ->
+            for(InvoiceItem prepaymentInvoiceItem : prepaymentInvoice.invoiceItems) {
+                if (prepaymentInvoiceItem.amount != null) {
+                    continue
+                }
                 prepaymentInvoiceItem.amount = computePrepaymentInvoiceItemAmount(prepaymentInvoiceItem)
-                prepaymentInvoiceItem.save(failOnError: true, flush: true)
+                prepaymentInvoiceItem.save(failOnError: true)
             }
         }
     }
@@ -66,7 +68,7 @@ class PrepaymentInvoiceMigrationService {
             InvoiceItem inverseItem = createInverseInvoiceItem(prepaymentInvoiceItem)
             finalInvoice.addToInvoiceItems(inverseItem)
         }
-        return finalInvoice.save(failOnError: true, flush: true)
+        return finalInvoice.save(failOnError: true)
     }
 
     private InvoiceItem createInverseInvoiceItem(InvoiceItem prepaymentInvoiceItem) {
