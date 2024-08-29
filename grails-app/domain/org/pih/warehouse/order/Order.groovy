@@ -415,6 +415,7 @@ class Order implements Serializable {
     /**
      * Function returning items so that prepayment invoices are at the bottom.
      * Final invoices at the top: the newest submitted at the top, the oldest submitted at the bottom.
+     * Method used for displaying items on PO view page
      */
     List<InvoiceItem> getSortedInvoiceItems() {
         return invoiceItems?.sort { a, b ->

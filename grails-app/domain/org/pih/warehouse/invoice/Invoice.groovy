@@ -229,6 +229,13 @@ class Invoice implements Serializable {
         return prepaymentInvoices?.invoiceItems?.flatten()
     }
 
+    List<InvoiceItem> getSortedInvoiceItems() {
+        return invoiceItems.sort { a, b ->
+            a.inverse <=> b.inverse ?:
+                    a.id <=> b.id
+        } ?: []
+    }
+
     Map toJson() {
         return [
             id: id,
