@@ -13,6 +13,7 @@ const FileSelect = ({
   width,
   dropzoneText,
   buttonLabel,
+  buttonVariant,
   className,
   multiple,
   maxFiles,
@@ -79,7 +80,7 @@ const FileSelect = ({
       <div {...getRootProps({ className: `dropzone d-flex flex-column justify-content-center align-items-center p-3 bg-light ${className}` })} {...fieldProps}>
         <input {...getInputProps()} />
         <h5 className="text-secondary font-italic">{translate(dropzoneText.id, dropzoneText.defaultMessage)}</h5>
-        <Button className="mt-3" onClick={open} variant="grayed" defaultLabel={buttonLabel.defaultMessage} label={buttonLabel.id} />
+        <Button className="mt-3" onClick={open} variant={buttonVariant} defaultLabel={buttonLabel.defaultMessage} label={buttonLabel.id} />
       </div>
       {acceptedFiles.length ? (
         <aside>
@@ -120,6 +121,7 @@ FileSelect.propTypes = {
     id: PropTypes.string,
     defaultMessage: PropTypes.string,
   }),
+  buttonVariant: PropTypes.string,
   // width of the dropzone
   width: PropTypes.string,
   // height of the dropzone
@@ -143,6 +145,7 @@ FileSelect.defaultProps = {
     id: 'react.default.fileDialog.label',
     defaultMessage: 'OPEN FILE DIALOG',
   },
+  buttonVariant: 'grayed',
   width: 'auto',
   height: 'auto',
   className: '',

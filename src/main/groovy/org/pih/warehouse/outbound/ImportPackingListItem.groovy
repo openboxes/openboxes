@@ -124,7 +124,10 @@ class ImportPackingListItem implements Validateable {
             product: [
                 id: product?.id,
                 name: product?.name,
-                productCode: product?.productCode
+                productCode: product?.productCode,
+                displayNames: product?.displayNames,
+                color: product?.color,
+                handlingIcons: product?.handlingIcons,
             ],
             binLocation: binLocation?.name,
             palletName: palletName,

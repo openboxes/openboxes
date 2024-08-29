@@ -41,7 +41,7 @@ const InvalidItemsIndicator = ({
   });
 
   const { resetScrollbar } = useResetScrollbar({
-    scrollableComponentClassName: 'rt-table',
+    selector: '.rt-table',
   });
 
   useEffect(() => {
