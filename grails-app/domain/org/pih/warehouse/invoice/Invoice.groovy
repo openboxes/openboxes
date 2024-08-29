@@ -229,6 +229,17 @@ class Invoice implements Serializable {
         return prepaymentInvoices?.invoiceItems?.flatten()
     }
 
+    /**
+     * Function returning items that are split into two groups (inverse, regular)
+     * This method is used for displaying items on invoice view page
+     */
+    List<InvoiceItem> getSortedInvoiceItems() {
+        return invoiceItems.sort { a, b ->
+            a.inverse <=> b.inverse ?:
+                    a.id <=> b.id
+        } ?: []
+    }
+
     Map toJson() {
         return [
             id: id,
