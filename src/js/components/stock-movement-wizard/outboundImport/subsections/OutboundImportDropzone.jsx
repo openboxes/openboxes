@@ -34,6 +34,7 @@ const OutboundImportDropzone = ({ control, errors }) => {
       <div className="col-12 px-2 pt-2">
         <Button
           className="mb-4"
+          variant="secondary"
           defaultLabel="Export Template"
           label="react.default.button.exportTemplate.label"
           onClick={downloadPackingListTemplate}
@@ -45,6 +46,7 @@ const OutboundImportDropzone = ({ control, errors }) => {
             <FileSelect
               allowedExtensions={[FileFormat.XLS]}
               errorMessage={errors.packingList?.message}
+              buttonVariant="primary"
               dropzoneText={{
                 id: 'react.outboundImport.form.importPackingList.title',
                 defaultMessage: 'Import packing list',

@@ -1,10 +1,11 @@
-import { useMemo } from 'react';
+import { useLayoutEffect, useMemo } from 'react';
 
 import PropTypes from 'prop-types';
 import queryString from 'query-string';
 import { useHistory, useLocation } from 'react-router-dom';
 
 import useQueryParams from 'hooks/useQueryParams';
+import useResetScrollbar from 'hooks/useResetScrollbar';
 
 const useWizard = ({ initialKey, steps }) => {
   const parsedQueryParams = useQueryParams();
@@ -26,6 +27,14 @@ const useWizard = ({ initialKey, steps }) => {
   const currentStepKey = useMemo(() =>
     parsedQueryParams.step || initialKey || steps[0]?.key,
   [parsedQueryParams.step, steps, initialKey]);
+
+  const { resetScrollbar } = useResetScrollbar({
+    selector: 'body',
+  });
+
+  useLayoutEffect(() => {
+    resetScrollbar();
+  }, [currentStepKey]);
 
   const stepProperties = useMemo(() => {
     let foundStepIdx = steps.findIndex((s) => s.key === currentStepKey);

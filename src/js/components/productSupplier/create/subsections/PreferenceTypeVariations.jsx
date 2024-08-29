@@ -32,7 +32,7 @@ const PreferenceTypeVariations = ({
   });
 
   const { resetScrollbar } = useResetScrollbar({
-    scrollableComponentClassName: 'rt-table',
+    selector: '.rt-table',
   });
 
   const {

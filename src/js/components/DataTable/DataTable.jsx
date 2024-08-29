@@ -29,7 +29,7 @@ const DataTable = React.forwardRef((props, ref) => {
         {footerComponent()}
       </div>
       )}
-      {data.length > 0 && <TablePagination{...paginationProps} totalData={totalData} /> }
+      {data.length > 0 && <TablePagination {...paginationProps} totalData={totalData} /> }
     </React.Fragment>);
 
   return (
@@ -48,9 +48,12 @@ const DataTable = React.forwardRef((props, ref) => {
         PaginationComponent={PaginationComponent}
         ThComponent={TableHeaderCell}
         TrComponent={TableRow}
+        getTheadThProps={(state, _row, columnInfo) => ({
+          sortable: columnInfo?.sortable || state?.sortable,
+        })}
         getTrProps={(state, rowInfo) => ({
           row: rowInfo?.row,
-          error: errors[rowInfo?.index],
+          error: _.get(errors.packingList, `['${rowInfo?.original?.rowId}']`, undefined),
         })}
         getTdProps={(state, rowInfo, columnInfo) => {
           const columnErrorAccessor = columnInfo?.getProps()?.errorAccessor ?? columnInfo?.id;
