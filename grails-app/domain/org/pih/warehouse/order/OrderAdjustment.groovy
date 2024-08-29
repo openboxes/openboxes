@@ -104,6 +104,20 @@ class OrderAdjustment implements Serializable, Comparable<OrderAdjustment> {
         return !postedPurchaseInvoiceItems.empty
     }
 
+    /**
+     * Overall invoiced quantity for this adjustment. Expected is either 0 or 1. Should not be more than 1.
+     * */
+    Integer getInvoicedQuantity() {
+        return invoiceItems?.findAll { it.invoice.isRegularInvoice && !it.inverse }?.sum { it.quantity } ?: 0
+    }
+
+    /**
+     * Overall inversed quantity for this adjustment. Expected is either 0 or 1. Should not be more than 1.
+     * */
+    Integer getInversedQuantity() {
+        return invoiceItems?.findAll { it.inverse }?.sum { it.quantity } ?: 0
+    }
+
     def getInvoices() {
         return invoiceItems*.invoice.unique()
     }
@@ -119,9 +133,20 @@ class OrderAdjustment implements Serializable, Comparable<OrderAdjustment> {
         return true
     }
 
+    /**
+     * Adjustment is invoiceable on regular invoice if:
+     *  - if adjustment is canceled, we can invoice if it has prepayment, does not have regular already and order is placed
+     *  - if adjustment is not canceled, and it was previously invoiced as canceled on regular invoice
+     *  - if adjustment has no reguler invoice yet and order is placed
+     * */
     Boolean isInvoiceable() {
         if (canceled) {
             return hasPrepaymentInvoice && !hasRegularInvoice && order.placed
+        }
+
+        // If is not canceled and has regular invoice, check if by any chance it was invoiced as cancelled
+        if (!canceled && hasRegularInvoice) {
+            return invoicedQuantity == 0 && order.placed
         }
 
         return !hasRegularInvoice && order.placed
