@@ -412,11 +412,16 @@ class Order implements Serializable {
         return invoiceItems
     }
 
+    /**
+     * Function returning items so that prepayment invoices are at the bottom.
+     * Final invoices at the top: the newest submitted at the top, the oldest submitted at the bottom.
+     */
     List<InvoiceItem> getSortedInvoiceItems() {
-        invoiceItems?.sort { a, b ->
+        return invoiceItems?.sort { a, b ->
+            b?.invoice?.dateCreated <=> a?.invoice?.dateCreated ?:
             a?.invoice?.invoiceNumber <=> b?.invoice?.invoiceNumber ?:
-                a?.product?.productCode <=> b?.product?.productCode ?:
-                    a.id <=> b.id
+                    a?.inverse <=> b?.inverse ?:
+                            a?.id <=> b?.id
         } ?: []
     }
 
