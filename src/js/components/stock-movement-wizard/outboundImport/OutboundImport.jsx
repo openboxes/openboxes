@@ -19,7 +19,7 @@ import 'utils/utils.scss';
 
 const OutboundImport = () => {
   useTranslation('outboundImport', 'stockMovement');
-  const [cachedData,] = useSessionStorage('outbound-import', {});
+  const [cachedData] = useSessionStorage('outbound-import', {});
 
   const translate = useTranslate();
 
@@ -56,6 +56,7 @@ const OutboundImport = () => {
     lineItemErrors,
     validateStatus,
     getValues,
+    setValue,
     errors,
     control,
     isValid,
@@ -92,6 +93,13 @@ const OutboundImport = () => {
     submitMethod(getValues());
   };
 
+  const redoImport = () => {
+    // clear uploaded file
+    setValue('packingList', undefined);
+    trigger('packingList');
+    previous();
+  };
+
   return (
     <PageWrapper>
       <WizardStepsV2 steps={stepsTitles} currentStepKey={Step.key} />
@@ -109,7 +117,7 @@ const OutboundImport = () => {
           && (
           <Step.Component
             {...detailsComponentProps}
-            previous={previous}
+            previous={redoImport}
             data={lineItems}
             tableErrors={lineItemErrors}
             hasErrors={validateStatus === HttpStatusCode.BadRequest}
