@@ -146,7 +146,7 @@ const INVOICE_ITEMS = {
                 >
                   <TextInput
                     type="number"
-                    value={params.fieldValue}
+                    value={params?.invoiceItems[params?.rowIndex].quantity}
                     showErrorBorder={!!errors}
                     onChange={
                     params.updateInvoiceItemQuantity(invoiceItem?.id)
