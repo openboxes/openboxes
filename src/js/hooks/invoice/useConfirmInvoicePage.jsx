@@ -55,16 +55,14 @@ const useConfirmInvoicePage = ({ initialValues }) => {
     invoiceApi.submitInvoice(stateValues.id)
       .then(() => {
         window.location = INVOICE_URL.show(stateValues.id);
-      })
-      .finally(() => spinner.hide());
+      });
   };
 
   const postInvoice = () => {
     invoiceApi.postInvoice(stateValues.id)
       .then(() => {
         window.location = INVOICE_URL.show(stateValues.id);
-      })
-      .finally(() => spinner.hide());
+      });
   };
 
   /**

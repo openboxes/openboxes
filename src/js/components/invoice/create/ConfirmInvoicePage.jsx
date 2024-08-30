@@ -10,6 +10,7 @@ import InvoicePrepayedItemsTable from 'components/invoice/create/InvoicePrepayed
 import useConfirmInvoicePage from 'hooks/invoice/useConfirmInvoicePage';
 import useInvoicePrepaidItemsTable from 'hooks/invoice/useInvoicePrepaidItemsTable';
 import Translate from 'utils/Translate';
+import useSpinner from 'hooks/useSpinner';
 
 const PREPAYMENT_INVOICE = 'PREPAYMENT_INVOICE';
 
@@ -24,6 +25,8 @@ const ConfirmInvoicePage = ({ initialValues, previousPage }) => {
     refetchData,
     loadMoreRows,
   } = useConfirmInvoicePage({ initialValues });
+
+  const spinner = useSpinner();
 
   const invoicePrepaidItemsTableData = useInvoicePrepaidItemsTable({
     invoiceItems: stateValues.invoiceItems,
@@ -61,8 +64,6 @@ const ConfirmInvoicePage = ({ initialValues, previousPage }) => {
               }
               disableSaveButton={!isValid
                 && values.invoiceType !== PREPAYMENT_INVOICE}
-              showSaveButton={stateValues.hasPrepaymentInvoice
-                && values.invoiceType !== PREPAYMENT_INVOICE}
             />
             <div className="submit-buttons">
               <button
@@ -77,6 +78,7 @@ const ConfirmInvoicePage = ({ initialValues, previousPage }) => {
               <button
                 type="submit"
                 onClick={() => {
+                  spinner.show();
                   if (
                     values.invoiceType !== PREPAYMENT_INVOICE
                     && stateValues.hasPrepaymentInvoice
@@ -102,6 +104,7 @@ const ConfirmInvoicePage = ({ initialValues, previousPage }) => {
                   <button
                     type="submit"
                     onClick={() => {
+                      spinner.show();
                       if (
                         values.invoiceType !== PREPAYMENT_INVOICE
                         && stateValues.hasPrepaymentInvoice

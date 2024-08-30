@@ -71,7 +71,6 @@ const InvoiceOptionsForm = ({
   updateInvoiceItem,
   canUpdateInvoiceItems,
   save,
-  showSaveButton,
 }) => {
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
 
@@ -106,7 +105,7 @@ const InvoiceOptionsForm = ({
             />
           </span>
         </button>
-        {showSaveButton && (
+        {canUpdateInvoiceItems && (
         <button
           type="button"
           className="btn btn-outline-secondary float-right btn-form btn-xs"
@@ -179,7 +178,6 @@ InvoiceOptionsForm.propTypes = {
   updateInvoiceItem: PropTypes.func.isRequired,
   canUpdateInvoiceItems: PropTypes.bool.isRequired,
   save: PropTypes.func.isRequired,
-  showSaveButton: PropTypes.bool.isRequired,
 };
 
 export default InvoiceOptionsForm;

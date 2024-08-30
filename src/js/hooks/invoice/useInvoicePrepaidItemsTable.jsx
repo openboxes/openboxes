@@ -62,15 +62,10 @@ const useInvoicePrepaidItemsTable = ({
   // Sending a request for updating invoice items quantity (batch update)
   const updateInvoiceItem = async (callback) => {
     const invoiceItemsToUpdate = getEditedInvoiceItems();
-    spinner.show();
-    try {
-      if (invoiceItemsToUpdate.length) {
-        await prepaymentInvoiceApi.updateInvoiceItems(invoiceId, invoiceItemsToUpdate);
-      }
-      callback?.();
-    } finally {
-      spinner.hide();
+    if (invoiceItemsToUpdate.length) {
+      await prepaymentInvoiceApi.updateInvoiceItems(invoiceId, invoiceItemsToUpdate);
     }
+    callback?.();
   };
 
   const markRowAsEditable = (rowId, quantity) => {
