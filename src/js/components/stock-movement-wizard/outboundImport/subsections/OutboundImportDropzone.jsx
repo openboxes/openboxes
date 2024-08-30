@@ -12,6 +12,7 @@ import Subsection from 'components/Layout/v2/Subsection';
 import FileFormat from 'consts/fileFormat';
 import exportFileFromAPI from 'utils/file-download-util';
 import { FormErrorPropType } from 'utils/propTypes';
+import { RiDownload2Line } from 'react-icons/ri';
 
 const OutboundImportDropzone = ({ control, errors }) => {
   const dispatch = useDispatch();
@@ -35,9 +36,10 @@ const OutboundImportDropzone = ({ control, errors }) => {
         <Button
           className="mb-4"
           variant="secondary"
-          defaultLabel="Export Template"
+          defaultLabel="Export template"
           label="react.default.button.exportTemplate.label"
           onClick={downloadPackingListTemplate}
+          EndIcon={<RiDownload2Line />}
         />
         <Controller
           name="packingList"
