@@ -63,7 +63,7 @@ databaseChangeLog = {
                 List<Invoice> prepaymentInvoices = Invoice.findAllByInvoiceType(prepaymentInvoiceType)
 
                 int totalPrepaymentOrders = prepaymentInvoices.size()
-                prepaymentInvoices.each { Invoice prepaymentInvoice ->
+                for (Invoice prepaymentInvoice : prepaymentInvoices) {
                     // While the domains are structured to allow for multiple orders per invoice, this flow only
                     // makes sense if there's a single order.
                     List<Order> orders = prepaymentInvoice.orders

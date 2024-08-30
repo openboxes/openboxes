@@ -21,10 +21,10 @@ class PrepaymentInvoiceMigrationService {
      */
     void updateAmountForPrepaymentInvoiceItems() {
         InvoiceType prepaymentInvoiceType = InvoiceType.findByCode(InvoiceTypeCode.PREPAYMENT_INVOICE)
-
-        Invoice.findAllByInvoiceType(prepaymentInvoiceType).each { Invoice prepaymentInvoice ->
+        List<Invoice> prepaymentInvoices = Invoice.findAllByInvoiceType(prepaymentInvoiceType)
+        for (Invoice prepaymentInvoice : prepaymentInvoices) {
             // The amount field will be null for all pre-existing invoices since the field was not being used.
-            for(InvoiceItem prepaymentInvoiceItem : prepaymentInvoice.invoiceItems) {
+            for (InvoiceItem prepaymentInvoiceItem : prepaymentInvoice.invoiceItems) {
                 if (prepaymentInvoiceItem.amount != null) {
                     continue
                 }
@@ -64,7 +64,7 @@ class PrepaymentInvoiceMigrationService {
      * prepayment invoice individually, they should ALL need to have inverse items created for them.
      */
     Invoice generateInverseInvoiceItems(Invoice prepaymentInvoice, Invoice finalInvoice) {
-        prepaymentInvoice.invoiceItems.each { InvoiceItem prepaymentInvoiceItem ->
+        for (InvoiceItem prepaymentInvoiceItem : prepaymentInvoice.invoiceItems) {
             InvoiceItem inverseItem = createInverseInvoiceItem(prepaymentInvoiceItem)
             finalInvoice.addToInvoiceItems(inverseItem)
         }
