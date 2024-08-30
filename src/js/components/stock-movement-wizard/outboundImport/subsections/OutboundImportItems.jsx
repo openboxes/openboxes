@@ -42,7 +42,8 @@ const OutboundImportItems = ({ data, errors }) => {
         <TableCell
           {...row}
           style={{ color: row.original?.product?.color }}
-          tooltip={row.original?.product?.name}
+          tooltip
+          tooltipLabel={row.original?.product?.name}
           value={formatProductDisplayName(row.original?.product)}
           showError
         />
