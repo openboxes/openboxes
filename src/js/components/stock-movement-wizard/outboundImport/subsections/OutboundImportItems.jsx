@@ -33,6 +33,9 @@ const OutboundImportItems = ({
   const {
     setIsFiltered,
     isFiltered,
+    getFilteredTableData,
+    getTablePageSize,
+    toggleFiltering,
   } = useOutboundImportFiltering();
 
   const columns = useMemo(() => [
@@ -126,23 +129,17 @@ const OutboundImportItems = ({
             isFiltered={isFiltered}
             setIsFiltered={setIsFiltered}
             triggerValidation={null}
-            handleOnFilterButtonClick={() => {
-              setIsFiltered((prev) => !prev);
-            }}
+            handleOnFilterButtonClick={toggleFiltering}
           />
         )}
       </span>
       <DataTable
         style={{ maxHeight: '20rem' }}
         showPagination={false}
-        pageSize={isFiltered
-          ? itemsWithErrors?.length
-          : itemsInOrder?.length}
+        pageSize={getTablePageSize(itemsWithErrors, itemsInOrder)}
         columns={columns}
         errors={errors}
-        data={isFiltered
-          ? (itemsWithErrors ?? [])
-          : (itemsInOrder ?? [])}
+        data={getFilteredTableData(itemsWithErrors, itemsInOrder)}
         loading={false}
       />
     </Subsection>
