@@ -197,6 +197,10 @@ class PrepaymentInvoiceService {
         if (!prepaymentItem) {
             return null
         }
+        if (orderAdjustment.inversedQuantity > 0) {
+            return null
+        }
+
         InvoiceItem inverseItem = createFromOrderAdjustment(orderAdjustment)
         // For order adjustment invoiceItem.quantity is 1 or 0, but for inverse should be for now 1
         inverseItem.quantity = 1

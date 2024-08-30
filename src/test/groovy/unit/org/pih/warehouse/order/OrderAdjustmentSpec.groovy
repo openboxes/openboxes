@@ -9,12 +9,14 @@ import spock.lang.Unroll
 
 @Unroll
 class OrderAdjustmentSpec extends Specification implements DomainUnitTest<OrderAdjustment> {
-    void 'OrderAdjustment.getIsInvoiceable() should return #isInvoiceable when the status of order is: #orderStatus and has regular invoice: #hasRegularInvoice'() {
+    void 'OrderAdjustment.getIsInvoiceable() should return #isInvoiceable when canceled: #canceled, the status of order is: #orderStatus and has regular invoice: #hasRegularInvoice'() {
         given:
         OrderAdjustment orderAdjustment = Spy(OrderAdjustment) {
             getHasRegularInvoice() >> hasRegularInvoice
             getHasPrepaymentInvoice() >> true
+            getInvoicedQuantity() >> 0
         }
+        orderAdjustment.canceled = canceled
         orderAdjustment.order = Spy(Order)
         orderAdjustment.order.status = orderStatus
 
@@ -22,10 +24,11 @@ class OrderAdjustmentSpec extends Specification implements DomainUnitTest<OrderA
         orderAdjustment.invoiceable == isInvoiceable
 
         where:
-        orderStatus         | hasRegularInvoice  || isInvoiceable
-        OrderStatus.PENDING | false              || false
-        OrderStatus.PLACED  | false              || true
-        OrderStatus.PENDING | false              || false
-        OrderStatus.PLACED  | true               || false
+        orderStatus         | hasRegularInvoice  |  canceled || isInvoiceable
+        OrderStatus.PENDING | false              |  true     || false
+        OrderStatus.PLACED  | false              |  true     || true
+        OrderStatus.PENDING | false              |  false    || false
+        OrderStatus.PLACED  | true               |  true     || false
+        OrderStatus.PLACED  | true               |  false    || true
     }
 }

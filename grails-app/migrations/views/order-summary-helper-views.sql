@@ -279,7 +279,9 @@ CREATE OR REPLACE VIEW order_summary AS (
                 `order`.status                              			            AS order_status,
                 0    													            AS quantity_ordered,
                 0                                                                   AS items_ordered,
-                IFNULL(SUM(order_adjustment_payment_status.quantity_ordered), 0)	AS adjustments_count,
+                -- count all distinct adjustment items, this is for the case when adjustment might be canceled,
+                -- then invoiced (invoiced quantity is 0), then uncanceled and invoiced again with quantity 1
+                IFNULL(COUNT(DISTINCT order_adjustment_payment_status.adjustment_id), 0)	AS adjustments_count,
                 0    													            AS quantity_shipped,
                 0                                                                   AS items_shipped,
                 0   													            AS quantity_received,
@@ -291,7 +293,8 @@ CREATE OR REPLACE VIEW order_summary AS (
             FROM `order`
                 LEFT OUTER JOIN order_adjustment ON order_adjustment.order_id = `order`.id
                 LEFT OUTER JOIN order_adjustment_payment_status ON order_adjustment_payment_status.adjustment_id = order_adjustment.id
-            WHERE `order`.order_type_id = 'PURCHASE_ORDER'
+            -- filter out canceled adjustments from here (in case canceled item was invoiced with quantity 0)
+            WHERE `order`.order_type_id = 'PURCHASE_ORDER' AND order_adjustment.canceled IS NOT TRUE
             GROUP BY `order`.id
         ) AS items_and_adjustments_union GROUP BY id, order_status
     )
