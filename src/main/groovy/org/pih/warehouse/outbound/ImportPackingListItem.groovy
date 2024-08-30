@@ -9,6 +9,7 @@ import grails.validation.Validateable
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.ProductAvailabilityService
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.product.ProductAvailability
 
 
 class ImportPackingListItem implements Validateable {
@@ -22,6 +23,24 @@ class ImportPackingListItem implements Validateable {
     @BindUsing({ obj, source -> Product.findByProductCode(source['product']) })
     Product product
 
+    @BindUsing({ obj, source ->
+        // set provided lot number
+        if (source['lotNumber']) {
+            return source['lotNumber']
+        }
+
+        // otherwise infer inventory item based on provided bin-location
+        Location internalLocation = Location.findByNameAndParentLocation(source['binLocation'], obj.origin)
+        Product product = Product.findByProductCode(source['product'])
+        List<ProductAvailability> items = ProductAvailability.findAllByProductAndBinLocation(product, internalLocation)
+
+        // infer lot-number only if there is a single possible inventory
+        if (items.size() == 1) {
+            return items.first().lotNumber
+        }
+
+        return null
+    })
     String lotNumber
 
     Location origin
