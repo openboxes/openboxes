@@ -81,6 +81,7 @@ const useOutboundImportForm = ({ next }) => {
    * Do not use this one to send the data for save/validation, but use the packingListData
    */
   const [tableData, setTableData] = useState([]);
+
   // State to store data that is sent to the API for validation/save
   const [packingListData, setPackingListData] = useState([]);
   const [errorsData, setErrorsData] = useState({
@@ -122,30 +123,54 @@ const useOutboundImportForm = ({ next }) => {
    * and second - containing the items without validation errors
    */
   const groupTableDataByErrors = (data) => data?.data?.reduce?.((acc, item) => {
+    const itemWithRowNumber = { ...item, fileRowNumber: acc.fileRowNumber };
     if (data?.errors?.packingList?.[item.rowId]) {
       return {
         ...acc,
-        itemsWithErrors: [...acc.itemsWithErrors, item],
+        itemsWithErrors: [...acc.itemsWithErrors, itemWithRowNumber],
+        itemsInOrder: [...acc.itemsInOrder, itemWithRowNumber],
+        fileRowNumber: acc.fileRowNumber + 1,
       };
     }
     return {
       ...acc,
-      itemsWithoutErrors: [...acc.itemsWithoutErrors, item],
+      itemsWithoutErrors: [...acc.itemsWithoutErrors, itemWithRowNumber],
+      itemsInOrder: [...acc.itemsInOrder, itemWithRowNumber],
+      fileRowNumber: acc.fileRowNumber + 1,
     };
-  }, { itemsWithErrors: [], itemsWithoutErrors: [] });
+  }, {
+    itemsWithErrors: [],
+    itemsWithoutErrors: [],
+    itemsInOrder: [],
+    // Rows in the excel file start on 2nd row (first row is the header)
+    fileRowNumber: 2,
+  });
 
   const validateOutboundData = async (fulfilmentPayload) => {
     try {
       const validationResponse = await fulfillmentApi.validateOutbound(fulfilmentPayload);
+      const tableDataGrouped = groupTableDataByErrors(validationResponse.data);
       // Set the table data that is used to display the items in the React table
-      setTableData(validationResponse.data.data);
+      setTableData({
+        itemsWithErrors: tableDataGrouped.itemsWithErrors,
+        itemsWithoutErrors: tableDataGrouped.itemsWithoutErrors,
+        itemsInOrder: tableDataGrouped.itemsInOrder,
+      });
       setErrorsData({ errors: {}, validateStatus: validationResponse.status });
     } catch (e) {
       setErrorsData({ errors: e.response.data.errors, validateStatus: e.response.status });
       // Group errors by errors and make the items with errors appear at the top,
       // by merging two grouped arrays
       const tableDataGrouped = groupTableDataByErrors(e.response.data);
-      setTableData([...tableDataGrouped.itemsWithErrors, ...tableDataGrouped.itemsWithoutErrors]);
+      setTableData({
+        itemsWithErrors: tableDataGrouped.itemsWithErrors,
+        itemsWithoutErrors: tableDataGrouped.itemsWithoutErrors,
+        itemsInOrder: tableDataGrouped.itemsInOrder,
+      });
+      notification(NotificationType.ERROR_OUTLINED)({
+        message: translate('react.outboundImport.validationException.label', 'Validation exception'),
+        details: `${tableDataGrouped.itemsWithErrors.length} ${translate('react.outboundImport.invalidRows.label', 'rows in the import are invalid. Review the table below to correct errors in the import.')}`,
+      });
     }
   };
 
@@ -213,7 +238,11 @@ const useOutboundImportForm = ({ next }) => {
         // Group errors by errors and make the items with errors appear at the top,
         // by merging two grouped arrays
         const tableDataGrouped = groupTableDataByErrors(e.response?.data);
-        setTableData([...tableDataGrouped.itemsWithErrors, ...tableDataGrouped.itemsWithoutErrors]);
+        setTableData({
+          itemsWithErrors: tableDataGrouped.itemsWithErrors,
+          itemsWithoutErrors: tableDataGrouped.itemsWithoutErrors,
+          itemsInOrder: tableDataGrouped.itemsInOrder,
+        });
         notification(NotificationType.ERROR_OUTLINED)({
           message: translate('react.outboundImport.validationException.label', 'Validation exception'),
           details: translate('react.outboundImport.validationException.details.label', 'Check out the table for the validation exceptions'),
