@@ -137,7 +137,7 @@ class OrderAdjustment implements Serializable, Comparable<OrderAdjustment> {
      * Adjustment is invoiceable on regular invoice if:
      *  - if adjustment is canceled, we can invoice if it has prepayment, does not have regular already and order is placed
      *  - if adjustment is not canceled, and it was previously invoiced as canceled on regular invoice
-     *  - if adjustment has no reguler invoice yet and order is placed
+     *  - if adjustment has no regular invoice yet and order is placed
      * */
     Boolean isInvoiceable() {
         if (canceled) {
