@@ -85,6 +85,13 @@ const PreferenceTypeVariations = ({
             isFiltered={isFiltered}
             setIsFiltered={setIsFiltered}
             triggerValidation={triggerValidation}
+            handleOnFilterButtonClick={() => {
+              triggerValidation('productSupplierPreferences');
+              if (invalidRowCount) {
+                setIsFiltered((value) => !value);
+                resetScrollbar();
+              }
+            }}
           />
           <Button
             onClick={addNewLine}

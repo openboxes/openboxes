@@ -33,7 +33,7 @@ const InvalidItemsIndicator = ({
   errorsCounter,
   setIsFiltered,
   isFiltered,
-  triggerValidation,
+  handleOnFilterButtonClick,
 }) => {
   const { Icon, variant, wrapperClassName } = getButtonVariant({
     buttonVariant: errorsCounter ? invalidLinesButton : validLinesButton,
@@ -50,14 +50,6 @@ const InvalidItemsIndicator = ({
       resetScrollbar();
     }
   }, [errorsCounter]);
-
-  const handleOnFilterButtonClick = () => {
-    triggerValidation('productSupplierPreferences');
-    if (errorsCounter) {
-      setIsFiltered((value) => !value);
-      resetScrollbar();
-    }
-  };
 
   return (
     <Button
@@ -84,7 +76,7 @@ InvalidItemsIndicator.propTypes = {
   errorsCounter: PropTypes.number,
   setIsFiltered: PropTypes.func,
   isFiltered: PropTypes.bool,
-  triggerValidation: PropTypes.func.isRequired,
+  handleOnFilterButtonClick: PropTypes.func.isRequired,
 };
 
 InvalidItemsIndicator.defaultProps = {
