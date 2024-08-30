@@ -70,6 +70,8 @@ const InvoiceOptionsForm = ({
   disableSaveButton,
   updateInvoiceItem,
   canUpdateInvoiceItems,
+  save,
+  showSaveButton,
 }) => {
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
 
@@ -104,6 +106,22 @@ const InvoiceOptionsForm = ({
             />
           </span>
         </button>
+        {showSaveButton && (
+        <button
+          type="button"
+          className="btn btn-outline-secondary float-right btn-form btn-xs"
+          disabled={disableSaveButton}
+          onClick={() => save()}
+        >
+          <span>
+            <i className="fa fa-save pr-2" />
+            <Translate
+              id="react.default.button.save.label"
+              defaultMessage="Save"
+            />
+          </span>
+        </button>
+        )}
         <span className="mr-3">
           <div className="dropdown">
             <button
@@ -160,6 +178,8 @@ InvoiceOptionsForm.propTypes = {
   disableSaveButton: PropTypes.bool.isRequired,
   updateInvoiceItem: PropTypes.func.isRequired,
   canUpdateInvoiceItems: PropTypes.bool.isRequired,
+  save: PropTypes.func.isRequired,
+  showSaveButton: PropTypes.bool.isRequired,
 };
 
 export default InvoiceOptionsForm;

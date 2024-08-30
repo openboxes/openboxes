@@ -10,10 +10,10 @@ import useSpinner from 'hooks/useSpinner';
 import useTranslate from 'hooks/useTranslate';
 
 const useInvoicePrepaidItemsTable = ({
-  loadMoreRows,
   invoiceItems,
   updateInvoiceItemQuantity,
   invoiceId,
+  refetchData,
 }) => {
   const spinner = useSpinner();
   const translate = useTranslate();
@@ -51,8 +51,7 @@ const useInvoicePrepaidItemsTable = ({
       await prepaymentInvoiceItemApi.deletePrepaymentInvoiceItem(invoiceItemId);
       setEditableRows((rows) => _.omit(rows, invoiceItemId));
       setInvalidRows((rows) => rows.filter((rowId) => rowId !== invoiceItemId));
-      loadMoreRows({
-        startIndex: 0,
+      refetchData({
         overrideInvoiceItems: true,
       });
     } finally {
@@ -135,6 +134,21 @@ const useInvoicePrepaidItemsTable = ({
       invoiceStatus === InvoiceStatus.PENDING || invoiceStatus === InvoiceStatus.SUBMITTED
     );
 
+  // Removing all information about edited lines
+  const clearEditedState = () => {
+    setEditableRows({});
+    setInvalidRows([]);
+  };
+
+  // Saving edited lines and refetching all invoice data
+  const save = async () => {
+    await updateInvoiceItem();
+    refetchData({
+      overrideInvoiceItems: true,
+      callback: clearEditedState,
+    });
+  };
+
   return {
     actions,
     isEditable,
@@ -142,6 +156,7 @@ const useInvoicePrepaidItemsTable = ({
     updateRowQuantity,
     updateInvoiceItem,
     isActionMenuVisible,
+    save,
     editableRows,
     isRowLoaded,
     isValid: !invalidRows.length,

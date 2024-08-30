@@ -1,144 +1,42 @@
-import React, {
-  useCallback, useEffect, useMemo, useState,
-} from 'react';
+import React from 'react';
 
 import arrayMutators from 'final-form-arrays';
 import PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
-import { useSelector } from 'react-redux';
 
-import invoiceApi from 'api/services/InvoiceApi';
 import InvoiceItemsTable from 'components/invoice/create/InvoiceItemsTable';
 import InvoiceOptionsForm from 'components/invoice/create/InvoiceOptionsForm';
 import InvoicePrepayedItemsTable from 'components/invoice/create/InvoicePrepayedItemsTable';
-import { INVOICE_URL } from 'consts/applicationUrls';
+import useConfirmInvoicePage from 'hooks/invoice/useConfirmInvoicePage';
 import useInvoicePrepaidItemsTable from 'hooks/invoice/useInvoicePrepaidItemsTable';
-import useSpinner from 'hooks/useSpinner';
-import accountingFormat from 'utils/number-utils';
 import Translate from 'utils/Translate';
 
 const PREPAYMENT_INVOICE = 'PREPAYMENT_INVOICE';
 
 const ConfirmInvoicePage = ({ initialValues, previousPage }) => {
-  const spinner = useSpinner();
-
   const {
-    pageSize,
     isSuperuser,
-  } = useSelector((state) => ({
-    pageSize: state.session.pageSize,
-    isSuperuser: state.session.isSuperuser,
-  }));
-
-  const [stateValues, setStateValues] = useState({
-    ...initialValues,
-    invoiceItems: [],
-  });
-
-  /**
-   * Fetches invoice values from API.
-   * @public
-   */
-  const fetchInvoiceData = useCallback(() => {
-    spinner.show();
-    invoiceApi.getInvoice(stateValues.id)
-      .then((response) => {
-        setStateValues((state) => ({
-          ...state,
-          documents: response.data.data.documents,
-        }));
-      })
-      .finally(() => spinner.hide());
-  }, [stateValues.id]);
-
-  useEffect(() => {
-    if (stateValues.id) {
-      fetchInvoiceData();
-    }
-  }, [stateValues.id]);
-
-  const totalValue = useMemo(() =>
-    accountingFormat(stateValues.totalValue.toFixed(2)), [stateValues.totalValue]);
-
-  const submitInvoice = () => {
-    invoiceApi.submitInvoice(stateValues.id)
-      .then(() => {
-        window.location = INVOICE_URL.show(stateValues.id);
-      })
-      .finally(() => spinner.hide());
-  };
-
-  const postInvoice = () => {
-    invoiceApi.postInvoice(stateValues.id)
-      .then(() => {
-        window.location = INVOICE_URL.show(stateValues.id);
-      })
-      .finally(() => spinner.hide());
-  };
-
-  /**
-   * Sets state of invoice items after fetch and calls method to fetch next items
-   * @param response
-   * @param {boolean} overrideInvoiceItems
-   * @public
-   */
-  const setInvoiceItems = (response, overrideInvoiceItems = true) => {
-    spinner.show();
-    const { data, totalCount } = response.data;
-    setStateValues((state) => ({
-      ...state,
-      invoiceItems: overrideInvoiceItems
-        ? data
-        : [
-          ...state.invoiceItems,
-          ...data,
-        ],
-      totalCount,
-    }));
-
-    spinner.hide();
-  };
-
-  /**
-   * Loads more rows, needed for pagination
-   * @param {index} startIndex
-   * @public
-   */
-  const loadMoreRows = useCallback(
-    ({ startIndex, overrideInvoiceItems = false }) => invoiceApi.getInvoiceItems(stateValues.id, {
-      params: { offset: startIndex, max: pageSize },
-    })
-      .then((response) => {
-        setInvoiceItems(response, overrideInvoiceItems);
-      }),
-    [stateValues.id, pageSize],
-  );
-
-  const updateInvoiceItemQuantity = (updateRowQuantity) => (invoiceItemId) => (quantity) => {
-    updateRowQuantity?.(invoiceItemId, quantity);
-    setStateValues((state) => ({
-      ...state,
-      invoiceItems: state.invoiceItems.map((item) => {
-        if (item.id === invoiceItemId) {
-          return { ...item, quantity };
-        }
-
-        return item;
-      }),
-    }));
-  };
+    stateValues,
+    totalValue,
+    submitInvoice,
+    postInvoice,
+    updateInvoiceItemQuantity,
+    refetchData,
+    loadMoreRows,
+  } = useConfirmInvoicePage({ initialValues });
 
   const invoicePrepaidItemsTableData = useInvoicePrepaidItemsTable({
-    loadMoreRows,
     invoiceItems: stateValues.invoiceItems,
     invoiceId: stateValues.id,
     updateInvoiceItemQuantity,
+    refetchData,
   });
 
   const {
     isValid,
     updateRowQuantity,
     updateInvoiceItem,
+    save,
   } = invoicePrepaidItemsTableData;
 
   return (
@@ -155,11 +53,15 @@ const ConfirmInvoicePage = ({ initialValues, previousPage }) => {
             <InvoiceOptionsForm
               values={values}
               updateInvoiceItem={updateInvoiceItem}
+              refetchData={refetchData}
+              save={save}
               canUpdateInvoiceItems={
                 values.invoiceType !== PREPAYMENT_INVOICE
                 && stateValues.hasPrepaymentInvoice
               }
               disableSaveButton={!isValid
+                && values.invoiceType !== PREPAYMENT_INVOICE}
+              showSaveButton={stateValues.hasPrepaymentInvoice
                 && values.invoiceType !== PREPAYMENT_INVOICE}
             />
             <div className="submit-buttons">
