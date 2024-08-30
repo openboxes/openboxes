@@ -502,6 +502,8 @@
         }
 
         function saveOrderItem() {
+          const saveButton = $("#save-item-button");
+            saveButton.attr('disabled', 'disabled');
             var data = $("#orderItemForm").serialize();
             data += '&orderIndex=' + $("#orderItemsTable tbody tr").length;
             if (validateItemsForm()) {
@@ -515,6 +517,7 @@
                * TODO localized strings? Further discussion at OBGM-343.
                */
               if ($("#validationCode").val() == 'WARN' && !confirm(htmlDecode(`${g.message(code: 'orderItem.warningSupplier.label')}`))) {
+                saveButton.removeAttr('disabled');
                 return false
               } else {
                 $.ajax({
@@ -544,14 +547,18 @@
                     } else {
                       $.notify("Error saving your item");
                     }
-                  }
+                  },
+                  complete: function() {
+                    saveButton.removeAttr('disabled');
+                  },
                 });
               }
             }
             else {
+              saveButton.removeAttr('disabled');
               $.notify(htmlDecode("${g.message(code: 'order.errors.allRequiredFields.label', default: 'Please enter a proper value for all required fields')}"));
             }
-            return false
+          return false
         }
 
         function saveOrderAdjustment() {
