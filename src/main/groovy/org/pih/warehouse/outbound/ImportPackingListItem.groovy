@@ -53,6 +53,7 @@ class ImportPackingListItem implements Validateable {
         if (!internalLocation && source['binLocation'] && !source['binLocation'].equalsIgnoreCase(Constants.DEFAULT_BIN_LOCATION_NAME)) {
             // We want to indicate, that a bin location for given name has not been found.
             obj.binLocationFound = false
+            return new Location(name: source['binLocation'])
         }
         return internalLocation
      })
@@ -106,7 +107,11 @@ class ImportPackingListItem implements Validateable {
             }
             return ['inventoryItemNotFound', lotNumber, item.product?.productCode]
         })
-        binLocation(nullable: true)
+        binLocation(nullable: true, validator: { Location binLocation, ImportPackingListItem item ->
+            if (!item.binLocationFound) {
+                return ['binLocationNotFound', binLocation.name]
+            }
+        })
         quantityPicked(min: 1, validator: { Integer quantityPicked, ImportPackingListItem item ->
             if (!item.binLocationFound) {
                 return ['binLocationNotFound']
