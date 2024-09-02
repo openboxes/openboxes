@@ -66,6 +66,7 @@ class ImportPackingListItem implements Validateable {
         if (!person && source['recipient']) {
             // We want to indicate if a recipient was not found, but the search term was given
             obj.recipientFound = false
+            return new Person(firstName: source['recipient'], lastName: "")
         }
         return person
     })
