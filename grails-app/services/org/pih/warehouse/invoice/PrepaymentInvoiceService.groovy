@@ -182,7 +182,13 @@ class PrepaymentInvoiceService {
             return null
         }
         InvoiceItem inverseItem = createFromShipmentItem(shipmentItem)
-        Integer quantity = invoiceItem.quantity >= quantityInverseable ? quantityInverseable : invoiceItem.quantity
+        Integer quantity
+        if (orderItem.isCompletelyFulfilled() && orderItem.isFullyInvoiced()) {
+            // If quantity if fully shipped and fully invoiced set full inverse quantity
+            quantity = quantityInverseable
+        } else {
+            quantity = invoiceItem.quantity >= quantityInverseable ? quantityInverseable : invoiceItem.quantity
+        }
         inverseItem.quantity = quantity
         inverseItem.inverse = true
         inverseItem.unitPrice = prepaymentItem.unitPrice
