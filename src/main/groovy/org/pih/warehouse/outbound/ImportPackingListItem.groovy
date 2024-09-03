@@ -53,6 +53,8 @@ class ImportPackingListItem implements Validateable {
         if (!internalLocation && source['binLocation'] && !source['binLocation'].equalsIgnoreCase(Constants.DEFAULT_BIN_LOCATION_NAME)) {
             // We want to indicate, that a bin location for given name has not been found.
             obj.binLocationFound = false
+            // returns a dummy location object to add more context in a response of what location was not found
+            return new Location(name: source['binLocation'])
         }
         return internalLocation
      })
@@ -65,6 +67,8 @@ class ImportPackingListItem implements Validateable {
         if (!person && source['recipient']) {
             // We want to indicate if a recipient was not found, but the search term was given
             obj.recipientFound = false
+            // returns a dummy person object to add more context in a response of what person was not found
+            return new Person(firstName: source['recipient'], lastName: "")
         }
         return person
     })
@@ -106,10 +110,14 @@ class ImportPackingListItem implements Validateable {
             }
             return ['inventoryItemNotFound', lotNumber, item.product?.productCode]
         })
-        binLocation(nullable: true)
+        binLocation(nullable: true, validator: { Location binLocation, ImportPackingListItem item ->
+            if (!item.binLocationFound) {
+                return ['binLocationNotFound', binLocation.name]
+            }
+        })
         quantityPicked(min: 1, validator: { Integer quantityPicked, ImportPackingListItem item ->
             if (!item.binLocationFound) {
-                return ['binLocationNotFound']
+                return ['binLocationNotFound', item.binLocation?.name]
             }
             ProductAvailabilityService productAvailabilityService = Holders.grailsApplication.mainContext.getBean(ProductAvailabilityService)
             InventoryItem inventoryItem = item.product?.getInventoryItem(item.lotNumber)
@@ -129,7 +137,7 @@ class ImportPackingListItem implements Validateable {
         })
         recipient(nullable: true, validator: { Person recipient, ImportPackingListItem item ->
             if (!item.recipientFound) {
-                return ['recipientNotFound']
+                return ['recipientNotFound', item.recipient?.name]
             }
         })
         binLocationFound(bindable: false)
