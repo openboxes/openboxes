@@ -201,7 +201,7 @@
                                     />
                                 </td>
                                 <td class="center middle">
-                                    <button type="button" class="button" onclick="saveOrderAdjustment()">
+                                    <button type="button" class="button" id="save-adjustment-button" onclick="saveOrderAdjustment()">
                                         <img src="${resource(dir: 'images/icons/silk', file: 'tick.png')}" />&nbsp
                                         <warehouse:message code="default.button.save.label"/>
                                     </button>
@@ -562,8 +562,11 @@
         }
 
         function saveOrderAdjustment() {
+            const saveButton = $("#save-adjustment-button");
+            saveButton.attr('disabled', 'disabled');
             const data = $("#orderAdjustmentForm").serialize();
             if (!validateAdjustmentsForm()) {
+              saveButton.removeAttr('disabled');
               return
             }
             $.ajax({
@@ -581,6 +584,9 @@
                     } else {
                         $.notify("Error saving adjustment");
                     }
+                },
+                complete: function () {
+                    saveButton.removeAttr('disabled');
                 }
             });
             return false;
