@@ -117,7 +117,7 @@ class ImportPackingListItem implements Validateable {
         })
         quantityPicked(min: 1, validator: { Integer quantityPicked, ImportPackingListItem item ->
             if (!item.binLocationFound) {
-                return ['binLocationNotFound']
+                return ['binLocationNotFound', item.binLocation?.name]
             }
             ProductAvailabilityService productAvailabilityService = Holders.grailsApplication.mainContext.getBean(ProductAvailabilityService)
             InventoryItem inventoryItem = item.product?.getInventoryItem(item.lotNumber)
@@ -137,7 +137,7 @@ class ImportPackingListItem implements Validateable {
         })
         recipient(nullable: true, validator: { Person recipient, ImportPackingListItem item ->
             if (!item.recipientFound) {
-                return ['recipientNotFound']
+                return ['recipientNotFound', item.recipient?.name]
             }
         })
         binLocationFound(bindable: false)
