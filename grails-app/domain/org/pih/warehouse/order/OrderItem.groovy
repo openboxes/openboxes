@@ -411,7 +411,7 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
 
     // Check quantity (standard uom) in posted invoices
     Integer getPostedQuantityInvoicedInStandardUom() {
-        return postedQuantityInvoiced * (quantityPerUom?:1)
+        return postedQuantityInvoiced * (quantityPerUom ?: 1)
     }
 
     def getInvoices() {
@@ -433,7 +433,7 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
     Integer getPostedQuantityInvoiced() {
         return allInvoiceItems?.findAll {
             it?.invoice?.datePosted != null && !it?.invoice?.isPrepaymentInvoice && !it.inverse
-        }?.collect {  it.quantity }?.sum() ?: 0
+        }?.sum { it.quantity } ?: 0
     }
 
     Set<ShipmentItem> getInvoiceableShipmentItems() {
