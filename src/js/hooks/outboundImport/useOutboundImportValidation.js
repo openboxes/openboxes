@@ -5,36 +5,40 @@ import { validateDateIsSameOrAfter, validateFutureDate } from 'utils/form-utils'
 
 const useOutboundImportValidation = () => {
   const translate = useTranslate();
+  const requestedBySchema = z.object({
+    id: z.string(),
+    label: z.string(),
+    name: z.string(),
+  }, {
+    invalid_type_error: translate('react.outboundImport.validation.requestedBy.required.label', 'Requested by is required'),
+    required_error: translate('react.outboundImport.validation.requestedBy.required.label', 'Requested by is required'),
+  }).required();
+  const originSchema = z.object({
+    id: z.string(),
+    label: z.string(),
+    name: z.string(),
+  }, {
+    invalid_type_error: translate('react.outboundImport.validation.origin.required.label', 'Origin is required'),
+    required_error: translate('react.outboundImport.validation.origin.required.label', 'Origin is required'),
+  }).required();
+  const destinationSchema = z.object({
+    id: z.string(),
+    label: z.string(),
+    name: z.string(),
+  }, {
+    invalid_type_error: translate('react.outboundImport.validation.destination.required.label', 'Destination is required'),
+    required_error: translate('react.outboundImport.validation.destination.required.label', 'Destination is required'),
+  }).required();
+
   const validationSchema = (data) => z.object({
     description: z
       .string({
         required_error: translate('react.outboundImport.validation.description.required.label', 'Description is required'),
       })
       .min(1, translate('react.outboundImport.validation.description.required.label', 'Description is required')),
-    origin: z.object({
-      id: z.string(),
-      label: z.string(),
-      name: z.string(),
-    }, {
-      invalid_type_error: translate('react.outboundImport.validation.origin.required.label', 'Origin is required'),
-      required_error: translate('react.outboundImport.validation.origin.required.label', 'Origin is required'),
-    }).required(),
-    destination: z.object({
-      id: z.string(),
-      label: z.string(),
-      name: z.string(),
-    }, {
-      invalid_type_error: translate('react.outboundImport.validation.destination.required.label', 'Destination is required'),
-      required_error: translate('react.outboundImport.validation.destination.required.label', 'Destination is required'),
-    }).required(),
-    requestedBy: z.object({
-      id: z.string(),
-      label: z.string(),
-      name: z.string(),
-    }, {
-      invalid_type_error: translate('react.outboundImport.validation.requestedBy.required.label', 'Requested by is required'),
-      required_error: translate('react.outboundImport.validation.requestedBy.required.label', 'Requested by is required'),
-    }).required(),
+    origin: originSchema,
+    destination: destinationSchema,
+    requestedBy: requestedBySchema,
     dateRequested: z.string({
       required_error: translate('react.outboundImport.validation.dateRequested.required.label', 'Date requested is required'),
       invalid_type_error: translate('react.outboundImport.validation.dateRequested.required.label', 'Date requested is required'),
@@ -76,6 +80,9 @@ const useOutboundImportValidation = () => {
 
   return {
     validationSchema,
+    destinationSchema,
+    originSchema,
+    requestedBySchema,
   };
 };
 

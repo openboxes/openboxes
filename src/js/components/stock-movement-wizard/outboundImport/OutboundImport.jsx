@@ -9,6 +9,7 @@ import OutboundImportDetails from 'components/stock-movement-wizard/outboundImpo
 import WizardStepsV2 from 'components/wizard/v2/WizardStepsV2';
 import OutboundImportStep from 'consts/OutboundImportStep';
 import useOutboundImportForm from 'hooks/outboundImport/useOutboundImportForm';
+import useOutboundImportValidation from 'hooks/outboundImport/useOutboundImportValidation';
 import useSessionStorage from 'hooks/useSessionStorage';
 import useTranslate from 'hooks/useTranslate';
 import useTranslation from 'hooks/useTranslation';
@@ -66,6 +67,12 @@ const OutboundImport = () => {
     trigger,
   } = useOutboundImportForm({ next });
 
+  const {
+    requestedBySchema,
+    originSchema,
+    destinationSchema,
+  } = useOutboundImportValidation();
+
   /** Redirect to first step if there is no cached data */
   useEffect(() => {
     if (_.isEmpty(cachedData) && !is(OutboundImportStep.DETAILS)) {
@@ -89,8 +96,14 @@ const OutboundImport = () => {
    * Related ticket OBPIH-6627 (Keep filled form progress when refreshing the page)
    */
   const handleConfirmSubmitForm = (submitMethod) => (event) => {
+    const values = getValues();
+    const requestedBy = requestedBySchema.parse(values.requestedBy);
+    const origin = originSchema.parse(values.origin);
+    const destination = destinationSchema.parse(values.destination);
     event.preventDefault();
-    submitMethod(getValues());
+    submitMethod({
+      ...values, requestedBy, origin, destination,
+    });
   };
 
   const redoImport = () => {
