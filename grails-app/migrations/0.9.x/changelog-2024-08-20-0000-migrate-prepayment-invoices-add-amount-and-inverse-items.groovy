@@ -69,7 +69,7 @@ databaseChangeLog = {
                     List<Order> orders = prepaymentInvoice.orders
                     if (!orders || orders.size() != 1) {
                         totalBadOrders++
-                        return
+                        continue
                     }
                     Order order = orders[0]
 
@@ -79,12 +79,12 @@ databaseChangeLog = {
                     List<Invoice> regularInvoices = order.invoices.findAll { it.isRegularInvoice }
                     if (!regularInvoices) {
                         totalOrdersNotYetFinalInvoiced++
-                        return
+                        continue
                     }
                     Invoice regularInvoice = regularInvoices[0]
                     if (regularInvoices.size() > 1 || regularInvoice.invoiceItems.any { it.inverse }) {
                         totalOrdersAlreadyMigrated++
-                        return
+                        continue
                     }
 
                     prepaymentInvoiceMigrationService.generateInverseInvoiceItems(prepaymentInvoice, regularInvoice)
