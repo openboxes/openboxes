@@ -42,4 +42,5 @@ FROM requisition AS r
      inventory_level AS il ON (il.inventory_id = origin.inventory_id
          AND il.product_id = product.id)
 WHERE ri.requisition_item_type = 'ORIGINAL'
-  AND r.status = 'ISSUED';
+  AND r.status = 'ISSUED'
+  AND r.type <> 'IMPORT';
