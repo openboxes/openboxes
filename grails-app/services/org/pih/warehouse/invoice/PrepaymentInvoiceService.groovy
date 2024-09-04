@@ -182,13 +182,7 @@ class PrepaymentInvoiceService {
             return null
         }
         InvoiceItem inverseItem = createFromShipmentItem(shipmentItem)
-        Integer quantity
-        if (orderItem.isCompletelyFulfilled() && orderItem.isFullyInvoiced()) {
-            // If quantity if fully shipped and fully invoiced set full inverse quantity
-            quantity = quantityInverseable
-        } else {
-            quantity = invoiceItem.quantity >= quantityInverseable ? quantityInverseable : invoiceItem.quantity
-        }
+        Integer quantity = getQuantityToInverse(orderItem, invoiceItem.quantity, quantityInverseable)
         inverseItem.quantity = quantity
         inverseItem.inverse = true
         inverseItem.unitPrice = prepaymentItem.unitPrice
@@ -336,7 +330,7 @@ class PrepaymentInvoiceService {
             // find quantity that is still available to inverse and add to the current quantity from this inverse item
             // this needs to be checked because we can also increase invoiced quantity here
             Integer quantityAvailableToInverse = inverseItem.quantity + getQuantityAvailableToInverse(orderItem, prepaymentItem)
-            Integer quantityToInverse = quantity > quantityAvailableToInverse ? quantityAvailableToInverse : quantity
+            Integer quantityToInverse = getQuantityToInverse(orderItem, quantity, quantityAvailableToInverse)
             inverseItem.quantity = quantityToInverse
             inverseItem.amount = quantityToInverse * prepaymentItem.unitPrice * orderItem.order.prepaymentPercent * (-1)
             return
@@ -348,5 +342,14 @@ class PrepaymentInvoiceService {
         if (inverseItem) {
             invoiceItem.invoice.addToInvoiceItems(inverseItem)
         }
+    }
+
+    Integer getQuantityToInverse(OrderItem orderItem, Integer quantityInvoiced, Integer quantityInverseable) {
+        if (orderItem.isCompletelyFulfilled() && orderItem.isFullyInvoiced()) {
+            // If quantity if fully shipped and fully invoiced set full inverse quantity
+            return quantityInverseable
+        }
+
+        return quantityInvoiced >= quantityInverseable ? quantityInverseable : quantityInvoiced
     }
 }
