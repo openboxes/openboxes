@@ -11,12 +11,12 @@ class PackingListController {
 
     UploadService uploadService
 
-    def importPackingList(ImportDataCommand command) {
+    def upload(ImportDataCommand command) {
         MultipartFile importFile = command.importFile
         File localFile = uploadService.createLocalFile(importFile.originalFilename)
         importFile.transferTo(localFile)
         DataImporter packingListImporter = new PackingListExcelImporter(localFile.absolutePath)
 
-        render([data: packingListImporter.toJson() ] as JSON)
+        render([data: packingListImporter.data] as JSON)
     }
 }
