@@ -2,7 +2,6 @@ package unit.org.pih.warehouse.invoice
 
 import grails.testing.gorm.DataTest
 import grails.testing.services.ServiceUnitTest
-import java.util.stream.Collectors
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -118,10 +117,10 @@ class PrepaymentInvoiceServiceSpec extends Specification implements ServiceUnitT
         then:
         assert invoice.invoiceType.code == InvoiceTypeCode.PREPAYMENT_INVOICE
 
-        List<InvoiceItem> adjustmentInvoiceItems = getInvoiceItemsOnAdjustments(invoice)
+        Set<InvoiceItem> adjustmentInvoiceItems = getInvoiceItemsOnAdjustments(invoice)
         assert adjustmentInvoiceItems.size() == 0
 
-        List<InvoiceItem> orderInvoiceItems = getInvoiceItemsOnOrderItems(invoice)
+        Set<InvoiceItem> orderInvoiceItems = getInvoiceItemsOnOrderItems(invoice)
         assert orderInvoiceItems.size() == 1
 
         InvoiceItem invoiceItem = orderInvoiceItems[0]
@@ -217,10 +216,10 @@ class PrepaymentInvoiceServiceSpec extends Specification implements ServiceUnitT
         then:
         assert invoice.invoiceType.code == InvoiceTypeCode.PREPAYMENT_INVOICE
 
-        List<InvoiceItem> orderInvoiceItems = getInvoiceItemsOnOrderItems(invoice)
+        Set<InvoiceItem> orderInvoiceItems = getInvoiceItemsOnOrderItems(invoice)
         assert orderInvoiceItems.size() == 0
 
-        List<InvoiceItem> adjustmentInvoiceItems = getInvoiceItemsOnAdjustments(invoice)
+        Set<InvoiceItem> adjustmentInvoiceItems = getInvoiceItemsOnAdjustments(invoice)
         assert adjustmentInvoiceItems.size() == 1
 
         InvoiceItem invoiceItem = adjustmentInvoiceItems[0]
@@ -289,11 +288,11 @@ class PrepaymentInvoiceServiceSpec extends Specification implements ServiceUnitT
         assert invoice.invoiceType.code == InvoiceTypeCode.PREPAYMENT_INVOICE
         assert invoice.invoiceItems.size() == 2
 
-        List<InvoiceItem> orderItemInvoiceItems = getInvoiceItemsOnOrderItems(invoice)
+        Set<InvoiceItem> orderItemInvoiceItems = getInvoiceItemsOnOrderItems(invoice)
         assert orderItemInvoiceItems.size() == 1
         // This test is for adjustment invoice items so don't bother with more order item asserts.
 
-        List<InvoiceItem> adjustmentInvoiceItems = getInvoiceItemsOnAdjustments(invoice)
+        Set<InvoiceItem> adjustmentInvoiceItems = getInvoiceItemsOnAdjustments(invoice)
         assert adjustmentInvoiceItems.size() == 1
 
         InvoiceItem invoiceItem = adjustmentInvoiceItems[0]
@@ -348,15 +347,11 @@ class PrepaymentInvoiceServiceSpec extends Specification implements ServiceUnitT
         thrown(Exception)
     }
 
-    private List<InvoiceItem> getInvoiceItemsOnOrderItems(Invoice invoice) {
-        return invoice.invoiceItems.stream()
-                .filter {ii -> ii.orderItems != null && !ii.orderItems.isEmpty()}
-                .collect(Collectors.toList())
+    private Set<InvoiceItem> getInvoiceItemsOnOrderItems(Invoice invoice) {
+        return invoice.invoiceItems.findAll{ it.orderItems }
     }
 
-    private List<InvoiceItem> getInvoiceItemsOnAdjustments(Invoice invoice) {
-        return invoice.invoiceItems.stream()
-                .filter {ii -> ii.orderAdjustments != null && !ii.orderAdjustments.isEmpty()}
-                .collect(Collectors.toList())
+    private Set<InvoiceItem> getInvoiceItemsOnAdjustments(Invoice invoice) {
+        return invoice.invoiceItems.findAll{ it.orderAdjustments }
     }
 }
