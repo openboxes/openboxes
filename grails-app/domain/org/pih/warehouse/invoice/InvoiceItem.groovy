@@ -110,7 +110,7 @@ class InvoiceItem implements Serializable {
         quantityPerUom(nullable: false)
         amount(nullable: true)
         unitPrice(nullable: true)
-        inverse(nullable: true)
+        inverse(nullable: false)
 
         updatedBy(nullable: true)
         createdBy(nullable: true)
@@ -190,6 +190,39 @@ class InvoiceItem implements Serializable {
 
     Integer getQuantityAvailableToInvoice() {
         return shipmentItem ? (shipmentItem.quantityToInvoiceInStandardUom / quantityPerUom) + quantity : null
+    }
+  
+    InvoiceItem clone() {
+        InvoiceItem clone = new InvoiceItem(
+                invoice: invoice,
+                product: product,
+                glAccount: glAccount,
+                budgetCode: budgetCode,
+                quantity: quantity,
+                quantityUom: quantityUom,
+                quantityPerUom: quantityPerUom,
+                amount: amount,
+                unitPrice: unitPrice,
+                inverse: inverse,
+        )
+
+        // A cloned invoice item retains all the same shipment items, and order items and adjustments as the original
+        // invoice. We also make sure to update the other side of the relationship to include the newly cloned invoice
+        // item since the relationship is bidirectional.
+        for (ShipmentItem shipmentItem : shipmentItems) {
+            clone.addToShipmentItems(shipmentItem)
+            shipmentItem.addToInvoiceItems(clone)
+        }
+        for (OrderItem orderItem : orderItems) {
+            clone.addToOrderItems(orderItem)
+            orderItem.addToInvoiceItems(clone)
+        }
+        for (OrderAdjustment orderAdjustment : orderAdjustments) {
+            clone.addToOrderAdjustments(orderAdjustment)
+            orderAdjustment.addToInvoiceItems(clone)
+        }
+
+        return clone
     }
 
     Map toJson() {
