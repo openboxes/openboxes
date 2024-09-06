@@ -10,7 +10,6 @@
 package util
 
 import groovy.text.SimpleTemplateEngine
-import org.pih.warehouse.core.Constants
 
 import java.text.DateFormat
 import java.text.MessageFormat
@@ -52,10 +51,4 @@ class StringUtil {
         }
         return null
     }
-
-    static String removeWhiteSpace(String s) {
-        return s.replace(Constants.SPACE_SEPARATOR, "")
-    }
-
-
 }

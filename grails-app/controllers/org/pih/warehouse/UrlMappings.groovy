@@ -868,7 +868,7 @@ class UrlMappings {
 
         "/api/fulfillments" {
             controller = { "fulfillmentApi" }
-            action = [POST: "createOutbound"]
+            action = [POST: "save"]
         }
 
         "/api/fulfillments/validate" {
