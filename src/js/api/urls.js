@@ -153,5 +153,5 @@ export const PICKLIST_CLEAR = id => `${PICKLIST_API}/${id}/items`;
 // FULL OUTBOUND IMPORT FEATURE
 export const FULFILLMENT_API = `${API}/fulfillments`;
 export const PACKING_LIST = `${CONTEXT_PATH}/packingList`;
-export const IMPORT_PACKING_LIST = `${PACKING_LIST}/importPackingList`;
+export const IMPORT_PACKING_LIST = `${PACKING_LIST}/upload`;
 export const FULFILLMENT_VALIDATION = `${FULFILLMENT_API}/validate`;

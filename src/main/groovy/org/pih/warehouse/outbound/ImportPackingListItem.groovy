@@ -63,7 +63,7 @@ class ImportPackingListItem implements Validateable {
     Integer quantityPicked
 
     @BindUsing({ obj, source ->
-        Person person = Person.findPersonByNameOrEmail(source['recipient'])
+        Person person = Person.findByNameOrEmail(source['recipient'])
         if (!person && source['recipient']) {
             // We want to indicate if a recipient was not found, but the search term was given
             obj.recipientFound = false

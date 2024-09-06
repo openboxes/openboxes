@@ -67,18 +67,4 @@ class PackingListExcelImporter extends AbstractExcelImporter implements DataImpo
     void importData(ImportDataCommand command) {
         throw new UnsupportedOperationException("This operation is not supported")
     }
-
-
-    List<Map> toJson() {
-        return data.collect { [
-                palletName: it?.palletName,
-                boxName: it?.boxName,
-                productCode: it?.productCode,
-                lotNumber: it?.lotNumber,
-                expirationDate: it?.expirationDate,
-                binLocation: it?.binLocation,
-                quantityPicked: it?.quantityPicked,
-                recipient: it?.recipient
-        ] }
-    }
 }

@@ -64,13 +64,13 @@ class Person implements Comparable, Serializable {
         return "$firstName ${anonymize ? lastInitial : lastName}"
     }
 
-    static Person findPersonByNameOrEmail(String regex) {
-        String[] searchTerm = regex?.split(Constants.SPACE_SEPARATOR)
+    static Person findByNameOrEmail(String searchTerm) {
+        String[] searchTerms = searchTerm?.split(Constants.SPACE_SEPARATOR)
         // If search term contains two words, try to search by first name or last name first
-        if (searchTerm?.length == 2) {
+        if (searchTerms?.length == 2) {
             return findByFirstNameAndLastName(searchTerm[0], searchTerm[1])
         }
-        if (searchTerm?.length == 1) {
+        if (searchTerms?.length == 1) {
             return findByEmail(searchTerm[0])
         }
         return null

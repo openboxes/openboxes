@@ -12,6 +12,7 @@ package org.pih.warehouse.fulfillment
 import grails.gorm.transactions.Transactional
 import grails.util.Holders
 import grails.validation.ValidationException
+import org.apache.commons.lang3.StringUtils
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Constants
@@ -107,7 +108,7 @@ class FulfillmentService {
         return command
     }
 
-    StockMovement createOutbound(ImportPackingListCommand command) {
+    StockMovement save(ImportPackingListCommand command) {
         // First create a requisition
         Requisition requisition = createRequisition(command.fulfillmentDetails)
         // Having a requisition we can create a shipment
@@ -143,7 +144,7 @@ class FulfillmentService {
         if (description) {
             name.append("${separator}${description}")
         }
-        return StringUtil.removeWhiteSpace(name.toString())
+        return StringUtils.deleteWhitespace(name.toString())
     }
 
     Requisition createRequisition(FulfillmentRequest fulfillmentRequest) {
