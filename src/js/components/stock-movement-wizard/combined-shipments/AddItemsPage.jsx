@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-import arrayMutators from 'final-form-arrays';
+import arrayMutators, { push } from 'final-form-arrays';
 import update from 'immutability-helper';
 import fileDownload from 'js-file-download';
 import _ from 'lodash';
@@ -71,7 +71,6 @@ const FIELDS = {
     type: ArrayField,
     arrowsNavigation: true,
     virtualized: true,
-    totalCount: ({ totalCount }) => totalCount,
     isRowLoaded: ({ isRowLoaded }) => isRowLoaded,
     loadMoreRows: ({ loadMoreRows }) => loadMoreRows(),
     isFirstPageLoaded: ({ isFirstPageLoaded }) => isFirstPageLoaded,
@@ -275,6 +274,7 @@ class AddItemsPage extends Component {
     super(props);
     this.state = {
       values: { ...this.props.initialValues, lineItems: [] },
+      rowsChanged: 0,
       totalCount: 0,
       isFirstPageLoaded: false,
       showAlert: false,
@@ -350,7 +350,12 @@ class AddItemsPage extends Component {
     }));
   }
 
-  setLineItems(response, startIndex) {
+  setLineItems({
+    response,
+    startIndex,
+    fetchedLineItems,
+    append,
+  }) {
     const { data } = response.data;
     const lineItemsData = _.map(
       data,
@@ -361,23 +366,24 @@ class AddItemsPage extends Component {
       }),
     );
 
-    this.setState({
-      values: {
-        ...this.state.values,
-        lineItems: this.props.isPaginated && !_.isNull(startIndex) ?
-          _.uniqBy(_.concat(this.state.values.lineItems, lineItemsData), 'id') : lineItemsData,
-      },
-    }, () => {
-      if (!_.isNull(startIndex) && this.state.values.lineItems.length !== this.state.totalCount) {
-        this.loadMoreRows({ startIndex: startIndex + this.props.pageSize });
-      }
-      this.props.hideSpinner();
+    append?.('lineItems', lineItemsData);
+
+    if (data.length < 10) {
+      return;
+    }
+
+    this.loadMoreRows(append)({
+      startIndex: startIndex + this.props.pageSize,
+      fetchedLineItems: fetchedLineItems + lineItemsData.length,
     });
+
+    this.props.hideSpinner();
   }
 
   updateTotalCount(value) {
     this.setState({
       totalCount: this.state.totalCount + value,
+      rowsChanged: this.state.rowsChanged + value,
     });
   }
 
@@ -559,7 +565,10 @@ class AddItemsPage extends Component {
     return apiClient.get(url)
       .then((response) => {
         this.setState({ totalCount: response.data.data.length });
-        this.setLineItems(response, null);
+        this.setLineItems({
+          response,
+          startIndex: null,
+        });
       })
       .catch(err => err);
   }
@@ -593,14 +602,19 @@ class AddItemsPage extends Component {
     return !!this.state.values.lineItems[index];
   }
 
-  loadMoreRows({ startIndex }) {
+  loadMoreRows = (append) => ({ startIndex, fetchedLineItems }) => {
     this.setState({
       isFirstPageLoaded: true,
     });
     const url = `${STOCK_MOVEMENT_ITEMS(this.state.values.stockMovementId)}?offset=${startIndex}&max=${this.props.pageSize}&stepNumber=2`;
     apiClient.get(url)
       .then((response) => {
-        this.setLineItems(response, startIndex);
+        this.setLineItems({
+          response,
+          startIndex,
+          fetchedLineItems: fetchedLineItems ?? 0,
+          append,
+        });
       });
   }
 
@@ -1045,9 +1059,14 @@ class AddItemsPage extends Component {
       <Form
         onSubmit={() => {}}
         validate={this.validate}
-        mutators={{ ...arrayMutators }}
+        mutators={{
+          ...arrayMutators,
+          append: ([field, value], state, { changeValue }) => {
+            changeValue(state, field, () => [...state.formState.values[field], ...value]);
+          },
+        }}
         initialValues={this.state.values}
-        render={({ handleSubmit, values, invalid }) => (
+        render={({ form, handleSubmit, values, invalid }) => (
           <div className="d-flex flex-column">
             <AlertMessage show={showAlert} message={alertMessage} danger />
             <span className="buttons-container">
@@ -1135,7 +1154,7 @@ class AddItemsPage extends Component {
                     recipients: this.props.recipients,
                     debouncedProductsFetch: this.debouncedProductsFetch,
                     totalCount: this.state.totalCount,
-                    loadMoreRows: this.loadMoreRows,
+                    loadMoreRows: this.loadMoreRows(form.mutators.append),
                     isRowLoaded: this.isRowLoaded,
                     updateTotalCount: this.updateTotalCount,
                     isPaginated: this.props.isPaginated,
