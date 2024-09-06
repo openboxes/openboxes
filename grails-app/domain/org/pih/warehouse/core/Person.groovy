@@ -68,10 +68,10 @@ class Person implements Comparable, Serializable {
         String[] searchTerms = searchTerm?.split(Constants.SPACE_SEPARATOR)
         // If search term contains two words, try to search by first name or last name first
         if (searchTerms?.length == 2) {
-            return findByFirstNameAndLastName(searchTerm[0], searchTerm[1])
+            return findByFirstNameAndLastName(searchTerms[0], searchTerms[1])
         }
         if (searchTerms?.length == 1) {
-            return findByEmail(searchTerm[0])
+            return findByEmail(searchTerms[0])
         }
         return null
     }
