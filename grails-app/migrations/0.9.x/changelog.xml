@@ -14,4 +14,6 @@
     <include file="0.9.x/changelog-2024-05-08-1110-rename-picker-to-pickedBy-column.groovy" />
     <include file="0.9.x/changelog-2024-06-27-1200-add-auto-allocated-column-to-requisition-item.groovy" />
     <include file="0.9.x/changelog-2024-08-19-1100-add-inverse-to-invoice-item.xml" />
+    <include file="0.9.x/changelog-2024-08-19-1200-alter-table-invoice-item-set-invoice-non-null.xml" />
+    <include file="0.9.x/changelog-2024-08-20-0000-migrate-prepayment-invoices-add-amount-and-inverse-items.groovy" />
 </databaseChangeLog>
