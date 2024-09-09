@@ -4,7 +4,6 @@ import grails.gorm.transactions.Transactional
 
 import org.pih.warehouse.order.OrderAdjustment
 import org.pih.warehouse.order.OrderItem
-import org.pih.warehouse.order.OrderItemStatusCode
 
 /**
  * This service exists for the sole purpose of performing data migrations for changelog 0.9.x/2024-08-20-0000.
@@ -18,16 +17,21 @@ class PrepaymentInvoiceMigrationService {
      *
      * Set the amount field for all prepayment invoice items that existed before the partial invoicing
      * feature was introduced.
+     *
+     * We don't need to check for canceled items or adjustment during this step because anything that was canceled
+     * before the prepayment invoice was created wouldn't be included in the prepayment invoice in the first place.
      */
     void updateAmountForPrepaymentInvoiceItems() {
         InvoiceType prepaymentInvoiceType = InvoiceType.findByCode(InvoiceTypeCode.PREPAYMENT_INVOICE)
         List<Invoice> prepaymentInvoices = Invoice.findAllByInvoiceType(prepaymentInvoiceType)
         for (Invoice prepaymentInvoice : prepaymentInvoices) {
-            // The amount field will be null for all pre-existing invoices since the field was not being used.
             for (InvoiceItem prepaymentInvoiceItem : prepaymentInvoice.invoiceItems) {
+                // The amount field will only be null for pre-existing, non-inversed invoices since the field was
+                // not being used before the partial invoicing feature was introduced.
                 if (prepaymentInvoiceItem.amount != null) {
                     continue
                 }
+
                 prepaymentInvoiceItem.amount = computePrepaymentInvoiceItemAmount(prepaymentInvoiceItem)
                 prepaymentInvoiceItem.save(failOnError: true)
             }
@@ -57,6 +61,9 @@ class PrepaymentInvoiceMigrationService {
      * This method assumes that because there is both a prepayment invoice and a final invoice, that the order
      * associated with both invoices has been fully invoiced, and so there's no need to check each item of the
      * prepayment invoice individually, they should ALL need to have inverse items created for them.
+     *
+     * Additionally, we don't need to check for canceled items or adjustments since the inverse is based entirely
+     * off the prepayment line. Even if the items are canceled, we still need to inverse the full prepaid amount.
      */
     Invoice generateInverseInvoiceItems(Invoice prepaymentInvoice, Invoice finalInvoice) {
         for (InvoiceItem prepaymentInvoiceItem : prepaymentInvoice.invoiceItems) {
