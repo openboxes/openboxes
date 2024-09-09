@@ -587,6 +587,8 @@ class AddItemsPage extends Component {
 
   isRowLoaded = (values) => ({ index }) => !!values.lineItems[index]
 
+  // At this moment we are fetching the whole stock movement at once (it already includes stock movement items)
+  // So this function is not used at this moment, but can be helpful in case of future improvements
   loadMoreRows = (append) => ({ startIndex, fetchedLineItems }) => {
     this.setState({
       isFirstPageLoaded: true,
