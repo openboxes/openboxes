@@ -40,16 +40,11 @@ class PrepaymentInvoiceMigrationService {
         // If the invoice item is for an adjustment.
         OrderAdjustment orderAdjustment = prepaymentInvoiceItem.orderAdjustment
         if (orderAdjustment) {
-            return (orderAdjustment?.canceled ? 0 : orderAdjustment.totalAdjustments) * prepaymentPercent
+            return orderAdjustment.totalAdjustments * prepaymentPercent
         }
 
-        // Else if the invoice item is for a canceled order item.
+        // Else the invoice item is for an order item.
         OrderItem orderItem = prepaymentInvoiceItem.orderItem
-        if (orderItem.orderItemStatusCode == OrderItemStatusCode.CANCELED) {
-            return 0
-        }
-
-        // Else the invoice item is for a non-canceled order item.
         return (orderItem.quantity ?: 0) * (orderItem.unitPrice ?: 0.0) * prepaymentPercent
     }
 
