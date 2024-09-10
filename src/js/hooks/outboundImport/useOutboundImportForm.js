@@ -267,8 +267,16 @@ const useOutboundImportForm = ({ next }) => {
     }
   };
 
+  const handleLoadCachedData = () => {
+    if (OutboundImportStep.CONFIRM === queryParams?.step) {
+      loadCachedData();
+      return;
+    }
+    clearCachedData();
+  };
+
   useEffect(() => {
-    loadCachedData();
+    handleLoadCachedData();
 
     if (currentLocation) {
       setValue('origin', {
