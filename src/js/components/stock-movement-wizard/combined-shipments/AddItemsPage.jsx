@@ -338,7 +338,6 @@ class AddItemsPage extends Component {
   setLineItems({
     response,
     startIndex,
-    fetchedLineItems,
     append,
   }) {
     const { data } = response.data;
@@ -360,7 +359,6 @@ class AddItemsPage extends Component {
 
     this.loadMoreRows(append)({
       startIndex: startIndex + this.props.pageSize,
-      fetchedLineItems: fetchedLineItems + lineItemsData.length,
     });
 
     this.props.hideSpinner();
@@ -589,7 +587,7 @@ class AddItemsPage extends Component {
 
   // At this moment we are fetching the whole stock movement at once (it already includes stock movement items)
   // So this function is not used at this moment, but can be helpful in case of future improvements
-  loadMoreRows = (append) => ({ startIndex, fetchedLineItems }) => {
+  loadMoreRows = (append) => ({ startIndex }) => {
     this.setState({
       isFirstPageLoaded: true,
     });
@@ -599,7 +597,6 @@ class AddItemsPage extends Component {
         this.setLineItems({
           response,
           startIndex,
-          fetchedLineItems: fetchedLineItems ?? 0,
           append,
         });
       });
