@@ -116,16 +116,16 @@ class ImportPackingListItem implements Validateable {
             }
         })
         quantityPicked(min: 1, validator: { Integer quantityPicked, ImportPackingListItem item ->
-            if (!item.binLocationFound) {
-                return ['binLocationNotFound', item.binLocation?.name]
-            }
-            ProductAvailabilityService productAvailabilityService = Holders.grailsApplication.mainContext.getBean(ProductAvailabilityService)
             InventoryItem inventoryItem = item.product?.getInventoryItem(item.lotNumber)
             if (!inventoryItem) {
                 return ['inventoryItemNotFound']
             }
             // Associate inventory item's expiration date with expirationDateToDisplay, to display the date in the table
             item.expirationDateToDisplay = inventoryItem.expirationDate
+            if (!item.binLocationFound) {
+                return ['binLocationNotFound', item.binLocation?.name]
+            }
+            ProductAvailabilityService productAvailabilityService = Holders.grailsApplication.mainContext.getBean(ProductAvailabilityService)
             Integer quantity = productAvailabilityService.getQuantityAvailableToPromiseForProductInBin(item.origin, item.binLocation, inventoryItem)
             if (quantity <= 0) {
                 return ['stockout']
