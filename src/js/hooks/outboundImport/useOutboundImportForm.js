@@ -67,8 +67,6 @@ const useOutboundImportForm = ({ next }) => {
         values.trackingNumber = sendingOptions?.trackingNumber;
         values.comments = sendingOptions?.comments;
         values.expectedDeliveryDate = sendingOptions?.expectedDeliveryDate;
-      } else {
-        clearCachedData();
       }
     }
 
