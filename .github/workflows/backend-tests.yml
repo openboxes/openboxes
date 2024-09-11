@@ -27,9 +27,22 @@ jobs:
           distribution: zulu
           cache: gradle
 
-      # Run all tests against each of the above defined databases. We could split this out and have the matrix run
-      # against a separate job that only runs database slice tests so that the rest of the tests run faster, but that
-      # complicates our flows and makes things like test coverage reporting more difficult. Because of this, we simply
-      # run all the tests together. In the future, if tests are taking too long to run, we can re-evaluate.
-      - name: Run All Tests
+      # Run all tests against each of the databases defined in the above matrix. We could split the integration
+      # tests into a separate job and run the matrix only on that job (because unit tests don't care about the
+      # underlying database and so running them against multiple databases is pointless), but matrix jobs are run
+      # in parallel so it wouldn't save us any running time to do that. Plus it would overcomplicate the flow.
+      - name: Run All Tests    
+        if: ${{ strategy.job-index != 0 }}
         run: TEST_DATABASE=${{ matrix.testdatabase }} ./grailsw test-app --non-interactive --no-daemon
+
+      # Tests are run for each database in the above matrix but we only want to generate a code coverage report once.
+      # "strategy.job-index" gives us the index of the current job in the matrix. Any index is fine. We use the first.
+      - name: Run All Tests With Coverage
+        if: ${{ strategy.job-index == 0 }}
+        run: TEST_DATABASE=${{ matrix.testdatabase }} ./grailsw test-app -coverage -xml --non-interactive --no-daemon
+
+      - name: Upload results to Codecov
+        if: ${{ strategy.job-index == 0 }}
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
