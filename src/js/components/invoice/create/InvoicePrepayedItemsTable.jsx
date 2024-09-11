@@ -66,19 +66,6 @@ const INVOICE_ITEMS = {
         defaultMessage: '',
         flexWidth: '0.25',
       },
-      orderNumber: {
-        type: LabelField,
-        label: 'react.invoice.orderNumber.label',
-        defaultMessage: 'PO Number',
-        flexWidth: '1',
-        getDynamicAttr: (params) => {
-          const { invoiceItems, rowIndex } = params;
-          const orderId = invoiceItems
-            && invoiceItems[rowIndex]
-            && invoiceItems[rowIndex].orderId;
-          return { url: orderId ? ORDER_URL.show(orderId) : '' };
-        },
-      },
       shipmentNumber: {
         type: LabelField,
         label: 'react.invoice.shipmentNumber.label',
