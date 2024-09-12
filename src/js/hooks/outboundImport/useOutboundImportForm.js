@@ -67,8 +67,6 @@ const useOutboundImportForm = ({ next }) => {
         values.trackingNumber = sendingOptions?.trackingNumber;
         values.comments = sendingOptions?.comments;
         values.expectedDeliveryDate = sendingOptions?.expectedDeliveryDate;
-      } else {
-        clearCachedData();
       }
     }
 
@@ -267,8 +265,16 @@ const useOutboundImportForm = ({ next }) => {
     }
   };
 
+  const handleLoadCachedData = () => {
+    if (OutboundImportStep.CONFIRM === queryParams?.step) {
+      loadCachedData();
+      return;
+    }
+    clearCachedData();
+  };
+
   useEffect(() => {
-    loadCachedData();
+    handleLoadCachedData();
 
     if (currentLocation) {
       setValue('origin', {
