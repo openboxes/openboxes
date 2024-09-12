@@ -293,8 +293,8 @@ class PrepaymentInvoiceMigrationServiceSpec extends Specification implements Ser
         assert InvoiceItem.findById(invoiceItemId).amount == 1
     }
 
-    void 'generateInverseInvoiceItems successfully creates inverse items for prepayment items'() {
-        given:
+    void 'migrateFinalInvoice successfully creates inverse items for prepayment items'() {
+        given: 'an existing prepayment invoice with an associated final invoice'
         Invoice prepaymentInvoice = new Invoice(
                 invoiceType: prepaymentInvoiceType,
                 invoiceItems: [
@@ -309,16 +309,18 @@ class PrepaymentInvoiceMigrationServiceSpec extends Specification implements Ser
         // when generating the inverse items so there's no point defining them.
         Invoice finalInvoice = new Invoice(
                 invoiceNumber: "1",
-        )
+        ).save(validate: false)
 
         when:
-        Invoice finalInvoiceAfterSave = service.generateInverseInvoiceItems(prepaymentInvoice, finalInvoice)
+        Invoice finalInvoiceAfterSave = service.migrateFinalInvoice(prepaymentInvoice, finalInvoice)
 
-        then:
+        then: 'the inverse item should be created'
         assert finalInvoiceAfterSave.invoiceItems.size() == 1
 
         InvoiceItem inverseItem = finalInvoiceAfterSave.invoiceItems.find { it.inverse }
         assert inverseItem != null
+
+        and: 'the amount field should be set for the inverse item'
         assert inverseItem.amount == expectedInverseAmount
 
         where:
@@ -326,5 +328,55 @@ class PrepaymentInvoiceMigrationServiceSpec extends Specification implements Ser
         0                || 0
         1                || -1
         10.46            || -10.46
+    }
+
+    void 'migrateFinalInvoice successfully sets amount for final invoice items'() {
+        given: 'an existing prepayment invoice with an associated final invoice'
+        Invoice prepaymentInvoice = new Invoice(
+                invoiceType: prepaymentInvoiceType,
+                invoiceItems: [
+                        new InvoiceItem(
+                                quantity: 0,  // Value not used, just needs to be non-null
+                                amount: 100,
+                        ),
+                ],
+        ).save(validate: false)
+
+        // We don't bother including the order item in the regular invoice here because it's not used when
+        // computing the amount field.
+        Invoice finalInvoice = new Invoice(
+                invoiceNumber: "1",
+                invoiceType: regularInvoiceType,
+                invoiceItems: [
+                        new InvoiceItem(
+                                quantity: invoiceQuantity,
+                                unitPrice: invoiceUnitPrice,
+                        ),
+                ],
+        ).save(validate: false)
+
+        when:
+        Invoice finalInvoiceAfterSave = service.migrateFinalInvoice(prepaymentInvoice, finalInvoice)
+
+        then: 'the inverse item should be created alongside the regular invoice item'
+        assert finalInvoiceAfterSave.invoiceItems.size() == 2
+
+        and: 'the amount field should be set for the regular invoice item'
+        InvoiceItem invoiceItem = finalInvoiceAfterSave.invoiceItems.find { !it.inverse }
+        assert invoiceItem != null
+        assert invoiceItem.amount == expectedInvoiceAmount
+
+        where:
+        invoiceQuantity | invoiceUnitPrice || expectedInvoiceAmount
+        null            | null             || 0
+        null            | 1.0              || 0
+        0               | 1.0              || 0
+        1               | 0                || 0
+        1               | null             || 0
+        1               | 1.0              || 1
+        2               | 1.0              || 2
+        1               | 2.2              || 2.2
+        2               | 2.2              || 4.4
+        5               | 0.5              || 2.5
     }
 }

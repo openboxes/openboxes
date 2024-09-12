@@ -55,8 +55,8 @@ class PrepaymentInvoiceMigrationService {
     /**
      * For STEP 2 of the migration.
      *
-     * For every item in a given prepayment invoice, computes the inverse invoice item and insert it to the database
-     * by adding it to the given final invoice.
+     * For every item in a given prepayment invoice, set the amount field and add an inverse invoice item to the
+     * final invoice of the order.
      *
      * This method assumes that because there is both a prepayment invoice and a final invoice, that the order
      * associated with both invoices has been fully invoiced, and so there's no need to check each item of the
@@ -65,12 +65,29 @@ class PrepaymentInvoiceMigrationService {
      * Additionally, we don't need to check for canceled items or adjustments since the inverse is based entirely
      * off the prepayment line. Even if the items are canceled, we still need to inverse the full prepaid amount.
      */
-    Invoice generateInverseInvoiceItems(Invoice prepaymentInvoice, Invoice finalInvoice) {
+    Invoice migrateFinalInvoice(Invoice prepaymentInvoice, Invoice finalInvoice) {
+        // STEP 2.1 - set amount
+        setAmountForFinalInvoiceItems(finalInvoice)
+
+        // STEP 2.2 - create inverse items
         for (InvoiceItem prepaymentInvoiceItem : prepaymentInvoice.invoiceItems) {
             InvoiceItem inverseItem = createInverseInvoiceItem(prepaymentInvoiceItem)
             finalInvoice.addToInvoiceItems(inverseItem)
         }
+
         return finalInvoice.save(failOnError: true)
+    }
+
+    private void setAmountForFinalInvoiceItems(Invoice finalInvoice) {
+        for (InvoiceItem finalInvoiceItem : finalInvoice.invoiceItems) {
+            // We shouldn't hit this scenario because inverse items won't be generated yet but check just in case.
+            if (finalInvoiceItem.inverse) {
+                continue
+            }
+            // We don't need to explicitly check for canceled items or adjustments because for those, the quantity
+            // or unit price are already set to 0 (or null in some rare cases).
+            finalInvoiceItem.amount = (finalInvoiceItem.quantity ?: 0) * (finalInvoiceItem.unitPrice ?: 0.0)
+        }
     }
 
     private InvoiceItem createInverseInvoiceItem(InvoiceItem prepaymentInvoiceItem) {
