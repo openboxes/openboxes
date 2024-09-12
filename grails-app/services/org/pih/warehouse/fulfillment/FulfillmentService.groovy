@@ -332,7 +332,7 @@ class FulfillmentService {
         Event shippedEvent = new Event(
                 createdBy: AuthService.currentUser,
                 eventType: eventType,
-                eventDate: new Date(),
+                eventDate: shipment.expectedShippingDate,
                 eventLocation: AuthService.currentLocation,
         )
         if (!shippedEvent.validate()) {
