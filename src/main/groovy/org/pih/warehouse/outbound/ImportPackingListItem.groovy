@@ -58,7 +58,7 @@ class ImportPackingListItem implements Validateable {
         }
 
         Product product = Product.findByProductCode(source['product'])
-        List<ProductAvailability> items = ProductAvailability.findAllByProductAndLotNumber(product, source['lotNumber'])
+        List<ProductAvailability> items = ProductAvailability.findAllByProductAndLotNumberAndLocation(product, source['lotNumber'], obj.origin)
 
         // infer bin location only if there is a single possible inventory
         if (items.size() == 1) {
