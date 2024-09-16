@@ -56,6 +56,15 @@ class ImportPackingListItem implements Validateable {
             // returns a dummy location object to add more context in a response of what location was not found
             return new Location(name: source['binLocation'])
         }
+
+        Product product = Product.findByProductCode(source['product'])
+        List<ProductAvailability> items = ProductAvailability.findAllByProductAndLotNumberAndLocation(product, source['lotNumber'], obj.origin)
+
+        // infer bin location only if there is a single possible inventory
+        if (items.size() == 1) {
+            return items.first().binLocation
+        }
+
         return internalLocation
      })
     Location binLocation
