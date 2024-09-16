@@ -364,7 +364,7 @@ class PrepaymentInvoiceServiceSpec extends Specification implements ServiceUnitT
         0.0              | -1.0               | 0.0
     }
 
-    void 'getAmountAvailableToInverse should calculate amount available to inverse #availableToInverse when amount on prepayment item is #preapymentItemAmount and '() {
+    void 'getAmountAvailableToInverse should calculate amount available to inverse #availableToInverse when amount on prepayment item is #preapymentItemAmount and inversed amount is #inversedAmount'() {
         given:
         InvoiceItem prepaymentItem = new InvoiceItem()
         prepaymentItem.amount = preapymentItemAmount

@@ -23,13 +23,7 @@ class PrepaymentInvoiceItemApiController {
 
     def update() {
         JSONObject jsonObject = request.JSON
-        Integer quantity = jsonObject.get('quantity', null)
-        if (quantity != null) {
-            prepaymentInvoiceService.updateInvoiceItemQuantity(params.id, quantity)
-        } else {
-            BigDecimal unitPrice = jsonObject.get('unitPrice')
-            prepaymentInvoiceService.updateInvoiceItemUnitPrice(params.id, unitPrice)
-        }
+        prepaymentInvoiceService.updateInvoiceItem(params.id, jsonObject)
         render status: 200
     }
 }

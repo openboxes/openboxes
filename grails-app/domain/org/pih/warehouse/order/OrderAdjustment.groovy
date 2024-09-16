@@ -115,7 +115,7 @@ class OrderAdjustment implements Serializable, Comparable<OrderAdjustment> {
      * Overall invoiced amount for this adjustment. Can be positive, negative or 0.
      * */
     BigDecimal getInvoicedAmount() {
-        return invoiceItems.findAll { it.invoice.isRegularInvoice && !it.inverse }?.sum { it.amount } ?: 0
+        return invoiceItems?.findAll { it.invoice?.isRegularInvoice && !it.inverse }?.sum { it.amount } ?: 0
     }
 
     /**

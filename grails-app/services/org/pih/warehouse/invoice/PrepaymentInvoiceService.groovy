@@ -1,6 +1,7 @@
 package org.pih.warehouse.invoice
 
 import grails.core.GrailsApplication
+import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderAdjustment
@@ -14,6 +15,10 @@ class PrepaymentInvoiceService {
 
     GrailsApplication grailsApplication
     InvoiceService invoiceService
+
+    ApplicationTagLib getApplicationTagLib() {
+        return grailsApplication.mainContext.getBean(ApplicationTagLib)
+    }
 
     Invoice generatePrepaymentInvoice(Order order) {
         if (order.orderItems.any { it.hasInvoices } || order.orderAdjustments.any { it.hasInvoices }) {
@@ -146,9 +151,9 @@ class PrepaymentInvoiceService {
                 quantity: orderAdjustment?.canceled ? 0 : 1,
                 quantityUom: orderAdjustment.orderItem?.quantityUom,
                 quantityPerUom: orderAdjustment.orderItem?.quantityPerUom ?: 1,
-                unitPrice: orderAdjustment.totalAdjustments,
+                unitPrice: orderAdjustment.amountAvailableToInvoice,
                 // For non-canceled order adjustments amount is equal to the total adjustments
-                amount: orderAdjustment?.canceled ? 0 : orderAdjustment.totalAdjustments
+                amount: orderAdjustment?.canceled ? 0 : orderAdjustment.amountAvailableToInvoice
         )
         invoiceItem.addToOrderAdjustments(orderAdjustment)
         return invoiceItem
@@ -199,8 +204,6 @@ class PrepaymentInvoiceService {
         }
 
         BigDecimal amountToInverse = getAmountAvailableToInverse(orderAdjustment, prepaymentItem)
-        // TODO: what if canceled and no inverse yet? Should work, but have to check that case.
-        // TODO: plus check cancel + uncancel
         if (!amountToInverse) {
             return null
         }
@@ -235,7 +238,7 @@ class PrepaymentInvoiceService {
         }
         if (invoiceItem.invoice.datePosted) {
             String defaultMessage = "Cannot update posted invoices"
-            throw new IllegalArgumentException(g.message(code: "invoice.cannotUpdatePosted.error", default: defaultMessage))
+            throw new IllegalArgumentException(applicationTagLib.message(code: "invoice.cannotUpdatePosted.error", default: defaultMessage))
         }
 
         InvoiceItem inverseItem = findInverseItem(invoiceItem)
@@ -276,15 +279,14 @@ class PrepaymentInvoiceService {
      *
      * */
     void updateItems(String invoiceId, List items) {
-        def g = grailsApplication.mainContext.getBean('org.grails.plugins.web.taglib.ApplicationTagLib')
         Invoice invoice = Invoice.get(invoiceId)
         if (!invoice) {
             String defaultMessage = "Cannot find invoice with id: ${invoiceId}"
-            throw new IllegalArgumentException(g.message(code: "invoice.cannotFind.label", args: [invoiceId], default: defaultMessage))
+            throw new IllegalArgumentException(applicationTagLib.message(code: "invoice.cannotFind.label", args: [invoiceId], default: defaultMessage))
         }
         if (invoice.isPrepaymentInvoice || !invoice.hasPrepaymentInvoice) {
             String defaultMessage = "Cannot update quantities on prepayment or non prepaid invoices"
-            throw new IllegalArgumentException(g.message(code: "invoice.cannotUpdate.label", default: defaultMessage))
+            throw new IllegalArgumentException(applicationTagLib.message(code: "invoice.cannotUpdate.label", default: defaultMessage))
         }
 
         items.each { Map item ->
@@ -296,36 +298,40 @@ class PrepaymentInvoiceService {
         }
     }
 
+    void updateInvoiceItem(String itemId, Map properties) {
+        if (properties.quantity == null && properties.unitPrice == null) {
+            throw new IllegalArgumentException("Missing required attributes")
+        }
+
+        if (properties.quantity) {
+            Integer quantity = properties.quantity as Integer
+            updateInvoiceItemQuantity(itemId, quantity)
+            return
+        }
+
+        BigDecimal unitPrice = properties.unitPrice as BigDecimal
+        updateInvoiceItemUnitPrice(itemId, unitPrice)
+    }
+
     /**
      * Updates invoice item's quantity and amount and finds related inverse item and updates quantity and amount
      * */
     void updateInvoiceItemQuantity(String itemId, Integer quantity) {
-        def g = grailsApplication.mainContext.getBean('org.grails.plugins.web.taglib.ApplicationTagLib')
         InvoiceItem invoiceItem = InvoiceItem.get(itemId)
-        if (!invoiceItem) {
-            String defaultMessage = "Cannot find invoice item with id: ${itemId}"
-            throw new IllegalArgumentException(g.message(code: "invoiceItem.cannotFind.error", args: [itemId], default: defaultMessage))
-        }
-        if (invoiceItem.invoice.datePosted) {
-            String defaultMessage = "Cannot update posted invoices"
-            throw new IllegalArgumentException(g.message(code: "invoice.cannotUpdatePosted.error", default: defaultMessage))
-        }
+        validateItem(invoiceItem, itemId)
+
         if (quantity <= 0) {
             String defaultMessage = "Quantity to change needs to be higher than 0"
-            throw new IllegalArgumentException(g.message(code: "invoiceItem.quantityTooLow.error", default: defaultMessage))
-        }
-        if (invoiceItem?.inverse) {
-            String defaultMessage = "Cannot edit inverse invoice items directly"
-            throw new IllegalArgumentException(g.message(code: "invoiceItem.cannotEditInverse.error", default: defaultMessage))
+            throw new IllegalArgumentException(applicationTagLib.message(code: "invoiceItem.quantityTooLow.error", default: defaultMessage))
         }
         if (!invoiceItem?.shipmentItem) {
             String defaultMessage = "Invoice item is missing shipment item. Cannot edit quantity."
-            throw new IllegalArgumentException(g.message(code: "invoiceItem.missingShipment.error", default: defaultMessage))
+            throw new IllegalArgumentException(applicationTagLib.message(code: "invoiceItem.missingShipment.error", default: defaultMessage))
         }
         Integer quantityAvailableToInvoice = invoiceItem.shipmentItem.quantityToInvoice
         if (quantity > quantityAvailableToInvoice + invoiceItem.quantity) {
             String defaultMessage = "Cannot update quantity to higher value than available to invoice"
-            throw new IllegalArgumentException(g.message(code: "invoiceItem.quantityTooHigh.error", default: defaultMessage))
+            throw new IllegalArgumentException(applicationTagLib.message(code: "invoiceItem.quantityTooHigh.error", default: defaultMessage))
         }
         // update invoice item's quantity (and adjust amount)
         invoiceItem.quantity = quantity
@@ -361,42 +367,45 @@ class PrepaymentInvoiceService {
         return quantityInvoiced >= quantityInverseable ? quantityInverseable : quantityInvoiced
     }
 
+    private void validateItem(InvoiceItem invoiceItem, String itemId) {
+        if (!invoiceItem) {
+            String defaultMessage = "Cannot find invoice item with id: ${itemId}"
+            throw new IllegalArgumentException(applicationTagLib.message(code: "invoiceItem.cannotFind.error", args: [itemId], default: defaultMessage))
+        }
+        if (invoiceItem.invoice.datePosted) {
+            String defaultMessage = "Cannot update posted invoices"
+            throw new IllegalArgumentException(applicationTagLib.message(code: "invoice.cannotUpdatePosted.error", default: defaultMessage))
+        }
+        if (invoiceItem?.inverse) {
+            String defaultMessage = "Cannot edit inverse invoice items directly"
+            throw new IllegalArgumentException(applicationTagLib.message(code: "invoiceItem.cannotEditInverse.error", default: defaultMessage))
+        }
+    }
+
     /**
      * Updates invoice item's unit price and amount and finds related inverse item and updates unit price and amount
      * */
     void updateInvoiceItemUnitPrice(String itemId, BigDecimal unitPrice) {
-        def g = grailsApplication.mainContext.getBean('org.grails.plugins.web.taglib.ApplicationTagLib')
         InvoiceItem invoiceItem = InvoiceItem.get(itemId)
-        if (!invoiceItem) {
-            String defaultMessage = "Cannot find invoice item with id: ${itemId}"
-            throw new IllegalArgumentException(g.message(code: "invoiceItem.cannotFind.error", args: [itemId], default: defaultMessage))
-        }
-        if (invoiceItem.invoice.datePosted) {
-            String defaultMessage = "Cannot update posted invoices"
-            throw new IllegalArgumentException(g.message(code: "invoice.cannotUpdatePosted.error", default: defaultMessage))
-        }
+        validateItem(invoiceItem, itemId)
         if (unitPrice == 0) {
             String defaultMessage = "Cannot update unit price to 0"
-            throw new IllegalArgumentException(g.message(code: "invoiceItem.unitPriceZero.error", default: defaultMessage))
-        }
-        if (invoiceItem?.inverse) {
-            String defaultMessage = "Cannot edit inverse invoice items directly"
-            throw new IllegalArgumentException(g.message(code: "invoiceItem.cannotEditInverse.error", default: defaultMessage))
+            throw new IllegalArgumentException(applicationTagLib.message(code: "invoiceItem.unitPriceZero.error", default: defaultMessage))
         }
         if (!invoiceItem?.orderAdjustment) {
             String defaultMessage = "Invoice item is missing order adjustment. Cannot edit unit price."
-            throw new IllegalArgumentException(g.message(code: "invoiceItem.missingAdjustment.error", default: defaultMessage))
+            throw new IllegalArgumentException(applicationTagLib.message(code: "invoiceItem.missingAdjustment.error", default: defaultMessage))
         }
         BigDecimal totalAdjustments = invoiceItem.orderAdjustment?.totalAdjustments
         if ((totalAdjustments < 0 && unitPrice > 0) || (totalAdjustments > 0 && unitPrice < 0)) {
             String defaultMessage = "Cannot change the positive unit price to negative or negative to positive."
-            throw new IllegalArgumentException(g.message(code: "invoiceItem.unitPriceSignChange.error", default: defaultMessage))
+            throw new IllegalArgumentException(applicationTagLib.message(code: "invoiceItem.unitPriceSignChange.error", default: defaultMessage))
         }
 
         BigDecimal amountAvailableToInvoice = invoiceItem.orderAdjustment.amountAvailableToInvoice
         if (Math.abs(unitPrice) > Math.abs(amountAvailableToInvoice) + Math.abs(invoiceItem.unitPrice)) {
             String defaultMessage = "Cannot update unit price to higher value than available to invoice"
-            throw new IllegalArgumentException(g.message(code: "invoiceItem.unitPriceTooHigh.error", default: defaultMessage))
+            throw new IllegalArgumentException(applicationTagLib.message(code: "invoiceItem.unitPriceTooHigh.error", default: defaultMessage))
         }
         // update invoice item's unit price (and adjust amount)
         invoiceItem.unitPrice = unitPrice
