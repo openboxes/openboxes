@@ -197,7 +197,11 @@ class PrepaymentInvoiceService {
         if (!prepaymentItem) {
             return null
         }
-        if (orderAdjustment.inversedQuantity > 0) {
+
+        BigDecimal amountToInverse = getAmountAvailableToInverse(orderAdjustment, prepaymentItem)
+        // TODO: what if canceled and no inverse yet? Should work, but have to check that case.
+        // TODO: plus check cancel + uncancel
+        if (!amountToInverse) {
             return null
         }
 
@@ -205,10 +209,10 @@ class PrepaymentInvoiceService {
         // For order adjustment invoiceItem.quantity is 1 or 0, but for inverse should be for now 1
         inverseItem.quantity = 1
         inverseItem.inverse = true
-        inverseItem.unitPrice = prepaymentItem.unitPrice
+        inverseItem.unitPrice = amountToInverse
         // Multiplied by (-1) to keep inverse items as negative amount
         // unit price is taken from prepayment item (to not accidentally overwrite inverse with changed unit price)
-        inverseItem.amount = prepaymentItem.amount * (-1)
+        inverseItem.amount = amountToInverse * (-1)
         return inverseItem
     }
 
@@ -284,7 +288,11 @@ class PrepaymentInvoiceService {
         }
 
         items.each { Map item ->
-            updateInvoiceItemQuantity(item.id, item.quantity)
+            if (item.quantity) {
+                updateInvoiceItemQuantity(item.id, item.quantity)
+            } else if (item.unitPrice) {
+                updateInvoiceItemUnitPrice(item.id, item.unitPrice)
+            }
         }
     }
 
@@ -351,5 +359,76 @@ class PrepaymentInvoiceService {
         }
 
         return quantityInvoiced >= quantityInverseable ? quantityInverseable : quantityInvoiced
+    }
+
+    /**
+     * Updates invoice item's unit price and amount and finds related inverse item and updates unit price and amount
+     * */
+    void updateInvoiceItemUnitPrice(String itemId, BigDecimal unitPrice) {
+        def g = grailsApplication.mainContext.getBean('org.grails.plugins.web.taglib.ApplicationTagLib')
+        InvoiceItem invoiceItem = InvoiceItem.get(itemId)
+        if (!invoiceItem) {
+            String defaultMessage = "Cannot find invoice item with id: ${itemId}"
+            throw new IllegalArgumentException(g.message(code: "invoiceItem.cannotFind.error", args: [itemId], default: defaultMessage))
+        }
+        if (invoiceItem.invoice.datePosted) {
+            String defaultMessage = "Cannot update posted invoices"
+            throw new IllegalArgumentException(g.message(code: "invoice.cannotUpdatePosted.error", default: defaultMessage))
+        }
+        if (unitPrice == 0) {
+            String defaultMessage = "Cannot update unit price to 0"
+            throw new IllegalArgumentException(g.message(code: "invoiceItem.unitPriceZero.error", default: defaultMessage))
+        }
+        if (invoiceItem?.inverse) {
+            String defaultMessage = "Cannot edit inverse invoice items directly"
+            throw new IllegalArgumentException(g.message(code: "invoiceItem.cannotEditInverse.error", default: defaultMessage))
+        }
+        if (!invoiceItem?.orderAdjustment) {
+            String defaultMessage = "Invoice item is missing order adjustment. Cannot edit unit price."
+            throw new IllegalArgumentException(g.message(code: "invoiceItem.missingAdjustment.error", default: defaultMessage))
+        }
+        BigDecimal totalAdjustments = invoiceItem.orderAdjustment?.totalAdjustments
+        if ((totalAdjustments < 0 && unitPrice > 0) || (totalAdjustments > 0 && unitPrice < 0)) {
+            String defaultMessage = "Cannot change the positive unit price to negative or negative to positive."
+            throw new IllegalArgumentException(g.message(code: "invoiceItem.unitPriceSignChange.error", default: defaultMessage))
+        }
+
+        BigDecimal amountAvailableToInvoice = invoiceItem.orderAdjustment.amountAvailableToInvoice
+        if (Math.abs(unitPrice) > Math.abs(amountAvailableToInvoice) + Math.abs(invoiceItem.unitPrice)) {
+            String defaultMessage = "Cannot update unit price to higher value than available to invoice"
+            throw new IllegalArgumentException(g.message(code: "invoiceItem.unitPriceTooHigh.error", default: defaultMessage))
+        }
+        // update invoice item's unit price (and adjust amount)
+        invoiceItem.unitPrice = unitPrice
+        invoiceItem.amount = invoiceItem.quantity * unitPrice
+        // update inverse item's quantity if there is inverse item (and adjust amount)
+        InvoiceItem inverseItem = findInverseItem(invoiceItem)
+        if (inverseItem) {
+            OrderAdjustment orderAdjustment = invoiceItem?.orderAdjustment
+            InvoiceItem prepaymentItem = orderAdjustment.invoiceItems.find { it.isPrepaymentInvoice }
+            // find quantity that is still available to inverse and add to the current quantity from this inverse item
+            // this needs to be checked because we can also increase invoiced quantity here
+            BigDecimal amountAvailableToInverse = inverseItem.amount + getAmountAvailableToInverse(orderAdjustment, prepaymentItem)
+            BigDecimal amountToInverse = getAmountToInverse(unitPrice, amountAvailableToInverse)
+            inverseItem.unitPrice = amountToInverse
+            inverseItem.amount = inverseItem.quantity * amountToInverse * orderAdjustment.order.prepaymentPercent * (-1)
+            return
+        }
+
+        // If there is a case that we did not found inverse item, but it was made available to inverse now after
+        // editing or removing invoice items on invoices, lets try to create it here
+        inverseItem = createInverseItemForOrderAdjustment(invoiceItem?.orderAdjustment)
+        if (inverseItem) {
+            invoiceItem.invoice.addToInvoiceItems(inverseItem)
+        }
+    }
+
+    BigDecimal getAmountToInverse(BigDecimal amountInvoiced, BigDecimal amountInverseable) {
+        return Math.abs(amountInvoiced) >= Math.abs(amountInverseable) ? amountInverseable : amountInvoiced
+    }
+
+    BigDecimal getAmountAvailableToInverse(OrderAdjustment orderAdjustment, InvoiceItem prepaymentItem) {
+        BigDecimal inversedAmount = orderAdjustment.inversedAmount
+        return Math.abs(prepaymentItem.amount) > Math.abs(inversedAmount) ? prepaymentItem.amount - inversedAmount : 0
     }
 }
