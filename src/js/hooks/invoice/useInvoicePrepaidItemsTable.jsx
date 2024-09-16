@@ -41,10 +41,14 @@ const useInvoicePrepaidItemsTable = ({
   // Returns lines which should be sent for updating invoice items
   const getEditedInvoiceItems = () => invoiceItems
     .filter((item) => isEditable(item.id))
-    .map((item) => ({
-      id: item.id,
-      quantity: item.quantity,
-    }));
+    .map((item) => (item?.orderAdjustment
+      ? {
+        id: item.id,
+        unitPrice: item.unitPrice,
+      } : {
+        id: item.id,
+        quantity: item.quantity,
+      }));
 
   const deletePrepaidInvoiceItem = async (invoiceItemId) => {
     spinner.show();
