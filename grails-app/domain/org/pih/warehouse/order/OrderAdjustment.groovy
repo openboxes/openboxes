@@ -65,6 +65,8 @@ class OrderAdjustment implements Serializable, Comparable<OrderAdjustment> {
         "hasPrepaymentInvoice",
         "hasRegularInvoice",
         "disableRefresh",
+        "amountInvoiced",
+        "amountInversed"
     ]
 
     static belongsTo = [order: Order, orderItem: OrderItem]
@@ -104,11 +106,23 @@ class OrderAdjustment implements Serializable, Comparable<OrderAdjustment> {
         return !postedPurchaseInvoiceItems.empty
     }
 
+    HashSet<InvoiceItem> getInvoicedItems() {
+        return invoiceItems?.findAll { it.invoice.isRegularInvoice && !it.inverse }
+    }
+
+    HashSet<InvoiceItem> getInverseItems() {
+        return invoiceItems?.findAll { it.inverse }
+    }
+
     /**
      * Overall invoiced quantity for this adjustment. Expected is either 0 or 1. Should not be more than 1.
      * */
     Integer getInvoicedQuantity() {
-        return invoiceItems?.findAll { it.invoice.isRegularInvoice && !it.inverse }?.sum { it.quantity } ?: 0
+        return invoicedItems?.sum { it.quantity } ?: 0
+    }
+
+    BigDecimal getAmountInvoiced() {
+        return invoicedItems?.sum { it.amount } ?: 0
     }
 
     /**
@@ -122,7 +136,11 @@ class OrderAdjustment implements Serializable, Comparable<OrderAdjustment> {
      * Overall inversed quantity for this adjustment. Expected is either 0 or 1. Should not be more than 1.
      * */
     Integer getInversedQuantity() {
-        return invoiceItems?.findAll { it.inverse }?.sum { it.quantity } ?: 0
+        return inverseItems?.sum { it.quantity } ?: 0
+    }
+
+    BigDecimal getAmountInversed() {
+        return inverseItems?.sum { it.amount } ?: 0
     }
 
     /**
@@ -155,16 +173,18 @@ class OrderAdjustment implements Serializable, Comparable<OrderAdjustment> {
      *  - if adjustment has no regular invoice yet and order is placed
      * */
     Boolean isInvoiceable() {
+        Boolean invoicedFullAmount = amountInvoiced == totalAdjustments
+
         if (canceled) {
-            return hasPrepaymentInvoice && !hasRegularInvoice && order.placed
+            return hasPrepaymentInvoice && !hasRegularInvoice && order.placed && !invoicedFullAmount
         }
 
         // If is not canceled and has regular invoice, check if by any chance it was invoiced as cancelled
-        if (!canceled && hasRegularInvoice) {
-            return invoicedQuantity == 0 && order.placed
+        if (hasRegularInvoice) {
+            return invoicedQuantity == 0 && order.placed && !invoicedFullAmount
         }
 
-        return !hasRegularInvoice && order.placed
+        return order.placed && !invoicedFullAmount
     }
 
     Boolean getHasInvoices() {
