@@ -14,6 +14,7 @@ const useInvoicePrepaidItemsTable = ({
   updateInvoiceItemData,
   invoiceId,
   refetchData,
+  invoiceItemsMap,
 }) => {
   const spinner = useSpinner();
   const translate = useTranslate();
@@ -113,7 +114,7 @@ const useInvoicePrepaidItemsTable = ({
   };
 
   const isRowLoaded = useCallback(
-    ({ index }) => !!invoiceItems[index],
+    ({ index }) => !!invoiceItemsMap.get(index),
     [invoiceItems],
   );
 
