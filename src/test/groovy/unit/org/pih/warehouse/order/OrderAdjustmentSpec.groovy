@@ -16,7 +16,7 @@ class OrderAdjustmentSpec extends Specification implements DomainUnitTest<OrderA
             getHasPrepaymentInvoice() >> true
             getInvoicedQuantity() >> 0
             getTotalAdjustments() >> 4
-            getInversedAmount() >> 3
+            getInvoicedAmount() >> 3
         }
         orderAdjustment.canceled = canceled
         orderAdjustment.order = Spy(Order)
@@ -42,7 +42,7 @@ class OrderAdjustmentSpec extends Specification implements DomainUnitTest<OrderA
             getHasPrepaymentInvoice() >> true
             getInvoicedQuantity() >> 0
             getTotalAdjustments() >> 4
-            getInversedAmount() >> amountInvoiced
+            getInvoicedAmount() >> amountInvoiced
         }
         orderAdjustment.canceled = canceled
         orderAdjustment.order = Spy(Order)
