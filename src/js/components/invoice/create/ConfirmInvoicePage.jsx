@@ -21,7 +21,7 @@ const ConfirmInvoicePage = ({ initialValues, previousPage }) => {
     totalValue,
     submitInvoice,
     postInvoice,
-    updateInvoiceItemQuantity,
+    updateInvoiceItemData,
     refetchData,
     loadMoreRows,
   } = useConfirmInvoicePage({ initialValues });
@@ -31,13 +31,13 @@ const ConfirmInvoicePage = ({ initialValues, previousPage }) => {
   const invoicePrepaidItemsTableData = useInvoicePrepaidItemsTable({
     invoiceItems: stateValues.invoiceItems,
     invoiceId: stateValues.id,
-    updateInvoiceItemQuantity,
+    updateInvoiceItemData,
     refetchData,
   });
 
   const {
     isValid,
-    updateRowQuantity,
+    updateRow,
     updateInvoiceItem,
     save,
   } = invoicePrepaidItemsTableData;
@@ -134,8 +134,8 @@ const ConfirmInvoicePage = ({ initialValues, previousPage }) => {
                   invoiceItems={stateValues.invoiceItems}
                   loadMoreRows={loadMoreRows}
                   isPrepaymentInvoice={stateValues.isPrepaymentInvoice}
-                  updateInvoiceItemQuantity={
-                    updateInvoiceItemQuantity(updateRowQuantity)
+                  updateInvoiceItemData={
+                    updateInvoiceItemData(updateRow)
                   }
                   invoicePrepaidItemsTableData={invoicePrepaidItemsTableData}
                   invoiceStatus={stateValues.status}

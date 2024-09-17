@@ -124,7 +124,7 @@ const INVOICE_ITEMS = {
           const invoiceItem = params?.invoiceItems[params?.rowIndex];
           const errors = params.validate(invoiceItem);
           return (
-            params.isEditable(invoiceItem?.id)
+            params.isEditable(invoiceItem?.id) && !invoiceItem?.orderAdjustment
               ? (
                 <Tooltip
                   html={<div className="custom-tooltip">{errors}</div>}
@@ -136,8 +136,8 @@ const INVOICE_ITEMS = {
                     value={invoiceItem.quantity}
                     showErrorBorder={!!errors}
                     onChange={
-                    params.updateInvoiceItemQuantity(invoiceItem?.id)
-                  }
+                      params.updateInvoiceItemData(invoiceItem?.id, 'quantity')
+                    }
                     {...params}
                   />
                 </Tooltip>
@@ -167,7 +167,31 @@ const INVOICE_ITEMS = {
         flexWidth: '1',
       },
       unitPrice: {
-        type: LabelField,
+        type: (params) => {
+          const invoiceItem = params?.invoiceItems[params?.rowIndex];
+          const errors = params.validate(invoiceItem);
+          return (
+            params.isEditable(invoiceItem?.id) && invoiceItem?.orderAdjustment
+              ? (
+                <Tooltip
+                  html={<div className="custom-tooltip">{errors}</div>}
+                  theme="transparent"
+                  disabled={!errors}
+                >
+                  <TextInput
+                    type="number"
+                    value={invoiceItem.unitPrice}
+                    showErrorBorder={!!errors}
+                    onChange={
+                      params.updateInvoiceItemData(invoiceItem?.id, 'unitPrice')
+                    }
+                    {...params}
+                  />
+                </Tooltip>
+              )
+              : <LabelField {...params} />
+          );
+        },
         label: 'react.invoice.unitPrice.label',
         defaultMessage: 'Unit Price',
         flexWidth: '1',
@@ -212,7 +236,7 @@ const INVOICE_ITEMS = {
 
 const InvoicePrepayedItemsTable = ({
   invoiceItems,
-  updateInvoiceItemQuantity,
+  updateInvoiceItemData,
   invoiceId,
   totalCount,
   loadMoreRows,
@@ -240,7 +264,7 @@ const InvoicePrepayedItemsTable = ({
           isRowLoaded,
           isPrepaymentInvoice,
           editableRows,
-          updateInvoiceItemQuantity,
+          updateInvoiceItemData,
           validate,
           isEditable,
           actions,
@@ -257,7 +281,7 @@ InvoicePrepayedItemsTable.propTypes = {
   invoiceItems: PropTypes.shape({}).isRequired,
   totalCount: PropTypes.number.isRequired,
   loadMoreRows: PropTypes.func.isRequired,
-  updateInvoiceItemQuantity: PropTypes.func.isRequired,
+  updateInvoiceItemData: PropTypes.func.isRequired,
   invoicePrepaidItemsTableData: PropTypes.shape({
     actions: PropTypes.arrayOf(
       PropTypes.shape({}),

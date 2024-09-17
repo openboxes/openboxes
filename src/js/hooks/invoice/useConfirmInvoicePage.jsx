@@ -73,7 +73,10 @@ const useConfirmInvoicePage = ({ initialValues }) => {
    */
   const setInvoiceItems = (response, overrideInvoiceItems = true) => {
     spinner.show();
-    const { data, totalCount } = response.data;
+    const {
+      data,
+      totalCount,
+    } = response.data;
     setStateValues((state) => ({
       ...state,
       invoiceItems: overrideInvoiceItems
@@ -94,8 +97,14 @@ const useConfirmInvoicePage = ({ initialValues }) => {
    * @public
    */
   const loadMoreRows = useCallback(
-    ({ startIndex, overrideInvoiceItems = false }) => invoiceApi.getInvoiceItems(stateValues.id, {
-      params: { offset: startIndex, max: pageSize },
+    ({
+      startIndex,
+      overrideInvoiceItems = false,
+    }) => invoiceApi.getInvoiceItems(stateValues.id, {
+      params: {
+        offset: startIndex,
+        max: pageSize,
+      },
     })
       .then((response) => {
         setInvoiceItems(response, overrideInvoiceItems);
@@ -103,13 +112,21 @@ const useConfirmInvoicePage = ({ initialValues }) => {
     [stateValues.id, pageSize],
   );
 
-  const updateInvoiceItemQuantity = (updateRowQuantity) => (invoiceItemId) => (quantity) => {
-    updateRowQuantity?.(invoiceItemId, quantity);
+  const updateInvoiceItemData = (updateRow) => (invoiceItemId, fieldName) => (value) => {
+    updateRow?.(
+      invoiceItemId,
+      {
+        [fieldName]: value,
+      },
+    );
     setStateValues((state) => ({
       ...state,
       invoiceItems: state.invoiceItems.map((item) => {
         if (item.id === invoiceItemId) {
-          return { ...item, quantity };
+          return {
+            ...item,
+            [fieldName]: value,
+          };
         }
 
         return item;
@@ -142,7 +159,7 @@ const useConfirmInvoicePage = ({ initialValues }) => {
     submitInvoice,
     postInvoice,
     setInvoiceItems,
-    updateInvoiceItemQuantity,
+    updateInvoiceItemData,
     refetchData,
     loadMoreRows,
   };
