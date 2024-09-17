@@ -66,7 +66,6 @@ class OrderAdjustment implements Serializable, Comparable<OrderAdjustment> {
         "hasRegularInvoice",
         "disableRefresh",
         "amountInvoiced",
-        "amountInversed"
     ]
 
     static belongsTo = [order: Order, orderItem: OrderItem]
@@ -106,50 +105,53 @@ class OrderAdjustment implements Serializable, Comparable<OrderAdjustment> {
         return !postedPurchaseInvoiceItems.empty
     }
 
-    HashSet<InvoiceItem> getInvoicedItems() {
-        return invoiceItems?.findAll { it.invoice.isRegularInvoice && !it.inverse }
-    }
-
-    HashSet<InvoiceItem> getInverseItems() {
-        return invoiceItems?.findAll { it.inverse }
-    }
-
     /**
      * Overall invoiced quantity for this adjustment. Expected is either 0 or 1. Should not be more than 1.
      * */
     Integer getInvoicedQuantity() {
-        return invoicedItems?.sum { it.quantity } ?: 0
-    }
-
-    BigDecimal getAmountInvoiced() {
-        return invoicedItems?.sum { it.amount } ?: 0
+        return invoiceItems?.sum {
+            if (it.invoice.isRegularInvoice && !it.inverse) {
+                return it.quantity
+            }
+            return 0
+        } ?: 0
     }
 
     /**
      * Overall invoiced amount for this adjustment. Can be positive, negative or 0.
      * */
     BigDecimal getInvoicedAmount() {
-        return invoiceItems?.findAll { it.invoice?.isRegularInvoice && !it.inverse }?.sum { it.amount } ?: 0
+        return invoiceItems?.sum {
+            if (it.invoice?.isRegularInvoice && !it.inverse) {
+                return it.amount
+            }
+            return 0
+        } ?: 0
     }
 
     /**
      * Overall inversed quantity for this adjustment. Expected is either 0 or 1. Should not be more than 1.
      * */
     Integer getInversedQuantity() {
-        return inverseItems?.sum { it.quantity } ?: 0
-    }
-
-    BigDecimal getAmountInversed() {
-        return inverseItems?.sum { it.amount } ?: 0
+        return invoiceItems?.sum { it ->
+            if (it.inverse) {
+                it.quantity
+            }
+            return 0
+        } ?: 0
     }
 
     /**
      * Overall inversed amount for this adjustment. Can be positive, negative or 0.
      * */
     BigDecimal getInversedAmount() {
-        return invoiceItems.findAll { it.inverse }?.sum { it.amount } ?: 0
+        return invoiceItems?.sum {
+            if (it.inverse) {
+                return it.amount
+            }
+            return 0
+        } ?: 0
     }
-
 
     def getInvoices() {
         return invoiceItems*.invoice.unique()
@@ -173,15 +175,10 @@ class OrderAdjustment implements Serializable, Comparable<OrderAdjustment> {
      *  - if adjustment has no regular invoice yet and order is placed
      * */
     Boolean isInvoiceable() {
-        Boolean invoicedFullAmount = amountInvoiced == totalAdjustments
+        Boolean invoicedFullAmount = invoicedAmount == totalAdjustments
 
         if (canceled) {
             return hasPrepaymentInvoice && !hasRegularInvoice && order.placed && !invoicedFullAmount
-        }
-
-        // If is not canceled and has regular invoice, check if by any chance it was invoiced as cancelled
-        if (hasRegularInvoice) {
-            return invoicedQuantity == 0 && order.placed && !invoicedFullAmount
         }
 
         return order.placed && !invoicedFullAmount
