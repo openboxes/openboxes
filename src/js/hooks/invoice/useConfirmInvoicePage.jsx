@@ -111,7 +111,7 @@ const useConfirmInvoicePage = ({ initialValues }) => {
     [stateValues.id, pageSize],
   );
 
-  const updateInvoiceItemQuantity = (updateRow) => (invoiceItemId, fieldName) => (value) => {
+  const updateInvoiceItemData = (updateRow) => (invoiceItemId, fieldName) => (value) => {
     updateRow?.(
       invoiceItemId,
       {
