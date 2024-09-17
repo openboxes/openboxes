@@ -23,8 +23,7 @@ class PrepaymentInvoiceItemApiController {
 
     def update() {
         JSONObject jsonObject = request.JSON
-        Integer quantity = jsonObject.get('quantity')
-        prepaymentInvoiceService.updateInvoiceItemQuantity(params.id, quantity)
+        prepaymentInvoiceService.updateInvoiceItem(params.id, jsonObject)
         render status: 200
     }
 }

@@ -112,11 +112,26 @@ class OrderAdjustment implements Serializable, Comparable<OrderAdjustment> {
     }
 
     /**
+     * Overall invoiced amount for this adjustment. Can be positive, negative or 0.
+     * */
+    BigDecimal getInvoicedAmount() {
+        return invoiceItems?.findAll { it.invoice?.isRegularInvoice && !it.inverse }?.sum { it.amount } ?: 0
+    }
+
+    /**
      * Overall inversed quantity for this adjustment. Expected is either 0 or 1. Should not be more than 1.
      * */
     Integer getInversedQuantity() {
         return invoiceItems?.findAll { it.inverse }?.sum { it.quantity } ?: 0
     }
+
+    /**
+     * Overall inversed amount for this adjustment. Can be positive, negative or 0.
+     * */
+    BigDecimal getInversedAmount() {
+        return invoiceItems.findAll { it.inverse }?.sum { it.amount } ?: 0
+    }
+
 
     def getInvoices() {
         return invoiceItems*.invoice.unique()
@@ -162,6 +177,17 @@ class OrderAdjustment implements Serializable, Comparable<OrderAdjustment> {
 
     Boolean getHasRegularInvoice() {
         return invoices.any { it.invoiceType == null || it.invoiceType?.code == InvoiceTypeCode.INVOICE }
+    }
+
+    /**
+     * Should it be unit price instead amount? :thinking:
+     * */
+    BigDecimal getAmountAvailableToInvoice() {
+        if (totalAdjustments == 0 || canceled) {
+            return 0
+        }
+
+        return totalAdjustments - invoicedAmount
     }
 
     @Override

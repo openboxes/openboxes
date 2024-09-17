@@ -347,6 +347,46 @@ class PrepaymentInvoiceServiceSpec extends Specification implements ServiceUnitT
         thrown(Exception)
     }
 
+    void 'getAmountToInverse should calculate amount to inverse #amountToInverse when amount invoiced is #amountInvoiced and amount inverseable is #amountInverseable'() {
+        when:
+        BigDecimal amountToInverseCalc = service.getAmountToInverse(amountInvoiced, amountInversable)
+
+        then:
+        assert amountToInverseCalc == amountToInverse
+
+        where:
+        amountInvoiced   | amountInversable   | amountToInverse
+        1.0              | 1.0                | 1.0
+        -1.0             | -1.0               | -1.0
+        1.0              | 0.0                | 0.0
+        0.0              | 1.0                | 0.0
+        -1.0             | 0.0                | 0.0
+        0.0              | -1.0               | 0.0
+    }
+
+    void 'getAmountAvailableToInverse should calculate amount available to inverse #availableToInverse when amount on prepayment item is #preapymentItemAmount and inversed amount is #inversedAmount'() {
+        given:
+        InvoiceItem prepaymentItem = new InvoiceItem()
+        prepaymentItem.amount = preapymentItemAmount
+        OrderAdjustment orderAdjustment = Spy(OrderAdjustment) {
+            getInversedAmount() >> inversedAmount
+        }
+
+        when:
+        BigDecimal amountAvailableToInverseCalc = service.getAmountAvailableToInverse(orderAdjustment, prepaymentItem)
+
+        then:
+        assert amountAvailableToInverseCalc == amountAvailableToInverse
+
+        where:
+        preapymentItemAmount   | inversedAmount   | amountAvailableToInverse
+        1.0                    | 1.0              | 0.0
+        -1.0                   | -1.0             | 0.0
+        1.0                    | 0.0              | 1.0
+        -1.0                   | 0.0              | -1.0
+        0.0                    | 0.0              | 0.0
+    }
+
     private Set<InvoiceItem> getInvoiceItemsOnOrderItems(Invoice invoice) {
         return invoice.invoiceItems.findAll{ it.orderItems }
     }
