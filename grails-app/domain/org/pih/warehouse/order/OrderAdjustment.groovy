@@ -169,9 +169,9 @@ class OrderAdjustment implements Serializable, Comparable<OrderAdjustment> {
 
     /**
      * Adjustment is invoiceable on regular invoice if:
-     *  - if adjustment is canceled, we can invoice if it has prepayment, does not have regular already and order is placed
-     *  - if adjustment is not canceled, and it was previously invoiced as canceled on regular invoice
-     *  - if adjustment has no regular invoice yet and order is placed
+     *  - adjustment is canceled, it has prepayment, does not have full amount (total adjustment) invoiced in all regular invoices and order is placed
+     *  - adjustment is not canceled, and does not have full amount (total adjustment) invoiced in all regular invoices
+     *  - adjustment does not have full amount (total adjustment) invoiced in all regular invoices yet and order is placed
      * */
     Boolean isInvoiceable() {
         Boolean invoicedFullAmount = invoicedAmount == totalAdjustments
