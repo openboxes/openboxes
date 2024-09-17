@@ -65,7 +65,6 @@ class OrderAdjustment implements Serializable, Comparable<OrderAdjustment> {
         "hasPrepaymentInvoice",
         "hasRegularInvoice",
         "disableRefresh",
-        "amountInvoiced",
     ]
 
     static belongsTo = [order: Order, orderItem: OrderItem]
