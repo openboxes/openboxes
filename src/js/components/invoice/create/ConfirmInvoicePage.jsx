@@ -9,8 +9,8 @@ import InvoiceOptionsForm from 'components/invoice/create/InvoiceOptionsForm';
 import InvoicePrepayedItemsTable from 'components/invoice/create/InvoicePrepayedItemsTable';
 import useConfirmInvoicePage from 'hooks/invoice/useConfirmInvoicePage';
 import useInvoicePrepaidItemsTable from 'hooks/invoice/useInvoicePrepaidItemsTable';
-import Translate from 'utils/Translate';
 import useSpinner from 'hooks/useSpinner';
+import Translate from 'utils/Translate';
 
 const PREPAYMENT_INVOICE = 'PREPAYMENT_INVOICE';
 
@@ -24,6 +24,7 @@ const ConfirmInvoicePage = ({ initialValues, previousPage }) => {
     updateInvoiceItemData,
     refetchData,
     loadMoreRows,
+    invoiceItemsMap,
   } = useConfirmInvoicePage({ initialValues });
 
   const spinner = useSpinner();
@@ -31,6 +32,7 @@ const ConfirmInvoicePage = ({ initialValues, previousPage }) => {
   const invoicePrepaidItemsTableData = useInvoicePrepaidItemsTable({
     invoiceItems: stateValues.invoiceItems,
     invoiceId: stateValues.id,
+    invoiceItemsMap,
     updateInvoiceItemData,
     refetchData,
   });
