@@ -869,7 +869,13 @@ class OrderService {
                     if (currentLocation.isAccountingRequired() && !code) {
                         throw new IllegalArgumentException("Budget code is required.")
                     }
-                    BudgetCode budgetCode = BudgetCode.findByCode(code)
+
+                    // There can be more than one budget code with the same code, despite the fact that the code is unique from the domain perspective.
+                    // As a fix for that we would like to have only one active budget code with the same code, so we have to find only active
+                    // budget codes. In case when there is only one budget code, and this one is inactive we have to throw a validation error,
+                    // so we can't just look for BudgetCode.findAllByCodeAndActive(code, true);
+                    List<BudgetCode> foundBudgetCodes = BudgetCode.findAllByCode(code)
+                    BudgetCode budgetCode = foundBudgetCodes.size() > 1 ? foundBudgetCodes.find { it.active } : foundBudgetCodes.first()
 
                     if (orderItem.id && orderItem.hasRegularInvoice && orderItem.budgetCode != budgetCode) {
                         throw new IllegalArgumentException("Cannot update the budget code on a line that is already invoiced.")
