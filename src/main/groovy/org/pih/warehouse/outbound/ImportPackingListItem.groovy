@@ -46,26 +46,42 @@ class ImportPackingListItem implements Validateable {
     Location origin
 
     @BindUsing({ obj, source ->
-        Location internalLocation = Location.findByNameAndParentLocation(source['binLocation'], obj.origin)
-        // If location is not found, but we provided bin location name, it means, the location was not found,
-        // and we want to indicate that, instead of falling back to default (null)
-        // without this, we would then search e.g. for quantity available to promise for a product in the default bin location
-        if (!internalLocation && source['binLocation'] && !source['binLocation'].equalsIgnoreCase(Constants.DEFAULT_BIN_LOCATION_NAME)) {
-            // We want to indicate, that a bin location for given name has not been found.
+        // Handle inferring bin location when it is not provided by the user
+        if (!source['binLocation']) {
+            Product product = Product.findByProductCode(source['product'])
+            List<ProductAvailability> items = ProductAvailability.findAllByProductAndLotNumberAndLocation(product, source['lotNumber'], obj.origin)
+
+            // Infer bin location only if there is a single possible inventory
+            if (items.size() == 1) {
+                return items.first().binLocation
+            }
+
+            // If default bin is in stock then return it
+            if (items.size() > 0 && items.any{ it.binLocation == null }) {
+                // null value assumes that this is a default bin location
+                return null
+            }
+
+            // Any attempt at inferring bin location failed and bin location was not located
             obj.binLocationFound = false
-            // returns a dummy location object to add more context in a response of what location was not found
-            return new Location(name: source['binLocation'])
         }
 
-        Product product = Product.findByProductCode(source['product'])
-        List<ProductAvailability> items = ProductAvailability.findAllByProductAndLotNumberAndLocation(product, source['lotNumber'], obj.origin)
+        Location internalLocation = Location.findByNameAndParentLocation(source['binLocation'], obj.origin)
 
-        // infer bin location only if there is a single possible inventory
-        if (items.size() == 1) {
-            return items.first().binLocation
+        if (internalLocation) {
+            return internalLocation
         }
 
-        return internalLocation
+        if (source['binLocation']?.equalsIgnoreCase(Constants.DEFAULT_BIN_LOCATION_NAME)) {
+            // null value assumes that this is a default bin location
+            return null
+        }
+
+        // Final fallback if provided location was not located
+        // we want to indicate, that a bin location for given name has not been found.
+        obj.binLocationFound = false
+        // return a dummy location object to add more context in a response of which location was not found
+        return new Location(name: source['binLocation'])
      })
     Location binLocation
 
