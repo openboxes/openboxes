@@ -41,7 +41,6 @@ import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
-
 const DELETE_BUTTON_FIELD = {
   type: ButtonField,
   label: 'react.default.button.delete.label',
@@ -71,7 +70,6 @@ const FIELDS = {
     type: ArrayField,
     arrowsNavigation: true,
     virtualized: true,
-    totalCount: ({ totalCount }) => totalCount,
     isRowLoaded: ({ isRowLoaded }) => isRowLoaded,
     loadMoreRows: ({ loadMoreRows }) => loadMoreRows(),
     isFirstPageLoaded: ({ isFirstPageLoaded }) => isFirstPageLoaded,
@@ -106,7 +104,7 @@ const FIELDS = {
           url: fieldValue?.orderId ? ORDER_URL.show(fieldValue.orderId) : '',
         }),
         attributes: {
-          formatValue: fieldValue => fieldValue && fieldValue.orderNumber,
+          formatValue: (fieldValue) => fieldValue && fieldValue.orderNumber,
         },
       },
       product: {
@@ -130,12 +128,10 @@ const FIELDS = {
         getDynamicAttr: ({
           rowIndex,
           values,
-          updateRow,
           fetchInventoryItem,
           debouncedInventoryItemFetch,
         }) => ({
           onBlur: () => {
-            updateRow(values, rowIndex);
             fetchInventoryItem(values, rowIndex);
           },
           onChange: () => {
@@ -156,11 +152,9 @@ const FIELDS = {
         getDynamicAttr: ({
           rowIndex,
           values,
-          updateRow,
           validateExpirationDate,
         }) => ({
           onBlur: () => {
-            updateRow(values, rowIndex);
             validateExpirationDate(values?.lineItems, rowIndex);
           },
         }),
@@ -175,9 +169,6 @@ const FIELDS = {
           type: 'number',
           showError: true,
         },
-        getDynamicAttr: ({ rowIndex, values, updateRow }) => ({
-          onBlur: () => updateRow(values, rowIndex),
-        }),
       },
       palletName: {
         type: TextField,
@@ -185,10 +176,9 @@ const FIELDS = {
         defaultMessage: 'Pack level 1',
         flexWidth: '1',
         getDynamicAttr: ({
-          rowIndex, rowCount, values, updateRow,
+          rowIndex, rowCount,
         }) => ({
           autoFocus: rowIndex === rowCount - 1,
-          onBlur: () => updateRow(values, rowIndex),
         }),
       },
       boxName: {
@@ -196,9 +186,6 @@ const FIELDS = {
         label: 'react.stockMovement.packLevel2.label',
         defaultMessage: 'Pack level 2',
         flexWidth: '1',
-        getDynamicAttr: ({ rowIndex, values, updateRow }) => ({
-          onBlur: () => updateRow(values, rowIndex),
-        }),
       },
       recipient: {
         type: SelectField,
@@ -206,10 +193,9 @@ const FIELDS = {
         defaultMessage: 'Recipient',
         flexWidth: '1.5',
         getDynamicAttr: ({
-          recipients, rowIndex, values, updateRow,
+          recipients,
         }) => ({
           options: recipients,
-          onBlur: () => updateRow(values, rowIndex),
         }),
         attributes: {
           labelKey: 'name',
@@ -274,7 +260,7 @@ class AddItemsPage extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      values: { ...this.props.initialValues, lineItems: [] },
+      values: this.props.initialValues,
       totalCount: 0,
       isFirstPageLoaded: false,
       showAlert: false,
@@ -289,7 +275,6 @@ class AddItemsPage extends Component {
     this.isRowLoaded = this.isRowLoaded.bind(this);
     this.loadMoreRows = this.loadMoreRows.bind(this);
     this.updateTotalCount = this.updateTotalCount.bind(this);
-    this.updateRow = this.updateRow.bind(this);
     this.removeItem = this.removeItem.bind(this);
     this.fetchLineItems = this.fetchLineItems.bind(this);
     this.saveRequisitionItemsInCurrentStep = this.saveRequisitionItemsInCurrentStep.bind(this);
@@ -336,7 +321,7 @@ class AddItemsPage extends Component {
   getLineItemsToBeSaved(lineItems) {
     const items = AddItemsPage.updateSortOrder(lineItems);
 
-    return _.map(items, item => ({
+    return _.map(items, (item) => ({
       id: item.id || null,
       product: { id: item.product.id },
       quantityRequested: item.quantityRequested,
@@ -350,29 +335,33 @@ class AddItemsPage extends Component {
     }));
   }
 
-  setLineItems(response, startIndex) {
+  setLineItems({
+    response,
+    startIndex,
+    append,
+  }) {
     const { data } = response.data;
     const lineItemsData = _.map(
       data,
-      val => ({
+      (val) => ({
         ...val,
         disabled: true,
         referenceId: val.orderItemId,
       }),
     );
 
-    this.setState({
-      values: {
-        ...this.state.values,
-        lineItems: this.props.isPaginated && !_.isNull(startIndex) ?
-          _.uniqBy(_.concat(this.state.values.lineItems, lineItemsData), 'id') : lineItemsData,
-      },
-    }, () => {
-      if (!_.isNull(startIndex) && this.state.values.lineItems.length !== this.state.totalCount) {
-        this.loadMoreRows({ startIndex: startIndex + this.props.pageSize });
-      }
+    append?.('lineItems', lineItemsData);
+
+    if (data.length < 10) {
       this.props.hideSpinner();
+      return;
+    }
+
+    this.loadMoreRows(append)({
+      startIndex: startIndex + this.props.pageSize,
     });
+
+    this.props.hideSpinner();
   }
 
   updateTotalCount(value) {
@@ -381,17 +370,7 @@ class AddItemsPage extends Component {
     });
   }
 
-  updateRow(values, index) {
-    const item = values.lineItems[index];
-    this.setState({
-      values: update(values, {
-        lineItems: { [index]: { $set: item } },
-      }),
-    });
-  }
-
   dataFetched = false;
-
 
   validate(values, ignoreLotAndExpiry) {
     const errors = {};
@@ -415,7 +394,7 @@ class AddItemsPage extends Component {
       if (moment().startOf('day').diff(dateRequested) > 0) {
         errors.lineItems[key] = { expirationDate: 'react.stockMovement.error.pastDate.label' };
       }
-      const splitItems = _.filter(values.lineItems, lineItem =>
+      const splitItems = _.filter(values.lineItems, (lineItem) =>
         lineItem.referenceId === item.referenceId);
       if (!item.id || splitItems.length > 1) {
         const requestedQuantity = _.reduce(
@@ -432,8 +411,8 @@ class AddItemsPage extends Component {
             });
           });
         }
-      } else if (splitItems.length === 1 &&
-        item && item.quantityAvailable < _.toInteger(item.quantityRequested)) {
+      } else if (splitItems.length === 1
+        && item && item.quantityAvailable < _.toInteger(item.quantityRequested)) {
         errors.lineItems[key] = { quantityRequested: 'react.stockMovement.error.higherQuantity.label' };
       }
       if (!ignoreLotAndExpiry) {
@@ -547,6 +526,7 @@ class AddItemsPage extends Component {
     if (!this.props.isPaginated) {
       this.fetchLineItems();
     }
+    this.props.hideSpinner();
   }
 
   /**
@@ -559,9 +539,12 @@ class AddItemsPage extends Component {
     return apiClient.get(url)
       .then((response) => {
         this.setState({ totalCount: response.data.data.length });
-        this.setLineItems(response, null);
+        this.setLineItems({
+          response,
+          startIndex: null,
+        });
       })
-      .catch(err => err);
+      .catch((err) => err);
   }
 
   /**
@@ -575,32 +558,47 @@ class AddItemsPage extends Component {
     apiClient.get(STOCK_MOVEMENT_BY_ID(this.state.values.stockMovementId))
       .then((resp) => {
         const { hasManageInventory } = resp.data.data;
-        const { statusCode } = resp.data.data;
+        const { statusCode, lineItems } = resp.data.data;
         const { totalCount } = resp.data;
+
+        const sortedLineItems = _.map(
+          _.sortBy(lineItems, ['sortOrder']),
+          (val) => ({
+            ...val,
+            disabled: true,
+            referenceId: val.orderItemId,
+          }),
+        );
 
         this.setState({
           values: {
             ...this.state.values,
             hasManageInventory,
             statusCode,
+            // setting initial values for the form
+            lineItems: sortedLineItems,
           },
           totalCount,
         }, () => this.props.hideSpinner());
       });
   }
 
-  isRowLoaded({ index }) {
-    return !!this.state.values.lineItems[index];
-  }
+  isRowLoaded = (values) => ({ index }) => !!values.lineItems[index]
 
-  loadMoreRows({ startIndex }) {
+  // At this moment we are fetching the whole stock movement at once (it already includes stock movement items)
+  // So this function is not used at this moment, but can be helpful in case of future improvements
+  loadMoreRows = (append) => ({ startIndex }) => {
     this.setState({
       isFirstPageLoaded: true,
     });
     const url = `${STOCK_MOVEMENT_ITEMS(this.state.values.stockMovementId)}?offset=${startIndex}&max=${this.props.pageSize}&stepNumber=2`;
     apiClient.get(url)
       .then((response) => {
-        this.setLineItems(response, startIndex);
+        this.setLineItems({
+          response,
+          startIndex,
+          append,
+        });
       });
   }
 
@@ -616,9 +614,9 @@ class AddItemsPage extends Component {
       return;
     }
 
-    const lineItems = _.filter(formValues.lineItems, val => !_.isEmpty(val) && val.product);
+    const lineItems = _.filter(formValues.lineItems, (val) => !_.isEmpty(val) && val.product);
 
-    if (_.some(lineItems, item => !item.quantityRequested || item.quantityRequested === '0')) {
+    if (_.some(lineItems, (item) => !item.quantityRequested || item.quantityRequested === '0')) {
       this.confirmSave(() =>
         this.saveAndTransitionToNextStep(formValues, lineItems));
     } else {
@@ -659,7 +657,7 @@ class AddItemsPage extends Component {
       return lineItem;
     });
 
-    this.setState(previousState => ({
+    this.setState((previousState) => ({
       ...previousState,
       values: {
         ...previousState.values,
@@ -675,15 +673,15 @@ class AddItemsPage extends Component {
 
   validateExpirationDate(lineItems, rowIndex) {
     const lineItem = lineItems?.[rowIndex];
-    const inventoryItem = lineItem?.fetchedInventoryItem?.inventoryItem ||
-      lineItem?.inventoryItem;
-    const quantity = (lineItem?.fetchedInventoryItem ?
-      lineItem?.fetchedInventoryItem?.quantity : lineItem?.inventoryItem?.quantity) || 0;
-    const expirationDateHasChanged = inventoryItem?.expirationDate &&
-      lineItem?.expirationDate &&
-      lineItem?.lotNumber &&
-      lineItem?.expirationDate !== inventoryItem?.expirationDate &&
-      quantity > 0;
+    const inventoryItem = lineItem?.fetchedInventoryItem?.inventoryItem
+      || lineItem?.inventoryItem;
+    const quantity = (lineItem?.fetchedInventoryItem
+      ? lineItem?.fetchedInventoryItem?.quantity : lineItem?.inventoryItem?.quantity) || 0;
+    const expirationDateHasChanged = inventoryItem?.expirationDate
+      && lineItem?.expirationDate
+      && lineItem?.lotNumber
+      && lineItem?.expirationDate !== inventoryItem?.expirationDate
+      && quantity > 0;
 
     if (expirationDateHasChanged && !isModalOpen) {
       isModalOpen = true;
@@ -696,7 +694,7 @@ class AddItemsPage extends Component {
 
   changeExpirationDate(lineItems, rowIndex, newDate) {
     const updatedLineItem = { ...lineItems?.[rowIndex], expirationDate: newDate };
-    this.setState(previousState => ({
+    this.setState((previousState) => ({
       ...previousState,
       values: {
         ...previousState.values,
@@ -710,8 +708,8 @@ class AddItemsPage extends Component {
   cancelSavingRequisitionItem(lineItems, rowIndex) {
     const mappedLineItems = lineItems?.map((item, index) => {
       if (index === rowIndex) {
-        const expirationDate = item?.fetchedInventoryItem?.inventoryItem?.expirationDate ||
-          item?.inventoryItem?.expirationDate;
+        const expirationDate = item?.fetchedInventoryItem?.inventoryItem?.expirationDate
+          || item?.inventoryItem?.expirationDate;
         return { ...item, expirationDate };
       }
       return item;
@@ -761,7 +759,7 @@ class AddItemsPage extends Component {
         if (resp) {
           values = {
             ...formValues,
-            lineItems: _.map(resp.data.data.lineItems, item => ({
+            lineItems: _.map(resp.data.data.lineItems, (item) => ({
               ...item,
               referenceId: item.orderItemId,
             })),
@@ -795,7 +793,7 @@ class AddItemsPage extends Component {
 
           const lineItemsBackendData = _.map(
             _.sortBy(lineItems, ['sortOrder']),
-            val => ({ ...val, referenceId: val.orderItemId }),
+            (val) => ({ ...val, referenceId: val.orderItemId }),
           );
 
           this.setState({ values: { ...this.state.values, lineItems: lineItemsBackendData } });
@@ -812,9 +810,9 @@ class AddItemsPage extends Component {
    * @public
    */
   save(formValues) {
-    const lineItems = _.filter(formValues.lineItems, item => !_.isEmpty(item));
+    const lineItems = _.filter(formValues.lineItems, (item) => !_.isEmpty(item));
     if (lineItems.length > 0) {
-      if (_.some(lineItems, item => !item.quantityRequested || item.quantityRequested === '0')) {
+      if (_.some(lineItems, (item) => !item.quantityRequested || item.quantityRequested === '0')) {
         this.confirmSave(() => this.saveItems(lineItems));
       } else {
         this.saveItems(lineItems);
@@ -906,7 +904,6 @@ class AddItemsPage extends Component {
           totalCount: 0,
           values: {
             ...this.state.values,
-            lineItems: [],
           },
         }, () => this.props.hideSpinner());
       })
@@ -1009,7 +1006,6 @@ class AddItemsPage extends Component {
           this.setState({
             values: {
               ...this.state.values,
-              lineItems: [],
             },
           });
         }
@@ -1045,9 +1041,16 @@ class AddItemsPage extends Component {
       <Form
         onSubmit={() => {}}
         validate={this.validate}
-        mutators={{ ...arrayMutators }}
+        mutators={{
+          ...arrayMutators,
+          append: ([field, value], state, { changeValue }) => {
+            changeValue(state, field, () => [...state.formState.values[field], ...value]);
+          },
+        }}
         initialValues={this.state.values}
-        render={({ handleSubmit, values, invalid }) => (
+        render={({
+          form, handleSubmit, values, invalid,
+        }) => (
           <div className="d-flex flex-column">
             <AlertMessage show={showAlert} message={alertMessage} danger />
             <span className="buttons-container">
@@ -1055,7 +1058,10 @@ class AddItemsPage extends Component {
                 htmlFor="csvInput"
                 className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
               >
-                <span><i className="fa fa-download pr-2" /><Translate id="react.default.button.importTemplate.label" defaultMessage="Import template" /></span>
+                <span>
+                  <i className="fa fa-download pr-2" />
+                  <Translate id="react.default.button.importTemplate.label" defaultMessage="Import template" />
+                </span>
                 <input
                   id="csvInput"
                   type="file"
@@ -1072,9 +1078,12 @@ class AddItemsPage extends Component {
                 <button
                   type="button"
                   onClick={this.toggleDropdown}
-                  className="dropdown-button float-right mb-1 btn btn-outline-secondary align-self-end btn-xs"
+                  className="dropdown-button float-right mb-1 btn btn-outline-secondary align-self-end btn-xs ml-1"
                 >
-                  <span><i className="fa fa-sign-out pr-2" /><Translate id="react.default.button.download.label" defaultMessage="Download" /></span>
+                  <span>
+                    <i className="fa fa-sign-out pr-2" />
+                    <Translate id="react.default.button.download.label" defaultMessage="Download" />
+                  </span>
                 </button>
                 <div className={`dropdown-content print-buttons-container col-md-3 flex-grow-1 
                         ${this.state.isDropdownVisible ? 'visible' : ''}`}
@@ -1084,14 +1093,20 @@ class AddItemsPage extends Component {
                     className="py-1 mb-1 btn btn-outline-secondary"
                     onClick={() => { this.exportTemplate(false); }}
                   >
-                    <span><i className="pr-2 fa fa-download" /><Translate id="react.combinedShipments.availableItems.label" defaultMessage="Available order items" /></span>
+                    <span>
+                      <i className="pr-2 fa fa-download" />
+                      <Translate id="react.combinedShipments.availableItems.label" defaultMessage="Available order items" />
+                    </span>
                   </a>
                   <a
                     href="#"
                     className="py-1 mb-1 btn btn-outline-secondary"
                     onClick={() => { this.exportTemplate(true); }}
                   >
-                    <span><i className="pr-2 fa fa-download" /><Translate id="react.combinedShipments.blankTemplate.label" defaultMessage="Blank import template" /></span>
+                    <span>
+                      <i className="pr-2 fa fa-download" />
+                      <Translate id="react.combinedShipments.blankTemplate.label" defaultMessage="Blank import template" />
+                    </span>
                   </a>
                 </div>
               </div>
@@ -1100,7 +1115,10 @@ class AddItemsPage extends Component {
                 onClick={() => this.refresh()}
                 className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
               >
-                <span><i className="fa fa-refresh pr-2" /><Translate id="react.default.button.refresh.label" defaultMessage="Reload" /></span>
+                <span>
+                  <i className="fa fa-refresh pr-2" />
+                  <Translate id="react.default.button.refresh.label" defaultMessage="Reload" />
+                </span>
               </button>
               <button
                 type="button"
@@ -1108,7 +1126,10 @@ class AddItemsPage extends Component {
                 onClick={() => this.save(values)}
                 className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
               >
-                <span><i className="fa fa-save pr-2" /><Translate id="react.default.button.save.label" defaultMessage="Save" /></span>
+                <span>
+                  <i className="fa fa-save pr-2" />
+                  <Translate id="react.default.button.save.label" defaultMessage="Save" />
+                </span>
               </button>
               <button
                 type="button"
@@ -1116,15 +1137,21 @@ class AddItemsPage extends Component {
                 onClick={() => this.saveAndExit(values)}
                 className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
               >
-                <span><i className="fa fa-sign-out pr-2" /><Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" /></span>
+                <span>
+                  <i className="fa fa-sign-out pr-2" />
+                  <Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" />
+                </span>
               </button>
               <button
                 type="button"
                 disabled={invalid}
                 onClick={() => this.removeAll()}
-                className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs"
+                className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs ml-1"
               >
-                <span><i className="fa fa-remove pr-2" /><Translate id="react.default.button.deleteAll.label" defaultMessage="Delete all" /></span>
+                <span>
+                  <i className="fa fa-remove pr-2" />
+                  <Translate id="react.default.button.deleteAll.label" defaultMessage="Delete all" />
+                </span>
               </button>
             </span>
             <form onSubmit={handleSubmit}>
@@ -1135,12 +1162,11 @@ class AddItemsPage extends Component {
                     recipients: this.props.recipients,
                     debouncedProductsFetch: this.debouncedProductsFetch,
                     totalCount: this.state.totalCount,
-                    loadMoreRows: this.loadMoreRows,
-                    isRowLoaded: this.isRowLoaded,
+                    loadMoreRows: this.loadMoreRows(form.mutators.append),
+                    isRowLoaded: this.isRowLoaded(values),
                     updateTotalCount: this.updateTotalCount,
                     isPaginated: this.props.isPaginated,
-                    isFromOrder: this.state.values.isFromOrder,
-                    updateRow: this.updateRow,
+                    isFromOrder: this.state.values?.isFromOrder,
                     values,
                     isFirstPageLoaded: this.state.isFirstPageLoaded,
                     removeItem: this.removeItem,
@@ -1165,8 +1191,9 @@ class AddItemsPage extends Component {
                   type="submit"
                   onClick={() => this.nextPage(values)}
                   className="btn btn-outline-primary btn-form float-right btn-xs"
-                  disabled={!_.some(values.lineItems, item => !_.isEmpty(item))}
-                ><Translate id="react.default.button.next.label" defaultMessage="Next" />
+                  disabled={!_.some(values.lineItems, (item) => !_.isEmpty(item))}
+                >
+                  <Translate id="react.default.button.next.label" defaultMessage="Next" />
                 </button>
               </div>
             </form>
@@ -1177,7 +1204,7 @@ class AddItemsPage extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   recipients: state.users.data,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
   stockMovementTranslationsFetched: state.session.fetchedTranslations.stockMovement,
