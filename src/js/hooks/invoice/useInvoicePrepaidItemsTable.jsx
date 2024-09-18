@@ -118,10 +118,6 @@ const useInvoicePrepaidItemsTable = ({
   );
 
   const validateQuantity = (row) => {
-    if (!isEditable(row?.id)) {
-      return null;
-    }
-
     if (
       _.toInteger(row?.quantityAvailableToInvoice) < row?.quantity
       || _.toInteger(row?.quantity) <= 0
@@ -146,6 +142,10 @@ const useInvoicePrepaidItemsTable = ({
   };
 
   const validate = (row) => {
+    if (!isEditable(row?.id)) {
+      return null;
+    }
+
     if (row?.orderAdjustment) {
       return validateUnitPrice(row);
     }
