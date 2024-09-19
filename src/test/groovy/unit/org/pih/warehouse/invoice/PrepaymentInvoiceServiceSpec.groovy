@@ -385,6 +385,8 @@ class PrepaymentInvoiceServiceSpec extends Specification implements ServiceUnitT
         1.0                    | 0.0              | 1.0
         -1.0                   | 0.0              | -1.0
         0.0                    | 0.0              | 0.0
+        10                     | -3               | 7
+        -5                     | 2                | -3
     }
 
     private Set<InvoiceItem> getInvoiceItemsOnOrderItems(Invoice invoice) {
