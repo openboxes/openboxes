@@ -28,11 +28,12 @@ class ImportPackingListItem implements Validateable {
         if (source['lotNumber']) {
             return source['lotNumber']
         }
+        ProductAvailabilityService productAvailabilityService = Holders.grailsApplication.mainContext.getBean(ProductAvailabilityService)
 
         // otherwise infer inventory item based on provided bin-location
-        Location internalLocation = Location.findByNameAndParentLocation(source['binLocation'], obj.origin)
         Product product = Product.findByProductCode(source['product'])
-        List<ProductAvailability> items = ProductAvailability.findAllByProductAndBinLocationAndLocation(product, internalLocation, obj.origin)
+        List<ProductAvailability> items = productAvailabilityService.getAvailableBinLocations(obj.origin, product?.productCode)
+                .findAll { it?.binLocation?.name == source['binLocation'] }
 
         // infer lot-number only if there is a single possible inventory
         if (items.size() == 1) {
@@ -46,26 +47,38 @@ class ImportPackingListItem implements Validateable {
     Location origin
 
     @BindUsing({ obj, source ->
+        // Handle inferring bin location when it is not provided by the user
+        if (!source['binLocation']) {
+            ProductAvailabilityService productAvailabilityService = Holders.grailsApplication.mainContext.getBean(ProductAvailabilityService)
+
+            Product product = Product.findByProductCode(source['product'])
+            List<ProductAvailability> items = productAvailabilityService.getAvailableBinLocations(obj.origin, product?.productCode)
+                    .findAll { it?.inventoryItem?.lotNumber == source['lotNumber']}
+            // Infer bin location only if there is a single possible inventory
+            if (items.size() == 1) {
+                return items.first().binLocation
+            }
+
+            // Any attempt at inferring bin location failed and bin location was not located
+            return null
+        }
+
         Location internalLocation = Location.findByNameAndParentLocation(source['binLocation'], obj.origin)
-        // If location is not found, but we provided bin location name, it means, the location was not found,
-        // and we want to indicate that, instead of falling back to default (null)
-        // without this, we would then search e.g. for quantity available to promise for a product in the default bin location
-        if (!internalLocation && source['binLocation'] && !source['binLocation'].equalsIgnoreCase(Constants.DEFAULT_BIN_LOCATION_NAME)) {
-            // We want to indicate, that a bin location for given name has not been found.
-            obj.binLocationFound = false
-            // returns a dummy location object to add more context in a response of what location was not found
-            return new Location(name: source['binLocation'])
+
+        if (internalLocation) {
+            return internalLocation
         }
 
-        Product product = Product.findByProductCode(source['product'])
-        List<ProductAvailability> items = ProductAvailability.findAllByProductAndLotNumberAndLocation(product, source['lotNumber'], obj.origin)
-
-        // infer bin location only if there is a single possible inventory
-        if (items.size() == 1) {
-            return items.first().binLocation
+        if (source['binLocation']?.equalsIgnoreCase(Constants.DEFAULT_BIN_LOCATION_NAME)) {
+            // null value assumes that this is a default bin location
+            return null
         }
 
-        return internalLocation
+        // Final fallback if provided location was not located
+        // we want to indicate, that a bin location for given name has not been found.
+        obj.binLocationFound = false
+        // return a dummy location object to add more context in a response of which location was not found
+        return new Location(name: source['binLocation'])
      })
     Location binLocation
 
@@ -121,7 +134,7 @@ class ImportPackingListItem implements Validateable {
         })
         binLocation(nullable: true, validator: { Location binLocation, ImportPackingListItem item ->
             if (!item.binLocationFound) {
-                return ['binLocationNotFound', binLocation.name]
+                return ['binLocationNotFound', binLocation?.name]
             }
         })
         quantityPicked(min: 1, validator: { Integer quantityPicked, ImportPackingListItem item ->
@@ -132,7 +145,7 @@ class ImportPackingListItem implements Validateable {
             // Associate inventory item's expiration date with expirationDateToDisplay, to display the date in the table
             item.expirationDateToDisplay = inventoryItem.expirationDate
             if (!item.binLocationFound) {
-                return ['binLocationNotFound', item.binLocation?.name]
+                return ['binLocationNotFound', item.binLocation.name]
             }
             ProductAvailabilityService productAvailabilityService = Holders.grailsApplication.mainContext.getBean(ProductAvailabilityService)
             Integer quantity = productAvailabilityService.getQuantityAvailableToPromiseForProductInBin(item.origin, item.binLocation, inventoryItem)
