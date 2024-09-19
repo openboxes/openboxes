@@ -16,6 +16,7 @@ import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderAdjustment
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.OrderItemStatusCode
+import org.pih.warehouse.shipping.ShipmentItem
 
 @Unroll
 class PrepaymentInvoiceMigrationServiceSpec extends Specification implements ServiceUnitTest<PrepaymentInvoiceMigrationService>, DataTest {
@@ -378,5 +379,78 @@ class PrepaymentInvoiceMigrationServiceSpec extends Specification implements Ser
         1               | 2.2              || 2.2
         2               | 2.2              || 4.4
         5               | 0.5              || 2.5
+    }
+
+    void 'OBPIH-6726: migrateFinalInvoice successfully populates the relationship to shipment items when generating inverses'() {
+        given: 'an order with an order item and a shipment item'
+        // We're testing that the database relationship is updated on the shipment/order items side as well as the
+        // invoice side so we need to mock the shipment/order items entities too.
+        mockDomains(Order, OrderItem, ShipmentItem)
+        Order order = new Order(
+                paymentTerm: new PaymentTerm(prepaymentPercent: 100),
+        )
+        OrderItem orderItem = new OrderItem(
+                quantity: 1,
+                unitPrice: 1,
+        )
+        ShipmentItem shipmentItem = new ShipmentItem(
+                // We don't care what the shipment item contains, only that one exists for the order
+        )
+        order.addToOrderItems(orderItem)
+        orderItem.addToShipmentItems(shipmentItem)
+        order.save(validate: false)  // Will cascade save the order item and shipment item
+
+        and: 'we make a prepayment on that order'
+        Invoice prepaymentInvoice = new Invoice(
+                invoiceType: prepaymentInvoiceType,
+        )
+        InvoiceItem prepaymentInvoiceItem = new InvoiceItem(
+                quantity: 1,  // Value not used, just needs to be non-null
+                amount: 1,
+        )
+        prepaymentInvoice.addToInvoiceItems(prepaymentInvoiceItem)
+        prepaymentInvoice.save(validate: false)
+
+        and: 'that prepayment is associated back to the order'
+        orderItem.addToInvoiceItems(prepaymentInvoiceItem)
+        orderItem.save(validate: false)
+
+        and: 'we have already generated a final invoice for that order'
+        // We leave out the final invoice items from the final invoice here because they're not used
+        // when generating the inverse items so there's no point defining them.
+        Invoice finalInvoice = new Invoice(
+                invoiceNumber: "1",
+        ).save(validate: false)
+
+        when:
+        Invoice finalInvoiceAfterSave = service.migrateFinalInvoice(prepaymentInvoice, finalInvoice)
+
+        then: 'the inverse item should be created'
+        assert finalInvoiceAfterSave.invoiceItems.size() == 1
+
+        InvoiceItem inverseItem = finalInvoiceAfterSave.invoiceItems.find { it.inverse }
+        assert inverseItem != null
+
+        and: 'the relationship between invoice item and order item should be fully populated in the returned inverse'
+        assert inverseItem.orderItem != null
+        assert inverseItem.orderItem.invoiceItems.size() == 2
+        assert inverseItem.orderItem.invoiceItems.find { it.inverse } == inverseItem
+
+        and: 'the relationship to order item should be fully populated in the order item'
+        OrderItem orderItemFromDb = OrderItem.find(orderItem)
+        assert orderItemFromDb != null
+        assert orderItemFromDb.invoiceItems.size() == 2
+        assert orderItemFromDb.invoiceItems.find { it.inverse } == inverseItem
+
+        and: 'the relationship between invoice item and shipment item should be fully populated in the returned inverse'
+        assert inverseItem.shipmentItem != null
+        assert inverseItem.shipmentItem.invoiceItems.size() == 2
+        assert inverseItem.shipmentItem.invoiceItems.find { it.inverse } == inverseItem
+
+        and: 'the relationship to shipment item should be fully populated in the shipment item'
+        ShipmentItem shipmentItemFromDb = ShipmentItem.find(shipmentItem)
+        assert shipmentItemFromDb != null
+        assert shipmentItemFromDb.invoiceItems.size() == 2
+        assert shipmentItemFromDb.invoiceItems.find { it.inverse } == inverseItem
     }
 }
