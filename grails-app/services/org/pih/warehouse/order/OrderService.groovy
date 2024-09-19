@@ -875,7 +875,13 @@ class OrderService {
                     // budget codes. In case when there is only one budget code, and this one is inactive we have to throw a validation error,
                     // so we can't just look for BudgetCode.findAllByCodeAndActive(code, true);
                     List<BudgetCode> foundBudgetCodes = BudgetCode.findAllByCode(code)
-                    BudgetCode budgetCode = foundBudgetCodes.size() > 1 ? foundBudgetCodes.find { it.active } : foundBudgetCodes.first()
+                    List<BudgetCode> activeBudgetCodes = foundBudgetCodes.findAll { it.active }
+
+                    if (activeBudgetCodes.size() > 1) {
+                        throw new IllegalArgumentException("Found more than one active budget code with the same code.")
+                    }
+
+                    BudgetCode budgetCode = activeBudgetCodes.size() == 0 ? foundBudgetCodes[0] : activeBudgetCodes.first()
 
                     if (orderItem.id && orderItem.hasRegularInvoice && orderItem.budgetCode != budgetCode) {
                         throw new IllegalArgumentException("Cannot update the budget code on a line that is already invoiced.")
