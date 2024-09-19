@@ -59,12 +59,6 @@ class ImportPackingListItem implements Validateable {
                 return items.first().binLocation
             }
 
-            // If default bin is in stock then return it
-            if (items.size() > 0 && items.any { it.binLocation == null }) {
-                // null value assumes that this is a default bin location
-                return null
-            }
-
             // Any attempt at inferring bin location failed and bin location was not located
             return null
         }
@@ -151,7 +145,7 @@ class ImportPackingListItem implements Validateable {
             // Associate inventory item's expiration date with expirationDateToDisplay, to display the date in the table
             item.expirationDateToDisplay = inventoryItem.expirationDate
             if (!item.binLocationFound) {
-                return ['binLocationNotFound', item.binLocation?.name]
+                return ['binLocationNotFound', item.binLocation.name]
             }
             ProductAvailabilityService productAvailabilityService = Holders.grailsApplication.mainContext.getBean(ProductAvailabilityService)
             Integer quantity = productAvailabilityService.getQuantityAvailableToPromiseForProductInBin(item.origin, item.binLocation, inventoryItem)
