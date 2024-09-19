@@ -174,7 +174,7 @@ class PrepaymentInvoiceService {
         return inverseItem
     }
 
-    private InvoiceItem createInverseItemForShipmentItem(ShipmentItem shipmentItem, InvoiceItem invoiceItem) {
+    InvoiceItem createInverseItemForShipmentItem(ShipmentItem shipmentItem, InvoiceItem invoiceItem) {
         OrderItem orderItem = shipmentItem.orderItems?.find { it }
         InvoiceItem prepaymentItem = orderItem.invoiceItems.find { it.isPrepaymentInvoice }
         if (!prepaymentItem) {

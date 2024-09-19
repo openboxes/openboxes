@@ -12,10 +12,12 @@ import org.pih.warehouse.invoice.InvoiceItem
 import org.pih.warehouse.invoice.InvoiceType
 import org.pih.warehouse.invoice.InvoiceTypeCode
 import org.pih.warehouse.invoice.PrepaymentInvoiceMigrationService
+import org.pih.warehouse.invoice.PrepaymentInvoiceService
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderAdjustment
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.OrderItemStatusCode
+import org.pih.warehouse.product.Product
 import org.pih.warehouse.shipping.ShipmentItem
 
 @Unroll
@@ -28,12 +30,15 @@ class PrepaymentInvoiceMigrationServiceSpec extends Specification implements Ser
     InvoiceType regularInvoiceType
 
     void setupSpec() {
-        mockDomains(Invoice, InvoiceItem, InvoiceType)
+        mockDomains(Invoice, InvoiceItem, InvoiceType, Order, OrderItem, ShipmentItem)
     }
 
     void setup() {
         prepaymentInvoiceType = new InvoiceType(code: InvoiceTypeCode.PREPAYMENT_INVOICE).save(validate: false)
         regularInvoiceType = new InvoiceType(code: InvoiceTypeCode.INVOICE).save(validate: false)
+
+        // Call spy here because we want to test the real service
+        service.prepaymentInvoiceService = Spy(PrepaymentInvoiceService)
     }
 
     void 'updateAmountForPrepaymentInvoiceItems does nothing for regular invoices'() {
@@ -98,7 +103,7 @@ class PrepaymentInvoiceMigrationServiceSpec extends Specification implements Ser
                 invoiceItems: [
                         new InvoiceItem(
                                 id: invoiceItemId,
-                                quantity: 0,  // Value not used, just needs to be non-null
+                                quantity: 0,  // Not used in amount calculation. Just needs to be non-null.
                                 orderItems: [orderItem],
                         ),
                 ],
@@ -134,7 +139,7 @@ class PrepaymentInvoiceMigrationServiceSpec extends Specification implements Ser
                 invoiceItems: [
                         new InvoiceItem(
                                 id: invoiceItemId,
-                                quantity: 0,  // Value not used, just needs to be non-null
+                                quantity: 0,  // Not used in amount calculation. Just needs to be non-null.
                                 orderAdjustments: [adjustment],
                         ),
                 ],
@@ -176,7 +181,7 @@ class PrepaymentInvoiceMigrationServiceSpec extends Specification implements Ser
                 invoiceItems: [
                         new InvoiceItem(
                                 id: invoiceItemId,
-                                quantity: 0,  // Value not used, just needs to be non-null
+                                quantity: 0,  // Not used in amount calculation. Just needs to be non-null.
                                 orderItems: [orderItem],
                                 orderAdjustments: [adjustment],
                         ),
@@ -229,7 +234,7 @@ class PrepaymentInvoiceMigrationServiceSpec extends Specification implements Ser
                 invoiceItems: [
                         new InvoiceItem(
                                 id: invoiceItemId,
-                                quantity: 0,  // Value not used, just needs to be non-null
+                                quantity: 0,  // Not used in amount calculation. Just needs to be non-null.
                                 orderItems: [orderItem],
                                 orderAdjustments: [adjustment],
                         ),
@@ -271,7 +276,7 @@ class PrepaymentInvoiceMigrationServiceSpec extends Specification implements Ser
                 invoiceItems: [
                         new InvoiceItem(
                                 id: invoiceItemId,
-                                quantity: 0,  // Value not used, just needs to be non-null
+                                quantity: 0,  // Not used in amount calculation. Just needs to be non-null.
                                 orderItems: [orderItem],
                         ),
                 ],
@@ -300,7 +305,7 @@ class PrepaymentInvoiceMigrationServiceSpec extends Specification implements Ser
                 invoiceType: prepaymentInvoiceType,
                 invoiceItems: [
                         new InvoiceItem(
-                                quantity: 0,  // Value not used, just needs to be non-null
+                                quantity: 0,  // Not used in amount calculation. Just needs to be non-null.
                                 amount: prepaymentAmount,
                         ),
                 ],
@@ -337,7 +342,7 @@ class PrepaymentInvoiceMigrationServiceSpec extends Specification implements Ser
                 invoiceType: prepaymentInvoiceType,
                 invoiceItems: [
                         new InvoiceItem(
-                                quantity: 0,  // Value not used, just needs to be non-null
+                                quantity: 0,  // Not used in amount calculation. Just needs to be non-null.
                                 amount: 100,
                         ),
                 ],
@@ -381,55 +386,52 @@ class PrepaymentInvoiceMigrationServiceSpec extends Specification implements Ser
         5               | 0.5              || 2.5
     }
 
-    void 'OBPIH-6726: migrateFinalInvoice successfully populates the relationship to shipment items when generating inverses'() {
-        given: 'an order with an order item and a shipment item'
-        // We're testing that the database relationship is updated on the shipment/order items side as well as the
-        // invoice side so we need to mock the shipment/order items entities too.
-        mockDomains(Order, OrderItem, ShipmentItem)
+    void 'OBPIH-6726: migrateFinalInvoice successfully populates the relationship to order items when generating inverses for canceled orders'() {
+        given: 'an order with an order item but no shipment item (because the order is canceled)'
         Order order = new Order(
                 paymentTerm: new PaymentTerm(prepaymentPercent: 100),
+                canceled: true,
         )
         OrderItem orderItem = new OrderItem(
-                quantity: 1,
-                unitPrice: 1,
-        )
-        ShipmentItem shipmentItem = new ShipmentItem(
-                // We don't care what the shipment item contains, only that one exists for the order
+                // The order item isn't used at all whe migrating canceled orders but including it for clarity.
         )
         order.addToOrderItems(orderItem)
-        orderItem.addToShipmentItems(shipmentItem)
-        order.save(validate: false)  // Will cascade save the order item and shipment item
+        order.save(validate: false)  // Will cascade save the order item
 
         and: 'we make a prepayment on that order'
         Invoice prepaymentInvoice = new Invoice(
                 invoiceType: prepaymentInvoiceType,
         )
         InvoiceItem prepaymentInvoiceItem = new InvoiceItem(
-                quantity: 1,  // Value not used, just needs to be non-null
-                amount: 1,
+                quantity: 0,  // Not used in amount calculation. Just needs to be non-null.
+                amount: prepaymentAmount,
         )
         prepaymentInvoice.addToInvoiceItems(prepaymentInvoiceItem)
         prepaymentInvoice.save(validate: false)
 
-        and: 'that prepayment is associated back to the order'
+        and: 'the prepayment item is mapped to the order item'
         orderItem.addToInvoiceItems(prepaymentInvoiceItem)
         orderItem.save(validate: false)
 
         and: 'we have already generated a final invoice for that order'
-        // We leave out the final invoice items from the final invoice here because they're not used
-        // when generating the inverse items so there's no point defining them.
+        InvoiceItem finalInvoiceItem = new InvoiceItem(
+                // The final invoice item isn't used at all when migrating canceled orders but including it for clarity.
+        )
         Invoice finalInvoice = new Invoice(
                 invoiceNumber: "1",
-        ).save(validate: false)
+        )
+        finalInvoice.addToInvoiceItems(finalInvoiceItem)
+        finalInvoice.save(validate: false)
 
         when:
         Invoice finalInvoiceAfterSave = service.migrateFinalInvoice(prepaymentInvoice, finalInvoice)
 
         then: 'the inverse item should be created'
-        assert finalInvoiceAfterSave.invoiceItems.size() == 1
+        assert finalInvoiceAfterSave.invoiceItems.size() == 2
 
         InvoiceItem inverseItem = finalInvoiceAfterSave.invoiceItems.find { it.inverse }
         assert inverseItem != null
+        assert inverseItem.amount == expectedInverseAmount
 
         and: 'the relationship between invoice item and order item should be fully populated in the returned inverse'
         assert inverseItem.orderItem != null
@@ -442,6 +444,69 @@ class PrepaymentInvoiceMigrationServiceSpec extends Specification implements Ser
         assert orderItemFromDb.invoiceItems.size() == 2
         assert orderItemFromDb.invoiceItems.find { it.inverse } == inverseItem
 
+        where:
+        prepaymentAmount || expectedInverseAmount
+        0                || 0
+        1                || -1
+        10.46            || -10.46
+    }
+
+    void 'OBPIH-6726: migrateFinalInvoice successfully populates the relationship to shipment items when generating inverses'() {
+        given: 'an order with an order item and a shipment item'
+        Order order = new Order(
+                paymentTerm: new PaymentTerm(prepaymentPercent: 100),
+        )
+        OrderItem orderItem = new OrderItem(
+                unitPrice: 1,
+        )
+        ShipmentItem shipmentItem = new ShipmentItem(
+                quantity: 1,
+                product: new Product(),
+        )
+        order.addToOrderItems(orderItem)
+        orderItem.addToShipmentItems(shipmentItem)
+        order.save(validate: false)  // Will cascade save the order item and shipment item
+
+        and: 'we make a prepayment on that order'
+        Invoice prepaymentInvoice = new Invoice(
+                invoiceType: prepaymentInvoiceType,
+        )
+        InvoiceItem prepaymentInvoiceItem = new InvoiceItem(
+                quantity: 1,  // Not used in amount calculation. Just needs to be > 0 to not get filtered out.
+                unitPrice: 1,
+        )
+        prepaymentInvoice.addToInvoiceItems(prepaymentInvoiceItem)
+        prepaymentInvoice.save(validate: false)
+
+        and: 'the prepayment item is mapped to the order item'
+        orderItem.addToInvoiceItems(prepaymentInvoiceItem)
+        orderItem.save(validate: false)
+
+        and: 'we have already generated a final invoice for that order'
+        InvoiceItem finalInvoiceItem = new InvoiceItem(
+                quantity: 1,
+                amount: 1,
+        )
+        Invoice finalInvoice = new Invoice(
+                invoiceNumber: "1",
+        )
+        finalInvoice.addToInvoiceItems(finalInvoiceItem)
+        finalInvoice.save(validate: false)
+
+        and: 'the final invoice item is mapped to the shipment item'
+        shipmentItem.addToInvoiceItems(finalInvoiceItem)
+        shipmentItem.save(validate: false)
+
+        when:
+        Invoice finalInvoiceAfterSave = service.migrateFinalInvoice(prepaymentInvoice, finalInvoice)
+
+        then: 'the inverse item should be created'
+        assert finalInvoiceAfterSave.invoiceItems.size() == 2
+
+        InvoiceItem inverseItem = finalInvoiceAfterSave.invoiceItems.find { it.inverse }
+        assert inverseItem != null
+        assert inverseItem.amount == -1
+
         and: 'the relationship between invoice item and shipment item should be fully populated in the returned inverse'
         assert inverseItem.shipmentItem != null
         assert inverseItem.shipmentItem.invoiceItems.size() == 2
@@ -452,5 +517,13 @@ class PrepaymentInvoiceMigrationServiceSpec extends Specification implements Ser
         assert shipmentItemFromDb != null
         assert shipmentItemFromDb.invoiceItems.size() == 2
         assert shipmentItemFromDb.invoiceItems.find { it.inverse } == inverseItem
+
+        where:
+        quantity | unitPrice || expectedInverseAmount
+        1        | 1         || -1
+        0        | 1         || 0
+        1        | 0         || 0
+        2        | 3         || -6
+        3        | 1.5       || -4.5
     }
 }
