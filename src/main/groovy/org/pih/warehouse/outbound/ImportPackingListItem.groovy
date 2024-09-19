@@ -32,7 +32,7 @@ class ImportPackingListItem implements Validateable {
 
         // otherwise infer inventory item based on provided bin-location
         Product product = Product.findByProductCode(source['product'])
-        List<ProductAvailability> items = productAvailabilityService.getAvailableBinLocations(obj.origin, product?.productCode)
+        List<ProductAvailability> items = productAvailabilityService.getAvailableBinLocations(obj.origin, product?.id)
                 .findAll { it?.binLocation?.name == source['binLocation'] }
 
         // infer lot-number only if there is a single possible inventory
@@ -52,7 +52,7 @@ class ImportPackingListItem implements Validateable {
             ProductAvailabilityService productAvailabilityService = Holders.grailsApplication.mainContext.getBean(ProductAvailabilityService)
 
             Product product = Product.findByProductCode(source['product'])
-            List<ProductAvailability> items = productAvailabilityService.getAvailableBinLocations(obj.origin, product?.productCode)
+            List<ProductAvailability> items = productAvailabilityService.getAvailableBinLocations(obj.origin, product?.id)
                     .findAll { it?.inventoryItem?.lotNumber == source['lotNumber']}
             // Infer bin location only if there is a single possible inventory
             if (items.size() == 1) {
