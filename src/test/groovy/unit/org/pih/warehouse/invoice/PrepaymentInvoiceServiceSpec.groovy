@@ -380,11 +380,14 @@ class PrepaymentInvoiceServiceSpec extends Specification implements ServiceUnitT
 
         where:
         preapymentItemAmount   | inversedAmount   | amountAvailableToInverse
-        1.0                    | 1.0              | 0.0
-        -1.0                   | -1.0             | 0.0
+        1.0                    | -1.0             | 0.0
+        -1.0                   | 1.0              | 0.0
         1.0                    | 0.0              | 1.0
         -1.0                   | 0.0              | -1.0
         0.0                    | 0.0              | 0.0
+        10                     | -3               | 7
+        -5                     | 2                | -3
+        -5                     | 5                | 0
     }
 
     private Set<InvoiceItem> getInvoiceItemsOnOrderItems(Invoice invoice) {

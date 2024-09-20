@@ -437,7 +437,13 @@ class PrepaymentInvoiceService {
     }
 
     BigDecimal getAmountAvailableToInverse(OrderAdjustment orderAdjustment, InvoiceItem prepaymentItem) {
-        BigDecimal inversedAmount = orderAdjustment.inversedAmount
-        return Math.abs(prepaymentItem.amount) > Math.abs(inversedAmount) ? prepaymentItem.amount - inversedAmount : 0
+        // To determine what is current amount available to inverse we have to add prepayment amount to currently
+        // inversed amount (because both values have different signs). Examples:
+        // prepaymentItem.amount = 10, orderAdjustment.inversedAmount = -3, expected available to inverse = 7
+        // prepaymentItem.amount = -5, orderAdjustment.inversedAmount = 2, expected available to inverse = -3
+        // prepaymentItem.amount = -5, orderAdjustment.inversedAmount = 5, expected available to inverse = 0
+        // The actual inverse item sign will be switched while saving the inverse, because now we only determine
+        // how much of prepayment item's amount is available for inversing.
+        return prepaymentItem.amount + orderAdjustment.inversedAmount
     }
 }
