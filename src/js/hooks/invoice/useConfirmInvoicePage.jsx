@@ -139,6 +139,7 @@ const useConfirmInvoicePage = ({ initialValues }) => {
       await fetchInvoiceData();
       await loadMoreRows({
         startIndex: 0,
+        stopIndex: stateValues.totalCount,
         overrideInvoiceItems,
       });
     } finally {
@@ -151,8 +152,7 @@ const useConfirmInvoicePage = ({ initialValues }) => {
     isSuperuser,
     stateValues: {
       ...stateValues,
-      invoiceItems: Array.from(stateValues.invoiceItems)
-        .map((invoiceItemEntry) => invoiceItemEntry[1]),
+      invoiceItems: Array.from(stateValues.invoiceItems.values()),
     },
     invoiceItemsMap: stateValues.invoiceItems,
     fetchInvoiceData,

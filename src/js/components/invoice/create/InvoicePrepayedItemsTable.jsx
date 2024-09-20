@@ -8,7 +8,7 @@ import { Tooltip } from 'react-tippy';
 import ArrayField from 'components/form-elements/ArrayField';
 import LabelField from 'components/form-elements/LabelField';
 import TextInput from 'components/form-elements/v2/TextInput';
-import { ORDER_URL, STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
+import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
 import ContextMenu from 'utils/ContextMenu';
 import { renderFormField } from 'utils/form-utils';
 import { getInvoiceDescription } from 'utils/form-values-utils';
