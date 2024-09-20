@@ -347,47 +347,50 @@ class PrepaymentInvoiceServiceSpec extends Specification implements ServiceUnitT
         thrown(Exception)
     }
 
-    void 'getAmountToInverse should calculate amount to inverse #amountToInverse when amount invoiced is #amountInvoiced and amount inverseable is #amountInverseable'() {
+    void 'getUnitPriceToInverse should calculate unitPrice to inverse #unitPriceToInverse when unitPrice invoiced is #unitPriceInvoiced and unitPrice inverseable is #unitPriceInverseable'() {
         when:
-        BigDecimal amountToInverseCalc = service.getAmountToInverse(amountInvoiced, amountInversable)
+        BigDecimal unitPriceToInverseCalc = service.getUnitPriceToInverse(unitPriceInvoiced, unitPriceInversable)
 
         then:
-        assert amountToInverseCalc == amountToInverse
+        assert unitPriceToInverseCalc == unitPriceToInverse
 
         where:
-        amountInvoiced   | amountInversable   | amountToInverse
-        1.0              | 1.0                | 1.0
-        -1.0             | -1.0               | -1.0
-        1.0              | 0.0                | 0.0
-        0.0              | 1.0                | 0.0
-        -1.0             | 0.0                | 0.0
-        0.0              | -1.0               | 0.0
+        unitPriceInvoiced   | unitPriceInversable   | unitPriceToInverse
+        1.0                 | 1.0                   | 1.0
+        -1.0                | -1.0                  | -1.0
+        1.0                 | 0.0                   | 0.0
+        0.0                 | 1.0                   | 0.0
+        -1.0                | 0.0                   | 0.0
+        0.0                 | -1.0                  | 0.0
     }
 
-    void 'getAmountAvailableToInverse should calculate amount available to inverse #availableToInverse when amount on prepayment item is #preapymentItemAmount and inversed amount is #inversedAmount'() {
+    void 'getUnitPriceAvailableToInverse should calculate unit price available to inverse #unitPriceAvailableToInverse when unit price on prepayment item is #preapymentItemUnitPrice and inversed unit price is #inversedUnitPrice'() {
         given:
         InvoiceItem prepaymentItem = new InvoiceItem()
-        prepaymentItem.amount = preapymentItemAmount
+        prepaymentItem.unitPrice = preapymentItemUnitPrice
         OrderAdjustment orderAdjustment = Spy(OrderAdjustment) {
-            getInversedAmount() >> inversedAmount
+            getInversedUnitPrice() >> inversedUnitPrice
         }
 
         when:
-        BigDecimal amountAvailableToInverseCalc = service.getAmountAvailableToInverse(orderAdjustment, prepaymentItem)
+        BigDecimal unitPriceAvailableToInverseCalc = service.getUnitPriceAvailableToInverse(
+                prepaymentItem.unitPrice,
+                orderAdjustment.inversedUnitPrice
+        )
 
         then:
-        assert amountAvailableToInverseCalc == amountAvailableToInverse
+        assert unitPriceAvailableToInverseCalc == unitPriceAvailableToInverse
 
         where:
-        preapymentItemAmount   | inversedAmount   | amountAvailableToInverse
-        1.0                    | -1.0             | 0.0
-        -1.0                   | 1.0              | 0.0
-        1.0                    | 0.0              | 1.0
-        -1.0                   | 0.0              | -1.0
-        0.0                    | 0.0              | 0.0
-        10                     | -3               | 7
-        -5                     | 2                | -3
-        -5                     | 5                | 0
+        preapymentItemUnitPrice | inversedUnitPrice | unitPriceAvailableToInverse
+        1.0                     | 1.0               | 0.0
+        -1.0                    | -1.0              | 0.0
+        1.0                     | 0.0               | 1.0
+        -1.0                    | 0.0               | -1.0
+        0.0                     | 0.0               | 0.0
+        10                      | 3                 | 7
+        -5                      | -2                | -3
+        -5                      | -5                | 0
     }
 
     private Set<InvoiceItem> getInvoiceItemsOnOrderItems(Invoice invoice) {

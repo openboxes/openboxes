@@ -14,9 +14,9 @@ class OrderAdjustmentSpec extends Specification implements DomainUnitTest<OrderA
         OrderAdjustment orderAdjustment = Spy(OrderAdjustment) {
             getHasRegularInvoice() >> hasRegularInvoice
             getHasPrepaymentInvoice() >> true
-            getInvoicedQuantity() >> 0
+//            getInvoicedQuantity() >> 0
             getTotalAdjustments() >> 4
-            getInvoicedAmount() >> 3
+            getInvoicedUnitPrice() >> 3
         }
         orderAdjustment.canceled = canceled
         orderAdjustment.order = Spy(Order)
@@ -35,14 +35,14 @@ class OrderAdjustmentSpec extends Specification implements DomainUnitTest<OrderA
     }
 
 
-    void 'OrderAdjustment.getIsInvoiceable() should return #isInvoiceable when trying to invoice #amountInvoiced out of 4 adjustments'() {
+    void 'OrderAdjustment.getIsInvoiceable() should return #isInvoiceable when trying to invoice #unitPriceInvoiced out of 4 adjustments'() {
         given:
         OrderAdjustment orderAdjustment = Spy(OrderAdjustment) {
             getHasRegularInvoice() >> hasRegularInvoice
             getHasPrepaymentInvoice() >> true
-            getInvoicedQuantity() >> 0
+//            getInvoicedQuantity() >> 0
             getTotalAdjustments() >> 4
-            getInvoicedAmount() >> amountInvoiced
+            getInvoicedUnitPrice() >> unitPriceInvoiced
         }
         orderAdjustment.canceled = canceled
         orderAdjustment.order = Spy(Order)
@@ -52,12 +52,12 @@ class OrderAdjustmentSpec extends Specification implements DomainUnitTest<OrderA
         orderAdjustment.invoiceable == isInvoiceable
 
         where:
-        hasRegularInvoice  | canceled   | amountInvoiced || isInvoiceable
-        false              | true       | 3              || true
-        false              | true       | 4              || false
-        false              | false      | 3              || true
-        false              | false      | 4              || false
-        true               | false      | 3              || true
-        true               | false      | 4              || false
+        hasRegularInvoice  | canceled   | unitPriceInvoiced || isInvoiceable
+        false              | true       | 3                 || true
+        false              | true       | 4                 || false
+        false              | false      | 3                 || true
+        false              | false      | 4                 || false
+        true               | false      | 3                 || true
+        true               | false      | 4                 || false
     }
 }
