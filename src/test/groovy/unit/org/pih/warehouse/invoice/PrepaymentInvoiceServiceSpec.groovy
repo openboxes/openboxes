@@ -364,10 +364,10 @@ class PrepaymentInvoiceServiceSpec extends Specification implements ServiceUnitT
         0.0                 | -1.0                  | 0.0
     }
 
-    void 'getUnitPriceAvailableToInverse should calculate unit price available to inverse #unitPriceAvailableToInverse when unit price on prepayment item is #preapymentItemUnitPrice and inversed unit price is #inversedUnitPrice'() {
+    void 'getUnitPriceAvailableToInverse should calculate unit price available to inverse #unitPriceAvailableToInverse when unit price on prepayment item is #prepaymentItemUnitPrice and inversed unit price is #inversedUnitPrice'() {
         given:
         InvoiceItem prepaymentItem = new InvoiceItem()
-        prepaymentItem.unitPrice = preapymentItemUnitPrice
+        prepaymentItem.unitPrice = prepaymentItemUnitPrice
         OrderAdjustment orderAdjustment = Spy(OrderAdjustment) {
             getInversedUnitPrice() >> inversedUnitPrice
         }
@@ -382,7 +382,7 @@ class PrepaymentInvoiceServiceSpec extends Specification implements ServiceUnitT
         assert unitPriceAvailableToInverseCalc == unitPriceAvailableToInverse
 
         where:
-        preapymentItemUnitPrice | inversedUnitPrice | unitPriceAvailableToInverse
+        prepaymentItemUnitPrice | inversedUnitPrice | unitPriceAvailableToInverse
         1.0                     | 1.0               | 0.0
         -1.0                    | -1.0              | 0.0
         1.0                     | 0.0               | 1.0
