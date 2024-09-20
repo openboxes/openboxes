@@ -156,6 +156,11 @@ class OrderAdjustment implements Serializable, Comparable<OrderAdjustment> {
             return hasPrepaymentInvoice && !hasRegularInvoice && order.placed && !fullyInvoiced
         }
 
+        // check if by any chance it was invoiced as cancelled
+        if (totalAdjustments == 0) {
+            return order.placed && !hasRegularInvoice
+        }
+
         return order.placed && !fullyInvoiced
     }
 
