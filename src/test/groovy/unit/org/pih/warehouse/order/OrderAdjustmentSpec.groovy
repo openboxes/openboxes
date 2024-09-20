@@ -14,7 +14,6 @@ class OrderAdjustmentSpec extends Specification implements DomainUnitTest<OrderA
         OrderAdjustment orderAdjustment = Spy(OrderAdjustment) {
             getHasRegularInvoice() >> hasRegularInvoice
             getHasPrepaymentInvoice() >> true
-//            getInvoicedQuantity() >> 0
             getTotalAdjustments() >> 4
             getInvoicedUnitPrice() >> 3
         }
@@ -40,7 +39,6 @@ class OrderAdjustmentSpec extends Specification implements DomainUnitTest<OrderA
         OrderAdjustment orderAdjustment = Spy(OrderAdjustment) {
             getHasRegularInvoice() >> hasRegularInvoice
             getHasPrepaymentInvoice() >> true
-//            getInvoicedQuantity() >> 0
             getTotalAdjustments() >> 4
             getInvoicedUnitPrice() >> unitPriceInvoiced
         }
