@@ -106,13 +106,13 @@ class OrderAdjustment implements Serializable, Comparable<OrderAdjustment> {
     }
 
     InvoiceAdjustmentStatus getDerivedStatus() {
-        Boolean invoicedFullAmount = invoicedAmount == totalAdjustments
+        Boolean fullyInvoiced = invoicedUnitPrice == totalAdjustments
 
         if (isInvoiced) {
             if (canceled || totalAdjustments == 0) {
                 return InvoiceAdjustmentStatus.INVOICED
             }
-            if (invoicedFullAmount) {
+            if (fullyInvoiced) {
                 return InvoiceAdjustmentStatus.INVOICED
             }
             return InvoiceAdjustmentStatus.PARTIALLY_INVOICED
