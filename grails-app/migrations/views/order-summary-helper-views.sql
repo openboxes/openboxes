@@ -127,7 +127,7 @@ FROM (
              order_adjustment.percentage 			 	 AS order_adjustment_percentage,
              order_adjustment.order_item_id 	         AS order_item_id,
              order_item.quantity * order_item.unit_price AS order_item_subtotal,
-             SUM(order_total.order_total)					 AS order_subtotal,
+             SUM(order_total.order_total)				 AS order_subtotal,
              CASE
                  WHEN invoice.date_posted IS NOT NULL THEN IFNULL(invoice_item.quantity, 0)
                  ELSE 0
