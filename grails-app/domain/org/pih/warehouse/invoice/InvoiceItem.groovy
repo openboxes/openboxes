@@ -86,7 +86,7 @@ class InvoiceItem implements Serializable {
             // If the invoice is a prepayment or the item is an order adjustment,
             // the validation below doesn't make sense, because
             // we do not have shipmentItem at this point.
-            if (obj.invoice?.isPrepaymentInvoice || obj.orderAdjustment) {
+            if (obj.invoice?.isPrepaymentInvoice || obj.orderAdjustment || obj.inverse) {
                 return true
             }
 

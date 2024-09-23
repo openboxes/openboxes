@@ -4,6 +4,7 @@ import grails.gorm.transactions.Transactional
 
 import org.pih.warehouse.order.OrderAdjustment
 import org.pih.warehouse.order.OrderItem
+import org.pih.warehouse.shipping.ShipmentItem
 
 /**
  * This service exists for the sole purpose of performing data migrations for changelog 0.9.x/2024-08-20-0000.
@@ -11,6 +12,8 @@ import org.pih.warehouse.order.OrderItem
  */
 @Transactional
 class PrepaymentInvoiceMigrationService {
+
+    PrepaymentInvoiceService prepaymentInvoiceService
 
     /**
      * For STEP 1 of the migration.
@@ -55,8 +58,10 @@ class PrepaymentInvoiceMigrationService {
     /**
      * For STEP 2 of the migration.
      *
-     * For every item in a given prepayment invoice, set the amount field and add an inverse invoice item to the
-     * final invoice of the order.
+     * For every item in a given prepayment invoice, set the amount field and add its inverse invoice items to the
+     * final invoice of the order. Notably if there are multiple shipments on a single order item, we'll be creating
+     * multiple inverse invoice items, one per shipment. Otherwise it's a one-to-one mapping from item in the
+     * prepayment invoice to inverse item in the final invoice.
      *
      * This method assumes that because there is both a prepayment invoice and a final invoice, that the order
      * associated with both invoices has been fully invoiced, and so there's no need to check each item of the
@@ -71,8 +76,11 @@ class PrepaymentInvoiceMigrationService {
 
         // STEP 2.2 - create inverse items
         for (InvoiceItem prepaymentInvoiceItem : prepaymentInvoice.invoiceItems) {
-            InvoiceItem inverseItem = createInverseInvoiceItem(prepaymentInvoiceItem)
-            finalInvoice.addToInvoiceItems(inverseItem)
+            List<InvoiceItem> inverseItems = createInverseInvoiceItems(prepaymentInvoiceItem)
+
+            // GORM requires that the invoice items be added to the invoice one by one in a loop in order
+            // to be able to set back-references properly.
+            inverseItems.each { finalInvoice.addToInvoiceItems(it) }
         }
 
         return finalInvoice.save(failOnError: true)
@@ -90,15 +98,39 @@ class PrepaymentInvoiceMigrationService {
         }
     }
 
-    private InvoiceItem createInverseInvoiceItem(InvoiceItem prepaymentInvoiceItem) {
-        // Because we already computed the amount field for prepayment invoice items in step 1, and because there will
-        // always be a one-to-one mapping of prepayment invoice item to final invoice item for pre-existing data,
-        // all we need to do to create the inverse item is copy the prepayment invoice item and inverse the amount.
-        InvoiceItem inverseItem = prepaymentInvoiceItem.clone()
+    private List<InvoiceItem> createInverseInvoiceItems(InvoiceItem prepaymentInvoiceItem) {
+        // If the prepayment item has no associated shipment items, it must be an adjustment or a canceled order item.
+        Set<ShipmentItem> shipmentItems = prepaymentInvoiceItem.orderItem?.shipmentItems
+        if (!shipmentItems) {
+            // Because we already computed the amount field for prepayment invoice items in step 1, and because there is
+            // always a one-to-one mapping of prepayment invoice item to final invoice item for pre-existing adjustment
+            // items and canceled order items, all we need to do to create the inverse item is copy the prepayment
+            // invoice item and inverse the amount.
+            InvoiceItem inverseItem = prepaymentInvoiceItem.clone()
 
-        inverseItem.inverse = true
-        inverseItem.amount = prepaymentInvoiceItem.amount * -1
+            inverseItem.inverse = true
+            inverseItem.amount = prepaymentInvoiceItem.amount * -1
 
-        return inverseItem
+            return [inverseItem]
+        }
+
+        // Otherwise the order item was shipped normally. Because the item might be split up across multiple shipments,
+        // and because we generate one regular invoice item per shipment item, we need to make sure to also create
+        // one inverse invoice item for each shipment item.
+        List<InvoiceItem> inverseItems = []
+        for (ShipmentItem shipmentItem : shipmentItems) {
+            // A shipment item has no association to prepayment invoice items and so this loop is only on the regular
+            // invoice items associated with the shipment.
+            for (InvoiceItem regularInvoiceItem : shipmentItem.invoiceItems) {
+                // This call does more work than we need at this point because for pre-migration data we know that there
+                // aren't any other invoices or inverses to check against. However, simply calling the service here
+                // saves us from needing to duplicate code, and the migration is performant enough for it to be okay.
+                InvoiceItem inverseItem = prepaymentInvoiceService.createInverseItemForShipmentItem(shipmentItem, regularInvoiceItem)
+                if (inverseItem) {
+                    inverseItems.add(inverseItem)
+                }
+            }
+        }
+        return inverseItems
     }
 }
