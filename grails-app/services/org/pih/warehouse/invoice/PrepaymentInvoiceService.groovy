@@ -151,9 +151,9 @@ class PrepaymentInvoiceService {
                 quantity: orderAdjustment?.canceled ? 0 : 1,
                 quantityUom: orderAdjustment.orderItem?.quantityUom,
                 quantityPerUom: orderAdjustment.orderItem?.quantityPerUom ?: 1,
-                unitPrice: orderAdjustment.amountAvailableToInvoice,
-                // For non-canceled order adjustments amount is equal to the total adjustments
-                amount: orderAdjustment?.canceled ? 0 : orderAdjustment.amountAvailableToInvoice
+                unitPrice: orderAdjustment.unitPriceAvailableToInvoice,
+                // For non-canceled order adjustments amount is equal to the total adjustments (which is kept as unit price)
+                amount: orderAdjustment?.canceled ? 0 : orderAdjustment.unitPriceAvailableToInvoice
         )
         invoiceItem.addToOrderAdjustments(orderAdjustment)
         return invoiceItem
@@ -203,8 +203,11 @@ class PrepaymentInvoiceService {
             return null
         }
 
-        BigDecimal amountToInverse = getAmountAvailableToInverse(orderAdjustment, prepaymentItem)
-        if (!amountToInverse) {
+        BigDecimal unitPriceToInverse = getUnitPriceAvailableToInverse(
+                prepaymentItem.unitPrice,
+                orderAdjustment.inversedUnitPrice
+        )
+        if (!unitPriceToInverse) {
             return null
         }
 
@@ -212,10 +215,10 @@ class PrepaymentInvoiceService {
         // For order adjustment invoiceItem.quantity is 1 or 0, but for inverse should be for now 1
         inverseItem.quantity = 1
         inverseItem.inverse = true
-        inverseItem.unitPrice = amountToInverse
+        inverseItem.unitPrice = unitPriceToInverse
         // Multiplied by (-1) to keep inverse items as negative amount
         // unit price is taken from prepayment item (to not accidentally overwrite inverse with changed unit price)
-        inverseItem.amount = amountToInverse * (-1)
+        inverseItem.amount = unitPriceToInverse * orderAdjustment.order.prepaymentPercent * (-1)
         return inverseItem
     }
 
@@ -402,8 +405,8 @@ class PrepaymentInvoiceService {
             throw new IllegalArgumentException(applicationTagLib.message(code: "invoiceItem.unitPriceSignChange.error", default: defaultMessage))
         }
 
-        BigDecimal amountAvailableToInvoice = invoiceItem.orderAdjustment.amountAvailableToInvoice
-        if (Math.abs(unitPrice) > Math.abs(amountAvailableToInvoice) + Math.abs(invoiceItem.unitPrice)) {
+        BigDecimal unitPriceAvailableToInvoice = invoiceItem.orderAdjustment.unitPriceAvailableToInvoice
+        if (Math.abs(unitPrice) > Math.abs(unitPriceAvailableToInvoice) + Math.abs(invoiceItem.unitPrice)) {
             String defaultMessage = "Cannot update unit price to higher value than available to invoice"
             throw new IllegalArgumentException(applicationTagLib.message(code: "invoiceItem.unitPriceTooHigh.error", default: defaultMessage))
         }
@@ -415,12 +418,15 @@ class PrepaymentInvoiceService {
         if (inverseItem) {
             OrderAdjustment orderAdjustment = invoiceItem?.orderAdjustment
             InvoiceItem prepaymentItem = orderAdjustment.invoiceItems.find { it.isPrepaymentInvoice }
-            // find quantity that is still available to inverse and add to the current quantity from this inverse item
-            // this needs to be checked because we can also increase invoiced quantity here
-            BigDecimal amountAvailableToInverse = inverseItem.amount + getAmountAvailableToInverse(orderAdjustment, prepaymentItem)
-            BigDecimal amountToInverse = getAmountToInverse(unitPrice, amountAvailableToInverse)
-            inverseItem.unitPrice = amountToInverse
-            inverseItem.amount = inverseItem.quantity * amountToInverse * orderAdjustment.order.prepaymentPercent * (-1)
+            // find unit price that is still available to inverse and add to the current unit price from this inverse item
+            // this needs to be checked because we can also increase invoiced unit price here
+            BigDecimal unitPriceAvailableToInverse = inverseItem.unitPrice + getUnitPriceAvailableToInverse(
+                    prepaymentItem.unitPrice,
+                    orderAdjustment.inversedUnitPrice
+            )
+            BigDecimal unitPriceToInverse = getUnitPriceToInverse(unitPrice, unitPriceAvailableToInverse)
+            inverseItem.unitPrice = unitPriceToInverse
+            inverseItem.amount = inverseItem.quantity * unitPriceToInverse * orderAdjustment.order.prepaymentPercent * (-1)
             return
         }
 
@@ -432,18 +438,11 @@ class PrepaymentInvoiceService {
         }
     }
 
-    BigDecimal getAmountToInverse(BigDecimal amountInvoiced, BigDecimal amountInverseable) {
-        return Math.abs(amountInvoiced) >= Math.abs(amountInverseable) ? amountInverseable : amountInvoiced
+    BigDecimal getUnitPriceToInverse(BigDecimal unitPriceInvoiced, BigDecimal unitPriceInverseable) {
+        return Math.abs(unitPriceInvoiced) >= Math.abs(unitPriceInverseable) ? unitPriceInverseable : unitPriceInvoiced
     }
 
-    BigDecimal getAmountAvailableToInverse(OrderAdjustment orderAdjustment, InvoiceItem prepaymentItem) {
-        // To determine what is current amount available to inverse we have to add prepayment amount to currently
-        // inversed amount (because both values have different signs). Examples:
-        // prepaymentItem.amount = 10, orderAdjustment.inversedAmount = -3, expected available to inverse = 7
-        // prepaymentItem.amount = -5, orderAdjustment.inversedAmount = 2, expected available to inverse = -3
-        // prepaymentItem.amount = -5, orderAdjustment.inversedAmount = 5, expected available to inverse = 0
-        // The actual inverse item sign will be switched while saving the inverse, because now we only determine
-        // how much of prepayment item's amount is available for inversing.
-        return prepaymentItem.amount + orderAdjustment.inversedAmount
+    BigDecimal getUnitPriceAvailableToInverse(BigDecimal unitPrice, BigDecimal inversedUnitPrice) {
+        return Math.abs(unitPrice) > Math.abs(inversedUnitPrice) ? unitPrice - inversedUnitPrice : 0
     }
 }

@@ -133,10 +133,10 @@ const useInvoicePrepaidItemsTable = ({
 
   // validation for order adjustments
   const validateUnitPrice = (row) => {
-    const amountAvailableToInvoice =
-      Math.abs(row?.amountAvailableToInvoice) + Math.abs(row?.amount);
+    const unitPriceAvailableToInvoice =
+      Math.abs(row?.unitPriceAvailableToInvoice) + Math.abs(row?.unitPrice);
     if (
-      row?.unitPrice === 0 || amountAvailableToInvoice < Math.abs(row.unitPrice)
+      row?.unitPrice === 0 || unitPriceAvailableToInvoice < Math.abs(row.unitPrice)
     ) {
       setInvalidRows((rows) => ([...rows, row?.id]));
       return translate('react.invoice.errors.unitPrice.label', 'Wrong amount to invoice value');

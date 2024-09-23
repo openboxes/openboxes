@@ -105,48 +105,24 @@ class OrderAdjustment implements Serializable, Comparable<OrderAdjustment> {
     }
 
     /**
-     * Overall invoiced quantity for this adjustment. Expected is either 0 or 1. Should not be more than 1.
+     * Overall invoiced unit price for this adjustment. Can be positive, negative or 0.
      * */
-    Integer getInvoicedQuantity() {
-        return invoiceItems?.sum {
-            if (it.invoice.isRegularInvoice && !it.inverse) {
-                return it.quantity
-            }
-            return 0
-        } ?: 0
-    }
-
-    /**
-     * Overall invoiced amount for this adjustment. Can be positive, negative or 0.
-     * */
-    BigDecimal getInvoicedAmount() {
+    BigDecimal getInvoicedUnitPrice() {
         return invoiceItems?.sum {
             if (it.invoice?.isRegularInvoice && !it.inverse) {
-                return it.amount
+                return it.unitPrice
             }
             return 0
         } ?: 0
     }
 
     /**
-     * Overall inversed quantity for this adjustment. Expected is either 0 or 1. Should not be more than 1.
+     * Overall inversed unit price for this adjustment. Can be positive, negative or 0.
      * */
-    Integer getInversedQuantity() {
-        return invoiceItems?.sum { it ->
-            if (it.inverse) {
-                it.quantity
-            }
-            return 0
-        } ?: 0
-    }
-
-    /**
-     * Overall inversed amount for this adjustment. Can be positive, negative or 0.
-     * */
-    BigDecimal getInversedAmount() {
+    BigDecimal getInversedUnitPrice() {
         return invoiceItems?.sum {
             if (it.inverse) {
-                return it.amount
+                return it.unitPrice
             }
             return 0
         } ?: 0
@@ -169,18 +145,18 @@ class OrderAdjustment implements Serializable, Comparable<OrderAdjustment> {
 
     /**
      * Adjustment is invoiceable on regular invoice if:
-     *  - adjustment is canceled, it has prepayment, does not have full amount (total adjustment) invoiced in all regular invoices and order is placed
-     *  - adjustment is not canceled, and does not have full amount (total adjustment) invoiced in all regular invoices
-     *  - adjustment does not have full amount (total adjustment) invoiced in all regular invoices yet and order is placed
+     *  - adjustment is canceled, it has prepayment, does not have full unit price (total adjustment) invoiced in all regular invoices and order is placed
+     *  - adjustment is not canceled, and does not have full unit price (total adjustment) invoiced in all regular invoices
+     *  - adjustment does not have full unit price (total adjustment) invoiced in all regular invoices yet and order is placed
      * */
     Boolean isInvoiceable() {
-        Boolean invoicedFullAmount = invoicedAmount == totalAdjustments
+        Boolean fullyInvoiced = invoicedUnitPrice == totalAdjustments
 
         if (canceled) {
-            return hasPrepaymentInvoice && !hasRegularInvoice && order.placed && !invoicedFullAmount
+            return hasPrepaymentInvoice && !hasRegularInvoice && order.placed && !fullyInvoiced
         }
 
-        return order.placed && !invoicedFullAmount
+        return order.placed && !fullyInvoiced
     }
 
     Boolean getHasInvoices() {
@@ -195,15 +171,12 @@ class OrderAdjustment implements Serializable, Comparable<OrderAdjustment> {
         return invoices.any { it.invoiceType == null || it.invoiceType?.code == InvoiceTypeCode.INVOICE }
     }
 
-    /**
-     * Should it be unit price instead amount? :thinking:
-     * */
-    BigDecimal getAmountAvailableToInvoice() {
+    BigDecimal getUnitPriceAvailableToInvoice() {
         if (totalAdjustments == 0 || canceled) {
             return 0
         }
 
-        return totalAdjustments - invoicedAmount
+        return totalAdjustments - invoicedUnitPrice
     }
 
     @Override
