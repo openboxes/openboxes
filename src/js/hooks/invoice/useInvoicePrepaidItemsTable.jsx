@@ -67,11 +67,15 @@ const useInvoicePrepaidItemsTable = ({
 
   // Sending a request for updating invoice items (batch update)
   const updateInvoiceItem = async (callback) => {
-    const invoiceItemsToUpdate = getEditedInvoiceItems();
-    if (invoiceItemsToUpdate.length) {
-      await prepaymentInvoiceApi.updateInvoiceItems(invoiceId, invoiceItemsToUpdate);
+    try {
+      const invoiceItemsToUpdate = getEditedInvoiceItems();
+      if (invoiceItemsToUpdate.length) {
+        await prepaymentInvoiceApi.updateInvoiceItems(invoiceId, invoiceItemsToUpdate);
+      }
+      callback?.();
+    } finally {
+      spinner.hide();
     }
-    callback?.();
   };
 
   const markRowAsEditable = ({
@@ -134,7 +138,7 @@ const useInvoicePrepaidItemsTable = ({
   // validation for order adjustments
   const validateUnitPrice = (row) => {
     const unitPriceAvailableToInvoice =
-      Math.abs(row?.unitPriceAvailableToInvoice) + Math.abs(row?.unitPrice);
+      Math.abs(row?.unitPriceAvailableToInvoice) + Math.abs(row?.amount);
     if (
       row?.unitPrice === 0 || unitPriceAvailableToInvoice < Math.abs(row.unitPrice)
     ) {
