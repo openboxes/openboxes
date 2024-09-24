@@ -11,13 +11,6 @@ package org.pih.warehouse
 
 import grails.converters.JSON
 import grails.util.Holders
-import liquibase.Contexts
-import liquibase.LabelExpression
-import liquibase.Liquibase
-import liquibase.changelog.DatabaseChangeLog
-import liquibase.database.DatabaseFactory
-import liquibase.database.jvm.JdbcConnection
-import liquibase.resource.ClassLoaderResourceAccessor
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.api.EditPageItem
 import org.pih.warehouse.api.PackPageItem
@@ -79,25 +72,17 @@ import org.pih.warehouse.shipping.ContainerType
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.shipping.ShipmentType
-import org.springframework.core.io.Resource
-import org.springframework.core.io.support.PathMatchingResourcePatternResolver
 import org.quartz.Scheduler
-import util.LiquibaseUtil
 
-import javax.sql.DataSource
 import java.math.RoundingMode
 
 class BootStrap {
 
     UploadService uploadService
-    DataSource dataSource
 
     def init = { servletContext ->
         log.info("Registering JSON marshallers ...")
         registerJsonMarshallers()
-
-        log.info("Executing database migrations ...")
-        executeDatabaseMigrations()
 
         log.info("Starting Quartz scheduler ...")
         Scheduler scheduler = Holders.grailsApplication.mainContext.getBean( 'quartzScheduler' )
@@ -616,101 +601,4 @@ class BootStrap {
     def destroy = {
 
     }
-
-    void executeDatabaseMigrations() {
-        // ================================    Static Data    ============================================
-        //
-        // Use the 'demo' environment to create a database with 'static' and 'demo' data.  Then
-        // run the following:
-        //
-        // 		$ grails -Dgrails.env=demo run-app
-        //
-        // In another terminal, run through these commands to generate the appropriate
-        // changelog files for a new version of the data model
-        //
-        // 		$ grails db-diff-schema > grails-app/migrations/x.x.x/changelog-initial-schema.xml
-        // 		$ grails db-diff-index > grails-app/migrations/x.x.x/changelog-initial-indexes.xml
-        // 		$ grails db-diff-data > grails-app/migrations/x.x.x/changelog-initial-data.xml
-        //
-        // Migrating existing data to the new data model is still a work in progress, but you can
-        // use the previous versions changelogs.
-        //
-        log.info("Running liquibase changelog(s) ...")
-        Liquibase liquibase = null
-        try {
-
-            def connection = new JdbcConnection(dataSource.getConnection())
-            if (connection == null) {
-                throw new RuntimeException("Connection could not be created.")
-            }
-
-            def database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(connection)
-            database.setDefaultSchemaName(connection.catalog)
-            boolean isRunningMigrations = LiquibaseUtil.isRunningMigrations()
-            log.info("Liquibase running: ${isRunningMigrations}")
-            log.info("Setting default schema to ${connection.catalog}")
-            log.info("Product Version: ${database.databaseProductVersion}")
-            log.info("Database Version: ${database.databaseMajorVersion}.${database.databaseMinorVersion} (${database.databaseProductName} ${database.databaseProductVersion})")
-
-            // Ensure the databasechangelog up-to-date in order to handle
-            // DatabaseException: Error executing SQL SELECT * FROM obnav.DATABASECHANGELOG
-            // ORDER BY DATEEXECUTED ASC, ORDEREXECUTED ASC: Unknown column 'ORDEREXECUTED' in 'order clause'
-            liquibase = new Liquibase(null as DatabaseChangeLog, new ClassLoaderResourceAccessor(), database)
-            liquibase.checkLiquibaseTables(false, null, new Contexts(), new LabelExpression())
-
-            // This needs to happen before we execute any changelogs in order to ensure that we
-            // FIXME could we ever be in a state where the install changelog has not been executed
-            //  but we have records in DATABASECHANGELOG
-            // FIXME, we should probably add some logic to look for an "install" changelog
-            List executedChangeLogVersions = LiquibaseUtil.getExecutedChangelogVersions()
-            log.info("executedChangelogVersions: " + executedChangeLogVersions)
-
-            // The process should always start with us dropping views (they are recreated at the end)
-            log.info 'Dropping all views (will rebuild after migrations complete)...'
-            LiquibaseUtil.executeChangeLog("views/drop-all-views.xml")
-
-
-            // If nothing has been created yet, let's create all new database objects with the install scripts
-            if (!executedChangeLogVersions) {
-                log.info("Running install changelog ...")
-                LiquibaseUtil.executeChangeLog("install/changelog.xml")
-            }
-
-            // Get all possible "upgrade to latest" versions. Currently, 0.9.x is the "install",
-            // version while 0.8.x, 0.7.x, 0.6.x, 0.5.x are considered "upgrade" versions.
-            Set<String> upgradeChangeLogVersions = LiquibaseUtil.upgradeChangeLogVersions
-            log.info("upgradeChangeLogVersions: " + upgradeChangeLogVersions)
-
-            // This should be removed if we ever reset changelogs so there are no "upgrade" versions
-            // in the source code (although this will probably never happen)
-            if (upgradeChangeLogVersions?.empty) {
-                throw new RuntimeException("Unable to determine whether there are database migrations to be executed")
-            }
-
-            // Check if any of the executed changelog versions include one of the "upgrade" versions
-            // and if so, then we need to keep running the upgrade changelogs to catch up to 0.9.x
-            boolean hasExecutedAnyUpgradeChangeLog =
-                executedChangeLogVersions.any { upgradeChangeLogVersions.contains(it.version) }
-
-            // Run through the upgrade changelog
-            // note: Liquibase does the hard work of determining what changesets need to be applied
-            if (hasExecutedAnyUpgradeChangeLog) {
-                log.info("Running upgrade changelog ...")
-                LiquibaseUtil.executeChangeLog("upgrade/changelog.xml")
-            }
-
-            // And now we need to run changelogs from 0.9.x and beyond
-            log.info("Running latest updates")
-            LiquibaseUtil.executeChangeLog("changelog.groovy")
-
-            log.info 'Rebuilding views ...'
-            LiquibaseUtil.executeChangeLog("views/changelog.xml")
-
-        } finally {
-            log.info('Safely closing database')
-            liquibase?.database?.close()
-        }
-        log.info("Finished running liquibase changelog(s)!")
-    }
-
 }

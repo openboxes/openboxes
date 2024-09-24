@@ -36,8 +36,10 @@ grails:
     plugin:
         console:
             enabled: true  # https://github.com/sheehan/grails-console#security
+
+        # Grails Liquibase database migration support. https://grails.github.io/grails-database-migration/latest/
         databasemigration:
-            updateOnStart: false
+            updateOnStart: true
             updateOnStartFileName: changelog.groovy
 
 info:
