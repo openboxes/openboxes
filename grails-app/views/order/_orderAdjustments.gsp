@@ -55,7 +55,7 @@
                         ${orderAdjustment?.budgetCode?.code}
                     </td>
                     <td>
-                        <format:metadata obj="${orderAdjustment.derivedStatus}"/>
+                        <format:metadata obj="${orderAdjustment.derivedPaymentStatus}"/>
                     </td>
                     </g:if>
                     <g:else>

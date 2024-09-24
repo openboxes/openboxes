@@ -11,21 +11,21 @@ package org.pih.warehouse.invoice
 
 import org.pih.warehouse.core.StatusType
 
-enum InvoiceAdjustmentStatus {
+enum OrderAdjustmentInvoiceStatus {
 
-    NOT_INVOICED(10, StatusType.WARNING),
-    INVOICED(10, StatusType.SUCCESS),
+    NOT_INVOICED(0, StatusType.WARNING),
     PARTIALLY_INVOICED(10, StatusType.PRIMARY),
+    INVOICED(20, StatusType.SUCCESS),
 
     int sortOrder
     StatusType variant
 
-    InvoiceAdjustmentStatus(int sortOrder, StatusType variant) {
+    OrderAdjustmentInvoiceStatus(int sortOrder, StatusType variant) {
         this.sortOrder = sortOrder
         this.variant = variant
     }
 
-    static int compare(InvoiceAdjustmentStatus a, InvoiceAdjustmentStatus b) {
+    static int compare(OrderAdjustmentInvoiceStatus a, OrderAdjustmentInvoiceStatus b) {
         return a.sortOrder <=> b.sortOrder
     }
 
