@@ -883,7 +883,7 @@ class OrderService {
 
                     BudgetCode budgetCode = activeBudgetCodes.size() == 0 ? foundBudgetCodes[0] : activeBudgetCodes.first()
 
-                    if (orderItem.id && orderItem.hasRegularInvoice && orderItem.budgetCode != budgetCode) {
+                    if (orderItem.id && orderItem.hasRegularInvoice && orderItem.budgetCode?.id != budgetCode?.id) {
                         throw new IllegalArgumentException("Cannot update the budget code on a line that is already invoiced.")
                     }
                     if (code) {
