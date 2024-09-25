@@ -78,7 +78,7 @@ const ConfirmInvoicePage = ({ initialValues, previousPage }) => {
                 <Translate id="react.default.button.previous.label" defaultMessage="Previous" />
               </button>
               <button
-                type="submit"
+                type="button"
                 onClick={() => {
                   spinner.show();
                   if (
@@ -104,7 +104,7 @@ const ConfirmInvoicePage = ({ initialValues, previousPage }) => {
               {isSuperuser
                   && (
                   <button
-                    type="submit"
+                    type="button"
                     onClick={() => {
                       spinner.show();
                       if (
