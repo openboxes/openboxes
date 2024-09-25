@@ -14,8 +14,8 @@ import grails.util.Holders
 import org.pih.warehouse.EmptyStringsToNullBinder
 import org.pih.warehouse.core.BudgetCode
 import org.pih.warehouse.core.GlAccount
+import org.pih.warehouse.invoice.OrderAdjustmentInvoiceStatus
 import org.pih.warehouse.invoice.InvoiceItem
-import org.pih.warehouse.invoice.InvoiceType
 import org.pih.warehouse.invoice.InvoiceTypeCode
 
 class OrderAdjustment implements Serializable, Comparable<OrderAdjustment> {
@@ -102,6 +102,25 @@ class OrderAdjustment implements Serializable, Comparable<OrderAdjustment> {
 
     Boolean getIsInvoiced() {
         return !postedPurchaseInvoiceItems.empty
+    }
+
+    OrderAdjustmentInvoiceStatus getDerivedPaymentStatus() {
+        Boolean fullyInvoiced = invoicedUnitPrice == totalAdjustments
+
+        if (!isInvoiced) {
+            return OrderAdjustmentInvoiceStatus.NOT_INVOICED
+        }
+
+        if (canceled || totalAdjustments == 0) {
+            return OrderAdjustmentInvoiceStatus.INVOICED
+        }
+
+        if (fullyInvoiced) {
+            return OrderAdjustmentInvoiceStatus.INVOICED
+        }
+
+        return OrderAdjustmentInvoiceStatus.PARTIALLY_INVOICED
+
     }
 
     /**
