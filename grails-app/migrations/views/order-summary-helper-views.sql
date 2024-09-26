@@ -105,29 +105,32 @@ SELECT
         ELSE 1
         END AS quantity_ordered,
     quantity_invoiced,
-    IFNULL(
-            order_adjustment_amount,
+    ABS(
+        IFNULL(
+        order_adjustment_amount,
             IF(order_adjustment_percentage IS NOT NULL,
                IF(order_item_id IS NOT NULL,
                   order_item_subtotal * (order_adjustment_percentage / 100),
                   order_subtotal * (order_adjustment_percentage / 100)),
-               0)
+               0
+            )
+        )
     ) as total_adjustments,
     invoice_item_amount as order_adjustment_amount
 FROM (
          SELECT
-             `order`.id                        	    	 AS order_id,
-             order_adjustment.id 		      	    	 AS adjustment_id,
-             order_adjustment.canceled 		    	   	 AS order_adjustment_canceled,
-             order_adjustment.amount     			     AS order_adjustment_amount,
-             invoice_item.amount 						 AS invoice_item_amount,
-             `order`.order_number              		     AS order_number,
-             order.status                      		     AS order_status,
-             invoice_item.id				        	 AS invoice_item_id,
-             order_adjustment.percentage 			 	 AS order_adjustment_percentage,
-             order_adjustment.order_item_id 	         AS order_item_id,
-             order_item.quantity * order_item.unit_price AS order_item_subtotal,
-             SUM(order_total.order_total)				 AS order_subtotal,
+             `order`.id                        	    	             AS order_id,
+             order_adjustment.id 		      	    	             AS adjustment_id,
+             order_adjustment.canceled 		    	             	 AS order_adjustment_canceled,
+             order_adjustment.amount     			                 AS order_adjustment_amount,
+             IF(invoice.date_posted IS NULL, 0, invoice_item.amount) AS invoice_item_amount,
+             `order`.order_number              		                 AS order_number,
+             order.status                      		                 AS order_status,
+             invoice_item.id				        	             AS invoice_item_id,
+             order_adjustment.percentage 			 	             AS order_adjustment_percentage,
+             order_adjustment.order_item_id 	                     AS order_item_id,
+             order_item.quantity * order_item.unit_price             AS order_item_subtotal,
+             SUM(order_total.order_total)				             AS order_subtotal,
              CASE
                  WHEN invoice.date_posted IS NOT NULL THEN IFNULL(invoice_item.quantity, 0)
                  ELSE 0
@@ -147,6 +150,7 @@ FROM (
            -- invoice type id 5 is for PREPAYMENT_INVOICE
            AND (invoice.invoice_type_id != '5' OR invoice.invoice_type_id IS NULL)
            AND (invoice_item.inverse IS NULL OR invoice_item.inverse = FALSE)
+           AND order_adjustment.canceled != 1
          GROUP BY `order`.id, `order`.order_number, invoice_item.id, order_adjustment.id
      )
  AS order_adjustment_payment_status;
@@ -267,10 +271,11 @@ CREATE OR REPLACE VIEW order_summary AS (
                 ELSE NULL
             END AS receipt_status,
             CASE
-                WHEN SUM(items_and_adjustments_union.quantity_ordered) = 0 AND SUM(items_and_adjustments_union.invoiced_amount) = 0 THEN NULL
-                WHEN SUM(items_and_adjustments_union.quantity_ordered) = SUM(items_and_adjustments_union.quantity_invoiced) AND SUM(items_and_adjustments_union.total_adjustments) = SUM(items_and_adjustments_union.invoiced_amount) THEN 'INVOICED'
-                WHEN (SUM(items_and_adjustments_union.quantity_ordered) < SUM(items_and_adjustments_union.quantity_invoiced) AND SUM(items_and_adjustments_union.quantity_ordered) > 0)
-                         OR (SUM(items_and_adjustments_union.invoiced_amount) < SUM(items_and_adjustments_union.total_adjustments) AND SUM(items_and_adjustments_union.total_adjustments) > 0) THEN 'PARTIALLY_INVOICED'
+                WHEN SUM(items_and_adjustments_union.quantity_ordered) = 0 AND SUM(items_and_adjustments_union.adjustments_count) = 0 THEN NULL
+                WHEN (SUM(items_and_adjustments_union.quantity_ordered) > SUM(items_and_adjustments_union.quantity_invoiced) AND SUM(items_and_adjustments_union.quantity_invoiced) > 0)
+                    OR (SUM(items_and_adjustments_union.invoiced_amount) < SUM(items_and_adjustments_union.total_adjustments) AND SUM(items_and_adjustments_union.invoiced_amount) > 0) THEN 'PARTIALLY_INVOICED'
+                WHEN (SUM(items_and_adjustments_union.quantity_ordered) = SUM(items_and_adjustments_union.quantity_invoiced) AND SUM(items_and_adjustments_union.total_adjustments) = SUM(items_and_adjustments_union.invoiced_amount) AND SUM(items_and_adjustments_union.total_adjustments) > 0)
+                    OR (SUM(items_and_adjustments_union.quantity_ordered) = SUM(items_and_adjustments_union.quantity_invoiced) AND SUM(items_and_adjustments_union.adjustments_count) = SUM(items_and_adjustments_union.adjustments_invoiced)) THEN 'INVOICED'
                 ELSE NULL
             END AS payment_status
         FROM (
