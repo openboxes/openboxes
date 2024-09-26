@@ -49,7 +49,7 @@ Update system packages and install necessary dependencies as outlined in the ins
 Once your virtual machine is provisioned, you are ready to install dependencies, configure basic settings, and deploy 
 the application. This guide provides a starting point for setting up the infrastructure needed to host the application effectively.
 
-For further assistance and installation details, please refer to the [OpenBoxes Installation Guide](installation).
+For further assistance and installation details, please refer to the [OpenBoxes Installation Guide](../installation/index.md).
 
    
 

@@ -9,7 +9,7 @@ sudo wget http://bamboo.pih-emr.org:8085/browse/OPENBOXES-SDOD2/latest/artifact/
 ```
 
 ### Create openboxes.yml file using heredoc
-Change `your_mysql_password` (and db user if it's not a default) with credentials set in [MySQL](/installation/ubuntu1804-grails3/mysql)
+Change `your_mysql_password` (and db user if it's not a default) with credentials set in [MySQL](mysql.md)
 ```
 cat <<-EOT > /tmp/openboxes.yml
 dataSource.dbCreate: none 

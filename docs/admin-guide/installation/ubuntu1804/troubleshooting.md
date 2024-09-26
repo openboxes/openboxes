@@ -166,7 +166,7 @@ INFO: Server startup in 546085 ms
 ```
 Unable to upload file due to exception: uploads/inventory (32).xls (No such file or directory)
 ```
-![Uploads directory does not exist](img/import-data-uploads-directory-does-not-exist.png)
+![Uploads directory does not exist](../../../assets/img/import-data-uploads-directory-does-not-exist.png)
 
 ### Solution
 Create `uploads` directory under Tomcat root directory (`/opt/tomcat`). 

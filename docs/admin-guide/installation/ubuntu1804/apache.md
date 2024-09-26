@@ -6,7 +6,7 @@ very well. However, it's not really a load balancer since it's only fronting a s
 sudo apt-get install apache2
 ```
 !!! note
-    To enable request delegation from Apache to Tomcat, please see [Configuration Guide > Tomcat AJP](configuration/ajp).
+    To enable request delegation from Apache to Tomcat, please see [Configuration Guide > Tomcat AJP](../../configuration/ajp.md).
     
 !!! note 
-    To enable HTTPS, please see [Configuration Guide > Apache HTTPS](configuration/https).
+    To enable HTTPS, please see [Configuration Guide > Apache HTTPS](../../configuration/https.md).

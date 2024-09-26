@@ -20,7 +20,7 @@
 
 ## Instructions
 These instructions are for developers only.  If you are a system administrator looking to install OpenBoxes on your
-own server, please check out our [Installation](installation/index) page.
+own server, please check out our [Installation](../admin-guide/installation/index.md) page.
 
 ### 1. Install Dependencies
 Install dependencies above

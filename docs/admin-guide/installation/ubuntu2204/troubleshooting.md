@@ -247,7 +247,7 @@ sudo chown tomcat:tomcat /uploads
 ```
 Unable to upload file due to exception: uploads/inventory (32).xls (No such file or directory)
 ```
-![Uploads directory does not exist](assets/img/import-data-uploads-directory-does-not-exist.png)
+![Uploads directory does not exist](../../../assets/img/import-data-uploads-directory-does-not-exist.png)
 
 
 ### java.util.zip.ZipException: zip END header not found

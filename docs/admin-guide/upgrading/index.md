@@ -1,7 +1,7 @@
 ??? warning
 
     Please do NOT use this page if you are upgrading from 0.8.x to 0.9.x. 
-    Review the [Migration Guide](../migration) if you need more information.
+    Review the [Migration Guide](../migration/index.md) if you need more information.
 
 
 # Upgrading

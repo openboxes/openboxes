@@ -77,5 +77,5 @@ used in the `create user` command when [creating the database](database.md) in t
 ## Advanced Configuration 
 
 Documentation for all available configuration properties will be provided in the 
-[Configuration Guide](../../../configuration). However, it is recommended that you 
+[Configuration Guide](../../configuration/index.md). However, it is recommended that you 
 [deploy the application](deployment.md) before proceeding to the configuration guide.

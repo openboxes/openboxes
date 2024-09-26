@@ -56,7 +56,7 @@ OpenBoxes is an open-source supply chain management system designed to manage su
 
     Reach out to the community or our support team for assistance— we're here to help with any questions or issues.
 
-    [:octicons-arrow-right-24: Get Support](support)
+    [:octicons-arrow-right-24: Get Support](support/index.md)
 
 [//]: # (-   :material-bug-check:{ .lg .middle } __Report a Bug__)
 

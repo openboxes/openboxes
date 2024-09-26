@@ -11,7 +11,7 @@ sudo service tomcat9 stop
 ### Step 2. Download the latest stable release
 As of August 2024, OpenBoxes 0.9.x is only available through our Bamboo CI/CD pipeline. This is a stable 
 release of version 0.9.2 that has been thoroughly tested and deployed to production environments. However, 
-we would like to publish a draft version of our [Migration Guide](../../migration) before making the 
+we would like to publish a draft version of our [Migration Guide](../../migration/index.md) before making the 
 official release available to the public via GitHub Releases.
 
 === "Nightly Build"
@@ -58,7 +58,7 @@ tail -f /var/lib/tomcat9/logs/catalina.out
 
 !!! note
     If you run into an error that's not covered in the [Troubleshooting Guide](troubleshooting.md) don't hesitate to
-    [contact support](../../../support).  
+    [contact support](../../../support/index.md).  
 
     If you post to our community forum or GitHub issues, please describe the problem in as much detail 
     as you can and include the catalina.out log from your Tomcat instance. 
