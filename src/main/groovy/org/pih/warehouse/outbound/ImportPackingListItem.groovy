@@ -2,6 +2,7 @@ package org.pih.warehouse.outbound
 
 import grails.databinding.BindUsing
 import grails.util.Holders
+import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
@@ -24,20 +25,42 @@ class ImportPackingListItem implements Validateable {
     Product product
 
     @BindUsing({ obj, source ->
-        // set provided lot number
-        if (source['lotNumber']) {
-            return source['lotNumber']
+        String lotNumber = source['lotNumber']
+        String productCode = source['product']
+        String binLocationName = source['binLocation']
+
+        // If lot number is provided then just return this value and bind it
+        // Otherwise try to infer the lot number
+        if (lotNumber) {
+            return lotNumber
         }
+
         ProductAvailabilityService productAvailabilityService = Holders.grailsApplication.mainContext.getBean(ProductAvailabilityService)
 
-        // otherwise infer inventory item based on provided bin-location
-        Product product = Product.findByProductCode(source['product'])
-        List<ProductAvailability> items = productAvailabilityService.getAvailableBinLocations(obj.origin, product?.id)
-                .findAll { it?.binLocation?.name == source['binLocation'] }
+        Product product = Product.findByProductCode(productCode)
+        List<AvailableItem> availableItems = productAvailabilityService
+                .getAvailableBinLocations(obj.origin as Location, product?.id)
 
-        // infer lot-number only if there is a single possible inventory
-        if (items.size() == 1) {
-            return items.first().inventoryItem?.lotNumber
+        // If bin location is not provided then first check if inventory with default lot number is available
+        if (!binLocationName) {
+            List<AvailableItem> itemsWithDefaultBin = availableItems.findAll {
+                !it?.inventoryItem?.lotNumber // Null or empty lot number
+            }
+            // only infer if there is one possible value
+            if (itemsWithDefaultBin.size() == 1) {
+                return itemsWithDefaultBin.first()?.inventoryItem?.lotNumber
+            }
+        }
+
+        // If failed to find exact or default lotNumber try to infer based on provided binLocation
+        // this also includes looking for default binLocation which is represented as a null value
+        List<AvailableItem> availableItemsByBinLocation = availableItems.findAll {
+            it?.binLocation?.name == binLocationName
+        }
+
+        // only infer if there is one possible value
+        if (availableItemsByBinLocation.size() == 1) {
+            return availableItemsByBinLocation.first()?.inventoryItem?.lotNumber
         }
 
         return null
@@ -47,38 +70,52 @@ class ImportPackingListItem implements Validateable {
     Location origin
 
     @BindUsing({ obj, source ->
-        // Handle inferring bin location when it is not provided by the user
-        if (!source['binLocation']) {
-            ProductAvailabilityService productAvailabilityService = Holders.grailsApplication.mainContext.getBean(ProductAvailabilityService)
+        String lotNumber = source['lotNumber']
+        String productCode = source['product']
+        String binLocationName = source['binLocation']
 
-            Product product = Product.findByProductCode(source['product'])
-            List<ProductAvailability> items = productAvailabilityService.getAvailableBinLocations(obj.origin, product?.id)
-                    .findAll { it?.inventoryItem?.lotNumber == source['lotNumber']}
-            // Infer bin location only if there is a single possible inventory
-            if (items.size() == 1) {
-                return items.first().binLocation
+        ProductAvailabilityService productAvailabilityService = Holders.grailsApplication.mainContext.getBean(ProductAvailabilityService)
+
+        Product product = Product.findByProductCode(productCode)
+        List<AvailableItem> availableItems = productAvailabilityService
+                .getAvailableBinLocations(obj.origin as Location, product?.id)
+
+        // if binLocation is provided then look for one available in stock
+        if (binLocationName) {
+            AvailableItem availableItemByBinLocation = availableItems.find {
+                it?.binLocation?.name == binLocationName
             }
 
-            // Any attempt at inferring bin location failed and bin location was not located
-            return null
+            if (availableItemByBinLocation) {
+                return availableItemByBinLocation?.binLocation
+            }
+
+            obj.binLocationFound = false
+            // return a dummy location object to add more context in a response of which location was not found
+            return new Location(name: binLocationName)
         }
 
-        Location internalLocation = Location.findByNameAndParentLocation(source['binLocation'], obj.origin)
-
-        if (internalLocation) {
-            return internalLocation
+        if (lotNumber) {
+            // if bin location is not provided and lot is provided
+            // then look for it in available stock
+            List<AvailableItem> availableItemsWithProvidedLotNumber = availableItems.findAll {
+                it?.inventoryItem?.lotNumber == lotNumber
+            }
+            if(availableItemsWithProvidedLotNumber.size() == 1) {
+                return availableItemsWithProvidedLotNumber.first()?.binLocation
+            }
+        } else {
+            // if bin location is not provided and lot number is not provided
+            // then check if we have default lot
+            List<AvailableItem> availableItemsWithDefaultLot = availableItems.findAll {
+                !it?.inventoryItem?.lotNumber // Null or empty lot number
+            }
+            if(availableItemsWithDefaultLot.size() == 1) {
+                return availableItemsWithDefaultLot.first()?.binLocation
+            }
         }
 
-        if (source['binLocation']?.equalsIgnoreCase(Constants.DEFAULT_BIN_LOCATION_NAME)) {
-            // null value assumes that this is a default bin location
-            return null
-        }
-
-        // Final fallback if provided location was not located
-        // we want to indicate, that a bin location for given name has not been found.
-        obj.binLocationFound = false
-        // return a dummy location object to add more context in a response of which location was not found
-        return new Location(name: source['binLocation'])
+        return null
      })
     Location binLocation
 
