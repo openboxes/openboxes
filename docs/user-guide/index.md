@@ -1,6 +1,63 @@
+<style>
+.md-content img {
+  border-width: 1px;
+  border-style: solid;
+  border-color: lightgrey;
+}
+</style>
+# User Guide
 
-Please be patient as our documentation expert (a.k.a our lead developer) is busy making the software 
-not suck so he's had some trouble finding time to update these guides. 
+## Resources
+
+<div class="grid cards" markdown>
+
+-   :material-book-open-page-variant:{ .lg .middle } __Glossary__
+
+    ---
+
+    The glossary serves as a quick reference resource to help understand terminology used in
+    OpenBoxes that may be unfamiliar.
+
+    [![img_2.png](img_2.png)](glossary.md)
+
+-   :material-head-lightbulb:{ .lg .middle } __Knowledge Base__
+
+    ---
+    
+    Search our self-service knowledge base for information and step-by-step instructions 
+    on the most common features.
+
+    [![img.png](../assets/img/helpscout.png)](https://help.openboxes.com)
+
+
+-   :material-chat-question:{ .lg .middle } __Community Support__
+
+    ---
+
+    Post your questions to our Community Support discussion forum and search for answers to common questions.
+
+    [![img_1.png](img_1.png)](https://community.openboxes.com)
+
+
+-   :material-youtube:{ .lg .middle } __YouTube Channel__
+
+    ---
+
+    Subscribe to our YouTube Channel! Or ... ya know ... don't. It's up to you.
+
+    [![img.png](../assets/img/youtube.png)](https://www.youtube.com/@openboxes)
+
+
+-   :material-presentation-play:{ .lg .middle } __Tutorials__
+
+    ---
+
+    Check out our tutorials page for very outdated tutorials.
+
+    [![img.png](../assets/img/tutorials.png)](https://openboxes.com/tutorials)
+
+</div>
+
 
 ## Contributing
 If you would like to contribute to this User Guide, please refer to the 
@@ -15,20 +72,3 @@ If you're impatient, not good at words & stuff, and would prefer to see User Gui
 please feel free to light a fire under our documentation expert. The most effective way to do that 
 would be to shame him through any of the public support channels (i.e. Twitter, Slack, Google 
 Groups, highway billboards, etc). 
-
-## Discussion Forum
-Review our Community Forum for answers to common questions or to post your own question. 
-<https://discuss.openboxes.com/>
-
-
-## YouTube channel
-Subscribe to our YouTube Channel! Or ... ya know ... don't. It's up to you.
-<a href="https://www.youtube.com/channel/UC-e9K2wU9wZFQ11eF-vwu6Q">
-![img.png](../img/youtube.png)
-</a>
-
-## Tutorials 
-Check out our tutorials page for the most up-to-date tutorials.
-<a href="https://openboxes.com/tutorials">
-![img.png](../img/tutorials.png)
-</a>

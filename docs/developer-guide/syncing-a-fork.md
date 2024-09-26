@@ -57,4 +57,4 @@ This will likely either be `develop` or `master`.
         $ git push
         
 ## Profit
-![Profit](../img/profit.jpg)
+![Profit](../assets/img/profit.jpg)

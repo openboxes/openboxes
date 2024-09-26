@@ -1,21 +1,91 @@
+# Introduction
 OpenBoxes is an open-source supply chain management system designed to manage supplies and medications for healthcare facilities and disaster response operations.
 
-## Features
+## What would you like to do?
 
-#### Browse Inventory
-<img src="https://openboxes.com/img/screenshots/inventory/browse-inventory.png"/>
+<div class="grid cards" markdown>
 
-#### View Stock Card
-<img src="https://openboxes.com/img/screenshots/inventory/track-lot-number-exp-date.png"/>
+-   :material-rocket-launch-outline:{ .lg .middle } [__Getting Started__](admin-guide/installation/index.md)
 
-### View Stock History
-<img src="https://openboxes.com/img/screenshots/stock-card/stock-history.png"/>
+    ---
 
-### Track Consumption
-<img src="https://openboxes.com/img/screenshots/stock-card/consumption.png"/>
+    You've already made the decision to implement OpenBoxes and you just want to get started.
 
-### Inventory Summary 
-<img src="https://openboxes.com/img/screenshots/dashboard/inventory-summary.png"/>
+    [:octicons-arrow-right-24: Installation Guide](admin-guide/installation/index.md)
 
 
-<a href="https://openboxes.com/features/">... including many more features!</a>
+-   :material-cloud-upload-outline:{ .lg .middle } [__Upgrading__](admin-guide/upgrading/index.md)
+
+    ---
+
+    You've already made the decision to implement OpenBoxes and you just want to get started.
+
+    [:octicons-arrow-right-24: Upgrade Guide](admin-guide/upgrading/index.md)
+
+
+
+-   :material-clipboard-check:{ .lg .middle } [__Software Evaluation__](https://calendly.com/openboxes/discussion)
+
+    ---
+
+    Schedule a discovery session to see OpenBoxes in action and explore whether
+    it can meet the needs of your organization.
+
+    [:octicons-arrow-right-24: Schedule a Discussion](https://calendly.com/openboxes/discussion)
+
+-   :material-calculator:{ .lg .middle } [__Cost Estimate__](https://calendly.com/openboxes/cost-analysis)
+
+    ---
+
+    Request a cost estimate to find the better understand the potential costs of implementing 
+    OpenBoxes. 
+
+    [:octicons-arrow-right-24: Schedule a Cost Estimate](https://calendly.com/openboxes/cost-analysis)
+
+-   :material-account-group:{ .lg .middle } [__Join the Community__](https://community.openboxes.com)
+
+    ---
+
+    Join our community to connect with OpenBoxes developers and implementers.
+
+    [:octicons-arrow-right-24: Join the Community](https://community.openboxes.com)
+
+-   :material-lifebuoy:{ .lg .middle } __Something else?__
+
+    ---
+
+    Reach out to the community or our support team for assistance— we're here to help with any questions or issues.
+
+    [:octicons-arrow-right-24: Get Support](support/index.md)
+
+[//]: # (-   :material-bug-check:{ .lg .middle } __Report a Bug__)
+
+[//]: # ()
+[//]: # (    ---)
+
+[//]: # ()
+[//]: # (    Help us improve OpenBoxes by reporting bugs you find—your feedback makes a difference.)
+
+[//]: # ()
+[//]: # (    [:octicons-arrow-right-24: Get Started]&#40;https://community.openboxes.com&#41;)
+
+[//]: # (    )
+[//]: # ()
+[//]: # ()
+[//]: # (-   :material-new-box:{ .lg .middle } __Request a Feature__)
+
+[//]: # ()
+[//]: # (    ---)
+
+[//]: # ()
+[//]: # (    Have a feature in mind? Let us know what you'd like to see in OpenBoxes.)
+
+[//]: # ()
+[//]: # (    [:octicons-arrow-right-24: Get Started]&#40;https://community.openboxes.com&#41;)
+
+[//]: # (    )
+
+
+
+
+</div>
