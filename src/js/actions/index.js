@@ -45,6 +45,7 @@ import {
   SET_ACTIVE_CONFIG,
   SET_OFFLINE,
   SET_ONLINE,
+  SET_SCROLL_TO_BOTTOM,
   SHOW_INFO_BAR,
   SHOW_INFO_BAR_MODAL,
   SHOW_SPINNER,
@@ -728,3 +729,8 @@ export const fetchAttributes = (config) => async (dispatch) => {
     payload: attributes?.data?.data,
   });
 };
+
+export const setScrollToBottom = (payload) => ({
+  type: SET_SCROLL_TO_BOTTOM,
+  payload,
+});
