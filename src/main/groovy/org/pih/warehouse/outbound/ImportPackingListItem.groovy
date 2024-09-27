@@ -37,32 +37,21 @@ class ImportPackingListItem implements Validateable {
 
         ProductAvailabilityService productAvailabilityService = Holders.grailsApplication.mainContext.getBean(ProductAvailabilityService)
 
-        Product product = Product.findByProductCode(productCode)
-        List<AvailableItem> availableItems = productAvailabilityService
-                .getAvailableBinLocations(obj.origin as Location, product?.id)
-
         // If bin location is not provided then first check if inventory with default lot number is available
         if (!binLocationName) {
             AvailableItem itemsWithDefaultLot = productAvailabilityService
-                    .getAvailableItemWithDefaultLots(availableItems)
+                    .getAvailableItemWithDefaultLots(obj.origin as Location, productCode)
             // only infer if there is one possible value
             if (itemsWithDefaultLot) {
                 return itemsWithDefaultLot?.inventoryItem?.lotNumber
             }
         }
 
-        // If failed to find exact or default lotNumber try to infer based on provided binLocation
-        // this also includes looking for default binLocation which is represented as a null value
-        List<AvailableItem> availableItemsByBinLocation = availableItems.findAll {
-            it?.binLocation?.name == binLocationName
-        }
+        // otherwise try to infer lotNumber based on provided binLocation
+        AvailableItem availableItem = productAvailabilityService
+                .inferAvailableItemByBinLocation(obj.origin as Location, productCode, binLocationName)
 
-        // only infer if there is one possible value
-        if (availableItemsByBinLocation.size() == 1) {
-            return availableItemsByBinLocation.first()?.inventoryItem?.lotNumber
-        }
-
-        return null
+        return availableItem?.inventoryItem?.lotNumber
     })
     String lotNumber
 
@@ -75,18 +64,13 @@ class ImportPackingListItem implements Validateable {
 
         ProductAvailabilityService productAvailabilityService = Holders.grailsApplication.mainContext.getBean(ProductAvailabilityService)
 
-        Product product = Product.findByProductCode(productCode)
-        List<AvailableItem> availableItems = productAvailabilityService
-                .getAvailableBinLocations(obj.origin as Location, product?.id)
-
         // if binLocation is provided then look for one available in stock
         if (binLocationName) {
-            AvailableItem availableItemByBinLocation = availableItems.find {
-                it?.binLocation?.name == binLocationName
-            }
+            Location binLocation = productAvailabilityService
+                    .getAvailableBinLocationByName(obj.origin as Location, productCode, binLocationName)
 
-            if (availableItemByBinLocation) {
-                return availableItemByBinLocation?.binLocation
+            if (binLocation) {
+                return binLocation
             }
 
             obj.binLocationFound = false
@@ -94,27 +78,22 @@ class ImportPackingListItem implements Validateable {
             return new Location(name: binLocationName)
         }
 
-        if (lotNumber) {
-            // if bin location is not provided and lot is provided
-            // then look for it in available stock
-            List<AvailableItem> availableItemsWithProvidedLotNumber = availableItems.findAll {
-                it?.inventoryItem?.lotNumber == lotNumber
-            }
-            if(availableItemsWithProvidedLotNumber.size() == 1) {
-                return availableItemsWithProvidedLotNumber.first()?.binLocation
-            }
-        } else {
+        if (!lotNumber) {
             // if bin location is not provided and lot number is not provided
             // then check if we have default lot
             AvailableItem itemsWithDefaultLot = productAvailabilityService
-                    .getAvailableItemWithDefaultLots(availableItems)
+                    .getAvailableItemWithDefaultLots(obj.origin as Location, productCode)
             // only infer if there is one possible value
             if (itemsWithDefaultLot) {
                 return itemsWithDefaultLot?.binLocation
             }
         }
 
-        return null
+        // otherwise try to infer based on existing lot
+        AvailableItem availableItem = productAvailabilityService
+                .inferAvailableItemByLotNumber(obj.origin as Location, productCode, lotNumber)
+
+        return availableItem?.binLocation
      })
     Location binLocation
 

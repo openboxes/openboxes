@@ -743,7 +743,10 @@ class ProductAvailabilityService {
         return availableBinLocations
     }
 
-    AvailableItem getAvailableItemWithDefaultLots(List<AvailableItem> availableItems ) {
+    AvailableItem getAvailableItemWithDefaultLots(Location origin, String productCode) {
+        Product product = Product.findByProductCode(productCode)
+        List<AvailableItem> availableItems = getAvailableBinLocations(origin, product?.id)
+
         List<AvailableItem> itemsWithDefaultLot = availableItems.findAll {
             !it?.inventoryItem?.lotNumber // Null or empty lot number
         }
@@ -751,6 +754,54 @@ class ProductAvailabilityService {
         if (itemsWithDefaultLot.size() == 1) {
             return itemsWithDefaultLot.first()
         }
+        return null
+    }
+
+    AvailableItem inferAvailableItemByBinLocation(Location origin, String productCode, String binLocationName) {
+        Product product = Product.findByProductCode(productCode)
+        List<AvailableItem> availableItems = getAvailableBinLocations(origin, product?.id)
+
+        // this also includes looking for default binLocation which is represented as a null value
+        List<AvailableItem> availableItemsByBinLocation = availableItems.findAll {
+            it?.binLocation?.name == binLocationName
+        }
+
+        // only infer if there is one possible value
+        if (availableItemsByBinLocation.size() == 1) {
+            return availableItemsByBinLocation.first()
+        }
+
+        return null
+    }
+
+    AvailableItem inferAvailableItemByLotNumber(Location origin, String productCode, String lotNumber) {
+        Product product = Product.findByProductCode(productCode)
+        List<AvailableItem> availableItems = getAvailableBinLocations(origin, product?.id)
+
+        // if bin location is not provided and lot is provided
+        // then look for it in available stock
+        List<AvailableItem> availableItemsWithProvidedLotNumber = availableItems.findAll {
+            it?.inventoryItem?.lotNumber == lotNumber
+        }
+        if(availableItemsWithProvidedLotNumber.size() == 1) {
+            return availableItemsWithProvidedLotNumber.first()
+        }
+
+        return null
+    }
+
+    Location getAvailableBinLocationByName(Location origin, String productCode, String binLocationName) {
+        Product product = Product.findByProductCode(productCode)
+        List<AvailableItem> availableItems = getAvailableBinLocations(origin, product?.id)
+
+        AvailableItem availableItemByBinLocation = availableItems.find {
+            it?.binLocation?.name == binLocationName
+        }
+
+        if (availableItemByBinLocation) {
+            return availableItemByBinLocation?.binLocation
+        }
+
         return null
     }
 
