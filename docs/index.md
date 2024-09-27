@@ -18,7 +18,7 @@ OpenBoxes is an open-source supply chain management system designed to manage su
 
     ---
 
-    You've already made the decision to implement OpenBoxes and you just want to get started.
+    You already have OpenBoxes installed and want to update to a newer version.
 
     [:octicons-arrow-right-24: Upgrade Guide](admin-guide/upgrading/index.md)
 
