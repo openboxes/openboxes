@@ -2,15 +2,13 @@ package org.pih.warehouse.outbound
 
 import grails.databinding.BindUsing
 import grails.util.Holders
-import org.pih.warehouse.api.AvailableItem
-import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import grails.validation.Validateable
+import org.pih.warehouse.fulfillment.FulfillmentService
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.ProductAvailabilityService
 import org.pih.warehouse.product.Product
-import org.pih.warehouse.product.ProductAvailability
 
 
 class ImportPackingListItem implements Validateable {
@@ -24,76 +22,17 @@ class ImportPackingListItem implements Validateable {
     @BindUsing({ obj, source -> Product.findByProductCode(source['product']) })
     Product product
 
-    @BindUsing({ obj, source ->
-        String lotNumber = source['lotNumber']
-        String productCode = source['product']
-        String binLocationName = source['binLocation']
-
-        // If lot number is provided then just return this value and bind it
-        // Otherwise try to infer the lot number
-        if (lotNumber) {
-            return lotNumber
-        }
-
-        ProductAvailabilityService productAvailabilityService = Holders.grailsApplication.mainContext.getBean(ProductAvailabilityService)
-
-        // If bin location is not provided then first check if inventory with default lot number is available
-        if (!binLocationName) {
-            AvailableItem itemsWithDefaultLot = productAvailabilityService
-                    .getAvailableItemWithDefaultLots(obj.origin as Location, productCode)
-            // only infer if there is one possible value
-            if (itemsWithDefaultLot) {
-                return itemsWithDefaultLot?.inventoryItem?.lotNumber
-            }
-        }
-
-        // otherwise try to infer lotNumber based on provided binLocation
-        AvailableItem availableItem = productAvailabilityService
-                .inferAvailableItemByBinLocation(obj.origin as Location, productCode, binLocationName)
-
-        return availableItem?.inventoryItem?.lotNumber
+    @BindUsing({ obj, source  ->
+        FulfillmentService fulfillmentService = Holders.grailsApplication.mainContext.getBean(FulfillmentService)
+        return fulfillmentService.bindOrInferLotNumber(obj as ImportPackingListItem, source as Map)
     })
     String lotNumber
 
     Location origin
 
-    @BindUsing({ obj, source ->
-        String lotNumber = source['lotNumber']
-        String productCode = source['product']
-        String binLocationName = source['binLocation']
-
-        ProductAvailabilityService productAvailabilityService = Holders.grailsApplication.mainContext.getBean(ProductAvailabilityService)
-
-        // if binLocation is provided then look for one available in stock
-        if (binLocationName) {
-            Location binLocation = productAvailabilityService
-                    .getAvailableBinLocationByName(obj.origin as Location, productCode, binLocationName)
-
-            if (binLocation) {
-                return binLocation
-            }
-
-            obj.binLocationFound = false
-            // return a dummy location object to add more context in a response of which location was not found
-            return new Location(name: binLocationName)
-        }
-
-        if (!lotNumber) {
-            // if bin location is not provided and lot number is not provided
-            // then check if we have default lot
-            AvailableItem itemsWithDefaultLot = productAvailabilityService
-                    .getAvailableItemWithDefaultLots(obj.origin as Location, productCode)
-            // only infer if there is one possible value
-            if (itemsWithDefaultLot) {
-                return itemsWithDefaultLot?.binLocation
-            }
-        }
-
-        // otherwise try to infer based on existing lot
-        AvailableItem availableItem = productAvailabilityService
-                .inferAvailableItemByLotNumber(obj.origin as Location, productCode, lotNumber)
-
-        return availableItem?.binLocation
+    @BindUsing({ obj, source  ->
+        FulfillmentService fulfillmentService = Holders.grailsApplication.mainContext.getBean(FulfillmentService)
+        return fulfillmentService.bindOrInferBinLocation(obj as ImportPackingListItem, source as Map)
      })
     Location binLocation
 
