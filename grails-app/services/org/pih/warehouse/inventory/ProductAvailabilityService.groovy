@@ -743,6 +743,17 @@ class ProductAvailabilityService {
         return availableBinLocations
     }
 
+    AvailableItem getAvailableItemWithDefaultLots(List<AvailableItem> availableItems ) {
+        List<AvailableItem> itemsWithDefaultLot = availableItems.findAll {
+            !it?.inventoryItem?.lotNumber // Null or empty lot number
+        }
+        // only infer if there is one possible value
+        if (itemsWithDefaultLot.size() == 1) {
+            return itemsWithDefaultLot.first()
+        }
+        return null
+    }
+
     /**
      * Sorting used by first expiry, first out algorithm
      */

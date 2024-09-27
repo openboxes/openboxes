@@ -43,12 +43,11 @@ class ImportPackingListItem implements Validateable {
 
         // If bin location is not provided then first check if inventory with default lot number is available
         if (!binLocationName) {
-            List<AvailableItem> itemsWithDefaultBin = availableItems.findAll {
-                !it?.inventoryItem?.lotNumber // Null or empty lot number
-            }
+            AvailableItem itemsWithDefaultLot = productAvailabilityService
+                    .getAvailableItemWithDefaultLots(availableItems)
             // only infer if there is one possible value
-            if (itemsWithDefaultBin.size() == 1) {
-                return itemsWithDefaultBin.first()?.inventoryItem?.lotNumber
+            if (itemsWithDefaultLot) {
+                return itemsWithDefaultLot?.inventoryItem?.lotNumber
             }
         }
 
@@ -107,11 +106,11 @@ class ImportPackingListItem implements Validateable {
         } else {
             // if bin location is not provided and lot number is not provided
             // then check if we have default lot
-            List<AvailableItem> availableItemsWithDefaultLot = availableItems.findAll {
-                !it?.inventoryItem?.lotNumber // Null or empty lot number
-            }
-            if(availableItemsWithDefaultLot.size() == 1) {
-                return availableItemsWithDefaultLot.first()?.binLocation
+            AvailableItem itemsWithDefaultLot = productAvailabilityService
+                    .getAvailableItemWithDefaultLots(availableItems)
+            // only infer if there is one possible value
+            if (itemsWithDefaultLot) {
+                return itemsWithDefaultLot?.binLocation
             }
         }
 
