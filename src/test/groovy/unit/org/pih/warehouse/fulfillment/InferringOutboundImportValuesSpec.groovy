@@ -13,7 +13,7 @@ import spock.lang.Specification
 import spock.lang.Unroll
 
 @Unroll
-class FulfillmentServiceSpec extends Specification implements ServiceUnitTest<FulfillmentService>, DataTest {
+class InferringOutboundImportValuesSpec extends Specification implements ServiceUnitTest<FulfillmentService>, DataTest {
 
     void setup() {
         service.productAvailabilityService = new ProductAvailabilityService()
