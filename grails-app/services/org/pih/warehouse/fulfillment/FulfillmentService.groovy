@@ -413,8 +413,6 @@ class FulfillmentService {
         String productCode = source['product']
         String binLocationName = source['binLocation']
 
-        ProductAvailabilityService productAvailabilityService = Holders.grailsApplication.mainContext.getBean(ProductAvailabilityService)
-
         // if binLocation is provided then look for one available in stock
         if (binLocationName) {
             Location binLocation = productAvailabilityService

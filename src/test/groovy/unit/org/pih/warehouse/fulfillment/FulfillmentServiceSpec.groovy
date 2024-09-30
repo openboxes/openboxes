@@ -264,4 +264,208 @@ class FulfillmentServiceSpec extends Specification implements ServiceUnitTest<Fu
         then:
         inferredLotNumber == null
     }
+
+    void 'bindOrInferBinLocation should return proper binLocation if provided bin location is in stock'() {
+        given:
+        Map data = [
+                product: "product-code-123",
+                lotNumber: null,
+                binLocation: "fake-bin"
+        ]
+        ImportPackingListItem importedFile = new ImportPackingListItem()
+        Location location = new Location(id: "fake-location")
+        importedFile.origin = location
+
+        ProductAvailabilityService productAvailabilityServiceSpy = Spy(service.productAvailabilityService)
+
+        productAvailabilityServiceSpy.getAvailableBinLocations(_, _) >> [
+                new AvailableItem(
+                        inventoryItem: new InventoryItem(lotNumber: "fake-lot-number-1"),
+                        binLocation:  new Location(name: "fake-bin"),
+                ),
+                new AvailableItem(
+                        inventoryItem: new InventoryItem(lotNumber: "fake-lot-number-2"),
+                        binLocation:   new Location(name: "fake-bin-too"),
+                ),
+        ]
+
+        service.productAvailabilityService = productAvailabilityServiceSpy
+
+        when:
+        Location inferredBinLocation = service.bindOrInferBinLocation(importedFile, data)
+
+        then:
+        inferredBinLocation.name == "fake-bin"
+        importedFile.binLocationFound == true
+    }
+
+    void 'bindOrInferBinLocation should return Location object with provided name and set binLocationFound to false if provided bin location is not in stock'() {
+        given:
+        Map data = [
+                product: "product-code-123",
+                lotNumber: null,
+                binLocation: "fake-bin"
+        ]
+        ImportPackingListItem importedFile = new ImportPackingListItem()
+        Location location = new Location(id: "fake-location")
+        importedFile.origin = location
+
+        ProductAvailabilityService productAvailabilityServiceSpy = Spy(service.productAvailabilityService)
+
+        productAvailabilityServiceSpy.getAvailableBinLocations(_, _) >> [
+                new AvailableItem(
+                        inventoryItem: new InventoryItem(lotNumber: "fake-lot-number-1"),
+                        binLocation:  new Location(name: "fake-bin-one"),
+                ),
+                new AvailableItem(
+                        inventoryItem: new InventoryItem(lotNumber: "fake-lot-number-2"),
+                        binLocation:   new Location(name: "fake-bin-too"),
+                ),
+        ]
+
+        service.productAvailabilityService = productAvailabilityServiceSpy
+
+        when:
+        Location inferredBinLocation = service.bindOrInferBinLocation(importedFile, data)
+
+        then:
+        inferredBinLocation.name == "fake-bin"
+        importedFile.binLocationFound == false
+    }
+
+    void 'bindOrInferBinLocation should return binLocation of a default lot bin when lotNumber is not provided and there is available stock on default lot (default lot as empty string)'() {
+        given:
+        Map data = [
+                product: "product-code-123",
+                lotNumber: null,
+                binLocation: null
+        ]
+        ImportPackingListItem importedFile = new ImportPackingListItem()
+        Location location = new Location(id: "fake-location")
+        importedFile.origin = location
+
+        ProductAvailabilityService productAvailabilityServiceSpy = Spy(service.productAvailabilityService)
+
+        productAvailabilityServiceSpy.getAvailableBinLocations(_, _) >> [
+                new AvailableItem(
+                        inventoryItem: new InventoryItem(lotNumber: ""),
+                        binLocation:  new Location(name: "fake-bin-one"),
+                ),
+                new AvailableItem(
+                        inventoryItem: new InventoryItem(lotNumber: "fake-lot-number-2"),
+                        binLocation:   new Location(name: "fake-bin-too"),
+                ),
+        ]
+
+        service.productAvailabilityService = productAvailabilityServiceSpy
+
+        when:
+        Location inferredBinLocation = service.bindOrInferBinLocation(importedFile, data)
+
+        then:
+        inferredBinLocation.name == "fake-bin-one"
+    }
+
+    void 'bindOrInferBinLocation should return binLocation of a default lot bin when lotNumber is not provided and there is available stock on default lot (default lot as null)'() {
+        given:
+        Map data = [
+                product: "product-code-123",
+                lotNumber: null,
+                binLocation: null
+        ]
+        ImportPackingListItem importedFile = new ImportPackingListItem()
+        Location location = new Location(id: "fake-location")
+        importedFile.origin = location
+
+        ProductAvailabilityService productAvailabilityServiceSpy = Spy(service.productAvailabilityService)
+
+        productAvailabilityServiceSpy.getAvailableBinLocations(_, _) >> [
+                new AvailableItem(
+                        inventoryItem: new InventoryItem(lotNumber: null),
+                        binLocation:  new Location(name: "fake-bin-one"),
+                ),
+                new AvailableItem(
+                        inventoryItem: new InventoryItem(lotNumber: "fake-lot-number-2"),
+                        binLocation:   new Location(name: "fake-bin-too"),
+                ),
+        ]
+
+        service.productAvailabilityService = productAvailabilityServiceSpy
+
+        when:
+        Location inferredBinLocation = service.bindOrInferBinLocation(importedFile, data)
+
+        then:
+        inferredBinLocation.name == "fake-bin-one"
+    }
+
+    void 'bindOrInferBinLocation should return binLocation of available stock when lotNumber is provided'() {
+        given:
+        Map data = [
+                product: "product-code-123",
+                lotNumber: "fake-lot-number-2",
+                binLocation: null
+        ]
+        ImportPackingListItem importedFile = new ImportPackingListItem()
+        Location location = new Location(id: "fake-location")
+        importedFile.origin = location
+
+        ProductAvailabilityService productAvailabilityServiceSpy = Spy(service.productAvailabilityService)
+
+        productAvailabilityServiceSpy.getAvailableBinLocations(_, _) >> [
+                new AvailableItem(
+                        inventoryItem: new InventoryItem(lotNumber: null),
+                        binLocation:  new Location(name: "fake-bin-one"),
+                ),
+                new AvailableItem(
+                        inventoryItem: new InventoryItem(lotNumber: "fake-lot-number-2"),
+                        binLocation:   new Location(name: "fake-bin-too"),
+                ),
+        ]
+
+        service.productAvailabilityService = productAvailabilityServiceSpy
+
+        when:
+        Location inferredBinLocation = service.bindOrInferBinLocation(importedFile, data)
+
+        then:
+        inferredBinLocation.name == "fake-bin-too"
+    }
+
+    void 'bindOrInferBinLocation should return null when there are multiple bins with provided lotNumber'() {
+        given:
+        Map data = [
+                product: "product-code-123",
+                lotNumber: "fake-lot-number-2",
+                binLocation: null
+        ]
+        ImportPackingListItem importedFile = new ImportPackingListItem()
+        Location location = new Location(id: "fake-location")
+        importedFile.origin = location
+
+        ProductAvailabilityService productAvailabilityServiceSpy = Spy(service.productAvailabilityService)
+
+        productAvailabilityServiceSpy.getAvailableBinLocations(_, _) >> [
+                new AvailableItem(
+                        inventoryItem: new InventoryItem(lotNumber: null),
+                        binLocation:  new Location(name: "fake-bin-one"),
+                ),
+                new AvailableItem(
+                        inventoryItem: new InventoryItem(lotNumber: "fake-lot-number-2"),
+                        binLocation:   new Location(name: "fake-bin-too"),
+                ),
+                new AvailableItem(
+                        inventoryItem: new InventoryItem(lotNumber: "fake-lot-number-2"),
+                        binLocation:   new Location(name: "fake-bin-three"),
+                ),
+        ]
+
+        service.productAvailabilityService = productAvailabilityServiceSpy
+
+        when:
+        Location inferredBinLocation = service.bindOrInferBinLocation(importedFile, data)
+
+        then:
+        inferredBinLocation == null
+    }
 }
