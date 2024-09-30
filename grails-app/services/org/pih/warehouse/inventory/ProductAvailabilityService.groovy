@@ -23,7 +23,6 @@ import org.hibernate.criterion.Projections
 import org.hibernate.criterion.Restrictions
 import org.hibernate.criterion.Subqueries
 import org.hibernate.SQLQuery
-import org.hibernate.sql.JoinType
 import org.hibernate.type.StandardBasicTypes
 import org.pih.warehouse.PaginatedList
 import org.pih.warehouse.api.AllocatedItem
@@ -757,7 +756,7 @@ class ProductAvailabilityService {
         return null
     }
 
-    AvailableItem inferAvailableItemByBinLocation(Location origin, String productCode, String binLocationName) {
+    AvailableItem getAvailableItemByBinLocation(Location origin, String productCode, String binLocationName) {
         Product product = Product.findByProductCode(productCode)
         List<AvailableItem> availableItems = getAvailableBinLocations(origin, product?.id)
 
@@ -774,7 +773,7 @@ class ProductAvailabilityService {
         return null
     }
 
-    AvailableItem inferAvailableItemByLotNumber(Location origin, String productCode, String lotNumber) {
+    AvailableItem getAvailableItemByLotNumber(Location origin, String productCode, String lotNumber) {
         Product product = Product.findByProductCode(productCode)
         List<AvailableItem> availableItems = getAvailableBinLocations(origin, product?.id)
 

@@ -45,8 +45,6 @@ import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.shipping.ShipmentStatusCode
 import org.pih.warehouse.shipping.ShipmentStatusTransitionEvent
-import util.StringUtil
-
 
 @Transactional
 class FulfillmentService {
@@ -403,7 +401,7 @@ class FulfillmentService {
 
         // otherwise try to infer lotNumber based on provided binLocation
         AvailableItem availableItem = productAvailabilityService
-                .inferAvailableItemByBinLocation(obj.origin, productCode, binLocationName)
+                .getAvailableItemByBinLocation(obj.origin, productCode, binLocationName)
 
         return availableItem?.inventoryItem?.lotNumber
     }
@@ -440,7 +438,7 @@ class FulfillmentService {
 
         // otherwise try to infer based on existing lot
         AvailableItem availableItem = productAvailabilityService
-                .inferAvailableItemByLotNumber(obj.origin, productCode, lotNumber)
+                .getAvailableItemByLotNumber(obj.origin, productCode, lotNumber)
 
         return availableItem?.binLocation
     }
