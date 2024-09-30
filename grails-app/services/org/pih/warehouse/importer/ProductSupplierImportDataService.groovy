@@ -66,6 +66,14 @@ class ProductSupplierImportDataService implements ImportDataService {
                 command.errors.reject("Row ${index + 1}: Preference Type with name '${params.globalPreferenceTypeName}' does not exist")
             }
 
+            if (!params.defaultProductPackageUomCode) {
+                command.errors.reject("Row ${index + 1}: Default Package Type is required")
+            }
+
+            if (!params.defaultProductPackageQuantity) {
+                command.errors.reject("Row ${index + 1}: Default Package Size is required")
+            }
+
             log.info("uomCode " + params.defaultProductPackageUomCode)
             if (params.defaultProductPackageUomCode) {
                 def unitOfMeasure = UnitOfMeasure.findByCode(params.defaultProductPackageUomCode)
