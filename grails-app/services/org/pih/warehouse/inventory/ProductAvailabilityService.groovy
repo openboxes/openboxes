@@ -783,7 +783,7 @@ class ProductAvailabilityService {
         List<AvailableItem> availableItemsWithProvidedLotNumber = availableItems.findAll {
             it?.inventoryItem?.lotNumber == lotNumber
         }
-        if(availableItemsWithProvidedLotNumber.size() == 1) {
+        if (availableItemsWithProvidedLotNumber.size() == 1) {
             return availableItemsWithProvidedLotNumber.first()
         }
 

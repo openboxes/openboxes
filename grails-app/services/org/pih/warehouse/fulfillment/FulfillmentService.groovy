@@ -393,11 +393,11 @@ class FulfillmentService {
 
         // If bin location is not provided then first check if inventory with default lot number is available
         if (!binLocationName) {
-            AvailableItem itemsWithDefaultLot = productAvailabilityService
+            AvailableItem itemWithDefaultLot = productAvailabilityService
                     .getAvailableItemWithDefaultLots(obj.origin, productCode)
             // only infer if there is one possible value
-            if (itemsWithDefaultLot) {
-                return itemsWithDefaultLot?.inventoryItem?.lotNumber
+            if (itemWithDefaultLot) {
+                return itemWithDefaultLot?.inventoryItem?.lotNumber
             }
         }
 

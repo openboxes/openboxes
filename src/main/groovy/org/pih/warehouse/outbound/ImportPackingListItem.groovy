@@ -22,7 +22,7 @@ class ImportPackingListItem implements Validateable {
     @BindUsing({ obj, source -> Product.findByProductCode(source['product']) })
     Product product
 
-    @BindUsing({ obj, source  ->
+    @BindUsing({ obj, source ->
         FulfillmentService fulfillmentService = Holders.grailsApplication.mainContext.getBean(FulfillmentService)
         return fulfillmentService.bindOrInferLotNumber(obj as ImportPackingListItem, source as Map)
     })
@@ -30,7 +30,7 @@ class ImportPackingListItem implements Validateable {
 
     Location origin
 
-    @BindUsing({ obj, source  ->
+    @BindUsing({  obj, source ->
         FulfillmentService fulfillmentService = Holders.grailsApplication.mainContext.getBean(FulfillmentService)
         return fulfillmentService.bindOrInferBinLocation(obj as ImportPackingListItem, source as Map)
      })
