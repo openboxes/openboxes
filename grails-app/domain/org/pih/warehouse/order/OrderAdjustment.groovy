@@ -128,7 +128,7 @@ class OrderAdjustment implements Serializable, Comparable<OrderAdjustment> {
      * */
     BigDecimal getInvoicedUnitPrice() {
         return invoiceItems?.sum {
-            if (it.invoice?.isRegularInvoice && !it.inverse) {
+            if (it.invoice?.datePosted != null && it.invoice?.isRegularInvoice && !it.inverse) {
                 return it.unitPrice
             }
             return 0
