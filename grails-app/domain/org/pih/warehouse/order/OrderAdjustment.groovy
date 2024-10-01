@@ -115,6 +115,10 @@ class OrderAdjustment implements Serializable, Comparable<OrderAdjustment> {
             return OrderAdjustmentInvoiceStatus.INVOICED
         }
 
+        if (invoicedUnitPrice == 0) {
+            return OrderAdjustmentInvoiceStatus.NOT_INVOICED
+        }
+
         if (fullyInvoiced) {
             return OrderAdjustmentInvoiceStatus.INVOICED
         }
