@@ -43,6 +43,10 @@ class ProductSupplierImportDataService implements ImportDataService {
                 command.errors.reject("Row ${index + 1}: Product with productCode ${params.productCode} does not exist")
             }
 
+            if (!params.supplierName) {
+                command.errors.reject("Row ${index + 1}: Supplier Name is required")
+            }
+
             if (params.supplierName && !Organization.findByName(params.supplierName)) {
                 command.errors.reject("Row ${index + 1}: Supplier with name '${params.supplierName}' does not exist")
             }
