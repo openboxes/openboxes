@@ -10,7 +10,7 @@ To ensure no further data is created while the backup process us taking place, w
 Make sure to stop both the old **and** the new application servers.
 
 !!! note
-This is where your downtime begins.
+    This is where your downtime begins.
 
 {% include 'admin-guide/common/_stop_server.md' %}
 

@@ -16,7 +16,7 @@ those upgrades to your system before installing the new version of the applicati
 Before you start installing dependency upgrades, you need to stop your application server.
 
 !!! note
-This is where your downtime begins.
+    This is where your downtime begins.
 
 {% include 'admin-guide/common/_stop_server.md' %}
 
