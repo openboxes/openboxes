@@ -272,8 +272,26 @@ class ProductSupplierService {
 
         PreferenceType preferenceType = params.globalPreferenceTypeName ? PreferenceType.findByName(params.globalPreferenceTypeName) : null
 
+        assignDefaultPreferenceType(productSupplier,
+                preferenceType,
+                params.globalPreferenceTypeComments,
+                params.globalPreferenceTypeValidityStartDate,
+                params.globalPreferenceTypeValidityEndDate)
+
+        if (!productSupplier.code && !productSupplier.id) {
+            assignSourceCode(productSupplier, supplier)
+        }
+        return productSupplier
+    }
+
+    void assignDefaultPreferenceType(ProductSupplier productSupplier,
+                 PreferenceType preferenceType,
+                 String comments,
+                 String validityStartDate,
+                 String validityEndDate) {
+        ProductSupplierPreference productSupplierPreference = productSupplier.getGlobalProductSupplierPreference()
         if (preferenceType) {
-            ProductSupplierPreference productSupplierPreference = productSupplier.getGlobalProductSupplierPreference()
+            SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy")
 
             if (!productSupplierPreference) {
                 productSupplierPreference = new ProductSupplierPreference()
@@ -281,25 +299,24 @@ class ProductSupplierService {
             }
 
             productSupplierPreference.preferenceType = preferenceType
-            productSupplierPreference.comments = params.globalPreferenceTypeComments
+            productSupplierPreference.comments = comments
 
-            def globalPreferenceTypeValidityStartDate = params.globalPreferenceTypeValidityStartDate ? dateFormat.parse(params.globalPreferenceTypeValidityStartDate) : null
+            Date globalPreferenceTypeValidityStartDate = validityStartDate ? dateFormat.parse(validityStartDate) : null
 
             if (globalPreferenceTypeValidityStartDate) {
                 productSupplierPreference.validityStartDate = globalPreferenceTypeValidityStartDate
             }
 
-            def globalPreferenceTypeValidityEndDate = params.globalPreferenceTypeValidityEndDate ? dateFormat.parse(params.globalPreferenceTypeValidityEndDate) : null
+            Date globalPreferenceTypeValidityEndDate = validityEndDate ? dateFormat.parse(validityEndDate) : null
 
             if (globalPreferenceTypeValidityEndDate) {
                 productSupplierPreference.validityEndDate = globalPreferenceTypeValidityEndDate
             }
+            return
         }
-
-        if (!productSupplier.code && !productSupplier.id) {
-            assignSourceCode(productSupplier, supplier)
-        }
-        return productSupplier
+        // If preference type is not provided, delete it
+        productSupplier.removeFromProductSupplierPreferences(productSupplierPreference)
+        productSupplierPreference.delete()
     }
 
     void assignSourceCode(ProductSupplier productSupplier, Organization organization) {
