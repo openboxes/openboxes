@@ -1,5 +1,5 @@
-Hopefully you've compiled a list of all the custom changes that you've made over time, but if not, some common places
-to check include:
+Hopefully you've compiled a list of all the custom configuration changes that you've made over time, but if not,
+some common places to check include:
 
 * [ ] MySQL
     * [ ] /etc/mysql/mysql.conf.d/mysql.cnf

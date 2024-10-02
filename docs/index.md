@@ -14,13 +14,13 @@ OpenBoxes is an open-source supply chain management system designed to manage su
     [:octicons-arrow-right-24: Installation Guide](admin-guide/installation/index.md)
 
 
--   :material-cloud-upload-outline:{ .lg .middle } [__Upgrading__](admin-guide/upgrading/index.md)
+-   :material-cloud-upload-outline:{ .lg .middle } [__Upgrading__](admin-guide/upgrading/introduction.md)
 
     ---
 
     You already have OpenBoxes installed and want to update to a newer version.
 
-    [:octicons-arrow-right-24: Upgrade Guide](admin-guide/upgrading/index.md)
+    [:octicons-arrow-right-24: Upgrade Guide](admin-guide/upgrading/introduction.md)
 
 
 
