@@ -59,7 +59,6 @@ class OrderAdjustment implements Serializable, Comparable<OrderAdjustment> {
     static transients = [
         'totalAdjustments',
         'postedPurchaseInvoiceItems',
-        'isInvoiced',
         "invoices",
         "hasInvoices",
         "hasPrepaymentInvoice",
@@ -100,14 +99,12 @@ class OrderAdjustment implements Serializable, Comparable<OrderAdjustment> {
         }
     }
 
-    Boolean getIsInvoiced() {
-        return !postedPurchaseInvoiceItems.empty
+    Boolean getIsFullyInvoiced() {
+        return Math.abs(unitPriceOnPostedInvoices) >= Math.abs(totalAdjustments)
     }
 
     OrderAdjustmentInvoiceStatus getDerivedPaymentStatus() {
-        Boolean fullyInvoiced = invoicedUnitPrice == totalAdjustments
-
-        if (!isInvoiced) {
+        if (postedPurchaseInvoiceItems.empty) {
             return OrderAdjustmentInvoiceStatus.NOT_INVOICED
         }
 
@@ -115,22 +112,33 @@ class OrderAdjustment implements Serializable, Comparable<OrderAdjustment> {
             return OrderAdjustmentInvoiceStatus.INVOICED
         }
 
-        if (invoicedUnitPrice == 0) {
+        if (unitPriceOnPostedInvoices == 0) {
             return OrderAdjustmentInvoiceStatus.NOT_INVOICED
         }
 
-        if (fullyInvoiced) {
+        if (isFullyInvoiced) {
             return OrderAdjustmentInvoiceStatus.INVOICED
         }
 
         return OrderAdjustmentInvoiceStatus.PARTIALLY_INVOICED
-
     }
 
     /**
      * Overall invoiced unit price for this adjustment. Can be positive, negative or 0.
      * */
     BigDecimal getInvoicedUnitPrice() {
+        return invoiceItems?.sum {
+            if (it.invoice?.isRegularInvoice && !it.inverse) {
+                return it.unitPrice
+            }
+            return 0
+        } ?: 0
+    }
+
+    /**
+     * Posted invoiced unit price for this adjustment. Can be positive, negative or 0.
+     * */
+    BigDecimal getUnitPriceOnPostedInvoices() {
         return invoiceItems?.sum {
             if (it.invoice?.datePosted != null && it.invoice?.isRegularInvoice && !it.inverse) {
                 return it.unitPrice
