@@ -9,13 +9,19 @@
  **/
 package util
 
+import grails.core.GrailsApplication
 import grails.util.Holders
 import groovy.sql.GroovyRowResult
+import liquibase.Contexts
+import liquibase.LabelExpression
+import liquibase.Liquibase
 import liquibase.database.Database
 import liquibase.database.DatabaseFactory
 import liquibase.database.jvm.JdbcConnection
 import liquibase.lockservice.LockService
 import liquibase.lockservice.LockServiceFactory
+import liquibase.resource.ClassLoaderResourceAccessor
+import org.apache.commons.lang.StringUtils
 
 import org.pih.warehouse.data.DataService
 
@@ -39,6 +45,20 @@ class LiquibaseUtil {
             database.close()
         }
         return false
+    }
+
+    /**
+     * Run all liquibase migrations using the entrypoint changelog file as defined in the configuration of
+     * the migration plugin: https://grails.github.io/grails-database-migration/latest/index.html
+     */
+    static void executeMigrations() {
+        String changeLogFile = Holders.grailsApplication.config.getProperty('grails.plugin.databasemigration.changelogFileName')
+        if (StringUtils.isBlank(changeLogFile)) {
+            throw new RuntimeException('Cannot find base changelog file when running Liquibase migrations. Check your configuration.')
+        }
+
+        Liquibase liquibase = new Liquibase(changeLogFile, new ClassLoaderResourceAccessor(), database)
+        liquibase.update(null as Contexts, new LabelExpression())
     }
 
     /**

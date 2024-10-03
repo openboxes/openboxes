@@ -38,9 +38,9 @@ grails:
             enabled: true  # https://github.com/sheehan/grails-console#security
 
         # Grails Liquibase database migration support. https://grails.github.io/grails-database-migration/latest/
+        # Automatic migrations are disabled by default. We run them manually in BootStrap.groovy
         databasemigration:
-            updateOnStart: true
-            updateOnStartFileName: changelog.groovy
+            changelogFileName: changelog.groovy
 
 info:
     app:

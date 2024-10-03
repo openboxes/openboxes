@@ -11,6 +11,19 @@ package org.pih.warehouse
 
 import grails.converters.JSON
 import grails.util.Holders
+import java.math.RoundingMode
+import javax.sql.DataSource
+import liquibase.Contexts
+import liquibase.LabelExpression
+import liquibase.Liquibase
+import liquibase.changelog.DatabaseChangeLog
+import liquibase.database.Database
+import liquibase.database.DatabaseFactory
+import liquibase.database.jvm.JdbcConnection
+import liquibase.resource.ClassLoaderResourceAccessor
+import org.quartz.Scheduler
+import util.LiquibaseUtil
+
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.api.EditPageItem
 import org.pih.warehouse.api.PackPageItem
@@ -72,17 +85,18 @@ import org.pih.warehouse.shipping.ContainerType
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.shipping.ShipmentType
-import org.quartz.Scheduler
-
-import java.math.RoundingMode
 
 class BootStrap {
 
     UploadService uploadService
+    DataSource dataSource
 
     def init = { servletContext ->
         log.info("Registering JSON marshallers ...")
         registerJsonMarshallers()
+
+        log.info("Executing database migrations ...")
+        executeDatabaseMigrations()
 
         log.info("Starting Quartz scheduler ...")
         Scheduler scheduler = Holders.grailsApplication.mainContext.getBean( 'quartzScheduler' )
@@ -600,5 +614,57 @@ class BootStrap {
 
     def destroy = {
 
+    }
+
+    void executeDatabaseMigrations() {
+        // ================================    Static Data    ============================================
+        //
+        // Use the 'demo' environment to create a database with 'static' and 'demo' data.  Then
+        // run the following:
+        //
+        // 		$ grails -Dgrails.env=demo run-app
+        //
+        // In another terminal, run through these commands to generate the appropriate
+        // changelog files for a new version of the data model
+        //
+        // 		$ grails db-diff-schema > grails-app/migrations/x.x.x/changelog-initial-schema.xml
+        // 		$ grails db-diff-index > grails-app/migrations/x.x.x/changelog-initial-indexes.xml
+        // 		$ grails db-diff-data > grails-app/migrations/x.x.x/changelog-initial-data.xml
+        //
+        // Migrating existing data to the new data model is still a work in progress, but you can
+        // use the previous versions changelogs.
+        //
+        log.info("Running liquibase changelog(s) ...")
+        Liquibase liquibase = null
+        try {
+
+            JdbcConnection connection = new JdbcConnection(dataSource.getConnection())
+            if (connection == null) {
+                throw new RuntimeException("Connection could not be created.")
+            }
+
+            Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(connection)
+            database.setDefaultSchemaName(connection.catalog)
+            boolean isRunningMigrations = LiquibaseUtil.isRunningMigrations()
+            log.info("Liquibase running: ${isRunningMigrations}")
+            log.info("Setting default schema to ${connection.catalog}")
+            log.info("Product Version: ${database.databaseProductVersion}")
+            log.info("Database Version: ${database.databaseMajorVersion}.${database.databaseMinorVersion} (${database.databaseProductName} ${database.databaseProductVersion})")
+
+            // Ensure the databasechangelog up-to-date in order to handle
+            // DatabaseException: Error executing SQL SELECT * FROM obnav.DATABASECHANGELOG
+            // ORDER BY DATEEXECUTED ASC, ORDEREXECUTED ASC: Unknown column 'ORDEREXECUTED' in 'order clause'
+            liquibase = new Liquibase(null as DatabaseChangeLog, new ClassLoaderResourceAccessor(), database)
+            liquibase.checkLiquibaseTables(false, null, new Contexts(), new LabelExpression())
+
+            log.info('Executing migrations ...')
+            LiquibaseUtil.executeMigrations()
+            log.info('All migrations ran successfully!')
+
+        } finally {
+            log.info('Safely closing database')
+            liquibase?.database?.close()
+        }
+        log.info("Finished running liquibase changelog(s)!")
     }
 }
