@@ -211,8 +211,6 @@ CREATE OR REPLACE VIEW order_summary AS (
        shipment_status,
        receipt_status,
        payment_status,
-       total_adjustments,
-       invoiced_adjustments_amount,
        CASE
            WHEN shipment_status = 'SHIPPED'
                AND receipt_status = 'RECEIVED'
@@ -256,9 +254,7 @@ CREATE OR REPLACE VIEW order_summary AS (
                         AND (SUM(items_and_adjustments_union.adjustments_count) = SUM(items_and_adjustments_union.adjustments_invoiced)
                             AND SUM(items_and_adjustments_union.total_adjustments) = SUM(items_and_adjustments_union.invoiced_adjustments_amount)) THEN 'INVOICED'
                     ELSE 'PARTIALLY_INVOICED'
-                    END AS payment_status,
-                SUM(items_and_adjustments_union.total_adjustments) AS total_adjustments,
-                SUM(items_and_adjustments_union.invoiced_adjustments_amount) AS invoiced_adjustments_amount
+                    END AS payment_status
          FROM (
                   -- There is need to make an union of order item summary and order adjustments payment status
                   -- to not get duplicated quantities and to get proper payment status for order summary
