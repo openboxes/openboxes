@@ -59,7 +59,6 @@ class OrderAdjustment implements Serializable, Comparable<OrderAdjustment> {
     static transients = [
         'totalAdjustments',
         'postedPurchaseInvoiceItems',
-        'isInvoiced',
         "invoices",
         "hasInvoices",
         "hasPrepaymentInvoice",
@@ -100,27 +99,34 @@ class OrderAdjustment implements Serializable, Comparable<OrderAdjustment> {
         }
     }
 
-    Boolean getIsInvoiced() {
-        return !postedPurchaseInvoiceItems.empty
+    Boolean getIsFullyInvoiced() {
+        return Math.abs(unitPriceOnPostedInvoices) >= Math.abs(totalAdjustments)
     }
 
     OrderAdjustmentInvoiceStatus getDerivedPaymentStatus() {
-        Boolean fullyInvoiced = invoicedUnitPrice == totalAdjustments
-
-        if (!isInvoiced) {
+        // An invoiced or partially invoiced adjustment will always have posted invoice items
+        if (postedPurchaseInvoiceItems.empty) {
             return OrderAdjustmentInvoiceStatus.NOT_INVOICED
         }
 
+        // check if order adjustment was invoiced as canceled
+        // either with canceled flag or amount 0
+        // then mark this order adjustment as invoiced
         if (canceled || totalAdjustments == 0) {
             return OrderAdjustmentInvoiceStatus.INVOICED
         }
 
-        if (fullyInvoiced) {
+        // if order adjustment was already invoiced but with amount 0
+        // meaning it was invoiced as canceled item
+        if (unitPriceOnPostedInvoices == 0) {
+            return OrderAdjustmentInvoiceStatus.NOT_INVOICED
+        }
+
+        if (isFullyInvoiced) {
             return OrderAdjustmentInvoiceStatus.INVOICED
         }
 
         return OrderAdjustmentInvoiceStatus.PARTIALLY_INVOICED
-
     }
 
     /**
@@ -129,6 +135,18 @@ class OrderAdjustment implements Serializable, Comparable<OrderAdjustment> {
     BigDecimal getInvoicedUnitPrice() {
         return invoiceItems?.sum {
             if (it.invoice?.isRegularInvoice && !it.inverse) {
+                return it.unitPrice
+            }
+            return 0
+        } ?: 0
+    }
+
+    /**
+     * Posted invoiced unit price for this adjustment. Can be positive, negative or 0.
+     * */
+    BigDecimal getUnitPriceOnPostedInvoices() {
+        return invoiceItems?.sum {
+            if (it.invoice?.datePosted != null && it.invoice?.isRegularInvoice && !it.inverse) {
                 return it.unitPrice
             }
             return 0
