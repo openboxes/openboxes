@@ -104,14 +104,20 @@ class OrderAdjustment implements Serializable, Comparable<OrderAdjustment> {
     }
 
     OrderAdjustmentInvoiceStatus getDerivedPaymentStatus() {
+        // An invoiced or partially invoiced adjustment will always have posted invoice items
         if (postedPurchaseInvoiceItems.empty) {
             return OrderAdjustmentInvoiceStatus.NOT_INVOICED
         }
 
+        // check if order adjustment was invoiced as canceled
+        // either with canceled flag or amount 0
+        // then mark this order adjustment as invoiced
         if (canceled || totalAdjustments == 0) {
             return OrderAdjustmentInvoiceStatus.INVOICED
         }
 
+        // if order adjustment was already invoiced but with amount 0
+        // meaning it was invoiced as canceled item
         if (unitPriceOnPostedInvoices == 0) {
             return OrderAdjustmentInvoiceStatus.NOT_INVOICED
         }
