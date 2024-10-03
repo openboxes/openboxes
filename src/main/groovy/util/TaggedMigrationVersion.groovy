@@ -7,7 +7,13 @@ import org.apache.commons.lang3.math.NumberUtils
  * By convention these should map to directories under the grails-app/migrations folder (Ex: '0.9.x').
  */
 class TaggedMigrationVersion implements Comparable<TaggedMigrationVersion> {
-    final int INVALID_VERSION = -1
+    static final int INVALID_VERSION = -1
+    static final String LATEST_VERSION_STRING = 'LATEST'
+
+    /**
+     * Represents 'whatever version is newest'. Saves us from having to update config values for each new release.
+     */
+    static final TaggedMigrationVersion LATEST_VERSION = new TaggedMigrationVersion(LATEST_VERSION_STRING)
 
     int major
     int minor
@@ -20,6 +26,15 @@ class TaggedMigrationVersion implements Comparable<TaggedMigrationVersion> {
         if (version == null) {
             throw new IllegalArgumentException("Version cannot be null.")
         }
+        stringVersion = version
+
+        // We shouldn't be comparing versions for the 'LATEST' version, but set values just in case.
+        if (version == LATEST_VERSION_STRING) {
+            major = 999
+            minor = 999
+            patch = 999
+            return
+        }
 
         String[] versionSplit = version.split("\\.")
         if (versionSplit.length != 3) {
@@ -28,7 +43,6 @@ class TaggedMigrationVersion implements Comparable<TaggedMigrationVersion> {
         major = NumberUtils.toInt(versionSplit[0], INVALID_VERSION)
         minor = NumberUtils.toInt(versionSplit[1], INVALID_VERSION)
         patch = NumberUtils.toInt(versionSplit[2], INVALID_VERSION)  // This is usually 'x', which resolves to -1
-        stringVersion = version
     }
 
     /**

@@ -9,7 +9,6 @@
  **/
 package util
 
-import grails.core.GrailsApplication
 import grails.util.Holders
 import groovy.sql.GroovyRowResult
 import liquibase.Contexts
@@ -26,6 +25,32 @@ import org.apache.commons.lang.StringUtils
 import org.pih.warehouse.data.DataService
 
 class LiquibaseUtil {
+
+    /**
+     * Because we skip changelogs under the release folders (Ex: '0.9.x') when doing clean installs, we don't get tagged
+     * changesets, and so we need to manually define what release the 'install' version of the migration brings us to.
+     *
+     * There are two methods of defining this:
+     * 1) Setting CLEAN_INSTALL_VERSION = 'LATEST_VERSION'.
+     *    Automatically computes the version to use based on the values in 'ALL_VERSIONS'. This is the preferred option.
+     *
+     * 2) Setting a specific version. Ex: CLEAN_INSTALL_VERSION = new TaggedMigrationVersion('0.8.x')
+     *    Useful in the case where you are unable to regenerated the 'install' migrations during the release process for
+     *    whatever reason. The version to set is the latest version that *is* consolidated in the "install" scripts.
+     */
+    public static final TaggedMigrationVersion CLEAN_INSTALL_VERSION = TaggedMigrationVersion.LATEST_VERSION
+
+    /**
+     * List all of our tagged migration versions. Any new tagged versions should be added to this list.
+     * By convention, these should map to the migrations directories.
+     */
+    public static final List<TaggedMigrationVersion> ALL_VERSIONS = [
+            new TaggedMigrationVersion('0.5.x'),
+            new TaggedMigrationVersion('0.6.x'),
+            new TaggedMigrationVersion('0.7.x'),
+            new TaggedMigrationVersion('0.8.x'),
+            new TaggedMigrationVersion('0.9.x'),
+    ]
 
     static getDatabase() {
         def dataSource = Holders.grailsApplication.mainContext.getBean("dataSource")
@@ -54,7 +79,7 @@ class LiquibaseUtil {
     static void executeMigrations() {
         String changeLogFile = Holders.grailsApplication.config.getProperty('grails.plugin.databasemigration.changelogFileName')
         if (StringUtils.isBlank(changeLogFile)) {
-            throw new RuntimeException('Cannot find base changelog file when running Liquibase migrations. Check your configuration.')
+            throw new RuntimeException('Cannot determine base changelog file when running Liquibase migrations. Check your configuration.')
         }
 
         Liquibase liquibase = new Liquibase(changeLogFile, new ClassLoaderResourceAccessor(), database)
@@ -62,55 +87,77 @@ class LiquibaseUtil {
     }
 
     /**
-     * @return true if any liquibase migrations have run on this machine.
+     * @return a list of all changelog tags (ex: '0.9.x') that have been successfully migrated to.
      */
-    static boolean haveMigrationsEverRan() {
+    static List<TaggedMigrationVersion> getCurrentTaggedVersions() {
         DataService dataService = Holders.grailsApplication.mainContext.getBean("dataService")
-        List<GroovyRowResult> result = dataService.executeQuery("SELECT EXISTS (SELECT 1 FROM DATABASECHANGELOG)")
-        return result[0]  // Will return 1 (which is truthy) if any rows exist and 0 (which is falsy) otherwise.
+        List<GroovyRowResult> versionRows = dataService.executeQuery(
+                "SELECT DISTINCT(tag) as version FROM DATABASECHANGELOG")
+        return rowsToVersions(versionRows)
+    }
+
+    /**
+     * @return a list of all release versions (ex: '0.9.x') that have had at least one changelog in their folder run.
+     */
+    static List<TaggedMigrationVersion> getCurrentVersionsByFolderName() {
+        DataService dataService = Holders.grailsApplication.mainContext.getBean("dataService")
+        List<GroovyRowResult> versionRows = dataService.executeQuery(
+                """SELECT DISTINCT(SUBSTRING(filename, 1, locate('/', filename)-1)) as version
+                         FROM DATABASECHANGELOG"""
+        )
+        return rowsToVersions(versionRows)
     }
 
     /**
      * @return The current tagged version that we've migrated up to.
      */
-    static TaggedMigrationVersion getCurrentVersion(List<TaggedMigrationVersion> allVersions) {
-        DataService dataService = Holders.grailsApplication.mainContext.getBean("dataService")
-        List<GroovyRowResult> versionRows = dataService.executeQuery(
-                "SELECT DISTINCT(tag) as version FROM DATABASECHANGELOG")
-
-        // If at least one tag exists in the database we're in the new flow (we do a > 1 here because there's
-        // also always a null row returned representing the un-tagged changesets).
-        if (versionRows.size() > 1) {
-            List<TaggedMigrationVersion> versions = rowsToVersions(versionRows)
-
+    static TaggedMigrationVersion getCurrentVersion() {
+        // If at least one tag exists in the database we're in an existing install in the new flow.
+        List<TaggedMigrationVersion> versions = getCurrentTaggedVersions()
+        if (versions.size() > 0) {
             // Having a tagged version in the database means we've completed all migrations for that version,
             // so actually we're on the version AFTER the latest tagged one.
-            return getNextVersion(versions.max(), allVersions)
+            return getNextVersion(versions.max())
         }
 
-        // This is for backwards compatability when migrating 0.9.x deployments and older. Any newer versions will have
-        // liquibase tags properly set in the database which allows us to avoid this awkward lookup on folder name.
-        String sql = """
-            SELECT DISTINCT(SUBSTRING(filename, 1, locate('/', filename)-1)) as version
-            FROM DATABASECHANGELOG"""
-        versionRows = dataService.executeQuery(sql)
-        List<TaggedMigrationVersion> versions = rowsToVersions(versionRows)
+        // This is for clean installs and for backwards compatability when running upgrades/migrations on 0.8.x
+        // deployments and older (both of which won't have any tagged changelogs).
+        versions = getCurrentVersionsByFolderName()
         return versions.max()
     }
 
     /**
-     * @return The next version given a list of all versions. If there is no next version, will return null.
-     * Ex: given ['0.8.x', '0.9.x', '1.0.x'], the next version of '0.8.x' is '0.9.x'
+     * @return the currently upgraded to migration version (Ex: '0.9.x') and any versions with a higher semver value.
      */
-    static TaggedMigrationVersion getNextVersion(TaggedMigrationVersion currentVersion,
-                                                 List<TaggedMigrationVersion> allVersions) {
-        TaggedMigrationVersion nextVersion = currentVersion
-        for (TaggedMigrationVersion version : allVersions) {
-            if (currentVersion < version && nextVersion > version) {
+    static List<TaggedMigrationVersion> getCurrentAndNewerVersions(TaggedMigrationVersion currentVersion) {
+        return currentVersion == null ? [] : ALL_VERSIONS.findAll{ it >= currentVersion }.sort()
+    }
+
+    /**
+     * @return the newest migration version as defined by the migration folders.
+     */
+    static TaggedMigrationVersion getNewestAvailableVersion() {
+        return ALL_VERSIONS.sort().last()
+    }
+
+    /**
+     * @return The next available migration version. If there is no next version, will return the current version.
+     * Ex: if we have the following versions: ['0.8.x', '0.9.x', '1.0.x'], the next version of '0.8.x' is '0.9.x'
+     * Ex: if we have the following versions: ['0.8.x', '0.9.x'], the next version of '0.9.x' is '0.9.x'
+     * Ex: if we have the following versions: ['0.8.x', '0.9.x'], the next version of 'LATEST' is '0.9.x'
+     */
+    static TaggedMigrationVersion getNextVersion(TaggedMigrationVersion currentVersion) {
+        if (currentVersion == TaggedMigrationVersion.LATEST_VERSION) {
+            return getNewestAvailableVersion()
+        }
+
+        TaggedMigrationVersion nextVersion = null
+        for (TaggedMigrationVersion version : ALL_VERSIONS) {
+            if (currentVersion < version && (nextVersion == null || nextVersion > version)) {
                 nextVersion = version
             }
         }
-        return nextVersion
+        return nextVersion ?: currentVersion
     }
 
     private static List<TaggedMigrationVersion> rowsToVersions(List<GroovyRowResult> rows) {
@@ -120,7 +167,7 @@ class LiquibaseUtil {
                 versions.add(new TaggedMigrationVersion(row.getProperty('version') as String))
             }
             catch (IllegalArgumentException ignored) {
-                // For simplicity, ignore malformed versions.
+                // For simplicity, ignore malformed versions. This will also ignore things like untagged changelogs.
             }
         }
         return versions
