@@ -47,6 +47,11 @@ databaseChangeLog = {
     // liquibase is smart enough to know to skip them.
     List<TaggedMigrationVersion> currentAndNewerReleases = LiquibaseUtil.getCurrentAndNewerVersions(currentVersion)
     for (TaggedMigrationVersion release : currentAndNewerReleases) {
+        // Sometimes these migrations take a long time and liquibase doesn't publish the logs until the whole
+        // thing completes, which may cause people to assume the process is stuck. We can't get the logger here
+        // so at least log something to console so we know it's still chugging along.
+        println("Executing migrations for release version: ${release}")
+
         include(file: release.toString() + "/changelog.xml")
     }
 
