@@ -276,6 +276,11 @@ environments:
             # For more information, see /src/integration-test/README.md
             url: jdbc:tc:${TEST_DATABASE:mysql:5.7.44}:///openboxes?TC_MY_CNF=testcontainers
             driverClassName: org.testcontainers.jdbc.ContainerDatabaseDriver
+        grails:
+            plugin:
+                databasemigration:
+                    changelogFileName: changelog-test.xml
+                    changelogLocation: src/integration-test/resources/migrations
     production:
         dataSource:
             dumpQueriesOnException: false
