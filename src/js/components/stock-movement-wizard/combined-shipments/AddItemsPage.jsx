@@ -373,6 +373,10 @@ class AddItemsPage extends Component {
   dataFetched = false;
 
   validate(values, ignoreLotAndExpiry) {
+    if (!this.dataFetched) {
+      return {};
+    }
+
     const errors = {};
     errors.lineItems = [];
     const date = moment(this.props.minimumExpirationDate, 'MM/DD/YYYY');
