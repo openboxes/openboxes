@@ -29,6 +29,7 @@ class ProductSupplierImportDataService implements ImportDataService {
     void validateData(ImportDataCommand command) {
         log.info "Validate data " + command.filename
         command.data.eachWithIndex { params, index ->
+            boolean productSupplierExists = params.id ? ProductSupplier.exists(params.id) : null
             if (params.active && !(params.active instanceof Boolean)) {
                 command.errors.reject("Row ${index + 1}: Active field has to be either empty or a boolean value (true/false)")
             }
@@ -47,7 +48,18 @@ class ProductSupplierImportDataService implements ImportDataService {
                 command.errors.reject("Row ${index + 1}: Supplier Name is required")
             }
 
-            if (params.supplierName && !Organization.findByName(params.supplierName)) {
+            Organization supplier = params.supplierName ? Organization.findByName(params.supplierName) : null
+
+            /**
+             *  Prevent from assigning an inactive supplier to a source that is about to become active or while creating a new source
+                "to become active" means that an existing source is active and we don't change it, or a source is inactive and we are activating it during the import
+                Allow assigning an inactive supplier to an inactive source (or to a source that is about to become inactive)
+             */
+            if (supplier && !supplier.active && (params.active || !productSupplierExists)) {
+                command.errors.reject("Row ${index + 1}: Supplier '${supplier.name}' is no longer active. Choose an active supplier")
+            }
+
+            if (params.supplierName && !supplier) {
                 command.errors.reject("Row ${index + 1}: Supplier with name '${params.supplierName}' does not exist")
             }
 
