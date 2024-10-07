@@ -193,7 +193,7 @@ class Invoice implements Serializable {
     }
 
     Float getTotalPrepaymentValue() {
-        return isPrepaymentInvoice ? invoiceItems.sum { it.amount } : 0
+        return isPrepaymentInvoice ? invoiceItems.sum { it.amount ?: 0 } : 0
     }
 
     List<Order> getOrders() {
