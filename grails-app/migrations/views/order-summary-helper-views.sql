@@ -101,15 +101,17 @@ SELECT
     invoice_item_id,
     order_status,
     quantity_invoiced,
-    invoice_item_amount as invoiced_amount
+    invoice_item_amount as invoiced_amount,
+    total_adjustments
 FROM (
          SELECT
-             `order`.id                        	    	             AS order_id,
-             order_adjustment.id 		      	    	             AS adjustment_id,
-             IF(invoice.date_posted IS NULL, 0, invoice_item.amount)  AS invoice_item_amount,
-             `order`.order_number              		                 AS order_number,
-             order.status                      		                 AS order_status,
-             invoice_item.id				        	                 AS invoice_item_id,
+             `order`.id                                                 AS order_id,
+             order_adjustment.id                                        AS adjustment_id,
+             IF(invoice.date_posted IS NULL, 0, invoice_item.amount)    AS invoice_item_amount,
+             total_adjustments.total_adjustment                         AS total_adjustments,
+             `order`.order_number                                       AS order_number,
+             order.status                                               AS order_status,
+             invoice_item.id				                            AS invoice_item_id,
              CASE
                  WHEN invoice.date_posted IS NOT NULL THEN IFNULL(invoice_item.quantity, 0)
                  ELSE 0
@@ -119,6 +121,22 @@ FROM (
                   INNER JOIN order_adjustment_invoice ON order_adjustment_invoice.order_adjustment_id = order_adjustment.id
                   LEFT OUTER JOIN invoice_item ON invoice_item.id = order_adjustment_invoice.invoice_item_id
                   LEFT OUTER JOIN invoice ON invoice.id = invoice_item.invoice_id
+                  LEFT JOIN (
+                     SELECT
+                         order_adjustment.id AS order_adjustment_id,
+                         SUM(DISTINCT ABS(IFNULL(order_adjustment.amount, IF(order_adjustment.percentage IS NOT NULL,IF(order_item_id IS NOT NULL,order_item.quantity * order_item.unit_price * (order_adjustment.percentage / 100),order_total.order_total * (order_adjustment.percentage / 100)), 0)))) AS total_adjustment
+                     FROM order_adjustment
+                              LEFT JOIN order_item ON order_adjustment.order_item_id = order_item.id
+                              LEFT OUTER JOIN (
+                         SELECT oi.order_id AS order_id,
+                                SUM(oi.quantity * oi.unit_price) AS order_total
+                         FROM order_item oi
+                                  LEFT OUTER JOIN `order` o ON o.id = oi.order_id
+                         GROUP BY oi.order_id
+                     ) AS order_total ON order_adjustment.order_id = order_total.order_id
+                     WHERE order_adjustment.canceled IS NOT TRUE
+                     GROUP BY order_adjustment_id
+                 ) AS total_adjustments ON total_adjustments.order_adjustment_id = order_adjustment.id
          WHERE `order`.order_type_id = 'PURCHASE_ORDER'
            -- invoice type id 5 is for PREPAYMENT_INVOICE
            AND (invoice.invoice_type_id != '5' OR invoice.invoice_type_id IS NULL)
