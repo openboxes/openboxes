@@ -19,7 +19,7 @@
         <sql>
             UPDATE invoice_item AS item
             JOIN (
-                SELECT id, quantity * unit_price AS calculated_amount
+                SELECT id, quantity * IFNULL(unit_price, 0) AS calculated_amount
                 FROM invoice_item
             ) AS calculated_amount ON calculated_amount.id = item.id
             SET item.amount = calculated_amount.calculated_amount
