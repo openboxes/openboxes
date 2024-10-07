@@ -306,13 +306,13 @@ class ProductSupplierService {
         productSupplierPreference.preferenceType = preferenceType
         productSupplierPreference.comments = comments
 
-        Date globalPreferenceTypeValidityStartDate = validityStartDate ? Constants.EXPIRATION_DATE_FORMATTER.parse(validityStartDate) : null
+        Date globalPreferenceTypeValidityStartDate = validityStartDate ? Constants.MONTH_DAY_YEAR_DATE_FORMATTER.parse(validityStartDate) : null
 
         if (globalPreferenceTypeValidityStartDate) {
             productSupplierPreference.validityStartDate = globalPreferenceTypeValidityStartDate
         }
 
-        Date globalPreferenceTypeValidityEndDate = validityEndDate ? Constants.EXPIRATION_DATE_FORMATTER.parse(validityEndDate) : null
+        Date globalPreferenceTypeValidityEndDate = validityEndDate ? Constants.MONTH_DAY_YEAR_DATE_FORMATTER.parse(validityEndDate) : null
 
         if (globalPreferenceTypeValidityEndDate) {
             productSupplierPreference.validityEndDate = globalPreferenceTypeValidityEndDate
