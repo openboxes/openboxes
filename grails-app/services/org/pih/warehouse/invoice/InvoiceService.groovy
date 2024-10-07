@@ -304,7 +304,8 @@ class InvoiceService {
             quantity: candidate.quantity,
             quantityUom: candidate.quantityUom,
             quantityPerUom: candidate.quantityPerUom ?: 1,
-            unitPrice: candidate.candidateUnitPrice
+            unitPrice: candidate.candidateUnitPrice,
+            amount: candidate.quantity * candidate.unitPrice
         )
 
         ShipmentItem shipmentItem = ShipmentItem.get(candidate.id)
