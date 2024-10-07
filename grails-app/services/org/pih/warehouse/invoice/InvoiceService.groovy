@@ -233,6 +233,7 @@ class InvoiceService {
                     }
                     invoiceItem = createFromInvoiceItemCandidate(candidateItem)
                     invoiceItem.quantity = item.quantityToInvoice
+                    invoiceItem.amount = invoiceItem.unitPrice != null ? item.quantityToInvoice * invoiceItem.unitPrice : null
                     invoice.addToInvoiceItems(invoiceItem)
                 }
             }
@@ -305,7 +306,6 @@ class InvoiceService {
             quantityUom: candidate.quantityUom,
             quantityPerUom: candidate.quantityPerUom ?: 1,
             unitPrice: candidate.candidateUnitPrice,
-            amount: candidate.quantity * candidate.unitPrice
         )
 
         ShipmentItem shipmentItem = ShipmentItem.get(candidate.id)

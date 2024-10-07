@@ -71,10 +71,8 @@ class InvoiceItem implements Serializable {
         'shipment',
         'order',
         'description',
-        'totalAmount',
         'unitOfMeasure',
         'isPrepaymentInvoice',
-        'totalPrepaymentAmount'
     ]
 
     static constraints = {
@@ -144,34 +142,6 @@ class InvoiceItem implements Serializable {
 
     String getDescription() {
         return orderAdjustment ? orderAdjustment.description : product?.name
-    }
-
-    /**
-     * Total shipment item value
-     * @deprecated From now should rely on the amount field instead always calculating it
-     */
-    def getTotalAmount() {
-        // After implementing the Partial invoicing for prepaid POs (OBPIH-6398)
-        // the total amount calculated below is kept in the amount field.
-        // For non prepaid invoices we have to use this deprecated calculations,
-        // but for the prepaid invoices we can get it from the amount property.
-        if (amount) {
-            return amount
-        }
-
-        def total = (quantity ?: 0.0) * (unitPrice ?: 0.0)
-        if (isPrepaymentInvoice || inverse) {
-            return total * ((order.paymentTerm?.prepaymentPercent?:100) / 100)
-        }
-
-        return total
-    }
-
-    /**
-     * @deprecated From now should rely on the amount field instead always calculating it
-     */
-    def getTotalPrepaymentAmount() {
-        return isPrepaymentInvoice ? totalAmount * (-1) : 0.0
     }
 
     String getUnitOfMeasure() {
@@ -247,10 +217,6 @@ class InvoiceItem implements Serializable {
                 isCanceled: orderItem?.canceled ?: orderAdjustment?.canceled,
                 quantityAvailableToInvoice: quantityAvailableToInvoice,
                 unitPriceAvailableToInvoice: orderAdjustment?.unitPriceAvailableToInvoice,
-                // Total amount and total prepayment amount are deprecated and amount field
-                // should be used instead (OBPIH-6398, OBPIH-6499)
-                totalAmount: totalAmount,
-                totalPrepaymentAmount: totalPrepaymentAmount
         ]
     }
 }

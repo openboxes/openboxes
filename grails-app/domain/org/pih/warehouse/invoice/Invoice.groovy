@@ -143,7 +143,7 @@ class Invoice implements Serializable {
     }
 
     Float getTotalValue() {
-        return invoiceItems?.collect { it?.totalAmount }?.sum() ?: 0
+        return invoiceItems?.collect { it?.amount ?: 0 }?.sum() ?: 0
     }
 
     Float getTotalValueNormalized() {
@@ -193,7 +193,7 @@ class Invoice implements Serializable {
     }
 
     Float getTotalPrepaymentValue() {
-        return isPrepaymentInvoice ? invoiceItems.sum { it.totalAmount } : 0
+        return isPrepaymentInvoice ? invoiceItems.sum { it.amount } : 0
     }
 
     List<Order> getOrders() {
