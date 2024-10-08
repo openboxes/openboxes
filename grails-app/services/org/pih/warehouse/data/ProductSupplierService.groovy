@@ -291,7 +291,7 @@ class ProductSupplierService {
                  String validityStartDate,
                  String validityEndDate) {
         ProductSupplierPreference productSupplierPreference = productSupplier.getGlobalProductSupplierPreference()
-        if (!preferenceType) {
+        if (!preferenceType && productSupplierPreference) {
             // If preference type is not provided, delete it
             productSupplier.removeFromProductSupplierPreferences(productSupplierPreference)
             productSupplierPreference.delete()
