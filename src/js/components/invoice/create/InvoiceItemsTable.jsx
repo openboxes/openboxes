@@ -102,7 +102,7 @@ const INVOICE_ITEMS = {
           formatValue: (value) => (value ? accountingFormat(value) : value),
         },
       },
-      totalAmount: {
+      amount: {
         type: LabelField,
         label: 'react.invoice.totalPrice.label',
         defaultMessage: 'Total Price',
