@@ -93,6 +93,37 @@ CREATE OR REPLACE VIEW order_item_payment_status AS
 AS order_item_payment_status
 GROUP BY order_item_id;
 
+CREATE OR REPLACE VIEW order_adjustment_details AS
+    SELECT id, total_adjustment FROM
+        (
+            SELECT
+                order_adjustment.id AS id,
+                SUM(
+                        DISTINCT ABS(
+                            IFNULL(
+                                order_adjustment.amount,
+                                IF(order_adjustment.percentage IS NOT NULL,
+                                   IF(order_item_id IS NOT NULL,
+                                      order_item.quantity * order_item.unit_price *
+                                      (order_adjustment.percentage / 100),
+                                      order_total.order_total * (order_adjustment.percentage / 100)),
+                                   0)
+                            )
+                         )
+                ) AS total_adjustment
+            FROM order_adjustment
+                     LEFT JOIN order_item ON order_adjustment.order_item_id = order_item.id
+                     LEFT OUTER JOIN (
+                SELECT oi.order_id AS order_id,
+                       SUM(oi.quantity * oi.unit_price) AS order_total
+                FROM order_item oi
+                         LEFT OUTER JOIN `order` o ON o.id = oi.order_id
+                GROUP BY oi.order_id
+            ) AS order_total ON order_adjustment.order_id = order_total.order_id
+            WHERE order_adjustment.canceled IS NOT TRUE
+            GROUP BY id
+        ) as order_adjustment_details;
+
 CREATE OR REPLACE VIEW order_adjustment_payment_status AS
 SELECT
     order_id,
