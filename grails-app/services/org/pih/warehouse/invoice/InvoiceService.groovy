@@ -417,7 +417,7 @@ class InvoiceService {
                     invoiceItem?.quantity,
                     invoiceItem?.quantityPerUom,
                     invoiceItem?.unitPrice ?: 0,
-                    invoiceItem?.totalAmount ?: 0,
+                    invoiceItem?.amount ?: 0,
             )
         }
         return csv
