@@ -927,15 +927,15 @@ class ReportService implements ApplicationContextAware {
                      LEFT OUTER JOIN invoice_item ON invoice_item.id = order_adjustment_invoice.invoice_item_id
                      LEFT OUTER JOIN invoice ON invoice_item.invoice_id = invoice.id
                      LEFT OUTER JOIN (
-                        SELECT adjustment_id,
-                               IF(SUM(invoiced_amount) = total_adjustments, TRUE, FALSE) as fully_invoiced
+                        SELECT adjustment_id, SUM(invoiced_amount) as total_invoiced_amount
                         FROM order_adjustment_payment_status
-                        GROUP BY adjustment_id, total_adjustments
+                        GROUP BY adjustment_id
                     ) as adjustment_invoice_amount ON adjustment_invoice_amount.adjustment_id = order_adjustment.id
+                    LEFT OUTER JOIN order_adjustment_details ON order_adjustment_details.id = order_adjustment.id
             WHERE o.order_type_id = 'PURCHASE_ORDER'
               AND order_adjustment.canceled IS NOT TRUE
               AND (invoice_item.inverse IS NULL OR invoice_item.inverse = FALSE)
-              ${additionalFilter}
+                ${additionalFilter}
             GROUP BY o.id, order_adjustment.id
             HAVING SUM(
                        CASE
@@ -943,7 +943,7 @@ class ReportService implements ApplicationContextAware {
                                invoice.invoice_type_id = :prepaymentInvoiceId
                                    OR invoice.invoice_type_id IS NULL
                                    OR invoice.date_posted IS NULL
-                                   OR (invoice.date_posted IS NOT NULL AND adjustment_invoice_amount.fully_invoiced IS FALSE)
+                                   OR (invoice.date_posted IS NOT NULL AND adjustment_invoice_amount.total_invoiced_amount < order_adjustment_details.total_adjustment)
                                ) THEN 0
                            ELSE 1
                            END
