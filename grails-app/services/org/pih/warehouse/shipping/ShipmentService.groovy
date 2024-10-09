@@ -35,6 +35,7 @@ import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionEntry
+import org.pih.warehouse.inventory.TransactionIdentifierService
 import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
@@ -59,7 +60,8 @@ class ShipmentService {
     def sessionFactory
     def productService
     def inventoryService
-    def identifierService
+    TransactionIdentifierService transactionIdentifierService
+    ShipmentIdentifierService shipmentIdentifierService
     def documentService
     def personService
     def productAvailabilityService
@@ -508,7 +510,7 @@ class ShipmentService {
      */
     void saveShipment(Shipment shipment) {
         if (!shipment.shipmentNumber) {
-            shipment.shipmentNumber = identifierService.generateShipmentIdentifier()
+            shipment.shipmentNumber = shipmentIdentifierService.generate()
         }
         shipment.save()
     }
@@ -1441,7 +1443,7 @@ class ShipmentService {
         creditTransaction.transactionDate = shipment.receipt.actualDeliveryDate
         creditTransaction.receipt = shipment?.receipt
         creditTransaction.requisition = shipment?.requisition
-        creditTransaction.transactionNumber = identifierService.generateTransactionIdentifier()
+        creditTransaction.transactionNumber = transactionIdentifierService.generate()
 
         shipment?.receipt?.receiptItems.each {
             def inventoryItem =
@@ -1501,7 +1503,7 @@ class ShipmentService {
             debitTransaction.inventory = shipmentInstance?.origin?.inventory
             debitTransaction.transactionDate = shipmentInstance.getActualShippingDate()
             debitTransaction.requisition = shipmentInstance.requisition
-            debitTransaction.transactionNumber = identifierService.generateTransactionIdentifier()
+            debitTransaction.transactionNumber = transactionIdentifierService.generate()
             debitTransaction.outgoingShipment = shipmentInstance
 
             addTransactionEntries(debitTransaction, shipmentInstance)

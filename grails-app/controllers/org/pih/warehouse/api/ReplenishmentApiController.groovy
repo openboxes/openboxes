@@ -10,24 +10,24 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
-import grails.validation.ValidationException
 import org.grails.web.json.JSONObject
-import org.pih.warehouse.core.Constants
+
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
+import org.pih.warehouse.core.identification.IdentifierGeneratorParams
 import org.pih.warehouse.inventory.InventoryLevelStatus
 import org.pih.warehouse.inventory.Requirement
 import org.pih.warehouse.order.Order
+import org.pih.warehouse.order.OrderIdentifierService
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.OrderType
 import org.pih.warehouse.order.OrderTypeCode
 
 class ReplenishmentApiController {
 
-    def identifierService
+    OrderIdentifierService orderIdentifierService
     def replenishmentService
     def picklistService
-    def inventoryService
 
     def list() {
         List<Order> replenishments = Order.findAllByOrderType(OrderType.get(OrderTypeCode.TRANSFER_ORDER.name()))
@@ -108,7 +108,11 @@ class ReplenishmentApiController {
         }
 
         if (!replenishment.replenishmentNumber) {
-            replenishment.replenishmentNumber = grailsApplication.config.openboxes.stockTransfer.binReplenishment.prefix + identifierService.generateOrderIdentifier()
+            String prefix = grailsApplication.config.openboxes.stockTransfer.binReplenishment.prefix
+            replenishment.replenishmentNumber = + orderIdentifierService.generate(
+                    IdentifierGeneratorParams.builder()
+                            .prefix(prefix)
+                            .build())
         }
 
         jsonObject.replenishmentItems.each { replenishmentItemMap ->

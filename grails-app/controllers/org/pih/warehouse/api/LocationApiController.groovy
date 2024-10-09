@@ -10,13 +10,13 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
-import grails.validation.ValidationException
 import org.grails.web.json.JSONObject
 import org.hibernate.Criteria
 import grails.gorm.transactions.Transactional
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationDataService
+import org.pih.warehouse.core.LocationIdentifierService
 import org.pih.warehouse.core.LocationRole
 import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.core.RoleType
@@ -34,7 +34,7 @@ class LocationApiController extends BaseDomainApiController {
     def locationService
     def userService
     GrailsApplication grailsApplication
-    def identifierService
+    LocationIdentifierService locationIdentifierService
     def inventoryService
     def documentService
     LocationDataService locationGormService
@@ -203,7 +203,7 @@ class LocationApiController extends BaseDomainApiController {
         }
 
         if (!location.locationNumber) {
-            location.locationNumber = identifierService.generateLocationIdentifier()
+            location.locationNumber = locationIdentifierService.generate()
         }
 
         if (!location.inventory) {

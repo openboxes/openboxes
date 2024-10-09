@@ -4,38 +4,43 @@ import org.pih.warehouse.core.IdentifierGeneratorTypeCode
 import org.pih.warehouse.core.RoleType
 
 // OpenBoxes identifier config
-openboxes.identifier.numeric = Constants.RANDOM_IDENTIFIER_NUMERIC_CHARACTERS
-openboxes.identifier.alphabetic = Constants.RANDOM_IDENTIFIER_ALPHABETIC_CHARACTERS
-openboxes.identifier.alphanumeric = Constants.RANDOM_IDENTIFIER_ALPHANUMERIC_CHARACTERS
-openboxes.identifier.transaction.format = Constants.DEFAULT_TRANSACTION_NUMBER_FORMAT
-openboxes.identifier.order.format = Constants.DEFAULT_ORDER_NUMBER_FORMAT
-openboxes.identifier.product.format = Constants.DEFAULT_PRODUCT_NUMBER_FORMAT
-openboxes.identifier.productSupplier.format = Constants.DEFAULT_PRODUCT_SUPPLIER_NUMBER_FORMAT
+openboxes.identifier.retry.max = 10
+openboxes.identifier.numeric = "0123456789"
+openboxes.identifier.alphabetic = "ABCDEFGHJKMNPQRSTUVXYZ"
+openboxes.identifier.alphanumeric = "0123456789ABCDEFGHJKMNPQRSTUVWXYZ"
+openboxes.identifier.sequenceNumber.format = "00000"
+
+// Default identifier
+openboxes.identifier.default.format = "\${random}"  // By default, simply generate a random id
+openboxes.identifier.default.random = "NNNLLL"
+openboxes.identifier.default.delimiter = "-"
+
+// Transaction identifier
+openboxes.identifier.transaction.random = "AAA-AAA-AAA"
+
+// Product identifier
+openboxes.identifier.product.random = "LLNN"
+
+// Product Supplier identifier
+openboxes.identifier.productSupplier.random = "NNNN"
 openboxes.identifier.productSupplier.prefix.enabled = true
-openboxes.identifier.receipt.format = Constants.DEFAULT_RECEIPT_NUMBER_FORMAT
-openboxes.identifier.requisition.format = Constants.DEFAULT_REQUISITION_NUMBER_FORMAT
-openboxes.identifier.shipment.format = Constants.DEFAULT_SHIPMENT_NUMBER_FORMAT
-openboxes.identifier.sequenceNumber.format = Constants.DEFAULT_SEQUENCE_NUMBER_FORMAT
-openboxes.identifier.invoice.format = Constants.DEFAULT_INVOICE_NUMBER_FORMAT
-openboxes.identifier.location.format = Constants.DEFAULT_LOCATION_NUMBER_FORMAT
 
 // Product identifier generator configuration for the systems default product
 openboxes.identifier.defaultProductType.id = "DEFAULT"
 openboxes.identifier.productCode.generatorType = IdentifierGeneratorTypeCode.SEQUENCE
 
 // Product identifier configuration for all sequential product codes
-openboxes.identifier.productCode.delimiter = Constants.DEFAULT_IDENTIFIER_SEPARATOR
 openboxes.identifier.productCode.format = "\${productTypeCode}\${delimiter}\${sequenceNumber}"
 openboxes.identifier.productCode.properties = ["productTypeCode": "code"]
 
 // Organization identifier
-openboxes.identifier.organization.format = Constants.DEFAULT_ORGANIZATION_NUMBER_FORMAT
+openboxes.identifier.organization.random = "AAA"
 openboxes.identifier.organization.minSize = 2
 openboxes.identifier.organization.maxSize = 3
 
 // Purchase Order identifier
 openboxes.identifier.purchaseOrder.generatorType = IdentifierGeneratorTypeCode.SEQUENCE
-openboxes.identifier.purchaseOrder.sequenceNumber.format = Constants.DEFAULT_PO_SEQUENCE_NUMBER_FORMAT
+openboxes.identifier.purchaseOrder.sequenceNumber.format = "000000"
 openboxes.identifier.purchaseOrder.format = "PO-\${destinationPartyCode}-\${sequenceNumber}"
 openboxes.identifier.purchaseOrder.properties = ["destinationPartyCode": "destinationParty.code"]
 

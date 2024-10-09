@@ -1,10 +1,9 @@
 package org.pih.warehouse.jobs
 
-import org.pih.warehouse.product.Product
-
+import org.pih.warehouse.core.identification.BlankIdentifierResolver
 class AssignIdentifierJob {
 
-    def identifierService
+    List<BlankIdentifierResolver> blankIdentifierResolvers
 
     def sessionRequired = false
 
@@ -20,13 +19,10 @@ class AssignIdentifierJob {
             return
         }
 
-        Product.withNewSession {
-            identifierService.assignProductIdentifiers()
-            identifierService.assignShipmentIdentifiers()
-            identifierService.assignReceiptIdentifiers()
-            identifierService.assignOrderIdentifiers()
-            identifierService.assignRequisitionIdentifiers()
-            identifierService.assignTransactionIdentifiers()
-        }
+//        Product.withNewSession {
+            for (BlankIdentifierResolver blankIdentifierResolver : blankIdentifierResolvers) {
+                blankIdentifierResolver.generateForAllUnassignedIdentifiers()
+            }
+//        }
     }
 }

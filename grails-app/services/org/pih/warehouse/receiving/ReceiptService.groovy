@@ -25,6 +25,7 @@ import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.RefreshProductAvailabilityEvent
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionEntry
+import org.pih.warehouse.inventory.TransactionIdentifierService
 import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
@@ -38,7 +39,8 @@ class ReceiptService {
     def shipmentService
     def inventoryService
     def locationService
-    def identifierService
+    ReceiptIdentifierService receiptIdentifierService
+    TransactionIdentifierService transactionIdentifierService
     GrailsApplication grailsApplication
     def productAvailabilityService
 
@@ -232,7 +234,7 @@ class ReceiptService {
         // Create new receipt
         if (!receipt) {
             receipt = new Receipt()
-            receipt.receiptNumber = identifierService.generateReceiptIdentifier()
+            receipt.receiptNumber = receiptIdentifierService.generate()
             shipment.addToReceipts(receipt)
         }
 
@@ -336,7 +338,7 @@ class ReceiptService {
         creditTransaction.destination = null
         creditTransaction.inventory = shipment?.destination?.inventory
         creditTransaction.transactionDate = receipt?.actualDeliveryDate
-        creditTransaction.transactionNumber = identifierService.generateTransactionIdentifier()
+        creditTransaction.transactionNumber = transactionIdentifierService.generate()
 
         receipt?.receiptItems?.each {
             def inventoryItem =

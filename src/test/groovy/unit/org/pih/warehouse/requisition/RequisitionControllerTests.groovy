@@ -2,7 +2,7 @@ package org.pih.warehouse.requisition
 
 import grails.testing.web.controllers.ControllerUnitTest
 import org.junit.Ignore
-import org.pih.warehouse.core.IdentifierService
+import org.pih.warehouse.core.identification.BaseIdentifierGenerator
 import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.Inventory
@@ -11,15 +11,9 @@ import org.pih.warehouse.inventory.InventoryService
 // import org.springframework.mock.web.MockHttpServletResponse
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
-import org.pih.warehouse.picklist.*
-import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.product.Product
 import grails.converters.JSON
 import org.pih.warehouse.core.ActivityCode
-import org.pih.warehouse.requisition.Requisition
-import org.pih.warehouse.requisition.RequisitionItem
-import org.pih.warehouse.requisition.RequisitionService
-import testutils.MockBindDataMixin
 
 //@Mixin(MockBindDataMixin)
 @Ignore
@@ -85,7 +79,7 @@ class RequisitionControllerTests implements ControllerUnitTest {
         requisition.addToRequisitionItems(requisitionItem)
 
 
-        def identifierServiceMock = mockFor(IdentifierService)
+        def identifierServiceMock = mockFor(BaseIdentifierGenerator)
         identifierServiceMock.demand.generateRequisitionIdentifier { ->
             return "uniqueIdentifier"
         }

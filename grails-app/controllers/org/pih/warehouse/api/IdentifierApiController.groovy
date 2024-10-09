@@ -11,9 +11,29 @@ package org.pih.warehouse.api
 
 import grails.converters.JSON
 
+import org.pih.warehouse.core.LocationIdentifierService
+import org.pih.warehouse.data.ProductSupplierIdentifierService
+import org.pih.warehouse.inventory.TransactionIdentifierService
+import org.pih.warehouse.invoice.InvoiceIdentifierService
+import org.pih.warehouse.order.OrderIdentifierService
+import org.pih.warehouse.order.PurchaseOrderIdentifierService
+import org.pih.warehouse.product.ProductIdentifierService
+import org.pih.warehouse.receiving.ReceiptIdentifierService
+import org.pih.warehouse.requisition.RequisitionIdentifierService
+import org.pih.warehouse.shipping.ShipmentIdentifierService
+
 class IdentifierApiController extends NoopApiController {
 
-    def identifierService
+    ProductIdentifierService productIdentifierService
+    ShipmentIdentifierService shipmentIdentifierService
+    InvoiceIdentifierService invoiceIdentifierService
+    LocationIdentifierService locationIdentifierService
+    ReceiptIdentifierService receiptIdentifierService
+    ProductSupplierIdentifierService productSupplierIdentifierService
+    OrderIdentifierService orderIdentifierService
+    PurchaseOrderIdentifierService purchaseOrderIdentifierService
+    RequisitionIdentifierService requisitionIdentifierService
+    TransactionIdentifierService transactionIdentifierService
 
     def create() {
         log.debug "create " + params
@@ -23,32 +43,39 @@ class IdentifierApiController extends NoopApiController {
         }
 
         String identifier
-
-        if (params.identifierFormat) {
-            identifier = identifierService.generateIdentifier(params.identifierFormat)
-        } else {
-            switch (identifierType) {
-                case "product":
-                    identifier = identifierService.generateProductIdentifier()
-                    break
-                case "productSupplier":
-                    identifier = identifierService.generateProductSupplierIdentifier()
-                    break
-                case "shipment":
-                    identifier = identifierService.generateShipmentIdentifier()
-                    break
-                case "requisition":
-                    identifier = identifierService.generateRequisitionIdentifier()
-                    break
-                case "order":
-                    identifier = identifierService.generateOrderIdentifier()
-                    break
-                case "transaction":
-                    identifier = identifierService.generateTransactionIdentifier()
-                    break
-                default:
-                    throw new IllegalArgumentException("Illegal identifier type ${identifierType}")
-            }
+        switch (identifierType) {
+            case "product":
+                identifier = productIdentifierService.generate()
+                break
+            case "productSupplier":
+                identifier = productSupplierIdentifierService.generate()
+                break
+            case "shipment":
+                identifier = shipmentIdentifierService.generate()
+                break
+            case "requisition":
+                identifier = requisitionIdentifierService.generate()
+                break
+            case "order":
+                identifier = orderIdentifierService.generate()
+                break
+            case "purchaseOrder":
+                identifier = purchaseOrderIdentifierService.generate()
+                break
+            case "transaction":
+                identifier = transactionIdentifierService.generate()
+                break
+            case "invoice":
+                identifier = invoiceIdentifierService.generate()
+                break
+            case "location":
+                identifier = locationIdentifierService.generate()
+                break
+            case "receipt":
+                identifier = receiptIdentifierService.generate()
+                break
+            default:
+                throw new IllegalArgumentException("Illegal identifier type ${identifierType}")
         }
         render([data: identifier] as JSON)
     }

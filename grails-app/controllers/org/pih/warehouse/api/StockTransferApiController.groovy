@@ -10,7 +10,6 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
-import grails.validation.ValidationException
 import org.grails.web.json.JSONObject
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
@@ -18,18 +17,18 @@ import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.order.Order
+import org.pih.warehouse.order.OrderIdentifierService
 import org.pih.warehouse.order.OrderStatus
 import org.pih.warehouse.order.OrderType
 import org.pih.warehouse.order.OrderTypeCode
 import org.pih.warehouse.product.Product
-import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentType
 
 import java.text.SimpleDateFormat
 
 class StockTransferApiController {
 
-    def identifierService
+    OrderIdentifierService orderIdentifierService
     def inventoryService
     def orderService
     def shipmentService
@@ -135,7 +134,7 @@ class StockTransferApiController {
         }
 
         if (!stockTransfer.stockTransferNumber) {
-            stockTransfer.stockTransferNumber = identifierService.generateOrderIdentifier()
+            stockTransfer.stockTransferNumber = orderIdentifierService.generate()
         }
 
         if (jsonObject.type) {
