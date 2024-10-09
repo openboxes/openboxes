@@ -1048,7 +1048,7 @@ class ReportService implements ApplicationContextAware {
                 "Value Shipped not invoiced"                        : "",
                 "Total Qty not Invoiced (UOM)"                      : "",
                 "Total Qty not Invoiced (Each)"                     : 1,
-                "Total Value not invoiced"                          : currencyNumberFormat.format((orderAdjustment?.totalAdjustments) ?: 0),
+                "Total Value not invoiced"                          : currencyNumberFormat.format((orderAdjustment?.totalAmountNotInvoiced) ?: 0),
                 "Budget Code"                                       : orderAdjustment?.budgetCode?.code,
                 "Payment Terms"                                     : orderAdjustment?.order?.paymentTerm?.name,
                 "Recipient"                                         : "",

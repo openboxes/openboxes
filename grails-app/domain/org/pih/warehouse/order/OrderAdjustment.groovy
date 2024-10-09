@@ -93,6 +93,10 @@ class OrderAdjustment implements Serializable, Comparable<OrderAdjustment> {
         return amount ?: percentage ? orderItem ? orderItem?.subtotal * (percentage/100) : order.subtotal * (percentage/100) : 0
     }
 
+    def getTotalAmountNotInvoiced() {
+        return totalAdjustments - unitPriceOnPostedInvoices
+    }
+
     def getPostedPurchaseInvoiceItems() {
         invoiceItems?.findAll {
             it.invoice.datePosted != null && it.invoice.isRegularInvoice
