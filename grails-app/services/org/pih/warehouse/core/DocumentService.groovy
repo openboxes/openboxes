@@ -404,9 +404,11 @@ class DocumentService {
     void createExcelRow(HSSFSheet sheet, int rowNumber, Map dataRow) {
         Row excelRow = sheet.createRow(rowNumber)
         dataRow.keySet().eachWithIndex { columnName, index ->
-            def cellValue = dataRow.get(columnName) ?: ""
-            // POI can't handle objects so we need to convert all objects to strings unless they are numeric
-            if (!(cellValue instanceof Number)) {
+            def actualValue = dataRow.get(columnName)
+            // We can't just check the truthiness of the actualValue, because the false boolean would be evaluated to an empty string
+            def cellValue = actualValue == null ? "" : actualValue
+            // POI can't handle objects so we need to convert all objects to strings unless they are numeric or boolean
+            if (!(cellValue instanceof Number) && !(cellValue instanceof Boolean)) {
                 cellValue = cellValue.toString()
             }
             excelRow.createCell(index).setCellValue(cellValue)
