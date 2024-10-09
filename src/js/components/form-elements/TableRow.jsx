@@ -39,6 +39,8 @@ class TableRow extends Component {
               flex: fixedWidth ? `0 1 ${fixedWidth}` : `${flexWidth || '12'} 1 0`,
               minWidth: 0,
             }}
+            role="cell"
+            aria-label={config?.defaultMessage}
           >
             {renderFormField(config, `${field}.${name}`, {
               ...properties,
