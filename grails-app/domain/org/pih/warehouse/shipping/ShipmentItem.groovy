@@ -12,6 +12,7 @@ package org.pih.warehouse.shipping
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
+import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.donation.Donor
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.LotStatusCode
@@ -73,6 +74,8 @@ class ShipmentItem implements Comparable, Serializable {
             "unavailableQuantityPicked",
             "paymentTerm",
             "quantityInvoiced",
+            "orderItem",
+            "uom",
     ]
 
     static mapping = {
@@ -215,12 +218,10 @@ class ShipmentItem implements Comparable, Serializable {
     }
 
     Integer getQuantityRemainingToShip() {
-        OrderItem orderItem = OrderItem.get(this.orderItemId)
         return orderItem ? orderItem.getQuantityRemainingToShip(shipment) : 0
     }
 
     BigDecimal getQuantityPerUom() {
-        OrderItem orderItem = OrderItem.get(this.orderItemId)
         return orderItem ? orderItem.quantityPerUom : 1
     }
 
@@ -294,6 +295,14 @@ class ShipmentItem implements Comparable, Serializable {
 
     Boolean isInvoiceable() {
         return quantityToInvoiceInStandardUom > 0
+    }
+
+    OrderItem getOrderItem() {
+        return orderItems[0]
+    }
+
+    String getUom() {
+        return orderItem?.unitOfMeasure
     }
 
     /**
