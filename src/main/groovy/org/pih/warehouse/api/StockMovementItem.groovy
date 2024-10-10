@@ -33,6 +33,8 @@ class StockMovementItem {
     BigDecimal quantityPicked
     BigDecimal quantityShipped
 
+    String unitOfMeasure
+
     // saved QOH in ward request
     Integer quantityCounted
 
@@ -131,6 +133,8 @@ class StockMovementItem {
                 quantityCanceled          : quantityCanceled,
                 quantityRevised           : quantityRevised,
                 quantityPicked            : quantityPicked,
+                unitOfMeasure             : unitOfMeasure,
+                packsRequested            : quantityRequested / packSize,
                 quantityRequired          : quantityRequired,
                 reasonCode                : reasonCode,
                 comments                  : comments,
@@ -179,6 +183,7 @@ class StockMovementItem {
                 orderNumber: shipmentItem?.orderNumber,
                 orderId: shipmentItem?.orderId,
                 quantityAvailable: shipmentItem.quantityRemainingToShip,
+                unitOfMeasure: shipmentItem.unitOfMeasure,
                 packSize: shipmentItem.quantityPerUom,
         )
     }
