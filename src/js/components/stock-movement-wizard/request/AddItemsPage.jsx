@@ -72,6 +72,7 @@ const FIELDS = {
     flexWidth: '9',
     attributes: {
       showSelectedOptionColor: true,
+      includeUom: true,
     },
   },
   quantityOnHand: {

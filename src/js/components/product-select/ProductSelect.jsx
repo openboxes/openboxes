@@ -36,7 +36,11 @@ const SelectedValue = option => (
 );
 
 const ProductSelect = ({
-  onExactProductSelected, locationId, fieldRef, ...props
+  onExactProductSelected,
+  locationId,
+  fieldRef,
+  includeUom,
+  ...props
 }) => {
   const selectRef = useRef(null);
   const [isExactMatch, setIsExactMatch] = useState(false);
@@ -53,6 +57,7 @@ const ProductSelect = ({
     debounceTime,
     minSearchLength,
     locationId,
+    { includeUom },
   );
 
   const onEnterPress = (event) => {
@@ -127,6 +132,7 @@ ProductSelect.defaultProps = {
   onExactProductSelected: undefined,
   fieldRef: undefined,
   loadOptions: undefined,
+  includeUom: false,
 };
 
 ProductSelect.propTypes = {
@@ -139,6 +145,7 @@ ProductSelect.propTypes = {
   onExactProductSelected: PropTypes.func,
   fieldRef: PropTypes.func,
   loadOptions: PropTypes.func,
+  includeUom: PropTypes.bool,
 };
 
 export default ProductSelect;
