@@ -943,7 +943,7 @@ class ReportService implements ApplicationContextAware {
                                invoice.invoice_type_id = :prepaymentInvoiceId
                                    OR invoice.invoice_type_id IS NULL
                                    OR invoice.date_posted IS NULL
-                                   OR (invoice.date_posted IS NOT NULL AND adjustment_invoice_amount.total_invoiced_amount < order_adjustment_details.total_adjustment)
+                                   OR (invoice.date_posted IS NOT NULL AND ABS(adjustment_invoice_amount.total_invoiced_amount) != order_adjustment_details.total_adjustment)
                                ) THEN 0
                            ELSE 1
                            END
