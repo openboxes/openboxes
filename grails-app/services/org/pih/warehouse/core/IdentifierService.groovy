@@ -5,6 +5,7 @@ import org.apache.commons.lang.StringUtils
 import org.apache.commons.lang.text.StrSubstitutor
 
 import org.pih.warehouse.core.identification.IdentifierGeneratorParams
+import org.pih.warehouse.core.identification.RandomCondition
 import org.pih.warehouse.core.identification.RandomIdentifierGenerator
 import org.pih.warehouse.data.DataService
 
@@ -28,37 +29,58 @@ abstract class IdentifierService {
      * @return the domain-specific key that is used in identifier properties.
      * Ex: The "product" of "openboxes.identifier.product.format"
      */
-    abstract protected String getPropertyKey()
+    abstract protected String getEntityKey()
 
     /**
      * Generates a new identifier for the entity using the given params.
      *
+     * The format is defined under "openboxes.identifier.x.format"
+     *
      * There are multiple reserved keyword options that can be used when defining the format of an identifier:
      * - ${delimiter} filled in with the value defined in "openboxes.identifier.x.delimiter"
      * - ${sequenceNumber} filled in with a sequential value as defined in "openboxes.identifier.x.sequenceNumber"
-     * - ${random} filled in with a random string as defined in "openboxes.identifier.x.random"
+     * - ${random} filled in with a random string as defined in "openboxes.identifier.x.random.template"
      * - any other keywords are populated from the template map and entities in IdentifierGeneratorParams
      */
     String generate(IdentifierGeneratorParams params=null) {
+        // Fetch and fill the constant/non-random values of the format/template.
         String format = getPopulatedFormat(params)
 
-        // Given that at this point we've populated all non-random fields of the format/template. Generate the remaining
-        // randomness of the identifier in a loop to allow for retries in case of duplicates. If there's no element
-        // of randomness, only try once.
-        String randomFormat = configService.getProperty("openboxes.identifier.${propertyKey}.random")
-        int maxAttempts = hasRandomness(format) ? configService.getProperty("openboxes.identifier.retry.max", Integer) : 1
+        // If there isn't any randomness in the format, we're done, so use the identifier as is.
+        boolean hasRandom = format.contains(Constants.IDENTIFIER_FORMAT_KEYWORD_RANDOM_EMBEDDED)
+        if (!hasRandom) {
+            return isIdentifierValidAndUnique(format) ? format : null
+        }
 
+        // Otherwise there is randomness. If the randomness should always be used, generate it right away.
+        RandomCondition randomCondition = getIdentifierPropertyWithDefault('random.condition', RandomCondition)
+        if (randomCondition == RandomCondition.ALWAYS) {
+            return generateAndFillRandomInFormat(format)
+        }
+
+        // Otherwise there's no mandatory randomness. Before adding any, first check if the identifier is unique as is.
+        String formatNoRandom = StrSubstitutor.replace(format, [(Constants.IDENTIFIER_FORMAT_KEYWORD_RANDOM): ""])
+        if (isIdentifierValidAndUnique(formatNoRandom)) {
+            return formatNoRandom
+        }
+
+        // If the identifier is not unique, add in the randomness to make it unique.
+        return generateAndFillRandomInFormat(format)
+    }
+
+    /**
+     * Generate randomness as configured in the .random property and add it to the template (in the ${random} GString).
+     * Generate the randomness in a loop to allow for retries in case of duplicates.
+     */
+    private String generateAndFillRandomInFormat(String format) {
+        String randomFormat = getIdentifierPropertyWithDefault('random.template')
+
+        int maxAttempts = configService.getProperty("openboxes.identifier.attempts.max", Integer)
         for (int i=0; i<maxAttempts; i++) {
             String randomIdentifier = randomIdentifierGenerator.generate(randomFormat)
-            String finalFormat = StrSubstitutor.replace(format, [Constants.IDENTIFIER_FORMAT_KEYWORD_RANDOM: randomIdentifier])
+            String finalFormat = StrSubstitutor.replace(format, [(Constants.IDENTIFIER_FORMAT_KEYWORD_RANDOM): randomIdentifier])
 
-            // The identifier should be fully generated at this point so if there are any unfilled template fields
-            // (meaning any embedded "${}" groovy gstrings), then something went wrong.
-            if (finalFormat.contains("\${")) {
-                throw new IllegalArgumentException("Failed generating identifier. Check your configuration! Format was not completely filled in:  ${finalFormat}")
-            }
-
-            if (!idAlreadyExists(finalFormat)) {
+            if (isIdentifierValidAndUnique(finalFormat)) {
                 return finalFormat
             }
         }
@@ -67,77 +89,122 @@ abstract class IdentifierService {
         return null
     }
 
+    private boolean isIdentifierValidAndUnique(String format) {
+        // If there are unfilled template fields (ie any embedded "${}" GStrings), then something went wrong.
+        if (format.contains("\${")) {
+            throw new IllegalArgumentException("Failed generating identifier. Check your configuration! Format was not completely filled in:  ${format}")
+        }
+
+        return !idAlreadyExists(format)
+    }
+
+    /**
+     * Fetch the identifier format/template and fill it in with values.
+     *
+     * Ex: Given a format/template like "PO${delimiter}${custom.code}", you might get: "PO-123"
+     */
     private String getPopulatedFormat(IdentifierGeneratorParams params) {
         String format = getInitialFormat(params)
 
         // Gradually build a map of values that will populate the format template
-        Map values = getTemplateValues(params)
-        values << getDelimiterValues()
+        Map values = new HashMap()
+        values.putAll(getEntityValues(params))
+        values.putAll(getCustomValues(params))
+        values.putAll(getDelimiterValues())
 
-        return StrSubstitutor.replace(format, values)
+        format = StrSubstitutor.replace(format, values)
+        return sanitizeFormat(format)
     }
 
     private String getInitialFormat(IdentifierGeneratorParams params) {
-        String format
-        if (!StringUtils.isBlank(params?.formatOverride)) {
-            format = params.formatOverride
-        }
-        else {
-            format = configService.getProperty("openboxes.identifier.${propertyKey}.format")
-            if (StringUtils.isBlank(format)) {
-                format = configService.getProperty("openboxes.identifier.default.format")
-            }
-        }
+        // If a custom format override was provided, use that, otherwise fetch the format from properties.
+        String format = StringUtils.isNotBlank(params?.formatOverride) ? params.formatOverride :
+                getIdentifierPropertyWithDefault('format')
 
         // Also check for any custom prefix/suffix as a part of the "initial" format because they are overrides that
         // directly modify the format (instead of filling it in).
-        if (configService.getProperty("openboxes.identifier.${propertyKey}.prefix.enabled", Boolean)) {
-            if (StringUtils.isNotBlank(params.prefix)) {
-                format = "${params.prefix}${Constants.DEFAULT_IDENTIFIER_SEPARATOR}${format}"
+        if (getIdentifierPropertyWithDefault("prefix.enabled", Boolean)) {
+            String delimiter = getIdentifierPropertyWithDefault(Constants.IDENTIFIER_FORMAT_KEYWORD_DELIMITER)
+            if (StringUtils.isNotBlank(params?.prefix)) {
+                format = "${params.prefix}${delimiter}${format}"
             }
-            if (StringUtils.isNotBlank(params.suffix)) {
-                format = "${format}${Constants.DEFAULT_IDENTIFIER_SEPARATOR}${params.suffix}"
+            if (StringUtils.isNotBlank(params?.suffix)) {
+                format = "${format}${delimiter}${params.suffix}"
             }
         }
 
         return format
     }
 
-    private Map getTemplateValues(IdentifierGeneratorParams params) {
+    /**
+     * Takes the entity that we're generating the identifier for and builds a map of its fields to include in
+     * the template as defined in the "openboxes.identifier.<entity>.properties" property.
+     */
+    private Map getEntityValues(IdentifierGeneratorParams params) {
+        if (!params?.templateEntity) {
+            return Collections.emptyMap()
+        }
+        Map properties = configService.getProperty("openboxes.identifier.${entityKey}.properties", Map)
+        return properties ? dataService.transformObject(params.templateEntity, properties) : Collections.emptyMap()
+    }
+
+    private Map getCustomValues(IdentifierGeneratorParams params) {
+        if (!params?.customKeys) {
+            return Collections.emptyMap()
+        }
+
         Map values = new HashMap()
-
-        // Add all fields from the given domain entity that are defined in the properties.
-        Map properties = configService.getProperty("openboxes.identifier.${propertyKey}.properties", Map)
-        if (params?.templateEntity) {
-            values << dataService.transformObject(params.templateEntity, properties)
+        for (Map.Entry entry in params.customKeys) {
+            // Add the "custom." prefix to each custom key. We do this to keep them visually distinct from non-custom
+            // keys (which don't use a prefix). This hopefully helps prevent misconfiguration.
+            values["custom.${entry.key}"] = entry.value
         }
-
-        // Add any non-entity-specific fields. Note that if a field exists in both templateCustomValues and an entity,
-        // the value in templateCustomValues takes precedence.
-        if (params?.templateCustomValues) {
-            values << params.templateCustomValues
-        }
-
         return values
     }
 
     private Map getDelimiterValues() {
-        String delimiter = configService.getProperty("openboxes.identifier.${propertyKey}.delimiter")
-        if (StringUtils.isBlank(delimiter)) {
-            delimiter = configService.getProperty("openboxes.identifier.default.delimiter")
-        }
-        return delimiter ? [Constants.IDENTIFIER_FORMAT_KEYWORD_DELIMITER: delimiter] : Collections.emptyMap()
+        String delimiter = getIdentifierPropertyWithDefault(Constants.IDENTIFIER_FORMAT_KEYWORD_DELIMITER)
+        return delimiter ? [(Constants.IDENTIFIER_FORMAT_KEYWORD_DELIMITER): delimiter] : Collections.emptyMap()
     }
 
-    private boolean hasRandomness(String format) {
-        return format.contains(Constants.IDENTIFIER_FORMAT_KEYWORD_RANDOM_EMBEDDED)
+    private <T> T getIdentifierPropertyWithDefault(String propertyName, Class<T> type=String) {
+        // If there's a custom property defined for the entity, use that. Ex: 'openboxes.identifier.product.format'
+        T property = configService.getProperty("openboxes.identifier.${entityKey}.${propertyName}", type)
+
+        // Otherwise use the default/fallback option. Ex: 'openboxes.identifier.default.format'
+        return property ?: configService.getProperty("openboxes.identifier.default.${propertyName}", type)
+
     }
 
-    protected boolean idAlreadyExists(String id) {
-        if (!id) {
-            // If we failed to generate the id, it'll be null here. The default behaviour is to accept that silently.
-            return false
+    /**
+     * Any cleanup work on the identifier format that is required in advance of using it.
+     */
+    private String sanitizeFormat(String format) {
+        StringBuilder formatBuilder = new StringBuilder()
+
+        // Clean up any occurrences of dangling or doubled up delimiters.
+        // Ex: If the delimiter character is "-", then "-x--y-" becomes "x-y"
+        String delimiter = getIdentifierPropertyWithDefault(Constants.IDENTIFIER_FORMAT_KEYWORD_DELIMITER)
+        Iterator<String> formatIterator = StringUtils.splitByWholeSeparator(format, delimiter).iterator()
+        while (formatIterator.hasNext()) {
+            String current = formatIterator.next()
+
+            // This can happen if there are empty spaces at the ends of the format.
+            if (StringUtils.isBlank(current)) {
+                continue
+            }
+
+            // Add the delimiter back in before the current element unless this is the first element.
+            if (!formatBuilder.isAllWhitespace()) {
+                formatBuilder.append(delimiter)
+            }
+            formatBuilder.append(current)
         }
+
+        return formatBuilder.toString()
+    }
+
+    private boolean idAlreadyExists(String id) {
         Integer count = countDuplicates(id)
         return count ? (count > 0) : false
     }

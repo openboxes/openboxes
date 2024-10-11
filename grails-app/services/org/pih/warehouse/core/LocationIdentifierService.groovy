@@ -3,7 +3,7 @@ package org.pih.warehouse.core
 class LocationIdentifierService extends IdentifierService {
 
     @Override
-    String getPropertyKey() {
+    String getEntityKey() {
         return "location"
     }
 

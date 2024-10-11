@@ -6,7 +6,7 @@ import org.pih.warehouse.core.identification.BlankIdentifierResolver
 class ReceiptIdentifierService extends IdentifierService implements BlankIdentifierResolver<Receipt> {
 
     @Override
-    String getPropertyKey() {
+    String getEntityKey() {
         return "receipt"
     }
 

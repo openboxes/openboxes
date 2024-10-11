@@ -18,7 +18,7 @@ class ProductIdentifierService extends IdentifierService implements BlankIdentif
     ProductTypeService productTypeService
 
     @Override
-    String getPropertyKey() {
+    String getEntityKey() {
         return "product"
     }
 
@@ -126,8 +126,10 @@ class ProductIdentifierService extends IdentifierService implements BlankIdentif
         String sequenceNumberStr = generateSequenceNumber(sequenceNumber.toString())
 
         return generate(IdentifierGeneratorParams.builder()
-                        .templateEntity(productType)
-                        .templateCustomValues(["sequenceNumber": sequenceNumberStr])
+                        .customKeys([
+                                "sequenceNumber": sequenceNumberStr,
+                                "code": productType.code,
+                        ])
                         .build())
     }
 

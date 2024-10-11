@@ -109,10 +109,9 @@ class ReplenishmentApiController {
 
         if (!replenishment.replenishmentNumber) {
             String prefix = grailsApplication.config.openboxes.stockTransfer.binReplenishment.prefix
-            replenishment.replenishmentNumber = + orderIdentifierService.generate(
-                    IdentifierGeneratorParams.builder()
-                            .prefix(prefix)
-                            .build())
+            replenishment.replenishmentNumber = + orderIdentifierService.generate(IdentifierGeneratorParams.builder()
+                    .prefix(prefix)
+                    .build())
         }
 
         jsonObject.replenishmentItems.each { replenishmentItemMap ->

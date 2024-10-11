@@ -19,7 +19,7 @@ trait BlankIdentifierResolver<T extends GormEntity> {
      * @return the domain-specific key that is used in identifier properties.
      * Ex: The "product" of "openboxes.identifier.product.format"
      */
-    abstract String getPropertyKey()
+    abstract String getEntityKey()
 
     /**
      * @return A list of all entities that do not have an identifier assigned.
@@ -53,7 +53,7 @@ trait BlankIdentifierResolver<T extends GormEntity> {
      */
     void generateForAllUnassignedIdentifiers() {
         List<T> entities = getAllUnassignedEntities()
-        String entityType = getPropertyKey()
+        String entityType = getEntityKey()
         for (T entity : entities) {
             try {
                 String identifier = generateForEntity(entity)

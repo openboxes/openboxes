@@ -13,7 +13,7 @@ class ConfigService {
     /**
      * Fetches the given property, casting it to the given type.
      */
-    <T> T getProperty(String property, Class<T> type) {
+    public <T> T getProperty(String property, Class<T> type) {
         return grailsApplication.config.getProperty(property, type)
     }
 

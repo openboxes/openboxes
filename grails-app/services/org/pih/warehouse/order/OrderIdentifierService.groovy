@@ -7,7 +7,7 @@ import org.pih.warehouse.shipping.Shipment
 class OrderIdentifierService extends IdentifierService implements BlankIdentifierResolver<Order> {
 
     @Override
-    String getPropertyKey() {
+    String getEntityKey() {
         return "order"
     }
 

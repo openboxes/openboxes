@@ -5,7 +5,7 @@ import org.pih.warehouse.core.IdentifierService
 class InvoiceIdentifierService extends IdentifierService {
 
     @Override
-    String getPropertyKey() {
+    String getEntityKey() {
         return "invoice"
     }
 

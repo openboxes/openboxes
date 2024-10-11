@@ -17,7 +17,6 @@ import org.pih.warehouse.core.EntityTypeCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.PreferenceType
-import org.pih.warehouse.core.identification.IdentifierGeneratorParams
 import org.pih.warehouse.data.ProductSupplierIdentifierService
 import org.pih.warehouse.data.ProductSupplierService
 
@@ -160,9 +159,8 @@ class ProductSupplierController {
 
             if (!productSupplierInstance.code) {
                 productSupplierInstance.code = productSupplierIdentifierService.generate(
-                        IdentifierGeneratorParams.builder()
-                                .prefix(productSupplierInstance?.product?.productCode)
-                                .build())
+                        productSupplierInstance?.product?.productCode,
+                        "")
             }
 
             if (params.defaultPreferenceType) {

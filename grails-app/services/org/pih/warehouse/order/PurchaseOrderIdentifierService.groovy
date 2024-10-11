@@ -15,7 +15,7 @@ import org.pih.warehouse.shipping.Shipment
 class PurchaseOrderIdentifierService extends IdentifierService {
 
     @Override
-    String getPropertyKey() {
+    String getEntityKey() {
         return "purchaseOrder"
     }
 
@@ -50,7 +50,7 @@ class PurchaseOrderIdentifierService extends IdentifierService {
         return generate(
                 IdentifierGeneratorParams.builder()
                         .templateEntity(order)
-                        .templateCustomValues(["sequenceNumber": sequenceNumberStr])
+                        .customKeys(["sequenceNumber": sequenceNumberStr])
                         .build())
     }
 

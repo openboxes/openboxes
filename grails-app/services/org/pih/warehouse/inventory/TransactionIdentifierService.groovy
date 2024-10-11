@@ -6,7 +6,7 @@ import org.pih.warehouse.core.identification.BlankIdentifierResolver
 class TransactionIdentifierService extends IdentifierService implements BlankIdentifierResolver<Transaction> {
 
     @Override
-    String getPropertyKey() {
+    String getEntityKey() {
         return "transaction"
     }
 

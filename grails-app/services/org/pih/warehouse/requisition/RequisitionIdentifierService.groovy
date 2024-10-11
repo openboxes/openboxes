@@ -7,7 +7,7 @@ import org.pih.warehouse.shipping.Shipment
 class RequisitionIdentifierService extends IdentifierService implements BlankIdentifierResolver<Requisition> {
 
     @Override
-    String getPropertyKey() {
+    String getEntityKey() {
         return "requisition"
     }
 

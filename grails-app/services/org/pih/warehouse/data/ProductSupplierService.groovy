@@ -26,7 +26,6 @@ import org.pih.warehouse.core.PreferenceType
 import org.pih.warehouse.core.ProductPrice
 import org.pih.warehouse.core.RatingTypeCode
 import org.pih.warehouse.core.UnitOfMeasure
-import org.pih.warehouse.core.identification.IdentifierGeneratorParams
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductPackage
 import org.pih.warehouse.product.ProductSupplier
@@ -304,10 +303,9 @@ class ProductSupplierService {
     }
 
     void assignSourceCode(ProductSupplier productSupplier, Organization organization) {
-        productSupplier.code = productSupplierIdentifierService.generate(IdentifierGeneratorParams.builder()
-                .prefix(productSupplier?.product?.productCode)
-                .suffix(organization?.code)
-                .build())
+        productSupplier.code = productSupplierIdentifierService.generate(
+                productSupplier?.product?.productCode,
+                organization?.code)
     }
 
     def getOrCreateNew(Map params, boolean forceCreate) {
@@ -371,10 +369,8 @@ class ProductSupplierService {
         Organization manufacturer = Organization.get(params.manufacturer)
         ProductSupplier productSupplier = new ProductSupplier()
         productSupplier.code = params.sourceCode ?: productSupplierIdentifierService.generate(
-                IdentifierGeneratorParams.builder()
-                        .prefix(product?.productCode)
-                        .suffix(organization?.code)
-                        .build())
+                product?.productCode,
+                organization?.code)
         productSupplier.name = params.sourceName ?: product?.name
         productSupplier.supplier = organization
         productSupplier.supplierCode = params.supplierCode
@@ -395,10 +391,9 @@ class ProductSupplierService {
     ProductSupplier saveProductSupplier(ProductSupplierDetailsCommand command) {
         ProductSupplier productSupplier = new ProductSupplier(command.properties)
         if (!productSupplier.code) {
-            productSupplier.code = productSupplierIdentifierService.generate(IdentifierGeneratorParams.builder()
-                    .prefix(command?.product?.productCode)
-                    .suffix(command?.supplier?.code)
-                    .build())
+            productSupplier.code = productSupplierIdentifierService.generate(
+                    command?.product?.productCode,
+                    command?.supplier?.code)
         }
         return productSupplierGormService.save(productSupplier)
     }
@@ -410,10 +405,9 @@ class ProductSupplierService {
         }
         productSupplier.properties = command.properties
         if (!productSupplier.code) {
-            productSupplier.code = productSupplierIdentifierService.generate(IdentifierGeneratorParams.builder()
-                    .prefix(command?.product?.productCode)
-                    .suffix(command?.supplier?.code)
-                    .build())
+            productSupplier.code = productSupplierIdentifierService.generate(
+                    command?.product?.productCode,
+                    command?.supplier?.code)
         }
         return productSupplier
     }
