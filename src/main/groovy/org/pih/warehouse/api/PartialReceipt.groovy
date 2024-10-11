@@ -41,10 +41,6 @@ class PartialReceipt {
         return partialReceiptItems
     }
 
-    Boolean isShipmentOrderBased() {
-        return shipment.orders.size() > 0
-    }
-
     Map toJson() {
         return [
 
@@ -64,7 +60,7 @@ class PartialReceipt {
                 requisition              : shipment?.requisition?.id,
                 description              : shipment?.description,
                 recipient                : recipient,
-                isShipmentOrderBased     : isShipmentOrderBased(),
+                isShipmentOrderBased     : shipment.isFromPurchaseOrder,
         ]
     }
 

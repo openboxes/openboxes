@@ -12,7 +12,6 @@ package org.pih.warehouse.shipping
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
-import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.donation.Donor
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.LotStatusCode
@@ -75,7 +74,7 @@ class ShipmentItem implements Comparable, Serializable {
             "paymentTerm",
             "quantityInvoiced",
             "orderItem",
-            "uom",
+            "unitOfMeasure",
     ]
 
     static mapping = {
@@ -301,7 +300,7 @@ class ShipmentItem implements Comparable, Serializable {
         return orderItems[0]
     }
 
-    String getUom() {
+    String getUnitOfMeasure() {
         return orderItem?.unitOfMeasure
     }
 

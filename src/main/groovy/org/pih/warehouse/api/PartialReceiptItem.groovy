@@ -70,8 +70,8 @@ class PartialReceiptItem {
         return product ?: inventoryItem?.product
     }
 
-    String getDisplayUom() {
-        return "${shipmentItem?.quantityPerUom?.toInteger()} ${shipmentItem?.uom}"
+    String getDisplayUnitOfMeasure() {
+        return "${shipmentItem?.quantityPerUom?.toInteger()} ${shipmentItem?.unitOfMeasure}"
     }
 
     Map toJson() {
@@ -105,7 +105,7 @@ class PartialReceiptItem {
                 cancelRemaining                 : cancelRemaining,
                 quantityOnHand                  : quantityOnHand,
                 comment                         : comment,
-                uom                             : displayUom,
+                unitOfMeasure                   : displayUnitOfMeasure,
         ]
     }
 
