@@ -73,7 +73,7 @@ const useInvoicePrepaidItemsTable = ({
         await prepaymentInvoiceApi.updateInvoiceItems(invoiceId, invoiceItemsToUpdate);
       }
       callback?.();
-    } finally {
+    } catch {
       spinner.hide();
     }
   };
