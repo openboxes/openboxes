@@ -1,4 +1,6 @@
 <%@ page import="org.pih.warehouse.core.EntityTypeCode; org.pih.warehouse.product.Attribute" %>
+<%@ page import="org.pih.warehouse.core.RoleType" %>
+
 <g:set var="availableAttributes" value="${org.pih.warehouse.product.Attribute.findAllByActive(true)}"/>
 <g:set var="availableAttributes" value="${availableAttributes.findAll { it.entityTypeCode == EntityTypeCode.PRODUCT_SUPPLIER}}"/>
 <g:set var="colspan" value="${(availableAttributes?.size()?:0) + 12}"/>
@@ -6,6 +8,18 @@
     <h2>
         <warehouse:message code="product.productSuppliers.label" default="Product Sources"/>
     </h2>
+
+    <g:set var="isProductManager" value="${false}"/>
+    <g:set var="isAdmin" value="${false}"/>
+
+    <g:isUserAdmin>
+        <g:set var="isAdmin" value="${true}"/>
+    </g:isUserAdmin>
+    <g:isUserInRole roles="[RoleType.ROLE_PRODUCT_MANAGER]">
+        <g:set var="isProductManager" value="${true}"/>
+    </g:isUserInRole>
+
+    <g:set var="canManageProductSources" value="${isAdmin && isProductManager}"/>
 
     <div class="dialog">
         <table>
@@ -102,11 +116,15 @@
                             </g:each>
                             <td>
                                 <div class="button-group">
-                                    <a href="${request.contextPath}/productSupplier/create/${productSupplier?.id}" class="button">
+                                    <g:link controller="productSupplier" action="create" id="${productSupplier?.id}" class="button"
+                                            disabled="${!canManageProductSources.toBoolean()}"
+                                            disabledMessage="${g.message(code:'errors.noPermissions.label')}">
                                         <img src="${resource(dir:'images/icons/silk', file:'pencil.png')}" />
                                         <g:message code="default.button.edit.label"/>
-                                    </a>
-                                    <g:link controller="productSupplier" action="delete" id="${productSupplier?.id}" params="[dialog:true]" class="button">
+                                    </g:link>
+                                    <g:link controller="productSupplier" action="delete" id="${productSupplier?.id}" params="[dialog:true]" class="button"
+                                            disabled="${!canManageProductSources.toBoolean()}"
+                                            disabledMessage="${g.message(code:'errors.noPermissions.label')}">
                                         <img src="${resource(dir:'images/icons/silk', file:'delete.png')}" />
                                         <g:message code="default.button.delete.label"/>
                                     </g:link>
@@ -127,7 +145,11 @@
             <tr>
                 <td colspan="${colspan}">
                     <div class="center">
-                        <g:link class="button" controller="productSupplier" action="create" params="[productId: productInstance?.id]">
+
+                        <g:link class="button" controller="productSupplier" action="create" params="[productId: productInstance?.id]"
+                                disabled="${!canManageProductSources.toBoolean()}"
+                                disabledMessage="${g.message(code:'errors.noPermissions.label')}"
+                        >
                             <img src="${resource(dir:'images/icons/silk', file:'add.png')}" />
                             ${g.message(code: 'default.create.label', default: 'Create', args: [g.message(code:'productSupplier.label')])}
                         </g:link>
