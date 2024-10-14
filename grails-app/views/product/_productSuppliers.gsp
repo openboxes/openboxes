@@ -102,10 +102,7 @@
                             </g:each>
                             <td>
                                 <div class="button-group">
-                                    <a href="javascript:void(0);" class="btn-show-dialog button"
-                                       data-position="top"
-                                       data-title="${g.message(code:'productSupplier.label')}"
-                                       data-url="${request.contextPath}/productSupplier/dialog?id=${productSupplier?.id}&product.id=${productInstance?.id}">
+                                    <a href="${request.contextPath}/productSupplier/create/${productSupplier?.id}" class="button">
                                         <img src="${resource(dir:'images/icons/silk', file:'pencil.png')}" />
                                         <g:message code="default.button.edit.label"/>
                                     </a>
@@ -130,12 +127,10 @@
             <tr>
                 <td colspan="${colspan}">
                     <div class="center">
-                        <button class="button btn-show-dialog" data-position="top"
-                                data-title="${g.message(code: 'default.add.label', args: [g.message(code:'productSupplier.label')])}"
-                                data-url="${request.contextPath}/productSupplier/dialog?product.id=${productInstance?.id}">
+                        <g:link class="button" controller="productSupplier" action="create" params="[productId: productInstance?.id]">
                             <img src="${resource(dir:'images/icons/silk', file:'add.png')}" />
                             ${g.message(code: 'default.create.label', default: 'Create', args: [g.message(code:'productSupplier.label')])}
-                        </button>
+                        </g:link>
                         <g:link class="button" controller="productSupplier" action="export" params="['productSupplier.id':productInstance?.productSuppliers*.id, format: 'xls']">
                             <img src="${resource(dir:'images/icons/silk', file:'page_excel.png')}" />
                             ${g.message(code: 'default.export.label', default: 'Export', args: [g.message(code:'productSuppliers.label')])}
