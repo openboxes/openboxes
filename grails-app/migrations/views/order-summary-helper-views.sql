@@ -309,27 +309,27 @@ CREATE OR REPLACE VIEW order_summary AS (
                            LEFT OUTER JOIN order_item_summary ON order_item_summary.id = order_item.id
                   WHERE `order`.order_type_id = 'PURCHASE_ORDER'
                   GROUP BY `order`.id
-                  UNION SELECT `order`.id                                                                  AS id,
-                               `order`.status                                                              AS order_status,
-                               0                                                                           AS quantity_ordered,
-                               0                                                                           AS items_ordered,
+                  UNION SELECT `order`.id                                                                    AS id,
+                               `order`.status                                                                AS order_status,
+                               0                                                                             AS quantity_ordered,
+                               0                                                                             AS items_ordered,
                                -- count all distinct adjustment items, this is for the case when adjustment might be canceled,
                                -- then invoiced (invoiced quantity is 0), then uncanceled and invoiced again with quantity 1
-                               IFNULL(COUNT(DISTINCT order_adjustment.id), 0)                              AS adjustments_count,
-                               0                                                                           AS quantity_shipped,
-                               0                                                                           AS items_shipped,
-                               0                                                                           AS quantity_received,
-                               0                                                                           AS items_received,
-                               0                                                                           AS quantity_canceled,
-                               0                                                                           AS quantity_invoiced,
-                               0                                                                           AS items_invoiced,
-                               IFNULL(COUNT(DISTINCT order_adjustment_payment_statuses.adjustment_id), 0)  AS adjustments_invoiced,
-                               SUM(DISTINCT total_adjustments.total_adjustments)                           AS total_adjustments,
-                               IFNULL(SUM(ABS(order_adjustment_payment_statuses.invoiced_amount)), 0)      AS invoiced_adjustments_amount
+                               IFNULL(COUNT(DISTINCT order_adjustment.id), 0)                                AS adjustments_count,
+                               0                                                                             AS quantity_shipped,
+                               0                                                                             AS items_shipped,
+                               0                                                                             AS quantity_received,
+                               0                                                                             AS items_received,
+                               0                                                                             AS quantity_canceled,
+                               0                                                                             AS quantity_invoiced,
+                               0                                                                             AS items_invoiced,
+                               IFNULL(SUM(order_adjustment_payment_statuses.quantity_invoiced), 0)           AS adjustments_invoiced,
+                               SUM(DISTINCT total_adjustments.total_adjustments)                             AS total_adjustments,
+                               IFNULL(SUM(ABS(order_adjustment_payment_statuses.invoiced_amount)), 0)        AS invoiced_adjustments_amount
                   FROM `order`
                            LEFT OUTER JOIN order_adjustment ON order_adjustment.order_id = `order`.id
                            LEFT OUTER JOIN (
-                                SELECT adjustment_id, SUM(invoiced_amount) as invoiced_amount
+                                SELECT adjustment_id, SUM(invoiced_amount) as invoiced_amount, IF(SUM(quantity_invoiced) > 0, 1, 0) as quantity_invoiced
                                 FROM order_adjustment_payment_status
                                 GROUP BY adjustment_id
                            ) as order_adjustment_payment_statuses ON order_adjustment_payment_statuses.adjustment_id = order_adjustment.id
