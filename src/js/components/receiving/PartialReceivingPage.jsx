@@ -260,7 +260,7 @@ const TABLE_FIELDS = {
         multilineHeader: true,
         flexWidth: '1',
         getDynamicAttr: (props) => ({
-          hide: !props.values?.isShipmentOrderBased,
+          hide: !props.values?.isShipmentFromPurchaseOrder,
         }),
       },
       quantityShipped: {
