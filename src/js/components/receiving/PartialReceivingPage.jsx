@@ -253,10 +253,21 @@ const TABLE_FIELDS = {
           showValueTooltip: true,
         },
       },
+      unitOfMeasure: {
+        type: (params) => <LabelField {...params} />,
+        label: 'react.partialReceiving.shippedInPo.label',
+        defaultMessage: 'Shipped (in PO)',
+        multilineHeader: true,
+        flexWidth: '1',
+        getDynamicAttr: (props) => ({
+          hide: !props.values?.isShipmentFromPurchaseOrder,
+        }),
+      },
       quantityShipped: {
         type: (params) => (params.subfield ? <LabelField {...params} /> : null),
         label: 'react.partialReceiving.shipped.label',
-        defaultMessage: 'Shipped',
+        defaultMessage: 'Shipped (each)',
+        multilineHeader: true,
         flexWidth: '1',
         attributes: {
           formatValue: (value) => (value ? (value.toLocaleString('en-US')) : value),
@@ -303,7 +314,8 @@ const TABLE_FIELDS = {
         type: (params) => (params.subfield ? <TextField {...params} /> : null),
         fieldKey: '',
         label: 'react.partialReceiving.receivingNow.label',
-        defaultMessage: 'Receiving now',
+        defaultMessage: 'Receiving now (each)',
+        multilineHeader: true,
         flexWidth: '1',
         attributes: {
           autoComplete: 'off',
