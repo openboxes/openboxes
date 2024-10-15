@@ -226,6 +226,7 @@ class ProductSupplierService {
         productSupplier.manufacturer = manufacturerName ? Organization.findByName(manufacturerName) : null
         productSupplier.supplierCode = supplierCode ? supplierCode : null
         productSupplier.manufacturerCode = manufacturerCode ? manufacturerCode : null
+        productSupplier.save()
 
         if (unitOfMeasure && quantity) {
             ProductPackage defaultProductPackage =
@@ -238,6 +239,9 @@ class ProductSupplierService {
                 defaultProductPackage.product = productSupplier.product
                 defaultProductPackage.uom = unitOfMeasure
                 defaultProductPackage.quantity = quantity
+                productSupplier.addToProductPackages(defaultProductPackage)
+                productSupplier.defaultProductPackage = defaultProductPackage
+                defaultProductPackage.productSupplier = productSupplier
                 if (price != null) {
                     ProductPrice productPrice = new ProductPrice()
                     productPrice.price = price
