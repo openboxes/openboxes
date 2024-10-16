@@ -674,7 +674,7 @@ class PartialReceivingPage extends Component {
 
     // Calculate index of line items coming from modal. When there are
     // more than one container, the index is relative to the container, so as an example:
-    // There are two container: First has 3 shipment items, second has 2. When we are
+    // There are two containers: First has 3 shipment items, second has 2. When we are
     // adding new lines to the second container at second index, the "editLinesIndex" is 2,
     // so we have to add sizes of previous containers.
     const getContainerEditLineIndex = formValues.containers.reduce((acc, container, idx) => {
@@ -691,11 +691,20 @@ class PartialReceivingPage extends Component {
       container.shipmentItems,
     ], []);
 
+    // We want to clear quantity receiving after using the edit modal
+    // to force users to enter new quantity to avoid mistakes in
+    // autofilling / copying old values not appropriate for the
+    // current quantity shipped
+    const clearedTableLines = editLines.map((line) => ({
+      ...line,
+      quantityReceiving: null,
+    }));
+
     // Concatenated values from first table part (lines after those coming from modal),
     // with those lines from modal and with values after that lines.
     const newTableValue = [
       ..._.take(flattenedShipmentItems, getContainerEditLineIndex),
-      ...editLines,
+      ...clearedTableLines,
       ..._.takeRight(
         flattenedShipmentItems,
         flattenedShipmentItems.length - getContainerEditLineIndex - 1,
@@ -734,10 +743,12 @@ class PartialReceivingPage extends Component {
    */
   saveEditLine(editLines, parentIndex, formValues, rowIndex) {
     this.props.showSpinner();
+
     const editedLinesToSave = {
       ...this.state.values,
       containers: [{ ...this.state.values.containers[parentIndex], shipmentItems: editLines }],
     };
+
     this.saveValues(editedLinesToSave)
       .then((response) => {
         const containers = this.rewriteQuantitiesAfterSave({
