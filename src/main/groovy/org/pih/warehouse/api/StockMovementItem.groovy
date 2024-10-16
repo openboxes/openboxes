@@ -80,6 +80,13 @@ class StockMovementItem {
         return stocklistItem?.quantity ?: null
     }
 
+    BigDecimal getPacksRequest () {
+        if (packSize == null || packSize == 0) {
+            return null
+        }
+        return quantityRequested?.toBigDecimal() / packSize.toBigDecimal()
+    }
+
 
     static constraints = {
         id(nullable: true)
@@ -134,7 +141,7 @@ class StockMovementItem {
                 quantityRevised           : quantityRevised,
                 quantityPicked            : quantityPicked,
                 unitOfMeasure             : unitOfMeasure,
-                packsRequested            : quantityRequested / packSize,
+                packsRequested            : packsRequest,
                 quantityRequired          : quantityRequired,
                 reasonCode                : reasonCode,
                 comments                  : comments,

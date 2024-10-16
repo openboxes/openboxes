@@ -224,11 +224,6 @@ class ShipmentItem implements Comparable, Serializable {
         return orderItem ? orderItem.quantityPerUom : 1
     }
 
-    String getUnitOfMeasure() {
-        OrderItem orderItem = OrderItem.get(this.orderItemId)
-        return orderItem.unitOfMeasure
-    }
-
     Integer getQuantityPicked() {
         Integer quantityPicked
         if (binLocation) {
