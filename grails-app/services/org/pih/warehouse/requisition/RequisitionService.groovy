@@ -39,7 +39,7 @@ class RequisitionService {
 
     GrailsApplication grailsApplication
     AuthService authService
-    def identifierService
+    RequisitionIdentifierService requisitionIdentifierService
     def inventoryService
 
     def getRequisitionStatistics(Location destination, Location origin, User user) {
@@ -352,7 +352,7 @@ class RequisitionService {
      */
     def saveRequisition(Requisition requisition) {
         if (!requisition.requestNumber) {
-            requisition.requestNumber = identifierService.generateRequisitionIdentifier()
+            requisition.requestNumber = requisitionIdentifierService.generate()
         }
 
         def savedRequisition = requisition.save(flush: true)
@@ -478,7 +478,7 @@ class RequisitionService {
         try {
             requisition.properties = data
             if (!requisition.requestNumber) {
-                requisition.requestNumber = identifierService.generateRequisitionIdentifier()
+                requisition.requestNumber = requisitionIdentifierService.generate()
             }
             def requisitionItems = itemsData.collect { itemData ->
                 println "itemData: " + itemData

@@ -47,7 +47,7 @@ class InventoryService implements ApplicationContextAware {
     def authService
     def dataService
     def gparsService
-    def identifierService
+    TransactionIdentifierService transactionIdentifierService
     def messageService
     def locationService
 
@@ -2506,7 +2506,7 @@ class InventoryService implements ApplicationContextAware {
      * @return a unique identifier to be assigned to a transaction
      */
     String generateTransactionNumber() {
-        return identifierService.generateTransactionIdentifier()
+        return transactionIdentifierService.generate()
     }
 
     List<Transaction> getCreditsBetweenDates(List<Location> fromLocations, List<Location> toLocations, Date fromDate, Date toDate) {
