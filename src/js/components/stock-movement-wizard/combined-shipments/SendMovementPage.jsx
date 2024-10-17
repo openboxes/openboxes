@@ -213,7 +213,7 @@ const SUPPLIER_FIELDS = {
         },
         getDynamicAttr: ({ rowIndex, tableItems }) => ({
           formatValue: () => {
-            const row = _.get(tableItems, `[${rowIndex}]`, {});
+            const row = tableItems[rowIndex] || {};
             return `${row.packsRequested} ${row.unitOfMeasure}`;
           },
         }),

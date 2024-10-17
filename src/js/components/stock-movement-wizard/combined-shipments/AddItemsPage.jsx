@@ -192,12 +192,9 @@ const FIELDS = {
         },
         getDynamicAttr: ({ rowIndex, values }) => ({
           formatValue: () => {
-            const packsRequested = _.toInteger(
-              _.get(values, `lineItems[${rowIndex}].packsRequested`),
-            );
-            const packSize = _.toInteger(
-              _.get(values, `lineItems[${rowIndex}].packSize`),
-            );
+            const row = values.lineItems[rowIndex] || {};
+            const packsRequested = _.toInteger(row.packsRequested);
+            const packSize = _.toInteger(row.packSize);
             return packsRequested * packSize;
           },
         }),
