@@ -159,16 +159,45 @@ const FIELDS = {
           },
         }),
       },
-      quantityRequested: {
+      packsRequested: {
         type: TextField,
-        label: 'react.stockMovement.quantity.label',
-        defaultMessage: 'Qty',
+        label: 'react.stockMovement.quantityPOUom.label',
+        defaultMessage: 'Quantity (in PO UoM)',
         flexWidth: '1',
         required: true,
+        headerTooltip: 'react.stockMovement.quantityPerUom.InputTooltip.label',
+        multilineHeader: true,
         attributes: {
           type: 'number',
           showError: true,
         },
+      },
+      unitOfMeasure: {
+        type: TextField,
+        label: 'react.stockMovement.POUom.label',
+        defaultMessage: 'PO UoM',
+        flexWidth: 0.9,
+        attributes: {
+          disabled: true,
+        },
+      },
+      calculatedQuantityRequested: {
+        type: TextField,
+        label: 'react.stockMovement.quantityEach.label',
+        defaultMessage: 'Quantity (each)',
+        multilineHeader: true,
+        flexWidth: 1,
+        attributes: {
+          disabled: true,
+        },
+        getDynamicAttr: ({ rowIndex, values }) => ({
+          formatValue: () => {
+            const row = values.lineItems[rowIndex] || {};
+            const packsRequested = _.toInteger(row.packsRequested);
+            const packSize = _.toInteger(row.packSize);
+            return packsRequested * packSize;
+          },
+        }),
       },
       palletName: {
         type: TextField,
@@ -324,7 +353,7 @@ class AddItemsPage extends Component {
     return _.map(items, (item) => ({
       id: item.id || null,
       product: { id: item.product.id },
-      quantityRequested: item.quantityRequested,
+      quantityRequested: item.packsRequested * item.packSize,
       palletName: item.palletName,
       boxName: item.boxName,
       lotNumber: item.lotNumber,
@@ -382,11 +411,8 @@ class AddItemsPage extends Component {
     const date = moment(this.props.minimumExpirationDate, 'MM/DD/YYYY');
 
     _.forEach(values.lineItems, (item, key) => {
-      if (!_.isNil(item.product) && (!item.quantityRequested || item.quantityRequested <= 0)) {
-        errors.lineItems[key] = { quantityRequested: 'react.stockMovement.error.enterQuantity.label' };
-      }
-      if (_.toInteger(item.quantityRequested) % item.packSize !== 0) {
-        errors.lineItems[key] = { quantityRequested: 'react.stockMovement.error.multipleOfPackSize.label' };
+      if (!_.isNil(item.product) && (!item.packsRequested || item.packsRequested <= 0)) {
+        errors.lineItems[key] = { packsRequested: 'react.stockMovement.error.enterQuantity.label' };
       }
       if (!_.isEmpty(item.boxName) && _.isEmpty(item.palletName)) {
         errors.lineItems[key] = { boxName: 'react.stockMovement.error.boxWithoutPallet.label' };
@@ -403,21 +429,24 @@ class AddItemsPage extends Component {
       if (!item.id || splitItems.length > 1) {
         const requestedQuantity = _.reduce(
           splitItems, (sum, val) =>
-            (sum + (val.quantityRequested ? _.toInteger(val.quantityRequested) : 0)),
+            (sum + (val.packsRequested
+              ? _.toInteger(val.packsRequested * val.packSize)
+              : 0
+            )),
           0,
         );
         if (requestedQuantity > item.quantityAvailable) {
           _.forEach(values.lineItems, (lineItem, lineItemKey) => {
             _.forEach(splitItems, (splitItem) => {
               if (lineItem === splitItem) {
-                errors.lineItems[lineItemKey] = { quantityRequested: 'react.stockMovement.error.higherSplitQuantity.label' };
+                errors.lineItems[lineItemKey] = { packsRequested: 'react.stockMovement.error.higherSplitQuantity.label' };
               }
             });
           });
         }
       } else if (splitItems.length === 1
-        && item && item.quantityAvailable < _.toInteger(item.quantityRequested)) {
-        errors.lineItems[key] = { quantityRequested: 'react.stockMovement.error.higherQuantity.label' };
+        && item && item.quantityAvailable < _.toInteger(item.packsRequested * item.packSize)) {
+        errors.lineItems[key] = { packsRequested: 'react.stockMovement.error.higherQuantity.label' };
       }
       if (!ignoreLotAndExpiry) {
         if (item.expirationDate && (_.isNil(item.lotNumber) || _.isEmpty(item.lotNumber))) {
@@ -620,7 +649,7 @@ class AddItemsPage extends Component {
 
     const lineItems = _.filter(formValues.lineItems, (val) => !_.isEmpty(val) && val.product);
 
-    if (_.some(lineItems, (item) => !item.quantityRequested || item.quantityRequested === '0')) {
+    if (_.some(lineItems, (item) => !item.packsRequested || item.packsRequested === '0')) {
       this.confirmSave(() =>
         this.saveAndTransitionToNextStep(formValues, lineItems));
     } else {
@@ -816,7 +845,7 @@ class AddItemsPage extends Component {
   save(formValues) {
     const lineItems = _.filter(formValues.lineItems, (item) => !_.isEmpty(item));
     if (lineItems.length > 0) {
-      if (_.some(lineItems, (item) => !item.quantityRequested || item.quantityRequested === '0')) {
+      if (_.some(lineItems, (item) => !item.packsRequested || item.packsRequested === '0')) {
         this.confirmSave(() => this.saveItems(lineItems));
       } else {
         this.saveItems(lineItems);
