@@ -735,6 +735,15 @@ class PartialReceivingPage extends Component {
     }));
   }
 
+  static mapContainers(containers, parentIndex, items) {
+    return containers.map((container, idx) => {
+      if (idx === parentIndex) {
+        return { ...container, shipmentItems: [...container.shipmentItems, ...items] };
+      }
+      return container;
+    });
+  }
+
   /*
    * Saves changes made in edit line modal and updates data.
    * @param {object} editLines
@@ -742,26 +751,55 @@ class PartialReceivingPage extends Component {
    * @public
    */
   saveEditLine(editLines, parentIndex, formValues, rowIndex) {
+    const { containers } = this.state.values;
+    const editLinesGrouped = editLines.reduce((acc, line) => {
+      if (line.receiptItemId) {
+        return {
+          ...acc,
+          itemsToSave: [...acc.itemsToSave, line],
+        };
+      }
+      return {
+        ...acc,
+        newItems: [...acc.newItems, line],
+      };
+    }, { itemsToSave: [], newItems: [] });
+    if (!editLinesGrouped.itemsToSave.length) {
+      const mappedContainers =
+        PartialReceivingPage.mapContainers(containers, parentIndex, editLinesGrouped.newItems);
+      this.setState((prevState) =>
+        ({ values: { ...prevState.values, containers: mappedContainers } }));
+      return;
+    }
     this.props.showSpinner();
 
     const editedLinesToSave = {
       ...this.state.values,
-      containers: [{ ...this.state.values.containers[parentIndex], shipmentItems: editLines }],
+      containers: [
+        {
+          ...this.state.values.containers[parentIndex],
+          shipmentItems: editLinesGrouped.itemsToSave,
+        },
+      ],
     };
 
     this.saveValues(editedLinesToSave)
       .then((response) => {
-        const containers = this.rewriteQuantitiesAfterSave({
+        const updatedContainersAfterSave = this.rewriteQuantitiesAfterSave({
           formValues,
           editLines,
           parentIndex,
           fetchedContainers: response.data.data.containers,
           editLinesIndex: rowIndex,
         });
+        const mappedContainers =
+          PartialReceivingPage.mapContainers(updatedContainersAfterSave,
+            parentIndex,
+            editLinesGrouped.newItems);
         this.setState({
           values: parseResponse({
             ...response.data.data,
-            containers,
+            containers: mappedContainers,
           }),
         });
       })
