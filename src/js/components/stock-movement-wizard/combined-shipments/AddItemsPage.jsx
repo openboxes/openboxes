@@ -161,8 +161,8 @@ const FIELDS = {
       },
       packsRequested: {
         type: TextField,
-        label: 'react.stockMovement.quantityPerUom.label',
-        defaultMessage: 'Quantity (per UoM)',
+        label: 'react.stockMovement.quantityPOUom.label',
+        defaultMessage: 'Quantity (in PO UoM)',
         flexWidth: '1',
         required: true,
         headerTooltip: 'react.stockMovement.quantityPerUom.InputTooltip.label',

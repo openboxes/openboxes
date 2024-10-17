@@ -204,8 +204,8 @@ const SUPPLIER_FIELDS = {
       },
       quantityPickedPerUom: {
         type: LabelField,
-        label: 'react.stockMovement.quantityPickedPerUom.label',
-        defaultMessage: 'Qty Picked (per UoM)',
+        label: 'react.stockMovement.quantityPickedPOUom.label',
+        defaultMessage: 'Qty Picked (in PO UoM)',
         multilineHeader: true,
         fixedWidth: '100px',
         attributes: {

@@ -80,7 +80,7 @@ class StockMovementItem {
         return stocklistItem?.quantity ?: null
     }
 
-    BigDecimal getPacksRequest () {
+    BigDecimal getPacksRequested () {
         if (packSize == null || packSize == 0) {
             return null
         }
@@ -141,7 +141,7 @@ class StockMovementItem {
                 quantityRevised           : quantityRevised,
                 quantityPicked            : quantityPicked,
                 unitOfMeasure             : unitOfMeasure,
-                packsRequested            : packsRequest,
+                packsRequested            : packsRequested,
                 quantityRequired          : quantityRequired,
                 reasonCode                : reasonCode,
                 comments                  : comments,
