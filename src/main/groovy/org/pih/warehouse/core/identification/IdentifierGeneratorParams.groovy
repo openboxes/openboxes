@@ -7,8 +7,7 @@ import org.grails.datastore.gorm.GormEntity
  * A POJO for holding all the configuration options when generating a custom id.
  *
  * Should be used sparingly as it is inflexible to dynamic customization. Any time we want to modify how an identifier
- * is generated with these custom params, it'll need to be done via a code change (vs a dynamic property change if
- * the generator.
+ * is generated with these custom params, it'll need to be done via a code change (vs a dynamic property change).
  */
 @Builder
 class IdentifierGeneratorParams {

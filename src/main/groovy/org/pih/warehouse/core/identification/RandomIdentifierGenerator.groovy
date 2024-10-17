@@ -3,7 +3,9 @@ package org.pih.warehouse.core.identification
 import org.apache.commons.lang.RandomStringUtils
 import org.apache.commons.lang.StringUtils
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.stereotype.Component
 
+@Component
 class RandomIdentifierGenerator {
 
     @Value('${openboxes.identifier.numeric}')

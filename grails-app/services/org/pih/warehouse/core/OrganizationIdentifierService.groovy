@@ -1,12 +1,14 @@
 package org.pih.warehouse.core
 
 import grails.core.GrailsApplication
+import grails.gorm.transactions.Transactional
 import org.apache.commons.lang.WordUtils
 
 // TODO: Try to merge this logic into IdentifierService. We'd need to support a new ${abbreviation} keyword in the
 //       format that would get injected to based on the same logic that we have here. Then we'd add a new
 //       identifier.x.abbreviation.field = "path.to.field" config that we can use to extract the field from the entity.
 //       Or if that's too challenging, we can simply return the string to use via abstract method in IdentifierService.
+@Transactional
 class OrganizationIdentifierService {
 
     GrailsApplication grailsApplication

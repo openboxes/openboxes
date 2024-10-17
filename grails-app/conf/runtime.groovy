@@ -23,6 +23,7 @@ openboxes.identifier.transaction.random.template = "AAA-AAA-AAA"
 
 // Product identifier
 openboxes.identifier.product.random.template = "LLNN"
+openboxes.identifier.productCode.generatorType = IdentifierGeneratorTypeCode.SEQUENCE
 
 // Product Supplier identifier
 openboxes.identifier.productSupplier.format = "\${custom.productCode}\${delimiter}\${custom.organizationCode}\${random}"
@@ -31,7 +32,6 @@ openboxes.identifier.productSupplier.random.condition = RandomCondition.ON_DUPLI
 
 // Product identifier generator configuration for the systems default product
 openboxes.identifier.defaultProductType.id = "DEFAULT"
-openboxes.identifier.productCode.generatorType = IdentifierGeneratorTypeCode.SEQUENCE
 
 // Product identifier configuration for all sequential product codes
 openboxes.identifier.productCode.format = "\${custom.productTypeCode}\${delimiter}\${custom.sequenceNumber}"
