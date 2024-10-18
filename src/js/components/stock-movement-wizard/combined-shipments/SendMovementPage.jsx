@@ -202,11 +202,27 @@ const SUPPLIER_FIELDS = {
         defaultMessage: 'Expiry',
         flexWidth: '3.5',
       },
+      quantityPickedPerUom: {
+        type: LabelField,
+        label: 'react.stockMovement.quantityPickedPOUom.label',
+        defaultMessage: 'Qty Picked (in PO UoM)',
+        multilineHeader: true,
+        fixedWidth: '100px',
+        attributes: {
+          disabled: true,
+        },
+        getDynamicAttr: ({ rowIndex, tableItems }) => ({
+          formatValue: () => {
+            const row = tableItems[rowIndex] || {};
+            return `${row.packsRequested} ${row.unitOfMeasure}`;
+          },
+        }),
+      },
       quantityRequested: {
         type: LabelField,
         fixedWidth: '150px',
-        label: 'react.stockMovement.quantityPicked.label',
-        defaultMessage: 'Qty Picked',
+        label: 'react.stockMovement.quantityPickedEach.label',
+        defaultMessage: 'Qty Picked (each)',
       },
       'recipient.name': {
         type: LabelField,
@@ -836,6 +852,7 @@ class SendMovementPage extends Component {
                       isBoxNameEmpty: _.every(this.state.values.tableItems, ({ boxName }) => !boxName),
                       // eslint-disable-next-line max-len
                       isPalletNameEmpty: _.every(this.state.values.tableItems, ({ palletName }) => !palletName),
+                      tableItems: values.tableItems
                     }))}
                 </div>
               </div>
