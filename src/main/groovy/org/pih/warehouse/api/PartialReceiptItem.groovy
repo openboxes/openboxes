@@ -71,7 +71,7 @@ class PartialReceiptItem {
     }
 
     String getDisplayUnitOfMeasure() {
-        return "${shipmentItem?.orderItem?.quantity} ${shipmentItem?.unitOfMeasure}"
+        return "${quantityShipped} ${shipmentItem?.unitOfMeasure}"
     }
 
     Map toJson() {

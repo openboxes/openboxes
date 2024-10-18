@@ -259,6 +259,9 @@ const TABLE_FIELDS = {
         defaultMessage: 'Shipped (in PO)',
         multilineHeader: true,
         flexWidth: '1',
+        attributes: {
+          showValueTooltip: true,
+        },
         getDynamicAttr: (props) => ({
           hide: !props.values?.isShipmentFromPurchaseOrder,
         }),
