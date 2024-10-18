@@ -60,14 +60,14 @@ class SentryGrailsTracingFilter extends OncePerRequestFilter {
             filterChain.doFilter(httpRequest, httpResponse)
         } catch (Throwable e) {
             // Properly set the status for any other exceptions thrown during the filter process.
-            transaction.setStatus(SpanStatus.INTERNAL_ERROR)
+            transaction.status = SpanStatus.INTERNAL_ERROR
             throw e
         } finally {
             // Now that all other filters have ran, we know we have the request attributes that we need.
-            transaction.setName(httpRequest.getRequestURI())
-            transaction.setOperation(TRANSACTION_OP)
-            if (transaction.getStatus() == null) {
-                transaction.setStatus(SpanStatus.fromHttpStatusCode(httpResponse.getStatus()))
+            transaction.name = httpRequest.requestURI
+            transaction.operation = TRANSACTION_OP
+            if (transaction.status == null) {
+                transaction.status = SpanStatus.fromHttpStatusCode(httpResponse.status)
             }
             transaction.finish()
         }
@@ -75,7 +75,7 @@ class SentryGrailsTracingFilter extends OncePerRequestFilter {
 
     private ITransaction startTransaction(final HttpServletRequest httpRequest) {
 
-        final String name = "${httpRequest.getMethod()} ${httpRequest.getRequestURI()}"
+        final String name = "${httpRequest.method} ${httpRequest.requestURI}"
 
         final CustomSamplingContext customSamplingContext = new CustomSamplingContext()
         customSamplingContext.set("request", httpRequest)
@@ -95,7 +95,7 @@ class SentryGrailsTracingFilter extends OncePerRequestFilter {
                 }
             } catch (InvalidSentryTraceHeaderException e) {
                 hub.getOptions().getLogger().log(
-                        SentryLevel.DEBUG, e, "Failed parsing Sentry trace header: %s", e.getMessage())
+                        SentryLevel.DEBUG, e, "Failed parsing Sentry trace header: %s", e.message)
             }
         }
 
