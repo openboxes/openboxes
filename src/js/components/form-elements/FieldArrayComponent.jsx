@@ -104,6 +104,8 @@ class FieldArrayComponent extends Component {
               const { hide, headerHtml } = dynamicAttr;
               const flexWidth = dynamicAttr.flexWidth || config.flexWidth;
               const fixedWidth = dynamicAttr.fixedWidth || config.fixedWidth;
+              const headerLabel = dynamicAttr.label || config.label;
+              const headerDefaultMessage = dynamicAttr.defaultMessage || config.defaultMessage;
 
               if (!hide) {
                 return (
@@ -139,8 +141,8 @@ class FieldArrayComponent extends Component {
                         }}
                       >
                         { headerHtml && headerHtml() }
-                        { config.label && !headerHtml &&
-                          <Translate id={config.label} defaultMessage={config.defaultMessage} />}
+                        { headerLabel && !headerHtml &&
+                          <Translate id={headerLabel} defaultMessage={headerDefaultMessage} />}
                       </div>
                     </Tooltip>
                   </div>);
