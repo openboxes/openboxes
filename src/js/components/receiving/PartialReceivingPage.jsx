@@ -275,6 +275,14 @@ const TABLE_FIELDS = {
         attributes: {
           formatValue: (value) => (value ? (value.toLocaleString('en-US')) : value),
         },
+        getDynamicAttr: ({ values }) => ({
+          label: values?.isShipmentFromPurchaseOrder
+            ? 'react.partialReceiving.shippedEach.label'
+            : 'react.partialReceiving.shipped.label',
+          defaultMessage: values?.isShipmentFromPurchaseOrder
+            ? 'Shipped (each)'
+            : 'Shipped',
+        }),
       },
       quantityReceived: {
         type: (params) => (params.subfield ? <LabelField {...params} /> : null),
@@ -316,19 +324,23 @@ const TABLE_FIELDS = {
       quantityReceiving: {
         type: (params) => (params.subfield ? <TextField {...params} /> : null),
         fieldKey: '',
-        label: 'react.partialReceiving.receivingNow.label',
-        defaultMessage: 'Receiving now (each)',
         multilineHeader: true,
         flexWidth: '1',
         attributes: {
           autoComplete: 'off',
         },
-        getDynamicAttr: ({ shipmentReceived, fieldValue }) => ({
+        getDynamicAttr: ({ shipmentReceived, fieldValue, values }) => ({
           disabled: shipmentReceived || isReceived(true, fieldValue),
           formatValue: (val) => {
             const { quantityShipped, quantityRemaining } = fieldValue;
             return quantityShipped === 0 && quantityRemaining === quantityShipped ? null : val;
           },
+          label: values?.isShipmentFromPurchaseOrder
+            ? 'react.partialReceiving.receivingNowEach.label'
+            : 'react.partialReceiving.receivingNow.label',
+          defaultMessage: values?.isShipmentFromPurchaseOrder
+            ? 'Receiving now (each)'
+            : 'Receiving now',
         }),
       },
       edit: {
