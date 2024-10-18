@@ -2,7 +2,7 @@ package unit.org.pih.warehouse.requisition
 
 import grails.testing.gorm.DataTest
 import grails.testing.services.ServiceUnitTest
-import org.pih.warehouse.core.IdentifierService
+
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.User
@@ -10,6 +10,7 @@ import org.pih.warehouse.inventory.InventoryService
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.requisition.Requisition
+import org.pih.warehouse.requisition.RequisitionIdentifierService
 import org.pih.warehouse.requisition.RequisitionService
 import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.requisition.RequisitionType
@@ -24,9 +25,6 @@ class RequisitionServiceSpec extends Specification implements ServiceUnitTest<Re
     @Shared
     InventoryService inventoryService
 
-    @Shared
-    IdentifierService identifierService
-
     void setupSpec() {
         mockDomain Requisition
         mockDomain Picklist
@@ -36,12 +34,11 @@ class RequisitionServiceSpec extends Specification implements ServiceUnitTest<Re
         inventoryService = Stub(InventoryService) {
             generateTransactionNumber() >> UUID.randomUUID().toString()
         }
-        identifierService = Stub(IdentifierService) {
-            generateRequisitionIdentifier() >> UUID.randomUUID().toString()
-        }
-        inventoryService.identifierService = identifierService
         service.inventoryService = inventoryService
-        service.identifierService = identifierService
+
+        service.requisitionIdentifierService = Stub(RequisitionIdentifierService) {
+            generate() >> UUID.randomUUID().toString()
+        }
     }
 
 

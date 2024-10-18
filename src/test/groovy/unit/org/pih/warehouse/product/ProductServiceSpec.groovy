@@ -6,8 +6,8 @@ import spock.lang.Ignore
 import spock.lang.Specification
 import spock.lang.Unroll
 
-import org.pih.warehouse.core.IdentifierService
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.product.ProductIdentifierService
 import org.pih.warehouse.product.ProductService
 import org.pih.warehouse.product.ProductType
 
@@ -46,8 +46,8 @@ class ProductServiceSpec extends Specification implements ServiceUnitTest<Produc
 
         and: 'the following mocks'
         // Product.metaClass.static.executeQuery = {String query, List params -> return [0]}
-        service.identifierService = Stub(IdentifierService) {
-            generateProductIdentifier(productType) >> productCode
+        service.productIdentifierService = Stub(ProductIdentifierService) {
+            generateForProductType(productType) >> productCode
         }
 
         when:
