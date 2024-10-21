@@ -184,6 +184,10 @@ class Invoice implements Serializable {
         return invoiceItems?.any { it.order?.hasPrepaymentInvoice }
     }
 
+    boolean getHasRegularInvoice() {
+        return invoiceItems?.any { it.order?.hasRegularInvoice }
+    }
+
     boolean getIsPrepaymentInvoice() {
         return invoiceType?.code == InvoiceTypeCode.PREPAYMENT_INVOICE
     }

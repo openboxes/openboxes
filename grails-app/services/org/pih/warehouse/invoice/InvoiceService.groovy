@@ -335,6 +335,9 @@ class InvoiceService {
         if (!invoice) {
             throw new IllegalArgumentException("Missing invoice to delete")
         }
+        if (invoice.isPrepaymentInvoice && invoice.hasRegularInvoice) {
+            throw new IllegalArgumentException("Prepayment invoice has associated final invoice")
+        }
         invoice.invoiceItems?.each { InvoiceItem invoiceItem ->
             deleteInvoiceItem(invoiceItem)
         }
