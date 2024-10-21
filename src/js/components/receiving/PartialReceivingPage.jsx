@@ -750,6 +750,76 @@ class PartialReceivingPage extends Component {
     }));
   }
 
+  static mapShipmentItems(shipmentItems, rowIndex, editedLines) {
+    // Group items for: before edited row, the edited row's original item, items after edited row
+    // To be able to append a new item just underneath (or replace) the original item
+    const shipmentItemsGrouped = shipmentItems.reduce((acc, item, idx) => {
+      if (idx < rowIndex) {
+        return {
+          ...acc,
+          itemsBeforeCurrentRow: [...acc.itemsBeforeCurrentRow, item],
+        };
+      }
+      if (idx === rowIndex) {
+        return {
+          ...acc,
+          originalItem: item,
+        };
+      }
+      return {
+        ...acc,
+        itemsAfterCurrentRow: [...acc.itemsAfterCurrentRow, item],
+      };
+    }, { itemsBeforeCurrentRow: [], originalItem: null, itemsAfterCurrentRow: [] });
+
+    /** If an original item is already persisted,
+      we don't want to replace it with a new item, but we want to keep the original item
+      This is the case if you pick one of the items,
+      go to check step, go back, edit the line and split it
+      (we want to keep the persisted item + add a new one underneath)
+      To keep the order (originalItem and then the new item),
+      we just add the original item at the end of the items before the current row
+    */
+    if (shipmentItemsGrouped.originalItem?.receiptItemId) {
+      shipmentItemsGrouped.itemsBeforeCurrentRow.push(shipmentItemsGrouped.originalItem);
+    }
+
+    /** Since the edited items are not immedietaly sent to the API,
+        and a few fields are not calculated and returned by the API, we have to set them statically
+    */
+    const editedLinesWithQuantities = editedLines.map((item) => ({
+      ...item,
+      quantityRemaining: item.quantityShipped,
+      unitOfMeasure: shipmentItemsGrouped.originalItem?.unitOfMeasure,
+    }));
+
+    /**
+     * Returned merged lists
+     * (items before current row that might include the original item,
+     * edited items (new items),
+     * items that were displayed under the edited item)
+     */
+
+    return [
+      ...shipmentItemsGrouped.itemsBeforeCurrentRow,
+      ...editedLinesWithQuantities,
+      ...shipmentItemsGrouped.itemsAfterCurrentRow,
+    ];
+  }
+
+  static mapContainers(containers, parentIndex, rowIndex, items) {
+    return containers.map((container, idx) => {
+      if (idx === parentIndex) {
+        const { shipmentItems } = container;
+        return {
+          ...container,
+          shipmentItems: PartialReceivingPage.mapShipmentItems(shipmentItems, rowIndex, items),
+        };
+      }
+      return container;
+    });
+  }
+
   /*
    * Saves changes made in edit line modal and updates data.
    * @param {object} editLines
@@ -757,26 +827,57 @@ class PartialReceivingPage extends Component {
    * @public
    */
   saveEditLine(editLines, parentIndex, formValues, rowIndex) {
+    const { containers } = this.state.values;
+    const editLinesGrouped = editLines.reduce((acc, line) => {
+      if (line.receiptItemId) {
+        return {
+          ...acc,
+          itemsToSave: [...acc.itemsToSave, line],
+        };
+      }
+      return {
+        ...acc,
+        newItems: [...acc.newItems, line],
+      };
+    }, { itemsToSave: [], newItems: [] });
+    if (!editLinesGrouped.itemsToSave.length) {
+      const { newItems } = editLinesGrouped;
+      const mappedContainers =
+        PartialReceivingPage.mapContainers(containers, parentIndex, rowIndex, newItems);
+      this.setState((prevState) =>
+        ({ values: { ...prevState.values, containers: mappedContainers } }));
+      return;
+    }
     this.props.showSpinner();
 
     const editedLinesToSave = {
       ...this.state.values,
-      containers: [{ ...this.state.values.containers[parentIndex], shipmentItems: editLines }],
+      containers: [
+        {
+          ...this.state.values.containers[parentIndex],
+          shipmentItems: editLinesGrouped.itemsToSave,
+        },
+      ],
     };
 
     this.saveValues(editedLinesToSave)
       .then((response) => {
-        const containers = this.rewriteQuantitiesAfterSave({
+        const updatedContainersAfterSave = this.rewriteQuantitiesAfterSave({
           formValues,
           editLines,
           parentIndex,
           fetchedContainers: response.data.data.containers,
           editLinesIndex: rowIndex,
         });
+        const mappedContainers =
+          PartialReceivingPage.mapContainers(updatedContainersAfterSave,
+            parentIndex,
+            rowIndex,
+            editLinesGrouped.newItems);
         this.setState({
           values: parseResponse({
             ...response.data.data,
-            containers,
+            containers: mappedContainers,
           }),
         });
       })
