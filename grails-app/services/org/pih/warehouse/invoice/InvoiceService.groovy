@@ -422,4 +422,15 @@ class InvoiceService {
         }
         return csv
     }
+
+    def rollbackInvoice(Invoice invoice) {
+        if (invoice.isPrepaymentInvoice && invoice.hasRegularInvoice) {
+            throw new IllegalArgumentException("Prepayment invoice has associated final invoice")
+        }
+
+        invoice.datePosted = null
+        invoice.disableRefresh = invoice.isPrepaymentInvoice
+
+        invoice.save()
+    }
 }

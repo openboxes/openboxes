@@ -51,21 +51,24 @@ class InvoiceController {
     }
 
     def rollback() {
-        def invoiceInstance = Invoice.get(params.id)
-        if (!invoiceInstance) {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'invoice.label', default: 'Invoice'), params.id])}"
-            redirect(action: "list")
-        } else {
-            invoiceInstance.datePosted = null
-            if (params.refreshInvoice && invoiceInstance.isPrepaymentInvoice) {
-                invoiceService.refreshInvoiceItems(invoiceInstance)
-            }
+        Invoice invoiceInstance = Invoice.get(params.id)
 
-            invoiceInstance.disableRefresh = invoiceInstance.isPrepaymentInvoice
-            invoiceDataService.save(invoiceInstance)
-            flash.message = "${warehouse.message(code: 'invoices.successfulRollback.message')}"
-            redirect(action: "show", id: params.id)
+        if (!invoiceInstance) {
+            log.info("Attempt to rollback not existing invoice")
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'invoice.label', default: 'Invoice'), params.id])}"
+            return redirect(action: "list")
         }
+
+        try {
+            log.info("Rolling back invoice " + invoiceInstance.id)
+            invoiceService.rollbackInvoice(invoiceInstance)
+        } catch (Exception e) {
+            log.error("Error rolling back invoice" + e.message, e)
+            flash.error = "${warehouse.message(code: 'default.not.rollback.message', args: [warehouse.message(code: 'invoice.label', default: 'Invoice'), params.id])}: " + e.message
+            return redirect(action: "show", id: params.id)
+        }
+        flash.message = "${warehouse.message(code: 'invoices.successfulRollback.message')}"
+        redirect(action: "show", id: params.id)
     }
 
     def eraseInvoice() {

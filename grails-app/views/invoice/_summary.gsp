@@ -53,10 +53,4 @@
     </div>
 </div>
 <script>
-  $(document).ready(function() {
-    $('a[name="invoiceRollback"]').bind('click', function() {
-      var refresh = confirm('${warehouse.message(code: 'invoice.refreshValues.label', default: 'Do you want to refresh Invoice values using PO?')}') || '';
-      $(this).attr('href', $(this).attr('href') + '?refreshInvoice=' + refresh);
-    })
-  });
 </script>
