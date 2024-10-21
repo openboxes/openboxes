@@ -3,16 +3,16 @@ package org.pih.warehouse.receiving
 import org.pih.warehouse.core.IdentifierService
 import org.pih.warehouse.core.identification.BlankIdentifierResolver
 
-class ReceiptIdentifierService extends IdentifierService implements BlankIdentifierResolver<Receipt> {
+class ReceiptIdentifierService extends IdentifierService<Receipt> implements BlankIdentifierResolver<Receipt> {
 
     @Override
-    String getEntityKey() {
+    String getIdentifierName() {
         return "receipt"
     }
 
     @Override
-    protected Integer countDuplicates(String receiptNumber) {
-        return Receipt.countByReceiptNumber(receiptNumber)
+    protected Integer countByIdentifier(String id) {
+        return Receipt.countByReceiptNumber(id)
     }
 
     @Override
@@ -21,7 +21,12 @@ class ReceiptIdentifierService extends IdentifierService implements BlankIdentif
     }
 
     @Override
-    void setIdentifierOnEntity(String receiptNumber, Receipt receipt) {
-        receipt.receiptNumber = receiptNumber
+    void setIdentifierOnEntity(String id, Receipt receipt) {
+        receipt.receiptNumber = id
+    }
+
+    @Override
+    String generate(Receipt entity) {
+        return generate(entity, null)
     }
 }

@@ -6,27 +6,32 @@ import org.pih.warehouse.core.IdentifierGeneratorTypeCode
 import org.pih.warehouse.core.IdentifierService
 import org.pih.warehouse.core.IdentifierTypeCode
 import org.pih.warehouse.core.Organization
-import org.pih.warehouse.core.identification.IdentifierGeneratorParams
+import org.pih.warehouse.core.identification.IdentifierGeneratorContext
 import org.pih.warehouse.shipping.Shipment
 
 // TODO: We should be able to move this sequential logic into the identifier service. That way we can support sequential
 //       id generation more generally. We'd need an abstract method there for fetching the next sequence number to use,
 //       and a new ${sequence} config option to know where to put the sequence.
-class PurchaseOrderIdentifierService extends IdentifierService {
+class PurchaseOrderIdentifierService extends IdentifierService<Order> {
 
     @Override
-    String getEntityKey() {
+    String getIdentifierName() {
         return "purchaseOrder"
     }
 
     @Override
-    protected Integer countDuplicates(String orderNumber) {
+    protected Integer countByIdentifier(String id) {
+        Integer count = Order.countByOrderNumber(id)
+
+        // TODO: Refactor how ids are generated for shipments so that we don't need to do this check. Uniqueness
+        //       of ids on one service shouldn't depend on another. The easiest solution is to override the format
+        //       for generating shipment ids to be "${custom.orderNumber}${random}" so that it's like the order
+        //       number but still unique.
+
         // We use order.orderNumber as shipment.shipmentNumber when creating a shipment from an order so we need to
         // check that the id is unique for shipments as well. See ShipmentService.createOrUpdateShipment for details.
-        Integer count = Order.countByOrderNumber(orderNumber)
-
-        // Only bother checking shipment if order doesn't already have a duplicate.
-        return count > 0 ? count : Shipment.countByShipmentNumber(orderNumber)
+        // Only bother checking shipment if order doesn't already have a duplicate though.
+        return count > 0 ? count : Shipment.countByShipmentNumber(id)
     }
 
     String generateForEntity(Order order) {
@@ -47,11 +52,9 @@ class PurchaseOrderIdentifierService extends IdentifierService {
         String sequenceNumberStr = StringUtils.leftPad(
                 sequenceNumber.toString(), sequenceNumberFormat.length(), sequenceNumberFormat.substring(0, 1))
 
-        return generate(
-                IdentifierGeneratorParams.builder()
-                        .templateEntity(order)
-                        .customKeys(["sequenceNumber": sequenceNumberStr])
-                        .build())
+        return generate(order, IdentifierGeneratorContext.builder()
+                .customProperties(["sequenceNumber": sequenceNumberStr])
+                .build())
     }
 
     private int getNextSequenceNumber(String partyId) {

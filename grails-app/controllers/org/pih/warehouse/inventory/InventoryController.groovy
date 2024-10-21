@@ -1019,7 +1019,7 @@ class InventoryController {
         List products = Product.getAll(productIds)
 
         def transaction = command?.transactionInstance
-        transaction.transactionNumber = transactionIdentifierService.generate()
+        transaction.transactionNumber = transactionIdentifierService.generate(transaction)
         def warehouseInstance = Location.get(session?.warehouse?.id)
         def quantityMap = inventoryService.getQuantityForInventory(warehouseInstance?.inventory, products)
 

@@ -47,7 +47,7 @@ class ProductServiceSpec extends Specification implements ServiceUnitTest<Produc
         and: 'the following mocks'
         // Product.metaClass.static.executeQuery = {String query, List params -> return [0]}
         service.productIdentifierService = Stub(ProductIdentifierService) {
-            generateForProductType(productType) >> productCode
+            generate(_ as Product) >> productCode
         }
 
         when:

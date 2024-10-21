@@ -150,7 +150,6 @@ class FulfillmentService {
     Requisition createRequisition(FulfillmentRequest fulfillmentRequest) {
         Requisition requisition = new Requisition(
                 status: RequisitionStatus.CREATED,
-                requestNumber: requisitionIdentifierService.generate(),
                 type: RequisitionType.IMPORT,
                 description: fulfillmentRequest.description,
                 destination: fulfillmentRequest.destination,
@@ -159,6 +158,7 @@ class FulfillmentService {
                 dateRequested: fulfillmentRequest.dateRequested,
                 name: generateName(fulfillmentRequest.origin, fulfillmentRequest.destination, fulfillmentRequest.dateRequested, null, fulfillmentRequest.description),
         )
+        requisition.requestNumber = requisitionIdentifierService.generate(requisition)
         if (!requisition.validate()) {
             throw new ValidationException("Invalid requisition", requisition.errors)
         }
@@ -352,10 +352,10 @@ class FulfillmentService {
                 inventory: shipment?.origin?.inventory,
                 transactionDate: shipment.actualShippingDate,
                 requisition: shipment.requisition,
-                transactionNumber: transactionIdentifierService.generate(),
                 outgoingShipment: shipment,
                 transactionType: debitTransactionType,
         )
+        debitTransaction.transactionNumber = transactionIdentifierService.generate(debitTransaction)
         if (!debitTransaction.validate()) {
             throw new ValidationException("Invalid transaction", debitTransaction.errors)
         }

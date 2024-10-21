@@ -787,7 +787,7 @@ class ProductService {
 
             if (!product?.id || product.validate()) {
                 if (!product.productCode) {
-                    product.productCode = generateProductIdentifier(product.productType)
+                    product.productCode = generateProductIdentifier(product)
                 }
             }
 
@@ -1082,12 +1082,10 @@ class ProductService {
     }
 
     /**
-     * Generate a product identifier.
-     *
-     * @return
+     * @return A generated identifier for the given product.
      */
-    String generateProductIdentifier(ProductType productType) {
-        return productIdentifierService.generateForProductType(productType)
+    String generateProductIdentifier(Product product) {
+        return productIdentifierService.generate(product)
     }
 
     /**
@@ -1111,7 +1109,7 @@ class ProductService {
         if (product) {
             // Generate product code if it doesn't already exist
             if (!product.productCode) {
-                product.productCode = generateProductIdentifier(product.productType)
+                product.productCode = generateProductIdentifier(product)
             }
             // Handle tags
             try {

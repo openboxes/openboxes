@@ -14,7 +14,7 @@ import org.grails.web.json.JSONObject
 
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
-import org.pih.warehouse.core.identification.IdentifierGeneratorParams
+import org.pih.warehouse.core.identification.IdentifierGeneratorContext
 import org.pih.warehouse.inventory.InventoryLevelStatus
 import org.pih.warehouse.inventory.Requirement
 import org.pih.warehouse.order.Order
@@ -82,7 +82,7 @@ class ReplenishmentApiController {
 
         Replenishment replenishment = new Replenishment()
         replenishment.id = params.id
-        bindReplenishmentData(replenishment, currentUser, currentLocation, jsonObject)
+        bindReplenishmentData(replenishment, order, currentUser, currentLocation, jsonObject)
         if (replenishment?.status == ReplenishmentStatus.COMPLETED) {
             replenishmentService.completeReplenishment(replenishment)
         } else {
@@ -92,7 +92,7 @@ class ReplenishmentApiController {
         render status: 200
     }
 
-    Replenishment bindReplenishmentData(Replenishment replenishment, User currentUser, Location currentLocation, JSONObject jsonObject) {
+    Replenishment bindReplenishmentData(Replenishment replenishment, Order order, User currentUser, Location currentLocation, JSONObject jsonObject) {
         bindData(replenishment, jsonObject, [exclude: ['replenishmentItems']])
 
         if (!replenishment.origin) {
@@ -109,9 +109,10 @@ class ReplenishmentApiController {
 
         if (!replenishment.replenishmentNumber) {
             String prefix = grailsApplication.config.openboxes.stockTransfer.binReplenishment.prefix
-            replenishment.replenishmentNumber = + orderIdentifierService.generate(IdentifierGeneratorParams.builder()
-                    .prefix(prefix)
-                    .build())
+            replenishment.replenishmentNumber = + orderIdentifierService.generate(order,
+                    IdentifierGeneratorContext.builder()
+                            .prefix(prefix)
+                            .build())
         }
 
         jsonObject.replenishmentItems.each { replenishmentItemMap ->

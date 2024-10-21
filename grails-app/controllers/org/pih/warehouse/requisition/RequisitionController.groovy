@@ -103,7 +103,7 @@ class RequisitionController {
                 requisition.commodityClass = params.commodityClass as CommodityClass
             }
             requisition.name = getName(requisition)
-            requisition.requestNumber = requisitionIdentifierService.generate()
+            requisition.requestNumber = requisitionIdentifierService.generate(requisition)
             requisition = requisitionService.saveRequisition(requisition)
             if (!requisition.hasErrors()) {
                 redirect(controller: "requisition", action: "edit", id: requisition?.id)

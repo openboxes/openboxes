@@ -100,7 +100,7 @@ class StockTransferApiController {
 
         StockTransfer stockTransfer = new StockTransfer()
 
-        bindStockTransferData(stockTransfer, currentUser, currentLocation, jsonObject)
+        bindStockTransferData(stockTransfer, order, currentUser, currentLocation, jsonObject)
 
         Boolean isReturnType = stockTransfer.type == OrderType.findByCode(Constants.RETURN_ORDER)
         if (isReturnType && (stockTransfer?.status == StockTransferStatus.PLACED)) {
@@ -118,7 +118,7 @@ class StockTransferApiController {
         render([data: stockTransfer?.toJson()] as JSON)
     }
 
-    StockTransfer bindStockTransferData(StockTransfer stockTransfer, User currentUser, Location currentLocation, JSONObject jsonObject) {
+    StockTransfer bindStockTransferData(StockTransfer stockTransfer, Order order, User currentUser, Location currentLocation, JSONObject jsonObject) {
         bindData(stockTransfer, jsonObject, [exclude: ['stockTransferItems']])
 
         if (!stockTransfer.origin) {
@@ -134,7 +134,7 @@ class StockTransferApiController {
         }
 
         if (!stockTransfer.stockTransferNumber) {
-            stockTransfer.stockTransferNumber = orderIdentifierService.generate()
+            stockTransfer.stockTransferNumber = orderIdentifierService.generate(order)
         }
 
         if (jsonObject.type) {

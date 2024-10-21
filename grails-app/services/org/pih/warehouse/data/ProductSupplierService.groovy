@@ -304,6 +304,7 @@ class ProductSupplierService {
 
     void assignSourceCode(ProductSupplier productSupplier, Organization organization) {
         productSupplier.code = productSupplierIdentifierService.generate(
+                productSupplier,
                 productSupplier?.product?.productCode,
                 organization?.code)
     }
@@ -369,6 +370,7 @@ class ProductSupplierService {
         Organization manufacturer = Organization.get(params.manufacturer)
         ProductSupplier productSupplier = new ProductSupplier()
         productSupplier.code = params.sourceCode ?: productSupplierIdentifierService.generate(
+                productSupplier,
                 product?.productCode,
                 organization?.code)
         productSupplier.name = params.sourceName ?: product?.name
@@ -392,6 +394,7 @@ class ProductSupplierService {
         ProductSupplier productSupplier = new ProductSupplier(command.properties)
         if (!productSupplier.code) {
             productSupplier.code = productSupplierIdentifierService.generate(
+                    productSupplier,
                     command?.product?.productCode,
                     command?.supplier?.code)
         }
@@ -406,6 +409,7 @@ class ProductSupplierService {
         productSupplier.properties = command.properties
         if (!productSupplier.code) {
             productSupplier.code = productSupplierIdentifierService.generate(
+                    productSupplier,
                     command?.product?.productCode,
                     command?.supplier?.code)
         }

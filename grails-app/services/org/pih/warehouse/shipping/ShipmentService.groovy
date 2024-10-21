@@ -510,7 +510,7 @@ class ShipmentService {
      */
     void saveShipment(Shipment shipment) {
         if (!shipment.shipmentNumber) {
-            shipment.shipmentNumber = shipmentIdentifierService.generate()
+            shipment.shipmentNumber = shipmentIdentifierService.generate(shipment)
         }
         shipment.save()
     }
@@ -1443,7 +1443,7 @@ class ShipmentService {
         creditTransaction.transactionDate = shipment.receipt.actualDeliveryDate
         creditTransaction.receipt = shipment?.receipt
         creditTransaction.requisition = shipment?.requisition
-        creditTransaction.transactionNumber = transactionIdentifierService.generate()
+        creditTransaction.transactionNumber = transactionIdentifierService.generate(creditTransaction)
 
         shipment?.receipt?.receiptItems.each {
             def inventoryItem =
@@ -1503,8 +1503,8 @@ class ShipmentService {
             debitTransaction.inventory = shipmentInstance?.origin?.inventory
             debitTransaction.transactionDate = shipmentInstance.getActualShippingDate()
             debitTransaction.requisition = shipmentInstance.requisition
-            debitTransaction.transactionNumber = transactionIdentifierService.generate()
             debitTransaction.outgoingShipment = shipmentInstance
+            debitTransaction.transactionNumber = transactionIdentifierService.generate(debitTransaction)
 
             addTransactionEntries(debitTransaction, shipmentInstance)
 

@@ -159,6 +159,7 @@ class ProductSupplierController {
 
             if (!productSupplierInstance.code) {
                 productSupplierInstance.code = productSupplierIdentifierService.generate(
+                        productSupplierInstance,
                         productSupplierInstance?.product?.productCode,
                         "")
             }

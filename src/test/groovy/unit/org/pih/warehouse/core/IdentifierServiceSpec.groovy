@@ -7,7 +7,7 @@ import spock.lang.Specification
 import spock.lang.Unroll
 
 import org.pih.warehouse.core.ConfigService
-import org.pih.warehouse.core.identification.IdentifierGeneratorParams
+import org.pih.warehouse.core.identification.IdentifierGeneratorContext
 import org.pih.warehouse.core.identification.RandomCondition
 import org.pih.warehouse.core.identification.RandomIdentifierGenerator
 import org.pih.warehouse.data.DataService
@@ -38,18 +38,20 @@ class IdentifierServiceSpec extends Specification implements ServiceUnitTest<Inv
     void 'generate should return the format as provided if no keywords are specified'() {
         given:
         configServiceStub.getProperty('openboxes.identifier.invoice.format', String) >> "testing"
+        configServiceStub.getProperty('openboxes.identifier.invoice.properties', Map) >> null
 
         expect:
-        assert service.generate() == "testing"
+        assert service.generate(new Invoice()) == "testing"
     }
 
     void 'generate should return #expectedIdentifier given a delimiter #delimiter and a format #format'() {
         given:
         configServiceStub.getProperty('openboxes.identifier.invoice.format', String) >> format
         configServiceStub.getProperty('openboxes.identifier.invoice.delimiter', String) >> delimiter
+        configServiceStub.getProperty('openboxes.identifier.invoice.properties', Map) >> null
 
         expect:
-        assert service.generate() == expectedIdentifier
+        assert service.generate(new Invoice()) == expectedIdentifier
 
         where:
         format                                                   | delimiter || expectedIdentifier
@@ -68,9 +70,10 @@ class IdentifierServiceSpec extends Specification implements ServiceUnitTest<Inv
         given:
         configServiceStub.getProperty('openboxes.identifier.invoice.format', String) >> "hi"
         configServiceStub.getProperty('openboxes.identifier.invoice.delimiter', String) >> delimiter
+        configServiceStub.getProperty('openboxes.identifier.invoice.properties', Map) >> null
 
         when:
-        String identifier = service.generate(IdentifierGeneratorParams.builder()
+        String identifier = service.generate(new Invoice(), IdentifierGeneratorContext.builder()
                 .prefix(prefix)
                 .suffix(suffix)
                 .build())
@@ -96,9 +99,10 @@ class IdentifierServiceSpec extends Specification implements ServiceUnitTest<Inv
         configServiceStub.getProperty('openboxes.identifier.attempts.max', Integer) >> 1
         configServiceStub.getProperty('openboxes.identifier.invoice.format', String) >> format
         configServiceStub.getProperty('openboxes.identifier.invoice.random.condition', RandomCondition) >> RandomCondition.ALWAYS
+        configServiceStub.getProperty('openboxes.identifier.invoice.properties', Map) >> null
 
         expect:
-        assert service.generate() == expectedIdentifier
+        assert service.generate(new Invoice()) == expectedIdentifier
 
         where:
         format                  || expectedIdentifier
@@ -117,9 +121,10 @@ class IdentifierServiceSpec extends Specification implements ServiceUnitTest<Inv
         configServiceStub.getProperty('openboxes.identifier.attempts.max', Integer) >> 1
         configServiceStub.getProperty('openboxes.identifier.invoice.format', String) >> "x\${random}"
         configServiceStub.getProperty('openboxes.identifier.invoice.random.condition', RandomCondition) >> RandomCondition.ON_DUPLICATE
+        configServiceStub.getProperty('openboxes.identifier.invoice.properties', Map) >> null
 
         when:
-        String identifier = service.generate()
+        String identifier = service.generate(new Invoice())
 
         then: 'randomness is not needed'
         assert identifier == "x"
@@ -128,7 +133,7 @@ class IdentifierServiceSpec extends Specification implements ServiceUnitTest<Inv
         new Invoice(invoiceNumber: "x").save(validate: false)
 
         then: 'randomness is now needed'
-        assert service.generate() == "x-ABC123"
+        assert service.generate(new Invoice()) == "x-ABC123"
     }
 
     void 'generate should return null if we exceed the number of retries'() {
@@ -141,20 +146,22 @@ class IdentifierServiceSpec extends Specification implements ServiceUnitTest<Inv
         configServiceStub.getProperty('openboxes.identifier.attempts.max', Integer) >> 1
         configServiceStub.getProperty('openboxes.identifier.invoice.format', String) >> "\${random}"
         configServiceStub.getProperty('openboxes.identifier.invoice.random.condition', RandomCondition) >> RandomCondition.ALWAYS
+        configServiceStub.getProperty('openboxes.identifier.invoice.properties', Map) >> null
 
         and: 'an invoice that already exists with that id'
         new Invoice(invoiceNumber: "ABC123").save(validate: false)
 
         expect:
-        assert service.generate() == null
+        assert service.generate(new Invoice()) == null
     }
 
     void 'generate should prioritize an overridden format if one is provided'() {
         given:
         configServiceStub.getProperty('openboxes.identifier.invoice.format', String) >> "hi"
+        configServiceStub.getProperty('openboxes.identifier.invoice.properties', Map) >> null
 
         when:
-        String identifier = service.generate(IdentifierGeneratorParams.builder()
+        String identifier = service.generate(new Invoice(), IdentifierGeneratorContext.builder()
                 .formatOverride("bye")
                 .build())
 
@@ -165,10 +172,11 @@ class IdentifierServiceSpec extends Specification implements ServiceUnitTest<Inv
     void 'generate should correctly apply custom keys'() {
         given:
         configServiceStub.getProperty('openboxes.identifier.invoice.format', String) >> "\${custom.x}"
+        configServiceStub.getProperty('openboxes.identifier.invoice.properties', Map) >> null
 
         when:
-        String identifier = service.generate(IdentifierGeneratorParams.builder()
-                .customKeys('x': 'thisIsCustom')
+        String identifier = service.generate(new Invoice(), IdentifierGeneratorContext.builder()
+                .customProperties('x': 'thisIsCustom')
                 .build())
 
         then:
@@ -178,10 +186,11 @@ class IdentifierServiceSpec extends Specification implements ServiceUnitTest<Inv
     void 'generate should fail with custom keys that were not provided'() {
         given:
         configServiceStub.getProperty('openboxes.identifier.invoice.format', String) >> "\${custom.x}"
+        configServiceStub.getProperty('openboxes.identifier.invoice.properties', Map) >> null
 
         when:
-        service.generate(IdentifierGeneratorParams.builder()
-                .customKeys('y': 'wrongKey')
+        service.generate(new Invoice(), IdentifierGeneratorContext.builder()
+                .customProperties('y': 'wrongKey')
                 .build())
 
         then:
@@ -199,9 +208,7 @@ class IdentifierServiceSpec extends Specification implements ServiceUnitTest<Inv
         }
 
         when:
-        String identifier = service.generate(IdentifierGeneratorParams.builder()
-                .templateEntity(new Invoice(name: 'myNameIs'))
-                .build())
+        String identifier = service.generate(new Invoice(name: 'myNameIs'))
 
         then:
         assert identifier == 'myNameIs'
@@ -219,9 +226,7 @@ class IdentifierServiceSpec extends Specification implements ServiceUnitTest<Inv
         }
 
         when:
-        String identifier = service.generate(IdentifierGeneratorParams.builder()
-                .templateEntity(new Invoice(name: 'myNameIs'))
-                .build())
+        String identifier = service.generate(new Invoice(name: 'myNameIs'))
 
         then:
         assert identifier == expectedIdentifier
@@ -236,9 +241,10 @@ class IdentifierServiceSpec extends Specification implements ServiceUnitTest<Inv
     void 'generate should fail on unknown keywords when no entity is provided'() {
         given:
         configServiceStub.getProperty('openboxes.identifier.invoice.format', String) >> "\${name}"
+        configServiceStub.getProperty('openboxes.identifier.invoice.properties', Map) >> null
 
         when:
-        service.generate()
+        service.generate(new Invoice())
 
         then:
         thrown(IllegalArgumentException)
@@ -248,9 +254,10 @@ class IdentifierServiceSpec extends Specification implements ServiceUnitTest<Inv
         given:
         configServiceStub.getProperty('openboxes.identifier.invoice.format', String) >> "x"
         configServiceStub.getProperty('openboxes.identifier.default.format', String) >> "y"
+        configServiceStub.getProperty('openboxes.identifier.invoice.properties', Map) >> null
 
         expect:
-        assert service.generate() == "x"
+        assert service.generate(new Invoice()) == "x"
     }
 
     void 'generate should prioritize feature delimiters over default'() {
@@ -258,8 +265,9 @@ class IdentifierServiceSpec extends Specification implements ServiceUnitTest<Inv
         configServiceStub.getProperty('openboxes.identifier.invoice.format', String) >> "x\${delimiter}y"
         configServiceStub.getProperty('openboxes.identifier.default.delimiter', String) >> "-"
         configServiceStub.getProperty('openboxes.identifier.invoice.delimiter', String) >> "."
+        configServiceStub.getProperty('openboxes.identifier.invoice.properties', Map) >> null
 
         expect:
-        assert service.generate() == "x.y"
+        assert service.generate(new Invoice()) == "x.y"
     }
 }

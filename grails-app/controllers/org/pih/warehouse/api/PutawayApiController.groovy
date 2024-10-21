@@ -72,7 +72,7 @@ class PutawayApiController {
         User currentUser = User.get(session.user.id)
 
         Putaway putaway = new Putaway()
-        bindPutawayData(putaway, currentUser, currentLocation, jsonObject)
+        bindPutawayData(putaway, order, currentUser, currentLocation, jsonObject)
 
         // Putaway stock
         if (putaway?.putawayStatus?.equals(PutawayStatus.COMPLETED)) {
@@ -93,7 +93,7 @@ class PutawayApiController {
     }
 
 
-    private Putaway bindPutawayData(Putaway putaway, User currentUser, Location currentLocation, JSONObject jsonObject) {
+    private Putaway bindPutawayData(Putaway putaway, Order order, User currentUser, Location currentLocation, JSONObject jsonObject) {
         // Bind the putaway
         bindData(putaway, jsonObject)
 
@@ -105,7 +105,7 @@ class PutawayApiController {
         }
 
         if (!putaway.putawayNumber) {
-            putaway.putawayNumber = orderIdentifierService.generate()
+            putaway.putawayNumber = orderIdentifierService.generate(order)
         }
 
         putaway.putawayAssignee = currentUser

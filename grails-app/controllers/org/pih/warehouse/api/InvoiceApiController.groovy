@@ -121,7 +121,7 @@ class InvoiceApiController {
         }
 
         if (!invoice.invoiceNumber) {
-            invoice.invoiceNumber = invoiceIdentifierService.generate()
+            invoice.invoiceNumber = invoiceIdentifierService.generate(invoice)
         }
 
         if (!invoice.invoiceType) {

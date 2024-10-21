@@ -203,7 +203,7 @@ class LocationApiController extends BaseDomainApiController {
         }
 
         if (!location.locationNumber) {
-            location.locationNumber = locationIdentifierService.generate()
+            location.locationNumber = locationIdentifierService.generate(location)
         }
 
         if (!location.inventory) {

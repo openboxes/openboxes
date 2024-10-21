@@ -8,23 +8,23 @@ import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.IdentifierGeneratorTypeCode
 import org.pih.warehouse.core.IdentifierService
 import org.pih.warehouse.core.identification.BlankIdentifierResolver
-import org.pih.warehouse.core.identification.IdentifierGeneratorParams
+import org.pih.warehouse.core.identification.IdentifierGeneratorContext
 
 // TODO: We should be able to move most of this logic into the identifier service. That way we can support sequential
 //       id generation more generally. We'd need an abstract method there for fetching the next sequence number to use,
 //       and a new ${sequence} config option to know where to put the sequence.
-class ProductIdentifierService extends IdentifierService implements BlankIdentifierResolver<Product> {
+class ProductIdentifierService extends IdentifierService<Product> implements BlankIdentifierResolver<Product> {
 
     ProductTypeService productTypeService
 
     @Override
-    String getEntityKey() {
+    String getIdentifierName() {
         return "product"
     }
 
     @Override
-    protected Integer countDuplicates(String productCode) {
-        return Product.countByProductCode(productCode)
+    protected Integer countByIdentifier(String id) {
+        return Product.countByProductCode(id)
     }
 
     @Override
@@ -33,13 +33,8 @@ class ProductIdentifierService extends IdentifierService implements BlankIdentif
     }
 
     @Override
-    void setIdentifierOnEntity(String productCode, Product product) {
-        product.productCode = productCode
-    }
-
-    @Override
-    String generateForEntity(Product product) {
-        return product.productType ? generateForProductType(product.productType) : generate()
+    void setIdentifierOnEntity(String id, Product entity) {
+        entity.productCode = id
     }
 
     /**
@@ -69,7 +64,13 @@ class ProductIdentifierService extends IdentifierService implements BlankIdentif
      *          - filled productIdentifierFormat
      *          - empty productIdentifierFormat (will be generated basing on the openboxes.identifier.product.format)
      */
-    String generateForProductType(ProductType productType) {
+    @Override
+    String generate(Product product, IdentifierGeneratorContext params=null) {
+        ProductType productType = product.productType
+        if (!productType) {
+            return super.generate(product, params)
+        }
+
         IdentifierGeneratorTypeCode generatorTypeCode = configService.getProperty('openboxes.identifier.productCode.generatorType', IdentifierGeneratorTypeCode)
         String defaultProductType = configService.getProperty('openboxes.identifier.defaultProductType.id')
 
@@ -77,11 +78,11 @@ class ProductIdentifierService extends IdentifierService implements BlankIdentif
             // If product type is systems default then generate basing on the generator type
             switch (generatorTypeCode) {
                 case IdentifierGeneratorTypeCode.SEQUENCE:
-                    return generateSequentialProductIdentifier(productType)
+                    return generateSequentialProductIdentifier(product, productType)
                 case IdentifierGeneratorTypeCode.RANDOM:
-                    return generateRandomProductIdentifier(productType)
+                    return generateRandomProductIdentifier(product, productType)
                 default:
-                    return generateRandomProductIdentifier(productType)
+                    return generateRandomProductIdentifier(product, productType)
             }
         }
 
@@ -92,31 +93,31 @@ class ProductIdentifierService extends IdentifierService implements BlankIdentif
         Boolean shouldGenerateSequential = generatorTypeCode == IdentifierGeneratorTypeCode.SEQUENCE
 
         if (productType?.hasSequentialFormat() || (productType?.code && shouldGenerateSequential)) {
-            return generateSequentialProductIdentifier(productType)
+            return generateSequentialProductIdentifier(product, productType)
         }
 
-        return generateRandomProductIdentifier(productType)
+        return generateRandomProductIdentifier(product, productType)
     }
 
-    private def generateSequentialProductIdentifier(ProductType productType) {
+    private String generateSequentialProductIdentifier(Product product, ProductType productType) {
         // If the product type does not have a custom identifier or does not contain character "0" which indicates the sequential part,
         // then generate sequential product code from product type code
         if (!productType.productIdentifierFormat || !productType.productIdentifierFormat.contains("0")) {
-            return generateSequentialProductIdentifierFromCode(productType)
+            return generateSequentialProductIdentifierFromCode(product, productType)
         }
 
-        def sequenceFormat = extractSequenceFormat(productType.productIdentifierFormat, Constants.DEFAULT_SEQUENCE_NUMBER_FORMAT_CHAR, 1)
+        String sequenceFormat = extractSequenceFormat(productType.productIdentifierFormat, Constants.DEFAULT_SEQUENCE_NUMBER_FORMAT_CHAR, 1)
         def sequenceNumber = productTypeService.getAndSetNextSequenceNumber(productType)
 
-        return generateSequentialIdentifier(productType.productIdentifierFormat, sequenceFormat, sequenceNumber.toString())
+        return generateSequentialIdentifier(product, productType.productIdentifierFormat, sequenceFormat, sequenceNumber.toString())
     }
 
-    private String generateSequentialProductIdentifierFromCode(ProductType productType) {
+    private String generateSequentialProductIdentifierFromCode(Product product, ProductType productType) {
         if (!productType) {
             throw new IllegalArgumentException("Missing product type")
         }
 
-        def defaultProductTypeId = configService.getProperty('openboxes.identifier.defaultProductType.id')
+        String defaultProductTypeId = configService.getProperty('openboxes.identifier.defaultProductType.id')
         if (!productType.code && productType.id != defaultProductTypeId) {
             throw new IllegalArgumentException("Can only generate sequential product code without specified product type code " +
                     "for default product type with id: ${defaultProductTypeId}")
@@ -125,8 +126,8 @@ class ProductIdentifierService extends IdentifierService implements BlankIdentif
         Integer sequenceNumber = productTypeService.getAndSetNextSequenceNumber(productType)
         String sequenceNumberStr = generateSequenceNumber(sequenceNumber.toString())
 
-        return generate(IdentifierGeneratorParams.builder()
-                        .customKeys([
+        return generate(product, IdentifierGeneratorContext.builder()
+                        .customProperties([
                                 "sequenceNumber": sequenceNumberStr,
                                 "code": productType.code,
                         ])
@@ -137,24 +138,24 @@ class ProductIdentifierService extends IdentifierService implements BlankIdentif
      * Generate random product identifier for specific productIdentifierFormat if it is set on the given product type,
      * or for configured config.openboxes.identifier.product.format
      */
-    private String generateRandomProductIdentifier(ProductType productType) {
+    private String generateRandomProductIdentifier(Product product, ProductType productType) {
         // If the product type is null or the product type does not have a custom identifier,
         // then generate product code from DEFAULT_PRODUCT_NUMBER_FORMAT
         if (!productType || !productType.productIdentifierFormat) {
-            return generate()
+            return generate(product)
         }
 
         // if the product type does not contain sequential part, then generate identifier basing on custom format
-        return generate(IdentifierGeneratorParams.builder()
+        return generate(product, IdentifierGeneratorContext.builder()
                 .formatOverride(productType.productIdentifierFormat)
                 .build())
     }
 
-    private def extractSequenceFormat(String productIdentifierFormat, String sequentialPatternChar, Integer allowedSequences) {
+    private String extractSequenceFormat(String productIdentifierFormat, String sequentialPatternChar, Integer allowedSequences) {
         Pattern pattern = Pattern.compile("${sequentialPatternChar}+")
         Matcher matcher = pattern.matcher(productIdentifierFormat)
         int count = 0
-        def sequenceFormat = ""
+        String sequenceFormat = ""
 
         while (matcher.find()) {
             sequenceFormat = matcher.group()
@@ -169,7 +170,7 @@ class ProductIdentifierService extends IdentifierService implements BlankIdentif
         return sequenceFormat
     }
 
-    private def generateSequentialIdentifier(String identifierFormat, String sequenceFormat, String sequenceNumber) {
+    private String generateSequentialIdentifier(Product product, String identifierFormat, String sequenceFormat, String sequenceNumber) {
         List identifierFormatComponents
         List identifierComponents
 
@@ -181,7 +182,7 @@ class ProductIdentifierService extends IdentifierService implements BlankIdentif
                 return generateSequenceNumber(sequenceNumber.toString(), identifierFormatComponent)
             }
             else {
-                return generate(IdentifierGeneratorParams.builder()
+                return generate(product, IdentifierGeneratorContext.builder()
                         .formatOverride(identifierFormatComponent)
                         .build())
             }

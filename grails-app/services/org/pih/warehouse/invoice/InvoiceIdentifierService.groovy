@@ -2,15 +2,15 @@ package org.pih.warehouse.invoice
 
 import org.pih.warehouse.core.IdentifierService
 
-class InvoiceIdentifierService extends IdentifierService {
+class InvoiceIdentifierService extends IdentifierService<Invoice> {
 
     @Override
-    String getEntityKey() {
+    String getIdentifierName() {
         return "invoice"
     }
 
     @Override
-    protected Integer countDuplicates(String invoiceNumber) {
-        return Invoice.countByInvoiceNumber(invoiceNumber)
+    protected Integer countByIdentifier(String id) {
+        return Invoice.countByInvoiceNumber(id)
     }
 }

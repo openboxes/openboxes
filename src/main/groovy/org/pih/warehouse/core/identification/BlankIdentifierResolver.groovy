@@ -16,10 +16,10 @@ import org.grails.datastore.gorm.GormEntity
 trait BlankIdentifierResolver<T extends GormEntity> {
 
     /**
-     * @return the domain-specific key that is used in identifier properties.
+     * @return the domain-specific name/keyword that is used in identifier properties.
      * Ex: The "product" of "openboxes.identifier.product.format"
      */
-    abstract String getEntityKey()
+    abstract String getIdentifierName()
 
     /**
      * @return A list of all entities that do not have an identifier assigned.
@@ -32,39 +32,31 @@ trait BlankIdentifierResolver<T extends GormEntity> {
     abstract void setIdentifierOnEntity(String id, T entity)
 
     /**
-     * Generates a new identifier for the entity using the given params.
+     * Generates a new identifier for the entity.
      *
      * This implementation will almost certainly come from the IdentifierService.
      */
-    abstract String generate(IdentifierGeneratorParams params=null)
-
-    /**
-     * Generates an identifier for the given entity.
-     * Can be overridden by child classes if they require additional logic when setting unassigned identifiers.
-     */
-    String generateForEntity(T entity) {
-        return generate(IdentifierGeneratorParams.builder()
-                .templateEntity(entity)
-                .build())
-    }
+    abstract String generate(T entity)
 
     /**
      * Fetches all entries from the database that have a null identifier, and tries to generate one for them.
      */
     void generateForAllUnassignedIdentifiers() {
         List<T> entities = getAllUnassignedEntities()
-        String entityType = getEntityKey()
+        String entityType = getIdentifierName()
         for (T entity : entities) {
             try {
-                String identifier = generateForEntity(entity)
+                String identifier = generate(entity)
                 if (identifier == null) {
-                    log.error("Failed to generate a unique identifier for entity ${entityType}. Terminating job early to save CPU in case we're running out of ids.")
+                    log.error("Failed to generate a unique identifier for ${entityType}. Terminating job early to save CPU in case we're running out of ids.")
                     return
                 }
 
                 log.info("Assigning identifier ${identifier} to ${entityType} with id: ${entity.id}")
                 setIdentifierOnEntity(identifier, entity)
 
+                // TODO: investigate why this merge with flush and no validation is required. Can we simplify this to
+                //       a regular save operation?
                 if (!entity.merge(flush: true, validate: false)) {
                     log.error("Unable to assign identifier to ${entityType} with id: ${entity.id}. Error: ${entity.errors}")
                 }

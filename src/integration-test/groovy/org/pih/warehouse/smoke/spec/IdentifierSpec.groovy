@@ -1,11 +1,12 @@
 package org.pih.warehouse.smoke.spec
 
 import org.apache.commons.lang.StringUtils
+import spock.lang.Ignore
 
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationIdentifierService
 import org.pih.warehouse.core.OrganizationIdentifierService
-import org.pih.warehouse.core.identification.IdentifierGeneratorParams
+import org.pih.warehouse.core.identification.IdentifierGeneratorContext
 import org.pih.warehouse.data.ProductSupplierIdentifierService
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionIdentifierService
@@ -13,6 +14,7 @@ import org.pih.warehouse.invoice.Invoice
 import org.pih.warehouse.invoice.InvoiceIdentifierService
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderIdentifierService
+import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductIdentifierService
 import org.pih.warehouse.product.ProductSupplier
 import org.pih.warehouse.product.ProductType
@@ -55,9 +57,7 @@ class IdentifierSpec extends SmokeSpec {
         )
 
         when:
-        String identifier = shipmentIdentifierService.generate(IdentifierGeneratorParams.builder()
-                .templateEntity(entity)
-                .build())
+        String identifier = shipmentIdentifierService.generate(entity)
 
         then:
         assert StringUtils.isNotBlank(identifier)
@@ -72,9 +72,7 @@ class IdentifierSpec extends SmokeSpec {
         )
 
         when:
-        String identifier = invoiceIdentifierService.generate(IdentifierGeneratorParams.builder()
-                .templateEntity(entity)
-                .build())
+        String identifier = invoiceIdentifierService.generate(entity)
 
         then:
         assert StringUtils.isNotBlank(identifier)
@@ -89,9 +87,7 @@ class IdentifierSpec extends SmokeSpec {
         )
 
         when:
-        String identifier = locationIdentifierService.generate(IdentifierGeneratorParams.builder()
-                .templateEntity(entity)
-                .build())
+        String identifier = locationIdentifierService.generate(entity)
 
         then:
         assert StringUtils.isNotBlank(identifier)
@@ -104,9 +100,7 @@ class IdentifierSpec extends SmokeSpec {
         )
 
         when:
-        String identifier = receiptIdentifierService.generate(IdentifierGeneratorParams.builder()
-                .templateEntity(entity)
-                .build())
+        String identifier = receiptIdentifierService.generate(entity)
 
         then:
         assert StringUtils.isNotBlank(identifier)
@@ -134,9 +128,8 @@ class IdentifierSpec extends SmokeSpec {
         ]
 
         when:
-        String identifier = productSupplierIdentifierService.generate(IdentifierGeneratorParams.builder()
-                .templateEntity(entity)
-                .customKeys(customKeys)
+        String identifier = productSupplierIdentifierService.generate(entity, IdentifierGeneratorContext.builder()
+                .customProperties(customKeys)
                 .build())
 
         then:
@@ -152,9 +145,7 @@ class IdentifierSpec extends SmokeSpec {
         )
 
         when:
-        String identifier = orderIdentifierService.generate(IdentifierGeneratorParams.builder()
-                .templateEntity(entity)
-                .build())
+        String identifier = orderIdentifierService.generate(entity)
 
         then:
         assert StringUtils.isNotBlank(identifier)
@@ -169,9 +160,7 @@ class IdentifierSpec extends SmokeSpec {
         )
 
         when:
-        String identifier = requisitionIdentifierService.generate(IdentifierGeneratorParams.builder()
-                .templateEntity(entity)
-                .build())
+        String identifier = requisitionIdentifierService.generate(entity)
 
         then:
         assert StringUtils.isNotBlank(identifier)
@@ -184,27 +173,31 @@ class IdentifierSpec extends SmokeSpec {
         )
 
         when:
-        String identifier = transactionIdentifierService.generate(IdentifierGeneratorParams.builder()
-                .templateEntity(entity)
-                .build())
+        String identifier = transactionIdentifierService.generate(entity)
 
         then:
         assert StringUtils.isNotBlank(identifier)
     }
 
+    @Ignore("We can't smoke test product identifier since the generate method actually updates the sequence, and we don't want to manipulate any real data. If that is ever changed to only update the sequence on save, this can be re-enabled.")
     void 'productIdentifierService can generate identifiers with the current configuration'() {
         given:
-        ProductType productType = new ProductType(
+        Product product = new Product(
                 id: '1',
                 name: 'name',
-                productTypeCode: ProductTypeCode.GOOD,
-                code: 'code',
-                productIdentifierFormat: 'MNNNNN',
-                sequenceNumber: 0,
+                description: 'description',
+                productType: new ProductType(
+                        id: '1',
+                        name: 'name',
+                        productTypeCode: ProductTypeCode.GOOD,
+                        code: 'code',
+                        productIdentifierFormat: 'MNNNNN',
+                        sequenceNumber: 0,
+                )
         )
 
         when:
-        String identifier = productIdentifierService.generateForProductType(productType)
+        String identifier = productIdentifierService.generate(product)
 
         then:
         assert StringUtils.isNotBlank(identifier)

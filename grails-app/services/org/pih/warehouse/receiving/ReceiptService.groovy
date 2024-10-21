@@ -234,7 +234,7 @@ class ReceiptService {
         // Create new receipt
         if (!receipt) {
             receipt = new Receipt()
-            receipt.receiptNumber = receiptIdentifierService.generate()
+            receipt.receiptNumber = receiptIdentifierService.generate(receipt)
             shipment.addToReceipts(receipt)
         }
 
@@ -338,7 +338,7 @@ class ReceiptService {
         creditTransaction.destination = null
         creditTransaction.inventory = shipment?.destination?.inventory
         creditTransaction.transactionDate = receipt?.actualDeliveryDate
-        creditTransaction.transactionNumber = transactionIdentifierService.generate()
+        creditTransaction.transactionNumber = transactionIdentifierService.generate(creditTransaction)
 
         receipt?.receiptItems?.each {
             def inventoryItem =

@@ -32,7 +32,7 @@ class RequisitionServiceSpec extends Specification implements ServiceUnitTest<Re
 
     void setup() {
         inventoryService = Stub(InventoryService) {
-            generateTransactionNumber() >> UUID.randomUUID().toString()
+            generateTransactionNumber(_ as Transaction) >> UUID.randomUUID().toString()
         }
         service.inventoryService = inventoryService
 

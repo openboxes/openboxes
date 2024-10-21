@@ -1,14 +1,14 @@
 package org.pih.warehouse.core
 
-class LocationIdentifierService extends IdentifierService {
+class LocationIdentifierService extends IdentifierService<Location> {
 
     @Override
-    String getEntityKey() {
+    String getIdentifierName() {
         return "location"
     }
 
     @Override
-    protected Integer countDuplicates(String locationNumber) {
-        return Location.countByLocationNumber(locationNumber)
+    protected Integer countByIdentifier(String id) {
+        return Location.countByLocationNumber(id)
     }
 }

@@ -3,8 +3,9 @@ package org.pih.warehouse.core
 import grails.gorm.transactions.Transactional
 import org.apache.commons.lang.StringUtils
 import org.apache.commons.lang.text.StrSubstitutor
+import org.grails.datastore.gorm.GormEntity
 
-import org.pih.warehouse.core.identification.IdentifierGeneratorParams
+import org.pih.warehouse.core.identification.IdentifierGeneratorContext
 import org.pih.warehouse.core.identification.RandomCondition
 import org.pih.warehouse.core.identification.RandomIdentifierGenerator
 import org.pih.warehouse.data.DataService
@@ -13,7 +14,7 @@ import org.pih.warehouse.data.DataService
  * Handles generating custom identifiers that conform to a certain format.
  */
 @Transactional
-abstract class IdentifierService {
+abstract class IdentifierService<T extends GormEntity> {
 
     RandomIdentifierGenerator randomIdentifierGenerator
     DataService dataService
@@ -23,16 +24,16 @@ abstract class IdentifierService {
      * Returns the number of entities (likely via database query) that are already using the given id.
      * Subclasses are left to decide the details of what uniqueness actually means here.
      */
-    abstract protected Integer countDuplicates(String id)
+    abstract protected Integer countByIdentifier(String id)
 
     /**
-     * @return the domain-specific key that is used in identifier properties.
+     * @return the domain-specific name/keyword that is used in identifier properties.
      * Ex: The "product" of "openboxes.identifier.product.format"
      */
-    abstract protected String getEntityKey()
+    abstract protected String getIdentifierName()
 
     /**
-     * Generates a new identifier for the entity using the given params.
+     * Generates a new identifier for the entity using the given configuration.
      *
      * The format is defined under "openboxes.identifier.x.format"
      *
@@ -40,11 +41,11 @@ abstract class IdentifierService {
      * - ${delimiter} filled in with the value defined in "openboxes.identifier.x.delimiter"
      * - ${sequenceNumber} filled in with a sequential value as defined in "openboxes.identifier.x.sequenceNumber"
      * - ${random} filled in with a random string as defined in "openboxes.identifier.x.random.template"
-     * - any other keywords are populated from the template map and entities in IdentifierGeneratorParams
+     * - any other keywords are populated from the template map and entities in IdentifierGeneratorContext
      */
-    String generate(IdentifierGeneratorParams params=null) {
+    String generate(T entity, IdentifierGeneratorContext context=null) {
         // Fetch and fill the constant/non-random values of the format/template.
-        String format = getPopulatedFormat(params)
+        String format = getPopulatedFormat(entity, context)
 
         // If there isn't any randomness in the format, we're done, so use the identifier as is.
         boolean hasRandom = format.contains(Constants.IDENTIFIER_FORMAT_KEYWORD_RANDOM_EMBEDDED)
@@ -103,33 +104,33 @@ abstract class IdentifierService {
      *
      * Ex: Given a format/template like "PO${delimiter}${custom.code}", you might get: "PO-123"
      */
-    private String getPopulatedFormat(IdentifierGeneratorParams params) {
-        String format = getInitialFormat(params)
+    private String getPopulatedFormat(T entity, IdentifierGeneratorContext context) {
+        String format = getInitialFormat(context)
 
         // Gradually build a map of values that will populate the format template
         Map values = new HashMap()
-        values.putAll(getEntityValues(params))
-        values.putAll(getCustomValues(params))
+        values.putAll(getEntityValues(entity))
+        values.putAll(getCustomValues(context))
         values.putAll(getDelimiterValues())
 
         format = StrSubstitutor.replace(format, values)
         return sanitizeFormat(format)
     }
 
-    private String getInitialFormat(IdentifierGeneratorParams params) {
+    private String getInitialFormat(IdentifierGeneratorContext context) {
         // If a custom format override was provided, use that, otherwise fetch the format from properties.
-        String format = StringUtils.isNotBlank(params?.formatOverride) ? params.formatOverride :
+        String format = StringUtils.isNotBlank(context?.formatOverride) ? context.formatOverride :
                 getIdentifierPropertyWithDefault('format')
 
         // Also check for any custom prefix/suffix as a part of the "initial" format because they are overrides that
         // directly modify the format (instead of filling it in).
         if (getIdentifierPropertyWithDefault("prefix.enabled", Boolean)) {
             String delimiter = getIdentifierPropertyWithDefault(Constants.IDENTIFIER_FORMAT_KEYWORD_DELIMITER)
-            if (StringUtils.isNotBlank(params?.prefix)) {
-                format = "${params.prefix}${delimiter}${format}"
+            if (StringUtils.isNotBlank(context?.prefix)) {
+                format = "${context.prefix}${delimiter}${format}"
             }
-            if (StringUtils.isNotBlank(params?.suffix)) {
-                format = "${format}${delimiter}${params.suffix}"
+            if (StringUtils.isNotBlank(context?.suffix)) {
+                format = "${format}${delimiter}${context.suffix}"
             }
         }
 
@@ -140,23 +141,24 @@ abstract class IdentifierService {
      * Takes the entity that we're generating the identifier for and builds a map of its fields to include in
      * the template as defined in the "openboxes.identifier.<entity>.properties" property.
      */
-    private Map getEntityValues(IdentifierGeneratorParams params) {
-        if (!params?.templateEntity) {
+    private Map getEntityValues(T entity) {
+        if (!entity) {
             return Collections.emptyMap()
         }
-        Map properties = configService.getProperty("openboxes.identifier.${entityKey}.properties", Map)
-        return properties ? dataService.transformObject(params.templateEntity, properties) : Collections.emptyMap()
+
+        Map properties = configService.getProperty("openboxes.identifier.${identifierName}.properties", Map)
+        return properties ? dataService.transformObject(entity, properties) : Collections.emptyMap()
     }
 
-    private Map getCustomValues(IdentifierGeneratorParams params) {
-        if (!params?.customKeys) {
+    private Map getCustomValues(IdentifierGeneratorContext context) {
+        if (!context?.customProperties) {
             return Collections.emptyMap()
         }
 
         Map values = new HashMap()
-        for (Map.Entry entry in params.customKeys) {
-            // Add the "custom." prefix to each custom key. We do this to keep them visually distinct from non-custom
-            // keys (which don't use a prefix). This hopefully helps prevent misconfiguration.
+        for (Map.Entry entry in context.customProperties) {
+            // Add the "custom." prefix to each custom property. We do this to keep them visually distinct from
+            // non-custom properties (which don't use a prefix). This hopefully helps prevent misconfiguration.
             values["custom.${entry.key}"] = entry.value
         }
         return values
@@ -167,9 +169,9 @@ abstract class IdentifierService {
         return delimiter ? [(Constants.IDENTIFIER_FORMAT_KEYWORD_DELIMITER): delimiter] : Collections.emptyMap()
     }
 
-    private <T> T getIdentifierPropertyWithDefault(String propertyName, Class<T> type=String) {
+    private <Clazz> Clazz getIdentifierPropertyWithDefault(String propertyName, Class<Clazz> type=String) {
         // If there's a custom property defined for the entity, use that. Ex: 'openboxes.identifier.product.format'
-        T property = configService.getProperty("openboxes.identifier.${entityKey}.${propertyName}", type)
+        Clazz property = configService.getProperty("openboxes.identifier.${identifierName}.${propertyName}", type)
 
         // Otherwise use the default/fallback option. Ex: 'openboxes.identifier.default.format'
         return property ?: configService.getProperty("openboxes.identifier.default.${propertyName}", type)
@@ -205,7 +207,7 @@ abstract class IdentifierService {
     }
 
     private boolean idAlreadyExists(String id) {
-        Integer count = countDuplicates(id)
+        Integer count = countByIdentifier(id)
         return count ? (count > 0) : false
     }
 }

@@ -2209,7 +2209,6 @@ class StockMovementService {
     Shipment createInboundShipment(ShipOrderCommand command) {
         Order order = command.order
         Shipment shipment = new Shipment()
-        shipment.shipmentNumber = shipmentIdentifierService.generate()
         shipment.expectedShippingDate = new Date()
         shipment.name = order.name ?: order.orderNumber
         shipment.description = order.orderNumber
@@ -2217,6 +2216,7 @@ class StockMovementService {
         shipment.destination = order.destination
         shipment.createdBy = order.orderedBy
         shipment.shipmentType = ShipmentType.get(Constants.DEFAULT_SHIPMENT_TYPE_ID)
+        shipment.shipmentNumber = shipmentIdentifierService.generate(shipment)
 
         command.shipOrderItems.each { ShipOrderItemCommand orderItemCommand ->
             if (orderItemCommand.quantityToShip > 0) {
@@ -2250,13 +2250,13 @@ class StockMovementService {
     Shipment createInboundShipment(StockMovement stockMovement) {
 
         Shipment shipment = new Shipment()
-        shipment.shipmentNumber = shipmentIdentifierService.generate()
         shipment.expectedShippingDate = new Date()
         shipment.name = stockMovement.generateName()
         shipment.description = stockMovement.description
         shipment.origin = stockMovement.origin
         shipment.destination = stockMovement.destination
         shipment.shipmentType = ShipmentType.get(Constants.DEFAULT_SHIPMENT_TYPE_ID)
+        shipment.shipmentNumber = shipmentIdentifierService.generate(shipment)
 
         // Save shipment before adding the items to avoid referencing an unsaved transient instance
         shipment.save()

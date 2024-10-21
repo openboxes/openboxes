@@ -198,7 +198,7 @@ class ProductMergeService {
             Transaction transaction = new Transaction()
             transaction.inventory = inventory
             transaction.transactionType = TransactionType.get(Constants.PRODUCT_INVENTORY_TRANSACTION_TYPE_ID)
-            transaction.transactionNumber = inventoryService.generateTransactionNumber()
+            transaction.transactionNumber = inventoryService.generateTransactionNumber(transaction)
             transaction.transactionDate = new Date()
             transaction.comment = "Created while merging product ${obsolete.productCode} into ${primary.productCode} " +
                 "(this happens if both products have transaction entries in the same inventory)"

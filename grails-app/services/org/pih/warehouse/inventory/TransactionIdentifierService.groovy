@@ -3,16 +3,16 @@ package org.pih.warehouse.inventory
 import org.pih.warehouse.core.IdentifierService
 import org.pih.warehouse.core.identification.BlankIdentifierResolver
 
-class TransactionIdentifierService extends IdentifierService implements BlankIdentifierResolver<Transaction> {
+class TransactionIdentifierService extends IdentifierService<Transaction> implements BlankIdentifierResolver<Transaction> {
 
     @Override
-    String getEntityKey() {
+    String getIdentifierName() {
         return "transaction"
     }
 
     @Override
-    protected Integer countDuplicates(String transactionNumber) {
-        return Transaction.countByTransactionNumber(transactionNumber)
+    protected Integer countByIdentifier(String id) {
+        return Transaction.countByTransactionNumber(id)
     }
 
     @Override
@@ -21,7 +21,12 @@ class TransactionIdentifierService extends IdentifierService implements BlankIde
     }
 
     @Override
-    void setIdentifierOnEntity(String transactionNumber, Transaction transaction) {
-        transaction.transactionNumber = transactionNumber
+    void setIdentifierOnEntity(String id, Transaction entity) {
+        entity.transactionNumber = id
+    }
+
+    @Override
+    String generate(Transaction entity) {
+        return generate(entity, null)
     }
 }

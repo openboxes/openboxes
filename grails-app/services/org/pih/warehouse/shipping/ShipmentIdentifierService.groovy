@@ -7,19 +7,23 @@ import org.pih.warehouse.core.identification.BlankIdentifierResolver
 class ShipmentIdentifierService extends IdentifierService implements BlankIdentifierResolver<Shipment> {
 
     @Override
-    String getEntityKey() {
+    String getIdentifierName() {
         return "shipment"
     }
 
     @Override
-    protected Integer countDuplicates(String shipmentNumber) {
+    protected Integer countByIdentifier(String id) {
+        Integer count = Shipment.countByShipmentNumber(id)
+
+        // TODO: Refactor how ids are generated for locations so that we don't need to do this check. Uniqueness
+        //       of ids on one service shouldn't depend on another. The easiest solution is to override the format
+        //       for generating location ids to be "${custom.shipmentNumber}${random}" so that it's like the
+        //       shipment number but still unique.
+
         // We use shipment.shipmentNumber as location.locationNumber when creating internal locations from shipments
         // (see LocationService.findOrCreateInternalLocation for details) so we need to check that the id is unique
-        // for locations as well.
-        Integer count = Shipment.countByShipmentNumber(shipmentNumber)
-
-        // Only bother checking location if shipment doesn't already have a duplicate.
-        return count > 0 ? count : Location.countByLocationNumber(shipmentNumber)
+        // for locations as well. Only bother checking location if shipment doesn't already have a duplicate though.
+        return count > 0 ? count : Location.countByLocationNumber(id)
     }
 
     @Override
@@ -30,5 +34,10 @@ class ShipmentIdentifierService extends IdentifierService implements BlankIdenti
     @Override
     void setIdentifierOnEntity(String id, Shipment entity) {
         entity.shipmentNumber = id
+    }
+
+    @Override
+    String generate(Shipment entity) {
+        return generate(entity, null)
     }
 }
