@@ -21,8 +21,7 @@ class ReceiptServiceSpec extends Specification implements ServiceUnitTest<Receip
     ShipmentService shipmentService
 
     void setupSpec() {
-        mockDomain Receipt
-        mockDomain Shipment
+        mockDomains(Receipt, Shipment)
     }
 
     void setup() {
@@ -35,7 +34,7 @@ class ReceiptServiceSpec extends Specification implements ServiceUnitTest<Receip
     void 'savePartialReceiptEvent should create RECEIVED event when partial receiving is not supported'() {
         given:
         Location location = Stub(Location) {
-            supports(_ as ActivityCode) >> false
+            supports(ActivityCode.PARTIAL_RECEIVING) >> false
         }
 
         Shipment shipment = new Shipment()
@@ -57,14 +56,14 @@ class ReceiptServiceSpec extends Specification implements ServiceUnitTest<Receip
     void 'savePartialReceiptEvent should create RECEIVED event when receiving fully'() {
         given:
         Location location = Stub(Location) {
-            supports(_ as ActivityCode) >> true
+            supports(ActivityCode.PARTIAL_RECEIVING) >> true
         }
 
         Shipment shipment = Stub(Shipment) {
             wasReceived() >> false
             isFullyReceived() >> true
+            getDestination() >> location
         }
-        shipment.destination = location
 
         PartialReceipt partialReceipt = Spy(PartialReceipt)
         partialReceipt.shipment = shipment
@@ -81,15 +80,15 @@ class ReceiptServiceSpec extends Specification implements ServiceUnitTest<Receip
     void 'savePartialReceiptEvent should create PARTIALLY_RECEIVED event when receiving partially'() {
         given:
         Location location = Stub(Location) {
-            supports(_ as ActivityCode) >> true
+            supports(ActivityCode.PARTIAL_RECEIVING) >> true
         }
 
         Shipment shipment = Stub(Shipment) {
             wasReceived() >> true
             isFullyReceived() >> false
             wasPartiallyReceived() >> false
+            getDestination() >> location
         }
-        shipment.destination = location
 
         PartialReceipt partialReceipt = Spy(PartialReceipt)
         partialReceipt.shipment = shipment
@@ -101,5 +100,55 @@ class ReceiptServiceSpec extends Specification implements ServiceUnitTest<Receip
         then:
         0 * shipmentService.createShipmentEvent(_, _, EventCode.RECEIVED, _)
         1 * shipmentService.createShipmentEvent(_, _, EventCode.PARTIALLY_RECEIVED, _)
+    }
+
+    void 'savePartialReceiptEvent should create RECEIVED event when fully receiving shipment that was partially received'() {
+        given:
+        Location location = Stub(Location) {
+            supports(ActivityCode.PARTIAL_RECEIVING) >> true
+        }
+
+        Shipment shipment = Stub(Shipment) {
+            wasReceived() >> false
+            isFullyReceived() >> true
+            wasPartiallyReceived() >> true
+            getDestination() >> location
+        }
+
+        PartialReceipt partialReceipt = Spy(PartialReceipt)
+        partialReceipt.shipment = shipment
+        partialReceipt.receipt = new Receipt(actualDeliveryDate: new Date())
+
+        when:
+        service.savePartialReceiptEvent(partialReceipt)
+
+        then:
+        1 * shipmentService.createShipmentEvent(_, _, EventCode.RECEIVED, _)
+        0 * shipmentService.createShipmentEvent(_, _, EventCode.PARTIALLY_RECEIVED, _)
+    }
+
+    void 'savePartialReceiptEvent should create no events when was partially received and still is'() {
+        given:
+        Location location = Stub(Location) {
+            supports(ActivityCode.PARTIAL_RECEIVING) >> true
+        }
+
+        Shipment shipment = Stub(Shipment) {
+            wasReceived() >> false
+            isFullyReceived() >> false
+            wasPartiallyReceived() >> true
+            getDestination() >> location
+        }
+
+        PartialReceipt partialReceipt = Spy(PartialReceipt)
+        partialReceipt.shipment = shipment
+        partialReceipt.receipt = new Receipt(actualDeliveryDate: new Date())
+
+        when:
+        service.savePartialReceiptEvent(partialReceipt)
+
+        then:
+        0 * shipmentService.createShipmentEvent(_, _, EventCode.RECEIVED, _)
+        0 * shipmentService.createShipmentEvent(_, _, EventCode.PARTIALLY_RECEIVED, _)
     }
 }
