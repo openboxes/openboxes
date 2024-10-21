@@ -226,7 +226,9 @@ class ProductSupplierService {
         productSupplier.manufacturer = manufacturerName ? Organization.findByName(manufacturerName) : null
         productSupplier.supplierCode = supplierCode ? supplierCode : null
         productSupplier.manufacturerCode = manufacturerCode ? manufacturerCode : null
-        productSupplier.save()
+        if (!productSupplier.code && !productSupplier.id) {
+            assignSourceCode(productSupplier, supplier)
+        }
 
         if (unitOfMeasure && quantity) {
             ProductPackage defaultProductPackage =
@@ -239,15 +241,17 @@ class ProductSupplierService {
                 defaultProductPackage.product = productSupplier.product
                 defaultProductPackage.uom = unitOfMeasure
                 defaultProductPackage.quantity = quantity
-                productSupplier.addToProductPackages(defaultProductPackage)
-                productSupplier.defaultProductPackage = defaultProductPackage
+                productSupplier.save()
                 defaultProductPackage.productSupplier = productSupplier
+                defaultProductPackage.save(flush: true)
+                productSupplier.defaultProductPackage = defaultProductPackage
+                productSupplier.addToProductPackages(defaultProductPackage)
+
                 if (price != null) {
                     ProductPrice productPrice = new ProductPrice()
                     productPrice.price = price
                     defaultProductPackage.productPrice = productPrice
                 }
-                productSupplier.addToProductPackages(defaultProductPackage)
             } else if (price != null && !defaultProductPackage.productPrice) {
                 ProductPrice productPrice = new ProductPrice()
                 productPrice.price = price
@@ -283,9 +287,6 @@ class ProductSupplierService {
                 params.globalPreferenceTypeValidityStartDate,
                 params.globalPreferenceTypeValidityEndDate)
 
-        if (!productSupplier.code && !productSupplier.id) {
-            assignSourceCode(productSupplier, supplier)
-        }
         return productSupplier
     }
 
