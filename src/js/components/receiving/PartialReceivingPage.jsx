@@ -789,6 +789,7 @@ class PartialReceivingPage extends Component {
     */
     const editedLinesWithQuantities = editedLines.map((item) => ({
       ...item,
+      quantityReceiving: null,
       quantityRemaining: item.quantityShipped,
       unitOfMeasure: shipmentItemsGrouped.originalItem?.unitOfMeasure,
     }));
