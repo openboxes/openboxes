@@ -70,8 +70,12 @@ class PartialReceiptItem {
         return product ?: inventoryItem?.product
     }
 
+    BigDecimal getPacksRequested() {
+        return quantityShipped / shipmentItem?.quantityPerUom
+    }
+
     String getDisplayUnitOfMeasure() {
-        return "${quantityShipped} ${shipmentItem?.unitOfMeasure}"
+        return "${packsRequested} ${shipmentItem?.unitOfMeasure}"
     }
 
     Map toJson() {
