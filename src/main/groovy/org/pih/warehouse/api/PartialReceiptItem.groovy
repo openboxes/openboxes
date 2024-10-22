@@ -75,7 +75,7 @@ class PartialReceiptItem {
     }
 
     String getDisplayUnitOfMeasure() {
-        return "${packsRequested} ${shipmentItem?.unitOfMeasure}"
+        return "${packsRequested?.toPlainString()} ${shipmentItem?.unitOfMeasure}"
     }
 
     Map toJson() {
