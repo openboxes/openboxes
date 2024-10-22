@@ -312,6 +312,15 @@ class ProductSupplierController {
                         property("price", "contractPrice.price")
                         property("toDate", "contractPrice.toDate")
                     }
+                    defaultProductPackage(JoinType.LEFT_OUTER_JOIN.joinTypeValue) {
+                        uom(JoinType.LEFT_OUTER_JOIN.joinTypeValue) {
+                            property("code", "defaultProductPackage.uom.code")
+                        }
+                        property("quantity", "defaultProductPackage.quantity")
+                        productPrice(JoinType.LEFT_OUTER_JOIN.joinTypeValue) {
+                            property("price", "defaultProductPackage.productPrice.price")
+                        }
+                    }
                     property("ratingTypeCode", "ratingTypeCode")
                     property("dateCreated", "dateCreated")
                     property("lastUpdated", "lastUpdated")
@@ -354,9 +363,15 @@ class ProductSupplierController {
         // Now, let's take the data we've gathered and build the model to use for
         productSuppliers.collect { Map entry ->
             ProductSupplier productSupplier = ProductSupplier.load(entry.id)
+            ProductPackage productPackage = defaultProductPackages[productSupplier?.id]
+            boolean useDerivedPackage = !entry["defaultProductPackage.uom.code"]
             entry["product"] = ["productCode": entry["productCode"], "name": productSupplier?.product?.displayNameWithLocaleCode ?: entry["productName"]]
             entry["productCode"] = entry["legacyProductCode"]
-            entry["defaultProductPackage"] = defaultProductPackages[productSupplier?.id]
+            if (useDerivedPackage) {
+                entry["defaultProductPackage.uom.code"] = productPackage?.uom?.code
+                entry["defaultProductPackage.quantity"] = productPackage?.quantity
+                entry["defaultProductPackage.productPrice.price"] = productPackage?.productPrice?.price
+            }
             entry["globalProductSupplierPreference"] = globalPreferencesByProductSupplier[productSupplier?.id]
         }
 

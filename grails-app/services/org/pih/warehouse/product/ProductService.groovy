@@ -1269,6 +1269,7 @@ class ProductService {
             product.controlled_substance as controlledSubstance, 
             product.hazardous_material as hazardousMaterial, 
             product.reconditioned,
+            product.unit_of_measure as unitOfMeasure,
             product.lot_and_expiry_control as lotAndExpiryControl,
             # Return whether search term returns an exact match
             ifnull(

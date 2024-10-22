@@ -104,6 +104,8 @@ class FieldArrayComponent extends Component {
               const { hide, headerHtml } = dynamicAttr;
               const flexWidth = dynamicAttr.flexWidth || config.flexWidth;
               const fixedWidth = dynamicAttr.fixedWidth || config.fixedWidth;
+              const headerLabel = dynamicAttr.label || config.label;
+              const headerDefaultMessage = dynamicAttr.defaultMessage || config.defaultMessage;
 
               if (!hide) {
                 return (
@@ -133,14 +135,14 @@ class FieldArrayComponent extends Component {
                       hideDelay="50"
                     >
                       <div
-                        className={`mx-2 text-truncate ${config.required ? 'arrayfield-header-required' : ''}`}
+                        className={`mx-2 ${config.multilineHeader ? '' : 'text-truncate'} ${config.required ? 'arrayfield-header-required' : ''}`}
                         style={{
                           fontSize: fieldsConfig.headerFontSize ? fieldsConfig.headerFontSize : '0.875rem',
                         }}
                       >
                         { headerHtml && headerHtml() }
-                        { config.label && !headerHtml &&
-                          <Translate id={config.label} defaultMessage={config.defaultMessage} />}
+                        { headerLabel && !headerHtml &&
+                          <Translate id={headerLabel} defaultMessage={headerDefaultMessage} />}
                       </div>
                     </Tooltip>
                   </div>);

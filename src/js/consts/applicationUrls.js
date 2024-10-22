@@ -25,6 +25,7 @@ const PRODUCT_URL = {
   base: `${CONTEXT_PATH}/product`,
   list: () => `${PRODUCT_URL.base}/list`,
   create: () => `${PRODUCT_URL.base}/create`,
+  edit: (id) => `${PRODUCT_URL.base}/edit/${id}`,
   importCSV: () => `${PRODUCT_URL.base}/importAsCsv`,
 };
 

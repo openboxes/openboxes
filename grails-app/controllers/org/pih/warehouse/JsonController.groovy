@@ -870,7 +870,7 @@ class JsonController {
                         quantity      : productQuantity,
                         productCode   : product?.productCode,
                         value         : product.id,
-                        label         : product?.productCode + " " + localizedName,
+                        label         : "${product?.productCode} ${localizedName} ${product?.unitOfMeasure ? "[${product?.unitOfMeasure}]" : ""}",
                         valueText     : localizedName,
                         desc          : product.description,
                         inventoryItems: inventoryItemList,

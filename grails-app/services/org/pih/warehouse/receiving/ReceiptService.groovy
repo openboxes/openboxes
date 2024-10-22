@@ -16,12 +16,18 @@ import grails.validation.ValidationException
 import org.pih.warehouse.api.PartialReceipt
 import org.pih.warehouse.api.PartialReceiptContainer
 import org.pih.warehouse.api.PartialReceiptItem
+import org.pih.warehouse.auth.AuthService
+import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Event
 import org.pih.warehouse.core.EventCode
+import org.pih.warehouse.core.IdentifierService
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.LocationService
 import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.inventory.InventoryService
+import org.pih.warehouse.inventory.ProductAvailabilityService
 import org.pih.warehouse.inventory.RefreshProductAvailabilityEvent
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionEntry
@@ -29,20 +35,21 @@ import org.pih.warehouse.inventory.TransactionIdentifierService
 import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
+import org.pih.warehouse.shipping.ShipmentService
 import org.pih.warehouse.shipping.ShipmentStatusCode
 import org.pih.warehouse.shipping.ShipmentStatusTransitionEvent
 
 @Transactional
 class ReceiptService {
 
-    def authService
-    def shipmentService
-    def inventoryService
-    def locationService
+    AuthService authService
+    ShipmentService shipmentService
+    InventoryService inventoryService
+    LocationService locationService
     ReceiptIdentifierService receiptIdentifierService
     TransactionIdentifierService transactionIdentifierService
     GrailsApplication grailsApplication
-    def productAvailabilityService
+    ProductAvailabilityService productAvailabilityService
 
     @Transactional(readOnly=true)
     PartialReceipt getPartialReceipt(String id, String stepNumber) {
@@ -289,26 +296,39 @@ class ReceiptService {
         }
     }
 
+    /**
+     We can create RECEIVED or PARTIALLY_RECEIVED event depending on the case:
+        1. When the location supports partial receiving
+            RECEIVED - when the shipment is not already received and is fully received
+            PARTIALLY_RECEIVED - when the shipment wasn't partially received before (it's
+                created only once)
+        2. When the location doesn't support partial receiving
+            RECEIVED - after receiving for the first time, we cannot receive
+                for the second time without partial receiving. The rest of the remaining quantities
+                should be canceled
+            PARTIALLY_RECEIVED - not allowed
+     */
     void savePartialReceiptEvent(PartialReceipt partialReceipt) {
         Shipment shipment = partialReceipt.shipment
         Receipt receipt = partialReceipt.receipt
 
-        if (shipment.isFullyReceived()) {
-            if (!shipment.wasReceived()) {
-                shipmentService.createShipmentEvent(shipment,
-                        receipt?.actualDeliveryDate,
-                        EventCode.RECEIVED,
-                        shipment.destination)
-            }
-        } else {
+        if (!shipment.wasReceived() && (!shipment.destination.supports(ActivityCode.PARTIAL_RECEIVING) || shipment.isFullyReceived())) {
+            shipmentService.createShipmentEvent(
+                shipment,
+                receipt?.actualDeliveryDate,
+                EventCode.RECEIVED,
+                shipment.destination,
+            )
+            return
+        }
 
-            // Create received shipment event
-            if (!shipment.wasPartiallyReceived()) {
-                shipmentService.createShipmentEvent(shipment,
-                        receipt?.actualDeliveryDate,
-                        EventCode.PARTIALLY_RECEIVED,
-                        shipment.destination)
-            }
+        if (!shipment.wasPartiallyReceived()) {
+            shipmentService.createShipmentEvent(
+                    shipment,
+                    receipt?.actualDeliveryDate,
+                    EventCode.PARTIALLY_RECEIVED,
+                    shipment.destination,
+            )
         }
     }
 

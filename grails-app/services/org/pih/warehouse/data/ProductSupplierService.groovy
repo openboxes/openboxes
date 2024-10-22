@@ -21,6 +21,7 @@ import org.hibernate.criterion.Projections
 import org.hibernate.criterion.Restrictions
 import org.hibernate.criterion.Subqueries
 import org.hibernate.sql.JoinType
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.PreferenceType
 import org.pih.warehouse.core.ProductPrice
@@ -225,6 +226,7 @@ class ProductSupplierService {
         productSupplier.manufacturer = manufacturerName ? Organization.findByName(manufacturerName) : null
         productSupplier.supplierCode = supplierCode ? supplierCode : null
         productSupplier.manufacturerCode = manufacturerCode ? manufacturerCode : null
+        productSupplier.save()
 
         if (unitOfMeasure && quantity) {
             ProductPackage defaultProductPackage =
@@ -237,6 +239,9 @@ class ProductSupplierService {
                 defaultProductPackage.product = productSupplier.product
                 defaultProductPackage.uom = unitOfMeasure
                 defaultProductPackage.quantity = quantity
+                productSupplier.addToProductPackages(defaultProductPackage)
+                productSupplier.defaultProductPackage = defaultProductPackage
+                defaultProductPackage.productSupplier = productSupplier
                 if (price != null) {
                     ProductPrice productPrice = new ProductPrice()
                     productPrice.price = price
@@ -272,34 +277,50 @@ class ProductSupplierService {
 
         PreferenceType preferenceType = params.globalPreferenceTypeName ? PreferenceType.findByName(params.globalPreferenceTypeName) : null
 
-        if (preferenceType) {
-            ProductSupplierPreference productSupplierPreference = productSupplier.getGlobalProductSupplierPreference()
-
-            if (!productSupplierPreference) {
-                productSupplierPreference = new ProductSupplierPreference()
-                productSupplier.addToProductSupplierPreferences(productSupplierPreference)
-            }
-
-            productSupplierPreference.preferenceType = preferenceType
-            productSupplierPreference.comments = params.globalPreferenceTypeComments
-
-            def globalPreferenceTypeValidityStartDate = params.globalPreferenceTypeValidityStartDate ? dateFormat.parse(params.globalPreferenceTypeValidityStartDate) : null
-
-            if (globalPreferenceTypeValidityStartDate) {
-                productSupplierPreference.validityStartDate = globalPreferenceTypeValidityStartDate
-            }
-
-            def globalPreferenceTypeValidityEndDate = params.globalPreferenceTypeValidityEndDate ? dateFormat.parse(params.globalPreferenceTypeValidityEndDate) : null
-
-            if (globalPreferenceTypeValidityEndDate) {
-                productSupplierPreference.validityEndDate = globalPreferenceTypeValidityEndDate
-            }
-        }
+        assignDefaultPreferenceType(productSupplier,
+                preferenceType,
+                params.globalPreferenceTypeComments,
+                params.globalPreferenceTypeValidityStartDate,
+                params.globalPreferenceTypeValidityEndDate)
 
         if (!productSupplier.code && !productSupplier.id) {
             assignSourceCode(productSupplier, supplier)
         }
         return productSupplier
+    }
+
+    void assignDefaultPreferenceType(ProductSupplier productSupplier,
+                 PreferenceType preferenceType,
+                 String comments,
+                 String validityStartDate,
+                 String validityEndDate) {
+        ProductSupplierPreference productSupplierPreference = productSupplier.getGlobalProductSupplierPreference()
+        if (!preferenceType && productSupplierPreference) {
+            // If preference type is not provided, delete it
+            productSupplier.removeFromProductSupplierPreferences(productSupplierPreference)
+            productSupplierPreference.delete()
+            return
+        }
+
+        if (!productSupplierPreference) {
+            productSupplierPreference = new ProductSupplierPreference()
+            productSupplier.addToProductSupplierPreferences(productSupplierPreference)
+        }
+
+        productSupplierPreference.preferenceType = preferenceType
+        productSupplierPreference.comments = comments
+
+        Date globalPreferenceTypeValidityStartDate = validityStartDate ? Constants.MONTH_DAY_YEAR_DATE_FORMATTER.parse(validityStartDate) : null
+
+        if (globalPreferenceTypeValidityStartDate) {
+            productSupplierPreference.validityStartDate = globalPreferenceTypeValidityStartDate
+        }
+
+        Date globalPreferenceTypeValidityEndDate = validityEndDate ? Constants.MONTH_DAY_YEAR_DATE_FORMATTER.parse(validityEndDate) : null
+
+        if (globalPreferenceTypeValidityEndDate) {
+            productSupplierPreference.validityEndDate = globalPreferenceTypeValidityEndDate
+        }
     }
 
     void assignSourceCode(ProductSupplier productSupplier, Organization organization) {
