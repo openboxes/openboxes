@@ -18,6 +18,12 @@ class IdentifierGeneratorContext {
     String formatOverride
 
     /**
+     * If set, will override the random template to use when generating the identifier. Takes precedence over the
+     * value in openboxes.identifier.x.random.template, even if there's a feature-specific value set.
+     */
+    String randomTemplateOverride
+
+    /**
      * A string to be prepended to the front of the id.
      *
      * Useful for prepending a sub-feature identifier (such as "R-" or "PO-") without needing to define a whole new

@@ -2,6 +2,7 @@ package org.pih.warehouse.order
 
 import org.apache.commons.lang.StringUtils
 
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.IdentifierGeneratorTypeCode
 import org.pih.warehouse.core.IdentifierService
 import org.pih.warehouse.core.IdentifierTypeCode
@@ -34,7 +35,8 @@ class PurchaseOrderIdentifierService extends IdentifierService<Order> {
         return count > 0 ? count : Shipment.countByShipmentNumber(id)
     }
 
-    String generateForEntity(Order order) {
+    @Override
+    String generate(Order order, IdentifierGeneratorContext context=null) {
         IdentifierGeneratorTypeCode identifierGeneratorTypeCode = configService.getProperty(
                 "openboxes.identifier.purchaseOrder.generatorType", IdentifierGeneratorTypeCode)
 
@@ -42,17 +44,17 @@ class PurchaseOrderIdentifierService extends IdentifierService<Order> {
             case IdentifierGeneratorTypeCode.SEQUENCE:
                 return generateSequential(order)
             case IdentifierGeneratorTypeCode.RANDOM:
-                return generateForEntity(order)
+                return super.generate(order, context)
         }
     }
 
     private String generateSequential(Order order) {
         Integer sequenceNumber = getNextSequenceNumber(order.destinationParty.id)
-        String sequenceNumberFormat = configService.getProperty("openboxes.identifier.purchaseOrder.sequenceNumber.format")
+        Integer sequenceNumberMinSize = configService.getProperty("openboxes.identifier.purchaseOrder.sequenceNumber.minSize", Integer)
         String sequenceNumberStr = StringUtils.leftPad(
-                sequenceNumber.toString(), sequenceNumberFormat.length(), sequenceNumberFormat.substring(0, 1))
+                sequenceNumber.toString(), sequenceNumberMinSize, Constants.DEFAULT_SEQUENCE_NUMBER_FORMAT_CHAR)
 
-        return generate(order, IdentifierGeneratorContext.builder()
+        return super.generate(order, IdentifierGeneratorContext.builder()
                 .customProperties(["sequenceNumber": sequenceNumberStr])
                 .build())
     }
@@ -65,7 +67,7 @@ class PurchaseOrderIdentifierService extends IdentifierService<Order> {
         Integer nextSequenceNumber = sequenceNumber + 1
 
         // We need to actually update the sequence number so that it doesn't get re-used.
-        organization.sequences.put(IdentifierTypeCode.PURCHASE_ORDER_NUMBER, nextSequenceNumber.toString())
+        organization.sequences.put(IdentifierTypeCode.PURCHASE_ORDER_NUMBER.toString(), nextSequenceNumber.toString())
         organization.save()
 
         return nextSequenceNumber

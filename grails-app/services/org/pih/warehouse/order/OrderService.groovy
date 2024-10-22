@@ -378,7 +378,7 @@ class OrderService {
         order.originParty = order?.origin?.organization
 
         if (!order.orderNumber) {
-            order.orderNumber = purchaseOrderIdentifierService.generateForEntity(order)
+            order.orderNumber = purchaseOrderIdentifierService.generate(order)
         }
 
         if (!order.hasErrors() && order.save(flush: true)) {

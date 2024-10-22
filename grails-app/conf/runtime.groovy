@@ -9,7 +9,6 @@ openboxes.identifier.attempts.max = 10
 openboxes.identifier.numeric = "0123456789"
 openboxes.identifier.alphabetic = "ABCDEFGHJKMNPQRSTUVXYZ"
 openboxes.identifier.alphanumeric = "0123456789ABCDEFGHJKMNPQRSTUVWXYZ"
-openboxes.identifier.sequenceNumber.format = "00000"
 
 // Default identifier
 openboxes.identifier.default.format = "\${random}"  // By default, simply generate a random id
@@ -17,24 +16,21 @@ openboxes.identifier.default.random.template = "NNNLLL"
 openboxes.identifier.default.random.condition = RandomCondition.ALWAYS  // By default, we always fill in random sections
 openboxes.identifier.default.delimiter = "-"
 openboxes.identifier.default.prefix.enabled = true
+openboxes.identifier.default.sequenceNumber.minSize = 5  // Aka five digits
 
 // Transaction identifier
 openboxes.identifier.transaction.random.template = "AAA-AAA-AAA"
 
 // Product identifier
 openboxes.identifier.product.random.template = "LLNN"
-openboxes.identifier.productCode.generatorType = IdentifierGeneratorTypeCode.SEQUENCE
+
+// Product identifier - For products using the default product type
+openboxes.identifier.product.defaultProductType.format = "\${custom.productTypeCode}\${delimiter}\${custom.sequenceNumber}"
 
 // Product Supplier identifier
 openboxes.identifier.productSupplier.format = "\${custom.productCode}\${delimiter}\${custom.organizationCode}\${random}"
 openboxes.identifier.productSupplier.random.template = "-NNNN"
 openboxes.identifier.productSupplier.random.condition = RandomCondition.ON_DUPLICATE
-
-// Product identifier generator configuration for the systems default product
-openboxes.identifier.defaultProductType.id = "DEFAULT"
-
-// Product identifier configuration for all sequential product codes
-openboxes.identifier.productCode.format = "\${custom.productTypeCode}\${delimiter}\${custom.sequenceNumber}"
 
 // Organization identifier
 openboxes.identifier.organization.random.template = "AAA"
@@ -43,9 +39,12 @@ openboxes.identifier.organization.maxSize = 3
 
 // Purchase Order identifier
 openboxes.identifier.purchaseOrder.generatorType = IdentifierGeneratorTypeCode.SEQUENCE
-openboxes.identifier.purchaseOrder.sequenceNumber.format = "000000"
 openboxes.identifier.purchaseOrder.format = "PO-\${destinationPartyCode}-\${custom.sequenceNumber}"
+openboxes.identifier.purchaseOrder.sequenceNumber.minSize = 6  // Aka six digits
 openboxes.identifier.purchaseOrder.properties = ["destinationPartyCode": "destinationParty.code"]
+
+// Default Product Type Configuration
+openboxes.productType.default.id = "DEFAULT"
 
 // Require approval on purchase orders
 openboxes.purchasing.approval.enabled = false

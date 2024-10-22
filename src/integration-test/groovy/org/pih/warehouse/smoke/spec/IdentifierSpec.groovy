@@ -1,7 +1,6 @@
 package org.pih.warehouse.smoke.spec
 
 import org.apache.commons.lang.StringUtils
-import spock.lang.Ignore
 
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationIdentifierService
@@ -47,6 +46,11 @@ class IdentifierSpec extends SmokeSpec {
     TransactionIdentifierService transactionIdentifierService
     ProductIdentifierService productIdentifierService
     OrganizationIdentifierService organizationIdentifierService
+
+    // Note the following services are tested in unit tests instead as to not actually increment any sequential
+    // identifiers in a live environment:
+    // - PurchaseOrderIdentifierService: tested in PurchaseOrderIdentifierServiceSpec
+    // - ProductIdentifierService: tested in ProductIdentifierServiceSpec
 
     void 'shipmentIdentifierService can generate identifiers with the current configuration'() {
         given:
@@ -179,7 +183,6 @@ class IdentifierSpec extends SmokeSpec {
         assert StringUtils.isNotBlank(identifier)
     }
 
-    @Ignore("We can't smoke test product identifier since the generate method actually updates the sequence, and we don't want to manipulate any real data. If that is ever changed to only update the sequence on save, this can be re-enabled.")
     void 'productIdentifierService can generate identifiers with the current configuration'() {
         given:
         Product product = new Product(
@@ -191,6 +194,9 @@ class IdentifierSpec extends SmokeSpec {
                         name: 'name',
                         productTypeCode: ProductTypeCode.GOOD,
                         code: 'code',
+                        // We've elected to not use a sequential format here since doing so would cause the smoke tests
+                        // to actually increment the sequence number, which we don't want to do for live environments.
+                        // Sequential checks are done in ProductIdentifierServiceSpec unit tests.
                         productIdentifierFormat: 'MNNNNN',
                         sequenceNumber: 0,
                 )

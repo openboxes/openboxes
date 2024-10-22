@@ -56,7 +56,7 @@ abstract class IdentifierService<T extends GormEntity> {
         // Otherwise there is randomness. If the randomness should always be used, generate it right away.
         RandomCondition randomCondition = getIdentifierPropertyWithDefault('random.condition', RandomCondition)
         if (randomCondition == RandomCondition.ALWAYS) {
-            return generateAndFillRandomInFormat(format)
+            return generateAndFillRandomInFormat(format, context?.randomTemplateOverride)
         }
 
         // Otherwise there's no mandatory randomness. Before adding any, first check if the identifier is unique as is.
@@ -66,15 +66,18 @@ abstract class IdentifierService<T extends GormEntity> {
         }
 
         // If the identifier is not unique, add in the randomness to make it unique.
-        return generateAndFillRandomInFormat(format)
+        return generateAndFillRandomInFormat(format, context?.randomTemplateOverride)
     }
 
     /**
      * Generate randomness as configured in the .random property and add it to the template (in the ${random} GString).
      * Generate the randomness in a loop to allow for retries in case of duplicates.
      */
-    private String generateAndFillRandomInFormat(String format) {
-        String randomFormat = getIdentifierPropertyWithDefault('random.template')
+    private String generateAndFillRandomInFormat(String format, String randomTemplateOverride=null) {
+        // Use the randomness override if it is provided, otherwise fetch the template.
+        String randomFormat = StringUtils.isBlank(randomTemplateOverride) ?
+                getIdentifierPropertyWithDefault('random.template') :
+                randomTemplateOverride
 
         int maxAttempts = configService.getProperty("openboxes.identifier.attempts.max", Integer)
         for (int i=0; i<maxAttempts; i++) {
