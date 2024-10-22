@@ -241,8 +241,17 @@ class ProductSupplierService {
                 defaultProductPackage.product = productSupplier.product
                 defaultProductPackage.uom = unitOfMeasure
                 defaultProductPackage.quantity = quantity
+                /**
+                    Product supplier needs to be saved here to receive an ID in order to be able to assign it to the product package
+                    otherwise the transient property value exception would be thrown
+                 */
                 productSupplier.save()
                 defaultProductPackage.productSupplier = productSupplier
+                /**
+                    The flush is needed because of the order Hibernate uses to save the entities in this operation -
+                    for productSupplier.defaultProductPackage to be stored properly and not be cleared after transaction commit, the flush is needed
+                    Check OBPIH-6757 for more details (#4904 PR)
+                 */
                 defaultProductPackage.save(flush: true)
                 productSupplier.defaultProductPackage = defaultProductPackage
                 productSupplier.addToProductPackages(defaultProductPackage)
