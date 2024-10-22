@@ -237,6 +237,16 @@ class UserService {
         return false
     }
 
+    Boolean hasRoleProductManager(User u) {
+        if (u) {
+            def user = User.get(u.id)
+            def roleTypes = [RoleType.ROLE_PRODUCT_MANAGER]
+            def co = getEffectiveRoles(user).any { Role role -> roleTypes.contains(role.roleType) }
+            return co
+        }
+        return false
+    }
+
     Boolean hasRoleBrowser(User u) {
         if (u) {
             def user = User.get(u.id)
