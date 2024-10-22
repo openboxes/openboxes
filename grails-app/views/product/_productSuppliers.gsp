@@ -1,5 +1,4 @@
 <%@ page import="org.pih.warehouse.core.EntityTypeCode; org.pih.warehouse.product.Attribute" %>
-<%@ page import="org.pih.warehouse.core.RoleType" %>
 
 <g:set var="availableAttributes" value="${org.pih.warehouse.product.Attribute.findAllByActive(true)}"/>
 <g:set var="availableAttributes" value="${availableAttributes.findAll { it.entityTypeCode == EntityTypeCode.PRODUCT_SUPPLIER}}"/>
@@ -15,9 +14,9 @@
     <g:isUserAdmin>
         <g:set var="isAdmin" value="${true}"/>
     </g:isUserAdmin>
-    <g:isUserInRole roles="[RoleType.ROLE_PRODUCT_MANAGER]">
+    <g:hasRoleProductManager>
         <g:set var="isProductManager" value="${true}"/>
-    </g:isUserInRole>
+    </g:hasRoleProductManager>
 
     <g:set var="canManageProductSources" value="${isAdmin && isProductManager}"/>
 
