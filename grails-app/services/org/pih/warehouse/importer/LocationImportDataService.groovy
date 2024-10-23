@@ -13,7 +13,7 @@ import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import org.pih.warehouse.LocalizationUtil
 import org.pih.warehouse.core.Address
-import org.pih.warehouse.core.IdentifierService
+import org.pih.warehouse.core.OrganizationIdentifierService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationGroup
 import org.pih.warehouse.core.LocationType
@@ -25,7 +25,7 @@ import org.pih.warehouse.inventory.Inventory
 @Transactional
 class LocationImportDataService implements ImportDataService {
     OrganizationService organizationService
-    IdentifierService identifierService
+    OrganizationIdentifierService organizationIdentifierService
 
     @Override
     void validateData(ImportDataCommand command) {
@@ -169,7 +169,7 @@ class LocationImportDataService implements ImportDataService {
 
         // Add required association to organization for depots and suppliers
         if (!(location.locationType?.isInternalLocation() || location.locationType?.isZone()) && !location.organization) {
-            def locationCode = identifierService.generateOrganizationIdentifier(params.organization)
+            def locationCode = organizationIdentifierService.generate(params.organization)
             Organization organization = (location.locationType?.locationTypeCode == LocationTypeCode.SUPPLIER) ?
                     organizationService.findOrCreateSupplierOrganization(params?.organization, locationCode) :
                     organizationService.findOrCreateOrganization(params?.organization, locationCode)
