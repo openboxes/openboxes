@@ -252,6 +252,7 @@ const FIELDS = {
               referenceId: fieldValue.orderItemId,
               orderNumber: fieldValue.orderNumber,
               packSize: fieldValue.packSize,
+              unitOfMeasure: fieldValue.unitOfMeasure,
               quantityAvailable: fieldValue.quantityAvailable,
             }, rowIndex);
           },
