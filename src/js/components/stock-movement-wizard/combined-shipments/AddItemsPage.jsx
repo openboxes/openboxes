@@ -163,7 +163,7 @@ const FIELDS = {
         type: TextField,
         label: 'react.stockMovement.quantityPOUom.label',
         defaultMessage: 'Quantity (in PO UoM)',
-        flexWidth: '1',
+        fixedWidth: '120px',
         required: true,
         headerTooltip: 'react.stockMovement.quantityPerUom.InputTooltip.label',
         multilineHeader: true,
@@ -176,7 +176,7 @@ const FIELDS = {
         type: TextField,
         label: 'react.stockMovement.POUom.label',
         defaultMessage: 'PO UoM',
-        flexWidth: 0.9,
+        fixedWidth: '110px',
         attributes: {
           disabled: true,
         },
