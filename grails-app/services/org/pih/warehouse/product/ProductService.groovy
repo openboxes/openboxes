@@ -36,7 +36,7 @@ class ProductService {
     def sessionFactory
     GrailsApplication grailsApplication
     def authService
-    def identifierService
+    ProductIdentifierService productIdentifierService
     def userService
     def dataService
     ProductGroupService productGroupService
@@ -787,7 +787,7 @@ class ProductService {
 
             if (!product?.id || product.validate()) {
                 if (!product.productCode) {
-                    product.productCode = generateProductIdentifier(product.productType)
+                    product.productCode = generateProductIdentifier(product)
                 }
             }
 
@@ -1082,39 +1082,10 @@ class ProductService {
     }
 
     /**
-     * Ensure that the given product code does not exist
-     *
-     * @param productCode
-     * @return
+     * @return A generated identifier for the given product.
      */
-    def validateProductIdentifier(productCode) {
-        if (!productCode) return false
-        def count = Product.executeQuery("select count(p.productCode) from Product p where productCode = :productCode", [productCode: productCode])
-        return count ? (count[0] == 0) : false
-    }
-
-    /**
-     * Generate a product identifier.
-     *
-     * @return
-     */
-    def generateProductIdentifier(ProductType productType) {
-        def productCode
-
-        try {
-            productCode = identifierService.generateProductIdentifier(productType)
-            if (validateProductIdentifier(productCode)) {
-                return productCode
-            }
-
-        } catch (Exception e) {
-            log.warn("Error generating unique product code " + e.message, e)
-        }
-        return productCode
-    }
-
-    def generateProductIdentifier() {
-        return generateProductIdentifier(null)
+    String generateProductIdentifier(Product product) {
+        return productIdentifierService.generate(product)
     }
 
     /**
@@ -1138,7 +1109,7 @@ class ProductService {
         if (product) {
             // Generate product code if it doesn't already exist
             if (!product.productCode) {
-                product.productCode = generateProductIdentifier(product.productType)
+                product.productCode = generateProductIdentifier(product)
             }
             // Handle tags
             try {

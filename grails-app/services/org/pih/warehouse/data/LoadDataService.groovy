@@ -40,7 +40,7 @@ class LoadDataService {
     ProductSupplierImportDataService productSupplierImportDataService
     ProductService productService
     InventoryService inventoryService
-    IdentifierService identifierService
+    OrganizationIdentifierService organizationIdentifierService
     ProductCatalogItemImportDataService productCatalogItemImportDataService
 
     def importLocations(URL csvURL) {
@@ -77,7 +77,7 @@ class LoadDataService {
 
             Organization organization = new Organization(
                     name: organizationName,
-                    code: identifierService.generateOrganizationIdentifier(organizationName),
+                    code: organizationIdentifierService.generate(organizationName),
                     partyType: PartyType.findByCode("ORG") // FIXME: Should party type be provided?
             )
 

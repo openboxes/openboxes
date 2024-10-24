@@ -17,6 +17,7 @@ import org.pih.warehouse.core.EntityTypeCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.PreferenceType
+import org.pih.warehouse.data.ProductSupplierIdentifierService
 import org.pih.warehouse.data.ProductSupplierService
 
 import java.math.RoundingMode
@@ -27,7 +28,7 @@ class ProductSupplierController {
 
     def dataService
     def documentService
-    def identifierService
+    ProductSupplierIdentifierService productSupplierIdentifierService
     ProductSupplierDataService productSupplierGormService
     ProductSupplierService productSupplierService
 
@@ -157,8 +158,10 @@ class ProductSupplierController {
             updateAttributes(productSupplierInstance, params)
 
             if (!productSupplierInstance.code) {
-                String prefix = productSupplierInstance?.product?.productCode
-                productSupplierInstance.code = identifierService.generateProductSupplierIdentifier(prefix)
+                productSupplierInstance.code = productSupplierIdentifierService.generate(
+                        productSupplierInstance,
+                        productSupplierInstance?.product?.productCode,
+                        "")
             }
 
             if (params.defaultPreferenceType) {
