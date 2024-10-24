@@ -490,6 +490,7 @@ dependencies {
     implementation "io.sentry:sentry:${sentryVersion}"
     implementation "io.sentry:sentry-logback:${sentryVersion}"
     implementation "io.sentry:sentry-servlet:${sentryVersion}"
+    implementation "io.sentry:sentry-spring-boot-starter:${sentryVersion}"
 
     // incorporate latest timezone changes
     implementation 'joda-time:joda-time:2.12.5'
