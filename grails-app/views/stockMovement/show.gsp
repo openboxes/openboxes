@@ -32,7 +32,7 @@
         <g:if test="${stockMovement?.documents}">
             <div class="right">
                 <div class="button-group">
-                    <g:if test="${stockMovement.electronicType}">
+                    <g:if test="${stockMovement?.requisition?.id}">
                         <g:link controller="stockMovement" action="addComment" id="${stockMovement?.id}" class="button">
                             <img src="${resource(dir: 'images/icons/silk', file: 'comment_add.png')}" />&nbsp;
                             <warehouse:message code="requisition.addComment.label" default="Add comment" />
@@ -583,7 +583,7 @@
                             <warehouse:message code="documents.label" default="Documents"/>
                         </g:link>
                     </li>
-                    <g:if test="${stockMovement.electronicType}">
+                    <g:if test="${stockMovement?.requisition?.id}">
                         <g:set var="commentCount" value="${stockMovement?.requisition?.comments?.size()}" />
                         <li
                             role="tab"
