@@ -10,6 +10,7 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
+import grails.validation.ValidationException
 import org.grails.web.json.JSONObject
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
@@ -17,18 +18,18 @@ import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.order.Order
-import org.pih.warehouse.order.OrderIdentifierService
 import org.pih.warehouse.order.OrderStatus
 import org.pih.warehouse.order.OrderType
 import org.pih.warehouse.order.OrderTypeCode
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentType
 
 import java.text.SimpleDateFormat
 
 class StockTransferApiController {
 
-    OrderIdentifierService orderIdentifierService
+    def identifierService
     def inventoryService
     def orderService
     def shipmentService
@@ -100,7 +101,7 @@ class StockTransferApiController {
 
         StockTransfer stockTransfer = new StockTransfer()
 
-        bindStockTransferData(stockTransfer, order, currentUser, currentLocation, jsonObject)
+        bindStockTransferData(stockTransfer, currentUser, currentLocation, jsonObject)
 
         Boolean isReturnType = stockTransfer.type == OrderType.findByCode(Constants.RETURN_ORDER)
         if (isReturnType && (stockTransfer?.status == StockTransferStatus.PLACED)) {
@@ -118,7 +119,7 @@ class StockTransferApiController {
         render([data: stockTransfer?.toJson()] as JSON)
     }
 
-    StockTransfer bindStockTransferData(StockTransfer stockTransfer, Order order, User currentUser, Location currentLocation, JSONObject jsonObject) {
+    StockTransfer bindStockTransferData(StockTransfer stockTransfer, User currentUser, Location currentLocation, JSONObject jsonObject) {
         bindData(stockTransfer, jsonObject, [exclude: ['stockTransferItems']])
 
         if (!stockTransfer.origin) {
@@ -134,7 +135,7 @@ class StockTransferApiController {
         }
 
         if (!stockTransfer.stockTransferNumber) {
-            stockTransfer.stockTransferNumber = orderIdentifierService.generate(order)
+            stockTransfer.stockTransferNumber = identifierService.generateOrderIdentifier()
         }
 
         if (jsonObject.type) {

@@ -14,8 +14,6 @@ import com.google.zxing.BarcodeFormat
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import groovy.sql.Sql
-import org.apache.commons.lang.text.StrSubstitutor
-
 import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.DocumentService
@@ -39,6 +37,7 @@ class ShipmentController {
     static scaffold = Shipment
     def shipmentService
     def userService
+    def identifierService
     def inventoryService
     MailService mailService
     def barcodeService
@@ -249,7 +248,8 @@ class ShipmentController {
             trackingUrl = String.format(trackingUrlTemplate, trackingNumber)
         }
         else {
-            trackingUrl = StrSubstitutor.replace(trackingUrlTemplate, [trackingNumber:trackingNumber])
+            trackingUrl =
+                    identifierService.renderTemplate(trackingUrlTemplate, [trackingNumber:trackingNumber])
         }
 
         render(template: "showTracking", model: [shipmentInstance: shipmentInstance, trackingUrl: trackingUrl])

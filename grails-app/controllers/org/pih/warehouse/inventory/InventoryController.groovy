@@ -48,7 +48,7 @@ class InventoryController {
     def userService
     def uploadService
     def documentService
-    TransactionIdentifierService transactionIdentifierService
+    def identifierService
     def forecastingService
 
     static allowedMethods = [show: "GET", search: "POST", download: "GET"]
@@ -1019,7 +1019,7 @@ class InventoryController {
         List products = Product.getAll(productIds)
 
         def transaction = command?.transactionInstance
-        transaction.transactionNumber = transactionIdentifierService.generate(transaction)
+        transaction.transactionNumber = identifierService.generateTransactionIdentifier()
         def warehouseInstance = Location.get(session?.warehouse?.id)
         def quantityMap = inventoryService.getQuantityForInventory(warehouseInstance?.inventory, products)
 

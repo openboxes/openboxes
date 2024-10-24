@@ -16,7 +16,6 @@ import org.grails.web.json.JSONObject
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Organization
 import org.pih.warehouse.invoice.Invoice
-import org.pih.warehouse.invoice.InvoiceIdentifierService
 import org.pih.warehouse.invoice.InvoiceItemCandidate
 import org.pih.warehouse.invoice.InvoiceItem
 import org.pih.warehouse.invoice.InvoiceList
@@ -26,7 +25,7 @@ import org.pih.warehouse.invoice.InvoiceStatus
 
 class InvoiceApiController {
 
-    InvoiceIdentifierService invoiceIdentifierService
+    def identifierService
     def invoiceDataService
     def invoiceService
 
@@ -121,7 +120,7 @@ class InvoiceApiController {
         }
 
         if (!invoice.invoiceNumber) {
-            invoice.invoiceNumber = invoiceIdentifierService.generate(invoice)
+            invoice.invoiceNumber = identifierService.generateInvoiceIdentifier()
         }
 
         if (!invoice.invoiceType) {

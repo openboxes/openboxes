@@ -47,7 +47,7 @@ class InventoryService implements ApplicationContextAware {
     def authService
     def dataService
     def gparsService
-    TransactionIdentifierService transactionIdentifierService
+    def identifierService
     def messageService
     def locationService
 
@@ -1354,7 +1354,7 @@ class InventoryService implements ApplicationContextAware {
             transaction.inventory = cmd.inventory
             transaction.comment = cmd.comment
             transaction.transactionType = TransactionType.get(Constants.PRODUCT_INVENTORY_TRANSACTION_TYPE_ID)
-            transaction.transactionNumber = generateTransactionNumber(transaction)
+            transaction.transactionNumber = generateTransactionNumber()
 
             // Process each row added to the record inventory page
             cmd.recordInventoryRows.each { row ->
@@ -1816,7 +1816,7 @@ class InventoryService implements ApplicationContextAware {
                     TransactionType.get(Constants.ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID)
             transaction.inventory = inventory
             transaction.comment = command.comment
-            transaction.transactionNumber = generateTransactionNumber(transaction)
+            transaction.transactionNumber = generateTransactionNumber()
 
             // Add transaction entry to transaction
             def transactionEntry = new TransactionEntry()
@@ -1857,7 +1857,7 @@ class InventoryService implements ApplicationContextAware {
         Transaction transaction = new Transaction()
         transaction.transactionDate = new Date()
         transaction.inventory = location.inventory
-        transaction.transactionNumber = generateTransactionNumber(transaction)
+        transaction.transactionNumber = generateTransactionNumber()
         transaction.transactionType = TransactionType.get(Constants.PRODUCT_INVENTORY_TRANSACTION_TYPE_ID)
 
         lineItems.each { lineItem ->
@@ -1925,7 +1925,7 @@ class InventoryService implements ApplicationContextAware {
             transaction.transactionDate = new Date()
             transaction.inventory = inventory
             transaction.order = command.order
-            transaction.transactionNumber = generateTransactionNumber(transaction)
+            transaction.transactionNumber = generateTransactionNumber()
             transaction.destination = (transferOut) ? otherLocation : null
             transaction.source = (transferOut) ? null : otherLocation
             transaction.transactionType = (transferOut) ?
@@ -2072,7 +2072,7 @@ class InventoryService implements ApplicationContextAware {
         // create and save the new mirrored transaction
         if (!mirroredTransaction) {
             mirroredTransaction = createMirroredTransaction(baseTransaction)
-            mirroredTransaction.transactionNumber = generateTransactionNumber(mirroredTransaction)
+            mirroredTransaction.transactionNumber = generateTransactionNumber()
             if (!mirroredTransaction.save(flush: true)) {
                 throw new RuntimeException("Unable to save mirrored transaction " + mirroredTransaction?.id)
             }
@@ -2128,7 +2128,7 @@ class InventoryService implements ApplicationContextAware {
         mirroredTransaction.order = baseTransaction.order
         mirroredTransaction.requisition = baseTransaction.requisition
         mirroredTransaction.transactionDate = baseTransaction.transactionDate
-        mirroredTransaction.transactionNumber = generateTransactionNumber(mirroredTransaction)
+        mirroredTransaction.transactionNumber = generateTransactionNumber()
 
         // create the transaction entries based on the base transaction
         baseTransaction.transactionEntries.each {
@@ -2505,8 +2505,8 @@ class InventoryService implements ApplicationContextAware {
     /**
      * @return a unique identifier to be assigned to a transaction
      */
-    String generateTransactionNumber(Transaction transaction) {
-        return transactionIdentifierService.generate(transaction)
+    String generateTransactionNumber() {
+        return identifierService.generateTransactionIdentifier()
     }
 
     List<Transaction> getCreditsBetweenDates(List<Location> fromLocations, List<Location> toLocations, Date fromDate, Date toDate) {
