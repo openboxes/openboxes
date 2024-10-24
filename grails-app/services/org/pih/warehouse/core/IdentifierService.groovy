@@ -160,9 +160,17 @@ abstract class IdentifierService<T extends GormEntity> {
 
         Map values = new HashMap()
         for (Map.Entry entry in context.customProperties) {
-            // Add the "custom." prefix to each custom property. We do this to keep them visually distinct from
-            // non-custom properties (which don't use a prefix). This hopefully helps prevent misconfiguration.
-            values["custom.${entry.key}"] = entry.value
+            // TODO: For now we're passing sequenceNumber in as a custom field, so don't add the "custom." prefix to it
+            //       to make sure that still matches with configured properties. Once we fully integrate sequence number
+            //       into this service (and stop treating it as a custom field), this "if" check can be removed.
+            if (entry.key == Constants.IDENTIFIER_FORMAT_KEYWORD_SEQUENCE_NUMBER) {
+                values[entry.key] = entry.value
+            }
+            else {
+                // Add the "custom." prefix to each custom property. We do this to keep them visually distinct from
+                // non-custom properties (which don't use a prefix). This hopefully helps prevent misconfiguration.
+                values["custom.${entry.key}"] = entry.value
+            }
         }
         return values
     }
@@ -172,7 +180,7 @@ abstract class IdentifierService<T extends GormEntity> {
         return delimiter ? [(Constants.IDENTIFIER_FORMAT_KEYWORD_DELIMITER): delimiter] : Collections.emptyMap()
     }
 
-    private <Clazz> Clazz getIdentifierPropertyWithDefault(String propertyName, Class<Clazz> type=String) {
+    protected <Clazz> Clazz getIdentifierPropertyWithDefault(String propertyName, Class<Clazz> type=String) {
         // If there's a custom property defined for the entity, use that. Ex: 'openboxes.identifier.product.format'
         Clazz property = configService.getProperty("openboxes.identifier.${identifierName}.${propertyName}", type)
 

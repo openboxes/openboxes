@@ -23,9 +23,9 @@ openboxes.identifier.transaction.random.template = "AAA-AAA-AAA"
 
 // Product identifier
 openboxes.identifier.product.random.template = "LLNN"
-
-// Product identifier - For products using the default product type
-openboxes.identifier.product.defaultProductType.format = "\${custom.productTypeCode}\${delimiter}\${custom.sequenceNumber}"
+openboxes.identifier.product.generatorType = IdentifierGeneratorTypeCode.SEQUENCE  // Controls which of the two below to use.
+openboxes.identifier.product.sequence.format = "\${custom.productTypeCode}\${delimiter}\${sequenceNumber}"
+openboxes.identifier.product.random.format = "\${random}"
 
 // Product Supplier identifier
 openboxes.identifier.productSupplier.format = "\${custom.productCode}\${delimiter}\${custom.organizationCode}\${random}"
@@ -38,8 +38,7 @@ openboxes.identifier.organization.minSize = 2
 openboxes.identifier.organization.maxSize = 3
 
 // Purchase Order identifier
-openboxes.identifier.purchaseOrder.generatorType = IdentifierGeneratorTypeCode.SEQUENCE
-openboxes.identifier.purchaseOrder.format = "PO-\${destinationPartyCode}-\${custom.sequenceNumber}"
+openboxes.identifier.purchaseOrder.format = "PO-\${destinationPartyCode}-\${sequenceNumber}"
 openboxes.identifier.purchaseOrder.sequenceNumber.minSize = 6  // Aka six digits
 openboxes.identifier.purchaseOrder.properties = ["destinationPartyCode": "destinationParty.code"]
 

@@ -3,16 +3,12 @@ package org.pih.warehouse.order
 import org.apache.commons.lang.StringUtils
 
 import org.pih.warehouse.core.Constants
-import org.pih.warehouse.core.IdentifierGeneratorTypeCode
 import org.pih.warehouse.core.IdentifierService
 import org.pih.warehouse.core.IdentifierTypeCode
 import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.identification.IdentifierGeneratorContext
 import org.pih.warehouse.shipping.Shipment
 
-// TODO: We should be able to move this sequential logic into the identifier service. That way we can support sequential
-//       id generation more generally. We'd need an abstract method there for fetching the next sequence number to use,
-//       and a new ${sequence} config option to know where to put the sequence.
 class PurchaseOrderIdentifierService extends IdentifierService<Order> {
 
     @Override
@@ -37,29 +33,27 @@ class PurchaseOrderIdentifierService extends IdentifierService<Order> {
 
     @Override
     String generate(Order order, IdentifierGeneratorContext context=null) {
-        IdentifierGeneratorTypeCode identifierGeneratorTypeCode = configService.getProperty(
-                "openboxes.identifier.purchaseOrder.generatorType", IdentifierGeneratorTypeCode)
 
-        switch (identifierGeneratorTypeCode) {
-            case IdentifierGeneratorTypeCode.SEQUENCE:
-                return generateSequential(order)
-            case IdentifierGeneratorTypeCode.RANDOM:
-                return super.generate(order, context)
-        }
-    }
-
-    private String generateSequential(Order order) {
-        Integer sequenceNumber = getNextSequenceNumber(order.destinationParty.id)
-        Integer sequenceNumberMinSize = configService.getProperty("openboxes.identifier.purchaseOrder.sequenceNumber.minSize", Integer)
-        String sequenceNumberStr = StringUtils.leftPad(
-                sequenceNumber.toString(), sequenceNumberMinSize, Constants.DEFAULT_SEQUENCE_NUMBER_FORMAT_CHAR)
+        // TODO: Move this sequential logic into the identifier service to support sequential id generation more
+        //       generally. We'll need an abstract method there for fetching the next sequence number to use.
+        String sequenceNumber = formatHasSequenceNumber(context) ?
+                getNextSequenceNumber(order.destinationParty.id) :
+                null
 
         return super.generate(order, IdentifierGeneratorContext.builder()
-                .customProperties(["sequenceNumber": sequenceNumberStr])
+                .customProperties(["sequenceNumber": sequenceNumber])
                 .build())
     }
 
-    private int getNextSequenceNumber(String partyId) {
+    private boolean formatHasSequenceNumber(IdentifierGeneratorContext context) {
+        String format = context?.formatOverride
+        if (!format) {
+            format = super.getIdentifierPropertyWithDefault('format')
+        }
+        return format.contains(Constants.IDENTIFIER_FORMAT_KEYWORD_SEQUENCE_NUMBER)
+    }
+
+    private String getNextSequenceNumber(String partyId) {
         Organization organization = Organization.get(partyId)
 
         Integer sequenceNumber = Integer.valueOf(
@@ -70,6 +64,10 @@ class PurchaseOrderIdentifierService extends IdentifierService<Order> {
         organization.sequences.put(IdentifierTypeCode.PURCHASE_ORDER_NUMBER.toString(), nextSequenceNumber.toString())
         organization.save()
 
-        return nextSequenceNumber
+        Integer sequenceNumberMinSize = configService.getProperty(
+                "openboxes.identifier.purchaseOrder.sequenceNumber.minSize", Integer)
+
+        return StringUtils.leftPad(
+                nextSequenceNumber.toString(), sequenceNumberMinSize, Constants.DEFAULT_SEQUENCE_NUMBER_FORMAT_CHAR)
     }
 }

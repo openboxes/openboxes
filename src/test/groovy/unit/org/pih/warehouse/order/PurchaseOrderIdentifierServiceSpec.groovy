@@ -7,7 +7,6 @@ import spock.lang.Specification
 import spock.lang.Unroll
 
 import org.pih.warehouse.core.ConfigService
-import org.pih.warehouse.core.IdentifierGeneratorTypeCode
 import org.pih.warehouse.core.IdentifierTypeCode
 import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.identification.RandomCondition
@@ -48,7 +47,6 @@ class PurchaseOrderIdentifierServiceSpec extends Specification implements Servic
         randomIdentifierGeneratorStub.generate("NNNLLL") >> "123ABC"
 
         and:
-        configServiceStub.getProperty('openboxes.identifier.purchaseOrder.generatorType', IdentifierGeneratorTypeCode) >> IdentifierGeneratorTypeCode.RANDOM
         configServiceStub.getProperty('openboxes.identifier.attempts.max', Integer) >> 1
         configServiceStub.getProperty('openboxes.identifier.purchaseOrder.properties', Map) >> null
         configServiceStub.getProperty('openboxes.identifier.purchaseOrder.random.template', String) >> "NNNLLL"
@@ -68,8 +66,7 @@ class PurchaseOrderIdentifierServiceSpec extends Specification implements Servic
 
     void 'generate should succeed for sequential identifiers'() {
         given:
-        configServiceStub.getProperty('openboxes.identifier.purchaseOrder.generatorType', IdentifierGeneratorTypeCode) >> IdentifierGeneratorTypeCode.SEQUENCE
-        configServiceStub.getProperty('openboxes.identifier.purchaseOrder.format', String) >> "PO-\${destinationPartyCode}-\${custom.sequenceNumber}"
+        configServiceStub.getProperty('openboxes.identifier.purchaseOrder.format', String) >> "PO-\${destinationPartyCode}-\${sequenceNumber}"
         configServiceStub.getProperty('openboxes.identifier.purchaseOrder.properties', Map) >> ["destinationPartyCode": "destinationParty.code"]
         configServiceStub.getProperty('openboxes.identifier.purchaseOrder.sequenceNumber.minSize', Integer) >> 6
 
@@ -96,8 +93,7 @@ class PurchaseOrderIdentifierServiceSpec extends Specification implements Servic
 
     void 'generate should succeed for sequential identifiers when we exceed the sequential number minSize'() {
         given:
-        configServiceStub.getProperty('openboxes.identifier.purchaseOrder.generatorType', IdentifierGeneratorTypeCode) >> IdentifierGeneratorTypeCode.SEQUENCE
-        configServiceStub.getProperty('openboxes.identifier.purchaseOrder.format', String) >> "PO-\${destinationPartyCode}-\${custom.sequenceNumber}"
+        configServiceStub.getProperty('openboxes.identifier.purchaseOrder.format', String) >> "PO-\${destinationPartyCode}-\${sequenceNumber}"
         configServiceStub.getProperty('openboxes.identifier.purchaseOrder.properties', Map) >> ["destinationPartyCode": "destinationParty.code"]
 
         and:
