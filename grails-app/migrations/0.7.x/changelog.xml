@@ -17,6 +17,6 @@
     <include file="0.7.x/changelog-2017-10-16-2101-update-requisition-type.xml"/>
     <include file="0.7.x/changelog-2018-03-21-0835-update-product-active.xml"/>
     <include file="0.7.x/changelog-2018-04-19-0020-configure-notification-roles.xml"/>
-
+    <include file="0.7.x/changelog-2024-09-24-0000-07x-final.xml"/>
 
 </databaseChangeLog>
