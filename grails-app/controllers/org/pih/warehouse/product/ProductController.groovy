@@ -180,7 +180,7 @@ class ProductController {
         // when the session is closed.
         if (!productInstance?.id || productInstance.validate()) {
             if (!productInstance.productCode) {
-                productInstance.productCode = productService.generateProductIdentifier(productInstance)
+                productInstance.productCode = productService.generateProductIdentifier(productInstance.productType)
             }
         }
 
@@ -270,7 +270,7 @@ class ProductController {
                 // when the session is closed.
                 if (productInstance.validate()) {
                     if (!productInstance.productCode) {
-                        productInstance.productCode = productService.generateProductIdentifier(productInstance)
+                        productInstance.productCode = productService.generateProductIdentifier(productInstance.productType)
                     }
                 }
 

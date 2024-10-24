@@ -38,6 +38,7 @@ import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.DocumentCode
 import org.pih.warehouse.core.DocumentType
 import org.pih.warehouse.core.EventCode
+import org.pih.warehouse.core.IdentifierService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationService
 import org.pih.warehouse.core.LocationTypeCode
@@ -57,6 +58,7 @@ import org.pih.warehouse.picklist.PicklistImportDataCommand
 import org.pih.warehouse.picklist.PicklistItemCommand
 import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.picklist.PicklistItem
+import org.pih.warehouse.picklist.PicklistService
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductAssociationTypeCode
 import org.pih.warehouse.product.ProductService
@@ -64,7 +66,6 @@ import org.pih.warehouse.receiving.ReceiptItem
 import org.pih.warehouse.requisition.ReplenishmentTypeCode
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionDataService
-import org.pih.warehouse.requisition.RequisitionIdentifierService
 import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.requisition.RequisitionItemSortByCode
 import org.pih.warehouse.requisition.RequisitionItemStatus
@@ -76,7 +77,6 @@ import org.pih.warehouse.requisition.RequisitionStatusTransitionEvent
 import org.pih.warehouse.requisition.RequisitionType
 import org.pih.warehouse.shipping.Container
 import org.pih.warehouse.shipping.Shipment
-import org.pih.warehouse.shipping.ShipmentIdentifierService
 import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.shipping.ShipmentService
 import org.pih.warehouse.shipping.ShipmentStatusCode
@@ -85,13 +85,14 @@ import org.pih.warehouse.shipping.ShipmentWorkflow
 import org.pih.warehouse.PaginatedList
 import org.springframework.web.multipart.MultipartFile
 
+
+
 @Transactional
 class StockMovementService {
 
     AuthService authService
     ProductService productService
-    RequisitionIdentifierService requisitionIdentifierService
-    ShipmentIdentifierService shipmentIdentifierService
+    IdentifierService identifierService
     RequisitionService requisitionService
     ShipmentService shipmentService
     InventoryService inventoryService
@@ -102,6 +103,7 @@ class StockMovementService {
     OutboundStockMovementService outboundStockMovementService
     UserService userService
     RequisitionDataService requisitionDataService
+    PicklistService picklistService
     GrailsApplication grailsApplication
 
     def createStockMovement(StockMovement stockMovement) {
@@ -2209,6 +2211,7 @@ class StockMovementService {
     Shipment createInboundShipment(ShipOrderCommand command) {
         Order order = command.order
         Shipment shipment = new Shipment()
+        shipment.shipmentNumber = identifierService.generateShipmentIdentifier()
         shipment.expectedShippingDate = new Date()
         shipment.name = order.name ?: order.orderNumber
         shipment.description = order.orderNumber
@@ -2216,7 +2219,6 @@ class StockMovementService {
         shipment.destination = order.destination
         shipment.createdBy = order.orderedBy
         shipment.shipmentType = ShipmentType.get(Constants.DEFAULT_SHIPMENT_TYPE_ID)
-        shipment.shipmentNumber = shipmentIdentifierService.generate(shipment)
 
         command.shipOrderItems.each { ShipOrderItemCommand orderItemCommand ->
             if (orderItemCommand.quantityToShip > 0) {
@@ -2250,13 +2252,13 @@ class StockMovementService {
     Shipment createInboundShipment(StockMovement stockMovement) {
 
         Shipment shipment = new Shipment()
+        shipment.shipmentNumber = identifierService.generateShipmentIdentifier()
         shipment.expectedShippingDate = new Date()
         shipment.name = stockMovement.generateName()
         shipment.description = stockMovement.description
         shipment.origin = stockMovement.origin
         shipment.destination = stockMovement.destination
         shipment.shipmentType = ShipmentType.get(Constants.DEFAULT_SHIPMENT_TYPE_ID)
-        shipment.shipmentNumber = shipmentIdentifierService.generate(shipment)
 
         // Save shipment before adding the items to avoid referencing an unsaved transient instance
         shipment.save()
@@ -2305,7 +2307,7 @@ class StockMovementService {
 
         // Generate identifier if one has not been provided
         if (!stockMovement.identifier && !requisition.requestNumber) {
-            requisition.requestNumber = requisitionIdentifierService.generate()
+            requisition.requestNumber = identifierService.generateRequisitionIdentifier()
         }
         requisition.type = stockMovement.requestType
         requisition.sourceType = stockMovement.sourceType

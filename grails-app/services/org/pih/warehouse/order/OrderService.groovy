@@ -22,6 +22,9 @@ import org.pih.warehouse.LocalizationUtil
 import org.pih.warehouse.core.BudgetCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Event
+import org.pih.warehouse.core.IdentifierGeneratorTypeCode
+import org.pih.warehouse.core.IdentifierService
+import org.pih.warehouse.core.IdentifierTypeCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.core.Organization
@@ -60,7 +63,7 @@ class OrderService {
     UserService userService
     DataService dataService
     ShipmentService shipmentService
-    PurchaseOrderIdentifierService purchaseOrderIdentifierService
+    IdentifierService identifierService
     InventoryService inventoryService
     ProductSupplierService productSupplierService
     PersonService personService
@@ -371,6 +374,33 @@ class OrderService {
         return orderCommand
     }
 
+    int getNextSequenceNumber(String partyId) {
+        Organization organization = Organization.get(partyId)
+        Integer sequenceNumber = Integer.valueOf(organization.sequences.get(IdentifierTypeCode.PURCHASE_ORDER_NUMBER.toString())?:0)
+        Integer nextSequenceNumber = sequenceNumber + 1
+        organization.sequences.put(IdentifierTypeCode.PURCHASE_ORDER_NUMBER.toString(), nextSequenceNumber.toString())
+        organization.save()
+        return nextSequenceNumber
+    }
+
+    String generatePurchaseOrderSequenceNumber(Order order) {
+        try {
+            Integer sequenceNumber = getNextSequenceNumber(order.destinationParty.id)
+            String sequenceNumberFormat = Holders.config.openboxes.identifier.purchaseOrder.sequenceNumber.format
+            String sequenceNumberStr = identifierService.generateSequenceNumber(sequenceNumber.toString(), sequenceNumberFormat)
+
+            // Properties to be used to get argument values for the template
+            Map properties = Holders.grailsApplication.config.openboxes.identifier.purchaseOrder.properties
+            Map model = dataService.transformObject(order, properties)
+            model.put("sequenceNumber", sequenceNumberStr)
+            String template = Holders.grailsApplication.config.openboxes.identifier.purchaseOrder.format
+            return identifierService.renderTemplate(template, model)
+        } catch(Exception e) {
+            log.error("Error " + e.message, e)
+            throw e;
+        }
+    }
+
     Order saveOrder(Order order) {
         // update the status of the order before saving
         order.updateStatus()
@@ -378,7 +408,18 @@ class OrderService {
         order.originParty = order?.origin?.organization
 
         if (!order.orderNumber) {
-            order.orderNumber = purchaseOrderIdentifierService.generate(order)
+            IdentifierGeneratorTypeCode identifierGeneratorTypeCode =
+                    Holders.grailsApplication.config.openboxes.identifier.purchaseOrder.generatorType
+
+            if (identifierGeneratorTypeCode == IdentifierGeneratorTypeCode.SEQUENCE) {
+                order.orderNumber = generatePurchaseOrderSequenceNumber(order)
+            }
+            else if (identifierGeneratorTypeCode == IdentifierGeneratorTypeCode.RANDOM) {
+                order.orderNumber = identifierService.generatePurchaseOrderIdentifier()
+            }
+            else {
+                throw new IllegalArgumentException("No identifier generator type associated with " + identifierGeneratorTypeCode)
+            }
         }
 
         if (!order.hasErrors() && order.save(flush: true)) {

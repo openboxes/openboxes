@@ -11,8 +11,6 @@ package org.pih.warehouse.product
 
 import grails.util.Holders
 
-import org.pih.warehouse.core.Constants
-
 class ProductType {
 
     String id
@@ -44,7 +42,7 @@ class ProductType {
 
     static namedQueries = {
         defaultProductType {
-            eq("id", Holders.config.openboxes.productType.default.id)
+            eq("id", Holders.config.openboxes.identifier.defaultProductType.id)
         }
     }
 
@@ -72,7 +70,7 @@ class ProductType {
     }
 
     Boolean hasSequentialFormat() {
-        return productIdentifierFormat?.contains(Constants.DEFAULT_SEQUENCE_NUMBER_FORMAT_CHAR)
+        return productIdentifierFormat?.contains("0")
     }
 
     Integer getNextSequenceNumber() {

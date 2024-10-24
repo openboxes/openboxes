@@ -20,6 +20,7 @@ import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.User
+import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Product
@@ -31,7 +32,6 @@ class RequisitionController {
 
     def dataService
     def requisitionService
-    RequisitionIdentifierService requisitionIdentifierService
     def inventoryService
     def productService
 
@@ -103,7 +103,7 @@ class RequisitionController {
                 requisition.commodityClass = params.commodityClass as CommodityClass
             }
             requisition.name = getName(requisition)
-            requisition.requestNumber = requisitionIdentifierService.generate(requisition)
+            requisition.requestNumber = requisitionService.getIdentifierService().generateRequisitionIdentifier()
             requisition = requisitionService.saveRequisition(requisition)
             if (!requisition.hasErrors()) {
                 redirect(controller: "requisition", action: "edit", id: requisition?.id)

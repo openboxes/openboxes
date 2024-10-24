@@ -113,7 +113,7 @@ class ProductTypeController {
     }
 
     def delete() {
-        if (params.id == Holders.config.openboxes.productType.default.id) {
+        if (params.id == Holders.config.openboxes.identifier.defaultProductType.id) {
             flash.message = "${warehouse.message(code: 'productType.cannotDeleteDefaultProductType.message')}"
             redirect(action: "list", id: params.id)
             return

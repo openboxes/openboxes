@@ -21,6 +21,7 @@ import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderAdjustment
 import org.pih.warehouse.order.OrderItem
+import org.pih.warehouse.order.OrderItemStatusCode
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.shipping.ReferenceNumber
 import org.pih.warehouse.shipping.ReferenceNumberType
@@ -31,7 +32,7 @@ import org.joda.time.LocalDate
 class InvoiceService {
 
     def authService
-    InvoiceIdentifierService invoiceIdentifierService
+    def identifierService
     GrailsApplication grailsApplication
 
     ApplicationTagLib getApplicationTagLib() {
@@ -254,6 +255,7 @@ class InvoiceService {
 
     Invoice createFromOrder(Order order) {
         Invoice invoice = new Invoice()
+        invoice.invoiceNumber = identifierService.generateInvoiceIdentifier()
         invoice.name = order.name
         invoice.description = order.description
         invoice.partyFrom = order.destinationParty
@@ -261,7 +263,6 @@ class InvoiceService {
         invoice.dateInvoiced = LocalDate.now().toDate()
         invoice.currencyUom = UnitOfMeasure.findByCode(order.currencyCode)
         invoice.invoiceType = InvoiceType.findByCode(InvoiceTypeCode.INVOICE)
-        invoice.invoiceNumber = invoiceIdentifierService.generate(invoice)
         return invoice
     }
 

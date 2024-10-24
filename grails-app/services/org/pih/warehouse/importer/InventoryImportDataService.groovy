@@ -133,7 +133,7 @@ class InventoryImportDataService implements ImportDataService {
         def transaction = new Transaction()
         transaction.transactionDate = command.date
         transaction.transactionType = TransactionType.get(Constants.PRODUCT_INVENTORY_TRANSACTION_TYPE_ID)
-        transaction.transactionNumber = inventoryService.generateTransactionNumber(transaction)
+        transaction.transactionNumber = inventoryService.generateTransactionNumber()
         transaction.comment = "Imported from ${command.filename} on ${new Date()}"
         transaction.inventory = command.location.inventory
 

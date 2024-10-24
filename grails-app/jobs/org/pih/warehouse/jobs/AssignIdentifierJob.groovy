@@ -1,11 +1,10 @@
 package org.pih.warehouse.jobs
 
-import org.pih.warehouse.core.identification.BlankIdentifierResolver
 import org.pih.warehouse.product.Product
 
 class AssignIdentifierJob {
 
-    List<BlankIdentifierResolver> blankIdentifierResolvers
+    def identifierService
 
     def sessionRequired = false
 
@@ -21,12 +20,13 @@ class AssignIdentifierJob {
             return
         }
 
-        // TODO: investigate alternatives to wrapping the whole job in a session on a single entity. Can we do
-        //       one session per BlankIdentifierResolver?
         Product.withNewSession {
-            for (BlankIdentifierResolver blankIdentifierResolver : blankIdentifierResolvers) {
-                blankIdentifierResolver.generateForAllUnassignedIdentifiers()
-            }
+            identifierService.assignProductIdentifiers()
+            identifierService.assignShipmentIdentifiers()
+            identifierService.assignReceiptIdentifiers()
+            identifierService.assignOrderIdentifiers()
+            identifierService.assignRequisitionIdentifiers()
+            identifierService.assignTransactionIdentifiers()
         }
     }
 }

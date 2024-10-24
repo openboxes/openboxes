@@ -19,13 +19,13 @@ import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Event
 import org.pih.warehouse.core.EventCode
 import org.pih.warehouse.core.EventType
+import org.pih.warehouse.core.IdentifierService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.ProductAvailabilityService
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionEntry
-import org.pih.warehouse.inventory.TransactionIdentifierService
 import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.outbound.FulfillmentRequest
 import org.pih.warehouse.outbound.ImportPackingListCommand
@@ -34,7 +34,6 @@ import org.pih.warehouse.outbound.ShippingRequest
 import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.requisition.Requisition
-import org.pih.warehouse.requisition.RequisitionIdentifierService
 import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.requisition.RequisitionType
@@ -45,12 +44,13 @@ import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.shipping.ShipmentStatusCode
 import org.pih.warehouse.shipping.ShipmentStatusTransitionEvent
+import util.StringUtil
+
 
 @Transactional
 class FulfillmentService {
 
-    TransactionIdentifierService transactionIdentifierService
-    RequisitionIdentifierService requisitionIdentifierService
+    IdentifierService identifierService
     ProductAvailabilityService productAvailabilityService
 
     /**
@@ -150,6 +150,7 @@ class FulfillmentService {
     Requisition createRequisition(FulfillmentRequest fulfillmentRequest) {
         Requisition requisition = new Requisition(
                 status: RequisitionStatus.CREATED,
+                requestNumber: identifierService.generateRequisitionIdentifier(),
                 type: RequisitionType.IMPORT,
                 description: fulfillmentRequest.description,
                 destination: fulfillmentRequest.destination,
@@ -158,7 +159,6 @@ class FulfillmentService {
                 dateRequested: fulfillmentRequest.dateRequested,
                 name: generateName(fulfillmentRequest.origin, fulfillmentRequest.destination, fulfillmentRequest.dateRequested, null, fulfillmentRequest.description),
         )
-        requisition.requestNumber = requisitionIdentifierService.generate(requisition)
         if (!requisition.validate()) {
             throw new ValidationException("Invalid requisition", requisition.errors)
         }
@@ -352,10 +352,10 @@ class FulfillmentService {
                 inventory: shipment?.origin?.inventory,
                 transactionDate: shipment.actualShippingDate,
                 requisition: shipment.requisition,
+                transactionNumber: identifierService.generateTransactionIdentifier(),
                 outgoingShipment: shipment,
                 transactionType: debitTransactionType,
         )
-        debitTransaction.transactionNumber = transactionIdentifierService.generate(debitTransaction)
         if (!debitTransaction.validate()) {
             throw new ValidationException("Invalid transaction", debitTransaction.errors)
         }
