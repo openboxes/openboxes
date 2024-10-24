@@ -30,9 +30,4 @@ class RequisitionIdentifierService extends IdentifierService<Requisition> implem
     void setIdentifierOnEntity(String id, Requisition entity) {
         entity.requestNumber = id
     }
-
-    @Override
-    String generate(Requisition entity) {
-        return generate(entity, null)
-    }
 }

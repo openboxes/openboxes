@@ -24,9 +24,4 @@ class TransactionIdentifierService extends IdentifierService<Transaction> implem
     void setIdentifierOnEntity(String id, Transaction entity) {
         entity.transactionNumber = id
     }
-
-    @Override
-    String generate(Transaction entity) {
-        return generate(entity, null)
-    }
 }

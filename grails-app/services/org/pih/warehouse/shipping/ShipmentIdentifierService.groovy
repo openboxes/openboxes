@@ -4,7 +4,7 @@ import org.pih.warehouse.core.IdentifierService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.identification.BlankIdentifierResolver
 
-class ShipmentIdentifierService extends IdentifierService implements BlankIdentifierResolver<Shipment> {
+class ShipmentIdentifierService extends IdentifierService<Shipment> implements BlankIdentifierResolver<Shipment> {
 
     @Override
     String getIdentifierName() {
@@ -34,10 +34,5 @@ class ShipmentIdentifierService extends IdentifierService implements BlankIdenti
     @Override
     void setIdentifierOnEntity(String id, Shipment entity) {
         entity.shipmentNumber = id
-    }
-
-    @Override
-    String generate(Shipment entity) {
-        return generate(entity, null)
     }
 }

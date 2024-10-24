@@ -24,9 +24,4 @@ class ReceiptIdentifierService extends IdentifierService<Receipt> implements Bla
     void setIdentifierOnEntity(String id, Receipt receipt) {
         receipt.receiptNumber = id
     }
-
-    @Override
-    String generate(Receipt entity) {
-        return generate(entity, null)
-    }
 }

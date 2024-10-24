@@ -2303,10 +2303,6 @@ class StockMovementService {
             requisition.status = RequisitionStatus.CREATED
         }
 
-        // Generate identifier if one has not been provided
-        if (!stockMovement.identifier && !requisition.requestNumber) {
-            requisition.requestNumber = requisitionIdentifierService.generate()
-        }
         requisition.type = stockMovement.requestType
         requisition.sourceType = stockMovement.sourceType
         requisition.requisitionTemplate = stockMovement.stocklist
@@ -2318,6 +2314,11 @@ class StockMovementService {
         requisition.name = stockMovement.generateName()
         requisition.requisitionItems = []
         requisition.approvers = stockMovement.approvers
+
+        // Generate identifier if one has not been provided
+        if (!stockMovement.identifier && !requisition.requestNumber) {
+            requisition.requestNumber = requisitionIdentifierService.generate(requisition)
+        }
 
         stockMovement.lineItems.each { stockMovementItem ->
             RequisitionItem requisitionItem = RequisitionItem.createFromStockMovementItem(stockMovementItem)

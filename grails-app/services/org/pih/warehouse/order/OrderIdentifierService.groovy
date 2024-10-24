@@ -35,9 +35,4 @@ class OrderIdentifierService extends IdentifierService<Order> implements BlankId
     void setIdentifierOnEntity(String id, Order entity) {
         entity.orderNumber = id
     }
-
-    @Override
-    String generate(Order entity) {
-        return generate(entity, null)
-    }
 }

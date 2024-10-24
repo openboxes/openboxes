@@ -55,7 +55,9 @@ class ReplenishmentApiController {
 
         Replenishment replenishment = new Replenishment()
 
-        bindReplenishmentData(replenishment, currentUser, currentLocation, jsonObject)
+        // We don't have the order yet so can't use it when generating the stockTransferNumber
+        bindReplenishmentData(replenishment, null, currentUser, currentLocation, jsonObject)
+
         Order order = replenishmentService.createOrUpdateOrderFromReplenishment(replenishment)
 
         picklistService.createPicklist(order)
@@ -109,7 +111,7 @@ class ReplenishmentApiController {
 
         if (!replenishment.replenishmentNumber) {
             String prefix = grailsApplication.config.openboxes.stockTransfer.binReplenishment.prefix
-            replenishment.replenishmentNumber = + orderIdentifierService.generate(order,
+            replenishment.replenishmentNumber = orderIdentifierService.generate(order,
                     IdentifierGeneratorContext.builder()
                             .prefix(prefix)
                             .build())

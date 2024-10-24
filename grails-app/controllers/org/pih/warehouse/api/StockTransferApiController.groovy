@@ -74,7 +74,8 @@ class StockTransferApiController {
 
         StockTransfer stockTransfer = new StockTransfer()
 
-        bindStockTransferData(stockTransfer, currentUser, currentLocation, jsonObject)
+        // We don't have the order yet so can't use it when generating the stockTransferNumber
+        bindStockTransferData(stockTransfer, null, currentUser, currentLocation, jsonObject)
 
         Order order = stockTransferService.createOrUpdateOrderFromStockTransfer(stockTransfer)
 
