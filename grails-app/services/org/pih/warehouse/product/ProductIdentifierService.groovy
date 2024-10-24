@@ -37,9 +37,10 @@ class ProductIdentifierService extends IdentifierService<Product> implements Bla
     /**
      * Generates a product identifier. The identifier will take the following format:
      *   1. If the product type has a productIdentifierFormat defined, use that.
-     *   2. Else if the product is of the default type, uses "openboxes.identifier.product.defaultProductType.format"
-     *   3. Else the value in "openboxes.identifier.product.format" if defined
-     *   4. Else the value in "openboxes.identifier.default.format"
+     *   2. Else if openboxes.identifier.product.generatorType == IdentifierGeneratorTypeCode.SEQUENCE,
+     *      use the value in openboxes.identifier.product.sequence.format
+     *   3. Else if openboxes.identifier.product.generatorType == IdentifierGeneratorTypeCode.RANDOM,
+     *      use the value in openboxes.identifier.product.random.format
      */
     @Override
     String generate(Product product, IdentifierGeneratorContext params=null) {
@@ -110,7 +111,8 @@ class ProductIdentifierService extends IdentifierService<Product> implements Bla
 
         // TODO: This is for backwards compatability. We used to use the format property to specify the random template,
         //       so if there's a format specified, use that as the random. Once we update our environments to use
-        //       ".random.template" instead of ".format", this line can be removed.
+        //       ".random.template" instead of ".format", this line can be removed, as well as the
+        //       "openboxes.identifier.product.generatorType" property and all the logic around it.
         String randomTemplate = configService.getProperty("openboxes.identifier.product.format")
 
         // Because we're using a format that is conditional on the type, we need to  override it in order to fit
