@@ -13,6 +13,7 @@ import grails.gorm.transactions.Transactional
 import grails.util.Holders
 import grails.validation.ValidationException
 import org.apache.commons.lang3.StringUtils
+import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Constants
@@ -332,7 +333,7 @@ class FulfillmentService {
         Event shippedEvent = new Event(
                 createdBy: AuthService.currentUser,
                 eventType: eventType,
-                eventDate: new Date(),
+                eventDate: shipment.expectedShippingDate,
                 eventLocation: AuthService.currentLocation,
         )
         if (!shippedEvent.validate()) {
@@ -377,5 +378,70 @@ class FulfillmentService {
         shipment.addToOutgoingTransactions(debitTransaction)
 
         return debitTransaction
+    }
+
+    String bindOrInferLotNumber(ImportPackingListItem obj, Map source) {
+        String lotNumber = source['lotNumber']
+        String productCode = source['product']
+        String binLocationName = source['binLocation']
+
+        // If lot number is provided then just return this value and bind it
+        // Otherwise try to infer the lot number
+        if (lotNumber) {
+            return lotNumber
+        }
+
+        // If bin location is not provided then first check if inventory with default lot number is available
+        if (!binLocationName) {
+            AvailableItem itemWithDefaultLot = productAvailabilityService
+                    .getAvailableItemWithDefaultLots(obj.origin, productCode)
+            // only infer if there is one possible value
+            if (itemWithDefaultLot) {
+                return itemWithDefaultLot?.inventoryItem?.lotNumber
+            }
+        }
+
+        // otherwise try to infer lotNumber based on provided binLocation
+        AvailableItem availableItem = productAvailabilityService
+                .getAvailableItemByBinLocation(obj.origin, productCode, binLocationName)
+
+        return availableItem?.inventoryItem?.lotNumber
+    }
+
+    Location bindOrInferBinLocation(ImportPackingListItem obj, Map source) {
+        String lotNumber = source['lotNumber']
+        String productCode = source['product']
+        String binLocationName = source['binLocation']
+
+        // if binLocation is provided then look for one available in stock
+        if (binLocationName) {
+            Location binLocation = productAvailabilityService
+                    .getAvailableBinLocationByName(obj.origin, productCode, binLocationName)
+
+            if (binLocation) {
+                return binLocation
+            }
+
+            obj.binLocationFound = false
+            // return a dummy location object to add more context in a response of which location was not found
+            return new Location(name: binLocationName)
+        }
+
+        if (!lotNumber) {
+            // if bin location is not provided and lot number is not provided
+            // then check if we have default lot
+            AvailableItem itemsWithDefaultLot = productAvailabilityService
+                    .getAvailableItemWithDefaultLots(obj.origin, productCode)
+            // only infer if there is one possible value
+            if (itemsWithDefaultLot) {
+                return itemsWithDefaultLot?.binLocation
+            }
+        }
+
+        // otherwise try to infer based on existing lot
+        AvailableItem availableItem = productAvailabilityService
+                .getAvailableItemByLotNumber(obj.origin, productCode, lotNumber)
+
+        return availableItem?.binLocation
     }
 }

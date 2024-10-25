@@ -36,7 +36,7 @@
                         <td>${invoiceItem?.invoice?.status}</td>
                         <td>${invoiceItem?.quantity}</td>
                         <td>${invoiceItem?.unitOfMeasure}</td>
-                        <td>${invoiceItem?.unitPrice}</td>
+                        <td><g:formatNumber number="${invoiceItem?.unitPrice}"/></td>
                         <td><g:formatNumber number="${invoiceItem?.amount}"/></td>
                     </tr>
                 </g:each>

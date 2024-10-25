@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="anadolny" id="041020241610-0">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <columnExists tableName="invoice_item" columnName="amount"/>
+                <not>
+                    <sqlCheck expectedResult="0">
+                        SELECT COUNT(item.id) FROM invoice_item item
+                        WHERE item.amount IS NULL
+                    </sqlCheck>
+                </not>
+            </and>
+        </preConditions>
+
+        <sql>
+        <!-- We must migrate invoice items for non-prepayment workflow to set -->
+        <!-- their amount as unit_price * quantity. All prepayment invoices -->
+        <!-- have been migrated, so we need to unify those behaviors. -->
+            UPDATE invoice_item AS item
+            JOIN (
+                SELECT id, quantity * IFNULL(unit_price, 0) AS calculated_amount
+                FROM invoice_item
+            ) AS invoice_item_amount ON invoice_item_amount.id = item.id
+            SET item.amount = invoice_item_amount.calculated_amount
+            WHERE item.amount IS NULL;
+        </sql>
+    </changeSet>
+</databaseChangeLog>

@@ -67,8 +67,6 @@ const useOutboundImportForm = ({ next }) => {
         values.trackingNumber = sendingOptions?.trackingNumber;
         values.comments = sendingOptions?.comments;
         values.expectedDeliveryDate = sendingOptions?.expectedDeliveryDate;
-      } else {
-        clearCachedData();
       }
     }
 
@@ -258,17 +256,38 @@ const useOutboundImportForm = ({ next }) => {
     }
   };
 
-  const loadCachedData = async () => {
+  const loadCachedData = async (origin) => {
     if (!_.isEmpty(cachedData)) {
+      // We need to update the origin after changing a location,
+      // so that the potential cached data doesn't contain stale data (origin)
+      const updatedCachedData = {
+        ...cachedData,
+        fulfillmentDetails: {
+          ...cachedData.fulfillmentDetails,
+          origin: origin?.id,
+        },
+        packingList: cachedData.packingList.map((item) => ({
+          ...item,
+          origin: origin?.id,
+        })),
+      };
       spinner.show();
-      setPackingListData(cachedData.packingList);
-      await validateOutboundData(cachedData);
+      setPackingListData(updatedCachedData.packingList);
+      await validateOutboundData(updatedCachedData);
       spinner.hide();
     }
   };
 
+  const handleLoadCachedData = (origin) => {
+    if (OutboundImportStep.CONFIRM === queryParams?.step) {
+      loadCachedData(origin);
+      return;
+    }
+    clearCachedData();
+  };
+
   useEffect(() => {
-    loadCachedData();
+    handleLoadCachedData(currentLocation);
 
     if (currentLocation) {
       setValue('origin', {

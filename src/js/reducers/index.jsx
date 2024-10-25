@@ -10,6 +10,7 @@ import infoBarVisibilityReducer from 'reducers/infoBarVisibilityReducer';
 import invoiceReducer from 'reducers/invoiceReducer';
 import locationReducer from 'reducers/locationReducer';
 import organizationsReducer from 'reducers/organizationsReducer';
+import outboundImportReducer from 'reducers/outboundImportReducer';
 import productSupplierReducer from 'reducers/productSupplierReducer';
 import purchaseOrderReducer from 'reducers/purchaseOrderReducer';
 import reasonCodesReducer from 'reducers/reasonCodesReducer';
@@ -22,7 +23,6 @@ import stockMovementDraftReducer from 'reducers/stockMovementDraftReducer';
 import stockTransferReducer from 'reducers/stockTransferReducer';
 import unitOfMeasureReducer from 'reducers/unitOfMeasureReducer';
 import usersReducer from 'reducers/usersReducer';
-
 
 const rootReducer = combineReducers({
   localize: localizeReducer,
@@ -47,6 +47,7 @@ const rootReducer = combineReducers({
   infoBarVisibility: infoBarVisibilityReducer,
   productSupplier: productSupplierReducer,
   unitOfMeasure: unitOfMeasureReducer,
+  outboundImport: outboundImportReducer,
 });
 
 export default rootReducer;

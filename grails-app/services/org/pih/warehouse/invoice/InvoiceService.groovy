@@ -232,6 +232,7 @@ class InvoiceService {
                     }
                     invoiceItem = createFromInvoiceItemCandidate(candidateItem)
                     invoiceItem.quantity = item.quantityToInvoice
+                    invoiceItem.amount = invoiceItem.unitPrice != null ? item.quantityToInvoice * invoiceItem.unitPrice : null
                     invoice.addToInvoiceItems(invoiceItem)
                 }
             }
@@ -265,36 +266,6 @@ class InvoiceService {
         return invoice
     }
 
-    def refreshInvoiceItems(Invoice invoice) {
-        invoice.invoiceItems?.each { item ->
-            if (item.orderAdjustment) {
-                OrderAdjustment orderAdjustment = item.orderAdjustment
-
-                item.budgetCode = orderAdjustment.budgetCode
-                item.quantityUom = orderAdjustment.orderItem?.quantityUom
-                item.quantityPerUom = orderAdjustment.orderItem?.quantityPerUom ?: 1
-                item.unitPrice = orderAdjustment.totalAdjustments
-            } else if (item.shipmentItem) {
-                ShipmentItem shipmentItem = item.shipmentItem
-                OrderItem orderItem = shipmentItem.orderItems?.find { it }
-
-                item.quantity = shipmentItem.quantity ? shipmentItem.quantity/orderItem.quantityPerUom : 0
-                item.budgetCode = orderItem?.budgetCode
-                item.quantityUom = orderItem?.quantityUom
-                item.quantityPerUom = orderItem?.quantityPerUom ?: 1
-                item.unitPrice = orderItem?.unitPrice
-            } else {
-                OrderItem orderItem = item.orderItem
-
-                item.quantity = orderItem.quantity
-                item.budgetCode = orderItem.budgetCode
-                item.quantityUom = orderItem.quantityUom
-                item.quantityPerUom = orderItem.quantityPerUom ?: 1
-                item.unitPrice = orderItem.unitPrice
-            }
-        }
-    }
-
     InvoiceItem createFromInvoiceItemCandidate(InvoiceItemCandidate candidate) {
         InvoiceItem invoiceItem = new InvoiceItem(
             budgetCode: candidate.budgetCode,
@@ -303,7 +274,7 @@ class InvoiceService {
             quantity: candidate.quantity,
             quantityUom: candidate.quantityUom,
             quantityPerUom: candidate.quantityPerUom ?: 1,
-            unitPrice: candidate.candidateUnitPrice
+            unitPrice: candidate.candidateUnitPrice,
         )
 
         ShipmentItem shipmentItem = ShipmentItem.get(candidate.id)
@@ -332,6 +303,9 @@ class InvoiceService {
     def deleteInvoice(Invoice invoice) {
         if (!invoice) {
             throw new IllegalArgumentException("Missing invoice to delete")
+        }
+        if (invoice.isPrepaymentInvoice && invoice.hasRegularInvoice) {
+            throw new IllegalArgumentException("Prepayment invoice has associated final invoice")
         }
         invoice.invoiceItems?.each { InvoiceItem invoiceItem ->
             deleteInvoiceItem(invoiceItem)
@@ -415,9 +389,20 @@ class InvoiceService {
                     invoiceItem?.quantity,
                     invoiceItem?.quantityPerUom,
                     invoiceItem?.unitPrice ?: 0,
-                    invoiceItem?.totalAmount ?: 0,
+                    invoiceItem?.amount ?: 0,
             )
         }
         return csv
+    }
+
+    def rollbackInvoice(Invoice invoice) {
+        if (invoice.isPrepaymentInvoice && invoice.hasRegularInvoice) {
+            throw new IllegalArgumentException("Prepayment invoice has associated final invoice")
+        }
+
+        invoice.datePosted = null
+        invoice.disableRefresh = invoice.isPrepaymentInvoice
+
+        invoice.save()
     }
 }

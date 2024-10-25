@@ -23,7 +23,6 @@ import org.hibernate.criterion.Projections
 import org.hibernate.criterion.Restrictions
 import org.hibernate.criterion.Subqueries
 import org.hibernate.SQLQuery
-import org.hibernate.sql.JoinType
 import org.hibernate.type.StandardBasicTypes
 import org.pih.warehouse.PaginatedList
 import org.pih.warehouse.api.AllocatedItem
@@ -741,6 +740,68 @@ class ProductAvailabilityService {
         List<AvailableItem> availableBinLocations = getAvailableItems(location, products)
 
         return availableBinLocations
+    }
+
+    AvailableItem getAvailableItemWithDefaultLots(Location origin, String productCode) {
+        Product product = Product.findByProductCode(productCode)
+        List<AvailableItem> availableItems = getAvailableBinLocations(origin, product?.id)
+
+        List<AvailableItem> itemsWithDefaultLot = availableItems.findAll {
+            !it?.inventoryItem?.lotNumber // Null or empty lot number
+        }
+        // only infer if there is one possible value
+        if (itemsWithDefaultLot.size() == 1) {
+            return itemsWithDefaultLot.first()
+        }
+        return null
+    }
+
+    AvailableItem getAvailableItemByBinLocation(Location origin, String productCode, String binLocationName) {
+        Product product = Product.findByProductCode(productCode)
+        List<AvailableItem> availableItems = getAvailableBinLocations(origin, product?.id)
+
+        // this also includes looking for default binLocation which is represented as a null value
+        List<AvailableItem> availableItemsByBinLocation = availableItems.findAll {
+            it?.binLocation?.name == binLocationName
+        }
+
+        // only infer if there is one possible value
+        if (availableItemsByBinLocation.size() == 1) {
+            return availableItemsByBinLocation.first()
+        }
+
+        return null
+    }
+
+    AvailableItem getAvailableItemByLotNumber(Location origin, String productCode, String lotNumber) {
+        Product product = Product.findByProductCode(productCode)
+        List<AvailableItem> availableItems = getAvailableBinLocations(origin, product?.id)
+
+        // if bin location is not provided and lot is provided
+        // then look for it in available stock
+        List<AvailableItem> availableItemsWithProvidedLotNumber = availableItems.findAll {
+            it?.inventoryItem?.lotNumber == lotNumber
+        }
+        if (availableItemsWithProvidedLotNumber.size() == 1) {
+            return availableItemsWithProvidedLotNumber.first()
+        }
+
+        return null
+    }
+
+    Location getAvailableBinLocationByName(Location origin, String productCode, String binLocationName) {
+        Product product = Product.findByProductCode(productCode)
+        List<AvailableItem> availableItems = getAvailableBinLocations(origin, product?.id)
+
+        AvailableItem availableItemByBinLocation = availableItems.find {
+            it?.binLocation?.name == binLocationName
+        }
+
+        if (availableItemByBinLocation) {
+            return availableItemByBinLocation?.binLocation
+        }
+
+        return null
     }
 
     /**

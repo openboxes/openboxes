@@ -28,5 +28,6 @@ CREATE OR REPLACE VIEW invoice_list AS (
     LEFT JOIN reference_number ON invoice_reference_number.reference_number_id = reference_number.id AND reference_number.reference_number_type_id = 'VENDOR_INVOICE_NUMBER'
     LEFT JOIN party ON invoice.party_id = party.id
     LEFT JOIN invoice_type ON invoice.invoice_type_id = invoice_type.id
+    WHERE invoice_item.inverse IS FALSE
     GROUP BY invoice.id, reference_number.id
 )

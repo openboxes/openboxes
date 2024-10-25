@@ -55,7 +55,7 @@
                         ${orderAdjustment?.budgetCode?.code}
                     </td>
                     <td>
-                        ${orderAdjustment?.isInvoiced ? g.message(code:'default.yes.label') : g.message(code:'default.no.label')}
+                        <format:metadata obj="${orderAdjustment.derivedPaymentStatus}"/>
                     </td>
                     </g:if>
                     <g:else>

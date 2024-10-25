@@ -15,6 +15,9 @@
             <g:if test="${flash.message}">
 	            <div class="message" role="status" aria-label="message">${flash.message}</div>
             </g:if>
+            <g:if test="${flash.error}">
+                <div class="errors p-1">${flash.error}</div>
+            </g:if>
             <div class="dialog">
                 <g:render template="summary" model="[invoiceInstance:invoiceInstance]"/>
                 <div class="yui-gf">

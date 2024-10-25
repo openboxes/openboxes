@@ -10,6 +10,7 @@ import OutboundImportDropzone
   from 'components/stock-movement-wizard/outboundImport/subsections/OutboundImportDropzone';
 import OutboundImportSendingOptions
   from 'components/stock-movement-wizard/outboundImport/subsections/OutboundImportSendingOptions';
+import useScrollToBottom from 'hooks/outboundImport/useScrollToBottom';
 import { FormErrorPropType } from 'utils/propTypes';
 
 const OutboundImportDetails = ({
@@ -17,26 +18,30 @@ const OutboundImportDetails = ({
   errors,
   isValid,
   trigger,
-}) => (
-  <Section
-    title={{
-      label: 'react.outboundImport.form.details.label',
-      defaultMessage: 'Details',
-    }}
-  >
-    <OutboundImportBasicDetails control={control} errors={errors} />
-    <OutboundImportSendingOptions control={control} errors={errors} trigger={trigger} />
-    <OutboundImportDropzone control={control} errors={errors} />
-    <Button
-      label="react.outboundImport.form.next.label"
-      defaultLabel="Next"
-      variant="primary"
-      type="submit"
-      className="fit-content align-self-end"
-      disabled={!isValid}
-    />
-  </Section>
-);
+}) => {
+  const { nextButtonRef } = useScrollToBottom();
+  return (
+    <Section
+      title={{
+        label: 'react.outboundImport.form.details.label',
+        defaultMessage: 'Details',
+      }}
+    >
+      <OutboundImportBasicDetails control={control} errors={errors} />
+      <OutboundImportSendingOptions control={control} errors={errors} trigger={trigger} />
+      <OutboundImportDropzone control={control} errors={errors} />
+      <Button
+        label="react.outboundImport.form.next.label"
+        defaultLabel="Next"
+        variant="primary"
+        type="submit"
+        className="fit-content align-self-end"
+        disabled={!isValid}
+        customRef={nextButtonRef}
+      />
+    </Section>
+  );
+};
 
 export default OutboundImportDetails;
 
