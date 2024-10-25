@@ -128,7 +128,7 @@ class EditLineModal extends Component {
      * as after mapping, the result would look like
      * [[<shipmentItem>, <shipmentItem>], [<shipmentItem>, <shipmentItem>]]
      */
-    const shipmentItems = containers.map((container) => container.shipmentItems).flat();
+    const shipmentItems = containers.flatMap((container) => container.shipmentItems);
     // Return the results as map of { [shipmentItemId]: [<shipmentItem>, <shipmentItem>] }
     return _.groupBy(shipmentItems, 'shipmentItemId');
   }
