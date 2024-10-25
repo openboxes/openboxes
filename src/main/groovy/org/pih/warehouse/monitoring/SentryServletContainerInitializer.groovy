@@ -9,13 +9,16 @@ import javax.servlet.ServletContext
 import javax.servlet.ServletException
 
 /**
- * Configures Sentry for Servlets. This gives us info from Tomcat such user-agent and url.
+ * Configures Sentry for Servlets.
  *
- * This flow is only executed when deploying Grails via WAR file to an external Servlet (ie not when running with
- * "grails run-app"), and so should only contain Servlet specific configuration. Regular Sentry configuration is
- * defined in the sentry.properties file.
+ * Enabled by the "io.sentry:sentry-servlet" dependency, which also magically gives us info from the Tomcat Servlet,
+ * such user-agent and url.
  *
- * https://docs.sentry.io/platforms/java/guides/servlet/#configure
+ * This flow is only executed when deploying the app to an external Servlet (ie not when running locally against an
+ * embedded Tomcat). As such this class should only contain Servlet specific configuration. Regular Sentry
+ * configuration is defined in the sentry.properties file.
+ *
+ * https://docs.sentry.io/platforms/java/guides/servlet/
  */
 final class SentryServletContainerInitializer implements ServletContainerInitializer {
 
@@ -29,7 +32,9 @@ final class SentryServletContainerInitializer implements ServletContainerInitial
                 // We set the git commit of the release as the Sentry release tag to be able to group
                 // Sentry errors by release. This technically doesn't need to be configured here, but
                 // it's the easiest place to do it with the current configuration options.
-                options.release = fetchGitCommit()
+                // TODO: investigate if this is even necessary. We already have the gradle-git-properties plugin,
+                //       so maybe this is happening automatically. If so, we can remove this class entirely.
+//                options.release = fetchGitCommit()
             }
         } catch (Exception e) {
             log.warn('Unable to initialize sentry-servlet', e)

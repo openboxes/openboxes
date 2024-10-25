@@ -64,7 +64,8 @@ plugins {
     // find outdated dependencies with `grails gradle dependencyUpdates`
     id 'com.github.ben-manes.versions' version '0.27.0'
 
-    // git magic, but releases past v2.3.0 require Gradle 5.1+
+    // Generates a "git.properties" file that provides info on the current git commit. Used by SpringBoot Actuator's
+    // "info" endpoint and by Sentry to tag issues with a release. Version 2.3.0+ requires Gradle 5.1+
     id 'com.gorylenko.gradle-git-properties' version '2.2.4'
 
     // enable `npmInstall` and `npm_run_*` targets, and the `node` block below

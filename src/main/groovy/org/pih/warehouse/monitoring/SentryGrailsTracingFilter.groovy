@@ -52,23 +52,16 @@ class SentryGrailsTracingFilter extends OncePerRequestFilter {
             return
         }
 
-        // The request doesn't have the attributes that we need yet so all we can do at this point is start the
-        // transaction, which we do to ensure that all other filters are captured by the trace.
+        // Start the transaction before applying all other filters so that they're all captured by the trace.
         final ITransaction transaction = startTransaction(httpRequest)
         try {
-            // Run all other filters first.
             filterChain.doFilter(httpRequest, httpResponse)
         } catch (Throwable e) {
-            // Properly set the status for any other exceptions thrown during the filter process.
+            // Capture any internal errors thrown during the request process.
             transaction.status = SpanStatus.INTERNAL_ERROR
             throw e
         } finally {
-            // Now that all other filters have ran, we know we have the request attributes that we need.
-            transaction.name = httpRequest.requestURI
-            transaction.operation = TRANSACTION_OP
-            if (transaction.status == null) {
-                transaction.status = SpanStatus.fromHttpStatusCode(httpResponse.status)
-            }
+            transaction.status ?: SpanStatus.fromHttpStatusCode(httpResponse.status)
             transaction.finish()
         }
     }
@@ -80,8 +73,9 @@ class SentryGrailsTracingFilter extends OncePerRequestFilter {
         final CustomSamplingContext customSamplingContext = new CustomSamplingContext()
         customSamplingContext.set("request", httpRequest)
 
-        // This header will be provided if the frontend/client is also running sentry tracing. Using this header
-        // enables distributed tracing (ie connecting frontend and backend traces together).
+        // If the Sentry trace and baggage headers are set on the request, it means the frontend is also running
+        // Sentry tracing. We want to connect frontend and backend traces together (ie distributed tracing) so instead
+        // of starting a new trace, we continue the existing one by attaching the backend transaction to it.
         // https://docs.sentry.io/platforms/java/guides/spring-boot/tracing/trace-propagation/
         final String sentryTraceHeader = httpRequest.getHeader(SentryTraceHeader.SENTRY_TRACE_HEADER)
         if (sentryTraceHeader != null) {
@@ -99,7 +93,7 @@ class SentryGrailsTracingFilter extends OncePerRequestFilter {
             }
         }
 
-        // Otherwise this is the entrypoint for the trace.
+        // Otherwise this is the entrypoint for the trace so no need to connect to anything.
         return hub.startTransaction(name, TRANSACTION_OP, customSamplingContext, true)
     }
 }
