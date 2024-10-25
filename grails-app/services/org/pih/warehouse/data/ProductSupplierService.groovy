@@ -45,7 +45,7 @@ class ProductSupplierService {
 
     public static final PREFERENCE_TYPE_MULTIPLE = "MULTIPLE"
 
-    def identifierService
+    ProductSupplierIdentifierService productSupplierIdentifierService
     def dataSource
     ProductSupplierDataService productSupplierGormService
 
@@ -334,8 +334,10 @@ class ProductSupplierService {
     }
 
     void assignSourceCode(ProductSupplier productSupplier, Organization organization) {
-        String prefix = productSupplier?.product?.productCode
-        productSupplier.code = identifierService.generateProductSupplierIdentifier(prefix, organization?.code)
+        productSupplier.code = productSupplierIdentifierService.generate(
+                productSupplier,
+                productSupplier?.product?.productCode,
+                organization?.code)
     }
 
     def getOrCreateNew(Map params, boolean forceCreate) {
@@ -398,7 +400,10 @@ class ProductSupplierService {
         Organization organization = Organization.get(params.supplier.id)
         Organization manufacturer = Organization.get(params.manufacturer)
         ProductSupplier productSupplier = new ProductSupplier()
-        productSupplier.code = params.sourceCode ?: identifierService.generateProductSupplierIdentifier(product?.productCode, organization?.code)
+        productSupplier.code = params.sourceCode ?: productSupplierIdentifierService.generate(
+                productSupplier,
+                product?.productCode,
+                organization?.code)
         productSupplier.name = params.sourceName ?: product?.name
         productSupplier.supplier = organization
         productSupplier.supplierCode = params.supplierCode
@@ -419,8 +424,10 @@ class ProductSupplierService {
     ProductSupplier saveProductSupplier(ProductSupplierDetailsCommand command) {
         ProductSupplier productSupplier = new ProductSupplier(command.properties)
         if (!productSupplier.code) {
-            productSupplier.code =
-                identifierService.generateProductSupplierIdentifier(command?.product?.productCode, command?.supplier?.code)
+            productSupplier.code = productSupplierIdentifierService.generate(
+                    productSupplier,
+                    command?.product?.productCode,
+                    command?.supplier?.code)
         }
         return productSupplierGormService.save(productSupplier)
     }
@@ -432,8 +439,10 @@ class ProductSupplierService {
         }
         productSupplier.properties = command.properties
         if (!productSupplier.code) {
-            productSupplier.code =
-                identifierService.generateProductSupplierIdentifier(command?.product?.productCode, command?.supplier?.code)
+            productSupplier.code = productSupplierIdentifierService.generate(
+                    productSupplier,
+                    command?.product?.productCode,
+                    command?.supplier?.code)
         }
         return productSupplier
     }
