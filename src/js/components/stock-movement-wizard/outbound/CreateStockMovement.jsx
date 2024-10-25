@@ -10,13 +10,25 @@ import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 
-import { hideSpinner, showSpinner } from 'actions';
+import {
+  closeInfoBar,
+  createInfoBar,
+  hideInfoBar,
+  hideSpinner,
+  showInfoBar,
+  showSpinner,
+} from 'actions';
 import DateField from 'components/form-elements/DateField';
 import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
 import AddDestinationModal from 'components/stock-movement-wizard/modals/AddDestinationModal';
 import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
+import { InfoBar, InfoBarConfigs } from 'consts/infoBar';
 import apiClient from 'utils/apiClient';
+import {
+  shouldCreateFullOutboundImportFeatureBar,
+  shouldShowFullOutboundImportFeatureBar,
+} from 'utils/featureBarUtils';
 import { renderFormField } from 'utils/form-utils';
 import { debounceLocationsFetch, debouncePeopleFetch } from 'utils/option-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
@@ -210,6 +222,16 @@ class CreateStockMovement extends Component {
       this.fetchStockLists(this.state.values.origin, this.state.values.destination);
     }
     this.fetchRequisitionTypes();
+
+    const { bars } = this.props;
+    // If the feature bar has not yet been triggered, try to add it to the redux store
+    if (shouldCreateFullOutboundImportFeatureBar(bars)) {
+      this.props.createInfoBar(InfoBarConfigs[InfoBar.FULL_OUTBOUND_IMPORT]);
+    }
+    // If the feature bar has not yet been closed by the user, show it
+    if (shouldShowFullOutboundImportFeatureBar(bars)) {
+      this.props.showInfoBar(InfoBar.FULL_OUTBOUND_IMPORT);
+    }
   }
 
   componentWillReceiveProps(nextProps) {
@@ -217,6 +239,12 @@ class CreateStockMovement extends Component {
       && nextProps.location.id) {
       this.setInitialValues(nextProps.location);
     }
+  }
+
+  componentWillUnmount() {
+    // We want to hide the feature bar when unmounting the component
+    // not to show it on any other page
+    this.props.hideInfoBar(InfoBar.FULL_OUTBOUND_IMPORT);
   }
 
   setRequestType(values, stocklist) {
@@ -473,11 +501,19 @@ const mapStateToProps = state => ({
   debounceTime: state.session.searchConfig.debounceTime,
   minSearchLength: state.session.searchConfig.minSearchLength,
   locationTypes: state.location.locationTypes,
+  bars: state.infoBar.bars,
 });
 
-export default withRouter(connect(mapStateToProps, {
-  showSpinner, hideSpinner,
-})(CreateStockMovement));
+const mapDispatchToProps = {
+  showSpinner,
+  hideSpinner,
+  createInfoBar,
+  hideInfoBar,
+  closeInfoBar,
+  showInfoBar,
+};
+
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(CreateStockMovement));
 
 CreateStockMovement.propTypes = {
   /** React router's object which contains information about url varaiables and params */
@@ -522,4 +558,20 @@ CreateStockMovement.propTypes = {
   debounceTime: PropTypes.number.isRequired,
   minSearchLength: PropTypes.number.isRequired,
   locationTypes: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  createInfoBar: PropTypes.func.isRequired,
+  bars: PropTypes.arrayOf(PropTypes.shape({
+    name: PropTypes.string.isRequired,
+    show: PropTypes.bool.isRequired,
+    closed: PropTypes.bool,
+    title: PropTypes.shape({
+      label: PropTypes.string.isRequired,
+      defaultLabel: PropTypes.string.isRequired,
+    }),
+    versionLabel: PropTypes.shape({
+      label: PropTypes.string.isRequired,
+      defaultLabel: PropTypes.string.isRequired,
+    }),
+  })).isRequired,
+  showInfoBar: PropTypes.func.isRequired,
+  hideInfoBar: PropTypes.func.isRequired,
 };

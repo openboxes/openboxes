@@ -50,6 +50,7 @@ const STOCK_MOVEMENT_URL = {
   editRequest: (id) => `${STOCK_MOVEMENT_URL.createRequest()}/${id}`,
   editCombinedShipments: (id) => `${STOCK_MOVEMENT_URL.createCombinedShipments()}/${id}`,
   show: (id) => `${STOCK_MOVEMENT_URL.base}/show/${id}`,
+  importOutbound: () => `${STOCK_MOVEMENT_URL.base}/importOutboundStockMovement`,
 };
 
 const INVOICE_URL = {
