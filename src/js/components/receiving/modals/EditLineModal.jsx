@@ -86,10 +86,22 @@ class EditLineModal extends Component {
     } = props;
     const dynamicAttr = getDynamicAttr ? getDynamicAttr(props) : {};
     const attr = { ...attributes, ...dynamicAttr };
+    const groupedShipmentItems = this.groupShipmentItems();
+    const shipmentItemsQuantityMap = Object.entries(groupedShipmentItems)
+      .reduce((acc, [key, value]) =>
+        ({
+          ...acc,
+          [key]: value.reduce((sum, curr) => (sum + _.toInteger(curr.quantityShipped)), 0),
+        }),
+      {});
 
     this.state = {
       attr,
       formValues: [],
+      shipmentItemsQuantityMap,
+      // This is the original quantity shipped of a shipmentItem. This indicates the maximum.
+      shipmentItemQuantityShippedSum: shipmentItemsQuantityMap[attr.fieldValue?.shipmentItemId],
+      showMismatchQuantityShippedInfo: false,
     };
 
     this.onOpen = this.onOpen.bind(this);
@@ -108,11 +120,25 @@ class EditLineModal extends Component {
     this.setState({ attr });
   }
 
+  groupShipmentItems() {
+    const { containers } = this.props.values;
+    /**
+     * containers are built like: [{..., shipmentItems: []}]
+     * so in the end we have to flat the result,
+     * as after mapping, the result would look like
+     * [[<shipmentItem>, <shipmentItem>], [<shipmentItem>, <shipmentItem>]]
+     */
+    const shipmentItems = containers.map((container) => container.shipmentItems).flat();
+    // Return the results as map of { [shipmentItemId]: [<shipmentItem>, <shipmentItem>] }
+    return _.groupBy(shipmentItems, 'shipmentItemId');
+  }
+
   /**
    * Loads available items into modal's form.
    * @public
   */
   onOpen() {
+    const { shipmentItemsQuantityMap, attr } = this.state;
     this.setState({
       formValues: {
         lines: _.map([this.state.attr.fieldValue], value => ({
@@ -121,6 +147,13 @@ class EditLineModal extends Component {
           originalLine: true,
         })),
       },
+      /**
+       * This needs to be set again while reopening a modal, due to table indexing problems
+       * assuming we have 5 lines, we split the first line to two items,
+       * the new, split item contains quantity info from the row,
+       * that was at this place before (2nd row, now 3rd row, after splitting the line)
+       */
+      shipmentItemQuantityShippedSum: shipmentItemsQuantityMap[attr.fieldValue?.shipmentItemId],
     });
   }
 
@@ -187,7 +220,56 @@ class EditLineModal extends Component {
     });
   }
 
+  calculateQuantityShippedSum(values) {
+    const { shipmentItemQuantityShippedSum } = this.state;
+    const originalItem = values.find((item) => item.rowId);
+    const qtyShippedSumFromModal =
+      values.reduce((acc, curr) => acc + _.toInteger(curr.quantityShipped), 0);
+    const groupedShipmentItems = this.groupShipmentItems();
+    /**
+     * We want to exclude from the calculation an "original item" (that contains a rowId).
+     * It would receive the rowId and we would find the original item
+     * if the item was split at least once. Assuming we had a shipment item with quantity shipped 35
+     * we split it to two lines (20, 15) and we try to split one of them again
+     * (let's say, the second one), when we open the modal,
+     * as existingItemsQuantities we would expect to get 20,
+     * and to get the total sum of 35 (15 + x, depending on how many lines we would split again)
+     * Since the "15" item is included in the modal (values) and
+     * we would not exclude it in the existingItemsQuantities, it would be counted twice,
+     * so the existingItemsQuantities for this shipment item would be 35, not 20.
+     */
+    const sumExistingShipmentItemQuantity = (shipmentItems) =>
+      shipmentItems
+        .reduce((sum, curr) => (curr.rowId === originalItem?.rowId
+          ? sum
+          : sum + _.toInteger(curr.quantityShipped)), 0);
+    const existingItemsQuantities = Object.entries(groupedShipmentItems)
+      .reduce((acc, [key, value]) =>
+        ({
+          ...acc,
+          [key]: sumExistingShipmentItemQuantity(value),
+        }),
+      {});
+    /** If the original item was not found, it means it's first attempt to edit a line,
+     *  and we don't have to check for existing quantities in rows below/above
+     *  as we only care about sum from the modal
+     */
+    const existingItemsQuantitySum = originalItem
+      ? existingItemsQuantities[originalItem.shipmentItemId]
+      : 0;
+    /**
+     * If sum from modal + eventual existing quantities is not equal to the original shipped qty,
+     * show the indicator of not matching quantity
+    */
+    if ((qtyShippedSumFromModal + existingItemsQuantitySum) !== shipmentItemQuantityShippedSum) {
+      this.setState({ showMismatchQuantityShippedInfo: true });
+      return;
+    }
+    this.setState({ showMismatchQuantityShippedInfo: false });
+  }
+
   validate(values) {
+    this.calculateQuantityShippedSum(values.lines);
     const errors = {};
     errors.lines = [];
     const date = moment(this.props.minimumExpirationDate, 'MM/DD/YYYY');
@@ -243,13 +325,22 @@ class EditLineModal extends Component {
           <div className="font-weight-bold mb-3">
             <Translate id="react.partialReceiving.originalQtyShipped.label" defaultMessage="Original quantity shipped" />: {this.state.attr.fieldValue.quantityShipped}
           </div>
+          {this.state.showMismatchQuantityShippedInfo
+            && (
+              <div className="font-weight-bold font-red-ob">
+                <Translate
+                  id="react.partialReceiving.mismatchingQuantityShipped.label"
+                  defaultMessage="The total edited quantity does not match the original quantity shipped."
+                />
+              </div>
+            )}
         </div>
       </ModalWrapper>
     );
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   minimumExpirationDate: state.session.minimumExpirationDate,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
 });
@@ -274,6 +365,9 @@ EditLineModal.propTypes = {
   minimumExpirationDate: PropTypes.string.isRequired,
   translate: PropTypes.func.isRequired,
   wrapperClassName: PropTypes.string,
+  values: PropTypes.shape({
+    containers: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  }).isRequired,
 };
 
 EditLineModal.defaultProps = {

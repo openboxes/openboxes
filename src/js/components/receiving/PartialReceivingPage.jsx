@@ -791,6 +791,8 @@ class PartialReceivingPage extends Component {
       ...item,
       quantityRemaining: item.quantityShipped,
       unitOfMeasure: shipmentItemsGrouped.originalItem?.unitOfMeasure,
+      // This helper id is needed for mismatching quantity shipped indicator in edit modal
+      rowId: _.uniqueId(),
     }));
 
     /**
