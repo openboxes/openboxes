@@ -91,7 +91,7 @@ class EditLineModal extends Component {
       .reduce((acc, [key, value]) =>
         ({
           ...acc,
-          [key]: value.reduce((sum, curr) => (sum + _.toInteger(curr.quantityShipped)), 0),
+          [key]: _.sumBy(value, (item) => _.toInteger(item.quantityShipped)),
         }),
       {});
 
@@ -223,8 +223,7 @@ class EditLineModal extends Component {
   calculateQuantityShippedSum(values) {
     const { shipmentItemQuantityShippedSum } = this.state;
     const originalItem = values.find((item) => item.rowId);
-    const qtyShippedSumFromModal =
-      values.reduce((acc, curr) => acc + _.toInteger(curr.quantityShipped), 0);
+    const qtyShippedSumFromModal = _.sumBy(values, (item) => _.toInteger(item.quantityShipped));
     const groupedShipmentItems = this.groupShipmentItems();
     /**
      * We want to exclude from the calculation an "original item" (that contains a rowId).
@@ -329,7 +328,7 @@ class EditLineModal extends Component {
             && (
               <div className="font-weight-bold font-red-ob">
                 <Translate
-                  id="react.partialReceiving.mismatchingQuantityShipped.label"
+                  id="react.partialReceiving.error.mismatchingQuantityShipped.label"
                   defaultMessage="The total edited quantity does not match the original quantity shipped."
                 />
               </div>
