@@ -659,6 +659,7 @@ export const createInfoBar = ({
   title,
   isCloseable,
   hasModalToDisplay,
+  redirect,
 }) => ({
   type: ADD_INFO_BAR,
   payload: {
@@ -667,6 +668,7 @@ export const createInfoBar = ({
     title,
     isCloseable,
     hasModalToDisplay,
+    redirect,
     show: true,
   },
 });

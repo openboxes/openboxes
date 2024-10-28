@@ -123,9 +123,9 @@ class FieldArrayComponent extends Component {
                         <div>
                           {this.props.translate(config.headerTooltip, config.headerDefaultTooltip)}
                         </div>
-                      ) : (config.label &&
+                      ) : (headerLabel &&
                         <div>
-                          {this.props.translate(config.label, config.defaultMessage)}
+                          {this.props.translate(headerLabel, headerDefaultMessage)}
                         </div>
                       )}
                       theme="transparent"

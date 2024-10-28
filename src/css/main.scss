@@ -1520,6 +1520,11 @@ div.search-input:focus-within {
   justify-content: space-between;
   align-items: center;
 
+  .info-bar-redirect > a {
+      text-decoration: underline;
+      color: #FFFFFF;
+  }
+
   svg {
     width: 18px;
     height: 18px;
