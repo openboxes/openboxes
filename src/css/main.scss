@@ -1132,6 +1132,10 @@ div.search-input:focus-within {
   background-color: var(--color-red);
 }
 
+.font-red-ob {
+  color: var(--color-red) !important;
+}
+
 // Action dots box
 .action-dots {
   width: 24px;
