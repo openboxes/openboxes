@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
+         version="3.1">
+
+    <!--
+    Server configuration for non-embedded server deployments (ie when deploying to an external Tomcat Servlet).
+    Note that running the application with an embedded server will not pick up these settings. Any settings that we
+    want to also apply for embedded servers should also be configured in a property file such as application.yml.
+    -->
+
+    <session-config>
+        <!--
+        The time (in minutes) of inactivity before we invalidate the user's session. (120 is two hours.)
+        "server.session.timeout" (or "server.servlet.session.timeout" in SpringBoot 2+) is the matching
+        setting in application.yml.
+         -->
+        <session-timeout>120</session-timeout>
+    </session-config>
+
+</web-app>
