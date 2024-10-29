@@ -20,14 +20,15 @@ import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
 import notification from 'components/Layout/notifications/notification';
 import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
+import DateFormat from 'consts/dateFormat';
 import NotificationType from 'consts/notificationTypes';
 import StockTransferStatus from 'consts/stockTransferStatus';
 import { flattenRequest, parseResponse } from 'utils/apiClient';
-import { renderFormField } from 'utils/form-utils';
+import { renderFormField, setColumnValue } from 'utils/form-utils';
+import Select from 'utils/Select';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
-import DateFormat from 'consts/dateFormat';
 
 const DELETE_BUTTON_FIELD = {
   type: ButtonField,
@@ -116,8 +117,21 @@ const FIELDS = {
         defaultMessage: 'Recipient',
         flexWidth: '1.5',
         getDynamicAttr: ({
-          recipients, addRow, rowCount, rowIndex, getSortOrder,
+          recipients, addRow, rowCount, rowIndex, getSortOrder, setRecipientValue, translate,
         }) => ({
+          headerHtml: () => (
+            <Select
+              placeholder={translate('react.stockMovement.recipient.label', 'Recipient')}
+              className="select-xs my-2"
+              classNamePrefix="react-select"
+              options={recipients}
+              onChange={(val) => {
+                if (val) {
+                  setRecipientValue(val);
+                }
+              }}
+            />
+          ),
           options: recipients,
           onTabPress: rowCount === rowIndex + 1 ? () =>
             addRow({ sortOrder: getSortOrder() }) : null,
@@ -474,9 +488,17 @@ class AddItemsPage extends Component {
       <Form
         onSubmit={() => {}}
         validate={this.validate}
-        mutators={{ ...arrayMutators }}
+        mutators={{
+          ...arrayMutators,
+          setColumnValue,
+        }}
         initialValues={this.state.formValues}
-        render={({ handleSubmit, values, invalid }) => (
+        render={({
+          handleSubmit,
+          values,
+          invalid,
+          form: { mutators },
+        }) => (
           <div className="d-flex flex-column">
             <span className="buttons-container">
               <button
@@ -512,6 +534,8 @@ class AddItemsPage extends Component {
                     removeItem: this.removeItem,
                     getSortOrder: this.getSortOrder,
                     originId: this.props.initialValues.origin.id,
+                    setRecipientValue: (val) => mutators.setColumnValue('returnItems', 'recipient', val),
+                    translate: this.props.translate,
                   }))}
               </div>
               <div className="submit-buttons">
