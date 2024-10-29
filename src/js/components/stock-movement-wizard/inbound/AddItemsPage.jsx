@@ -958,10 +958,15 @@ class AddItemsPage extends Component {
         validate={this.validate}
         mutators={{
           ...arrayMutators,
-          setColumnValue: setColumnValue,
+          setColumnValue,
         }}
         initialValues={this.state.values}
-        render={({ handleSubmit, values, invalid, form: { mutators }  }) => (
+        render={({
+          handleSubmit,
+          values,
+          invalid,
+          form: { mutators },
+        }) => (
           <div className="d-flex flex-column">
             <span className="buttons-container">
               <label
@@ -1041,7 +1046,7 @@ class AddItemsPage extends Component {
                   values,
                   isFirstPageLoaded: this.state.isFirstPageLoaded,
                   setRecipientValue: (val) => mutators.setColumnValue('lineItems', 'recipient', val),
-                  translate: this.props.translate
+                  translate: this.props.translate,
                 }))}
               </div>
               <div className="submit-buttons">
