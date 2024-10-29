@@ -40,9 +40,10 @@ import {
   shouldCreateFullOutboundImportFeatureBar,
   shouldShowFullOutboundImportFeatureBar
 } from 'utils/featureBarUtils';
-import { renderFormField } from 'utils/form-utils';
+import { renderFormField, setColumnValue } from 'utils/form-utils';
 import requestsQueue from 'utils/requestsQueue';
 import RowSaveIconIndicator from 'utils/RowSaveIconIndicator';
+import Select from 'utils/Select';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
@@ -177,8 +178,21 @@ const NO_STOCKLIST_FIELDS = {
         fieldKey: '',
         getDynamicAttr: ({
           fieldValue, recipients, addRow, rowCount, rowIndex, getSortOrder,
-          updateTotalCount, updateRow, values, saveProgress,
+          updateTotalCount, updateRow, values, saveProgress, setRecipientValue, translate,
         }) => ({
+          headerHtml: () => (
+            <Select
+              placeholder={translate('react.stockMovement.recipient.label', 'Recipient')}
+              className="select-xs my-2"
+              classNamePrefix="react-select"
+              options={recipients}
+              onChange={(val) => {
+                if (val) {
+                  setRecipientValue(val);
+                }
+              }}
+            />
+          ),
           options: recipients,
           disabled: fieldValue?.rowSaveStatus === RowSaveStatus.SAVING ||
                (fieldValue && fieldValue.statusCode === 'SUBSTITUTED') ||
@@ -1336,9 +1350,17 @@ class AddItemsPage extends Component {
         <Form
           onSubmit={() => {}}
           validate={this.validate}
-          mutators={{ ...arrayMutators }}
+          mutators={{
+            ...arrayMutators,
+            setColumnValue,
+          }}
           initialValues={this.state.values}
-          render={({ handleSubmit, values, invalid }) => (
+          render={({
+            handleSubmit,
+            values,
+            invalid,
+            form: { mutators },
+          }) => (
             <div className="d-flex flex-column">
               { !showOnly ?
                 <span className="buttons-container">
@@ -1442,6 +1464,8 @@ class AddItemsPage extends Component {
                   getStockMovementDraft: this.getStockMovementDraft,
                   isDraftAvailable: this.state.isDraftAvailable,
                   isAutosaveEnabled: this.props.isAutosaveEnabled,
+                  setRecipientValue: (val) => mutators.setColumnValue('lineItems', 'recipient', val),
+                  translate: this.props.translate,
                 }))}
                 </div>
                 <div className="submit-buttons">
