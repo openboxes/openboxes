@@ -210,6 +210,8 @@ slf4j.detectLoggerNameMismatch: true
 
 ---
 hibernate:
+    show_sql: false  # Logs Hibernate queries to the console. We configure this via Logback instead.
+    format_sql: false
     allow_update_outside_transaction: false
     cache:
         queries: false
@@ -226,8 +228,16 @@ dataSource:
     dbCreate: none
     dialect: org.hibernate.dialect.MySQL57InnoDBDialect
     factory: org.apache.tomcat.jdbc.pool.DataSourceFactory
-    logger: com.mysql.cj.jdbc.log.StandardLogger
     type: org.apache.tomcat.jdbc.pool.DataSource
+
+    # Settings for database logging
+    logger: com.mysql.cj.jdbc.log.StandardLogger
+    dumpQueriesOnException: false
+    logSql: false  # Logs SQL queries to the console. We configure this via Logback instead.
+    formatSql: false
+    logSlowQueries: false
+    includeInnodbStatusInDeadlockExceptions: true
+
     properties:
         # from https://docs.grails.org/3.3.16/guide/conf.html#dataSource
         jmxEnabled: true
@@ -253,22 +263,17 @@ environments:
     development:
         dataSource:
             dumpQueriesOnException: true
-            formatSql: true
-            includeInnodbStatusInDeadlockExceptions: true
             logAbandoned: true
-            logSql: false
             logSlowQueries: true
             username: "openboxes"
             password: "openboxes"
-            url: jdbc:mysql://localhost:3306/openboxes?serverTimezone=UTC&useSSL=false
+            # P6Spy is an interceptor that allows us to log database queries. We use it in our Sentry integration.
+            driverClassName: com.p6spy.engine.spy.P6SpyDriver
+            url: jdbc:p6spy:mysql://localhost:3306/openboxes?serverTimezone=UTC&useSSL=false
     test:
         dataSource:
             dumpQueriesOnException: true
-            formatSql: false
-            includeInnodbStatusInDeadlockExceptions: true
             logAbandoned: true
-            logSql: false
-            logSlowQueries: false
             # Our integration tests run against a containerized database: https://java.testcontainers.org/modules/databases/jdbc/.
             # Note that testcontainers auto-disable SSL when connecting via jdbc: https://github.com/testcontainers/testcontainers-java/pull/561
             # For more information, see /src/integration-test/README.md
@@ -276,14 +281,11 @@ environments:
             driverClassName: org.testcontainers.jdbc.ContainerDatabaseDriver
     production:
         dataSource:
-            dumpQueriesOnException: false
-            formatSql: false
-            includeInnodbStatusInDeadlockExceptions: true
-            logSql: false
-            logSlowQueries: false
             username: "openboxes"
             password: "openboxes"
-            url: jdbc:mysql://localhost:3306/openboxes?serverTimezone=UTC&useSSL=false
+            # P6Spy is an interceptor that allows us to log database queries. We use it in our Sentry integration.
+            driverClassName: com.p6spy.engine.spy.P6SpyDriver
+            url: jdbc:p6spy:mysql://localhost:3306/openboxes?serverTimezone=UTC&useSSL=false
 ---
 openboxes:
     ajaxRequest:

@@ -5,25 +5,33 @@
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>info</level>
         </filter>
-    </appender>
-
-    <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>
-                %date{ISO8601} %5level [%-10.10thread] %-40.40logger{40}: %message%n%xException
+                <!-- https://logback.qos.ch/manual/layouts.html -->
+                %date{ISO8601} %-5level [%thread] %logger{40}: %message%n%xException
+            </pattern>
+        </encoder>
+    </appender>
+
+    <!--  Outputs Logback logs to the console.  -->
+    <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+        <!-- Adds colors to the logs only if the terminal can support it https://logback.qos.ch/manual/layouts.html#coloring -->
+        <withJansi>true</withJansi>
+        <encoder>
+            <pattern>
+                <!-- https://logback.qos.ch/manual/layouts.html -->
+                %cyan(%date{ISO8601}) %highlight(%-5level) %magenta([%thread]) %yellow(%logger{40}): %message%n%xException
             </pattern>
         </encoder>
     </appender>
 
     <!-- log levels for software we maintain -->
-
     <logger name="openboxes" level="debug" />
     <logger name="org.pih.warehouse" level="debug" />
     <logger name="testutils" level="debug" />
     <logger name="util" level="debug" />
 
     <!-- log levels for dependencies -->
-
     <logger name="asset.pipeline" level="debug" /><!-- use 'info' to hide asset-pipeline logs -->
     <logger name="ch.qos.logback" level="warn" /><!-- hide logs about logging -->
     <logger name="grails.app.services" level="info" /><!-- use `debug` to see service/plugin logs -->
@@ -91,7 +99,7 @@
     <logger name="org.hibernate.stat" level="info" />
     <logger name="org.hibernate.transform" level="info" />
     <logger name="org.hibernate.tool" level="info" />
-    <logger name="org.hibernate.type" level="info" />
+    <logger name="org.hibernate.type" level="info" /><!-- https://www.javacodegeeks.com/2012/10/logging-hibernate-sql.html -->
     <logger name="org.hibernate.validator" level="info" />
     <logger name="org.springframework.aop" level="info" />
     <logger name="org.springframework.beans" level="info" />
@@ -112,6 +120,11 @@
     <logger name="quartz" level="info" /><!-- use 'info' to hide quartz scheduler notifications -->
     <logger name="io.sentry" level="info" />
 
+    <!--
+    The parent config for all loggers. All loggers will use the log level defined here unless they specifically
+    configure their loggers to do otherwise (see above examples).
+    Logback supports the following logging levels (in order of most to least verbose): TRACE, DEBUG, INFO, WARN, ERROR
+    -->
     <root level="debug">
         <appender-ref ref="sentry" />
         <appender-ref ref="stdout" />
