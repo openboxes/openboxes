@@ -35,8 +35,9 @@ import CombinedShipmentItemsModal from 'components/stock-movement-wizard/modals/
 import { ORDER_URL, STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
 import AlertMessage from 'utils/AlertMessage';
 import apiClient from 'utils/apiClient';
-import { renderFormField } from 'utils/form-utils';
+import { renderFormField, setColumnValue } from 'utils/form-utils';
 import { debounceProductsFetch } from 'utils/option-utils';
+import Select from 'utils/Select';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
@@ -223,7 +224,22 @@ const FIELDS = {
         flexWidth: '1.5',
         getDynamicAttr: ({
           recipients,
+          translate,
+          setRecipientValue,
         }) => ({
+          headerHtml: () => (
+            <Select
+              placeholder={translate('react.stockMovement.recipient.label', 'Recipient')}
+              className="select-xs my-2"
+              classNamePrefix="react-select"
+              options={recipients}
+              onChange={(val) => {
+                if (val) {
+                  setRecipientValue(val);
+                }
+              }}
+            />
+          ),
           options: recipients,
         }),
         attributes: {
@@ -1080,6 +1096,7 @@ class AddItemsPage extends Component {
           append: ([field, value], state, { changeValue }) => {
             changeValue(state, field, () => [...state.formState.values[field], ...value]);
           },
+          setColumnValue,
         }}
         initialValues={this.state.values}
         render={({
@@ -1210,6 +1227,8 @@ class AddItemsPage extends Component {
                     fetchInventoryItem: this.fetchInventoryItem,
                     debouncedInventoryItemFetch: this.debouncedInventoryItemFetch,
                     validateExpirationDate: this.validateExpirationDate,
+                    setRecipientValue: (val) => form.mutators.setColumnValue('lineItems', 'recipient', val),
+                    translate: this.props.translate,
                   }))}
               </div>
               <div className="submit-buttons">
