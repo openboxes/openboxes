@@ -21,11 +21,11 @@ import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
 import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
 import apiClient from 'utils/apiClient';
-import { renderFormField } from 'utils/form-utils';
+import { renderFormField, setColumnValue } from 'utils/form-utils';
+import Select from 'utils/Select';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
-import Select from 'utils/Select';
 
 
 const DELETE_BUTTON_FIELD = {
@@ -174,7 +174,11 @@ const VENDOR_FIELDS = {
               className="select-xs my-2"
               classNamePrefix="react-select"
               options={recipients}
-              onChange={(val) => setRecipientValue(val)}
+              onChange={(val) => {
+                if (val) {
+                  setRecipientValue(val);
+                }
+              }}
             />
           ),
           options: recipients,
@@ -947,14 +951,6 @@ class AddItemsPage extends Component {
     }
   }
 
-  setColumnValue([fieldName, column, value], state, { changeValue }) {
-    return changeValue(state, fieldName, (array) =>
-      array.map((row) => ({
-        ...row,
-        [column]: value,
-      })));
-  }
-
   render() {
     return (
       <Form
@@ -962,7 +958,7 @@ class AddItemsPage extends Component {
         validate={this.validate}
         mutators={{
           ...arrayMutators,
-          setColumnValue: this.setColumnValue,
+          setColumnValue: setColumnValue,
         }}
         initialValues={this.state.values}
         render={({ handleSubmit, values, invalid, form: { mutators }  }) => (
