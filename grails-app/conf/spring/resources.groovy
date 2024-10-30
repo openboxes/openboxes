@@ -9,6 +9,8 @@ import org.pih.warehouse.monitoring.SentryGrailsTracingFilter
 // Regular beans that conform to Grails conventions don't need to be registered here.
 // https://docs.grails.org/latest/guide/spring.html
 beans = {
+
+    // Override Sentry's default tracing filters since Grails behaves slightly differently than SpringBoot.
     sentryTracingFilter(SentryGrailsTracingFilter)
     sentryTracingFilterRegistration(FilterRegistrationBean) {
         filter = sentryTracingFilter
