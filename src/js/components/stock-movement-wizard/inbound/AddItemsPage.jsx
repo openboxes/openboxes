@@ -21,7 +21,8 @@ import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
 import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
 import apiClient from 'utils/apiClient';
-import { renderFormField } from 'utils/form-utils';
+import { renderFormField, setColumnValue } from 'utils/form-utils';
+import Select from 'utils/Select';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
@@ -165,8 +166,21 @@ const VENDOR_FIELDS = {
         flexWidth: '1.5',
         getDynamicAttr: ({
           recipients, addRow, rowCount, rowIndex, getSortOrder,
-          updateTotalCount, updateRow, values,
+          updateTotalCount, updateRow, values, setRecipientValue, translate,
         }) => ({
+          headerHtml: () => (
+            <Select
+              placeholder={translate('react.stockMovement.recipient.label', 'Recipient')}
+              className="select-xs my-2"
+              classNamePrefix="react-select"
+              options={recipients}
+              onChange={(val) => {
+                if (val) {
+                  setRecipientValue(val);
+                }
+              }}
+            />
+          ),
           options: recipients,
           onTabPress: rowCount === rowIndex + 1 ? () => {
             updateTotalCount(1);
@@ -942,9 +956,17 @@ class AddItemsPage extends Component {
       <Form
         onSubmit={() => {}}
         validate={this.validate}
-        mutators={{ ...arrayMutators }}
+        mutators={{
+          ...arrayMutators,
+          setColumnValue,
+        }}
         initialValues={this.state.values}
-        render={({ handleSubmit, values, invalid }) => (
+        render={({
+          handleSubmit,
+          values,
+          invalid,
+          form: { mutators },
+        }) => (
           <div className="d-flex flex-column">
             <span className="buttons-container">
               <label
@@ -1023,6 +1045,8 @@ class AddItemsPage extends Component {
                   updateRow: this.updateRow,
                   values,
                   isFirstPageLoaded: this.state.isFirstPageLoaded,
+                  setRecipientValue: (val) => mutators.setColumnValue('lineItems', 'recipient', val),
+                  translate: this.props.translate,
                 }))}
               </div>
               <div className="submit-buttons">

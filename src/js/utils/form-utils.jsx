@@ -169,3 +169,13 @@ export const validateDateIsSameOrAfter = (laterDate, earlierDate) => {
   const earlierDateParsed = moment(earlierDate);
   return laterDateParsed.startOf('day').isSameOrAfter(earlierDateParsed.startOf('day'));
 };
+
+/**
+ * * Mutator function to set all values in a specified column for each entry in an array field.
+ */
+export const setColumnValue = ([fieldName, column, value], state, { changeValue }) =>
+  changeValue(state, fieldName, (array) =>
+    array.map((row) => ({
+      ...row,
+      [column]: value,
+    })));
