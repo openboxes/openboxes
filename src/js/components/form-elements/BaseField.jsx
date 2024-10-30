@@ -121,8 +121,8 @@ class BaseField extends Component {
         component={renderField}
         renderInput={this.renderInput}
         attributes={attr}
-        label={label}
-        defaultMessage={defaultMessage}
+        label={dynamicAttr?.label || label}
+        defaultMessage={dynamicAttr?.defaultMessage || defaultMessage}
         touched={this.state.touched}
         arrayField={arrayField}
       />
