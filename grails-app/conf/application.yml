@@ -78,9 +78,7 @@ server:
     contextPath: "/openboxes"
     session:
         # The time (in seconds) of inactivity before we invalidate the user's session. (7200 is two hours.)
-        # In SpringBoot 2+, this setting is "server.servlet.session.timeout"
-        # This setting is only applied when running via embedded server. Settings for when the app is deployed to
-        # a Tomcat Servlet can be found in /src/main/webapp/WEB-INF/web.xml
+        # For future reference, this setting has been renamed to "server.servlet.session.timeout" in SpringBoot 2+
         timeout: 7200
 ---
 grails:
