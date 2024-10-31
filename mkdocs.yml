@@ -182,17 +182,41 @@ nav:
 
   # Upgrade Guide
   - Upgrade:
-    - Introduction: admin-guide/upgrading/index.md
-    - Migration Primer:
-      - Introduction: admin-guide/migration/index.md
-      - Migration Strategies: admin-guide/migration/strategies.md
-      - Decision Factors: admin-guide/migration/factors.md
-      - Comparison: admin-guide/migration/differences.md
-    - Migration Guide:
-      - Parallel Migration: admin-guide/migration/parallel/index.md
-      - In-Place Upgrade: admin-guide/migration/in-place/index.md
-    - Troubleshooting:
-      - Known Issues: admin-guide/migration/known-issues/index.md
+    - Introduction: admin-guide/upgrading/introduction.md
+    - Plan:
+      - Upgrade Strategies:
+        - Overview: admin-guide/upgrading/plan/upgrade-strategies/overview.md
+        - Parallel Upgrade Overview: admin-guide/upgrading/plan/upgrade-strategies/parallel-upgrade-overview.md
+        - In-Place Upgrade Overview: admin-guide/upgrading/plan/upgrade-strategies/in-place-upgrade-overview.md
+      - Rollback Strategies:
+        - Overview: admin-guide/upgrading/plan/rollback-strategies/overview.md
+        - Backup Your Database: admin-guide/upgrading/plan/rollback-strategies/backup-database.md
+        - Backup Your Custom Configuration: admin-guide/upgrading/plan/rollback-strategies/backup-config.md
+    - Execute:
+      - Parallel Upgrade Guide:
+        - Introduction: admin-guide/upgrading/execute/parallel/introduction.md
+        - 1. Install The New Server: admin-guide/upgrading/execute/parallel/install-new-server.md
+        - 2. Copy Custom Config : admin-guide/upgrading/execute/parallel/copy-custom-config.md
+        - 3. Import Database Backup: admin-guide/upgrading/execute/parallel/import-database-backup.md
+        - 4. Start The New Server: admin-guide/upgrading/execute/parallel/start-server.md
+        - 5. Reimport Database Backup: admin-guide/upgrading/execute/parallel/reimport-database-backup.md
+        - 6. Route Requests To New Installation: admin-guide/upgrading/execute/parallel/reroute-requests.md
+        - 7. Deprovision Old Instance: admin-guide/upgrading/execute/parallel/deprovision-old-instance.md
+      - In-Place Upgrade Guide:
+        - Introduction: admin-guide/upgrading/execute/in-place/introduction.md
+        - 1. Upgrade Dependencies: admin-guide/upgrading/execute/in-place/upgrade-dependencies.md
+        - 2. Upgrade The App: admin-guide/upgrading/execute/in-place/upgrade-app.md
+        - 3. Start The Server: admin-guide/upgrading/execute/in-place/start-server.md
+        - 4. Remove Old Dependencies: admin-guide/upgrading/execute/in-place/remove-old-dependencies.md
+      - Version-Specific Upgrade Guide:
+          - Introduction: admin-guide/upgrading/execute/version-specific/index.md
+          - 0.8.x to 0.9.x:
+            - Introduction: admin-guide/upgrading/execute/version-specific/08x-to-09x/introduction.md
+            - Parallel Upgrade: admin-guide/upgrading/execute/version-specific/08x-to-09x/parallel.md
+            - In-Place Upgrade: admin-guide/upgrading/execute/version-specific/08x-to-09x/in-place.md
+    - Validate:
+      - Verifying An Upgrade: admin-guide/upgrading/validate/verifying-upgrade.md
+      - Known Issues: admin-guide/upgrading/validate/known-issues.md
 
   # Onboarding Guide
   - Onboarding: admin-guide/onboarding/index.md
