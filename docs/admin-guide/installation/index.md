@@ -15,7 +15,7 @@
     Review the required skills and responsibilities required to
     host the application on your own servers.
 
-- :material-server-network:{ .lg .middle } __Deployment _Strategery___
+- :material-server-network:{ .lg .middle } __Deployment _Strategy___
   
     ---
     Decide which Deployment Strategy (single VM, multiple VM, managed database)
