@@ -10,11 +10,10 @@ import javax.servlet.http.HttpServletRequest
 class GrailsHttpTransactionNameProvider implements TransactionNameProvider {
 
     String provideTransactionName(HttpServletRequest var1) {
-        return "${var1.method} ${var1.requestURI}"
-
-        // If we want to make this look more like Spring MVC traces, we could have done the following instead, but
-        // we decided that "GET /openboxes/api/invoices" is easier to debug than "invoiceApi/list".
-        // return "${var1.getAttribute("org.grails.CONTROLLER_NAME_ATTRIBUTE")}/${var1.getAttribute("org.grails.ACTION_NAME_ATTRIBUTE")}"
+        // If we wanted our logs to look more like HTTP Requests, we could have done the following instead, but
+        // we decided that "invoiceApi/list" is easier to debug than "GET /openboxes/api/invoices".
+        //return "${var1.method} ${var1.requestURI}"
+        return "${var1.getAttribute("org.grails.CONTROLLER_NAME_ATTRIBUTE")}/${var1.getAttribute("org.grails.ACTION_NAME_ATTRIBUTE")}"
     }
 
     TransactionNameSource provideTransactionSource() {

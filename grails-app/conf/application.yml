@@ -267,9 +267,7 @@ environments:
             logSlowQueries: true
             username: "openboxes"
             password: "openboxes"
-            # P6Spy is an interceptor that allows us to log database queries. We use it in our Sentry integration.
-            driverClassName: com.p6spy.engine.spy.P6SpyDriver
-            url: jdbc:p6spy:mysql://localhost:3306/openboxes?serverTimezone=UTC&useSSL=false
+            url: jdbc:mysql://localhost:3306/openboxes?serverTimezone=UTC&useSSL=false
     test:
         dataSource:
             dumpQueriesOnException: true
@@ -283,9 +281,7 @@ environments:
         dataSource:
             username: "openboxes"
             password: "openboxes"
-            # P6Spy is an interceptor that allows us to log database queries. We use it in our Sentry integration.
-            driverClassName: com.p6spy.engine.spy.P6SpyDriver
-            url: jdbc:p6spy:mysql://localhost:3306/openboxes?serverTimezone=UTC&useSSL=false
+            url: jdbc:mysql://localhost:3306/openboxes?serverTimezone=UTC&useSSL=false
 ---
 openboxes:
     ajaxRequest:

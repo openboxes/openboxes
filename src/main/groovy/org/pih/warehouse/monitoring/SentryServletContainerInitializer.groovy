@@ -34,7 +34,7 @@ final class SentryServletContainerInitializer implements ServletContainerInitial
                 // it's the easiest place to do it with the current configuration options.
                 // TODO: investigate if this is even necessary. We already have the gradle-git-properties plugin,
                 //       so maybe this is happening automatically. If so, we can remove this class entirely.
-//                options.release = fetchGitCommit()
+                options.release = fetchGitCommit()
             }
         } catch (Exception e) {
             log.warn('Unable to initialize sentry-servlet', e)
