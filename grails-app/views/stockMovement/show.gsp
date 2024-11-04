@@ -264,6 +264,27 @@
                                 </td>
                             </tr>
                         </g:if>
+                        <g:if test="${stockMovement?.isElectronicType()}">
+                            <tr class="prop">
+                                <td class="name">
+                                    <g:message
+                                            code="stockMovement.desiredDateOfDelivery"
+                                            default="Desired date of delivery"
+                                    />
+                                </td>
+                                <td class="value">
+                                    <g:if test="${stockMovement?.requisition?.desiredDeliveryDate}">
+                                        <g:formatDate
+                                                format="${Constants.DEFAULT_MONTH_YEAR_DATE_FORMAT}"
+                                                date="${stockMovement?.requisition?.desiredDeliveryDate}"
+                                        />
+                                    </g:if>
+                                    <g:else>
+                                        <warehouse:message code="default.none.label" />
+                                    </g:else>
+                                </td>
+                            </tr>
+                        </g:if>
                         <tr class="prop">
                             <td class="name">
                                 <warehouse:message code="stockMovement.stocklist.label"/>
