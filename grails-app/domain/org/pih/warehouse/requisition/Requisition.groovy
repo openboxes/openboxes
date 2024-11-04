@@ -46,6 +46,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
     Date dateDelivered
     Date dateIssued
     Date dateReceived
+    Date desiredDeliveryDate
 
     Date requestedDeliveryDate = new Date()
 
@@ -188,6 +189,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
         lastUpdated(nullable: true)
         dateValidFrom(nullable: true)
         dateValidTo(nullable: true)
+        desiredDeliveryDate(nullable: true)
         createdBy(nullable: true)
         updatedBy(nullable: true)
         recipientProgram(nullable: true)
