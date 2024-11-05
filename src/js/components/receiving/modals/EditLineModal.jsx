@@ -86,7 +86,15 @@ class EditLineModal extends Component {
     } = props;
     const dynamicAttr = getDynamicAttr ? getDynamicAttr(props) : {};
     const attr = { ...attributes, ...dynamicAttr };
-    const groupedShipmentItems = this.groupShipmentItems();
+    /**
+     * When calculating grouped shipment items while building the modal (it is built once)
+     * we want to look at the initial values in order to know the original qty shipped
+     * this is why we pass this.props.initialReceiptCandidates to the groupShipmentItems function
+     * If we were to pass the this.props.values while building a new row,
+     * we already might have edited qty shipped
+     * that would be considered as original qty that we should validate further edits with.
+     */
+    const groupedShipmentItems = this.groupShipmentItems(this.props.initialReceiptCandidates);
     const shipmentItemsQuantityMap = Object.entries(groupedShipmentItems)
       .reduce((acc, [key, value]) =>
         ({
@@ -120,8 +128,8 @@ class EditLineModal extends Component {
     this.setState({ attr });
   }
 
-  groupShipmentItems() {
-    const { containers } = this.props.values;
+  groupShipmentItems(values = this.props.values) {
+    const { containers } = values;
     /**
      * containers are built like: [{..., shipmentItems: []}]
      * so in the end we have to flat the result,
@@ -224,7 +232,12 @@ class EditLineModal extends Component {
     const { shipmentItemQuantityShippedSum } = this.state;
     const originalItem = values.find((item) => item.rowId);
     const qtyShippedSumFromModal = _.sumBy(values, (item) => _.toInteger(item.quantityShipped));
-    const groupedShipmentItems = this.groupShipmentItems();
+    /**
+     * When calculating grouped shipment items while validating,
+     * we want to look at the current form values
+     * this is why we pass this.props.values to the groupShipmentItems function
+     */
+    const groupedShipmentItems = this.groupShipmentItems(this.props.values);
     /**
      * We want to exclude from the calculation an "original item" (that contains a rowId).
      * It would receive the rowId and we would find the original item
@@ -365,6 +378,9 @@ EditLineModal.propTypes = {
   translate: PropTypes.func.isRequired,
   wrapperClassName: PropTypes.string,
   values: PropTypes.shape({
+    containers: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  }).isRequired,
+  initialReceiptCandidates: PropTypes.shape({
     containers: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   }).isRequired,
 };

@@ -579,7 +579,10 @@ class PartialReceivingPage extends Component {
     return apiClient.get(url)
       .then((response) => {
         this.setState({ values: {} }, () => {
-          this.setState({ values: parseResponse(response.data.data) });
+          this.setState({
+            values: parseResponse(response.data.data),
+            initialReceiptCandidates: parseResponse(response.data.data),
+          });
         });
       })
       .catch(() => this.props.hideSpinner());
@@ -1052,6 +1055,7 @@ class PartialReceivingPage extends Component {
                         hasPartialReceivingSupport: this.props.hasPartialReceivingSupport,
                         translate: this.props.translate,
                         formatLocalizedDate: this.props.formatLocalizedDate,
+                        initialReceiptCandidates: this.state.initialReceiptCandidates,
                       }))}
                   </div>
                   <div className="submit-buttons">
