@@ -308,6 +308,7 @@ class ProductService {
         String sortOrder = params.order ?: "asc"
         Date dateCreatedAfter = params.createdAfter ? Date.parse("MM/dd/yyyy", params.createdAfter) : null
         Date dateCreatedBefore = params.createdBefore ? Date.parse("MM/dd/yyyy", params.createdBefore) : null
+        List<ProductField> handlingRequirements = params.list("handlingRequirementId").collect { ProductField.valueOf(it) }
 
         def query = { isCountQuery ->
 
@@ -357,6 +358,21 @@ class ProductService {
             if (tagsInput) {
                 tags {
                     'in'("id", tagsInput.collect { it.id })
+                }
+            }
+
+            if (!handlingRequirements.empty) {
+                if (handlingRequirements.contains(ProductField.COLD_CHAIN)) {
+                    eq("coldChain", true)
+                }
+                if (handlingRequirements.contains(ProductField.CONTROLLED_SUBSTANCE)) {
+                    eq("controlledSubstance", true)
+                }
+                if (handlingRequirements.contains(ProductField.HAZARDOUS_MATERIAL)) {
+                    eq("hazardousMaterial", true)
+                }
+                if (handlingRequirements.contains(ProductField.RECONDITIONED)) {
+                    eq("reconditioned", true)
                 }
             }
 
