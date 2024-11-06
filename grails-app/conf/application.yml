@@ -77,7 +77,9 @@ management:
 server:
     contextPath: "/openboxes"
     session:
-        timeout: 3600
+        # The time (in seconds) of inactivity before we invalidate the user's session. (7200 is two hours.)
+        # For future reference, this setting has been renamed to "server.servlet.session.timeout" in SpringBoot 2+
+        timeout: 7200
 ---
 grails:
     #
