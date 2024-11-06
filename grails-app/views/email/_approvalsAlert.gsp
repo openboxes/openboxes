@@ -1,4 +1,5 @@
-<%@ page contentType="text/html"%>
+<%@ page import="org.pih.warehouse.core.Constants" contentType="text/html"%>
+
 <style>
     label {
         font-weight: bold;
@@ -11,10 +12,31 @@
     <div>
         <g:message
                 code="email.requestReceived.message"
-                args="[requisition.destination,
-                       requisition.requestedBy,
-                       g.createLink(uri: redirectUrl, absolute: true),
+                args="[requisition.destination]"
+        />
+        %{--
+             If there is a desired delivery date we want to add a comma at the end of this message, because there is a
+             second part of the sentence. If there is no delivery date, we just finish the sentence after requestCreatedBy
+             message. It cannot be included in HTML alone because there will be additional space around the punctuation mark.
+         --}%
+        <g:set var="punctuationMark" value="${requisition.dateDeliveryRequested ? ',' : '.'}" />
+        <g:message
+                code="email.requestCreatedBy.message"
+                args="[
+                        requisition.requestedBy,
+                        punctuationMark,
                 ]"
+        />
+        <g:if test="${requisition.dateDeliveryRequested}">
+            <g:message
+                    code="email.requestDesiredDateOfDelivery.message"
+                    args="[requisition.dateDeliveryRequested?.format(Constants.DEFAULT_MONTH_YEAR_DATE_FORMAT)]"
+            />
+        </g:if>
+        <g:set var="redirect" value="${g.createLink(uri: redirectUrl, absolute: true)}" />
+        <g:message
+                code="email.requestRedirect.message"
+                args="[redirect]"
         />
     </div>
     &nbsp;

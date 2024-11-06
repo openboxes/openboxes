@@ -35,11 +35,6 @@ class DateField extends Component {
     arrowLeft, arrowUp, arrowRight, arrowDown, fieldRef, onTabPress, localizeDate,
     localizedDateFormat = DateFormat.COMMON, showLocalizedPlaceholder, ...attributes
   }) {
-    const onChange = (date) => {
-      const val = !date || typeof date === 'string' ? date : date.format(dateFormat);
-      attributes.onChange(val);
-    };
-
     const onChangeRaw = (e) => {
       attributes.onChange(e.target.value);
     };
@@ -58,6 +53,11 @@ class DateField extends Component {
       }
 
       return dateFormat;
+    };
+
+    const onChange = (date) => {
+      const val = !date || typeof date === 'string' ? date : date.format(getFormat());
+      attributes.onChange(val);
     };
 
     const getLocale = () => {
