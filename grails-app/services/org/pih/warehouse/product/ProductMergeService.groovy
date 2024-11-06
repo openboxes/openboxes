@@ -548,13 +548,6 @@ class ProductMergeService {
             throw new IllegalArgumentException("Cannot merge the product with itself")
         }
 
-        def primaryRequisitionItems = requisitionService.getPendingRequisitionItems(primary)
-        if (primaryRequisitionItems) {
-            def primaryPendingRequisitions = primaryRequisitionItems.requisition?.unique()?.requestNumber
-                throw new IllegalArgumentException("Primary product has pending stock movements or requisitions (${primaryPendingRequisitions?.join(', ')}). " +
-                    "Please finish or cancel these stock movements or requisitions before merging products.")
-        }
-
         def obsoleteRequisitionItems = requisitionService.getPendingRequisitionItems(obsolete)
         if (obsoleteRequisitionItems) {
             def obsoletePendingRequisitions = obsoleteRequisitionItems.requisition?.unique()?.requestNumber
