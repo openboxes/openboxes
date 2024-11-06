@@ -273,10 +273,10 @@
                                     />
                                 </td>
                                 <td class="value">
-                                    <g:if test="${stockMovement?.requisition?.desiredDeliveryDate}">
+                                    <g:if test="${stockMovement?.requisition?.dateDeliveryRequested}">
                                         <g:formatDate
                                                 format="${Constants.DEFAULT_MONTH_YEAR_DATE_FORMAT}"
-                                                date="${stockMovement?.requisition?.desiredDeliveryDate}"
+                                                date="${stockMovement?.requisition?.dateDeliveryRequested}"
                                         />
                                     </g:if>
                                     <g:else>

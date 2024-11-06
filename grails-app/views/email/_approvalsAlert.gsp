@@ -19,7 +19,7 @@
              second part of the sentence. If there is no delivery date, we just finish the sentence after requestCreatedBy
              message. It cannot be included in HTML alone because there will be additional space around the punctuation mark.
          --}%
-        <g:set var="punctuationMark" value="${requisition.desiredDeliveryDate ? ',' : '.'}" />
+        <g:set var="punctuationMark" value="${requisition.dateDeliveryRequested ? ',' : '.'}" />
         <g:message
                 code="email.requestCreatedBy.message"
                 args="[
@@ -27,10 +27,10 @@
                         punctuationMark,
                 ]"
         />
-        <g:if test="${requisition.desiredDeliveryDate}">
+        <g:if test="${requisition.dateDeliveryRequested}">
             <g:message
                     code="email.requestDesiredDateOfDelivery.message"
-                    args="[requisition.desiredDeliveryDate?.format(Constants.DEFAULT_MONTH_YEAR_DATE_FORMAT)]"
+                    args="[requisition.dateDeliveryRequested?.format(Constants.DEFAULT_MONTH_YEAR_DATE_FORMAT)]"
             />
         </g:if>
         <g:set var="redirect" value="${g.createLink(uri: redirectUrl, absolute: true)}" />

@@ -6,12 +6,12 @@
     <changeSet author="anadolny" id="281020241330-0">
         <preConditions onFail="MARK_RAN">
             <not>
-                <columnExists tableName="requisition" columnName="desired_delivery_date"/>
+                <columnExists tableName="requisition" columnName="date_delivery_requested"/>
             </not>
         </preConditions>
 
         <addColumn tableName="requisition">
-            <column name="desired_delivery_date" type="DATETIME">
+            <column name="date_delivery_requested" type="DATETIME">
                 <constraints nullable="true" />
             </column>
         </addColumn>

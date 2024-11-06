@@ -183,13 +183,14 @@ const DEFAULT_FIELDS = {
       },
     }),
   },
-  desiredDeliveryDate: {
+  dateDeliveryRequested: {
     label: 'react.stockMovement.desiredDateOfDelivery',
     defaultMessage: 'Desired date of delivery',
     type: DateField,
     attributes: {
       localizeDate: true,
       localizedDateFormat: DateFormat.COMMON,
+      dateFormat: null,
       autoComplete: 'off',
     },
   },
@@ -409,7 +410,7 @@ class CreateStockMovement extends Component {
         stocklist: { id: _.get(values.stocklist, 'id', '') },
         requestType: values.requestType.id,
         sourceType: ELECTRONIC,
-        desiredDeliveryDate: values.desiredDeliveryDate,
+        dateDeliveryRequested: values.dateDeliveryRequested,
         approvers: values.approvers?.map(user => user.id),
       };
 

@@ -347,7 +347,7 @@ class StockMovementService {
         if (stockMovement.dateRequested) requisition.dateRequested = stockMovement.dateRequested
         if (stockMovement.requestType) requisition.type = stockMovement.requestType
         if (stockMovement.approvers != null) requisition.approvers = stockMovement.approvers
-        if (stockMovement.desiredDeliveryDate) requisition.desiredDeliveryDate = stockMovement.desiredDeliveryDate
+        if (stockMovement.dateDeliveryRequested) requisition.dateDeliveryRequested = stockMovement.dateDeliveryRequested
         requisition.name = stockMovement.generateName()
 
         if (requisition.requisitionTemplate?.id != stockMovement.stocklist?.id) {
@@ -2312,7 +2312,7 @@ class StockMovementService {
         requisition.origin = stockMovement.origin
         requisition.requestedBy = stockMovement.requestedBy
         requisition.dateRequested = stockMovement.dateRequested
-        requisition.desiredDeliveryDate = stockMovement.desiredDeliveryDate
+        requisition.dateDeliveryRequested = stockMovement.dateDeliveryRequested
         requisition.name = stockMovement.generateName()
         requisition.requisitionItems = []
         requisition.approvers = stockMovement.approvers
