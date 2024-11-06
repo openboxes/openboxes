@@ -170,3 +170,6 @@ export const FULFILLMENT_API = `${API}/fulfillments`;
 export const PACKING_LIST = `${CONTEXT_PATH}/packingList`;
 export const IMPORT_PACKING_LIST = `${PACKING_LIST}/upload`;
 export const FULFILLMENT_VALIDATION = `${FULFILLMENT_API}/validate`;
+
+// SELECT OPTIONS
+export const HANDLING_REQUIREMENTS_OPTIONS = `${API}/handlingRequirementsOptions`;

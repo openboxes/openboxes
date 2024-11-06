@@ -101,6 +101,11 @@ class UrlMappings {
             action = [GET: "ratingTypeCodeOptions"]
         }
 
+        "/api/handlingRequirementsOptions" {
+            controller = { "selectOptionsApi" }
+            action = [GET: "handlingRequirementsOptions"]
+        }
+
         "/api/products"(parseRequest: true) {
             controller = { "productApi" }
             action = [GET: "list"]
