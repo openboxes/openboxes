@@ -43,7 +43,7 @@ class PutawayService {
         List binLocationEntries = productAvailabilityService.getAvailableQuantityOnHandByBinLocation(location)
 
         List<PutawayItem> putawayItems = binLocationEntries.inject ([], { putawayItems,  binLocationEntry ->
-            if (binLocationEntry.binLocation.supports(ActivityCode.RECEIVE_STOCK)) {
+            if (binLocationEntry.binLocation?.supports(ActivityCode.RECEIVE_STOCK)) {
                 return putawayItems + new PutawayItem(
                         putawayStatus: PutawayStatus.READY,
                         product: binLocationEntry.product,
