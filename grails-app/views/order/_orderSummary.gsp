@@ -70,13 +70,13 @@
                                 </div>
                             </td>
                         </g:if>
-                        <td style="color: ${orderItem?.product?.color}">
+                        <td style="color: ${orderItem?.product?.color}" title="hello">
                             ${orderItem?.product?.productCode}
                         </td>
                         <td>
                             <g:link controller="inventoryItem" action="showStockCard"
                                     style="color: ${orderItem?.product?.color}"  params="['product.id':orderItem?.product?.id]">
-                                <format:displayNameWithColor product="${orderItem?.product}" showTooltip="${true}" />
+                                <format:displayNameWithColor product="${orderItem?.product}" productSupplier="${orderItem?.productSupplier}"  showTooltip="${true}" />
                                 <g:renderHandlingIcons product="${orderItem?.product}" />
                             </g:link>
                         </td>
