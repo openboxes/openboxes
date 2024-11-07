@@ -86,10 +86,14 @@ const FIELDS = {
         },
         getDynamicAttr: ({ values, rowIndex }) => {
           const orderItem = values.orderItems[rowIndex];
+          const productSupplierName = orderItem?.productSupplierName
+            ? `(source: ${orderItem?.productSupplierName})`
+            : null;
+
           return {
             color: orderItem?.color,
             showValueTooltip: true,
-            tooltipValue: orderItem?.productName,
+            tooltipValue: [orderItem?.productName, productSupplierName].join(' ')?.trim(),
             formatValue: () => orderItem?.displayName || orderItem?.productName,
           };
         },
