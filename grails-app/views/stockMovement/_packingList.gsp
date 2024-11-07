@@ -90,7 +90,7 @@
                         <g:set var="cacheKey" value="${shipmentItem?.id}-${productId}-${LocalizationUtil.currentLocale}" />
                         <g:link controller="inventoryItem" action="showStockCard" id="${productId}">
                             <cache:block key="${cacheKey}">
-                                <format:displayNameWithColor product="${shipmentItem?.inventoryItem?.product}" showTooltip="${true}" />
+                                <format:displayNameWithColor product="${shipmentItem?.inventoryItem?.product}" productSupplier="${shipmentItem?.orderItem?.productSupplier}" showTooltip="${true}" />
                                 <g:renderHandlingIcons product="${shipmentItem?.inventoryItem?.product}" />
                             </cache:block>
                         </g:link>
