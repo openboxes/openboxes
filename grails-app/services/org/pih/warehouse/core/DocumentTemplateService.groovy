@@ -112,7 +112,8 @@ class DocumentTemplateService {
                     unitPrice           : orderItem?.unitPrice ?: "",
                     totalPrice          : orderItem?.totalPrice() ?: "",
                     budgetCode          : orderItem?.budgetCode?.code ?: "",
-                    expectedShippingDate: orderItem?.estimatedReadyDate ? orderItem?.estimatedReadyDate?.format("MMM dd, yyyy") : ""
+                    expectedShippingDate: orderItem?.estimatedReadyDate ? orderItem?.estimatedReadyDate?.format("MMM dd, yyyy") : "",
+                    supplierName        : orderItem?.productSupplier?.name ?: ""
             ]
         }
         def orderAdjustments = orderInstance?.orderAdjustments?.findAll { !it.canceled }?.sort()?.collect { OrderAdjustment orderAdjustment ->
@@ -150,7 +151,8 @@ class DocumentTemplateService {
                 quantity: v?.sum { it.quantity },
                 totalPrice: v?.sum { it.totalPrice() },
                 budgetCode: v?.budgetCode?.first()?.code ?: "",
-                expectedShippingDate: v?.estimatedReadyDate?.first() ? v?.estimatedReadyDate?.first()?.format(Constants.EUROPEAN_DATE_FORMAT) : ""
+                expectedShippingDate: v?.estimatedReadyDate?.first() ? v?.estimatedReadyDate?.first()?.format(Constants.EUROPEAN_DATE_FORMAT) : "",
+                supplierName: productSuppliers?.size() ? productSuppliers.first()?.name : "",
             ]
         }
 
@@ -217,6 +219,7 @@ class DocumentTemplateService {
         metadata.addFieldAsList("orderItems.unitPrice")
         metadata.addFieldAsList("orderItems.totalPrice")
         metadata.addFieldAsList("orderItems.expectedShippingDate")
+        metadata.addFieldAsList("orderItems.supplierName")
 
         metadata.addFieldAsList("orderItemsGroupedByProductAndUom.code")
         metadata.addFieldAsList("orderItemsGroupedByProductAndUom.description")
@@ -229,6 +232,7 @@ class DocumentTemplateService {
         metadata.addFieldAsList("orderItemsGroupedByProductAndUom.totalPrice")
         metadata.addFieldAsList("orderItemsGroupedByProductAndUom.expectedShippingDate")
         metadata.addFieldAsList("orderItemsGroupedByProductAndUom.budgetCode")
+        metadata.addFieldAsList("orderItemsGroupedByProductAndUom.supplierName")
 
         // Add order adjustment fields to metadata
         metadata.addFieldAsList("orderAdjustments.code")

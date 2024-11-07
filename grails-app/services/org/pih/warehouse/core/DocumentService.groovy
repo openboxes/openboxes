@@ -598,6 +598,7 @@ class DocumentService {
             sheet.setColumnWidth((short) counter++, (short) ((50 * 3) / ((double) 1 / 20)))
             sheet.setColumnWidth((short) counter++, (short) ((50 * 12) / ((double) 1 / 20)))
             sheet.setColumnWidth((short) counter++, (short) ((50 * 5) / ((double) 1 / 20)))
+            sheet.setColumnWidth((short) counter++, (short) ((50 * 12) / ((double) 1 / 20)))
             sheet.setColumnWidth((short) counter++, (short) ((50 * 5) / ((double) 1 / 20)))
             sheet.setColumnWidth((short) counter++, (short) ((50 * 6) / ((double) 1 / 20)))
             sheet.setColumnWidth((short) counter++, (short) ((50 * 5) / ((double) 1 / 20)))
@@ -836,6 +837,9 @@ class DocumentService {
             row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code: 'productSupplier.supplierCode.label', default: 'Supplier code'))
             row.getCell(CELL_INDEX++).setCellStyle(tableHeaderLeftStyle)
 
+            row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code: 'productSupplier.supplierName.label', default: 'Supplier Product Name'))
+            row.getCell(CELL_INDEX++).setCellStyle(tableHeaderLeftStyle)
+
             row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code: 'productSupplier.manufacturer.label', default: 'Manufacturer'))
             row.getCell(CELL_INDEX++).setCellStyle(tableHeaderLeftStyle)
 
@@ -923,6 +927,9 @@ class DocumentService {
                 ProductSupplier supplier = suppliersList.size() > 0 ? suppliersList.get(0) : null
 
                 row.createCell(CELL_INDEX).setCellValue(supplier?.supplierCode ?: '')
+                row.getCell(CELL_INDEX++).setCellStyle(tableDataCenterStyle)
+
+                row.createCell(CELL_INDEX).setCellValue(supplier?.name ?: '')
                 row.getCell(CELL_INDEX++).setCellStyle(tableDataCenterStyle)
 
                 row.createCell(CELL_INDEX).setCellValue(supplier?.manufacturer?.toString() ?: '')
