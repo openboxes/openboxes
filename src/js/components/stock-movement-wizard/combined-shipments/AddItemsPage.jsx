@@ -120,6 +120,19 @@ const FIELDS = {
           showValueTooltip: true,
           disabled: true,
         },
+        getDynamicAttr: ({ rowIndex, values }) => {
+          const row = values.lineItems[rowIndex] || {};
+          const productDisplayNameLabel = row?.product?.displayNames?.default
+            ? row?.product?.name
+            : null;
+          const productSupplierNameLabel = row?.productSupplier?.name
+            ? `(source: ${row?.productSupplier?.name})`
+            : null;
+
+          return {
+            tooltipValue: [productDisplayNameLabel, productSupplierNameLabel].join(' '),
+          };
+        },
       },
       lotNumber: {
         type: TextField,

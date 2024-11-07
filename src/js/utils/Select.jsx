@@ -153,14 +153,36 @@ class Select extends Component {
   }
 
   getTooltipHtml() {
-    const { placeholder, showLabelTooltip, defaultPlaceholder } = this.props;
+    const {
+      placeholder,
+      showLabelTooltip,
+      defaultPlaceholder,
+      tooltipValue,
+      tooltipDefaultValue,
+    } = this.props;
+
+    if (tooltipValue?.trim()) {
+      const tooltipTranslatedLabel = this.props.translate(
+        tooltipValue,
+        tooltipDefaultValue ?? tooltipValue,
+      );
+      return (
+        <div className="p-1">
+          {tooltipTranslatedLabel}
+        </div>
+      );
+    }
 
     const valueLabel = this.getValueLabel();
 
     if (showLabelTooltip) {
+      const placeholderTranslatedLabel = this.props.translate(
+        placeholder,
+        defaultPlaceholder ?? placeholder,
+      );
       return (
         <div className="p-1">
-          {`${this.props.translate(placeholder, defaultPlaceholder ?? placeholder)}${valueLabel ? `: ${valueLabel}` : ''}`}
+          {`${placeholderTranslatedLabel}${valueLabel ? `: ${valueLabel}` : ''}`}
         </div>
       );
     }
@@ -168,9 +190,9 @@ class Select extends Component {
     return (
       <div className="p-1">
         {valueLabel}
-      </div>);
+      </div>
+    );
   }
-
 
   mapOptions(values) {
     return (_.map(values, (value) => {
@@ -447,6 +469,8 @@ Select.propTypes = {
   delimiter: PropTypes.string,
   showValueTooltip: PropTypes.bool,
   showLabelTooltip: PropTypes.bool,
+  tooltipValue: PropTypes.string,
+  tooltipDefaultValue: PropTypes.string,
   placeholder: PropTypes.string,
   initialValue: PropTypes.oneOfType([PropTypes.string,
     PropTypes.shape({}), PropTypes.any]),
@@ -485,6 +509,8 @@ Select.defaultProps = {
   initialValue: null,
   showValueTooltip: false,
   showLabelTooltip: false,
+  tooltipValue: undefined,
+  tooltipDefaultValue: undefined,
   arrowLeft: null,
   arrowUp: null,
   arrowRight: null,

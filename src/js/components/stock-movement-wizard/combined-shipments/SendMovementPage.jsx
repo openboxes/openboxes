@@ -28,7 +28,6 @@ import splitTranslation from 'utils/translation-utils';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
-
 const SHIPMENT_FIELDS = {
   'origin.name': {
     label: 'react.stockMovement.origin.label',
@@ -180,11 +179,21 @@ const SUPPLIER_FIELDS = {
         defaultMessage: 'Product',
         headerAlign: 'left',
         flexWidth: '7',
-        getDynamicAttr: ({ fieldValue, isBoxNameEmpty, isPalletNameEmpty }) => ({
-          showValueTooltip: !!fieldValue?.displayNames?.default,
-          tooltipValue: fieldValue?.name,
-          flexWidth: 7 + (isBoxNameEmpty ? 3 : 0) + (isPalletNameEmpty ? 3 : 0),
-        }),
+        getDynamicAttr: ({
+          isBoxNameEmpty, isPalletNameEmpty, tableItems, rowIndex,
+        }) => {
+          const row = tableItems[rowIndex] || {};
+          const productDisplayNameLabel = row?.product?.displayNames?.default
+            ? row?.product?.name
+            : null;
+          const productSupplierNameLabel = row?.productSupplier?.name ? `(source: ${row?.productSupplier?.name})` : null;
+          const tooltipValue = [productDisplayNameLabel, productSupplierNameLabel].join(' ').trim();
+          return {
+            showValueTooltip: Boolean(tooltipValue),
+            tooltipValue,
+            flexWidth: 7 + (isBoxNameEmpty ? 3 : 0) + (isPalletNameEmpty ? 3 : 0),
+          };
+        },
         attributes: {
           className: 'text-left',
           formatValue: formatProductDisplayName,

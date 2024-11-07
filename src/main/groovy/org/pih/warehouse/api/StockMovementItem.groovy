@@ -10,6 +10,7 @@ import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.product.ProductSupplier
 import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.shipping.ShipmentItem
 
@@ -24,6 +25,7 @@ class StockMovementItem {
 
     StockMovement stockMovement
     RequisitionItem requisitionItem
+    ProductSupplier productSupplier
 
     BigDecimal quantityRequested
     BigDecimal quantityOnHand
@@ -149,6 +151,11 @@ class StockMovementItem {
                 substitutionItems         : substitutionItems,
                 sortOrder                 : sortOrder,
                 orderItemId               : orderItemId,
+                productSupplier           : productSupplier ? [
+                        id            : productSupplier.id,
+                        name          : productSupplier.name,
+                        code          : productSupplier.code,
+                ] : null,
                 orderNumber               : orderNumber,
                 orderId                   : orderId,
                 packSize                  : packSize,
@@ -183,6 +190,7 @@ class StockMovementItem {
                 palletName: palletName,
                 boxName: boxName,
                 orderItemId: shipmentItem.orderItemId,
+                productSupplier: shipmentItem.orderItem?.productSupplier,
                 comments: null,
                 lotNumber: shipmentItem?.inventoryItem?.lotNumber ?: "",
                 expirationDate: shipmentItem?.inventoryItem?.expirationDate,
@@ -246,6 +254,7 @@ class StockMovementItem {
                 quantityRequested: orderItem.quantityRemainingToShip * orderItem.quantityPerUom,
                 recipient: orderItem.recipient,
                 orderItemId: orderItem.id,
+                productSupplier: orderItem.productSupplier,
                 orderNumber: orderItem.order.orderNumber,
         )
     }
