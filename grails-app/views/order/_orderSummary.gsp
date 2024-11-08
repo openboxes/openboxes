@@ -70,7 +70,7 @@
                                 </div>
                             </td>
                         </g:if>
-                        <td style="color: ${orderItem?.product?.color}" title="hello">
+                        <td style="color: ${orderItem?.product?.color}">
                             ${orderItem?.product?.productCode}
                         </td>
                         <td>

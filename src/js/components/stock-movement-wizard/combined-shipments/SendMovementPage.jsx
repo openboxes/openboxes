@@ -21,7 +21,7 @@ import TextField from 'components/form-elements/TextField';
 import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
 import apiClient from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
-import { formatProductDisplayName } from 'utils/form-values-utils';
+import { formatProductDisplayName, formatProductSupplierSubtext } from 'utils/form-values-utils';
 import { debounceLocationsFetch } from 'utils/option-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 import splitTranslation from 'utils/translation-utils';
@@ -186,7 +186,7 @@ const SUPPLIER_FIELDS = {
           const productDisplayNameLabel = row?.product?.displayNames?.default
             ? row?.product?.name
             : null;
-          const productSupplierNameLabel = row?.productSupplier?.name ? `(source: ${row?.productSupplier?.name})` : null;
+          const productSupplierNameLabel = formatProductSupplierSubtext(row?.productSupplier);
           const tooltipValue = [productDisplayNameLabel, productSupplierNameLabel].join(' ').trim();
           return {
             showValueTooltip: Boolean(tooltipValue),

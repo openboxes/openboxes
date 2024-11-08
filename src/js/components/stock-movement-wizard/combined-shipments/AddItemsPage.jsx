@@ -36,6 +36,7 @@ import { ORDER_URL, STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
 import AlertMessage from 'utils/AlertMessage';
 import apiClient from 'utils/apiClient';
 import { renderFormField, setColumnValue } from 'utils/form-utils';
+import { formatProductSupplierSubtext } from 'utils/form-values-utils';
 import { debounceProductsFetch } from 'utils/option-utils';
 import Select from 'utils/Select';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
@@ -122,9 +123,7 @@ const FIELDS = {
         },
         getDynamicAttr: ({ rowIndex, values }) => {
           const row = values.lineItems[rowIndex] || {};
-          const productSupplierNameLabel = row?.productSupplier?.name
-            ? `(source: ${row?.productSupplier?.name})`
-            : null;
+          const productSupplierNameLabel = formatProductSupplierSubtext(row?.productSupplier);
 
           return {
             tooltipValue: [row?.product?.name, productSupplierNameLabel].join(' '),

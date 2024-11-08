@@ -15,6 +15,7 @@ import ProductSelect from 'components/product-select/ProductSelect';
 import { ORDER_URL } from 'consts/applicationUrls';
 import apiClient from 'utils/apiClient';
 import Checkbox from 'utils/Checkbox';
+import { formatProductSupplierSubtext } from 'utils/form-values-utils';
 import { debounceProductsInOrders } from 'utils/option-utils';
 import Select from 'utils/Select';
 import { translateWithDefaultMessage } from 'utils/Translate';
@@ -86,9 +87,9 @@ const FIELDS = {
         },
         getDynamicAttr: ({ values, rowIndex }) => {
           const orderItem = values.orderItems[rowIndex];
-          const productSupplierName = orderItem?.productSupplierName
-            ? `(source: ${orderItem?.productSupplierName})`
-            : null;
+          const productSupplierName = formatProductSupplierSubtext({
+            name: orderItem?.productSupplierName,
+          });
 
           return {
             color: orderItem?.color,

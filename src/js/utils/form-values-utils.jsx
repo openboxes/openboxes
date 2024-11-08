@@ -24,6 +24,10 @@ export const getInvoiceDescription = (rowValue) => {
   return rowValue?.description;
 };
 
+export const formatProductSupplierSubtext = (productSupplier) => (
+  productSupplier?.name ? `(source: ${productSupplier?.name})` : null
+);
+
 export const formatProductDisplayName = (rowValue) => (
   <div className="d-flex">
     <span className="text-truncate">
