@@ -40,6 +40,7 @@ jobs:
         if: ${{ strategy.job-index == 0 }}
         uses: codecov/codecov-action@v4
         with:
-          file: ./build/reports/jacoco/test/jacocoTestReport.xml
-          fail_ci_if_error: false
+          fail_ci_if_error: true
           verbose: true
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
