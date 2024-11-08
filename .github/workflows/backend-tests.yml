@@ -3,6 +3,9 @@ name: Backend Tests
 # Is only runnable via other workflows
 on:
   workflow_call:
+    secrets:
+      CODECOV_TOKEN:
+        required: true
 
 env:
   JAVA_VERSION: 8
@@ -42,3 +45,4 @@ jobs:
         with:
           fail_ci_if_error: true
           verbose: true
+          token: ${{ secrets.CODECOV_TOKEN }}
