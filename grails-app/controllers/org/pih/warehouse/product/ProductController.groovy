@@ -1181,9 +1181,16 @@ class ProductController {
     }
 
     def showMergeProductDialog() {
-        // TODO: ADD WARNING IF PRODUCT HAS PENDING ORDER/SHIPMENT/RECEIPT/whatever
         Product primaryProduct = Product.get(params.primaryProduct)
-        render(template: params.template, model: [ primaryProduct: primaryProduct ])
+        List<Location> locationsWithPendingTransactions = productMergeService
+                .getLocationsWithPendingTransactions(primaryProduct)
+        render(
+                template: params.template,
+                model: [
+                        primaryProduct: primaryProduct,
+                        locationsWithPendingTransactions: locationsWithPendingTransactions,
+                ]
+        )
     }
 
     def merge() {

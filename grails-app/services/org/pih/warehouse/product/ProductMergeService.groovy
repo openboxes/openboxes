@@ -13,6 +13,7 @@ import grails.gorm.transactions.Transactional
 import org.hibernate.sql.JoinType
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.core.Constants
+import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.Transaction
@@ -548,13 +549,6 @@ class ProductMergeService {
             throw new IllegalArgumentException("Cannot merge the product with itself")
         }
 
-        def primaryRequisitionItems = requisitionService.getPendingRequisitionItems(primary)
-        if (primaryRequisitionItems) {
-            def primaryPendingRequisitions = primaryRequisitionItems.requisition?.unique()?.requestNumber
-                throw new IllegalArgumentException("Primary product has pending stock movements or requisitions (${primaryPendingRequisitions?.join(', ')}). " +
-                    "Please finish or cancel these stock movements or requisitions before merging products.")
-        }
-
         def obsoleteRequisitionItems = requisitionService.getPendingRequisitionItems(obsolete)
         if (obsoleteRequisitionItems) {
             def obsoletePendingRequisitions = obsoleteRequisitionItems.requisition?.unique()?.requestNumber
@@ -568,5 +562,10 @@ class ProductMergeService {
             throw new IllegalArgumentException("Obsolete product has pending invoices (${pendingInvoiceNumbers?.join(', ')}). " +
                 "Please post these invoices before merging products.")
         }
+    }
+
+    List<Location> getLocationsWithPendingTransactions(Product product) {
+        List<RequisitionItem> requisitionItems = requisitionService.getPendingRequisitionItems(product)
+        return requisitionItems?.requisition.origin.unique()
     }
 }
