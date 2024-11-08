@@ -38,7 +38,7 @@ jobs:
       # "strategy.job-index" gives us the index of the current job in the matrix. Any index is fine. We use the first.
       - name: Upload results to Codecov
         if: ${{ strategy.job-index == 0 }}
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
         with:
           fail_ci_if_error: true
           verbose: true
