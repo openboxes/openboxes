@@ -75,6 +75,10 @@ plugins {
 
     // enable `grails gradle autoLintGradle`
     id 'nebula.lint' version '17.8.0'
+
+    // Adds the "jacocoTestReport" command for generating code coverage reports as well as the
+    // "jacocoTestCoverageVerification" command for validating coverage percentage minimums.
+    id 'jacoco'
 }
 
 // prevent warfile issues by applying this before `asset-pipeline`. OBGM-353
@@ -838,30 +842,66 @@ task writePom {
     }
 }
 
+// Jacoco code coverage reporting. https://docs.gradle.org/4.10.3/userguide/jacoco_plugin.html
+// Running "./gradlew jacocoTestReport" will execute all unit and integration tests, then generate a code
+// coverage report under the "/build/reports/jacoco" folder.
+jacoco {
+    // Jacoco 0.7.7 requires ASM Version 5.1+ https://www.eclemma.org/jacoco/trunk/doc/changes.html
+    toolVersion = '0.7.6.201602180812'
+}
+// Note that the paths here are by package name (as they are in "build/classes/groovy/main"). As such, we cannot
+// filter by Grails folders such as "**/controller/**" (but we could filter by "**/*Controller.class").
+List jacocoExcludes = [
+        // Filter out the Groovy-generated closure classes from Jacoco for the sake of visual clarity in the report.
+        // https://stackoverflow.com/questions/39453696/how-do-you-exclude-implicit-groovy-closure-classes-from-jacoco-test-resport-with
+        '**/*$*_closure*',
+]
+jacocoTestReport {
+    // Makes sure that tests are always run before a report is generated (because otherwise the report will be blank or
+    // out of date). This allows us to run both tests and coverage with "./gradlew jacocoTestReport"
+    dependsOn test, integrationTest
+
+    // Generates a combined report based on the coverage results generated from both unit tests and integration tests.
+    executionData test, integrationTest
+
+    reports {
+        xml.enabled true  // Needed so that we can upload to Codecov.
+        html.enabled true  // Useful for verifying locally during development.
+    }
+
+    doFirst {
+        // Our source code builds to both "build/classes/groovy" and "build/classes/java" so we need to filter one of
+        // the two class paths out to avoid "Can't add different class with same name" errors. It's dirty to do this
+        // in the "doFirst" block, but it's the only way to tell Jacoco to ONLY use this path.
+        classDirectories = files(files("build/classes/groovy/main").collect {
+            // Then also exclude any packages from the report that we didn't actually generate any coverage % for.
+            fileTree(dir: it, exclude: jacocoExcludes)
+        })
+    }
+}
+
+// Configuration for both "test" and "integrationTest" tasks.
 tasks.withType(Test) {
     systemProperty 'geb.build.reportsDir', reporting.file('geb/integrationTest')
     systemProperty 'geb.env', System.getProperty('geb.env')
     systemProperty 'webdriver.chrome.driver', System.getProperty('webdriver.chrome.driver')
     systemProperty 'webdriver.firefox.driver', System.getProperty('webdriver.firefox.driver')
+    systemProperty "username", System.getProperty("username")
+    systemProperty "password", System.getProperty("password")
+
     testLogging {
         events 'failed', 'passed', 'skipped'
         exceptionFormat 'full'
-    }
-}
-
-/**
- * Used when running integration tests. Can be defined at the commandline by our build and
- * test pipelines (which use secrets, not plaintext passwords).
- */
-test {
-    systemProperty "username", System.getProperty("username")
-    systemProperty "password", System.getProperty("password")
-}
-
-integrationTest {
-    testLogging {
-        events "passed", "skipped", "failed"
         showStackTraces = true
         showStandardStreams = true
+    }
+
+    // Generate a code coverage report whenever tests run. This is useful for simplifying uploading coverage reports
+    // during our CI flows. The actual report generation is quick (<20 seconds), so it's fine to do this every time.
+    finalizedBy jacocoTestReport
+
+    jacoco {
+        // When running tests, exclude the given folders from Jacoco coverage % generation.
+        excludes = jacocoExcludes
     }
 }
