@@ -13,6 +13,7 @@ import grails.gorm.transactions.Transactional
 import org.hibernate.sql.JoinType
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.core.Constants
+import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.Transaction
@@ -561,5 +562,10 @@ class ProductMergeService {
             throw new IllegalArgumentException("Obsolete product has pending invoices (${pendingInvoiceNumbers?.join(', ')}). " +
                 "Please post these invoices before merging products.")
         }
+    }
+
+    List<Location> getLocationsWithPendingTransactions(Product product) {
+        List<RequisitionItem> requisitionItems = requisitionService.getPendingRequisitionItems(product)
+        return requisitionItems?.requisition.origin.unique()
     }
 }

@@ -2,6 +2,17 @@
     <p class="message m-2">
         <warehouse:message code="product.mergeProducts.description.label"/>
     </p>
+    <g:if test="${locationsWithPendingTransactions}">
+        <div class="warning m-2">
+            <g:message code="product.mergeProducts.pendingTransactions.warning.label"/>
+            <g:each var="location" in="${locationsWithPendingTransactions}">
+                <div class="ml-2 pt-1">
+                    <img src="${resource(dir:'images/icons/silk',file: 'arrow_right.png')}" style="vertical-align: middle"/>
+                    <b>${location.name}</b>
+                </div>
+            </g:each>
+        </div>
+    </g:if>
     <table>
         <tbody>
             <tr class="prop">
