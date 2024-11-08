@@ -362,17 +362,19 @@ class ProductService {
             }
 
             if (!handlingRequirements.empty) {
-                if (handlingRequirements.contains(ProductField.COLD_CHAIN)) {
-                    eq("coldChain", true)
-                }
-                if (handlingRequirements.contains(ProductField.CONTROLLED_SUBSTANCE)) {
-                    eq("controlledSubstance", true)
-                }
-                if (handlingRequirements.contains(ProductField.HAZARDOUS_MATERIAL)) {
-                    eq("hazardousMaterial", true)
-                }
-                if (handlingRequirements.contains(ProductField.RECONDITIONED)) {
-                    eq("reconditioned", true)
+                or {
+                    if (handlingRequirements.contains(ProductField.COLD_CHAIN)) {
+                        eq("coldChain", true)
+                    }
+                    if (handlingRequirements.contains(ProductField.CONTROLLED_SUBSTANCE)) {
+                        eq("controlledSubstance", true)
+                    }
+                    if (handlingRequirements.contains(ProductField.HAZARDOUS_MATERIAL)) {
+                        eq("hazardousMaterial", true)
+                    }
+                    if (handlingRequirements.contains(ProductField.RECONDITIONED)) {
+                        eq("reconditioned", true)
+                    }
                 }
             }
 
