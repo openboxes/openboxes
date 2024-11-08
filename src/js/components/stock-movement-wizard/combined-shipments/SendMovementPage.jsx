@@ -21,13 +21,12 @@ import TextField from 'components/form-elements/TextField';
 import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
 import apiClient from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
-import { formatProductDisplayName } from 'utils/form-values-utils';
+import { formatProductDisplayName, formatProductSupplierSubtext } from 'utils/form-values-utils';
 import { debounceLocationsFetch } from 'utils/option-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 import splitTranslation from 'utils/translation-utils';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
-
 
 const SHIPMENT_FIELDS = {
   'origin.name': {
@@ -180,11 +179,21 @@ const SUPPLIER_FIELDS = {
         defaultMessage: 'Product',
         headerAlign: 'left',
         flexWidth: '7',
-        getDynamicAttr: ({ fieldValue, isBoxNameEmpty, isPalletNameEmpty }) => ({
-          showValueTooltip: !!fieldValue?.displayNames?.default,
-          tooltipValue: fieldValue?.name,
-          flexWidth: 7 + (isBoxNameEmpty ? 3 : 0) + (isPalletNameEmpty ? 3 : 0),
-        }),
+        getDynamicAttr: ({
+          isBoxNameEmpty, isPalletNameEmpty, tableItems, rowIndex,
+        }) => {
+          const row = tableItems[rowIndex] || {};
+          const productDisplayNameLabel = row?.product?.displayNames?.default
+            ? row?.product?.name
+            : null;
+          const productSupplierNameLabel = formatProductSupplierSubtext(row?.productSupplier);
+          const tooltipValue = [productDisplayNameLabel, productSupplierNameLabel].join(' ').trim();
+          return {
+            showValueTooltip: Boolean(tooltipValue),
+            tooltipValue,
+            flexWidth: 7 + (isBoxNameEmpty ? 3 : 0) + (isPalletNameEmpty ? 3 : 0),
+          };
+        },
         attributes: {
           className: 'text-left',
           formatValue: formatProductDisplayName,

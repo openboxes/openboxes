@@ -106,6 +106,7 @@ class FormatTagLib {
                         template: '/taglib/productDisplayName',
                         model: [
                                 product         : [ name: attrs.product?.name, productCode: attrs.product?.productCode ],
+                                productSupplier : [ name: attrs.productSupplier?.name, code: attrs.productSupplier?.code ],
                                 displayName     : displayNames[attrs.locale],
                                 showProductCode : attrs.showProductCode,
                         ],

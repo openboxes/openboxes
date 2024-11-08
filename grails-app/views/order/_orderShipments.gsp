@@ -28,7 +28,7 @@
                         <td>
                             <g:if test="${!j}">
                                 ${shipmentItem?.product?.productCode}
-                                <format:displayName product="${shipmentItem?.product}" showTooltip="${true}"/>
+                                <format:displayName product="${shipmentItem?.product}" productSupplier="${orderItem?.productSupplier}" showTooltip="${true}"/>
                             </g:if>
                         </td>
                         <td>

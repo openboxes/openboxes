@@ -51,7 +51,7 @@ export const renderFormFields = ({
   if (arrayField) {
     return (
       <Tooltip
-        title={translate(`${error}`)}
+        title={error ? translate(`${error}`) : undefined}
         disabled={!error || !(touched || fieldTouched)}
         arrow="true"
         delay="150"
