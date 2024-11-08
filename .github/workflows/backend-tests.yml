@@ -3,6 +3,9 @@ name: Backend Tests
 # Is only runnable via other workflows
 on:
   workflow_call:
+    secrets:
+      CODECOV_TOKEN:
+        required: true
 
 env:
   JAVA_VERSION: 8
@@ -41,6 +44,3 @@ jobs:
         uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          files: ./build/reports/jacoco/test/jacocoTestReport.xml
-          fail_ci_if_error: false
-          verbose: true
