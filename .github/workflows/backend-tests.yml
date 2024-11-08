@@ -43,6 +43,4 @@ jobs:
         if: ${{ strategy.job-index == 0 }}
         uses: codecov/codecov-action@v4
         with:
-          fail_ci_if_error: true
-          verbose: true
           token: ${{ secrets.CODECOV_TOKEN }}
