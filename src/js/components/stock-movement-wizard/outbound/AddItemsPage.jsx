@@ -189,6 +189,15 @@ const NO_STOCKLIST_FIELDS = {
               onChange={(val) => {
                 if (val) {
                   setRecipientValue(val);
+                  saveProgress({
+                    editAll: true,
+                    values: update(values, {
+                      lineItems: {
+                        $set: values.lineItems
+                          .map((item) => update(item, { recipient: { $set: val } })),
+                      },
+                    }),
+                  });
                 }
               }}
             />
@@ -1021,7 +1030,7 @@ class AddItemsPage extends Component {
 
   // if rowIndex is passed, it means that we are editing row
   // not adding new one
-  saveProgress = ({ values, rowIndex, fieldValue }) => {
+  saveProgress = ({ values, rowIndex, fieldValue, editAll }) => {
     if (!this.props.isAutosaveEnabled) {
       return;
     }
@@ -1034,6 +1043,10 @@ class AddItemsPage extends Component {
     // rowIndex is present
     const isEdited = rowIndex !== undefined;
     const itemsWithStatuses = values.lineItems.map((item) => {
+      if (editAll) {
+        return { ...item, rowSaveStatus: RowSaveStatus.PENDING };
+      }
+
       if (isEdited && rowIndex === values.lineItems.indexOf(item)) {
         return { ...fieldValue, rowSaveStatus: RowSaveStatus.PENDING };
       }
@@ -1052,7 +1065,7 @@ class AddItemsPage extends Component {
 
     // We don't want to save the item during editing or
     // when there is an error in line
-    if (isEdited) {
+    if (isEdited || editAll) {
       this.debouncedSave();
       return;
     }
