@@ -111,7 +111,7 @@ class TableBodyVirtualized extends Component {
     const RowComponent = fieldsConfig.rowComponent || TableRow;
     const { totalCount } = properties;
 
-    if (fields.value[index]) {
+    if (fields?.value?.[index]) {
       const dynamicRowAttr = fieldsConfig.getDynamicRowAttr ?
         fieldsConfig.getDynamicRowAttr({
           ...properties,
