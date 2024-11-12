@@ -930,7 +930,7 @@ class DocumentService {
                 row.getCell(CELL_INDEX++).setCellStyle(tableDataCenterStyle)
 
                 row.createCell(CELL_INDEX).setCellValue(supplier?.name ?: '')
-                row.getCell(CELL_INDEX++).setCellStyle(tableDataCenterStyle)
+                row.getCell(CELL_INDEX++).setCellStyle(tableDataLeftStyle)
 
                 row.createCell(CELL_INDEX).setCellValue(supplier?.manufacturer?.toString() ?: '')
                 row.getCell(CELL_INDEX++).setCellStyle(tableDataCenterStyle)
