@@ -1065,7 +1065,7 @@ class AddItemsPage extends Component {
 
     // We don't want to save the item during editing or
     // when there is an error in line
-    if (isEdited) {
+    if (isEdited || editAll) {
       this.debouncedSave();
       return;
     }
