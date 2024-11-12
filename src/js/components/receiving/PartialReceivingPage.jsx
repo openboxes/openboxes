@@ -103,6 +103,11 @@ const TABLE_FIELDS = {
   containers: {
     type: ArrayField,
     arrowsNavigation: true,
+    virtualized: true,
+    totalCount: ({ totalCount }) => totalCount,
+    isRowLoaded: ({ isRowLoaded }) => isRowLoaded,
+    loadMoreRows: ({ loadMoreRows }) => loadMoreRows(),
+    isFirstPageLoaded: ({ isFirstPageLoaded }) => isFirstPageLoaded,
     rowComponent: TableRowWithSubfields,
     headerFontSize: '0.775rem',
     subfieldKey: 'shipmentItems',
@@ -452,6 +457,7 @@ class PartialReceivingPage extends Component {
 
     this.state = {
       values: {},
+      isFirstPageLoaded: false,
     };
     this.autofillLines = this.autofillLines.bind(this);
     this.setLocation = this.setLocation.bind(this);
@@ -462,6 +468,7 @@ class PartialReceivingPage extends Component {
     this.exportTemplate = this.exportTemplate.bind(this);
     this.importTemplate = this.importTemplate.bind(this);
     this.rewriteQuantitiesAfterSave = this.rewriteQuantitiesAfterSave.bind(this);
+    this.isRowLoaded = this.isRowLoaded.bind(this);
   }
 
   componentDidMount() {
@@ -582,6 +589,7 @@ class PartialReceivingPage extends Component {
           this.setState({
             values: parseResponse(response.data.data),
             initialReceiptCandidates: parseResponse(response.data.data),
+            isFirstPageLoaded: true,
           });
         });
       })
@@ -966,6 +974,10 @@ class PartialReceivingPage extends Component {
       .catch(() => this.props.hideSpinner());
   }
 
+  isRowLoaded({ index }) {
+    return !!this.state.values.containers[index];
+  }
+
   render() {
     return (
       <div>
@@ -1044,6 +1056,10 @@ class PartialReceivingPage extends Component {
                   <div className="my-2 table-form" data-testid="items-table">
                     {_.map(TABLE_FIELDS, (fieldConfig, fieldName) =>
                       renderFormField(fieldConfig, fieldName, {
+                        totalCount: this.state.values?.containers?.length || 0,
+                        loadMoreRows: () => {},
+                        isRowLoaded: this.isRowLoaded,
+                        isFirstPageLoaded: this.state.isFirstPageLoaded,
                         autofillLines: this.autofillLines,
                         saveEditLine: this.saveEditLine,
                         setLocation: this.setLocation,
