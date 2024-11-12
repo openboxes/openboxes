@@ -852,9 +852,9 @@ jacoco {
 // Note that the paths here are by package name (as they are in "build/classes/groovy/main"). As such, we cannot
 // filter by Grails folders such as "**/controller/**" (but we could filter by "**/*Controller.class").
 List jacocoExcludes = [
-        // Filter out the Groovy-generated closure classes from Jacoco for the sake of visual clarity in the report.
-        // https://stackoverflow.com/questions/39453696/how-do-you-exclude-implicit-groovy-closure-classes-from-jacoco-test-resport-with
-        '**/*$*_closure*',
+        // This filters out all the Groovy-generated closure elements from Jacoco, which helps de-clutter the report but
+        // also prevents any closures from being counted in the report. Leave them in to get a more accurate percentage.
+        //'**/*$*_closure*',
 ]
 jacocoTestReport {
     // Makes sure that tests are always run before a report is generated (because otherwise the report will be blank or
