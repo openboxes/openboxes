@@ -26,9 +26,10 @@ import {
   handleSuccess,
   handleValidationErrors,
 } from 'utils/apiClient';
-import { renderFormField } from 'utils/form-utils';
+import { renderFormField , setColumnValue} from 'utils/form-utils';
 import { formatProductDisplayName, matchesProductCodeOrName } from 'utils/form-values-utils';
 import { debouncePeopleFetch } from 'utils/option-utils';
+import Select from 'utils/Select';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 import { formatDate } from 'utils/translation-utils';
 
@@ -138,9 +139,25 @@ const FIELDS = {
           labelKey: 'name',
           filterOptions: options => options,
         },
-        getDynamicAttr: props => ({
-          loadOptions: props.debouncedPeopleFetch,
-          disabled: props.showOnly,
+        getDynamicAttr: ({
+          debouncedPeopleFetch, showOnly, setRecipientValue, translate,
+        }) => ({
+          loadOptions: debouncedPeopleFetch,
+          disabled: showOnly,
+          headerHtml: () => (
+            <Select
+              placeholder={translate('react.stockMovement.recipient.label', 'Recipient')}
+              className="select-xs my-2"
+              classNamePrefix="react-select"
+              async={true}
+              loadOptions={debouncedPeopleFetch}
+              onChange={(val) => {
+                if (val) {
+                  setRecipientValue(val);
+                }
+              }}
+            />
+          ),
         }),
       },
       palletName: {
@@ -494,10 +511,18 @@ class PackingPage extends Component {
     return (
       <Form
         onSubmit={values => this.nextPage(values)}
-        mutators={{ ...arrayMutators }}
+        mutators={{
+          ...arrayMutators,
+          setColumnValue,
+        }}
         initialValues={this.state.values}
         validate={validate}
-        render={({ handleSubmit, values, invalid }) => (
+        render={({
+          handleSubmit,
+          values,
+          invalid,
+          form: { mutators },
+        }) => (
           <div className="d-flex flex-column">
             <AlertMessage show={this.state.showAlert} message={this.state.alertMessage} danger />
             { !showOnly ?
@@ -560,6 +585,8 @@ class PackingPage extends Component {
                   showOnly,
                   itemFilter,
                   formatLocalizedDate: this.props.formatLocalizedDate,
+                  setRecipientValue: (val) => mutators.setColumnValue('packPageItems', 'recipient', val),
+                  translate: this.props.translate,
                 }))}
               </div>
               <div className="submit-buttons">
