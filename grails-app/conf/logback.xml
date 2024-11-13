@@ -99,7 +99,13 @@
     <logger name="org.hibernate.stat" level="info" />
     <logger name="org.hibernate.transform" level="info" />
     <logger name="org.hibernate.tool" level="info" />
-    <logger name="org.hibernate.type" level="info" /><!-- https://www.javacodegeeks.com/2012/10/logging-hibernate-sql.html -->
+    <!--
+    Manages the hibernate PreparedStatement logs which bind parameters to the positional '?' args of SQL queries.
+    We restrict these down to "info" level to avoid flooding the logs with tons of statements for each query, but we
+    can set this to "trace" if we want to be able to search the database logs for the actual parameters that were used,
+    (and not just the positional '?' params). https://www.javacodegeeks.com/2012/10/logging-hibernate-sql.html
+    -->
+    <logger name="org.hibernate.type" level="info" />
     <logger name="org.hibernate.validator" level="info" />
     <logger name="org.springframework.aop" level="info" />
     <logger name="org.springframework.beans" level="info" />

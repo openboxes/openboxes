@@ -612,3 +612,16 @@ grails:
     logging:
         jul:
             usebridge: true
+
+sentry:
+    # TODO: For some reason defining the dsn here causes the following exception:
+    #       - java.lang.IllegalStateException: Error processing condition on io.sentry.spring.boot.SentryAutoConfiguration$HubConfiguration$SentryWebMvcConfiguration.transactionNameProvider
+    #       - Caused by: java.lang.reflect.MalformedParameterizedTypeException: null
+    #       https://github.com/getsentry/sentry-java/blob/6.34.0/sentry-spring-boot/src/main/java/io/sentry/spring/boot/SentryAutoConfiguration.java#L268-L272
+    #       Find a way to bypass this auto-configuration or provide a default implementation of transactionNameProvider.
+    #       Possibly related to: https://github.com/getsentry/sentry-java/issues/1863
+    #       Until this is resolved, all sentry related properties must be defined in sentry.properties.
+    #dsn: ${SENTRY_DSN_BACKEND}
+
+    # A custom setting that defines the format of Sentry HTTP transaction names
+    httpTransactionNameFormat: CONTROLLER_METHOD
