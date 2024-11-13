@@ -410,8 +410,10 @@ class CreateStockMovement extends Component {
         stocklist: { id: _.get(values.stocklist, 'id', '') },
         requestType: values.requestType.id,
         sourceType: ELECTRONIC,
-        dateDeliveryRequested: values.dateDeliveryRequested,
         approvers: values.approvers?.map(user => user.id),
+        dateDeliveryRequested: values.dateDeliveryRequested
+          ? moment(values.dateDeliveryRequested).format('MM/DD/YYYY')
+          : null,
       };
 
       apiClient.post(stockMovementUrl, payload)
