@@ -10,13 +10,16 @@
 package org.pih.warehouse.receiving
 
 import grails.util.Holders
+import org.pih.warehouse.core.EventCode
+import org.pih.warehouse.core.Historiable
+import org.pih.warehouse.core.HistoryItem
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.RefreshOrderSummaryEvent
 import org.pih.warehouse.shipping.Shipment
 
-class Receipt implements Serializable, Comparable<Receipt> {
+class Receipt implements Serializable, Comparable<Receipt>, Historiable {
 
     def publishRefreshEvent() {
         Holders.grailsApplication.mainContext.publishEvent(new RefreshOrderSummaryEvent(this))
@@ -88,5 +91,14 @@ class Receipt implements Serializable, Comparable<Receipt> {
         return receiptItems?.sort(receiptItemsComparator)
     }
 
-
+    @Override
+    List<HistoryItem<Receipt>> getHistory() {
+        HistoryItem<Receipt> historyItem = new HistoryItem<>(
+                identifier: receiptNumber,
+                date: actualDeliveryDate,
+                associatedLocation: shipment.destination,
+                parentObject: this
+        )
+        return [historyItem]
+    }
 }

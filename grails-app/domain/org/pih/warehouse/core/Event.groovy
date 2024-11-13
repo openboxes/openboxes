@@ -18,7 +18,7 @@ package org.pih.warehouse.core
  *{eventDate: 1/1/2010, eventLocation: Boston, eventType: SHIPPED}*
  *  Shipment #2 Arrived at Customs on 5/5/2010:
  *{eventDate: 5/5/2010, eventLocation: Customs, eventType: ARRIVED}*/
-class Event implements Comparable, Serializable {
+class Event implements Comparable, Serializable, Historiable {
 
     String id
     Date eventDate                // The date and time on which the Event occurred
@@ -40,6 +40,18 @@ class Event implements Comparable, Serializable {
         eventLocation(nullable: true)
         createdBy(nullable: true)
         comment(nullable: true)
+    }
+
+    @Override
+    List<HistoryItem<Event>> getHistory() {
+        HistoryItem<Event> historyItem = new HistoryItem<>(
+                identifier: id,
+                date: eventDate,
+                associatedLocation: eventLocation,
+                parentObject: this,
+                eventCode: eventType?.eventCode
+        )
+       return [historyItem]
     }
 
     String toString() { return "$eventType $eventLocation on $eventDate" }
