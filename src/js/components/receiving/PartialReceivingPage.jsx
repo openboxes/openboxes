@@ -265,6 +265,7 @@ const TABLE_FIELDS = {
         multilineHeader: true,
         flexWidth: '1',
         attributes: {
+          cellClassName: 'text-right',
           showValueTooltip: true,
         },
         getDynamicAttr: ({ values, parentIndex, rowIndex }) => ({
@@ -293,6 +294,7 @@ const TABLE_FIELDS = {
         multilineHeader: true,
         flexWidth: '1',
         attributes: {
+          cellClassName: 'text-right',
           formatValue: (value) => (value ? (value.toLocaleString('en-US')) : value),
         },
         getDynamicAttr: ({ values }) => ({
@@ -348,6 +350,7 @@ const TABLE_FIELDS = {
         flexWidth: '1',
         attributes: {
           autoComplete: 'off',
+          inputClassName: 'text-right',
         },
         getDynamicAttr: ({ shipmentReceived, fieldValue, values }) => ({
           disabled: shipmentReceived || isReceived(true, fieldValue),
