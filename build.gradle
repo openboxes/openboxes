@@ -496,7 +496,10 @@ dependencies {
     implementation "io.sentry:sentry-servlet:${sentryVersion}"
     // Uses P6Spy to capture database queries.
     implementation "io.sentry:sentry-jdbc:${sentryVersion}"
-    implementation "io.sentry:sentry-spring-boot-starter:${sentryVersion}"
+    // We can't use "io.sentry:sentry-spring-boot-starter" because it causes a null pointer on transaction name in
+    // io.sentry.spring.boot.SentryAutoConfiguration$HubConfiguration$SentryWebMvcConfiguration.transactionNameProvider
+    // Once we can successfully switch to sentry-spring-boot-starter then we can configure sentry in application.yml
+    implementation "io.sentry:sentry-spring:${sentryVersion}"
 
     // incorporate latest timezone changes
     implementation 'joda-time:joda-time:2.12.5'
