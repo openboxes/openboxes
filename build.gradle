@@ -493,7 +493,6 @@ dependencies {
     testCompile 'io.micronaut:micronaut-http-client:1.2.11'
 
     implementation "io.sentry:sentry-logback:${sentryVersion}"
-    implementation "io.sentry:sentry-servlet:${sentryVersion}"
     // Uses P6Spy to capture database queries.
     implementation "io.sentry:sentry-jdbc:${sentryVersion}"
     implementation "io.sentry:sentry-spring-boot-starter:${sentryVersion}"
