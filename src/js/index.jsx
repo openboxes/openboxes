@@ -20,10 +20,14 @@ import 'font-awesome/css/font-awesome.min.css';
 // eslint-disable-next-line import/no-unresolved
 import 'css/main.scss';
 import 'react-tippy/dist/tippy.css';
+import initializeSentry from './config/sentry';
 
 library.add(fab, fas);
 // eslint-disable-next-line camelcase,no-undef
 __webpack_public_path__ = `${window.CONTEXT_PATH}/static/webpack/`;
+
+// Initialize Sentry as early as possible so that it can capture startup errors as well.
+initializeSentry();
 
 ReactDOM.render(
   <Provider store={store}>
