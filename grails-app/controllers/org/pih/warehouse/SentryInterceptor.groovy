@@ -17,6 +17,12 @@ import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
 
+/**
+ * Intercepts Sentry traces/logs and enhances their context with user information.
+ *
+ * If we ever switch to use the Spring Security plugin, this code will need to be moved to a Spring Component
+ * that implements SentryUserProvider.
+ */
 @CompileStatic
 class SentryInterceptor {
 
@@ -30,19 +36,8 @@ class SentryInterceptor {
     }
 
     @Override
-    /**
-     * Update user/location data for Sentry at each page load.
-     *
-     * This method doesn't actually send any events to Sentry; rather,
-     * it attaches various data to the Sentry global for later use in
-     * case an error or logging event occurs. (A logback plugin sends the
-     * actual events; see the SentryAppender definition in logback.xml.)
-     *
-     * N.B. Sentry also loads some user-agent/url information by itself
-     * from Tomcat (see SentryServletContainerInitializer).
-     */
     boolean before() {
-        def startTime = System.currentTimeMillis()
+        long startTime = System.currentTimeMillis()
         try {
             User user = authService.currentUser
             Location location = authService.currentLocation

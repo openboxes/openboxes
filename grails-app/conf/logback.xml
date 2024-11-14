@@ -1,40 +1,37 @@
 <configuration>
 
-    <!--
-       - Connect Sentry with our logging framework.
-       -
-       - Most of Sentry's configuration is done programmatically;
-       - cf. SentryInterceptor and SentryServletContainerInitializer.
-      -->
+    <!-- Allows Logback logs to appear in Sentry. See sentry.properties for configuration. -->
     <appender name="sentry" class="io.sentry.logback.SentryAppender">
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>info</level>
         </filter>
-        <!--
-           - When we log an error or exception, send recent log entries
-           - at level 'info' or higher to Sentry for additional context.
-          -->
-        <minimumEventLevel>error</minimumEventLevel>
-        <minimumBreadcrumbLevel>info</minimumBreadcrumbLevel>
-    </appender>
-
-    <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>
-                %date{ISO8601} %5level [%-10.10thread] %-40.40logger{40}: %message%n%xException
+                <!-- https://logback.qos.ch/manual/layouts.html -->
+                %date{ISO8601} %-5level [%thread] %logger{40}: %message%n%xException
+            </pattern>
+        </encoder>
+    </appender>
+
+    <!--  Outputs Logback logs to the console.  -->
+    <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+        <!-- Adds colors to the logs only if the terminal can support it https://logback.qos.ch/manual/layouts.html#coloring -->
+        <withJansi>true</withJansi>
+        <encoder>
+            <pattern>
+                <!-- https://logback.qos.ch/manual/layouts.html -->
+                %cyan(%date{ISO8601}) %highlight(%-5level) %magenta([%thread]) %yellow(%logger{40}): %message%n%xException
             </pattern>
         </encoder>
     </appender>
 
     <!-- log levels for software we maintain -->
-
     <logger name="openboxes" level="debug" />
     <logger name="org.pih.warehouse" level="debug" />
     <logger name="testutils" level="debug" />
     <logger name="util" level="debug" />
 
     <!-- log levels for dependencies -->
-
     <logger name="asset.pipeline" level="debug" /><!-- use 'info' to hide asset-pipeline logs -->
     <logger name="ch.qos.logback" level="warn" /><!-- hide logs about logging -->
     <logger name="grails.app.services" level="info" /><!-- use `debug` to see service/plugin logs -->
@@ -102,6 +99,12 @@
     <logger name="org.hibernate.stat" level="info" />
     <logger name="org.hibernate.transform" level="info" />
     <logger name="org.hibernate.tool" level="info" />
+    <!--
+    Manages the hibernate PreparedStatement logs which bind parameters to the positional '?' args of SQL queries.
+    We restrict these down to "info" level to avoid flooding the logs with tons of statements for each query, but we
+    can set this to "trace" if we want to be able to search the database logs for the actual parameters that were used,
+    (and not just the positional '?' params). https://www.javacodegeeks.com/2012/10/logging-hibernate-sql.html
+    -->
     <logger name="org.hibernate.type" level="info" />
     <logger name="org.hibernate.validator" level="info" />
     <logger name="org.springframework.aop" level="info" />
@@ -123,6 +126,11 @@
     <logger name="quartz" level="info" /><!-- use 'info' to hide quartz scheduler notifications -->
     <logger name="io.sentry" level="info" />
 
+    <!--
+    The parent config for all loggers. All loggers will use the log level defined here unless they specifically
+    configure their loggers to do otherwise (see above examples).
+    Logback supports the following logging levels (in order of most to least verbose): TRACE, DEBUG, INFO, WARN, ERROR
+    -->
     <root level="debug">
         <appender-ref ref="sentry" />
         <appender-ref ref="stdout" />

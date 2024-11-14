@@ -212,6 +212,8 @@ slf4j.detectLoggerNameMismatch: true
 
 ---
 hibernate:
+    show_sql: false  # Logs Hibernate queries to the console. We configure this via Logback instead.
+    format_sql: false
     allow_update_outside_transaction: false
     cache:
         queries: false
@@ -228,8 +230,16 @@ dataSource:
     dbCreate: none
     dialect: org.hibernate.dialect.MySQL57InnoDBDialect
     factory: org.apache.tomcat.jdbc.pool.DataSourceFactory
-    logger: com.mysql.cj.jdbc.log.StandardLogger
     type: org.apache.tomcat.jdbc.pool.DataSource
+
+    # Settings for database logging
+    logger: com.mysql.cj.jdbc.log.StandardLogger
+    dumpQueriesOnException: false
+    logSql: false  # Logs SQL queries to the console. We configure this via Logback instead.
+    formatSql: false
+    logSlowQueries: false
+    includeInnodbStatusInDeadlockExceptions: true
+
     properties:
         # from https://docs.grails.org/3.3.16/guide/conf.html#dataSource
         jmxEnabled: true
@@ -255,10 +265,7 @@ environments:
     development:
         dataSource:
             dumpQueriesOnException: true
-            formatSql: true
-            includeInnodbStatusInDeadlockExceptions: true
             logAbandoned: true
-            logSql: false
             logSlowQueries: true
             username: "openboxes"
             password: "openboxes"
@@ -266,11 +273,7 @@ environments:
     test:
         dataSource:
             dumpQueriesOnException: true
-            formatSql: false
-            includeInnodbStatusInDeadlockExceptions: true
             logAbandoned: true
-            logSql: false
-            logSlowQueries: false
             # Our integration tests run against a containerized database: https://java.testcontainers.org/modules/databases/jdbc/.
             # Note that testcontainers auto-disable SSL when connecting via jdbc: https://github.com/testcontainers/testcontainers-java/pull/561
             # For more information, see /src/integration-test/README.md
@@ -278,11 +281,6 @@ environments:
             driverClassName: org.testcontainers.jdbc.ContainerDatabaseDriver
     production:
         dataSource:
-            dumpQueriesOnException: false
-            formatSql: false
-            includeInnodbStatusInDeadlockExceptions: true
-            logSql: false
-            logSlowQueries: false
             username: "openboxes"
             password: "openboxes"
             url: jdbc:mysql://localhost:3306/openboxes?serverTimezone=UTC&useSSL=false
@@ -616,3 +614,16 @@ grails:
     logging:
         jul:
             usebridge: true
+
+sentry:
+    # TODO: For some reason defining the dsn here causes the following exception:
+    #       - java.lang.IllegalStateException: Error processing condition on io.sentry.spring.boot.SentryAutoConfiguration$HubConfiguration$SentryWebMvcConfiguration.transactionNameProvider
+    #       - Caused by: java.lang.reflect.MalformedParameterizedTypeException: null
+    #       https://github.com/getsentry/sentry-java/blob/6.34.0/sentry-spring-boot/src/main/java/io/sentry/spring/boot/SentryAutoConfiguration.java#L268-L272
+    #       Find a way to bypass this auto-configuration or provide a default implementation of transactionNameProvider.
+    #       Possibly related to: https://github.com/getsentry/sentry-java/issues/1863
+    #       Until this is resolved, all sentry related properties must be defined in sentry.properties.
+    #dsn: ${SENTRY_DSN_BACKEND}
+
+    # A custom setting that defines the format of Sentry HTTP transaction names
+    httpTransactionNameFormat: CONTROLLER_METHOD
