@@ -267,8 +267,15 @@ const TABLE_FIELDS = {
         attributes: {
           showValueTooltip: true,
         },
-        getDynamicAttr: (props) => ({
-          hide: !props.values?.isShipmentFromPurchaseOrder,
+        getDynamicAttr: ({ values, parentIndex, rowIndex }) => ({
+          formatValue: (uomValue) => {
+            const packsRequested = _.get(
+              values,
+              `containers[${parentIndex}].shipmentItems[${rowIndex}].packsRequested`,
+            );
+            return uomValue ? `${packsRequested} ${uomValue}` : undefined;
+          },
+          hide: !values?.isShipmentFromPurchaseOrder,
         }),
       },
       quantityShipped: {
@@ -805,6 +812,11 @@ class PartialReceivingPage extends Component {
       unitOfMeasure: shipmentItemsGrouped.originalItem?.unitOfMeasure,
       // This helper id is needed for mismatching quantity shipped indicator in edit modal
       rowId: _.uniqueId(),
+      packSize: shipmentItemsGrouped.originalItem?.packSize,
+      packsRequested: shipmentItemsGrouped.originalItem?.packSize ? _.round(
+        item.quantityShipped / shipmentItemsGrouped.originalItem?.packSize,
+        1,
+      ) : null,
     }));
 
     /**
