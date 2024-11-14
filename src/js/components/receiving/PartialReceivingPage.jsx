@@ -261,7 +261,7 @@ const TABLE_FIELDS = {
       unitOfMeasure: {
         type: (params) => <LabelField {...params} />,
         label: 'react.partialReceiving.shippedInPo.label',
-        defaultMessage: 'Shipped (in PO)',
+        defaultMessage: 'Shipped (in PO UoM)',
         multilineHeader: true,
         flexWidth: '1',
         attributes: {
