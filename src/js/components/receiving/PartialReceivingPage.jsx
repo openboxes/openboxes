@@ -268,24 +268,31 @@ const TABLE_FIELDS = {
           cellClassName: 'text-right',
           showValueTooltip: true,
         },
-        getDynamicAttr: ({ values, parentIndex, rowIndex }) => ({
-          formatValue: (uomValue) => {
-            const packsRequested = _.get(
-              values,
-              `containers[${parentIndex}].shipmentItems[${rowIndex}].packsRequested`,
-            );
-            if (!uomValue) {
-              return null;
-            }
-            return (
-              <span>
-                {_.round(packsRequested, 1)}
-                <small className="text-muted ml-1">{uomValue}</small>
-              </span>
-            );
-          },
-          hide: !values?.isShipmentFromPurchaseOrder,
-        }),
+        getDynamicAttr: ({ values, parentIndex, rowIndex }) => {
+          const shipmentItem = _.get(
+            values,
+            `containers[${parentIndex}].shipmentItems[${rowIndex}]`,
+            {},
+          );
+          const packsRequested = _.round(shipmentItem?.packsRequested, 1);
+          const unitOfMeasure = shipmentItem?.unitOfMeasure;
+
+          return {
+            tooltipValue: unitOfMeasure ? `${packsRequested} ${unitOfMeasure}` : undefined,
+            formatValue: () => {
+              if (!unitOfMeasure) {
+                return null;
+              }
+              return (
+                <span>
+                  {packsRequested}
+                  <small className="text-muted ml-1">{unitOfMeasure}</small>
+                </span>
+              );
+            },
+            hide: !values?.isShipmentFromPurchaseOrder,
+          };
+        },
       },
       quantityShipped: {
         type: (params) => (params.subfield ? <LabelField {...params} /> : null),
