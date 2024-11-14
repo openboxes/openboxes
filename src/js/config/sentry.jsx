@@ -4,8 +4,8 @@ import * as Sentry from "@sentry/react";
  * Initialize Sentry for performance and error monitoring.
  */
 const initializeSentry = () => {
-    // If our custom DSN environment variable isn't defined, skip all frontend monitoring because we don't want
-    // our frontend monitoring to get bundled in with any backend monitoring.
+    // If our custom DSN environment variable isn't defined, skip all frontend monitoring. This check is potentially
+    // unnecessary, but avoids potential weirdness with environments that don't have Sentry configured on the frontend.
     if (!process.env.REACT_APP_SENTRY_DSN_FRONTEND) {
         return;
     }
@@ -42,7 +42,7 @@ const initializeSentry = () => {
         // The ratio of all requests to capture for performance tracing. 1.0 is 100% of requests. Disable tracing
         // by setting a value of 0. We keep this number low (as recommended by Sentry) for performance reasons, but
         // it can be increased if we decide we need more data.
-        tracesSampleRate: 1.0,
+        tracesSampleRate: 0.1,
 
         // For Session Replay. We only capture session recordings if there is an error (which we record 100% of).
         replaysSessionSampleRate: 0,
