@@ -274,7 +274,7 @@ const TABLE_FIELDS = {
             `containers[${parentIndex}].shipmentItems[${rowIndex}]`,
             {},
           );
-          const packsRequested = _.round(shipmentItem?.packsRequested, 1);
+          const packsRequested = _.round(shipmentItem?.packsRequested, 2);
           const unitOfMeasure = shipmentItem?.unitOfMeasure;
 
           return {
