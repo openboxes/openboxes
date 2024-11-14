@@ -273,7 +273,15 @@ const TABLE_FIELDS = {
               values,
               `containers[${parentIndex}].shipmentItems[${rowIndex}].packsRequested`,
             );
-            return uomValue ? `${packsRequested} ${uomValue}` : undefined;
+            if (!uomValue) {
+              return null;
+            }
+            return (
+              <span>
+                {_.round(packsRequested, 1)}
+                <small className="text-muted ml-1">{uomValue}</small>
+              </span>
+            );
           },
           hide: !values?.isShipmentFromPurchaseOrder,
         }),
@@ -813,10 +821,9 @@ class PartialReceivingPage extends Component {
       // This helper id is needed for mismatching quantity shipped indicator in edit modal
       rowId: _.uniqueId(),
       packSize: shipmentItemsGrouped.originalItem?.packSize,
-      packsRequested: shipmentItemsGrouped.originalItem?.packSize ? _.round(
-        item.quantityShipped / shipmentItemsGrouped.originalItem?.packSize,
-        1,
-      ) : null,
+      packsRequested: shipmentItemsGrouped.originalItem?.packSize
+        ? item.quantityShipped / shipmentItemsGrouped.originalItem?.packSize
+        : null,
     }));
 
     /**
