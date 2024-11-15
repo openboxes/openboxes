@@ -11,6 +11,7 @@ package org.pih.warehouse.core
 
 enum EventCode {
 
+    CREATED,
     SCHEDULED,
     PICKED,
     PACKED,

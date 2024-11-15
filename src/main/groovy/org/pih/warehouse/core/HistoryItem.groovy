@@ -5,11 +5,9 @@ class HistoryItem<T> {
 
     Date date
 
-    // FIXME: I didn't know what name suits the best for the location
-    Location associatedLocation
+    Location location
 
-    T parentObject
+    ReferenceDocument referenceDocument
 
-    // FIXME: Introduced this property to be able to determine which history item is pointing to e.g. received event, which one to shipped event etc.
     EventCode eventCode
 }

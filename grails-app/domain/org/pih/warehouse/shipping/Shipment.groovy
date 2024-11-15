@@ -28,7 +28,7 @@ import org.pih.warehouse.order.RefreshOrderSummaryEvent
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.requisition.Requisition
 
-class Shipment implements Comparable, Serializable, Historiable {
+class Shipment implements Comparable, Serializable, Historizable {
 
     def publishRefreshEvent() {
         Holders.grailsApplication.mainContext.publishEvent(new RefreshOrderSummaryEvent(this))
@@ -699,29 +699,41 @@ class Shipment implements Comparable, Serializable, Historiable {
     }
 
     Set<Event> getCustomEvents() {
-        Set<Event> customEvents = events.findAll { it.eventType?.eventCode?.name()?.startsWith("CUSTOMS") }
+        return events.findAll { it.eventType?.eventCode?.name()?.startsWith("CUSTOMS") }
+    }
+
+    @Override
+    ReferenceDocument getReferenceDocument() {
+        return new ReferenceDocument(
+                label: shipmentNumber,
+                url: "/stockMovement/show/${requisition?.id ?: id}",
+                id: id,
+                identifier: shipmentNumber,
+                description: description,
+                name: name,
+        )
     }
 
     @Override
     List<HistoryItem> getHistory() {
         List<HistoryItem> histories = []
+        ReferenceDocument shipmentReferenceDocument = getReferenceDocument()
         // First collect history of CREATED event
         histories.add(new HistoryItem<Shipment>(
                 identifier: shipmentNumber,
                 date: dateCreated,
-                associatedLocation: origin,
-                parentObject: this,
-                // FIXME: Don't know what event code suits the best for CREATED
-                eventCode: EventCode.SCHEDULED
+                location: origin,
+                eventCode: EventCode.CREATED,
+                referenceDocument: shipmentReferenceDocument
         ))
         // Then collect history of a shipped event if any
         if (hasShipped()) {
             histories.add(new HistoryItem<Shipment>(
                     identifier: shipmentNumber,
                     date: dateShipped(),
-                    associatedLocation: origin,
-                    parentObject: this,
-                    eventCode: EventCode.SHIPPED
+                    location: origin,
+                    eventCode: EventCode.SHIPPED,
+                    referenceDocument: shipmentReferenceDocument,
             ))
         }
         // Then collect history of a received event if any
