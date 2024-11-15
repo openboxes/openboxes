@@ -616,7 +616,7 @@ grails:
             usebridge: true
 
 sentry:
-    # TODO: For some reason defining the dsn here causes the following exception:
+    # TODO: For some reason adding the "sentry-spring-boot-starter" dependency and defining the dsn here causes:
     #       - java.lang.IllegalStateException: Error processing condition on io.sentry.spring.boot.SentryAutoConfiguration$HubConfiguration$SentryWebMvcConfiguration.transactionNameProvider
     #       - Caused by: java.lang.reflect.MalformedParameterizedTypeException: null
     #       https://github.com/getsentry/sentry-java/blob/6.34.0/sentry-spring-boot/src/main/java/io/sentry/spring/boot/SentryAutoConfiguration.java#L268-L272
