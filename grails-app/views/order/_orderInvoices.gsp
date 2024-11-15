@@ -26,7 +26,8 @@
                                 ${invoiceItem?.description}
                             </g:if>
                             <g:else>
-                                <format:displayName product="${invoiceItem?.product}" productSupplier="${invoiceItem?.orderItem?.productSupplier}" showTooltip="${true}" />
+                                <g:set var="orderItem"  value="${invoiceItem?.orderItem ?: invoiceItem?.shipmentItem?.orderItem}" />
+                                <format:displayName product="${invoiceItem?.product}" productSupplier="${orderItem?.productSupplier}" showTooltip="${true}" />
                             </g:else>
                         </td>
                         <td>
