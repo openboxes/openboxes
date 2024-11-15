@@ -25,15 +25,6 @@ class SentryServletContextListener implements ServletContextListener {
     @Override
     void contextInitialized(ServletContextEvent event) {
         log.info('Initializing sentry-servlet')
-        log.error('*'*300)
-        log.error('*'*300)
-        log.error('*'*300)
-        log.error("SENTRY_DSN: ${System.getenv("SENTRY_DSN")}")
-        log.error("SENTRY_DSN_BACKEND: ${System.getenv("SENTRY_DSN_BACKEND")}")
-        log.error("SENTRY_ENVIRONMENT: ${System.getenv("SENTRY_ENVIRONMENT")}")
-        log.error('*'*300)
-        log.error('*'*300)
-        log.error('*'*300)
         try {
             // Anything defined here will be overwritten by values in sentry.properties.
             // Note that while we're using the "sentry-servlet" dependency, this init block is required.
@@ -41,8 +32,8 @@ class SentryServletContextListener implements ServletContextListener {
             // dependency, we might be able to remove this file and the "sentry-servlet" dependency entirely.
             Sentry.init { options ->
 
-                // If "SENTRY_DSN" is defined, or a dsn is provided in sentry.properties, those will take precedence.
-                // If none of these are defined, Sentry will be disabled.
+                // If "SENTRY_DSN" is defined, or a dsn is provided in sentry.properties, those will take precedence
+                // over "SENTRY_DSN_BACKEND". If none of these are defined, Sentry will be disabled.
                 options.dsn = System.getenv("SENTRY_DSN_BACKEND")
 
                 // We set the git commit of the release as the Sentry release tag to be able to group
