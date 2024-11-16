@@ -5,15 +5,19 @@
 # Required
 version: 2
 
+# Allows you to specify the base Read the Docs image used to build the documentation
+# and control versions of tools. https://docs.readthedocs.io/en/stable/config-file/v2.html#build
+build:
+  os: ubuntu-22.04
+  tools:
+    python: "3.8"
+
+# Configuration for MkDocs documentation
+# https://docs.readthedocs.io/en/stable/config-file/v2.html#mkdocs
 mkdocs:
   configuration: mkdocs.yml
 
-# Optionally build your docs in additional formats such as PDF
-formats:
-   - pdf
-
 # Optionally set the version of Python and requirements required to build your docs
 python:
-   version: 3.7
    install:
    - requirements: docs/requirements.txt
