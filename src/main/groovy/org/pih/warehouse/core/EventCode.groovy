@@ -59,5 +59,22 @@ enum EventCode {
         [SCHEDULED]
     }
 
+    static List<EventCode> listSystemEventTypeCodes() {
+        return [
+            CREATED,
+            SHIPPED,
+            RECEIVED,
+            PARTIALLY_RECEIVED,
+            REJECTED,
+            SUBMITTED,
+            PENDING_APPROVAL,
+            APPROVED
+        ]
+    }
+
+    static List<EventCode> listCustomEventTypeCodes() {
+        return values() - listSystemEventTypeCodes()
+    }
+
 }
 

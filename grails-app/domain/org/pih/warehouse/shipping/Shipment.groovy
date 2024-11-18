@@ -699,7 +699,7 @@ class Shipment implements Comparable, Serializable, Historizable {
     }
 
     Set<Event> getCustomEvents() {
-        return events.findAll { it.eventType?.eventCode?.name()?.startsWith("CUSTOMS") }
+        return events.findAll { EventCode.listCustomEventTypeCodes().contains(it.eventType?.eventCode) }
     }
 
     @Override
@@ -717,14 +717,13 @@ class Shipment implements Comparable, Serializable, Historizable {
     @Override
     List<HistoryItem> getHistory() {
         List<HistoryItem> histories = []
-        ReferenceDocument shipmentReferenceDocument = getReferenceDocument()
         // First collect history of CREATED event
         histories.add(new HistoryItem<Shipment>(
                 identifier: shipmentNumber,
                 date: dateCreated,
                 location: origin,
                 eventCode: EventCode.CREATED,
-                referenceDocument: shipmentReferenceDocument
+                referenceDocument: referenceDocument
         ))
         // Then collect history of a shipped event if any
         if (hasShipped()) {
@@ -733,14 +732,8 @@ class Shipment implements Comparable, Serializable, Historizable {
                     date: dateShipped(),
                     location: origin,
                     eventCode: EventCode.SHIPPED,
-                    referenceDocument: shipmentReferenceDocument,
+                    referenceDocument: referenceDocument,
             ))
-        }
-        // Then collect history of a received event if any
-        if (wasReceived()) {
-            List<HistoryItem<Receipt>> receivedHistoryItem = receipts.last().getHistory()
-            receivedHistoryItem.each { it.eventCode = EventCode.RECEIVED }
-            histories.addAll(receivedHistoryItem)
         }
         // Then collect history of a partially_received events if any
         if (wasPartiallyReceived()) {
@@ -749,6 +742,12 @@ class Shipment implements Comparable, Serializable, Historizable {
             List<HistoryItem<Receipt>> partiallyReceivedHistoryItem = partialReceipts.collect { it.getHistory() }.flatten()
             partiallyReceivedHistoryItem.each { it.eventCode = EventCode.PARTIALLY_RECEIVED }
             histories.addAll(partiallyReceivedHistoryItem)
+        }
+        // Then collect history of a received event if any
+        if (wasReceived()) {
+            List<HistoryItem<Receipt>> receivedHistoryItem = receipts.last().getHistory()
+            receivedHistoryItem.each { it.eventCode = EventCode.RECEIVED }
+            histories.addAll(receivedHistoryItem)
         }
         // At the end collect history of custom events
         List<HistoryItem<Event>> customEventsHistory = getCustomEvents().collect { it.getHistory() }.flatten()
