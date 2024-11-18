@@ -261,15 +261,38 @@ const TABLE_FIELDS = {
       unitOfMeasure: {
         type: (params) => <LabelField {...params} />,
         label: 'react.partialReceiving.shippedInPo.label',
-        defaultMessage: 'Shipped (in PO)',
+        defaultMessage: 'Shipped (in PO UoM)',
         multilineHeader: true,
         flexWidth: '1',
         attributes: {
+          cellClassName: 'text-right',
           showValueTooltip: true,
         },
-        getDynamicAttr: (props) => ({
-          hide: !props.values?.isShipmentFromPurchaseOrder,
-        }),
+        getDynamicAttr: ({ values, parentIndex, rowIndex }) => {
+          const shipmentItem = _.get(
+            values,
+            `containers[${parentIndex}].shipmentItems[${rowIndex}]`,
+            {},
+          );
+          const packsRequested = _.round(shipmentItem?.packsRequested, 2);
+          const unitOfMeasure = shipmentItem?.unitOfMeasure;
+
+          return {
+            tooltipValue: unitOfMeasure ? `${packsRequested} ${unitOfMeasure}` : undefined,
+            formatValue: () => {
+              if (!unitOfMeasure) {
+                return null;
+              }
+              return (
+                <span>
+                  {packsRequested}
+                  <small className="text-muted ml-1">{unitOfMeasure}</small>
+                </span>
+              );
+            },
+            hide: !values?.isShipmentFromPurchaseOrder,
+          };
+        },
       },
       quantityShipped: {
         type: (params) => (params.subfield ? <LabelField {...params} /> : null),
@@ -278,6 +301,7 @@ const TABLE_FIELDS = {
         multilineHeader: true,
         flexWidth: '1',
         attributes: {
+          cellClassName: 'text-right',
           formatValue: (value) => (value ? (value.toLocaleString('en-US')) : value),
         },
         getDynamicAttr: ({ values }) => ({
@@ -333,6 +357,7 @@ const TABLE_FIELDS = {
         flexWidth: '1',
         attributes: {
           autoComplete: 'off',
+          inputClassName: 'text-right',
         },
         getDynamicAttr: ({ shipmentReceived, fieldValue, values }) => ({
           disabled: shipmentReceived || isReceived(true, fieldValue),
@@ -805,6 +830,10 @@ class PartialReceivingPage extends Component {
       unitOfMeasure: shipmentItemsGrouped.originalItem?.unitOfMeasure,
       // This helper id is needed for mismatching quantity shipped indicator in edit modal
       rowId: _.uniqueId(),
+      packSize: shipmentItemsGrouped.originalItem?.packSize,
+      packsRequested: shipmentItemsGrouped.originalItem?.packSize
+        ? item.quantityShipped / shipmentItemsGrouped.originalItem?.packSize
+        : null,
     }));
 
     /**

@@ -164,6 +164,7 @@ const TABLE_FIELDS = {
         defaultMessage: 'Receiving now',
         flexWidth: '1',
         attributes: {
+          cellClassName: 'text-right',
           formatValue: value => (value ? (value.toLocaleString('en-US')) : value),
         },
       },
@@ -174,6 +175,7 @@ const TABLE_FIELDS = {
         fieldKey: '',
         flexWidth: '1',
         attributes: {
+          cellClassName: 'text-right',
           formatValue: fieldValue => (fieldValue && fieldValue.quantityRemaining ? fieldValue.quantityRemaining.toLocaleString('en-US') : fieldValue.quantityRemaining),
         },
         getDynamicAttr: ({ fieldValue }) => ({
