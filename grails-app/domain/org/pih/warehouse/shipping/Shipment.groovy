@@ -196,12 +196,12 @@ class Shipment implements Comparable, Serializable, Historizable {
             })?.unique({ a, b -> a <=> b })?.size() == referenceNumbers?.size()
         })
 
-        // a shipment can't have two events with the same event code (this should be the case for the current event codes: CREATED, SHIPPED, RECEIVED)
-        // we may want to change this in the future?
+        // a shipment can't have two system events with the same event code
         events(validator: { events ->
-            events?.collect({
-                it.eventType?.eventCode
-            })?.unique({ a, b -> a <=> b })?.size() == events?.size()
+            List<Event> systemEvents = events.toList().findAll {
+                it.eventType.eventCode in EventCode.listSystemEventTypeCodes()
+            }
+            return systemEvents.unique().size() == systemEvents.size()
         })
         requisition(nullable: true)
         shipmentItemCount(nullable: true)
