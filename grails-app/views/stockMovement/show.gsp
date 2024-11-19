@@ -585,23 +585,28 @@
                     <g:if test="${!stockMovement?.origin?.isSupplier()}">
                         <li role="tab">
                             <g:link controller="stockMovement" action="requisition" params="${[ id: stockMovement?.id ]}">
-                                <warehouse:message code="requestDetails.label"/>
+                                <g:message code="requestDetails.label"/>
                             </g:link>
                         </li>
                     </g:if>
                     <li role="tab">
                         <g:link controller="stockMovement" action="packingList" params="${[ id: stockMovement?.id ]}">
-                            <warehouse:message code="shipping.packingList.label" />
+                            <g:message code="shipping.packingList.label" />
                         </g:link>
                     </li>
                     <li role="tab">
                         <g:link controller="stockMovement" action="receipts" params="${[ id: stockMovement?.id ]}">
-                            <warehouse:message code="receipts.label" default="Receipts"/>
+                            <g:message code="receipts.label" default="Receipts"/>
+                        </g:link>
+                    </li>
+                    <li role="tab">
+                        <g:link controller="stockMovement" action="events" params="${[ id: stockMovement?.id ]}">
+                            <g:message code="events.label" default="Event"/>
                         </g:link>
                     </li>
                     <li role="tab">
                         <g:link controller="stockMovement" action="documents" params="${[ id: stockMovement?.id ]}">
-                            <warehouse:message code="documents.label" default="Documents"/>
+                            <g:message code="documents.label" default="Documents"/>
                         </g:link>
                     </li>
                     <g:if test="${stockMovement?.requisition?.id}">
@@ -612,7 +617,7 @@
                             class="${commentCount > 0 ? 'tab-badge' : ''}"
                         >
                             <g:link controller="stockMovement" action="comments" params="${[ id: stockMovement?.id ]}">
-                                <warehouse:message code="comments.label" default="Comments"/>
+                                <g:message code="comments.label" default="Comments"/>
                             </g:link>
                         </li>
                     </g:if>
