@@ -12,4 +12,6 @@ class HistoryItem<T> {
     EventCode eventCode
 
     Comment comment
+
+    User createdBy
 }

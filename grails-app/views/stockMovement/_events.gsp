@@ -16,6 +16,7 @@
                 <th><g:message code="default.dateTime.label" default="Date/Time"/></th>
                 <th><g:message code="default.location.label" default="Location"/></th>
                 <th><g:message code="default.reference.label" default="Reference"/></th>
+                <th><g:message code="default.createdBy.label" default="Created by"/></th>
                 <th><g:message code="default.comment.label" default="Comment"/></th>
             </tr>
             </thead>
@@ -33,6 +34,9 @@
                     </td>
                     <td>
                         ${historyItem?.referenceDocument?.identifier}
+                    </td>
+                    <td>
+                        ${historyItem?.createdBy}
                     </td>
                     <td>
                         ${historyItem?.comment}
@@ -56,6 +60,7 @@
     </h2>
     <g:form controller="shipment" action="saveEvent" method="POST">
         <g:hiddenField name="shipmentId" value="${shipmentId}" />
+        <g:hiddenField name="createdBy.id" value="${session.user.id}" />
         <table>
             <tbody>
             %{-- Event type picker --}%
@@ -72,6 +77,7 @@
                           noSelection="['': g.message(code: 'default.selectOne.label')]"
                           from='${EventType.listCustomEventTypes()}'
                           optionValue="${{ format.metadata(obj: it) }}"
+                          required="${true}"
                           class="chzn-select-deselect">
                 </g:select>
                 </td>

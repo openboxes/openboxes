@@ -199,7 +199,7 @@ class Shipment implements Comparable, Serializable, Historizable {
         // a shipment can't have two system events with the same event code
         events(validator: { events ->
             List<Event> systemEvents = events.toList().findAll {
-                it.eventType.eventCode in EventCode.listSystemEventTypeCodes()
+                it?.eventType?.eventCode in EventCode.listSystemEventTypeCodes()
             }
             return systemEvents.unique().size() == systemEvents.size()
         })
