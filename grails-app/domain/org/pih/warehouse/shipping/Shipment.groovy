@@ -198,7 +198,7 @@ class Shipment implements Comparable, Serializable, Historizable {
 
         // a shipment can't have two system events with the same event code
         events(validator: { events ->
-            List<Event> systemEvents = events.toList().findAll {
+            Set<Event> systemEvents = events.findAll {
                 it?.eventType?.eventCode in EventCode.listSystemEventTypeCodes()
             }
             return systemEvents.unique().size() == systemEvents.size()
@@ -719,7 +719,6 @@ class Shipment implements Comparable, Serializable, Historizable {
         List<HistoryItem> histories = []
         // First collect history of CREATED event
         histories.add(new HistoryItem<Shipment>(
-                identifier: shipmentNumber,
                 date: dateCreated,
                 location: origin,
                 eventCode: EventCode.CREATED,
@@ -728,7 +727,6 @@ class Shipment implements Comparable, Serializable, Historizable {
         // Then collect history of a shipped event if any
         if (hasShipped()) {
             histories.add(new HistoryItem<Shipment>(
-                    identifier: shipmentNumber,
                     date: dateShipped(),
                     location: origin,
                     eventCode: EventCode.SHIPPED,

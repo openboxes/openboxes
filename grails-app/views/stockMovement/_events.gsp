@@ -93,7 +93,7 @@
                     <g:select id="eventLocation.id"
                               name="eventLocation.id"
                               noSelection="['': warehouse.message(code: 'default.selectOne.label')]"
-                              from='${Location.list()}'
+                              from='${Location.listNonInternalLocations()}'
                               optionKey="id"
                               optionValue="name"
                               class="chzn-select-deselect">
