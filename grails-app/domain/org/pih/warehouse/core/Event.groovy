@@ -58,6 +58,7 @@ class Event implements Comparable, Serializable, Historizable {
                 date: eventDate,
                 location: eventLocation,
                 eventCode: eventType?.eventCode,
+                comment: comment,
                 referenceDocument: getReferenceDocument()
         )
        return [historyItem]

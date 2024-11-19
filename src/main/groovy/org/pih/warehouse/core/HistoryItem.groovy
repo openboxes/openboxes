@@ -10,4 +10,6 @@ class HistoryItem<T> {
     ReferenceDocument referenceDocument
 
     EventCode eventCode
+
+    Comment comment
 }
