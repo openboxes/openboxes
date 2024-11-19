@@ -28,7 +28,7 @@ import org.pih.warehouse.order.RefreshOrderSummaryEvent
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.requisition.Requisition
 
-class Shipment implements Comparable, Serializable {
+class Shipment implements Comparable, Serializable, Historizable {
 
     def publishRefreshEvent() {
         Holders.grailsApplication.mainContext.publishEvent(new RefreshOrderSummaryEvent(this))
@@ -696,6 +696,63 @@ class Shipment implements Comparable, Serializable {
 
     Boolean hasChildContainer() {
         shipmentItems?.any { it?.container }
+    }
+
+    Set<Event> getCustomEvents() {
+        return events.findAll { EventCode.listCustomEventTypeCodes().contains(it.eventType?.eventCode) }
+    }
+
+    @Override
+    ReferenceDocument getReferenceDocument() {
+        return new ReferenceDocument(
+                label: shipmentNumber,
+                url: "/stockMovement/show/${requisition?.id ?: id}",
+                id: id,
+                identifier: shipmentNumber,
+                description: description,
+                name: name,
+        )
+    }
+
+    @Override
+    List<HistoryItem> getHistory() {
+        List<HistoryItem> histories = []
+        // First collect history of CREATED event
+        histories.add(new HistoryItem<Shipment>(
+                identifier: shipmentNumber,
+                date: dateCreated,
+                location: origin,
+                eventCode: EventCode.CREATED,
+                referenceDocument: referenceDocument
+        ))
+        // Then collect history of a shipped event if any
+        if (hasShipped()) {
+            histories.add(new HistoryItem<Shipment>(
+                    identifier: shipmentNumber,
+                    date: dateShipped(),
+                    location: origin,
+                    eventCode: EventCode.SHIPPED,
+                    referenceDocument: referenceDocument,
+            ))
+        }
+        // Then collect history of a partially_received events if any
+        if (wasPartiallyReceived()) {
+            // If there is a received event, exclude it from the set
+            Set<Receipt> partialReceipts = wasReceived() ? (receipts - receipts.last()) : receipts
+            List<HistoryItem<Receipt>> partiallyReceivedHistoryItem = partialReceipts.collect { it.getHistory() }.flatten()
+            partiallyReceivedHistoryItem.each { it.eventCode = EventCode.PARTIALLY_RECEIVED }
+            histories.addAll(partiallyReceivedHistoryItem)
+        }
+        // Then collect history of a received event if any
+        if (wasReceived()) {
+            List<HistoryItem<Receipt>> receivedHistoryItem = receipts.last().getHistory()
+            receivedHistoryItem.each { it.eventCode = EventCode.RECEIVED }
+            histories.addAll(receivedHistoryItem)
+        }
+        // At the end collect history of custom events
+        List<HistoryItem<Event>> customEventsHistory = getCustomEvents().collect { it.getHistory() }.flatten()
+        histories.addAll(customEventsHistory)
+        return histories
     }
 }
 
