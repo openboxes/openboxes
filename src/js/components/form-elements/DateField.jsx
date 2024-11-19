@@ -56,7 +56,7 @@ class DateField extends Component {
     };
 
     const onChange = (date) => {
-      const val = !date || typeof date === 'string' ? date : date.format(getFormat());
+      const val = !date || typeof date === 'string' ? date : date.format(dateFormat);
       attributes.onChange(val);
     };
 
