@@ -1,6 +1,7 @@
 package org.pih.warehouse.order
 
 import org.apache.commons.lang.StringUtils
+import org.apache.commons.lang.text.StrSubstitutor
 
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.IdentifierService
@@ -36,13 +37,31 @@ class PurchaseOrderIdentifierService extends IdentifierService<Order> {
 
         // TODO: Move this sequential logic into the identifier service to support sequential id generation more
         //       generally. We'll need an abstract method there for fetching the next sequence number to use.
-        String sequenceNumber = formatHasSequenceNumber(context) ?
-                getNextSequenceNumber(order.destinationParty.id) :
-                null
 
-        return super.generate(order, IdentifierGeneratorContext.builder()
-                .customProperties(["sequenceNumber": sequenceNumber])
-                .build())
+        // If the identifier has no sequential piece, fallback to the default behaviour
+        if (!formatHasSequenceNumber(context)) {
+            return super.generate(order, context)
+        }
+
+        // Otherwise there is a sequential piece. If we fail generating the id, increment the sequence number and try
+        // again. This is to resolve the scenario where the sequence number is already in use (likely because someone
+        // manually set another entity to use it, which doesn't update sequence number for the organization). In that
+        // case, the simplest solution is to skip the number and try again with the next. (See OBPIH-6821 for details.)
+        int maxAttempts = configService.getProperty("openboxes.identifier.attempts.max", Integer)
+        IdentifierGeneratorContext innerContext = context ?: new IdentifierGeneratorContext()
+        for (int i=0; i<maxAttempts; i++) {
+
+            String sequenceNumber = getNextSequenceNumber(order.destinationParty.id)
+            innerContext.customProperties.put('sequenceNumber', sequenceNumber)
+
+            String identifier = super.generate(order, innerContext)
+
+            if (StringUtils.isNotBlank(identifier)) {
+                return identifier
+            }
+        }
+
+        return null
     }
 
     private boolean formatHasSequenceNumber(IdentifierGeneratorContext context) {
@@ -56,8 +75,8 @@ class PurchaseOrderIdentifierService extends IdentifierService<Order> {
     private String getNextSequenceNumber(String partyId) {
         Organization organization = Organization.get(partyId)
 
-        Integer sequenceNumber = Integer.valueOf(
-                organization.sequences.getOrDefault(IdentifierTypeCode.PURCHASE_ORDER_NUMBER.toString(), "0"))
+        String sequenceNumberStr = organization.sequences.get(IdentifierTypeCode.PURCHASE_ORDER_NUMBER.toString())
+        Integer sequenceNumber = StringUtils.isBlank(sequenceNumberStr) ? 0 : Integer.valueOf(sequenceNumberStr)
         Integer nextSequenceNumber = sequenceNumber + 1
 
         // We need to actually update the sequence number so that it doesn't get re-used.

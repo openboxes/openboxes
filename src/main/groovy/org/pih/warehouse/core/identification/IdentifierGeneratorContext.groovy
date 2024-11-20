@@ -42,5 +42,5 @@ class IdentifierGeneratorContext {
      * These must be defined in the .format property in GStrings prefixed with the "custom" category. Ex: ${custom.x}
      * This is to distinguish the custom keys from entity-specific keys (which are defined in the .properties property).
      */
-    Map customProperties
+    Map<String, String> customProperties = new HashMap<>()
 }

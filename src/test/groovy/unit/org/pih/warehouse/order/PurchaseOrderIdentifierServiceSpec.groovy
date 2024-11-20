@@ -69,6 +69,7 @@ class PurchaseOrderIdentifierServiceSpec extends Specification implements Servic
         configServiceStub.getProperty('openboxes.identifier.purchaseOrder.format', String) >> "PO-\${destinationPartyCode}-\${sequenceNumber}"
         configServiceStub.getProperty('openboxes.identifier.purchaseOrder.properties', Map) >> ["destinationPartyCode": "destinationParty.code"]
         configServiceStub.getProperty('openboxes.identifier.purchaseOrder.sequenceNumber.minSize', Integer) >> 6
+        configServiceStub.getProperty('openboxes.identifier.attempts.max', Integer) >> 1
 
         and:
         dataServiceStub.transformObject(_, _ as Map) >> ['destinationPartyCode': 'code']
@@ -95,6 +96,7 @@ class PurchaseOrderIdentifierServiceSpec extends Specification implements Servic
         given:
         configServiceStub.getProperty('openboxes.identifier.purchaseOrder.format', String) >> "PO-\${destinationPartyCode}-\${sequenceNumber}"
         configServiceStub.getProperty('openboxes.identifier.purchaseOrder.properties', Map) >> ["destinationPartyCode": "destinationParty.code"]
+        configServiceStub.getProperty('openboxes.identifier.attempts.max', Integer) >> 1
 
         and:
         dataServiceStub.transformObject(_, _ as Map) >> ['destinationPartyCode': 'code']
@@ -118,5 +120,70 @@ class PurchaseOrderIdentifierServiceSpec extends Specification implements Servic
 
         expect:
         assert service.generate(order) == "PO-code-161"
+    }
+
+    void 'OBPIH-6821: generate should succeed for sequential identifiers given an empty sequence'() {
+        given:
+        configServiceStub.getProperty('openboxes.identifier.purchaseOrder.format', String) >> "PO-\${sequenceNumber}"
+        configServiceStub.getProperty('openboxes.identifier.purchaseOrder.properties', Map) >> [:]
+        configServiceStub.getProperty('openboxes.identifier.purchaseOrder.sequenceNumber.minSize', Integer) >> 6
+        configServiceStub.getProperty('openboxes.identifier.attempts.max', Integer) >> 1
+
+        and: 'an empty sequence number'
+        Organization organization = new Organization(
+                id: '1',
+                code: 'code',
+                sequences: [(IdentifierTypeCode.PURCHASE_ORDER_NUMBER.toString()): ''],
+        ).save(validate: false)
+
+        Order order = new Order(
+                id: '1',
+                name: 'name',
+                description: 'description',
+                destinationParty: organization,
+        )
+
+        expect:
+        assert service.generate(order) == "PO-000001"
+    }
+
+    void 'OBPIH-6821: generate should succeed for sequential identifiers when a number is already taken'() {
+        given:
+        configServiceStub.getProperty('openboxes.identifier.purchaseOrder.format', String) >> "PO-\${sequenceNumber}"
+        configServiceStub.getProperty('openboxes.identifier.purchaseOrder.properties', Map) >> [:]
+        configServiceStub.getProperty('openboxes.identifier.purchaseOrder.sequenceNumber.minSize', Integer) >> 6
+
+        and: 'a limited number of retries'
+        configServiceStub.getProperty('openboxes.identifier.attempts.max', Integer) >> maxAttepmts
+
+        and: 'the sequence number we are on is already taken'
+        Organization organization = new Organization(
+                id: '1',
+                code: 'code',
+                sequences: [(IdentifierTypeCode.PURCHASE_ORDER_NUMBER.toString()): '0'],
+        ).save(validate: false)
+
+        new Order(
+                id: '1',
+                name: 'name',
+                description: 'description',
+                destinationParty: organization,
+                orderNumber: "PO-000001"  // This is the number we'll generate in our first attempt
+        ).save(validate: false)
+
+        Order order = new Order(
+                id: '2',
+                name: 'name2',
+                description: 'description2',
+                destinationParty: organization,
+        )
+
+        expect:
+        assert service.generate(order) == expectedIdentifier
+
+        where:
+        maxAttepmts || expectedIdentifier
+        1           || null
+        2           || "PO-000002"
     }
 }
