@@ -371,7 +371,7 @@ class Location implements Comparable<Location>, java.io.Serializable {
             and {
                 eq('active', true)
                 not {
-                    'in'('locationType.locationTypeCode', [LocationTypeCode.INTERNAL, LocationTypeCode.BIN_LOCATION])
+                    'in'('locationType.locationTypeCode', LocationTypeCode.listInternalTypeCodes())
                 }
             }
         }
