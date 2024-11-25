@@ -1,8 +1,6 @@
 package org.pih.warehouse.core
 
 class HistoryItem<T> {
-    String identifier
-
     Date date
 
     Location location
@@ -10,4 +8,8 @@ class HistoryItem<T> {
     ReferenceDocument referenceDocument
 
     EventCode eventCode
+
+    Comment comment
+
+    User createdBy
 }

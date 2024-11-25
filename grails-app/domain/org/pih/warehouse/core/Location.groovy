@@ -10,6 +10,7 @@
 package org.pih.warehouse.core
 
 import grails.util.Holders
+import org.hibernate.sql.JoinType
 import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.InventorySnapshotEvent
 import org.pih.warehouse.inventory.RefreshProductAvailabilityEvent
@@ -362,6 +363,18 @@ class Location implements Comparable<Location>, java.io.Serializable {
 
     Boolean isApprovalRequired() {
         return supports(ActivityCode.APPROVE_REQUEST)
+    }
+
+    static List<Location> listNonInternalLocations() {
+        return createCriteria().list {
+            createAlias("locationType", "locationType", JoinType.LEFT_OUTER_JOIN)
+            and {
+                eq('active', true)
+                not {
+                    'in'('locationType.locationTypeCode', LocationTypeCode.listInternalTypeCodes())
+                }
+            }
+        }
     }
 
     Map toBaseJson() {

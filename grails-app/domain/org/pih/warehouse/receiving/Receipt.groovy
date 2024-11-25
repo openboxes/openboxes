@@ -104,7 +104,6 @@ class Receipt implements Serializable, Comparable<Receipt>, Historizable {
     @Override
     List<HistoryItem<Receipt>> getHistory() {
         HistoryItem<Receipt> historyItem = new HistoryItem<>(
-                identifier: receiptNumber,
                 date: actualDeliveryDate,
                 location: shipment.destination,
                 referenceDocument: getReferenceDocument()

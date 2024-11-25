@@ -54,10 +54,11 @@ class Event implements Comparable, Serializable, Historizable {
     @Override
     List<HistoryItem<Event>> getHistory() {
         HistoryItem<Event> historyItem = new HistoryItem<>(
-                identifier: id,
                 date: eventDate,
                 location: eventLocation,
                 eventCode: eventType?.eventCode,
+                comment: comment,
+                createdBy: createdBy,
                 referenceDocument: getReferenceDocument()
         )
        return [historyItem]
