@@ -83,7 +83,7 @@ class StockMovementItem {
     }
 
     BigDecimal getPacksRequested () {
-        if (packSize == null || packSize == 0) {
+        if (packSize == null || packSize == 0 || quantityRequested == null) {
             return null
         }
         return quantityRequested?.toBigDecimal() / packSize.toBigDecimal()
