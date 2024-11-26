@@ -799,7 +799,14 @@ class OrderService {
 
                     orderItem.quantity = parsedQty
                     orderItem.unitPrice = parsedUnitPrice
-                    orderItem.recipient = recipient ? personService.getPersonByNames(recipient) : null
+
+                    if (recipient) {
+                        Person person = personService.getPersonByNames(recipient)
+                        if (!person?.active) {
+                            throw new IllegalArgumentException("Cannot set a recipient who is non-existant or inactive: ${recipient}")
+                        }
+                        orderItem.recipient = person
+                    }
 
                     def estReadyDate = null
                     Locale locale = LocalizationUtil.currentLocale
