@@ -224,7 +224,7 @@ class CombinedShipmentItemsModal extends Component {
       .then(() => {
         this.setState(INITIAL_STATE, () => {
           this.props.hideSpinner();
-          this.props.onResponse();
+          this.props.onResponse(this.props.overrideFormValue);
         });
       })
       .catch(() => this.props.hideSpinner());
@@ -441,6 +441,7 @@ CombinedShipmentItemsModal.propTypes = {
   btnOpenText: PropTypes.string,
   btnOpenDefaultText: PropTypes.string,
   btnOpenDisabled: PropTypes.bool,
+  overrideFormValue: PropTypes.func.isRequired,
 };
 
 CombinedShipmentItemsModal.defaultProps = {
