@@ -191,7 +191,7 @@ class RoleInterceptor {
     }
 
     static Boolean needProductManager(controllerName, actionName) {
-        invoiceActions[controllerName]?.contains("*") || productManagerActions[controllerName]?.contains(actionName)
+        productManagerActions[controllerName]?.contains("*") || productManagerActions[controllerName]?.contains(actionName)
     }
 
     static Boolean needRequestorOrManager(controllerName, actionName) {
