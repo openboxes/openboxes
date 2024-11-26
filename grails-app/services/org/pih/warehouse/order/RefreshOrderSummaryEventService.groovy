@@ -9,23 +9,20 @@
  **/
 package org.pih.warehouse.order
 
-import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
-import org.pih.warehouse.order.RefreshOrderSummaryEvent
 import org.springframework.context.ApplicationListener
 
 @Transactional
 class RefreshOrderSummaryEventService implements ApplicationListener<RefreshOrderSummaryEvent> {
 
-    GrailsApplication grailsApplication
-    def orderService
+    OrderSummaryService orderSummaryService
 
     void onApplicationEvent(RefreshOrderSummaryEvent event) {
         log.info "Application event ${event} has been published! " + event.properties
 
         if (event?.orderIds && !event.disableRefresh) {
             log.info "Refreshing order summary ${event.isDelete ? 'before delete action' : ''} for orders with ids : ${event.orderIds}"
-            orderService.refreshOrderSummary(event.orderIds, event.isDelete)
+            orderSummaryService.refreshOrderSummary(event.orderIds, event.isDelete)
         } else {
             log.info "Event not processed because ${!event?.orderIds ? 'lack of purchase order ids.' : 'it was disabled by event publisher.'}"
         }

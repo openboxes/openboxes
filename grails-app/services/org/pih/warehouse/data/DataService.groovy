@@ -59,12 +59,12 @@ class DataService {
         return new Sql(dataSource).rows(query, params)
     }
 
-    void executeStatement(String statement) {
+    void executeStatement(String statement, Boolean logStatement = true) {
         Sql sql = new Sql(dataSource)
         sql.withTransaction {
             try {
                 def startTime = System.currentTimeMillis()
-                log.info "Executing statement ${statement}"
+                log.info "Executing statement ${logStatement ? statement : ''}"
                 sql.execute(statement)
                 log.info "Updated ${sql.updateCount} rows in " +  (System.currentTimeMillis() - startTime) + " ms"
                 sql.commit()
@@ -75,9 +75,9 @@ class DataService {
         }
     }
 
-    void executeStatements(List statementList) {
+    void executeStatements(List statementList, Boolean logStatements = true) {
         statementList.each { String statement ->
-            executeStatement(statement)
+            executeStatement(statement, logStatements)
         }
     }
 

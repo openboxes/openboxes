@@ -14,15 +14,18 @@ import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.OrderItemStatusCode
+import org.pih.warehouse.order.OrderService
 import org.pih.warehouse.order.OrderStatus
 import org.pih.warehouse.order.OrderSummary
+import org.pih.warehouse.order.OrderSummaryService
 import org.pih.warehouse.order.OrderSummaryStatus
 
 import java.math.RoundingMode
 
 class PurchaseOrderApiController {
 
-    def orderService
+    OrderService orderService
+    OrderSummaryService orderSummaryService
 
     def list() {
         List<OrderSummary> purchaseOrders = orderService.getPurchaseOrders(params)
@@ -234,7 +237,6 @@ class PurchaseOrderApiController {
     }
 
     def orderItemsDerivedStatus = {
-        Order order = Order.get(params.id)
-        render order?.getOrderItemsDerivedStatus() as JSON
+        render orderSummaryService.getOrderItemsDerivedStatus(params.id) as JSON
     }
 }
