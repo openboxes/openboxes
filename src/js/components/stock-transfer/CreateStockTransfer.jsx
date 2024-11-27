@@ -24,6 +24,7 @@ import Translate from 'utils/Translate';
 import { formatDate } from 'utils/translation-utils';
 
 import 'react-table/react-table.css';
+import { STOCK_TRANSFER_CANDIDATES } from 'api/urls';
 
 const SelectTreeTable = selectTableHOC(customTreeTableHOC(ReactTable));
 
@@ -60,7 +61,10 @@ class CreateStockTransfer extends Component {
   componentDidMount() {
     if (this.props.stockTransferTranslationsFetched) {
       this.dataFetched = true;
-      this.fetchStockTransferCandidates(this.props.locationId);
+      // Not passing location id here, because when jumping from gsp to react pages,
+      // the redux persist doesn't have enough time to refresh local storage. In this case
+      // we want to use location id from the session on backend.
+      this.fetchStockTransferCandidates();
     }
 
     this.props.createInfoBar(InfoBarConfigs[InfoBar.STOCK_TRANSFER_DESCRIPTION]);
@@ -157,9 +161,7 @@ class CreateStockTransfer extends Component {
    */
   fetchStockTransferCandidates(locationId) {
     this.props.showSpinner();
-    const url = `/api/stockTransfers/candidates?location.id=${locationId}`;
-
-    return apiClient.get(url)
+    return apiClient.get(STOCK_TRANSFER_CANDIDATES(locationId))
       .then((resp) => {
         const stockTransferCandidates = parseResponse(resp.data.data);
         const stockTransferItems = [];
