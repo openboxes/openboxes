@@ -274,21 +274,22 @@ const TABLE_FIELDS = {
             `containers[${parentIndex}].shipmentItems[${rowIndex}]`,
             {},
           );
-          const packsRequested = _.round(
-            shipmentItem?.quantityRemaining / shipmentItem?.packSize,
-            2,
-          );
+          const packsReceived = shipmentItem?.quantityReceived
+            ? _.round(shipmentItem?.quantityReceived / shipmentItem?.packSize, 2)
+            : 0;
+
+          const packsRequested = _.round(shipmentItem?.packsRequested, 2);
           const unitOfMeasure = shipmentItem?.unitOfMeasure;
 
           return {
-            tooltipValue: unitOfMeasure ? `${packsRequested} ${unitOfMeasure}` : undefined,
+            tooltipValue: unitOfMeasure ? `${packsRequested - packsReceived} ${unitOfMeasure}` : undefined,
             formatValue: () => {
               if (!unitOfMeasure) {
                 return null;
               }
               return (
                 <span>
-                  {packsRequested}
+                  {packsRequested - packsReceived}
                   <small className="text-muted ml-1">{unitOfMeasure}</small>
                 </span>
               );
