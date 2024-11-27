@@ -1,4 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <configuration>
+
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+    <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
 
     <!-- Allows Logback logs to appear in Sentry. See sentry.properties for configuration. -->
     <appender name="sentry" class="io.sentry.logback.SentryAppender">
@@ -9,18 +13,6 @@
             <pattern>
                 <!-- https://logback.qos.ch/manual/layouts.html -->
                 %date{ISO8601} %-5level [%thread] %logger{40}: %message%n%xException
-            </pattern>
-        </encoder>
-    </appender>
-
-    <!--  Outputs Logback logs to the console.  -->
-    <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
-        <!-- Adds colors to the logs only if the terminal can support it https://logback.qos.ch/manual/layouts.html#coloring -->
-        <withJansi>true</withJansi>
-        <encoder>
-            <pattern>
-                <!-- https://logback.qos.ch/manual/layouts.html -->
-                %cyan(%date{ISO8601}) %highlight(%-5level) %magenta([%thread]) %yellow(%logger{40}): %message%n%xException
             </pattern>
         </encoder>
     </appender>
@@ -133,7 +125,7 @@
     -->
     <root level="debug">
         <appender-ref ref="sentry" />
-        <appender-ref ref="stdout" />
+        <appender-ref ref="CONSOLE" />
     </root>
 
 </configuration>
