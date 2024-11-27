@@ -13,6 +13,7 @@ import {
   hideSpinner,
   showSpinner,
 } from 'actions';
+import { STOCK_TRANSFER_CANDIDATES } from 'api/urls';
 import { TableCell } from 'components/DataTable';
 import { STOCK_TRANSFER_URL } from 'consts/applicationUrls';
 import DateFormat from 'consts/dateFormat';
@@ -24,7 +25,6 @@ import Translate from 'utils/Translate';
 import { formatDate } from 'utils/translation-utils';
 
 import 'react-table/react-table.css';
-import { STOCK_TRANSFER_CANDIDATES } from 'api/urls';
 
 const SelectTreeTable = selectTableHOC(customTreeTableHOC(ReactTable));
 
