@@ -903,10 +903,6 @@ tasks.withType(Test) {
         showStandardStreams = true
     }
 
-    // Generate a code coverage report whenever tests run. This is useful for simplifying uploading coverage reports
-    // during our CI flows. The actual report generation is quick (<20 seconds), so it's fine to do this every time.
-    finalizedBy jacocoTestReport
-
     jacoco {
         // When running tests, exclude the given folders from Jacoco coverage % generation.
         excludes = jacocoExcludes
