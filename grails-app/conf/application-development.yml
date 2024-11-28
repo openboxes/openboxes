@@ -4,3 +4,5 @@
 logging:
     pattern:
         console: "%cyan(%date{ISO8601}) %highlight(%-5level) %magenta([%thread]) %yellow(%logger{40}): %message%n%xException"
+    level:
+        root: DEBUG
