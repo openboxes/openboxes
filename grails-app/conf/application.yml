@@ -627,3 +627,9 @@ sentry:
 
     # A custom setting that defines the format of Sentry HTTP transaction names
     httpTransactionNameFormat: CONTROLLER_METHOD
+
+# Application-level logger config. See logback.xml for Logback-specific configuration.
+logging:
+    # How the logs are formatted. See https://logback.qos.ch/manual/layouts.html for config options.
+    pattern:
+        console: "%date{ISO8601} %-5level [%thread] %logger{40}: %message%n%xException"
