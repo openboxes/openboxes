@@ -4,17 +4,25 @@
     <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
     <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
 
-    <!-- Allows Logback logs to appear in Sentry. See sentry.properties for configuration. -->
+    <springProperty scope="context" name="sentryDsn" source="sentry.dsn" />
+
+    <!--
+    Allows Logback logs to appear in Sentry. See sentry.properties and application.yml for configuration.
+    Once we switch to using the "sentry-spring-boot-starter" dependency, we can move all this Sentry configuration to
+    application.yml https://docs.sentry.io/platforms/java/guides/spring-boot/logging-frameworks/#logback
+    -->
     <appender name="sentry" class="io.sentry.logback.SentryAppender">
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <!-- Use the INFO log level or higher for Sentry so that we don't hit our usage limit. -->
             <level>info</level>
         </filter>
-        <encoder>
-            <pattern>
-                <!-- https://logback.qos.ch/manual/layouts.html -->
-                %date{ISO8601} %-5level [%thread] %logger{40}: %message%n%xException
-            </pattern>
-        </encoder>
+        <options>
+            <!--
+            DSN is required here because Sentry for logback is configured separately from Sentry for Servlet
+            (see SentryServletContextListener for that). https://docs.sentry.io/platforms/java/guides/logback/
+            -->
+            <dsn>${sentryDsn}</dsn>
+        </options>
     </appender>
 
     <!-- log levels for software we maintain -->

@@ -34,7 +34,7 @@ class SentryServletContextListener implements ServletContextListener {
 
                 // If "SENTRY_DSN" is defined, or a dsn is provided in sentry.properties, those will take precedence
                 // over "SENTRY_DSN_BACKEND". If none of these are defined, Sentry will be disabled.
-                options.dsn = System.getenv("SENTRY_DSN_BACKEND")
+                options.dsn = System.getenv("SENTRY_DSN_BACKEND") ?: ""
 
                 // We set the git commit of the release as the Sentry release tag to be able to group
                 // Sentry errors by release. Once we switch to use the "io.sentry:sentry-spring-boot-starter"

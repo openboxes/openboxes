@@ -18,7 +18,7 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
 
 /**
- * Intercepts Sentry traces/logs and enhances their context with user information.
+ * Intercepts HTTP requests, adding user information to the Sentry transaction that will be created for the request.
  *
  * If we ever switch to use the Spring Security plugin, this code will need to be moved to a Spring Component
  * that implements SentryUserProvider.
@@ -31,7 +31,7 @@ class SentryInterceptor {
 
     AuthService authService
 
-    public SentryInterceptor() {
+    SentryInterceptor() {
         matchAll().except(uri: '/static/**').except(uri: "/info").except(uri: "/health")
     }
 
