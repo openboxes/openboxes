@@ -602,7 +602,7 @@ class Order implements Serializable {
                     dateCreated     : dateCreated,
                     origin          : origin?.name,
                     destination     : destination?.name,
-                    orderItemsCount : orderItems?.size(),
+                    orderItemsCount : orderItems?.count { it.orderItemStatusCode != OrderItemStatusCode.CANCELED },
                 ]
             default:
                 return toJson()
