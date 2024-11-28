@@ -10,24 +10,21 @@ import ReactTable from 'react-table';
 import { Tooltip } from 'react-tippy';
 
 import { hideSpinner, showSpinner } from 'actions';
+import { TableCell } from 'components/DataTable';
 import { extractStockTransferItems, prepareRequest } from 'components/stock-transfer/utils';
 import { STOCK_TRANSFER_URL } from 'consts/applicationUrls';
+import DateFormat from 'consts/dateFormat';
+import StockTransferStatus from 'consts/stockTransferStatus';
 import apiClient, { flattenRequest, parseResponse } from 'utils/apiClient';
 import customTreeTableHOC from 'utils/CustomTreeTable';
 import Filter from 'utils/Filter';
 import Select from 'utils/Select';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
+import { formatDate } from 'utils/translation-utils';
 
 import 'react-table/react-table.css';
-import { formatDate } from 'utils/translation-utils';
-import DateFormat from 'consts/dateFormat';
-import { TableCell } from 'components/DataTable';
-
 
 const SelectTreeTable = (customTreeTableHOC(ReactTable));
-
-const APPROVED = 'APPROVED';
-const CANCELED = 'CANCELED';
 
 /**
  * The second page of stock transfer where user can choose qty and bin to transfer
@@ -195,12 +192,12 @@ class StockTransferSecondPage extends Component {
             duration="250"
             hideDelay="50"
           >
-            <div className={disabled && props.original.status !== CANCELED ? 'has-error' : ''}>
+            <div className={disabled && props.original.status !== StockTransferStatus.CANCELED ? 'has-error' : ''}>
               <input
                 type="number"
                 className="form-control form-control-xs"
                 value={props.value}
-                disabled={props.original.status === CANCELED}
+                disabled={props.original.status === StockTransferStatus.CANCELED}
                 onChange={(event) => {
               const stockTransfer = update(this.state.stockTransfer, {
                 stockTransferItems: { [itemIndex]: { quantity: { $set: event.target.value } } },
@@ -224,7 +221,7 @@ class StockTransferSecondPage extends Component {
         valueKey="id"
         labelKey="name"
         className="select-xs"
-        disabled={cellInfo.original.status === CANCELED}
+        disabled={cellInfo.original.status === StockTransferStatus.CANCELED}
       />),
       Filter,
     }, {
@@ -326,7 +323,7 @@ class StockTransferSecondPage extends Component {
    */
   saveStockTransfer(data, callback) {
     const url = `/api/stockTransfers/${this.props.match.params.stockTransferId}`;
-    const payload = prepareRequest(data, APPROVED);
+    const payload = prepareRequest(data, StockTransferStatus.APPROVED);
     apiClient.put(url, flattenRequest(payload))
       .then((response) => {
         const stockTransfer = parseResponse(response.data.data);
@@ -349,11 +346,20 @@ class StockTransferSecondPage extends Component {
     this.setState({ stockTransfer });
   }
 
+  // Functions for managing items in state after delete action.
+  // 1. When clicking the delete button on the original item:
+  //   - Delete the original item and every subitem of it
+  // 2. When clicking the delete button on the saved subitem:
+  //   - if it is the last subitem: delete it and enable the field on the original item
+  //   - if it is not the last subitem: just delete it
+  // 3. When clicking the delete button on the not saved subitem:
+  //   - delete it just from the state, it is done in the deleteItem function.
   getItemsAfterDelete(items, indexToDelete) {
     // Reference of deleted line: (if line has referenceId it's not the original one)
     const { referenceId, id } = items[indexToDelete];
 
-    return items.filter((el, index) => {
+    // Removing deleted item from state
+    const filteredItems = items.filter((el, index) => {
       // If it's the original line we have to delete all the split lines
       // coming from the original one line and the original line itself
       if (!referenceId) {
@@ -362,6 +368,18 @@ class StockTransferSecondPage extends Component {
 
       // If it's not the original line we just deleting it
       return index !== indexToDelete;
+    });
+
+    // grouping items by referenceId for checking if the original item has any existing subitem
+    const itemsGroupedByReferenceId = _.groupBy(filteredItems, 'referenceId');
+
+    // If an item doesn't have any subitems it should be enabled (status PENDING)
+    return filteredItems.map((item) => {
+      if (!itemsGroupedByReferenceId[item?.id]) {
+        return { ...item, status: StockTransferStatus.PENDING };
+      }
+
+      return item;
     });
   }
 
@@ -408,7 +426,7 @@ class StockTransferSecondPage extends Component {
       if (splitItems.length === 0 && originalItem) {
         const originalItemIndex = _.findIndex(stockTransfer.stockTransferItems, originalItem);
         stockTransfer = update(stockTransfer, {
-          stockTransferItems: { [originalItemIndex]: { status: { $set: 'PENDING' } } },
+          stockTransferItems: { [originalItemIndex]: { status: { $set: StockTransferStatus.PENDING } } },
         });
       }
 
@@ -459,13 +477,13 @@ class StockTransferSecondPage extends Component {
       stockTransferItems: {
         // If splitting not yet canceled item, then cancel original row and add two new split lines
         // else if splitting already CANCELED line add a new line once
-        $splice: original.status !== CANCELED ? [
+        $splice: original.status !== StockTransferStatus.CANCELED ? [
           [index + 1, 0, newLine],
           [index + 1, 0, newLine],
         ] : [
           [index + 1, 0, newLine],
         ],
-        [index]: { $set: original.id ? { ...original, status: CANCELED, quantity: '' } : { ...original, quantity: '' } },
+        [index]: { $set: original.id ? { ...original, status: StockTransferStatus.CANCELED, quantity: '' } : { ...original, quantity: '' } },
       },
     });
 
@@ -491,7 +509,7 @@ class StockTransferSecondPage extends Component {
     return stockTransferItems && !!stockTransferItems.find((item) => {
       const { quantity, quantityNotPicked, status } = item;
 
-      if (status !== 'CANCELED' && (!quantity || quantity > quantityNotPicked || quantity <= 0)) {
+      if (status !== StockTransferStatus.CANCELED && (!quantity || quantity > quantityNotPicked || quantity <= 0)) {
         return true;
       }
 
