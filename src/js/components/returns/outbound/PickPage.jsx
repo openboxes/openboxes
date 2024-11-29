@@ -61,7 +61,7 @@ const FIELDS = {
       },
       originZone: {
         type: LabelField,
-        label: 'react.outboundReturn.zone.label',
+        label: 'react.outboundReturns.zone.label',
         defaultMessage: 'Zone',
         flexWidth: '0.5',
         attributes: {
@@ -70,7 +70,7 @@ const FIELDS = {
       },
       'originBinLocation.name': {
         type: LabelField,
-        label: 'react.outboundReturn.bin.label',
+        label: 'react.outboundReturns.bin.label',
         defaultMessage: 'Bin Location',
         flexWidth: '1',
         attributes: {
@@ -82,13 +82,13 @@ const FIELDS = {
       },
       lotNumber: {
         type: LabelField,
-        label: 'react.outboundReturn.lot.label',
+        label: 'react.outboundReturns.lot.label',
         defaultMessage: 'Lot',
         flexWidth: '1',
       },
       expirationDate: {
         type: LabelField,
-        label: 'react.outboundReturn.expiry.label',
+        label: 'react.outboundReturns.expiry.label',
         defaultMessage: 'Expiry',
         flexWidth: '1',
         getDynamicAttr: ({ formatLocalizedDate }) => ({
@@ -97,7 +97,7 @@ const FIELDS = {
       },
       quantity: {
         type: LabelField,
-        label: 'react.outboundReturn.quantity.label',
+        label: 'react.outboundReturns.quantity.label',
         defaultMessage: 'Qty to Return',
         flexWidth: '1',
       },
@@ -214,12 +214,12 @@ class PickPage extends Component {
                   type="button"
                   onClick={() => this.previousPage(outboundReturn)}
                   className="btn btn-outline-primary btn-form float-right btn-xs"
-                ><Translate id="react.outboundReturn.previous.label" defaultMessage="Previous" />
+                ><Translate id="react.outboundReturns.previous.label" defaultMessage="Previous" />
                 </button>
                 <button
                   type="submit"
                   className="btn btn-outline-primary btn-form float-right btn-xs"
-                ><Translate id="react.outboundReturn.next.label" defaultMessage="Next" />
+                ><Translate id="react.outboundReturns.next.label" defaultMessage="Next" />
                 </button>
               </div>
             </form>

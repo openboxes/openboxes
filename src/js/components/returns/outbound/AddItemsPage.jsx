@@ -537,7 +537,7 @@ class AddItemsPage extends Component {
                   type="button"
                   onClick={() => this.saveAndTransition(this.props.previousPage)}
                   className="btn btn-outline-primary btn-form float-right btn-xs"
-                ><Translate id="react.replenishment.next.label" defaultMessage="Previous" />
+                ><Translate id="react.outboundReturns.previous.label" defaultMessage="Previous" />
                 </button>
                 <button
                   type="submit"
@@ -545,7 +545,7 @@ class AddItemsPage extends Component {
                     !_.some(values.returnItems, item => _.parseInt(item.quantity) && item.checked)
                   }
                   className="btn btn-outline-primary btn-form float-right btn-xs"
-                ><Translate id="react.replenishment.next.label" defaultMessage="Next" />
+                ><Translate id="react.outboundReturns.next.label" defaultMessage="Next" />
                 </button>
               </div>
             </form>
