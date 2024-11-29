@@ -372,13 +372,23 @@
 
       function fetchOrderDerivedStatus() {
         const orderId = $('#orderId').val();
-        $.ajax({
-          url: "${request.contextPath}/json/getOrdersDerivedStatus",
-          data: "order.id=" + orderId,
-          success: function(data, textStatus, jqXHR){
-            $("." + orderId).text(data[orderId]);
-          }
-        });
+        if (orderId) {
+          $.ajax({
+            url: "${request.contextPath}/json/getOrdersDerivedStatus",
+            data: "order.id=" + orderId,
+            success: function(data, textStatus, jqXHR) {
+              $("." + orderId).text(data[orderId]);
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+              console.error(jqXHR, textStatus, errorThrown);
+              if (jqXHR.responseText) {
+                $.notify(jqXHR.responseText, "error");
+              } else {
+                $.notify("An error occurred", "error");
+              }
+            }
+          });
+        }
       }
     </script>
 </div>
