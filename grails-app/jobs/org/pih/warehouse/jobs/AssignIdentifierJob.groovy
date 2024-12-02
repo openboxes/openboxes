@@ -1,13 +1,15 @@
 package org.pih.warehouse.jobs
 
+import grails.gorm.transactions.Transactional
+
 import org.pih.warehouse.inventory.TransactionIdentifierService
 import org.pih.warehouse.order.OrderIdentifierService
-import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductIdentifierService
 import org.pih.warehouse.receiving.ReceiptIdentifierService
 import org.pih.warehouse.requisition.RequisitionIdentifierService
 import org.pih.warehouse.shipping.ShipmentIdentifierService
 
+@Transactional
 class AssignIdentifierJob {
 
     // Every identifier service that implements BlankIdentifierResolver
@@ -32,15 +34,11 @@ class AssignIdentifierJob {
             return
         }
 
-        // TODO: investigate alternatives to wrapping the whole job in a session on a single entity. Can we do
-        //       one session per BlankIdentifierResolver?
-        Product.withNewSession {
-            productIdentifierService.generateForAllUnassignedIdentifiers()
-            shipmentIdentifierService.generateForAllUnassignedIdentifiers()
-            receiptIdentifierService.generateForAllUnassignedIdentifiers()
-            orderIdentifierService.generateForAllUnassignedIdentifiers()
-            requisitionIdentifierService.generateForAllUnassignedIdentifiers()
-            transactionIdentifierService.generateForAllUnassignedIdentifiers()
-        }
+        productIdentifierService.generateForAllUnassignedIdentifiers()
+        shipmentIdentifierService.generateForAllUnassignedIdentifiers()
+        receiptIdentifierService.generateForAllUnassignedIdentifiers()
+        orderIdentifierService.generateForAllUnassignedIdentifiers()
+        requisitionIdentifierService.generateForAllUnassignedIdentifiers()
+        transactionIdentifierService.generateForAllUnassignedIdentifiers()
     }
 }
