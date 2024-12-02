@@ -41,7 +41,6 @@
                             </td>
                             <td valign="top" class="value ${hasErrors(bean: locationTypeInstance, field: 'description', 'errors')}">
                                 <g:select name="locationTypeCode" class="chzn-select-deselect" from="${org.pih.warehouse.core.LocationTypeCode.list()}"
-                                          noSelection="['':'']"
                                           value="${locationTypeInstance?.locationTypeCode}"/>
                             </td>
                         </tr>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="ewaterman" id="021220241330-0">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="location_type" columnName="location_type_code"/>
+        </preConditions>
+
+        <!--
+        Set a default value for location_type_code for all existing rows that don't already have a code. There
+        shouldn't be any rows where location_type_code is null because it doesn't make sense, but check just in case.
+        -->
+        <update tableName="location_type">
+            <column name="location_type_code" value="DEFAULT"/>
+            <where>location_type_code IS NULL</where>
+        </update>
+
+        <!-- Make location_type_code non-nullable -->
+        <modifyColumn tableName="location_type">
+            <column name="location_type_code" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </modifyColumn>
+    </changeSet>
+</databaseChangeLog>
