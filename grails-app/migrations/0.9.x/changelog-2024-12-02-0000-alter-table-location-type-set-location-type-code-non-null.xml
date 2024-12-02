@@ -9,19 +9,9 @@
         </preConditions>
 
         <!--
-        Set a default value for location_type_code for all existing rows that don't already have a code. There
-        shouldn't be any rows where location_type_code is null because it doesn't make sense, but check just in case.
+        Make location_type_code non-nullable. There shouldn't be any rows where location_type_code is null because
+        that doesn't make much sense, but we set a default anyway, just in case.
         -->
-        <update tableName="location_type">
-            <column name="location_type_code" value="DEFAULT"/>
-            <where>location_type_code IS NULL</where>
-        </update>
-
-        <!-- Make location_type_code non-nullable -->
-        <modifyColumn tableName="location_type">
-            <column name="location_type_code" type="INT">
-                <constraints nullable="false"/>
-            </column>
-        </modifyColumn>
+        <addNotNullConstraint tableName="location_type" columnName="location_type_code" columnDataType="VARCHAR(100)" defaultNullValue="DEFAULT"/>
     </changeSet>
 </databaseChangeLog>
