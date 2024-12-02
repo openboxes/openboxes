@@ -1,11 +1,22 @@
 package org.pih.warehouse.jobs
 
-import org.pih.warehouse.core.identification.BlankIdentifierResolver
+import org.pih.warehouse.inventory.TransactionIdentifierService
+import org.pih.warehouse.order.OrderIdentifierService
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.product.ProductIdentifierService
+import org.pih.warehouse.receiving.ReceiptIdentifierService
+import org.pih.warehouse.requisition.RequisitionIdentifierService
+import org.pih.warehouse.shipping.ShipmentIdentifierService
 
 class AssignIdentifierJob {
 
-    List<BlankIdentifierResolver> blankIdentifierResolvers
+    // Every identifier service that implements BlankIdentifierResolver
+    ProductIdentifierService productIdentifierService
+    ShipmentIdentifierService shipmentIdentifierService
+    ReceiptIdentifierService receiptIdentifierService
+    OrderIdentifierService orderIdentifierService
+    RequisitionIdentifierService requisitionIdentifierService
+    TransactionIdentifierService transactionIdentifierService
 
     def sessionRequired = false
 
@@ -24,9 +35,12 @@ class AssignIdentifierJob {
         // TODO: investigate alternatives to wrapping the whole job in a session on a single entity. Can we do
         //       one session per BlankIdentifierResolver?
         Product.withNewSession {
-            for (BlankIdentifierResolver blankIdentifierResolver : blankIdentifierResolvers) {
-                blankIdentifierResolver.generateForAllUnassignedIdentifiers()
-            }
+            productIdentifierService.generateForAllUnassignedIdentifiers()
+            shipmentIdentifierService.generateForAllUnassignedIdentifiers()
+            receiptIdentifierService.generateForAllUnassignedIdentifiers()
+            orderIdentifierService.generateForAllUnassignedIdentifiers()
+            requisitionIdentifierService.generateForAllUnassignedIdentifiers()
+            transactionIdentifierService.generateForAllUnassignedIdentifiers()
         }
     }
 }
