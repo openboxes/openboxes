@@ -17,12 +17,14 @@ import MenuConfigurationSubsection from 'components/Layout/menu/MenuConfiguratio
 import NavbarIcon from 'components/Layout/NavbarIcon';
 import HelpScout from 'components/support-button/HelpScout';
 import useElementSize from 'hooks/useElementSize';
+import useTranslate from 'hooks/useTranslate';
 
 const NavbarIcons = ({
   username, highestRole, menuItems, configurationMenuSection,
 }) => {
   const windowSize = useElementSize(window);
   const [isMenuCollapsed, setIsMenuCollapsed] = useState(false);
+  const translate = useTranslate();
 
   useEffect(() => {
     // We collapse the megamenu on medium (MD) breakpoint which starts at 768px of window size
@@ -51,7 +53,7 @@ const NavbarIcons = ({
   const iconsList = [
     {
       name: 'search',
-      tooltip: 'Search',
+      tooltip: translate('react.default.navbar.search', 'Search'),
       component: renderProps => (<GlobalSearch
         renderButton={({ showSearchbar, isVisible }) => {
           renderProps.setIsTooltipDisabled(isVisible);
@@ -64,12 +66,12 @@ const NavbarIcons = ({
     },
     {
       name: 'help',
-      tooltip: 'Help',
+      tooltip: translate('react.default.navbar.help', 'Help'),
       component: () => (<div className="menu-icon"><HelpScout /></div>),
     },
     {
       name: 'configuration',
-      tooltip: 'Configuration',
+      tooltip: translate('react.default.navbar.configuration', 'Configuration'),
       hide: configurationMenuSubsections.length === 0,
       component: renderProps => (
         <div className="btn-group">
@@ -101,7 +103,7 @@ const NavbarIcons = ({
     },
     {
       name: 'profile',
-      tooltip: 'Profile',
+      tooltip: translate('react.default.navbar.profile', 'Profile'),
       component: renderProps => (
         <div className="btn-group">
           <div
