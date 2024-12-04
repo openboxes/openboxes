@@ -1,9 +1,12 @@
 package org.pih.warehouse.shipping
 
+import grails.gorm.transactions.Transactional
+
 import org.pih.warehouse.core.IdentifierService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.identification.BlankIdentifierResolver
 
+@Transactional
 class ShipmentIdentifierService extends IdentifierService<Shipment> implements BlankIdentifierResolver<Shipment> {
 
     @Override

@@ -55,9 +55,7 @@ trait BlankIdentifierResolver<T extends GormEntity> {
                 log.info("Assigning identifier ${identifier} to ${entityType} with id: ${entity.id}")
                 setIdentifierOnEntity(identifier, entity)
 
-                // TODO: investigate why this merge with flush and no validation is required. Can we simplify this to
-                //       a regular save operation?
-                if (!entity.merge(flush: true, validate: false)) {
+                if (!entity.save()) {
                     log.error("Unable to assign identifier to ${entityType} with id: ${entity.id}. Error: ${entity.errors}")
                 }
             } catch (Exception e) {
