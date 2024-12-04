@@ -1,5 +1,6 @@
 package org.pih.warehouse.core
 
+import grails.gorm.transactions.Transactional
 import org.apache.commons.lang.StringUtils
 import org.apache.commons.lang.text.StrSubstitutor
 import org.grails.datastore.gorm.GormEntity
@@ -12,6 +13,7 @@ import org.pih.warehouse.data.DataService
 /**
  * Handles generating custom identifiers that conform to a certain format.
  */
+@Transactional
 abstract class IdentifierService<T extends GormEntity> {
 
     RandomIdentifierGenerator randomIdentifierGenerator
