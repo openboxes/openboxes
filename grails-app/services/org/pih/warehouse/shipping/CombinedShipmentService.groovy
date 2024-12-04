@@ -16,6 +16,7 @@ import grails.util.Holders
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.UnitOfMeasure
+import org.pih.warehouse.data.PersonService
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.order.Order
@@ -33,6 +34,7 @@ class CombinedShipmentService {
     def inventoryService
     def messageService
     def localizationService
+    PersonService personService
 
     /**
      * Parse the given text into a list of maps.
@@ -224,12 +226,10 @@ class CombinedShipmentService {
 
                 Person recipient = line.recipient ? Person.get(line.recipient) : null
                 if (!recipient && line.recipient) {
-                    String[] names = line.recipient.split(" ")
-                    if (names.length == 2) {
-                        String firstName = names[0], lastName = names[1]
-                        recipient = Person.findByFirstNameAndLastName(firstName, lastName)
-                    } else if (names.length == 1) {
-                        recipient = Person.findByEmail(names[0])
+                    if (line.recipient.contains(" ")) {
+                        recipient = personService.getActivePersonByName(line.recipient)
+                    } else {
+                        recipient = personService.getActivePersonByEmail(line.recipient)
                     }
                     if (!recipient) {
                         throw new IllegalArgumentException("Unable to locate person")
