@@ -1,7 +1,7 @@
 package org.pih.warehouse.order
 
+import grails.gorm.transactions.Transactional
 import org.apache.commons.lang.StringUtils
-import org.apache.commons.lang.text.StrSubstitutor
 
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.IdentifierService
@@ -10,6 +10,7 @@ import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.identification.IdentifierGeneratorContext
 import org.pih.warehouse.shipping.Shipment
 
+@Transactional
 class PurchaseOrderIdentifierService extends IdentifierService<Order> {
 
     @Override

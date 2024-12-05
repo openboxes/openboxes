@@ -1,5 +1,8 @@
 package org.pih.warehouse.core
 
+import grails.gorm.transactions.Transactional
+
+@Transactional
 class LocationIdentifierService extends IdentifierService<Location> {
 
     @Override

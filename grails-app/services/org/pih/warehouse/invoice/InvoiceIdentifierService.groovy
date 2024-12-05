@@ -1,7 +1,10 @@
 package org.pih.warehouse.invoice
 
+import grails.gorm.transactions.Transactional
+
 import org.pih.warehouse.core.IdentifierService
 
+@Transactional
 class InvoiceIdentifierService extends IdentifierService<Invoice> {
 
     @Override
