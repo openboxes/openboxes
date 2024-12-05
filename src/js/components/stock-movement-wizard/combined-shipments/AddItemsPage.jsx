@@ -1015,10 +1015,9 @@ class AddItemsPage extends Component {
 
   /**
    * Imports chosen file to backend and then fetches line items.
-   * @param {object} event
-   * @public
+   * @param mutateTableData
    */
-  importTemplate(event) {
+  importTemplate = (mutateTableData) => (event) => {
     this.props.showSpinner();
     const formData = new FormData();
     const file = event.target.files[0];
@@ -1034,7 +1033,7 @@ class AddItemsPage extends Component {
     return apiClient
       .post(COMBINED_SHIPMENT_ITEMS_IMPORT_TEMPLATE(stockMovementId), formData, config)
       .then(() => {
-        this.fetchLineItems();
+        this.fetchLineItems(mutateTableData);
         if (_.isNil(_.last(this.state.values.lineItems).product)) {
           this.setState({
             values: {
@@ -1100,7 +1099,7 @@ class AddItemsPage extends Component {
                   id="csvInput"
                   type="file"
                   style={{ display: 'none' }}
-                  onChange={this.importTemplate}
+                  onChange={this.importTemplate(form.mutators.override)}
                   onClick={(event) => {
                     // eslint-disable-next-line no-param-reassign
                     event.target.value = null;
