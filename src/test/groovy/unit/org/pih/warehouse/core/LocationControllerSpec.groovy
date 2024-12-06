@@ -131,15 +131,15 @@ class LocationControllerSpec extends Specification implements ControllerUnitTest
     }
 
     LocationGroup createLocationGroup(String name) {
-        return new LocationGroup(name: name).save(validate:false)
+        return new LocationGroup(name: name).save(validate: false)
     }
 
     LocationType createLocationType(String name) {
-        return new LocationType(name: name).save(validate:false)
+        return new LocationType(name: name).save(validate: false)
     }
 
     Organization createOrganization(String code, String name) {
-        return new Organization(code: code, name: name).save(validate:false)
+        return new Organization(code: code, name: name).save(validate: false)
     }
 
     Location createLocation(String name, LocationType locationType, LocationGroup locationGroup, Organization organization) {
@@ -148,6 +148,6 @@ class LocationControllerSpec extends Specification implements ControllerUnitTest
                 locationType: locationType,
                 locationGroup: locationGroup,
                 organization: organization)
-                .save(validate:false)
+                .save(validate: false)
     }
 }
