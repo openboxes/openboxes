@@ -25,7 +25,7 @@ class PersonService {
      */
     private Person getPersonByEmail(String email) {
         List<Person> people = Person.findAllByEmail(email)
-        if (people?.empty) {
+        if (people.empty) {
             return null
         }
 
@@ -87,8 +87,7 @@ class PersonService {
         }
 
         InternetAddress internetAddress
-        try
-        {
+        try {
             internetAddress = new InternetAddress(recipient, false)
         }
         catch (AddressException ignored) {

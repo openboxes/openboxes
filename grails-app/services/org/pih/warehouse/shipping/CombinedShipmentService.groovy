@@ -226,11 +226,9 @@ class CombinedShipmentService {
 
                 Person recipient = line.recipient ? Person.get(line.recipient) : null
                 if (!recipient && line.recipient) {
-                    if (line.recipient.contains(" ")) {
-                        recipient = personService.getActivePersonByName(line.recipient)
-                    } else {
-                        recipient = personService.getActivePersonByEmail(line.recipient)
-                    }
+                    recipient = line.recipient.contains(" ") ?
+                            personService.getActivePersonByName(line.recipient) :
+                            personService.getActivePersonByEmail(line.recipient)
                     if (!recipient) {
                         throw new IllegalArgumentException("Unable to locate person")
                     }
