@@ -90,7 +90,8 @@ class OutboundStockMovement implements Serializable, Validateable {
             "pending",
             "electronicType",
             "approvers",
-            "pendingApproval"
+            "pendingApproval",
+            "isReturn"
     ]
 
     static mapping = {
@@ -339,4 +340,8 @@ class OutboundStockMovement implements Serializable, Validateable {
         return requisition?.approvalRequired && origin?.approvalRequired && RequisitionStatus.compare(requisition.status, RequisitionStatus.PICKING) == -1
     }
 
+    // This has to be named with the get prefix to align with the StockMovement DTO
+    boolean getIsReturn() {
+        return shipment?.isFromReturnOrder
+    }
 }
