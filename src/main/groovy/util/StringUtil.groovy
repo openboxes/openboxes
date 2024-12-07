@@ -51,4 +51,8 @@ class StringUtil {
         }
         return null
     }
+
+    static String capitalize(String text) {
+        return text.toLowerCase().capitalize()
+    }
 }

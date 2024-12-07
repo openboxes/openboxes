@@ -1,4 +1,6 @@
-<%@ page import="org.pih.warehouse.core.EventType; org.pih.warehouse.core.Location" %>
+<%@ page import="org.pih.warehouse.core.Constants" %>
+<%@ page import="org.pih.warehouse.core.EventType" %>
+<%@ page import="org.pih.warehouse.core.Location" %>
 <%@ page import="org.pih.warehouse.core.EventCode" %>
 
 <section class="box" aria-label="Events">
@@ -24,10 +26,10 @@
             <g:each var="historyItem" in="${historyItems}">
                 <tr>
                     <td>
-                        ${format.metadata(obj: historyItem?.eventCode)}
+                        ${historyItem?.eventTypeName}
                     </td>
                     <td>
-                        ${historyItem?.date}
+                        ${historyItem?.date?.format(Constants.DATE_SHORT_TIME_FORMAT)}
                     </td>
                     <td>
                         ${historyItem?.location}

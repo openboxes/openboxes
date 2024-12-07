@@ -12,6 +12,7 @@ package org.pih.warehouse.shipping
 import grails.util.Holders
 import groovy.time.TimeCategory
 import groovy.time.TimeDuration
+import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.pih.warehouse.core.*
 import org.pih.warehouse.core.Event
 import org.pih.warehouse.auth.AuthService
@@ -27,6 +28,7 @@ import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.RefreshOrderSummaryEvent
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.requisition.Requisition
+import util.StringUtil
 
 class Shipment implements Comparable, Serializable, Historizable {
 
@@ -722,7 +724,9 @@ class Shipment implements Comparable, Serializable, Historizable {
                 date: dateCreated,
                 location: origin,
                 eventCode: EventCode.CREATED,
-                referenceDocument: referenceDocument
+                eventTypeName: StringUtil.capitalize(EventCode.CREATED.name()),
+                referenceDocument: referenceDocument,
+                createdBy: createdBy,
         ))
         // Then collect history of a shipped event if any
         if (hasShipped()) {
@@ -730,7 +734,9 @@ class Shipment implements Comparable, Serializable, Historizable {
                     date: dateShipped(),
                     location: origin,
                     eventCode: EventCode.SHIPPED,
+                    eventTypeName: StringUtil.capitalize(EventCode.SHIPPED.name()),
                     referenceDocument: referenceDocument,
+                    createdBy: shippedBy,
             ))
         }
         // Then collect history of a partially_received events if any
@@ -738,13 +744,19 @@ class Shipment implements Comparable, Serializable, Historizable {
             // If there is a received event, exclude it from the set
             Set<Receipt> partialReceipts = wasReceived() ? (receipts - receipts.last()) : receipts
             List<HistoryItem<Receipt>> partiallyReceivedHistoryItem = partialReceipts.collect { it.getHistory() }.flatten()
-            partiallyReceivedHistoryItem.each { it.eventCode = EventCode.PARTIALLY_RECEIVED }
+            partiallyReceivedHistoryItem.each {
+                it.eventCode = EventCode.PARTIALLY_RECEIVED
+                it.eventTypeName = StringUtil.capitalize(EventCode.PARTIALLY_RECEIVED.name())
+            }
             histories.addAll(partiallyReceivedHistoryItem)
         }
         // Then collect history of a received event if any
         if (wasReceived()) {
             List<HistoryItem<Receipt>> receivedHistoryItem = receipts.last().getHistory()
-            receivedHistoryItem.each { it.eventCode = EventCode.RECEIVED }
+            receivedHistoryItem.each {
+                it.eventCode = EventCode.RECEIVED
+                it.eventTypeName = StringUtil.capitalize(EventCode.RECEIVED.name())
+            }
             histories.addAll(receivedHistoryItem)
         }
         // At the end collect history of custom events
