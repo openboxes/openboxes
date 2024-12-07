@@ -724,7 +724,7 @@ class Shipment implements Comparable, Serializable, Historizable {
                 date: dateCreated,
                 location: origin,
                 eventCode: EventCode.CREATED,
-                eventTypeName: StringUtil.capitalize(EventCode.CREATED.name()),
+                eventTypeName: StringUtil.format(EventCode.CREATED.name()),
                 referenceDocument: referenceDocument,
                 createdBy: createdBy,
         ))
@@ -734,7 +734,7 @@ class Shipment implements Comparable, Serializable, Historizable {
                     date: dateShipped(),
                     location: origin,
                     eventCode: EventCode.SHIPPED,
-                    eventTypeName: StringUtil.capitalize(EventCode.SHIPPED.name()),
+                    eventTypeName: StringUtil.format(EventCode.SHIPPED.name()),
                     referenceDocument: referenceDocument,
                     createdBy: shippedBy,
             ))
@@ -746,7 +746,7 @@ class Shipment implements Comparable, Serializable, Historizable {
             List<HistoryItem<Receipt>> partiallyReceivedHistoryItem = partialReceipts.collect { it.getHistory() }.flatten()
             partiallyReceivedHistoryItem.each {
                 it.eventCode = EventCode.PARTIALLY_RECEIVED
-                it.eventTypeName = StringUtil.capitalize(EventCode.PARTIALLY_RECEIVED.name())
+                it.eventTypeName = StringUtil.format(EventCode.PARTIALLY_RECEIVED.name())
             }
             histories.addAll(partiallyReceivedHistoryItem)
         }
@@ -755,7 +755,7 @@ class Shipment implements Comparable, Serializable, Historizable {
             List<HistoryItem<Receipt>> receivedHistoryItem = receipts.last().getHistory()
             receivedHistoryItem.each {
                 it.eventCode = EventCode.RECEIVED
-                it.eventTypeName = StringUtil.capitalize(EventCode.RECEIVED.name())
+                it.eventTypeName = StringUtil.format(EventCode.RECEIVED.name())
             }
             histories.addAll(receivedHistoryItem)
         }
