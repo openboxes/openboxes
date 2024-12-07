@@ -12,15 +12,8 @@ package org.pih.warehouse.shipping
 import grails.util.Holders
 import groovy.time.TimeCategory
 import groovy.time.TimeDuration
-import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.pih.warehouse.core.*
-import org.pih.warehouse.core.Event
 import org.pih.warehouse.auth.AuthService
-import org.pih.warehouse.core.Comment
-import org.pih.warehouse.core.Document
-import org.pih.warehouse.core.Location
-import org.pih.warehouse.core.Person
-import org.pih.warehouse.core.User
 import org.pih.warehouse.donation.Donor
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.Transaction
