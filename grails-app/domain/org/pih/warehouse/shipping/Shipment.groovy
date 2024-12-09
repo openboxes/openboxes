@@ -716,8 +716,10 @@ class Shipment implements Comparable, Serializable, Historizable {
         histories.add(new HistoryItem<Shipment>(
                 date: dateCreated,
                 location: origin,
-                eventCode: EventCode.CREATED,
-                eventTypeName: StringUtil.format(EventCode.CREATED.name()),
+                eventTypeDto: new EventTypeDto(
+                        name: StringUtil.format(EventCode.CREATED.name()),
+                        eventCode: EventCode.CREATED,
+                ),
                 referenceDocument: referenceDocument,
                 createdBy: createdBy,
         ))
@@ -726,8 +728,10 @@ class Shipment implements Comparable, Serializable, Historizable {
             histories.add(new HistoryItem<Shipment>(
                     date: dateShipped(),
                     location: origin,
-                    eventCode: EventCode.SHIPPED,
-                    eventTypeName: StringUtil.format(EventCode.SHIPPED.name()),
+                    eventTypeDto: new EventTypeDto(
+                            name: StringUtil.format(EventCode.SHIPPED.name()),
+                            eventCode: EventCode.SHIPPED,
+                    ),
                     referenceDocument: referenceDocument,
                     createdBy: shippedBy,
             ))
@@ -738,8 +742,10 @@ class Shipment implements Comparable, Serializable, Historizable {
             Set<Receipt> partialReceipts = wasReceived() ? (receipts - receipts.last()) : receipts
             List<HistoryItem<Receipt>> partiallyReceivedHistoryItem = partialReceipts.collect { it.getHistory() }.flatten()
             partiallyReceivedHistoryItem.each {
-                it.eventCode = EventCode.PARTIALLY_RECEIVED
-                it.eventTypeName = StringUtil.format(EventCode.PARTIALLY_RECEIVED.name())
+                it.eventTypeDto = new EventTypeDto(
+                        name: StringUtil.format(EventCode.PARTIALLY_RECEIVED.name()),
+                        eventCode: EventCode.PARTIALLY_RECEIVED,
+                )
             }
             histories.addAll(partiallyReceivedHistoryItem)
         }
@@ -747,8 +753,10 @@ class Shipment implements Comparable, Serializable, Historizable {
         if (wasReceived()) {
             List<HistoryItem<Receipt>> receivedHistoryItem = receipts.last().getHistory()
             receivedHistoryItem.each {
-                it.eventCode = EventCode.RECEIVED
-                it.eventTypeName = StringUtil.format(EventCode.RECEIVED.name())
+                it.eventTypeDto = new EventTypeDto(
+                        name: StringUtil.format(EventCode.RECEIVED.name()),
+                        eventCode: EventCode.RECEIVED,
+                )
             }
             histories.addAll(receivedHistoryItem)
         }
