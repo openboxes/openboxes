@@ -716,7 +716,7 @@ class Shipment implements Comparable, Serializable, Historizable {
         histories.add(new HistoryItem<Shipment>(
                 date: dateCreated,
                 location: origin,
-                eventTypeDto: new EventTypeDto(
+                eventType: new EventTypeDto(
                         name: StringUtil.format(EventCode.CREATED.name()),
                         eventCode: EventCode.CREATED,
                 ),
@@ -728,7 +728,7 @@ class Shipment implements Comparable, Serializable, Historizable {
             histories.add(new HistoryItem<Shipment>(
                     date: dateShipped(),
                     location: origin,
-                    eventTypeDto: new EventTypeDto(
+                    eventType: new EventTypeDto(
                             name: StringUtil.format(EventCode.SHIPPED.name()),
                             eventCode: EventCode.SHIPPED,
                     ),
@@ -742,7 +742,7 @@ class Shipment implements Comparable, Serializable, Historizable {
             Set<Receipt> partialReceipts = wasReceived() ? (receipts - receipts.last()) : receipts
             List<HistoryItem<Receipt>> partiallyReceivedHistoryItem = partialReceipts.collect { it.getHistory() }.flatten()
             partiallyReceivedHistoryItem.each {
-                it.eventTypeDto = new EventTypeDto(
+                it.eventType = new EventTypeDto(
                         name: StringUtil.format(EventCode.PARTIALLY_RECEIVED.name()),
                         eventCode: EventCode.PARTIALLY_RECEIVED,
                 )
@@ -753,7 +753,7 @@ class Shipment implements Comparable, Serializable, Historizable {
         if (wasReceived()) {
             List<HistoryItem<Receipt>> receivedHistoryItem = receipts.last().getHistory()
             receivedHistoryItem.each {
-                it.eventTypeDto = new EventTypeDto(
+                it.eventType = new EventTypeDto(
                         name: StringUtil.format(EventCode.RECEIVED.name()),
                         eventCode: EventCode.RECEIVED,
                 )

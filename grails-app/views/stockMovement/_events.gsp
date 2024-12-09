@@ -26,7 +26,7 @@
             <g:each var="historyItem" in="${historyItems}">
                 <tr>
                     <td>
-                        ${historyItem?.eventTypeDto?.name}
+                        ${historyItem?.eventType?.name}
                     </td>
                     <td>
                         ${historyItem?.date?.format(Constants.EUROPEAN_DATE_FORMAT_WITH_TIME)}

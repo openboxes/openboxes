@@ -7,7 +7,7 @@ class HistoryItem<T> implements Comparable<HistoryItem> {
 
     ReferenceDocument referenceDocument
 
-    EventTypeDto eventTypeDto
+    EventTypeDto eventType
 
     Comment comment
 
@@ -17,18 +17,18 @@ class HistoryItem<T> implements Comparable<HistoryItem> {
     int compareTo(HistoryItem historyItem) {
         // Events with event code created should be placed
         // at the top of the lists as a first created event
-        if (historyItem?.eventTypeDto?.eventCode == EventCode.CREATED) {
+        if (historyItem?.eventType?.eventCode == EventCode.CREATED) {
             return 1
         }
 
-        if (eventTypeDto?.eventCode == EventCode.CREATED) {
+        if (eventType?.eventCode == EventCode.CREATED) {
             return -1
         }
 
         // falling back to the reference document id, to avoid disappearing items
         // in case of the same dates and event codes
         return date <=> historyItem?.date ?:
-               eventTypeDto?.name <=> historyItem?.eventTypeDto?.name ?:
+               eventType?.name <=> historyItem?.eventType?.name ?:
                referenceDocument?.id <=> historyItem?.referenceDocument?.id
     }
 }

@@ -56,7 +56,7 @@ class Event implements Comparable, Serializable, Historizable {
         HistoryItem<Event> historyItem = new HistoryItem<>(
                 date: eventDate,
                 location: eventLocation,
-                eventTypeDto: eventType?.toDto(),
+                eventType: eventType?.toDto(),
                 comment: comment,
                 createdBy: createdBy,
                 referenceDocument: getReferenceDocument()
