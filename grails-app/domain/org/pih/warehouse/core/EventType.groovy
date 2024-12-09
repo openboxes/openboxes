@@ -61,4 +61,11 @@ class EventType implements Comparable<EventType>, Serializable {
             'in'('eventCode', EventCode.listCustomEventTypeCodes())
         }
     }
+
+    EventTypeDto toDto() {
+        return new EventTypeDto(
+                name: name,
+                eventCode: eventCode,
+        )
+    }
 }

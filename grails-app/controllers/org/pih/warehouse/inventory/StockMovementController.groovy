@@ -454,7 +454,7 @@ class StockMovementController {
 
     def events() {
         StockMovement stockMovement = getStockMovement(params.id)
-        List<HistoryItem> historyItems = stockMovement?.shipment?.getHistory() ?: []
+        List<HistoryItem> historyItems = stockMovement?.shipment?.getHistory()?.sort() ?: []
         render(
                 template: "events",
                 model: [historyItems: historyItems, shipmentId: stockMovement?.shipment?.id]

@@ -51,4 +51,10 @@ class StringUtil {
         }
         return null
     }
+
+    static String format(String text) {
+        return text.replace("_", " ")
+                   .toLowerCase()
+                   .capitalize()
+    }
 }
