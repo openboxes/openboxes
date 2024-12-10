@@ -227,9 +227,9 @@ class InvoiceItemsModal extends Component {
   }
 
   getSortOrder() {
-    this.setState({
-      sortOrder: this.state.sortOrder + 1,
-    });
+    this.setState((prev) => ({
+      sortOrder: prev.sortOrder + 1,
+    }));
 
     return this.state.sortOrder;
   }
@@ -342,7 +342,8 @@ class InvoiceItemsModal extends Component {
   }
 
   checkAllVisibleItems(value) {
-    const formValues = update(this.state.formValues, {
+    const { formValues: formValuesFromState } = this.state;
+    const formValues = update(formValuesFromState, {
       invoiceItems: {
         $apply: (items) => items.map((invoiceItem) => (
           {
@@ -386,7 +387,7 @@ class InvoiceItemsModal extends Component {
       selectedShipmentNumbers,
     } = this.state;
     const {
-      btnOpenText, btnOpenDefaultText, translate, btnOpenDisabled,
+      translate, btnOpenDisabled,
     } = this.props;
 
     return (
@@ -472,13 +473,9 @@ InvoiceItemsModal.propTypes = {
   onResponse: PropTypes.func.isRequired,
   onOpen: PropTypes.func.isRequired,
   invoiceId: PropTypes.string.isRequired,
-  btnOpenText: PropTypes.string,
-  btnOpenDefaultText: PropTypes.string,
   btnOpenDisabled: PropTypes.bool,
 };
 
 InvoiceItemsModal.defaultProps = {
-  btnOpenText: '',
-  btnOpenDefaultText: '',
   btnOpenDisabled: false,
 };

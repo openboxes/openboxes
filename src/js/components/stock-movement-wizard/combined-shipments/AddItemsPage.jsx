@@ -410,9 +410,9 @@ class AddItemsPage extends Component {
   }
 
   updateTotalCount(value) {
-    this.setState({
-      totalCount: this.state.totalCount + value,
-    });
+    this.setState((prev) => ({
+      totalCount: prev.totalCount + value,
+    }));
   }
 
   dataFetched = false;
@@ -619,16 +619,16 @@ class AddItemsPage extends Component {
           }),
         );
 
-        this.setState({
+        this.setState((prev) => ({
           values: {
-            ...this.state.values,
+            ...prev.values,
             hasManageInventory,
             statusCode,
             // setting initial values for the form
             lineItems: sortedLineItems,
           },
           totalCount,
-        }, () => this.props.hideSpinner());
+        }), () => this.props.hideSpinner());
       });
   }
 
@@ -747,13 +747,13 @@ class AddItemsPage extends Component {
       return item;
     });
 
-    this.setState({
-      ...this.state,
+    this.setState((prev) => ({
+      ...prev,
       values: {
-        ...this.state.values,
+        ...prev.values,
         lineItems: mappedLineItems,
       },
-    });
+    }));
   }
 
   /**
@@ -828,7 +828,12 @@ class AddItemsPage extends Component {
             (val) => ({ ...val, referenceId: val.orderItemId }),
           );
 
-          this.setState({ values: { ...this.state.values, lineItems: lineItemsBackendData } });
+          this.setState((prev) => ({
+            values: {
+              ...prev.values,
+              lineItems: lineItemsBackendData,
+            },
+          }));
         })
         .catch(() => Promise.reject(new Error(this.props.translate('react.stockMovement.error.saveRequisitionItems.label', 'Could not save requisition items'))));
     }
@@ -932,13 +937,13 @@ class AddItemsPage extends Component {
 
     return apiClient.delete(STOCK_MOVEMENT_REMOVE_ALL_ITEMS(this.state.values.stockMovementId))
       .then(() => {
-        this.setState({
+        this.setState((prev) => ({
           totalCount: 0,
           values: {
-            ...this.state.values,
+            ...prev.values,
             lineItems: [],
           },
-        }, () => this.props.hideSpinner());
+        }), () => this.props.hideSpinner());
       })
       .catch(() => {
         this.fetchLineItems();
@@ -1035,11 +1040,11 @@ class AddItemsPage extends Component {
       .then(() => {
         this.fetchLineItems(mutateTableData);
         if (_.isNil(_.last(this.state.values.lineItems).product)) {
-          this.setState({
+          this.setState((prev) => ({
             values: {
-              ...this.state.values,
+              ...prev.values,
             },
-          });
+          }));
         }
       })
       .catch(() => {
@@ -1061,9 +1066,9 @@ class AddItemsPage extends Component {
    * Toggle the downloadable files
    */
   toggleDropdown() {
-    this.setState({
-      isDropdownVisible: !this.state.isDropdownVisible,
-    });
+    this.setState((prev) => ({
+      isDropdownVisible: !prev.isDropdownVisible,
+    }));
   }
 
   render() {
@@ -1286,5 +1291,4 @@ AddItemsPage.propTypes = {
   isPaginated: PropTypes.bool.isRequired,
   /** Function returning user to the previous page */
   previousPage: PropTypes.func.isRequired,
-  pageSize: PropTypes.number.isRequired,
 };

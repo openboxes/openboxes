@@ -30,11 +30,13 @@ const LabelField = (props) => {
     <div className="form-group my-0" data-testid="label-field" aria-label={defaultMessage}>
       <div className="row">
         {
-            typeof FieldLabel === 'string' ?
-              <label htmlFor={attr.id} className="col-md-2 col-form-label col-form-label-xs text-right">
-                <Translate id={FieldLabel} defaultMessage={defaultMessage} />
-              </label> :
-              <FieldLabel />
+            typeof FieldLabel === 'string'
+              ? (
+                <label htmlFor={attr.id} className="col-md-2 col-form-label col-form-label-xs text-right">
+                  <Translate id={FieldLabel} defaultMessage={defaultMessage} />
+                </label>
+              )
+              : <FieldLabel />
           }
         <div className="col-md-4 align-self-center">
           <span {...otherAttr}>{formatValue ? formatValue(value) : value}</span>
@@ -60,21 +62,23 @@ const LabelField = (props) => {
           hideDelay="50"
           arrow
         >
-          {url ?
-            <div {...otherAttr} className={`font-size-xs ${className}`}>
-              <a
-                href={url}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <span>{formattedValue}</span>
-              </a>
-            </div>
-            :
-            <div style={{ color }} {...otherAttr} className={`font-size-xs ${className}`}>
-              {formattedValue}
-            </div>
-          }
+          {url
+            ? (
+              <div {...otherAttr} className={`font-size-xs ${className}`}>
+                <a
+                  href={url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <span>{formattedValue}</span>
+                </a>
+              </div>
+            )
+            : (
+              <div style={{ color }} {...otherAttr} className={`font-size-xs ${className}`}>
+                {formattedValue}
+              </div>
+            )}
         </Tooltip>
       </div>
     );

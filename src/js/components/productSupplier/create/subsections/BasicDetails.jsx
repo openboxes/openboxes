@@ -42,9 +42,9 @@ const BasicDetails = ({ control, errors }) => {
                 errorMessage={errors.code?.message}
                 tooltip={{
                   id: 'react.productSupplier.form.code.tooltip',
-                  defaultMessage: 'Unique code that identifies this record. ' +
-                    'Auto-generated based on the product and supplier codes, ' +
-                    'but can be manually overwritten',
+                  defaultMessage: 'Unique code that identifies this record. '
+                    + 'Auto-generated based on the product and supplier codes, '
+                    + 'but can be manually overwritten',
                 }}
                 placeholder="Leave blank to autogenerate"
                 {...field}

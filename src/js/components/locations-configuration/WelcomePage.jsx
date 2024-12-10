@@ -36,6 +36,7 @@ class WelcomePage extends Component {
       <div className="modal-page">
         <div className="modal-page__content position-relative">
           <button
+            type="button"
             className="btn btn-lg position-absolute"
             style={{ right: '1rem' }}
             onClick={() => this.skipConfiguration()}
@@ -46,14 +47,27 @@ class WelcomePage extends Component {
             <Translate id="react.locationsConfiguration.welcomeHeader.label" defaultMessage="Welcome to OpenBoxes!" />
           </h3>
           <div className="my-3 px-5 text-center">
-            <Translate id="react.locationsConfiguration.modalIntro.label" defaultMessage="Learn more about locations in OpenBoxes" />&nbsp;
+            <Translate id="react.locationsConfiguration.modalIntro.label" defaultMessage="Learn more about locations in OpenBoxes" />
+&nbsp;
             <a target="_blank" rel="noopener noreferrer" href="https://openboxes.atlassian.net/wiki/spaces/OBW/pages/1291452471/Configure+Organizations+and+Locations">
               <Translate id="react.locationsConfiguration.here.label" defaultMessage="here" />
-            </a>.&nbsp;
+            </a>
+            .&nbsp;
             <Translate id="react.locationsConfiguration.modalText1.label" defaultMessage="" />
-            <span className="font-weight-bold"> <Translate id="react.locationsConfiguration.locationCreation.label" defaultMessage="" />, </span>
+            <span className="font-weight-bold">
+              {' '}
+              <Translate id="react.locationsConfiguration.locationCreation.label" defaultMessage="" />
+              ,
+              {' '}
+            </span>
             <Translate id="react.locationsConfiguration.modalText2.label" defaultMessage="" />
-            <span className="font-weight-bold"> &ldquo;<Translate id="react.locationsConfiguration.importLocations.label" defaultMessage="" />&rdquo; </span>
+            <span className="font-weight-bold">
+              {' '}
+              &ldquo;
+              <Translate id="react.locationsConfiguration.importLocations.label" defaultMessage="" />
+              &rdquo;
+              {' '}
+            </span>
             <Translate id="react.locationsConfiguration.modalText3.label" defaultMessage="" />
           </div>
           <div className="d-flex justify-content-center align-items-center my-3">
@@ -75,7 +89,7 @@ class WelcomePage extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   locale: state.session.activeLanguage,
 });
 

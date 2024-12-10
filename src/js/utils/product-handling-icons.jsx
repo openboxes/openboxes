@@ -3,7 +3,7 @@ import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import _ from 'lodash';
 
-const getIcon = iconName => _.trimStart(iconName, ['fa', '-']);
+const getIcon = (iconName) => _.trimStart(iconName, ['fa', '-']);
 
 const renderHandlingIcons = (handlingIcons) => {
   if (!handlingIcons || handlingIcons.length === 0) {

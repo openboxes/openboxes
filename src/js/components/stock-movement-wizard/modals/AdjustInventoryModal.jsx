@@ -14,7 +14,6 @@ import TextField from 'components/form-elements/TextField';
 import apiClient from 'utils/apiClient';
 import Translate from 'utils/Translate';
 
-
 const FIELDS = {
   adjustInventory: {
     // eslint-disable-next-line react/prop-types
@@ -23,7 +22,8 @@ const FIELDS = {
         type="button"
         className="btn btn-outline-success btn-xs"
         onClick={() => addRow({ productId })}
-      ><Translate id="react.stockMovement.addLot.label" defaultMessage="Add new lot number" />
+      >
+        <Translate id="react.stockMovement.addLot.label" defaultMessage="Add new lot number" />
       </button>
     ),
     type: ArrayField,
@@ -67,7 +67,7 @@ const FIELDS = {
         defaultMessage: 'Previous Qty',
         fixedWidth: '150px',
         attributes: {
-          formatValue: value => (value ? value.toLocaleString('en-US') : null),
+          formatValue: (value) => (value ? value.toLocaleString('en-US') : null),
         },
       },
       quantityAdjusted: {
@@ -103,7 +103,6 @@ function validate(values) {
   return errors;
 }
 
-
 /** Modal window where user can adjust existing inventory or add a new one. */
 class AdjustInventoryModal extends Component {
   constructor(props) {
@@ -138,9 +137,10 @@ class AdjustInventoryModal extends Component {
    * @public
    */
   onOpen() {
+    const { availableItems } = this.state.attr.fieldValue;
     this.setState({
       formValues: {
-        adjustInventory: _.map(this.state.attr.fieldValue.availableItems, item => ({
+        adjustInventory: _.map(availableItems, (item) => ({
           ...item,
           binLocation: {
             id: item['binLocation.id'],
@@ -160,7 +160,7 @@ class AdjustInventoryModal extends Component {
     this.props.showSpinner();
 
     const url = `/api/stockAdjustments?location.id=${this.props.locationId}`;
-    const items = _.filter(values.adjustInventory, item => !_.isNil(item.quantityAdjusted) && item.quantityAdjusted !== '');
+    const items = _.filter(values.adjustInventory, (item) => !_.isNil(item.quantityAdjusted) && item.quantityAdjusted !== '');
     const payload = _.map(items, (item) => {
       if (!item['inventoryItem.id']) {
         return {
@@ -208,15 +208,27 @@ class AdjustInventoryModal extends Component {
         }}
       >
         <div>
-          <div className="font-weight-bold"><Translate id="react.stockMovement.productCode.label" defaultMessage="Product code" />: {this.state.attr.fieldValue.productCode}</div>
-          <div className="font-weight-bold"><Translate id="react.stockMovement.productName.label" defaultMessage="Product name" />: {this.state.attr.fieldValue['product.name']} <hr /></div>
+          <div className="font-weight-bold">
+            <Translate id="react.stockMovement.productCode.label" defaultMessage="Product code" />
+            :
+            {' '}
+            {this.state.attr.fieldValue.productCode}
+          </div>
+          <div className="font-weight-bold">
+            <Translate id="react.stockMovement.productName.label" defaultMessage="Product name" />
+            :
+            {' '}
+            {this.state.attr.fieldValue['product.name']}
+            {' '}
+            <hr />
+          </div>
         </div>
       </ModalWrapper>
     );
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   hasBinLocationSupport: state.session.currentLocation.hasBinLocationSupport,
 });
 

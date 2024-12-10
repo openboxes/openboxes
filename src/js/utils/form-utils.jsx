@@ -12,7 +12,6 @@ import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-tippy/dist/tippy.css';
 
-
 export const renderFormField = (fieldConfig, fieldName, props = {}) => {
   const FieldType = fieldConfig.type;
 
@@ -69,10 +68,12 @@ export const renderFormFields = ({
     <div className={`${!filterElement ? 'mt-2' : ''} ${className}`} data-testid="form-field" aria-label={fieldAriaLabel}>
       <div className={`${filterElement ? 'd-flex flex-wrap flex-1' : 'row'}`}>
         {
-          typeof FieldLabel === 'string' ?
-            <label htmlFor={otherAttr.id} className={`${!filterElement ? 'col-md-2 col-7 col-form-label col-form-label-xs text-center  text-md-right' : ''}`}>
-              {FieldLabel && <Translate id={FieldLabel} defaultMessage={defaultMessage} />}
-              {otherAttr.withTooltip &&
+          typeof FieldLabel === 'string'
+            ? (
+              <label htmlFor={otherAttr.id} className={`${!filterElement ? 'col-md-2 col-7 col-form-label col-form-label-xs text-center  text-md-right' : ''}`}>
+                {FieldLabel && <Translate id={FieldLabel} defaultMessage={defaultMessage} />}
+                {otherAttr.withTooltip
+                && (
                 <Tooltip
                   interactive="true"
                   arrow="true"
@@ -80,16 +81,15 @@ export const renderFormFields = ({
                   hideOnClick="true"
                   html={injectionData
                     ? ReactHtmlParser(translate(tooltip, tooltip, injectionData))
-                    : translate(tooltip, tooltip)
-                  }
+                    : translate(tooltip, tooltip)}
                 >
                   &nbsp;
                   <i className="fa fa-question-circle-o text-primary" aria-hidden="true" />
                 </Tooltip>
-              }
-            </label>
-            :
-            <FieldLabel />
+                )}
+              </label>
+            )
+            : <FieldLabel />
         }
         <div className={`form-element-container ${!filterElement ? 'col-md-4 col-7' : 'flex-1 filter-element-container'}`}>
           {renderInput(input, otherAttr)}
@@ -110,7 +110,7 @@ export const renderFormFields = ({
   );
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
 });
 

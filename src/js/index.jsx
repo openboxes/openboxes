@@ -33,6 +33,6 @@ ReactDOM.render(
       </MetaTags>
       <MainRouter />
     </LocalizeProvider>
-  </Provider>
-  , document.getElementById('root'),
+  </Provider>,
+  document.getElementById('root'),
 );

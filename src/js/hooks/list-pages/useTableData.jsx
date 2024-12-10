@@ -1,4 +1,6 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import {
+  useCallback, useEffect, useRef, useState,
+} from 'react';
 
 import { CancelToken } from 'axios';
 import _ from 'lodash';
@@ -34,7 +36,7 @@ const useTableData = ({
   const {
     currentLocation,
     translate,
-  } = useSelector(state => ({
+  } = useSelector((state) => ({
     currentLocation: state.session.currentLocation,
     translate: translateWithDefaultMessage(getTranslate(state.localize)),
   }));
@@ -79,7 +81,7 @@ const useTableData = ({
       setLoading(true);
       apiClient.get(url, {
         params,
-        paramsSerializer: parameters => queryString.stringify(parameters),
+        paramsSerializer: (parameters) => queryString.stringify(parameters),
         cancelToken: sourceRef.current?.token,
       })
         .then((res) => {

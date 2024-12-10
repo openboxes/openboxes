@@ -8,10 +8,9 @@ import Alert from 'react-s-alert';
 
 import { hideSpinner, showSpinner } from 'actions';
 import ModalWrapper from 'components/form-elements/ModalWrapper';
+import FileSelect from 'components/form-elements/v2/FileSelect';
 import apiClient from 'utils/apiClient';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
-import FileSelect from 'components/form-elements/v2/FileSelect';
-
 
 class ImportBinModal extends Component {
   constructor(props) {
@@ -122,8 +121,7 @@ class ImportBinModal extends Component {
   }
 }
 
-
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
 });
 

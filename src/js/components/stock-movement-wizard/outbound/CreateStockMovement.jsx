@@ -35,7 +35,6 @@ import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
-
 function validate(values) {
   const errors = {};
   if (!values.description) {
@@ -86,9 +85,9 @@ const FIELDS = {
       autoload: false,
       cache: false,
       options: [],
-      filterOptions: options => options,
+      filterOptions: (options) => options,
     },
-    getDynamicAttr: props => ({
+    getDynamicAttr: (props) => ({
       loadOptions: props.debouncedLocationsFetch,
       onChange: (value) => {
         if (value && props.destination && props.destination.id) {
@@ -113,7 +112,7 @@ const FIELDS = {
       autoload: false,
       cache: false,
       options: [],
-      filterOptions: options => options,
+      filterOptions: (options) => options,
     },
     getDynamicAttr: ({
       debouncedLocationsFetch,
@@ -145,9 +144,9 @@ const FIELDS = {
       cache: false,
       options: [],
       labelKey: 'name',
-      filterOptions: options => options,
+      filterOptions: (options) => options,
     },
-    getDynamicAttr: props => ({
+    getDynamicAttr: (props) => ({
       loadOptions: props.debouncedPeopleFetch,
     }),
   },
@@ -208,11 +207,15 @@ class CreateStockMovement extends Component {
     this.fetchStockLists = this.fetchStockLists.bind(this);
     this.setRequestType = this.setRequestType.bind(this);
 
-    this.debouncedPeopleFetch =
-      debouncePeopleFetch(this.props.debounceTime, this.props.minSearchLength);
+    this.debouncedPeopleFetch = debouncePeopleFetch(
+      this.props.debounceTime,
+      this.props.minSearchLength,
+    );
 
-    this.debouncedLocationsFetch =
-      debounceLocationsFetch(this.props.debounceTime, this.props.minSearchLength);
+    this.debouncedLocationsFetch = debounceLocationsFetch(
+      this.props.debounceTime,
+      this.props.minSearchLength,
+    );
 
     this.openAddDestinationModal = this.openAddDestinationModal.bind(this);
   }
@@ -248,7 +251,8 @@ class CreateStockMovement extends Component {
   }
 
   setRequestType(values, stocklist) {
-    const requestType = _.find(this.state.requestTypes, type => type.value === 'STOCK');
+    const { requestTypes } = this.state;
+    const requestType = _.find(requestTypes, (type) => type.value === 'STOCK');
 
     this.setState({
       values: update(values, {
@@ -285,7 +289,7 @@ class CreateStockMovement extends Component {
 
     return apiClient.get(url)
       .then((response) => {
-        const requestTypes = _.map(response.data.data, type => ({
+        const requestTypes = _.map(response.data.data, (type) => ({
           value: type.id,
           label: type.name,
         }));
@@ -301,11 +305,11 @@ class CreateStockMovement extends Component {
     const originLocs = newValues.origin && origin;
     const isOldSupplier = origin && origin.type === 'SUPPLIER';
     const isNewSupplier = newValues.origin && newValues.type === 'SUPPLIER';
-    const checkOrigin = originLocs && (!isOldSupplier || (isOldSupplier && !isNewSupplier)) ?
-      newValues.origin.id !== origin.id : false;
+    const checkOrigin = originLocs && (!isOldSupplier || (isOldSupplier && !isNewSupplier))
+      ? newValues.origin.id !== origin.id : false;
 
-    const checkDest = stocklist && newValues.destination && destination ?
-      newValues.destination.id !== destination.id : false;
+    const checkDest = stocklist && newValues.destination && destination
+      ? newValues.destination.id !== destination.id : false;
     const checkStockList = newValues.stockMovementId ? _.get(newValues.stocklist, 'id', null) !== _.get(stocklist, 'id', null) : false;
 
     return (checkOrigin || checkDest || checkStockList);
@@ -324,13 +328,13 @@ class CreateStockMovement extends Component {
 
     return apiClient.get(url)
       .then((response) => {
-        const stocklists = _.map(response.data.data, stocklist => (
+        const stocklists = _.map(response.data.data, (stocklist) => (
           {
             id: stocklist.id, name: stocklist.name, value: stocklist.id, label: stocklist.name,
           }
         ));
 
-        const stocklistChanged = !_.find(stocklists, item => item.value.id === _.get(this.state.values, 'stocklist.id'));
+        const stocklistChanged = !_.find(stocklists, (item) => item.value.id === _.get(this.state.values, 'stocklist.id'));
 
         if (stocklistChanged && clearStocklist) {
           clearStocklist();
@@ -341,15 +345,14 @@ class CreateStockMovement extends Component {
       .catch(() => this.props.hideSpinner());
   }
 
-
   /**
    * Creates or updates stock movement with given data
    * @param {object} values
    * @public
    */
   saveStockMovement(values) {
-    if (values.origin && values.destination && values.requestedBy &&
-      values.dateRequested && values.description) {
+    if (values.origin && values.destination && values.requestedBy
+      && values.dateRequested && values.description) {
       this.props.showSpinner();
 
       let stockMovementUrl = '';
@@ -437,7 +440,7 @@ class CreateStockMovement extends Component {
   render() {
     return (
       <Form
-        onSubmit={values => this.nextPage(values)}
+        onSubmit={(values) => this.nextPage(values)}
         validate={validate}
         initialValues={this.state.values}
         mutators={{
@@ -454,7 +457,7 @@ class CreateStockMovement extends Component {
           },
         }}
         render={({ form: { mutators }, handleSubmit, values }) => (
-          <React.Fragment>
+          <>
             <AddDestinationModal
               isOpen={this.state.showDestinationModal}
               onClose={() => this.setState({ showDestinationModal: false })}
@@ -487,14 +490,14 @@ class CreateStockMovement extends Component {
                 </button>
               </div>
             </form>
-          </React.Fragment>
+          </>
         )}
       />
     );
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   location: state.session.currentLocation,
   isSuperuser: state.session.isSuperuser,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),

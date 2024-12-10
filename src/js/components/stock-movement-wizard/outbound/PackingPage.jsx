@@ -26,7 +26,7 @@ import {
   handleSuccess,
   handleValidationErrors,
 } from 'utils/apiClient';
-import { renderFormField , setColumnValue} from 'utils/form-utils';
+import { renderFormField, setColumnValue } from 'utils/form-utils';
 import { formatProductDisplayName, matchesProductCodeOrName } from 'utils/form-values-utils';
 import { debouncePeopleFetch } from 'utils/option-utils';
 import Select from 'utils/Select';
@@ -45,8 +45,8 @@ const FIELDS = {
     loadMoreRows: ({ loadMoreRows }) => loadMoreRows(),
     isFirstPageLoaded: ({ isFirstPageLoaded }) => isFirstPageLoaded,
     getDynamicRowAttr: ({ rowValues, itemFilter }) => {
-      const hideRow = itemFilter &&
-        !matchesProductCodeOrName({
+      const hideRow = itemFilter
+        && !matchesProductCodeOrName({
           product: rowValues?.product,
           filterValue: itemFilter,
         });
@@ -88,11 +88,12 @@ const FIELDS = {
         }),
         attributes: {
           showValueTooltip: true,
-          formatValue: fieldValue => fieldValue && (
+          formatValue: (fieldValue) => fieldValue && (
             <div className="d-flex">
               {fieldValue.zoneName ? <div className="text-truncate" style={{ minWidth: 30, flexShrink: 20 }}>{fieldValue.zoneName}</div> : ''}
               <div className="text-truncate">{fieldValue.zoneName ? `: ${fieldValue.name}` : fieldValue.name}</div>
-            </div>),
+            </div>
+          ),
         },
       },
       lotNumber: {
@@ -137,7 +138,7 @@ const FIELDS = {
           cache: false,
           options: [],
           labelKey: 'name',
-          filterOptions: options => options,
+          filterOptions: (options) => options,
         },
         getDynamicAttr: ({
           debouncedPeopleFetch, showOnly, setRecipientValue, translate,
@@ -149,7 +150,7 @@ const FIELDS = {
               placeholder={translate('react.stockMovement.recipient.label', 'Recipient')}
               className="select-xs my-2"
               classNamePrefix="react-select"
-              async={true}
+              async
               loadOptions={debouncedPeopleFetch}
               onChange={(val) => {
                 if (val) {
@@ -196,7 +197,7 @@ const FIELDS = {
         }) => ({
           lineItem: fieldValue,
           btnOpenDisabled: showOnly,
-          onSave: splitLineItems => onSave(formValues, rowIndex, splitLineItems),
+          onSave: (splitLineItems) => onSave(formValues, rowIndex, splitLineItems),
         }),
       },
     },
@@ -239,8 +240,10 @@ class PackingPage extends Component {
     this.loadMoreRows = this.loadMoreRows.bind(this);
     this.setState = this.setState.bind(this);
 
-    this.debouncedPeopleFetch =
-      debouncePeopleFetch(this.props.debounceTime, this.props.minSearchLength);
+    this.debouncedPeopleFetch = debouncePeopleFetch(
+      this.props.debounceTime,
+      this.props.minSearchLength,
+    );
 
     this.props.showSpinner();
 
@@ -265,14 +268,15 @@ class PackingPage extends Component {
 
   setPackPageItems(response, startIndex) {
     const { data } = response.data;
+    const { values, totalCount } = this.state;
     this.setState({
       values: {
-        ...this.state.values,
-        packPageItems: _.uniqBy(_.concat(this.state.values.packPageItems, data), 'shipmentItemId'),
+        ...values,
+        packPageItems: _.uniqBy(_.concat(values.packPageItems, data), 'shipmentItemId'),
       },
     }, () => {
       // eslint-disable-next-line max-len
-      if (!_.isNull(startIndex) && this.state.values.packPageItems.length !== this.state.totalCount) {
+      if (!_.isNull(startIndex) && values.packPageItems.length !== totalCount) {
         this.loadMoreRows({ startIndex: startIndex + this.props.pageSize });
       }
     });
@@ -292,7 +296,7 @@ class PackingPage extends Component {
         const { statusCode } = resp.data.data;
         const { totalCount } = resp.data;
 
-        this.setState({ values: { ...this.state.values, statusCode }, totalCount }, () => {
+        this.setState((prev) => ({ values: { ...prev.values, statusCode }, totalCount }), () => {
           this.props.hideSpinner();
         });
       }).catch(() => {
@@ -331,8 +335,8 @@ class PackingPage extends Component {
     const url = `/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?stepNumber=5`;
 
     return apiClient.get(url)
-      .then(resp => resp)
-      .catch(err => err);
+      .then((resp) => resp)
+      .catch((err) => err);
   }
 
   /**
@@ -345,7 +349,7 @@ class PackingPage extends Component {
     this.savePackingData(formValues.packPageItems)
       .then((resp) => {
         const { data } = resp.data;
-        this.setState({ values: { ...this.state.values, packPageItems: data } });
+        this.setState((prev) => ({ values: { ...prev.values, packPageItems: data } }));
         this.props.hideSpinner();
         Alert.success(this.props.translate('react.stockMovement.alert.saveSuccess.label', 'Changes saved successfully'), { timeout: 3000 });
       })
@@ -425,8 +429,8 @@ class PackingPage extends Component {
 
   confirmHiddenLinesAndGoToNextPage(formValues) {
     const { packPageItems } = formValues;
-    const isAnyLineHidden = this.state.itemFilter &&
-      packPageItems.some((rowValue) => {
+    const isAnyLineHidden = this.state.itemFilter
+      && packPageItems.some((rowValue) => {
         const { product } = rowValue;
         return !matchesProductCodeOrName({
           product,
@@ -493,13 +497,13 @@ class PackingPage extends Component {
     }))
       .then((resp) => {
         const { data } = resp.data;
-        this.setState({
+        this.setState((prev) => ({
           values: {
-            ...this.state.values,
+            ...prev.values,
             packPageItems: data,
           },
-          totalCount: this.state.totalCount + (splitLineItems.length - 1),
-        });
+          totalCount: prev.totalCount + (splitLineItems.length - 1),
+        }));
         this.props.hideSpinner();
       })
       .catch(() => this.props.hideSpinner());
@@ -510,7 +514,7 @@ class PackingPage extends Component {
     const { itemFilter } = this.state;
     return (
       <Form
-        onSubmit={values => this.nextPage(values)}
+        onSubmit={(values) => this.nextPage(values)}
         mutators={{
           ...arrayMutators,
           setColumnValue,
@@ -525,51 +529,67 @@ class PackingPage extends Component {
         }) => (
           <div className="d-flex flex-column">
             <AlertMessage show={this.state.showAlert} message={this.state.alertMessage} danger />
-            { !showOnly ?
-              <span className="buttons-container">
-                <FilterInput
-                  itemFilter={itemFilter}
-                  onChange={e => this.setState({ itemFilter: e.target.value })}
-                  onClear={() => this.setState({ itemFilter: '' })}
-                  inputRef={this.inputRef}
-                />
-                <button
-                  type="button"
-                  onClick={() => this.refresh()}
-                  className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
-                >
-                  <span><i className="fa fa-refresh pr-2" />
-                    <Translate id="react.default.button.refresh.label" defaultMessage="Reload" />
-                  </span>
-                </button>
+            { !showOnly
+              ? (
+                <span className="buttons-container">
+                  <FilterInput
+                    itemFilter={itemFilter}
+                    onChange={(e) => this.setState({ itemFilter: e.target.value })}
+                    onClear={() => this.setState({ itemFilter: '' })}
+                    inputRef={this.inputRef}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => this.refresh()}
+                    className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
+                  >
+                    <span>
+                      <i className="fa fa-refresh pr-2" />
+                      <Translate id="react.default.button.refresh.label" defaultMessage="Reload" />
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    disabled={invalid}
+                    onClick={() => this.save(values)}
+                    className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs ml-3"
+                  >
+                    <span>
+                      <i className="fa fa-save pr-2" />
+                      <Translate id="react.default.button.save.label" defaultMessage="Save" />
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    disabled={invalid}
+                    onClick={() =>
+                      this.savePackingData(values.packPageItems).then(() => {
+                        window.location = STOCK_MOVEMENT_URL.show(values.stockMovementId);
+                      })}
+                    className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs"
+                  >
+                    <span>
+                      <i className="fa fa-sign-out pr-2" />
+                      <Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" />
+                    </span>
+                  </button>
+                </span>
+              )
+              : (
                 <button
                   type="button"
                   disabled={invalid}
-                  onClick={() => this.save(values)}
-                  className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs ml-3"
+                  onClick={() => this.props.history.push(STOCK_MOVEMENT_URL.listOutbound())}
+                  className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs mr-2"
                 >
-                  <span><i className="fa fa-save pr-2" />
-                    <Translate id="react.default.button.save.label" defaultMessage="Save" />
+                  <span>
+                    <i className="fa fa-sign-out pr-2" />
+                    {' '}
+                    <Translate id="react.default.button.exit.label" defaultMessage="Exit" />
+                    {' '}
                   </span>
                 </button>
-                <button
-                  type="button"
-                  disabled={invalid}
-                  onClick={() => this.savePackingData(values.packPageItems).then(() => { window.location = STOCK_MOVEMENT_URL.show(values.stockMovementId); })}
-                  className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs"
-                >
-                  <span><i className="fa fa-sign-out pr-2" /><Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" /></span>
-                </button>
-              </span>
-                :
-              <button
-                type="button"
-                disabled={invalid}
-                onClick={() => this.props.history.push(STOCK_MOVEMENT_URL.listOutbound())}
-                className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs mr-2"
-              >
-                <span><i className="fa fa-sign-out pr-2" /> <Translate id="react.default.button.exit.label" defaultMessage="Exit" /> </span>
-              </button> }
+              ) }
             <form onSubmit={handleSubmit}>
               <div className="table-form">
                 {_.map(FIELDS, (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
@@ -611,7 +631,7 @@ class PackingPage extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   recipients: state.users.data,
   recipientsFetched: state.users.fetched,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),

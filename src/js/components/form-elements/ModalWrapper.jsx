@@ -9,7 +9,6 @@ import Modal from 'react-modal';
 import { renderFormField } from 'utils/form-utils';
 import Translate from 'utils/Translate';
 
-
 class ModalWrapper extends Component {
   constructor(props) {
     super(props);
@@ -56,15 +55,17 @@ class ModalWrapper extends Component {
                 onClick={() => this.openModal()}
               >
                 {
-                  this.props.btnOpenIcon &&
-                  <i className={`fa ${this.props.btnOpenIcon} mr-1`} aria-hidden="true" />
+                  this.props.btnOpenIcon
+                  && <i className={`fa ${this.props.btnOpenIcon} mr-1`} aria-hidden="true" />
                 }
                 {
-                  this.props.btnOpenText && !this.props.btnOpenAsIcon &&
+                  this.props.btnOpenText && !this.props.btnOpenAsIcon
+                  && (
                   <Translate
                     id={this.props.btnOpenText}
                     defaultMessage={this.props.btnOpenDefaultText}
                   />
+                  )
                 }
               </button>
             )
@@ -77,13 +78,18 @@ class ModalWrapper extends Component {
         >
           <div className={this.props.bodyContainerClassName} style={this.props.bodyContainerStyle}>
             {
-            typeof Title === 'string' ?
-              <h5 className="text-center"> <Translate id={Title} defaultMessage={defaultTitleMessage} /></h5> :
-              <Title />
+            typeof Title === 'string'
+              ? (
+                <h5 className="text-center">
+                  {' '}
+                  <Translate id={Title} defaultMessage={defaultTitleMessage} />
+                </h5>
+              )
+              : <Title />
           }
             <hr />
             <Form
-              onSubmit={values => this.save(values)}
+              onSubmit={(values) => this.save(values)}
               initialValues={this.props.initialValues}
               validate={this.props.validate}
               mutators={{ ...arrayMutators }}
@@ -135,8 +141,7 @@ class ModalWrapper extends Component {
                       </button>
                     </div>
                   </form>
-                )
-              }
+                )}
             />
           </div>
         </Modal>

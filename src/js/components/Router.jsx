@@ -138,7 +138,6 @@ const AsyncPurchaseOrderList = Loadable({
   loading: Loading,
 });
 
-
 const AsyncStockList = Loadable({
   loader: () => import('components/stock-list/StockList'),
   loading: Loading,
@@ -181,22 +180,22 @@ const StockMovementList = (props) => {
     case 'INBOUND':
       return <AsyncStockMovementInboundList {...props} />;
     case 'OUTBOUND': {
-      return (<AsyncStockMovementOutboundList
-        {...props}
-        sourceType={parsedSearchQuery?.sourceType?.toUpperCase()}
-      />);
+      return (
+        <AsyncStockMovementOutboundList
+          {...props}
+          sourceType={parsedSearchQuery?.sourceType?.toUpperCase()}
+        />
+      );
     }
     default:
       return <Redirect to={DASHBOARD_URL.base} />;
   }
 };
 
-
 const AsyncStockTransferList = Loadable({
   loader: () => import('components/stock-transfer/list/StockTransferList'),
   loading: Loading,
 });
-
 
 const Router = (props) => {
   useConnectionListener();
@@ -230,10 +229,10 @@ const Router = (props) => {
             <MainLayoutRoute path="**/productsConfiguration/index" component={AsyncProductsConfiguration} />
             <MainLayoutRoute path="**/locationsConfiguration/create/:locationId?" component={AsyncLocationsConfiguration} />
             <MainLayoutRoute path="**/locationsConfiguration/upload" component={AsyncImportLocations} />
-            <Route path="**/locationsConfiguration/index" >
+            <Route path="**/locationsConfiguration/index">
               <AsyncWelcomePage />
             </Route>
-            <Route path="**/loadData/index" ><AsyncLoadDataPage /></Route>
+            <Route path="**/loadData/index"><AsyncLoadDataPage /></Route>
             <Route path="**/resettingInstanceInfo/index">
               <AsyncResetInstancePage />
             </Route>
@@ -267,7 +266,7 @@ const Router = (props) => {
   );
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   spinner: state.spinner.show,
   supportedActivities: state.session.supportedActivities,
   notificationAutohideDelay: state.session.notificationAutohideDelay,

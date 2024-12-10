@@ -11,9 +11,9 @@ const InvoiceStatus = ({ status, allStatuses, fetchStatuses }) => {
   const [circle, setCircle] = useState('primary');
   const findStatusCircle = (statusProp) => {
     // Example labels: "Pending", "Posted"
-    const matchedStatus = allStatuses &&
-      allStatuses.length > 0 &&
-      allStatuses.find(stat => stat.label === statusProp);
+    const matchedStatus = allStatuses
+      && allStatuses.length > 0
+      && allStatuses.find((stat) => stat.label === statusProp);
     if (matchedStatus && matchedStatus.variant) {
       setCircle(matchedStatus.variant);
     }
@@ -34,7 +34,7 @@ const InvoiceStatus = ({ status, allStatuses, fetchStatuses }) => {
   return (<StatusIndicator status={status} variant={circle} />);
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   // All possible invoice statuses from store
   allStatuses: state.invoices.statuses,
 });

@@ -39,11 +39,11 @@ class AddZoneModal extends Component {
   render() {
     return (
       <ModalWrapper
-        onSave={values => this.handleSubmit(values)}
+        onSave={(values) => this.handleSubmit(values)}
         fields={this.props.FIELDS}
         validate={this.props.validate}
-        initialValues={this.props.zoneTypes.length === 1 ?
-          { ...this.state.values, locationType: this.props.zoneTypes[0] }
+        initialValues={this.props.zoneTypes.length === 1
+          ? { ...this.state.values, locationType: this.props.zoneTypes[0] }
           : this.state.values}
         formProps={{
           zoneTypes: this.props.zoneTypes,
@@ -73,8 +73,7 @@ class AddZoneModal extends Component {
   }
 }
 
-
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
 });
 

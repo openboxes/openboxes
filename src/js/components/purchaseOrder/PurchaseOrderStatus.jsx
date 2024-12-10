@@ -12,9 +12,9 @@ const PurchaseOrderStatus = ({ status, allStatuses, fetchStatuses }) => {
   const [statusLabel, setStatusLabel] = useState('');
   const findStatusCircle = (statusProp) => {
     // Example ids: "PENDING", "PRIMARY"
-    const matchedStatus = allStatuses &&
-      allStatuses.length > 0 &&
-      allStatuses.find(stat => stat.id === statusProp);
+    const matchedStatus = allStatuses
+      && allStatuses.length > 0
+      && allStatuses.find((stat) => stat.id === statusProp);
     if (matchedStatus && matchedStatus.variant) {
       setCircle(matchedStatus.variant);
       setStatusLabel(matchedStatus.label);
@@ -36,7 +36,7 @@ const PurchaseOrderStatus = ({ status, allStatuses, fetchStatuses }) => {
   return (<StatusIndicator status={statusLabel} variant={circle} />);
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   // All possible PO statuses from store
   allStatuses: state.purchaseOrder.statuses,
 });

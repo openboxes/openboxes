@@ -63,7 +63,7 @@ const InvoiceListTable = ({
       width: 50,
       sortable: false,
       style: { overflow: 'visible', zIndex: 1 },
-      Cell: row => (
+      Cell: (row) => (
         <ContextMenu
           positions={['right']}
           dropdownClasses="action-dropdown-offset"
@@ -78,28 +78,28 @@ const InvoiceListTable = ({
       className: 'active-circle d-flex justify-content-center',
       headerClassName: 'header justify-content-center',
       maxWidth: 100,
-      Cell: row => (<TableCell {...row} defaultValue={0} className="items-count-circle" />),
+      Cell: (row) => (<TableCell {...row} defaultValue={0} className="items-count-circle" />),
     },
     {
       Header: <Translate id="react.invoice.column.status.label" defaultMessage="Status" />,
       accessor: 'status',
       width: 250,
       Cell: (row) => {
-        const label = invoiceStatuses &&
-          invoiceStatuses.find(status => status.id === row.original.status).label;
+        const label = invoiceStatuses
+          && invoiceStatuses.find((status) => status.id === row.original.status).label;
         return (<InvoiceStatus status={label || row.original.status} />);
       },
     },
     {
       Header: <Translate id="react.invoice.typeCode.label" defaultMessage="Invoice Type" />,
       accessor: 'invoiceTypeCode',
-      Cell: row => (<TableCell {...row} tooltip />),
+      Cell: (row) => (<TableCell {...row} tooltip />),
     },
     {
       Header: <Translate id="react.invoice.column.invoiceNumber.label" defaultMessage="Invoice Number" />,
       accessor: 'invoiceNumber',
       sortable: false,
-      Cell: row => <TableCell {...row} link={INVOICE_URL.show(row.original.id)} />,
+      Cell: (row) => <TableCell {...row} link={INVOICE_URL.show(row.original.id)} />,
     },
     {
       Header: <Translate id="react.invoice.vendor.label" defaultMessage="Vendor" />,
@@ -109,7 +109,7 @@ const InvoiceListTable = ({
       Header: <Translate id="react.invoice.column.vendorInvoiceNumber" defaultMessage="Vendor invoice number" />,
       accessor: 'vendorInvoiceNumber',
       minWidth: 200,
-      Cell: row => (<TableCell {...row} tooltip />),
+      Cell: (row) => (<TableCell {...row} tooltip />),
     },
     {
       Header: <Translate id="react.invoice.column.totalValue" defaultMessage="Total Value" />,
@@ -182,7 +182,7 @@ const InvoiceListTable = ({
   );
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   supportedActivities: state.session.supportedActivities,
   highestRole: state.session.highestRole,
   invoiceStatuses: state.invoices.statuses,

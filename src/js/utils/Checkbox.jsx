@@ -18,14 +18,16 @@ const Checkbox = ({
   if (custom) {
     return (
       <div data-testid="custom-checkbox" className="custom-checkbox">
-        <input
-          type="checkbox"
-          ref={fieldRef}
-          checked={value}
-          {...props}
-          onChange={onChange}
-        />
-        <label htmlFor={props.id} />
+        <label htmlFor={props.id}>
+          <input
+            id={props.id}
+            type="checkbox"
+            ref={fieldRef}
+            checked={value}
+            {...props}
+            onChange={onChange}
+          />
+        </label>
       </div>
     );
   }
@@ -71,7 +73,8 @@ const Checkbox = ({
       checked={value}
       {...props}
       onChange={onChange}
-    />);
+    />
+  );
 };
 
 export default Checkbox;
