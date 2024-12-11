@@ -432,7 +432,7 @@ class ShipmentService {
             if (shipments) {
                 shipments.each {
                     it.currentStatus = it.status.code
-                    it.currentEvent = it.mostRecentEvent
+                    it.currentEvent = it.mostRecentSystemEvent
                     if (it.save(flush: true)) {
                         count++
                     }

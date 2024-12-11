@@ -32,13 +32,13 @@ class Shipment implements Comparable, Serializable, Historizable {
     def beforeInsert() {
         createdBy = AuthService.currentUser
         updatedBy = AuthService.currentUser
-        currentEvent = mostRecentEvent
+        currentEvent = mostRecentSystemEvent
         currentStatus = status.code
     }
 
     def beforeUpdate() {
         updatedBy = AuthService.currentUser
-        currentEvent = mostRecentEvent
+        currentEvent = mostRecentSystemEvent
         currentStatus = status.code
     }
 
