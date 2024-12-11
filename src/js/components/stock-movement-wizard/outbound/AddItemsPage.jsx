@@ -577,7 +577,8 @@ class AddItemsPage extends Component {
     // check if stock list has items with qty 0
     if (
       this.props.isAutosaveEnabled &&
-      _.get(this.state.values.stocklist, 'id')
+      _.get(this.state.values.stocklist, 'id') &&
+      !this.state.isDraftAvailable
     ) {
       this.saveRequisitionItemsInCurrentStep(data, false);
     }
