@@ -7,7 +7,7 @@ const CycleCountHeader = () => {
     <HeaderWrapper>
       <ListTitle label={{
         id: 'react.cycleCount.headerTitle.label',
-        defaultMessage: 'Cycle count',
+        defaultMessage: 'Cycle Count',
       }}
       />
     </HeaderWrapper>
