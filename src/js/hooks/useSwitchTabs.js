@@ -3,10 +3,9 @@ import { useEffect } from 'react';
 import queryString from 'query-string';
 import { useHistory, useLocation } from 'react-router-dom';
 
-import { DETAILS_TAB } from 'consts/productSupplierList';
 import useQueryParams from 'hooks/useQueryParams';
 
-const useProductSupplierTabs = () => {
+const useSwitchTabs = ({ defaultTab }) => {
   const history = useHistory();
   const { pathname } = useLocation();
   const currentQueryParams = useQueryParams();
@@ -22,9 +21,9 @@ const useProductSupplierTabs = () => {
 
   useEffect(() => {
     // If we don't have tab query param,
-    // we want to display the detalis tab by default
+    // we want to display the default tab by default
     if (!currentQueryParams.tab) {
-      switchTab(DETAILS_TAB);
+      switchTab(defaultTab);
     }
   }, []);
 
@@ -33,4 +32,4 @@ const useProductSupplierTabs = () => {
   };
 };
 
-export default useProductSupplierTabs;
+export default useSwitchTabs;
