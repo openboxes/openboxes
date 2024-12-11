@@ -432,7 +432,7 @@ class ShipmentService {
             if (shipments) {
                 shipments.each {
                     it.currentStatus = it.status.code
-                    it.currentEvent = it.mostRecentEvent
+                    it.currentEvent = it.mostRecentSystemEvent
                     if (it.save(flush: true)) {
                         count++
                     }
@@ -1812,7 +1812,7 @@ class ShipmentService {
 
     void rollbackLastEvent(Shipment shipmentInstance) {
 
-        def eventInstance = shipmentInstance.mostRecentEvent
+        Event eventInstance = shipmentInstance.mostRecentSystemEvent
 
         if (!eventInstance) {
             throw new RuntimeException("Cannot rollback shipment status because there are no recent events")

@@ -32,13 +32,13 @@ class Shipment implements Comparable, Serializable, Historizable {
     def beforeInsert() {
         createdBy = AuthService.currentUser
         updatedBy = AuthService.currentUser
-        currentEvent = mostRecentEvent
+        currentEvent = mostRecentSystemEvent
         currentStatus = status.code
     }
 
     def beforeUpdate() {
         updatedBy = AuthService.currentUser
-        currentEvent = mostRecentEvent
+        currentEvent = mostRecentSystemEvent
         currentStatus = status.code
     }
 
@@ -425,6 +425,14 @@ class Shipment implements Comparable, Serializable, Historizable {
     Event getMostRecentEvent() {
         if (events && events.size() > 0) {
             return events.iterator().next()
+        }
+        return null
+    }
+
+    Event getMostRecentSystemEvent() {
+        Set<Event> systemEvents = events.findAll { EventCode.listSystemEventTypeCodes().contains(it.eventType?.eventCode) }.sort()
+        if (systemEvents?.size()) {
+            return systemEvents.first()
         }
         return null
     }
