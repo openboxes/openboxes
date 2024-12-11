@@ -429,6 +429,14 @@ class Shipment implements Comparable, Serializable, Historizable {
         return null
     }
 
+    Event getMostRecentSystemEvent() {
+        Set<Event> systemEvents = events.findAll { EventCode.listSystemEventTypeCodes().contains(it.eventType?.eventCode) }.sort()
+        if (systemEvents?.size()) {
+            return systemEvents.first()
+        }
+        return null
+    }
+
     ShipmentStatus getStatus() {
         if (this.wasReceived()) {
             return new ShipmentStatus([code    : ShipmentStatusCode.RECEIVED,

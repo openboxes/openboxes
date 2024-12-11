@@ -1812,7 +1812,7 @@ class ShipmentService {
 
     void rollbackLastEvent(Shipment shipmentInstance) {
 
-        def eventInstance = shipmentInstance.mostRecentEvent
+        Event eventInstance = shipmentInstance.mostRecentSystemEvent
 
         if (!eventInstance) {
             throw new RuntimeException("Cannot rollback shipment status because there are no recent events")
