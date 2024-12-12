@@ -1,11 +1,9 @@
 import React from 'react';
 
-const CycleCountToCount = () => {
-  return (
-    <div>
-      to count
-    </div>
-  );
-};
+const CycleCountToCount = () => (
+  <div>
+    to count
+  </div>
+);
 
 export default CycleCountToCount;
