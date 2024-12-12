@@ -183,7 +183,7 @@ openboxes {
                         defaultLabel: "Cycle count",
                         menuItems: [
                                 [label: "inventory.manageCycleCount.label", defaultLabel: "Manage Cycle Count", href: "/inventory/cycleCount"],
-                                [label: "inventory.createReplenishment.label", defaultLabel: "Perform Cycle Count", href: "/inventory/cycleCount?tab=TO_COUNT"],
+                                [label: "inventory.performCycleCount.label", defaultLabel: "Perform Cycle Count", href: "/inventory/cycleCount?tab=TO_COUNT"],
                         ]
                 ]
             ]

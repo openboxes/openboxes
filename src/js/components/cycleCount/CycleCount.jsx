@@ -52,16 +52,16 @@ const CycleCount = () => {
     },
   };
 
-  const parsedQueryParams = useQueryParams();
+  const { tab } = useQueryParams();
 
   return (
     <PageWrapper>
       <CycleCountHeader />
       <Tabs config={tabs} />
-      {parsedQueryParams.tab === ALL_PRODUCTS_TAB && <CycleCountAllProducts />}
-      {parsedQueryParams.tab === TO_COUNT_TAB && <CycleCountToCount />}
-      {parsedQueryParams.tab === TO_RESOLVE_TAB && <CycleCountToResolve />}
-      {parsedQueryParams.tab === TO_APPROVE_TAB && <CycleCountToApprove />}
+      {tab === ALL_PRODUCTS_TAB && <CycleCountAllProducts />}
+      {tab === TO_COUNT_TAB && <CycleCountToCount />}
+      {tab === TO_RESOLVE_TAB && <CycleCountToResolve />}
+      {tab === TO_APPROVE_TAB && <CycleCountToApprove />}
     </PageWrapper>
   );
 };
