@@ -177,6 +177,14 @@ openboxes {
                         [label: "inventory.createReplenishment.label", defaultLabel: "Replenish picking bins", requiredActivitiesAll: ActivityCode.binTrackingList(), href: "/replenishment/create"],
                         [label: "inventory.listStockTransfers.label", defaultLabel: "List Stock Transfers", requiredActivitiesAll: ActivityCode.binTrackingList(), href: "/stockTransfer/list"],
                     ]
+                ],
+                [
+                        label: "inventory.cycleCount.label",
+                        defaultLabel: "Cycle count",
+                        menuItems: [
+                                [label: "inventory.manageCycleCount.label", defaultLabel: "Manage Cycle Count", href: "/inventory/cycleCount"],
+                                [label: "inventory.performCycleCount.label", defaultLabel: "Perform Cycle Count", href: "/inventory/cycleCount?tab=TO_COUNT"],
+                        ]
                 ]
             ]
         }
