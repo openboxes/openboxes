@@ -304,17 +304,19 @@ const useProductSupplierForm = () => {
       const productSupplier = detailsResponse.data?.data?.id;
 
       // Build package and pricing payload and send a request
-      const packagePayload =
-        buildPackagePayload({ packageSpecification, fixedPrice, productSupplier });
+      const packagePayload = buildPackagePayload({
+        packageSpecification,
+        fixedPrice,
+        productSupplier,
+      });
       await productPackageApi.save(packagePayload);
 
       // Build preferences payload and if payload array is not empty, send a request
-      const preferencesPayload =
-        buildPreferencesPayload({
-          defaultPreferenceType,
-          productSupplierPreferences,
-          productSupplier,
-        });
+      const preferencesPayload = buildPreferencesPayload({
+        defaultPreferenceType,
+        productSupplierPreferences,
+        productSupplier,
+      });
 
       if (preferencesPayload.productSupplierPreferences?.length) {
         await productSupplierPreferenceApi.saveOrUpdateBatch(preferencesPayload);

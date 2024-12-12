@@ -38,4 +38,3 @@ describe('ButtonField component is correctly rendering', () => {
     expect(rendered.toJSON()).toMatchSnapshot();
   });
 });
-

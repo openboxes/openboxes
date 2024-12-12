@@ -137,10 +137,10 @@ const useInvoicePrepaidItemsTable = ({
 
   // validation for order adjustments
   const validateUnitPrice = (row) => {
-    const haveUnitPricesDifferentSigns =
-      (row.amount > 0 && row.unitPrice < 0) || (row?.amount < 0 && row.unitPrice > 0);
-    const unitPriceAvailableToInvoice =
-      Math.abs(row?.unitPriceAvailableToInvoice) + Math.abs(row.amount);
+    const haveUnitPricesDifferentSigns = (row.amount > 0 && row.unitPrice < 0)
+                                                || (row?.amount < 0 && row.unitPrice > 0);
+    const { unitPriceAvailableToInvoice: unitPrice, amount } = row;
+    const unitPriceAvailableToInvoice = Math.abs(unitPrice) + Math.abs(amount);
     if (!row.unitPrice
       || unitPriceAvailableToInvoice < Math.abs(row.unitPrice)
       || haveUnitPricesDifferentSigns) {

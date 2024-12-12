@@ -47,7 +47,7 @@ const StockMovementOutboundList = (props) => {
   );
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   currentUser: state.session.user,
   currentLocation: state.session.currentLocation,
   requisitionStatuses: state.requisitionStatuses.data,

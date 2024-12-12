@@ -123,10 +123,12 @@ class FieldArrayComponent extends Component {
                         <div>
                           {this.props.translate(config.headerTooltip, config.headerDefaultTooltip)}
                         </div>
-                      ) : (headerLabel &&
+                      ) : (headerLabel
+                        && (
                         <div>
                           {this.props.translate(headerLabel, headerDefaultMessage)}
                         </div>
+                        )
                       )}
                       theme="transparent"
                       arrow="true"
@@ -141,14 +143,15 @@ class FieldArrayComponent extends Component {
                         }}
                       >
                         { headerHtml && headerHtml() }
-                        { headerLabel && !headerHtml &&
-                          <Translate id={headerLabel} defaultMessage={headerDefaultMessage} />}
+                        { headerLabel && !headerHtml
+                          && <Translate id={headerLabel} defaultMessage={headerDefaultMessage} />}
                       </div>
                     </Tooltip>
-                  </div>);
+                  </div>
+                );
               }
               return null;
-})}
+            })}
           </div>
         </div>
         <div
@@ -174,23 +177,29 @@ class FieldArrayComponent extends Component {
             }}
           />
         </div>
-        { AddButton &&
+        { AddButton
+          && (
           <div className="text-center add-button">
             {
-              typeof AddButton === 'string' ?
-                <button type="button" className="btn btn-outline-success btn-xs" onClick={() => addRow()}>
-                  <span><i className="fa fa-plus pr-2" /><Translate id={AddButton} /></span>
-                </button>
+              typeof AddButton === 'string'
+                ? (
+                  <button type="button" className="btn btn-outline-success btn-xs" onClick={() => addRow()}>
+                    <span>
+                      <i className="fa fa-plus pr-2" />
+                      <Translate id={AddButton} />
+                    </span>
+                  </button>
+                )
                 : <AddButton {...properties} addRow={addRow} />
             }
           </div>
-        }
+          )}
       </div>
     );
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
   isPaginated: state.session.isPaginated,
 });

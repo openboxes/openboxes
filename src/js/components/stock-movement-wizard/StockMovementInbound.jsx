@@ -9,12 +9,12 @@ import AddItemsPage from 'components/stock-movement-wizard/inbound/AddItemsPage'
 import CreateStockMovement from 'components/stock-movement-wizard/inbound/CreateStockMovement';
 import SendMovementPage from 'components/stock-movement-wizard/inbound/SendMovementPage';
 import Wizard from 'components/wizard/Wizard';
+import DateFormat from 'consts/dateFormat';
 import apiClient from 'utils/apiClient';
 import { translateWithDefaultMessage } from 'utils/Translate';
+import { formatDate } from 'utils/translation-utils';
 
 import 'components/stock-movement-wizard/StockMovement.scss';
-import { formatDate } from 'utils/translation-utils';
-import DateFormat from 'consts/dateFormat';
 
 // TODO: Cleanup not required code
 // TODO: Revise docs
@@ -210,7 +210,7 @@ class StockMovements extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   locale: state.session.activeLanguage,
   stockMovementTranslationsFetched: state.session.fetchedTranslations.stockMovement,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),

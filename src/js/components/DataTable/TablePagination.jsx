@@ -43,13 +43,12 @@ const TablePagination = (props) => {
     rangeNumberTo = totalDataSize;
   }
 
-  const pageSizeSelectOptions = props.pageSizeOptions.map(size => ({
+  const pageSizeSelectOptions = props.pageSizeOptions.map((size) => ({
     label: `${size} ${props.translate('react.reactTable.pagination.rows.label', 'rows')}`,
     value: size,
   }));
   const selectedPageSizeOption = pageSizeSelectOptions.find(({ value }) =>
     value === props.pageSize);
-
 
   return (
     <div className="table-pagination d-flex flex-row align-items-center justify-content-between py-2 px-3">
@@ -61,6 +60,7 @@ const TablePagination = (props) => {
       <div className="d-flex">
         <nav className="d-flex justify-content-center align-items-center">
           <button
+            type="button"
             disabled={!props.canPrevious}
             className="table-pagination__btn-previous"
             onClick={previousPage}
@@ -80,6 +80,7 @@ const TablePagination = (props) => {
             <span>{props.pages}</span>
           </span>
           <button
+            type="button"
             disabled={!props.canNext}
             className="table-pagination__btn-next"
             onClick={nextPage}
@@ -98,10 +99,11 @@ const TablePagination = (props) => {
           />
         </div>
       </div>
-    </div>);
+    </div>
+  );
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
 });
 
@@ -122,6 +124,5 @@ TablePagination.propTypes = {
   totalData: PropTypes.number,
   translate: PropTypes.func.isRequired,
 };
-
 
 export default connect(mapStateToProps)(TablePagination);

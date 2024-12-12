@@ -13,7 +13,6 @@ import TextField from 'components/form-elements/TextField';
 import apiClient from 'utils/apiClient';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
-
 const FIELDS = {
   availableItems: {
     type: ArrayField,
@@ -69,7 +68,7 @@ const FIELDS = {
         headerAlign: 'right',
         attributes: {
           cellClassName: 'text-right',
-          formatValue: value => (value || value === 0 ? value.toLocaleString('en-US') : null),
+          formatValue: (value) => (value || value === 0 ? value.toLocaleString('en-US') : null),
         },
       },
       quantityPicked: {
@@ -165,7 +164,7 @@ class EditPickModal extends Component {
 
     const picklistUrl = `/api/replenishments/${this.state.attr.itemId}/picklists`;
     const payload = {
-      picklistItems: _.map(values.availableItems, avItem => ({
+      picklistItems: _.map(values.availableItems, (avItem) => ({
         id: avItem.id || '',
         'inventoryItem.id': avItem['inventoryItem.id'],
         'binLocation.id': avItem['binLocation.id'] || '',
@@ -191,7 +190,9 @@ class EditPickModal extends Component {
     return (
       <div>
         <div className="font-weight-bold pb-2">
-          <Translate id="react.stockMovement.quantityPicked.label" defaultMessage="Qty Picked" />: {_.reduce(values.availableItems, (sum, val) =>
+          <Translate id="react.stockMovement.quantityPicked.label" defaultMessage="Qty Picked" />
+          :
+          {_.reduce(values.availableItems, (sum, val) =>
             (sum + (val.quantityPicked ? _.toInteger(val.quantityPicked) : 0)), 0)}
         </div>
         <hr />
@@ -208,7 +209,7 @@ class EditPickModal extends Component {
 
         const availableItems = _.map(pickPageItem.availableItems, (avItem) => {
           // check if this picklist item already exists
-          const picklistItem = _.find(pickPageItem.picklistItems, item => item['inventoryItem.id'] === avItem['inventoryItem.id'] && item['binLocation.id'] === avItem['binLocation.id']);
+          const picklistItem = _.find(pickPageItem.picklistItems, (item) => item['inventoryItem.id'] === avItem['inventoryItem.id'] && item['binLocation.id'] === avItem['binLocation.id']);
 
           if (picklistItem && avItem.status !== 'NOT_AVAILABLE') {
             return {
@@ -263,13 +264,19 @@ class EditPickModal extends Component {
       >
         <div>
           <div className="font-weight-bold">
-            <Translate id="react.stockMovement.productCode.label" defaultMessage="Product code" />: {this.state.formValues.productCode}
+            <Translate id="react.stockMovement.productCode.label" defaultMessage="Product code" />
+            :
+            {this.state.formValues.productCode}
           </div>
           <div className="font-weight-bold">
-            <Translate id="react.stockMovement.productName.label" defaultMessage="Product name" />: {this.state.formValues.productName}
+            <Translate id="react.stockMovement.productName.label" defaultMessage="Product name" />
+            :
+            {this.state.formValues.productName}
           </div>
           <div className="font-weight-bold">
-            <Translate id="react.stockMovement.quantityRequired.label" defaultMessage="Qty Required" />: {this.state.formValues.quantityRequired}
+            <Translate id="react.stockMovement.quantityRequired.label" defaultMessage="Qty Required" />
+            :
+            {this.state.formValues.quantityRequired}
           </div>
         </div>
       </ModalWrapper>
@@ -277,7 +284,7 @@ class EditPickModal extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
 });
 

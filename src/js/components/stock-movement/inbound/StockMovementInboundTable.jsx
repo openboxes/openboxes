@@ -42,7 +42,7 @@ const StockMovementInboundTable = ({
     deleteConfirmAlert,
   } = useInboundListTableData(filterParams);
 
-  const getStatusTooltip = status => translate(
+  const getStatusTooltip = (status) => translate(
     `react.stockMovement.status.${status.toLowerCase()}.description.label`,
     status.toLowerCase(),
   );
@@ -107,13 +107,14 @@ const StockMovementInboundTable = ({
       sortable: false,
       style: { overflow: 'visible', zIndex: 1 },
       fixed: 'left',
-      Cell: row => (
+      Cell: (row) => (
         <ContextMenu
           positions={['right']}
           dropdownClasses="action-dropdown-offset"
           actions={getActions(row)}
           id={row.original.id}
-        />),
+        />
+      ),
     },
     {
       Header: <Translate id="react.stockMovement.column.itemsCount.label" defaultMessage="# items" />,
@@ -123,7 +124,7 @@ const StockMovementInboundTable = ({
       headerClassName: 'header justify-content-center',
       width: 80,
       sortable: false,
-      Cell: row => (<TableCell defaultValue={0} {...row} className="items-count-circle" />),
+      Cell: (row) => (<TableCell defaultValue={0} {...row} className="items-count-circle" />),
     },
     {
       Header: <Translate id="react.stockMovement.column.status.label" defaultMessage="Status" />,
@@ -131,7 +132,7 @@ const StockMovementInboundTable = ({
       fixed: 'left',
       width: 170,
       sortable: false,
-      Cell: row => (
+      Cell: (row) => (
         <TableCell
           {...row}
           tooltip
@@ -141,7 +142,8 @@ const StockMovementInboundTable = ({
             variant={row?.value?.variant}
             status={row?.value?.label}
           />
-        </TableCell>),
+        </TableCell>
+      ),
     },
     {
       Header: <Translate id="react.stockMovement.column.identifier.label" defaultMessage="Identifier" />,
@@ -165,7 +167,8 @@ const StockMovementInboundTable = ({
               shipmentType={mapShipmentTypes(shipmentType)}
               identifier={row?.value}
             />
-          </TableCell>);
+          </TableCell>
+        );
       },
     },
     {
@@ -178,38 +181,40 @@ const StockMovementInboundTable = ({
           isReturn, id, order, description, name,
         } = row.original;
         const stockMovementId = isReturn ? order?.id : id;
-        return (<TableCell
-          {...row}
-          tooltip
-          link={STOCK_MOVEMENT_URL.show(stockMovementId)}
-          value={description || name}
-        />);
+        return (
+          <TableCell
+            {...row}
+            tooltip
+            link={STOCK_MOVEMENT_URL.show(stockMovementId)}
+            value={description || name}
+          />
+        );
       },
     },
     {
       Header: <Translate id="react.stockMovement.origin.label" defaultMessage="Origin" />,
       accessor: 'origin.name',
       minWidth: 250,
-      Cell: row => (<TableCell {...row} tooltip />),
+      Cell: (row) => (<TableCell {...row} tooltip />),
     },
     {
       Header: <Translate id="react.stockMovement.stocklist.label" defaultMessage="Stocklist" />,
       accessor: 'stocklist.name',
       minWidth: 150,
-      Cell: row => (<TableCell {...row} tooltip defaultValue="None" />),
+      Cell: (row) => (<TableCell {...row} tooltip defaultValue="None" />),
     },
     {
       Header: <Translate id="react.stockMovement.requestedBy.label" defaultMessage="Requested by" />,
       accessor: 'requestedBy.name',
       minWidth: 250,
       sortable: false,
-      Cell: row => (<TableCell {...row} defaultValue="None" />),
+      Cell: (row) => (<TableCell {...row} defaultValue="None" />),
     },
     {
       Header: <Translate id="react.stockMovement.column.dateCreated.label" defaultMessage="Date Created" />,
       accessor: 'dateCreated',
       width: 150,
-      Cell: row => (
+      Cell: (row) => (
         <DateCell
           localizeDate
           formatLocalizedDate={DateFormat.DISPLAY}
@@ -221,7 +226,7 @@ const StockMovementInboundTable = ({
       Header: <Translate id="react.stockMovement.column.expectedReceiptDate" defaultMessage="Expected Receipt Date" />,
       accessor: 'expectedDeliveryDate',
       width: 200,
-      Cell: row => (
+      Cell: (row) => (
         <DateCell
           localizeDate
           formatLocalizedDate={DateFormat.DISPLAY}
@@ -280,7 +285,7 @@ const StockMovementInboundTable = ({
   );
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
   shipmentStatuses: state.shipmentStatuses.data,
   currentLocation: state.session.currentLocation,
@@ -289,7 +294,6 @@ const mapStateToProps = state => ({
 });
 
 export default connect(mapStateToProps)(StockMovementInboundTable);
-
 
 StockMovementInboundTable.propTypes = {
   filterParams: PropTypes.shape({}).isRequired,

@@ -57,7 +57,7 @@ const StockMovementOutboundTable = ({
   } = useOutboundListTableData(filterParams);
   const [isOpenRejectionModal, setIsOpenRejectionModal] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState(null);
-  const getStatusTooltip = status => translate(
+  const getStatusTooltip = (status) => translate(
     `react.stockMovement.status.${status.toLowerCase()}.description.label`,
     status.toLowerCase(),
   );
@@ -105,7 +105,7 @@ const StockMovementOutboundTable = ({
           defaultLabel: 'Approve',
           label: 'react.stockMovement.action.approve.label',
           leftIcon: <RiCheckFill />,
-          onClick: id => approveRequest(id, identifier),
+          onClick: (id) => approveRequest(id, identifier),
         };
         actions.push(approveAction);
 
@@ -120,9 +120,9 @@ const StockMovementOutboundTable = ({
         };
         actions.push(rejectAction);
       }
-      if ((statusCode === RequisitionStatus.APPROVED ||
-          statusCode === RequisitionStatus.REJECTED) &&
-        (isUserRequestApprover || isUserRequestor || isUserAdmin)) {
+      if ((statusCode === RequisitionStatus.APPROVED
+          || statusCode === RequisitionStatus.REJECTED)
+        && (isUserRequestApprover || isUserRequestor || isUserAdmin)) {
         const rollbackAction = {
           defaultLabel: 'Rolllback',
           label: 'react.stockMovement.action.rollback.label',
@@ -135,7 +135,6 @@ const StockMovementOutboundTable = ({
     },
     [],
   );
-
 
   // List of all actions for outbound Stock Movement rows
   const getActions = useCallback((row) => {
@@ -168,8 +167,8 @@ const StockMovementOutboundTable = ({
 
     // Edit
     if (
-      !isReceived && !isPartiallyReceived &&
-      canEditRequest(currentUser, row.original, currentLocation)
+      !isReceived && !isPartiallyReceived
+      && canEditRequest(currentUser, row.original, currentLocation)
     ) {
       const editAction = {
         defaultLabel: 'Edit Stock Movement',
@@ -210,7 +209,7 @@ const StockMovementOutboundTable = ({
       sortable: false,
       style: { overflow: 'visible', zIndex: 1 },
       fixed: 'left',
-      Cell: row => (
+      Cell: (row) => (
         <ContextMenu
           positions={['right']}
           dropdownClasses="action-dropdown-offset"
@@ -227,7 +226,7 @@ const StockMovementOutboundTable = ({
       headerClassName: 'header justify-content-center',
       width: 80,
       sortable: false,
-      Cell: row => (
+      Cell: (row) => (
         <TableCell {...row} defaultValue={0} className="items-count-circle" />),
     },
     {
@@ -236,7 +235,7 @@ const StockMovementOutboundTable = ({
       fixed: 'left',
       width: 170,
       sortable: false,
-      Cell: row => (
+      Cell: (row) => (
         <TableCell
           {...row}
           tooltip
@@ -277,7 +276,7 @@ const StockMovementOutboundTable = ({
       accessor: 'name',
       minWidth: 250,
       sortable: false,
-      Cell: row => (
+      Cell: (row) => (
         <TableCell
           {...row}
           tooltip
@@ -292,26 +291,27 @@ const StockMovementOutboundTable = ({
           </span>
           <RiArrowRightSLine />
           <span>{row.original.description || row.original.name}</span>
-        </TableCell>),
+        </TableCell>
+      ),
     },
     {
       Header: <Translate id="react.stockMovement.destination.label" defaultMessage="Destination" />,
       accessor: 'destination.name',
       minWidth: 250,
-      Cell: row => (<TableCell {...row} tooltip />),
+      Cell: (row) => (<TableCell {...row} tooltip />),
     },
     {
       Header: <Translate id="react.stockMovement.stocklist.label" defaultMessage="Stocklist" />,
       accessor: 'stocklist.name',
       minWidth: 150,
-      Cell: row => (<TableCell {...row} tooltip defaultValue="None" />),
+      Cell: (row) => (<TableCell {...row} tooltip defaultValue="None" />),
     },
     {
       Header: <Translate id="react.stockMovement.requestedBy.label" defaultMessage="Requested by" />,
       accessor: 'requestedBy.name',
       minWidth: 250,
       sortable: false,
-      Cell: row => (<TableCell {...row} defaultValue="None" />),
+      Cell: (row) => (<TableCell {...row} defaultValue="None" />),
     },
     {
       Header: <Translate id="react.stockMovement.request.approvers.label" defaultMessage="Approvers" />,
@@ -319,19 +319,21 @@ const StockMovementOutboundTable = ({
       minWidth: 250,
       sortable: false,
       show: isRequestsOpen,
-      Cell: row =>
-        (<TableCell
-          {...row}
-          tooltip
-          defaultValue="None"
-          value={row.value?.map(approver => approver.name)?.join(', ')}
-        />),
+      Cell: (row) =>
+        (
+          <TableCell
+            {...row}
+            tooltip
+            defaultValue="None"
+            value={row.value?.map((approver) => approver.name)?.join(', ')}
+          />
+        ),
     },
     {
       Header: <Translate id="react.stockMovement.outbound.column.dateRequested.label" defaultMessage="Date Requested" />,
       accessor: 'dateRequested',
       width: 150,
-      Cell: row => (
+      Cell: (row) => (
         <DateCell
           localizeDate
           formatLocalizedDate={DateFormat.DISPLAY}
@@ -343,7 +345,7 @@ const StockMovementOutboundTable = ({
       Header: <Translate id="react.stockMovement.column.dateCreated.label" defaultMessage="Date Created" />,
       accessor: 'dateCreated',
       width: 150,
-      Cell: row => (
+      Cell: (row) => (
         <DateCell
           localizeDate
           formatLocalizedDate={DateFormat.DISPLAY}
@@ -414,7 +416,7 @@ const StockMovementOutboundTable = ({
   );
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
   requisitionStatuses: state.requisitionStatuses.data,
   currentLocation: state.session.currentLocation,
@@ -425,7 +427,6 @@ const mapStateToProps = state => ({
 });
 
 export default connect(mapStateToProps)(StockMovementOutboundTable);
-
 
 StockMovementOutboundTable.propTypes = {
   filterParams: PropTypes.shape({}).isRequired,

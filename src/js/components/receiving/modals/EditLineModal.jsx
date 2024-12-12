@@ -16,7 +16,6 @@ import TextField from 'components/form-elements/TextField';
 import DateFormat from 'consts/dateFormat';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
-
 const FIELDS = {
   lines: {
     type: ArrayField,
@@ -34,7 +33,8 @@ const FIELDS = {
           receiptItemId: null,
           newLine: true,
         })}
-      ><Translate id="react.default.button.addLine.label" defaultMessage="Add line" />
+      >
+        <Translate id="react.default.button.addLine.label" defaultMessage="Add line" />
       </button>
     ),
     fields: {
@@ -73,6 +73,15 @@ const FIELDS = {
     },
   },
 };
+
+// Erase receiving quantity when shipped quantity is equal to 0
+const eraseReceivingQuantity = (items) => items.map((item) => {
+  if (!_.parseInt(item.quantityShipped)) {
+    return { ...item, quantityReceiving: null };
+  }
+
+  return item;
+});
 
 /**
  * Modal window where user can edit receiving's line. User can open it on the first page
@@ -147,9 +156,9 @@ class EditLineModal extends Component {
   */
   onOpen() {
     const { shipmentItemsQuantityMap, attr } = this.state;
-    this.setState({
+    this.setState((prev) => ({
       formValues: {
-        lines: _.map([this.state.attr.fieldValue], value => ({
+        lines: _.map([prev.attr.fieldValue], (value) => ({
           ...value,
           disabled: true,
           originalLine: true,
@@ -162,18 +171,7 @@ class EditLineModal extends Component {
        * that was at this place before (2nd row, now 3rd row, after splitting the line)
        */
       shipmentItemQuantityShippedSum: shipmentItemsQuantityMap[attr.fieldValue?.shipmentItemId],
-    });
-  }
-
-  // Erase receiving quantity when shipped quantity is equal to 0
-  eraseReceivingQuantity(items) {
-    return items.map((item) => {
-      if (!_.parseInt(item.quantityShipped)) {
-        return { ...item, quantityReceiving: null };
-      }
-
-      return item;
-    });
+    }));
   }
 
   /**
@@ -182,9 +180,9 @@ class EditLineModal extends Component {
    * @public
    */
   onSave(values) {
-    const lines = this.eraseReceivingQuantity(values.lines);
+    const lines = eraseReceivingQuantity(values.lines);
     if (_.some(lines, (line) => {
-      const oldItem = _.find(this.state.formValues.lines, item => line.product
+      const oldItem = _.find(this.state.formValues.lines, (item) => line.product
         && line.product.id === item.product.id && line.lotNumber === item.lotNumber);
 
       return oldItem && oldItem.quantityOnHand && oldItem.expirationDate !== line.expirationDate;
@@ -335,7 +333,9 @@ class EditLineModal extends Component {
       >
         <div>
           <div className="font-weight-bold mb-3">
-            <Translate id="react.partialReceiving.originalQtyShipped.label" defaultMessage="Original quantity shipped" />: {this.state.attr.fieldValue.quantityShipped}
+            <Translate id="react.partialReceiving.originalQtyShipped.label" defaultMessage="Original quantity shipped" />
+            :
+            {this.state.attr.fieldValue.quantityShipped}
           </div>
           {this.state.showMismatchQuantityShippedInfo
             && (

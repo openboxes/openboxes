@@ -29,7 +29,7 @@ export default {
       valueKey: 'id',
       labelKey: 'name',
       options: [],
-      filterOptions: options => options,
+      filterOptions: (options) => options,
       filterElement: true,
       placeholder: 'react.stockTransfer.filters.createdBy.placeholder.label',
       defaultPlaceholder: 'Created by',

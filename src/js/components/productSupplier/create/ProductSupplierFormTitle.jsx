@@ -11,7 +11,7 @@ import '../styles.scss';
 const ProductSupplierFormTitle = () => {
   const { productSupplier } = useProductSupplierData();
 
-  const { translate } = useSelector(state => ({
+  const { translate } = useSelector((state) => ({
     translate: translateWithDefaultMessage(getTranslate(state.localize)),
   }));
 

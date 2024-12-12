@@ -5,7 +5,6 @@ import ReactLoading from 'react-loading';
 
 import { getRandomColor } from 'consts/dataFormat/colorMapping';
 
-
 const LoadingNumbers = () => {
   const loadingNumbers = [];
   for (let i = 0; i < 4; i += 1) {
@@ -27,6 +26,5 @@ const LoadingNumbers = () => {
     </div>
   );
 };
-
 
 export default LoadingNumbers;

@@ -1,3 +1,4 @@
+/* eslint-disable react/button-has-type */
 import React from 'react';
 
 import PropTypes from 'prop-types';
@@ -32,11 +33,11 @@ const Button = ({
       aria-expanded={isDropdown && 'false'}
       ref={customRef}
     >
-      <React.Fragment>
+      <>
         {StartIcon && StartIcon}
         <Translate id={label} defaultMessage={defaultLabel} />
         {EndIcon && EndIcon}
-      </React.Fragment>
+      </>
     </button>
   );
 };

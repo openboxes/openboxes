@@ -1,12 +1,13 @@
 import React from 'react';
 
-import _ from 'lodash';
 import PropTypes from 'prop-types';
 
 import useTranslate from 'hooks/useTranslate';
 import HeaderWrapper from 'wrappers/HeaderWrapper';
 
-const OutboundImportHeader = ({ origin, destination, description, dateRequested }) => {
+const OutboundImportHeader = ({
+  origin, destination, description, dateRequested,
+}) => {
   const translate = useTranslate();
   return (
     <HeaderWrapper className="align-items-center h-100 py-3">

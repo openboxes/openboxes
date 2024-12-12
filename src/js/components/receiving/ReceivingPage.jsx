@@ -19,7 +19,6 @@ import { formatDate } from 'utils/translation-utils';
 import 'react-confirm-alert/src/react-confirm-alert.css';
 import 'components/stock-movement-wizard/StockMovement.scss';
 
-
 /** Main partial receiving form's component. */
 class ReceivingPage extends Component {
   constructor(props) {
@@ -148,12 +147,12 @@ class ReceivingPage extends Component {
    */
   fetchBins() {
     const url = '/api/internalLocations/receiving';
-    const mapBins = bins => (_.chain(bins)
+    const mapBins = (bins) => (_.chain(bins)
       .orderBy(['name'], ['asc']).value()
     );
 
     return apiClient.get(url, {
-      paramsSerializer: parameters => queryString.stringify(parameters),
+      paramsSerializer: (parameters) => queryString.stringify(parameters),
       params: {
         locationTypeCode: ['BIN_LOCATION', 'INTERNAL'],
         'location.id': this.state.locationId,
@@ -161,7 +160,7 @@ class ReceivingPage extends Component {
       },
     })
       .then((response) => {
-        const binGroups = _.partition(response.data.data, bin => (bin.zoneName));
+        const binGroups = _.partition(response.data.data, (bin) => (bin.zoneName));
         const binsWithZone = _.chain(binGroups[0]).groupBy('zoneName')
           .map((value, key) => ({ name: key, options: mapBins(value) }))
           .orderBy(['label'], ['asc'])
@@ -202,7 +201,7 @@ class ReceivingPage extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
   hasBinLocationSupport: state.session.currentLocation.hasBinLocationSupport,
   locale: state.session.activeLanguage,

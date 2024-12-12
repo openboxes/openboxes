@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 const Filter = ({ filter, onChange }) => (
   <input
     data-testid="filter-input"
-    onChange={event => onChange(event.target.value)}
+    onChange={(event) => onChange(event.target.value)}
     value={filter ? filter.value : ''}
     style={{ width: '100%' }}
     placeholder="Search"

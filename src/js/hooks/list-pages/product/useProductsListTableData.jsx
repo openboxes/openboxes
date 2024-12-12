@@ -75,7 +75,7 @@ const useProductsListTableData = (filterParams) => {
 
     const config = {
       params: params(),
-      paramsSerializer: parameters => queryString.stringify(parameters),
+      paramsSerializer: (parameters) => queryString.stringify(parameters),
     };
     const { data } = await productApi.getProducts(config);
     const date = new Date();

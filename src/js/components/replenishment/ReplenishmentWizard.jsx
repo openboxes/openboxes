@@ -20,7 +20,6 @@ import { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'components/replenishment/Replenishment.scss';
 
-
 class ReplenishmentWizard extends Component {
   constructor(props) {
     super(props);
@@ -132,7 +131,7 @@ class ReplenishmentWizard extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   location: state.session.currentLocation,
   locale: state.session.activeLanguage,
   replenishmentTranslationsFetched: state.session.fetchedTranslations.replenishment,

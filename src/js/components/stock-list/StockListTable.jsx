@@ -139,7 +139,7 @@ const StockListTable = ({
       sortable: false,
       style: { overflow: 'visible', zIndex: 1 },
       fixed: 'left',
-      Cell: row => (
+      Cell: (row) => (
         <ContextMenu
           positions={['right']}
           dropdownClasses="action-dropdown-offset"
@@ -153,37 +153,39 @@ const StockListTable = ({
       accessor: 'isPublished',
       fixed: 'left',
       width: 150,
-      Cell: row => (
+      Cell: (row) => (
         <StatusIndicator
           status={row.original.isPublished ? 'Published' : 'Draft'}
           variant={row.original.isPublished ? 'success' : 'danger'}
-        />),
+        />
+      ),
     },
     {
       Header: <Translate id="react.stocklists.column.name.label" defaultMessage="Name" />,
       accessor: 'name',
       fixed: 'left',
       minWidth: 250,
-      Cell: row => (
+      Cell: (row) => (
         <TableCell
           {...row}
           tooltip
           link={REQUISITION_TEMPLATE_URL.show(row.original.id)}
-        />),
+        />
+      ),
     },
     {
       Header: <Translate id="react.stocklists.filters.origin.label" defaultMessage="Origin" />,
       accessor: 'origin',
       minWidth: 250,
       fixed: 'left',
-      Cell: row => (<TableCell {...row} tooltip />),
+      Cell: (row) => (<TableCell {...row} tooltip />),
     },
     {
       Header: <Translate id="react.stocklists.filters.destination.label" defaultMessage="Destination" />,
       accessor: 'destination',
       minWidth: 250,
       fixed: 'left',
-      Cell: row => (<TableCell {...row} tooltip />),
+      Cell: (row) => (<TableCell {...row} tooltip />),
     },
     {
       Header: <Translate id="react.stocklists.column.requisitionItems.label" defaultMessage="Requisition items" />,
@@ -253,13 +255,12 @@ const StockListTable = ({
   );
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
   highestRole: state.session.highestRole,
 });
 
 export default connect(mapStateToProps)(StockListTable);
-
 
 StockListTable.propTypes = {
   filterParams: PropTypes.shape({}).isRequired,

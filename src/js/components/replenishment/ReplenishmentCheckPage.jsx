@@ -18,7 +18,6 @@ import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
-
 const FIELDS = {
   replenishmentItems: {
     type: ArrayField,
@@ -131,7 +130,6 @@ const FIELDS = {
   },
 };
 
-
 /* eslint class-methods-use-this: ["error",{ "exceptMethods": ["checkForInitialPicksChanges"] }] */
 class ReplenishmentSecondPage extends Component {
   constructor(props) {
@@ -142,6 +140,7 @@ class ReplenishmentSecondPage extends Component {
 
     this.fetchReplenishment = this.fetchReplenishment.bind(this);
   }
+
   componentDidMount() {
     if (this.props.replenishmentTranslationsFetched) {
       this.dataFetched = true;
@@ -171,7 +170,7 @@ class ReplenishmentSecondPage extends Component {
               ...replenishment,
               replenishmentItems: _.map(
                 replenishment.replenishmentItems,
-                item => this.checkForInitialPicksChanges(item),
+                (item) => this.checkForInitialPicksChanges(item),
               ),
             },
           },
@@ -189,7 +188,7 @@ class ReplenishmentSecondPage extends Component {
         // if yes -> compare quantityPicked of item in picklist with suggestion
         const pick = _.find(
           pickPageItem.picklistItems,
-          item => _.get(suggestion, 'inventoryItem.id') === _.get(item, 'inventoryItem.id') && _.get(item, 'binLocation.id') === _.get(suggestion, 'binLocation.id'),
+          (item) => _.get(suggestion, 'inventoryItem.id') === _.get(item, 'inventoryItem.id') && _.get(item, 'binLocation.id') === _.get(suggestion, 'binLocation.id'),
         );
         if (_.isEmpty(pick) || (pick.quantity !== suggestion.quantityPicked)) {
           initialPicks.push({
@@ -244,13 +243,15 @@ class ReplenishmentSecondPage extends Component {
                   type="button"
                   onClick={() => this.previousPage()}
                   className="btn btn-outline-primary btn-form btn-xs"
-                ><Translate id="react.default.button.previous.label" defaultMessage="Previous" />
+                >
+                  <Translate id="react.default.button.previous.label" defaultMessage="Previous" />
                 </button>
                 <button
                   type="button"
                   onClick={() => this.completeReplenishment()}
                   className="btn btn-outline-success float-right btn-xs mr-3"
-                ><Translate id="react.stockTransfer.completeStockTransfer.label" defaultMessage="Complete Stock Transfer" />
+                >
+                  <Translate id="react.stockTransfer.completeStockTransfer.label" defaultMessage="Complete Stock Transfer" />
                 </button>
               </div>
             </form>
@@ -261,7 +262,7 @@ class ReplenishmentSecondPage extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   replenishmentTranslationsFetched: state.session.fetchedTranslations.replenishment,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
 });

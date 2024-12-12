@@ -15,7 +15,7 @@ const Input = ({
     return event;
   };
 
-  const handleFocus = event => event.target.select();
+  const handleFocus = (event) => event.target.select();
 
   let keys = {};
 

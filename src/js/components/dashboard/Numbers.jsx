@@ -27,6 +27,8 @@ const Numbers = (props) => {
               </a>
             );
           }
+
+          return null;
         })
     }
     </div>
