@@ -37,6 +37,7 @@ import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.DocumentCode
 import org.pih.warehouse.core.DocumentType
+import org.pih.warehouse.core.Event
 import org.pih.warehouse.core.EventCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationService
@@ -3493,6 +3494,23 @@ class StockMovementService {
                 userService.isUserAdmin(user) ||
                 user?.id == stockMovement?.requestedBy?.id) &&
                 stockMovement.isInApprovalState()
+    }
+
+    void deleteComment(Comment comment, StockMovement stockMovement) {
+        Event event = Event.findByComment(comment)
+        if (event) {
+            event.comment = null
+        }
+        def associatedObject = stockMovement?.requisition ?: stockMovement?.shipment
+        associatedObject?.removeFromComments(comment)
+    }
+
+    Comment saveComment(Comment comment, StockMovement stockMovement) {
+        def associatedObject  = stockMovement?.requisition ?: stockMovement?.shipment
+        if (!comment.id) {
+            associatedObject?.addToComments(comment)
+        }
+        return comment.save()
     }
 
     ApplicationTagLib getApplicationTagLib() {
