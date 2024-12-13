@@ -932,6 +932,16 @@ class UrlMappings {
             action = [GET: "read", POST: "update", PUT: "update", DELETE: "delete"]
         }
 
+        "/api/messaging/consume"(parseRequest: true) {
+            controller = { "rabbit" }
+            action = [GET: "consume"]
+        }
+
+        "/api/messaging/send"(parseRequest: true) {
+            controller = { "rabbit" }
+            action = [GET: "send"]
+        }
+
         // Error handling
 
         "401"(controller: "errors", action: "handleUnauthorized")

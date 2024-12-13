@@ -486,6 +486,8 @@ dependencies {
 
     implementation 'fr.w3blog:zebra-zpl:0.0.4'  // ZebraUtils.printZpl(), Labelary API, etc.
 
+    implementation 'com.rabbitmq:amqp-client:5.16.0'
+
     /*
      * FIXME Used in only one place: ApiControllerFunctionalSpec.groovy.
      * FIXME Use apache's httpclient instead.
