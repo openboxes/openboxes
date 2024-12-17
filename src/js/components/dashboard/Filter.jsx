@@ -52,13 +52,15 @@ class Filter extends Component {
   }
 
   searchOnChange = (event) => {
-    this.setState((prev) => ({
+    const { listCategoryData } = this.state;
+    const filteredList = listCategoryData
+      .filter((categoryData) => categoryData.name
+        .toLowerCase()
+        .includes(event.target.value.toLowerCase()));
+    this.setState({
+      listCategoryDataFiltered: filteredList,
       searchTerm: event.target.value,
-      listCategoryDataFiltered: prev.listCategoryData
-        .filter((categoryData) => categoryData.name
-          .toLowerCase()
-          .includes(event.target.value.toLowerCase())),
-    }));
+    });
   }
 
   toggleAddingFilter = () => {
