@@ -69,6 +69,12 @@ enum ActivityCode {
 
     ALLOW_OVERPICK('ALLOW_OVERPICK'),
 
+    DYNAMIC_SLOTTING('DYNAMIC_SLOTTING'),
+
+    STATIC_SLOTTING('STATIC_SLOTTING'),
+
+    PUTAWAY_STRATEGY_SINGLE_LPN('PUTAWAY_STRATEGY_SINGLE_LPN'),
+
     NONE('NONE')
 
     final String id
@@ -105,6 +111,9 @@ enum ActivityCode {
                 DYNAMIC_CREATION,
                 AUTOSAVE,
                 ALLOW_OVERPICK,
+                DYNAMIC_SLOTTING,
+                STATIC_SLOTTING,
+                PUTAWAY_STRATEGY_SINGLE_LPN,
                 NONE,
         ]
     }
