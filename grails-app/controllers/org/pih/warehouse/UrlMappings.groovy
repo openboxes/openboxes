@@ -51,6 +51,11 @@ class UrlMappings {
             action = [GET: "read", POST: "save", PUT: "save", DELETE: "delete"]
         }
 
+        "/api/locations/$id/putawayCandidates" {
+            controller = { "putawayItemApi" }
+            action = [GET: "list"]
+        }
+
         // Category options for filters on  product list page
         "/api/categoryOptions"(parseRequest: true) {
             controller = { "selectOptionsApi" }
