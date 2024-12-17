@@ -256,6 +256,7 @@ class ShipmentService {
 
     /**
      * Retrieve shipments filtered by origin, destination, shipment status, and requisition statuses.
+     * Used by MOBILE api
      *
      * @param origin             The origin location of the shipment.
      * @param destination        The destination location of the shipment.
