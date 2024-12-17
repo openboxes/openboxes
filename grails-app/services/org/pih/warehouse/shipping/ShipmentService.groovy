@@ -46,6 +46,7 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.receiving.ReceiptItem
 import org.pih.warehouse.receiving.ReceiptStatusCode
+import org.pih.warehouse.requisition.RequisitionStatus
 import org.springframework.validation.BeanPropertyBindingResult
 import org.springframework.validation.Errors
 
@@ -229,17 +230,54 @@ class ShipmentService {
         return getAllShipments()
     }
 
-
+    /**
+     * Retrieve shipments filtered by a single location.
+     *
+     * @param location The location to filter (used for both origin and destination).
+     * @return A list of shipments matching the criteria.
+     */
     List<Shipment> getShipmentsByLocation(Location location) {
-        return getShipmentsByLocation(location, location, null)
+        return getShipmentsByCriteria(location, location, null, [])
     }
 
     /**
+     * Retrieve shipments filtered by origin, destination, and shipment status.
      *
-     * @param location
-     * @return
+     * @param origin            The origin location of the shipment.
+     * @param destination       The destination location of the shipment.
+     * @param shipmentStatusCode The status code of the shipment.
+     * @return A list of shipments matching the criteria.
      */
     List<Shipment> getShipmentsByLocation(Location origin, Location destination, ShipmentStatusCode shipmentStatusCode) {
+        return getShipmentsByCriteria(origin, destination, shipmentStatusCode, [])
+    }
+
+    /**
+     * Retrieve shipments filtered by origin, destination, shipment status, and requisition statuses.
+     * Used by MOBILE api
+     *
+     * @param origin             The origin location of the shipment.
+     * @param destination        The destination location of the shipment.
+     * @param shipmentStatusCode The status code of the shipment.
+     * @param requisitionStatuses A list of requisition statuses to filter by.
+     * @return A list of shipments matching the criteria.
+     */
+    List<Shipment> getShipmentsByLocationAndRequisitionStatuses(Location origin, Location destination, ShipmentStatusCode shipmentStatusCode, List<RequisitionStatus> requisitionStatuses = []) {
+        return getShipmentsByCriteria(origin, destination, shipmentStatusCode, requisitionStatuses, "expectedShippingDate", "asc")
+    }
+
+    /**
+     * Helper method to encapsulate the common criteria logic for querying Shipments.
+     *
+     * @param origin              The origin location (optional).
+     * @param destination         The destination location (optional).
+     * @param shipmentStatusCode  The shipment status code (optional).
+     * @param requisitionStatuses A list of requisition statuses (optional).
+     * @param orderByField        The field to order by (optional).
+     * @param orderDirection      The sorting direction ("asc" or "desc", optional).
+     * @return A list of shipments matching the criteria.
+     */
+    private List<Shipment> getShipmentsByCriteria(Location origin, Location destination, ShipmentStatusCode shipmentStatusCode, List<RequisitionStatus> requisitionStatuses, String orderByField = null, String orderDirection = "asc") {
         return Shipment.withCriteria {
             and {
                 or {
@@ -250,9 +288,20 @@ class ShipmentService {
                         eq("destination", destination)
                     }
                 }
+
                 if (shipmentStatusCode) {
                     eq("currentStatus", shipmentStatusCode)
                 }
+
+                if (requisitionStatuses) {
+                    requisition {
+                        'in'("status", requisitionStatuses)
+                    }
+                }
+            }
+
+            if (orderByField) {
+                order(orderByField, orderDirection)
             }
         }
     }
