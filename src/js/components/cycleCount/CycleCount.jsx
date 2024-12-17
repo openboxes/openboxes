@@ -1,6 +1,6 @@
 import React from 'react';
 
-import CycleCountAllProducts from 'components/cycleCount/CycleCountAllProducts';
+import CycleCountAllProducts from 'components/cycleCount/allProductsTab/CycleCountAllProducts';
 import CycleCountHeader from 'components/cycleCount/CycleCountHeader';
 import CycleCountToApprove from 'components/cycleCount/CycleCountToApprove';
 import CycleCountToCount from 'components/cycleCount/CycleCountToCount';
@@ -16,6 +16,8 @@ import useQueryParams from 'hooks/useQueryParams';
 import useSwitchTabs from 'hooks/useSwitchTabs';
 import useTranslation from 'hooks/useTranslation';
 import PageWrapper from 'wrappers/PageWrapper';
+
+import 'components/cycleCount/cycleCount.scss';
 
 const CycleCount = () => {
   const { switchTab } = useSwitchTabs({ defaultTab: ALL_PRODUCTS_TAB });
@@ -57,11 +59,13 @@ const CycleCount = () => {
   return (
     <PageWrapper>
       <CycleCountHeader />
-      <Tabs config={tabs} />
-      {tab === ALL_PRODUCTS_TAB && <CycleCountAllProducts />}
-      {tab === TO_COUNT_TAB && <CycleCountToCount />}
-      {tab === TO_RESOLVE_TAB && <CycleCountToResolve />}
-      {tab === TO_APPROVE_TAB && <CycleCountToApprove />}
+      <div className="list-page-list-section">
+        <Tabs config={tabs} className="m-3" />
+        {tab === ALL_PRODUCTS_TAB && <CycleCountAllProducts />}
+        {tab === TO_COUNT_TAB && <CycleCountToCount />}
+        {tab === TO_RESOLVE_TAB && <CycleCountToResolve />}
+        {tab === TO_APPROVE_TAB && <CycleCountToApprove />}
+      </div>
     </PageWrapper>
   );
 };
