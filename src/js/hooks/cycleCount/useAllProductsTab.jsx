@@ -3,6 +3,7 @@ import React, { useMemo } from 'react';
 import { createColumnHelper } from '@tanstack/react-table';
 import fileDownload from 'js-file-download';
 import queryString from 'query-string';
+import { useSelector } from 'react-redux';
 
 import { TableCell } from 'components/DataTable';
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
@@ -14,6 +15,7 @@ import useTranslate from 'hooks/useTranslate';
 const useAllProductsTab = () => {
   const columnHelper = createColumnHelper();
   const translate = useTranslate();
+
   const { tableData, loading } = useTableData({
     filterParams: {},
     // Should be replaced after integrating with backend
@@ -24,6 +26,12 @@ const useAllProductsTab = () => {
     getParams: () => {},
     onFetchedData: () => {},
   });
+
+  const {
+    currentLocation,
+  } = useSelector((state) => ({
+    currentLocation: state.session.currentLocation,
+  }));
 
   const columns = useMemo(() => [
     columnHelper.accessor('lastCountDate', {
@@ -153,7 +161,7 @@ const useAllProductsTab = () => {
     const date = new Date();
     const [month, day, year] = [date.getMonth(), date.getDate(), date.getFullYear()];
     const [hour, minutes, seconds] = [date.getHours(), date.getMinutes(), date.getSeconds()];
-    fileDownload(`\uFEFF${data}`, `Products-${year}${month}${day}-${hour}${minutes}${seconds}`, 'text/csv');
+    fileDownload(`\uFEFF${data}`, `CycleCountReport-${currentLocation?.name}-${year}${month}${day}-${hour}${minutes}${seconds}`, 'text/csv');
   };
 
   return {
