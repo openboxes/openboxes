@@ -209,7 +209,6 @@ class PicklistItem implements Serializable {
             pickUnitOfMeasure           : pickUnitOfMeasure,
             pickTypeClassification      : PicklistItem.getPickTypeClassification(pickUnitOfMeasure?.uom?.code)?.name(),
             shortage                    : shortage,
-            picker                      : pickedBy,
             index                       : index,
             totalCount                  : totalCount,
             indexString                 : indexString,

@@ -211,7 +211,7 @@ class PicklistService {
         productAvailabilityService.refreshProductsAvailability(orderItem?.order?.origin?.id, [inventoryItem?.product?.id], [binLocation?.id], false)
     }
 
-    void updatePicklistItem(String picklistItemId, String productId, BigDecimal quantityPicked, String pickerId, String reasonCode) {
+    void updatePicklistItem(String picklistItemId, String productId, BigDecimal quantityPicked, String pickedById, String reasonCode) {
         PicklistItem picklistItem = PicklistItem.get(picklistItemId)
 
         Product product = Product.get(productId)
@@ -230,7 +230,7 @@ class PicklistService {
 
         picklistItem.quantityPicked += quantityPicked
         picklistItem.datePicked = new Date()
-        picklistItem.picker = User.load(pickerId)
+        picklistItem.pickedBy = User.load(pickedById)
 
         // Used to mark a pick item as shorted
         if (reasonCode) {

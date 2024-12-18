@@ -310,6 +310,7 @@ class BootStrap {
                 "picklist.id"           : picklistItem?.picklist?.id,
                 "requisitionItem.id"    : picklistItem?.requisitionItem?.id,
                 "inventoryItem.id"      : picklistItem.inventoryItem?.id,
+                "product.id"            : picklistItem?.inventoryItem?.product?.id,
                 "product.name"          : picklistItem?.inventoryItem?.product?.name,
                 "product.displayName"   : picklistItem?.inventoryItem?.product?.displayName,
                 "product.color"         : picklistItem?.inventoryItem?.product?.color,

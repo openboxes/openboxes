@@ -365,6 +365,10 @@ class Location implements Comparable<Location>, java.io.Serializable {
         return supports(ActivityCode.APPROVE_REQUEST)
     }
 
+    Boolean requiresMobilPicking() {
+        return supports(ActivityCode.REQUIRE_MOBILE_PICKING)
+    }
+
     static List<Location> listNonInternalLocations() {
         return createCriteria().list {
             createAlias("locationType", "locationType", JoinType.LEFT_OUTER_JOIN)
