@@ -10,17 +10,20 @@
 package org.pih.warehouse.picklist
 
 import grails.gorm.transactions.Transactional
+import grails.validation.ValidationException
 import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.api.AvailableItem
-import org.pih.warehouse.api.StockMovementItem
 import org.pih.warehouse.api.SuggestedItem
+import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryLevel
+import org.pih.warehouse.inventory.ProductAvailabilityService
+import org.pih.warehouse.inventory.StockMovementService
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.product.Product
-import org.pih.warehouse.product.ProductAvailability
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.requisition.RequisitionStatus
@@ -28,7 +31,8 @@ import org.pih.warehouse.requisition.RequisitionStatus
 @Transactional
 class PicklistService {
 
-    def productAvailabilityService
+    ProductAvailabilityService productAvailabilityService
+    StockMovementService stockMovementService
 
     Picklist save(Map data) {
         def itemsData = data.picklistItems ?: []
@@ -205,6 +209,54 @@ class PicklistService {
         picklist.save(flush: true)
 
         productAvailabilityService.refreshProductsAvailability(orderItem?.order?.origin?.id, [inventoryItem?.product?.id], [binLocation?.id], false)
+    }
+
+    void updatePicklistItem(String picklistItemId, String productId, BigDecimal quantityPicked, String pickerId, String reasonCode) {
+        PicklistItem picklistItem = PicklistItem.get(picklistItemId)
+
+        Product product = Product.get(productId)
+        if (product != picklistItem?.requisitionItem?.product) {
+            picklistItem.errors.reject("Picked product ${product?.productCode} does not match picklist item ${picklistItem?.requisitionItem?.product?.productCode}")
+        }
+
+        // Initialize quantity picked
+        if (!picklistItem.quantityPicked) {
+            picklistItem.quantityPicked = 0
+        }
+
+        if (quantityPicked > picklistItem?.quantityRemaining) {
+            picklistItem.errors.rejectValue("quantityPicked","Quantity picked (${quantityPicked}) cannot exceed quantity remaining (${picklistItem?.quantityRemaining})")
+        }
+
+        picklistItem.quantityPicked += quantityPicked
+        picklistItem.datePicked = new Date()
+        picklistItem.picker = User.load(pickerId)
+
+        // Used to mark a pick item as shorted
+        if (reasonCode) {
+            picklistItem.reasonCode = reasonCode
+        }
+
+        // Save picklist item
+        if (picklistItem.hasErrors() || !picklistItem.save(flush:true)) {
+            throw new ValidationException("Unable to save picklist item", picklistItem.errors)
+        }
+
+        // Checking whether we need to perform automatic reallocation after shortage
+        if (picklistItem.shortage) {
+            Location currentLocation = picklistItem?.requisitionItem?.requisition?.origin
+            if (currentLocation?.supports(ActivityCode.PICKING_STRATEGY_AUTOMATIC_REALLOCATION)) {
+                log.info "Automatically generate new picklist item for shortage: ${picklistItem?.toJson()}"
+                stockMovementService.createPicklist(picklistItem, Boolean.TRUE)
+            }
+        }
+
+        // Check if the picklist has been completed
+        String requisitionId = picklistItem?.picklist?.requisition?.id
+        if (requisitionId) {
+            // TODO: To be implemented if needed
+            // grailsApplication.mainContext.publishEvent(new RefreshPicklistStatusEvent(requisitionId))
+        }
     }
 
     List getSuggestedItems(List<AvailableItem> availableItems, Integer quantityRequested, Location warehouse) {
