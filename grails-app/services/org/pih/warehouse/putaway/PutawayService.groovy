@@ -9,21 +9,18 @@
  **/
 package org.pih.warehouse.putaway
 
-import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import org.apache.commons.beanutils.BeanUtils
 import org.hibernate.criterion.CriteriaSpecification
 import org.hibernate.sql.JoinType
-import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.api.Putaway
 import org.pih.warehouse.api.PutawayItem
 import org.pih.warehouse.api.PutawayStatus
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.core.LocationService
+import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.inventory.InventoryItem
-import org.pih.warehouse.inventory.InventoryService
 import org.pih.warehouse.inventory.TransferStockCommand
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
@@ -81,7 +78,7 @@ class PutawayService {
     def getPutawayUsers(Location location) {
         List<User> users = userService.findUsersByRoleType(RoleType.ROLE_PUTAWAY)
         if (!users) {
-            String usernameOrId = ConfigurationHolder.config.openboxes.jobs.automaticSlottingJob.defaultPutawayAssignee
+            String usernameOrId = grailsApplication.config.openboxes.jobs.automaticSlottingJob.defaultPutawayAssignee
             User user = User.findByIdOrUsername(usernameOrId, usernameOrId)
             users = [user]
         }

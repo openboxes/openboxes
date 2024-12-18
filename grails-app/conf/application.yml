@@ -482,6 +482,9 @@ openboxes:
             enabled: false
             cronExpression: "0 0 * * * ?" # every hour
 
+        automaticSlottingJob:
+            defaultPutawayAssignee: "admin"
+
     # LDAP configuration
     ldap:
         enabled: false
