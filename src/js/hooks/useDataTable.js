@@ -2,6 +2,8 @@ import { useState } from 'react';
 
 import { getCoreRowModel, getPaginationRowModel, useReactTable } from '@tanstack/react-table';
 
+// Hook handling logic for DataTable component. It handles pagination, changing pages,
+// changing page size and some default table settings
 const useDataTable = ({ pageSize, columns, data }) => {
   const [pagination, setPagination] = useState({
     pageIndex: 0,

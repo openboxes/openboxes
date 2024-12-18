@@ -12,6 +12,7 @@ import cycleCountMockedData from 'consts/cycleCountMockedData';
 import apiClient from 'utils/apiClient';
 import { translateWithDefaultMessage } from 'utils/Translate';
 
+// Hook for managing data which is later populated in data table component.
 const useTableData = ({
   filterParams,
   url,

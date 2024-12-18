@@ -16,6 +16,10 @@ const useAllProductsTab = () => {
   const columnHelper = createColumnHelper();
   const translate = useTranslate();
 
+  const currentLocale = useSelector((state) => ({
+    currentLocale: state.session.activeLanguage,
+  }));
+
   const { tableData, loading } = useTableData({
     filterParams: {},
     // Should be replaced after integrating with backend
@@ -138,7 +142,7 @@ const useAllProductsTab = () => {
         </TableCell>
       ),
     }),
-  ], []);
+  ], [currentLocale]);
 
   const emptyTableMessage = {
     id: 'react.cycleCount.table.emptyTable.label',
