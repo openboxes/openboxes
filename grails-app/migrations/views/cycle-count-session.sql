@@ -1,8 +1,4 @@
 CREATE OR REPLACE VIEW cycle_count_session AS (
-  SELECT
-	*,
-	RANK() OVER (ORDER BY abc_class, inventory_item_count desc) as ranking
-  FROM (
 	SELECT
 		# ID hash of product.id and location.id
 		CRC32(CONCAT(location.id, product.id)) as id,
@@ -32,5 +28,5 @@ CREATE OR REPLACE VIEW cycle_count_session AS (
 	JOIN inventory on location.inventory_id = inventory.id
     WHERE product_availability.quantity_on_hand > 0
 	GROUP BY location.id, product.id, abc_class
-  ) as cycle_count_session
+    ORDER BY abc_class, inventory_item_count desc
 );
