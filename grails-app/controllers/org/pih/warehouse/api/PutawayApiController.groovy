@@ -12,11 +12,14 @@ package org.pih.warehouse.api
 import grails.converters.JSON
 import grails.plugins.rendering.pdf.PdfRenderingService
 import org.grails.web.json.JSONObject
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderIdentifierService
+import org.pih.warehouse.order.OrderStatus
+import org.pih.warehouse.order.OrderType
 
 /**
  * Should not extend BaseDomainApiController since stocklist is not a valid domain.
@@ -26,6 +29,7 @@ class PutawayApiController {
     OrderIdentifierService orderIdentifierService
     def productAvailabilityService
     def putawayService
+    def orderService
     PdfRenderingService pdfRenderingService
 
     def list() {
@@ -36,6 +40,20 @@ class PutawayApiController {
         }
         List putawayItems = putawayService.getPutawayCandidates(location)
         render([data: putawayItems.collect { it.toJson() }] as JSON)
+    }
+
+    def listPutaways() {
+        // MOBILE
+        Location location = params["location.id"] ? Location.get(params["location.id"]) : Location.load(session.warehouse.id)
+        if (!location) {
+            throw new IllegalArgumentException("Must provide location.id as request parameter")
+        }
+        OrderType orderType = OrderType.findByCode(Constants.PUTAWAY_ORDER)
+        OrderStatus status = params.status ? params.status as OrderStatus : OrderStatus.PENDING
+        Order orderCriteria = new Order(orderType: orderType, status: status, origin: location, destination: location)
+        List<Order> orders = orderService.getOrders(orderCriteria)
+        List<Putaway> putaways = orders.collect {  Order order -> Putaway.createFromOrder(order) }
+        render([data: putaways.collect { it.toJson() }] as JSON)
     }
 
     def read() {
