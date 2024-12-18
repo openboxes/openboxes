@@ -9,7 +9,6 @@ CREATE OR REPLACE VIEW cycle_count_session AS (
         inventory.id as inventory_id,
 		product.id as product_id,
 		location.id as facility_id,
-        #IFNULL(inventory_level.abc_class, product.abc_class) as abc_class,
 		product.abc_class as abc_class,
 
 		# Inventory Item Count

@@ -51,15 +51,19 @@ class CycleCountCandidate {
                         name: product.category?.name,
                 ],
                 internalLocations: internalLocations,
-                tags: product.tags?.collect { Tag tag ->
-                    [
-                        id: tag.id,
-                        tag: tag.tag,
-                    ]
-                },
+                tags: tagsToJson(),
                 productCatalogs: product.productCatalogs,
                 abcClass: abcClass,
                 quantityOnHand: quantityOnHand,
         ]
+    }
+
+    List<Map> tagsToJson() {
+        return product.tags?.collect { Tag tag ->
+            [
+                    id : tag.id,
+                    tag: tag.tag,
+            ]
+        }
     }
 }

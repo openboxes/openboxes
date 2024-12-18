@@ -60,8 +60,8 @@ class CycleCountService {
         }
     }
 
-    private static void getCandidatesSortOrder(String sort, String orderDirection, Criteria criteria, Set<String> usedAliases) {
-        switch (sort) {
+    private static void getCandidatesSortOrder(String sortBy, String orderDirection, Criteria criteria, Set<String> usedAliases) {
+        switch (sortBy) {
             case "product":
                 createProductAlias(criteria, usedAliases)
                 criteria.addOrder(getOrderDirection("product.productCode", orderDirection))
