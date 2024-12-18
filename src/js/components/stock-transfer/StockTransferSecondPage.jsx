@@ -414,7 +414,7 @@ class StockTransferSecondPage extends Component {
         })
         .catch(() => this.props.hideSpinner());
     } else {
-      const { stockTransferFromState } = this.state;
+      const { stockTransfer: stockTransferFromState } = this.state;
       let stockTransfer = update(stockTransferFromState, {
         stockTransferItems: {
           $splice: [
@@ -488,7 +488,7 @@ class StockTransferSecondPage extends Component {
       status: null,
     };
 
-    const { stockTransferFromState } = this.state;
+    const { stockTransfer: stockTransferFromState } = this.state;
 
     const stockTransfer = update(stockTransferFromState, {
       stockTransferItems: {
