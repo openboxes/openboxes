@@ -221,11 +221,14 @@ class ReceiptService {
             inventoryItem.save(flush: true)
         }
 
-        if (partialReceiptItem.cancelRemaining && ReceiptStatusCode.RECEIVED == receiptItem.receipt?.receiptStatusCode) {
+        if (partialReceiptItem.cancelRemaining && (partialReceiptItem.mobile || ReceiptStatusCode.RECEIVED == receiptItem.receipt?.receiptStatusCode)) {
             //when completing the pending receipt status was already changed to received and the item quantity will in quantityReceived,
             // so there is no need to subtract quantityReceiving, unless it's split item (which will always have quantity received = 0)
-            Integer qtyCanceled = partialReceiptItem.quantityShipped - (partialReceiptItem.quantityReceived +
-                    (partialReceiptItem.isSplitItem ? partialReceiptItem.quantityReceiving : 0))
+            Integer qtyCanceled = partialReceiptItem.quantityShipped - (
+                    partialReceiptItem.quantityReceived +
+                            (partialReceiptItem.mobile ? partialReceiptItem.quantityReceiving : 0) +
+                            (partialReceiptItem.isSplitItem ? partialReceiptItem.quantityReceiving : 0)
+            )
             receiptItem.quantityCanceled = qtyCanceled
         }
 
