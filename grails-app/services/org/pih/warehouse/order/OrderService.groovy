@@ -801,8 +801,8 @@ class OrderService {
                     orderItem.unitPrice = parsedUnitPrice
 
                     if (recipient) {
-                        Person person = personService.getActivePersonByName(recipient)
-                        if (!person) {
+                        Person person = personService.getPersonByNames(recipient)
+                        if (!person?.active) {
                             throw new IllegalArgumentException("Cannot set a recipient who is non-existant or inactive: ${recipient}")
                         }
                         orderItem.recipient = person
