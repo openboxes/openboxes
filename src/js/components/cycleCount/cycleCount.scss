@@ -1,0 +1,25 @@
+.all-products-tab-footer {
+
+  p {
+    font-weight: 500;
+    color: var(--blue-700);
+    font-size: 14px;
+    margin: auto 0;
+
+    span {
+      font-weight: 400;
+    }
+  }
+
+  .suggestion-button {
+    color: var(--blue-primary);
+
+    &:hover {
+      background: transparent;
+    }
+  }
+}
+
+.sorting-arrows {
+  display: flex !important;
+}

@@ -8,9 +8,11 @@ import queryString from 'query-string';
 import { getTranslate } from 'react-localize-redux';
 import { useSelector } from 'react-redux';
 
+import cycleCountMockedData from 'consts/cycleCountMockedData';
 import apiClient from 'utils/apiClient';
 import { translateWithDefaultMessage } from 'utils/Translate';
 
+// Hook for managing data which is later populated in data table component.
 const useTableData = ({
   filterParams,
   url,
@@ -19,6 +21,7 @@ const useTableData = ({
   getParams,
   onFetchedData,
   defaultSorting,
+  fetchManually,
 }) => {
   // Util ref for react-table to force the fetch of data
   const tableRef = useRef(null);
@@ -55,19 +58,10 @@ const useTableData = ({
     }
   };
 
-  // If filterParams change, refetch the data with applied filters
-  useEffect(() => fireFetchData(), [filterParams]);
-
-  useEffect(() => () => {
-    if (currentLocation?.id) {
-      sourceRef.current.cancel('Fetching canceled');
-    }
-  }, [currentLocation?.id]);
-
   const onFetchHandler = useCallback((tableState) => {
-    if (!_.isEmpty(filterParams)) {
+    if (!_.isEmpty(filterParams) || fetchManually) {
       const offset = tableState.page > 0 ? (tableState.page) * tableState.pageSize : 0;
-      const sortingParams = (tableState.sorted.length > 0 ? {
+      const sortingParams = (tableState.sorted?.length > 0 ? {
         sort: tableState.sorted[0].id,
         order: tableState.sorted[0].desc ? 'desc' : 'asc',
       } : defaultSorting);
@@ -79,6 +73,18 @@ const useTableData = ({
       });
       // Fetch data
       setLoading(true);
+      // Remove after integrating with backend,
+      // temporary returning mocked data for cycle count
+      if (url === 'cycleCount') {
+        setTableData({
+          data: cycleCountMockedData.data,
+          totalCount: cycleCountMockedData.data.length,
+          pages: Math.ceil(cycleCountMockedData.data.length / tableState.pageSize),
+          currentParams: {},
+        });
+        setLoading(false);
+        return;
+      }
       apiClient.get(url, {
         params,
         paramsSerializer: (parameters) => queryString.stringify(parameters),
@@ -99,6 +105,29 @@ const useTableData = ({
         .finally(() => setLoading(false));
     }
   }, [filterParams]);
+
+  // If filterParams change, refetch the data with applied filters
+  useEffect(() => {
+    if (!fetchManually) {
+      fireFetchData();
+    }
+  }, [filterParams]);
+
+  // When we are fetching manually we want to call
+  // initial fetching without any dependencies in array.
+  // The rest of the fetches (on changes in filters, sorting, pagination)
+  // should be call directly on action.
+  useEffect(() => {
+    if (fetchManually) {
+      onFetchHandler(tableData);
+    }
+  }, []);
+
+  useEffect(() => () => {
+    if (currentLocation?.id) {
+      sourceRef.current.cancel('Fetching canceled');
+    }
+  }, [currentLocation?.id]);
 
   return {
     sourceRef,

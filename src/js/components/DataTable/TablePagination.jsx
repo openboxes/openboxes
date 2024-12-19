@@ -51,13 +51,13 @@ const TablePagination = (props) => {
     value === props.pageSize);
 
   return (
-    <div className="table-pagination d-flex flex-row align-items-center justify-content-between py-2 px-3">
+    <div className={`table-pagination d-flex flex-row align-items-center justify-content-between py-2 px-3 ${props.className}`}>
       <div className="d-flex">
         <span>{`${rangeNumberFrom}-${rangeNumberTo}`}</span>
         <span className="mx-1">{props.translate('react.reactTable.pagination.of.label', 'of')}</span>
         <span>{totalDataSize}</span>
       </div>
-      <div className="d-flex">
+      <div className="d-flex pages-selector">
         <nav className="d-flex justify-content-center align-items-center">
           <button
             type="button"
@@ -109,6 +109,7 @@ const mapStateToProps = (state) => ({
 
 TablePagination.defaultProps = {
   totalData: undefined,
+  className: '',
 };
 
 TablePagination.propTypes = {
@@ -123,6 +124,7 @@ TablePagination.propTypes = {
   canPrevious: PropTypes.bool.isRequired,
   totalData: PropTypes.number,
   translate: PropTypes.func.isRequired,
+  className: PropTypes.string,
 };
 
 export default connect(mapStateToProps)(TablePagination);
