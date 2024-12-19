@@ -10,6 +10,7 @@
 package org.pih.warehouse.shipping
 
 import grails.converters.JSON
+import grails.gorm.transactions.Transactional
 import org.grails.web.json.JSONObject
 import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.api.BaseDomainApiController
@@ -17,6 +18,7 @@ import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Document
 import org.pih.warehouse.inventory.LotStatusCode
 
+@Transactional
 class ContainerApiController extends BaseDomainApiController {
 
     def zebraService
@@ -67,7 +69,7 @@ class ContainerApiController extends BaseDomainApiController {
                 throw new IllegalArgumentException("Shipment is a required property")
             }
 
-            Shipment shipment = shipmentService.getShipment(jsonObject.getString("shipment.id"))
+            Shipment shipment = shipmentService.getShipmentInstance(jsonObject.getString("shipment.id"))
             Container container = !jsonObject.isNull("containerNumber") ? Container.findByShipmentAndContainerNumber(shipment, jsonObject.containerNumber) : null
             if (!container) {
                 container = new Container()
@@ -96,9 +98,15 @@ class ContainerApiController extends BaseDomainApiController {
             throw new IllegalArgumentException("Can't find container with given id: ${params.id}")
         }
 
-        ContainerStatus updatedContainerStatus = ContainerStatus.valueOf(params.status)
+        String status = request.JSON?.status
+
+        if (!status) {
+            throw new IllegalArgumentException("Status is required in the request body.")
+        }
+
+        ContainerStatus updatedContainerStatus = ContainerStatus.valueOf(status)
         if (!updatedContainerStatus || !(updatedContainerStatus in ContainerStatus.list())) {
-            throw new IllegalArgumentException("Must provide valid container status (${params.status})")
+            throw new IllegalArgumentException("Must provide valid container status (${status})")
         }
 
         if (updatedContainerStatus == ContainerStatus.MISSING) {

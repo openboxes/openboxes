@@ -185,4 +185,6 @@ class Constants {
     static final String FOUR_OR_MORE = "4+"
 
     static final String NONE = 'None'
+
+    static final String DEFAULT_CONTAINER_LABEL_DOCUMENT_NUMBER = "barcodeLabel:container"
 }
