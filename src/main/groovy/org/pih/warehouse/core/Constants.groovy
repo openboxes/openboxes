@@ -71,6 +71,10 @@ class Constants {
     static final Float POUNDS_PER_KILOGRAM = 0.45359237
     static final Float KILOGRAMS_PER_POUND = 2.20462262
 
+    static final String UOM_CODE_PALLET = "PL"
+    static final String UOM_CODE_CASE = "CS"
+    static final String UOM_CODE_EACH = "EA"
+
     static final ArrayList COLORS = ['FFFFFF', 'FFDFDF', 'FFBFBF', 'FF9F9F', 'FF7F7F', 'FF5F5F', 'FF3F3F', 'FF1F1F', 'FF0000', 'DF1F00', 'C33B00', 'A75700', '8B7300', '6F8F00', '53AB00', '37C700', '1BE300', '00FF00', '00DF1F', '00C33B', '00A757', '008B73', '006F8F', '0053AB', '0037C7', '001BE3', '0000FF', '0000df', '0000c3', '0000a7', '00008b', '00006f', '000053', '000037', '00001b', '000000']
 
     static final ArrayList EXPORT_PRODUCT_COLUMNS = ["Id", "ProductCode", "ProductType", "Name", "ProductFamily", "Category", "GLAccount", "Description", "UnitOfMeasure", "Tags", "UnitCost", "LotAndExpiryControl", "ColdChain", "ControlledSubstance", "HazardousMaterial", "Reconditioned", "Manufacturer", "BrandName", "ManufacturerCode", "ManufacturerName", "Vendor", "VendorCode", "VendorName", "UPC", "NDC", "Created", "Updated"]
