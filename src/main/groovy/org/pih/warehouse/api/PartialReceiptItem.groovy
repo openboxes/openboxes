@@ -17,6 +17,7 @@ class PartialReceiptItem {
     Location binLocation
     Person recipient
     Boolean cancelRemaining = Boolean.FALSE
+    Boolean mobile = Boolean.FALSE // Simple indicator to show that item was received on a mobile device (to enable single item cancellation without completing receipt)
 
     Boolean isSplitItem = Boolean.FALSE
     Boolean shouldSave = Boolean.FALSE
