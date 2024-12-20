@@ -773,5 +773,40 @@ class Shipment implements Comparable, Serializable, Historizable {
         histories.addAll(customEventsHistory)
         return histories
     }
+
+    Map toJson() {
+        def containerList = []
+        def shipmentItemsByContainer = shipmentItems?.groupBy { it.container }
+        shipmentItemsByContainer.each { container, shipmentItems ->
+            containerList << [id: container?.id, name: container?.name, status: container?.containerStatus?.name(), type: container?.containerType?.name, shipmentItems: shipmentItems]
+        }
+
+        return [
+                id                  : id,
+                name                : name,
+                status              : status?.code?.name(),
+                origin              : [
+                        id  : origin?.id,
+                        name: origin?.name,
+                        type: origin?.locationType?.locationTypeCode?.name()
+                ],
+                destination         : [
+                        id  : destination?.id,
+                        name: destination?.name,
+                        type: destination?.locationType?.locationTypeCode?.name()
+
+                ],
+                expectedShippingDate: expectedShippingDate?.format("MM/dd/yyyy HH:mm XXX"),
+                actualShippingDate  : actualShippingDate?.format("MM/dd/yyyy HH:mm XXX"),
+                expectedDeliveryDate: expectedDeliveryDate?.format("MM/dd/yyyy HH:mm XXX"),
+                actualDeliveryDate  : actualDeliveryDate?.format("MM/dd/yyyy HH:mm XXX"),
+                shipmentItems       : shipmentItems,
+                containers          : containerList,
+
+                // Mobile
+                shipmentNumber      : shipmentNumber,
+                receivedCount       : shipmentItems?.findAll { it.isFullyReceived() }.size(),
+        ]
+    }
 }
 
