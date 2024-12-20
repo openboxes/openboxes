@@ -32,15 +32,15 @@ import org.pih.warehouse.product.ProductAvailability
 import org.pih.warehouse.inventory.InventoryLevel
 import org.grails.web.json.JSONObject
 import org.pih.warehouse.core.User
+import org.pih.warehouse.order.OrderIdentifierService
 
 @Transactional
 class PutawayService {
 
     def userService
-    def locationService
     def inventoryService
     def productAvailabilityService
-    def identifierService
+    OrderIdentifierService orderIdentifierService
     def grailsApplication
 
     void generatePutaways(Location location, User putawayAssignee) {
@@ -67,7 +67,6 @@ class PutawayService {
                 putaway.putawayDate = new Date()
                 putaway.putawayStatus = PutawayStatus.PENDING
                 putaway.putawayAssignee = putawayAssignee
-                putaway.putawayNumber = identifierService.generateOrderIdentifier()
                 putawayCandidate.putawayLocation = putawayLocation
                 putaway.putawayItems.add(putawayCandidate)
                 savePutaway(putaway)
@@ -298,7 +297,7 @@ class PutawayService {
         order.orderType = orderType
         order.status = OrderStatus.valueOf(putaway.putawayStatus.toString())
         if (!order.orderNumber) {
-            order.orderNumber = "P-${putaway.putawayNumber}"
+            order.orderNumber = "P-${putaway.putawayNumber ?: orderIdentifierService.generate(order)}"
         }
         order.orderedBy = putaway.putawayAssignee
         order.dateOrdered = new Date()
