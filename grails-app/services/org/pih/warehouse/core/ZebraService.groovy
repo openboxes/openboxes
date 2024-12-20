@@ -26,6 +26,7 @@ class ZebraService {
     }
 
     private Map postData(String urlString, String body) {
+        // TODO: to be tested once we got zebra document type on the server
         try {
             def url = new URL(urlString)
             def connection = (HttpURLConnection) url.openConnection()

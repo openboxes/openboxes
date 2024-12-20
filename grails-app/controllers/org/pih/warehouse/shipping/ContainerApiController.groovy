@@ -33,6 +33,7 @@ class ContainerApiController extends BaseDomainApiController {
     }
 
     def renderLabel = {
+        // TODO: to be tested once we got zebra document type on the server
         Container container = Container.get(params.id)
         Document document = Document.get(params.documentId)
         if (!document) {
@@ -43,6 +44,7 @@ class ContainerApiController extends BaseDomainApiController {
     }
 
     def printLabel = {
+        // TODO: to be tested once we got zebra document type on the server
         try {
             Container container = Container.get(params.id)
             Document document = Document.get(params.documentId)
