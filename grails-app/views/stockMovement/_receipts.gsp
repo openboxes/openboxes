@@ -52,7 +52,11 @@
                 </td>
                 <td>
                     <g:link controller="inventoryItem" action="showStockCard" id="${receiptItem?.product?.id}">
-                        <format:displayName product="${receiptItem?.product}" showTooltip="${true}" />
+                        <format:displayName
+                                product="${receiptItem?.product}"
+                                productSupplier="${receiptItem?.shipmentItem?.orderItem?.productSupplier}"
+                                showTooltip="${true}"
+                        />
                     </g:link>
                 </td>
                 <td>

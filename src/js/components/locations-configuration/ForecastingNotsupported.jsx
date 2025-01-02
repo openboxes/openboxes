@@ -4,9 +4,8 @@ import PropTypes from 'prop-types';
 
 import Translate from 'utils/Translate';
 
-
 const ForecastingNotsupported = ({ previousPage }) => (
-  <React.Fragment>
+  <>
     <div className="classic-form with-description forecasting">
       <div className="form-title">
         <Translate id="react.locationsConfiguration.forecasting.label" defaultMessage="Forecasting" />
@@ -26,7 +25,7 @@ const ForecastingNotsupported = ({ previousPage }) => (
         <Translate id="react.default.button.finish.label" defaultMessage="Finish" />
       </button>
     </div>
-  </React.Fragment>
+  </>
 );
 
 export default ForecastingNotsupported;

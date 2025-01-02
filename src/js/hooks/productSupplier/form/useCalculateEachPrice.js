@@ -12,9 +12,9 @@ const useCalculateEachPrice = ({ control, setValue }) => {
   // eachPrice is a computed value from packagePrice and productPackageQuantity
   useEffect(() => {
     if (
-      !_.isNil(packagePrice) &&
-      !_.isNil(productPackageQuantity) &&
-      productPackageQuantity !== 0
+      !_.isNil(packagePrice)
+      && !_.isNil(productPackageQuantity)
+      && productPackageQuantity !== 0
     ) {
       setValue('packageSpecification.eachPrice', decimalParser(packagePrice / productPackageQuantity, 4));
     } else {

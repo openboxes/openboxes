@@ -2,14 +2,13 @@ package org.pih.warehouse.outbound
 
 import grails.databinding.BindUsing
 import grails.util.Holders
-import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import grails.validation.Validateable
+import org.pih.warehouse.fulfillment.FulfillmentService
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.ProductAvailabilityService
 import org.pih.warehouse.product.Product
-import org.pih.warehouse.product.ProductAvailability
 
 
 class ImportPackingListItem implements Validateable {
@@ -24,39 +23,16 @@ class ImportPackingListItem implements Validateable {
     Product product
 
     @BindUsing({ obj, source ->
-        // set provided lot number
-        if (source['lotNumber']) {
-            return source['lotNumber']
-        }
-
-        // otherwise infer inventory item based on provided bin-location
-        Location internalLocation = Location.findByNameAndParentLocation(source['binLocation'], obj.origin)
-        Product product = Product.findByProductCode(source['product'])
-        List<ProductAvailability> items = ProductAvailability.findAllByProductAndBinLocationAndLocation(product, internalLocation, obj.origin)
-
-        // infer lot-number only if there is a single possible inventory
-        if (items.size() == 1) {
-            return items.first().inventoryItem?.lotNumber
-        }
-
-        return null
+        FulfillmentService fulfillmentService = Holders.grailsApplication.mainContext.getBean(FulfillmentService)
+        return fulfillmentService.bindOrInferLotNumber(obj as ImportPackingListItem, source as Map)
     })
     String lotNumber
 
     Location origin
 
-    @BindUsing({ obj, source ->
-        Location internalLocation = Location.findByNameAndParentLocation(source['binLocation'], obj.origin)
-        // If location is not found, but we provided bin location name, it means, the location was not found,
-        // and we want to indicate that, instead of falling back to default (null)
-        // without this, we would then search e.g. for quantity available to promise for a product in the default bin location
-        if (!internalLocation && source['binLocation'] && !source['binLocation'].equalsIgnoreCase(Constants.DEFAULT_BIN_LOCATION_NAME)) {
-            // We want to indicate, that a bin location for given name has not been found.
-            obj.binLocationFound = false
-            // returns a dummy location object to add more context in a response of what location was not found
-            return new Location(name: source['binLocation'])
-        }
-        return internalLocation
+    @BindUsing({  obj, source ->
+        FulfillmentService fulfillmentService = Holders.grailsApplication.mainContext.getBean(FulfillmentService)
+        return fulfillmentService.bindOrInferBinLocation(obj as ImportPackingListItem, source as Map)
      })
     Location binLocation
 
@@ -112,20 +88,20 @@ class ImportPackingListItem implements Validateable {
         })
         binLocation(nullable: true, validator: { Location binLocation, ImportPackingListItem item ->
             if (!item.binLocationFound) {
-                return ['binLocationNotFound', binLocation.name]
+                return ['binLocationNotFound', binLocation?.name]
             }
         })
         quantityPicked(min: 1, validator: { Integer quantityPicked, ImportPackingListItem item ->
-            if (!item.binLocationFound) {
-                return ['binLocationNotFound', item.binLocation?.name]
-            }
-            ProductAvailabilityService productAvailabilityService = Holders.grailsApplication.mainContext.getBean(ProductAvailabilityService)
             InventoryItem inventoryItem = item.product?.getInventoryItem(item.lotNumber)
             if (!inventoryItem) {
                 return ['inventoryItemNotFound']
             }
             // Associate inventory item's expiration date with expirationDateToDisplay, to display the date in the table
             item.expirationDateToDisplay = inventoryItem.expirationDate
+            if (!item.binLocationFound) {
+                return ['binLocationNotFound', item.binLocation.name]
+            }
+            ProductAvailabilityService productAvailabilityService = Holders.grailsApplication.mainContext.getBean(ProductAvailabilityService)
             Integer quantity = productAvailabilityService.getQuantityAvailableToPromiseForProductInBin(item.origin, item.binLocation, inventoryItem)
             if (quantity <= 0) {
                 return ['stockout']

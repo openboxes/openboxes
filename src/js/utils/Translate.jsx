@@ -22,7 +22,7 @@ import { Translate } from 'react-localize-redux';
  * @param {function} translate - The translation function provided by react-localize-redux.
  * @returns {TranslationCallback} - The translated message function.
  */
-export const translateWithDefaultMessage = translate => (
+export const translateWithDefaultMessage = (translate) => (
 
   (id, defaultMessage, data, options) =>
     translate(id, data, {

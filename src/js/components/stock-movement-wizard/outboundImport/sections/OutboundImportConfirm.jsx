@@ -1,7 +1,9 @@
 import React from 'react';
 
 import PropTypes from 'prop-types';
+import { useDispatch } from 'react-redux';
 
+import { setScrollToBottom } from 'actions';
 import Button from 'components/form-elements/Button';
 import Section from 'components/Layout/v2/Section';
 import OutboundImportItems
@@ -17,32 +19,38 @@ const OutboundImportConfirm = ({
   data,
   tableErrors,
   hasErrors,
-}) => (
-  <Section
-    title={{
-      label: 'react.outboundImport.form.confirmation.label',
-      defaultMessage: 'Confirmation',
-    }}
-  >
-    <OutboundImportShipmentDetails control={control} errors={errors} />
-    <div className="d-flex flex-row justify-content-between">
-      <Button
-        label="react.outboundImport.form.redoImport.label"
-        defaultLabel="Redo import"
-        variant={hasErrors ? 'primary' : 'secondary'}
-        onClick={previous}
-      />
-      <Button
-        label="react.outboundImport.form.finish.label"
-        defaultLabel="Finish"
-        type="submit"
-        disabled={hasErrors}
-        variant="primary"
-      />
-    </div>
-    <OutboundImportItems data={data} errors={tableErrors} />
-  </Section>
-);
+}) => {
+  const dispatch = useDispatch();
+  return (
+    <Section
+      title={{
+        label: 'react.outboundImport.form.confirmation.label',
+        defaultMessage: 'Confirmation',
+      }}
+    >
+      <OutboundImportShipmentDetails control={control} errors={errors} />
+      <div className="d-flex flex-row justify-content-between">
+        <Button
+          label="react.outboundImport.form.redoImport.label"
+          defaultLabel="Redo import"
+          variant={hasErrors ? 'primary' : 'secondary'}
+          onClick={() => {
+            previous();
+            dispatch(setScrollToBottom(true));
+          }}
+        />
+        <Button
+          label="react.outboundImport.form.finish.label"
+          defaultLabel="Finish"
+          type="submit"
+          disabled={hasErrors}
+          variant="primary"
+        />
+      </div>
+      <OutboundImportItems data={data} errors={tableErrors} />
+    </Section>
+  );
+};
 
 export default OutboundImportConfirm;
 

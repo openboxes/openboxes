@@ -20,7 +20,7 @@ jest.mock('react-final-form-arrays', () => ({
   FieldArray: (props) => {
     const { component: Component, name, ...others } = props;
     const fields = {
-      map: callback => [`${name}[0]`, `${name}[1]`].map(callback),
+      map: (callback) => [`${name}[0]`, `${name}[1]`].map(callback),
       value: [{}, {}],
       length: 2,
       name: 'test-field',
@@ -48,7 +48,7 @@ jest.mock('react-virtualized', () => ({
       })))
     );
   },
-  AutoSizer: props => (props.children({ width: 600 })),
+  AutoSizer: (props) => (props.children({ width: 600 })),
   formValueSelector: () => {},
 }));
 
@@ -116,4 +116,3 @@ xdescribe('ArrayField component is correctly rendering', () => {
     expect(rendered.toJSON()).toMatchSnapshot();
   });
 });
-

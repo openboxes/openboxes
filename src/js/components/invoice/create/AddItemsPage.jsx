@@ -111,7 +111,7 @@ const FIELDS = {
         attributes: {
           className: 'text-left',
         },
-        getDynamicAttr: params => ({
+        getDynamicAttr: (params) => ({
           formatValue: () => {
             const { values, rowIndex } = params;
             const rowValue = values?.invoiceItems?.[rowIndex];
@@ -168,21 +168,42 @@ const FIELDS = {
         defaultMessage: 'Unit Price',
         flexWidth: '1',
         attributes: {
-          formatValue: value => (value ? accountingFormat(value) : value),
+          formatValue: (value) => (value ? accountingFormat(value) : value),
         },
       },
-      totalAmount: {
+      amount: {
         type: LabelField,
         label: 'react.invoice.totalPrice.label',
         defaultMessage: 'Total Price',
         flexWidth: '1',
         attributes: {
-          formatValue: value => (value ? accountingFormat(value) : value),
+          formatValue: (value) => (value ? accountingFormat(value) : value),
         },
       },
       deleteButton: DELETE_BUTTON_FIELD,
     },
   },
+};
+
+const someItemsHaveZeroQuantity = (invoiceItems) =>
+  _.some(invoiceItems, (item) => _.parseInt(item.quantity) === 0);
+
+const allItemsHaveZeroQuantity = (invoiceItems) =>
+  _.every(invoiceItems, (item) => _.parseInt(item.quantity) === 0);
+
+const validate = (values) => {
+  const errors = {};
+  errors.invoiceItems = [];
+  _.forEach(values?.invoiceItems, (item, key) => {
+    if (_.isNil(item?.quantity)) {
+      errors.invoiceItems[key] = { quantity: 'react.invoice.error.enterQuantity.label' };
+    }
+    if (_.has(item, 'isValid') && !item.isValid) {
+      errors.invoiceItems[key] = { quantity: item?.errorMessage };
+    }
+  });
+
+  return errors;
 };
 
 class AddItemsPage extends Component {
@@ -220,16 +241,16 @@ class AddItemsPage extends Component {
     const totalValue = _.reduce(invoiceItems, (sum, val) =>
       (sum + (val.totalAmount ? parseFloat(val.totalAmount) : 0.0)), 0);
 
-    this.setState({
+    this.setState((prev) => ({
       values: {
-        ...this.state.values,
+        ...prev.values,
         invoiceItems,
         totalCount,
         totalValue,
       },
-    }, () => {
-      if (!_.isNull(startIndex) &&
-        this.state.values.invoiceItems.length !== this.state.values.totalCount) {
+    }), () => {
+      if (!_.isNull(startIndex)
+        && this.state.values.invoiceItems.length !== this.state.values.totalCount) {
         this.loadMoreRows({ startIndex: startIndex + this.props.pageSize });
       }
       this.props.hideSpinner();
@@ -271,12 +292,12 @@ class AddItemsPage extends Component {
    * @public
    */
   updateTotalCount(value) {
-    this.setState({
+    this.setState((prev) => ({
       values: {
-        ...this.state.values,
-        totalCount: this.state.values.totalCount + value,
+        ...prev.values,
+        totalCount: prev.values.totalCount + value,
       },
-    });
+    }));
   }
 
   /**
@@ -302,7 +323,7 @@ class AddItemsPage extends Component {
   saveInvoiceItems(values) {
     const payload = {
       id: values.id,
-      invoiceItems: _.map(values.invoiceItems, item => ({
+      invoiceItems: _.map(values.invoiceItems, (item) => ({
         id: item.id,
         quantity: _.toInteger(item.quantity),
       })),
@@ -339,7 +360,7 @@ class AddItemsPage extends Component {
    * @public
    */
   nextPage(values) {
-    if (this.someItemsHaveZeroQuantity(values.invoiceItems)) {
+    if (someItemsHaveZeroQuantity(values.invoiceItems)) {
       this.confirmSave(() => {
         this.saveInvoiceItems(values).then(() => this.props.nextPage(values));
       });
@@ -354,7 +375,7 @@ class AddItemsPage extends Component {
    * @public
    */
   previousPage(values) {
-    if (this.someItemsHaveZeroQuantity(values.invoiceItems)) {
+    if (someItemsHaveZeroQuantity(values.invoiceItems)) {
       this.confirmSave(() => {
         this.saveInvoiceItems(values).then(() => this.props.previousPage(values));
       });
@@ -374,37 +395,22 @@ class AddItemsPage extends Component {
 
     return invoiceApi.removeInvoiceItem(itemId)
       .then(() => {
-        this.setState({
+        this.setState((prev) => ({
           values: {
-            ...this.state.values,
-            invoiceItems: update(this.state.values.invoiceItems, {
+            ...prev.values,
+            invoiceItems: update(prev.values.invoiceItems, {
               $splice: [
                 [index, 1],
               ],
             }),
             totalValue: newTotalValue,
           },
-        });
+        }));
       })
       .catch(() => {
         this.props.hideSpinner();
         return Promise.reject(new Error('react.invoice.error.deleteInvoiceItem.label'));
       });
-  }
-
-  validate(values) {
-    const errors = {};
-    errors.invoiceItems = [];
-    _.forEach(values?.invoiceItems, (item, key) => {
-      if (_.isNil(item?.quantity)) {
-        errors.invoiceItems[key] = { quantity: 'react.invoice.error.enterQuantity.label' };
-      }
-      if (_.has(item, 'isValid') && !item.isValid) {
-        errors.invoiceItems[key] = { quantity: item?.errorMessage };
-      }
-    });
-
-    return errors;
   }
 
   async validateInvoiceItem({
@@ -413,9 +419,10 @@ class AddItemsPage extends Component {
   }) {
     this.debouncedInvoiceItemValidation.cancel();
 
+    const { values } = this.state;
     try {
       await invoiceItemApi.validateInvoiceItem(_.pick(invoiceItem, ['quantity', 'id', 'shipmentId']));
-      const updatedValues = update(this.state.values, {
+      const updatedValues = update(values, {
         invoiceItems: {
           [rowIndex]: {
             isValid: { $set: true },
@@ -426,7 +433,7 @@ class AddItemsPage extends Component {
 
       this.setState({ values: updatedValues });
     } catch (err) {
-      const updatedValues = update(this.state.values, {
+      const updatedValues = update(values, {
         invoiceItems: {
           [rowIndex]: {
             isValid: { $set: false },
@@ -442,32 +449,33 @@ class AddItemsPage extends Component {
 
   saveBeforeOpenInvoiceCandidates(values) {
     return new Promise((resolve) => {
-      if (this.someItemsHaveZeroQuantity(values.invoiceItems)) {
+      if (someItemsHaveZeroQuantity(values.invoiceItems)) {
         return this.confirmSave(() => {
           this.saveInvoiceItems(values).then(() => {
             this.loadMoreRows({ startIndex: 0 });
           }).finally(() => resolve());
         });
-      } else {
-        return this.saveInvoiceItems(values).finally(() => resolve());
       }
+      return this.saveInvoiceItems(values).finally(() => resolve());
     });
   }
 
   save(values) {
-    if (this.someItemsHaveZeroQuantity(values.invoiceItems)) {
+    if (someItemsHaveZeroQuantity(values.invoiceItems)) {
       this.confirmSave(() => {
         this.saveInvoiceItems(values).then(() => {
           this.loadMoreRows({ startIndex: 0 });
         });
       });
-    } else {
-      return this.saveInvoiceItems(values);
+
+      return null;
     }
+
+    return this.saveInvoiceItems(values);
   }
 
   saveAndExit(formValues) {
-    if (this.someItemsHaveZeroQuantity(formValues.invoiceItems)) {
+    if (someItemsHaveZeroQuantity(formValues.invoiceItems)) {
       this.confirmSave(() => {
         this.saveInvoiceItems(formValues).then(() => {
           window.location = INVOICE_URL.show(formValues.id);
@@ -480,21 +488,13 @@ class AddItemsPage extends Component {
     }
   }
 
-  someItemsHaveZeroQuantity(invoiceItems) {
-    return _.some(invoiceItems, (item) => _.parseInt(item.quantity) === 0);
-  }
-
-  allItemsHaveZeroQuantity(invoiceItems) {
-    return _.every(invoiceItems, (item) => _.parseInt(item.quantity) === 0);
-  }
-
   render() {
     return (
       <Form
         onSubmit={() => {}}
         mutators={{ ...arrayMutators }}
         initialValues={this.state.values}
-        validate={this.validate}
+        validate={validate}
         render={({ handleSubmit, values, invalid }) => (
           <div className="d-flex flex-column">
             <span className="buttons-container">
@@ -504,7 +504,10 @@ class AddItemsPage extends Component {
                 disabled={invalid}
                 onClick={() => this.save(values)}
               >
-                <span><i className="fa fa-floppy-o pr-2" /><Translate id="react.default.button.save.label" defaultMessage="Save" /></span>
+                <span>
+                  <i className="fa fa-floppy-o pr-2" />
+                  <Translate id="react.default.button.save.label" defaultMessage="Save" />
+                </span>
               </button>
               <button
                 type="button"
@@ -512,7 +515,10 @@ class AddItemsPage extends Component {
                 disabled={invalid}
                 onClick={() => this.saveAndExit(values)}
               >
-                <span><i className="fa fa-sign-out pr-2" /><Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" /></span>
+                <span>
+                  <i className="fa fa-sign-out pr-2" />
+                  <Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" />
+                </span>
               </button>
             </span>
             <form onSubmit={handleSubmit}>
@@ -533,22 +539,27 @@ class AddItemsPage extends Component {
                   }))}
               </div>
               <div className="font-weight-bold float-right mr-5er e mt-1">
-                <Translate id="react.default.total.label" defaultMessage="Total" />:&nbsp;
-                {this.state.values.totalValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {this.state.values.currencyUom.code}
+                <Translate id="react.default.total.label" defaultMessage="Total" />
+                :&nbsp;
+                {this.state.values.totalValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                {' '}
+                {this.state.values.currencyUom.code}
               </div>
               &nbsp;
               <div className="submit-buttons">
                 <button
+                  type="button"
                   onClick={() => this.previousPage(values)}
                   className="btn btn-outline-primary btn-form btn-xs"
                 >
                   <Translate id="react.default.button.previous.label" defaultMessage="Previous" />
                 </button>
                 <button
+                  type="button"
                   disabled={
                     invalid
                     || !values.invoiceItems?.length
-                    || this.allItemsHaveZeroQuantity(values.invoiceItems)
+                    || allItemsHaveZeroQuantity(values.invoiceItems)
                 }
                   onClick={() => this.nextPage(values)}
                   className="btn btn-outline-primary btn-form float-right btn-xs"
@@ -564,7 +575,7 @@ class AddItemsPage extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   pageSize: state.session.pageSize,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
 });

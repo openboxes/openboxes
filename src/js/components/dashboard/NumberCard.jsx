@@ -13,7 +13,6 @@ import { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'components/dashboard/Dashboard.scss';
 
-
 const options = {
   responsive: true,
   maintainAspectRatio: true,
@@ -62,8 +61,16 @@ const NumberSparklineCard = ({
         {translate(cardTitle, cardTitle)}
       </span>
       <div className="result-part">
-        <span style={{ color: getColorByName(color, 'default') }}> {value}  </span>
-        <span className="goal-difference"> {goalDifference} </span>
+        <span style={{ color: getColorByName(color, 'default') }}>
+          {' '}
+          {value}
+          {' '}
+        </span>
+        <span className="goal-difference">
+          {' '}
+          {goalDifference}
+          {' '}
+        </span>
       </div>
 
       <Line
@@ -74,9 +81,13 @@ const NumberSparklineCard = ({
     </div>
     <div className="number-infos">
       <Tooltip
-        html={
-          <p> {translate(cardInfo, cardInfo)} </p>
-        }
+        html={(
+          <p>
+            {' '}
+            {translate(cardInfo, cardInfo)}
+            {' '}
+          </p>
+        )}
         theme="transparent"
         arrow="true"
         disabled={!cardInfo}
@@ -110,7 +121,13 @@ const NumberCard = SortableElement(({
   const cardNumberLocale = cardNumber ? cardNumber.toLocaleString() : ZERO.toLocaleString();
   const card = !isSparkline ? (
     <Tooltip
-      html={<p style={{ whiteSpace: 'pre' }}> {cardDataTooltip} </p>}
+      html={(
+        <p style={{ whiteSpace: 'pre' }}>
+          {' '}
+          {cardDataTooltip}
+          {' '}
+        </p>
+)}
       theme="transparent"
       arrow="true"
       disabled={!cardDataTooltip}
@@ -120,32 +137,39 @@ const NumberCard = SortableElement(({
           <span className="title-card">
             {translate(cardTitle, cardTitle)}
           </span>
-          <span className="result-card"> {cardNumberType === 'number' ? cardNumberLocale : `${cardNumberLocale} ${currencyCode}`} </span>
+          <span className="result-card">
+            {' '}
+            {cardNumberType === 'number' ? cardNumberLocale : `${cardNumberLocale} ${currencyCode}`}
+            {' '}
+          </span>
           <span className="subtitle-card text-overflow-ellipsis text-nowrap">
             {translate(cardSubtitle, cardSubtitle)}
           </span>
         </div>
         {
-          cardInfo ?
-            <div className="number-infos">
-              <Tooltip
-                html={
-                  <p>
-                    {translate(cardInfo, cardInfo)}
-                  </p>
-                }
-                theme="transparent"
-                arrow="true"
-              >
-                <i className="fa fa-info-circle" />
-              </Tooltip>
-            </div>
-        : null}
+          cardInfo
+            ? (
+              <div className="number-infos">
+                <Tooltip
+                  html={(
+                    <p>
+                      {translate(cardInfo, cardInfo)}
+                    </p>
+                )}
+                  theme="transparent"
+                  arrow="true"
+                >
+                  <i className="fa fa-info-circle" />
+                </Tooltip>
+              </div>
+            )
+            : null
+}
         {!hideDraghandle && <DragHandle />}
       </div>
     </Tooltip>
-  ) :
-    (
+  )
+    : (
       <NumberSparklineCard
         cardTitle={cardTitle}
         cardInfo={cardInfo}
@@ -162,7 +186,7 @@ const NumberCard = SortableElement(({
   );
 });
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
   currencyCode: state.session.currencyCode,
 });

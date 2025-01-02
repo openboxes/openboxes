@@ -9,8 +9,8 @@ import InvoiceOptionsForm from 'components/invoice/create/InvoiceOptionsForm';
 import InvoicePrepayedItemsTable from 'components/invoice/create/InvoicePrepayedItemsTable';
 import useConfirmInvoicePage from 'hooks/invoice/useConfirmInvoicePage';
 import useInvoicePrepaidItemsTable from 'hooks/invoice/useInvoicePrepaidItemsTable';
-import Translate from 'utils/Translate';
 import useSpinner from 'hooks/useSpinner';
+import Translate from 'utils/Translate';
 
 const PREPAYMENT_INVOICE = 'PREPAYMENT_INVOICE';
 
@@ -21,9 +21,10 @@ const ConfirmInvoicePage = ({ initialValues, previousPage }) => {
     totalValue,
     submitInvoice,
     postInvoice,
-    updateInvoiceItemQuantity,
+    updateInvoiceItemData,
     refetchData,
     loadMoreRows,
+    invoiceItemsMap,
   } = useConfirmInvoicePage({ initialValues });
 
   const spinner = useSpinner();
@@ -31,13 +32,14 @@ const ConfirmInvoicePage = ({ initialValues, previousPage }) => {
   const invoicePrepaidItemsTableData = useInvoicePrepaidItemsTable({
     invoiceItems: stateValues.invoiceItems,
     invoiceId: stateValues.id,
-    updateInvoiceItemQuantity,
+    invoiceItemsMap,
+    updateInvoiceItemData,
     refetchData,
   });
 
   const {
     isValid,
-    updateRowQuantity,
+    updateRow,
     updateInvoiceItem,
     save,
   } = invoicePrepaidItemsTableData;
@@ -76,7 +78,7 @@ const ConfirmInvoicePage = ({ initialValues, previousPage }) => {
                 <Translate id="react.default.button.previous.label" defaultMessage="Previous" />
               </button>
               <button
-                type="submit"
+                type="button"
                 onClick={() => {
                   spinner.show();
                   if (
@@ -102,7 +104,7 @@ const ConfirmInvoicePage = ({ initialValues, previousPage }) => {
               {isSuperuser
                   && (
                   <button
-                    type="submit"
+                    type="button"
                     onClick={() => {
                       spinner.show();
                       if (
@@ -134,8 +136,8 @@ const ConfirmInvoicePage = ({ initialValues, previousPage }) => {
                   invoiceItems={stateValues.invoiceItems}
                   loadMoreRows={loadMoreRows}
                   isPrepaymentInvoice={stateValues.isPrepaymentInvoice}
-                  updateInvoiceItemQuantity={
-                    updateInvoiceItemQuantity(updateRowQuantity)
+                  updateInvoiceItemData={
+                    updateInvoiceItemData(updateRow)
                   }
                   invoicePrepaidItemsTableData={invoicePrepaidItemsTableData}
                   invoiceStatus={stateValues.status}

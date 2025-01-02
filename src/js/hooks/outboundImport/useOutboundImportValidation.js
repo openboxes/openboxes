@@ -49,9 +49,21 @@ const useOutboundImportValidation = () => {
     dateShipped: z.string({
       required_error: translate('react.outboundImport.validation.dateShipped.required.label', 'Date shipped is required'),
       invalid_type_error: translate('react.outboundImport.validation.dateShipped.required.label', 'Date shipped is required'),
-    }).refine((pickedDate) =>
-      validateFutureDate(pickedDate), {
-      message: translate('react.outboundImport.validation.dateRequested.futureDate.label', 'The date cannot be in the future'),
+    }).superRefine((pickedDate, ctx) => {
+      if (!validateFutureDate(pickedDate)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: translate('react.outboundImport.validation.dateRequested.futureDate.label', 'The date cannot be in the future'),
+        });
+      }
+      const { expectedDeliveryDate, dateShipped } = data;
+      if (!validateDateIsSameOrAfter(expectedDeliveryDate, dateShipped)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: translate('react.outboundImport.validation.expectedDeliveryDate.afterDateShipped.label',
+            'Please verify timeline. Delivery date cannot be before Ship date.'),
+        });
+      }
     }),
     shipmentType: z.object({
       id: z.string(),

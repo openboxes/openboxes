@@ -12,14 +12,18 @@ const StockMovementOutboundHeader = ({ showMyStockMovements, isRequestsOpen }) =
     <span className="d-flex align-self-center title">
       {
         isRequestsOpen
-          ? (<Translate
-            id="react.stockMovement.request.list.label"
-            defaultMessage="Request List"
-          />)
-          : (<Translate
-            id="react.stockMovement.outbound.list.label"
-            defaultMessage="Outbound Movement List"
-          />)
+          ? (
+            <Translate
+              id="react.stockMovement.request.list.label"
+              defaultMessage="Request List"
+            />
+          )
+          : (
+            <Translate
+              id="react.stockMovement.outbound.list.label"
+              defaultMessage="Outbound Movement List"
+            />
+          )
       }
     </span>
     <div className="d-flex justify-content-end buttons align-items-center">

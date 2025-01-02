@@ -65,7 +65,7 @@ export default (Component) => {
         TrComponent,
         getTrProps,
       };
-      return <Component {...rest} {...extra} ref={r => (this.wrappedInstance = r)} />;
+      return <Component {...rest} {...extra} ref={(r) => (this.wrappedInstance = r)} />;
     }
   };
   wrapper.displayName = 'RTTreeTable';

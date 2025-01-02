@@ -18,7 +18,6 @@ import { debounceAvailableItemsFetch } from 'utils/option-utils';
 import Translate from 'utils/Translate';
 import { formatDate } from 'utils/translation-utils';
 
-
 const FIELDS = {
   reasonCode: {
     type: SelectField,
@@ -28,7 +27,7 @@ const FIELDS = {
       required: true,
       className: 'mb-2',
     },
-    getDynamicAttr: props => ({
+    getDynamicAttr: (props) => ({
       options: props.reasonCodes,
     }),
   },
@@ -42,8 +41,8 @@ const FIELDS = {
     }) => {
       let className = '';
       const rowDate = new Date(rowValues.minExpirationDate);
-      const origDate = originalItem && originalItem.minExpirationDate ?
-        new Date(originalItem.minExpirationDate) : null;
+      const origDate = originalItem && originalItem.minExpirationDate
+        ? new Date(originalItem.minExpirationDate) : null;
       if (!rowValues.originalItem) {
         className = (origDate && rowDate && rowDate < origDate) || (!origDate && rowDate) ? 'text-danger' : '';
       } else {
@@ -61,10 +60,11 @@ const FIELDS = {
         type="button"
         className="btn btn-outline-success btn-xs"
         onClick={() => addRow({}, null, false)}
-      ><Translate
-        id="react.default.button.addCustomSubstitution.label"
-        defaultMessage="Add custom substitution"
-      />
+      >
+        <Translate
+          id="react.default.button.addCustomSubstitution.label"
+          defaultMessage="Add custom substitution"
+        />
       </button>
     ),
     fields: {
@@ -97,17 +97,26 @@ const FIELDS = {
         fieldKey: '',
         attributes: {
           // eslint-disable-next-line no-nested-ternary
-          formatValue: fieldValue => (_.get(fieldValue, 'quantityAvailable') ? _.get(fieldValue, 'quantityAvailable')
-            .toLocaleString('en-US') :
-            _.get(fieldValue, 'product.quantityAvailable') ? _.get(fieldValue, 'product.quantityAvailable')
+          formatValue: (fieldValue) => (_.get(fieldValue, 'quantityAvailable') ? _.get(fieldValue, 'quantityAvailable')
+            .toLocaleString('en-US')
+            : _.get(fieldValue, 'product.quantityAvailable') ? _.get(fieldValue, 'product.quantityAvailable')
               .toLocaleString('en-US') : null),
           showValueTooltip: true,
         },
         getDynamicAttr: ({ fieldValue }) => ({
-          tooltipValue: _.map(fieldValue && fieldValue.availableItems, availableItem =>
+          tooltipValue: _.map(fieldValue && fieldValue.availableItems, (availableItem) =>
             (
-              <p>{fieldValue.productCode} {fieldValue.productName}, {availableItem.expirationDate ? availableItem.expirationDate : '---'},
-                Qty {availableItem.quantityAvailable}
+              <p>
+                {fieldValue.productCode}
+                {' '}
+                {fieldValue.productName}
+                ,
+                {' '}
+                {availableItem.expirationDate ? availableItem.expirationDate : '---'}
+                ,
+                Qty
+                {' '}
+                {availableItem.quantityAvailable}
               </p>
             )),
         }),
@@ -189,9 +198,9 @@ class SubstitutionsModal extends Component {
   onSave(values) {
     this.props.showSpinner();
 
-    const substitutions = _.filter(values.substitutions, sub =>
+    const substitutions = _.filter(values.substitutions, (sub) =>
       sub.quantitySelected > 0);
-    const originalItem = _.find(values.substitutions, sub => sub.originalItem)
+    const originalItem = _.find(values.substitutions, (sub) => sub.originalItem)
       || this.state.attr.lineItem;
     const substitutionReasonCode = _.get(values, 'reasonCode.value');
 
@@ -224,7 +233,7 @@ class SubstitutionsModal extends Component {
       .then((resp) => {
         let substitutions = _.map(
           resp.data.data,
-          val => ({
+          (val) => ({
             ...val,
             disabled: true,
             product: {
@@ -271,7 +280,7 @@ class SubstitutionsModal extends Component {
           originalItem,
         });
       })
-      .catch(err => err)
+      .catch((err) => err)
       .finally(() => this.setState({
         isLoading: false,
       }));
@@ -314,9 +323,10 @@ class SubstitutionsModal extends Component {
           <Translate
             id="react.stockMovement.quantitySelected.label"
             defaultMessage="Quantity selected"
-          />: {_.reduce(values.substitutions, (sum, val) =>
-          (sum + (val.quantitySelected ? _.toInteger(val.quantitySelected) : 0)), 0)
-        }
+          />
+          :
+          {_.reduce(values.substitutions, (sum, val) =>
+            (sum + (val.quantitySelected ? _.toInteger(val.quantitySelected) : 0)), 0)}
         </div>
         <hr />
       </div>
@@ -349,7 +359,9 @@ class SubstitutionsModal extends Component {
             <Translate
               id="react.stockMovement.productCode.label"
               defaultMessage="Product code"
-            />: {this.state.attr.lineItem.productCode}
+            />
+            :
+            {this.state.attr.lineItem.productCode}
           </div>
           <div className="font-weight-bold">
             <Tooltip
@@ -361,9 +373,11 @@ class SubstitutionsModal extends Component {
               <Translate
                 id="react.stockMovement.productName.label"
                 defaultMessage="Product name"
-              />: {
-              this.state.attr.lineItem.product.displayNames?.default ??
-              this.state.attr.lineItem.product.name
+              />
+              :
+              {
+              this.state.attr.lineItem.product.displayNames?.default
+              ?? this.state.attr.lineItem.product.name
               }
             </Tooltip>
           </div>
@@ -371,7 +385,9 @@ class SubstitutionsModal extends Component {
             <Translate
               id="react.stockMovement.quantityRequested.label"
               defaultMessage="Qty Requested"
-            />: {this.state.attr.lineItem.quantityRequested}
+            />
+            :
+            {this.state.attr.lineItem.quantityRequested}
           </div>
         </div>
       </ModalWrapper>
@@ -379,7 +395,7 @@ class SubstitutionsModal extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   debounceTime: state.session.searchConfig.debounceTime,
   minSearchLength: state.session.searchConfig.minSearchLength,
   formatLocalizedDate: formatDate(state.localize),

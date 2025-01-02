@@ -18,6 +18,7 @@
       DROP VIEW IF EXISTS order_item_payment_status;
       DROP VIEW IF EXISTS order_payment_status_from_adjustments;
       DROP VIEW IF EXISTS order_adjustment_payment_status;
+      DROP VIEW IF EXISTS order_adjustment_details;
       DROP VIEW IF EXISTS order_summary;
       DROP VIEW IF EXISTS order_item_details;
       DROP VIEW IF EXISTS order_item_status;

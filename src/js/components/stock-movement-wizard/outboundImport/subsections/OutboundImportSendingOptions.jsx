@@ -95,6 +95,10 @@ const OutboundImportSendingOptions = ({ control, errors, trigger }) => {
                 errorMessage={errors.expectedDeliveryDate?.message}
                 required
                 {...field}
+                onBlur={() => {
+                  field.onBlur();
+                  trigger('dateShipped');
+                }}
               />
             )}
           />

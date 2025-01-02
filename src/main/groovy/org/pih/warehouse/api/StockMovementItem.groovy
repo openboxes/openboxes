@@ -10,6 +10,7 @@ import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.product.ProductSupplier
 import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.shipping.ShipmentItem
 
@@ -24,6 +25,7 @@ class StockMovementItem {
 
     StockMovement stockMovement
     RequisitionItem requisitionItem
+    ProductSupplier productSupplier
 
     BigDecimal quantityRequested
     BigDecimal quantityOnHand
@@ -32,6 +34,8 @@ class StockMovementItem {
     BigDecimal quantityCanceled
     BigDecimal quantityPicked
     BigDecimal quantityShipped
+
+    String unitOfMeasure
 
     // saved QOH in ward request
     Integer quantityCounted
@@ -76,6 +80,13 @@ class StockMovementItem {
             it?.product?.productCode == requisitionItem?.product?.productCode
         }
         return stocklistItem?.quantity ?: null
+    }
+
+    BigDecimal getPacksRequested () {
+        if (packSize == null || packSize == 0 || quantityRequested == null) {
+            return null
+        }
+        return quantityRequested?.toBigDecimal() / packSize.toBigDecimal()
     }
 
 
@@ -131,6 +142,8 @@ class StockMovementItem {
                 quantityCanceled          : quantityCanceled,
                 quantityRevised           : quantityRevised,
                 quantityPicked            : quantityPicked,
+                unitOfMeasure             : unitOfMeasure,
+                packsRequested            : packsRequested,
                 quantityRequired          : quantityRequired,
                 reasonCode                : reasonCode,
                 comments                  : comments,
@@ -138,6 +151,11 @@ class StockMovementItem {
                 substitutionItems         : substitutionItems,
                 sortOrder                 : sortOrder,
                 orderItemId               : orderItemId,
+                productSupplier           : productSupplier ? [
+                        id            : productSupplier.id,
+                        name          : productSupplier.name,
+                        code          : productSupplier.code,
+                ] : null,
                 orderNumber               : orderNumber,
                 orderId                   : orderId,
                 packSize                  : packSize,
@@ -172,6 +190,7 @@ class StockMovementItem {
                 palletName: palletName,
                 boxName: boxName,
                 orderItemId: shipmentItem.orderItemId,
+                productSupplier: shipmentItem.orderItem?.productSupplier,
                 comments: null,
                 lotNumber: shipmentItem?.inventoryItem?.lotNumber ?: "",
                 expirationDate: shipmentItem?.inventoryItem?.expirationDate,
@@ -179,6 +198,7 @@ class StockMovementItem {
                 orderNumber: shipmentItem?.orderNumber,
                 orderId: shipmentItem?.orderId,
                 quantityAvailable: shipmentItem.quantityRemainingToShip,
+                unitOfMeasure: shipmentItem.unitOfMeasure,
                 packSize: shipmentItem.quantityPerUom,
         )
     }
@@ -234,6 +254,7 @@ class StockMovementItem {
                 quantityRequested: orderItem.quantityRemainingToShip * orderItem.quantityPerUom,
                 recipient: orderItem.recipient,
                 orderItemId: orderItem.id,
+                productSupplier: orderItem.productSupplier,
                 orderNumber: orderItem.order.orderNumber,
         )
     }

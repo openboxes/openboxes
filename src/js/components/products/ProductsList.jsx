@@ -9,7 +9,6 @@ import ProductsListTable from 'components/products/ProductsListTable';
 import useProductFilters from 'hooks/list-pages/product/useProductFilters';
 import useTranslation from 'hooks/useTranslation';
 
-
 const ProductsList = () => {
   const {
     defaultFilterValues,
@@ -20,6 +19,7 @@ const ProductsList = () => {
     glAccounts,
     filterParams,
     productGroups,
+    handlingRequirements,
   } = useProductFilters();
 
   useTranslation('productsList', 'reactTable');
@@ -32,7 +32,12 @@ const ProductsList = () => {
         setFilterParams={setFilterValues}
         filterFields={filterFields}
         formProps={{
-         categories, catalogs, tags, glAccounts, productGroups,
+          categories,
+          catalogs,
+          tags,
+          glAccounts,
+          productGroups,
+          handlingRequirements,
         }}
       />
       <ProductsListTable filterParams={filterParams} />

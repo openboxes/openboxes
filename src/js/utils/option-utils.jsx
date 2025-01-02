@@ -6,6 +6,7 @@ import locationApi from 'api/services/LocationApi';
 import organizationApi from 'api/services/OrganizationApi';
 import productApi from 'api/services/ProductApi';
 import productGroupApi from 'api/services/ProductGroupApi';
+import selectOptionsApi from 'api/services/SelectOptionsApi';
 import userApi from 'api/services/UserApi';
 import apiClient from 'utils/apiClient';
 import splitTranslation from 'utils/translation-utils';
@@ -107,7 +108,7 @@ export const debounceGlobalSearch = (waitTime, minSearchLength) =>
     }
   }, waitTime);
 
-export const debounceProductsFetch = (waitTime, minSearchLength, locationId) =>
+export const debounceProductsFetch = (waitTime, minSearchLength, locationId, params = {}) =>
   _.debounce((searchTerm, callback) => {
     if (searchTerm && searchTerm.length >= minSearchLength) {
       apiClient.get(encodeURI(`/api/products/search?name=${searchTerm}&productCode=${searchTerm}&location.id=${locationId}`))
@@ -123,7 +124,7 @@ export const debounceProductsFetch = (waitTime, minSearchLength, locationId) =>
             color: obj.color,
             exactMatch: obj.exactMatch,
             active: obj.active,
-            label: `${obj.productCode} - ${obj.displayName ?? obj.name}`,
+            label: `${obj.productCode} - ${obj.displayName ?? obj.name} ${(params.includeUom && obj.unitOfMeasure) ? `[${obj.unitOfMeasure}]` : ''}`,
           }
         ))))
         .catch(() => callback([]));
@@ -260,6 +261,11 @@ export const fetchProductsGlAccounts = async (params) => {
 
 export const fetchProductGroups = async () => {
   const { data } = await productGroupApi.getProductGroupsOptions();
+  return data.data;
+};
+
+export const fetchHandlingRequirements = async () => {
+  const { data } = await selectOptionsApi.getHandlingRequirementsOptions();
   return data.data;
 };
 

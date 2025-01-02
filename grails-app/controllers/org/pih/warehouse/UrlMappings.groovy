@@ -101,6 +101,11 @@ class UrlMappings {
             action = [GET: "ratingTypeCodeOptions"]
         }
 
+        "/api/handlingRequirementsOptions" {
+            controller = { "selectOptionsApi" }
+            action = [GET: "handlingRequirementsOptions"]
+        }
+
         "/api/products"(parseRequest: true) {
             controller = { "productApi" }
             action = [GET: "list"]
@@ -925,6 +930,11 @@ class UrlMappings {
         "/api/generic/${resource}/$id"(parseRequest: false) {
             controller = "genericApi"
             action = [GET: "read", POST: "update", PUT: "update", DELETE: "delete"]
+        }
+
+        "/api/facilities/$facilityId/cycle-count-candidates" {
+            controller = "cycleCountApi"
+            action = [GET: "getCandidates"]
         }
 
         // Error handling

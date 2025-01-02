@@ -26,7 +26,8 @@
                                 ${invoiceItem?.description}
                             </g:if>
                             <g:else>
-                                <format:displayName product="${invoiceItem?.product}" showTooltip="${true}" />
+                                <g:set var="orderItem"  value="${invoiceItem?.orderItem ?: invoiceItem?.shipmentItem?.orderItem}" />
+                                <format:displayName product="${invoiceItem?.product}" productSupplier="${orderItem?.productSupplier}" showTooltip="${true}" />
                             </g:else>
                         </td>
                         <td>
@@ -36,7 +37,7 @@
                         <td>${invoiceItem?.invoice?.status}</td>
                         <td>${invoiceItem?.quantity}</td>
                         <td>${invoiceItem?.unitOfMeasure}</td>
-                        <td>${invoiceItem?.unitPrice}</td>
+                        <td><g:formatNumber number="${invoiceItem?.unitPrice}"/></td>
                         <td><g:formatNumber number="${invoiceItem?.amount}"/></td>
                     </tr>
                 </g:each>

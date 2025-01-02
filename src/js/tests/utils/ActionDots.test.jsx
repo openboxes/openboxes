@@ -30,12 +30,14 @@ describe('action dots', () => {
       variant: 'danger',
       label: 'testLabel',
       defaultLabel: 'defaultLabelTest',
-      leftIcon: <React.Fragment>leftIconTest</React.Fragment>,
+      leftIcon: <>leftIconTest</>,
     }];
-    actionDots = (<ContextMenu
-      id="1"
-      actions={actions}
-    />);
+    actionDots = (
+      <ContextMenu
+        id="1"
+        actions={actions}
+      />
+    );
   });
 
   it('should match snapshot', () => {

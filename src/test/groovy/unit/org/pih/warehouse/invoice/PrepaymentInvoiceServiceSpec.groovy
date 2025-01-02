@@ -347,6 +347,52 @@ class PrepaymentInvoiceServiceSpec extends Specification implements ServiceUnitT
         thrown(Exception)
     }
 
+    void 'getUnitPriceToInverse should calculate unitPrice to inverse #unitPriceToInverse when unitPrice invoiced is #unitPriceInvoiced and unitPrice inverseable is #unitPriceInverseable'() {
+        when:
+        BigDecimal unitPriceToInverseCalc = service.getUnitPriceToInverse(unitPriceInvoiced, unitPriceInversable)
+
+        then:
+        assert unitPriceToInverseCalc == unitPriceToInverse
+
+        where:
+        unitPriceInvoiced   | unitPriceInversable   | unitPriceToInverse
+        1.0                 | 1.0                   | 1.0
+        -1.0                | -1.0                  | -1.0
+        1.0                 | 0.0                   | 0.0
+        0.0                 | 1.0                   | 0.0
+        -1.0                | 0.0                   | 0.0
+        0.0                 | -1.0                  | 0.0
+    }
+
+    void 'getUnitPriceAvailableToInverse should calculate unit price available to inverse #unitPriceAvailableToInverse when unit price on prepayment item is #prepaymentItemUnitPrice and inversed unit price is #inversedUnitPrice'() {
+        given:
+        InvoiceItem prepaymentItem = new InvoiceItem()
+        prepaymentItem.unitPrice = prepaymentItemUnitPrice
+        OrderAdjustment orderAdjustment = Spy(OrderAdjustment) {
+            getInversedUnitPrice() >> inversedUnitPrice
+        }
+
+        when:
+        BigDecimal unitPriceAvailableToInverseCalc = service.getUnitPriceAvailableToInverse(
+                prepaymentItem.unitPrice,
+                orderAdjustment.inversedUnitPrice
+        )
+
+        then:
+        assert unitPriceAvailableToInverseCalc == unitPriceAvailableToInverse
+
+        where:
+        prepaymentItemUnitPrice | inversedUnitPrice | unitPriceAvailableToInverse
+        1.0                     | 1.0               | 0.0
+        -1.0                    | -1.0              | 0.0
+        1.0                     | 0.0               | 1.0
+        -1.0                    | 0.0               | -1.0
+        0.0                     | 0.0               | 0.0
+        10                      | 3                 | 7
+        -5                      | -2                | -3
+        -5                      | -5                | 0
+    }
+
     private Set<InvoiceItem> getInvoiceItemsOnOrderItems(Invoice invoice) {
         return invoice.invoiceItems.findAll{ it.orderItems }
     }

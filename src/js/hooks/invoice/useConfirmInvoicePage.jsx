@@ -22,7 +22,9 @@ const useConfirmInvoicePage = ({ initialValues }) => {
 
   const [stateValues, setStateValues] = useState({
     ...initialValues,
-    invoiceItems: [],
+    // react-virtualize expects a map for checking if an item is already fetched. Using a list
+    // results in fetching the same items range multiple times.
+    invoiceItems: new Map(),
   });
 
   /**
@@ -65,26 +67,31 @@ const useConfirmInvoicePage = ({ initialValues }) => {
       });
   };
 
+  const parseItemsToMap = (items, indexOffset = 0) =>
+    new Map(items.map((item, index) => [index + indexOffset, item]));
+
+  const addToLineItems = (stateData, newItems, firstIndex) => {
+    const items = parseItemsToMap(newItems, firstIndex);
+    return new Map([...Array.from(stateData), ...items]);
+  };
+
   /**
    * Sets state of invoice items after fetch and calls method to fetch next items
    * @param response
    * @param {boolean} overrideInvoiceItems
+   * @param startIndex
    * @public
    */
-  const setInvoiceItems = (response, overrideInvoiceItems = true) => {
+  const setInvoiceItems = (response, overrideInvoiceItems = true, startIndex = 0) => {
     spinner.show();
     const { data, totalCount } = response.data;
     setStateValues((state) => ({
       ...state,
       invoiceItems: overrideInvoiceItems
-        ? data
-        : [
-          ...state.invoiceItems,
-          ...data,
-        ],
+        ? parseItemsToMap(data)
+        : addToLineItems(state.invoiceItems, data, startIndex),
       totalCount,
     }));
-
     spinner.hide();
   };
 
@@ -94,26 +101,32 @@ const useConfirmInvoicePage = ({ initialValues }) => {
    * @public
    */
   const loadMoreRows = useCallback(
-    ({ startIndex, overrideInvoiceItems = false }) => invoiceApi.getInvoiceItems(stateValues.id, {
-      params: { offset: startIndex, max: pageSize },
-    })
-      .then((response) => {
-        setInvoiceItems(response, overrideInvoiceItems);
-      }),
+    ({ startIndex, stopIndex, overrideInvoiceItems = false }) =>
+      invoiceApi.getInvoiceItems(stateValues.id, {
+        params: { offset: startIndex, max: stopIndex ? (stopIndex - startIndex + 1) : pageSize },
+      })
+        .then((response) => {
+          setInvoiceItems(response, overrideInvoiceItems, startIndex);
+        }),
     [stateValues.id, pageSize],
   );
 
-  const updateInvoiceItemQuantity = (updateRowQuantity) => (invoiceItemId) => (quantity) => {
-    updateRowQuantity?.(invoiceItemId, quantity);
+  const updateInvoiceItemData = (updateRow) => (invoiceItemId, fieldName) => (value) => {
+    updateRow?.(
+      invoiceItemId,
+      {
+        [fieldName]: value,
+      },
+    );
     setStateValues((state) => ({
       ...state,
-      invoiceItems: state.invoiceItems.map((item) => {
+      invoiceItems: new Map(Array.from(state.invoiceItems).map(([idx, item]) => {
         if (item.id === invoiceItemId) {
-          return { ...item, quantity };
+          return [idx, { ...item, [fieldName]: value }];
         }
 
-        return item;
-      }),
+        return [idx, item];
+      })),
     }));
   };
 
@@ -126,6 +139,7 @@ const useConfirmInvoicePage = ({ initialValues }) => {
       await fetchInvoiceData();
       await loadMoreRows({
         startIndex: 0,
+        stopIndex: stateValues.totalCount,
         overrideInvoiceItems,
       });
     } finally {
@@ -136,13 +150,17 @@ const useConfirmInvoicePage = ({ initialValues }) => {
 
   return {
     isSuperuser,
-    stateValues,
+    stateValues: {
+      ...stateValues,
+      invoiceItems: Array.from(stateValues.invoiceItems.values()),
+    },
+    invoiceItemsMap: stateValues.invoiceItems,
     fetchInvoiceData,
     totalValue,
     submitInvoice,
     postInvoice,
     setInvoiceItems,
-    updateInvoiceItemQuantity,
+    updateInvoiceItemData,
     refetchData,
     loadMoreRows,
   };

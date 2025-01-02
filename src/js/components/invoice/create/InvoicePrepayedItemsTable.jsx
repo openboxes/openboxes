@@ -8,7 +8,7 @@ import { Tooltip } from 'react-tippy';
 import ArrayField from 'components/form-elements/ArrayField';
 import LabelField from 'components/form-elements/LabelField';
 import TextInput from 'components/form-elements/v2/TextInput';
-import { ORDER_URL, STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
+import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
 import ContextMenu from 'utils/ContextMenu';
 import { renderFormField } from 'utils/form-utils';
 import { getInvoiceDescription } from 'utils/form-values-utils';
@@ -65,19 +65,6 @@ const INVOICE_ITEMS = {
         label: '',
         defaultMessage: '',
         flexWidth: '0.25',
-      },
-      orderNumber: {
-        type: LabelField,
-        label: 'react.invoice.orderNumber.label',
-        defaultMessage: 'PO Number',
-        flexWidth: '1',
-        getDynamicAttr: (params) => {
-          const { invoiceItems, rowIndex } = params;
-          const orderId = invoiceItems
-            && invoiceItems[rowIndex]
-            && invoiceItems[rowIndex].orderId;
-          return { url: orderId ? ORDER_URL.show(orderId) : '' };
-        },
       },
       shipmentNumber: {
         type: LabelField,
@@ -137,7 +124,7 @@ const INVOICE_ITEMS = {
           const invoiceItem = params?.invoiceItems[params?.rowIndex];
           const errors = params.validate(invoiceItem);
           return (
-            params.isEditable(invoiceItem?.id)
+            params.isEditable(invoiceItem?.id) && !invoiceItem?.orderAdjustment
               ? (
                 <Tooltip
                   html={<div className="custom-tooltip">{errors}</div>}
@@ -149,8 +136,8 @@ const INVOICE_ITEMS = {
                     value={invoiceItem.quantity}
                     showErrorBorder={!!errors}
                     onChange={
-                    params.updateInvoiceItemQuantity(invoiceItem?.id)
-                  }
+                      params.updateInvoiceItemData(invoiceItem?.id, 'quantity')
+                    }
                     {...params}
                   />
                 </Tooltip>
@@ -180,7 +167,31 @@ const INVOICE_ITEMS = {
         flexWidth: '1',
       },
       unitPrice: {
-        type: LabelField,
+        type: (params) => {
+          const invoiceItem = params?.invoiceItems[params?.rowIndex];
+          const errors = params.validate(invoiceItem);
+          return (
+            params.isEditable(invoiceItem?.id) && invoiceItem?.orderAdjustment
+              ? (
+                <Tooltip
+                  html={<div className="custom-tooltip">{errors}</div>}
+                  theme="transparent"
+                  disabled={!errors}
+                >
+                  <TextInput
+                    type="number"
+                    value={invoiceItem.unitPrice}
+                    showErrorBorder={!!errors}
+                    onChange={
+                      params.updateInvoiceItemData(invoiceItem?.id, 'unitPrice')
+                    }
+                    {...params}
+                  />
+                </Tooltip>
+              )
+              : <LabelField {...params} />
+          );
+        },
         label: 'react.invoice.unitPrice.label',
         defaultMessage: 'Unit Price',
         flexWidth: '1',
@@ -225,7 +236,7 @@ const INVOICE_ITEMS = {
 
 const InvoicePrepayedItemsTable = ({
   invoiceItems,
-  updateInvoiceItemQuantity,
+  updateInvoiceItemData,
   invoiceId,
   totalCount,
   loadMoreRows,
@@ -253,7 +264,7 @@ const InvoicePrepayedItemsTable = ({
           isRowLoaded,
           isPrepaymentInvoice,
           editableRows,
-          updateInvoiceItemQuantity,
+          updateInvoiceItemData,
           validate,
           isEditable,
           actions,
@@ -270,7 +281,7 @@ InvoicePrepayedItemsTable.propTypes = {
   invoiceItems: PropTypes.shape({}).isRequired,
   totalCount: PropTypes.number.isRequired,
   loadMoreRows: PropTypes.func.isRequired,
-  updateInvoiceItemQuantity: PropTypes.func.isRequired,
+  updateInvoiceItemData: PropTypes.func.isRequired,
   invoicePrepaidItemsTableData: PropTypes.shape({
     actions: PropTypes.arrayOf(
       PropTypes.shape({}),

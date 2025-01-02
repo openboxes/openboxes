@@ -20,14 +20,13 @@ import CheckboxField from 'components/form-elements/CheckboxField';
 import LabelField from 'components/form-elements/LabelField';
 import TextField from 'components/form-elements/TextField';
 import { REPLENISHMENT_URL } from 'consts/applicationUrls';
+import { InfoBar, InfoBarConfigs } from 'consts/infoBar';
 import apiClient, { flattenRequest, parseResponse } from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import Select from 'utils/Select';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
-import { InfoBar, InfoBarConfigs } from 'consts/infoBar';
-
 
 const FIELD = {
   requirements: {
@@ -50,7 +49,7 @@ const FIELD = {
               onClick={selectAllCode}
             />
           ),
-          onChange: checkState => updateSelectedItems(checkState, rowIndex),
+          onChange: (checkState) => updateSelectedItems(checkState, rowIndex),
         }),
       },
       'product.productCode': {
@@ -170,7 +169,7 @@ function validate(values) {
     }
   });
 
-  const anyRowSelected = _.find(values.requirements, row => row.checked);
+  const anyRowSelected = _.find(values.requirements, (row) => row.checked);
   if (!anyRowSelected) {
     _.forEach(values.requirements, (item, key) => {
       errors.requirements[key] = {
@@ -227,28 +226,28 @@ class CreateReplenishment extends Component {
   }
 
   allRowsSelected() {
-    return !_.find(this.state.values.requirements, row => !row.checked);
+    return !_.find(this.state.values.requirements, (row) => !row.checked);
   }
 
   selectAllRows() {
     const isAllSelected = this.allRowsSelected();
-    this.setState({
-      values: update(this.state.values, {
+    this.setState((prev) => ({
+      values: update(prev.values, {
         requirements: {
-          $apply: req => req.map(it => ({
+          $apply: (req) => req.map((it) => ({
             ...it, checked: !isAllSelected,
           })),
         },
       }),
-    });
+    }));
   }
 
   updateSelectedItems(checkedValue, index) {
-    this.setState({
-      values: update(this.state.values, {
+    this.setState((prev) => ({
+      values: update(prev.values, {
         requirements: { [index]: { checked: { $set: checkedValue } } },
       }),
-    });
+    }));
   }
 
   updateRow(values, index) {
@@ -285,7 +284,7 @@ class CreateReplenishment extends Component {
 
     return apiClient.get(url)
       .then((resp) => {
-        const requirements = _.map(parseResponse(resp.data.data), requirement => ({
+        const requirements = _.map(parseResponse(resp.data.data), (requirement) => ({
           ...requirement,
           quantity: requirement.quantityNeeded,
           checked: true,
@@ -299,7 +298,7 @@ class CreateReplenishment extends Component {
     this.props.showSpinner();
     const url = '/api/replenishments/';
     const payload = {
-      replenishmentItems: values.requirements.filter(item => item.checked && item.quantity > 0),
+      replenishmentItems: values.requirements.filter((item) => item.checked && item.quantity > 0),
     };
 
     apiClient.post(url, flattenRequest(payload))
@@ -353,12 +352,13 @@ class CreateReplenishment extends Component {
                   <Translate
                     id="react.replenishment.filter.label"
                     defaultMessage="Replenish bins that have a stock level"
-                  />:
+                  />
+                  :
                 </label>
                 <Select
                   name="stock-level-filter"
                   value={this.state.inventoryLevelStatus}
-                  onChange={value => this.inventoryLevelStatusChange(value)}
+                  onChange={(value) => this.inventoryLevelStatusChange(value)}
                   options={this.state.statusOptions}
                   className="select-sm stocklist-select"
                   clearable={false}
@@ -373,7 +373,8 @@ class CreateReplenishment extends Component {
                 }}
                 className="btn btn-outline-primary float-right btn-xs"
                 disabled={invalid}
-              ><Translate id="react.replenishment.next.label" defaultMessage="Next" />
+              >
+                <Translate id="react.replenishment.next.label" defaultMessage="Next" />
               </button>
             </div>
             <form onSubmit={handleSubmit}>
@@ -397,7 +398,8 @@ class CreateReplenishment extends Component {
                   }}
                   className="btn btn-outline-primary btn-form float-right btn-xs"
                   disabled={invalid}
-                ><Translate id="react.replenishment.next.label" defaultMessage="Next" />
+                >
+                  <Translate id="react.replenishment.next.label" defaultMessage="Next" />
                 </button>
               </div>
             </form>
@@ -408,7 +410,7 @@ class CreateReplenishment extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   replenishmentTranslationsFetched: state.session.fetchedTranslations.replenishment,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
 });

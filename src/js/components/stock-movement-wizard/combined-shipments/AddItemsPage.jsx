@@ -35,8 +35,10 @@ import CombinedShipmentItemsModal from 'components/stock-movement-wizard/modals/
 import { ORDER_URL, STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
 import AlertMessage from 'utils/AlertMessage';
 import apiClient from 'utils/apiClient';
-import { renderFormField } from 'utils/form-utils';
+import { renderFormField, setColumnValue } from 'utils/form-utils';
+import { formatProductSupplierSubtext } from 'utils/form-values-utils';
 import { debounceProductsFetch } from 'utils/option-utils';
+import Select from 'utils/Select';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
@@ -76,13 +78,14 @@ const FIELDS = {
     // eslint-disable-next-line react/prop-types
     addButton: ({
       // eslint-disable-next-line react/prop-types
-      values, onResponse, saveItems, invalid,
+      values, onResponse, saveItems, invalid, overrideFormValue,
     }) => (
       <CombinedShipmentItemsModal
         shipment={values.stockMovementId}
         vendor={values.origin.id}
         destination={values.destination.id}
         onResponse={onResponse}
+        overrideFormValue={overrideFormValue}
         btnOpenText="react.default.button.addLines.label"
         btnOpenDefaultText="Add lines"
         onOpen={() => saveItems(values.lineItems)}
@@ -118,6 +121,14 @@ const FIELDS = {
           showSelectedOptionColor: true,
           showValueTooltip: true,
           disabled: true,
+        },
+        getDynamicAttr: ({ rowIndex, values }) => {
+          const row = values.lineItems[rowIndex] || {};
+          const productSupplierNameLabel = formatProductSupplierSubtext(row?.productSupplier);
+
+          return {
+            tooltipValue: [row?.product?.name, productSupplierNameLabel].join(' '),
+          };
         },
       },
       lotNumber: {
@@ -159,16 +170,45 @@ const FIELDS = {
           },
         }),
       },
-      quantityRequested: {
+      packsRequested: {
         type: TextField,
-        label: 'react.stockMovement.quantity.label',
-        defaultMessage: 'Qty',
-        flexWidth: '1',
+        label: 'react.stockMovement.quantityPOUom.label',
+        defaultMessage: 'Quantity (in PO UoM)',
+        fixedWidth: '120px',
         required: true,
+        headerTooltip: 'react.stockMovement.quantityPerUom.InputTooltip.label',
+        multilineHeader: true,
         attributes: {
           type: 'number',
           showError: true,
         },
+      },
+      unitOfMeasure: {
+        type: TextField,
+        label: 'react.stockMovement.POUom.label',
+        defaultMessage: 'PO UoM',
+        fixedWidth: '110px',
+        attributes: {
+          disabled: true,
+        },
+      },
+      calculatedQuantityRequested: {
+        type: TextField,
+        label: 'react.stockMovement.quantityEach.label',
+        defaultMessage: 'Quantity (each)',
+        multilineHeader: true,
+        flexWidth: 1,
+        attributes: {
+          disabled: true,
+        },
+        getDynamicAttr: ({ rowIndex, values }) => ({
+          formatValue: () => {
+            const row = values.lineItems[rowIndex] || {};
+            const packsRequested = _.toInteger(row.packsRequested);
+            const packSize = _.toInteger(row.packSize);
+            return packsRequested * packSize;
+          },
+        }),
       },
       palletName: {
         type: TextField,
@@ -194,7 +234,22 @@ const FIELDS = {
         flexWidth: '1.5',
         getDynamicAttr: ({
           recipients,
+          translate,
+          setRecipientValue,
         }) => ({
+          headerHtml: () => (
+            <Select
+              placeholder={translate('react.stockMovement.recipient.label', 'Recipient')}
+              className="select-xs my-2"
+              classNamePrefix="react-select"
+              options={recipients}
+              onChange={(val) => {
+                if (val) {
+                  setRecipientValue(val);
+                }
+              }}
+            />
+          ),
           options: recipients,
         }),
         attributes: {
@@ -223,6 +278,7 @@ const FIELDS = {
               referenceId: fieldValue.orderItemId,
               orderNumber: fieldValue.orderNumber,
               packSize: fieldValue.packSize,
+              unitOfMeasure: fieldValue.unitOfMeasure,
               quantityAvailable: fieldValue.quantityAvailable,
             }, rowIndex);
           },
@@ -273,7 +329,6 @@ class AddItemsPage extends Component {
     this.validateWithAlertMessage = this.validateWithAlertMessage.bind(this);
     this.isValidForSave = this.isValidForSave.bind(this);
     this.isRowLoaded = this.isRowLoaded.bind(this);
-    this.loadMoreRows = this.loadMoreRows.bind(this);
     this.updateTotalCount = this.updateTotalCount.bind(this);
     this.removeItem = this.removeItem.bind(this);
     this.fetchLineItems = this.fetchLineItems.bind(this);
@@ -324,7 +379,7 @@ class AddItemsPage extends Component {
     return _.map(items, (item) => ({
       id: item.id || null,
       product: { id: item.product.id },
-      quantityRequested: item.quantityRequested,
+      quantityRequested: item.packsRequested * item.packSize,
       palletName: item.palletName,
       boxName: item.boxName,
       lotNumber: item.lotNumber,
@@ -337,8 +392,7 @@ class AddItemsPage extends Component {
 
   setLineItems({
     response,
-    startIndex,
-    append,
+    setTableData,
   }) {
     const { data } = response.data;
     const lineItemsData = _.map(
@@ -350,39 +404,31 @@ class AddItemsPage extends Component {
       }),
     );
 
-    append?.('lineItems', lineItemsData);
-
-    if (data.length < 10) {
-      this.props.hideSpinner();
-      return;
-    }
-
-    this.loadMoreRows(append)({
-      startIndex: startIndex + this.props.pageSize,
-    });
+    setTableData?.('lineItems', lineItemsData);
 
     this.props.hideSpinner();
   }
 
   updateTotalCount(value) {
-    this.setState({
-      totalCount: this.state.totalCount + value,
-    });
+    this.setState((prev) => ({
+      totalCount: prev.totalCount + value,
+    }));
   }
 
   dataFetched = false;
 
   validate(values, ignoreLotAndExpiry) {
+    if (!this.dataFetched) {
+      return {};
+    }
+
     const errors = {};
     errors.lineItems = [];
     const date = moment(this.props.minimumExpirationDate, 'MM/DD/YYYY');
 
     _.forEach(values.lineItems, (item, key) => {
-      if (!_.isNil(item.product) && (!item.quantityRequested || item.quantityRequested <= 0)) {
-        errors.lineItems[key] = { quantityRequested: 'react.stockMovement.error.enterQuantity.label' };
-      }
-      if (_.toInteger(item.quantityRequested) % item.packSize !== 0) {
-        errors.lineItems[key] = { quantityRequested: 'react.stockMovement.error.multipleOfPackSize.label' };
+      if (!_.isNil(item.product) && (!item.packsRequested || item.packsRequested <= 0)) {
+        errors.lineItems[key] = { packsRequested: 'react.stockMovement.error.enterQuantity.label' };
       }
       if (!_.isEmpty(item.boxName) && _.isEmpty(item.palletName)) {
         errors.lineItems[key] = { boxName: 'react.stockMovement.error.boxWithoutPallet.label' };
@@ -399,21 +445,24 @@ class AddItemsPage extends Component {
       if (!item.id || splitItems.length > 1) {
         const requestedQuantity = _.reduce(
           splitItems, (sum, val) =>
-            (sum + (val.quantityRequested ? _.toInteger(val.quantityRequested) : 0)),
+            (sum + (val.packsRequested
+              ? _.toInteger(val.packsRequested * val.packSize)
+              : 0
+            )),
           0,
         );
         if (requestedQuantity > item.quantityAvailable) {
           _.forEach(values.lineItems, (lineItem, lineItemKey) => {
             _.forEach(splitItems, (splitItem) => {
               if (lineItem === splitItem) {
-                errors.lineItems[lineItemKey] = { quantityRequested: 'react.stockMovement.error.higherSplitQuantity.label' };
+                errors.lineItems[lineItemKey] = { packsRequested: 'react.stockMovement.error.higherSplitQuantity.label' };
               }
             });
           });
         }
       } else if (splitItems.length === 1
-        && item && item.quantityAvailable < _.toInteger(item.quantityRequested)) {
-        errors.lineItems[key] = { quantityRequested: 'react.stockMovement.error.higherQuantity.label' };
+        && item && item.quantityAvailable < _.toInteger(item.packsRequested * item.packSize)) {
+        errors.lineItems[key] = { packsRequested: 'react.stockMovement.error.higherQuantity.label' };
       }
       if (!ignoreLotAndExpiry) {
         if (item.expirationDate && (_.isNil(item.lotNumber) || _.isEmpty(item.lotNumber))) {
@@ -533,7 +582,7 @@ class AddItemsPage extends Component {
    * Fetches 2nd step data from current stock movement.
    * @public
    */
-  fetchLineItems() {
+  fetchLineItems(mutateTableData) {
     const url = `${STOCK_MOVEMENT_ITEMS(this.state.values.stockMovementId)}?stepNumber=2`;
 
     return apiClient.get(url)
@@ -541,7 +590,7 @@ class AddItemsPage extends Component {
         this.setState({ totalCount: response.data.data.length });
         this.setLineItems({
           response,
-          startIndex: null,
+          setTableData: mutateTableData,
         });
       })
       .catch((err) => err);
@@ -570,37 +619,20 @@ class AddItemsPage extends Component {
           }),
         );
 
-        this.setState({
+        this.setState((prev) => ({
           values: {
-            ...this.state.values,
+            ...prev.values,
             hasManageInventory,
             statusCode,
             // setting initial values for the form
             lineItems: sortedLineItems,
           },
           totalCount,
-        }, () => this.props.hideSpinner());
+        }), () => this.props.hideSpinner());
       });
   }
 
   isRowLoaded = (values) => ({ index }) => !!values.lineItems[index]
-
-  // At this moment we are fetching the whole stock movement at once (it already includes stock movement items)
-  // So this function is not used at this moment, but can be helpful in case of future improvements
-  loadMoreRows = (append) => ({ startIndex }) => {
-    this.setState({
-      isFirstPageLoaded: true,
-    });
-    const url = `${STOCK_MOVEMENT_ITEMS(this.state.values.stockMovementId)}?offset=${startIndex}&max=${this.props.pageSize}&stepNumber=2`;
-    apiClient.get(url)
-      .then((response) => {
-        this.setLineItems({
-          response,
-          startIndex,
-          append,
-        });
-      });
-  }
 
   /**
    * Saves current stock movement progress (line items) and goes to the next stock movement step.
@@ -616,7 +648,7 @@ class AddItemsPage extends Component {
 
     const lineItems = _.filter(formValues.lineItems, (val) => !_.isEmpty(val) && val.product);
 
-    if (_.some(lineItems, (item) => !item.quantityRequested || item.quantityRequested === '0')) {
+    if (_.some(lineItems, (item) => !item.packsRequested || item.packsRequested === '0')) {
       this.confirmSave(() =>
         this.saveAndTransitionToNextStep(formValues, lineItems));
     } else {
@@ -715,13 +747,13 @@ class AddItemsPage extends Component {
       return item;
     });
 
-    this.setState({
-      ...this.state,
+    this.setState((prev) => ({
+      ...prev,
       values: {
-        ...this.state.values,
+        ...prev.values,
         lineItems: mappedLineItems,
       },
-    });
+    }));
   }
 
   /**
@@ -796,7 +828,12 @@ class AddItemsPage extends Component {
             (val) => ({ ...val, referenceId: val.orderItemId }),
           );
 
-          this.setState({ values: { ...this.state.values, lineItems: lineItemsBackendData } });
+          this.setState((prev) => ({
+            values: {
+              ...prev.values,
+              lineItems: lineItemsBackendData,
+            },
+          }));
         })
         .catch(() => Promise.reject(new Error(this.props.translate('react.stockMovement.error.saveRequisitionItems.label', 'Could not save requisition items'))));
     }
@@ -812,7 +849,7 @@ class AddItemsPage extends Component {
   save(formValues) {
     const lineItems = _.filter(formValues.lineItems, (item) => !_.isEmpty(item));
     if (lineItems.length > 0) {
-      if (_.some(lineItems, (item) => !item.quantityRequested || item.quantityRequested === '0')) {
+      if (_.some(lineItems, (item) => !item.packsRequested || item.packsRequested === '0')) {
         this.confirmSave(() => this.saveItems(lineItems));
       } else {
         this.saveItems(lineItems);
@@ -900,12 +937,13 @@ class AddItemsPage extends Component {
 
     return apiClient.delete(STOCK_MOVEMENT_REMOVE_ALL_ITEMS(this.state.values.stockMovementId))
       .then(() => {
-        this.setState({
+        this.setState((prev) => ({
           totalCount: 0,
           values: {
-            ...this.state.values,
+            ...prev.values,
+            lineItems: [],
           },
-        }, () => this.props.hideSpinner());
+        }), () => this.props.hideSpinner());
       })
       .catch(() => {
         this.fetchLineItems();
@@ -982,10 +1020,9 @@ class AddItemsPage extends Component {
 
   /**
    * Imports chosen file to backend and then fetches line items.
-   * @param {object} event
-   * @public
+   * @param mutateTableData
    */
-  importTemplate(event) {
+  importTemplate = (mutateTableData) => (event) => {
     this.props.showSpinner();
     const formData = new FormData();
     const file = event.target.files[0];
@@ -1001,13 +1038,13 @@ class AddItemsPage extends Component {
     return apiClient
       .post(COMBINED_SHIPMENT_ITEMS_IMPORT_TEMPLATE(stockMovementId), formData, config)
       .then(() => {
-        this.fetchLineItems();
+        this.fetchLineItems(mutateTableData);
         if (_.isNil(_.last(this.state.values.lineItems).product)) {
-          this.setState({
+          this.setState((prev) => ({
             values: {
-              ...this.state.values,
+              ...prev.values,
             },
-          });
+          }));
         }
       })
       .catch(() => {
@@ -1029,9 +1066,9 @@ class AddItemsPage extends Component {
    * Toggle the downloadable files
    */
   toggleDropdown() {
-    this.setState({
-      isDropdownVisible: !this.state.isDropdownVisible,
-    });
+    this.setState((prev) => ({
+      isDropdownVisible: !prev.isDropdownVisible,
+    }));
   }
 
   render() {
@@ -1043,9 +1080,10 @@ class AddItemsPage extends Component {
         validate={this.validate}
         mutators={{
           ...arrayMutators,
-          append: ([field, value], state, { changeValue }) => {
-            changeValue(state, field, () => [...state.formState.values[field], ...value]);
+          override: ([field, value], state, { changeValue }) => {
+            changeValue(state, field, () => value);
           },
+          setColumnValue,
         }}
         initialValues={this.state.values}
         render={({
@@ -1066,7 +1104,7 @@ class AddItemsPage extends Component {
                   id="csvInput"
                   type="file"
                   style={{ display: 'none' }}
-                  onChange={this.importTemplate}
+                  onChange={this.importTemplate(form.mutators.override)}
                   onClick={(event) => {
                     // eslint-disable-next-line no-param-reassign
                     event.target.value = null;
@@ -1160,9 +1198,9 @@ class AddItemsPage extends Component {
                   renderFormField(fieldConfig, fieldName, {
                     stocklist: values.stocklist,
                     recipients: this.props.recipients,
+                    loadMoreRows: () => {},
                     debouncedProductsFetch: this.debouncedProductsFetch,
                     totalCount: this.state.totalCount,
-                    loadMoreRows: this.loadMoreRows(form.mutators.append),
                     isRowLoaded: this.isRowLoaded(values),
                     updateTotalCount: this.updateTotalCount,
                     isPaginated: this.props.isPaginated,
@@ -1176,6 +1214,9 @@ class AddItemsPage extends Component {
                     fetchInventoryItem: this.fetchInventoryItem,
                     debouncedInventoryItemFetch: this.debouncedInventoryItemFetch,
                     validateExpirationDate: this.validateExpirationDate,
+                    setRecipientValue: (val) => form.mutators.setColumnValue('lineItems', 'recipient', val),
+                    translate: this.props.translate,
+                    overrideFormValue: form.mutators.override,
                   }))}
               </div>
               <div className="submit-buttons">
@@ -1250,5 +1291,4 @@ AddItemsPage.propTypes = {
   isPaginated: PropTypes.bool.isRequired,
   /** Function returning user to the previous page */
   previousPage: PropTypes.func.isRequired,
-  pageSize: PropTypes.number.isRequired,
 };

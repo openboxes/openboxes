@@ -64,3 +64,6 @@ export const FETCH_ATTRIBUTES = 'FETCH_ATTRIBUTES';
 
 // Rating type options
 export const FETCH_RATING_TYPE_OPTIONS = 'FETCH_RATING_TYPE_OPTIONS';
+
+// Outbound import
+export const SET_SCROLL_TO_BOTTOM = 'SET_SCROLL_TO_BOTTOM';

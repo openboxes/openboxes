@@ -25,7 +25,7 @@ const usePurchaseOrderFilters = () => {
     paymentTerms,
     currentUser,
     currentLocale,
-  } = useSelector(state => ({
+  } = useSelector((state) => ({
     supportedActivities: state.session.supportedActivities,
     buyers: state.organizations.buyers,
     currentLocation: state.session.currentLocation,
@@ -69,7 +69,7 @@ const usePurchaseOrderFilters = () => {
 
     if (isCentralPurchasingEnabled) {
       defaultValues.destinationParty = buyers
-        .find(org => org.id === currentLocation.organization.id);
+        .find((org) => org.id === currentLocation.organization.id);
     }
 
     const queryProps = queryString.parse(history.location.search);

@@ -59,12 +59,12 @@ class DataService {
         return new Sql(dataSource).rows(query, params)
     }
 
-    void executeStatement(String statement) {
+    void executeStatement(String statement, Boolean logStatement = true) {
         Sql sql = new Sql(dataSource)
         sql.withTransaction {
             try {
                 def startTime = System.currentTimeMillis()
-                log.info "Executing statement ${statement}"
+                log.info "Executing statement ${logStatement ? statement : ''}"
                 sql.execute(statement)
                 log.info "Updated ${sql.updateCount} rows in " +  (System.currentTimeMillis() - startTime) + " ms"
                 sql.commit()
@@ -75,9 +75,9 @@ class DataService {
         }
     }
 
-    void executeStatements(List statementList) {
+    void executeStatements(List statementList, Boolean logStatements = true) {
         statementList.each { String statement ->
-            executeStatement(statement)
+            executeStatement(statement, logStatements)
         }
     }
 
@@ -702,12 +702,14 @@ class DataService {
                 } else if (element.defaultValue && !value) {
                     value = element.defaultValue
                 }
-                properties[fieldName] = value ?: ""
+                // We can't just check the truthiness of the value, because the false boolean would be evaluated to an empty string
+                properties[fieldName] = value == null ? "" : value
             } else {
                 // to access object value by key we must use the object.get(key) instead of object[key]
                 // because using the object[key] will throw an error when trying to export data using the batch controller
                 value = object.get(element) ?: element.tokenize('.').inject(object) { v, k -> v?."$k" }
-                properties[fieldName] = value ?: ""
+                // We can't just check the truthiness of the value, because the false boolean would be evaluated to an empty string
+                properties[fieldName] = value == null ? "" : value
             }
         }
         return properties

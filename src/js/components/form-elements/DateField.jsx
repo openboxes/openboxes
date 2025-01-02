@@ -35,11 +35,6 @@ class DateField extends Component {
     arrowLeft, arrowUp, arrowRight, arrowDown, fieldRef, onTabPress, localizeDate,
     localizedDateFormat = DateFormat.COMMON, showLocalizedPlaceholder, ...attributes
   }) {
-    const onChange = (date) => {
-      const val = !date || typeof date === 'string' ? date : date.format(dateFormat);
-      attributes.onChange(val);
-    };
-
     const onChangeRaw = (e) => {
       attributes.onChange(e.target.value);
     };
@@ -60,6 +55,11 @@ class DateField extends Component {
       return dateFormat;
     };
 
+    const onChange = (date) => {
+      const val = !date || typeof date === 'string' ? date : date.format(dateFormat);
+      attributes.onChange(val);
+    };
+
     const getLocale = () => {
       if (localizeDate) {
         return this.props.localeCode;
@@ -75,9 +75,9 @@ class DateField extends Component {
           {...attributes}
           placeholderText={getPlaceholder()}
           selected={moment(value, dateFormat).isValid() ? moment(value, dateFormat) : null}
-          highlightDates={[!moment(value, dateFormat).isValid() ?
-            moment(new Date(), dateFormat) : {}]}
-          onChange={date => onChange(date)}
+          highlightDates={[!moment(value, dateFormat).isValid()
+            ? moment(new Date(), dateFormat) : {}]}
+          onChange={(date) => onChange(date)}
           onChangeRaw={onChangeRaw}
           onSelect={() => {
             this.dateInput.setOpen(false);

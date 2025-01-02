@@ -22,15 +22,16 @@ const DataTable = React.forwardRef((props, ref) => {
     data, footerComponent, headerComponent, columns, className, totalData, errors,
   } = props;
 
-  const PaginationComponent = paginationProps => (
-    <React.Fragment>
+  const PaginationComponent = (paginationProps) => (
+    <>
       { paginationProps.footerComponent && (
       <div className="app-react-table-footer d-flex p-2">
         {footerComponent()}
       </div>
       )}
       {data.length > 0 && <TablePagination {...paginationProps} totalData={totalData} /> }
-    </React.Fragment>);
+    </>
+  );
 
   return (
     <div className="app-react-table-wrapper" data-testid="data-table">

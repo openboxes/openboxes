@@ -8,7 +8,6 @@ import useTranslation from 'hooks/useTranslation';
 import apiClient from 'utils/apiClient';
 import Translate from 'utils/Translate';
 
-
 // eslint-disable-next-line no-shadow
 const ResettingInstanceInfoPage = ({ history }) => {
   const [resettingInstanceCommand, setResettingInstanceCommand] = useState('');

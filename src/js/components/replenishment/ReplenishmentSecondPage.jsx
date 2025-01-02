@@ -21,7 +21,6 @@ import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
-
 const FIELDS = {
   replenishmentItems: {
     type: ArrayField,
@@ -196,7 +195,7 @@ class ReplenishmentSecondPage extends Component {
               ...replenishment,
               replenishmentItems: _.map(
                 replenishment.replenishmentItems,
-                item => this.checkForInitialPicksChanges(item),
+                (item) => this.checkForInitialPicksChanges(item),
               ),
             },
           },
@@ -225,7 +224,7 @@ class ReplenishmentSecondPage extends Component {
         // if yes -> compare quantityPicked of item in picklist with suggestion
         const pick = _.find(
           pickPageItem.picklistItems,
-          item => _.get(suggestion, 'inventoryItem.id') === _.get(item, 'inventoryItem.id') && _.get(item, 'binLocation.id') === _.get(suggestion, 'binLocation.id'),
+          (item) => _.get(suggestion, 'inventoryItem.id') === _.get(item, 'inventoryItem.id') && _.get(item, 'binLocation.id') === _.get(suggestion, 'binLocation.id'),
         );
         if (_.isEmpty(pick) || (pick.quantity !== suggestion.quantityPicked)) {
           initialPicks.push({
@@ -302,11 +301,12 @@ class ReplenishmentSecondPage extends Component {
 
   sortByBins() {
     if (this.state.sorted) {
-      const sortedPickItemsByDefault = this.state.values.replenishment.replenishmentItems.map(item => ({ ...item, picklistItems: _.sortBy(item.picklistItems, ['binLocation.name', 'quantity']) }));
+      const { replenishment } = this.state.values;
+      const sortedPickItemsByDefault = replenishment.replenishmentItems.map((item) => ({ ...item, picklistItems: _.sortBy(item.picklistItems, ['binLocation.name', 'quantity']) }));
       this.setState({
         values: {
           replenishment: {
-            ...this.state.values.replenishment,
+            ...replenishment,
             replenishmentItems: _.sortBy(sortedPickItemsByDefault, ['product.productCode']),
           },
         },
@@ -315,11 +315,12 @@ class ReplenishmentSecondPage extends Component {
       return;
     }
 
-    const sortedPickItemsByBinName = this.state.values.replenishment.replenishmentItems.map(item => ({ ...item, picklistItems: _.sortBy(item.picklistItems, ['zone.name', 'binLocation.name']) }));
+    const { replenishment } = this.state.values;
+    const sortedPickItemsByBinName = replenishment.replenishmentItems.map((item) => ({ ...item, picklistItems: _.sortBy(item.picklistItems, ['zone.name', 'binLocation.name']) }));
     this.setState({
       values: {
         replenishment: {
-          ...this.state.values.replenishment,
+          ...replenishment,
           replenishmentItems: _.sortBy(sortedPickItemsByBinName, ['picklistItems[0].zone.name', 'picklistItems[0].binLocation.name']),
         },
       },
@@ -371,17 +372,19 @@ class ReplenishmentSecondPage extends Component {
                 onClick={() => this.sortByBins()}
                 className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs"
               >
-                {this.state.sorted ?
-                  <span>
-                    <i className="fa fa-sort pr-2" />
-                    <Translate id="react.replenishment.originalOrder.label" defaultMessage="Original order" />
-                  </span>
-                  :
-                  <span>
-                    <i className="fa fa-sort pr-2" />
-                    <Translate id="react.replenishment.sortByBins.label" defaultMessage="Sort by bins" />
-                  </span>
-                }
+                {this.state.sorted
+                  ? (
+                    <span>
+                      <i className="fa fa-sort pr-2" />
+                      <Translate id="react.replenishment.originalOrder.label" defaultMessage="Original order" />
+                    </span>
+                  )
+                  : (
+                    <span>
+                      <i className="fa fa-sort pr-2" />
+                      <Translate id="react.replenishment.sortByBins.label" defaultMessage="Sort by bins" />
+                    </span>
+                  )}
               </button>
             </div>
             <form onSubmit={handleSubmit} className="print-mt">
@@ -398,7 +401,8 @@ class ReplenishmentSecondPage extends Component {
                 <button
                   type="submit"
                   className="btn btn-outline-primary btn-form float-right btn-xs"
-                ><Translate id="react.replenishment.next.label" defaultMessage="Next" />
+                >
+                  <Translate id="react.replenishment.next.label" defaultMessage="Next" />
                 </button>
               </div>
             </form>
@@ -409,7 +413,7 @@ class ReplenishmentSecondPage extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   replenishmentTranslationsFetched: state.session.fetchedTranslations.replenishment,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
 });

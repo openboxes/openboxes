@@ -35,7 +35,9 @@ module.exports = {
       colors: false,
     },
     plugins: [
-      new ESLintPlugin({}),
+      new ESLintPlugin({
+        extensions: ['js', 'jsx'],
+      }),
       new FileManagerPlugin({
         events: {
           onStart: {

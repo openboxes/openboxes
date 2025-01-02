@@ -30,7 +30,9 @@ const FIELDS = {
           binLocation: lineItem.binLocation,
           recipient: lineItem.recipient,
         }, null, false)}
-      > <Translate id="react.default.button.addLine.label" defaultMessage="Add line" />
+      >
+        {' '}
+        <Translate id="react.default.button.addLine.label" defaultMessage="Add line" />
       </button>
     ),
     type: ArrayField,
@@ -69,11 +71,12 @@ const FIELDS = {
         }),
         attributes: {
           showValueTooltip: true,
-          formatValue: fieldValue => fieldValue && (
+          formatValue: (fieldValue) => fieldValue && (
             <div className="d-flex">
               {fieldValue.zoneName ? <div className="text-truncate" style={{ minWidth: 30, flexShrink: 20 }}>{fieldValue.zoneName}</div> : ''}
               <div className="text-truncate">{fieldValue.zoneName ? `: ${fieldValue.name}` : fieldValue.name}</div>
-            </div>),
+            </div>
+          ),
         },
       },
       quantityShipped: {
@@ -99,9 +102,9 @@ const FIELDS = {
           cache: false,
           options: [],
           labelKey: 'name',
-          filterOptions: options => options,
+          filterOptions: (options) => options,
         },
-        getDynamicAttr: props => ({
+        getDynamicAttr: (props) => ({
           loadOptions: props.debouncedPeopleFetch,
         }),
       },
@@ -142,7 +145,9 @@ class PackingSplitLineModal extends Component {
     return (
       <div>
         <div className="font-weight-bold pb-2">
-          <Translate id="react.stockMovement.quantityPacked.label" defaultMessage="Qty Packed" />: {PackingSplitLineModal.calculatePacked(values.splitLineItems)}
+          <Translate id="react.stockMovement.quantityPacked.label" defaultMessage="Qty Packed" />
+          :
+          {PackingSplitLineModal.calculatePacked(values.splitLineItems)}
         </div>
         <hr />
       </div>
@@ -165,8 +170,10 @@ class PackingSplitLineModal extends Component {
     this.onOpen = this.onOpen.bind(this);
     this.validate = this.validate.bind(this);
 
-    this.debouncedPeopleFetch =
-      debouncePeopleFetch(this.props.debounceTime, this.props.minSearchLength);
+    this.debouncedPeopleFetch = debouncePeopleFetch(
+      this.props.debounceTime,
+      this.props.minSearchLength,
+    );
   }
 
   componentWillReceiveProps(nextProps) {
@@ -184,18 +191,29 @@ class PackingSplitLineModal extends Component {
    * @public
    */
   onOpen() {
+    const {
+      product,
+      lotNumber,
+      expirationDate,
+      binLocation,
+      quantityShipped,
+      recipient,
+      palletName,
+      boxName,
+    } = this.state.attr.lineItem;
+
     this.setState({
       formValues: {
         splitLineItems: [
           {
-            product: this.state.attr.lineItem.product,
-            lotNumber: this.state.attr.lineItem.lotNumber,
-            expirationDate: this.state.attr.lineItem.expirationDate,
-            binLocation: this.state.attr.lineItem.binLocation,
-            quantityShipped: this.state.attr.lineItem.quantityShipped,
-            recipient: this.state.attr.lineItem.recipient,
-            palletName: this.state.attr.lineItem.palletName,
-            boxName: this.state.attr.lineItem.boxName,
+            product,
+            lotNumber,
+            expirationDate,
+            binLocation,
+            quantityShipped,
+            recipient,
+            palletName,
+            boxName,
           },
         ],
       },
@@ -224,8 +242,8 @@ class PackingSplitLineModal extends Component {
       <ModalWrapper
         {...this.state.attr}
         onOpen={this.onOpen}
-        onSave={values =>
-          this.state.attr.onSave(_.filter(values.splitLineItems, item => item.quantityShipped))}
+        onSave={(values) =>
+          this.state.attr.onSave(_.filter(values.splitLineItems, (item) => item.quantityShipped))}
         fields={FIELDS}
         initialValues={this.state.formValues}
         formProps={{
@@ -239,7 +257,9 @@ class PackingSplitLineModal extends Component {
       >
         <div>
           <div className="font-weight-bold">
-            <Translate id="react.stockMovement.totalQuantity.label" defaultMessage="Total quantity" />: {this.state.attr.lineItem.quantityShipped}
+            <Translate id="react.stockMovement.totalQuantity.label" defaultMessage="Total quantity" />
+            :
+            {this.state.attr.lineItem.quantityShipped}
           </div>
         </div>
       </ModalWrapper>
@@ -247,7 +267,7 @@ class PackingSplitLineModal extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   debounceTime: state.session.searchConfig.debounceTime,
   minSearchLength: state.session.searchConfig.minSearchLength,
   hasBinLocationSupport: state.session.currentLocation.hasBinLocationSupport,

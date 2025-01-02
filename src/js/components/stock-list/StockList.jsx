@@ -9,7 +9,6 @@ import StockListTable from 'components/stock-list/StockListTable';
 import useStockListFilters from 'hooks/list-pages/stock-list/useStockListFilters';
 import useTranslation from 'hooks/useTranslation';
 
-
 const StockList = () => {
   const {
     defaultFilterValues, setFilterValues, locations, filterParams,

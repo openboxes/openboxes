@@ -78,7 +78,7 @@ class StockTransferSecondPage extends Component {
       Header: <Translate id="react.stockTransfer.product.label" defaultMessage="Product" />,
       accessor: 'product',
       style: { whiteSpace: 'normal' },
-      Cell: row => (
+      Cell: (row) => (
         <TableCell
           {...row}
           value={row.value?.displayName ?? row.value?.name}
@@ -201,7 +201,7 @@ class StockTransferSecondPage extends Component {
   completeStockTransfer() {
     const itemsWithLowerQuantity = _.filter(
       this.state.stockTransfer.stockTransferItems,
-      stockTransferItem => stockTransferItem.transferQty < stockTransferItem.quantityNotPicked,
+      (stockTransferItem) => stockTransferItem.transferQty < stockTransferItem.quantityNotPicked,
     );
 
     if (!_.isEmpty(itemsWithLowerQuantity)) {
@@ -218,11 +218,20 @@ class StockTransferSecondPage extends Component {
   confirmLowerQuantity(items) {
     confirmAlert({
       title: this.props.translate('react.stockTransfer.message.confirmStockTransfer.label', 'Confirm Stock Transfer'),
-      message: _.map(items, item =>
+      message: _.map(items, (item) =>
         (
-          <p>Qty {item.quantityNotPicked - item.transferQty} {this.props.translate('react.stockTransfer.alert.lowerQty1.label', 'of item')} {' '}
-            {item.productName} {this.props.translate('react.stockTransfer.alert.lowerQty2.label', 'is still in the receiving bin. Do you want to continue?')}
-          </p>)),
+          <p>
+            Qty
+            {item.quantityNotPicked - item.transferQty}
+            {' '}
+            {this.props.translate('react.stockTransfer.alert.lowerQty1.label', 'of item')}
+            {' '}
+            {' '}
+            {item.productName}
+            {' '}
+            {this.props.translate('react.stockTransfer.alert.lowerQty2.label', 'is still in the receiving bin. Do you want to continue?')}
+          </p>
+        )),
       buttons: [
         {
           label: this.props.translate('react.default.yes.label', 'Yes'),
@@ -256,14 +265,14 @@ class StockTransferSecondPage extends Component {
     const {
       columns, pivotBy,
     } = this.state;
-    const extraProps =
-      {
-        pivotBy,
-      };
+    const extraProps = {
+      pivotBy,
+    };
 
     return (
       <div className="stock-transfer">
-        {this.state.stockTransfer && this.state.stockTransfer.status === 'COMPLETED' &&
+        {this.state.stockTransfer && this.state.stockTransfer.status === 'COMPLETED'
+          && (
           <div className="submit-buttons d-flex justify-content-end mb-3 mt-0">
             <button
               type="button"
@@ -272,24 +281,27 @@ class StockTransferSecondPage extends Component {
               }}
               className="btn btn-outline-primary btn-form btn-xs"
               hidden={this.state.stockTransfer.status !== 'COMPLETED'}
-            ><Translate id="react.default.button.exit.label" defaultMessage="Exit" />
+            >
+              <Translate id="react.default.button.exit.label" defaultMessage="Exit" />
             </button>
           </div>
-        }
+          )}
         {
-          this.state.stockTransfer.stockTransferItems ?
-            <SelectTreeTable
-              data={this.state.stockTransfer.stockTransferItems}
-              columns={columns}
-              ref={(r) => { this.selectTable = r; }}
-              className="-striped -highlight"
-              {...extraProps}
-              defaultPageSize={Number.MAX_SAFE_INTEGER}
-              minRows={0}
-              showPaginationBottom={false}
-              filterable
-              defaultFilterMethod={this.filterMethod}
-            />
+          this.state.stockTransfer.stockTransferItems
+            ? (
+              <SelectTreeTable
+                data={this.state.stockTransfer.stockTransferItems}
+                columns={columns}
+                ref={(r) => { this.selectTable = r; }}
+                className="-striped -highlight"
+                {...extraProps}
+                defaultPageSize={Number.MAX_SAFE_INTEGER}
+                minRows={0}
+                showPaginationBottom={false}
+                filterable
+                defaultFilterMethod={this.filterMethod}
+              />
+            )
             : null
         }
         <div className="submit-buttons">
@@ -298,14 +310,16 @@ class StockTransferSecondPage extends Component {
             onClick={() => this.previousPage()}
             className="btn btn-outline-primary btn-form btn-xs"
             disabled={this.state.stockTransfer.status === 'COMPLETED'}
-          ><Translate id="react.default.button.previous.label" defaultMessage="Previous" />
+          >
+            <Translate id="react.default.button.previous.label" defaultMessage="Previous" />
           </button>
           <button
             type="button"
             onClick={() => this.completeStockTransfer()}
             className="btn btn-outline-success float-right btn-xs mr-3"
             disabled={this.state.stockTransfer.status === 'COMPLETED'}
-          ><Translate id="react.stockTransfer.completeStockTransfer.label" defaultMessage="Complete Stock Transfer" />
+          >
+            <Translate id="react.stockTransfer.completeStockTransfer.label" defaultMessage="Complete Stock Transfer" />
           </button>
         </div>
       </div>
@@ -313,7 +327,7 @@ class StockTransferSecondPage extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
   stockTransferTranslationsFetched: state.session.fetchedTranslations.stockTransfer,
   formatLocalizedDate: formatDate(state.localize),

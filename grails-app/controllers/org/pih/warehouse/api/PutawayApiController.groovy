@@ -10,20 +10,20 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
-import grails.gorm.transactions.Transactional
 import grails.plugins.rendering.pdf.PdfRenderingService
 import org.grails.web.json.JSONObject
 import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.order.Order
+import org.pih.warehouse.order.OrderIdentifierService
 
 /**
  * Should not extend BaseDomainApiController since stocklist is not a valid domain.
  */
 class PutawayApiController {
 
-    def identifierService
+    OrderIdentifierService orderIdentifierService
     def productAvailabilityService
     def putawayService
     PdfRenderingService pdfRenderingService
@@ -72,7 +72,7 @@ class PutawayApiController {
         User currentUser = User.get(session.user.id)
 
         Putaway putaway = new Putaway()
-        bindPutawayData(putaway, currentUser, currentLocation, jsonObject)
+        bindPutawayData(putaway, order, currentUser, currentLocation, jsonObject)
 
         // Putaway stock
         if (putaway?.putawayStatus?.equals(PutawayStatus.COMPLETED)) {
@@ -93,7 +93,7 @@ class PutawayApiController {
     }
 
 
-    private Putaway bindPutawayData(Putaway putaway, User currentUser, Location currentLocation, JSONObject jsonObject) {
+    private Putaway bindPutawayData(Putaway putaway, Order order, User currentUser, Location currentLocation, JSONObject jsonObject) {
         // Bind the putaway
         bindData(putaway, jsonObject)
 
@@ -105,7 +105,7 @@ class PutawayApiController {
         }
 
         if (!putaway.putawayNumber) {
-            putaway.putawayNumber = identifierService.generateOrderIdentifier()
+            putaway.putawayNumber = orderIdentifierService.generate(order)
         }
 
         putaway.putawayAssignee = currentUser

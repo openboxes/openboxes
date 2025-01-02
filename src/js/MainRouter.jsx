@@ -29,7 +29,7 @@ class MainRouter extends React.Component {
       });
       this.props.setActiveLanguage(this.props.locale);
       this.props.fetchMenuConfig();
-      TRANSLATION_PREFIXES.forEach(prefix => this.props.fetchTranslations('', prefix));
+      TRANSLATION_PREFIXES.forEach((prefix) => this.props.fetchTranslations('', prefix));
     });
   }
 
@@ -38,7 +38,7 @@ class MainRouter extends React.Component {
       this.props.setActiveLanguage(nextProps.locale);
 
       if (this.props.locale) {
-        TRANSLATION_PREFIXES.forEach(prefix => this.props.fetchTranslations('', prefix));
+        TRANSLATION_PREFIXES.forEach((prefix) => this.props.fetchTranslations('', prefix));
       }
 
       this.props.fetchMenuConfig();
@@ -52,7 +52,7 @@ class MainRouter extends React.Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   locale: state.session.activeLanguage,
   supportedLocales: state.session.supportedLocales,
 });
@@ -60,7 +60,6 @@ const mapStateToProps = state => ({
 export default withLocalize(connect(mapStateToProps, {
   fetchTranslations, fetchSessionInfo, fetchMenuConfig,
 })(MainRouter));
-
 
 MainRouter.propTypes = {
   initialize: PropTypes.func.isRequired,

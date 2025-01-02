@@ -16,4 +16,6 @@
     <include file="0.9.x/changelog-2024-08-19-1100-add-inverse-to-invoice-item.xml" />
     <include file="0.9.x/changelog-2024-08-19-1200-alter-table-invoice-item-set-invoice-non-null.xml" />
     <include file="0.9.x/changelog-2024-08-20-0000-migrate-prepayment-invoices-add-amount-and-inverse-items.groovy" />
+    <include file="0.9.x/changelog-2024-10-04-1610-assign-amount-to-invoice-items.xml" />
+    <include file="0.9.x/changelog-2024-10-28-1330-add-column-date-delivery-requested-to-requisition.xml" />
 </databaseChangeLog>

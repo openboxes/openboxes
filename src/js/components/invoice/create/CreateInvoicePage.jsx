@@ -70,7 +70,7 @@ const FIELDS = {
       autoload: false,
       cache: false,
       options: [],
-      filterOptions: options => options,
+      filterOptions: (options) => options,
     },
     getDynamicAttr: ({ debouncedOrganizationsFetch }) => ({
       loadOptions: debouncedOrganizationsFetch,
@@ -117,8 +117,10 @@ class CreateInvoicePage extends Component {
       values: this.props.initialValues,
     };
 
-    this.debounceOrganizationsFetch =
-      debounceOrganizationsFetch(this.props.debounceTime, this.props.minSearchLength);
+    this.debounceOrganizationsFetch = debounceOrganizationsFetch(
+      this.props.debounceTime,
+      this.props.minSearchLength,
+    );
   }
 
   componentDidMount() {
@@ -218,7 +220,7 @@ class CreateInvoicePage extends Component {
   render() {
     return (
       <Form
-        onSubmit={values => this.nextPage(values)}
+        onSubmit={(values) => this.nextPage(values)}
         validate={validate}
         initialValues={this.state.values}
         render={({ form, handleSubmit }) => (
@@ -244,7 +246,7 @@ class CreateInvoicePage extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
   currencies: state.unitOfMeasure.currency,
   debounceTime: state.session.searchConfig.debounceTime,

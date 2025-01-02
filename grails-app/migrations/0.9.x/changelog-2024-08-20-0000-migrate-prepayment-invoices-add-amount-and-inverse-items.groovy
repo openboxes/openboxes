@@ -36,8 +36,8 @@ databaseChangeLog = {
     }
 
     /*
-     * STEP 2: For every pre-existing prepayment invoice, for every invoice item, add an inverse invoice
-     *         item to the final invoice of the order.
+     * STEP 2: For every pre-existing prepayment invoice, for every invoice item, set the amount field
+     *         and add an inverse invoice item to the final invoice of the order.
      *
      * For existing data from before the partial invoicing feature was introduced, ALL non-prepayment
      * invoices will ALWAYS be the final invoice, meaning every order will have one prepayment invoice
@@ -87,7 +87,7 @@ databaseChangeLog = {
                         continue
                     }
 
-                    prepaymentInvoiceMigrationService.generateInverseInvoiceItems(prepaymentInvoice, regularInvoice)
+                    prepaymentInvoiceMigrationService.migrateFinalInvoice(prepaymentInvoice, regularInvoice)
 
                     totalOrdersMigrated++
                 }

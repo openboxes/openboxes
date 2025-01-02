@@ -45,8 +45,8 @@ function validate(values) {
   }
 
   // Don't allow having NONE supported activity in combination with any other supported activity
-  if (values.supportedActivities?.length > 1 &&
-    values.supportedActivities?.find(activity => activity.value === ActivityCode.NONE)) {
+  if (values.supportedActivities?.length > 1
+    && values.supportedActivities?.find((activity) => activity.value === ActivityCode.NONE)) {
     errors.supportedActivities = 'react.locationsConfiguration.error.supportedActivities.label';
   }
 
@@ -99,7 +99,7 @@ const FIELDS = {
       withTooltip: true,
       tooltip: 'react.locationsConfiguration.organization.tooltip.label',
       options: [],
-      filterOptions: options => options,
+      filterOptions: (options) => options,
     },
     getDynamicAttr: ({
       debouncedOrganizationsFetch,
@@ -127,7 +127,7 @@ const FIELDS = {
       withTooltip: true,
       tooltip: 'react.locationsConfiguration.locationGroup.tooltip.label',
       options: [],
-      filterOptions: options => options,
+      filterOptions: (options) => options,
     },
     getDynamicAttr: ({ debouncedLocationGroupsFetch, openNewLocationGroupModal }) => ({
       loadOptions: debouncedLocationGroupsFetch,
@@ -146,7 +146,7 @@ const FIELDS = {
       cache: false,
       options: [],
       labelKey: 'name',
-      filterOptions: options => options,
+      filterOptions: (options) => options,
     },
     getDynamicAttr: ({ debouncedPeopleFetch }) => ({
       loadOptions: debouncedPeopleFetch,
@@ -198,14 +198,22 @@ class LocationDetails extends Component {
     };
     this.openNewOrganizationModal = this.openNewOrganizationModal.bind(this);
     this.openNewLocationGroupModal = this.openNewLocationGroupModal.bind(this);
-    this.debouncedPeopleFetch =
-      debouncePeopleFetch(this.props.debounceTime, this.props.minSearchLength);
+    this.debouncedPeopleFetch = debouncePeopleFetch(
+      this.props.debounceTime,
+      this.props.minSearchLength,
+    );
 
-    this.debouncedLocationGroupsFetch =
-      debounceLocationGroupsFetch(this.props.debounceTime, this.props.minSearchLength);
+    this.debouncedLocationGroupsFetch = debounceLocationGroupsFetch(
+      this.props.debounceTime,
+      this.props.minSearchLength,
+    );
 
-    this.debouncedOrganizationsFetch =
-      debounceOrganizationsFetch(this.props.debounceTime, this.props.minSearchLength, [], true);
+    this.debouncedOrganizationsFetch = debounceOrganizationsFetch(
+      this.props.debounceTime,
+      this.props.minSearchLength,
+      [],
+      true,
+    );
     this.getSupportLinks = this.getSupportLinks.bind(this);
   }
 
@@ -221,6 +229,7 @@ class LocationDetails extends Component {
       this.fetchLocation();
     }
   }
+
   componentWillReceiveProps(nextProps) {
     if (!this.dataFetched && nextProps.locConfTranslationsFetched) {
       this.dataFetched = true;
@@ -251,7 +260,7 @@ class LocationDetails extends Component {
   getSupportedActivities(locationType) {
     return _.chain(locationType)
       .get('supportedActivities')
-      .map(value => ({ value, label: this.props.translate(`react.locationsConfiguration.ActivityCode.${value}`, value) }))
+      .map((value) => ({ value, label: this.props.translate(`react.locationsConfiguration.ActivityCode.${value}`, value) }))
       .value();
   }
 
@@ -265,13 +274,13 @@ class LocationDetails extends Component {
         this.props.history.push(LOCATION_CONFIGURATION_URL.create());
         return;
       }
-      this.setState({
+      this.setState((prev) => ({
         values: {
-          ...this.state.values,
+          ...prev.values,
           locationId: this.props.match.params.locationId,
           ...location,
-          locationGroup: location.locationGroup ?
-            {
+          locationGroup: location.locationGroup
+            ? {
               value: location.locationGroup.id,
               id: location.locationGroup.id,
               name: location.locationGroup.name,
@@ -279,15 +288,15 @@ class LocationDetails extends Component {
             }
             : '',
           manager: location.manager ? location.manager : '',
-          locationType: location.locationType ?
-            {
+          locationType: location.locationType
+            ? {
               value: location.locationType.id,
               id: location.locationType.id,
               name: location.locationType.name,
               label: splitTranslation(location.locationType.name, this.props.locale),
             }
             : '',
-          supportedActivities: _.map(location.supportedActivities, value => ({ value, label: this.props.translate(`react.locationsConfiguration.ActivityCode.${value}`, value) })),
+          supportedActivities: _.map(location.supportedActivities, (value) => ({ value, label: this.props.translate(`react.locationsConfiguration.ActivityCode.${value}`, value) })),
           organization: {
             value: location.organization.id,
             id: location.organization.id,
@@ -295,7 +304,7 @@ class LocationDetails extends Component {
             label: `${location.organization.code} ${location.organization.name}`,
           },
         },
-      });
+      }));
     })
       .catch(() => Promise.reject(new Error(this.props.translate('react.locationsConfiguration.error.fetchingLocation', 'Could not load location data'))));
   }
@@ -314,11 +323,11 @@ class LocationDetails extends Component {
         if (this.state.values.locationType) {
           this.setState({ locationTypes });
         } else {
-          const locationType = _.find(locationTypes, type => _.startsWith(type.name, 'Depot'));
+          const locationType = _.find(locationTypes, (type) => _.startsWith(type.name, 'Depot'));
           const supportedActivities = this.getSupportedActivities(locationType);
-          this.setState({
-            locationTypes, values: { ...this.state.values, locationType, supportedActivities },
-          });
+          this.setState((prev) => ({
+            locationTypes, values: { ...prev.values, locationType, supportedActivities },
+          }));
         }
       });
   }
@@ -329,11 +338,10 @@ class LocationDetails extends Component {
     apiClient.get(url)
       .then((response) => {
         const resp = response.data.data;
-        const supportedActivities = _.map(resp, value => ({ value, label: this.props.translate(`react.locationsConfiguration.ActivityCode.${value}`, value) }));
+        const supportedActivities = _.map(resp, (value) => ({ value, label: this.props.translate(`react.locationsConfiguration.ActivityCode.${value}`, value) }));
         this.setState({ supportedActivities });
       });
   }
-
 
   openNewOrganizationModal() {
     this.setState({ showOrganizationModal: true });
@@ -342,7 +350,6 @@ class LocationDetails extends Component {
   openNewLocationGroupModal() {
     this.setState({ showLocationGroupModal: true });
   }
-
 
   saveLocationDetails(values) {
     if (values.name && values.organization) {
@@ -357,7 +364,7 @@ class LocationDetails extends Component {
 
       const payload = {
         ...values,
-        supportedActivities: _.map(values.supportedActivities, val => val.value),
+        supportedActivities: _.map(values.supportedActivities, (val) => val.value),
       };
 
       apiClient.post(locationUrl, payload)
@@ -398,7 +405,7 @@ class LocationDetails extends Component {
     return (
       <div className="configuration-wizard-content flex-column">
         <Form
-          onSubmit={values => this.nextPage(values)}
+          onSubmit={(values) => this.nextPage(values)}
           validate={validate}
           initialValues={this.state.values}
           mutators={{
@@ -449,23 +456,25 @@ class LocationDetails extends Component {
                   {_.map(
                     FIELDS,
                     (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
-                        active: values.active,
-                        debouncedLocationGroupsFetch: this.debouncedLocationGroupsFetch,
-                        debouncedOrganizationsFetch: this.debouncedOrganizationsFetch,
-                        debouncedPeopleFetch: this.debouncedPeopleFetch,
-                        openNewOrganizationModal: this.openNewOrganizationModal,
-                        openNewLocationGroupModal: this.openNewLocationGroupModal,
-                        injectionData: this.state.supportLinks,
-                      }),
+                      active: values.active,
+                      debouncedLocationGroupsFetch: this.debouncedLocationGroupsFetch,
+                      debouncedOrganizationsFetch: this.debouncedOrganizationsFetch,
+                      debouncedPeopleFetch: this.debouncedPeopleFetch,
+                      openNewOrganizationModal: this.openNewOrganizationModal,
+                      openNewLocationGroupModal: this.openNewLocationGroupModal,
+                      injectionData: this.state.supportLinks,
+                    }),
                   )}
 
                   <div className="form-title"><Translate id="react.locationsConfiguration.typeAndActivities.label" defaultMessage="Location Type and Supported Activities" /></div>
                   <div className="form-subtitle">
                     <span>
-                      <Translate id="react.locationsConfiguration.typeAndActivitiesDescription.label" />&nbsp;
+                      <Translate id="react.locationsConfiguration.typeAndActivitiesDescription.label" />
+&nbsp;
                       <a target="_blank" rel="noopener noreferrer" href="https://openboxes.atlassian.net/wiki/spaces/OBW/pages/1744633857/Location+Types+and+Supported+Activities">
                         <Translate id="react.locationsConfiguration.here.label" defaultMessage="here" />
-                      </a>.
+                      </a>
+                      .
                     </span>
                   </div>
 
@@ -492,7 +501,7 @@ class LocationDetails extends Component {
                     <Checkbox
                       id="useDefaultActivities"
                       value={this.state.useDefaultActivities}
-                      onChange={val => this.setState({ useDefaultActivities: val })}
+                      onChange={(val) => this.setState({ useDefaultActivities: val })}
                       withLabel
                       label={this.props.translate('react.locationsConfiguration.useDefaultActivities.label', 'Use default settings for Supported Activities')}
                     />
@@ -558,7 +567,7 @@ class LocationDetails extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   location: state.session.currentLocation,
   locale: state.session.activeLanguage,
   isSuperuser: state.session.isSuperuser,

@@ -11,21 +11,23 @@ import useTranslate from 'hooks/useTranslate';
 
 const useInvoicePrepaidItemsTable = ({
   invoiceItems,
-  updateInvoiceItemQuantity,
+  updateInvoiceItemData,
   invoiceId,
   refetchData,
+  invoiceItemsMap,
 }) => {
   const spinner = useSpinner();
   const translate = useTranslate();
   const [editableRows, setEditableRows] = useState({});
   const [invalidRows, setInvalidRows] = useState([]);
 
-  // Function reverting quantity to the version stored in editableRows state.
-  // Used for reverting changed quantity after fetching new data.
+  // Function reverting data to the version stored in editableRows state.
+  // Used for reverting information after fetching new data.
   const revertQuantityToEdited = () => {
     Object.entries(editableRows)
-      .forEach(([id, quantity]) => {
-        updateInvoiceItemQuantity()(id)(quantity);
+      .forEach(([id, data]) => {
+        updateInvoiceItemData()(id, 'quantity')(data?.quantity);
+        updateInvoiceItemData()(id, 'unitPrice')(data?.unitPrice);
       });
   };
 
@@ -37,13 +39,17 @@ const useInvoicePrepaidItemsTable = ({
 
   const isEditable = (rowId) => rowId in editableRows;
 
-  // Returns quantity which should be sent for updating invoice items
+  // Returns lines which should be sent for updating invoice items
   const getEditedInvoiceItems = () => invoiceItems
     .filter((item) => isEditable(item.id))
-    .map((item) => ({
-      id: item.id,
-      quantity: item.quantity,
-    }));
+    .map((item) => (item?.orderAdjustment
+      ? {
+        id: item.id,
+        unitPrice: item.unitPrice,
+      } : {
+        id: item.id,
+        quantity: item.quantity,
+      }));
 
   const deletePrepaidInvoiceItem = async (invoiceItemId) => {
     spinner.show();
@@ -59,19 +65,30 @@ const useInvoicePrepaidItemsTable = ({
     }
   };
 
-  // Sending a request for updating invoice items quantity (batch update)
+  // Sending a request for updating invoice items (batch update)
   const updateInvoiceItem = async (callback) => {
-    const invoiceItemsToUpdate = getEditedInvoiceItems();
-    if (invoiceItemsToUpdate.length) {
-      await prepaymentInvoiceApi.updateInvoiceItems(invoiceId, invoiceItemsToUpdate);
+    try {
+      const invoiceItemsToUpdate = getEditedInvoiceItems();
+      if (invoiceItemsToUpdate.length) {
+        await prepaymentInvoiceApi.updateInvoiceItems(invoiceId, invoiceItemsToUpdate);
+      }
+      callback?.();
+    } catch {
+      spinner.hide();
     }
-    callback?.();
   };
 
-  const markRowAsEditable = (rowId, quantity) => {
+  const markRowAsEditable = ({
+    rowId,
+    quantity,
+    unitPrice,
+  }) => {
     setEditableRows((rows) => ({
       ...rows,
-      [rowId]: quantity,
+      [rowId]: {
+        quantity,
+        unitPrice,
+      },
     }));
   };
 
@@ -88,24 +105,24 @@ const useInvoicePrepaidItemsTable = ({
       defaultLabel: 'Edit',
       label: 'react.default.button.edit.label',
       leftIcon: <RiPencilLine />,
-      onClick: () => markRowAsEditable(row.id, row.quantity),
+      onClick: () => markRowAsEditable({
+        rowId: row.id,
+        quantity: row.quantity,
+        unitPrice: row.unitPrice,
+      }),
     };
 
-    return row?.isCanceled || row?.orderAdjustment
+    return row?.isCanceled || (row?.orderAdjustment && row?.unitPrice === 0)
       ? [removeAction]
       : [editAction, removeAction];
   };
 
   const isRowLoaded = useCallback(
-    ({ index }) => !!invoiceItems[index],
+    ({ index }) => !!invoiceItemsMap.get(index),
     [invoiceItems],
   );
 
-  const validate = (row) => {
-    if (!isEditable(row?.id)) {
-      return null;
-    }
-
+  const validateQuantity = (row) => {
     if (
       _.toInteger(row?.quantityAvailableToInvoice) < row?.quantity
       || _.toInteger(row?.quantity) <= 0
@@ -118,10 +135,45 @@ const useInvoicePrepaidItemsTable = ({
     return null;
   };
 
-  const updateRowQuantity = (rowId, quantity) =>
+  // validation for order adjustments
+  const validateUnitPrice = (row) => {
+    const haveUnitPricesDifferentSigns = (row.amount > 0 && row.unitPrice < 0)
+                                                || (row?.amount < 0 && row.unitPrice > 0);
+    const { unitPriceAvailableToInvoice: unitPrice, amount } = row;
+    const unitPriceAvailableToInvoice = Math.abs(unitPrice) + Math.abs(amount);
+    if (!row.unitPrice
+      || unitPriceAvailableToInvoice < Math.abs(row.unitPrice)
+      || haveUnitPricesDifferentSigns) {
+      setInvalidRows((rows) => ([...rows, row?.id]));
+      return translate('react.invoice.errors.unitPrice.label', 'Wrong amount to invoice value');
+    }
+
+    setInvalidRows((rows) => rows.filter((rowId) => row.id !== rowId));
+    return null;
+  };
+
+  const validate = (row) => {
+    if (!isEditable(row?.id)) {
+      return null;
+    }
+
+    if (row?.orderAdjustment) {
+      return validateUnitPrice(row);
+    }
+
+    return validateQuantity(row);
+  };
+
+  const updateRow = (
+    rowId,
+    data,
+  ) =>
     setEditableRows((rows) => ({
       ...rows,
-      [rowId]: quantity,
+      [rowId]: {
+        ...rows[rowId],
+        ...data,
+      },
     }));
 
   const isActionMenuVisible = (invoiceStatus, isPrepaymentInvoice, isInverseItem) =>
@@ -148,7 +200,7 @@ const useInvoicePrepaidItemsTable = ({
     actions,
     isEditable,
     validate,
-    updateRowQuantity,
+    updateRow,
     updateInvoiceItem,
     isActionMenuVisible,
     save,

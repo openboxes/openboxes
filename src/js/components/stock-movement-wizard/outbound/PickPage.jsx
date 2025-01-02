@@ -55,8 +55,8 @@ const FIELDS = {
     }) => {
       let className = rowValues.initial ? 'crossed-out ' : '';
       if (!subfield) { className += 'font-weight-bold'; }
-      const filterOutItems = itemFilter &&
-        !matchesProductCodeOrName({
+      const filterOutItems = itemFilter
+        && !matchesProductCodeOrName({
           product: rowValues?.product,
           filterValue: itemFilter,
         });
@@ -120,11 +120,12 @@ const FIELDS = {
         }),
         attributes: {
           showValueTooltip: true,
-          formatValue: fieldValue => fieldValue && (
+          formatValue: (fieldValue) => fieldValue && (
             <div className="d-flex">
               {fieldValue.zoneName ? <div className="text-truncate" style={{ minWidth: 30, flexShrink: 20 }}>{fieldValue.zoneName}</div> : ''}
               <div className="text-truncate">{fieldValue.zoneName ? `: ${fieldValue.name}` : fieldValue.name}</div>
-            </div>),
+            </div>
+          ),
         },
       },
       quantityRequired: {
@@ -133,7 +134,7 @@ const FIELDS = {
         defaultMessage: 'Qty required',
         flexWidth: '0.8',
         attributes: {
-          formatValue: value => (value ? (value.toLocaleString('en-US')) : value),
+          formatValue: (value) => (value ? (value.toLocaleString('en-US')) : value),
         },
       },
       quantityPicked: {
@@ -214,6 +215,18 @@ const FIELDS = {
   },
 };
 
+// Returns indexes of rows with quantity picked 0, and without subitems.
+const getIndexesOfRowsWithEmptyPicks = (pickPageItems) =>
+  pickPageItems.reduce((acc, item, index) => {
+  // When the quantity picked is equal to 0 we have to check its subitems,
+  // because the item can be edited to 0, not cleared.
+    if (!item.quantityPicked && !item.picklistItems.length) {
+      return [...acc, index];
+    }
+
+    return acc;
+  }, []);
+
 /* eslint class-methods-use-this: ["error",{ "exceptMethods": ["checkForInitialPicksChanges"] }] */
 /**
  * The forth step of stock movement(for movements from a depot) where user
@@ -273,22 +286,22 @@ class PickPage extends Component {
 
   setPickPageItems(response, startIndex) {
     const { data } = response.data;
-    this.setState({
+    this.setState((prev) => ({
       values: {
-        ...this.state.values,
+        ...prev.values,
         pickPageItems: this.props.isPaginated ? _.uniqBy(_.concat(
-          this.state.values.pickPageItems,
+          prev.values.pickPageItems,
           _.map(
             parseResponse(data),
-            item => this.checkForInitialPicksChanges(item),
+            (item) => this.checkForInitialPicksChanges(item),
           ),
         ), 'requisitionItem.id') : _.map(
           parseResponse(data),
-          item => this.checkForInitialPicksChanges(item),
+          (item) => this.checkForInitialPicksChanges(item),
         ),
       },
       sorted: false,
-    }, () => {
+    }), () => {
       // eslint-disable-next-line max-len
       if (!_.isNull(startIndex) && this.state.values.pickPageItems.length !== this.state.totalCount) {
         this.loadMoreRows({ startIndex: startIndex + this.props.pageSize });
@@ -312,12 +325,12 @@ class PickPage extends Component {
     if (!this.props.isPaginated) {
       this.fetchPickPageItems();
     } else if (forceFetch) {
-      this.setState({
+      this.setState((prev) => ({
         values: {
-          ...this.state.values,
+          ...prev.values,
           pickPageItems: [],
         },
-      }, () => {
+      }), () => {
         this.loadMoreRows({ startIndex: 0 });
       });
     }
@@ -337,7 +350,7 @@ class PickPage extends Component {
         // if yes -> compare quantityPicked of item in picklist with sugestion
         const pick = _.find(
           pickPageItem.picklistItems,
-          item => _.get(suggestion, 'inventoryItem.id') === _.get(item, 'inventoryItem.id') && _.get(item, 'binLocation.id') === _.get(suggestion, 'binLocation.id'),
+          (item) => _.get(suggestion, 'inventoryItem.id') === _.get(item, 'inventoryItem.id') && _.get(item, 'binLocation.id') === _.get(suggestion, 'binLocation.id'),
         );
         if (_.isEmpty(pick) || (pick.quantityPicked !== suggestion.quantityPicked)) {
           initialPicks.push({
@@ -366,17 +379,17 @@ class PickPage extends Component {
         const { associations, picklist } = resp.data.data;
         const printPicks = _.find(
           associations.documents,
-          doc => doc.documentType === 'PICKLIST' && doc.uri.includes('print'),
+          (doc) => doc.documentType === 'PICKLIST' && doc.uri.includes('print'),
         );
-        this.setState({
+        this.setState((prev) => ({
           totalCount,
           printPicksUrl: printPicks ? printPicks.uri : '/',
           sorted: false,
           values: {
-            ...this.state.values,
+            ...prev.values,
             picklist,
           },
-        }, () => this.props.hideSpinner());
+        }), () => this.props.hideSpinner());
       })
       .catch(() => this.props.hideSpinner());
   }
@@ -394,16 +407,16 @@ class PickPage extends Component {
       params: { stepNumber: OutboundWorkflowState.PICK_ITEMS, refreshPicklistItems: false },
     }).then((response) => {
       const { data } = response.data;
-      this.setState({
+      this.setState((prev) => ({
         values: {
-          ...this.state.values,
+          ...prev.values,
           pickPageItems: _.map(
             parseResponse(data),
-            item => this.checkForInitialPicksChanges(item),
+            (item) => this.checkForInitialPicksChanges(item),
           ),
         },
         sorted: false,
-      });
+      }));
     });
   }
 
@@ -433,14 +446,14 @@ class PickPage extends Component {
       .then((resp) => {
         const { pickPageItems } = resp.data.data.pickPage;
 
-        this.setState({
+        this.setState((prev) => ({
           values: {
-            ...this.state.values,
-            pickPageItems: _.map(parseResponse(pickPageItems), item =>
+            ...prev.values,
+            pickPageItems: _.map(parseResponse(pickPageItems), (item) =>
               this.checkForInitialPicksChanges(item)),
           },
           sorted: false,
-        }, () => this.props.hideSpinner());
+        }), () => this.props.hideSpinner());
       })
       .catch(() => { this.props.hideSpinner(); });
   }
@@ -468,9 +481,9 @@ class PickPage extends Component {
     const { pickPageItems } = lineItems;
     const invalidItem = _.find(
       pickPageItems,
-      pickPageItem => pickPageItem.quantityRequired > pickPageItem.quantityPicked && _.find(
+      (pickPageItem) => pickPageItem.quantityRequired > pickPageItem.quantityPicked && _.find(
         pickPageItem.picklistItems,
-        item => !item.reasonCode && !item.initial,
+        (item) => !item.reasonCode && !item.initial,
       ),
     );
 
@@ -514,21 +527,20 @@ class PickPage extends Component {
    * @public
    */
   updatePickPageItem(pickPageItem) {
-    const pickPageItemIndex =
-      _.findIndex(this.state.values.pickPageItems, item => _.get(item, 'requisitionItem.id') === _.get(pickPageItem, 'requisitionItem.id'));
+    const pickPageItemIndex = _.findIndex(this.state.values.pickPageItems, (item) => _.get(item, 'requisitionItem.id') === _.get(pickPageItem, 'requisitionItem.id'));
 
-    this.setState({
+    this.setState((prev) => ({
       values: {
-        ...this.state.values,
-        pickPageItems: update(this.state.values.pickPageItems, {
+        ...prev.values,
+        pickPageItems: update(prev.values.pickPageItems, {
           [pickPageItemIndex]: {
             $set: this.checkForInitialPicksChanges(parseResponse(pickPageItem)),
           },
         }),
       },
-    }, () => {
+    }), () => {
       const { values, showOnlyErroredItems } = this.state;
-      const indexesOfEmptyPicks = this.getIndexesOfRowsWithEmptyPicks(values.pickPageItems);
+      const indexesOfEmptyPicks = getIndexesOfRowsWithEmptyPicks(values.pickPageItems);
       this.setState({
         showOnlyErroredItems: indexesOfEmptyPicks.length ? showOnlyErroredItems : false,
       });
@@ -577,22 +589,9 @@ class PickPage extends Component {
     this.revertToAutoPick(itemId);
   }
 
-  // Returns indexes of rows with quantity picked 0, and without subitems.
-  getIndexesOfRowsWithEmptyPicks(pickPageItems) {
-    return pickPageItems.reduce((acc, item, index) => {
-      // When the quantity picked is equal to 0 we have to check its subitems,
-      // because the item can be edited to 0, not cleared.
-      if (!item.quantityPicked && !item.picklistItems.length) {
-        return [...acc, index];
-      }
-
-      return acc;
-    }, []);
-  }
-
   // Displaying an error message when an item with a quantity picked equal to 0 exists
   showEmptyPicksErrorMessage(formValues) {
-    const emptyPicks = this.getIndexesOfRowsWithEmptyPicks(formValues.pickPageItems);
+    const emptyPicks = getIndexesOfRowsWithEmptyPicks(formValues.pickPageItems);
     const emptyPickLinesNumber = emptyPicks.map((index) => index + 1).join(', ');
     const alertMessage = this.props.translate(
       'react.stockMovement.missingPickedLot.label',
@@ -611,7 +610,7 @@ class PickPage extends Component {
   // Managing hasError property depending on the value of quantity
   // picked and on the existing subitems
   validateEmptyPicks(formValues) {
-    const emptyPicks = this.getIndexesOfRowsWithEmptyPicks(formValues.pickPageItems);
+    const emptyPicks = getIndexesOfRowsWithEmptyPicks(formValues.pickPageItems);
 
     const pickPageItems = formValues.pickPageItems.map((item, index) => {
       if (emptyPicks.includes(index)) {
@@ -621,12 +620,12 @@ class PickPage extends Component {
       return { ...item, hasError: false };
     });
 
-    this.setState({
+    this.setState((prev) => ({
       values: {
-        ...this.state.values,
+        ...prev.values,
         pickPageItems,
       },
-    });
+    }));
 
     return !emptyPicks.length;
   }
@@ -641,18 +640,18 @@ class PickPage extends Component {
       sortedValues = _.orderBy(this.state.values.pickPageItems, ['sortOrder'], ['asc']);
     }
 
-    this.setState({
+    this.setState((prev) => ({
       values: {
-        ...this.state.values,
+        ...prev.values,
         pickPageItems: [],
       },
-    }, () => this.setState({
+    }), () => this.setState((prev) => ({
       values: {
-        ...this.state.values,
+        ...prev.values,
         pickPageItems: sortedValues,
       },
-      sorted: !this.state.sorted,
-    }));
+      sorted: !prev.sorted,
+    })));
   }
 
   exportTemplate(formValues) {
@@ -837,12 +836,11 @@ class PickPage extends Component {
       isExportDropdownVisible,
     } = this.state;
     const { showOnly } = this.props;
-    const emptyPicksCount =
-      this.getIndexesOfRowsWithEmptyPicks(this.state.values?.pickPageItems).length;
+    const emptyPicksCount = getIndexesOfRowsWithEmptyPicks(this.state.values?.pickPageItems).length;
 
     return (
       <Form
-        onSubmit={values => this.nextPage(values)}
+        onSubmit={(values) => this.nextPage(values)}
         mutators={{ ...arrayMutators }}
         initialValues={this.state.values}
         render={({ handleSubmit, values }) => (
@@ -853,8 +851,8 @@ class PickPage extends Component {
                 <span className="buttons-container">
                   <FilterInput
                     itemFilter={itemFilter}
-                    onChange={(e) => this.setState({itemFilter: e.target.value})}
-                    onClear={() => this.setState({itemFilter: ''})}
+                    onChange={(e) => this.setState({ itemFilter: e.target.value })}
+                    onClear={() => this.setState({ itemFilter: '' })}
                   />
                   {this.isMissingPick() && (
                     <button
@@ -862,19 +860,19 @@ class PickPage extends Component {
                       onClick={() => {
                         if (emptyPicksCount) {
                           this.validateEmptyPicks(values);
-                          this.setState({showOnlyErroredItems: !showOnlyErroredItems});
+                          this.setState({ showOnlyErroredItems: !showOnlyErroredItems });
                         }
                       }}
                       className={`float-right mb-1 btn btn-outline-secondary align-self-end btn-xs ml-3 ${showOnlyErroredItems ? 'active' : ''}`}
                     >
-                    <span>
-                      {emptyPicksCount}
-                      {' '}
-                      <Translate
-                        id="react.stockMovement.erroredItemsCount.label"
-                        defaultMessage="item(s) require your attention"
-                      />
-                    </span>
+                      <span>
+                        {emptyPicksCount}
+                        {' '}
+                        <Translate
+                          id="react.stockMovement.erroredItemsCount.label"
+                          defaultMessage="item(s) require your attention"
+                        />
+                      </span>
                     </button>
                   )}
                   <label
@@ -882,7 +880,7 @@ class PickPage extends Component {
                     className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs mr-1"
                   >
                     <span>
-                      <i className="fa fa-download pr-2"/>
+                      <i className="fa fa-download pr-2" />
                       <Translate
                         id="react.default.button.importTemplate.label"
                         defaultMessage="Import template"
@@ -891,7 +889,7 @@ class PickPage extends Component {
                     <input
                       id="csvInput"
                       type="file"
-                      style={{display: 'none'}}
+                      style={{ display: 'none' }}
                       onChange={this.importTemplate}
                       onClick={(event) => {
                         // eslint-disable-next-line no-param-reassign
@@ -907,7 +905,7 @@ class PickPage extends Component {
                       className="dropdown-button float-right mb-1 btn btn-outline-secondary align-self-end btn-xs"
                     >
                       <span>
-                        <i className="fa fa-sign-out pr-2"/>
+                        <i className="fa fa-sign-out pr-2" />
                         Export
                       </span>
                     </button>
@@ -921,7 +919,7 @@ class PickPage extends Component {
                         onClick={() => this.exportPick(values)}
                       >
                         <span>
-                          <i className="fa fa-upload pr-2"/>
+                          <i className="fa fa-upload pr-2" />
                           <Translate
                             id="react.stockMovement.pickListItem.export.label"
                             defaultMessage="Export Pick"
@@ -935,7 +933,7 @@ class PickPage extends Component {
                         onClick={() => this.exportTemplate(values)}
                       >
                         <span>
-                          <i className="fa fa-upload pr-2"/>
+                          <i className="fa fa-upload pr-2" />
                           <Translate
                             id="react.default.button.exportTemplate.label"
                             defaultMessage="Export template"
@@ -951,7 +949,7 @@ class PickPage extends Component {
                     rel="noopener noreferrer"
                   >
                     <span>
-                      <i className="fa fa-print pr-2"/>
+                      <i className="fa fa-print pr-2" />
                       <Translate
                         id="react.stockMovement.printPicklist.label"
                         defaultMessage="Print picklist"
@@ -964,7 +962,7 @@ class PickPage extends Component {
                     className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs ml-1"
                   >
                     <span>
-                      <i className="fa fa-refresh pr-2"/>
+                      <i className="fa fa-refresh pr-2" />
                       <Translate
                         id="react.stockMovement.clearPick.label"
                         defaultMessage="Clear pick"
@@ -991,7 +989,7 @@ class PickPage extends Component {
                     disabled={emptyPicksCount}
                   >
                     <span>
-                      <i className="fa fa-sign-out pr-2"/>
+                      <i className="fa fa-sign-out pr-2" />
                       <Translate
                         id="react.default.button.saveAndExit.label"
                         defaultMessage="Save and exit"
@@ -1005,21 +1003,21 @@ class PickPage extends Component {
                   >
                     {this.state.sorted && (
                       <span>
-                      <i className="fa fa-sort pr-2"/>
-                      <Translate
-                        id="react.stockMovement.originalOrder.label"
-                        defaultMessage="Original order"
-                      />
-                    </span>
+                        <i className="fa fa-sort pr-2" />
+                        <Translate
+                          id="react.stockMovement.originalOrder.label"
+                          defaultMessage="Original order"
+                        />
+                      </span>
                     )}
                     {!this.state.sorted && (
                       <span>
-                      <i className="fa fa-sort pr-2"/>
-                      <Translate
-                        id="react.stockMovement.sortByBins.label"
-                        defaultMessage="Sort by bins"
-                      />
-                    </span>
+                        <i className="fa fa-sort pr-2" />
+                        <Translate
+                          id="react.stockMovement.sortByBins.label"
+                          defaultMessage="Sort by bins"
+                        />
+                      </span>
                     )}
                   </button>
                 </span>
@@ -1031,7 +1029,7 @@ class PickPage extends Component {
                   className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs mr-2"
                 >
                   <span>
-                    <i className="fa fa-sign-out pr-2"/>
+                    <i className="fa fa-sign-out pr-2" />
                     <Translate
                       id="react.default.button.exit.label"
                       defaultMessage="Exit"

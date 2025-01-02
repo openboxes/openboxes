@@ -11,6 +11,7 @@ import './style.scss';
 const FileSelect = ({
   height,
   width,
+  minHeight,
   dropzoneText,
   buttonLabel,
   buttonVariant,
@@ -76,7 +77,7 @@ const FileSelect = ({
   });
 
   return (
-    <div style={{ width, height }}>
+    <div style={{ width, height, minHeight }}>
       <div {...getRootProps({ className: `dropzone d-flex flex-column justify-content-center align-items-center p-3 bg-light ${className}` })} {...fieldProps}>
         <input {...getInputProps()} />
         <h5 className="text-secondary font-italic">{translate(dropzoneText.id, dropzoneText.defaultMessage)}</h5>
@@ -126,6 +127,7 @@ FileSelect.propTypes = {
   width: PropTypes.string,
   // height of the dropzone
   height: PropTypes.string,
+  minHeight: PropTypes.string,
   // classname applied to the dropzone
   className: PropTypes.string,
   // indicator whether we can upload multiple files
@@ -148,6 +150,7 @@ FileSelect.defaultProps = {
   buttonVariant: 'grayed',
   width: 'auto',
   height: 'auto',
+  minHeight: '200px',
   className: '',
   multiple: false,
   maxFiles: null,

@@ -7,7 +7,6 @@ import WizardPage from 'components/wizard/WizardPage';
 import WizardSteps from 'components/wizard/WizardSteps';
 import WizardTitle from 'components/wizard/WizardTitle';
 
-
 /** Wizard component. */
 class Wizard extends Component {
   constructor(props) {
@@ -103,7 +102,7 @@ class Wizard extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   locale: state.session.activeLanguage,
   stockMovementTranslationsFetched: state.session.fetchedTranslations.stockMovement,
   hasPackingSupport: state.session.currentLocation.hasPackingSupport,

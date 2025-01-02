@@ -73,6 +73,8 @@ class ShipmentItem implements Comparable, Serializable {
             "unavailableQuantityPicked",
             "paymentTerm",
             "quantityInvoiced",
+            "orderItem",
+            "unitOfMeasure",
     ]
 
     static mapping = {
@@ -215,12 +217,10 @@ class ShipmentItem implements Comparable, Serializable {
     }
 
     Integer getQuantityRemainingToShip() {
-        OrderItem orderItem = OrderItem.get(this.orderItemId)
         return orderItem ? orderItem.getQuantityRemainingToShip(shipment) : 0
     }
 
     BigDecimal getQuantityPerUom() {
-        OrderItem orderItem = OrderItem.get(this.orderItemId)
         return orderItem ? orderItem.quantityPerUom : 1
     }
 
@@ -294,6 +294,18 @@ class ShipmentItem implements Comparable, Serializable {
 
     Boolean isInvoiceable() {
         return quantityToInvoiceInStandardUom > 0
+    }
+
+    OrderItem getOrderItem() {
+        return orderItems[0]
+    }
+
+    String getUnitOfMeasure() {
+        return orderItem?.unitOfMeasure
+    }
+
+    BigDecimal getPackSize() {
+        return orderItem?.quantityPerUom
     }
 
     /**

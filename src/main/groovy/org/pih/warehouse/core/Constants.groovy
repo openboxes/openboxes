@@ -32,11 +32,13 @@ class Constants {
     static final String DEFAULT_MONTH_YEAR_DATE_FORMAT = "dd/MMM/yyyy"
     static final String SHORT_MONTH_YEAR_DATE_FORMAT = "MM/yyyy"
     static final String EXPIRATION_DATE_FORMAT = "MM/dd/yyyy"
+    static final String MONTH_DAY_YEAR_DATE_FORMAT = "MM/dd/yyyy"
     static final String DELIVERY_DATE_FORMAT = "MM/dd/yyyy HH:mm XXX"
     static final String EUROPEAN_DATE_FORMAT = "dd/MM/yyyy"
     static final String DISPLAY_DATE_FORMAT = "MMM DD, yyyy"
     static final String DISPLAY_DATE_DEFAULT_VALUE = "-"
     static final String GENERATE_NAME_DATE_FORMAT = "ddMMMyyyy"
+    static final String EUROPEAN_DATE_FORMAT_WITH_TIME = "${EUROPEAN_DATE_FORMAT} HH:mm"
 
     static final String SPANISH_MEXICO_ORDER_IMPORT_DATE_FORMAT = "dd/MM/yyyy"
     static final String DEFAULT_ORDER_IMPORT_DATE_FORMAT = "MM/dd/yyyy"
@@ -46,6 +48,7 @@ class Constants {
     static final DateFormat EXPIRATION_DATE_FORMATTER = new SimpleDateFormat(EXPIRATION_DATE_FORMAT)
     static final DateFormat DELIVERY_DATE_FORMATTER = new SimpleDateFormat(DELIVERY_DATE_FORMAT)
     static final DateFormat EUROPEAN_DATE_FORMATTER = new SimpleDateFormat(EUROPEAN_DATE_FORMAT)
+    static final DateFormat MONTH_DAY_YEAR_DATE_FORMATTER = new SimpleDateFormat(MONTH_DAY_YEAR_DATE_FORMAT)
 
     // Dimension date formats
     static DateFormat weekFormat = new SimpleDateFormat("w")
@@ -115,25 +118,14 @@ class Constants {
     static final String DEFAULT_LINE_SEPARATOR = "\n"
     static final String SPACE_SEPARATOR = " "
 
-    // Characters that should be included with each of the random number types
-    static final String RANDOM_IDENTIFIER_ALPHABETIC_CHARACTERS = "ABCDEFGHJKMNPQRSTUVXYZ"
-    static final String RANDOM_IDENTIFIER_ALPHANUMERIC_CHARACTERS = "0123456789ABCDEFGHJKMNPQRSTUVWXYZ"
-    static final String RANDOM_IDENTIFIER_NUMERIC_CHARACTERS = "0123456789"
+    // Keyword values that can be used within identifier formats
+    static final String IDENTIFIER_FORMAT_KEYWORD_RANDOM = "random"
+    static final String IDENTIFIER_FORMAT_KEYWORD_RANDOM_EMBEDDED = "\${random}"
+    static final String IDENTIFIER_FORMAT_KEYWORD_DELIMITER = "delimiter"
+    static final String IDENTIFIER_FORMAT_KEYWORD_SEQUENCE_NUMBER = "sequenceNumber"
 
     // Default random number formats
-    static final String DEFAULT_ORDER_NUMBER_FORMAT = "NNNLLL"
-    static final String DEFAULT_PRODUCT_NUMBER_FORMAT = "LLNN"
-    static final String DEFAULT_PRODUCT_SUPPLIER_NUMBER_FORMAT = "NNNN"
-    static final String DEFAULT_REQUISITION_NUMBER_FORMAT = "NNNLLL"
-    static final String DEFAULT_SHIPMENT_NUMBER_FORMAT = "NNNLLL"
-    static final String DEFAULT_RECEIPT_NUMBER_FORMAT = "NNNLLL"
-    static final String DEFAULT_TRANSACTION_NUMBER_FORMAT = "AAA-AAA-AAA"
-    static final String DEFAULT_ORGANIZATION_NUMBER_FORMAT = "AAA"
-    static final String DEFAULT_SEQUENCE_NUMBER_FORMAT = "00000"
-    static final String DEFAULT_PO_SEQUENCE_NUMBER_FORMAT = "000000"
     static final String DEFAULT_SEQUENCE_NUMBER_FORMAT_CHAR = "0"
-    static final String DEFAULT_INVOICE_NUMBER_FORMAT = "NNNLLL"
-    static final String DEFAULT_LOCATION_NUMBER_FORMAT = "NNNLLL"
 
     static final String TRACKING_NUMBER_TYPE_ID = "10"
     static final String VENDOR_INVOICE_NUMBER_TYPE_ID = "VENDOR_INVOICE_NUMBER"

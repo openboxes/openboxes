@@ -69,6 +69,10 @@ class PartialReceiptItem {
         return product ?: inventoryItem?.product
     }
 
+    BigDecimal getPacksRequested() {
+        return quantityShipped / shipmentItem?.quantityPerUom
+    }
+
     Map toJson() {
         return [
 
@@ -99,7 +103,10 @@ class PartialReceiptItem {
                 quantityRemaining               : quantityRemaining,
                 cancelRemaining                 : cancelRemaining,
                 quantityOnHand                  : quantityOnHand,
-                comment                         : comment
+                comment                         : comment,
+                unitOfMeasure                   : shipmentItem?.unitOfMeasure,
+                packSize                        : shipmentItem?.packSize,
+                packsRequested                  : packsRequested,
         ]
     }
 

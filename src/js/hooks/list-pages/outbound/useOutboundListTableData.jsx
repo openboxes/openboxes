@@ -74,7 +74,7 @@ const useOutboundListTableData = (filterParams) => {
   });
 
   const dispatch = useDispatch();
-  const { isRequisitionStatusesFetched, requisitionStatuses, translate } = useSelector(state => ({
+  const { isRequisitionStatusesFetched, requisitionStatuses, translate } = useSelector((state) => ({
     isRequisitionStatusesFetched: state.requisitionStatuses.fetched,
     requisitionStatuses: state.requisitionStatuses.data,
     translate: translateWithDefaultMessage(getTranslate(state.localize)),

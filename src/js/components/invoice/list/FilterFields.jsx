@@ -79,7 +79,7 @@ export default {
       valueKey: 'id',
       labelKey: 'name',
       options: [],
-      filterOptions: options => options,
+      filterOptions: (options) => options,
       filterElement: true,
       placeholder: 'react.invoice.createdBy.label',
       defaultPlaceholder: 'Created by',

@@ -43,24 +43,24 @@ const TablePagination = (props) => {
     rangeNumberTo = totalDataSize;
   }
 
-  const pageSizeSelectOptions = props.pageSizeOptions.map(size => ({
+  const pageSizeSelectOptions = props.pageSizeOptions.map((size) => ({
     label: `${size} ${props.translate('react.reactTable.pagination.rows.label', 'rows')}`,
     value: size,
   }));
   const selectedPageSizeOption = pageSizeSelectOptions.find(({ value }) =>
     value === props.pageSize);
 
-
   return (
-    <div className="table-pagination d-flex flex-row align-items-center justify-content-between py-2 px-3">
+    <div className={`table-pagination d-flex flex-row align-items-center justify-content-between py-2 px-3 ${props.className}`}>
       <div className="d-flex">
         <span>{`${rangeNumberFrom}-${rangeNumberTo}`}</span>
         <span className="mx-1">{props.translate('react.reactTable.pagination.of.label', 'of')}</span>
         <span>{totalDataSize}</span>
       </div>
-      <div className="d-flex">
+      <div className="d-flex pages-selector">
         <nav className="d-flex justify-content-center align-items-center">
           <button
+            type="button"
             disabled={!props.canPrevious}
             className="table-pagination__btn-previous"
             onClick={previousPage}
@@ -80,6 +80,7 @@ const TablePagination = (props) => {
             <span>{props.pages}</span>
           </span>
           <button
+            type="button"
             disabled={!props.canNext}
             className="table-pagination__btn-next"
             onClick={nextPage}
@@ -98,15 +99,17 @@ const TablePagination = (props) => {
           />
         </div>
       </div>
-    </div>);
+    </div>
+  );
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
 });
 
 TablePagination.defaultProps = {
   totalData: undefined,
+  className: '',
 };
 
 TablePagination.propTypes = {
@@ -121,7 +124,7 @@ TablePagination.propTypes = {
   canPrevious: PropTypes.bool.isRequired,
   totalData: PropTypes.number,
   translate: PropTypes.func.isRequired,
+  className: PropTypes.string,
 };
-
 
 export default connect(mapStateToProps)(TablePagination);

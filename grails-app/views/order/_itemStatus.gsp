@@ -56,7 +56,7 @@
                 <td class="order-item-product">
                     <g:if test="${orderItem?.product }">
                         <g:link controller="inventoryItem" action="showStockCard" params="['product.id':orderItem?.product?.id]">
-                            <format:displayName product="${orderItem?.product}" showTooltip="${true}" />
+                            <format:displayName product="${orderItem?.product}" productSupplier="${orderItem?.productSupplier}" showTooltip="${true}" />
                             <g:renderHandlingIcons product="${orderItem?.product}" />
                         </g:link>
                     </g:if>

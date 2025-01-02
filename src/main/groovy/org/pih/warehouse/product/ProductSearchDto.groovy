@@ -28,6 +28,8 @@ class ProductSearchDto {
 
     Boolean exactMatch = Boolean.FALSE
 
+    String unitOfMeasure
+
     def getApplicationTagLib() {
         return Holders.grailsApplication.mainContext.getBean('org.grails.plugins.web.taglib.ApplicationTagLib')
     }
@@ -52,7 +54,8 @@ class ProductSearchDto {
                 color              : productColor,
                 handlingIcons      : handlingIcons,
                 lotAndExpiryControl: lotAndExpiryControl,
-                exactMatch         : exactMatch
+                exactMatch         : exactMatch,
+                unitOfMeasure      : unitOfMeasure
         ]
     }
 }

@@ -55,4 +55,17 @@ class EventType implements Comparable<EventType>, Serializable {
     int compareTo(EventType other) {
         return sortOrder <=> other?.sortOrder ?: eventCode <=> other?.eventCode ?: name <=> other?.name
     }
+
+    static List<EventType> listCustomEventTypes() {
+        return createCriteria().list {
+            'in'('eventCode', EventCode.listCustomEventTypeCodes())
+        }
+    }
+
+    EventTypeDto toDto() {
+        return new EventTypeDto(
+                name: name,
+                eventCode: eventCode,
+        )
+    }
 }
