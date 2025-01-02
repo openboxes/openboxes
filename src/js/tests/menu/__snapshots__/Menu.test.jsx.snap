@@ -41,6 +41,7 @@ exports[`menuItem component should match snapshot 1`] = `
       className="nav-link dropdown-toggle"
       href="#"
       id="navbarDropdown"
+      role="menuitem"
     />
     <div
       aria-labelledby="navbarDropdown"

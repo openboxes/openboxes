@@ -7,7 +7,6 @@ import {
   SHOW_INFO_BAR_MODAL,
 } from 'actions/types';
 
-
 /**
  * Initial state for Info Bar reducer
  * @type {{bars: {

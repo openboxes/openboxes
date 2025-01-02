@@ -15,13 +15,14 @@ const Numbers = () => {
 
   return (
     <div className="value">
-      <div className={classColor} /> {_.random(3, 95)}
+      <div className={classColor} />
+      {' '}
+      {_.random(3, 95)}
     </div>
   );
 };
 
-
-const PreviewIndicator = props => (
+const PreviewIndicator = (props) => (
   <li className="unarchived-item">
     <div className="archived-indicator">
       <div className="row">
@@ -47,8 +48,7 @@ const PreviewIndicator = props => (
   </li>
 );
 
-
-const ArchivedNumber = props => (
+const ArchivedNumber = (props) => (
   <PreviewIndicator
     title={props.title}
     index={props.index}
@@ -60,7 +60,6 @@ const ArchivedNumber = props => (
     <span>{_.random(3, 95)}</span>
   </PreviewIndicator>
 );
-
 
 const ArchivedGraph = (props) => {
   let graph;
@@ -111,8 +110,7 @@ const ArchivedGraph = (props) => {
   );
 };
 
-
-const ArchivedIndicators = props => (
+const ArchivedIndicators = (props) => (
   <div>
     {props.widgets.map((value, index) =>
       (value.type === 'number' ? (
@@ -142,16 +140,15 @@ const ArchivedIndicators = props => (
   </div>
 );
 
-
 const UnarchiveIndicators = (props) => {
   const data = [...props.graphData, ...props.numberData];
   const dashboardWidgets = _.chain(data)
-    .filter(widget => widget && widget.widgetId)
-    .map(widget => widget.widgetId).value();
+    .filter((widget) => widget && widget.widgetId)
+    .map((widget) => widget.widgetId).value();
   const archivedWidgets = _.chain(props.dashboardConfig.dashboardWidgets)
     .omit(dashboardWidgets)
     .map((widget, widgetId) => ({ ...widget, widgetId }))
-    .filter(widget => widget.enabled)
+    .filter((widget) => widget.enabled)
     .value();
   const size = _.size(archivedWidgets);
 
@@ -163,11 +160,15 @@ const UnarchiveIndicators = (props) => {
     >
       <div className="unarchive" role="button" tabIndex={0} onClick={props.unarchiveHandler} onKeyDown={props.unarchiveHandler}>
         <span>
-          Archived Indicators ({size}) <i className="fa fa-archive" />
+          Archived Indicators (
+          {size}
+          )
+          {' '}
+          <i className="fa fa-archive" />
         </span>
       </div>
       <div className="unarchive-popover">
-        <span role="button" tabIndex={0} className="close-button" onClick={props.unarchiveHandler} onKeyDown={props.unarchiveHandler} >
+        <span role="button" tabIndex={0} className="close-button" onClick={props.unarchiveHandler} onKeyDown={props.unarchiveHandler}>
           &times;
         </span>
         <ul className="unarchived-list">
@@ -184,7 +185,7 @@ const UnarchiveIndicators = (props) => {
   );
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
 });
 

@@ -799,7 +799,14 @@ class OrderService {
 
                     orderItem.quantity = parsedQty
                     orderItem.unitPrice = parsedUnitPrice
-                    orderItem.recipient = recipient ? personService.getPersonByNames(recipient) : null
+
+                    if (recipient) {
+                        Person person = personService.getActivePersonByName(recipient)
+                        if (!person) {
+                            throw new IllegalArgumentException("Cannot set a recipient who is non-existant or inactive: ${recipient}")
+                        }
+                        orderItem.recipient = person
+                    }
 
                     def estReadyDate = null
                     Locale locale = LocalizationUtil.currentLocale
@@ -1246,61 +1253,6 @@ class OrderService {
         }
 
         return results
-    }
-
-    /**
-     * Refreshing entire Order Summary materialized view, should be only triggered from time to time
-     * (same statements as in the order-summary-materialized-view.sql)
-     * */
-    def refreshOrderSummary() {
-        List statements = [
-            // Drop mv temp table if somehow it still exists
-            "DROP TABLE IF EXISTS order_summary_mv_temp;",
-            // Create temp mv table from sql view (to shorten the time when MV is unavailable)
-            "CREATE TABLE order_summary_mv_temp AS SELECT DISTINCT * FROM order_summary;",
-            "DROP TABLE IF EXISTS order_summary_mv;",
-            // Copy data from temp mv table into mv table
-            "CREATE TABLE IF NOT EXISTS order_summary_mv LIKE order_summary_mv_temp;",
-            "TRUNCATE order_summary_mv;",
-            "INSERT INTO order_summary_mv SELECT * FROM order_summary_mv_temp;",
-            "ALTER TABLE order_summary_mv ADD UNIQUE INDEX (id);",
-            // Cleanup
-            "DROP TABLE IF EXISTS order_summary_mv_temp;",
-        ]
-        dataService.executeStatements(statements)
-    }
-
-    /**
-     * Refreshing the Order Summary materialized view for a specific list of Order Ids (PASS ONLY A PO IDs)
-     * */
-    def refreshOrderSummary(List<String> orderIds, Boolean isDelete) {
-        List statements = []
-        orderIds?.each { String orderId ->
-            if (isDelete) {
-                statements << "DELETE FROM order_summary_mv WHERE id = '${orderId}';"
-            } else {
-                statements << "REPLACE INTO order_summary_mv (SELECT * FROM order_summary WHERE id = '${orderId}');"
-            }
-        }
-
-        if (statements && checkIfOrderSummaryExists()) {
-            dataService.executeStatements(statements)
-        }
-    }
-
-    Boolean checkIfOrderSummaryExists() {
-        try {
-            // Check if table exists.
-            dataService.executeQuery("SELECT * FROM order_summary_mv LIMIT 1")
-            return true
-        } catch (Exception e) {
-            // UndeclaredThrowableException caused by MySQLSyntaxErrorException is thrown when
-            // the table 'order_summary_mv' doesn't exist. Then just simply refresh entire table
-            log.info "Refreshing order summary failed due to: ${e?.cause?.message}. Refreshing entire table now."
-
-            RefreshOrderSummaryJob.triggerNow()
-            return false
-        }
     }
 
     Map getOrderSummary(String orderId) {

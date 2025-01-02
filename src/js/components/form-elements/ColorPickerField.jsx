@@ -4,7 +4,7 @@ import BaseField from 'components/form-elements/BaseField';
 import ColorPicker from 'utils/ColorPicker';
 
 const ColorPickerField = (props) => {
-  const renderInput = attributes => (
+  const renderInput = (attributes) => (
     <ColorPicker
       {...attributes}
     />

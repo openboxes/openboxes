@@ -17,8 +17,7 @@ const InvoiceListFilters = ({
   suppliers,
   typeCodes,
 }) => {
-  const { defaultValues, setFilterValues } =
-    useInvoiceFilters({ setFilterParams });
+  const { defaultValues, setFilterValues } = useInvoiceFilters({ setFilterParams });
 
   const debouncedPeopleFetch = useCallback(
     debouncePeopleFetch(debounceTime, minSearchLength),
@@ -29,7 +28,7 @@ const InvoiceListFilters = ({
     <div className="d-flex flex-column list-page-filters">
       <FilterForm
         filterFields={filterFields}
-        updateFilterParams={values => setFilterValues({ ...values })}
+        updateFilterParams={(values) => setFilterValues({ ...values })}
         formProps={{
           statuses,
           debouncedPeopleFetch,
@@ -48,7 +47,7 @@ const InvoiceListFilters = ({
   );
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   debounceTime: state.session.searchConfig.debounceTime,
   minSearchLength: state.session.searchConfig.minSearchLength,
   currentLocation: state.session.currentLocation,

@@ -83,7 +83,6 @@ class SplitLineModal extends Component {
     return '';
   }
 
-
   /**
    * Saves split items added by user in this modal.
    * @public
@@ -154,7 +153,7 @@ class SplitLineModal extends Component {
    */
 
   isNegativeQuantity() {
-    return _.some(this.state.splitItems, items => _.toInteger(items.quantity) <= 0);
+    return _.some(this.state.splitItems, (items) => _.toInteger(items.quantity) <= 0);
   }
 
   isQuantityGreaterThanOriginalPutaway() {
@@ -181,7 +180,7 @@ class SplitLineModal extends Component {
    * @public
    */
   isBinSelected() {
-    return _.every(this.state.splitItems, splitItem =>
+    return _.every(this.state.splitItems, (splitItem) =>
       _.get(splitItem, 'putawayLocation.id'));
   }
 
@@ -192,7 +191,8 @@ class SplitLineModal extends Component {
           type="button"
           className="btn btn-outline-success btn-xs mr-1 mb-1"
           onClick={() => this.openModal()}
-        ><Translate id="react.putAway.splitLine.label" defaultMessage="Split line" />
+        >
+          <Translate id="react.putAway.splitLine.label" defaultMessage="Split line" />
         </button>
         <Modal
           isOpen={this.state.showModal}
@@ -209,8 +209,8 @@ class SplitLineModal extends Component {
                 duration="250"
                 hideDelay="50"
                 className="text-overflow-ellipsis"
-                disabled={this.props.putawayItem.product?.name ===
-                  this.props.putawayItem.product?.displayNameOrDefaultName}
+                disabled={this.props.putawayItem.product?.name
+                  === this.props.putawayItem.product?.displayNameOrDefaultName}
                 html={this.props.putawayItem.product?.name}
               >
                 {' '}
@@ -218,10 +218,11 @@ class SplitLineModal extends Component {
               </Tooltip>
             </h3>
             <div className="font-weight-bold">
-              <Translate id="react.putAway.expiry.label" defaultMessage="Expiry" />:
+              <Translate id="react.putAway.expiry.label" defaultMessage="Expiry" />
+              :
               {
-                this.props.putawayItem.inventoryItem.expirationDate ?
-                  this.props.formatLocalizedDate(
+                this.props.putawayItem.inventoryItem.expirationDate
+                  ? this.props.formatLocalizedDate(
                     this.props.putawayItem.inventoryItem.expirationDate,
                     DateFormat.COMMON,
                   )
@@ -229,10 +230,14 @@ class SplitLineModal extends Component {
               }
             </div>
             <div className="font-weight-bold">
-              <Translate id="react.putAway.totalQty.label" defaultMessage="Total QTY" />: {this.props.putawayItem.quantity}
+              <Translate id="react.putAway.totalQty.label" defaultMessage="Total QTY" />
+              :
+              {this.props.putawayItem.quantity}
             </div>
             <div className="font-weight-bold">
-              <Translate id="react.putAway.putAwayQty.label" defaultMessage="Putaway QTY" />: {this.calculatePutAwayQty()}
+              <Translate id="react.putAway.putAwayQty.label" defaultMessage="Putaway QTY" />
+              :
+              {this.calculatePutAwayQty()}
             </div>
           </div>
           <hr />
@@ -241,14 +246,15 @@ class SplitLineModal extends Component {
             <table className="table table-striped text-center border">
               <thead>
                 <tr>
-                  <th className="py-1"><Translate id="react.putAway.putAwayBin.label" defaultMessage="Putaway Bin" /></th>
-                  <th className="py-1"><Translate id="react.putAway.quantity.label" defaultMessage="Quantity" /></th>
-                  <th className="py-1"><Translate id="react.default.button.delete.label" defaultMessage="Delete" /></th>
+                  <th aria-label="Putaway Bin" className="py-1"><Translate id="react.putAway.putAwayBin.label" defaultMessage="Putaway Bin" /></th>
+                  <th aria-label="Quantity" className="py-1"><Translate id="react.putAway.quantity.label" defaultMessage="Quantity" /></th>
+                  <th aria-label="Delete" className="py-1"><Translate id="react.default.button.delete.label" defaultMessage="Delete" /></th>
                 </tr>
               </thead>
               <tbody>
                 { _.map(this.state.splitItems, (item, index) => (
-                !item.delete &&
+                  !item.delete
+                && (
                 <tr
                   // eslint-disable-next-line react/no-array-index-key
                   key={index}
@@ -259,13 +265,13 @@ class SplitLineModal extends Component {
                       valueKey="id"
                       labelKey="name"
                       value={item.putawayLocation}
-                      onChange={value => this.setState({
-                        splitItems: update(this.state.splitItems, {
+                      onChange={(value) => this.setState((prev) => ({
+                        splitItems: update(prev.splitItems, {
                           [index]: {
                             putawayLocation: { $set: value },
                           },
                         }),
-                      })}
+                      }))}
                       className="select-xs"
                     />
                   </td>
@@ -283,47 +289,50 @@ class SplitLineModal extends Component {
                         <Input
                           type="number"
                           value={item.quantity}
-                          onChange={value => this.setState({
-                              splitItems: update(this.state.splitItems, {
-                                [index]: { quantity: { $set: value } },
-                              }),
-                            })
-                          }
+                          onChange={(value) => this.setState((prev) => ({
+                            splitItems: update(prev.splitItems, {
+                              [index]: { quantity: { $set: value } },
+                            }),
+                          }))}
                         />
                       </div>
                     </Tooltip>
                   </td>
                   <td width="120px" className="py-1">
                     <button
+                      type="button"
                       className="btn btn-outline-danger btn-xs"
                       onClick={() => {
                         if (this.state.splitItems[index].id) {
-                          this.setState({
-                            splitItems: update(this.state.splitItems, {
+                          this.setState((prev) => ({
+                            splitItems: update(prev.splitItems, {
                               [index]: { delete: { $set: true } },
                             }),
-                          });
+                          }));
                         } else {
-                          this.setState({
-                            splitItems: update(this.state.splitItems, {
+                          this.setState((prev) => ({
+                            splitItems: update(prev.splitItems, {
                               $splice: [
                                 [index, 1],
                               ],
                             }),
-                          });
+                          }));
                         }
                       }}
-                    ><Translate id="react.default.button.delete.label" defaultMessage="Delete" />
+                    >
+                      <Translate id="react.default.button.delete.label" defaultMessage="Delete" />
                     </button>
                   </td>
                 </tr>
-              ))}
+                )
+                ))}
               </tbody>
             </table>
             <button
+              type="button"
               className="btn btn-outline-success btn-xs"
-              onClick={() => this.setState({
-                splitItems: update(this.state.splitItems, {
+              onClick={() => this.setState((prev) => ({
+                splitItems: update(prev.splitItems, {
                   $push: [{
                     quantity: '',
                     putawayFacility: {
@@ -335,12 +344,13 @@ class SplitLineModal extends Component {
                     inventoryItem: { id: this.props.putawayItem.inventoryItem.id },
                     currentLocation: {
                       id: this.props.putawayItem.currentLocation
-                      ? this.props.putawayItem.currentLocation.id : null,
+                        ? this.props.putawayItem.currentLocation.id : null,
                     },
                   }],
                 }),
-              })}
-            ><Translate id="react.default.button.addLine.label" defaultMessage="Add line" />
+              }))}
+            >
+              <Translate id="react.default.button.addLine.label" defaultMessage="Add line" />
             </button>
           </div>
 
@@ -351,13 +361,15 @@ class SplitLineModal extends Component {
               className="btn btn-outline-success btn-sm"
               disabled={!this.isValid() || !this.isBinSelected()}
               onClick={() => this.onSave()}
-            ><Translate id="react.default.button.save.label" defaultMessage="Save" />
+            >
+              <Translate id="react.default.button.save.label" defaultMessage="Save" />
             </button>
             <button
               type="button"
               className="btn btn-outline-secondary btn-sm"
               onClick={() => this.closeModal()}
-            ><Translate id="react.default.button.cancel.label" defaultMessage="Cancel" />
+            >
+              <Translate id="react.default.button.cancel.label" defaultMessage="Cancel" />
             </button>
           </div>
         </Modal>
@@ -366,7 +378,7 @@ class SplitLineModal extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
   formatLocalizedDate: formatDate(state.localize),
 });

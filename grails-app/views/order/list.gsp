@@ -229,6 +229,14 @@
 						for (const [orderId, derivedStatus] of Object.entries(data)) {
 							$("." + orderId).text(derivedStatus);
 						}
+					},
+					error: function (jqXHR, textStatus, errorThrown) {
+						console.error(jqXHR, textStatus, errorThrown);
+						if (jqXHR.responseText) {
+							$.notify(jqXHR.responseText, "error");
+						} else {
+							$.notify("An error occurred", "error");
+						}
 					}
 				});
 			}

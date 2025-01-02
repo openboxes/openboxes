@@ -496,7 +496,11 @@ dependencies {
     implementation "io.sentry:sentry-servlet:${sentryVersion}"
     // Uses P6Spy to capture database queries.
     implementation "io.sentry:sentry-jdbc:${sentryVersion}"
-    implementation "io.sentry:sentry-spring-boot-starter:${sentryVersion}"
+    // TODO: We can't use "io.sentry:sentry-spring-boot-starter" because it causes a null pointer on transaction name in
+    // io.sentry.spring.boot.SentryAutoConfiguration$HubConfiguration$SentryWebMvcConfiguration.transactionNameProvider
+    // but only when deploying to an external Servlet. Once this is resolved we can switch to sentry-spring-boot-starter
+    // which will give us automatic Sentry releases and allow us to configure sentry in application.yml
+    implementation "io.sentry:sentry-spring:${sentryVersion}"
 
     // incorporate latest timezone changes
     implementation 'joda-time:joda-time:2.12.5'
@@ -898,10 +902,6 @@ tasks.withType(Test) {
         showStackTraces = true
         showStandardStreams = true
     }
-
-    // Generate a code coverage report whenever tests run. This is useful for simplifying uploading coverage reports
-    // during our CI flows. The actual report generation is quick (<20 seconds), so it's fine to do this every time.
-    finalizedBy jacocoTestReport
 
     jacoco {
         // When running tests, exclude the given folders from Jacoco coverage % generation.

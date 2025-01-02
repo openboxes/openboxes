@@ -1,8 +1,11 @@
 package org.pih.warehouse.receiving
 
+import grails.gorm.transactions.Transactional
+
 import org.pih.warehouse.core.IdentifierService
 import org.pih.warehouse.core.identification.BlankIdentifierResolver
 
+@Transactional
 class ReceiptIdentifierService extends IdentifierService<Receipt> implements BlankIdentifierResolver<Receipt> {
 
     @Override

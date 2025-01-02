@@ -15,9 +15,7 @@ const ShipmentIdentifier = ({ shipmentType, identifier }) => {
   );
 };
 
-
 export default ShipmentIdentifier;
-
 
 ShipmentIdentifier.propTypes = {
   shipmentType: PropTypes.shape({}).isRequired,

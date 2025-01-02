@@ -8,42 +8,43 @@ const { CONTEXT_PATH } = window;
 
 // PURCHASE ORDER
 export const PURCHASE_ORDER_API = `${API}/purchaseOrders`;
-export const PURCHASE_ORDER_DELETE = id => `${PURCHASE_ORDER_API}/${id}`;
-export const PURCHASE_ORDER_ROLLBACK_ORDER = id => `${PURCHASE_ORDER_API}/${id}/rollback`;
+export const PURCHASE_ORDER_DELETE = (id) => `${PURCHASE_ORDER_API}/${id}`;
+export const PURCHASE_ORDER_ROLLBACK_ORDER = (id) => `${PURCHASE_ORDER_API}/${id}/rollback`;
 
 // STOCK MOVEMENT
 export const STOCK_MOVEMENT_API = `${API}/stockMovements`;
-export const STOCK_MOVEMENT_BY_ID = id => `${STOCK_MOVEMENT_API}/${id}`;
+export const STOCK_MOVEMENT_BY_ID = (id) => `${STOCK_MOVEMENT_API}/${id}`;
 export const STOCK_MOVEMENT_PENDING_SHIPMENT_ITEMS = `${STOCK_MOVEMENT_API}/pendingRequisitionItems`;
 export const STOCK_MOVEMENT_INCOMING_ITEMS = `${STOCK_MOVEMENT_API}/shippedItems`;
-export const STOCK_MOVEMENT_UPDATE_STATUS = id => `${STOCK_MOVEMENT_API}/${id}/status`;
-export const STOCK_MOVEMENT_ROLLBACK_APPROVAL = id => `${STOCK_MOVEMENT_API}/${id}/rollbackApproval`;
-export const STOCK_MOVEMENT_ITEMS = id => `${STOCK_MOVEMENT_BY_ID(id)}/stockMovementItems`;
-export const STOCK_MOVEMENT_UPDATE_ITEMS = id => `${STOCK_MOVEMENT_BY_ID(id)}/updateItems`;
-export const STOCK_MOVEMENT_REMOVE_ALL_ITEMS = id => `${STOCK_MOVEMENT_BY_ID(id)}/removeAllItems`;
-export const STOCK_MOVEMENT_STATUS = id => `${STOCK_MOVEMENT_BY_ID(id)}/status`;
-export const PICKLIST_ITEMS_EXPORT = id => `${STOCK_MOVEMENT_API}/exportPickListItems/${id}`;
-export const PICKLIST_TEMPLATE_EXPORT = id => `${STOCK_MOVEMENT_API}/picklistTemplate/${id}`;
-export const PICKLIST_IMPORT = id => `${STOCK_MOVEMENT_API}/importPickListItems/${id}`;
+export const STOCK_MOVEMENT_UPDATE_STATUS = (id) => `${STOCK_MOVEMENT_API}/${id}/status`;
+export const STOCK_MOVEMENT_ROLLBACK_APPROVAL = (id) => `${STOCK_MOVEMENT_API}/${id}/rollbackApproval`;
+export const STOCK_MOVEMENT_ITEMS = (id) => `${STOCK_MOVEMENT_BY_ID(id)}/stockMovementItems`;
+export const STOCK_MOVEMENT_UPDATE_ITEMS = (id) => `${STOCK_MOVEMENT_BY_ID(id)}/updateItems`;
+export const STOCK_MOVEMENT_REMOVE_ALL_ITEMS = (id) => `${STOCK_MOVEMENT_BY_ID(id)}/removeAllItems`;
+export const STOCK_MOVEMENT_STATUS = (id) => `${STOCK_MOVEMENT_BY_ID(id)}/status`;
+export const PICKLIST_ITEMS_EXPORT = (id) => `${STOCK_MOVEMENT_API}/exportPickListItems/${id}`;
+export const PICKLIST_TEMPLATE_EXPORT = (id) => `${STOCK_MOVEMENT_API}/picklistTemplate/${id}`;
+export const PICKLIST_IMPORT = (id) => `${STOCK_MOVEMENT_API}/importPickListItems/${id}`;
 export const PACKING_LIST_TEMPLATE = `${STOCK_MOVEMENT_API}/packingList/template`;
 
 // STOCK MOVEMENT ITEMS
 export const STOCK_MOVEMENT_ITEM_API = `${API}/stockMovementItems`;
-export const STOCK_MOVEMENT_ITEM_BY_ID = id => `${STOCK_MOVEMENT_ITEM_API}/${id}`;
-export const STOCK_MOVEMENT_ITEM_DETAILS = id => `${STOCK_MOVEMENT_ITEM_BY_ID(id)}/details`;
-export const STOCK_MOVEMENT_ITEM_REMOVE = id => `${STOCK_MOVEMENT_ITEM_BY_ID(id)}/removeItem`;
-export const STOCK_MOVEMENT_UPDATE_PICKLIST = id => `${STOCK_MOVEMENT_ITEM_BY_ID(id)}/updatePicklist`;
-export const STOCK_MOVEMENT_CREATE_PICKLIST = id => `${STOCK_MOVEMENT_ITEM_BY_ID(id)}/createPicklist`;
-export const STOCK_MOVEMENT_ITEM_REVERT_PICK = id => `${STOCK_MOVEMENT_ITEM_BY_ID(id)}/picklistItems`;
+export const STOCK_MOVEMENT_ITEM_BY_ID = (id) => `${STOCK_MOVEMENT_ITEM_API}/${id}`;
+export const STOCK_MOVEMENT_ITEM_DETAILS = (id) => `${STOCK_MOVEMENT_ITEM_BY_ID(id)}/details`;
+export const STOCK_MOVEMENT_ITEM_REMOVE = (id) => `${STOCK_MOVEMENT_ITEM_BY_ID(id)}/removeItem`;
+export const STOCK_MOVEMENT_UPDATE_PICKLIST = (id) => `${STOCK_MOVEMENT_ITEM_BY_ID(id)}/updatePicklist`;
+export const STOCK_MOVEMENT_CREATE_PICKLIST = (id) => `${STOCK_MOVEMENT_ITEM_BY_ID(id)}/createPicklist`;
+export const STOCK_MOVEMENT_ITEM_REVERT_PICK = (id) => `${STOCK_MOVEMENT_ITEM_BY_ID(id)}/picklistItems`;
 
 // STOCK TRANSFER
 export const STOCK_TRANSFER_API = `${API}/stockTransfers`;
-export const STOCK_TRANSFER_BY_ID = id => `${STOCK_TRANSFER_API}/${id}`;
-export const STOCK_TRANSFER_REMOVE_ALL_ITEMS = id => `${STOCK_TRANSFER_BY_ID(id)}/removeAllItems`;
+export const STOCK_TRANSFER_BY_ID = (id) => `${STOCK_TRANSFER_API}/${id}`;
+export const STOCK_TRANSFER_REMOVE_ALL_ITEMS = (id) => `${STOCK_TRANSFER_BY_ID(id)}/removeAllItems`;
+export const STOCK_TRANSFER_CANDIDATES = (id) => `/api/stockTransfers/candidates${id ? `?location.id=${id}` : ''}`;
 
 // STOCK TRANSFER ITEMS
 export const STOCK_TRANSFER_ITEM_API = `${API}/stockTransferItems`;
-export const STOCK_TRANSFER_ITEM_BY_ID = id => `${STOCK_TRANSFER_ITEM_API}/${id}`;
+export const STOCK_TRANSFER_ITEM_BY_ID = (id) => `${STOCK_TRANSFER_ITEM_API}/${id}`;
 
 // INVOICE
 export const INVOICE_API = `${API}/invoices`;
@@ -75,12 +76,12 @@ export const INVENTORY_ITEM = (productCode, lotNumber) => `${CONTEXT_PATH}/${PRO
 
 // STOCK LIST
 export const STOCKLIST_API = `${API}/stocklists`;
-export const STOCKLIST_EXPORT = id => `${STOCKLIST_API}/${id}/export`;
-export const STOCKLIST_DELETE = id => `${STOCKLIST_API}/${id}`;
-export const STOCKLIST_CLEAR = id => `${STOCKLIST_API}/${id}/clear`;
-export const STOCKLIST_CLONE = id => `${STOCKLIST_API}/${id}/clone`;
-export const STOCKLIST_PUBLISH = id => `${STOCKLIST_API}/${id}/publish`;
-export const STOCKLIST_UNPUBLISH = id => `${STOCKLIST_API}/${id}/unpublish`;
+export const STOCKLIST_EXPORT = (id) => `${STOCKLIST_API}/${id}/export`;
+export const STOCKLIST_DELETE = (id) => `${STOCKLIST_API}/${id}`;
+export const STOCKLIST_CLEAR = (id) => `${STOCKLIST_API}/${id}/clear`;
+export const STOCKLIST_CLONE = (id) => `${STOCKLIST_API}/${id}/clone`;
+export const STOCKLIST_PUBLISH = (id) => `${STOCKLIST_API}/${id}/publish`;
+export const STOCKLIST_UNPUBLISH = (id) => `${STOCKLIST_API}/${id}/unpublish`;
 
 // GL ACCOUNTS
 export const GL_ACCOUNTS_OPTION = `${API}/glAccountOptions`;
@@ -111,10 +112,10 @@ export const LOCATION_API = `${API}/locations`;
 export const LOCATION_TYPES = `${LOCATION_API}/locationTypes`;
 export const LOCATION_TEMPLATE = `${CONTEXT_PATH}${LOCATION_API}/template`;
 export const LOCATION_IMPORT = `${CONTEXT_PATH}${LOCATION_API}/importCsv`;
-export const LOCATION = id => `${LOCATION_API}/${id}`;
+export const LOCATION = (id) => `${LOCATION_API}/${id}`;
 
 // PUTAWAY
-export const PUTAWAY_GENERATE_PDF = id => `/putAway/generatePdf/${id}`;
+export const PUTAWAY_GENERATE_PDF = (id) => `/putAway/generatePdf/${id}`;
 
 // SUPPORT LINKS
 export const SUPPORT_LINKS = `${CONTEXT_PATH}${API}/supportLinks`;
@@ -134,7 +135,7 @@ export const DISABLE_LOCALIZATION = (languageCode) => {
   return `${CONTEXT_PATH}/user/disableLocalizationMode`;
 };
 
-export const GLOBAL_SEARCH = term => `${CONTEXT_PATH}/dashboard/globalSearch?searchTerms=${term}`;
+export const GLOBAL_SEARCH = (term) => `${CONTEXT_PATH}/dashboard/globalSearch?searchTerms=${term}`;
 
 // ORGANIZATIONS
 export const ORGANIZATION_API = `${API}/organizations`;
@@ -163,7 +164,7 @@ export const PRODUCT_SUPPLIER_ATTRIBUTE_API = `${API}/productSupplierAttributes`
 export const PRODUCT_SUPPLIER_ATTRIBUTE_BATCH = `${PRODUCT_SUPPLIER_ATTRIBUTE_API}/batch`;
 
 export const PICKLIST_API = `${API}/picklists`;
-export const PICKLIST_CLEAR = id => `${PICKLIST_API}/${id}/items`;
+export const PICKLIST_CLEAR = (id) => `${PICKLIST_API}/${id}/items`;
 
 // FULL OUTBOUND IMPORT FEATURE
 export const FULFILLMENT_API = `${API}/fulfillments`;

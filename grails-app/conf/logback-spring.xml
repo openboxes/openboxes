@@ -1,28 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 
-    <!-- Allows Logback logs to appear in Sentry. See sentry.properties for configuration. -->
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+    <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+
+    <springProperty scope="context" name="sentryDsn" source="sentry.dsn" />
+
+    <!--
+    Allows Logback logs to appear in Sentry. See sentry.properties and application.yml for configuration.
+    Once we switch to using the "sentry-spring-boot-starter" dependency, we can move all this Sentry configuration to
+    application.yml https://docs.sentry.io/platforms/java/guides/spring-boot/logging-frameworks/#logback
+    -->
     <appender name="sentry" class="io.sentry.logback.SentryAppender">
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <!-- Use the INFO log level or higher for Sentry so that we don't hit our usage limit. -->
             <level>info</level>
         </filter>
-        <encoder>
-            <pattern>
-                <!-- https://logback.qos.ch/manual/layouts.html -->
-                %date{ISO8601} %-5level [%thread] %logger{40}: %message%n%xException
-            </pattern>
-        </encoder>
-    </appender>
-
-    <!--  Outputs Logback logs to the console.  -->
-    <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
-        <!-- Adds colors to the logs only if the terminal can support it https://logback.qos.ch/manual/layouts.html#coloring -->
-        <withJansi>true</withJansi>
-        <encoder>
-            <pattern>
-                <!-- https://logback.qos.ch/manual/layouts.html -->
-                %cyan(%date{ISO8601}) %highlight(%-5level) %magenta([%thread]) %yellow(%logger{40}): %message%n%xException
-            </pattern>
-        </encoder>
+        <options>
+            <!--
+            DSN is required here because Sentry for logback is configured separately from Sentry for Servlet
+            (see SentryServletContextListener for that). https://docs.sentry.io/platforms/java/guides/logback/
+            -->
+            <dsn>${sentryDsn}</dsn>
+        </options>
     </appender>
 
     <!-- log levels for software we maintain -->
@@ -133,7 +133,7 @@
     -->
     <root level="debug">
         <appender-ref ref="sentry" />
-        <appender-ref ref="stdout" />
+        <appender-ref ref="CONSOLE" />
     </root>
 
 </configuration>

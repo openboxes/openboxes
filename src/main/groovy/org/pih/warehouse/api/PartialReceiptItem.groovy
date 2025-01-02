@@ -3,7 +3,6 @@ package org.pih.warehouse.api
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.inventory.InventoryItem
-import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.receiving.ReceiptItem
 import org.pih.warehouse.receiving.ReceiptStatusCode
@@ -74,10 +73,6 @@ class PartialReceiptItem {
         return quantityShipped / shipmentItem?.quantityPerUom
     }
 
-    String getDisplayUnitOfMeasure() {
-        return "${packsRequested?.toPlainString()} ${shipmentItem?.unitOfMeasure}"
-    }
-
     Map toJson() {
         return [
 
@@ -109,7 +104,9 @@ class PartialReceiptItem {
                 cancelRemaining                 : cancelRemaining,
                 quantityOnHand                  : quantityOnHand,
                 comment                         : comment,
-                unitOfMeasure                   : displayUnitOfMeasure,
+                unitOfMeasure                   : shipmentItem?.unitOfMeasure,
+                packSize                        : shipmentItem?.packSize,
+                packsRequested                  : packsRequested,
         ]
     }
 

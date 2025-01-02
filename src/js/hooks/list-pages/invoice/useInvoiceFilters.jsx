@@ -12,7 +12,6 @@ import { transformFilterParams } from 'utils/list-utils';
 import { fetchUserById } from 'utils/option-utils';
 import { translateWithDefaultMessage } from 'utils/Translate';
 
-
 const useInvoiceFilters = ({ setFilterParams }) => {
   const {
     statuses,
@@ -21,7 +20,7 @@ const useInvoiceFilters = ({ setFilterParams }) => {
     currentLocation,
     currentUser,
     currentLocale,
-  } = useSelector(state => ({
+  } = useSelector((state) => ({
     statuses: state.invoices.statuses,
     suppliers: state.organizations.suppliers,
     typeCodes: state.invoices.typeCodes,
@@ -60,8 +59,8 @@ const useInvoiceFilters = ({ setFilterParams }) => {
       initialEmptyValues.vendor = suppliers.find(({ value }) => value === queryProps.vendor);
     }
     if (queryProps.invoiceTypeCode) {
-      initialEmptyValues.invoiceTypeCode =
-          typeCodes.find(({ value }) => value === queryProps.invoiceTypeCode);
+      initialEmptyValues.invoiceTypeCode = typeCodes.find(({ value }) =>
+        value === queryProps.invoiceTypeCode);
     }
     if (queryProps.dateInvoiced) {
       initialEmptyValues.dateInvoiced = queryProps.dateInvoiced;

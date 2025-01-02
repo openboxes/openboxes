@@ -9,7 +9,7 @@ const useOptionsFetch = (fnArray, settings) => {
   const {
     currentLocation,
     currentLocale,
-  } = useSelector(state => ({
+  } = useSelector((state) => ({
     currentLocation: state.session.currentLocation,
     currentLocale: state.session.activeLanguage,
   }));
@@ -27,7 +27,7 @@ const useOptionsFetch = (fnArray, settings) => {
     const mainConfig = {
       signal: controller.signal,
     };
-    fnArray.forEach(fn => {
+    fnArray.forEach((fn) => {
       dispatch(fn(mainConfig));
     });
 

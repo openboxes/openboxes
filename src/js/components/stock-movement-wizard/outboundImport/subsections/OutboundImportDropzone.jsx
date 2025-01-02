@@ -2,6 +2,7 @@ import React from 'react';
 
 import PropTypes from 'prop-types';
 import { Controller } from 'react-hook-form';
+import { RiDownload2Line } from 'react-icons/ri';
 import { useDispatch } from 'react-redux';
 
 import { hideSpinner, showSpinner } from 'actions';
@@ -12,7 +13,6 @@ import Subsection from 'components/Layout/v2/Subsection';
 import FileFormat from 'consts/fileFormat';
 import exportFileFromAPI from 'utils/file-download-util';
 import { FormErrorPropType } from 'utils/propTypes';
-import { RiDownload2Line } from 'react-icons/ri';
 
 const OutboundImportDropzone = ({ control, errors }) => {
   const dispatch = useDispatch();

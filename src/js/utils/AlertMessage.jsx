@@ -11,7 +11,7 @@ const AlertMessage = ({
 }) => {
   const getMessageElement = useMemo(() => {
     const alertMessages = typeof message !== 'string' && Array.isArray(message) ? message : [message];
-    return alertMessages.map(msg => (
+    return alertMessages.map((msg) => (
       <div>
         <i className={`fa ${danger ? 'fa-times-circle' : 'fa-exclamation-circle'} pr-2`} />
         {msg}
@@ -26,14 +26,15 @@ const AlertMessage = ({
         className={`${className} alert ${danger ? 'alert-danger' : 'alert-warning'}`}
         style={{
           cursor: close ? 'pointer' : 'default',
-          whiteSpace: 'pre-line'
+          whiteSpace: 'pre-line',
         }}
         role="presentation"
         onClick={() => close()}
       >
 
         {getMessageElement}
-      </div>);
+      </div>
+    );
   }
 
   return null;

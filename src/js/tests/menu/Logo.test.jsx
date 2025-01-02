@@ -33,4 +33,3 @@ describe('logo component', () => {
       .toBeTruthy();
   });
 });
-

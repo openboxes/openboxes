@@ -31,7 +31,7 @@ const FIELDS = {
     attributes: {
       className: 'mb-2',
     },
-    getDynamicAttr: props => ({
+    getDynamicAttr: (props) => ({
       options: props.reasonCodes,
     }),
   },
@@ -55,7 +55,7 @@ const FIELDS = {
             if (fieldValue.status === 'AVAILABLE' && fieldValue.pickedRequisitionNumbers.length !== 0) {
               const status = translate('react.stockMovement.enum.AvailableItemStatus.PICKED', 'PICKED');
               return status + (fieldValue.pickedRequisitionNumbers ? ` [${fieldValue.pickedRequisitionNumbers}]` : '');
-            } else if (!fieldValue.status || fieldValue.status === 'AVAILABLE') {
+            } if (!fieldValue.status || fieldValue.status === 'AVAILABLE') {
               return '';
             }
 
@@ -90,11 +90,12 @@ const FIELDS = {
         }),
         attributes: {
           showValueTooltip: true,
-          formatValue: fieldValue => fieldValue && (
+          formatValue: (fieldValue) => fieldValue && (
             <div className="d-flex justify-content-center">
               {fieldValue.zoneName ? <div className="text-truncate" style={{ minWidth: 30, flexShrink: 20 }}>{fieldValue.zoneName}</div> : ''}
               <div className="text-truncate">{fieldValue.zoneName ? `: ${fieldValue.name}` : fieldValue.name}</div>
-            </div>),
+            </div>
+          ),
         },
       },
       quantityOnHand: {
@@ -103,7 +104,7 @@ const FIELDS = {
         defaultMessage: 'On Hand',
         fixedWidth: '150px',
         attributes: {
-          formatValue: value => (value || value === 0 ? value.toLocaleString('en-US') : null),
+          formatValue: (value) => (value || value === 0 ? value.toLocaleString('en-US') : null),
         },
       },
       quantityAvailable: {
@@ -112,7 +113,7 @@ const FIELDS = {
         defaultMessage: 'Available',
         fixedWidth: '150px',
         attributes: {
-          formatValue: value => (value || value === 0 ? value.toLocaleString('en-US') : null),
+          formatValue: (value) => (value || value === 0 ? value.toLocaleString('en-US') : null),
         },
       },
       quantityPicked: {
@@ -153,9 +154,8 @@ function validate(values) {
     0,
   );
 
-
-  if (_.some(values.availableItems, val => !_.isNil(val.quantityPicked)) &&
-    !values.reasonCode && pickedSum !== values.quantityRequired) {
+  if (_.some(values.availableItems, (val) => !_.isNil(val.quantityPicked))
+    && !values.reasonCode && pickedSum !== values.quantityRequired) {
     errors.reasonCode = 'react.stockMovement.errors.differentTotalQty.label';
   }
 
@@ -210,7 +210,7 @@ class EditPickModal extends Component {
     this.props.showSpinner();
 
     const payload = {
-      picklistItems: _.map(values.availableItems, avItem => ({
+      picklistItems: _.map(values.availableItems, (avItem) => ({
         id: avItem.id || '',
         inventoryItem: { id: avItem['inventoryItem.id'] },
         binLocation: { id: avItem['binLocation.id'] || '' },
@@ -245,7 +245,9 @@ class EditPickModal extends Component {
     return (
       <div>
         <div className="font-weight-bold pb-2">
-          <Translate id="react.stockMovement.quantityPicked.label" defaultMessage="Qty Picked" />: {_.reduce(values.availableItems, (sum, val) =>
+          <Translate id="react.stockMovement.quantityPicked.label" defaultMessage="Qty Picked" />
+          :
+          {_.reduce(values.availableItems, (sum, val) =>
             (sum + (val.quantityPicked ? _.toInteger(val.quantityPicked) : 0)), 0)}
         </div>
         <hr />
@@ -261,7 +263,7 @@ class EditPickModal extends Component {
 
       const availableItems = _.map(pickPageItem.availableItems, (avItem) => {
         // check if this picklist item already exists
-        const picklistItem = _.find(pickPageItem.picklistItems, item => item['inventoryItem.id'] === avItem['inventoryItem.id'] && item['binLocation.id'] === avItem['binLocation.id']);
+        const picklistItem = _.find(pickPageItem.picklistItems, (item) => item['inventoryItem.id'] === avItem['inventoryItem.id'] && item['binLocation.id'] === avItem['binLocation.id']);
 
         if (picklistItem) {
           return {
@@ -325,7 +327,9 @@ class EditPickModal extends Component {
       >
         <div>
           <div className="font-weight-bold">
-            <Translate id="react.stockMovement.productCode.label" defaultMessage="Product code" />: {this.state.formValues.productCode}
+            <Translate id="react.stockMovement.productCode.label" defaultMessage="Product code" />
+            :
+            {this.state.formValues.productCode}
           </div>
           <div className="font-weight-bold">
             <Tooltip
@@ -335,13 +339,17 @@ class EditPickModal extends Component {
               position="top-start"
             >
               <span className="d-flex">
-                <Translate id="react.stockMovement.productName.label" defaultMessage="Product name" />:{' '}
+                <Translate id="react.stockMovement.productName.label" defaultMessage="Product name" />
+                :
+                {' '}
                 {this.state.formValues.displayName ?? this.state.formValues.productName}
               </span>
             </Tooltip>
           </div>
           <div className="font-weight-bold">
-            <Translate id="react.stockMovement.quantityRequired.label" defaultMessage="Qty Required" />: {this.state.formValues.quantityRequired}
+            <Translate id="react.stockMovement.quantityRequired.label" defaultMessage="Qty Required" />
+            :
+            {this.state.formValues.quantityRequired}
           </div>
         </div>
       </ModalWrapper>
@@ -349,7 +357,7 @@ class EditPickModal extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
   formatLocalizedDate: formatDate(state.localize),
 });

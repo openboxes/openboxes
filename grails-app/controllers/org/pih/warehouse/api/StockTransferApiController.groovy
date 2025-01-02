@@ -202,9 +202,11 @@ class StockTransferApiController {
     }
 
     def stockTransferCandidates() {
-        Location location = Location.get(params.location.id)
+        String locationId = params?.location?.id ?: session.warehouse.id
+        Location location = Location.get(locationId)
+
         if (!location) {
-            throw new IllegalArgumentException("Can't find location with given id: ${params.location.id}")
+            throw new IllegalArgumentException("Can't find location with given id: ${locationId}")
         }
 
         List<StockTransferItem> stockTransferCandidates = stockTransferService.getStockTransferCandidates(location, null)

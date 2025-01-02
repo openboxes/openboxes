@@ -304,6 +304,10 @@ class ShipmentItem implements Comparable, Serializable {
         return orderItem?.unitOfMeasure
     }
 
+    BigDecimal getPackSize() {
+        return orderItem?.quantityPerUom
+    }
+
     /**
      * Sorts shipping items by associated product name, then lot number, then quantity,
      * and finally by id.

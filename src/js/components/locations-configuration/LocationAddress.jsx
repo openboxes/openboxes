@@ -18,7 +18,6 @@ import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 import 'react-confirm-alert/src/react-confirm-alert.css';
 import 'components/locations-configuration/LocationAddress.scss';
 
-
 const FIELDS = {
   address: {
     type: TextField,
@@ -58,7 +57,7 @@ const FIELDS = {
 
 };
 
-const validate = values => Object.keys(FIELDS)
+const validate = (values) => Object.keys(FIELDS)
   .reduce((acc, fieldName) => {
     if (values[fieldName] && values[fieldName].length > 255) {
       return {
@@ -78,7 +77,6 @@ class LocationAddress extends Component {
     };
   }
 
-
   componentDidMount() {
     if (this.props.match.params.locationId) {
       this.fetchLocation();
@@ -89,12 +87,12 @@ class LocationAddress extends Component {
     const url = `/api/locations/${this.props.match.params.locationId}`;
     apiClient.get(url).then((response) => {
       const location = response.data.data;
-      this.setState({
+      this.setState((prev) => ({
         values: {
-          ...this.state.values,
+          ...prev.values,
           address: location.address,
         },
-      });
+      }));
     })
       .catch(() => Promise.reject(new Error(this.props.translate('react.locationsConfiguration.error.fetchingLocation', 'Could not load location data'))));
   }
@@ -138,7 +136,7 @@ class LocationAddress extends Component {
       <div className="d-flex flex-column">
         <div className="configuration-wizard-content flex-column">
           <Form
-            onSubmit={values => this.nextPage(values)}
+            onSubmit={(values) => this.nextPage(values)}
             validate={validate}
             initialValues={_.get(this.state.values, 'address')}
             render={({ values, handleSubmit }) => (
@@ -176,7 +174,7 @@ class LocationAddress extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
 });
 

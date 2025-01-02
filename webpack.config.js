@@ -38,7 +38,9 @@ module.exports = {
     /* We generate source maps so Sentry can map errors to lines of code, even when the code is minified */
     devtool: 'source-map',
     plugins: [
-      new ESLintPlugin({}),
+      new ESLintPlugin({
+        extensions: ['js', 'jsx'],
+      }),
       new FileManagerPlugin({
         events: {
           onStart: {

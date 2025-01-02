@@ -1040,7 +1040,8 @@ class ShipmentController {
             shipmentInstance.addToEvents(eventInstance).save(flush: true)
         }
 
-        redirect(action: 'showDetails', id: shipmentInstance.id)
+        // Redirect to the page from where the request came
+        redirect(uri: request.getHeader('referer'))
     }
 
     def addShipmentItem() {

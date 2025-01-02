@@ -17,8 +17,10 @@ const FilterInput = ({
       placeholder={translate('react.stockMovement.searchPlaceholder.label', 'Search...')}
       ref={inputRef}
     />
-    {itemFilter &&
+    {itemFilter
+      && (
       <i
+        aria-label="Clear"
         role="button"
         className="fa fa-times-circle"
         style={{ color: 'grey', cursor: 'pointer' }}
@@ -26,16 +28,15 @@ const FilterInput = ({
         onKeyPress={() => onClear()}
         tabIndex={0}
       />
-    }
+      )}
   </div>
 );
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
 });
 
 export default connect(mapStateToProps)(FilterInput);
-
 
 FilterInput.propTypes = {
   itemFilter: PropTypes.string.isRequired,

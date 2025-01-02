@@ -54,6 +54,7 @@ const ContextMenu = ({
               <React.Fragment key={action.label}>
                 {elementType === actionItemType.BUTTON && (
                 <button
+                  type="button"
                   onClick={() => {
                     action.onClick(id);
                     setIsPopoverOpen(false);

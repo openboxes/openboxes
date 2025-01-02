@@ -25,6 +25,7 @@ import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.DocumentCommand
 import org.pih.warehouse.core.DocumentService
 import org.pih.warehouse.core.DocumentType
+import org.pih.warehouse.core.HistoryItem
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.User
@@ -352,14 +353,14 @@ class StockMovementController {
     }
 
     def comments() {
-        Requisition requisition = Requisition.get(params.id)
-        render(template: "comments", model: [requisition: requisition])
+        StockMovement stockMovement = getStockMovement(params.id)
+        render(template: "comments", model: [stockMovement: stockMovement])
     }
 
     def addComment() {
         def stockMovement = outboundStockMovementService.getStockMovement(params.id)
         if (!stockMovement) {
-            stockMovementService.getStockMovement(params.id)
+            stockMovement = stockMovementService.getStockMovement(params.id)
         }
         [stockMovement: stockMovement, comment: new Comment()]
     }
@@ -373,9 +374,9 @@ class StockMovementController {
     }
 
     def editComment() {
-        def stockMovement = outboundStockMovementService.getStockMovement(params.requisition)
+        def stockMovement = outboundStockMovementService.getStockMovement(params.stockMovementId)
         if (!stockMovement) {
-            stockMovementService.getStockMovement(params.requisition)
+            stockMovement = stockMovementService.getStockMovement(params.stockMovementId)
         }
 
         Comment comment = Comment.get(params?.id)
@@ -393,8 +394,7 @@ class StockMovementController {
     }
 
     def deleteComment() {
-        Requisition requisition = Requisition.get(params.requisition)
-
+        StockMovement stockMovement = stockMovementService.getStockMovement(params.stockMovementId)
         Comment comment = Comment.get(params?.id)
         if (!comment) {
             flash.message = "${g.message(code: 'default.not.found.message', args: [g.message(code: 'comment.label', default: 'Comment'), params.id])}"
@@ -405,29 +405,26 @@ class StockMovementController {
         if (comment.sender.id != session.user.id) {
             throw new UnsupportedOperationException("${g.message(code: 'errors.noPermissions.label')}")
         }
-        requisitionService.deleteComment(comment, requisition)
+        stockMovementService.deleteComment(comment, stockMovement)
         flash.message = "${g.message(code: 'default.deleted.message', args: [g.message(code: 'comment.label', default: 'Comment'), comment.id])}"
-        redirect(action: "show", id: requisition.id)
+        redirect(action: "show", id: stockMovement.id)
     }
 
     def saveComment() {
-        Requisition requisition = Requisition.get(params.requisition)
-        StockMovement stockMovement = StockMovement.createFromRequisition(requisition)
+        StockMovement stockMovement = stockMovementService.getStockMovement(params.stockMovementId)
 
         Comment comment = new Comment(params)
-         if (comment.validate()) {
-             requisitionService.saveComment(comment)
-             requisitionService.addCommentToRequisition(comment, requisition)
-             flash.message = "${g.message(code: 'default.created.message', args: [g.message(code: 'comment.label', default: 'Comment'), comment.id])}"
-             redirect(action: "show", id: stockMovement.id)
-             return
+        if (comment.validate()) {
+            stockMovementService.saveComment(comment, stockMovement)
+            flash.message = "${g.message(code: 'default.created.message', args: [g.message(code: 'comment.label', default: 'Comment'), comment.id])}"
+            redirect(action: "show", id: stockMovement.id)
+            return
          }
         render(view: "addComment", model: [stockMovement: stockMovement, comment: comment])
     }
 
     def updateComment() {
-        Requisition requisition = Requisition.get(params.requisition)
-        StockMovement stockMovement = StockMovement.createFromRequisition(requisition)
+        StockMovement stockMovement = stockMovementService.getStockMovement(params.stockMovementId)
 
         Comment comment = Comment.get(params?.id)
         if (comment.sender.id != session.user.id) {
@@ -435,7 +432,7 @@ class StockMovementController {
         }
         comment.properties = params
         if (comment.validate()) {
-            requisitionService.saveComment(comment)
+            stockMovementService.saveComment(comment, stockMovement)
             flash.message = "${g.message(code: 'default.updated.message', args: [g.message(code: 'comment.label', default: 'Comment'), comment.id])}"
             redirect(action: "show", id: stockMovement.id)
             return
@@ -453,6 +450,15 @@ class StockMovementController {
         def stockMovement = getStockMovement(params.id)
         def receiptItems = stockMovementService.getStockMovementReceiptItems(stockMovement)
         render(template: "receipts", model: [receiptItems: receiptItems])
+    }
+
+    def events() {
+        StockMovement stockMovement = getStockMovement(params.id)
+        List<HistoryItem> historyItems = stockMovement?.shipment?.getHistory()?.sort() ?: []
+        render(
+                template: "events",
+                model: [historyItems: historyItems, shipmentId: stockMovement?.shipment?.id]
+        )
     }
 
     // Used by SM show page 'tabs' actions - packing list, documents and receipts

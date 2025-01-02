@@ -52,7 +52,7 @@ const useStockListTableData = (filterParams) => {
   });
 
   const dispatch = useDispatch();
-  const { translate } = useSelector(state => ({
+  const { translate } = useSelector((state) => ({
     translate: translateWithDefaultMessage(getTranslate(state.localize)),
   }));
 
@@ -70,7 +70,6 @@ const useStockListTableData = (filterParams) => {
       url: STOCKLIST_EXPORT(id),
     });
   };
-
 
   const deleteStocklists = async (id) => {
     dispatch(showSpinner());

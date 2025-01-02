@@ -78,13 +78,14 @@ const FIELDS = {
     // eslint-disable-next-line react/prop-types
     addButton: ({
       // eslint-disable-next-line react/prop-types
-      values, onResponse, saveItems, invalid,
+      values, onResponse, saveItems, invalid, overrideFormValue,
     }) => (
       <CombinedShipmentItemsModal
         shipment={values.stockMovementId}
         vendor={values.origin.id}
         destination={values.destination.id}
         onResponse={onResponse}
+        overrideFormValue={overrideFormValue}
         btnOpenText="react.default.button.addLines.label"
         btnOpenDefaultText="Add lines"
         onOpen={() => saveItems(values.lineItems)}
@@ -328,7 +329,6 @@ class AddItemsPage extends Component {
     this.validateWithAlertMessage = this.validateWithAlertMessage.bind(this);
     this.isValidForSave = this.isValidForSave.bind(this);
     this.isRowLoaded = this.isRowLoaded.bind(this);
-    this.loadMoreRows = this.loadMoreRows.bind(this);
     this.updateTotalCount = this.updateTotalCount.bind(this);
     this.removeItem = this.removeItem.bind(this);
     this.fetchLineItems = this.fetchLineItems.bind(this);
@@ -392,8 +392,7 @@ class AddItemsPage extends Component {
 
   setLineItems({
     response,
-    startIndex,
-    append,
+    setTableData,
   }) {
     const { data } = response.data;
     const lineItemsData = _.map(
@@ -405,24 +404,15 @@ class AddItemsPage extends Component {
       }),
     );
 
-    append?.('lineItems', lineItemsData);
-
-    if (data.length < 10) {
-      this.props.hideSpinner();
-      return;
-    }
-
-    this.loadMoreRows(append)({
-      startIndex: startIndex + this.props.pageSize,
-    });
+    setTableData?.('lineItems', lineItemsData);
 
     this.props.hideSpinner();
   }
 
   updateTotalCount(value) {
-    this.setState({
-      totalCount: this.state.totalCount + value,
-    });
+    this.setState((prev) => ({
+      totalCount: prev.totalCount + value,
+    }));
   }
 
   dataFetched = false;
@@ -592,7 +582,7 @@ class AddItemsPage extends Component {
    * Fetches 2nd step data from current stock movement.
    * @public
    */
-  fetchLineItems() {
+  fetchLineItems(mutateTableData) {
     const url = `${STOCK_MOVEMENT_ITEMS(this.state.values.stockMovementId)}?stepNumber=2`;
 
     return apiClient.get(url)
@@ -600,7 +590,7 @@ class AddItemsPage extends Component {
         this.setState({ totalCount: response.data.data.length });
         this.setLineItems({
           response,
-          startIndex: null,
+          setTableData: mutateTableData,
         });
       })
       .catch((err) => err);
@@ -629,37 +619,20 @@ class AddItemsPage extends Component {
           }),
         );
 
-        this.setState({
+        this.setState((prev) => ({
           values: {
-            ...this.state.values,
+            ...prev.values,
             hasManageInventory,
             statusCode,
             // setting initial values for the form
             lineItems: sortedLineItems,
           },
           totalCount,
-        }, () => this.props.hideSpinner());
+        }), () => this.props.hideSpinner());
       });
   }
 
   isRowLoaded = (values) => ({ index }) => !!values.lineItems[index]
-
-  // At this moment we are fetching the whole stock movement at once (it already includes stock movement items)
-  // So this function is not used at this moment, but can be helpful in case of future improvements
-  loadMoreRows = (append) => ({ startIndex }) => {
-    this.setState({
-      isFirstPageLoaded: true,
-    });
-    const url = `${STOCK_MOVEMENT_ITEMS(this.state.values.stockMovementId)}?offset=${startIndex}&max=${this.props.pageSize}&stepNumber=2`;
-    apiClient.get(url)
-      .then((response) => {
-        this.setLineItems({
-          response,
-          startIndex,
-          append,
-        });
-      });
-  }
 
   /**
    * Saves current stock movement progress (line items) and goes to the next stock movement step.
@@ -774,13 +747,13 @@ class AddItemsPage extends Component {
       return item;
     });
 
-    this.setState({
-      ...this.state,
+    this.setState((prev) => ({
+      ...prev,
       values: {
-        ...this.state.values,
+        ...prev.values,
         lineItems: mappedLineItems,
       },
-    });
+    }));
   }
 
   /**
@@ -855,7 +828,12 @@ class AddItemsPage extends Component {
             (val) => ({ ...val, referenceId: val.orderItemId }),
           );
 
-          this.setState({ values: { ...this.state.values, lineItems: lineItemsBackendData } });
+          this.setState((prev) => ({
+            values: {
+              ...prev.values,
+              lineItems: lineItemsBackendData,
+            },
+          }));
         })
         .catch(() => Promise.reject(new Error(this.props.translate('react.stockMovement.error.saveRequisitionItems.label', 'Could not save requisition items'))));
     }
@@ -959,12 +937,13 @@ class AddItemsPage extends Component {
 
     return apiClient.delete(STOCK_MOVEMENT_REMOVE_ALL_ITEMS(this.state.values.stockMovementId))
       .then(() => {
-        this.setState({
+        this.setState((prev) => ({
           totalCount: 0,
           values: {
-            ...this.state.values,
+            ...prev.values,
+            lineItems: [],
           },
-        }, () => this.props.hideSpinner());
+        }), () => this.props.hideSpinner());
       })
       .catch(() => {
         this.fetchLineItems();
@@ -1041,10 +1020,9 @@ class AddItemsPage extends Component {
 
   /**
    * Imports chosen file to backend and then fetches line items.
-   * @param {object} event
-   * @public
+   * @param mutateTableData
    */
-  importTemplate(event) {
+  importTemplate = (mutateTableData) => (event) => {
     this.props.showSpinner();
     const formData = new FormData();
     const file = event.target.files[0];
@@ -1060,13 +1038,13 @@ class AddItemsPage extends Component {
     return apiClient
       .post(COMBINED_SHIPMENT_ITEMS_IMPORT_TEMPLATE(stockMovementId), formData, config)
       .then(() => {
-        this.fetchLineItems();
+        this.fetchLineItems(mutateTableData);
         if (_.isNil(_.last(this.state.values.lineItems).product)) {
-          this.setState({
+          this.setState((prev) => ({
             values: {
-              ...this.state.values,
+              ...prev.values,
             },
-          });
+          }));
         }
       })
       .catch(() => {
@@ -1088,9 +1066,9 @@ class AddItemsPage extends Component {
    * Toggle the downloadable files
    */
   toggleDropdown() {
-    this.setState({
-      isDropdownVisible: !this.state.isDropdownVisible,
-    });
+    this.setState((prev) => ({
+      isDropdownVisible: !prev.isDropdownVisible,
+    }));
   }
 
   render() {
@@ -1102,8 +1080,8 @@ class AddItemsPage extends Component {
         validate={this.validate}
         mutators={{
           ...arrayMutators,
-          append: ([field, value], state, { changeValue }) => {
-            changeValue(state, field, () => [...state.formState.values[field], ...value]);
+          override: ([field, value], state, { changeValue }) => {
+            changeValue(state, field, () => value);
           },
           setColumnValue,
         }}
@@ -1126,7 +1104,7 @@ class AddItemsPage extends Component {
                   id="csvInput"
                   type="file"
                   style={{ display: 'none' }}
-                  onChange={this.importTemplate}
+                  onChange={this.importTemplate(form.mutators.override)}
                   onClick={(event) => {
                     // eslint-disable-next-line no-param-reassign
                     event.target.value = null;
@@ -1220,9 +1198,9 @@ class AddItemsPage extends Component {
                   renderFormField(fieldConfig, fieldName, {
                     stocklist: values.stocklist,
                     recipients: this.props.recipients,
+                    loadMoreRows: () => {},
                     debouncedProductsFetch: this.debouncedProductsFetch,
                     totalCount: this.state.totalCount,
-                    loadMoreRows: this.loadMoreRows(form.mutators.append),
                     isRowLoaded: this.isRowLoaded(values),
                     updateTotalCount: this.updateTotalCount,
                     isPaginated: this.props.isPaginated,
@@ -1238,6 +1216,7 @@ class AddItemsPage extends Component {
                     validateExpirationDate: this.validateExpirationDate,
                     setRecipientValue: (val) => form.mutators.setColumnValue('lineItems', 'recipient', val),
                     translate: this.props.translate,
+                    overrideFormValue: form.mutators.override,
                   }))}
               </div>
               <div className="submit-buttons">
@@ -1312,5 +1291,4 @@ AddItemsPage.propTypes = {
   isPaginated: PropTypes.bool.isRequired,
   /** Function returning user to the previous page */
   previousPage: PropTypes.func.isRequired,
-  pageSize: PropTypes.number.isRequired,
 };

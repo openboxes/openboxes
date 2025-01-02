@@ -10,7 +10,9 @@ const RejectRequestModalHeader = ({ identifier }) => (
       <Translate
         id="react.rejectRequestModal.provideReason.label"
         defaultMessage="Please provide a reason for rejecting request"
-      />: {identifier}
+      />
+      :
+      {identifier}
     </h4>
   </div>
 );

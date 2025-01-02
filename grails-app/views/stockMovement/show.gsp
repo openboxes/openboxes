@@ -32,7 +32,7 @@
         <g:if test="${stockMovement?.documents}">
             <div class="right">
                 <div class="button-group">
-                    <g:if test="${stockMovement?.requisition?.id}">
+                    <g:if test="${!stockMovement.isReturn}">
                         <g:link controller="stockMovement" action="addComment" id="${stockMovement?.id}" class="button">
                             <img src="${resource(dir: 'images/icons/silk', file: 'comment_add.png')}" />&nbsp;
                             <warehouse:message code="requisition.addComment.label" default="Add comment" />
@@ -585,34 +585,40 @@
                     <g:if test="${!stockMovement?.origin?.isSupplier()}">
                         <li role="tab">
                             <g:link controller="stockMovement" action="requisition" params="${[ id: stockMovement?.id ]}">
-                                <warehouse:message code="requestDetails.label"/>
+                                <g:message code="requestDetails.label"/>
                             </g:link>
                         </li>
                     </g:if>
                     <li role="tab">
                         <g:link controller="stockMovement" action="packingList" params="${[ id: stockMovement?.id ]}">
-                            <warehouse:message code="shipping.packingList.label" />
+                            <g:message code="shipping.packingList.label" />
                         </g:link>
                     </li>
                     <li role="tab">
                         <g:link controller="stockMovement" action="receipts" params="${[ id: stockMovement?.id ]}">
-                            <warehouse:message code="receipts.label" default="Receipts"/>
+                            <g:message code="receipts.label" default="Receipts"/>
+                        </g:link>
+                    </li>
+                    <li role="tab">
+                        <g:link controller="stockMovement" action="events" params="${[ id: stockMovement?.id ]}">
+                            <g:message code="events.label" default="Event"/>
                         </g:link>
                     </li>
                     <li role="tab">
                         <g:link controller="stockMovement" action="documents" params="${[ id: stockMovement?.id ]}">
-                            <warehouse:message code="documents.label" default="Documents"/>
+                            <g:message code="documents.label" default="Documents"/>
                         </g:link>
                     </li>
-                    <g:if test="${stockMovement?.requisition?.id}">
-                        <g:set var="commentCount" value="${stockMovement?.requisition?.comments?.size()}" />
+                    <g:if test="${!stockMovement.isReturn}">
+                        <g:set var="comments" value="${stockMovement?.requisition?.comments ?: stockMovement?.shipment?.comments}" />
+                        <g:set var="commentCount" value="${comments?.size()}" />
                         <li
                             role="tab"
                             data-count="${commentCount < 1000 ? commentCount : '999+' }"
                             class="${commentCount > 0 ? 'tab-badge' : ''}"
                         >
                             <g:link controller="stockMovement" action="comments" params="${[ id: stockMovement?.id ]}">
-                                <warehouse:message code="comments.label" default="Comments"/>
+                                <g:message code="comments.label" default="Comments"/>
                             </g:link>
                         </li>
                     </g:if>

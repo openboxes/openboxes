@@ -56,7 +56,7 @@ class DateField extends Component {
     };
 
     const onChange = (date) => {
-      const val = !date || typeof date === 'string' ? date : date.format(getFormat());
+      const val = !date || typeof date === 'string' ? date : date.format(dateFormat);
       attributes.onChange(val);
     };
 
@@ -75,9 +75,9 @@ class DateField extends Component {
           {...attributes}
           placeholderText={getPlaceholder()}
           selected={moment(value, dateFormat).isValid() ? moment(value, dateFormat) : null}
-          highlightDates={[!moment(value, dateFormat).isValid() ?
-            moment(new Date(), dateFormat) : {}]}
-          onChange={date => onChange(date)}
+          highlightDates={[!moment(value, dateFormat).isValid()
+            ? moment(new Date(), dateFormat) : {}]}
+          onChange={(date) => onChange(date)}
           onChangeRaw={onChangeRaw}
           onSelect={() => {
             this.dateInput.setOpen(false);
