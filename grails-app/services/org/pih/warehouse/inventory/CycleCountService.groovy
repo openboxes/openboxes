@@ -5,7 +5,9 @@ import grails.validation.ValidationException
 import org.grails.datastore.mapping.query.api.Criteria
 import org.hibernate.criterion.Order
 import org.hibernate.sql.JoinType
+import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.product.Product
 
 @Transactional
 class CycleCountService {
@@ -98,5 +100,31 @@ class CycleCountService {
             usedAliases.add("product")
             criteria.createAlias("product", "product", JoinType.INNER_JOIN)
         }
+    }
+
+    List<CycleCountRequest> createRequest(CycleCountRequestCommand command) {
+        List<CycleCountRequest> cycleCountsRequests = []
+        // Since cycle count request is product based, iterate through products and create a CCR for each provided product
+        command.products.each { Product product ->
+            CycleCountRequest cycleCountRequest = new CycleCountRequest(
+                    facility: command.facility,
+                    product: product,
+                    status: CycleCountStatus.CREATED,
+                    requestType: CycleCountRequestType.MANUAL_REQUEST,
+                    blindCount: command.blindCount,
+                    createdBy: AuthService.currentUser,
+                    updatedBy: AuthService.currentUser
+            )
+            cycleCountsRequests.add(cycleCountRequest)
+        }
+        cycleCountsRequests.each { CycleCountRequest cycleCountRequest ->
+            if (!cycleCountRequest.validate()) {
+                throw new ValidationException("Invalid cycle count request", cycleCountRequest.errors)
+            }
+            // Flush is needed to know what has already been persisted inside this loop. Without flush, we could save two CCR for the same product and facility.
+            // This won't be doable via UI, but could be possible via API.
+            cycleCountRequest.save(flush: true)
+        }
+        return cycleCountsRequests
     }
 }
