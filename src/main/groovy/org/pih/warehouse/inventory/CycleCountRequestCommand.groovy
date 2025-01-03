@@ -8,24 +8,16 @@ class CycleCountRequestCommand implements Validateable {
 
     Location facility
 
-    List<Product> products
+    Product product
 
     Boolean blindCount
 
     static constraints = {
-        products(nullable: true, validator: { List<Product> products, CycleCountRequestCommand obj ->
-            String productCode = null
-            boolean duplicateExists = products.any { Product product ->
-                // FIXME: Most probably, this will have to be modified not to include completed cycle counts
-                CycleCountRequest cycleCountRequest = CycleCountRequest.findByProductAndFacility(product, obj.facility)
-                if (cycleCountRequest) {
-                    productCode = product.productCode
-                    return true
-                }
-                return false
-            }
-            if (duplicateExists) {
-                return ['duplicateExists', productCode]
+        product(nullable: true, validator: { Product product, CycleCountRequestCommand obj ->
+            // TODO: Most probably, this will have to be modified not to include completed cycle counts
+            CycleCountRequest cycleCountRequest = CycleCountRequest.findByProductAndFacility(product, obj.facility)
+            if (cycleCountRequest) {
+                return ['duplicateExists', product.productCode]
             }
             return true
         })

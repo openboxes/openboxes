@@ -1,6 +1,6 @@
 package org.pih.warehouse.inventory
 
-enum CycleCountStatus {
+enum CycleCountRequestStatus {
     CREATED,
     REQUESTED,
     IN_PROGRESS,

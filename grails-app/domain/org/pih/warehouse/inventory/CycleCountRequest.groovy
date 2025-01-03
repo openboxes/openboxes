@@ -13,7 +13,7 @@ class CycleCountRequest {
 
     Product product
 
-    CycleCountStatus status
+    CycleCountRequestStatus status
 
     // To be included when cycle count table is created
     // CycleCount cycleCount

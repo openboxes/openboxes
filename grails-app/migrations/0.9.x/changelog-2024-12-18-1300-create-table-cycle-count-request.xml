@@ -23,7 +23,7 @@
             <column name="product_id" type="CHAR(38)">
                 <constraints nullable="true" />
             </column>
-            <column name="status" type="CHAR(38)">
+            <column name="status" type="VARCHAR(100)">
                 <constraints nullable="false" />
             </column>
             <column name="cycle_count_id" type="CHAR(38)">
@@ -32,7 +32,7 @@
             <column name="blind_count" type="BIT">
                 <constraints nullable="false" />
             </column>
-            <column name="request_type" type="CHAR(38)">
+            <column name="request_type" type="VARCHAR(100)">
                 <constraints nullable="false" />
             </column>
             <column name="date_created" type="DATETIME">
