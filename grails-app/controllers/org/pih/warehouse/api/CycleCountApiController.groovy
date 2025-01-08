@@ -39,7 +39,7 @@ class CycleCountApiController {
                     errors.addError(error)
                 }
             }
-            throw new ValidationException("Invalid cycle count", errors)
+            throw new ValidationException("Invalid cycle count request", errors)
         }
         List<CycleCountRequest> cycleCountRequests = cycleCountService.createRequests(command)
         render([data: cycleCountRequests] as JSON)
