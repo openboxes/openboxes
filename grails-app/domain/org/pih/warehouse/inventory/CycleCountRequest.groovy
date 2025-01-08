@@ -41,7 +41,7 @@ class CycleCountRequest {
 
     static constraints = {
         id generator: "uuid"
-        product(nullable: true, unique: "facility")
+        product(nullable: true)
         createdBy(nullable: true)
         updatedBy(nullable: true)
     }
