@@ -77,10 +77,14 @@ module.exports = {
           receivingIfStatement: '',
         }),
       }),
-      // We need to explicitly define our environment variables here so that they can be referenced in the frontend.
+      // We need to explicitly define our environment variables here so that they can be referenced
+      // in the frontend.
       new webpack.DefinePlugin({
-        'process.env.REACT_APP_SENTRY_DSN_FRONTEND': JSON.stringify(process.env.REACT_APP_SENTRY_DSN_FRONTEND),
+        'process.env.REACT_APP_WEB_SENTRY_DSN': JSON.stringify(process.env.REACT_APP_WEB_SENTRY_DSN),
         'process.env.REACT_APP_SENTRY_ENVIRONMENT': JSON.stringify(process.env.REACT_APP_SENTRY_ENVIRONMENT),
+        'process.env.REACT_APP_WEB_SENTRY_TRACES_SAMPLE_RATE': JSON.stringify(process.env.REACT_APP_WEB_SENTRY_TRACES_SAMPLE_RATE),
+        'process.env.REACT_APP_WEB_SENTRY_REPLAYS_SAMPLE_RATE': JSON.stringify(process.env.REACT_APP_WEB_SENTRY_REPLAYS_SAMPLE_RATE),
+        'process.env.REACT_APP_WEB_SENTRY_REPLAYS_ERROR_SAMPLE_RATE': JSON.stringify(process.env.REACT_APP_WEB_SENTRY_REPLAYS_ERROR_SAMPLE_RATE),
       }),
       new HtmlWebpackPlugin({
         filename: `${RECEIVING_VIEW}/create.gsp`,

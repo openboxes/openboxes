@@ -15,12 +15,13 @@ import 'bootstrap/dist/js/bootstrap';
 // eslint-disable-next-line import/extensions
 import '@fontsource/inter';
 
+import initializeSentry from './config/sentry';
+
 import 'bootstrap/dist/css/bootstrap.css';
 import 'font-awesome/css/font-awesome.min.css';
 // eslint-disable-next-line import/no-unresolved
 import 'css/main.scss';
 import 'react-tippy/dist/tippy.css';
-import initializeSentry from './config/sentry';
 
 library.add(fab, fas);
 // eslint-disable-next-line camelcase,no-undef
