@@ -5,6 +5,7 @@ import grails.validation.ValidationException
 import org.grails.datastore.mapping.query.api.Criteria
 import org.hibernate.criterion.Order
 import org.hibernate.sql.JoinType
+import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Location
 
 @Transactional
@@ -98,5 +99,28 @@ class CycleCountService {
             usedAliases.add("product")
             criteria.createAlias("product", "product", JoinType.INNER_JOIN)
         }
+    }
+
+    List<CycleCountRequest> createRequests(CycleCountRequestBatchCommand command) {
+        List<CycleCountRequest> cycleCountsRequests = []
+        command.requests.each { CycleCountRequestCommand request ->
+            CycleCountRequest cycleCountRequest = new CycleCountRequest(
+                    facility: request.facility,
+                    product: request.product,
+                    status: CycleCountRequestStatus.CREATED,
+                    requestType: CycleCountRequestType.MANUAL_REQUEST,
+                    blindCount: request.blindCount,
+                    createdBy: AuthService.currentUser,
+                    updatedBy: AuthService.currentUser
+            )
+            cycleCountsRequests.add(cycleCountRequest)
+        }
+        cycleCountsRequests.each { CycleCountRequest cycleCountRequest ->
+            if (!cycleCountRequest.validate()) {
+                throw new ValidationException("Invalid cycle count request", cycleCountRequest.errors)
+            }
+            cycleCountRequest.save()
+        }
+        return cycleCountsRequests
     }
 }
