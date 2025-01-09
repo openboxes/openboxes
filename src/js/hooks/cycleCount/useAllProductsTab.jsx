@@ -93,7 +93,7 @@ const useAllProductsTab = ({ filterParams }) => {
   const columns = useMemo(() => [
     columnHelper.accessor('lastCountDate', {
       header: () => (
-        <TableHeaderCell sortable columnId="lastCountDate" {...sortableProps} order={order} sort={sort}>
+        <TableHeaderCell sortable columnId="lastCountDate" {...sortableProps}>
           {translate('react.cycleCount.table.lastCounted.label', 'Last Counted')}
         </TableHeaderCell>
       ),
