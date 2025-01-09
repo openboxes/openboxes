@@ -75,8 +75,8 @@ export const debounceLocationsFetch = (
           activityCodes,
         },
       }).then((result) => callback(_.map(result.data.data, (obj) => {
-        const locationType = withTypeDescription ? ` [${obj.locationType.description}]` : '';
-        const label = `${obj.name}${locationType}`;
+        const locationTypeData = withTypeDescription ? ` [${obj.locationType.description}]` : '';
+        const label = `${obj.name}${locationTypeData}`;
         return {
           id: obj.id,
           type: obj.locationType.locationTypeCode,
