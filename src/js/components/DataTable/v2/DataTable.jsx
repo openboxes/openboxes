@@ -17,6 +17,8 @@ const DataTable = ({
   loading,
   loadingMessage,
   emptyTableMessage,
+  setRowsOffset,
+  setPageSize,
 }) => {
   const {
     defaultEmptyTableMessage,
@@ -33,6 +35,8 @@ const DataTable = ({
     pageSize,
     columns,
     data,
+    setRowsOffset,
+    setPageSize,
   });
 
   return (
@@ -88,6 +92,9 @@ DataTable.propTypes = {
     id: PropTypes.string.isRequired,
     defaultMessage: PropTypes.string.isRequired,
   }),
+  // Setting data for sending requests with pagination
+  setRowsOffset: PropTypes.func,
+  setPageSize: PropTypes.func,
 };
 
 DataTable.defaultProps = {
@@ -96,4 +103,6 @@ DataTable.defaultProps = {
   loadingMessage: null,
   emptyTableMessage: null,
   pageSize: 5,
+  setRowsOffset: () => {},
+  setPageSize: () => {},
 };

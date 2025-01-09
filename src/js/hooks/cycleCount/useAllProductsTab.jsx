@@ -1,7 +1,8 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 
 import { createColumnHelper } from '@tanstack/react-table';
 import fileDownload from 'js-file-download';
+import _ from 'lodash';
 import queryString from 'query-string';
 import { useSelector } from 'react-redux';
 
@@ -9,38 +10,90 @@ import { TableCell } from 'components/DataTable';
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
 import { INVENTORY_ITEM_URL } from 'consts/applicationUrls';
 import cycleCountMockedData from 'consts/cycleCountMockedData';
-import useTableData from 'hooks/list-pages/useTableData';
+import useTableDataV2 from 'hooks/useTableDataV2';
+import useTableSorting from 'hooks/useTableSorting';
 import useTranslate from 'hooks/useTranslate';
 
-const useAllProductsTab = () => {
+const useAllProductsTab = ({ filterParams }) => {
   const columnHelper = createColumnHelper();
   const translate = useTranslate();
+  const [pageSize, setPageSize] = useState(5);
+  const [rowsOffset, setRowsOffset] = useState(0);
 
-  const currentLocale = useSelector((state) => ({
+  const {
+    currentLocale,
+    currentLocation,
+  } = useSelector((state) => ({
     currentLocale: state.session.activeLanguage,
+    currentLocation: state.session.currentLocation,
   }));
 
-  const { tableData, loading } = useTableData({
-    filterParams: {},
+  const getParams = ({
+    sortingParams,
+  }) => {
+    const {
+      dateLastCount,
+      categories,
+      internalLocations,
+      tags,
+      catalogs,
+      negativeQuantity,
+    } = filterParams;
+    return _.omitBy({
+      format: 'list',
+      offset: `${rowsOffset}`,
+      max: `${pageSize}`,
+      ...sortingParams,
+      ...filterParams,
+      facility: currentLocation?.id,
+      dateLastCount,
+      categories: categories?.map?.(({ id }) => id),
+      internalLocations: internalLocations?.map?.(({ name }) => name),
+      tags: tags?.map?.(({ id }) => id),
+      catalogs: catalogs?.map?.(({ id }) => id),
+      abcClass: [],
+      negativeQuantity,
+    }, (val) => {
+      if (typeof val === 'boolean') {
+        return !val;
+      }
+      return _.isEmpty(val);
+    });
+  };
+
+  const {
+    sortableProps,
+    sort,
+    order,
+  } = useTableSorting();
+
+  const {
+    tableData,
+    loading,
+  } = useTableDataV2({
     // Should be replaced after integrating with backend
     url: 'cycleCount',
     errorMessageId: 'react.cycleCount.table.errorMessage.label',
     defaultErrorMessage: 'Unable to fetch products',
-    fetchManually: true,
-    getParams: () => {},
-    onFetchedData: () => {},
+    getParams,
+    pageSize,
+    rowsOffset,
+    sort,
+    order,
+    paramKeys: [
+      'negativeQuantity',
+      'catalogs',
+      'tags',
+      'internalLocations',
+      'categories',
+      'dateLastCount',
+    ],
   });
-
-  const {
-    currentLocation,
-  } = useSelector((state) => ({
-    currentLocation: state.session.currentLocation,
-  }));
 
   const columns = useMemo(() => [
     columnHelper.accessor('lastCountDate', {
       header: () => (
-        <TableHeaderCell sortable>
+        <TableHeaderCell sortable columnId="lastCountDate" {...sortableProps} order={order} sort={sort}>
           {translate('react.cycleCount.table.lastCounted.label', 'Last Counted')}
         </TableHeaderCell>
       ),
@@ -53,7 +106,7 @@ const useAllProductsTab = () => {
     columnHelper.accessor((row) => `${row.product.productCode} ${row.product.name}`, {
       id: 'product',
       header: () => (
-        <TableHeaderCell sortable>
+        <TableHeaderCell sortable columnId="product" {...sortableProps}>
           {translate('react.cycleCount.table.products.label', 'Products')}
         </TableHeaderCell>
       ),
@@ -68,7 +121,7 @@ const useAllProductsTab = () => {
     }),
     columnHelper.accessor('product.category', {
       header: () => (
-        <TableHeaderCell sortable>
+        <TableHeaderCell sortable columnId="category" {...sortableProps}>
           {translate('react.cycleCount.table.category.label', 'Category')}
         </TableHeaderCell>
       ),
@@ -80,7 +133,7 @@ const useAllProductsTab = () => {
     }),
     columnHelper.accessor('binLocation.name', {
       header: () => (
-        <TableHeaderCell sortable>
+        <TableHeaderCell sortable columnId="binLocation" {...sortableProps}>
           {translate('react.cycleCount.table.binLocation.label', 'Bin Location')}
         </TableHeaderCell>
       ),
@@ -120,7 +173,7 @@ const useAllProductsTab = () => {
     }),
     columnHelper.accessor('product.abcClass', {
       header: () => (
-        <TableHeaderCell sortable>
+        <TableHeaderCell sortable columnId="abcClass" {...sortableProps}>
           {translate('react.cycleCount.table.abcClass.label', 'ABC Class')}
         </TableHeaderCell>
       ),
@@ -132,7 +185,7 @@ const useAllProductsTab = () => {
     }),
     columnHelper.accessor('product.quantity', {
       header: () => (
-        <TableHeaderCell sortable>
+        <TableHeaderCell sortable columnId="quantity" {...sortableProps}>
           {translate('react.cycleCount.table.quantity.label', 'Quantity')}
         </TableHeaderCell>
       ),
@@ -142,7 +195,7 @@ const useAllProductsTab = () => {
         </TableCell>
       ),
     }),
-  ], [currentLocale]);
+  ], [currentLocale, sort, order]);
 
   const emptyTableMessage = {
     id: 'react.cycleCount.table.emptyTable.label',
@@ -174,6 +227,8 @@ const useAllProductsTab = () => {
     loading,
     emptyTableMessage,
     exportTableData,
+    setPageSize,
+    setRowsOffset,
   };
 };
 
