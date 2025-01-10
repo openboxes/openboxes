@@ -16,7 +16,8 @@ const ImpersonateInfo = ({ currentUserName }) => (
     <div className="info d-flex align-items-center">
       <RiShieldUserLine />
       <span>
-        <Translate id="react.default.impersonate.label" defaultMessage="You are impersonating user" />&nbsp;
+        <Translate id="react.default.impersonate.label" defaultMessage="You are impersonating user" />
+&nbsp;
         <span className="font-weight-bold">{currentUserName}</span>
       </span>
     </div>
@@ -26,7 +27,7 @@ const ImpersonateInfo = ({ currentUserName }) => (
   </div>
 );
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   currentUserName: state.session.user.username,
 });
 

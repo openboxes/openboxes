@@ -23,7 +23,6 @@ import 'react-confirm-alert/src/react-confirm-alert.css';
 import 'react-table/react-table.css';
 import 'components/locations-configuration/ZoneTable.scss';
 
-
 const ZONE_FIELDS = {
   active: {
     type: CheckboxField,
@@ -120,7 +119,6 @@ const zoneValidate = (values) => {
     }, {});
 };
 
-
 const binValidate = (values) => {
   const requiredFields = ['name', 'locationType'];
   return Object.keys(BIN_FIELDS)
@@ -134,7 +132,6 @@ const binValidate = (values) => {
       return acc;
     }, {});
 };
-
 
 class ZoneAndBinLocations extends Component {
   constructor(props) {
@@ -172,8 +169,8 @@ class ZoneAndBinLocations extends Component {
             label: this.props.locale === 'fr' && fr ? fr : en,
           };
         });
-        const binTypes = locationTypes.filter(location => location.locationTypeCode === 'BIN_LOCATION' || location.locationTypeCode === 'INTERNAL');
-        const zoneTypes = locationTypes.filter(location => location.locationTypeCode === 'ZONE');
+        const binTypes = locationTypes.filter((location) => location.locationTypeCode === 'BIN_LOCATION' || location.locationTypeCode === 'INTERNAL');
+        const zoneTypes = locationTypes.filter((location) => location.locationTypeCode === 'ZONE');
         this.setState({ binTypes, zoneTypes });
       })
       .catch(() => Promise.reject(new Error(this.props.translate('react.locationsConfiguration.error.fetchingBinAndZoneTypes', 'Could not load location types'))));
@@ -373,7 +370,7 @@ class ZoneAndBinLocations extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
   locale: state.session.activeLanguage,
 });
@@ -384,7 +381,6 @@ const mapDispatchToProps = {
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(ZoneAndBinLocations);
-
 
 ZoneAndBinLocations.propTypes = {
   nextPage: PropTypes.func.isRequired,

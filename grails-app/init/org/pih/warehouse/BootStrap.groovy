@@ -47,6 +47,8 @@ import org.pih.warehouse.core.PaymentTerm
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.UploadService
 import org.pih.warehouse.core.User
+import org.pih.warehouse.inventory.CycleCountCandidate
+import org.pih.warehouse.inventory.CycleCountRequest
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.OutboundStockMovementListItem
 import org.pih.warehouse.invoice.InvoiceItem
@@ -610,6 +612,14 @@ class BootStrap {
 
         JSON.registerObjectMarshaller(ProductPackage) { ProductPackage productPackage ->
             return productPackage.toJson()
+        }
+
+        JSON.registerObjectMarshaller(CycleCountCandidate) { CycleCountCandidate cycleCountCandidate ->
+            return cycleCountCandidate.toJson()
+        }
+
+        JSON.registerObjectMarshaller(CycleCountRequest) { CycleCountRequest cycleCountRequest ->
+            return cycleCountRequest.toJson()
         }
     }
 

@@ -64,9 +64,9 @@ export const matchesProductCodeOrName = ({
 }) => {
   const { productCode, name, displayNames } = product;
   const value = filterValue?.toLowerCase();
-  return (productCode?.toLowerCase()?.includes(value) ||
-    name?.toLowerCase()?.includes(value) ||
-    displayNames?.default?.toLowerCase()?.includes(value)
+  return (productCode?.toLowerCase()?.includes(value)
+    || name?.toLowerCase()?.includes(value)
+    || displayNames?.default?.toLowerCase()?.includes(value)
   );
 };
 

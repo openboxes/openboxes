@@ -19,4 +19,5 @@
     <include file="0.9.x/changelog-2024-10-04-1610-assign-amount-to-invoice-items.xml" />
     <include file="0.9.x/changelog-2024-10-28-1330-add-column-date-delivery-requested-to-requisition.xml" />
     <include file="0.9.x/changelog-2024-12-02-0000-alter-table-location-type-set-location-type-code-non-null.xml" />
+    <include file="0.9.x/changelog-2024-12-18-1300-create-table-cycle-count-request.xml" />
 </databaseChangeLog>

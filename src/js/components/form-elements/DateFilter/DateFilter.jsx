@@ -38,7 +38,11 @@ const CustomInput = React.forwardRef((props, ref) => {
       <div className="date-picker__icon-wrapper">
         {
           value
-            ? <button className="date-picker__icon" onClick={onClear}><RiCloseLine /></button>
+            ? (
+              <button aria-label="Pick date" type="button" className="date-picker__icon" onClick={onClear}>
+                <RiCloseLine />
+              </button>
+            )
             : <div className="date-picker__icon"><RiCalendarLine /></div>
         }
       </div>
@@ -57,7 +61,7 @@ const DateFilter = (props) => {
   }));
   const [isFocused, setIsFocused] = useState(false);
 
-  const onChangeHandler = date => onChange(date.format(dateFormat));
+  const onChangeHandler = (date) => onChange(date.format(dateFormat));
 
   const onClear = (e) => {
     e.stopPropagation();
@@ -123,11 +127,12 @@ const DateFilter = (props) => {
   );
 };
 
-const DateFilterBaseInput = props => (
+const DateFilterBaseInput = (props) => (
   <BaseField
     {...props}
     renderInput={DateFilter}
-  />);
+  />
+);
 
 DateFilter.defaultProps = {
   onChange: undefined,

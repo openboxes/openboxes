@@ -14,7 +14,6 @@ import { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'components/stock-movement-wizard/StockMovement.scss';
 
-
 const SUPPORT_LINKS = {
   locationDetails: 'Location Details',
   locationAddress: 'Address',
@@ -78,7 +77,7 @@ class LocationsConfigurationWizard extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   locale: state.session.activeLanguage,
   location: state.session.currentLocation,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),

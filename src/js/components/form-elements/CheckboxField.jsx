@@ -9,7 +9,8 @@ const CheckboxField = (props) => {
     <Checkbox
       {...attributes}
       value={value || false}
-    />);
+    />
+  );
 
   return (
     <BaseField

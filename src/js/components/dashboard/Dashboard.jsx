@@ -37,7 +37,8 @@ const SortableCards = SortableContainer(({
 }) => (
   <div className="card-component">
     {data.map((value, index) =>
-      (value &&
+      (value
+        && (
         <GraphCard
           key={`item-${value.id}`}
           index={index}
@@ -59,15 +60,16 @@ const SortableCards = SortableContainer(({
           disabled={!personalDashboardActive}
           hideDraghandle={!personalDashboardActive}
         />
+        )
       ))}
   </div>
 ));
 
-
 const SortableNumberCards = SortableContainer(({ data, personalDashboardActive }) => (
   <div className="card-component">
     {data.map((value, index) => (
-      (value &&
+      (value
+        && (
         <NumberCard
           key={`item-${value.id}`}
           index={index}
@@ -83,11 +85,11 @@ const SortableNumberCards = SortableContainer(({ data, personalDashboardActive }
           disabled={!personalDashboardActive}
           hideDraghandle={!personalDashboardActive}
         />
+        )
       )
     ))}
   </div>
 ));
-
 
 const ArchiveIndicator = ({ hideArchive }) => (
   <div className={hideArchive ? 'archive-div hide-archive' : 'archive-div'}>
@@ -101,7 +103,6 @@ const ArchiveIndicator = ({ hideArchive }) => (
   </div>
 );
 
-
 const ConfigurationsList = ({
   configs, activeConfig, loadConfigData, showNav, toggleNav, configModified, updateConfig,
 }) => {
@@ -110,50 +111,49 @@ const ConfigurationsList = ({
   }
   return (
     <div className={`configs-left-nav ${!showNav ? 'hidden' : ''}`}>
-      <button className="toggle-nav" onClick={toggleNav}>
-        {showNav ?
-          <i className="fa fa-chevron-left" aria-hidden="true" />
-        :
-          <i className="fa fa-chevron-right" aria-hidden="true" />
-        }
+      <button type="button" className="toggle-nav" onClick={toggleNav}>
+        {showNav
+          ? <i className="fa fa-chevron-left" aria-hidden="true" />
+          : <i className="fa fa-chevron-right" aria-hidden="true" />}
       </button>
       <ul className="configs-list">
         {Object.entries(configs).map(([key, value]) => (
           <li className={`configs-list-item ${activeConfig === key ? 'active' : ''}`} key={key}>
-            <button onClick={() => loadConfigData(key)}>
+            <button type="button" onClick={() => loadConfigData(key)}>
               <i className="fa fa-bar-chart" aria-hidden="true" />
               <Translate id={`react.dashboard.${key}.label`} defaultMessage={value.name} />
             </button>
           </li>
-          ))}
+        ))}
       </ul>
       {
-        (activeConfig === 'personal' && configModified) ?
-          <div className="update-section">
-            <div className="division-line" />
-            <span>
-              <i className="fa fa-info-circle" aria-hidden="true" />
-              <Translate
-                id="react.dashboard.hasBeenEdited.message"
-                defaultMessage="The dashboard layout has been edited"
-              />
-            </span>
-            <button onClick={updateConfig} >
-              <i className="fa fa-floppy-o" aria-hidden="true" />
-              <Translate
-                id="react.dashboard.saveConfiguration.label"
-                defaultMessage="Save configuration"
-              />
-            </button>
-          </div>
-        : null
+        (activeConfig === 'personal' && configModified)
+          ? (
+            <div className="update-section">
+              <div className="division-line" />
+              <span>
+                <i className="fa fa-info-circle" aria-hidden="true" />
+                <Translate
+                  id="react.dashboard.hasBeenEdited.message"
+                  defaultMessage="The dashboard layout has been edited"
+                />
+              </span>
+              <button type="button" onClick={updateConfig}>
+                <i className="fa fa-floppy-o" aria-hidden="true" />
+                <Translate
+                  id="react.dashboard.saveConfiguration.label"
+                  defaultMessage="Save configuration"
+                />
+              </button>
+            </div>
+          )
+          : null
       }
     </div>
   );
 };
 
 const MAIN_DASHBOARD_CONFIG = 'mainDashboard';
-
 
 class Dashboard extends Component {
   constructor(props) {
@@ -310,7 +310,7 @@ class Dashboard extends Component {
 
   loadIndicator = (widgetId, params) => {
     const dashboardConf = this.props.dashboardConfig.dashboard[this.props.activeConfig];
-    const widget = _.find(dashboardConf.widgets, w => w.widgetId === widgetId);
+    const widget = _.find(dashboardConf.widgets, (w) => w.widgetId === widgetId);
     const widgetConf = {
       ...this.props.dashboardConfig.dashboardWidgets[widgetId],
       ...widget,
@@ -319,7 +319,7 @@ class Dashboard extends Component {
   };
 
   toggleNav = () => {
-    this.setState({ showNav: !this.state.showNav });
+    this.setState((prev) => ({ showNav: !prev.showNav }));
   };
 
   sortStartHandle = () => {
@@ -355,7 +355,7 @@ class Dashboard extends Component {
       - (this.props.indicatorsData.length + this.props.numberData.length);
 
     if (size) {
-      this.setState({ showPopout: !this.state.showPopout });
+      this.setState((prev) => ({ showPopout: !prev.showPopout }));
     } else {
       this.setState({ showPopout: false });
     }
@@ -418,6 +418,7 @@ class Dashboard extends Component {
         />
         <div
           className={`overlay ${this.state.showNav ? 'visible' : ''}`}
+          aria-label="button"
           role="button"
           tabIndex={0}
           onClick={this.toggleNav}
@@ -434,7 +435,7 @@ class Dashboard extends Component {
             {numberCards}
             <SortableCards
               allLocations={this.state.allLocations}
-              data={this.props.indicatorsData.filter(indicator => indicator)}
+              data={this.props.indicatorsData.filter((indicator) => indicator)}
               onSortStart={this.sortStartHandle}
               onSortEnd={this.sortEndHandleGraph}
               loadIndicator={this.loadIndicator}
@@ -443,7 +444,8 @@ class Dashboard extends Component {
               personalDashboardActive={isPersonalDashboardActive}
             />
             <ArchiveIndicator hideArchive={!this.state.isDragging} />
-            {isPersonalDashboardActive &&
+            {isPersonalDashboardActive
+              && (
               <UnarchiveIndicators
                 graphData={this.props.indicatorsData}
                 numberData={this.props.numberData}
@@ -453,7 +455,7 @@ class Dashboard extends Component {
                 unarchiveHandler={this.unarchiveHandler}
                 handleAdd={this.handleAdd}
               />
-            }
+              )}
           </div>
         </div>
       </div>
@@ -461,7 +463,7 @@ class Dashboard extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   indicatorsData: state.indicators.data,
   numberData: state.indicators.numberData,
   dashboardConfig: state.indicators.config,
@@ -485,7 +487,6 @@ Dashboard.defaultProps = {
   currentUser: '',
   indicatorsData: null,
   numberData: [],
-  configModified: false,
   match: {
     params: { configId: 'personal' },
   },
@@ -496,17 +497,17 @@ Dashboard.propTypes = {
   reorderIndicators: PropTypes.func.isRequired,
   indicatorsData: PropTypes.arrayOf(PropTypes.shape({
     id: PropTypes.number,
-  })).isRequired,
+  })),
   numberData: PropTypes.arrayOf(PropTypes.shape({
     id: PropTypes.number,
-  })).isRequired,
+  })),
   dashboardConfig: PropTypes.shape({
     dashboard: PropTypes.shape({}),
     dashboardWidgets: PropTypes.shape({}),
   }).isRequired,
   activeConfig: PropTypes.string.isRequired,
-  currentLocation: PropTypes.string.isRequired,
-  currentUser: PropTypes.string.isRequired,
+  currentLocation: PropTypes.string,
+  currentUser: PropTypes.string,
   addToIndicators: PropTypes.func.isRequired,
   reloadIndicator: PropTypes.func.isRequired,
   resetIndicators: PropTypes.func.isRequired,

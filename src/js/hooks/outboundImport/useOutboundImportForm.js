@@ -155,7 +155,15 @@ const useOutboundImportForm = ({ next }) => {
         itemsInOrder: tableDataGrouped.itemsInOrder,
       });
       setErrorsData({ errors: {}, validateStatus: validationResponse.status });
+      next();
     } catch (e) {
+      if (e.response.status !== HttpStatusCode.BadRequest) {
+        notification(NotificationType.ERROR_FILLED)({
+          message: 'Internal server error',
+          details: e.response.data.errorMessage,
+        });
+        return;
+      }
       setErrorsData({ errors: e.response.data.errors, validateStatus: e.response.status });
       // Group errors by errors and make the items with errors appear at the top,
       // by merging two grouped arrays
@@ -169,6 +177,7 @@ const useOutboundImportForm = ({ next }) => {
         message: translate('react.outboundImport.validationException.label', 'Validation exception'),
         details: `${tableDataGrouped.itemsWithErrors.length} ${translate('react.outboundImport.invalidRows.label', 'rows in the import are invalid. Review the table below to correct errors in the import.')}`,
       });
+      next();
     }
   };
 
@@ -202,9 +211,11 @@ const useOutboundImportForm = ({ next }) => {
       sendingOptions,
     };
     setCachedData(fulfilmentPayload);
-    await validateOutboundData(fulfilmentPayload);
-    spinner.hide();
-    next();
+    try {
+      await validateOutboundData(fulfilmentPayload);
+    } finally {
+      spinner.hide();
+    }
   };
 
   /**

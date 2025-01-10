@@ -12,7 +12,7 @@ const productOptionLabel = ({
   productCode, displayName, displayNames, name,
 }) => (`${productCode} - ${displayName || displayNames?.default || name}`);
 
-const Option = option => (
+const Option = (option) => (
   <Tooltip
     html={<div className="text-truncate">{option.name}</div>}
     theme="transparent"
@@ -24,9 +24,10 @@ const Option = option => (
         &nbsp;
       {renderHandlingIcons(option.handlingIcons)}
     </strong>
-  </Tooltip>);
+  </Tooltip>
+);
 
-const SelectedValue = option => (
+const SelectedValue = (option) => (
   <span className="d-flex align-items-center">
     <span style={{ color: option.showSelectedOptionColor && option.color }} className="text-truncate">
       {option.label || productOptionLabel(option)}
@@ -48,7 +49,7 @@ const ProductSelect = ({
   const [searchTerm, setSearchTerm] = useState('');
   const {
     debounceTime, minSearchLength,
-  } = useSelector(state => ({
+  } = useSelector((state) => ({
     debounceTime: state.session.searchConfig.debounceTime,
     minSearchLength: state.session.searchConfig.minSearchLength,
   }));
@@ -68,7 +69,7 @@ const ProductSelect = ({
 
   useEffect(() => {
     if (isExactMatch && loadedOptions.length && searchTerm) {
-      const exactMatches = loadedOptions.filter(product => product.exactMatch);
+      const exactMatches = loadedOptions.filter((product) => product.exactMatch);
       let exactMatchProduct = null;
 
       if (exactMatches.length === 1) {
@@ -116,11 +117,12 @@ const ProductSelect = ({
         setLoadedOptions([]);
         setSearchTerm('');
       }}
-      filterOption={item => (item)}
+      filterOption={(item) => (item)}
       onEnterPress={onEnterPress}
       optionRenderer={Option}
       valueRenderer={SelectedValue}
-    />);
+    />
+  );
 };
 
 ProductSelect.defaultProps = {

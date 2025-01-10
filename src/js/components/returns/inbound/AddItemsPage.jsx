@@ -64,8 +64,12 @@ const FIELDS = {
         className="btn btn-outline-success btn-xs"
         onClick={() => addRow({ sortOrder: getSortOrder() })}
       >
-        <span><i className="fa fa-plus pr-2" /><Translate id="react.default.button.addLine.label" defaultMessage="Add line" /></span>
-      </button>),
+        <span>
+          <i className="fa fa-plus pr-2" />
+          <Translate id="react.default.button.addLine.label" defaultMessage="Add line" />
+        </span>
+      </button>
+    ),
     fields: {
       product: {
         type: ProductSelectField,
@@ -166,8 +170,8 @@ class AddItemsPage extends Component {
     this.confirmEmptyQuantitySave = this.confirmEmptyQuantitySave.bind(this);
     this.confirmExpirationDateSave = this.confirmExpirationDateSave.bind(this);
     this.confirmEmptyQuantitySave = this.confirmEmptyQuantitySave.bind(this);
-    this.confirmValidationErrorOnPreviousPage =
-      this.confirmValidationErrorOnPreviousPage.bind(this);
+    this.confirmValidationErrorOnPreviousPage = this.confirmValidationErrorOnPreviousPage
+      .bind(this);
     this.validate = this.validate.bind(this);
   }
 
@@ -188,12 +192,13 @@ class AddItemsPage extends Component {
   }
 
   getSortOrder() {
-    this.setState({
-      sortOrder: this.state.sortOrder + 100,
-    });
+    this.setState((prev) => ({
+      sortOrder: prev.sortOrder + 100,
+    }));
 
     return this.state.sortOrder;
   }
+
   dataFetched = false;
 
   validate(values) {
@@ -374,7 +379,10 @@ class AddItemsPage extends Component {
   }
 
   async saveStockTransferInCurrentStep(formValues, status = null) {
-    const returnItems = _.filter(formValues.returnItems, (item) => !_.isEmpty(item) && item.product);
+    const returnItems = _.filter(
+      formValues.returnItems,
+      (item) => !_.isEmpty(item) && item.product,
+    );
 
     const hasEmptyOrZeroValues = _.some(returnItems, (item) => !item.quantity || item.quantity === '0');
 
@@ -385,16 +393,21 @@ class AddItemsPage extends Component {
       }
     }
 
-    const itemsWithLotAndExpirationDate = returnItems.filter(it => it.expirationDate && it.lotNumber);
+    const itemsWithLotAndExpirationDate = returnItems.filter(
+      (it) => it.expirationDate && it.lotNumber,
+    );
 
     // Trying to find at least one instance where the data that we are trying to save
     // does not match the expiration date of the existing inventoryItem in the system
+    // eslint-disable-next-line no-restricted-syntax
     for (const it of itemsWithLotAndExpirationDate) {
+      // eslint-disable-next-line no-await-in-loop
       const { data } = await ProductApi.getInventoryItem(it.product?.id, it.lotNumber);
       if (data.inventoryItem && data.inventoryItem.expirationDate !== it.expirationDate) {
         // After finding at least a single instance where expiration date we are trying to save
         // does not match the existing inventoryItem expiration date, we want to inform the user
         // that certain updates to th expiration date in the system will be performed
+        // eslint-disable-next-line no-await-in-loop
         const shouldUpdateLotExpirationDate = await this.confirmExpirationDateSave();
         if (!shouldUpdateLotExpirationDate) {
           return Promise.reject();
@@ -507,7 +520,10 @@ class AddItemsPage extends Component {
                 onClick={() => this.save(values)}
                 className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
               >
-                <span><i className="fa fa-save pr-2" /><Translate id="react.default.button.save.label" defaultMessage="Save" /></span>
+                <span>
+                  <i className="fa fa-save pr-2" />
+                  <Translate id="react.default.button.save.label" defaultMessage="Save" />
+                </span>
               </button>
               <button
                 type="button"
@@ -515,7 +531,10 @@ class AddItemsPage extends Component {
                 onClick={() => this.saveAndExit(values)}
                 className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
               >
-                <span><i className="fa fa-sign-out pr-2" /><Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" /></span>
+                <span>
+                  <i className="fa fa-sign-out pr-2" />
+                  <Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" />
+                </span>
               </button>
               <button
                 type="button"
@@ -523,7 +542,10 @@ class AddItemsPage extends Component {
                 onClick={() => this.removeAll()}
                 className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs"
               >
-                <span><i className="fa fa-remove pr-2" /><Translate id="react.default.button.deleteAll.label" defaultMessage="Delete all" /></span>
+                <span>
+                  <i className="fa fa-remove pr-2" />
+                  <Translate id="react.default.button.deleteAll.label" defaultMessage="Delete all" />
+                </span>
               </button>
             </span>
             <form onSubmit={handleSubmit}>
@@ -555,9 +577,10 @@ class AddItemsPage extends Component {
                   }}
                   className="btn btn-outline-primary btn-form float-right btn-xs"
                   disabled={
-                    !_.some(values.returnItems, item => item.product && _.parseInt(item.quantity))
+                    !_.some(values.returnItems, (item) => item.product && _.parseInt(item.quantity))
                   }
-                ><Translate id="react.default.button.next.label" defaultMessage="Next" />
+                >
+                  <Translate id="react.default.button.next.label" defaultMessage="Next" />
                 </button>
               </div>
             </form>
@@ -568,7 +591,7 @@ class AddItemsPage extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   recipients: state.users.data,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
   inboundReturnsTranslationsFetched: state.session.fetchedTranslations.inboundReturns,

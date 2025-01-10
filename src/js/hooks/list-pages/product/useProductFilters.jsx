@@ -106,8 +106,10 @@ const useProductFilters = () => {
     defaultValues.categoryId = setDefaultValue(categoryId, categoryList);
     defaultValues.glAccountsId = setDefaultValue(glAccountsId, glAccountsList);
     defaultValues.productFamilyId = setDefaultValue(productFamilyId, productGroupList);
-    defaultValues.handlingRequirementId =
-      setDefaultValue(handlingRequirementId, handlingRequirementsList);
+    defaultValues.handlingRequirementId = setDefaultValue(
+      handlingRequirementId,
+      handlingRequirementsList,
+    );
     if (catalogId
       || tagId
       || categoryId

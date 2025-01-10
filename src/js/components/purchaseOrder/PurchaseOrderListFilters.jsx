@@ -6,7 +6,6 @@ import { connect } from 'react-redux';
 import FilterForm from 'components/Filter/FilterForm';
 import { debounceLocationsFetch, debouncePeopleFetch } from 'utils/option-utils';
 
-
 const PurchaseOrderListFilters = ({
   setFilterParams,
   debounceTime,
@@ -48,7 +47,7 @@ const PurchaseOrderListFilters = ({
     <div className="d-flex flex-column list-page-filters">
       <FilterForm
         filterFields={filterFields}
-        updateFilterParams={values => setFilterParams({ ...values })}
+        updateFilterParams={(values) => setFilterParams({ ...values })}
         formProps={{
           ...formProps,
           debouncedOriginLocationsFetch,
@@ -66,7 +65,7 @@ const PurchaseOrderListFilters = ({
   );
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   debounceTime: state.session.searchConfig.debounceTime,
   minSearchLength: state.session.searchConfig.minSearchLength,
   supportedActivities: state.session.supportedActivities,

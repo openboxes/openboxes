@@ -61,6 +61,10 @@ class InventoryController {
         [command: command]
     }
 
+    def cycleCount() {
+        render(view: "/common/react")
+    }
+
     def binLocations() {
         Location location = Location.load(session.warehouse.id)
         List binLocations = productAvailabilityService.getQuantityOnHandByBinLocation(location)

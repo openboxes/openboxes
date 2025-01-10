@@ -1,5 +1,6 @@
 package org.pih.warehouse.product
 
+import grails.gorm.transactions.Transactional
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 import org.apache.commons.lang.StringUtils
@@ -10,6 +11,7 @@ import org.pih.warehouse.core.IdentifierService
 import org.pih.warehouse.core.identification.BlankIdentifierResolver
 import org.pih.warehouse.core.identification.IdentifierGeneratorContext
 
+@Transactional
 class ProductIdentifierService extends IdentifierService<Product> implements BlankIdentifierResolver<Product> {
 
     ProductTypeService productTypeService

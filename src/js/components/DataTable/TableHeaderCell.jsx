@@ -20,10 +20,12 @@ const TableHeaderCell = ({
       className={`rt-th ${className}`}
     >
       {children}
+      {sortable && (
       <div className="sorting-arrows">
         <RiArrowUpSFill className="arrow-up" />
         <RiArrowDownSFill className="arrow-down" />
       </div>
+      )}
     </div>
   );
 };
@@ -32,6 +34,7 @@ TableHeaderCell.defaultProps = {
   style: undefined,
   className: undefined,
   sortable: false,
+  toggleSort: () => {},
 };
 
 TableHeaderCell.propTypes = {
@@ -42,7 +45,7 @@ TableHeaderCell.propTypes = {
   className: PropTypes.string,
   sortable: PropTypes.bool,
   style: PropTypes.shape({}),
-  toggleSort: PropTypes.func.isRequired,
+  toggleSort: PropTypes.func,
 };
 
 export default TableHeaderCell;

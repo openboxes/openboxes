@@ -7,10 +7,10 @@ const Loading = ({ error, pastDelay, retry }) => {
     return (
       <div className="text-center">
         <div className="my-3">Error occurred when loading the component</div>
-        <button className="btn btn-outline-primary my-3" onClick={retry}>Retry</button>
+        <button type="button" className="btn btn-outline-primary my-3" onClick={retry}>Retry</button>
       </div>
     );
-  } else if (pastDelay) {
+  } if (pastDelay) {
     return <div className="text-center">Loading...</div>;
   }
 

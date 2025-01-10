@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import Numbers from 'components/dashboard/Numbers';
 import TableCard from 'components/dashboard/TableCard';
 
-const NumbersTableCard = props => (
+const NumbersTableCard = (props) => (
   <div className="numbers-table-card">
     <div className="numbers-left">
       <Numbers data={props.data.numbersIndicator} options={props.options} />

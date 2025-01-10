@@ -8,20 +8,21 @@ import { connect } from 'react-redux';
 import SupportButton from 'components/support-button/SupportButton';
 
 const HelpScout = ({ isHelpScoutEnabled, localizedHelpScoutKey, ...props }) => (
-  isHelpScoutEnabled ?
-    <LiveChatLoaderProvider provider="helpScout" providerKey={localizedHelpScoutKey}>
-      <SupportButton {...props} />
-    </LiveChatLoaderProvider>
+  isHelpScoutEnabled
+    ? (
+      <LiveChatLoaderProvider provider="helpScout" providerKey={localizedHelpScoutKey}>
+        <SupportButton {...props} />
+      </LiveChatLoaderProvider>
+    )
     : <RiQuestionLine />
 );
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   localizedHelpScoutKey: state.session.localizedHelpScoutKey,
   isHelpScoutEnabled: state.session.isHelpScoutEnabled,
 });
 
 export default connect(mapStateToProps)(HelpScout);
-
 
 HelpScout.propTypes = {
   localizedHelpScoutKey: PropTypes.string,

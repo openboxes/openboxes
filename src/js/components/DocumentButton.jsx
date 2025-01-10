@@ -21,9 +21,12 @@ const DocumentButton = ({
     className={`py-1 mb-1 btn btn-outline-secondary ${disabled ? 'disabled' : ''}`}
     target={target}
     rel="noopener noreferrer"
-    onClick={event => handleClick(onClick, event, link)}
+    onClick={(event) => handleClick(onClick, event, link)}
   >
-    <span><i className={`pr-2 fa ${buttonIcon}`} />{buttonTitle}</span>
+    <span>
+      <i className={`pr-2 fa ${buttonIcon}`} />
+      {buttonTitle}
+    </span>
   </a>
 );
 

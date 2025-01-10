@@ -11,7 +11,8 @@ import { translateWithDefaultMessage } from 'utils/Translate';
 
 const RowSaveIconIndicator = ({ lineItemSaveStatus }) => {
   const { icon, id, defaultMessage } = SaveStatusIcons[lineItemSaveStatus];
-  const translate = useSelector(state => translateWithDefaultMessage(getTranslate(state.localize)));
+  const translate = useSelector((state) =>
+    translateWithDefaultMessage(getTranslate(state.localize)));
 
   return (
     <Tooltip html={<span className="p-1">{translate(id, defaultMessage)}</span>} delay="150" duration="250">
@@ -29,4 +30,3 @@ RowSaveIconIndicator.propTypes = {
 RowSaveIconIndicator.defaultProps = {
   lineItemSaveStatus: RowSaveStatus.SAVED,
 };
-
