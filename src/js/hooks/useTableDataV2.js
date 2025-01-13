@@ -21,7 +21,7 @@ const useTableDataV2 = ({
   errorMessageId,
   defaultErrorMessage,
   getParams,
-  rowsOffset,
+  offset,
   pageSize,
   paramKeys,
   sort,
@@ -78,7 +78,7 @@ const useTableDataV2 = ({
   // Fetching data after changing page size, page number and sorting
   useEffect(() => {
     fetchData();
-  }, [pageSize, rowsOffset, sort, order]);
+  }, [pageSize, offset, sort, order]);
 
   // Fetching data after changes in filters
   useQueryParamsListener({

@@ -17,7 +17,7 @@ const CycleCountAllProducts = ({
     loading,
     emptyTableMessage,
     exportTableData,
-    setRowsOffset,
+    setOffset,
     setPageSize,
   } = useAllProductsTab({
     filterParams,
@@ -41,7 +41,7 @@ const CycleCountAllProducts = ({
         footerComponent={AllProductsTabFooter}
         emptyTableMessage={emptyTableMessage}
         loading={loading}
-        setRowsOffset={setRowsOffset}
+        setOffset={setOffset}
         setPageSize={setPageSize}
       />
     </div>

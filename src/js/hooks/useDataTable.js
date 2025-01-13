@@ -8,7 +8,7 @@ const useDataTable = ({
   pageSize,
   columns,
   data,
-  setRowsOffset,
+  setOffset,
   setPageSize,
 }) => {
   // Managing pagination on the client side, no need for server side handling
@@ -28,7 +28,7 @@ const useDataTable = ({
 
   const onPageChange = (page) => {
     // Function call for managing pagination outside the table (server side)
-    setRowsOffset?.(page * pagination.pageSize);
+    setOffset?.(page * pagination.pageSize);
     setPagination((prev) => ({
       ...prev,
       pageIndex: page,

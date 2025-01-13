@@ -18,7 +18,7 @@ const useAllProductsTab = ({ filterParams }) => {
   const columnHelper = createColumnHelper();
   const translate = useTranslate();
   const [pageSize, setPageSize] = useState(5);
-  const [rowsOffset, setRowsOffset] = useState(0);
+  const [offset, setOffset] = useState(0);
 
   const {
     currentLocale,
@@ -41,7 +41,7 @@ const useAllProductsTab = ({ filterParams }) => {
     } = filterParams;
     return _.omitBy({
       format: 'list',
-      offset: `${rowsOffset}`,
+      offset: `${offset}`,
       max: `${pageSize}`,
       ...sortingParams,
       ...filterParams,
@@ -77,7 +77,7 @@ const useAllProductsTab = ({ filterParams }) => {
     defaultErrorMessage: 'Unable to fetch products',
     getParams,
     pageSize,
-    rowsOffset,
+    offset,
     sort,
     order,
     paramKeys: [
@@ -228,7 +228,7 @@ const useAllProductsTab = ({ filterParams }) => {
     emptyTableMessage,
     exportTableData,
     setPageSize,
-    setRowsOffset,
+    setOffset,
   };
 };
 

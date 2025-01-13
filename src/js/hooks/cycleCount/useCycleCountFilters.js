@@ -18,13 +18,16 @@ const useCycleCountFilters = () => {
   const [filterParams, setFilterParams] = useState({});
   const [defaultFilterValues, setDefaultFilterValues] = useState({});
   const [dateLastCount] = useState(null);
-  const [categories, setCategories] = useState([]);
-  const [internalLocations, setInternalLocations] = useState([]);
-  const [tags, setTags] = useState([]);
-  const [catalogs, setCatalogs] = useState([]);
-  const [abcClasses] = useState([]);
   const [negativeQuantity] = useState(false);
   const [filtersInitialized, setFiltersInitialized] = useState(false);
+
+  const [selectOptions, setSelectOptions] = useState({
+    categories: [],
+    catalogs: [],
+    internalLocations: [],
+    tags: [],
+    abcClasses: [],
+  });
 
   const {
     currentLocation,
@@ -84,10 +87,13 @@ const useCycleCountFilters = () => {
       fetchBins(currentLocation?.id),
     ]);
 
-    setCategories(categoryList);
-    setCatalogs(catalogList);
-    setTags(tagList);
-    setInternalLocations(binList);
+    setSelectOptions({
+      categories: categoryList,
+      catalogs: catalogList,
+      tags: tagList,
+      internalLocations: binList,
+      abcClasses: [],
+    });
 
     defaultValues.catalogs = setDefaultValue(queryProps.catalogs, catalogList);
     defaultValues.tags = setDefaultValue(queryProps.tags, tagList);
@@ -124,14 +130,10 @@ const useCycleCountFilters = () => {
   return {
     defaultFilterValues,
     setFilterValues,
-    categories,
-    catalogs,
-    tags,
     filterParams,
     dateLastCount,
-    internalLocations,
-    abcClasses,
     negativeQuantity,
+    ...selectOptions,
   };
 };
 
