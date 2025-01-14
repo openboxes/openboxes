@@ -8,6 +8,7 @@ const exportFileFromAPI = ({
   params,
   format = 'csv',
   filename: customFilename,
+  afterExporting,
 }) => apiClient.get(url, {
   responseType: 'blob',
   params: {
@@ -24,6 +25,7 @@ const exportFileFromAPI = ({
     const filename = customFilename || filenameFromHeader || 'file';
 
     fileDownload(res.data, `${filename}.${format}`);
+    afterExporting?.();
     return res;
   });
 

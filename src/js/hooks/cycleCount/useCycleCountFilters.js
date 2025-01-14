@@ -104,7 +104,11 @@ const useCycleCountFilters = () => {
     setFiltersInitialized(true);
   };
 
-  useCommonFiltersCleaner({ filtersInitialized, initializeDefaultFilterValues, clearFilterValues });
+  useCommonFiltersCleaner({
+    filtersInitialized,
+    initializeDefaultFilterValues,
+    clearFilterValues,
+  });
 
   const setFilterValues = (values) => {
     const filterAccessors = {

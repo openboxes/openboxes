@@ -43,6 +43,7 @@ const CycleCountAllProducts = ({
         loading={loading}
         setOffset={setOffset}
         setPageSize={setPageSize}
+        totalCount={tableData.totalCount}
       />
     </div>
   );
