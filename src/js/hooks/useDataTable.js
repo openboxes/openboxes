@@ -10,6 +10,7 @@ const useDataTable = ({
   data,
   setOffset,
   setPageSize,
+  totalCount,
 }) => {
   // Managing pagination on the client side, no need for server side handling
   const [pagination, setPagination] = useState({
@@ -44,7 +45,7 @@ const useDataTable = ({
     }));
   };
 
-  const pages = Math.ceil(data.length / pagination.pageSize);
+  const pages = Math.ceil(totalCount / pagination.pageSize);
   const pageSizeSelectOptions = [5, 10, 20, 25, 50, 100];
 
   const canNext = () => pagination.pageIndex + 1 < pages;
