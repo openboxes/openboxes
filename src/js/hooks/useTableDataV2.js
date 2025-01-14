@@ -78,6 +78,12 @@ const useTableDataV2 = ({
     searchTerm,
   ]);
 
+  // Start displaying the loader in the table when
+  // accessing the page first time, before sending a request
+  useEffect(() => {
+    setLoading(true);
+  }, []);
+
   useEffect(() => () => {
     if (currentLocation?.id) {
       sourceRef.current.cancel('Fetching canceled');

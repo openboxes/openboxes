@@ -108,6 +108,5 @@ DataTable.defaultProps = {
   pageSize: 5,
   setOffset: () => {},
   totalCount: 0,
-  setRowsOffset: () => {},
   setPageSize: () => {},
 };
