@@ -12,9 +12,9 @@ import useSpinner from 'hooks/useSpinner';
 import useTableDataV2 from 'hooks/useTableDataV2';
 import useTableSorting from 'hooks/useTableSorting';
 import useTranslate from 'hooks/useTranslate';
+import Badge from 'utils/Badge';
 import exportFileFromAPI from 'utils/file-download-util';
 import { mapStringToList } from 'utils/form-values-utils';
-import Badge from 'utils/Badge';
 
 const useAllProductsTab = ({ filterParams }) => {
   const columnHelper = createColumnHelper();
