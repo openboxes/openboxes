@@ -2,6 +2,7 @@ package org.pih.warehouse.api
 
 import grails.converters.JSON
 import grails.validation.ValidationException
+import org.apache.commons.csv.CSVPrinter
 import org.pih.warehouse.inventory.CycleCountCandidate
 import org.pih.warehouse.inventory.CycleCountCandidateFilterCommand
 import org.pih.warehouse.inventory.CycleCountRequest
@@ -17,6 +18,13 @@ class CycleCountApiController {
 
     def getCandidates(CycleCountCandidateFilterCommand filterParams) {
         List<CycleCountCandidate> candidates = cycleCountService.getCandidates(filterParams, params.facilityId)
+
+        if (filterParams.format == "csv") {
+            CSVPrinter csv = cycleCountService.getCycleCountCsv(candidates)
+            response.setHeader("Content-disposition", "attachment; filename=\"CycleCountReport-${new Date().format("yyyyMMdd-hhmmss")}.csv\"")
+            render(contentType: "text/csv", text: csv.out.toString())
+            return
+        }
 
         render([data: candidates, totalCount: candidates.totalCount] as JSON)
     }

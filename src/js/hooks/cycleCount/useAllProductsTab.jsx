@@ -1,46 +1,96 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 
 import { createColumnHelper } from '@tanstack/react-table';
-import fileDownload from 'js-file-download';
-import queryString from 'query-string';
+import _ from 'lodash';
 import { useSelector } from 'react-redux';
 
+import { CYCLE_COUNT_CANDIDATES } from 'api/urls';
 import { TableCell } from 'components/DataTable';
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
 import { INVENTORY_ITEM_URL } from 'consts/applicationUrls';
-import cycleCountMockedData from 'consts/cycleCountMockedData';
-import useTableData from 'hooks/list-pages/useTableData';
+import useSpinner from 'hooks/useSpinner';
+import useTableDataV2 from 'hooks/useTableDataV2';
+import useTableSorting from 'hooks/useTableSorting';
 import useTranslate from 'hooks/useTranslate';
+import exportFileFromAPI from 'utils/file-download-util';
+import { mapStringToList } from 'utils/form-values-utils';
 
-const useAllProductsTab = () => {
+const useAllProductsTab = ({ filterParams }) => {
   const columnHelper = createColumnHelper();
+  const spinner = useSpinner();
   const translate = useTranslate();
+  const [pageSize, setPageSize] = useState(5);
+  const [offset, setOffset] = useState(0);
 
-  const currentLocale = useSelector((state) => ({
+  const {
+    currentLocale,
+    currentLocation,
+  } = useSelector((state) => ({
     currentLocale: state.session.activeLanguage,
+    currentLocation: state.session.currentLocation,
   }));
 
-  const { tableData, loading } = useTableData({
-    filterParams: {},
-    // Should be replaced after integrating with backend
-    url: 'cycleCount',
-    errorMessageId: 'react.cycleCount.table.errorMessage.label',
-    defaultErrorMessage: 'Unable to fetch products',
-    fetchManually: true,
-    getParams: () => {},
-    onFetchedData: () => {},
+  const {
+    dateLastCount,
+    categories,
+    internalLocations,
+    tags,
+    catalogs,
+    negativeQuantity,
+    searchTerm,
+  } = filterParams;
+
+  const getParams = ({
+    sortingParams,
+  }) => _.omitBy({
+    offset: `${offset}`,
+    max: `${pageSize}`,
+    ...sortingParams,
+    ...filterParams,
+    searchTerm,
+    facility: currentLocation?.id,
+    dateLastCount,
+    categories: categories?.map?.(({ id }) => id),
+    internalLocations: internalLocations?.map?.(({ name }) => name),
+    tags: tags?.map?.(({ id }) => id),
+    catalogs: catalogs?.map?.(({ id }) => id),
+    abcClass: [],
+    negativeQuantity,
+  }, (val) => {
+    if (typeof val === 'boolean') {
+      return !val;
+    }
+    return _.isEmpty(val);
   });
 
   const {
-    currentLocation,
-  } = useSelector((state) => ({
-    currentLocation: state.session.currentLocation,
-  }));
+    sortableProps,
+    sort,
+    order,
+  } = useTableSorting();
+
+  const {
+    tableData,
+    loading,
+  } = useTableDataV2({
+    url: CYCLE_COUNT_CANDIDATES(currentLocation?.id),
+    errorMessageId: 'react.cycleCount.table.errorMessage.label',
+    defaultErrorMessage: 'Unable to fetch products',
+    // We should start fetching after initializing the filters to avoid re-fetching
+    shouldFetch: filterParams.tab,
+    getParams,
+    pageSize,
+    offset,
+    sort,
+    order,
+    searchTerm,
+    filterParams,
+  });
 
   const columns = useMemo(() => [
     columnHelper.accessor('lastCountDate', {
       header: () => (
-        <TableHeaderCell sortable>
+        <TableHeaderCell sortable columnId="dateLastCount" {...sortableProps}>
           {translate('react.cycleCount.table.lastCounted.label', 'Last Counted')}
         </TableHeaderCell>
       ),
@@ -53,7 +103,7 @@ const useAllProductsTab = () => {
     columnHelper.accessor((row) => `${row.product.productCode} ${row.product.name}`, {
       id: 'product',
       header: () => (
-        <TableHeaderCell sortable>
+        <TableHeaderCell sortable columnId="product" {...sortableProps}>
           {translate('react.cycleCount.table.products.label', 'Products')}
         </TableHeaderCell>
       ),
@@ -66,9 +116,9 @@ const useAllProductsTab = () => {
         </TableCell>
       ),
     }),
-    columnHelper.accessor('product.category', {
+    columnHelper.accessor('category.name', {
       header: () => (
-        <TableHeaderCell sortable>
+        <TableHeaderCell sortable columnId="category" {...sortableProps}>
           {translate('react.cycleCount.table.category.label', 'Category')}
         </TableHeaderCell>
       ),
@@ -78,9 +128,9 @@ const useAllProductsTab = () => {
         </TableCell>
       ),
     }),
-    columnHelper.accessor('binLocation.name', {
+    columnHelper.accessor('internalLocations', {
       header: () => (
-        <TableHeaderCell sortable>
+        <TableHeaderCell sortable columnId="internalLocations" {...sortableProps}>
           {translate('react.cycleCount.table.binLocation.label', 'Bin Location')}
         </TableHeaderCell>
       ),
@@ -90,11 +140,13 @@ const useAllProductsTab = () => {
           tooltip
           tooltipLabel={getValue()}
         >
-          {getValue()}
+          {mapStringToList(getValue(), ',', 100).map((binLocationName) => <div>{binLocationName}</div>)}
         </TableCell>
       ),
     }),
-    columnHelper.accessor('product.tags', {
+    columnHelper.accessor((row) =>
+      row?.tags?.map?.((tag) => <div>{tag?.tag}</div>), {
+      id: 'tags',
       header: () => (
         <TableHeaderCell>
           {translate('react.cycleCount.table.tag.label', 'Tag')}
@@ -106,7 +158,9 @@ const useAllProductsTab = () => {
         </TableCell>
       ),
     }),
-    columnHelper.accessor('product.catalogs', {
+    columnHelper.accessor((row) =>
+      row?.productCatalogs?.map((catalog) => <div>{catalog?.name}</div>), {
+      id: 'productCatalogs',
       header: () => (
         <TableHeaderCell>
           {translate('react.cycleCount.table.productCatalogue.label', 'Product Catalogue')}
@@ -118,9 +172,9 @@ const useAllProductsTab = () => {
         </TableCell>
       ),
     }),
-    columnHelper.accessor('product.abcClass', {
+    columnHelper.accessor('abcClass', {
       header: () => (
-        <TableHeaderCell sortable>
+        <TableHeaderCell sortable columnId="abcClass" {...sortableProps}>
           {translate('react.cycleCount.table.abcClass.label', 'ABC Class')}
         </TableHeaderCell>
       ),
@@ -130,9 +184,9 @@ const useAllProductsTab = () => {
         </TableCell>
       ),
     }),
-    columnHelper.accessor('product.quantity', {
+    columnHelper.accessor('quantityOnHand', {
       header: () => (
-        <TableHeaderCell sortable>
+        <TableHeaderCell sortable columnId="quantityOnHand" {...sortableProps}>
           {translate('react.cycleCount.table.quantity.label', 'Quantity')}
         </TableHeaderCell>
       ),
@@ -142,30 +196,24 @@ const useAllProductsTab = () => {
         </TableCell>
       ),
     }),
-  ], [currentLocale]);
+  ], [currentLocale, sort, order]);
 
   const emptyTableMessage = {
     id: 'react.cycleCount.table.emptyTable.label',
     defaultMessage: 'No products match the given criteria',
   };
 
-  const getFilterParams = () =>
-    // Add filter params according to applied filters
-    ({ format: 'csv' });
-
   const exportTableData = () => {
-    // eslint-disable-next-line no-unused-vars
-    const config = {
-      params: getFilterParams(),
-      paramsSerializer: (parameters) => queryString.stringify(parameters),
-    };
-    // replace with appropriate API call (+pass config as a parameter,
-    // remove line disabling eslint rule)
-    const data = cycleCountMockedData.csvData;
+    spinner.show();
     const date = new Date();
     const [month, day, year] = [date.getMonth(), date.getDate(), date.getFullYear()];
     const [hour, minutes, seconds] = [date.getHours(), date.getMinutes(), date.getSeconds()];
-    fileDownload(`\uFEFF${data}`, `CycleCountReport-${currentLocation?.name}-${year}${month}${day}-${hour}${minutes}${seconds}`, 'text/csv');
+    exportFileFromAPI({
+      url: CYCLE_COUNT_CANDIDATES(currentLocation?.id),
+      params: getParams({}),
+      filename: `CycleCountReport-${currentLocation?.name}-${year}${month}${day}-${hour}${minutes}${seconds}`,
+      afterExporting: spinner.hide,
+    });
   };
 
   return {
@@ -174,6 +222,8 @@ const useAllProductsTab = () => {
     loading,
     emptyTableMessage,
     exportTableData,
+    setPageSize,
+    setOffset,
   };
 };
 

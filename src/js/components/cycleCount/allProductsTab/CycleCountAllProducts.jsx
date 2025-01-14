@@ -1,5 +1,6 @@
 import React from 'react';
 
+import PropTypes from 'prop-types';
 import { RiDownload2Line } from 'react-icons/ri';
 
 import AllProductsTabFooter from 'components/cycleCount/allProductsTab/AllProductsTabFooter';
@@ -7,14 +8,20 @@ import DataTable from 'components/DataTable/v2/DataTable';
 import Button from 'components/form-elements/Button';
 import useAllProductsTab from 'hooks/cycleCount/useAllProductsTab';
 
-const CycleCountAllProducts = () => {
+const CycleCountAllProducts = ({
+  filterParams,
+}) => {
   const {
     columns,
     tableData,
     loading,
     emptyTableMessage,
     exportTableData,
-  } = useAllProductsTab();
+    setOffset,
+    setPageSize,
+  } = useAllProductsTab({
+    filterParams,
+  });
 
   return (
     <div>
@@ -34,9 +41,16 @@ const CycleCountAllProducts = () => {
         footerComponent={AllProductsTabFooter}
         emptyTableMessage={emptyTableMessage}
         loading={loading}
+        setOffset={setOffset}
+        setPageSize={setPageSize}
+        totalCount={tableData.totalCount}
       />
     </div>
   );
 };
 
 export default CycleCountAllProducts;
+
+CycleCountAllProducts.propTypes = {
+  filterParams: PropTypes.shape({}).isRequired,
+};

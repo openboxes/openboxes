@@ -8,7 +8,6 @@ import queryString from 'query-string';
 import { getTranslate } from 'react-localize-redux';
 import { useSelector } from 'react-redux';
 
-import cycleCountMockedData from 'consts/cycleCountMockedData';
 import apiClient from 'utils/apiClient';
 import { translateWithDefaultMessage } from 'utils/Translate';
 
@@ -21,7 +20,6 @@ const useTableData = ({
   getParams,
   onFetchedData,
   defaultSorting,
-  fetchManually,
 }) => {
   // Util ref for react-table to force the fetch of data
   const tableRef = useRef(null);
@@ -59,7 +57,7 @@ const useTableData = ({
   };
 
   const onFetchHandler = useCallback((tableState) => {
-    if (!_.isEmpty(filterParams) || fetchManually) {
+    if (!_.isEmpty(filterParams)) {
       const offset = tableState.page > 0 ? (tableState.page) * tableState.pageSize : 0;
       const sortingParams = (tableState.sorted?.length > 0 ? {
         sort: tableState.sorted[0].id,
@@ -73,18 +71,6 @@ const useTableData = ({
       });
       // Fetch data
       setLoading(true);
-      // Remove after integrating with backend,
-      // temporary returning mocked data for cycle count
-      if (url === 'cycleCount') {
-        setTableData({
-          data: cycleCountMockedData.data,
-          totalCount: cycleCountMockedData.data.length,
-          pages: Math.ceil(cycleCountMockedData.data.length / tableState.pageSize),
-          currentParams: {},
-        });
-        setLoading(false);
-        return;
-      }
       apiClient.get(url, {
         params,
         paramsSerializer: (parameters) => queryString.stringify(parameters),
@@ -108,20 +94,8 @@ const useTableData = ({
 
   // If filterParams change, refetch the data with applied filters
   useEffect(() => {
-    if (!fetchManually) {
-      fireFetchData();
-    }
+    fireFetchData();
   }, [filterParams]);
-
-  // When we are fetching manually we want to call
-  // initial fetching without any dependencies in array.
-  // The rest of the fetches (on changes in filters, sorting, pagination)
-  // should be call directly on action.
-  useEffect(() => {
-    if (fetchManually) {
-      onFetchHandler(tableData);
-    }
-  }, []);
 
   useEffect(() => () => {
     if (currentLocation?.id) {
