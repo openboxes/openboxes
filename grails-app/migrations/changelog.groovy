@@ -1,5 +1,8 @@
+import org.apache.log4j.Logger
 import util.LiquibaseUtil
 import util.TaggedMigrationVersion
+
+final Logger LOGGER = Logger.getLogger('changelog')
 
 /**
  * The entrypoint changelog for all liquibase migrations.
@@ -23,8 +26,7 @@ import util.TaggedMigrationVersion
  * already ran (which is necessary for fresh installs where we're not actually running changelogs for old releases).
  */
 databaseChangeLog = {
-
-    // Drop all views (they are recreated at the end).
+    LOGGER.info("Dropping all views. They will be rebuilt after migrations complete...")
     include(file: 'views/drop-all-views.xml')
 
     // Find out what migration version/folder we're currently on.
@@ -33,12 +35,16 @@ databaseChangeLog = {
     // If we have no migrations performed yet, we're starting from a clean install. This means we can use our
     // consolidated 'install' changelog to speed up migrations.
     if (currentVersion == null) {
+        LOGGER.info("Executing migrations on new installation. Running consolidated migrations...")
         include(file: 'install/changelog.xml')
 
         // We only ever regenerate the install changelogs once we've fully locked down a release (aka there are no
         // more changelogs being added to that version). This means that if we've clean installed up to the version
         // defined in CLEAN_INSTALL_VERSION, our next scripts to run come from the version AFTER that one.
         currentVersion = LiquibaseUtil.getNextVersion(LiquibaseUtil.CLEAN_INSTALL_VERSION)
+    }
+    else {
+        LOGGER.info("Current migration version is ${currentVersion}. Skipping older migrations. They've already ran.")
     }
 
     // At this point we know we've run *some* migrations but we might not be fully up to date, so bring us to the
@@ -48,10 +54,8 @@ databaseChangeLog = {
     List<TaggedMigrationVersion> currentAndNewerReleases = LiquibaseUtil.getCurrentAndNewerVersions(currentVersion)
     for (TaggedMigrationVersion release : currentAndNewerReleases) {
         // Sometimes these migrations take a long time and liquibase doesn't publish the logs until the whole
-        // thing completes, which may cause people to assume the process is stuck. We can't get the logger here
-        // so at least log something to console so we know it's still chugging along.
-        println("Executing migrations for release version: ${release}")
-
+        // thing completes, which may cause people to assume the process is stuck.
+        LOGGER.info("Executing migrations for release version: ${release}")
         include(file: release.toString() + "/changelog.xml")
     }
 

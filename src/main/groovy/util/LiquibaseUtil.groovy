@@ -24,6 +24,9 @@ import org.apache.commons.lang.StringUtils
 
 import org.pih.warehouse.data.DataService
 
+/**
+ * Utility methods for running Liquibase database migrations.
+ */
 class LiquibaseUtil {
 
     /**
@@ -42,7 +45,7 @@ class LiquibaseUtil {
 
     /**
      * List all of our tagged migration versions. Any new tagged versions should be added to this list.
-     * By convention, these should map to the migrations directories.
+     * By convention, these should map to the directories under /grails-app/migrations
      */
     public static final List<TaggedMigrationVersion> ALL_VERSIONS = [
             new TaggedMigrationVersion('0.5.x'),
