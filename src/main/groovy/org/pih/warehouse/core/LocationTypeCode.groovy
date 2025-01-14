@@ -13,6 +13,8 @@ package org.pih.warehouse.core
  */
 enum LocationTypeCode {
 
+    DEFAULT(0),         // Don't use for new location types. Backwards compatability option for old types that had no code.
+
     // Storage
     DEPOT(10),          // storage location
     ZONE(16),

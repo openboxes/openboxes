@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="ewaterman" id="021220241330-0">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="location_type" columnName="location_type_code"/>
+        </preConditions>
+
+        <!--
+        Make location_type_code non-nullable. There shouldn't be any rows where location_type_code is null because
+        that doesn't make much sense, but we set a default anyway, just in case.
+        -->
+        <addNotNullConstraint tableName="location_type" columnName="location_type_code" columnDataType="VARCHAR(100)" defaultNullValue="DEFAULT"/>
+    </changeSet>
+</databaseChangeLog>
