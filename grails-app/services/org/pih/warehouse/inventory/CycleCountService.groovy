@@ -2,15 +2,11 @@ package org.pih.warehouse.inventory
 
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
-import org.apache.commons.csv.CSVPrinter
-import org.apache.commons.lang.StringEscapeUtils
 import org.grails.datastore.mapping.query.api.Criteria
 import org.hibernate.criterion.Order
 import org.hibernate.sql.JoinType
 import org.pih.warehouse.auth.AuthService
-import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.importer.CSVUtils
 
 @Transactional
 class CycleCountService {
@@ -19,13 +15,11 @@ class CycleCountService {
         if (command.hasErrors()) {
             throw new ValidationException("Invalid params", command.errors)
         }
-        Integer max = command.format == "csv" ? null : command.max
-        Integer offset = command.format == "csv" ? null : command.offset
         Location facility = Location.read(facilityId)
         // Store added aliases to avoid duplicate alias exceptions for product
         // This could happen when params.searchTerm and e.g. sort by product is applied
         Set<String> usedAliases = new HashSet<>()
-        return CycleCountCandidate.createCriteria().list(max: max, offset: offset) {
+        return CycleCountCandidate.createCriteria().list(max: command.max, offset: command.offset) {
             eq("facility", facility)
             if (command.searchTerm) {
                 createProductAlias(delegate, usedAliases)
@@ -128,39 +122,5 @@ class CycleCountService {
             cycleCountRequest.save()
         }
         return cycleCountsRequests
-    }
-
-    CSVPrinter getCycleCountCsv(List<CycleCountCandidate> candidates) {
-        CSVPrinter csv = CSVUtils.getCSVPrinter()
-
-        csv.printRecord(
-                "Code",
-                "Product",
-                "Product Family",
-                "Category",
-                "Formularies",
-                "ABC Classification",
-                "Bin Location",
-                "Tag",
-                "Last Counted",
-                "QoH",
-        )
-
-        candidates?.each { CycleCountCandidate candidate ->
-            csv.printRecord(
-                    StringEscapeUtils.escapeCsv(candidate?.product?.productCode),
-                    candidate?.product?.name ?: "",
-                    candidate?.product?.productFamily ?: "",
-                    StringEscapeUtils.escapeCsv(candidate?.product?.category?.name ?: ""),
-                    candidate?.product?.productCatalogs?.join(", ") ?: "",
-                    StringEscapeUtils.escapeCsv(candidate?.abcClass),
-                    StringEscapeUtils.escapeCsv(candidate?.internalLocations ?: ""),
-                    StringEscapeUtils.escapeCsv(candidate?.product?.tags?.tag?.join(", ")),
-                    candidate?.dateLastCount?.format(Constants.EUROPEAN_DATE_FORMAT) ?: "",
-                    candidate?.quantityOnHand ?: 0,
-            )
-        }
-
-        return csv
     }
 }

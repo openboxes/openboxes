@@ -9,11 +9,11 @@ const DataTableFooter = ({
   pagination,
   onPageChange,
   onPageSizeChange,
+  data,
   canPrevious,
   canNext,
   pages,
   pageSizeSelectOptions,
-  totalData,
 }) => (
   <>
     {footerComponent && (
@@ -27,8 +27,7 @@ const DataTableFooter = ({
         onPageChange={onPageChange}
         onPageSizeChange={onPageSizeChange}
         pageSize={pagination.pageSize}
-        totalData={totalData}
-        resolvedData={[]}
+        resolvedData={data}
         canPrevious={canPrevious()}
         canNext={canNext()}
         pages={pages}
@@ -49,10 +48,10 @@ DataTableFooter.propTypes = {
   }).isRequired,
   onPageChange: PropTypes.func.isRequired,
   onPageSizeChange: PropTypes.func.isRequired,
+  data: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   canPrevious: PropTypes.func.isRequired,
   canNext: PropTypes.func.isRequired,
   pages: PropTypes.number.isRequired,
-  totalData: PropTypes.number.isRequired,
   pageSizeSelectOptions: PropTypes.arrayOf(PropTypes.number).isRequired,
 };
 

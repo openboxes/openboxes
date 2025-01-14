@@ -7,6 +7,8 @@ import queryString from 'query-string';
 import { getTranslate } from 'react-localize-redux';
 import { useSelector } from 'react-redux';
 
+import cycleCountMockedData from 'consts/cycleCountMockedData';
+import useQueryParamsListener from 'hooks/useQueryParamsListener';
 import useTranslate from 'hooks/useTranslate';
 import apiClient from 'utils/apiClient';
 import { translateWithDefaultMessage } from 'utils/Translate';
@@ -21,11 +23,9 @@ const useTableDataV2 = ({
   getParams,
   offset,
   pageSize,
+  paramKeys,
   sort,
   order,
-  searchTerm,
-  filterParams,
-  shouldFetch,
 }) => {
   const sourceRef = useRef(CancelToken.source());
 
@@ -49,6 +49,17 @@ const useTableDataV2 = ({
       sortingParams: { sort, order },
     });
     setLoading(true);
+    // Remove after integrating with backend,
+    // temporary returning mocked data for cycle count
+    if (url === 'cycleCount') {
+      console.log('params: ', params);
+      setTableData({
+        data: cycleCountMockedData.data,
+        totalCount: cycleCountMockedData.data.length,
+      });
+      setLoading(false);
+      return;
+    }
     apiClient.get(url, {
       params,
       paramsSerializer: (parameters) => queryString.stringify(parameters),
@@ -64,25 +75,18 @@ const useTableDataV2 = ({
       .finally(() => setLoading(false));
   };
 
-  // fetching data after changing page size, filters, page number and sorting
+  // Fetching data after changing page size, page number and sorting
   useEffect(() => {
-    if (shouldFetch) {
-      fetchData();
-    }
-  }, [
-    filterParams,
-    pageSize,
-    offset,
-    sort,
-    order,
-    searchTerm,
-  ]);
+    fetchData();
+  }, [pageSize, offset, sort, order]);
 
-  // Start displaying the loader in the table when
-  // accessing the page first time, before sending a request
-  useEffect(() => {
-    setLoading(true);
-  }, []);
+  // Fetching data after changes in filters
+  useQueryParamsListener({
+    callback: () => {
+      fetchData();
+    },
+    params: paramKeys,
+  });
 
   useEffect(() => () => {
     if (currentLocation?.id) {

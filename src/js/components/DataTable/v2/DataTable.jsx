@@ -19,7 +19,6 @@ const DataTable = ({
   emptyTableMessage,
   setOffset,
   setPageSize,
-  totalCount,
 }) => {
   const {
     defaultEmptyTableMessage,
@@ -38,7 +37,6 @@ const DataTable = ({
     data,
     setOffset,
     setPageSize,
-    totalCount,
   });
 
   return (
@@ -62,11 +60,11 @@ const DataTable = ({
             pagination={pagination}
             onPageChange={onPageChange}
             onPageSizeChange={onPageSizeChange}
+            data={data}
             canPrevious={canPrevious}
             canNext={canNext}
             pages={pages}
             pageSizeSelectOptions={pageSizeSelectOptions}
-            totalData={totalCount}
           />
         </div>
       </div>
@@ -97,7 +95,6 @@ DataTable.propTypes = {
   // Setting data for sending requests with pagination
   setOffset: PropTypes.func,
   setPageSize: PropTypes.func,
-  totalCount: PropTypes.number,
 };
 
 DataTable.defaultProps = {
@@ -107,6 +104,5 @@ DataTable.defaultProps = {
   emptyTableMessage: null,
   pageSize: 5,
   setOffset: () => {},
-  totalCount: 0,
   setPageSize: () => {},
 };

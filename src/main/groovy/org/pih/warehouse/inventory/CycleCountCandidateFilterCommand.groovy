@@ -26,8 +26,6 @@ class CycleCountCandidateFilterCommand extends PaginationCommand implements Vali
 
     String order
 
-    String format
-
     static constraints = {
         searchTerm(nullable: true)
         categories(nullable: true)
@@ -38,6 +36,5 @@ class CycleCountCandidateFilterCommand extends PaginationCommand implements Vali
         abcClasses(nullable: true)
         sort(nullable: true)
         order(nullable: true)
-        format(nullable: true)
     }
 }
