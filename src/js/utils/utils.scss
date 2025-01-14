@@ -86,3 +86,23 @@
 .react-tiny-popover-container {
   z-index: 999;
 }
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1px 10px;
+  border-radius: 10px;
+  font-size: 12px;
+}
+
+.badge.light-purple {
+  background-color:#EFEDFD;
+  color:#644FFF;
+}
+
+.badge.light-blue {
+  background-color: #E4F0FA;
+  color: #2192EE;
+}
+

@@ -5,6 +5,7 @@ import CycleCountHeader from 'components/cycleCount/CycleCountHeader';
 import CycleCountToApprove from 'components/cycleCount/CycleCountToApprove';
 import CycleCountToCount from 'components/cycleCount/CycleCountToCount';
 import CycleCountToResolve from 'components/cycleCount/CycleCountToResolve';
+import NewTable from 'components/cycleCount/newTable/NewTable';
 import Tabs from 'components/listPagesUtils/Tabs';
 import {
   ALL_PRODUCTS_TAB,
@@ -61,6 +62,10 @@ const CycleCount = () => {
       <CycleCountHeader />
       <div className="list-page-list-section">
         <Tabs config={tabs} className="m-3" />
+
+        {/* this should be removed after testing is completed */}
+        <NewTable />
+
         {tab === ALL_PRODUCTS_TAB && <CycleCountAllProducts />}
         {tab === TO_COUNT_TAB && <CycleCountToCount />}
         {tab === TO_RESOLVE_TAB && <CycleCountToResolve />}
