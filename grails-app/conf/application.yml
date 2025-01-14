@@ -633,3 +633,5 @@ logging:
     # How the logs are formatted. See https://logback.qos.ch/manual/layouts.html for config options.
     pattern:
         console: "%date{ISO8601} %-5level [%thread] %logger{40}: %message%n%xException"
+    level:
+        root: INFO

@@ -1,10 +1,18 @@
 import { useState } from 'react';
 
-import { getCoreRowModel, getPaginationRowModel, useReactTable } from '@tanstack/react-table';
+import { getCoreRowModel, useReactTable } from '@tanstack/react-table';
 
 // Hook handling logic for DataTable component. It handles pagination, changing pages,
 // changing page size and some default table settings
-const useDataTable = ({ pageSize, columns, data }) => {
+const useDataTable = ({
+  pageSize,
+  columns,
+  data,
+  setOffset,
+  setPageSize,
+  totalCount,
+}) => {
+  // Managing pagination on the client side, no need for server side handling
   const [pagination, setPagination] = useState({
     pageIndex: 0,
     pageSize: pageSize || 5,
@@ -14,14 +22,14 @@ const useDataTable = ({ pageSize, columns, data }) => {
     columns,
     data,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    state: {
-      pagination,
-    },
-    onPaginationChange: setPagination,
+    manualFiltering: true,
+    manualPagination: true,
+    manualSorting: true,
   });
 
   const onPageChange = (page) => {
+    // Function call for managing pagination outside the table (server side)
+    setOffset?.(page * pagination.pageSize);
     setPagination((prev) => ({
       ...prev,
       pageIndex: page,
@@ -29,16 +37,18 @@ const useDataTable = ({ pageSize, columns, data }) => {
   };
 
   const onPageSizeChange = (selectedPageSize) => {
+    // Function call for managing pagination outside the table (server side)
+    setPageSize?.(selectedPageSize);
     setPagination((prev) => ({
       ...prev,
       pageSize: selectedPageSize,
     }));
   };
 
-  const pages = Math.ceil(data.length / pagination.pageSize);
+  const pages = Math.ceil(totalCount / pagination.pageSize);
   const pageSizeSelectOptions = [5, 10, 20, 25, 50, 100];
-  const canNext = () => pagination.pageIndex + 1 < pages;
 
+  const canNext = () => pagination.pageIndex + 1 < pages;
   const canPrevious = () => pagination.pageIndex > 0;
 
   const defaultEmptyTableMessage = {

@@ -8,6 +8,9 @@ import productApi from 'api/services/ProductApi';
 import productGroupApi from 'api/services/ProductGroupApi';
 import selectOptionsApi from 'api/services/SelectOptionsApi';
 import userApi from 'api/services/UserApi';
+import { INTERNAL_LOCATIONS } from 'api/urls';
+import ActivityCode from 'consts/activityCode';
+import locationType from 'consts/locationType';
 import apiClient from 'utils/apiClient';
 import splitTranslation from 'utils/translation-utils';
 
@@ -72,8 +75,8 @@ export const debounceLocationsFetch = (
           activityCodes,
         },
       }).then((result) => callback(_.map(result.data.data, (obj) => {
-        const locationType = withTypeDescription ? ` [${obj.locationType.description}]` : '';
-        const label = `${obj.name}${locationType}`;
+        const locationTypeData = withTypeDescription ? ` [${obj.locationType.description}]` : '';
+        const label = `${obj.name}${locationTypeData}`;
         return {
           id: obj.id,
           type: obj.locationType.locationTypeCode,
@@ -237,6 +240,19 @@ export const fetchUserById = async (id) => {
 export const fetchLocationById = async (id) => {
   const response = await apiClient(`/api/locations/${id}`);
   return response.data?.data;
+};
+
+export const fetchBins = async (locationId) => {
+  const response = await apiClient.get(INTERNAL_LOCATIONS, {
+    paramsSerializer: (parameters) => queryString.stringify(parameters),
+    params: {
+      'location.id': locationId,
+      locationTypeCode: [locationType.BIN_LOCATION, locationType.INTERNAL],
+      ignoreActivityCodes: [ActivityCode.RECEIVE_STOCK],
+    },
+  });
+
+  return response.data.data;
 };
 
 export const fetchProductsCategories = async () => {
