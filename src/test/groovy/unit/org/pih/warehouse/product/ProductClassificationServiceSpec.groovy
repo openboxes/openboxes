@@ -34,4 +34,13 @@ class ProductClassificationServiceSpec extends Specification implements ServiceU
         assert classifications.size() == 4
         assert classifications.containsAll(["A", "B", "C", ""])
     }
+
+    void 'list can gracefully handle when we have no classifications configured'() {
+        when:
+        List<String> classifications = service.list()
+
+        then:
+        assert classifications != null
+        assert classifications.size() == 0
+    }
 }
