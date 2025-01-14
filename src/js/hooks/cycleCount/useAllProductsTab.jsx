@@ -13,7 +13,7 @@ import useTableData from 'hooks/list-pages/useTableData';
 import useTranslate from 'hooks/useTranslate';
 import Badge from 'utils/Badge';
 
-import '../../utils/utils.scss';
+import 'utils/utils.scss';
 
 const useAllProductsTab = () => {
   const columnHelper = createColumnHelper();
@@ -23,20 +23,15 @@ const useAllProductsTab = () => {
     currentLocale: state.session.activeLanguage,
   }));
 
-  const {
-    tableData,
-    loading,
-  } = useTableData({
+  const { tableData, loading } = useTableData({
     filterParams: {},
     // Should be replaced after integrating with backend
     url: 'cycleCount',
     errorMessageId: 'react.cycleCount.table.errorMessage.label',
     defaultErrorMessage: 'Unable to fetch products',
     fetchManually: true,
-    getParams: () => {
-    },
-    onFetchedData: () => {
-    },
+    getParams: () => {},
+    onFetchedData: () => {},
   });
 
   const {
@@ -65,10 +60,7 @@ const useAllProductsTab = () => {
           {translate('react.cycleCount.table.products.label', 'Products')}
         </TableHeaderCell>
       ),
-      cell: ({
-        getValue,
-        row,
-      }) => (
+      cell: ({ getValue, row }) => (
         <TableCell
           link={INVENTORY_ITEM_URL.showStockCard(row.original.product.productCode)}
           className="rt-td multiline-cell"
@@ -106,15 +98,13 @@ const useAllProductsTab = () => {
       ),
     }),
     columnHelper.accessor((row) =>
-      // eslint-disable-next-line react/no-array-index-key
-      row?.product?.tags?.map((tag, index) => <Badge label={tag} variant="badge--purple" key={index} />), {
+      row?.product?.tags?.map((tag) => <Badge label={tag.name} variant="badge--purple" key={tag.id} />), {
       id: 'tags',
       header: () => (
         <TableHeaderCell>
           {translate('react.cycleCount.table.tag.label', 'Tag')}
         </TableHeaderCell>
       ),
-      // eslint-disable-next-line react/prop-types
       cell: ({ getValue }) => (
         <TableCell className="rt-td multiline-cell">
           <div className="badge-container">
@@ -124,8 +114,7 @@ const useAllProductsTab = () => {
       ),
     }),
     columnHelper.accessor((row) =>
-      // eslint-disable-next-line react/no-array-index-key
-      row?.product.catalogs?.map((catalog, index) => <Badge label={catalog} variant="badge--blue" key={index} />),
+      row?.product.catalogs?.map((catalog) => <Badge label={catalog.name} variant="badge--blue" key={catalog.id} />),
     {
       id: 'productCatalogs',
       header: () => (
@@ -133,7 +122,6 @@ const useAllProductsTab = () => {
           {translate('react.cycleCount.table.productCatalogue.label', 'Product Catalogue')}
         </TableHeaderCell>
       ),
-      // eslint-disable-next-line react/prop-types
       cell: ({ getValue }) => (
         <TableCell className="rt-td multiline-cell">
           <div className="badge-container">

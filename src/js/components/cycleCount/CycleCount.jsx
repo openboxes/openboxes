@@ -61,7 +61,6 @@ const CycleCount = () => {
       <CycleCountHeader />
       <div className="list-page-list-section">
         <Tabs config={tabs} className="m-3" />
-
         {tab === ALL_PRODUCTS_TAB && <CycleCountAllProducts />}
         {tab === TO_COUNT_TAB && <CycleCountToCount />}
         {tab === TO_RESOLVE_TAB && <CycleCountToResolve />}
