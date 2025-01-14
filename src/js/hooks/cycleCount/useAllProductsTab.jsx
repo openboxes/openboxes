@@ -12,6 +12,7 @@ import cycleCountMockedData from 'consts/cycleCountMockedData';
 import useTableData from 'hooks/list-pages/useTableData';
 import useTranslate from 'hooks/useTranslate';
 import Badge from 'utils/Badge';
+
 import '../../utils/utils.scss';
 
 const useAllProductsTab = () => {
@@ -66,7 +67,7 @@ const useAllProductsTab = () => {
       ),
       cell: ({
         getValue,
-        row
+        row,
       }) => (
         <TableCell
           link={INVENTORY_ITEM_URL.showStockCard(row.original.product.productCode)}
@@ -113,6 +114,7 @@ const useAllProductsTab = () => {
           {translate('react.cycleCount.table.tag.label', 'Tag')}
         </TableHeaderCell>
       ),
+      // eslint-disable-next-line react/prop-types
       cell: ({ getValue }) => (
         <TableCell className="rt-td multiline-cell">
           <div className="badge-container">
@@ -131,6 +133,7 @@ const useAllProductsTab = () => {
           {translate('react.cycleCount.table.productCatalogue.label', 'Product Catalogue')}
         </TableHeaderCell>
       ),
+      // eslint-disable-next-line react/prop-types
       cell: ({ getValue }) => (
         <TableCell className="rt-td multiline-cell">
           <div className="badge-container">
