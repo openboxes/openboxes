@@ -12,6 +12,7 @@ import useSpinner from 'hooks/useSpinner';
 import useTableDataV2 from 'hooks/useTableDataV2';
 import useTableSorting from 'hooks/useTableSorting';
 import useTranslate from 'hooks/useTranslate';
+import Badge from 'utils/Badge';
 import exportFileFromAPI from 'utils/file-download-util';
 import { mapStringToList } from 'utils/form-values-utils';
 
@@ -145,7 +146,7 @@ const useAllProductsTab = ({ filterParams }) => {
       ),
     }),
     columnHelper.accessor((row) =>
-      row?.tags?.map?.((tag) => <div>{tag?.tag}</div>), {
+      row?.tags?.map?.((tag) => <Badge label={tag?.tag} variant="badge--purple" key={tag.id} />), {
       id: 'tags',
       header: () => (
         <TableHeaderCell>
@@ -154,12 +155,14 @@ const useAllProductsTab = ({ filterParams }) => {
       ),
       cell: ({ getValue }) => (
         <TableCell className="rt-td multiline-cell">
-          {getValue()}
+          <div className="badge-container">
+            {getValue()}
+          </div>
         </TableCell>
       ),
     }),
     columnHelper.accessor((row) =>
-      row?.productCatalogs?.map((catalog) => <div>{catalog?.name}</div>), {
+      row?.productCatalogs?.map((catalog) => <Badge label={catalog?.name} variant="badge--blue" key={catalog.id} />), {
       id: 'productCatalogs',
       header: () => (
         <TableHeaderCell>
@@ -168,7 +171,9 @@ const useAllProductsTab = ({ filterParams }) => {
       ),
       cell: ({ getValue }) => (
         <TableCell className="rt-td multiline-cell">
-          {getValue()}
+          <div className="badge-container">
+            {getValue()}
+          </div>
         </TableCell>
       ),
     }),
