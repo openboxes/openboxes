@@ -180,4 +180,4 @@ export const INTERNAL_LOCATIONS = `${API}/internalLocations`;
 
 // CYCLE COUNT
 export const CYCLE_COUNT = (locationId) => `${API}/facilities/${locationId}`;
-export const CYCLE_COUNT_CANDIDATES = (locationId) => `${CYCLE_COUNT(locationId)}/cycle-count-candidates`;
+export const CYCLE_COUNTS = (locationId) => `${CYCLE_COUNT(locationId)}/cycle-counts`;

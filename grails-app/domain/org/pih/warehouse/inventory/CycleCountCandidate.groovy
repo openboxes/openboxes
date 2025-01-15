@@ -14,6 +14,8 @@ class CycleCountCandidate {
 
     Location facility
 
+    CycleCountRequest cycleCountRequest
+
     String abcClass
 
     Integer inventoryItemCount
@@ -55,6 +57,7 @@ class CycleCountCandidate {
                 productCatalogs: product.productCatalogs,
                 abcClass: abcClass,
                 quantityOnHand: quantityOnHand,
+                cycleCountRequest: cycleCountRequest
         ]
     }
 
