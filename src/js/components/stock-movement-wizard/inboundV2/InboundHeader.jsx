@@ -10,20 +10,6 @@ import '../StockMovement.scss';
 const InboundHeader = ({ title, additionalTitle }) => {
   const translate = useTranslate();
 
-  const renderTitle = () => {
-    if (!Array.isArray(title)) {
-      return null;
-    }
-
-    return title.map((item, index) => (
-      // eslint-disable-next-line react/no-array-index-key
-      <React.Fragment key={index}>
-        <span style={{ color: item.color }}>{item.text}</span>
-        {item.delimeter && <span>{item.delimeter}</span>}
-      </React.Fragment>
-    ));
-  };
-
   return (
     <HeaderWrapper className="align-items-center h-100 py-3">
       <div className="create-page-title d-flex align-items-center justify-content-between w-100">
@@ -32,7 +18,13 @@ const InboundHeader = ({ title, additionalTitle }) => {
           {title && (
             <>
               <span>{' | '}</span>
-              {renderTitle()}
+              {title.map((item, index) => (
+                // eslint-disable-next-line react/no-array-index-key
+                <React.Fragment key={index}>
+                  <span style={{ color: item.color }}>{item.text}</span>
+                  {item.delimeter && <span>{item.delimeter}</span>}
+                </React.Fragment>
+              ))}
             </>
           )}
         </h5>

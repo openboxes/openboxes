@@ -72,6 +72,7 @@ const InboundV2 = () => {
       {is(inboundV2Step.ADD_ITEMS) && (<Step.Component />)}
       {is(inboundV2Step.SEND) && (<Step.Component />)}
 
+      {/* these buttons are for testing purposes now */}
       <div className="d-flex justify-content-between">
         <Button
           label="react.stockMovement.form.previous.label"
