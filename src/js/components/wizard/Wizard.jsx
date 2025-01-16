@@ -81,7 +81,6 @@ class Wizard extends Component {
     const {
       title, pageList, stepList, additionalTitle, additionalProps, showStepNumber,
     } = this.props;
-
     return (
       <div className="content-wrap" data-testid="content-wrap">
         <WizardTitle title={title} additionalTitle={additionalTitle} values={values} />
