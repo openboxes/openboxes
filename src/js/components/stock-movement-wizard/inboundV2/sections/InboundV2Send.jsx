@@ -3,7 +3,7 @@ import React from 'react';
 import Section from 'components/Layout/v2/Section';
 
 const InboundV2Send = () => {
-  console.log('XD');
+  console.log('InboundV2Send');
   return (
     <Section>
       InboundV2Send

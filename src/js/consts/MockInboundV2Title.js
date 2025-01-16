@@ -1,4 +1,4 @@
-export const mockInboundV2Title = [
+const mockInboundV2Title = [
   { text: '445STA', color: '#000000', delimeter: ' - ' },
   { text: 'Metropolitan Medical Services of', color: '#004d40', delimeter: ' to ' },
   { text: 'Lisungwi Warehouse', color: '#01579b', delimeter: ', ' },

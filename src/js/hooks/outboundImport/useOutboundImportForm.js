@@ -30,6 +30,7 @@ const useOutboundImportForm = ({ next }) => {
     currentLocation: state.session.currentLocation,
   }));
   const [cachedData, setCachedData, clearCachedData] = useSessionStorage('outbound-import', {});
+
   const defaultValues = useMemo(() => {
     const values = {
       description: undefined,

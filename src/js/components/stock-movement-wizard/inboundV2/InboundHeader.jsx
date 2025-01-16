@@ -5,8 +5,7 @@ import PropTypes from 'prop-types';
 import useTranslate from 'hooks/useTranslate';
 import HeaderWrapper from 'wrappers/HeaderWrapper';
 
-// eslint-disable-next-line import/no-absolute-path,import/no-unresolved
-import '/src/js/components/stock-movement-wizard/StockMovement.scss';
+import '../StockMovement.scss';
 
 const InboundHeader = ({ title, additionalTitle }) => {
   const translate = useTranslate();
@@ -33,9 +32,7 @@ const InboundHeader = ({ title, additionalTitle }) => {
           {title && (
             <>
               <span>{' | '}</span>
-              <span className="text-blue-primary">
-                {renderTitle()}
-              </span>
+              {renderTitle()}
             </>
           )}
         </h5>

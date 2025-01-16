@@ -9,11 +9,9 @@ import InboundV2Send from 'components/stock-movement-wizard/inboundV2/sections/I
 import WizardStepsV2 from 'components/wizard/v2/WizardStepsV2';
 import inboundV2Step from 'consts/InboundV2Step';
 import mockInboundV2AdditionalTitle from 'consts/MockInboundV2AdditionalTitle';
-// eslint-disable-next-line import/no-named-as-default
 import mockInboundV2Title from 'consts/MockInboundV2Title';
 import useTranslate from 'hooks/useTranslate';
 import useTranslation from 'hooks/useTranslation';
-// eslint-disable-next-line import/no-extraneous-dependencies
 import useWizard from 'hooks/useWizard';
 import PageWrapper from 'wrappers/PageWrapper';
 
@@ -57,10 +55,10 @@ const InboundV2 = () => {
     steps,
   });
 
-  // I need to check this
+  // this will still need to be improved in the future
   const headerAdditionalTitle = is(inboundV2Step.SEND) ? mockInboundV2AdditionalTitle : undefined;
-  // eslint-disable-next-line max-len
-  const headerTitle = is(inboundV2Step.ADD_ITEMS) || is(inboundV2Step.SEND) ? mockInboundV2Title : undefined;
+  const headerTitle = is(inboundV2Step.ADD_ITEMS)
+  || is(inboundV2Step.SEND) ? mockInboundV2Title : undefined;
 
   return (
     <PageWrapper>
@@ -73,26 +71,23 @@ const InboundV2 = () => {
       {is(inboundV2Step.CREATE) && (<Step.Component />)}
       {is(inboundV2Step.ADD_ITEMS) && (<Step.Component />)}
       {is(inboundV2Step.SEND) && (<Step.Component />)}
-      {/* eslint-disable-next-line react/button-has-type */}
-      <div className="d-flex gap-8 justify-content-between">
+
+      <div className="d-flex justify-content-between">
         <Button
-          label="react.outboundImport.form.previous.label"
-          defaultLabel="previous"
+          label="react.stockMovement.form.previous.label"
+          defaultLabel="Previous"
           variant="primary"
           className="fit-content align-self-end"
           onClick={previous}
         />
         <Button
-          label="react.outboundImport.form.next.label"
+          label="react.stockMovement.form.next.label"
           defaultLabel="Next"
           variant="primary"
           className="fit-content align-self-end"
           onClick={next}
         />
       </div>
-      {/* <button onClick={() => previous()}>Previous</button> */}
-      {/* /!* eslint-disable-next-line react/button-has-type *!/ */}
-      {/* <button onClick={() => next()}>Next</button> */}
       {/* </form> */}
     </PageWrapper>
   );
