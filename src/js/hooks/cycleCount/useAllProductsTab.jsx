@@ -140,15 +140,11 @@ const useAllProductsTab = ({ filterParams }) => {
 
         return (
           <TableCell
-            className="rt-td"
+            className="rt-td multiline-cell"
             tooltip
             tooltipLabel={`${getValue()} (${binLocationList.length})`}
           >
-            {binLocationList.map((binLocationName) => (
-              <div>
-                {binLocationName.length > 16 ? `${binLocationName.substring(0, 16)}...` : binLocationName}
-              </div>
-            ))}
+            {getValue()}
           </TableCell>
         );
       },
