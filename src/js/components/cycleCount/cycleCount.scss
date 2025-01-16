@@ -23,3 +23,20 @@
 .sorting-arrows {
   display: flex !important;
 }
+
+.rt-tr > .checkbox-column {
+  width: 100px !important;
+}
+
+.header-cell {
+
+  > div:first-child {
+    height: 46px;
+  }
+}
+
+.selected-rows-indicator {
+  font-weight: 400;
+  color: var(--gray-600);
+  font-size: 14px;
+}
