@@ -5,9 +5,7 @@ import PropTypes from 'prop-types';
 import useTranslate from 'hooks/useTranslate';
 import HeaderWrapper from 'wrappers/HeaderWrapper';
 
-import '../StockMovement.scss';
-
-const InboundHeader = ({ title, additionalTitle }) => {
+const InboundHeader = ({ title, status }) => {
   const translate = useTranslate();
 
   return (
@@ -19,8 +17,7 @@ const InboundHeader = ({ title, additionalTitle }) => {
             <>
               <span>{' | '}</span>
               {title.map((item, index) => (
-                // eslint-disable-next-line react/no-array-index-key
-                <React.Fragment key={index}>
+                <React.Fragment key={`${title}-${index + 1}`}>
                   <span style={{ color: item.color }}>{item.text}</span>
                   {item.delimeter && <span>{item.delimeter}</span>}
                 </React.Fragment>
@@ -28,11 +25,11 @@ const InboundHeader = ({ title, additionalTitle }) => {
             </>
           )}
         </h5>
-        {additionalTitle && (
+        {status && (
           <span
-            className={`${additionalTitle.className}`}
+            className={status.className}
           >
-              {additionalTitle.children}
+              {status.children}
           </span>
         )}
       </div>
@@ -42,7 +39,7 @@ const InboundHeader = ({ title, additionalTitle }) => {
 
 InboundHeader.defaultProps = {
   title: undefined,
-  additionalTitle: undefined,
+  status: undefined,
 };
 
 InboundHeader.propTypes = {
@@ -53,7 +50,7 @@ InboundHeader.propTypes = {
       delimeter: PropTypes.string,
     }),
   ),
-  additionalTitle: PropTypes.shape({
+  status: PropTypes.shape({
     children: PropTypes.string,
     className: PropTypes.string,
   }),
