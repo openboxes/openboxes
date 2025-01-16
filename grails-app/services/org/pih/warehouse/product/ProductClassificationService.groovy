@@ -2,6 +2,7 @@ package org.pih.warehouse.product
 
 import grails.gorm.transactions.Transactional
 
+import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.InventoryLevel
 
 /**
@@ -28,28 +29,37 @@ class ProductClassificationService {
     /**
      * Fetches all product classifications that we have configured.
      *
-     * Currently, classifications exist as plain strings under the abcClass column of the Product and InventoryLevel
+     * Currently, classifications exist as plain strings under the "abcClass" column of the Product and InventoryLevel
      * tables. Until we move classifications to their own entity, we simply fetch all unique values from those columns.
      */
-    List<String> list() {
+//    @Transactional(readOnly=true)
+    List<ProductClassificationDto> list(String facilityId) {
+        Location facility = Location.read(facilityId)
+        if (!facility) {
+            throw new IllegalArgumentException("Invalid facilityId: ${facilityId}")
+        }
+
         // Use a projection because we only need the one field. The grouping is for uniqueness.
-        // We do this in two separate queries then join the result in code for simplicity.
+        // We do this in two separate queries to avoid joining on a non-indexed field.
         Set<String> productClassifications = Product.createCriteria().listDistinct() {
             projections {
                 groupProperty("abcClass")
             }
+            isNotNull("abcClass")
         } as Set<String>
         productClassifications += InventoryLevel.createCriteria().listDistinct() {
             projections {
                 groupProperty("abcClass")
             }
+            // Only fetch abcClasses that are configured for the requesting facility.
+            eq("inventory", facility.inventory)
+            isNotNull("abcClass")
         } as Set<String>
 
-        // Filter out null since it's not a valid classification. Note that abcClass is allowed to be blank, so blank
-        // strings are considered valid classifications here. Likely we'll want to sanitize the data at some point to
-        // prevent blanks from being allowed, but since this is just a list call, we return whatever we have in the db.
-        productClassifications.remove(null)
-
-        return productClassifications.toList()
+        // We convert to a DTO here instead of returning the raw string because it will make things easier
+        // once product classification becomes its own proper entity.
+        return productClassifications.collect {
+            new ProductClassificationDto(name: it)
+        }
     }
 }

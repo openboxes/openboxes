@@ -5,6 +5,7 @@ import glAccountApi from 'api/services/GlAccountApi';
 import locationApi from 'api/services/LocationApi';
 import organizationApi from 'api/services/OrganizationApi';
 import productApi from 'api/services/ProductApi';
+import productClassificationApi from 'api/services/ProductClassificationApi';
 import productGroupApi from 'api/services/ProductGroupApi';
 import selectOptionsApi from 'api/services/SelectOptionsApi';
 import userApi from 'api/services/UserApi';
@@ -278,6 +279,20 @@ export const fetchProductsGlAccounts = async (params) => {
 export const fetchProductGroups = async () => {
   const { data } = await productGroupApi.getProductGroupsOptions();
   return data.data;
+};
+
+export const fetchProductClassifications = async (facilityId) => {
+  const { data } = await productClassificationApi.getProductClassifications(facilityId);
+  if (data.data) {
+    return data.data.map((obj) => (
+      {
+        id: obj.name,
+        value: obj.name,
+        label: obj.name,
+      }
+    ));
+  }
+  return null;
 };
 
 export const fetchHandlingRequirements = async () => {

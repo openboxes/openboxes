@@ -125,9 +125,14 @@ class UrlMappings {
             action = [GET: "getInventoryItem"]
         }
 
-        "/api/products/classifications" {
+        "/api/facilities/$facilityId/products/classifications" {
             controller = "productClassificationApi"
             action = [GET: "list"]
+        }
+
+        "/api/facilities/$facilityId/products/classifications/options" {
+            controller = "productClassificationApi"
+            action = [GET: "options"]
         }
 
         "/api/locations/locationTypes" {

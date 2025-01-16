@@ -85,6 +85,9 @@ export default {
       showLabelTooltip: true,
       closeMenuOnSelect: false,
     },
+    getDynamicAttr: ({ abcClasses }) => ({
+      options: abcClasses,
+    }),
   },
   negativeQuantity: {
     type: CheckboxField,
