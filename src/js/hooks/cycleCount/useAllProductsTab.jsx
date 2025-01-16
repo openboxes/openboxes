@@ -135,15 +135,23 @@ const useAllProductsTab = ({ filterParams }) => {
           {translate('react.cycleCount.table.binLocation.label', 'Bin Location')}
         </TableHeaderCell>
       ),
-      cell: ({ getValue }) => (
-        <TableCell
-          className="rt-td"
-          tooltip
-          tooltipLabel={getValue()}
-        >
-          {mapStringToList(getValue(), ',', 100).map((binLocationName) => <div>{binLocationName}</div>)}
-        </TableCell>
-      ),
+      cell: ({ getValue }) => {
+        const binLocationList = mapStringToList(getValue(), ',');
+
+        return (
+          <TableCell
+            className="rt-td"
+            tooltip
+            tooltipLabel={`${getValue()} (${binLocationList.length})`}
+          >
+            {binLocationList.map((binLocationName) => (
+              <div>
+                {binLocationName.length > 16 ? `${binLocationName.substring(0, 16)}...` : binLocationName}
+              </div>
+            ))}
+          </TableCell>
+        );
+      },
     }),
     columnHelper.accessor((row) =>
       row?.tags?.map?.((tag) => <Badge label={tag?.tag} variant="badge--purple" key={tag.id} />), {
