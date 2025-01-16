@@ -62,7 +62,7 @@ InboundHeader.propTypes = {
     }),
   ),
   additionalTitle: PropTypes.shape({
-    children: PropTypes.node,
+    children: PropTypes.string,
     className: PropTypes.string,
   }),
 };
