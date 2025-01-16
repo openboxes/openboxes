@@ -17,7 +17,7 @@ class CycleCountApiController {
 
     CycleCountService cycleCountService
 
-    def getCycleCounts(CycleCountCandidateFilterCommand filterParams) {
+    def getCandidates(CycleCountCandidateFilterCommand filterParams) {
         List<CycleCountCandidate> cycleCounts = cycleCountService.getCandidates(filterParams, params.facilityId)
 
         if (filterParams.format == "csv") {

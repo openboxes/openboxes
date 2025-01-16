@@ -4,7 +4,7 @@ import { createColumnHelper } from '@tanstack/react-table';
 import _ from 'lodash';
 import { useSelector } from 'react-redux';
 
-import { CYCLE_COUNTS } from 'api/urls';
+import { CYCLE_COUNT_CANDIDATES } from 'api/urls';
 import { TableCell } from 'components/DataTable';
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
 import { INVENTORY_ITEM_URL } from 'consts/applicationUrls';
@@ -73,7 +73,7 @@ const useAllProductsTab = ({ filterParams }) => {
     tableData,
     loading,
   } = useTableDataV2({
-    url: CYCLE_COUNTS(currentLocation?.id),
+    url: CYCLE_COUNT_CANDIDATES(currentLocation?.id),
     errorMessageId: 'react.cycleCount.table.errorMessage.label',
     defaultErrorMessage: 'Unable to fetch products',
     // We should start fetching after initializing the filters to avoid re-fetching
@@ -209,7 +209,7 @@ const useAllProductsTab = ({ filterParams }) => {
     const [month, day, year] = [date.getMonth(), date.getDate(), date.getFullYear()];
     const [hour, minutes, seconds] = [date.getHours(), date.getMinutes(), date.getSeconds()];
     exportFileFromAPI({
-      url: CYCLE_COUNTS(currentLocation?.id),
+      url: CYCLE_COUNT_CANDIDATES(currentLocation?.id),
       params: getParams({}),
       filename: `CycleCountReport-${currentLocation?.name}-${year}${month}${day}-${hour}${minutes}${seconds}`,
       afterExporting: spinner.hide,
