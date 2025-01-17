@@ -45,8 +45,11 @@ class SelectOptionsApiController {
     }
 
     def catalogOptions() {
-        List<ProductCatalog> catalogs = genericApiService.getList(ProductCatalog.class.simpleName, [sort: "name"]).collect {
-            [id: it.id, label: "${it.name}"]
+        boolean hideNumbers = params.boolean('hideNumbers', false)
+
+        def catalogs = genericApiService.getList(ProductCatalog.class.simpleName, [sort: 'name']).collect {
+            String label = hideNumbers ? it.name : "${it.name} (${it?.productCatalogItems?.size()})"
+            [id: it.id, label: label]
         }
         render([data: catalogs] as JSON)
     }
@@ -59,11 +62,15 @@ class SelectOptionsApiController {
     }
 
     def tagOptions() {
-        List<Tag> tags = genericApiService.getList(Tag.class.simpleName, [sort: "tag"]).collect {
-            [id: it.id, label: "${it.tag}"]
+        boolean hideNumbers = params.boolean('hideNumbers', false)
+
+        def tags = genericApiService.getList(Tag.class.simpleName, [sort: 'tag']).collect {
+            [id: it.id, label: hideNumbers ? it.tag : "${it.tag} (${it?.products?.size()})"]
         }
         render([data: tags] as JSON)
     }
+
+
 
     def paymentTermOptions() {
         List<PaymentTerm> paymentTerms = genericApiService.getList(PaymentTerm.class.simpleName, [sort: "name"]).collect {

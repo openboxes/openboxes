@@ -82,8 +82,8 @@ const useCycleCountFilters = () => {
       binList,
     ] = await Promise.all([
       fetchProductsCategories(),
-      fetchProductsTags(),
-      fetchProductsCatalogs(),
+      fetchProductsTags({ hideNumbers: true }),
+      fetchProductsCatalogs({ hideNumbers: true }),
       fetchBins(currentLocation?.id),
     ]);
 
