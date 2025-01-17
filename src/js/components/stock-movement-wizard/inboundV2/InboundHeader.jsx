@@ -16,11 +16,11 @@ const InboundHeader = ({ title, status }) => {
           {title && (
             <>
               <span>{' | '}</span>
-              {title.map((item, index) => (
-                <React.Fragment key={`${title}-${index + 1}`}>
+              {title.map((item) => (
+                <>
                   <span style={{ color: item.color }}>{item.text}</span>
                   {item.delimeter && <span>{item.delimeter}</span>}
-                </React.Fragment>
+                </>
               ))}
             </>
           )}

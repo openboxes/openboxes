@@ -1,5 +1,7 @@
 import React, { useMemo } from 'react';
 
+import { useSelector } from 'react-redux';
+
 import Button from 'components/form-elements/Button';
 import InboundHeader from 'components/stock-movement-wizard/inboundV2/InboundHeader';
 import InboundV2AddItems
@@ -20,6 +22,7 @@ import 'utils/utils.scss';
 const InboundV2 = () => {
   useTranslation('stockMovement');
   const translate = useTranslate();
+  const { locale } = useSelector((state) => state.session.activeLanguage);
 
   const steps = useMemo(() => [
     {
@@ -37,7 +40,7 @@ const InboundV2 = () => {
       title: translate('react.stockMovement.send.label', 'Send'),
       Component: () => (<InboundV2Send />),
     },
-  ], [translate]);
+  ], [locale]);
 
   const stepsTitles = steps.map((step) => ({
     title: step.title,
