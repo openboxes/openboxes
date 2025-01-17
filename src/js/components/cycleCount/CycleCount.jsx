@@ -91,6 +91,7 @@ const CycleCount = () => {
         />
         {tab === ALL_PRODUCTS_TAB && (
         <CycleCountAllProducts
+          switchTab={switchTab}
           filterParams={filterParams}
         />
         )}

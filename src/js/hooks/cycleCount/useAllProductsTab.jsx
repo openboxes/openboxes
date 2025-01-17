@@ -4,11 +4,13 @@ import { createColumnHelper } from '@tanstack/react-table';
 import _ from 'lodash';
 import { useSelector } from 'react-redux';
 
+import cycleCountApi from 'api/services/CycleCountApi';
 import { CYCLE_COUNT_CANDIDATES } from 'api/urls';
 import { TableCell } from 'components/DataTable';
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
 import Checkbox from 'components/form-elements/v2/Checkbox';
 import { INVENTORY_ITEM_URL } from 'consts/applicationUrls';
+import { TO_COUNT_TAB } from 'consts/cycleCount';
 import useSpinner from 'hooks/useSpinner';
 import useTableCheckboxes from 'hooks/useTableCheckboxes';
 import useTableDataV2 from 'hooks/useTableDataV2';
@@ -18,7 +20,10 @@ import Badge from 'utils/Badge';
 import exportFileFromAPI from 'utils/file-download-util';
 import { mapStringToList } from 'utils/form-values-utils';
 
-const useAllProductsTab = ({ filterParams }) => {
+const useAllProductsTab = ({
+  filterParams,
+  switchTab,
+}) => {
   const columnHelper = createColumnHelper();
   const spinner = useSpinner();
   const translate = useTranslate();
@@ -95,6 +100,7 @@ const useAllProductsTab = ({ filterParams }) => {
     isChecked,
     selectHeaderCheckbox,
     selectedCheckboxesAmount,
+    checkedCheckboxes,
     headerCheckboxProps,
   } = useTableCheckboxes();
 
@@ -261,6 +267,22 @@ const useAllProductsTab = ({ filterParams }) => {
     });
   };
 
+  const countSelected = async () => {
+    const payload = {
+      requests: checkedCheckboxes.map((productId) => ({
+        product: productId,
+        blindCount: true,
+      })),
+    };
+    spinner.show();
+    try {
+      await cycleCountApi.createRequest(payload, currentLocation?.id);
+      switchTab(TO_COUNT_TAB);
+    } finally {
+      spinner.hide();
+    }
+  };
+
   return {
     columns: [checkboxesColumn, ...columns],
     tableData,
@@ -270,6 +292,7 @@ const useAllProductsTab = ({ filterParams }) => {
     setPageSize,
     setOffset,
     selectedCheckboxesAmount,
+    countSelected,
   };
 };
 
