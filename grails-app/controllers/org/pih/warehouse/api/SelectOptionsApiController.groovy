@@ -46,7 +46,7 @@ class SelectOptionsApiController {
 
     def catalogOptions() {
         List<ProductCatalog> catalogs = genericApiService.getList(ProductCatalog.class.simpleName, [sort: "name"]).collect {
-            [id: it.id, label: "${it.name} (${it?.productCatalogItems?.size()})"]
+            [id: it.id, label: "${it.name}"]
         }
         render([data: catalogs] as JSON)
     }
@@ -60,7 +60,7 @@ class SelectOptionsApiController {
 
     def tagOptions() {
         List<Tag> tags = genericApiService.getList(Tag.class.simpleName, [sort: "tag"]).collect {
-            [id: it.id, label: "${it.tag} (${it?.products?.size()})"]
+            [id: it.id, label: "${it.tag}"]
         }
         render([data: tags] as JSON)
     }
