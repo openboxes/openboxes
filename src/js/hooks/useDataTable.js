@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { getCoreRowModel, useReactTable } from '@tanstack/react-table';
 
@@ -11,6 +11,7 @@ const useDataTable = ({
   setOffset,
   setPageSize,
   totalCount,
+  filterParams,
 }) => {
   // Managing pagination on the client side, no need for server side handling
   const [pagination, setPagination] = useState({
@@ -60,6 +61,11 @@ const useDataTable = ({
     id: 'react.default.loading.label',
     defaultMessage: 'Loading...',
   };
+
+  useEffect(() => {
+    onPageChange(0);
+  }, [filterParams]);
+
 
   return {
     defaultEmptyTableMessage,

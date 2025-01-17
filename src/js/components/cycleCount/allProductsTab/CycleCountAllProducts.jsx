@@ -44,6 +44,7 @@ const CycleCountAllProducts = ({
         setOffset={setOffset}
         setPageSize={setPageSize}
         totalCount={tableData.totalCount}
+        filterParams={filterParams}
       />
     </div>
   );

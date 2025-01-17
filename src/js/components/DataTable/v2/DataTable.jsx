@@ -20,6 +20,7 @@ const DataTable = ({
   setOffset,
   setPageSize,
   totalCount,
+  filterParams,
 }) => {
   const {
     defaultEmptyTableMessage,
@@ -39,6 +40,7 @@ const DataTable = ({
     setOffset,
     setPageSize,
     totalCount,
+    filterParams,
   });
 
   return (
@@ -98,6 +100,7 @@ DataTable.propTypes = {
   setOffset: PropTypes.func,
   setPageSize: PropTypes.func,
   totalCount: PropTypes.number,
+  filterParams: PropTypes.shape({}).isRequired,
 };
 
 DataTable.defaultProps = {
