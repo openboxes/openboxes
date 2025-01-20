@@ -18,10 +18,10 @@ const useTableCheckboxes = () => {
   }, [checkedCheckboxes]);
 
   useEffect(() => {
-    const selectedRows = checkedCheckboxes.length;
+    const amountOfCheckedCheckboxes = checkedCheckboxes.length;
     setHeaderCheckboxState({
-      indeterminate: selectedRows > 0,
-      value: selectedRows !== 0,
+      indeterminate: amountOfCheckedCheckboxes > 0,
+      value: amountOfCheckedCheckboxes !== 0,
     });
   }, [checkedCheckboxes.length]);
 
@@ -30,9 +30,7 @@ const useTableCheckboxes = () => {
     [checkedCheckboxes],
   );
 
-  // Argument is a function to avoid calculating data in the main component
-  // Data is calculated directly when the function is called
-  const selectHeaderCheckbox = (getIdentifiers) => useCallback(() => {
+  const selectHeaderCheckbox = (identifiers) => useCallback(() => {
     setHeaderCheckboxState((headerState) => ({
       indeterminate: !headerState.indeterminate,
       value: !headerState.value,
@@ -43,7 +41,7 @@ const useTableCheckboxes = () => {
       return;
     }
 
-    setCheckedCheckboxes(getIdentifiers());
+    setCheckedCheckboxes(identifiers);
   }, [
     headerCheckboxState.indeterminate,
     headerCheckboxState.value,
@@ -54,7 +52,7 @@ const useTableCheckboxes = () => {
     isChecked,
     selectHeaderCheckbox,
     checkedCheckboxes,
-    selectedRowsAmount: checkedCheckboxes.length,
+    selectedCheckboxesAmount: checkedCheckboxes.length,
     headerCheckboxProps: headerCheckboxState,
   };
 };

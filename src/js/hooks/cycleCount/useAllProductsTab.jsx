@@ -94,11 +94,11 @@ const useAllProductsTab = ({ filterParams }) => {
     selectRow,
     isChecked,
     selectHeaderCheckbox,
-    selectedRowsAmount,
+    selectedCheckboxesAmount,
     headerCheckboxProps,
   } = useTableCheckboxes();
 
-  const getProductIds = () => tableData.data.map((row) => row.product.id);
+  const productIds = tableData.data.map((row) => row.product.id);
 
   // Separated from columns to reduce the amount of rerenders of
   // the rest columns (on checked checkboxes change)
@@ -108,7 +108,7 @@ const useAllProductsTab = ({ filterParams }) => {
         <Checkbox
           noWrapper
           {...headerCheckboxProps}
-          onClick={selectHeaderCheckbox(getProductIds)}
+          onClick={selectHeaderCheckbox(productIds)}
         />
       </TableHeaderCell>
     ),
@@ -269,7 +269,7 @@ const useAllProductsTab = ({ filterParams }) => {
     exportTableData,
     setPageSize,
     setOffset,
-    selectedRowsAmount,
+    selectedCheckboxesAmount,
   };
 };
 

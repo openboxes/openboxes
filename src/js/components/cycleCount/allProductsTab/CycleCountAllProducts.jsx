@@ -20,7 +20,7 @@ const CycleCountAllProducts = ({
     exportTableData,
     setOffset,
     setPageSize,
-    selectedRowsAmount,
+    selectedCheckboxesAmount,
   } = useAllProductsTab({
     filterParams,
   });
@@ -31,7 +31,7 @@ const CycleCountAllProducts = ({
     <div>
       <div className="d-flex justify-content-sm-between align-items-center">
         <span className="selected-rows-indicator pl-4">
-          {selectedRowsAmount}
+          {selectedCheckboxesAmount}
           {' '}
           {translate('react.default.selected.label', 'selected')}
         </span>
@@ -41,7 +41,7 @@ const CycleCountAllProducts = ({
             defaultLabel="Count selected"
             variant="primary-outline"
             StartIcon={<RiCalculatorLine size={18} />}
-            disabled={!selectedRowsAmount}
+            disabled={!selectedCheckboxesAmount}
           />
           <Button
             onClick={exportTableData}
