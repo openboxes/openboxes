@@ -7,8 +7,10 @@ import { useSelector } from 'react-redux';
 import { CYCLE_COUNT_CANDIDATES } from 'api/urls';
 import { TableCell } from 'components/DataTable';
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
+import Checkbox from 'components/form-elements/v2/Checkbox';
 import { INVENTORY_ITEM_URL } from 'consts/applicationUrls';
 import useSpinner from 'hooks/useSpinner';
+import useTableCheckboxes from 'hooks/useTableCheckboxes';
 import useTableDataV2 from 'hooks/useTableDataV2';
 import useTableSorting from 'hooks/useTableSorting';
 import useTranslate from 'hooks/useTranslate';
@@ -88,6 +90,44 @@ const useAllProductsTab = ({ filterParams }) => {
     filterParams,
   });
 
+  const {
+    selectRow,
+    isChecked,
+    selectHeaderCheckbox,
+    selectedCheckboxesAmount,
+    headerCheckboxProps,
+  } = useTableCheckboxes();
+
+  const productIds = tableData.data.map((row) => row.product.id);
+
+  // Separated from columns to reduce the amount of rerenders of
+  // the rest columns (on checked checkboxes change)
+  const checkboxesColumn = columnHelper.accessor('selected', {
+    header: () => (
+      <TableHeaderCell>
+        <Checkbox
+          noWrapper
+          {...headerCheckboxProps}
+          onClick={selectHeaderCheckbox(productIds)}
+        />
+      </TableHeaderCell>
+    ),
+    cell: ({ row }) => (
+      <TableCell className="rt-td">
+        <Checkbox
+          noWrapper
+          onChange={selectRow(row.original.product.id)}
+          value={isChecked(row.original.product.id)}
+        />
+      </TableCell>
+    ),
+    meta: {
+      getCellContext: () => ({
+        className: 'checkbox-column',
+      }),
+    },
+  });
+
   const columns = useMemo(() => [
     columnHelper.accessor('lastCountDate', {
       header: () => (
@@ -131,7 +171,7 @@ const useAllProductsTab = ({ filterParams }) => {
     }),
     columnHelper.accessor('internalLocations', {
       header: () => (
-        <TableHeaderCell sortable columnId="internalLocations" {...sortableProps}>
+        <TableHeaderCell>
           {translate('react.cycleCount.table.binLocation.label', 'Bin Location')}
         </TableHeaderCell>
       ),
@@ -222,13 +262,14 @@ const useAllProductsTab = ({ filterParams }) => {
   };
 
   return {
-    columns,
+    columns: [checkboxesColumn, ...columns],
     tableData,
     loading,
     emptyTableMessage,
     exportTableData,
     setPageSize,
     setOffset,
+    selectedCheckboxesAmount,
   };
 };
 

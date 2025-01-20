@@ -36,11 +36,14 @@ const DataTableBody = ({
         <div key={row.id} className="rt-tr-group cell-wrapper" role="rowgroup">
           <TableRow key={row.id} className="rt-tr">
             {row.getVisibleCells()
-              .map((cell) => (
-                <div className="w-100 d-flex" key={cell.id}>
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                </div>
-              ))}
+              .map((cell) => {
+                const className = cell.column.columnDef?.meta?.getCellContext?.()?.className;
+                return (
+                  <div className={`w-100 d-flex ${className}`} key={cell.id}>
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </div>
+                );
+              })}
           </TableRow>
         </div>
       ))}
