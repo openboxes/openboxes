@@ -28,6 +28,8 @@ class CycleCountCandidateFilterCommand extends PaginationCommand implements Vali
 
     String format
 
+    Boolean negativeQuantity
+
     static constraints = {
         searchTerm(nullable: true)
         categories(nullable: true)
@@ -39,5 +41,6 @@ class CycleCountCandidateFilterCommand extends PaginationCommand implements Vali
         sort(nullable: true)
         order(nullable: true)
         format(nullable: true)
+        negativeQuantity(nullable: true)
     }
 }
