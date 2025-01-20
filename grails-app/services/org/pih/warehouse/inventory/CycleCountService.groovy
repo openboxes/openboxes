@@ -61,6 +61,9 @@ class CycleCountService {
                 usedAliases.add("tags")
                 "in"("tags.id", command.tags.collect { it.id })
             }
+            if (command.negativeQuantity) {
+                lt("quantityOnHand", 0)
+            }
             if (command.sort) {
                 getCandidatesSortOrder(command.sort, command.order, delegate, usedAliases)
             }
