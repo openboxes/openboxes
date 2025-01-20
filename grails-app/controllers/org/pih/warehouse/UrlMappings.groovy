@@ -932,7 +932,7 @@ class UrlMappings {
             action = [GET: "read", POST: "update", PUT: "update", DELETE: "delete"]
         }
 
-        "/api/facilities/$facilityId/cycle-count-candidates" {
+        "/api/facilities/$facilityId/cycle-counts/candidates" {
             controller = "cycleCountApi"
             action = [GET: "getCandidates"]
         }

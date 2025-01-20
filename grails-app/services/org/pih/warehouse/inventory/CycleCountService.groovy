@@ -64,6 +64,12 @@ class CycleCountService {
             if (command.sort) {
                 getCandidatesSortOrder(command.sort, command.order, delegate, usedAliases)
             }
+            if (command.status) {
+                createAlias("cycleCountRequest", "cycleCountRequest", JoinType.INNER_JOIN)
+                eq("cycleCountRequest.status", command.status)
+                return
+            }
+            isNull("cycleCountRequest")
         }
     }
 
