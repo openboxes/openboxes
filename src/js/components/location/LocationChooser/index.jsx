@@ -76,9 +76,8 @@ const LocationChooser = (props) => {
     props.changeCurrentLocation(location).then(() => {
       props.fetchMenuConfig();
       props.fetchSessionInfo();
-
-      window.location.reload();
     });
+    setIsOpen(false);
   };
 
   const toggleModalHandler = () => {

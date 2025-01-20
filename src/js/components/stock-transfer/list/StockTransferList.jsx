@@ -15,7 +15,6 @@ const StockTransferList = (props) => {
   const { setFilterValues, defaultFilterValues, filterParams } = useStockTransferFilters();
 
   useTranslation('stockTransfer', 'reactTable');
-
   return (
     <div className="d-flex flex-column list-page-main">
       <StockTransferListHeader />
