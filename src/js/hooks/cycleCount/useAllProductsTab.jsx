@@ -110,7 +110,7 @@ const useAllProductsTab = ({ filterParams }) => {
       ),
       cell: ({ getValue, row }) => (
         <TableCell
-          link={INVENTORY_ITEM_URL.showStockCard(row.original.product.productCode)}
+          link={INVENTORY_ITEM_URL.showStockCard(row.original.product.id)}
           className="rt-td multiline-cell"
         >
           {getValue()}
