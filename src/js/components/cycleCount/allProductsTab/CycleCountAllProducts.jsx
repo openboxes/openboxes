@@ -11,6 +11,7 @@ import useTranslate from 'hooks/useTranslate';
 
 const CycleCountAllProducts = ({
   filterParams,
+  switchTab,
 }) => {
   const {
     columns,
@@ -21,8 +22,10 @@ const CycleCountAllProducts = ({
     setOffset,
     setPageSize,
     selectedCheckboxesAmount,
+    countSelected,
   } = useAllProductsTab({
     filterParams,
+    switchTab,
   });
 
   const translate = useTranslate();
@@ -41,6 +44,7 @@ const CycleCountAllProducts = ({
             defaultLabel="Count selected"
             variant="primary-outline"
             StartIcon={<RiCalculatorLine size={18} />}
+            onClick={countSelected}
             disabled={!selectedCheckboxesAmount}
           />
           <Button

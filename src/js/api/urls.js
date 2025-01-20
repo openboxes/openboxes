@@ -179,5 +179,6 @@ export const HANDLING_REQUIREMENTS_OPTIONS = `${API}/handlingRequirementsOptions
 export const INTERNAL_LOCATIONS = `${API}/internalLocations`;
 
 // CYCLE COUNT
-export const CYCLE_COUNT = (locationId) => `${API}/facilities/${locationId}`;
-export const CYCLE_COUNT_CANDIDATES = (locationId) => `${CYCLE_COUNT(locationId)}/cycle-counts/candidates`;
+export const CYCLE_COUNT = (locationId) => `${API}/facilities/${locationId}/cycle-counts`;
+export const CYCLE_COUNT_CANDIDATES = (locationId) => `${CYCLE_COUNT(locationId)}/candidates`;
+export const CYCLE_COUNT_REQUESTS = (locationId) => `${CYCLE_COUNT(locationId)}/requests/batch`;
