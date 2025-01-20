@@ -145,7 +145,7 @@ const useAllProductsTab = ({ filterParams }) => {
             tooltipLabel={`${getValue()} (${binLocationList.length})`}
           >
             {binLocationList.map((binLocationName) => (
-              <div className="truncate-text">
+              <div className="truncate-text" key={crypto.randomUUID()}>
                 {binLocationName}
               </div>
             ))}
