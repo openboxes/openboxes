@@ -4,18 +4,26 @@ import { createColumnHelper } from '@tanstack/react-table';
 import _ from 'lodash';
 import { useSelector } from 'react-redux';
 
+import cycleCountApi from 'api/services/CycleCountApi';
 import { CYCLE_COUNT_CANDIDATES } from 'api/urls';
 import { TableCell } from 'components/DataTable';
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
+import Checkbox from 'components/form-elements/v2/Checkbox';
 import { INVENTORY_ITEM_URL } from 'consts/applicationUrls';
+import { TO_COUNT_TAB } from 'consts/cycleCount';
 import useSpinner from 'hooks/useSpinner';
+import useTableCheckboxes from 'hooks/useTableCheckboxes';
 import useTableDataV2 from 'hooks/useTableDataV2';
 import useTableSorting from 'hooks/useTableSorting';
 import useTranslate from 'hooks/useTranslate';
+import Badge from 'utils/Badge';
 import exportFileFromAPI from 'utils/file-download-util';
 import { mapStringToList } from 'utils/form-values-utils';
 
-const useAllProductsTab = ({ filterParams }) => {
+const useAllProductsTab = ({
+  filterParams,
+  switchTab,
+}) => {
   const columnHelper = createColumnHelper();
   const spinner = useSpinner();
   const translate = useTranslate();
@@ -88,6 +96,45 @@ const useAllProductsTab = ({ filterParams }) => {
     filterParams,
   });
 
+  const {
+    selectRow,
+    isChecked,
+    selectHeaderCheckbox,
+    selectedCheckboxesAmount,
+    checkedCheckboxes,
+    headerCheckboxProps,
+  } = useTableCheckboxes();
+
+  const productIds = tableData.data.map((row) => row.product.id);
+
+  // Separated from columns to reduce the amount of rerenders of
+  // the rest columns (on checked checkboxes change)
+  const checkboxesColumn = columnHelper.accessor('selected', {
+    header: () => (
+      <TableHeaderCell>
+        <Checkbox
+          noWrapper
+          {...headerCheckboxProps}
+          onClick={selectHeaderCheckbox(productIds)}
+        />
+      </TableHeaderCell>
+    ),
+    cell: ({ row }) => (
+      <TableCell className="rt-td">
+        <Checkbox
+          noWrapper
+          onChange={selectRow(row.original.product.id)}
+          value={isChecked(row.original.product.id)}
+        />
+      </TableCell>
+    ),
+    meta: {
+      getCellContext: () => ({
+        className: 'checkbox-column',
+      }),
+    },
+  });
+
   const columns = useMemo(() => [
     columnHelper.accessor('lastCountDate', {
       header: () => (
@@ -110,7 +157,7 @@ const useAllProductsTab = ({ filterParams }) => {
       ),
       cell: ({ getValue, row }) => (
         <TableCell
-          link={INVENTORY_ITEM_URL.showStockCard(row.original.product.productCode)}
+          link={INVENTORY_ITEM_URL.showStockCard(row.original.product.id)}
           className="rt-td multiline-cell"
         >
           {getValue()}
@@ -131,22 +178,30 @@ const useAllProductsTab = ({ filterParams }) => {
     }),
     columnHelper.accessor('internalLocations', {
       header: () => (
-        <TableHeaderCell sortable columnId="internalLocations" {...sortableProps}>
+        <TableHeaderCell>
           {translate('react.cycleCount.table.binLocation.label', 'Bin Location')}
         </TableHeaderCell>
       ),
-      cell: ({ getValue }) => (
-        <TableCell
-          className="rt-td"
-          tooltip
-          tooltipLabel={getValue()}
-        >
-          {mapStringToList(getValue(), ',', 100).map((binLocationName) => <div>{binLocationName}</div>)}
-        </TableCell>
-      ),
+      cell: ({ getValue }) => {
+        const binLocationList = mapStringToList(getValue(), ',');
+
+        return (
+          <TableCell
+            className="rt-td"
+            tooltip
+            tooltipLabel={`${getValue()} (${binLocationList.length})`}
+          >
+            {binLocationList.map((binLocationName) => (
+              <div className="truncate-text" key={crypto.randomUUID()}>
+                {binLocationName}
+              </div>
+            ))}
+          </TableCell>
+        );
+      },
     }),
     columnHelper.accessor((row) =>
-      row?.tags?.map?.((tag) => <div>{tag?.tag}</div>), {
+      row?.tags?.map?.((tag) => <Badge label={tag?.tag} variant="badge--purple" key={tag.id} />), {
       id: 'tags',
       header: () => (
         <TableHeaderCell>
@@ -155,12 +210,14 @@ const useAllProductsTab = ({ filterParams }) => {
       ),
       cell: ({ getValue }) => (
         <TableCell className="rt-td multiline-cell">
-          {getValue()}
+          <div className="badge-container">
+            {getValue()}
+          </div>
         </TableCell>
       ),
     }),
     columnHelper.accessor((row) =>
-      row?.productCatalogs?.map((catalog) => <div>{catalog?.name}</div>), {
+      row?.productCatalogs?.map((catalog) => <Badge label={catalog?.name} variant="badge--blue" key={catalog.id} />), {
       id: 'productCatalogs',
       header: () => (
         <TableHeaderCell>
@@ -169,7 +226,9 @@ const useAllProductsTab = ({ filterParams }) => {
       ),
       cell: ({ getValue }) => (
         <TableCell className="rt-td multiline-cell">
-          {getValue()}
+          <div className="badge-container">
+            {getValue()}
+          </div>
         </TableCell>
       ),
     }),
@@ -217,14 +276,32 @@ const useAllProductsTab = ({ filterParams }) => {
     });
   };
 
+  const countSelected = async () => {
+    const payload = {
+      requests: checkedCheckboxes.map((productId) => ({
+        product: productId,
+        blindCount: true,
+      })),
+    };
+    spinner.show();
+    try {
+      await cycleCountApi.createRequest(payload, currentLocation?.id);
+      switchTab(TO_COUNT_TAB);
+    } finally {
+      spinner.hide();
+    }
+  };
+
   return {
-    columns,
+    columns: [checkboxesColumn, ...columns],
     tableData,
     loading,
     emptyTableMessage,
     exportTableData,
     setPageSize,
     setOffset,
+    selectedCheckboxesAmount,
+    countSelected,
   };
 };
 

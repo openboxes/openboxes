@@ -243,6 +243,16 @@
       white-space: break-spaces;
       text-overflow: clip;
     }
+
+    .truncate-text {
+      max-width: 100px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+
+      @media (min-width: 1450px) {
+        max-width: 150px;
+      }
+    }
   }
 
   .pages-selector {

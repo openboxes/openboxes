@@ -5,6 +5,7 @@ import grails.validation.ValidationException
 import org.apache.commons.csv.CSVPrinter
 import org.pih.warehouse.inventory.CycleCountCandidate
 import org.pih.warehouse.inventory.CycleCountCandidateFilterCommand
+
 import org.pih.warehouse.inventory.CycleCountRequest
 import org.pih.warehouse.inventory.CycleCountRequestBatchCommand
 import org.pih.warehouse.inventory.CycleCountRequestCommand
@@ -17,16 +18,15 @@ class CycleCountApiController {
     CycleCountService cycleCountService
 
     def getCandidates(CycleCountCandidateFilterCommand filterParams) {
-        List<CycleCountCandidate> candidates = cycleCountService.getCandidates(filterParams, params.facilityId)
+        List<CycleCountCandidate> cycleCounts = cycleCountService.getCandidates(filterParams, params.facilityId)
 
         if (filterParams.format == "csv") {
-            CSVPrinter csv = cycleCountService.getCycleCountCsv(candidates)
+            CSVPrinter csv = cycleCountService.getCycleCountCsv(cycleCounts)
             response.setHeader("Content-disposition", "attachment; filename=\"CycleCountReport-${new Date().format("yyyyMMdd-hhmmss")}.csv\"")
             render(contentType: "text/csv", text: csv.out.toString())
             return
         }
-
-        render([data: candidates, totalCount: candidates.totalCount] as JSON)
+        render([data: cycleCounts, totalCount: cycleCounts.totalCount] as JSON)
     }
 
     def createRequests(CycleCountRequestBatchCommand command) {

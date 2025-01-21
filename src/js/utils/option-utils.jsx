@@ -261,13 +261,13 @@ export const fetchProductsCategories = async () => {
   return response.data.data;
 };
 
-export const fetchProductsCatalogs = async () => {
-  const response = await apiClient.get('/api/catalogOptions');
+export const fetchProductsCatalogs = async (params = {}) => {
+  const response = await apiClient.get('/api/catalogOptions', { params });
   return response.data.data;
 };
 
-export const fetchProductsTags = async () => {
-  const response = await apiClient.get('/api/tagOptions');
+export const fetchProductsTags = async (params = {}) => {
+  const response = await apiClient.get('/api/tagOptions', { params });
   return response.data.data;
 };
 
