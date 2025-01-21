@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 
 import { createColumnHelper } from '@tanstack/react-table';
 import _ from 'lodash';
@@ -23,12 +23,12 @@ import { mapStringToList } from 'utils/form-values-utils';
 const useAllProductsTab = ({
   filterParams,
   switchTab,
+  offset,
+  pageSize,
 }) => {
   const columnHelper = createColumnHelper();
   const spinner = useSpinner();
   const translate = useTranslate();
-  const [pageSize, setPageSize] = useState(5);
-  const [offset, setOffset] = useState(0);
 
   const {
     currentLocale,
@@ -297,8 +297,6 @@ const useAllProductsTab = ({
     loading,
     emptyTableMessage,
     exportTableData,
-    setPageSize,
-    setOffset,
     selectedCheckboxesAmount,
     countSelected,
   };

@@ -1,26 +1,45 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 
+import PropTypes from 'prop-types';
 import { RiCalculatorLine, RiDownload2Line } from 'react-icons/ri';
 
 import DataTable from 'components/DataTable/v2/DataTable';
 import Button from 'components/form-elements/Button';
 import useToCountTab from 'hooks/cycleCount/useToCountTab';
+import useTablePagination from 'hooks/useTablePagination';
 import useTranslate from 'hooks/useTranslate';
 
 const CycleCountToCount = ({ filterParams }) => {
+  const totalCount = useRef(0);
   const translate = useTranslate();
+
+  const {
+    paginationProps,
+    offset,
+    pageSize,
+  } = useTablePagination({
+    defaultPageSize: 5,
+    totalCount: totalCount.current,
+    filterParams,
+  });
+
   const {
     columns,
     tableData,
     loading,
     emptyTableMessage,
     exportTableData,
-    setOffset,
-    setPageSize,
     selectedCheckboxesAmount,
   } = useToCountTab({
     filterParams,
+    offset,
+    pageSize,
   });
+
+  // Use effect to avoid circular dependency
+  useEffect(() => {
+    totalCount.current = tableData.totalCount;
+  }, [tableData.totalCount]);
 
   return (
     <div>
@@ -52,13 +71,16 @@ const CycleCountToCount = ({ filterParams }) => {
         data={tableData.data}
         emptyTableMessage={emptyTableMessage}
         loading={loading}
-        setOffset={setOffset}
-        setPageSize={setPageSize}
         totalCount={tableData.totalCount}
         filterParams={filterParams}
+        paginationProps={paginationProps}
       />
     </div>
   );
 };
 
 export default CycleCountToCount;
+
+CycleCountToCount.propTypes = {
+  filterParams: PropTypes.shape({}).isRequired,
+};

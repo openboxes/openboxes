@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 
 import { createColumnHelper } from '@tanstack/react-table';
 import _ from 'lodash';
@@ -20,12 +20,14 @@ import exportFileFromAPI from 'utils/file-download-util';
 import { mapStringToList } from 'utils/form-values-utils';
 import StatusIndicator from 'utils/StatusIndicator';
 
-const useToCountTab = ({ filterParams }) => {
+const useToCountTab = ({
+  filterParams,
+  offset,
+  pageSize,
+}) => {
   const columnHelper = createColumnHelper();
   const translate = useTranslate();
   const spinner = useSpinner();
-  const [pageSize, setPageSize] = useState(5);
-  const [offset, setOffset] = useState(0);
 
   const { currentLocale, currentLocation } = useSelector((state) => ({
     currentLocale: state.session.activeLanguage,
@@ -133,6 +135,7 @@ const useToCountTab = ({ filterParams }) => {
         </TableHeaderCell>
       ),
       cell: () => (
+        // TODO: Use variant and status fetched from the API
         <TableCell className="rt-td">
           <StatusIndicator
             variant="danger"
@@ -265,8 +268,6 @@ const useToCountTab = ({ filterParams }) => {
     tableData,
     loading,
     columns: [checkboxesColumn, ...columns],
-    setOffset,
-    setPageSize,
     emptyTableMessage,
     exportTableData,
     selectedCheckboxesAmount,
