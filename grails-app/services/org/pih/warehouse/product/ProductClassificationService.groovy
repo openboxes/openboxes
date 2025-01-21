@@ -39,14 +39,13 @@ class ProductClassificationService {
             throw new IllegalArgumentException("Invalid facilityId: ${facilityId}")
         }
 
-        // Use a projection because we only need the one field. The grouping is for uniqueness.
-        // We do this in two separate queries to avoid joining on a non-indexed field.
-        Set<String> productClassifications = Product.createCriteria().listDistinct() {
+        List<String> productClassifications = Product.createCriteria().listDistinct() {
             projections {
                 groupProperty("abcClass")
             }
             isNotNull("abcClass")
-        } as Set<String>
+        } as List<String>
+
         productClassifications += InventoryLevel.createCriteria().listDistinct() {
             projections {
                 groupProperty("abcClass")
@@ -54,10 +53,13 @@ class ProductClassificationService {
             // Only fetch abcClasses that are configured for the requesting facility.
             eq("inventory", facility.inventory)
             isNotNull("abcClass")
-        } as Set<String>
+        } as List<String>
+
+        // Sort the results by ABC class name. Once ABC class becomes its own domain, this can be moved to the query.
+        Collections.sort(productClassifications)
 
         // We convert to a DTO here instead of returning the raw string because it will make things easier
-        // once product classification becomes its own proper entity.
+        // once product classification becomes a proper entity.
         return productClassifications.collect {
             new ProductClassificationDto(name: it)
         }
