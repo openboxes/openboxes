@@ -1,58 +1,53 @@
-To deploy, manage, monitor, and maintain a Spring application on a cloud hosting provider, you'll 
-need a range of skills and responsibilities across different areas. 
+Deploying and managing OpenBoxes requires a solid understanding of server administration, 
+database management, and application configuration. Experience with Linux, MySQL, and Tomcat is 
+highly recommended. This process demands significant effort, and attempting installation without 
+the necessary expertise can lead to security vulnerabilities, system instability, and data loss. 
+Organizations without in-house technical expertise should consider seeking professional support to 
+ensure a successful deployment.
 
-The following Skills and Responsibilities are the bare minimum requirements for deploying and 
-managing OpenBoxes on your own server. If you don't understand these requirements or don't feel 
-confident that your organization can achieve these 
-
-
-
-## Skills Required
-
-### Cloud Infrastructure Management
-- [ ] **Virtual Machines:** Provision and configure VMs to host Apache, Tomcat, and MySQL.
-- [ ] **Networking:** Set up and manage networking components like firewalls, security groups, and load balancers.
-- [ ] **Storage Management:** Use cloud storage solutions for application data and backups.
+## Requirements
 
 ### Application Deployment
 
-#### Java 8 
 - [ ] Proficiency in deploying and configuring Java applications.
 - [ ] Understanding of how to handle JVM settings and optimizations.
-#### Tomcat 9
 - [ ] Deployment of WAR files.
-- [ ] Configuration of server.xml and context.xml for performance tuning.
-#### Apache 2
+- [ ] Configuration of server.xml and context.xml performance tuning.
 - [ ] Configuring Apache as a reverse proxy for Tomcat.
-- [ ] SSL/TLS setup for securing HTTP traffic.
 - [ ] Load balancing and handling static content.
 
 ### Database Management
-#### MySQL 8
+
 - [ ] Installation and configuration of MySQL on cloud-based instances.
 - [ ] Database backup and recovery.
 - [ ] Query optimization and performance tuning.
 - [ ] Setting up replication for high availability.
 
+### Cloud Infrastructure Management
+- [ ] Provision and configure VMs to host Apache, Tomcat, and MySQL.
+- [ ] Set up and manage networking components like firewalls, security groups, and load balancers.
+- [ ] Use cloud storage solutions for application data and backups.
+
 ### Security
-- [ ] SSL/TLS Configuration of SSL certificates on Apache.
-- [ ] Firewall Management Configuring security groups to restrict access to application ports.
+- [ ] SSL/TLS setup for securing HTTP traffic.
+- [ ] Configuration of SSL certificates on Apache.
+- [ ] Configuring security groups to restrict access to application ports.
 - [ ] Identify Management and Access Control Managing user permissions and access to VMs, databases, and other cloud resources.
 
 ### Monitoring and Logging
-- [ ] **Application Monitoring:** Set up monitoring for JVM performance, Tomcat, and MySQL using tools like Prometheus and Grafana.
-- [ ] **Server Monitoring:** Monitoring CPU, memory, disk usage, and network traffic on the VMs.
-- [ ] **Logging:** Configure and manage logs for Apache, Tomcat, and MySQL, possibly using ELK stack or cloud-native logging solutions.
-- [ ] **Alerting:** Setting up alerts for critical metrics like server load, database response times, or application errors.
+- [ ] Set up monitoring for JVM performance, Tomcat, and MySQL using tools like Prometheus and Grafana.
+- [ ] Monitoring CPU, memory, disk usage, and network traffic on the VMs.
+- [ ] Configure and manage logs for Apache, Tomcat, and MySQL, possibly using ELK stack or cloud-native logging solutions.
+- [ ] Setting up alerts for critical metrics like server load, database response times, or application errors.
 
 ### Backup and Recovery
-- [ ] **Database Backup:** Automate regular backups of MySQL databases, including offsite/cloud storage.
-- [ ] **Disaster Recovery:** Implement strategies for restoring VMs, application servers, and databases in case of failure.
+- [ ] Automate regular backups of MySQL databases, including offsite/cloud storage.
+- [ ] Implement strategies for restoring VMs, application servers, and databases in case of failure.
 
 ### DevOps Practices
-- [ ] **Continuous Integration/Continuous Deployment (CI/CD):** Automate deployment pipelines using tools like Jenkins or GitLab CI.
-- [ ] **Infrastructure as Code:** Use tools like Terraform or Ansible to manage cloud infrastructure.
-- [ ] **Automation:** Scripting (Bash, Python) for automating deployment, scaling, and maintenance tasks.
+- [ ] Automate deployment pipelines using tools like GitHub Actions or Bamboo.
+- [ ] Use tools like Terraform or Ansible to manage cloud infrastructure.
+- [ ] Scripting (Bash, Python) for automating deployment, scaling, and maintenance tasks.
 
 ## Responsibilities
 

@@ -11,7 +11,7 @@
 
 
 ## Example 
-```yml title="/var/lib/tomcat9/.grails/openboxes.yml"
+```yml title="/opt/tomcat/.grails/openboxes.yml"
 dataSource:
     url: jdbc:mysql://localhost:3306/openboxes
     username: openboxes

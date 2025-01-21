@@ -200,18 +200,18 @@ There are a few things to check to validate that things went smoothly.
 We can now update the OpenBoxes configuration so that we don't get redirected to the URL with
 IP address and port.
 
-```yml title="var/lib/tomcat9/.grails/openboxes.yml"
+```yml title="/opt/tomcat/.grails/openboxes.yml"
 grails:
-  serverURL: https://<your-domain-name>/openboxes
+  serverURL: https://<your-custom-domain-name>/openboxes
 ```
 
 Then all you need to do is restart the Tomcat service.
 ```shell
-sudo service tomcat9 restart
+sudo service tomcat restart
 ```
 Once the Tomcat logs show that the application is backup and running
 ```title="journalctl -u tomcat9 -f"
-Aug 18 05:17:12 ubuntu-s-2vcpu-4gb-nyc1-01 tomcat9[63292]: Deployment of web application archive [/var/lib/tomcat9/webapps/openboxes.war] has finished in [63,977] ms
+Aug 18 05:17:12 ubuntu-s-2vcpu-4gb-nyc1-01 tomcat9[63292]: Deployment of web application archive [/opt/tomcat9/webapps/openboxes.war] has finished in [63,977] ms
 Aug 18 05:17:14 ubuntu-s-2vcpu-4gb-nyc1-01 tomcat9[63292]: Starting ProtocolHandler ["http-nio-8080"]
 Aug 18 05:17:14 ubuntu-s-2vcpu-4gb-nyc1-01 tomcat9[63292]: Server startup in [65308] milliseconds
 ```

@@ -1,115 +1,257 @@
-# Overview
+The Instalaltion Guide 
+provides step-by-step instructions for deploying OpenBoxes on-premise or to a cloud hosting provider
+of your choosing.  
 
-## Step 1: Getting Started 
+The installation process is broken into five stages:
 
-<div class="grid cards" markdown>
+* Preparation – Understanding system requirements and gathering necessary resources.
+* Installation – Setting up dependencies and installing OpenBoxes.
+* Configuration – Adjusting settings and environment variables.
+* Deployment – Running OpenBoxes on a server or local environment.
+* Onboarding – Setting up users, roles, and initial data to start using OpenBoxes.
 
-- :octicons-checklist-16:{ .lg .middle } __System Requirements__
+By following this guide, you’ll be able to deploy OpenBoxes to a production-ready environment. 
+If you encounter issues, refer to the [Troubleshooting](troubleshooting) 
+section or join the OpenBoxes [Community](https://community.openboxes.com) for support.
 
-    ---
-    Review system requirements (CPU, memory, disk space).
+!!! tip "Pro Tip"
 
-- :material-brain:{ .lg .middle } __Knowledge Requirements__ 
+    Use the Navigation (Previous, Next) links in the footer to walk through each step of the 
+    Installation process in the intended order. 
 
-    ---
-    Review the required skills and responsibilities required to
-    host the application on your own servers.
+[//]: # ()
+[//]: # (## Step 1: Prerequisites)
 
-- :material-server-network:{ .lg .middle } __Deployment _Strategy___
-  
-    ---
-    Decide which Deployment Strategy (single VM, multiple VM, managed database)
-    is right for your use case and expertise.
+[//]: # ()
+[//]: # ()
+[//]: # (<div class="grid cards" markdown>)
 
+[//]: # ()
+[//]: # ()
+[//]: # (- :octicons-checklist-16:{ .lg .middle } __System Requirements__)
 
-- :material-cloud:{ .lg .middle } __Hosting Provider__
+[//]: # ()
+[//]: # ()
+[//]: # (    ---)
 
-    --- 
-    Once you have a deployment strategy, you should decide which Cloud Hosting Provider
-    is best for your use case and budget.
+[//]: # ()
+[//]: # (    Review system requirements &#40;CPU, memory, disk space&#41;.)
 
-</div>
+[//]: # ()
+[//]: # ()
+[//]: # (- :material-brain:{ .lg .middle } __Knowledge Requirements__ )
 
-[//]: # (2. Review System Requirements &#40;CPU, memory, disk space, technology stack&#41;)
+[//]: # ()
+[//]: # ()
+[//]: # (    ---)
 
-[//]: # (1. Review Knowledge Requirements &#40;required skills for hosting the application yourself&#41;)
+[//]: # ()
+[//]: # (    Review the required skills and responsibilities required to)
 
-[//]: # (3. Choose Deployment Strategy &#40;single VM, multiple VM, managed database&#41;)
+[//]: # ()
+[//]: # (    host the application on your own servers.)
 
-[//]: # (2. Choose Hosting Provider &#40;Digital Ocean, Amazon, Azure&#41;)
+[//]: # ()
+[//]: # ()
+[//]: # (- :material-server-network:{ .lg .middle } __Deployment _Strategy___)
 
-## Step 2: Installation 
+[//]: # ()
+[//]: # (  )
+[//]: # (    ---)
 
-<div class="grid cards" markdown>
+[//]: # ()
+[//]: # (    Decide which Deployment Strategy &#40;single VM, multiple VM, managed database&#41;)
 
-- :material-server-plus:{ .lg .middle } __Create Virtual Private Server__
+[//]: # ()
+[//]: # (    is right for your use case and expertise.)
 
-    ---
-    Create a Virtual Private Server (VPS) on your hosting provider of choice
+[//]: # ()
+[//]: # ()
+[//]: # ()
+[//]: # (- :material-cloud:{ .lg .middle } __Hosting Provider__)
 
-- :material-ubuntu:{ .lg .middle } __Install Operating System__
+[//]: # ()
+[//]: # ()
+[//]: # (    --- )
 
-    ---
-    Install the operating system on your newly provisioned VPS
+[//]: # ()
+[//]: # (    Once you have a deployment strategy, you should decide which Cloud Hosting Provider)
 
-- :material-update:{ .lg .middle } __Install Updates__
+[//]: # ()
+[//]: # (    is best for your use case and budget.)
 
-    ---
-    Install operating system and upgrades.
+[//]: # ()
+[//]: # ()
+[//]: # (</div>)
 
-- :octicons-checklist-16:{ .lg .middle } __Install Dependencies__
+[//]: # ()
+[//]: # ()
+[//]: # ([//]: # &#40;2. Review System Requirements &#40;CPU, memory, disk space, technology stack&#41;&#41;)
+[//]: # ()
+[//]: # ([//]: # &#40;1. Review Knowledge Requirements &#40;required skills for hosting the application yourself&#41;&#41;)
+[//]: # ()
+[//]: # ([//]: # &#40;3. Choose Deployment Strategy &#40;single VM, multiple VM, managed database&#41;&#41;)
+[//]: # ()
+[//]: # ([//]: # &#40;2. Choose Hosting Provider &#40;Digital Ocean, Amazon, Azure&#41;&#41;)
+[//]: # ()
+[//]: # (## Step 2: Installation )
 
-    ---
-    Install the required dependencies (Java, Tomcat, MySQL)
+[//]: # ()
+[//]: # ()
+[//]: # (<div class="grid cards" markdown>)
 
+[//]: # ()
+[//]: # ()
+[//]: # (- :material-server-plus:{ .lg .middle } __Create Virtual Private Server__)
 
+[//]: # ()
+[//]: # ()
+[//]: # (    ---)
 
+[//]: # ()
+[//]: # (    Create a Virtual Private Server &#40;VPS&#41; on your hosting provider of choice)
 
-</div>
+[//]: # ()
+[//]: # ()
+[//]: # (- :material-ubuntu:{ .lg .middle } __Install Operating System__)
 
+[//]: # ()
+[//]: # ()
+[//]: # (    ---)
 
-## Step 3. Configuration
+[//]: # ()
+[//]: # (    Install the operating system on your newly provisioned VPS)
 
-<div class="grid cards" markdown>
+[//]: # ()
+[//]: # ()
+[//]: # (- :material-update:{ .lg .middle } __Install Updates__)
 
-- :simple-apachetomcat:{ .lg .middle } __Configure Tomcat__
+[//]: # ()
+[//]: # ()
+[//]: # (    ---)
 
-    ---
-    Configure Tomcat 
+[//]: # ()
+[//]: # (    Install operating system and upgrades.)
 
-- :simple-mysql:{ .lg .middle } __Configure MySQL__
+[//]: # ()
+[//]: # ()
+[//]: # (- :octicons-checklist-16:{ .lg .middle } __Install Dependencies__)
 
-    ---
-    Configure MySQL
+[//]: # ()
+[//]: # ()
+[//]: # (    ---)
 
-- :material-database:{ .lg .middle } __Setup Database__
+[//]: # ()
+[//]: # (    Install the required dependencies &#40;Java, Tomcat, MySQL&#41;)
 
-    ---
-    Create a new database and database user. Grant permissions to new database user.
+[//]: # ()
+[//]: # ()
+[//]: # ()
+[//]: # ()
+[//]: # ()
+[//]: # (</div>)
 
-- :material-application-brackets:{ .lg .middle } __Configure Application__
+[//]: # ()
+[//]: # ()
+[//]: # ()
+[//]: # (## Step 3. Configuration)
 
-    ---
-    Configure application runtime properties.
+[//]: # ()
+[//]: # ()
+[//]: # (<div class="grid cards" markdown>)
 
+[//]: # ()
+[//]: # ()
+[//]: # (- :simple-apachetomcat:{ .lg .middle } __Configure Tomcat__)
 
+[//]: # ()
+[//]: # ()
+[//]: # (    ---)
 
-</div>
+[//]: # ()
+[//]: # (    Configure Tomcat )
 
+[//]: # ()
+[//]: # ()
+[//]: # (- :simple-mysql:{ .lg .middle } __Configure MySQL__)
 
-## Step 4. Deployment
-3. Download the latest release
-1. Copy WAR file to Tomcat
-1. Restart Tomcat
-1. Watch the Tomcat logs during startup
-1. Open application using Chrome browser 
+[//]: # ()
+[//]: # ()
+[//]: # (    ---)
 
-## Step 5. Onboarding
-1. Authenticate
-1. Change admin password
-2. Create a product
-3. Record stock 
-4. 
+[//]: # ()
+[//]: # (    Configure MySQL)
 
-## Troubleshooting
-1. Post issues to community forum
+[//]: # ()
+[//]: # ()
+[//]: # (- :material-database:{ .lg .middle } __Setup Database__)
+
+[//]: # ()
+[//]: # ()
+[//]: # (    ---)
+
+[//]: # ()
+[//]: # (    Create a new database and database user. Grant permissions to new database user.)
+
+[//]: # ()
+[//]: # ()
+[//]: # (- :material-application-brackets:{ .lg .middle } __Configure Application__)
+
+[//]: # ()
+[//]: # ()
+[//]: # (    ---)
+
+[//]: # ()
+[//]: # (    Configure application runtime properties.)
+
+[//]: # ()
+[//]: # ()
+[//]: # ()
+[//]: # ()
+[//]: # (</div>)
+
+[//]: # ()
+[//]: # ()
+[//]: # ()
+[//]: # (## Step 4. Deployment)
+
+[//]: # ()
+[//]: # (3. Download the latest release)
+
+[//]: # ()
+[//]: # (1. Copy WAR file to Tomcat)
+
+[//]: # ()
+[//]: # (1. Restart Tomcat)
+
+[//]: # ()
+[//]: # (1. Watch the Tomcat logs during startup)
+
+[//]: # ()
+[//]: # (1. Open application using Chrome browser )
+
+[//]: # ()
+[//]: # ()
+[//]: # (## Step 5. Onboarding)
+
+[//]: # ()
+[//]: # (1. Authenticate)
+
+[//]: # ()
+[//]: # (1. Change admin password)
+
+[//]: # ()
+[//]: # (2. Create a product)
+
+[//]: # ()
+[//]: # (3. Record stock )
+
+[//]: # ()
+[//]: # (4. )
+
+[//]: # ()
+[//]: # ()
+[//]: # (## Troubleshooting)
+
+[//]: # ()
+[//]: # (1. Post issues to community forum)

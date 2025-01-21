@@ -19,7 +19,7 @@ The `dataSource.url` should include parameter `allowPublicKeyRetrieval=true`
 [2024-08-09 03:56:10] [info] 2024-08-09 03:56:10,566 ERROR [-utility-2] o.apache.tomcat.jdbc.pool.ConnectionPool: Unable to create initial connections of pool.
 [2024-08-09 03:56:10] [info] java.sql.SQLNonTransientConnectionException: Public Key Retrieval is not allowed
 ```
-#### Alterantive stacktrace
+#### Alternative stacktrace
 ```
 [2024-08-09 03:56:23] [info] 2024-08-09 03:56:23,438  WARN [-utility-2] o.s.jdbc.support.SQLErrorCodesFactory   : Error while extracting database name - falling back to empty error codes
 [2024-08-09 03:56:23] [info] org.springframework.jdbc.support.MetaDataAccessException: Error while extracting DatabaseMetaData; nested exception is java.sql.SQLNonTransientConnectionException: Public Key
@@ -58,9 +58,9 @@ TBD
 
 #### Stacktrace 
 ```
-[2024-08-09 04:03:48] [info] Deploying web application archive [/var/lib/tomcat9/webapps/openboxes.war]
+[2024-08-09 04:03:48] [info] Deploying web application archive [/opt/tomcat/webapps/openboxes.war]
 [2024-08-09 04:03:49] [info] WARNING: An illegal reflective access operation has occurred
-[2024-08-09 04:03:49] [info] WARNING: Illegal reflective access by org.codehaus.groovy.vmplugin.v7.Java7$1 (file:/var/lib/tomcat9/webapps/openboxes/WEB-INF/lib/groovy-2.4.21.jar) to constructor java.lang.
+[2024-08-09 04:03:49] [info] WARNING: Illegal reflective access by org.codehaus.groovy.vmplugin.v7.Java7$1 (file:/opt/tomcat/webapps/openboxes/WEB-INF/lib/groovy-2.4.21.jar) to constructor java.lang.
 invoke.MethodHandles$Lookup(java.lang.Class,int)
 [2024-08-09 04:03:49] [info] WARNING: Please consider reporting this to the maintainers of org.codehaus.groovy.vmplugin.v7.Java7$1
 [2024-08-09 04:03:49] [info] WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
@@ -231,10 +231,9 @@ It is unclear why this directory is not created during the startup process.
 #### Solution 
 Create an `uploads` directory under Tomcat root directory.
 ```
-sudo mkdir /var/lib/tomcat9/uploads
-sudo chown tomcat:tomcat /var/lib/tomcat9/uploads
+sudo mkdir /opt/tomcat/uploads
+sudo chown tomcat:tomcat /opt/tomcat/uploads
 ```
-
 There are times when this may not resolve the issue (particularly when you install Tomcat from scatch like we've done
 here in these instructions). We're still looking into this bug, but in case you get the same error even after creating the
 `uploads` directory under Tomcat, consider creating it under the root (/) directory.
@@ -243,9 +242,9 @@ sudo mkdir /uploads
 sudo chown tomcat:tomcat /uploads
 ```
 
-#### Stracktrace
+#### Stacktrace
 ```
-Unable to upload file due to exception: uploads/inventory (32).xls (No such file or directory)
+Unable to upload file due to exception: uploads/inventory.xls (No such file or directory)
 ```
 ![Uploads directory does not exist](../../../assets/img/import-data-uploads-directory-does-not-exist.png)
 
@@ -260,7 +259,7 @@ with the deployment.
 
 #### Stacktrace
 ```
-[2024-08-09 03:55:26] [info] Deploying web application archive [/var/lib/tomcat9/webapps/openboxes.war]
+[2024-08-09 03:55:26] [info] Deploying web application archive [/opt/tomcat/webapps/openboxes.war]
 [2024-08-09 03:55:26] [crit] Exception fixing docBase for context [/openboxes]
 [2024-08-09 03:55:26] [crit] java.util.zip.ZipException: zip END header not found
 [2024-08-09 03:55:26] [crit]     at java.base/java.util.zip.ZipFile$Source.zerror(ZipFile.java:1776)
@@ -311,7 +310,7 @@ with the deployment.
 [2024-08-09 03:55:26] [crit]     at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
 [2024-08-09 03:55:26] [crit]     at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:61)
 [2024-08-09 03:55:26] [crit]     at java.base/java.lang.Thread.run(Thread.java:829)
-[2024-08-09 03:55:26] [crit] Error deploying web application archive [/var/lib/tomcat9/webapps/openboxes.war]
+[2024-08-09 03:55:26] [crit] Error deploying web application archive [/opt/tomcat/webapps/openboxes.war]
 ```
 
 ## Unable to add the resource at [filename] to the cache for web application [/openboxes] ...
@@ -320,7 +319,7 @@ with the deployment.
 Unknown 
 
 ### Solution
-Unknown
+Ignore
 
 ### Stacktrace
 ```
@@ -505,3 +504,5 @@ Caused by: java.sql.SQLException: Java heap space
         at org.grails.orm.hibernate.GrailsHibernateTemplate.doExecute(GrailsHibernateTemplate.java:299)
         ... 40 common frames omitted
 ```
+
+

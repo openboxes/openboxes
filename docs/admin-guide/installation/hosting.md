@@ -1,5 +1,17 @@
 
+When deploying OpenBoxes, you can choose between cloud-based or on-premise hosting. Each option has its own advantages:
+
+- **Cloud Hosting**: Ideal for organizations that require scalability, remote access, and minimal infrastructure management. Cloud providers handle server maintenance, security, and backups, reducing IT overhead.
+- **On-Premise Hosting**: Suitable for organizations needing full control over their infrastructure, enhanced security, and compliance with strict data regulations. This option requires in-house IT expertise for maintenance and support.
+
+Consider factors such as cost, scalability, security, and IT capabilities when deciding the best hosting solution for your needs.
+
+
+## Cloud Hosting 
 Here are some popular cloud hosting providers where you can provision a virtual machine for OpenBoxes:
+
+!!! note
+    Please let us know if we missed any good hosting option.
 
 
 <div class="grid cards" markdown>
@@ -60,11 +72,6 @@ Here are some popular cloud hosting providers where you can provision a virtual 
 
 </div>
 
-
-
-
-
-
 [//]: # (NOTE: AWS has a free-tier that includes a free year of 750 hours per month for t2.micro EC2 instances &#40;as well as other )
 
 [//]: # (services&#41;. It's a great deal it if you're not going to be using OpenBoxes too heavily. Unfortunately, keeping a )
@@ -73,9 +80,6 @@ Here are some popular cloud hosting providers where you can provision a virtual 
 
 [//]: # (size and permgen memory allocated to Tomcat to something minimal &#40;see Installing Tomcat page&#41;.)
 
-
-!!! note
-    Please let us know if we missed a good hosting option.
 
 ## On-Premise
 Installing OpenBoxes on-premise requires a bit of work to install the appropriate Ubuntu version on a rack-mounted 
