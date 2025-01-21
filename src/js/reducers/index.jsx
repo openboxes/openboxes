@@ -4,6 +4,7 @@ import { combineReducers } from 'redux';
 import approversReducer from 'reducers/approversReducer';
 import connectionReducer from 'reducers/connectionReducer';
 import filterFormReducer from 'reducers/filterFormReducer';
+import inboundV2Reducer from 'reducers/InboundReducerV2';
 import indicatorsReducer from 'reducers/indicatorsReducer';
 import infoBarReducer from 'reducers/infoBarReducer';
 import infoBarVisibilityReducer from 'reducers/infoBarVisibilityReducer';
@@ -23,7 +24,6 @@ import stockMovementDraftReducer from 'reducers/stockMovementDraftReducer';
 import stockTransferReducer from 'reducers/stockTransferReducer';
 import unitOfMeasureReducer from 'reducers/unitOfMeasureReducer';
 import usersReducer from 'reducers/usersReducer';
-import inboundV2Reducer from 'reducers/InboundReducerV2';
 
 const rootReducer = combineReducers({
   localize: localizeReducer,
