@@ -23,6 +23,7 @@ import stockMovementDraftReducer from 'reducers/stockMovementDraftReducer';
 import stockTransferReducer from 'reducers/stockTransferReducer';
 import unitOfMeasureReducer from 'reducers/unitOfMeasureReducer';
 import usersReducer from 'reducers/usersReducer';
+import inboundV2Reducer from 'reducers/InboundReducerV2';
 
 const rootReducer = combineReducers({
   localize: localizeReducer,
@@ -48,6 +49,7 @@ const rootReducer = combineReducers({
   productSupplier: productSupplierReducer,
   unitOfMeasure: unitOfMeasureReducer,
   outboundImport: outboundImportReducer,
+  inboundV2: inboundV2Reducer,
 });
 
 export default rootReducer;
