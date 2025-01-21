@@ -74,7 +74,7 @@ export default {
       options: catalogs,
     }),
   },
-  abcClass: {
+  abcClasses: {
     type: FilterSelectField,
     attributes: {
       multi: true,
