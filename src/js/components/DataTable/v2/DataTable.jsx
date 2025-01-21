@@ -77,11 +77,9 @@ DataTable.propTypes = {
     id: PropTypes.string.isRequired,
     defaultMessage: PropTypes.string.isRequired,
   }),
-  // Setting data for sending requests with pagination
-  setOffset: PropTypes.func,
-  setPageSize: PropTypes.func,
   totalCount: PropTypes.number,
   filterParams: PropTypes.shape({}).isRequired,
+  paginationProps: PropTypes.shape({}).isRequired,
 };
 
 DataTable.defaultProps = {
@@ -89,7 +87,5 @@ DataTable.defaultProps = {
   loading: false,
   loadingMessage: null,
   emptyTableMessage: null,
-  setOffset: () => {},
   totalCount: 0,
-  setPageSize: () => {},
 };
