@@ -78,6 +78,10 @@ class StockMovementController {
         render(view: "/common/react", params: params)
     }
 
+    def createInboundV2() {
+        render(view: "/common/react", params: params)
+    }
+
     def createRequest() {
         render(view: "/common/react", params: params)
     }
