@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import queryString from 'query-string';
 import { useSelector } from 'react-redux';
@@ -79,44 +79,30 @@ const useCycleCountFilters = () => {
       categoryList,
       tagList,
       catalogList,
+      binList,
     ] = await Promise.all([
       fetchProductsCategories(),
       fetchProductsTags({ hideNumbers: true }),
       fetchProductsCatalogs({ hideNumbers: true }),
+      fetchBins(currentLocation?.id),
     ]);
 
     setSelectOptions({
       categories: categoryList,
       catalogs: catalogList,
       tags: tagList,
+      internalLocations: binList,
       abcClasses: [],
     });
 
     defaultValues.catalogs = setDefaultValue(queryProps.catalogs, catalogList);
     defaultValues.tags = setDefaultValue(queryProps.tags, tagList);
     defaultValues.categories = setDefaultValue(queryProps.categories, categoryList);
+    defaultValues.internalLocations = setDefaultValue(queryProps.internalLocations, binList);
 
     setDefaultFilterValues(defaultValues);
     setFiltersInitialized(true);
   };
-
-  const refetchBins = async () => {
-    if (currentLocation?.id) {
-      const binList = await fetchBins(currentLocation.id);
-      setSelectOptions((prev) => ({
-        ...prev,
-        internalLocations: binList,
-      }));
-      setDefaultFilterValues((prev) => ({
-        ...prev,
-        internalLocations: binList,
-      }));
-    }
-  };
-
-  useEffect(() => {
-    refetchBins();
-  }, [currentLocation]);
 
   useCommonFiltersCleaner({
     filtersInitialized,
