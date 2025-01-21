@@ -32,6 +32,11 @@ const AsyncStockMovementInbound = Loadable({
   loading: Loading,
 });
 
+const AsyncStockMovementInbound2 = Loadable({
+  loader: () => import('components/stock-movement-wizard/inboundV2/InboundV2'),
+  loading: Loading,
+});
+
 const AsyncStockMovementCombinedShipments = Loadable({
   loader: () => import('components/stock-movement-wizard/StockMovementCombinedShipments'),
   loading: Loading,
@@ -238,6 +243,7 @@ const Router = (props) => {
             <MainLayoutRoute path="**/inventory/cycleCount/reporting" component={AsyncCycleCountReporting} />
             <MainLayoutRoute path="**/inventory/cycleCount" component={AsyncCycleCount} />
             <MainLayoutRoute path="**/stockMovement/createInbound/:stockMovementId?" component={AsyncStockMovementInbound} />
+            <MainLayoutRoute path="**/stockMovement/createInboundV2/:stockMovementId?" component={AsyncStockMovementInbound2} />
             <MainLayoutRoute path="**/stockMovement/createCombinedShipments/:stockMovementId?" component={AsyncStockMovementCombinedShipments} />
             <MainLayoutRoute path="**/stockMovement/createRequest/:stockMovementId?" component={AsyncStockMovementRequest} />
             <MainLayoutRoute path="**/stockMovement/verifyRequest/:stockMovementId?" component={AsyncStockMovementVerifyRequest} />
