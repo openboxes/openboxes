@@ -45,6 +45,7 @@ const useTableDataV2 = ({
   }));
 
   const fetchData = () => {
+    sourceRef.current = CancelToken.source();
     const params = getParams({
       sortingParams: { sort, order },
     });
@@ -76,7 +77,6 @@ const useTableDataV2 = ({
     sort,
     order,
     searchTerm,
-    currentLocation?.id,
   ]);
 
   // Start displaying the loader in the table when
@@ -84,6 +84,12 @@ const useTableDataV2 = ({
   useEffect(() => {
     setLoading(true);
   }, []);
+
+  useEffect(() => () => {
+    if (currentLocation?.id) {
+      sourceRef.current.cancel('Fetching canceled');
+    }
+  }, [currentLocation?.id]);
 
   return {
     sourceRef,
