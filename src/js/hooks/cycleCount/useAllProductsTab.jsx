@@ -57,7 +57,6 @@ const useAllProductsTab = ({
     ...sortingParams,
     ...filterParams,
     searchTerm,
-    facility: currentLocation?.id,
     dateLastCount,
     categories: categories?.map?.(({ id }) => id),
     internalLocations: internalLocations?.map?.(({ name }) => name),
