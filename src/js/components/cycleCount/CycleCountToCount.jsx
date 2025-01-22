@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 
 import PropTypes from 'prop-types';
-import { RiCalculatorLine, RiDownload2Line } from 'react-icons/ri';
+import { RiCalculatorLine, RiDownload2Line, RiPrinterLine } from 'react-icons/ri';
 
 import DataTable from 'components/DataTable/v2/DataTable';
 import Button from 'components/form-elements/Button';
@@ -30,6 +30,8 @@ const CycleCountToCount = ({ filterParams }) => {
     emptyTableMessage,
     exportTableData,
     selectedCheckboxesAmount,
+    startCount,
+    printCountForm,
   } = useToCountTab({
     filterParams,
     offset,
@@ -51,10 +53,19 @@ const CycleCountToCount = ({ filterParams }) => {
         </span>
         <div className="d-flex m-2 gap-8">
           <Button
+            onClick={startCount}
             label="react.cycleCount.table.startCount.label"
             defaultLabel="Start count"
             variant="primary-outline"
             StartIcon={<RiCalculatorLine size={18} />}
+            disabled={!selectedCheckboxesAmount}
+          />
+          <Button
+            onClick={printCountForm}
+            defaultLabel="Print count form"
+            label="react.cycleCount.printCountForm.label"
+            variant="primary-outline"
+            StartIcon={<RiPrinterLine size={18} />}
             disabled={!selectedCheckboxesAmount}
           />
           <Button

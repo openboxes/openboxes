@@ -4,6 +4,7 @@ import { createColumnHelper } from '@tanstack/react-table';
 import _ from 'lodash';
 import { useSelector } from 'react-redux';
 
+import cycleCountApi from 'api/services/CycleCountApi';
 import { CYCLE_COUNT_CANDIDATES } from 'api/urls';
 import { TableCell } from 'components/DataTable';
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
@@ -80,6 +81,7 @@ const useToCountTab = ({
     selectHeaderCheckbox,
     selectedCheckboxesAmount,
     headerCheckboxProps,
+    checkedCheckboxes,
   } = useTableCheckboxes();
 
   const {
@@ -264,6 +266,25 @@ const useToCountTab = ({
     });
   };
 
+  const printCountForm = () => {
+    console.log('print count form pressed');
+  };
+
+  const startCount = async () => {
+    const payload = {
+      requests: checkedCheckboxes.map((productId) => ({
+        product: productId,
+      })),
+    };
+    spinner.show();
+    try {
+      // Mocked request for start counting
+      await cycleCountApi.startCount(payload, currentLocation?.id);
+    } finally {
+      spinner.hide();
+    }
+  };
+
   return {
     tableData,
     loading,
@@ -271,6 +292,8 @@ const useToCountTab = ({
     emptyTableMessage,
     exportTableData,
     selectedCheckboxesAmount,
+    startCount,
+    printCountForm,
   };
 };
 
