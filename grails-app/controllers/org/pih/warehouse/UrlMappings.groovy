@@ -130,11 +130,6 @@ class UrlMappings {
             action = [GET: "list"]
         }
 
-        "/api/facilities/$facilityId/products/classifications/options" {
-            controller = "productClassificationApi"
-            action = [GET: "options"]
-        }
-
         "/api/locations/locationTypes" {
             controller = { "locationApi" }
             action = [GET: "locationTypes"]

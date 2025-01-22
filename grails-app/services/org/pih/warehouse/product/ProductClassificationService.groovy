@@ -32,6 +32,7 @@ class ProductClassificationService {
      * Currently, classifications exist as plain strings under the "abcClass" column of the Product and InventoryLevel
      * tables. Until we move classifications to their own entity, we simply fetch all unique values from those columns.
      */
+    @Transactional(readOnly = true)
     List<ProductClassificationDto> list(String facilityId) {
         Location facility = Location.read(facilityId)
         if (!facility) {
