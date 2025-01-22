@@ -15,15 +15,13 @@ OpenBoxes is an open-source supply chain management system designed to manage su
 
     ---
 
-    
-
     [:octicons-arrow-right-24: Discover the Benefits](about/benefits.md)
 
     [:octicons-arrow-right-24: Explore the Features](about/features.md)
 
     [:octicons-arrow-right-24: Understand the Challenges](about/considerations.md)
 
-    [:octicons-arrow-right-24: Quickstart Guide](admin-guide/quickstart/index.md)
+    [:octicons-arrow-right-24: Quickstart Guide](admin-guide/quickstart/requirements.md)
 
 
 -   :material-cloud-upload-outline:{ .lg .middle } __Administrators__
