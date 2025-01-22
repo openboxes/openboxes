@@ -14,11 +14,11 @@ Now that your dependencies are up-to-date, it's time to update the application i
 
     #### 3. Remove existing deployment
 
-        sudo rm -rf /var/lib/tomcat9/webapps/openboxes*
+        sudo rm -rf /opt/tomcat/webapps/openboxes*
 
     #### 4. Copy WAR file to Tomcat webapps directory (NOTE: we need to change the name of the WAR file)
 
-        sudo cp openboxes.war /var/lib/tomcat9/webapps/openboxes.war
+        sudo cp openboxes.war /opt/tomcat/webapps/openboxes.war
 
 
 === "Using Tomcat Manager"

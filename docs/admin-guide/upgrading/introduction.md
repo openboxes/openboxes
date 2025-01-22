@@ -1,4 +1,7 @@
-# Upgrading
+---
+hide:
+  - toc
+---
 
 This guide documents the procedures for upgrading to a new version of OpenBoxes from an existing installation.
 
