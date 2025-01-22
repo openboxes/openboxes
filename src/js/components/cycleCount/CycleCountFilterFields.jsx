@@ -74,7 +74,7 @@ export default {
       options: catalogs,
     }),
   },
-  abcClass: {
+  abcClasses: {
     type: FilterSelectField,
     attributes: {
       multi: true,
@@ -85,6 +85,9 @@ export default {
       showLabelTooltip: true,
       closeMenuOnSelect: false,
     },
+    getDynamicAttr: ({ abcClasses }) => ({
+      options: abcClasses,
+    }),
   },
   negativeQuantity: {
     type: CheckboxField,

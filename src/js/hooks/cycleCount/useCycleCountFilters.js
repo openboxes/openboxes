@@ -9,6 +9,7 @@ import useCommonFiltersCleaner from 'hooks/list-pages/useCommonFiltersCleaner';
 import { getParamList, transformFilterParams } from 'utils/list-utils';
 import {
   fetchBins,
+  fetchProductClassifications,
   fetchProductsCatalogs,
   fetchProductsCategories,
   fetchProductsTags,
@@ -79,11 +80,13 @@ const useCycleCountFilters = () => {
       categoryList,
       tagList,
       catalogList,
+      classificationList,
       binList,
     ] = await Promise.all([
       fetchProductsCategories(),
       fetchProductsTags({ hideNumbers: true }),
       fetchProductsCatalogs({ hideNumbers: true }),
+      fetchProductClassifications(currentLocation?.id),
       fetchBins(currentLocation?.id),
     ]);
 
@@ -92,13 +95,14 @@ const useCycleCountFilters = () => {
       catalogs: catalogList,
       tags: tagList,
       internalLocations: binList,
-      abcClasses: [],
+      abcClasses: classificationList,
     });
 
     defaultValues.catalogs = setDefaultValue(queryProps.catalogs, catalogList);
     defaultValues.tags = setDefaultValue(queryProps.tags, tagList);
     defaultValues.categories = setDefaultValue(queryProps.categories, categoryList);
     defaultValues.internalLocations = setDefaultValue(queryProps.internalLocations, binList);
+    defaultValues.abcClasses = setDefaultValue(queryProps.abcClasses, classificationList);
 
     setDefaultFilterValues(defaultValues);
     setFiltersInitialized(true);
@@ -117,7 +121,7 @@ const useCycleCountFilters = () => {
       internalLocations: { name: 'internalLocations', accessor: 'id' },
       tags: { name: 'tags', accessor: 'id' },
       catalogs: { name: 'catalogs', accessor: 'id' },
-      abcClasses: { name: 'abcClasses' },
+      abcClasses: { name: 'abcClasses', accessor: 'id' },
       negativeQuantity: { name: 'negativeQuantity' },
       tab: { name: 'tab' },
     };

@@ -61,6 +61,10 @@ class CycleCountService {
                 usedAliases.add("tags")
                 "in"("tags.id", command.tags.collect { it.id })
             }
+            if (command.abcClasses) {
+                createProductAlias(delegate, usedAliases)
+                "in"("product.abcClass", command.abcClasses)
+            }
             if (command.sort) {
                 getCandidatesSortOrder(command.sort, command.order, delegate, usedAliases)
             }

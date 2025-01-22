@@ -44,6 +44,7 @@ const useAllProductsTab = ({
     internalLocations,
     tags,
     catalogs,
+    abcClasses,
     negativeQuantity,
     searchTerm,
   } = filterParams;
@@ -56,13 +57,12 @@ const useAllProductsTab = ({
     ...sortingParams,
     ...filterParams,
     searchTerm,
-    facility: currentLocation?.id,
     dateLastCount,
     categories: categories?.map?.(({ id }) => id),
     internalLocations: internalLocations?.map?.(({ name }) => name),
     tags: tags?.map?.(({ id }) => id),
     catalogs: catalogs?.map?.(({ id }) => id),
-    abcClass: [],
+    abcClasses: abcClasses?.map?.(({ id }) => id),
     negativeQuantity,
   }, (val) => {
     if (typeof val === 'boolean') {
