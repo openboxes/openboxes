@@ -1,9 +1,10 @@
 import { useState } from 'react';
 
 import queryString from 'query-string';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
+import { setShouldRebuildFilterParams } from 'actions';
 import cycleCountFilterFields from 'components/cycleCount/CycleCountFilterFields';
 import useCommonFiltersCleaner from 'hooks/list-pages/useCommonFiltersCleaner';
 import { getParamList, transformFilterParams } from 'utils/list-utils';
@@ -36,6 +37,8 @@ const useCycleCountFilters = () => {
     currentLocation: state.session.currentLocation,
   }));
 
+  const dispatch = useDispatch();
+
   const history = useHistory();
 
   const clearFilterValues = () => {
@@ -48,6 +51,11 @@ const useCycleCountFilters = () => {
     const queryFilterParams = queryString.stringify(transformedParams);
     const { pathname } = history.location;
     history.push({ pathname, search: queryFilterParams });
+  };
+
+  const resetForm = () => {
+    clearFilterValues();
+    dispatch(setShouldRebuildFilterParams(true));
   };
 
   const setDefaultValue = (queryPropsParam, elementsList) => {
@@ -138,6 +146,7 @@ const useCycleCountFilters = () => {
   return {
     defaultFilterValues,
     setFilterValues,
+    resetForm,
     filterParams,
     dateLastCount,
     negativeQuantity,

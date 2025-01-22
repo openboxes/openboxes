@@ -12,33 +12,21 @@ import 'components/DataTable/DataTable.scss';
 const DataTable = ({
   columns,
   data,
-  pageSize,
   footerComponent,
   loading,
   loadingMessage,
   emptyTableMessage,
-  setOffset,
-  setPageSize,
   totalCount,
   filterParams,
+  paginationProps,
 }) => {
   const {
     defaultEmptyTableMessage,
     defaultLoadingTableMessage,
-    canPrevious,
-    canNext,
-    pageSizeSelectOptions,
-    onPageSizeChange,
-    onPageChange,
     table,
-    pages,
-    pagination,
   } = useDataTable({
-    pageSize,
     columns,
     data,
-    setOffset,
-    setPageSize,
     totalCount,
     filterParams,
   });
@@ -61,14 +49,8 @@ const DataTable = ({
           />
           <DataTableFooter
             footerComponent={footerComponent}
-            pagination={pagination}
-            onPageChange={onPageChange}
-            onPageSizeChange={onPageSizeChange}
-            canPrevious={canPrevious}
-            canNext={canNext}
-            pages={pages}
-            pageSizeSelectOptions={pageSizeSelectOptions}
             totalData={totalCount}
+            {...paginationProps}
           />
         </div>
       </div>
@@ -85,7 +67,6 @@ DataTable.propTypes = {
   data: PropTypes.arrayOf(
     PropTypes.shape({}),
   ).isRequired,
-  pageSize: PropTypes.number,
   footerComponent: PropTypes.func,
   loading: PropTypes.bool,
   loadingMessage: PropTypes.shape({
@@ -96,11 +77,9 @@ DataTable.propTypes = {
     id: PropTypes.string.isRequired,
     defaultMessage: PropTypes.string.isRequired,
   }),
-  // Setting data for sending requests with pagination
-  setOffset: PropTypes.func,
-  setPageSize: PropTypes.func,
   totalCount: PropTypes.number,
   filterParams: PropTypes.shape({}).isRequired,
+  paginationProps: PropTypes.shape({}).isRequired,
 };
 
 DataTable.defaultProps = {
@@ -108,8 +87,5 @@ DataTable.defaultProps = {
   loading: false,
   loadingMessage: null,
   emptyTableMessage: null,
-  pageSize: 5,
-  setOffset: () => {},
   totalCount: 0,
-  setPageSize: () => {},
 };

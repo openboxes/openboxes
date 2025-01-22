@@ -26,39 +26,6 @@ const CycleCount = () => {
   const { switchTab } = useSwitchTabs({ defaultTab: ALL_PRODUCTS_TAB });
   useTranslation('cycleCount');
 
-  const tabs = {
-    [ALL_PRODUCTS_TAB]: {
-      label: {
-        id: 'react.cycleCount.allProducts.label',
-        defaultMessage: 'All products',
-      },
-      onClick: (tab) => switchTab(tab),
-    },
-    [TO_COUNT_TAB]: {
-      label: {
-        id: 'react.cycleCount.toCount.label',
-        defaultMessage: 'To count',
-      },
-      onClick: (tab) => switchTab(tab),
-    },
-    [TO_RESOLVE_TAB]: {
-      label: {
-        id: 'react.cycleCount.toResolve.label',
-        defaultMessage: 'To resolve',
-      },
-      onClick: (tab) => switchTab(tab),
-    },
-    [TO_APPROVE_TAB]: {
-      label: {
-        id: 'react.cycleCount.toApprove.label',
-        defaultMessage: 'To approve',
-      },
-      onClick: (tab) => switchTab(tab),
-    },
-  };
-
-  const { tab } = useQueryParams();
-
   const {
     defaultFilterValues,
     setFilterValues,
@@ -69,7 +36,41 @@ const CycleCount = () => {
     abcClasses,
     negativeQuantity,
     filterParams,
+    resetForm,
   } = useCycleCountFilters();
+
+  const tabs = {
+    [ALL_PRODUCTS_TAB]: {
+      label: {
+        id: 'react.cycleCount.allProducts.label',
+        defaultMessage: 'All products',
+      },
+      onClick: (tab) => switchTab(tab, resetForm),
+    },
+    [TO_COUNT_TAB]: {
+      label: {
+        id: 'react.cycleCount.toCount.label',
+        defaultMessage: 'To count',
+      },
+      onClick: (tab) => switchTab(tab, resetForm),
+    },
+    [TO_RESOLVE_TAB]: {
+      label: {
+        id: 'react.cycleCount.toResolve.label',
+        defaultMessage: 'To resolve',
+      },
+      onClick: (tab) => switchTab(tab, resetForm),
+    },
+    [TO_APPROVE_TAB]: {
+      label: {
+        id: 'react.cycleCount.toApprove.label',
+        defaultMessage: 'To approve',
+      },
+      onClick: (tab) => switchTab(tab, resetForm),
+    },
+  };
+
+  const { tab } = useQueryParams();
 
   return (
     <PageWrapper>
@@ -95,7 +96,11 @@ const CycleCount = () => {
           filterParams={filterParams}
         />
         )}
-        {tab === TO_COUNT_TAB && <CycleCountToCount />}
+        {tab === TO_COUNT_TAB && (
+        <CycleCountToCount
+          filterParams={filterParams}
+        />
+        )}
         {tab === TO_RESOLVE_TAB && <CycleCountToResolve />}
         {tab === TO_APPROVE_TAB && <CycleCountToApprove />}
       </div>

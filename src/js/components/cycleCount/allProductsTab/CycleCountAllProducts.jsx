@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 
 import PropTypes from 'prop-types';
 import { RiCalculatorLine, RiDownload2Line } from 'react-icons/ri';
@@ -7,28 +7,46 @@ import AllProductsTabFooter from 'components/cycleCount/allProductsTab/AllProduc
 import DataTable from 'components/DataTable/v2/DataTable';
 import Button from 'components/form-elements/Button';
 import useAllProductsTab from 'hooks/cycleCount/useAllProductsTab';
+import useTablePagination from 'hooks/useTablePagination';
 import useTranslate from 'hooks/useTranslate';
 
 const CycleCountAllProducts = ({
   filterParams,
   switchTab,
 }) => {
+  const totalCount = useRef(0);
+
+  const {
+    paginationProps,
+    offset,
+    pageSize,
+  } = useTablePagination({
+    defaultPageSize: 5,
+    totalCount: totalCount.current,
+    filterParams,
+  });
+
   const {
     columns,
     tableData,
     loading,
     emptyTableMessage,
     exportTableData,
-    setOffset,
-    setPageSize,
     selectedCheckboxesAmount,
     countSelected,
   } = useAllProductsTab({
     filterParams,
     switchTab,
+    offset,
+    pageSize,
   });
 
   const translate = useTranslate();
+
+  // Use effect to avoid circular dependency
+  useEffect(() => {
+    totalCount.current = tableData.totalCount;
+  }, [tableData.totalCount]);
 
   return (
     <div>
@@ -55,7 +73,6 @@ const CycleCountAllProducts = ({
             EndIcon={<RiDownload2Line />}
           />
         </div>
-
       </div>
       <DataTable
         columns={columns}
@@ -63,10 +80,9 @@ const CycleCountAllProducts = ({
         footerComponent={AllProductsTabFooter}
         emptyTableMessage={emptyTableMessage}
         loading={loading}
-        setOffset={setOffset}
-        setPageSize={setPageSize}
         totalCount={tableData.totalCount}
         filterParams={filterParams}
+        paginationProps={paginationProps}
       />
     </div>
   );
@@ -76,4 +92,5 @@ export default CycleCountAllProducts;
 
 CycleCountAllProducts.propTypes = {
   filterParams: PropTypes.shape({}).isRequired,
+  switchTab: PropTypes.func.isRequired,
 };
