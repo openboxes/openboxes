@@ -1,3 +1,8 @@
+---
+hide:
+  - toc
+---
+
 <style>
 .md-content img {
   border-width: 1px;
@@ -7,20 +12,11 @@
 </style>
 # User Guide
 
-## Resources
+## Community Resources
 
 <div class="grid cards" markdown>
 
--   :material-book-open-page-variant:{ .lg .middle } __Glossary__
-
-    ---
-
-    The glossary serves as a quick reference resource to help understand terminology used in
-    OpenBoxes that may be unfamiliar.
-
-    [![img_2.png](img_2.png)](glossary.md)
-
--   :material-head-lightbulb:{ .lg .middle } __Knowledge Base__
+-   :material-head-lightbulb:{ .lg .middle } __User Guide__
 
     ---
     
@@ -45,7 +41,7 @@
 
     Subscribe to our YouTube Channel! Or ... ya know ... don't. It's up to you.
 
-    [![img.png](../assets/img/youtube.png)](https://www.youtube.com/@openboxes)
+    [![img.png](../assets/img/youtube.png)](https://www.youtube.com/@openboxes){ width="500" }
 
 
 -   :material-presentation-play:{ .lg .middle } __Tutorials__
@@ -59,16 +55,3 @@
 </div>
 
 
-## Contributing
-If you would like to contribute to this User Guide, please refer to the 
-[Contributing](../developer-guide/contributing.md) section in the Developer Guide 
-as well as the [CONTRIBUTING.md](https://github.com/openboxes/openboxes/blob/develop/CONTRIBUTING.md)
-docs in our GitHub repository.
-
-If you would prefer to submit documentation updates as Word docs or collaborate with us
-using Google Docs, please share the docs or links with our Support Team [support@openboxes.com](mailto:support@openboxes.com).
-
-If you're impatient, not good at words & stuff, and would prefer to see User Guide completed pronto, 
-please feel free to light a fire under our documentation expert. The most effective way to do that 
-would be to shame him through any of the public support channels (i.e. Twitter, Slack, Google 
-Groups, highway billboards, etc). 

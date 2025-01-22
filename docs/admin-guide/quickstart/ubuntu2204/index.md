@@ -1,54 +1,61 @@
 
-# Quickstart on Ubuntu 22.04
+This guide provides step-by-step instructions to get you started quickly on Ubuntu 22.04.
 
-This guide provides a step-by-step introduction to get you started quickly.
 
-## Requirements
-* Operating System: You are running Ubuntu 22.04 or higher
-* Memory: You have at least 4 GB of RAM, preferably 8 GB
-* Disk Space: You have at least 25 GB of disk available
-
-!!! warning 
+!!! warning
 
     These quickstart instructions are not recommended for production 
-    environments. Please use the installation guide. 
+    environments. Please use the Installation Guide instead.
 
-## Instructions
+!!! danger
 
-### Step 1: Install dependencies
+    It recently came to our attention that at least one community member had encountered bugs using 
+    this Quickstart Guide. We assume there are other bugs as well. Therefore, we recommend not 
+    using this Quickstart Guide until we have a chance to investigate and fix these issues. 
 
-#### Update System Packages
+    * [https://community.openboxes.com/t/internal-server-error-cannot-get-property-inputstream-on-null-object](https://community.openboxes.com/t/internal-server-error-cannot-get-property-inputstream-on-null-object)
+    * [https://community.openboxes.com/t/import-templates-download-results-in-error](https://community.openboxes.com/t/import-templates-download-results-in-error)
+
+## Requirements
+* **Operating System**: You are running Ubuntu 22.04 or higher
+* **Memory**: You have at least 4 GB of RAM, preferably 8 GB
+* **Disk Space**: You have at least 25 GB of disk available
+
+
+## Step 1: Install dependencies
+
+### Update System Packages
 First, ensure that your system is up to date by running:
 ```shell
 sudo apt update
 sudo apt upgrade -y
 ```
 
-#### Install MySQL 8
+### Install MySQL 8
 ```shell
 sudo apt install mysql-server-8
 ```
 
-#### Install Java 8
+### Install Java 8
 ```shell
 sudo apt-get install openjdk-8-jdk
 ```
 
-### Step 2: Create Database
+## Step 2: Create Database
 
 
-#### Create Database
+### Create Database
 
 ```shell
 mysql -e 'create database openboxes default charset utf8'
 ```
 
-#### Create Database User
+### Create Database User
 ```shell
 mysql -e 'grant all on openboxes.* to openboxes@localhost identified by "openboxes"'
 ```
 
-### Step 3: Setup Environment 
+## Step 3: Configure Application 
 
 === "Use Defaults"
     If you don't touch anything, OpenBoxes will use the defaults provided within 
@@ -88,9 +95,9 @@ mysql -e 'grant all on openboxes.* to openboxes@localhost identified by "openbox
 
 
 
-### Step 4: Start Application 
+## Step 4: Start Application 
 
-#### Download WAR file
+### Download WAR file
 
 Download the stable release (production) or the daily snapshot (development).
 
@@ -108,7 +115,7 @@ Download the stable release (production) or the daily snapshot (development).
     [Download](https://bamboo-ci.pih-emr.org/browse/OPENBOXES-DS/latestSuccessful/artifact/G3JOB/Latest-WAR/openboxes.war)
 
 
-#### Execute WAR file 
+### Execute WAR file 
 ```shell
 java -jar openboxes.war
 ```

@@ -9,6 +9,20 @@ theme:
   language: en
   logo: assets/img/logo.svg
 #  favicon: assets/img/logo.ico
+  icon:
+    admonition:
+      note: octicons/tag-16
+      abstract: octicons/checklist-16
+      info: octicons/info-16
+      tip: octicons/squirrel-16
+      success: octicons/check-16
+      question: octicons/question-16
+      warning: octicons/alert-16
+      failure: octicons/x-circle-16
+      danger: octicons/zap-16
+      bug: octicons/bug-16
+      example: octicons/beaker-16
+      quote: octicons/quote-16
   palette:
     # Palette toggle for light mode
     - scheme: default
@@ -27,9 +41,9 @@ theme:
     - content.code.copy
     - content.code.select
     - header.autohide
-     - navigation.indexes
-#     - navigation.instant
-#     - navigation.instant.progress
+    #- navigation.indexes
+    #- navigation.instant
+    #- navigation.instant.progress
     - navigation.expand
     - navigation.footer
     - navigation.header
@@ -38,9 +52,10 @@ theme:
     - navigation.sections
     - navigation.tabs
     - navigation.top
-    - nativation.tracking
+    - navigation.tracking
     - search.suggest
     - search.highlight
+    - toc.follow
 use_directory_urls: true
 copyright: Copyright &copy; 2010-2024, OpenBoxes
 extra:
@@ -106,39 +121,53 @@ markdown_extensions:
       emoji_generator: !!python/name:material.extensions.emoji.to_svg
 nav:
 
-  - Home:
-    - index.md
+  - OpenBoxes:
+    - Home: index.md
     - Features: about/features.md
     - Benefits: about/benefits.md
     - Considerations: about/considerations.md
     - Release Notes: about/release-notes.md
 
+    # Other potential (Architecture, Scalability, Integration, Implementation Timeline, Security and Compliance)
+    #    - Use Cases: about/use-cases.md
+    #    - Case Studies: about/case-studies.md
+    #    - Cost Analysis: about/cost-analysis.md
+    #    - Alternatives: about/alternatives.md
+
+
   # Quickstart Guide
   - Quickstart:
-      - Requirements: admin-guide/quickstart/requirements.md
-      - Options:
-        - Ubuntu 22.04: admin-guide/quickstart/ubuntu2204/index.md
-        - Mac OS: admin-guide/quickstart/macos/index.md
-#       - Docker: admin-guide/quickstart/docker/
-#       - Windows: admin-guide/quickstart/windows/
+    - System Requirements: admin-guide/quickstart/requirements.md
+    - Quickstart on Ubuntu 22.04: admin-guide/quickstart/ubuntu2204/index.md
+    - Quickstart on Mac OS: admin-guide/quickstart/macos/index.md
+#      - Quickstart on Windows: admin-guide/quickstart/windows/
+#      - Docker: admin-guide/quickstart/docker/
 
   # Installation Guide
   # Need to add a discussion re: self-hosted on-premise vs cloud vs managed hosting
   - Install:
     - Introduction: admin-guide/installation/index.md
-    - Basic Instructions: admin-guide/installation/basic-instructions.md
     - Getting Started:
+      - Basic Instructions: admin-guide/installation/basic-instructions.md
       - System Requirements: admin-guide/installation/requirements.md
-      - Knowledge Requirements: admin-guide/installation/getting-started.md
-      - Hosting Providers: admin-guide/installation/hosting.md
-      #- Deployment Strategy: admin-guide/installation/deployment.md
-    - Installation:
+      - Knowledge Requirements: admin-guide/installation/knowledge-requirements.md
+      - Cloud vs On-Premise: admin-guide/installation/hosting.md
       - Provision Resources: admin-guide/hosting/provisioning.md
-      - Install Dependencies: admin-guide/installation/ubuntu2204/dependencies.md
-      - Create Database: admin-guide/installation/ubuntu2204/database.md
-      - Configure Basics: admin-guide/installation/ubuntu2204/configuration.md
+      #- Deployment Strategy: admin-guide/installation/deployment-strategies.md
+    - Installation:
+      - Update System: admin-guide/installation/ubuntu2204/dependencies.md
+      - Install Java: admin-guide/installation/ubuntu2204/java.md
+      - Install Tomcat: admin-guide/installation/ubuntu2204/tomcat.md
+      - Install MySQL: admin-guide/installation/ubuntu2204/mysql.md
+    - Configuration:
+      - Setup Database: admin-guide/installation/ubuntu2204/database.md
+      - Configure Application: admin-guide/installation/ubuntu2204/configuration.md
+      #- Configure Tomcat: admin-guide/installation/ubuntu2204/tomcat-configuration.md
+    - Deployment:
       - Deploy Application: admin-guide/installation/ubuntu2204/deployment.md
       - Verify Deployment: admin-guide/installation/ubuntu2204/verification.md
+    #- Onboarding:
+      #- Introduction:  admin-guide/installation/ubuntu2204/onboarding/index.md
       # Should delete this version of the deployment instructions
       #- Deploy Application: admin-guide/installation/ubuntu2204/application.md
     - Post-Deployment:
@@ -146,13 +175,13 @@ nav:
       - Configure Reverse Proxy: admin-guide/installation/ubuntu2204/reverse-proxy.md
       - Enable HTTPS: admin-guide/installation/ubuntu2204/https.md
       # Other post-deployment topics to document which should also go in Configuration Guide
-      #- Rotate Logs:
-      #- Tune Performance:
-      #- Secure Database:
-      #- Configure Tomcat:
-      #- Configure Database:
+        #- Rotate Logs:
+        #- Tune Performance:
+        #- Secure Database:
+        #- Configure Tomcat:
+        #- Configure Database:
     - Troubleshooting:
-      - admin-guide/installation/ubuntu2204/troubleshooting.md
+      - Known Issues: admin-guide/installation/ubuntu2204/troubleshooting.md
 
   # Configuration Guide - needs a lot of work
   - Configure:
@@ -179,47 +208,50 @@ nav:
 #       #- Lanugage:
 #     #- Data Model:
 
-
   # Upgrade Guide
   - Upgrade:
-    - Introduction: admin-guide/upgrading/introduction.md
-    - Plan:
-      - Upgrade Strategies:
-        - Overview: admin-guide/upgrading/plan/upgrade-strategies/overview.md
-        - Parallel Upgrade Overview: admin-guide/upgrading/plan/upgrade-strategies/parallel-upgrade-overview.md
-        - In-Place Upgrade Overview: admin-guide/upgrading/plan/upgrade-strategies/in-place-upgrade-overview.md
-      - Rollback Strategies:
-        - Overview: admin-guide/upgrading/plan/rollback-strategies/overview.md
-        - Backup Your Database: admin-guide/upgrading/plan/rollback-strategies/backup-database.md
-        - Backup Your Custom Configuration: admin-guide/upgrading/plan/rollback-strategies/backup-config.md
-    - Execute:
-      - Parallel Upgrade Guide:
-        - Introduction: admin-guide/upgrading/execute/parallel/introduction.md
-        - 1. Install The New Server: admin-guide/upgrading/execute/parallel/install-new-server.md
-        - 2. Copy Custom Config : admin-guide/upgrading/execute/parallel/copy-custom-config.md
-        - 3. Import Database Backup: admin-guide/upgrading/execute/parallel/import-database-backup.md
-        - 4. Start The New Server: admin-guide/upgrading/execute/parallel/start-server.md
-        - 5. Reimport Database Backup: admin-guide/upgrading/execute/parallel/reimport-database-backup.md
-        - 6. Route Requests To New Installation: admin-guide/upgrading/execute/parallel/reroute-requests.md
-        - 7. Deprovision Old Instance: admin-guide/upgrading/execute/parallel/deprovision-old-instance.md
-      - In-Place Upgrade Guide:
-        - Introduction: admin-guide/upgrading/execute/in-place/introduction.md
-        - 1. Upgrade Dependencies: admin-guide/upgrading/execute/in-place/upgrade-dependencies.md
-        - 2. Upgrade The App: admin-guide/upgrading/execute/in-place/upgrade-app.md
-        - 3. Start The Server: admin-guide/upgrading/execute/in-place/start-server.md
-        - 4. Remove Old Dependencies: admin-guide/upgrading/execute/in-place/remove-old-dependencies.md
+    - Introduction: admin-guide/upgrading/index.md
+    - Upgrading Ubuntu: admin-guide/upgrading/ubuntu.md
+    - Upgrading Tomcat: admin-guide/upgrading/tomcat.md
+    - Upgrading OpenBoxes:
+      - Minor version upgrade: admin-guide/upgrading/minor.md
+      - Major version upgrade: admin-guide/upgrading/major.md
+    - Migrating to a new server:
       - Version-Specific Upgrade Guide:
-          - Introduction: admin-guide/upgrading/execute/version-specific/index.md
-          - 0.8.x to 0.9.x:
-            - Introduction: admin-guide/upgrading/execute/version-specific/08x-to-09x/introduction.md
-            - Parallel Upgrade: admin-guide/upgrading/execute/version-specific/08x-to-09x/parallel.md
-            - In-Place Upgrade: admin-guide/upgrading/execute/version-specific/08x-to-09x/in-place.md
-    - Validate:
-      - Verifying An Upgrade: admin-guide/upgrading/validate/verifying-upgrade.md
-      - Known Issues: admin-guide/upgrading/validate/known-issues.md
-
-  # Onboarding Guide
-  - Onboarding: admin-guide/onboarding/index.md
+        - Introduction: admin-guide/upgrading/execute/version-specific/index.md
+        - 0.8.x to 0.9.x:
+          - Introduction: admin-guide/upgrading/execute/version-specific/08x-to-09x/introduction.md
+          - Parallel Upgrade: admin-guide/upgrading/execute/version-specific/08x-to-09x/parallel.md
+          - In-Place Upgrade: admin-guide/upgrading/execute/version-specific/08x-to-09x/in-place.md
+    - Migration Process:
+      - Plan:
+        - Upgrade Strategies:
+          - Overview: admin-guide/upgrading/plan/upgrade-strategies/overview.md
+          - Parallel Upgrade Overview: admin-guide/upgrading/plan/upgrade-strategies/parallel-upgrade-overview.md
+          - In-Place Upgrade Overview: admin-guide/upgrading/plan/upgrade-strategies/in-place-upgrade-overview.md
+        - Rollback Strategies:
+          - Overview: admin-guide/upgrading/plan/rollback-strategies/overview.md
+          - Backup Your Database: admin-guide/upgrading/plan/rollback-strategies/backup-database.md
+          - Backup Your Custom Configuration: admin-guide/upgrading/plan/rollback-strategies/backup-config.md
+      - Execute:
+        - Parallel Upgrade Guide:
+          - Introduction: admin-guide/upgrading/execute/parallel/introduction.md
+          - Install Server: admin-guide/upgrading/execute/parallel/install-new-server.md
+          - Copy Configuration : admin-guide/upgrading/execute/parallel/copy-custom-config.md
+          - Import Database: admin-guide/upgrading/execute/parallel/import-database-backup.md
+          - Start Application: admin-guide/upgrading/execute/parallel/start-server.md
+          - Reimport Database: admin-guide/upgrading/execute/parallel/reimport-database-backup.md
+          - Re-route Traffic: admin-guide/upgrading/execute/parallel/reroute-requests.md
+          - Deprovision Old Instance: admin-guide/upgrading/execute/parallel/deprovision-old-instance.md
+        - In-Place Upgrade Guide:
+          - Introduction: admin-guide/upgrading/execute/in-place/introduction.md
+          - Upgrade Dependencies: admin-guide/upgrading/execute/in-place/upgrade-dependencies.md
+          - Upgrade Application: admin-guide/upgrading/execute/in-place/upgrade-app.md
+          - Start Application: admin-guide/upgrading/execute/in-place/start-server.md
+          - Remove Dependencies: admin-guide/upgrading/execute/in-place/remove-old-dependencies.md
+      - Validate:
+        - Verifying Upgrade: admin-guide/upgrading/validate/verifying-upgrade.md
+        - Known Issues: admin-guide/upgrading/validate/known-issues.md
 
   # Developer Guide - needs a lot of work
 #  - Developer Guide:
@@ -246,16 +278,13 @@ nav:
 
 #     # Create a GH label to capture migration issues and link them here
 #     #- Troubleshooting
-  - Support: support/index.md
 
   # User Guide
   - User Guide:
-    - Introduction: user-guide/index.md
+    - Resources: user-guide/index.md
+    - Onboarding: user-guide/onboarding/index.md
+    - Contributing: user-guide/contributing.md
     - Glossary: user-guide/glossary.md
-    - Knowledge Base: user-guide/#knowledge-base
-    - Community Support: user-guide/#community-support
-    - YouTube Channel: user-guide/#youtube
-    - Tutorial Videos: user-guide/#tutorials
 
   # API Guide
   - API Guide:
@@ -294,3 +323,4 @@ nav:
       - Bulk Actions:
         - Create Resources: api-guide/generic/create-resources.md
         - Update Resources: api-guide/generic/update-resources.md
+  - Support: support/index.md

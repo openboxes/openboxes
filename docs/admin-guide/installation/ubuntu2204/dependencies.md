@@ -80,7 +80,7 @@ line in the welcome message when you SSH'd into the server.
 ```
 To reboot your server, execute the following command:
 ```shell
-sudo apt reboot
+sudo reboot
 ```
 
 !!! note 

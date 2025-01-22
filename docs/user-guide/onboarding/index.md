@@ -1,5 +1,7 @@
-
-# Onboarding
+---
+hide:
+  - toc
+---
 
 ## Basic Setup
 
