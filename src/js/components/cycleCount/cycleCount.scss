@@ -1,3 +1,12 @@
+@mixin
+limit-lines($lines-number) {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: $lines-number;
+  line-clamp: $lines-number;
+  -webkit-box-orient: vertical;
+}
+
 .all-products-tab-footer {
 
   p {
@@ -38,4 +47,8 @@
   font-weight: 400;
   color: var(--gray-600);
   font-size: 14px;
+}
+
+.limit-lines-2 {
+  @include limit-lines(2);
 }
