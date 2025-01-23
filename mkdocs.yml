@@ -186,13 +186,46 @@ nav:
   # Configuration Guide - needs a lot of work
   - Configure:
     - Introduction: admin-guide/configuration/index.md
-    - Configuration Files: admin-guide/configuration/configuration-files.md
-    - Configuration Properties:
-      - Database: admin-guide/configuration/database.md
-      - Application: admin-guide/configuration/application.md
-      - Hibernate: admin-guide/configuration/hibernate.md
-      - Email: admin-guide/configuration/email.md
-      - Sentry: admin-guide/configuration/sentry.md
+    - Concepts:
+      - Configuration Defaults: admin-guide/configuration/basics.md
+      - Configuration Locations: admin-guide/configuration/locations.md
+      - Configuration Overrides: admin-guide/configuration/overrides.md
+#      - Configuration Reloading: admin-guide/configuration/reloading.md
+    - Basic Settings:
+      - Data Source: admin-guide/configuration/database.md
+      - Outbound Mail: admin-guide/configuration/email.md
+#      - Server URL: admin-guide/configuration/server-url.md
+#     - Customization:
+#       - Application: admin-guide/configuration/application.md
+#       - Appearance: admin-guide/configuration/appearance.md
+#       - Feature Flags: admin-guide/configuration/feature-flags.md
+#       - File Uploads: admin-guide/configuration/uploads.md
+#       - Internationalization: admin-guide/configuration/i18n.md
+#       - Localization: admin-guide/configuration/localization.md
+#     - Integration:
+#       - Webhooks: admin-guide/configuration/webhooks.md
+#     - Load Balancer:
+#       - SSL/HTTPS: admin-guide/configuration/https.md
+#       - Proxy Server: admin-guide/configuration/ajp.md
+#     - Logging:
+#       - Logging: admin-guide/configuration/logging.md
+#       - Logrotate.d: admin-guide/configuration/logrotate.md
+#     - Security:
+#       - Access Control: admin-guide/configuration/access-control.md
+#       - CORS: admin-guide/configuration/cors.md
+#     - Observability:
+#       - Analytics: admin-guide/configuration/analytics.md
+#       - Health Check: admin-guide/configuration/health.md
+#       - Monitoring: admin-guide/configuration/apm.md
+#       - Sentry: admin-guide/configuration/sentry.md
+#     - Advanced:
+#       - Job Scheduling: admin-guide/configuration/job-scheduling.md
+#       - Hibernate: admin-guide/configuration/hibernate.md
+#       - Notifications: admin-guide/configuration/notifications.md
+#       - Performance: admin-guide/configuration/performance.md
+#       - Tomcat: admin-guide/configuration/tomcat.md
+#       - Recaptcha: admin-guide/configuration/recaptcha.md
+#       - Unattended Updates: admin-guide/configuration/unattended-updates.md
 #      - Monitoring:
 #      - Analytics:
 #      - Logrotate.d:

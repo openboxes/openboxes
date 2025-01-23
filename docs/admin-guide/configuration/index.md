@@ -1,278 +1,77 @@
 
-# Overview
+This guide provides detailed instructions for system administrators on configuring OpenBoxes 
+for deployment in a production environment. It covers the use of external configuration files, 
+system properties, and environment variables to ensure a secure and scalable deployment.
 
-* [ ] Configuration File Locations (legacy vs new)
-* [ ] Configuration File Precedence
-* [ ] Configuration File formats (yml, json, properties, groovy)
-* [ ] Override configuration locations using system variables 
-* [ ] Override configuration locations using environment variables
-* [ ] List all known configuration properties 
-* [ ] Link to other configuration property documentation (Grails, Hibernate, etc)
-* [ ] messages.properties?
-* [ ] Configure context path (/openboxes, /)
+The purpose of this guide is to assist system administrators in properly configuring OpenBoxes 
+for production use, ensuring the application is secure, reliable, and performs optimally.
 
-## Configuration Methods
+[//]: # (## Basic Settings)
 
-* Default Configuration 
+[//]: # (Set up and customize the structure of your documentation by configuring the header and footer to your taste, choosing among many modes of navigation, setting up site search, and more.)
 
-* External Config Files (recommended)
+[//]: # ()
+[//]: # (<div class="grid cards" markdown>)
 
-* System Variables (experimental)
+[//]: # ()
+[//]: # (- :fontawesome-solid-earth-americas: __[Language]__ – Choose out of the 60+ supported languages or add a new one)
 
-* Environment Variables (experimental)
+[//]: # (- :material-page-layout-sidebar-left: __[Navigation]__ – Create a clear, concise, and comprehensive navigation structure)
 
+[//]: # (- :material-page-layout-header: __[Header]__ – Customize the behavior of the header, add an announcement bar)
 
-## Configuration Properties
+[//]: # (- :material-page-layout-footer: __[Footer]__ – Add links to your social media profiles or websites in the footer)
 
-!!! todo
-    Should probably be a table but let's see if there are good overviews out there. 
+[//]: # (- :material-tab-search: __[Search]__ – Set up and configure search, running entirely in the user's browser)
 
+[//]: # (- :material-tag-plus-outline: __[Tags]__ – Categorize your pages with tags and group related pages)
 
+[//]: # ()
+[//]: # (</div>)
 
+[//]: # ()
+[//]: # (  [Language]: changing-the-language.md)
 
+[//]: # (  [Navigation]: setting-up-navigation.md)
 
-# Configuration Guide
-Below is a configuration guide for a Grails application, covering how to set configurations, an overview of configuration properties, and some common settings you might want to configure.
+[//]: # (  [Header]: setting-up-the-header.md)
 
-## Introduction
-This guide provides detailed instructions for system administrators on configuring OpenBoxes for deployment in a production environment. It covers the use of external configuration files, system properties, and environment variables to ensure a secure and scalable deployment.
+[//]: # (  [Footer]: setting-up-the-footer.md)
 
-The purpose of this guide is to assist system administrators in properly configuring OpenBoxes for production use, ensuring the application is secure, reliable, and performs optimally.
+[//]: # (  [Search]: setting-up-site-search.md)
 
-## Prerequisites
-- Familiarity with Grails and Groovy.
-- Access to the Grails application source code.
-- Basic understanding of application deployment environments.
+[//]: # (  [Tags]: setting-up-tags.md)
 
-## 2. Overview of Grails Configuration
+[//]: # ()
+[//]: # (## Appearance)
 
-Grails uses a configuration file called `application.yml` (formerly, Config.groovy) to manage application settings. These configurations include database connections, server settings, environment-specific configurations, and more.
+[//]: # ()
+[//]: # (Match your brand's colors, fonts, icons, logo, and more with a few lines of)
 
-### 2.1 Configuration Files
-- **`application.yml`**: The main configuration file located in the `grails-app/conf` directory.
-- **Environment-Specific Configurations**: You can define environment-specific configurations within the `application.yml` file or use separate configuration files such as `application-development.yml`, `application-production.yml`, etc.
+[//]: # (configuration – Material for MkDocs makes it easy to extend the basic)
 
-## 3. Setting Configuration Properties
+[//]: # (configuration or alter the appearance.)
 
-### 3.1 Editing `application.yml`
-The `application.yml` file uses a YAML format, which is hierarchical and structured by indentation.
+[//]: # ()
+[//]: # (<div class="grid cards" markdown>)
 
-**Example `application.yml` Structure:**
-```yaml
-grails:
-    profile: web
-    codegen:
-        defaultPackage: com.example
-    gorm:
-        failOnError: true
+[//]: # ()
+[//]: # (- :material-brush-variant: __[Colors]__ – Change colors with an existing color palette or customize with CSS)
 
-dataSource:
-    pooled: true
-    jmxExport: true
-    driverClassName: org.h2.Driver
-    username: sa
-    password: ''
-    dbCreate: update
-    url: jdbc:h2:mem:devDb;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE
+[//]: # (- :material-format-font: __[Fonts]__ – Choose among 1,000 Google Fonts or load self-hosted fonts)
 
-environments:
-    development:
-        grails:
-            serverURL: http://localhost:8080
-        dataSource:
-            dbCreate: create-drop
-            url: jdbc:h2:mem:devDb
+[//]: # (- :material-google-downasaur: __[Logo & Icons]__ – Change the logo, use any of the 8,000+ icons, or add new ones)
 
-    production:
-        grails:
-            serverURL: http://www.example.com
-        dataSource:
-            dbCreate: update
-            url: jdbc:mysql://localhost/prodDb
-            properties:
-                jmxEnabled: true
-                initialSize: 5
-                maxActive: 50
-                minIdle: 5
-                maxIdle: 25
-                maxWait: 10000
-                maxAge: 10 * 60000
-                timeBetweenEvictionRunsMillis: 5000
-                minEvictableIdleTimeMillis: 60000
-                validationQuery: SELECT 1
-```
+[//]: # (- :material-cards-variant: __[Social Cards]__ – Automatically create social media previews when sharing links)
 
-### 3.2 Configuring Properties
-To set a configuration property, define it under the relevant section in `application.yml`.
+[//]: # ()
+[//]: # (</div>)
 
-**Example: Setting the Server URL**
-```yaml
-grails:
-    serverURL: http://www.example.com
-```
+[//]: # ()
+[//]: # (  [Colors]: changing-the-colors.md)
 
-### 3.3 Environment-Specific Configuration
-Grails supports environment-specific configurations, which allows different settings for `development`, `test`, and `production`.
+[//]: # (  [Fonts]: changing-the-fonts.md)
 
-**Example: Environment-Specific Server URL**
-```yaml
-environments:
-    development:
-        grails:
-            serverURL: http://localhost:8080
+[//]: # (  [Logo & Icons]: changing-the-logo-and-icons.md)
 
-    production:
-        grails:
-            serverURL: http://www.example.com
-```
-
-## 4. Common Configuration Properties
-
-### 4.1 Database Configuration
-Configure the data source for different environments:
-```yaml
-dataSource:
-    driverClassName: org.postgresql.Driver
-    username: dbuser
-    password: dbpassword
-
-environments:
-    development:
-        dataSource:
-            dbCreate: update
-            url: jdbc:postgresql://localhost:5432/devDb
-
-    production:
-        dataSource:
-            dbCreate: update
-            url: jdbc:postgresql://localhost:5432/prodDb
-```
-
-### 4.2 Logging Configuration
-Grails uses Logback for logging. You can configure logging in `logback.groovy` or directly in `application.yml`.
-
-**Example: Basic Logging Configuration**
-```yaml
-logging:
-    level:
-        org:
-            springframework: INFO
-            grails: DEBUG
-```
-
-### 4.3 Mail Configuration
-Configure email settings for sending emails from the application.
-```yaml
-grails:
-    mail:
-        host: smtp.example.com
-        port: 587
-        username: your-email@example.com
-        password: your-email-password
-        props:
-            "mail.smtp.auth": "true"
-            "mail.smtp.starttls.enable": "true"
-```
-
-### 4.4 Security Configuration
-Configure security settings like password policies and authentication mechanisms.
-
-**Example: Spring Security Configuration**
-```yaml
-grails:
-    plugin:
-        springsecurity:
-            userLookup:
-                userDomainClassName: 'com.example.User'
-                authorityJoinClassName: 'com.example.UserRole'
-            authority:
-                className: 'com.example.Role'
-            password:
-                algorithm: bcrypt
-```
-
-### 4.5 GORM Configuration
-Configure Grails Object Relational Mapping (GORM) settings.
-```yaml
-grails:
-    gorm:
-        failOnError: true
-        default:
-            constraints:
-                '*'(nullable: true)
-```
-
-### 4.6 CORS Configuration
-To enable Cross-Origin Resource Sharing (CORS):
-```yaml
-grails:
-    cors:
-        enabled: true
-        mappings:
-            '/**':
-                allowedOrigins: '*'
-                allowedMethods: 'GET,POST,PUT,DELETE,OPTIONS'
-                allowedHeaders: '*'
-```
-
-### 4.7 Internationalization (i18n)
-Configure default language and message bundles:
-```yaml
-grails:
-    i18n:
-        defaultLocale: en
-        messageBundles:
-            - 'messages'
-```
-
-## 5. Advanced Configuration
-
-### 5.1 Externalized Configuration
-You can externalize configuration properties by placing them in an external file and loading them in `application.yml`.
-
-**Example: Externalizing Configurations**
-```yaml
-grails:
-    config:
-        locations:
-            - classpath:application-external.yml
-```
-
-### 5.2 Custom Configuration Properties
-You can define custom properties in `application.yml` and access them in your application.
-
-**Example: Custom Properties**
-```yaml
-app:
-    name: My Grails Application
-    version: 1.0.0
-```
-
-Accessing custom properties in Groovy:
-```groovy
-String appName = grailsApplication.config.app.name
-```
-
-## 6. Conclusion
-
-This guide provides a comprehensive overview of how to configure a Grails application, covering key properties and their configurations. By understanding and using these configurations, you can tailor the behavior of your Grails application to meet specific needs across different environments.
-
-For more detailed information, always refer to the [official Grails documentation](https://grails.org/documentation.html).
-
----
-
-This guide offers a basic structure for configuring common and advanced settings in a Grails application. Depending on your specific project, you can add more detailed configurations or tailor the examples to suit your needs.
-
-### Core
-* Data Source 
-* Application
-
-
-### Email
-
-
-### Scheduling
-
-### Performance
-
-### Monitoring 
+[//]: # (  [Social Cards]: setting-up-social-cards.md)
