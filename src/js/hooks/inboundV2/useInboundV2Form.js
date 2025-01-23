@@ -53,7 +53,6 @@ const useInboundV2Form = ({ next }) => {
       zodResolver(validationSchema(values))(values, context, options),
   });
 
-  // eslint-disable-next-line consistent-return
   const onSubmitStockMovementDetails = async (values) => {
     const formattedValues = {
       ...values,
