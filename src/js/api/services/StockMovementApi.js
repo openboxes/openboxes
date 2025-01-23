@@ -8,6 +8,8 @@ import RequisitionStatus from 'consts/requisitionStatus';
 import apiClient from 'utils/apiClient';
 
 export default {
+  createStockMovement: (payload) => apiClient.post('/api/stockMovements', payload),
+  updateStockMovement: (id, payload) => apiClient.post(`/api/stockMovements/${id}/updateRequisition`, payload),
   getStockMovements: (config) => apiClient.get(STOCK_MOVEMENT_API, config),
   deleteStockMovement: (id) => apiClient.delete(STOCK_MOVEMENT_BY_ID(id)),
   updateStatus: (id, status) => apiClient.post(STOCK_MOVEMENT_UPDATE_STATUS(id), { status }),
