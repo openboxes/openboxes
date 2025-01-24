@@ -18,7 +18,7 @@ import useTableSorting from 'hooks/useTableSorting';
 import useTranslate from 'hooks/useTranslate';
 import Badge from 'utils/Badge';
 import exportFileFromAPI from 'utils/file-download-util';
-import { mapStringToList } from 'utils/form-values-utils';
+import { mapStringToLimitedList } from 'utils/form-values-utils';
 import StatusIndicator from 'utils/StatusIndicator';
 
 const useToCountTab = ({
@@ -181,7 +181,7 @@ const useToCountTab = ({
         </TableHeaderCell>
       ),
       cell: ({ getValue }) => {
-        const binLocationList = mapStringToList(getValue(), ',');
+        const binLocationList = mapStringToLimitedList(getValue(), ',');
 
         return (
           <TableCell
