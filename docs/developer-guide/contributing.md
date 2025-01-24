@@ -15,7 +15,7 @@ Here are a few examples of areas we need a considerable amount of help.
 
 1. Find or create an issue for the feature or bug in [GitHub Issues.](https://github.com/openboxes/openboxes/issues)
 
-1. Fork the [openboxes/openboxes](https://github.com/openboxes/openboxes) GitHub repository. ![Fork Repo](../img/fork-repo.png)
+1. Fork the [openboxes/openboxes](https://github.com/openboxes/openboxes) GitHub repository. ![Fork Repo](../assets/img/fork-repo.png)
 
 1. Create a branch for your changes (create a `hotfix` for bugs if working off `master` or a `feature` branch for 
 features if working off `develop`). **NOTE:** The use of the `hotfix` or `develop` prefix will help us identify which 
