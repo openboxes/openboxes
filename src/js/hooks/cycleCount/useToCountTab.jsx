@@ -18,7 +18,7 @@ import useTableSorting from 'hooks/useTableSorting';
 import useTranslate from 'hooks/useTranslate';
 import Badge from 'utils/Badge';
 import exportFileFromAPI from 'utils/file-download-util';
-import { mapStringToList } from 'utils/form-values-utils';
+import { mapStringToLimitedList } from 'utils/form-values-utils';
 import StatusIndicator from 'utils/StatusIndicator';
 
 const useToCountTab = ({
@@ -155,7 +155,7 @@ const useToCountTab = ({
       ),
       cell: ({ getValue, row }) => (
         <TableCell
-          link={INVENTORY_ITEM_URL.showStockCard(row.original.product.productCode)}
+          link={INVENTORY_ITEM_URL.showStockCard(row.original.product.id)}
           className="rt-td multiline-cell"
         >
           {getValue()}
@@ -176,19 +176,27 @@ const useToCountTab = ({
     }),
     columnHelper.accessor('internalLocations', {
       header: () => (
-        <TableHeaderCell sortable columnId="internalLocations" {...sortableProps}>
+        <TableHeaderCell>
           {translate('react.cycleCount.table.binLocation.label', 'Bin Location')}
         </TableHeaderCell>
       ),
-      cell: ({ getValue }) => (
-        <TableCell
-          className="rt-td"
-          tooltip
-          tooltipLabel={getValue()}
-        >
-          {mapStringToList(getValue(), ',', 100).map((binLocationName) => <div>{binLocationName}</div>)}
-        </TableCell>
-      ),
+      cell: ({ getValue }) => {
+        const binLocationList = mapStringToLimitedList(getValue(), ',');
+
+        return (
+          <TableCell
+            className="rt-td"
+            tooltip
+            tooltipLabel={`${getValue()} (${binLocationList.length})`}
+          >
+            {binLocationList.map((binLocationName) => (
+              <div className="truncate-text" key={crypto.randomUUID()}>
+                {binLocationName}
+              </div>
+            ))}
+          </TableCell>
+        );
+      },
     }),
     columnHelper.accessor((row) =>
       row?.tags?.map?.((tag) => <Badge label={tag?.tag} variant="badge--purple" key={tag.id} />), {

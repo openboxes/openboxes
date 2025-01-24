@@ -91,5 +91,5 @@ export const omitEmptyValues = (values) => _.omitBy(values, (val) => {
   return _.isEmpty(val);
 });
 
-export const mapStringToList = (value, elementsSeparator, lengthLimit) =>
+export const mapStringToLimitedList = (value, elementsSeparator, lengthLimit) =>
   (value?.length > lengthLimit ? `${_.take(value, lengthLimit).join('')}...` : value)?.split(elementsSeparator);
