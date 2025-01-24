@@ -72,19 +72,19 @@ class PartialReceivingApiController {
                             a.receiptItem?.sortOrder <=> b.receiptItem?.sortOrder
         }.collect {
             [
-                    "Receipt item id" : it?.receiptItem?.id ?: "",
-                    "Shipment item id": it?.shipmentItem?.id ?: "",
-                    Code              : it?.shipmentItem?.product?.productCode ?: "",
-                    Name              : it?.shipmentItem?.product?.name ?: "",
-                    "Lot/Serial No."  : it?.lotNumber ?: "",
-                    "Expiration date" : it?.expirationDate?.format("MM/dd/yyyy") ?: "",
-                    "Bin Location"    : it?.binLocation ?: "",
-                    Recipient         : it?.recipient?.id ?: "",
-                    Shipped           : it?.quantityShipped ?: "",
-                    Received          : it?.quantityReceived ?: "",
-                    "To receive"      : it?.quantityRemaining ?: "",
-                    "Receiving now"   : it?.quantityReceiving ?: "",
-                    Comment           : it?.comment ?: ""
+                    "Receipt item id"        : it?.receiptItem?.id ?: "",
+                    "Shipment item id"       : it?.shipmentItem?.id ?: "",
+                    Code                     : it?.shipmentItem?.product?.productCode ?: "",
+                    Name                     : it?.shipmentItem?.product?.name ?: "",
+                    "Lot/Serial No."         : it?.lotNumber ?: "",
+                    "Expiration date"        : it?.expirationDate?.format("MM/dd/yyyy") ?: "",
+                    "Bin Location"           : it?.binLocation ?: "",
+                    Recipient                : it?.recipient?.id ?: "",
+                    "Shipped (each)"         : it?.quantityShipped ?: "",
+                    Received                 : it?.quantityReceived ?: "",
+                    "To receive"             : it?.quantityRemaining ?: "",
+                    "Receiving now (each)"   : it?.quantityReceiving ?: "",
+                    Comment                  : it?.comment ?: ""
             ]
         }
 

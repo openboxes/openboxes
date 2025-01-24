@@ -23,12 +23,11 @@ import Button from 'components/form-elements/Button';
 import PurchaseOrderStatus from 'components/purchaseOrder/PurchaseOrderStatus';
 import { ORDER_URL, PURCHASE_ORDER_URL } from 'consts/applicationUrls';
 import usePurchaseOrderListTableData from 'hooks/list-pages/purchase-order/usePurchaseOrderListTableData';
-import ActionDots from 'utils/ActionDots';
+import ContextMenu from 'utils/ContextMenu';
 import { findActions } from 'utils/list-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
-
 
 const PurchaseOrderListTable = ({
   supportedActivities,
@@ -51,8 +50,7 @@ const PurchaseOrderListTable = ({
     onFetchHandler,
   } = usePurchaseOrderListTableData(filterParams);
 
-
-  const getStatusTooltip = status => translate(
+  const getStatusTooltip = (status) => translate(
     `react.purchaseOrder.status.${status.toLowerCase()}.description.label`,
     status.toLowerCase(),
   );
@@ -108,7 +106,7 @@ const PurchaseOrderListTable = ({
       defaultLabel: 'Print order',
       leftIcon: <RiPrinterLine />,
       activityCode: ['PLACE_ORDER'],
-      onClick: id => printOrder(id),
+      onClick: (id) => printOrder(id),
     },
     {
       label: 'react.purchaseOrder.cancelOrder.label',
@@ -124,9 +122,9 @@ const PurchaseOrderListTable = ({
       minimumRequiredRole: 'Superuser',
       activityCode: ['PLACE_ORDER'],
       // Display for statuses > PENDING
-      statuses: allStatuses.filter(stat => stat.id !== 'PENDING')
-        .map(status => status.id),
-      onClick: id => rollbackHandler(id),
+      statuses: allStatuses.filter((stat) => stat.id !== 'PENDING')
+        .map((status) => status.id),
+      onClick: (id) => rollbackHandler(id),
     },
     {
       label: 'react.purchaseOrder.delete.label',
@@ -134,7 +132,7 @@ const PurchaseOrderListTable = ({
       leftIcon: <RiDeleteBinLine />,
       minimumRequiredRole: 'Assistant',
       variant: 'danger',
-      onClick: id => deleteHandler(id),
+      onClick: (id) => deleteHandler(id),
     },
   ], [allStatuses]);
 
@@ -149,16 +147,17 @@ const PurchaseOrderListTable = ({
         overflow: 'visible',
         zIndex: 1,
       },
-      Cell: row => (
-        <ActionDots
-          dropdownPlacement="right"
+      Cell: (row) => (
+        <ContextMenu
+          positions={['right']}
           dropdownClasses="action-dropdown-offset"
           actions={findActions(actions, row, {
             supportedActivities,
             highestRole,
           })}
           id={row.original.id}
-        />),
+        />
+      ),
     },
     {
       Header: <Translate id="react.purchaseOrder.column.status.label" defaultMessage="Status" />,
@@ -167,10 +166,11 @@ const PurchaseOrderListTable = ({
       headerClassName: 'header',
       fixed: 'left',
       width: 160,
-      Cell: row => (
+      Cell: (row) => (
         <TableCell {...row} tooltip tooltipLabel={getStatusTooltip(row.original.status)}>
           <PurchaseOrderStatus status={row.original.status} />
-        </TableCell>),
+        </TableCell>
+      ),
     },
     {
       Header: <Translate
@@ -180,7 +180,7 @@ const PurchaseOrderListTable = ({
       accessor: 'orderNumber',
       fixed: 'left',
       width: 150,
-      Cell: row => (
+      Cell: (row) => (
         <TableCell
           {...row}
           link={ORDER_URL.show(row.original.id)}
@@ -192,7 +192,7 @@ const PurchaseOrderListTable = ({
       accessor: 'name',
       fixed: 'left',
       minWidth: 250,
-      Cell: row => (
+      Cell: (row) => (
         <TableCell
           {...row}
           tooltip
@@ -204,7 +204,7 @@ const PurchaseOrderListTable = ({
       Header: <Translate id="react.purchaseOrder.column.supplier.label" defaultMessage="Supplier" />,
       accessor: 'origin',
       minWidth: 300,
-      Cell: row => <TableCell {...row} tooltip />,
+      Cell: (row) => <TableCell {...row} tooltip />,
     },
     {
       Header: <Translate
@@ -213,7 +213,7 @@ const PurchaseOrderListTable = ({
       />,
       accessor: 'destination',
       minWidth: 300,
-      Cell: row => <TableCell {...row} tooltip />,
+      Cell: (row) => <TableCell {...row} tooltip />,
     },
     {
       Header: <Translate
@@ -222,7 +222,7 @@ const PurchaseOrderListTable = ({
       />,
       accessor: 'paymentTerm',
       minWidth: 150,
-      Cell: row => <TableCell {...row} tooltip value={row.value?.name} />,
+      Cell: (row) => <TableCell {...row} tooltip value={row.value?.name} />,
     },
     {
       Header: <Translate
@@ -231,7 +231,7 @@ const PurchaseOrderListTable = ({
       />,
       accessor: 'dateOrdered',
       minWidth: 120,
-      Cell: row => <DateCell {...row} />,
+      Cell: (row) => <DateCell {...row} />,
     },
     {
       Header: <Translate
@@ -241,7 +241,7 @@ const PurchaseOrderListTable = ({
       accessor: 'orderedBy',
       headerClassName: 'text-left',
       minWidth: 150,
-      Cell: row => <TableCell {...row} tooltip />,
+      Cell: (row) => <TableCell {...row} tooltip />,
     },
     {
       Header: <Translate
@@ -313,7 +313,9 @@ const PurchaseOrderListTable = ({
         <span>
           <Translate id="react.purchaseOrder.listOrders.label" defaultMessage="List Orders" />
           &nbsp;
-          ({totalAmount()})
+          (
+          {totalAmount()}
+          )
         </span>
         <div className="btn-group">
           <Button
@@ -370,17 +372,16 @@ const PurchaseOrderListTable = ({
   );
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   supportedActivities: state.session.supportedActivities,
   highestRole: state.session.highestRole,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
   currencyCode: state.session.currencyCode,
   allStatuses: state.purchaseOrder.statuses,
-  locale: state.session.activeLanguage,
+  locale: state.session.activeLanguageTag,
 });
 
 export default connect(mapStateToProps)(PurchaseOrderListTable);
-
 
 PurchaseOrderListTable.propTypes = {
   filterParams: PropTypes.shape({}).isRequired,

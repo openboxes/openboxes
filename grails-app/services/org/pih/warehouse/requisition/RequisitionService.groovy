@@ -39,7 +39,7 @@ class RequisitionService {
 
     GrailsApplication grailsApplication
     AuthService authService
-    def identifierService
+    RequisitionIdentifierService requisitionIdentifierService
     def inventoryService
 
     def getRequisitionStatistics(Location destination, Location origin, User user) {
@@ -352,7 +352,7 @@ class RequisitionService {
      */
     def saveRequisition(Requisition requisition) {
         if (!requisition.requestNumber) {
-            requisition.requestNumber = identifierService.generateRequisitionIdentifier()
+            requisition.requestNumber = requisitionIdentifierService.generate(requisition)
         }
 
         def savedRequisition = requisition.save(flush: true)
@@ -402,7 +402,7 @@ class RequisitionService {
         if (!outboundTransaction) {
             // Create a new transaction
             outboundTransaction = new Transaction()
-            outboundTransaction.transactionNumber = inventoryService.generateTransactionNumber()
+            outboundTransaction.transactionNumber = inventoryService.generateTransactionNumber(outboundTransaction)
             outboundTransaction.transactionDate = new Date()
             outboundTransaction.requisition = requisition
             // requisition origin is where the requisition originated from (the destination of stock transfer)
@@ -478,7 +478,7 @@ class RequisitionService {
         try {
             requisition.properties = data
             if (!requisition.requestNumber) {
-                requisition.requestNumber = identifierService.generateRequisitionIdentifier()
+                requisition.requestNumber = requisitionIdentifierService.generate(requisition)
             }
             def requisitionItems = itemsData.collect { itemData ->
                 println "itemData: " + itemData
@@ -661,7 +661,7 @@ class RequisitionService {
                     eq("origin", origin)
                 }
                 not {
-                    'in'("status", [RequisitionStatus.ISSUED, RequisitionStatus.CANCELED])
+                    'in'("status", [RequisitionStatus.ISSUED, RequisitionStatus.CANCELED, RequisitionStatus.REJECTED])
                 }
             }
             eq("product", product)

@@ -1,12 +1,12 @@
 package org.pih.warehouse.jobs
 
 import grails.util.Holders
-import org.pih.warehouse.order.OrderService
+import org.pih.warehouse.order.OrderSummaryService
 import org.quartz.JobExecutionContext
 
 class RefreshOrderSummaryJob {
 
-    OrderService orderService
+    OrderSummaryService orderSummaryService
 
     static concurrent = false
 
@@ -21,7 +21,7 @@ class RefreshOrderSummaryJob {
         if (JobUtils.shouldExecute(RefreshOrderSummaryJob)) {
             def startTime = System.currentTimeMillis()
             log.info("Refreshing order summary: " + context.mergedJobDataMap)
-            orderService.refreshOrderSummary()
+            orderSummaryService.refreshOrderSummary()
             log.info "Finished refreshing order summary in " + (System.currentTimeMillis() - startTime) + " ms"
         }
     }

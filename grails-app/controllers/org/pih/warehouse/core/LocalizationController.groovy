@@ -11,6 +11,7 @@ package org.pih.warehouse.core
 
 import grails.gorm.transactions.Transactional
 import grails.validation.Validateable
+import org.pih.warehouse.LocalizationUtil
 import org.springframework.web.multipart.MultipartFile
 import java.nio.charset.Charset
 
@@ -154,9 +155,9 @@ class LocalizationController {
 
     def export() {
         log.info("Locale: " + session.user.locale)
-        Locale locale = params.locale ? new Locale(params.locale) : session.user.locale
-        def filename = locale.language == 'en' ? "messages.properties" : "messages_${locale.language}.properties"
-        def localizationInstanceList = Localization.findAllByLocale(locale.language)
+        Locale locale = params.locale ? LocalizationUtil.getLocale(params.locale) : session.user.locale
+        def filename = locale.language == 'en' ? "messages.properties" : "messages_${locale.toString()}.properties"
+        def localizationInstanceList = Localization.findAllByLocale(locale.toString())
         response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
         response.contentType = 'text/plain'
         String output = localizationInstanceList.sort { it.code }.collect {
@@ -181,9 +182,9 @@ class LocalizationController {
                 properties.stringPropertyNames().each { String property ->
                     String text = properties.getProperty(property)
                     log.info "Property " + property + " = " + text
-                    Localization localization = Localization.findByCodeAndLocale(property, command.locale.language)
+                    Localization localization = Localization.findByCodeAndLocale(property, command.locale.toString())
                     if (!localization) {
-                        localization = new Localization(code: property, locale: command.locale.language, text: text)
+                        localization = new Localization(code: property, locale: command.locale.toString(), text: text)
                     }
                     localization.text = text
                     localization.save()

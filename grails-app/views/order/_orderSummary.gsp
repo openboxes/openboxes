@@ -76,7 +76,7 @@
                         <td>
                             <g:link controller="inventoryItem" action="showStockCard"
                                     style="color: ${orderItem?.product?.color}"  params="['product.id':orderItem?.product?.id]">
-                                <format:product product="${orderItem?.product}"/>
+                                <format:displayNameWithColor product="${orderItem?.product}" productSupplier="${orderItem?.productSupplier}"  showTooltip="${true}" />
                                 <g:renderHandlingIcons product="${orderItem?.product}" />
                             </g:link>
                         </td>

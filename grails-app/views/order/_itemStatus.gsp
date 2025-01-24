@@ -1,3 +1,5 @@
+<%@ page import="org.pih.warehouse.core.Constants" %>
+
 <div id="tab-content" class="box">
     <h2>
         <warehouse:message code="order.itemStatus.label" default="Item Status"/>
@@ -54,7 +56,7 @@
                 <td class="order-item-product">
                     <g:if test="${orderItem?.product }">
                         <g:link controller="inventoryItem" action="showStockCard" params="['product.id':orderItem?.product?.id]">
-                            <format:product product="${orderItem?.product}"/>
+                            <format:displayName product="${orderItem?.product}" productSupplier="${orderItem?.productSupplier}" showTooltip="${true}" />
                             <g:renderHandlingIcons product="${orderItem?.product}" />
                         </g:link>
                     </g:if>
@@ -76,7 +78,7 @@
                         ${orderItem?.quantityReceived}
                     </td>
                     <td class="right">
-                        ${orderItem?.quantityInvoicedInStandardUom}
+                        ${orderItem?.postedQuantityInvoiced}
                     </td>
                     <td class="">
                         <g:formatNumber number="${orderItem?.unitPrice?:0}" />
@@ -92,7 +94,10 @@
                         ${orderItem?.inventoryItem?.lotNumber}
                     </td>
                     <td>
-                        <g:formatDate date="${orderItem?.inventoryItem?.expirationDate}" format="MM/dd/yyyy"/>
+                        <g:formatDate
+                                date="${orderItem?.inventoryItem?.expirationDate}"
+                                format="${Constants.DEFAULT_MONTH_YEAR_DATE_FORMAT}"
+                        />
                     </td>
                     <td>
                         ${orderItem?.originBinLocation}

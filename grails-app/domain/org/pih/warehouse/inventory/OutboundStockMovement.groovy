@@ -6,7 +6,6 @@ import org.pih.warehouse.api.StockMovementType
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
-import org.pih.warehouse.core.Role
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
 import org.pih.warehouse.order.Order
@@ -20,6 +19,8 @@ import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.shipping.ShipmentStatusCode
 import org.pih.warehouse.shipping.ShipmentType
+import org.pih.warehouse.api.StockMovementStatusContext
+import util.StockMovementStatusResolver
 
 class OutboundStockMovement implements Serializable, Validateable {
 
@@ -89,7 +90,8 @@ class OutboundStockMovement implements Serializable, Validateable {
             "pending",
             "electronicType",
             "approvers",
-            "pendingApproval"
+            "pendingApproval",
+            "isReturn"
     ]
 
     static mapping = {
@@ -228,6 +230,19 @@ class OutboundStockMovement implements Serializable, Validateable {
         return shipment?.currentStatus == ShipmentStatusCode.RECEIVED
     }
 
+    @Deprecated
+    Map<String, String> getDisplayStatus() {
+        StockMovementStatusContext stockMovementContext = new StockMovementStatusContext(
+                order: order,
+                requisition: requisition,
+                shipment: shipment,
+                origin: origin,
+                destination: destination
+        )
+        Enum status = StockMovementStatusResolver.getStatus(stockMovementContext)
+        return StockMovementStatusResolver.getStatusMetaData(status)
+    }
+
     Boolean isDeleteOrRollbackAuthorized(Location currentLocation) {
         Location origin = requisition?.origin?:shipment?.origin
         Location destination = requisition?.destination?:shipment?.destination
@@ -323,5 +338,10 @@ class OutboundStockMovement implements Serializable, Validateable {
     Boolean isApprovalRequired() {
         // The requisition status has to be lower than PICKING (so comparing them will return -1)
         return requisition?.approvalRequired && origin?.approvalRequired && RequisitionStatus.compare(requisition.status, RequisitionStatus.PICKING) == -1
+    }
+
+    // This has to be named with the get prefix to align with the StockMovement DTO
+    boolean getIsReturn() {
+        return shipment?.isFromReturnOrder
     }
 }

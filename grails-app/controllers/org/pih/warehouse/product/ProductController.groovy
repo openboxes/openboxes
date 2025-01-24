@@ -18,6 +18,7 @@ import grails.web.context.ServletContextHolder
 import org.apache.commons.io.FilenameUtils
 import org.hibernate.Criteria
 import org.pih.warehouse.core.Document
+import org.pih.warehouse.core.DocumentType
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.MailService
 import org.pih.warehouse.core.ProductPrice
@@ -179,7 +180,7 @@ class ProductController {
         // when the session is closed.
         if (!productInstance?.id || productInstance.validate()) {
             if (!productInstance.productCode) {
-                productInstance.productCode = productService.generateProductIdentifier(productInstance.productType)
+                productInstance.productCode = productService.generateProductIdentifier(productInstance)
             }
         }
 
@@ -269,7 +270,7 @@ class ProductController {
                 // when the session is closed.
                 if (productInstance.validate()) {
                     if (!productInstance.productCode) {
-                        productInstance.productCode = productService.generateProductIdentifier(productInstance.productType)
+                        productInstance.productCode = productService.generateProductIdentifier(productInstance)
                     }
                 }
 
@@ -1120,7 +1121,9 @@ class ProductController {
 
     def addDocument() {
         Product productInstance = Product.get(params.id)
-        def documentInstance = Document.get(params?.document?.id)
+        Document documentInstance = Document.get(params?.document?.id)
+        List<DocumentType> documentTypes = documentService.getNonTemplateDocumentTypes()
+
         if (!documentInstance) {
             documentInstance = new Document()
         }
@@ -1128,7 +1131,11 @@ class ProductController {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'product.label', default: 'Product'), params.id])}"
             redirect(action: "list")
         }
-        render(view: "addDocument", model: [productInstance: productInstance, documentInstance: documentInstance])
+        render(view: "addDocument", model: [
+                productInstance: productInstance,
+                documentInstance: documentInstance,
+                documentTypes: documentTypes
+        ])
     }
 
     def importProductSynonyms(ImportDataCommand command) {
@@ -1174,9 +1181,16 @@ class ProductController {
     }
 
     def showMergeProductDialog() {
-        // TODO: ADD WARNING IF PRODUCT HAS PENDING ORDER/SHIPMENT/RECEIPT/whatever
         Product primaryProduct = Product.get(params.primaryProduct)
-        render(template: params.template, model: [ primaryProduct: primaryProduct ])
+        List<Location> locationsWithPendingTransactions = productMergeService
+                .getLocationsWithPendingTransactions(primaryProduct)
+        render(
+                template: params.template,
+                model: [
+                        primaryProduct: primaryProduct,
+                        locationsWithPendingTransactions: locationsWithPendingTransactions,
+                ]
+        )
     }
 
     def merge() {

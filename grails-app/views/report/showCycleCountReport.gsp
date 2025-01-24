@@ -14,7 +14,7 @@
 <body>
 <div class="body">
     <g:if test="${flash.message}">
-        <div class="message">${flash.message}</div>
+        <div class="message" role="status" aria-label="message">${flash.message}</div>
     </g:if>
     <div class="button-bar">
         <g:link controller="dashboard" action="index" class="button"><g:message code="default.button.backTo.label" args="['Dashboard']"/></g:link>

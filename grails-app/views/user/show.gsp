@@ -13,7 +13,7 @@
 
 
         <g:if test="${flash.message}">
-            <div class="message">${flash.message}</div>
+            <div class="message" role="status" aria-label="message">${flash.message}</div>
         </g:if>
 
         <div class="dialog">
@@ -45,7 +45,7 @@
 							<td valign="top" class="name"><label><warehouse:message
 									code="user.email.label" /></label></td>
 							<td valign="top" class="value">
-								${fieldValue(bean: userInstance, field: "email")}								
+								${fieldValue(bean: userInstance, field: "email")}
 							</td>
 						</tr>
 						<tr class="prop">

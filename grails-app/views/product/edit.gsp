@@ -22,23 +22,23 @@
     <body>
         <div class="body">
             <g:if test="${flash.message}">
-            	<div class="message">${flash.message}</div>
+            	<div class="message" role="status" aria-label="message">${flash.message}</div>
             </g:if>
             <g:if test="${flash.error}">
-                <div class="errors">${flash.error}</div>
+                <div class="errors" role="alert" aria-label="error-message">${flash.error}</div>
             </g:if>
             <g:if test="${flash.errors}">
-                <div class="errors">
+                <div class="errors" role="alert" aria-label="error-message">
                     <g:renderErrors bean="${flash.errors}" as="list" />
                 </div>
             </g:if>
             <g:hasErrors bean="${productInstance}">
-	            <div class="errors">
+	            <div class="errors" role="alert" aria-label="error-message">
 	                <g:renderErrors bean="${productInstance}" as="list" />
 	            </div>
             </g:hasErrors>
             <g:hasErrors bean="${packageInstance}">
-                <div class="errors">
+                <div class="errors" role="alert" aria-label="error-message">
                     <g:renderErrors bean="${packageInstance}" as="list" />
                 </div>
             </g:hasErrors>

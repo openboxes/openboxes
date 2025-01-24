@@ -11,21 +11,21 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 
 import { hideSpinner, showSpinner } from 'actions';
-import { STOCKLIST_API } from 'api/urls';
 import userApi from 'api/services/UserApi';
+import { STOCKLIST_API } from 'api/urls';
 import DateField from 'components/form-elements/DateField';
 import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
 import ActivityCode from 'consts/activityCode';
-import RoleType from 'consts/roleType';
 import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
+import DateFormat from 'consts/dateFormat';
+import RoleType from 'consts/roleType';
 import apiClient from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import { debounceLocationsFetch, debouncePeopleFetch } from 'utils/option-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
-
 
 function validate(values) {
   const errors = {};
@@ -78,9 +78,9 @@ const DEFAULT_FIELDS = {
       cache: false,
       options: [],
       disabled: true,
-      filterOptions: options => options,
+      filterOptions: (options) => options,
     },
-    getDynamicAttr: props => ({
+    getDynamicAttr: (props) => ({
       loadOptions: props.debouncedLocationsFetch,
       onChange: (value) => {
         if (value && props.origin && props.origin.id) {
@@ -101,9 +101,9 @@ const DEFAULT_FIELDS = {
       autoload: false,
       cache: false,
       options: [],
-      filterOptions: options => options,
+      filterOptions: (options) => options,
     },
-    getDynamicAttr: props => ({
+    getDynamicAttr: (props) => ({
       loadOptions: props.debouncedLocationsFetch,
       onChange: (value) => {
         if (value && props.destination && props.destination.id) {
@@ -132,9 +132,9 @@ const DEFAULT_FIELDS = {
       cache: false,
       options: [],
       labelKey: 'name',
-      filterOptions: options => options,
+      filterOptions: (options) => options,
     },
-    getDynamicAttr: props => ({
+    getDynamicAttr: (props) => ({
       loadOptions: props.debouncedPeopleFetch,
     }),
   },
@@ -144,7 +144,8 @@ const DEFAULT_FIELDS = {
     defaultMessage: 'Date requested',
     attributes: {
       required: true,
-      dateFormat: 'MM/DD/YYYY',
+      localizeDate: true,
+      localizedDateFormat: DateFormat.COMMON,
       autoComplete: 'off',
     },
   },
@@ -181,6 +182,17 @@ const DEFAULT_FIELDS = {
       },
     }),
   },
+  dateDeliveryRequested: {
+    label: 'react.stockMovement.desiredDateOfDelivery',
+    defaultMessage: 'Desired date of delivery',
+    type: DateField,
+    attributes: {
+      localizeDate: true,
+      localizedDateFormat: DateFormat.COMMON,
+      dateFormat: null,
+      autoComplete: 'off',
+    },
+  },
 };
 
 const APPROVER_FIELDS = {
@@ -195,12 +207,11 @@ const APPROVER_FIELDS = {
       labelKey: 'name',
     },
     type: SelectField,
-    getDynamicAttr: props => ({
+    getDynamicAttr: (props) => ({
       options: props.availableApprovers,
     }),
   },
 };
-
 
 const ELECTRONIC = 'ELECTRONIC';
 
@@ -221,11 +232,12 @@ class CreateStockMovement extends Component {
     this.fetchAvailableApprovers = this.fetchAvailableApprovers.bind(this);
     this.setSupportsApprover = this.setSupportsApprover.bind(this);
 
-    this.debouncedPeopleFetch =
-      debouncePeopleFetch(this.props.debounceTime, this.props.minSearchLength);
+    this.debouncedPeopleFetch = debouncePeopleFetch(
+      this.props.debounceTime,
+      this.props.minSearchLength,
+    );
 
-    this.debouncedLocationsFetch =
-      debounceLocationsFetch(this.props.debounceTime, this.props.minSearchLength, ['FULFILL_REQUEST']);
+    this.debouncedLocationsFetch = debounceLocationsFetch(this.props.debounceTime, this.props.minSearchLength, ['FULFILL_REQUEST']);
   }
 
   componentDidMount() {
@@ -251,7 +263,8 @@ class CreateStockMovement extends Component {
   }
 
   setRequestType(values, stocklist) {
-    const requestType = _.find(this.state.requestTypes, type => type.id === 'STOCK');
+    const { requestTypes } = this.state;
+    const requestType = _.find(requestTypes, (type) => type.id === 'STOCK');
 
     this.setState({
       values: update(values, {
@@ -307,7 +320,7 @@ class CreateStockMovement extends Component {
       params: { roleTypes: RoleType.ROLE_REQUISITION_APPROVER, location: locationId },
     })
       .then((response) => {
-        const options = response.data.data?.map(user => ({
+        const options = response.data.data?.map((user) => ({
           id: user.id,
           value: user.id,
           label: user.name,
@@ -326,11 +339,11 @@ class CreateStockMovement extends Component {
     const originLocs = newValues.origin && origin;
     const isOldSupplier = origin && origin.type === 'SUPPLIER';
     const isNewSupplier = newValues.origin && newValues.type === 'SUPPLIER';
-    const checkOrigin = originLocs && (!isOldSupplier || (isOldSupplier && !isNewSupplier)) ?
-      newValues.origin.id !== origin.id : false;
+    const checkOrigin = originLocs && (!isOldSupplier || (isOldSupplier && !isNewSupplier))
+      ? newValues.origin.id !== origin.id : false;
 
-    const checkDest = stocklist && newValues.destination && destination ?
-      newValues.destination.id !== destination.id : false;
+    const checkDest = stocklist && newValues.destination && destination
+      ? newValues.destination.id !== destination.id : false;
     const checkStockList = newValues.stockMovementId ? _.get(newValues.stocklist, 'id', null) !== _.get(stocklist, 'id', null) : false;
 
     return (checkOrigin || checkDest || checkStockList);
@@ -352,13 +365,13 @@ class CreateStockMovement extends Component {
       },
     })
       .then((response) => {
-        const stocklists = _.map(response.data.data, stocklist => (
+        const stocklists = _.map(response.data.data, (stocklist) => (
           {
             id: stocklist.id, name: stocklist.name, value: stocklist.id, label: stocklist.name,
           }
         ));
 
-        const stocklistChanged = !_.find(stocklists, item => item.value.id === _.get(this.state.values, 'stocklist'));
+        const stocklistChanged = !_.find(stocklists, (item) => item.value.id === _.get(this.state.values, 'stocklist'));
 
         if (stocklistChanged && clearStocklist) {
           clearStocklist();
@@ -369,15 +382,14 @@ class CreateStockMovement extends Component {
       .catch(() => this.props.hideSpinner());
   }
 
-
   /**
    * Creates or updates stock movement with given data
    * @param {object} values
    * @public
    */
   saveStockMovement(values) {
-    if (values.origin && values.destination && values.requestedBy &&
-      values.dateRequested && values.description) {
+    if (values.origin && values.destination && values.requestedBy
+      && values.dateRequested && values.description) {
       this.props.showSpinner();
 
       let stockMovementUrl = '';
@@ -397,7 +409,10 @@ class CreateStockMovement extends Component {
         stocklist: { id: _.get(values.stocklist, 'id', '') },
         requestType: values.requestType.id,
         sourceType: ELECTRONIC,
-        approvers: values.approvers?.map(user => user.id),
+        approvers: values.approvers?.map((user) => user.id),
+        dateDeliveryRequested: values.dateDeliveryRequested
+          ? moment(values.dateDeliveryRequested).format('MM/DD/YYYY')
+          : null,
       };
 
       apiClient.post(stockMovementUrl, payload)
@@ -460,11 +475,12 @@ class CreateStockMovement extends Component {
       });
     }
   }
+
   render() {
     const FIELDS = this.state.supportsApprover ? APPROVER_FIELDS : DEFAULT_FIELDS;
     return (
       <Form
-        onSubmit={values => this.nextPage(values)}
+        onSubmit={(values) => this.nextPage(values)}
         validate={validate}
         initialValues={this.state.values}
         mutators={{
@@ -480,34 +496,34 @@ class CreateStockMovement extends Component {
           <form onSubmit={handleSubmit}>
             <div className="classic-form with-description">
               {_.map(
-              FIELDS,
-              (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
-                stocklists: this.state.stocklists,
-                fetchStockLists: (origin, destination) =>
-                  this.fetchStockLists(origin, destination, mutators.clearStocklist),
-                fetchAvailableApprovers: (locationId) => {
-                  this.fetchAvailableApprovers(locationId).then((resp) => {
+                FIELDS,
+                (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
+                  stocklists: this.state.stocklists,
+                  fetchStockLists: (origin, destination) =>
+                    this.fetchStockLists(origin, destination, mutators.clearStocklist),
+                  fetchAvailableApprovers: (locationId) => {
+                    this.fetchAvailableApprovers(locationId).then((resp) => {
                     // if there is only one available approver to choose from
                     // then preselect this options by default
-                    if (resp?.length === 1) {
-                      mutators.setApproversValues(resp);
-                    } else {
-                      mutators.setApproversValues([]);
-                    }
-                  });
-                },
-                setSupportsApprover: this.setSupportsApprover,
-                origin: values.origin,
-                destination: values.destination,
-                isSuperuser: this.props.isSuperuser,
-                debouncedPeopleFetch: this.debouncedPeopleFetch,
-                debouncedLocationsFetch: this.debouncedLocationsFetch,
-                requestTypes: this.state.requestTypes,
-                setRequestType: this.setRequestType,
-                availableApprovers: this.state.availableApprovers,
-                values,
-              }),
-            )}
+                      if (resp?.length === 1) {
+                        mutators.setApproversValues(resp);
+                      } else {
+                        mutators.setApproversValues([]);
+                      }
+                    });
+                  },
+                  setSupportsApprover: this.setSupportsApprover,
+                  origin: values.origin,
+                  destination: values.destination,
+                  isSuperuser: this.props.isSuperuser,
+                  debouncedPeopleFetch: this.debouncedPeopleFetch,
+                  debouncedLocationsFetch: this.debouncedLocationsFetch,
+                  requestTypes: this.state.requestTypes,
+                  setRequestType: this.setRequestType,
+                  availableApprovers: this.state.availableApprovers,
+                  values,
+                }),
+              )}
             </div>
             <div className="submit-buttons">
               <button type="submit" className="btn btn-outline-primary float-right btn-xs">
@@ -521,7 +537,7 @@ class CreateStockMovement extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   location: state.session.currentLocation,
   isSuperuser: state.session.isSuperuser,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),

@@ -56,3 +56,58 @@
 .product-supplier-buttons-container {
   height: 100px;
 }
+
+.text-blue-primary {
+  color: var(--blue-primary);
+}
+
+.text-blue-400 {
+  color: var(--blue-400);
+}
+
+.context-menu {
+  background-color: white;
+  box-shadow: 0 0 4px 1px rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+
+  .dropdown-item {
+    color: var(--blue-700) !important;;
+
+    &:hover {
+      background-color: var(--blue-300) !important;
+    }
+  }
+
+  .font-red-ob {
+    color: var(--color-red) !important;
+  }
+}
+
+.react-tiny-popover-container {
+  z-index: 999;
+}
+
+.badge-container {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 2px;
+
+  .badge {
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    white-space: normal;
+    max-width: 170px;
+
+    &--purple {
+      background-color: var(--purple-100);
+      color: var(--purple-600);
+    }
+
+    &--blue {
+      background-color: var(--blue-202);
+      color: var(--blue-401);
+    }
+  }
+}

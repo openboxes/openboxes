@@ -45,6 +45,7 @@ import {
   SET_ACTIVE_CONFIG,
   SET_OFFLINE,
   SET_ONLINE,
+  SET_SCROLL_TO_BOTTOM,
   SHOW_INFO_BAR,
   SHOW_INFO_BAR_MODAL,
   SHOW_SPINNER,
@@ -197,10 +198,10 @@ export function changeCurrentLocation(location) {
   };
 }
 
-export function fetchTranslations(lang, prefix) {
+export function fetchTranslations(languageCode, prefix) {
   return (dispatch) => {
-    const url = `/api/localizations?lang=${lang ||
-      ''}&prefix=react.${prefix || ''}`;
+    const url = `/api/localizations?languageCode=${languageCode
+      || ''}&prefix=react.${prefix || ''}`;
 
     apiClient.get(url).then((response) => {
       const { messages, currentLocale } = parseResponse(response.data);
@@ -219,10 +220,10 @@ export function changeCurrentLocale(locale) {
   return (dispatch) => {
     const url = `/api/chooseLocale/${locale}`;
 
-    apiClient.put(url).then(() => {
+    apiClient.put(url).then((response) => {
       dispatch({
         type: CHANGE_CURRENT_LOCALE,
-        payload: locale,
+        payload: response,
       });
     });
   };
@@ -248,7 +249,7 @@ function getParameterList(params = '', locationId = '', userId = '') {
   // filter[1] represent the values
   Object.entries(pageConfig[dashboardKey]).forEach((filter) => {
     listFiltersSelected.push(filter[0]);
-    filter[1].forEach(value => listValues.push(value));
+    filter[1].forEach((value) => listValues.push(value));
   });
   // Add condition to check if currentPage has any filter
   listFiltersSelected.forEach((filter) => {
@@ -306,6 +307,9 @@ function fetchGraphIndicator(
           stacked: indicatorConfig.stacked,
           datalabel: indicatorConfig.datalabel,
           colors: indicatorConfig.colors,
+          columnsSize: indicatorConfig.columnsSize,
+          truncationLength: indicatorConfig.truncationLength,
+          disableTruncation: indicatorConfig.disableTruncation,
         },
         size: indicatorConfig.size,
       },
@@ -365,14 +369,14 @@ function getData(dispatch, dashboardConfig, locationId, config = 'personal', use
   // new reference so that the original config is not modified
 
   const dashboard = dashboardConfig.dashboard[config] || {};
-  const widgets = _.map(dashboard.widgets, widget => ({
+  const widgets = _.map(dashboard.widgets, (widget) => ({
     ...dashboardConfig.dashboardWidgets[widget.widgetId],
     order: widget.order,
     widgetId: widget.widgetId,
   }));
 
   const visibleWidgets = _.chain(widgets)
-    .filter(widget => widget.enabled)
+    .filter((widget) => widget.enabled)
     .sortBy(['order']).value();
 
   _.forEach(visibleWidgets, (widgetConfig) => {
@@ -516,7 +520,7 @@ export function fetchBuyers(active = false) {
     apiClient.get(`/api/organizations?roleType=ROLE_BUYER&active=${active}`)
       .then((res) => {
         if (res.data.data) {
-          const buyers = res.data.data.map(obj => (
+          const buyers = res.data.data.map((obj) => (
             {
               id: obj.id,
               value: obj.id,
@@ -614,7 +618,7 @@ export const addStockMovementDraft = ({
   lineItems,
   id,
   statusCode,
-}) => dispatch => dispatch({
+}) => (dispatch) => dispatch({
   type: ADD_STOCK_MOVEMENT_DRAFT,
   payload: {
     workflow,
@@ -624,7 +628,7 @@ export const addStockMovementDraft = ({
   },
 });
 
-export const removeStockMovementDraft = id => dispatch => dispatch({
+export const removeStockMovementDraft = (id) => (dispatch) => dispatch({
   type: REMOVE_STOCK_MOVEMENT_DRAFT,
   payload: {
     id,
@@ -640,7 +644,7 @@ export const fetchShipmentTypes = () => async (dispatch) => {
   });
 };
 
-export const fetchLocationTypes = config => async (dispatch) => {
+export const fetchLocationTypes = (config) => async (dispatch) => {
   const response = await locationApi.getLocationTypes(config);
   const data = response?.data?.data;
   return dispatch({
@@ -655,6 +659,7 @@ export const createInfoBar = ({
   title,
   isCloseable,
   hasModalToDisplay,
+  redirect,
 }) => ({
   type: ADD_INFO_BAR,
   payload: {
@@ -663,39 +668,40 @@ export const createInfoBar = ({
     title,
     isCloseable,
     hasModalToDisplay,
+    redirect,
     show: true,
   },
 });
 
-export const hideInfoBar = name => ({
+export const hideInfoBar = (name) => ({
   type: HIDE_INFO_BAR,
   payload: {
     name,
   },
 });
 
-export const closeInfoBar = name => ({
+export const closeInfoBar = (name) => ({
   type: CLOSE_INFO_BAR,
   payload: {
     name,
   },
 });
 
-export const showInfoBar = name => ({
+export const showInfoBar = (name) => ({
   type: SHOW_INFO_BAR,
   payload: {
     name,
   },
 });
 
-export const showInfoBarModal = name => ({
+export const showInfoBarModal = (name) => ({
   type: SHOW_INFO_BAR_MODAL,
   payload: {
     name,
   },
 });
 
-export const hideInfoBarModal = name => ({
+export const hideInfoBarModal = (name) => ({
   type: HIDE_INFO_BAR_MODAL,
   payload: {
     name,
@@ -725,3 +731,8 @@ export const fetchAttributes = (config) => async (dispatch) => {
     payload: attributes?.data?.data,
   });
 };
+
+export const setScrollToBottom = (payload) => ({
+  type: SET_SCROLL_TO_BOTTOM,
+  payload,
+});

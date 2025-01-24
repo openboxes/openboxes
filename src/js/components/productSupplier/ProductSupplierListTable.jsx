@@ -12,7 +12,7 @@ import RoleType from 'consts/roleType';
 import useProductSupplierActions from 'hooks/list-pages/productSupplier/useProductSupplierActions';
 import useProductSupplierListTableData from 'hooks/list-pages/productSupplier/useProductSupplierListTableData';
 import useUserHasPermissions from 'hooks/useUserHasPermissions';
-import ActionDots from 'utils/ActionDots';
+import ContextMenu from 'utils/ContextMenu';
 import StatusIndicator from 'utils/StatusIndicator';
 import Translate from 'utils/Translate';
 import ListTableTitleWrapper from 'wrappers/ListTableTitleWrapper';
@@ -48,8 +48,8 @@ const ProductSupplierListTable = ({ filterParams }) => {
       },
       fixed: 'left',
       Cell: (row) => (
-        <ActionDots
-          dropdownPlacement="right"
+        <ContextMenu
+          positions={['right']}
           dropdownClasses="action-dropdown-offset"
           id={row.original.id}
           actions={getActions(row.original.id)}

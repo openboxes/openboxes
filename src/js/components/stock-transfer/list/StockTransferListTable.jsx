@@ -12,12 +12,11 @@ import DateCell from 'components/DataTable/DateCell';
 import StockTransferStatus from 'components/stock-transfer/list/StockTransferStatus';
 import { STOCK_TRANSFER_URL } from 'consts/applicationUrls';
 import useStockTransferListTableData from 'hooks/list-pages/stock-transfer/useStockTransferListTableData';
-import ActionDots from 'utils/ActionDots';
+import ContextMenu from 'utils/ContextMenu';
 import { findActions } from 'utils/list-utils';
 import Translate from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
-
 
 const StockTransferListTable = ({
   filterParams,
@@ -46,10 +45,9 @@ const StockTransferListTable = ({
       minimumRequiredRole: 'Manager',
       statuses: ['PENDING', 'APPROVED'],
       variant: 'danger',
-      onClick: id => deleteHandler(id),
+      onClick: (id) => deleteHandler(id),
     },
   ], []);
-
 
   // Columns for react-table
   const columns = useMemo(() => [
@@ -59,13 +57,14 @@ const StockTransferListTable = ({
       sortable: false,
       className: 'active-circle d-flex align-items-center',
       style: { overflow: 'visible', zIndex: 1 },
-      Cell: row => (
-        <ActionDots
-          dropdownPlacement="right"
+      Cell: (row) => (
+        <ContextMenu
+          positions={['right']}
           dropdownClasses="action-dropdown-offset"
           actions={findActions(actions, row, { highestRole })}
           id={row.original.id}
-        />),
+        />
+      ),
     },
     {
       Header: <Translate id="react.stockTransfer.column.lineItems.label" defaultMessage="Line items" />,
@@ -73,7 +72,7 @@ const StockTransferListTable = ({
       className: 'd-flex align-items-center justify-content-center',
       sortable: false,
       maxWidth: 100,
-      Cell: row => (<span className="items-count-circle d-flex align-items-center justify-content-center align-self-center">{row.original.orderItemsCount}</span>),
+      Cell: (row) => (<span className="items-count-circle d-flex align-items-center justify-content-center align-self-center">{row.original.orderItemsCount}</span>),
     },
     {
       Header: <Translate id="react.stockTransfer.column.status.label" defaultMessage="Status" />,
@@ -81,7 +80,7 @@ const StockTransferListTable = ({
       className: 'active-circle d-flex',
       headerClassName: 'header',
       Cell: (row) => {
-        const label = statuses?.find(status => status.id === row.original.status)?.label;
+        const label = statuses?.find((status) => status.id === row.original.status)?.label;
         return (<StockTransferStatus status={label ?? row.original.status} />);
       },
       maxWidth: 250,
@@ -91,7 +90,7 @@ const StockTransferListTable = ({
       accessor: 'orderNumber',
       className: 'active-circle d-flex align-items-center',
       headerClassName: 'header',
-      Cell: row => <TableCell {...row} link={STOCK_TRANSFER_URL.show(row.original.id)} />,
+      Cell: (row) => <TableCell {...row} link={STOCK_TRANSFER_URL.show(row.original.id)} />,
     },
     {
       Header: <Translate id="react.stockTransfer.column.createdBy.label" defaultMessage="Created by" />,
@@ -103,7 +102,7 @@ const StockTransferListTable = ({
       Header: <Translate id="react.stockTransfer.column.dateCreated.label" defaultMessage="Date created" />,
       accessor: 'dateCreated',
       className: 'd-flex align-items-center',
-      Cell: row => <DateCell {...row} tooltip />,
+      Cell: (row) => <DateCell {...row} tooltip />,
     },
   ], [highestRole, statuses]);
 
@@ -131,14 +130,12 @@ const StockTransferListTable = ({
   );
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   highestRole: state.session.highestRole,
   statuses: state.stockTransfer.statuses,
 });
 
-
 export default connect(mapStateToProps)(StockTransferListTable);
-
 
 StockTransferListTable.propTypes = {
   filterParams: PropTypes.shape({}).isRequired,

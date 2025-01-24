@@ -1,4 +1,6 @@
-<div id="receipt" class="dialog box">
+<%@ page import="org.pih.warehouse.core.Constants" %>
+
+<section id="receipt" class="dialog box" aria-label="Receipt">
     <h2>
         <img src="${resource(dir:'images/icons',file:'handtruck.png')}" />
         <label><warehouse:message code="shipping.receipt.label"/></label>
@@ -50,7 +52,11 @@
                 </td>
                 <td>
                     <g:link controller="inventoryItem" action="showStockCard" id="${receiptItem?.product?.id}">
-                        <format:displayName product="${receiptItem?.product}" showTooltip="${true}" />
+                        <format:displayName
+                                product="${receiptItem?.product}"
+                                productSupplier="${receiptItem?.shipmentItem?.orderItem?.productSupplier}"
+                                showTooltip="${true}"
+                        />
                     </g:link>
                 </td>
                 <td>
@@ -93,4 +99,4 @@
         </div>
     </g:unless>
 
-</div>
+</section>

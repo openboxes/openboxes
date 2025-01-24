@@ -8,11 +8,11 @@
     <body>
         <div class="body">
             <g:if test="${flash.message}">
-				<div class="message">${flash.message}</div>
+				<div class="message" role="status" aria-label="message">${flash.message}</div>
             </g:if>
 
             <g:if test="${shipments?.size() == params.max}">
-                <div class="message">
+                <div class="message" role="status" aria-label="message">
                     <ul>
                         <li>${g.message(code: 'shipment.limitHasBeenReached.message', args: [params.max])}</li>
                     </ul>

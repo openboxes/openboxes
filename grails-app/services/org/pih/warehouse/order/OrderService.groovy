@@ -18,12 +18,10 @@ import org.hibernate.sql.JoinType
 
 import grails.plugins.csv.CSVMapReader
 import org.hibernate.criterion.CriteriaSpecification
+import org.pih.warehouse.LocalizationUtil
 import org.pih.warehouse.core.BudgetCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Event
-import org.pih.warehouse.core.IdentifierGeneratorTypeCode
-import org.pih.warehouse.core.IdentifierService
-import org.pih.warehouse.core.IdentifierTypeCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.core.Organization
@@ -54,13 +52,15 @@ import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.shipping.ShipmentService
 import util.ReportUtil
 
+import java.text.SimpleDateFormat
+
 @Transactional
 class OrderService {
 
     UserService userService
     DataService dataService
     ShipmentService shipmentService
-    IdentifierService identifierService
+    PurchaseOrderIdentifierService purchaseOrderIdentifierService
     InventoryService inventoryService
     ProductSupplierService productSupplierService
     PersonService personService
@@ -371,33 +371,6 @@ class OrderService {
         return orderCommand
     }
 
-    int getNextSequenceNumber(String partyId) {
-        Organization organization = Organization.get(partyId)
-        Integer sequenceNumber = Integer.valueOf(organization.sequences.get(IdentifierTypeCode.PURCHASE_ORDER_NUMBER.toString())?:0)
-        Integer nextSequenceNumber = sequenceNumber + 1
-        organization.sequences.put(IdentifierTypeCode.PURCHASE_ORDER_NUMBER.toString(), nextSequenceNumber.toString())
-        organization.save()
-        return nextSequenceNumber
-    }
-
-    String generatePurchaseOrderSequenceNumber(Order order) {
-        try {
-            Integer sequenceNumber = getNextSequenceNumber(order.destinationParty.id)
-            String sequenceNumberFormat = Holders.config.openboxes.identifier.purchaseOrder.sequenceNumber.format
-            String sequenceNumberStr = identifierService.generateSequenceNumber(sequenceNumber.toString(), sequenceNumberFormat)
-
-            // Properties to be used to get argument values for the template
-            Map properties = Holders.grailsApplication.config.openboxes.identifier.purchaseOrder.properties
-            Map model = dataService.transformObject(order, properties)
-            model.put("sequenceNumber", sequenceNumberStr)
-            String template = Holders.grailsApplication.config.openboxes.identifier.purchaseOrder.format
-            return identifierService.renderTemplate(template, model)
-        } catch(Exception e) {
-            log.error("Error " + e.message, e)
-            throw e;
-        }
-    }
-
     Order saveOrder(Order order) {
         // update the status of the order before saving
         order.updateStatus()
@@ -405,18 +378,7 @@ class OrderService {
         order.originParty = order?.origin?.organization
 
         if (!order.orderNumber) {
-            IdentifierGeneratorTypeCode identifierGeneratorTypeCode =
-                    Holders.grailsApplication.config.openboxes.identifier.purchaseOrder.generatorType
-
-            if (identifierGeneratorTypeCode == IdentifierGeneratorTypeCode.SEQUENCE) {
-                order.orderNumber = generatePurchaseOrderSequenceNumber(order)
-            }
-            else if (identifierGeneratorTypeCode == IdentifierGeneratorTypeCode.RANDOM) {
-                order.orderNumber = identifierService.generatePurchaseOrderIdentifier()
-            }
-            else {
-                throw new IllegalArgumentException("No identifier generator type associated with " + identifierGeneratorTypeCode)
-            }
+            order.orderNumber = purchaseOrderIdentifierService.generate(order)
         }
 
         if (!order.hasErrors() && order.save(flush: true)) {
@@ -837,12 +799,21 @@ class OrderService {
 
                     orderItem.quantity = parsedQty
                     orderItem.unitPrice = parsedUnitPrice
-                    orderItem.recipient = recipient ? personService.getPersonByNames(recipient) : null
+
+                    if (recipient) {
+                        Person person = personService.getActivePersonByName(recipient)
+                        if (!person) {
+                            throw new IllegalArgumentException("Cannot set a recipient who is non-existant or inactive: ${recipient}")
+                        }
+                        orderItem.recipient = person
+                    }
 
                     def estReadyDate = null
+                    Locale locale = LocalizationUtil.currentLocale
+                    SimpleDateFormat readyDateFormat = new SimpleDateFormat(LocalizationUtil.getLocalizedOrderImportDateFormat(locale))
                     if (estimatedReadyDate) {
                         try {
-                            estReadyDate = new Date(estimatedReadyDate)
+                            estReadyDate = readyDateFormat.parse(estimatedReadyDate)
                         } catch (Exception e) {
                             log.error("Unable to parse date: " + e.message, e)
                             throw new IllegalArgumentException("Could not parse estimated ready date with value: ${estimatedReadyDate}.")
@@ -853,7 +824,7 @@ class OrderService {
                     def actReadyDate = null
                     if (actualReadyDate) {
                         try {
-                            actReadyDate = new Date(actualReadyDate)
+                            actReadyDate = readyDateFormat.parse(actualReadyDate)
                         } catch (Exception e) {
                             log.error("Unable to parse date: " + e.message, e)
                             throw new IllegalArgumentException("Could not parse actual ready date with value: ${actualReadyDate}.")
@@ -864,9 +835,21 @@ class OrderService {
                     if (currentLocation.isAccountingRequired() && !code) {
                         throw new IllegalArgumentException("Budget code is required.")
                     }
-                    BudgetCode budgetCode = BudgetCode.findByCode(code)
 
-                    if (orderItem.id && orderItem.hasRegularInvoice && orderItem.budgetCode != budgetCode) {
+                    // There can be more than one budget code with the same code, despite the fact that the code is unique from the domain perspective.
+                    // As a fix for that we would like to have only one active budget code with the same code, so we have to find only active
+                    // budget codes. In case when there is only one budget code, and this one is inactive we have to throw a validation error,
+                    // so we can't just look for BudgetCode.findAllByCodeAndActive(code, true);
+                    List<BudgetCode> foundBudgetCodes = BudgetCode.findAllByCode(code)
+                    List<BudgetCode> activeBudgetCodes = foundBudgetCodes.findAll { it.active }
+
+                    if (activeBudgetCodes.size() > 1) {
+                        throw new IllegalArgumentException("Found more than one active budget code with the same code.")
+                    }
+
+                    BudgetCode budgetCode = activeBudgetCodes.size() == 0 ? foundBudgetCodes[0] : activeBudgetCodes.first()
+
+                    if (orderItem.id && orderItem.hasRegularInvoice && orderItem.budgetCode?.id != budgetCode?.id) {
                         throw new IllegalArgumentException("Cannot update the budget code on a line that is already invoiced.")
                     }
                     if (code) {
@@ -1270,61 +1253,6 @@ class OrderService {
         }
 
         return results
-    }
-
-    /**
-     * Refreshing entire Order Summary materialized view, should be only triggered from time to time
-     * (same statements as in the order-summary-materialized-view.sql)
-     * */
-    def refreshOrderSummary() {
-        List statements = [
-            // Drop mv temp table if somehow it still exists
-            "DROP TABLE IF EXISTS order_summary_mv_temp;",
-            // Create temp mv table from sql view (to shorten the time when MV is unavailable)
-            "CREATE TABLE order_summary_mv_temp AS SELECT DISTINCT * FROM order_summary;",
-            "DROP TABLE IF EXISTS order_summary_mv;",
-            // Copy data from temp mv table into mv table
-            "CREATE TABLE IF NOT EXISTS order_summary_mv LIKE order_summary_mv_temp;",
-            "TRUNCATE order_summary_mv;",
-            "INSERT INTO order_summary_mv SELECT * FROM order_summary_mv_temp;",
-            "ALTER TABLE order_summary_mv ADD UNIQUE INDEX (id);",
-            // Cleanup
-            "DROP TABLE IF EXISTS order_summary_mv_temp;",
-        ]
-        dataService.executeStatements(statements)
-    }
-
-    /**
-     * Refreshing the Order Summary materialized view for a specific list of Order Ids (PASS ONLY A PO IDs)
-     * */
-    def refreshOrderSummary(List<String> orderIds, Boolean isDelete) {
-        List statements = []
-        orderIds?.each { String orderId ->
-            if (isDelete) {
-                statements << "DELETE FROM order_summary_mv WHERE id = '${orderId}';"
-            } else {
-                statements << "REPLACE INTO order_summary_mv (SELECT * FROM order_summary WHERE id = '${orderId}');"
-            }
-        }
-
-        if (statements && checkIfOrderSummaryExists()) {
-            dataService.executeStatements(statements)
-        }
-    }
-
-    Boolean checkIfOrderSummaryExists() {
-        try {
-            // Check if table exists.
-            dataService.executeQuery("SELECT * FROM order_summary_mv LIMIT 1")
-            return true
-        } catch (Exception e) {
-            // UndeclaredThrowableException caused by MySQLSyntaxErrorException is thrown when
-            // the table 'order_summary_mv' doesn't exist. Then just simply refresh entire table
-            log.info "Refreshing order summary failed due to: ${e?.cause?.message}. Refreshing entire table now."
-
-            RefreshOrderSummaryJob.triggerNow()
-            return false
-        }
     }
 
     Map getOrderSummary(String orderId) {

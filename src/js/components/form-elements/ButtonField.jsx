@@ -16,19 +16,23 @@ const ButtonField = (props) => {
   const attr = { ...attributes, ...dynamicAttr };
 
   return (
-    <button type="button" key={fieldName} {...attr} className={`text-truncate btn btn-xs ${attr.className}`} >
+    <button type="button" key={fieldName} {...attr} className={`text-truncate btn btn-xs ${attr.className}`}>
       {
-        typeof ButtonLabel === 'string' ?
-          <Tooltip
-            html={(ButtonLabel &&
-            <Translate id={ButtonLabel} defaultMessage={buttonDefaultMessage} />)}
-            theme="transparent"
-            arrow="true"
-            delay="150"
-            duration="250"
-            hideDelay="50"
-          > <Translate id={ButtonLabel} defaultMessage={buttonDefaultMessage} />
-          </Tooltip>
+        typeof ButtonLabel === 'string'
+          ? (
+            <Tooltip
+              html={(ButtonLabel
+            && <Translate id={ButtonLabel} defaultMessage={buttonDefaultMessage} />)}
+              theme="transparent"
+              arrow="true"
+              delay="150"
+              duration="250"
+              hideDelay="50"
+            >
+              {' '}
+              <Translate id={ButtonLabel} defaultMessage={buttonDefaultMessage} />
+            </Tooltip>
+          )
           : <ButtonLabel />
       }
     </button>

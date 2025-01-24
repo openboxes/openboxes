@@ -9,7 +9,7 @@
 <body>
     <div class="body">
         <g:if test="${flash.message}">
-            <div class="message">${flash.message}</div>
+            <div class="message" role="status" aria-label="message">${flash.message}</div>
         </g:if>
 
 
@@ -27,7 +27,7 @@
                                     <p>
                                         <label><warehouse:message code="user.search.label"/></label>
                                     </p>
-                                    <g:textField name="q" value="${params.q }" class="text large" />
+                                    <g:textField name="q" value="${params.q}" class="text large" aria-label="filter-by-name" />
                                 </li>
                                 <li class="filter-list-item">
                                     <p>

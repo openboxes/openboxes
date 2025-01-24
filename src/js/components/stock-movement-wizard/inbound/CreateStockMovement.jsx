@@ -21,7 +21,6 @@ import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
-
 function validate(values) {
   const errors = {};
   if (!values.description) {
@@ -69,9 +68,9 @@ const FIELDS = {
       autoload: false,
       cache: false,
       options: [],
-      filterOptions: options => options,
+      filterOptions: (options) => options,
     },
-    getDynamicAttr: props => ({
+    getDynamicAttr: (props) => ({
       loadOptions: props.debouncedLocationsFetch,
       onChange: (value) => {
         if (value && props.destination && props.destination.id) {
@@ -92,9 +91,9 @@ const FIELDS = {
       autoload: false,
       cache: false,
       options: [],
-      filterOptions: options => options,
+      filterOptions: (options) => options,
     },
-    getDynamicAttr: props => ({
+    getDynamicAttr: (props) => ({
       loadOptions: props.debouncedLocationsFetch,
       onChange: (value) => {
         if (value && props.origin && props.origin.id) {
@@ -129,9 +128,9 @@ const FIELDS = {
       cache: false,
       options: [],
       labelKey: 'name',
-      filterOptions: options => options,
+      filterOptions: (options) => options,
     },
-    getDynamicAttr: props => ({
+    getDynamicAttr: (props) => ({
       loadOptions: props.debouncedPeopleFetch,
     }),
   },
@@ -141,7 +140,7 @@ const FIELDS = {
     defaultMessage: 'Date requested',
     attributes: {
       required: true,
-      dateFormat: 'MM/DD/YYYY',
+      localizeDate: true,
       autoComplete: 'off',
     },
   },
@@ -158,11 +157,15 @@ class CreateStockMovement extends Component {
     };
     this.fetchStockLists = this.fetchStockLists.bind(this);
 
-    this.debouncedPeopleFetch =
-      debouncePeopleFetch(this.props.debounceTime, this.props.minSearchLength);
+    this.debouncedPeopleFetch = debouncePeopleFetch(
+      this.props.debounceTime,
+      this.props.minSearchLength,
+    );
 
-    this.debouncedLocationsFetch =
-      debounceLocationsFetch(this.props.debounceTime, this.props.minSearchLength);
+    this.debouncedLocationsFetch = debounceLocationsFetch(
+      this.props.debounceTime,
+      this.props.minSearchLength,
+    );
   }
 
   componentDidMount() {
@@ -197,11 +200,11 @@ class CreateStockMovement extends Component {
     const originLocs = newValues.origin && origin;
     const isOldSupplier = origin && origin.type === 'SUPPLIER';
     const isNewSupplier = newValues.origin && newValues.type === 'SUPPLIER';
-    const checkOrigin = originLocs && (!isOldSupplier || (isOldSupplier && !isNewSupplier)) ?
-      newValues.origin.id !== origin.id : false;
+    const checkOrigin = originLocs && (!isOldSupplier || (isOldSupplier && !isNewSupplier))
+      ? newValues.origin.id !== origin.id : false;
 
-    const checkDest = stocklist && newValues.destination && destination ?
-      newValues.destination.id !== destination.id : false;
+    const checkDest = stocklist && newValues.destination && destination
+      ? newValues.destination.id !== destination.id : false;
     const checkStockList = newValues.stockMovementId ? _.get(newValues.stocklist, 'id', null) !== _.get(stocklist, 'id', null) : false;
 
     return (checkOrigin || checkDest || checkStockList);
@@ -220,13 +223,13 @@ class CreateStockMovement extends Component {
 
     return apiClient.get(url)
       .then((response) => {
-        const stocklists = _.map(response.data.data, stocklist => (
+        const stocklists = _.map(response.data.data, (stocklist) => (
           {
             id: stocklist.id, name: stocklist.name, value: stocklist.id, label: stocklist.name,
           }
         ));
 
-        const stocklistChanged = !_.find(stocklists, item => item.value.id === _.get(this.state.values, 'stocklist.id'));
+        const stocklistChanged = !_.find(stocklists, (item) => item.value.id === _.get(this.state.values, 'stocklist.id'));
 
         if (stocklistChanged && clearStocklist) {
           clearStocklist();
@@ -237,15 +240,14 @@ class CreateStockMovement extends Component {
       .catch(() => this.props.hideSpinner());
   }
 
-
   /**
    * Creates or updates stock movement with given data
    * @param {object} values
    * @public
    */
   saveStockMovement(values) {
-    if (values.origin && values.destination && values.requestedBy &&
-      values.dateRequested && values.description) {
+    if (values.origin && values.destination && values.requestedBy
+      && values.dateRequested && values.description) {
       this.props.showSpinner();
 
       let stockMovementUrl = '';
@@ -328,7 +330,7 @@ class CreateStockMovement extends Component {
   render() {
     return (
       <Form
-        onSubmit={values => this.nextPage(values)}
+        onSubmit={(values) => this.nextPage(values)}
         validate={validate}
         initialValues={this.state.values}
         mutators={{
@@ -365,7 +367,7 @@ class CreateStockMovement extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   location: state.session.currentLocation,
   isSuperuser: state.session.isSuperuser,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),

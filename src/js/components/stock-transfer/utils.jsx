@@ -14,8 +14,8 @@ function extractItem(item, status) {
   } else {
     destinationBin = {
       id: destinationBinLocation && destinationBinLocation.id ? destinationBinLocation.id : null,
-      name: destinationBinLocation && destinationBinLocation.name ?
-        destinationBinLocation.name : null,
+      name: destinationBinLocation && destinationBinLocation.name
+        ? destinationBinLocation.name : null,
       zoneId: destinationZone && destinationZone.id ? destinationZone.id : null,
       zoneName: destinationZone && destinationZone.name ? destinationZone.name : null,
     };
@@ -82,12 +82,12 @@ export function extractNonCanceledItems(stockTransfer) {
 }
 
 export function prepareRequest(stockTransfer, status) {
-  const originalItems = _.filter(stockTransfer.stockTransferItems, item => !item.referenceId);
-  const stockTransferItems = _.map(originalItems, item => ({
+  const originalItems = _.filter(stockTransfer.stockTransferItems, (item) => !item.referenceId);
+  const stockTransferItems = _.map(originalItems, (item) => ({
     ...item,
     splitItems: _.filter(
       stockTransfer.stockTransferItems,
-      splitItem => splitItem.referenceId === item.id,
+      (splitItem) => splitItem.referenceId === item.id,
     ),
     quantity: item.quantity === '' ? item.quantityOnHand : item.quantity,
   }));

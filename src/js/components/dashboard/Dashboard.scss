@@ -508,6 +508,10 @@
           overflow-wrap: anywhere;
         }
 
+        .last {
+          text-wrap: nowrap;
+        }
+
         td,
         th {
           border-bottom: 1px solid #dddddd;
@@ -648,6 +652,8 @@
       height: 100%;
 
       .numbers-left {
+        max-width: 100px;
+
         .gyr-indicator {
           flex-direction: column;
 
@@ -675,6 +681,20 @@
         }
       }
     }
+  }
+
+  .indicator-item-href {
+    color: inherit;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  .disabled-indicator-item-href {
+    color: inherit;
+    pointer-events: none;
+    cursor: default;
   }
 }
 

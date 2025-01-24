@@ -164,6 +164,10 @@ input, .date-field-input {
     width: 100%;
   }
 
+  .react-select--is-disabled .react-select__control {
+    background-color: var(--blue-100);
+  }
+
   .react-select__control {
     border: 1px solid var(--gray-200);
     color: var(--gray-600);
@@ -208,6 +212,59 @@ input, .date-field-input {
         border-color: var(--color-red) !important;
         box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 6px var(--color-red) !important;
       }
+    }
+  }
+}
+
+.checkbox-v2 {
+  width: 18px;
+  height: 18px;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  border: 2px solid var(--gray-300);
+  border-radius: 4px;
+  background-color: var(--white-alpha);
+  cursor: pointer;
+  position: relative;
+  outline: none;
+
+  &:hover {
+    border-color: var(--blue-primary);
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    transition: all 0.2s ease;
+  }
+
+  &:checked {
+    background-color: var(--blue-primary);
+    border-color: var(--blue-primary);
+
+    &::after {
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -60%) rotate(45deg);
+      width: 6px;
+      height: 12px;
+      border: solid #ffffff;
+      border-width: 0 2px 2px 0;
+    }
+  }
+
+  &:indeterminate {
+    background-color: var(--blue-primary);
+    border-color: var(--blue-primary);
+
+    &::after {
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 10px;
+      height: 2px;
+      background-color: #ffffff;
     }
   }
 }

@@ -33,7 +33,8 @@ const Subsection = ({
           onKeyDown={collapsable ? () => triggerCollapse() : null}
           style={collapsable ? { cursor: 'pointer' } : { cursor: 'unset' }}
         >
-          <Translate id={title.label} defaultMessage={title.defaultMessage} />
+          {title.label && title.defaultMessage
+            && <Translate id={title.label} defaultMessage={title.defaultMessage} />}
           {collapsable
             && <RiArrowDownSLine className={`arrow-up ${expanded ? 'arrow-up--expanded' : ''}`} />}
         </span>
@@ -51,7 +52,7 @@ Subsection.propTypes = {
   title: PropTypes.shape({
     label: PropTypes.string.isRequired,
     defaultMessage: PropTypes.string.isRequired,
-  }).isRequired,
+  }),
   collapsable: PropTypes.bool,
   expandedByDefault: PropTypes.bool,
   children: PropTypes.node.isRequired,
@@ -60,4 +61,5 @@ Subsection.propTypes = {
 Subsection.defaultProps = {
   collapsable: true,
   expandedByDefault: true,
+  title: '',
 };

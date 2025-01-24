@@ -1,3 +1,4 @@
+/* eslint-disable react/button-has-type */
 import React from 'react';
 
 import PropTypes from 'prop-types';
@@ -15,6 +16,7 @@ const Button = ({
   isDropdown,
   StartIcon,
   className,
+  customRef,
 }) => {
   const buttonClass = 'd-flex justify-content-around align-items-center gap-8';
   const variantClass = `${variant}-button`;
@@ -29,12 +31,13 @@ const Button = ({
       data-toggle={isDropdown && 'dropdown'}
       aria-haspopup={isDropdown && 'true'}
       aria-expanded={isDropdown && 'false'}
+      ref={customRef}
     >
-      <React.Fragment>
+      <>
         {StartIcon && StartIcon}
         <Translate id={label} defaultMessage={defaultLabel} />
         {EndIcon && EndIcon}
-      </React.Fragment>
+      </>
     </button>
   );
 };
@@ -51,12 +54,17 @@ Button.propTypes = {
     'secondary',
     'transparent',
     'primary-outline',
+    'grayed',
   ]),
   onClick: PropTypes.func,
   EndIcon: PropTypes.element,
   StartIcon: PropTypes.element,
   isDropdown: PropTypes.bool,
   className: PropTypes.string,
+  customRef: PropTypes.oneOfType([
+    PropTypes.func,
+    PropTypes.shape({ current: PropTypes.instanceOf(Element) }),
+  ]),
 };
 
 Button.defaultProps = {
@@ -68,4 +76,5 @@ Button.defaultProps = {
   EndIcon: null,
   StartIcon: null,
   className: '',
+  customRef: null,
 };

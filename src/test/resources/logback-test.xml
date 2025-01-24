@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <!--
+    Logback configuration to apply when running tests (via ./gradlew test or grails test-app). We could have configured
+    this via properties in an application-test.yml file (similar to how the regular logback.xml is working), but those
+    properties aren't applied when running unit tests because they're run outside the context of Spring.
+    -->
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <!-- https://logback.qos.ch/manual/layouts.html#coloring -->
+        <withJansi>true</withJansi>
+        <encoder>
+            <pattern>
+                %cyan(%date{ISO8601}) %highlight(%-5level) %magenta([%thread]) %yellow(%logger{40}): %message%n%xException
+            </pattern>
+        </encoder>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE" />
+    </root>
+
+</configuration>

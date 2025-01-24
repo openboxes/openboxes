@@ -22,7 +22,7 @@ const FIELDS = {
       labelKey: 'name',
       className: 'request-modal-select text-capitalize',
       options: [],
-      filterOptions: options => options,
+      filterOptions: (options) => options,
     },
     getDynamicAttr: ({ debouncedPeopleFetch }) => ({
       loadOptions: debouncedPeopleFetch,
@@ -79,7 +79,7 @@ const RejectRequestModalContent = ({
     [debounceTime, minSearchLength],
   );
 
-  const validate = values => (!values?.comment ? { comment: 'react.default.error.requiredField.label' } : {});
+  const validate = (values) => (!values?.comment ? { comment: 'react.default.error.requiredField.label' } : {});
 
   return (
     <Form
@@ -87,38 +87,37 @@ const RejectRequestModalContent = ({
       validate={validate}
       initialValues={initialValues}
       render={({ handleSubmit, values }) =>
-      (
-        <form id="modalForm" onSubmit={handleSubmit}>
-          <div className="classic-form location-field-rows">
-            {_.map(
-              FIELDS,
-              (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
-                values, debouncedPeopleFetch,
-              }),
-            )}
-          </div>
-          <div className="btn-toolbar justify-content-between">
-            <Button
-              type="button"
-              onClick={closeRejectionModal}
-              defaultLabel="Cancel"
-              label="react.default.button.cancel.label"
-            />
+        (
+          <form id="modalForm" onSubmit={handleSubmit}>
+            <div className="classic-form location-field-rows">
+              {_.map(
+                FIELDS,
+                (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
+                  values, debouncedPeopleFetch,
+                }),
+              )}
+            </div>
+            <div className="btn-toolbar justify-content-between">
+              <Button
+                type="button"
+                onClick={closeRejectionModal}
+                defaultLabel="Cancel"
+                label="react.default.button.cancel.label"
+              />
 
-            <Button
-              type="submit"
-              defaultLabel="Confirm reject"
-              label="react.rejectRequestModal.confirmReject.label"
-            />
-          </div>
-        </form>
-      )
-    }
+              <Button
+                type="submit"
+                defaultLabel="Confirm reject"
+                label="react.rejectRequestModal.confirmReject.label"
+              />
+            </div>
+          </form>
+        )}
     />
   );
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   currentUser: state.session.user,
   debounceTime: state.session.searchConfig.debounceTime,
   minSearchLength: state.session.searchConfig.minSearchLength,

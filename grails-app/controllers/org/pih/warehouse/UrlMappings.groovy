@@ -101,6 +101,11 @@ class UrlMappings {
             action = [GET: "ratingTypeCodeOptions"]
         }
 
+        "/api/handlingRequirementsOptions" {
+            controller = { "selectOptionsApi" }
+            action = [GET: "handlingRequirementsOptions"]
+        }
+
         "/api/products"(parseRequest: true) {
             controller = { "productApi" }
             action = [GET: "list"]
@@ -118,6 +123,11 @@ class UrlMappings {
         "/api/products/$productId/inventoryItems/$lotNumber"(parseRequest: true) {
             controller = { "productApi" }
             action = [GET: "getInventoryItem"]
+        }
+
+        "/api/facilities/$facilityId/products/classifications" {
+            controller = "productClassificationApi"
+            action = [GET: "list"]
         }
 
         "/api/locations/locationTypes" {
@@ -184,6 +194,11 @@ class UrlMappings {
         "/api/stockMovementItems/$id/updatePicklist"(parseRequest: true) {
             controller = "stockMovementItemApi"
             action = [POST: "updatePicklist"]
+        }
+
+        "/api/stockMovementItems/$id/picklistItems" {
+            controller = "stockMovementItemApi"
+            action = [DELETE: "revertPick"]
         }
 
         "/api/stockMovementItems/$id/createPicklist"(parseRequest: true) {
@@ -269,13 +284,18 @@ class UrlMappings {
         }
 
         "/api/stockMovements/importPickListItems/$id"(parseRequest: true) {
-            controller = "stockMovementApi"
+            controller = "picklist"
             action = [POST: "importPickListItems"]
         }
 
         "/api/stockMovements/exportPickListItems/$id"(parseRequest: true) {
-            controller = "stockMovementApi"
-            action = [GET: "exportPickListItems"]
+            controller = "picklist"
+            action = [GET: "exportPicklistItems"]
+        }
+
+        "/api/stockMovements/picklistTemplate/$id"(parseRequest: true) {
+            controller = "picklist"
+            action = [GET: "exportPicklistTemplate"]
         }
 
         "/api/stockMovements/createPickList/$id"(parseRequest: true) {
@@ -327,6 +347,16 @@ class UrlMappings {
         "/api/stockMovements/$id/rollbackApproval" {
             controller = "stockMovementApi"
             action = [PUT: "rollbackApproval"]
+        }
+
+        "/api/stockMovements/packingList/template" {
+            controller = "stockMovementApi"
+            action = [GET: "downloadPackingListTemplate"]
+        }
+
+        "/api/picklists/$id/items" {
+            controller = "picklistApi"
+            action = [DELETE: "clearPicklist"]
         }
 
         // Partial Receiving API
@@ -511,6 +541,16 @@ class UrlMappings {
         "/api/invoiceItems/$id/validation" {
             controller = "invoiceApi"
             action = [POST: "validateInvoiceItem"]
+        }
+
+        "/api/prepaymentInvoices/$id/invoiceItems" {
+            controller = "prepaymentInvoiceApi"
+            action = [POST: "updateItems"]
+        }
+
+        "/api/prepaymentInvoiceItems/$id" {
+            controller = "prepaymentInvoiceItemApi"
+            action = [POST: "update", DELETE: "delete"]
         }
 
         // Stock Transfer API
@@ -736,6 +776,21 @@ class UrlMappings {
             action = [GET: "getOpenPurchaseOrdersCount"]
         }
 
+        "/api/dashboard/backdatedOutboundShipments" {
+            controller = { "dashboardApi" }
+            action = [GET: "getBackdatedOutboundShipments"]
+        }
+
+        "/api/dashboard/backdatedInboundShipments" {
+            controller = { "dashboardApi" }
+            action = [GET: "getBackdatedInboundShipments"]
+        }
+
+        "/api/dashboard/itemsWithBackdatedShipments" {
+            controller = { "dashboardApi" }
+            action = [GET: "getItemsWithBackdatedShipments"]
+        }
+
         /**
         * Purchase Orders API endpoints
         */
@@ -821,6 +876,16 @@ class UrlMappings {
             action = [GET: "listOfDemoData"]
         }
 
+        "/api/fulfillments" {
+            controller = { "fulfillmentApi" }
+            action = [POST: "save"]
+        }
+
+        "/api/fulfillments/validate" {
+            controller = { "fulfillmentApi" }
+            action = [POST: "validate"]
+        }
+
         // Standard REST APIs
 
         "/api/${resource}s"(parseRequest: true) {
@@ -870,6 +935,16 @@ class UrlMappings {
         "/api/generic/${resource}/$id"(parseRequest: false) {
             controller = "genericApi"
             action = [GET: "read", POST: "update", PUT: "update", DELETE: "delete"]
+        }
+
+        "/api/facilities/$facilityId/cycle-counts/candidates" {
+            controller = "cycleCountApi"
+            action = [GET: "getCandidates"]
+        }
+
+        "/api/facilities/$facilityId/cycle-counts/requests/batch" {
+            controller = "cycleCountApi"
+            action = [POST: "createRequests"]
         }
 
         // Error handling

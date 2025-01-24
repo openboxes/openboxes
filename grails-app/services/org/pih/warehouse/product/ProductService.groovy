@@ -36,7 +36,7 @@ class ProductService {
     def sessionFactory
     GrailsApplication grailsApplication
     def authService
-    def identifierService
+    ProductIdentifierService productIdentifierService
     def userService
     def dataService
     ProductGroupService productGroupService
@@ -308,6 +308,7 @@ class ProductService {
         String sortOrder = params.order ?: "asc"
         Date dateCreatedAfter = params.createdAfter ? Date.parse("MM/dd/yyyy", params.createdAfter) : null
         Date dateCreatedBefore = params.createdBefore ? Date.parse("MM/dd/yyyy", params.createdBefore) : null
+        List<ProductField> handlingRequirements = params.list("handlingRequirementId").collect { ProductField.valueOf(it) }
 
         def query = { isCountQuery ->
 
@@ -357,6 +358,23 @@ class ProductService {
             if (tagsInput) {
                 tags {
                     'in'("id", tagsInput.collect { it.id })
+                }
+            }
+
+            if (!handlingRequirements.empty) {
+                or {
+                    if (handlingRequirements.contains(ProductField.COLD_CHAIN)) {
+                        eq("coldChain", true)
+                    }
+                    if (handlingRequirements.contains(ProductField.CONTROLLED_SUBSTANCE)) {
+                        eq("controlledSubstance", true)
+                    }
+                    if (handlingRequirements.contains(ProductField.HAZARDOUS_MATERIAL)) {
+                        eq("hazardousMaterial", true)
+                    }
+                    if (handlingRequirements.contains(ProductField.RECONDITIONED)) {
+                        eq("reconditioned", true)
+                    }
                 }
             }
 
@@ -787,7 +805,7 @@ class ProductService {
 
             if (!product?.id || product.validate()) {
                 if (!product.productCode) {
-                    product.productCode = generateProductIdentifier(product.productType)
+                    product.productCode = generateProductIdentifier(product)
                 }
             }
 
@@ -1082,39 +1100,10 @@ class ProductService {
     }
 
     /**
-     * Ensure that the given product code does not exist
-     *
-     * @param productCode
-     * @return
+     * @return A generated identifier for the given product.
      */
-    def validateProductIdentifier(productCode) {
-        if (!productCode) return false
-        def count = Product.executeQuery("select count(p.productCode) from Product p where productCode = :productCode", [productCode: productCode])
-        return count ? (count[0] == 0) : false
-    }
-
-    /**
-     * Generate a product identifier.
-     *
-     * @return
-     */
-    def generateProductIdentifier(ProductType productType) {
-        def productCode
-
-        try {
-            productCode = identifierService.generateProductIdentifier(productType)
-            if (validateProductIdentifier(productCode)) {
-                return productCode
-            }
-
-        } catch (Exception e) {
-            log.warn("Error generating unique product code " + e.message, e)
-        }
-        return productCode
-    }
-
-    def generateProductIdentifier() {
-        return generateProductIdentifier(null)
+    String generateProductIdentifier(Product product) {
+        return productIdentifierService.generate(product)
     }
 
     /**
@@ -1138,7 +1127,7 @@ class ProductService {
         if (product) {
             // Generate product code if it doesn't already exist
             if (!product.productCode) {
-                product.productCode = generateProductIdentifier(product.productType)
+                product.productCode = generateProductIdentifier(product)
             }
             // Handle tags
             try {
@@ -1286,7 +1275,7 @@ class ProductService {
     }
 
     def searchProductDtos(String[] terms) {
-        String locale = LocalizationUtil.localizationService.getCurrentLocale().toLanguageTag()
+        String locale = LocalizationUtil.localizationService.getCurrentLocale().toString()
 
         def query = """
             select distinct
@@ -1298,6 +1287,7 @@ class ProductService {
             product.controlled_substance as controlledSubstance, 
             product.hazardous_material as hazardousMaterial, 
             product.reconditioned,
+            product.unit_of_measure as unitOfMeasure,
             product.lot_and_expiry_control as lotAndExpiryControl,
             # Return whether search term returns an exact match
             ifnull(
@@ -1449,7 +1439,7 @@ class ProductService {
 
     Product addSynonymToProduct(String productId, String synonymTypeCodeName, String synonymValue, String localeName) {
         Product product = Product.get(productId)
-        Locale locale = localeName ? new Locale(localeName) : null
+        Locale locale = localeName ? LocalizationUtil.getLocale(localeName) : null
         SynonymTypeCode synonymTypeCode = synonymTypeCodeName ? SynonymTypeCode.valueOf(synonymTypeCodeName) : SynonymTypeCode.ALTERNATE_NAME
         Synonym synonym = new Synonym(name: synonymValue, locale: locale, synonymTypeCode: synonymTypeCode)
         product.addToSynonyms(synonym)
@@ -1461,7 +1451,7 @@ class ProductService {
 
     Synonym editProductSynonym(String synonymId, String synonymTypeCodeName, String synonymValue, String localeName) {
         Synonym synonym = Synonym.get(synonymId)
-        Locale locale = localeName ? new Locale(localeName) : null
+        Locale locale = localeName ? LocalizationUtil.getLocale(localeName) : null
         SynonymTypeCode synonymTypeCode = null
         try {
             if (synonymTypeCodeName) {

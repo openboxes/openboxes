@@ -20,7 +20,6 @@ const INITIAL_STATE = {
   categoryOptions: {},
 };
 
-
 class ConfigureProductCategories extends Component {
   constructor(props) {
     super(props);
@@ -103,7 +102,7 @@ class ConfigureProductCategories extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
 });
 

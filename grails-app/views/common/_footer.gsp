@@ -1,4 +1,8 @@
-<%@ page import="org.pih.warehouse.core.Constants; org.pih.warehouse.core.RoleType; util.ConfigHelper" %>
+<%@ page import="org.pih.warehouse.core.Constants" %>
+<%@ page import="org.pih.warehouse.core.RoleType" %>
+<%@ page import="org.pih.warehouse.LocalizationUtil" %>
+<%@ page import="util.ConfigHelper" %>
+
 <div id="footer">
 	<div style="line-height: 2em;" class="center middle">
 		&copy; <g:copyrightYear/>
@@ -17,7 +21,7 @@
 		<!-- show all supported locales -->
 		<g:set var="targetUri" value="${(request.forwardURI - request.contextPath) + '?' + (request.queryString?:'') }"/>
 		<g:each in="${grailsApplication.config.openboxes.locale.supportedLocales}" var="l">
-			<g:set var="locale" value="${new Locale(l)}"/>
+			<g:set var="locale" value="${LocalizationUtil.getLocale(l)}"/>
 			<g:set var="selected" value="${locale == (session?.locale ?: session?.user?.locale)}"/>
             <g:set var="localizationModeLocale" value="${new Locale(grailsApplication.config.openboxes.locale.localizationModeLocale)}" />
             %{-- If the locale is the localizationModeLocale and localizationMode is active, create a link to disableLocalizationMode--}%
@@ -29,7 +33,7 @@
             <g:set var="defaultLocale" value="${new Locale(grailsApplication.config.openboxes.locale.defaultLocale)}"/>
 			<a class="${selected?'selected':''}" href="${link}">
 				<!-- fetch the display for locale based on the current locale -->
-				${g.message(code: "locale." + l + ".label", default: locale?.getDisplayName(locale ?: defaultLocale))}
+				${warehouse.message(code: "locale." + l + ".label", default: locale?.getDisplayName(locale ?: defaultLocale))}
 			</a>
 		</g:each>
 		<g:isUserInRole roles="[RoleType.ROLE_ADMIN]">

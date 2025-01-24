@@ -2,19 +2,24 @@ import _ from 'lodash';
 import queryString from 'query-string';
 
 import glAccountApi from 'api/services/GlAccountApi';
+import locationApi from 'api/services/LocationApi';
 import organizationApi from 'api/services/OrganizationApi';
 import productApi from 'api/services/ProductApi';
+import productClassificationApi from 'api/services/ProductClassificationApi';
 import productGroupApi from 'api/services/ProductGroupApi';
+import selectOptionsApi from 'api/services/SelectOptionsApi';
 import userApi from 'api/services/UserApi';
+import { INTERNAL_LOCATIONS } from 'api/urls';
+import ActivityCode from 'consts/activityCode';
+import locationType from 'consts/locationType';
 import apiClient from 'utils/apiClient';
 import splitTranslation from 'utils/translation-utils';
-
 
 export const debouncePeopleFetch = (waitTime, minSearchLength) =>
   _.debounce((searchTerm, callback) => {
     if (searchTerm && searchTerm.length >= minSearchLength) {
       apiClient.get('/api/persons', { params: { name: searchTerm, status: true } })
-        .then(result => callback(_.map(result.data.data, obj => (
+        .then((result) => callback(_.map(result.data.data, (obj) => (
           {
             ...obj,
             value: obj.id,
@@ -37,7 +42,7 @@ export const debounceUsersFetch = (waitTime, minSearchLength) =>
         },
       };
       userApi.getUsersOptions(config).then((users) => {
-        callback(users?.data?.data?.map?.(user => ({
+        callback(users?.data?.data?.map?.((user) => ({
           ...user,
           value: user.id,
           label: user.name,
@@ -56,24 +61,31 @@ export const debounceLocationsFetch = (
   withOrgCode = false,
   withTypeDescription = true,
   isReturnOrder = false,
+  direction,
 ) =>
   _.debounce((searchTerm, callback) => {
     if (searchTerm && searchTerm.length >= minSearchLength) {
-      const activityCodesParams = activityCodes ? activityCodes.map(activityCode => `&activityCodes=${activityCode}`).join('') : '';
-      const { direction } = queryString.parse(window.location.search);
-      const directionParam = fetchAll ? null : direction;
-      apiClient.get(`/api/locations?name=${searchTerm}${directionParam ? `&direction=${directionParam}` : ''}${activityCodesParams}${isReturnOrder ? '&isReturnOrder=true' : ''}`)
-        .then(result => callback(_.map(result.data.data, (obj) => {
-          const locationType = withTypeDescription ? ` [${obj.locationType.description}]` : '';
-          const label = `${obj.name}${locationType}`;
-          return {
-            id: obj.id,
-            type: obj.locationType.locationTypeCode,
-            name: obj.name,
-            supportedActivities: obj.supportedActivities,
-            label: withOrgCode ? `${obj.organizationCode ? `${obj.organizationCode} - ` : ''}${label}` : label,
-          };
-        })))
+      const queryParams = queryString.parse(window.location.search);
+
+      locationApi.getLocations({
+        paramsSerializer: (parameters) => queryString.stringify(parameters),
+        params: {
+          name: searchTerm,
+          direction: fetchAll ? undefined : (direction || queryParams?.direction),
+          isReturnOrder: isReturnOrder || undefined,
+          activityCodes,
+        },
+      }).then((result) => callback(_.map(result.data.data, (obj) => {
+        const locationTypeData = withTypeDescription ? ` [${obj.locationType.description}]` : '';
+        const label = `${obj.name}${locationTypeData}`;
+        return {
+          id: obj.id,
+          type: obj.locationType.locationTypeCode,
+          name: obj.name,
+          supportedActivities: obj.supportedActivities,
+          label: withOrgCode ? `${obj.organizationCode ? `${obj.organizationCode} - ` : ''}${label}` : label,
+        };
+      })))
         .catch(() => callback([]));
     } else {
       callback([]);
@@ -84,7 +96,7 @@ export const debounceGlobalSearch = (waitTime, minSearchLength) =>
   _.debounce((searchTerm, callback) => {
     if (searchTerm && searchTerm.length >= minSearchLength) {
       apiClient.get(encodeURI(`/json/globalSearch?term=${searchTerm}`))
-        .then(result => callback(_.map(result.data, obj => (
+        .then((result) => callback(_.map(result.data, (obj) => (
           {
             value: obj.url,
             url: obj.url,
@@ -100,11 +112,11 @@ export const debounceGlobalSearch = (waitTime, minSearchLength) =>
     }
   }, waitTime);
 
-export const debounceProductsFetch = (waitTime, minSearchLength, locationId) =>
+export const debounceProductsFetch = (waitTime, minSearchLength, locationId, params = {}) =>
   _.debounce((searchTerm, callback) => {
     if (searchTerm && searchTerm.length >= minSearchLength) {
       apiClient.get(encodeURI(`/api/products/search?name=${searchTerm}&productCode=${searchTerm}&location.id=${locationId}`))
-        .then(result => callback(_.map(result.data.data, obj => (
+        .then((result) => callback(_.map(result.data.data, (obj) => (
           {
             value: obj.id,
             id: obj.id,
@@ -116,7 +128,7 @@ export const debounceProductsFetch = (waitTime, minSearchLength, locationId) =>
             color: obj.color,
             exactMatch: obj.exactMatch,
             active: obj.active,
-            label: `${obj.productCode} - ${obj.displayName ?? obj.name}`,
+            label: `${obj.productCode} - ${obj.displayName ?? obj.name} ${(params.includeUom && obj.unitOfMeasure) ? `[${obj.unitOfMeasure}]` : ''}`,
           }
         ))))
         .catch(() => callback([]));
@@ -129,7 +141,7 @@ export const debounceAvailableItemsFetch = (waitTime, minSearchLength) =>
   _.debounce((searchTerm, callback) => {
     if (searchTerm && searchTerm.length >= minSearchLength) {
       apiClient.get(encodeURI(`/api/products/search?name=${searchTerm}&productCode=${searchTerm}&availableItems=true`))
-        .then(result => callback(_.map(result.data.data, obj => (
+        .then((result) => callback(_.map(result.data.data, (obj) => (
           {
             id: obj.id,
             value: obj.id,
@@ -152,7 +164,7 @@ export const debounceProductsInOrders = (waitTime, minSearchLength, vendor, dest
   _.debounce((searchTerm, callback) => {
     if (searchTerm && searchTerm.length >= minSearchLength) {
       apiClient.get(encodeURI(`/api/combinedShipmentItems/getProductsInOrders?name=${searchTerm}&vendor=${vendor}&destination=${destination}`))
-        .then(result => callback(_.map(result.data.data, obj => (
+        .then((result) => callback(_.map(result.data.data, (obj) => (
           {
             value: obj.id,
             id: obj.id,
@@ -172,8 +184,8 @@ export const debounceProductsInOrders = (waitTime, minSearchLength, vendor, dest
 export const debounceOrganizationsFetch = (waitTime, minSearchLength, roleTypes = ['ROLE_SUPPLIER'], active = false) =>
   _.debounce((searchTerm, callback) => {
     if (searchTerm && searchTerm.length >= minSearchLength) {
-      apiClient.get(`/api/organizations?q=${searchTerm}${roleTypes ? roleTypes.map(roleType => `&roleType=${roleType}`).join('') : ''}&active=${active}`)
-        .then(result => callback(_.map(result.data.data, obj => (
+      apiClient.get(`/api/organizations?q=${searchTerm}${roleTypes ? roleTypes.map((roleType) => `&roleType=${roleType}`).join('') : ''}&active=${active}`)
+        .then((result) => callback(_.map(result.data.data, (obj) => (
           {
             value: obj.id,
             id: obj.id,
@@ -191,7 +203,7 @@ export const debounceLocationGroupsFetch = (waitTime, minSearchLength) =>
   _.debounce((searchTerm, callback) => {
     if (searchTerm && searchTerm.length >= minSearchLength) {
       apiClient.get(`/api/locationGroups?q=${searchTerm}`)
-        .then(result => callback(_.map(result.data.data, obj => (
+        .then((result) => callback(_.map(result.data.data, (obj) => (
           {
             id: obj.id,
             value: obj.id,
@@ -206,10 +218,10 @@ export const debounceLocationGroupsFetch = (waitTime, minSearchLength) =>
   }, waitTime);
 
 export const organizationsFetch = (roleTypes = ['ROLE_SUPPLIER'], active = false) =>
-  apiClient.get(`/api/organizations?${roleTypes ? roleTypes.map(roleType => `&roleType=${roleType}`).join('') : ''}&active=${active}`)
+  apiClient.get(`/api/organizations?${roleTypes ? roleTypes.map((roleType) => `&roleType=${roleType}`).join('') : ''}&active=${active}`)
     .then((res) => {
       if (res.data.data) {
-        return res.data.data.map(obj => (
+        return res.data.data.map((obj) => (
           {
             id: obj.id,
             value: obj.id,
@@ -231,18 +243,31 @@ export const fetchLocationById = async (id) => {
   return response.data?.data;
 };
 
+export const fetchBins = async (locationId) => {
+  const response = await apiClient.get(INTERNAL_LOCATIONS, {
+    paramsSerializer: (parameters) => queryString.stringify(parameters),
+    params: {
+      'location.id': locationId,
+      locationTypeCode: [locationType.BIN_LOCATION, locationType.INTERNAL],
+      ignoreActivityCodes: [ActivityCode.RECEIVE_STOCK],
+    },
+  });
+
+  return response.data.data;
+};
+
 export const fetchProductsCategories = async () => {
   const response = await apiClient.get('/api/categoryOptions');
   return response.data.data;
 };
 
-export const fetchProductsCatalogs = async () => {
-  const response = await apiClient.get('/api/catalogOptions');
+export const fetchProductsCatalogs = async (params = {}) => {
+  const response = await apiClient.get('/api/catalogOptions', { params });
   return response.data.data;
 };
 
-export const fetchProductsTags = async () => {
-  const response = await apiClient.get('/api/tagOptions');
+export const fetchProductsTags = async (params = {}) => {
+  const response = await apiClient.get('/api/tagOptions', { params });
   return response.data.data;
 };
 
@@ -253,6 +278,25 @@ export const fetchProductsGlAccounts = async (params) => {
 
 export const fetchProductGroups = async () => {
   const { data } = await productGroupApi.getProductGroupsOptions();
+  return data.data;
+};
+
+export const fetchProductClassifications = async (facilityId) => {
+  const { data } = await productClassificationApi.getProductClassifications(facilityId);
+  if (data.data) {
+    return data.data.map((obj) => (
+      {
+        id: obj.name,
+        value: obj.name,
+        label: obj.name,
+      }
+    ));
+  }
+  return null;
+};
+
+export const fetchHandlingRequirements = async () => {
+  const { data } = await selectOptionsApi.getHandlingRequirementsOptions();
   return data.data;
 };
 
@@ -279,7 +323,7 @@ const mapShipmentType = (shipmentType) => {
 // Shipment types arg can be an array or a single element (passed from table cell)
 export const mapShipmentTypes = (shipmentTypes) => {
   if (_.isArray(shipmentTypes)) {
-    return shipmentTypes.map(shipmentType => mapShipmentType(shipmentType));
+    return shipmentTypes.map((shipmentType) => mapShipmentType(shipmentType));
   }
   return mapShipmentType(shipmentTypes);
 };

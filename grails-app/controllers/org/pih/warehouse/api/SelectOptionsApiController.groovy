@@ -21,6 +21,7 @@ import org.pih.warehouse.data.ProductSupplierService
 import org.pih.warehouse.glAccount.GlAccountService
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.ProductCatalog
+import org.pih.warehouse.product.ProductField
 import org.pih.warehouse.product.ProductGroup
 
 class SelectOptionsApiController {
@@ -44,8 +45,11 @@ class SelectOptionsApiController {
     }
 
     def catalogOptions() {
-        List<ProductCatalog> catalogs = genericApiService.getList(ProductCatalog.class.simpleName, [sort: "name"]).collect {
-            [id: it.id, label: "${it.name} (${it?.productCatalogItems?.size()})"]
+        boolean hideNumbers = params.boolean("hideNumbers", false)
+
+        def catalogs = genericApiService.getList(ProductCatalog.class.simpleName, [sort: "name"]).collect {
+            String label = hideNumbers ? it.name : "${it.name} (${it?.productCatalogItems?.size()})"
+            [id: it.id, label: label]
         }
         render([data: catalogs] as JSON)
     }
@@ -58,8 +62,10 @@ class SelectOptionsApiController {
     }
 
     def tagOptions() {
-        List<Tag> tags = genericApiService.getList(Tag.class.simpleName, [sort: "tag"]).collect {
-            [id: it.id, label: "${it.tag} (${it?.products?.size()})"]
+        boolean hideNumbers = params.boolean("hideNumbers", false)
+
+        def tags = genericApiService.getList(Tag.class.simpleName, [sort: "tag"]).collect {
+            [id: it.id, label: hideNumbers ? it.tag : "${it.tag} (${it?.products?.size()})"]
         }
         render([data: tags] as JSON)
     }
@@ -119,5 +125,17 @@ class SelectOptionsApiController {
             [id: it.name, value: it.name, label: g.message(code: "enum.RatingTypeCode.$it.name", default: it.name)]
         }
         render([data: ratingTypeCodeOptions] as JSON)
+    }
+
+    def handlingRequirementsOptions() {
+        List<ProductField> handlingRequirements = [
+                ProductField.COLD_CHAIN,
+                ProductField.CONTROLLED_SUBSTANCE,
+                ProductField.HAZARDOUS_MATERIAL,
+                ProductField.RECONDITIONED
+        ].collect {
+            [id: it.name(), value: it.name(), label: g.message(code: "enum.ProductField.${it.name()}", default: it.name())]
+        }
+        render([data: handlingRequirements] as JSON)
     }
 }

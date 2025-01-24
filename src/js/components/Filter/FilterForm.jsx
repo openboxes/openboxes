@@ -16,7 +16,6 @@ import { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'components/Filter/FilterStyles.scss';
 
-
 const FilterForm = ({
   filterFields,
   updateFilterParams,
@@ -50,6 +49,7 @@ const FilterForm = ({
     type: SearchField,
     attributes: {
       placeholder: translate(searchFieldPlaceholder, searchFieldDefaultPlaceholder),
+      ariaLabel: 'Search',
       filterElement: true,
       onKeyPress: submitOnEnter,
     },
@@ -134,7 +134,7 @@ const FilterForm = ({
                     <Button
                       defaultLabel="Search"
                       label="react.button.search.label"
-                      disabled={!allowEmptySubmit && _.every(values, value => !value)}
+                      disabled={!allowEmptySubmit && _.every(values, (value) => !value)}
                       variant="primary"
                       type="submit"
                     />
@@ -148,14 +148,13 @@ const FilterForm = ({
               </div>
             </form>
           );
-        }
-        }
+        }}
       />
     </div>
   );
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   currentLocation: state.session.currentLocation,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
 });
@@ -165,7 +164,6 @@ const mapDispatchToProps = {
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(FilterForm);
-
 
 FilterForm.propTypes = {
   filterFields: PropTypes.shape({}).isRequired,

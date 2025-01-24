@@ -12,11 +12,11 @@
     <body>
         <div class="body">
             <g:if test="${flash.message}">
-            	<div class="message">${flash.message}</div>
+            	<div class="message" role="status" aria-label="message">${flash.message}</div>
             </g:if>
             <div class="list">
 
-					
+
 				<g:if test="${orderItems }">
 					<table>
 						<thead>
@@ -24,28 +24,28 @@
 								<th> </th>
 								<g:sortableColumn property="order"
 									title="${warehouse.message(code: 'order.label')}" />
-					
+
 								<g:sortableColumn property="description"
 									title="${warehouse.message(code: 'default.description.label')}" />
-									
+
 								<g:sortableColumn property="quantity"
 									title="${warehouse.message(code: 'default.qty.label')}" />
-									
+
 								<g:sortableColumn property="status"
 									title="${warehouse.message(code: 'default.status.label')}" />
-									
+
 							</tr>
 						</thead>
 						<tbody>
-							<g:set var="i" value="${0 }"/> 
+							<g:set var="i" value="${0 }"/>
 							<g:each in="${orderItems.groupBy { it.order } }" var="entrymap">
 								<g:each in="${entrymap.value }" var="orderItem" >
 									<tr class="${(i++ % 2) == 0 ? 'odd' : 'even'}">
 										<td>
-											
+
 										</td>
-										<td>		
-											<g:link controller="order" action="show" id="${orderItem?.order?.id}">	
+										<td>
+											<g:link controller="order" action="show" id="${orderItem?.order?.id}">
 												${fieldValue(bean: orderItem, field: "order.name")}
 											</g:link>
 										</td>
@@ -58,7 +58,7 @@
 										<td>
 											${(orderItem?.isCompletelyFulfilled()) ? warehouse.message(code:'order.complete.label') : warehouse.message(code:'order.pending.label') }
 										</td>
-						
+
 									</tr>
 								</g:each>
 							</g:each>

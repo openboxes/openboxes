@@ -10,30 +10,30 @@
     <body>
         <div class="body">
             <g:if test="${flash.message}">
-	            <div class="message">${flash.message}</div>
+	            <div class="message" role="status" aria-label="message">${flash.message}</div>
             </g:if>
             <div class="box">
                 <h2><warehouse:message code="default.show.label" args="[entityName]" /></h2>
                 <table>
                     <tbody>
-                    
+
                         <tr class="prop">
                             <td valign="top" class="name"><warehouse:message code="party.id.label" default="Id" /></td>
-                            
+
                             <td valign="top" class="value">${fieldValue(bean: partyInstance, field: "id")}</td>
-                            
+
                         </tr>
-                    
+
                         <tr class="prop">
                             <td valign="top" class="name"><warehouse:message code="party.partyType.label" default="Party Type" /></td>
 
                             <td valign="top" class="value"><g:link controller="partyType" action="show" id="${partyInstance?.partyType?.id}">${partyInstance?.partyType}</g:link></td>
 
                         </tr>
-                    
+
                         <tr class="prop">
                             <td valign="top" class="name"><warehouse:message code="party.roles.label" default="Roles" /></td>
-                            
+
                             <td valign="top" style="text-align: left;" class="value">
                                 <ul>
                                 <g:each in="${partyInstance.roles}" var="r">
@@ -41,13 +41,13 @@
                                 </g:each>
                                 </ul>
                             </td>
-                            
+
                         </tr>
-                    
-                    
+
+
 						<tr class="prop">
                         	<td valign="top"></td>
-                        	<td valign="top">                         
+                        	<td valign="top">
 					            <div class="buttons left">
 					                <g:form>
 					                    <g:hiddenField name="id" value="${partyInstance?.id}" />
@@ -56,7 +56,7 @@
 					                </g:form>
 					            </div>
 							</td>
-						</tr>                    
+						</tr>
                     </tbody>
                 </table>
             </div>

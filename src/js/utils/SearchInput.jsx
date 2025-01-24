@@ -16,13 +16,15 @@ const SearchInput = (props) => {
     <div data-testid="search-input-div" className={`d-flex flex-row align-items-center justify-content-center search-input ${props.value ? 'search-input-has-value' : ''}`}>
       <RiSearchLine />
       <Input {...props} />
-      {props.value &&
+      {props.value
+        && (
         <button
           type="button"
           onClick={handleClear}
         >
           <RiCloseLine />
-        </button>}
+        </button>
+        )}
     </div>
   );
 };

@@ -9,16 +9,18 @@ import Alert from 'react-s-alert';
 import ReactTable from 'react-table';
 
 import { hideSpinner, showSpinner } from 'actions';
+import { TableCell } from 'components/DataTable';
 import { extractNonCanceledItems } from 'components/stock-transfer/utils';
 import { STOCK_TRANSFER_URL } from 'consts/applicationUrls';
+import DateFormat from 'consts/dateFormat';
 import apiClient, { flattenRequest, parseResponse } from 'utils/apiClient';
 import customTreeTableHOC from 'utils/CustomTreeTable';
 import Filter from 'utils/Filter';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
+import { formatDate } from 'utils/translation-utils';
 
 import 'react-table/react-table.css';
 import 'react-confirm-alert/src/react-confirm-alert.css';
-
 
 const SelectTreeTable = (customTreeTableHOC(ReactTable));
 
@@ -74,8 +76,16 @@ class StockTransferSecondPage extends Component {
       Filter,
     }, {
       Header: <Translate id="react.stockTransfer.product.label" defaultMessage="Product" />,
-      accessor: 'product.name',
+      accessor: 'product',
       style: { whiteSpace: 'normal' },
+      Cell: (row) => (
+        <TableCell
+          {...row}
+          value={row.value?.displayName ?? row.value?.name}
+          tooltip={row.value?.displayName && row.value?.name !== row.value?.displayName}
+          tooltipLabel={row.value?.name}
+        />
+      ),
       Filter,
     }, {
       Header: <Translate id="react.stockTransfer.lot.label" defaultMessage="Lot" />,
@@ -86,6 +96,15 @@ class StockTransferSecondPage extends Component {
       Header: <Translate id="react.stockTransfer.expiry.label" defaultMessage="Expiry" />,
       accessor: 'expirationDate',
       style: { whiteSpace: 'normal' },
+      Cell: (props) => (
+        <span>
+          {
+            props?.value
+              ? this.props.formatLocalizedDate(props.value, DateFormat.COMMON)
+              : props.value
+          }
+        </span>
+      ),
       Filter,
     }, {
       Header: <Translate id="react.stockTransfer.quantityAvailableToTransfer.label" defaultMessage="Quantity Available to Transfer" />,
@@ -145,7 +164,10 @@ class StockTransferSecondPage extends Component {
   }
 
   filterMethod = (filter, row) => {
-    const val = row[filter.id];
+    let val = row[filter.id];
+    if (filter.id === 'product') {
+      val = val ? `${val.name} ${val.displayName}` : null;
+    }
     return _.toString(val).toLowerCase().includes(filter.value.toLowerCase());
   };
 
@@ -179,7 +201,7 @@ class StockTransferSecondPage extends Component {
   completeStockTransfer() {
     const itemsWithLowerQuantity = _.filter(
       this.state.stockTransfer.stockTransferItems,
-      stockTransferItem => stockTransferItem.transferQty < stockTransferItem.quantityNotPicked,
+      (stockTransferItem) => stockTransferItem.transferQty < stockTransferItem.quantityNotPicked,
     );
 
     if (!_.isEmpty(itemsWithLowerQuantity)) {
@@ -196,11 +218,20 @@ class StockTransferSecondPage extends Component {
   confirmLowerQuantity(items) {
     confirmAlert({
       title: this.props.translate('react.stockTransfer.message.confirmStockTransfer.label', 'Confirm Stock Transfer'),
-      message: _.map(items, item =>
+      message: _.map(items, (item) =>
         (
-          <p>Qty {item.quantityNotPicked - item.transferQty} {this.props.translate('react.stockTransfer.alert.lowerQty1.label', 'of item')} {' '}
-            {item.productName} {this.props.translate('react.stockTransfer.alert.lowerQty2.label', 'is still in the receiving bin. Do you want to continue?')}
-          </p>)),
+          <p>
+            Qty
+            {item.quantityNotPicked - item.transferQty}
+            {' '}
+            {this.props.translate('react.stockTransfer.alert.lowerQty1.label', 'of item')}
+            {' '}
+            {' '}
+            {item.productName}
+            {' '}
+            {this.props.translate('react.stockTransfer.alert.lowerQty2.label', 'is still in the receiving bin. Do you want to continue?')}
+          </p>
+        )),
       buttons: [
         {
           label: this.props.translate('react.default.yes.label', 'Yes'),
@@ -234,14 +265,14 @@ class StockTransferSecondPage extends Component {
     const {
       columns, pivotBy,
     } = this.state;
-    const extraProps =
-      {
-        pivotBy,
-      };
+    const extraProps = {
+      pivotBy,
+    };
 
     return (
       <div className="stock-transfer">
-        {this.state.stockTransfer && this.state.stockTransfer.status === 'COMPLETED' &&
+        {this.state.stockTransfer && this.state.stockTransfer.status === 'COMPLETED'
+          && (
           <div className="submit-buttons d-flex justify-content-end mb-3 mt-0">
             <button
               type="button"
@@ -250,24 +281,27 @@ class StockTransferSecondPage extends Component {
               }}
               className="btn btn-outline-primary btn-form btn-xs"
               hidden={this.state.stockTransfer.status !== 'COMPLETED'}
-            ><Translate id="react.default.button.exit.label" defaultMessage="Exit" />
+            >
+              <Translate id="react.default.button.exit.label" defaultMessage="Exit" />
             </button>
           </div>
-        }
+          )}
         {
-          this.state.stockTransfer.stockTransferItems ?
-            <SelectTreeTable
-              data={this.state.stockTransfer.stockTransferItems}
-              columns={columns}
-              ref={(r) => { this.selectTable = r; }}
-              className="-striped -highlight"
-              {...extraProps}
-              defaultPageSize={Number.MAX_SAFE_INTEGER}
-              minRows={0}
-              showPaginationBottom={false}
-              filterable
-              defaultFilterMethod={this.filterMethod}
-            />
+          this.state.stockTransfer.stockTransferItems
+            ? (
+              <SelectTreeTable
+                data={this.state.stockTransfer.stockTransferItems}
+                columns={columns}
+                ref={(r) => { this.selectTable = r; }}
+                className="-striped -highlight"
+                {...extraProps}
+                defaultPageSize={Number.MAX_SAFE_INTEGER}
+                minRows={0}
+                showPaginationBottom={false}
+                filterable
+                defaultFilterMethod={this.filterMethod}
+              />
+            )
             : null
         }
         <div className="submit-buttons">
@@ -276,14 +310,16 @@ class StockTransferSecondPage extends Component {
             onClick={() => this.previousPage()}
             className="btn btn-outline-primary btn-form btn-xs"
             disabled={this.state.stockTransfer.status === 'COMPLETED'}
-          ><Translate id="react.default.button.previous.label" defaultMessage="Previous" />
+          >
+            <Translate id="react.default.button.previous.label" defaultMessage="Previous" />
           </button>
           <button
             type="button"
             onClick={() => this.completeStockTransfer()}
             className="btn btn-outline-success float-right btn-xs mr-3"
             disabled={this.state.stockTransfer.status === 'COMPLETED'}
-          ><Translate id="react.stockTransfer.completeStockTransfer.label" defaultMessage="Complete Stock Transfer" />
+          >
+            <Translate id="react.stockTransfer.completeStockTransfer.label" defaultMessage="Complete Stock Transfer" />
           </button>
         </div>
       </div>
@@ -291,9 +327,10 @@ class StockTransferSecondPage extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
   stockTransferTranslationsFetched: state.session.fetchedTranslations.stockTransfer,
+  formatLocalizedDate: formatDate(state.localize),
 });
 
 export default connect(
@@ -327,4 +364,5 @@ StockTransferSecondPage.propTypes = {
     id: PropTypes.string,
   }).isRequired,
   stockTransferTranslationsFetched: PropTypes.bool.isRequired,
+  formatLocalizedDate: PropTypes.func.isRequired,
 };

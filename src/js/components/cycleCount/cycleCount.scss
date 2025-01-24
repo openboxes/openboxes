@@ -1,0 +1,41 @@
+.all-products-tab-footer {
+
+  p {
+    font-weight: 500;
+    color: var(--blue-700);
+    font-size: 14px;
+    margin: auto 0;
+
+    span {
+      font-weight: 400;
+    }
+  }
+
+  .suggestion-button {
+    color: var(--blue-primary);
+
+    &:hover {
+      background: transparent;
+    }
+  }
+}
+
+.sorting-arrows {
+  display: flex !important;
+}
+
+.rt-tr > .checkbox-column {
+  width: 100px !important;
+}
+
+.header-cell {
+  > div:first-child {
+    height: 46px;
+  }
+}
+
+.selected-rows-indicator {
+  font-weight: 400;
+  color: var(--gray-600);
+  font-size: 14px;
+}

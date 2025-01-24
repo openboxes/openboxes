@@ -1015,6 +1015,18 @@ div.search-input:focus-within {
   }
 }
 
+.grayed-button {
+  @extend %button-base;
+
+  color: $black-alpha;
+  font-weight: 700;
+  border: 1px solid $black-alpha !important;
+
+  &:hover {
+    background-color: var(--gray-200);
+  }
+}
+
 .transparent-button {
   @extend %button-base;
 
@@ -1120,6 +1132,10 @@ div.search-input:focus-within {
   background-color: var(--color-red);
 }
 
+.font-red-ob {
+  color: var(--color-red) !important;
+}
+
 // Action dots box
 .action-dots {
   width: 24px;
@@ -1200,10 +1216,6 @@ div.search-input:focus-within {
     .filters-row {
       .filter-group > div:first-child {
         align-items: center;
-
-        label {
-          margin: 0 4px 0 0;
-        }
       }
     }
   }
@@ -1504,6 +1516,11 @@ div.search-input:focus-within {
   justify-content: space-between;
   align-items: center;
 
+  .info-bar-redirect > a {
+      text-decoration: underline;
+      color: #FFFFFF;
+  }
+
   svg {
     width: 18px;
     height: 18px;
@@ -1605,4 +1622,40 @@ div.search-input:focus-within {
 // Disabling resizing of textarea
 .resizable-false {
   resize: none;
+}
+
+.jipt-login-dialog {
+  inset: 0 auto 0 !important;
+}
+
+.fit-content {
+  width: fit-content;
+}
+
+.ReactVirtualized__List {
+  overflow: auto !important;
+}
+
+.tabs {
+  height: 53px;
+  gap: 12px;
+  color: var(--gray-600);
+  border-bottom: 2px solid var(--gray-102);
+
+  span {
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 21px;
+    padding: 16px 8px;
+    text-transform: uppercase;
+
+    &:hover {
+      color: var(--blue-primary);
+    }
+  }
+
+  .active-tab {
+    color: var(--blue-primary);
+    box-shadow: 0 2px 0 var(--blue-primary);
+  }
 }

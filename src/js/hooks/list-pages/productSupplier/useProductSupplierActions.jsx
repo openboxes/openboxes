@@ -72,8 +72,8 @@ const useProductSupplierActions = ({ fireFetchData }) => {
     });
   };
 
-  const getActions = useCallback((productSupplierId) => (canManageProducts ?
-    [
+  const getActions = useCallback((productSupplierId) => (canManageProducts
+    ? [
       {
         defaultLabel: 'Edit',
         label: 'react.productSupplier.edit.label',

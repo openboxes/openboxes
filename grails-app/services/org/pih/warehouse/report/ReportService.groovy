@@ -662,7 +662,7 @@ class ReportService implements ApplicationContextAware {
     }
 
     List getOnOrderSummary(Location location) {
-        String locale = LocalizationUtil.localizationService.getCurrentLocale().toLanguageTag()
+        String locale = LocalizationUtil.localizationService.getCurrentLocale().toString()
 
         String query = """
             select 
@@ -897,10 +897,7 @@ class ReportService implements ApplicationContextAware {
                         WHEN shipment.current_status IN ('SHIPPED', 'PARTIALLY_RECEIVED', 'RECEIVED') THEN IFNULL(shipment_item.quantity / order_item.quantity_per_uom, 0)
                         ELSE 0
                     END AS quantity_shipped,
-                    CASE 
-                        WHEN invoice.date_posted IS NULL THEN 0
-                        ELSE IFNULL(SUM(invoice_item.quantity), 0) 
-                    END AS quantity_invoiced
+                    SUM(IF(invoice.date_posted IS NULL, 0, IFNULL(invoice_item.quantity, 0))) AS quantity_invoiced
                 FROM `order` o
                     LEFT OUTER JOIN order_item ON o.id = order_item.order_id
                     LEFT OUTER JOIN order_shipment ON order_item.id = order_shipment.order_item_id
@@ -912,38 +909,45 @@ class ReportService implements ApplicationContextAware {
                 WHERE o.order_type_id = 'PURCHASE_ORDER'
                     AND order_item.order_item_status_code != 'CANCELED'
                     AND (invoice.invoice_type_id != :prepaymentInvoiceId OR invoice.invoice_type_id IS NULL)
+                    AND (invoice_item.inverse IS NULL OR invoice_item.inverse = FALSE)
                     ${additionalFilter}
-                GROUP BY o.id, order_item.id, shipment_item.id, invoice_item.id
+                GROUP BY o.id, order_item.id, shipment_item.id
             ) AS order_item_invoice_summary 
             GROUP BY id
             HAVING order_item_invoice_summary.quantity_ordered > SUM(order_item_invoice_summary.quantity_invoiced);
         """
 
         String orderAdjustmentsQuery = """
-            SELECT 
-                order_adjustment_invoice_summary.id,
-                order_adjustment_invoice_summary.order_id,
-                SUM(order_adjustment_invoice_summary.quantity_invoiced)
-            FROM (
-                SELECT 
-                    order_adjustment.id AS id,
-                    o.id AS order_id,
-                    CASE
-                        WHEN (invoice.invoice_type_id = :prepaymentInvoiceId OR invoice.invoice_type_id IS NULL OR invoice.date_posted IS NULL) THEN 0
-                        ELSE 1
-                    END as quantity_invoiced
-                FROM `order` o
-                    LEFT OUTER JOIN order_adjustment ON order_adjustment.order_id = o.id
-                    LEFT OUTER JOIN order_adjustment_invoice ON order_adjustment_invoice.order_adjustment_id = order_adjustment.id
-                    LEFT OUTER JOIN invoice_item ON invoice_item.id = order_adjustment_invoice.invoice_item_id
-                    LEFT OUTER JOIN invoice ON invoice_item.invoice_id = invoice.id
-                WHERE o.order_type_id = 'PURCHASE_ORDER'
-                    AND order_adjustment.canceled IS NOT TRUE
-                    ${additionalFilter}
-                GROUP BY o.id, order_adjustment.id, invoice_item.id
-            ) AS order_adjustment_invoice_summary
-            GROUP BY id
-            HAVING SUM(order_adjustment_invoice_summary.quantity_invoiced) = 0;
+            SELECT
+                order_adjustment.id AS id,
+                o.id AS order_id
+            FROM `order` o
+                     LEFT OUTER JOIN order_adjustment ON order_adjustment.order_id = o.id
+                     LEFT OUTER JOIN order_adjustment_invoice ON order_adjustment_invoice.order_adjustment_id = order_adjustment.id
+                     LEFT OUTER JOIN invoice_item ON invoice_item.id = order_adjustment_invoice.invoice_item_id
+                     LEFT OUTER JOIN invoice ON invoice_item.invoice_id = invoice.id
+                     LEFT OUTER JOIN (
+                        SELECT adjustment_id, SUM(invoiced_amount) as total_invoiced_amount
+                        FROM order_adjustment_payment_status
+                        GROUP BY adjustment_id
+                    ) as adjustment_invoice_amount ON adjustment_invoice_amount.adjustment_id = order_adjustment.id
+                    LEFT OUTER JOIN order_adjustment_details ON order_adjustment_details.id = order_adjustment.id
+            WHERE o.order_type_id = 'PURCHASE_ORDER'
+              AND order_adjustment.canceled IS NOT TRUE
+              AND (invoice_item.inverse IS NULL OR invoice_item.inverse = FALSE)
+                ${additionalFilter}
+            GROUP BY o.id, order_adjustment.id
+            HAVING SUM(
+                       CASE
+                           WHEN (
+                               invoice.invoice_type_id = :prepaymentInvoiceId
+                                   OR invoice.invoice_type_id IS NULL
+                                   OR invoice.date_posted IS NULL
+                                   OR (invoice.date_posted IS NOT NULL AND ABS(adjustment_invoice_amount.total_invoiced_amount) != order_adjustment_details.total_adjustment)
+                               ) THEN 0
+                           ELSE 1
+                           END
+                   ) = 0;
         """
 
         List orderItemResults = dataService.executeQuery(orderItemsQuery, queryParams)
@@ -1044,7 +1048,7 @@ class ReportService implements ApplicationContextAware {
                 "Value Shipped not invoiced"                        : "",
                 "Total Qty not Invoiced (UOM)"                      : "",
                 "Total Qty not Invoiced (Each)"                     : 1,
-                "Total Value not invoiced"                          : currencyNumberFormat.format((orderAdjustment?.totalAdjustments) ?: 0),
+                "Total Value not invoiced"                          : currencyNumberFormat.format((orderAdjustment?.totalAmountNotInvoiced) ?: 0),
                 "Budget Code"                                       : orderAdjustment?.budgetCode?.code,
                 "Payment Terms"                                     : orderAdjustment?.order?.paymentTerm?.name,
                 "Recipient"                                         : "",

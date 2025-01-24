@@ -21,6 +21,7 @@ import org.hibernate.criterion.Projections
 import org.hibernate.criterion.Restrictions
 import org.hibernate.criterion.Subqueries
 import org.hibernate.sql.JoinType
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.PreferenceType
 import org.pih.warehouse.core.ProductPrice
@@ -44,7 +45,7 @@ class ProductSupplierService {
 
     public static final PREFERENCE_TYPE_MULTIPLE = "MULTIPLE"
 
-    def identifierService
+    ProductSupplierIdentifierService productSupplierIdentifierService
     def dataSource
     ProductSupplierDataService productSupplierGormService
 
@@ -225,6 +226,9 @@ class ProductSupplierService {
         productSupplier.manufacturer = manufacturerName ? Organization.findByName(manufacturerName) : null
         productSupplier.supplierCode = supplierCode ? supplierCode : null
         productSupplier.manufacturerCode = manufacturerCode ? manufacturerCode : null
+        if (!productSupplier.code && !productSupplier.id) {
+            assignSourceCode(productSupplier, supplier)
+        }
 
         if (unitOfMeasure && quantity) {
             ProductPackage defaultProductPackage =
@@ -237,12 +241,26 @@ class ProductSupplierService {
                 defaultProductPackage.product = productSupplier.product
                 defaultProductPackage.uom = unitOfMeasure
                 defaultProductPackage.quantity = quantity
+                /**
+                    Product supplier needs to be saved here to receive an ID in order to be able to assign it to the product package
+                    otherwise the transient property value exception would be thrown
+                 */
+                productSupplier.save()
+                defaultProductPackage.productSupplier = productSupplier
+                /**
+                    The flush is needed because of the order Hibernate uses to save the entities in this operation -
+                    for productSupplier.defaultProductPackage to be stored properly and not be cleared after transaction commit, the flush is needed
+                    Check OBPIH-6757 for more details (#4904 PR)
+                 */
+                defaultProductPackage.save(flush: true)
+                productSupplier.defaultProductPackage = defaultProductPackage
+                productSupplier.addToProductPackages(defaultProductPackage)
+
                 if (price != null) {
                     ProductPrice productPrice = new ProductPrice()
                     productPrice.price = price
                     defaultProductPackage.productPrice = productPrice
                 }
-                productSupplier.addToProductPackages(defaultProductPackage)
             } else if (price != null && !defaultProductPackage.productPrice) {
                 ProductPrice productPrice = new ProductPrice()
                 productPrice.price = price
@@ -272,39 +290,54 @@ class ProductSupplierService {
 
         PreferenceType preferenceType = params.globalPreferenceTypeName ? PreferenceType.findByName(params.globalPreferenceTypeName) : null
 
-        if (preferenceType) {
-            ProductSupplierPreference productSupplierPreference = productSupplier.getGlobalProductSupplierPreference()
+        assignDefaultPreferenceType(productSupplier,
+                preferenceType,
+                params.globalPreferenceTypeComments,
+                params.globalPreferenceTypeValidityStartDate,
+                params.globalPreferenceTypeValidityEndDate)
 
-            if (!productSupplierPreference) {
-                productSupplierPreference = new ProductSupplierPreference()
-                productSupplier.addToProductSupplierPreferences(productSupplierPreference)
-            }
-
-            productSupplierPreference.preferenceType = preferenceType
-            productSupplierPreference.comments = params.globalPreferenceTypeComments
-
-            def globalPreferenceTypeValidityStartDate = params.globalPreferenceTypeValidityStartDate ? dateFormat.parse(params.globalPreferenceTypeValidityStartDate) : null
-
-            if (globalPreferenceTypeValidityStartDate) {
-                productSupplierPreference.validityStartDate = globalPreferenceTypeValidityStartDate
-            }
-
-            def globalPreferenceTypeValidityEndDate = params.globalPreferenceTypeValidityEndDate ? dateFormat.parse(params.globalPreferenceTypeValidityEndDate) : null
-
-            if (globalPreferenceTypeValidityEndDate) {
-                productSupplierPreference.validityEndDate = globalPreferenceTypeValidityEndDate
-            }
-        }
-
-        if (!productSupplier.code && !productSupplier.id) {
-            assignSourceCode(productSupplier, supplier)
-        }
         return productSupplier
     }
 
+    void assignDefaultPreferenceType(ProductSupplier productSupplier,
+                 PreferenceType preferenceType,
+                 String comments,
+                 String validityStartDate,
+                 String validityEndDate) {
+        ProductSupplierPreference productSupplierPreference = productSupplier.getGlobalProductSupplierPreference()
+        if (!preferenceType && productSupplierPreference) {
+            // If preference type is not provided, delete it
+            productSupplier.removeFromProductSupplierPreferences(productSupplierPreference)
+            productSupplierPreference.delete()
+            return
+        }
+
+        if (!productSupplierPreference) {
+            productSupplierPreference = new ProductSupplierPreference()
+            productSupplier.addToProductSupplierPreferences(productSupplierPreference)
+        }
+
+        productSupplierPreference.preferenceType = preferenceType
+        productSupplierPreference.comments = comments
+
+        Date globalPreferenceTypeValidityStartDate = validityStartDate ? Constants.MONTH_DAY_YEAR_DATE_FORMATTER.parse(validityStartDate) : null
+
+        if (globalPreferenceTypeValidityStartDate) {
+            productSupplierPreference.validityStartDate = globalPreferenceTypeValidityStartDate
+        }
+
+        Date globalPreferenceTypeValidityEndDate = validityEndDate ? Constants.MONTH_DAY_YEAR_DATE_FORMATTER.parse(validityEndDate) : null
+
+        if (globalPreferenceTypeValidityEndDate) {
+            productSupplierPreference.validityEndDate = globalPreferenceTypeValidityEndDate
+        }
+    }
+
     void assignSourceCode(ProductSupplier productSupplier, Organization organization) {
-        String prefix = productSupplier?.product?.productCode
-        productSupplier.code = identifierService.generateProductSupplierIdentifier(prefix, organization?.code)
+        productSupplier.code = productSupplierIdentifierService.generate(
+                productSupplier,
+                productSupplier?.product?.productCode,
+                organization?.code)
     }
 
     def getOrCreateNew(Map params, boolean forceCreate) {
@@ -367,7 +400,10 @@ class ProductSupplierService {
         Organization organization = Organization.get(params.supplier.id)
         Organization manufacturer = Organization.get(params.manufacturer)
         ProductSupplier productSupplier = new ProductSupplier()
-        productSupplier.code = params.sourceCode ?: identifierService.generateProductSupplierIdentifier(product?.productCode, organization?.code)
+        productSupplier.code = params.sourceCode ?: productSupplierIdentifierService.generate(
+                productSupplier,
+                product?.productCode,
+                organization?.code)
         productSupplier.name = params.sourceName ?: product?.name
         productSupplier.supplier = organization
         productSupplier.supplierCode = params.supplierCode
@@ -388,8 +424,10 @@ class ProductSupplierService {
     ProductSupplier saveProductSupplier(ProductSupplierDetailsCommand command) {
         ProductSupplier productSupplier = new ProductSupplier(command.properties)
         if (!productSupplier.code) {
-            productSupplier.code =
-                identifierService.generateProductSupplierIdentifier(command?.product?.productCode, command?.supplier?.code)
+            productSupplier.code = productSupplierIdentifierService.generate(
+                    productSupplier,
+                    command?.product?.productCode,
+                    command?.supplier?.code)
         }
         return productSupplierGormService.save(productSupplier)
     }
@@ -401,8 +439,10 @@ class ProductSupplierService {
         }
         productSupplier.properties = command.properties
         if (!productSupplier.code) {
-            productSupplier.code =
-                identifierService.generateProductSupplierIdentifier(command?.product?.productCode, command?.supplier?.code)
+            productSupplier.code = productSupplierIdentifierService.generate(
+                    productSupplier,
+                    command?.product?.productCode,
+                    command?.supplier?.code)
         }
         return productSupplier
     }

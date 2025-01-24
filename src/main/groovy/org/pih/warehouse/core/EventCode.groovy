@@ -11,6 +11,7 @@ package org.pih.warehouse.core
 
 enum EventCode {
 
+    CREATED,
     SCHEDULED,
     PICKED,
     PACKED,
@@ -56,6 +57,23 @@ enum EventCode {
 
     static listPending() {
         [SCHEDULED]
+    }
+
+    static List<EventCode> listSystemEventTypeCodes() {
+        return [
+            CREATED,
+            SHIPPED,
+            RECEIVED,
+            PARTIALLY_RECEIVED,
+            REJECTED,
+            SUBMITTED,
+            PENDING_APPROVAL,
+            APPROVED
+        ]
+    }
+
+    static List<EventCode> listCustomEventTypeCodes() {
+        return values() - listSystemEventTypeCodes()
     }
 
 }

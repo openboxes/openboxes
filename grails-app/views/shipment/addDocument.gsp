@@ -9,16 +9,16 @@
 
 	<div class="body">
 		<g:if test="${flash.message}">
-			<div class="message">
+			<div class="message" role="status" aria-label="message">
 				${flash.message}
 			</div>
 		</g:if>
 		<g:hasErrors bean="${shipmentInstance}">
-			<div class="errors">
+			<div class="errors" role="alert" aria-label="error-message">
 				<g:renderErrors bean="${shipmentInstance}" as="list" />
 			</div>
 		</g:hasErrors>
-			
+
 
 		<g:render template="summary" />
 		<div class="box">
@@ -51,7 +51,7 @@
 							<td valign="top" class="name"><label><warehouse:message
 								code="document.type.label" /></label></td>
 							<td valign="top" class="value ${hasErrors(bean: documentInstance, field: 'documentType', 'errors')}">
-									<g:select name="typeId" from="${org.pih.warehouse.core.DocumentType.list().sort { it.name }}" noSelection="['':'']"
+									<g:select name="typeId" from="${documentTypes}" noSelection="['':'']"
                                               class="chzn-select-deselect" value="${documentInstance?.documentType?.id}" optionKey="id" optionValue="${{format.metadata(obj:it)}}"/>
 							</td>
 						</tr>

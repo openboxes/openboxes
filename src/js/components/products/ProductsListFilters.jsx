@@ -13,7 +13,7 @@ const ProductsListFilters = ({
   <div className="d-flex flex-column list-page-filters">
     <FilterForm
       filterFields={filterFields}
-      updateFilterParams={values => setFilterParams({ ...values })}
+      updateFilterParams={(values) => setFilterParams({ ...values })}
       formProps={formProps}
       searchFieldPlaceholder="react.productsList.filters.search.placeholder.label"
       searchFieldDefaultPlaceholder="Search by product name"

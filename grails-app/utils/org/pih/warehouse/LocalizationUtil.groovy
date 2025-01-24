@@ -10,13 +10,16 @@
 package org.pih.warehouse
 
 import grails.util.Holders
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.LocalizationService
 import org.pih.warehouse.inventory.Transaction
+import org.springframework.util.StringUtils
 
 class LocalizationUtil {
 
     static final def delimiter = '\\|'
     static final def localeDelimiter = ':'
+    static final String DASH = '-'
 
     static LocalizationService getLocalizationService() {
         return Holders.getGrailsApplication().getParentContext().getBean("localizationService")
@@ -26,9 +29,29 @@ class LocalizationUtil {
         return localizationService.currentLocale
     }
 
+    /**
+     * Convenience util to handle country specific language (for example Mexican Spanish). As we
+     * used to provide supported locales in config as a language code in ISO 639 alpha-2 or
+     * ISO 639 alpha-3 format, to support country specific languages we have to add a country
+     * code in ISO 3166 alpha-2 or UN M.49 numeric-3 format to it.
+     * As there is no Locale constructor that handles `<languageCode>_<countryCode>` or
+     * `<languageCode>-<countryCode>` we have to handle it here.
+     * @param localeCode String with locale code represented as single language code (ex.: "en", "es"),
+     *                   or combined with country code (ex.: "en_GB", "es_MX", "en-GB", "es-MX")
+     * @return Locale
+     * */
+    static Locale getLocale(String localeCode) {
+        // Since spring 5.0.4 StringUtils.parseLocale(localeCode) could be used to handle both cases
+        if (localeCode?.contains(DASH)) {
+            return Locale.forLanguageTag(localeCode)
+        }
+
+        return StringUtils.parseLocaleString(localeCode)
+    }
+
     static List<Locale> getSupportedLocales() {
         def supportedLocales = Holders.config.openboxes.locale.supportedLocales
-        return supportedLocales.collect { new Locale(it) }
+        return supportedLocales.collect { getLocale(it) }
     }
 
     static String getLocalizedString(Transaction transaction) {
@@ -112,5 +135,17 @@ class LocalizationUtil {
      */
     static String getDefaultString(String str) {
         return getLocalizedString(str, null)
+    }
+
+
+    static boolean isSpanishMexico(Locale locale) {
+        return locale == new Locale("es", "MX")
+    }
+
+    static String getLocalizedOrderImportDateFormat(Locale locale) {
+        if (isSpanishMexico(locale)) {
+            return Constants.SPANISH_MEXICO_ORDER_IMPORT_DATE_FORMAT
+        }
+        return Constants.DEFAULT_ORDER_IMPORT_DATE_FORMAT
     }
 }

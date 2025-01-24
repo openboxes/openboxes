@@ -6,10 +6,13 @@ import apiClient from 'utils/apiClient';
 const exportFileFromAPI = ({
   url,
   params,
+  format = 'csv',
   filename: customFilename,
+  afterExporting,
 }) => apiClient.get(url, {
+  responseType: 'blob',
   params: {
-    format: 'csv',
+    format,
     ...params,
   },
   paramsSerializer: queryString.stringify,
@@ -21,7 +24,8 @@ const exportFileFromAPI = ({
 
     const filename = customFilename || filenameFromHeader || 'file';
 
-    fileDownload(res.data, filename, 'text/csv');
+    fileDownload(res.data, `${filename}.${format}`);
+    afterExporting?.();
     return res;
   });
 

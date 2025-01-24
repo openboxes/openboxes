@@ -13,8 +13,8 @@ import DateField from 'components/form-elements/DateField';
 import ModalWrapper from 'components/form-elements/ModalWrapper';
 import ProductSelectField from 'components/form-elements/ProductSelectField';
 import TextField from 'components/form-elements/TextField';
+import DateFormat from 'consts/dateFormat';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
-
 
 const FIELDS = {
   lines: {
@@ -33,7 +33,8 @@ const FIELDS = {
           receiptItemId: null,
           newLine: true,
         })}
-      ><Translate id="react.default.button.addLine.label" defaultMessage="Add line" />
+      >
+        <Translate id="react.default.button.addLine.label" defaultMessage="Add line" />
       </button>
     ),
     fields: {
@@ -56,7 +57,8 @@ const FIELDS = {
         label: 'react.partialReceiving.expiry.label',
         defaultMessage: 'Expiry',
         attributes: {
-          dateFormat: 'MM/DD/YYYY',
+          localizeDate: true,
+          localizedDateFormat: DateFormat.COMMON,
           autoComplete: 'off',
         },
       },
@@ -72,6 +74,15 @@ const FIELDS = {
   },
 };
 
+// Erase receiving quantity when shipped quantity is equal to 0
+const eraseReceivingQuantity = (items) => items.map((item) => {
+  if (!_.parseInt(item.quantityShipped)) {
+    return { ...item, quantityReceiving: null };
+  }
+
+  return item;
+});
+
 /**
  * Modal window where user can edit receiving's line. User can open it on the first page
  * of partial receiving if they want to change lot information.
@@ -84,10 +95,30 @@ class EditLineModal extends Component {
     } = props;
     const dynamicAttr = getDynamicAttr ? getDynamicAttr(props) : {};
     const attr = { ...attributes, ...dynamicAttr };
+    /**
+     * When calculating grouped shipment items while building the modal (it is built once)
+     * we want to look at the initial values in order to know the original qty shipped
+     * this is why we pass this.props.initialReceiptCandidates to the groupShipmentItems function
+     * If we were to pass the this.props.values while building a new row,
+     * we already might have edited qty shipped
+     * that would be considered as original qty that we should validate further edits with.
+     */
+    const groupedShipmentItems = this.groupShipmentItems(this.props.initialReceiptCandidates);
+    const shipmentItemsQuantityMap = Object.entries(groupedShipmentItems)
+      .reduce((acc, [key, value]) =>
+        ({
+          ...acc,
+          [key]: _.sumBy(value, (item) => _.toInteger(item.quantityShipped)),
+        }),
+      {});
 
     this.state = {
       attr,
       formValues: [],
+      shipmentItemsQuantityMap,
+      // This is the original quantity shipped of a shipmentItem. This indicates the maximum.
+      shipmentItemQuantityShippedSum: shipmentItemsQuantityMap[attr.fieldValue?.shipmentItemId],
+      showMismatchQuantityShippedInfo: false,
     };
 
     this.onOpen = this.onOpen.bind(this);
@@ -106,31 +137,41 @@ class EditLineModal extends Component {
     this.setState({ attr });
   }
 
+  groupShipmentItems(values = this.props.values) {
+    const { containers } = values;
+    /**
+     * containers are built like: [{..., shipmentItems: []}]
+     * so in the end we have to flat the result,
+     * as after mapping, the result would look like
+     * [[<shipmentItem>, <shipmentItem>], [<shipmentItem>, <shipmentItem>]]
+     */
+    const shipmentItems = containers.flatMap((container) => container.shipmentItems);
+    // Return the results as map of { [shipmentItemId]: [<shipmentItem>, <shipmentItem>] }
+    return _.groupBy(shipmentItems, 'shipmentItemId');
+  }
+
   /**
    * Loads available items into modal's form.
    * @public
   */
   onOpen() {
-    this.setState({
+    const { shipmentItemsQuantityMap, attr } = this.state;
+    this.setState((prev) => ({
       formValues: {
-        lines: _.map([this.state.attr.fieldValue], value => ({
+        lines: _.map([prev.attr.fieldValue], (value) => ({
           ...value,
           disabled: true,
           originalLine: true,
         })),
       },
-    });
-  }
-
-  // Erase receiving quantity when shipped quantity is equal to 0
-  eraseReceivingQuantity(items) {
-    return items.map((item) => {
-      if (!_.parseInt(item.quantityShipped)) {
-        return { ...item, quantityReceiving: null };
-      }
-
-      return item;
-    });
+      /**
+       * This needs to be set again while reopening a modal, due to table indexing problems
+       * assuming we have 5 lines, we split the first line to two items,
+       * the new, split item contains quantity info from the row,
+       * that was at this place before (2nd row, now 3rd row, after splitting the line)
+       */
+      shipmentItemQuantityShippedSum: shipmentItemsQuantityMap[attr.fieldValue?.shipmentItemId],
+    }));
   }
 
   /**
@@ -139,9 +180,9 @@ class EditLineModal extends Component {
    * @public
    */
   onSave(values) {
-    const lines = this.eraseReceivingQuantity(values.lines);
+    const lines = eraseReceivingQuantity(values.lines);
     if (_.some(lines, (line) => {
-      const oldItem = _.find(this.state.formValues.lines, item => line.product
+      const oldItem = _.find(this.state.formValues.lines, (item) => line.product
         && line.product.id === item.product.id && line.lotNumber === item.lotNumber);
 
       return oldItem && oldItem.quantityOnHand && oldItem.expirationDate !== line.expirationDate;
@@ -185,7 +226,60 @@ class EditLineModal extends Component {
     });
   }
 
+  calculateQuantityShippedSum(values) {
+    const { shipmentItemQuantityShippedSum } = this.state;
+    const originalItem = values.find((item) => item.rowId);
+    const qtyShippedSumFromModal = _.sumBy(values, (item) => _.toInteger(item.quantityShipped));
+    /**
+     * When calculating grouped shipment items while validating,
+     * we want to look at the current form values
+     * this is why we pass this.props.values to the groupShipmentItems function
+     */
+    const groupedShipmentItems = this.groupShipmentItems(this.props.values);
+    /**
+     * We want to exclude from the calculation an "original item" (that contains a rowId).
+     * It would receive the rowId and we would find the original item
+     * if the item was split at least once. Assuming we had a shipment item with quantity shipped 35
+     * we split it to two lines (20, 15) and we try to split one of them again
+     * (let's say, the second one), when we open the modal,
+     * as existingItemsQuantities we would expect to get 20,
+     * and to get the total sum of 35 (15 + x, depending on how many lines we would split again)
+     * Since the "15" item is included in the modal (values) and
+     * we would not exclude it in the existingItemsQuantities, it would be counted twice,
+     * so the existingItemsQuantities for this shipment item would be 35, not 20.
+     */
+    const sumExistingShipmentItemQuantity = (shipmentItems) =>
+      shipmentItems
+        .reduce((sum, curr) => (curr.rowId === originalItem?.rowId
+          ? sum
+          : sum + _.toInteger(curr.quantityShipped)), 0);
+    const existingItemsQuantities = Object.entries(groupedShipmentItems)
+      .reduce((acc, [key, value]) =>
+        ({
+          ...acc,
+          [key]: sumExistingShipmentItemQuantity(value),
+        }),
+      {});
+    /** If the original item was not found, it means it's first attempt to edit a line,
+     *  and we don't have to check for existing quantities in rows below/above
+     *  as we only care about sum from the modal
+     */
+    const existingItemsQuantitySum = originalItem
+      ? existingItemsQuantities[originalItem.shipmentItemId]
+      : 0;
+    /**
+     * If sum from modal + eventual existing quantities is not equal to the original shipped qty,
+     * show the indicator of not matching quantity
+    */
+    if ((qtyShippedSumFromModal + existingItemsQuantitySum) !== shipmentItemQuantityShippedSum) {
+      this.setState({ showMismatchQuantityShippedInfo: true });
+      return;
+    }
+    this.setState({ showMismatchQuantityShippedInfo: false });
+  }
+
   validate(values) {
+    this.calculateQuantityShippedSum(values.lines);
     const errors = {};
     errors.lines = [];
     const date = moment(this.props.minimumExpirationDate, 'MM/DD/YYYY');
@@ -239,15 +333,26 @@ class EditLineModal extends Component {
       >
         <div>
           <div className="font-weight-bold mb-3">
-            <Translate id="react.partialReceiving.originalQtyShipped.label" defaultMessage="Original quantity shipped" />: {this.state.attr.fieldValue.quantityShipped}
+            <Translate id="react.partialReceiving.originalQtyShipped.label" defaultMessage="Original quantity shipped" />
+            :
+            {this.state.attr.fieldValue.quantityShipped}
           </div>
+          {this.state.showMismatchQuantityShippedInfo
+            && (
+              <div className="font-weight-bold font-red-ob">
+                <Translate
+                  id="react.partialReceiving.error.mismatchingQuantityShipped.label"
+                  defaultMessage="The total edited quantity does not match the original quantity shipped."
+                />
+              </div>
+            )}
         </div>
       </ModalWrapper>
     );
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   minimumExpirationDate: state.session.minimumExpirationDate,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
 });
@@ -272,6 +377,12 @@ EditLineModal.propTypes = {
   minimumExpirationDate: PropTypes.string.isRequired,
   translate: PropTypes.func.isRequired,
   wrapperClassName: PropTypes.string,
+  values: PropTypes.shape({
+    containers: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  }).isRequired,
+  initialReceiptCandidates: PropTypes.shape({
+    containers: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  }).isRequired,
 };
 
 EditLineModal.defaultProps = {

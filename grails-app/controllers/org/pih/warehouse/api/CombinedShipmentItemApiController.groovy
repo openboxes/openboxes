@@ -11,6 +11,8 @@ package org.pih.warehouse.api
 
 import grails.plugins.csv.CSVWriter
 import grails.converters.JSON
+import grails.util.Holders
+import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.grails.web.json.JSONObject
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.importer.ImportDataCommand
@@ -91,6 +93,7 @@ class CombinedShipmentItemApiController {
                 quantityToShip: '',
                 uom: it.unitOfMeasure,
                 supplierCode: it.productSupplier?.supplierCode,
+                productSupplierName: it.productSupplier?.name,
                 color: it.product?.color,
             ]
         }] as JSON)
@@ -112,23 +115,29 @@ class CombinedShipmentItemApiController {
         render (status: 200, text: "Successfully imported template")
     }
 
+    ApplicationTagLib getApplicationTagLib() {
+        return Holders.grailsApplication.mainContext.getBean(ApplicationTagLib)
+    }
+
     def exportTemplate() {
         def sw = new StringWriter()
 
+        ApplicationTagLib g = applicationTagLib
+
         def csv = new CSVWriter(sw, {
-            "Order number" { it.orderNumber }
-            "Order Item id" { it.id }
-            "Product code" { it.productCode }
-            "Product name" { it.productName }
-            "Lot number" { it.lotNumber }
-            "Expiry" { it.expiry }
-            "Quantity to ship" { it.quantityToShip }
-            "UOM" { it.unitOfMeasure }
-            "Pack level 1" { it.palletName }
-            "Pack level 2" { it.boxName }
-            "Recipient" { it.recipient }
-            "Budget code" { it.budgetCode }
-            "Supplier code" { it.supplierCode }
+            "${g.message(code: "order.orderNumber.label", default: "Order number")}" { it.orderNumber }
+            "${g.message(code: "orderItem.id.label", default: "Order Item id")}" { it.id }
+            "${g.message(code: "product.code.label", default: "Product code")}" { it.productCode }
+            "${g.message(code: "import.productName.label", default: "Product name")}" { it.productName }
+            "${g.message(code: "import.lotNumber.label", default: "Lot number")}" { it.lotNumber }
+            "${g.message(code: "orderItem.expiry.label", default: "Expiry")}" { it.expiry }
+            "${g.message(code: "react.stockMovement.quantityToShip.label", default: "Quantity to ship")}" { it.quantityToShip }
+            "${g.message(code: "product.uom.label", default: "UOM")}" { it.unitOfMeasure }
+            "${g.message(code: "packLevel1.label", default: "Pack level 1")}" { it.palletName }
+            "${g.message(code: "packLevel2.label", default: "Pack level 2")}" { it.boxName }
+            "${g.message(code: "orderItem.recipient.label", default: "Recipient")}" { it.recipient }
+            "${g.message(code: "orderItem.budgetCode.label", default: "Budget code")}" { it.budgetCode }
+            "${g.message(code: "order.originCode.label", default: "Supplier Code")}" { it.supplierCode }
         })
 
         if (params.blank) {
@@ -176,7 +185,9 @@ class CombinedShipmentItemApiController {
             }
         }
 
-        response.setHeader("Content-disposition", "attachment; filename=\"Order-items-template.csv\"")
+        String filename = g.message(code: "orderItem.template.fileName.label", default: "Order-items-template")
+
+        response.setHeader("Content-disposition", "attachment; filename=\"${filename}.csv\"")
         render(contentType: "text/csv", text: sw.toString(), encoding: "UTF-8")
         return
     }

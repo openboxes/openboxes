@@ -143,7 +143,7 @@ class Invoice implements Serializable {
     }
 
     Float getTotalValue() {
-        return invoiceItems?.collect { it?.totalAmount }?.sum() ?: 0
+        return invoiceItems?.collect { it?.amount ?: 0 }?.sum() ?: 0
     }
 
     Float getTotalValueNormalized() {
@@ -184,6 +184,10 @@ class Invoice implements Serializable {
         return invoiceItems?.any { it.order?.hasPrepaymentInvoice }
     }
 
+    boolean getHasRegularInvoice() {
+        return invoiceItems?.any { it.order?.hasRegularInvoice }
+    }
+
     boolean getIsPrepaymentInvoice() {
         return invoiceType?.code == InvoiceTypeCode.PREPAYMENT_INVOICE
     }
@@ -193,7 +197,7 @@ class Invoice implements Serializable {
     }
 
     Float getTotalPrepaymentValue() {
-        return isPrepaymentInvoice ? invoiceItems.sum { it.totalAmount } : 0
+        return isPrepaymentInvoice ? invoiceItems.sum { it.amount ?: 0 } : 0
     }
 
     List<Order> getOrders() {
@@ -217,12 +221,27 @@ class Invoice implements Serializable {
         return orders?.invoices?.flatten()?.findAll { it.invoiceType?.code == InvoiceTypeCode.PREPAYMENT_INVOICE }?.unique()
     }
 
+    /**
+     * @deprecated Inverse items are now stored on the final invoice (and this transient used to return
+     * prepayment items to display them as inverse items on the final invoice confirm page
+     * */
     List<InvoiceItem> getPrepaymentItems() {
         // Avoid returning prepayment items for PREPAYMENT_INVOICE (these are only for 'final' invoice)
         if (invoiceType?.code == InvoiceTypeCode.PREPAYMENT_INVOICE) {
             return []
         }
         return prepaymentInvoices?.invoiceItems?.flatten()
+    }
+
+    /**
+     * Function returning items that are split into two groups (inverse, regular)
+     * This method is used for displaying items on invoice view page
+     */
+    List<InvoiceItem> getSortedInvoiceItems() {
+        return invoiceItems.sort { a, b ->
+            a.inverse <=> b.inverse ?:
+                    a.id <=> b.id
+        } ?: []
     }
 
     Map toJson() {
@@ -246,6 +265,7 @@ class Invoice implements Serializable {
             invoiceType: invoiceType?.code?.name(),
             hasPrepaymentInvoice: hasPrepaymentInvoice,
             isPrepaymentInvoice: isPrepaymentInvoice,
+            status: getStatus()?.name(),
             documents: documents ? documents?.collect {it.toJson()} + getOrderDocuments() : getOrderDocuments(),
         ]
     }

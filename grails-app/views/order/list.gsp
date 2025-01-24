@@ -19,7 +19,7 @@
 		<div class="body">
 
 			<g:if test="${flash.message}">
-				<div class="message">${flash.message}</div>
+				<div class="message" role="status" aria-label="message">${flash.message}</div>
 			</g:if>
 
 			<div class="buttonBar">
@@ -228,6 +228,14 @@
 					success: function(data, textStatus, jqXHR){
 						for (const [orderId, derivedStatus] of Object.entries(data)) {
 							$("." + orderId).text(derivedStatus);
+						}
+					},
+					error: function (jqXHR, textStatus, errorThrown) {
+						console.error(jqXHR, textStatus, errorThrown);
+						if (jqXHR.responseText) {
+							$.notify(jqXHR.responseText, "error");
+						} else {
+							$.notify("An error occurred", "error");
 						}
 					}
 				});

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 
 import moment from 'moment';
 import PropTypes from 'prop-types';
@@ -6,13 +6,13 @@ import DatePicker from 'react-datepicker';
 
 import DateFieldInput from 'components/form-elements/v2/DateFieldInput';
 import { DateFormat, TimeFormat } from 'consts/timeFormat';
+import useTranslate from 'hooks/useTranslate';
 import InputWrapper from 'wrappers/InputWrapper';
 import RootPortalWrapper from 'wrappers/RootPortalWrapper';
 
 import 'react-datepicker/dist/react-datepicker.css';
 import 'components/form-elements/DateFilter/DateFilter.scss';
 import './style.scss';
-import useTranslate from 'hooks/useTranslate';
 
 const DateField = ({
   title,
@@ -25,19 +25,30 @@ const DateField = ({
   className,
   value,
   onChange,
+  showTimeSelect,
   ...fieldProps
 }) => {
   const translate = useTranslate();
   const onClear = () => onChange(null);
 
-  const onChangeHandler = date => onChange(date?.format(DateFormat.MMM_DD_YYYY));
+  const onChangeHandler = (date) => {
+    if (showTimeSelect) {
+      onChange(date?.format(DateFormat.MMM_DD_YYYY_HH_MM_SS));
+      return;
+    }
+    onChange(date?.format(DateFormat.MMM_DD_YYYY));
+  };
 
   const formatDate = (dateToFormat) => {
     if (!dateToFormat) {
       return null;
     }
-
-    return moment(new Date(dateToFormat), DateFormat.MMM_DD_YYYY);
+    if (showTimeSelect) {
+      return moment(new Date(dateToFormat), DateFormat.MMM_DD_YYYY_HH_MM_SS);
+    }
+    return showTimeSelect
+      ? moment(new Date(dateToFormat), DateFormat.MMM_DD_YYYY_HH_MM_SS)
+      : moment(new Date(dateToFormat), DateFormat.MMM_DD_YYYY);
   };
 
   const selectedDate = formatDate(value);
@@ -46,6 +57,8 @@ const DateField = ({
   const placeholderText = typeof placeholder === 'object'
     ? translate(placeholder?.id, placeholder?.default)
     : placeholder;
+
+  const datePickerRef = useRef(null);
 
   return (
     <InputWrapper
@@ -57,10 +70,11 @@ const DateField = ({
     >
       <DatePicker
         {...fieldProps}
+        showTimeSelect={showTimeSelect}
         customInput={<DateFieldInput onClear={onClear} />}
         className={`form-element-input ${errorMessage ? 'has-errors' : ''} ${className}`}
         dropdownMode="scroll"
-        dateFormat={DateFormat.MMM_DD_YYYY}
+        dateFormat={showTimeSelect ? DateFormat.MMM_DD_YYYY_HH_MM_SS : DateFormat.MMM_DD_YYYY}
         timeFormat={TimeFormat.HH_MM}
         disabled={disabled}
         timeIntervals={15}
@@ -74,6 +88,15 @@ const DateField = ({
         selected={selectedDate}
         highlightDates={highlightedDates}
         onChange={onChangeHandler}
+        onSelect={() => {
+          // Close date picker on select - this is somewhat a workaround to close the datepicker
+          // when using showTimeSelect, when we are expecting to close the datepicker
+          // after picking the date without picking the time.
+          datePickerRef.current?.setOpen(false);
+        }}
+        ref={(el) => {
+          datePickerRef.current = el;
+        }}
       />
     </InputWrapper>
   );
@@ -116,6 +139,7 @@ DateField.propTypes = {
   className: PropTypes.string,
   value: PropTypes.string,
   onChange: PropTypes.func,
+  showTimeSelect: PropTypes.bool,
 };
 
 DateField.defaultProps = {
@@ -129,4 +153,5 @@ DateField.defaultProps = {
   className: '',
   value: null,
   onChange: () => {},
+  showTimeSelect: false,
 };

@@ -37,7 +37,7 @@ class LocationType implements Comparable, Serializable {
 
     static constraints = {
         name(nullable: false, maxSize: 255)
-        locationTypeCode(nullable: true)
+        locationTypeCode(nullable: false)
         description(nullable: true, maxSize: 255)
         supportedActivities(nullable: true, display: false)
         sortOrder(nullable: true)

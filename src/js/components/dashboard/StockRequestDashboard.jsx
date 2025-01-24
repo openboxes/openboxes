@@ -22,8 +22,8 @@ const COLUMNS = [
     accessor: 'identifier',
     headerClassName: 'text-left font-weight-bold px-4 py-3',
     className: 'px-4 py-2 btn-link',
-    Cell: row => (
-      <a href={STOCK_MOVEMENT_URL.show(row.original.id)} >
+    Cell: (row) => (
+      <a href={STOCK_MOVEMENT_URL.show(row.original.id)}>
         { row.original.identifier }
       </a>
     ),
@@ -39,7 +39,7 @@ const COLUMNS = [
       return (
         <span className="d-flex align-items-center">
           <span className="d-inline-block text-overflow-ellipsis">
-            {row.original.displayStatus}
+            {row.original.displayStatus?.label}
           </span>
           {comment && (
             <Tooltip
@@ -61,7 +61,7 @@ const COLUMNS = [
     accessor: 'description',
     headerClassName: 'text-left font-weight-bold px-4 py-3',
     className: 'px-4 py-2 btn-link',
-    Cell: row => (
+    Cell: (row) => (
       <a href={STOCK_MOVEMENT_URL.show(row.original.id)}>
         { row.original.description }
       </a>
@@ -131,6 +131,7 @@ class StockRequestDashboard extends Component {
         this.setState({ isLoading: false });
       });
   }
+
   render() {
     return (
       <div className="p-3">
@@ -166,16 +167,15 @@ class StockRequestDashboard extends Component {
           nextText={<i className="fa fa-chevron-right" aria-hidden="true" />}
           pageText=""
           onFetchData={(tableState) => {
-              this.fetchStockMovementItems(tableState.page, tableState.pageSize);
-            }
-          }
+            this.fetchStockMovementItems(tableState.page, tableState.pageSize);
+          }}
         />
       </div>
     );
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   locale: state.session.activeLanguage,
   currentLocation: state.session.currentLocation,
 });

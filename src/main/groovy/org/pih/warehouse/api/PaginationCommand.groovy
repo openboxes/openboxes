@@ -1,25 +1,18 @@
 package org.pih.warehouse.api
 
 import grails.validation.Validateable
+import org.pih.warehouse.core.PaginationParams
 
-class PaginationCommand implements Validateable {
+class PaginationCommand extends PaginationParams implements Validateable {
 
-    Integer offset
-
-    Integer max
-
-    static constraints = {
-        offset min: 0, nullable: true
-        max min: 0, nullable: true
-    }
-
-
+    @Override
     Integer getMax() {
-        return Math.min(max ?: 10, 100)
+        return Math.min(super.max ?: 10, 100)
     }
 
+    @Override
     Integer getOffset() {
-        return Math.max(offset ?: 0, 0)
+        return Math.max(super.offset ?: 0, 0)
     }
 
     Map<String, Integer> getPaginationParams() {

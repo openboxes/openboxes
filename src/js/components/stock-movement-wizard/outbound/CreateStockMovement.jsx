@@ -10,19 +10,30 @@ import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 
-import { hideSpinner, showSpinner } from 'actions';
+import {
+  closeInfoBar,
+  createInfoBar,
+  hideInfoBar,
+  hideSpinner,
+  showInfoBar,
+  showSpinner,
+} from 'actions';
 import DateField from 'components/form-elements/DateField';
 import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
 import AddDestinationModal from 'components/stock-movement-wizard/modals/AddDestinationModal';
 import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
+import { InfoBar, InfoBarConfigs } from 'consts/infoBar';
 import apiClient from 'utils/apiClient';
+import {
+  shouldCreateFullOutboundImportFeatureBar,
+  shouldShowFullOutboundImportFeatureBar,
+} from 'utils/featureBarUtils';
 import { renderFormField } from 'utils/form-utils';
 import { debounceLocationsFetch, debouncePeopleFetch } from 'utils/option-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
-
 
 function validate(values) {
   const errors = {};
@@ -74,9 +85,9 @@ const FIELDS = {
       autoload: false,
       cache: false,
       options: [],
-      filterOptions: options => options,
+      filterOptions: (options) => options,
     },
-    getDynamicAttr: props => ({
+    getDynamicAttr: (props) => ({
       loadOptions: props.debouncedLocationsFetch,
       onChange: (value) => {
         if (value && props.destination && props.destination.id) {
@@ -101,7 +112,7 @@ const FIELDS = {
       autoload: false,
       cache: false,
       options: [],
-      filterOptions: options => options,
+      filterOptions: (options) => options,
     },
     getDynamicAttr: ({
       debouncedLocationsFetch,
@@ -133,9 +144,9 @@ const FIELDS = {
       cache: false,
       options: [],
       labelKey: 'name',
-      filterOptions: options => options,
+      filterOptions: (options) => options,
     },
-    getDynamicAttr: props => ({
+    getDynamicAttr: (props) => ({
       loadOptions: props.debouncedPeopleFetch,
     }),
   },
@@ -145,7 +156,7 @@ const FIELDS = {
     defaultMessage: 'Date requested',
     attributes: {
       required: true,
-      dateFormat: 'MM/DD/YYYY',
+      localizeDate: true,
       autoComplete: 'off',
     },
   },
@@ -196,11 +207,15 @@ class CreateStockMovement extends Component {
     this.fetchStockLists = this.fetchStockLists.bind(this);
     this.setRequestType = this.setRequestType.bind(this);
 
-    this.debouncedPeopleFetch =
-      debouncePeopleFetch(this.props.debounceTime, this.props.minSearchLength);
+    this.debouncedPeopleFetch = debouncePeopleFetch(
+      this.props.debounceTime,
+      this.props.minSearchLength,
+    );
 
-    this.debouncedLocationsFetch =
-      debounceLocationsFetch(this.props.debounceTime, this.props.minSearchLength);
+    this.debouncedLocationsFetch = debounceLocationsFetch(
+      this.props.debounceTime,
+      this.props.minSearchLength,
+    );
 
     this.openAddDestinationModal = this.openAddDestinationModal.bind(this);
   }
@@ -210,6 +225,16 @@ class CreateStockMovement extends Component {
       this.fetchStockLists(this.state.values.origin, this.state.values.destination);
     }
     this.fetchRequisitionTypes();
+
+    const { bars } = this.props;
+    // If the feature bar has not yet been triggered, try to add it to the redux store
+    if (shouldCreateFullOutboundImportFeatureBar(bars)) {
+      this.props.createInfoBar(InfoBarConfigs[InfoBar.FULL_OUTBOUND_IMPORT]);
+    }
+    // If the feature bar has not yet been closed by the user, show it
+    if (shouldShowFullOutboundImportFeatureBar(bars)) {
+      this.props.showInfoBar(InfoBar.FULL_OUTBOUND_IMPORT);
+    }
   }
 
   componentWillReceiveProps(nextProps) {
@@ -219,8 +244,15 @@ class CreateStockMovement extends Component {
     }
   }
 
+  componentWillUnmount() {
+    // We want to hide the feature bar when unmounting the component
+    // not to show it on any other page
+    this.props.hideInfoBar(InfoBar.FULL_OUTBOUND_IMPORT);
+  }
+
   setRequestType(values, stocklist) {
-    const requestType = _.find(this.state.requestTypes, type => type.value === 'STOCK');
+    const { requestTypes } = this.state;
+    const requestType = _.find(requestTypes, (type) => type.value === 'STOCK');
 
     this.setState({
       values: update(values, {
@@ -257,7 +289,7 @@ class CreateStockMovement extends Component {
 
     return apiClient.get(url)
       .then((response) => {
-        const requestTypes = _.map(response.data.data, type => ({
+        const requestTypes = _.map(response.data.data, (type) => ({
           value: type.id,
           label: type.name,
         }));
@@ -273,11 +305,11 @@ class CreateStockMovement extends Component {
     const originLocs = newValues.origin && origin;
     const isOldSupplier = origin && origin.type === 'SUPPLIER';
     const isNewSupplier = newValues.origin && newValues.type === 'SUPPLIER';
-    const checkOrigin = originLocs && (!isOldSupplier || (isOldSupplier && !isNewSupplier)) ?
-      newValues.origin.id !== origin.id : false;
+    const checkOrigin = originLocs && (!isOldSupplier || (isOldSupplier && !isNewSupplier))
+      ? newValues.origin.id !== origin.id : false;
 
-    const checkDest = stocklist && newValues.destination && destination ?
-      newValues.destination.id !== destination.id : false;
+    const checkDest = stocklist && newValues.destination && destination
+      ? newValues.destination.id !== destination.id : false;
     const checkStockList = newValues.stockMovementId ? _.get(newValues.stocklist, 'id', null) !== _.get(stocklist, 'id', null) : false;
 
     return (checkOrigin || checkDest || checkStockList);
@@ -296,13 +328,13 @@ class CreateStockMovement extends Component {
 
     return apiClient.get(url)
       .then((response) => {
-        const stocklists = _.map(response.data.data, stocklist => (
+        const stocklists = _.map(response.data.data, (stocklist) => (
           {
             id: stocklist.id, name: stocklist.name, value: stocklist.id, label: stocklist.name,
           }
         ));
 
-        const stocklistChanged = !_.find(stocklists, item => item.value.id === _.get(this.state.values, 'stocklist.id'));
+        const stocklistChanged = !_.find(stocklists, (item) => item.value.id === _.get(this.state.values, 'stocklist.id'));
 
         if (stocklistChanged && clearStocklist) {
           clearStocklist();
@@ -313,15 +345,14 @@ class CreateStockMovement extends Component {
       .catch(() => this.props.hideSpinner());
   }
 
-
   /**
    * Creates or updates stock movement with given data
    * @param {object} values
    * @public
    */
   saveStockMovement(values) {
-    if (values.origin && values.destination && values.requestedBy &&
-      values.dateRequested && values.description) {
+    if (values.origin && values.destination && values.requestedBy
+      && values.dateRequested && values.description) {
       this.props.showSpinner();
 
       let stockMovementUrl = '';
@@ -409,7 +440,7 @@ class CreateStockMovement extends Component {
   render() {
     return (
       <Form
-        onSubmit={values => this.nextPage(values)}
+        onSubmit={(values) => this.nextPage(values)}
         validate={validate}
         initialValues={this.state.values}
         mutators={{
@@ -426,7 +457,7 @@ class CreateStockMovement extends Component {
           },
         }}
         render={({ form: { mutators }, handleSubmit, values }) => (
-          <React.Fragment>
+          <>
             <AddDestinationModal
               isOpen={this.state.showDestinationModal}
               onClose={() => this.setState({ showDestinationModal: false })}
@@ -459,25 +490,33 @@ class CreateStockMovement extends Component {
                 </button>
               </div>
             </form>
-          </React.Fragment>
+          </>
         )}
       />
     );
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   location: state.session.currentLocation,
   isSuperuser: state.session.isSuperuser,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
   debounceTime: state.session.searchConfig.debounceTime,
   minSearchLength: state.session.searchConfig.minSearchLength,
   locationTypes: state.location.locationTypes,
+  bars: state.infoBar.bars,
 });
 
-export default withRouter(connect(mapStateToProps, {
-  showSpinner, hideSpinner,
-})(CreateStockMovement));
+const mapDispatchToProps = {
+  showSpinner,
+  hideSpinner,
+  createInfoBar,
+  hideInfoBar,
+  closeInfoBar,
+  showInfoBar,
+};
+
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(CreateStockMovement));
 
 CreateStockMovement.propTypes = {
   /** React router's object which contains information about url varaiables and params */
@@ -522,4 +561,20 @@ CreateStockMovement.propTypes = {
   debounceTime: PropTypes.number.isRequired,
   minSearchLength: PropTypes.number.isRequired,
   locationTypes: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  createInfoBar: PropTypes.func.isRequired,
+  bars: PropTypes.arrayOf(PropTypes.shape({
+    name: PropTypes.string.isRequired,
+    show: PropTypes.bool.isRequired,
+    closed: PropTypes.bool,
+    title: PropTypes.shape({
+      label: PropTypes.string.isRequired,
+      defaultLabel: PropTypes.string.isRequired,
+    }),
+    versionLabel: PropTypes.shape({
+      label: PropTypes.string.isRequired,
+      defaultLabel: PropTypes.string.isRequired,
+    }),
+  })).isRequired,
+  showInfoBar: PropTypes.func.isRequired,
+  hideInfoBar: PropTypes.func.isRequired,
 };

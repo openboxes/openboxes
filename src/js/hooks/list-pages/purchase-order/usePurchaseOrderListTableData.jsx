@@ -37,7 +37,7 @@ const usePurchaseOrderListTableData = (filterParams) => {
         ...sortingParams,
         ...filterParams,
         paymentTerm: paymentTerm?.map?.(({ id }) => id),
-        status: status?.map?.(statusElement => statusElement.value),
+        status: status?.map?.((statusElement) => statusElement.value),
         origin: origin?.id,
         orderedBy: orderedBy?.id,
         createdBy: createdBy?.id,
@@ -47,7 +47,7 @@ const usePurchaseOrderListTableData = (filterParams) => {
     };
   };
 
-  const { translate, isUserApprover } = useSelector(state => ({
+  const { translate, isUserApprover } = useSelector((state) => ({
     translate: translateWithDefaultMessage(getTranslate(state.localize)),
     isUserApprover: state.session.isUserApprover,
   }));
@@ -67,13 +67,13 @@ const usePurchaseOrderListTableData = (filterParams) => {
     defaultErrorMessage,
     defaultSorting,
     getParams,
-    onFetchedData: data => setTotalPrice(data.totalPrice),
+    onFetchedData: (data) => setTotalPrice(data.totalPrice),
   });
 
   const downloadOrders = (orderItems) => {
     exportFileFromAPI({
       url: PURCHASE_ORDER_API,
-      filename: orderItems ? 'OrdersLineDetails.csv' : 'Orders',
+      filename: orderItems ? 'OrdersLineDetails' : 'Orders',
       params: {
         ..._.omit(tableData.currentParams, 'offset', 'max'),
         orderItems,
@@ -138,7 +138,7 @@ const usePurchaseOrderListTableData = (filterParams) => {
       ));
       return;
     }
-    const order = tableData.data.find(ord => ord.id === id);
+    const order = tableData.data.find((ord) => ord.id === id);
     if (order && order.shipmentsCount > 0) {
       Alert.error(translate(
         'react.purchaseOrder.rollback.error.label',
@@ -165,7 +165,7 @@ const usePurchaseOrderListTableData = (filterParams) => {
   };
 
   const printOrder = (id) => {
-    const order = tableData.data.find(ord => ord.id === id);
+    const order = tableData.data.find((ord) => ord.id === id);
     if (order && order.status && order.status.toUpperCase() === 'PENDING') {
       Alert.error('Order must be placed in order to print');
       return;

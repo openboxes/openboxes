@@ -1,25 +1,35 @@
 import React from 'react';
 
+import _ from 'lodash';
 import PropTypes from 'prop-types';
 
 const Numbers = (props) => {
   const [data, options] = Object.values(props);
+  const values = _.sortBy(Object.entries(data), '[1].order');
   return (
     <div className="gyr-indicator">
       {
-      Object.keys(data).map((number) => {
-        const { link, value, subtitle } = data[number];
-        const redirect = link ? { href: link } : {};
-        return (
-          <a key={number} className="number-indicator" {...redirect}>
-            <div className="value">
-              <div className="circle" style={{ backgroundColor: options.colors[number] }} />
-              {value}
-            </div>
-            <div className="subtitle">{subtitle}</div>
-          </a>
-        );
-      })
+        values.map(([key, indicator]) => {
+          if (indicator) {
+            const {
+              link,
+              value,
+              subtitle,
+            } = indicator;
+            const redirect = link ? { href: link } : {};
+            return (
+              <a key={key} className="number-indicator" {...redirect}>
+                <div className="value">
+                  <div className="circle" style={{ backgroundColor: options.colors[key] }} />
+                  {value}
+                </div>
+                <div className="subtitle">{subtitle}</div>
+              </a>
+            );
+          }
+
+          return null;
+        })
     }
     </div>
   );

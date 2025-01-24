@@ -46,6 +46,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
     Date dateDelivered
     Date dateIssued
     Date dateReceived
+    Date dateDeliveryRequested
 
     Date requestedDeliveryDate = new Date()
 
@@ -188,6 +189,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
         lastUpdated(nullable: true)
         dateValidFrom(nullable: true)
         dateValidTo(nullable: true)
+        dateDeliveryRequested(nullable: true)
         createdBy(nullable: true)
         updatedBy(nullable: true)
         recipientProgram(nullable: true)
@@ -411,6 +413,10 @@ class Requisition implements Comparable<Requisition>, Serializable {
 
         // If status is not handled above assume it is wrongly triggered and don't send notification
         return false
+    }
+
+    boolean isElectronicType() {
+        return sourceType == RequisitionSourceType.ELECTRONIC
     }
 
     Map toJson() {

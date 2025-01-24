@@ -9,13 +9,13 @@
     <body>
         <div class="body">
             <g:if test="${flash.message}">
-            	<div class="message">${flash.message}</div>
+            	<div class="message" role="status" aria-label="message">${flash.message}</div>
             </g:if>
 			<g:hasErrors>
-				<div class="errors"><g:renderErrors as="list" /></div>
+				<div class="errors" role="alert" aria-label="error-message"><g:renderErrors as="list" /></div>
 			</g:hasErrors>
             <g:if test="${flash.error}">
-                <div class="errors">${flash.error}</div>
+                <div class="errors" role="alert" aria-label="error-message">${flash.error}</div>
             </g:if>
 
             <div class="buttonBar d-flex">

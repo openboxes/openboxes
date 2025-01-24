@@ -12,6 +12,8 @@ package org.pih.warehouse.putaway
 import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import org.apache.commons.beanutils.BeanUtils
+import org.hibernate.criterion.CriteriaSpecification
+import org.hibernate.sql.JoinType
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.api.Putaway
 import org.pih.warehouse.api.PutawayItem
@@ -38,37 +40,25 @@ class PutawayService {
     GrailsApplication grailsApplication
 
     def getPutawayCandidates(Location location) {
-        List putawayItems = []
-        List<Location> internalLocations = locationService.getInternalLocations(location,
-                [ActivityCode.RECEIVE_STOCK] as ActivityCode[])
-
         List binLocationEntries = productAvailabilityService.getAvailableQuantityOnHandByBinLocation(location)
 
-        internalLocations.each { internalLocation ->
-            List putawayItemsTemp = binLocationEntries.findAll {
-                it.binLocation == internalLocation
+        List<PutawayItem> putawayItems = binLocationEntries.inject ([], { putawayItems,  binLocationEntry ->
+            if (binLocationEntry.binLocation?.supports(ActivityCode.RECEIVE_STOCK)) {
+                return putawayItems + new PutawayItem(
+                        putawayStatus: PutawayStatus.READY,
+                        product: binLocationEntry.product,
+                        inventoryItem: binLocationEntry.inventoryItem,
+                        currentLocation: binLocationEntry.binLocation,
+                        currentFacility: location,
+                        putawayFacility: null,
+                        putawayLocation: null,
+                        availableItems: [],
+                        quantity: binLocationEntry.quantity,
+                )
             }
-            if (putawayItemsTemp) {
-                putawayItemsTemp = putawayItemsTemp.collect {
 
-                    // FIXME Removed because it was causing very slow performance - determine if this is even necessary
-                    List<AvailableItem> availableItems = []
-
-                    PutawayItem putawayItem = new PutawayItem()
-                    putawayItem.putawayStatus = PutawayStatus.READY
-                    putawayItem.product = it.product
-                    putawayItem.inventoryItem = it.inventoryItem
-                    putawayItem.currentFacility = location
-                    putawayItem.currentLocation = it.binLocation
-                    putawayItem.putawayFacility = null
-                    putawayItem.putawayLocation = null
-                    putawayItem.availableItems = availableItems
-                    putawayItem.quantity = it.quantity
-                    return putawayItem
-                }
-                putawayItems.addAll(putawayItemsTemp)
-            }
-        }
+            return putawayItems
+        })
 
         List<PutawayItem> pendingPutawayItems = getPendingItems(location)
 
@@ -88,18 +78,36 @@ class PutawayService {
     }
 
     List<PutawayItem> getPendingItems(Location location) {
-        List<Order> orders = Order.findAllByOriginAndOrderType(location, OrderType.findByCode(Constants.PUTAWAY_ORDER))
-        List<Putaway> putaways = orders.collect { Putaway.createFromOrder(it) }
-        List<PutawayItem> putawayItems = []
-
-        putaways.each {
-            putawayItems.addAll(it.putawayItems.findAll {
-                it.putawayStatus == PutawayStatus.PENDING ||
-                        (it.putawayStatus == PutawayStatus.CANCELED && it.splitItems?.any { item -> item.putawayStatus == PutawayStatus.PENDING })
-            })
+        List<Order> orders = Order.createCriteria().list {
+            setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY)
+            and {
+                eq("origin", location)
+                eq("orderType", OrderType.findByCode(Constants.PUTAWAY_ORDER))
+            }
+            createAlias("origin", "o")
+            createAlias("picklist", "p", JoinType.LEFT_OUTER_JOIN)
+            createAlias("orderItems", "oi", JoinType.LEFT_OUTER_JOIN)
+            createAlias("oi.product", "oip", JoinType.LEFT_OUTER_JOIN)
+            createAlias("oi.inventoryItem", "ii",JoinType.LEFT_OUTER_JOIN)
+            createAlias("oi.recipient", "oir", JoinType.LEFT_OUTER_JOIN)
+            createAlias("oip.category", "oipc", JoinType.LEFT_OUTER_JOIN)
+            createAlias("oip.synonyms", "oips",JoinType.LEFT_OUTER_JOIN)
+            createAlias("oi.originBinLocation", "oibl", JoinType.LEFT_OUTER_JOIN)
+            createAlias("oi.destinationBinLocation", "oidl", JoinType.LEFT_OUTER_JOIN)
+            createAlias("oi.orderItems", "oioi", JoinType.LEFT_OUTER_JOIN)
         }
 
-        return putawayItems
+        // Filter out items before creating putaways
+        List<OrderItem> filteredItems = orders*.orderItems.flatten().findAll { OrderItem it ->
+            !it.parentOrderItem && (
+                    it.orderItemStatusCode == OrderItemStatusCode.PENDING || (
+                            it.orderItemStatusCode == OrderItemStatusCode.CANCELED && it.orderItems?.any {
+                                item -> item.orderItemStatusCode == OrderItemStatusCode.PENDING
+                            })
+
+            )}
+
+        return filteredItems.collect { PutawayItem.createFromOrderItem(it) }
     }
 
     void processSplitItems(Putaway putaway) {
@@ -216,6 +224,7 @@ class PutawayService {
                 } else if (childOrderItem) {
                     childOrderItem = updateOrderItem(splitItem, childOrderItem)
                     childOrderItem.parentOrderItem = orderItem
+                    orderItem.addToOrderItems(childOrderItem)
                 }
             }
         }

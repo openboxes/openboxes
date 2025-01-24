@@ -91,10 +91,11 @@ class AddOrganizationModal extends Component {
             <Translate id="react.locationsConfiguration.organizationModal.subtitle.label" defaultMessage="Enter a name and description for your organization. This organization is the company or entity that owns and manages the location. Read more about organizations" />
             <a target="_blank" rel="noopener noreferrer" href="https://openboxes.atlassian.net/wiki/spaces/OBW/pages/1291452471/Configure+Organizations+and+Locations">
               <Translate id="react.locationsConfiguration.here.label" defaultMessage="here" />
-            </a>.&nbsp;
+            </a>
+            .&nbsp;
           </div>
           <Form
-            onSubmit={values => this.save(values)}
+            onSubmit={(values) => this.save(values)}
             initialValues={this.initialValues}
             validate={validate}
             render={({ handleSubmit, values }) =>
@@ -120,8 +121,7 @@ class AddOrganizationModal extends Component {
                     </button>
                   </div>
                 </form>
-              )
-            }
+              )}
           />
         </div>
       </Modal>
@@ -129,7 +129,7 @@ class AddOrganizationModal extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   locale: state.session.activeLanguage,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
 });

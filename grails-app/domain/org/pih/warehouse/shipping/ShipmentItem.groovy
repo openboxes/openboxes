@@ -53,9 +53,29 @@ class ShipmentItem implements Comparable, Serializable {
 
     static hasMany = [orderItems: OrderItem, receiptItems: ReceiptItem, invoiceItems: InvoiceItem]
 
-    static transients = ["comments", "orderItemId", "quantityReceivedAndCanceled", "quantityCanceled", "quantityReceived", "quantityRemaining",
-                         "orderNumber", "orderId", "purchaseOrders", "orderName", "quantityRemainingToShip", "quantityPerUom", "hasRecalledLot", "quantityPicked", "quantityPickedFromOrders",
-                         "unavailableQuantityPicked", "paymentTerm", "quantityInvoiced"]
+    static transients = [
+            "comments",
+            "orderItemId",
+            "quantityReceivedAndCanceled",
+            "quantityCanceled",
+            "quantityReceived",
+            "quantityRemaining",
+            "orderNumber",
+            "orderId",
+            "purchaseOrders",
+            "orderName",
+            "quantityRemainingToShip",
+            "quantityToInvoiceInStandardUom",
+            "quantityPerUom",
+            "hasRecalledLot",
+            "quantityPicked",
+            "quantityPickedFromOrders",
+            "unavailableQuantityPicked",
+            "paymentTerm",
+            "quantityInvoiced",
+            "orderItem",
+            "unitOfMeasure",
+    ]
 
     static mapping = {
         id generator: 'uuid'
@@ -197,12 +217,10 @@ class ShipmentItem implements Comparable, Serializable {
     }
 
     Integer getQuantityRemainingToShip() {
-        OrderItem orderItem = OrderItem.get(this.orderItemId)
         return orderItem ? orderItem.getQuantityRemainingToShip(shipment) : 0
     }
 
     BigDecimal getQuantityPerUom() {
-        OrderItem orderItem = OrderItem.get(this.orderItemId)
         return orderItem ? orderItem.quantityPerUom : 1
     }
 
@@ -256,8 +274,38 @@ class ShipmentItem implements Comparable, Serializable {
         return inventoryItem?.lotStatus == LotStatusCode.RECALLED
     }
 
+    // quantity invoiced in uom
     Integer getQuantityInvoiced() {
-        return invoiceItems?.sum { it.quantity ?: 0 } ?: 0
+        return invoiceItems?.findAll { !it.inverse } ?.sum { it.quantity ?: 0 } ?: 0
+    }
+
+    Integer getQuantityInvoicedInStandardUom() {
+        return quantityInvoiced * quantityPerUom
+    }
+
+    Integer getQuantityToInvoiceInStandardUom() {
+        // ShipmentItem.quantity is in standard uom
+        return quantity - quantityInvoicedInStandardUom
+    }
+
+    Integer getQuantityToInvoice() {
+        return quantityToInvoiceInStandardUom / quantityPerUom
+    }
+
+    Boolean isInvoiceable() {
+        return quantityToInvoiceInStandardUom > 0
+    }
+
+    OrderItem getOrderItem() {
+        return orderItems[0]
+    }
+
+    String getUnitOfMeasure() {
+        return orderItem?.unitOfMeasure
+    }
+
+    BigDecimal getPackSize() {
+        return orderItem?.quantityPerUom
     }
 
     /**

@@ -11,13 +11,19 @@ package org.pih.warehouse
 
 import grails.converters.JSON
 import grails.util.Holders
+import java.math.RoundingMode
+import javax.sql.DataSource
 import liquibase.Contexts
 import liquibase.LabelExpression
 import liquibase.Liquibase
 import liquibase.changelog.DatabaseChangeLog
+import liquibase.database.Database
 import liquibase.database.DatabaseFactory
 import liquibase.database.jvm.JdbcConnection
 import liquibase.resource.ClassLoaderResourceAccessor
+import org.quartz.Scheduler
+import util.LiquibaseUtil
+
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.api.EditPageItem
 import org.pih.warehouse.api.PackPageItem
@@ -47,6 +53,8 @@ import org.pih.warehouse.core.PaymentTerm
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.UploadService
 import org.pih.warehouse.core.User
+import org.pih.warehouse.inventory.CycleCountCandidate
+import org.pih.warehouse.inventory.CycleCountRequest
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.OutboundStockMovementListItem
 import org.pih.warehouse.invoice.InvoiceItem
@@ -79,13 +87,6 @@ import org.pih.warehouse.shipping.ContainerType
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.shipping.ShipmentType
-import org.springframework.core.io.Resource
-import org.springframework.core.io.support.PathMatchingResourcePatternResolver
-import org.quartz.Scheduler
-import util.LiquibaseUtil
-
-import javax.sql.DataSource
-import java.math.RoundingMode
 
 class BootStrap {
 
@@ -611,6 +612,14 @@ class BootStrap {
         JSON.registerObjectMarshaller(ProductPackage) { ProductPackage productPackage ->
             return productPackage.toJson()
         }
+
+        JSON.registerObjectMarshaller(CycleCountCandidate) { CycleCountCandidate cycleCountCandidate ->
+            return cycleCountCandidate.toJson()
+        }
+
+        JSON.registerObjectMarshaller(CycleCountRequest) { CycleCountRequest cycleCountRequest ->
+            return cycleCountRequest.toJson()
+        }
     }
 
     def destroy = {
@@ -639,12 +648,12 @@ class BootStrap {
         Liquibase liquibase = null
         try {
 
-            def connection = new JdbcConnection(dataSource.getConnection())
+            JdbcConnection connection = new JdbcConnection(dataSource.getConnection())
             if (connection == null) {
                 throw new RuntimeException("Connection could not be created.")
             }
 
-            def database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(connection)
+            Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(connection)
             database.setDefaultSchemaName(connection.catalog)
             boolean isRunningMigrations = LiquibaseUtil.isRunningMigrations()
             log.info("Liquibase running: ${isRunningMigrations}")
@@ -658,53 +667,9 @@ class BootStrap {
             liquibase = new Liquibase(null as DatabaseChangeLog, new ClassLoaderResourceAccessor(), database)
             liquibase.checkLiquibaseTables(false, null, new Contexts(), new LabelExpression())
 
-            def executedChangelogVersions = LiquibaseUtil.getExecutedChangelogVersions()
-            log.info("executedChangelogVersions: " + executedChangelogVersions)
-
-            log.info 'Dropping all views (will rebuild after migrations complete)...'
-            liquibase = new Liquibase('views/drop-all-views.xml', new ClassLoaderResourceAccessor(), database)
-            liquibase.update(null as Contexts, new LabelExpression());
-
-            // Get all directories from /migrations
-            PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver()
-            Resource[] resources = resolver.getResources("file:grails-app/migrations/*")
-
-            // Find directories with names matching current versions pattern which
-            // will match to any version number between 0.0.x to 999.999.x
-            List<String> changelogVersions = resources
-                    .collect { it.filename }
-                    .findAll { it.matches("\\d{1,3}.\\d{1,3}.x") }
-                    .reverse()
-
-            // Exclude the newest changelog version, this one should be run separately
-            List<String> previousChangelogVersions = !changelogVersions.empty ? changelogVersions.tail() : []
-
-            //If nothing has been created yet, let's create all new database objects with the install scripts
-            if (!executedChangelogVersions) {
-                log.info("Running install changelog ...")
-                liquibase = new Liquibase("install/changelog.xml", new ClassLoaderResourceAccessor(), database)
-                liquibase.update(null as Contexts, new LabelExpression());
-            }
-
-            // Check if the executed changelog versions include one of the previous versions
-            // and if so, then we need to keep running the old updates to catch up to 0.9.x
-            boolean hasExecutedAnyPreviousChangesets =
-                executedChangelogVersions.any { previousChangelogVersions.contains(it.version) }
-
-            if (hasExecutedAnyPreviousChangesets) {
-                log.info("Running upgrade changelog ...")
-                liquibase = new Liquibase("upgrade/changelog.xml", new ClassLoaderResourceAccessor(), database)
-                liquibase.update(null as Contexts, new LabelExpression())
-            }
-
-            // And now we need to run changelogs from 0.9.x and beyond
-            log.info("Running latest updates")
-            liquibase = new Liquibase("changelog.groovy", new ClassLoaderResourceAccessor(), database)
-            liquibase.update(null as Contexts, new LabelExpression())
-
-            log.info 'Rebuilding views ...'
-            liquibase = new Liquibase('views/changelog.xml', new ClassLoaderResourceAccessor(), database)
-            liquibase.update(null as Contexts, new LabelExpression());
+            log.info('Executing migrations ...')
+            LiquibaseUtil.executeMigrations()
+            log.info('All migrations ran successfully!')
 
         } finally {
             log.info('Safely closing database')
@@ -712,5 +677,4 @@ class BootStrap {
         }
         log.info("Finished running liquibase changelog(s)!")
     }
-
 }

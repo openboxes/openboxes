@@ -190,12 +190,10 @@
                                 </g:link>
                             </g:if>
                             <g:if test="${orderInstance?.canGenerateInvoice}">
-                                <g:link controller="invoice" action="generateInvoice" id="${orderInstance?.id}" class="button"
-                                        disabled="${!hasRoleInvoice}"
-                                        disabledMessage="${disabledInvoiceMessage}">
+                                <button id="generate-invoice" class="button">
                                     <img src="${resource(dir: 'images/icons', file: 'document.png')}" />&nbsp;
                                     ${warehouse.message(code: 'default.button.generateInvoice.label', default: "Generate Invoice")}
-                                </g:link>
+                                </button>
                             </g:if>
                             <g:link controller="order" action="createCombinedShipment" params="[direction:'INBOUND', orderId: orderInstance?.id]" class="button"
                                     disabled="${orderInstance?.status < OrderStatus.PLACED}"
@@ -354,17 +352,43 @@
     <script>
       $(document).ready(function() {
         setTimeout(fetchOrderDerivedStatus, ${grailsApplication.config.openboxes.purchaseOrder.derivedStatusFetch.delay});
+
+        $('#generate-invoice').on('click', function() {
+          if (${!hasRoleInvoice}) {
+            alert("${g.message(code:'errors.noPermissions.label')}")
+            return
+          }
+
+          if (${!orderInstance.fullyInvoiceable}) {
+            const dialogMessage = '${warehouse.message(code: 'invoice.partialInvoice.message', default: 'Not all lines on this purchase order are available to invoice. Generate partial invoice?')}';
+            if (!confirm(dialogMessage)) {
+              return
+            }
+          }
+
+          window.location="${createLink(controller: 'invoice', action: 'generateInvoice', id: orderInstance?.id)}"
+        });
       });
 
       function fetchOrderDerivedStatus() {
         const orderId = $('#orderId').val();
-        $.ajax({
-          url: "${request.contextPath}/json/getOrdersDerivedStatus",
-          data: "order.id=" + orderId,
-          success: function(data, textStatus, jqXHR){
-            $("." + orderId).text(data[orderId]);
-          }
-        });
+        if (orderId) {
+          $.ajax({
+            url: "${request.contextPath}/json/getOrdersDerivedStatus",
+            data: "order.id=" + orderId,
+            success: function(data, textStatus, jqXHR) {
+              $("." + orderId).text(data[orderId]);
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+              console.error(jqXHR, textStatus, errorThrown);
+              if (jqXHR.responseText) {
+                $.notify(jqXHR.responseText, "error");
+              } else {
+                $.notify("An error occurred", "error");
+              }
+            }
+          });
+        }
       }
     </script>
 </div>

@@ -20,7 +20,7 @@ const useStockTransferFilters = () => {
     statuses,
     currentUser,
     currentLocale,
-  } = useSelector(state => ({
+  } = useSelector((state) => ({
     statuses: state.stockTransfer.statuses,
     currentUser: state.session.user,
     currentLocation: state.session.currentLocation,
@@ -28,7 +28,6 @@ const useStockTransferFilters = () => {
     currentLocale: state.session.activeLanguage,
   }));
   const dispatch = useDispatch();
-
 
   const clearFilterValues = () => {
     const { pathname } = history.location;

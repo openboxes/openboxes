@@ -35,7 +35,8 @@ exports[`wizard component should match snapshot 1`] = `
     >
       <div
         className="step-container active"
-        data-testid="active"
+        data-stepstate="active"
+        data-testid="wizard-step"
       >
         <div
           className="circle"
@@ -53,7 +54,8 @@ exports[`wizard component should match snapshot 1`] = `
       </div>
       <div
         className="step-container "
-        data-testid="inactive"
+        data-stepstate="inactive"
+        data-testid="wizard-step"
       >
         <div
           className="circle"
@@ -71,7 +73,8 @@ exports[`wizard component should match snapshot 1`] = `
       </div>
       <div
         className="step-container "
-        data-testid="inactive"
+        data-stepstate="inactive"
+        data-testid="wizard-step"
       >
         <div
           className="circle"
@@ -103,7 +106,9 @@ exports[`wizard component should match snapshot 1`] = `
           className="classic-form with-description"
         >
           <div
+            aria-label="Invoice number"
             className="mt-2  mb-0 mx-1 form-group   "
+            data-testid="form-field"
           >
             <div
               className="row"
@@ -136,6 +141,7 @@ exports[`wizard component should match snapshot 1`] = `
               </div>
             </div>
             <div
+              aria-label="subtext"
               className="row"
             >
               <div
@@ -152,7 +158,9 @@ exports[`wizard component should match snapshot 1`] = `
             </div>
           </div>
           <div
+            aria-label="Vendor"
             className="mt-2  mb-0 mx-1 form-group required  "
+            data-testid="form-field"
           >
             <div
               className="row"
@@ -167,6 +175,7 @@ exports[`wizard component should match snapshot 1`] = `
                 className="form-element-container col-md-4 col-7"
               >
                 <div
+                  data-testid="custom-select-element"
                   id="select-id_1-container"
                 >
                   <div
@@ -290,6 +299,7 @@ exports[`wizard component should match snapshot 1`] = `
               </div>
             </div>
             <div
+              aria-label="subtext"
               className="row"
             >
               <div
@@ -306,7 +316,9 @@ exports[`wizard component should match snapshot 1`] = `
             </div>
           </div>
           <div
+            aria-label="Vendor Invoice Number"
             className="mt-2  mb-0 mx-1 form-group required  "
+            data-testid="form-field"
           >
             <div
               className="row"
@@ -338,6 +350,7 @@ exports[`wizard component should match snapshot 1`] = `
               </div>
             </div>
             <div
+              aria-label="subtext"
               className="row"
             >
               <div
@@ -354,7 +367,9 @@ exports[`wizard component should match snapshot 1`] = `
             </div>
           </div>
           <div
+            aria-label="Invoice Date"
             className="mt-2  mb-0 mx-1 form-group required  "
+            data-testid="form-field"
           >
             <div
               className="row"
@@ -397,6 +412,7 @@ exports[`wizard component should match snapshot 1`] = `
               </div>
             </div>
             <div
+              aria-label="subtext"
               className="row"
             >
               <div
@@ -413,7 +429,9 @@ exports[`wizard component should match snapshot 1`] = `
             </div>
           </div>
           <div
+            aria-label="Currency"
             className="mt-2  mb-0 mx-1 form-group required  "
+            data-testid="form-field"
           >
             <div
               className="row"
@@ -428,6 +446,7 @@ exports[`wizard component should match snapshot 1`] = `
                 className="form-element-container col-md-4 col-7"
               >
                 <div
+                  data-testid="custom-select-element"
                   id="select-id_2-container"
                 >
                   <div
@@ -551,6 +570,7 @@ exports[`wizard component should match snapshot 1`] = `
               </div>
             </div>
             <div
+              aria-label="subtext"
               className="row"
             >
               <div
@@ -595,7 +615,9 @@ exports[`wizardPage component should match snapshot 1`] = `
       className="classic-form with-description"
     >
       <div
+        aria-label="Invoice number"
         className="mt-2  mb-0 mx-1 form-group   "
+        data-testid="form-field"
       >
         <div
           className="row"
@@ -628,6 +650,7 @@ exports[`wizardPage component should match snapshot 1`] = `
           </div>
         </div>
         <div
+          aria-label="subtext"
           className="row"
         >
           <div
@@ -644,7 +667,9 @@ exports[`wizardPage component should match snapshot 1`] = `
         </div>
       </div>
       <div
+        aria-label="Vendor"
         className="mt-2  mb-0 mx-1 form-group required  "
+        data-testid="form-field"
       >
         <div
           className="row"
@@ -659,6 +684,7 @@ exports[`wizardPage component should match snapshot 1`] = `
             className="form-element-container col-md-4 col-7"
           >
             <div
+              data-testid="custom-select-element"
               id="select-id_5-container"
             >
               <div
@@ -782,6 +808,7 @@ exports[`wizardPage component should match snapshot 1`] = `
           </div>
         </div>
         <div
+          aria-label="subtext"
           className="row"
         >
           <div
@@ -798,7 +825,9 @@ exports[`wizardPage component should match snapshot 1`] = `
         </div>
       </div>
       <div
+        aria-label="Vendor Invoice Number"
         className="mt-2  mb-0 mx-1 form-group required  "
+        data-testid="form-field"
       >
         <div
           className="row"
@@ -830,6 +859,7 @@ exports[`wizardPage component should match snapshot 1`] = `
           </div>
         </div>
         <div
+          aria-label="subtext"
           className="row"
         >
           <div
@@ -846,7 +876,9 @@ exports[`wizardPage component should match snapshot 1`] = `
         </div>
       </div>
       <div
+        aria-label="Invoice Date"
         className="mt-2  mb-0 mx-1 form-group required  "
+        data-testid="form-field"
       >
         <div
           className="row"
@@ -889,6 +921,7 @@ exports[`wizardPage component should match snapshot 1`] = `
           </div>
         </div>
         <div
+          aria-label="subtext"
           className="row"
         >
           <div
@@ -905,7 +938,9 @@ exports[`wizardPage component should match snapshot 1`] = `
         </div>
       </div>
       <div
+        aria-label="Currency"
         className="mt-2  mb-0 mx-1 form-group required  "
+        data-testid="form-field"
       >
         <div
           className="row"
@@ -920,6 +955,7 @@ exports[`wizardPage component should match snapshot 1`] = `
             className="form-element-container col-md-4 col-7"
           >
             <div
+              data-testid="custom-select-element"
               id="select-id_6-container"
             >
               <div
@@ -1043,6 +1079,7 @@ exports[`wizardPage component should match snapshot 1`] = `
           </div>
         </div>
         <div
+          aria-label="subtext"
           className="row"
         >
           <div
@@ -1082,7 +1119,8 @@ exports[`wizardSteps component should match snapshot 1`] = `
   >
     <div
       className="step-container active"
-      data-testid="active"
+      data-stepstate="active"
+      data-testid="wizard-step"
     >
       <div
         className="circle"
@@ -1100,7 +1138,8 @@ exports[`wizardSteps component should match snapshot 1`] = `
     </div>
     <div
       className="step-container "
-      data-testid="inactive"
+      data-stepstate="inactive"
+      data-testid="wizard-step"
     >
       <div
         className="circle"

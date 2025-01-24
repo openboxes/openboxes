@@ -84,47 +84,80 @@ CREATE OR REPLACE VIEW order_item_payment_status AS
             LEFT OUTER JOIN invoice ON invoice.id = invoice_item.invoice_id
         WHERE `order`.order_type_id = 'PURCHASE_ORDER'
           AND order_item.order_item_status_code != 'CANCELLED'
+          -- invoice type id 5 is for PREPAYMENT_INVOICE
           AND (invoice.invoice_type_id != '5' OR invoice.invoice_type_id IS NULL)
           AND invoice.date_posted IS NOT NULL
+          AND (invoice_item.inverse IS NULL OR invoice_item.inverse = FALSE)
         GROUP BY `order`.id, order_item.id, invoice_item.id, shipment_item.id
     )
 AS order_item_payment_status
 GROUP BY order_item_id;
 
+CREATE OR REPLACE VIEW order_adjustment_details AS
+    SELECT id, total_adjustment FROM
+        (
+            SELECT
+                order_adjustment.id AS id,
+                SUM(
+                        DISTINCT ABS(
+                            IFNULL(
+                                order_adjustment.amount,
+                                IF(order_adjustment.percentage IS NOT NULL,
+                                   IF(order_item_id IS NOT NULL,
+                                      order_item.quantity * order_item.unit_price *
+                                      (order_adjustment.percentage / 100),
+                                      order_total.order_total * (order_adjustment.percentage / 100)),
+                                   0)
+                            )
+                         )
+                ) AS total_adjustment
+            FROM order_adjustment
+                     LEFT JOIN order_item ON order_adjustment.order_item_id = order_item.id
+                     LEFT OUTER JOIN (
+                SELECT oi.order_id AS order_id,
+                       SUM(oi.quantity * oi.unit_price) AS order_total
+                FROM order_item oi
+                         LEFT OUTER JOIN `order` o ON o.id = oi.order_id
+                GROUP BY oi.order_id
+            ) AS order_total ON order_adjustment.order_id = order_total.order_id
+            WHERE order_adjustment.canceled IS NOT TRUE
+            GROUP BY id
+        ) as order_adjustment_details;
+
 CREATE OR REPLACE VIEW order_adjustment_payment_status AS
-    SELECT
-        order_id,
-        order_number,
-        adjustment_id,
-        invoice_item_id,
-        order_status,
-        CASE
-            WHEN order_adjustment_canceled IS TRUE THEN 0
-            ELSE 1
-        END AS quantity_ordered,
-        quantity_invoiced
-    FROM (
-        SELECT
-            `order`.id                          AS order_id,
-            order_adjustment.id 		        AS adjustment_id,
-            order_adjustment.canceled 		    AS order_adjustment_canceled,
-            `order`.order_number                AS order_number,
-            order.status                        AS order_status,
-            invoice_item.id				        AS invoice_item_id,
-            CASE
-                WHEN invoice.date_posted IS NOT NULL THEN IFNULL(invoice_item.quantity, 0)
-                ELSE 0
-            END AS quantity_invoiced
-        FROM `order`
-            LEFT OUTER JOIN order_adjustment ON order_adjustment.order_id = `order`.id
-            LEFT OUTER JOIN order_adjustment_invoice ON order_adjustment_invoice.order_adjustment_id = order_adjustment.id
-            LEFT OUTER JOIN invoice_item ON invoice_item.id = order_adjustment_invoice.invoice_item_id
-            LEFT OUTER JOIN invoice ON invoice.id = invoice_item.invoice_id
-        WHERE `order`.order_type_id = 'PURCHASE_ORDER'
-          AND (invoice.invoice_type_id != '5' OR invoice.invoice_type_id IS NULL)
-        GROUP BY `order`.id, `order`.order_number, invoice_item.id, order_adjustment.id
-    )
-AS order_adjustment_payment_status;
+SELECT
+    order_id,
+    order_number,
+    adjustment_id,
+    invoice_item_id,
+    order_status,
+    quantity_invoiced,
+    invoice_item_amount as invoiced_amount
+FROM (
+         SELECT
+             `order`.id                        	    	             AS order_id,
+             order_adjustment.id 		      	    	             AS adjustment_id,
+             IF(invoice.date_posted IS NULL, 0, invoice_item.amount)  AS invoice_item_amount,
+             `order`.order_number              		                 AS order_number,
+             order.status                      		                 AS order_status,
+             invoice_item.id				        	                 AS invoice_item_id,
+             CASE
+                 WHEN invoice.date_posted IS NOT NULL THEN IFNULL(invoice_item.quantity, 0)
+                 ELSE 0
+                 END AS quantity_invoiced
+         FROM `order`
+                  LEFT OUTER JOIN order_adjustment ON order_adjustment.order_id = `order`.id
+                  INNER JOIN order_adjustment_invoice ON order_adjustment_invoice.order_adjustment_id = order_adjustment.id
+                  LEFT OUTER JOIN invoice_item ON invoice_item.id = order_adjustment_invoice.invoice_item_id
+                  LEFT OUTER JOIN invoice ON invoice.id = invoice_item.invoice_id
+         WHERE `order`.order_type_id = 'PURCHASE_ORDER'
+           -- invoice type id 5 is for PREPAYMENT_INVOICE
+           AND (invoice.invoice_type_id != '5' OR invoice.invoice_type_id IS NULL)
+           AND (invoice_item.inverse IS NULL OR invoice_item.inverse = FALSE)
+           AND order_adjustment.canceled != 1
+         GROUP BY `order`.id, `order`.order_number, invoice_item.id, order_adjustment.id
+     )
+         AS order_adjustment_payment_status;
 
 CREATE OR REPLACE VIEW order_item_summary AS (
     SELECT
@@ -192,103 +225,151 @@ CREATE OR REPLACE VIEW order_item_summary AS (
     ) AS order_item_summary);
 
 CREATE OR REPLACE VIEW order_summary AS (
-    SELECT
-        id,
-        id as order_id,
-        quantity_ordered,
-        adjustments_count,
-        quantity_shipped,
-        quantity_received,
-        quantity_canceled,
-        quantity_invoiced,
-        adjustments_invoiced,
-        items_ordered,
-        items_shipped,
-        items_received,
-        items_invoiced,
-        order_status,
-        shipment_status,
-        receipt_status,
-        payment_status,
-        CASE
-            WHEN  shipment_status = 'SHIPPED' AND receipt_status = 'RECEIVED' AND payment_status = 'INVOICED' THEN 'COMPLETED'
-            ELSE COALESCE(payment_status, receipt_status, shipment_status, order_status)
-        END AS derived_status
+    SELECT id,
+       id AS order_id,
+       quantity_ordered,
+       adjustments_count,
+       quantity_shipped,
+       quantity_received,
+       quantity_canceled,
+       quantity_invoiced,
+       adjustments_invoiced,
+       items_ordered,
+       items_shipped,
+       items_received,
+       items_invoiced,
+       order_status,
+       shipment_status,
+       receipt_status,
+       payment_status,
+       CASE
+           WHEN shipment_status = 'SHIPPED'
+               AND receipt_status = 'RECEIVED'
+               AND payment_status = 'INVOICED' THEN 'COMPLETED'
+           ELSE COALESCE(payment_status, receipt_status, shipment_status, order_status)
+           END AS derived_status
     FROM (
-        SELECT
-            id,
-            order_status,
-            SUM(items_and_adjustments_union.quantity_ordered)    AS quantity_ordered,
-            SUM(items_and_adjustments_union.adjustments_count) 		AS adjustments_count,
-            SUM(items_and_adjustments_union.quantity_shipped)    AS quantity_shipped,
-            SUM(items_and_adjustments_union.quantity_received)   AS quantity_received,
-            SUM(items_and_adjustments_union.quantity_canceled)   AS quantity_canceled,
-            SUM(items_and_adjustments_union.quantity_invoiced)   AS quantity_invoiced,
-            SUM(items_and_adjustments_union.items_ordered)    AS items_ordered,
-            SUM(items_and_adjustments_union.items_shipped)    AS items_shipped,
-            SUM(items_and_adjustments_union.items_received)   AS items_received,
-            SUM(items_and_adjustments_union.items_invoiced)   AS items_invoiced,
-            SUM(items_and_adjustments_union.adjustments_invoiced)   AS adjustments_invoiced,
-            CASE
-                WHEN (SUM(items_and_adjustments_union.quantity_ordered) + SUM(items_and_adjustments_union.quantity_shipped)) = 0 THEN NULL
-                WHEN SUM(items_and_adjustments_union.quantity_ordered) = SUM(items_and_adjustments_union.quantity_shipped) THEN 'SHIPPED'
-                WHEN SUM(items_and_adjustments_union.quantity_ordered) > 0 AND SUM(items_and_adjustments_union.quantity_shipped) > 0 THEN 'PARTIALLY_SHIPPED'
-                ELSE NULL
-            END AS shipment_status,
-            CASE
-	            WHEN SUM(items_and_adjustments_union.quantity_received) = 0 THEN NULL
-                WHEN (SUM(items_and_adjustments_union.quantity_ordered) - SUM(items_and_adjustments_union.quantity_canceled)) > SUM(items_and_adjustments_union.quantity_received) AND SUM(items_and_adjustments_union.quantity_received) > 0 THEN 'PARTIALLY_RECEIVED'
-                WHEN (SUM(items_and_adjustments_union.quantity_ordered) - SUM(items_and_adjustments_union.quantity_canceled)) <= SUM(items_and_adjustments_union.quantity_received) THEN 'RECEIVED'
-                ELSE NULL
-            END AS receipt_status,
-            CASE
-                WHEN (SUM(items_and_adjustments_union.quantity_ordered) + SUM(items_and_adjustments_union.adjustments_count)) = 0 THEN NULL
-                WHEN (SUM(items_and_adjustments_union.quantity_ordered) + SUM(items_and_adjustments_union.adjustments_count)) = (SUM(items_and_adjustments_union.quantity_invoiced) + SUM(items_and_adjustments_union.adjustments_invoiced)) THEN 'INVOICED'
-                WHEN (SUM(items_and_adjustments_union.quantity_ordered) + SUM(items_and_adjustments_union.adjustments_count)) > 0 AND (SUM(items_and_adjustments_union.quantity_invoiced) + SUM(items_and_adjustments_union.adjustments_invoiced) > 0) THEN 'PARTIALLY_INVOICED'
-                ELSE NULL
-            END AS payment_status
-        FROM (
-            -- There is need to make an union of order item summary and order adjustments payment status
-            -- to not get duplicated quantities and to get proper payment status for order summary
-            SELECT
-                `order`.id                                              AS id,
-                `order`.status                                          AS order_status,
-                IFNULL(SUM(order_item_summary.quantity_ordered), 0)     AS quantity_ordered,
-                SUM(order_item_summary.is_item_fully_ordered)           AS items_ordered,
-                0									 		            AS adjustments_count,
-                IFNULL(SUM(order_item_summary.quantity_shipped), 0)     AS quantity_shipped,
-                SUM(order_item_summary.is_item_fully_shipped)           AS items_shipped,
-                IFNULL(SUM(order_item_summary.quantity_received), 0)    AS quantity_received,
-                SUM(order_item_summary.is_item_fully_received)          AS items_received,
-                IFNULL(SUM(order_item_summary.quantity_canceled), 0)    AS quantity_canceled,
-                IFNULL(SUM(order_item_summary.quantity_invoiced), 0)    AS quantity_invoiced,
-                SUM(order_item_summary.is_item_fully_invoiced)          AS items_invoiced,
-                0   										            AS adjustments_invoiced
-            FROM `order`
-                LEFT OUTER JOIN order_item ON order_item.order_id = `order`.id
-                LEFT OUTER JOIN order_item_summary ON order_item_summary.id = order_item.id
-            WHERE `order`.order_type_id = 'PURCHASE_ORDER'
-            GROUP BY `order`.id
-            UNION
-            SELECT
-                `order`.id                                  			            AS id,
-                `order`.status                              			            AS order_status,
-                0    													            AS quantity_ordered,
-                0                                                                   AS items_ordered,
-                IFNULL(SUM(order_adjustment_payment_status.quantity_ordered), 0)	AS adjustments_count,
-                0    													            AS quantity_shipped,
-                0                                                                   AS items_shipped,
-                0   													            AS quantity_received,
-                0                                                                   AS items_received,
-                0   													            AS quantity_canceled,
-                0   													            AS quantity_invoiced,
-                0                                                                   AS items_invoiced,
-                SUM(order_adjustment_payment_status.quantity_invoiced)	            AS adjustments_invoiced
-            FROM `order`
-                LEFT OUTER JOIN order_adjustment ON order_adjustment.order_id = `order`.id
-                LEFT OUTER JOIN order_adjustment_payment_status ON order_adjustment_payment_status.adjustment_id = order_adjustment.id
-            WHERE `order`.order_type_id = 'PURCHASE_ORDER'
-            GROUP BY `order`.id
-        ) AS items_and_adjustments_union GROUP BY id, order_status
-    )
-AS order_summary);
+         SELECT id,
+                order_status,
+                SUM(items_and_adjustments_union.quantity_ordered)     AS quantity_ordered,
+                SUM(items_and_adjustments_union.adjustments_count)    AS adjustments_count,
+                SUM(items_and_adjustments_union.quantity_shipped)     AS quantity_shipped,
+                SUM(items_and_adjustments_union.quantity_received)    AS  quantity_received,
+                SUM(items_and_adjustments_union.quantity_canceled)    AS quantity_canceled,
+                SUM(items_and_adjustments_union.quantity_invoiced)    AS quantity_invoiced,
+                SUM(items_and_adjustments_union.items_ordered)        AS items_ordered,
+                SUM(items_and_adjustments_union.items_shipped)        AS items_shipped,
+                SUM(items_and_adjustments_union.items_received)       AS items_received,
+                SUM(items_and_adjustments_union.items_invoiced)       AS items_invoiced,
+                SUM(items_and_adjustments_union.adjustments_invoiced) AS adjustments_invoiced,
+                CASE
+                    WHEN (SUM(items_and_adjustments_union.quantity_ordered) + SUM(items_and_adjustments_union.quantity_shipped)) = 0 THEN NULL
+                    WHEN SUM(items_and_adjustments_union.quantity_ordered) = SUM(items_and_adjustments_union.quantity_shipped) THEN 'SHIPPED'
+                    WHEN SUM(items_and_adjustments_union.quantity_ordered) > 0
+                        AND SUM(items_and_adjustments_union.quantity_shipped) > 0 THEN 'PARTIALLY_SHIPPED'
+                    ELSE NULL
+                    END AS shipment_status,
+                CASE
+                    WHEN SUM(items_and_adjustments_union.quantity_received) = 0 THEN NULL
+                    WHEN (SUM(items_and_adjustments_union.quantity_ordered) - SUM(items_and_adjustments_union.quantity_canceled)) > SUM(items_and_adjustments_union.quantity_received)
+                        AND SUM(items_and_adjustments_union.quantity_received) > 0 THEN 'PARTIALLY_RECEIVED'
+                    WHEN (SUM(items_and_adjustments_union.quantity_ordered) - SUM(items_and_adjustments_union.quantity_canceled)) <= SUM(items_and_adjustments_union.quantity_received) THEN 'RECEIVED'
+                    ELSE NULL
+                    END AS receipt_status,
+                CASE
+                    WHEN (SUM(items_and_adjustments_union.quantity_ordered) = 0
+                        AND SUM(items_and_adjustments_union.adjustments_count) = 0)
+                        OR (SUM(items_and_adjustments_union.quantity_invoiced) = 0
+                            AND SUM(items_and_adjustments_union.adjustments_invoiced) = 0) THEN NULL
+                    WHEN (SUM(items_and_adjustments_union.quantity_ordered) = SUM(items_and_adjustments_union.quantity_invoiced))
+                        AND (SUM(items_and_adjustments_union.adjustments_count) = SUM(items_and_adjustments_union.adjustments_invoiced)
+                            AND SUM(items_and_adjustments_union.total_adjustments) = SUM(items_and_adjustments_union.invoiced_adjustments_amount)) THEN 'INVOICED'
+                    ELSE 'PARTIALLY_INVOICED'
+                    END AS payment_status
+         FROM (
+                  -- There is need to make an union of order item summary and order adjustments payment status
+                  -- to not get duplicated quantities and to get proper payment status for order summary
+                  SELECT `order`.id                                              AS id,
+                         `order`.status                                          AS order_status,
+                         IFNULL(SUM(order_item_summary.quantity_ordered), 0)     AS quantity_ordered,
+                         SUM(order_item_summary.is_item_fully_ordered)           AS items_ordered,
+                         0                                                       AS adjustments_count,
+                         IFNULL(SUM(order_item_summary.quantity_shipped), 0)     AS quantity_shipped,
+                         SUM(order_item_summary.is_item_fully_shipped)           AS items_shipped,
+                         IFNULL(SUM(order_item_summary.quantity_received), 0)    AS quantity_received,
+                         SUM(order_item_summary.is_item_fully_received)          AS items_received,
+                         IFNULL(SUM(order_item_summary.quantity_canceled), 0)    AS quantity_canceled,
+                         IFNULL(SUM(order_item_summary.quantity_invoiced), 0)    AS quantity_invoiced,
+                         SUM(order_item_summary.is_item_fully_invoiced)          AS items_invoiced,
+                         0                                                       AS adjustments_invoiced,
+                         0                                                       AS total_adjustments,
+                         0                                                       AS invoiced_adjustments_amount
+                  FROM `order`
+                           LEFT OUTER JOIN order_item ON order_item.order_id = `order`.id
+                           LEFT OUTER JOIN order_item_summary ON order_item_summary.id = order_item.id
+                  WHERE `order`.order_type_id = 'PURCHASE_ORDER'
+                  GROUP BY `order`.id
+                  UNION SELECT `order`.id                                                                    AS id,
+                               `order`.status                                                                AS order_status,
+                               0                                                                             AS quantity_ordered,
+                               0                                                                             AS items_ordered,
+                               -- count all distinct adjustment items, this is for the case when adjustment might be canceled,
+                               -- then invoiced (invoiced quantity is 0), then uncanceled and invoiced again with quantity 1
+                               IFNULL(COUNT(DISTINCT order_adjustment.id), 0)                                AS adjustments_count,
+                               0                                                                             AS quantity_shipped,
+                               0                                                                             AS items_shipped,
+                               0                                                                             AS quantity_received,
+                               0                                                                             AS items_received,
+                               0                                                                             AS quantity_canceled,
+                               0                                                                             AS quantity_invoiced,
+                               0                                                                             AS items_invoiced,
+                               IFNULL(SUM(order_adjustment_payment_statuses.quantity_invoiced), 0)           AS adjustments_invoiced,
+                               SUM(DISTINCT total_adjustments.total_adjustments)                             AS total_adjustments,
+                               IFNULL(SUM(ABS(order_adjustment_payment_statuses.invoiced_amount)), 0)        AS invoiced_adjustments_amount
+                  FROM `order`
+                           LEFT OUTER JOIN order_adjustment ON order_adjustment.order_id = `order`.id
+                           LEFT OUTER JOIN (
+                                SELECT adjustment_id, SUM(invoiced_amount) as invoiced_amount, IF(SUM(quantity_invoiced) > 0, 1, 0) as quantity_invoiced
+                                FROM order_adjustment_payment_status
+                                GROUP BY adjustment_id
+                           ) as order_adjustment_payment_statuses ON order_adjustment_payment_statuses.adjustment_id = order_adjustment.id
+                           LEFT OUTER JOIN (
+                      SELECT order_id,
+                             SUM(total_adjustment) AS total_adjustments
+                      FROM (
+                               SELECT `order`.id AS order_id,
+                                      order_adjustment.id AS order_adjustment_id,
+                                      SUM(
+                                              DISTINCT ABS(
+                                              IFNULL(
+                                                      order_adjustment.amount, IF(
+                                                      order_adjustment.percentage IS NOT NULL,
+                                                      IF(
+                                                              order_item_id IS NOT NULL,
+                                                              order_item.quantity * order_item.unit_price * (order_adjustment.percentage / 100),
+                                                              order_total.order_total * (order_adjustment.percentage / 100)), 0)
+                                              )
+                                                       )
+                                      ) AS total_adjustment
+                               FROM `order`
+                                        LEFT OUTER JOIN order_adjustment ON order_adjustment.order_id = `order`.id
+                                        LEFT OUTER JOIN order_adjustment_payment_status ON order_adjustment_payment_status.adjustment_id = order_adjustment.id
+                                        LEFT OUTER JOIN order_item ON order_adjustment.order_item_id = order_item.id
+                                        LEFT OUTER JOIN (
+                                   SELECT oi.order_id AS order_id,
+                                          SUM(oi.quantity * oi.unit_price) AS order_total
+                                   FROM order_item oi
+                                            LEFT OUTER JOIN `order` o ON o.id = oi.order_id
+                                   GROUP BY oi.order_id
+                               ) AS order_total ON `order`.id = order_total.order_id
+                               WHERE order_adjustment.canceled IS NOT TRUE
+                               GROUP BY order_adjustment_id, order_id
+                           ) AS amount_per_order_by_adjustment
+                      GROUP BY amount_per_order_by_adjustment.order_id) AS total_adjustments ON total_adjustments.order_id = `order`.id
+                  WHERE `order`.order_type_id = 'PURCHASE_ORDER'
+                    AND order_adjustment.canceled IS NOT TRUE
+                  GROUP BY `order`.id) AS items_and_adjustments_union
+         GROUP BY id,
+                  order_status
+     ) AS order_summary
+);

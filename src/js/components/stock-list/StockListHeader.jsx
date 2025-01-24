@@ -23,7 +23,7 @@ const StockListHeader = ({ isUserAdmin }) => (
   </div>
 );
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   isUserAdmin: state.session.isUserAdmin,
 });
 
@@ -32,4 +32,3 @@ export default connect(mapStateToProps)(StockListHeader);
 StockListHeader.propTypes = {
   isUserAdmin: PropTypes.bool.isRequired,
 };
-

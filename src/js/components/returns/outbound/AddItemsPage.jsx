@@ -17,6 +17,8 @@ import ArrayField from 'components/form-elements/ArrayField';
 import LabelField from 'components/form-elements/LabelField';
 import TextField from 'components/form-elements/TextField';
 import ProductSelect from 'components/product-select/ProductSelect';
+import DateFormat from 'consts/dateFormat';
+import StockMovementStatus from 'consts/stockMovementStatus';
 import apiClient, { flattenRequest, parseResponse } from 'utils/apiClient';
 import Checkbox from 'utils/Checkbox';
 import { renderFormField } from 'utils/form-utils';
@@ -24,6 +26,7 @@ import { formatProductDisplayName } from 'utils/form-values-utils';
 import { debounceAvailableItemsFetch } from 'utils/option-utils';
 import Select from 'utils/Select';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
+import { formatDate, getDateFormat, getLocaleCode } from 'utils/translation-utils';
 
 import 'react-table/react-table.css';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -61,7 +64,7 @@ const FIELDS = {
             disabled={false}
             className="ml-4"
             value={fieldValue.checked}
-            onChange={value => selectRow(value, rowIndex)}
+            onChange={(value) => selectRow(value, rowIndex)}
           />
         ),
       },
@@ -96,6 +99,9 @@ const FIELDS = {
         label: 'react.outboundReturns.expiry.label',
         defaultMessage: 'Expiry',
         flexWidth: '1',
+        getDynamicAttr: ({ formatLocalizedDate }) => ({
+          formatValue: (value) => formatLocalizedDate(value, DateFormat.COMMON),
+        }),
       },
       quantityOnHand: {
         type: LabelField,
@@ -153,10 +159,10 @@ function validate(values) {
 
   _.forEach(values.returnItems, (item, key) => {
     if (
-      item.checked &&
-      (
-        (_.toInteger(item.quantity) > item.quantityNotPicked) ||
-        _.toInteger(item.quantity) < 0
+      item.checked
+      && (
+        (_.toInteger(item.quantity) > item.quantityNotPicked)
+        || _.toInteger(item.quantity) < 0
       )
     ) {
       errors.returnItems[key] = { quantity: 'react.outboundReturns.errors.quantityToReturn.label' };
@@ -255,7 +261,7 @@ class AddItemsPage extends Component {
           const returnItems = _.map(
             outboundReturn.stockTransferItems,
             // Picked value added to compensate value already subtracted
-            item => ({ ...item, quantityNotPicked: item.quantityNotPicked + _.sumBy(item.picklistItems, 'quantity'), checked: true }),
+            (item) => ({ ...item, quantityNotPicked: item.quantityNotPicked + _.sumBy(item.picklistItems, 'quantity'), checked: true }),
           );
           this.setState({
             outboundReturn,
@@ -277,10 +283,10 @@ class AddItemsPage extends Component {
     } = this.state;
 
     if (
-      selectedProductId ||
-      selectedLotNumber ||
-      selectedExpirationDate ||
-      selectedBinLocation
+      selectedProductId
+      || selectedLotNumber
+      || selectedExpirationDate
+      || selectedBinLocation
     ) {
       this.props.showSpinner();
       const url = '/api/stockTransfers/candidates';
@@ -294,12 +300,13 @@ class AddItemsPage extends Component {
 
       apiClient.post(url, payload)
         .then((resp) => {
-          const returnItems = _.map(parseResponse(resp.data.data), item => ({
+          const returnItems = _.map(parseResponse(resp.data.data), (item) => ({
             ...item,
             quantity: this.state.selectedItems[item.productAvailabilityId] ? this.state.selectedItems[item.productAvailabilityId].quantity : '',
             // Picked value added to compensate value already subtracted
-            quantityNotPicked: this.state.selectedItems[item.productAvailabilityId] ?
-              item.quantityNotPicked + this.state.selectedItems[item.productAvailabilityId].quantity
+            quantityNotPicked: this.state.selectedItems[item.productAvailabilityId]
+              ? (item.quantityNotPicked
+                  + this.state.selectedItems[item.productAvailabilityId].quantity)
               : item.quantityNotPicked,
             checked: !!this.state.selectedItems[item.productAvailabilityId],
           }));
@@ -307,18 +314,18 @@ class AddItemsPage extends Component {
         })
         .catch(() => this.props.hideSpinner());
     } else if (
-      !selectedProductId &&
-      !selectedLotNumber &&
-      !selectedExpirationDate &&
-      !selectedBinLocation
+      !selectedProductId
+      && !selectedLotNumber
+      && !selectedExpirationDate
+      && !selectedBinLocation
     ) {
-      this.setState({ formValues: { returnItems: _.values(this.state.selectedItems) } });
+      this.setState((prev) => ({ formValues: { returnItems: _.values(prev.selectedItems) } }));
     }
   }
 
   dataFetched = false;
 
-  saveAndTransition(callback) {
+  saveAndTransition(callback, status) {
     const errors = validate({ returnItems: _.values(this.state.selectedItems) });
     if (errors && errors.returnItems.length) {
       Alert.error(this.props.translate('react.outboundReturns.errors.quantityToReturn.label'));
@@ -332,9 +339,14 @@ class AddItemsPage extends Component {
     }
 
     this.props.showSpinner();
+
+    const statusPayload = status ? {
+      status,
+    } : {};
+
     const payload = {
       ...this.state.outboundReturn,
-      status: 'APPROVED',
+      ...statusPayload,
       stockTransferItems: _.values(this.state.selectedItems),
     };
     const url = `/api/stockTransfers/${this.props.match.params.outboundReturnId}`;
@@ -352,12 +364,12 @@ class AddItemsPage extends Component {
     this.props.showSpinner();
     const url = '/api/internalLocations';
 
-    const mapBins = bins => (_.chain(bins)
+    const mapBins = (bins) => (_.chain(bins)
       .orderBy(['name'], ['asc']).value()
     );
 
     return apiClient.get(url, {
-      paramsSerializer: parameters => queryString.stringify(parameters),
+      paramsSerializer: (parameters) => queryString.stringify(parameters),
       params: {
         locationTypeCode: ['BIN_LOCATION', 'INTERNAL'],
         ignoreActivityCodes: ['RECEIVE_STOCK'],
@@ -365,7 +377,7 @@ class AddItemsPage extends Component {
       },
     })
       .then((response) => {
-        const binGroups = _.partition(response.data.data, bin => (bin.zoneName));
+        const binGroups = _.partition(response.data.data, (bin) => (bin.zoneName));
         const binsWithZone = _.chain(binGroups[0]).groupBy('zoneName')
           .map((value, key) => ({ name: key, options: mapBins(value) }))
           .orderBy(['name'], ['asc'])
@@ -459,7 +471,7 @@ class AddItemsPage extends Component {
 
     return (
       <Form
-        onSubmit={() => this.saveAndTransition(this.props.nextPage)}
+        onSubmit={() => this.saveAndTransition(this.props.nextPage, StockMovementStatus.APPROVED)}
         mutators={{ ...arrayMutators }}
         initialValues={formValues}
         validate={validate}
@@ -469,7 +481,7 @@ class AddItemsPage extends Component {
               <ProductSelect
                 placeholder={this.props.translate('react.outboundReturns.selectProduct.label', 'Select product...')}
                 loadOptions={this.debounceAvailableItemsFetch}
-                onChange={value => this.setSelectedProduct(value)}
+                onChange={(value) => this.setSelectedProduct(value)}
               />
               &nbsp;
               <input
@@ -479,23 +491,24 @@ class AddItemsPage extends Component {
                 className="form-control my-2"
                 placeholder={this.props.translate('react.outboundReturns.enterLotNumber.label', 'Enter lot number...')}
                 value={selectedLotNumber}
-                onChange={event => this.setSelectedLotNumber(event.target.value)}
+                onChange={(event) => this.setSelectedLotNumber(event.target.value)}
               />
               &nbsp;
               <div className="form-element-container returns-date-picker">
                 <DatePicker
                   className="form-control"
                   selected={moment(selectedExpirationDate, 'MM/DD/YYYY').isValid() ? moment(selectedExpirationDate, 'MM/DD/YYYY') : null}
-                  highlightDates={[!moment(selectedExpirationDate, 'MM/DD/YYYY').isValid() ?
-                    moment(new Date(), 'MM/DD/YYYY') : {}]}
-                  onChange={date => this.setSelectedExpirationDate(date)}
+                  highlightDates={[!moment(selectedExpirationDate, 'MM/DD/YYYY').isValid()
+                    ? moment(new Date(), 'MM/DD/YYYY') : {}]}
+                  onChange={(date) => this.setSelectedExpirationDate(date)}
                   popperClassName="force-on-top"
                   showYearDropdown
                   scrollableYearDropdown
-                  dateFormat="MM/DD/YYYY"
+                  dateFormat={this.props.dateFormat(DateFormat.COMMON)}
                   yearDropdownItemNumber={3}
                   utcOffset={0}
                   placeholderText={this.props.translate('react.outboundReturns.selectExpirationDate.label', 'Select expiration date...')}
+                  locale={this.props.localeCode}
                 />
               </div>
               &nbsp;
@@ -504,7 +517,7 @@ class AddItemsPage extends Component {
                 valueKey="id"
                 labelKey="name"
                 value={selectedBinLocation || null}
-                onChange={value => this.setSelectedBinLocation(value)}
+                onChange={(value) => this.setSelectedBinLocation(value)}
                 placeholder={this.props.translate('react.outboundReturns.selectBinLocation.label', 'Select bin location...')}
               />
             </div>
@@ -516,6 +529,7 @@ class AddItemsPage extends Component {
                   translate: this.props.translate,
                   selectRow: this.selectRow,
                   updateRow: this.updateRow,
+                  formatLocalizedDate: this.props.formatLocalizedDate,
                   values,
                 }))}
               </div>
@@ -524,15 +538,17 @@ class AddItemsPage extends Component {
                   type="button"
                   onClick={() => this.saveAndTransition(this.props.previousPage)}
                   className="btn btn-outline-primary btn-form float-right btn-xs"
-                ><Translate id="react.replenishment.next.label" defaultMessage="Previous" />
+                >
+                  <Translate id="react.outboundReturns.previous.label" defaultMessage="Previous" />
                 </button>
                 <button
                   type="submit"
                   disabled={
-                    !_.some(values.returnItems, item => _.parseInt(item.quantity) && item.checked)
+                    !_.some(values.returnItems, (item) => _.parseInt(item.quantity) && item.checked)
                   }
                   className="btn btn-outline-primary btn-form float-right btn-xs"
-                ><Translate id="react.replenishment.next.label" defaultMessage="Next" />
+                >
+                  <Translate id="react.outboundReturns.next.label" defaultMessage="Next" />
                 </button>
               </div>
             </form>
@@ -543,11 +559,14 @@ class AddItemsPage extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   debounceTime: state.session.searchConfig.debounceTime,
   minSearchLength: state.session.searchConfig.minSearchLength,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
   outboundReturnsTranslationsFetched: state.session.fetchedTranslations.outboundReturns,
+  formatLocalizedDate: formatDate(state.localize),
+  localeCode: getLocaleCode(state.localize),
+  dateFormat: getDateFormat(state.localize),
 });
 
 export default (connect(mapStateToProps, {
@@ -569,4 +588,7 @@ AddItemsPage.propTypes = {
       outboundReturnId: PropTypes.string,
     }),
   }).isRequired,
+  formatLocalizedDate: PropTypes.func.isRequired,
+  localeCode: PropTypes.string.isRequired,
+  dateFormat: PropTypes.string.isRequired,
 };

@@ -1,5 +1,6 @@
 import DateFilter from 'components/form-elements/DateFilter/DateFilter';
 import FilterSelectField from 'components/form-elements/FilterSelectField';
+import DateFormat from 'consts/dateFormat';
 
 export default {
   receiptStatusCode: {
@@ -9,6 +10,7 @@ export default {
       filterElement: true,
       placeholder: 'react.stockMovement.inbound.filters.receiptStatus.label',
       defaultPlaceholder: 'Receipt Status',
+      ariaLabel: 'Receipt Status',
       showLabelTooltip: true,
       options: [],
       closeMenuOnSelect: false,
@@ -28,10 +30,11 @@ export default {
       valueKey: 'id',
       labelKey: 'name',
       options: [],
-      filterOptions: options => options,
+      filterOptions: (options) => options,
       filterElement: true,
       placeholder: 'react.stockMovement.origin.label',
       defaultPlaceholder: 'Origin',
+      ariaLabel: 'Origin',
       showLabelTooltip: true,
     },
     getDynamicAttr: ({
@@ -48,6 +51,7 @@ export default {
       filterElement: true,
       placeholder: 'react.stockMovement.destination.label',
       defaultPlaceholder: 'Destination',
+      ariaLabel: 'Destination',
       showLabelTooltip: true,
       disabled: true,
     },
@@ -59,6 +63,7 @@ export default {
       filterElement: true,
       placeholder: 'react.stockMovement.shipmentType.label',
       defaultPlaceholder: 'Shipment type',
+      ariaLabel: 'Shipment type',
       showLabelTooltip: true,
       options: [],
       blurInputOnSelect: false,
@@ -80,10 +85,11 @@ export default {
       valueKey: 'id',
       labelKey: 'name',
       options: [],
-      filterOptions: options => options,
+      filterOptions: (options) => options,
       filterElement: true,
       placeholder: 'react.stockMovement.requestedBy.label',
       defaultPlaceholder: 'Requested By',
+      ariaLabel: 'Requested By',
       showLabelTooltip: true,
     },
     getDynamicAttr: ({
@@ -102,10 +108,11 @@ export default {
       valueKey: 'id',
       labelKey: 'name',
       options: [],
-      filterOptions: options => options,
+      filterOptions: (options) => options,
       filterElement: true,
       placeholder: 'react.stockMovement.createdBy.label',
       defaultPlaceholder: 'Created By',
+      ariaLabel: 'Created By',
       showLabelTooltip: true,
     },
     getDynamicAttr: ({
@@ -124,10 +131,11 @@ export default {
       valueKey: 'id',
       labelKey: 'name',
       options: [],
-      filterOptions: options => options,
+      filterOptions: (options) => options,
       filterElement: true,
       placeholder: 'react.stockMovement.updatedBy.label',
       defaultPlaceholder: 'Updated By',
+      ariaLabel: 'Updated By',
       showLabelTooltip: true,
     },
     getDynamicAttr: ({
@@ -139,18 +147,26 @@ export default {
   createdAfter: {
     type: DateFilter,
     attributes: {
+      localizeDate: true,
+      localizedDateFormat: DateFormat.COMMON,
       label: 'react.stockMovement.filter.createdAfter.label',
       defaultMessage: 'Created after',
+      // date format in which the date will be sent to the API
       dateFormat: 'MM/DD/YYYY',
+      ariaLabel: 'Created after',
       filterElement: true,
     },
   },
   createdBefore: {
     type: DateFilter,
     attributes: {
+      localizeDate: true,
+      localizedDateFormat: DateFormat.COMMON,
       label: 'react.stockMovement.filter.createdBefore.label',
       defaultMessage: 'Created before',
+      // date format in which the date will be sent to the API
       dateFormat: 'MM/DD/YYYY',
+      ariaLabel: 'Created before',
       filterElement: true,
     },
   },
