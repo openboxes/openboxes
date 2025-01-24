@@ -11,7 +11,19 @@ const useTablePagination = ({
   });
 
   const onPageChange = (page) => {
+    const maxPage = Math.floor(totalCount / pagination.pageSize);
+    if (maxPage < page) {
+      setPagination((prev) => ({
+        ...prev,
+        pageIndex: maxPage,
+      }));
+      return;
+    }
     if (page < 0) {
+      setPagination((prev) => ({
+        ...prev,
+        pageIndex: 0,
+      }));
       return;
     }
     setPagination((prev) => ({
