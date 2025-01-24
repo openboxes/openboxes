@@ -103,7 +103,8 @@ markdown_extensions:
       clickable_checkbox: true
   - pymdownx.tilde
   - pymdownx.inlinehilite
-  - pymdownx.snippets
+  - pymdownx.snippets:
+      url_download: true
   # Allow nesting of code and content blocks
   - pymdownx.superfences:
       custom_fences:
@@ -141,7 +142,7 @@ nav:
     - Quickstart on Ubuntu 22.04: admin-guide/quickstart/ubuntu2204/index.md
     - Quickstart on Mac OS: admin-guide/quickstart/macos/index.md
 #      - Quickstart on Windows: admin-guide/quickstart/windows/
-#      - Docker: admin-guide/quickstart/docker/
+#      - Quickstart using Docker: admin-guide/quickstart/docker/
 
   # Installation Guide
   # Need to add a discussion re: self-hosted on-premise vs cloud vs managed hosting
@@ -279,34 +280,49 @@ nav:
       - Verifying An Upgrade: admin-guide/upgrading/validate/verifying-upgrade.md
       - Known Issues: admin-guide/upgrading/validate/known-issues.md
 
-  # Onboarding Guide
-  - Onboarding: admin-guide/onboarding/index.md
-
-  # Developer Guide - needs a lot of work
-#  - Developer Guide:
-#    - Getting Started: developer-guide/getting-started.md
-#    - Architecture: developer-guide/architecture/index.md
-#    - Contributing: developer-guide/contributing.md
-#    - Forking: developer-guide/syncing-a-fork.md
-#    - Tagging a Release: developer-guide/tagging.md
-#    - Troubleshooting: developer-guide/troubleshooting.md
-#    - Release:
-#      - Process:
-#        - Overview: developer-guide/release/index.md
-#        - Plan: developer-guide/release/plan.md
-#        - Develop: developer-guide/release/develop.md
-#        - Prepare: developer-guide/release/prepare.md
-#        - Test: developer-guide/release/testing.md
-#        - Finalize: developer-guide/release/finalize.md
-#        - Document: developer-guide/release/document.md
-#        - Publish: developer-guide/release/publish.md
-#        - Deploy: developer-guide/release/deploy.md
-#        - Cleanup: developer-guide/release/cleanup.md
-#      - Hotfix: developer-guide/hotfix/index.md
-
-
-#     # Create a GH label to capture migration issues and link them here
-#     #- Troubleshooting
+#   - Upgrade (WIP):
+#     - admin-guide/upgrading/index.md
+#     - Upgrading Ubuntu: admin-guide/upgrading/ubuntu.md
+#     - Upgrading Tomcat: admin-guide/upgrading/tomcat.md
+#     - Upgrading OpenBoxes:
+#       - Minor version upgrade: admin-guide/upgrading/minor.md
+#       - Major version upgrade: admin-guide/upgrading/major.md
+#     - Migrating to a new server:
+#       - Version-Specific Upgrade Guide:
+#         - Introduction: admin-guide/upgrading/execute/version-specific/index.md
+#         - 0.8.x to 0.9.x:
+#           - Introduction: admin-guide/upgrading/execute/version-specific/08x-to-09x/introduction.md
+#           - Parallel Upgrade: admin-guide/upgrading/execute/version-specific/08x-to-09x/parallel.md
+#           - In-Place Upgrade: admin-guide/upgrading/execute/version-specific/08x-to-09x/in-place.md
+#     - Migration Process:
+#       - Plan:
+#         - Upgrade Strategies:
+#           - Overview: admin-guide/upgrading/plan/upgrade-strategies/overview.md
+#           - Parallel Upgrade Overview: admin-guide/upgrading/plan/upgrade-strategies/parallel-upgrade-overview.md
+#           - In-Place Upgrade Overview: admin-guide/upgrading/plan/upgrade-strategies/in-place-upgrade-overview.md
+#         - Rollback Strategies:
+#           - Overview: admin-guide/upgrading/plan/rollback-strategies/overview.md
+#           - Backup Your Database: admin-guide/upgrading/plan/rollback-strategies/backup-database.md
+#           - Backup Your Custom Configuration: admin-guide/upgrading/plan/rollback-strategies/backup-config.md
+#       - Execute:
+#         - Parallel Upgrade Guide:
+#           - Introduction: admin-guide/upgrading/execute/parallel/introduction.md
+#           - Install Server: admin-guide/upgrading/execute/parallel/install-new-server.md
+#           - Copy Configuration : admin-guide/upgrading/execute/parallel/copy-custom-config.md
+#           - Import Database: admin-guide/upgrading/execute/parallel/import-database-backup.md
+#           - Start Application: admin-guide/upgrading/execute/parallel/start-server.md
+#           - Reimport Database: admin-guide/upgrading/execute/parallel/reimport-database-backup.md
+#           - Re-route Traffic: admin-guide/upgrading/execute/parallel/reroute-requests.md
+#           - Deprovision Old Instance: admin-guide/upgrading/execute/parallel/deprovision-old-instance.md
+#         - In-Place Upgrade Guide:
+#           - Introduction: admin-guide/upgrading/execute/in-place/introduction.md
+#           - Upgrade Dependencies: admin-guide/upgrading/execute/in-place/upgrade-dependencies.md
+#           - Upgrade Application: admin-guide/upgrading/execute/in-place/upgrade-app.md
+#           - Start Application: admin-guide/upgrading/execute/in-place/start-server.md
+#           - Remove Dependencies: admin-guide/upgrading/execute/in-place/remove-old-dependencies.md
+#       - Validate:
+#         - Verifying Upgrade: admin-guide/upgrading/validate/verifying-upgrade.md
+#         - Known Issues: admin-guide/upgrading/validate/known-issues.md
 
   # User Guide
   - User Guide:
@@ -352,4 +368,27 @@ nav:
       - Bulk Actions:
         - Create Resources: api-guide/generic/create-resources.md
         - Update Resources: api-guide/generic/update-resources.md
+
+  # Developer Guide - needs a lot of work
+#   - Developer Guide:
+#     - Getting Started: developer-guide/getting-started.md
+#     - Architecture: developer-guide/architecture/index.md
+#     - Contributing: developer-guide/contributing.md
+#     - Forking: developer-guide/syncing-a-fork.md
+#     - Tagging a Release: developer-guide/tagging.md
+#     - Troubleshooting: developer-guide/troubleshooting.md
+#     - Releases:
+#       - Release Guide:
+#         - Overview: developer-guide/release/index.md
+#         - Planning: developer-guide/release/plan.md
+#         - Development: developer-guide/release/develop.md
+#         - Preparation: developer-guide/release/prepare.md
+#         - Testing: developer-guide/release/testing.md
+#         - Finalization: developer-guide/release/finalize.md
+#         - Documentation: developer-guide/release/document.md
+#         - Publishing: developer-guide/release/publish.md
+#         - Deploying: developer-guide/release/deploy.md
+#         - Cleanup: developer-guide/release/cleanup.md
+#       - Hotfix Guide: developer-guide/hotfix/index.md
+
   - Support: support/index.md

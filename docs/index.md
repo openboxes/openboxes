@@ -36,8 +36,6 @@ OpenBoxes is an open-source supply chain management system designed to manage su
 
     ---
 
-
-
     [:octicons-arrow-right-24: API Guide](api-guide/index.md)
 
 
@@ -45,7 +43,7 @@ OpenBoxes is an open-source supply chain management system designed to manage su
 
     ---
 
-    [:octicons-arrow-right-24: User Guide](https://help.openboxes.com)
+    [:octicons-arrow-right-24: User Guide](user-guide/index.md)
 
     [:octicons-arrow-right-24: Onboarding Guide](user-guide/onboarding/index.md)
 
