@@ -11,6 +11,9 @@ const useTablePagination = ({
   });
 
   const onPageChange = (page) => {
+    if (page < 0) {
+      return;
+    }
     setPagination((prev) => ({
       ...prev,
       pageIndex: page,
@@ -18,10 +21,13 @@ const useTablePagination = ({
   };
 
   const onPageSizeChange = (selectedPageSize) => {
-    setPagination((prev) => ({
-      ...prev,
+    const newPageIndex = Math.floor(
+      (pagination.pageIndex * pagination.pageSize) / selectedPageSize,
+    );
+    setPagination({
+      pageIndex: newPageIndex,
       pageSize: selectedPageSize,
-    }));
+    });
   };
 
   const pages = Math.ceil(totalCount / pagination.pageSize);
