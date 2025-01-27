@@ -187,6 +187,9 @@ const useAllProductsTab = ({
       ),
       cell: ({ getValue }) => {
         const binLocationList = mapStringToLimitedList(getValue(), ',');
+        const hiddenBinLocationsLength = binLocationList.length - 4 > 0
+          ? binLocationList.length - 4
+          : null;
 
         return (
           <TableCell
@@ -194,11 +197,19 @@ const useAllProductsTab = ({
             tooltip
             tooltipLabel={`${getValue()} (${binLocationList.length})`}
           >
-            {binLocationList.map((binLocationName) => (
+            {_.take(binLocationList, 4).map((binLocationName) => (
               <div className="truncate-text" key={crypto.randomUUID()}>
                 {binLocationName}
               </div>
             ))}
+            {hiddenBinLocationsLength && (
+            <p>
+              +
+              {hiddenBinLocationsLength}
+              {' '}
+              more
+            </p>
+            )}
           </TableCell>
         );
       },
