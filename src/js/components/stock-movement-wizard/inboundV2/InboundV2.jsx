@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 
 import { useSelector } from 'react-redux';
 
+import Button from 'components/form-elements/Button';
 import InboundHeader from 'components/stock-movement-wizard/inboundV2/InboundHeader';
 import InboundV2AddItems
   from 'components/stock-movement-wizard/inboundV2/sections/InboundV2AddItems';
@@ -18,7 +19,6 @@ import useWizard from 'hooks/useWizard';
 import PageWrapper from 'wrappers/PageWrapper';
 
 import 'utils/utils.scss';
-import Button from 'components/form-elements/Button';
 
 const InboundV2 = () => {
   useTranslation('stockMovement');
