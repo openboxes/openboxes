@@ -58,6 +58,9 @@ const useInboundForm = ({ next }) => {
       ...values,
       name: '',
       dateRequested: moment(values.dateRequested).format(DateFormat.MM_DD_YYYY),
+      origin: { id: values.origin.id },
+      destination: { id: values.destination.id },
+      requestedBy: { id: values.requestedBy.id },
     };
     try {
       let response;
