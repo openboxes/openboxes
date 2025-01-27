@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 const useTablePagination = ({
   defaultPageSize,
@@ -10,8 +10,24 @@ const useTablePagination = ({
     pageSize: defaultPageSize || 5,
   });
 
+  const maxPage = useMemo(
+    () => Math.floor(totalCount / pagination.pageSize),
+    [totalCount, pagination.pageSize],
+  );
+
   const onPageChange = (page) => {
+    if (page > maxPage) {
+      setPagination((prev) => ({
+        ...prev,
+        pageIndex: maxPage,
+      }));
+      return;
+    }
     if (page < 0) {
+      setPagination((prev) => ({
+        ...prev,
+        pageIndex: 0,
+      }));
       return;
     }
     setPagination((prev) => ({

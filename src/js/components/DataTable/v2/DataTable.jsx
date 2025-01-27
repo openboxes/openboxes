@@ -31,6 +31,8 @@ const DataTable = ({
     filterParams,
   });
 
+  const shouldDisplayPagination = Boolean(data?.length && !loading);
+
   return (
     <div className="app-react-table-wrapper table-v2">
       <div className="ReactTable app-react-table">
@@ -47,11 +49,13 @@ const DataTable = ({
             rowModel={table.getRowModel()}
             dataLength={data?.length}
           />
+          {shouldDisplayPagination && (
           <DataTableFooter
             footerComponent={footerComponent}
             totalData={totalCount}
             {...paginationProps}
           />
+          )}
         </div>
       </div>
     </div>
