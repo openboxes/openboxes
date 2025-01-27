@@ -3,7 +3,7 @@ import { z } from 'zod';
 import useTranslate from 'hooks/useTranslate';
 import { validateFutureDate } from 'utils/form-utils';
 
-const useInboundV2Validation = () => {
+const useInboundValidation = () => {
   const translate = useTranslate();
 
   const requestedBySchema = z.object({
@@ -63,4 +63,4 @@ const useInboundV2Validation = () => {
   };
 };
 
-export default useInboundV2Validation;
+export default useInboundValidation;

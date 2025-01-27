@@ -8,7 +8,7 @@ import { useSelector } from 'react-redux';
 import stockListApi from 'api/services/StockListApi';
 import stockMovementApi from 'api/services/StockMovementApi';
 import { DateFormat } from 'consts/timeFormat';
-import useInboundV2Validation from 'hooks/inboundV2/useInboundV2Validation';
+import useInboundValidation from 'hooks/inboundV2/useInboundValidation';
 import useQueryParams from 'hooks/useQueryParams';
 import useSpinner from 'hooks/useSpinner';
 
@@ -18,7 +18,7 @@ const useInboundForm = ({ next }) => {
     currentLocation: state.session.currentLocation,
   }));
   const spinner = useSpinner();
-  const { validationSchema } = useInboundV2Validation();
+  const { validationSchema } = useInboundValidation();
   const queryParams = useQueryParams();
 
   const defaultValues = useMemo(() => {
@@ -125,7 +125,7 @@ const useInboundForm = ({ next }) => {
     if (origin?.id && destination?.id) {
       fetchStockLists();
     }
-  }, [origin, origin?.id, destination, destination?.id]);
+  }, [origin?.id, destination?.id]);
 
   return {
     control,
