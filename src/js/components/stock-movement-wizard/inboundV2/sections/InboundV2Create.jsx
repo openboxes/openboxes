@@ -114,7 +114,7 @@ const InboundV2Create = ({
               <SelectField
                 title={{
                   id: 'react.stockMovement.stocklist.label',
-                  defaultMessage: 'StockList',
+                  defaultMessage: 'Stocklist',
                 }}
                 options={stockLists}
                 {...field}
