@@ -32,7 +32,7 @@ const InboundV2Create = ({
     minSearchLength: state.session.searchConfig.minSearchLength,
   }));
 
-  const loadInboundV2Locations = debounceLocationsFetch(
+  const debouncedLocationsFetch = debounceLocationsFetch(
     debounceTime,
     minSearchLength,
     null,
@@ -78,7 +78,7 @@ const InboundV2Create = ({
                 hasErrors={Boolean(errors.origin?.message)}
                 errorMessage={errors.origin?.message}
                 async
-                loadOptions={loadInboundV2Locations}
+                loadOptions={debouncedLocationsFetch}
                 {...field}
               />
             )}
@@ -99,7 +99,7 @@ const InboundV2Create = ({
                 hasErrors={Boolean(errors.destination?.message)}
                 errorMessage={errors.destination?.message}
                 async
-                loadOptions={loadInboundV2Locations}
+                loadOptions={debouncedLocationsFetch}
                 {...field}
               />
             )}
@@ -108,7 +108,7 @@ const InboundV2Create = ({
         <div className="col-lg-6 col-md-12 px-2 pt-2">
           <Controller
             name="stockList"
-            disabled={!origin || !origin.id || !destination || !destination.id}
+            disabled={!origin || !destination}
             control={control}
             render={({ field }) => (
               <SelectField

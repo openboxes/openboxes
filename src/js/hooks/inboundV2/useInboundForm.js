@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import _ from 'lodash';
 import moment from 'moment';
 import { useForm } from 'react-hook-form';
 import { useSelector } from 'react-redux';
@@ -13,7 +12,7 @@ import useInboundV2Validation from 'hooks/inboundV2/useInboundV2Validation';
 import useQueryParams from 'hooks/useQueryParams';
 import useSpinner from 'hooks/useSpinner';
 
-const useInboundV2Form = ({ next }) => {
+const useInboundForm = ({ next }) => {
   const [stockLists, setStockLists] = useState([]);
   const { currentLocation } = useSelector((state) => ({
     currentLocation: state.session.currentLocation,
@@ -54,6 +53,7 @@ const useInboundV2Form = ({ next }) => {
   });
 
   const onSubmitStockMovementDetails = async (values) => {
+    spinner.show();
     const formattedValues = {
       ...values,
       name: '',
@@ -83,7 +83,7 @@ const useInboundV2Form = ({ next }) => {
       });
     }
   }, [currentLocation?.id]);
-  //
+
   const fetchStockLists = async () => {
     spinner.show();
     const config = {
@@ -95,15 +95,15 @@ const useInboundV2Form = ({ next }) => {
     try {
       const response = await stockListApi.getStockLists(config);
 
-      const newStockLists = _.map(response.data.data, (stocklist) => ({
+      const newStockLists = response.data.data.map((stocklist) => ({
         id: stocklist.id,
         name: stocklist.name,
         value: stocklist.id,
         label: stocklist.name,
       }));
 
-      const currentStocklistId = _.get(getValues(), 'stocklist.id');
-      const stocklistChanged = !_.find(newStockLists, (item) => item.id === currentStocklistId);
+      const currentStocklistId = getValues()?.stocklist?.id;
+      const stocklistChanged = !newStockLists.find((item) => item.id === currentStocklistId);
 
       if (stocklistChanged) {
         setValue('stocklist', undefined);
@@ -122,7 +122,7 @@ const useInboundV2Form = ({ next }) => {
     if (origin?.id && destination?.id) {
       fetchStockLists();
     }
-  }, [origin, destination]);
+  }, [origin, origin?.id, destination, destination?.id]);
 
   return {
     control,
@@ -137,4 +137,4 @@ const useInboundV2Form = ({ next }) => {
   };
 };
 
-export default useInboundV2Form;
+export default useInboundForm;

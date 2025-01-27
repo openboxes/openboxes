@@ -2,7 +2,6 @@ import React, { useMemo } from 'react';
 
 import { useSelector } from 'react-redux';
 
-import Button from 'components/form-elements/Button';
 import InboundHeader from 'components/stock-movement-wizard/inboundV2/InboundHeader';
 import InboundV2AddItems
   from 'components/stock-movement-wizard/inboundV2/sections/InboundV2AddItems';
@@ -12,13 +11,14 @@ import WizardStepsV2 from 'components/wizard/v2/WizardStepsV2';
 import inboundV2Step from 'consts/InboundV2Step';
 import mockInboundV2Status from 'consts/MockInboundV2Status';
 import mockInboundV2Title from 'consts/MockInboundV2Title';
-import useInboundV2Form from 'hooks/inboundV2/useInboundV2Form';
+import useInboundForm from 'hooks/inboundV2/useInboundForm';
 import useTranslate from 'hooks/useTranslate';
 import useTranslation from 'hooks/useTranslation';
 import useWizard from 'hooks/useWizard';
 import PageWrapper from 'wrappers/PageWrapper';
 
 import 'utils/utils.scss';
+import Button from 'components/form-elements/Button';
 
 const InboundV2 = () => {
   useTranslation('stockMovement');
@@ -68,7 +68,7 @@ const InboundV2 = () => {
     handleSubmit,
     onSubmitStockMovementDetails,
     stockLists,
-  } = useInboundV2Form({ next });
+  } = useInboundForm({ next });
 
   const detailsComponentProps = {
     control,
@@ -96,7 +96,6 @@ const InboundV2 = () => {
       </form>
       {is(inboundV2Step.ADD_ITEMS) && (<Step.Component />)}
       {is(inboundV2Step.SEND) && (<Step.Component />)}
-
       {/* this is for testing purposes */}
       <Button
         label="react.default.button.previous.label"

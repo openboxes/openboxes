@@ -61,6 +61,7 @@ const useWizard = ({ initialKey, steps }) => {
     navigateToStep(steps[lastIdx]?.key);
   };
 
+  // params might be needed to join some query params to the URL while switching the step
   const next = (params = {}) => {
     const nextStepIdx = stepProperties.currentStepIdx + 1;
     const nextStep = steps[nextStepIdx];
