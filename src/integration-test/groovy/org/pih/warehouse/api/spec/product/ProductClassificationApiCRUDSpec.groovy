@@ -44,7 +44,10 @@ class ProductClassificationApiCRUDSpec extends ApiSpec {
 
         then:
         assert classifications.size() >= 3  // Don't use '==' because other tests might have left data in the db
-        assert asNames(classifications).containsAll([CLASS_A, CLASS_B, CLASS_C])
+
+        List<String> names = asNames(classifications)
+        assert names.containsAll([CLASS_A, CLASS_B, CLASS_C])
+        assert names.size() == new HashSet<>(names).size()  // Ensure there are no duplicates
     }
 
     void 'given an invalid facility, list correctly errors'() {

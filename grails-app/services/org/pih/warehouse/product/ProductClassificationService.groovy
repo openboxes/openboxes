@@ -39,13 +39,13 @@ class ProductClassificationService {
             throw new IllegalArgumentException("Invalid facilityId: ${facilityId}")
         }
 
-        List<String> productClassifications = Product.createCriteria().listDistinct() {
+        Set<String> productClassifications = Product.createCriteria().listDistinct() {
             projections {
                 groupProperty("abcClass")
             }
             isNotNull("abcClass")
             ne("abcClass", "")  // Once classifications have their own entity, this should be removed.
-        } as List<String>
+        } as Set<String>
 
         productClassifications += InventoryLevel.createCriteria().listDistinct() {
             projections {
@@ -55,15 +55,13 @@ class ProductClassificationService {
             eq("inventory", facility.inventory)
             isNotNull("abcClass")
             ne("abcClass", "")  // Once classifications have their own entity, this should be removed.
-        } as List<String>
-
-        // Sort the results by ABC class name. Once ABC class becomes its own domain, this can be moved to the query.
-        Collections.sort(productClassifications)
+        } as Set<String>
 
         // We convert to a DTO here instead of returning the raw string because it will make things easier
         // once product classification becomes a proper entity.
-        return productClassifications.collect {
-            new ProductClassificationDto(name: it)
-        }
+        return productClassifications.stream()
+                // Once ABC class becomes its own domain, this sort by name can be moved to the query.
+                .sorted()
+                .collect{ new ProductClassificationDto(name: it) }
     }
 }
