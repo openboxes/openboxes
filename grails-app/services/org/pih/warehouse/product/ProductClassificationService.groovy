@@ -59,9 +59,8 @@ class ProductClassificationService {
 
         // We convert to a DTO here instead of returning the raw string because it will make things easier
         // once product classification becomes a proper entity.
-        return productClassifications.stream()
-                // Once ABC class becomes its own domain, this sort by name can be moved to the query.
-                .sorted()
+        return productClassifications
+                .sort()  // Once ABC class becomes its own domain, this sort by name can be moved to the query.
                 .collect{ new ProductClassificationDto(name: it) }
     }
 }
