@@ -63,13 +63,9 @@ const useInboundForm = ({ next }) => {
       requestedBy: { id: values.requestedBy.id },
     };
     try {
-      let response;
-      if (queryParams.id) {
-        response = await stockMovementApi.updateStockMovement(queryParams.id,
-          formattedValues);
-      } else {
-        response = await stockMovementApi.createStockMovement(formattedValues);
-      }
+      const response = await (queryParams.id
+        ? stockMovementApi.updateStockMovement(queryParams.id, formattedValues)
+        : stockMovementApi.createStockMovement(formattedValues));
 
       next({ id: response.data.data.id });
     } finally {
