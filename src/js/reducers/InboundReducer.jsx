@@ -1,13 +1,13 @@
-import { UPDATE_INBOUNDV2_DATA } from 'actions/types';
+import { UPDATE_INBOUND_DATA } from 'actions/types';
 
 const initialState = {
   initialValues: {
   },
 };
 
-export default function inboundV2Reducer(state = initialState, action) {
+export default function inboundReducer(state = initialState, action) {
   switch (action.type) {
-    case UPDATE_INBOUNDV2_DATA:
+    case UPDATE_INBOUND_DATA:
       return {
         ...state,
         initialValues: {
