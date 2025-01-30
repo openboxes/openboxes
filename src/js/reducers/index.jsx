@@ -51,6 +51,7 @@ const rootReducer = combineReducers({
   unitOfMeasure: unitOfMeasureReducer,
   outboundImport: outboundImportReducer,
   cycleCount: cycleCountReducer,
+  inbound: inboundReducer,
   lotNumbers: lotNumbersReducer,
 });
 
