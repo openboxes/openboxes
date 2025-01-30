@@ -5,6 +5,7 @@ import approversReducer from 'reducers/approversReducer';
 import connectionReducer from 'reducers/connectionReducer';
 import cycleCountReducer from 'reducers/cycleCountReducer';
 import filterFormReducer from 'reducers/filterFormReducer';
+import inboundReducer from 'reducers/InboundReducer';
 import indicatorsReducer from 'reducers/indicatorsReducer';
 import infoBarReducer from 'reducers/infoBarReducer';
 import infoBarVisibilityReducer from 'reducers/infoBarVisibilityReducer';
@@ -50,6 +51,7 @@ const rootReducer = combineReducers({
   unitOfMeasure: unitOfMeasureReducer,
   outboundImport: outboundImportReducer,
   cycleCount: cycleCountReducer,
+  inbound: inboundReducer,
 });
 
 export default rootReducer;
