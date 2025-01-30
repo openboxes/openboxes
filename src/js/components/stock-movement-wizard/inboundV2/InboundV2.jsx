@@ -12,6 +12,7 @@ import WizardStepsV2 from 'components/wizard/v2/WizardStepsV2';
 import inboundV2Step from 'consts/InboundV2Step';
 import mockInboundV2Status from 'consts/MockInboundV2Status';
 import mockInboundV2Title from 'consts/MockInboundV2Title';
+import useInboundForm from 'hooks/inboundV2/useInboundForm';
 import useTranslate from 'hooks/useTranslate';
 import useTranslation from 'hooks/useTranslation';
 import useWizard from 'hooks/useWizard';
@@ -28,7 +29,7 @@ const InboundV2 = () => {
     {
       key: inboundV2Step.CREATE,
       title: translate('react.stockMovement.create.label', 'Create'),
-      Component: () => (<InboundV2Create />),
+      Component: (props) => (<InboundV2Create {...props} />),
     },
     {
       key: inboundV2Step.ADD_ITEMS,
@@ -59,6 +60,25 @@ const InboundV2 = () => {
     steps,
   });
 
+  const {
+    errors,
+    control,
+    isValid,
+    trigger,
+    handleSubmit,
+    onSubmitStockMovementDetails,
+    stockLists,
+  } = useInboundForm({ next });
+
+  const detailsComponentProps = {
+    control,
+    errors,
+    isValid,
+    next,
+    trigger,
+    stockLists,
+  };
+
   // this will still need to be improved in the future
   const headerStatus = is(inboundV2Step.SEND) ? mockInboundV2Status : undefined;
   const headerTitle = is(inboundV2Step.ADD_ITEMS)
@@ -71,26 +91,19 @@ const InboundV2 = () => {
         title={headerTitle}
         status={headerStatus}
       />
-      {is(inboundV2Step.CREATE) && (<Step.Component />)}
+      <form onSubmit={handleSubmit(onSubmitStockMovementDetails)}>
+        {is(inboundV2Step.CREATE) && (<Step.Component {...detailsComponentProps} />)}
+      </form>
       {is(inboundV2Step.ADD_ITEMS) && (<Step.Component />)}
       {is(inboundV2Step.SEND) && (<Step.Component />)}
-
-      <div className="d-flex justify-content-between">
-        <Button
-          label="react.default.button.previous.label"
-          defaultLabel="Previous"
-          variant="primary"
-          className="fit-content align-self-end"
-          onClick={() => previous()}
-        />
-        <Button
-          label="react.default.button.next.label"
-          defaultLabel="Next"
-          variant="primary"
-          className="fit-content align-self-end"
-          onClick={() => next()}
-        />
-      </div>
+      {/* this is for testing purposes */}
+      <Button
+        label="react.default.button.previous.label"
+        defaultLabel="Previous"
+        variant="primary"
+        className="fit-content align-self-end"
+        onClick={() => previous()}
+      />
     </PageWrapper>
   );
 };
