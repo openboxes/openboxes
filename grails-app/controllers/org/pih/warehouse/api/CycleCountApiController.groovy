@@ -10,12 +10,20 @@ import org.pih.warehouse.inventory.CycleCountRequest
 import org.pih.warehouse.inventory.CycleCountRequestBatchCommand
 import org.pih.warehouse.inventory.CycleCountRequestCommand
 import org.pih.warehouse.inventory.CycleCountService
+import org.pih.warehouse.inventory.TestCommand
 import org.springframework.validation.BeanPropertyBindingResult
 import org.springframework.validation.Errors
 
 class CycleCountApiController {
 
     CycleCountService cycleCountService
+
+    def bindCommandObject(TestCommand command) {
+        log.info "params " + params
+        log.info "command.facility " + command.facility
+
+        render ([command:command] as JSON)
+    }
 
     def getCandidates(CycleCountCandidateFilterCommand filterParams) {
         List<CycleCountCandidate> cycleCounts = cycleCountService.getCandidates(filterParams, params.facilityId)

@@ -947,6 +947,11 @@ class UrlMappings {
             action = [POST: "createRequests"]
         }
 
+        "/api/facilities/${facility}/cycle-counts/subresource" {
+            controller = "cycleCountApi"
+            action = [GET: "bindCommandObject", POST: "bindCommandObject", PUT: "bindCommandObject", DELETE: "bindCommandObject"]
+        }
+
         // Error handling
 
         "401"(controller: "errors", action: "handleUnauthorized")
