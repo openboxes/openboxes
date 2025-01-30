@@ -53,6 +53,7 @@ const rootReducer = combineReducers({
   outboundImport: outboundImportReducer,
   cycleCount: cycleCountReducer,
   countWorkflow: countWorkflowReducer,
+  inbound: inboundReducer,
   lotNumbers: lotNumbersReducer,
 });
 
