@@ -12,11 +12,13 @@ const useWizard = ({ initialKey, steps }) => {
   const history = useHistory();
   const location = useLocation();
 
-  const navigateToStep = (step) => {
-    history.push(queryString.stringifyUrl({
-      url: location.pathname,
-      query: { ...parsedQueryParams, step },
-    }));
+  const navigateToStep = (step, params = {}) => {
+    history.push(
+      queryString.stringifyUrl({
+        url: location.pathname,
+        query: { ...parsedQueryParams, step, ...params },
+      }),
+    );
   };
 
   /** Compute current active wizard step
@@ -59,11 +61,12 @@ const useWizard = ({ initialKey, steps }) => {
     navigateToStep(steps[lastIdx]?.key);
   };
 
-  const next = () => {
+  // params might be needed to join some query params to the URL while switching the step
+  const next = (params = {}) => {
     const nextStepIdx = stepProperties.currentStepIdx + 1;
     const nextStep = steps[nextStepIdx];
     if (nextStep) {
-      navigateToStep(nextStep.key);
+      navigateToStep(nextStep.key, params);
     }
   };
 
