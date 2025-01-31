@@ -43,7 +43,7 @@ class CycleCountRequest {
         product(nullable: true)
         createdBy(nullable: true)
         updatedBy(nullable: true)
-        cycleCount(unique: true) // Unique: true determines the unidirectional 1:1 association between cycle count request and cycle count
+        cycleCount(unique: true, nullable: true) // Unique: true determines the unidirectional 1:1 association between cycle count request and cycle count
     }
 
     Map toJson() {

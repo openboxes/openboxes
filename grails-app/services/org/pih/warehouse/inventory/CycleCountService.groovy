@@ -206,6 +206,7 @@ class CycleCountService {
         newCycleCount.save()
         // 1:1 association between cycle count and cycle count request
         request.cycleCountRequest.cycleCount = newCycleCount
+        request.cycleCountRequest.status = CycleCountRequestStatus.IN_PROGRESS
         List<CycleCountItem> cycleCountItems = []
         itemsToSave.each { AvailableItem availableItem ->
             CycleCountItem cycleCountItem = new CycleCountItem(
@@ -233,15 +234,15 @@ class CycleCountService {
     }
 
     CycleCountDto updateCycleCount(CycleCount cycleCount, List<CycleCountItem> cycleCountItems, CycleCountStartCommand request) {
-        if (cycleCount.status in [CycleCountStatus.TO_REVIEW, CycleCountStatus.CANCELED]) {
+        if (cycleCount.status in [CycleCountStatus.READY_TO_REVIEW, CycleCountStatus.CANCELED]) {
             throw new IllegalArgumentException("Cycle count is already in review or canceled")
         }
-        if (cycleCount.status in [CycleCountStatus.COUNTING, CycleCountStatus.COUNTED]) {
+        if (cycleCount.status in [CycleCountStatus.INVESTIGATING, CycleCountStatus.COUNTED]) {
             throw new UnsupportedOperationException("Support will be added later")
         }
-        if (cycleCount.status in [CycleCountStatus.COUNTING, CycleCountStatus.COUNTED, CycleCountStatus.INVESTIGATING, CycleCountStatus.TO_REVIEW]) {
-            cycleCountItems.sort { it.countIndex }
-            if (cycleCountItems?.first()?.countIndex != request.countIndex) {
+        if (cycleCount.status in CycleCountStatus.listInProgress()) {
+            CycleCountItem itemWithHighestCountIndex = cycleCountItems.max { it.countIndex }
+            if (itemWithHighestCountIndex?.countIndex != request.countIndex) {
                 throw new IllegalArgumentException("Count index can't be higher than the highest count index of the items")
             }
         }
@@ -254,13 +255,8 @@ class CycleCountService {
      * */
     List<AvailableItem> determineCycleCountItemsToSave(Location facility, Product product) {
         List<AvailableItem> availableItems =
-                productAvailabilityService.getAvailableItems(facility, [product.id])
-        CycleCount previousCycleCount =
-                CycleCountRequest.findAllByProductAndFacility(product, facility).cycleCount.sort { it.lastUpdated }.first()
-        List<CycleCountItem> previousCycleCountItems = CycleCountItem.findAllByCycleCount(previousCycleCount)
-        List<AvailableItem> filteredItems = availableItems.findAll { AvailableItem availableItem ->
-            (availableItem.quantityOnHand > 0) || (previousCycleCountItems.find { it.inventoryItem.id == availableItem.inventoryItem.id })}
+                productAvailabilityService.getAvailableItems(facility, [product.id], false, true)
 
-        return filteredItems
+        return availableItems
     }
 }

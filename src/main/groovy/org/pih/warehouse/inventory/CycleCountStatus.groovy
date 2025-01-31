@@ -6,7 +6,11 @@ enum CycleCountStatus {
     COUNTING,
     COUNTED,
     INVESTIGATING,
-    TO_REVIEW,
+    READY_TO_REVIEW,
     COMPLETED,
-    CANCELED,
+    CANCELED
+
+    static List<CycleCountStatus> listInProgress() {
+        return [COUNTING, COUNTED, READY_TO_REVIEW]
+    }
 }

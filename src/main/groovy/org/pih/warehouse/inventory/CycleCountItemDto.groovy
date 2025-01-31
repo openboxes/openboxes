@@ -2,7 +2,7 @@ package org.pih.warehouse.inventory
 
 import org.pih.warehouse.product.Product
 
-class CycleCountItemBasicDto {
+class CycleCountItemDto {
 
     String id
 
@@ -15,4 +15,16 @@ class CycleCountItemBasicDto {
     Integer countIndex
 
     CycleCountItemStatus status
+
+    Integer quantityOnHand
+
+    Integer quantityCounted
+
+    DiscrepancyReasonCode discrepancyReasonCode
+
+    String comment
+
+    Boolean custom
+
+    Date dateCounted
 }

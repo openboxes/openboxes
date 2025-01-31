@@ -26,11 +26,9 @@ class CycleCountItem {
 
     Integer quantityCounted
 
-    DiscrepancyCause discrepancyCause
+    DiscrepancyReasonCode discrepancyReasonCode
 
     String comment
-
-    Boolean draft
 
     Boolean custom
 
@@ -44,14 +42,20 @@ class CycleCountItem {
 
     User updatedBy
 
-    CycleCountItemBasicDto toBasicDto() {
-        return new CycleCountItemBasicDto(
+    CycleCountItemDto toDto() {
+        return new CycleCountItemDto(
                 id: id,
                 facility: facility.toBaseJson(),
                 product: product,
                 inventoryItem: inventoryItem,
                 countIndex: countIndex,
                 status: status,
+                quantityOnHand: quantityOnHand,
+                quantityCounted: quantityCounted,
+                discrepancyReasonCode: discrepancyReasonCode,
+                dateCounted: dateCounted,
+                comment: comment,
+                custom: custom
         )
     }
 
@@ -60,6 +64,6 @@ class CycleCountItem {
         comment(nullable: true)
         assignee(nullable: true)
         quantityCounted(nullable: true)
-        discrepancyCause(nullable: true)
+        discrepancyReasonCode(nullable: true)
     }
 }

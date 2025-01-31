@@ -74,7 +74,7 @@ class CycleCountApiController {
                     errors.addError(error)
                 }
             }
-            throw new ValidationException("Invalid cycle count request", errors)
+            throw new ValidationException("Invalid cycle count", errors)
         }
         List<CycleCountDto> cycleCounts = cycleCountService.startCycleCount(command)
 

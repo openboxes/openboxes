@@ -44,14 +44,11 @@
             <column name="quantity_counted" type="INT">
                 <constraints nullable="true" />
             </column>
-            <column name="discrepancy_cause" type="VARCHAR(100)">
+            <column name="discrepancy_reason_code" type="VARCHAR(100)">
                 <constraints nullable="true" />
             </column>
             <column name="comment" type="VARCHAR(255)">
                 <constraints nullable="true" />
-            </column>
-            <column name="draft" type="BIT">
-                <constraints nullable="false" />
             </column>
             <column name="custom" type="BIT">
                 <constraints nullable="false" />

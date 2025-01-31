@@ -1,6 +1,6 @@
 package org.pih.warehouse.inventory
 
-enum DiscrepancyCause {
+enum DiscrepancyReasonCode {
     MISSING_TRANSACTION,
     MISCOUNTED,
     INVENTORY_FOUND,
