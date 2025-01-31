@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="ewaterman" id="010120250000-0">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="testing_dates"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="testing_dates">
+            <column name="id" type="CHAR(38)">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="true" />
+            </column>
+            <column name="my_instant" type="DATETIME">
+                <constraints nullable="true" />
+            </column>
+            <column name="my_local_date" type="DATETIME">
+                <constraints nullable="true" />
+            </column>
+            <column name="my_date" type="DATETIME">
+                <constraints nullable="true" />
+            </column>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>

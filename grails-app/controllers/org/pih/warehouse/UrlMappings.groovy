@@ -947,6 +947,11 @@ class UrlMappings {
             action = [POST: "createRequests"]
         }
 
+        "/api/testing-dates" {
+            controller = "testingDatesApi"
+            action = [POST: "save"]
+        }
+
         // Error handling
 
         "401"(controller: "errors", action: "handleUnauthorized")

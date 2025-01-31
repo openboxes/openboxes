@@ -12,6 +12,7 @@ package org.pih.warehouse
 import grails.converters.JSON
 import grails.util.Holders
 import java.math.RoundingMode
+import java.time.ZoneOffset
 import javax.sql.DataSource
 import liquibase.Contexts
 import liquibase.LabelExpression
@@ -94,6 +95,12 @@ class BootStrap {
     DataSource dataSource
 
     def init = { servletContext ->
+
+        // WE SHOULD BE DOING THIS! I commented it out though because it has big implications for everywhere else that
+        // we parse in dates. We should definitely review this though. Without it, the default timezone that we parse
+        // dates to will change depending on where the app is hosted.
+        // TimeZone.setDefault(TimeZone.getTimeZone(ZoneOffset.UTC))
+
         log.info("Registering JSON marshallers ...")
         registerJsonMarshallers()
 
@@ -619,6 +626,10 @@ class BootStrap {
 
         JSON.registerObjectMarshaller(CycleCountRequest) { CycleCountRequest cycleCountRequest ->
             return cycleCountRequest.toJson()
+        }
+
+        JSON.registerObjectMarshaller(TestingDates) { TestingDates testingDates ->
+            return testingDates.toJson()
         }
     }
 
