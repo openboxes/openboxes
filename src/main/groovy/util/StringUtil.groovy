@@ -11,11 +11,11 @@ package util
 
 import groovy.text.SimpleTemplateEngine
 
-import java.text.DateFormat
 import java.text.MessageFormat
-import java.text.SimpleDateFormat
 
-
+/**
+ * Utility methods for parsing/formatting strings and general string manipulation.
+ */
 class StringUtil {
 
     static String mask(String value) {
@@ -34,22 +34,6 @@ class StringUtil {
 
     static String format(text, args) {
         return MessageFormat.format(text, args)
-    }
-
-    static Date parseDate(String format, String source) {
-        if (source) {
-            DateFormat dateFormat = new SimpleDateFormat(format)
-            return dateFormat.parse(source)
-        }
-        return null
-    }
-
-    static String formatString(String format, Date date) {
-        if (date) {
-            DateFormat dateFormat = new SimpleDateFormat(format)
-            return dateFormat.format(date)
-        }
-        return null
     }
 
     static String format(String text) {
