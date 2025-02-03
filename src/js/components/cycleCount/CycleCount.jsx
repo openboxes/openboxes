@@ -101,7 +101,11 @@ const CycleCount = () => {
           filterParams={filterParams}
         />
         )}
-        {tab === TO_RESOLVE_TAB && <CycleCountToResolve />}
+        {tab === TO_RESOLVE_TAB && (
+        <CycleCountToResolve
+          filterParams={filterParams}
+        />
+        )}
         {tab === TO_APPROVE_TAB && <CycleCountToApprove />}
       </div>
     </PageWrapper>
