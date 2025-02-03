@@ -52,3 +52,60 @@ limit-lines($lines-number) {
 .limit-lines-2 {
   @include limit-lines(2);
 }
+
+.count-step-title {
+  color: var(--gray-600);
+  font-weight: 600 !important;
+  font-size: 20px;
+}
+
+.count-step-label {
+  color: var(--gray-500);
+}
+
+.count-step-date {
+  color: var(--gray-600);
+  font-weight: 500;
+}
+
+.count-step-select-counted-by {
+
+  > div:first-of-type {
+    width: 160px;
+  }
+}
+
+.count-step-table {
+
+  .count-step-actions {
+    width: 50px !important;
+    align-items: center;
+    color: var(--red-500);
+    cursor: pointer;
+  }
+
+  .react-datepicker-wrapper {
+    width: 100%;
+  }
+
+  .rt-tr {
+    align-items: center;
+  }
+
+  .rt-td {
+    padding: 0 !important;
+  }
+
+  .rt-td-count-step {
+    padding: 0;
+    align-items: center;
+  }
+
+  .cell-inner-wrapper {
+    padding: 10px;
+  }
+
+  .date-field-input__value {
+    font-weight: normal;
+  }
+}

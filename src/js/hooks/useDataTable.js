@@ -4,14 +4,18 @@ import { getCoreRowModel, useReactTable } from '@tanstack/react-table';
 const useDataTable = ({
   columns,
   data,
+  defaultColumn,
+  meta,
 }) => {
   const table = useReactTable({
     columns,
     data,
+    defaultColumn,
     getCoreRowModel: getCoreRowModel(),
     manualFiltering: true,
     manualPagination: true,
     manualSorting: true,
+    meta,
   });
 
   const defaultEmptyTableMessage = {
