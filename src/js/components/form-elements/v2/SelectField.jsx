@@ -44,27 +44,35 @@ const SelectField = ({
 
   const SelectComponent = productSelect ? ProductSelect : Select;
 
+  const InputComponent = (
+    <SelectComponent
+      autosize
+      className={`form-element-select ${className} ${hasErrors ? 'has-errors' : ''}`}
+      disabled={disabled}
+      placeholder={placeholder}
+      value={value}
+      onChange={onChangeValue}
+      multi={multiple}
+      {...asyncProps}
+      {...fieldProps}
+    />
+  );
+
   return (
-    <InputWrapper
-      title={title}
-      errorMessage={errorMessage}
-      button={{ ...button, onClick: () => button.onClick(fieldProps?.value?.id ?? value) }}
-      tooltip={tooltip}
-      required={required}
-      className="select-wrapper-container"
-    >
-      <SelectComponent
-        autosize
-        className={`form-element-select ${className} ${errorMessage || hasErrors ? 'has-errors' : ''}`}
-        disabled={disabled}
-        placeholder={placeholder}
-        value={value}
-        onChange={onChangeValue}
-        multi={multiple}
-        {...asyncProps}
-        {...fieldProps}
-      />
-    </InputWrapper>
+    noWrapper
+      ? InputComponent
+      : (
+        <InputWrapper
+          title={title}
+          errorMessage={errorMessage}
+          button={{ ...button, onClick: () => button.onClick(fieldProps?.value?.id ?? value) }}
+          tooltip={tooltip}
+          required={required}
+          className="select-wrapper-container"
+        >
+          {InputComponent}
+        </InputWrapper>
+      )
   );
 };
 
