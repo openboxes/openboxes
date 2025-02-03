@@ -7,13 +7,17 @@ import org.apache.commons.lang.StringEscapeUtils
 import org.grails.datastore.mapping.query.api.Criteria
 import org.hibernate.criterion.Order
 import org.hibernate.sql.JoinType
+import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.importer.CSVUtils
+import org.pih.warehouse.product.Product
 
 @Transactional
 class CycleCountService {
+
+    ProductAvailabilityService productAvailabilityService
 
     List<CycleCountCandidate> getCandidates(CycleCountCandidateFilterCommand command, String facilityId) {
         if (command.hasErrors()) {
@@ -171,5 +175,89 @@ class CycleCountService {
         }
 
         return csv
+    }
+
+    /**
+     * Batch method to start a cycle count.
+     * Fetch associated Cycle count with the CycleCountRequest and do the following:
+     * if a cycle count doesn't exist, create it, fetch all bin locations + inventory items for the product in a request,
+     * get the product availability for each item, filter out items that have qoh = 0 (but keep those that have qoh = 0 and were included in the previous count)
+     *
+     * */
+    List<CycleCountDto> startCycleCount(CycleCountStartBatchCommand command) {
+        List<CycleCountDto> cycleCounts = []
+        command.requests.each { CycleCountStartCommand request ->
+            CycleCount cycleCount = request.cycleCountRequest.cycleCount
+            if (!cycleCount) {
+                CycleCountDto cycleCountDto = createCycleCount(request, command.facility)
+                cycleCounts.add(cycleCountDto)
+                return
+            }
+            List<CycleCountItem> cycleCountItems = CycleCountItem.findAllByCycleCount(cycleCount)
+            CycleCountDto cycleCountDto = updateCycleCount(cycleCount, cycleCountItems, request)
+            cycleCounts.add(cycleCountDto)
+        }
+        return cycleCounts
+    }
+
+    CycleCountDto createCycleCount(CycleCountStartCommand request, Location facility) {
+        CycleCount newCycleCount = new CycleCount(
+                facility: facility,
+                dateLastRefreshed: new Date()
+        )
+        List<AvailableItem> itemsToSave = determineCycleCountItemsToSave(facility, request.cycleCountRequest.product)
+        newCycleCount.save()
+        // 1:1 association between cycle count and cycle count request
+        request.cycleCountRequest.cycleCount = newCycleCount
+        request.cycleCountRequest.status = CycleCountRequestStatus.IN_PROGRESS
+        List<CycleCountItem> cycleCountItems = []
+        itemsToSave.each { AvailableItem availableItem ->
+            CycleCountItem cycleCountItem = new CycleCountItem(
+                    status: CycleCountItemStatus.READY_TO_COUNT,
+                    countIndex: request.countIndex,
+                    quantityOnHand: availableItem.quantityOnHand,
+                    quantityCounted: availableItem.quantityOnHand == 0 ? 0 : null,
+                    cycleCount: newCycleCount,
+                    facility: facility,
+                    inventoryItem: availableItem.inventoryItem,
+                    product: availableItem.inventoryItem.product,
+                    createdBy: AuthService.currentUser,
+                    updatedBy: AuthService.currentUser,
+                    custom: false,
+            )
+            if (!cycleCountItem.validate()) {
+                throw new ValidationException("Invalid cycle count item", cycleCountItem.errors)
+            }
+            cycleCountItem.save()
+            cycleCountItems.add(cycleCountItem)
+        }
+        return CycleCountDto.createFromCycleCountItems(cycleCountItems)
+    }
+
+    CycleCountDto updateCycleCount(CycleCount cycleCount, List<CycleCountItem> cycleCountItems, CycleCountStartCommand request) {
+        if (cycleCount.status in [CycleCountStatus.READY_TO_REVIEW, CycleCountStatus.CANCELED]) {
+            throw new IllegalArgumentException("Cycle count is already in review or canceled")
+        }
+        if (cycleCount.status in [CycleCountStatus.INVESTIGATING, CycleCountStatus.COUNTED]) {
+            throw new UnsupportedOperationException("Support will be added later")
+        }
+        if (cycleCount.status in CycleCountStatus.listInProgress()) {
+            CycleCountItem itemWithHighestCountIndex = cycleCountItems.max { it.countIndex }
+            if (itemWithHighestCountIndex?.countIndex != request.countIndex) {
+                throw new IllegalArgumentException("Count index can't be higher than the highest count index of the items")
+            }
+        }
+        return CycleCountDto.createFromCycleCountItems(cycleCountItems)
+    }
+
+    /**
+     * Get product availability for a product and for facility.
+     * Filter out items with QOH = 0 (but keep those that were counted in the previous count)
+     * */
+    List<AvailableItem> determineCycleCountItemsToSave(Location facility, Product product) {
+        List<AvailableItem> availableItems =
+                productAvailabilityService.getAvailableItems(facility, [product.id], false, true)
+
+        return availableItems
     }
 }

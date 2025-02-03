@@ -947,6 +947,11 @@ class UrlMappings {
             action = [POST: "createRequests"]
         }
 
+        "/api/facilities/$facility/cycle-counts/start/batch" {
+            controller = "cycleCountApi"
+            action = [POST: "startCycleCount"]
+        }
+
         // Error handling
 
         "401"(controller: "errors", action: "handleUnauthorized")

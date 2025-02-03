@@ -15,8 +15,7 @@ class CycleCountRequest {
 
     CycleCountRequestStatus status
 
-    // To be included when cycle count table is created
-    // CycleCount cycleCount
+    CycleCount cycleCount
 
     CycleCountRequestType requestType
 
@@ -44,6 +43,7 @@ class CycleCountRequest {
         product(nullable: true)
         createdBy(nullable: true)
         updatedBy(nullable: true)
+        cycleCount(unique: true, nullable: true) // Unique: true determines the unidirectional 1:1 association between cycle count request and cycle count
     }
 
     Map toJson() {
