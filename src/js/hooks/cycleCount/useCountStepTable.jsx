@@ -14,7 +14,7 @@ import useTranslate from 'hooks/useTranslate';
 import { fetchBins } from 'utils/option-utils';
 
 // Managing state for single table, mainly table configuration (from count step)
-const useCountStepTable = ({ removeRow, validationErrors }) => {
+const useCountStepTable = ({ removeRow }) => {
   const columnHelper = createColumnHelper();
   const [binLocations, setBinLocations] = useState([]);
 
@@ -79,10 +79,10 @@ const useCountStepTable = ({ removeRow, validationErrors }) => {
       // Keep and update the state of the cell
       const initialValue = getValue();
       const [value, setValue] = useState(initialValue);
-      const isEdited = initialValue !== value;
+
       // When the input is blurred, we'll call our table meta's updateData function
       const onBlur = () => {
-        if (isEdited) {
+        if (initialValue !== value) {
           table.options.meta?.updateData(original.id, id, value);
         }
       };
@@ -106,8 +106,8 @@ const useCountStepTable = ({ removeRow, validationErrors }) => {
             value={value}
             onChange={onChange}
             onBlur={onBlur}
-            className="w-75 m-1"
-            errorMessage={!isEdited && validationErrors?.[original?.id]?.[id]?._errors}
+            className="w-100"
+            noWrapper
             {...fieldProps}
           />
         </TableCell>
@@ -154,7 +154,7 @@ const useCountStepTable = ({ removeRow, validationErrors }) => {
     columnHelper.accessor(null, {
       id: 'actions',
       header: () => <TableHeaderCell className="count-step-actions" />,
-      cell: ({ row: { original } }) => (
+      cell: ({ row: { original, index } }) => (
         <TableCell className="rt-td d-flex justify-content-center count-step-actions">
           <Tooltip
             arrow="true"
@@ -169,9 +169,9 @@ const useCountStepTable = ({ removeRow, validationErrors }) => {
           )}
             disabled={original.id}
           >
-            {original.id.includes('newRow') && (
+            {!original.id && (
             <RiDeleteBinLine
-              onClick={() => removeRow(original.id)}
+              onClick={() => removeRow(index)}
               size={22}
             />
             )}
