@@ -142,8 +142,15 @@ const PRODUCT_SUPPLIER_URL = {
   export: () => `${PRODUCT_SUPPLIER_URL.base}/export?format=xls`,
 };
 
+const CYCLE_COUNT = {
+  base: `${CONTEXT_PATH}/inventory/cycleCount`,
+  list: (tab) => `${CYCLE_COUNT.base}?tab=${tab}`,
+  countStep: () => `${CYCLE_COUNT.base}/count`,
+};
+
 export {
   CATEGORY_URL,
+  CYCLE_COUNT,
   DASHBOARD_URL,
   INVENTORY_ITEM_URL,
   INVOICE_URL,
