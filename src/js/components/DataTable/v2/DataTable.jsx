@@ -19,7 +19,6 @@ const DataTable = ({
   totalCount,
   filterParams,
   paginationProps,
-  disablePagination,
   defaultColumn,
   meta,
 }) => {
@@ -36,7 +35,7 @@ const DataTable = ({
     filterParams,
   });
 
-  const shouldDisplayPagination = Boolean(data?.length && !loading) && disablePagination;
+  const shouldDisplayPagination = Boolean(data?.length && !loading);
 
   return (
     <div className="app-react-table-wrapper table-v2">
@@ -89,7 +88,6 @@ DataTable.propTypes = {
   totalCount: PropTypes.number,
   filterParams: PropTypes.shape({}).isRequired,
   paginationProps: PropTypes.shape({}),
-  disablePagination: PropTypes.bool,
 };
 
 DataTable.defaultProps = {
@@ -98,6 +96,5 @@ DataTable.defaultProps = {
   loadingMessage: null,
   emptyTableMessage: null,
   paginationProps: {},
-  disablePagination: false,
   totalCount: 0,
 };
