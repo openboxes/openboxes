@@ -1,16 +1,18 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 import _ from 'lodash';
 
 import countingPageMockedData from 'consts/countingPageMockedData';
+import useForceUpdate from 'hooks/useForceUpdate';
 
 // Managing state for all tables, operations on shared state (from count step)
 const useCountStep = () => {
-  const [tableData, setTableData] = useState(countingPageMockedData.data);
+  const forceUpdate = useForceUpdate();
+  const tableData = useRef(countingPageMockedData.data);
   const [countedBy, setCountedBy] = useState({});
   // I am not sure how to response from API will look like, so at least for now, I am grouping
   // the response by product code
-  const dataGroupedByTables = _.groupBy(tableData, 'product.productCode');
+  const dataGroupedByTables = _.groupBy(tableData.current, 'product.productCode');
 
   const printCountForm = () => {
     console.log('print count form');
@@ -18,15 +20,15 @@ const useCountStep = () => {
 
   const next = () => {
     // This data should be combined to a single request
-    console.log('next: ', tableData, countedBy);
+    console.log('next: ', tableData.current, countedBy);
   };
 
   const updateRow = (id, columnId, value) => {
-    setTableData((prevState) => (
-      prevState.map(
+    tableData.current = (
+      tableData.current.map(
         (row) => (id === row.id ? { ...row, [columnId]: value } : row),
       )
-    ));
+    );
   };
 
   const assignCountedBy = (productCode) => (person) => {
@@ -53,17 +55,15 @@ const useCountStep = () => {
       quantityCounted: null,
       comment: '',
     };
-    setTableData((prevState) => ([...prevState, emptyRow]));
+    tableData.current = [...tableData.current, emptyRow];
+    forceUpdate();
   };
 
   const removeRow = (id) => {
-    setTableData((prevState) => (
-      prevState.data.filter((row) => id !== row.id)
-    ));
-  };
-
-  const validate = (rowId) => {
-    return false;
+    tableData.current = (
+      tableData.current.data.filter((row) => id !== row.id)
+    );
+    forceUpdate();
   };
 
   return {
@@ -74,7 +74,6 @@ const useCountStep = () => {
     printCountForm,
     assignCountedBy,
     next,
-    validate,
   };
 };
 

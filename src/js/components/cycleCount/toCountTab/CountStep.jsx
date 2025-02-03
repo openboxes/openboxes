@@ -16,7 +16,6 @@ const CountStep = () => {
     addEmptyRow,
     removeRow,
     assignCountedBy,
-    validate,
   } = useCountStep();
 
   return (
