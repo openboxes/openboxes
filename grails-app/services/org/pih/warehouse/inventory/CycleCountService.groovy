@@ -220,9 +220,7 @@ class CycleCountService {
                     product: availableItem.inventoryItem.product,
                     createdBy: AuthService.currentUser,
                     updatedBy: AuthService.currentUser,
-                    // FIXME: I don't know what default values for custom and draft should be
                     custom: false,
-                    draft: true,
             )
             if (!cycleCountItem.validate()) {
                 throw new ValidationException("Invalid cycle count item", cycleCountItem.errors)

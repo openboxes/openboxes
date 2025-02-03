@@ -5,7 +5,7 @@ enum CycleCountItemStatus {
     COUNTING,
     COUNTED,
     INVESTIGATING,
-    TO_REVIEW,
+    READY_TO_REVIEW,
     REVIEWED,
     APPROVED,
     REJECTED,

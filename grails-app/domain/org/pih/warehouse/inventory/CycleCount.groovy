@@ -47,17 +47,17 @@ class CycleCount {
         if (items.every { it.status == CycleCountItemStatus.REVIEWED }) {
             return CycleCountStatus.REVIEWED
         }
-        if (items.every { it.status == CycleCountItemStatus.TO_REVIEW }) {
-            return CycleCountStatus.TO_REVIEW
+        if (items.every { it.status == CycleCountItemStatus.READY_TO_REVIEW }) {
+            return CycleCountStatus.READY_TO_REVIEW
         }
         if (items.any { it.status == CycleCountItemStatus.INVESTIGATING }) {
             return CycleCountStatus.INVESTIGATING
         }
         if (items.any { it.status == CycleCountItemStatus.COUNTING }
-                && !items.any { it.status in [CycleCountItemStatus.INVESTIGATING, CycleCountItemStatus.TO_REVIEW] }) {
+                && !items.any { it.status in [CycleCountItemStatus.INVESTIGATING, CycleCountItemStatus.READY_TO_REVIEW] }) {
             return CycleCountStatus.COUNTING
         }
-        if (items.every { it.status in [CycleCountItemStatus.COUNTED, CycleCountItemStatus.TO_REVIEW] }) {
+        if (items.every { it.status in [CycleCountItemStatus.COUNTED, CycleCountItemStatus.READY_TO_REVIEW] }) {
             return CycleCountStatus.COUNTED
         }
         if (items.every { it.status in [CycleCountItemStatus.REVIEWED, CycleCountItemStatus.APPROVED, CycleCountItemStatus.REJECTED] }) {
