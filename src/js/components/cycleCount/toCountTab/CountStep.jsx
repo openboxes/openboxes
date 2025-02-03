@@ -16,7 +16,7 @@ const CountStep = () => {
     addEmptyRow,
     removeRow,
     assignCountedBy,
-    validationErrors,
+    validate,
   } = useCountStep();
 
   return (
@@ -35,7 +35,6 @@ const CountStep = () => {
             addEmptyRow={addEmptyRow}
             removeRow={removeRow}
             assignCountedBy={assignCountedBy}
-            validationErrors={validationErrors}
           />
         ))}
     </PageWrapper>
