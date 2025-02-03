@@ -25,6 +25,7 @@ const SelectField = ({
   productSelect,
   hasErrors,
   className,
+  noWrapper,
   ...fieldProps
 }) => {
   const [value, setValue] = useState(defaultValue);
@@ -43,26 +44,35 @@ const SelectField = ({
 
   const SelectComponent = productSelect ? ProductSelect : Select;
 
+  const InputComponent = (
+    <SelectComponent
+      autosize
+      className={`form-element-select ${className} ${hasErrors ? 'has-errors' : ''}`}
+      disabled={disabled}
+      placeholder={placeholder}
+      value={value}
+      onChange={onChangeValue}
+      multi={multiple}
+      {...asyncProps}
+      {...fieldProps}
+    />
+  );
+
   return (
-    <InputWrapper
-      title={title}
-      errorMessage={errorMessage}
-      button={{ ...button, onClick: () => button.onClick(fieldProps?.value?.id ?? value) }}
-      tooltip={tooltip}
-      required={required}
-      className="select-wrapper-container"
-    >
-      <SelectComponent
-        className={`form-element-select ${className} ${hasErrors ? 'has-errors' : ''}`}
-        disabled={disabled}
-        placeholder={placeholder}
-        value={value}
-        onChange={onChangeValue}
-        multi={multiple}
-        {...asyncProps}
-        {...fieldProps}
-      />
-    </InputWrapper>
+    noWrapper
+      ? InputComponent
+      : (
+        <InputWrapper
+          title={title}
+          errorMessage={errorMessage}
+          button={{ ...button, onClick: () => button.onClick(fieldProps?.value?.id ?? value) }}
+          tooltip={tooltip}
+          required={required}
+          className="select-wrapper-container"
+        >
+          {InputComponent}
+        </InputWrapper>
+      )
   );
 };
 
@@ -109,6 +119,7 @@ SelectField.propTypes = {
   // indicator whether field should be marked as invalid
   hasErrors: PropTypes.bool,
   className: PropTypes.string,
+  noWrapper: PropTypes.bool,
 };
 
 SelectField.defaultProps = {
@@ -127,5 +138,6 @@ SelectField.defaultProps = {
   onChange: () => {},
   productSelect: false,
   hasErrors: false,
+  noWrapper: false,
   className: '',
 };
