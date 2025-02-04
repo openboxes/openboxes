@@ -101,7 +101,7 @@ const useToCountTab = ({
     filterParams,
   });
 
-  const getProductIds = () => tableData.data.map((row) => row.product.id);
+  const getCycleCountRequestsIds = () => tableData.data.map((row) => row.cycleCountRequest.id);
 
   const checkboxesColumn = columnHelper.accessor('selected', {
     header: () => (
@@ -109,7 +109,7 @@ const useToCountTab = ({
         <Checkbox
           noWrapper
           {...headerCheckboxProps}
-          onClick={selectHeaderCheckbox(getProductIds)}
+          onClick={selectHeaderCheckbox(getCycleCountRequestsIds)}
         />
       </TableHeaderCell>
     ),
@@ -117,8 +117,8 @@ const useToCountTab = ({
       <TableCell className="rt-td">
         <Checkbox
           noWrapper
-          onChange={selectRow(row.original.product.id)}
-          value={isChecked(row.original.product.id)}
+          onChange={selectRow(row.original.cycleCountRequest.id)}
+          value={isChecked(row.original.cycleCountRequest.id)}
         />
       </TableCell>
     ),
@@ -291,8 +291,9 @@ const useToCountTab = ({
 
   const startCount = async () => {
     const payload = {
-      requests: checkedCheckboxes.map((productId) => ({
-        product: productId,
+      requests: checkedCheckboxes.map((cycleCountRequestId) => ({
+        cycleCountRequest: cycleCountRequestId,
+        countIndex: 0,
       })),
     };
     spinner.show();
