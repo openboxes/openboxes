@@ -14,7 +14,7 @@ import useTranslate from 'hooks/useTranslate';
 import { fetchBins } from 'utils/option-utils';
 
 // Managing state for single table, mainly table configuration (from count step)
-const useCountStepTable = ({ removeRow }) => {
+const useCountStepTable = ({ removeRow, validationErrors }) => {
   const columnHelper = createColumnHelper();
   const [binLocations, setBinLocations] = useState([]);
 
@@ -79,10 +79,10 @@ const useCountStepTable = ({ removeRow }) => {
       // Keep and update the state of the cell
       const initialValue = getValue();
       const [value, setValue] = useState(initialValue);
-
+      const isEdited = initialValue !== value;
       // When the input is blurred, we'll call our table meta's updateData function
       const onBlur = () => {
-        if (initialValue !== value) {
+        if (isEdited) {
           table.options.meta?.updateData(original.id, id, value);
         }
       };
@@ -106,8 +106,8 @@ const useCountStepTable = ({ removeRow }) => {
             value={value}
             onChange={onChange}
             onBlur={onBlur}
-            className="w-100"
-            noWrapper
+            className="w-75 m-1"
+            errorMessage={!isEdited && validationErrors?.[original?.id]?.[id]?._errors}
             {...fieldProps}
           />
         </TableCell>
@@ -154,7 +154,7 @@ const useCountStepTable = ({ removeRow }) => {
     columnHelper.accessor(null, {
       id: 'actions',
       header: () => <TableHeaderCell className="count-step-actions" />,
-      cell: ({ row: { original, index } }) => (
+      cell: ({ row: { original } }) => (
         <TableCell className="rt-td d-flex justify-content-center count-step-actions">
           <Tooltip
             arrow="true"
@@ -169,9 +169,9 @@ const useCountStepTable = ({ removeRow }) => {
           )}
             disabled={original.id}
           >
-            {!original.id && (
+            {original.id.includes('newRow') && (
             <RiDeleteBinLine
-              onClick={() => removeRow(index)}
+              onClick={() => removeRow(original.id)}
               size={22}
             />
             )}
