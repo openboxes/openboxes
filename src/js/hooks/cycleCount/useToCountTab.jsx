@@ -130,18 +130,18 @@ const useToCountTab = ({
   });
 
   const columns = useMemo(() => [
-    columnHelper.accessor('status', {
+    columnHelper.accessor('cycleCountRequest.cycleCount.status', {
       header: () => (
         <TableHeaderCell>
           {translate('react.cycleCount.table.status.label', 'Status')}
         </TableHeaderCell>
       ),
-      cell: () => (
-        // TODO: Use variant and status fetched from the API
+      cell: ({ getValue }) => (
+        // TODO: Use variant fetched from the API https://pihemr.atlassian.net/browse/OBPIH-6931
         <TableCell className="rt-td">
           <StatusIndicator
             variant="danger"
-            status={translate('react.cycleCount.toCount.status.label', 'To count')}
+            status={translate(`react.cycleCount.status.${getValue()}.label`, 'To count')}
           />
         </TableCell>
       ),

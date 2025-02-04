@@ -50,8 +50,7 @@ const useToResolveTab = ({
   }) => _.omitBy({
     // TODO: We need to display only the rows where cycle count in [INVESTIGATING, COUNTED].
     //       This will require us to be able to filter on the cycle count status, not just the cycle
-    //       count request status! So we need to be able to support fetching by a list of values,
-    //       or we need the get candidate API to internally fetch both.
+    //       count request status! https://pihemr.atlassian.net/browse/OBPIH-6931
     status: CycleCountStatus.CREATED,
     offset: `${offset}`,
     max: `${pageSize}`,
@@ -105,7 +104,7 @@ const useToResolveTab = ({
     filterParams,
   });
 
-  const getProductIds = () => tableData.data.map((row) => row.product.id);
+  const getCycleCountRequestsIds = () => tableData.data.map((row) => row.cycleCountRequest.id);
 
   const checkboxesColumn = columnHelper.accessor('selected', {
     header: () => (
@@ -113,7 +112,7 @@ const useToResolveTab = ({
         <Checkbox
           noWrapper
           {...headerCheckboxProps}
-          onClick={selectHeaderCheckbox(getProductIds)}
+          onClick={selectHeaderCheckbox(getCycleCountRequestsIds)}
         />
       </TableHeaderCell>
     ),
@@ -121,8 +120,8 @@ const useToResolveTab = ({
       <TableCell className="rt-td">
         <Checkbox
           noWrapper
-          onChange={selectRow(row.original.product.id)}
-          value={isChecked(row.original.product.id)}
+          onChange={selectRow(row.original.cycleCountRequest.id)}
+          value={isChecked(row.original.cycleCountRequest.id)}
         />
       </TableCell>
     ),
@@ -141,10 +140,11 @@ const useToResolveTab = ({
         </TableHeaderCell>
       ),
       cell: ({ getValue }) => (
+        // TODO: Use variant fetched from the API https://pihemr.atlassian.net/browse/OBPIH-6931
         <TableCell className="rt-td">
           <StatusIndicator
             variant="primary"
-            status={translate(`react.cycleCount.table.status.${getValue()}.label`, 'To Resolve')}
+            status={translate(`react.cycleCount.status.${getValue()}.label`, 'To Resolve')}
           />
         </TableCell>
       ),
@@ -295,9 +295,8 @@ const useToResolveTab = ({
 
   const startResolution = async () => {
     const payload = {
-      // TODO: replace this with a real call to startCount and pass the request id!
-      requests: checkedCheckboxes.map((productId) => ({
-        cycleCountRequest: productId,
+      requests: checkedCheckboxes.map((cycleCountRequestId) => ({
+        cycleCountRequest: cycleCountRequestId,
         countIndex: 1, // We only ever allow for a single recount, so index is always 1.
       })),
     };
