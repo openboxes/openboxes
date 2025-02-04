@@ -1,10 +1,12 @@
 package org.pih.warehouse.databinding
 
 import java.time.Instant
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeFormatterBuilder
+import java.time.temporal.ChronoField
 import org.apache.commons.lang.StringUtils
 import org.springframework.stereotype.Component
-
-import org.pih.warehouse.DateUtil
 
 /**
  * As of Java 8, Java.util.Date is functionally replaced with the java.time classes, but Grails 4 and older does not
@@ -13,6 +15,17 @@ import org.pih.warehouse.DateUtil
  */
 @Component
 class InstantValueConverter extends StringValueConverter<Instant> {
+
+    private static final DateTimeFormatter FLEXIBLE_DATE_TIME_ZONE_FORMAT = new DateTimeFormatterBuilder()
+            .appendPattern(DataBindingConstants.FLEXIBLE_DATE_TIME_ZONE_PATTERN)
+            // Defaults to 00:00:00.000 if time is not provided in the String
+            .parseDefaulting(ChronoField.HOUR_OF_DAY, 0)
+            .parseDefaulting(ChronoField.MINUTE_OF_HOUR, 0)
+            .parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0)
+            .parseDefaulting(ChronoField.MILLI_OF_SECOND, 0)
+            // Defaults to UTC if timezone is not provided in the String
+            .parseDefaulting(ChronoField.OFFSET_SECONDS, ZoneOffset.UTC.getTotalSeconds())
+            .toFormatter()
 
     /**
      * Binds a given user-input String to an Instant.
@@ -32,6 +45,6 @@ class InstantValueConverter extends StringValueConverter<Instant> {
     Instant convertString(String value) {
         return StringUtils.isBlank(value) ?
                 null :
-                Instant.from(DateUtil.FLEXIBLE_DATE_TIME_ZONE_FORMAT.parse(value.trim()))
+                Instant.from(FLEXIBLE_DATE_TIME_ZONE_FORMAT.parse(value.trim()))
     }
 }

@@ -206,13 +206,24 @@ grails:
         dateFormats:
             # Old date formats, don't use going forward! Kept first in the list to maintain backwards compatability.
             - 'MM/dd/yyyy HH:mm:ss XXX'
+            - 'MM/dd/yyyy HH:mm:ss XX'
+            - 'MM/dd/yyyy HH:mm:ss X'
             - 'MM/dd/yyyy HH:mm XXX'
+            - 'MM/dd/yyyy HH:mm XX'
+            - 'MM/dd/yyyy HH:mm X'
+            # Note that if this format is given, Grails will treat it as midnight in the local server timezone, which
+            # is ahead of UTC, can cause the date to actually be the next day. It can also cause inconsistencies across
+            # hosts/environments if they're configured for different local timezones. Avoid this format going forward!
             - 'MM/dd/yyyy'
-            # ISO-8601 formats. These are better than the old formats, but new APIs should always use Instant instead
-            # of Date. Note that a format without time and timezone is NOT allowed here because that would be ambiguous
-            # and would lead to Date conversion weirdness. If you need a date only, use LocalDate.
+            # ISO-8601 formats. These are better than the old formats, but new APIs should still use Instant instead
+            # of Date whenever possible. Note that a format without time and timezone is NOT allowed here because that
+            # would be ambiguous and would lead to Date conversion weirdness. If you need a date only, use LocalDate.
             - "yyyy-MM-dd'T'HH:mm:ssXXX"
+            - "yyyy-MM-dd'T'HH:mm:ssXX"
+            - "yyyy-MM-dd'T'HH:mm:ssX"
             - "yyyy-MM-dd'T'HH:mmXXX"
+            - "yyyy-MM-dd'T'HH:mmXX"
+            - "yyyy-MM-dd'T'HH:mmX"
         convertEmptyStringsToNull: false
 endpoints:
     jmx:
