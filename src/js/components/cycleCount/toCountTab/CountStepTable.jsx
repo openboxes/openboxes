@@ -19,12 +19,14 @@ const CountStepTable = ({
   addEmptyRow,
   removeRow,
   assignCountedBy,
+  validationErrors,
 }) => {
   const {
     columns,
     defaultColumn,
     recipients,
   } = useCountStepTable({
+    validationErrors,
     removeRow,
   });
 
