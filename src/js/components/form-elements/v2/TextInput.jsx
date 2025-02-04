@@ -22,7 +22,6 @@ const TextInput = ({
   decimal,
   className,
   showErrorBorder,
-  noWrapper,
   ...fieldProps
 }) => {
   const onBlurHandler = (e) => {
@@ -52,36 +51,28 @@ const TextInput = ({
     ? 0.1 ** decimal
     : undefined;
 
-  const InputComponent = (
-    <input
-      id={id || name}
-      name={name}
-      disabled={disabled}
-      className={`form-element-input ${className} ${(errorMessage || showErrorBorder) ? 'has-errors' : ''}`}
-      placeholder={placeholder}
-      type={type}
-      step={numberIncrementValue}
-      {...fieldProps}
-      onChange={onChangeHandler}
-      onBlur={onBlurHandler}
-    />
-  );
-
   return (
-    noWrapper
-      ? InputComponent
-      : (
-        <InputWrapper
-          title={title}
-          tooltip={tooltip}
-          required={required}
-          button={button}
-          inputId={id || name}
-          errorMessage={errorMessage}
-        >
-          {InputComponent}
-        </InputWrapper>
-      )
+    <InputWrapper
+      title={title}
+      tooltip={tooltip}
+      required={required}
+      button={button}
+      inputId={id || name}
+      errorMessage={errorMessage}
+    >
+      <input
+        id={id || name}
+        name={name}
+        disabled={disabled}
+        className={`form-element-input ${className} ${(errorMessage || showErrorBorder) ? 'has-errors' : ''}`}
+        placeholder={placeholder}
+        type={type}
+        step={numberIncrementValue}
+        {...fieldProps}
+        onChange={onChangeHandler}
+        onBlur={onBlurHandler}
+      />
+    </InputWrapper>
   );
 };
 
@@ -121,7 +112,6 @@ TextInput.propTypes = {
   decimal: PropTypes.number,
   className: PropTypes.string,
   showErrorBorder: PropTypes.bool,
-  noWrapper: PropTypes.bool,
 };
 
 TextInput.defaultProps = {
@@ -138,5 +128,4 @@ TextInput.defaultProps = {
   decimal: undefined,
   className: '',
   showErrorBorder: false,
-  noWrapper: false,
 };
