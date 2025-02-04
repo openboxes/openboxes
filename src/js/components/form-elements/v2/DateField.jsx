@@ -26,7 +26,6 @@ const DateField = ({
   value,
   onChange,
   showTimeSelect,
-  noWrapper,
   ...fieldProps
 }) => {
   const translate = useTranslate();
@@ -61,53 +60,45 @@ const DateField = ({
 
   const datePickerRef = useRef(null);
 
-  const InputComponent = (
-    <DatePicker
-      {...fieldProps}
-      showTimeSelect={showTimeSelect}
-      customInput={<DateFieldInput onClear={onClear} />}
-      className={`form-element-input ${errorMessage ? 'has-errors' : ''} ${className}`}
-      dropdownMode="scroll"
-      dateFormat={showTimeSelect ? DateFormat.MMM_DD_YYYY_HH_MM_SS : DateFormat.MMM_DD_YYYY}
-      timeFormat={TimeFormat.HH_MM}
-      disabled={disabled}
-      timeIntervals={15}
-      yearDropdownItemNumber={3}
-      showYearDropdown
-      scrollableYearDropdown
-      disabledKeyboardNavigation
-      utcOffset={0}
-      placeholderText={placeholderText}
-      popperContainer={RootPortalWrapper}
-      selected={selectedDate}
-      highlightDates={highlightedDates}
-      onChange={onChangeHandler}
-      onSelect={() => {
-        // Close date picker on select - this is somewhat a workaround to close the datepicker
-        // when using showTimeSelect, when we are expecting to close the datepicker
-        // after picking the date without picking the time.
-        datePickerRef.current?.setOpen(false);
-      }}
-      ref={(el) => {
-        datePickerRef.current = el;
-      }}
-    />
-  );
-
   return (
-    noWrapper
-      ? InputComponent
-      : (
-        <InputWrapper
-          title={title}
-          required={required}
-          tooltip={tooltip}
-          errorMessage={errorMessage}
-          button={button}
-        >
-          {InputComponent}
-        </InputWrapper>
-      )
+    <InputWrapper
+      title={title}
+      required={required}
+      tooltip={tooltip}
+      errorMessage={errorMessage}
+      button={button}
+    >
+      <DatePicker
+        {...fieldProps}
+        showTimeSelect={showTimeSelect}
+        customInput={<DateFieldInput onClear={onClear} />}
+        className={`form-element-input ${errorMessage ? 'has-errors' : ''} ${className}`}
+        dropdownMode="scroll"
+        dateFormat={showTimeSelect ? DateFormat.MMM_DD_YYYY_HH_MM_SS : DateFormat.MMM_DD_YYYY}
+        timeFormat={TimeFormat.HH_MM}
+        disabled={disabled}
+        timeIntervals={15}
+        yearDropdownItemNumber={3}
+        showYearDropdown
+        scrollableYearDropdown
+        disabledKeyboardNavigation
+        utcOffset={0}
+        placeholderText={placeholderText}
+        popperContainer={RootPortalWrapper}
+        selected={selectedDate}
+        highlightDates={highlightedDates}
+        onChange={onChangeHandler}
+        onSelect={() => {
+          // Close date picker on select - this is somewhat a workaround to close the datepicker
+          // when using showTimeSelect, when we are expecting to close the datepicker
+          // after picking the date without picking the time.
+          datePickerRef.current?.setOpen(false);
+        }}
+        ref={(el) => {
+          datePickerRef.current = el;
+        }}
+      />
+    </InputWrapper>
   );
 };
 
@@ -149,7 +140,6 @@ DateField.propTypes = {
   value: PropTypes.string,
   onChange: PropTypes.func,
   showTimeSelect: PropTypes.bool,
-  noWrapper: PropTypes.bool,
 };
 
 DateField.defaultProps = {
@@ -164,5 +154,4 @@ DateField.defaultProps = {
   value: null,
   onChange: () => {},
   showTimeSelect: false,
-  noWrapper: false,
 };
