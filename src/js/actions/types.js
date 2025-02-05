@@ -67,3 +67,6 @@ export const FETCH_RATING_TYPE_OPTIONS = 'FETCH_RATING_TYPE_OPTIONS';
 
 // Outbound import
 export const SET_SCROLL_TO_BOTTOM = 'SET_SCROLL_TO_BOTTOM';
+
+// Inbound
+export const UPDATE_INBOUND_DATA = 'UPDATE_INBOUND_DATA';

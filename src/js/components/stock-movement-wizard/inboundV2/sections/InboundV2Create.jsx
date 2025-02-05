@@ -191,3 +191,4 @@ InboundV2Create.propTypes = {
     label: PropTypes.string.isRequired,
   })).isRequired,
 };
+
