@@ -260,4 +260,13 @@ class CycleCountService {
 
         return availableItems
     }
+
+    List<CycleCountDto> getCycleCounts(List<String> ids) {
+        List<CycleCount> cycleCounts = CycleCount.createCriteria().list {
+            if (ids) {
+                'in'("id", ids)
+            }
+        }
+        return cycleCounts.collect { CycleCountDto.createFromCycleCountItems(it.cycleCountItems) }
+    }
 }

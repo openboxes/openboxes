@@ -4,6 +4,7 @@ import grails.converters.JSON
 import grails.validation.ValidationException
 import org.apache.commons.csv.CSVPrinter
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.inventory.CycleCount
 import org.pih.warehouse.inventory.CycleCountCandidate
 import org.pih.warehouse.inventory.CycleCountCandidateFilterCommand
 import org.pih.warehouse.inventory.CycleCountDto
@@ -77,6 +78,13 @@ class CycleCountApiController {
             throw new ValidationException("Invalid cycle count", errors)
         }
         List<CycleCountDto> cycleCounts = cycleCountService.startCycleCount(command)
+
+        render([data: cycleCounts] as JSON)
+    }
+
+    def list() {
+        List<String> ids = params.list("id")
+        List<CycleCountDto> cycleCounts = cycleCountService.getCycleCounts(ids)
 
         render([data: cycleCounts] as JSON)
     }
