@@ -72,7 +72,7 @@ const InboundV2 = () => {
     stockLists,
   } = useInboundCreateForm({ next });
 
-  const detailsComponentProps = {
+  const createComponentProps = {
     control,
     errors,
     isValid,
@@ -134,7 +134,7 @@ const InboundV2 = () => {
         status={headerStatus}
       />
       <form onSubmit={handleSubmit(onSubmitStockMovementDetails)}>
-        {is(inboundV2Step.CREATE) && (<Step.Component {...detailsComponentProps} />)}
+        {is(inboundV2Step.CREATE) && (<Step.Component {...createComponentProps} />)}
       </form>
 
       <form>

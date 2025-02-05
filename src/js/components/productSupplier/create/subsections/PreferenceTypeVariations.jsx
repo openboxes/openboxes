@@ -25,7 +25,7 @@ const PreferenceTypeVariations = ({
     control,
     name: 'productSupplierPreferences',
   });
-  console.log(errors);
+
   const updatedRows = useWatch({
     name: 'productSupplierPreferences',
     control,
