@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 import useTranslate from 'hooks/useTranslate';
 
-const useInboundV2Validation = () => {
+const useInboundAddItemsV2Validation = () => {
   const translate = useTranslate();
 
   const lineItemSchema = z.object({
@@ -59,4 +59,4 @@ const useInboundV2Validation = () => {
   };
 };
 
-export default useInboundV2Validation;
+export default useInboundAddItemsV2Validation;

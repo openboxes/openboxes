@@ -31,7 +31,7 @@ const useInboundCreateValidation = () => {
   }, {
     invalid_type_error: translate('react.default.error.requiredField.label', 'Destination is required'),
     required_error: translate('react.default.error.requiredField.label', 'Destination is required'),
-  }).required();
+  }).optional().nullable();
 
   const stocklistSchema = z.object({
     id: z.string(),
@@ -45,7 +45,7 @@ const useInboundCreateValidation = () => {
       })
       .min(1, translate('react.default.error.requiredField.label', 'Description is required')),
     origin: originSchema,
-    destination: destinationSchema.optional().nullable(),
+    destination: destinationSchema,
     stocklist: stocklistSchema,
     requestedBy: requestedBySchema,
     dateRequested: z
