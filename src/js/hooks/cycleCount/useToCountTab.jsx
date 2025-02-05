@@ -10,7 +10,7 @@ import { TableCell } from 'components/DataTable';
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
 import Checkbox from 'components/form-elements/v2/Checkbox';
 import { INVENTORY_ITEM_URL } from 'consts/applicationUrls';
-import CycleCountStatus from 'consts/cycleCountStatus';
+import CycleCountStatusGroup from 'consts/cycleCountStatusGroup';
 import useSpinner from 'hooks/useSpinner';
 import useTableCheckboxes from 'hooks/useTableCheckboxes';
 import useTableDataV2 from 'hooks/useTableDataV2';
@@ -48,7 +48,7 @@ const useToCountTab = ({
   const getParams = ({
     sortingParams,
   }) => _.omitBy({
-    status: CycleCountStatus.CREATED,
+    status: CycleCountStatusGroup.TO_COUNT,
     offset: `${offset}`,
     max: `${pageSize}`,
     ...sortingParams,
@@ -137,7 +137,6 @@ const useToCountTab = ({
         </TableHeaderCell>
       ),
       cell: ({ getValue }) => (
-        // TODO: Use variant fetched from the API https://pihemr.atlassian.net/browse/OBPIH-6931
         <TableCell className="rt-td">
           <StatusIndicator
             variant="danger"

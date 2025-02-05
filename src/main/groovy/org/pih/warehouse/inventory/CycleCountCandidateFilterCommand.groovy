@@ -8,7 +8,7 @@ import org.pih.warehouse.product.ProductCatalog
 
 class CycleCountCandidateFilterCommand extends PaginationCommand implements Validateable {
 
-    CycleCountRequestStatus status
+    CycleCountStatusGroup status
 
     String searchTerm
 

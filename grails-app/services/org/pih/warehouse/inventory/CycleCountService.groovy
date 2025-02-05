@@ -71,12 +71,24 @@ class CycleCountService {
             if (command.sort) {
                 getCandidatesSortOrder(command.sort, command.order, delegate, usedAliases)
             }
-            if (command.status) {
-                createAlias("cycleCountRequest", "cycleCountRequest", JoinType.INNER_JOIN)
-                eq("cycleCountRequest.status", command.status)
-                return
+            if (!command.status || command.status == CycleCountStatusGroup.NOT_YET_REQUESTED) {
+                isNull("cycleCountRequest")
             }
-            isNull("cycleCountRequest")
+            else {
+                createAlias("cycleCountRequest", "cycleCountRequest", JoinType.INNER_JOIN)
+                createAlias("cycleCountRequest.cycleCount", "cycleCount")
+
+                // A special case. Needed because the cycle count might not be created yet.
+                if (command.status == CycleCountStatusGroup.TO_COUNT) {
+                    or {
+                        "in"("cycleCountRequest.status", CycleCountRequestStatus.CREATED)
+                        "in"("cycleCount.status", command.status.statuses)  // FAILS! Cannot resolve the transient
+                    }
+                }
+                else {
+                    "in"("cycleCount.status", command.status.statuses)  // FAILS! Cannot resolve the transient
+                }
+            }
         }
     }
 
