@@ -4,6 +4,7 @@ import { combineReducers } from 'redux';
 import approversReducer from 'reducers/approversReducer';
 import connectionReducer from 'reducers/connectionReducer';
 import filterFormReducer from 'reducers/filterFormReducer';
+import inboundReducer from 'reducers/InboundReducer';
 import indicatorsReducer from 'reducers/indicatorsReducer';
 import infoBarReducer from 'reducers/infoBarReducer';
 import infoBarVisibilityReducer from 'reducers/infoBarVisibilityReducer';
@@ -48,6 +49,7 @@ const rootReducer = combineReducers({
   productSupplier: productSupplierReducer,
   unitOfMeasure: unitOfMeasureReducer,
   outboundImport: outboundImportReducer,
+  inbound: inboundReducer,
 });
 
 export default rootReducer;
