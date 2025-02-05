@@ -219,10 +219,12 @@ class CycleCountService {
                     quantityCounted: availableItem.quantityOnHand == 0 ? 0 : null,
                     cycleCount: newCycleCount,
                     facility: facility,
+                    location: availableItem.binLocation,
                     inventoryItem: availableItem.inventoryItem,
                     product: availableItem.inventoryItem.product,
                     createdBy: AuthService.currentUser,
                     updatedBy: AuthService.currentUser,
+                    dateCounted: new Date(),
                     custom: false,
             )
             if (!cycleCountItem.validate()) {

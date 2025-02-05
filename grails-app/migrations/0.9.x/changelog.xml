@@ -23,4 +23,5 @@
     <include file="0.9.x/changelog-2025-01-17-1800-create-table-cycle-count.xml" />
     <include file="0.9.x/changelog-2025-01-17-1830-add-column-cycle-count-to-cycle-count-request.xml" />
     <include file="0.9.x/changelog-2025-01-17-1900-create-table-cycle-count-item.xml" />
+    <include file="0.9.x/changelog-2025-02-05-1500-add-column-location-to-cycle-count-item.xml" />
 </databaseChangeLog>
