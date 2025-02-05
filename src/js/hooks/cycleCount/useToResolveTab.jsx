@@ -21,7 +21,7 @@ import exportFileFromAPI from 'utils/file-download-util';
 import { mapStringToLimitedList } from 'utils/form-values-utils';
 import StatusIndicator from 'utils/StatusIndicator';
 
-const useToCountTab = ({
+const useToResolveTab = ({
   filterParams,
   offset,
   pageSize,
@@ -48,6 +48,9 @@ const useToCountTab = ({
   const getParams = ({
     sortingParams,
   }) => _.omitBy({
+    // TODO: We need to display only the rows where cycle count in [INVESTIGATING, COUNTED].
+    //       This will require us to be able to filter on the cycle count status, not just the cycle
+    //       count request status! https://pihemr.atlassian.net/browse/OBPIH-6931
     status: CycleCountStatus.CREATED,
     offset: `${offset}`,
     max: `${pageSize}`,
@@ -140,8 +143,8 @@ const useToCountTab = ({
         // TODO: Use variant fetched from the API https://pihemr.atlassian.net/browse/OBPIH-6931
         <TableCell className="rt-td">
           <StatusIndicator
-            variant="danger"
-            status={translate(`react.cycleCount.status.${getValue()}.label`, 'To count')}
+            variant="primary"
+            status={translate(`react.cycleCount.status.${getValue()}.label`, 'To Resolve')}
           />
         </TableCell>
       ),
@@ -285,20 +288,20 @@ const useToCountTab = ({
     });
   };
 
-  const printCountForm = () => {
-    console.log('print count form pressed');
+  const printResolveForm = () => {
+    // TODO: implement me!
+    console.log('print resolve form pressed');
   };
 
-  const startCount = async () => {
+  const startResolution = async () => {
     const payload = {
       requests: checkedCheckboxes.map((cycleCountRequestId) => ({
         cycleCountRequest: cycleCountRequestId,
-        countIndex: 0,
+        countIndex: 1, // We only ever allow for a single recount, so index is always 1.
       })),
     };
     spinner.show();
     try {
-      // Mocked request for start counting
       await cycleCountApi.startCount(payload, currentLocation?.id);
     } finally {
       spinner.hide();
@@ -312,9 +315,9 @@ const useToCountTab = ({
     emptyTableMessage,
     exportTableData,
     selectedCheckboxesAmount,
-    startCount,
-    printCountForm,
+    startResolution,
+    printResolveForm,
   };
 };
 
-export default useToCountTab;
+export default useToResolveTab;
