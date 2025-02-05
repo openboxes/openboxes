@@ -96,14 +96,6 @@ const InboundV2 = () => {
       </form>
       {is(inboundV2Step.ADD_ITEMS) && (<Step.Component />)}
       {is(inboundV2Step.SEND) && (<Step.Component />)}
-      {/* this is for testing purposes */}
-      <Button
-        label="react.default.button.previous.label"
-        defaultLabel="Previous"
-        variant="primary"
-        className="fit-content align-self-end"
-        onClick={() => previous()}
-      />
     </PageWrapper>
   );
 };

@@ -31,7 +31,7 @@ const useInboundValidation = () => {
   }, {
     invalid_type_error: translate('react.default.error.requiredField.label', 'Destination is required'),
     required_error: translate('react.default.error.requiredField.label', 'Destination is required'),
-  }).required();
+  }).optional().nullable();
 
   const stocklistSchema = z.object({
     id: z.string(),
