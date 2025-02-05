@@ -2,7 +2,6 @@ import React, { useMemo } from 'react';
 
 import { useSelector } from 'react-redux';
 
-import Button from 'components/form-elements/Button';
 import InboundHeader from 'components/stock-movement-wizard/inboundV2/InboundHeader';
 import InboundV2AddItems
   from 'components/stock-movement-wizard/inboundV2/sections/InboundV2AddItems';
@@ -52,7 +51,6 @@ const InboundV2 = () => {
     Step,
     {
       next,
-      previous,
       is,
     },
   ] = useWizard({
