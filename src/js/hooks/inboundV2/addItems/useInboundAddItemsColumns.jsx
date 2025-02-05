@@ -268,9 +268,9 @@ const useInboundAddItemsColumns = ({
                   type="number"
                   hasErrors={hasErrors}
                   showErrorBorder={hasErrors}
-                  onBlur={async () => {
+                  onBlur={() => {
                     field.onBlur();
-                    await trigger(`values.lineItems.${row.index}.quantityRequested`);
+                    trigger(`values.lineItems.${row.index}.quantityRequested`);
                   }}
                 />
               )}

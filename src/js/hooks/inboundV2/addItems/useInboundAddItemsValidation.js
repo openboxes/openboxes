@@ -50,7 +50,7 @@ const useInboundV2Validation = () => {
 
   const validationSchema = z.object({
     values: z.object({
-      lineItems: z.array(lineItemSchema).optional(),
+      lineItems: z.array(lineItemSchema),
     }),
   });
 

@@ -578,7 +578,6 @@ class AddItemsPage extends Component {
    * @public
    */
   nextPage(formValues) {
-    console.log(this.state);
     const lineItems = _.filter(formValues.lineItems, (val) => !_.isEmpty(val) && val.product);
 
     if (_.some(lineItems, (item) => !item.quantityRequested || item.quantityRequested === '0')) {

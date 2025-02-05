@@ -149,10 +149,7 @@ const useInboundAddItemsForm = ({ next, previous }) => {
     });
 
     return [
-      ...lineItemsToBeAdded.map((item) => formatItem({
-        ...item,
-        id: undefined,
-      })),
+      ...lineItemsToBeAdded.map(formatItem),
       ...lineItemsToBeUpdated.map(formatItem),
     ];
   };
@@ -252,7 +249,6 @@ const useInboundAddItemsForm = ({ next, previous }) => {
       id: queryParams.id,
       lineItems: itemsToSave,
     };
-
     try {
       spinner.show();
       await apiClient.post(STOCK_MOVEMENT_UPDATE_INVENTORY_ITEMS(queryParams.id), payload);
