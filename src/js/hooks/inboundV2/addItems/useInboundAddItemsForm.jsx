@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import _ from 'lodash';
 import moment from 'moment';
 import { confirmAlert } from 'react-confirm-alert';
 import { useForm } from 'react-hook-form';
@@ -14,6 +15,7 @@ import {
   STOCK_MOVEMENT_UPDATE_STATUS,
 } from 'api/urls';
 import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
+import InboundV2Step from 'consts/InboundV2Step';
 import { DateFormat } from 'consts/timeFormat';
 import useInboundAddItemsValidation from 'hooks/inboundV2/addItems/useInboundAddItemsValidation';
 import useQueryParams from 'hooks/useQueryParams';
@@ -199,25 +201,27 @@ const useInboundAddItemsForm = ({ next, previous }) => {
       expirationDate: item.expirationDate ? moment(item.expirationDate)
         .format(DateFormat.MM_DD_YYYY) : null,
     }));
-    if (!itemsToSave.length) return null;
-    const payload = {
-      id: queryParams.id,
-      lineItems: itemsToSave,
-    };
-
-    try {
-      spinner.show();
-      const resp = await apiClient.post(STOCK_MOVEMENT_UPDATE_ITEMS(queryParams.id), payload);
-      const transformedData = {
-        ...resp.data.data,
-        lineItems: resp.data.data.lineItems?.map(transformLineItem),
+    if (itemsToSave.length) {
+      const payload = {
+        id: queryParams.id,
+        lineItems: itemsToSave,
       };
-      setValue('currentLineItems', transformedData.lineItems);
-      setValue('values', transformedData);
-      return resp;
-    } finally {
-      spinner.hide();
+
+      try {
+        spinner.show();
+        const resp = await apiClient.post(STOCK_MOVEMENT_UPDATE_ITEMS(queryParams.id), payload);
+        const transformedData = {
+          ...resp.data.data,
+          lineItems: resp.data.data.lineItems?.map(transformLineItem),
+        };
+        setValue('currentLineItems', transformedData.lineItems);
+        setValue('values', transformedData);
+        return resp;
+      } finally {
+        spinner.hide();
+      }
     }
+    return null;
   };
 
   const transitionToNextStep = async (formValues) => {
@@ -316,23 +320,23 @@ const useInboundAddItemsForm = ({ next, previous }) => {
 
   const nextPage = async () => {
     trigger();
-    if (!isValid) return;
+    if (isValid) {
+      const formValues = getValues();
+      const lineItems = formValues.values.lineItems
+        .filter((item) => item?.product)
+        .map((item) => ({
+          ...item,
+          expirationDate: item.expirationDate ? moment(item.expirationDate)
+            .format(DateFormat.MM_DD_YYYY) : null,
+        }));
 
-    const formValues = getValues();
-    const lineItems = formValues.values.lineItems
-      .filter((item) => item?.product)
-      .map((item) => ({
-        ...item,
-        expirationDate: item.expirationDate ? moment(item.expirationDate)
-          .format(DateFormat.MM_DD_YYYY) : null,
-      }));
+      const hasInvalidQuantity = lineItems.some((item) => !item.quantityRequested || item.quantityRequested === '0');
 
-    const hasInvalidQuantity = lineItems.some((item) => !item.quantityRequested || item.quantityRequested === '0');
-
-    if (hasInvalidQuantity) {
-      await confirmSave(() => checkDuplicatesSaveAndTransitionToNextStep(formValues, lineItems));
-    } else {
-      await checkDuplicatesSaveAndTransitionToNextStep(formValues, lineItems);
+      if (hasInvalidQuantity) {
+        await confirmSave(() => checkDuplicatesSaveAndTransitionToNextStep(formValues, lineItems));
+      } else {
+        await checkDuplicatesSaveAndTransitionToNextStep(formValues, lineItems);
+      }
     }
   };
 
@@ -352,32 +356,26 @@ const useInboundAddItemsForm = ({ next, previous }) => {
 
   const save = () => {
     trigger();
-    if (!isValid) return;
-    const lineItems = getValues()
-      .values
-      .lineItems
-      .filter((item) => Object.keys(item).length > 0);
-    const hasInvalidQuantity = lineItems.some((item) => !item.quantityRequested || item.quantityRequested === '0');
+    if (isValid) {
+      const lineItems = getValues()
+        .values
+        .lineItems
+        .filter((item) => Object.keys(item).length > 0);
+      const hasInvalidQuantity = lineItems.some((item) => !item.quantityRequested || item.quantityRequested === '0');
 
-    if (hasInvalidQuantity) {
-      confirmSave(() => saveItems(lineItems));
-    } else {
-      saveItems(lineItems);
+      if (hasInvalidQuantity) {
+        confirmSave(() => saveItems(lineItems));
+      } else {
+        saveItems(lineItems);
+      }
     }
   };
 
   const saveAndExit = async () => {
     const formValues = getValues();
     const lineItems = formValues.values.lineItems.filter((item) => Object.keys(item).length > 0);
-    if (isValid) {
-      try {
-        spinner.show();
-        await saveRequisitionItemsInCurrentStep(lineItems);
-        window.location = STOCK_MOVEMENT_URL.show(queryParams.id);
-      } finally {
-        spinner.hide();
-      }
-    } else {
+
+    if (!isValid) {
       confirmAlert({
         title: translate('react.stockMovement.confirmExit.label', 'Confirm save'),
         message: translate(
@@ -396,6 +394,15 @@ const useInboundAddItemsForm = ({ next, previous }) => {
           },
         ],
       });
+      return;
+    }
+
+    try {
+      spinner.show();
+      await saveRequisitionItemsInCurrentStep(lineItems);
+      window.location = STOCK_MOVEMENT_URL.show(queryParams.id);
+    } finally {
+      spinner.hide();
     }
   };
 
@@ -413,6 +420,47 @@ const useInboundAddItemsForm = ({ next, previous }) => {
     }
   };
 
+  const loadMoreRows = async ({ startIndex }) => {
+    setValue('isFirstPageLoaded', true);
+    try {
+      spinner.show();
+      const response = await apiClient.get(`${STOCK_MOVEMENT_ITEMS(queryParams.id)}?offset=${startIndex}&max=${getValues().pageSize}&stepNumber=2`);
+      // eslint-disable-next-line no-use-before-define
+      setLineItems(response, startIndex);
+    } finally {
+      spinner.hide();
+    }
+  };
+
+  const setLineItems = (response, startIndex) => {
+    const { data } = response.data;
+    const lineItemsData = data.length === 0 && getValues('values.lineItems').length === 0
+      ? [{ sortOrder: 100 }]
+      : data.map((val) => ({
+        ...transformLineItem(val),
+        itemId: val.id,
+        disabled: true,
+      }));
+    const newSortOrder = (lineItemsData.length > 0
+      ? lineItemsData[lineItemsData.length - 1].sortOrder : 0) + 100;
+    setValue('sortOrder', newSortOrder);
+    setValue('currentLineItems', getValues().isPaginated ? _.uniqBy([...getValues('currentLineItems'), ...data], 'id') : data);
+    setValue('values.lineItems', getValues().isPaginated ? _.uniqBy([...getValues('values.lineItems'), ...lineItemsData], 'id') : lineItemsData);
+
+    if (startIndex !== null && getValues('values.lineItems').length !== getValues().totalCount) {
+      loadMoreRows({ startIndex: startIndex + getValues().pageSize });
+    }
+  };
+
+  const fetchLineItems = async () => {
+    if (queryParams.id) {
+      const url = `${STOCK_MOVEMENT_ITEMS(queryParams.id)}?stepNumber=2`;
+      const response = await apiClient.get(url);
+      setValue('totalCount', response.data.data.length);
+      setLineItems(response, null);
+    }
+  };
+
   const removeAll = async () => {
     try {
       spinner.show();
@@ -420,7 +468,6 @@ const useInboundAddItemsForm = ({ next, previous }) => {
       setValue('totalCount', 1);
       setValue('currentLineItems', []);
       setValue('values', { ...getValues('values'), lineItems: new Array(1).fill({ sortOrder: 100 }) });
-      // eslint-disable-next-line no-use-before-define
       await fetchLineItems();
     } finally {
       spinner.hide();
@@ -455,69 +502,17 @@ const useInboundAddItemsForm = ({ next, previous }) => {
   };
 
   const fetchAddItemsPageData = async () => {
-    if (!queryParams.id) return;
+    if (queryParams.id) {
+      const response = await apiClient.get(STOCK_MOVEMENT_BY_ID(queryParams.id));
+      const { totalCount, data } = response.data;
+      const transformedData = {
+        ...data,
+        lineItems: data.lineItems?.map(transformLineItem),
+      };
 
-    const response = await apiClient.get(STOCK_MOVEMENT_BY_ID(queryParams.id));
-    const { totalCount, data } = response.data;
-    const transformedData = {
-      ...data,
-      lineItems: data.lineItems?.map(transformLineItem),
-    };
-
-    setValue('values', transformedData);
-    setValue('totalCount', totalCount || 1);
-  };
-
-  const loadMoreRows = async ({ startIndex }) => {
-    setValue('isFirstPageLoaded', true);
-    try {
-      spinner.show();
-      const response = await apiClient.get(`${STOCK_MOVEMENT_ITEMS(queryParams.id)}?offset=${startIndex}&max=${getValues().pageSize}&stepNumber=2`);
-      // eslint-disable-next-line no-use-before-define
-      setLineItems(response, startIndex);
-    } finally {
-      spinner.hide();
+      setValue('values', transformedData);
+      setValue('totalCount', totalCount || 1);
     }
-  };
-
-  const uniqueById = (array) => {
-    const seen = new Map();
-    return array.filter((item) => {
-      if (!seen.has(item.id)) {
-        seen.set(item.id, true);
-        return true;
-      }
-      return false;
-    });
-  };
-
-  const setLineItems = (response, startIndex) => {
-    const { data } = response.data;
-    const lineItemsData = data.length === 0 && getValues('values.lineItems').length === 0
-      ? [{ sortOrder: 100 }]
-      : data.map((val) => ({
-        ...transformLineItem(val),
-        itemId: val.id,
-        disabled: true,
-      }));
-    const newSortOrder = (lineItemsData.length > 0
-      ? lineItemsData[lineItemsData.length - 1].sortOrder : 0) + 100;
-    setValue('sortOrder', newSortOrder);
-    setValue('currentLineItems', getValues().isPaginated ? uniqueById([...getValues('currentLineItems'), ...data]) : data);
-    setValue('values.lineItems', getValues().isPaginated ? uniqueById([...getValues('values.lineItems'), ...lineItemsData]) : lineItemsData);
-
-    if (startIndex !== null && getValues('values.lineItems').length !== getValues().totalCount) {
-      loadMoreRows({ startIndex: startIndex + getValues().pageSize });
-    }
-  };
-
-  const fetchLineItems = async () => {
-    if (!queryParams.id) return;
-    const url = `${STOCK_MOVEMENT_ITEMS(queryParams.id)}?stepNumber=2`;
-    const response = await apiClient.get(url);
-
-    setValue('totalCount', response.data.data.length);
-    setLineItems(response, null);
   };
 
   const fetchData = async () => {
@@ -533,11 +528,13 @@ const useInboundAddItemsForm = ({ next, previous }) => {
       spinner.hide();
     }
   };
+
   useEffect(() => {
-    if (queryParams.step === 'ADD_ITEMS') {
+    if (queryParams.step === InboundV2Step.ADD_ITEMS) {
       fetchData();
     }
   }, [queryParams.step]);
+
   return {
     control,
     getValues,

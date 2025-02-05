@@ -48,7 +48,6 @@ const DataTable = ({
         <div className="rt-table" role="grid">
           <DataTableHeader
             headerGroups={table.getHeaderGroups()}
-            columns={columns}
           />
           <DataTableBody
             emptyTableMessage={emptyTableMessage}
@@ -58,7 +57,6 @@ const DataTable = ({
             loading={loading}
             rowModel={table.getRowModel()}
             dataLength={data?.length}
-            columns={columns}
           />
           {showPagination && (
           <DataTableFooter

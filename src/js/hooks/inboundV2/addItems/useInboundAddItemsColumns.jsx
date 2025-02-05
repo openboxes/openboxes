@@ -100,7 +100,9 @@ const useInboundAddItemsColumns = ({
           </TableCell>
         );
       },
-      flexWidth: 1,
+      meta: {
+        flexWidth: 1,
+      },
     }),
     columnHelper.accessor('boxName', {
       header: () => (
@@ -134,7 +136,9 @@ const useInboundAddItemsColumns = ({
           </TableCell>
         );
       },
-      flexWidth: 1,
+      meta: {
+        flexWidth: 1,
+      },
     }),
     columnHelper.accessor('product', {
       header: () => (
@@ -175,7 +179,9 @@ const useInboundAddItemsColumns = ({
           </TableCell>
         );
       },
-      flexWidth: 4,
+      meta: {
+        flexWidth: 4,
+      },
     }),
     columnHelper.accessor('lotNumber', {
       header: () => (
@@ -206,7 +212,9 @@ const useInboundAddItemsColumns = ({
           </TableCell>
         );
       },
-      flexWidth: 1,
+      meta: {
+        flexWidth: 1,
+      },
     }),
     columnHelper.accessor('expirationDate', {
       header: () => (
@@ -242,7 +250,9 @@ const useInboundAddItemsColumns = ({
           </TableCell>
         );
       },
-      flexWidth: 1.5,
+      meta: {
+        flexWidth: 1.5,
+      },
     }),
     columnHelper.accessor('quantityRequested', {
       header: () => (
@@ -278,7 +288,9 @@ const useInboundAddItemsColumns = ({
           </TableCell>
         );
       },
-      flexWidth: 1,
+      meta: {
+        flexWidth: 1,
+      },
     }),
     columnHelper.accessor('recipient', {
       header: () => (
@@ -314,7 +326,9 @@ const useInboundAddItemsColumns = ({
           </TableCell>
         );
       },
-      flexWidth: 1.5,
+      meta: {
+        flexWidth: 1.5,
+      },
     }),
     columnHelper.display({
       id: 'delete',
@@ -334,7 +348,9 @@ const useInboundAddItemsColumns = ({
           </div>
         </TableCell>
       ),
-      flexWidth: 0.5,
+      meta: {
+        flexWidth: 0.5,
+      },
     }),
   ], [errors, control]);
 

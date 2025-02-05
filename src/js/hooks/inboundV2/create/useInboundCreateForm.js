@@ -8,6 +8,7 @@ import { useSelector } from 'react-redux';
 import stockListApi from 'api/services/StockListApi';
 import stockMovementApi from 'api/services/StockMovementApi';
 import { STOCK_MOVEMENT_BY_ID } from 'api/urls';
+import InboundV2Step from 'consts/InboundV2Step';
 import { DateFormat } from 'consts/timeFormat';
 import useInboundCreateValidation from 'hooks/inboundV2/create/useInboundCreateValidation';
 import useQueryParams from 'hooks/useQueryParams';
@@ -65,13 +66,9 @@ const useInboundCreateForm = ({ next }) => {
       requestedBy: { id: values.requestedBy.id },
     };
     try {
-      let response;
-      if (queryParams.id) {
-        response = await stockMovementApi.updateStockMovement(queryParams.id,
-          formattedValues);
-      } else {
-        response = await stockMovementApi.createStockMovement(formattedValues);
-      }
+      const response = queryParams.id
+        ? await stockMovementApi.updateStockMovement(queryParams.id, formattedValues)
+        : await stockMovementApi.createStockMovement(formattedValues);
 
       next({ id: response.data.data.id });
     } finally {
@@ -155,7 +152,7 @@ const useInboundCreateForm = ({ next }) => {
   };
 
   useEffect(() => {
-    if (queryParams.step !== 'ADD_ITEMS' && queryParams.step !== 'SEND') {
+    if (queryParams.step !== InboundV2Step.ADD_ITEMS && queryParams.step !== InboundV2Step.SEND) {
       fetchAddItemsPageData();
     }
   }, [queryParams.step]);

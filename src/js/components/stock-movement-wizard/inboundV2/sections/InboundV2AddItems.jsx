@@ -130,7 +130,7 @@ const InboundV2AddItems = ({
             showPagination={false}
             loading={loading}
             emptyTableMessage={{
-              id: 'stockMovement.emptyTable.label',
+              id: 'react.stockMovement.emptyTable.label',
               defaultMessage: 'No items to display',
             }}
           />

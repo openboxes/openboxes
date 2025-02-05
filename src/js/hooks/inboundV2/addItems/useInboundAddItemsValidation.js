@@ -17,9 +17,6 @@ const useInboundAddItemsV2Validation = () => {
     expirationDate: z.string().optional().nullable(),
     quantityRequested: z.number()
       .min(0, translate('react.stockMovement.error.enterQuantity.label', 'Enter proper quantity'))
-      .refine((value) => value >= 0, {
-        message: translate('react.stockMovement.error.enterQuantity.label', 'Enter proper quantity'),
-      })
       .optional(),
     recipient: z.object({
       id: z.string(),
@@ -32,15 +29,15 @@ const useInboundAddItemsV2Validation = () => {
       path: ['boxName'],
     })
     .refine((data) => {
-      const isValid = !(data.expirationDate && (!data.lotNumber || data.lotNumber === ''));
+      const isValid = !(data.expirationDate && !data.lotNumber);
       return isValid;
     }, {
       message: translate('react.stockMovement.error.expiryWithoutLot.label', 'Items with an expiry date must also have a lot number'),
       path: ['lotNumber'],
     })
     .refine((data) => {
-      if (data.product && data.product.id) {
-        return data.quantityRequested !== undefined;
+      if (data?.product && data?.product?.id) {
+        return data?.quantityRequested !== undefined;
       }
       return true;
     }, {

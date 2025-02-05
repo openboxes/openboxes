@@ -14,7 +14,6 @@ const DataTableBody = ({
   loading,
   rowModel,
   dataLength,
-  columns,
 }) => (
   <div className="rt-tbody">
     <DataTableStatus
@@ -37,10 +36,11 @@ const DataTableBody = ({
         <div key={row.id} className="rt-tr-group cell-wrapper" role="rowgroup">
           <TableRow key={row.id} className="rt-tr">
             {row.getVisibleCells()
-              .map((cell, index) => {
+              .map((cell) => {
                 const className = cell.column.columnDef?.meta?.getCellContext?.()?.className;
+                const flexWidth = cell.column.columnDef.meta?.flexWidth || 1;
                 return (
-                  <div className={`d-flex ${className}`} style={{ flex: columns[index].flexWidth || 1 }} key={cell.id}>
+                  <div className={`d-flex ${className}`} style={{ flex: flexWidth }} key={cell.id}>
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </div>
                 );
@@ -77,9 +77,6 @@ DataTableBody.propTypes = {
     ).isRequired,
   }).isRequired,
   dataLength: PropTypes.number.isRequired,
-  columns: PropTypes.arrayOf(
-    PropTypes.shape({}),
-  ).isRequired,
 };
 
 DataTableBody.defaultProps = {
