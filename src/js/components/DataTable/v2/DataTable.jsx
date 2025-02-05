@@ -20,6 +20,7 @@ const DataTable = ({
   setOffset,
   setPageSize,
   totalCount,
+  showPagination,
 }) => {
   const {
     defaultEmptyTableMessage,
@@ -47,6 +48,7 @@ const DataTable = ({
         <div className="rt-table" role="grid">
           <DataTableHeader
             headerGroups={table.getHeaderGroups()}
+            columns={columns}
           />
           <DataTableBody
             emptyTableMessage={emptyTableMessage}
@@ -56,7 +58,9 @@ const DataTable = ({
             loading={loading}
             rowModel={table.getRowModel()}
             dataLength={data?.length}
+            columns={columns}
           />
+          {showPagination && (
           <DataTableFooter
             footerComponent={footerComponent}
             pagination={pagination}
@@ -68,6 +72,7 @@ const DataTable = ({
             pageSizeSelectOptions={pageSizeSelectOptions}
             totalData={totalCount}
           />
+          )}
         </div>
       </div>
     </div>
@@ -98,6 +103,7 @@ DataTable.propTypes = {
   setOffset: PropTypes.func,
   setPageSize: PropTypes.func,
   totalCount: PropTypes.number,
+  showPagination: PropTypes.bool,
 };
 
 DataTable.defaultProps = {
@@ -109,4 +115,5 @@ DataTable.defaultProps = {
   setOffset: () => {},
   totalCount: 0,
   setPageSize: () => {},
+  showPagination: true,
 };

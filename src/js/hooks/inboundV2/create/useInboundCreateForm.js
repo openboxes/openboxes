@@ -7,23 +7,25 @@ import { useSelector } from 'react-redux';
 
 import stockListApi from 'api/services/StockListApi';
 import stockMovementApi from 'api/services/StockMovementApi';
+import { STOCK_MOVEMENT_BY_ID } from 'api/urls';
 import { DateFormat } from 'consts/timeFormat';
-import useInboundValidation from 'hooks/inboundV2/useInboundValidation';
+import useInboundCreateValidation from 'hooks/inboundV2/create/useInboundCreateValidation';
 import useQueryParams from 'hooks/useQueryParams';
 import useSpinner from 'hooks/useSpinner';
+import apiClient from 'utils/apiClient';
 
-const useInboundForm = ({ next }) => {
+const useInboundCreateForm = ({ next }) => {
   const [stockLists, setStockLists] = useState([]);
   const { currentLocation } = useSelector((state) => ({
     currentLocation: state.session.currentLocation,
   }));
   const spinner = useSpinner();
-  const { validationSchema } = useInboundValidation();
+  const { validationSchema } = useInboundCreateValidation();
   const queryParams = useQueryParams();
 
   const defaultValues = useMemo(() => {
     const values = {
-      description: undefined,
+      description: '',
       origin: undefined,
       destination: {
         id: currentLocation?.id,
@@ -59,7 +61,7 @@ const useInboundForm = ({ next }) => {
       name: '',
       dateRequested: moment(values.dateRequested).format(DateFormat.MM_DD_YYYY),
       origin: { id: values.origin.id },
-      destination: { id: values.destination.id },
+      destination: { id: currentLocation.id },
       requestedBy: { id: values.requestedBy.id },
     };
     try {
@@ -127,6 +129,36 @@ const useInboundForm = ({ next }) => {
     }
   }, [origin?.id, destination?.id]);
 
+  const fetchAddItemsPageData = async () => {
+    if (!queryParams.id) return;
+    spinner.show();
+    try {
+      const response = await apiClient.get(STOCK_MOVEMENT_BY_ID(queryParams.id));
+
+      const { data } = response.data;
+      setValue('description', data.description);
+      setValue('origin', {
+        id: data.origin.id,
+        name: data.origin.name,
+        label: `${data.origin.name} [${data.origin.locationType.description}]`,
+      });
+      setValue('requestedBy', {
+        id: data.requestedBy.id,
+        name: data.requestedBy.name,
+        label: data.requestedBy.name,
+      });
+      setValue('dateRequested', data.dateRequested);
+      trigger();
+    } finally {
+      spinner.hide();
+    }
+  };
+
+  useEffect(() => {
+    if (queryParams.step !== 'ADD_ITEMS' && queryParams.step !== 'SEND') {
+      fetchAddItemsPageData();
+    }
+  }, [queryParams.step]);
   return {
     control,
     getValues,
@@ -140,4 +172,4 @@ const useInboundForm = ({ next }) => {
   };
 };
 
-export default useInboundForm;
+export default useInboundCreateForm;

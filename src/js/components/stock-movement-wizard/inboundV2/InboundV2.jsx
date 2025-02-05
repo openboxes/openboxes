@@ -2,8 +2,7 @@ import React, { useMemo } from 'react';
 
 import { useSelector } from 'react-redux';
 
-import Button from 'components/form-elements/Button';
-import InboundHeader from 'components/stock-movement-wizard/inboundV2/InboundHeader';
+import InboundV2Header from 'components/stock-movement-wizard/inboundV2/InboundV2Header';
 import InboundV2AddItems
   from 'components/stock-movement-wizard/inboundV2/sections/InboundV2AddItems';
 import InboundV2Create from 'components/stock-movement-wizard/inboundV2/sections/InboundV2Create';
@@ -12,13 +11,16 @@ import WizardStepsV2 from 'components/wizard/v2/WizardStepsV2';
 import inboundV2Step from 'consts/InboundV2Step';
 import mockInboundV2Status from 'consts/MockInboundV2Status';
 import mockInboundV2Title from 'consts/MockInboundV2Title';
-import useInboundForm from 'hooks/inboundV2/useInboundForm';
+import useInboundAddItemsForm from 'hooks/inboundV2/addItems/useInboundAddItemsForm';
+import useInboundCreateForm from 'hooks/inboundV2/create/useInboundCreateForm';
 import useTranslate from 'hooks/useTranslate';
 import useTranslation from 'hooks/useTranslation';
 import useWizard from 'hooks/useWizard';
 import PageWrapper from 'wrappers/PageWrapper';
 
 import 'utils/utils.scss';
+import 'components/stock-movement-wizard/inboundV2/inboundV2.scss';
+import 'react-confirm-alert/src/react-confirm-alert.css';
 
 const InboundV2 = () => {
   useTranslation('stockMovement');
@@ -34,12 +36,12 @@ const InboundV2 = () => {
     {
       key: inboundV2Step.ADD_ITEMS,
       title: translate('react.stockMovement.addItems.label', 'Add Items'),
-      Component: () => (<InboundV2AddItems />),
+      Component: (props) => (<InboundV2AddItems {...props} />),
     },
     {
       key: inboundV2Step.SEND,
       title: translate('react.stockMovement.send.label', 'Send'),
-      Component: () => (<InboundV2Send />),
+      Component: (props) => (<InboundV2Send {...props} />),
     },
   ], [locale]);
 
@@ -56,7 +58,7 @@ const InboundV2 = () => {
       is,
     },
   ] = useWizard({
-    initialKey: InboundV2.DETAILS,
+    initialKey: inboundV2Step.CREATE,
     steps,
   });
 
@@ -68,7 +70,7 @@ const InboundV2 = () => {
     handleSubmit,
     onSubmitStockMovementDetails,
     stockLists,
-  } = useInboundForm({ next });
+  } = useInboundCreateForm({ next });
 
   const detailsComponentProps = {
     control,
@@ -79,6 +81,46 @@ const InboundV2 = () => {
     stockLists,
   };
 
+  const {
+    control: addItemsControl,
+    handleSubmit: addItemsHandleSubmit,
+    errors: addItemsErrors,
+    isValid: addItemsIsValid,
+    trigger: addItemsTrigger,
+    getValues: addItemsGetValues,
+    setValue: addItemsValue,
+    loading,
+    nextPage,
+    save,
+    removeItem,
+    updateTotalCount,
+    removeAll,
+    saveAndExit,
+    previousPage,
+  } = useInboundAddItemsForm({ next, previous });
+
+  const addItemsComponentProps = {
+    control: addItemsControl,
+    handleSubmit: addItemsHandleSubmit,
+    errors: addItemsErrors?.values?.lineItems ? addItemsErrors.values.lineItems : [],
+    isValid: addItemsIsValid,
+    trigger: addItemsTrigger,
+    getValues: addItemsGetValues,
+    setValue: addItemsValue,
+    loading,
+    nextPage,
+    save,
+    removeItem,
+    updateTotalCount,
+    removeAll,
+    saveAndExit,
+    previousPage,
+  };
+
+  const sendComponentProps = {
+    previous,
+  };
+
   // this will still need to be improved in the future
   const headerStatus = is(inboundV2Step.SEND) ? mockInboundV2Status : undefined;
   const headerTitle = is(inboundV2Step.ADD_ITEMS)
@@ -87,23 +129,18 @@ const InboundV2 = () => {
   return (
     <PageWrapper>
       <WizardStepsV2 steps={stepsTitles} currentStepKey={Step.key} />
-      <InboundHeader
+      <InboundV2Header
         title={headerTitle}
         status={headerStatus}
       />
       <form onSubmit={handleSubmit(onSubmitStockMovementDetails)}>
         {is(inboundV2Step.CREATE) && (<Step.Component {...detailsComponentProps} />)}
       </form>
-      {is(inboundV2Step.ADD_ITEMS) && (<Step.Component />)}
-      {is(inboundV2Step.SEND) && (<Step.Component />)}
-      {/* this is for testing purposes */}
-      <Button
-        label="react.default.button.previous.label"
-        defaultLabel="Previous"
-        variant="primary"
-        className="fit-content align-self-end"
-        onClick={() => previous()}
-      />
+
+      <form>
+        {is(inboundV2Step.ADD_ITEMS) && (<Step.Component {...addItemsComponentProps} />)}
+      </form>
+      {is(inboundV2Step.SEND) && (<Step.Component {...sendComponentProps} />)}
     </PageWrapper>
   );
 };

@@ -3,7 +3,7 @@ import { z } from 'zod';
 import useTranslate from 'hooks/useTranslate';
 import { validateFutureDate } from 'utils/form-utils';
 
-const useInboundValidation = () => {
+const useInboundCreateValidation = () => {
   const translate = useTranslate();
 
   const requestedBySchema = z.object({
@@ -45,7 +45,7 @@ const useInboundValidation = () => {
       })
       .min(1, translate('react.default.error.requiredField.label', 'Description is required')),
     origin: originSchema,
-    destination: destinationSchema,
+    destination: destinationSchema.optional().nullable(),
     stocklist: stocklistSchema,
     requestedBy: requestedBySchema,
     dateRequested: z
@@ -63,4 +63,4 @@ const useInboundValidation = () => {
   };
 };
 
-export default useInboundValidation;
+export default useInboundCreateValidation;
