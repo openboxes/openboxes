@@ -51,7 +51,7 @@ class CycleCountItem {
                 facility: facility.toBaseJson(),
                 product: product,
                 inventoryItem: inventoryItem,
-                binLocation: location.toBaseJson(),
+                binLocation: location?.toBaseJson(),
                 countIndex: countIndex,
                 status: status,
                 quantityOnHand: quantityOnHand,
@@ -69,5 +69,6 @@ class CycleCountItem {
         assignee(nullable: true)
         quantityCounted(nullable: true)
         discrepancyReasonCode(nullable: true)
+        location(nullable: true)
     }
 }
