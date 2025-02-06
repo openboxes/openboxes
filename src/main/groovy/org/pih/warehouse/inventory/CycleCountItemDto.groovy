@@ -8,6 +8,8 @@ class CycleCountItemDto {
 
     Map facility
 
+    Map binLocation
+
     Product product
 
     InventoryItem inventoryItem
