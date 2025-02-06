@@ -42,7 +42,6 @@ const useInboundAddItemsForm = ({ next, previous }) => {
           expirationDate: '',
           quantityRequested: undefined,
           recipient: undefined,
-          inventoryItem: undefined,
         }],
       },
       newItem: false,
@@ -124,23 +123,22 @@ const useInboundAddItemsForm = ({ next, previous }) => {
       const oldRecipient = oldItem.recipient?.id ?? oldItem.recipient;
       const newRecipient = item.recipient?.id ?? item.recipient;
 
-      const keyIntersection = _.remove(
-        _.intersection(
-          _.keys(oldItem),
-          _.keys(item),
-        ),
-        (key) => key !== 'product',
-      );
+      const keyIntersection = Object.keys(oldItem).filter((key) => key !== 'product' && key in item);
 
+      const hasChanges = keyIntersection.some((key) => !Object.is(item[key], oldItem[key]));
       if (
-        !_.isEqual(_.pick(item, keyIntersection), _.pick(oldItem, keyIntersection))
-        || (item.product.id !== oldItem.product.id)
+        !hasChanges
+        || item.palletName !== oldItem.palletName
+        || item.boxName !== oldItem.boxName
+        || item.product.id !== oldItem.product.id
+        || newQty !== oldQty
+        || newRecipient !== oldRecipient
+        || item.lotNumber !== oldItem.lotNumber
       ) {
         lineItemsToBeUpdated.push(item);
-      } else if (newQty !== oldQty || newRecipient !== oldRecipient) {
-        lineItemsToBeUpdated.push(item);
-      } else if (item.inventoryItem?.expirationDate && item.expirationDate
-        && item.inventoryItem?.expirationDate !== item.expirationDate) {
+      } else if (item.expirationDate
+        && item.inventoryItem.expirationDate !== item.expirationDate
+      ) {
         lineItemsToBeUpdated.push(item);
       }
     });
@@ -451,6 +449,10 @@ const useInboundAddItemsForm = ({ next, previous }) => {
     const newSortOrder = (lineItemsData.length > 0
       ? lineItemsData[lineItemsData.length - 1].sortOrder : 0) + 100;
     setValue('sortOrder', newSortOrder);
+    // eslint-disable-next-line max-len
+    // setValue('currentLineItems', getValues().isPaginated ? [...getValues('currentLineItems'), ...data] : data);
+    // eslint-disable-next-line max-len
+    // setValue('values.lineItems', getValues().isPaginated ? [...getValues('values.lineItems'), ...lineItemsData] : lineItemsData);
     setValue('currentLineItems', getValues().isPaginated ? _.uniqBy(_.concat(data, ...getValues('currentLineItems')), 'id') : data);
     setValue('values.lineItems', getValues().isPaginated ? _.uniqBy(_.concat(lineItemsData, ...getValues('values.lineItems')), 'id') : lineItemsData);
 
