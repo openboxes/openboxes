@@ -42,6 +42,7 @@ const useInboundAddItemsForm = ({ next, previous }) => {
           expirationDate: '',
           quantityRequested: undefined,
           recipient: undefined,
+          inventoryItem: undefined,
         }],
       },
       newItem: false,
@@ -51,6 +52,7 @@ const useInboundAddItemsForm = ({ next, previous }) => {
     };
     return values;
   }, []);
+
   const {
     control,
     getValues,
@@ -122,18 +124,23 @@ const useInboundAddItemsForm = ({ next, previous }) => {
       const oldRecipient = oldItem.recipient?.id ?? oldItem.recipient;
       const newRecipient = item.recipient?.id ?? item.recipient;
 
-      const keyIntersection = Object.keys(oldItem).filter((key) => key !== 'product' && key in item);
+      const keyIntersection = _.remove(
+        _.intersection(
+          _.keys(oldItem),
+          _.keys(item),
+        ),
+        (key) => key !== 'product',
+      );
 
-      const hasChanges = keyIntersection.some((key) => !Object.is(item[key], oldItem[key]));
-
-      if (hasChanges || item.product.id !== oldItem.product.id || newQty !== oldQty
-        || newRecipient !== oldRecipient) {
-        lineItemsToBeUpdated.push(item);
-      } else if (
-        item.inventoryItem?.expirationDate
-        && item.expirationDate
-        && item.inventoryItem.expirationDate !== item.expirationDate
+      if (
+        !_.isEqual(_.pick(item, keyIntersection), _.pick(oldItem, keyIntersection))
+        || (item.product.id !== oldItem.product.id)
       ) {
+        lineItemsToBeUpdated.push(item);
+      } else if (newQty !== oldQty || newRecipient !== oldRecipient) {
+        lineItemsToBeUpdated.push(item);
+      } else if (item.inventoryItem?.expirationDate && item.expirationDate
+        && item.inventoryItem?.expirationDate !== item.expirationDate) {
         lineItemsToBeUpdated.push(item);
       }
     });
@@ -444,8 +451,8 @@ const useInboundAddItemsForm = ({ next, previous }) => {
     const newSortOrder = (lineItemsData.length > 0
       ? lineItemsData[lineItemsData.length - 1].sortOrder : 0) + 100;
     setValue('sortOrder', newSortOrder);
-    setValue('currentLineItems', getValues().isPaginated ? _.uniqBy([...getValues('currentLineItems'), ...data], 'id') : data);
-    setValue('values.lineItems', getValues().isPaginated ? _.uniqBy([...getValues('values.lineItems'), ...lineItemsData], 'id') : lineItemsData);
+    setValue('currentLineItems', getValues().isPaginated ? _.uniqBy(_.concat(data, ...getValues('currentLineItems')), 'id') : data);
+    setValue('values.lineItems', getValues().isPaginated ? _.uniqBy(_.concat(lineItemsData, ...getValues('values.lineItems')), 'id') : lineItemsData);
 
     if (startIndex !== null && getValues('values.lineItems').length !== getValues().totalCount) {
       loadMoreRows({ startIndex: startIndex + getValues().pageSize });
