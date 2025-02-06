@@ -2,10 +2,10 @@ import React, { useMemo } from 'react';
 
 import { createColumnHelper } from '@tanstack/react-table';
 import _ from 'lodash';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
-import cycleCountApi from 'api/services/CycleCountApi';
+import { startCount } from 'actions';
 import { CYCLE_COUNT_CANDIDATES } from 'api/urls';
 import { TableCell } from 'components/DataTable';
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
@@ -36,6 +36,8 @@ const useToCountTab = ({
     currentLocale: state.session.activeLanguage,
     currentLocation: state.session.currentLocation,
   }));
+
+  const dispatch = useDispatch();
 
   const {
     dateLastCount,
@@ -291,7 +293,7 @@ const useToCountTab = ({
     console.log('print count form pressed');
   };
 
-  const startCount = async () => {
+  const moveToCounting = async () => {
     const payload = {
       requests: checkedCheckboxes.map((cycleCountRequestId) => ({
         cycleCountRequest: cycleCountRequestId,
@@ -300,8 +302,7 @@ const useToCountTab = ({
     };
     spinner.show();
     try {
-      // Mocked request for start counting
-      await cycleCountApi.startCount(payload, currentLocation?.id);
+      dispatch(startCount(payload, currentLocation?.id));
       history.push(CYCLE_COUNT.countStep());
     } finally {
       spinner.hide();
@@ -315,7 +316,7 @@ const useToCountTab = ({
     emptyTableMessage,
     exportTableData,
     selectedCheckboxesAmount,
-    startCount,
+    moveToCounting,
     printCountForm,
   };
 };

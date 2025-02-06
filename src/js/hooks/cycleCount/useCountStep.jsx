@@ -1,9 +1,11 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import _ from 'lodash';
+import { useDispatch, useSelector } from 'react-redux';
 import { z } from 'zod';
 
-import countingPageMockedData from 'consts/countingPageMockedData';
+import { fetchUsers } from 'actions';
+import cycleCountApi from 'api/services/CycleCountApi';
 import useForceUpdate from 'hooks/useForceUpdate';
 import useTranslate from 'hooks/useTranslate';
 
@@ -12,14 +14,45 @@ const useCountStep = () => {
   const forceUpdate = useForceUpdate();
   // Table data is stored using useRef to avoid re-renders onBlur
   // (it removes focus while selecting new fields)
-  const tableData = useRef(countingPageMockedData.data);
+  const tableData = useRef([]);
   const [countedBy, setCountedBy] = useState({});
-  const [validationErrors, setValidationErrors] = useState({});
-  // I am not sure how to response from API will look like, so at least for now, I am grouping
-  // the response by product code
-  const dataGroupedByTables = _.groupBy(tableData.current, 'product.productCode');
+  const [dateCounted, setDateCounted] = useState({});
+  const validationErrors = useRef({});
 
   const translate = useTranslate();
+
+  const dispatch = useDispatch();
+
+  const {
+    cycleCountIds,
+    currentLocation,
+    users,
+  } = useSelector((state) => ({
+    users: state.users.data,
+    cycleCountIds: state.cycleCount.toCount,
+    currentLocation: state.session.currentLocation,
+  }));
+
+  useEffect(() => {
+    (async () => {
+      const { data } = await cycleCountApi.getCycleCounts(
+        currentLocation?.id,
+        cycleCountIds,
+      );
+      tableData.current = data?.data;
+      const countedDates = data?.data?.reduce((acc, cycleCount) => ({
+        ...acc,
+        [cycleCount?.id]: cycleCount?.cycleCountItems[0].dateCounted,
+      }), {});
+      setDateCounted(countedDates);
+    })();
+  }, [cycleCountIds]);
+
+  useEffect(() => {
+    if (!users?.length) {
+      dispatch(fetchUsers());
+    }
+  }, []);
 
   const printCountForm = () => {
     console.log('print count form');
@@ -29,7 +62,7 @@ const useCountStep = () => {
     setCountedBy((prevState) => ({ ...prevState, [productCode]: person }));
   };
 
-  const addEmptyRow = (productCode) => {
+  const addEmptyRow = (productCode, id) => {
     // ID is needed for updating appropriate row
     // Product is needed for placing row in appropriate table
     const emptyRow = {
@@ -37,29 +70,60 @@ const useCountStep = () => {
       product: {
         productCode,
       },
-      internalLocation: undefined,
-      lotNumber: undefined,
-      expirationDate: undefined,
+      inventoryItem: {
+        lotNumber: undefined,
+        expirationDate: undefined,
+      },
+      binLocation: {
+        name: undefined,
+      },
       quantityCounted: undefined,
       comment: '',
     };
-    tableData.current = [...tableData.current, emptyRow];
+    const tableIndex = tableData.current.findIndex(
+      (cycleCount) => cycleCount?.id === id,
+    );
+    tableData.current = tableData.current.map((data, index) => {
+      if (index === tableIndex) {
+        return {
+          ...data,
+          cycleCountItems: [
+            ...data.cycleCountItems,
+            emptyRow,
+          ],
+        };
+      }
+
+      return data;
+    });
     forceUpdate();
   };
 
-  const removeRow = (id) => {
-    tableData.current = tableData.current.filter((row) => id !== row.id);
+  const removeRow = (cycleCountId, rowId) => {
+    const tableIndex = tableData.current.findIndex(
+      (cycleCount) => cycleCount?.id === cycleCountId,
+    );
+    tableData.current = tableData.current.map((data, index) => {
+      if (index === tableIndex) {
+        return {
+          ...data,
+          cycleCountItems: data.cycleCountItems.filter((row) => row.id !== rowId),
+        };
+      }
+
+      return data;
+    });
     forceUpdate();
   };
 
-  const checkBinLocationUniqueness = (data) => {
-    if (!data.internalLocation) {
+  const checkLotNumberUniqueness = (data) => {
+    if (!data?.inventory?.lotNumber) {
       return true;
     }
     const product = tableData.current.find((row) => row?.id === data.id)?.product?.productCode;
     const table = _.groupBy(tableData.current, 'product.productCode')[product];
-    const groupedBinLocations = _.groupBy(table, 'internalLocation.id');
-    return groupedBinLocations[data.internalLocation?.id].length === 1;
+    const groupedLotNumbers = _.groupBy(table, 'inventoryItem.lotNumber');
+    return groupedLotNumbers[data.inventoryItem?.lotNumber].length === 1;
   };
 
   const rowValidationSchema = z.object({
@@ -71,69 +135,91 @@ const useCountStep = () => {
         invalid_type_error: translate('react.cycleCount.requiredQuantityCounted', 'Quantity counted is required'),
       })
       .gte(0),
-    expirationDate: z
-      .string()
-      .optional(),
-    lotNumber: z
-      .string()
-      .optional(),
+    inventoryItem: z.object({
+      expirationDate: z
+        .string()
+        .optional(),
+      lotNumber: z
+        .string()
+        .optional(),
+    }).optional(),
     internalLocation: z.object({
       id: z.string(),
-      label: z.string(),
+      name: z.string(),
+      label: z.string().optional(),
     }).optional(),
-  }).refine((data) => !data.lotNumber || data.expirationDate, {
-    path: ['expirationDate'],
-    message: translate('react.cycleCount.requiredExpirationDate', 'Expiration date is required'),
-  }).refine((data) => data.lotNumber || !data.expirationDate, {
-    path: ['lotNumber'],
+  }).refine((data) => data?.inventoryItem?.lotNumber || !data?.inventoryItem?.expirationDate, {
+    path: ['inventoryItem.lotNumber'],
     message: translate('react.cycleCount.requiredLotNumber', 'Lot number is required'),
-  }).refine(checkBinLocationUniqueness, {
-    path: ['internalLocation'],
-    message: translate('react.cycleCount.uniqueInternalLocation', 'Internal location should be unique'),
+  }).refine(checkLotNumberUniqueness, {
+    path: ['inventoryItem.lotNumber'],
+    message: translate('react.cycleCount.uniqueLotNumber', 'Lot number should be unique'),
   });
 
   const rowsValidationSchema = z.array(rowValidationSchema);
 
   const triggerValidation = () => {
-    const errors = rowsValidationSchema.safeParse(tableData.current);
-    const errorsWithIds = tableData.current.reduce((acc, row, index) => ({
-      ...acc,
-      [row.id]: errors?.error?.format()?.[index],
-    }), {});
-    setValidationErrors(errorsWithIds);
-    return errors.success;
+    const errors = tableData.current.reduce((acc, cycleCount) => {
+      const parsedValidation = rowsValidationSchema.safeParse(cycleCount.cycleCountItems);
+      return {
+        ...acc,
+        [cycleCount.id]: {
+          errors: parsedValidation?.error?.format(),
+          success: parsedValidation.success,
+        },
+      };
+    }, {});
+
+    validationErrors.current = errors;
+    return _.every(Object.values(errors), (val) => val.success);
   };
 
   const next = () => {
     const isValid = triggerValidation();
+    forceUpdate();
     if (isValid) {
       // This data should be combined to a single request
       console.log('next: ', tableData.current, countedBy);
     }
   };
 
-  const updateRow = (id, columnId, value) => {
-    tableData.current = (
-      tableData.current.map(
-        (row) => (id === row.id ? { ...row, [columnId]: value } : row),
-      )
+  const updateRow = (cycleCountId, rowId, columnId, value) => {
+    const tableIndex = tableData.current.findIndex(
+      (cycleCount) => cycleCount?.id === cycleCountId,
     );
+    const rowIndex = tableData.current[tableIndex].cycleCountItems.findIndex(
+      (row) => row.id === rowId,
+    );
+    // Nested path in colum names contains "_" instead of "."
+    const nestedPath = columnId.replaceAll('_', '.');
+    _.set(tableData.current, `[${tableIndex}].cycleCountItems[${rowIndex}].${nestedPath}`, value);
   };
 
   const tableMeta = {
-    updateData: (id, columnId, value) => {
-      updateRow(id, columnId, value);
+    updateData: (cycleCountId, rowId, columnId, value) => {
+      updateRow(cycleCountId, rowId, columnId, value);
     },
   };
 
+  const getCountedDate = (cycleCountId) => dateCounted[cycleCountId];
+
+  const setCountedDate = (cycleCountId) => (date) => {
+    setDateCounted({
+      ...date,
+      [cycleCountId]: date,
+    });
+  };
+
   return {
-    dataGroupedByTables,
+    tableData: tableData.current,
     tableMeta,
-    validationErrors,
+    validationErrors: validationErrors.current,
     addEmptyRow,
     removeRow,
     printCountForm,
     assignCountedBy,
+    getCountedDate,
+    setCountedDate,
     next,
   };
 };

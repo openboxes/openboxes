@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
 import { createColumnHelper } from '@tanstack/react-table';
+import _ from 'lodash';
 import { RiDeleteBinLine } from 'react-icons/ri';
 import { useSelector } from 'react-redux';
 import { Tooltip } from 'react-tippy';
@@ -14,7 +15,7 @@ import useTranslate from 'hooks/useTranslate';
 import { fetchBins } from 'utils/option-utils';
 
 // Managing state for single table, mainly table configuration (from count step)
-const useCountStepTable = ({ removeRow, validationErrors }) => {
+const useCountStepTable = ({ cycleCountId, removeRow, validationErrors }) => {
   const columnHelper = createColumnHelper();
   const [binLocations, setBinLocations] = useState([]);
 
@@ -25,17 +26,19 @@ const useCountStepTable = ({ removeRow, validationErrors }) => {
     currentLocation: state.session.currentLocation,
   }));
 
-  useEffect(async () => {
-    const fetchedBins = await fetchBins(currentLocation?.id);
-    setBinLocations(fetchedBins);
+  useEffect(() => {
+    (async () => {
+      const fetchedBins = await fetchBins(currentLocation?.id);
+      setBinLocations(fetchedBins);
+    })();
   }, [currentLocation?.id]);
 
   const getFieldComponent = (fieldName) => {
-    if (fieldName === 'expirationDate') {
+    if (fieldName === 'inventoryItem_expirationDate') {
       return DateField;
     }
 
-    if (fieldName === 'internalLocation') {
+    if (fieldName === 'binLocation') {
       return SelectField;
     }
 
@@ -51,11 +54,12 @@ const useCountStepTable = ({ removeRow, validationErrors }) => {
   };
 
   const getFieldProps = (fieldName) => {
-    if (fieldName === 'internalLocation') {
+    if (fieldName === 'binLocation') {
       return {
+        labelKey: 'name',
         options: binLocations.map((binLocation) => ({
           id: binLocation.id,
-          label: binLocation.name,
+          name: binLocation.name,
         })),
       };
     }
@@ -65,13 +69,13 @@ const useCountStepTable = ({ removeRow, validationErrors }) => {
 
   const defaultColumn = {
     cell: ({
-      getValue, row: { original }, column: { id }, table,
+      getValue, row: { original, index }, column: { id }, table,
     }) => {
       const isFieldEditable = !original.id.includes('newRow') && id !== 'quantityCounted';
       // We shouldn't allow users edit fetched data (only quantity counted is editable)
       if (isFieldEditable) {
         return (
-          <TableCell className="rt-td rt-td-count-step">
+          <TableCell className="rt-td rt-td-count-step static-cell-count-step">
             {getValue()}
           </TableCell>
         );
@@ -80,16 +84,17 @@ const useCountStepTable = ({ removeRow, validationErrors }) => {
       const initialValue = getValue();
       const [value, setValue] = useState(initialValue);
       const isEdited = initialValue !== value;
-      // When the input is blurred, we'll call our table meta's updateData function
+      // When the input is blurred, we'll call the table meta's updateData function
       const onBlur = () => {
         if (isEdited) {
-          table.options.meta?.updateData(original.id, id, value);
+          table.options.meta?.updateData(cycleCountId, original.id, id, value);
         }
       };
 
       // on change function expects e.target.value for text fields,
       // in other cases it expects just the value
       const onChange = (e) => {
+        e?.preventDefault?.();
         setValue(e?.target?.value ?? e);
       };
 
@@ -99,6 +104,9 @@ const useCountStepTable = ({ removeRow, validationErrors }) => {
       const Component = getFieldComponent(id);
       const fieldProps = getFieldProps(id);
 
+      const nestedErrorPath = `${id.replaceAll('_', '.')}._errors`;
+      const error = _.get(validationErrors?.[cycleCountId]?.errors?.[index], nestedErrorPath);
+
       return (
         <TableCell className="rt-td rt-td-count-step pb-0">
           <Component
@@ -107,7 +115,7 @@ const useCountStepTable = ({ removeRow, validationErrors }) => {
             onChange={onChange}
             onBlur={onBlur}
             className="w-75 m-1"
-            errorMessage={!isEdited && validationErrors?.[original?.id]?.[id]?._errors}
+            errorMessage={!isEdited && error}
             {...fieldProps}
           />
         </TableCell>
@@ -116,26 +124,34 @@ const useCountStepTable = ({ removeRow, validationErrors }) => {
   };
 
   const columns = [
-    columnHelper.accessor('internalLocation', {
-      header: () => (
-        <TableHeaderCell>
-          {translate('react.cycleCount.table.binLocation.label', 'Bin Location')}
-        </TableHeaderCell>
-      ),
-    }),
-    columnHelper.accessor('lotNumber', {
+    columnHelper.accessor(
+      (row) => (row?.binLocation?.label ? row?.binLocation : row.binLocation?.name), {
+        id: 'binLocation',
+        header: () => (
+          <TableHeaderCell>
+            {translate('react.cycleCount.table.binLocation.label', 'Bin Location')}
+          </TableHeaderCell>
+        ),
+      },
+    ),
+    columnHelper.accessor('inventoryItem.lotNumber', {
       header: () => (
         <TableHeaderCell>
           {translate('react.cycleCount.table.lotNumber.label', 'Serial / Lot Number')}
         </TableHeaderCell>
       ),
     }),
-    columnHelper.accessor('expirationDate', {
+    columnHelper.accessor('inventoryItem.expirationDate', {
       header: () => (
         <TableHeaderCell>
           {translate('react.cycleCount.table.expirationDate.label', 'Expiration Date')}
         </TableHeaderCell>
       ),
+      meta: {
+        getCellContext: () => ({
+          className: 'split-table-right',
+        }),
+      },
     }),
     columnHelper.accessor('quantityCounted', {
       header: () => (
@@ -166,12 +182,12 @@ const useCountStepTable = ({ removeRow, validationErrors }) => {
               <span className="p-2">
                 {translate('react.default.button.delete.label', 'Delete')}
               </span>
-          )}
+            )}
             disabled={original.id}
           >
             {original.id.includes('newRow') && (
             <RiDeleteBinLine
-              onClick={() => removeRow(original.id)}
+              onClick={() => removeRow(cycleCountId, original.id)}
               size={22}
             />
             )}
