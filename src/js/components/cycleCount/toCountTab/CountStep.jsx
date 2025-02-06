@@ -9,13 +9,15 @@ import 'components/cycleCount/cycleCount.scss';
 
 const CountStep = () => {
   const {
-    dataGroupedByTables,
+    tableData,
     printCountForm,
     next,
     tableMeta,
     addEmptyRow,
     removeRow,
     assignCountedBy,
+    getCountedDate,
+    setCountedDate,
     validationErrors,
   } = useCountStep();
 
@@ -25,15 +27,18 @@ const CountStep = () => {
         printCountForm={printCountForm}
         next={next}
       />
-      {Object.values(dataGroupedByTables)
-        .map((data) => (
+      {tableData
+        .map(({ cycleCountItems, id }) => (
           <CountStepTable
-            product={data[0]?.product}
-            dateCounted={data[0]?.dateCounted}
-            tableData={data}
+            key={id}
+            id={id}
+            product={cycleCountItems[0]?.product}
+            dateCounted={getCountedDate(id)}
+            tableData={cycleCountItems}
             tableMeta={tableMeta}
             addEmptyRow={addEmptyRow}
             removeRow={removeRow}
+            setCountedDate={setCountedDate(id)}
             assignCountedBy={assignCountedBy}
             validationErrors={validationErrors}
           />
