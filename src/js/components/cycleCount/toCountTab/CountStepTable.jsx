@@ -5,6 +5,7 @@ import { Tooltip } from 'react-tippy';
 
 import DataTable from 'components/DataTable/v2/DataTable';
 import Button from 'components/form-elements/Button';
+import DateField from 'components/form-elements/v2/DateField';
 import SelectField from 'components/form-elements/v2/SelectField';
 import useCountStepTable from 'hooks/cycleCount/useCountStepTable';
 import useTranslate from 'hooks/useTranslate';
@@ -12,6 +13,7 @@ import useTranslate from 'hooks/useTranslate';
 import 'components/cycleCount/cycleCount.scss';
 
 const CountStepTable = ({
+  id,
   product,
   dateCounted,
   tableData,
@@ -20,12 +22,14 @@ const CountStepTable = ({
   removeRow,
   assignCountedBy,
   validationErrors,
+  setCountedDate,
 }) => {
   const {
     columns,
     defaultColumn,
     recipients,
   } = useCountStepTable({
+    cycleCountId: id,
     validationErrors,
     removeRow,
   });
@@ -35,18 +39,23 @@ const CountStepTable = ({
   return (
     <div className="list-page-list-section">
       <p className="count-step-title pt-4 pl-4">
-        {product.productCode}
+        {product?.productCode}
         {' '}
-        {product.name}
+        {product?.name}
       </p>
       <div className="pt-3 pl-4 d-flex align-items-center">
-        <p>
-          <span className="count-step-label">
+        <div className="d-flex date-counted-container">
+          <span className="count-step-label count-step-label-date-counted mr-2 mt-2">
             {translate('react.cycleCount.dateCounted.label', 'Date counted')}
           </span>
           {' '}
-          <span className="count-step-date">{dateCounted}</span>
-        </p>
+          <DateField
+            className="date-counted-date-picker date-field-input"
+            onChange={setCountedDate}
+            value={dateCounted}
+
+          />
+        </div>
         <div className="d-flex count-step-select-counted-by ml-5 align-items-center">
           <p className="count-step-label mr-2">
             {translate('react.cycleCount.countedBy.label', 'Counted by')}
@@ -54,7 +63,7 @@ const CountStepTable = ({
           <SelectField
             placeholder="Select"
             options={recipients}
-            onChange={assignCountedBy(product.productCode)}
+            onChange={assignCountedBy(product?.productCode)}
           />
         </div>
       </div>
@@ -81,7 +90,7 @@ const CountStepTable = ({
         )}
         >
           <Button
-            onClick={() => addEmptyRow(product.productCode)}
+            onClick={() => addEmptyRow(product?.productCode, id)}
             label="react.cycleCount.addNewRecord.label"
             defaultLabel="Add new record"
             variant="transparent"
