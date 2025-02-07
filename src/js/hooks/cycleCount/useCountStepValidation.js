@@ -11,13 +11,13 @@ const useCountStepValidation = ({ tableData }) => {
   const translate = useTranslate();
 
   const checkLotNumberUniqueness = (data) => {
-    if (!data?.inventory?.lotNumber) {
-      return true;
-    }
-    const product = tableData.current.find((row) => row?.id === data.id)?.product?.productCode;
-    const table = _.groupBy(tableData.current, 'product.productCode')[product];
-    const groupedLotNumbers = _.groupBy(table, 'inventoryItem.lotNumber');
-    return groupedLotNumbers[data.inventoryItem?.lotNumber].length === 1;
+    const foundCycleCount = tableData.current.find(
+      (cycleCount) => cycleCount.cycleCountItems.find((row) => row.id === data.id),
+    );
+    const groupedLotNumbers = _.groupBy(
+      foundCycleCount.cycleCountItems, 'inventoryItem.lotNumber',
+    );
+    return groupedLotNumbers[data.inventoryItem?.lotNumber]?.length === 1;
   };
 
   const rowValidationSchema = z.object({
@@ -32,10 +32,12 @@ const useCountStepValidation = ({ tableData }) => {
     inventoryItem: z.object({
       expirationDate: z
         .string()
-        .optional(),
+        .optional()
+        .nullable(),
       lotNumber: z
         .string()
-        .optional(),
+        .optional()
+        .nullable(),
     }).optional(),
     internalLocation: z.object({
       id: z.string(),

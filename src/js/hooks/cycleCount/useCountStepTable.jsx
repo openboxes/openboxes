@@ -88,19 +88,22 @@ const useCountStepTable = ({
       // Keep and update the state of the cell
       const columnPath = id.replaceAll('_', '.');
       const initialValue = _.get(tableData, `[${index}].${columnPath}`);
+      const errorMessage = validationErrors?.[cycleCountId]?.errors?.[index]?.[columnPath]?._errors;
+
       const [value, setValue] = useState(initialValue);
+      const [error, setError] = useState(errorMessage);
       const isEdited = initialValue !== value;
       // When the input is blurred, we'll call the table meta's updateData function
       const onBlur = () => {
         if (isEdited) {
           table.options.meta?.updateData(cycleCountId, original.id, id, value);
+          setError(null);
         }
       };
 
       // on change function expects e.target.value for text fields,
       // in other cases it expects just the value
       const onChange = (e) => {
-        e?.preventDefault?.();
         setValue(e?.target?.value ?? e);
       };
 
@@ -110,9 +113,6 @@ const useCountStepTable = ({
       const Component = getFieldComponent(id);
       const fieldProps = getFieldProps(id);
 
-      const nestedErrorPath = `${columnPath}._errors`;
-      const error = _.get(validationErrors?.[cycleCountId]?.errors?.[index], nestedErrorPath);
-
       return (
         <TableCell className="rt-td rt-td-count-step pb-0">
           <Component
@@ -121,7 +121,7 @@ const useCountStepTable = ({
             onChange={onChange}
             onBlur={onBlur}
             className="w-75 m-1"
-            errorMessage={!isEdited && error}
+            errorMessage={error}
             {...fieldProps}
           />
         </TableCell>
