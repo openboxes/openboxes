@@ -71,25 +71,13 @@ class CycleCountService {
             if (command.sort) {
                 getCandidatesSortOrder(command.sort, command.order, delegate, usedAliases)
             }
-            if (!command.status || command.status == CycleCountStatusGroup.NOT_YET_REQUESTED) {
-                isNull("cycleCountRequest")
+            if (!command.statuses) {
+                isNull("status")
             }
             else {
-                createAlias("cycleCountRequest", "cycleCountRequest", JoinType.INNER_JOIN)
-                createAlias("cycleCountRequest.cycleCount", "cycleCount")
-
-                // A special case. Needed because the cycle count might not be created yet.
-                if (command.status == CycleCountStatusGroup.TO_COUNT) {
-                    or {
-                        "in"("cycleCountRequest.status", CycleCountRequestStatus.CREATED)
-                        "in"("cycleCount.status", command.status.statuses)  // FAILS! Cannot resolve the transient
-                    }
-                }
-                else {
-                    "in"("cycleCount.status", command.status.statuses)  // FAILS! Cannot resolve the transient
-                }
+                inList("status", command.statuses.collect { it.name })
             }
-        }
+        } as List<CycleCountCandidate>
     }
 
     private static void getCandidatesSortOrder(String sortBy, String orderDirection, Criteria criteria, Set<String> usedAliases) {
@@ -215,6 +203,7 @@ class CycleCountService {
     CycleCountDto createCycleCount(CycleCountStartCommand request, Location facility) {
         CycleCount newCycleCount = new CycleCount(
                 facility: facility,
+                status: CycleCountStatus.READY_TO_REVIEW,
                 dateLastRefreshed: new Date()
         )
         List<AvailableItem> itemsToSave = determineCycleCountItemsToSave(facility, request.cycleCountRequest.product)
@@ -240,9 +229,14 @@ class CycleCountService {
             if (!cycleCountItem.validate()) {
                 throw new ValidationException("Invalid cycle count item", cycleCountItem.errors)
             }
-            cycleCountItem.save()
             cycleCountItems.add(cycleCountItem)
         }
+        CycleCountItem.saveAll(cycleCountItems)
+
+        // TODO: clean this up!
+        newCycleCount.status = newCycleCount.recomputeStatus(cycleCountItems)
+        newCycleCount.save(failOnError: true)
+
         return CycleCountDto.createFromCycleCountItems(cycleCountItems)
     }
 

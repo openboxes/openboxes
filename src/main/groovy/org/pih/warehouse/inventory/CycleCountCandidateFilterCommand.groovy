@@ -8,7 +8,7 @@ import org.pih.warehouse.product.ProductCatalog
 
 class CycleCountCandidateFilterCommand extends PaginationCommand implements Validateable {
 
-    CycleCountStatusGroup status
+    List<CycleCountCandidateStatus> statuses
 
     String searchTerm
 
@@ -31,7 +31,7 @@ class CycleCountCandidateFilterCommand extends PaginationCommand implements Vali
     String format
 
     static constraints = {
-        status(nullable: true)
+        statuses(nullable: true)
         searchTerm(nullable: true)
         categories(nullable: true)
         internalLocations(nullable: true)

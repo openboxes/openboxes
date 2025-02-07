@@ -18,6 +18,8 @@ class CycleCountCandidate {
 
     String abcClass
 
+    CycleCountCandidateStatus status
+
     Integer inventoryItemCount
 
     String internalLocations
@@ -39,7 +41,6 @@ class CycleCountCandidate {
         table "cycle_count_session"
     }
 
-
     Map toJson() {
         return [
                 product: [
@@ -57,7 +58,8 @@ class CycleCountCandidate {
                 productCatalogs: product.productCatalogs,
                 abcClass: abcClass,
                 quantityOnHand: quantityOnHand,
-                cycleCountRequest: cycleCountRequest
+                cycleCountRequest: cycleCountRequest,
+                status: status.toString(),
         ]
     }
 

@@ -2,11 +2,11 @@ package org.pih.warehouse.inventory
 
 enum CycleCountStatus {
     REQUESTED,
-    REVIEWED,
     COUNTING,
     COUNTED,
     INVESTIGATING,
     READY_TO_REVIEW,
+    REVIEWED,
     COMPLETED,
     CANCELED
 

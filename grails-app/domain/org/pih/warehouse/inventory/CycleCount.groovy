@@ -12,6 +12,8 @@ class CycleCount {
 
     Date dateLastRefreshed
 
+    CycleCountStatus status
+
     Date dateCreated
 
     Date lastUpdated
@@ -39,9 +41,16 @@ class CycleCount {
         return CycleCountItem.findAllByCycleCount(this)
     }
 
-    CycleCountStatus getStatus() {
-        List<CycleCountItem> items = cycleCountItems
-        if (items.every { it.status == CycleCountItemStatus.READY_TO_COUNT }) {
+    /**
+     * Determines what the CycleCountStatus should be for the cycle count.
+     *
+     * We don't need to call this in beforeInsert() or beforeUpdate() because the cycle count's status is determined
+     * entirely by the status of its cycle count items, and so any change to fields in the CycleCount itself won't
+     * actually ever change its status. Instead we make sure to call this method in CycleCountItem.
+     */
+    CycleCountStatus recomputeStatus(List<CycleCountItem> items) {
+//        List<CycleCountItem> items = cycleCountItems
+        if (!items || items.every { it.status == CycleCountItemStatus.READY_TO_COUNT }) {
             return CycleCountStatus.REQUESTED
         }
         if (items.every { it.status == CycleCountItemStatus.REVIEWED }) {

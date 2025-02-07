@@ -10,7 +10,7 @@ import { TableCell } from 'components/DataTable';
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
 import Checkbox from 'components/form-elements/v2/Checkbox';
 import { INVENTORY_ITEM_URL } from 'consts/applicationUrls';
-import CycleCountStatusGroup from 'consts/cycleCountStatusGroup';
+import CycleCountCandidateStatus from 'consts/cycleCountCandidateStatus';
 import useSpinner from 'hooks/useSpinner';
 import useTableCheckboxes from 'hooks/useTableCheckboxes';
 import useTableDataV2 from 'hooks/useTableDataV2';
@@ -48,7 +48,11 @@ const useToCountTab = ({
   const getParams = ({
     sortingParams,
   }) => _.omitBy({
-    status: CycleCountStatusGroup.TO_COUNT,
+    statuses: [
+      CycleCountCandidateStatus.CREATED,
+      CycleCountCandidateStatus.REQUESTED,
+      CycleCountCandidateStatus.COUNTING,
+    ],
     offset: `${offset}`,
     max: `${pageSize}`,
     ...sortingParams,
@@ -130,7 +134,7 @@ const useToCountTab = ({
   });
 
   const columns = useMemo(() => [
-    columnHelper.accessor('cycleCountRequest.cycleCount.status', {
+    columnHelper.accessor('status', {
       header: () => (
         <TableHeaderCell>
           {translate('react.cycleCount.table.status.label', 'Status')}
@@ -140,7 +144,8 @@ const useToCountTab = ({
         <TableCell className="rt-td">
           <StatusIndicator
             variant="danger"
-            status={translate(`react.cycleCount.status.${getValue()}.label`, 'To count')}
+            // TODO: getValue() is giving "Requested" instead of "REQUESTED". Why?
+            status={translate(`react.cycleCount.CycleCountCandidateStatus.${getValue()}.label`, 'To Count')}
           />
         </TableCell>
       ),
