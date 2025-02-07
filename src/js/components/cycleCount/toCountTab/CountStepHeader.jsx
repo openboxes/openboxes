@@ -1,5 +1,6 @@
 import React from 'react';
 
+import PropTypes from 'prop-types';
 import { RiPrinterLine } from 'react-icons/ri';
 
 import Button from 'components/form-elements/Button';
@@ -34,3 +35,8 @@ const CountStepHeader = ({ printCountForm, next }) => (
 );
 
 export default CountStepHeader;
+
+CountStepHeader.propTypes = {
+  printCountForm: PropTypes.func.isRequired,
+  next: PropTypes.func.isRequired,
+};

@@ -22,6 +22,7 @@ const useCountStepTable = ({
   tableData,
 }) => {
   const columnHelper = createColumnHelper();
+  // State for saving data for binLocation dropdown
   const [binLocations, setBinLocations] = useState([]);
 
   const translate = useTranslate();
@@ -38,6 +39,7 @@ const useCountStepTable = ({
     })();
   }, [currentLocation?.id]);
 
+  // Get appropriate input component based on table column
   const getFieldComponent = (fieldName) => {
     if (fieldName === 'inventoryItem_expirationDate') {
       return DateField;
@@ -50,6 +52,8 @@ const useCountStepTable = ({
     return TextInput;
   };
 
+  // Get text input type: quantityCounted expects a number,
+  // the rest of the inputs should be text
   const getFieldType = (fieldName) => {
     if (fieldName === 'quantityCounted') {
       return 'number';
@@ -58,6 +62,7 @@ const useCountStepTable = ({
     return 'text';
   };
 
+  // Get field props, for the binLocation dropdown we have to pass options
   const getFieldProps = (fieldName) => {
     if (fieldName === 'binLocation') {
       return {
@@ -85,13 +90,15 @@ const useCountStepTable = ({
           </TableCell>
         );
       }
-      // Keep and update the state of the cell
+      // Keep and update the state of the cell during rerenders
       const columnPath = id.replaceAll('_', '.');
       const initialValue = _.get(tableData, `[${index}].${columnPath}`);
       const errorMessage = validationErrors?.[cycleCountId]?.errors?.[index]?.[columnPath]?._errors;
 
       const [value, setValue] = useState(initialValue);
       const [error, setError] = useState(errorMessage);
+      // If the value at the end of entering data is the same as it was initially,
+      // we don't want to trigger rerender
       const isEdited = initialValue !== value;
       // When the input is blurred, we'll call the table meta's updateData function
       const onBlur = () => {

@@ -1,5 +1,6 @@
 import React from 'react';
 
+import PropTypes from 'prop-types';
 import { RiAddCircleLine } from 'react-icons/all';
 import { Tooltip } from 'react-tippy';
 
@@ -104,3 +105,23 @@ const CountStepTable = ({
 };
 
 export default CountStepTable;
+
+CountStepTable.propTypes = {
+  id: PropTypes.string.isRequired,
+  product: PropTypes.shape({
+    productCode: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+  }).isRequired,
+  dateCounted: PropTypes.string.isRequired,
+  tableData: PropTypes.arrayOf(
+    PropTypes.shape({}),
+  ).isRequired,
+  tableMeta: PropTypes.shape({
+    updateData: PropTypes.func.isRequired,
+  }).isRequired,
+  addEmptyRow: PropTypes.func.isRequired,
+  removeRow: PropTypes.func.isRequired,
+  assignCountedBy: PropTypes.func.isRequired,
+  validationErrors: PropTypes.shape({}).isRequired,
+  setCountedDate: PropTypes.func.isRequired,
+};

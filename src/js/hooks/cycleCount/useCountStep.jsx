@@ -12,7 +12,9 @@ const useCountStep = () => {
   // Table data is stored using useRef to avoid re-renders onBlur
   // (it removes focus while selecting new fields)
   const tableData = useRef([]);
+  // Saving selected "counted by" option
   const [countedBy, setCountedBy] = useState({});
+  // Saving selected "date counted" option, initially it's the date fetched from API
   const [dateCounted, setDateCounted] = useState({});
 
   const dispatch = useDispatch();
@@ -47,6 +49,7 @@ const useCountStep = () => {
     })();
   }, [cycleCountIds]);
 
+  // Fetching data for "counted by" dropdown
   useEffect(() => {
     if (!users?.length) {
       dispatch(fetchUsers());
@@ -80,7 +83,6 @@ const useCountStep = () => {
 
   const addEmptyRow = (productCode, id) => {
     // ID is needed for updating appropriate row
-    // Product is needed for placing row in appropriate table
     const emptyRow = {
       id: _.uniqueId('newRow'),
       product: {
@@ -124,14 +126,17 @@ const useCountStep = () => {
   };
 
   const updateRow = (cycleCountId, rowId, columnId, value) => {
+    // Find table index, for which the row should be updated
     const tableIndex = tableData.current.findIndex(
       (cycleCount) => cycleCount?.id === cycleCountId,
     );
+    // Find updated row index
     const rowIndex = tableData.current[tableIndex].cycleCountItems.findIndex(
       (row) => row.id === rowId,
     );
     // Nested path in colum names contains "_" instead of "."
     const nestedPath = columnId.replaceAll('_', '.');
+    // Update data for: cycleCount (table) -> cycleCountItem (row) -> column (nestedPath)
     _.set(tableData.current, `[${tableIndex}].cycleCountItems[${rowIndex}].${nestedPath}`, value);
   };
 
