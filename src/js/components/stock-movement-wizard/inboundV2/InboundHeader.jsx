@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import useTranslate from 'hooks/useTranslate';
 import HeaderWrapper from 'wrappers/HeaderWrapper';
 
-const InboundV2Header = ({ title, status }) => {
+const InboundHeader = ({ title, status }) => {
   const translate = useTranslate();
 
   return (
@@ -37,12 +37,12 @@ const InboundV2Header = ({ title, status }) => {
   );
 };
 
-InboundV2Header.defaultProps = {
+InboundHeader.defaultProps = {
   title: undefined,
   status: undefined,
 };
 
-InboundV2Header.propTypes = {
+InboundHeader.propTypes = {
   title: PropTypes.arrayOf(
     PropTypes.shape({
       text: PropTypes.string.isRequired,
@@ -56,4 +56,4 @@ InboundV2Header.propTypes = {
   }),
 };
 
-export default InboundV2Header;
+export default InboundHeader;

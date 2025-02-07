@@ -29,14 +29,17 @@ const useInboundAddItemsColumns = ({
 }) => {
   const columnHelper = createColumnHelper();
   const translate = useTranslate();
+
   const {
     debounceTime,
     minSearchLength,
     users,
+    locale,
   } = useSelector((state) => ({
     debounceTime: state.session.searchConfig.debounceTime,
     minSearchLength: state.session.searchConfig.minSearchLength,
     users: state.users.data,
+    locale: state.session.activeLanguage,
   }));
   const debouncedProductsFetch = debounceProductsFetch(
     debounceTime,
@@ -352,7 +355,14 @@ const useInboundAddItemsColumns = ({
         flexWidth: 0.5,
       },
     }),
-  ], [errors, control]);
+  ], [
+    errors,
+    control,
+    debounceTime,
+    minSearchLength,
+    users,
+    locale,
+  ]);
 
   return { columns };
 };

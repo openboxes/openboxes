@@ -3,7 +3,6 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import _ from 'lodash';
 import moment from 'moment';
-import { confirmAlert } from 'react-confirm-alert';
 import { useForm } from 'react-hook-form';
 import Alert from 'react-s-alert';
 
@@ -16,12 +15,14 @@ import {
 } from 'api/urls';
 import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
 import InboundV2Step from 'consts/InboundV2Step';
+import RequisitionStatus from 'consts/requisitionStatus';
 import { DateFormat } from 'consts/timeFormat';
 import useInboundAddItemsValidation from 'hooks/inboundV2/addItems/useInboundAddItemsValidation';
 import useQueryParams from 'hooks/useQueryParams';
 import useSpinner from 'hooks/useSpinner';
 import useTranslate from 'hooks/useTranslate';
 import apiClient from 'utils/apiClient';
+import confirmationModal from 'utils/confirmationModalUtils';
 
 const useInboundAddItemsForm = ({ next, previous }) => {
   const [loading, setLoading] = useState(false);
@@ -44,7 +45,6 @@ const useInboundAddItemsForm = ({ next, previous }) => {
           recipient: undefined,
         }],
       },
-      newItem: false,
       totalCount: 0,
       isFirstPageLoaded: false,
       isPaginated: true,
@@ -68,40 +68,140 @@ const useInboundAddItemsForm = ({ next, previous }) => {
     resolver: zodResolver(validationSchema),
   });
 
-  const confirmSave = (onConfirm) => {
-    confirmAlert({
-      title: translate('react.stockMovement.message.confirmSave.label', 'Confirm save'),
-      message: translate(
-        'react.stockMovement.confirmSave.message',
-        'Are you sure you want to save? There are some lines with empty or zero quantity, those lines will be deleted.',
-      ),
-      buttons: [
-        {
-          label: translate('react.default.yes.label', 'Yes'),
-          onClick: onConfirm,
+  const confirmAction = (onConfirm, messageId, defaultMessage) => {
+    const modalLabels = {
+      title: {
+        label: 'react.stockMovement.message.confirmSave.label',
+        default: 'Confirm save',
+      },
+      content: {
+        label: messageId,
+        default: defaultMessage,
+      },
+    };
+
+    const modalButtons = (onClose) => [
+      {
+        variant: 'transparent',
+        defaultLabel: 'No',
+        label: 'react.default.no.label',
+        onClick: () => onClose(),
+      },
+      {
+        variant: 'primary',
+        defaultLabel: 'Yes',
+        label: 'react.default.yes.label',
+        onClick: () => {
+          onConfirm();
+          onClose();
         },
-        { label: translate('react.default.no.label', 'No') },
-      ],
+      },
+    ];
+
+    confirmationModal({
+      buttons: modalButtons,
+      ...modalLabels,
     });
   };
 
-  const confirmInventoryItemExpirationDateUpdate = (onConfirm) => {
-    confirmAlert({
-      title: translate('react.stockMovement.message.confirmSave.label', 'Confirm save'),
-      message: translate(
-        'react.stockMovement.confirmExpiryDateUpdate.message',
-        'This will update the expiry date across all depots in the system. Are you sure you want to proceed?',
-      ),
-      buttons: [
-        {
-          label: translate('react.default.yes.label', 'Yes'),
-          onClick: onConfirm,
+  const confirmTransition = (onConfirm, items) => {
+    const modalLabels = {
+      title: {
+        label: 'react.stockMovement.confirmTransition.label',
+        default: 'You have entered the same code twice. Do you want to continue?',
+      },
+      content: {
+        label: '',
+        default: items.map((item) => (
+          <p key={item.sortOrder}>
+            {`${item.product.productCode} ${item.product.displayNames?.default || item.product.name} ${item.quantityRequested}`}
+          </p>
+        )),
+      },
+    };
+
+    const modalButtons = (onClose) => [
+      {
+        variant: 'transparent',
+        defaultLabel: 'No',
+        label: 'react.default.no.label',
+        onClick: () => onClose(),
+      },
+      {
+        variant: 'primary',
+        defaultLabel: 'Yes',
+        label: 'react.default.yes.label',
+        onClick: () => {
+          onConfirm();
+          onClose();
         },
-        {
-          label: translate('react.default.no.label', 'No'),
-        },
-      ],
+      },
+    ];
+
+    confirmationModal({
+      buttons: modalButtons,
+      ...modalLabels,
     });
+  };
+
+  const confirmValidationError = () => {
+    const modalLabels = {
+      title: {
+        label: 'react.stockMovement.confirmPreviousPage.label',
+        default: 'Validation error',
+      },
+      content: {
+        label: 'react.stockMovement.confirmPreviousPage.message.label',
+        default: 'Cannot save due to validation error on page',
+      },
+    };
+
+    const modalButtons = (onClose) => [
+      {
+        variant: 'primary',
+        defaultLabel: 'Correct error',
+        label: 'react.stockMovement.confirmPreviousPage.correctError.label',
+        onClick: () => onClose(),
+      },
+      {
+        variant: 'danger',
+        defaultLabel: 'Continue (lose unsaved work)',
+        label: 'react.stockMovement.confirmPreviousPage.continue.label',
+        onClick: () => {
+          previous();
+          onClose();
+        },
+      },
+    ];
+
+    confirmationModal({
+      buttons: modalButtons,
+      ...modalLabels,
+    });
+  };
+
+  const detectItemChanges = (item, oldItem) => {
+    const comparableKeys = Object.keys(oldItem).filter(
+      (key) => key !== 'product' && key in item,
+    );
+    return comparableKeys.some((key) => !Object.is(item[key], oldItem[key]));
+  };
+
+  const shouldUpdateItem = (item, oldItem) => {
+    const oldQty = Number(oldItem.quantityRequested) || 0;
+    const newQty = Number(item.quantityRequested) || 0;
+
+    return (
+      !detectItemChanges(item, oldItem)
+      || item.palletName !== oldItem.palletName
+      || item.boxName !== oldItem.boxName
+      || item.product.id !== oldItem.product.id
+      || newQty !== oldQty
+      || item.recipient?.id !== oldItem.recipient?.id
+      || item.lotNumber !== oldItem.lotNumber
+      || (item.expirationDate
+        && item.inventoryItem.expirationDate !== item.expirationDate)
+    );
   };
 
   const getLineItemsToBeSaved = (lineItems) => {
@@ -109,39 +209,12 @@ const useInboundAddItemsForm = ({ next, previous }) => {
       (item) => !item.statusCode && item.quantityRequested && item.quantityRequested !== '0' && item.product,
     );
 
-    const lineItemsWithStatus = lineItems.filter((item) => item.statusCode);
-    const lineItemsToBeUpdated = [];
-
-    lineItemsWithStatus.forEach((item) => {
-      const oldItem = getValues()
-        .currentLineItems
-        .find((old) => old.id === item.id);
-      if (!oldItem) return;
-
-      const oldQty = Number(oldItem.quantityRequested) || 0;
-      const newQty = Number(item.quantityRequested) || 0;
-      const oldRecipient = oldItem.recipient?.id ?? oldItem.recipient;
-      const newRecipient = item.recipient?.id ?? item.recipient;
-
-      const keyIntersection = Object.keys(oldItem).filter((key) => key !== 'product' && key in item);
-
-      const hasChanges = keyIntersection.some((key) => !Object.is(item[key], oldItem[key]));
-      if (
-        !hasChanges
-        || item.palletName !== oldItem.palletName
-        || item.boxName !== oldItem.boxName
-        || item.product.id !== oldItem.product.id
-        || newQty !== oldQty
-        || newRecipient !== oldRecipient
-        || item.lotNumber !== oldItem.lotNumber
-      ) {
-        lineItemsToBeUpdated.push(item);
-      } else if (item.expirationDate
-        && item.inventoryItem.expirationDate !== item.expirationDate
-      ) {
-        lineItemsToBeUpdated.push(item);
-      }
-    });
+    const lineItemsToBeUpdated = lineItems
+      .filter((item) => item.statusCode)
+      .filter((item) => {
+        const oldItem = getValues().currentLineItems.find((old) => old.id === item.id);
+        return oldItem && shouldUpdateItem(item, oldItem);
+      });
 
     const formatItem = (item) => ({
       id: item.id,
@@ -155,30 +228,7 @@ const useInboundAddItemsForm = ({ next, previous }) => {
       sortOrder: item.sortOrder,
     });
 
-    return [
-      ...lineItemsToBeAdded.map(formatItem),
-      ...lineItemsToBeUpdated.map(formatItem),
-    ];
-  };
-
-  const confirmTransition = (onConfirm, items) => {
-    confirmAlert({
-      title: translate('react.stockMovement.confirmTransition.label', 'You have entered the same code twice. Do you want to continue?'),
-      message: items.map((item) => (
-        <p key={item.sortOrder}>
-          {`${item.product.productCode} ${item.product.displayNames?.default || item.product.name} ${item.quantityRequested}`}
-        </p>
-      )),
-      buttons: [
-        {
-          label: translate('react.default.yes.label', 'Yes'),
-          onClick: onConfirm,
-        },
-        {
-          label: translate('react.default.no.label', 'No'),
-        },
-      ],
-    });
+    return [...lineItemsToBeAdded.map(formatItem), ...lineItemsToBeUpdated.map(formatItem)];
   };
 
   const transformLineItem = (item) => ({
@@ -211,7 +261,6 @@ const useInboundAddItemsForm = ({ next, previous }) => {
         id: queryParams.id,
         lineItems: itemsToSave,
       };
-
       try {
         spinner.show();
         const resp = await apiClient.post(STOCK_MOVEMENT_UPDATE_ITEMS(queryParams.id), payload);
@@ -232,20 +281,10 @@ const useInboundAddItemsForm = ({ next, previous }) => {
   const transitionToNextStep = async (formValues) => {
     try {
       spinner.show();
-      const payload = { status: 'CHECKING' };
-      if (formValues.values.statusCode === 'CREATED') {
+      const payload = { status: RequisitionStatus.CHECKING };
+      if (formValues.values.statusCode === RequisitionStatus.CREATED) {
         await apiClient.post(STOCK_MOVEMENT_UPDATE_STATUS(queryParams.id), payload);
       }
-      return Promise.resolve();
-    } finally {
-      spinner.hide();
-    }
-  };
-
-  const transitionToNextStepAndChangePage = async (formValues) => {
-    try {
-      spinner.show();
-      await transitionToNextStep(formValues);
       next();
     } finally {
       spinner.hide();
@@ -261,56 +300,68 @@ const useInboundAddItemsForm = ({ next, previous }) => {
     try {
       spinner.show();
       await apiClient.post(STOCK_MOVEMENT_UPDATE_INVENTORY_ITEMS(queryParams.id), payload);
-      transitionToNextStepAndChangePage(formValues);
+      transitionToNextStep(formValues);
     } finally {
       spinner.hide();
+    }
+  };
+
+  const handleExpirationDateMismatch = (updatedValues, lineItems, hasNonZeroQuantity) => {
+    if (hasNonZeroQuantity) {
+      confirmAction(
+        () => updateInventoryItemsAndTransitionToNextStep(updatedValues, lineItems),
+        'react.stockMovement.confirmExpiryDateUpdate.message',
+        'This will update the expiry date across all depots in the system. Are you sure you want to proceed?',
+      );
+    } else {
+      updateInventoryItemsAndTransitionToNextStep(updatedValues, lineItems);
+    }
+  };
+
+  const handleTransition = (updatedValues, lineItems) => {
+    const updatedLineItems = updatedValues.lineItems;
+
+    const hasExpirationDateMismatch = updatedLineItems?.some(
+      (item) => item.inventoryItem && item.expirationDate !== item.inventoryItem.expirationDate,
+    );
+
+    const hasNonZeroQuantity = updatedLineItems?.some(
+      (item) => item.inventoryItem?.quantity && item.inventoryItem.quantity !== '0',
+    );
+
+    if (hasExpirationDateMismatch) {
+      handleExpirationDateMismatch(updatedValues, lineItems, hasNonZeroQuantity);
+    } else {
+      transitionToNextStep(updatedValues);
     }
   };
 
   const saveAndTransitionToNextStep = async (values, lineItems) => {
     try {
       spinner.show();
-
       const resp = await saveRequisitionItemsInCurrentStep(lineItems);
-      const updatedValues = resp ? {
-        ...values,
-        lineItems: resp.data.data.lineItems,
-      } : values;
-      const updatedLineItems = updatedValues.lineItems;
+      const updatedValues = resp
+        ? { ...values, lineItems: resp.data.data.lineItems }
+        : values;
 
-      const hasExpirationDateMismatch = updatedLineItems?.some((item) =>
-        item.inventoryItem && item.expirationDate !== item.inventoryItem.expirationDate);
-
-      const hasNonZeroQuantity = updatedLineItems?.some((item) =>
-        item.inventoryItem?.quantity && item.inventoryItem.quantity !== '0');
-
-      if (hasExpirationDateMismatch) {
-        if (hasNonZeroQuantity) {
-          confirmInventoryItemExpirationDateUpdate(() =>
-            updateInventoryItemsAndTransitionToNextStep(updatedValues, lineItems));
-        } else {
-          updateInventoryItemsAndTransitionToNextStep(updatedValues, lineItems);
-        }
-      } else {
-        transitionToNextStepAndChangePage(updatedValues);
-      }
+      handleTransition(updatedValues, lineItems);
     } finally {
       spinner.hide();
     }
   };
 
+  const getItemsMapByProductCode = (lineItems) => lineItems.reduce((acc, item) => {
+    const { productCode } = item.product;
+    acc[productCode] = acc[productCode] || [];
+    acc[productCode].push(item);
+    return acc;
+  }, {});
+
   const checkDuplicatesSaveAndTransitionToNextStep = (formValues, lineItems) => {
-    const itemsMap = lineItems.reduce((acc, item) => {
-      const { productCode } = item.product;
-      if (!acc[productCode]) {
-        acc[productCode] = [];
-      }
-      acc[productCode].push(item);
-      return acc;
-    }, {});
-    const itemsWithSameCode = Object.values(itemsMap)
-      .filter((item) => item.length > 1);
-    const itemsWithSameCodeFlattened = itemsWithSameCode.flat();
+    const itemsMap = getItemsMapByProductCode(lineItems);
+
+    const itemsWithSameCodeFlattened = Object.values(itemsMap)
+      .filter((item) => item.length > 1).flat();
     if (Object.values(itemsMap)
       .some((item) => item.length > 1) && !(formValues.values.origin.locationType.locationTypeCode === 'SUPPLIER'
       || !formValues.values.hasManageInventory)) {
@@ -323,25 +374,28 @@ const useInboundAddItemsForm = ({ next, previous }) => {
     }
   };
 
+  const checkInvalidQuantities = (lineItems) =>
+    lineItems.some((item) => !item.quantityRequested || item.quantityRequested === '0');
+
   const nextPage = async () => {
-    trigger();
-    if (isValid) {
-      const formValues = getValues();
-      const lineItems = formValues.values.lineItems
-        .filter((item) => item?.product)
-        .map((item) => ({
-          ...item,
-          expirationDate: item.expirationDate ? moment(item.expirationDate)
-            .format(DateFormat.MM_DD_YYYY) : null,
-        }));
+    const formValues = getValues();
+    const lineItems = formValues.values.lineItems
+      .filter((item) => item?.product)
+      .map((item) => ({
+        ...item,
+        expirationDate: item.expirationDate ? moment(item.expirationDate)
+          .format(DateFormat.MM_DD_YYYY) : null,
+      }));
+    const hasInvalidQuantity = checkInvalidQuantities(lineItems);
 
-      const hasInvalidQuantity = lineItems.some((item) => !item.quantityRequested || item.quantityRequested === '0');
-
-      if (hasInvalidQuantity) {
-        await confirmSave(() => checkDuplicatesSaveAndTransitionToNextStep(formValues, lineItems));
-      } else {
-        await checkDuplicatesSaveAndTransitionToNextStep(formValues, lineItems);
-      }
+    if (hasInvalidQuantity) {
+      confirmAction(
+        () => checkDuplicatesSaveAndTransitionToNextStep(formValues, lineItems),
+        'react.stockMovement.confirmSave.message',
+        'Are you sure you want to save? There are some lines with empty or zero quantity, those lines will be deleted.',
+      );
+    } else {
+      await checkDuplicatesSaveAndTransitionToNextStep(formValues, lineItems);
     }
   };
 
@@ -359,17 +413,21 @@ const useInboundAddItemsForm = ({ next, previous }) => {
     }
   };
 
+  const getFilteredLineItems = (formValues) =>
+    formValues.values.lineItems.filter((item) => Object.keys(item).length > 0);
+
   const save = () => {
     trigger();
     if (isValid) {
-      const lineItems = getValues()
-        .values
-        .lineItems
-        .filter((item) => Object.keys(item).length > 0);
-      const hasInvalidQuantity = lineItems.some((item) => !item.quantityRequested || item.quantityRequested === '0');
+      const lineItems = getFilteredLineItems(getValues());
+      const hasInvalidQuantity = checkInvalidQuantities(lineItems);
 
       if (hasInvalidQuantity) {
-        confirmSave(() => saveItems(lineItems));
+        confirmAction(
+          () => saveItems(lineItems),
+          'react.stockMovement.confirmSave.message',
+          'Are you sure you want to save? There are some lines with empty or zero quantity, those lines will be deleted.',
+        );
       } else {
         saveItems(lineItems);
       }
@@ -377,28 +435,16 @@ const useInboundAddItemsForm = ({ next, previous }) => {
   };
 
   const saveAndExit = async () => {
-    const formValues = getValues();
-    const lineItems = formValues.values.lineItems.filter((item) => Object.keys(item).length > 0);
+    const lineItems = getFilteredLineItems(getValues());
 
     if (!isValid) {
-      confirmAlert({
-        title: translate('react.stockMovement.confirmExit.label', 'Confirm save'),
-        message: translate(
-          'react.stockMovement.confirmExit.message',
-          'Validation errors occurred. Are you sure you want to exit and lose unsaved data?',
-        ),
-        buttons: [
-          {
-            label: translate('react.default.yes.label', 'Yes'),
-            onClick: () => {
-              window.location = STOCK_MOVEMENT_URL.show(queryParams.id);
-            },
-          },
-          {
-            label: translate('react.default.no.label', 'No'),
-          },
-        ],
-      });
+      confirmAction(
+        () => {
+          window.location = STOCK_MOVEMENT_URL.show(queryParams.id);
+        },
+        'react.stockMovement.confirmExpiryDateUpdate.message',
+        'This will update the expiry date across all depots in the system. Are you sure you want to proceed? ',
+      );
       return;
     }
 
@@ -449,10 +495,6 @@ const useInboundAddItemsForm = ({ next, previous }) => {
     const newSortOrder = (lineItemsData.length > 0
       ? lineItemsData[lineItemsData.length - 1].sortOrder : 0) + 100;
     setValue('sortOrder', newSortOrder);
-    // eslint-disable-next-line max-len
-    // setValue('currentLineItems', getValues().isPaginated ? [...getValues('currentLineItems'), ...data] : data);
-    // eslint-disable-next-line max-len
-    // setValue('values.lineItems', getValues().isPaginated ? [...getValues('values.lineItems'), ...lineItemsData] : lineItemsData);
     setValue('currentLineItems', getValues().isPaginated ? _.uniqBy(_.concat(data, ...getValues('currentLineItems')), 'id') : data);
     setValue('values.lineItems', getValues().isPaginated ? _.uniqBy(_.concat(lineItemsData, ...getValues('values.lineItems')), 'id') : lineItemsData);
 
@@ -494,19 +536,7 @@ const useInboundAddItemsForm = ({ next, previous }) => {
         spinner.hide();
       }
     } else {
-      confirmAlert({
-        title: translate('react.stockMovement.confirmPreviousPage.label', 'Validation error'),
-        message: translate('react.stockMovement.confirmPreviousPage.message.label', 'Cannot save due to validation error on page'),
-        buttons: [
-          {
-            label: translate('react.stockMovement.confirmPreviousPage.correctError.label', 'Correct error'),
-          },
-          {
-            label: translate('react.stockMovement.confirmPreviousPage.continue.label', 'Continue (lose unsaved work)'),
-            onClick: () => previous(),
-          },
-        ],
-      });
+      confirmValidationError();
     }
   };
 

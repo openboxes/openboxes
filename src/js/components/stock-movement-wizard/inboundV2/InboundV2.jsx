@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 
 import { useSelector } from 'react-redux';
 
-import InboundV2Header from 'components/stock-movement-wizard/inboundV2/InboundV2Header';
+import InboundHeader from 'components/stock-movement-wizard/inboundV2/InboundHeader';
 import InboundV2AddItems
   from 'components/stock-movement-wizard/inboundV2/sections/InboundV2AddItems';
 import InboundV2Create from 'components/stock-movement-wizard/inboundV2/sections/InboundV2Create';
@@ -102,7 +102,7 @@ const InboundV2 = () => {
   const addItemsComponentProps = {
     control: addItemsControl,
     handleSubmit: addItemsHandleSubmit,
-    errors: addItemsErrors?.values?.lineItems ? addItemsErrors.values.lineItems : [],
+    errors: addItemsErrors?.values?.lineItems?.length ? addItemsErrors.values.lineItems : [],
     isValid: addItemsIsValid,
     trigger: addItemsTrigger,
     getValues: addItemsGetValues,
@@ -129,7 +129,7 @@ const InboundV2 = () => {
   return (
     <PageWrapper>
       <WizardStepsV2 steps={stepsTitles} currentStepKey={Step.key} />
-      <InboundV2Header
+      <InboundHeader
         title={headerTitle}
         status={headerStatus}
       />
@@ -137,7 +137,7 @@ const InboundV2 = () => {
         {is(inboundV2Step.CREATE) && (<Step.Component {...createComponentProps} />)}
       </form>
 
-      <form>
+      <form onSubmit={addItemsHandleSubmit(nextPage)}>
         {is(inboundV2Step.ADD_ITEMS) && (<Step.Component {...addItemsComponentProps} />)}
       </form>
       {is(inboundV2Step.SEND) && (<Step.Component {...sendComponentProps} />)}

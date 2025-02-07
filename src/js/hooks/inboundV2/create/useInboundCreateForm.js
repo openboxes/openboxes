@@ -126,8 +126,10 @@ const useInboundCreateForm = ({ next }) => {
     }
   }, [origin?.id, destination?.id]);
 
-  const fetchAddItemsPageData = async () => {
-    if (!queryParams.id) return;
+  const fetchData = async () => {
+    if (!queryParams.id) {
+      return;
+    }
     spinner.show();
     try {
       const response = await apiClient.get(STOCK_MOVEMENT_BY_ID(queryParams.id));
@@ -153,7 +155,7 @@ const useInboundCreateForm = ({ next }) => {
 
   useEffect(() => {
     if (queryParams.step !== InboundV2Step.ADD_ITEMS && queryParams.step !== InboundV2Step.SEND) {
-      fetchAddItemsPageData();
+      fetchData();
     }
   }, [queryParams.step]);
   return {
