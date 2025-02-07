@@ -25,7 +25,6 @@ const SelectField = ({
   productSelect,
   hasErrors,
   className,
-  noWrapper,
   ...fieldProps
 }) => {
   const [value, setValue] = useState(defaultValue);
@@ -54,7 +53,6 @@ const SelectField = ({
       className="select-wrapper-container"
     >
       <SelectComponent
-        autosize
         className={`form-element-select ${className} ${errorMessage || hasErrors ? 'has-errors' : ''}`}
         disabled={disabled}
         placeholder={placeholder}
@@ -111,7 +109,6 @@ SelectField.propTypes = {
   // indicator whether field should be marked as invalid
   hasErrors: PropTypes.bool,
   className: PropTypes.string,
-  noWrapper: PropTypes.bool,
 };
 
 SelectField.defaultProps = {
@@ -130,6 +127,5 @@ SelectField.defaultProps = {
   onChange: () => {},
   productSelect: false,
   hasErrors: false,
-  noWrapper: false,
   className: '',
 };
