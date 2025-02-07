@@ -15,7 +15,12 @@ import useTranslate from 'hooks/useTranslate';
 import { fetchBins } from 'utils/option-utils';
 
 // Managing state for single table, mainly table configuration (from count step)
-const useCountStepTable = ({ cycleCountId, removeRow, validationErrors }) => {
+const useCountStepTable = ({
+  cycleCountId,
+  removeRow,
+  validationErrors,
+  tableData,
+}) => {
   const columnHelper = createColumnHelper();
   const [binLocations, setBinLocations] = useState([]);
 
@@ -81,7 +86,8 @@ const useCountStepTable = ({ cycleCountId, removeRow, validationErrors }) => {
         );
       }
       // Keep and update the state of the cell
-      const initialValue = getValue();
+      const columnPath = id.replaceAll('_', '.');
+      const initialValue = _.get(tableData, `[${index}].${columnPath}`);
       const [value, setValue] = useState(initialValue);
       const isEdited = initialValue !== value;
       // When the input is blurred, we'll call the table meta's updateData function
@@ -104,7 +110,7 @@ const useCountStepTable = ({ cycleCountId, removeRow, validationErrors }) => {
       const Component = getFieldComponent(id);
       const fieldProps = getFieldProps(id);
 
-      const nestedErrorPath = `${id.replaceAll('_', '.')}._errors`;
+      const nestedErrorPath = `${columnPath}._errors`;
       const error = _.get(validationErrors?.[cycleCountId]?.errors?.[index], nestedErrorPath);
 
       return (

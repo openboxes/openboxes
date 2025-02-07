@@ -30,6 +30,7 @@ const CountStepTable = ({
     recipients,
   } = useCountStepTable({
     cycleCountId: id,
+    tableData,
     validationErrors,
     removeRow,
   });
