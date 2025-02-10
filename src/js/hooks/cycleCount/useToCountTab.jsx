@@ -2,14 +2,15 @@ import React, { useMemo } from 'react';
 
 import { createColumnHelper } from '@tanstack/react-table';
 import _ from 'lodash';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 
-import cycleCountApi from 'api/services/CycleCountApi';
+import { startCount } from 'actions';
 import { CYCLE_COUNT_CANDIDATES } from 'api/urls';
 import { TableCell } from 'components/DataTable';
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
 import Checkbox from 'components/form-elements/v2/Checkbox';
-import { INVENTORY_ITEM_URL } from 'consts/applicationUrls';
+import { CYCLE_COUNT, INVENTORY_ITEM_URL } from 'consts/applicationUrls';
 import CycleCountStatus from 'consts/cycleCountStatus';
 import useSpinner from 'hooks/useSpinner';
 import useTableCheckboxes from 'hooks/useTableCheckboxes';
@@ -29,11 +30,14 @@ const useToCountTab = ({
   const columnHelper = createColumnHelper();
   const translate = useTranslate();
   const spinner = useSpinner();
+  const history = useHistory();
 
   const { currentLocale, currentLocation } = useSelector((state) => ({
     currentLocale: state.session.activeLanguage,
     currentLocation: state.session.currentLocation,
   }));
+
+  const dispatch = useDispatch();
 
   const {
     dateLastCount,
@@ -289,7 +293,7 @@ const useToCountTab = ({
     console.log('print count form pressed');
   };
 
-  const startCount = async () => {
+  const moveToCounting = async () => {
     const payload = {
       requests: checkedCheckboxes.map((cycleCountRequestId) => ({
         cycleCountRequest: cycleCountRequestId,
@@ -298,8 +302,8 @@ const useToCountTab = ({
     };
     spinner.show();
     try {
-      // Mocked request for start counting
-      await cycleCountApi.startCount(payload, currentLocation?.id);
+      dispatch(startCount(payload, currentLocation?.id));
+      history.push(CYCLE_COUNT.countStep());
     } finally {
       spinner.hide();
     }
@@ -312,7 +316,7 @@ const useToCountTab = ({
     emptyTableMessage,
     exportTableData,
     selectedCheckboxesAmount,
-    startCount,
+    moveToCounting,
     printCountForm,
   };
 };

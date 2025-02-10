@@ -39,7 +39,7 @@ const DataTableBody = ({
               .map((cell) => {
                 const className = cell.column.columnDef?.meta?.getCellContext?.()?.className;
                 return (
-                  <div className={`w-100 d-flex ${className}`} key={cell.id}>
+                  <div className={`w-100 d-flex cell-inner-wrapper ${className}`} key={cell.id}>
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </div>
                 );

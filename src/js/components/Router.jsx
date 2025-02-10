@@ -178,6 +178,11 @@ const AsyncCycleCount = Loadable({
   loading: Loading,
 });
 
+const AsyncCycleCountCountStep = Loadable({
+  loader: () => import('components/cycleCount/toCountTab/CountStep'),
+  loading: Loading,
+});
+
 const StockMovementList = (props) => {
   const parsedSearchQuery = queryString.parse(props?.location?.search);
   const direction = parsedSearchQuery?.direction?.toUpperCase();
@@ -218,6 +223,7 @@ const Router = (props) => {
             <MainLayoutRoute path="**/stockMovement/list" component={StockMovementList} />
             <MainLayoutRoute path="**/stockMovement/createOutbound/:stockMovementId?" component={AsyncStockMovement} />
             <MainLayoutRoute path="**/stockMovement/importOutboundStockMovement" component={AsyncOutboundImport} />
+            <MainLayoutRoute path="**/inventory/cycleCount/count" component={AsyncCycleCountCountStep} />
             <MainLayoutRoute path="**/inventory/cycleCount" component={AsyncCycleCount} />
             <MainLayoutRoute path="**/stockMovement/createInbound/:stockMovementId?" component={AsyncStockMovementInbound} />
             <MainLayoutRoute path="**/stockMovement/createCombinedShipments/:stockMovementId?" component={AsyncStockMovementCombinedShipments} />

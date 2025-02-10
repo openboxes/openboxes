@@ -53,7 +53,7 @@ const SelectField = ({
       className="select-wrapper-container"
     >
       <SelectComponent
-        className={`form-element-select ${className} ${hasErrors ? 'has-errors' : ''}`}
+        className={`form-element-select ${className} ${errorMessage || hasErrors ? 'has-errors' : ''}`}
         disabled={disabled}
         placeholder={placeholder}
         value={value}

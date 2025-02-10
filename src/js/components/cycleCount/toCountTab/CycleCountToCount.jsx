@@ -30,7 +30,7 @@ const CycleCountToCount = ({ filterParams }) => {
     emptyTableMessage,
     exportTableData,
     selectedCheckboxesAmount,
-    startCount,
+    moveToCounting,
     printCountForm,
   } = useToCountTab({
     filterParams,
@@ -53,7 +53,7 @@ const CycleCountToCount = ({ filterParams }) => {
         </span>
         <div className="d-flex m-2 gap-8">
           <Button
-            onClick={startCount}
+            onClick={moveToCounting}
             label="react.cycleCount.table.startCount.label"
             defaultLabel="Start count"
             variant="primary-outline"

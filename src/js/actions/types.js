@@ -67,3 +67,6 @@ export const FETCH_RATING_TYPE_OPTIONS = 'FETCH_RATING_TYPE_OPTIONS';
 
 // Outbound import
 export const SET_SCROLL_TO_BOTTOM = 'SET_SCROLL_TO_BOTTOM';
+
+// Cycle count
+export const START_COUNT = 'START_COUNT';
