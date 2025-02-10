@@ -75,7 +75,7 @@ class CycleCountService {
                 isNull("status")
             }
             else {
-                inList("status", command.statuses.collect { it.name })
+                inList("status", command.statuses)
             }
         } as List<CycleCountCandidate>
     }

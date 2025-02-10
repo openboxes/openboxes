@@ -1,25 +1,26 @@
 package org.pih.warehouse.inventory
 
-// TODO: document!
+/**
+ * Enumerates the possible statuses of a cycle count candidate.
+ *
+ * Because a candidate can have all the statuses of the cycle count request and of a cycle count, this is simply
+ * a copy of both those enums values.
+ */
 enum CycleCountCandidateStatus {
-    CREATED('CREATED'),
+    // Cycle Count Request statuses
+    CREATED,
 
-    REQUESTED('REQUESTED'),
-    COUNTING('COUNTING'),
-    COUNTED('COUNTED'),
-    INVESTIGATING('INVESTIGATING'),
-    READY_TO_REVIEW('READY_TO_REVIEW'),
-    REVIEWED('REVIEWED'),
-    COMPLETED('COMPLETED'),
-    CANCELED('CANCELED')
-
-    String name
-
-    CycleCountCandidateStatus(String name) {
-        this.name = name
-    }
+    // Cycle Count statuses (some are the same as Cycle Count Request statuses)
+    REQUESTED,
+    COUNTING,
+    COUNTED,
+    INVESTIGATING,
+    READY_TO_REVIEW,
+    REVIEWED,
+    COMPLETED,
+    CANCELED
 
     String toString() {
-        name
+        name()
     }
 }

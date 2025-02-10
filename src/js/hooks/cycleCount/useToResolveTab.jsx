@@ -143,7 +143,6 @@ const useToResolveTab = ({
         <TableCell className="rt-td">
           <StatusIndicator
             variant="primary"
-            // TODO: getValue() is giving "Counted" instead of "COUNTED". Why?
             status={translate(`react.cycleCount.CycleCountCandidateStatus.${getValue()}.label`, 'To Resolve')}
           />
         </TableCell>

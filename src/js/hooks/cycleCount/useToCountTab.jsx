@@ -144,7 +144,6 @@ const useToCountTab = ({
         <TableCell className="rt-td">
           <StatusIndicator
             variant="danger"
-            // TODO: getValue() is giving "Requested" instead of "REQUESTED". Why?
             status={translate(`react.cycleCount.CycleCountCandidateStatus.${getValue()}.label`, 'To Count')}
           />
         </TableCell>
