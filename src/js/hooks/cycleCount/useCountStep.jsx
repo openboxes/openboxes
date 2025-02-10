@@ -30,7 +30,7 @@ const useCountStep = () => {
     users,
   } = useSelector((state) => ({
     users: state.users.data,
-    cycleCountIds: state.cycleCount.toCount,
+    cycleCountIds: state.cycleCount.requests,
     currentLocation: state.session.currentLocation,
   }));
 

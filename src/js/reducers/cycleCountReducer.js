@@ -1,7 +1,7 @@
 import { START_COUNT } from 'actions/types';
 
 const initialState = {
-  toCount: [],
+  requests: [],
 };
 
 export default function cycleCountReducer(state = initialState, action) {
@@ -9,7 +9,7 @@ export default function cycleCountReducer(state = initialState, action) {
     case START_COUNT:
       return {
         ...state,
-        toCount: action.payload,
+        requests: action.payload,
       };
     default:
       return state;
