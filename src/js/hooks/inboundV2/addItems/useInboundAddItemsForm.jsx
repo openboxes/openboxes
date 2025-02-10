@@ -24,7 +24,10 @@ import useTranslate from 'hooks/useTranslate';
 import apiClient from 'utils/apiClient';
 import confirmationModal from 'utils/confirmationModalUtils';
 
-const useInboundAddItemsForm = ({ next, previous }) => {
+const useInboundAddItemsForm = ({
+  next,
+  previous,
+}) => {
   const [loading, setLoading] = useState(false);
   const spinner = useSpinner();
   const { validationSchema } = useInboundAddItemsValidation();
@@ -180,19 +183,14 @@ const useInboundAddItemsForm = ({ next, previous }) => {
     });
   };
 
-  const detectItemChanges = (item, oldItem) => {
-    const comparableKeys = Object.keys(oldItem).filter(
-      (key) => key !== 'product' && key in item,
-    );
-    return comparableKeys.some((key) => !Object.is(item[key], oldItem[key]));
-  };
+  const isItemUpdated = (item, oldItem) => !_.isEqual(_.omit(item, ['product']), _.omit(oldItem, ['product']));
 
   const shouldUpdateItem = (item, oldItem) => {
     const oldQty = Number(oldItem.quantityRequested) || 0;
     const newQty = Number(item.quantityRequested) || 0;
 
     return (
-      !detectItemChanges(item, oldItem)
+      !isItemUpdated(item, oldItem)
       || item.palletName !== oldItem.palletName
       || item.boxName !== oldItem.boxName
       || item.product.id !== oldItem.product.id
@@ -209,12 +207,9 @@ const useInboundAddItemsForm = ({ next, previous }) => {
       (item) => !item.statusCode && item.quantityRequested && item.quantityRequested !== '0' && item.product,
     );
 
-    const lineItemsToBeUpdated = lineItems
-      .filter((item) => item.statusCode)
-      .filter((item) => {
-        const oldItem = getValues().currentLineItems.find((old) => old.id === item.id);
-        return oldItem && shouldUpdateItem(item, oldItem);
-      });
+    const lineItemsToBeUpdated = lineItems.filter((item) => item.statusCode
+      && getValues().currentLineItems.some((old) =>
+        old.id === item.id && shouldUpdateItem(item, old)));
 
     const formatItem = (item) => ({
       id: item.id,
@@ -251,11 +246,12 @@ const useInboundAddItemsForm = ({ next, previous }) => {
   });
 
   const saveRequisitionItemsInCurrentStep = async (itemCandidatesToSave) => {
-    const itemsToSave = getLineItemsToBeSaved(itemCandidatesToSave).map((item) => ({
-      ...item,
-      expirationDate: item.expirationDate ? moment(item.expirationDate)
-        .format(DateFormat.MM_DD_YYYY) : null,
-    }));
+    const itemsToSave = getLineItemsToBeSaved(itemCandidatesToSave)
+      .map((item) => ({
+        ...item,
+        expirationDate: item.expirationDate ? moment(item.expirationDate)
+          .format(DateFormat.MM_DD_YYYY) : null,
+      }));
     if (itemsToSave.length) {
       const payload = {
         id: queryParams.id,
@@ -341,7 +337,10 @@ const useInboundAddItemsForm = ({ next, previous }) => {
       spinner.show();
       const resp = await saveRequisitionItemsInCurrentStep(lineItems);
       const updatedValues = resp
-        ? { ...values, lineItems: resp.data.data.lineItems }
+        ? {
+          ...values,
+          lineItems: resp.data.data.lineItems,
+        }
         : values;
 
       handleTransition(updatedValues, lineItems);
@@ -350,18 +349,21 @@ const useInboundAddItemsForm = ({ next, previous }) => {
     }
   };
 
-  const getItemsMapByProductCode = (lineItems) => lineItems.reduce((acc, item) => {
-    const { productCode } = item.product;
-    acc[productCode] = acc[productCode] || [];
-    acc[productCode].push(item);
-    return acc;
-  }, {});
+  const getItemsMapByProductCode = (lineItems) =>
+    lineItems.reduce((acc, item) => {
+      const { productCode } = item.product;
+      return {
+        ...acc,
+        [productCode]: [...(acc[productCode] || []), item],
+      };
+    }, {});
 
   const checkDuplicatesSaveAndTransitionToNextStep = (formValues, lineItems) => {
     const itemsMap = getItemsMapByProductCode(lineItems);
 
     const itemsWithSameCodeFlattened = Object.values(itemsMap)
-      .filter((item) => item.length > 1).flat();
+      .filter((item) => item.length > 1)
+      .flat();
     if (Object.values(itemsMap)
       .some((item) => item.length > 1) && !(formValues.values.origin.locationType.locationTypeCode === 'SUPPLIER'
       || !formValues.values.hasManageInventory)) {
@@ -518,7 +520,10 @@ const useInboundAddItemsForm = ({ next, previous }) => {
       await apiClient.delete(STOCK_MOVEMENT_REMOVE_ALL_ITEMS(queryParams.id));
       setValue('totalCount', 1);
       setValue('currentLineItems', []);
-      setValue('values', { ...getValues('values'), lineItems: new Array(1).fill({ sortOrder: 100 }) });
+      setValue('values', {
+        ...getValues('values'),
+        lineItems: new Array(1).fill({ sortOrder: 100 }),
+      });
       await fetchLineItems();
     } finally {
       spinner.hide();
@@ -543,7 +548,10 @@ const useInboundAddItemsForm = ({ next, previous }) => {
   const fetchAddItemsPageData = async () => {
     if (queryParams.id) {
       const response = await apiClient.get(STOCK_MOVEMENT_BY_ID(queryParams.id));
-      const { totalCount, data } = response.data;
+      const {
+        totalCount,
+        data,
+      } = response.data;
       const transformedData = {
         ...data,
         lineItems: data.lineItems?.map(transformLineItem),
