@@ -35,7 +35,7 @@ const CountStepTable = ({
   });
 
   const translate = useTranslate();
-
+  console.log('dateCounted', dateCounted);
   return (
     <div className="list-page-list-section">
       <p className="count-step-title pt-4 pl-4">

@@ -111,6 +111,11 @@ limit-lines($lines-number) {
     align-items: center;
   }
 
+  .rt-td-check-step {
+    padding: 10px;
+    padding-bottom: 14px;
+  }
+
   .cell-inner-wrapper {
     padding: 10px 3px 3px 3px;
   }
