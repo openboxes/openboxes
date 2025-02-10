@@ -201,17 +201,16 @@ class CycleCountService {
     }
 
     CycleCountDto createCycleCount(CycleCountStartCommand request, Location facility) {
+        // We don't set the status on the cycle count here because it will be done automatically upon save.
         CycleCount newCycleCount = new CycleCount(
                 facility: facility,
-                status: CycleCountStatus.READY_TO_REVIEW,
                 dateLastRefreshed: new Date()
         )
+
         List<AvailableItem> itemsToSave = determineCycleCountItemsToSave(facility, request.cycleCountRequest.product)
-        newCycleCount.save()
         // 1:1 association between cycle count and cycle count request
         request.cycleCountRequest.cycleCount = newCycleCount
         request.cycleCountRequest.status = CycleCountRequestStatus.IN_PROGRESS
-        List<CycleCountItem> cycleCountItems = []
         itemsToSave.each { AvailableItem availableItem ->
             CycleCountItem cycleCountItem = new CycleCountItem(
                     status: CycleCountItemStatus.READY_TO_COUNT,
@@ -226,28 +225,14 @@ class CycleCountService {
                     updatedBy: AuthService.currentUser,
                     custom: false,
             )
-            if (!cycleCountItem.validate()) {
-                throw new ValidationException("Invalid cycle count item", cycleCountItem.errors)
-            }
-            cycleCountItem.save()
-            cycleCountItems.add(cycleCountItem)
+            newCycleCount.addToCycleCountItems(cycleCountItem)
         }
-        // Now that we've created all the items, we need to refresh the status on the cycle count itself.
-        recomputeCycleCountStatusAndSave(newCycleCount, cycleCountItems)
 
-        return CycleCountDto.createFromCycleCountItems(cycleCountItems)
-    }
+        if(!newCycleCount.save()) {
+            throw new ValidationException("Invalid cycle count", newCycleCount.errors)
+        }
 
-    /**
-     * Recalculates the status of the cycle count based on the given list of cycle count items. If no items are given,
-     * we will fetch them from the database.
-     *
-     * This method should be called whenever we update the status of a cycle count item as it may cause the
-     * cycle count's status to also need to be updated.
-     */
-    private CycleCount recomputeCycleCountStatusAndSave(CycleCount cycleCount, List<CycleCountItem> items=null) {
-        cycleCount.status = cycleCount.recomputeStatus(items)
-        cycleCount.save(failOnError: true)
+        return CycleCountDto.asDto(newCycleCount)
     }
 
     CycleCountDto updateCycleCount(CycleCount cycleCount, List<CycleCountItem> cycleCountItems, CycleCountStartCommand request) {
@@ -263,7 +248,7 @@ class CycleCountService {
                 throw new IllegalArgumentException("Count index can't be higher than the highest count index of the items")
             }
         }
-        return CycleCountDto.createFromCycleCountItems(cycleCountItems)
+        return CycleCountDto.asDto(cycleCount)
     }
 
     /**
@@ -282,7 +267,7 @@ class CycleCountService {
             if (ids) {
                 'in'("id", ids)
             }
-        }
-        return cycleCounts.collect { CycleCountDto.createFromCycleCountItems(it.cycleCountItems) }
+        } as List<CycleCount>
+        return cycleCounts.collect { CycleCountDto.asDto(it) }
     }
 }

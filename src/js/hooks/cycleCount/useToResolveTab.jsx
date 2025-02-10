@@ -143,7 +143,7 @@ const useToResolveTab = ({
         <TableCell className="rt-td">
           <StatusIndicator
             variant="primary"
-            status={translate(`react.cycleCount.CycleCountCandidateStatus.${getValue()}.label`, 'To Resolve')}
+            status={translate(`react.cycleCount.CycleCountCandidateStatus.${getValue()}.label`, 'To resolve')}
           />
         </TableCell>
       ),

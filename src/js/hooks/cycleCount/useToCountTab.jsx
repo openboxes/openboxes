@@ -144,7 +144,7 @@ const useToCountTab = ({
         <TableCell className="rt-td">
           <StatusIndicator
             variant="danger"
-            status={translate(`react.cycleCount.CycleCountCandidateStatus.${getValue()}.label`, 'To Count')}
+            status={translate(`react.cycleCount.CycleCountCandidateStatus.${getValue()}.label`, 'To count')}
           />
         </TableCell>
       ),
