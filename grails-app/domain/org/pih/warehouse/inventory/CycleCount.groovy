@@ -44,12 +44,13 @@ class CycleCount {
     /**
      * Determines what the CycleCountStatus should be for the cycle count.
      *
-     * We don't need to call this in beforeInsert() or beforeUpdate() because the cycle count's status is determined
+     * We don't want to call this in beforeInsert() or beforeUpdate() because the cycle count's status is determined
      * entirely by the status of its cycle count items, and so any change to fields in the CycleCount itself won't
-     * actually ever change its status. Instead we make sure to call this method in CycleCountItem.
+     * ever change its status. Instead we opt to only recompute the status when explicitly told to do so.
      */
-    CycleCountStatus recomputeStatus(List<CycleCountItem> items) {
-//        List<CycleCountItem> items = cycleCountItems
+    CycleCountStatus recomputeStatus(List<CycleCountItem> cycleCountItems=null) {
+        List<CycleCountItem> items = cycleCountItems == null ? getCycleCountItems() : cycleCountItems
+
         if (!items || items.every { it.status == CycleCountItemStatus.READY_TO_COUNT }) {
             return CycleCountStatus.REQUESTED
         }

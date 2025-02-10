@@ -229,15 +229,25 @@ class CycleCountService {
             if (!cycleCountItem.validate()) {
                 throw new ValidationException("Invalid cycle count item", cycleCountItem.errors)
             }
+            cycleCountItem.save()
             cycleCountItems.add(cycleCountItem)
         }
-        CycleCountItem.saveAll(cycleCountItems)
-
-        // TODO: clean this up!
-        newCycleCount.status = newCycleCount.recomputeStatus(cycleCountItems)
-        newCycleCount.save(failOnError: true)
+        // Now that we've created all the items, we need to refresh the status on the cycle count itself.
+        recomputeCycleCountStatusAndSave(newCycleCount, cycleCountItems)
 
         return CycleCountDto.createFromCycleCountItems(cycleCountItems)
+    }
+
+    /**
+     * Recalculates the status of the cycle count based on the given list of cycle count items. If no items are given,
+     * we will fetch them from the database.
+     *
+     * This method should be called whenever we update the status of a cycle count item as it may cause the
+     * cycle count's status to also need to be updated.
+     */
+    private CycleCount recomputeCycleCountStatusAndSave(CycleCount cycleCount, List<CycleCountItem> items=null) {
+        cycleCount.status = cycleCount.recomputeStatus(items)
+        cycleCount.save(failOnError: true)
     }
 
     CycleCountDto updateCycleCount(CycleCount cycleCount, List<CycleCountItem> cycleCountItems, CycleCountStartCommand request) {
