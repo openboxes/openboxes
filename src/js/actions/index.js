@@ -49,9 +49,11 @@ import {
   SHOW_INFO_BAR,
   SHOW_INFO_BAR_MODAL,
   SHOW_SPINNER,
+  START_COUNT,
   TOGGLE_USER_ACTION_MENU,
   TRANSLATIONS_FETCHED,
 } from 'actions/types';
+import cycleCountApi from 'api/services/CycleCountApi';
 import genericApi from 'api/services/GenericApi';
 import locationApi from 'api/services/LocationApi';
 import productSupplierApi from 'api/services/ProductSupplierApi';
@@ -736,3 +738,12 @@ export const setScrollToBottom = (payload) => ({
   type: SET_SCROLL_TO_BOTTOM,
   payload,
 });
+
+export const startCount = (payload, locationId) => async (dispatch) => {
+  const cycleCounts = await cycleCountApi.startCount(payload, locationId);
+  const cycleCountIds = cycleCounts?.data?.data?.map?.((cycleCount) => cycleCount.id);
+  return dispatch({
+    type: START_COUNT,
+    payload: cycleCountIds,
+  });
+};

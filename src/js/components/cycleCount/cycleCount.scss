@@ -52,3 +52,86 @@ limit-lines($lines-number) {
 .limit-lines-2 {
   @include limit-lines(2);
 }
+
+.count-step-title {
+  color: var(--gray-600);
+  font-weight: 600 !important;
+  font-size: 20px;
+}
+
+.count-step-label {
+  color: var(--gray-500);
+}
+
+.count-step-date {
+  color: var(--gray-600);
+  font-weight: 500;
+}
+
+.count-step-select-counted-by {
+
+  > div:first-of-type {
+    width: 160px;
+  }
+}
+
+.count-step-table {
+
+  .split-table-right {
+    box-shadow: 0 0 15px #00000040;
+    clip-path: inset(0 -15px 0 0);
+    margin-right: 5px;
+  }
+
+  .count-step-actions {
+    width: 50px !important;
+    align-items: center;
+    color: var(--red-500);
+    cursor: pointer;
+  }
+
+  .static-cell-count-step {
+    margin-left: 10px;
+  }
+
+  .react-datepicker-wrapper {
+    width: 100%;
+  }
+
+  .rt-tr {
+    align-items: stretch;
+  }
+
+  .rt-td {
+    padding: 0 !important;
+  }
+
+  .rt-td-count-step {
+    padding: 0;
+    align-items: center;
+  }
+
+  .cell-inner-wrapper {
+    padding: 10px 3px 3px 3px;
+  }
+
+  .date-field-input__value {
+    font-weight: normal;
+  }
+}
+
+.count-step-label-date-counted {
+  white-space: nowrap;
+}
+
+.date-counted-container {
+
+  .date-counted-date-picker {
+    width: 150px;
+
+    .date-field-input__value {
+      font-weight: normal;
+    }
+  }
+}
+
