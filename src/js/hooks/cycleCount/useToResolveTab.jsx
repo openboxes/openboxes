@@ -158,10 +158,14 @@ const useToResolveTab = ({
       ),
       cell: ({ getValue, row }) => (
         <TableCell
+          tooltip
+          tooltipLabel={getValue()}
           link={INVENTORY_ITEM_URL.showStockCard(row.original.product.id)}
           className="rt-td multiline-cell"
         >
-          {getValue()}
+          <div className="limit-lines-2">
+            {getValue()}
+          </div>
         </TableCell>
       ),
     }),
