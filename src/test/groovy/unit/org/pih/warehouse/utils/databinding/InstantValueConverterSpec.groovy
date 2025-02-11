@@ -1,6 +1,5 @@
 package unit.org.pih.warehouse.utils.databinding
 
-import java.text.ParseException
 import java.time.format.DateTimeParseException
 import spock.lang.Shared
 import spock.lang.Specification

@@ -1,8 +1,10 @@
 package unit.org.pih.warehouse.utils
 
 import java.text.ParseException
+import java.text.SimpleDateFormat
 import java.time.Instant
 import java.time.ZoneId
+import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import spock.lang.Specification
 import spock.lang.Unroll
@@ -13,42 +15,51 @@ import org.pih.warehouse.DateUtil
 class DateUtilSpec extends Specification {
 
     void 'asDate should successfully parse using the default format for case: #scenario'() {
-        expect:
-        assert new Date(expectedConvertedDate) == DateUtil.asDate(givenDate)
+        given: 'a format to Stringify the parsed Date as (for asserting against)'
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
+        format.setTimeZone(TimeZone.getTimeZone(ZoneOffset.UTC))
+
+        when:
+        Date date = DateUtil.asDate(givenDate)
+
+        then:
+        assert expectedConvertedDate == format.format(date)
 
         where:
-        givenDate                   || expectedConvertedDate              | scenario
-        "2000-01-01T00:00:00Z"      || "Sat, 01 Jan 2000 00:00:00 UTC"    | "Full string in proper ISO format"
-        "2000-01-01T00:00Z"         || "Sat, 01 Jan 2000 00:00:00 UTC"    | "No seconds"
-        "2000-01-01T00:00:00-05"    || "Sat, 01 Jan 2000 00:00:00 UTC-05" | "Timezone conforming to X format w/ negative"
-        "2000-01-01T00:00:00-0500"  || "Sat, 01 Jan 2000 00:00:00 UTC-05" | "Timezone conforming to XX format w/ negative"
-        "2000-01-01T00:00:00-05:00" || "Sat, 01 Jan 2000 00:00:00 UTC-05" | "Timezone conforming to XXX format w/ negative"
-        "2000-01-01T00:00:00+00"    || "Sat, 01 Jan 2000 00:00:00 UTC"    | "Timezone conforming to X format w/ zero"
-        "2000-01-01T00:00:00+0000"  || "Sat, 01 Jan 2000 00:00:00 UTC"    | "Timezone conforming to XX format w/ zero"
-        "2000-01-01T00:00:00+00:00" || "Sat, 01 Jan 2000 00:00:00 UTC"    | "Timezone conforming to XXX format w/ zero"
-        "2000-01-01T00:00:00+05"    || "Sat, 01 Jan 2000 00:00:00 UTC+05" | "Timezone conforming to X format w/ positive"
-        "2000-01-01T00:00:00+0500"  || "Sat, 01 Jan 2000 00:00:00 UTC+05" | "Timezone conforming to XX format w/ positive"
-        "2000-01-01T00:00:00+05:00" || "Sat, 01 Jan 2000 00:00:00 UTC+05" | "Timezone conforming to XXX format w/ positive"
+        givenDate                   || expectedConvertedDate  | scenario
+        "2000-01-01T00:00:00Z"      || "2000-01-01T00:00:00Z" | "Full string in proper ISO format"
+        "2000-01-01T00:00Z"         || "2000-01-01T00:00:00Z" | "No seconds"
+        "2000-01-01T00:00:00-05"    || "2000-01-01T05:00:00Z" | "Timezone conforming to X format w/ negative"
+        "2000-01-01T00:00:00-0500"  || "2000-01-01T05:00:00Z" | "Timezone conforming to XX format w/ negative"
+        "2000-01-01T00:00:00-05:00" || "2000-01-01T05:00:00Z" | "Timezone conforming to XXX format w/ negative"
+        "2000-01-01T00:00:00+00"    || "2000-01-01T00:00:00Z" | "Timezone conforming to X format w/ zero"
+        "2000-01-01T00:00:00+0000"  || "2000-01-01T00:00:00Z" | "Timezone conforming to XX format w/ zero"
+        "2000-01-01T00:00:00+00:00" || "2000-01-01T00:00:00Z" | "Timezone conforming to XXX format w/ zero"
+        "2000-01-01T00:00:00+05"    || "1999-12-31T19:00:00Z" | "Timezone conforming to X format w/ positive"
+        "2000-01-01T00:00:00+0500"  || "1999-12-31T19:00:00Z" | "Timezone conforming to XX format w/ positive"
+        "2000-01-01T00:00:00+05:00" || "1999-12-31T19:00:00Z" | "Timezone conforming to XXX format w/ positive"
 
-        "01/01/2000 00:00:00 Z"     || "Sat, 01 Jan 2000 00:00:00 UTC"    | "Full string in our format"
-        "01/01/2000 00:00 Z"        || "Sat, 01 Jan 2000 00:00:00 UTC"    | "No seconds our format"
-        "01/01/2000 00:00 -05"      || "Sat, 01 Jan 2000 00:00:00 UTC-05" | "Timezone conforming to X format w/ negative our format"
-        "01/01/2000 00:00 -0500"    || "Sat, 01 Jan 2000 00:00:00 UTC-05" | "Timezone conforming to XX format w/ negative our format"
-        "01/01/2000 00:00 -05:00"   || "Sat, 01 Jan 2000 00:00:00 UTC-05" | "Timezone conforming to XXX format w/ negative our format"
-        "01/01/2000 00:00 +00"      || "Sat, 01 Jan 2000 00:00:00 UTC"    | "Timezone conforming to X format w/ zero our format"
-        "01/01/2000 00:00 +0000"    || "Sat, 01 Jan 2000 00:00:00 UTC"    | "Timezone conforming to XX format w/ zero our format"
-        "01/01/2000 00:00 +00:00"   || "Sat, 01 Jan 2000 00:00:00 UTC"    | "Timezone conforming to XXX format w/ zero our format"
-        "01/01/2000 00:00 +05"      || "Sat, 01 Jan 2000 00:00:00 UTC+05" | "Timezone conforming to X format w/ positive our format"
-        "01/01/2000 00:00 +0500"    || "Sat, 01 Jan 2000 00:00:00 UTC+05" | "Timezone conforming to XX format w/ positive our format"
-        "01/01/2000 00:00 +05:00"   || "Sat, 01 Jan 2000 00:00:00 UTC+05" | "Timezone conforming to XXX format w/ positive our format"
+        "01/01/2000 00:00:00 Z"     || "2000-01-01T00:00:00Z" | "Full string in our format"
+        "01/01/2000 00:00 Z"        || "2000-01-01T00:00:00Z" | "No seconds our format"
+        "01/01/2000 00:00 -05"      || "2000-01-01T05:00:00Z" | "Timezone conforming to X format w/ negative our format"
+        "01/01/2000 00:00 -0500"    || "2000-01-01T05:00:00Z" | "Timezone conforming to XX format w/ negative our format"
+        "01/01/2000 00:00 -05:00"   || "2000-01-01T05:00:00Z" | "Timezone conforming to XXX format w/ negative our format"
+        "01/01/2000 00:00 +00"      || "2000-01-01T00:00:00Z" | "Timezone conforming to X format w/ zero our format"
+        "01/01/2000 00:00 +0000"    || "2000-01-01T00:00:00Z" | "Timezone conforming to XX format w/ zero our format"
+        "01/01/2000 00:00 +00:00"   || "2000-01-01T00:00:00Z" | "Timezone conforming to XXX format w/ zero our format"
+        "01/01/2000 00:00 +05"      || "1999-12-31T19:00:00Z" | "Timezone conforming to X format w/ positive our format"
+        "01/01/2000 00:00 +0500"    || "1999-12-31T19:00:00Z" | "Timezone conforming to XX format w/ positive our format"
+        "01/01/2000 00:00 +05:00"   || "1999-12-31T19:00:00Z" | "Timezone conforming to XXX format w/ positive our format"
 
         // This case fails because when no timezone is provided to Date, it uses the system local timezone instead of
         // UTC. This can cause unexpected behaviour! Adding "TimeZone.setDefault(TimeZone.getTimeZone(ZoneOffset.UTC))"
         // to Bootstrap.groovy will change the default to always be UTC. This fixes the issue by making the behaviour
         // consistent (and would allow us to re-enable this test).
-        //"01/01/2000"                || "Sat, 01 Jan 2000 00:00:00 UTC"    | "No time or timezone our format"
-        // It's noteworthy that the "yyyy" format for java.util.Date supports a two year format
-        //"01/01/00"                  || "Sat, 01 Jan 2000 00:00:00 UTC"    | "No time or timezone our format two digit year"
+        //"01/01/2000"                || "2000-01-01T00:00:00Z" | "No time or timezone our format"
+
+        // It's noteworthy that the "yyyy" format for java.util.Date supports a two year format but it is year 0 based,
+        // not based on the year of this century (ie "25" is year 25, not 2025)!
+        "01/01/00 00:00 Z"          || "0001-01-01T00:00:00Z" | "No time or timezone our format two digit year"
     }
 
     void 'asDate should fail to parse using the default format for case: #failureReason'() {
