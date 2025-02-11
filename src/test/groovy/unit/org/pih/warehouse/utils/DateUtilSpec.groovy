@@ -47,14 +47,20 @@ class DateUtilSpec extends Specification {
         // to Bootstrap.groovy will change the default to always be UTC. This fixes the issue by making the behaviour
         // consistent (and would allow us to re-enable this test).
         //"01/01/2000"                || "Sat, 01 Jan 2000 00:00:00 UTC"    | "No time or timezone our format"
+        // It's noteworthy that the "yyyy" format for java.util.Date supports a two year format
+        //"01/01/00"                  || "Sat, 01 Jan 2000 00:00:00 UTC"    | "No time or timezone our format two digit year"
     }
 
-    void 'asDate should fail to parse using the default format when given an invalid date string'() {
+    void 'asDate should fail to parse using the default format for case: #failureReason'() {
         when:
-        DateUtil.asDate("01 01 2000")
+        DateUtil.asDate(givenDate)
 
         then:
         thrown(ParseException)
+
+        where:
+        givenDate    || failureReason
+        "01 01 2000" || "spaces not supported as separator"
     }
 
     void 'asInstant should successfully convert a Date to an Instant for case: #scenario'() {

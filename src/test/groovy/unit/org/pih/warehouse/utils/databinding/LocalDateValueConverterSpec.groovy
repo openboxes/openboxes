@@ -17,7 +17,7 @@ class LocalDateValueConverterSpec extends Specification {
         converter = new LocalDateValueConverter()
     }
 
-    void 'convertString should successfully parse in valid strings: #scenario'() {
+    void 'convertString should successfully parse valid strings for case: #scenario'() {
         expect:
         assert converter.convertString(givenDate).toString() == expectedResult
 
@@ -29,7 +29,7 @@ class LocalDateValueConverterSpec extends Specification {
         "20000101"   || "2000-01-01"   | "Date with no separator"
     }
 
-    void 'convertString should fail to parse invalid strings because: #failureReason'() {
+    void 'convertString should fail to parse invalid strings for case: #failureReason'() {
         when:
         converter.convertString(givenDate)
 
@@ -42,5 +42,6 @@ class LocalDateValueConverterSpec extends Specification {
         "2000-01-32"       || "day out of range"
         "2000-13-01"       || "month out of range"
         "10000-13-01"      || "year out of range"
+        "00-01-01"         || "two digit year format not supported"
     }
 }

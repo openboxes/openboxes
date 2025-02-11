@@ -1,5 +1,7 @@
 package unit.org.pih.warehouse.utils.databinding
 
+import java.text.ParseException
+import java.time.format.DateTimeParseException
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
@@ -16,7 +18,7 @@ class InstantValueConverterSpec extends Specification {
         converter = new InstantValueConverter()
     }
 
-    void 'convertString should successfully parse in valid strings for case: #scenario'() {
+    void 'convertString should successfully parse valid strings for case: #scenario'() {
         expect:
         assert converter.convertString(givenDate).toString() == expectedConvertedDate
 
@@ -50,5 +52,20 @@ class InstantValueConverterSpec extends Specification {
         "2000-01-01T00:00:00+05"    || "1999-12-31T19:00:00Z" | "Timezone conforming to X format w/ positive"
         "2000-01-01T00:00:00+0500"  || "1999-12-31T19:00:00Z" | "Timezone conforming to XX format w/ positive"
         "2000-01-01T00:00:00+05:00" || "1999-12-31T19:00:00Z" | "Timezone conforming to XXX format w/ positive"
+    }
+
+    void 'convertString should fail to parse invalid strings for case: #failureReason'() {
+        when:
+        converter.convertString(givenDate)
+
+        then:
+        thrown(DateTimeParseException)
+
+        where:
+        givenDate     || failureReason
+        "2000-01-32"  || "day out of range"
+        "2000-13-01"  || "month out of range"
+        "10000-13-01" || "year out of range"
+        "00-01-01"    || "two digit year format not supported"
     }
 }
