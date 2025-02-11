@@ -1,12 +1,14 @@
 import { useCallback, useEffect, useState } from 'react';
 
+import { useSelector } from 'react-redux';
+
 const useTableCheckboxes = () => {
   const [checkedCheckboxes, setCheckedCheckboxes] = useState([]);
   const [headerCheckboxState, setHeaderCheckboxState] = useState({
     indeterminate: false,
     value: false,
   });
-
+  const { currentLocation } = useSelector((state) => state.session);
   const selectRow = (identifier) => useCallback(() => {
     if (checkedCheckboxes.includes(identifier)) {
       setCheckedCheckboxes(
@@ -46,6 +48,15 @@ const useTableCheckboxes = () => {
     headerCheckboxState.indeterminate,
     headerCheckboxState.value,
   ]);
+
+  useEffect(() => {
+    if (checkedCheckboxes.length > 0
+      || headerCheckboxState.value
+      || headerCheckboxState.indeterminate) {
+      setCheckedCheckboxes([]);
+      setHeaderCheckboxState({ indeterminate: false, value: false });
+    }
+  }, [currentLocation?.id]);
 
   return {
     selectRow,
