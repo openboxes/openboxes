@@ -87,7 +87,7 @@ const CountStepTable = ({
               {formatLocalizedDate(dateCounted, DateFormat.COMMON)}
             </span>
           </div>
-          <div className="count-step-counted-by-wrapper">
+          <div className="confirm-step-counted-by-wrapper">
             <span className="count-step-label mr-2">
               {translate('react.cycleCount.countedBy.label', 'Counted by')}
             </span>
