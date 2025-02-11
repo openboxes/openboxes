@@ -91,7 +91,8 @@ limit-lines($lines-number) {
   }
 
   .static-cell-count-step {
-    margin-left: 10px;
+    padding: 10px;
+    padding-bottom: 18px;
   }
 
   .react-datepicker-wrapper {
@@ -109,11 +110,6 @@ limit-lines($lines-number) {
   .rt-td-count-step {
     padding: 0;
     align-items: center;
-  }
-
-  .rt-td-confirm-step {
-    padding: 10px;
-    padding-bottom: 18px;
   }
 
   .cell-inner-wrapper {

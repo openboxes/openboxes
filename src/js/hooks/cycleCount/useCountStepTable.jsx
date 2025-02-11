@@ -86,7 +86,7 @@ const useCountStepTable = ({
       // We shouldn't allow users edit fetched data (only quantity counted is editable)
       if (isFieldEditable || !isEditable) {
         return (
-          <TableCell className="rt-td-confirm-step">
+          <TableCell className="static-cell-count-step">
             {getValue()}
           </TableCell>
         );
