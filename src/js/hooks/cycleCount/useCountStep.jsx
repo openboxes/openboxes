@@ -2,9 +2,11 @@ import { useEffect, useRef, useState } from 'react';
 
 import _ from 'lodash';
 import { useDispatch, useSelector } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 
 import { fetchUsers } from 'actions';
 import cycleCountApi from 'api/services/CycleCountApi';
+import { CYCLE_COUNT } from 'consts/applicationUrls';
 import useCountStepValidation from 'hooks/cycleCount/useCountStepValidation';
 
 // Managing state for all tables, operations on shared state (from count step)
@@ -16,6 +18,9 @@ const useCountStep = () => {
   const [countedBy, setCountedBy] = useState({});
   // Saving selected "date counted" option, initially it's the date fetched from API
   const [dateCounted, setDateCounted] = useState({});
+  const [isEditable, setIsEditable] = useState(true);
+
+  const history = useHistory();
 
   const dispatch = useDispatch();
 
@@ -122,7 +127,16 @@ const useCountStep = () => {
     if (isValid) {
       // This data should be combined to a single request
       console.log('next: ', tableData.current, countedBy);
+      setIsEditable(false);
     }
+  };
+  const back = () => {
+    history.push(CYCLE_COUNT.countStep());
+    setIsEditable(true);
+  };
+
+  const save = () => {
+    console.log('save');
   };
 
   const updateRow = (cycleCountId, rowId, columnId, value) => {
@@ -163,9 +177,13 @@ const useCountStep = () => {
     removeRow,
     printCountForm,
     assignCountedBy,
+    countedBy,
     getCountedDate,
     setCountedDate,
     next,
+    back,
+    save,
+    isEditable,
   };
 };
 

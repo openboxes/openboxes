@@ -4,9 +4,9 @@ import PropTypes from 'prop-types';
 
 import Button from 'components/form-elements/Button';
 
-const CheckStepHeader = ({ back, save }) => (
+const ConfirmStepHeader = ({ back, save }) => (
 
-  <div className="d-flex justify-content-end align-items-end gap-8 pt-5">
+  <div className="confirm-step-header">
     <Button
       onClick={back}
       label="react.default.button.back.label"
@@ -22,9 +22,9 @@ const CheckStepHeader = ({ back, save }) => (
   </div>
 );
 
-export default CheckStepHeader;
+export default ConfirmStepHeader;
 
-CheckStepHeader.propTypes = {
+ConfirmStepHeader.propTypes = {
   back: PropTypes.func.isRequired,
   save: PropTypes.func.isRequired,
 };

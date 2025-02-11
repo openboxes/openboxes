@@ -20,6 +20,7 @@ const useCountStepTable = ({
   removeRow,
   validationErrors,
   tableData,
+  isEditable,
 }) => {
   const columnHelper = createColumnHelper();
   // State for saving data for binLocation dropdown
@@ -83,9 +84,9 @@ const useCountStepTable = ({
     }) => {
       const isFieldEditable = !original.id.includes('newRow') && id !== 'quantityCounted';
       // We shouldn't allow users edit fetched data (only quantity counted is editable)
-      if (isFieldEditable) {
+      if (isFieldEditable || !isEditable) {
         return (
-          <TableCell className="rt-td rt-td-count-step static-cell-count-step">
+          <TableCell className="rt-td-confirm-step">
             {getValue()}
           </TableCell>
         );

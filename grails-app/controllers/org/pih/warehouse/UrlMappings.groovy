@@ -40,11 +40,6 @@ class UrlMappings {
             }
         }
 
-        "/inventory/cycleCount/count/check" {
-            controller = "inventory"
-            action = "cycleCount"
-        }
-
         // REST APIs with complex resource names or subresources
 
         "/api/categories"(parseRequest: true) {
