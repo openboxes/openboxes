@@ -88,18 +88,13 @@ const InboundV2Create = ({
           <Controller
             name="destination"
             control={control}
+            disabled
             render={({ field }) => (
               <SelectField
                 title={{
                   id: 'react.stockMovement.destination.label',
                   defaultMessage: 'Destination',
                 }}
-                placeholder="Select Destination"
-                required
-                hasErrors={Boolean(errors.destination?.message)}
-                errorMessage={errors.destination?.message}
-                async
-                loadOptions={debouncedLocationsFetch}
                 {...field}
               />
             )}
