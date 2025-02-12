@@ -52,50 +52,35 @@ const CountStepTable = ({
         {' '}
         {product?.name}
       </p>
-      {isEditable ? (
-        <div className="pt-3 pl-4 d-flex align-items-center">
-          <div className="d-flex date-counted-container">
-            <span className="count-step-label count-step-label-date-counted mr-2 mt-2">
-              {translate('react.cycleCount.dateCounted.label', 'Date counted')}
-            </span>
-            {' '}
+
+      <div className="pt-3 pl-4 d-flex align-items-center">
+        <div className="d-flex align-items-center date-counted-container">
+          <p className="count-step-label count-step-label-date-counted mr-2">
+            {translate('react.cycleCount.dateCounted.label', 'Date counted')}
+          </p>
+          {' '}
+          {isEditable ? (
             <DateField
               className="date-counted-date-picker date-field-input"
               onChange={setCountedDate}
               value={dateCounted}
             />
-          </div>
-          <div className="d-flex count-step-select-counted-by ml-5 align-items-center">
-            <p className="count-step-label mr-2">
-              {translate('react.cycleCount.countedBy.label', 'Counted by')}
-            </p>
+          ) : <p>{formatLocalizedDate(dateCounted, DateFormat.COMMON)}</p>}
+        </div>
+        <div className="d-flex count-step-select-counted-by ml-5 align-items-center">
+          <p className="count-step-label mr-2">
+            {translate('react.cycleCount.countedBy.label', 'Counted by')}
+          </p>
+          {' '}
+          {isEditable ? (
             <SelectField
               placeholder="Select"
               options={recipients}
               onChange={assignCountedBy(product?.productCode)}
             />
-          </div>
+          ) : <p>{countedBy[product.productCode]?.label}</p>}
         </div>
-      ) : (
-        <div className="py-4 pl-4 d-flex align-items-center">
-          <div className="d-flex align-items-center">
-            <span className="count-step-label mr-2">
-              {translate('react.cycleCount.dateCounted.label', 'Date counted')}
-            </span>
-            {' '}
-            <span>
-              {formatLocalizedDate(dateCounted, DateFormat.COMMON)}
-            </span>
-          </div>
-          <div className="confirm-step-counted-by-wrapper">
-            <span className="count-step-label mr-2">
-              {translate('react.cycleCount.countedBy.label', 'Counted by')}
-            </span>
-            {' '}
-            <span>{countedBy[product.productCode]?.label}</span>
-          </div>
-        </div>
-      )}
+      </div>
       <div className="mx-4 count-step-table">
         <DataTable
           columns={columns}

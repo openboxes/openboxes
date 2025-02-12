@@ -69,7 +69,6 @@ limit-lines($lines-number) {
 }
 
 .count-step-select-counted-by {
-
   > div:first-of-type {
     width: 160px;
   }
@@ -142,10 +141,4 @@ limit-lines($lines-number) {
   align-items: center;
   gap: 8px;
   padding-top: 40px;
-}
-
-.confirm-step-counted-by-wrapper {
-  margin-left: 113px;
-  display: flex;
-  align-items: center;
 }
