@@ -56,6 +56,11 @@
         font-weight: bold;
         border-right: none;
 
+        .required {
+          font-size: 12px;
+          color: var(--color-red);
+        }
+
         .sorting-arrows {
           display: none;
           flex-direction: column;
