@@ -52,9 +52,7 @@ const useCountStep = () => {
 
   // Fetching data for "counted by" dropdown
   useEffect(() => {
-    if (!users?.length) {
-      dispatch(fetchUsers());
-    }
+    dispatch(fetchUsers());
   }, []);
 
   const printCountForm = () => {
