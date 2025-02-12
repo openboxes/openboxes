@@ -1,0 +1,62 @@
+@mixin set-size($width, $height) {
+  width: $width;
+  height: $height;
+}
+
+.inbound-add-items {
+  .rt-tbody {
+    max-height: 275px;
+  }
+
+  .input-wrapper-error-message {
+    min-height: unset;
+  }
+
+  .buttons-container {
+    display: flex;
+    gap: 4px;
+    .icon {
+      @include set-size(16px, 16px);
+    }
+  }
+
+  .custom-select-error-placeholder {
+
+    svg {
+      color: var(--color-red);
+      margin-right: 5px;
+      @include set-size(16px, 16px);
+    }
+
+    span {
+      font-size: 14px;
+      color: var(--gray-350);
+      font-weight: 400;
+    }
+  }
+
+  .bin-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+
+    .inbound-bin {
+      @include set-size(20px, 20px);
+      color: var(--blue-primary);
+      cursor: pointer;
+
+      &.disabled {
+        color: var(--blue-primary);
+        cursor: auto;
+      }
+    }
+  }
+}
+
+.submit-buttons {
+  margin-top: 18px;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}

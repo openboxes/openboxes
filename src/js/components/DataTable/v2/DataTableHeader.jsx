@@ -8,11 +8,15 @@ const DataTableHeader = ({ headerGroups }) => (
     <div className="rt-tr">
       {headerGroups
         .map((headerGroup) => (
-          headerGroup.headers.map((header) => (
-            <div className="w-100" key={header.id}>
-              {flexRender(header.column.columnDef.header, header.getContext())}
-            </div>
-          ))
+          headerGroup.headers.map((header) => {
+            const className = header.column.columnDef.meta?.getCellContext?.().className;
+            const flexWidth = header.column.columnDef.meta?.flexWidth || 1;
+            return (
+              <div style={{ flex: flexWidth }} className={`header-cell ${className ?? ''}`} key={header.id}>
+                {flexRender(header.column.columnDef.header, header.getContext())}
+              </div>
+            );
+          })
         ))}
     </div>
   </div>

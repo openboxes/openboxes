@@ -19,15 +19,15 @@ const DataTableBody = ({
     <DataTableStatus
       label={emptyTableMessage?.id || defaultEmptyTableMessage.id}
       defaultMessage={
-          emptyTableMessage?.defaultMessage || defaultEmptyTableMessage.defaultMessage
-        }
+        emptyTableMessage?.defaultMessage || defaultEmptyTableMessage.defaultMessage
+      }
       shouldDisplay={!dataLength && !loading}
     />
     <DataTableStatus
       label={loadingMessage?.id || defaultLoadingTableMessage.id}
       defaultMessage={
-          loadingMessage?.defaultMessage || defaultLoadingTableMessage.defaultMessage
-        }
+        loadingMessage?.defaultMessage || defaultLoadingTableMessage.defaultMessage
+      }
       shouldDisplay={loading}
     />
     {(dataLength > 0 && !loading) && rowModel
@@ -36,11 +36,15 @@ const DataTableBody = ({
         <div key={row.id} className="rt-tr-group cell-wrapper" role="rowgroup">
           <TableRow key={row.id} className="rt-tr">
             {row.getVisibleCells()
-              .map((cell) => (
-                <div className="w-100 d-flex" key={cell.id}>
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                </div>
-              ))}
+              .map((cell) => {
+                const className = cell.column.columnDef?.meta?.getCellContext?.()?.className;
+                const flexWidth = cell.column.columnDef.meta?.flexWidth || 1;
+                return (
+                  <div className={`d-flex ${className}`} style={{ flex: flexWidth }} key={cell.id}>
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </div>
+                );
+              })}
           </TableRow>
         </div>
       ))}

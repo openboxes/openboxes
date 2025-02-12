@@ -20,6 +20,7 @@ const DataTable = ({
   setOffset,
   setPageSize,
   totalCount,
+  showPagination,
 }) => {
   const {
     defaultEmptyTableMessage,
@@ -57,6 +58,7 @@ const DataTable = ({
             rowModel={table.getRowModel()}
             dataLength={data?.length}
           />
+          {showPagination && (
           <DataTableFooter
             footerComponent={footerComponent}
             pagination={pagination}
@@ -68,6 +70,7 @@ const DataTable = ({
             pageSizeSelectOptions={pageSizeSelectOptions}
             totalData={totalCount}
           />
+          )}
         </div>
       </div>
     </div>
@@ -98,6 +101,7 @@ DataTable.propTypes = {
   setOffset: PropTypes.func,
   setPageSize: PropTypes.func,
   totalCount: PropTypes.number,
+  showPagination: PropTypes.bool,
 };
 
 DataTable.defaultProps = {
@@ -109,4 +113,5 @@ DataTable.defaultProps = {
   setOffset: () => {},
   totalCount: 0,
   setPageSize: () => {},
+  showPagination: true,
 };
