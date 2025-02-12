@@ -11,6 +11,7 @@ const TableHeaderCell = ({
   sortable,
   columnId,
   dynamicClassName,
+  required,
 }) => {
   const sortableProps = {
     tabIndex: '0',
@@ -26,6 +27,7 @@ const TableHeaderCell = ({
       className={`rt-th ${className} ${dynamicClassName?.(columnId)}`}
     >
       {children}
+      {required && <span className="ml-1 required">&#42;</span>}
       {sortable && (
       <div className="sorting-arrows">
         <RiArrowUpSFill className="arrow-up" />
@@ -42,6 +44,7 @@ TableHeaderCell.defaultProps = {
   style: undefined,
   className: undefined,
   sortable: false,
+  required: false,
   columnId: null,
   dynamicClassName: () => {},
   toggleSort: () => {},
@@ -54,6 +57,7 @@ TableHeaderCell.propTypes = {
   ]).isRequired,
   className: PropTypes.string,
   sortable: PropTypes.bool,
+  required: PropTypes.bool,
   style: PropTypes.shape({}),
   toggleSort: PropTypes.func,
   // When passing columnId, it is expected that toggleSort will take this as an argument.
