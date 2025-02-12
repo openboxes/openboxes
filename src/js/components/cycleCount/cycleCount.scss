@@ -69,7 +69,6 @@ limit-lines($lines-number) {
 }
 
 .count-step-select-counted-by {
-
   > div:first-of-type {
     width: 160px;
   }
@@ -91,7 +90,8 @@ limit-lines($lines-number) {
   }
 
   .static-cell-count-step {
-    margin-left: 10px;
+    padding: 10px;
+    padding-bottom: 18px;
   }
 
   .react-datepicker-wrapper {
@@ -135,3 +135,10 @@ limit-lines($lines-number) {
   }
 }
 
+.confirm-step-header {
+  display: flex;
+  justify-content: end;
+  align-items: center;
+  gap: 8px;
+  padding-top: 40px;
+}

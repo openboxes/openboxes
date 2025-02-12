@@ -16,6 +16,7 @@ const useCountStep = () => {
   const [countedBy, setCountedBy] = useState({});
   // Saving selected "date counted" option, initially it's the date fetched from API
   const [dateCounted, setDateCounted] = useState({});
+  const [isEditable, setIsEditable] = useState(true);
 
   const dispatch = useDispatch();
 
@@ -122,7 +123,15 @@ const useCountStep = () => {
     if (isValid) {
       // This data should be combined to a single request
       console.log('next: ', tableData.current, countedBy);
+      setIsEditable(false);
     }
+  };
+  const back = () => {
+    setIsEditable(true);
+  };
+
+  const save = () => {
+    console.log('save');
   };
 
   const updateRow = (cycleCountId, rowId, columnId, value) => {
@@ -163,9 +172,13 @@ const useCountStep = () => {
     removeRow,
     printCountForm,
     assignCountedBy,
+    countedBy,
     getCountedDate,
     setCountedDate,
     next,
+    back,
+    save,
+    isEditable,
   };
 };
 

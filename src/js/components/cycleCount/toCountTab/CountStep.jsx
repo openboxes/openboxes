@@ -1,5 +1,6 @@
 import React from 'react';
 
+import ConfirmStepHeader from 'components/cycleCount/toCountTab/ConfirmStepHeader';
 import CountStepHeader from 'components/cycleCount/toCountTab/CountStepHeader';
 import CountStepTable from 'components/cycleCount/toCountTab/CountStepTable';
 import useCountStep from 'hooks/cycleCount/useCountStep';
@@ -12,6 +13,8 @@ const CountStep = () => {
     tableData,
     printCountForm,
     next,
+    save,
+    back,
     tableMeta,
     addEmptyRow,
     removeRow,
@@ -19,14 +22,18 @@ const CountStep = () => {
     getCountedDate,
     setCountedDate,
     validationErrors,
+    isEditable,
+    countedBy,
   } = useCountStep();
 
   return (
     <PageWrapper>
-      <CountStepHeader
-        printCountForm={printCountForm}
-        next={next}
-      />
+      {isEditable ? (
+        <CountStepHeader
+          printCountForm={printCountForm}
+          next={next}
+        />
+      ) : <ConfirmStepHeader back={back} save={save} />}
       {tableData
         .map(({ cycleCountItems, id }) => (
           <CountStepTable
@@ -41,6 +48,8 @@ const CountStep = () => {
             setCountedDate={setCountedDate(id)}
             assignCountedBy={assignCountedBy}
             validationErrors={validationErrors}
+            isEditable={isEditable}
+            countedBy={countedBy}
           />
         ))}
     </PageWrapper>
