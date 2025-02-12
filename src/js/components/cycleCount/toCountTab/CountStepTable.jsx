@@ -54,7 +54,7 @@ const CountStepTable = ({
       </p>
 
       <div className="pt-3 pl-4 d-flex align-items-center">
-        <div className="d-flex align-items-center date-counted-container">
+        <div className={`d-flex align-items-center date-counted-container ${!isEditable && 'p-2'}`}>
           <p className="count-step-label count-step-label-date-counted mr-2">
             {translate('react.cycleCount.dateCounted.label', 'Date counted')}
           </p>
@@ -67,7 +67,7 @@ const CountStepTable = ({
             />
           ) : <p>{formatLocalizedDate(dateCounted, DateFormat.COMMON)}</p>}
         </div>
-        <div className="d-flex count-step-select-counted-by ml-5 align-items-center">
+        <div className={`d-flex count-step-select-counted-by ml-5 align-items-center ${!isEditable && 'p-2'}`}>
           <p className="count-step-label mr-2">
             {translate('react.cycleCount.countedBy.label', 'Counted by')}
           </p>
