@@ -44,126 +44,129 @@ const InboundV2Create = ({
   );
 
   return (
-    <Section title="Details">
-      <div className="row">
-        <div className="col-12 px-2 pt-2">
-          <Controller
-            name="description"
-            control={control}
-            render={({ field }) => (
-              <TextInput
-                title={{
-                  id: 'react.stockMovement.description.label',
-                  defaultMessage: 'Description',
-                }}
-                errorMessage={errors.description?.message}
-                required
-                {...field}
-              />
-            )}
-          />
+    <>
+      <Section title="Details">
+        <div className="row">
+          <div className="col-12 px-2 pt-2">
+            <Controller
+              name="description"
+              control={control}
+              render={({ field }) => (
+                <TextInput
+                  title={{
+                    id: 'react.stockMovement.description.label',
+                    defaultMessage: 'Description',
+                  }}
+                  errorMessage={errors.description?.message}
+                  required
+                  {...field}
+                />
+              )}
+            />
+          </div>
+          <div className="col-lg-6 col-md-12 px-2 pt-2">
+            <Controller
+              name="origin"
+              control={control}
+              render={({ field }) => (
+                <SelectField
+                  title={{
+                    id: 'react.stockMovement.origin.label',
+                    defaultMessage: 'Origin',
+                  }}
+                  placeholder="Select Origin"
+                  required
+                  hasErrors={Boolean(errors.origin?.message)}
+                  errorMessage={errors.origin?.message}
+                  async
+                  loadOptions={debouncedLocationsFetch}
+                  {...field}
+                />
+              )}
+            />
+          </div>
+          <div className="col-lg-6 col-md-12 px-2 pt-2">
+            <Controller
+              name="destination"
+              control={control}
+              disabled
+              render={({ field }) => (
+                <SelectField
+                  title={{
+                    id: 'react.stockMovement.destination.label',
+                    defaultMessage: 'Destination',
+                  }}
+                  {...field}
+                />
+              )}
+            />
+          </div>
+          <div className="col-lg-6 col-md-12 px-2 pt-2">
+            <Controller
+              name="stockList"
+              disabled={!origin || !destination}
+              control={control}
+              render={({ field }) => (
+                <SelectField
+                  title={{
+                    id: 'react.stockMovement.stocklist.label',
+                    defaultMessage: 'Stocklist',
+                  }}
+                  options={stockLists}
+                  {...field}
+                />
+              )}
+            />
+          </div>
+          <div className="col-lg-6 col-md-12 px-2 pt-2">
+            <Controller
+              name="requestedBy"
+              control={control}
+              render={({ field }) => (
+                <SelectField
+                  title={{
+                    id: 'react.stockMovement.requestedBy.label',
+                    defaultMessage: 'Requested By',
+                  }}
+                  required
+                  hasErrors={Boolean(errors.requestedBy?.message)}
+                  errorMessage={errors.requestedBy?.message}
+                  async
+                  loadOptions={debouncePeopleFetch(debounceTime, minSearchLength)}
+                  {...field}
+                />
+              )}
+            />
+          </div>
+          <div className="col-lg-6 col-md-12 px-2 pt-2">
+            <Controller
+              name="dateRequested"
+              control={control}
+              render={({ field }) => (
+                <DateField
+                  title={{
+                    id: 'react.stockMovement.dateRequested.label',
+                    defaultMessage: 'Date Requested',
+                  }}
+                  errorMessage={errors.dateRequested?.message}
+                  required
+                  {...field}
+                />
+              )}
+            />
+          </div>
         </div>
-        <div className="col-lg-6 col-md-12 px-2 pt-2">
-          <Controller
-            name="origin"
-            control={control}
-            render={({ field }) => (
-              <SelectField
-                title={{
-                  id: 'react.stockMovement.origin.label',
-                  defaultMessage: 'Origin',
-                }}
-                placeholder="Select Origin"
-                required
-                hasErrors={Boolean(errors.origin?.message)}
-                errorMessage={errors.origin?.message}
-                async
-                loadOptions={debouncedLocationsFetch}
-                {...field}
-              />
-            )}
-          />
-        </div>
-        <div className="col-lg-6 col-md-12 px-2 pt-2">
-          <Controller
-            name="destination"
-            control={control}
-            disabled
-            render={({ field }) => (
-              <SelectField
-                title={{
-                  id: 'react.stockMovement.destination.label',
-                  defaultMessage: 'Destination',
-                }}
-                {...field}
-              />
-            )}
-          />
-        </div>
-        <div className="col-lg-6 col-md-12 px-2 pt-2">
-          <Controller
-            name="stockList"
-            disabled={!origin || !destination}
-            control={control}
-            render={({ field }) => (
-              <SelectField
-                title={{
-                  id: 'react.stockMovement.stocklist.label',
-                  defaultMessage: 'Stocklist',
-                }}
-                options={stockLists}
-                {...field}
-              />
-            )}
-          />
-        </div>
-        <div className="col-lg-6 col-md-12 px-2 pt-2">
-          <Controller
-            name="requestedBy"
-            control={control}
-            render={({ field }) => (
-              <SelectField
-                title={{
-                  id: 'react.stockMovement.requestedBy.label',
-                  defaultMessage: 'Requested By',
-                }}
-                required
-                hasErrors={Boolean(errors.requestedBy?.message)}
-                errorMessage={errors.requestedBy?.message}
-                async
-                loadOptions={debouncePeopleFetch(debounceTime, minSearchLength)}
-                {...field}
-              />
-            )}
-          />
-        </div>
-        <div className="col-lg-6 col-md-12 px-2 pt-2">
-          <Controller
-            name="dateRequested"
-            control={control}
-            render={({ field }) => (
-              <DateField
-                title={{
-                  id: 'react.stockMovement.dateRequested.label',
-                  defaultMessage: 'Date Requested',
-                }}
-                errorMessage={errors.dateRequested?.message}
-                required
-                {...field}
-              />
-            )}
-          />
-        </div>
+      </Section>
+      <div className="d-flex justify-content-end mt-4">
+        <Button
+          label="react.default.button.next.label"
+          defaultLabel="Next"
+          variant="primary"
+          type="submit"
+          disabled={!isValid}
+        />
       </div>
-      <Button
-        label="react.default.button.next.label"
-        defaultLabel="Next"
-        variant="primary"
-        type="submit"
-        disabled={!isValid}
-        className="fit-content align-self-end"
-      />
-    </Section>
+    </>
   );
 };
 

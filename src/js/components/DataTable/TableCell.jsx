@@ -11,6 +11,7 @@ const TableCell = ({
   value,
   children,
   tooltip,
+  tooltipForm,
   tooltipLabel,
   link, reactLink,
   defaultValue,
@@ -53,6 +54,7 @@ const TableCell = ({
           duration="250"
           hideDelay="50"
           className="text-overflow-ellipsis"
+          style={tooltipForm && { width: '100%' }}
           html={tooltipLabel || value}
           style={tooltipForm && { width: '100%' }}
         >
@@ -121,6 +123,7 @@ TableCell.propTypes = {
   showError: PropTypes.bool,
   className: PropTypes.string,
   tooltip: PropTypes.bool,
+  tooltipForm: PropTypes.bool,
   openLinkInNewTab: PropTypes.bool,
   tooltipLabel: PropTypes.string,
   style: PropTypes.shape({}),
