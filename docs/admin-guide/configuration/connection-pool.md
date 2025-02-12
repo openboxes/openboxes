@@ -4,6 +4,16 @@ overhead from frequent connection creation. The previous section ([Data Source](
 covers the bare minimum around database connections. This section includes all of the properties 
 that need to be configured to tune your database connection pool to allow optimal performance.
 
+!!! caution 
+    Please use extreme caution when modifying connection pool settings, as improper configurations 
+    can lead to performance issues, connection exhaustion, and database instability. Always test 
+    changes in a staging environment before applying them to production. Ensure that settings 
+    align with your database capacity and application workload. Misconfigured pools may cause 
+    slow queries, timeouts, or excessive resource usage. If unsure, consult database and server 
+    logs to fine-tune settings or seek expert guidance from our 
+    [community](https://community.openboxes.com).
+
+
 ## Configuration
 The default configuration uses Tomcat JDBC Connection Pool, along with other default settings 
 defined in application.yml.

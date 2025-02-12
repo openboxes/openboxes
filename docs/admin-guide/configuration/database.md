@@ -31,8 +31,5 @@ dataSource:
 ## Customization
 There are many more configuration properties under the `dataSource` configuration object that are not
 mentioned here. You can read more about these properties in our 
-[Connection Pool configuration](connection-pool.md) section. However, please be advised that you 
-will need 
-
-
+[Connection Pool configuration](connection-pool.md) section. 
 
