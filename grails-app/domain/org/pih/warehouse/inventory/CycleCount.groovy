@@ -1,5 +1,7 @@
 package org.pih.warehouse.inventory
 
+import grails.validation.ValidationException
+
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
@@ -33,33 +35,40 @@ class CycleCount {
         status = recomputeStatus()
     }
 
-    static hasMany = [
-            /*
-             * We've moved away from using "hasMany" in our code whenever possible due to performance concerns around
-             * inserting new child records (the whole set of items will always be fetched when addToCycleCountItems is
-             * called). In this specific case we've deemed it okay because:
-             *
-             * 1) cycleCountItems is a relatively small dataset (almost always < 100 elements, usually < 10) and it is
-             *    not ever-growing because a cycle count doesn't stay open forever.
-             *
-             * 2) When we're working with a cycle count, we almost always want to fetch all of its items anyways for
-             *    validation purposes.
-             *
-             * Using hasMany greatly simplifies recomputing the cycle count status since it allows the cycle count to
-             * maintain an accurate list of items (which it uses to compute its status). Still, the disadvantage is
-             * important to note, and we should strive to replace this hasMany with a better option in the future.
-             */
-            cycleCountItems: CycleCountItem,
-    ]
-
-    static mapping = {
-        cycleCountItems cascade: 'all-delete-orphan'
-    }
-
     static constraints = {
         id generator: "uuid"
         createdBy(nullable: true)
         updatedBy(nullable: true)
+    }
+
+    List<CycleCountItem> getCycleCountItems() {
+        return CycleCountItem.findAllByCycleCount(this)
+    }
+
+    CycleCount saveCountAndItems(List<CycleCountItem> items) {
+        if (!save()) {
+            throw new ValidationException("Invalid cycle count", errors)
+        }
+
+        for (item in items) {
+            item.save()
+            if (!item.save()) {
+                throw new ValidationException("Invalid cycle count item", item.errors)
+            }
+        }
+
+        // Hi Kacper :)
+        // This doesn't work because the call to cycleCountItems returns an empty list! For some reason the items
+        // that we're saving in the above for loop aren't getting included in the list that we have in the context.
+        // Note that we can't just recompute from the items that we have in the method here unless we can somehow
+        // enforce that the items list always contains ALL of the items for the count (which is why I just switched
+        // to the hasMany, because we always need to fetch all the items anyways to compare against).
+        status = recomputeStatus()
+        if (!save()) {
+            throw new ValidationException("Invalid cycle count", errors)
+        }
+
+        return this
     }
 
     /**
@@ -70,26 +79,28 @@ class CycleCount {
      * ever change its status. Instead we opt to only recompute the status when explicitly told to do so.
      */
     CycleCountStatus recomputeStatus() {
-        if (!cycleCountItems || cycleCountItems.every { it.status == CycleCountItemStatus.READY_TO_COUNT }) {
+        List<CycleCountItem> items = cycleCountItems
+
+        if (!items || items.every { it.status == CycleCountItemStatus.READY_TO_COUNT }) {
             return CycleCountStatus.REQUESTED
         }
-        if (cycleCountItems.every { it.status == CycleCountItemStatus.REVIEWED }) {
+        if (items.every { it.status == CycleCountItemStatus.REVIEWED }) {
             return CycleCountStatus.REVIEWED
         }
-        if (cycleCountItems.every { it.status == CycleCountItemStatus.READY_TO_REVIEW }) {
+        if (items.every { it.status == CycleCountItemStatus.READY_TO_REVIEW }) {
             return CycleCountStatus.READY_TO_REVIEW
         }
-        if (cycleCountItems.any { it.status == CycleCountItemStatus.INVESTIGATING }) {
+        if (items.any { it.status == CycleCountItemStatus.INVESTIGATING }) {
             return CycleCountStatus.INVESTIGATING
         }
-        if (cycleCountItems.any { it.status == CycleCountItemStatus.COUNTING }
-                && !cycleCountItems.any { it.status in [CycleCountItemStatus.INVESTIGATING, CycleCountItemStatus.READY_TO_REVIEW] }) {
+        if (items.any { it.status == CycleCountItemStatus.COUNTING }
+                && !items.any { it.status in [CycleCountItemStatus.INVESTIGATING, CycleCountItemStatus.READY_TO_REVIEW] }) {
             return CycleCountStatus.COUNTING
         }
-        if (cycleCountItems.every { it.status in [CycleCountItemStatus.COUNTED, CycleCountItemStatus.READY_TO_REVIEW] }) {
+        if (items.every { it.status in [CycleCountItemStatus.COUNTED, CycleCountItemStatus.READY_TO_REVIEW] }) {
             return CycleCountStatus.COUNTED
         }
-        if (cycleCountItems.every { it.status in [CycleCountItemStatus.REVIEWED, CycleCountItemStatus.APPROVED, CycleCountItemStatus.REJECTED] }) {
+        if (items.every { it.status in [CycleCountItemStatus.REVIEWED, CycleCountItemStatus.APPROVED, CycleCountItemStatus.REJECTED] }) {
             return CycleCountStatus.COMPLETED
         }
         return null

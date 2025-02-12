@@ -201,9 +201,10 @@ class CycleCountService {
     }
 
     CycleCountDto createCycleCount(CycleCountStartCommand request, Location facility) {
-        // We don't set the status on the cycle count here because it will be done automatically upon save.
         CycleCount newCycleCount = new CycleCount(
                 facility: facility,
+                // This will get overwritten when we save the count and items later. We just need a temp value for now.
+                status: CycleCountStatus.REQUESTED,
                 dateLastRefreshed: new Date()
         )
 
@@ -211,6 +212,7 @@ class CycleCountService {
         // 1:1 association between cycle count and cycle count request
         request.cycleCountRequest.cycleCount = newCycleCount
         request.cycleCountRequest.status = CycleCountRequestStatus.IN_PROGRESS
+        List<CycleCountItem> cycleCountItems = []
         itemsToSave.each { AvailableItem availableItem ->
             CycleCountItem cycleCountItem = new CycleCountItem(
                     status: CycleCountItemStatus.READY_TO_COUNT,
@@ -227,12 +229,10 @@ class CycleCountService {
                     dateCounted: new Date(),
                     custom: false,
             )
-            newCycleCount.addToCycleCountItems(cycleCountItem)
+            cycleCountItems.add(cycleCountItem)
         }
 
-        if (!newCycleCount.save()) {
-            throw new ValidationException("Invalid cycle count", newCycleCount.errors)
-        }
+        newCycleCount.saveCountAndItems(cycleCountItems)
 
         return CycleCountDto.toDto(newCycleCount)
     }
