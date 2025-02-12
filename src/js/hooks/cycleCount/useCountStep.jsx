@@ -28,9 +28,7 @@ const useCountStep = () => {
   const {
     cycleCountIds,
     currentLocation,
-    users,
   } = useSelector((state) => ({
-    users: state.users.data,
     cycleCountIds: state.cycleCount.requests,
     currentLocation: state.session.currentLocation,
   }));
