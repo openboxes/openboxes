@@ -8,7 +8,7 @@ class CycleCountDto {
 
     List<CycleCountItemDto> cycleCountItems
 
-    static CycleCountDto asDto(CycleCount cycleCount) {
+    static CycleCountDto toDto(CycleCount cycleCount) {
         return new CycleCountDto(
                 id: cycleCount.id,
                 status: cycleCount.status.toString(),

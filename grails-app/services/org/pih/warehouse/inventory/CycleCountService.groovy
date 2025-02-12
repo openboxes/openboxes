@@ -230,11 +230,11 @@ class CycleCountService {
             newCycleCount.addToCycleCountItems(cycleCountItem)
         }
 
-        if(!newCycleCount.save()) {
+        if (!newCycleCount.save()) {
             throw new ValidationException("Invalid cycle count", newCycleCount.errors)
         }
 
-        return CycleCountDto.asDto(newCycleCount)
+        return CycleCountDto.toDto(newCycleCount)
     }
 
     CycleCountDto updateCycleCount(CycleCount cycleCount, List<CycleCountItem> cycleCountItems, CycleCountStartCommand request) {
@@ -250,7 +250,7 @@ class CycleCountService {
                 throw new IllegalArgumentException("Count index can't be higher than the highest count index of the items")
             }
         }
-        return CycleCountDto.asDto(cycleCount)
+        return CycleCountDto.toDto(cycleCount)
     }
 
     /**
@@ -270,6 +270,6 @@ class CycleCountService {
                 'in'("id", ids)
             }
         } as List<CycleCount>
-        return cycleCounts.collect { CycleCountDto.asDto(it) }
+        return cycleCounts.collect { CycleCountDto.toDto(it) }
     }
 }
