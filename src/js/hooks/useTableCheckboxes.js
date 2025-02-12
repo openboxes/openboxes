@@ -50,9 +50,7 @@ const useTableCheckboxes = () => {
   ]);
 
   useEffect(() => {
-    if (checkedCheckboxes.length > 0
-      || headerCheckboxState.value
-      || headerCheckboxState.indeterminate) {
+    if (checkedCheckboxes.length > 0) {
       setCheckedCheckboxes([]);
       setHeaderCheckboxState({ indeterminate: false, value: false });
     }
