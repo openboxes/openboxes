@@ -49,10 +49,15 @@ const useTableCheckboxes = () => {
     headerCheckboxState.value,
   ]);
 
+  const resetCheckboxes = () => {
+    setCheckedCheckboxes([]);
+    setHeaderCheckboxState({ indeterminate: false, value: false });
+  };
+
   useEffect(() => {
+    // Resets all checkboxes when the location changes to ensure a fresh state
     if (checkedCheckboxes.length > 0) {
-      setCheckedCheckboxes([]);
-      setHeaderCheckboxState({ indeterminate: false, value: false });
+      resetCheckboxes();
     }
   }, [currentLocation?.id]);
 
