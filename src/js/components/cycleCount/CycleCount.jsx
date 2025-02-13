@@ -5,8 +5,8 @@ import cycleCountFilterFields from 'components/cycleCount/CycleCountFilterFields
 import CycleCountFilters from 'components/cycleCount/CycleCountFilters';
 import CycleCountHeader from 'components/cycleCount/CycleCountHeader';
 import CycleCountToApprove from 'components/cycleCount/CycleCountToApprove';
-import CycleCountToResolve from 'components/cycleCount/CycleCountToResolve';
 import CycleCountToCount from 'components/cycleCount/toCountTab/CycleCountToCount';
+import CycleCountToResolve from 'components/cycleCount/toResolveTab/CycleCountToResolve';
 import Tabs from 'components/listPagesUtils/Tabs';
 import {
   ALL_PRODUCTS_TAB,
