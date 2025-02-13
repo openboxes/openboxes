@@ -113,7 +113,6 @@ const useCountStepTable = ({
         let valueToDisplay = null;
 
         if (id === 'quantityCounted') {
-          // If value is 0, show "0", otherwise show the value
           valueToDisplay = value === 0 ? '0' : value;
         }
         if (id === 'inventoryItem_expirationDate') {
@@ -155,7 +154,7 @@ const useCountStepTable = ({
 
   const columns = [
     columnHelper.accessor(
-      (row) => (row?.binLocation?.label ? row?.binLocation : row.binLocation?.name), {
+      (row) => row?.binLocation?.label || row?.binLocation?.name || '', {
         id: 'binLocation',
         header: () => (
           <TableHeaderCell>
