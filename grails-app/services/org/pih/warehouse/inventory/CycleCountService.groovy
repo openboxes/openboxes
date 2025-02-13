@@ -201,9 +201,10 @@ class CycleCountService {
     }
 
     CycleCountDto createCycleCount(CycleCountStartCommand request, Location facility) {
-        // We don't set the status on the cycle count here because it will be done automatically upon save.
         CycleCount newCycleCount = new CycleCount(
                 facility: facility,
+                // Set an initial status here so that validation passes. It gets automatically recomputed on save.
+                status: CycleCountStatus.REQUESTED,
                 dateLastRefreshed: new Date()
         )
 
