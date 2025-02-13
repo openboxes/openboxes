@@ -1,6 +1,6 @@
 import { EventEmitter } from 'events';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { createColumnHelper } from '@tanstack/react-table';
 import _ from 'lodash';
@@ -209,7 +209,7 @@ const useResolveStepTable = ({
           {translate('react.cycleCount.table.quantityCounted.label', 'Quantity Counted')}
         </TableHeaderCell>
       ), []),
-      cell: ({ row: { original: { id } } }) => (
+      cell: useCallback(({ row: { original: { id } } }) => (
         // TODO: Remove check if id is equal to quantityCounted
         //  after quantityCounted will be added to the response
         <TableCell className="rt-td rt-td-count-step static-cell-count-step">
@@ -231,7 +231,7 @@ const useResolveStepTable = ({
             </Tooltip>
           ) : ''}
         </TableCell>
-      ),
+      ), []),
     }),
     columnHelper.accessor(cycleCountColumn.COUNT_DIFFERENCE, {
       header: useMemo(() => (
@@ -239,14 +239,14 @@ const useResolveStepTable = ({
           {translate('react.cycleCount.table.countDifference.label', 'Count Difference')}
         </TableHeaderCell>
       ), []),
-      cell: ({ row: { original: { id, quantityOnHand } } }) => (
+      cell: useCallback(({ row: { original: { id, quantityOnHand } } }) => (
         // TODO: Replace random value with quantityCounted from response
         <TableCell className="rt-td rt-td-count-step static-cell-count-step">
           {id.includes('newRow')
             ? '-'
             : (Math.floor(Math.random() * 10) - quantityOnHand).toString()}
         </TableCell>
-      ),
+      ), []),
     }),
     columnHelper.accessor(cycleCountColumn.QUANTITY_RECOUNTED, {
       header: useMemo(() => (
@@ -291,7 +291,7 @@ const useResolveStepTable = ({
     columnHelper.accessor(null, {
       id: cycleCountColumn.ACTIONS,
       header: useMemo(() => <TableHeaderCell className="count-step-actions" />, []),
-      cell: ({ row: { original } }) => (
+      cell: useCallback(({ row: { original } }) => (
         <TableCell className="rt-td d-flex justify-content-center count-step-actions">
           <Tooltip
             arrow="true"
@@ -314,7 +314,7 @@ const useResolveStepTable = ({
             )}
           </Tooltip>
         </TableCell>
-      ),
+      ), []),
       meta: {
         getCellContext: () => ({
           className: 'count-step-actions',
