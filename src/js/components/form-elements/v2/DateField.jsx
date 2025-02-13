@@ -31,7 +31,6 @@ const DateField = ({
 }) => {
   const translate = useTranslate();
   const onClear = () => onChange(null);
-
   const onChangeHandler = (date) => {
     if (showTimeSelect) {
       onChange(date?.format(DateFormat.MMM_DD_YYYY_HH_MM_SS));
@@ -61,6 +60,13 @@ const DateField = ({
 
   const datePickerRef = useRef(null);
 
+  const getDateFormat = () => {
+    if (showTimeSelect) {
+      return customDateFormat ? `${customDateFormat} HH:mm:ss` : DateFormat.MMM_DD_YYYY_HH_MM_SS;
+    }
+    return customDateFormat || DateFormat.MMM_DD_YYYY;
+  };
+
   return (
     <InputWrapper
       title={title}
@@ -75,8 +81,7 @@ const DateField = ({
         customInput={<DateFieldInput onClear={onClear} />}
         className={`form-element-input ${errorMessage ? 'has-errors' : ''} ${className}`}
         dropdownMode="scroll"
-        dateFormat={showTimeSelect ? DateFormat.MMM_DD_YYYY_HH_MM_SS
-          : (customDateFormat || DateFormat.MMM_DD_YYYY)}
+        dateFormat={getDateFormat()}
         timeFormat={TimeFormat.HH_MM}
         disabled={disabled}
         timeIntervals={15}

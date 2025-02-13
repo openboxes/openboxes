@@ -21,7 +21,7 @@ const useCountStepTable = ({
   removeRow,
   validationErrors,
   tableData,
-  isEditable,
+  isEditableStep,
   formatLocalizedDate,
 }) => {
   const columnHelper = createColumnHelper();
@@ -86,6 +86,21 @@ const useCountStepTable = ({
     return {};
   };
 
+  // this function is required because there is a problem w getValue
+  const getValueToDisplay = (id, value) => {
+    let valueToDisplay = null;
+
+    if (id === 'quantityCounted') {
+      valueToDisplay = value === 0 ? '0' : value;
+    } else if (id === 'inventoryItem_expirationDate') {
+      valueToDisplay = formatLocalizedDate(value, DateFormat.DD_MMM_YYYY);
+    } else if (id === 'inventoryItem_lotNumber' || id === 'comment') {
+      valueToDisplay = value;
+    }
+
+    return valueToDisplay;
+  };
+
   const defaultColumn = {
     cell: ({
       getValue, row: { original, index }, column: { id }, table,
@@ -93,9 +108,22 @@ const useCountStepTable = ({
       // Keep and update the state of the cell during rerenders
       const columnPath = id.replaceAll('_', '.');
       const initialValue = _.get(tableData, `[${index}].${columnPath}`);
-      const errorMessage = validationErrors?.[cycleCountId]?.errors?.[index]?.[columnPath]?._errors;
-
       const [value, setValue] = useState(initialValue);
+      const isFieldEditable = !original.id.includes('newRow') && id !== 'quantityCounted';
+
+      // isEditableStep is a boolean that checks whether we are at the save step.
+      // We shouldn't allow users edit fetched data (only quantity counted is editable)
+      if (isFieldEditable || !isEditableStep) {
+        const valueToDisplay = getValueToDisplay(id, value);
+
+        return (
+          <TableCell className="static-cell-count-step">
+            {valueToDisplay || getValue()}
+          </TableCell>
+        );
+      }
+
+      const errorMessage = validationErrors?.[cycleCountId]?.errors?.[index]?.[columnPath]?._errors;
       const [error, setError] = useState(errorMessage);
       // If the value at the end of entering data is the same as it was initially,
       // we don't want to trigger rerender
@@ -107,24 +135,6 @@ const useCountStepTable = ({
           setError(null);
         }
       };
-      const isFieldEditable = !original.id.includes('newRow') && id !== 'quantityCounted';
-      // We shouldn't allow users edit fetched data (only quantity counted is editable)
-      if (isFieldEditable || !isEditable) {
-        let valueToDisplay = null;
-
-        if (id === 'quantityCounted') {
-          valueToDisplay = value === 0 ? '0' : value;
-        }
-        if (id === 'inventoryItem_expirationDate') {
-          valueToDisplay = formatLocalizedDate(getValue(), DateFormat.DD_MMM_YYYY);
-        }
-
-        return (
-          <TableCell className="static-cell-count-step">
-            {valueToDisplay || getValue()}
-          </TableCell>
-        );
-      }
       // on change function expects e.target.value for text fields,
       // in other cases it expects just the value
       const onChange = (e) => {
@@ -214,7 +224,7 @@ const useCountStepTable = ({
             )}
             disabled={original.id}
           >
-            {original.id.includes('newRow') && isEditable && (
+            {original.id.includes('newRow') && isEditableStep && (
             <RiDeleteBinLine
               onClick={() => removeRow(cycleCountId, original.id)}
               size={22}
