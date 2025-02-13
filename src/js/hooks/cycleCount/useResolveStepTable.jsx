@@ -1,8 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import { EventEmitter } from 'events';
+
+import React, { useEffect, useMemo, useState } from 'react';
 
 import { createColumnHelper } from '@tanstack/react-table';
 import _ from 'lodash';
-import { RiDeleteBinLine } from 'react-icons/ri';
+import { RiChat3Line, RiDeleteBinLine } from 'react-icons/ri';
 import { useSelector } from 'react-redux';
 import { Tooltip } from 'react-tippy';
 
@@ -11,23 +13,23 @@ import TableHeaderCell from 'components/DataTable/TableHeaderCell';
 import DateField from 'components/form-elements/v2/DateField';
 import SelectField from 'components/form-elements/v2/SelectField';
 import TextInput from 'components/form-elements/v2/TextInput';
+import cycleCountColumn from 'consts/cycleCountColumn';
+import discrepancyReasonCode from 'consts/discrepancyReasonCode';
 import useTranslate from 'hooks/useTranslate';
 import { fetchBins } from 'utils/option-utils';
-import cycleCountColumn from 'consts/cycleCountColumn';
 
-// Managing state for single table, mainly table configuration (from count step)
-const useCountStepTable = ({
+// Managing state for single table, mainly table configuration (from resolve step)
+const useResolveStepTable = ({
   cycleCountId,
   removeRow,
   validationErrors,
   tableData,
-  isEditable,
 }) => {
   const columnHelper = createColumnHelper();
   // State for saving data for binLocation dropdown
   const [binLocations, setBinLocations] = useState([]);
-
   const translate = useTranslate();
+  const events = new EventEmitter();
 
   const { recipients, currentLocation } = useSelector((state) => ({
     recipients: state.users.data,
@@ -47,7 +49,7 @@ const useCountStepTable = ({
       return DateField;
     }
 
-    if (fieldName === cycleCountColumn.BIN_LOCATION) {
+    if ([cycleCountColumn.BIN_LOCATION, cycleCountColumn.ROOT_CAUSE].includes(fieldName)) {
       return SelectField;
     }
 
@@ -57,7 +59,10 @@ const useCountStepTable = ({
   // Get text input type: quantityCounted expects a number,
   // the rest of the inputs should be text
   const getFieldType = (fieldName) => {
-    if (fieldName === cycleCountColumn.QUANTITY_COUNTED) {
+    if ([
+      cycleCountColumn.QUANTITY_COUNTED,
+      cycleCountColumn.QUANTITY_RECOUNTED,
+    ].includes(fieldName)) {
       return 'number';
     }
 
@@ -76,6 +81,17 @@ const useCountStepTable = ({
       };
     }
 
+    if (fieldName === cycleCountColumn.ROOT_CAUSE) {
+      return {
+        // TODO: It should be replaced with discrepancies fetched from API
+        options: Object.values(discrepancyReasonCode).map((value) => ({
+          id: value,
+          label: _.capitalize(value.toLowerCase().replaceAll('_', ' ')),
+        })),
+        placeholder: translate('react.cycleCount.selectPlaceholder.label', 'Select'),
+      };
+    }
+
     return {};
   };
 
@@ -83,11 +99,17 @@ const useCountStepTable = ({
     cell: ({
       getValue, row: { original, index }, column: { id }, table,
     }) => {
-      const isFieldEditable = !original.id.includes('newRow') && id !== cycleCountColumn.QUANTITY_COUNTED;
-      // We shouldn't allow users edit fetched data (only quantity counted is editable)
-      if (isFieldEditable || !isEditable) {
+      const isFieldEditable = !original.id.includes('newRow')
+        && ![
+          cycleCountColumn.QUANTITY_RECOUNTED,
+          cycleCountColumn.ROOT_CAUSE,
+          cycleCountColumn.COMMENT,
+        ].includes(id);
+      // We shouldn't allow users edit fetched data (quantityRecounted, rootCause and comment
+      // field are editable)
+      if (isFieldEditable) {
         return (
-          <TableCell className="static-cell-count-step">
+          <TableCell className="rt-td rt-td-count-step static-cell-count-step">
             {getValue()}
           </TableCell>
         );
@@ -104,9 +126,13 @@ const useCountStepTable = ({
       const isEdited = initialValue !== value;
       // When the input is blurred, we'll call the table meta's updateData function
       const onBlur = () => {
-        if (isEdited) {
-          table.options.meta?.updateData(cycleCountId, original.id, id, value);
-          setError(null);
+        if (!isEdited) {
+          return;
+        }
+        table.options.meta?.updateData(cycleCountId, original.id, id, value);
+        setError(null);
+        if (id === cycleCountColumn.QUANTITY_RECOUNTED) {
+          events.emit('refreshRecountDifference');
         }
       };
 
@@ -116,8 +142,8 @@ const useCountStepTable = ({
         setValue(e?.target?.value ?? e);
       };
 
-      // Table consists of text fields, one numerical field for quantity counted,
-      // select field for bin locations and one date picker for the expiration date.
+      // Table consists of text fields, one numerical field for quantity recounted,
+      // select field for bin locations and root cause and one date picker for the expiration date.
       const type = getFieldType(id);
       const Component = getFieldComponent(id);
       const fieldProps = getFieldProps(id);
@@ -142,26 +168,26 @@ const useCountStepTable = ({
     columnHelper.accessor(
       (row) => (row?.binLocation?.label ? row?.binLocation : row.binLocation?.name), {
         id: cycleCountColumn.BIN_LOCATION,
-        header: () => (
+        header: useMemo(() => (
           <TableHeaderCell>
             {translate('react.cycleCount.table.binLocation.label', 'Bin Location')}
           </TableHeaderCell>
-        ),
+        ), []),
       },
     ),
     columnHelper.accessor(cycleCountColumn.LOT_NUMBER, {
-      header: () => (
+      header: useMemo(() => (
         <TableHeaderCell>
           {translate('react.cycleCount.table.lotNumber.label', 'Serial / Lot Number')}
         </TableHeaderCell>
-      ),
+      ), []),
     }),
     columnHelper.accessor(cycleCountColumn.EXPIRATION_DATE, {
-      header: () => (
+      header: useMemo(() => (
         <TableHeaderCell>
           {translate('react.cycleCount.table.expirationDate.label', 'Expiration Date')}
         </TableHeaderCell>
-      ),
+      ), []),
       meta: {
         getCellContext: () => ({
           className: 'split-table-right',
@@ -169,22 +195,93 @@ const useCountStepTable = ({
       },
     }),
     columnHelper.accessor(cycleCountColumn.QUANTITY_COUNTED, {
-      header: () => (
+      header: useMemo(() => (
         <TableHeaderCell>
           {translate('react.cycleCount.table.quantityCounted.label', 'Quantity Counted')}
         </TableHeaderCell>
+      ), []),
+      cell: ({ row: { original: { id } } }) => (
+        // TODO: Remove check if id is equal to quantityCounted
+        //  after quantityCounted will be added to the response
+        <TableCell className="rt-td rt-td-count-step static-cell-count-step">
+          {id.includes('newRow') ? '-' : Math.floor(Math.random() * 10).toString()}
+          {!id.includes('newRow') ? (
+            <Tooltip
+              arrow="true"
+              delay="150"
+              duration="250"
+              hideDelay="50"
+              // TODO: Should be replaced with comment fetched from the API
+              html={<span className="p-2">Comment from count step</span>}
+            >
+              <RiChat3Line
+                role="button"
+                size={16}
+                className="ml-2"
+              />
+            </Tooltip>
+          ) : ''}
+        </TableCell>
       ),
     }),
+    columnHelper.accessor(cycleCountColumn.COUNT_DIFFERENCE, {
+      header: useMemo(() => (
+        <TableHeaderCell>
+          {translate('react.cycleCount.table.countDifference.label', 'Count Difference')}
+        </TableHeaderCell>
+      ), []),
+      cell: ({ row: { original: { id, quantityOnHand } } }) => (
+        // TODO: Replace random value with quantityCounted from response
+        <TableCell className="rt-td rt-td-count-step static-cell-count-step">
+          {id.includes('newRow')
+            ? '-'
+            : (Math.floor(Math.random() * 10) - quantityOnHand).toString()}
+        </TableCell>
+      ),
+    }),
+    columnHelper.accessor(cycleCountColumn.QUANTITY_RECOUNTED, {
+      header: useMemo(() => (
+        <TableHeaderCell>
+          {translate('react.cycleCount.table.quantityRecounted.label', 'Quantity Recounted')}
+        </TableHeaderCell>
+      ), []),
+    }),
+    columnHelper.accessor(cycleCountColumn.RECOUNT_DIFFERENCE, {
+      header: useMemo(() => (
+        <TableHeaderCell>
+          {translate('react.cycleCount.table.recountDifference.label', 'Recount Difference')}
+        </TableHeaderCell>
+      ), []),
+      cell: ({ row: { original: { quantityOnHand }, index } }) => {
+        const [value, setValue] = useState(tableData?.[index]?.quantityRecounted);
+        events.on('refreshRecountDifference', () => {
+          setValue(tableData?.[index]?.quantityRecounted);
+        });
+
+        return (
+          <TableCell className="rt-td rt-td-count-step static-cell-count-step">
+            {value !== undefined ? ((value - quantityOnHand || 0)).toString() : 'EQUAL'}
+          </TableCell>
+        );
+      },
+    }),
+    columnHelper.accessor(cycleCountColumn.ROOT_CAUSE, {
+      header: useMemo(() => (
+        <TableHeaderCell>
+          {translate('react.cycleCount.table.rootCause.label', 'Root Cause')}
+        </TableHeaderCell>
+      ), []),
+    }),
     columnHelper.accessor(cycleCountColumn.COMMENT, {
-      header: () => (
+      header: useMemo(() => (
         <TableHeaderCell>
           {translate('react.cycleCount.table.comment.label', 'Comment')}
         </TableHeaderCell>
-      ),
+      ), []),
     }),
     columnHelper.accessor(null, {
       id: cycleCountColumn.ACTIONS,
-      header: () => <TableHeaderCell className="count-step-actions" />,
+      header: useMemo(() => <TableHeaderCell className="count-step-actions" />, []),
       cell: ({ row: { original } }) => (
         <TableCell className="rt-td d-flex justify-content-center count-step-actions">
           <Tooltip
@@ -201,10 +298,10 @@ const useCountStepTable = ({
             disabled={original.id}
           >
             {original.id.includes('newRow') && (
-            <RiDeleteBinLine
-              onClick={() => removeRow(cycleCountId, original.id)}
-              size={22}
-            />
+              <RiDeleteBinLine
+                onClick={() => removeRow(cycleCountId, original.id)}
+                size={22}
+              />
             )}
           </Tooltip>
         </TableCell>
@@ -224,4 +321,4 @@ const useCountStepTable = ({
   };
 };
 
-export default useCountStepTable;
+export default useResolveStepTable;
