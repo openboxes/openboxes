@@ -26,6 +26,7 @@ const DateField = ({
   value,
   onChange,
   showTimeSelect,
+  customDateFormat,
   ...fieldProps
 }) => {
   const translate = useTranslate();
@@ -74,7 +75,8 @@ const DateField = ({
         customInput={<DateFieldInput onClear={onClear} />}
         className={`form-element-input ${errorMessage ? 'has-errors' : ''} ${className}`}
         dropdownMode="scroll"
-        dateFormat={showTimeSelect ? DateFormat.MMM_DD_YYYY_HH_MM_SS : DateFormat.MMM_DD_YYYY}
+        dateFormat={showTimeSelect ? DateFormat.MMM_DD_YYYY_HH_MM_SS
+          : (customDateFormat || DateFormat.MMM_DD_YYYY)}
         timeFormat={TimeFormat.HH_MM}
         disabled={disabled}
         timeIntervals={15}
@@ -140,6 +142,7 @@ DateField.propTypes = {
   value: PropTypes.string,
   onChange: PropTypes.func,
   showTimeSelect: PropTypes.bool,
+  customDateFormat: PropTypes.string,
 };
 
 DateField.defaultProps = {
@@ -154,4 +157,5 @@ DateField.defaultProps = {
   value: null,
   onChange: () => {},
   showTimeSelect: false,
+  customDateFormat: null,
 };

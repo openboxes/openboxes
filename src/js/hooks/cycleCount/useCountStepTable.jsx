@@ -11,6 +11,7 @@ import TableHeaderCell from 'components/DataTable/TableHeaderCell';
 import DateField from 'components/form-elements/v2/DateField';
 import SelectField from 'components/form-elements/v2/SelectField';
 import TextInput from 'components/form-elements/v2/TextInput';
+import { DateFormat } from 'consts/timeFormat';
 import useTranslate from 'hooks/useTranslate';
 import { fetchBins } from 'utils/option-utils';
 
@@ -21,6 +22,7 @@ const useCountStepTable = ({
   validationErrors,
   tableData,
   isEditable,
+  formatLocalizedDate,
 }) => {
   const columnHelper = createColumnHelper();
   // State for saving data for binLocation dropdown
@@ -75,6 +77,12 @@ const useCountStepTable = ({
       };
     }
 
+    if (fieldName === 'inventoryItem_expirationDate') {
+      return {
+        customDateFormat: DateFormat.DD_MMM_YYYY,
+      };
+    }
+
     return {};
   };
 
@@ -82,15 +90,6 @@ const useCountStepTable = ({
     cell: ({
       getValue, row: { original, index }, column: { id }, table,
     }) => {
-      const isFieldEditable = !original.id.includes('newRow') && id !== 'quantityCounted';
-      // We shouldn't allow users edit fetched data (only quantity counted is editable)
-      if (isFieldEditable || !isEditable) {
-        return (
-          <TableCell className="static-cell-count-step">
-            {getValue()}
-          </TableCell>
-        );
-      }
       // Keep and update the state of the cell during rerenders
       const columnPath = id.replaceAll('_', '.');
       const initialValue = _.get(tableData, `[${index}].${columnPath}`);
@@ -108,13 +107,30 @@ const useCountStepTable = ({
           setError(null);
         }
       };
+      const isFieldEditable = !original.id.includes('newRow') && id !== 'quantityCounted';
+      // We shouldn't allow users edit fetched data (only quantity counted is editable)
+      if (isFieldEditable || !isEditable) {
+        let valueToDisplay = null;
 
+        if (id === 'quantityCounted') {
+          // If value is 0, show "0", otherwise show the value
+          valueToDisplay = value === 0 ? '0' : value;
+        }
+        if (id === 'inventoryItem_expirationDate') {
+          valueToDisplay = formatLocalizedDate(getValue(), DateFormat.DD_MMM_YYYY);
+        }
+
+        return (
+          <TableCell className="static-cell-count-step">
+            {valueToDisplay || getValue()}
+          </TableCell>
+        );
+      }
       // on change function expects e.target.value for text fields,
       // in other cases it expects just the value
       const onChange = (e) => {
         setValue(e?.target?.value ?? e);
       };
-
       // Table consists of text fields, one numerical field for quantity counted,
       // select field for bin locations and one date picker for the expiration date.
       const type = getFieldType(id);
@@ -199,7 +215,7 @@ const useCountStepTable = ({
             )}
             disabled={original.id}
           >
-            {original.id.includes('newRow') && (
+            {original.id.includes('newRow') && isEditable && (
             <RiDeleteBinLine
               onClick={() => removeRow(cycleCountId, original.id)}
               size={22}

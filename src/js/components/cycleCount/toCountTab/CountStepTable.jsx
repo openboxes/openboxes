@@ -9,7 +9,7 @@ import DataTable from 'components/DataTable/v2/DataTable';
 import Button from 'components/form-elements/Button';
 import DateField from 'components/form-elements/v2/DateField';
 import SelectField from 'components/form-elements/v2/SelectField';
-import DateFormat from 'consts/dateFormat';
+import { DateFormat } from 'consts/timeFormat';
 import useCountStepTable from 'hooks/cycleCount/useCountStepTable';
 import useTranslate from 'hooks/useTranslate';
 import { formatDate } from 'utils/translation-utils';
@@ -30,6 +30,9 @@ const CountStepTable = ({
   isEditable,
   countedBy,
 }) => {
+  const translate = useTranslate();
+  const localize = useSelector((state) => state.localize);
+  const formatLocalizedDate = formatDate(localize);
   const {
     columns,
     defaultColumn,
@@ -40,10 +43,8 @@ const CountStepTable = ({
     validationErrors,
     removeRow,
     isEditable,
+    formatLocalizedDate,
   });
-  const translate = useTranslate();
-  const localize = useSelector((state) => state.localize);
-  const formatLocalizedDate = formatDate(localize);
 
   return (
     <div className="list-page-list-section">
@@ -64,8 +65,9 @@ const CountStepTable = ({
               className="date-counted-date-picker date-field-input"
               onChange={setCountedDate}
               value={dateCounted}
+              customDateFormat={DateFormat.DD_MMM_YYYY}
             />
-          ) : <p>{formatLocalizedDate(dateCounted, DateFormat.COMMON)}</p>}
+          ) : <p>{formatLocalizedDate(dateCounted, DateFormat.DD_MMM_YYYY)}</p>}
         </div>
         <div className={`d-flex count-step-select-counted-by ml-5 align-items-center ${!isEditable && 'p-2'}`}>
           <p className="count-step-label mr-2">
