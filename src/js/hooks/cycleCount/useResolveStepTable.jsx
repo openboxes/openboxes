@@ -5,16 +5,16 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { createColumnHelper } from '@tanstack/react-table';
 import _ from 'lodash';
 import { RiChat3Line, RiDeleteBinLine } from 'react-icons/ri';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Tooltip } from 'react-tippy';
 
+import { fetchReasonCodes } from 'actions';
 import { TableCell } from 'components/DataTable';
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
 import DateField from 'components/form-elements/v2/DateField';
 import SelectField from 'components/form-elements/v2/SelectField';
 import TextInput from 'components/form-elements/v2/TextInput';
 import cycleCountColumn from 'consts/cycleCountColumn';
-import discrepancyReasonCode from 'consts/discrepancyReasonCode';
 import useTranslate from 'hooks/useTranslate';
 import { fetchBins } from 'utils/option-utils';
 
@@ -31,10 +31,17 @@ const useResolveStepTable = ({
   const translate = useTranslate();
   const events = new EventEmitter();
 
-  const { recipients, currentLocation } = useSelector((state) => ({
+  const {
+    recipients,
+    currentLocation,
+    reasonCodes,
+  } = useSelector((state) => ({
     recipients: state.users.data,
     currentLocation: state.session.currentLocation,
+    reasonCodes: state.reasonCodes.data,
   }));
+
+  const dispatch = useDispatch();
 
   useEffect(() => {
     (async () => {
@@ -42,6 +49,12 @@ const useResolveStepTable = ({
       setBinLocations(fetchedBins);
     })();
   }, [currentLocation?.id]);
+
+  useEffect(() => {
+    if (!reasonCodes.length) {
+      dispatch(fetchReasonCodes());
+    }
+  }, []);
 
   // Get appropriate input component based on table column
   const getFieldComponent = (fieldName) => {
@@ -83,11 +96,7 @@ const useResolveStepTable = ({
 
     if (fieldName === cycleCountColumn.ROOT_CAUSE) {
       return {
-        // TODO: It should be replaced with discrepancies fetched from API
-        options: Object.values(discrepancyReasonCode).map((value) => ({
-          id: value,
-          label: _.capitalize(value.toLowerCase().replaceAll('_', ' ')),
-        })),
+        options: reasonCodes,
         placeholder: translate('react.cycleCount.selectPlaceholder.label', 'Select'),
       };
     }
@@ -260,7 +269,7 @@ const useResolveStepTable = ({
 
         return (
           <TableCell className="rt-td rt-td-count-step static-cell-count-step">
-            {value !== undefined ? ((value - quantityOnHand || 0)).toString() : 'EQUAL'}
+            {value !== undefined ? (value - (quantityOnHand || 0)).toString() : 'EQUAL'}
           </TableCell>
         );
       },

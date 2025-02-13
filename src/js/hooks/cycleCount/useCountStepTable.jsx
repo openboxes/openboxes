@@ -11,9 +11,9 @@ import TableHeaderCell from 'components/DataTable/TableHeaderCell';
 import DateField from 'components/form-elements/v2/DateField';
 import SelectField from 'components/form-elements/v2/SelectField';
 import TextInput from 'components/form-elements/v2/TextInput';
+import cycleCountColumn from 'consts/cycleCountColumn';
 import useTranslate from 'hooks/useTranslate';
 import { fetchBins } from 'utils/option-utils';
-import cycleCountColumn from 'consts/cycleCountColumn';
 
 // Managing state for single table, mainly table configuration (from count step)
 const useCountStepTable = ({
