@@ -65,8 +65,7 @@ const CountStepTable = ({
               className="date-counted-date-picker date-field-input"
               onChange={setCountedDate}
               value={dateCounted}
-              // customDateFormat={DateFormat.DD_MMM_YYYY}
-              dateFormat={DateFormat.DD_MMM_YYYY}
+              customDateFormat={DateFormat.DD_MMM_YYYY}
             />
           ) : <p>{formatLocalizedDate(dateCounted, DateFormat.DD_MMM_YYYY)}</p>}
         </div>
