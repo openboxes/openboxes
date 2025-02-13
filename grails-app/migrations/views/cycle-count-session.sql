@@ -8,6 +8,9 @@ CREATE OR REPLACE VIEW cycle_count_session AS (
         cycle_count_request.id as cycle_count_request_id,
         COALESCE(inventory_level.abc_class, product.abc_class) as abc_class,
 
+        # Consolidate the statuses down to a single field representing the status of the candidate itself.
+        COALESCE(cycle_count.status, cycle_count_request.status) as status,
+
 		# Inventory Item Count
 		count(*) as inventory_item_count,
 
@@ -29,6 +32,7 @@ CREATE OR REPLACE VIEW cycle_count_session AS (
 	JOIN inventory on location.inventory_id = inventory.id
     LEFT OUTER JOIN inventory_level on product.id = inventory_level.product_id AND inventory.id = inventory_level.inventory_id
     LEFT OUTER JOIN cycle_count_request ON product.id = cycle_count_request.product_id AND location.id = cycle_count_request.facility_id
+    LEFT OUTER JOIN cycle_count ON cycle_count_request.cycle_count_id = cycle_count.id
     WHERE product_availability.quantity_on_hand > 0
        AND (cycle_count_request.id IS NULL OR (cycle_count_request.status <> 'COMPLETED' AND cycle_count_request.status <> 'CANCELED'))
 	GROUP BY location.id, product.id, abc_class, cycle_count_request.id

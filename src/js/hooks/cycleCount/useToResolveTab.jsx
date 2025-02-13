@@ -10,7 +10,7 @@ import { TableCell } from 'components/DataTable';
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
 import Checkbox from 'components/form-elements/v2/Checkbox';
 import { INVENTORY_ITEM_URL } from 'consts/applicationUrls';
-import CycleCountStatus from 'consts/cycleCountStatus';
+import CycleCountCandidateStatus from 'consts/cycleCountCandidateStatus';
 import useSpinner from 'hooks/useSpinner';
 import useTableCheckboxes from 'hooks/useTableCheckboxes';
 import useTableDataV2 from 'hooks/useTableDataV2';
@@ -48,10 +48,10 @@ const useToResolveTab = ({
   const getParams = ({
     sortingParams,
   }) => _.omitBy({
-    // TODO: We need to display only the rows where cycle count in [INVESTIGATING, COUNTED].
-    //       This will require us to be able to filter on the cycle count status, not just the cycle
-    //       count request status! https://pihemr.atlassian.net/browse/OBPIH-6931
-    status: CycleCountStatus.CREATED,
+    statuses: [
+      CycleCountCandidateStatus.COUNTED,
+      CycleCountCandidateStatus.INVESTIGATING,
+    ],
     offset: `${offset}`,
     max: `${pageSize}`,
     ...sortingParams,
@@ -133,18 +133,17 @@ const useToResolveTab = ({
   });
 
   const columns = useMemo(() => [
-    columnHelper.accessor('cycleCountRequest.cycleCount.status', {
+    columnHelper.accessor('status', {
       header: () => (
         <TableHeaderCell>
           {translate('react.cycleCount.table.status.label', 'Status')}
         </TableHeaderCell>
       ),
       cell: ({ getValue }) => (
-        // TODO: Use variant fetched from the API https://pihemr.atlassian.net/browse/OBPIH-6931
         <TableCell className="rt-td">
           <StatusIndicator
             variant="primary"
-            status={translate(`react.cycleCount.status.${getValue()}.label`, 'To Resolve')}
+            status={translate(`react.cycleCount.CycleCountCandidateStatus.${getValue()}.label`, 'To resolve')}
           />
         </TableCell>
       ),
@@ -158,10 +157,14 @@ const useToResolveTab = ({
       ),
       cell: ({ getValue, row }) => (
         <TableCell
+          tooltip
+          tooltipLabel={getValue()}
           link={INVENTORY_ITEM_URL.showStockCard(row.original.product.id)}
           className="rt-td multiline-cell"
         >
-          {getValue()}
+          <div className="limit-lines-2">
+            {getValue()}
+          </div>
         </TableCell>
       ),
     }),

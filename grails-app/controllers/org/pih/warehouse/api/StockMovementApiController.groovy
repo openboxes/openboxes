@@ -11,6 +11,8 @@ package org.pih.warehouse.api
 
 import grails.converters.JSON
 import org.grails.web.json.JSONObject
+
+import org.pih.warehouse.DateUtil
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.DocumentService
@@ -359,19 +361,12 @@ class StockMovementApiController {
         render([data: pendingRequisitionDetails] as JSON)
     }
 
-    /**
-     * Bind the date field value to the date object.
-     *
-     * @param dateObject
-     * @param jsonObject
-     * @param dateField
-     */
     private Date parseDateRequested(String date) {
-        return date ? Constants.EXPIRATION_DATE_FORMATTER.parse(date) : null
+        return DateUtil.asDate(date, Constants.EXPIRATION_DATE_FORMATTER)
     }
 
     private Date parseDateShipped(String date) {
-        return date ? Constants.DELIVERY_DATE_FORMATTER.parse(date) : null
+        return DateUtil.asDate(date, Constants.DELIVERY_DATE_FORMATTER)
     }
 
     private void bindStockMovement(StockMovement stockMovement, JSONObject jsonObject) {

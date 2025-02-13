@@ -17,7 +17,6 @@ const useCountStep = () => {
   // Saving selected "date counted" option, initially it's the date fetched from API
   const [dateCounted, setDateCounted] = useState({});
   const [isEditableStep, setIsEditableStep] = useState(true);
-
   const dispatch = useDispatch();
 
   const {
