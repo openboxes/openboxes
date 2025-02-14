@@ -329,7 +329,6 @@ const useToCountTab = ({
     const payload = {
       requests: checkedCheckboxes.map((cycleCountRequestId) => ({
         cycleCountRequest: cycleCountRequestId,
-        countIndex: 0,
       })),
     };
     spinner.show();

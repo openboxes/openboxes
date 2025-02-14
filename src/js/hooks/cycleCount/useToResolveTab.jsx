@@ -330,7 +330,7 @@ const useToResolveTab = ({
     };
     spinner.show();
     try {
-      await cycleCountApi.startCount(payload, currentLocation?.id);
+      await cycleCountApi.startRecount(payload, currentLocation?.id);
     } finally {
       spinner.hide();
     }

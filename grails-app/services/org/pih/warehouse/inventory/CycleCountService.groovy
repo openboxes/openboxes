@@ -213,21 +213,13 @@ class CycleCountService {
         request.cycleCountRequest.cycleCount = newCycleCount
         request.cycleCountRequest.status = CycleCountRequestStatus.IN_PROGRESS
         itemsToSave.each { AvailableItem availableItem ->
-            CycleCountItem cycleCountItem = new CycleCountItem(
-                    status: CycleCountItemStatus.READY_TO_COUNT,
-                    countIndex: request.countIndex,
-                    quantityOnHand: availableItem.quantityOnHand,
-                    quantityCounted: availableItem.quantityOnHand == 0 ? 0 : null,
-                    cycleCount: newCycleCount,
-                    facility: facility,
-                    location: availableItem.binLocation,
-                    inventoryItem: availableItem.inventoryItem,
-                    product: availableItem.inventoryItem.product,
-                    createdBy: AuthService.currentUser,
-                    updatedBy: AuthService.currentUser,
-                    dateCounted: new Date(),
-                    custom: false,
-            )
+            CycleCountItem cycleCountItem = initCycleCountItem(
+                    facility,
+                    availableItem,
+                    newCycleCount,
+                    0,  // countIndex is always zero for the initial count
+                    CycleCountItemStatus.READY_TO_COUNT)
+
             newCycleCount.addToCycleCountItems(cycleCountItem)
         }
 
@@ -236,6 +228,80 @@ class CycleCountService {
         }
 
         return CycleCountDto.toDto(newCycleCount)
+    }
+
+    /**
+     * Inserts a list of cycle count items representing the recount for each request in the given batch.
+     */
+    List<CycleCountDto> startRecount(CycleCountStartRecountBatchCommand command) {
+        Location facility = command.facility
+
+        List<CycleCountDto> cycleCounts = []
+        for (CycleCountStartRecountCommand request : command.requests) {
+            CycleCountDto cycleCountDto = startRecount(facility, request)
+            cycleCounts.add(cycleCountDto)
+        }
+
+        return cycleCounts
+    }
+
+    /**
+     * Inserts a list of cycle count items representing the recount for the given request.
+     */
+    CycleCountDto startRecount(Location facility, CycleCountStartRecountCommand command) {
+        CycleCount cycleCount = command.cycleCountRequest.cycleCount
+        Product product = command.cycleCountRequest.product
+
+        // If there are already items for the requested count index, simply return the count as it is since the recount
+        // has already been started. We do this (instead of throwing an error) because it's convenient for the frontend.
+        if (cycleCount.cycleCountItems.any(){ it.countIndex == command.countIndex }) {
+            return CycleCountDto.toDto(cycleCount)
+        }
+
+        // The items to recount are determined by product availability, just like in a regular count. As such, any
+        // new transactions that have occurred on the product since the initial count will be applied when determining
+        // the QoH values used for recounts. This includes any new [bin location + lot number] quantities that did not
+        // exist at the time of the initial count.
+        List<AvailableItem> availableItemsToRecount = determineCycleCountItemsToSave(facility, product)
+        for (AvailableItem availableItemToRecount : availableItemsToRecount) {
+            CycleCountItem cycleCountItem = initCycleCountItem(
+                    facility,
+                    availableItemToRecount,
+                    cycleCount,
+                    command.countIndex,
+                    CycleCountItemStatus.INVESTIGATING)
+
+            cycleCount.addToCycleCountItems(cycleCountItem)
+        }
+
+        if (!cycleCount.save()) {
+            throw new ValidationException("Invalid cycle count", cycleCount.errors)
+        }
+        return CycleCountDto.toDto(cycleCount)
+    }
+
+    private CycleCountItem initCycleCountItem(
+            Location facility,
+            AvailableItem availableItem,
+            CycleCount cycleCount,
+            int countIndex,
+            CycleCountItemStatus status) {
+
+        return new CycleCountItem(
+                status: status,
+                countIndex: countIndex,
+                quantityOnHand: availableItem.quantityOnHand,
+                quantityCounted: availableItem.quantityOnHand == 0 ? 0 : null,
+                cycleCount: cycleCount,
+                facility: facility,
+                location: availableItem.binLocation,
+                inventoryItem: availableItem.inventoryItem,
+                product: availableItem.inventoryItem.product,
+                createdBy: AuthService.currentUser,
+                updatedBy: AuthService.currentUser,
+                dateCounted: new Date(),
+                custom: false,
+        )
     }
 
     CycleCountDto updateCycleCount(CycleCount cycleCount, List<CycleCountItem> cycleCountItems, CycleCountStartCommand request) {
