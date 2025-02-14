@@ -129,6 +129,7 @@ const useToResolveTab = ({
       getCellContext: () => ({
         className: 'checkbox-column',
       }),
+      flexWidth: 40,
     },
   });
 
@@ -147,6 +148,9 @@ const useToResolveTab = ({
           />
         </TableCell>
       ),
+      meta: {
+        flexWidth: 180,
+      },
     }),
     columnHelper.accessor((row) => `${row.product.productCode} ${row.product.name}`, {
       id: 'product',
@@ -167,6 +171,9 @@ const useToResolveTab = ({
           </div>
         </TableCell>
       ),
+      meta: {
+        flexWidth: 370,
+      },
     }),
     columnHelper.accessor('category.name', {
       header: () => (
@@ -179,6 +186,9 @@ const useToResolveTab = ({
           {getValue()}
         </TableCell>
       ),
+      meta: {
+        flexWidth: 200,
+      },
     }),
     columnHelper.accessor('internalLocations', {
       header: () => (
@@ -214,6 +224,9 @@ const useToResolveTab = ({
           </TableCell>
         );
       },
+      meta: {
+        flexWidth: 200,
+      },
     }),
     columnHelper.accessor((row) =>
       row?.tags?.map?.((tag) => <Badge label={tag?.tag} variant="badge--purple" key={tag.id} />), {
@@ -230,6 +243,9 @@ const useToResolveTab = ({
           </div>
         </TableCell>
       ),
+      meta: {
+        flexWidth: 200,
+      },
     }),
     columnHelper.accessor((row) =>
       row?.productCatalogs?.map((catalog) => <Badge label={catalog?.name} variant="badge--blue" key={catalog.id} />), {
@@ -246,6 +262,9 @@ const useToResolveTab = ({
           </div>
         </TableCell>
       ),
+      meta: {
+        flexWidth: 200,
+      },
     }),
     columnHelper.accessor('abcClass', {
       header: () => (
@@ -258,6 +277,9 @@ const useToResolveTab = ({
           {getValue()}
         </TableCell>
       ),
+      meta: {
+        flexWidth: 150,
+      },
     }),
     columnHelper.accessor('quantityOnHand', {
       header: () => (
@@ -270,6 +292,9 @@ const useToResolveTab = ({
           {getValue()}
         </TableCell>
       ),
+      meta: {
+        flexWidth: 150,
+      },
     }),
   ], [currentLocale, sort, order]);
 
