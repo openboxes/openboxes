@@ -93,9 +93,7 @@ const useCountStep = () => {
         lotNumber: undefined,
         expirationDate: undefined,
       },
-      binLocation: {
-        name: undefined,
-      },
+      binLocation: undefined,
       quantityCounted: undefined,
       comment: '',
     };

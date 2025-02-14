@@ -66,16 +66,65 @@ const useCountStepTable = ({
   // Get field props, for the binLocation dropdown we have to pass options
   const getFieldProps = (fieldName) => {
     if (fieldName === 'binLocation') {
+      const binLocationsWithZones = binLocations.map((binLocation) => {
+        const randomZoneId = Math.floor(Math.random() * 5) + 1;
+        return {
+          ...binLocation,
+          zoneId: randomZoneId,
+          zoneName: `Zone ${randomZoneId}`,
+        };
+      });
+
+      const groupedByZone = binLocationsWithZones.reduce((acc, bin) => {
+        if (!acc[bin.zoneId]) {
+          acc[bin.zoneId] = {
+            zoneId: bin.zoneId,
+            zoneName: bin.zoneName,
+            bins: [],
+          };
+        }
+        acc[bin.zoneId].bins.push({
+          id: bin.id,
+          name: bin.name,
+          label: bin.name,
+          value: bin.id,
+        });
+        return acc;
+      }, {});
+
+      const groupedOptions = Object.values(groupedByZone);
+
       return {
         labelKey: 'name',
-        options: binLocations.map((binLocation) => ({
-          id: binLocation.id,
-          name: binLocation.name,
+        options: groupedOptions.map((group) => ({
+          id: `zone-${group.zoneId}`,
+          name: group.zoneName,
+          label: (
+            <span style={{ color: 'black', fontWeight: 'bold', fontSize: '15px' }}>{group.zoneName}</span>
+          ),
+          isDisabled: true,
+          options: group.bins,
         })),
       };
     }
 
     return {};
+  };
+
+  // this function is required because there is a problem w getValue
+  const getValueToDisplay = (id, value) => {
+    let valueToDisplay = null;
+
+    if (id === 'quantityCounted') {
+      valueToDisplay = value === 0 ? '0' : value;
+    } else if (id === 'inventoryItem_lotNumber' || id === 'comment') {
+      valueToDisplay = value;
+    }
+    if (id === 'binLocation') {
+      valueToDisplay = value?.name;
+    }
+
+    return valueToDisplay;
   };
 
   const defaultColumn = {
@@ -84,13 +133,7 @@ const useCountStepTable = ({
     }) => {
       const isFieldEditable = !original.id.includes('newRow') && id !== 'quantityCounted';
       // We shouldn't allow users edit fetched data (only quantity counted is editable)
-      if (isFieldEditable || !isEditable) {
-        return (
-          <TableCell className="static-cell-count-step">
-            {getValue()}
-          </TableCell>
-        );
-      }
+
       // Keep and update the state of the cell during rerenders
       const columnPath = id.replaceAll('_', '.');
       const initialValue = _.get(tableData, `[${index}].${columnPath}`);
@@ -98,6 +141,16 @@ const useCountStepTable = ({
 
       const [value, setValue] = useState(initialValue);
       const [error, setError] = useState(errorMessage);
+
+      if (isFieldEditable || !isEditable) {
+        const valueToDisplay = getValueToDisplay(id, value);
+        return (
+          <TableCell className="static-cell-count-step">
+            {valueToDisplay || getValue()}
+          </TableCell>
+        );
+      }
+
       // If the value at the end of entering data is the same as it was initially,
       // we don't want to trigger rerender
       const isEdited = initialValue !== value;
@@ -120,15 +173,20 @@ const useCountStepTable = ({
       const type = getFieldType(id);
       const Component = getFieldComponent(id);
       const fieldProps = getFieldProps(id);
-
       return (
-        <TableCell className="rt-td rt-td-count-step pb-0">
+        <TableCell
+          className="rt-td rt-td-count-step pb-0"
+          tooltip={id === 'binLocation' && value?.label}
+          tooltipLabel={value?.label}
+          tooltipForm={id === 'binLocation' && value?.label}
+          customTooltipStyles="bin-location-tooltip"
+        >
           <Component
             type={type}
             value={value}
             onChange={onChange}
             onBlur={onBlur}
-            className="w-75 m-1"
+            className={`m-1 ${id === 'binLocation' && value?.label ? 'w-99' : 'w-75'}`}
             errorMessage={error}
             {...fieldProps}
           />
@@ -139,7 +197,7 @@ const useCountStepTable = ({
 
   const columns = [
     columnHelper.accessor(
-      (row) => (row?.binLocation?.label ? row?.binLocation : row.binLocation?.name), {
+      (row) => row?.binLocation?.label || row?.binLocation?.name, {
         id: 'binLocation',
         header: () => (
           <TableHeaderCell>
@@ -200,10 +258,10 @@ const useCountStepTable = ({
             disabled={original.id}
           >
             {original.id.includes('newRow') && (
-            <RiDeleteBinLine
-              onClick={() => removeRow(cycleCountId, original.id)}
-              size={22}
-            />
+              <RiDeleteBinLine
+                onClick={() => removeRow(cycleCountId, original.id)}
+                size={22}
+              />
             )}
           </Tooltip>
         </TableCell>

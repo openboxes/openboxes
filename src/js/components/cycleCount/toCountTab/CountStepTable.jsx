@@ -30,6 +30,10 @@ const CountStepTable = ({
   isEditable,
   countedBy,
 }) => {
+  const translate = useTranslate();
+  const localize = useSelector((state) => state.localize);
+  const formatLocalizedDate = formatDate(localize);
+
   const {
     columns,
     defaultColumn,
@@ -40,11 +44,8 @@ const CountStepTable = ({
     validationErrors,
     removeRow,
     isEditable,
+    formatLocalizedDate,
   });
-  const translate = useTranslate();
-  const localize = useSelector((state) => state.localize);
-  const formatLocalizedDate = formatDate(localize);
-
   return (
     <div className="list-page-list-section">
       <p className="count-step-title pt-4 pl-4">
