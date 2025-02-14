@@ -11,6 +11,7 @@ import TableHeaderCell from 'components/DataTable/TableHeaderCell';
 import DateField from 'components/form-elements/v2/DateField';
 import SelectField from 'components/form-elements/v2/SelectField';
 import TextInput from 'components/form-elements/v2/TextInput';
+import { DateFormat } from 'consts/timeFormat';
 import useTranslate from 'hooks/useTranslate';
 import { fetchBins } from 'utils/option-utils';
 
@@ -20,7 +21,8 @@ const useCountStepTable = ({
   removeRow,
   validationErrors,
   tableData,
-  isEditable,
+  isEditableStep,
+  formatLocalizedDate,
 }) => {
   const columnHelper = createColumnHelper();
   // State for saving data for binLocation dropdown
@@ -66,30 +68,22 @@ const useCountStepTable = ({
   // Get field props, for the binLocation dropdown we have to pass options
   const getFieldProps = (fieldName) => {
     if (fieldName === 'binLocation') {
-      const binLocationsWithZones = binLocations.map((binLocation) => {
-        const randomZoneId = Math.floor(Math.random() * 5) + 1;
-        return {
-          ...binLocation,
-          zoneId: randomZoneId,
-          zoneName: `Zone ${randomZoneId}`,
-        };
-      });
+      const groupedByZone = binLocations.reduce((acc, bin) => {
+        const { zoneId, zoneName } = bin;
 
-      const groupedByZone = binLocationsWithZones.reduce((acc, bin) => {
-        if (!acc[bin.zoneId]) {
-          acc[bin.zoneId] = {
-            zoneId: bin.zoneId,
-            zoneName: bin.zoneName,
-            bins: [],
-          };
-        }
-        acc[bin.zoneId].bins.push({
-          id: bin.id,
-          name: bin.name,
-          label: bin.name,
-          value: bin.id,
-        });
-        return acc;
+        return {
+          ...acc,
+          [zoneId]: {
+            zoneId,
+            zoneName,
+            bins: [...(acc[zoneId]?.bins || []), {
+              id: bin.id,
+              name: bin.name,
+              label: bin.name,
+              value: bin.id,
+            }],
+          },
+        };
       }, {});
 
       const groupedOptions = Object.values(groupedByZone);
@@ -100,7 +94,9 @@ const useCountStepTable = ({
           id: `zone-${group.zoneId}`,
           name: group.zoneName,
           label: (
-            <span style={{ color: 'black', fontWeight: 'bold', fontSize: '15px' }}>{group.zoneName}</span>
+            <span className="zone-label">
+              {group.zoneName}
+            </span>
           ),
           isDisabled: true,
           options: group.bins,
@@ -117,6 +113,8 @@ const useCountStepTable = ({
 
     if (id === 'quantityCounted') {
       valueToDisplay = value === 0 ? '0' : value;
+    } else if (id === 'inventoryItem_expirationDate') {
+      valueToDisplay = formatLocalizedDate(value, DateFormat.DD_MMM_YYYY);
     } else if (id === 'inventoryItem_lotNumber' || id === 'comment') {
       valueToDisplay = value;
     }
@@ -137,12 +135,10 @@ const useCountStepTable = ({
       // Keep and update the state of the cell during rerenders
       const columnPath = id.replaceAll('_', '.');
       const initialValue = _.get(tableData, `[${index}].${columnPath}`);
-      const errorMessage = validationErrors?.[cycleCountId]?.errors?.[index]?.[columnPath]?._errors;
 
       const [value, setValue] = useState(initialValue);
-      const [error, setError] = useState(errorMessage);
 
-      if (isFieldEditable || !isEditable) {
+      if (isFieldEditable || !isEditableStep) {
         const valueToDisplay = getValueToDisplay(id, value);
         return (
           <TableCell className="static-cell-count-step">
@@ -150,6 +146,9 @@ const useCountStepTable = ({
           </TableCell>
         );
       }
+
+      const errorMessage = validationErrors?.[cycleCountId]?.errors?.[index]?.[columnPath]?._errors;
+      const [error, setError] = useState(errorMessage);
 
       // If the value at the end of entering data is the same as it was initially,
       // we don't want to trigger rerender
@@ -176,17 +175,17 @@ const useCountStepTable = ({
       return (
         <TableCell
           className="rt-td rt-td-count-step pb-0"
-          tooltip={id === 'binLocation' && value?.label}
-          tooltipLabel={value?.label}
-          tooltipForm={id === 'binLocation' && value?.label}
+          tooltip={id === 'binLocation'}
+          tooltipForm={id === 'binLocation'}
           customTooltipStyles="bin-location-tooltip"
+          tooltipLabel={value?.name || translate('react.cycleCount.table.binLocation.label', 'Bin Location')}
         >
           <Component
             type={type}
             value={value}
             onChange={onChange}
             onBlur={onBlur}
-            className={`m-1 ${id === 'binLocation' && value?.label ? 'w-99' : 'w-75'}`}
+            className={`m-1 ${id === 'binLocation' ? 'w-99' : 'w-75'}`}
             errorMessage={error}
             {...fieldProps}
           />
