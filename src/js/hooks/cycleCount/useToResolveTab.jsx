@@ -10,7 +10,7 @@ import { TableCell } from 'components/DataTable';
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
 import Checkbox from 'components/form-elements/v2/Checkbox';
 import { INVENTORY_ITEM_URL } from 'consts/applicationUrls';
-import CycleCountStatus from 'consts/cycleCountStatus';
+import CycleCountCandidateStatus from 'consts/cycleCountCandidateStatus';
 import useSpinner from 'hooks/useSpinner';
 import useTableCheckboxes from 'hooks/useTableCheckboxes';
 import useTableDataV2 from 'hooks/useTableDataV2';
@@ -48,10 +48,10 @@ const useToResolveTab = ({
   const getParams = ({
     sortingParams,
   }) => _.omitBy({
-    // TODO: We need to display only the rows where cycle count in [INVESTIGATING, COUNTED].
-    //       This will require us to be able to filter on the cycle count status, not just the cycle
-    //       count request status! https://pihemr.atlassian.net/browse/OBPIH-6931
-    status: CycleCountStatus.CREATED,
+    statuses: [
+      CycleCountCandidateStatus.COUNTED,
+      CycleCountCandidateStatus.INVESTIGATING,
+    ],
     offset: `${offset}`,
     max: `${pageSize}`,
     ...sortingParams,
@@ -129,25 +129,28 @@ const useToResolveTab = ({
       getCellContext: () => ({
         className: 'checkbox-column',
       }),
+      flexWidth: 40,
     },
   });
 
   const columns = useMemo(() => [
-    columnHelper.accessor('cycleCountRequest.cycleCount.status', {
+    columnHelper.accessor('status', {
       header: () => (
         <TableHeaderCell>
           {translate('react.cycleCount.table.status.label', 'Status')}
         </TableHeaderCell>
       ),
       cell: ({ getValue }) => (
-        // TODO: Use variant fetched from the API https://pihemr.atlassian.net/browse/OBPIH-6931
         <TableCell className="rt-td">
           <StatusIndicator
             variant="primary"
-            status={translate(`react.cycleCount.status.${getValue()}.label`, 'To Resolve')}
+            status={translate(`react.cycleCount.CycleCountCandidateStatus.${getValue()}.label`, 'To resolve')}
           />
         </TableCell>
       ),
+      meta: {
+        flexWidth: 180,
+      },
     }),
     columnHelper.accessor((row) => `${row.product.productCode} ${row.product.name}`, {
       id: 'product',
@@ -168,6 +171,9 @@ const useToResolveTab = ({
           </div>
         </TableCell>
       ),
+      meta: {
+        flexWidth: 370,
+      },
     }),
     columnHelper.accessor('category.name', {
       header: () => (
@@ -180,6 +186,9 @@ const useToResolveTab = ({
           {getValue()}
         </TableCell>
       ),
+      meta: {
+        flexWidth: 200,
+      },
     }),
     columnHelper.accessor('internalLocations', {
       header: () => (
@@ -215,6 +224,9 @@ const useToResolveTab = ({
           </TableCell>
         );
       },
+      meta: {
+        flexWidth: 200,
+      },
     }),
     columnHelper.accessor((row) =>
       row?.tags?.map?.((tag) => <Badge label={tag?.tag} variant="badge--purple" key={tag.id} />), {
@@ -231,6 +243,9 @@ const useToResolveTab = ({
           </div>
         </TableCell>
       ),
+      meta: {
+        flexWidth: 200,
+      },
     }),
     columnHelper.accessor((row) =>
       row?.productCatalogs?.map((catalog) => <Badge label={catalog?.name} variant="badge--blue" key={catalog.id} />), {
@@ -247,6 +262,9 @@ const useToResolveTab = ({
           </div>
         </TableCell>
       ),
+      meta: {
+        flexWidth: 200,
+      },
     }),
     columnHelper.accessor('abcClass', {
       header: () => (
@@ -259,6 +277,9 @@ const useToResolveTab = ({
           {getValue()}
         </TableCell>
       ),
+      meta: {
+        flexWidth: 150,
+      },
     }),
     columnHelper.accessor('quantityOnHand', {
       header: () => (
@@ -271,6 +292,9 @@ const useToResolveTab = ({
           {getValue()}
         </TableCell>
       ),
+      meta: {
+        flexWidth: 150,
+      },
     }),
   ], [currentLocale, sort, order]);
 

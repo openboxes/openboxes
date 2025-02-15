@@ -11,7 +11,7 @@ import { TableCell } from 'components/DataTable';
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
 import Checkbox from 'components/form-elements/v2/Checkbox';
 import { CYCLE_COUNT, INVENTORY_ITEM_URL } from 'consts/applicationUrls';
-import CycleCountStatus from 'consts/cycleCountStatus';
+import CycleCountCandidateStatus from 'consts/cycleCountCandidateStatus';
 import useSpinner from 'hooks/useSpinner';
 import useTableCheckboxes from 'hooks/useTableCheckboxes';
 import useTableDataV2 from 'hooks/useTableDataV2';
@@ -52,7 +52,11 @@ const useToCountTab = ({
   const getParams = ({
     sortingParams,
   }) => _.omitBy({
-    status: CycleCountStatus.CREATED,
+    statuses: [
+      CycleCountCandidateStatus.CREATED,
+      CycleCountCandidateStatus.REQUESTED,
+      CycleCountCandidateStatus.COUNTING,
+    ],
     offset: `${offset}`,
     max: `${pageSize}`,
     ...sortingParams,
@@ -130,25 +134,28 @@ const useToCountTab = ({
       getCellContext: () => ({
         className: 'checkbox-column',
       }),
+      flexWidth: 40,
     },
   });
 
   const columns = useMemo(() => [
-    columnHelper.accessor('cycleCountRequest.cycleCount.status', {
+    columnHelper.accessor('status', {
       header: () => (
         <TableHeaderCell>
           {translate('react.cycleCount.table.status.label', 'Status')}
         </TableHeaderCell>
       ),
       cell: ({ getValue }) => (
-        // TODO: Use variant fetched from the API https://pihemr.atlassian.net/browse/OBPIH-6931
         <TableCell className="rt-td">
           <StatusIndicator
             variant="danger"
-            status={translate(`react.cycleCount.status.${getValue()}.label`, 'To count')}
+            status={translate(`react.cycleCount.CycleCountCandidateStatus.${getValue()}.label`, 'To count')}
           />
         </TableCell>
       ),
+      meta: {
+        flexWidth: 180,
+      },
     }),
     columnHelper.accessor((row) => `${row.product.productCode} ${row.product.name}`, {
       id: 'product',
@@ -169,6 +176,9 @@ const useToCountTab = ({
           </div>
         </TableCell>
       ),
+      meta: {
+        flexWidth: 370,
+      },
     }),
     columnHelper.accessor('category.name', {
       header: () => (
@@ -181,6 +191,9 @@ const useToCountTab = ({
           {getValue()}
         </TableCell>
       ),
+      meta: {
+        flexWidth: 200,
+      },
     }),
     columnHelper.accessor('internalLocations', {
       header: () => (
@@ -216,6 +229,9 @@ const useToCountTab = ({
           </TableCell>
         );
       },
+      meta: {
+        flexWidth: 200,
+      },
     }),
     columnHelper.accessor((row) =>
       row?.tags?.map?.((tag) => <Badge label={tag?.tag} variant="badge--purple" key={tag.id} />), {
@@ -232,6 +248,9 @@ const useToCountTab = ({
           </div>
         </TableCell>
       ),
+      meta: {
+        flexWidth: 200,
+      },
     }),
     columnHelper.accessor((row) =>
       row?.productCatalogs?.map((catalog) => <Badge label={catalog?.name} variant="badge--blue" key={catalog.id} />), {
@@ -248,6 +267,9 @@ const useToCountTab = ({
           </div>
         </TableCell>
       ),
+      meta: {
+        flexWidth: 200,
+      },
     }),
     columnHelper.accessor('abcClass', {
       header: () => (
@@ -260,6 +282,9 @@ const useToCountTab = ({
           {getValue()}
         </TableCell>
       ),
+      meta: {
+        flexWidth: 150,
+      },
     }),
     columnHelper.accessor('quantityOnHand', {
       header: () => (
@@ -272,6 +297,9 @@ const useToCountTab = ({
           {getValue()}
         </TableCell>
       ),
+      meta: {
+        flexWidth: 150,
+      },
     }),
   ], [currentLocale, sort, order]);
 

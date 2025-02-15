@@ -38,8 +38,9 @@ const DataTableBody = ({
             {row.getVisibleCells()
               .map((cell) => {
                 const className = cell.column.columnDef?.meta?.getCellContext?.()?.className;
+                const flexWidth = cell.column.columnDef.meta?.flexWidth || 1;
                 return (
-                  <div className={`w-100 d-flex cell-inner-wrapper ${className}`} key={cell.id}>
+                  <div className={`d-flex ${className}`} style={{ flex: flexWidth }} key={cell.id}>
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </div>
                 );

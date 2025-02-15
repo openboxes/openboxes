@@ -12,6 +12,9 @@ package org.pih.warehouse
 import grails.converters.JSON
 import grails.util.Holders
 import java.math.RoundingMode
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZonedDateTime
 import javax.sql.DataSource
 import liquibase.Contexts
 import liquibase.LabelExpression
@@ -131,6 +134,16 @@ class BootStrap {
     }
 
     void registerJsonMarshallers() {
+
+        // java.time types. With these marshallers we don't need to call toString() on the java.time fields in the
+        // toJson() methods of Domains/DTOs or in the other object marshallers below. When we're on Grails 5+ we can
+        // add the "jackson-datatype-jsr310" dependency and let SpringBoot handle things automatically (it adds the
+        // JavaTimeModule when it registers the ObjectMapper bean), but that doesn't work with our custom ValueConverter
+        // classes for these types, which we need because Grails 4 and older doesn't support these types out of the box.
+        // https://docs.spring.io/spring-boot/how-to/spring-mvc.html#howto.spring-mvc.customize-jackson-objectmapper
+        JSON.registerObjectMarshaller(Instant) { Instant instant -> instant.toString() }
+        JSON.registerObjectMarshaller(LocalDate) { LocalDate localDate -> localDate.toString() }
+        JSON.registerObjectMarshaller(ZonedDateTime) { ZonedDateTime zonedDateTime -> zonedDateTime.toString() }
 
         // Static data
         JSON.registerObjectMarshaller(ContainerType) { ContainerType containerType ->

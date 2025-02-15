@@ -131,13 +131,18 @@ const useAllProductsTab = ({
       getCellContext: () => ({
         className: 'checkbox-column',
       }),
+      flexWidth: 40,
     },
   });
 
   const columns = useMemo(() => [
     columnHelper.accessor('lastCountDate', {
       header: () => (
-        <TableHeaderCell sortable columnId="dateLastCount" {...sortableProps}>
+        <TableHeaderCell
+          sortable
+          columnId="dateLastCount"
+          {...sortableProps}
+        >
           {translate('react.cycleCount.table.lastCounted.label', 'Last Counted')}
         </TableHeaderCell>
       ),
@@ -146,6 +151,9 @@ const useAllProductsTab = ({
           {getValue()}
         </TableCell>
       ),
+      meta: {
+        flexWidth: 180,
+      },
     }),
     columnHelper.accessor((row) => `${row.product.productCode} ${row.product.name}`, {
       id: 'product',
@@ -166,6 +174,9 @@ const useAllProductsTab = ({
           </div>
         </TableCell>
       ),
+      meta: {
+        flexWidth: 370,
+      },
     }),
     columnHelper.accessor('category.name', {
       header: () => (
@@ -174,10 +185,17 @@ const useAllProductsTab = ({
         </TableHeaderCell>
       ),
       cell: ({ getValue }) => (
-        <TableCell className="rt-td multiline-cell">
-          {getValue()}
+        <TableCell
+          className="rt-td multiline-cell"
+          tooltip
+          tooltipLabel={getValue()}
+        >
+          <div className="truncate-text">{getValue()}</div>
         </TableCell>
       ),
+      meta: {
+        flexWidth: 200,
+      },
     }),
     columnHelper.accessor('internalLocations', {
       header: () => (
@@ -213,6 +231,9 @@ const useAllProductsTab = ({
           </TableCell>
         );
       },
+      meta: {
+        flexWidth: 200,
+      },
     }),
     columnHelper.accessor((row) =>
       row?.tags?.map?.((tag) => <Badge label={tag?.tag} variant="badge--purple" key={tag.id} />), {
@@ -229,6 +250,9 @@ const useAllProductsTab = ({
           </div>
         </TableCell>
       ),
+      meta: {
+        flexWidth: 200,
+      },
     }),
     columnHelper.accessor((row) =>
       row?.productCatalogs?.map((catalog) => <Badge label={catalog?.name} variant="badge--blue" key={catalog.id} />), {
@@ -245,6 +269,9 @@ const useAllProductsTab = ({
           </div>
         </TableCell>
       ),
+      meta: {
+        flexWidth: 200,
+      },
     }),
     columnHelper.accessor('abcClass', {
       header: () => (
@@ -257,6 +284,9 @@ const useAllProductsTab = ({
           {getValue()}
         </TableCell>
       ),
+      meta: {
+        flexWidth: 150,
+      },
     }),
     columnHelper.accessor('quantityOnHand', {
       header: () => (
@@ -269,6 +299,9 @@ const useAllProductsTab = ({
           {getValue()}
         </TableCell>
       ),
+      meta: {
+        flexWidth: 150,
+      },
     }),
   ], [currentLocale, sort, order]);
 

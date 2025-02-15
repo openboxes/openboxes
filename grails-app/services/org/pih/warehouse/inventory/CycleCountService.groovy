@@ -71,13 +71,13 @@ class CycleCountService {
             if (command.sort) {
                 getCandidatesSortOrder(command.sort, command.order, delegate, usedAliases)
             }
-            if (command.status) {
-                createAlias("cycleCountRequest", "cycleCountRequest", JoinType.INNER_JOIN)
-                eq("cycleCountRequest.status", command.status)
-                return
+            if (!command.statuses) {
+                isNull("status")
             }
-            isNull("cycleCountRequest")
-        }
+            else {
+                inList("status", command.statuses)
+            }
+        } as List<CycleCountCandidate>
     }
 
     private static void getCandidatesSortOrder(String sortBy, String orderDirection, Criteria criteria, Set<String> usedAliases) {
@@ -203,14 +203,15 @@ class CycleCountService {
     CycleCountDto createCycleCount(CycleCountStartCommand request, Location facility) {
         CycleCount newCycleCount = new CycleCount(
                 facility: facility,
+                // Set an initial status here so that validation passes. It gets automatically recomputed on save.
+                status: CycleCountStatus.REQUESTED,
                 dateLastRefreshed: new Date()
         )
+
         List<AvailableItem> itemsToSave = determineCycleCountItemsToSave(facility, request.cycleCountRequest.product)
-        newCycleCount.save()
         // 1:1 association between cycle count and cycle count request
         request.cycleCountRequest.cycleCount = newCycleCount
         request.cycleCountRequest.status = CycleCountRequestStatus.IN_PROGRESS
-        List<CycleCountItem> cycleCountItems = []
         itemsToSave.each { AvailableItem availableItem ->
             CycleCountItem cycleCountItem = new CycleCountItem(
                     status: CycleCountItemStatus.READY_TO_COUNT,
@@ -227,13 +228,14 @@ class CycleCountService {
                     dateCounted: new Date(),
                     custom: false,
             )
-            if (!cycleCountItem.validate()) {
-                throw new ValidationException("Invalid cycle count item", cycleCountItem.errors)
-            }
-            cycleCountItem.save()
-            cycleCountItems.add(cycleCountItem)
+            newCycleCount.addToCycleCountItems(cycleCountItem)
         }
-        return CycleCountDto.createFromCycleCountItems(cycleCountItems)
+
+        if (!newCycleCount.save()) {
+            throw new ValidationException("Invalid cycle count", newCycleCount.errors)
+        }
+
+        return CycleCountDto.toDto(newCycleCount)
     }
 
     CycleCountDto updateCycleCount(CycleCount cycleCount, List<CycleCountItem> cycleCountItems, CycleCountStartCommand request) {
@@ -249,7 +251,7 @@ class CycleCountService {
                 throw new IllegalArgumentException("Count index can't be higher than the highest count index of the items")
             }
         }
-        return CycleCountDto.createFromCycleCountItems(cycleCountItems)
+        return CycleCountDto.toDto(cycleCount)
     }
 
     /**
@@ -268,7 +270,7 @@ class CycleCountService {
             if (ids) {
                 'in'("id", ids)
             }
-        }
-        return cycleCounts.collect { CycleCountDto.createFromCycleCountItems(it.cycleCountItems) }
+        } as List<CycleCount>
+        return cycleCounts.collect { CycleCountDto.toDto(it) }
     }
 }
