@@ -158,6 +158,11 @@ input, .date-field-input {
 
 // SELECT FIELD
 
+.select-auto-width {
+  width: fit-content !important;
+  min-width: 170px !important;
+}
+
 .select-wrapper-container {
 
   div:nth-child(2) > div:first-child {

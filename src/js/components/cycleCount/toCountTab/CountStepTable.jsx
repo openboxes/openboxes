@@ -77,6 +77,7 @@ const CountStepTable = ({
               placeholder="Select"
               options={recipients}
               onChange={assignCountedBy(product?.productCode)}
+              autoWidth
             />
           ) : <p>{countedBy[product.productCode]?.label}</p>}
         </div>

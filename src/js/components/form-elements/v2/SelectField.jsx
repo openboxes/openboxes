@@ -25,6 +25,7 @@ const SelectField = ({
   productSelect,
   hasErrors,
   className,
+  autoWidth,
   ...fieldProps
 }) => {
   const [value, setValue] = useState(defaultValue);
@@ -50,7 +51,7 @@ const SelectField = ({
       button={{ ...button, onClick: () => button.onClick(fieldProps?.value?.id ?? value) }}
       tooltip={tooltip}
       required={required}
-      className="select-wrapper-container"
+      className={`select-wrapper-container ${autoWidth && 'select-auto-width'}`}
     >
       <SelectComponent
         className={`form-element-select ${className} ${errorMessage || hasErrors ? 'has-errors' : ''}`}
@@ -109,6 +110,7 @@ SelectField.propTypes = {
   // indicator whether field should be marked as invalid
   hasErrors: PropTypes.bool,
   className: PropTypes.string,
+  autoWidth: PropTypes.bool,
 };
 
 SelectField.defaultProps = {
@@ -128,4 +130,5 @@ SelectField.defaultProps = {
   productSelect: false,
   hasErrors: false,
   className: '',
+  autoWidth: false,
 };
