@@ -88,22 +88,20 @@ const useCountStepTable = ({
 
   // this function is required because there is a problem w getValue
   const getValueToDisplay = (id, value) => {
-    let valueToDisplay = null;
-
-    if (id === 'quantityCounted') {
-      valueToDisplay = value === 0 ? '0' : value;
-    } else if (id === 'inventoryItem_expirationDate') {
-      valueToDisplay = formatLocalizedDate(value, DateFormat.DD_MMM_YYYY);
-    } else if (id === 'inventoryItem_lotNumber' || id === 'comment') {
-      valueToDisplay = value;
+    if (id === 'inventoryItem_expirationDate') {
+      return formatLocalizedDate(value, DateFormat.DD_MMM_YYYY);
     }
 
-    return valueToDisplay;
+    if (id === 'quantityCounted') {
+      return value.toString();
+    }
+
+    return value;
   };
 
   const defaultColumn = {
     cell: ({
-      getValue, row: { original, index }, column: { id }, table,
+      row: { original, index }, column: { id }, table,
     }) => {
       // Keep and update the state of the cell during rerenders
       const columnPath = id.replaceAll('_', '.');
@@ -113,12 +111,11 @@ const useCountStepTable = ({
 
       // isEditableStep is a boolean that checks whether we are at the save step.
       // We shouldn't allow users edit fetched data (only quantity counted is editable)
-      if (isFieldEditable || !isEditableStep) {
+      if (isFieldEditable) {
         const valueToDisplay = getValueToDisplay(id, value);
-
         return (
           <TableCell className="static-cell-count-step">
-            {valueToDisplay || getValue()}
+            {valueToDisplay || value}
           </TableCell>
         );
       }
@@ -208,7 +205,7 @@ const useCountStepTable = ({
     }),
     columnHelper.accessor(null, {
       id: 'actions',
-      header: () => <TableHeaderCell className="count-step-actions" />,
+      header: () => <TableHeaderCell />,
       cell: ({ row: { original } }) => (
         <TableCell className="rt-td d-flex justify-content-center count-step-actions">
           <Tooltip
