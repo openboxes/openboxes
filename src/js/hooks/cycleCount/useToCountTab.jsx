@@ -134,6 +134,7 @@ const useToCountTab = ({
       getCellContext: () => ({
         className: 'checkbox-column',
       }),
+      flexWidth: 40,
     },
   });
 
@@ -152,6 +153,9 @@ const useToCountTab = ({
           />
         </TableCell>
       ),
+      meta: {
+        flexWidth: 180,
+      },
     }),
     columnHelper.accessor((row) => `${row.product.productCode} ${row.product.name}`, {
       id: 'product',
@@ -172,6 +176,9 @@ const useToCountTab = ({
           </div>
         </TableCell>
       ),
+      meta: {
+        flexWidth: 370,
+      },
     }),
     columnHelper.accessor('category.name', {
       header: () => (
@@ -184,6 +191,9 @@ const useToCountTab = ({
           {getValue()}
         </TableCell>
       ),
+      meta: {
+        flexWidth: 200,
+      },
     }),
     columnHelper.accessor('internalLocations', {
       header: () => (
@@ -219,6 +229,9 @@ const useToCountTab = ({
           </TableCell>
         );
       },
+      meta: {
+        flexWidth: 200,
+      },
     }),
     columnHelper.accessor((row) =>
       row?.tags?.map?.((tag) => <Badge label={tag?.tag} variant="badge--purple" key={tag.id} />), {
@@ -235,6 +248,9 @@ const useToCountTab = ({
           </div>
         </TableCell>
       ),
+      meta: {
+        flexWidth: 200,
+      },
     }),
     columnHelper.accessor((row) =>
       row?.productCatalogs?.map((catalog) => <Badge label={catalog?.name} variant="badge--blue" key={catalog.id} />), {
@@ -251,6 +267,9 @@ const useToCountTab = ({
           </div>
         </TableCell>
       ),
+      meta: {
+        flexWidth: 200,
+      },
     }),
     columnHelper.accessor('abcClass', {
       header: () => (
@@ -263,6 +282,9 @@ const useToCountTab = ({
           {getValue()}
         </TableCell>
       ),
+      meta: {
+        flexWidth: 150,
+      },
     }),
     columnHelper.accessor('quantityOnHand', {
       header: () => (
@@ -275,6 +297,9 @@ const useToCountTab = ({
           {getValue()}
         </TableCell>
       ),
+      meta: {
+        flexWidth: 150,
+      },
     }),
   ], [currentLocale, sort, order]);
 

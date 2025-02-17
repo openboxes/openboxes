@@ -10,8 +10,9 @@ const DataTableHeader = ({ headerGroups }) => (
         .map((headerGroup) => (
           headerGroup.headers.map((header) => {
             const className = header.column.columnDef.meta?.getCellContext?.().className;
+            const flexWidth = header.column.columnDef.meta?.flexWidth || 1;
             return (
-              <div className={`w-100 header-cell ${className ?? ''}`} key={header.id}>
+              <div style={{ flex: flexWidth }} className={`header-cell ${className ?? ''}`} key={header.id}>
                 {flexRender(header.column.columnDef.header, header.getContext())}
               </div>
             );
