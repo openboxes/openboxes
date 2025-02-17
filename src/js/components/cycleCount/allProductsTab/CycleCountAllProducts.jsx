@@ -21,7 +21,6 @@ const CycleCountAllProducts = ({
     paginationProps,
     offset,
     pageSize,
-    resetForm,
   } = useTablePagination({
     defaultPageSize: 5,
     totalCount: totalCount.current,
@@ -41,6 +40,7 @@ const CycleCountAllProducts = ({
     switchTab,
     offset,
     pageSize,
+    resetForm,
   });
 
   const translate = useTranslate();
@@ -95,4 +95,5 @@ export default CycleCountAllProducts;
 CycleCountAllProducts.propTypes = {
   filterParams: PropTypes.shape({}).isRequired,
   switchTab: PropTypes.func.isRequired,
+  resetForm: PropTypes.func.isRequired,
 };

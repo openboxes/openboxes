@@ -98,14 +98,14 @@ const CycleCount = () => {
           />
         )}
         {tab === TO_COUNT_TAB && (
-        <CycleCountToCount
-          filterParams={filterParams}
-        />
+          <CycleCountToCount
+            filterParams={filterParams}
+          />
         )}
         {tab === TO_RESOLVE_TAB && (
-        <CycleCountToResolve
-          filterParams={filterParams}
-        />
+          <CycleCountToResolve
+            filterParams={filterParams}
+          />
         )}
         {tab === TO_APPROVE_TAB && <CycleCountToApprove />}
       </div>
