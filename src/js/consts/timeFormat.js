@@ -1,5 +1,6 @@
 export const TimeFormat = {
   HH_MM: 'HH:mm',
+  HH_MM_SS: 'HH:mm:ss',
 };
 
 export const DateFormat = {

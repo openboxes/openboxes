@@ -13,6 +13,7 @@ import SelectField from 'components/form-elements/v2/SelectField';
 import TextInput from 'components/form-elements/v2/TextInput';
 import cycleCountColumn from 'consts/cycleCountColumn';
 import useTranslate from 'hooks/useTranslate';
+import groupBinLocationsByZone from 'utils/groupBinLocationsByZone';
 import { fetchBins } from 'utils/option-utils';
 
 // Managing state for single table, mainly table configuration (from count step)
@@ -21,7 +22,8 @@ const useCountStepTable = ({
   removeRow,
   validationErrors,
   tableData,
-  isEditable,
+  isStepEditable,
+  formatLocalizedDate,
 }) => {
   const columnHelper = createColumnHelper();
   // State for saving data for binLocation dropdown
@@ -79,26 +81,49 @@ const useCountStepTable = ({
     return {};
   };
 
+  // this function is required because there is a problem w getValue
+  const getValueToDisplay = (id, value) => {
+    if (id === 'inventoryItem_expirationDate') {
+      return formatLocalizedDate(value, DateFormat.DD_MMM_YYYY);
+    }
+
+    if (id === 'quantityCounted') {
+      return value.toString();
+    }
+
+    if (id === 'binLocation') {
+      return value?.name;
+    }
+
+    return value;
+  };
+
   const defaultColumn = {
     cell: ({
-      getValue, row: { original, index }, column: { id }, table,
+      row: { original, index }, column: { id }, table,
     }) => {
-      const isFieldEditable = !original.id.includes('newRow') && id !== cycleCountColumn.QUANTITY_COUNTED;
+      const isFieldEditable = !original.id.includes('newRow') && id !== 'quantityCounted';
       // We shouldn't allow users edit fetched data (only quantity counted is editable)
-      if (isFieldEditable || !isEditable) {
-        return (
-          <TableCell className="static-cell-count-step">
-            {getValue()}
-          </TableCell>
-        );
-      }
+
       // Keep and update the state of the cell during rerenders
       const columnPath = id.replaceAll('_', '.');
       const initialValue = _.get(tableData, `[${index}].${columnPath}`);
-      const errorMessage = validationErrors?.[cycleCountId]?.errors?.[index]?.[columnPath]?._errors;
 
       const [value, setValue] = useState(initialValue);
+
+      // isStepEditable is a boolean that checks whether we are at the save step.
+      // We shouldn't allow users edit fetched data (only quantity counted is editable)
+      if (isFieldEditable || !isStepEditable) {
+        return (
+          <TableCell className="static-cell-count-step">
+            {getValueToDisplay(id, value)}
+          </TableCell>
+        );
+      }
+
+      const errorMessage = validationErrors?.[cycleCountId]?.errors?.[index]?.[columnPath]?._errors;
       const [error, setError] = useState(errorMessage);
+
       // If the value at the end of entering data is the same as it was initially,
       // we don't want to trigger rerender
       const isEdited = initialValue !== value;
@@ -121,15 +146,22 @@ const useCountStepTable = ({
       const type = getFieldType(id);
       const Component = getFieldComponent(id);
       const fieldProps = getFieldProps(id);
+      const showTooltip = id === 'binLocation';
 
       return (
-        <TableCell className="rt-td rt-td-count-step pb-0">
+        <TableCell
+          className="rt-td rt-td-count-step pb-0"
+          tooltip={showTooltip}
+          tooltipForm={showTooltip}
+          customTooltipStyles={showTooltip && 'bin-location-tooltip'}
+          tooltipLabel={value?.name || translate('react.cycleCount.table.binLocation.label', 'Bin Location')}
+        >
           <Component
             type={type}
             value={value}
             onChange={onChange}
             onBlur={onBlur}
-            className="w-75 m-1"
+            className={`m-1 ${showTooltip ? 'w-99' : 'w-75'}`}
             errorMessage={error}
             {...fieldProps}
           />
@@ -140,8 +172,8 @@ const useCountStepTable = ({
 
   const columns = [
     columnHelper.accessor(
-      (row) => (row?.binLocation?.label ? row?.binLocation : row.binLocation?.name), {
-        id: cycleCountColumn.BIN_LOCATION,
+      (row) => row?.binLocation?.label || row?.binLocation?.name, {
+        id: 'binLocation',
         header: () => (
           <TableHeaderCell>
             {translate('react.cycleCount.table.binLocation.label', 'Bin Location')}
