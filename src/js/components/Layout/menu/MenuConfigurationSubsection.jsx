@@ -6,7 +6,13 @@ const MenuConfigurationSubsection = ({ subsection }) => (
   <div className="padding-8">
     <span className="subsection-section-title">{subsection.label && subsection.label}</span>
     {subsection.menuItems && subsection.menuItems.map((menuItem) => (
-      <a className="dropdown-item" key={`${menuItem.label}-menuItem`} href={menuItem.href} target={menuItem.target}>
+      <a
+        role="menuitem"
+        className="dropdown-item"
+        key={`${menuItem.label}-menuItem`}
+        href={menuItem.href}
+        target={menuItem.target}
+      >
         {menuItem.label}
       </a>
     ))}
