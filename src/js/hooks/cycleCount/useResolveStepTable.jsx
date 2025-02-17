@@ -13,9 +13,13 @@ import { Tooltip } from 'react-tippy';
 import { fetchReasonCodes } from 'actions';
 import { TableCell } from 'components/DataTable';
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
+import ArrowValueIndicator from 'components/DataTable/v2/ArrowValueIndicator';
 import DateField from 'components/form-elements/v2/DateField';
 import SelectField from 'components/form-elements/v2/SelectField';
 import TextInput from 'components/form-elements/v2/TextInput';
+import ArrowValueIndicatorVariant, {
+  getCycleCountDifferencesVariant,
+} from 'consts/arrowValueIndicatorVariant';
 import cycleCountColumn from 'consts/cycleCountColumn';
 import useTranslate from 'hooks/useTranslate';
 import { fetchBins } from 'utils/option-utils';
@@ -209,7 +213,7 @@ const useResolveStepTable = ({
         getCellContext: () => ({
           className: 'split-table-right',
         }),
-        flexWidth: 176,
+        flexWidth: 160,
       },
     }),
     columnHelper.accessor(cycleCountColumn.QUANTITY_COUNTED, {
@@ -222,14 +226,16 @@ const useResolveStepTable = ({
         // TODO: Remove check if id is equal to quantityCounted
         //  after quantityCounted will be added to the response
         <TableCell className="rt-td rt-td-count-step static-cell-count-step">
-          {id.includes('newRow') ? '-' : Math.floor(Math.random() * 10).toString()}
+          {id.includes('newRow')
+            ? <ArrowValueIndicator variant={ArrowValueIndicatorVariant.EMPTY} />
+            : Math.floor(Math.random() * 10).toString()}
           {!id.includes('newRow') ? (
             <Tooltip
               arrow="true"
               delay="150"
               duration="250"
               hideDelay="50"
-              // TODO: Should be replaced with comment fetched from the API
+                // TODO: Should be replaced with comment fetched from the API
               html={<span className="p-2">Comment from count step</span>}
             >
               <RiChat3Line
@@ -251,14 +257,16 @@ const useResolveStepTable = ({
           {translate('react.cycleCount.table.countDifference.label', 'Count Difference')}
         </TableHeaderCell>
       ), []),
-      cell: useCallback(({ row: { original: { id, quantityOnHand } } }) => (
+      cell: useCallback(({ row: { original: { id, quantityOnHand } } }) => {
         // TODO: Replace random value with quantityCounted from response
-        <TableCell className="rt-td rt-td-count-step static-cell-count-step">
-          {id.includes('newRow')
-            ? '-'
-            : (Math.floor(Math.random() * 10) - quantityOnHand).toString()}
-        </TableCell>
-      ), []),
+        const value = Math.floor(Math.random() * 10) - quantityOnHand;
+        const variant = getCycleCountDifferencesVariant(value, id);
+        return (
+          <TableCell className="rt-td rt-td-count-step static-cell-count-step">
+            <ArrowValueIndicator value={value} variant={variant} showAbsoluteValue />
+          </TableCell>
+        );
+      }, []),
       meta: {
         flexWidth: 120,
       },
@@ -279,15 +287,17 @@ const useResolveStepTable = ({
           {translate('react.cycleCount.table.recountDifference.label', 'Recount Difference')}
         </TableHeaderCell>
       ), []),
-      cell: ({ row: { original: { quantityOnHand }, index } }) => {
+      cell: ({ row: { original: { quantityOnHand, id }, index } }) => {
         const [value, setValue] = useState(tableData?.[index]?.quantityRecounted);
+        const recountDifference = value - (quantityOnHand || 0);
+        const variant = getCycleCountDifferencesVariant(recountDifference, id);
         events.on('refreshRecountDifference', () => {
           setValue(tableData?.[index]?.quantityRecounted);
         });
 
         return (
           <TableCell className="rt-td rt-td-count-step static-cell-count-step">
-            {value !== undefined ? (value - (quantityOnHand || 0)).toString() : 'EQUAL'}
+            <ArrowValueIndicator value={recountDifference} variant={variant} showAbsoluteValue />
           </TableCell>
         );
       },
@@ -343,7 +353,7 @@ const useResolveStepTable = ({
         </TableCell>
       ), []),
       meta: {
-        flexWidth: 10,
+        flexWidth: 30,
       },
     }),
   ];
