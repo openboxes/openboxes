@@ -28,7 +28,7 @@ const useTableDataV2 = ({
   shouldFetch,
 }) => {
   const sourceRef = useRef(CancelToken.source());
-
+  const { tab } = useQueryParams();
   const translate = useTranslate();
 
   const [loading, setLoading] = useState(false);
@@ -67,8 +67,10 @@ const useTableDataV2 = ({
   };
 
   // fetching data after changing page size, filters, page number and sorting
+  // Ensuring data is only fetched for the currently active tab
+  // to prevent unnecessary API calls when switching between tabs
   useEffect(() => {
-    if (shouldFetch) {
+    if (shouldFetch && tab === filterParams.tab) {
       fetchData();
     }
   }, [

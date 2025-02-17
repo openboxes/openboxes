@@ -13,6 +13,7 @@ import useTranslate from 'hooks/useTranslate';
 const CycleCountAllProducts = ({
   filterParams,
   switchTab,
+  resetForm,
 }) => {
   const totalCount = useRef(0);
 
@@ -20,6 +21,7 @@ const CycleCountAllProducts = ({
     paginationProps,
     offset,
     pageSize,
+    resetForm,
   } = useTablePagination({
     defaultPageSize: 5,
     totalCount: totalCount.current,
