@@ -96,6 +96,10 @@ const useCountStepTable = ({
       return value.toString();
     }
 
+    if (id === 'binLocation') {
+      return value.name;
+    }
+
     return value;
   };
 
