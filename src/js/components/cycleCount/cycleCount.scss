@@ -125,6 +125,15 @@ limit-lines($lines-number) {
   }
 }
 
+.resolve-step-table {
+
+  .rt-td-count-step {
+    margin-left: 14px;
+    display: flex;
+    align-items: center;
+  }
+}
+
 .count-step-label-date-counted {
   white-space: nowrap;
 }
