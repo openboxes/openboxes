@@ -7,7 +7,6 @@ import queryString from 'query-string';
 import { getTranslate } from 'react-localize-redux';
 import { useSelector } from 'react-redux';
 
-import useQueryParams from 'hooks/useQueryParams';
 import useTranslate from 'hooks/useTranslate';
 import apiClient from 'utils/apiClient';
 import { translateWithDefaultMessage } from 'utils/Translate';
@@ -29,7 +28,6 @@ const useTableDataV2 = ({
   shouldFetch,
 }) => {
   const sourceRef = useRef(CancelToken.source());
-  const { tab } = useQueryParams();
   const translate = useTranslate();
 
   const [loading, setLoading] = useState(false);
@@ -71,7 +69,7 @@ const useTableDataV2 = ({
   // Ensuring data is only fetched for the currently active tab
   // to prevent unnecessary API calls when switching between tabs
   useEffect(() => {
-    if (shouldFetch && tab === filterParams.tab) {
+    if (shouldFetch) {
       fetchData();
     }
   }, [

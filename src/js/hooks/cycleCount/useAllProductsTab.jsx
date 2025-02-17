@@ -11,6 +11,7 @@ import TableHeaderCell from 'components/DataTable/TableHeaderCell';
 import Checkbox from 'components/form-elements/v2/Checkbox';
 import { INVENTORY_ITEM_URL } from 'consts/applicationUrls';
 import { TO_COUNT_TAB } from 'consts/cycleCount';
+import useQueryParams from 'hooks/useQueryParams';
 import useSpinner from 'hooks/useSpinner';
 import useTableCheckboxes from 'hooks/useTableCheckboxes';
 import useTableDataV2 from 'hooks/useTableDataV2';
@@ -30,6 +31,7 @@ const useAllProductsTab = ({
   const columnHelper = createColumnHelper();
   const spinner = useSpinner();
   const translate = useTranslate();
+  const { tab } = useQueryParams();
 
   const {
     currentLocale,
@@ -86,7 +88,7 @@ const useAllProductsTab = ({
     errorMessageId: 'react.cycleCount.table.errorMessage.label',
     defaultErrorMessage: 'Unable to fetch products',
     // We should start fetching after initializing the filters to avoid re-fetching
-    shouldFetch: filterParams.tab,
+    shouldFetch: filterParams.tab && tab === filterParams.tab,
     getParams,
     pageSize,
     offset,
@@ -222,12 +224,12 @@ const useAllProductsTab = ({
               </div>
             ))}
             {hiddenBinLocationsLength && (
-              <p>
-                +
-                {hiddenBinLocationsLength}
-                {' '}
-                more
-              </p>
+            <p>
+              +
+              {hiddenBinLocationsLength}
+              {' '}
+              more
+            </p>
             )}
           </TableCell>
         );
