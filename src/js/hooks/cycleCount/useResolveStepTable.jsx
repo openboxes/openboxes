@@ -184,6 +184,9 @@ const useResolveStepTable = ({
             {translate('react.cycleCount.table.binLocation.label', 'Bin Location')}
           </TableHeaderCell>
         ), []),
+        meta: {
+          flexWidth: 160,
+        },
       },
     ),
     columnHelper.accessor(cycleCountColumn.LOT_NUMBER, {
@@ -192,6 +195,9 @@ const useResolveStepTable = ({
           {translate('react.cycleCount.table.lotNumber.label', 'Serial / Lot Number')}
         </TableHeaderCell>
       ), []),
+      meta: {
+        flexWidth: 160,
+      },
     }),
     columnHelper.accessor(cycleCountColumn.EXPIRATION_DATE, {
       header: useMemo(() => (
@@ -203,6 +209,7 @@ const useResolveStepTable = ({
         getCellContext: () => ({
           className: 'split-table-right',
         }),
+        flexWidth: 176,
       },
     }),
     columnHelper.accessor(cycleCountColumn.QUANTITY_COUNTED, {
@@ -234,6 +241,9 @@ const useResolveStepTable = ({
           ) : ''}
         </TableCell>
       ), []),
+      meta: {
+        flexWidth: 120,
+      },
     }),
     columnHelper.accessor(cycleCountColumn.COUNT_DIFFERENCE, {
       header: useMemo(() => (
@@ -249,6 +259,9 @@ const useResolveStepTable = ({
             : (Math.floor(Math.random() * 10) - quantityOnHand).toString()}
         </TableCell>
       ), []),
+      meta: {
+        flexWidth: 120,
+      },
     }),
     columnHelper.accessor(cycleCountColumn.QUANTITY_RECOUNTED, {
       header: useMemo(() => (
@@ -256,6 +269,9 @@ const useResolveStepTable = ({
           {translate('react.cycleCount.table.quantityRecounted.label', 'Quantity Recounted')}
         </TableHeaderCell>
       ), []),
+      meta: {
+        flexWidth: 120,
+      },
     }),
     columnHelper.accessor(cycleCountColumn.RECOUNT_DIFFERENCE, {
       header: useMemo(() => (
@@ -275,6 +291,9 @@ const useResolveStepTable = ({
           </TableCell>
         );
       },
+      meta: {
+        flexWidth: 120,
+      },
     }),
     columnHelper.accessor(cycleCountColumn.ROOT_CAUSE, {
       header: useMemo(() => (
@@ -282,6 +301,9 @@ const useResolveStepTable = ({
           {translate('react.cycleCount.table.rootCause.label', 'Root Cause')}
         </TableHeaderCell>
       ), []),
+      meta: {
+        flexWidth: 120,
+      },
     }),
     columnHelper.accessor(cycleCountColumn.COMMENT, {
       header: useMemo(() => (
@@ -289,10 +311,13 @@ const useResolveStepTable = ({
           {translate('react.cycleCount.table.comment.label', 'Comment')}
         </TableHeaderCell>
       ), []),
+      meta: {
+        flexWidth: 228,
+      },
     }),
     columnHelper.accessor(null, {
       id: cycleCountColumn.ACTIONS,
-      header: useMemo(() => <TableHeaderCell className="count-step-actions" />, []),
+      header: useMemo(() => <TableHeaderCell />, []),
       cell: useCallback(({ row: { original } }) => (
         <TableCell className="rt-td d-flex justify-content-center count-step-actions">
           <Tooltip
@@ -318,9 +343,7 @@ const useResolveStepTable = ({
         </TableCell>
       ), []),
       meta: {
-        getCellContext: () => ({
-          className: 'count-step-actions',
-        }),
+        flexWidth: 10,
       },
     }),
   ];
