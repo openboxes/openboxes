@@ -25,6 +25,7 @@ const useAllProductsTab = ({
   switchTab,
   offset,
   pageSize,
+  resetForm,
 }) => {
   const columnHelper = createColumnHelper();
   const spinner = useSpinner();
@@ -221,12 +222,12 @@ const useAllProductsTab = ({
               </div>
             ))}
             {hiddenBinLocationsLength && (
-            <p>
-              +
-              {hiddenBinLocationsLength}
-              {' '}
-              more
-            </p>
+              <p>
+                +
+                {hiddenBinLocationsLength}
+                {' '}
+                more
+              </p>
             )}
           </TableCell>
         );
@@ -333,7 +334,7 @@ const useAllProductsTab = ({
     spinner.show();
     try {
       await cycleCountApi.createRequest(payload, currentLocation?.id);
-      switchTab(TO_COUNT_TAB);
+      switchTab(TO_COUNT_TAB, resetForm);
     } finally {
       spinner.hide();
     }

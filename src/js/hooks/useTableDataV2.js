@@ -7,6 +7,7 @@ import queryString from 'query-string';
 import { getTranslate } from 'react-localize-redux';
 import { useSelector } from 'react-redux';
 
+import useQueryParams from 'hooks/useQueryParams';
 import useTranslate from 'hooks/useTranslate';
 import apiClient from 'utils/apiClient';
 import { translateWithDefaultMessage } from 'utils/Translate';
@@ -28,7 +29,7 @@ const useTableDataV2 = ({
   shouldFetch,
 }) => {
   const sourceRef = useRef(CancelToken.source());
-
+  const { tab } = useQueryParams();
   const translate = useTranslate();
 
   const [loading, setLoading] = useState(false);
@@ -68,7 +69,7 @@ const useTableDataV2 = ({
 
   // fetching data after changing page size, filters, page number and sorting
   useEffect(() => {
-    if (shouldFetch) {
+    if (shouldFetch && tab === filterParams.tab) {
       fetchData();
     }
   }, [
@@ -83,6 +84,8 @@ const useTableDataV2 = ({
   // Start displaying the loader in the table when
   // accessing the page first time, before sending a request
   useEffect(() => {
+    // Ensuring data is only fetched for the currently active tab
+    // to prevent unnecessary API calls when switching between tabs
     setLoading(true);
   }, []);
 
