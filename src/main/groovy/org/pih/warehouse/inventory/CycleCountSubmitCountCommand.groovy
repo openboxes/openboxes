@@ -25,13 +25,7 @@ class CycleCountSubmitCountCommand implements Validateable {
 
     static constraints = {
         cycleCount(validator: { CycleCount obj ->
-            List<CycleCountStatus> validStatuses = [
-                    CycleCountStatus.COUNTING,
-                    CycleCountStatus.INVESTIGATING,
-                    CycleCountStatus.REQUESTED,
-                    CycleCountStatus.COUNTED,
-            ]
-            if (!validStatuses.contains(obj?.status)) {
+            if (obj?.status != CycleCountStatus.COUNTING) {
                 return ['invalidStatus']
             }
         })

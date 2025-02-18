@@ -279,34 +279,30 @@ class CycleCountService {
             updateCycleCountItemForSubmit(cycleCountItem, command.refreshQuantityOnHand, command.failOnOutdatedQuantity)
             determineCycleCountItemStatus(cycleCountItem, command.requireRecountOnDiscrepancy)
         }
-        if (command.cycleCount.status == CycleCountStatus.COUNTED) {
+        command.cycleCount.status = command.cycleCount.recomputeStatus()
+        if (command.cycleCount.status == CycleCountStatus.READY_TO_REVIEW) {
             createCycleCountTransaction(command.cycleCount)
         }
-        return CycleCountDto.createFromCycleCountItems(command.cycleCount.cycleCountItems)
+        return CycleCountDto.toDto(command.cycleCount)
     }
 
     void updateCycleCountItemForSubmit(CycleCountItem cycleCountItem, boolean refreshQuantityOnHand, boolean failOnOutdatedQuantity) {
         Integer currentQuantityOnHand =
             productAvailabilityService.getQuantityOnHandInBinLocation(cycleCountItem.inventoryItem, cycleCountItem.location)
-        if (refreshQuantityOnHand) {
-            cycleCountItem.quantityOnHand = currentQuantityOnHand
-        }
         if (failOnOutdatedQuantity && cycleCountItem.quantityOnHand != currentQuantityOnHand) {
             throw new IllegalArgumentException("Quantity on hand for a cycle count item is no longer up to date")
+        }
+        if (refreshQuantityOnHand) {
+            cycleCountItem.quantityOnHand = currentQuantityOnHand
         }
     }
 
     void determineCycleCountItemStatus(CycleCountItem cycleCountItem, boolean requireRecountOnDiscrepancy) {
-        if (cycleCountItem.quantityOnHand == cycleCountItem.quantityCounted) {
-            cycleCountItem.status = CycleCountItemStatus.COUNTED
+        if ((cycleCountItem.quantityOnHand == cycleCountItem.quantityCounted) || !requireRecountOnDiscrepancy) {
+            cycleCountItem.status = CycleCountItemStatus.READY_TO_REVIEW
             return
         }
-        if (!requireRecountOnDiscrepancy) {
-            cycleCountItem.status = CycleCountItemStatus.APPROVED
-            return
-        }
-        // FIXME: INVESTIGATING = DISCREPANCY_TO_RESOLVE???
-        cycleCountItem.status = CycleCountItemStatus.INVESTIGATING
+        cycleCountItem.status = CycleCountItemStatus.COUNTED
     }
 
     void createCycleCountTransaction(CycleCount cycleCount) {
