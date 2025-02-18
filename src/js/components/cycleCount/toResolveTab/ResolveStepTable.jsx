@@ -59,7 +59,7 @@ const ResolveStepTable = ({
             <p className="count-step-label count-step-label-date-counted mr-2 mt-2">
               {translate('react.cycleCount.dateCounted.label', 'Date Counted')}
               <span className="count-step-value ml-1">
-                {formatLocalizedDate(dateCounted, DateFormat.DD_MM_YYYY)}
+                {formatLocalizedDate(dateCounted, DateFormat.DD_MMM_YYYY)}
               </span>
             </p>
           </div>
