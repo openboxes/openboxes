@@ -24,7 +24,13 @@ const DropdownMenu = ({ section, active }) => {
             <div className="padding-8" key={subsectionKey}>
               {subsection.label && <span className="subsection-section-title">{subsection.label}</span>}
               {_.map(subsection.menuItems, (menuItem, menuItemKey) => (
-                <a className="dropdown-item" key={menuItemKey} href={menuItem.href} target={menuItem.target}>
+                <a
+                  role="menuitem"
+                  className="dropdown-item"
+                  key={menuItemKey}
+                  href={menuItem.href}
+                  target={menuItem.target}
+                >
                   {menuItem.label}
                 </a>
               ))}

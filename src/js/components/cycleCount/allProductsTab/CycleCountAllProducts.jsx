@@ -13,6 +13,7 @@ import useTranslate from 'hooks/useTranslate';
 const CycleCountAllProducts = ({
   filterParams,
   switchTab,
+  resetForm,
 }) => {
   const totalCount = useRef(0);
 
@@ -39,6 +40,7 @@ const CycleCountAllProducts = ({
     switchTab,
     offset,
     pageSize,
+    resetForm,
   });
 
   const translate = useTranslate();
@@ -93,4 +95,5 @@ export default CycleCountAllProducts;
 CycleCountAllProducts.propTypes = {
   filterParams: PropTypes.shape({}).isRequired,
   switchTab: PropTypes.func.isRequired,
+  resetForm: PropTypes.func.isRequired,
 };
