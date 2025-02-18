@@ -38,11 +38,11 @@ const useResolveStepTable = ({
   const events = new EventEmitter();
 
   const {
-    recipients,
+    users,
     currentLocation,
     reasonCodes,
   } = useSelector((state) => ({
-    recipients: state.users.data,
+    users: state.users.data,
     currentLocation: state.session.currentLocation,
     reasonCodes: state.reasonCodes.data,
   }));
@@ -361,7 +361,7 @@ const useResolveStepTable = ({
   return {
     columns,
     defaultColumn,
-    recipients,
+    users,
   };
 };
 

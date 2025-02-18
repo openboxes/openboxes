@@ -31,7 +31,7 @@ const ResolveStepTable = ({
   const {
     columns,
     defaultColumn,
-    recipients,
+    users,
   } = useResolveStepTable({
     cycleCountId: id,
     tableData,
@@ -91,7 +91,7 @@ const ResolveStepTable = ({
             </p>
             <SelectField
               placeholder="Select"
-              options={recipients}
+              options={users}
               onChange={assignRecountedBy(product?.productCode)}
             />
           </div>
