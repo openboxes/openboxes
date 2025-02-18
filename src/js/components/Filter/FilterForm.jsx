@@ -31,6 +31,7 @@ const FilterForm = ({
   currentLocation,
   translate,
   setShouldRebuildFilterValues,
+  isLoadingFilters,
 }) => {
   const [amountFilled, setAmountFilled] = useState(0);
   const [filtersHidden, setFiltersHidden] = useState(hidden);
@@ -102,6 +103,8 @@ const FilterForm = ({
       onClearHandler(formRef.current);
     }
   }, [currentLocation?.id]);
+
+  if (isLoadingFilters) return <div className="text-center">Loading...</div>;
 
   return (
     <div className="filter-form">
@@ -182,6 +185,7 @@ FilterForm.propTypes = {
   }).isRequired,
   translate: PropTypes.func.isRequired,
   setShouldRebuildFilterValues: PropTypes.func.isRequired,
+  isLoadingFilters: PropTypes.bool,
 };
 
 FilterForm.defaultProps = {
@@ -193,4 +197,5 @@ FilterForm.defaultProps = {
   hidden: true,
   onClear: undefined,
   ignoreClearFilters: [],
+  isLoadingFilters: false,
 };
