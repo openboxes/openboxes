@@ -142,3 +142,7 @@ limit-lines($lines-number) {
   gap: 8px;
   padding-top: 40px;
 }
+
+.dynamic-width {
+  min-width: 250px;
+}
