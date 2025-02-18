@@ -97,7 +97,7 @@ const ResolveStepTable = ({
           </div>
         </div>
       </div>
-      <div className="mx-4 count-step-table">
+      <div className="mx-4 count-step-table resolve-step-table">
         <DataTable
           columns={columns}
           data={tableData}
