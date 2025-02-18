@@ -183,7 +183,7 @@ const useCountStepTable = ({
     }),
     columnHelper.accessor(null, {
       id: 'actions',
-      header: () => <TableHeaderCell className="count-step-actions" />,
+      header: () => <TableHeaderCell />,
       cell: ({ row: { original } }) => (
         <TableCell className="rt-td d-flex justify-content-center count-step-actions">
           <Tooltip

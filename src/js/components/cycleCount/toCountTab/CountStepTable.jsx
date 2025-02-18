@@ -73,12 +73,23 @@ const CountStepTable = ({
           </p>
           {' '}
           {isEditable ? (
-            <SelectField
-              placeholder="Select"
-              options={recipients}
-              onChange={assignCountedBy(product?.productCode)}
-              autoWidth
-            />
+            <Tooltip
+              className=""
+              html={(
+                <span className="p-1">
+                  {countedBy[product.productCode]?.label || translate('react.cycleCount.countedBy.label', 'Counted By')}
+                </span>
+              )}
+              style={{ width: 'fit-content' }}
+              arrow
+            >
+              <SelectField
+                placeholder="Select"
+                options={recipients}
+                onChange={assignCountedBy(product?.productCode)}
+                className="counted-by-width"
+              />
+            </Tooltip>
           ) : <p>{countedBy[product.productCode]?.label}</p>}
         </div>
       </div>
