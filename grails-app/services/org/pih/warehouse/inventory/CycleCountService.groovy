@@ -254,7 +254,7 @@ class CycleCountService {
 
         // If there are already items for the requested count index, simply return the count as it is since the recount
         // has already been started. We do this (instead of throwing an error) because it's convenient for the frontend.
-        if (cycleCount.cycleCountItems.any(){ it.countIndex == command.countIndex }) {
+        if (cycleCount.cycleCountItems.any{ it.countIndex == command.countIndex }) {
             return CycleCountDto.toDto(cycleCount)
         }
 
