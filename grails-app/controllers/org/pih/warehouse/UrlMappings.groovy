@@ -967,6 +967,11 @@ class UrlMappings {
             action = [POST: "submitCount"]
         }
 
+        "/api/facilities/$facility/cycle-counts/$cycleCountId/recount" {
+            controller = "cycleCountApi"
+            action = [POST: "submitRecount"]
+        }
+
         // Error handling
 
         "401"(controller: "errors", action: "handleUnauthorized")
