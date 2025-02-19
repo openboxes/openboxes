@@ -22,13 +22,13 @@ const CountStep = () => {
     getCountedDate,
     setCountedDate,
     validationErrors,
-    isEditableStep,
+    isStepEditable,
     countedBy,
   } = useCountStep();
 
   return (
     <PageWrapper>
-      {isEditableStep ? (
+      {isStepEditable ? (
         <CountStepHeader
           printCountForm={printCountForm}
           next={next}
@@ -48,7 +48,7 @@ const CountStep = () => {
             setCountedDate={setCountedDate(id)}
             assignCountedBy={assignCountedBy}
             validationErrors={validationErrors}
-            isEditableStep={isEditableStep}
+            isStepEditable={isStepEditable}
             countedBy={countedBy}
           />
         ))}

@@ -11,8 +11,8 @@ import TableHeaderCell from 'components/DataTable/TableHeaderCell';
 import DateField from 'components/form-elements/v2/DateField';
 import SelectField from 'components/form-elements/v2/SelectField';
 import TextInput from 'components/form-elements/v2/TextInput';
-import { DateFormat } from 'consts/timeFormat';
 import cycleCountColumn from 'consts/cycleCountColumn';
+import { DateFormat } from 'consts/timeFormat';
 import useTranslate from 'hooks/useTranslate';
 import { fetchBins } from 'utils/option-utils';
 
@@ -22,7 +22,7 @@ const useCountStepTable = ({
   removeRow,
   validationErrors,
   tableData,
-  isEditableStep,
+  isStepEditable,
   formatLocalizedDate,
 }) => {
   const columnHelper = createColumnHelper();
@@ -98,7 +98,7 @@ const useCountStepTable = ({
     }
 
     if (id === 'binLocation') {
-      return value.name;
+      return value?.name;
     }
 
     return value;
@@ -108,14 +108,13 @@ const useCountStepTable = ({
     cell: ({
       row: { original, index }, column: { id }, table,
     }) => {
-      
       const columnPath = id.replaceAll('_', '.');
       const initialValue = _.get(tableData, `[${index}].${columnPath}`);
       const [value, setValue] = useState(initialValue);
 
       const isFieldEditable = !original.id.includes('newRow') && id !== cycleCountColumn.QUANTITY_COUNTED;
       // We shouldn't allow users edit fetched data (only quantity counted is editable)
-      if (isFieldEditable) {
+      if (isFieldEditable || !isStepEditable) {
         const valueToDisplay = getValueToDisplay(id, value);
         return (
           <TableCell className="static-cell-count-step">
@@ -225,7 +224,7 @@ const useCountStepTable = ({
             )}
             disabled={original.id}
           >
-            {original.id.includes('newRow') && isEditableStep && (
+            {original.id.includes('newRow') && isStepEditable && (
             <RiDeleteBinLine
               onClick={() => removeRow(cycleCountId, original.id)}
               size={22}

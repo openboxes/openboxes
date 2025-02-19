@@ -27,7 +27,7 @@ const CountStepTable = ({
   assignCountedBy,
   validationErrors,
   setCountedDate,
-  isEditableStep,
+  isStepEditable,
   countedBy,
 }) => {
   const translate = useTranslate();
@@ -42,7 +42,7 @@ const CountStepTable = ({
     tableData,
     validationErrors,
     removeRow,
-    isEditableStep,
+    isStepEditable,
     formatLocalizedDate,
   });
 
@@ -54,12 +54,12 @@ const CountStepTable = ({
         {product?.name}
       </p>
       <div className="pt-3 pl-4 d-flex align-items-center">
-        <div className={`d-flex align-items-center date-counted-container ${!isEditableStep && 'p-2'}`}>
+        <div className={`d-flex align-items-center date-counted-container ${!isStepEditable && 'p-2'}`}>
           <p className="count-step-label count-step-label-date-counted mr-2">
             {translate('react.cycleCount.dateCounted.label', 'Date counted')}
           </p>
           {' '}
-          {isEditableStep ? (
+          {isStepEditable ? (
             <DateField
               className="date-counted-date-picker date-field-input"
               onChange={setCountedDate}
@@ -68,12 +68,12 @@ const CountStepTable = ({
             />
           ) : <p>{formatLocalizedDate(dateCounted, DateFormat.DD_MMM_YYYY)}</p>}
         </div>
-        <div className={`d-flex count-step-select-counted-by ml-5 align-items-center ${!isEditableStep && 'p-2'}`}>
+        <div className={`d-flex count-step-select-counted-by ml-5 align-items-center ${!isStepEditable && 'p-2'}`}>
           <p className="count-step-label mr-2">
             {translate('react.cycleCount.countedBy.label', 'Counted by')}
           </p>
           {' '}
-          {isEditableStep ? (
+          {isStepEditable ? (
             <SelectField
               placeholder="Select"
               options={recipients}
@@ -93,7 +93,7 @@ const CountStepTable = ({
           disablePagination
         />
       </div>
-      {isEditableStep && (
+      {isStepEditable && (
         <div
           className="ml-4 mb-3 d-flex"
         >
@@ -139,7 +139,7 @@ CountStepTable.propTypes = {
   assignCountedBy: PropTypes.func.isRequired,
   validationErrors: PropTypes.shape({}).isRequired,
   setCountedDate: PropTypes.func.isRequired,
-  isEditableStep: PropTypes.bool.isRequired,
+  isStepEditable: PropTypes.bool.isRequired,
   countedBy: PropTypes.arrayOf(
     PropTypes.shape({}),
   ).isRequired,
