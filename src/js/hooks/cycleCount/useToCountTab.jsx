@@ -12,6 +12,7 @@ import TableHeaderCell from 'components/DataTable/TableHeaderCell';
 import Checkbox from 'components/form-elements/v2/Checkbox';
 import { CYCLE_COUNT, INVENTORY_ITEM_URL } from 'consts/applicationUrls';
 import CycleCountCandidateStatus from 'consts/cycleCountCandidateStatus';
+import useQueryParams from 'hooks/useQueryParams';
 import useSpinner from 'hooks/useSpinner';
 import useTableCheckboxes from 'hooks/useTableCheckboxes';
 import useTableDataV2 from 'hooks/useTableDataV2';
@@ -31,6 +32,7 @@ const useToCountTab = ({
   const translate = useTranslate();
   const spinner = useSpinner();
   const history = useHistory();
+  const { tab } = useQueryParams();
 
   const { currentLocale, currentLocation } = useSelector((state) => ({
     currentLocale: state.session.activeLanguage,
@@ -99,7 +101,7 @@ const useToCountTab = ({
     url: CYCLE_COUNT_CANDIDATES(currentLocation?.id),
     errorMessageId: 'react.cycleCount.table.errorMessage.label',
     defaultErrorMessage: 'Unable to fetch products',
-    shouldFetch: filterParams.tab,
+    shouldFetch: filterParams.tab && tab === filterParams.tab,
     getParams,
     pageSize,
     offset,

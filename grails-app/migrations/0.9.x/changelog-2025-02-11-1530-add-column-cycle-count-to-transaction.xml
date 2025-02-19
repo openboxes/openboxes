@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="kchelstowski" id="110220251530-0">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="transaction" columnName="cycle_count_id"/>
+            </not>
+        </preConditions>
+
+        <addColumn tableName="transaction">
+            <column name="cycle_count_id" type="CHAR(38)">
+                <constraints nullable="true" />
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="kchelstowski" id="110220251530-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="fk_transaction_cycle_count"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint
+                baseColumnNames="cycle_count_id"
+                baseTableName="transaction"
+                constraintName="fk_transaction_cycle_count"
+                deferrable="false"
+                initiallyDeferred="false"
+                referencedColumnNames="id"
+                referencedTableName="cycle_count"
+        />
+    </changeSet>
+</databaseChangeLog>

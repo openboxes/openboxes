@@ -52,7 +52,6 @@ const CountStepTable = ({
         {' '}
         {product?.name}
       </p>
-
       <div className="pt-3 pl-4 d-flex align-items-center">
         <div className={`d-flex align-items-center date-counted-container ${!isEditable && 'p-2'}`}>
           <p className="count-step-label count-step-label-date-counted mr-2">

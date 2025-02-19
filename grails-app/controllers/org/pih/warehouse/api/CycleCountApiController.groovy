@@ -14,6 +14,7 @@ import org.pih.warehouse.inventory.CycleCountRequestCommand
 import org.pih.warehouse.inventory.CycleCountService
 import org.pih.warehouse.inventory.CycleCountStartBatchCommand
 import org.pih.warehouse.inventory.CycleCountStartCommand
+import org.pih.warehouse.inventory.CycleCountSubmitCountCommand
 import org.springframework.validation.BeanPropertyBindingResult
 import org.springframework.validation.Errors
 
@@ -87,5 +88,14 @@ class CycleCountApiController {
         List<CycleCountDto> cycleCounts = cycleCountService.getCycleCounts(ids)
 
         render([data: cycleCounts] as JSON)
+    }
+
+    def submitCount(CycleCountSubmitCountCommand command) {
+        if (command.hasErrors()) {
+            throw new ValidationException("Invalid submit count object", command.errors)
+        }
+        CycleCountDto cycleCount = cycleCountService.submitCount(command)
+
+        render([data: cycleCount] as JSON)
     }
 }
