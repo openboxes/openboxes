@@ -577,16 +577,6 @@ class PartialReceivingPage extends Component {
 
   componentDidMount() {
     this.fetchPartialReceiptCandidates();
-    if (this.props.partialReceivingTranslationsFetched) {
-      this.dataFetched = true;
-    }
-    this.props.hideSpinner();
-  }
-
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.partialReceivingTranslationsFetched && !this.dataFetched) {
-      this.dataFetched = true;
-    }
   }
 
   confirmReceive(formValues, emptyLinesCount) {
@@ -687,14 +677,14 @@ class PartialReceivingPage extends Component {
     this.props.showSpinner();
     const url = `/api/partialReceiving/${this.props.match.params.shipmentId}?stepNumber=1`;
 
-    return apiClient.get(url)
+    apiClient.get(url)
       .then((response) => {
         this.setState({ values: {} }, () => {
           this.setState({
             values: parseResponse(response.data.data),
             initialReceiptCandidates: parseResponse(response.data.data),
             isFirstPageLoaded: true,
-          });
+          }, () => this.props.hideSpinner());
         });
       })
       .catch(() => this.props.hideSpinner());
@@ -738,8 +728,6 @@ class PartialReceivingPage extends Component {
       })
       .catch(() => this.props.hideSpinner());
   }
-
-  dataFetched = false;
 
   /**
    * Autofills "to receive" cells in different ways depending on what user did.
@@ -1126,7 +1114,6 @@ class PartialReceivingPage extends Component {
 
 const mapStateToProps = (state) => ({
   hasBinLocationSupport: state.session.currentLocation.hasBinLocationSupport,
-  partialReceivingTranslationsFetched: state.session.fetchedTranslations.partialReceiving,
   hasPartialReceivingSupport: state.session.currentLocation.hasPartialReceivingSupport,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
   formatLocalizedDate: formatDate(state.localize),
@@ -1146,7 +1133,6 @@ PartialReceivingPage.propTypes = {
   bins: PropTypes.arrayOf(PropTypes.shape({})),
   /** Location ID (destination). Needs to be used in /api/products request. */
   locationId: PropTypes.string.isRequired,
-  partialReceivingTranslationsFetched: PropTypes.bool.isRequired,
   nextPage: PropTypes.func.isRequired,
   /** Is true when currently selected location supports partial receiving */
   hasPartialReceivingSupport: PropTypes.bool.isRequired,
