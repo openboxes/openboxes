@@ -12,6 +12,7 @@ import DateField from 'components/form-elements/v2/DateField';
 import SelectField from 'components/form-elements/v2/SelectField';
 import TextInput from 'components/form-elements/v2/TextInput';
 import cycleCountColumn from 'consts/cycleCountColumn';
+import { DateFormat } from 'consts/timeFormat';
 import useTranslate from 'hooks/useTranslate';
 import groupBinLocationsByZone from 'utils/groupBinLocationsByZone';
 import { fetchBins } from 'utils/option-utils';
@@ -71,10 +72,13 @@ const useCountStepTable = ({
     if (fieldName === cycleCountColumn.BIN_LOCATION) {
       return {
         labelKey: 'name',
-        options: binLocations.map((binLocation) => ({
-          id: binLocation.id,
-          name: binLocation.name,
-        })),
+        options: groupBinLocationsByZone(binLocations),
+      };
+    }
+
+    if (fieldName === 'inventoryItem_expirationDate') {
+      return {
+        customDateFormat: DateFormat.DD_MMM_YYYY,
       };
     }
 
@@ -102,7 +106,7 @@ const useCountStepTable = ({
     cell: ({
       row: { original, index }, column: { id }, table,
     }) => {
-      const isFieldEditable = !original.id.includes('newRow') && id !== 'quantityCounted';
+      const isFieldEditable = !original.id.includes('newRow') && id !== cycleCountColumn.QUANTITY_COUNTED;
       // We shouldn't allow users edit fetched data (only quantity counted is editable)
 
       // Keep and update the state of the cell during rerenders
@@ -153,7 +157,7 @@ const useCountStepTable = ({
           className="rt-td rt-td-count-step pb-0"
           tooltip={showTooltip}
           tooltipForm={showTooltip}
-          customTooltipStyles={showTooltip && 'bin-location-tooltip'}
+          tooltipClassname={showTooltip && 'bin-location-tooltip'}
           tooltipLabel={value?.name || translate('react.cycleCount.table.binLocation.label', 'Bin Location')}
         >
           <Component
@@ -172,8 +176,8 @@ const useCountStepTable = ({
 
   const columns = [
     columnHelper.accessor(
-      (row) => row?.binLocation?.label || row?.binLocation?.name, {
-        id: 'binLocation',
+      (row) => (row?.binLocation?.label ? row?.binLocation : row.binLocation?.name), {
+        id: cycleCountColumn.BIN_LOCATION,
         header: () => (
           <TableHeaderCell>
             {translate('react.cycleCount.table.binLocation.label', 'Bin Location')}
@@ -216,7 +220,7 @@ const useCountStepTable = ({
     }),
     columnHelper.accessor(null, {
       id: cycleCountColumn.ACTIONS,
-      header: () => <TableHeaderCell className="count-step-actions" />,
+      header: () => <TableHeaderCell />,
       cell: ({ row: { original } }) => (
         <TableCell className="rt-td d-flex justify-content-center count-step-actions">
           <Tooltip
@@ -232,11 +236,11 @@ const useCountStepTable = ({
             )}
             disabled={original.id}
           >
-            {original.id.includes('newRow') && (
-            <RiDeleteBinLine
-              onClick={() => removeRow(cycleCountId, original.id)}
-              size={22}
-            />
+            {original.id.includes('newRow') && isStepEditable && (
+              <RiDeleteBinLine
+                onClick={() => removeRow(cycleCountId, original.id)}
+                size={22}
+              />
             )}
           </Tooltip>
         </TableCell>

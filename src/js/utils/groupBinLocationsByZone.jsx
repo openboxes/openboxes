@@ -1,43 +1,37 @@
 import React from 'react';
 
+import _ from 'lodash';
+
 import useTranslate from 'hooks/useTranslate';
 
 const groupBinLocationsByZone = (binLocations) => {
   const translate = useTranslate();
-  const groupedByZone = binLocations.reduce((acc, bin) => {
-    const zoneKey = bin.zoneId || 'no-zone';
-    const zoneName = bin.zoneName || translate('react.cycleCount.noZone', 'No Zone');
+  const groupedByZone = _.groupBy(binLocations, bin => bin.zoneId || 'no-zone');
 
-    return {
-      ...acc,
-      [zoneKey]: {
-        zoneId: bin.zoneId,
-        zoneName,
-        bins: [...(acc[zoneKey]?.bins || []), {
-          id: bin.id,
-          name: bin.name,
-          label: bin.name,
-          value: bin.id,
-        }],
-      },
-    };
-  }, {});
+  return Object.entries(groupedByZone)
+    .map(([zoneKey, bins]) => {
+      const zoneName = bins[0].zoneName || translate('react.cycleCount.noZone', 'No Zone');
 
-  return (
-    Object.values(groupedByZone)
-      .sort((a, b) => {
-        if (!a.zoneId) return 1;
-        if (!b.zoneId) return -1;
-        return a.zoneName.localeCompare(b.zoneName);
-      })
-      .map((group) => ({
-        id: `zone-${group.zoneId || 'no-zone'}`,
-        name: group.zoneName,
-        label: <span className="zone-label">{group.zoneName}</span>,
+      return {
+        id: `zone-${zoneKey}`,
+        name: zoneName,
+        label: <span className="zone-label">{zoneName}</span>,
         isDisabled: true,
-        options: group.bins.sort((a, b) => a.name.localeCompare(b.name)),
-      }))
-  );
+        options: bins
+          .map(bin => ({
+            id: bin.id,
+            name: bin.name,
+            label: bin.name,
+            value: bin.id,
+          }))
+          .sort((a, b) => a.name.localeCompare(b.name)),
+      };
+    })
+    .sort((a, b) => {
+      if (a.id === 'zone-no-zone') return 1;
+      if (b.id === 'zone-no-zone') return -1;
+      return a.name.localeCompare(b.name);
+    });
 };
 
 export default groupBinLocationsByZone;
