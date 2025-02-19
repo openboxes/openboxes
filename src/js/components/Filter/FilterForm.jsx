@@ -104,7 +104,7 @@ const FilterForm = ({
     }
   }, [currentLocation?.id]);
 
-  if (isLoading) return <div className="text-center">Loading...</div>;
+  if (isLoading) return <div className="text-center">{translate('react.default.loading.label', 'Loading...')}</div>;
 
   return (
     <div className="filter-form">
