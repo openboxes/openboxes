@@ -84,6 +84,7 @@ class Transaction implements Comparable, Serializable {
     Requisition requisition                // associated requisition
     Receipt receipt
     Order order
+    CycleCount cycleCount
 
     // Auditing fields
     Boolean confirmed = Boolean.FALSE    // Transactions need to be confirmed by a supervisor
@@ -169,6 +170,7 @@ class Transaction implements Comparable, Serializable {
         requisition(nullable: true)
         receipt(nullable: true)
         order(nullable: true)
+        cycleCount(nullable: true)
         //outboundTransfer(nullable: true)
         //inboundTransfer(nullable: true)
         confirmed(nullable: true)

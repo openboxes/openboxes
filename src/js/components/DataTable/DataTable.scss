@@ -260,3 +260,29 @@
     right: 10px;
   }
 }
+
+.arrow-value-indicator, .value-indicator {
+
+  &--positive {
+    color: var(--color-green);
+  }
+
+  &--negative {
+    color: var(--color-red);
+  }
+
+  &--equal {
+    background-color: var(--blue-200);
+    color: var(--blue-primary);
+  }
+
+  &--empty {
+    min-width: 64px;
+    background-color: var(--gray-100);
+    color: var(--gray-600);
+  }
+}
+
+.value-indicator {
+  font-weight: 600;
+}

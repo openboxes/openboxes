@@ -213,21 +213,13 @@ class CycleCountService {
         request.cycleCountRequest.cycleCount = newCycleCount
         request.cycleCountRequest.status = CycleCountRequestStatus.IN_PROGRESS
         itemsToSave.each { AvailableItem availableItem ->
-            CycleCountItem cycleCountItem = new CycleCountItem(
-                    status: CycleCountItemStatus.READY_TO_COUNT,
-                    countIndex: request.countIndex,
-                    quantityOnHand: availableItem.quantityOnHand,
-                    quantityCounted: availableItem.quantityOnHand == 0 ? 0 : null,
-                    cycleCount: newCycleCount,
-                    facility: facility,
-                    location: availableItem.binLocation,
-                    inventoryItem: availableItem.inventoryItem,
-                    product: availableItem.inventoryItem.product,
-                    createdBy: AuthService.currentUser,
-                    updatedBy: AuthService.currentUser,
-                    dateCounted: new Date(),
-                    custom: false,
-            )
+            CycleCountItem cycleCountItem = initCycleCountItem(
+                    facility,
+                    availableItem,
+                    newCycleCount,
+                    0,  // countIndex is always zero for the initial count
+                    CycleCountItemStatus.READY_TO_COUNT)
+
             newCycleCount.addToCycleCountItems(cycleCountItem)
         }
 
@@ -236,6 +228,80 @@ class CycleCountService {
         }
 
         return CycleCountDto.toDto(newCycleCount)
+    }
+
+    /**
+     * Inserts a list of cycle count items representing the recount for each request in the given batch.
+     */
+    List<CycleCountDto> startRecount(CycleCountStartRecountBatchCommand command) {
+        Location facility = command.facility
+
+        List<CycleCountDto> cycleCounts = []
+        for (CycleCountStartRecountCommand request : command.requests) {
+            CycleCountDto cycleCountDto = startRecount(facility, request)
+            cycleCounts.add(cycleCountDto)
+        }
+
+        return cycleCounts
+    }
+
+    /**
+     * Inserts a list of cycle count items representing the recount for the given request.
+     */
+    CycleCountDto startRecount(Location facility, CycleCountStartRecountCommand command) {
+        CycleCount cycleCount = command.cycleCountRequest.cycleCount
+        Product product = command.cycleCountRequest.product
+
+        // If there are already items for the requested count index, simply return the count as it is since the recount
+        // has already been started. We do this (instead of throwing an error) because it's convenient for the frontend.
+        if (cycleCount.cycleCountItems.any{ it.countIndex == command.countIndex }) {
+            return CycleCountDto.toDto(cycleCount)
+        }
+
+        // The items to recount are determined by product availability, just like in a regular count. As such, any
+        // new transactions that have occurred on the product since the initial count will be applied when determining
+        // the QoH values used for recounts. This includes any new [bin location + lot number] quantities that did not
+        // exist at the time of the initial count.
+        List<AvailableItem> availableItemsToRecount = determineCycleCountItemsToSave(facility, product)
+        for (AvailableItem availableItemToRecount : availableItemsToRecount) {
+            CycleCountItem cycleCountItem = initCycleCountItem(
+                    facility,
+                    availableItemToRecount,
+                    cycleCount,
+                    command.countIndex,
+                    CycleCountItemStatus.INVESTIGATING)
+
+            cycleCount.addToCycleCountItems(cycleCountItem)
+        }
+
+        if (!cycleCount.save()) {
+            throw new ValidationException("Invalid cycle count", cycleCount.errors)
+        }
+        return CycleCountDto.toDto(cycleCount)
+    }
+
+    private CycleCountItem initCycleCountItem(
+            Location facility,
+            AvailableItem availableItem,
+            CycleCount cycleCount,
+            int countIndex,
+            CycleCountItemStatus status) {
+
+        return new CycleCountItem(
+                status: status,
+                countIndex: countIndex,
+                quantityOnHand: availableItem.quantityOnHand,
+                quantityCounted: availableItem.quantityOnHand == 0 ? 0 : null,
+                cycleCount: cycleCount,
+                facility: facility,
+                location: availableItem.binLocation,
+                inventoryItem: availableItem.inventoryItem,
+                product: availableItem.inventoryItem.product,
+                createdBy: AuthService.currentUser,
+                updatedBy: AuthService.currentUser,
+                dateCounted: new Date(),
+                custom: false,
+        )
     }
 
     CycleCountDto updateCycleCount(CycleCount cycleCount, List<CycleCountItem> cycleCountItems, CycleCountStartCommand request) {
@@ -272,5 +338,65 @@ class CycleCountService {
             }
         } as List<CycleCount>
         return cycleCounts.collect { CycleCountDto.toDto(it) }
+    }
+
+    CycleCountDto submitCount(CycleCountSubmitCountCommand command) {
+        command.cycleCount.cycleCountItems.each { CycleCountItem cycleCountItem ->
+            updateCycleCountItemForSubmit(cycleCountItem, command.refreshQuantityOnHand, command.failOnOutdatedQuantity)
+            determineCycleCountItemStatus(cycleCountItem, command.requireRecountOnDiscrepancy)
+        }
+        command.cycleCount.status = command.cycleCount.recomputeStatus()
+        if (command.cycleCount.status == CycleCountStatus.READY_TO_REVIEW) {
+            createCycleCountTransaction(command.cycleCount)
+        }
+        return CycleCountDto.toDto(command.cycleCount)
+    }
+
+    void updateCycleCountItemForSubmit(CycleCountItem cycleCountItem, boolean refreshQuantityOnHand, boolean failOnOutdatedQuantity) {
+        Integer currentQuantityOnHand =
+            productAvailabilityService.getQuantityOnHandInBinLocation(cycleCountItem.inventoryItem, cycleCountItem.location)
+        if (failOnOutdatedQuantity && cycleCountItem.quantityOnHand != currentQuantityOnHand) {
+            throw new IllegalArgumentException("Quantity on hand for a cycle count item is no longer up to date")
+        }
+        if (refreshQuantityOnHand) {
+            cycleCountItem.quantityOnHand = currentQuantityOnHand
+        }
+    }
+
+    void determineCycleCountItemStatus(CycleCountItem cycleCountItem, boolean requireRecountOnDiscrepancy) {
+        if ((cycleCountItem.quantityOnHand == cycleCountItem.quantityCounted) || !requireRecountOnDiscrepancy) {
+            cycleCountItem.status = CycleCountItemStatus.READY_TO_REVIEW
+            return
+        }
+        cycleCountItem.status = CycleCountItemStatus.COUNTED
+    }
+
+    void createCycleCountTransaction(CycleCount cycleCount) {
+        TransactionType cycleCountProductInventoryTransactionType =
+            TransactionType.read(Constants.CYCLE_COUNT_PRODUCT_INVENTORY_TRANSACTION_TYPE_ID)
+        Transaction transaction = new Transaction(
+                source: cycleCount.facility,
+                inventory: cycleCount.facility.inventory,
+                transactionDate: new Date(),
+                transactionType: cycleCountProductInventoryTransactionType,
+                cycleCount: cycleCount
+        )
+        if (!transaction.validate()) {
+            throw new ValidationException("Invalid transaction", transaction.errors)
+        }
+        transaction.save()
+        cycleCount.cycleCountItems.each { CycleCountItem cycleCountItem ->
+            TransactionEntry transactionEntry = new TransactionEntry(
+                    quantity: cycleCountItem.quantityCounted,
+                    binLocation: cycleCountItem.location,
+                    inventoryItem: cycleCountItem.inventoryItem,
+                    transaction: transaction
+            )
+            if (!transactionEntry.validate()) {
+                throw new ValidationException("Invalid transaction entry", transactionEntry.errors)
+            }
+            transactionEntry.save()
+            transaction.addToTransactionEntries(transactionEntry)
+        }
     }
 }

@@ -11,6 +11,7 @@ import TableHeaderCell from 'components/DataTable/TableHeaderCell';
 import DateField from 'components/form-elements/v2/DateField';
 import SelectField from 'components/form-elements/v2/SelectField';
 import TextInput from 'components/form-elements/v2/TextInput';
+import cycleCountColumn from 'consts/cycleCountColumn';
 import useTranslate from 'hooks/useTranslate';
 import { fetchBins } from 'utils/option-utils';
 
@@ -42,11 +43,11 @@ const useCountStepTable = ({
 
   // Get appropriate input component based on table column
   const getFieldComponent = (fieldName) => {
-    if (fieldName === 'inventoryItem_expirationDate') {
+    if (fieldName === cycleCountColumn.EXPIRATION_DATE) {
       return DateField;
     }
 
-    if (fieldName === 'binLocation') {
+    if (fieldName === cycleCountColumn.BIN_LOCATION) {
       return SelectField;
     }
 
@@ -56,7 +57,7 @@ const useCountStepTable = ({
   // Get text input type: quantityCounted expects a number,
   // the rest of the inputs should be text
   const getFieldType = (fieldName) => {
-    if (fieldName === 'quantityCounted') {
+    if (fieldName === cycleCountColumn.QUANTITY_COUNTED) {
       return 'number';
     }
 
@@ -65,7 +66,7 @@ const useCountStepTable = ({
 
   // Get field props, for the binLocation dropdown we have to pass options
   const getFieldProps = (fieldName) => {
-    if (fieldName === 'binLocation') {
+    if (fieldName === cycleCountColumn.BIN_LOCATION) {
       return {
         labelKey: 'name',
         options: binLocations.map((binLocation) => ({
@@ -82,7 +83,7 @@ const useCountStepTable = ({
     cell: ({
       getValue, row: { original, index }, column: { id }, table,
     }) => {
-      const isFieldEditable = !original.id.includes('newRow') && id !== 'quantityCounted';
+      const isFieldEditable = !original.id.includes('newRow') && id !== cycleCountColumn.QUANTITY_COUNTED;
       // We shouldn't allow users edit fetched data (only quantity counted is editable)
       if (isFieldEditable || !isEditable) {
         return (
@@ -152,7 +153,7 @@ const useCountStepTable = ({
   const columns = [
     columnHelper.accessor(
       (row) => (row?.binLocation?.label ? row?.binLocation : row.binLocation?.name), {
-        id: 'binLocation',
+        id: cycleCountColumn.BIN_LOCATION,
         header: () => (
           <TableHeaderCell>
             {translate('react.cycleCount.table.binLocation.label', 'Bin Location')}
@@ -160,14 +161,14 @@ const useCountStepTable = ({
         ),
       },
     ),
-    columnHelper.accessor('inventoryItem.lotNumber', {
+    columnHelper.accessor(cycleCountColumn.LOT_NUMBER, {
       header: () => (
         <TableHeaderCell>
           {translate('react.cycleCount.table.lotNumber.label', 'Serial / Lot Number')}
         </TableHeaderCell>
       ),
     }),
-    columnHelper.accessor('inventoryItem.expirationDate', {
+    columnHelper.accessor(cycleCountColumn.EXPIRATION_DATE, {
       header: () => (
         <TableHeaderCell>
           {translate('react.cycleCount.table.expirationDate.label', 'Expiration Date')}
@@ -179,14 +180,14 @@ const useCountStepTable = ({
         }),
       },
     }),
-    columnHelper.accessor('quantityCounted', {
+    columnHelper.accessor(cycleCountColumn.QUANTITY_COUNTED, {
       header: () => (
         <TableHeaderCell>
           {translate('react.cycleCount.table.quantityCounted.label', 'Quantity Counted')}
         </TableHeaderCell>
       ),
     }),
-    columnHelper.accessor('comment', {
+    columnHelper.accessor(cycleCountColumn.COMMENT, {
       header: () => (
         <TableHeaderCell>
           {translate('react.cycleCount.table.comment.label', 'Comment')}
@@ -194,8 +195,8 @@ const useCountStepTable = ({
       ),
     }),
     columnHelper.accessor(null, {
-      id: 'actions',
-      header: () => <TableHeaderCell />,
+      id: cycleCountColumn.ACTIONS,
+      header: () => <TableHeaderCell className="count-step-actions" />,
       cell: ({ row: { original } }) => (
         <TableCell className="rt-td d-flex justify-content-center count-step-actions">
           <Tooltip
