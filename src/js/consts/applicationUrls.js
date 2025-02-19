@@ -146,6 +146,7 @@ const CYCLE_COUNT = {
   base: `${CONTEXT_PATH}/inventory/cycleCount`,
   list: (tab) => `${CYCLE_COUNT.base}?tab=${tab}`,
   countStep: () => `${CYCLE_COUNT.base}/count`,
+  resolveStep: () => `${CYCLE_COUNT.base}/resolve`,
 };
 
 export {

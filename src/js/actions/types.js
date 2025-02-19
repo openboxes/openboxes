@@ -70,3 +70,4 @@ export const SET_SCROLL_TO_BOTTOM = 'SET_SCROLL_TO_BOTTOM';
 
 // Cycle count
 export const START_COUNT = 'START_COUNT';
+export const START_RESOLUTION = 'START_RESOLUTION';
