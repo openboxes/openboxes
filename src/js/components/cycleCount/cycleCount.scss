@@ -147,6 +147,10 @@ limit-lines($lines-number) {
     align-items: center;
     white-space: break-spaces;
   }
+
+  .input-wrapper-error-message {
+    text-wrap: balance;
+  }
 }
 
 .count-step-label-date-counted {
