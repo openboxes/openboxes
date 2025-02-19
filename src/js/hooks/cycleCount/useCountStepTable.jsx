@@ -94,7 +94,7 @@ const useCountStepTable = ({
     }
 
     if (id === 'quantityCounted') {
-      return value.toString();
+      return value?.toString();
     }
 
     if (id === 'binLocation') {
@@ -207,7 +207,7 @@ const useCountStepTable = ({
       ),
     }),
     columnHelper.accessor(null, {
-      id: 'actions',
+      id: cycleCountColumn.ACTIONS,
       header: () => <TableHeaderCell />,
       cell: ({ row: { original } }) => (
         <TableCell className="rt-td d-flex justify-content-center count-step-actions">
