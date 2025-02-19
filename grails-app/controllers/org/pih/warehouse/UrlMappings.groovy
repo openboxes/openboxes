@@ -952,6 +952,11 @@ class UrlMappings {
             action = [POST: "startCycleCount"]
         }
 
+        "/api/facilities/$facility/cycle-counts/recount/start/batch" {
+            controller = "cycleCountApi"
+            action = [POST: "startRecount"]
+        }
+
         "/api/facilities/$facility/cycle-counts" {
             controller = "cycleCountApi"
             action = [GET: "list"]
