@@ -63,6 +63,11 @@ limit-lines($lines-number) {
   color: var(--gray-500);
 }
 
+.count-step-value {
+  font-weight: 500;
+  color: var(--gray-600);
+}
+
 .count-step-date {
   color: var(--gray-600);
   font-weight: 500;
@@ -117,6 +122,15 @@ limit-lines($lines-number) {
 
   .date-field-input__value {
     font-weight: normal;
+  }
+}
+
+.resolve-step-table {
+
+  .rt-td-count-step {
+    margin-left: 14px;
+    display: flex;
+    align-items: center;
   }
 }
 

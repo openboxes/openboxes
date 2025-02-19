@@ -5,8 +5,8 @@ import cycleCountFilterFields from 'components/cycleCount/CycleCountFilterFields
 import CycleCountFilters from 'components/cycleCount/CycleCountFilters';
 import CycleCountHeader from 'components/cycleCount/CycleCountHeader';
 import CycleCountToApprove from 'components/cycleCount/CycleCountToApprove';
-import CycleCountToResolve from 'components/cycleCount/CycleCountToResolve';
 import CycleCountToCount from 'components/cycleCount/toCountTab/CycleCountToCount';
+import CycleCountToResolve from 'components/cycleCount/toResolveTab/CycleCountToResolve';
 import Tabs from 'components/listPagesUtils/Tabs';
 import {
   ALL_PRODUCTS_TAB,
@@ -91,20 +91,21 @@ const CycleCount = () => {
           }}
         />
         {tab === ALL_PRODUCTS_TAB && (
-        <CycleCountAllProducts
-          switchTab={switchTab}
-          filterParams={filterParams}
-        />
+          <CycleCountAllProducts
+            switchTab={switchTab}
+            filterParams={filterParams}
+            resetForm={resetForm}
+          />
         )}
         {tab === TO_COUNT_TAB && (
-        <CycleCountToCount
-          filterParams={filterParams}
-        />
+          <CycleCountToCount
+            filterParams={filterParams}
+          />
         )}
         {tab === TO_RESOLVE_TAB && (
-        <CycleCountToResolve
-          filterParams={filterParams}
-        />
+          <CycleCountToResolve
+            filterParams={filterParams}
+          />
         )}
         {tab === TO_APPROVE_TAB && <CycleCountToApprove />}
       </div>
