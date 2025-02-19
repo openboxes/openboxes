@@ -109,6 +109,7 @@ limit-lines($lines-number) {
   .rt-td-count-step {
     padding: 0;
     align-items: center;
+    position: relative;
   }
 
   .cell-inner-wrapper {
@@ -141,4 +142,17 @@ limit-lines($lines-number) {
   align-items: center;
   gap: 8px;
   padding-top: 40px;
+}
+
+.error-icon {
+  position: absolute;
+  left: 5%;
+  top: 50%;
+  transform: translateY(-50%);
+  color: red;
+  font-size: 16px;
+}
+
+.error-border {
+  border: 1px solid red;
 }

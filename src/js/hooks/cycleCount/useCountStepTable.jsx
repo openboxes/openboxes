@@ -128,10 +128,22 @@ const useCountStepTable = ({
             value={value}
             onChange={onChange}
             onBlur={onBlur}
-            className="w-75 m-1"
-            errorMessage={error}
+            className={`w-75 m-1 ${error && 'error-border'}`}
+            hideErrorMessage
             {...fieldProps}
           />
+          {error && (
+            <Tooltip
+              className="d-flex align-items-center error-icon"
+              html={(
+                <span className="p-1">
+                  {error}
+                </span>
+              )}
+            >
+              <i className="fa fa-exclamation-circle" aria-hidden="true" />
+            </Tooltip>
+          )}
         </TableCell>
       );
     },
@@ -183,7 +195,7 @@ const useCountStepTable = ({
     }),
     columnHelper.accessor(null, {
       id: 'actions',
-      header: () => <TableHeaderCell className="count-step-actions" />,
+      header: () => <TableHeaderCell />,
       cell: ({ row: { original } }) => (
         <TableCell className="rt-td d-flex justify-content-center count-step-actions">
           <Tooltip

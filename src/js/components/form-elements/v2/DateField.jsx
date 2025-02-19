@@ -26,6 +26,7 @@ const DateField = ({
   value,
   onChange,
   showTimeSelect,
+  hideErrorMessage,
   ...fieldProps
 }) => {
   const translate = useTranslate();
@@ -67,6 +68,7 @@ const DateField = ({
       tooltip={tooltip}
       errorMessage={errorMessage}
       button={button}
+      hideErrorMessage={hideErrorMessage}
     >
       <DatePicker
         {...fieldProps}
@@ -140,6 +142,7 @@ DateField.propTypes = {
   value: PropTypes.string,
   onChange: PropTypes.func,
   showTimeSelect: PropTypes.bool,
+  hideErrorMessage: PropTypes.bool,
 };
 
 DateField.defaultProps = {
@@ -154,4 +157,5 @@ DateField.defaultProps = {
   value: null,
   onChange: () => {},
   showTimeSelect: false,
+  hideErrorMessage: false,
 };
