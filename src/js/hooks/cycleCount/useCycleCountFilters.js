@@ -23,7 +23,7 @@ const useCycleCountFilters = () => {
   const [negativeQuantity] = useState(false);
   const [filtersInitialized, setFiltersInitialized] = useState(false);
   // This boolean ensures that we avoid issues with outdated bin location data
-  const [isLoadingFilters, setIsLoadingFilters] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const [selectOptions, setSelectOptions] = useState({
     categories: [],
@@ -73,7 +73,7 @@ const useCycleCountFilters = () => {
   };
 
   const initializeDefaultFilterValues = async () => {
-    setIsLoadingFilters(true);
+    setIsLoading(true);
 
     try {
       const queryProps = queryString.parse(history.location.search);
@@ -119,7 +119,7 @@ const useCycleCountFilters = () => {
       setDefaultFilterValues(defaultValues);
       setFiltersInitialized(true);
     } finally {
-      setIsLoadingFilters(false);
+      setIsLoading(false);
     }
   };
 
@@ -157,7 +157,7 @@ const useCycleCountFilters = () => {
     filterParams,
     dateLastCount,
     negativeQuantity,
-    isLoadingFilters,
+    isLoading,
     ...selectOptions,
   };
 };

@@ -37,7 +37,7 @@ const CycleCount = () => {
     negativeQuantity,
     filterParams,
     resetForm,
-    isLoadingFilters,
+    isLoading,
   } = useCycleCountFilters();
 
   const tabs = {
@@ -90,7 +90,7 @@ const CycleCount = () => {
             abcClasses,
             negativeQuantity,
           }}
-          isLoadingFilters={isLoadingFilters}
+          isLoading={isLoading}
         />
         {tab === ALL_PRODUCTS_TAB && (
           <CycleCountAllProducts
