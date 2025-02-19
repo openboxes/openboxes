@@ -2,15 +2,17 @@ import React, { useMemo } from 'react';
 
 import { createColumnHelper } from '@tanstack/react-table';
 import _ from 'lodash';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 
-import cycleCountApi from 'api/services/CycleCountApi';
+import { startResolution } from 'actions';
 import { CYCLE_COUNT_CANDIDATES } from 'api/urls';
 import { TableCell } from 'components/DataTable';
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
 import Checkbox from 'components/form-elements/v2/Checkbox';
-import { INVENTORY_ITEM_URL } from 'consts/applicationUrls';
+import { CYCLE_COUNT, INVENTORY_ITEM_URL } from 'consts/applicationUrls';
 import CycleCountCandidateStatus from 'consts/cycleCountCandidateStatus';
+import useQueryParams from 'hooks/useQueryParams';
 import useSpinner from 'hooks/useSpinner';
 import useTableCheckboxes from 'hooks/useTableCheckboxes';
 import useTableDataV2 from 'hooks/useTableDataV2';
@@ -29,11 +31,16 @@ const useToResolveTab = ({
   const columnHelper = createColumnHelper();
   const translate = useTranslate();
   const spinner = useSpinner();
+  const { tab } = useQueryParams();
 
   const { currentLocale, currentLocation } = useSelector((state) => ({
     currentLocale: state.session.activeLanguage,
     currentLocation: state.session.currentLocation,
   }));
+
+  const dispatch = useDispatch();
+
+  const history = useHistory();
 
   const {
     dateLastCount,
@@ -94,7 +101,7 @@ const useToResolveTab = ({
     url: CYCLE_COUNT_CANDIDATES(currentLocation?.id),
     errorMessageId: 'react.cycleCount.table.errorMessage.label',
     defaultErrorMessage: 'Unable to fetch products',
-    shouldFetch: filterParams.tab,
+    shouldFetch: filterParams.tab && tab === filterParams.tab,
     getParams,
     pageSize,
     offset,
@@ -321,7 +328,7 @@ const useToResolveTab = ({
     console.log('print resolve form pressed');
   };
 
-  const startResolution = async () => {
+  const moveToResolving = async () => {
     const payload = {
       requests: checkedCheckboxes.map((cycleCountRequestId) => ({
         cycleCountRequest: cycleCountRequestId,
@@ -330,7 +337,8 @@ const useToResolveTab = ({
     };
     spinner.show();
     try {
-      await cycleCountApi.startCount(payload, currentLocation?.id);
+      dispatch(startResolution(payload, currentLocation?.id));
+      history.push(CYCLE_COUNT.resolveStep());
     } finally {
       spinner.hide();
     }
@@ -343,7 +351,7 @@ const useToResolveTab = ({
     emptyTableMessage,
     exportTableData,
     selectedCheckboxesAmount,
-    startResolution,
+    moveToResolving,
     printResolveForm,
   };
 };

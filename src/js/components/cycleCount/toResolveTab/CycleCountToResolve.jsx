@@ -30,7 +30,7 @@ const CycleCountToResolve = ({ filterParams }) => {
     emptyTableMessage,
     exportTableData,
     selectedCheckboxesAmount,
-    startResolution,
+    moveToResolving,
     printResolveForm,
   } = useToResolveTab({
     filterParams,
@@ -53,7 +53,7 @@ const CycleCountToResolve = ({ filterParams }) => {
         </span>
         <div className="d-flex m-2 gap-8">
           <Button
-            onClick={startResolution}
+            onClick={moveToResolving}
             label="react.cycleCount.table.startResolution.label"
             defaultLabel="Start resolution"
             variant="primary-outline"

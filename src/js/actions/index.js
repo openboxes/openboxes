@@ -50,6 +50,7 @@ import {
   SHOW_INFO_BAR_MODAL,
   SHOW_SPINNER,
   START_COUNT,
+  START_RESOLUTION,
   TOGGLE_USER_ACTION_MENU,
   TRANSLATIONS_FETCHED,
 } from 'actions/types';
@@ -744,6 +745,15 @@ export const startCount = (payload, locationId) => async (dispatch) => {
   const cycleCountIds = cycleCounts?.data?.data?.map?.((cycleCount) => cycleCount.id);
   return dispatch({
     type: START_COUNT,
+    payload: cycleCountIds,
+  });
+};
+
+export const startResolution = (payload, locationId) => async (dispatch) => {
+  const cycleCounts = await cycleCountApi.startCount(payload, locationId);
+  const cycleCountIds = cycleCounts?.data?.data?.map?.((cycleCount) => cycleCount.id);
+  return dispatch({
+    type: START_RESOLUTION,
     payload: cycleCountIds,
   });
 };
