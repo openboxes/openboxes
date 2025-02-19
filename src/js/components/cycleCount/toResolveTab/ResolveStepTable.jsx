@@ -27,6 +27,7 @@ const ResolveStepTable = ({
   removeRow,
   assignRecountedBy,
   setRecountedDate,
+  validationErrors,
 }) => {
   const {
     columns,
@@ -34,6 +35,7 @@ const ResolveStepTable = ({
     users,
   } = useResolveStepTable({
     cycleCountId: id,
+    validationErrors,
     tableData,
     removeRow,
   });

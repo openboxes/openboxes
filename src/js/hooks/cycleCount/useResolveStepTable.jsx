@@ -134,7 +134,6 @@ const useResolveStepTable = ({
       const columnPath = id.replaceAll('_', '.');
       const initialValue = _.get(tableData, `[${index}].${columnPath}`);
       const errorMessage = validationErrors?.[cycleCountId]?.errors?.[index]?.[columnPath]?._errors;
-
       const [value, setValue] = useState(initialValue);
       const [error, setError] = useState(errorMessage);
       // If the value at the end of entering data is the same as it was initially,

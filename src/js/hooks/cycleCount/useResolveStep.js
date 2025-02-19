@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { fetchUsers } from 'actions';
 import cycleCountApi from 'api/services/CycleCountApi';
+import useResolveStepValidation from 'hooks/cycleCount/useResolveStepValidation';
 
 // Managing state for all tables, operations on shared state (from resolve step)
 const useResolveStep = () => {
@@ -16,9 +17,10 @@ const useResolveStep = () => {
   // Saving selected "date recounted" option, initially it's the date fetched from API
   const [dateRecounted, setDateRecounted] = useState({});
 
-  // TODO: Remove after implementing validation, used for re-rendering table
-  // to see newly added rows
-  const [, setReloadData] = useState(0);
+  const {
+    validationErrors,
+    triggerValidation,
+  } = useResolveStepValidation({ tableData });
 
   const dispatch = useDispatch();
 
@@ -77,7 +79,7 @@ const useResolveStep = () => {
 
       return data;
     });
-    setReloadData(x => x + 1);
+    triggerValidation();
   };
 
   const addEmptyRow = (productCode, id) => {
@@ -115,12 +117,15 @@ const useResolveStep = () => {
 
       return data;
     });
-    setReloadData(x => x + 1);
+    triggerValidation();
   };
 
   const next = () => {
-    // This data should be combined to a single request
-    console.log('next: ', tableData.current, recountedBy);
+    const isValid = triggerValidation();
+    if (isValid) {
+      // This data should be combined to a single request
+      console.log('next: ', tableData.current, recountedBy, dateRecounted);
+    }
   };
 
   const updateRow = (cycleCountId, rowId, columnId, value) => {
@@ -156,6 +161,7 @@ const useResolveStep = () => {
   return {
     tableData: tableData.current,
     tableMeta,
+    validationErrors,
     addEmptyRow,
     removeRow,
     printRecountForm,

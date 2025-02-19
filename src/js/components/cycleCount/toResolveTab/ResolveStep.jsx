@@ -10,6 +10,7 @@ import 'components/cycleCount/cycleCount.scss';
 const ResolveStep = () => {
   const {
     tableData,
+    validationErrors,
     printRecountForm,
     next,
     tableMeta,
@@ -37,6 +38,7 @@ const ResolveStep = () => {
             removeRow={removeRow}
             setRecountedDate={setRecountedDate(id)}
             assignRecountedBy={assignRecountedBy}
+            validationErrors={validationErrors}
           />
         ))}
     </PageWrapper>
