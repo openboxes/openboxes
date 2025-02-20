@@ -15,6 +15,7 @@ import useTranslate from 'hooks/useTranslate';
 import { formatDate } from 'utils/translation-utils';
 
 import 'components/cycleCount/cycleCount.scss';
+import TooltipWrapper from 'wrappers/TooltipWrapper';
 
 const CountStepTable = ({
   id,
@@ -95,14 +96,24 @@ const CountStepTable = ({
         <div
           className="ml-4 mb-3 d-flex"
         >
-          <Tooltip
-            className="d-flex align-items-center"
-            html={(
-              <span className="p-1">
-                {translate('react.cycleCount.addNewRecord.tooltip', 'Use this button to change lot number or bin location.')}
-              </span>
-            )}
-          >
+          {/* <Tooltip */}
+          {/*   className="d-flex align-items-center" */}
+          {/*   html={( */}
+          {/*     <span className="p-1"> */}
+          {/*       {translate('react.cycleCount.addNewRecord.tooltip', 'Use this button to change lot number or bin location.')} */}
+          {/*     </span> */}
+          {/*   )} */}
+          {/* > */}
+          {/*   <Button */}
+          {/*     onClick={() => addEmptyRow(product?.productCode, id)} */}
+          {/*     label="react.cycleCount.addNewRecord.label" */}
+          {/*     defaultLabel="Add new record" */}
+          {/*     variant="transparent" */}
+          {/*     StartIcon={<RiAddCircleLine size={18} />} */}
+          {/*   /> */}
+          {/* </Tooltip> */}
+
+          <TooltipWrapper content={translate('react.cycleCount.addNewRecord.tooltip', 'Use this button to change lot number or bin location.')}>
             <Button
               onClick={() => addEmptyRow(product?.productCode, id)}
               label="react.cycleCount.addNewRecord.label"
@@ -110,7 +121,7 @@ const CountStepTable = ({
               variant="transparent"
               StartIcon={<RiAddCircleLine size={18} />}
             />
-          </Tooltip>
+          </TooltipWrapper>
         </div>
       )}
     </div>

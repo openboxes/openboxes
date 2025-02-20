@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 
 import { createColumnHelper } from '@tanstack/react-table';
 import _ from 'lodash';
-import { RiDeleteBinLine } from 'react-icons/ri';
+import { RiDeleteBinLine, RiErrorWarningLine } from 'react-icons/ri';
 import { useSelector } from 'react-redux';
 import { Tooltip } from 'react-tippy';
 
@@ -139,7 +139,7 @@ const useCountStepTable = ({
               content={error}
               className="error-icon"
             >
-              <i className="fa fa-exclamation-circle" aria-hidden="true" />
+              <RiErrorWarningLine />
             </TooltipWrapper>
           )}
         </TableCell>

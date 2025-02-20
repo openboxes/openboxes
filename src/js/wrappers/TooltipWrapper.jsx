@@ -1,24 +1,22 @@
 import React from 'react';
 
+import Tippy from '@tippyjs/react';
 import PropTypes from 'prop-types';
-import { Tooltip } from 'react-tippy';
+
+// eslint-disable-next-line import/no-extraneous-dependencies
+import 'tippy.js/animations/shift-away.css';
 
 const TooltipWrapper = ({
   children,
   content,
   className,
-  ...props
 }) => (
-  <Tooltip
-    className={`d-flex align-items-center ${className}`}
-    delay={150}
-    duration={250}
-    hideDelay={50}
-    html={<div className="custom-tooltip-v2">{content}</div>}
-    {...props}
+  <Tippy
+    content={<div className="tippy-tooltip-v2">{content}</div>}
+    animation="shift-away"
   >
-    {children}
-  </Tooltip>
+    <span className={className}>{children}</span>
+  </Tippy>
 );
 
 export default TooltipWrapper;
