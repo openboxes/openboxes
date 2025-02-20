@@ -10,6 +10,7 @@ const CycleCountFilters = ({
   setFilterParams,
   defaultValues,
   formProps,
+  isLoading,
 }) => (
   <ListFilterFormWrapper>
     <FilterForm
@@ -22,6 +23,7 @@ const CycleCountFilters = ({
       searchFieldPlaceholder="react.cycleCount.filter.search.label"
       ignoreClearFilters={['tab']}
       hidden={false}
+      isLoading={isLoading}
     />
   </ListFilterFormWrapper>
 );
@@ -32,6 +34,7 @@ CycleCountFilters.propTypes = {
   setFilterParams: PropTypes.func.isRequired,
   defaultValues: PropTypes.shape({}).isRequired,
   formProps: PropTypes.shape({}),
+  isLoading: PropTypes.bool.isRequired,
 };
 
 CycleCountFilters.defaultProps = {

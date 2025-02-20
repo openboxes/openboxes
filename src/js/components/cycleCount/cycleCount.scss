@@ -1,3 +1,5 @@
+@import "src/css/colors";
+
 @mixin
 limit-lines($lines-number) {
   overflow: hidden;
@@ -95,11 +97,8 @@ limit-lines($lines-number) {
   }
 
   .static-cell-count-step {
-    display: flex;
-    align-items: center;
-    padding-left: 12px;
-    padding-top: 13px ;
-    padding-bottom: 15px;
+    padding: 10px;
+    padding-bottom: 18px;
   }
 
   .react-datepicker-wrapper {
@@ -115,10 +114,8 @@ limit-lines($lines-number) {
   }
 
   .rt-td-count-step {
-    margin-left: 5px;
-    margin-bottom: 5px;
+    padding: 0;
     align-items: center;
-    position: relative;
   }
 
   .cell-inner-wrapper {
@@ -160,6 +157,16 @@ limit-lines($lines-number) {
   align-items: center;
   gap: 8px;
   padding-top: 40px;
+}
+
+.bin-location-tooltip {
+  width: 75%;
+}
+
+.zone-label {
+  color: $black-alpha;
+  font-weight: bold;
+  font-size: 15px;
 }
 
 .error-icon {

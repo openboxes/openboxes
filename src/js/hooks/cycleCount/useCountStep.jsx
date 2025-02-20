@@ -16,8 +16,7 @@ const useCountStep = () => {
   const [countedBy, setCountedBy] = useState({});
   // Saving selected "date counted" option, initially it's the date fetched from API
   const [dateCounted, setDateCounted] = useState({});
-  const [isEditable, setIsEditable] = useState(true);
-
+  const [isStepEditable, setIsStepEditable] = useState(true);
   const dispatch = useDispatch();
 
   const {
@@ -28,9 +27,7 @@ const useCountStep = () => {
   const {
     cycleCountIds,
     currentLocation,
-    users,
   } = useSelector((state) => ({
-    users: state.users.data,
     cycleCountIds: state.cycleCount.requests,
     currentLocation: state.session.currentLocation,
   }));
@@ -52,9 +49,7 @@ const useCountStep = () => {
 
   // Fetching data for "counted by" dropdown
   useEffect(() => {
-    if (!users?.length) {
-      dispatch(fetchUsers());
-    }
+    dispatch(fetchUsers());
   }, []);
 
   const printCountForm = () => {
@@ -93,9 +88,7 @@ const useCountStep = () => {
         lotNumber: undefined,
         expirationDate: undefined,
       },
-      binLocation: {
-        name: undefined,
-      },
+      binLocation: undefined,
       quantityCounted: undefined,
       comment: '',
     };
@@ -123,11 +116,11 @@ const useCountStep = () => {
     if (isValid) {
       // This data should be combined to a single request
       console.log('next: ', tableData.current, countedBy);
-      setIsEditable(false);
+      setIsStepEditable(false);
     }
   };
   const back = () => {
-    setIsEditable(true);
+    setIsStepEditable(true);
   };
 
   const save = () => {
@@ -178,7 +171,7 @@ const useCountStep = () => {
     next,
     back,
     save,
-    isEditable,
+    isStepEditable,
   };
 };
 
