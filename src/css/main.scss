@@ -905,7 +905,8 @@ div.crossed-out .table-inner-row:before {
 // Tooltip style
 .custom-tooltip {
   background-color: var(--blue-800);
-  border-radius: 2px;
+  background: orange;
+  border-radius: 12px;
   padding: 4px 8px;
   font-weight: 400;
   font-size: 12px;
@@ -913,10 +914,22 @@ div.crossed-out .table-inner-row:before {
   color: #FFFFFF;
 }
 
+.custom-tooltip-v2 {
+  font-size: 16px;
+  max-width: 250px;
+  background-color: var(--blue-800);;
+  border-radius: 12px;
+  padding: 4px 8px !important;
+  font-weight: 400;
+  line-height: 15px;
+  color: #FFFFFF;
+}
+
 // Overriding built-in tooltip-style (react-tippy)
 .tippy-tooltip {
-  padding: 0 !important;
-  border-radius: 0 !important;
+  padding: 2px !important;
+  border-radius: 10px !important;
+  background-color: var(--blue-800);
 }
 
 // Table Filters fields
@@ -1658,4 +1671,8 @@ div.search-input:focus-within {
     color: var(--blue-primary);
     box-shadow: 0 2px 0 var(--blue-primary);
   }
+}
+
+.w-35 {
+  width: 35%;
 }

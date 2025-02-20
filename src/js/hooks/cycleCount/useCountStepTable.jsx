@@ -14,6 +14,7 @@ import TextInput from 'components/form-elements/v2/TextInput';
 import cycleCountColumn from 'consts/cycleCountColumn';
 import useTranslate from 'hooks/useTranslate';
 import { fetchBins } from 'utils/option-utils';
+import TooltipWrapper from 'wrappers/TooltipWrapper';
 
 // Managing state for single table, mainly table configuration (from count step)
 const useCountStepTable = ({
@@ -129,21 +130,17 @@ const useCountStepTable = ({
             value={value}
             onChange={onChange}
             onBlur={onBlur}
-            className={`w-75 m-1 ${error && 'error-border'}`}
+            className={`${id === cycleCountColumn.QUANTITY_COUNTED ? 'w-35' : 'w-75'} m-1 ${error && 'error-border'}`}
             hideErrorMessage
             {...fieldProps}
           />
           {error && (
-            <Tooltip
-              className="d-flex align-items-center error-icon"
-              html={(
-                <span className="p-1">
-                  {error}
-                </span>
-              )}
+            <TooltipWrapper
+              content={error}
+              className="error-icon"
             >
               <i className="fa fa-exclamation-circle" aria-hidden="true" />
-            </Tooltip>
+            </TooltipWrapper>
           )}
         </TableCell>
       );
@@ -159,6 +156,9 @@ const useCountStepTable = ({
             {translate('react.cycleCount.table.binLocation.label', 'Bin Location')}
           </TableHeaderCell>
         ),
+        meta: {
+          flexWidth: 100,
+        },
       },
     ),
     columnHelper.accessor(cycleCountColumn.LOT_NUMBER, {
@@ -167,6 +167,9 @@ const useCountStepTable = ({
           {translate('react.cycleCount.table.lotNumber.label', 'Serial / Lot Number')}
         </TableHeaderCell>
       ),
+      meta: {
+        flexWidth: 100,
+      },
     }),
     columnHelper.accessor(cycleCountColumn.EXPIRATION_DATE, {
       header: () => (
@@ -175,6 +178,7 @@ const useCountStepTable = ({
         </TableHeaderCell>
       ),
       meta: {
+        flexWidth: 100,
         getCellContext: () => ({
           className: 'split-table-right',
         }),
@@ -186,6 +190,9 @@ const useCountStepTable = ({
           {translate('react.cycleCount.table.quantityCounted.label', 'Quantity Counted')}
         </TableHeaderCell>
       ),
+      meta: {
+        flexWidth: 100,
+      },
     }),
     columnHelper.accessor(cycleCountColumn.COMMENT, {
       header: () => (
@@ -193,10 +200,13 @@ const useCountStepTable = ({
           {translate('react.cycleCount.table.comment.label', 'Comment')}
         </TableHeaderCell>
       ),
+      meta: {
+        flexWidth: 100,
+      },
     }),
     columnHelper.accessor(null, {
       id: cycleCountColumn.ACTIONS,
-      header: () => <TableHeaderCell className="count-step-actions" />,
+      header: () => <TableHeaderCell />,
       cell: ({ row: { original } }) => (
         <TableCell className="rt-td d-flex justify-content-center count-step-actions">
           <Tooltip
@@ -225,6 +235,7 @@ const useCountStepTable = ({
         getCellContext: () => ({
           className: 'count-step-actions',
         }),
+        flexWidth: 100,
       },
     }),
   ];

@@ -95,8 +95,11 @@ limit-lines($lines-number) {
   }
 
   .static-cell-count-step {
-    padding: 10px;
-    padding-bottom: 18px;
+    display: flex;
+    align-items: center;
+    padding-left: 12px;
+    padding-top: 15px ;
+    padding-bottom: 15px ;
   }
 
   .react-datepicker-wrapper {
@@ -112,7 +115,8 @@ limit-lines($lines-number) {
   }
 
   .rt-td-count-step {
-    padding: 0;
+    margin-left: 5px;
+    margin-bottom: 5px;
     align-items: center;
     position: relative;
   }
@@ -160,7 +164,7 @@ limit-lines($lines-number) {
 
 .error-icon {
   position: absolute;
-  left: 5%;
+  left: 10px;
   top: 50%;
   transform: translateY(-50%);
   color: red;
