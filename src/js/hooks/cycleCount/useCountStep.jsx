@@ -27,9 +27,7 @@ const useCountStep = () => {
   const {
     cycleCountIds,
     currentLocation,
-    users,
   } = useSelector((state) => ({
-    users: state.users.data,
     cycleCountIds: state.cycleCount.requests,
     currentLocation: state.session.currentLocation,
   }));
@@ -51,9 +49,7 @@ const useCountStep = () => {
 
   // Fetching data for "counted by" dropdown
   useEffect(() => {
-    if (!users?.length) {
-      dispatch(fetchUsers());
-    }
+    dispatch(fetchUsers());
   }, []);
 
   const printCountForm = () => {

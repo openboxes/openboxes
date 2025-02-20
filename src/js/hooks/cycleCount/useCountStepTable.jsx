@@ -31,8 +31,8 @@ const useCountStepTable = ({
 
   const translate = useTranslate();
 
-  const { recipients, currentLocation } = useSelector((state) => ({
-    recipients: state.users.data,
+  const { users, currentLocation } = useSelector((state) => ({
+    users: state.users.data,
     currentLocation: state.session.currentLocation,
   }));
 
@@ -244,7 +244,7 @@ const useCountStepTable = ({
   return {
     columns,
     defaultColumn,
-    recipients,
+    users,
   };
 };
 

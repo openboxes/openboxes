@@ -36,7 +36,7 @@ const CountStepTable = ({
   const {
     columns,
     defaultColumn,
-    recipients,
+    users,
   } = useCountStepTable({
     cycleCountId: id,
     tableData,
@@ -74,11 +74,22 @@ const CountStepTable = ({
           </p>
           {' '}
           {isStepEditable ? (
-            <SelectField
-              placeholder="Select"
-              options={recipients}
-              onChange={assignCountedBy(product?.productCode)}
-            />
+            <Tooltip
+              html={(
+                <span className="p-1">
+                  {countedBy[product.productCode]?.label || translate('react.cycleCount.countedBy.label', 'Counted By')}
+                </span>
+              )}
+              style={{ width: 'fit-content' }}
+              arrow
+            >
+              <SelectField
+                placeholder="Select"
+                options={users}
+                onChange={assignCountedBy(product?.productCode)}
+                className="min-width-250"
+              />
+            </Tooltip>
           ) : <p>{countedBy[product.productCode]?.label}</p>}
         </div>
       </div>
