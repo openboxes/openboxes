@@ -14,6 +14,7 @@ import TextInput from 'components/form-elements/v2/TextInput';
 import cycleCountColumn from 'consts/cycleCountColumn';
 import { DateFormat } from 'consts/timeFormat';
 import useTranslate from 'hooks/useTranslate';
+import groupBinLocationsByZone from 'utils/groupBinLocationsByZone';
 import { fetchBins } from 'utils/option-utils';
 
 // Managing state for single table, mainly table configuration (from count step)
@@ -71,10 +72,7 @@ const useCountStepTable = ({
     if (fieldName === cycleCountColumn.BIN_LOCATION) {
       return {
         labelKey: 'name',
-        options: binLocations.map((binLocation) => ({
-          id: binLocation.id,
-          name: binLocation.name,
-        })),
+        options: groupBinLocationsByZone(binLocations),
       };
     }
 
@@ -115,10 +113,9 @@ const useCountStepTable = ({
       const isFieldEditable = !original.id.includes('newRow') && id !== cycleCountColumn.QUANTITY_COUNTED;
       // We shouldn't allow users edit fetched data (only quantity counted is editable)
       if (isFieldEditable || !isStepEditable) {
-        const valueToDisplay = getValueToDisplay(id, value);
         return (
           <TableCell className="static-cell-count-step">
-            {valueToDisplay || value}
+            {getValueToDisplay(id, value)}
           </TableCell>
         );
       }
@@ -135,6 +132,7 @@ const useCountStepTable = ({
           setError(null);
         }
       };
+
       // on change function expects e.target.value for text fields,
       // in other cases it expects just the value
       const onChange = (e) => {
@@ -145,15 +143,22 @@ const useCountStepTable = ({
       const type = getFieldType(id);
       const Component = getFieldComponent(id);
       const fieldProps = getFieldProps(id);
+      const showTooltip = id === 'binLocation';
 
       return (
-        <TableCell className="rt-td rt-td-count-step pb-0">
+        <TableCell
+          className="rt-td rt-td-count-step pb-0"
+          tooltip={showTooltip}
+          tooltipForm={showTooltip}
+          tooltipClassname={showTooltip && 'bin-location-tooltip'}
+          tooltipLabel={value?.name || translate('react.cycleCount.table.binLocation.label', 'Bin Location')}
+        >
           <Component
             type={type}
             value={value}
             onChange={onChange}
             onBlur={onBlur}
-            className="w-75 m-1"
+            className={`m-1 ${showTooltip ? 'w-99' : 'w-75'}`}
             errorMessage={error}
             {...fieldProps}
           />
