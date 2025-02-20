@@ -29,9 +29,11 @@ const groupBinLocationsByZone = (binLocations) => {
     })
     .sort((a, b) => {
       if (a.id === 'zone-no-zone') {
-      return 1;
+        return 1;
       }
-      if (b.id === 'zone-no-zone') return -1;
+      if (b.id === 'zone-no-zone') {
+        return -1;
+      }
       return a.name.localeCompare(b.name);
     });
 };
