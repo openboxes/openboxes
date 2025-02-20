@@ -16,8 +16,7 @@ const useCountStep = () => {
   const [countedBy, setCountedBy] = useState({});
   // Saving selected "date counted" option, initially it's the date fetched from API
   const [dateCounted, setDateCounted] = useState({});
-  const [isEditable, setIsEditable] = useState(true);
-
+  const [isStepEditable, setIsStepEditable] = useState(true);
   const dispatch = useDispatch();
 
   const {
@@ -119,11 +118,11 @@ const useCountStep = () => {
     if (isValid) {
       // This data should be combined to a single request
       console.log('next: ', tableData.current, countedBy);
-      setIsEditable(false);
+      setIsStepEditable(false);
     }
   };
   const back = () => {
-    setIsEditable(true);
+    setIsStepEditable(true);
   };
 
   const save = () => {
@@ -174,7 +173,7 @@ const useCountStep = () => {
     next,
     back,
     save,
-    isEditable,
+    isStepEditable,
   };
 };
 

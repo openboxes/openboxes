@@ -12,6 +12,7 @@ import DateField from 'components/form-elements/v2/DateField';
 import SelectField from 'components/form-elements/v2/SelectField';
 import TextInput from 'components/form-elements/v2/TextInput';
 import cycleCountColumn from 'consts/cycleCountColumn';
+import { DateFormat } from 'consts/timeFormat';
 import useTranslate from 'hooks/useTranslate';
 import { fetchBins } from 'utils/option-utils';
 
@@ -21,7 +22,8 @@ const useCountStepTable = ({
   removeRow,
   validationErrors,
   tableData,
-  isEditable,
+  isStepEditable,
+  formatLocalizedDate,
 }) => {
   const columnHelper = createColumnHelper();
   // State for saving data for binLocation dropdown
@@ -76,28 +78,52 @@ const useCountStepTable = ({
       };
     }
 
+    if (fieldName === 'inventoryItem_expirationDate') {
+      return {
+        customDateFormat: DateFormat.DD_MMM_YYYY,
+      };
+    }
+
     return {};
+  };
+
+  // this function is required because there is a problem w getValue
+  const getValueToDisplay = (id, value) => {
+    if (id === 'inventoryItem_expirationDate') {
+      return formatLocalizedDate(value, DateFormat.DD_MMM_YYYY);
+    }
+
+    if (id === 'quantityCounted') {
+      return value?.toString();
+    }
+
+    if (id === 'binLocation') {
+      return value?.name;
+    }
+
+    return value;
   };
 
   const defaultColumn = {
     cell: ({
-      getValue, row: { original, index }, column: { id }, table,
+      row: { original, index }, column: { id }, table,
     }) => {
+      const columnPath = id.replaceAll('_', '.');
+      const initialValue = _.get(tableData, `[${index}].${columnPath}`);
+      const [value, setValue] = useState(initialValue);
+
       const isFieldEditable = !original.id.includes('newRow') && id !== cycleCountColumn.QUANTITY_COUNTED;
       // We shouldn't allow users edit fetched data (only quantity counted is editable)
-      if (isFieldEditable || !isEditable) {
+      if (isFieldEditable || !isStepEditable) {
+        const valueToDisplay = getValueToDisplay(id, value);
         return (
           <TableCell className="static-cell-count-step">
-            {getValue()}
+            {valueToDisplay || value}
           </TableCell>
         );
       }
-      // Keep and update the state of the cell during rerenders
-      const columnPath = id.replaceAll('_', '.');
-      const initialValue = _.get(tableData, `[${index}].${columnPath}`);
-      const errorMessage = validationErrors?.[cycleCountId]?.errors?.[index]?.[columnPath]?._errors;
 
-      const [value, setValue] = useState(initialValue);
+      const errorMessage = validationErrors?.[cycleCountId]?.errors?.[index]?.[columnPath]?._errors;
       const [error, setError] = useState(errorMessage);
       // If the value at the end of entering data is the same as it was initially,
       // we don't want to trigger rerender
@@ -109,13 +135,11 @@ const useCountStepTable = ({
           setError(null);
         }
       };
-
       // on change function expects e.target.value for text fields,
       // in other cases it expects just the value
       const onChange = (e) => {
         setValue(e?.target?.value ?? e);
       };
-
       // Table consists of text fields, one numerical field for quantity counted,
       // select field for bin locations and one date picker for the expiration date.
       const type = getFieldType(id);
@@ -200,7 +224,7 @@ const useCountStepTable = ({
             )}
             disabled={original.id}
           >
-            {original.id.includes('newRow') && (
+            {original.id.includes('newRow') && isStepEditable && (
             <RiDeleteBinLine
               onClick={() => removeRow(cycleCountId, original.id)}
               size={22}
