@@ -62,7 +62,7 @@ const DateField = ({
 
   const getDateFormat = () => {
     if (showTimeSelect) {
-      return customDateFormat ? `${customDateFormat} ${TimeFormat.HH_MM_SS}` : DateFormat.MMM_DD_YYYY_HH_MM_SS;
+      return customDateFormat ? `${customDateFormat} HH:mm:ss` : DateFormat.MMM_DD_YYYY_HH_MM_SS;
     }
     return customDateFormat || DateFormat.MMM_DD_YYYY;
   };

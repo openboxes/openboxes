@@ -14,7 +14,6 @@ import TextInput from 'components/form-elements/v2/TextInput';
 import cycleCountColumn from 'consts/cycleCountColumn';
 import { DateFormat } from 'consts/timeFormat';
 import useTranslate from 'hooks/useTranslate';
-import groupBinLocationsByZone from 'utils/groupBinLocationsByZone';
 import { fetchBins } from 'utils/option-utils';
 
 // Managing state for single table, mainly table configuration (from count step)
@@ -72,7 +71,10 @@ const useCountStepTable = ({
     if (fieldName === cycleCountColumn.BIN_LOCATION) {
       return {
         labelKey: 'name',
-        options: groupBinLocationsByZone(binLocations),
+        options: binLocations.map((binLocation) => ({
+          id: binLocation.id,
+          name: binLocation.name,
+        })),
       };
     }
 
@@ -92,7 +94,7 @@ const useCountStepTable = ({
     }
 
     if (id === 'quantityCounted') {
-      return value.toString();
+      return value?.toString();
     }
 
     if (id === 'binLocation') {
@@ -106,28 +108,23 @@ const useCountStepTable = ({
     cell: ({
       row: { original, index }, column: { id }, table,
     }) => {
-      const isFieldEditable = !original.id.includes('newRow') && id !== cycleCountColumn.QUANTITY_COUNTED;
-      // We shouldn't allow users edit fetched data (only quantity counted is editable)
-
-      // Keep and update the state of the cell during rerenders
       const columnPath = id.replaceAll('_', '.');
       const initialValue = _.get(tableData, `[${index}].${columnPath}`);
-
       const [value, setValue] = useState(initialValue);
 
-      // isStepEditable is a boolean that checks whether we are at the save step.
+      const isFieldEditable = !original.id.includes('newRow') && id !== cycleCountColumn.QUANTITY_COUNTED;
       // We shouldn't allow users edit fetched data (only quantity counted is editable)
       if (isFieldEditable || !isStepEditable) {
+        const valueToDisplay = getValueToDisplay(id, value);
         return (
           <TableCell className="static-cell-count-step">
-            {getValueToDisplay(id, value)}
+            {valueToDisplay || value}
           </TableCell>
         );
       }
 
       const errorMessage = validationErrors?.[cycleCountId]?.errors?.[index]?.[columnPath]?._errors;
       const [error, setError] = useState(errorMessage);
-
       // If the value at the end of entering data is the same as it was initially,
       // we don't want to trigger rerender
       const isEdited = initialValue !== value;
@@ -138,34 +135,25 @@ const useCountStepTable = ({
           setError(null);
         }
       };
-
       // on change function expects e.target.value for text fields,
       // in other cases it expects just the value
       const onChange = (e) => {
         setValue(e?.target?.value ?? e);
       };
-
       // Table consists of text fields, one numerical field for quantity counted,
       // select field for bin locations and one date picker for the expiration date.
       const type = getFieldType(id);
       const Component = getFieldComponent(id);
       const fieldProps = getFieldProps(id);
-      const showTooltip = id === 'binLocation';
 
       return (
-        <TableCell
-          className="rt-td rt-td-count-step pb-0"
-          tooltip={showTooltip}
-          tooltipForm={showTooltip}
-          tooltipClassname={showTooltip && 'bin-location-tooltip'}
-          tooltipLabel={value?.name || translate('react.cycleCount.table.binLocation.label', 'Bin Location')}
-        >
+        <TableCell className="rt-td rt-td-count-step pb-0">
           <Component
             type={type}
             value={value}
             onChange={onChange}
             onBlur={onBlur}
-            className={`m-1 ${showTooltip ? 'w-99' : 'w-75'}`}
+            className="w-75 m-1"
             errorMessage={error}
             {...fieldProps}
           />
@@ -237,10 +225,10 @@ const useCountStepTable = ({
             disabled={original.id}
           >
             {original.id.includes('newRow') && isStepEditable && (
-              <RiDeleteBinLine
-                onClick={() => removeRow(cycleCountId, original.id)}
-                size={22}
-              />
+            <RiDeleteBinLine
+              onClick={() => removeRow(cycleCountId, original.id)}
+              size={22}
+            />
             )}
           </Tooltip>
         </TableCell>
