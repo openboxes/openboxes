@@ -1,3 +1,5 @@
+@import "src/css/colors";
+
 @mixin
 limit-lines($lines-number) {
   overflow: hidden;
@@ -155,4 +157,14 @@ limit-lines($lines-number) {
   align-items: center;
   gap: 8px;
   padding-top: 40px;
+}
+
+.bin-location-tooltip {
+  width: 75%;
+}
+
+.zone-label {
+  color: $black-alpha;
+  font-weight: bold;
+  font-size: 15px;
 }
