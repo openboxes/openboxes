@@ -8,15 +8,15 @@ const TooltipWrapper = ({
   content,
   className,
 }) => (
-
+  // This div was added to ensure the tooltip works correctly with absolute positioning
   <div className={className}>
     <Tooltip
       delay="150"
       duration="250"
       hideDelay="50"
-      html={<div className="p-2 custom-tooltip-v2">{content} fsdfdsfds fds dsfds fdsf dsfsf</div>}
+      html={<div className="p-2 custom-tooltip-v2">{content}</div>}
     >
-      <span>{children}</span>
+      {children}
     </Tooltip>
   </div>
 );
