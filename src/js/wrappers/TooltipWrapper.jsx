@@ -11,11 +11,10 @@ const TooltipWrapper = ({
 
   <div className={className}>
     <Tooltip
-      arrow="true"
       delay="150"
       duration="250"
       hideDelay="50"
-      html={<span className="p-2 rounded-lg custom-tooltip-v2">{content}</span>}
+      html={<div className="p-2 custom-tooltip-v2">{content}</div>}
     >
       <span>{children}</span>
     </Tooltip>

@@ -220,7 +220,7 @@ const useCountStepTable = ({
         </TableHeaderCell>
       ),
       meta: {
-        flexWidth: 45,
+        flexWidth: 50,
       },
     }),
     columnHelper.accessor(cycleCountColumn.COMMENT, {
@@ -264,7 +264,7 @@ const useCountStepTable = ({
         getCellContext: () => ({
           className: 'count-step-actions',
         }),
-        flexWidth: 20,
+        flexWidth: 25,
       },
     }),
   ];

@@ -27,28 +27,28 @@ const InputWrapper = ({
           {title && <Translate id={title?.id} defaultMessage={title?.defaultMessage} />}
         </label>
         {tooltip && (
-          <Tooltip
-            html={(
-              <span className="p-1">
+        <Tooltip
+          html={(
+            <span className="p-1">
               <Translate id={tooltip.id} defaultMessage={tooltip.defaultMessage} />
             </span>
-            )}
-          >
+              )}
+        >
           <span className="input-wrapper-tooltip">
             <RiQuestionLine className="ml-1" />
           </span>
-          </Tooltip>
+        </Tooltip>
         )}
         {required && <span className="input-wrapper-asterisk ml-1">&#42;</span>}
       </div>
       {button && (
-        <div
-          onClick={button.onClick}
-          role="presentation"
-          className="input-wrapper-button"
-        >
-          <Translate id={button.id} defaultMessage={button.defaultMessage} />
-        </div>
+      <div
+        onClick={button.onClick}
+        role="presentation"
+        className="input-wrapper-button"
+      >
+        <Translate id={button.id} defaultMessage={button.defaultMessage} />
+      </div>
       )}
     </div>
     {children}

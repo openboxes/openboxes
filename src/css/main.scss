@@ -618,11 +618,11 @@ tr.crossed-out td:before {
 
 .recalled-and-on-hold {
   background: repeating-linear-gradient(
-                  135deg,
-                  $orange-alpha,
-                  $orange-alpha 10px,
-                  $red-delta 10px,
-                  $red-delta 20px
+    135deg,
+    $orange-alpha,
+    $orange-alpha 10px,
+    $red-delta 10px,
+    $red-delta 20px
   );;
 }
 
@@ -905,9 +905,10 @@ div.crossed-out .table-inner-row:before {
 // Tooltip style
 .custom-tooltip {
   background-color: var(--blue-800);
+  border-radius: 2px;
   padding: 4px 8px;
   font-weight: 400;
-  font-size: 14px;
+  font-size: 12px;
   line-height: 15px;
   color: #FFFFFF;
 }
@@ -918,7 +919,7 @@ div.crossed-out .table-inner-row:before {
   font-size: 14px;
   line-height: 1.2;
   color: #FFFFFF;
-  max-width: 250px !important;
+  max-width: 250px
 }
 
 // Overriding built-in tooltip-style (react-tippy)
