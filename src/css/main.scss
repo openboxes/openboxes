@@ -905,29 +905,26 @@ div.crossed-out .table-inner-row:before {
 // Tooltip style
 .custom-tooltip {
   background-color: var(--blue-800);
-  border-radius: 2px;
   padding: 4px 8px;
   font-weight: 400;
-  font-size: 12px;
+  font-size: 14px;
   line-height: 15px;
   color: #FFFFFF;
+}
+
+.custom-tooltip-v2 {
+  background-color: var(--blue-800);
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 1.2;
+  color: #FFFFFF;
+  max-width: 250px !important;
 }
 
 // Overriding built-in tooltip-style (react-tippy)
 .tippy-tooltip {
   padding: 0 !important;
   border-radius: 0 !important;
-}
-
-.tippy-tooltip-v2 {
-  background-color: var(--blue-800);
-  border-radius: 5px;
-  padding: 8px;
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 1.2;
-  color: #FFFFFF;
-  max-width: 250px;
 }
 
 // Table Filters fields

@@ -1,22 +1,25 @@
 import React from 'react';
 
-import Tippy from '@tippyjs/react';
 import PropTypes from 'prop-types';
-
-// eslint-disable-next-line import/no-extraneous-dependencies
-import 'tippy.js/animations/shift-away.css';
+import { Tooltip } from 'react-tippy';
 
 const TooltipWrapper = ({
   children,
   content,
   className,
 }) => (
-  <Tippy
-    content={<div className="tippy-tooltip-v2">{content}</div>}
-    animation="shift-away"
-  >
-    <span className={className}>{children}</span>
-  </Tippy>
+
+  <div className={className}>
+    <Tooltip
+      arrow="true"
+      delay="150"
+      duration="250"
+      hideDelay="50"
+      html={<span className="p-2 rounded-lg custom-tooltip-v2">{content}</span>}
+    >
+      <span>{children}</span>
+    </Tooltip>
+  </div>
 );
 
 export default TooltipWrapper;

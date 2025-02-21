@@ -175,12 +175,14 @@ const useResolveStepTable = ({
             hideErrorMessage
             {...fieldProps}
           />
-          <TooltipWrapper
-            content={error}
-            className="error-icon"
-          >
-            <RiErrorWarningLine />
-          </TooltipWrapper>
+          {error && (
+            <TooltipWrapper
+              content={error}
+              className="error-icon"
+            >
+              <RiErrorWarningLine />
+            </TooltipWrapper>
+          )}
         </TableCell>
       );
     },

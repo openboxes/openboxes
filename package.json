@@ -62,7 +62,6 @@
     "@sentry/react": "7.119.2",
     "@tanstack/react-table": "8.20.5",
     "@testing-library/react-hooks": "8.0.1",
-    "@tippyjs/react": "^4.2.6",
     "axios": "1.6.8",
     "bootstrap": "4.6.2",
     "chart.js": "2.9.4",
