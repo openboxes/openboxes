@@ -618,11 +618,11 @@ tr.crossed-out td:before {
 
 .recalled-and-on-hold {
   background: repeating-linear-gradient(
-    135deg,
-    $orange-alpha,
-    $orange-alpha 10px,
-    $red-delta 10px,
-    $red-delta 20px
+                  135deg,
+                  $orange-alpha,
+                  $orange-alpha 10px,
+                  $red-delta 10px,
+                  $red-delta 20px
   );;
 }
 
@@ -905,12 +905,20 @@ div.crossed-out .table-inner-row:before {
 // Tooltip style
 .custom-tooltip {
   background-color: var(--blue-800);
-  border-radius: 2px;
   padding: 4px 8px;
   font-weight: 400;
-  font-size: 12px;
+  font-size: 14px;
   line-height: 15px;
   color: #FFFFFF;
+}
+
+.custom-tooltip-v2 {
+  background-color: var(--blue-800);
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 1.2;
+  color: #FFFFFF;
+  max-width: 250px !important;
 }
 
 // Overriding built-in tooltip-style (react-tippy)
@@ -1517,8 +1525,8 @@ div.search-input:focus-within {
   align-items: center;
 
   .info-bar-redirect > a {
-      text-decoration: underline;
-      color: #FFFFFF;
+    text-decoration: underline;
+    color: #FFFFFF;
   }
 
   svg {

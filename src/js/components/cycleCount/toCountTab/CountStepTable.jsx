@@ -13,6 +13,7 @@ import { DateFormat } from 'consts/timeFormat';
 import useCountStepTable from 'hooks/cycleCount/useCountStepTable';
 import useTranslate from 'hooks/useTranslate';
 import { formatDate } from 'utils/translation-utils';
+import TooltipWrapper from 'wrappers/TooltipWrapper';
 
 import 'components/cycleCount/cycleCount.scss';
 
@@ -108,14 +109,7 @@ const CountStepTable = ({
         <div
           className="ml-4 mb-3 d-flex"
         >
-          <Tooltip
-            className="d-flex align-items-center"
-            html={(
-              <span className="p-1">
-                {translate('react.cycleCount.addNewRecord.tooltip', 'Use this button to change lot number or bin location.')}
-              </span>
-            )}
-          >
+          <TooltipWrapper content={translate('react.cycleCount.addNewRecord.tooltip', 'Use this button to change lot number or bin location.')}>
             <Button
               onClick={() => addEmptyRow(product?.productCode, id)}
               label="react.cycleCount.addNewRecord.label"
@@ -123,7 +117,7 @@ const CountStepTable = ({
               variant="transparent"
               StartIcon={<RiAddCircleLine size={18} />}
             />
-          </Tooltip>
+          </TooltipWrapper>
         </div>
       )}
     </div>
