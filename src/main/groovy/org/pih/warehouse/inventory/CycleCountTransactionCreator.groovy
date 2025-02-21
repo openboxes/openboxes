@@ -1,5 +1,6 @@
 package org.pih.warehouse.inventory
 
+import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import org.springframework.stereotype.Component
 
@@ -10,6 +11,7 @@ import org.pih.warehouse.product.Product
  * Component responsible for creating and persisting the Transactions that result from a cycle count.
  */
 @Component
+@Transactional
 class CycleCountTransactionCreator {
 
     ProductAvailabilityService productAvailabilityService
@@ -26,8 +28,8 @@ class CycleCountTransactionCreator {
         List<Transaction> transactions = []
         Date transactionDate = new Date()
 
-        Transaction productInventoryTransaction = createProductInventoryTransaction(cycleCount, transactionDate)
-        transactions.add(productInventoryTransaction)
+        List<Transaction> productInventoryTransactions = createProductInventoryTransactions(cycleCount, transactionDate)
+        transactions.addAll(productInventoryTransactions)
 
         Transaction adjustmentTransaction = createAdjustmentTransaction(
                 cycleCount, transactionDate, itemQuantityOnHandIsUpToDate)
@@ -63,9 +65,8 @@ class CycleCountTransactionCreator {
                 // TODO: This doesn't account for any new bins/lots that have been created since the count started! We
                 //       need a full QoH fetch on the product, and to create new cycle count items for any new bins/lot
                 //       numbers.
-                Integer quantityFromProductAvailability = productAvailabilityService.getQuantityOnHandInBinLocation(
-                        cycleCountItem.inventoryItem, cycleCountItem.location) as Integer
-                actualQuantityOnHand = quantityFromProductAvailability ? quantityFromProductAvailability : 0
+                actualQuantityOnHand = productAvailabilityService.getQuantityOnHandInBinLocation(
+                        cycleCountItem.inventoryItem, cycleCountItem.location) as Integer ?: 0
             }
 
             int discrepancyAmount = cycleCountItem.quantityCounted - actualQuantityOnHand
@@ -79,6 +80,7 @@ class CycleCountTransactionCreator {
                     quantity: discrepancyAmount,
                     binLocation: cycleCountItem.location,
                     inventoryItem: cycleCountItem.inventoryItem,
+                    product: cycleCountItem.product,
             )
             entries.add(transactionEntry)
         }
@@ -109,20 +111,28 @@ class CycleCountTransactionCreator {
         return transaction
     }
 
-    private Transaction createProductInventoryTransaction(CycleCount cycleCount, Date transactionDate) {
-        // Currently, all items of a count are for the same product, so we can get the product by simply looking at
-        // the first item. When this requirement changes, we'll need to pass in a list of products here.
-        Product product = cycleCount.cycleCountItems[0].product
+    private List<Transaction> createProductInventoryTransactions(CycleCount cycleCount, Date transactionDate) {
+        // A cycle count can count multiple products. Each product needs their own product inventory transaction.
+        List<Product> products = cycleCount.cycleCountItems
+                .collect { it.product }
+                .unique { it.id }
 
-        // Creates a "snapshot style" product inventory transaction. We do this because we want any changes in
-        // quantity to be represented by a separate adjustment transaction. It's important to note that the quantity
-        // values for this transaction will be a pure copy of QoH in product availability, NOT the quantityOnHand of
-        // the cycle count items.
-        return productInventorySnapshotTaker.createTransaction(
-                cycleCount.facility,
-                product,
-                ProductInventorySnapshotSource.CYCLE_COUNT,
-                cycleCount,
-                transactionDate)
+        List<Transaction> transactions = []
+        for (Product product : products) {
+            // Creates a "snapshot style" product inventory transaction. We do this because we want any changes in
+            // quantity to be represented by a separate adjustment transaction. It's important to note that the quantity
+            // values for this transaction will be a pure copy of QoH in product availability, NOT the quantityOnHand of
+            // the cycle count items.
+            Transaction transaction = productInventorySnapshotTaker.createTransaction(
+                    cycleCount.facility,
+                    product,
+                    ProductInventorySnapshotSource.CYCLE_COUNT,
+                    cycleCount,
+                    transactionDate)
+
+            transactions.add(transaction)
+        }
+
+        return transactions
     }
 }

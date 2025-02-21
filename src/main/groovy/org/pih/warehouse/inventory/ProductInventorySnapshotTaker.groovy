@@ -1,5 +1,6 @@
 package org.pih.warehouse.inventory
 
+import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import org.springframework.stereotype.Component
 
@@ -14,6 +15,7 @@ import org.pih.warehouse.product.Product
  * Importantly, transactions created via this class should NOT result in any quantity changes/adjustments.
  */
 @Component
+@Transactional
 class ProductInventorySnapshotTaker {
 
     ProductAvailabilityService productAvailabilityService
@@ -21,6 +23,13 @@ class ProductInventorySnapshotTaker {
 
     /**
      * Take a new product inventory "snapshot" transaction based on the current product availability.
+     *
+     * @param facility The Location to take the product inventory snapshot at
+     * @param product The Product to take the product inventory snapshot for
+     * @param sourceType The feature triggering the product inventory snapshot
+     * @param source The source object to be associated with the Transaction, such as CycleCount, Order, Requisition...
+     * @param transactionDate The datetime that the transaction should be marked with
+     * @return The Transaction that was created
      */
     Transaction createTransaction(
             Location facility,
@@ -56,7 +65,7 @@ class ProductInventorySnapshotTaker {
                     quantity: availableItem.quantityOnHand,
                     binLocation: availableItem.binLocation,
                     inventoryItem: availableItem.inventoryItem,
-                    transaction: transaction
+                    transaction: transaction,
             )
             transaction.addToTransactionEntries(transactionEntry)
         }

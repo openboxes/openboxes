@@ -348,7 +348,7 @@ class CycleCountService {
         }
         command.cycleCount.status = command.cycleCount.recomputeStatus()
         if (command.cycleCount.status == CycleCountStatus.READY_TO_REVIEW) {
-            cycleCountTransactionCreator.createTransactions(command.cycleCount)
+            cycleCountTransactionCreator.createTransactions(command.cycleCount, command.refreshQuantityOnHand)
         }
         return CycleCountDto.toDto(command.cycleCount)
     }

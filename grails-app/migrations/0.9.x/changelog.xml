@@ -28,4 +28,5 @@
     <include file="0.9.x/changelog-2025-02-06-2200-drop-not-null-constraint-on-bin-location-in-cycle-count-item.xml" />
     <include file="0.9.x/changelog-2025-02-11-1530-add-column-cycle-count-to-transaction.xml" />
     <include file="0.9.x/changelog-2025-02-12-1300-add-cycle-count-related-transaction-types.xml" />
+    <include file="0.9.x/changelog-2025-02-21-0000-remove-cycle-count-debit-transaction-type.xml" />
 </databaseChangeLog>
