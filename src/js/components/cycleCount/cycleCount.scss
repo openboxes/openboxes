@@ -99,7 +99,7 @@ limit-lines($lines-number) {
   .static-cell-count-step {
     display: flex;
     align-items: center;
-    padding: 14px;
+    padding: 15px;
   }
 
   .react-datepicker-wrapper {
@@ -116,7 +116,7 @@ limit-lines($lines-number) {
 
   .rt-th-count-step {
     text-align: left;
-    white-space: break-spaces !important;
+    white-space: break-spaces;
   }
 
   .rt-td-count-step {
@@ -124,6 +124,7 @@ limit-lines($lines-number) {
     margin-left: 5px;
     margin-bottom: 5px;
     align-items: center;
+    white-space: break-spaces;
   }
 
   .cell-inner-wrapper {
@@ -139,14 +140,14 @@ limit-lines($lines-number) {
 
   .rt-th-count-step {
     text-align: left;
-    white-space: break-spaces !important;
+    white-space: break-spaces;
   }
   .rt-td-count-step {
     position: relative;
     margin-left: 14px;
     display: flex;
     align-items: center;
-    white-space: break-spaces !important;
+    white-space: break-spaces;
   }
 }
 

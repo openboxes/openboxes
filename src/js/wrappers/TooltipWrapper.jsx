@@ -14,7 +14,7 @@ const TooltipWrapper = ({
       delay="150"
       duration="250"
       hideDelay="50"
-      html={<div className="p-2 custom-tooltip-v2">{content}</div>}
+      html={<div className="p-2 custom-tooltip-v2">{content} fsdfdsfds fds dsfds fdsf dsfsf</div>}
     >
       <span>{children}</span>
     </Tooltip>
