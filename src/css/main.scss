@@ -918,7 +918,6 @@ div.crossed-out .table-inner-row:before {
   font-weight: 400;
   font-size: 14px;
   line-height: 20px;
-  color: #FFFFFF;
   max-width: 250px
 }
 
@@ -1526,8 +1525,8 @@ div.search-input:focus-within {
   align-items: center;
 
   .info-bar-redirect > a {
-    text-decoration: underline;
-    color: #FFFFFF;
+      text-decoration: underline;
+      color: #FFFFFF;
   }
 
   svg {

@@ -22,7 +22,7 @@ const TextInput = ({
   decimal,
   className,
   showErrorBorder,
-  hideErrorMessage,
+  hideErrorMessageWrapper,
   ...fieldProps
 }) => {
   const onBlurHandler = (e) => {
@@ -60,7 +60,7 @@ const TextInput = ({
       button={button}
       inputId={id || name}
       errorMessage={errorMessage}
-      hideErrorMessage={hideErrorMessage}
+      hideErrorMessageWrapper={hideErrorMessageWrapper}
     >
       <input
         id={id || name}
@@ -114,7 +114,7 @@ TextInput.propTypes = {
   decimal: PropTypes.number,
   className: PropTypes.string,
   showErrorBorder: PropTypes.bool,
-  hideErrorMessage: PropTypes.bool,
+  hideErrorMessageWrapper: PropTypes.bool,
 };
 
 TextInput.defaultProps = {
@@ -131,5 +131,5 @@ TextInput.defaultProps = {
   decimal: undefined,
   className: '',
   showErrorBorder: false,
-  hideErrorMessage: false,
+  hideErrorMessageWrapper: false,
 };

@@ -3,32 +3,38 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Tooltip } from 'react-tippy';
 
-const TooltipWrapper = ({
+const CustomTooltipV2 = ({
   children,
   content,
   className,
+  icon: Icon,
 }) => (
   // This div was added to ensure the tooltip works correctly with absolute positioning
   <div className={className}>
     <Tooltip
-      delay="150"
-      duration="250"
-      hideDelay="50"
+      delay={150}
+      duration={250}
+      hideDelay={50}
       html={<div className="p-2 custom-tooltip-v2">{content}</div>}
     >
-      {children}
+      <div className="flex items-center">
+        {Icon && <Icon className="mr-2" />}
+        {children}
+      </div>
     </Tooltip>
   </div>
 );
 
-export default TooltipWrapper;
+export default CustomTooltipV2;
 
-TooltipWrapper.propTypes = {
+CustomTooltipV2.propTypes = {
   children: PropTypes.node.isRequired,
   content: PropTypes.node.isRequired,
   className: PropTypes.string,
+  icon: PropTypes.elementType,
 };
 
-TooltipWrapper.defaultProps = {
+CustomTooltipV2.defaultProps = {
   className: '',
+  icon: null,
 };
