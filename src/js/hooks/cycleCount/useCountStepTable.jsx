@@ -159,10 +159,7 @@ const useCountStepTable = ({
             value={value}
             onChange={onChange}
             onBlur={onBlur}
-            errorMessage={error}
-            className={`m-1 
-  ${showTooltip ? 'w-99' : id === cycleCountColumn.QUANTITY_COUNTED ? 'w-35' : 'w-75'} 
-  ${error ? 'error-border' : ''}`}
+            className={`m-1 ${showTooltip ? 'w-99' : 'w-75'} ${error ? 'error-border' : ''}`}
             hideErrorMessage
             {...fieldProps}
           />
@@ -184,7 +181,7 @@ const useCountStepTable = ({
       (row) => (row?.binLocation?.label ? row?.binLocation : row.binLocation?.name), {
         id: cycleCountColumn.BIN_LOCATION,
         header: () => (
-          <TableHeaderCell>
+          <TableHeaderCell className="rt-th-count-step">
             {translate('react.cycleCount.table.binLocation.label', 'Bin Location')}
           </TableHeaderCell>
         ),
@@ -195,7 +192,7 @@ const useCountStepTable = ({
     ),
     columnHelper.accessor(cycleCountColumn.LOT_NUMBER, {
       header: () => (
-        <TableHeaderCell>
+        <TableHeaderCell className="rt-th-count-step">
           {translate('react.cycleCount.table.lotNumber.label', 'Serial / Lot Number')}
         </TableHeaderCell>
       ),
@@ -205,7 +202,7 @@ const useCountStepTable = ({
     }),
     columnHelper.accessor(cycleCountColumn.EXPIRATION_DATE, {
       header: () => (
-        <TableHeaderCell>
+        <TableHeaderCell className="rt-th-count-step">
           {translate('react.cycleCount.table.expirationDate.label', 'Expiration Date')}
         </TableHeaderCell>
       ),
@@ -218,17 +215,17 @@ const useCountStepTable = ({
     }),
     columnHelper.accessor(cycleCountColumn.QUANTITY_COUNTED, {
       header: () => (
-        <TableHeaderCell>
+        <TableHeaderCell className="rt-th-count-step">
           {translate('react.cycleCount.table.quantityCounted.label', 'Quantity Counted')}
         </TableHeaderCell>
       ),
       meta: {
-        flexWidth: 100,
+        flexWidth: 45,
       },
     }),
     columnHelper.accessor(cycleCountColumn.COMMENT, {
       header: () => (
-        <TableHeaderCell>
+        <TableHeaderCell className="rt-th-count-step">
           {translate('react.cycleCount.table.comment.label', 'Comment')}
         </TableHeaderCell>
       ),
@@ -267,6 +264,7 @@ const useCountStepTable = ({
         getCellContext: () => ({
           className: 'count-step-actions',
         }),
+        flexWidth: 20,
       },
     }),
   ];
