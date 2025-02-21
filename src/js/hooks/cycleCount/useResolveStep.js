@@ -7,6 +7,8 @@ import { fetchUsers } from 'actions';
 import cycleCountApi from 'api/services/CycleCountApi';
 import useResolveStepValidation from 'hooks/cycleCount/useResolveStepValidation';
 
+import 'react-tippy/dist/tippy.css';
+
 // Managing state for all tables, operations on shared state (from resolve step)
 const useResolveStep = () => {
   // Table data is stored using useRef to avoid re-renders onBlur

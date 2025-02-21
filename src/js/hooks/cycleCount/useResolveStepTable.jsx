@@ -356,7 +356,6 @@ const useResolveStepTable = ({
                 {translate('react.default.button.delete.label', 'Delete')}
               </span>
             )}
-            disabled={original.id}
           >
             {original.id.includes('newRow') && (
               <RiDeleteBinLine

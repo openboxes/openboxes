@@ -10,6 +10,15 @@ const useResolveStepValidation = ({ tableData }) => {
 
   const translate = useTranslate();
 
+  // Validation for already existing inventories and also newly added lines:
+  // 1. The same lot in different bins should be accepted
+  // 2. For the same lot in the same bin in multiple rows:
+  //    - Should be a duplicate rows validation error
+  // 3. Same lot with different exp, in different bins:
+  //    - Should be an error related to valid exp
+  // 4. For lot and exp date for products with lot and expiry control:
+  //    - Should be an error related to required lot and exp
+
   const checkDuplicatedLotNumber = (arr, ctx) => {
     arr.forEach((row, index) => {
       const cycleCountItems = _.find(tableData.current,
@@ -57,7 +66,6 @@ const useResolveStepValidation = ({ tableData }) => {
         (cycleCount) => _.find(cycleCount.cycleCountItems,
           (item) => item?.id === row?.id))?.cycleCountItems;
       const lotAndExpiryControl = cycleCountItems?.[0]?.product?.lotAndExpiryControl;
-      console.log(cycleCountItems)
       if (lotAndExpiryControl && !row?.inventoryItem?.lotNumber) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
@@ -96,6 +104,7 @@ const useResolveStepValidation = ({ tableData }) => {
     quantityOnHand: z
       .number()
       .nullish(),
+    // Quantity recounted field is mandatory on each row of inventory record
     quantityRecounted: z
       .number({
         required_error: translate('react.cycleCount.requiredQuantityRecounted.label', 'Quantity recounted is required'),
@@ -144,8 +153,6 @@ const useResolveStepValidation = ({ tableData }) => {
     setValidationErrors(errors);
     return _.every(Object.values(errors), (val) => val.success);
   };
-
-  console.log(validationErrors)
 
   return {
     validationErrors,
