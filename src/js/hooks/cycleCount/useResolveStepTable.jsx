@@ -144,8 +144,10 @@ const useResolveStepTable = ({
         if (!isEdited) {
           return;
         }
-        table.options.meta?.updateData(cycleCountId, original.id, id, value);
-        setError(null);
+        if (id !== cycleCountColumn.BIN_LOCATION) {
+          table.options.meta?.updateData(cycleCountId, original.id, id, value);
+          setError(null);
+        }
         if (id === cycleCountColumn.QUANTITY_RECOUNTED) {
           events.emit('refreshRecountDifference');
         }
@@ -154,7 +156,12 @@ const useResolveStepTable = ({
       // on change function expects e.target.value for text fields,
       // in other cases it expects just the value
       const onChange = (e) => {
-        setValue(e?.target?.value ?? e);
+        const enteredValue = e?.target?.value ?? e;
+        if (id === cycleCountColumn.BIN_LOCATION) {
+          table.options.meta?.updateData(cycleCountId, original.id, id, enteredValue);
+          setError(null);
+        }
+        setValue(enteredValue);
       };
 
       // Table consists of text fields, one numerical field for quantity recounted,

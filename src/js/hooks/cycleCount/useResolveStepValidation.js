@@ -10,18 +10,6 @@ const useResolveStepValidation = ({ tableData }) => {
 
   const translate = useTranslate();
 
-  const checkRootCauseRequireness = (arr, ctx) => {
-    arr.forEach((row, index) => {
-      if ((row.quantityRecounted - (row?.quantityOnHand || 0)) || row.id.includes('newRow')) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: translate('react.cycleCount.requiredRootCause', 'Root cause is required'),
-          path: [index, 'rootCause'],
-        });
-      }
-    });
-  };
-
   const checkDuplicatedLotNumber = (arr, ctx) => {
     arr.forEach((row, index) => {
       const cycleCountItems = _.find(tableData.current,
@@ -42,9 +30,62 @@ const useResolveStepValidation = ({ tableData }) => {
     });
   };
 
+  const checkDifferentExpirationDatesForTheSameLot = (arr, ctx) => {
+    arr.forEach((row, index) => {
+      const cycleCountItems = _.find(tableData.current,
+        (cycleCount) => _.find(cycleCount.cycleCountItems,
+          (item) => item?.id === row?.id))?.cycleCountItems;
+      const dataGroupedByLotNumber = _.groupBy(
+        cycleCountItems,
+        (item) => item?.inventoryItem?.lotNumber,
+      );
+      const expirationDates = dataGroupedByLotNumber[row?.inventoryItem?.lotNumber]
+        .map((item) => item?.inventoryItem?.expirationDate);
+      if (_.uniq(expirationDates).length !== 1) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: translate('rreact.cycleCount.multipleExpirationDates.label', 'Multiple expiry dates for this lot/batch.'),
+          path: [index, 'inventoryItem.expirationDate'],
+        });
+      }
+    });
+  };
+
+  const checkProductsWithLotAndExpiryControl = (arr, ctx) => {
+    arr.forEach((row, index) => {
+      const cycleCountItems = _.find(tableData.current,
+        (cycleCount) => _.find(cycleCount.cycleCountItems,
+          (item) => item?.id === row?.id))?.cycleCountItems;
+      const lotAndExpiryControl = cycleCountItems?.[0]?.product?.lotAndExpiryControl;
+      console.log(cycleCountItems)
+      if (lotAndExpiryControl && !row?.inventoryItem?.lotNumber) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: translate('react.cycleCount.requiredLotAndExpirationDate.label', 'Lot number and expiry date are required.'),
+          path: [index, 'inventoryItem.lotNumber'],
+        });
+      }
+      if (lotAndExpiryControl && !row?.inventoryItem?.expirationDate) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: translate('react.cycleCount.requiredLotAndExpirationDate.label', 'Lot number and expiry date are required.'),
+          path: [index, 'inventoryItem.expirationDate'],
+        });
+      }
+    });
+  };
+
   const rowValidationSchema = z.object({
     id: z
       .string(),
+    product: z.object({
+      productCode: z
+        .string()
+        .nullish(),
+      lotAndExpiryControl: z
+        .boolean()
+        .nullish(),
+    }).nullish(),
     quantityCounted: z
       .number({
         required_error: translate('react.cycleCount.requiredQuantityCounted', 'Quantity counted is required'),
@@ -70,11 +111,11 @@ const useResolveStepValidation = ({ tableData }) => {
         .optional()
         .nullable(),
     }).optional(),
-    internalLocation: z.object({
+    binLocation: z.object({
       id: z.string(),
       name: z.string(),
       label: z.string().optional(),
-    }).optional(),
+    }).nullish(),
     rootCause: z.object({
       id: z.string(),
       value: z.string(),
@@ -84,8 +125,9 @@ const useResolveStepValidation = ({ tableData }) => {
 
   const rowsValidationSchema = z
     .array(rowValidationSchema)
-    .superRefine(checkRootCauseRequireness)
-    .superRefine(checkDuplicatedLotNumber);
+    .superRefine(checkDuplicatedLotNumber)
+    .superRefine(checkDifferentExpirationDatesForTheSameLot)
+    .superRefine(checkProductsWithLotAndExpiryControl);
 
   const triggerValidation = () => {
     const errors = tableData.current.reduce((acc, cycleCount) => {
@@ -102,6 +144,8 @@ const useResolveStepValidation = ({ tableData }) => {
     setValidationErrors(errors);
     return _.every(Object.values(errors), (val) => val.success);
   };
+
+  console.log(validationErrors)
 
   return {
     validationErrors,
