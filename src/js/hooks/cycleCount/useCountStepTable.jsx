@@ -16,7 +16,7 @@ import { DateFormat } from 'consts/timeFormat';
 import useTranslate from 'hooks/useTranslate';
 import groupBinLocationsByZone from 'utils/groupBinLocationsByZone';
 import { fetchBins } from 'utils/option-utils';
-import CustomTooltipV2 from 'wrappers/CustomTooltipV2';
+import CustomTooltip from 'wrappers/CustomTooltip';
 
 // Managing state for single table, mainly table configuration (from count step)
 const useCountStepTable = ({
@@ -164,7 +164,7 @@ const useCountStepTable = ({
             {...fieldProps}
           />
           {error && (
-            <CustomTooltipV2
+            <CustomTooltip
               content={error}
               className="error-icon"
               icon={RiErrorWarningLine}

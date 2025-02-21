@@ -23,7 +23,7 @@ import ArrowValueIndicatorVariant, {
 import cycleCountColumn from 'consts/cycleCountColumn';
 import useTranslate from 'hooks/useTranslate';
 import { fetchBins } from 'utils/option-utils';
-import CustomTooltipV2 from 'wrappers/CustomTooltipV2';
+import CustomTooltip from 'wrappers/CustomTooltip';
 
 // Managing state for single table, mainly table configuration (from resolve step)
 const useResolveStepTable = ({
@@ -176,7 +176,7 @@ const useResolveStepTable = ({
             {...fieldProps}
           />
           {error && (
-            <CustomTooltipV2
+            <CustomTooltip
               content={error}
               className="error-icon"
               icon={RiErrorWarningLine}

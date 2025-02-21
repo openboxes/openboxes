@@ -3,7 +3,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Tooltip } from 'react-tippy';
 
-const CustomTooltipV2 = ({
+const CustomTooltip = ({
   children,
   content,
   className,
@@ -25,16 +25,16 @@ const CustomTooltipV2 = ({
   </div>
 );
 
-export default CustomTooltipV2;
+export default CustomTooltip;
 
-CustomTooltipV2.propTypes = {
+CustomTooltip.propTypes = {
   children: PropTypes.node.isRequired,
   content: PropTypes.node.isRequired,
   className: PropTypes.string,
   icon: PropTypes.elementType,
 };
 
-CustomTooltipV2.defaultProps = {
+CustomTooltip.defaultProps = {
   className: '',
   icon: null,
 };
