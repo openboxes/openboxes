@@ -373,4 +373,75 @@ class CycleCountService {
         }
         cycleCountItem.status = CycleCountItemStatus.COUNTED
     }
+
+    void createCycleCountTransaction(CycleCount cycleCount) {
+        TransactionType cycleCountProductInventoryTransactionType =
+            TransactionType.read(Constants.CYCLE_COUNT_PRODUCT_INVENTORY_TRANSACTION_TYPE_ID)
+        Transaction transaction = new Transaction(
+                source: cycleCount.facility,
+                inventory: cycleCount.facility.inventory,
+                transactionDate: new Date(),
+                transactionType: cycleCountProductInventoryTransactionType,
+                cycleCount: cycleCount
+        )
+        if (!transaction.validate()) {
+            throw new ValidationException("Invalid transaction", transaction.errors)
+        }
+        transaction.save()
+        cycleCount.cycleCountItems.each { CycleCountItem cycleCountItem ->
+            TransactionEntry transactionEntry = new TransactionEntry(
+                    quantity: cycleCountItem.quantityCounted,
+                    binLocation: cycleCountItem.location,
+                    inventoryItem: cycleCountItem.inventoryItem,
+                    transaction: transaction
+            )
+            if (!transactionEntry.validate()) {
+                throw new ValidationException("Invalid transaction entry", transactionEntry.errors)
+            }
+            transactionEntry.save()
+            transaction.addToTransactionEntries(transactionEntry)
+        }
+    }
+
+    CycleCountItemDto updateCycleCountItem(CycleCountUpdateItemCommand command) {
+        command.cycleCountItem.quantityCounted = command.quantityCounted
+        command.cycleCountItem.comment = command.comment
+        command.cycleCountItem.countIndex = command.recount ? 1 : 0
+        command.cycleCountItem.status = CycleCountItemStatus.COUNTING
+
+        return command.cycleCountItem.toDto()
+    }
+
+    CycleCountItemDto createCustomCycleCountItem(CycleCountCustomItemCommand command) {
+        CycleCountItem cycleCountItem = new CycleCountItem(
+                facility: command.facility,
+                status: CycleCountItemStatus.COUNTING,
+                countIndex: command.recount ? 1 : 0,
+                quantityOnHand: command.quantityCounted, // FIXME: should we assume that qoh = quantityCounted for a custom row?
+                quantityCounted: command.quantityCounted,
+                cycleCount: command.cycleCount,
+                location: command.binLocation,
+                inventoryItem: command.inventoryItem,
+                product: command.inventoryItem?.product,
+                createdBy: AuthService.currentUser,
+                updatedBy: AuthService.currentUser,
+                dateCounted: new Date(),
+                comment: command.comment,
+                custom: true,
+        )
+        if (!cycleCountItem.validate()) {
+            throw new ValidationException("Invalid cycle count item", cycleCountItem.errors)
+        }
+        cycleCountItem.save()
+
+        return cycleCountItem.toDto()
+    }
+
+    void deleteCycleCountItem(String cycleCountItemId) {
+        CycleCountItem cycleCountItem = CycleCountItem.get(cycleCountItemId)
+        if (!cycleCountItem.custom) {
+            throw new IllegalArgumentException("Only custom cycle count items can be deleted")
+        }
+        cycleCountItem.delete()
+    }
 }
