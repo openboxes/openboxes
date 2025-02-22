@@ -8,7 +8,6 @@ import org.pih.warehouse.inventory.CycleCountCandidate
 import org.pih.warehouse.inventory.CycleCountCandidateFilterCommand
 import org.pih.warehouse.inventory.CycleCountCustomItemCommand
 import org.pih.warehouse.inventory.CycleCountDto
-import org.pih.warehouse.inventory.CycleCountItem
 import org.pih.warehouse.inventory.CycleCountItemDto
 import org.pih.warehouse.inventory.CycleCountRequest
 import org.pih.warehouse.inventory.CycleCountRequestBatchCommand
@@ -17,8 +16,6 @@ import org.pih.warehouse.inventory.CycleCountStartBatchCommand
 import org.pih.warehouse.inventory.CycleCountStartRecountBatchCommand
 import org.pih.warehouse.inventory.CycleCountSubmitCountCommand
 import org.pih.warehouse.inventory.CycleCountUpdateItemCommand
-import org.springframework.validation.BeanPropertyBindingResult
-import org.springframework.validation.Errors
 
 import org.pih.warehouse.inventory.CycleCountSubmitRecountCommand
 
