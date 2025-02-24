@@ -39,10 +39,12 @@ const useCountStepTable = ({
     currentLocation: state.session.currentLocation,
   }));
 
-  const showBinLocation = useMemo(() =>
+  const checkBinLocationSupport = () =>
     supports(currentLocation.supportedActivities, ActivityCode.PUTAWAY_STOCK)
-      && supports(currentLocation.supportedActivities, ActivityCode.PICK_STOCK),
-  [currentLocation?.id]);
+      && supports(currentLocation.supportedActivities, ActivityCode.PICK_STOCK);
+
+  const showBinLocation = useMemo(() =>
+    checkBinLocationSupport(), [currentLocation?.id]);
 
   useEffect(() => {
     if (showBinLocation) {
