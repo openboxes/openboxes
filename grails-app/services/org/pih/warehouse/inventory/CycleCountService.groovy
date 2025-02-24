@@ -17,7 +17,7 @@ import org.pih.warehouse.product.Product
 @Transactional
 class CycleCountService {
 
-    CycleCountTransactionCreator cycleCountTransactionCreator
+    CycleCountTransactionService cycleCountTransactionService
     ProductAvailabilityService productAvailabilityService
 
     List<CycleCountCandidate> getCandidates(CycleCountCandidateFilterCommand command, String facilityId) {
@@ -348,7 +348,7 @@ class CycleCountService {
         }
         command.cycleCount.status = command.cycleCount.recomputeStatus()
         if (command.cycleCount.status == CycleCountStatus.READY_TO_REVIEW) {
-            cycleCountTransactionCreator.createTransactions(command.cycleCount, command.refreshQuantityOnHand)
+            cycleCountTransactionService.createTransactions(command.cycleCount, command.refreshQuantityOnHand)
         }
         return CycleCountDto.toDto(command.cycleCount)
     }

@@ -2,27 +2,26 @@ package org.pih.warehouse.inventory
 
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
-import org.springframework.stereotype.Component
 
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
 
 /**
- * Responsible for creating and persisting product inventory transactions. We call this a "snapshot taker" because
- * product inventory transactions saved via this class are functionally a copy of what the quantity on hand
- * (determined by product availability) was for each [bin location + lot number] combo of the product at the time.
- * Importantly, transactions created via this class should NOT result in any quantity changes/adjustments.
+ * Responsible for managing product inventory transactions.
  */
-@Component
 @Transactional
-class ProductInventorySnapshotTaker {
+class ProductInventoryTransactionService {
 
     ProductAvailabilityService productAvailabilityService
     TransactionIdentifierService transactionIdentifierService
 
     /**
-     * Take a new product inventory "snapshot" transaction based on the current product availability.
+     * Create a new product inventory transaction based on the current QoH in product availability.
+     *
+     * We refer to this transaction as a product inventory "snapshot" because it's functionally a copy of what the
+     * quantity on hand (determined by product availability) was for each [bin location + lot number] of the product at
+     * the time. As such, transactions created via this method should NOT result in any quantity changes/adjustments.
      *
      * @param facility The Location to take the product inventory snapshot at
      * @param product The Product to take the product inventory snapshot for

@@ -2,27 +2,27 @@ package org.pih.warehouse.inventory
 
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
-import org.springframework.stereotype.Component
 
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.product.Product
 
 /**
- * Component responsible for creating and persisting the Transactions that result from a cycle count.
+ * Responsible for creating and persisting the Transactions that result from a cycle count.
  */
-@Component
 @Transactional
-class CycleCountTransactionCreator {
+class CycleCountTransactionService {
 
     ProductAvailabilityService productAvailabilityService
-    ProductInventorySnapshotTaker productInventorySnapshotTaker
+    ProductInventoryTransactionService productInventoryTransactionService
     TransactionIdentifierService transactionIdentifierService
 
     /**
-     * Given a completed cycle count, will create and persist the resulting product inventory snapshot transaction,
+     * Given a completed cycle count, will create and persist the resulting product inventory transaction,
      * as well as the credit/debit adjustment transaction if there are discrepancies.
      *
-     * @param itemQuantityOnHandIsUpToDate
+     * @param cycleCount the cycle count to create the transactions from
+     * @param itemQuantityOnHandIsUpToDate true if the cycle count items already have accurate QoH (and so don't
+     *                                     need to be refreshed).
      */
     List<Transaction> createTransactions(CycleCount cycleCount, boolean itemQuantityOnHandIsUpToDate=false) {
         List<Transaction> transactions = []
@@ -123,7 +123,7 @@ class CycleCountTransactionCreator {
             // quantity to be represented by a separate adjustment transaction. It's important to note that the quantity
             // values for this transaction will be a pure copy of QoH in product availability, NOT the quantityOnHand of
             // the cycle count items.
-            Transaction transaction = productInventorySnapshotTaker.createTransaction(
+            Transaction transaction = productInventoryTransactionService.createTransaction(
                     cycleCount.facility,
                     product,
                     ProductInventorySnapshotSource.CYCLE_COUNT,

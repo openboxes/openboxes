@@ -12,7 +12,7 @@ import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.ProductAvailabilityService
 import org.pih.warehouse.inventory.ProductInventorySnapshotSource
-import org.pih.warehouse.inventory.ProductInventorySnapshotTaker
+import org.pih.warehouse.inventory.ProductInventoryTransactionService
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.inventory.TransactionIdentifierService
@@ -20,10 +20,10 @@ import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.product.Product
 
 @Unroll
-class ProductInventorySnapshotTakerSpec extends Specification implements DataTest {
+class ProductInventoryTransactionServiceSpec extends Specification implements DataTest {
 
     @Shared
-    ProductInventorySnapshotTaker productInventorySnapshotTaker
+    ProductInventoryTransactionService productInventoryTransactionService
 
     @Shared
     ProductAvailabilityService productAvailabilityServiceStub
@@ -36,13 +36,13 @@ class ProductInventorySnapshotTakerSpec extends Specification implements DataTes
     }
 
     void setup() {
-        productInventorySnapshotTaker = new ProductInventorySnapshotTaker()
+        productInventoryTransactionService = new ProductInventoryTransactionService()
 
         productAvailabilityServiceStub = Stub(ProductAvailabilityService)
-        productInventorySnapshotTaker.productAvailabilityService = productAvailabilityServiceStub
+        productInventoryTransactionService.productAvailabilityService = productAvailabilityServiceStub
 
         transactionIdentifierServiceStub = Stub(TransactionIdentifierService)
-        productInventorySnapshotTaker.transactionIdentifierService = transactionIdentifierServiceStub
+        productInventoryTransactionService.transactionIdentifierService = transactionIdentifierServiceStub
     }
 
     void 'createTransaction should succeed when some items are available'() {
@@ -77,7 +77,7 @@ class ProductInventorySnapshotTakerSpec extends Specification implements DataTes
                 facility, [product.id], false, true) >> availableItems
 
         when:
-        Transaction transaction = productInventorySnapshotTaker.createTransaction(
+        Transaction transaction = productInventoryTransactionService.createTransaction(
                 facility, product, ProductInventorySnapshotSource.CYCLE_COUNT, cycleCount, date)
 
         then:
@@ -85,8 +85,9 @@ class ProductInventorySnapshotTakerSpec extends Specification implements DataTes
         assert transaction.transactionDate == date
         assert transaction.source == facility
         assert transaction.transactionNumber == "123ABC"
-        assert transaction.transactionEntries.size() == 2
 
-        assert transaction.transactionEntries.collect{ it.quantity }.containsAll([50, 25])
+        List<TransactionEntry> transactionEntries = transaction.transactionEntries as List<TransactionEntry>
+        assert transactionEntries.size() == 2
+        assert transactionEntries.collect{ it.quantity }.containsAll([50, 25])
     }
 }

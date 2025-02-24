@@ -9,12 +9,12 @@ import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.CycleCount
 import org.pih.warehouse.inventory.CycleCountItem
-import org.pih.warehouse.inventory.CycleCountTransactionCreator
+import org.pih.warehouse.inventory.CycleCountTransactionService
 import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.ProductAvailabilityService
 import org.pih.warehouse.inventory.ProductInventorySnapshotSource
-import org.pih.warehouse.inventory.ProductInventorySnapshotTaker
+import org.pih.warehouse.inventory.ProductInventoryTransactionService
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.inventory.TransactionIdentifierService
@@ -22,16 +22,16 @@ import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.product.Product
 
 @Unroll
-class CycleCountTransactionCreatorSpec extends Specification implements DataTest {
+class CycleCountTransactionServiceSpec extends Specification implements DataTest {
 
     @Shared
-    CycleCountTransactionCreator cycleCountTransactionCreator
+    CycleCountTransactionService cycleCountTransactionService
 
     @Shared
     ProductAvailabilityService productAvailabilityServiceStub
 
     @Shared
-    ProductInventorySnapshotTaker productInventorySnapshotTakerStub
+    ProductInventoryTransactionService productInventoryTransactionServiceStub
 
     @Shared
     TransactionIdentifierService transactionIdentifierServiceStub
@@ -47,16 +47,16 @@ class CycleCountTransactionCreatorSpec extends Specification implements DataTest
     }
 
     void setup() {
-        cycleCountTransactionCreator = new CycleCountTransactionCreator()
+        cycleCountTransactionService = new CycleCountTransactionService()
 
-        productInventorySnapshotTakerStub = Stub(ProductInventorySnapshotTaker)
-        cycleCountTransactionCreator.productInventorySnapshotTaker = productInventorySnapshotTakerStub
+        productInventoryTransactionServiceStub = Stub(ProductInventoryTransactionService)
+        cycleCountTransactionService.productInventoryTransactionService = productInventoryTransactionServiceStub
 
         productAvailabilityServiceStub = Stub(ProductAvailabilityService)
-        cycleCountTransactionCreator.productAvailabilityService = productAvailabilityServiceStub
+        cycleCountTransactionService.productAvailabilityService = productAvailabilityServiceStub
 
         transactionIdentifierServiceStub = Stub(TransactionIdentifierService)
-        cycleCountTransactionCreator.transactionIdentifierService = transactionIdentifierServiceStub
+        cycleCountTransactionService.transactionIdentifierService = transactionIdentifierServiceStub
 
         // Set up the transaction types
         productInventoryTransactionType = new TransactionType()
@@ -93,7 +93,7 @@ class CycleCountTransactionCreatorSpec extends Specification implements DataTest
         createExpectedProductInventoryTransaction(facility, product, date)
 
         when:
-        List<Transaction> transactions = cycleCountTransactionCreator.createTransactions(cycleCount, true)
+        List<Transaction> transactions = cycleCountTransactionService.createTransactions(cycleCount, true)
 
         then: 'the only transaction should be the product inventory one'
         assert transactions.size() == 1
@@ -137,7 +137,7 @@ class CycleCountTransactionCreatorSpec extends Specification implements DataTest
         createExpectedProductInventoryTransaction(facility, product2, date)
 
         when:
-        List<Transaction> transactions = cycleCountTransactionCreator.createTransactions(cycleCount, true)
+        List<Transaction> transactions = cycleCountTransactionService.createTransactions(cycleCount, true)
 
         then: 'the only transactions should be the product inventory ones'
         assert transactions.size() == 2
@@ -196,7 +196,7 @@ class CycleCountTransactionCreatorSpec extends Specification implements DataTest
         createExpectedProductInventoryTransaction(facility, product, date)
 
         when:
-        List<Transaction> transactions = cycleCountTransactionCreator.createTransactions(cycleCount, true)
+        List<Transaction> transactions = cycleCountTransactionService.createTransactions(cycleCount, true)
 
         then: 'both a product inventory and adjustment transaction should be created'
         assert transactions.size() == 2
@@ -232,7 +232,7 @@ class CycleCountTransactionCreatorSpec extends Specification implements DataTest
                 transactionType: productInventoryTransactionType,
         )
 
-        productInventorySnapshotTakerStub.createTransaction(
+        productInventoryTransactionServiceStub.createTransaction(
                 facility, product, ProductInventorySnapshotSource.CYCLE_COUNT, date) >> transaction
 
         return transaction
