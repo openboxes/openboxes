@@ -125,7 +125,7 @@ const useResolveStepTable = ({
       // field are editable)
       if (isFieldEditable) {
         return (
-          <TableCell className="rt-td rt-td-count-step static-cell-count-step">
+          <TableCell className="rt-td rt-td-count-step static-cell-count-step d-flex align-items-center">
             {getValue()}
           </TableCell>
         );
@@ -172,6 +172,7 @@ const useResolveStepTable = ({
             onChange={onChange}
             onBlur={onBlur}
             className="w-75 m-1"
+            showErrorBorder={error}
             hideErrorMessageWrapper
             {...fieldProps}
           />
@@ -233,7 +234,7 @@ const useResolveStepTable = ({
       cell: useCallback(({ row: { original: { id } } }) => (
         // TODO: Remove check if id is equal to quantityCounted
         //  after quantityCounted will be added to the response
-        <TableCell className="rt-td rt-td-count-step static-cell-count-step">
+        <TableCell className="rt-td rt-td-count-step static-cell-count-step d-flex align-items-center">
           {id.includes('newRow')
             ? <ArrowValueIndicator variant={ArrowValueIndicatorVariant.EMPTY} />
             : Math.floor(Math.random() * 10).toString()}
@@ -270,7 +271,7 @@ const useResolveStepTable = ({
         const value = Math.floor(Math.random() * 10) - quantityOnHand;
         const variant = getCycleCountDifferencesVariant(value, id);
         return (
-          <TableCell className="rt-td rt-td-count-step static-cell-count-step">
+          <TableCell className="rt-td rt-td-count-step static-cell-count-step d-flex align-items-center">
             <ArrowValueIndicator value={value} variant={variant} showAbsoluteValue />
           </TableCell>
         );
@@ -304,7 +305,7 @@ const useResolveStepTable = ({
         });
 
         return (
-          <TableCell className="rt-td rt-td-count-step static-cell-count-step">
+          <TableCell className="rt-td rt-td-count-step static-cell-count-step d-flex align-items-center">
             <ArrowValueIndicator value={recountDifference} variant={variant} showAbsoluteValue />
           </TableCell>
         );

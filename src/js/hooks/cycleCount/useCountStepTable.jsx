@@ -115,7 +115,7 @@ const useCountStepTable = ({
       // We shouldn't allow users edit fetched data (only quantity counted is editable)
       if (isFieldEditable || !isStepEditable) {
         return (
-          <TableCell className="static-cell-count-step">
+          <TableCell className="static-cell-count-step d-flex align-items-center">
             {getValueToDisplay(id, value)}
           </TableCell>
         );
@@ -160,6 +160,7 @@ const useCountStepTable = ({
             onChange={onChange}
             onBlur={onBlur}
             className={`m-1 ${showTooltip ? 'w-99' : 'w-75'} ${error && 'border border-danger'}`}
+            showErrorBorder={error}
             hideErrorMessageWrapper
             {...fieldProps}
           />
