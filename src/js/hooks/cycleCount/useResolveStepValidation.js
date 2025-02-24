@@ -3,10 +3,13 @@ import { useState } from 'react';
 import _ from 'lodash';
 import { z } from 'zod';
 
+import notification from 'components/Layout/notifications/notification';
+import NotificationType from 'consts/notificationTypes';
 import useTranslate from 'hooks/useTranslate';
 
 const useResolveStepValidation = ({ tableData }) => {
   const [validationErrors, setValidationErrors] = useState({});
+  const [isRootCauseWarningSkipped, setIsRootCauseWarningSkipped] = useState(false);
 
   const translate = useTranslate();
 
@@ -154,10 +157,46 @@ const useResolveStepValidation = ({ tableData }) => {
     return _.every(Object.values(errors), (val) => val.success);
   };
 
+  const validateRootCauses = () => {
+    const cycleCountItems = _.flatten(
+      tableData.current.map((cycleCount) => cycleCount.cycleCountItems),
+    );
+    return cycleCountItems.reduce((acc, curr) => {
+      const recountDifference = curr.quantityRecounted - (curr.quantityOnHand || 0);
+      if (recountDifference !== 0 && !Number.isNaN(recountDifference)) {
+        return [...acc, curr?.id];
+      }
+
+      return acc;
+    }, []);
+  };
+
+  const shouldHaveRootCause = (id) => {
+    const selectedRootCause = _.flatten(
+      tableData.current.map((cycleCount) => cycleCount.cycleCountItems),
+    ).find((row) => row.id === id)?.rootCause;
+    const missingRootCauses = validateRootCauses();
+    return missingRootCauses.includes(id) && !selectedRootCause;
+  };
+
+  const showEmptyRootCauseWarning = () => {
+    setIsRootCauseWarningSkipped(true);
+    notification(NotificationType.INFO)({
+      message: translate(
+        'react.cycleCount.popup.emptyRootCause.label',
+        'Are you sure you want to continue with empty root cause? Click next if you want to continue.',
+      ),
+    });
+  };
+
   return {
     validationErrors,
     setValidationErrors,
     triggerValidation,
+    validateRootCauses,
+    shouldHaveRootCause,
+    showEmptyRootCauseWarning,
+    isRootCauseWarningSkipped,
     rowValidationSchema,
     rowsValidationSchema,
   };
