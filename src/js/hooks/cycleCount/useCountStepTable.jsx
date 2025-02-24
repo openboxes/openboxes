@@ -167,7 +167,7 @@ const useCountStepTable = ({
           {error && (
             <CustomTooltip
               content={error}
-              className="error-icon"
+              className="tooltip-icon tooltip-icon--error"
               icon={RiErrorWarningLine}
             />
           )}

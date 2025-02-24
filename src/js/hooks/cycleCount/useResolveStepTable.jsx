@@ -112,6 +112,22 @@ const useResolveStepTable = ({
     return {};
   };
 
+  const getTooltipMessage = (error, warning, id) => {
+    if (error) {
+      return error;
+    }
+
+    // Warning is applicable only for root cause field
+    if (warning && id === cycleCountColumn.ROOT_CAUSE) {
+      return translate(
+        'react.cycleCount.rootCauseWarning.label',
+        'Specify result of investigation if applicable.',
+      );
+    }
+
+    return null;
+  };
+
   const defaultColumn = {
     cell: ({
       getValue, row: { original, index }, column: { id }, table,
@@ -178,6 +194,7 @@ const useResolveStepTable = ({
       const type = getFieldType(id);
       const Component = getFieldComponent(id);
       const fieldProps = getFieldProps(id);
+      const tooltipContent = getTooltipMessage(errorMessage, warning, id);
 
       return (
         <TableCell className="rt-td rt-td-count-step pb-0">
@@ -192,10 +209,10 @@ const useResolveStepTable = ({
             warning={warning}
             {...fieldProps}
           />
-          {error && (
+          {(error || warning) && tooltipContent && (
             <CustomTooltip
-              content={error}
-              className="error-icon"
+              content={tooltipContent}
+              className={`tooltip-icon tooltip-icon--${error ? 'error' : 'warning'}`}
               icon={RiErrorWarningLine}
             />
           )}
