@@ -21,7 +21,11 @@ const useResolveStep = () => {
 
   const {
     validationErrors,
+    isRootCauseWarningSkipped,
     triggerValidation,
+    validateRootCauses,
+    shouldHaveRootCause,
+    showEmptyRootCauseWarning,
   } = useResolveStepValidation({ tableData });
 
   const dispatch = useDispatch();
@@ -122,10 +126,18 @@ const useResolveStep = () => {
 
   const next = () => {
     const isValid = triggerValidation();
-    if (isValid) {
-      // This data should be combined to a single request
-      console.log('next: ', tableData.current, recountedBy, dateRecounted);
+    if (!isValid) {
+      return;
     }
+
+    const missingRootCauses = validateRootCauses();
+    // Fix asynchronous isAnyRootCauseMissing();
+    if (!isRootCauseWarningSkipped && missingRootCauses.length > 0) {
+      showEmptyRootCauseWarning();
+      return;
+    }
+
+    console.log('next: ', tableData.current, recountedBy, dateRecounted);
   };
 
   const updateRow = (cycleCountId, rowId, columnId, value) => {
@@ -168,6 +180,7 @@ const useResolveStep = () => {
     assignRecountedBy,
     getRecountedDate,
     setRecountedDate,
+    shouldHaveRootCause,
     next,
   };
 };

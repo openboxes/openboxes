@@ -30,6 +30,7 @@ const useResolveStepTable = ({
   cycleCountId,
   removeRow,
   validationErrors,
+  shouldHaveRootCause,
   tableData,
 }) => {
   const columnHelper = createColumnHelper();
@@ -136,6 +137,7 @@ const useResolveStepTable = ({
       const errorMessage = validationErrors?.[cycleCountId]?.errors?.[index]?.[columnPath]?._errors;
       const [value, setValue] = useState(initialValue);
       const [error, setError] = useState(errorMessage);
+      const [warning, setWarning] = useState(error ? null : shouldHaveRootCause(original?.id));
       // If the value at the end of entering data is the same as it was initially,
       // we don't want to trigger rerender
       const isEdited = initialValue !== value;
@@ -144,7 +146,10 @@ const useResolveStepTable = ({
         if (!isEdited) {
           return;
         }
-        if (id !== cycleCountColumn.BIN_LOCATION) {
+        if (![
+          cycleCountColumn.BIN_LOCATION,
+          cycleCountColumn.ROOT_CAUSE,
+        ].includes(id)) {
           table.options.meta?.updateData(cycleCountId, original.id, id, value);
           setError(null);
         }
@@ -157,9 +162,13 @@ const useResolveStepTable = ({
       // in other cases it expects just the value
       const onChange = (e) => {
         const enteredValue = e?.target?.value ?? e;
-        if (id === cycleCountColumn.BIN_LOCATION) {
+        if ([
+          cycleCountColumn.BIN_LOCATION,
+          cycleCountColumn.ROOT_CAUSE,
+        ].includes(id)) {
           table.options.meta?.updateData(cycleCountId, original.id, id, enteredValue);
           setError(null);
+          setWarning(null);
         }
         setValue(enteredValue);
       };
@@ -180,6 +189,7 @@ const useResolveStepTable = ({
             className="w-75 m-1"
             showErrorBorder={error}
             hideErrorMessageWrapper
+            warning={warning}
             {...fieldProps}
           />
           {error && (

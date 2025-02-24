@@ -19,6 +19,7 @@ const ResolveStep = () => {
     assignRecountedBy,
     getRecountedDate,
     setRecountedDate,
+    shouldHaveRootCause,
   } = useResolveStep();
 
   return (
@@ -39,6 +40,7 @@ const ResolveStep = () => {
             setRecountedDate={setRecountedDate(id)}
             assignRecountedBy={assignRecountedBy}
             validationErrors={validationErrors}
+            shouldHaveRootCause={shouldHaveRootCause}
           />
         ))}
     </PageWrapper>
