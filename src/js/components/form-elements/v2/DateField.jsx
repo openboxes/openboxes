@@ -26,6 +26,7 @@ const DateField = ({
   value,
   onChange,
   showTimeSelect,
+  hideErrorMessageWrapper,
   customDateFormat,
   ...fieldProps
 }) => {
@@ -74,6 +75,7 @@ const DateField = ({
       tooltip={tooltip}
       errorMessage={errorMessage}
       button={button}
+      hideErrorMessageWrapper={hideErrorMessageWrapper}
     >
       <DatePicker
         {...fieldProps}
@@ -147,6 +149,7 @@ DateField.propTypes = {
   value: PropTypes.string,
   onChange: PropTypes.func,
   showTimeSelect: PropTypes.bool,
+  hideErrorMessageWrapper: PropTypes.bool,
   customDateFormat: PropTypes.string,
 };
 
@@ -162,5 +165,6 @@ DateField.defaultProps = {
   value: null,
   onChange: () => {},
   showTimeSelect: false,
+  hideErrorMessageWrapper: false,
   customDateFormat: null,
 };

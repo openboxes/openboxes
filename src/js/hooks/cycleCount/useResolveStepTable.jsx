@@ -6,7 +6,7 @@ import React, {
 
 import { createColumnHelper } from '@tanstack/react-table';
 import _ from 'lodash';
-import { RiChat3Line, RiDeleteBinLine } from 'react-icons/ri';
+import { RiChat3Line, RiDeleteBinLine, RiErrorWarningLine } from 'react-icons/ri';
 import { useDispatch, useSelector } from 'react-redux';
 import { Tooltip } from 'react-tippy';
 
@@ -25,7 +25,11 @@ import cycleCountColumn from 'consts/cycleCountColumn';
 import useTranslate from 'hooks/useTranslate';
 import groupBinLocationsByZone from 'utils/groupBinLocationsByZone';
 import { fetchBins } from 'utils/option-utils';
+<<<<<<< HEAD
 import { supports } from 'utils/supportedActivitiesUtils';
+=======
+import CustomTooltip from 'wrappers/CustomTooltip';
+>>>>>>> develop
 
 // Managing state for single table, mainly table configuration (from resolve step)
 const useResolveStepTable = ({
@@ -133,7 +137,7 @@ const useResolveStepTable = ({
       // field are editable)
       if (isFieldEditable) {
         return (
-          <TableCell className="rt-td rt-td-count-step static-cell-count-step">
+          <TableCell className="rt-td rt-td-count-step static-cell-count-step d-flex align-items-center">
             {getValue()}
           </TableCell>
         );
@@ -180,15 +184,24 @@ const useResolveStepTable = ({
             onChange={onChange}
             onBlur={onBlur}
             className="w-75 m-1"
-            errorMessage={error}
+            showErrorBorder={error}
+            hideErrorMessageWrapper
             {...fieldProps}
           />
+          {error && (
+            <CustomTooltip
+              content={error}
+              className="error-icon"
+              icon={RiErrorWarningLine}
+            />
+          )}
         </TableCell>
       );
     },
   };
 
   const columns = [
+<<<<<<< HEAD
     ...(showBinLocation ? [
       columnHelper.accessor(
         (row) => (row?.binLocation?.label ? row?.binLocation : row.binLocation?.name), {
@@ -198,12 +211,24 @@ const useResolveStepTable = ({
               {translate('react.cycleCount.table.binLocation.label', 'Bin Location')}
             </TableHeaderCell>
           ),
+=======
+    columnHelper.accessor(
+      (row) => (row?.binLocation?.label ? row?.binLocation : row.binLocation?.name), {
+        id: cycleCountColumn.BIN_LOCATION,
+        header: useMemo(() => (
+          <TableHeaderCell className="rt-th-count-step">
+            {translate('react.cycleCount.table.binLocation.label', 'Bin Location')}
+          </TableHeaderCell>
+        ), []),
+        meta: {
+          flexWidth: 160,
+>>>>>>> develop
         },
       ),
     ] : []),
     columnHelper.accessor(cycleCountColumn.LOT_NUMBER, {
       header: useMemo(() => (
-        <TableHeaderCell>
+        <TableHeaderCell className="rt-th-count-step">
           {translate('react.cycleCount.table.lotNumber.label', 'Serial / Lot Number')}
         </TableHeaderCell>
       ), []),
@@ -213,7 +238,7 @@ const useResolveStepTable = ({
     }),
     columnHelper.accessor(cycleCountColumn.EXPIRATION_DATE, {
       header: useMemo(() => (
-        <TableHeaderCell>
+        <TableHeaderCell className="rt-th-count-step">
           {translate('react.cycleCount.table.expirationDate.label', 'Expiration Date')}
         </TableHeaderCell>
       ), []),
@@ -226,14 +251,14 @@ const useResolveStepTable = ({
     }),
     columnHelper.accessor(cycleCountColumn.QUANTITY_COUNTED, {
       header: useMemo(() => (
-        <TableHeaderCell>
+        <TableHeaderCell className="rt-th-count-step">
           {translate('react.cycleCount.table.quantityCounted.label', 'Quantity Counted')}
         </TableHeaderCell>
       ), []),
       cell: useCallback(({ row: { original: { id } } }) => (
         // TODO: Remove check if id is equal to quantityCounted
         //  after quantityCounted will be added to the response
-        <TableCell className="rt-td rt-td-count-step static-cell-count-step">
+        <TableCell className="rt-td rt-td-count-step static-cell-count-step d-flex align-items-center">
           {id.includes('newRow')
             ? <ArrowValueIndicator variant={ArrowValueIndicatorVariant.EMPTY} />
             : Math.floor(Math.random() * 10).toString()}
@@ -243,7 +268,7 @@ const useResolveStepTable = ({
               delay="150"
               duration="250"
               hideDelay="50"
-                // TODO: Should be replaced with comment fetched from the API
+              // TODO: Should be replaced with comment fetched from the API
               html={<span className="p-2">Comment from count step</span>}
             >
               <RiChat3Line
@@ -261,7 +286,7 @@ const useResolveStepTable = ({
     }),
     columnHelper.accessor(cycleCountColumn.COUNT_DIFFERENCE, {
       header: useMemo(() => (
-        <TableHeaderCell>
+        <TableHeaderCell className="rt-th-count-step">
           {translate('react.cycleCount.table.countDifference.label', 'Count Difference')}
         </TableHeaderCell>
       ), []),
@@ -270,7 +295,7 @@ const useResolveStepTable = ({
         const value = Math.floor(Math.random() * 10) - quantityOnHand;
         const variant = getCycleCountDifferencesVariant(value, id);
         return (
-          <TableCell className="rt-td rt-td-count-step static-cell-count-step">
+          <TableCell className="rt-td rt-td-count-step static-cell-count-step d-flex align-items-center">
             <ArrowValueIndicator value={value} variant={variant} showAbsoluteValue />
           </TableCell>
         );
@@ -281,7 +306,7 @@ const useResolveStepTable = ({
     }),
     columnHelper.accessor(cycleCountColumn.QUANTITY_RECOUNTED, {
       header: useMemo(() => (
-        <TableHeaderCell>
+        <TableHeaderCell className="rt-th-count-step">
           {translate('react.cycleCount.table.quantityRecounted.label', 'Quantity Recounted')}
         </TableHeaderCell>
       ), []),
@@ -291,7 +316,7 @@ const useResolveStepTable = ({
     }),
     columnHelper.accessor(cycleCountColumn.RECOUNT_DIFFERENCE, {
       header: useMemo(() => (
-        <TableHeaderCell>
+        <TableHeaderCell className="rt-th-count-step">
           {translate('react.cycleCount.table.recountDifference.label', 'Recount Difference')}
         </TableHeaderCell>
       ), []),
@@ -304,7 +329,7 @@ const useResolveStepTable = ({
         });
 
         return (
-          <TableCell className="rt-td rt-td-count-step static-cell-count-step">
+          <TableCell className="rt-td rt-td-count-step static-cell-count-step d-flex align-items-center">
             <ArrowValueIndicator value={recountDifference} variant={variant} showAbsoluteValue />
           </TableCell>
         );
@@ -315,7 +340,7 @@ const useResolveStepTable = ({
     }),
     columnHelper.accessor(cycleCountColumn.ROOT_CAUSE, {
       header: useMemo(() => (
-        <TableHeaderCell>
+        <TableHeaderCell className="rt-th-count-step">
           {translate('react.cycleCount.table.rootCause.label', 'Root Cause')}
         </TableHeaderCell>
       ), []),
@@ -325,7 +350,7 @@ const useResolveStepTable = ({
     }),
     columnHelper.accessor(cycleCountColumn.COMMENT, {
       header: useMemo(() => (
-        <TableHeaderCell>
+        <TableHeaderCell className="rt-th-count-step">
           {translate('react.cycleCount.table.comment.label', 'Comment')}
         </TableHeaderCell>
       ), []),
@@ -361,7 +386,7 @@ const useResolveStepTable = ({
         </TableCell>
       ), []),
       meta: {
-        flexWidth: 30,
+        flexWidth: 50,
       },
     }),
   ];
