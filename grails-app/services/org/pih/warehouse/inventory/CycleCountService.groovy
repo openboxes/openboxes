@@ -73,7 +73,8 @@ class CycleCountService {
             }
             if (!command.statuses) {
                 isNull("status")
-            } else {
+            }
+            else {
                 inList("status", command.statuses)
             }
         } as List<CycleCountCandidate>
@@ -253,7 +254,7 @@ class CycleCountService {
 
         // If there are already items for the requested count index, simply return the count as it is since the recount
         // has already been started. We do this (instead of throwing an error) because it's convenient for the frontend.
-        if (cycleCount.cycleCountItems.any { it.countIndex == command.countIndex }) {
+        if (cycleCount.cycleCountItems.any{ it.countIndex == command.countIndex }) {
             return CycleCountDto.toDto(cycleCount)
         }
 
@@ -331,7 +332,7 @@ class CycleCountService {
     }
 
     List<CycleCountDto> getCycleCounts(List<String> ids) {
-        List<CycleCount> cycleCounts = CycleCount.createCriteria().list() {
+        List<CycleCount> cycleCounts = CycleCount.createCriteria().list {
             if (ids) {
                 'in'("id", ids)
             }
