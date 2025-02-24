@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import { createColumnHelper } from '@tanstack/react-table';
 import _ from 'lodash';
@@ -11,11 +11,13 @@ import TableHeaderCell from 'components/DataTable/TableHeaderCell';
 import DateField from 'components/form-elements/v2/DateField';
 import SelectField from 'components/form-elements/v2/SelectField';
 import TextInput from 'components/form-elements/v2/TextInput';
+import ActivityCode from 'consts/activityCode';
 import cycleCountColumn from 'consts/cycleCountColumn';
 import { DateFormat } from 'consts/timeFormat';
 import useTranslate from 'hooks/useTranslate';
 import groupBinLocationsByZone from 'utils/groupBinLocationsByZone';
 import { fetchBins } from 'utils/option-utils';
+import { supports } from 'utils/supportedActivitiesUtils';
 
 // Managing state for single table, mainly table configuration (from count step)
 const useCountStepTable = ({
@@ -37,11 +39,18 @@ const useCountStepTable = ({
     currentLocation: state.session.currentLocation,
   }));
 
+  const showBinLocation = useMemo(() =>
+    supports(currentLocation.supportedActivities, ActivityCode.PUTAWAY_STOCK)
+      && supports(currentLocation.supportedActivities, ActivityCode.PICK_STOCK),
+  [currentLocation?.id]);
+
   useEffect(() => {
-    (async () => {
-      const fetchedBins = await fetchBins(currentLocation?.id);
-      setBinLocations(fetchedBins);
-    })();
+    if (showBinLocation) {
+      (async () => {
+        const fetchedBins = await fetchBins(currentLocation?.id);
+        setBinLocations(fetchedBins);
+      })();
+    }
   }, [currentLocation?.id]);
 
   // Get appropriate input component based on table column
@@ -69,7 +78,7 @@ const useCountStepTable = ({
 
   // Get field props, for the binLocation dropdown we have to pass options
   const getFieldProps = (fieldName) => {
-    if (fieldName === cycleCountColumn.BIN_LOCATION) {
+    if (fieldName === cycleCountColumn.BIN_LOCATION && showBinLocation) {
       return {
         labelKey: 'name',
         options: groupBinLocationsByZone(binLocations),
@@ -95,7 +104,7 @@ const useCountStepTable = ({
       return value?.toString();
     }
 
-    if (id === 'binLocation') {
+    if (id === 'binLocation' && showBinLocation) {
       return value?.name;
     }
 
@@ -168,22 +177,30 @@ const useCountStepTable = ({
   };
 
   const columns = [
-    columnHelper.accessor(
-      (row) => (row?.binLocation?.label ? row?.binLocation : row.binLocation?.name), {
-        id: cycleCountColumn.BIN_LOCATION,
-        header: () => (
-          <TableHeaderCell>
-            {translate('react.cycleCount.table.binLocation.label', 'Bin Location')}
-          </TableHeaderCell>
-        ),
-      },
-    ),
+    ...(showBinLocation ? [
+      columnHelper.accessor(
+        (row) => (row?.binLocation?.label ? row?.binLocation : row.binLocation?.name), {
+          id: cycleCountColumn.BIN_LOCATION,
+          header: () => (
+            <TableHeaderCell>
+              {translate('react.cycleCount.table.binLocation.label', 'Bin Location')}
+            </TableHeaderCell>
+          ),
+          meta: {
+            flexWidth: 100,
+          },
+        },
+      ),
+    ] : []),
     columnHelper.accessor(cycleCountColumn.LOT_NUMBER, {
       header: () => (
         <TableHeaderCell>
           {translate('react.cycleCount.table.lotNumber.label', 'Serial / Lot Number')}
         </TableHeaderCell>
       ),
+      meta: {
+        flexWidth: 100,
+      },
     }),
     columnHelper.accessor(cycleCountColumn.EXPIRATION_DATE, {
       header: () => (
@@ -195,6 +212,7 @@ const useCountStepTable = ({
         getCellContext: () => ({
           className: 'split-table-right',
         }),
+        flexWidth: 100,
       },
     }),
     columnHelper.accessor(cycleCountColumn.QUANTITY_COUNTED, {
@@ -203,6 +221,9 @@ const useCountStepTable = ({
           {translate('react.cycleCount.table.quantityCounted.label', 'Quantity Counted')}
         </TableHeaderCell>
       ),
+      meta: {
+        flexWidth: 50,
+      },
     }),
     columnHelper.accessor(cycleCountColumn.COMMENT, {
       header: () => (
@@ -210,6 +231,9 @@ const useCountStepTable = ({
           {translate('react.cycleCount.table.comment.label', 'Comment')}
         </TableHeaderCell>
       ),
+      meta: {
+        flexWidth: 100,
+      },
     }),
     columnHelper.accessor(null, {
       id: cycleCountColumn.ACTIONS,
@@ -242,6 +266,7 @@ const useCountStepTable = ({
         getCellContext: () => ({
           className: 'count-step-actions',
         }),
+        flexWidth: 25,
       },
     }),
   ];

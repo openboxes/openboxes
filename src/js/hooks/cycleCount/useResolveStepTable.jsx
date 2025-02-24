@@ -17,12 +17,15 @@ import ArrowValueIndicator from 'components/DataTable/v2/ArrowValueIndicator';
 import DateField from 'components/form-elements/v2/DateField';
 import SelectField from 'components/form-elements/v2/SelectField';
 import TextInput from 'components/form-elements/v2/TextInput';
+import ActivityCode from 'consts/activityCode';
 import ArrowValueIndicatorVariant, {
   getCycleCountDifferencesVariant,
 } from 'consts/arrowValueIndicatorVariant';
 import cycleCountColumn from 'consts/cycleCountColumn';
 import useTranslate from 'hooks/useTranslate';
+import groupBinLocationsByZone from 'utils/groupBinLocationsByZone';
 import { fetchBins } from 'utils/option-utils';
+import { supports } from 'utils/supportedActivitiesUtils';
 
 // Managing state for single table, mainly table configuration (from resolve step)
 const useResolveStepTable = ({
@@ -49,11 +52,18 @@ const useResolveStepTable = ({
 
   const dispatch = useDispatch();
 
+  const showBinLocation = useMemo(() =>
+    supports(currentLocation.supportedActivities, ActivityCode.PUTAWAY_STOCK)
+      && supports(currentLocation.supportedActivities, ActivityCode.PICK_STOCK),
+  [currentLocation?.id]);
+
   useEffect(() => {
-    (async () => {
-      const fetchedBins = await fetchBins(currentLocation?.id);
-      setBinLocations(fetchedBins);
-    })();
+    if (showBinLocation) {
+      (async () => {
+        const fetchedBins = await fetchBins(currentLocation?.id);
+        setBinLocations(fetchedBins);
+      })();
+    }
   }, [currentLocation?.id]);
 
   useEffect(() => {
@@ -90,13 +100,10 @@ const useResolveStepTable = ({
 
   // Get field props, for the binLocation dropdown we have to pass options
   const getFieldProps = (fieldName) => {
-    if (fieldName === cycleCountColumn.BIN_LOCATION) {
+    if (fieldName === cycleCountColumn.BIN_LOCATION && showBinLocation) {
       return {
         labelKey: 'name',
-        options: binLocations.map((binLocation) => ({
-          id: binLocation.id,
-          name: binLocation.name,
-        })),
+        options: groupBinLocationsByZone(binLocations),
       };
     }
 
@@ -180,19 +187,18 @@ const useResolveStepTable = ({
   };
 
   const columns = [
-    columnHelper.accessor(
-      (row) => (row?.binLocation?.label ? row?.binLocation : row.binLocation?.name), {
-        id: cycleCountColumn.BIN_LOCATION,
-        header: useMemo(() => (
-          <TableHeaderCell>
-            {translate('react.cycleCount.table.binLocation.label', 'Bin Location')}
-          </TableHeaderCell>
-        ), []),
-        meta: {
-          flexWidth: 160,
+    ...(showBinLocation ? [
+      columnHelper.accessor(
+        (row) => (row?.binLocation?.label ? row?.binLocation : row.binLocation?.name), {
+          id: cycleCountColumn.BIN_LOCATION,
+          header: () => (
+            <TableHeaderCell>
+              {translate('react.cycleCount.table.binLocation.label', 'Bin Location')}
+            </TableHeaderCell>
+          ),
         },
-      },
-    ),
+      ),
+    ] : []),
     columnHelper.accessor(cycleCountColumn.LOT_NUMBER, {
       header: useMemo(() => (
         <TableHeaderCell>

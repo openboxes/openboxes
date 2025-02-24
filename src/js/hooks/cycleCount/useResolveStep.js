@@ -91,9 +91,7 @@ const useResolveStep = () => {
         lotNumber: undefined,
         expirationDate: undefined,
       },
-      binLocation: {
-        name: undefined,
-      },
+      binLocation: undefined,
       quantityRecounted: undefined,
       quantityCounted: undefined,
       rootCause: undefined,
