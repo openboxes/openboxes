@@ -88,6 +88,7 @@ const CountStepTable = ({
                 options={users}
                 onChange={assignCountedBy(product?.productCode)}
                 className="min-width-250"
+                defaultValue={countedBy[product.productCode]}
               />
             </Tooltip>
           ) : <p>{countedBy[product.productCode]?.label}</p>}

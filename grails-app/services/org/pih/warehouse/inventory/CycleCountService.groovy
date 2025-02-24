@@ -73,8 +73,7 @@ class CycleCountService {
             }
             if (!command.statuses) {
                 isNull("status")
-            }
-            else {
+            } else {
                 inList("status", command.statuses)
             }
         } as List<CycleCountCandidate>
@@ -254,7 +253,7 @@ class CycleCountService {
 
         // If there are already items for the requested count index, simply return the count as it is since the recount
         // has already been started. We do this (instead of throwing an error) because it's convenient for the frontend.
-        if (cycleCount.cycleCountItems.any{ it.countIndex == command.countIndex }) {
+        if (cycleCount.cycleCountItems.any { it.countIndex == command.countIndex }) {
             return CycleCountDto.toDto(cycleCount)
         }
 
@@ -332,7 +331,7 @@ class CycleCountService {
     }
 
     List<CycleCountDto> getCycleCounts(List<String> ids) {
-        List<CycleCount> cycleCounts = CycleCount.createCriteria().list {
+        List<CycleCount> cycleCounts = CycleCount.createCriteria().list() {
             if (ids) {
                 'in'("id", ids)
             }
@@ -354,7 +353,7 @@ class CycleCountService {
 
     void updateCycleCountItemForSubmit(CycleCountItem cycleCountItem, boolean refreshQuantityOnHand, boolean failOnOutdatedQuantity) {
         Integer currentQuantityOnHand =
-            productAvailabilityService.getQuantityOnHandInBinLocation(cycleCountItem.inventoryItem, cycleCountItem.location)
+                productAvailabilityService.getQuantityOnHandInBinLocation(cycleCountItem.inventoryItem, cycleCountItem.location)
         if (failOnOutdatedQuantity && cycleCountItem.quantityOnHand != currentQuantityOnHand) {
             throw new IllegalArgumentException("Quantity on hand for a cycle count item is no longer up to date")
         }
@@ -373,7 +372,7 @@ class CycleCountService {
 
     void createCycleCountTransaction(CycleCount cycleCount) {
         TransactionType cycleCountProductInventoryTransactionType =
-            TransactionType.read(Constants.CYCLE_COUNT_PRODUCT_INVENTORY_TRANSACTION_TYPE_ID)
+                TransactionType.read(Constants.CYCLE_COUNT_PRODUCT_INVENTORY_TRANSACTION_TYPE_ID)
         Transaction transaction = new Transaction(
                 source: cycleCount.facility,
                 inventory: cycleCount.facility.inventory,
