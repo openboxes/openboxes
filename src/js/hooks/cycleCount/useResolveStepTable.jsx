@@ -17,7 +17,6 @@ import ArrowValueIndicator from 'components/DataTable/v2/ArrowValueIndicator';
 import DateField from 'components/form-elements/v2/DateField';
 import SelectField from 'components/form-elements/v2/SelectField';
 import TextInput from 'components/form-elements/v2/TextInput';
-import ActivityCode from 'consts/activityCode';
 import ArrowValueIndicatorVariant, {
   getCycleCountDifferencesVariant,
 } from 'consts/arrowValueIndicatorVariant';
@@ -25,11 +24,8 @@ import cycleCountColumn from 'consts/cycleCountColumn';
 import useTranslate from 'hooks/useTranslate';
 import groupBinLocationsByZone from 'utils/groupBinLocationsByZone';
 import { fetchBins } from 'utils/option-utils';
-<<<<<<< HEAD
-import { supports } from 'utils/supportedActivitiesUtils';
-=======
+import { checkBinLocationSupport } from 'utils/supportedActivitiesUtils';
 import CustomTooltip from 'wrappers/CustomTooltip';
->>>>>>> develop
 
 // Managing state for single table, mainly table configuration (from resolve step)
 const useResolveStepTable = ({
@@ -56,12 +52,8 @@ const useResolveStepTable = ({
 
   const dispatch = useDispatch();
 
-  const checkBinLocationSupport = () =>
-    supports(currentLocation.supportedActivities, ActivityCode.PUTAWAY_STOCK)
-    && supports(currentLocation.supportedActivities, ActivityCode.PICK_STOCK);
-
   const showBinLocation = useMemo(() =>
-    checkBinLocationSupport(), [currentLocation?.id]);
+    checkBinLocationSupport(currentLocation.supportedActivities), [currentLocation?.id]);
 
   useEffect(() => {
     if (showBinLocation) {
@@ -201,7 +193,6 @@ const useResolveStepTable = ({
   };
 
   const columns = [
-<<<<<<< HEAD
     ...(showBinLocation ? [
       columnHelper.accessor(
         (row) => (row?.binLocation?.label ? row?.binLocation : row.binLocation?.name), {
@@ -211,31 +202,12 @@ const useResolveStepTable = ({
               {translate('react.cycleCount.table.binLocation.label', 'Bin Location')}
             </TableHeaderCell>
           ),
-=======
-    columnHelper.accessor(
-      (row) => (row?.binLocation?.label ? row?.binLocation : row.binLocation?.name), {
-        id: cycleCountColumn.BIN_LOCATION,
-        header: useMemo(() => (
-          <TableHeaderCell className="rt-th-count-step">
-            {translate('react.cycleCount.table.binLocation.label', 'Bin Location')}
-          </TableHeaderCell>
-        ), []),
-        meta: {
-          flexWidth: 160,
->>>>>>> develop
+          meta: {
+            flexWidth: 100,
+          },
         },
       ),
     ] : []),
-    columnHelper.accessor(cycleCountColumn.LOT_NUMBER, {
-      header: useMemo(() => (
-        <TableHeaderCell className="rt-th-count-step">
-          {translate('react.cycleCount.table.lotNumber.label', 'Serial / Lot Number')}
-        </TableHeaderCell>
-      ), []),
-      meta: {
-        flexWidth: 160,
-      },
-    }),
     columnHelper.accessor(cycleCountColumn.EXPIRATION_DATE, {
       header: useMemo(() => (
         <TableHeaderCell className="rt-th-count-step">

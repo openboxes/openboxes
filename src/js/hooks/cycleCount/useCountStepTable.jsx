@@ -11,13 +11,12 @@ import TableHeaderCell from 'components/DataTable/TableHeaderCell';
 import DateField from 'components/form-elements/v2/DateField';
 import SelectField from 'components/form-elements/v2/SelectField';
 import TextInput from 'components/form-elements/v2/TextInput';
-import ActivityCode from 'consts/activityCode';
 import cycleCountColumn from 'consts/cycleCountColumn';
 import { DateFormat } from 'consts/timeFormat';
 import useTranslate from 'hooks/useTranslate';
 import groupBinLocationsByZone from 'utils/groupBinLocationsByZone';
 import { fetchBins } from 'utils/option-utils';
-import { supports } from 'utils/supportedActivitiesUtils';
+import { checkBinLocationSupport } from 'utils/supportedActivitiesUtils';
 import CustomTooltip from 'wrappers/CustomTooltip';
 
 // Managing state for single table, mainly table configuration (from count step)
@@ -40,12 +39,8 @@ const useCountStepTable = ({
     currentLocation: state.session.currentLocation,
   }));
 
-  const checkBinLocationSupport = () =>
-    supports(currentLocation.supportedActivities, ActivityCode.PUTAWAY_STOCK)
-      && supports(currentLocation.supportedActivities, ActivityCode.PICK_STOCK);
-
   const showBinLocation = useMemo(() =>
-    checkBinLocationSupport(), [currentLocation?.id]);
+    checkBinLocationSupport(currentLocation.supportedActivities), [currentLocation?.id]);
 
   useEffect(() => {
     if (showBinLocation) {
@@ -88,7 +83,7 @@ const useCountStepTable = ({
       };
     }
 
-    if (fieldName === 'inventoryItem_expirationDate') {
+    if (fieldName === cycleCountColumn.EXPIRATION_DATE) {
       return {
         customDateFormat: DateFormat.DD_MMM_YYYY,
       };
@@ -99,15 +94,15 @@ const useCountStepTable = ({
 
   // this function is required because there is a problem w getValue
   const getValueToDisplay = (id, value) => {
-    if (id === 'inventoryItem_expirationDate') {
+    if (id === cycleCountColumn.EXPIRATION_DATE) {
       return formatLocalizedDate(value, DateFormat.DD_MMM_YYYY);
     }
 
-    if (id === 'quantityCounted') {
+    if (id === cycleCountColumn.QUANTITY_COUNTED) {
       return value?.toString();
     }
 
-    if (id === 'binLocation' && showBinLocation) {
+    if (id === cycleCountColumn.BIN_LOCATION && showBinLocation) {
       return value?.name;
     }
 
@@ -188,19 +183,21 @@ const useCountStepTable = ({
   };
 
   const columns = [
-    columnHelper.accessor(
-      (row) => (row?.binLocation?.label ? row?.binLocation : row.binLocation?.name), {
-        id: cycleCountColumn.BIN_LOCATION,
-        header: () => (
-          <TableHeaderCell className="rt-th-count-step">
-            {translate('react.cycleCount.table.binLocation.label', 'Bin Location')}
-          </TableHeaderCell>
-        ),
-        meta: {
-          flexWidth: 100,
+    ...(showBinLocation ? [
+      columnHelper.accessor(
+        (row) => (row?.binLocation?.label ? row?.binLocation : row.binLocation?.name), {
+          id: cycleCountColumn.BIN_LOCATION,
+          header: () => (
+            <TableHeaderCell>
+              {translate('react.cycleCount.table.binLocation.label', 'Bin Location')}
+            </TableHeaderCell>
+          ),
+          meta: {
+            flexWidth: 100,
+          },
         },
-      },
-    ),
+      ),
+    ] : []),
     columnHelper.accessor(cycleCountColumn.LOT_NUMBER, {
       header: () => (
         <TableHeaderCell className="rt-th-count-step">
