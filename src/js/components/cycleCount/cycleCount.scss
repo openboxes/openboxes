@@ -1,3 +1,5 @@
+@import "src/css/colors";
+
 @mixin
 limit-lines($lines-number) {
   overflow: hidden;
@@ -95,8 +97,7 @@ limit-lines($lines-number) {
   }
 
   .static-cell-count-step {
-    padding: 10px;
-    padding-bottom: 18px;
+    padding: 15px;
   }
 
   .react-datepicker-wrapper {
@@ -111,9 +112,17 @@ limit-lines($lines-number) {
     padding: 0 !important;
   }
 
+  .rt-th-count-step {
+    text-align: left;
+    white-space: break-spaces;
+  }
+
   .rt-td-count-step {
-    padding: 0;
+    position: relative;
+    margin-left: 5px;
+    margin-bottom: 5px;
     align-items: center;
+    white-space: break-spaces;
   }
 
   .cell-inner-wrapper {
@@ -127,10 +136,20 @@ limit-lines($lines-number) {
 
 .resolve-step-table {
 
+  .rt-th-count-step {
+    text-align: left;
+    white-space: break-spaces;
+  }
   .rt-td-count-step {
+    position: relative;
     margin-left: 14px;
     display: flex;
     align-items: center;
+    white-space: break-spaces;
+  }
+
+  .input-wrapper-error-message {
+    text-wrap: balance;
   }
 }
 
@@ -155,4 +174,31 @@ limit-lines($lines-number) {
   align-items: center;
   gap: 8px;
   padding-top: 40px;
+}
+
+.bin-location-tooltip {
+  width: 75%;
+}
+
+.zone-label {
+  color: $black-alpha;
+  font-weight: bold;
+  font-size: 15px;
+}
+
+.tooltip-icon {
+  position: absolute;
+  left: 10px;
+  top: 55%;
+  transform: translateY(-50%);
+  font-size: 16px;
+  cursor: pointer;
+
+  &--error {
+    color: var(--color-red);
+  }
+
+  &--warning {
+    color: var(--blue-primary);
+  }
 }

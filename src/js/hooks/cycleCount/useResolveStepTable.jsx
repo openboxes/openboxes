@@ -6,7 +6,7 @@ import React, {
 
 import { createColumnHelper } from '@tanstack/react-table';
 import _ from 'lodash';
-import { RiChat3Line, RiDeleteBinLine } from 'react-icons/ri';
+import { RiChat3Line, RiDeleteBinLine, RiErrorWarningLine } from 'react-icons/ri';
 import { useDispatch, useSelector } from 'react-redux';
 import { Tooltip } from 'react-tippy';
 
@@ -22,13 +22,17 @@ import ArrowValueIndicatorVariant, {
 } from 'consts/arrowValueIndicatorVariant';
 import cycleCountColumn from 'consts/cycleCountColumn';
 import useTranslate from 'hooks/useTranslate';
+import groupBinLocationsByZone from 'utils/groupBinLocationsByZone';
 import { fetchBins } from 'utils/option-utils';
+import { checkBinLocationSupport } from 'utils/supportedActivitiesUtils';
+import CustomTooltip from 'wrappers/CustomTooltip';
 
 // Managing state for single table, mainly table configuration (from resolve step)
 const useResolveStepTable = ({
   cycleCountId,
   removeRow,
   validationErrors,
+  shouldHaveRootCause,
   tableData,
 }) => {
   const columnHelper = createColumnHelper();
@@ -49,11 +53,16 @@ const useResolveStepTable = ({
 
   const dispatch = useDispatch();
 
+  const showBinLocation = useMemo(() =>
+    checkBinLocationSupport(currentLocation.supportedActivities), [currentLocation?.id]);
+
   useEffect(() => {
-    (async () => {
-      const fetchedBins = await fetchBins(currentLocation?.id);
-      setBinLocations(fetchedBins);
-    })();
+    if (showBinLocation) {
+      (async () => {
+        const fetchedBins = await fetchBins(currentLocation?.id);
+        setBinLocations(fetchedBins);
+      })();
+    }
   }, [currentLocation?.id]);
 
   useEffect(() => {
@@ -90,13 +99,10 @@ const useResolveStepTable = ({
 
   // Get field props, for the binLocation dropdown we have to pass options
   const getFieldProps = (fieldName) => {
-    if (fieldName === cycleCountColumn.BIN_LOCATION) {
+    if (fieldName === cycleCountColumn.BIN_LOCATION && showBinLocation) {
       return {
         labelKey: 'name',
-        options: binLocations.map((binLocation) => ({
-          id: binLocation.id,
-          name: binLocation.name,
-        })),
+        options: groupBinLocationsByZone(binLocations),
       };
     }
 
@@ -108,6 +114,22 @@ const useResolveStepTable = ({
     }
 
     return {};
+  };
+
+  const getTooltipMessage = (error, warning, id) => {
+    if (error) {
+      return error;
+    }
+
+    // Warning is applicable only for root cause field
+    if (warning && id === cycleCountColumn.ROOT_CAUSE) {
+      return translate(
+        'react.cycleCount.rootCauseWarning.label',
+        'Specify result of investigation if applicable.',
+      );
+    }
+
+    return null;
   };
 
   const defaultColumn = {
@@ -124,7 +146,7 @@ const useResolveStepTable = ({
       // field are editable)
       if (isFieldEditable) {
         return (
-          <TableCell className="rt-td rt-td-count-step static-cell-count-step">
+          <TableCell className="rt-td rt-td-count-step static-cell-count-step d-flex align-items-center">
             {getValue()}
           </TableCell>
         );
@@ -133,9 +155,9 @@ const useResolveStepTable = ({
       const columnPath = id.replaceAll('_', '.');
       const initialValue = _.get(tableData, `[${index}].${columnPath}`);
       const errorMessage = validationErrors?.[cycleCountId]?.errors?.[index]?.[columnPath]?._errors;
-
       const [value, setValue] = useState(initialValue);
       const [error, setError] = useState(errorMessage);
+      const [warning, setWarning] = useState(error ? null : shouldHaveRootCause(original?.id));
       // If the value at the end of entering data is the same as it was initially,
       // we don't want to trigger rerender
       const isEdited = initialValue !== value;
@@ -144,8 +166,13 @@ const useResolveStepTable = ({
         if (!isEdited) {
           return;
         }
-        table.options.meta?.updateData(cycleCountId, original.id, id, value);
-        setError(null);
+        if (![
+          cycleCountColumn.BIN_LOCATION,
+          cycleCountColumn.ROOT_CAUSE,
+        ].includes(id)) {
+          table.options.meta?.updateData(cycleCountId, original.id, id, value);
+          setError(null);
+        }
         if (id === cycleCountColumn.QUANTITY_RECOUNTED) {
           events.emit('refreshRecountDifference');
         }
@@ -154,7 +181,16 @@ const useResolveStepTable = ({
       // on change function expects e.target.value for text fields,
       // in other cases it expects just the value
       const onChange = (e) => {
-        setValue(e?.target?.value ?? e);
+        const enteredValue = e?.target?.value ?? e;
+        if ([
+          cycleCountColumn.BIN_LOCATION,
+          cycleCountColumn.ROOT_CAUSE,
+        ].includes(id)) {
+          table.options.meta?.updateData(cycleCountId, original.id, id, enteredValue);
+          setError(null);
+          setWarning(null);
+        }
+        setValue(enteredValue);
       };
 
       // Table consists of text fields, one numerical field for quantity recounted,
@@ -162,6 +198,7 @@ const useResolveStepTable = ({
       const type = getFieldType(id);
       const Component = getFieldComponent(id);
       const fieldProps = getFieldProps(id);
+      const tooltipContent = getTooltipMessage(errorMessage, warning, id);
 
       return (
         <TableCell className="rt-td rt-td-count-step pb-0">
@@ -171,9 +208,18 @@ const useResolveStepTable = ({
             onChange={onChange}
             onBlur={onBlur}
             className="w-75 m-1"
-            errorMessage={error}
+            showErrorBorder={error}
+            hideErrorMessageWrapper
+            warning={warning}
             {...fieldProps}
           />
+          {(error || warning) && tooltipContent && (
+            <CustomTooltip
+              content={tooltipContent}
+              className={`tooltip-icon tooltip-icon--${error ? 'error' : 'warning'}`}
+              icon={RiErrorWarningLine}
+            />
+          )}
         </TableCell>
       );
     },
@@ -184,18 +230,19 @@ const useResolveStepTable = ({
       (row) => (row?.binLocation?.label ? row?.binLocation : row.binLocation?.name), {
         id: cycleCountColumn.BIN_LOCATION,
         header: useMemo(() => (
-          <TableHeaderCell>
+          <TableHeaderCell className="rt-th-count-step">
             {translate('react.cycleCount.table.binLocation.label', 'Bin Location')}
           </TableHeaderCell>
         ), []),
         meta: {
           flexWidth: 160,
+          hide: !showBinLocation,
         },
       },
     ),
     columnHelper.accessor(cycleCountColumn.LOT_NUMBER, {
       header: useMemo(() => (
-        <TableHeaderCell>
+        <TableHeaderCell className="rt-th-count-step">
           {translate('react.cycleCount.table.lotNumber.label', 'Serial / Lot Number')}
         </TableHeaderCell>
       ), []),
@@ -205,7 +252,7 @@ const useResolveStepTable = ({
     }),
     columnHelper.accessor(cycleCountColumn.EXPIRATION_DATE, {
       header: useMemo(() => (
-        <TableHeaderCell>
+        <TableHeaderCell className="rt-th-count-step">
           {translate('react.cycleCount.table.expirationDate.label', 'Expiration Date')}
         </TableHeaderCell>
       ), []),
@@ -218,14 +265,14 @@ const useResolveStepTable = ({
     }),
     columnHelper.accessor(cycleCountColumn.QUANTITY_COUNTED, {
       header: useMemo(() => (
-        <TableHeaderCell>
+        <TableHeaderCell className="rt-th-count-step">
           {translate('react.cycleCount.table.quantityCounted.label', 'Quantity Counted')}
         </TableHeaderCell>
       ), []),
       cell: useCallback(({ row: { original: { id } } }) => (
         // TODO: Remove check if id is equal to quantityCounted
         //  after quantityCounted will be added to the response
-        <TableCell className="rt-td rt-td-count-step static-cell-count-step">
+        <TableCell className="rt-td rt-td-count-step static-cell-count-step d-flex align-items-center">
           {id.includes('newRow')
             ? <ArrowValueIndicator variant={ArrowValueIndicatorVariant.EMPTY} />
             : Math.floor(Math.random() * 10).toString()}
@@ -235,7 +282,7 @@ const useResolveStepTable = ({
               delay="150"
               duration="250"
               hideDelay="50"
-                // TODO: Should be replaced with comment fetched from the API
+              // TODO: Should be replaced with comment fetched from the API
               html={<span className="p-2">Comment from count step</span>}
             >
               <RiChat3Line
@@ -253,7 +300,7 @@ const useResolveStepTable = ({
     }),
     columnHelper.accessor(cycleCountColumn.COUNT_DIFFERENCE, {
       header: useMemo(() => (
-        <TableHeaderCell>
+        <TableHeaderCell className="rt-th-count-step">
           {translate('react.cycleCount.table.countDifference.label', 'Count Difference')}
         </TableHeaderCell>
       ), []),
@@ -262,7 +309,7 @@ const useResolveStepTable = ({
         const value = Math.floor(Math.random() * 10) - quantityOnHand;
         const variant = getCycleCountDifferencesVariant(value, id);
         return (
-          <TableCell className="rt-td rt-td-count-step static-cell-count-step">
+          <TableCell className="rt-td rt-td-count-step static-cell-count-step d-flex align-items-center">
             <ArrowValueIndicator value={value} variant={variant} showAbsoluteValue />
           </TableCell>
         );
@@ -273,7 +320,7 @@ const useResolveStepTable = ({
     }),
     columnHelper.accessor(cycleCountColumn.QUANTITY_RECOUNTED, {
       header: useMemo(() => (
-        <TableHeaderCell>
+        <TableHeaderCell className="rt-th-count-step">
           {translate('react.cycleCount.table.quantityRecounted.label', 'Quantity Recounted')}
         </TableHeaderCell>
       ), []),
@@ -283,7 +330,7 @@ const useResolveStepTable = ({
     }),
     columnHelper.accessor(cycleCountColumn.RECOUNT_DIFFERENCE, {
       header: useMemo(() => (
-        <TableHeaderCell>
+        <TableHeaderCell className="rt-th-count-step">
           {translate('react.cycleCount.table.recountDifference.label', 'Recount Difference')}
         </TableHeaderCell>
       ), []),
@@ -296,7 +343,7 @@ const useResolveStepTable = ({
         });
 
         return (
-          <TableCell className="rt-td rt-td-count-step static-cell-count-step">
+          <TableCell className="rt-td rt-td-count-step static-cell-count-step d-flex align-items-center">
             <ArrowValueIndicator value={recountDifference} variant={variant} showAbsoluteValue />
           </TableCell>
         );
@@ -307,7 +354,7 @@ const useResolveStepTable = ({
     }),
     columnHelper.accessor(cycleCountColumn.ROOT_CAUSE, {
       header: useMemo(() => (
-        <TableHeaderCell>
+        <TableHeaderCell className="rt-th-count-step">
           {translate('react.cycleCount.table.rootCause.label', 'Root Cause')}
         </TableHeaderCell>
       ), []),
@@ -317,7 +364,7 @@ const useResolveStepTable = ({
     }),
     columnHelper.accessor(cycleCountColumn.COMMENT, {
       header: useMemo(() => (
-        <TableHeaderCell>
+        <TableHeaderCell className="rt-th-count-step">
           {translate('react.cycleCount.table.comment.label', 'Comment')}
         </TableHeaderCell>
       ), []),
@@ -341,7 +388,6 @@ const useResolveStepTable = ({
                 {translate('react.default.button.delete.label', 'Delete')}
               </span>
             )}
-            disabled={original.id}
           >
             {original.id.includes('newRow') && (
               <RiDeleteBinLine
@@ -353,7 +399,7 @@ const useResolveStepTable = ({
         </TableCell>
       ), []),
       meta: {
-        flexWidth: 30,
+        flexWidth: 50,
       },
     }),
   ];

@@ -9,6 +9,9 @@ const DataTableHeader = ({ headerGroups }) => (
       {headerGroups
         .map((headerGroup) => (
           headerGroup.headers.map((header) => {
+            if (header.column.columnDef?.meta?.hide) {
+              return null;
+            }
             const className = header.column.columnDef.meta?.getCellContext?.().className;
             const flexWidth = header.column.columnDef.meta?.flexWidth || 1;
             return (

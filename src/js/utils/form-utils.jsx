@@ -73,20 +73,20 @@ export const renderFormFields = ({
               <label htmlFor={otherAttr.id} className={`${!filterElement ? 'col-md-2 col-7 col-form-label col-form-label-xs text-center  text-md-right' : ''}`}>
                 {FieldLabel && <Translate id={FieldLabel} defaultMessage={defaultMessage} />}
                 {otherAttr.withTooltip
-                && (
-                <Tooltip
-                  interactive="true"
-                  arrow="true"
-                  trigger={trigger}
-                  hideOnClick="true"
-                  html={injectionData
-                    ? ReactHtmlParser(translate(tooltip, tooltip, injectionData))
-                    : translate(tooltip, tooltip)}
-                >
-                  &nbsp;
-                  <i className="fa fa-question-circle-o text-primary" aria-hidden="true" />
-                </Tooltip>
-                )}
+                  && (
+                    <Tooltip
+                      interactive="true"
+                      arrow="true"
+                      trigger={trigger}
+                      hideOnClick="true"
+                      html={injectionData
+                        ? ReactHtmlParser(translate(tooltip, tooltip, injectionData))
+                        : translate(tooltip, tooltip)}
+                    >
+                      &nbsp;
+                      <i className="fa fa-question-circle-o text-primary" aria-hidden="true" />
+                    </Tooltip>
+                  )}
               </label>
             )
             : <FieldLabel />

@@ -9,7 +9,7 @@ import DataTable from 'components/DataTable/v2/DataTable';
 import Button from 'components/form-elements/Button';
 import DateField from 'components/form-elements/v2/DateField';
 import SelectField from 'components/form-elements/v2/SelectField';
-import DateFormat from 'consts/dateFormat';
+import { DateFormat } from 'consts/timeFormat';
 import useCountStepTable from 'hooks/cycleCount/useCountStepTable';
 import useTranslate from 'hooks/useTranslate';
 import { formatDate } from 'utils/translation-utils';
@@ -27,23 +27,24 @@ const CountStepTable = ({
   assignCountedBy,
   validationErrors,
   setCountedDate,
-  isEditable,
+  isStepEditable,
   countedBy,
 }) => {
+  const translate = useTranslate();
+  const localize = useSelector((state) => state.localize);
+  const formatLocalizedDate = formatDate(localize);
   const {
     columns,
     defaultColumn,
-    recipients,
+    users,
   } = useCountStepTable({
     cycleCountId: id,
     tableData,
     validationErrors,
     removeRow,
-    isEditable,
+    isStepEditable,
+    formatLocalizedDate,
   });
-  const translate = useTranslate();
-  const localize = useSelector((state) => state.localize);
-  const formatLocalizedDate = formatDate(localize);
 
   return (
     <div className="list-page-list-section">
@@ -53,30 +54,43 @@ const CountStepTable = ({
         {product?.name}
       </p>
       <div className="pt-3 pl-4 d-flex align-items-center">
-        <div className={`d-flex align-items-center date-counted-container ${!isEditable && 'p-2'}`}>
+        <div className={`d-flex align-items-center date-counted-container ${!isStepEditable && 'p-2'}`}>
           <p className="count-step-label count-step-label-date-counted mr-2">
             {translate('react.cycleCount.dateCounted.label', 'Date counted')}
           </p>
           {' '}
-          {isEditable ? (
+          {isStepEditable ? (
             <DateField
               className="date-counted-date-picker date-field-input"
               onChange={setCountedDate}
               value={dateCounted}
+              customDateFormat={DateFormat.DD_MMM_YYYY}
             />
-          ) : <p>{formatLocalizedDate(dateCounted, DateFormat.COMMON)}</p>}
+          ) : <p>{formatLocalizedDate(dateCounted, DateFormat.DD_MMM_YYYY)}</p>}
         </div>
-        <div className={`d-flex count-step-select-counted-by ml-5 align-items-center ${!isEditable && 'p-2'}`}>
+        <div className={`d-flex count-step-select-counted-by ml-5 align-items-center ${!isStepEditable && 'p-2'}`}>
           <p className="count-step-label mr-2">
             {translate('react.cycleCount.countedBy.label', 'Counted by')}
           </p>
           {' '}
-          {isEditable ? (
-            <SelectField
-              placeholder="Select"
-              options={recipients}
-              onChange={assignCountedBy(product?.productCode)}
-            />
+          {isStepEditable ? (
+            <Tooltip
+              html={(
+                <span className="p-1">
+                  {countedBy[product.productCode]?.label || translate('react.cycleCount.countedBy.label', 'Counted By')}
+                </span>
+              )}
+              style={{ width: 'fit-content' }}
+              arrow
+            >
+              <SelectField
+                placeholder="Select"
+                options={users}
+                onChange={assignCountedBy(product?.productCode)}
+                className="min-width-250"
+                defaultValue={countedBy[product.productCode]}
+              />
+            </Tooltip>
           ) : <p>{countedBy[product.productCode]?.label}</p>}
         </div>
       </div>
@@ -91,7 +105,7 @@ const CountStepTable = ({
           disablePagination
         />
       </div>
-      {isEditable && (
+      {isStepEditable && (
         <div
           className="ml-4 mb-3 d-flex"
         >
@@ -137,7 +151,7 @@ CountStepTable.propTypes = {
   assignCountedBy: PropTypes.func.isRequired,
   validationErrors: PropTypes.shape({}).isRequired,
   setCountedDate: PropTypes.func.isRequired,
-  isEditable: PropTypes.bool.isRequired,
+  isStepEditable: PropTypes.bool.isRequired,
   countedBy: PropTypes.arrayOf(
     PropTypes.shape({}),
   ).isRequired,

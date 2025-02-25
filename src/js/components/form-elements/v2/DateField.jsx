@@ -26,11 +26,12 @@ const DateField = ({
   value,
   onChange,
   showTimeSelect,
+  hideErrorMessageWrapper,
+  customDateFormat,
   ...fieldProps
 }) => {
   const translate = useTranslate();
   const onClear = () => onChange(null);
-
   const onChangeHandler = (date) => {
     if (showTimeSelect) {
       onChange(date?.format(DateFormat.MMM_DD_YYYY_HH_MM_SS));
@@ -60,6 +61,13 @@ const DateField = ({
 
   const datePickerRef = useRef(null);
 
+  const getDateFormat = () => {
+    if (showTimeSelect) {
+      return customDateFormat ? `${customDateFormat} HH:mm:ss` : DateFormat.MMM_DD_YYYY_HH_MM_SS;
+    }
+    return customDateFormat || DateFormat.MMM_DD_YYYY;
+  };
+
   return (
     <InputWrapper
       title={title}
@@ -67,6 +75,7 @@ const DateField = ({
       tooltip={tooltip}
       errorMessage={errorMessage}
       button={button}
+      hideErrorMessageWrapper={hideErrorMessageWrapper}
     >
       <DatePicker
         {...fieldProps}
@@ -74,7 +83,7 @@ const DateField = ({
         customInput={<DateFieldInput onClear={onClear} />}
         className={`form-element-input ${errorMessage ? 'has-errors' : ''} ${className}`}
         dropdownMode="scroll"
-        dateFormat={showTimeSelect ? DateFormat.MMM_DD_YYYY_HH_MM_SS : DateFormat.MMM_DD_YYYY}
+        dateFormat={getDateFormat()}
         timeFormat={TimeFormat.HH_MM}
         disabled={disabled}
         timeIntervals={15}
@@ -140,6 +149,8 @@ DateField.propTypes = {
   value: PropTypes.string,
   onChange: PropTypes.func,
   showTimeSelect: PropTypes.bool,
+  hideErrorMessageWrapper: PropTypes.bool,
+  customDateFormat: PropTypes.string,
 };
 
 DateField.defaultProps = {
@@ -154,4 +165,6 @@ DateField.defaultProps = {
   value: null,
   onChange: () => {},
   showTimeSelect: false,
+  hideErrorMessageWrapper: false,
+  customDateFormat: null,
 };

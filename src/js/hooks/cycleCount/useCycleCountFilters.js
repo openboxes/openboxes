@@ -22,6 +22,8 @@ const useCycleCountFilters = () => {
   const [dateLastCount] = useState(null);
   const [negativeQuantity] = useState(false);
   const [filtersInitialized, setFiltersInitialized] = useState(false);
+  // This boolean ensures that we avoid issues with outdated bin location data
+  const [isLoading, setIsLoading] = useState(false);
 
   const [selectOptions, setSelectOptions] = useState({
     categories: [],
@@ -71,49 +73,54 @@ const useCycleCountFilters = () => {
   };
 
   const initializeDefaultFilterValues = async () => {
-    const queryProps = queryString.parse(history.location.search);
+    setIsLoading(true);
 
-    const defaultValues = Object.keys(cycleCountFilterFields)
-      .reduce((acc, key) => ({ ...acc, [key]: '' }), { tab: queryProps.tab });
+    try {
+      const queryProps = queryString.parse(history.location.search);
+      const defaultValues = Object.keys(cycleCountFilterFields)
+        .reduce((acc, key) => ({ ...acc, [key]: '' }), { tab: queryProps.tab });
 
-    if (queryProps.negativeQuantity) {
-      defaultValues.negativeQuantity = queryProps.negativeQuantity;
+      if (queryProps.negativeQuantity) {
+        defaultValues.negativeQuantity = queryProps.negativeQuantity;
+      }
+
+      if (queryProps.dateLastCount) {
+        defaultValues.dateLastCount = queryProps.dateLastCount;
+      }
+
+      const [
+        categoryList,
+        tagList,
+        catalogList,
+        classificationList,
+        binList,
+      ] = await Promise.all([
+        fetchProductsCategories(),
+        fetchProductsTags({ hideNumbers: true }),
+        fetchProductsCatalogs({ hideNumbers: true }),
+        fetchProductClassifications(currentLocation?.id),
+        fetchBins(currentLocation?.id),
+      ]);
+
+      setSelectOptions({
+        categories: categoryList,
+        catalogs: catalogList,
+        tags: tagList,
+        internalLocations: binList,
+        abcClasses: classificationList,
+      });
+
+      defaultValues.catalogs = setDefaultValue(queryProps.catalogs, catalogList);
+      defaultValues.tags = setDefaultValue(queryProps.tags, tagList);
+      defaultValues.categories = setDefaultValue(queryProps.categories, categoryList);
+      defaultValues.internalLocations = setDefaultValue(queryProps.internalLocations, binList);
+      defaultValues.abcClasses = setDefaultValue(queryProps.abcClasses, classificationList);
+
+      setDefaultFilterValues(defaultValues);
+      setFiltersInitialized(true);
+    } finally {
+      setIsLoading(false);
     }
-
-    if (queryProps.dateLastCount) {
-      defaultValues.dateLastCount = queryProps.dateLastCount;
-    }
-
-    const [
-      categoryList,
-      tagList,
-      catalogList,
-      classificationList,
-      binList,
-    ] = await Promise.all([
-      fetchProductsCategories(),
-      fetchProductsTags({ hideNumbers: true }),
-      fetchProductsCatalogs({ hideNumbers: true }),
-      fetchProductClassifications(currentLocation?.id),
-      fetchBins(currentLocation?.id),
-    ]);
-
-    setSelectOptions({
-      categories: categoryList,
-      catalogs: catalogList,
-      tags: tagList,
-      internalLocations: binList,
-      abcClasses: classificationList,
-    });
-
-    defaultValues.catalogs = setDefaultValue(queryProps.catalogs, catalogList);
-    defaultValues.tags = setDefaultValue(queryProps.tags, tagList);
-    defaultValues.categories = setDefaultValue(queryProps.categories, categoryList);
-    defaultValues.internalLocations = setDefaultValue(queryProps.internalLocations, binList);
-    defaultValues.abcClasses = setDefaultValue(queryProps.abcClasses, classificationList);
-
-    setDefaultFilterValues(defaultValues);
-    setFiltersInitialized(true);
   };
 
   useCommonFiltersCleaner({
@@ -150,6 +157,7 @@ const useCycleCountFilters = () => {
     filterParams,
     dateLastCount,
     negativeQuantity,
+    isLoading,
     ...selectOptions,
   };
 };

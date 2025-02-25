@@ -25,6 +25,8 @@ const SelectField = ({
   productSelect,
   hasErrors,
   className,
+  warning,
+  hideErrorMessageWrapper,
   ...fieldProps
 }) => {
   const [value, setValue] = useState(defaultValue);
@@ -50,10 +52,11 @@ const SelectField = ({
       button={{ ...button, onClick: () => button.onClick(fieldProps?.value?.id ?? value) }}
       tooltip={tooltip}
       required={required}
+      hideErrorMessageWrapper={hideErrorMessageWrapper}
       className="select-wrapper-container"
     >
       <SelectComponent
-        className={`form-element-select ${className} ${errorMessage || hasErrors ? 'has-errors' : ''}`}
+        className={`form-element-select ${className} ${errorMessage || hasErrors ? 'has-errors' : ''} ${warning ? 'has-warning' : ''}`}
         disabled={disabled}
         placeholder={placeholder}
         value={value}
@@ -109,6 +112,8 @@ SelectField.propTypes = {
   // indicator whether field should be marked as invalid
   hasErrors: PropTypes.bool,
   className: PropTypes.string,
+  hideErrorMessageWrapper: PropTypes.bool,
+  warning: PropTypes.bool,
 };
 
 SelectField.defaultProps = {
@@ -128,4 +133,6 @@ SelectField.defaultProps = {
   productSelect: false,
   hasErrors: false,
   className: '',
+  hideErrorMessageWrapper: false,
+  warning: false,
 };

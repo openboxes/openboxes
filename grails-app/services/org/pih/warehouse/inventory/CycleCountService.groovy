@@ -355,7 +355,7 @@ class CycleCountService {
 
     private void updateCycleCountItemForSubmit(CycleCountItem cycleCountItem, boolean refreshQuantityOnHand, boolean failOnOutdatedQuantity) {
         Integer currentQuantityOnHand =
-            productAvailabilityService.getQuantityOnHandInBinLocation(cycleCountItem.inventoryItem, cycleCountItem.location)
+                productAvailabilityService.getQuantityOnHandInBinLocation(cycleCountItem.inventoryItem, cycleCountItem.location)
         if (failOnOutdatedQuantity && cycleCountItem.quantityOnHand != currentQuantityOnHand) {
             throw new IllegalArgumentException("Quantity on hand for a cycle count item is no longer up to date")
         }

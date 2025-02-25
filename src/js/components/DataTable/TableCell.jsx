@@ -17,6 +17,8 @@ const TableCell = ({
   tdProps,
   style,
   showError,
+  tooltipForm,
+  tooltipClassname,
 }) => {
   let cellValue = children || value || defaultValue;
   const errorMessage = tdProps?.rest?.error;
@@ -41,7 +43,7 @@ const TableCell = ({
 
   if (tooltip) {
     cellValue = (
-      <div className="d-flex">
+      <div className={`d-flex ${tooltipClassname}`}>
         <Tooltip
           arrow="true"
           delay="150"
@@ -49,12 +51,14 @@ const TableCell = ({
           hideDelay="50"
           className="text-overflow-ellipsis"
           html={tooltipLabel || value}
+          style={tooltipForm && { width: '100%' }}
         >
           {cellValue}
         </Tooltip>
       </div>
     );
   }
+
   const cellErrorClasses = showError && errorMessage ? 'invalid-cell' : '';
   const elementClasses = `${className} text-overflow-ellipsis ${cellErrorClasses}`;
 
@@ -119,6 +123,8 @@ TableCell.propTypes = {
     PropTypes.string,
     PropTypes.number,
   ]),
+  tooltipForm: PropTypes.bool,
+  tooltipClassname: PropTypes.string,
 };
 
 export default TableCell;
