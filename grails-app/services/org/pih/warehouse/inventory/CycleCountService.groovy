@@ -354,7 +354,7 @@ class CycleCountService {
 
     void updateCycleCountItemForSubmit(CycleCountItem cycleCountItem, boolean refreshQuantityOnHand, boolean failOnOutdatedQuantity) {
         Integer currentQuantityOnHand =
-            productAvailabilityService.getQuantityOnHandInBinLocation(cycleCountItem.inventoryItem, cycleCountItem.location)
+                productAvailabilityService.getQuantityOnHandInBinLocation(cycleCountItem.inventoryItem, cycleCountItem.location)
         if (failOnOutdatedQuantity && cycleCountItem.quantityOnHand != currentQuantityOnHand) {
             throw new IllegalArgumentException("Quantity on hand for a cycle count item is no longer up to date")
         }
@@ -373,7 +373,7 @@ class CycleCountService {
 
     void createCycleCountTransaction(CycleCount cycleCount) {
         TransactionType cycleCountProductInventoryTransactionType =
-            TransactionType.read(Constants.CYCLE_COUNT_PRODUCT_INVENTORY_TRANSACTION_TYPE_ID)
+                TransactionType.read(Constants.CYCLE_COUNT_PRODUCT_INVENTORY_TRANSACTION_TYPE_ID)
         Transaction transaction = new Transaction(
                 source: cycleCount.facility,
                 inventory: cycleCount.facility.inventory,
