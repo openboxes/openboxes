@@ -332,12 +332,20 @@ class CycleCountService {
     }
 
     List<CycleCountDto> getCycleCounts(List<String> ids) {
-        List<CycleCount> cycleCounts = CycleCount.createCriteria().list {
+        List<CycleCount> cycleCounts = CycleCount.createCriteria().list() {
             if (ids) {
                 'in'("id", ids)
             }
         } as List<CycleCount>
-        return cycleCounts.collect { CycleCountDto.toDto(it) }
+
+        return cycleCounts.collect { cycleCount ->
+            def dto = CycleCountDto.toDto(cycleCount)
+            dto.cycleCountItems = dto.cycleCountItems.sort { a, b ->
+                def comparison = a.inventoryItem?.expirationDate <=> b.inventoryItem?.expirationDate
+                comparison == 0 ? a.inventoryItem?.lotNumber <=> b.inventoryItem?.lotNumber : comparison
+            }
+            return dto
+        }
     }
 
     CycleCountDto submitCount(CycleCountSubmitCountCommand command) {
