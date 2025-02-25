@@ -4,6 +4,7 @@ import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 
 import org.pih.warehouse.api.AvailableItem
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
 
@@ -37,7 +38,7 @@ class ProductInventoryTransactionService {
             Object source,
             Date transactionDate=new Date()) {
 
-        TransactionType transactionType = TransactionType.read(sourceType.transactionTypeId)
+        TransactionType transactionType = TransactionType.read(Constants.PRODUCT_INVENTORY_TRANSACTION_TYPE_ID)
 
         Transaction transaction = new Transaction(
                 source: facility,

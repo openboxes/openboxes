@@ -6,6 +6,7 @@ import spock.lang.Specification
 import spock.lang.Unroll
 
 import org.pih.warehouse.api.AvailableItem
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.CycleCount
 import org.pih.warehouse.inventory.Inventory
@@ -31,6 +32,9 @@ class ProductInventoryTransactionServiceSpec extends Specification implements Da
     @Shared
     TransactionIdentifierService transactionIdentifierServiceStub
 
+    @Shared
+    TransactionType productInventoryTransactionType
+
     void setupSpec() {
         mockDomains(Transaction, TransactionEntry, TransactionType)
     }
@@ -43,6 +47,11 @@ class ProductInventoryTransactionServiceSpec extends Specification implements Da
 
         transactionIdentifierServiceStub = Stub(TransactionIdentifierService)
         productInventoryTransactionService.transactionIdentifierService = transactionIdentifierServiceStub
+
+        // Set up the transaction types
+        productInventoryTransactionType = new TransactionType()
+        productInventoryTransactionType.id = Constants.PRODUCT_INVENTORY_TRANSACTION_TYPE_ID
+        productInventoryTransactionType.save(validate: false)
     }
 
     void 'createTransaction should succeed when some items are available'() {
@@ -52,12 +61,7 @@ class ProductInventoryTransactionServiceSpec extends Specification implements Da
         CycleCount cycleCount = new CycleCount()
         Date date = new Date()
 
-        and: 'add the product inventory transaction type to the db because it is referenced in code'
-        TransactionType transactionType = new TransactionType()
-        transactionType.id = ProductInventorySnapshotSource.CYCLE_COUNT.transactionTypeId
-        transactionType.save(validate: false)
-
-        and: 'a mocked identifier'
+        and: 'a mocked transaction number'
         transactionIdentifierServiceStub.generate(_ as Transaction) >> "123ABC"
 
         and: 'mocked available items'
@@ -81,7 +85,7 @@ class ProductInventoryTransactionServiceSpec extends Specification implements Da
                 facility, product, ProductInventorySnapshotSource.CYCLE_COUNT, cycleCount, date)
 
         then:
-        assert transaction.transactionType == transactionType
+        assert transaction.transactionType == productInventoryTransactionType
         assert transaction.transactionDate == date
         assert transaction.source == facility
         assert transaction.transactionNumber == "123ABC"

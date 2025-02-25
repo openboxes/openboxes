@@ -60,11 +60,11 @@ class CycleCountTransactionServiceSpec extends Specification implements DataTest
 
         // Set up the transaction types
         productInventoryTransactionType = new TransactionType()
-        productInventoryTransactionType.id = Constants.CYCLE_COUNT_PRODUCT_INVENTORY_TRANSACTION_TYPE_ID
+        productInventoryTransactionType.id = Constants.PRODUCT_INVENTORY_TRANSACTION_TYPE_ID
         productInventoryTransactionType.save(validate: false)
 
         adjustmentTransactionType = new TransactionType()
-        adjustmentTransactionType.id = Constants.CYCLE_COUNT_ADJUSTMENT_TRANSACTION_TYPE_ID
+        adjustmentTransactionType.id = Constants.ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID
         adjustmentTransactionType.save(validate: false)
     }
 
@@ -184,12 +184,7 @@ class CycleCountTransactionServiceSpec extends Specification implements DataTest
                 ]
         )
 
-        and: 'add the adjustment transaction type to the db because it is referenced in code'
-        TransactionType adjustmentTransactionType = new TransactionType()
-        adjustmentTransactionType.id = Constants.CYCLE_COUNT_ADJUSTMENT_TRANSACTION_TYPE_ID
-        adjustmentTransactionType.save(validate: false)
-
-        and: 'a mocked identifier'
+        and: 'a mocked transaction number'
         transactionIdentifierServiceStub.generate(_ as Transaction) >> "123ABC"
 
         and: 'a mocked product inventory transaction'
@@ -203,8 +198,10 @@ class CycleCountTransactionServiceSpec extends Specification implements DataTest
         Transaction productInventoryTransaction = transactions.find{ it.transactionType != adjustmentTransactionType }
         assert productInventoryTransaction != null
 
+        // The adjustment transaction isn't mocked so make sure to assert on its fields
         Transaction adjustmentTransaction = transactions.find{ it.transactionType == adjustmentTransactionType }
         assert adjustmentTransaction != null
+        assert adjustmentTransaction.transactionNumber == "123ABC"
         assert adjustmentTransaction.source == facility
         assert adjustmentTransaction.inventory == facility.inventory
         assert adjustmentTransaction.cycleCount == cycleCount
