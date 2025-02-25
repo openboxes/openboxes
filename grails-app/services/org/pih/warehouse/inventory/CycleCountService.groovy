@@ -404,20 +404,21 @@ class CycleCountService {
     }
 
     CycleCountItemDto updateCycleCountItem(CycleCountUpdateItemCommand command) {
-        command.cycleCountItem.quantityCounted = command.quantityCounted
-        command.cycleCountItem.comment = command.comment
-        command.cycleCountItem.countIndex = command.recount ? 1 : 0
-        command.cycleCountItem.status = CycleCountItemStatus.COUNTING
+        CycleCountItem cycleCountItem = command.cycleCountItem
+        cycleCountItem.properties = command.properties
+        cycleCountItem.countIndex = command.recount ? 1 : 0
+        cycleCountItem.status = command.recount ? CycleCountItemStatus.INVESTIGATING : CycleCountItemStatus.COUNTING
+        cycleCountItem.dateCounted = new Date()
 
-        return command.cycleCountItem.toDto()
+        return cycleCountItem.toDto()
     }
 
-    CycleCountItemDto createCustomCycleCountItem(CycleCountCustomItemCommand command) {
+    CycleCountItemDto createCustomCycleCountItem(CycleCountItemCommand command) {
         CycleCountItem cycleCountItem = new CycleCountItem(
                 facility: command.facility,
-                status: CycleCountItemStatus.COUNTING,
+                status: command.recount ? CycleCountItemStatus.INVESTIGATING : CycleCountItemStatus.COUNTING,
                 countIndex: command.recount ? 1 : 0,
-                quantityOnHand: command.quantityCounted, // FIXME: should we assume that qoh = quantityCounted for a custom row?
+                quantityOnHand: command.quantityCounted,
                 quantityCounted: command.quantityCounted,
                 cycleCount: command.cycleCount,
                 location: command.binLocation,
@@ -439,7 +440,7 @@ class CycleCountService {
 
     void deleteCycleCountItem(String cycleCountItemId) {
         CycleCountItem cycleCountItem = CycleCountItem.get(cycleCountItemId)
-        if (!cycleCountItem.custom) {
+        if (!cycleCountItem?.custom) {
             throw new IllegalArgumentException("Only custom cycle count items can be deleted")
         }
         cycleCountItem.delete()

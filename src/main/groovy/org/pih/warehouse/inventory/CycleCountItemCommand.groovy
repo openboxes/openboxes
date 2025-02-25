@@ -6,14 +6,13 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
 import org.springframework.web.context.request.RequestContextHolder
 
-class CycleCountCustomItemCommand implements Validateable {
+class CycleCountItemCommand implements Validateable {
 
     boolean recount
 
     @BindUsing({ obj, source ->
         Product product = Product.read(source['inventoryItem']['product'])
-        Date expirationDate = new Date(source['inventoryItem']['expirationDate'])
-        return InventoryItem.findByProductAndLotNumberAndExpirationDate(product, source['inventoryItem']['lotNumber'], expirationDate)
+        return InventoryItem.findByProductAndLotNumber(product, source['inventoryItem']['lotNumber'])
     })
     InventoryItem inventoryItem
 
@@ -35,7 +34,7 @@ class CycleCountCustomItemCommand implements Validateable {
     }
 
     static constraints = {
-        quantityCounted(nullable: true) // FIXME: should we allow for empty quantityCounted?
+        quantityCounted(nullable: true)
         comment(nullable: true, blank: true)
     }
 }

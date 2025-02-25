@@ -6,8 +6,8 @@ import org.apache.commons.csv.CSVPrinter
 import org.pih.warehouse.core.dtos.BatchCommandUtils
 import org.pih.warehouse.inventory.CycleCountCandidate
 import org.pih.warehouse.inventory.CycleCountCandidateFilterCommand
-import org.pih.warehouse.inventory.CycleCountCustomItemCommand
 import org.pih.warehouse.inventory.CycleCountDto
+import org.pih.warehouse.inventory.CycleCountItemCommand
 import org.pih.warehouse.inventory.CycleCountItemDto
 import org.pih.warehouse.inventory.CycleCountRequest
 import org.pih.warehouse.inventory.CycleCountRequestBatchCommand
@@ -95,7 +95,7 @@ class CycleCountApiController {
         render(status: 204)
     }
 
-    def createCustomCycleCountItem(CycleCountCustomItemCommand command) {
+    def createCustomCycleCountItem(CycleCountItemCommand command) {
         if (command.hasErrors()) {
             throw new ValidationException("Invalid cycle count item", command.errors)
         }
