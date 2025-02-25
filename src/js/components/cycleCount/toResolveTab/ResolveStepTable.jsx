@@ -27,6 +27,8 @@ const ResolveStepTable = ({
   removeRow,
   assignRecountedBy,
   setRecountedDate,
+  validationErrors,
+  shouldHaveRootCause,
 }) => {
   const {
     columns,
@@ -34,8 +36,10 @@ const ResolveStepTable = ({
     users,
   } = useResolveStepTable({
     cycleCountId: id,
+    validationErrors,
     tableData,
     removeRow,
+    shouldHaveRootCause,
   });
 
   const translate = useTranslate();
@@ -153,4 +157,5 @@ ResolveStepTable.propTypes = {
   assignRecountedBy: PropTypes.func.isRequired,
   validationErrors: PropTypes.shape({}).isRequired,
   setRecountedDate: PropTypes.func.isRequired,
+  shouldHaveRootCause: PropTypes.func.isRequired,
 };

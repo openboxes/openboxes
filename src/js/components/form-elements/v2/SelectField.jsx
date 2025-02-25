@@ -25,6 +25,7 @@ const SelectField = ({
   productSelect,
   hasErrors,
   className,
+  warning,
   hideErrorMessageWrapper,
   ...fieldProps
 }) => {
@@ -55,7 +56,7 @@ const SelectField = ({
       className="select-wrapper-container"
     >
       <SelectComponent
-        className={`form-element-select ${className} ${errorMessage || hasErrors ? 'has-errors' : ''}`}
+        className={`form-element-select ${className} ${errorMessage || hasErrors ? 'has-errors' : ''} ${warning ? 'has-warning' : ''}`}
         disabled={disabled}
         placeholder={placeholder}
         value={value}
@@ -112,6 +113,7 @@ SelectField.propTypes = {
   hasErrors: PropTypes.bool,
   className: PropTypes.string,
   hideErrorMessageWrapper: PropTypes.bool,
+  warning: PropTypes.bool,
 };
 
 SelectField.defaultProps = {
@@ -132,4 +134,5 @@ SelectField.defaultProps = {
   hasErrors: false,
   className: '',
   hideErrorMessageWrapper: false,
+  warning: false,
 };

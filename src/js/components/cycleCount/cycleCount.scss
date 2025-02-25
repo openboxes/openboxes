@@ -147,6 +147,10 @@ limit-lines($lines-number) {
     align-items: center;
     white-space: break-spaces;
   }
+
+  .input-wrapper-error-message {
+    text-wrap: balance;
+  }
 }
 
 .count-step-label-date-counted {
@@ -182,12 +186,19 @@ limit-lines($lines-number) {
   font-size: 15px;
 }
 
-.error-icon {
+.tooltip-icon {
   position: absolute;
   left: 10px;
   top: 55%;
   transform: translateY(-50%);
-  color: var(--color-red);
   font-size: 16px;
   cursor: pointer;
+
+  &--error {
+    color: var(--color-red);
+  }
+
+  &--warning {
+    color: var(--blue-primary);
+  }
 }

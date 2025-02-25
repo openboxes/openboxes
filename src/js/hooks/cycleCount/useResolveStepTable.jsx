@@ -30,6 +30,7 @@ const useResolveStepTable = ({
   cycleCountId,
   removeRow,
   validationErrors,
+  shouldHaveRootCause,
   tableData,
 }) => {
   const columnHelper = createColumnHelper();
@@ -111,6 +112,22 @@ const useResolveStepTable = ({
     return {};
   };
 
+  const getTooltipMessage = (error, warning, id) => {
+    if (error) {
+      return error;
+    }
+
+    // Warning is applicable only for root cause field
+    if (warning && id === cycleCountColumn.ROOT_CAUSE) {
+      return translate(
+        'react.cycleCount.rootCauseWarning.label',
+        'Specify result of investigation if applicable.',
+      );
+    }
+
+    return null;
+  };
+
   const defaultColumn = {
     cell: ({
       getValue, row: { original, index }, column: { id }, table,
@@ -134,9 +151,9 @@ const useResolveStepTable = ({
       const columnPath = id.replaceAll('_', '.');
       const initialValue = _.get(tableData, `[${index}].${columnPath}`);
       const errorMessage = validationErrors?.[cycleCountId]?.errors?.[index]?.[columnPath]?._errors;
-
       const [value, setValue] = useState(initialValue);
       const [error, setError] = useState(errorMessage);
+      const [warning, setWarning] = useState(error ? null : shouldHaveRootCause(original?.id));
       // If the value at the end of entering data is the same as it was initially,
       // we don't want to trigger rerender
       const isEdited = initialValue !== value;
@@ -145,8 +162,13 @@ const useResolveStepTable = ({
         if (!isEdited) {
           return;
         }
-        table.options.meta?.updateData(cycleCountId, original.id, id, value);
-        setError(null);
+        if (![
+          cycleCountColumn.BIN_LOCATION,
+          cycleCountColumn.ROOT_CAUSE,
+        ].includes(id)) {
+          table.options.meta?.updateData(cycleCountId, original.id, id, value);
+          setError(null);
+        }
         if (id === cycleCountColumn.QUANTITY_RECOUNTED) {
           events.emit('refreshRecountDifference');
         }
@@ -155,7 +177,16 @@ const useResolveStepTable = ({
       // on change function expects e.target.value for text fields,
       // in other cases it expects just the value
       const onChange = (e) => {
-        setValue(e?.target?.value ?? e);
+        const enteredValue = e?.target?.value ?? e;
+        if ([
+          cycleCountColumn.BIN_LOCATION,
+          cycleCountColumn.ROOT_CAUSE,
+        ].includes(id)) {
+          table.options.meta?.updateData(cycleCountId, original.id, id, enteredValue);
+          setError(null);
+          setWarning(null);
+        }
+        setValue(enteredValue);
       };
 
       // Table consists of text fields, one numerical field for quantity recounted,
@@ -163,6 +194,7 @@ const useResolveStepTable = ({
       const type = getFieldType(id);
       const Component = getFieldComponent(id);
       const fieldProps = getFieldProps(id);
+      const tooltipContent = getTooltipMessage(errorMessage, warning, id);
 
       return (
         <TableCell className="rt-td rt-td-count-step pb-0">
@@ -174,12 +206,13 @@ const useResolveStepTable = ({
             className="w-75 m-1"
             showErrorBorder={error}
             hideErrorMessageWrapper
+            warning={warning}
             {...fieldProps}
           />
-          {error && (
+          {(error || warning) && tooltipContent && (
             <CustomTooltip
-              content={error}
-              className="error-icon"
+              content={tooltipContent}
+              className={`tooltip-icon tooltip-icon--${error ? 'error' : 'warning'}`}
               icon={RiErrorWarningLine}
             />
           )}
@@ -350,7 +383,6 @@ const useResolveStepTable = ({
                 {translate('react.default.button.delete.label', 'Delete')}
               </span>
             )}
-            disabled={original.id}
           >
             {original.id.includes('newRow') && (
               <RiDeleteBinLine
