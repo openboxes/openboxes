@@ -14,6 +14,8 @@ import org.pih.warehouse.inventory.CycleCountStartBatchCommand
 import org.pih.warehouse.inventory.CycleCountStartRecountBatchCommand
 import org.pih.warehouse.inventory.CycleCountSubmitCountCommand
 
+import org.pih.warehouse.inventory.CycleCountSubmitRecountCommand
+
 class CycleCountApiController {
 
     CycleCountService cycleCountService
@@ -60,6 +62,15 @@ class CycleCountApiController {
     def submitCount(CycleCountSubmitCountCommand command) {
         if (command.hasErrors()) {
             throw new ValidationException("Invalid submit count object", command.errors)
+        }
+        CycleCountDto cycleCount = cycleCountService.submitCount(command)
+
+        render([data: cycleCount] as JSON)
+    }
+
+    def submitRecount(CycleCountSubmitRecountCommand command) {
+        if (command.hasErrors()) {
+            throw new ValidationException("Invalid submit recount object", command.errors)
         }
         CycleCountDto cycleCount = cycleCountService.submitCount(command)
 

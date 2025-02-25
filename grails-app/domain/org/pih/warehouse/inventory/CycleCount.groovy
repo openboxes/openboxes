@@ -94,4 +94,19 @@ class CycleCount {
         }
         return null
     }
+
+    /**
+     * @return The largest count index of all the cycle count items. Helps determine what count we're on.
+     */
+    Integer getMaxCountIndex() {
+        return cycleCountItems.max{ it.countIndex }?.countIndex
+    }
+
+    /**
+     * @return All CycleCountItems with the highest countIndex, representing the newest (re)count.
+     */
+    Set<CycleCountItem> getItemsOfMostRecentCount() {
+        Integer countIndex = maxCountIndex
+        return cycleCountItems.findAll{ it.countIndex == countIndex}
+    }
 }
