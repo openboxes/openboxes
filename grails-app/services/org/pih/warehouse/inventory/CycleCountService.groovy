@@ -332,7 +332,7 @@ class CycleCountService {
     }
 
     List<CycleCountDto> getCycleCounts(List<String> ids) {
-        List<CycleCount> cycleCounts = CycleCount.createCriteria().list() {
+        List<CycleCount> cycleCounts = CycleCount.createCriteria().list {
             if (ids) {
                 'in'("id", ids)
             }
