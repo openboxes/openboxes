@@ -187,7 +187,7 @@ const useCountStepTable = ({
       (row) => (row?.binLocation?.label ? row?.binLocation : row.binLocation?.name), {
         id: cycleCountColumn.BIN_LOCATION,
         header: () => (
-          <TableHeaderCell>
+          <TableHeaderCell className="rt-th-count-step">
             {translate('react.cycleCount.table.binLocation.label', 'Bin Location')}
           </TableHeaderCell>
         ),

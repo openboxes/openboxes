@@ -196,11 +196,11 @@ const useResolveStepTable = ({
     columnHelper.accessor(
       (row) => (row?.binLocation?.label ? row?.binLocation : row.binLocation?.name), {
         id: cycleCountColumn.BIN_LOCATION,
-        header: () => (
-          <TableHeaderCell>
+        header: useMemo(() => (
+          <TableHeaderCell className="rt-th-count-step">
             {translate('react.cycleCount.table.binLocation.label', 'Bin Location')}
           </TableHeaderCell>
-        ),
+        ), []),
         meta: {
           flexWidth: 160,
           hide: !showBinLocation,
