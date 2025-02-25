@@ -202,7 +202,7 @@ const useResolveStepTable = ({
           </TableHeaderCell>
         ),
         meta: {
-          flexWidth: 100,
+          flexWidth: 160,
           hide: !showBinLocation,
         },
       },
