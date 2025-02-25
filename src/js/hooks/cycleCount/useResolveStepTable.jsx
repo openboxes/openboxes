@@ -22,7 +22,9 @@ import ArrowValueIndicatorVariant, {
 } from 'consts/arrowValueIndicatorVariant';
 import cycleCountColumn from 'consts/cycleCountColumn';
 import useTranslate from 'hooks/useTranslate';
+import groupBinLocationsByZone from 'utils/groupBinLocationsByZone';
 import { fetchBins } from 'utils/option-utils';
+import { checkBinLocationSupport } from 'utils/supportedActivitiesUtils';
 import CustomTooltip from 'wrappers/CustomTooltip';
 
 // Managing state for single table, mainly table configuration (from resolve step)
@@ -51,11 +53,16 @@ const useResolveStepTable = ({
 
   const dispatch = useDispatch();
 
+  const showBinLocation = useMemo(() =>
+    checkBinLocationSupport(currentLocation.supportedActivities), [currentLocation?.id]);
+
   useEffect(() => {
-    (async () => {
-      const fetchedBins = await fetchBins(currentLocation?.id);
-      setBinLocations(fetchedBins);
-    })();
+    if (showBinLocation) {
+      (async () => {
+        const fetchedBins = await fetchBins(currentLocation?.id);
+        setBinLocations(fetchedBins);
+      })();
+    }
   }, [currentLocation?.id]);
 
   useEffect(() => {
@@ -92,13 +99,10 @@ const useResolveStepTable = ({
 
   // Get field props, for the binLocation dropdown we have to pass options
   const getFieldProps = (fieldName) => {
-    if (fieldName === cycleCountColumn.BIN_LOCATION) {
+    if (fieldName === cycleCountColumn.BIN_LOCATION && showBinLocation) {
       return {
         labelKey: 'name',
-        options: binLocations.map((binLocation) => ({
-          id: binLocation.id,
-          name: binLocation.name,
-        })),
+        options: groupBinLocationsByZone(binLocations),
       };
     }
 
@@ -232,6 +236,7 @@ const useResolveStepTable = ({
         ), []),
         meta: {
           flexWidth: 160,
+          hide: !showBinLocation,
         },
       },
     ),

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import { createColumnHelper } from '@tanstack/react-table';
 import _ from 'lodash';
@@ -16,6 +16,7 @@ import { DateFormat } from 'consts/timeFormat';
 import useTranslate from 'hooks/useTranslate';
 import groupBinLocationsByZone from 'utils/groupBinLocationsByZone';
 import { fetchBins } from 'utils/option-utils';
+import { checkBinLocationSupport } from 'utils/supportedActivitiesUtils';
 import CustomTooltip from 'wrappers/CustomTooltip';
 
 // Managing state for single table, mainly table configuration (from count step)
@@ -38,11 +39,16 @@ const useCountStepTable = ({
     currentLocation: state.session.currentLocation,
   }));
 
+  const showBinLocation = useMemo(() =>
+    checkBinLocationSupport(currentLocation.supportedActivities), [currentLocation?.id]);
+
   useEffect(() => {
-    (async () => {
-      const fetchedBins = await fetchBins(currentLocation?.id);
-      setBinLocations(fetchedBins);
-    })();
+    if (showBinLocation) {
+      (async () => {
+        const fetchedBins = await fetchBins(currentLocation?.id);
+        setBinLocations(fetchedBins);
+      })();
+    }
   }, [currentLocation?.id]);
 
   // Get appropriate input component based on table column
@@ -70,14 +76,14 @@ const useCountStepTable = ({
 
   // Get field props, for the binLocation dropdown we have to pass options
   const getFieldProps = (fieldName) => {
-    if (fieldName === cycleCountColumn.BIN_LOCATION) {
+    if (fieldName === cycleCountColumn.BIN_LOCATION && showBinLocation) {
       return {
         labelKey: 'name',
         options: groupBinLocationsByZone(binLocations),
       };
     }
 
-    if (fieldName === 'inventoryItem_expirationDate') {
+    if (fieldName === cycleCountColumn.EXPIRATION_DATE) {
       return {
         customDateFormat: DateFormat.DD_MMM_YYYY,
       };
@@ -88,15 +94,15 @@ const useCountStepTable = ({
 
   // this function is required because there is a problem w getValue
   const getValueToDisplay = (id, value) => {
-    if (id === 'inventoryItem_expirationDate') {
+    if (id === cycleCountColumn.EXPIRATION_DATE) {
       return formatLocalizedDate(value, DateFormat.DD_MMM_YYYY);
     }
 
-    if (id === 'quantityCounted') {
+    if (id === cycleCountColumn.QUANTITY_COUNTED) {
       return value?.toString();
     }
 
-    if (id === 'binLocation') {
+    if (id === cycleCountColumn.BIN_LOCATION && showBinLocation) {
       return value?.name;
     }
 
@@ -187,6 +193,7 @@ const useCountStepTable = ({
         ),
         meta: {
           flexWidth: 100,
+          hide: !showBinLocation,
         },
       },
     ),

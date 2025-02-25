@@ -37,6 +37,9 @@ const DataTableBody = ({
           <TableRow key={row.id} className="rt-tr">
             {row.getVisibleCells()
               .map((cell) => {
+                if (cell.column.columnDef?.meta?.hide) {
+                  return null;
+                }
                 const className = cell.column.columnDef?.meta?.getCellContext?.()?.className;
                 const flexWidth = cell.column.columnDef.meta?.flexWidth || 1;
                 return (
