@@ -193,21 +193,30 @@ const useResolveStepTable = ({
   };
 
   const columns = [
-    ...(showBinLocation ? [
-      columnHelper.accessor(
-        (row) => (row?.binLocation?.label ? row?.binLocation : row.binLocation?.name), {
-          id: cycleCountColumn.BIN_LOCATION,
-          header: () => (
-            <TableHeaderCell>
-              {translate('react.cycleCount.table.binLocation.label', 'Bin Location')}
-            </TableHeaderCell>
-          ),
-          meta: {
-            flexWidth: 100,
-          },
+    columnHelper.accessor(
+      (row) => (row?.binLocation?.label ? row?.binLocation : row.binLocation?.name), {
+        id: cycleCountColumn.BIN_LOCATION,
+        header: () => (
+          <TableHeaderCell>
+            {translate('react.cycleCount.table.binLocation.label', 'Bin Location')}
+          </TableHeaderCell>
+        ),
+        meta: {
+          flexWidth: 100,
+          hide: !showBinLocation,
         },
-      ),
-    ] : []),
+      },
+    ),
+    columnHelper.accessor(cycleCountColumn.LOT_NUMBER, {
+      header: useMemo(() => (
+        <TableHeaderCell className="rt-th-count-step">
+          {translate('react.cycleCount.table.lotNumber.label', 'Serial / Lot Number')}
+        </TableHeaderCell>
+      ), []),
+      meta: {
+        flexWidth: 160,
+      },
+    }),
     columnHelper.accessor(cycleCountColumn.EXPIRATION_DATE, {
       header: useMemo(() => (
         <TableHeaderCell className="rt-th-count-step">
