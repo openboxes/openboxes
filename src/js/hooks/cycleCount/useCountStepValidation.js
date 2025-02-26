@@ -3,6 +3,7 @@ import { useState } from 'react';
 import _ from 'lodash';
 import { z } from 'zod';
 
+import useInventoryValidation from 'hooks/cycleCount/useInventoryValidation';
 import useTranslate from 'hooks/useTranslate';
 
 const useCountStepValidation = ({ tableData }) => {
@@ -10,15 +11,12 @@ const useCountStepValidation = ({ tableData }) => {
 
   const translate = useTranslate();
 
-  const checkLotNumberUniqueness = (data) => {
-    const foundCycleCount = tableData.current.find(
-      (cycleCount) => cycleCount.cycleCountItems.find((row) => row.id === data.id),
-    );
-    const groupedLotNumbers = _.groupBy(
-      foundCycleCount.cycleCountItems, 'inventoryItem.lotNumber',
-    );
-    return groupedLotNumbers[data.inventoryItem?.lotNumber]?.length === 1;
-  };
+  const {
+    checkDuplicatedLotNumber,
+    checkDifferentExpirationDatesForTheSameLot,
+    checkProductsWithLotAndExpiryControl,
+    checkLotNumberRequireness,
+  } = useInventoryValidation({ tableData });
 
   const rowValidationSchema = z.object({
     id: z
@@ -44,15 +42,16 @@ const useCountStepValidation = ({ tableData }) => {
       name: z.string(),
       label: z.string().optional(),
     }).optional(),
-  }).refine((data) => data?.inventoryItem?.lotNumber || !data?.inventoryItem?.expirationDate, {
+  }).refine(checkLotNumberRequireness, {
     path: ['inventoryItem.lotNumber'],
     message: translate('react.cycleCount.requiredLotNumber', 'Lot number is required'),
-  }).refine(checkLotNumberUniqueness, {
-    path: ['inventoryItem.lotNumber'],
-    message: translate('react.cycleCount.uniqueLotNumber', 'Lot number should be unique'),
   });
 
-  const rowsValidationSchema = z.array(rowValidationSchema);
+  const rowsValidationSchema = z
+    .array(rowValidationSchema)
+    .superRefine(checkDuplicatedLotNumber)
+    .superRefine(checkDifferentExpirationDatesForTheSameLot)
+    .superRefine(checkProductsWithLotAndExpiryControl);
 
   const triggerValidation = () => {
     const errors = tableData.current.reduce((acc, cycleCount) => {
