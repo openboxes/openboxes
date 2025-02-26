@@ -17,6 +17,7 @@ import org.pih.warehouse.product.Product
 @Transactional
 class CycleCountService {
 
+    CycleCountTransactionService cycleCountTransactionService
     ProductAvailabilityService productAvailabilityService
 
     List<CycleCountCandidate> getCandidates(CycleCountCandidateFilterCommand command, String facilityId) {
@@ -343,60 +344,33 @@ class CycleCountService {
     CycleCountDto submitCount(CycleCountSubmitCountCommand command) {
         command.cycleCount.cycleCountItems.each { CycleCountItem cycleCountItem ->
             updateCycleCountItemForSubmit(cycleCountItem, command.refreshQuantityOnHand, command.failOnOutdatedQuantity)
-            determineCycleCountItemStatus(cycleCountItem, command.requireRecountOnDiscrepancy)
+            determineCycleCountItemStatusForSubmit(cycleCountItem, command.requireRecountOnDiscrepancy)
         }
         command.cycleCount.status = command.cycleCount.recomputeStatus()
         if (command.cycleCount.status == CycleCountStatus.READY_TO_REVIEW) {
-            createCycleCountTransaction(command.cycleCount)
+            cycleCountTransactionService.createTransactions(command.cycleCount, command.refreshQuantityOnHand)
         }
         return CycleCountDto.toDto(command.cycleCount)
     }
 
-    void updateCycleCountItemForSubmit(CycleCountItem cycleCountItem, boolean refreshQuantityOnHand, boolean failOnOutdatedQuantity) {
+    private void updateCycleCountItemForSubmit(CycleCountItem cycleCountItem, boolean refreshQuantityOnHand, boolean failOnOutdatedQuantity) {
         Integer currentQuantityOnHand =
                 productAvailabilityService.getQuantityOnHandInBinLocation(cycleCountItem.inventoryItem, cycleCountItem.location)
         if (failOnOutdatedQuantity && cycleCountItem.quantityOnHand != currentQuantityOnHand) {
             throw new IllegalArgumentException("Quantity on hand for a cycle count item is no longer up to date")
         }
         if (refreshQuantityOnHand) {
+            // TODO: This doesn't account for any new bins/lots that have been created since the count started! We need
+            //       a full QoH fetch on the product, and to create new cycle count items for any new bins/lot numbers.
             cycleCountItem.quantityOnHand = currentQuantityOnHand
         }
     }
 
-    void determineCycleCountItemStatus(CycleCountItem cycleCountItem, boolean requireRecountOnDiscrepancy) {
+    private void determineCycleCountItemStatusForSubmit(CycleCountItem cycleCountItem, boolean requireRecountOnDiscrepancy) {
         if ((cycleCountItem.quantityOnHand == cycleCountItem.quantityCounted) || !requireRecountOnDiscrepancy) {
             cycleCountItem.status = CycleCountItemStatus.READY_TO_REVIEW
             return
         }
         cycleCountItem.status = CycleCountItemStatus.COUNTED
-    }
-
-    void createCycleCountTransaction(CycleCount cycleCount) {
-        TransactionType cycleCountProductInventoryTransactionType =
-                TransactionType.read(Constants.CYCLE_COUNT_PRODUCT_INVENTORY_TRANSACTION_TYPE_ID)
-        Transaction transaction = new Transaction(
-                source: cycleCount.facility,
-                inventory: cycleCount.facility.inventory,
-                transactionDate: new Date(),
-                transactionType: cycleCountProductInventoryTransactionType,
-                cycleCount: cycleCount
-        )
-        if (!transaction.validate()) {
-            throw new ValidationException("Invalid transaction", transaction.errors)
-        }
-        transaction.save()
-        cycleCount.cycleCountItems.each { CycleCountItem cycleCountItem ->
-            TransactionEntry transactionEntry = new TransactionEntry(
-                    quantity: cycleCountItem.quantityCounted,
-                    binLocation: cycleCountItem.location,
-                    inventoryItem: cycleCountItem.inventoryItem,
-                    transaction: transaction
-            )
-            if (!transactionEntry.validate()) {
-                throw new ValidationException("Invalid transaction entry", transactionEntry.errors)
-            }
-            transactionEntry.save()
-            transaction.addToTransactionEntries(transactionEntry)
-        }
     }
 }
