@@ -979,7 +979,7 @@ class UrlMappings {
 
         "/api/facilities/$facility/cycle-counts/$cycleCountId/items" {
             controller = "cycleCountApi"
-            action = [POST: "createCustomCycleCountItem"]
+            action = [POST: "createCycleCountItem"]
         }
 
         // Error handling

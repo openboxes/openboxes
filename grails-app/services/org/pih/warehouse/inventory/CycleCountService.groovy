@@ -374,35 +374,6 @@ class CycleCountService {
         cycleCountItem.status = CycleCountItemStatus.COUNTED
     }
 
-    void createCycleCountTransaction(CycleCount cycleCount) {
-        TransactionType cycleCountProductInventoryTransactionType =
-            TransactionType.read(Constants.CYCLE_COUNT_PRODUCT_INVENTORY_TRANSACTION_TYPE_ID)
-        Transaction transaction = new Transaction(
-                source: cycleCount.facility,
-                inventory: cycleCount.facility.inventory,
-                transactionDate: new Date(),
-                transactionType: cycleCountProductInventoryTransactionType,
-                cycleCount: cycleCount
-        )
-        if (!transaction.validate()) {
-            throw new ValidationException("Invalid transaction", transaction.errors)
-        }
-        transaction.save()
-        cycleCount.cycleCountItems.each { CycleCountItem cycleCountItem ->
-            TransactionEntry transactionEntry = new TransactionEntry(
-                    quantity: cycleCountItem.quantityCounted,
-                    binLocation: cycleCountItem.location,
-                    inventoryItem: cycleCountItem.inventoryItem,
-                    transaction: transaction
-            )
-            if (!transactionEntry.validate()) {
-                throw new ValidationException("Invalid transaction entry", transactionEntry.errors)
-            }
-            transactionEntry.save()
-            transaction.addToTransactionEntries(transactionEntry)
-        }
-    }
-
     CycleCountItemDto updateCycleCountItem(CycleCountUpdateItemCommand command) {
         CycleCountItem cycleCountItem = command.cycleCountItem
         cycleCountItem.properties = command.properties
@@ -414,7 +385,7 @@ class CycleCountService {
         return cycleCountItem.toDto()
     }
 
-    CycleCountItemDto createCustomCycleCountItem(CycleCountItemCommand command) {
+    CycleCountItemDto createCycleCountItem(CycleCountItemCommand command) {
         CycleCountItem cycleCountItem = new CycleCountItem(
                 facility: command.facility,
                 status: command.recount ? CycleCountItemStatus.INVESTIGATING : CycleCountItemStatus.COUNTING,

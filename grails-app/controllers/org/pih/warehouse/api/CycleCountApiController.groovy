@@ -95,11 +95,11 @@ class CycleCountApiController {
         render(status: 204)
     }
 
-    def createCustomCycleCountItem(CycleCountItemCommand command) {
+    def createCycleCountItem(CycleCountItemCommand command) {
         if (command.hasErrors()) {
             throw new ValidationException("Invalid cycle count item", command.errors)
         }
-        CycleCountItemDto cycleCountItem = cycleCountService.createCustomCycleCountItem(command)
+        CycleCountItemDto cycleCountItem = cycleCountService.createCycleCountItem(command)
 
         render([data: cycleCountItem] as JSON)
     }
