@@ -22,7 +22,7 @@ class CycleCountItemDto {
 
     Integer quantityCounted
 
-    Integer discrepancy
+    Integer quantityVariance
 
     DiscrepancyReasonCode discrepancyReasonCode
 

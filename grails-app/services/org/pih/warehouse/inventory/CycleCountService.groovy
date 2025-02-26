@@ -409,6 +409,7 @@ class CycleCountService {
         cycleCountItem.countIndex = command.recount ? 1 : 0
         cycleCountItem.status = command.recount ? CycleCountItemStatus.INVESTIGATING : CycleCountItemStatus.COUNTING
         cycleCountItem.dateCounted = new Date()
+        cycleCountItem.assignee = AuthService.currentUser
 
         return cycleCountItem.toDto()
     }
@@ -440,9 +441,9 @@ class CycleCountService {
 
     void deleteCycleCountItem(String cycleCountItemId) {
         CycleCountItem cycleCountItem = CycleCountItem.get(cycleCountItemId)
-        if (!cycleCountItem?.custom) {
+        if (cycleCountItem && !cycleCountItem?.custom) {
             throw new IllegalArgumentException("Only custom cycle count items can be deleted")
         }
-        cycleCountItem.delete()
+        cycleCountItem?.delete()
     }
 }

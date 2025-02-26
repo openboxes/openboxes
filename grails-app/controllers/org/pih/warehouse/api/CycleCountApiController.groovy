@@ -7,6 +7,7 @@ import org.pih.warehouse.core.dtos.BatchCommandUtils
 import org.pih.warehouse.inventory.CycleCountCandidate
 import org.pih.warehouse.inventory.CycleCountCandidateFilterCommand
 import org.pih.warehouse.inventory.CycleCountDto
+import org.pih.warehouse.inventory.CycleCountItem
 import org.pih.warehouse.inventory.CycleCountItemCommand
 import org.pih.warehouse.inventory.CycleCountItemDto
 import org.pih.warehouse.inventory.CycleCountRequest
@@ -89,8 +90,8 @@ class CycleCountApiController {
         render([data: cycleCountItem] as JSON)
     }
 
-    def deleteCycleCountItem() {
-        cycleCountService.deleteCycleCountItem(params.cycleCountItemId)
+    def deleteCycleCountItem(String cycleCountItemId) {
+        cycleCountService.deleteCycleCountItem(cycleCountItemId)
 
         render(status: 204)
     }

@@ -56,7 +56,7 @@ class CycleCountItem {
                 status: status,
                 quantityOnHand: quantityOnHand,
                 quantityCounted: quantityCounted,
-                discrepancy: discrepancy,
+                quantityVariance: quantityVariance,
                 discrepancyReasonCode: discrepancyReasonCode,
                 dateCounted: dateCounted,
                 comment: comment,
@@ -73,7 +73,10 @@ class CycleCountItem {
         location(nullable: true)
     }
 
-    Integer getDiscrepancy() {
-        return quantityCounted - quantityOnHand
+    Integer getQuantityVariance() {
+        if (quantityCounted && quantityOnHand) {
+            return quantityCounted - quantityOnHand
+        }
+        return null
     }
 }
