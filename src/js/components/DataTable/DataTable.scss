@@ -20,6 +20,7 @@
 
   .rt-table {
     font-size: 14px;
+    overflow: visible;
 
     &::-webkit-scrollbar {
       width: 0.5em;
