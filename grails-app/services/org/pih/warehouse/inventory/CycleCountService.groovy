@@ -5,6 +5,7 @@ import grails.validation.ValidationException
 import org.apache.commons.csv.CSVPrinter
 import org.apache.commons.lang.StringEscapeUtils
 import org.grails.datastore.mapping.query.api.Criteria
+import org.hibernate.criterion.CriteriaSpecification
 import org.hibernate.criterion.Order
 import org.hibernate.sql.JoinType
 import org.pih.warehouse.api.AvailableItem
@@ -332,20 +333,20 @@ class CycleCountService {
     }
 
     List<CycleCountDto> getCycleCounts(List<String> ids) {
-        List<CycleCount> cycleCounts = CycleCount.createCriteria().list {
+        List<CycleCount> cycleCounts = CycleCount.createCriteria().list() {
+            setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY)
             if (ids) {
                 'in'("id", ids)
             }
+            cycleCountItems {
+                inventoryItem {
+                    order("expirationDate", "asc")
+                    order("lotNumber", "asc")
+                }
+            }
         } as List<CycleCount>
 
-        return cycleCounts.collect { cycleCount ->
-            def dto = CycleCountDto.toDto(cycleCount)
-            dto.cycleCountItems = dto.cycleCountItems.sort { a, b ->
-                def comparison = a.inventoryItem?.expirationDate <=> b.inventoryItem?.expirationDate
-                comparison == 0 ? a.inventoryItem?.lotNumber <=> b.inventoryItem?.lotNumber : comparison
-            }
-            return dto
-        }
+        return cycleCounts.collect { CycleCountDto.toDto(it) }
     }
 
     CycleCountDto submitCount(CycleCountSubmitCountCommand command) {
