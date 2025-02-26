@@ -2,6 +2,7 @@ import React from 'react';
 
 import PropTypes from 'prop-types';
 import { RiArrowDownSFill, RiArrowUpSFill } from 'react-icons/ri';
+
 import CustomTooltip from 'wrappers/CustomTooltip';
 
 const TableHeaderCell = ({
