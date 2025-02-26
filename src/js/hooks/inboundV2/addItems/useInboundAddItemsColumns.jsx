@@ -189,7 +189,6 @@ const useInboundAddItemsColumns = ({
                     trigger(`values.lineItems.${row.index}.quantityRequested`);
                   }}
                   hasErrors={hasErrors}
-                  // defaultValue={getValues().currentLineItems[0]?.product?.name}
                 />
               )}
             />
@@ -233,6 +232,10 @@ const useInboundAddItemsColumns = ({
                     } else {
                       setValue(`values.lineItems.${row.index}.lotNumber`, e.target.value);
                     }
+                  }}
+                  onBlur={() => {
+                    field.onBlur();
+                    trigger(`values.lineItems.${row.index}.lotNumber`);
                   }}
                 />
               )}

@@ -79,10 +79,8 @@ TableHeaderCell.defaultProps = {
   sortable: false,
   required: false,
   columnId: null,
-  dynamicClassName: () => {
-  },
-  toggleSort: () => {
-  },
+  dynamicClassName: () => {},
+  toggleSort: () => {},
   tooltip: false,
   tooltipLabel: '',
 };
