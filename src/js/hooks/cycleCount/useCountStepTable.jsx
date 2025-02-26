@@ -117,8 +117,11 @@ const useCountStepTable = ({
       const initialValue = _.get(tableData, `[${index}].${columnPath}`);
       const [value, setValue] = useState(initialValue);
 
-      const isFieldEditable = !original.id.includes('newRow') && id !== cycleCountColumn.QUANTITY_COUNTED;
-      // We shouldn't allow users edit fetched data (only quantity counted is editable)
+      const isFieldEditable = !original.id.includes('newRow') && ![
+        cycleCountColumn.QUANTITY_COUNTED,
+        cycleCountColumn.COMMENT,
+      ].includes(id);
+      // We shouldn't allow users edit fetched data (only quantity counted and comment are editable)
       if (isFieldEditable || !isStepEditable) {
         return (
           <TableCell className="static-cell-count-step d-flex align-items-center">
