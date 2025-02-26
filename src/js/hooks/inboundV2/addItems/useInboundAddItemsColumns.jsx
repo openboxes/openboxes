@@ -29,7 +29,6 @@ const useInboundAddItemsColumns = ({
 }) => {
   const columnHelper = createColumnHelper();
   const translate = useTranslate();
-  // console.log(getValues().currentLineItems[0]?.product)
 
   const {
     debounceTime,
@@ -80,7 +79,7 @@ const useInboundAddItemsColumns = ({
     columnHelper.accessor('palletName', {
       header: () => (
         <TableHeaderCell
-          style={{ justifyContent: 'center' }}
+          className="justify-content-center"
           tooltip
           tooltipLabel={translate('react.stockMovement.packLevel1.label', 'Pack Level 1')}
         >
@@ -115,7 +114,7 @@ const useInboundAddItemsColumns = ({
     columnHelper.accessor('boxName', {
       header: () => (
         <TableHeaderCell
-          style={{ justifyContent: 'center' }}
+          className="justify-content-center"
           tooltip
           tooltipLabel={translate('react.stockMovement.packLevel2.label', 'Pack Level 2')}
         >
@@ -202,7 +201,7 @@ const useInboundAddItemsColumns = ({
     columnHelper.accessor('lotNumber', {
       header: () => (
         <TableHeaderCell
-          style={{ justifyContent: 'center' }}
+          className="justify-content-center"
           tooltip
           tooltipLabel={translate('react.stockMovement.lot.label', 'Lot')}
         >
@@ -244,7 +243,7 @@ const useInboundAddItemsColumns = ({
     columnHelper.accessor('expirationDate', {
       header: () => (
         <TableHeaderCell
-          style={{ justifyContent: 'center' }}
+          className="justify-content-center"
           tooltip
           tooltipLabel={translate('react.stockMovement.expiry.label', 'Expiry')}
         >
@@ -287,7 +286,7 @@ const useInboundAddItemsColumns = ({
       header: () => (
         <TableHeaderCell
           required
-          style={{ justifyContent: 'center' }}
+          className="justify-content-center"
           tooltip
           tooltipLabel={translate('react.stockMovement.quantity.label', 'Quantity')}
         >
@@ -312,7 +311,7 @@ const useInboundAddItemsColumns = ({
                   type="number"
                   hasErrors={hasErrors}
                   showErrorBorder={hasErrors}
-                  onChange={(e) => setValue(`values.lineItems.${row.index}.quantityRequested`, e ?? null)}
+                  onChange={(e) => setValue(`values.lineItems.${row.index}.quantityRequested`, e)}
                   onBlur={() => {
                     field.onBlur();
                     trigger(`values.lineItems.${row.index}.quantityRequested`);
@@ -330,7 +329,7 @@ const useInboundAddItemsColumns = ({
     columnHelper.accessor('recipient', {
       header: () => (
         <TableHeaderCell
-          style={{ justifyContent: 'center' }}
+          className="justify-content-center"
           tooltip
           tooltipLabel={translate('react.stockMovement.recipient.label', 'Recipient')}
         >
@@ -373,7 +372,7 @@ const useInboundAddItemsColumns = ({
       id: 'delete',
       header: () => (
         <TableHeaderCell
-          style={{ justifyContent: 'center' }}
+          className="justify-content-center"
           tooltip
           tooltipLabel={translate('react.default.button.delete.label', 'Delete')}
         >
