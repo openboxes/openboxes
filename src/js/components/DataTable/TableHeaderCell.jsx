@@ -3,6 +3,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { RiArrowDownSFill, RiArrowUpSFill } from 'react-icons/ri';
 import { Tooltip } from 'react-tippy';
+import CustomTooltip from 'wrappers/CustomTooltip';
 
 const TableHeaderCell = ({
   children,
@@ -25,15 +26,7 @@ const TableHeaderCell = ({
 
   if (tooltip) {
     return (
-      <Tooltip
-        arrow
-        delay={150}
-        duration={250}
-        hideDelay={50}
-        position="top"
-        className="text-overflow-ellipsis"
-        html={tooltipLabel}
-      >
+      <CustomTooltip content={tooltipLabel}>
         <div
           {...(sortable ? sortableProps : {})}
           style={style}
@@ -48,7 +41,7 @@ const TableHeaderCell = ({
             </div>
           )}
         </div>
-      </Tooltip>
+      </CustomTooltip>
     );
   }
 

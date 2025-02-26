@@ -913,6 +913,14 @@ div.crossed-out .table-inner-row:before {
   color: #FFFFFF;
 }
 
+.tooltip-dark-blue {
+  background-color: var(--blue-800);
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  max-width: 250px
+}
+
 // Overriding built-in tooltip-style (react-tippy)
 .tippy-tooltip {
   padding: 0 !important;
