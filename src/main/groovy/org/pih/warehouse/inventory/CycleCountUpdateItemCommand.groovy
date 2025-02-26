@@ -19,7 +19,7 @@ class CycleCountUpdateItemCommand implements Validateable {
     }
 
     static constraints = {
-        quantityCounted(nullable: true) // FIXME: should we allow clearing the quantityCounted?
+        quantityCounted(nullable: true)
         comment(nullable: true, blank: true)
     }
 }
