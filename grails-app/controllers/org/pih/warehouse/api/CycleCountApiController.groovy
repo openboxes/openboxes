@@ -7,14 +7,17 @@ import org.pih.warehouse.core.dtos.BatchCommandUtils
 import org.pih.warehouse.inventory.CycleCountCandidate
 import org.pih.warehouse.inventory.CycleCountCandidateFilterCommand
 import org.pih.warehouse.inventory.CycleCountDto
+import org.pih.warehouse.inventory.CycleCountItemCommand
+import org.pih.warehouse.inventory.CycleCountItemDto
 import org.pih.warehouse.inventory.CycleCountRequest
 import org.pih.warehouse.inventory.CycleCountRequestBatchCommand
 import org.pih.warehouse.inventory.CycleCountService
 import org.pih.warehouse.inventory.CycleCountStartBatchCommand
 import org.pih.warehouse.inventory.CycleCountStartRecountBatchCommand
 import org.pih.warehouse.inventory.CycleCountSubmitCountCommand
-
 import org.pih.warehouse.inventory.CycleCountSubmitRecountCommand
+import org.pih.warehouse.inventory.CycleCountUpdateItemCommand
+
 
 class CycleCountApiController {
 
@@ -75,5 +78,29 @@ class CycleCountApiController {
         CycleCountDto cycleCount = cycleCountService.submitCount(command)
 
         render([data: cycleCount] as JSON)
+    }
+
+    def updateCycleCountItem(CycleCountUpdateItemCommand command) {
+        if (command.hasErrors()) {
+            throw new ValidationException("Invalid cycle count item", command.errors)
+        }
+        CycleCountItemDto cycleCountItem = cycleCountService.updateCycleCountItem(command)
+
+        render([data: cycleCountItem] as JSON)
+    }
+
+    def deleteCycleCountItem(String cycleCountItemId) {
+        cycleCountService.deleteCycleCountItem(cycleCountItemId)
+
+        render(status: 204)
+    }
+
+    def createCycleCountItem(CycleCountItemCommand command) {
+        if (command.hasErrors()) {
+            throw new ValidationException("Invalid cycle count item", command.errors)
+        }
+        CycleCountItemDto cycleCountItem = cycleCountService.createCycleCountItem(command)
+
+        render([data: cycleCountItem] as JSON)
     }
 }

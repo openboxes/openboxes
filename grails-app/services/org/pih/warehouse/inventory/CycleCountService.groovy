@@ -373,4 +373,48 @@ class CycleCountService {
         }
         cycleCountItem.status = CycleCountItemStatus.COUNTED
     }
+
+    CycleCountItemDto updateCycleCountItem(CycleCountUpdateItemCommand command) {
+        CycleCountItem cycleCountItem = command.cycleCountItem
+        cycleCountItem.properties = command.properties
+        cycleCountItem.countIndex = command.recount ? 1 : 0
+        cycleCountItem.status = command.recount ? CycleCountItemStatus.INVESTIGATING : CycleCountItemStatus.COUNTING
+        cycleCountItem.dateCounted = new Date()
+        cycleCountItem.assignee = AuthService.currentUser
+
+        return cycleCountItem.toDto()
+    }
+
+    CycleCountItemDto createCycleCountItem(CycleCountItemCommand command) {
+        CycleCountItem cycleCountItem = new CycleCountItem(
+                facility: command.facility,
+                status: command.recount ? CycleCountItemStatus.INVESTIGATING : CycleCountItemStatus.COUNTING,
+                countIndex: command.recount ? 1 : 0,
+                quantityOnHand: command.quantityCounted,
+                quantityCounted: command.quantityCounted,
+                cycleCount: command.cycleCount,
+                location: command.binLocation,
+                inventoryItem: command.inventoryItem,
+                product: command.inventoryItem?.product,
+                createdBy: AuthService.currentUser,
+                updatedBy: AuthService.currentUser,
+                dateCounted: new Date(),
+                comment: command.comment,
+                custom: true,
+        )
+        if (!cycleCountItem.validate()) {
+            throw new ValidationException("Invalid cycle count item", cycleCountItem.errors)
+        }
+        cycleCountItem.save()
+
+        return cycleCountItem.toDto()
+    }
+
+    void deleteCycleCountItem(String cycleCountItemId) {
+        CycleCountItem cycleCountItem = CycleCountItem.get(cycleCountItemId)
+        if (cycleCountItem && !cycleCountItem?.custom) {
+            throw new IllegalArgumentException("Only custom cycle count items can be deleted")
+        }
+        cycleCountItem?.delete()
+    }
 }

@@ -56,6 +56,7 @@ class CycleCountItem implements Comparable {
                 status: status,
                 quantityOnHand: quantityOnHand,
                 quantityCounted: quantityCounted,
+                quantityVariance: quantityVariance,
                 discrepancyReasonCode: discrepancyReasonCode,
                 dateCounted: dateCounted,
                 comment: comment,
@@ -72,7 +73,14 @@ class CycleCountItem implements Comparable {
         location(nullable: true)
     }
 
-    @Override
+    Integer getQuantityVariance() {
+        if (quantityCounted && quantityOnHand) {
+            return quantityCounted - quantityOnHand
+        }
+        return null
+    }
+  
+      @Override
     int compareTo(Object that) {
         return inventoryItem?.expirationDate <=> that.inventoryItem?.expirationDate ?: inventoryItem?.lotNumber <=> that.inventoryItem?.lotNumber
     }

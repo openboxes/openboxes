@@ -98,7 +98,7 @@ const useResolveStepTable = ({
   };
 
   // Get field props, for the binLocation dropdown we have to pass options
-  const getFieldProps = (fieldName) => {
+  const getFieldProps = (fieldName, hasTooltipIcon) => {
     if (fieldName === cycleCountColumn.BIN_LOCATION && showBinLocation) {
       return {
         labelKey: 'name',
@@ -109,7 +109,11 @@ const useResolveStepTable = ({
     if (fieldName === cycleCountColumn.ROOT_CAUSE) {
       return {
         options: reasonCodes,
-        placeholder: translate('react.cycleCount.selectPlaceholder.label', 'Select'),
+        placeholder: (
+          <span className={hasTooltipIcon ? 'pl-12px' : ''}>
+            {translate('react.cycleCount.selectPlaceholder.label', 'Select')}
+          </span>
+        ),
       };
     }
 
@@ -197,8 +201,8 @@ const useResolveStepTable = ({
       // select field for bin locations and root cause and one date picker for the expiration date.
       const type = getFieldType(id);
       const Component = getFieldComponent(id);
-      const fieldProps = getFieldProps(id);
       const tooltipContent = getTooltipMessage(errorMessage, warning, id);
+      const fieldProps = getFieldProps(id, tooltipContent);
 
       return (
         <TableCell className="rt-td rt-td-count-step pb-0">
@@ -210,7 +214,7 @@ const useResolveStepTable = ({
             className="w-75 m-1"
             showErrorBorder={error}
             hideErrorMessageWrapper
-            warning={warning}
+            warning={tooltipContent && warning}
             {...fieldProps}
           />
           {(error || warning) && tooltipContent && (
