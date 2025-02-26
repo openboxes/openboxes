@@ -22,6 +22,8 @@ class CycleCountItemDto {
 
     Integer quantityCounted
 
+    Integer quantityVariance
+
     DiscrepancyReasonCode discrepancyReasonCode
 
     String comment
