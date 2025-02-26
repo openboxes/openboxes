@@ -226,13 +226,7 @@ const useInboundAddItemsColumns = ({
                   {...field}
                   hasErrors={hasErrors}
                   showErrorBorder={hasErrors}
-                  onChange={(e) => {
-                    if (e.target.value === undefined) {
-                      setValue(`values.lineItems.${row.index}.lotNumber`, null);
-                    } else {
-                      setValue(`values.lineItems.${row.index}.lotNumber`, e.target.value);
-                    }
-                  }}
+                  onChange={(e) => setValue(`values.lineItems.${row.index}.lotNumber`, e.target.value ?? null)}
                   onBlur={() => {
                     field.onBlur();
                     trigger(`values.lineItems.${row.index}.lotNumber`);
@@ -318,13 +312,7 @@ const useInboundAddItemsColumns = ({
                   type="number"
                   hasErrors={hasErrors}
                   showErrorBorder={hasErrors}
-                  onChange={(e) => {
-                    if (e === undefined) {
-                      setValue(`values.lineItems.${row.index}.quantityRequested`, null);
-                    } else {
-                      setValue(`values.lineItems.${row.index}.quantityRequested`, e);
-                    }
-                  }}
+                  onChange={(e) => setValue(`values.lineItems.${row.index}.quantityRequested`, e ?? null)}
                   onBlur={() => {
                     field.onBlur();
                     trigger(`values.lineItems.${row.index}.quantityRequested`);
