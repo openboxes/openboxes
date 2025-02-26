@@ -84,7 +84,7 @@ class CycleCountItem implements Comparable {
     int compareTo(Object that) {
         int diff = inventoryItem?.expirationDate <=> that.inventoryItem?.expirationDate ?: inventoryItem?.lotNumber <=> that.inventoryItem?.lotNumber
         if (diff == 0) {
-            return id <=> that.id
+            return -1
         }
         return inventoryItem?.expirationDate <=> that.inventoryItem?.expirationDate ?: inventoryItem?.lotNumber <=> that.inventoryItem?.lotNumber
     }
