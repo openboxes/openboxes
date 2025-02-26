@@ -334,18 +334,10 @@ class CycleCountService {
 
     List<CycleCountDto> getCycleCounts(List<String> ids) {
         List<CycleCount> cycleCounts = CycleCount.createCriteria().list() {
-            setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY)
             if (ids) {
                 'in'("id", ids)
             }
-            cycleCountItems {
-                inventoryItem {
-                    order("expirationDate", "asc")
-                    order("lotNumber", "asc")
-                }
-            }
         } as List<CycleCount>
-
         return cycleCounts.collect { CycleCountDto.toDto(it) }
     }
 
