@@ -33,6 +33,8 @@ class CycleCount {
         status = recomputeStatus()
     }
 
+    SortedSet cycleCountItems
+
     static hasMany = [
             /*
              * We've moved away from using "hasMany" in our code whenever possible due to performance concerns around

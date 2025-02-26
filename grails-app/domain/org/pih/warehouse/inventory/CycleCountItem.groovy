@@ -4,7 +4,7 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
 import org.pih.warehouse.product.Product
 
-class CycleCountItem {
+class CycleCountItem implements Comparable {
 
     String id
 
@@ -70,5 +70,11 @@ class CycleCountItem {
         quantityCounted(nullable: true)
         discrepancyReasonCode(nullable: true)
         location(nullable: true)
+    }
+
+    @Override
+    int compareTo(Object that) {
+        return inventoryItem?.expirationDate <=> that.inventoryItem?.expirationDate ?:
+                inventoryItem?.lotNumber <=> that.inventoryItem?.lotNumber
     }
 }
