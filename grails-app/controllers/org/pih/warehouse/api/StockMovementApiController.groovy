@@ -14,7 +14,6 @@ import org.grails.web.json.JSONObject
 
 import org.pih.warehouse.DateUtil
 import org.pih.warehouse.core.ActivityCode
-import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.DocumentService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.RoleType
@@ -361,14 +360,6 @@ class StockMovementApiController {
         render([data: pendingRequisitionDetails] as JSON)
     }
 
-    private Date parseDateRequested(String date) {
-        return DateUtil.asDate(date, Constants.EXPIRATION_DATE_FORMATTER)
-    }
-
-    private Date parseDateShipped(String date) {
-        return DateUtil.asDate(date, Constants.DELIVERY_DATE_FORMATTER)
-    }
-
     private void bindStockMovement(StockMovement stockMovement, JSONObject jsonObject) {
         // Remove attributes that cause issues in the default grails data binder
         List lineItems = jsonObject.remove("lineItems")
@@ -376,11 +367,11 @@ class StockMovementApiController {
 
         // Dates aren't bound properly using default JSON binding
         if (jsonObject.containsKey("dateShipped")) {
-            stockMovement.dateShipped = parseDateShipped(jsonObject.remove("dateShipped"))
+            stockMovement.dateShipped = DateUtil.asDate(jsonObject.remove("dateShipped") as String)
         }
 
         if (jsonObject.containsKey("dateRequested")) {
-            stockMovement.dateRequested = parseDateRequested(jsonObject.remove("dateRequested"))
+            stockMovement.dateRequested = DateUtil.asDate(jsonObject.remove("dateRequested") as String)
         }
 
         // If the stocklist.id key is present and empty, then we need to remove the stocklist from the stock movement
@@ -449,8 +440,7 @@ class StockMovementApiController {
             // FIXME Lookup inventory item by product, lot number, expiration date
             stockMovementItem.inventoryItem = lineItem?.inventoryItem?.id ? InventoryItem.load(lineItem?.inventoryItem?.id) : null
             stockMovementItem.lotNumber = lineItem["lotNumber"]
-            stockMovementItem.expirationDate = (!isNull(lineItem["expirationDate"])) ?
-                    Constants.EXPIRATION_DATE_FORMATTER.parse(lineItem["expirationDate"]) : null
+            stockMovementItem.expirationDate = DateUtil.asDate(lineItem["expirationDate"] as String)
 
             // Sort order (optional)
             stockMovementItem.sortOrder = lineItem.sortOrder && !lineItem.isNull("sortOrder") ? new Integer(lineItem.sortOrder) : null
