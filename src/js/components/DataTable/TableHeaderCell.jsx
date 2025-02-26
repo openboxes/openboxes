@@ -20,8 +20,7 @@ const TableHeaderCell = ({
     tabIndex: '0',
     role: 'button',
     onClick: columnId ? toggleSort(columnId) : toggleSort,
-    onKeyPress: () => {
-    },
+    onKeyPress: () => {},
   };
 
   if (tooltip) {
@@ -82,7 +81,7 @@ TableHeaderCell.defaultProps = {
   dynamicClassName: () => {},
   toggleSort: () => {},
   tooltip: false,
-  tooltipLabel: '',
+  tooltipLabel: undefined,
 };
 
 TableHeaderCell.propTypes = {
