@@ -60,7 +60,8 @@ class CycleCountItem {
                 discrepancyReasonCode: discrepancyReasonCode,
                 dateCounted: dateCounted,
                 comment: comment,
-                custom: custom
+                custom: custom,
+                assignee: assignee,
         )
     }
 

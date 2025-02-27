@@ -29,6 +29,7 @@ const CountStepTable = ({
   setCountedDate,
   isStepEditable,
   countedBy,
+  defaultCountedBy,
 }) => {
   const translate = useTranslate();
   const localize = useSelector((state) => state.localize);
@@ -45,6 +46,21 @@ const CountStepTable = ({
     isStepEditable,
     formatLocalizedDate,
   });
+
+  // Default counted by needs to be stored in order to set the default select value correctly
+  const defaultCountedByMeta = defaultCountedBy ? {
+    id: defaultCountedBy.id,
+    value: defaultCountedBy.id,
+    label: defaultCountedBy.label ?? `${defaultCountedBy.firstName} ${defaultCountedBy.lastName}`,
+    name: `${defaultCountedBy.firstName} ${defaultCountedBy.lastName}`,
+  } : undefined;
+
+  const countedByMeta = countedBy ? {
+    id: countedBy.id,
+    value: countedBy.id,
+    label: countedBy.label ?? `${countedBy.firstName} ${countedBy.lastName}`,
+    name: `${countedBy.firstName} ${countedBy.lastName}`,
+  } : undefined;
 
   return (
     <div className="list-page-list-section">
@@ -77,7 +93,7 @@ const CountStepTable = ({
             <Tooltip
               html={(
                 <span className="p-1">
-                  {countedBy[product.productCode]?.label || translate('react.cycleCount.countedBy.label', 'Counted By')}
+                  {countedByMeta?.label || translate('react.cycleCount.countedBy.label', 'Counted By')}
                 </span>
               )}
               style={{ width: 'fit-content' }}
@@ -86,12 +102,12 @@ const CountStepTable = ({
               <SelectField
                 placeholder="Select"
                 options={users}
-                onChange={assignCountedBy(product?.productCode)}
+                onChange={assignCountedBy(id)}
                 className="min-width-250"
-                defaultValue={countedBy[product.productCode]}
+                defaultValue={defaultCountedByMeta}
               />
             </Tooltip>
-          ) : <p>{countedBy[product.productCode]?.label}</p>}
+          ) : <p>{countedByMeta?.label}</p>}
         </div>
       </div>
       <div className="mx-4 count-step-table">
@@ -118,7 +134,7 @@ const CountStepTable = ({
             )}
           >
             <Button
-              onClick={() => addEmptyRow(product?.productCode, id)}
+              onClick={() => addEmptyRow(product?.id, id)}
               label="react.cycleCount.addNewRecord.label"
               defaultLabel="Add new record"
               variant="transparent"
@@ -152,7 +168,11 @@ CountStepTable.propTypes = {
   validationErrors: PropTypes.shape({}).isRequired,
   setCountedDate: PropTypes.func.isRequired,
   isStepEditable: PropTypes.bool.isRequired,
-  countedBy: PropTypes.arrayOf(
-    PropTypes.shape({}),
-  ).isRequired,
+  countedBy: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    value: PropTypes.string.isRequired,
+    label: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+  }).isRequired,
+  defaultCountedBy: PropTypes.shape({}).isRequired,
 };

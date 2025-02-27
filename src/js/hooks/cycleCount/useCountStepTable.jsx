@@ -212,7 +212,7 @@ const useCountStepTable = ({
     }),
     columnHelper.accessor(cycleCountColumn.EXPIRATION_DATE, {
       header: () => (
-        <TableHeaderCell className="rt-th-count-step">
+        <TableHeaderCell>
           {translate('react.cycleCount.table.expirationDate.label', 'Expiration Date')}
         </TableHeaderCell>
       ),
@@ -261,11 +261,11 @@ const useCountStepTable = ({
             )}
             disabled={original.id}
           >
-            {original.id.includes('newRow') && isStepEditable && (
-              <RiDeleteBinLine
-                onClick={() => removeRow(cycleCountId, original.id)}
-                size={22}
-              />
+            {(original.id.includes('newRow') || original.custom) && isStepEditable && (
+            <RiDeleteBinLine
+              onClick={() => removeRow(cycleCountId, original.id)}
+              size={22}
+            />
             )}
           </Tooltip>
         </TableCell>

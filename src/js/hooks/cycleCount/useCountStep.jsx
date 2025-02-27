@@ -3,8 +3,9 @@ import { useEffect, useRef, useState } from 'react';
 import _ from 'lodash';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { fetchUsers } from 'actions';
+import { fetchUsers, hideSpinner, showSpinner } from 'actions';
 import cycleCountApi from 'api/services/CycleCountApi';
+import CycleCountItemStatus from 'consts/cycleCountStatus';
 import useCountStepValidation from 'hooks/cycleCount/useCountStepValidation';
 
 // Managing state for all tables, operations on shared state (from count step)
@@ -14,6 +15,7 @@ const useCountStep = () => {
   const tableData = useRef([]);
   // Saving selected "counted by" option
   const [countedBy, setCountedBy] = useState({});
+  const [defaultCountedBy, setDefaultCountedBy] = useState({});
   // Saving selected "date counted" option, initially it's the date fetched from API
   const [dateCounted, setDateCounted] = useState({});
   const [isStepEditable, setIsStepEditable] = useState(true);
@@ -31,20 +33,34 @@ const useCountStep = () => {
     cycleCountIds: state.cycleCount.requests,
     currentLocation: state.session.currentLocation,
   }));
-
-  useEffect(() => {
-    (async () => {
+  const fetchCycleCounts = async () => {
+    try {
+      dispatch(showSpinner());
       const { data } = await cycleCountApi.getCycleCounts(
         currentLocation?.id,
         cycleCountIds,
       );
       tableData.current = data?.data;
+      // Date counted and assignee are the same for all items,
+      // so we create a map looking at first item
       const countedDates = data?.data?.reduce((acc, cycleCount) => ({
         ...acc,
         [cycleCount?.id]: cycleCount?.cycleCountItems[0].dateCounted,
       }), {});
       setDateCounted(countedDates);
-    })();
+      const countedByMap = data?.data?.reduce((acc, cycleCount) => ({
+        ...acc,
+        [cycleCount?.id]: cycleCount?.cycleCountItems[0].assignee,
+      }), {});
+      setCountedBy(countedByMap);
+      setDefaultCountedBy(countedByMap);
+    } finally {
+      dispatch(hideSpinner());
+    }
+  };
+
+  useEffect(() => {
+    fetchCycleCounts();
   }, [cycleCountIds]);
 
   // Fetching data for "counted by" dropdown
@@ -56,33 +72,66 @@ const useCountStep = () => {
     console.log('print count form');
   };
 
-  const assignCountedBy = (productCode) => (person) => {
-    setCountedBy((prevState) => ({ ...prevState, [productCode]: person }));
-  };
-
-  const removeRow = (cycleCountId, rowId) => {
+  const markAllItemsAsUpdated = (cycleCountId) => {
     const tableIndex = tableData.current.findIndex(
       (cycleCount) => cycleCount?.id === cycleCountId,
     );
-    tableData.current = tableData.current.map((data, index) => {
+    tableData.current = tableData.current.map((cycleCount, index) => {
       if (index === tableIndex) {
         return {
-          ...data,
-          cycleCountItems: data.cycleCountItems.filter((row) => row.id !== rowId),
+          ...cycleCount,
+          cycleCountItems: cycleCount.cycleCountItems.map((item) => ({ ...item, updated: true })),
         };
       }
-
-      return data;
+      return cycleCount;
     });
-    triggerValidation();
   };
 
-  const addEmptyRow = (productCode, id) => {
+  const assignCountedBy = (cycleCountId) => (person) => {
+    // We need to mark all items as updated if we change the counted by person,
+    // because counted by is associated with every cycle count item and needs to be set
+    // for every item
+    markAllItemsAsUpdated(cycleCountId);
+    setCountedBy((prevState) => ({ ...prevState, [cycleCountId]: person }));
+  };
+
+  const getCountedBy = (cycleCountId) => countedBy?.[cycleCountId];
+
+  const getDefaultCountedBy = (cycleCountId) => defaultCountedBy?.[cycleCountId];
+
+  const removeRow = async (cycleCountId, rowId) => {
+    if (rowId.includes('newRow')) {
+      const tableIndex = tableData.current.findIndex(
+        (cycleCount) => cycleCount?.id === cycleCountId,
+      );
+      tableData.current = tableData.current.map((data, index) => {
+        if (index === tableIndex) {
+          return {
+            ...data,
+            cycleCountItems: data.cycleCountItems.filter((row) => row.id !== rowId),
+          };
+        }
+
+        return data;
+      });
+      triggerValidation();
+      return;
+    }
+    try {
+      dispatch(showSpinner());
+      await cycleCountApi.deleteCycleCountItem(currentLocation?.id, rowId);
+    } finally {
+      dispatch(hideSpinner());
+      await fetchCycleCounts();
+    }
+  };
+
+  const addEmptyRow = (productId, id) => {
     // ID is needed for updating appropriate row
     const emptyRow = {
       id: _.uniqueId('newRow'),
       product: {
-        productCode,
+        id: productId,
       },
       inventoryItem: {
         lotNumber: undefined,
@@ -123,8 +172,46 @@ const useCountStep = () => {
     setIsStepEditable(true);
   };
 
-  const save = () => {
-    console.log('save');
+  const save = async () => {
+    // This data should be combined to a single request
+    // eslint-disable-next-line no-restricted-syntax
+    for (const cycleCount of tableData.current) {
+      const cycleCountItemsToUpdate = cycleCount.cycleCountItems.filter((item) => ((item.updated || item.status.name !== CycleCountItemStatus.COUNTING) && !item.id.includes('newRow')));
+      // eslint-disable-next-line no-restricted-syntax
+      for (const cycleCountItem of cycleCountItemsToUpdate) {
+        try {
+          dispatch(showSpinner());
+          // eslint-disable-next-line no-await-in-loop
+          await cycleCountApi.updateCycleCountItem({
+            ...cycleCountItem,
+            recount: false,
+            assignee: getCountedBy(cycleCount.id)?.id,
+          },
+          currentLocation?.id, cycleCountItem?.id);
+        } finally {
+          dispatch(hideSpinner());
+        }
+      }
+      const cycleCountItemsToCreate = cycleCount.cycleCountItems.filter((item) => item.id.includes('newRow'));
+      // eslint-disable-next-line no-restricted-syntax
+      for (const cycleCountItem of cycleCountItemsToCreate) {
+        try {
+          dispatch(showSpinner());
+          // eslint-disable-next-line no-await-in-loop
+          await cycleCountApi.createCycleCountItem({
+            ...cycleCountItem,
+            recount: false,
+            inventoryItem: {
+              ...cycleCountItem.inventoryItem,
+              product: cycleCountItem.product?.id,
+            },
+            assignee: getCountedBy(cycleCount.id)?.id,
+          }, currentLocation?.id, cycleCount?.id);
+        } finally {
+          dispatch(hideSpinner());
+        }
+      }
+    }
   };
 
   const updateRow = (cycleCountId, rowId, columnId, value) => {
@@ -140,6 +227,9 @@ const useCountStep = () => {
     const nestedPath = columnId.replaceAll('_', '.');
     // Update data for: cycleCount (table) -> cycleCountItem (row) -> column (nestedPath)
     _.set(tableData.current, `[${tableIndex}].cycleCountItems[${rowIndex}].${nestedPath}`, value);
+
+    // Mark item as updated, so that the item can be easily distinguished whether it was updated
+    _.set(tableData.current, `[${tableIndex}].cycleCountItems[${rowIndex}].updated`, true);
   };
 
   const tableMeta = {
@@ -147,7 +237,6 @@ const useCountStep = () => {
       updateRow(cycleCountId, rowId, columnId, value);
     },
   };
-
   const getCountedDate = (cycleCountId) => dateCounted[cycleCountId];
 
   const setCountedDate = (cycleCountId) => (date) => {
@@ -165,6 +254,8 @@ const useCountStep = () => {
     removeRow,
     printCountForm,
     assignCountedBy,
+    getCountedBy,
+    getDefaultCountedBy,
     countedBy,
     getCountedDate,
     setCountedDate,
