@@ -157,13 +157,6 @@ const useCountStepTable = ({
       const fieldProps = getFieldProps(id);
       const showTooltip = id === 'binLocation';
 
-      const focusCell = (rowIndex, columnId) => {
-        const targetCell = document.querySelector(`[data-row-index="${rowIndex}"][data-column-id="${columnId}"]`);
-        if (targetCell) {
-          targetCell.focus();
-        }
-      };
-
       const getNextColumnId = (columnId) => {
         const columnIds = [
           cycleCountColumn.BIN_LOCATION,
@@ -185,7 +178,6 @@ const useCountStepTable = ({
           cycleCountColumn.QUANTITY_COUNTED,
           cycleCountColumn.COMMENT,
         ];
-
         const currentIndex = columnIds.indexOf(columnId);
         return columnIds[currentIndex - 1] || columnIds[currentIndex];
       };
@@ -195,7 +187,6 @@ const useCountStepTable = ({
 
         if (key === 'ArrowUp') {
           if (rowIndex > 0) {
-            focusCell(rowIndex - 1, columnId);
             setFocusIndex(rowIndex - 1);
             setFocusId(columnId);
           }
@@ -203,7 +194,6 @@ const useCountStepTable = ({
 
         if (key === 'ArrowDown') {
           if (rowIndex < tableData.length - 1) {
-            focusCell(rowIndex + 1, columnId);
             setFocusIndex(rowIndex + 1);
             setFocusId(columnId);
           }
@@ -211,19 +201,36 @@ const useCountStepTable = ({
 
         if (key === 'ArrowRight') {
           const nextColumnId = getNextColumnId(columnId);
-          console.log('nextColumnId', nextColumnId);
-          focusCell(rowIndex, nextColumnId);
+          // console.log('nextColumnId', nextColumnId);
+          const isInArray = [
+            cycleCountColumn.QUANTITY_COUNTED,
+            cycleCountColumn.COMMENT,
+          ].includes(nextColumnId);
+
+          if (isInArray || tableData[rowIndex].id.includes('newRow')) {
+            setFocusIndex(rowIndex);
+            setFocusId(nextColumnId);
+          }
+
           setFocusIndex(rowIndex);
           setFocusId(nextColumnId);
         }
 
         if (key === 'ArrowLeft') {
           const prevColumnId = getPrevColumnId(columnId);
-          console.log('prevColumnId', prevColumnId);
-          focusCell(rowIndex, prevColumnId);
-          setFocusIndex(rowIndex);
-          setFocusId(prevColumnId);
+
+          const isInArray = [
+            cycleCountColumn.QUANTITY_COUNTED,
+            cycleCountColumn.COMMENT,
+          ].includes(prevColumnId);
+
+          if (isInArray || tableData[rowIndex].id.includes('newRow')) {
+            setFocusIndex(rowIndex);
+            setFocusId(prevColumnId);
+          }
         }
+        e.preventDefault();
+        e.stopPropagation();
       };
 
       return (
@@ -242,9 +249,9 @@ const useCountStepTable = ({
             className={`m-1 hide-arrows ${showTooltip ? 'w-99' : 'w-75'} ${error && 'border border-danger'}`}
             showErrorBorder={error}
             hideErrorMessageWrapper
-            onKeyDown={(e) => handleKeyDown(e, index, id)}
+            onKeyDown={(e) => handleKeyDown(e, index, columnPath)}
             fieldIndex={index}
-            fieldId={id}
+            fieldId={columnPath}
             focusIndex={focusIndex}
             focusId={focusId}
             {...fieldProps}

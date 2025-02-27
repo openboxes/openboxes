@@ -262,7 +262,7 @@ class Select extends Component {
       multi = false, delimiter = ';', async = false, showValueTooltip, showLabelTooltip,
       clearable = true, arrowLeft, arrowUp, arrowRight, arrowDown, fieldRef, onTabPress,
       onEnterPress, customSelectComponents, optionRenderer, classNamePrefix,
-      showSelectedOptionColor, scrollableParentContainerClassName, ...attributes
+      showSelectedOptionColor, scrollableParentContainerClassName, onKeyDown, ...attributes
     } = this.props;
     const { formatValue, className, showLabel = false } = attributes;
 
@@ -402,6 +402,10 @@ class Select extends Component {
               ? this.props.translate('react.default.select.noResultsFound.label', 'No results found')
               : this.props.translate('react.default.select.typeToSearch.label', 'Type to search'))}
             onKeyDown={(event) => {
+              if (this.props.onKeyDown) {
+                this.props.onKeyDown(event);
+              }
+
               switch (event.keyCode) {
                 case 37: /* arrow left */
                   if (arrowLeft) {
@@ -498,6 +502,7 @@ Select.propTypes = {
   nullOptionLabel: PropTypes.string,
   nullOptionDefaultLabel: PropTypes.string,
   scrollableParentContainerClassName: PropTypes.string,
+  onKeyDown: PropTypes.func,
 };
 
 Select.defaultProps = {
@@ -533,4 +538,5 @@ Select.defaultProps = {
   nullOptionLabel: '',
   nullOptionDefaultLabel: 'null',
   scrollableParentContainerClassName: null,
+  onKeyDown: null,
 };

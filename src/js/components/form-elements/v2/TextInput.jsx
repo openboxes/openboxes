@@ -33,7 +33,7 @@ const TextInput = ({
   const inputRef = useRef(null);
 
   useEffect(() => {
-    if (fieldIndex === focusIndex && fieldId === focusId) {
+    if (fieldIndex === focusIndex && fieldId.replaceAll('_', '.') === focusId.replaceAll('_', '.')) {
       inputRef.current?.focus();
     }
   }, [fieldIndex, fieldId, focusIndex, focusId]);
@@ -140,7 +140,7 @@ TextInput.defaultProps = {
   className: '',
   showErrorBorder: false,
   hideErrorMessageWrapper: false,
-  onKeyDown: null,
+  onKeyDown: () => {},
   fieldIndex: '',
   fieldId: '',
   focusIndex: '',

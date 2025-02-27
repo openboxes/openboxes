@@ -73,8 +73,7 @@ const DateField = ({
   };
 
   useEffect(() => {
-    console.log('xdddd', fieldIndex, fieldId, focusIndex, focusId);
-    if (focusIndex && fieldIndex === focusIndex && fieldId === focusId) {
+    if (focusIndex && fieldIndex === focusIndex && fieldId.replaceAll('_', '.') === focusId.replaceAll('_', '.')) {
       datePickerRef.current?.setOpen(true);
       datePickerRef.current?.input?.focus();
     }

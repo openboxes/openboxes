@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import PropTypes from 'prop-types';
 
@@ -27,6 +27,11 @@ const SelectField = ({
   className,
   warning,
   hideErrorMessageWrapper,
+  onKeyDown,
+  fieldIndex,
+  fieldId,
+  focusIndex,
+  focusId,
   ...fieldProps
 }) => {
   const [value, setValue] = useState(defaultValue);
@@ -45,6 +50,16 @@ const SelectField = ({
 
   const SelectComponent = productSelect ? ProductSelect : Select;
 
+  const selectRef = useRef(null);
+
+  useEffect(() => {
+    if (focusIndex
+      && fieldIndex === focusIndex
+      && fieldId.replaceAll('_', '.') === focusId.replaceAll('_', '.')) {
+      selectRef.current?.focus();
+    }
+  }, [fieldIndex, fieldId, focusIndex, focusId]);
+
   return (
     <InputWrapper
       title={title}
@@ -62,6 +77,8 @@ const SelectField = ({
         value={value}
         onChange={onChangeValue}
         multi={multiple}
+        fieldRef={selectRef}
+        onKeyDown={onKeyDown}
         {...asyncProps}
         {...fieldProps}
       />
@@ -114,6 +131,11 @@ SelectField.propTypes = {
   className: PropTypes.string,
   hideErrorMessageWrapper: PropTypes.bool,
   warning: PropTypes.bool,
+  onKeyDown: PropTypes.func,
+  fieldIndex: PropTypes.string,
+  fieldId: PropTypes.string,
+  focusIndex: PropTypes.string,
+  focusId: PropTypes.string,
 };
 
 SelectField.defaultProps = {
@@ -135,4 +157,9 @@ SelectField.defaultProps = {
   className: '',
   hideErrorMessageWrapper: false,
   warning: false,
+  onKeyDown: () => {},
+  fieldIndex: '',
+  fieldId: '',
+  focusIndex: '',
+  focusId: '',
 };

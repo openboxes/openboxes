@@ -1,5 +1,5 @@
 const columns = {
-  EXPIRATION_DATE: 'inventoryItem_expirationDate',
+  EXPIRATION_DATE: 'inventoryItem.expirationDate',
   QUANTITY_COUNTED: 'quantityCounted',
   QUANTITY_RECOUNTED: 'quantityRecounted',
   BIN_LOCATION: 'binLocation',
