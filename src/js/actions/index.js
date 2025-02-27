@@ -102,8 +102,12 @@ export function hideUserActions() {
   };
 }
 
-export function fetchReasonCodes() {
-  const url = '/api/reasonCodes';
+export function fetchReasonCodes(activityCode = null) {
+  let url = '/api/reasonCodes';
+  if (activityCode) {
+    url += `?activityCode=${activityCode}`;
+  }
+
   return (dispatch) => {
     apiClient.get(url).then((res) => {
       dispatch({

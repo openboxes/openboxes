@@ -1,6 +1,7 @@
 package org.pih.warehouse.inventory
 
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.ReasonCode
 import org.pih.warehouse.core.User
 import org.pih.warehouse.product.Product
 
@@ -29,7 +30,7 @@ class CycleCountItem {
 
     Integer quantityCounted
 
-    DiscrepancyReasonCode discrepancyReasonCode
+    ReasonCode discrepancyReasonCode
 
     String comment
 
@@ -69,7 +70,11 @@ class CycleCountItem {
         comment(nullable: true)
         assignee(nullable: true)
         quantityCounted(nullable: true)
-        discrepancyReasonCode(nullable: true)
+        discrepancyReasonCode(nullable: true, validator: { ReasonCode discrepancyReasonCode ->
+            return ReasonCode.listInventoryAdjustmentReasonCodes().contains(discrepancyReasonCode) ?
+                    true :
+                    ['cycleCountItem.discrepancyReasonCode.invalid']
+        })
         location(nullable: true)
     }
 

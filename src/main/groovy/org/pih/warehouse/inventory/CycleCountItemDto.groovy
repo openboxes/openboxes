@@ -1,5 +1,6 @@
 package org.pih.warehouse.inventory
 
+import org.pih.warehouse.core.ReasonCode
 import org.pih.warehouse.product.Product
 
 class CycleCountItemDto {
@@ -24,7 +25,7 @@ class CycleCountItemDto {
 
     Integer quantityVariance
 
-    DiscrepancyReasonCode discrepancyReasonCode
+    ReasonCode discrepancyReasonCode
 
     String comment
 

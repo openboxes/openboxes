@@ -67,7 +67,7 @@ const useResolveStepTable = ({
 
   useEffect(() => {
     if (!reasonCodes.length) {
-      dispatch(fetchReasonCodes());
+      dispatch(fetchReasonCodes('ADJUST_INVENTORY'));
     }
   }, []);
 
