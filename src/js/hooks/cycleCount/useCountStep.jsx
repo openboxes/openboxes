@@ -175,7 +175,6 @@ const useCountStep = () => {
   };
 
   const save = async () => {
-    // This data should be combined to a single request
     // eslint-disable-next-line no-restricted-syntax
     for (const cycleCount of tableData.current) {
       const cycleCountItemsToUpdate = cycleCount.cycleCountItems.filter((item) => ((item.updated || item.status.name !== CycleCountItemStatus.COUNTING) && !item.id.includes('newRow')));
