@@ -3,10 +3,11 @@ import { useEffect, useRef, useState } from 'react';
 import _ from 'lodash';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { fetchUsers, hideSpinner, showSpinner } from 'actions';
+import { fetchUsers } from 'actions';
 import cycleCountApi from 'api/services/CycleCountApi';
 import CycleCountItemStatus from 'consts/cycleCountStatus';
 import useCountStepValidation from 'hooks/cycleCount/useCountStepValidation';
+import useSpinner from 'hooks/useSpinner';
 
 // Managing state for all tables, operations on shared state (from count step)
 const useCountStep = () => {
@@ -20,6 +21,7 @@ const useCountStep = () => {
   const [dateCounted, setDateCounted] = useState({});
   const [isStepEditable, setIsStepEditable] = useState(true);
   const dispatch = useDispatch();
+  const { show, hide } = useSpinner();
 
   const {
     validationErrors,
@@ -35,7 +37,7 @@ const useCountStep = () => {
   }));
   const fetchCycleCounts = async () => {
     try {
-      dispatch(showSpinner());
+      show();
       const { data } = await cycleCountApi.getCycleCounts(
         currentLocation?.id,
         cycleCountIds,
@@ -55,7 +57,7 @@ const useCountStep = () => {
       setCountedBy(countedByMap);
       setDefaultCountedBy(countedByMap);
     } finally {
-      dispatch(hideSpinner());
+      hide();
     }
   };
 
@@ -118,10 +120,10 @@ const useCountStep = () => {
       return;
     }
     try {
-      dispatch(showSpinner());
+      show();
       await cycleCountApi.deleteCycleCountItem(currentLocation?.id, rowId);
     } finally {
-      dispatch(hideSpinner());
+      hide();
       await fetchCycleCounts();
     }
   };
@@ -180,7 +182,7 @@ const useCountStep = () => {
       // eslint-disable-next-line no-restricted-syntax
       for (const cycleCountItem of cycleCountItemsToUpdate) {
         try {
-          dispatch(showSpinner());
+          show();
           // eslint-disable-next-line no-await-in-loop
           await cycleCountApi.updateCycleCountItem({
             ...cycleCountItem,
@@ -189,14 +191,14 @@ const useCountStep = () => {
           },
           currentLocation?.id, cycleCountItem?.id);
         } finally {
-          dispatch(hideSpinner());
+          hide();
         }
       }
       const cycleCountItemsToCreate = cycleCount.cycleCountItems.filter((item) => item.id.includes('newRow'));
       // eslint-disable-next-line no-restricted-syntax
       for (const cycleCountItem of cycleCountItemsToCreate) {
         try {
-          dispatch(showSpinner());
+          show();
           // eslint-disable-next-line no-await-in-loop
           await cycleCountApi.createCycleCountItem({
             ...cycleCountItem,
@@ -208,7 +210,7 @@ const useCountStep = () => {
             assignee: getCountedBy(cycleCount.id)?.id,
           }, currentLocation?.id, cycleCount?.id);
         } finally {
-          dispatch(hideSpinner());
+          hide();
         }
       }
     }
