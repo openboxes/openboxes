@@ -1,6 +1,6 @@
 import React from 'react';
 
-import ConfirmStepHeader from 'components/cycleCount/toCountTab/ConfirmStepHeader';
+import ConfirmStepHeader from 'components/cycleCount/ConfirmStepHeader';
 import CountStepHeader from 'components/cycleCount/toCountTab/CountStepHeader';
 import CountStepTable from 'components/cycleCount/toCountTab/CountStepTable';
 import useCountStep from 'hooks/cycleCount/useCountStep';

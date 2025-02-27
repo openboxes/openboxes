@@ -103,19 +103,19 @@ const CountStepTable = ({
               style={{ width: 'fit-content' }}
               arrow
             >
-            <SelectField
-              placeholder="Select"
-              options={users}
-              onChange={assignCountedBy(id)}
-              className="min-width-250"
-              defaultValue={defaultCountedByMeta}
-            />
+              <SelectField
+                placeholder="Select"
+                options={users}
+                onChange={assignCountedBy(id)}
+                className="min-width-250"
+                defaultValue={defaultCountedByMeta}
+              />
             </Tooltip>
           </HeaderSelect>
         ) : (
           <HeaderLabel
             label={translate('react.cycleCount.countedBy.label', 'Counted by')}
-            value={countedByMeta[product.productCode]?.label}
+            value={countedByMeta?.label}
             className="ml-4"
           />
         )}
