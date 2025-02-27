@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 
 import moment from 'moment';
 import PropTypes from 'prop-types';
@@ -28,6 +28,10 @@ const DateField = ({
   showTimeSelect,
   hideErrorMessageWrapper,
   customDateFormat,
+  fieldIndex,
+  fieldId,
+  focusIndex,
+  focusId,
   ...fieldProps
 }) => {
   const translate = useTranslate();
@@ -67,6 +71,14 @@ const DateField = ({
     }
     return customDateFormat || DateFormat.MMM_DD_YYYY;
   };
+
+  useEffect(() => {
+    console.log('xdddd', fieldIndex, fieldId, focusIndex, focusId);
+    if (focusIndex && fieldIndex === focusIndex && fieldId === focusId) {
+      datePickerRef.current?.setOpen(true);
+      datePickerRef.current?.input?.focus();
+    }
+  }, [fieldIndex, fieldId, focusIndex, focusId]);
 
   return (
     <InputWrapper
@@ -151,6 +163,10 @@ DateField.propTypes = {
   showTimeSelect: PropTypes.bool,
   hideErrorMessageWrapper: PropTypes.bool,
   customDateFormat: PropTypes.string,
+  fieldIndex: PropTypes.string,
+  fieldId: PropTypes.string,
+  focusIndex: PropTypes.string,
+  focusId: PropTypes.string,
 };
 
 DateField.defaultProps = {
@@ -167,4 +183,8 @@ DateField.defaultProps = {
   showTimeSelect: false,
   hideErrorMessageWrapper: false,
   customDateFormat: null,
+  fieldIndex: '',
+  fieldId: '',
+  focusIndex: '',
+  focusId: '',
 };

@@ -31,6 +31,8 @@ const useCountStepTable = ({
   const columnHelper = createColumnHelper();
   // State for saving data for binLocation dropdown
   const [binLocations, setBinLocations] = useState([]);
+  const [focusIndex, setFocusIndex] = useState(null);
+  const [focusId, setFocusId] = useState(null);
 
   const translate = useTranslate();
 
@@ -155,6 +157,75 @@ const useCountStepTable = ({
       const fieldProps = getFieldProps(id);
       const showTooltip = id === 'binLocation';
 
+      const focusCell = (rowIndex, columnId) => {
+        const targetCell = document.querySelector(`[data-row-index="${rowIndex}"][data-column-id="${columnId}"]`);
+        if (targetCell) {
+          targetCell.focus();
+        }
+      };
+
+      const getNextColumnId = (columnId) => {
+        const columnIds = [
+          cycleCountColumn.BIN_LOCATION,
+          cycleCountColumn.LOT_NUMBER,
+          cycleCountColumn.EXPIRATION_DATE,
+          cycleCountColumn.QUANTITY_COUNTED,
+          cycleCountColumn.COMMENT,
+        ];
+
+        const currentIndex = columnIds.indexOf(columnId);
+        return columnIds[currentIndex + 1] || columnIds[currentIndex];
+      };
+
+      const getPrevColumnId = (columnId) => {
+        const columnIds = [
+          cycleCountColumn.BIN_LOCATION,
+          cycleCountColumn.LOT_NUMBER,
+          cycleCountColumn.EXPIRATION_DATE,
+          cycleCountColumn.QUANTITY_COUNTED,
+          cycleCountColumn.COMMENT,
+        ];
+
+        const currentIndex = columnIds.indexOf(columnId);
+        return columnIds[currentIndex - 1] || columnIds[currentIndex];
+      };
+
+      const handleKeyDown = (e, rowIndex, columnId) => {
+        const { key } = e;
+
+        if (key === 'ArrowUp') {
+          if (rowIndex > 0) {
+            focusCell(rowIndex - 1, columnId);
+            setFocusIndex(rowIndex - 1);
+            setFocusId(columnId);
+          }
+        }
+
+        if (key === 'ArrowDown') {
+          if (rowIndex < tableData.length - 1) {
+            focusCell(rowIndex + 1, columnId);
+            setFocusIndex(rowIndex + 1);
+            setFocusId(columnId);
+          }
+        }
+
+        if (key === 'ArrowRight') {
+          const nextColumnId = getNextColumnId(columnId);
+          console.log('nextColumnId', nextColumnId);
+          focusCell(rowIndex, nextColumnId);
+          setFocusIndex(rowIndex);
+          setFocusId(nextColumnId);
+        }
+
+        if (key === 'ArrowLeft') {
+          const prevColumnId = getPrevColumnId(columnId);
+          console.log('prevColumnId', prevColumnId);
+          focusCell(rowIndex, prevColumnId);
+          setFocusIndex(rowIndex);
+          setFocusId(prevColumnId);
+        }
+      };
+
       return (
         <TableCell
           className="rt-td rt-td-count-step pb-0"
@@ -168,9 +239,14 @@ const useCountStepTable = ({
             value={value}
             onChange={onChange}
             onBlur={onBlur}
-            className={`m-1 ${showTooltip ? 'w-99' : 'w-75'} ${error && 'border border-danger'}`}
+            className={`m-1 hide-arrows ${showTooltip ? 'w-99' : 'w-75'} ${error && 'border border-danger'}`}
             showErrorBorder={error}
             hideErrorMessageWrapper
+            onKeyDown={(e) => handleKeyDown(e, index, id)}
+            fieldIndex={index}
+            fieldId={id}
+            focusIndex={focusIndex}
+            focusId={focusId}
             {...fieldProps}
           />
           {error && (
