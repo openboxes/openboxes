@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { fetchUsers } from 'actions';
 import cycleCountApi from 'api/services/CycleCountApi';
-import CycleCountItemStatus from 'consts/cycleCountStatus';
+import CycleCountItemStatus from 'consts/cycleCountItemStatus';
 import useCountStepValidation from 'hooks/cycleCount/useCountStepValidation';
 import useSpinner from 'hooks/useSpinner';
 
