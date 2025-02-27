@@ -107,6 +107,19 @@
   <changeSet id="1580848680306-30" author="awalkowiak" runOnChange="true" runAlways="true" failOnError="true">
     <sqlFile path="views/order-item-details.sql"/>
   </changeSet>
+  <!-- views used by the cycle count feature -->
+  <changeSet id="1740696149645-1" author="jmiranda" runOnChange="true" runAlways="true" failOnError="true">
+    <sqlFile path="views/product-cycle-count-history.sql"/>
+  </changeSet>
+  <changeSet id="1740696149645-2" author="jmiranda" runOnChange="true" runAlways="true" failOnError="true">
+    <sqlFile path="views/product-physical-count-history.sql"/>
+  </changeSet>
+  <changeSet id="1740696149645-3" author="jmiranda" runOnChange="true" runAlways="true" failOnError="true">
+    <sqlFile path="views/product-receipt-history.sql"/>
+  </changeSet>
+  <changeSet id="1740696149645-4" author="jmiranda" runOnChange="true" runAlways="true" failOnError="true">
+    <sqlFile path="views/product-count-history.sql"/>
+  </changeSet>
   <changeSet id="1580848680306-31" author="kchelstowski" runOnChange="true" runAlways="true" failOnError="true">
     <sqlFile path="views/cycle-count-session.sql"/>
   </changeSet>
