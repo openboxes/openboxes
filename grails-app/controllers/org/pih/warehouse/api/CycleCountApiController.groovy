@@ -78,7 +78,7 @@ class CycleCountApiController {
                 exportRecountXls(cycleCounts)
             }
             pdf {
-                // TODO: To be implemented in OBPIH-7016
+                renderRecountPdf(cycleCounts, command.facility.name)
             }
             json {
                 render([data: cycleCounts] as JSON)
@@ -102,7 +102,7 @@ class CycleCountApiController {
             }
             pdf {
                 String facilityName = cycleCounts?.first()?.cycleCountItems?.first()?.facility?.name  ?: ""
-                renderCountPdf(cycleCounts, facilityName)
+                isRecount ? renderRecountPdf(cycleCounts, facilityName) : renderCountPdf(cycleCounts, facilityName)
             }
             json {
                 render([data: cycleCounts] as JSON)
@@ -132,6 +132,14 @@ class CycleCountApiController {
         response.contentType = "application/vnd.ms-excel"
         documentService.generateExcel(response.outputStream, data)
         response.outputStream.flush()
+    }
+
+    def renderRecountPdf(List<CycleCountDto> cycleCounts, String facilityName) {
+        renderPdf(
+                template: "/cycleCount/printRecount",
+                model: [cycleCounts: cycleCounts, facilityName: facilityName, datePrinted: new Date()],
+                filename: "Recount form.pdf"
+        )
     }
 
     def submitCount(CycleCountSubmitCountCommand command) {
