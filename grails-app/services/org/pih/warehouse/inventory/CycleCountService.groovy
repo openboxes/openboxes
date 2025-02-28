@@ -190,10 +190,36 @@ class CycleCountService {
                         "Lot Number": item.inventoryItem.lotNumber,
                         "Expiration Date": item.inventoryItem.expirationDate ? dateFormat.format(item.inventoryItem.expirationDate) : "",
                         "Bin Location": item.binLocation?.locationNumber,
-                        "Quantity Counted": '',
-                        "Comment": '',
-                        "User Counted": '',
-                        "Date Counted": ''
+                        "Quantity Counted": "",
+                        "Comment": "",
+                        "User Counted": "",
+                        "Date Counted": ""
+                ]
+            }
+        }
+
+        return data
+    }
+
+    List<Map> getRecountFormXls(List<CycleCountDto> cycleCounts) {
+        def data = []
+        SimpleDateFormat dateFormat = new SimpleDateFormat(Constants.EXPIRATION_DATE_FORMAT)
+        cycleCounts.each { CycleCountDto cycleCount ->
+            cycleCount.cycleCountItems.each { CycleCountItemDto item ->
+                data << [
+                        "Product Code": item.product.productCode,
+                        "Product Name": item.product.name,
+                        "Lot Number": item.inventoryItem.lotNumber,
+                        "Expiration Date": item.inventoryItem.expirationDate ? dateFormat.format(item.inventoryItem.expirationDate) : "",
+                        "Bin Location": item.binLocation?.locationNumber,
+                        "Quantity Counted": item.quantityCounted,
+                        "Difference": item.quantityVariance,
+                        "Counted by": item.assignee,
+                        "Date Counted": item.dateCounted ? dateFormat.format(item.dateCounted) : "",
+                        "Quantity Recounted": "",
+                        "Comment": "",
+                        "Recounted By": "",
+                        "Date Recounted": ""
                 ]
             }
         }
