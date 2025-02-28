@@ -689,7 +689,7 @@ class DataService {
         }
     }
 
-    def transformObject(Object object, Map includeFields) {
+    Map transformObject(Object object, Map includeFields) {
         Map properties = [:]
         includeFields.each { fieldName, element ->
             def value = null

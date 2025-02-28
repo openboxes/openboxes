@@ -30,3 +30,11 @@ const exportFileFromAPI = ({
   });
 
 export default exportFileFromAPI;
+
+export const extractFilenameFromHeader = (header) => {
+  if (!header) {
+    return null;
+  }
+
+  return header.split('filename=')[1]?.split(';')[0]?.replaceAll('"', '');
+};

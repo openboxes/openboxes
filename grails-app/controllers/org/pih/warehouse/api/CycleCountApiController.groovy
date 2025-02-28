@@ -3,6 +3,7 @@ package org.pih.warehouse.api
 import grails.converters.JSON
 import grails.validation.ValidationException
 import org.apache.commons.csv.CSVPrinter
+import org.pih.warehouse.core.DocumentService
 import org.pih.warehouse.core.dtos.BatchCommandUtils
 import org.pih.warehouse.inventory.CycleCountCandidate
 import org.pih.warehouse.inventory.CycleCountCandidateFilterCommand
@@ -14,6 +15,7 @@ import org.pih.warehouse.inventory.CycleCountRequestBatchCommand
 import org.pih.warehouse.inventory.CycleCountService
 import org.pih.warehouse.inventory.CycleCountStartBatchCommand
 import org.pih.warehouse.inventory.CycleCountStartRecountBatchCommand
+import org.pih.warehouse.inventory.CycleCountStatus
 import org.pih.warehouse.inventory.CycleCountSubmitCountCommand
 import org.pih.warehouse.inventory.CycleCountSubmitRecountCommand
 import org.pih.warehouse.inventory.CycleCountUpdateItemCommand
@@ -22,6 +24,7 @@ import org.pih.warehouse.inventory.CycleCountUpdateItemCommand
 class CycleCountApiController {
 
     CycleCountService cycleCountService
+    DocumentService documentService
 
     def getCandidates(CycleCountCandidateFilterCommand filterParams) {
         List<CycleCountCandidate> cycleCounts = cycleCountService.getCandidates(filterParams, params.facilityId)
@@ -45,7 +48,21 @@ class CycleCountApiController {
         BatchCommandUtils.validateBatch(command, "requests")
         List<CycleCountDto> cycleCounts = cycleCountService.startCycleCount(command)
 
-        render([data: cycleCounts] as JSON)
+        if (!params.format) {
+            params.format = "json"
+        }
+
+        withFormat {
+            xls {
+                exportCountXls(cycleCounts)
+            }
+            pdf {
+                // TODO: to be implemented in OBPIH-7015
+            }
+            json {
+                render([data: cycleCounts] as JSON)
+            }
+        }
     }
 
     def startRecount(CycleCountStartRecountBatchCommand command) {
@@ -59,7 +76,29 @@ class CycleCountApiController {
         List<String> ids = params.list("id")
         List<CycleCountDto> cycleCounts = cycleCountService.getCycleCounts(ids)
 
-        render([data: cycleCounts] as JSON)
+        if (!params.format) {
+            params.format = "json"
+        }
+
+        withFormat {
+            xls {
+                exportCountXls(cycleCounts)
+            }
+            pdf {
+                // TODO: to be implemented in OBPIH-7015
+            }
+            json {
+                render([data: cycleCounts] as JSON)
+            }
+        }
+    }
+
+    def exportCountXls(List<CycleCountDto> cycleCounts) {
+        List<Map> data = cycleCountService.getCountFormXls(cycleCounts)
+        response.setHeader("Content-disposition", "attachment; filename=Count form.xls")
+        response.contentType = "application/vnd.ms-excel"
+        documentService.generateExcel(response.outputStream, data)
+        response.outputStream.flush()
     }
 
     def submitCount(CycleCountSubmitCountCommand command) {
