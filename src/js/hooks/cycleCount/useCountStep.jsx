@@ -85,11 +85,11 @@ const useCountStep = () => {
         productCode,
       },
       inventoryItem: {
-        lotNumber: undefined,
-        expirationDate: undefined,
+        lotNumber: null,
+        expirationDate: null,
       },
-      binLocation: undefined,
-      quantityCounted: undefined,
+      binLocation: null,
+      quantityCounted: null,
       comment: '',
     };
     const tableIndex = tableData.current.findIndex(
