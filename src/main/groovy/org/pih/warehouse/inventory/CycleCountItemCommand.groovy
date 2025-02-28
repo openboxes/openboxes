@@ -4,6 +4,7 @@ import grails.databinding.BindUsing
 import grails.validation.Validateable
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.ReasonCode
+import org.pih.warehouse.core.User
 import org.pih.warehouse.product.Product
 import org.springframework.web.context.request.RequestContextHolder
 
@@ -28,6 +29,8 @@ class CycleCountItemCommand implements Validateable {
     CycleCount cycleCount
 
     Location facility
+
+    User assignee
 
     def beforeValidate() {
         String cycleCountId = RequestContextHolder.getRequestAttributes().params?.cycleCountId

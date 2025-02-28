@@ -187,3 +187,5 @@ export const CYCLE_COUNT_CANDIDATES = (locationId) => `${CYCLE_COUNT(locationId)
 export const CYCLE_COUNT_REQUESTS = (locationId) => `${CYCLE_COUNT(locationId)}/requests/batch`;
 export const CYCLE_COUNT_START = (locationId) => `${CYCLE_COUNT(locationId)}/start/batch`;
 export const CYCLE_COUNT_RECOUNT_START = (locationId) => `${CYCLE_COUNT(locationId)}/recount/start/batch`;
+export const CYCLE_COUNT_ITEM = (locationId, itemId) => `${CYCLE_COUNT(locationId)}/items/${itemId}`;
+export const CYCLE_COUNT_ITEMS = (locationId, cycleCountId) => `${CYCLE_COUNT(locationId)}/${cycleCountId}/items`;

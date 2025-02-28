@@ -37,11 +37,11 @@ const useCountStepValidation = ({ tableData }) => {
         .optional()
         .nullable(),
     }).optional(),
-    internalLocation: z.object({
+    binLocation: z.object({
       id: z.string(),
       name: z.string(),
       label: z.string().optional(),
-    }).optional(),
+    }).optional().nullish(),
   }).refine(checkLotNumberRequireness, {
     path: ['inventoryItem.lotNumber'],
     message: translate('react.cycleCount.requiredLotNumber', 'Lot number is required'),

@@ -1,6 +1,7 @@
 package org.pih.warehouse.inventory
 
 import org.pih.warehouse.core.ReasonCode
+import org.pih.warehouse.core.User
 import org.pih.warehouse.product.Product
 
 class CycleCountItemDto {
@@ -32,4 +33,6 @@ class CycleCountItemDto {
     Boolean custom
 
     Date dateCounted
+
+    User assignee
 }

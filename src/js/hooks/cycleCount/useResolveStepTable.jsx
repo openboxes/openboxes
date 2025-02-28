@@ -22,10 +22,12 @@ import ArrowValueIndicatorVariant, {
   getCycleCountDifferencesVariant,
 } from 'consts/arrowValueIndicatorVariant';
 import cycleCountColumn from 'consts/cycleCountColumn';
+import { DateFormat } from 'consts/timeFormat';
 import useTranslate from 'hooks/useTranslate';
 import groupBinLocationsByZone from 'utils/groupBinLocationsByZone';
 import { fetchBins } from 'utils/option-utils';
 import { checkBinLocationSupport } from 'utils/supportedActivitiesUtils';
+import { formatDate } from 'utils/translation-utils';
 import CustomTooltip from 'wrappers/CustomTooltip';
 
 // Managing state for single table, mainly table configuration (from resolve step)
@@ -34,6 +36,7 @@ const useResolveStepTable = ({
   removeRow,
   validationErrors,
   shouldHaveRootCause,
+  isStepEditable,
   tableData,
 }) => {
   const columnHelper = createColumnHelper();
@@ -45,10 +48,12 @@ const useResolveStepTable = ({
   const {
     users,
     currentLocation,
+    formatLocalizedDate,
     reasonCodes,
   } = useSelector((state) => ({
     users: state.users.data,
     currentLocation: state.session.currentLocation,
+    formatLocalizedDate: formatDate(state.localize),
     reasonCodes: state.cycleCount.reasonCodes,
   }));
 
@@ -137,10 +142,36 @@ const useResolveStepTable = ({
     return null;
   };
 
+  // this function is required because there is a problem w getValue
+  const getValueToDisplay = (id, value) => {
+    if (id === cycleCountColumn.EXPIRATION_DATE) {
+      return formatLocalizedDate(value, DateFormat.DD_MMM_YYYY);
+    }
+
+    if (id === cycleCountColumn.QUANTITY_COUNTED) {
+      return value?.toString();
+    }
+
+    if (id === cycleCountColumn.BIN_LOCATION) {
+      return value?.name;
+    }
+
+    if (id === cycleCountColumn.ROOT_CAUSE) {
+      return value?.label;
+    }
+
+    return value;
+  };
+
   const defaultColumn = {
     cell: ({
-      getValue, row: { original, index }, column: { id }, table,
+      row: { original, index }, column: { id }, table,
     }) => {
+      const columnPath = id.replaceAll('_', '.');
+      const initialValue = _.get(tableData, `[${index}].${columnPath}`);
+      // Keep and update the state of the cell during rerenders
+      const [value, setValue] = useState(initialValue);
+
       const isFieldEditable = !original.id.includes('newRow')
         && ![
           cycleCountColumn.QUANTITY_RECOUNTED,
@@ -149,18 +180,19 @@ const useResolveStepTable = ({
         ].includes(id);
       // We shouldn't allow users edit fetched data (quantityRecounted, rootCause and comment
       // field are editable)
-      if (isFieldEditable) {
+      if (isFieldEditable || !isStepEditable) {
         return (
-          <TableCell className="rt-td rt-td-count-step static-cell-count-step d-flex align-items-center">
-            {getValue()}
-          </TableCell>
+          <CustomTooltip
+            content={getValueToDisplay(id, value)}
+            show={id === cycleCountColumn.COMMENT}
+          >
+            <TableCell className="static-cell-count-step align-items-center limit-lines-3 text-break resolve-table-limit-lines">
+              {getValueToDisplay(id, value)}
+            </TableCell>
+          </CustomTooltip>
         );
       }
-      // Keep and update the state of the cell during rerenders
-      const columnPath = id.replaceAll('_', '.');
-      const initialValue = _.get(tableData, `[${index}].${columnPath}`);
       const errorMessage = validationErrors?.[cycleCountId]?.errors?.[index]?.[columnPath]?._errors;
-      const [value, setValue] = useState(initialValue);
       const [error, setError] = useState(errorMessage);
       const [warning, setWarning] = useState(error ? null : shouldHaveRootCause(original?.id));
       // If the value at the end of entering data is the same as it was initially,
@@ -212,7 +244,7 @@ const useResolveStepTable = ({
             value={value}
             onChange={onChange}
             onBlur={onBlur}
-            className="w-75 m-1"
+            className={`w-75 m-1 ${error && 'border border-danger input-has-error'}`}
             showErrorBorder={error}
             hideErrorMessageWrapper
             warning={tooltipContent && warning}
@@ -375,6 +407,9 @@ const useResolveStepTable = ({
       ), []),
       meta: {
         flexWidth: 228,
+        getCellContext: () => ({
+          className: 'overflow-hidden',
+        }),
       },
     }),
     columnHelper.accessor(null, {
@@ -405,6 +440,7 @@ const useResolveStepTable = ({
       ), []),
       meta: {
         flexWidth: 50,
+        hide: !isStepEditable,
       },
     }),
   ];

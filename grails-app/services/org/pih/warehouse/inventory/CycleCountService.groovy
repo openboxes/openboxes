@@ -5,6 +5,7 @@ import grails.validation.ValidationException
 import org.apache.commons.csv.CSVPrinter
 import org.apache.commons.lang.StringEscapeUtils
 import org.grails.datastore.mapping.query.api.Criteria
+import org.hibernate.criterion.CriteriaSpecification
 import org.hibernate.criterion.Order
 import org.hibernate.sql.JoinType
 import org.pih.warehouse.api.AvailableItem
@@ -380,7 +381,6 @@ class CycleCountService {
         cycleCountItem.countIndex = command.recount ? 1 : 0
         cycleCountItem.status = command.recount ? CycleCountItemStatus.INVESTIGATING : CycleCountItemStatus.COUNTING
         cycleCountItem.dateCounted = new Date()
-        cycleCountItem.assignee = AuthService.currentUser
 
         return cycleCountItem.toDto()
     }
@@ -403,6 +403,7 @@ class CycleCountService {
                 dateCounted: new Date(),
                 comment: command.comment,
                 discrepancyReasonCode: command.discrepancyReasonCode,
+                assignee: command.assignee,
                 custom: true,
         )
         if (!cycleCountItem.validate()) {
