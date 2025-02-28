@@ -111,10 +111,9 @@ export function fetchReasonCodes(activityCode = null, dispatchType = FETCH_REASO
   return (dispatch) => {
     apiClient.get(url).then((res) => {
       if (res.data) {
-        // These codes are exclusively used in dropdown selectors so we map the response to conform
-        // to that format.
-        // TODO: confirm this. Test all the callers of this method (outbound edit/pick request edit)
-        const reasonCodes = res.data.map((reasonCode) => (
+        // These reason codes are exclusively used in dropdown selectors, so for the sake of
+        // convenience, we immediately transform the response to conform to that format.
+        const reasonCodes = res.data.data.map((reasonCode) => (
           {
             id: reasonCode.id,
             value: reasonCode.id,
