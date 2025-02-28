@@ -5,7 +5,6 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { fetchUsers } from 'actions';
 import cycleCountApi from 'api/services/CycleCountApi';
-import CycleCountItemStatus from 'consts/cycleCountItemStatus';
 import useCountStepValidation from 'hooks/cycleCount/useCountStepValidation';
 import useSpinner from 'hooks/useSpinner';
 
@@ -74,7 +73,7 @@ const useCountStep = () => {
     console.log('print count form');
   };
 
-  const markAllItemsAsUpdated = (cycleCountId) => {
+  const setAllItemsUpdatedState = (cycleCountId, updated) => {
     const tableIndex = tableData.current.findIndex(
       (cycleCount) => cycleCount?.id === cycleCountId,
     );
@@ -82,12 +81,16 @@ const useCountStep = () => {
       if (index === tableIndex) {
         return {
           ...cycleCount,
-          cycleCountItems: cycleCount.cycleCountItems.map((item) => ({ ...item, updated: true })),
+          cycleCountItems: cycleCount.cycleCountItems.map((item) => ({ ...item, updated })),
         };
       }
       return cycleCount;
     });
   };
+
+  const markAllItemsAsUpdated = (cycleCountId) => setAllItemsUpdatedState(cycleCountId, true);
+
+  const markAllItemsAsNotUpdated = (cycleCountId) => setAllItemsUpdatedState(cycleCountId, false);
 
   const assignCountedBy = (cycleCountId) => (person) => {
     // We need to mark all items as updated if we change the counted by person,
@@ -177,7 +180,7 @@ const useCountStep = () => {
   const save = async () => {
     // eslint-disable-next-line no-restricted-syntax
     for (const cycleCount of tableData.current) {
-      const cycleCountItemsToUpdate = cycleCount.cycleCountItems.filter((item) => ((item.updated || item.status.name !== CycleCountItemStatus.COUNTING) && !item.id.includes('newRow')));
+      const cycleCountItemsToUpdate = cycleCount.cycleCountItems.filter((item) => (item.updated && !item.id.includes('newRow')));
       // eslint-disable-next-line no-restricted-syntax
       for (const cycleCountItem of cycleCountItemsToUpdate) {
         try {
@@ -212,6 +215,10 @@ const useCountStep = () => {
           hide();
         }
       }
+
+      // Now that we've successfully saved all the items, mark them all as not updated so that
+      // we don't try to update them again next time something is changed.
+      markAllItemsAsNotUpdated(cycleCount.id);
     }
   };
 
