@@ -94,13 +94,13 @@ const useResolveStep = () => {
         productCode,
       },
       inventoryItem: {
-        lotNumber: undefined,
-        expirationDate: undefined,
+        lotNumber: null,
+        expirationDate: null,
       },
-      binLocation: undefined,
-      quantityRecounted: undefined,
-      quantityCounted: undefined,
-      rootCause: undefined,
+      binLocation: null,
+      quantityRecounted: null,
+      quantityCounted: null,
+      rootCause: null,
       comment: '',
     };
     const tableIndex = tableData.current.findIndex(

@@ -168,7 +168,7 @@ const useCountStepTable = ({
             value={value}
             onChange={onChange}
             onBlur={onBlur}
-            className={`m-1 ${showTooltip ? 'w-99' : 'w-75'} ${error && 'border border-danger'}`}
+            className={`m-1 ${showTooltip ? 'w-99' : 'w-75'} ${error && 'border border-danger input-has-error'}`}
             showErrorBorder={error}
             hideErrorMessageWrapper
             {...fieldProps}

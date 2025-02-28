@@ -211,7 +211,7 @@ const useResolveStepTable = ({
             value={value}
             onChange={onChange}
             onBlur={onBlur}
-            className="w-75 m-1"
+            className={`w-75 m-1 ${error && 'border border-danger input-has-error'}`}
             showErrorBorder={error}
             hideErrorMessageWrapper
             warning={tooltipContent && warning}
