@@ -4,10 +4,11 @@ create or replace view product_physical_count_history as
 (
     select
         transaction.inventory_id as inventory_id,
-        transaction_entry.product_id,
+        inventory_item.product_id,
         max(transaction.transaction_date) as date_counted
     from transaction_entry
     join transaction on transaction.id = transaction_entry.transaction_id
+    join inventory_item on transaction_entry.inventory_item_id = inventory_item.id
     where transaction.transaction_type_id = '11'
-    group by transaction.inventory_id, transaction_entry.product_id
+    group by transaction.inventory_id, inventory_item.product_id
 );
