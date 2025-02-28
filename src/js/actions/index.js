@@ -102,7 +102,7 @@ export function hideUserActions() {
   };
 }
 
-export function fetchReasonCodes(activityCode = null) {
+export function fetchReasonCodes(activityCode = null, dispatchType = FETCH_REASONCODES) {
   let url = '/api/reasonCodes';
   if (activityCode) {
     url += `?activityCode=${activityCode}`;
@@ -110,9 +110,26 @@ export function fetchReasonCodes(activityCode = null) {
 
   return (dispatch) => {
     apiClient.get(url).then((res) => {
+      if (res.data) {
+        // These codes are exclusively used in dropdown selectors so we map the response to conform
+        // to that format.
+        // TODO: confirm this. Test all the callers of this method (outbound edit/pick request edit)
+        const reasonCodes = res.data.map((reasonCode) => (
+          {
+            id: reasonCode.id,
+            value: reasonCode.id,
+            label: reasonCode.name,
+          }
+        ));
+        dispatch({
+          type: dispatchType,
+          payload: reasonCodes,
+        });
+        return;
+      }
       dispatch({
-        type: FETCH_REASONCODES,
-        payload: res.data,
+        type: dispatchType,
+        payload: [],
       });
     });
   };
