@@ -23,7 +23,8 @@ const CountStep = () => {
     setCountedDate,
     validationErrors,
     isStepEditable,
-    countedBy,
+    getCountedBy,
+    getDefaultCountedBy,
   } = useCountStep();
 
   return (
@@ -32,6 +33,7 @@ const CountStep = () => {
         <CountStepHeader
           printCountForm={printCountForm}
           next={next}
+          save={save}
         />
       ) : <ConfirmStepHeader back={back} save={save} />}
       {tableData
@@ -49,7 +51,8 @@ const CountStep = () => {
             assignCountedBy={assignCountedBy}
             validationErrors={validationErrors}
             isStepEditable={isStepEditable}
-            countedBy={countedBy}
+            countedBy={getCountedBy(id)}
+            defaultCountedBy={getDefaultCountedBy(id)}
           />
         ))}
     </PageWrapper>
