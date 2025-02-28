@@ -2,10 +2,10 @@ package org.pih.warehouse.inventory
 
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
+import java.text.SimpleDateFormat
 import org.apache.commons.csv.CSVPrinter
 import org.apache.commons.lang.StringEscapeUtils
 import org.grails.datastore.mapping.query.api.Criteria
-import org.hibernate.criterion.CriteriaSpecification
 import org.hibernate.criterion.Order
 import org.hibernate.sql.JoinType
 import org.pih.warehouse.api.AvailableItem
@@ -177,6 +177,28 @@ class CycleCountService {
         }
 
         return csv
+    }
+
+    List<Map> getCountFormXls(List<CycleCountDto> cycleCounts) {
+        def data = []
+        SimpleDateFormat dateFormat = new SimpleDateFormat(Constants.EXPIRATION_DATE_FORMAT)
+        cycleCounts.each { CycleCountDto cycleCount ->
+            cycleCount.cycleCountItems.each { CycleCountItemDto item ->
+                data << [
+                        "Product Code": item.product.productCode,
+                        "Product Name": item.product.name,
+                        "Lot Number": item.inventoryItem.lotNumber,
+                        "Expiration Date": item.inventoryItem.expirationDate ? dateFormat.format(item.inventoryItem.expirationDate) : "",
+                        "Bin Location": item.binLocation?.locationNumber,
+                        "Quantity Counted": '',
+                        "Comment": '',
+                        "User Counted": '',
+                        "Date Counted": ''
+                ]
+            }
+        }
+
+        return data
     }
 
     /**

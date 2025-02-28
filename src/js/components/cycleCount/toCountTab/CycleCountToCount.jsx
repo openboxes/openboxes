@@ -5,9 +5,11 @@ import { RiCalculatorLine, RiDownload2Line, RiPrinterLine } from 'react-icons/ri
 
 import DataTable from 'components/DataTable/v2/DataTable';
 import Button from 'components/form-elements/Button';
+import FileFormat from 'consts/fileFormat';
 import useToCountTab from 'hooks/cycleCount/useToCountTab';
 import useTablePagination from 'hooks/useTablePagination';
 import useTranslate from 'hooks/useTranslate';
+import Translate from 'utils/Translate';
 
 const CycleCountToCount = ({ filterParams }) => {
   const totalCount = useRef(0);
@@ -60,14 +62,30 @@ const CycleCountToCount = ({ filterParams }) => {
             StartIcon={<RiCalculatorLine size={18} />}
             disabled={!selectedCheckboxesAmount}
           />
-          <Button
-            onClick={printCountForm}
-            defaultLabel="Print count form"
-            label="react.cycleCount.printCountForm.label"
-            variant="primary-outline"
-            StartIcon={<RiPrinterLine size={18} />}
-            disabled={!selectedCheckboxesAmount}
-          />
+          <div className="btn-group">
+            <Button
+              isDropdown
+              defaultLabel="Print count form"
+              label="react.cycleCount.printCountForm.label"
+              variant="primary-outline"
+              StartIcon={<RiPrinterLine size={18} />}
+              disabled={!selectedCheckboxesAmount}
+            />
+            <div className="dropdown-menu dropdown-menu-right nav-item padding-8" aria-labelledby="dropdownMenuButton">
+              <a href="#" className="dropdown-item" onClick={() => printCountForm(FileFormat.PDF)} role="button">
+                <Translate
+                  id="react.cycleCount.printCountFormPdf.label"
+                  defaultMessage="Print Count form PDF"
+                />
+              </a>
+              <a href="#" className="dropdown-item" onClick={() => printCountForm(FileFormat.XLS)} role="button">
+                <Translate
+                  id="react.cycleCount.exportCountSheet.label"
+                  defaultMessage="Export Count sheet"
+                />
+              </a>
+            </div>
+          </div>
           <Button
             onClick={exportTableData}
             defaultLabel="Export"

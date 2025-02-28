@@ -1,12 +1,15 @@
 import { useEffect, useRef, useState } from 'react';
 
+import fileDownload from 'js-file-download';
 import _ from 'lodash';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { fetchUsers } from 'actions';
 import cycleCountApi from 'api/services/CycleCountApi';
+import MimeType from 'consts/mimeType';
 import useCountStepValidation from 'hooks/cycleCount/useCountStepValidation';
 import useSpinner from 'hooks/useSpinner';
+import { extractFilenameFromHeader } from 'utils/file-download-util';
 
 // Managing state for all tables, operations on shared state (from count step)
 const useCountStep = () => {
@@ -69,8 +72,17 @@ const useCountStep = () => {
     dispatch(fetchUsers());
   }, []);
 
-  const printCountForm = () => {
-    console.log('print count form');
+  const printCountForm = async (fileFormat) => {
+    show();
+    const response = await cycleCountApi.getCycleCounts(
+      currentLocation?.id,
+      cycleCountIds,
+      fileFormat,
+      { responseType: 'blob' },
+    );
+    const filename = extractFilenameFromHeader(response.headers['content-disposition']);
+    fileDownload(response.data, filename, MimeType[fileFormat]);
+    hide();
   };
 
   const setAllItemsUpdatedState = (cycleCountId, updated) => {
