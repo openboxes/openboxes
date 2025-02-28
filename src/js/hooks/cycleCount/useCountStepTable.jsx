@@ -92,7 +92,7 @@ const useCountStepTable = ({
     return {};
   };
 
-  // this function is required because there is a problem w getValue
+  // this function is required because there is a problem with getValue
   const getValueToDisplay = (id, value) => {
     if (id === cycleCountColumn.EXPIRATION_DATE) {
       return formatLocalizedDate(value, DateFormat.DD_MMM_YYYY);
