@@ -57,7 +57,7 @@ class CycleCountApiController {
                 exportCountXls(cycleCounts)
             }
             pdf {
-                // TODO: to be implemented in OBPIH-7015
+                renderCountPdf(cycleCounts, command.facility.name)
             }
             json {
                 render([data: cycleCounts] as JSON)
@@ -85,7 +85,8 @@ class CycleCountApiController {
                 exportCountXls(cycleCounts)
             }
             pdf {
-                // TODO: to be implemented in OBPIH-7015
+                String facilityName = cycleCounts?.first()?.cycleCountItems?.first()?.facility?.name  ?: ""
+                renderCountPdf(cycleCounts, facilityName)
             }
             json {
                 render([data: cycleCounts] as JSON)
@@ -99,6 +100,14 @@ class CycleCountApiController {
         response.contentType = "application/vnd.ms-excel"
         documentService.generateExcel(response.outputStream, data)
         response.outputStream.flush()
+    }
+
+    def renderCountPdf(List<CycleCountDto> cycleCounts, String facilityName) {
+        renderPdf(
+                template: "/cycleCount/printCount",
+                model: [cycleCounts: cycleCounts, facilityName: facilityName, datePrinted: new Date()],
+                filename: "Count form.pdf"
+        )
     }
 
     def submitCount(CycleCountSubmitCountCommand command) {
