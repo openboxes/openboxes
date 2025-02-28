@@ -5,9 +5,11 @@ import { RiCalculatorLine, RiDownload2Line, RiPrinterLine } from 'react-icons/ri
 
 import DataTable from 'components/DataTable/v2/DataTable';
 import Button from 'components/form-elements/Button';
+import FileFormat from 'consts/fileFormat';
 import useToResolveTab from 'hooks/cycleCount/useToResolveTab';
 import useTablePagination from 'hooks/useTablePagination';
 import useTranslate from 'hooks/useTranslate';
+import Translate from 'utils/Translate';
 
 const CycleCountToResolve = ({ filterParams }) => {
   const totalCount = useRef(0);
@@ -60,14 +62,30 @@ const CycleCountToResolve = ({ filterParams }) => {
             StartIcon={<RiCalculatorLine size={18} />}
             disabled={!selectedCheckboxesAmount}
           />
-          <Button
-            onClick={printResolveForm}
-            defaultLabel="Print resolve form"
-            label="react.cycleCount.printResolveForm.label"
-            variant="primary-outline"
-            StartIcon={<RiPrinterLine size={18} />}
-            disabled={!selectedCheckboxesAmount}
-          />
+          <div className="btn-group">
+            <Button
+              isDropdown
+              defaultLabel="Print recount form"
+              label="react.cycleCount.printRecountForm.label"
+              variant="primary-outline"
+              StartIcon={<RiPrinterLine size={18} />}
+              disabled={!selectedCheckboxesAmount}
+            />
+            <div className="dropdown-menu dropdown-menu-right nav-item padding-8" aria-labelledby="dropdownMenuButton">
+              <a href="#" className="dropdown-item" onClick={() => printResolveForm(FileFormat.PDF)} role="button">
+                <Translate
+                  id="react.cycleCount.printRecountFormPdf.label"
+                  defaultMessage="Print Recount Form PDF"
+                />
+              </a>
+              <a href="#" className="dropdown-item" onClick={() => printResolveForm(FileFormat.XLS)} role="button">
+                <Translate
+                  id="react.cycleCount.exportRecountSheet.label"
+                  defaultMessage="Export Recount Sheet"
+                />
+              </a>
+            </div>
+          </div>
           <Button
             onClick={exportTableData}
             defaultLabel="Export"

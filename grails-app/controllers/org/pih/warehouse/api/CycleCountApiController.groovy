@@ -69,7 +69,21 @@ class CycleCountApiController {
         BatchCommandUtils.validateBatch(command, "requests")
         List<CycleCountDto> cycleCounts = cycleCountService.startRecount(command)
 
-        render([data: cycleCounts] as JSON)
+        if (!params.format) {
+            params.format = "json"
+        }
+
+        withFormat {
+            xls {
+                exportRecountXls(cycleCounts)
+            }
+            pdf {
+                // TODO: To be implemented in OBPIH-7016
+            }
+            json {
+                render([data: cycleCounts] as JSON)
+            }
+        }
     }
 
     def list() {
@@ -80,9 +94,11 @@ class CycleCountApiController {
             params.format = "json"
         }
 
+        boolean isRecount = cycleCounts?.any { it.status == CycleCountStatus.INVESTIGATING.name() }
+
         withFormat {
             xls {
-                exportCountXls(cycleCounts)
+                isRecount ? exportRecountXls(cycleCounts) : exportCountXls(cycleCounts)
             }
             pdf {
                 String facilityName = cycleCounts?.first()?.cycleCountItems?.first()?.facility?.name  ?: ""
@@ -108,6 +124,14 @@ class CycleCountApiController {
                 model: [cycleCounts: cycleCounts, facilityName: facilityName, datePrinted: new Date()],
                 filename: "Count form.pdf"
         )
+    }
+
+    def exportRecountXls(List<CycleCountDto> cycleCounts) {
+        List<Map> data = cycleCountService.getRecountFormXls(cycleCounts)
+        response.setHeader("Content-disposition", "attachment; filename=Recount form.xls")
+        response.contentType = "application/vnd.ms-excel"
+        documentService.generateExcel(response.outputStream, data)
+        response.outputStream.flush()
     }
 
     def submitCount(CycleCountSubmitCountCommand command) {
