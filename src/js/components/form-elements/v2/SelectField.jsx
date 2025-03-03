@@ -1,8 +1,9 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 
 import PropTypes from 'prop-types';
 
 import ProductSelect from 'components/product-select/ProductSelect';
+import useFocusOnMatch from 'hooks/useFocusOnMatch';
 import Select from 'utils/Select';
 import InputWrapper from 'wrappers/InputWrapper';
 
@@ -52,13 +53,7 @@ const SelectField = ({
 
   const selectRef = useRef(null);
 
-  useEffect(() => {
-    if (focusIndex
-      && fieldIndex === focusIndex
-      && fieldId.replaceAll('_', '.') === focusId.replaceAll('_', '.')) {
-      selectRef.current?.focus();
-    }
-  }, [fieldIndex, fieldId, focusIndex, focusId]);
+  useFocusOnMatch(focusId, fieldIndex, focusIndex, fieldId, selectRef);
 
   return (
     <InputWrapper

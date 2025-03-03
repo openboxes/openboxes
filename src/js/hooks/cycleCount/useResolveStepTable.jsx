@@ -21,6 +21,7 @@ import ArrowValueIndicatorVariant, {
   getCycleCountDifferencesVariant,
 } from 'consts/arrowValueIndicatorVariant';
 import cycleCountColumn from 'consts/cycleCountColumn';
+import useNavigation from 'hooks/useNavigation';
 import useTranslate from 'hooks/useTranslate';
 import groupBinLocationsByZone from 'utils/groupBinLocationsByZone';
 import { fetchBins } from 'utils/option-utils';
@@ -34,10 +35,14 @@ const useResolveStepTable = ({
   validationErrors,
   shouldHaveRootCause,
   tableData,
+  productCode,
+  addEmptyRow,
 }) => {
   const columnHelper = createColumnHelper();
   // State for saving data for binLocation dropdown
   const [binLocations, setBinLocations] = useState([]);
+  const [focusIndex, setFocusIndex] = useState(null);
+  const [focusId, setFocusId] = useState(null);
   const translate = useTranslate();
   const events = new EventEmitter();
 
@@ -199,10 +204,41 @@ const useResolveStepTable = ({
 
       // Table consists of text fields, one numerical field for quantity recounted,
       // select field for bin locations and root cause and one date picker for the expiration date.
-      const type = getFieldType(id);
-      const Component = getFieldComponent(id);
-      const tooltipContent = getTooltipMessage(errorMessage, warning, id);
-      const fieldProps = getFieldProps(id, tooltipContent);
+      const type = getFieldType(columnPath);
+      const Component = getFieldComponent(columnPath);
+      const tooltipContent = getTooltipMessage(errorMessage, warning, columnPath);
+      const fieldProps = getFieldProps(columnPath, tooltipContent);
+
+      // Columns allowed for focus in new rows
+      const newRowFocusColumns = [
+        cycleCountColumn.LOT_NUMBER,
+        cycleCountColumn.EXPIRATION_DATE,
+        cycleCountColumn.QUANTITY_RECOUNTED,
+        cycleCountColumn.ROOT_CAUSE,
+        cycleCountColumn.COMMENT,
+      ];
+
+      if (showBinLocation) {
+        newRowFocusColumns.splice(0, 0, cycleCountColumn.BIN_LOCATION);
+      }
+
+      // Columns allowed for focus in existing rows
+      const existingRowFocusColumns = [
+        cycleCountColumn.QUANTITY_RECOUNTED,
+        cycleCountColumn.ROOT_CAUSE,
+        cycleCountColumn.COMMENT,
+      ];
+
+      const { handleKeyDown } = useNavigation({
+        newRowFocusColumns,
+        existingRowFocusColumns,
+        tableData,
+        setFocusId,
+        setFocusIndex,
+        addEmptyRow,
+        productCode,
+        cycleCountId,
+      });
 
       return (
         <TableCell className="rt-td rt-td-count-step pb-0">
@@ -211,10 +247,15 @@ const useResolveStepTable = ({
             value={value}
             onChange={onChange}
             onBlur={onBlur}
-            className="w-75 m-1"
+            className="w-75 m-1 hide-arrows"
             showErrorBorder={error}
             hideErrorMessageWrapper
             warning={tooltipContent && warning}
+            onKeyDown={(e) => handleKeyDown(e, index, columnPath)}
+            fieldIndex={index}
+            fieldId={columnPath}
+            focusIndex={focusIndex}
+            focusId={focusId}
             {...fieldProps}
           />
           {(error || warning) && tooltipContent && (

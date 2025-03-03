@@ -40,6 +40,8 @@ const ResolveStepTable = ({
     tableData,
     removeRow,
     shouldHaveRootCause,
+    productCode: product?.productCode,
+    addEmptyRow,
   });
 
   const translate = useTranslate();

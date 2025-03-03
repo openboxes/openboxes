@@ -39,11 +39,13 @@ const CountStepTable = ({
     users,
   } = useCountStepTable({
     cycleCountId: id,
+    productCode: product?.productCode,
     tableData,
     validationErrors,
     removeRow,
     isStepEditable,
     formatLocalizedDate,
+    addEmptyRow,
   });
 
   return (

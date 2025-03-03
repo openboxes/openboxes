@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useRef } from 'react';
 
 import moment from 'moment';
 import PropTypes from 'prop-types';
@@ -6,6 +6,7 @@ import DatePicker from 'react-datepicker';
 
 import DateFieldInput from 'components/form-elements/v2/DateFieldInput';
 import { DateFormat, TimeFormat } from 'consts/timeFormat';
+import useFocusOnMatch from 'hooks/useFocusOnMatch';
 import useTranslate from 'hooks/useTranslate';
 import InputWrapper from 'wrappers/InputWrapper';
 import RootPortalWrapper from 'wrappers/RootPortalWrapper';
@@ -72,12 +73,7 @@ const DateField = ({
     return customDateFormat || DateFormat.MMM_DD_YYYY;
   };
 
-  useEffect(() => {
-    if (focusIndex && fieldIndex === focusIndex && fieldId.replaceAll('_', '.') === focusId.replaceAll('_', '.')) {
-      datePickerRef.current?.setOpen(true);
-      datePickerRef.current?.input?.focus();
-    }
-  }, [fieldIndex, fieldId, focusIndex, focusId]);
+  useFocusOnMatch(focusId, fieldIndex, focusIndex, fieldId, datePickerRef);
 
   return (
     <InputWrapper

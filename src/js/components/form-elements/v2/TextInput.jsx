@@ -1,8 +1,9 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useRef } from 'react';
 
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 
+import useFocusOnMatch from 'hooks/useFocusOnMatch';
 import { decimalParser } from 'utils/form-utils';
 import InputWrapper from 'wrappers/InputWrapper';
 
@@ -32,11 +33,7 @@ const TextInput = ({
 }) => {
   const inputRef = useRef(null);
 
-  useEffect(() => {
-    if (fieldIndex === focusIndex && fieldId.replaceAll('_', '.') === focusId.replaceAll('_', '.')) {
-      inputRef.current?.focus();
-    }
-  }, [fieldIndex, fieldId, focusIndex, focusId]);
+  useFocusOnMatch(focusId, fieldIndex, focusIndex, fieldId, inputRef);
 
   const onBlurHandler = (e) => {
     if (type === 'number') {
@@ -93,25 +90,37 @@ const TextInput = ({
   );
 };
 
+export default TextInput;
+
 TextInput.propTypes = {
+  // Message which will be shown on the tooltip above the field
   tooltip: PropTypes.shape({
     id: PropTypes.string.isRequired,
     defaultMessage: PropTypes.string.isRequired,
   }),
+  // Indicator whether the red asterisk has to be shown
   required: PropTypes.bool,
+  // Title displayed above the field
   title: PropTypes.shape({
     id: PropTypes.string.isRequired,
     defaultMessage: PropTypes.string.isRequired,
   }),
+  // Button on the right side above the input
   button: PropTypes.shape({
     id: PropTypes.string.isRequired,
     defaultMessage: PropTypes.string.isRequired,
     onClick: PropTypes.func.isRequired,
   }),
+  // Indicator whether the field should be disabled
   disabled: PropTypes.bool,
+  // If the errorMessage is not empty then the field is bordered
+  // and the message is displayed under the input
   errorMessage: PropTypes.string,
+  // Text displayed within input field
   placeholder: PropTypes.string,
+  // html element id
   id: PropTypes.string,
+  // html element name
   name: PropTypes.string,
   type: PropTypes.string,
   decimal: PropTypes.number,
@@ -146,5 +155,3 @@ TextInput.defaultProps = {
   focusIndex: '',
   focusId: '',
 };
-
-export default TextInput;

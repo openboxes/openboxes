@@ -13,6 +13,7 @@ import SelectField from 'components/form-elements/v2/SelectField';
 import TextInput from 'components/form-elements/v2/TextInput';
 import cycleCountColumn from 'consts/cycleCountColumn';
 import { DateFormat } from 'consts/timeFormat';
+import useNavigation from 'hooks/useNavigation';
 import useTranslate from 'hooks/useTranslate';
 import groupBinLocationsByZone from 'utils/groupBinLocationsByZone';
 import { fetchBins } from 'utils/option-utils';
@@ -22,11 +23,13 @@ import CustomTooltip from 'wrappers/CustomTooltip';
 // Managing state for single table, mainly table configuration (from count step)
 const useCountStepTable = ({
   cycleCountId,
+  productCode,
   removeRow,
   validationErrors,
   tableData,
   isStepEditable,
   formatLocalizedDate,
+  addEmptyRow,
 }) => {
   const columnHelper = createColumnHelper();
   // State for saving data for binLocation dropdown
@@ -152,86 +155,39 @@ const useCountStepTable = ({
       };
       // Table consists of text fields, one numerical field for quantity counted,
       // select field for bin locations and one date picker for the expiration date.
-      const type = getFieldType(id);
-      const Component = getFieldComponent(id);
-      const fieldProps = getFieldProps(id);
-      const showTooltip = id === 'binLocation';
+      const type = getFieldType(columnPath);
+      const Component = getFieldComponent(columnPath);
+      const fieldProps = getFieldProps(columnPath);
+      const showTooltip = columnPath === cycleCountColumn.BIN_LOCATION;
 
-      const getNextColumnId = (columnId) => {
-        const columnIds = [
-          cycleCountColumn.BIN_LOCATION,
-          cycleCountColumn.LOT_NUMBER,
-          cycleCountColumn.EXPIRATION_DATE,
-          cycleCountColumn.QUANTITY_COUNTED,
-          cycleCountColumn.COMMENT,
-        ];
+      // Columns allowed for focus in new rows
+      const newRowFocusColumns = [
+        cycleCountColumn.LOT_NUMBER,
+        cycleCountColumn.EXPIRATION_DATE,
+        cycleCountColumn.QUANTITY_COUNTED,
+        cycleCountColumn.COMMENT,
+      ];
 
-        const currentIndex = columnIds.indexOf(columnId);
-        return columnIds[currentIndex + 1] || columnIds[currentIndex];
-      };
+      if (showBinLocation) {
+        newRowFocusColumns.splice(0, 0, cycleCountColumn.BIN_LOCATION);
+      }
 
-      const getPrevColumnId = (columnId) => {
-        const columnIds = [
-          cycleCountColumn.BIN_LOCATION,
-          cycleCountColumn.LOT_NUMBER,
-          cycleCountColumn.EXPIRATION_DATE,
-          cycleCountColumn.QUANTITY_COUNTED,
-          cycleCountColumn.COMMENT,
-        ];
-        const currentIndex = columnIds.indexOf(columnId);
-        return columnIds[currentIndex - 1] || columnIds[currentIndex];
-      };
+      // Columns allowed for focus in existing rows
+      const existingRowFocusColumns = [
+        cycleCountColumn.QUANTITY_COUNTED,
+        cycleCountColumn.COMMENT,
+      ];
 
-      const handleKeyDown = (e, rowIndex, columnId) => {
-        const { key } = e;
-
-        if (key === 'ArrowUp') {
-          if (rowIndex > 0) {
-            setFocusIndex(rowIndex - 1);
-            setFocusId(columnId);
-          }
-        }
-
-        if (key === 'ArrowDown') {
-          if (rowIndex < tableData.length - 1) {
-            setFocusIndex(rowIndex + 1);
-            setFocusId(columnId);
-          }
-        }
-
-        if (key === 'ArrowRight') {
-          const nextColumnId = getNextColumnId(columnId);
-          // console.log('nextColumnId', nextColumnId);
-          const isInArray = [
-            cycleCountColumn.QUANTITY_COUNTED,
-            cycleCountColumn.COMMENT,
-          ].includes(nextColumnId);
-
-          if (isInArray || tableData[rowIndex].id.includes('newRow')) {
-            setFocusIndex(rowIndex);
-            setFocusId(nextColumnId);
-          }
-
-          setFocusIndex(rowIndex);
-          setFocusId(nextColumnId);
-        }
-
-        if (key === 'ArrowLeft') {
-          const prevColumnId = getPrevColumnId(columnId);
-
-          const isInArray = [
-            cycleCountColumn.QUANTITY_COUNTED,
-            cycleCountColumn.COMMENT,
-          ].includes(prevColumnId);
-
-          if (isInArray || tableData[rowIndex].id.includes('newRow')) {
-            setFocusIndex(rowIndex);
-            setFocusId(prevColumnId);
-          }
-        }
-        e.preventDefault();
-        e.stopPropagation();
-      };
+      const { handleKeyDown } = useNavigation({
+        newRowFocusColumns,
+        existingRowFocusColumns,
+        tableData,
+        setFocusId,
+        setFocusIndex,
+        addEmptyRow,
+        productCode,
+        cycleCountId,
+      });
 
       return (
         <TableCell
