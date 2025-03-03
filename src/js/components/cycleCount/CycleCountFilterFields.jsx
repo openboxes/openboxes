@@ -94,8 +94,11 @@ export default {
     attributes: {
       withLabel: true,
       label: 'react.cycleCount.filter.negativeInventory.label',
+      showLabelTooltip: true,
       defaultMessage: 'Negative quantity',
       filterElement: true,
+      showCustomTooltip: true,
+      customTooltipLabel: 'react.cycleCount.filter.negativeInventory.tooltip',
     },
   },
 };

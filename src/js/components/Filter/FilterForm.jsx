@@ -13,7 +13,6 @@ import SearchField from 'components/form-elements/SearchField';
 import useTranslation from 'hooks/useTranslation';
 import { renderFormField } from 'utils/form-utils';
 import { translateWithDefaultMessage } from 'utils/Translate';
-import CustomTooltip from 'wrappers/CustomTooltip';
 
 import 'components/Filter/FilterStyles.scss';
 
@@ -138,21 +137,13 @@ const FilterForm = ({
                       variant="transparent"
                       type="button"
                     />
-                    <CustomTooltip
-                      content={translate(
-                        'react.cycleCount.filter.negativeInventory.tooltip',
-                        'Returns products with negative inventory items in stock. Unselected for all products.',
-                      )}
-                      show={isCycleCountTab}
-                    >
-                      <Button
-                        defaultLabel={isCycleCountTab ? 'Filter' : 'Search'}
-                        label={isCycleCountTab ? 'react.button.filter.label' : 'react.button.search.label'}
-                        disabled={!allowEmptySubmit && _.every(values, (value) => !value)}
-                        variant="primary"
-                        type="submit"
-                      />
-                    </CustomTooltip>
+                    <Button
+                      defaultLabel={isCycleCountTab ? 'Filter' : 'Search'}
+                      label={isCycleCountTab ? 'react.button.filter.label' : 'react.button.search.label'}
+                      disabled={!allowEmptySubmit && _.every(values, (value) => !value)}
+                      variant="primary"
+                      type="submit"
+                    />
                   </div>
                 </div>
 
