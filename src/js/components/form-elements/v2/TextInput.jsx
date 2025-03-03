@@ -149,7 +149,7 @@ TextInput.defaultProps = {
   className: '',
   showErrorBorder: false,
   hideErrorMessageWrapper: false,
-  onKeyDown: () => {},
+  onKeyDown: null,
   fieldIndex: '',
   fieldId: '',
   focusIndex: '',

@@ -11,29 +11,27 @@ const useNavigation = ({
   const getNextFocus = (columnId, rowIndex) => {
     const currentIndex = newRowFocusColumns.indexOf(columnId);
     const remainingColumns = newRowFocusColumns.slice(currentIndex + 1);
-    const newRow = tableData[rowIndex + 1];
-    let newColumnId = newRowFocusColumns[currentIndex + 1];
+    const newRowIndex = tableData[rowIndex + 1];
 
     if (!remainingColumns.some(col => existingRowFocusColumns.includes(col))) {
-      if (remainingColumns.length > 0 && tableData[rowIndex]?.id.includes('newRow')) {
-        return { newColumnId, newRowIndex: rowIndex };
-      }
-
-      if (!newRow) {
+      if (!newRowIndex) {
         addEmptyRow(productCode, cycleCountId);
         return { newColumnId: newRowFocusColumns[0], newRowIndex: rowIndex + 1 };
       }
 
-      if (newRow?.id.includes('newRow')) {
+      if (newRowIndex?.id.includes('newRow')) {
         return { newColumnId: newRowFocusColumns[0], newRowIndex: rowIndex + 1 };
       }
       return { newColumnId: existingRowFocusColumns[0], newRowIndex: rowIndex + 1 };
     }
 
-    if (!(existingRowFocusColumns.includes(newColumnId) || tableData[rowIndex]?.id.includes('newRow'))) {
-      newColumnId = newRowFocusColumns.find(col => existingRowFocusColumns.includes(col));
+    if (tableData[rowIndex]?.id.includes('newRow')) {
+      return { newColumnId: newRowFocusColumns[currentIndex + 1], newRowIndex: rowIndex };
     }
-    return { newColumnId, newRowIndex: rowIndex };
+    return {
+      newColumnId: existingRowFocusColumns[existingRowFocusColumns.indexOf(columnId) + 1],
+      newRowIndex: rowIndex,
+    };
   };
 
   const getPreviousFocus = (columnId, rowIndex) => {
@@ -58,8 +56,7 @@ const useNavigation = ({
       }
     }
 
-    const isAllowedColumn = existingRowFocusColumns.includes(newColumnId) || tableData[newRowIndex]?.id.includes('newRow');
-    if (!isAllowedColumn) {
+    if (!(existingRowFocusColumns.includes(newColumnId) || tableData[newRowIndex]?.id.includes('newRow'))) {
       newColumnId = previousColumns.find(col => existingRowFocusColumns.includes(col))
         || existingRowFocusColumns[existingRowFocusColumns.length - 1];
     }

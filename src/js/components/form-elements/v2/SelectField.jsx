@@ -152,7 +152,7 @@ SelectField.defaultProps = {
   className: '',
   hideErrorMessageWrapper: false,
   warning: false,
-  onKeyDown: () => {},
+  onKeyDown: null,
   fieldIndex: '',
   fieldId: '',
   focusIndex: '',
