@@ -28,6 +28,10 @@ class CycleCountUpdateItemCommand implements Validateable {
     static constraints = {
         quantityCounted(nullable: true)
         discrepancyReasonCode(nullable: true, validator: { ReasonCode discrepancyReasonCode ->
+            if (!discrepancyReasonCode) {
+                return true
+            }
+
             return ReasonCode.listInventoryAdjustmentReasonCodes().contains(discrepancyReasonCode) ?
                     true :
                     ['cycleCountUpdateItemCommand.discrepancyReasonCode.invalid']
