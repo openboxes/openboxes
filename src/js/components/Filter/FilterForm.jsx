@@ -13,6 +13,7 @@ import SearchField from 'components/form-elements/SearchField';
 import useTranslation from 'hooks/useTranslation';
 import { renderFormField } from 'utils/form-utils';
 import { translateWithDefaultMessage } from 'utils/Translate';
+import CustomTooltip from 'wrappers/CustomTooltip';
 
 import 'components/Filter/FilterStyles.scss';
 
@@ -32,6 +33,7 @@ const FilterForm = ({
   translate,
   setShouldRebuildFilterValues,
   isLoading,
+  isCycleCountTab,
 }) => {
   const [amountFilled, setAmountFilled] = useState(0);
   const [filtersHidden, setFiltersHidden] = useState(hidden);
@@ -136,13 +138,21 @@ const FilterForm = ({
                       variant="transparent"
                       type="button"
                     />
-                    <Button
-                      defaultLabel="Search"
-                      label="react.button.search.label"
-                      disabled={!allowEmptySubmit && _.every(values, (value) => !value)}
-                      variant="primary"
-                      type="submit"
-                    />
+                    <CustomTooltip
+                      content={translate(
+                        'react.cycleCount.filter.negativeInventory.tooltip',
+                        'Returns products with negative inventory items in stock. Unselected for all products.',
+                      )}
+                      show={isCycleCountTab}
+                    >
+                      <Button
+                        defaultLabel={isCycleCountTab ? 'Filter' : 'Search'}
+                        label={isCycleCountTab ? 'react.button.filter.label' : 'react.button.search.label'}
+                        disabled={!allowEmptySubmit && _.every(values, (value) => !value)}
+                        variant="primary"
+                        type="submit"
+                      />
+                    </CustomTooltip>
                   </div>
                 </div>
 
@@ -188,6 +198,7 @@ FilterForm.propTypes = {
   translate: PropTypes.func.isRequired,
   setShouldRebuildFilterValues: PropTypes.func.isRequired,
   isLoading: PropTypes.bool,
+  isCycleCountTab: PropTypes.bool,
 };
 
 FilterForm.defaultProps = {
@@ -200,4 +211,5 @@ FilterForm.defaultProps = {
   onClear: undefined,
   ignoreClearFilters: [],
   isLoading: false,
+  isCycleCountTab: false,
 };

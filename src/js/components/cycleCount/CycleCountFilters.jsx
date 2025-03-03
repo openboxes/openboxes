@@ -24,6 +24,7 @@ const CycleCountFilters = ({
       ignoreClearFilters={['tab']}
       hidden={false}
       isLoading={isLoading}
+      isCycleCountTab
     />
   </ListFilterFormWrapper>
 );
