@@ -9,6 +9,7 @@ import { connect } from 'react-redux';
 import { Tooltip } from 'react-tippy';
 
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
+import CustomTooltip from 'wrappers/CustomTooltip';
 
 import 'react-tippy/dist/tippy.css';
 
@@ -92,7 +93,12 @@ export const renderFormFields = ({
             : <FieldLabel />
         }
         <div className={`form-element-container ${!filterElement ? 'col-md-4 col-7' : 'flex-1 filter-element-container'}`}>
-          {renderInput(input, otherAttr)}
+          <CustomTooltip
+            content={translate(attr?.customTooltipLabel || '')}
+            show={!!attr.showCustomTooltip}
+          >
+            {renderInput(input, otherAttr)}
+          </CustomTooltip>
         </div>
       </div>
       <div className="row" aria-label="subtext">
