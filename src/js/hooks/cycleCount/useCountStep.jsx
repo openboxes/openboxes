@@ -46,12 +46,12 @@ const useCountStep = () => {
       // so we create a map looking at first item
       const countedDates = data?.data?.reduce((acc, cycleCount) => ({
         ...acc,
-        [cycleCount?.id]: cycleCount?.cycleCountItems[0].dateCounted,
+        [cycleCount?.id]: cycleCount?.cycleCountItems[0]?.dateCounted,
       }), {});
       setDateCounted(countedDates);
       const countedByMap = data?.data?.reduce((acc, cycleCount) => ({
         ...acc,
-        [cycleCount?.id]: cycleCount?.cycleCountItems[0].assignee,
+        [cycleCount?.id]: cycleCount?.cycleCountItems[0]?.assignee,
       }), {});
       setCountedBy(countedByMap);
       setDefaultCountedBy(countedByMap);

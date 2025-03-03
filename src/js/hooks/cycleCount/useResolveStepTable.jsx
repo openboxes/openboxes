@@ -21,8 +21,8 @@ import ArrowValueIndicatorVariant, {
   getCycleCountDifferencesVariant,
 } from 'consts/arrowValueIndicatorVariant';
 import cycleCountColumn from 'consts/cycleCountColumn';
-import useNavigation from 'hooks/useNavigation';
 import { DateFormat } from 'consts/timeFormat';
+import useNavigation from 'hooks/useNavigation';
 import useTranslate from 'hooks/useTranslate';
 import groupBinLocationsByZone from 'utils/groupBinLocationsByZone';
 import { fetchBins } from 'utils/option-utils';
