@@ -22,7 +22,7 @@ import ArrowValueIndicatorVariant, {
 } from 'consts/arrowValueIndicatorVariant';
 import cycleCountColumn from 'consts/cycleCountColumn';
 import { DateFormat } from 'consts/timeFormat';
-import useNavigation from 'hooks/useNavigation';
+import useArrowsNavigation from 'hooks/useArrowsNavigation';
 import useTranslate from 'hooks/useTranslate';
 import groupBinLocationsByZone from 'utils/groupBinLocationsByZone';
 import { fetchBins } from 'utils/option-utils';
@@ -261,15 +261,13 @@ const useResolveStepTable = ({
         cycleCountColumn.COMMENT,
       ];
 
-      const { handleKeyDown } = useNavigation({
+      const { handleKeyDown } = useArrowsNavigation({
         newRowFocusColumns,
         existingRowFocusColumns,
         tableData,
         setFocusId,
         setFocusIndex,
-        addEmptyRow,
-        productCode,
-        cycleCountId,
+        addNewRow: () => addEmptyRow(productCode, cycleCountId),
       });
 
       return (
@@ -284,10 +282,12 @@ const useResolveStepTable = ({
             hideErrorMessageWrapper
             warning={tooltipContent && warning}
             onKeyDown={(e) => handleKeyDown(e, index, columnPath)}
-            fieldIndex={index}
-            fieldId={columnPath}
-            focusIndex={focusIndex}
-            focusId={focusId}
+            focusProps={{
+              fieldIndex: index,
+              fieldId: columnPath,
+              focusIndex,
+              focusId,
+            }}
             {...fieldProps}
           />
           {(error || warning) && tooltipContent && (

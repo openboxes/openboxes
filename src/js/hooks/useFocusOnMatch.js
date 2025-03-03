@@ -2,7 +2,13 @@ import { useEffect } from 'react';
 
 import cycleCountColumn from 'consts/cycleCountColumn';
 
-const useFocusOnMatch = (focusId, fieldIndex, focusIndex, fieldId, ref) => {
+const useFocusOnMatch = ({
+  focusId,
+  fieldIndex,
+  focusIndex,
+  fieldId,
+  ref,
+}) => {
   useEffect(() => {
     const shouldFocus = focusId
       && fieldIndex === focusIndex

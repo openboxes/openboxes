@@ -1,21 +1,21 @@
-const useNavigation = ({
+import navigationKey from 'consts/navigationKey';
+
+const useArrowsNavigation = ({
   newRowFocusColumns,
   existingRowFocusColumns,
   tableData,
   setFocusId,
   setFocusIndex,
-  addEmptyRow,
-  productCode,
-  cycleCountId,
+  addNewRow,
 }) => {
   const getNextFocus = (columnId, rowIndex) => {
     const currentIndex = newRowFocusColumns.indexOf(columnId);
     const remainingColumns = newRowFocusColumns.slice(currentIndex + 1);
     const newRowIndex = tableData[rowIndex + 1];
 
-    if (!remainingColumns.some(col => existingRowFocusColumns.includes(col))) {
+    if (!remainingColumns.some((col) => existingRowFocusColumns.includes(col))) {
       if (!newRowIndex) {
-        addEmptyRow(productCode, cycleCountId);
+        addNewRow();
         return { newColumnId: newRowFocusColumns[0], newRowIndex: rowIndex + 1 };
       }
 
@@ -42,23 +42,22 @@ const useNavigation = ({
     let newRowIndex = rowIndex;
 
     const hasAllowedColumnToLeft = previousColumns
-      .some(col => existingRowFocusColumns.includes(col))
+      .some((col) => existingRowFocusColumns.includes(col))
       || tableData[rowIndex]?.id.includes('newRow');
 
     if (currentIndex === 0 || !hasAllowedColumnToLeft) {
-      if (previousRow) {
-        newRowIndex = rowIndex - 1;
-        newColumnId = previousRow.id.includes('newRow')
-          ? newRowFocusColumns[newRowFocusColumns.length - 1]
-          : existingRowFocusColumns[existingRowFocusColumns.length - 1];
-      } else {
+      if (!previousRow) {
         return { newColumnId: columnId, newRowIndex: rowIndex };
       }
+
+      newRowIndex = rowIndex - 1;
+      newColumnId = previousRow.id.includes('newRow')
+        ? newRowFocusColumns[newRowFocusColumns.length - 1]
+        : existingRowFocusColumns[existingRowFocusColumns.length - 1];
     }
 
     if (!(existingRowFocusColumns.includes(newColumnId) || tableData[newRowIndex]?.id.includes('newRow'))) {
-      newColumnId = previousColumns.find(col => existingRowFocusColumns.includes(col))
-        || existingRowFocusColumns[existingRowFocusColumns.length - 1];
+      newColumnId = previousColumns.find((col) => existingRowFocusColumns.includes(col));
     }
 
     return { newColumnId, newRowIndex };
@@ -67,7 +66,7 @@ const useNavigation = ({
   const handleKeyDown = (e, rowIndex, columnId) => {
     const { key } = e;
 
-    if (key === 'ArrowUp') {
+    if (key === navigationKey.ARROW_UP) {
       const isInArray = existingRowFocusColumns.includes(columnId);
       if (rowIndex > 0 && (isInArray || tableData[rowIndex - 1].id.includes('newRow'))) {
         setFocusIndex(rowIndex - 1);
@@ -78,7 +77,7 @@ const useNavigation = ({
       }
     }
 
-    if (key === 'ArrowDown') {
+    if (key === navigationKey.ARROW_DOWN) {
       if (rowIndex < tableData.length - 1) {
         setFocusIndex(rowIndex + 1);
         setFocusId(columnId);
@@ -88,13 +87,13 @@ const useNavigation = ({
       }
     }
 
-    if (key === 'ArrowRight') {
+    if (key === navigationKey.ARROW_RIGHT) {
       const { newColumnId, newRowIndex } = getNextFocus(columnId, rowIndex);
       setFocusId(newColumnId);
       setFocusIndex(newRowIndex);
     }
 
-    if (key === 'ArrowLeft') {
+    if (key === navigationKey.ARROW_LEFT) {
       const { newColumnId, newRowIndex } = getPreviousFocus(columnId, rowIndex);
       setFocusId(newColumnId);
       setFocusIndex(newRowIndex);
@@ -104,4 +103,4 @@ const useNavigation = ({
   return { handleKeyDown };
 };
 
-export default useNavigation;
+export default useArrowsNavigation;

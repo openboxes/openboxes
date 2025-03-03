@@ -29,10 +29,7 @@ const DateField = ({
   showTimeSelect,
   hideErrorMessageWrapper,
   customDateFormat,
-  fieldIndex,
-  fieldId,
-  focusIndex,
-  focusId,
+  focusProps = {},
   ...fieldProps
 }) => {
   const translate = useTranslate();
@@ -73,7 +70,7 @@ const DateField = ({
     return customDateFormat || DateFormat.MMM_DD_YYYY;
   };
 
-  useFocusOnMatch(focusId, fieldIndex, focusIndex, fieldId, datePickerRef);
+  useFocusOnMatch({ ...focusProps, ref: datePickerRef });
 
   return (
     <InputWrapper
@@ -158,10 +155,12 @@ DateField.propTypes = {
   showTimeSelect: PropTypes.bool,
   hideErrorMessageWrapper: PropTypes.bool,
   customDateFormat: PropTypes.string,
-  fieldIndex: PropTypes.string,
-  fieldId: PropTypes.string,
-  focusIndex: PropTypes.string,
-  focusId: PropTypes.string,
+  focusProps: PropTypes.shape({
+    fieldIndex: PropTypes.string,
+    fieldId: PropTypes.string,
+    focusIndex: PropTypes.string,
+    focusId: PropTypes.string,
+  }),
 };
 
 DateField.defaultProps = {
@@ -178,8 +177,5 @@ DateField.defaultProps = {
   showTimeSelect: false,
   hideErrorMessageWrapper: false,
   customDateFormat: null,
-  fieldIndex: '',
-  fieldId: '',
-  focusIndex: '',
-  focusId: '',
+  focusProps: {},
 };

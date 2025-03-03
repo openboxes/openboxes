@@ -43,10 +43,7 @@ const ProductSelect = ({
   fieldRef,
   includeUom,
   onKeyDown,
-  fieldIndex,
-  fieldId,
-  focusIndex,
-  focusId,
+  focusProps = {},
   ...props
 }) => {
   const selectRef = useRef(null);
@@ -102,7 +99,7 @@ const ProductSelect = ({
     }
   }, [isExactMatch, loadedOptions, searchTerm]);
 
-  useFocusOnMatch(focusId, fieldIndex, focusIndex, fieldId, fieldRef);
+  useFocusOnMatch({ ...focusProps, ref: fieldRef });
 
   const loadProductOptions = (searchString, callback) =>
     debouncedProductsFetch(searchString, (resultOptions) => {
@@ -145,10 +142,12 @@ ProductSelect.defaultProps = {
   loadOptions: undefined,
   includeUom: false,
   onKeyDown: PropTypes.func,
-  fieldIndex: PropTypes.string,
-  fieldId: PropTypes.string,
-  focusIndex: PropTypes.string,
-  focusId: PropTypes.string,
+  focusProps: PropTypes.shape({
+    fieldIndex: PropTypes.string,
+    fieldId: PropTypes.string,
+    focusIndex: PropTypes.string,
+    focusId: PropTypes.string,
+  }),
 };
 
 ProductSelect.propTypes = {
@@ -163,10 +162,7 @@ ProductSelect.propTypes = {
   loadOptions: PropTypes.func,
   includeUom: PropTypes.bool,
   onKeyDown: null,
-  fieldIndex: '',
-  fieldId: '',
-  focusIndex: '',
-  focusId: '',
+  focusProps: {},
 };
 
 export default ProductSelect;

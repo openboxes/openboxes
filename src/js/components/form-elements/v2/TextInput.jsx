@@ -25,15 +25,12 @@ const TextInput = ({
   showErrorBorder,
   hideErrorMessageWrapper,
   onKeyDown,
-  fieldIndex,
-  fieldId,
-  focusIndex,
-  focusId,
+  focusProps = {},
   ...fieldProps
 }) => {
   const inputRef = useRef(null);
 
-  useFocusOnMatch(focusId, fieldIndex, focusIndex, fieldId, inputRef);
+  useFocusOnMatch({ ...focusProps, ref: inputRef });
 
   const onBlurHandler = (e) => {
     if (type === 'number') {
@@ -128,10 +125,12 @@ TextInput.propTypes = {
   showErrorBorder: PropTypes.bool,
   hideErrorMessageWrapper: PropTypes.bool,
   onKeyDown: PropTypes.func,
-  fieldIndex: PropTypes.string,
-  fieldId: PropTypes.string,
-  focusIndex: PropTypes.string,
-  focusId: PropTypes.string,
+  focusProps: PropTypes.shape({
+    fieldIndex: PropTypes.string,
+    fieldId: PropTypes.string,
+    focusIndex: PropTypes.string,
+    focusId: PropTypes.string,
+  }),
 };
 
 TextInput.defaultProps = {
@@ -150,8 +149,5 @@ TextInput.defaultProps = {
   showErrorBorder: false,
   hideErrorMessageWrapper: false,
   onKeyDown: null,
-  fieldIndex: '',
-  fieldId: '',
-  focusIndex: '',
-  focusId: '',
+  focusProps: {},
 };

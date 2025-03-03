@@ -29,10 +29,7 @@ const SelectField = ({
   warning,
   hideErrorMessageWrapper,
   onKeyDown,
-  fieldIndex,
-  fieldId,
-  focusIndex,
-  focusId,
+  focusProps = {},
   ...fieldProps
 }) => {
   const [value, setValue] = useState(defaultValue);
@@ -57,7 +54,7 @@ const SelectField = ({
 
   const selectRef = useRef(null);
 
-  useFocusOnMatch(focusId, fieldIndex, focusIndex, fieldId, selectRef);
+  useFocusOnMatch({ ...focusProps, ref: selectRef });
 
   return (
     <InputWrapper
@@ -131,10 +128,12 @@ SelectField.propTypes = {
   hideErrorMessageWrapper: PropTypes.bool,
   warning: PropTypes.bool,
   onKeyDown: PropTypes.func,
-  fieldIndex: PropTypes.string,
-  fieldId: PropTypes.string,
-  focusIndex: PropTypes.string,
-  focusId: PropTypes.string,
+  focusProps: PropTypes.shape({
+    fieldIndex: PropTypes.string,
+    fieldId: PropTypes.string,
+    focusIndex: PropTypes.string,
+    focusId: PropTypes.string,
+  }),
 };
 
 SelectField.defaultProps = {
@@ -157,8 +156,5 @@ SelectField.defaultProps = {
   hideErrorMessageWrapper: false,
   warning: false,
   onKeyDown: null,
-  fieldIndex: '',
-  fieldId: '',
-  focusIndex: '',
-  focusId: '',
+  focusProps: {},
 };
