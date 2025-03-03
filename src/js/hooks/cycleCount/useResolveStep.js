@@ -16,6 +16,7 @@ const useResolveStep = () => {
   const [recountedBy, setRecountedBy] = useState({});
   // Saving selected "date recounted" option, initially it's the date fetched from API
   const [dateRecounted, setDateRecounted] = useState({});
+  const [isStepEditable, setIsStepEditable] = useState(true);
 
   const {
     validationErrors,
@@ -65,9 +66,11 @@ const useResolveStep = () => {
     console.log('print count form');
   };
 
-  const assignRecountedBy = (productCode) => (person) => {
-    setRecountedBy((prevState) => ({ ...prevState, [productCode]: person }));
+  const assignRecountedBy = (cycleCountId) => (person) => {
+    setRecountedBy((prevState) => ({ ...prevState, [cycleCountId]: person }));
   };
+
+  const getRecountedBy = (cycleCountId) => recountedBy?.[cycleCountId];
 
   const removeRow = (cycleCountId, rowId) => {
     const tableIndex = tableData.current.findIndex(
@@ -94,13 +97,13 @@ const useResolveStep = () => {
         productCode,
       },
       inventoryItem: {
-        lotNumber: undefined,
-        expirationDate: undefined,
+        lotNumber: null,
+        expirationDate: null,
       },
-      binLocation: undefined,
-      quantityRecounted: undefined,
-      quantityCounted: undefined,
-      rootCause: undefined,
+      binLocation: null,
+      quantityRecounted: null,
+      quantityCounted: null,
+      rootCause: null,
       comment: '',
     };
     const tableIndex = tableData.current.findIndex(
@@ -135,6 +138,15 @@ const useResolveStep = () => {
     }
 
     console.log('next: ', tableData.current, recountedBy, dateRecounted);
+    setIsStepEditable(false);
+  };
+
+  const back = () => {
+    setIsStepEditable(true);
+  };
+
+  const save = () => {
+    console.log('save');
   };
 
   const updateRow = (cycleCountId, rowId, columnId, value) => {
@@ -171,6 +183,8 @@ const useResolveStep = () => {
     tableData: tableData.current,
     tableMeta,
     validationErrors,
+    isStepEditable,
+    getRecountedBy,
     addEmptyRow,
     removeRow,
     printRecountForm,
@@ -179,6 +193,8 @@ const useResolveStep = () => {
     setRecountedDate,
     shouldHaveRootCause,
     next,
+    save,
+    back,
   };
 };
 

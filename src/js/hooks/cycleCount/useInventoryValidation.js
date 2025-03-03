@@ -25,11 +25,11 @@ const useInventoryValidation = ({ tableData }) => {
         (item) => `${item?.binLocation?.id}-${item?.inventoryItem?.lotNumber}`,
       );
       const key = `${row?.binLocation?.id}-${row?.inventoryItem?.lotNumber}`;
-      if (dataGroupedByBinLocationAndLotNumber[key]?.length > 1 && row?.inventoryItem?.lotNumber) {
+      if (dataGroupedByBinLocationAndLotNumber[key]?.length > 1) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: translate('react.cycleCount.duplicatedRow.label', 'Duplicate rows for this inventory item.'),
-          path: [index, 'inventoryItem.lotNumber'],
+          path: [index, 'binLocation'],
         });
       }
     });
@@ -46,10 +46,12 @@ const useInventoryValidation = ({ tableData }) => {
       );
       const expirationDates = dataGroupedByLotNumber[row?.inventoryItem?.lotNumber]
         .map((item) => item?.inventoryItem?.expirationDate);
-      if (_.uniq(expirationDates).length !== 1) {
+      const binLocations = dataGroupedByLotNumber[row?.inventoryItem?.lotNumber]
+        .map((item) => item?.binLocation?.id);
+      if (_.uniq(expirationDates).length !== 1 && _.uniq(binLocations).length !== 1) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: translate('rreact.cycleCount.multipleExpirationDates.label', 'Multiple expiry dates for this lot/batch.'),
+          message: translate('react.cycleCount.multipleExpirationDates.label', 'Multiple expiry dates for this lot/batch.'),
           path: [index, 'inventoryItem.expirationDate'],
         });
       }
@@ -58,6 +60,10 @@ const useInventoryValidation = ({ tableData }) => {
 
   const checkProductsWithLotAndExpiryControl = (arr, ctx) => {
     arr.forEach((row, index) => {
+      // Already existing rows shouldn't be validated in case of required lot and expiry control
+      if (!row?.id.includes('newRow')) {
+        return;
+      }
       const cycleCountItems = _.find(tableData.current,
         (cycleCount) => _.find(cycleCount.cycleCountItems,
           (item) => item?.id === row?.id))?.cycleCountItems;

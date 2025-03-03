@@ -97,7 +97,7 @@ const useCountStepTable = ({
     return {};
   };
 
-  // this function is required because there is a problem w getValue
+  // this function is required because there is a problem with getValue
   const getValueToDisplay = (id, value) => {
     if (id === cycleCountColumn.EXPIRATION_DATE) {
       return formatLocalizedDate(value, DateFormat.DD_MMM_YYYY);
@@ -202,7 +202,7 @@ const useCountStepTable = ({
             value={value}
             onChange={onChange}
             onBlur={onBlur}
-            className={`m-1 hide-arrows ${showTooltip ? 'w-99' : 'w-75'} ${error && 'border border-danger'}`}
+            className={`m-1 hide-arrows ${showTooltip ? 'w-99' : 'w-75'} ${error && 'border border-danger input-has-error'}`}
             showErrorBorder={error}
             hideErrorMessageWrapper
             onKeyDown={(e) => handleKeyDown(e, index, columnPath)}
@@ -251,7 +251,7 @@ const useCountStepTable = ({
     }),
     columnHelper.accessor(cycleCountColumn.EXPIRATION_DATE, {
       header: () => (
-        <TableHeaderCell className="rt-th-count-step">
+        <TableHeaderCell>
           {translate('react.cycleCount.table.expirationDate.label', 'Expiration Date')}
         </TableHeaderCell>
       ),
@@ -300,11 +300,11 @@ const useCountStepTable = ({
             )}
             disabled={original.id}
           >
-            {original.id.includes('newRow') && isStepEditable && (
-              <RiDeleteBinLine
-                onClick={() => removeRow(cycleCountId, original.id)}
-                size={22}
-              />
+            {(original.id.includes('newRow') || original.custom) && isStepEditable && (
+            <RiDeleteBinLine
+              onClick={() => removeRow(cycleCountId, original.id)}
+              size={22}
+            />
             )}
           </Tooltip>
         </TableCell>
