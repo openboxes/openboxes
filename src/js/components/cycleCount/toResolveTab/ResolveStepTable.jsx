@@ -5,6 +5,8 @@ import { RiAddCircleLine } from 'react-icons/all';
 import { useSelector } from 'react-redux';
 import { Tooltip } from 'react-tippy';
 
+import HeaderLabel from 'components/cycleCount/HeaderLabel';
+import HeaderSelect from 'components/cycleCount/HeaderSelect';
 import DataTable from 'components/DataTable/v2/DataTable';
 import Button from 'components/form-elements/Button';
 import DateField from 'components/form-elements/v2/DateField';
@@ -26,9 +28,11 @@ const ResolveStepTable = ({
   addEmptyRow,
   removeRow,
   assignRecountedBy,
+  recountedBy,
   setRecountedDate,
   validationErrors,
   shouldHaveRootCause,
+  isStepEditable,
 }) => {
   const {
     columns,
@@ -39,6 +43,7 @@ const ResolveStepTable = ({
     validationErrors,
     tableData,
     removeRow,
+    isStepEditable,
     shouldHaveRootCause,
     productCode: product?.productCode,
     addEmptyRow,
@@ -61,46 +66,54 @@ const ResolveStepTable = ({
       </p>
       <div className="d-flex">
         <div className="pt-3 pl-4 d-flex align-items-center">
-          <div className="d-flex date-counted-container mb-2">
-            <p className="count-step-label count-step-label-date-counted mr-2 mt-2">
-              {translate('react.cycleCount.dateCounted.label', 'Date Counted')}
-              <span className="count-step-value ml-1">
-                {formatLocalizedDate(dateCounted, DateFormat.DD_MMM_YYYY)}
-              </span>
-            </p>
-          </div>
-          <div className="d-flex count-step-select-counted-by ml-5 mt-2 align-items-center mb-2">
-            <p className="count-step-label mr-2">
-              {translate('react.cycleCount.countedBy.label', 'Counted by')}
-              {/* TODO: Replace the name with value fetched from the API */}
-              <span className="count-step-value ml-1">
-                John Smith
-              </span>
-            </p>
-          </div>
+          <HeaderLabel
+            label={translate('react.cycleCount.dateCounted.label', 'Date Counted')}
+            value={formatLocalizedDate(dateCounted, DateFormat.DD_MMM_YYYY)}
+          />
+          {/* TODO: Replace the name with value fetched from the API */}
+          <HeaderLabel
+            label={translate('react.cycleCount.countedBy.label', 'Counted by')}
+            value="John Smith"
+            className="pl-4"
+          />
         </div>
         <div className="ml-5 pt-3 pl-4 d-flex align-items-center">
-          <div className="d-flex date-counted-container">
-            <span className="count-step-label count-step-label-date-counted mr-2 mt-2">
-              {translate('react.cycleCount.dateRecounted.label', 'Date recounted')}
-            </span>
-            {' '}
-            <DateField
-              className="date-counted-date-picker date-field-input"
-              onChange={setRecountedDate}
-              value={dateRecounted}
+          {isStepEditable ? (
+            <HeaderSelect
+              label={translate('react.cycleCount.dateRecounted.label', 'Date recounted')}
+            >
+              <DateField
+                className="date-counted-date-picker date-field-input"
+                onChange={setRecountedDate}
+                value={dateRecounted}
+                hideErrorMessageWrapper
+              />
+            </HeaderSelect>
+          ) : (
+            <HeaderLabel
+              label={translate('react.cycleCount.dateRecounted.label', 'Date recounted')}
+              value={formatLocalizedDate(dateRecounted, DateFormat.DD_MMM_YYYY)}
             />
-          </div>
-          <div className="d-flex count-step-select-counted-by ml-5 align-items-center">
-            <p className="count-step-label mr-2">
-              {translate('react.cycleCount.recountedBy.label', 'Recounted by')}
-            </p>
-            <SelectField
-              placeholder="Select"
-              options={users}
-              onChange={assignRecountedBy(product?.productCode)}
+          )}
+          {isStepEditable ? (
+            <HeaderSelect
+              label={translate('react.cycleCount.recountedBy.label', 'Recounted by')}
+              className="ml-5 count-step-select-counted-by"
+            >
+              <SelectField
+                placeholder="Select"
+                options={users}
+                onChange={assignRecountedBy(id)}
+                hideErrorMessageWrapper
+              />
+            </HeaderSelect>
+          ) : (
+            <HeaderLabel
+              label={translate('react.cycleCount.recountedBy.label', 'Recounted by')}
+              value={recountedBy?.name}
+              className="ml-4"
             />
-          </div>
+          )}
         </div>
       </div>
       <div className="mx-4 count-step-table resolve-step-table">
@@ -115,8 +128,9 @@ const ResolveStepTable = ({
         />
       </div>
       <div
-        className="ml-4 mb-3 d-flex"
+        className={`ml-4 mb-3 d-flex ${isStepEditable ? '' : 'pt-3'}`}
       >
+        {isStepEditable && (
         <Tooltip
           className="d-flex align-items-center"
           html={(
@@ -133,6 +147,7 @@ const ResolveStepTable = ({
             StartIcon={<RiAddCircleLine size={18} />}
           />
         </Tooltip>
+        )}
       </div>
     </div>
   );
@@ -160,4 +175,5 @@ ResolveStepTable.propTypes = {
   validationErrors: PropTypes.shape({}).isRequired,
   setRecountedDate: PropTypes.func.isRequired,
   shouldHaveRootCause: PropTypes.func.isRequired,
+  isStepEditable: PropTypes.bool.isRequired,
 };

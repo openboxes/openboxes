@@ -1,5 +1,6 @@
 import React from 'react';
 
+import ConfirmStepHeader from 'components/cycleCount/ConfirmStepHeader';
 import ResolveStepHeader from 'components/cycleCount/toResolveTab/ResolveStepHeader';
 import ResolveStepTable from 'components/cycleCount/toResolveTab/ResolveStepTable';
 import useResolveStep from 'hooks/cycleCount/useResolveStep';
@@ -20,11 +21,20 @@ const ResolveStep = () => {
     getRecountedDate,
     setRecountedDate,
     shouldHaveRootCause,
+    back,
+    save,
+    isStepEditable,
+    getRecountedBy,
   } = useResolveStep();
 
   return (
     <PageWrapper>
-      <ResolveStepHeader printRecountForm={printRecountForm} next={next} />
+      {isStepEditable ? (
+        <ResolveStepHeader
+          printRecountForm={printRecountForm}
+          next={next}
+        />
+      ) : <ConfirmStepHeader back={back} save={save} />}
       {tableData
         .map(({ cycleCountItems, id }) => (
           <ResolveStepTable
@@ -41,6 +51,8 @@ const ResolveStep = () => {
             assignRecountedBy={assignRecountedBy}
             validationErrors={validationErrors}
             shouldHaveRootCause={shouldHaveRootCause}
+            isStepEditable={isStepEditable}
+            recountedBy={getRecountedBy(id)}
           />
         ))}
     </PageWrapper>

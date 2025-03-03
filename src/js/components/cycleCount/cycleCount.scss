@@ -51,8 +51,14 @@ limit-lines($lines-number) {
   font-size: 14px;
 }
 
-.limit-lines-2 {
-  @include limit-lines(2);
+@for $i from 1 through 10 {
+  .limit-lines-#{$i} {
+    @include limit-lines($i);
+  }
+}
+
+.resolve-table-limit-lines {
+  max-height: calc(1.5em* 3 + 20px);
 }
 
 .count-step-title {
@@ -153,11 +159,11 @@ limit-lines($lines-number) {
   }
 }
 
-.count-step-label-date-counted {
+.count-step-label-select {
   white-space: nowrap;
 }
 
-.date-counted-container {
+.header-container {
 
   .date-counted-date-picker {
     width: 150px;
@@ -200,6 +206,17 @@ limit-lines($lines-number) {
 
   &--warning {
     color: var(--blue-primary);
+  }
+}
+
+.input-has-error {
+
+  .react-select__value-container {
+    padding-left: 20px;
+  }
+
+  .date-field-input__value {
+    padding-left: 15px;
   }
 }
 
