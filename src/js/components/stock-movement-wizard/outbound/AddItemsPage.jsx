@@ -585,9 +585,9 @@ class AddItemsPage extends Component {
     const sortOrder = _.toInteger(_.last(lineItemsData).sortOrder) + 100;
     // check if stock list has items with qty 0
     if (
-      this.props.isAutosaveEnabled &&
-      _.get(this.state.values.stocklist, 'id') &&
-      !this.state.isDraftAvailable
+      this.props.isAutosaveEnabled
+      && _.get(this.state.values.stocklist, 'id')
+      && !this.state.isDraftAvailable
     ) {
       this.saveRequisitionItemsInCurrentStep(data, false);
     }

@@ -161,6 +161,8 @@ grails:
             xml:
               - text/xml
               - application/xml
+            xls:
+              - application/vnd.ms-excel
         file:
             extensions: true
         use:

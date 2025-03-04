@@ -11,10 +11,14 @@ import apiClient from 'utils/apiClient';
 
 export default {
   createRequest: (payload, locationId) => apiClient.post(CYCLE_COUNT_REQUESTS(locationId), payload),
-  startCount: (payload, locationId, format = null, config = {}) => apiClient.post(
+  startCount: ({
+    payload, locationId, format = null, config = {},
+  }) => apiClient.post(
     CYCLE_COUNT_START(locationId, format), payload, config,
   ),
-  startRecount: (payload, locationId, format = null, config = {}) => apiClient.post(
+  startRecount: ({
+    payload, locationId, format = null, config = {},
+  }) => apiClient.post(
     CYCLE_COUNT_RECOUNT_START(locationId, format), payload, config,
   ),
   getCycleCounts: (locationId, ids, format = null, config = {}) => {

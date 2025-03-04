@@ -58,8 +58,8 @@
             <div id="page-header" class="small-font">
                 <table class="no-border-table no-padding">
                     <tr>
-                        <td align="left" class="no-padding">${warehouse.message(code: 'cycleCount.facility.label')}: ${facilityName}</td>
-                        <td align="right" class="no-padding">${warehouse.message(code: 'cycleCount.datePrinted.label')}: <g:formatDate date="${datePrinted}" format="MMM d, yyyy"/></td>
+                        <td align="left" class="no-padding">${g.message(code: 'cycleCount.facility.label')}: ${facilityName}</td>
+                        <td align="right" class="no-padding">${g.message(code: 'cycleCount.datePrinted.label')}: <g:formatDate date="${datePrinted}" format="MMM d, yyyy"/></td>
                     </tr>
                 </table>
             </div>
@@ -82,40 +82,40 @@
                     <thead>
                     <tr>
                         <th colspan="6" class="b-r0 b-b0" style="padding: 10px 0 10px 10px;">
-                            ${warehouse.message(code: 'cycleCount.product.label')}: ${product?.name}
+                            ${g.message(code: 'cycleCount.product.label')}: ${product?.name}
                         </th>
                         <th align="right" class="b-l0 b-b0" style="padding: 10px 10px 10px 0;">
-                            ${warehouse.message(code: 'cycleCount.productCode.label')}: ${product?.productCode}
+                            ${g.message(code: 'cycleCount.productCode.label')}: ${product?.productCode}
                         </th>
                     </tr>
                     <tr>
                         <th colspan="2" class="b-r0 b-t0 b-b0" style="padding: 0 0 10px 10px;">
-                            ${warehouse.message(code: 'cycleCount.dateCounted.label')}:
+                            ${g.message(code: 'cycleCount.dateCounted.label')}:
                             <g:formatDate date="${dateCounted}" format="MMM d, yyyy"/>
                         </th>
                         <th colspan="2" class="b-r0 b-l0 b-t0 b-b0" style="padding: 0 0 10px 0;">
-                            ${warehouse.message(code: 'cycleCount.userCounted.label')}:
+                            ${g.message(code: 'cycleCount.userCounted.label')}:
                             ${userCounted}
                         </th>
                         <th colspan="3" class="b-l0 b-t0 b-b0" style="padding-bottom: 10px;"></th>
                     </tr>
                     <tr>
                         <th colspan="2" class="b-r0 b-t0" style="padding: 0 0 10px 10px;">
-                            ${warehouse.message(code: 'cycleCount.dateRecounted.label')}:
+                            ${g.message(code: 'cycleCount.dateRecounted.label')}:
                         </th>
                         <th colspan="2" class="b-r0 b-l0 b-t0" style="padding: 0 0 10px 0;">
-                            ${warehouse.message(code: 'cycleCount.userRecounted.label')}:
+                            ${g.message(code: 'cycleCount.userRecounted.label')}:
                         </th>
                         <th colspan="3" class="b-l0 b-t0" style="padding-bottom: 10px;"></th>
                     </tr>
                     <tr>
-                        <th>${warehouse.message(code: 'cycleCount.binLocation.label')}</th>
-                        <th>${warehouse.message(code: 'cycleCount.lotNumber.label')}</th>
-                        <th>${warehouse.message(code: 'cycleCount.expirationDate.label')}</th>
-                        <th>${warehouse.message(code: 'cycleCount.quantityCounted.label')}</th>
-                        <th>${warehouse.message(code: 'cycleCount.difference.label')}</th>
-                        <th>${warehouse.message(code: 'cycleCount.quantityRecounted.label')}</th>
-                        <th>${warehouse.message(code: 'cycleCount.comments.label')}</th>
+                        <th>${g.message(code: 'cycleCount.binLocation.label')}</th>
+                        <th>${g.message(code: 'cycleCount.lotNumber.label')}</th>
+                        <th>${g.message(code: 'cycleCount.expirationDate.label')}</th>
+                        <th>${g.message(code: 'cycleCount.quantityCounted.label')}</th>
+                        <th>${g.message(code: 'cycleCount.difference.label')}</th>
+                        <th>${g.message(code: 'cycleCount.quantityRecounted.label')}</th>
+                        <th>${g.message(code: 'cycleCount.comments.label')}</th>
                     </tr>
                     </thead>
                     <tbody>

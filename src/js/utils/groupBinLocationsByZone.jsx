@@ -6,7 +6,7 @@ import useTranslate from 'hooks/useTranslate';
 
 const groupBinLocationsByZone = (binLocations) => {
   const translate = useTranslate();
-  const groupedByZone = _.groupBy(binLocations, bin => bin.zoneId || 'no-zone');
+  const groupedByZone = _.groupBy(binLocations, (bin) => bin.zoneId || 'no-zone');
 
   return Object.entries(groupedByZone)
     .map(([zoneKey, bins]) => {
@@ -18,7 +18,7 @@ const groupBinLocationsByZone = (binLocations) => {
         label: <span className="zone-label">{zoneName}</span>,
         isDisabled: true,
         options: bins
-          .map(bin => ({
+          .map((bin) => ({
             id: bin.id,
             name: bin.name,
             label: bin.name,

@@ -749,7 +749,7 @@ export const setScrollToBottom = (payload) => ({
 });
 
 export const startCount = (payload, locationId) => async (dispatch) => {
-  const cycleCounts = await cycleCountApi.startCount(payload, locationId);
+  const cycleCounts = await cycleCountApi.startCount({ payload, locationId });
   const cycleCountIds = cycleCounts?.data?.data?.map?.((cycleCount) => cycleCount.id);
   return dispatch({
     type: START_COUNT,

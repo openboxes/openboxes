@@ -326,16 +326,21 @@ const useToCountTab = ({
     });
   };
 
-  const printCountForm = async (fileFormat) => {
+  const printCountForm = async (format) => {
     spinner.show();
     const payload = {
       requests: checkedCheckboxes.map((cycleCountRequestId) => ({
         cycleCountRequest: cycleCountRequestId,
       })),
     };
-    const response = await cycleCountApi.startCount(payload, currentLocation?.id, fileFormat, { responseType: 'blob' });
+    const response = await cycleCountApi.startCount({
+      payload,
+      locationId: currentLocation?.id,
+      format,
+      config: { responseType: 'blob' },
+    });
     const filename = extractFilenameFromHeader(response.headers['content-disposition']);
-    fileDownload(response.data, filename, MimeType[fileFormat]);
+    fileDownload(response.data, filename, MimeType[format]);
     spinner.hide();
   };
 

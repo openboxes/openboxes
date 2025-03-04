@@ -5,7 +5,10 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { fetchUsers } from 'actions';
 import cycleCountApi from 'api/services/CycleCountApi';
+import { CYCLE_COUNT } from 'api/urls';
 import useResolveStepValidation from 'hooks/cycleCount/useResolveStepValidation';
+import useSpinner from 'hooks/useSpinner';
+import exportFileFromApi from 'utils/file-download-util';
 
 // Managing state for all tables, operations on shared state (from resolve step)
 const useResolveStep = () => {
@@ -17,6 +20,7 @@ const useResolveStep = () => {
   // Saving selected "date recounted" option, initially it's the date fetched from API
   const [dateRecounted, setDateRecounted] = useState({});
   const [isStepEditable, setIsStepEditable] = useState(true);
+  const { show, hide } = useSpinner();
 
   const {
     validationErrors,
@@ -62,8 +66,14 @@ const useResolveStep = () => {
     }
   }, []);
 
-  const printRecountForm = () => {
-    console.log('print count form');
+  const printRecountForm = async (format) => {
+    show();
+    await exportFileFromApi({
+      url: CYCLE_COUNT(currentLocation?.id),
+      params: { ids: cycleCountIds },
+      format,
+    });
+    hide();
   };
 
   const assignRecountedBy = (cycleCountId) => (person) => {
