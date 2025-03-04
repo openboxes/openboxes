@@ -5,7 +5,9 @@ import PropTypes from 'prop-types';
 import DatePicker from 'react-datepicker';
 
 import DateFieldInput from 'components/form-elements/v2/DateFieldInput';
+import componentType from 'consts/componentType';
 import { DateFormat, TimeFormat } from 'consts/timeFormat';
+import useFocusOnMatch from 'hooks/useFocusOnMatch';
 import useTranslate from 'hooks/useTranslate';
 import InputWrapper from 'wrappers/InputWrapper';
 import RootPortalWrapper from 'wrappers/RootPortalWrapper';
@@ -28,6 +30,7 @@ const DateField = ({
   showTimeSelect,
   hideErrorMessageWrapper,
   customDateFormat,
+  focusProps = {},
   ...fieldProps
 }) => {
   const translate = useTranslate();
@@ -67,6 +70,8 @@ const DateField = ({
     }
     return customDateFormat || DateFormat.MMM_DD_YYYY;
   };
+
+  useFocusOnMatch({ ...focusProps, ref: datePickerRef, type: componentType.DATE_FIELD });
 
   return (
     <InputWrapper
@@ -151,6 +156,12 @@ DateField.propTypes = {
   showTimeSelect: PropTypes.bool,
   hideErrorMessageWrapper: PropTypes.bool,
   customDateFormat: PropTypes.string,
+  focusProps: PropTypes.shape({
+    fieldIndex: PropTypes.string,
+    fieldId: PropTypes.string,
+    focusIndex: PropTypes.string,
+    focusId: PropTypes.string,
+  }),
 };
 
 DateField.defaultProps = {
@@ -167,4 +178,5 @@ DateField.defaultProps = {
   showTimeSelect: false,
   hideErrorMessageWrapper: false,
   customDateFormat: null,
+  focusProps: {},
 };

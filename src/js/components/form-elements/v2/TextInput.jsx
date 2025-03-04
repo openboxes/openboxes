@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useRef } from 'react';
 
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 
+import componentType from 'consts/componentType';
+import useFocusOnMatch from 'hooks/useFocusOnMatch';
 import { decimalParser } from 'utils/form-utils';
 import InputWrapper from 'wrappers/InputWrapper';
 
@@ -23,8 +25,14 @@ const TextInput = ({
   className,
   showErrorBorder,
   hideErrorMessageWrapper,
+  onKeyDown,
+  focusProps = {},
   ...fieldProps
 }) => {
+  const inputRef = useRef(null);
+
+  useFocusOnMatch({ ...focusProps, ref: inputRef, type: componentType.TEXT_INPUT });
+
   const onBlurHandler = (e) => {
     if (type === 'number') {
       const valueAsNumber = decimalParser(e.target.value, decimal);
@@ -63,6 +71,7 @@ const TextInput = ({
       hideErrorMessageWrapper={hideErrorMessageWrapper}
     >
       <input
+        ref={inputRef}
         id={id || name}
         name={name}
         disabled={disabled}
@@ -73,6 +82,7 @@ const TextInput = ({
         {...fieldProps}
         onChange={onChangeHandler}
         onBlur={onBlurHandler}
+        onKeyDown={onKeyDown}
       />
     </InputWrapper>
   );
@@ -115,6 +125,13 @@ TextInput.propTypes = {
   className: PropTypes.string,
   showErrorBorder: PropTypes.bool,
   hideErrorMessageWrapper: PropTypes.bool,
+  onKeyDown: PropTypes.func,
+  focusProps: PropTypes.shape({
+    fieldIndex: PropTypes.string,
+    fieldId: PropTypes.string,
+    focusIndex: PropTypes.string,
+    focusId: PropTypes.string,
+  }),
 };
 
 TextInput.defaultProps = {
@@ -132,4 +149,6 @@ TextInput.defaultProps = {
   className: '',
   showErrorBorder: false,
   hideErrorMessageWrapper: false,
+  onKeyDown: null,
+  focusProps: {},
 };

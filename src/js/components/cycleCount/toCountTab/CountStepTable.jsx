@@ -42,11 +42,13 @@ const CountStepTable = ({
     users,
   } = useCountStepTable({
     cycleCountId: id,
+    productCode: product?.productCode,
     tableData,
     validationErrors,
     removeRow,
     isStepEditable,
     formatLocalizedDate,
+    addEmptyRow,
   });
 
   // Default counted by needs to be stored in order to set the default select value correctly

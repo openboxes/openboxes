@@ -13,6 +13,7 @@ import SelectField from 'components/form-elements/v2/SelectField';
 import TextInput from 'components/form-elements/v2/TextInput';
 import cycleCountColumn from 'consts/cycleCountColumn';
 import { DateFormat } from 'consts/timeFormat';
+import useArrowsNavigation from 'hooks/useArrowsNavigation';
 import useTranslate from 'hooks/useTranslate';
 import groupBinLocationsByZone from 'utils/groupBinLocationsByZone';
 import { fetchBins } from 'utils/option-utils';
@@ -22,15 +23,19 @@ import CustomTooltip from 'wrappers/CustomTooltip';
 // Managing state for single table, mainly table configuration (from count step)
 const useCountStepTable = ({
   cycleCountId,
+  productCode,
   removeRow,
   validationErrors,
   tableData,
   isStepEditable,
   formatLocalizedDate,
+  addEmptyRow,
 }) => {
   const columnHelper = createColumnHelper();
   // State for saving data for binLocation dropdown
   const [binLocations, setBinLocations] = useState([]);
+  const [focusIndex, setFocusIndex] = useState(null);
+  const [focusId, setFocusId] = useState(null);
 
   const translate = useTranslate();
 
@@ -150,10 +155,42 @@ const useCountStepTable = ({
       };
       // Table consists of text fields, one numerical field for quantity counted,
       // select field for bin locations and one date picker for the expiration date.
-      const type = getFieldType(id);
-      const Component = getFieldComponent(id);
-      const fieldProps = getFieldProps(id);
-      const showTooltip = id === 'binLocation';
+      const type = getFieldType(columnPath);
+      const Component = getFieldComponent(columnPath);
+      const fieldProps = getFieldProps(columnPath);
+      const showTooltip = columnPath === cycleCountColumn.BIN_LOCATION;
+
+      // Columns allowed for focus in new rows
+      const newRowFocusableCells = [
+        cycleCountColumn.LOT_NUMBER,
+        cycleCountColumn.EXPIRATION_DATE,
+        cycleCountColumn.QUANTITY_COUNTED,
+        cycleCountColumn.COMMENT,
+      ];
+
+      if (showBinLocation) {
+        newRowFocusableCells.splice(0, 0, cycleCountColumn.BIN_LOCATION);
+      }
+
+      // Columns allowed for focus in existing rows
+      const existingRowFocusableCells = [
+        cycleCountColumn.QUANTITY_COUNTED,
+        cycleCountColumn.COMMENT,
+      ];
+
+      // Checks if the row is a new one (i.e., added by user and contains 'newRow' in id),
+      // and if yes, allow navigation through `newRowFocusableCells`.
+      const isNewRow = (row) => row?.id?.includes('newRow');
+
+      const { handleKeyDown } = useArrowsNavigation({
+        newRowFocusableCells,
+        existingRowFocusableCells,
+        tableData,
+        setFocusId,
+        setFocusIndex,
+        addNewRow: () => addEmptyRow(productCode, cycleCountId),
+        isNewRow,
+      });
 
       return (
         <TableCell
@@ -168,9 +205,16 @@ const useCountStepTable = ({
             value={value}
             onChange={onChange}
             onBlur={onBlur}
-            className={`m-1 ${showTooltip ? 'w-99' : 'w-75'} ${error && 'border border-danger input-has-error'}`}
+            className={`m-1 hide-arrows ${showTooltip ? 'w-99' : 'w-75'} ${error && 'border border-danger input-has-error'}`}
             showErrorBorder={error}
             hideErrorMessageWrapper
+            onKeyDown={(e) => handleKeyDown(e, index, columnPath)}
+            focusProps={{
+              fieldIndex: index,
+              fieldId: columnPath,
+              focusIndex,
+              focusId,
+            }}
             {...fieldProps}
           />
           {error && (

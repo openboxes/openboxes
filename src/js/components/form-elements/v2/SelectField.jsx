@@ -1,8 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import PropTypes from 'prop-types';
 
 import ProductSelect from 'components/product-select/ProductSelect';
+import componentType from 'consts/componentType';
+import useFocusOnMatch from 'hooks/useFocusOnMatch';
 import Select from 'utils/Select';
 import InputWrapper from 'wrappers/InputWrapper';
 
@@ -27,6 +29,8 @@ const SelectField = ({
   className,
   warning,
   hideErrorMessageWrapper,
+  onKeyDown,
+  focusProps = {},
   ...fieldProps
 }) => {
   const [value, setValue] = useState(defaultValue);
@@ -49,6 +53,10 @@ const SelectField = ({
 
   const SelectComponent = productSelect ? ProductSelect : Select;
 
+  const selectRef = useRef(null);
+
+  useFocusOnMatch({ ...focusProps, ref: selectRef, type: componentType.SELECT_FIELD });
+
   return (
     <InputWrapper
       title={title}
@@ -66,6 +74,8 @@ const SelectField = ({
         value={value}
         onChange={onChangeValue}
         multi={multiple}
+        fieldRef={selectRef}
+        onKeyDown={onKeyDown}
         {...asyncProps}
         {...fieldProps}
       />
@@ -118,6 +128,13 @@ SelectField.propTypes = {
   className: PropTypes.string,
   hideErrorMessageWrapper: PropTypes.bool,
   warning: PropTypes.bool,
+  onKeyDown: PropTypes.func,
+  focusProps: PropTypes.shape({
+    fieldIndex: PropTypes.string,
+    fieldId: PropTypes.string,
+    focusIndex: PropTypes.string,
+    focusId: PropTypes.string,
+  }),
 };
 
 SelectField.defaultProps = {
@@ -139,4 +156,6 @@ SelectField.defaultProps = {
   className: '',
   hideErrorMessageWrapper: false,
   warning: false,
+  onKeyDown: null,
+  focusProps: {},
 };
