@@ -32,6 +32,7 @@ const FilterForm = ({
   translate,
   setShouldRebuildFilterValues,
   isLoading,
+  isCycleCountTab,
 }) => {
   const [amountFilled, setAmountFilled] = useState(0);
   const [filtersHidden, setFiltersHidden] = useState(hidden);
@@ -137,8 +138,8 @@ const FilterForm = ({
                       type="button"
                     />
                     <Button
-                      defaultLabel="Search"
-                      label="react.button.search.label"
+                      defaultLabel={isCycleCountTab ? 'Filter' : 'Search'}
+                      label={isCycleCountTab ? 'react.button.filter.label' : 'react.button.search.label'}
                       disabled={!allowEmptySubmit && _.every(values, (value) => !value)}
                       variant="primary"
                       type="submit"
@@ -188,6 +189,7 @@ FilterForm.propTypes = {
   translate: PropTypes.func.isRequired,
   setShouldRebuildFilterValues: PropTypes.func.isRequired,
   isLoading: PropTypes.bool,
+  isCycleCountTab: PropTypes.bool,
 };
 
 FilterForm.defaultProps = {
@@ -200,4 +202,5 @@ FilterForm.defaultProps = {
   onClear: undefined,
   ignoreClearFilters: [],
   isLoading: false,
+  isCycleCountTab: false,
 };
