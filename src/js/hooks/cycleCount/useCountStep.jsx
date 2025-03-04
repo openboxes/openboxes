@@ -1,13 +1,22 @@
+/* eslint-disable no-restricted-syntax */
+/* eslint-disable no-await-in-loop */
+
 import { useEffect, useRef, useState } from 'react';
 
 import _ from 'lodash';
 import { useDispatch, useSelector } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 
 import { fetchUsers } from 'actions';
 import cycleCountApi from 'api/services/CycleCountApi';
+import { CYCLE_COUNT } from 'consts/applicationUrls';
+import {
+  TO_RESOLVE_TAB,
+} from 'consts/cycleCount';
 import { CYCLE_COUNT } from 'api/urls';
 import useCountStepValidation from 'hooks/cycleCount/useCountStepValidation';
 import useSpinner from 'hooks/useSpinner';
+import confirmationModal from 'utils/confirmationModalUtils';
 import exportFileFromApi from 'utils/file-download-util';
 
 // Managing state for all tables, operations on shared state (from count step)
@@ -22,6 +31,7 @@ const useCountStep = () => {
   const [dateCounted, setDateCounted] = useState({});
   const [isStepEditable, setIsStepEditable] = useState(true);
   const dispatch = useDispatch();
+  const history = useHistory();
   const { show, hide } = useSpinner();
 
   const {
@@ -176,40 +186,29 @@ const useCountStep = () => {
   const next = () => {
     const isValid = triggerValidation();
     if (isValid) {
-      // This data should be combined to a single request
-      console.log('next: ', tableData.current, countedBy);
       setIsStepEditable(false);
     }
   };
+
   const back = () => {
     setIsStepEditable(true);
   };
 
   const save = async () => {
-    // eslint-disable-next-line no-restricted-syntax
-    for (const cycleCount of tableData.current) {
-      const cycleCountItemsToUpdate = cycleCount.cycleCountItems.filter((item) => (item.updated && !item.id.includes('newRow')));
-      // eslint-disable-next-line no-restricted-syntax
-      for (const cycleCountItem of cycleCountItemsToUpdate) {
-        try {
-          show();
-          // eslint-disable-next-line no-await-in-loop
+    try {
+      show();
+      for (const cycleCount of tableData.current) {
+        const cycleCountItemsToUpdate = cycleCount.cycleCountItems.filter((item) => (item.updated && !item.id.includes('newRow')));
+        for (const cycleCountItem of cycleCountItemsToUpdate) {
           await cycleCountApi.updateCycleCountItem({
             ...cycleCountItem,
             recount: false,
             assignee: getCountedBy(cycleCount.id)?.id,
           },
           currentLocation?.id, cycleCountItem?.id);
-        } finally {
-          hide();
         }
-      }
-      const cycleCountItemsToCreate = cycleCount.cycleCountItems.filter((item) => item.id.includes('newRow'));
-      // eslint-disable-next-line no-restricted-syntax
-      for (const cycleCountItem of cycleCountItemsToCreate) {
-        try {
-          show();
-          // eslint-disable-next-line no-await-in-loop
+        const cycleCountItemsToCreate = cycleCount.cycleCountItems.filter((item) => item.id.includes('newRow'));
+        for (const cycleCountItem of cycleCountItemsToCreate) {
           await cycleCountApi.createCycleCountItem({
             ...cycleCountItem,
             recount: false,
@@ -219,14 +218,87 @@ const useCountStep = () => {
             },
             assignee: getCountedBy(cycleCount.id)?.id,
           }, currentLocation?.id, cycleCount?.id);
-        } finally {
-          hide();
         }
-      }
 
-      // Now that we've successfully saved all the items, mark them all as not updated so that
-      // we don't try to update them again next time something is changed.
-      markAllItemsAsNotUpdated(cycleCount.id);
+        // Now that we've successfully saved all the items, mark them all as not updated so that
+        // we don't try to update them again next time something is changed.
+        markAllItemsAsNotUpdated(cycleCount.id);
+      }
+    } finally {
+      hide();
+    }
+  };
+
+  const modalLabels = {
+    title: {
+      label: 'react.cycleCount.modal.resolveDiscrepanciesTitle.label',
+      default: 'Resolve discrepancies?',
+    },
+    content: {
+      label: 'react.cycleCount.modal.resolveDiscrepanciesContent.label',
+      default: 'There are discrepancies to resolve. Would you like to resolve them?',
+    },
+  };
+
+  const submitCount = async () => {
+    for (const cycleCount of tableData.current) {
+      await cycleCountApi.submitCount({
+        refreshQuantityOnHand: true,
+        failOnOutdatedQuantity: false,
+        requireRecountOnDiscrepancy: true,
+        cycleCountItems: cycleCount.cycleCountItems,
+      },
+      currentLocation?.id,
+      cycleCount?.id);
+    }
+    history.push(CYCLE_COUNT.list(TO_RESOLVE_TAB));
+  };
+
+  const resolveDiscrepanciesModalButtons = (onClose) => ([
+    {
+      variant: 'transparent',
+      defaultLabel: 'Not now',
+      label: 'react.cycleCount.modal.notNow.label',
+      onClick: onClose,
+    },
+    {
+      variant: 'primary',
+      defaultLabel: 'Resolve',
+      label: 'react.cycleCount.modal.resolve.label',
+      onClick: async () => {
+        await submitCount();
+        onClose?.();
+      },
+    },
+  ]);
+
+  const openResolveDiscrepanciesModal = () => {
+    confirmationModal({
+      buttons: resolveDiscrepanciesModalButtons,
+      ...modalLabels,
+    });
+  };
+
+  const resolveDiscrepancies = async () => {
+    try {
+      show();
+      await save();
+      const { data } = await cycleCountApi.getCycleCounts(
+        currentLocation?.id,
+        cycleCountIds,
+      );
+      const cycleCountsItems = _.flatten(
+        data?.data?.map((cycleCount) => cycleCount.cycleCountItems),
+      );
+      const hasDiscrepancies = _.some(cycleCountsItems,
+        ({ quantityVariance }) => quantityVariance !== 0);
+      if (hasDiscrepancies) {
+        openResolveDiscrepanciesModal();
+        return;
+      }
+      await submitCount();
+    } finally {
+      hide();
     }
   };
 
@@ -278,6 +350,7 @@ const useCountStep = () => {
     next,
     back,
     save,
+    resolveDiscrepancies,
     isStepEditable,
   };
 };

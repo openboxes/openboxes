@@ -210,6 +210,7 @@ const useCountStepTable = ({
             type={type}
             value={value}
             onChange={onChange}
+            onChangeRaw={onChange}
             onBlur={onBlur}
             className={`m-1 hide-arrows ${showTooltip ? 'w-99' : 'w-75'} ${error && 'border border-danger input-has-error'}`}
             showErrorBorder={error}
