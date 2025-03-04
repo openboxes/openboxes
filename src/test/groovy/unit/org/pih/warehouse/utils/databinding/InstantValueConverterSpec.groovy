@@ -24,6 +24,7 @@ class InstantValueConverterSpec extends Specification {
         where:
         givenDate                   || expectedConvertedDate  | scenario
         "2000-01-01T00:00:00.000Z"  || "2000-01-01T00:00:00Z" | "Full string in proper ISO format"
+        "2000-01-01T00:00:00.000 Z" || "2000-01-01T00:00:00Z" | "Full string, space before timezone"
         "2000-01-01T00:00:00.000"   || "2000-01-01T00:00:00Z" | "Full string, no timezone"
         "2000-01-01T00:00:00.00"    || "2000-01-01T00:00:00Z" | "Shorter millis"
         "2000-01-01T00:00:00.0"     || "2000-01-01T00:00:00Z" | "Shorter millis"
@@ -32,6 +33,7 @@ class InstantValueConverterSpec extends Specification {
         "2000-01-01"                || "2000-01-01T00:00:00Z" | "No time"
         "2000 01 01"                || "2000-01-01T00:00:00Z" | "Date with spaces"
         "2000/01/01"                || "2000-01-01T00:00:00Z" | "Date with slashes"
+        "01/01/2000"                || "2000-01-01T00:00:00Z" | "Date with slashes, Excel format"
         "20000101"                  || "2000-01-01T00:00:00Z" | "Date with no separator"
         "2000-01-01 00:00:00.000Z"  || "2000-01-01T00:00:00Z" | "Replace 'T' with space"
         "2000-01-01T000000000Z"     || "2000-01-01T00:00:00Z" | "Time with no separator"

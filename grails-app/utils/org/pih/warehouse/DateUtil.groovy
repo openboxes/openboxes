@@ -10,13 +10,14 @@
 package org.pih.warehouse
 
 import grails.validation.ValidationException
-import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.time.Instant
 import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import org.apache.commons.lang.StringUtils
+
+import org.pih.warehouse.databinding.DataBindingConstants
 
 /**
  * Utility methods on date and datetime objects.
@@ -39,26 +40,6 @@ import org.apache.commons.lang.StringUtils
  * We also have java.util.Date, which is deprecated and should not be used going forward.
  */
 class DateUtil {
-
-    /**
-     * Formats for parsing a String to a java.util.Date. Mirror the formats defined in application.yml under the
-     * grails.databinding.dateFormats setting. List order is important as formats will be attempted in order.
-     */
-    private static final List<SimpleDateFormat> DEFAULT_SIMPLE_DATE_FORMATS = [
-            new SimpleDateFormat("MM/dd/yyyy HH:mm:ss XXX"),
-            new SimpleDateFormat("MM/dd/yyyy HH:mm:ss XX"),
-            new SimpleDateFormat("MM/dd/yyyy HH:mm:ss X"),
-            new SimpleDateFormat("MM/dd/yyyy HH:mm XXX"),
-            new SimpleDateFormat("MM/dd/yyyy HH:mm XX"),
-            new SimpleDateFormat("MM/dd/yyyy HH:mm X"),
-            new SimpleDateFormat("MM/dd/yyyy"),
-            new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX"),
-            new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXX"),
-            new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssX"),
-            new SimpleDateFormat("yyyy-MM-dd'T'HH:mmXXX"),
-            new SimpleDateFormat("yyyy-MM-dd'T'HH:mmXX"),
-            new SimpleDateFormat("yyyy-MM-dd'T'HH:mmX"),
-    ]
 
     /**
      * Null-safe conversion of a (deprecated) java.util.Date to an Instant.
@@ -106,18 +87,18 @@ class DateUtil {
         }
 
         String dateSanitized = date.trim()
+
+        // If we're given a specific format, use that to parse the string directly to a Date. We shouldn't ever need
+        // to define this unless we know we're going to be given input in a non-conventional format. The flexible
+        // format should cover all the normal cases.
         if (format != null) {
             return format.parse(dateSanitized)
         }
 
-        for (SimpleDateFormat defaultFormat : DEFAULT_SIMPLE_DATE_FORMATS) {
-            try {
-                return defaultFormat.parse(dateSanitized)
-            } catch (ParseException ignored) {
-                // Do nothing. Try the next format.
-            }
-        }
-        throw new ParseException("Unparseable date: ${date}", 0)
+        // Otherwise, try to parse using our flexible list of supported formats. We parse to an Instant and then convert
+        // to a Date since it allows us to use DateTimeFormatter, which is less error-prone than SimpleDateFormat.
+        Instant instant = Instant.from(DataBindingConstants.FLEXIBLE_DATE_TIME_ZONE_FORMAT.parse(dateSanitized))
+        return Date.from(instant)
     }
 
     /**
