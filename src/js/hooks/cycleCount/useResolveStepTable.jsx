@@ -242,7 +242,7 @@ const useResolveStepTable = ({
       const fieldProps = getFieldProps(columnPath, tooltipContent);
 
       // Columns allowed for focus in new rows
-      const newRowFocusColumns = [
+      const newRowFocusableCells = [
         cycleCountColumn.LOT_NUMBER,
         cycleCountColumn.EXPIRATION_DATE,
         cycleCountColumn.QUANTITY_RECOUNTED,
@@ -251,23 +251,28 @@ const useResolveStepTable = ({
       ];
 
       if (showBinLocation) {
-        newRowFocusColumns.splice(0, 0, cycleCountColumn.BIN_LOCATION);
+        newRowFocusableCells.splice(0, 0, cycleCountColumn.BIN_LOCATION);
       }
 
       // Columns allowed for focus in existing rows
-      const existingRowFocusColumns = [
+      const existingRowFocusableCells = [
         cycleCountColumn.QUANTITY_RECOUNTED,
         cycleCountColumn.ROOT_CAUSE,
         cycleCountColumn.COMMENT,
       ];
 
+      // Checks if the row is a new one (i.e., added by user and contains 'newRow' in id),
+      // and if yes, allow navigation through `newRowFocusableCells`.
+      const isNewRow = (row) => row?.id?.includes('newRow');
+
       const { handleKeyDown } = useArrowsNavigation({
-        newRowFocusColumns,
-        existingRowFocusColumns,
+        newRowFocusableCells,
+        existingRowFocusableCells,
         tableData,
         setFocusId,
         setFocusIndex,
         addNewRow: () => addEmptyRow(productCode, cycleCountId),
+        isNewRow,
       });
 
       return (

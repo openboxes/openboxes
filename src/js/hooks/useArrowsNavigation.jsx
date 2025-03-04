@@ -1,50 +1,49 @@
 import navigationKey from 'consts/navigationKey';
 
 const useArrowsNavigation = ({
-  newRowFocusColumns,
-  existingRowFocusColumns,
+  newRowFocusableCells,
+  existingRowFocusableCells,
   tableData,
   setFocusId,
   setFocusIndex,
   addNewRow,
+  isNewRow,
 }) => {
-  const isNewRow = (row) => !row?.id || row?.id?.includes('newRow') || row?.id === null;
-
   const getNextFocus = (columnId, rowIndex) => {
-    const currentIndex = newRowFocusColumns.indexOf(columnId);
-    const remainingColumns = newRowFocusColumns.slice(currentIndex + 1);
+    const currentIndex = newRowFocusableCells.indexOf(columnId);
+    const remainingColumns = newRowFocusableCells.slice(currentIndex + 1);
     const newRowIndex = tableData[rowIndex + 1];
 
-    if (!remainingColumns.some((col) => existingRowFocusColumns.includes(col))) {
+    if (!remainingColumns.some((col) => existingRowFocusableCells.includes(col))) {
       if (!newRowIndex) {
         addNewRow();
-        return { newColumnId: newRowFocusColumns[0], newRowIndex: rowIndex + 1 };
+        return { newColumnId: newRowFocusableCells[0], newRowIndex: rowIndex + 1 };
       }
 
       if (isNewRow(newRowIndex)) {
-        return { newColumnId: newRowFocusColumns[0], newRowIndex: rowIndex + 1 };
+        return { newColumnId: newRowFocusableCells[0], newRowIndex: rowIndex + 1 };
       }
-      return { newColumnId: existingRowFocusColumns[0], newRowIndex: rowIndex + 1 };
+      return { newColumnId: existingRowFocusableCells[0], newRowIndex: rowIndex + 1 };
     }
 
     if (isNewRow(tableData[rowIndex])) {
-      return { newColumnId: newRowFocusColumns[currentIndex + 1], newRowIndex: rowIndex };
+      return { newColumnId: newRowFocusableCells[currentIndex + 1], newRowIndex: rowIndex };
     }
     return {
-      newColumnId: existingRowFocusColumns[existingRowFocusColumns.indexOf(columnId) + 1],
+      newColumnId: existingRowFocusableCells[existingRowFocusableCells.indexOf(columnId) + 1],
       newRowIndex: rowIndex,
     };
   };
 
   const getPreviousFocus = (columnId, rowIndex) => {
-    const currentIndex = newRowFocusColumns.indexOf(columnId);
-    const previousColumns = newRowFocusColumns.slice(0, currentIndex).reverse();
+    const currentIndex = newRowFocusableCells.indexOf(columnId);
+    const previousColumns = newRowFocusableCells.slice(0, currentIndex).reverse();
     const previousRow = tableData[rowIndex - 1];
-    let newColumnId = newRowFocusColumns[currentIndex - 1];
+    let newColumnId = newRowFocusableCells[currentIndex - 1];
     let newRowIndex = rowIndex;
 
     const hasAllowedColumnToLeft = previousColumns
-      .some((col) => existingRowFocusColumns.includes(col))
+      .some((col) => existingRowFocusableCells.includes(col))
       || isNewRow(tableData[rowIndex]);
 
     if (currentIndex === 0 || !hasAllowedColumnToLeft) {
@@ -54,12 +53,12 @@ const useArrowsNavigation = ({
 
       newRowIndex = rowIndex - 1;
       newColumnId = isNewRow(previousRow) || previousColumns.id === null
-        ? newRowFocusColumns[newRowFocusColumns.length - 1]
-        : existingRowFocusColumns[existingRowFocusColumns.length - 1];
+        ? newRowFocusableCells[newRowFocusableCells.length - 1]
+        : existingRowFocusableCells[existingRowFocusableCells.length - 1];
     }
 
-    if (!(existingRowFocusColumns.includes(newColumnId) || isNewRow(tableData[newRowIndex]))) {
-      newColumnId = previousColumns.find((col) => existingRowFocusColumns.includes(col));
+    if (!(existingRowFocusableCells.includes(newColumnId) || isNewRow(tableData[newRowIndex]))) {
+      newColumnId = previousColumns.find((col) => existingRowFocusableCells.includes(col));
     }
 
     return { newColumnId, newRowIndex };
@@ -69,7 +68,7 @@ const useArrowsNavigation = ({
     const { key } = e;
 
     if (key === navigationKey.ARROW_UP) {
-      const isInArray = existingRowFocusColumns.includes(columnId);
+      const isInArray = existingRowFocusableCells.includes(columnId);
       if (rowIndex > 0 && (isInArray || isNewRow([rowIndex - 1]))) {
         setFocusIndex(rowIndex - 1);
         setFocusId(columnId);
