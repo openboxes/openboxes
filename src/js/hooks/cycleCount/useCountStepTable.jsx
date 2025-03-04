@@ -114,6 +114,12 @@ const useCountStepTable = ({
     return value;
   };
 
+  const handleAddEmptyRow = () => {
+    addEmptyRow(productCode, cycleCountId);
+    setFocusIndex(null);
+    setFocusId(null);
+  };
+
   const defaultColumn = {
     cell: ({
       row: { original, index }, column: { id }, table,
@@ -327,6 +333,7 @@ const useCountStepTable = ({
     columns,
     defaultColumn,
     users,
+    handleAddEmptyRow,
   };
 };
 

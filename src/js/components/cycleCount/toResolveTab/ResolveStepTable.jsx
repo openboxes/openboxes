@@ -38,6 +38,7 @@ const ResolveStepTable = ({
     columns,
     defaultColumn,
     users,
+    handleAddEmptyRow,
   } = useResolveStepTable({
     cycleCountId: id,
     validationErrors,
@@ -140,7 +141,7 @@ const ResolveStepTable = ({
           )}
         >
           <Button
-            onClick={() => addEmptyRow(product?.productCode, id)}
+            onClick={handleAddEmptyRow}
             label="react.cycleCount.addNewRecord.label"
             defaultLabel="Add new record"
             variant="transparent"

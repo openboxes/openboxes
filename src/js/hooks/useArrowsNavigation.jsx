@@ -69,23 +69,21 @@ const useArrowsNavigation = ({
 
     if (key === navigationKey.ARROW_UP) {
       const isInArray = existingRowFocusableCells.includes(columnId);
-      if (rowIndex > 0 && (isInArray || isNewRow([rowIndex - 1]))) {
+      if (rowIndex > 0 && (isInArray || isNewRow(tableData[rowIndex - 1]))) {
         setFocusIndex(rowIndex - 1);
         setFocusId(columnId);
-      } else {
-        e.preventDefault();
-        e.stopPropagation();
       }
+      e.preventDefault();
+      e.stopPropagation();
     }
 
     if (key === navigationKey.ARROW_DOWN) {
       if (rowIndex < tableData.length - 1) {
         setFocusIndex(rowIndex + 1);
         setFocusId(columnId);
-      } else {
-        e.preventDefault();
-        e.stopPropagation();
       }
+      e.preventDefault();
+      e.stopPropagation();
     }
 
     if (key === navigationKey.ARROW_RIGHT) {
