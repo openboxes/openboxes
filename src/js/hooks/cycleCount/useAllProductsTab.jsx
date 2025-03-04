@@ -239,7 +239,7 @@ const useAllProductsTab = ({
       },
     }),
     columnHelper.accessor((row) =>
-      row?.tags?.map?.((tag) => <Badge label={tag?.tag} variant="badge--purple" key={tag.id} />), {
+      row?.tags?.map?.((tag) => <Badge label={tag?.tag} variant="badge--purple" tooltip key={tag.id} />), {
       id: 'tags',
       header: () => (
         <TableHeaderCell>
@@ -258,7 +258,7 @@ const useAllProductsTab = ({
       },
     }),
     columnHelper.accessor((row) =>
-      row?.productCatalogs?.map((catalog) => <Badge label={catalog?.name} variant="badge--blue" key={catalog.id} />), {
+      row?.productCatalogs?.map((catalog) => <Badge label={catalog?.name} variant="badge--blue" tooltip key={catalog.id} />), {
       id: 'productCatalogs',
       header: () => (
         <TableHeaderCell>
