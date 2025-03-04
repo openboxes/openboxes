@@ -22,8 +22,6 @@ class InventoryLevelImportDataService implements ImportDataService {
 
     @Override
     void validateData(ImportDataCommand command) {
-        log.info "validate inventory levels " + command.filename
-
         List validated = []
         command.data.eachWithIndex { params, index ->
 
@@ -187,7 +185,6 @@ class InventoryLevelImportDataService implements ImportDataService {
      * @return
      */
     def findOrCreateInventoryLevel(Location facility, Product product) {
-        log.info "Product ${product.productCode} facility ${facility}"
         InventoryLevel inventoryLevel = InventoryLevel.findByInventoryAndProductAndBinLocationIsNull(facility.inventory, product)
         if (!inventoryLevel) {
             inventoryLevel = new InventoryLevel()

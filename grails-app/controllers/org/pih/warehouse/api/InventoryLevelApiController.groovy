@@ -14,7 +14,6 @@ class InventoryLevelApiController {
     InventoryLevelImportDataService inventoryLevelImportDataService
 
     def list() {
-        log.info "params " + params
         Location facility = Location.get(params.facilityId)
         if (!facility)
             throw new IllegalArgumentException("Unable to locate facility with id ${params.facilityId}")
@@ -26,7 +25,6 @@ class InventoryLevelApiController {
 
         withFormat {
             "xls" {
-                log.info "here"
                 def data = dataService.transformObjects(inventoryLevels, InventoryLevel.PROPERTIES)
                 documentService.generateExcel(response.outputStream, data)
                 response.setHeader 'Content-disposition', "attachment; filename=\"inventory-levels.xls\""
