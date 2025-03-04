@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import DatePicker from 'react-datepicker';
 
 import DateFieldInput from 'components/form-elements/v2/DateFieldInput';
+import componentType from 'consts/componentType';
 import { DateFormat, TimeFormat } from 'consts/timeFormat';
 import useFocusOnMatch from 'hooks/useFocusOnMatch';
 import useTranslate from 'hooks/useTranslate';
@@ -70,7 +71,7 @@ const DateField = ({
     return customDateFormat || DateFormat.MMM_DD_YYYY;
   };
 
-  useFocusOnMatch({ ...focusProps, ref: datePickerRef });
+  useFocusOnMatch({ ...focusProps, ref: datePickerRef, type: componentType.DATE_FIELD });
 
   return (
     <InputWrapper

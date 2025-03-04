@@ -3,6 +3,7 @@ import React, { useRef } from 'react';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 
+import componentType from 'consts/componentType';
 import useFocusOnMatch from 'hooks/useFocusOnMatch';
 import { decimalParser } from 'utils/form-utils';
 import InputWrapper from 'wrappers/InputWrapper';
@@ -30,7 +31,7 @@ const TextInput = ({
 }) => {
   const inputRef = useRef(null);
 
-  useFocusOnMatch({ ...focusProps, ref: inputRef });
+  useFocusOnMatch({ ...focusProps, ref: inputRef, type: componentType.TEXT_INPUT });
 
   const onBlurHandler = (e) => {
     if (type === 'number') {

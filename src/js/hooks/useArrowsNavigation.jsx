@@ -8,6 +8,8 @@ const useArrowsNavigation = ({
   setFocusIndex,
   addNewRow,
 }) => {
+  const isNewRow = (row) => !row?.id || row?.id?.includes('newRow') || row?.id === null;
+
   const getNextFocus = (columnId, rowIndex) => {
     const currentIndex = newRowFocusColumns.indexOf(columnId);
     const remainingColumns = newRowFocusColumns.slice(currentIndex + 1);
@@ -19,13 +21,13 @@ const useArrowsNavigation = ({
         return { newColumnId: newRowFocusColumns[0], newRowIndex: rowIndex + 1 };
       }
 
-      if (newRowIndex?.id.includes('newRow')) {
+      if (isNewRow(newRowIndex)) {
         return { newColumnId: newRowFocusColumns[0], newRowIndex: rowIndex + 1 };
       }
       return { newColumnId: existingRowFocusColumns[0], newRowIndex: rowIndex + 1 };
     }
 
-    if (tableData[rowIndex]?.id.includes('newRow')) {
+    if (isNewRow(tableData[rowIndex])) {
       return { newColumnId: newRowFocusColumns[currentIndex + 1], newRowIndex: rowIndex };
     }
     return {
@@ -43,7 +45,7 @@ const useArrowsNavigation = ({
 
     const hasAllowedColumnToLeft = previousColumns
       .some((col) => existingRowFocusColumns.includes(col))
-      || tableData[rowIndex]?.id.includes('newRow');
+      || isNewRow(tableData[rowIndex]);
 
     if (currentIndex === 0 || !hasAllowedColumnToLeft) {
       if (!previousRow) {
@@ -51,12 +53,12 @@ const useArrowsNavigation = ({
       }
 
       newRowIndex = rowIndex - 1;
-      newColumnId = previousRow.id.includes('newRow')
+      newColumnId = isNewRow(previousRow) || previousColumns.id === null
         ? newRowFocusColumns[newRowFocusColumns.length - 1]
         : existingRowFocusColumns[existingRowFocusColumns.length - 1];
     }
 
-    if (!(existingRowFocusColumns.includes(newColumnId) || tableData[newRowIndex]?.id.includes('newRow'))) {
+    if (!(existingRowFocusColumns.includes(newColumnId) || isNewRow(tableData[newRowIndex]))) {
       newColumnId = previousColumns.find((col) => existingRowFocusColumns.includes(col));
     }
 
@@ -68,7 +70,7 @@ const useArrowsNavigation = ({
 
     if (key === navigationKey.ARROW_UP) {
       const isInArray = existingRowFocusColumns.includes(columnId);
-      if (rowIndex > 0 && (isInArray || tableData[rowIndex - 1].id.includes('newRow'))) {
+      if (rowIndex > 0 && (isInArray || isNewRow([rowIndex - 1]))) {
         setFocusIndex(rowIndex - 1);
         setFocusId(columnId);
       } else {

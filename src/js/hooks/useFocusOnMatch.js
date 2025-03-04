@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 
-import cycleCountColumn from 'consts/cycleCountColumn';
+import componentType from 'consts/componentType';
 
 const useFocusOnMatch = ({
   focusId,
@@ -8,13 +8,14 @@ const useFocusOnMatch = ({
   focusIndex,
   fieldId,
   ref,
+  type,
 }) => {
   useEffect(() => {
     const shouldFocus = focusId
       && fieldIndex === focusIndex
       && fieldId === focusId;
 
-    if (shouldFocus && fieldId === cycleCountColumn.EXPIRATION_DATE) {
+    if (shouldFocus && type === componentType.DATE_FIELD) {
       ref.current?.setOpen(true);
       ref.current?.input?.focus();
       return;

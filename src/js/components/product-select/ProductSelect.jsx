@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
 import { Tooltip } from 'react-tippy';
 
+import componentType from 'consts/componentType';
 import useFocusOnMatch from 'hooks/useFocusOnMatch';
 import { debounceProductsFetch } from 'utils/option-utils';
 import renderHandlingIcons from 'utils/product-handling-icons';
@@ -99,7 +100,7 @@ const ProductSelect = ({
     }
   }, [isExactMatch, loadedOptions, searchTerm]);
 
-  useFocusOnMatch({ ...focusProps, ref: fieldRef });
+  useFocusOnMatch({ ...focusProps, ref: fieldRef, type: componentType.SELECT_FIELD });
 
   const loadProductOptions = (searchString, callback) =>
     debouncedProductsFetch(searchString, (resultOptions) => {

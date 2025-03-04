@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 
 import ProductSelect from 'components/product-select/ProductSelect';
+import componentType from 'consts/componentType';
 import useFocusOnMatch from 'hooks/useFocusOnMatch';
 import Select from 'utils/Select';
 import InputWrapper from 'wrappers/InputWrapper';
@@ -54,7 +55,7 @@ const SelectField = ({
 
   const selectRef = useRef(null);
 
-  useFocusOnMatch({ ...focusProps, ref: selectRef });
+  useFocusOnMatch({ ...focusProps, ref: selectRef, type: componentType.SELECT_FIELD });
 
   return (
     <InputWrapper
