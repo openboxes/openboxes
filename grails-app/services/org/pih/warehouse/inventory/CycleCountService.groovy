@@ -399,6 +399,10 @@ class CycleCountService {
         if (command.cycleCount.status == CycleCountStatus.READY_TO_REVIEW) {
             cycleCountTransactionService.createTransactions(command.cycleCount, command.refreshQuantityOnHand)
         }
+        // TODO: The beforeUpdate() on CycleCount class is not triggered without
+        // the line below, so without it status is not correct in the DB.
+        // Investigate why this line is needed.
+        command.cycleCount.save()
         return CycleCountDto.toDto(command.cycleCount)
     }
 
