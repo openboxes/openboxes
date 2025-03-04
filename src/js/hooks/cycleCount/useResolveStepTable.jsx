@@ -167,6 +167,12 @@ const useResolveStepTable = ({
     return value;
   };
 
+  const handleAddEmptyRow = () => {
+    addEmptyRow(productCode, cycleCountId);
+    setFocusIndex(null);
+    setFocusId(null);
+  };
+
   const defaultColumn = {
     cell: ({
       row: { original, index }, column: { id }, table,
@@ -494,6 +500,7 @@ const useResolveStepTable = ({
     columns,
     defaultColumn,
     users,
+    handleAddEmptyRow,
   };
 };
 

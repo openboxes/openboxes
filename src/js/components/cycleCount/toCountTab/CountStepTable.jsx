@@ -40,6 +40,7 @@ const CountStepTable = ({
     columns,
     defaultColumn,
     users,
+    handleAddEmptyRow,
   } = useCountStepTable({
     cycleCountId: id,
     productCode: product?.productCode,
@@ -146,7 +147,7 @@ const CountStepTable = ({
             )}
           >
             <Button
-              onClick={() => addEmptyRow(product?.id, id)}
+              onClick={handleAddEmptyRow}
               label="react.cycleCount.addNewRecord.label"
               defaultLabel="Add new record"
               variant="transparent"
