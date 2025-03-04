@@ -399,6 +399,10 @@ class CycleCountService {
         if (command.cycleCount.status == CycleCountStatus.READY_TO_REVIEW) {
             cycleCountTransactionService.createTransactions(command.cycleCount, command.refreshQuantityOnHand)
         }
+        // TODO: The beforeUpdate() on CycleCount class is not triggered without
+        // the line below, so without it status is not correct in the DB.
+        // Investigate why this line is needed.
+        command.cycleCount.save()
         return CycleCountDto.toDto(command.cycleCount)
     }
 
@@ -440,7 +444,7 @@ class CycleCountService {
                 countIndex: command.recount ? 1 : 0,
                 // TODO: This is a new item so we need to fetch the most up to date QoH via product availability.
                 //       (And if the inventory item has just been created, QoH will be 0.)
-                quantityOnHand: command.quantityCounted,
+                quantityOnHand: 0,
                 quantityCounted: command.quantityCounted,
                 cycleCount: command.cycleCount,
                 location: command.binLocation,

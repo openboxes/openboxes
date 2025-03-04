@@ -14,6 +14,7 @@ const CountStep = () => {
     printCountForm,
     next,
     save,
+    resolveDiscrepancies,
     back,
     tableMeta,
     addEmptyRow,
@@ -35,7 +36,12 @@ const CountStep = () => {
           next={next}
           save={save}
         />
-      ) : <ConfirmStepHeader back={back} save={save} />}
+      ) : (
+        <ConfirmStepHeader
+          back={back}
+          save={resolveDiscrepancies}
+        />
+      )}
       {tableData
         .map(({ cycleCountItems, id }) => (
           <CountStepTable

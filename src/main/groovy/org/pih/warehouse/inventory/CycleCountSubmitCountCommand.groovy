@@ -25,7 +25,9 @@ class CycleCountSubmitCountCommand implements Validateable {
 
     static constraints = {
         cycleCount(validator: { CycleCount obj ->
-            if (obj?.status != CycleCountStatus.COUNTING) {
+            // TODO: Fix persisting valid status for cycle count
+            CycleCountStatus currentStatus = obj?.recomputeStatus()
+            if (currentStatus != CycleCountStatus.COUNTING) {
                 return ['invalidStatus']
             }
         })
