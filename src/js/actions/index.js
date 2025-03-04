@@ -102,13 +102,21 @@ export function hideUserActions() {
   };
 }
 
-export function fetchReasonCodes() {
-  const url = '/api/reasonCodes';
+export function fetchReasonCodes(activityCode = null, dispatchType = FETCH_REASONCODES) {
+  const url = `/api/reasonCodes${activityCode ? `?activityCode=${activityCode}` : ''}`;
+
   return (dispatch) => {
     apiClient.get(url).then((res) => {
+      const reasonCodes = res.data.data.map((reasonCode) => (
+        {
+          id: reasonCode.id,
+          value: reasonCode.id,
+          label: reasonCode.name,
+        }
+      ));
       dispatch({
-        type: FETCH_REASONCODES,
-        payload: res.data,
+        type: dispatchType,
+        payload: reasonCodes || [],
       });
     });
   };

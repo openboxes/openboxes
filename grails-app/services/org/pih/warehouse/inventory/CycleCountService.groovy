@@ -390,6 +390,8 @@ class CycleCountService {
                 facility: command.facility,
                 status: command.recount ? CycleCountItemStatus.INVESTIGATING : CycleCountItemStatus.COUNTING,
                 countIndex: command.recount ? 1 : 0,
+                // TODO: This is a new item so we need to fetch the most up to date QoH via product availability.
+                //       (And if the inventory item has just been created, QoH will be 0.)
                 quantityOnHand: command.quantityCounted,
                 quantityCounted: command.quantityCounted,
                 cycleCount: command.cycleCount,
@@ -400,6 +402,7 @@ class CycleCountService {
                 updatedBy: AuthService.currentUser,
                 dateCounted: new Date(),
                 comment: command.comment,
+                discrepancyReasonCode: command.discrepancyReasonCode,
                 assignee: command.assignee,
                 custom: true,
         )

@@ -11,6 +11,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Tooltip } from 'react-tippy';
 
 import { fetchReasonCodes } from 'actions';
+import { FETCH_CYCLE_COUNT_REASON_CODES } from 'actions/types';
 import { TableCell } from 'components/DataTable';
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
 import ArrowValueIndicator from 'components/DataTable/v2/ArrowValueIndicator';
@@ -53,7 +54,7 @@ const useResolveStepTable = ({
     users: state.users.data,
     currentLocation: state.session.currentLocation,
     formatLocalizedDate: formatDate(state.localize),
-    reasonCodes: state.reasonCodes.data,
+    reasonCodes: state.cycleCount.reasonCodes,
   }));
 
   const dispatch = useDispatch();
@@ -71,8 +72,8 @@ const useResolveStepTable = ({
   }, [currentLocation?.id]);
 
   useEffect(() => {
-    if (!reasonCodes.length) {
-      dispatch(fetchReasonCodes());
+    if (!reasonCodes?.length) {
+      dispatch(fetchReasonCodes('ADJUST_INVENTORY', FETCH_CYCLE_COUNT_REASON_CODES));
     }
   }, []);
 
