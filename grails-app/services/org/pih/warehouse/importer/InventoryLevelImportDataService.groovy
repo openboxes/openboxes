@@ -24,17 +24,28 @@ class InventoryLevelImportDataService implements ImportDataService {
     void validateData(ImportDataCommand command) {
         log.info "validate inventory levels " + command.filename
 
-        command.data.eachWithIndex { row, index ->
-            if (!validateInventoryLevel(row)) {
-                command.errors.reject("Row ${index + 1}: Failed validation")
+        List validated = []
+        command.data.eachWithIndex { params, index ->
+
+            if (!validateInventoryLevel(params)) {
+                command.errors.reject("Row ${index + 2}: Failed validation")
             }
+
+            // Detect duplicates in the validated data
+            def count = validated.count { it.facility == params.facility && it.productCode == params.productCode }
+            if (count > 0) {
+                command.errors.reject("Row ${index + 2}: Detected duplicate inventory levels with facility ${params.facility} and product code ${params.productCode}")
+            }
+
+            // Add the current row to the list of validated records (used to detect duplicates)
+            validated << params
         }
     }
 
     @Override
     void importData(ImportDataCommand command) {
         command.data.eachWithIndex { Map params, Integer index ->
-            importInventoryLevel(params, index)
+            importInventoryLevel(params)
         }
     }
 
@@ -62,18 +73,17 @@ class InventoryLevelImportDataService implements ImportDataService {
      * @param fileName
      * @return
      */
-    def importInventoryLevel(Map params, Integer index) {
-        log.info "Import inventory levels(${index}): " + params
+    def importInventoryLevel(Map params) {
 
-        def product = Product.findByProductCode(params.productCode as String)
+        Product product = Product.findByProductCode(params.productCode as String)
         if (!product) {
             throw new IllegalArgumentException("Product with product code ${params.productCode} was not found")
         }
 
         // Validate that the facility exists
-        Location facility = Location.findByName(params.inventory as String)
+        Location facility = Location.findByName(params.facility as String)
         if (!facility || !facility.inventory) {
-            throw new IllegalArgumentException("Facility with name ${params.inventory} was not found or is not valid")
+            throw new IllegalArgumentException("Facility with name ${params.facility} was not found or is not valid")
         }
 
         // TODO Any record with a non-empty internal location is a bin replenishment rule rather than an facility-based
@@ -88,8 +98,15 @@ class InventoryLevelImportDataService implements ImportDataService {
             return
         }
 
+        // Validate the target internal location
+        // FIXME for now updating the internal location is prevented by the check above. However in the future we
+        //  would like for users to be able to update this field as part of the . One thing to note is that we
+        //  should add protections to avoid users unwittingly changing facility level rules to internal location
+        //  level rules since this might have dramatic effects. Therefore, it's probably best to allow setting the
+        //  internal location property on create. The other locations
+        // params.internalLocation = resolveInternalLocation(facility, params.internalLocation as String)
+
         // Resolve any objects that require a database lookup
-        params.internalLocation = params.internalLocation ? resolveInternalLocation(facility, params.internalLocation as String) : null
         params.preferredBinLocation = params.preferredBinLocation ? resolveInternalLocation(facility, params.preferredBinLocation as String) : null
         params.replenishmentLocation = params.replenishmentLocation ? resolveInternalLocation(facility, params.replenishmentLocation as String) : null
 
@@ -102,10 +119,15 @@ class InventoryLevelImportDataService implements ImportDataService {
             inventoryLevel.delete()
             product.save()
         } else {
-            // Save inventory level OR we could return the inventory level and save them all at the end
-            product.addToInventoryLevels(inventoryLevel)
-            inventoryLevel.save()
-            product.save()
+            // Save inventory level
+            if (inventoryLevel.id) {
+                inventoryLevel.save()
+            }
+            // Create a new inventory level
+            else {
+                product.addToInventoryLevels(inventoryLevel)
+                product.save()
+            }
         }
     }
 
@@ -129,6 +151,8 @@ class InventoryLevelImportDataService implements ImportDataService {
      * @return
      */
     InventoryLevel updateOrCreateInventoryLevel(Location facility, Product product, Map params) {
+        // FIXME This should handle duplicate inventory level but I'm not exactly sure
+        //  what to do at this point so I'm going to let the user correct duplicates on their own
         InventoryLevel inventoryLevel = findOrCreateInventoryLevel(facility, product)
 
         inventoryLevel.status = params.status ? params.status as InventoryStatus : InventoryStatus.SUPPORTED
@@ -136,8 +160,6 @@ class InventoryLevelImportDataService implements ImportDataService {
         inventoryLevel.minQuantity = params.minQuantity as Integer
         inventoryLevel.reorderQuantity = params.reorderQuantity as Integer
         inventoryLevel.maxQuantity = params.maxQuantity as Integer
-        inventoryLevel.expectedLeadTimeDays = params.expectedLeadTimeDays as Integer
-        inventoryLevel.replenishmentPeriodDays = params.replenishmentPeriodDays as Integer
 
         // Don't clear locations if columns in import are null
         if (params.internalLocation) {
@@ -166,7 +188,7 @@ class InventoryLevelImportDataService implements ImportDataService {
      */
     def findOrCreateInventoryLevel(Location facility, Product product) {
         log.info "Product ${product.productCode} facility ${facility}"
-        def inventoryLevel = InventoryLevel.findByInventoryAndProductAndBinLocationIsNull(facility.inventory, product)
+        InventoryLevel inventoryLevel = InventoryLevel.findByInventoryAndProductAndBinLocationIsNull(facility.inventory, product)
         if (!inventoryLevel) {
             inventoryLevel = new InventoryLevel()
             inventoryLevel.product = product
@@ -182,14 +204,12 @@ class InventoryLevelImportDataService implements ImportDataService {
      * @return
      */
     String exportInventoryLevels(Collection inventoryLevels) {
-        def sw = new StringWriter()
-        def csv = new CSVWriter(sw, {
+        StringWriter sw = new StringWriter()
+        CSVWriter csv = new CSVWriter(sw, {
             "Product Code" { it?.productCode }
             "Product Name" { it?.productName }
-            "Inventory" { it?.inventory }
+            "Facility" { it?.inventory }
             "Status" { it?.status }
-            "Bin Location" { it?.binLocation }
-            "Preferred" { it?.preferred }
             "Target Bin Location" { it?.internalLocation }
             "Preferred Putaway Location" { it?.preferredBinLocation }
             "Default Replenishment Source" { it?.replenishmentLocation }
@@ -197,9 +217,6 @@ class InventoryLevelImportDataService implements ImportDataService {
             "Min Quantity" { it?.minQuantity }
             "Reorder Quantity" { it?.reorderQuantity }
             "Max Quantity" { it?.maxQuantity }
-            "Forecast Quantity" { it?.forecastQuantity }
-            "Forecast Period" { it?.forecastPeriodDays }
-            "UOM" { it?.unitOfMeasure }
         })
         inventoryLevels.each { inventoryLevel ->
             csv << [

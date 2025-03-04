@@ -122,27 +122,17 @@ class InventoryLevel {
         return forecastPeriodDays ? Math.ceil(((Double) (forecastQuantity) / forecastPeriodDays) * 30) : (forecastQuantity * 30)
     }
 
-
     static PROPERTIES = [
             productCode          : "product.productCode",
             productName          : "product.name",
-            inventory            : "inventory",
+            facility             : "inventory",
             status               : "status",
-            binLocation          : "binLocation",
-            preferred            : "preferred",
             internalLocation     : "internalLocation",
             preferredBinLocation : "preferredBinLocation",
             replenishmentLocation: "replenishmentLocation",
             abcClass             : "abcClass",
             minQuantity          : "minQuantity",
             reorderQuantity      : "reorderQuantity",
-            maxQuantity          : "maxQuantity",
-            forecastQuantity     : "forecastQuantity",
-            forecastPeriodDays   : "forecastPeriodDays",
-            "Unit of Measure"    : "product.unitOfMeasure"
-            //expectedLeadTimeDays   : "expectedLeadTimeDays",
-            //replenishmentPeriodDays: "replenishmentPeriodDays",
-            //preferredForReorder    : "preferredForReorder",
-
+            maxQuantity          : "maxQuantity"
     ]
 }

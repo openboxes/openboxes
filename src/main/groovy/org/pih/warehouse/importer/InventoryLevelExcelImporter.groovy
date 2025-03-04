@@ -32,30 +32,23 @@ class InventoryLevelExcelImporter extends AbstractExcelImporter implements DataI
             columnMap: [
                     'A': 'productCode',
                     'B': 'productName',
-                    'C': 'inventory',
+                    'C': 'facility',
                     'D': 'status',
-                    'E': 'binLocation',
-                    'F': 'preferred',
-                    'G': 'internalLocation',
-                    'H': 'preferredBinLocation',
-                    'I': 'replenishmentLocation',
-                    'J': 'abcClass',
-                    'K': 'minQuantity',
-                    'L': 'reorderQuantity',
-                    'M': 'maxQuantity',
-                    'N': 'forecastQuantity',
-                    'O': 'forecastPeriodDays',
-                    'P': 'product.unitOfMeasure'
+                    'E': 'internalLocation',
+                    'F': 'preferredBinLocation',
+                    'G': 'replenishmentLocation',
+                    'H': 'abcClass',
+                    'I': 'minQuantity',
+                    'J': 'reorderQuantity',
+                    'K': 'maxQuantity'
             ]
     ]
 
     static Map propertyMap = [
             productCode            : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
             productName            : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
-            inventory              : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            facility               : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
             status                 : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
-            binLocation            : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
-            preferred              : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
             internalLocation       : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
             preferredBinLocation   : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
             replenishmentLocation  : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
@@ -63,14 +56,7 @@ class InventoryLevelExcelImporter extends AbstractExcelImporter implements DataI
             minQuantity            : ([expectedType: ExpectedPropertyType.IntType, defaultValue: null]),
             reorderQuantity        : ([expectedType: ExpectedPropertyType.IntType, defaultValue: null]),
             maxQuantity            : ([expectedType: ExpectedPropertyType.IntType, defaultValue: null]),
-            forecastQuantity       : ([expectedType: ExpectedPropertyType.IntType, defaultValue: null]),
-            forecastPeriodDays     : ([expectedType: ExpectedPropertyType.IntType, defaultValue: null]),
-            'product.unitOfMeasure': ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
-            //expectedLeadTimeDays   : ([expectedType: ExpectedPropertyType.IntType, defaultValue: null]),
-            //replenishmentPeriodDays: ([expectedType: ExpectedPropertyType.IntType, defaultValue: null]),
-            //preferredForReorder    : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
     ]
-
 
     InventoryLevelExcelImporter(String fileName) {
         super()
