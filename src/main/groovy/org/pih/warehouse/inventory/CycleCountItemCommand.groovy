@@ -2,6 +2,7 @@ package org.pih.warehouse.inventory
 
 import grails.databinding.BindUsing
 import grails.validation.Validateable
+import org.pih.warehouse.DateUtil
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.ReasonCode
 import org.pih.warehouse.core.User
@@ -14,7 +15,12 @@ class CycleCountItemCommand implements Validateable {
 
     @BindUsing({ obj, source ->
         Product product = Product.read(source['inventoryItem']['product'])
-        return InventoryItem.findByProductAndLotNumber(product, source['inventoryItem']['lotNumber'])
+        InventoryItem inventoryItem = InventoryItem.findByProductAndLotNumber(product, source['inventoryItem']['lotNumber'])
+        return inventoryItem ?: new InventoryItem(
+                product: product,
+                lotNumber: source['inventoryItem']['lotNumber'],
+                expirationDate: DateUtil.asDate(source['inventoryItem']['expirationDate'].toString())
+        )
     })
     InventoryItem inventoryItem
 
