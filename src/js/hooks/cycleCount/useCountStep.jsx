@@ -9,11 +9,11 @@ import { useHistory } from 'react-router-dom';
 
 import { fetchUsers } from 'actions';
 import cycleCountApi from 'api/services/CycleCountApi';
+import { CYCLE_COUNT as CYCLE_COUNT_URL } from 'api/urls';
 import { CYCLE_COUNT } from 'consts/applicationUrls';
 import {
   TO_RESOLVE_TAB,
 } from 'consts/cycleCount';
-import { CYCLE_COUNT } from 'api/urls';
 import useCountStepValidation from 'hooks/cycleCount/useCountStepValidation';
 import useSpinner from 'hooks/useSpinner';
 import confirmationModal from 'utils/confirmationModalUtils';
@@ -84,7 +84,7 @@ const useCountStep = () => {
   const printCountForm = async (format) => {
     show();
     await exportFileFromApi({
-      url: CYCLE_COUNT(currentLocation?.id),
+      url: CYCLE_COUNT_URL(currentLocation?.id),
       params: { ids: cycleCountIds },
       format,
     });
