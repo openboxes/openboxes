@@ -326,7 +326,7 @@ const useToResolveTab = ({
     });
   };
 
-  const printResolveForm = async (fileFormat) => {
+  const printResolveForm = async (format) => {
     spinner.show();
     const payload = {
       requests: checkedCheckboxes.map((cycleCountRequestId) => ({
@@ -334,9 +334,14 @@ const useToResolveTab = ({
         countIndex: 1, // We only ever allow for a single recount, so index is always 1.
       })),
     };
-    const response = await cycleCountApi.startRecount(payload, currentLocation?.id, fileFormat, { responseType: 'blob' });
+    const response = await cycleCountApi.startRecount({
+      payload,
+      locationId: currentLocation?.id,
+      format,
+      config: { responseType: 'blob' },
+    });
     const filename = extractFilenameFromHeader(response.headers['content-disposition']);
-    fileDownload(response.data, filename, MimeType[fileFormat]);
+    fileDownload(response.data, filename, MimeType[format]);
     spinner.hide();
   };
 

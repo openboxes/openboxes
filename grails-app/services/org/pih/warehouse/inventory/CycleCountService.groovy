@@ -180,15 +180,15 @@ class CycleCountService {
     }
 
     List<Map> getCountFormXls(List<CycleCountDto> cycleCounts) {
-        def data = []
-        SimpleDateFormat dateFormat = new SimpleDateFormat(Constants.EXPIRATION_DATE_FORMAT)
+        List<Map> data = []
         cycleCounts.each { CycleCountDto cycleCount ->
             cycleCount.cycleCountItems.each { CycleCountItemDto item ->
                 data << [
                         "Product Code": item.product.productCode,
                         "Product Name": item.product.name,
                         "Lot Number": item.inventoryItem.lotNumber,
-                        "Expiration Date": item.inventoryItem.expirationDate ? dateFormat.format(item.inventoryItem.expirationDate) : "",
+                        "Expiration Date": item.inventoryItem.expirationDate
+                                ? Constants.EXPIRATION_DATE_FORMATTER.format(item.inventoryItem.expirationDate) : "",
                         "Bin Location": item.binLocation?.locationNumber,
                         "Quantity Counted": "",
                         "Comment": "",
@@ -202,20 +202,20 @@ class CycleCountService {
     }
 
     List<Map> getRecountFormXls(List<CycleCountDto> cycleCounts) {
-        def data = []
-        SimpleDateFormat dateFormat = new SimpleDateFormat(Constants.EXPIRATION_DATE_FORMAT)
+        List<Map> data = []
         cycleCounts.each { CycleCountDto cycleCount ->
             cycleCount.cycleCountItems.each { CycleCountItemDto item ->
                 data << [
                         "Product Code": item.product.productCode,
                         "Product Name": item.product.name,
                         "Lot Number": item.inventoryItem.lotNumber,
-                        "Expiration Date": item.inventoryItem.expirationDate ? dateFormat.format(item.inventoryItem.expirationDate) : "",
+                        "Expiration Date": item.inventoryItem.expirationDate
+                                ? Constants.EXPIRATION_DATE_FORMATTER.format(item.inventoryItem.expirationDate) : "",
                         "Bin Location": item.binLocation?.locationNumber,
                         "Quantity Counted": item.quantityCounted,
                         "Difference": item.quantityVariance,
                         "Counted by": item.assignee,
-                        "Date Counted": item.dateCounted ? dateFormat.format(item.dateCounted) : "",
+                        "Date Counted": item.dateCounted ? Constants.EXPIRATION_DATE_FORMATTER.format(item.dateCounted) : "",
                         "Quantity Recounted": "",
                         "Comment": "",
                         "Recounted By": "",
