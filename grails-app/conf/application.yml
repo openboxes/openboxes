@@ -158,6 +158,8 @@ grails:
             hal:
               - application/hal+json
               - application/hal+xml
+            xls:
+              - application/vnd.ms-excel
             xml:
               - text/xml
               - application/xml

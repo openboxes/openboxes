@@ -12,13 +12,15 @@ package org.pih.warehouse.inventory
 import grails.gorm.PagedResultList
 import grails.gorm.transactions.Transactional
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.importer.InventoryLevelImportDataService
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.product.ProductService
 
 @Transactional
 class InventoryLevelController {
 
-    def productService
-    def dataService
+    ProductService productService
+    InventoryLevelImportDataService inventoryLevelImportDataService
 
     static allowedMethods = [save: "POST", update: "POST"]
 
@@ -50,7 +52,7 @@ class InventoryLevelController {
 
         if (params.format && inventoryLevels) {
             def filename = "inventoryLevels.csv"
-            String text = dataService.exportInventoryLevels(inventoryLevels)
+            String text = inventoryLevelImportDataService.exportInventoryLevels(inventoryLevels)
             response.contentType = "text/csv"
             response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
             render(contentType: "text/csv", text: text)
@@ -262,9 +264,8 @@ class InventoryLevelController {
             inventoryLevels = InventoryLevel.findAll()
         }
 
-
         if (inventoryLevels) {
-            String text = dataService.exportInventoryLevels(inventoryLevels)
+            String text = inventoryLevelImportDataService.exportInventoryLevels(inventoryLevels)
             response.contentType = "text/csv"
             response.setHeader("Content-disposition", "attachment; filename=\"${filename}.csv\"")
             render(contentType: "text/csv", text: text)
@@ -274,6 +275,5 @@ class InventoryLevelController {
         }
 
     }
-
 
 }

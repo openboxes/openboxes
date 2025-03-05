@@ -11,8 +11,13 @@ package org.pih.warehouse.batch
 
 import grails.core.GrailsApplication
 import org.apache.poi.poifs.filesystem.OfficeXmlFileException
+import org.pih.warehouse.api.GenericApiService
+import org.pih.warehouse.core.DocumentService
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.UploadService
+import org.pih.warehouse.data.DataService
 import org.pih.warehouse.importer.CategoryExcelImporter
+import org.pih.warehouse.importer.DataImporter
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.importer.InventoryExcelImporter
 import org.pih.warehouse.importer.InventoryLevelExcelImporter
@@ -38,15 +43,13 @@ import org.springframework.web.multipart.support.StandardMultipartHttpServletReq
 
 class BatchController {
 
-    def dataService
-    def documentService
-    def inventoryService
+    DataService dataService
+    DocumentService documentService
     GrailsApplication grailsApplication
-    def genericApiService
-    def uploadService
+    GenericApiService genericApiService
+    UploadService uploadService
 
     def index() {}
-
 
     def uploadData(ImportDataCommand command) {
         if (request instanceof DefaultMultipartHttpServletRequest) {
@@ -57,7 +60,6 @@ class BatchController {
             }
         }
     }
-
 
     def downloadExcel() {
         println "Download XLS template " + params
@@ -102,7 +104,6 @@ class BatchController {
         }
     }
 
-
     def importData(ImportDataCommand command) {
 
         if ("POST".equals(request.getMethod())) {
@@ -131,71 +132,7 @@ class BatchController {
                 command.filename = localFile.getAbsolutePath()
                 command.location = Location.get(session.warehouse.id)
                 try {
-                    // Need to choose the right importer
-                    switch (command.importType) {
-                        case "category":
-                            dataImporter = new CategoryExcelImporter(command?.filename)
-                            break
-                        case "inventory":
-                            dataImporter = new InventoryExcelImporter(command?.filename)
-                            break
-                        case "inventoryLevel":
-                            dataImporter = new InventoryLevelExcelImporter(command?.filename)
-                            break
-                        case "location":
-                            dataImporter = new LocationExcelImporter(command?.filename)
-                            break
-                        case "person":
-                            dataImporter = new PersonExcelImporter(command?.filename)
-                            break
-                        case "product":
-                            dataImporter = new ProductExcelImporter(command?.filename)
-                            break
-                        case "productAttribute":
-                            dataImporter = new ProductAttributeExcelImporter(command?.filename)
-                            break
-                        case "productCatalog":
-                            dataImporter = new ProductCatalogExcelImporter(command?.filename)
-                            break
-                        case "productCatalogItem":
-                            dataImporter = new ProductCatalogItemExcelImporter(command?.filename)
-                            break
-                        case "productSupplier":
-                            dataImporter = new ProductSupplierExcelImporter(command?.filename)
-                            break
-                        case "productSupplierPreference":
-                            dataImporter = new ProductSupplierPreferenceExcelImporter(command?.filename)
-                            break
-                        case "productSupplierAttribute":
-                            dataImporter = new ProductSupplierAttributeExcelImporter(command?.filename)
-                            break
-                        case "productPackage":
-                            dataImporter = new ProductPackageExcelImporter(command?.filename)
-                            break
-                        case "outboundStockMovement":
-                            dataImporter = new OutboundStockMovementExcelImporter(command?.filename)
-                            break
-                        case "tag":
-                            dataImporter = new TagExcelImporter(command?.filename)
-                            break
-                        case "user":
-                            dataImporter = new UserExcelImporter(command?.filename)
-                            break
-                        case "userLocation":
-                            dataImporter = new UserLocationExcelImporter(command?.filename)
-                            break
-                        case "productAssociation":
-                            dataImporter = new ProductAssociationExcelImporter(command?.filename)
-                            break
-                        case "productSynonym":
-                            dataImporter = new ProductSynonymExcelImporter(command?.filename)
-                            break
-                        case "purchaseOrderActualReadyDate":
-                            dataImporter = new PurchaseOrderActualReadyDateExcelImporter(command?.filename)
-                            break
-                        default:
-                            command.errors.reject("importType", "${warehouse.message(code: 'import.invalidType.message', default: 'Please choose a valid import type')}")
-                    }
+                    dataImporter = createExcelImporter(command)
                 }
                 catch (OfficeXmlFileException e) {
                     log.error("Error with import file " + e.message, e)
@@ -247,4 +184,51 @@ class BatchController {
         }
     }
 
+    DataImporter createExcelImporter(ImportDataCommand command) {
+
+        switch (command.importType) {
+            case "category":
+                return new CategoryExcelImporter(command?.filename)
+            case "inventory":
+                return new InventoryExcelImporter(command?.filename)
+            case "inventoryLevel":
+                return new InventoryLevelExcelImporter(command?.filename)
+            case "location":
+                return new LocationExcelImporter(command?.filename)
+            case "person":
+                return new PersonExcelImporter(command?.filename)
+            case "product":
+                return new ProductExcelImporter(command?.filename)
+            case "productAttribute":
+                return new ProductAttributeExcelImporter(command?.filename)
+            case "productCatalog":
+                return new ProductCatalogExcelImporter(command?.filename)
+            case "productCatalogItem":
+                return new ProductCatalogItemExcelImporter(command?.filename)
+            case "productSupplier":
+                return new ProductSupplierExcelImporter(command?.filename)
+            case "productSupplierPreference":
+                return new ProductSupplierPreferenceExcelImporter(command?.filename)
+            case "productSupplierAttribute":
+                return new ProductSupplierAttributeExcelImporter(command?.filename)
+            case "productPackage":
+                return new ProductPackageExcelImporter(command?.filename)
+            case "outboundStockMovement":
+                return new OutboundStockMovementExcelImporter(command?.filename)
+            case "tag":
+                return new TagExcelImporter(command?.filename)
+            case "user":
+                return new UserExcelImporter(command?.filename)
+            case "userLocation":
+                return new UserLocationExcelImporter(command?.filename)
+            case "productAssociation":
+                return new ProductAssociationExcelImporter(command?.filename)
+            case "productSynonym":
+                return new ProductSynonymExcelImporter(command?.filename)
+            case "purchaseOrderActualReadyDate":
+                return new PurchaseOrderActualReadyDateExcelImporter(command?.filename)
+            default:
+                command.errors.reject("importType", "${warehouse.message(code: 'import.invalidType.message', default: 'Please choose a valid import type')}")
+        }
+    }
 }

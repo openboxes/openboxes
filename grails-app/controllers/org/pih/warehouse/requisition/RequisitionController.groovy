@@ -583,7 +583,7 @@ class RequisitionController {
             response.setHeader("Content-disposition",
                     "attachment; filename=\"Requisitions-${date ? date.format("yyyyMMdd-hhmmss") : ""}.csv\"")
             response.contentType = "text/csv"
-            def csv = dataService.exportRequisitions(requisitions)
+            def csv = requisitionService.exportRequisitions(requisitions)
             println "export requisitions: " + csv
             render(contentType: "text/csv", text: csv, encoding: "UTF-8")
         } else {
@@ -599,7 +599,7 @@ class RequisitionController {
             response.setHeader("Content-disposition",
                     "attachment; filename=\"Requisitions-${date ? date.format("yyyyMMdd-hhmmss") : ""}.csv\"")
             response.contentType = "text/csv"
-            def csv = dataService.exportRequisitionItems(requisitions)
+            def csv = requisitionService.exportRequisitionItems(requisitions)
             println "export requisitions: " + csv
             render(contentType: "text/csv", text: csv, encoding: "UTF-8")
         } else {
@@ -615,7 +615,7 @@ class RequisitionController {
             response.setHeader("Content-disposition",
                     "attachment; filename=\"Requisitions-${date ? date.format("yyyyMMdd-hhmmss") : ""}.csv\"")
             response.contentType = "text/csv"
-            def csv = dataService.exportRequisitions(requisitions)
+            def csv = requisitionService.exportRequisitions(requisitions)
             println "export requisitions: " + csv
             render(contentType: "text/csv", text: csv, encoding: "UTF-8")
         } else {
