@@ -144,6 +144,9 @@ grails:
             css: text/css
             csv: text/csv
             form: application/x-www-form-urlencoded
+            hal:
+                - application/hal+json
+                - application/hal+xml
             html:
               - text/html
               - application/xhtml+xml
@@ -155,16 +158,11 @@ grails:
             pdf: application/pdf
             rss: application/rss+xml
             text: text/plain
-            hal:
-              - application/hal+json
-              - application/hal+xml
             xls:
               - application/vnd.ms-excel
             xml:
               - text/xml
               - application/xml
-            xls:
-              - application/vnd.ms-excel
         file:
             extensions: true
         use:
