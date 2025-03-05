@@ -6,18 +6,25 @@ import {
   CYCLE_COUNT_RECOUNT_START,
   CYCLE_COUNT_REQUESTS,
   CYCLE_COUNT_START,
+  CYCLE_COUNT_SUBMIT_COUNT,
 } from 'api/urls';
 import apiClient from 'utils/apiClient';
 
 export default {
   createRequest: (payload, locationId) => apiClient.post(CYCLE_COUNT_REQUESTS(locationId), payload),
-  startCount: (payload, locationId) => apiClient.post(CYCLE_COUNT_START(locationId), payload),
-  startRecount: (payload, locationId) => apiClient.post(
-    CYCLE_COUNT_RECOUNT_START(locationId), payload,
+  startCount: ({
+    payload, locationId, format = null, config = {},
+  }) => apiClient.post(
+    CYCLE_COUNT_START(locationId, format), payload, config,
   ),
-  getCycleCounts: (locationId, ids) => {
-    const queryParams = queryString.stringify({ id: ids });
-    return apiClient.get(`${CYCLE_COUNT(locationId)}?${queryParams}`);
+  startRecount: ({
+    payload, locationId, format = null, config = {},
+  }) => apiClient.post(
+    CYCLE_COUNT_RECOUNT_START(locationId, format), payload, config,
+  ),
+  getCycleCounts: (locationId, ids, format = null, config = {}) => {
+    const queryParams = queryString.stringify({ id: ids, format });
+    return apiClient.get(`${CYCLE_COUNT(locationId)}?${queryParams}`, config);
   },
   updateCycleCountItem: (payload, locationId, itemId) =>
     apiClient.patch(CYCLE_COUNT_ITEM(locationId, itemId), payload),
@@ -25,4 +32,6 @@ export default {
     apiClient.post(CYCLE_COUNT_ITEMS(locationId, cycleCountId), payload),
   deleteCycleCountItem: (locationId, itemId) =>
     apiClient.delete(CYCLE_COUNT_ITEM(locationId, itemId)),
+  submitCount: (payload, locationId, cycleCountId) =>
+    apiClient.post(CYCLE_COUNT_SUBMIT_COUNT(locationId, cycleCountId), payload),
 };

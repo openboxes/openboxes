@@ -130,6 +130,11 @@ class UrlMappings {
             action = [GET: "list"]
         }
 
+        "/api/facilities/$facilityId/inventory-levels(.$format)?" {
+            controller = "inventoryLevelApi"
+            action = [GET: "list"]
+        }
+
         "/api/locations/locationTypes" {
             controller = { "locationApi" }
             action = [GET: "locationTypes"]

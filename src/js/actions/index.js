@@ -102,13 +102,21 @@ export function hideUserActions() {
   };
 }
 
-export function fetchReasonCodes() {
-  const url = '/api/reasonCodes';
+export function fetchReasonCodes(activityCode = null, dispatchType = FETCH_REASONCODES) {
+  const url = `/api/reasonCodes${activityCode ? `?activityCode=${activityCode}` : ''}`;
+
   return (dispatch) => {
     apiClient.get(url).then((res) => {
+      const reasonCodes = res.data.data.map((reasonCode) => (
+        {
+          id: reasonCode.id,
+          value: reasonCode.id,
+          label: reasonCode.name,
+        }
+      ));
       dispatch({
-        type: FETCH_REASONCODES,
-        payload: res.data,
+        type: dispatchType,
+        payload: reasonCodes || [],
       });
     });
   };
@@ -741,7 +749,7 @@ export const setScrollToBottom = (payload) => ({
 });
 
 export const startCount = (payload, locationId) => async (dispatch) => {
-  const cycleCounts = await cycleCountApi.startCount(payload, locationId);
+  const cycleCounts = await cycleCountApi.startCount({ payload, locationId });
   const cycleCountIds = cycleCounts?.data?.data?.map?.((cycleCount) => cycleCount.id);
   return dispatch({
     type: START_COUNT,
@@ -750,7 +758,7 @@ export const startCount = (payload, locationId) => async (dispatch) => {
 };
 
 export const startResolution = (payload, locationId) => async (dispatch) => {
-  const cycleCounts = await cycleCountApi.startRecount(payload, locationId);
+  const cycleCounts = await cycleCountApi.startRecount({ payload, locationId });
   const cycleCountIds = cycleCounts?.data?.data?.map?.((cycleCount) => cycleCount.id);
   return dispatch({
     type: START_RESOLUTION,

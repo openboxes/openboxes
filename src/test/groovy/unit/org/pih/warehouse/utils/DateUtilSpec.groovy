@@ -1,11 +1,11 @@
 package unit.org.pih.warehouse.utils
 
-import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.time.Instant
 import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
+import java.time.format.DateTimeParseException
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -51,15 +51,13 @@ class DateUtilSpec extends Specification {
         "01/01/2000 00:00 +0500"    || "1999-12-31T19:00:00Z" | "Timezone conforming to XX format w/ positive our format"
         "01/01/2000 00:00 +05:00"   || "1999-12-31T19:00:00Z" | "Timezone conforming to XXX format w/ positive our format"
 
-        // This case fails because when no timezone is provided to Date, it uses the system local timezone instead of
-        // UTC. This can cause unexpected behaviour! Adding "TimeZone.setDefault(TimeZone.getTimeZone(ZoneOffset.UTC))"
-        // to Bootstrap.groovy will change the default to always be UTC. This fixes the issue by making the behaviour
-        // consistent (and would allow us to re-enable this test).
-        //"01/01/2000"                || "2000-01-01T00:00:00Z" | "No time or timezone our format"
+        // When not given a timezone, we default to UTC.
+        "01/01/2000 00:00"          || "2000-01-01T00:00:00Z" | "No timezone our format"
+        "2000-01-01 00:00"          || "2000-01-01T00:00:00Z" | "No timezone ISO format"
 
-        // It's noteworthy that the "yyyy" format for java.util.Date supports a two year format but it is year 0 based,
-        // not based on the year of this century (ie "25" is year 25, not 2025)!
-        "01/01/00 00:00 Z"          || "0001-01-01T00:00:00Z" | "No time or timezone our format two digit year"
+        // When not given a time or timezone, we default to midnight UTC.
+        "01/01/2000"                || "2000-01-01T00:00:00Z" | "No time or timezone our format"
+        "2000-01-01"                || "2000-01-01T00:00:00Z" | "No time or timezone ISO format"
     }
 
     void 'asDate should fail to parse using the default format for case: #failureReason'() {
@@ -67,11 +65,12 @@ class DateUtilSpec extends Specification {
         DateUtil.asDate(givenDate)
 
         then:
-        thrown(ParseException)
+        thrown(DateTimeParseException)
 
         where:
         givenDate    || failureReason
         "01 01 2000" || "spaces not supported as separator"
+        "01/01/00"   || "two digit year format not supported"
     }
 
     void 'asInstant should successfully convert a Date to an Instant for case: #scenario'() {
@@ -86,12 +85,6 @@ class DateUtilSpec extends Specification {
         "Sat, 01 Jan 2000 00:00:00 UTC"    || "2000-01-01T00:00:00Z" | "UTC timezone"
         "Sat, 01 Jan 2000 00:00:00 UTC+05" || "1999-12-31T19:00:00Z" | "timezone ahead of UTC"
         "Sat, 01 Jan 2000 00:00:00 UTC-05" || "2000-01-01T05:00:00Z" | "timezone behind UTC"
-
-        // This case fails because when no timezone is provided to Date, it uses the system local timezone instead of
-        // UTC. This can cause unexpected behaviour! Adding "TimeZone.setDefault(TimeZone.getTimeZone(ZoneOffset.UTC))"
-        // to Bootstrap.groovy will change the default to always be UTC. This fixes the issue by making the behaviour
-        // consistent (and would allow us to re-enable this test).
-        //"Sat, 01 Jan 2000 00:00:00"        || "2000-01-01T00:00:00Z" | "no timezone given"
     }
 
     void 'asInstant should successfully convert a ZonedDateTime to an Instant for case: #scenario'() {
@@ -151,11 +144,5 @@ class DateUtilSpec extends Specification {
         "Sat, 01 Jan 2000 00:00:00 UTC"    || "2000-01-01T00:00Z"   | "UTC timezone"
         "Sat, 01 Jan 2000 00:00:00 UTC+05" || "1999-12-31T19:00Z"   | "timezone ahead of UTC"
         "Sat, 01 Jan 2000 00:00:00 UTC-05" || "2000-01-01T05:00Z"   | "timezone behind UTC"
-
-        // This case fails because when no timezone is provided to Date, it uses the system local timezone instead of
-        // UTC. This can cause unexpected behaviour! Adding "TimeZone.setDefault(TimeZone.getTimeZone(ZoneOffset.UTC))"
-        // to Bootstrap.groovy will change the default to always be UTC. This fixes the issue by making the behaviour
-        // consistent (and would allow us to re-enable this test).
-        //"Sat, 01 Jan 2000 00:00:00"        || "2000-01-01T00:00Z"   | "no timezone given"
     }
 }

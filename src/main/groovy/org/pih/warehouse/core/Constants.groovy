@@ -25,8 +25,9 @@ class Constants {
     static final adminControllers = ['createProduct', 'admin']
     static final adminActions = ['product': ['create'], 'person': ['list'], 'user': ['list'], 'location': ['edit'], 'shipper': ['create'], 'locationGroup': ['create'], 'locationType': ['create'], '*': ['delete']]
 
-    // TODO: Don't add more dates here! We should refactor all usages of these constants to instead use the
-    //       DateTimeFormatter constants in DateUtil. The backend should always return dates in the same format so that
+    // TODO: Don't add more dates here! We should refactor all backend usages (old gsp pages can continue using these)
+    //       of these constants to use the DateUtil.asDate(String) method to parse in Date types and then return Date
+    //       objects unformatted in our responses. The backend should always return dates in the same format so that
     //       the frontend can easily parse response objects. Let the frontend decide what the display format of each
     //       individual field should be.
     static final String DEFAULT_YEAR_FORMAT = "yyyy"
@@ -39,7 +40,7 @@ class Constants {
     static final String MONTH_DAY_YEAR_DATE_FORMAT = "MM/dd/yyyy"
     static final String DELIVERY_DATE_FORMAT = "MM/dd/yyyy HH:mm XXX"
     static final String EUROPEAN_DATE_FORMAT = "dd/MM/yyyy"
-    static final String DISPLAY_DATE_FORMAT = "MMM DD, yyyy"
+    static final String DISPLAY_DATE_FORMAT = "MMM dd, yyyy"
     static final String DISPLAY_DATE_DEFAULT_VALUE = "-"
     static final String GENERATE_NAME_DATE_FORMAT = "ddMMMyyyy"
     static final String EUROPEAN_DATE_FORMAT_WITH_TIME = "${EUROPEAN_DATE_FORMAT} HH:mm"
@@ -53,6 +54,7 @@ class Constants {
     static final DateFormat DELIVERY_DATE_FORMATTER = new SimpleDateFormat(DELIVERY_DATE_FORMAT)
     static final DateFormat EUROPEAN_DATE_FORMATTER = new SimpleDateFormat(EUROPEAN_DATE_FORMAT)
     static final DateFormat MONTH_DAY_YEAR_DATE_FORMATTER = new SimpleDateFormat(MONTH_DAY_YEAR_DATE_FORMAT)
+    static final DateFormat DISPLAY_DATE_FORMATTER = new SimpleDateFormat(DISPLAY_DATE_FORMAT)
 
     // Dimension date formats
     static DateFormat weekFormat = new SimpleDateFormat("w")

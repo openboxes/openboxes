@@ -2,10 +2,10 @@ package org.pih.warehouse.inventory
 
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
+import java.text.SimpleDateFormat
 import org.apache.commons.csv.CSVPrinter
 import org.apache.commons.lang.StringEscapeUtils
 import org.grails.datastore.mapping.query.api.Criteria
-import org.hibernate.criterion.CriteriaSpecification
 import org.hibernate.criterion.Order
 import org.hibernate.sql.JoinType
 import org.pih.warehouse.api.AvailableItem
@@ -177,6 +177,54 @@ class CycleCountService {
         }
 
         return csv
+    }
+
+    List<Map> getCountFormXls(List<CycleCountDto> cycleCounts) {
+        List<Map> data = []
+        cycleCounts.each { CycleCountDto cycleCount ->
+            cycleCount.cycleCountItems.each { CycleCountItemDto item ->
+                data << [
+                        "Product Code": item.product.productCode,
+                        "Product Name": item.product.name,
+                        "Lot Number": item.inventoryItem.lotNumber,
+                        "Expiration Date": item.inventoryItem.expirationDate
+                                ? Constants.EXPIRATION_DATE_FORMATTER.format(item.inventoryItem.expirationDate) : "",
+                        "Bin Location": item.binLocation?.locationNumber,
+                        "Quantity Counted": "",
+                        "Comment": "",
+                        "User Counted": "",
+                        "Date Counted": ""
+                ]
+            }
+        }
+
+        return data
+    }
+
+    List<Map> getRecountFormXls(List<CycleCountDto> cycleCounts) {
+        List<Map> data = []
+        cycleCounts.each { CycleCountDto cycleCount ->
+            cycleCount.cycleCountItems.each { CycleCountItemDto item ->
+                data << [
+                        "Product Code": item.product.productCode,
+                        "Product Name": item.product.name,
+                        "Lot Number": item.inventoryItem.lotNumber,
+                        "Expiration Date": item.inventoryItem.expirationDate
+                                ? Constants.EXPIRATION_DATE_FORMATTER.format(item.inventoryItem.expirationDate) : "",
+                        "Bin Location": item.binLocation?.locationNumber,
+                        "Quantity Counted": item.quantityCounted,
+                        "Difference": item.quantityVariance,
+                        "Counted by": item.assignee,
+                        "Date Counted": item.dateCounted ? Constants.EXPIRATION_DATE_FORMATTER.format(item.dateCounted) : "",
+                        "Quantity Recounted": "",
+                        "Comment": "",
+                        "Recounted By": "",
+                        "Date Recounted": ""
+                ]
+            }
+        }
+
+        return data
     }
 
     /**
@@ -351,6 +399,10 @@ class CycleCountService {
         if (command.cycleCount.status == CycleCountStatus.READY_TO_REVIEW) {
             cycleCountTransactionService.createTransactions(command.cycleCount, command.refreshQuantityOnHand)
         }
+        // TODO: The beforeUpdate() on CycleCount class is not triggered without
+        // the line below, so without it status is not correct in the DB.
+        // Investigate why this line is needed.
+        command.cycleCount.save()
         return CycleCountDto.toDto(command.cycleCount)
     }
 
@@ -390,7 +442,9 @@ class CycleCountService {
                 facility: command.facility,
                 status: command.recount ? CycleCountItemStatus.INVESTIGATING : CycleCountItemStatus.COUNTING,
                 countIndex: command.recount ? 1 : 0,
-                quantityOnHand: command.quantityCounted,
+                // TODO: This is a new item so we need to fetch the most up to date QoH via product availability.
+                //       (And if the inventory item has just been created, QoH will be 0.)
+                quantityOnHand: 0,
                 quantityCounted: command.quantityCounted,
                 cycleCount: command.cycleCount,
                 location: command.binLocation,
@@ -400,6 +454,7 @@ class CycleCountService {
                 updatedBy: AuthService.currentUser,
                 dateCounted: new Date(),
                 comment: command.comment,
+                discrepancyReasonCode: command.discrepancyReasonCode,
                 assignee: command.assignee,
                 custom: true,
         )

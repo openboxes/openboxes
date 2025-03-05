@@ -10,6 +10,8 @@
 package org.pih.warehouse.inventory
 
 import grails.databinding.BindUsing
+import grails.plugins.csv.CSVWriter
+import org.grails.plugins.excelimport.ExpectedPropertyType
 import org.pih.warehouse.EmptyStringsToNullBinder
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
@@ -47,15 +49,15 @@ class InventoryLevel {
     BigDecimal forecastPeriodDays = 30
 
     // Lead time in days (safety stock is lead time days x daily forecast quantity)
-    @BindUsing({ obj, source -> EmptyStringsToNullBinder.bindEmptyStringToNull(source, "expectedLeadTimeDays")})
+    @BindUsing({ obj, source -> EmptyStringsToNullBinder.bindEmptyStringToNull(source, "expectedLeadTimeDays") })
     BigDecimal expectedLeadTimeDays
 
     // Replenishment period in days
-    @BindUsing({ obj, source -> EmptyStringsToNullBinder.bindEmptyStringToNull(source, "replenishmentPeriodDays")})
+    @BindUsing({ obj, source -> EmptyStringsToNullBinder.bindEmptyStringToNull(source, "replenishmentPeriodDays") })
     BigDecimal replenishmentPeriodDays
 
     // Demand time period in days
-    @BindUsing({ obj, source -> EmptyStringsToNullBinder.bindEmptyStringToNull(source, "demandTimePeriodDays")})
+    @BindUsing({ obj, source -> EmptyStringsToNullBinder.bindEmptyStringToNull(source, "demandTimePeriodDays") })
     BigDecimal demandTimePeriodDays
 
     // Preferred bin location
@@ -91,7 +93,7 @@ class InventoryLevel {
     static constraints = {
         status(nullable: true)
         product(nullable: true, unique: ["inventory", "internalLocation"])
-        internalLocation(nullable:true)
+        internalLocation(nullable: true)
         minQuantity(nullable: true, range: 0..2147483646)
         reorderQuantity(nullable: true, range: 0..2147483646)
         maxQuantity(nullable: true, range: 0..2147483646)
@@ -120,4 +122,17 @@ class InventoryLevel {
         return forecastPeriodDays ? Math.ceil(((Double) (forecastQuantity) / forecastPeriodDays) * 30) : (forecastQuantity * 30)
     }
 
+    static PROPERTIES = [
+            productCode          : "product.productCode",
+            productName          : "product.name",
+            facility             : "inventory",
+            status               : "status",
+            internalLocation     : "internalLocation",
+            preferredBinLocation : "preferredBinLocation",
+            replenishmentLocation: "replenishmentLocation",
+            abcClass             : "abcClass",
+            minQuantity          : "minQuantity",
+            reorderQuantity      : "reorderQuantity",
+            maxQuantity          : "maxQuantity"
+    ]
 }

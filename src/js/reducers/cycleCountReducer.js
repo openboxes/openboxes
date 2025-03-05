@@ -1,8 +1,9 @@
-import { START_COUNT, START_RESOLUTION } from 'actions/types';
+import { FETCH_CYCLE_COUNT_REASON_CODES, START_COUNT, START_RESOLUTION } from 'actions/types';
 
 const initialState = {
   requests: [],
   cycleCounts: [],
+  reasonCodes: [],
 };
 
 export default function cycleCountReducer(state = initialState, action) {
@@ -16,6 +17,11 @@ export default function cycleCountReducer(state = initialState, action) {
       return {
         ...state,
         cycleCounts: action.payload,
+      };
+    case FETCH_CYCLE_COUNT_REASON_CODES:
+      return {
+        ...state,
+        reasonCodes: action.payload,
       };
     default:
       return state;

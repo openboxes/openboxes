@@ -1,17 +1,20 @@
 import React, { useMemo } from 'react';
 
 import { createColumnHelper } from '@tanstack/react-table';
+import fileDownload from 'js-file-download';
 import _ from 'lodash';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
 import { startResolution } from 'actions';
+import cycleCountApi from 'api/services/CycleCountApi';
 import { CYCLE_COUNT_CANDIDATES } from 'api/urls';
 import { TableCell } from 'components/DataTable';
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
 import Checkbox from 'components/form-elements/v2/Checkbox';
 import { CYCLE_COUNT, INVENTORY_ITEM_URL } from 'consts/applicationUrls';
 import CycleCountCandidateStatus from 'consts/cycleCountCandidateStatus';
+import MimeType from 'consts/mimeType';
 import useQueryParams from 'hooks/useQueryParams';
 import useSpinner from 'hooks/useSpinner';
 import useTableCheckboxes from 'hooks/useTableCheckboxes';
@@ -19,7 +22,7 @@ import useTableDataV2 from 'hooks/useTableDataV2';
 import useTableSorting from 'hooks/useTableSorting';
 import useTranslate from 'hooks/useTranslate';
 import Badge from 'utils/Badge';
-import exportFileFromAPI from 'utils/file-download-util';
+import exportFileFromAPI, { extractFilenameFromHeader } from 'utils/file-download-util';
 import { mapStringToLimitedList } from 'utils/form-values-utils';
 import StatusIndicator from 'utils/StatusIndicator';
 
@@ -236,7 +239,7 @@ const useToResolveTab = ({
       },
     }),
     columnHelper.accessor((row) =>
-      row?.tags?.map?.((tag) => <Badge label={tag?.tag} variant="badge--purple" key={tag.id} />), {
+      row?.tags?.map?.((tag) => <Badge label={tag?.tag} variant="badge--purple" tooltip key={tag.id} />), {
       id: 'tags',
       header: () => (
         <TableHeaderCell>
@@ -255,7 +258,7 @@ const useToResolveTab = ({
       },
     }),
     columnHelper.accessor((row) =>
-      row?.productCatalogs?.map((catalog) => <Badge label={catalog?.name} variant="badge--blue" key={catalog.id} />), {
+      row?.productCatalogs?.map((catalog) => <Badge label={catalog?.name} variant="badge--blue" tooltip key={catalog.id} />), {
       id: 'productCatalogs',
       header: () => (
         <TableHeaderCell>
@@ -323,9 +326,23 @@ const useToResolveTab = ({
     });
   };
 
-  const printResolveForm = () => {
-    // TODO: implement me!
-    console.log('print resolve form pressed');
+  const printResolveForm = async (format) => {
+    spinner.show();
+    const payload = {
+      requests: checkedCheckboxes.map((cycleCountRequestId) => ({
+        cycleCountRequest: cycleCountRequestId,
+        countIndex: 1, // We only ever allow for a single recount, so index is always 1.
+      })),
+    };
+    const response = await cycleCountApi.startRecount({
+      payload,
+      locationId: currentLocation?.id,
+      format,
+      config: { responseType: 'blob' },
+    });
+    const filename = extractFilenameFromHeader(response.headers['content-disposition']);
+    fileDownload(response.data, filename, MimeType[format]);
+    spinner.hide();
   };
 
   const moveToResolving = async () => {

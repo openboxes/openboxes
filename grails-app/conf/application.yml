@@ -144,6 +144,9 @@ grails:
             css: text/css
             csv: text/csv
             form: application/x-www-form-urlencoded
+            hal:
+                - application/hal+json
+                - application/hal+xml
             html:
               - text/html
               - application/xhtml+xml
@@ -155,9 +158,8 @@ grails:
             pdf: application/pdf
             rss: application/rss+xml
             text: text/plain
-            hal:
-              - application/hal+json
-              - application/hal+xml
+            xls:
+              - application/vnd.ms-excel
             xml:
               - text/xml
               - application/xml
@@ -204,16 +206,17 @@ grails:
         # We now use the java.time classes instead (ex: Instant, LocalDate). Those fields define their own
         # ValueConverter classes and so don't use the formats defined here.
         dateFormats:
-            # Old date formats, don't use going forward! Kept first in the list to maintain backwards compatability.
+            # Date formats used by Excel and our old APIs. Kept first in the list to maintain backwards compatability.
             - 'MM/dd/yyyy HH:mm:ss XXX'
             - 'MM/dd/yyyy HH:mm:ss XX'
             - 'MM/dd/yyyy HH:mm:ss X'
             - 'MM/dd/yyyy HH:mm XXX'
             - 'MM/dd/yyyy HH:mm XX'
             - 'MM/dd/yyyy HH:mm X'
-            # Note that if this format is given, Grails will treat it as midnight in the local server timezone, which
-            # is ahead of UTC, can cause the date to actually be the next day. It can also cause inconsistencies across
-            # hosts/environments if they're configured for different local timezones. Avoid this format going forward!
+            # Note that Grails will treat this format as midnight in the local server timezone. For zones that are
+            # ahead of UTC, this can cause the date to actually become the next day. It can also cause
+            # inconsistencies across hosts/environments if they're configured for different local timezones.
+            # Avoid using this format going forward! Only kept to maintain backwards compatability.
             - 'MM/dd/yyyy'
             # ISO-8601 formats. These are better than the old formats, but new APIs should still use Instant instead
             # of Date whenever possible. Note that a format without time and timezone is NOT allowed here because that
