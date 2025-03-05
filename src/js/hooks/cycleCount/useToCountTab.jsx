@@ -109,6 +109,7 @@ const useToCountTab = ({
     searchTerm,
     filterParams,
   });
+
   const getCycleCountRequestsIds = () => tableData.data.map((row) => row.cycleCountRequest.id);
 
   const checkboxesColumn = columnHelper.accessor('selected', {

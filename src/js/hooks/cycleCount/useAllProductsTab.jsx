@@ -27,7 +27,7 @@ const useAllProductsTab = ({
   offset,
   pageSize,
   resetForm,
-  countSetCheckedCheckboxes,
+  setToCountCheckedCheckboxes,
 }) => {
   const columnHelper = createColumnHelper();
   const spinner = useSpinner();
@@ -338,7 +338,8 @@ const useAllProductsTab = ({
     spinner.show();
     try {
       const response = await cycleCountApi.createRequest(payload, currentLocation?.id);
-      countSetCheckedCheckboxes((prev) => [...prev, ...response.data.data.map((item) => item.id)]);
+      setToCountCheckedCheckboxes((prev) =>
+        [...prev, ...response.data.data.map((item) => item.id)]);
       switchTab(TO_COUNT_TAB, resetForm);
     } finally {
       resetCheckboxes();

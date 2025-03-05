@@ -102,7 +102,7 @@ const CycleCount = () => {
             switchTab={switchTab}
             filterParams={filterParams}
             resetForm={resetForm}
-            countSetCheckedCheckboxes={setCheckedCheckboxes}
+            setToCountCheckedCheckboxes={setCheckedCheckboxes}
           />
         )}
         {tab === TO_COUNT_TAB && (
