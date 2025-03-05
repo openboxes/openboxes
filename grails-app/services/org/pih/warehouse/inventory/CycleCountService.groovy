@@ -204,7 +204,7 @@ class CycleCountService {
     List<Map> getRecountFormXls(List<CycleCountDto> cycleCounts) {
         List<Map> data = []
         cycleCounts.each { CycleCountDto cycleCount ->
-            cycleCount.cycleCountItems.each { CycleCountItemDto item ->
+            cycleCount.cycleCountItems?.findAll { it.countIndex == 0 }?.each { CycleCountItemDto item ->
                 data << [
                         "Product Code": item.product.productCode,
                         "Product Name": item.product.name,
