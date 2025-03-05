@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import CycleCountAllProducts from 'components/cycleCount/allProductsTab/CycleCountAllProducts';
 import cycleCountFilterFields from 'components/cycleCount/CycleCountFilterFields';
@@ -17,6 +17,7 @@ import {
 import useCycleCountFilters from 'hooks/cycleCount/useCycleCountFilters';
 import useQueryParams from 'hooks/useQueryParams';
 import useSwitchTabs from 'hooks/useSwitchTabs';
+import useTablePagination from 'hooks/useTablePagination';
 import useTranslation from 'hooks/useTranslation';
 import PageWrapper from 'wrappers/PageWrapper';
 
@@ -39,6 +40,24 @@ const CycleCount = () => {
     resetForm,
     isLoading,
   } = useCycleCountFilters();
+
+  const [totalCount, setTotalCount] = useState(0);
+
+  const {
+    paginationProps,
+    offset,
+    pageSize,
+  } = useTablePagination({
+    defaultPageSize: 5,
+    totalCount,
+    filterParams,
+  });
+  const tablePaginationProps = {
+    paginationProps,
+    offset,
+    pageSize,
+    setTotalCount,
+  };
 
   const tabs = {
     [ALL_PRODUCTS_TAB]: {
@@ -97,16 +116,19 @@ const CycleCount = () => {
             switchTab={switchTab}
             filterParams={filterParams}
             resetForm={resetForm}
+            tablePaginationProps={tablePaginationProps}
           />
         )}
         {tab === TO_COUNT_TAB && (
           <CycleCountToCount
             filterParams={filterParams}
+            tablePaginationProps={tablePaginationProps}
           />
         )}
         {tab === TO_RESOLVE_TAB && (
           <CycleCountToResolve
             filterParams={filterParams}
+            tablePaginationProps={tablePaginationProps}
           />
         )}
         {tab === TO_APPROVE_TAB && <CycleCountToApprove />}
