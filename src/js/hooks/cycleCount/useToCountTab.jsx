@@ -26,7 +26,7 @@ const useToCountTab = ({
   filterParams,
   offset,
   pageSize,
-  checkboxesProps,
+  toCountTabCheckboxes,
 }) => {
   const columnHelper = createColumnHelper();
   const translate = useTranslate();
@@ -57,7 +57,7 @@ const useToCountTab = ({
     selectHeaderCheckbox,
     headerCheckboxProps,
     checkedCheckboxes,
-  } = checkboxesProps;
+  } = toCountTabCheckboxes;
 
   const getParams = ({
     sortingParams,

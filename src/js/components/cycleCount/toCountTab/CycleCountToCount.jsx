@@ -9,7 +9,7 @@ import useToCountTab from 'hooks/cycleCount/useToCountTab';
 import useTablePagination from 'hooks/useTablePagination';
 import useTranslate from 'hooks/useTranslate';
 
-const CycleCountToCount = ({ filterParams, checkboxesProps }) => {
+const CycleCountToCount = ({ filterParams, toCountTabCheckboxes }) => {
   const totalCount = useRef(0);
   const translate = useTranslate();
 
@@ -23,7 +23,8 @@ const CycleCountToCount = ({ filterParams, checkboxesProps }) => {
     filterParams,
   });
 
-  const { selectedCheckboxesAmount } = checkboxesProps;
+  const { selectedCheckboxesAmount } = toCountTabCheckboxes;
+
   const {
     columns,
     tableData,
@@ -36,7 +37,7 @@ const CycleCountToCount = ({ filterParams, checkboxesProps }) => {
     filterParams,
     offset,
     pageSize,
-    checkboxesProps,
+    toCountTabCheckboxes,
   });
 
   // Use effect to avoid circular dependency
@@ -95,12 +96,14 @@ export default CycleCountToCount;
 
 CycleCountToCount.propTypes = {
   filterParams: PropTypes.shape({}).isRequired,
-  checkboxesProps: PropTypes.shape({
+  toCountTabCheckboxes: PropTypes.shape({
     selectRow: PropTypes.func.isRequired,
     isChecked: PropTypes.func.isRequired,
     selectHeaderCheckbox: PropTypes.func.isRequired,
     selectedCheckboxesAmount: PropTypes.number.isRequired,
     headerCheckboxProps: PropTypes.shape({}).isRequired,
     checkedCheckboxes: PropTypes.arrayOf(PropTypes.string).isRequired,
+    resetCheckboxes: PropTypes.func.isRequired,
+    setCheckedCheckboxes: PropTypes.func.isRequired,
   }).isRequired,
 };

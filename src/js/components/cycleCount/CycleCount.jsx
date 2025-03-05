@@ -41,25 +41,9 @@ const CycleCount = () => {
     isLoading,
   } = useCycleCountFilters();
 
-  const {
-    selectRow,
-    isChecked,
-    selectHeaderCheckbox,
-    selectedCheckboxesAmount,
-    headerCheckboxProps,
-    checkedCheckboxes,
-    resetCheckboxes,
-  } = useTableCheckboxes();
-
-  const {
-    selectRow: countSelectRow,
-    isChecked: countIsChecked,
-    selectHeaderCheckbox: countSelectHeaderCheckbox,
-    selectedCheckboxesAmount: countSelectedCheckboxesAmount,
-    headerCheckboxProps: countHeaderCheckboxProps,
-    checkedCheckboxes: countCheckedCheckboxes,
-    setCheckedCheckboxes: countSetCheckedCheckboxes,
-  } = useTableCheckboxes();
+  // This is needed to pass the selected checkboxes state from "All Products" to "To Count"
+  const toCountTabCheckboxes = useTableCheckboxes();
+  const { setCheckedCheckboxes } = toCountTabCheckboxes;
 
   const tabs = {
     [ALL_PRODUCTS_TAB]: {
@@ -118,32 +102,13 @@ const CycleCount = () => {
             switchTab={switchTab}
             filterParams={filterParams}
             resetForm={resetForm}
-            checkboxesProps={{
-              selectRow,
-              isChecked,
-              selectHeaderCheckbox,
-              selectedCheckboxesAmount,
-              headerCheckboxProps,
-              checkedCheckboxes,
-              resetCheckboxes,
-            }}
-            countCheckboxesProps={{
-              countSetCheckedCheckboxes,
-            }}
+            countSetCheckedCheckboxes={setCheckedCheckboxes}
           />
         )}
         {tab === TO_COUNT_TAB && (
           <CycleCountToCount
             filterParams={filterParams}
-            checkboxesProps={{
-              selectRow: countSelectRow,
-              isChecked: countIsChecked,
-              selectHeaderCheckbox: countSelectHeaderCheckbox,
-              selectedCheckboxesAmount: countSelectedCheckboxesAmount,
-              headerCheckboxProps: countHeaderCheckboxProps,
-              checkedCheckboxes: countCheckedCheckboxes,
-              resetCheckboxes: countSetCheckedCheckboxes,
-            }}
+            toCountTabCheckboxes={toCountTabCheckboxes}
           />
         )}
         {tab === TO_RESOLVE_TAB && (

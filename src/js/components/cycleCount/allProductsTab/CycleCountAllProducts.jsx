@@ -14,11 +14,9 @@ const CycleCountAllProducts = ({
   filterParams,
   switchTab,
   resetForm,
-  checkboxesProps,
-  countCheckboxesProps,
+  countSetCheckedCheckboxes,
 }) => {
   const totalCount = useRef(0);
-
   const {
     paginationProps,
     offset,
@@ -28,13 +26,13 @@ const CycleCountAllProducts = ({
     totalCount: totalCount.current,
     filterParams,
   });
-  const { selectedCheckboxesAmount } = checkboxesProps;
   const {
     columns,
     tableData,
     loading,
     emptyTableMessage,
     exportTableData,
+    selectedCheckboxesAmount,
     countSelected,
   } = useAllProductsTab({
     filterParams,
@@ -42,8 +40,7 @@ const CycleCountAllProducts = ({
     offset,
     pageSize,
     resetForm,
-    checkboxesProps,
-    countCheckboxesProps,
+    countSetCheckedCheckboxes,
   });
 
   const translate = useTranslate();
@@ -99,16 +96,5 @@ CycleCountAllProducts.propTypes = {
   filterParams: PropTypes.shape({}).isRequired,
   switchTab: PropTypes.func.isRequired,
   resetForm: PropTypes.func.isRequired,
-  checkboxesProps: PropTypes.shape({
-    selectRow: PropTypes.func.isRequired,
-    isChecked: PropTypes.func.isRequired,
-    selectHeaderCheckbox: PropTypes.func.isRequired,
-    selectedCheckboxesAmount: PropTypes.number.isRequired,
-    headerCheckboxProps: PropTypes.shape({}).isRequired,
-    checkedCheckboxes: PropTypes.arrayOf(PropTypes.string).isRequired,
-    resetCheckboxes: PropTypes.func.isRequired,
-  }).isRequired,
-  countCheckboxesProps: PropTypes.shape({
-    countSetCheckedCheckboxes: PropTypes.func.isRequired,
-  }).isRequired,
+  countSetCheckedCheckboxes: PropTypes.func.isRequired,
 };

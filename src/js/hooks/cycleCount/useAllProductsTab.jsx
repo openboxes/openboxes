@@ -13,6 +13,7 @@ import { INVENTORY_ITEM_URL } from 'consts/applicationUrls';
 import { TO_COUNT_TAB } from 'consts/cycleCount';
 import useQueryParams from 'hooks/useQueryParams';
 import useSpinner from 'hooks/useSpinner';
+import useTableCheckboxes from 'hooks/useTableCheckboxes';
 import useTableDataV2 from 'hooks/useTableDataV2';
 import useTableSorting from 'hooks/useTableSorting';
 import useTranslate from 'hooks/useTranslate';
@@ -26,8 +27,7 @@ const useAllProductsTab = ({
   offset,
   pageSize,
   resetForm,
-  checkboxesProps,
-  countCheckboxesProps,
+  countSetCheckedCheckboxes,
 }) => {
   const columnHelper = createColumnHelper();
   const spinner = useSpinner();
@@ -57,12 +57,11 @@ const useAllProductsTab = ({
     selectRow,
     isChecked,
     selectHeaderCheckbox,
-    headerCheckboxProps,
+    selectedCheckboxesAmount,
     checkedCheckboxes,
+    headerCheckboxProps,
     resetCheckboxes,
-  } = checkboxesProps;
-
-  const { countSetCheckedCheckboxes } = countCheckboxesProps;
+  } = useTableCheckboxes();
 
   const getParams = ({
     sortingParams,
@@ -353,6 +352,7 @@ const useAllProductsTab = ({
     loading,
     emptyTableMessage,
     exportTableData,
+    selectedCheckboxesAmount,
     countSelected,
   };
 };
