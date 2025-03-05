@@ -14,7 +14,6 @@ import { CYCLE_COUNT, INVENTORY_ITEM_URL } from 'consts/applicationUrls';
 import CycleCountCandidateStatus from 'consts/cycleCountCandidateStatus';
 import useQueryParams from 'hooks/useQueryParams';
 import useSpinner from 'hooks/useSpinner';
-import useTableCheckboxes from 'hooks/useTableCheckboxes';
 import useTableDataV2 from 'hooks/useTableDataV2';
 import useTableSorting from 'hooks/useTableSorting';
 import useTranslate from 'hooks/useTranslate';
@@ -27,6 +26,7 @@ const useToCountTab = ({
   filterParams,
   offset,
   pageSize,
+  checkboxesProps,
 }) => {
   const columnHelper = createColumnHelper();
   const translate = useTranslate();
@@ -38,7 +38,6 @@ const useToCountTab = ({
     currentLocale: state.session.activeLanguage,
     currentLocation: state.session.currentLocation,
   }));
-
   const dispatch = useDispatch();
 
   const {
@@ -50,6 +49,13 @@ const useToCountTab = ({
     negativeQuantity,
     searchTerm,
   } = filterParams;
+  const {
+    selectRow,
+    isChecked,
+    selectHeaderCheckbox,
+    headerCheckboxProps,
+    checkedCheckboxes,
+  } = checkboxesProps;
 
   const getParams = ({
     sortingParams,
@@ -86,15 +92,6 @@ const useToCountTab = ({
   } = useTableSorting();
 
   const {
-    selectRow,
-    isChecked,
-    selectHeaderCheckbox,
-    selectedCheckboxesAmount,
-    headerCheckboxProps,
-    checkedCheckboxes,
-  } = useTableCheckboxes();
-
-  const {
     tableData,
     loading,
   } = useTableDataV2({
@@ -110,16 +107,17 @@ const useToCountTab = ({
     searchTerm,
     filterParams,
   });
+  const productIds = tableData.data.map((row) => row.product.id);
 
-  const getCycleCountRequestsIds = () => tableData.data.map((row) => row.cycleCountRequest.id);
-
+  // Separated from columns to reduce the amount of rerenders of
+  // the rest columns (on checked checkboxes change)
   const checkboxesColumn = columnHelper.accessor('selected', {
     header: () => (
       <TableHeaderCell>
         <Checkbox
           noWrapper
           {...headerCheckboxProps}
-          onClick={selectHeaderCheckbox(getCycleCountRequestsIds)}
+          onClick={selectHeaderCheckbox(productIds)}
         />
       </TableHeaderCell>
     ),
@@ -127,8 +125,8 @@ const useToCountTab = ({
       <TableCell className="rt-td">
         <Checkbox
           noWrapper
-          onChange={selectRow(row.original.cycleCountRequest.id)}
-          value={isChecked(row.original.cycleCountRequest.id)}
+          onChange={selectRow(row.original.product.id)}
+          value={isChecked(row.original.product.id)}
         />
       </TableCell>
     ),
@@ -329,9 +327,10 @@ const useToCountTab = ({
 
   const moveToCounting = async () => {
     const payload = {
-      requests: checkedCheckboxes.map((cycleCountRequestId) => ({
-        cycleCountRequest: cycleCountRequestId,
-      })),
+      requests: checkedCheckboxes.map((productId) => {
+        const data = tableData.data.find((row) => row.product.id === productId);
+        return data ? { cycleCountRequest: data.cycleCountRequest.id } : null;
+      }),
     };
     spinner.show();
     try {
@@ -348,7 +347,6 @@ const useToCountTab = ({
     columns: [checkboxesColumn, ...columns],
     emptyTableMessage,
     exportTableData,
-    selectedCheckboxesAmount,
     moveToCounting,
     printCountForm,
   };

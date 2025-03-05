@@ -13,7 +13,6 @@ import { INVENTORY_ITEM_URL } from 'consts/applicationUrls';
 import { TO_COUNT_TAB } from 'consts/cycleCount';
 import useQueryParams from 'hooks/useQueryParams';
 import useSpinner from 'hooks/useSpinner';
-import useTableCheckboxes from 'hooks/useTableCheckboxes';
 import useTableDataV2 from 'hooks/useTableDataV2';
 import useTableSorting from 'hooks/useTableSorting';
 import useTranslate from 'hooks/useTranslate';
@@ -27,12 +26,13 @@ const useAllProductsTab = ({
   offset,
   pageSize,
   resetForm,
+  checkboxesProps,
+  countCheckboxesProps,
 }) => {
   const columnHelper = createColumnHelper();
   const spinner = useSpinner();
   const translate = useTranslate();
   const { tab } = useQueryParams();
-
   const {
     currentLocale,
     currentLocation,
@@ -40,7 +40,6 @@ const useAllProductsTab = ({
     currentLocale: state.session.activeLanguage,
     currentLocation: state.session.currentLocation,
   }));
-
   const {
     dateLastCount,
     categories,
@@ -51,6 +50,15 @@ const useAllProductsTab = ({
     negativeQuantity,
     searchTerm,
   } = filterParams;
+  const {
+    selectRow,
+    isChecked,
+    selectHeaderCheckbox,
+    headerCheckboxProps,
+    checkedCheckboxes,
+    resetCheckboxes,
+  } = checkboxesProps;
+  const { countSetCheckedCheckboxes } = countCheckboxesProps;
 
   const getParams = ({
     sortingParams,
@@ -97,15 +105,6 @@ const useAllProductsTab = ({
     searchTerm,
     filterParams,
   });
-
-  const {
-    selectRow,
-    isChecked,
-    selectHeaderCheckbox,
-    selectedCheckboxesAmount,
-    checkedCheckboxes,
-    headerCheckboxProps,
-  } = useTableCheckboxes();
 
   const productIds = tableData.data.map((row) => row.product.id);
 
@@ -338,6 +337,8 @@ const useAllProductsTab = ({
       await cycleCountApi.createRequest(payload, currentLocation?.id);
       switchTab(TO_COUNT_TAB, resetForm);
     } finally {
+      countSetCheckedCheckboxes((prev) => [...prev, ...checkedCheckboxes]);
+      resetCheckboxes();
       spinner.hide();
     }
   };
@@ -348,8 +349,8 @@ const useAllProductsTab = ({
     loading,
     emptyTableMessage,
     exportTableData,
-    selectedCheckboxesAmount,
     countSelected,
+    productIds,
   };
 };
 

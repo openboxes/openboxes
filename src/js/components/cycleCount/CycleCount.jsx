@@ -17,6 +17,7 @@ import {
 import useCycleCountFilters from 'hooks/cycleCount/useCycleCountFilters';
 import useQueryParams from 'hooks/useQueryParams';
 import useSwitchTabs from 'hooks/useSwitchTabs';
+import useTableCheckboxes from 'hooks/useTableCheckboxes';
 import useTranslation from 'hooks/useTranslation';
 import PageWrapper from 'wrappers/PageWrapper';
 
@@ -39,6 +40,26 @@ const CycleCount = () => {
     resetForm,
     isLoading,
   } = useCycleCountFilters();
+
+  const {
+    selectRow,
+    isChecked,
+    selectHeaderCheckbox,
+    selectedCheckboxesAmount,
+    headerCheckboxProps,
+    checkedCheckboxes,
+    resetCheckboxes,
+  } = useTableCheckboxes();
+
+  const {
+    selectRow: countSelectRow,
+    isChecked: countIsChecked,
+    selectHeaderCheckbox: countSelectHeaderCheckbox,
+    selectedCheckboxesAmount: countSelectedCheckboxesAmount,
+    headerCheckboxProps: countHeaderCheckboxProps,
+    checkedCheckboxes: countCheckedCheckboxes,
+    setCheckedCheckboxes: countSetCheckedCheckboxes,
+  } = useTableCheckboxes();
 
   const tabs = {
     [ALL_PRODUCTS_TAB]: {
@@ -97,11 +118,38 @@ const CycleCount = () => {
             switchTab={switchTab}
             filterParams={filterParams}
             resetForm={resetForm}
+            checkboxesProps={{
+              selectRow,
+              isChecked,
+              selectHeaderCheckbox,
+              selectedCheckboxesAmount,
+              headerCheckboxProps,
+              checkedCheckboxes,
+              resetCheckboxes,
+            }}
+            countCheckboxesProps={{
+              countSetCheckedCheckboxes,
+            }}
           />
         )}
         {tab === TO_COUNT_TAB && (
           <CycleCountToCount
             filterParams={filterParams}
+            // selectRow={countSelectRow}
+            // isChecked={countIsChecked}
+            // selectHeaderCheckbox={countSelectHeaderCheckbox}
+            // selectedCheckboxesAmount={countSelectedCheckboxesAmount}
+            // headerCheckboxProps={countHeaderCheckboxProps}
+            // checkedCheckboxes={countCheckedCheckboxes}
+            checkboxesProps={{
+              selectRow: countSelectRow,
+              isChecked: countIsChecked,
+              selectHeaderCheckbox: countSelectHeaderCheckbox,
+              selectedCheckboxesAmount: countSelectedCheckboxesAmount,
+              headerCheckboxProps: countHeaderCheckboxProps,
+              checkedCheckboxes: countCheckedCheckboxes,
+              resetCheckboxes: countSetCheckedCheckboxes,
+            }}
           />
         )}
         {tab === TO_RESOLVE_TAB && (
