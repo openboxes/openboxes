@@ -9,6 +9,7 @@ import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.CycleCount
 import org.pih.warehouse.inventory.CycleCountItem
+import org.pih.warehouse.inventory.CycleCountProductAvailabilityService
 import org.pih.warehouse.inventory.CycleCountTransactionService
 import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.InventoryItem
@@ -26,6 +27,9 @@ class CycleCountTransactionServiceSpec extends Specification implements DataTest
 
     @Shared
     CycleCountTransactionService cycleCountTransactionService
+
+    @Shared
+    CycleCountProductAvailabilityService cycleCountProductAvailabilityServiceStub
 
     @Shared
     ProductAvailabilityService productAvailabilityServiceStub
@@ -48,6 +52,11 @@ class CycleCountTransactionServiceSpec extends Specification implements DataTest
 
     void setup() {
         cycleCountTransactionService = new CycleCountTransactionService()
+
+        // Set up the stubs
+        cycleCountProductAvailabilityServiceStub = Stub(CycleCountProductAvailabilityService)
+        cycleCountTransactionService.cycleCountProductAvailabilityService = cycleCountProductAvailabilityServiceStub
+        cycleCountProductAvailabilityServiceStub.refreshProductAvailability(_ as CycleCount) >> false
 
         productInventoryTransactionServiceStub = Stub(ProductInventoryTransactionService)
         cycleCountTransactionService.productInventoryTransactionService = productInventoryTransactionServiceStub

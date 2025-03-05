@@ -14,7 +14,7 @@ class CycleCountStartRecountCommand implements Validateable {
             if (!cycleCount) {
                 return ['noCycleCountFound']
             }
-            if (!CycleCountStatus.listRecounting().contains(cycleCount.status)) {
+            if (!cycleCount.status.isRecounting()) {
                 return ['invalidCycleCountStatus', cycleCount.status]
             }
         })

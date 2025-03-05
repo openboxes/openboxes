@@ -2,10 +2,10 @@ package org.pih.warehouse.inventory
 
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
-import java.text.SimpleDateFormat
 import org.apache.commons.csv.CSVPrinter
 import org.apache.commons.lang.StringEscapeUtils
 import org.grails.datastore.mapping.query.api.Criteria
+import org.hibernate.ObjectNotFoundException
 import org.hibernate.criterion.Order
 import org.hibernate.sql.JoinType
 import org.pih.warehouse.api.AvailableItem
@@ -19,7 +19,7 @@ import org.pih.warehouse.product.Product
 class CycleCountService {
 
     CycleCountTransactionService cycleCountTransactionService
-    ProductAvailabilityService productAvailabilityService
+    CycleCountProductAvailabilityService cycleCountProductAvailabilityService
 
     List<CycleCountCandidate> getCandidates(CycleCountCandidateFilterCommand command, String facilityId) {
         if (command.hasErrors()) {
@@ -228,29 +228,38 @@ class CycleCountService {
     }
 
     /**
-     * Batch method to start a cycle count.
-     * Fetch associated Cycle count with the CycleCountRequest and do the following:
-     * if a cycle count doesn't exist, create it, fetch all bin locations + inventory items for the product in a request,
-     * get the product availability for each item, filter out items that have qoh = 0 (but keep those that have qoh = 0 and were included in the previous count)
-     *
-     * */
+     * Batch start multiple cycle counts.
+     */
     List<CycleCountDto> startCycleCount(CycleCountStartBatchCommand command) {
         List<CycleCountDto> cycleCounts = []
         command.requests.each { CycleCountStartCommand request ->
-            CycleCount cycleCount = request.cycleCountRequest.cycleCount
-            if (!cycleCount) {
-                CycleCountDto cycleCountDto = createCycleCount(request, command.facility)
-                cycleCounts.add(cycleCountDto)
-                return
-            }
-            List<CycleCountItem> cycleCountItems = CycleCountItem.findAllByCycleCount(cycleCount)
-            CycleCountDto cycleCountDto = updateCycleCount(cycleCount, cycleCountItems, request)
+            CycleCountDto cycleCountDto = startCycleCount(request, command.facility)
             cycleCounts.add(cycleCountDto)
         }
         return cycleCounts
     }
 
-    CycleCountDto createCycleCount(CycleCountStartCommand request, Location facility) {
+    /**
+     * Starts a cycle count. If the count is already started for the given cycle count request, we simply
+     * return it as is.
+     */
+    CycleCountDto startCycleCount(CycleCountStartCommand command, Location facility) {
+        CycleCount cycleCount = command.cycleCountRequest.cycleCount
+
+        // When first starting a count, the cycle count object won't exist yet, so create it now.
+        if (!cycleCount) {
+            return createCycleCount(command, facility)
+        }
+
+        // Otherwise the count has already been started so simply return it as is. We allow this behaviour of
+        // "starting" already started counts (instead of throwing an error) because it's simpler for the frontend.
+        return CycleCountDto.toDto(cycleCount)
+    }
+
+    /**
+     * Initializes a new cycle count given a request to start the count.
+     */
+    private CycleCountDto createCycleCount(CycleCountStartCommand request, Location facility) {
         CycleCount newCycleCount = new CycleCount(
                 facility: facility,
                 // Set an initial status here so that validation passes. It gets automatically recomputed on save.
@@ -258,7 +267,8 @@ class CycleCountService {
                 dateLastRefreshed: new Date()
         )
 
-        List<AvailableItem> itemsToSave = determineCycleCountItemsToSave(facility, request.cycleCountRequest.product)
+        List<AvailableItem> itemsToSave = cycleCountProductAvailabilityService.getAvailableItems(
+                facility, request.cycleCountRequest.product)
         // 1:1 association between cycle count and cycle count request
         request.cycleCountRequest.cycleCount = newCycleCount
         request.cycleCountRequest.status = CycleCountRequestStatus.IN_PROGRESS
@@ -312,7 +322,8 @@ class CycleCountService {
         // new transactions that have occurred on the product since the initial count will be applied when determining
         // the QoH values used for recounts. This includes any new [bin location + lot number] quantities that did not
         // exist at the time of the initial count.
-        List<AvailableItem> availableItemsToRecount = determineCycleCountItemsToSave(facility, product)
+        List<AvailableItem> availableItemsToRecount = cycleCountProductAvailabilityService.getAvailableItems(
+                facility, product)
         for (AvailableItem availableItemToRecount : availableItemsToRecount) {
             CycleCountItem cycleCountItem = initCycleCountItem(
                     facility,
@@ -354,33 +365,6 @@ class CycleCountService {
         )
     }
 
-    CycleCountDto updateCycleCount(CycleCount cycleCount, List<CycleCountItem> cycleCountItems, CycleCountStartCommand request) {
-        if (cycleCount.status in [CycleCountStatus.READY_TO_REVIEW, CycleCountStatus.CANCELED]) {
-            throw new IllegalArgumentException("Cycle count is already in review or canceled")
-        }
-        if (cycleCount.status in [CycleCountStatus.INVESTIGATING, CycleCountStatus.COUNTED]) {
-            throw new UnsupportedOperationException("Support will be added later")
-        }
-        if (cycleCount.status in CycleCountStatus.listInProgress()) {
-            CycleCountItem itemWithHighestCountIndex = cycleCountItems.max { it.countIndex }
-            if (itemWithHighestCountIndex?.countIndex != request.countIndex) {
-                throw new IllegalArgumentException("Count index can't be higher than the highest count index of the items")
-            }
-        }
-        return CycleCountDto.toDto(cycleCount)
-    }
-
-    /**
-     * Get product availability for a product and for facility.
-     * Filter out items with QOH = 0 (but keep those that were counted in the previous count)
-     * */
-    List<AvailableItem> determineCycleCountItemsToSave(Location facility, Product product) {
-        List<AvailableItem> availableItems =
-                productAvailabilityService.getAvailableItems(facility, [product.id], false, true)
-
-        return availableItems
-    }
-
     List<CycleCountDto> getCycleCounts(List<String> ids) {
         List<CycleCount> cycleCounts = CycleCount.createCriteria().list {
             if (ids) {
@@ -390,33 +374,31 @@ class CycleCountService {
         return cycleCounts.collect { CycleCountDto.toDto(it) }
     }
 
+    /**
+     * Submits the (re)count as it is in its current state.
+     */
     CycleCountDto submitCount(CycleCountSubmitCountCommand command) {
-        command.cycleCount.cycleCountItems.each { CycleCountItem cycleCountItem ->
-            updateCycleCountItemForSubmit(cycleCountItem, command.refreshQuantityOnHand, command.failOnOutdatedQuantity)
+        CycleCount cycleCount = command.cycleCount
+
+        if (command.refreshQuantityOnHand) {
+            boolean hasQuantityChanged = cycleCountProductAvailabilityService.refreshProductAvailability(cycleCount)
+            if (hasQuantityChanged && command.failOnOutdatedQuantity) {
+                throw new IllegalArgumentException("Quantity on hand for a cycle count item is no longer up to date")
+            }
+        }
+
+        cycleCount.cycleCountItems.each { CycleCountItem cycleCountItem ->
             determineCycleCountItemStatusForSubmit(cycleCountItem, command.requireRecountOnDiscrepancy)
         }
-        command.cycleCount.status = command.cycleCount.recomputeStatus()
-        if (command.cycleCount.status == CycleCountStatus.READY_TO_REVIEW) {
-            cycleCountTransactionService.createTransactions(command.cycleCount, command.refreshQuantityOnHand)
+        cycleCount.status = cycleCount.recomputeStatus()
+        if (cycleCount.status == CycleCountStatus.READY_TO_REVIEW) {
+            cycleCountTransactionService.createTransactions(cycleCount, command.refreshQuantityOnHand)
         }
         // TODO: The beforeUpdate() on CycleCount class is not triggered without
         // the line below, so without it status is not correct in the DB.
         // Investigate why this line is needed.
-        command.cycleCount.save()
-        return CycleCountDto.toDto(command.cycleCount)
-    }
-
-    private void updateCycleCountItemForSubmit(CycleCountItem cycleCountItem, boolean refreshQuantityOnHand, boolean failOnOutdatedQuantity) {
-        Integer currentQuantityOnHand =
-                productAvailabilityService.getQuantityOnHandInBinLocation(cycleCountItem.inventoryItem, cycleCountItem.location)
-        if (failOnOutdatedQuantity && cycleCountItem.quantityOnHand != currentQuantityOnHand) {
-            throw new IllegalArgumentException("Quantity on hand for a cycle count item is no longer up to date")
-        }
-        if (refreshQuantityOnHand) {
-            // TODO: This doesn't account for any new bins/lots that have been created since the count started! We need
-            //       a full QoH fetch on the product, and to create new cycle count items for any new bins/lot numbers.
-            cycleCountItem.quantityOnHand = currentQuantityOnHand
-        }
+        cycleCount.save()
+        return CycleCountDto.toDto(cycleCount)
     }
 
     private void determineCycleCountItemStatusForSubmit(CycleCountItem cycleCountItem, boolean requireRecountOnDiscrepancy) {
@@ -472,5 +454,26 @@ class CycleCountService {
             throw new IllegalArgumentException("Only custom cycle count items can be deleted")
         }
         cycleCountItem?.delete()
+    }
+
+    /**
+     * Refreshes the most recent count items of a given cycle count.
+     *
+     * A "refresh" means fetching the product availability for the product associated with the count and updating
+     * the QoH for each of the items in the most recent count.
+     */
+    CycleCountDto refreshCycleCountItems(String cycleCountId) {
+        CycleCount cycleCount = CycleCount.get(cycleCountId)
+        if (!cycleCount) {
+            throw new ObjectNotFoundException(cycleCountId, CycleCount.class.toString())
+        }
+
+        if (!cycleCount.status.isCounting() && !cycleCount.status.isRecounting()) {
+            throw new IllegalArgumentException("Cycle count cannot be refreshed when in state: ${cycleCount.status}")
+        }
+
+        cycleCountProductAvailabilityService.refreshProductAvailability(cycleCount)
+
+        return CycleCountDto.toDto(cycleCount)
     }
 }

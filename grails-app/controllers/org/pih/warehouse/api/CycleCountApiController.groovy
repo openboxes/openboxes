@@ -21,7 +21,6 @@ import org.pih.warehouse.inventory.CycleCountSubmitCountCommand
 import org.pih.warehouse.inventory.CycleCountSubmitRecountCommand
 import org.pih.warehouse.inventory.CycleCountUpdateItemCommand
 
-
 class CycleCountApiController {
 
     CycleCountService cycleCountService
@@ -83,7 +82,7 @@ class CycleCountApiController {
         List<String> ids = params.list("id")
         List<CycleCountDto> cycleCounts = cycleCountService.getCycleCounts(ids)
 
-        boolean isRecount = cycleCounts?.any { (it.status as CycleCountStatus) in CycleCountStatus.listRecounting() }
+        boolean isRecount = cycleCounts?.any { (it.status as CycleCountStatus).isRecounting() }
         String facilityName = cycleCounts?.first()?.cycleCountItems?.first()?.facility?.name  ?: ""
 
         withFormat {
@@ -173,5 +172,11 @@ class CycleCountApiController {
         CycleCountItemDto cycleCountItem = cycleCountService.createCycleCountItem(command)
 
         render([data: cycleCountItem] as JSON)
+    }
+
+    def refreshCycleCountItems(String cycleCountId) {
+        CycleCountDto cycleCount = cycleCountService.refreshCycleCountItems(cycleCountId)
+
+        render([data: cycleCount] as JSON)
     }
 }

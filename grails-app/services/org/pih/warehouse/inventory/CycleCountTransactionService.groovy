@@ -12,6 +12,7 @@ import org.pih.warehouse.product.Product
 @Transactional
 class CycleCountTransactionService {
 
+    CycleCountProductAvailabilityService cycleCountProductAvailabilityService
     ProductAvailabilityService productAvailabilityService
     ProductInventoryTransactionService productInventoryTransactionService
     TransactionIdentifierService transactionIdentifierService
@@ -42,42 +43,34 @@ class CycleCountTransactionService {
 
     private Transaction createAdjustmentTransaction(
             CycleCount cycleCount, Date transactionDate, boolean itemQuantityOnHandIsUpToDate) {
-        // We only care about the cycle count items from the most recent count. We create the entries first to avoid
-        // needlessly creating the transaction itself if there are no discrepancies.
+
+        // We need to compare the quantity counted against the most up to date QoH in product availability.
+        // However, if the cycle count items already have an up to date QoH (which will be the case if
+        // refreshQuantityOnHand == true when submitting the count), we don't need to re-compute it.
+        if (!itemQuantityOnHandIsUpToDate) {
+            // While the final QoH of the product for each [bin location + lot number] will always be the same value
+            // as was counted, if the QoH in the cycle count items changes at this step, the amount of quantity
+            // adjustment/change might be different than what was displayed to the user during the count.
+            cycleCountProductAvailabilityService.refreshProductAvailability(cycleCount)
+        }
+
+        // We only care about the cycle count items from the most recent count.
         List<TransactionEntry> entries = []
         for (CycleCountItem cycleCountItem : cycleCount.itemsOfMostRecentCount) {
             if (cycleCountItem.quantityCounted == null) {
                 continue
             }
 
-            // We need to compare the quantity counted against the most up to date QoH in product availability.
-            // However, if the cycle count items already have an up to date QoH (which will be the case if
-            // refreshQuantityOnHand == true when submitting the count), we don't need to re-compute it.
-            int actualQuantityOnHand
-            if (itemQuantityOnHandIsUpToDate) {
-                actualQuantityOnHand = cycleCountItem.quantityOnHand
-            }
-            // While the final QoH of the product for each [bin location + lot number] will always be the same value
-            // as was counted, if the QoH in the cycle count items is not up to date, and we have to re-compute it from
-            // product availability here, the amount of quantity adjustment/change might be different than what was
-            // displayed to the user during the count.
-            else {
-                // TODO: This doesn't account for any new bins/lots that have been created since the count started! We
-                //       need a full QoH fetch on the product, and to create new cycle count items for any new bins/lot
-                //       numbers.
-                actualQuantityOnHand = productAvailabilityService.getQuantityOnHandInBinLocation(
-                        cycleCountItem.inventoryItem, cycleCountItem.location) as Integer ?: 0
-            }
-
-            int discrepancyAmount = cycleCountItem.quantityCounted - actualQuantityOnHand
-            if (discrepancyAmount == 0) {
+            Integer quantityVariance = cycleCountItem.quantityVariance
+            if (quantityVariance == null || quantityVariance == 0) {
                 continue
             }
 
+            // We create the entries first to avoid needlessly creating the transaction if there are no discrepancies.
             TransactionEntry transactionEntry = new TransactionEntry(
-                    // If discrepancyAmount > 0, we're making a credit/positive adjustment.
-                    // If discrepancyAmount < 0, we're making a debit/negative adjustment.
-                    quantity: discrepancyAmount,
+                    // If quantityVariance > 0, we're making a credit/positive adjustment.
+                    // If quantityVariance < 0, we're making a debit/negative adjustment.
+                    quantity: quantityVariance,
                     binLocation: cycleCountItem.location,
                     inventoryItem: cycleCountItem.inventoryItem,
                     product: cycleCountItem.product,
@@ -112,13 +105,10 @@ class CycleCountTransactionService {
     }
 
     private List<Transaction> createProductInventoryTransactions(CycleCount cycleCount, Date transactionDate) {
-        // A cycle count can count multiple products. Each product needs their own product inventory transaction.
-        List<Product> products = cycleCount.cycleCountItems
-                .collect { it.product }
-                .unique { it.id }
-
         List<Transaction> transactions = []
-        for (Product product : products) {
+
+        // A cycle count can count multiple products. Each product needs their own product inventory transaction.
+        for (Product product : cycleCount.products) {
             // Creates a "snapshot style" product inventory transaction. We do this because we want any changes in
             // quantity to be represented by a separate adjustment transaction. It's important to note that the quantity
             // values for this transaction will be a pure copy of QoH in product availability, NOT the quantityOnHand of

@@ -10,7 +10,7 @@ import FileFormat from 'consts/fileFormat';
 import RedirectButton from 'utils/RedirectButton';
 import Translate from 'utils/Translate';
 
-const ResolveStepHeader = ({ next, printRecountForm }) => (
+const ResolveStepHeader = ({ next, printRecountForm, refreshCountItems }) => (
   <div className="d-flex justify-content-sm-between align-items-end">
     <RedirectButton
       label="react.cycleCount.redirectToList.label"
@@ -43,6 +43,12 @@ const ResolveStepHeader = ({ next, printRecountForm }) => (
         </div>
       </div>
       <Button
+        onClick={refreshCountItems}
+        label="react.default.button.refresh.label"
+        defaultLabel="Reload"
+        variant="primary"
+      />
+      <Button
         onClick={next}
         label="react.default.button.next.label"
         defaultLabel="Next"
@@ -57,4 +63,5 @@ export default ResolveStepHeader;
 ResolveStepHeader.propTypes = {
   next: PropTypes.func.isRequired,
   printRecountForm: PropTypes.func.isRequired,
+  refreshCountItems: PropTypes.func.isRequired,
 };

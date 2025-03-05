@@ -43,20 +43,22 @@ const useResolveStep = () => {
     currentLocation: state.session.currentLocation,
   }));
 
+  const fetchCycleCounts = async () => {
+    const { data } = await cycleCountApi.getCycleCounts(
+      currentLocation?.id,
+      cycleCountIds,
+    );
+    tableData.current = data?.data;
+    const recountedDates = data?.data?.reduce((acc, cycleCount) => ({
+      ...acc,
+      // Replace it with the recounted date from the response
+      [cycleCount?.id]: new Date(),
+    }), {});
+    setDateRecounted(recountedDates);
+  };
+
   useEffect(() => {
-    (async () => {
-      const { data } = await cycleCountApi.getCycleCounts(
-        currentLocation?.id,
-        cycleCountIds,
-      );
-      tableData.current = data?.data;
-      const recountedDates = data?.data?.reduce((acc, cycleCount) => ({
-        ...acc,
-        // Replace it with the recounted date from the response
-        [cycleCount?.id]: new Date(),
-      }), {});
-      setDateRecounted(recountedDates);
-    })();
+    fetchCycleCounts();
   }, [cycleCountIds]);
 
   // Fetching data for "recounted by" dropdown
@@ -74,6 +76,20 @@ const useResolveStep = () => {
       format,
     });
     hide();
+  };
+
+  const refreshCountItems = async () => {
+    try {
+      show();
+      // eslint-disable-next-line no-restricted-syntax
+      for (const cycleCountId of cycleCountIds) {
+        // eslint-disable-next-line no-await-in-loop
+        await cycleCountApi.refreshItems(currentLocation?.id, cycleCountId);
+      }
+    } finally {
+      hide();
+      await fetchCycleCounts();
+    }
   };
 
   const assignRecountedBy = (cycleCountId) => (person) => {
@@ -198,6 +214,7 @@ const useResolveStep = () => {
     addEmptyRow,
     removeRow,
     printRecountForm,
+    refreshCountItems,
     assignRecountedBy,
     getRecountedDate,
     setRecountedDate,

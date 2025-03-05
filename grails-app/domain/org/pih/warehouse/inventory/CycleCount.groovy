@@ -3,6 +3,7 @@ package org.pih.warehouse.inventory
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
+import org.pih.warehouse.product.Product
 
 class CycleCount {
 
@@ -33,7 +34,7 @@ class CycleCount {
         status = recomputeStatus()
     }
 
-    SortedSet cycleCountItems
+    SortedSet<CycleCountItem> cycleCountItems
 
     static hasMany = [
             /*
@@ -111,4 +112,22 @@ class CycleCount {
         Integer countIndex = maxCountIndex
         return cycleCountItems.findAll{ it.countIndex == countIndex}
     }
+
+    /**
+     * @return a list of all the products being counted by the cycle count.
+     */
+    List<Product> getProducts() {
+        return cycleCountItems.collect{ it.product }.unique{ it.id }
+    }
+
+    /**
+     * @return the cycle count item matching the given input (which uniquely identifies the item within the count).
+     */
+    CycleCountItem getCycleCountItem(Location binLocation, InventoryItem inventoryItem, int countIndex) {
+        return cycleCountItems.find{
+                    it.location == binLocation &&
+                    it.inventoryItem == inventoryItem &&
+                    it.countIndex == countIndex }
+    }
+
 }
