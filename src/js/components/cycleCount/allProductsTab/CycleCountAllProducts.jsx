@@ -29,7 +29,6 @@ const CycleCountAllProducts = ({
     filterParams,
   });
   const { selectedCheckboxesAmount } = checkboxesProps;
-
   const {
     columns,
     tableData,

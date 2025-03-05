@@ -135,12 +135,6 @@ const CycleCount = () => {
         {tab === TO_COUNT_TAB && (
           <CycleCountToCount
             filterParams={filterParams}
-            // selectRow={countSelectRow}
-            // isChecked={countIsChecked}
-            // selectHeaderCheckbox={countSelectHeaderCheckbox}
-            // selectedCheckboxesAmount={countSelectedCheckboxesAmount}
-            // headerCheckboxProps={countHeaderCheckboxProps}
-            // checkedCheckboxes={countCheckedCheckboxes}
             checkboxesProps={{
               selectRow: countSelectRow,
               isChecked: countIsChecked,

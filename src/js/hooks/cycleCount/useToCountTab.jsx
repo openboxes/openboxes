@@ -38,6 +38,7 @@ const useToCountTab = ({
     currentLocale: state.session.activeLanguage,
     currentLocation: state.session.currentLocation,
   }));
+
   const dispatch = useDispatch();
 
   const {
@@ -49,6 +50,7 @@ const useToCountTab = ({
     negativeQuantity,
     searchTerm,
   } = filterParams;
+
   const {
     selectRow,
     isChecked,
@@ -107,17 +109,15 @@ const useToCountTab = ({
     searchTerm,
     filterParams,
   });
-  const productIds = tableData.data.map((row) => row.product.id);
+  const getCycleCountRequestsIds = () => tableData.data.map((row) => row.cycleCountRequest.id);
 
-  // Separated from columns to reduce the amount of rerenders of
-  // the rest columns (on checked checkboxes change)
   const checkboxesColumn = columnHelper.accessor('selected', {
     header: () => (
       <TableHeaderCell>
         <Checkbox
           noWrapper
           {...headerCheckboxProps}
-          onClick={selectHeaderCheckbox(productIds)}
+          onClick={selectHeaderCheckbox(getCycleCountRequestsIds)}
         />
       </TableHeaderCell>
     ),
@@ -125,8 +125,8 @@ const useToCountTab = ({
       <TableCell className="rt-td">
         <Checkbox
           noWrapper
-          onChange={selectRow(row.original.product.id)}
-          value={isChecked(row.original.product.id)}
+          onChange={selectRow(row.original.cycleCountRequest.id)}
+          value={isChecked(row.original.cycleCountRequest.id)}
         />
       </TableCell>
     ),
@@ -327,10 +327,9 @@ const useToCountTab = ({
 
   const moveToCounting = async () => {
     const payload = {
-      requests: checkedCheckboxes.map((productId) => {
-        const data = tableData.data.find((row) => row.product.id === productId);
-        return data ? { cycleCountRequest: data.cycleCountRequest.id } : null;
-      }),
+      requests: checkedCheckboxes.map((cycleCountRequestId) => ({
+        cycleCountRequest: cycleCountRequestId,
+      })),
     };
     spinner.show();
     try {

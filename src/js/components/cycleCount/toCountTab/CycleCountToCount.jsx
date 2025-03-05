@@ -9,12 +9,10 @@ import useToCountTab from 'hooks/cycleCount/useToCountTab';
 import useTablePagination from 'hooks/useTablePagination';
 import useTranslate from 'hooks/useTranslate';
 
-const CycleCountToCount = ({
-  filterParams,
-  checkboxesProps,
-}) => {
+const CycleCountToCount = ({ filterParams, checkboxesProps }) => {
   const totalCount = useRef(0);
   const translate = useTranslate();
+
   const {
     paginationProps,
     offset,
@@ -25,6 +23,7 @@ const CycleCountToCount = ({
     filterParams,
   });
 
+  const { selectedCheckboxesAmount } = checkboxesProps;
   const {
     columns,
     tableData,
@@ -39,7 +38,6 @@ const CycleCountToCount = ({
     pageSize,
     checkboxesProps,
   });
-  const { selectedCheckboxesAmount } = checkboxesProps;
 
   // Use effect to avoid circular dependency
   useEffect(() => {

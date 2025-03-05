@@ -33,6 +33,7 @@ const useAllProductsTab = ({
   const spinner = useSpinner();
   const translate = useTranslate();
   const { tab } = useQueryParams();
+
   const {
     currentLocale,
     currentLocation,
@@ -40,6 +41,7 @@ const useAllProductsTab = ({
     currentLocale: state.session.activeLanguage,
     currentLocation: state.session.currentLocation,
   }));
+
   const {
     dateLastCount,
     categories,
@@ -50,6 +52,7 @@ const useAllProductsTab = ({
     negativeQuantity,
     searchTerm,
   } = filterParams;
+
   const {
     selectRow,
     isChecked,
@@ -58,6 +61,7 @@ const useAllProductsTab = ({
     checkedCheckboxes,
     resetCheckboxes,
   } = checkboxesProps;
+
   const { countSetCheckedCheckboxes } = countCheckboxesProps;
 
   const getParams = ({
@@ -334,10 +338,10 @@ const useAllProductsTab = ({
     };
     spinner.show();
     try {
-      await cycleCountApi.createRequest(payload, currentLocation?.id);
+      const response = await cycleCountApi.createRequest(payload, currentLocation?.id);
+      countSetCheckedCheckboxes((prev) => [...prev, ...response.data.data.map((item) => item.id)]);
       switchTab(TO_COUNT_TAB, resetForm);
     } finally {
-      countSetCheckedCheckboxes((prev) => [...prev, ...checkedCheckboxes]);
       resetCheckboxes();
       spinner.hide();
     }
@@ -350,7 +354,6 @@ const useAllProductsTab = ({
     emptyTableMessage,
     exportTableData,
     countSelected,
-    productIds,
   };
 };
 
