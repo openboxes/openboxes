@@ -157,7 +157,9 @@ const useCountStepTable = ({
       // on change function expects e.target.value for text fields,
       // in other cases it expects just the value
       const onChange = (e) => {
-        setValue(e?.target?.value ?? e);
+        const enteredValue = e?.target?.value ?? e;
+        table.options.meta?.updateData(cycleCountId, original.id, id, enteredValue);
+        setValue(enteredValue);
       };
       // Table consists of text fields, one numerical field for quantity counted,
       // select field for bin locations and one date picker for the expiration date.

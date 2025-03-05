@@ -233,10 +233,10 @@ const useResolveStepTable = ({
           cycleCountColumn.BIN_LOCATION,
           cycleCountColumn.ROOT_CAUSE,
         ].includes(id)) {
-          table.options.meta?.updateData(cycleCountId, original.id, id, enteredValue);
           setError(null);
           setWarning(null);
         }
+        table.options.meta?.updateData(cycleCountId, original.id, id, enteredValue);
         setValue(enteredValue);
       };
 
