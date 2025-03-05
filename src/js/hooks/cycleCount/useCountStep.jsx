@@ -85,7 +85,7 @@ const useCountStep = () => {
     show();
     await exportFileFromApi({
       url: CYCLE_COUNT_URL(currentLocation?.id),
-      params: { ids: cycleCountIds },
+      params: { id: cycleCountIds },
       format,
     });
     hide();

@@ -70,7 +70,7 @@ const useResolveStep = () => {
     show();
     await exportFileFromApi({
       url: CYCLE_COUNT(currentLocation?.id),
-      params: { ids: cycleCountIds },
+      params: { id: cycleCountIds },
       format,
     });
     hide();
