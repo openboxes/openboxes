@@ -42,7 +42,7 @@ const CycleCountAllProducts = ({
 
   useEffect(() => {
     setTotalCount(tableData.totalCount);
-  }, [tableData.totalCount, setTotalCount]);
+  }, [tableData.totalCount]);
 
   return (
     <div>

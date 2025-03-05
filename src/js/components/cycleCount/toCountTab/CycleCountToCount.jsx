@@ -10,10 +10,7 @@ import useToCountTab from 'hooks/cycleCount/useToCountTab';
 import useTranslate from 'hooks/useTranslate';
 import Translate from 'utils/Translate';
 
-const CycleCountToCount = ({
-  filterParams,
-  tablePaginationProps,
-}) => {
+const CycleCountToCount = ({ filterParams, tablePaginationProps }) => {
   const translate = useTranslate();
   const {
     paginationProps,
@@ -39,7 +36,7 @@ const CycleCountToCount = ({
 
   useEffect(() => {
     setTotalCount(tableData.totalCount);
-  }, [tableData.totalCount, setTotalCount]);
+  }, [tableData.totalCount]);
 
   return (
     <div>
