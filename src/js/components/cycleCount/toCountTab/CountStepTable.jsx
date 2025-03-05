@@ -32,6 +32,7 @@ const CountStepTable = ({
   isStepEditable,
   countedBy,
   defaultCountedBy,
+  isFormValid,
 }) => {
   const translate = useTranslate();
   const localize = useSelector((state) => state.localize);
@@ -66,6 +67,14 @@ const CountStepTable = ({
     label: countedBy.label ?? `${countedBy.firstName} ${countedBy.lastName}`,
     name: `${countedBy.firstName} ${countedBy.lastName}`,
   } : undefined;
+
+  const showCountedByErrorMessage = () => {
+    if (isFormValid === null) {
+      return null;
+    }
+
+    return countedBy?.id ? null : true;
+  };
 
   return (
     <div className="list-page-list-section">
@@ -107,6 +116,7 @@ const CountStepTable = ({
               arrow
             >
               <SelectField
+                errorMessage={showCountedByErrorMessage()}
                 placeholder="Select"
                 options={users}
                 onChange={assignCountedBy(id)}
