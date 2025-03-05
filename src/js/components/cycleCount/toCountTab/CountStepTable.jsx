@@ -111,7 +111,7 @@ const CountStepTable = ({
                 options={users}
                 onChange={assignCountedBy(id)}
                 className="min-width-250"
-                defaultValue={defaultCountedByMeta}
+                defaultValue={countedByMeta || defaultCountedByMeta}
               />
             </Tooltip>
           </HeaderSelect>
