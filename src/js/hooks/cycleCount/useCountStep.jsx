@@ -37,6 +37,7 @@ const useCountStep = () => {
   const {
     validationErrors,
     triggerValidation,
+    isFormValid,
   } = useCountStepValidation({ tableData });
 
   const {
@@ -185,7 +186,11 @@ const useCountStep = () => {
 
   const next = () => {
     const isValid = triggerValidation();
-    if (isValid) {
+    const areCountedByFilled = _.every(
+      cycleCountIds,
+      (id) => getCountedBy(id)?.id,
+    );
+    if (isValid && areCountedByFilled) {
       setIsStepEditable(false);
     }
   };
@@ -352,6 +357,7 @@ const useCountStep = () => {
     save,
     resolveDiscrepancies,
     isStepEditable,
+    isFormValid,
   };
 };
 
