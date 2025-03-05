@@ -41,9 +41,9 @@ const CycleCount = () => {
     isLoading,
   } = useCycleCountFilters();
 
-  // Moved `totalCount` here to prevent resetting number of rows per page when switching tabs
   const [totalCount, setTotalCount] = useState(0);
 
+  // Moved this here to prevent resetting number of rows per page when switching tabs.
   const {
     paginationProps,
     offset,
