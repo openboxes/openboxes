@@ -70,7 +70,7 @@ const useResolveStepTable = ({
   useEffect(() => {
     if (showBinLocation) {
       (async () => {
-        const fetchedBins = await fetchBins(currentLocation?.id);
+        const fetchedBins = await fetchBins(currentLocation?.id, []);
         setBinLocations(fetchedBins);
       })();
     }

@@ -243,13 +243,13 @@ export const fetchLocationById = async (id) => {
   return response.data?.data;
 };
 
-export const fetchBins = async (locationId) => {
+export const fetchBins = async (locationId, ignoreActivityCodes = [ActivityCode.RECEIVE_STOCK]) => {
   const response = await apiClient.get(INTERNAL_LOCATIONS, {
     paramsSerializer: (parameters) => queryString.stringify(parameters),
     params: {
       'location.id': locationId,
       locationTypeCode: [locationType.BIN_LOCATION, locationType.INTERNAL],
-      ignoreActivityCodes: [ActivityCode.RECEIVE_STOCK],
+      ignoreActivityCodes,
     },
   });
 
