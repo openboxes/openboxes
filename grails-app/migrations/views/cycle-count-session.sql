@@ -11,10 +11,16 @@ SELECT
     cycle_count_request_summary.cycle_count_request_id                               as cycle_count_request_id,
 
     -- ABC Classification
-    MAX(COALESCE(inventory_level_summary.abc_class, product.abc_class))              as abc_class,
+    -- FIXME Using a grouping operator due to a GROUP BY issue. This isn't the best approach sicne it'll return an
+    --  empty string or NULL value ahead of valid ABC classes (A, B, C, etc). But I don't have a better solution and
+    --  this will likely work for 99% of cases.
+    MIN(COALESCE(inventory_level_summary.abc_class, product.abc_class))              as abc_class,
 
     -- Status of any pending cycle counts
     -- Consolidate the statuses down to a single field representing the status of the candidate itself.
+    -- FIXME Using a grouping operator because the SQL is invalid otherwise. There's probably a better way to handle
+    --  this (perhaps pulling this into a separate domain that can be joined to the CycleCountSession when needed for
+    --  certain queries).
     MAX(cycle_count_request_summary.status)                                          as status,
 
     # Inventory Item Count

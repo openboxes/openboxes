@@ -9,6 +9,8 @@ create or replace view product_physical_count_history as
     from transaction_entry
     join transaction on transaction.id = transaction_entry.transaction_id
     join inventory_item on transaction_entry.inventory_item_id = inventory_item.id
+    -- FIXME Hard-coding the transaction type to PRODUCT_INVENTORY in order to avoid an
+    --  additional JOIN to the transaction_type table.
     where transaction.transaction_type_id = '11'
     group by transaction.inventory_id, inventory_item.product_id
 );
