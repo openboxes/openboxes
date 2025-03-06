@@ -167,6 +167,12 @@ const FilterSelectField = (props) => {
       if (action.action === 'input-change') setInput(value);
     };
 
+    const handleKeyDown = (event) => {
+      if (event.key === 'Backspace' && !input) {
+        event.preventDefault();
+      }
+    };
+
     return (
       <Select
         name={attributes.id}
@@ -182,6 +188,7 @@ const FilterSelectField = (props) => {
         }}
         inputValue={input}
         onInputChange={handleInputChange}
+        onKeyDown={handleKeyDown}
       />
     );
   };
