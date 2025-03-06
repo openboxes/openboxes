@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 import CycleCountAllProducts from 'components/cycleCount/allProductsTab/CycleCountAllProducts';
 import cycleCountFilterFields from 'components/cycleCount/CycleCountFilterFields';
@@ -15,9 +15,9 @@ import {
   TO_RESOLVE_TAB,
 } from 'consts/cycleCount';
 import useCycleCountFilters from 'hooks/cycleCount/useCycleCountFilters';
+import useCycleCountPagination from 'hooks/useCycleCountPagination';
 import useQueryParams from 'hooks/useQueryParams';
 import useSwitchTabs from 'hooks/useSwitchTabs';
-import useTablePagination from 'hooks/useTablePagination';
 import useTranslation from 'hooks/useTranslation';
 import PageWrapper from 'wrappers/PageWrapper';
 
@@ -41,24 +41,8 @@ const CycleCount = () => {
     isLoading,
   } = useCycleCountFilters();
 
-  const [totalCount, setTotalCount] = useState(0);
-
   // Moved this here to prevent resetting number of rows per page when switching tabs.
-  const {
-    paginationProps,
-    offset,
-    pageSize,
-  } = useTablePagination({
-    defaultPageSize: 5,
-    totalCount,
-    filterParams,
-  });
-  const tablePaginationProps = {
-    paginationProps,
-    offset,
-    pageSize,
-    setTotalCount,
-  };
+  const tablePaginationProps = useCycleCountPagination(filterParams);
 
   const tabs = {
     [ALL_PRODUCTS_TAB]: {
