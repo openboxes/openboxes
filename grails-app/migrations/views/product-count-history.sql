@@ -5,7 +5,7 @@ select
     product_id,
     max(date_counted) as date_counted
 from (
-select inventory_id,
+    select inventory_id,
              product_id,
              date_counted as date_counted
       from product_cycle_count_history

@@ -10,4 +10,5 @@ create or replace view product_cycle_count_history as (
         join cycle_count_item on cycle_count_item.cycle_count_id = cycle_count.id
         join location on location.id = cycle_count.facility_id
     where cycle_count.status = 'COMPLETED'
+    group by location.inventory_id, cycle_count_item.product_id
 );
