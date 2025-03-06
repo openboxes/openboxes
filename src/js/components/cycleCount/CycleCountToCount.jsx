@@ -10,9 +10,7 @@ import useToCountTab from 'hooks/cycleCount/useToCountTab';
 import useTranslate from 'hooks/useTranslate';
 import Translate from 'utils/Translate';
 
-const CycleCountToCount = ({ filterParams, tablePaginationProps }) => {
-const CycleCountToCount = ({ filterParams, toCountTabCheckboxes }) => {
-  const totalCount = useRef(0);
+const CycleCountToCount = ({ filterParams, toCountTabCheckboxes, tablePaginationProps }) => {
   const translate = useTranslate();
   const {
     paginationProps,
