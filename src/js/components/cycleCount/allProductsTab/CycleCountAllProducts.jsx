@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
 
 import PropTypes from 'prop-types';
 import { RiCalculatorLine, RiDownload2Line } from 'react-icons/ri';
@@ -7,7 +7,6 @@ import AllProductsTabFooter from 'components/cycleCount/allProductsTab/AllProduc
 import DataTable from 'components/DataTable/v2/DataTable';
 import Button from 'components/form-elements/Button';
 import useAllProductsTab from 'hooks/cycleCount/useAllProductsTab';
-import useTablePagination from 'hooks/useTablePagination';
 import useTranslate from 'hooks/useTranslate';
 
 const CycleCountAllProducts = ({
@@ -15,18 +14,14 @@ const CycleCountAllProducts = ({
   switchTab,
   resetForm,
   setToCountCheckedCheckboxes,
+  tablePaginationProps,
 }) => {
-  const totalCount = useRef(0);
-
   const {
     paginationProps,
     offset,
     pageSize,
-  } = useTablePagination({
-    defaultPageSize: 5,
-    totalCount: totalCount.current,
-    filterParams,
-  });
+    setTotalCount,
+  } = tablePaginationProps;
 
   const {
     columns,
@@ -47,9 +42,8 @@ const CycleCountAllProducts = ({
 
   const translate = useTranslate();
 
-  // Use effect to avoid circular dependency
   useEffect(() => {
-    totalCount.current = tableData.totalCount;
+    setTotalCount(tableData.totalCount);
   }, [tableData.totalCount]);
 
   return (
@@ -99,4 +93,10 @@ CycleCountAllProducts.propTypes = {
   switchTab: PropTypes.func.isRequired,
   resetForm: PropTypes.func.isRequired,
   setToCountCheckedCheckboxes: PropTypes.func.isRequired,
+  tablePaginationProps: PropTypes.shape({
+    paginationProps: PropTypes.shape({}).isRequired,
+    offset: PropTypes.number.isRequired,
+    pageSize: PropTypes.number.isRequired,
+    setTotalCount: PropTypes.func.isRequired,
+  }).isRequired,
 };

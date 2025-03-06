@@ -15,6 +15,7 @@ import {
   TO_RESOLVE_TAB,
 } from 'consts/cycleCount';
 import useCycleCountFilters from 'hooks/cycleCount/useCycleCountFilters';
+import useCycleCountPagination from 'hooks/useCycleCountPagination';
 import useQueryParams from 'hooks/useQueryParams';
 import useSwitchTabs from 'hooks/useSwitchTabs';
 import useTableCheckboxes from 'hooks/useTableCheckboxes';
@@ -44,6 +45,9 @@ const CycleCount = () => {
   // This is needed to pass the selected checkboxes state from "All Products" to "To Count"
   const toCountTabCheckboxes = useTableCheckboxes();
   const { setCheckedCheckboxes } = toCountTabCheckboxes;
+
+  // Moved this here to prevent resetting number of rows per page when switching tabs.
+  const tablePaginationProps = useCycleCountPagination(filterParams);
 
   const tabs = {
     [ALL_PRODUCTS_TAB]: {
@@ -103,17 +107,20 @@ const CycleCount = () => {
             filterParams={filterParams}
             resetForm={resetForm}
             setToCountCheckedCheckboxes={setCheckedCheckboxes}
+            tablePaginationProps={tablePaginationProps}
           />
         )}
         {tab === TO_COUNT_TAB && (
           <CycleCountToCount
             filterParams={filterParams}
             toCountTabCheckboxes={toCountTabCheckboxes}
+            tablePaginationProps={tablePaginationProps}
           />
         )}
         {tab === TO_RESOLVE_TAB && (
           <CycleCountToResolve
             filterParams={filterParams}
+            tablePaginationProps={tablePaginationProps}
           />
         )}
         {tab === TO_APPROVE_TAB && <CycleCountToApprove />}
