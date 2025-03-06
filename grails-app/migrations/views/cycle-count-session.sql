@@ -7,7 +7,7 @@ SELECT
     product.id                                                                   as product_id,
     location.id                                                                  as facility_id,
 
-    -- Cycle count request ID (deprecated)
+    -- Cycle count request ID
     cycle_count_request_summary.cycle_count_request_id as cycle_count_request_id,
 
     -- ABC Classification
