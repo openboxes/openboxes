@@ -55,7 +55,7 @@ const useCountStep = () => {
         currentLocation?.id,
         cycleCountIds,
       );
-      tableData.current = data?.data;
+      tableData.current = data?.data.filter((cycleCount) => cycleCount.countIndex !== 0);
       // Date counted and assignee are the same for all items,
       // so we create a map looking at first item
       const countedDates = data?.data?.reduce((acc, cycleCount) => ({

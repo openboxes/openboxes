@@ -29,6 +29,7 @@ const ResolveStepTable = ({
   removeRow,
   assignRecountedBy,
   recountedBy,
+  countedBy,
   setRecountedDate,
   validationErrors,
   shouldHaveRootCause,
@@ -71,10 +72,9 @@ const ResolveStepTable = ({
             label={translate('react.cycleCount.dateCounted.label', 'Date Counted')}
             value={formatLocalizedDate(dateCounted, DateFormat.DD_MMM_YYYY)}
           />
-          {/* TODO: Replace the name with value fetched from the API */}
           <HeaderLabel
             label={translate('react.cycleCount.countedBy.label', 'Counted by')}
-            value="John Smith"
+            value={countedBy?.name}
             className="pl-4"
           />
         </div>
@@ -163,6 +163,8 @@ ResolveStepTable.propTypes = {
     name: PropTypes.string.isRequired,
   }).isRequired,
   dateRecounted: PropTypes.string.isRequired,
+  recountedBy: PropTypes.shape({}).isRequired,
+  countedBy: PropTypes.shape({}).isRequired,
   dateCounted: PropTypes.string.isRequired,
   tableData: PropTypes.arrayOf(
     PropTypes.shape({}),
