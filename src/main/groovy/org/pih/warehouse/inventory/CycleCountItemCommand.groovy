@@ -19,7 +19,7 @@ class CycleCountItemCommand implements Validateable {
         return inventoryItem ?: new InventoryItem(
                 product: product,
                 lotNumber: source['inventoryItem']['lotNumber'],
-                expirationDate: DateUtil.asDate(source['inventoryItem']['expirationDate'].toString())
+                expirationDate: source['inventoryItem']['expirationDate'] ? DateUtil.asDate(source['inventoryItem']['expirationDate'].toString()) : null
         )
     })
     InventoryItem inventoryItem
