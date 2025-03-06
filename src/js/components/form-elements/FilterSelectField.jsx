@@ -157,21 +157,34 @@ IndicatorsContainer.propTypes = {
 };
 
 const FilterSelectField = (props) => {
-  const renderInput = ({ className, ...attributes }) => (
-    <Select
-      name={attributes.id}
-      {...attributes}
-      className={`filter-select ${!_.isEmpty(attributes?.value) ? 'filter-select-has-value' : ''} ${className}`}
-      classNamePrefix="filter-select"
-      hideSelectedOptions={false}
-      controlShouldRenderValue={!attributes.multi}
-      customSelectComponents={{
-        Menu,
-        Option,
-        IndicatorsContainer,
-      }}
-    />
-  );
+  const renderInput = ({ className, ...attributes }) => {
+    const [input, setInput] = useState('');
+
+    const handleInputChange = (value, action) => {
+      // only set the input when the action that caused the
+      // change equals to "input-change" and ignore the other
+      // ones like: "set-value", "input-blur", and "menu-close"
+      if (action.action === 'input-change') setInput(value);
+    };
+
+    return (
+      <Select
+        name={attributes.id}
+        {...attributes}
+        className={`filter-select ${!_.isEmpty(attributes?.value) ? 'filter-select-has-value' : ''} ${className}`}
+        classNamePrefix="filter-select"
+        hideSelectedOptions={false}
+        controlShouldRenderValue={!attributes.multi}
+        customSelectComponents={{
+          Menu,
+          Option,
+          IndicatorsContainer,
+        }}
+        inputValue={input}
+        onInputChange={handleInputChange}
+      />
+    );
+  };
 
   return (
     <BaseField
