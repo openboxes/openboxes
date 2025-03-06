@@ -25,7 +25,7 @@ class InventoryLevelImportDataService implements ImportDataService {
         List validated = []
         command.data.eachWithIndex { params, index ->
 
-            if (!validateInventoryLevel(params)) {
+            if (!validateExpectedType(params)) {
                 command.errors.reject("Row ${index + 2}: Failed validation")
             }
 
@@ -47,7 +47,7 @@ class InventoryLevelImportDataService implements ImportDataService {
         }
     }
 
-    def validateInventoryLevel(Map params) {
+    def validateExpectedType(Map params) {
         params.each { key, value ->
             def expectedType = InventoryLevelExcelImporter.propertyMap.get(key).expectedType
             switch (expectedType) {
@@ -93,7 +93,8 @@ class InventoryLevelImportDataService implements ImportDataService {
         //  we should create separate command classes to validate the two types of inventory levels.
         if (params.internalLocation) {
             log.info "Skipping update to bin replenishment rule ${params}"
-            return
+            throw new UnsupportedOperationException("Importing inventory levels currently supports only facility-level rules. " +
+                    "Please remove all records with the internalLocation column populated.")
         }
 
         // Validate the target internal location
@@ -185,7 +186,7 @@ class InventoryLevelImportDataService implements ImportDataService {
      * @return
      */
     def findOrCreateInventoryLevel(Location facility, Product product) {
-        InventoryLevel inventoryLevel = InventoryLevel.findByInventoryAndProductAndBinLocationIsNull(facility.inventory, product)
+        InventoryLevel inventoryLevel = InventoryLevel.findByInventoryAndProductAndInternalLocationIsNull(facility.inventory, product)
         if (!inventoryLevel) {
             inventoryLevel = new InventoryLevel()
             inventoryLevel.product = product

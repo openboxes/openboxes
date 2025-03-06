@@ -73,6 +73,11 @@ const useCountStepValidation = ({ tableData }) => {
     return isFormValid;
   };
 
+  // This is a workaround to trigger re-render of the table after adding a new row
+  const triggerRerenderAfterAddingNewRow = () => {
+    setValidationErrors((prev) => ({ ...prev }));
+  };
+
   return {
     validationErrors,
     setValidationErrors,
@@ -80,6 +85,7 @@ const useCountStepValidation = ({ tableData }) => {
     isFormValid: isValid,
     rowValidationSchema,
     rowsValidationSchema,
+    triggerRerenderAfterAddingNewRow,
   };
 };
 

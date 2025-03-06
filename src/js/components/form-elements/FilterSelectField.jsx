@@ -172,7 +172,7 @@ const FilterSelectField = (props) => {
         event.preventDefault();
       }
     };
-
+    
     return (
       <Select
         name={attributes.id}
