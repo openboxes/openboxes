@@ -43,17 +43,41 @@ const useResolveStep = () => {
     currentLocation: state.session.currentLocation,
   }));
 
+  const mergeCycleCountItems = (items) => {
+    const duplicatedItems = _.groupBy(items,
+      (item) => `${item.binLocation?.id}-${item?.inventoryItem?.lotNumber}`);
+    return Object.values(duplicatedItems).map((itemsToMerge) => {
+      const maxCountIndex = _.maxBy(itemsToMerge, 'countIndex').countIndex;
+      const itemFromCount = _.find(itemsToMerge, (item) => item.countIndex === maxCountIndex - 1);
+      const itemFromResolve = _.find(itemsToMerge, (item) => item.countIndex === maxCountIndex);
+      return itemFromCount ? {
+        ...itemFromResolve,
+        ...itemFromCount,
+        commentFromCount: itemFromCount?.comment,
+        quantityRecounted: itemFromResolve?.quantityCounted,
+        dateRecounted: itemFromResolve?.dateCounted,
+        comment: itemFromResolve?.comment,
+      } : {
+        ...itemFromResolve,
+        commentFromCount: itemFromResolve?.comment,
+        quantityRecounted: null,
+        dateRecounted: null,
+        comment: null,
+      };
+    });
+  };
+
   useEffect(() => {
     (async () => {
       const { data } = await cycleCountApi.getCycleCounts(
         currentLocation?.id,
         cycleCountIds,
       );
-      tableData.current = data?.data;
-      const recountedDates = data?.data?.reduce((acc, cycleCount) => ({
+      tableData.current = data?.data?.map((cycleCount) =>
+        ({ ...cycleCount, cycleCountItems: mergeCycleCountItems(cycleCount.cycleCountItems) }));
+      const recountedDates = tableData.current?.reduce((acc, cycleCount) => ({
         ...acc,
-        // Replace it with the recounted date from the response
-        [cycleCount?.id]: new Date(),
+        [cycleCount?.id]: cycleCount?.cycleCountItems?.[0]?.dateRecounted,
       }), {});
       setDateRecounted(recountedDates);
     })();
@@ -81,6 +105,10 @@ const useResolveStep = () => {
   };
 
   const getRecountedBy = (cycleCountId) => recountedBy?.[cycleCountId];
+
+  const getCountedBy = (cycleCountId) => tableData?.current.find(
+    (cycleCount) => cycleCount?.id === cycleCountId,
+  )?.cycleCountItems?.[0]?.assignee;
 
   const removeRow = (cycleCountId, rowId) => {
     const tableIndex = tableData.current.findIndex(
@@ -195,6 +223,7 @@ const useResolveStep = () => {
     validationErrors,
     isStepEditable,
     getRecountedBy,
+    getCountedBy,
     addEmptyRow,
     removeRow,
     printRecountForm,

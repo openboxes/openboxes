@@ -358,21 +358,18 @@ const useResolveStepTable = ({
           {translate('react.cycleCount.table.quantityCounted.label', 'Quantity Counted')}
         </TableHeaderCell>
       ), []),
-      cell: useCallback(({ row: { original: { id } } }) => (
-        // TODO: Remove check if id is equal to quantityCounted
-        //  after quantityCounted will be added to the response
+      cell: useCallback(({ row: { original: { quantityCounted, commentFromCount } } }) => (
         <TableCell className="rt-td rt-td-count-step static-cell-count-step d-flex align-items-center">
-          {id.includes('newRow')
+          {quantityCounted === null
             ? <ArrowValueIndicator variant={ArrowValueIndicatorVariant.EMPTY} />
-            : Math.floor(Math.random() * 10).toString()}
-          {!id.includes('newRow') ? (
+            : quantityCounted}
+          {commentFromCount && (
             <Tooltip
               arrow="true"
               delay="150"
               duration="250"
               hideDelay="50"
-              // TODO: Should be replaced with comment fetched from the API
-              html={<span className="p-2">Comment from count step</span>}
+              html={<span className="p-2">{commentFromCount}</span>}
             >
               <RiChat3Line
                 role="button"
@@ -380,7 +377,7 @@ const useResolveStepTable = ({
                 className="ml-2"
               />
             </Tooltip>
-          ) : ''}
+          )}
         </TableCell>
       ), []),
       meta: {
@@ -393,13 +390,11 @@ const useResolveStepTable = ({
           {translate('react.cycleCount.table.countDifference.label', 'Count Difference')}
         </TableHeaderCell>
       ), []),
-      cell: useCallback(({ row: { original: { id, quantityOnHand } } }) => {
-        // TODO: Replace random value with quantityCounted from response
-        const value = Math.floor(Math.random() * 10) - quantityOnHand;
-        const variant = getCycleCountDifferencesVariant(value, id);
+      cell: useCallback(({ row: { original: { id, quantityVariance } } }) => {
+        const variant = getCycleCountDifferencesVariant(quantityVariance, id);
         return (
           <TableCell className="rt-td rt-td-count-step static-cell-count-step d-flex align-items-center">
-            <ArrowValueIndicator value={value} variant={variant} showAbsoluteValue />
+            <ArrowValueIndicator value={quantityVariance} variant={variant} showAbsoluteValue />
           </TableCell>
         );
       }, []),
@@ -433,7 +428,14 @@ const useResolveStepTable = ({
 
         return (
           <TableCell className="rt-td rt-td-count-step static-cell-count-step d-flex align-items-center">
-            <ArrowValueIndicator value={recountDifference} variant={variant} showAbsoluteValue />
+            {value !== null
+              && (
+                <ArrowValueIndicator
+                  value={recountDifference}
+                  variant={variant}
+                  showAbsoluteValue
+                />
+              )}
           </TableCell>
         );
       },
