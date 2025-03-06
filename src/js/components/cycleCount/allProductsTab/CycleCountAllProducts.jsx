@@ -14,6 +14,7 @@ const CycleCountAllProducts = ({
   filterParams,
   switchTab,
   resetForm,
+  setToCountCheckedCheckboxes,
 }) => {
   const totalCount = useRef(0);
 
@@ -41,6 +42,7 @@ const CycleCountAllProducts = ({
     offset,
     pageSize,
     resetForm,
+    setToCountCheckedCheckboxes,
   });
 
   const translate = useTranslate();
@@ -96,4 +98,5 @@ CycleCountAllProducts.propTypes = {
   filterParams: PropTypes.shape({}).isRequired,
   switchTab: PropTypes.func.isRequired,
   resetForm: PropTypes.func.isRequired,
+  setToCountCheckedCheckboxes: PropTypes.func.isRequired,
 };

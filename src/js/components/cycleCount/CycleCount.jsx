@@ -17,6 +17,7 @@ import {
 import useCycleCountFilters from 'hooks/cycleCount/useCycleCountFilters';
 import useQueryParams from 'hooks/useQueryParams';
 import useSwitchTabs from 'hooks/useSwitchTabs';
+import useTableCheckboxes from 'hooks/useTableCheckboxes';
 import useTranslation from 'hooks/useTranslation';
 import PageWrapper from 'wrappers/PageWrapper';
 
@@ -39,6 +40,10 @@ const CycleCount = () => {
     resetForm,
     isLoading,
   } = useCycleCountFilters();
+
+  // This is needed to pass the selected checkboxes state from "All Products" to "To Count"
+  const toCountTabCheckboxes = useTableCheckboxes();
+  const { setCheckedCheckboxes } = toCountTabCheckboxes;
 
   const tabs = {
     [ALL_PRODUCTS_TAB]: {
@@ -97,11 +102,13 @@ const CycleCount = () => {
             switchTab={switchTab}
             filterParams={filterParams}
             resetForm={resetForm}
+            setToCountCheckedCheckboxes={setCheckedCheckboxes}
           />
         )}
         {tab === TO_COUNT_TAB && (
           <CycleCountToCount
             filterParams={filterParams}
+            toCountTabCheckboxes={toCountTabCheckboxes}
           />
         )}
         {tab === TO_RESOLVE_TAB && (
