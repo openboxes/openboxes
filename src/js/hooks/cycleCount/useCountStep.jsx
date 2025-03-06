@@ -37,6 +37,7 @@ const useCountStep = () => {
   const {
     validationErrors,
     triggerValidation,
+    triggerRerenderAfterAddingNewRow,
     isFormValid,
   } = useCountStepValidation({ tableData });
 
@@ -181,7 +182,7 @@ const useCountStep = () => {
 
       return data;
     });
-    triggerValidation();
+    triggerRerenderAfterAddingNewRow();
   };
 
   const next = () => {
@@ -230,6 +231,8 @@ const useCountStep = () => {
         markAllItemsAsNotUpdated(cycleCount.id);
       }
     } finally {
+      // After the save, refetch cycle counts so that a new row can't be saved multiple times
+      await fetchCycleCounts();
       hide();
     }
   };

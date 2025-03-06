@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
 
 import PropTypes from 'prop-types';
 import { RiCalculatorLine, RiDownload2Line, RiPrinterLine } from 'react-icons/ri';
@@ -7,23 +7,19 @@ import DataTable from 'components/DataTable/v2/DataTable';
 import Button from 'components/form-elements/Button';
 import FileFormat from 'consts/fileFormat';
 import useToCountTab from 'hooks/cycleCount/useToCountTab';
-import useTablePagination from 'hooks/useTablePagination';
 import useTranslate from 'hooks/useTranslate';
 import Translate from 'utils/Translate';
 
-const CycleCountToCount = ({ filterParams }) => {
-  const totalCount = useRef(0);
+const CycleCountToCount = ({ filterParams, toCountTabCheckboxes, tablePaginationProps }) => {
   const translate = useTranslate();
-
   const {
     paginationProps,
     offset,
     pageSize,
-  } = useTablePagination({
-    defaultPageSize: 5,
-    totalCount: totalCount.current,
-    filterParams,
-  });
+    setTotalCount,
+  } = tablePaginationProps;
+
+  const { selectedCheckboxesAmount } = toCountTabCheckboxes;
 
   const {
     columns,
@@ -31,18 +27,17 @@ const CycleCountToCount = ({ filterParams }) => {
     loading,
     emptyTableMessage,
     exportTableData,
-    selectedCheckboxesAmount,
     moveToCounting,
     printCountForm,
   } = useToCountTab({
     filterParams,
     offset,
     pageSize,
+    toCountTabCheckboxes,
   });
 
-  // Use effect to avoid circular dependency
   useEffect(() => {
-    totalCount.current = tableData.totalCount;
+    setTotalCount(tableData.totalCount);
   }, [tableData.totalCount]);
 
   return (
@@ -112,4 +107,20 @@ export default CycleCountToCount;
 
 CycleCountToCount.propTypes = {
   filterParams: PropTypes.shape({}).isRequired,
+  toCountTabCheckboxes: PropTypes.shape({
+    selectRow: PropTypes.func.isRequired,
+    isChecked: PropTypes.func.isRequired,
+    selectHeaderCheckbox: PropTypes.func.isRequired,
+    selectedCheckboxesAmount: PropTypes.number.isRequired,
+    headerCheckboxProps: PropTypes.shape({}).isRequired,
+    checkedCheckboxes: PropTypes.arrayOf(PropTypes.string).isRequired,
+    resetCheckboxes: PropTypes.func.isRequired,
+    setCheckedCheckboxes: PropTypes.func.isRequired,
+  }).isRequired,
+  tablePaginationProps: PropTypes.shape({
+    paginationProps: PropTypes.shape({}).isRequired,
+    offset: PropTypes.number.isRequired,
+    pageSize: PropTypes.number.isRequired,
+    setTotalCount: PropTypes.func.isRequired,
+  }).isRequired,
 };
