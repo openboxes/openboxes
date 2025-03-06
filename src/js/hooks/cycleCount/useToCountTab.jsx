@@ -17,7 +17,6 @@ import CycleCountCandidateStatus from 'consts/cycleCountCandidateStatus';
 import MimeType from 'consts/mimeType';
 import useQueryParams from 'hooks/useQueryParams';
 import useSpinner from 'hooks/useSpinner';
-import useTableCheckboxes from 'hooks/useTableCheckboxes';
 import useTableDataV2 from 'hooks/useTableDataV2';
 import useTableSorting from 'hooks/useTableSorting';
 import useTranslate from 'hooks/useTranslate';
@@ -30,6 +29,7 @@ const useToCountTab = ({
   filterParams,
   offset,
   pageSize,
+  toCountTabCheckboxes,
 }) => {
   const columnHelper = createColumnHelper();
   const translate = useTranslate();
@@ -53,6 +53,14 @@ const useToCountTab = ({
     negativeQuantity,
     searchTerm,
   } = filterParams;
+
+  const {
+    selectRow,
+    isChecked,
+    selectHeaderCheckbox,
+    headerCheckboxProps,
+    checkedCheckboxes,
+  } = toCountTabCheckboxes;
 
   const getParams = ({
     sortingParams,
@@ -87,15 +95,6 @@ const useToCountTab = ({
     sort,
     order,
   } = useTableSorting();
-
-  const {
-    selectRow,
-    isChecked,
-    selectHeaderCheckbox,
-    selectedCheckboxesAmount,
-    headerCheckboxProps,
-    checkedCheckboxes,
-  } = useTableCheckboxes();
 
   const {
     tableData,
@@ -365,7 +364,6 @@ const useToCountTab = ({
     columns: [checkboxesColumn, ...columns],
     emptyTableMessage,
     exportTableData,
-    selectedCheckboxesAmount,
     moveToCounting,
     printCountForm,
   };

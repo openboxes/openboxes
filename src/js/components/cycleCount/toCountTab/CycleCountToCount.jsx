@@ -11,6 +11,8 @@ import useTranslate from 'hooks/useTranslate';
 import Translate from 'utils/Translate';
 
 const CycleCountToCount = ({ filterParams, tablePaginationProps }) => {
+const CycleCountToCount = ({ filterParams, toCountTabCheckboxes }) => {
+  const totalCount = useRef(0);
   const translate = useTranslate();
   const {
     paginationProps,
@@ -19,19 +21,21 @@ const CycleCountToCount = ({ filterParams, tablePaginationProps }) => {
     setTotalCount,
   } = tablePaginationProps;
 
+  const { selectedCheckboxesAmount } = toCountTabCheckboxes;
+
   const {
     columns,
     tableData,
     loading,
     emptyTableMessage,
     exportTableData,
-    selectedCheckboxesAmount,
     moveToCounting,
     printCountForm,
   } = useToCountTab({
     filterParams,
     offset,
     pageSize,
+    toCountTabCheckboxes,
   });
 
   useEffect(() => {
@@ -105,6 +109,16 @@ export default CycleCountToCount;
 
 CycleCountToCount.propTypes = {
   filterParams: PropTypes.shape({}).isRequired,
+  toCountTabCheckboxes: PropTypes.shape({
+    selectRow: PropTypes.func.isRequired,
+    isChecked: PropTypes.func.isRequired,
+    selectHeaderCheckbox: PropTypes.func.isRequired,
+    selectedCheckboxesAmount: PropTypes.number.isRequired,
+    headerCheckboxProps: PropTypes.shape({}).isRequired,
+    checkedCheckboxes: PropTypes.arrayOf(PropTypes.string).isRequired,
+    resetCheckboxes: PropTypes.func.isRequired,
+    setCheckedCheckboxes: PropTypes.func.isRequired,
+  }).isRequired,
   tablePaginationProps: PropTypes.shape({
     paginationProps: PropTypes.shape({}).isRequired,
     offset: PropTypes.number.isRequired,

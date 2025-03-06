@@ -50,7 +50,7 @@ const useCountStepTable = ({
   useEffect(() => {
     if (showBinLocation) {
       (async () => {
-        const fetchedBins = await fetchBins(currentLocation?.id);
+        const fetchedBins = await fetchBins(currentLocation?.id, []);
         setBinLocations(fetchedBins);
       })();
     }
@@ -99,15 +99,16 @@ const useCountStepTable = ({
 
   // this function is required because there is a problem with getValue
   const getValueToDisplay = (id, value) => {
-    if (id === cycleCountColumn.EXPIRATION_DATE) {
+    const columnPath = id.replaceAll('_', '.');
+    if (columnPath === cycleCountColumn.EXPIRATION_DATE) {
       return formatLocalizedDate(value, DateFormat.DD_MMM_YYYY);
     }
 
-    if (id === cycleCountColumn.QUANTITY_COUNTED) {
+    if (columnPath === cycleCountColumn.QUANTITY_COUNTED) {
       return value?.toString();
     }
 
-    if (id === cycleCountColumn.BIN_LOCATION && showBinLocation) {
+    if (columnPath === cycleCountColumn.BIN_LOCATION && showBinLocation) {
       return value?.name;
     }
 
@@ -159,6 +160,12 @@ const useCountStepTable = ({
       const onChange = (e) => {
         setValue(e?.target?.value ?? e);
       };
+
+      const onChangeRaw = (e) => {
+        const valueToUpdate = (e?.target?.value ?? e)?.format();
+        setValue(valueToUpdate);
+      };
+
       // Table consists of text fields, one numerical field for quantity counted,
       // select field for bin locations and one date picker for the expiration date.
       const type = getFieldType(columnPath);
@@ -210,7 +217,7 @@ const useCountStepTable = ({
             type={type}
             value={value}
             onChange={onChange}
-            onChangeRaw={onChange}
+            onChangeRaw={onChangeRaw}
             onBlur={onBlur}
             className={`m-1 hide-arrows ${showTooltip ? 'w-99' : 'w-75'} ${error && 'border border-danger input-has-error'}`}
             showErrorBorder={error}

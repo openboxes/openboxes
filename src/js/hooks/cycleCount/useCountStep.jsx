@@ -37,6 +37,8 @@ const useCountStep = () => {
   const {
     validationErrors,
     triggerValidation,
+    triggerRerenderAfterAddingNewRow,
+    isFormValid,
   } = useCountStepValidation({ tableData });
 
   const {
@@ -180,12 +182,16 @@ const useCountStep = () => {
 
       return data;
     });
-    triggerValidation();
+    triggerRerenderAfterAddingNewRow();
   };
 
   const next = () => {
     const isValid = triggerValidation();
-    if (isValid) {
+    const areCountedByFilled = _.every(
+      cycleCountIds,
+      (id) => getCountedBy(id)?.id,
+    );
+    if (isValid && areCountedByFilled) {
       setIsStepEditable(false);
     }
   };
@@ -225,6 +231,8 @@ const useCountStep = () => {
         markAllItemsAsNotUpdated(cycleCount.id);
       }
     } finally {
+      // After the save, refetch cycle counts so that a new row can't be saved multiple times
+      await fetchCycleCounts();
       hide();
     }
   };
@@ -352,6 +360,7 @@ const useCountStep = () => {
     save,
     resolveDiscrepancies,
     isStepEditable,
+    isFormValid,
   };
 };
 

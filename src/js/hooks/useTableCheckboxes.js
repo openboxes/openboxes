@@ -66,6 +66,8 @@ const useTableCheckboxes = () => {
     isChecked,
     selectHeaderCheckbox,
     checkedCheckboxes,
+    resetCheckboxes,
+    setCheckedCheckboxes,
     selectedCheckboxesAmount: checkedCheckboxes.length,
     headerCheckboxProps: headerCheckboxState,
   };

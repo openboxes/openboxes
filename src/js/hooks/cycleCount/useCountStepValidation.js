@@ -8,6 +8,8 @@ import useTranslate from 'hooks/useTranslate';
 
 const useCountStepValidation = ({ tableData }) => {
   const [validationErrors, setValidationErrors] = useState({});
+  // isValid is null only at the beginning, after submitting
+  const [isValid, setIsValid] = useState(null);
 
   const translate = useTranslate();
 
@@ -65,16 +67,25 @@ const useCountStepValidation = ({ tableData }) => {
       };
     }, {});
 
+    const isFormValid = _.every(Object.values(errors), (val) => val.success);
     setValidationErrors(errors);
-    return _.every(Object.values(errors), (val) => val.success);
+    setIsValid(isFormValid);
+    return isFormValid;
+  };
+
+  // This is a workaround to trigger re-render of the table after adding a new row
+  const triggerRerenderAfterAddingNewRow = () => {
+    setValidationErrors((prev) => ({ ...prev }));
   };
 
   return {
     validationErrors,
     setValidationErrors,
     triggerValidation,
+    isFormValid: isValid,
     rowValidationSchema,
     rowsValidationSchema,
+    triggerRerenderAfterAddingNewRow,
   };
 };
 
