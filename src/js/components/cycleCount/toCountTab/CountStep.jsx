@@ -26,6 +26,7 @@ const CountStep = () => {
     isStepEditable,
     getCountedBy,
     getDefaultCountedBy,
+    isFormValid,
   } = useCountStep();
 
   return (
@@ -59,6 +60,7 @@ const CountStep = () => {
             isStepEditable={isStepEditable}
             countedBy={getCountedBy(id)}
             defaultCountedBy={getDefaultCountedBy(id)}
+            isFormValid={isFormValid}
           />
         ))}
     </PageWrapper>

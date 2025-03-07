@@ -204,7 +204,7 @@ class CycleCountService {
     List<Map> getRecountFormXls(List<CycleCountDto> cycleCounts) {
         List<Map> data = []
         cycleCounts.each { CycleCountDto cycleCount ->
-            cycleCount.cycleCountItems.each { CycleCountItemDto item ->
+            cycleCount.cycleCountItems?.findAll { it.countIndex == 0 }?.each { CycleCountItemDto item ->
                 data << [
                         "Product Code": item.product.productCode,
                         "Product Name": item.product.name,
@@ -438,13 +438,15 @@ class CycleCountService {
     }
 
     CycleCountItemDto createCycleCountItem(CycleCountItemCommand command) {
+        boolean isInventoryItemNew = command.inventoryItem?.id == null
+        Integer currentQuantityOnHand = isInventoryItemNew
+                    ? 0
+                    : productAvailabilityService.getQuantityOnHandInBinLocation(command.inventoryItem, command.facility)
         CycleCountItem cycleCountItem = new CycleCountItem(
                 facility: command.facility,
                 status: command.recount ? CycleCountItemStatus.INVESTIGATING : CycleCountItemStatus.COUNTING,
                 countIndex: command.recount ? 1 : 0,
-                // TODO: This is a new item so we need to fetch the most up to date QoH via product availability.
-                //       (And if the inventory item has just been created, QoH will be 0.)
-                quantityOnHand: 0,
+                quantityOnHand: currentQuantityOnHand,
                 quantityCounted: command.quantityCounted,
                 cycleCount: command.cycleCount,
                 location: command.binLocation,

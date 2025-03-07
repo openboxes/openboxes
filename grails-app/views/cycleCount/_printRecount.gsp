@@ -77,7 +77,7 @@
             <g:each var="cycleCount" in="${cycleCounts}">
                 <g:set var="product" value="${cycleCount.cycleCountItems?.first()?.product}"/>
                 <g:set var="dateCounted" value="${cycleCount.cycleCountItems?.first()?.dateCounted}"/>
-                <g:set var="userCounted" value="${cycleCount.cycleCountItems?.first()?.assignee}"/>
+                <g:set var="userCounted" value="${cycleCount.cycleCountItems?.find { it.countIndex == 0 }?.assignee}"/>
                 <table>
                     <thead>
                     <tr>
