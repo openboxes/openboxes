@@ -58,5 +58,6 @@ class CycleCountItemCommand implements Validateable {
         })
         comment(nullable: true, blank: true)
         assignee(nullable: true)
+        binLocation(nullable: true)
     }
 }
