@@ -1,14 +1,20 @@
-import { useEffect, useRef, useState } from 'react';
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 import _ from 'lodash';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { fetchUsers } from 'actions';
+import { fetchBinLocations, fetchUsers } from 'actions';
 import cycleCountApi from 'api/services/CycleCountApi';
 import { CYCLE_COUNT } from 'api/urls';
 import useResolveStepValidation from 'hooks/cycleCount/useResolveStepValidation';
 import useSpinner from 'hooks/useSpinner';
 import exportFileFromApi from 'utils/file-download-util';
+import { checkBinLocationSupport } from 'utils/supportedActivitiesUtils';
 
 // Managing state for all tables, operations on shared state (from resolve step)
 const useResolveStep = () => {
@@ -42,6 +48,15 @@ const useResolveStep = () => {
     cycleCountIds: state.cycleCount.cycleCounts,
     currentLocation: state.session.currentLocation,
   }));
+
+  const showBinLocation = useMemo(() =>
+    checkBinLocationSupport(currentLocation.supportedActivities), [currentLocation?.id]);
+
+  useEffect(() => {
+    if (showBinLocation) {
+      dispatch(fetchBinLocations(currentLocation?.id));
+    }
+  }, [currentLocation?.id]);
 
   const mergeCycleCountItems = (items) => {
     const duplicatedItems = _.groupBy(items,
