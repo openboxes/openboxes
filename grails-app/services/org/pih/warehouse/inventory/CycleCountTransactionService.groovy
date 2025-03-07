@@ -48,9 +48,13 @@ class CycleCountTransactionService {
         // However, if the cycle count items already have an up to date QoH (which will be the case if
         // refreshQuantityOnHand == true when submitting the count), we don't need to re-compute it.
         if (!itemQuantityOnHandIsUpToDate) {
-            // While the final QoH of the product for each [bin location + lot number] will always be the same value
-            // as was counted, if the QoH in the cycle count items changes at this step, the amount of quantity
-            // adjustment/change might be different than what was displayed to the user during the count.
+            // While the quantity that we end up with for each [product + bin location + lot number] will always be
+            // the same as the quantityCounted, if this refresh results in the QoH in the cycle count items changing,
+            // the quantityVariance will also change, as will the quantity of the adjustment transaction.
+            // Ex: QoH before == 10, quantity counted == 10 -> adjustment quantity and quantityVariance == 0
+            //     QoH after  == 20, quantity counted == 10 -> adjustment quantity and quantityVariance == -10
+            // This means the quantity adjustment that we end up with will be different than the quantityVariance that
+            // was displayed to the user during the count.
             cycleCountProductAvailabilityService.refreshProductAvailability(cycleCount)
         }
 

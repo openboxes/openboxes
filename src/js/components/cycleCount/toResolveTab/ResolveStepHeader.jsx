@@ -7,56 +7,69 @@ import Button from 'components/form-elements/Button';
 import { CYCLE_COUNT } from 'consts/applicationUrls';
 import { TO_COUNT_TAB } from 'consts/cycleCount';
 import FileFormat from 'consts/fileFormat';
+import useTranslate from 'hooks/useTranslate';
 import RedirectButton from 'utils/RedirectButton';
 import Translate from 'utils/Translate';
+import CustomTooltip from 'wrappers/CustomTooltip';
 
-const ResolveStepHeader = ({ next, printRecountForm, refreshCountItems }) => (
-  <div className="d-flex justify-content-sm-between align-items-end">
-    <RedirectButton
-      label="react.cycleCount.redirectToList.label"
-      defaultMessage="Back to Cycle Count List"
-      redirectTo={CYCLE_COUNT.list(TO_COUNT_TAB)}
-      className="pt-5"
-    />
-    <div className="d-flex gap-8">
-      <div className="btn-group">
-        <Button
-          isDropdown
-          defaultLabel="Print recount form"
-          label="react.cycleCount.printRecountForm.label"
-          variant="primary-outline"
-          StartIcon={<RiPrinterLine size={18} />}
-        />
-        <div className="dropdown-menu dropdown-menu-right nav-item padding-8" aria-labelledby="dropdownMenuButton">
-          <a href="#" className="dropdown-item" onClick={() => printRecountForm(FileFormat.PDF)} role="button">
-            <Translate
-              id="react.cycleCount.printRecountFormPdf.label"
-              defaultMessage="Print Recount Form PDF"
-            />
-          </a>
-          <a href="#" className="dropdown-item" onClick={() => printRecountForm(FileFormat.XLS)} role="button">
-            <Translate
-              id="react.cycleCount.exportRecountSheet.label"
-              defaultMessage="Export Recount Sheet"
-            />
-          </a>
+const ResolveStepHeader = ({ next, printRecountForm, refreshCountItems }) => {
+  const translate = useTranslate();
+
+  return (
+    <div className="d-flex justify-content-sm-between align-items-end">
+      <RedirectButton
+        label="react.cycleCount.redirectToList.label"
+        defaultMessage="Back to Cycle Count List"
+        redirectTo={CYCLE_COUNT.list(TO_COUNT_TAB)}
+        className="pt-5"
+      />
+      <div className="d-flex gap-8">
+        <div className="btn-group">
+          <Button
+            isDropdown
+            defaultLabel="Print recount form"
+            label="react.cycleCount.printRecountForm.label"
+            variant="primary-outline"
+            StartIcon={<RiPrinterLine size={18} />}
+          />
+          <div className="dropdown-menu dropdown-menu-right nav-item padding-8" aria-labelledby="dropdownMenuButton">
+            <a href="#" className="dropdown-item" onClick={() => printRecountForm(FileFormat.PDF)} role="button">
+              <Translate
+                id="react.cycleCount.printRecountFormPdf.label"
+                defaultMessage="Print Recount Form PDF"
+              />
+            </a>
+            <a href="#" className="dropdown-item" onClick={() => printRecountForm(FileFormat.XLS)} role="button">
+              <Translate
+                id="react.cycleCount.exportRecountSheet.label"
+                defaultMessage="Export Recount Sheet"
+              />
+            </a>
+          </div>
         </div>
+        <CustomTooltip
+          content={translate(
+            'react.cycleCount.table.refreshQuantitiesTooltip.label',
+            'Fix missing or transaction error on this product and Refresh to see updated discrepancies.',
+          )}
+        >
+          <Button
+            onClick={refreshCountItems}
+            label="react.default.button.refresh.label"
+            defaultLabel="Reload"
+            variant="primary"
+          />
+        </CustomTooltip>
+        <Button
+          onClick={next}
+          label="react.default.button.next.label"
+          defaultLabel="Next"
+          variant="primary"
+        />
       </div>
-      <Button
-        onClick={refreshCountItems}
-        label="react.default.button.refresh.label"
-        defaultLabel="Reload"
-        variant="primary"
-      />
-      <Button
-        onClick={next}
-        label="react.default.button.next.label"
-        defaultLabel="Next"
-        variant="primary"
-      />
     </div>
-  </div>
-);
+  );
+};
 
 export default ResolveStepHeader;
 

@@ -60,18 +60,44 @@ class CycleCountProductAvailabilityService {
         // the products of the count. We do this because new items might have been created since the count started.
         List<AvailableItem> availableItems = getAvailableItems(facility, cycleCount.products)
         for (AvailableItem availableItem : availableItems) {
+
             boolean itemHasChanged = updateItem(cycleCount, cycleCountItems, availableItem, facility, currentCountIndex,
                     assigneeForNewItems, dateCountedForNewItems, statusForNewItems)
 
+            // Once itemsHaveChanged becomes true, keep it true. We could collect more info here to build and return
+            // a map of data like {cycleCountItem : {oldQoH: x, newQoH: y}}, but we don't need that much info yet.
             itemsHaveChanged = itemsHaveChanged || itemHasChanged
+        }
+
+        // Additionally, we need to remove any cycle count items for bins or lots that have been deleted (which we
+        // assume is the case when we have the cycle count item but not a matching available item).
+        for (CycleCountItem cycleCountItem : cycleCountItems) {
+
+            AvailableItem availableItem = availableItems.find{
+                        it.inventoryItem == cycleCountItem.inventoryItem &&
+                        it.binLocation == cycleCountItem.location }
+
+            if (!availableItem) {
+                // Custom items should always stay, even if there's no available item. Just make sure to zero out QoH.
+                if (cycleCountItem.custom) {
+                    if (cycleCountItem.quantityOnHand != 0) {
+                        cycleCountItem.quantityOnHand = 0
+                        itemsHaveChanged = true
+                    }
+                }
+                else {
+                    cycleCount.removeFromCycleCountItems(cycleCountItem)
+                    cycleCountItem.delete()
+                    itemsHaveChanged = true
+                }
+            }
         }
 
         return itemsHaveChanged
     }
 
     /**
-     * Refreshes a single cycle count item (or creates it if it does not exist) based on the given product availability
-     * record.
+     * Refreshes (or creates or deletes) a single cycle count item based on the given product availability record.
      *
      * Note that any items that are not yet added to the cycle count will be added to the count here, and any existing
      * (non-custom) items whose QoH has become 0 will be removed from the count. As such, this method WILL mutate
@@ -85,7 +111,7 @@ class CycleCountProductAvailabilityService {
                                CycleCountItemStatus statusForNewItems) {
 
         CycleCountItem existingCycleCountItem = currentCountItems.find{
-            it.inventoryItem == availableItem.inventoryItem &&
+                    it.inventoryItem == availableItem.inventoryItem &&
                     it.location == availableItem.binLocation }
 
         boolean itemHasZeroQuantityOnHand = availableItem.quantityOnHand == 0
