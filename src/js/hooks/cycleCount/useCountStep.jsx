@@ -1,13 +1,18 @@
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable no-await-in-loop */
 
-import { useEffect, useRef, useState } from 'react';
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 import _ from 'lodash';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
-import { fetchUsers } from 'actions';
+import { fetchBinLocations, fetchUsers } from 'actions';
 import cycleCountApi from 'api/services/CycleCountApi';
 import { CYCLE_COUNT as CYCLE_COUNT_URL } from 'api/urls';
 import { CYCLE_COUNT } from 'consts/applicationUrls';
@@ -18,6 +23,7 @@ import useCountStepValidation from 'hooks/cycleCount/useCountStepValidation';
 import useSpinner from 'hooks/useSpinner';
 import confirmationModal from 'utils/confirmationModalUtils';
 import exportFileFromApi from 'utils/file-download-util';
+import { checkBinLocationSupport } from 'utils/supportedActivitiesUtils';
 
 // Managing state for all tables, operations on shared state (from count step)
 const useCountStep = () => {
@@ -35,19 +41,28 @@ const useCountStep = () => {
   const { show, hide } = useSpinner();
 
   const {
-    validationErrors,
-    triggerValidation,
-    triggerRerenderAfterAddingNewRow,
-    isFormValid,
-  } = useCountStepValidation({ tableData });
-
-  const {
     cycleCountIds,
     currentLocation,
   } = useSelector((state) => ({
     cycleCountIds: state.cycleCount.requests,
     currentLocation: state.session.currentLocation,
   }));
+
+  const showBinLocation = useMemo(() =>
+    checkBinLocationSupport(currentLocation.supportedActivities), [currentLocation?.id]);
+
+  useEffect(() => {
+    if (showBinLocation) {
+      dispatch(fetchBinLocations(currentLocation?.id));
+    }
+  }, [currentLocation?.id]);
+
+  const {
+    validationErrors,
+    triggerValidation,
+    triggerRerenderAfterAddingNewRow,
+    isFormValid,
+  } = useCountStepValidation({ tableData });
 
   const filterCountItems = (cycleCounts) => cycleCounts.map((cycleCount) => ({
     ...cycleCount,

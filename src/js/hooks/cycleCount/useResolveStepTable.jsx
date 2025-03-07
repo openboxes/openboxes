@@ -26,7 +26,6 @@ import { DateFormat } from 'consts/timeFormat';
 import useArrowsNavigation from 'hooks/useArrowsNavigation';
 import useTranslate from 'hooks/useTranslate';
 import groupBinLocationsByZone from 'utils/groupBinLocationsByZone';
-import { fetchBins } from 'utils/option-utils';
 import { checkBinLocationSupport } from 'utils/supportedActivitiesUtils';
 import { formatDate } from 'utils/translation-utils';
 import CustomTooltip from 'wrappers/CustomTooltip';
@@ -44,7 +43,6 @@ const useResolveStepTable = ({
 }) => {
   const columnHelper = createColumnHelper();
   // State for saving data for binLocation dropdown
-  const [binLocations, setBinLocations] = useState([]);
   const [focusIndex, setFocusIndex] = useState(null);
   const [focusId, setFocusId] = useState(null);
   const translate = useTranslate();
@@ -55,26 +53,19 @@ const useResolveStepTable = ({
     currentLocation,
     formatLocalizedDate,
     reasonCodes,
+    binLocations,
   } = useSelector((state) => ({
     users: state.users.data,
     currentLocation: state.session.currentLocation,
     formatLocalizedDate: formatDate(state.localize),
     reasonCodes: state.cycleCount.reasonCodes,
+    binLocations: state.cycleCount.binLocations,
   }));
-
-  const dispatch = useDispatch();
 
   const showBinLocation = useMemo(() =>
     checkBinLocationSupport(currentLocation.supportedActivities), [currentLocation?.id]);
 
-  useEffect(() => {
-    if (showBinLocation) {
-      (async () => {
-        const fetchedBins = await fetchBins(currentLocation?.id, []);
-        setBinLocations(fetchedBins);
-      })();
-    }
-  }, [currentLocation?.id]);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (!reasonCodes?.length) {

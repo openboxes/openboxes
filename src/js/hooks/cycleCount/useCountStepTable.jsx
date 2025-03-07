@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 
 import { createColumnHelper } from '@tanstack/react-table';
 import _ from 'lodash';
@@ -16,7 +16,6 @@ import { DateFormat } from 'consts/timeFormat';
 import useArrowsNavigation from 'hooks/useArrowsNavigation';
 import useTranslate from 'hooks/useTranslate';
 import groupBinLocationsByZone from 'utils/groupBinLocationsByZone';
-import { fetchBins } from 'utils/option-utils';
 import { checkBinLocationSupport } from 'utils/supportedActivitiesUtils';
 import CustomTooltip from 'wrappers/CustomTooltip';
 
@@ -33,28 +32,19 @@ const useCountStepTable = ({
 }) => {
   const columnHelper = createColumnHelper();
   // State for saving data for binLocation dropdown
-  const [binLocations, setBinLocations] = useState([]);
   const [focusIndex, setFocusIndex] = useState(null);
   const [focusId, setFocusId] = useState(null);
 
   const translate = useTranslate();
 
-  const { users, currentLocation } = useSelector((state) => ({
+  const { users, currentLocation, binLocations } = useSelector((state) => ({
     users: state.users.data,
+    binLocations: state.cycleCount.binLocations,
     currentLocation: state.session.currentLocation,
   }));
 
   const showBinLocation = useMemo(() =>
     checkBinLocationSupport(currentLocation.supportedActivities), [currentLocation?.id]);
-
-  useEffect(() => {
-    if (showBinLocation) {
-      (async () => {
-        const fetchedBins = await fetchBins(currentLocation?.id, []);
-        setBinLocations(fetchedBins);
-      })();
-    }
-  }, [currentLocation?.id]);
 
   // Get appropriate input component based on table column
   const getFieldComponent = (fieldName) => {
