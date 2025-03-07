@@ -53,9 +53,11 @@ const SelectField = ({
 
   const SelectComponent = productSelect ? ProductSelect : Select;
 
-  const selectRef = useRef(null);
+  const fieldRef = useRef(null);
 
-  useFocusOnMatch({ ...focusProps, ref: selectRef, type: componentType.SELECT_FIELD });
+  const refProps = productSelect ? {} : { fieldRef };
+
+  useFocusOnMatch({ ...focusProps, ref: fieldRef, type: componentType.SELECT_FIELD });
 
   return (
     <InputWrapper
@@ -75,6 +77,7 @@ const SelectField = ({
         onChange={onChangeValue}
         multi={multiple}
         onKeyDown={onKeyDown}
+        {...refProps}
         {...asyncProps}
         {...fieldProps}
       />

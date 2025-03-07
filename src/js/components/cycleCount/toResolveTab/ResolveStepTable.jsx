@@ -104,7 +104,10 @@ const ResolveStepTable = ({
               <SelectField
                 placeholder="Select"
                 options={users}
-                onChange={assignRecountedBy(id)}
+                onChange={(person) => {
+                  assignRecountedBy(id)(person);
+                  resetFocus();
+                }}
                 hideErrorMessageWrapper
               />
             </HeaderSelect>
