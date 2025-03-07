@@ -10,6 +10,7 @@ import {
   CLOSE_INFO_BAR,
   FETCH_APPROVERS,
   FETCH_ATTRIBUTES,
+  FETCH_BIN_LOCATIONS,
   FETCH_BUYERS,
   FETCH_CONFIG,
   FETCH_CONFIG_AND_SET_ACTIVE,
@@ -65,7 +66,7 @@ import { ORGANIZATION_API } from 'api/urls';
 import RoleType from 'consts/roleType';
 import { UnitOfMeasureType } from 'consts/UnitOfMeasureType';
 import apiClient, { parseResponse } from 'utils/apiClient';
-import { mapShipmentTypes } from 'utils/option-utils';
+import { fetchBins, mapShipmentTypes } from 'utils/option-utils';
 
 export function showSpinner() {
   return {
@@ -552,6 +553,15 @@ export function fetchBuyers(active = false) {
       });
   };
 }
+
+export const fetchBinLocations = (currentLocationId, ignoreActivityCodes = []) =>
+  async (dispatch) => {
+    const fetchedBins = await fetchBins(currentLocationId, ignoreActivityCodes);
+    dispatch({
+      type: FETCH_BIN_LOCATIONS,
+      payload: fetchedBins,
+    });
+  };
 
 export function fetchInvoiceStatuses() {
   return (dispatch) => {
