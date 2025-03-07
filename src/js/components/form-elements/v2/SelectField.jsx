@@ -74,7 +74,6 @@ const SelectField = ({
         value={value}
         onChange={onChangeValue}
         multi={multiple}
-        fieldRef={selectRef}
         onKeyDown={onKeyDown}
         {...asyncProps}
         {...fieldProps}
