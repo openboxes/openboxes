@@ -46,6 +46,7 @@ const useCountStep = () => {
     cycleCountIds: state.cycleCount.requests,
     currentLocation: state.session.currentLocation,
   }));
+
   const fetchCycleCounts = async () => {
     try {
       show();

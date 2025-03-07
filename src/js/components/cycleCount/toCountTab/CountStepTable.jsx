@@ -40,7 +40,7 @@ const CountStepTable = ({
     columns,
     defaultColumn,
     users,
-    handleAddEmptyRow,
+    resetFocus,
   } = useCountStepTable({
     cycleCountId: id,
     productCode: product?.productCode,
@@ -109,10 +109,14 @@ const CountStepTable = ({
               <SelectField
                 placeholder="Select"
                 options={users}
-                onChange={assignCountedBy(id)}
+                onChange={(person) => {
+                  assignCountedBy(id)(person);
+                  resetFocus();
+                }}
                 className="min-width-250"
                 defaultValue={countedByMeta || defaultCountedByMeta}
               />
+
             </Tooltip>
           </HeaderSelect>
         ) : (
@@ -147,7 +151,10 @@ const CountStepTable = ({
             )}
           >
             <Button
-              onClick={handleAddEmptyRow}
+              onClick={() => {
+                addEmptyRow(product?.productCode, id);
+                resetFocus();
+              }}
               label="react.cycleCount.addNewRecord.label"
               defaultLabel="Add new record"
               variant="transparent"
