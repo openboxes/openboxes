@@ -8,7 +8,7 @@ SELECT
     product_availability.location_id                                                 as facility_id,
 
     -- Cycle count request ID
-    MAX(cycle_count_request_summary.cycle_count_request_id)                               as cycle_count_request_id,
+    cycle_count_request_summary.cycle_count_request_id                              as cycle_count_request_id,
 
     -- ABC Classification
     -- FIXME Using a grouping operator due to a GROUP BY issue. This isn't the best approach sicne it'll return an
