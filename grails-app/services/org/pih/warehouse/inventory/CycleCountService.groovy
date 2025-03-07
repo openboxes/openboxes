@@ -79,6 +79,9 @@ class CycleCountService {
             else {
                 inList("status", command.statuses)
             }
+            if (command.negativeQuantity) {
+                gt("negativeItemCount", 0)
+            }
         } as List<CycleCountCandidate>
     }
 
