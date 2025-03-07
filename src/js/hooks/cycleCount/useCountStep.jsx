@@ -49,6 +49,11 @@ const useCountStep = () => {
     currentLocation: state.session.currentLocation,
   }));
 
+  const filterCountItems = (cycleCounts) => cycleCounts.map((cycleCount) => ({
+    ...cycleCount,
+    cycleCountItems: cycleCount.cycleCountItems.filter((item) => item.countIndex === 0),
+  }));
+
   const fetchCycleCounts = async () => {
     try {
       show();
@@ -56,7 +61,7 @@ const useCountStep = () => {
         currentLocation?.id,
         cycleCountIds,
       );
-      tableData.current = data?.data;
+      tableData.current = filterCountItems(data?.data);
       // Date counted and assignee are the same for all items,
       // so we create a map looking at first item
       const countedDates = data?.data?.reduce((acc, cycleCount) => ({

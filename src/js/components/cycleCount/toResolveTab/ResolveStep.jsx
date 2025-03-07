@@ -25,6 +25,7 @@ const ResolveStep = () => {
     save,
     isStepEditable,
     getRecountedBy,
+    getCountedBy,
   } = useResolveStep();
 
   return (
@@ -53,6 +54,7 @@ const ResolveStep = () => {
             shouldHaveRootCause={shouldHaveRootCause}
             isStepEditable={isStepEditable}
             recountedBy={getRecountedBy(id)}
+            countedBy={getCountedBy(id)}
           />
         ))}
     </PageWrapper>
