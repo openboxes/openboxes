@@ -57,5 +57,7 @@ class CycleCountItemCommand implements Validateable {
                     ['cycleCountItemCommand.discrepancyReasonCode.invalid']
         })
         comment(nullable: true, blank: true)
+        assignee(nullable: true)
+        binLocation(nullable: true)
     }
 }
