@@ -168,8 +168,7 @@ const useResolveStepTable = ({
     return value;
   };
 
-  const handleAddEmptyRow = () => {
-    addEmptyRow(productCode, cycleCountId);
+  const resetFocus = () => {
     setFocusIndex(null);
     setFocusId(null);
   };
@@ -237,7 +236,7 @@ const useResolveStepTable = ({
           setError(null);
           setWarning(null);
         }
-        table.options.meta?.updateData(cycleCountId, original.id, id, enteredValue);
+        // table.options.meta?.updateData(cycleCountId, original.id, id, enteredValue);
         setValue(enteredValue);
       };
 
@@ -501,7 +500,7 @@ const useResolveStepTable = ({
     columns,
     defaultColumn,
     users,
-    handleAddEmptyRow,
+    resetFocus,
   };
 };
 
