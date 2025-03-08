@@ -95,7 +95,7 @@ const useResolveStep = () => {
     }), {});
     setDateRecounted(recountedDates);
   };
-  
+
   useEffect(() => {
     fetchCycleCounts();
   }, [cycleCountIds]);
