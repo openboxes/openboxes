@@ -11,6 +11,7 @@ import TableHeaderCell from 'components/DataTable/TableHeaderCell';
 import Checkbox from 'components/form-elements/v2/Checkbox';
 import { INVENTORY_ITEM_URL } from 'consts/applicationUrls';
 import { TO_COUNT_TAB } from 'consts/cycleCount';
+import { DateFormat } from 'consts/timeFormat';
 import useQueryParams from 'hooks/useQueryParams';
 import useSpinner from 'hooks/useSpinner';
 import useTableCheckboxes from 'hooks/useTableCheckboxes';
@@ -20,6 +21,7 @@ import useTranslate from 'hooks/useTranslate';
 import Badge from 'utils/Badge';
 import exportFileFromAPI from 'utils/file-download-util';
 import { mapStringToLimitedList } from 'utils/form-values-utils';
+import { formatDate } from 'utils/translation-utils';
 
 const useAllProductsTab = ({
   filterParams,
@@ -27,6 +29,7 @@ const useAllProductsTab = ({
   offset,
   pageSize,
   resetForm,
+  setToCountCheckedCheckboxes,
 }) => {
   const columnHelper = createColumnHelper();
   const spinner = useSpinner();
@@ -42,6 +45,12 @@ const useAllProductsTab = ({
   }));
 
   const {
+    formatLocalizedDate,
+  } = useSelector((state) => ({
+    formatLocalizedDate: formatDate(state.localize),
+  }));
+
+  const {
     dateLastCount,
     categories,
     internalLocations,
@@ -51,6 +60,16 @@ const useAllProductsTab = ({
     negativeQuantity,
     searchTerm,
   } = filterParams;
+
+  const {
+    selectRow,
+    isChecked,
+    selectHeaderCheckbox,
+    selectedCheckboxesAmount,
+    checkedCheckboxes,
+    headerCheckboxProps,
+    resetCheckboxes,
+  } = useTableCheckboxes();
 
   const getParams = ({
     sortingParams,
@@ -98,15 +117,6 @@ const useAllProductsTab = ({
     filterParams,
   });
 
-  const {
-    selectRow,
-    isChecked,
-    selectHeaderCheckbox,
-    selectedCheckboxesAmount,
-    checkedCheckboxes,
-    headerCheckboxProps,
-  } = useTableCheckboxes();
-
   const productIds = tableData.data.map((row) => row.product.id);
 
   // Separated from columns to reduce the amount of rerenders of
@@ -139,7 +149,7 @@ const useAllProductsTab = ({
   });
 
   const columns = useMemo(() => [
-    columnHelper.accessor('lastCountDate', {
+    columnHelper.accessor('dateLastCount', {
       header: () => (
         <TableHeaderCell
           sortable
@@ -151,7 +161,7 @@ const useAllProductsTab = ({
       ),
       cell: ({ getValue }) => (
         <TableCell className="rt-td">
-          {getValue()}
+          {formatLocalizedDate(getValue(), DateFormat.DD_MMM_YYYY)}
         </TableCell>
       ),
       meta: {
@@ -335,9 +345,12 @@ const useAllProductsTab = ({
     };
     spinner.show();
     try {
-      await cycleCountApi.createRequest(payload, currentLocation?.id);
+      const response = await cycleCountApi.createRequest(payload, currentLocation?.id);
+      setToCountCheckedCheckboxes((prev) =>
+        [...prev, ...response.data.data.map((item) => item.id)]);
       switchTab(TO_COUNT_TAB, resetForm);
     } finally {
+      resetCheckboxes();
       spinner.hide();
     }
   };

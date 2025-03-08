@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
 
 import PropTypes from 'prop-types';
 import { RiCalculatorLine, RiDownload2Line, RiPrinterLine } from 'react-icons/ri';
@@ -7,24 +7,20 @@ import DataTable from 'components/DataTable/v2/DataTable';
 import Button from 'components/form-elements/Button';
 import FileFormat from 'consts/fileFormat';
 import useToResolveTab from 'hooks/cycleCount/useToResolveTab';
-import useTablePagination from 'hooks/useTablePagination';
 import useTranslate from 'hooks/useTranslate';
 import Translate from 'utils/Translate';
 
-const CycleCountToResolve = ({ filterParams }) => {
-  const totalCount = useRef(0);
+const CycleCountToResolve = ({
+  filterParams,
+  tablePaginationProps,
+}) => {
   const translate = useTranslate();
-
   const {
     paginationProps,
     offset,
     pageSize,
-  } = useTablePagination({
-    defaultPageSize: 5,
-    totalCount: totalCount.current,
-    filterParams,
-  });
-
+    setTotalCount,
+  } = tablePaginationProps;
   const {
     columns,
     tableData,
@@ -40,9 +36,8 @@ const CycleCountToResolve = ({ filterParams }) => {
     pageSize,
   });
 
-  // Use effect to avoid circular dependency
   useEffect(() => {
-    totalCount.current = tableData.totalCount;
+    setTotalCount(tableData.totalCount);
   }, [tableData.totalCount]);
 
   return (
@@ -112,4 +107,10 @@ export default CycleCountToResolve;
 
 CycleCountToResolve.propTypes = {
   filterParams: PropTypes.shape({}).isRequired,
+  tablePaginationProps: PropTypes.shape({
+    paginationProps: PropTypes.shape({}).isRequired,
+    offset: PropTypes.number.isRequired,
+    pageSize: PropTypes.number.isRequired,
+    setTotalCount: PropTypes.func.isRequired,
+  }).isRequired,
 };

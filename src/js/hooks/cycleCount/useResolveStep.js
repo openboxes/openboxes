@@ -1,14 +1,20 @@
-import { useEffect, useRef, useState } from 'react';
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 import _ from 'lodash';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { fetchUsers } from 'actions';
+import { fetchBinLocations, fetchUsers } from 'actions';
 import cycleCountApi from 'api/services/CycleCountApi';
 import { CYCLE_COUNT } from 'api/urls';
 import useResolveStepValidation from 'hooks/cycleCount/useResolveStepValidation';
 import useSpinner from 'hooks/useSpinner';
 import exportFileFromApi from 'utils/file-download-util';
+import { checkBinLocationSupport } from 'utils/supportedActivitiesUtils';
 
 // Managing state for all tables, operations on shared state (from resolve step)
 const useResolveStep = () => {
@@ -43,20 +49,53 @@ const useResolveStep = () => {
     currentLocation: state.session.currentLocation,
   }));
 
+  const showBinLocation = useMemo(() =>
+    checkBinLocationSupport(currentLocation.supportedActivities), [currentLocation?.id]);
+
+  useEffect(() => {
+    if (showBinLocation) {
+      dispatch(fetchBinLocations(currentLocation?.id));
+    }
+  }, [currentLocation?.id]);
+
+  const mergeCycleCountItems = (items) => {
+    const duplicatedItems = _.groupBy(items,
+      (item) => `${item.binLocation?.id}-${item?.inventoryItem?.lotNumber}`);
+    return Object.values(duplicatedItems).map((itemsToMerge) => {
+      const maxCountIndex = _.maxBy(itemsToMerge, 'countIndex').countIndex;
+      const itemFromCount = _.find(itemsToMerge, (item) => item.countIndex === maxCountIndex - 1);
+      const itemFromResolve = _.find(itemsToMerge, (item) => item.countIndex === maxCountIndex);
+      return itemFromCount ? {
+        ...itemFromResolve,
+        ...itemFromCount,
+        commentFromCount: itemFromCount?.comment,
+        quantityRecounted: itemFromResolve?.quantityCounted,
+        dateRecounted: itemFromResolve?.dateCounted,
+        comment: itemFromResolve?.comment,
+      } : {
+        ...itemFromResolve,
+        commentFromCount: itemFromResolve?.comment,
+        quantityRecounted: null,
+        dateRecounted: null,
+        comment: null,
+      };
+    });
+  };
+
   const fetchCycleCounts = async () => {
     const { data } = await cycleCountApi.getCycleCounts(
       currentLocation?.id,
       cycleCountIds,
     );
-    tableData.current = data?.data;
-    const recountedDates = data?.data?.reduce((acc, cycleCount) => ({
+    tableData.current = data?.data?.map((cycleCount) =>
+      ({ ...cycleCount, cycleCountItems: mergeCycleCountItems(cycleCount.cycleCountItems) }));
+    const recountedDates = tableData.current?.reduce((acc, cycleCount) => ({
       ...acc,
-      // Replace it with the recounted date from the response
-      [cycleCount?.id]: new Date(),
+      [cycleCount?.id]: cycleCount?.cycleCountItems?.[0]?.dateRecounted,
     }), {});
     setDateRecounted(recountedDates);
   };
-
+  
   useEffect(() => {
     fetchCycleCounts();
   }, [cycleCountIds]);
@@ -97,6 +136,10 @@ const useResolveStep = () => {
   };
 
   const getRecountedBy = (cycleCountId) => recountedBy?.[cycleCountId];
+
+  const getCountedBy = (cycleCountId) => tableData?.current.find(
+    (cycleCount) => cycleCount?.id === cycleCountId,
+  )?.cycleCountItems?.[0]?.assignee;
 
   const removeRow = (cycleCountId, rowId) => {
     const tableIndex = tableData.current.findIndex(
@@ -211,6 +254,7 @@ const useResolveStep = () => {
     validationErrors,
     isStepEditable,
     getRecountedBy,
+    getCountedBy,
     addEmptyRow,
     removeRow,
     printRecountForm,

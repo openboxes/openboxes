@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useLayoutEffect } from 'react';
 
 import CycleCountAllProducts from 'components/cycleCount/allProductsTab/CycleCountAllProducts';
 import cycleCountFilterFields from 'components/cycleCount/CycleCountFilterFields';
@@ -15,8 +15,11 @@ import {
   TO_RESOLVE_TAB,
 } from 'consts/cycleCount';
 import useCycleCountFilters from 'hooks/cycleCount/useCycleCountFilters';
+import useCycleCountPagination from 'hooks/useCycleCountPagination';
 import useQueryParams from 'hooks/useQueryParams';
+import useResetScrollbar from 'hooks/useResetScrollbar';
 import useSwitchTabs from 'hooks/useSwitchTabs';
+import useTableCheckboxes from 'hooks/useTableCheckboxes';
 import useTranslation from 'hooks/useTranslation';
 import PageWrapper from 'wrappers/PageWrapper';
 
@@ -39,6 +42,14 @@ const CycleCount = () => {
     resetForm,
     isLoading,
   } = useCycleCountFilters();
+
+  // This is needed to pass the selected checkboxes state from "All Products" to "To Count"
+  const toCountTabCheckboxes = useTableCheckboxes();
+  const { setCheckedCheckboxes } = toCountTabCheckboxes;
+
+  // Moved this here to prevent resetting number of rows per page when switching tabs.
+  const tablePaginationProps = useCycleCountPagination(filterParams);
+  const { pageSize, offset } = tablePaginationProps;
 
   const tabs = {
     [ALL_PRODUCTS_TAB]: {
@@ -73,6 +84,14 @@ const CycleCount = () => {
 
   const { tab } = useQueryParams();
 
+  const { resetScrollbar } = useResetScrollbar({
+    selector: 'body',
+  });
+
+  useLayoutEffect(() => {
+    resetScrollbar();
+  }, [tab, pageSize, offset]);
+
   return (
     <PageWrapper>
       <CycleCountHeader />
@@ -97,16 +116,21 @@ const CycleCount = () => {
             switchTab={switchTab}
             filterParams={filterParams}
             resetForm={resetForm}
+            setToCountCheckedCheckboxes={setCheckedCheckboxes}
+            tablePaginationProps={tablePaginationProps}
           />
         )}
         {tab === TO_COUNT_TAB && (
           <CycleCountToCount
             filterParams={filterParams}
+            toCountTabCheckboxes={toCountTabCheckboxes}
+            tablePaginationProps={tablePaginationProps}
           />
         )}
         {tab === TO_RESOLVE_TAB && (
           <CycleCountToResolve
             filterParams={filterParams}
+            tablePaginationProps={tablePaginationProps}
           />
         )}
         {tab === TO_APPROVE_TAB && <CycleCountToApprove />}

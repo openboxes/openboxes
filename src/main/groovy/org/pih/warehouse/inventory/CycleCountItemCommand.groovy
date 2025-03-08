@@ -19,7 +19,7 @@ class CycleCountItemCommand implements Validateable {
         return inventoryItem ?: new InventoryItem(
                 product: product,
                 lotNumber: source['inventoryItem']['lotNumber'],
-                expirationDate: DateUtil.asDate(source['inventoryItem']['expirationDate'].toString())
+                expirationDate: source['inventoryItem']['expirationDate'] ? DateUtil.asDate(source['inventoryItem']['expirationDate'].toString()) : null
         )
     })
     InventoryItem inventoryItem
@@ -57,5 +57,7 @@ class CycleCountItemCommand implements Validateable {
                     ['cycleCountItemCommand.discrepancyReasonCode.invalid']
         })
         comment(nullable: true, blank: true)
+        assignee(nullable: true)
+        binLocation(nullable: true)
     }
 }

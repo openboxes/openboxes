@@ -101,7 +101,9 @@ const useResolveStepValidation = ({ tableData }) => {
     );
     return cycleCountItems.reduce((acc, curr) => {
       const recountDifference = curr.quantityRecounted - (curr.quantityOnHand || 0);
-      if (recountDifference !== 0 && !Number.isNaN(recountDifference)) {
+      if (recountDifference !== 0
+        && !Number.isNaN(recountDifference)
+        && curr.quantityRecounted !== null) {
         return [...acc, curr?.id];
       }
 
