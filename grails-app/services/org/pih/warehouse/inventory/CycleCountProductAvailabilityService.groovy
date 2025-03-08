@@ -36,130 +36,222 @@ class CycleCountProductAvailabilityService {
      * Refreshes a given cycle count by fetching up-to-date product availability for the products associated with
      * the count and updating the QoH for each of the items in the most recent count.
      *
-     * @return true if one or more cycle count items were added to the count or had their QoH modified.
+     * @return CycleCountItemsForRefresh the items that were created, updated, and deleted as a result of the refresh.
      */
-    boolean refreshProductAvailability(CycleCount cycleCount) {
-        boolean itemsHaveChanged = false
+    CycleCountItemsForRefresh refreshProductAvailability(CycleCount cycleCount) {
 
-        // We only want to refresh the items of the most recent count. We do this because previous counts are already
-        // completed, so their data should be considered static.
-        Set<CycleCountItem> cycleCountItems = cycleCount.getItemsOfMostRecentCount()
-        int currentCountIndex = cycleCountItems.first().countIndex
-        Location facility = cycleCount.facility
+        CycleCountRefreshState refreshState = new CycleCountRefreshState(cycleCount)
 
-        // Used by newly created items. We know that the frontend only supports a single assignee and date counted
-        // for all items of a count, so for convenience we set the values of any new items to match.
-        User assigneeForNewItems = cycleCountItems.find{ it.assignee }?.assignee
-        Date dateCountedForNewItems = cycleCountItems.find{ it.dateCounted }?.dateCounted ?: new Date()
+        // The refresh is based on the current product availability in all [product + bin location + lot] combinations
+        // of the count. We need to fetch all available items (instead of simply looping the cycle count items) because
+        // new [product + bin location + lot] combinations might have been created since the count started.
+        List<AvailableItem> availableItems = getAvailableItems(cycleCount.facility, cycleCount.products)
 
-        // This logic is shared between count and recount flows so we need to check which we're in.
-        CycleCountItemStatus statusForNewItems = cycleCount.status.isCounting() ?
-                CycleCountItemStatus.COUNTING : CycleCountItemStatus.INVESTIGATING
-
-        // The refresh is based on the current product availability in all [bin location + lot] combinations for all
-        // the products of the count. We do this because new items might have been created since the count started.
-        List<AvailableItem> availableItems = getAvailableItems(facility, cycleCount.products)
+        // Compute what changes need to be made to the cycle count items and add them to the refresh state.
         for (AvailableItem availableItem : availableItems) {
-
-            boolean itemHasChanged = updateItem(cycleCount, cycleCountItems, availableItem, facility, currentCountIndex,
-                    assigneeForNewItems, dateCountedForNewItems, statusForNewItems)
-
-            // Once itemsHaveChanged becomes true, keep it true. We could collect more info here to build and return
-            // a map of data like {cycleCountItem : {oldQoH: x, newQoH: y}}, but we don't need that much info yet.
-            itemsHaveChanged = itemsHaveChanged || itemHasChanged
+            updateRefreshStateForItem(refreshState, availableItem)
         }
 
-        // Additionally, we need to remove any cycle count items for bins or lots that have been deleted (which we
-        // assume is the case when we have the cycle count item but not a matching available item).
-        for (CycleCountItem cycleCountItem : cycleCountItems) {
-
-            AvailableItem availableItem = availableItems.find{
-                        it.inventoryItem == cycleCountItem.inventoryItem &&
-                        it.binLocation == cycleCountItem.location }
-
-            if (!availableItem) {
-                // Custom items should always stay, even if there's no available item. Just make sure to zero out QoH.
-                if (cycleCountItem.custom) {
-                    if (cycleCountItem.quantityOnHand != 0) {
-                        cycleCountItem.quantityOnHand = 0
-                        itemsHaveChanged = true
-                    }
-                }
-                else {
-                    cycleCount.removeFromCycleCountItems(cycleCountItem)
-                    cycleCountItem.delete()
-                    itemsHaveChanged = true
-                }
-            }
+        // Additionally, we need to remove any cycle count items for bins or lots that have been deleted.
+        for (CycleCountItem cycleCountItem : refreshState.itemsOfMostRecentCount) {
+            updateRefreshStateIfItemDeleted(refreshState, availableItems, cycleCountItem)
         }
 
-        return itemsHaveChanged
+        // Now that we've computed the changes that need to be made, persist them to the cycle count items
+        updateCycleCountItems(refreshState)
+
+        return refreshState.cycleCountItemsForRefresh
     }
 
     /**
-     * Refreshes (or creates or deletes) a single cycle count item based on the given product availability record.
+     * Based on the current product availability of an item, determines if the matching cycle count item needs
+     * to be created, updated, deleted, or left unchanged, and updates the refresh state with those potential
+     * changes. The cycle count items themselves are NOT updated at this point, only the refresh state object.
+     */
+    private void updateRefreshStateForItem(CycleCountRefreshState refreshState, AvailableItem availableItem) {
+
+        CycleCountItem existingCycleCountItem = refreshState.itemsOfMostRecentCount.find{
+                    it.inventoryItem == availableItem.inventoryItem &&
+                    it.location == availableItem.binLocation }
+
+        // The item does NOT yet exist in the current count. It must have been created after the count was started.
+        if (!existingCycleCountItem) {
+            refreshState.addItemToCreate(availableItem)
+            return
+        }
+
+        BigDecimal actualQuantityOnHand = availableItem.quantityOnHand
+        boolean itemHasZeroQuantityOnHand = actualQuantityOnHand == 0
+
+        // QoH == 0 for the item (and it's not a custom row) so it should not be a part of the count any longer,
+        // even if it has been counted already this round. Custom added items should not get removed from the count,
+        // even if QoH == 0. We trust the user to manage items they manually added.
+        if (itemHasZeroQuantityOnHand && !existingCycleCountItem.custom) {
+            refreshState.addItemToDelete(existingCycleCountItem)
+            return
+        }
+
+        // If the QoH has changed, we'll need to update the QoH in the cycle count item.
+        if (existingCycleCountItem.quantityOnHand != actualQuantityOnHand) {
+            refreshState.addItemToUpdate(existingCycleCountItem, actualQuantityOnHand)
+        }
+    }
+
+    /**
+     * Given a cycle count item, determine if the bin or lot associated with the item has since been deleted
+     * (ie there's no matching available item), and if so, add that item to the refresh state to be deleted.
+     * The cycle count items themselves are NOT updated at this point, only the refresh state object.
+     */
+    private void updateRefreshStateIfItemDeleted(CycleCountRefreshState refreshState,
+                                                 List<AvailableItem> availableItems, CycleCountItem cycleCountItem) {
+
+        AvailableItem availableItem = availableItems.find{
+            it.inventoryItem == cycleCountItem.inventoryItem &&
+                    it.binLocation == cycleCountItem.location }
+
+        // If the available item exists, there's nothing to do.
+        if (availableItem) {
+            return
+        }
+
+        // Otherwise, it does not exist, so we need to remove it from the count (unless it's a custom added row).
+        // Custom added items should not get removed from the count, even if there's no available item. We trust
+        // the user to manage items they manually added.
+        if (!cycleCountItem.custom) {
+            refreshState.addItemToDelete(cycleCountItem)
+            return
+        }
+
+        // For custom items with no available item, we still need to make sure to zero out QoH (if it isn't already).
+        if (cycleCountItem.quantityOnHand != 0) {
+            refreshState.addItemToUpdate(cycleCountItem, BigDecimal.valueOf(0))
+        }
+    }
+
+    /**
+     * Performs the create, update, and delete operations on the cycle count items to be refreshed.
      *
      * Note that any items that are not yet added to the cycle count will be added to the count here, and any existing
      * (non-custom) items whose QoH has become 0 will be removed from the count. As such, this method WILL mutate
      * the cycle count items.
-     *
-     * @return true if a new cycle count item was added to the count or an existing one had their QoH modified.
      */
-    private boolean updateItem(CycleCount cycleCount, Set<CycleCountItem> currentCountItems,
-                               AvailableItem availableItem, Location facility, int currentCountIndex,
-                               User assigneeForNewItems, Date dateCountedForNewItems,
-                               CycleCountItemStatus statusForNewItems) {
+    private void updateCycleCountItems(CycleCountRefreshState refreshState) {
+        CycleCount cycleCount = refreshState.cycleCount
 
-        CycleCountItem existingCycleCountItem = currentCountItems.find{
-                    it.inventoryItem == availableItem.inventoryItem &&
-                    it.location == availableItem.binLocation }
+        // Create
+        for (AvailableItem availableItem : refreshState.itemsToCreate) {
+            CycleCountItem newCycleCountItem = new CycleCountItem(
+                    status: refreshState.statusForNewItems,
+                    countIndex: refreshState.currentCountIndex,
+                    quantityOnHand: availableItem.quantityOnHand,
+                    quantityCounted: availableItem.quantityOnHand == 0 ? 0 : null,
+                    cycleCount: cycleCount,
+                    facility: cycleCount.facility,
+                    location: availableItem.binLocation,
+                    inventoryItem: availableItem.inventoryItem,
+                    product: availableItem.inventoryItem.product,
+                    createdBy: AuthService.currentUser,
+                    updatedBy: AuthService.currentUser,
+                    dateCounted: refreshState.dateCountedForNewItems,
+                    custom: false,
+                    assignee: refreshState.assigneeForNewItems
+            )
 
-        boolean itemHasZeroQuantityOnHand = availableItem.quantityOnHand == 0
-
-        // The item already exists in the current count.
-        if (existingCycleCountItem) {
-            // Custom rows should always remain in the count, even if QoH == 0.
-            if (!itemHasZeroQuantityOnHand || existingCycleCountItem.custom) {
-                // If the QoH has changed, update the cycle count item.
-                if (existingCycleCountItem.quantityOnHand != availableItem.quantityOnHand) {
-                    existingCycleCountItem.quantityOnHand = (Integer) availableItem.quantityOnHand
-                    return true
-                }
-                // Otherwise nothing has changed.
-                return false
+            cycleCount.addToCycleCountItems(newCycleCountItem)
+            if (!newCycleCountItem.save()) {
+                throw new ValidationException("Invalid cycle count item", newCycleCountItem.errors)
             }
-
-            // QoH == 0 for the item and it's not a custom row so it should not be a part of the count any longer,
-            // even if it has been counted already this round.
-            cycleCount.removeFromCycleCountItems(existingCycleCountItem)
-            existingCycleCountItem.delete()
-            return true
         }
 
-        // The item does NOT yet exist in the current count. It must have been created since the count started.
-        // We make sure to add it to the count now so that it is accounted for.
-        CycleCountItem newCycleCountItem = new CycleCountItem(
-                status: statusForNewItems,
-                countIndex: currentCountIndex,
-                quantityOnHand: availableItem.quantityOnHand,
-                quantityCounted: availableItem.quantityOnHand == 0 ? 0 : null,
-                cycleCount: cycleCount,
-                facility: facility,
-                location: availableItem.binLocation,
-                inventoryItem: availableItem.inventoryItem,
-                product: availableItem.inventoryItem.product,
-                createdBy: AuthService.currentUser,
-                updatedBy: AuthService.currentUser,
-                dateCounted: dateCountedForNewItems,
-                custom: false,
-                assignee: assigneeForNewItems
-        )
-
-        cycleCount.addToCycleCountItems(newCycleCountItem)
-        if (!newCycleCountItem.save()) {
-            throw new ValidationException("Invalid cycle count item", newCycleCountItem.errors)
+        // Update
+        for (Map.Entry<CycleCountItem, BigDecimal> entry : refreshState.itemsToUpdate) {
+            entry.key.quantityOnHand = (Integer) entry.value
         }
 
-        return true
+        // Delete
+        for (CycleCountItem cycleCountItem : refreshState.itemsToDelete) {
+            cycleCount.removeFromCycleCountItems(cycleCountItem)
+            cycleCountItem.delete()
+        }
+    }
+
+    /**
+     * Holds and manages the state of a cycle count product availability refresh.
+     */
+    private class CycleCountRefreshState {
+
+        // Input fields
+        CycleCount cycleCount
+
+        // Computed fields
+        Set<CycleCountItem> itemsOfMostRecentCount
+        int currentCountIndex
+        User assigneeForNewItems
+        Date dateCountedForNewItems
+        CycleCountItemStatus statusForNewItems
+
+        // Output fields
+        CycleCountItemsForRefresh cycleCountItemsForRefresh
+
+        CycleCountRefreshState(CycleCount cycleCount) {
+            this.cycleCount = cycleCount
+
+            // We only want to refresh the items of the most recent count. We do this because previous counts are
+            // already completed, so their data should be considered static.
+            itemsOfMostRecentCount = cycleCount.getItemsOfMostRecentCount()
+            currentCountIndex = itemsOfMostRecentCount.first().countIndex
+
+            // Used by newly created items. We know that the frontend only supports a single assignee and date counted
+            // for all items of a count, so for convenience we set the values of any new items to match.
+            assigneeForNewItems = itemsOfMostRecentCount.find{ it.assignee }?.assignee
+            dateCountedForNewItems = itemsOfMostRecentCount.find{ it.dateCounted }?.dateCounted ?: new Date()
+
+            // This logic is shared between count and recount flows so we need to check which we're in.
+            statusForNewItems = cycleCount.status.isCounting() ?
+                    CycleCountItemStatus.COUNTING : CycleCountItemStatus.INVESTIGATING
+
+            cycleCountItemsForRefresh = new CycleCountItemsForRefresh()
+        }
+
+        void addItemToCreate(AvailableItem item) {
+            cycleCountItemsForRefresh.itemsToCreate.add(item)
+        }
+
+        List<AvailableItem> getItemsToCreate() {
+            return cycleCountItemsForRefresh.itemsToCreate
+        }
+
+        void addItemToUpdate(CycleCountItem item, BigDecimal quantityOnHand) {
+            cycleCountItemsForRefresh.itemsToUpdate.put(item, quantityOnHand)
+        }
+
+        Map<CycleCountItem, BigDecimal> getItemsToUpdate() {
+            return cycleCountItemsForRefresh.itemsToUpdate
+        }
+
+        void addItemToDelete(CycleCountItem item) {
+            cycleCountItemsForRefresh.itemsToDelete.add(item)
+        }
+
+        List<CycleCountItem> getItemsToDelete() {
+            return cycleCountItemsForRefresh.itemsToDelete
+        }
+    }
+
+    /**
+     * POJO for holding the state of a product availability refresh on a cycle count.
+     */
+    class CycleCountItemsForRefresh {
+        List<AvailableItem> itemsToCreate = []
+        Map<CycleCountItem, BigDecimal> itemsToUpdate = [:]
+        List<CycleCountItem> itemsToDelete = []
+
+        /**
+         * @return true if any cycle count items are going to be (or already have been) created, updated, or deleted
+         *         as a result of the refresh
+         */
+        boolean itemsHaveChanged() {
+            return !itemsToCreate.isEmpty() || !itemsToUpdate.isEmpty() || !itemsToDelete.isEmpty()
+        }
     }
 }

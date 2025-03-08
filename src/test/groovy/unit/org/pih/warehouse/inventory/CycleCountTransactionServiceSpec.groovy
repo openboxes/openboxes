@@ -56,7 +56,8 @@ class CycleCountTransactionServiceSpec extends Specification implements DataTest
         // Set up the stubs
         cycleCountProductAvailabilityServiceStub = Stub(CycleCountProductAvailabilityService)
         cycleCountTransactionService.cycleCountProductAvailabilityService = cycleCountProductAvailabilityServiceStub
-        cycleCountProductAvailabilityServiceStub.refreshProductAvailability(_ as CycleCount) >> false
+        cycleCountProductAvailabilityServiceStub.refreshProductAvailability(_ as CycleCount) >>
+                new CycleCountProductAvailabilityService.CycleCountItemsForRefresh()
 
         productInventoryTransactionServiceStub = Stub(ProductInventoryTransactionService)
         cycleCountTransactionService.productInventoryTransactionService = productInventoryTransactionServiceStub

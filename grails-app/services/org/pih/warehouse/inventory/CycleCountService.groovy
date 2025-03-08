@@ -381,8 +381,10 @@ class CycleCountService {
         CycleCount cycleCount = command.cycleCount
 
         if (command.refreshQuantityOnHand) {
-            boolean hasQuantityChanged = cycleCountProductAvailabilityService.refreshProductAvailability(cycleCount)
-            if (hasQuantityChanged && command.failOnOutdatedQuantity) {
+            CycleCountProductAvailabilityService.CycleCountItemsForRefresh refreshedItems =
+                    cycleCountProductAvailabilityService.refreshProductAvailability(cycleCount)
+
+            if (refreshedItems.itemsHaveChanged() && command.failOnOutdatedQuantity) {
                 throw new IllegalArgumentException("Quantity on hand for a cycle count item is no longer up to date")
             }
         }

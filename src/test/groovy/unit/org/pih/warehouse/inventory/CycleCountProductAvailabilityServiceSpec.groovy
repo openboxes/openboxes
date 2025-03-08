@@ -74,10 +74,11 @@ class CycleCountProductAvailabilityServiceSpec extends Specification implements 
         productAvailabilityServiceStub.getAvailableItems(facility, [product.id], false, true) >> availableItems
 
         when: 'we refresh product availability'
-        boolean itemsHaveChanged = cycleCountProductAvailabilityService.refreshProductAvailability(cycleCount)
+        CycleCountProductAvailabilityService.CycleCountItemsForRefresh changedItems =
+                cycleCountProductAvailabilityService.refreshProductAvailability(cycleCount)
 
         then: 'items should not have changed'
-        assert !itemsHaveChanged
+        assert !changedItems.itemsHaveChanged()
         assert cycleCount.cycleCountItems.size() == 1
 
         CycleCountItem cycleCountItem = cycleCount.getCycleCountItem(binLocation, inventoryItem, 0)
@@ -116,10 +117,11 @@ class CycleCountProductAvailabilityServiceSpec extends Specification implements 
         productAvailabilityServiceStub.getAvailableItems(facility, [product.id], false, true) >> availableItems
 
         when: 'we refresh product availability'
-        boolean itemsHaveChanged = cycleCountProductAvailabilityService.refreshProductAvailability(cycleCount)
+        CycleCountProductAvailabilityService.CycleCountItemsForRefresh changedItems =
+                cycleCountProductAvailabilityService.refreshProductAvailability(cycleCount)
 
         then: 'items should have changed'
-        assert itemsHaveChanged
+        assert changedItems.itemsHaveChanged()
         assert cycleCount.cycleCountItems.size() == 1
 
         CycleCountItem cycleCountItem = cycleCount.getCycleCountItem(binLocation, inventoryItem, 0)
@@ -170,10 +172,11 @@ class CycleCountProductAvailabilityServiceSpec extends Specification implements 
         productAvailabilityServiceStub.getAvailableItems(facility, [product.id], false, true) >> availableItems
 
         when: 'we refresh product availability'
-        boolean itemsHaveChanged = cycleCountProductAvailabilityService.refreshProductAvailability(cycleCount)
+        CycleCountProductAvailabilityService.CycleCountItemsForRefresh changedItems =
+                cycleCountProductAvailabilityService.refreshProductAvailability(cycleCount)
 
         then: 'items should have changed'
-        assert itemsHaveChanged
+        assert changedItems.itemsHaveChanged()
         assert cycleCount.cycleCountItems.size() == 2
 
         CycleCountItem existingCycleCountItem = cycleCount.getCycleCountItem(existingBinLocation, existingInventoryItem, 0)
@@ -223,10 +226,11 @@ class CycleCountProductAvailabilityServiceSpec extends Specification implements 
         productAvailabilityServiceStub.getAvailableItems(facility, [product.id], false, true) >> availableItems
 
         when: 'we refresh product availability'
-        boolean itemsHaveChanged = cycleCountProductAvailabilityService.refreshProductAvailability(cycleCount)
+        CycleCountProductAvailabilityService.CycleCountItemsForRefresh changedItems =
+                cycleCountProductAvailabilityService.refreshProductAvailability(cycleCount)
 
         then: 'items should have changed'
-        assert itemsHaveChanged
+        assert changedItems.itemsHaveChanged()
 
         // TODO: We enter the correct flow but for some reason removeFromCycleCountItems doesn't actually remove
         //       the item. This is almost certainly due to unit test weirdness. Possibly because the item hasn't been
@@ -259,10 +263,11 @@ class CycleCountProductAvailabilityServiceSpec extends Specification implements 
         productAvailabilityServiceStub.getAvailableItems(facility, [product.id], false, true) >> []
 
         when: 'we refresh product availability'
-        boolean itemsHaveChanged = cycleCountProductAvailabilityService.refreshProductAvailability(cycleCount)
+        CycleCountProductAvailabilityService.CycleCountItemsForRefresh changedItems =
+                cycleCountProductAvailabilityService.refreshProductAvailability(cycleCount)
 
         then: 'items should have changed'
-        assert itemsHaveChanged
+        assert changedItems.itemsHaveChanged()
 
         // TODO: We enter the correct flow but for some reason removeFromCycleCountItems doesn't actually remove
         //       the item. This is almost certainly due to unit test weirdness. Possibly because the item hasn't been
@@ -295,11 +300,12 @@ class CycleCountProductAvailabilityServiceSpec extends Specification implements 
         productAvailabilityServiceStub.getAvailableItems(facility, [product.id], false, true) >> []
 
         when: 'we refresh product availability'
-        boolean itemsHaveChanged = cycleCountProductAvailabilityService.refreshProductAvailability(cycleCount)
+        CycleCountProductAvailabilityService.CycleCountItemsForRefresh changedItems =
+                cycleCountProductAvailabilityService.refreshProductAvailability(cycleCount)
 
         then: 'items should have changed'
-        assert itemsHaveChanged
-         assert cycleCount.cycleCountItems.size() == 1  // The item has not been removed!
+        assert changedItems.itemsHaveChanged()
+        assert cycleCount.cycleCountItems.size() == 1  // The item has not been removed!
 
         CycleCountItem cycleCountItem = cycleCount.getCycleCountItem(binLocation, inventoryItem, 0)
         assert cycleCountItem.quantityOnHand == 0  // QoH is changed
@@ -337,10 +343,11 @@ class CycleCountProductAvailabilityServiceSpec extends Specification implements 
         productAvailabilityServiceStub.getAvailableItems(facility, [product.id], false, true) >> availableItems
 
         when: 'we refresh product availability'
-        boolean itemsHaveChanged = cycleCountProductAvailabilityService.refreshProductAvailability(cycleCount)
+        CycleCountProductAvailabilityService.CycleCountItemsForRefresh changedItems =
+                cycleCountProductAvailabilityService.refreshProductAvailability(cycleCount)
 
         then: 'items should have changed'
-        assert itemsHaveChanged
+        assert changedItems.itemsHaveChanged()
         assert cycleCount.cycleCountItems.size() == 1  // The item has not been removed!
 
         CycleCountItem cycleCountItem = cycleCount.getCycleCountItem(binLocation, inventoryItem, 0)
@@ -387,10 +394,11 @@ class CycleCountProductAvailabilityServiceSpec extends Specification implements 
         productAvailabilityServiceStub.getAvailableItems(facility, [product.id], false, true) >> availableItems
 
         when: 'we refresh product availability'
-        boolean itemsHaveChanged = cycleCountProductAvailabilityService.refreshProductAvailability(cycleCount)
+        CycleCountProductAvailabilityService.CycleCountItemsForRefresh changedItems =
+                cycleCountProductAvailabilityService.refreshProductAvailability(cycleCount)
 
         then: 'items should have changed'
-        assert itemsHaveChanged
+        assert changedItems.itemsHaveChanged()
         assert cycleCount.cycleCountItems.size() == 2
 
         CycleCountItem countCycleCountItem = cycleCount.getCycleCountItem(binLocation, inventoryItem, 0)
