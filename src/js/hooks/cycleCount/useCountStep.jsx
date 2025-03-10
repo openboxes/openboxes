@@ -324,8 +324,8 @@ const useCountStep = () => {
         return;
       }
       await submitCount();
-    } finally {
       dispatch(eraseDraft());
+    } finally {
       hide();
     }
   };
