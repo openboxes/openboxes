@@ -10,6 +10,13 @@ enum CycleCountStatus {
     COMPLETED,
     CANCELED
 
+    /**
+     * @return true if the cycle count is fully closed out / resolved.
+     */
+    boolean isClosed() {
+        return this in [COMPLETED, CANCELED]
+    }
+
     static List<CycleCountStatus> listInProgress() {
         return [COUNTING, COUNTED, READY_TO_REVIEW]
     }
