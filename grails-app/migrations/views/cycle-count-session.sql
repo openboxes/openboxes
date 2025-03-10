@@ -8,10 +8,10 @@ SELECT
     product_availability.location_id                                                 as facility_id,
 
     -- Cycle count request ID
-    cycle_count_request_summary.cycle_count_request_id                               as cycle_count_request_id,
+    MAX(cycle_count_request_summary.cycle_count_request_id)                               as cycle_count_request_id,
 
     -- ABC Classification
-    -- FIXME Using a grouping operator due to a GROUP BY issue. This isn't the best approach sicne it'll return an
+    -- FIXME Using a grouping operator due to a GROUP BY issue. This isn't the best approach since it'll return an
     --  empty string or NULL value ahead of valid ABC classes (A, B, C, etc). But I don't have a better solution and
     --  this will likely work for 99% of cases.
     MIN(COALESCE(inventory_level_summary.abc_class, product.abc_class))              as abc_class,
@@ -41,12 +41,15 @@ SELECT
        AND pai.location_id = product_availability.location_id)                       as negative_item_count,
 
     -- Date last counted
+    -- NULL as date_last_count,
     (select max(date_counted)
      from product_count_history
      where product_count_history.product_id = product_availability.product_id
        and product_count_history.inventory_id = location.inventory_id
      group by inventory_id, product_id)                                              as date_last_count,
 
+#    NULL as date_next_count,
+#    NULL as days_until_next_count,
     cycle_count_metadata.date_expected                                               as date_next_count,
     cycle_count_metadata.days_until_next_count                                       as days_until_next_count,
     NULL                                                                             as date_latest_inventory
@@ -64,7 +67,7 @@ FROM product_availability
                          ON product_availability.product_id = inventory_level_summary.product_id AND
                             location.inventory_id = inventory_level_summary.inventory_id
 
-    -- The following
+    -- The following subquery pulls the latest cycle count request data
          LEFT OUTER JOIN (SELECT cycle_count_request.facility_id                          as facility_id,
                                  cycle_count_request.product_id                           as product_id,
                                  cycle_count_request.id                                   as cycle_count_request_id,
@@ -77,6 +80,8 @@ FROM product_availability
                          ON cycle_count_request_summary.product_id = product_availability.product_id
                              AND cycle_count_request_summary.facility_id = product_availability.location_id
 
+    -- The following subquery computes the expected next count date and days until next count to help with sorting
+    -- This subquery adds about 3 seconds to the response time for this query so it might make sense to pull this into
          LEFT OUTER JOIN (SELECT inventory_id,
                                  product_id,
                                  abc_class,
@@ -88,7 +93,10 @@ FROM product_availability
                             cycle_count_metadata.product_id = product_availability.product_id
 
 GROUP BY product_availability.location_id, product_availability.product_id, location.inventory_id
-HAVING sum(product_availability.quantity_on_hand) > 0 and cycle_count_metadata.days_until_next_count <= 0
-ORDER BY cycle_count_metadata.abc_class IS NULL asc, cycle_count_metadata.abc_class asc,
-         cycle_count_metadata.days_until_next_count
+
+-- Moved to the candidates query, but I wanted to leave this in the session view in case we need
+-- to consider reverting at some point before release.
+# HAVING sum(product_availability.quantity_on_hand) > 0 and cycle_count_metadata.days_until_next_count <= 0
+# ORDER BY cycle_count_metadata.abc_class IS NULL asc, cycle_count_metadata.abc_class asc,
+#         cycle_count_metadata.days_until_next_count
     );

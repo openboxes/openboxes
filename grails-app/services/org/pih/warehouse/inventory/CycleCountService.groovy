@@ -2,7 +2,7 @@ package org.pih.warehouse.inventory
 
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
-import java.text.SimpleDateFormat
+import org.hibernate.NullPrecedence
 import org.apache.commons.csv.CSVPrinter
 import org.apache.commons.lang.StringEscapeUtils
 import org.grails.datastore.mapping.query.api.Criteria
@@ -70,22 +70,40 @@ class CycleCountService {
             if (command.abcClasses) {
                 "in"("abcClass", command.abcClasses)
             }
-            if (command.sort) {
-                getCandidatesSortOrder(command.sort, command.order, delegate, usedAliases)
-            }
+
             if (!command.statuses) {
                 isNull("status")
             }
             else {
                 inList("status", command.statuses)
             }
+
             if (command.negativeQuantity) {
                 gt("negativeItemCount", 0)
             }
+
+            // FIXME It's possible we need this to be "ne" rather "gt" because we probably want to include
+            //  product/facility pairs where quantity on hand is negative.
+            // Moved this from the cycle count session view since it's a requirement of the candidate query,
+            // not the cycle count session.
+            gt("quantityOnHand", 0)
+
+            // FIXME This should only be used when querying for candidates, but right now we only have a single
+            //  candidates query for all of the subsets of the session (counted, ready to be counted, counting).
+            // This will filter out cycle count session records where a count has been completed in the required
+            // frequency internal (i.e. this helps reduce the results returned in the All Products tab).
+            lte("daysUntilNextCount", 0)
+
+            // FIXME Sort order should allow multiple sort order rules ("columna, -columnb"). We should consider
+            //  using a more conventional syntax for the column and direction i.e. "columna" sorts "columna" in
+            //  ascending order while "-columnb" sorts "columnb" in descending order.
+            // Don't check command.sort because we want the default case to be applied if there's no sort order
+            applySortOrder(command.sort, command.order, delegate, usedAliases)
+
         } as List<CycleCountCandidate>
     }
 
-    private static void getCandidatesSortOrder(String sortBy, String orderDirection, Criteria criteria, Set<String> usedAliases) {
+    private static void applySortOrder(String sortBy, String orderDirection, Criteria criteria, Set<String> usedAliases) {
         switch (sortBy) {
             case "product":
                 createProductAlias(criteria, usedAliases)
@@ -107,6 +125,14 @@ class CycleCountService {
                 criteria.addOrder(getOrderDirection("quantityOnHand", orderDirection))
                 break
             default:
+                // FIXME We could potentially handle this in the future by making ABC class a first-class citizen
+                //  and allowing it to be configured with a sort value, the default sort value in cases of NULL would
+                //  be some large integer value (999).
+                // The default sort order for the cycle count session (i.e. at least for the All Products tab) should
+                // be by ABC class, then by days until next count. The first order guarantees that NULL abc classes
+                // are sorted last.
+                criteria.order(Order.asc("abcClass").nulls(NullPrecedence.LAST))
+                        .order("daysUntilNextCount", "asc")
                 break
         }
     }

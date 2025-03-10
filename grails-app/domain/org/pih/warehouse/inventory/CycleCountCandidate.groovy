@@ -20,19 +20,21 @@ class CycleCountCandidate {
 
     CycleCountCandidateStatus status
 
-    Integer inventoryItemCount
-
     String internalLocations
 
     Integer quantityOnHand
 
     Integer quantityAvailable
 
+    Integer inventoryItemCount
+
     Integer negativeItemCount
 
     Date dateLastCount
 
     Date dateNextCount
+
+    Integer daysUntilNextCount
 
     Date dateLatestInventory
 
@@ -49,6 +51,8 @@ class CycleCountCandidate {
                         productCode: product.productCode,
                 ],
                 dateLastCount: dateLastCount,
+                dateNextCount: dateNextCount,
+                daysUntilNextCount: daysUntilNextCount,
                 category: [
                         id: product.category?.id,
                         name: product.category?.name,
