@@ -40,13 +40,22 @@ const useResolveStepTable = ({
   tableData,
   productCode,
   addEmptyRow,
+  focusProps,
+  tableIndex,
 }) => {
   const columnHelper = createColumnHelper();
   // State for saving data for binLocation dropdown
-  const [focusIndex, setFocusIndex] = useState(null);
-  const [focusId, setFocusId] = useState(null);
   const translate = useTranslate();
   const events = new EventEmitter();
+
+  const {
+    focusIndex,
+    setFocusIndex,
+    focusId,
+    setFocusId,
+    tableFocusIndex,
+    setTableFocusIndex,
+  } = focusProps;
 
   const {
     users,
@@ -159,11 +168,6 @@ const useResolveStepTable = ({
     return value;
   };
 
-  const resetFocus = () => {
-    setFocusIndex(null);
-    setFocusId(null);
-  };
-
   const defaultColumn = {
     cell: ({
       row: { original, index }, column: { id }, table,
@@ -270,6 +274,8 @@ const useResolveStepTable = ({
         setFocusIndex,
         addNewRow: () => addEmptyRow(productCode, cycleCountId),
         isNewRow,
+        setTableFocusIndex,
+        tableIndex,
       });
 
       return (
@@ -289,6 +295,8 @@ const useResolveStepTable = ({
               fieldId: columnPath,
               focusIndex,
               focusId,
+              tableFocusIndex,
+              tableIndex,
             }}
             onWheel={(event) => event.currentTarget.blur()}
             {...fieldProps}
@@ -494,7 +502,6 @@ const useResolveStepTable = ({
     columns,
     defaultColumn,
     users,
-    resetFocus,
   };
 };
 

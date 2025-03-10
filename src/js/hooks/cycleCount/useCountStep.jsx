@@ -36,6 +36,10 @@ const useCountStep = () => {
   // Saving selected "date counted" option, initially it's the date fetched from API
   const [dateCounted, setDateCounted] = useState({});
   const [isStepEditable, setIsStepEditable] = useState(true);
+  const [focusIndex, setFocusIndex] = useState(null);
+  const [focusId, setFocusId] = useState(null);
+  const [tableFocusIndex, setTableFocusIndex] = useState(null);
+
   const dispatch = useDispatch();
   const history = useHistory();
   const { show, hide } = useSpinner();
@@ -47,6 +51,11 @@ const useCountStep = () => {
     cycleCountIds: state.cycleCount.requests,
     currentLocation: state.session.currentLocation,
   }));
+
+  const resetFocus = () => {
+    setFocusIndex(null);
+    setFocusId(null);
+  };
 
   const showBinLocation = useMemo(() =>
     checkBinLocationSupport(currentLocation.supportedActivities), [currentLocation?.id]);
@@ -111,6 +120,7 @@ const useCountStep = () => {
       params: { id: cycleCountIds },
       format,
     });
+    resetFocus();
     hide();
   };
 
@@ -140,6 +150,7 @@ const useCountStep = () => {
     markAllItemsAsUpdated(cycleCountId);
     setCountedBy((prevState) => ({ ...prevState, [cycleCountId]: person }));
     setDefaultCountedBy((prevState) => ({ ...prevState, [cycleCountId]: person }));
+    resetFocus();
   };
 
   const getCountedBy = (cycleCountId) => countedBy?.[cycleCountId];
@@ -161,6 +172,7 @@ const useCountStep = () => {
 
         return data;
       });
+      resetFocus();
       triggerValidation();
       return;
     }
@@ -204,6 +216,7 @@ const useCountStep = () => {
 
       return data;
     });
+    resetFocus();
     triggerRerenderAfterAddingNewRow();
   };
 
@@ -216,10 +229,12 @@ const useCountStep = () => {
     if (isValid && areCountedByFilled) {
       setIsStepEditable(false);
     }
+    resetFocus();
   };
 
   const back = () => {
     setIsStepEditable(true);
+    resetFocus();
   };
 
   const save = async () => {
@@ -255,6 +270,7 @@ const useCountStep = () => {
     } finally {
       // After the save, refetch cycle counts so that a new row can't be saved multiple times
       await fetchCycleCounts();
+      resetFocus();
       hide();
     }
   };
@@ -328,6 +344,7 @@ const useCountStep = () => {
       }
       await submitCount();
     } finally {
+      resetFocus();
       hide();
     }
   };
@@ -362,6 +379,7 @@ const useCountStep = () => {
       ...date,
       [cycleCountId]: date,
     });
+    resetFocus();
   };
 
   return {
@@ -383,6 +401,14 @@ const useCountStep = () => {
     resolveDiscrepancies,
     isStepEditable,
     isFormValid,
+    focusProps: {
+      focusIndex,
+      setFocusIndex,
+      focusId,
+      setFocusId,
+      tableFocusIndex,
+      setTableFocusIndex,
+    },
   };
 };
 

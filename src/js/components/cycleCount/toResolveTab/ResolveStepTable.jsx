@@ -34,12 +34,13 @@ const ResolveStepTable = ({
   validationErrors,
   shouldHaveRootCause,
   isStepEditable,
+  focusProps,
+  tableIndex,
 }) => {
   const {
     columns,
     defaultColumn,
     users,
-    resetFocus,
   } = useResolveStepTable({
     cycleCountId: id,
     validationErrors,
@@ -49,6 +50,8 @@ const ResolveStepTable = ({
     shouldHaveRootCause,
     productCode: product?.productCode,
     addEmptyRow,
+    focusProps,
+    tableIndex,
   });
 
   const translate = useTranslate();
@@ -58,13 +61,6 @@ const ResolveStepTable = ({
   } = useSelector((state) => ({
     formatLocalizedDate: formatDate(state.localize),
   }));
-
-  const recountedByMeta = recountedBy ? {
-    id: recountedBy.id,
-    value: recountedBy.id,
-    label: recountedBy.label ?? `${recountedBy.firstName} ${recountedBy.lastName}`,
-    name: `${recountedBy.firstName} ${recountedBy.lastName}`,
-  } : undefined;
 
   return (
     <div className="list-page-list-section">
@@ -111,12 +107,8 @@ const ResolveStepTable = ({
               <SelectField
                 placeholder="Select"
                 options={users}
-                onChange={(person) => {
-                  assignRecountedBy(id)(person);
-                  resetFocus();
-                }}
+                onChange={assignRecountedBy(id)}
                 hideErrorMessageWrapper
-                defaultValue={recountedByMeta}
               />
             </HeaderSelect>
           ) : (
@@ -154,7 +146,6 @@ const ResolveStepTable = ({
           <Button
             onClick={() => {
               addEmptyRow(product?.productCode, id);
-              resetFocus();
             }}
             label="react.cycleCount.addNewRecord.label"
             defaultLabel="Add new record"
@@ -193,4 +184,13 @@ ResolveStepTable.propTypes = {
   setRecountedDate: PropTypes.func.isRequired,
   shouldHaveRootCause: PropTypes.func.isRequired,
   isStepEditable: PropTypes.bool.isRequired,
+  focusProps: PropTypes.shape({
+    focusIndex: PropTypes.number.isRequired,
+    setFocusIndex: PropTypes.func.isRequired,
+    focusId: PropTypes.string.isRequired,
+    setFocusId: PropTypes.func.isRequired,
+    tableFocusIndex: PropTypes.string.isRequired,
+    setTableFocusIndex: PropTypes.func.isRequired,
+  }).isRequired,
+  tableIndex: PropTypes.number.isRequired,
 };

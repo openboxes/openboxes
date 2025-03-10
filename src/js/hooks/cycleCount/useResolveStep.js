@@ -26,6 +26,9 @@ const useResolveStep = () => {
   // Saving selected "date recounted" option, initially it's the date fetched from API
   const [dateRecounted, setDateRecounted] = useState({});
   const [isStepEditable, setIsStepEditable] = useState(true);
+  const [focusIndex, setFocusIndex] = useState(null);
+  const [focusId, setFocusId] = useState(null);
+  const [tableFocusIndex, setTableFocusIndex] = useState(null);
   const { show, hide } = useSpinner();
 
   const {
@@ -48,6 +51,11 @@ const useResolveStep = () => {
     cycleCountIds: state.cycleCount.cycleCounts,
     currentLocation: state.session.currentLocation,
   }));
+
+  const resetFocus = () => {
+    setFocusIndex(null);
+    setFocusId(null);
+  };
 
   const showBinLocation = useMemo(() =>
     checkBinLocationSupport(currentLocation.supportedActivities), [currentLocation?.id]);
@@ -112,11 +120,13 @@ const useResolveStep = () => {
       params: { id: cycleCountIds },
       format,
     });
+    resetFocus();
     hide();
   };
 
   const assignRecountedBy = (cycleCountId) => (person) => {
     setRecountedBy((prevState) => ({ ...prevState, [cycleCountId]: person }));
+    resetFocus();
   };
 
   const getRecountedBy = (cycleCountId) => recountedBy?.[cycleCountId];
@@ -139,6 +149,7 @@ const useResolveStep = () => {
 
       return data;
     });
+    resetFocus();
     triggerValidation();
   };
 
@@ -175,10 +186,12 @@ const useResolveStep = () => {
 
       return data;
     });
+    resetFocus();
     triggerValidation();
   };
 
   const next = () => {
+    resetFocus();
     const isValid = triggerValidation();
     if (!isValid) {
       return;
@@ -196,10 +209,12 @@ const useResolveStep = () => {
 
   const back = () => {
     setIsStepEditable(true);
+    resetFocus();
   };
 
   const save = () => {
     console.log('save');
+    resetFocus();
   };
 
   const updateRow = (cycleCountId, rowId, columnId, value) => {
@@ -230,6 +245,7 @@ const useResolveStep = () => {
       ...date,
       [cycleCountId]: date,
     });
+    resetFocus();
   };
 
   return {
@@ -249,6 +265,14 @@ const useResolveStep = () => {
     next,
     save,
     back,
+    focusProps: {
+      focusIndex,
+      setFocusIndex,
+      focusId,
+      setFocusId,
+      tableFocusIndex,
+      setTableFocusIndex,
+    },
   };
 };
 

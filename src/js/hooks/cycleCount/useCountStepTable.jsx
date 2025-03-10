@@ -29,11 +29,19 @@ const useCountStepTable = ({
   isStepEditable,
   formatLocalizedDate,
   addEmptyRow,
+  focusProps,
+  tableIndex,
 }) => {
   const columnHelper = createColumnHelper();
   // State for saving data for binLocation dropdown
-  const [focusIndex, setFocusIndex] = useState(null);
-  const [focusId, setFocusId] = useState(null);
+  const {
+    focusIndex,
+    setFocusIndex,
+    focusId,
+    setFocusId,
+    tableFocusIndex,
+    setTableFocusIndex,
+  } = focusProps;
 
   const translate = useTranslate();
 
@@ -117,7 +125,6 @@ const useCountStepTable = ({
       const columnPath = id.replaceAll('_', '.');
       const initialValue = _.get(tableData, `[${index}].${columnPath}`);
       const [value, setValue] = useState(initialValue);
-
       const isFieldEditable = !original.id.includes('newRow') && ![
         cycleCountColumn.QUANTITY_COUNTED,
         cycleCountColumn.COMMENT,
@@ -194,6 +201,8 @@ const useCountStepTable = ({
         setFocusIndex,
         addNewRow: () => addEmptyRow(productCode, cycleCountId),
         isNewRow,
+        setTableFocusIndex,
+        tableIndex,
       });
 
       return (
@@ -219,6 +228,8 @@ const useCountStepTable = ({
               fieldId: columnPath,
               focusIndex,
               focusId,
+              tableFocusIndex,
+              tableIndex,
             }}
             onWheel={(event) => event.currentTarget.blur()}
             {...fieldProps}

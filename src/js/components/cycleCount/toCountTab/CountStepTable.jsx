@@ -33,6 +33,8 @@ const CountStepTable = ({
   countedBy,
   defaultCountedBy,
   isFormValid,
+  focusProps,
+  tableIndex,
 }) => {
   const translate = useTranslate();
   const localize = useSelector((state) => state.localize);
@@ -41,7 +43,6 @@ const CountStepTable = ({
     columns,
     defaultColumn,
     users,
-    resetFocus,
   } = useCountStepTable({
     cycleCountId: id,
     productCode: product?.productCode,
@@ -51,6 +52,8 @@ const CountStepTable = ({
     isStepEditable,
     formatLocalizedDate,
     addEmptyRow,
+    focusProps,
+    tableIndex,
   });
 
   // Default counted by needs to be stored in order to set the default select value correctly
@@ -119,10 +122,7 @@ const CountStepTable = ({
                 errorMessage={showCountedByErrorMessage()}
                 placeholder="Select"
                 options={users}
-                onChange={(person) => {
-                  assignCountedBy(id)(person);
-                  resetFocus();
-                }}
+                onChange={assignCountedBy(id)}
                 className="min-width-250"
                 defaultValue={defaultCountedByMeta}
               />
@@ -161,10 +161,7 @@ const CountStepTable = ({
             )}
           >
             <Button
-              onClick={() => {
-                addEmptyRow(product?.productCode, id);
-                resetFocus();
-              }}
+              onClick={() => addEmptyRow(product.productCode, id)}
               label="react.cycleCount.addNewRecord.label"
               defaultLabel="Add new record"
               variant="transparent"
@@ -205,4 +202,13 @@ CountStepTable.propTypes = {
     name: PropTypes.string.isRequired,
   }).isRequired,
   defaultCountedBy: PropTypes.shape({}).isRequired,
+  focusProps: PropTypes.shape({
+    focusIndex: PropTypes.number.isRequired,
+    setFocusIndex: PropTypes.func.isRequired,
+    focusId: PropTypes.string.isRequired,
+    setFocusId: PropTypes.func.isRequired,
+    tableFocusIndex: PropTypes.string.isRequired,
+    setTableFocusIndex: PropTypes.func.isRequired,
+  }).isRequired,
+  tableIndex: PropTypes.number.isRequired,
 };

@@ -26,6 +26,7 @@ const ResolveStep = () => {
     isStepEditable,
     getRecountedBy,
     getCountedBy,
+    focusProps,
   } = useResolveStep();
 
   return (
@@ -37,7 +38,7 @@ const ResolveStep = () => {
         />
       ) : <ConfirmStepHeader back={back} save={save} />}
       {tableData
-        .map(({ cycleCountItems, id }) => (
+        .map(({ cycleCountItems, id }, index) => (
           <ResolveStepTable
             key={id}
             id={id}
@@ -55,6 +56,8 @@ const ResolveStep = () => {
             isStepEditable={isStepEditable}
             recountedBy={getRecountedBy(id)}
             countedBy={getCountedBy(id)}
+            focusProps={focusProps}
+            tableIndex={index}
           />
         ))}
     </PageWrapper>
