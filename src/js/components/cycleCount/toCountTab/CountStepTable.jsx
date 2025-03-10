@@ -124,7 +124,7 @@ const CountStepTable = ({
                   resetFocus();
                 }}
                 className="min-width-250"
-                defaultValue={countedByMeta || defaultCountedByMeta}
+                defaultValue={defaultCountedByMeta}
               />
 
             </Tooltip>

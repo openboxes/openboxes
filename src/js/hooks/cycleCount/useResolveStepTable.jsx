@@ -290,6 +290,7 @@ const useResolveStepTable = ({
               focusIndex,
               focusId,
             }}
+            onWheel={(event) => event.currentTarget.blur()}
             {...fieldProps}
           />
           {(error || warning) && tooltipContent && (

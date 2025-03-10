@@ -59,6 +59,13 @@ const ResolveStepTable = ({
     formatLocalizedDate: formatDate(state.localize),
   }));
 
+  const recountedByMeta = recountedBy ? {
+    id: recountedBy.id,
+    value: recountedBy.id,
+    label: recountedBy.label ?? `${recountedBy.firstName} ${recountedBy.lastName}`,
+    name: `${recountedBy.firstName} ${recountedBy.lastName}`,
+  } : undefined;
+
   return (
     <div className="list-page-list-section">
       <p className="count-step-title pt-4 pl-4">
@@ -109,6 +116,7 @@ const ResolveStepTable = ({
                   resetFocus();
                 }}
                 hideErrorMessageWrapper
+                defaultValue={recountedByMeta}
               />
             </HeaderSelect>
           ) : (
