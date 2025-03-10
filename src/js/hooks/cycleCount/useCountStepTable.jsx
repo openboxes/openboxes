@@ -113,11 +113,6 @@ const useCountStepTable = ({
     return value;
   };
 
-  const resetFocus = () => {
-    setFocusIndex(null);
-    setFocusId(null);
-  };
-
   const defaultColumn = {
     cell: ({
       row: { original, index }, column: { id }, table,
@@ -344,7 +339,6 @@ const useCountStepTable = ({
     columns,
     defaultColumn,
     users,
-    resetFocus,
   };
 };
 
