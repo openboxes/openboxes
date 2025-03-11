@@ -12,10 +12,13 @@ import _ from 'lodash';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
-import { fetchBinLocations, fetchUsers, startResolution } from 'actions';
+import { fetchBinLocations, fetchUsers } from 'actions';
 import cycleCountApi from 'api/services/CycleCountApi';
 import { CYCLE_COUNT as CYCLE_COUNT_URL } from 'api/urls';
 import { CYCLE_COUNT } from 'consts/applicationUrls';
+import {
+  TO_RESOLVE_TAB,
+} from 'consts/cycleCount';
 import useCountStepValidation from 'hooks/cycleCount/useCountStepValidation';
 import useSpinner from 'hooks/useSpinner';
 import confirmationModal from 'utils/confirmationModalUtils';
@@ -277,8 +280,7 @@ const useCountStep = () => {
       currentLocation?.id,
       cycleCount?.id);
     }
-    dispatch(startResolution(cycleCountIds));
-    history.push(CYCLE_COUNT.resolveStep());
+    history.push(CYCLE_COUNT.list(TO_RESOLVE_TAB));
   };
 
   const resolveDiscrepanciesModalButtons = (onClose) => ([
