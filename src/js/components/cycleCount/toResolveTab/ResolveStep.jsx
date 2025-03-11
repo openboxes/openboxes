@@ -13,6 +13,7 @@ const ResolveStep = () => {
     tableData,
     validationErrors,
     printRecountForm,
+    refreshCountItems,
     next,
     tableMeta,
     addEmptyRow,
@@ -36,6 +37,7 @@ const ResolveStep = () => {
       {isStepEditable ? (
         <ResolveStepHeader
           printRecountForm={printRecountForm}
+          refreshCountItems={refreshCountItems}
           next={next}
           save={save}
         />
