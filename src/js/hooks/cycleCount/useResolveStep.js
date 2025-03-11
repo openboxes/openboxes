@@ -145,19 +145,13 @@ const useResolveStep = () => {
   const refreshCountItems = async () => {
     try {
       show();
-      // eslint-disable-next-line no-restricted-syntax
       for (const cycleCountId of cycleCountIds) {
-        // eslint-disable-next-line no-await-in-loop
         await cycleCountApi.refreshItems(currentLocation?.id, cycleCountId);
       }
     } finally {
       hide();
       await refetchData();
     }
-  };
-
-  const assignRecountedBy = (cycleCountId) => (person) => {
-    setRecountedBy((prevState) => ({ ...prevState, [cycleCountId]: person }));
   };
 
   const getRecountedBy = (cycleCountId) => recountedBy?.[cycleCountId];

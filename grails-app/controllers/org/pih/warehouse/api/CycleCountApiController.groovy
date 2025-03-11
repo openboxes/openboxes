@@ -174,8 +174,8 @@ class CycleCountApiController {
         render([data: cycleCountItem] as JSON)
     }
 
-    def refreshCycleCountItems(String cycleCountId) {
-        CycleCountDto cycleCount = cycleCountService.refreshCycleCountItems(cycleCountId)
+    def refreshCycleCount(String cycleCountId) {
+        CycleCountDto cycleCount = cycleCountService.refreshCycleCount(cycleCountId)
 
         render([data: cycleCount] as JSON)
     }

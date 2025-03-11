@@ -464,10 +464,10 @@ class CycleCountService {
     /**
      * Refreshes the most recent count items of a given cycle count.
      *
-     * A "refresh" means fetching the product availability for the product associated with the count and updating
+     * A "refresh" means fetching the product availability for the products associated with the count and updating
      * the QoH for each of the items in the most recent count.
      */
-    CycleCountDto refreshCycleCountItems(String cycleCountId) {
+    CycleCountDto refreshCycleCount(String cycleCountId) {
         CycleCount cycleCount = CycleCount.get(cycleCountId)
         if (!cycleCount) {
             throw new ObjectNotFoundException(cycleCountId, CycleCount.class.toString())

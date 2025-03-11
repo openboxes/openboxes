@@ -12,15 +12,17 @@ import RedirectButton from 'utils/RedirectButton';
 import Translate from 'utils/Translate';
 import CustomTooltip from 'wrappers/CustomTooltip';
 
-const ResolveStepHeader = ({ next, save, printRecountForm, refreshCountItems }) => {
+const ResolveStepHeader = ({
+  next, save, printRecountForm, refreshCountItems,
+}) => {
   const translate = useTranslate();
 
   return (
     <div className="d-flex justify-content-sm-between align-items-end">
       <RedirectButton
-        label="react.cycleCount.redirectToList.label"
-        defaultMessage="Back to Cycle Count List"
-        redirectTo={CYCLE_COUNT.list(TO_COUNT_TAB)}
+        label="react.cycleCount.redirectToResolveTab.label"
+        defaultMessage="Back to Resolve tab"
+        redirectTo={CYCLE_COUNT.list(TO_RESOLVE_TAB)}
         className="pt-5"
       />
       <div className="d-flex gap-8">

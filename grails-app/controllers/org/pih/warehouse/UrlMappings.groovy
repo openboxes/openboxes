@@ -987,9 +987,9 @@ class UrlMappings {
             action = [POST: "createCycleCountItem"]
         }
 
-        "/api/facilities/$facility/cycle-counts/$cycleCountId/items/refresh" {
+        "/api/facilities/$facility/cycle-counts/$cycleCountId/refresh" {
             controller = "cycleCountApi"
-            action = [POST: "refreshCycleCountItems"]
+            action = [POST: "refreshCycleCount"]
         }
 
         // Error handling
