@@ -47,7 +47,7 @@ const useResolveStepTable = ({
   const [focusId, setFocusId] = useState(null);
   const translate = useTranslate();
   const events = new EventEmitter();
-
+  const tableHasNewRow = tableData.some((row) => row.id?.includes('newRow'));
   const {
     users,
     currentLocation,
@@ -180,16 +180,21 @@ const useResolveStepTable = ({
           cycleCountColumn.ROOT_CAUSE,
           cycleCountColumn.COMMENT,
         ].includes(id);
+      const showTooltip = [cycleCountColumn.ROOT_CAUSE].includes(id);
       // We shouldn't allow users edit fetched data (quantityRecounted, rootCause and comment
       // field are editable)
       if (isFieldEditable || !isStepEditable) {
         return (
           <CustomTooltip
             content={getValueToDisplay(id, value)}
-            show={id === cycleCountColumn.COMMENT}
+            show={showTooltip}
           >
-            <TableCell className="static-cell-count-step align-items-center limit-lines-3 text-break resolve-table-limit-lines">
-              {getValueToDisplay(id, value)}
+            <TableCell
+              className="static-cell-count-step align-items-center resolve-table-limit-lines"
+            >
+              <div className="limit-lines-1">
+                {getValueToDisplay(id, value)}
+              </div>
             </TableCell>
           </CustomTooltip>
         );
@@ -272,15 +277,20 @@ const useResolveStepTable = ({
         addNewRow: () => addEmptyRow(productCode, cycleCountId),
         isNewRow,
       });
-
+      const isWiderWidth = [cycleCountColumn.ROOT_CAUSE, cycleCountColumn.COMMENT].includes(id);
       return (
-        <TableCell className="rt-td rt-td-count-step pb-0">
+        <TableCell
+          className="rt-td rt-td-count-step pb-0"
+          customTooltip={showTooltip && getValueToDisplay(id, value)}
+          tooltipClassname="w-100"
+          tooltipLabel={getValueToDisplay(id, value)}
+        >
           <Component
             type={type}
             value={value}
             onChange={onChange}
             onBlur={onBlur}
-            className={`w-75 m-1 hide-arrows ${error && 'border border-danger input-has-error'}`}
+            className={`${isWiderWidth ? 'w-90' : 'w-75'} m-1 hide-arrows ${error && 'border border-danger input-has-error'}`}
             showErrorBorder={error}
             hideErrorMessageWrapper
             warning={tooltipContent && warning}
@@ -441,7 +451,7 @@ const useResolveStepTable = ({
         </TableHeaderCell>
       ), []),
       meta: {
-        flexWidth: 120,
+        flexWidth: 160,
       },
     }),
     columnHelper.accessor(cycleCountColumn.COMMENT, {
@@ -451,7 +461,7 @@ const useResolveStepTable = ({
         </TableHeaderCell>
       ), []),
       meta: {
-        flexWidth: 228,
+        flexWidth: 160,
         getCellContext: () => ({
           className: 'overflow-hidden',
         }),
@@ -485,7 +495,7 @@ const useResolveStepTable = ({
       ), []),
       meta: {
         flexWidth: 50,
-        hide: !isStepEditable,
+        hide: !tableHasNewRow || !isStepEditable,
       },
     }),
   ];

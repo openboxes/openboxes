@@ -1672,6 +1672,10 @@ div.search-input:focus-within {
   min-width: 250px;
 }
 
+.w-90 {
+  width: 90%;
+}
+
 @for $i from 1 through 100 {
   .pl-#{$i}px {
     padding-left: #{$i}px;
