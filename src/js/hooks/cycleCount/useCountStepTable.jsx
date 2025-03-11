@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import { createColumnHelper } from '@tanstack/react-table';
 import _ from 'lodash';
@@ -22,7 +22,7 @@ import CustomTooltip from 'wrappers/CustomTooltip';
 // Managing state for single table, mainly table configuration (from count step)
 const useCountStepTable = ({
   cycleCountId,
-  productCode,
+  productId,
   removeRow,
   validationErrors,
   tableData,
@@ -33,7 +33,6 @@ const useCountStepTable = ({
   tableIndex,
 }) => {
   const columnHelper = createColumnHelper();
-  // State for saving data for binLocation dropdown
   const {
     focusIndex,
     setFocusIndex,
@@ -120,6 +119,7 @@ const useCountStepTable = ({
       const columnPath = id.replaceAll('_', '.');
       const initialValue = _.get(tableData, `[${index}].${columnPath}`);
       const [value, setValue] = useState(initialValue);
+
       const isFieldEditable = !original.id.includes('newRow') && ![
         cycleCountColumn.QUANTITY_COUNTED,
         cycleCountColumn.COMMENT,
@@ -149,10 +149,12 @@ const useCountStepTable = ({
       // on change function expects e.target.value for text fields,
       // in other cases it expects just the value
       const onChange = (e) => {
-        const enteredValue = e?.target?.value ?? e;
-        table.options.meta?.updateData(cycleCountId, original.id, id, enteredValue);
-        setValue(enteredValue);
+        setValue(e?.target?.value ?? e);
       };
+
+      useEffect(() => {
+        table.options.meta?.updateData(cycleCountId, original.id, id, value);
+      }, [value]);
 
       const onChangeRaw = (e) => {
         const valueToUpdate = (e?.target?.value ?? e)?.format();
@@ -194,7 +196,7 @@ const useCountStepTable = ({
         tableData,
         setFocusId,
         setFocusIndex,
-        addNewRow: () => addEmptyRow(productCode, cycleCountId),
+        addNewRow: () => addEmptyRow(productId, cycleCountId),
         isNewRow,
         setTableFocusIndex,
         tableIndex,
@@ -318,10 +320,10 @@ const useCountStepTable = ({
             disabled={original.id}
           >
             {(original.id.includes('newRow') || original.custom) && isStepEditable && (
-            <RiDeleteBinLine
-              onClick={() => removeRow(cycleCountId, original.id)}
-              size={22}
-            />
+              <RiDeleteBinLine
+                onClick={() => removeRow(cycleCountId, original.id)}
+                size={22}
+              />
             )}
           </Tooltip>
         </TableCell>

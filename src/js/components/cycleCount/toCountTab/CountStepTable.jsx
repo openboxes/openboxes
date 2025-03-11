@@ -45,7 +45,7 @@ const CountStepTable = ({
     users,
   } = useCountStepTable({
     cycleCountId: id,
-    productCode: product?.productCode,
+    productId: product?.id,
     tableData,
     validationErrors,
     removeRow,
@@ -126,7 +126,6 @@ const CountStepTable = ({
                 className="min-width-250"
                 defaultValue={defaultCountedByMeta}
               />
-
             </Tooltip>
           </HeaderSelect>
         ) : (
@@ -211,4 +210,5 @@ CountStepTable.propTypes = {
     setTableFocusIndex: PropTypes.func.isRequired,
   }).isRequired,
   tableIndex: PropTypes.number.isRequired,
+  isFormValid: PropTypes.bool.isRequired,
 };

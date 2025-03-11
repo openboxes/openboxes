@@ -38,7 +38,7 @@ const useResolveStepTable = ({
   shouldHaveRootCause,
   isStepEditable,
   tableData,
-  productCode,
+  productId,
   addEmptyRow,
   focusProps,
   tableIndex,
@@ -223,7 +223,6 @@ const useResolveStepTable = ({
       // on change function expects e.target.value for text fields,
       // in other cases it expects just the value
       const onChange = (e) => {
-        const enteredValue = e?.target?.value ?? e;
         if ([
           cycleCountColumn.BIN_LOCATION,
           cycleCountColumn.ROOT_CAUSE,
@@ -231,8 +230,16 @@ const useResolveStepTable = ({
           setError(null);
           setWarning(null);
         }
-        table.options.meta?.updateData(cycleCountId, original.id, id, enteredValue);
-        setValue(enteredValue);
+        setValue(e?.target?.value ?? e);
+      };
+
+      useEffect(() => {
+        table.options.meta?.updateData(cycleCountId, original.id, id, value);
+      }, [value]);
+
+      const onChangeRaw = (e) => {
+        const valueToUpdate = (e?.target?.value ?? e)?.format();
+        setValue(valueToUpdate);
       };
 
       // Table consists of text fields, one numerical field for quantity recounted,
@@ -272,7 +279,7 @@ const useResolveStepTable = ({
         tableData,
         setFocusId,
         setFocusIndex,
-        addNewRow: () => addEmptyRow(productCode, cycleCountId),
+        addNewRow: () => addEmptyRow(productId, cycleCountId),
         isNewRow,
         setTableFocusIndex,
         tableIndex,
@@ -287,6 +294,7 @@ const useResolveStepTable = ({
             onBlur={onBlur}
             className={`w-75 m-1 hide-arrows ${error && 'border border-danger input-has-error'}`}
             showErrorBorder={error}
+            onChangeRaw={onChangeRaw}
             hideErrorMessageWrapper
             warning={tooltipContent && warning}
             onKeyDown={(e) => handleKeyDown(e, index, columnPath)}
@@ -482,7 +490,7 @@ const useResolveStepTable = ({
               </span>
             )}
           >
-            {original.id.includes('newRow') && (
+            {(original.id.includes('newRow') || original.custom) && (
               <RiDeleteBinLine
                 onClick={() => removeRow(cycleCountId, original.id)}
                 size={22}

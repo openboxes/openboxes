@@ -355,7 +355,7 @@ const useToResolveTab = ({
     };
     spinner.show();
     try {
-      dispatch(startResolution(payload, currentLocation?.id));
+      await dispatch(startResolution(payload, currentLocation?.id));
       history.push(CYCLE_COUNT.resolveStep());
     } finally {
       spinner.hide();

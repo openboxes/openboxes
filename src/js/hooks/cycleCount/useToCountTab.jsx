@@ -352,7 +352,7 @@ const useToCountTab = ({
     };
     spinner.show();
     try {
-      dispatch(startCount(payload, currentLocation?.id));
+      await dispatch(startCount(payload, currentLocation?.id));
       history.push(CYCLE_COUNT.countStep());
     } finally {
       spinner.hide();
