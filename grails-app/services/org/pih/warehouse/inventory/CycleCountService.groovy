@@ -441,10 +441,7 @@ class CycleCountService {
     }
 
     CycleCountItemDto createCycleCountItem(CycleCountItemCommand command) {
-        boolean isInventoryItemNew = command.inventoryItem?.id == null
-        Integer currentQuantityOnHand = isInventoryItemNew
-                    ? 0
-                    : productAvailabilityService.getQuantityOnHandInBinLocation(command.inventoryItem, command.facility)
+        Integer currentQuantityOnHand = productAvailabilityService.getQuantityOnHandInBinLocation(command.inventoryItem, command.facility) ?: 0
         CycleCountItem cycleCountItem = new CycleCountItem(
                 facility: command.facility,
                 status: command.recount ? CycleCountItemStatus.INVESTIGATING : CycleCountItemStatus.COUNTING,
