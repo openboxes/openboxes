@@ -180,7 +180,11 @@ const useResolveStepTable = ({
           cycleCountColumn.ROOT_CAUSE,
           cycleCountColumn.COMMENT,
         ].includes(id);
-      const showStaticTooltip = [cycleCountColumn.ROOT_CAUSE, cycleCountColumn.COMMENT]
+      const showStaticTooltip = [
+        cycleCountColumn.ROOT_CAUSE,
+        cycleCountColumn.COMMENT,
+        cycleCountColumn.BIN_LOCATION,
+      ]
         .includes(id);
       // We shouldn't allow users edit fetched data (quantityRecounted, rootCause and comment
       // field are editable)
@@ -279,7 +283,7 @@ const useResolveStepTable = ({
         isNewRow,
       });
       const isWiderWidth = [cycleCountColumn.ROOT_CAUSE, cycleCountColumn.COMMENT].includes(id);
-      const showTooltip = [cycleCountColumn.ROOT_CAUSE].includes(id);
+      const showTooltip = [cycleCountColumn.ROOT_CAUSE, cycleCountColumn.BIN_LOCATION].includes(id);
       return (
         <TableCell
           className="rt-td rt-td-count-step pb-0"
