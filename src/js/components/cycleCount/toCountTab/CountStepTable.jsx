@@ -161,7 +161,7 @@ const CountStepTable = ({
             )}
           >
             <Button
-              onClick={() => addEmptyRow(product.productCode, id)}
+              onClick={() => addEmptyRow(product?.id, id)}
               label="react.cycleCount.addNewRecord.label"
               defaultLabel="Add new record"
               variant="transparent"

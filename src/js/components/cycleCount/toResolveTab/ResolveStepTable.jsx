@@ -145,7 +145,7 @@ const ResolveStepTable = ({
         >
           <Button
             onClick={() => {
-              addEmptyRow(product?.productCode, id);
+              addEmptyRow(product?.id, id);
             }}
             label="react.cycleCount.addNewRecord.label"
             defaultLabel="Add new record"

@@ -14,6 +14,7 @@ import TableHeaderCell from 'components/DataTable/TableHeaderCell';
 import Checkbox from 'components/form-elements/v2/Checkbox';
 import { CYCLE_COUNT, INVENTORY_ITEM_URL } from 'consts/applicationUrls';
 import CycleCountCandidateStatus from 'consts/cycleCountCandidateStatus';
+import cycleCountColumn from 'consts/cycleCountColumn';
 import MimeType from 'consts/mimeType';
 import useQueryParams from 'hooks/useQueryParams';
 import useSpinner from 'hooks/useSpinner';
@@ -116,7 +117,7 @@ const useToResolveTab = ({
 
   const getCycleCountRequestsIds = () => tableData.data.map((row) => row.cycleCountRequest.id);
 
-  const checkboxesColumn = columnHelper.accessor('selected', {
+  const checkboxesColumn = columnHelper.accessor(cycleCountColumn.SELECTED, {
     header: () => (
       <TableHeaderCell>
         <Checkbox
@@ -144,7 +145,7 @@ const useToResolveTab = ({
   });
 
   const columns = useMemo(() => [
-    columnHelper.accessor('status', {
+    columnHelper.accessor(cycleCountColumn.STATUS, {
       header: () => (
         <TableHeaderCell>
           {translate('react.cycleCount.table.status.label', 'Status')}
@@ -163,9 +164,9 @@ const useToResolveTab = ({
       },
     }),
     columnHelper.accessor((row) => `${row.product.productCode} ${row.product.name}`, {
-      id: 'product',
+      id: cycleCountColumn.PRODUCT,
       header: () => (
-        <TableHeaderCell sortable columnId="product" {...sortableProps}>
+        <TableHeaderCell sortable columnId={cycleCountColumn.PRODUCT} {...sortableProps}>
           {translate('react.cycleCount.table.products.label', 'Products')}
         </TableHeaderCell>
       ),
@@ -185,9 +186,9 @@ const useToResolveTab = ({
         flexWidth: 370,
       },
     }),
-    columnHelper.accessor('category.name', {
+    columnHelper.accessor(cycleCountColumn.CATEGORY_NAME, {
       header: () => (
-        <TableHeaderCell sortable columnId="category" {...sortableProps}>
+        <TableHeaderCell sortable columnId={cycleCountColumn.CATEGORY} {...sortableProps}>
           {translate('react.cycleCount.table.category.label', 'Category')}
         </TableHeaderCell>
       ),
@@ -200,7 +201,7 @@ const useToResolveTab = ({
         flexWidth: 200,
       },
     }),
-    columnHelper.accessor('internalLocations', {
+    columnHelper.accessor(cycleCountColumn.INTERNAL_LOCATIONS, {
       header: () => (
         <TableHeaderCell>
           {translate('react.cycleCount.table.binLocation.label', 'Bin Location')}
@@ -240,7 +241,7 @@ const useToResolveTab = ({
     }),
     columnHelper.accessor((row) =>
       row?.tags?.map?.((tag) => <Badge label={tag?.tag} variant="badge--purple" tooltip key={tag.id} />), {
-      id: 'tags',
+      id: cycleCountColumn.TAGS,
       header: () => (
         <TableHeaderCell>
           {translate('react.cycleCount.table.tag.label', 'Tag')}
@@ -259,7 +260,7 @@ const useToResolveTab = ({
     }),
     columnHelper.accessor((row) =>
       row?.productCatalogs?.map((catalog) => <Badge label={catalog?.name} variant="badge--blue" tooltip key={catalog.id} />), {
-      id: 'productCatalogs',
+      id: cycleCountColumn.PRODUCT_CATALOGS,
       header: () => (
         <TableHeaderCell>
           {translate('react.cycleCount.table.productCatalogue.label', 'Product Catalogue')}
@@ -276,9 +277,9 @@ const useToResolveTab = ({
         flexWidth: 200,
       },
     }),
-    columnHelper.accessor('abcClass', {
+    columnHelper.accessor(cycleCountColumn.ABC_CLASS, {
       header: () => (
-        <TableHeaderCell sortable columnId="abcClass" {...sortableProps}>
+        <TableHeaderCell sortable columnId={cycleCountColumn.ABC_CLASS} {...sortableProps}>
           {translate('react.cycleCount.table.abcClass.label', 'ABC Class')}
         </TableHeaderCell>
       ),
@@ -291,9 +292,9 @@ const useToResolveTab = ({
         flexWidth: 150,
       },
     }),
-    columnHelper.accessor('quantityOnHand', {
+    columnHelper.accessor(cycleCountColumn.QUANTITY_ON_HAND, {
       header: () => (
-        <TableHeaderCell sortable columnId="quantityOnHand" {...sortableProps}>
+        <TableHeaderCell sortable columnId={cycleCountColumn.QUANTITY_ON_HAND} {...sortableProps}>
           {translate('react.cycleCount.table.quantity.label', 'Quantity')}
         </TableHeaderCell>
       ),

@@ -9,6 +9,17 @@ const columns = {
   COUNT_DIFFERENCE: 'countDifference',
   RECOUNT_DIFFERENCE: 'recountDifference',
   ACTIONS: 'actions',
+  SELECTED: 'selected',
+  DATE_LAST_COUNTED: 'dateLastCounted',
+  PRODUCT: 'product',
+  CATEGORY_NAME: 'category.name',
+  CATEGORY: 'category',
+  INTERNAL_LOCATIONS: 'internalLocations',
+  TAGS: 'tags',
+  PRODUCT_CATALOGS: 'productCatalogs',
+  ABC_CLASS: 'abcClass',
+  QUANTITY_ON_HAND: 'quantityOnHand',
+  STATUS: 'status',
 };
 
 export default columns;
