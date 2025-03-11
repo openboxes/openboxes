@@ -47,6 +47,7 @@ const useResolveStepTable = ({
   const [focusId, setFocusId] = useState(null);
   const translate = useTranslate();
   const events = new EventEmitter();
+
   const {
     users,
     currentLocation,
@@ -192,7 +193,7 @@ const useResolveStepTable = ({
             <TableCell
               className="static-cell-count-step align-items-center resolve-table-limit-lines"
             >
-              <div className="limit-lines-1">
+              <div className={showStaticTooltip ? 'limit-lines-1' : 'limit-lines-3 text-break'}>
                 {getValueToDisplay(id, value)}
               </div>
             </TableCell>
