@@ -44,7 +44,7 @@ const CountStepTable = ({
     handleAddEmptyRow,
   } = useCountStepTable({
     cycleCountId: id,
-    productCode: product?.productCode,
+    productId: product?.id,
     tableData,
     validationErrors,
     removeRow,
@@ -198,4 +198,5 @@ CountStepTable.propTypes = {
     name: PropTypes.string.isRequired,
   }).isRequired,
   defaultCountedBy: PropTypes.shape({}).isRequired,
+  isFormValid: PropTypes.bool.isRequired,
 };

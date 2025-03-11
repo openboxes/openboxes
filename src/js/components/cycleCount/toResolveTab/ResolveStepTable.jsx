@@ -47,7 +47,7 @@ const ResolveStepTable = ({
     removeRow,
     isStepEditable,
     shouldHaveRootCause,
-    productCode: product?.productCode,
+    productId: product?.id,
     addEmptyRow,
   });
 
@@ -85,7 +85,7 @@ const ResolveStepTable = ({
             >
               <DateField
                 className="date-counted-date-picker date-field-input"
-                onChange={setRecountedDate}
+                onChangeRaw={setRecountedDate}
                 value={dateRecounted}
                 hideErrorMessageWrapper
               />
@@ -159,6 +159,7 @@ export default ResolveStepTable;
 ResolveStepTable.propTypes = {
   id: PropTypes.string.isRequired,
   product: PropTypes.shape({
+    id: PropTypes.string.isRequired,
     productCode: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
   }).isRequired,

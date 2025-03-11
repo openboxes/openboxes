@@ -1,18 +1,18 @@
 import React from 'react';
 
 import PropTypes from 'prop-types';
-import { RiPrinterLine } from 'react-icons/ri';
+import { RiPrinterLine, RiSave2Line } from 'react-icons/ri';
 
 import Button from 'components/form-elements/Button';
 import { CYCLE_COUNT } from 'consts/applicationUrls';
-import { TO_COUNT_TAB } from 'consts/cycleCount';
+import { TO_RESOLVE_TAB } from 'consts/cycleCount';
 import FileFormat from 'consts/fileFormat';
 import useTranslate from 'hooks/useTranslate';
 import RedirectButton from 'utils/RedirectButton';
 import Translate from 'utils/Translate';
 import CustomTooltip from 'wrappers/CustomTooltip';
 
-const ResolveStepHeader = ({ next, printRecountForm, refreshCountItems }) => {
+const ResolveStepHeader = ({ next, save, printRecountForm, refreshCountItems }) => {
   const translate = useTranslate();
 
   return (
@@ -61,6 +61,13 @@ const ResolveStepHeader = ({ next, printRecountForm, refreshCountItems }) => {
           />
         </CustomTooltip>
         <Button
+          onClick={save}
+          label="react.cycleCount.save.label"
+          defaultLabel="Save progress"
+          variant="primary"
+          StartIcon={<RiSave2Line size={18} />}
+        />
+        <Button
           onClick={next}
           label="react.default.button.next.label"
           defaultLabel="Next"
@@ -75,6 +82,7 @@ export default ResolveStepHeader;
 
 ResolveStepHeader.propTypes = {
   next: PropTypes.func.isRequired,
+  save: PropTypes.func.isRequired,
   printRecountForm: PropTypes.func.isRequired,
   refreshCountItems: PropTypes.func.isRequired,
 };

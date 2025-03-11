@@ -27,6 +27,9 @@ const ResolveStep = () => {
     isStepEditable,
     getRecountedBy,
     getCountedBy,
+    submitRecount,
+    getProduct,
+    getDateCounted,
   } = useResolveStep();
 
   return (
@@ -36,15 +39,16 @@ const ResolveStep = () => {
           printRecountForm={printRecountForm}
           refreshCountItems={refreshCountItems}
           next={next}
+          save={save}
         />
-      ) : <ConfirmStepHeader back={back} save={save} />}
+      ) : <ConfirmStepHeader back={back} save={submitRecount} />}
       {tableData
         .map(({ cycleCountItems, id }) => (
           <ResolveStepTable
             key={id}
             id={id}
-            product={cycleCountItems[0]?.product}
-            dateCounted={cycleCountItems[0]?.dateCounted}
+            product={getProduct(cycleCountItems)}
+            dateCounted={getDateCounted(cycleCountItems)}
             dateRecounted={getRecountedDate(id)}
             tableData={cycleCountItems}
             tableMeta={tableMeta}
