@@ -6,10 +6,10 @@
   <changeSet id="1633402273161-1" author="jmiranda" runOnChange="true" runAlways="true" failOnError="true">
     <comment>Views will be recreated after database migrations are executed.</comment>
     <sql>
+      DROP VIEW IF EXISTS cycle_count_candidate;
       DROP VIEW IF EXISTS cycle_count_frequency;
       DROP VIEW IF EXISTS cycle_count_session;
       DROP VIEW IF EXISTS cycle_count_metadata;
-      DROP VIEW IF EXISTS cycle_count_frequency;
       DROP VIEW IF EXISTS edit_page_item;
       DROP VIEW IF EXISTS fill_rate;
       DROP VIEW IF EXISTS invoice_item_candidate;

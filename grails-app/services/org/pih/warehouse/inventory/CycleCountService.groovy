@@ -1,6 +1,7 @@
 package org.pih.warehouse.inventory
 
 import grails.gorm.transactions.Transactional
+import grails.plugin.cache.Cacheable
 import grails.validation.ValidationException
 import org.hibernate.NullPrecedence
 import org.apache.commons.csv.CSVPrinter
@@ -21,6 +22,7 @@ class CycleCountService {
     CycleCountTransactionService cycleCountTransactionService
     ProductAvailabilityService productAvailabilityService
 
+    //@Cacheable
     List<CycleCountCandidate> getCandidates(CycleCountCandidateFilterCommand command, String facilityId) {
         if (command.hasErrors()) {
             throw new ValidationException("Invalid params", command.errors)
@@ -92,7 +94,7 @@ class CycleCountService {
             //  candidates query for all of the subsets of the session (counted, ready to be counted, counting).
             // This will filter out cycle count session records where a count has been completed in the required
             // frequency internal (i.e. this helps reduce the results returned in the All Products tab).
-            lte("daysUntilNextCount", 0)
+            //lte("daysUntilNextCount", 0)
 
             // FIXME Sort order should allow multiple sort order rules ("columna, -columnb"). We should consider
             //  using a more conventional syntax for the column and direction i.e. "columna" sorts "columna" in
@@ -131,8 +133,8 @@ class CycleCountService {
                 // The default sort order for the cycle count session (i.e. at least for the All Products tab) should
                 // be by ABC class, then by days until next count. The first order guarantees that NULL abc classes
                 // are sorted last.
-                criteria.order(Order.asc("abcClass").nulls(NullPrecedence.LAST))
-                        .order("daysUntilNextCount", "asc")
+                //criteria.order(Order.asc("abcClass").nulls(NullPrecedence.LAST))
+                //        .order("daysUntilNextCount", "asc")
                 break
         }
     }

@@ -8,7 +8,7 @@ SELECT
     product_availability.location_id                                                 as facility_id,
 
     -- Cycle count request ID
-    MAX(cycle_count_request_summary.cycle_count_request_id)                               as cycle_count_request_id,
+    MAX(cycle_count_request_summary.cycle_count_request_id)                          as cycle_count_request_id,
 
     -- ABC Classification
     -- FIXME Using a grouping operator due to a GROUP BY issue. This isn't the best approach since it'll return an
@@ -45,14 +45,14 @@ SELECT
     (select max(date_counted)
      from product_count_history
      where product_count_history.product_id = product_availability.product_id
-       and product_count_history.inventory_id = location.inventory_id
-     group by inventory_id, product_id)                                              as date_last_count,
+       and product_count_history.inventory_id = location.inventory_id)               as date_last_count,
 
-#    NULL as date_next_count,
-#    NULL as days_until_next_count,
+    #    NULL as date_next_count,
+    #    NULL as days_until_next_count,
     cycle_count_metadata.date_expected                                               as date_next_count,
     cycle_count_metadata.days_until_next_count                                       as days_until_next_count,
     NULL                                                                             as date_latest_inventory
+
 FROM product_availability
          JOIN location ON product_availability.location_id = location.id
          JOIN product ON product_availability.product_id = product.id
@@ -93,10 +93,5 @@ FROM product_availability
                             cycle_count_metadata.product_id = product_availability.product_id
 
 GROUP BY product_availability.location_id, product_availability.product_id, location.inventory_id
+    )
 
--- Moved to the candidates query, but I wanted to leave this in the session view in case we need
--- to consider reverting at some point before release.
-# HAVING sum(product_availability.quantity_on_hand) > 0 and cycle_count_metadata.days_until_next_count <= 0
-# ORDER BY cycle_count_metadata.abc_class IS NULL asc, cycle_count_metadata.abc_class asc,
-#         cycle_count_metadata.days_until_next_count
-    );
