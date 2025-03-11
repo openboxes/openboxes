@@ -47,7 +47,6 @@ const useResolveStepTable = ({
   const [focusId, setFocusId] = useState(null);
   const translate = useTranslate();
   const events = new EventEmitter();
-  const tableHasNewRow = tableData.some((row) => row.id?.includes('newRow'));
   const {
     users,
     currentLocation,
@@ -180,14 +179,15 @@ const useResolveStepTable = ({
           cycleCountColumn.ROOT_CAUSE,
           cycleCountColumn.COMMENT,
         ].includes(id);
-      const showTooltip = [cycleCountColumn.ROOT_CAUSE].includes(id);
+      const showStaticTooltip = [cycleCountColumn.ROOT_CAUSE, cycleCountColumn.COMMENT]
+        .includes(id);
       // We shouldn't allow users edit fetched data (quantityRecounted, rootCause and comment
       // field are editable)
       if (isFieldEditable || !isStepEditable) {
         return (
           <CustomTooltip
             content={getValueToDisplay(id, value)}
-            show={showTooltip}
+            show={showStaticTooltip}
           >
             <TableCell
               className="static-cell-count-step align-items-center resolve-table-limit-lines"
@@ -278,6 +278,7 @@ const useResolveStepTable = ({
         isNewRow,
       });
       const isWiderWidth = [cycleCountColumn.ROOT_CAUSE, cycleCountColumn.COMMENT].includes(id);
+      const showTooltip = [cycleCountColumn.ROOT_CAUSE].includes(id);
       return (
         <TableCell
           className="rt-td rt-td-count-step pb-0"
@@ -495,7 +496,7 @@ const useResolveStepTable = ({
       ), []),
       meta: {
         flexWidth: 50,
-        hide: !tableHasNewRow || !isStepEditable,
+        hide: !tableData.some((row) => row.id?.includes('newRow')) || !isStepEditable,
       },
     }),
   ];

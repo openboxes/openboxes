@@ -22,7 +22,6 @@ const TableCell = ({
   tooltipForm,
   tooltipClassname,
   customTooltip,
-  showCustomTooltip,
 }) => {
   let cellValue = children || value || defaultValue;
   const errorMessage = tdProps?.rest?.error;
@@ -67,7 +66,7 @@ const TableCell = ({
     cellValue = (
       <CustomTooltip
         content={tooltipLabel || value}
-        className={`d-flex ${tooltipClassname}`}
+        className={tooltipClassname}
       >
         {cellValue}
       </CustomTooltip>
@@ -141,7 +140,6 @@ TableCell.propTypes = {
   tooltipForm: PropTypes.bool,
   tooltipClassname: PropTypes.string,
   customTooltip: PropTypes.bool,
-  showCustomTooltip: PropTypes.bool,
 };
 
 export default TableCell;
