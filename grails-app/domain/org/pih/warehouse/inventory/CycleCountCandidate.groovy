@@ -38,6 +38,8 @@ class CycleCountCandidate {
 
     Date dateLatestInventory
 
+    Integer sortOrder
+
     static constraints = {
         version false
         table "cycle_count_candidate"
@@ -64,6 +66,9 @@ class CycleCountCandidate {
                 quantityOnHand: quantityOnHand,
                 cycleCountRequest: cycleCountRequest,
                 status: status.toString(),
+                inventoryItemCount: inventoryItemCount,
+                negativeItemCount: negativeItemCount,
+                sortOrder: sortOrder,
         ]
     }
 
