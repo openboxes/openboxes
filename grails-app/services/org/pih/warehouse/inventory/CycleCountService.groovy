@@ -398,8 +398,8 @@ class CycleCountService {
         }
 
         cycleCount.status = cycleCount.recomputeStatus()
-        if (command.cycleCount.status.isClosed()) {
-            closeCycleCount(command.cycleCount, command.refreshQuantityOnHand)
+        if (cycleCount.status.isClosed()) {
+            closeCycleCount(cycleCount, command.refreshQuantityOnHand)
         }
 
         // TODO: The beforeUpdate() on CycleCount class is not triggered without
