@@ -38,7 +38,7 @@ const useResolveStepTable = ({
   shouldHaveRootCause,
   isStepEditable,
   tableData,
-  productCode,
+  productId,
   addEmptyRow,
 }) => {
   const columnHelper = createColumnHelper();
@@ -160,7 +160,7 @@ const useResolveStepTable = ({
   };
 
   const handleAddEmptyRow = () => {
-    addEmptyRow(productCode, cycleCountId);
+    addEmptyRow(productId, cycleCountId);
     setFocusIndex(null);
     setFocusId(null);
   };
@@ -242,6 +242,11 @@ const useResolveStepTable = ({
         setValue(enteredValue);
       };
 
+      const onChangeRaw = (e) => {
+        const valueToUpdate = (e?.target?.value ?? e)?.format();
+        setValue(valueToUpdate);
+      };
+
       // Table consists of text fields, one numerical field for quantity recounted,
       // select field for bin locations and root cause and one date picker for the expiration date.
       const type = getFieldType(columnPath);
@@ -279,7 +284,7 @@ const useResolveStepTable = ({
         tableData,
         setFocusId,
         setFocusIndex,
-        addNewRow: () => addEmptyRow(productCode, cycleCountId),
+        addNewRow: () => addEmptyRow(productId, cycleCountId),
         isNewRow,
       });
       const isWiderWidth = [
@@ -305,6 +310,7 @@ const useResolveStepTable = ({
             onBlur={onBlur}
             className={`${isWiderWidth ? 'w-90' : 'w-75'} m-1 hide-arrows ${error && 'border border-danger input-has-error'}`}
             showErrorBorder={error}
+            onChangeRaw={onChangeRaw}
             hideErrorMessageWrapper
             warning={tooltipContent && warning}
             onKeyDown={(e) => handleKeyDown(e, index, columnPath)}
@@ -497,7 +503,7 @@ const useResolveStepTable = ({
               </span>
             )}
           >
-            {original.id.includes('newRow') && (
+            {(original.id.includes('newRow') || original.custom) && (
               <RiDeleteBinLine
                 onClick={() => removeRow(cycleCountId, original.id)}
                 size={22}

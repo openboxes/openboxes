@@ -148,26 +148,27 @@ const useAllProductsTab = ({
     },
   });
 
+  const dateLastCountColumn = columnHelper.accessor('dateLastCount', {
+    header: () => (
+      <TableHeaderCell
+        sortable
+        columnId="dateLastCount"
+        {...sortableProps}
+      >
+        {translate('react.cycleCount.table.lastCounted.label', 'Last Counted')}
+      </TableHeaderCell>
+    ),
+    cell: ({ getValue }) => (
+      <TableCell className="rt-td">
+        {formatLocalizedDate(getValue(), DateFormat.DD_MMM_YYYY)}
+      </TableCell>
+    ),
+    meta: {
+      flexWidth: 180,
+    },
+  });
+
   const columns = useMemo(() => [
-    columnHelper.accessor('dateLastCount', {
-      header: () => (
-        <TableHeaderCell
-          sortable
-          columnId="dateLastCount"
-          {...sortableProps}
-        >
-          {translate('react.cycleCount.table.lastCounted.label', 'Last Counted')}
-        </TableHeaderCell>
-      ),
-      cell: ({ getValue }) => (
-        <TableCell className="rt-td">
-          {formatLocalizedDate(getValue(), DateFormat.DD_MMM_YYYY)}
-        </TableCell>
-      ),
-      meta: {
-        flexWidth: 180,
-      },
-    }),
     columnHelper.accessor((row) => `${row.product.productCode} ${row.product.name}`, {
       id: 'product',
       header: () => (
@@ -356,7 +357,7 @@ const useAllProductsTab = ({
   };
 
   return {
-    columns: [checkboxesColumn, ...columns],
+    columns: [checkboxesColumn, dateLastCountColumn, ...columns],
     tableData,
     loading,
     emptyTableMessage,
