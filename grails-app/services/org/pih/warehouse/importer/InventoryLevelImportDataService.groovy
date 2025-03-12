@@ -11,6 +11,7 @@ package org.pih.warehouse.importer
 
 import grails.gorm.transactions.Transactional
 import grails.plugins.csv.CSVWriter
+import grails.validation.ValidationException
 import org.grails.plugins.excelimport.ExpectedPropertyType
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.InventoryLevel
@@ -124,8 +125,10 @@ class InventoryLevelImportDataService implements ImportDataService {
             }
             // Create a new inventory level
             else {
-                product.addToInventoryLevels(inventoryLevel)
-                product.save()
+                facility.inventory.addToConfiguredProducts(inventoryLevel)
+                facility.inventory.save()
+                if (!inventoryLevel.validate())
+                    throw new ValidationException("Invalid inventory level", inventoryLevel.errors)
             }
         }
     }
@@ -152,13 +155,19 @@ class InventoryLevelImportDataService implements ImportDataService {
     InventoryLevel updateOrCreateInventoryLevel(Location facility, Product product, Map params) {
         // FIXME This should handle duplicate inventory level but I'm not exactly sure
         //  what to do at this point so I'm going to let the user correct duplicates on their own
-        InventoryLevel inventoryLevel = findOrCreateInventoryLevel(facility, product)
+        InventoryLevel inventoryLevel = InventoryLevel.findByInventoryAndProductAndInternalLocationIsNull(facility.inventory, product)
+        if (!inventoryLevel) {
+            inventoryLevel = new InventoryLevel()
+        }
 
+        inventoryLevel.inventory = facility.inventory
+        inventoryLevel.product = product
         inventoryLevel.status = params.status ? params.status as InventoryStatus : InventoryStatus.SUPPORTED
         inventoryLevel.abcClass = params.abcClass
         inventoryLevel.minQuantity = params.minQuantity as Integer
         inventoryLevel.reorderQuantity = params.reorderQuantity as Integer
         inventoryLevel.maxQuantity = params.maxQuantity as Integer
+        inventoryLevel.forecastPeriodDays = 30
 
         // Don't clear locations if columns in import are null
         if (params.internalLocation) {
@@ -171,27 +180,6 @@ class InventoryLevelImportDataService implements ImportDataService {
             inventoryLevel.replenishmentLocation = params.replenishmentLocation as Location
         }
 
-        return inventoryLevel
-    }
-
-    /**
-     * Find or create an inventory level with the given parameters.
-     *
-     * @param product
-     * @param inventory
-     * @param preferredBinLocation
-     * @param minQuantity
-     * @param reorderQuantity
-     * @param maxQuantity
-     * @return
-     */
-    def findOrCreateInventoryLevel(Location facility, Product product) {
-        InventoryLevel inventoryLevel = InventoryLevel.findByInventoryAndProductAndInternalLocationIsNull(facility.inventory, product)
-        if (!inventoryLevel) {
-            inventoryLevel = new InventoryLevel()
-            inventoryLevel.product = product
-            inventoryLevel.inventory = facility.inventory
-        }
         return inventoryLevel
     }
 

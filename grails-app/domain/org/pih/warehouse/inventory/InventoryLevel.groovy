@@ -92,8 +92,9 @@ class InventoryLevel {
 
     static constraints = {
         status(nullable: true)
-        product(nullable: true, unique: ["inventory", "internalLocation"])
-        internalLocation(nullable: true)
+        inventory(nullable: false)
+        product(nullable: false)
+        internalLocation(nullable: true, unique: ["inventory", "product"])
         minQuantity(nullable: true, range: 0..2147483646)
         reorderQuantity(nullable: true, range: 0..2147483646)
         maxQuantity(nullable: true, range: 0..2147483646)
@@ -103,7 +104,7 @@ class InventoryLevel {
         preferredBinLocation(nullable: true)
         replenishmentLocation(nullable: true)
         binLocation(nullable: true)
-        abcClass(nullable: true)
+        abcClass(nullable: true, blank: false)
         preferred(nullable: true)
         comments(nullable: true)
         replenishmentPeriodDays(nullable: true)
