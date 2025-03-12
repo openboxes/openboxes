@@ -282,8 +282,15 @@ const useResolveStepTable = ({
         addNewRow: () => addEmptyRow(productCode, cycleCountId),
         isNewRow,
       });
-      const isWiderWidth = [cycleCountColumn.ROOT_CAUSE, cycleCountColumn.COMMENT].includes(id);
-      const showTooltip = [cycleCountColumn.ROOT_CAUSE, cycleCountColumn.BIN_LOCATION].includes(id);
+      const isWiderWidth = [
+        cycleCountColumn.ROOT_CAUSE,
+        cycleCountColumn.COMMENT,
+        cycleCountColumn.EXPIRATION_DATE,
+      ].includes(columnPath);
+      const showTooltip = [
+        cycleCountColumn.ROOT_CAUSE,
+        cycleCountColumn.BIN_LOCATION,
+      ].includes(id);
       return (
         <TableCell
           className="rt-td rt-td-count-step pb-0"
