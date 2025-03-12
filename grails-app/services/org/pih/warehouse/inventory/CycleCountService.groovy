@@ -398,7 +398,8 @@ class CycleCountService {
         }
 
         cycleCount.status = cycleCount.recomputeStatus()
-        if (cycleCount.status.isClosed()) {
+        // TODO: Investigate why status could be null here
+        if (cycleCount.status?.isClosed()) {
             closeCycleCount(cycleCount, command.refreshQuantityOnHand)
         }
 
@@ -450,6 +451,12 @@ class CycleCountService {
     }
 
     CycleCountItemDto createCycleCountItem(CycleCountItemCommand command) {
+        if (!command.inventoryItem?.id) {
+            if (!command.inventoryItem.validate()) {
+                throw new ValidationException("Invalid inventory item", command.inventoryItem.errors)
+            }
+            command.inventoryItem.save()
+        }
         Integer currentQuantityOnHand = productAvailabilityService.getQuantityOnHandInBinLocation(command.inventoryItem, command.facility) ?: 0
         CycleCountItem cycleCountItem = new CycleCountItem(
                 facility: command.facility,
