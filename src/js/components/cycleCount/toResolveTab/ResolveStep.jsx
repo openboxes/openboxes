@@ -30,6 +30,7 @@ const ResolveStep = () => {
     submitRecount,
     getProduct,
     getDateCounted,
+    isFormValid,
   } = useResolveStep();
 
   return (
@@ -61,6 +62,7 @@ const ResolveStep = () => {
             isStepEditable={isStepEditable}
             recountedBy={getRecountedBy(id)}
             countedBy={getCountedBy(id)}
+            isFormValid={isFormValid}
           />
         ))}
     </PageWrapper>

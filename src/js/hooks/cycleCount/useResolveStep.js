@@ -38,6 +38,7 @@ const useResolveStep = () => {
     validateRootCauses,
     shouldHaveRootCause,
     showEmptyRootCauseWarning,
+    isFormValid,
   } = useResolveStepValidation({ tableData });
 
   const dispatch = useDispatch();
@@ -347,6 +348,7 @@ const useResolveStep = () => {
     tableMeta,
     validationErrors,
     isStepEditable,
+    isFormValid,
     getRecountedBy,
     getCountedBy,
     addEmptyRow,
