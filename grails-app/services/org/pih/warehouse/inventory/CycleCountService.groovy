@@ -397,17 +397,31 @@ class CycleCountService {
             determineCycleCountItemStatusForSubmit(cycleCountItem, command.requireRecountOnDiscrepancy)
         }
 
-        cycleCount.status = cycleCount.recomputeStatus()
+        // We've updated the status of the cycle count items so we need to also update the status of the count.
+        recomputeCycleCountStatus(cycleCount)
+
         // TODO: Investigate why status could be null here
         if (cycleCount.status?.isClosed()) {
             closeCycleCount(cycleCount, command.refreshQuantityOnHand)
         }
 
-        // TODO: The beforeUpdate() on CycleCount class is not triggered without
-        // the line below, so without it status is not correct in the DB.
-        // Investigate why this line is needed.
-        cycleCount.save()
         return CycleCountDto.toDto(cycleCount)
+    }
+
+    /**
+     * Recalculate the status of a cycle count based on the status of its items.
+     *
+     * This status will be automatically recomputed when a cycle count is saved, so this method only needs to be called
+     * when we want to trigger a status recalculation outside of that flow, such as when the status of a cycle
+     * count item changes.
+     */
+    private void recomputeCycleCountStatus(CycleCount cycleCount) {
+        cycleCount.status = cycleCount.recomputeStatus()
+
+        // TODO: We sometimes get errors and the status update isn't persisted unless we call save like this. GORM
+        //       should be automatically persisting the status update when its session is flushed so we shouldn't
+        //       need this save() but something weird is happening. Investigate why this line is needed.
+        cycleCount.save()
     }
 
     private void determineCycleCountItemStatusForSubmit(CycleCountItem cycleCountItem, boolean requireRecountOnDiscrepancy) {
@@ -447,6 +461,9 @@ class CycleCountService {
         cycleCountItem.status = command.recount ? CycleCountItemStatus.INVESTIGATING : CycleCountItemStatus.COUNTING
         cycleCountItem.dateCounted = new Date()
 
+        // We've updated the status of a cycle count item so we need to also update the status of the count.
+        recomputeCycleCountStatus(cycleCountItem.cycleCount)
+
         return cycleCountItem.toDto()
     }
 
@@ -458,13 +475,15 @@ class CycleCountService {
             command.inventoryItem.save()
         }
         Integer currentQuantityOnHand = productAvailabilityService.getQuantityOnHandInBinLocation(command.inventoryItem, command.facility) ?: 0
+        CycleCount cycleCount = command.cycleCount
+
         CycleCountItem cycleCountItem = new CycleCountItem(
                 facility: command.facility,
                 status: command.recount ? CycleCountItemStatus.INVESTIGATING : CycleCountItemStatus.COUNTING,
                 countIndex: command.recount ? 1 : 0,
                 quantityOnHand: currentQuantityOnHand,
                 quantityCounted: command.quantityCounted,
-                cycleCount: command.cycleCount,
+                cycleCount: cycleCount,
                 location: command.binLocation,
                 inventoryItem: command.inventoryItem,
                 product: command.inventoryItem?.product,
@@ -480,6 +499,10 @@ class CycleCountService {
             throw new ValidationException("Invalid cycle count item", cycleCountItem.errors)
         }
         cycleCountItem.save()
+
+        // We're adding a new cycle count item to the count so we need to also update the status of the count.
+        cycleCount.addToCycleCountItems(cycleCountItem)
+        recomputeCycleCountStatus(cycleCount)
 
         return cycleCountItem.toDto()
     }
