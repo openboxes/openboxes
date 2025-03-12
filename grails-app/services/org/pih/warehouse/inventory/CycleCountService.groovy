@@ -396,10 +396,12 @@ class CycleCountService {
         cycleCount.cycleCountItems.each { CycleCountItem cycleCountItem ->
             determineCycleCountItemStatusForSubmit(cycleCountItem, command.requireRecountOnDiscrepancy)
         }
+
         cycleCount.status = cycleCount.recomputeStatus()
-        if (cycleCount.status == CycleCountStatus.READY_TO_REVIEW) {
-            cycleCountTransactionService.createTransactions(cycleCount, command.refreshQuantityOnHand)
+        if (cycleCount.status.isClosed()) {
+            closeCycleCount(cycleCount, command.refreshQuantityOnHand)
         }
+
         // TODO: The beforeUpdate() on CycleCount class is not triggered without
         // the line below, so without it status is not correct in the DB.
         // Investigate why this line is needed.
@@ -409,10 +411,32 @@ class CycleCountService {
 
     private void determineCycleCountItemStatusForSubmit(CycleCountItem cycleCountItem, boolean requireRecountOnDiscrepancy) {
         if ((cycleCountItem.quantityOnHand == cycleCountItem.quantityCounted) || !requireRecountOnDiscrepancy) {
-            cycleCountItem.status = CycleCountItemStatus.READY_TO_REVIEW
+            // TODO: Once we add support for the "to review" tab, this should be changed to assign status =
+            //       CycleCountItemStatus.READY_TO_REVIEW. For now we simply complete the count for the item.
+            cycleCountItem.status = CycleCountItemStatus.APPROVED
             return
         }
         cycleCountItem.status = CycleCountItemStatus.COUNTED
+    }
+
+    /**
+     * Given a resolved cycle count, close it out by bringing it to the completion state and committing any
+     * required quantity adjustments.
+     */
+    private void closeCycleCount(CycleCount cycleCount, boolean refreshQuantityOnHand) {
+        // If the count was cancelled, there's nothing to do except also cancel the request
+        if (cycleCount.status == CycleCountStatus.CANCELED) {
+            cycleCount.cycleCountRequest.status = CycleCountRequestStatus.CANCELED
+            return
+        }
+
+        if (cycleCount.status != CycleCountStatus.COMPLETED) {
+            throw new IllegalStateException("Cannot complete cycle count when it's in status ${cycleCount.status}")
+        }
+
+        // The count completed successfully, so commit the adjustments and close out the cycle count request.
+        cycleCountTransactionService.createTransactions(cycleCount, refreshQuantityOnHand)
+        cycleCount.cycleCountRequest.status = CycleCountRequestStatus.COMPLETED
     }
 
     CycleCountItemDto updateCycleCountItem(CycleCountUpdateItemCommand command) {

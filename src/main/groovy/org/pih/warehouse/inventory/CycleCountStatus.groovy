@@ -23,4 +23,11 @@ enum CycleCountStatus {
     boolean isRecounting() {
         return this in [COUNTED, INVESTIGATING]
     }
+
+    /**
+     * @return true if the cycle count is fully closed out / resolved.
+     */
+    boolean isClosed() {
+        return this in [COMPLETED, CANCELED]
+    }
 }
