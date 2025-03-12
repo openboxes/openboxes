@@ -769,14 +769,15 @@ export const startCount = (payload, locationId) => async (dispatch) => {
 };
 
 export const startResolution = (payload, locationId) => async (dispatch) => {
-  // If moving directly from count to resolve workflow, payload already contains cycleCountIds
-  let cycleCountIds = payload;
-
-  // If locationId is not provided, we're moving from count to resolve workflow
-  if (locationId) {
-    const cycleCounts = await cycleCountApi.startRecount({ payload, locationId });
-    cycleCountIds = cycleCounts?.data?.data?.map?.((cycleCount) => cycleCount.id);
-  }
+  const cycleCounts = await cycleCountApi.startRecount({
+    payload: {
+      cycleCounts:
+        payload.map((cycleCountId) =>
+          ({ cycleCount: cycleCountId, countIndex: 1 })),
+    },
+    locationId,
+  });
+  const cycleCountIds = cycleCounts?.data?.data?.map?.((cycleCount) => cycleCount.id);
   return dispatch({
     type: START_RESOLUTION,
     payload: cycleCountIds,

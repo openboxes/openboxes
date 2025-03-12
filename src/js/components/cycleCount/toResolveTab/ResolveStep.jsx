@@ -30,6 +30,7 @@ const ResolveStep = () => {
     submitRecount,
     getProduct,
     getDateCounted,
+    isFormValid,
   } = useResolveStep();
 
   return (
@@ -41,7 +42,12 @@ const ResolveStep = () => {
           next={next}
           save={save}
         />
-      ) : <ConfirmStepHeader back={back} save={submitRecount} />}
+      ) : (
+        <ConfirmStepHeader
+          back={back}
+          save={submitRecount}
+        />
+      )}
       {tableData
         .map(({ cycleCountItems, id }) => (
           <ResolveStepTable
@@ -61,6 +67,7 @@ const ResolveStep = () => {
             isStepEditable={isStepEditable}
             recountedBy={getRecountedBy(id)}
             countedBy={getCountedBy(id)}
+            isFormValid={isFormValid}
           />
         ))}
     </PageWrapper>

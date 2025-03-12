@@ -11,7 +11,8 @@ import useTranslate from 'hooks/useTranslate';
 const useResolveStepValidation = ({ tableData }) => {
   const [validationErrors, setValidationErrors] = useState({});
   const [isRootCauseWarningSkipped, setIsRootCauseWarningSkipped] = useState(false);
-
+  // isValid is null only at the beginning, after submitting
+  const [isValid, setIsValid] = useState(null);
   const translate = useTranslate();
 
   const {
@@ -91,8 +92,10 @@ const useResolveStepValidation = ({ tableData }) => {
       };
     }, {});
 
+    const isFormValid = _.every(Object.values(errors), (val) => val.success);
     setValidationErrors(errors);
-    return _.every(Object.values(errors), (val) => val.success);
+    setIsValid(isFormValid);
+    return isFormValid;
   };
 
   const validateRootCauses = () => {
@@ -132,6 +135,7 @@ const useResolveStepValidation = ({ tableData }) => {
   return {
     validationErrors,
     setValidationErrors,
+    isFormValid: isValid,
     triggerValidation,
     validateRootCauses,
     shouldHaveRootCause,
