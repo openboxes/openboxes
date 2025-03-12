@@ -53,6 +53,13 @@ const ResolveStepTable = ({
 
   const translate = useTranslate();
 
+  const defaultRecountedByMeta = recountedBy ? {
+    id: recountedBy.id,
+    value: recountedBy.id,
+    label: recountedBy.label ?? `${recountedBy.firstName} ${recountedBy.lastName}`,
+    name: `${recountedBy.firstName} ${recountedBy.lastName}`,
+  } : undefined;
+
   const {
     formatLocalizedDate,
   } = useSelector((state) => ({
@@ -105,6 +112,7 @@ const ResolveStepTable = ({
                 placeholder="Select"
                 options={users}
                 onChange={assignRecountedBy(id)}
+                defaultValue={defaultRecountedByMeta}
                 hideErrorMessageWrapper
               />
             </HeaderSelect>
