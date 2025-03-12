@@ -41,6 +41,7 @@ const useResolveStep = () => {
     validateRootCauses,
     shouldHaveRootCause,
     showEmptyRootCauseWarning,
+    isFormValid,
   } = useResolveStepValidation({ tableData });
 
   const dispatch = useDispatch();
@@ -226,7 +227,12 @@ const useResolveStep = () => {
 
   const next = () => {
     const isValid = triggerValidation();
-    if (!isValid) {
+    const areRecountedByFilled = _.every(
+      cycleCountIds,
+      (id) => getRecountedBy(id)?.id,
+    );
+
+    if (!isValid || !areRecountedByFilled) {
       return;
     }
 
@@ -390,6 +396,7 @@ const useResolveStep = () => {
     tableMeta,
     validationErrors,
     isStepEditable,
+    isFormValid,
     getRecountedBy,
     getCountedBy,
     addEmptyRow,

@@ -33,6 +33,7 @@ const ResolveStepTable = ({
   setRecountedDate,
   validationErrors,
   shouldHaveRootCause,
+  isFormValid,
   isStepEditable,
 }) => {
   const {
@@ -65,6 +66,14 @@ const ResolveStepTable = ({
   } = useSelector((state) => ({
     formatLocalizedDate: formatDate(state.localize),
   }));
+
+  const showRecountedByErrorMessage = () => {
+    if (isFormValid === null) {
+      return null;
+    }
+
+    return recountedBy?.id ? null : true;
+  };
 
   return (
     <div className="list-page-list-section">
@@ -109,11 +118,13 @@ const ResolveStepTable = ({
               className="ml-5 count-step-select-counted-by"
             >
               <SelectField
+                errorMessage={showRecountedByErrorMessage()}
                 placeholder="Select"
                 options={users}
                 onChange={assignRecountedBy(id)}
                 defaultValue={defaultRecountedByMeta}
                 hideErrorMessageWrapper
+                className="min-width-250"
               />
             </HeaderSelect>
           ) : (
@@ -188,4 +199,5 @@ ResolveStepTable.propTypes = {
   setRecountedDate: PropTypes.func.isRequired,
   shouldHaveRootCause: PropTypes.func.isRequired,
   isStepEditable: PropTypes.bool.isRequired,
+  isFormValid: PropTypes.bool.isRequired,
 };
