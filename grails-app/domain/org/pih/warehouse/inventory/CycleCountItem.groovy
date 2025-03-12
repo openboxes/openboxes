@@ -1,6 +1,7 @@
 package org.pih.warehouse.inventory
 
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.ReasonCode
 import org.pih.warehouse.core.User
 import org.pih.warehouse.product.Product
@@ -20,7 +21,7 @@ class CycleCountItem implements Comparable {
 
     Product product
 
-    User assignee
+    Person assignee
 
     Integer countIndex
 

@@ -148,6 +148,18 @@ const useResolveStep = () => {
     hide();
   };
 
+  const refreshCountItems = async () => {
+    try {
+      show();
+      for (const cycleCountId of cycleCountIds) {
+        await cycleCountApi.refreshItems(currentLocation?.id, cycleCountId);
+      }
+    } finally {
+      hide();
+      await refetchData();
+    }
+  };
+
   const getRecountedBy = (cycleCountId) => recountedBy?.[cycleCountId];
 
   const getCountedBy = (cycleCountId) => tableData?.current.find(
@@ -351,6 +363,7 @@ const useResolveStep = () => {
     addEmptyRow,
     removeRow,
     printRecountForm,
+    refreshCountItems,
     assignRecountedBy,
     getRecountedDate,
     setRecountedDate,
