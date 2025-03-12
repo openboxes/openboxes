@@ -10,7 +10,7 @@ const columns = {
   RECOUNT_DIFFERENCE: 'recountDifference',
   ACTIONS: 'actions',
   SELECTED: 'selected',
-  DATE_LAST_COUNTED: 'dateLastCounted',
+  DATE_LAST_COUNTED: 'dateLastCount',
   PRODUCT: 'product',
   CATEGORY_NAME: 'category.name',
   CATEGORY: 'category',
