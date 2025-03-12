@@ -216,7 +216,12 @@ const useResolveStep = () => {
 
   const next = () => {
     const isValid = triggerValidation();
-    if (!isValid) {
+    const areRecountedByFilled = _.every(
+      cycleCountIds,
+      (id) => getRecountedBy(id)?.id,
+    );
+
+    if (!isValid || !areRecountedByFilled) {
       return;
     }
 
