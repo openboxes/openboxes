@@ -2,7 +2,9 @@ import React, { useEffect } from 'react';
 
 import PropTypes from 'prop-types';
 import { RiCalculatorLine, RiDownload2Line, RiPrinterLine } from 'react-icons/ri';
+import { useSelector } from 'react-redux';
 
+import CycleCountDraftInfoBar from 'components/cycleCount/CycleCountDraftInfoBar';
 import DataTable from 'components/DataTable/v2/DataTable';
 import Button from 'components/form-elements/Button';
 import FileFormat from 'consts/fileFormat';
@@ -20,6 +22,8 @@ const CycleCountToCount = ({ filterParams, toCountTabCheckboxes, tablePagination
   } = tablePaginationProps;
 
   const { selectedCheckboxesAmount } = toCountTabCheckboxes;
+
+  const cycleCountIds = useSelector((state) => (state.cycleCount.requests));
 
   const {
     columns,
@@ -42,6 +46,7 @@ const CycleCountToCount = ({ filterParams, toCountTabCheckboxes, tablePagination
 
   return (
     <div>
+      {cycleCountIds.length !== 0 && <CycleCountDraftInfoBar />}
       <div className="d-flex justify-content-sm-between align-items-center">
         <span className="selected-rows-indicator pl-4">
           {selectedCheckboxesAmount}

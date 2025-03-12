@@ -8,6 +8,7 @@ import {
   CHANGE_CURRENT_LOCALE,
   CHANGE_CURRENT_LOCATION,
   CLOSE_INFO_BAR,
+  ERASE_DRAFT,
   FETCH_APPROVERS,
   FETCH_ATTRIBUTES,
   FETCH_BIN_LOCATIONS,
@@ -781,3 +782,7 @@ export const startResolution = (payload, locationId) => async (dispatch) => {
     payload: cycleCountIds,
   });
 };
+
+export const eraseDraft = () => ({
+  type: ERASE_DRAFT,
+});

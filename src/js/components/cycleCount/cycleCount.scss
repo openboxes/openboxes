@@ -231,3 +231,10 @@ input.hide-arrows::-webkit-inner-spin-button {
 input.hide-arrows[type=number] {
   -moz-appearance: textfield;
 }
+
+.draft-modal {
+  background-color: var(--blue-200);
+  margin: 10px 16px;
+  padding: 10px 16px;
+  color: var(--blue-700);
+}
