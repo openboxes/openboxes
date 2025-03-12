@@ -279,7 +279,7 @@ const useCountStep = () => {
       currentLocation?.id,
       cycleCount?.id);
     }
-    dispatch(startResolution(cycleCountIds));
+    dispatch(startResolution(cycleCountIds, currentLocation?.id));
     history.push(CYCLE_COUNT.resolveStep());
   };
 
