@@ -112,7 +112,7 @@ const CountStepTable = ({
               content={countedByMeta?.label || translate('react.cycleCount.countedBy.label', 'Counted By')}
               show={!showCountedByErrorMessage()}
             >
-              <div style={{ position: 'relative' }}>
+              <div className="position-relative">
                 <SelectField
                   errorMessage={showCountedByErrorMessage()}
                   placeholder="Select"

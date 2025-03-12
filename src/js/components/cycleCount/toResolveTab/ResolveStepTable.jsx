@@ -123,7 +123,7 @@ const ResolveStepTable = ({
                 content={recountedBy?.label || translate('react.cycleCount.recountedBy.label', 'Recounted by')}
                 show={!showRecountedByErrorMessage()}
               >
-                <div style={{ position: 'relative' }}>
+                <div className="position-relative">
                   <SelectField
                     errorMessage={showRecountedByErrorMessage()}
                     placeholder="Select"
