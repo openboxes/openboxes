@@ -14,7 +14,7 @@ SELECT
     -- FIXME Using a grouping operator due to a GROUP BY issue. This isn't the best approach since it'll return an
     --  empty string or NULL value ahead of valid ABC classes (A, B, C, etc). But I don't have a better solution and
     --  this will likely work for 99% of cases.
-    MIN(COALESCE(inventory_level_summary.abc_class, product.abc_class))              as abc_class,
+    MIN(inventory_level_summary.abc_class)              as abc_class,
 
     -- Status of any pending cycle counts
     -- Consolidate the statuses down to a single field representing the status of the candidate itself.
@@ -35,27 +35,23 @@ SELECT
 
     # Stuff we need to include now or wait for the materialized view
     -- Negative item count
+    -- NULL as negative_item_count,
     (SELECT SUM(CASE WHEN pai.quantity_on_hand < 0 THEN 1 ELSE 0 END)
      FROM product_availability pai
      WHERE pai.product_id = product_availability.product_id
-       AND pai.location_id = product_availability.location_id)                       as negative_item_count,
+       AND pai.location_id = product_availability.location_id
+     group by pai.product_id, pai.location_id)                                       as negative_item_count,
 
     -- Date last counted
     -- NULL as date_last_count,
-    (select max(date_counted)
-     from product_count_history
-     where product_count_history.product_id = product_availability.product_id
-       and product_count_history.inventory_id = location.inventory_id)               as date_last_count,
-
-    #    NULL as date_next_count,
-    #    NULL as days_until_next_count,
+    cycle_count_metadata.date_counted                                                as date_last_count,
     cycle_count_metadata.date_expected                                               as date_next_count,
     cycle_count_metadata.days_until_next_count                                       as days_until_next_count,
     NULL                                                                             as date_latest_inventory
 
 FROM product_availability
          JOIN location ON product_availability.location_id = location.id
-         JOIN product ON product_availability.product_id = product.id
+         -- JOIN product ON product_availability.product_id = product.id
     # FIXME need to add a unique constraint to prevent duplicate inventory levels for a single facility / product
     # Using min(abc_class) means we'll return the highest value if there are multiple inventory levels with different abc classes (A, B, C)
          LEFT OUTER JOIN (SELECT inventory_id,
@@ -85,6 +81,7 @@ FROM product_availability
          LEFT OUTER JOIN (SELECT inventory_id,
                                  product_id,
                                  abc_class,
+                                 max(date_counted)          as date_counted,
                                  max(date_expected)         as date_expected,
                                  max(days_until_next_count) as days_until_next_count
                           FROM cycle_count_metadata

@@ -1,3 +1,6 @@
+
+-- FIXME Consider cleaning the ABC classification here instead of in the session view.
+--  We could change the default case to DEFAULT here as well. The only
 CREATE OR REPLACE VIEW product_classification AS (
     select
         inventory_level.inventory_id as inventory_id,

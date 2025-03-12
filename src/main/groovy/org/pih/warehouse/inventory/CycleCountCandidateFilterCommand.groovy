@@ -30,7 +30,7 @@ class CycleCountCandidateFilterCommand extends PaginationCommand implements Vali
 
     String format
 
-    boolean negativeQuantity = false
+    Boolean negativeQuantity = false
 
     static constraints = {
         statuses(nullable: true)

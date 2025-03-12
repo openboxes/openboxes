@@ -22,7 +22,6 @@ class CycleCountService {
     CycleCountTransactionService cycleCountTransactionService
     ProductAvailabilityService productAvailabilityService
 
-    //@Cacheable
     List<CycleCountCandidate> getCandidates(CycleCountCandidateFilterCommand command, String facilityId) {
         if (command.hasErrors()) {
             throw new ValidationException("Invalid params", command.errors)

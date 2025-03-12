@@ -1,19 +1,20 @@
 CREATE OR REPLACE VIEW cycle_count_metadata AS
 SELECT
     CRC32(CONCAT(inventory_id, product_id)) as id,
-    cycle_count_metadata_tmp.inventory_id,
-    cycle_count_metadata_tmp.product_id,
-    cycle_count_metadata_tmp.date_counted,
-    cycle_count_metadata_tmp.days_since_last_count,
-    cycle_count_metadata_tmp.abc_class,
-    cycle_count_frequency.frequency,
+    cycle_count_metadata_tmp.inventory_id as inventory_id,
+    cycle_count_metadata_tmp.product_id as product_id,
+    cycle_count_metadata_tmp.date_counted as date_counted,
+    cycle_count_metadata_tmp.date_counted as date_counted2,
+    cycle_count_metadata_tmp.days_since_last_count as days_since_last_count,
+    cycle_count_metadata_tmp.abc_class as abc_class,
+    cycle_count_frequency.frequency as frequencey,
     date_add(cycle_count_metadata_tmp.date_counted, INTERVAL cycle_count_frequency.frequency DAY) as date_expected,
     datediff(date_add(cycle_count_metadata_tmp.date_counted, INTERVAL cycle_count_frequency.frequency DAY), now()) as days_until_next_count
 FROM (
          SELECT
-             product_count_history.inventory_id,
-             product_count_history.product_id,
-             product_count_history.date_counted,
+             product_count_history.inventory_id as inventory_id,
+             product_count_history.product_id as product_id,
+             product_count_history.date_counted as date_counted,
              datediff(now(), date_counted) as days_since_last_count,
              -- FIXME Used to clean data, this should not be used in the actual solution
              CASE WHEN abc_class = 'A' THEN 'A' WHEN abc_class = 'B' THEN 'B' WHEN abc_class = 'C' THEN 'C' ELSE 'DEFAULT' END as abc_class

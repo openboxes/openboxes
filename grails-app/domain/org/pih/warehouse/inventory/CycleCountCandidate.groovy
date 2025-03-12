@@ -40,7 +40,7 @@ class CycleCountCandidate {
 
     static constraints = {
         version false
-        table "cycle_count_session"
+        table "cycle_count_candidate"
     }
 
     Map toJson() {
