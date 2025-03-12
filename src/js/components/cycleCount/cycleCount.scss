@@ -208,8 +208,13 @@ limit-lines($lines-number) {
     color: var(--blue-primary);
   }
 
-  &--top-70 {
+  &--top-40 {
     top: 40%;
+    left: 5px;
+  }
+
+  &--top-60 {
+    top: 60%;
     left: 5px;
   }
 }

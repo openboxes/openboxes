@@ -124,7 +124,7 @@ const CountStepTable = ({
                 {showCountedByErrorMessage() && (
                   <CustomTooltip
                     content={translate('react.cycleCount.requiredField', 'This field is required')}
-                    className="tooltip-icon tooltip-icon--error tooltip-icon--top-70"
+                    className="tooltip-icon tooltip-icon--error tooltip-icon--top-40"
                     icon={RiErrorWarningLine}
                   />
                 )}
