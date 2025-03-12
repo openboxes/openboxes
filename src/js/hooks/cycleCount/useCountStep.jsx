@@ -33,9 +33,7 @@ const useCountStep = () => {
   // Saving selected "date counted" option, initially it's the date fetched from API
   const [dateCounted, setDateCounted] = useState({});
   const [isStepEditable, setIsStepEditable] = useState(true);
-  const [focusIndex, setFocusIndex] = useState(null);
-  const [focusId, setFocusId] = useState(null);
-  const [tableFocusIndex, setTableFocusIndex] = useState(null);
+  const [refreshFocusCounter, setRefreshFocusCounter] = useState(0);
 
   const dispatch = useDispatch();
   const history = useHistory();
@@ -50,8 +48,7 @@ const useCountStep = () => {
   }));
 
   const resetFocus = () => {
-    setFocusIndex(null);
-    setFocusId(null);
+    setRefreshFocusCounter((prev) => prev + 1);
   };
 
   const showBinLocation = useMemo(() =>
@@ -213,7 +210,6 @@ const useCountStep = () => {
 
       return data;
     });
-    resetFocus();
     triggerRerenderAfterAddingNewRow();
   };
 
@@ -399,14 +395,7 @@ const useCountStep = () => {
     resolveDiscrepancies,
     isStepEditable,
     isFormValid,
-    focusProps: {
-      focusIndex,
-      setFocusIndex,
-      focusId,
-      setFocusId,
-      tableFocusIndex,
-      setTableFocusIndex,
-    },
+    refreshFocusCounter,
   };
 };
 

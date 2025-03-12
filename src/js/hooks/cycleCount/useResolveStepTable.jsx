@@ -40,22 +40,16 @@ const useResolveStepTable = ({
   tableData,
   productId,
   addEmptyRow,
-  focusProps,
-  tableIndex,
+  refreshFocusCounter,
 }) => {
   const columnHelper = createColumnHelper();
+  const [focusIndex, setFocusIndex] = useState(null);
+  const [focusId, setFocusId] = useState(null);
+  const [prevForceResetFocus, setPrevForceResetFocus] = useState(0);
+
   // State for saving data for binLocation dropdown
   const translate = useTranslate();
   const events = new EventEmitter();
-
-  const {
-    focusIndex,
-    setFocusIndex,
-    focusId,
-    setFocusId,
-    tableFocusIndex,
-    setTableFocusIndex,
-  } = focusProps;
 
   const {
     users,
@@ -75,6 +69,14 @@ const useResolveStepTable = ({
     checkBinLocationSupport(currentLocation.supportedActivities), [currentLocation?.id]);
 
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (refreshFocusCounter !== prevForceResetFocus) {
+      setFocusIndex(null);
+      setFocusId(null);
+      setPrevForceResetFocus(refreshFocusCounter);
+    }
+  }, [refreshFocusCounter]);
 
   useEffect(() => {
     if (!reasonCodes?.length) {
@@ -233,6 +235,8 @@ const useResolveStepTable = ({
         setValue(e?.target?.value ?? e);
       };
 
+      // After pulling the latest changes, table.options.meta?.updateData no longer
+      // works on onChange, so for now, I put it inside useEffect
       useEffect(() => {
         table.options.meta?.updateData(cycleCountId, original.id, id, value);
       }, [value]);
@@ -281,8 +285,6 @@ const useResolveStepTable = ({
         setFocusIndex,
         addNewRow: () => addEmptyRow(productId, cycleCountId),
         isNewRow,
-        setTableFocusIndex,
-        tableIndex,
       });
 
       return (
@@ -303,8 +305,6 @@ const useResolveStepTable = ({
               fieldId: columnPath,
               focusIndex,
               focusId,
-              tableFocusIndex,
-              tableIndex,
             }}
             onWheel={(event) => event.currentTarget.blur()}
             {...fieldProps}

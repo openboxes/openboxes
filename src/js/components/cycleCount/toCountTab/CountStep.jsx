@@ -27,7 +27,7 @@ const CountStep = () => {
     getCountedBy,
     getDefaultCountedBy,
     isFormValid,
-    focusProps,
+    refreshFocusCounter,
   } = useCountStep();
 
   return (
@@ -45,7 +45,7 @@ const CountStep = () => {
         />
       )}
       {tableData
-        .map(({ cycleCountItems, id }, index) => (
+        .map(({ cycleCountItems, id }) => (
           <CountStepTable
             key={id}
             id={id}
@@ -62,8 +62,7 @@ const CountStep = () => {
             countedBy={getCountedBy(id)}
             defaultCountedBy={getDefaultCountedBy(id)}
             isFormValid={isFormValid}
-            focusProps={focusProps}
-            tableIndex={index}
+            refreshFocusCounter={refreshFocusCounter}
           />
         ))}
     </PageWrapper>

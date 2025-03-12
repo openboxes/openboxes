@@ -29,18 +29,12 @@ const useCountStepTable = ({
   isStepEditable,
   formatLocalizedDate,
   addEmptyRow,
-  focusProps,
-  tableIndex,
+  refreshFocusCounter,
 }) => {
   const columnHelper = createColumnHelper();
-  const {
-    focusIndex,
-    setFocusIndex,
-    focusId,
-    setFocusId,
-    tableFocusIndex,
-    setTableFocusIndex,
-  } = focusProps;
+  const [focusIndex, setFocusIndex] = useState(null);
+  const [focusId, setFocusId] = useState(null);
+  const [prevForceResetFocus, setPrevForceResetFocus] = useState(0);
 
   const translate = useTranslate();
 
@@ -49,6 +43,14 @@ const useCountStepTable = ({
     binLocations: state.cycleCount.binLocations,
     currentLocation: state.session.currentLocation,
   }));
+
+  useEffect(() => {
+    if (refreshFocusCounter !== prevForceResetFocus) {
+      setFocusIndex(null);
+      setFocusId(null);
+      setPrevForceResetFocus(refreshFocusCounter);
+    }
+  }, [refreshFocusCounter]);
 
   const showBinLocation = useMemo(() =>
     checkBinLocationSupport(currentLocation.supportedActivities), [currentLocation?.id]);
@@ -152,6 +154,8 @@ const useCountStepTable = ({
         setValue(e?.target?.value ?? e);
       };
 
+      // After pulling the latest changes, table.options.meta?.updateData no longer
+      // works on onChange, so for now, I put it inside useEffect
       useEffect(() => {
         table.options.meta?.updateData(cycleCountId, original.id, id, value);
       }, [value]);
@@ -198,8 +202,6 @@ const useCountStepTable = ({
         setFocusIndex,
         addNewRow: () => addEmptyRow(productId, cycleCountId),
         isNewRow,
-        setTableFocusIndex,
-        tableIndex,
       });
 
       return (
@@ -225,8 +227,6 @@ const useCountStepTable = ({
               fieldId: columnPath,
               focusIndex,
               focusId,
-              tableFocusIndex,
-              tableIndex,
             }}
             onWheel={(event) => event.currentTarget.blur()}
             {...fieldProps}

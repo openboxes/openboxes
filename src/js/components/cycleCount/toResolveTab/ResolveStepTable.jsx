@@ -34,8 +34,7 @@ const ResolveStepTable = ({
   validationErrors,
   shouldHaveRootCause,
   isStepEditable,
-  focusProps,
-  tableIndex,
+  refreshFocusCounter,
 }) => {
   const {
     columns,
@@ -50,8 +49,7 @@ const ResolveStepTable = ({
     shouldHaveRootCause,
     productId: product?.id,
     addEmptyRow,
-    focusProps,
-    tableIndex,
+    refreshFocusCounter,
   });
 
   const translate = useTranslate();
@@ -185,13 +183,5 @@ ResolveStepTable.propTypes = {
   setRecountedDate: PropTypes.func.isRequired,
   shouldHaveRootCause: PropTypes.func.isRequired,
   isStepEditable: PropTypes.bool.isRequired,
-  focusProps: PropTypes.shape({
-    focusIndex: PropTypes.number.isRequired,
-    setFocusIndex: PropTypes.func.isRequired,
-    focusId: PropTypes.string.isRequired,
-    setFocusId: PropTypes.func.isRequired,
-    tableFocusIndex: PropTypes.string.isRequired,
-    setTableFocusIndex: PropTypes.func.isRequired,
-  }).isRequired,
-  tableIndex: PropTypes.number.isRequired,
+  refreshFocusCounter: PropTypes.number.isRequired,
 };

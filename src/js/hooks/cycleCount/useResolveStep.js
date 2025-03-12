@@ -29,9 +29,7 @@ const useResolveStep = () => {
   // Saving selected "date recounted" option, initially it's the date fetched from API
   const [dateRecounted, setDateRecounted] = useState({});
   const [isStepEditable, setIsStepEditable] = useState(true);
-  const [focusIndex, setFocusIndex] = useState(null);
-  const [focusId, setFocusId] = useState(null);
-  const [tableFocusIndex, setTableFocusIndex] = useState(null);
+  const [refreshFocusCounter, setRefreshFocusCounter] = useState(0);
   const { show, hide } = useSpinner();
 
   const {
@@ -58,8 +56,7 @@ const useResolveStep = () => {
   }));
 
   const resetFocus = () => {
-    setFocusIndex(null);
-    setFocusId(null);
+    setRefreshFocusCounter((prev) => prev + 1);
   };
 
   const showBinLocation = useMemo(() =>
@@ -208,7 +205,6 @@ const useResolveStep = () => {
 
       return data;
     });
-    resetFocus();
     triggerValidation();
   };
 
@@ -365,14 +361,7 @@ const useResolveStep = () => {
     back,
     getProduct,
     getDateCounted,
-    focusProps: {
-      focusIndex,
-      setFocusIndex,
-      focusId,
-      setFocusId,
-      tableFocusIndex,
-      setTableFocusIndex,
-    },
+    refreshFocusCounter,
   };
 };
 

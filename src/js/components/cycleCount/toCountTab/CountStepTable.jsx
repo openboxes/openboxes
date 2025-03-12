@@ -33,8 +33,7 @@ const CountStepTable = ({
   countedBy,
   defaultCountedBy,
   isFormValid,
-  focusProps,
-  tableIndex,
+  refreshFocusCounter,
 }) => {
   const translate = useTranslate();
   const localize = useSelector((state) => state.localize);
@@ -52,8 +51,7 @@ const CountStepTable = ({
     isStepEditable,
     formatLocalizedDate,
     addEmptyRow,
-    focusProps,
-    tableIndex,
+    refreshFocusCounter,
   });
 
   // Default counted by needs to be stored in order to set the default select value correctly
@@ -201,14 +199,6 @@ CountStepTable.propTypes = {
     name: PropTypes.string.isRequired,
   }).isRequired,
   defaultCountedBy: PropTypes.shape({}).isRequired,
-  focusProps: PropTypes.shape({
-    focusIndex: PropTypes.number.isRequired,
-    setFocusIndex: PropTypes.func.isRequired,
-    focusId: PropTypes.string.isRequired,
-    setFocusId: PropTypes.func.isRequired,
-    tableFocusIndex: PropTypes.string.isRequired,
-    setTableFocusIndex: PropTypes.func.isRequired,
-  }).isRequired,
-  tableIndex: PropTypes.number.isRequired,
   isFormValid: PropTypes.bool.isRequired,
+  refreshFocusCounter: PropTypes.number.isRequired,
 };

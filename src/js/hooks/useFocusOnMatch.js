@@ -7,16 +7,13 @@ const useFocusOnMatch = ({
   fieldIndex,
   focusIndex,
   fieldId,
-  tableFocusIndex,
-  tableIndex,
   ref,
   type,
 }) => {
   useEffect(() => {
     const shouldFocus = focusId
       && fieldIndex === focusIndex
-      && fieldId === focusId
-      && tableFocusIndex === tableIndex;
+      && fieldId === focusId;
 
     if (shouldFocus && type === componentType.DATE_FIELD) {
       ref.current?.setOpen(true);
