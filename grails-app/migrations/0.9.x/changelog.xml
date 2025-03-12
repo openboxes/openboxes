@@ -27,4 +27,6 @@
     <include file="0.9.x/changelog-2025-02-06-0000-add-column-status-to-cycle-count.xml" />
     <include file="0.9.x/changelog-2025-02-06-2200-drop-not-null-constraint-on-bin-location-in-cycle-count-item.xml" />
     <include file="0.9.x/changelog-2025-02-11-1530-add-column-cycle-count-to-transaction.xml" />
+    <include file="0.9.x/changelog-2025-03-11-1300-drop-user-foreign-key-from-assignee-in-cycle-count-item.xml" />
+    <include file="0.9.x/changelog-2025-03-11-1400-add-person-foreign-key-for-assignee-in-cycle-count-item.xml" />
 </databaseChangeLog>
