@@ -36,6 +36,8 @@ class CycleCountCandidate {
 
     Integer daysUntilNextCount
 
+    Boolean included
+
     Date dateLatestInventory
 
     Integer sortOrder

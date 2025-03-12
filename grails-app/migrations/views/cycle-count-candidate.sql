@@ -1,6 +1,7 @@
 CREATE OR REPLACE VIEW cycle_count_candidate AS
 (
 SELECT *,
+       (negative_item_count > 0 OR quantity_on_hand > 0) as included,
        CASE
            -- Calculate the sort order priority for each cycle count candidate
            -- 0 = Has never been counted or overdue for a count

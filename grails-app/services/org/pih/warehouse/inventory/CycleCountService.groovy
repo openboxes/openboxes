@@ -87,7 +87,8 @@ class CycleCountService {
             //  product/facility pairs where quantity on hand is negative.
             // Moved this from the cycle count session view since it's a requirement of the candidate query,
             // not the cycle count session.
-            gt("quantityOnHand", 0)
+            eq("included", true)
+            //gt("quantityOnHand", 0)
 
             // FIXME This should only be used when querying for candidates, but right now we only have a single
             //  candidates query for all of the subsets of the session (counted, ready to be counted, counting).
