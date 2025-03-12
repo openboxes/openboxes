@@ -8,6 +8,7 @@ import {
   CHANGE_CURRENT_LOCALE,
   CHANGE_CURRENT_LOCATION,
   CLOSE_INFO_BAR,
+  ERASE_DRAFT,
   FETCH_APPROVERS,
   FETCH_ATTRIBUTES,
   FETCH_BIN_LOCATIONS,
@@ -768,10 +769,20 @@ export const startCount = (payload, locationId) => async (dispatch) => {
 };
 
 export const startResolution = (payload, locationId) => async (dispatch) => {
-  const cycleCounts = await cycleCountApi.startRecount({ payload, locationId });
-  const cycleCountIds = cycleCounts?.data?.data?.map?.((cycleCount) => cycleCount.id);
+  // If moving directly from count to resolve workflow, payload already contains cycleCountIds
+  let cycleCountIds = payload;
+
+  // If locationId is not provided, we're moving from count to resolve workflow
+  if (locationId) {
+    const cycleCounts = await cycleCountApi.startRecount({ payload, locationId });
+    cycleCountIds = cycleCounts?.data?.data?.map?.((cycleCount) => cycleCount.id);
+  }
   return dispatch({
     type: START_RESOLUTION,
     payload: cycleCountIds,
   });
 };
+
+export const eraseDraft = () => ({
+  type: ERASE_DRAFT,
+});

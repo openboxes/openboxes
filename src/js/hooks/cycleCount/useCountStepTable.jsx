@@ -22,7 +22,7 @@ import CustomTooltip from 'wrappers/CustomTooltip';
 // Managing state for single table, mainly table configuration (from count step)
 const useCountStepTable = ({
   cycleCountId,
-  productCode,
+  productId,
   removeRow,
   validationErrors,
   tableData,
@@ -106,7 +106,7 @@ const useCountStepTable = ({
   };
 
   const handleAddEmptyRow = () => {
-    addEmptyRow(productCode, cycleCountId);
+    addEmptyRow(productId, cycleCountId);
     setFocusIndex(null);
     setFocusId(null);
   };
@@ -191,7 +191,7 @@ const useCountStepTable = ({
         tableData,
         setFocusId,
         setFocusIndex,
-        addNewRow: () => addEmptyRow(productCode, cycleCountId),
+        addNewRow: () => addEmptyRow(productId, cycleCountId),
         isNewRow,
       });
 

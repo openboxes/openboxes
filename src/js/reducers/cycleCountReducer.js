@@ -1,4 +1,5 @@
 import {
+  ERASE_DRAFT,
   FETCH_BIN_LOCATIONS,
   FETCH_CYCLE_COUNT_REASON_CODES,
   START_COUNT,
@@ -33,6 +34,11 @@ export default function cycleCountReducer(state = initialState, action) {
       return {
         ...state,
         binLocations: action.payload,
+      };
+    case ERASE_DRAFT:
+      return {
+        ...state,
+        requests: [],
       };
     default:
       return state;
