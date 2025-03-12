@@ -434,9 +434,9 @@ class CycleCountService {
             throw new IllegalStateException("Cannot complete cycle count when it's in status ${cycleCount.status}")
         }
 
-        // The count completed successfully so update the request status to match and commit the adjustments.
-        cycleCount.cycleCountRequest.status = CycleCountRequestStatus.COMPLETED
+        // The count completed successfully, so commit the adjustments and close out the cycle count request.
         cycleCountTransactionService.createTransactions(cycleCount, refreshQuantityOnHand)
+        cycleCount.cycleCountRequest.status = CycleCountRequestStatus.COMPLETED
     }
 
     CycleCountItemDto updateCycleCountItem(CycleCountUpdateItemCommand command) {
