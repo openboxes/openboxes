@@ -85,7 +85,7 @@ class CycleCountItem implements Comparable {
     }
 
     Integer getQuantityVariance() {
-        if (quantityCounted && quantityOnHand) {
+        if (quantityCounted != null && quantityOnHand != null) {
             return quantityCounted - quantityOnHand
         }
         return null
