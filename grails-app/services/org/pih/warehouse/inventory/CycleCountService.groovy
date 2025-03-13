@@ -315,10 +315,11 @@ class CycleCountService {
     CycleCountDto startRecount(Location facility, CycleCountStartRecountCommand command) {
         CycleCount cycleCount = command.cycleCountRequest.cycleCount
         Product product = command.cycleCountRequest.product
+        Integer countIndex = command.countIndex
 
         // If there are already items for the requested count index, simply return the count as it is since the recount
         // has already been started. We do this (instead of throwing an error) because it's convenient for the frontend.
-        if (cycleCount.cycleCountItems.any{ it.countIndex == command.countIndex }) {
+        if (cycleCount.maxCountIndex >= countIndex) {
             return CycleCountDto.toDto(cycleCount)
         }
 
@@ -333,50 +334,39 @@ class CycleCountService {
                     facility,
                     availableItemToRecount,
                     cycleCount,
-                    command.countIndex,
+                    countIndex,
                     CycleCountItemStatus.INVESTIGATING)
 
             cycleCount.addToCycleCountItems(cycleCountItem)
         }
 
-        // If there are custom items we need to create adjusted non-custom items with the appropriate
-        // cycle count index
-        for (CycleCountItem customCycleCountItem : cycleCount.cycleCountItems) {
+        // If there are custom items, they won't have been discovered by the above loop (because they won't have
+        // a product availability record) so make sure to create new recount items for them as well.
+        // "Most recent count" in this scenario is the previous count.
+        Set<CycleCountItem> customItemsOfLastCount = cycleCount.itemsOfMostRecentCount.findAll{ it.custom }
+        for (CycleCountItem customCycleCountItem : customItemsOfLastCount) {
             // We want to avoid a situation where we create an inventory using a custom row
             // and then someone is creating the same inventory on record stock
-            CycleCountItem itemCreatedFromCustom = findItemCreatedFromCustom(
-                    cycleCount.cycleCountItems,
-                    customCycleCountItem,
-                    command.countIndex,
-            )
-            if (customCycleCountItem.custom && !itemCreatedFromCustom) {
-                CycleCountItem cycleCountItem = initCycleCountItemFromCustom(
-                        facility,
-                        customCycleCountItem,
-                        cycleCount,
-                        command.countIndex,
-                        CycleCountItemStatus.INVESTIGATING)
-
-                cycleCount.addToCycleCountItems(cycleCountItem)
+            CycleCountItem itemAlreadyExists = cycleCount.getCycleCountItem(customCycleCountItem.product,
+                    customCycleCountItem.location, customCycleCountItem.inventoryItem, countIndex)
+            if (itemAlreadyExists) {
+                continue
             }
+
+            CycleCountItem cycleCountItem = initCycleCountItemFromCustom(
+                    facility,
+                    customCycleCountItem,
+                    cycleCount,
+                    countIndex,
+                    CycleCountItemStatus.INVESTIGATING)
+
+            cycleCount.addToCycleCountItems(cycleCountItem)
         }
 
         if (!cycleCount.save()) {
             throw new ValidationException("Invalid cycle count", cycleCount.errors)
         }
         return CycleCountDto.toDto(cycleCount)
-    }
-
-    private CycleCountItem findItemCreatedFromCustom(
-            Set<CycleCountItem> cycleCountItems,
-            CycleCountItem customItem,
-            int countIndex) {
-        return cycleCountItems.find {
-            it?.product?.id == customItem?.product?.id &&
-                    it?.location?.id == customItem?.location?.id &&
-                    it?.inventoryItem?.lotNumber == customItem?.inventoryItem?.lotNumber &&
-                    it?.countIndex == countIndex
-        }
     }
 
     private CycleCountItem initCycleCountItem(
@@ -423,6 +413,11 @@ class CycleCountService {
                 createdBy: AuthService.currentUser,
                 updatedBy: AuthService.currentUser,
                 dateCounted: new Date(),
+
+                // Note that even though the given item is custom added, the resulting item is treated as not
+                // custom. This is done to preserve count information. Ex: If the item was custom added during the
+                // count, we don't want to be able to remove it from the recount. If on a recount a user decides they
+                // don't actually need an item they added during the count, they can set its quantity counted to 0.
                 custom: false,
         )
     }

@@ -127,8 +127,11 @@ class CycleCount {
     /**
      * @return the cycle count item matching the given input (which uniquely identifies the item within the count).
      */
-    CycleCountItem getCycleCountItem(Location binLocation, InventoryItem inventoryItem, int countIndex) {
+    CycleCountItem getCycleCountItem(
+            Product product, Location binLocation, InventoryItem inventoryItem, int countIndex) {
+
         return cycleCountItems.find{
+                    it.product == product &&
                     it.location == binLocation &&
                     it.inventoryItem == inventoryItem &&
                     it.countIndex == countIndex }
