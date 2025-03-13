@@ -12,7 +12,9 @@ import _ from 'lodash';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
-import { fetchBinLocations, fetchUsers, startResolution } from 'actions';
+import {
+  eraseDraft, fetchBinLocations, fetchUsers, startResolution,
+} from 'actions';
 import cycleCountApi from 'api/services/CycleCountApi';
 import { CYCLE_COUNT as CYCLE_COUNT_URL } from 'api/urls';
 import { CYCLE_COUNT } from 'consts/applicationUrls';
@@ -277,7 +279,7 @@ const useCountStep = () => {
       currentLocation?.id,
       cycleCount?.id);
     }
-    dispatch(startResolution(cycleCountIds));
+    dispatch(startResolution(cycleCountIds, currentLocation?.id));
     history.push(CYCLE_COUNT.resolveStep());
   };
 
@@ -324,6 +326,7 @@ const useCountStep = () => {
         return;
       }
       await submitCount();
+      dispatch(eraseDraft());
     } finally {
       hide();
     }

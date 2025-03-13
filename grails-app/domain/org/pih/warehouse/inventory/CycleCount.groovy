@@ -3,6 +3,7 @@ package org.pih.warehouse.inventory
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
+import org.pih.warehouse.product.Product
 
 class CycleCount {
 
@@ -33,7 +34,7 @@ class CycleCount {
         status = recomputeStatus()
     }
 
-    SortedSet cycleCountItems
+    SortedSet<CycleCountItem> cycleCountItems
 
     static hasMany = [
             /*
@@ -65,11 +66,15 @@ class CycleCount {
     }
 
     /**
+     * Fetch the cycle count request associated with this cycle count.
+     * We can safely do this because CycleCountRequest has a 1:1 association with cycle count.
+     */
+    CycleCountRequest getCycleCountRequest() {
+        return CycleCountRequest.findByCycleCount(this)
+    }
+
+    /**
      * Determines what the CycleCountStatus should be for the cycle count.
-     *
-     * We don't want to call this in beforeInsert() or beforeUpdate() because the cycle count's status is determined
-     * entirely by the status of its cycle count items, and so any change to fields in the CycleCount itself won't
-     * ever change its status. Instead we opt to only recompute the status when explicitly told to do so.
      */
     CycleCountStatus recomputeStatus() {
         if (!cycleCountItems || cycleCountItems.every { it.status == CycleCountItemStatus.READY_TO_COUNT }) {
@@ -111,4 +116,22 @@ class CycleCount {
         Integer countIndex = maxCountIndex
         return cycleCountItems.findAll{ it.countIndex == countIndex}
     }
+
+    /**
+     * @return a list of all the products being counted by the cycle count.
+     */
+    List<Product> getProducts() {
+        return cycleCountItems.collect{ it.product }.unique{ it.id }
+    }
+
+    /**
+     * @return the cycle count item matching the given input (which uniquely identifies the item within the count).
+     */
+    CycleCountItem getCycleCountItem(Location binLocation, InventoryItem inventoryItem, int countIndex) {
+        return cycleCountItems.find{
+                    it.location == binLocation &&
+                    it.inventoryItem == inventoryItem &&
+                    it.countIndex == countIndex }
+    }
+
 }

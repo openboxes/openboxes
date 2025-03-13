@@ -4,9 +4,11 @@ import {
   CYCLE_COUNT, CYCLE_COUNT_ITEM,
   CYCLE_COUNT_ITEMS,
   CYCLE_COUNT_RECOUNT_START,
+  CYCLE_COUNT_REFRESH_ITEMS,
   CYCLE_COUNT_REQUESTS,
   CYCLE_COUNT_START,
   CYCLE_COUNT_SUBMIT_COUNT,
+  CYCLE_COUNT_SUBMIT_RECOUNT,
 } from 'api/urls';
 import apiClient from 'utils/apiClient';
 
@@ -34,4 +36,8 @@ export default {
     apiClient.delete(CYCLE_COUNT_ITEM(locationId, itemId)),
   submitCount: (payload, locationId, cycleCountId) =>
     apiClient.post(CYCLE_COUNT_SUBMIT_COUNT(locationId, cycleCountId), payload),
+  submitRecount: (payload, locationId, cycleCountId) =>
+    apiClient.post(CYCLE_COUNT_SUBMIT_RECOUNT(locationId, cycleCountId), payload),
+  refreshItems: (locationId, cycleCountId) =>
+    apiClient.post(CYCLE_COUNT_REFRESH_ITEMS(locationId, cycleCountId)),
 };
