@@ -78,17 +78,17 @@ class CycleCount {
      */
     CycleCountStatus recomputeStatus() {
         Set<CycleCountItem> items = itemsOfMostRecentCount
-        if (items.every { it.status in CycleCountItemStatus.isCompleted()}) {
+        if (items.every { it.status.isCompleted() }) {
             return CycleCountStatus.COMPLETED
         }
         if (items.any { it.status == CycleCountItemStatus.INVESTIGATING }) {
             return CycleCountStatus.INVESTIGATING
         }
-        if (items.any { it.status == CycleCountItemStatus.COUNTED }) {
-            return CycleCountStatus.COUNTED
-        }
         if (items.any { it.status == CycleCountItemStatus.COUNTING }) {
             return CycleCountStatus.COUNTING
+        }
+        if (items.any { it.status == CycleCountItemStatus.COUNTED }) {
+            return CycleCountStatus.COUNTED
         }
         if (items.any { it.status == CycleCountItemStatus.READY_TO_COUNT }) {
             return CycleCountStatus.REQUESTED
