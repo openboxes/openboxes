@@ -339,10 +339,44 @@ class CycleCountService {
             cycleCount.addToCycleCountItems(cycleCountItem)
         }
 
+        // If there are custom items we need to create adjusted non-custom items with the appropriate
+        // cycle count index
+        for (CycleCountItem customCycleCountItem : cycleCount.cycleCountItems) {
+            // We want to avoid a situation where we create an inventory using a custom row
+            // and then someone is creating the same inventory on record stock
+            CycleCountItem itemCreatedFromCustom = findItemCreatedFromCustom(
+                    cycleCount.cycleCountItems,
+                    customCycleCountItem,
+                    command.countIndex,
+            )
+            if (customCycleCountItem.custom && !itemCreatedFromCustom) {
+                CycleCountItem cycleCountItem = initCycleCountItemFromCustom(
+                        facility,
+                        customCycleCountItem,
+                        cycleCount,
+                        command.countIndex,
+                        CycleCountItemStatus.INVESTIGATING)
+
+                cycleCount.addToCycleCountItems(cycleCountItem)
+            }
+        }
+
         if (!cycleCount.save()) {
             throw new ValidationException("Invalid cycle count", cycleCount.errors)
         }
         return CycleCountDto.toDto(cycleCount)
+    }
+
+    private CycleCountItem findItemCreatedFromCustom(
+            Set<CycleCountItem> cycleCountItems,
+            CycleCountItem customItem,
+            int countIndex) {
+        return cycleCountItems.find {
+            it?.product?.id == customItem?.product?.id &&
+                    it?.location?.id == customItem?.location?.id &&
+                    it?.inventoryItem?.lotNumber == customItem?.inventoryItem?.lotNumber &&
+                    it?.countIndex == countIndex
+        }
     }
 
     private CycleCountItem initCycleCountItem(
@@ -362,6 +396,30 @@ class CycleCountService {
                 location: availableItem.binLocation,
                 inventoryItem: availableItem.inventoryItem,
                 product: availableItem.inventoryItem.product,
+                createdBy: AuthService.currentUser,
+                updatedBy: AuthService.currentUser,
+                dateCounted: new Date(),
+                custom: false,
+        )
+    }
+
+    private CycleCountItem initCycleCountItemFromCustom(
+            Location facility,
+            CycleCountItem cycleCountItem,
+            CycleCount cycleCount,
+            int countIndex,
+            CycleCountItemStatus status) {
+
+        return new CycleCountItem(
+                status: status,
+                countIndex: countIndex,
+                quantityOnHand: cycleCountItem.quantityOnHand,
+                quantityCounted: null,
+                cycleCount: cycleCount,
+                facility: facility,
+                location: cycleCountItem.location,
+                inventoryItem: cycleCountItem.inventoryItem,
+                product: cycleCountItem.inventoryItem.product,
                 createdBy: AuthService.currentUser,
                 updatedBy: AuthService.currentUser,
                 dateCounted: new Date(),
