@@ -346,15 +346,9 @@ const useToResolveTab = ({
   };
 
   const moveToResolving = async () => {
-    const payload = {
-      requests: checkedCheckboxes.map((cycleCountRequestId) => ({
-        cycleCountRequest: cycleCountRequestId,
-        countIndex: 1, // We only ever allow for a single recount, so index is always 1.
-      })),
-    };
     spinner.show();
     try {
-      await dispatch(startResolution(payload, currentLocation?.id));
+      await dispatch(startResolution(checkedCheckboxes, currentLocation?.id));
       history.push(CYCLE_COUNT.resolveStep());
     } finally {
       spinner.hide();

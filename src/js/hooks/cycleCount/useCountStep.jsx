@@ -286,7 +286,7 @@ const useCountStep = () => {
       cycleCount?.id),
     ]), []);
 
-  const resolveDiscrepanciesModalButtons = (cycleCountIdsWithDiscrepancies) => (onClose) => ([
+  const resolveDiscrepanciesModalButtons = (requestIdsWithDiscrepancies) => (onClose) => ([
     {
       variant: 'transparent',
       defaultLabel: 'Not now',
@@ -302,7 +302,7 @@ const useCountStep = () => {
       label: 'react.cycleCount.modal.resolve.label',
       onClick: async () => {
         dispatch(startResolution(
-          cycleCountIdsWithDiscrepancies,
+          requestIdsWithDiscrepancies,
           currentLocation?.id,
         ));
         history.push(CYCLE_COUNT.resolveStep());
@@ -311,9 +311,9 @@ const useCountStep = () => {
     },
   ]);
 
-  const openResolveDiscrepanciesModal = (cycleCountIdsWithDiscrepancies) => {
+  const openResolveDiscrepanciesModal = (requestIdsWithDiscrepancies) => {
     confirmationModal({
-      buttons: resolveDiscrepanciesModalButtons(cycleCountIdsWithDiscrepancies),
+      buttons: resolveDiscrepanciesModalButtons(requestIdsWithDiscrepancies),
       ...modalLabels,
     });
   };
@@ -324,18 +324,18 @@ const useCountStep = () => {
       await save();
       const submittedCounts = await Promise.all(submitCount());
 
-      const cycleCountIdsWithDiscrepancies = submittedCounts
+      const requestIdsWithDiscrepancies = submittedCounts
         .reduce((acc, submittedCycleCountRequest) => {
           const { data } = submittedCycleCountRequest;
           if (data.data.status === cycleCountStatus?.COUNTED) {
-            return [...acc, data?.data?.id];
+            return [...acc, data?.data?.requestId];
           }
 
           return acc;
         }, []);
 
-      if (cycleCountIdsWithDiscrepancies.length > 0) {
-        openResolveDiscrepanciesModal(cycleCountIdsWithDiscrepancies);
+      if (requestIdsWithDiscrepancies.length > 0) {
+        openResolveDiscrepanciesModal(requestIdsWithDiscrepancies);
         return;
       }
       dispatch(eraseDraft());
