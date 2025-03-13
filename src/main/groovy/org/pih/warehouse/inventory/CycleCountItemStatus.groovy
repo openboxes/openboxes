@@ -9,5 +9,11 @@ enum CycleCountItemStatus {
     REVIEWED,
     APPROVED,
     REJECTED,
-    CANCELED,
+    CANCELED
+
+    static List<CycleCountItemStatus> isCompleted() {
+        return [APPROVED, REVIEWED, REJECTED, CANCELED, READY_TO_REVIEW]
+    }
+
+
 }
