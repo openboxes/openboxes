@@ -301,8 +301,8 @@ class CycleCountService {
         Location facility = command.facility
 
         List<CycleCountDto> cycleCounts = []
-        for (CycleCountStartRecountCommand cycleCount : command.cycleCounts) {
-            CycleCountDto cycleCountDto = startRecount(facility, cycleCount)
+        for (CycleCountStartRecountCommand request : command.requests) {
+            CycleCountDto cycleCountDto = startRecount(facility, request)
             cycleCounts.add(cycleCountDto)
         }
 
@@ -313,8 +313,8 @@ class CycleCountService {
      * Inserts a list of cycle count items representing the recount for the given request.
      */
     CycleCountDto startRecount(Location facility, CycleCountStartRecountCommand command) {
-        CycleCount cycleCount = command.cycleCount
-        Product product = command.cycleCount.cycleCountItems?.first()?.product
+        CycleCount cycleCount = command.cycleCountRequest.cycleCount
+        Product product = command.cycleCountRequest.product
 
         // If there are already items for the requested count index, simply return the count as it is since the recount
         // has already been started. We do this (instead of throwing an error) because it's convenient for the frontend.
@@ -339,10 +339,44 @@ class CycleCountService {
             cycleCount.addToCycleCountItems(cycleCountItem)
         }
 
+        // If there are custom items we need to create adjusted non-custom items with the appropriate
+        // cycle count index
+        for (CycleCountItem customCycleCountItem : cycleCount.cycleCountItems) {
+            // We want to avoid a situation where we create an inventory using a custom row
+            // and then someone is creating the same inventory on record stock
+            CycleCountItem itemCreatedFromCustom = findItemCreatedFromCustom(
+                    cycleCount.cycleCountItems,
+                    customCycleCountItem,
+                    command.countIndex,
+            )
+            if (customCycleCountItem.custom && !itemCreatedFromCustom) {
+                CycleCountItem cycleCountItem = initCycleCountItemFromCustom(
+                        facility,
+                        customCycleCountItem,
+                        cycleCount,
+                        command.countIndex,
+                        CycleCountItemStatus.INVESTIGATING)
+
+                cycleCount.addToCycleCountItems(cycleCountItem)
+            }
+        }
+
         if (!cycleCount.save()) {
             throw new ValidationException("Invalid cycle count", cycleCount.errors)
         }
         return CycleCountDto.toDto(cycleCount)
+    }
+
+    private CycleCountItem findItemCreatedFromCustom(
+            Set<CycleCountItem> cycleCountItems,
+            CycleCountItem customItem,
+            int countIndex) {
+        return cycleCountItems.find {
+            it?.product?.id == customItem?.product?.id &&
+                    it?.location?.id == customItem?.location?.id &&
+                    it?.inventoryItem?.lotNumber == customItem?.inventoryItem?.lotNumber &&
+                    it?.countIndex == countIndex
+        }
     }
 
     private CycleCountItem initCycleCountItem(
@@ -362,6 +396,30 @@ class CycleCountService {
                 location: availableItem.binLocation,
                 inventoryItem: availableItem.inventoryItem,
                 product: availableItem.inventoryItem.product,
+                createdBy: AuthService.currentUser,
+                updatedBy: AuthService.currentUser,
+                dateCounted: new Date(),
+                custom: false,
+        )
+    }
+
+    private CycleCountItem initCycleCountItemFromCustom(
+            Location facility,
+            CycleCountItem cycleCountItem,
+            CycleCount cycleCount,
+            int countIndex,
+            CycleCountItemStatus status) {
+
+        return new CycleCountItem(
+                status: status,
+                countIndex: countIndex,
+                quantityOnHand: cycleCountItem.quantityOnHand,
+                quantityCounted: null,
+                cycleCount: cycleCount,
+                facility: facility,
+                location: cycleCountItem.location,
+                inventoryItem: cycleCountItem.inventoryItem,
+                product: cycleCountItem.inventoryItem.product,
                 createdBy: AuthService.currentUser,
                 updatedBy: AuthService.currentUser,
                 dateCounted: new Date(),

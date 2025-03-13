@@ -768,13 +768,15 @@ export const startCount = (payload, locationId) => async (dispatch) => {
   });
 };
 
-export const startResolution = (payload, locationId) => async (dispatch) => {
+export const startResolution = (requestIds, locationId) => async (dispatch) => {
+  const payload = {
+    requests: requestIds.map((cycleCountRequestId) => ({
+      cycleCountRequest: cycleCountRequestId,
+      countIndex: 1,
+    })),
+  };
   const cycleCounts = await cycleCountApi.startRecount({
-    payload: {
-      cycleCounts:
-        payload.map((cycleCountId) =>
-          ({ cycleCount: cycleCountId, countIndex: 1 })),
-    },
+    payload,
     locationId,
   });
   const cycleCountIds = cycleCounts?.data?.data?.map?.((cycleCount) => cycleCount.id);

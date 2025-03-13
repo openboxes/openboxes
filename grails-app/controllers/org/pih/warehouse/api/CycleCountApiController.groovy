@@ -62,7 +62,7 @@ class CycleCountApiController {
     }
 
     def startRecount(CycleCountStartRecountBatchCommand command) {
-        BatchCommandUtils.validateBatch(command, "cycleCounts")
+        BatchCommandUtils.validateBatch(command, "requests")
         List<CycleCountDto> cycleCounts = cycleCountService.startRecount(command)
 
         withFormat {
