@@ -93,7 +93,8 @@ class CycleCount {
                 && !cycleCountItems.any { it.status in [CycleCountItemStatus.INVESTIGATING, CycleCountItemStatus.READY_TO_REVIEW] }) {
             return CycleCountStatus.COUNTING
         }
-        if (cycleCountItems.every { it.status in [CycleCountItemStatus.COUNTED, CycleCountItemStatus.READY_TO_REVIEW] }) {
+        // TODO: Once we add support for the "to review" tab, we should look for READY_TO_REVIEW instead of APPROVED
+        if (cycleCountItems.every { it.status in [CycleCountItemStatus.COUNTED, CycleCountItemStatus.APPROVED] }) {
             return CycleCountStatus.COUNTED
         }
         if (cycleCountItems.every { it.status in [CycleCountItemStatus.REVIEWED, CycleCountItemStatus.APPROVED, CycleCountItemStatus.REJECTED] }) {
