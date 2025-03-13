@@ -301,8 +301,8 @@ class CycleCountService {
         Location facility = command.facility
 
         List<CycleCountDto> cycleCounts = []
-        for (CycleCountStartRecountCommand cycleCount : command.cycleCounts) {
-            CycleCountDto cycleCountDto = startRecount(facility, cycleCount)
+        for (CycleCountStartRecountCommand request : command.requests) {
+            CycleCountDto cycleCountDto = startRecount(facility, request)
             cycleCounts.add(cycleCountDto)
         }
 
@@ -313,8 +313,8 @@ class CycleCountService {
      * Inserts a list of cycle count items representing the recount for the given request.
      */
     CycleCountDto startRecount(Location facility, CycleCountStartRecountCommand command) {
-        CycleCount cycleCount = command.cycleCount
-        Product product = command.cycleCount.cycleCountItems?.first()?.product
+        CycleCount cycleCount = command.cycleCountRequest.cycleCount
+        Product product = command.cycleCountRequest.product
 
         // If there are already items for the requested count index, simply return the count as it is since the recount
         // has already been started. We do this (instead of throwing an error) because it's convenient for the frontend.
