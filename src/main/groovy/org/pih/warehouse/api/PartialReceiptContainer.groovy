@@ -5,12 +5,17 @@ import org.pih.warehouse.shipping.Container
 class PartialReceiptContainer {
 
     Container container
+    String sortBy
     List<PartialReceiptItem> partialReceiptItems = []
 
     Boolean isDefault() {
         return container == null
     }
-
+    private static int defaultOrderComparison(a, b) {
+        return a.shipmentItem?.requisitionItem?.orderIndex <=> b.shipmentItem?.requisitionItem?.orderIndex ?:
+                a.shipmentItem?.sortOrder <=> b.shipmentItem?.sortOrder ?:
+                        a.receiptItem?.sortOrder <=> b.receiptItem?.sortOrder
+    }
 
     Map toJson() {
         return [
@@ -20,9 +25,14 @@ class PartialReceiptContainer {
                 "parentContainer.name": container?.parentContainer?.name,
                 "container.type"      : container?.containerType?.name,
                 shipmentItems         : partialReceiptItems.sort { a, b ->
-                    a.shipmentItem?.requisitionItem?.orderIndex <=> b.shipmentItem?.requisitionItem?.orderIndex ?:
-                            a.shipmentItem?.sortOrder <=> b.shipmentItem?.sortOrder ?:
-                                    a.receiptItem?.sortOrder <=> b.receiptItem?.sortOrder
+                    switch (sortBy) {
+                        case "alphabetical":
+                            return b.shipmentItem?.product?.name <=> a.shipmentItem?.product?.name ?:
+                                    defaultOrderComparison(a, b)
+                        case "sortOrder":
+                        default:
+                            return defaultOrderComparison(a, b)
+                    }
                 }
         ]
     }

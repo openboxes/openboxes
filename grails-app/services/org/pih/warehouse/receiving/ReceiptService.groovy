@@ -52,7 +52,7 @@ class ReceiptService {
     ProductAvailabilityService productAvailabilityService
 
     @Transactional(readOnly=true)
-    PartialReceipt getPartialReceipt(String id, String stepNumber) {
+    PartialReceipt getPartialReceipt(String id, String stepNumber, String sort = null) {
         Shipment shipment = Shipment.get(id)
         if (!shipment) {
             throw new IllegalArgumentException("Unable to find shipment with ID ${id}")
@@ -68,7 +68,7 @@ class ReceiptService {
         Receipt receipt = receipts ? receipts.first() : null
         if (receipt) {
             boolean includeShipmentItems = stepNumber == "1"
-            partialReceipt = getPartialReceiptFromReceipt(receipt, includeShipmentItems)
+            partialReceipt = getPartialReceiptFromReceipt(receipt, includeShipmentItems, sort)
         } else {
             partialReceipt = getPartialReceiptFromShipment(shipment)
         }
@@ -112,8 +112,7 @@ class ReceiptService {
      * @param receipt
      * @return
      */
-    PartialReceipt getPartialReceiptFromReceipt(Receipt receipt, boolean includeShipmentItems) {
-
+    PartialReceipt getPartialReceiptFromReceipt(Receipt receipt, boolean includeShipmentItems, String sort) {
         PartialReceipt partialReceipt = new PartialReceipt()
         partialReceipt.receipt = receipt
         partialReceipt.shipment = receipt.shipment
@@ -128,8 +127,7 @@ class ReceiptService {
         def shipmentItemsByContainer = receipt.shipment.sortShipmentItemsBySortOrder().groupBy { it.container }
         shipmentItemsByContainer.collect { container, shipmentItems ->
 
-            PartialReceiptContainer partialReceiptContainer = new PartialReceiptContainer(container: container)
-
+            PartialReceiptContainer partialReceiptContainer = new PartialReceiptContainer(container: container, sortBy: sort)
             shipmentItems.each { ShipmentItem shipmentItem ->
                 Set<ReceiptItem> pendingReceiptItems =
                         receipt.receiptItems.findAll { ReceiptItem receiptItem -> receiptItem.shipmentItem == shipmentItem }

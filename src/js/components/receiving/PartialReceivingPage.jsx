@@ -19,6 +19,7 @@ import TextField from 'components/form-elements/TextField';
 import EditLineModal from 'components/receiving/modals/EditLineModal';
 import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
 import DateFormat from 'consts/dateFormat';
+import receivingSortOptions from 'consts/receivingSortOptions';
 import apiClient, { flattenRequest, parseResponse } from 'utils/apiClient';
 import Checkbox from 'utils/Checkbox';
 import { renderFormField } from 'utils/form-utils';
@@ -559,7 +560,6 @@ class PartialReceivingPage extends Component {
 
   constructor(props) {
     super(props);
-
     this.state = {
       values: {},
       isFirstPageLoaded: false,
@@ -675,7 +675,7 @@ class PartialReceivingPage extends Component {
    */
   fetchPartialReceiptCandidates() {
     this.props.showSpinner();
-    const url = `/api/partialReceiving/${this.props.match.params.shipmentId}?stepNumber=1`;
+    const url = `/api/partialReceiving/${this.props.match.params.shipmentId}?stepNumber=1&sort=${this.props.sort}`;
 
     apiClient.get(url)
       .then((response) => {
@@ -1001,6 +1001,14 @@ class PartialReceivingPage extends Component {
     return !!this.state.values.containers[index];
   }
 
+  handleSortChange = (selectedOption) => {
+    this.props.updateSort(selectedOption.value);
+    this.fetchPartialReceiptCandidates();
+    // this.setState({ sort: selectedOption.value }, () => {
+    //   this.fetchPartialReceiptCandidates();
+    // });
+  };
+
   render() {
     return (
       <div>
@@ -1030,8 +1038,16 @@ class PartialReceivingPage extends Component {
             return (
               <form onSubmit={handleSubmit}>
                 <div className="d-flex flex-column">
-                  <div>
-                    <span className="buttons-container">
+                  <div className="d-flex justify-content-between align-items-center">
+                    <div className="width-250">
+                      <Select
+                        options={receivingSortOptions}
+                        value={this.props.sort}
+                        onChange={this.handleSortChange}
+                        placeholder="Select Sort Option"
+                      />
+                    </div>
+                    <div className="buttons-container">
                       <button type="button" className="btn btn-outline-secondary float-right btn-form btn-xs" disabled={this.state.values.shipmentStatus === 'RECEIVED'} onClick={() => this.autofillLines(values)}>
                         <Translate id="react.partialReceiving.autofillQuantities.label" defaultMessage="Autofill quantities" />
                       </button>
@@ -1074,7 +1090,7 @@ class PartialReceivingPage extends Component {
                           accept=".csv"
                         />
                       </label>
-                    </span>
+                    </div>
                   </div>
                   <div className="my-2 table-form" data-testid="items-table">
                     {_.map(TABLE_FIELDS, (fieldConfig, fieldName) =>
@@ -1138,6 +1154,8 @@ PartialReceivingPage.propTypes = {
   hasPartialReceivingSupport: PropTypes.bool.isRequired,
   translate: PropTypes.func.isRequired,
   formatLocalizedDate: PropTypes.func.isRequired,
+  sort: PropTypes.string.isRequired,
+  updateSort: PropTypes.func.isRequired,
 };
 
 PartialReceivingPage.defaultProps = {

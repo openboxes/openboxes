@@ -275,7 +275,7 @@ class ReceivingCheckScreen extends Component {
    */
   fetchPartialReceiptCandidates() {
     this.props.showSpinner();
-    const url = `/api/partialReceiving/${this.props.match.params.shipmentId}?stepNumber=2`;
+    const url = `/api/partialReceiving/${this.props.match.params.shipmentId}?stepNumber=2&sort=${this.props.sort}`;
 
     return apiClient.get(url)
       .then((response) => {
@@ -528,6 +528,7 @@ ReceivingCheckScreen.propTypes = {
   translate: PropTypes.func.isRequired,
   previousPage: PropTypes.func.isRequired,
   formatLocalizedDate: PropTypes.func.isRequired,
+  sort: PropTypes.string.isRequired,
 };
 
 ReceivingCheckScreen.defaultProps = {
