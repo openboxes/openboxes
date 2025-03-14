@@ -70,7 +70,7 @@ class ReceiptService {
             boolean includeShipmentItems = stepNumber == "1"
             partialReceipt = getPartialReceiptFromReceipt(receipt, includeShipmentItems, sort)
         } else {
-            partialReceipt = getPartialReceiptFromShipment(shipment)
+            partialReceipt = getPartialReceiptFromShipment(shipment, sort)
         }
         return partialReceipt
     }
@@ -81,7 +81,7 @@ class ReceiptService {
      * @param shipment
      * @return
      */
-    PartialReceipt getPartialReceiptFromShipment(Shipment shipment) {
+    PartialReceipt getPartialReceiptFromShipment(Shipment shipment, String sort) {
         def currentUser = authService.currentUser
         PartialReceipt partialReceipt = new PartialReceipt()
         partialReceipt.shipment = shipment
@@ -96,7 +96,7 @@ class ReceiptService {
         def shipmentItemsByContainer = shipment.sortShipmentItemsBySortOrder().groupBy { it.container }
         shipmentItemsByContainer.collect { container, shipmentItems ->
 
-            PartialReceiptContainer partialReceiptContainer = new PartialReceiptContainer(container: container)
+            PartialReceiptContainer partialReceiptContainer = new PartialReceiptContainer(container: container, sortBy: sort)
             partialReceipt.partialReceiptContainers.add(partialReceiptContainer)
 
             shipmentItems.each { ShipmentItem shipmentItem ->
