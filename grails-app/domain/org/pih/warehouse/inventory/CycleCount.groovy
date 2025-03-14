@@ -77,29 +77,25 @@ class CycleCount {
      * Determines what the CycleCountStatus should be for the cycle count.
      */
     CycleCountStatus recomputeStatus() {
-        if (!cycleCountItems || cycleCountItems.every { it.status == CycleCountItemStatus.READY_TO_COUNT }) {
-            return CycleCountStatus.REQUESTED
-        }
-        if (cycleCountItems.every { it.status == CycleCountItemStatus.REVIEWED }) {
-            return CycleCountStatus.REVIEWED
-        }
-        if (cycleCountItems.every { it.status == CycleCountItemStatus.READY_TO_REVIEW }) {
-            return CycleCountStatus.READY_TO_REVIEW
-        }
-        if (cycleCountItems.any { it.status == CycleCountItemStatus.INVESTIGATING }) {
-            return CycleCountStatus.INVESTIGATING
-        }
-        if (cycleCountItems.any { it.status == CycleCountItemStatus.COUNTING }
-                && !cycleCountItems.any { it.status in [CycleCountItemStatus.INVESTIGATING, CycleCountItemStatus.READY_TO_REVIEW] }) {
-            return CycleCountStatus.COUNTING
-        }
-        if (cycleCountItems.every { it.status in [CycleCountItemStatus.COUNTED, CycleCountItemStatus.READY_TO_REVIEW] }) {
-            return CycleCountStatus.COUNTED
-        }
-        if (cycleCountItems.every { it.status in [CycleCountItemStatus.REVIEWED, CycleCountItemStatus.APPROVED, CycleCountItemStatus.REJECTED] }) {
+        Set<CycleCountItem> items = itemsOfMostRecentCount
+        if (items.every { it.status.isCompleted() }) {
             return CycleCountStatus.COMPLETED
         }
-        return null
+        if (items.any { it.status == CycleCountItemStatus.INVESTIGATING }) {
+            return CycleCountStatus.INVESTIGATING
+        }
+        if (items.any { it.status == CycleCountItemStatus.COUNTING }) {
+            return CycleCountStatus.COUNTING
+        }
+        if (items.any { it.status == CycleCountItemStatus.COUNTED }) {
+            return CycleCountStatus.COUNTED
+        }
+        if (items.any { it.status == CycleCountItemStatus.READY_TO_COUNT }) {
+            return CycleCountStatus.REQUESTED
+        }
+        // If no matching if statement found, throw an exception to quickly catch the bug, instead of
+        // allowing to persist some stale data
+        throw new IllegalArgumentException("No matching cycle count status found")
     }
 
     /**
@@ -127,8 +123,11 @@ class CycleCount {
     /**
      * @return the cycle count item matching the given input (which uniquely identifies the item within the count).
      */
-    CycleCountItem getCycleCountItem(Location binLocation, InventoryItem inventoryItem, int countIndex) {
+    CycleCountItem getCycleCountItem(
+            Product product, Location binLocation, InventoryItem inventoryItem, int countIndex) {
+
         return cycleCountItems.find{
+                    it.product == product &&
                     it.location == binLocation &&
                     it.inventoryItem == inventoryItem &&
                     it.countIndex == countIndex }
