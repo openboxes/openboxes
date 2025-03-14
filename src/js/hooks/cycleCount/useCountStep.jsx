@@ -301,7 +301,7 @@ const useCountStep = () => {
       defaultLabel: 'Resolve',
       label: 'react.cycleCount.modal.resolve.label',
       onClick: async () => {
-        dispatch(startResolution(
+        await dispatch(startResolution(
           requestIdsWithDiscrepancies,
           currentLocation?.id,
         ));
