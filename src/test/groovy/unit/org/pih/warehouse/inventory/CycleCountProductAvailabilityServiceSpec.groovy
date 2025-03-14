@@ -81,7 +81,7 @@ class CycleCountProductAvailabilityServiceSpec extends Specification implements 
         assert !changedItems.itemsHaveChanged()
         assert cycleCount.cycleCountItems.size() == 1
 
-        CycleCountItem cycleCountItem = cycleCount.getCycleCountItem(binLocation, inventoryItem, 0)
+        CycleCountItem cycleCountItem = cycleCount.getCycleCountItem(product, binLocation, inventoryItem, 0)
         assert cycleCountItem.quantityOnHand == 20  // QoH is unchanged
     }
 
@@ -124,7 +124,7 @@ class CycleCountProductAvailabilityServiceSpec extends Specification implements 
         assert changedItems.itemsHaveChanged()
         assert cycleCount.cycleCountItems.size() == 1
 
-        CycleCountItem cycleCountItem = cycleCount.getCycleCountItem(binLocation, inventoryItem, 0)
+        CycleCountItem cycleCountItem = cycleCount.getCycleCountItem(product, binLocation, inventoryItem, 0)
         assert cycleCountItem.quantityOnHand == 30  // QoH is updated
     }
 
@@ -179,10 +179,11 @@ class CycleCountProductAvailabilityServiceSpec extends Specification implements 
         assert changedItems.itemsHaveChanged()
         assert cycleCount.cycleCountItems.size() == 2
 
-        CycleCountItem existingCycleCountItem = cycleCount.getCycleCountItem(existingBinLocation, existingInventoryItem, 0)
+        CycleCountItem existingCycleCountItem = cycleCount.getCycleCountItem(
+                product, existingBinLocation, existingInventoryItem, 0)
         assert existingCycleCountItem.quantityOnHand == 20  // QoH is unchanged
 
-        CycleCountItem newCycleCountItem = cycleCount.getCycleCountItem(newBinLocation, newInventoryItem, 0)
+        CycleCountItem newCycleCountItem = cycleCount.getCycleCountItem(product, newBinLocation, newInventoryItem, 0)
         assert newCycleCountItem.status == CycleCountItemStatus.INVESTIGATING
         assert newCycleCountItem.countIndex == 0
         assert newCycleCountItem.quantityOnHand == 30
@@ -307,7 +308,7 @@ class CycleCountProductAvailabilityServiceSpec extends Specification implements 
         assert changedItems.itemsHaveChanged()
         assert cycleCount.cycleCountItems.size() == 1  // The item has not been removed!
 
-        CycleCountItem cycleCountItem = cycleCount.getCycleCountItem(binLocation, inventoryItem, 0)
+        CycleCountItem cycleCountItem = cycleCount.getCycleCountItem(product, binLocation, inventoryItem, 0)
         assert cycleCountItem.quantityOnHand == 0  // QoH is changed
     }
 
@@ -350,7 +351,7 @@ class CycleCountProductAvailabilityServiceSpec extends Specification implements 
         assert changedItems.itemsHaveChanged()
         assert cycleCount.cycleCountItems.size() == 1  // The item has not been removed!
 
-        CycleCountItem cycleCountItem = cycleCount.getCycleCountItem(binLocation, inventoryItem, 0)
+        CycleCountItem cycleCountItem = cycleCount.getCycleCountItem(product, binLocation, inventoryItem, 0)
         assert cycleCountItem.quantityOnHand == 0  // QoH is changed
     }
 
@@ -401,10 +402,10 @@ class CycleCountProductAvailabilityServiceSpec extends Specification implements 
         assert changedItems.itemsHaveChanged()
         assert cycleCount.cycleCountItems.size() == 2
 
-        CycleCountItem countCycleCountItem = cycleCount.getCycleCountItem(binLocation, inventoryItem, 0)
+        CycleCountItem countCycleCountItem = cycleCount.getCycleCountItem(product, binLocation, inventoryItem, 0)
         assert countCycleCountItem.quantityOnHand == 20  // QoH is unchanged
 
-        CycleCountItem recountCycleCountItem = cycleCount.getCycleCountItem(binLocation, inventoryItem, 1)
+        CycleCountItem recountCycleCountItem = cycleCount.getCycleCountItem(product, binLocation, inventoryItem, 1)
         assert recountCycleCountItem.quantityOnHand == 40  // QoH is updated
     }
 }

@@ -11,6 +11,7 @@ package org.pih.warehouse.importer
 
 import grails.gorm.transactions.Transactional
 import grails.plugins.csv.CSVWriter
+import grails.validation.ValidationException
 import org.grails.plugins.excelimport.ExpectedPropertyType
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.InventoryLevel
@@ -25,14 +26,24 @@ class InventoryLevelImportDataService implements ImportDataService {
         List validated = []
         command.data.eachWithIndex { params, index ->
 
+            // Validate that the data type of the column matches the expected type
             if (!validateExpectedType(params)) {
-                command.errors.reject("Row ${index + 2}: Failed validation")
+                command.errors.reject("Row ${index + 2}: Failed expected type validation ${}")
+            }
+
+            // Validate that there are no rows attempting to update inventory levels associated with internal locations
+            if (params.internalLocation) {
+                command.errors.reject("Row ${index + 2}: Importing inventory levels with internal location is not" +
+                        " supported at this time - please remove this row from the import and try again " +
+                        "['${params.productCode}', '${params.facility}', '${params.internalLocation}']")
             }
 
             // Detect duplicates in the validated data
-            def count = validated.count { it.facility == params.facility && it.productCode == params.productCode }
+            def count = validated.count { it.facility == params.facility && it.productCode == params.productCode && it.internalLocation == params.internalLocation }
             if (count > 0) {
-                command.errors.reject("Row ${index + 2}: Detected duplicate inventory levels with facility ${params.facility} and product code ${params.productCode}")
+                command.errors.reject("Row ${index + 2}: Detected duplicate inventory levels with - please remove " +
+                        "duplicate row from the import and try again " +
+                        "['${params.productCode}', '${params.facility}', '${params.internalLocation}']")
             }
 
             // Add the current row to the list of validated records (used to detect duplicates)
@@ -124,8 +135,10 @@ class InventoryLevelImportDataService implements ImportDataService {
             }
             // Create a new inventory level
             else {
-                product.addToInventoryLevels(inventoryLevel)
-                product.save()
+                facility.inventory.addToConfiguredProducts(inventoryLevel)
+                facility.inventory.save()
+                if (!inventoryLevel.validate())
+                    throw new ValidationException("Invalid inventory level", inventoryLevel.errors)
             }
         }
     }
@@ -152,7 +165,12 @@ class InventoryLevelImportDataService implements ImportDataService {
     InventoryLevel updateOrCreateInventoryLevel(Location facility, Product product, Map params) {
         // FIXME This should handle duplicate inventory level but I'm not exactly sure
         //  what to do at this point so I'm going to let the user correct duplicates on their own
-        InventoryLevel inventoryLevel = findOrCreateInventoryLevel(facility, product)
+        InventoryLevel inventoryLevel = InventoryLevel.findByInventoryAndProductAndInternalLocationIsNull(facility.inventory, product)
+        if (!inventoryLevel) {
+            inventoryLevel = new InventoryLevel()
+            inventoryLevel.inventory = facility.inventory
+            inventoryLevel.product = product
+        }
 
         inventoryLevel.status = params.status ? params.status as InventoryStatus : InventoryStatus.SUPPORTED
         inventoryLevel.abcClass = params.abcClass
@@ -171,27 +189,6 @@ class InventoryLevelImportDataService implements ImportDataService {
             inventoryLevel.replenishmentLocation = params.replenishmentLocation as Location
         }
 
-        return inventoryLevel
-    }
-
-    /**
-     * Find or create an inventory level with the given parameters.
-     *
-     * @param product
-     * @param inventory
-     * @param preferredBinLocation
-     * @param minQuantity
-     * @param reorderQuantity
-     * @param maxQuantity
-     * @return
-     */
-    def findOrCreateInventoryLevel(Location facility, Product product) {
-        InventoryLevel inventoryLevel = InventoryLevel.findByInventoryAndProductAndInternalLocationIsNull(facility.inventory, product)
-        if (!inventoryLevel) {
-            inventoryLevel = new InventoryLevel()
-            inventoryLevel.product = product
-            inventoryLevel.inventory = facility.inventory
-        }
         return inventoryLevel
     }
 
