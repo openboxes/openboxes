@@ -21,7 +21,7 @@ import {
 import cycleCountApi from 'api/services/CycleCountApi';
 import { CYCLE_COUNT as CYCLE_COUNT_URL } from 'api/urls';
 import { CYCLE_COUNT } from 'consts/applicationUrls';
-import { TO_RESOLVE_TAB } from 'consts/cycleCount';
+import { TO_COUNT_TAB, TO_RESOLVE_TAB } from 'consts/cycleCount';
 import cycleCountStatus from 'consts/cycleCountStatus';
 import useCountStepValidation from 'hooks/cycleCount/useCountStepValidation';
 import useSpinner from 'hooks/useSpinner';
@@ -340,6 +340,7 @@ const useCountStep = () => {
         return;
       }
       dispatch(eraseDraft());
+      history.push(CYCLE_COUNT.list(TO_COUNT_TAB));
     } finally {
       hide();
     }
