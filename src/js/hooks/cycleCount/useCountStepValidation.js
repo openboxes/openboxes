@@ -1,15 +1,16 @@
-import { useState } from 'react';
+import { useRef } from 'react';
 
 import _ from 'lodash';
 import { z } from 'zod';
 
 import useInventoryValidation from 'hooks/cycleCount/useInventoryValidation';
+import useForceRender from 'hooks/useForceRender';
 import useTranslate from 'hooks/useTranslate';
 
 const useCountStepValidation = ({ tableData }) => {
-  const [validationErrors, setValidationErrors] = useState({});
+  const validationErrors = useRef({});
   // isValid is null only at the beginning, after submitting
-  const [isValid, setIsValid] = useState(null);
+  const isValid = useRef(null);
 
   const translate = useTranslate();
 
@@ -19,6 +20,8 @@ const useCountStepValidation = ({ tableData }) => {
     checkProductsWithLotAndExpiryControl,
     checkLotNumberRequireness,
   } = useInventoryValidation({ tableData });
+
+  const { forceRerender } = useForceRender();
 
   const rowValidationSchema = z.object({
     id: z
@@ -68,24 +71,18 @@ const useCountStepValidation = ({ tableData }) => {
     }, {});
 
     const isFormValid = _.every(Object.values(errors), (val) => val.success);
-    setValidationErrors(errors);
-    setIsValid(isFormValid);
+    validationErrors.current = errors;
+    isValid.current = isFormValid;
     return isFormValid;
   };
 
-  // This is a workaround to trigger re-render of the table after adding a new row
-  const triggerRerenderAfterAddingNewRow = () => {
-    setValidationErrors((prev) => ({ ...prev }));
-  };
-
   return {
-    validationErrors,
-    setValidationErrors,
+    validationErrors: validationErrors.current,
+    isFormValid: isValid.current,
     triggerValidation,
-    isFormValid: isValid,
+    forceRerender,
     rowValidationSchema,
     rowsValidationSchema,
-    triggerRerenderAfterAddingNewRow,
   };
 };
 

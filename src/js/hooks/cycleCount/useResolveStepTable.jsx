@@ -34,6 +34,7 @@ import CustomTooltip from 'wrappers/CustomTooltip';
 const useResolveStepTable = ({
   cycleCountId,
   removeRow,
+  triggerValidation,
   validationErrors,
   shouldHaveRootCause,
   isStepEditable,
@@ -221,6 +222,7 @@ const useResolveStepTable = ({
         ].includes(id)) {
           table.options.meta?.updateData(cycleCountId, original.id, id, value);
           setError(null);
+          triggerValidation();
         }
         if (id === cycleCountColumn.QUANTITY_RECOUNTED) {
           events.emit('refreshRecountDifference');
@@ -238,6 +240,7 @@ const useResolveStepTable = ({
           table.options.meta?.updateData(cycleCountId, original.id, id, enteredValue);
           setError(null);
           setWarning(null);
+          triggerValidation();
         }
         setValue(enteredValue);
       };

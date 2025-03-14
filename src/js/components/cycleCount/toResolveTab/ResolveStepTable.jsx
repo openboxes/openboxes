@@ -37,6 +37,7 @@ const ResolveStepTable = ({
   shouldHaveRootCause,
   isFormValid,
   isStepEditable,
+  triggerValidation,
 }) => {
   const {
     columns,
@@ -52,6 +53,7 @@ const ResolveStepTable = ({
     shouldHaveRootCause,
     productId: product?.id,
     addEmptyRow,
+    triggerValidation,
   });
 
   const translate = useTranslate();
@@ -216,4 +218,5 @@ ResolveStepTable.propTypes = {
   shouldHaveRootCause: PropTypes.func.isRequired,
   isStepEditable: PropTypes.bool.isRequired,
   isFormValid: PropTypes.bool.isRequired,
+  triggerValidation: PropTypes.func.isRequired,
 };

@@ -29,6 +29,7 @@ const useCountStepTable = ({
   isStepEditable,
   formatLocalizedDate,
   addEmptyRow,
+  triggerValidation,
 }) => {
   const columnHelper = createColumnHelper();
   // State for saving data for binLocation dropdown
@@ -142,6 +143,7 @@ const useCountStepTable = ({
         if (isEdited) {
           table.options.meta?.updateData(cycleCountId, original.id, id, value);
           setError(null);
+          triggerValidation();
         }
       };
 

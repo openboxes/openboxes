@@ -68,7 +68,7 @@ const useCountStep = () => {
   const {
     validationErrors,
     triggerValidation,
-    triggerRerenderAfterAddingNewRow,
+    forceRerender,
     isFormValid,
   } = useCountStepValidation({ tableData });
 
@@ -212,11 +212,12 @@ const useCountStep = () => {
 
       return data;
     });
-    triggerRerenderAfterAddingNewRow();
+    forceRerender();
   };
 
   const next = () => {
     const isValid = triggerValidation();
+    forceRerender();
     const areCountedByFilled = _.every(
       cycleCountIds,
       (id) => getCountedBy(id)?.id,
@@ -387,6 +388,7 @@ const useCountStep = () => {
     tableData: tableData.current,
     tableMeta,
     validationErrors,
+    triggerValidation,
     addEmptyRow,
     removeRow,
     printCountForm,

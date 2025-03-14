@@ -40,6 +40,7 @@ const useResolveStep = () => {
     validationErrors,
     isRootCauseWarningSkipped,
     triggerValidation,
+    forceRerender,
     validateRootCauses,
     shouldHaveRootCause,
     showEmptyRootCauseWarning,
@@ -227,11 +228,12 @@ const useResolveStep = () => {
 
       return data;
     });
-    triggerValidation();
+    forceRerender();
   };
 
   const next = () => {
     const isValid = triggerValidation();
+    forceRerender();
     const areRecountedByFilled = _.every(
       cycleCountIds,
       (id) => getRecountedBy(id)?.id,
@@ -418,6 +420,7 @@ const useResolveStep = () => {
     back,
     getProduct,
     getDateCounted,
+    triggerValidation,
   };
 };
 

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 import _ from 'lodash';
 import { z } from 'zod';
@@ -6,14 +6,17 @@ import { z } from 'zod';
 import notification from 'components/Layout/notifications/notification';
 import NotificationType from 'consts/notificationTypes';
 import useInventoryValidation from 'hooks/cycleCount/useInventoryValidation';
+import useForceRender from 'hooks/useForceRender';
 import useTranslate from 'hooks/useTranslate';
 
 const useResolveStepValidation = ({ tableData }) => {
-  const [validationErrors, setValidationErrors] = useState({});
+  const validationErrors = useRef({});
   const [isRootCauseWarningSkipped, setIsRootCauseWarningSkipped] = useState(false);
   // isValid is null only at the beginning, after submitting
-  const [isValid, setIsValid] = useState(null);
+  const isValid = useRef(null);
   const translate = useTranslate();
+
+  const { forceRerender } = useForceRender();
 
   const {
     checkDuplicatedLotNumber,
@@ -93,8 +96,8 @@ const useResolveStepValidation = ({ tableData }) => {
     }, {});
 
     const isFormValid = _.every(Object.values(errors), (val) => val.success);
-    setValidationErrors(errors);
-    setIsValid(isFormValid);
+    validationErrors.current = errors;
+    isValid.current = isFormValid;
     return isFormValid;
   };
 
@@ -133,13 +136,13 @@ const useResolveStepValidation = ({ tableData }) => {
   };
 
   return {
-    validationErrors,
-    setValidationErrors,
-    isFormValid: isValid,
+    validationErrors: validationErrors.current,
+    isFormValid: isValid.current,
     triggerValidation,
     validateRootCauses,
     shouldHaveRootCause,
     showEmptyRootCauseWarning,
+    forceRerender,
     isRootCauseWarningSkipped,
     rowValidationSchema,
     rowsValidationSchema,
