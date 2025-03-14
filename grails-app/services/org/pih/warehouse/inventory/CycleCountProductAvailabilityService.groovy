@@ -6,6 +6,7 @@ import grails.validation.ValidationException
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.User
 import org.pih.warehouse.product.Product
 
@@ -114,10 +115,18 @@ class CycleCountProductAvailabilityService {
             return
         }
 
+        // Find for an original item (countIndex 0) to see, if the original item is custom.
+        // On the counting step we eventually create a custom row that on recount has custom flag as false,
+        // to prevent from deleting such a row. (OBPIH-7097)
+        CycleCountItem correspondingOriginalItem = cycleCountItem.cycleCount.cycleCountItems.find {
+            it.inventoryItem == cycleCountItem.inventoryItem &&
+                    it.location == cycleCountItem.location &&
+                    it.countIndex == 0
+        }
         // Otherwise, it does not exist, so we need to remove it from the count (unless it's a custom added row).
         // Custom added items should not get removed from the count, even if there's no available item. We trust
         // the user to manage items they manually added.
-        if (!cycleCountItem.custom) {
+        if (!cycleCountItem.custom && !correspondingOriginalItem.custom) {
             refreshState.addItemToDelete(cycleCountItem)
             return
         }
@@ -186,7 +195,7 @@ class CycleCountProductAvailabilityService {
         // Computed fields
         Set<CycleCountItem> itemsOfMostRecentCount
         int currentCountIndex
-        User assigneeForNewItems
+        Person assigneeForNewItems
         Date dateCountedForNewItems
         CycleCountItemStatus statusForNewItems
 
