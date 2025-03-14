@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.inventory
 
+import grails.converters.JSON
 import grails.gorm.PagedResultList
 import grails.gorm.transactions.Transactional
 import org.pih.warehouse.core.DocumentService
@@ -17,6 +18,7 @@ import org.pih.warehouse.data.DataService
 import org.pih.warehouse.importer.InventoryLevelImportDataService
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductService
+import org.springframework.http.HttpStatus
 
 @Transactional
 class InventoryLevelController {
@@ -250,9 +252,9 @@ class InventoryLevelController {
     def export() {
 
         Product product = Product.load(params.id)
-        Location facility = Location.load(params?.location?.id ?: session?.warehouse?.id)
+        Location facility = Location.load(params?.location?.id)
 
-        List inventoryLevels = InventoryLevel.createCriteria().list {
+        def inventoryLevels = InventoryLevel.createCriteria().list() {
             if (facility) {
                 eq("inventory", facility.inventory)
             }
@@ -261,28 +263,32 @@ class InventoryLevelController {
             }
         }
 
-        if (inventoryLevels) {
+        if (!inventoryLevels) {
+            response.status = HttpStatus.NOT_FOUND.value()
+            render text: 'Resource not found'
+            return
+        }
 
-            withFormat {
+        withFormat {
 
-                'xls' {
-                    def data = dataService.transformObjects(inventoryLevels, InventoryLevel.PROPERTIES)
-                    documentService.generateExcel(response.outputStream, data)
-                    response.setHeader 'Content-disposition', "attachment; filename=\"inventory-levels.xls\""
-                    response.outputStream.flush()
-                    return
-                }
-
-                '*' {
-                    String text = inventoryLevelImportDataService.exportInventoryLevels(inventoryLevels)
-                    response.contentType = "text/csv"
-                    response.setHeader("Content-disposition", "attachment; filename=\"inventory-levels.csv\"")
-                    render(contentType: "text/csv", text: text)
-                    return
-                }
+            json {
+                render([data: inventoryLevels] as JSON)
             }
-        } else {
-            render(text: 'No inventory levels found', status: 404)
+
+            xls {
+                def data = dataService.transformObjects(inventoryLevels, InventoryLevel.PROPERTIES)
+                documentService.generateExcel(response.outputStream, data)
+                response.setHeader 'Content-disposition', "attachment; filename=\"inventory-levels.xls\""
+                response.outputStream.flush()
+            }
+
+            csv {
+                String text = inventoryLevelImportDataService.exportInventoryLevels(inventoryLevels)
+                response.contentType = "text/csv"
+                response.setHeader("Content-disposition", "attachment; filename=\"inventory-levels.csv\"")
+                render(contentType: "text/csv", text: text)
+            }
+
         }
 
     }

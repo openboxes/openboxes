@@ -26,14 +26,24 @@ class InventoryLevelImportDataService implements ImportDataService {
         List validated = []
         command.data.eachWithIndex { params, index ->
 
+            // Validate that the data type of the column matches the expected type
             if (!validateExpectedType(params)) {
-                command.errors.reject("Row ${index + 2}: Failed validation")
+                command.errors.reject("Row ${index + 2}: Failed expected type validation ${}")
+            }
+
+            // Validate that there are no rows attempting to update inventory levels associated with internal locations
+            if (params.internalLocation) {
+                command.errors.reject("Row ${index + 2}: Importing inventory levels with internal location is not" +
+                        " supported at this time - please remove this row from the import and try again " +
+                        "['${params.productCode}', '${params.facility}', '${params.internalLocation}']")
             }
 
             // Detect duplicates in the validated data
-            def count = validated.count { it.facility == params.facility && it.productCode == params.productCode }
+            def count = validated.count { it.facility == params.facility && it.productCode == params.productCode && it.internalLocation == params.internalLocation }
             if (count > 0) {
-                command.errors.reject("Row ${index + 2}: Detected duplicate inventory levels with facility ${params.facility} and product code ${params.productCode}")
+                command.errors.reject("Row ${index + 2}: Detected duplicate inventory levels with - please remove " +
+                        "duplicate row from the import and try again " +
+                        "['${params.productCode}', '${params.facility}', '${params.internalLocation}']")
             }
 
             // Add the current row to the list of validated records (used to detect duplicates)
@@ -158,16 +168,15 @@ class InventoryLevelImportDataService implements ImportDataService {
         InventoryLevel inventoryLevel = InventoryLevel.findByInventoryAndProductAndInternalLocationIsNull(facility.inventory, product)
         if (!inventoryLevel) {
             inventoryLevel = new InventoryLevel()
+            inventoryLevel.inventory = facility.inventory
+            inventoryLevel.product = product
         }
 
-        inventoryLevel.inventory = facility.inventory
-        inventoryLevel.product = product
         inventoryLevel.status = params.status ? params.status as InventoryStatus : InventoryStatus.SUPPORTED
         inventoryLevel.abcClass = params.abcClass
         inventoryLevel.minQuantity = params.minQuantity as Integer
         inventoryLevel.reorderQuantity = params.reorderQuantity as Integer
         inventoryLevel.maxQuantity = params.maxQuantity as Integer
-        inventoryLevel.forecastPeriodDays = 30
 
         // Don't clear locations if columns in import are null
         if (params.internalLocation) {
