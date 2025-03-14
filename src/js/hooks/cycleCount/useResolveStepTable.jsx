@@ -438,24 +438,21 @@ const useResolveStepTable = ({
           {translate('react.cycleCount.table.recountDifference.label', 'Recount Difference')}
         </TableHeaderCell>
       ), []),
-      cell: ({ row: { original: { quantityOnHand, id }, index } }) => {
+      cell: ({ row: { original: { quantityOnHand }, index } }) => {
         const [value, setValue] = useState(tableData?.[index]?.quantityRecounted);
         const recountDifference = value - (quantityOnHand || 0);
-        const variant = getCycleCountDifferencesVariant(recountDifference, id);
+        const variant = getCycleCountDifferencesVariant(recountDifference, value);
         events.on('refreshRecountDifference', () => {
           setValue(tableData?.[index]?.quantityRecounted);
         });
 
         return (
           <TableCell className="rt-td rt-td-count-step static-cell-count-step d-flex align-items-center">
-            {value !== null
-              && (
-                <ArrowValueIndicator
-                  value={recountDifference}
-                  variant={variant}
-                  showAbsoluteValue
-                />
-              )}
+              <ArrowValueIndicator
+                value={recountDifference}
+                variant={variant}
+                showAbsoluteValue
+              />
           </TableCell>
         );
       },
