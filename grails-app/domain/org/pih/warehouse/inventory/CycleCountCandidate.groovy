@@ -36,7 +36,7 @@ class CycleCountCandidate {
 
     Integer daysUntilNextCount
 
-    Boolean included
+    Boolean hasStockOnHandOrNegativeStock
 
     Date dateLatestInventory
 
@@ -70,6 +70,7 @@ class CycleCountCandidate {
                 status: status.toString(),
                 inventoryItemCount: inventoryItemCount,
                 negativeItemCount: negativeItemCount,
+                hasStockOnHandOrNegativeStock: hasStockOnHandOrNegativeStock,
                 sortOrder: sortOrder,
         ]
     }

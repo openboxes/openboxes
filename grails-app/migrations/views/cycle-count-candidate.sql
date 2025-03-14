@@ -1,7 +1,7 @@
 CREATE OR REPLACE VIEW cycle_count_candidate AS
 (
 SELECT *,
-       (negative_item_count > 0 OR quantity_on_hand > 0) as included,
+       (negative_item_count > 0 OR quantity_on_hand > 0) as has_stock_on_hand_or_negative_stock,
        CASE
            -- Calculate the sort order priority for each cycle count candidate
            -- 0 = Has never been counted or overdue for a count
@@ -12,7 +12,7 @@ SELECT *,
            WHEN days_until_next_count < 0 THEN 1
            WHEN days_until_next_count >= 0 THEN 2
            ELSE 3
-       END as sort_order
+           END                                           as sort_order
 FROM cycle_count_session
 ORDER BY sort_order,
          abc_class IS NULL asc,
