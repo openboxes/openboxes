@@ -143,6 +143,7 @@ const useCountStep = () => {
     // for every item
     markAllItemsAsUpdated(cycleCountId);
     setCountedBy((prevState) => ({ ...prevState, [cycleCountId]: person }));
+    setDefaultCountedBy((prevState) => ({ ...prevState, [cycleCountId]: person }));
   };
 
   const getCountedBy = (cycleCountId) => countedBy?.[cycleCountId];

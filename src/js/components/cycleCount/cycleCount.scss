@@ -207,6 +207,16 @@ limit-lines($lines-number) {
   &--warning {
     color: var(--blue-primary);
   }
+
+  &--top-40 {
+    top: 40%;
+    left: 5px;
+  }
+
+  &--top-60 {
+    top: 60%;
+    left: 5px;
+  }
 }
 
 .input-has-error {
