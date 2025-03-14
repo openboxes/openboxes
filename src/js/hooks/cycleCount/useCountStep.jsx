@@ -315,6 +315,7 @@ const useCountStep = () => {
     confirmationModal({
       buttons: resolveDiscrepanciesModalButtons(requestIdsWithDiscrepancies),
       ...modalLabels,
+      hideCloseButton: true,
     });
   };
 
