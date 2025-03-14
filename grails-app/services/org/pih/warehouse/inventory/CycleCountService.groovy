@@ -301,8 +301,8 @@ class CycleCountService {
         Location facility = command.facility
 
         List<CycleCountDto> cycleCounts = []
-        for (CycleCountStartRecountCommand cycleCount : command.cycleCounts) {
-            CycleCountDto cycleCountDto = startRecount(facility, cycleCount)
+        for (CycleCountStartRecountCommand request : command.requests) {
+            CycleCountDto cycleCountDto = startRecount(facility, request)
             cycleCounts.add(cycleCountDto)
         }
 
@@ -313,12 +313,13 @@ class CycleCountService {
      * Inserts a list of cycle count items representing the recount for the given request.
      */
     CycleCountDto startRecount(Location facility, CycleCountStartRecountCommand command) {
-        CycleCount cycleCount = command.cycleCount
-        Product product = command.cycleCount.cycleCountItems?.first()?.product
+        CycleCount cycleCount = command.cycleCountRequest.cycleCount
+        Product product = command.cycleCountRequest.product
+        Integer countIndex = command.countIndex
 
         // If there are already items for the requested count index, simply return the count as it is since the recount
         // has already been started. We do this (instead of throwing an error) because it's convenient for the frontend.
-        if (cycleCount.cycleCountItems.any{ it.countIndex == command.countIndex }) {
+        if (cycleCount.maxCountIndex >= countIndex) {
             return CycleCountDto.toDto(cycleCount)
         }
 
@@ -333,7 +334,30 @@ class CycleCountService {
                     facility,
                     availableItemToRecount,
                     cycleCount,
-                    command.countIndex,
+                    countIndex,
+                    CycleCountItemStatus.INVESTIGATING)
+
+            cycleCount.addToCycleCountItems(cycleCountItem)
+        }
+
+        // If there are custom items, they won't have been discovered by the above loop (because they won't have
+        // a product availability record) so make sure to create new recount items for them as well.
+        // "Most recent count" in this scenario is the previous count.
+        Set<CycleCountItem> customItemsOfLastCount = cycleCount.itemsOfMostRecentCount.findAll{ it.custom }
+        for (CycleCountItem customCycleCountItem : customItemsOfLastCount) {
+            // We want to avoid a situation where we create an inventory using a custom row
+            // and then someone is creating the same inventory on record stock
+            CycleCountItem itemAlreadyExists = cycleCount.getCycleCountItem(customCycleCountItem.product,
+                    customCycleCountItem.location, customCycleCountItem.inventoryItem, countIndex)
+            if (itemAlreadyExists) {
+                continue
+            }
+
+            CycleCountItem cycleCountItem = initCycleCountItemFromCustom(
+                    facility,
+                    customCycleCountItem,
+                    cycleCount,
+                    countIndex,
                     CycleCountItemStatus.INVESTIGATING)
 
             cycleCount.addToCycleCountItems(cycleCountItem)
@@ -369,6 +393,35 @@ class CycleCountService {
         )
     }
 
+    private CycleCountItem initCycleCountItemFromCustom(
+            Location facility,
+            CycleCountItem cycleCountItem,
+            CycleCount cycleCount,
+            int countIndex,
+            CycleCountItemStatus status) {
+
+        return new CycleCountItem(
+                status: status,
+                countIndex: countIndex,
+                quantityOnHand: cycleCountItem.quantityOnHand,
+                quantityCounted: null,
+                cycleCount: cycleCount,
+                facility: facility,
+                location: cycleCountItem.location,
+                inventoryItem: cycleCountItem.inventoryItem,
+                product: cycleCountItem.inventoryItem.product,
+                createdBy: AuthService.currentUser,
+                updatedBy: AuthService.currentUser,
+                dateCounted: new Date(),
+
+                // Note that even though the given item is custom added, the resulting item is treated as not
+                // custom. This is done to preserve count information. Ex: If the item was custom added during the
+                // count, we don't want to be able to remove it from the recount. If on a recount a user decides they
+                // don't actually need an item they added during the count, they can set its quantity counted to 0.
+                custom: false,
+        )
+    }
+
     List<CycleCountDto> getCycleCounts(List<String> ids) {
         List<CycleCount> cycleCounts = CycleCount.createCriteria().list {
             if (ids) {
@@ -397,17 +450,31 @@ class CycleCountService {
             determineCycleCountItemStatusForSubmit(cycleCountItem, command.requireRecountOnDiscrepancy)
         }
 
-        cycleCount.status = cycleCount.recomputeStatus()
+        // We've updated the status of the cycle count items so we need to also update the status of the count.
+        recomputeCycleCountStatus(cycleCount)
+
         // TODO: Investigate why status could be null here
         if (cycleCount.status?.isClosed()) {
             closeCycleCount(cycleCount, command.refreshQuantityOnHand)
         }
 
-        // TODO: The beforeUpdate() on CycleCount class is not triggered without
-        // the line below, so without it status is not correct in the DB.
-        // Investigate why this line is needed.
-        cycleCount.save()
         return CycleCountDto.toDto(cycleCount)
+    }
+
+    /**
+     * Recalculate the status of a cycle count based on the status of its items.
+     *
+     * This status will be automatically recomputed when a cycle count is saved, so this method only needs to be called
+     * when we want to trigger a status recalculation outside of that flow, such as when the status of a cycle
+     * count item changes.
+     */
+    private void recomputeCycleCountStatus(CycleCount cycleCount) {
+        cycleCount.status = cycleCount.recomputeStatus()
+
+        // TODO: We sometimes get errors and the status update isn't persisted unless we call save like this. GORM
+        //       should be automatically persisting the status update when its session is flushed so we shouldn't
+        //       need this save() but something weird is happening. Investigate why this line is needed.
+        cycleCount.save()
     }
 
     private void determineCycleCountItemStatusForSubmit(CycleCountItem cycleCountItem, boolean requireRecountOnDiscrepancy) {
@@ -447,6 +514,9 @@ class CycleCountService {
         cycleCountItem.status = command.recount ? CycleCountItemStatus.INVESTIGATING : CycleCountItemStatus.COUNTING
         cycleCountItem.dateCounted = new Date()
 
+        // We've updated the status of a cycle count item so we need to also update the status of the count.
+        recomputeCycleCountStatus(cycleCountItem.cycleCount)
+
         return cycleCountItem.toDto()
     }
 
@@ -458,13 +528,15 @@ class CycleCountService {
             command.inventoryItem.save()
         }
         Integer currentQuantityOnHand = productAvailabilityService.getQuantityOnHandInBinLocation(command.inventoryItem, command.facility) ?: 0
+        CycleCount cycleCount = command.cycleCount
+
         CycleCountItem cycleCountItem = new CycleCountItem(
                 facility: command.facility,
                 status: command.recount ? CycleCountItemStatus.INVESTIGATING : CycleCountItemStatus.COUNTING,
                 countIndex: command.recount ? 1 : 0,
                 quantityOnHand: currentQuantityOnHand,
                 quantityCounted: command.quantityCounted,
-                cycleCount: command.cycleCount,
+                cycleCount: cycleCount,
                 location: command.binLocation,
                 inventoryItem: command.inventoryItem,
                 product: command.inventoryItem?.product,
@@ -480,6 +552,10 @@ class CycleCountService {
             throw new ValidationException("Invalid cycle count item", cycleCountItem.errors)
         }
         cycleCountItem.save()
+
+        // We're adding a new cycle count item to the count so we need to also update the status of the count.
+        cycleCount.addToCycleCountItems(cycleCountItem)
+        recomputeCycleCountStatus(cycleCount)
 
         return cycleCountItem.toDto()
     }

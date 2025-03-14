@@ -7,7 +7,7 @@ import org.pih.warehouse.core.Location
 
 class CycleCountStartRecountBatchCommand implements Validateable {
 
-    List<CycleCountStartRecountCommand> cycleCounts
+    List<CycleCountStartRecountCommand> requests
 
     Location facility
 
@@ -17,10 +17,10 @@ class CycleCountStartRecountBatchCommand implements Validateable {
     }
 
     static constraints = {
-        cycleCounts(validator: { List<CycleCountStartRecountCommand> cycleCounts ->
+        requests(validator: { List<CycleCountStartRecountCommand> requests ->
             // Validate every element of the batch
-            cycleCounts.each { CycleCountStartRecountCommand command -> command.validate() }
-            if (cycleCounts.any { it.hasErrors() }) {
+            requests.each { CycleCountStartRecountCommand command -> command.validate() }
+            if (requests.any { it.hasErrors() }) {
                 return false
             }
         })

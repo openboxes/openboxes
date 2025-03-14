@@ -10,10 +10,12 @@ import {
 
 import _ from 'lodash';
 import { useDispatch, useSelector } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 
 import { fetchBinLocations, fetchUsers } from 'actions';
 import cycleCountApi from 'api/services/CycleCountApi';
-import { CYCLE_COUNT } from 'api/urls';
+import { CYCLE_COUNT } from 'consts/applicationUrls';
+import { TO_RESOLVE_TAB } from 'consts/cycleCount';
 import useResolveStepValidation from 'hooks/cycleCount/useResolveStepValidation';
 import useSpinner from 'hooks/useSpinner';
 import exportFileFromApi from 'utils/file-download-util';
@@ -31,6 +33,7 @@ const useResolveStep = () => {
   const [isStepEditable, setIsStepEditable] = useState(true);
   const [refreshFocusCounter, setRefreshFocusCounter] = useState(0);
   const { show, hide } = useSpinner();
+  const history = useHistory();
 
   const {
     validationErrors,
@@ -39,6 +42,7 @@ const useResolveStep = () => {
     validateRootCauses,
     shouldHaveRootCause,
     showEmptyRootCauseWarning,
+    isFormValid,
   } = useResolveStepValidation({ tableData });
 
   const dispatch = useDispatch();
@@ -85,6 +89,7 @@ const useResolveStep = () => {
           quantityRecounted: item?.quantityCounted,
           dateRecounted: item?.dateCounted,
           recountedBy: item?.assignee,
+          quantityVariance: null,
           quantityCounted: null,
           commentFromCount: null,
           dateCounted: null,
@@ -101,6 +106,8 @@ const useResolveStep = () => {
         ...itemFromResolve,
         commentFromCount: itemFromCount?.comment,
         quantityRecounted: itemFromResolve?.quantityCounted,
+        quantityCounted: itemFromCount?.quantityCounted,
+        quantityVariance: itemFromCount?.quantityVariance,
         dateCounted: itemFromCount?.dateCounted,
         dateRecounted: itemFromResolve?.dateCounted,
         countedBy: itemFromCount?.assignee,
@@ -121,7 +128,12 @@ const useResolveStep = () => {
       ...acc,
       [cycleCount?.id]: cycleCount?.cycleCountItems?.[0]?.dateRecounted,
     }), {});
+    const recountedByData = tableData.current?.reduce((acc, cycleCount) => ({
+      ...acc,
+      [cycleCount?.id]: cycleCount?.cycleCountItems?.[0]?.recountedBy,
+    }), {});
     setDateRecounted(recountedDates);
+    setRecountedBy(recountedByData);
   };
 
   useEffect(() => {
@@ -223,7 +235,12 @@ const useResolveStep = () => {
   const next = () => {
     resetFocus();
     const isValid = triggerValidation();
-    if (!isValid) {
+    const areRecountedByFilled = _.every(
+      cycleCountIds,
+      (id) => getRecountedBy(id)?.id,
+    );
+
+    if (!isValid || !areRecountedByFilled) {
       return;
     }
 
@@ -320,8 +337,40 @@ const useResolveStep = () => {
     }
   };
 
-  const submitRecount = () => {
-    console.log('submit');
+  const mapItemToSubmitRecountPayload = (cycleCountItem) => ({
+    assignee: cycleCountItem?.recountedBy,
+    binLocation: cycleCountItem?.binLocation,
+    comment: cycleCountItem?.comment,
+    countIndex: 1,
+    dateCounted: cycleCountItem?.dateRecounted,
+    discrepancyReasonCode: cycleCountItem?.discrepancyReasonCode,
+    facility: currentLocation?.id,
+    id: cycleCountItem?.id,
+    inventoryItem: cycleCountItem?.inventoryItem,
+    product: cycleCountItem?.product,
+    quantityCounted: cycleCountItem?.quantityRecounted,
+  });
+
+  const submitRecount = async () => {
+    try {
+      show();
+      await save();
+      for (const cycleCount of tableData.current) {
+        await cycleCountApi.submitRecount({
+          refreshQuantityOnHand: true,
+          failOnOutdatedQuantity: true,
+          requireRecountOnDiscrepancy: false,
+          cycleCountItems: cycleCount?.cycleCountItems?.map(
+            (item) => mapItemToSubmitRecountPayload(item),
+          ),
+        },
+        currentLocation?.id,
+        cycleCount?.id);
+      }
+      history.push(CYCLE_COUNT.list(TO_RESOLVE_TAB));
+    } finally {
+      hide();
+    }
   };
 
   const updateRow = (cycleCountId, rowId, columnId, value) => {
@@ -358,6 +407,7 @@ const useResolveStep = () => {
     tableMeta,
     validationErrors,
     isStepEditable,
+    isFormValid,
     getRecountedBy,
     getCountedBy,
     addEmptyRow,
