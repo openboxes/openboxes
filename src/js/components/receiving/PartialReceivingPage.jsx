@@ -673,9 +673,9 @@ class PartialReceivingPage extends Component {
    * Fetches available receipts from API.
    * @public
    */
-  fetchPartialReceiptCandidates() {
+  fetchPartialReceiptCandidates(selectedOption) {
     this.props.showSpinner();
-    const url = `/api/partialReceiving/${this.props.match.params.shipmentId}?stepNumber=1&sort=${this.props.sort}`;
+    const url = `/api/partialReceiving/${this.props.match.params.shipmentId}?stepNumber=1&sort=${selectedOption || this.props.sort}`;
 
     apiClient.get(url)
       .then((response) => {
@@ -1003,10 +1003,7 @@ class PartialReceivingPage extends Component {
 
   handleSortChange = (selectedOption) => {
     this.props.updateSort(selectedOption.value);
-    this.fetchPartialReceiptCandidates();
-    // this.setState({ sort: selectedOption.value }, () => {
-    //   this.fetchPartialReceiptCandidates();
-    // });
+    this.fetchPartialReceiptCandidates(selectedOption.value);
   };
 
   render() {
