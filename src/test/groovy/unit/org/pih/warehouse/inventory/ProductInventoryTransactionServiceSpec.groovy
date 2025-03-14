@@ -58,7 +58,7 @@ class ProductInventoryTransactionServiceSpec extends Specification implements Da
         given: 'mocked inputs'
         Location facility = new Location(inventory: new Inventory())
         Product product = new Product()
-        CycleCount cycleCount = new CycleCount()
+        CycleCount cycleCount = new CycleCount(cycleCountItems: [])
         Date date = new Date()
 
         and: 'a mocked transaction number'
