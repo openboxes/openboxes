@@ -370,10 +370,10 @@ const useCountStep = () => {
   const getCountedDate = (cycleCountId) => dateCounted[cycleCountId];
 
   const setCountedDate = (cycleCountId) => (date) => {
-    setDateCounted({
-      ...date,
+    setDateCounted((prevState) => ({
+      ...prevState,
       [cycleCountId]: date,
-    });
+    }));
   };
 
   return {
