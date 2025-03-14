@@ -5,7 +5,7 @@ import org.pih.warehouse.shipping.Container
 class PartialReceiptContainer{
 
     Container container
-    String sortBy = 'sortOrder'
+    String sortBy
     List<PartialReceiptItem> partialReceiptItems = []
 
     Boolean isDefault() {
@@ -18,7 +18,6 @@ class PartialReceiptContainer{
     }
 
     Map toJson() {
-        println("sortBy ${sortBy}")
         return [
                 "container.id"        : container?.id,
                 "container.name"      : container?.name,
