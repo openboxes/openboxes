@@ -4,12 +4,13 @@ import grails.validation.Validateable
 
 class CycleCountStartRecountCommand implements Validateable {
 
-    CycleCount cycleCount
+    CycleCountRequest cycleCountRequest
 
     Integer countIndex
 
     static constraints = {
-        cycleCount(validator: { CycleCount cycleCount ->
+        cycleCountRequest(validator: { CycleCountRequest cycleCountRequest ->
+            CycleCount cycleCount = cycleCountRequest.cycleCount
             if (!cycleCount) {
                 return ['noCycleCountFound']
             }
