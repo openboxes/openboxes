@@ -75,9 +75,13 @@
 
         <div class="content">
             <g:each var="cycleCount" in="${cycleCounts}">
-                <g:set var="product" value="${cycleCount.cycleCountItems?.first()?.product}"/>
-                <g:set var="dateCounted" value="${cycleCount.cycleCountItems?.first()?.dateCounted}"/>
-                <g:set var="userCounted" value="${cycleCount.cycleCountItems?.find { it.countIndex == 0 }?.assignee}"/>
+                <g:set var="firstCountItem" value="${cycleCount.cycleCountItems?.find { it.countIndex == 0 }}"/>
+                <g:set var="firstRecountItem" value="${cycleCount.cycleCountItems?.find { it.countIndex == 1 }}"/>
+                <g:set var="product" value="${firstCountItem?.product}"/>
+                <g:set var="dateCounted" value="${firstCountItem?.dateCounted}"/>
+                <g:set var="userCounted" value="${firstCountItem?.assignee}"/>
+                <g:set var="dateRecounted" value="${firstRecountItem?.dateCounted}"/>
+                <g:set var="userRecounted" value="${firstRecountItem?.assignee}"/>
                 <table>
                     <thead>
                     <tr>
@@ -102,9 +106,11 @@
                     <tr>
                         <th colspan="2" class="b-r0 b-t0" style="padding: 0 0 10px 10px;">
                             ${g.message(code: 'cycleCount.dateRecounted.label')}:
+                            <g:formatDate date="${dateRecounted}" format="MMM d, yyyy"/>
                         </th>
                         <th colspan="2" class="b-r0 b-l0 b-t0" style="padding: 0 0 10px 0;">
                             ${g.message(code: 'cycleCount.userRecounted.label')}:
+                            ${userRecounted}
                         </th>
                         <th colspan="3" class="b-l0 b-t0" style="padding-bottom: 10px;"></th>
                     </tr>

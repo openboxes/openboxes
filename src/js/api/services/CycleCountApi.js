@@ -24,9 +24,9 @@ export default {
   }) => apiClient.post(
     CYCLE_COUNT_RECOUNT_START(locationId, format), payload, config,
   ),
-  getCycleCounts: (locationId, ids, format = null, config = {}) => {
-    const queryParams = queryString.stringify({ id: ids, format });
-    return apiClient.get(`${CYCLE_COUNT(locationId)}?${queryParams}`, config);
+  getCycleCounts: (locationId, ids) => {
+    const queryParams = queryString.stringify({ id: ids });
+    return apiClient.get(`${CYCLE_COUNT(locationId)}?${queryParams}`);
   },
   updateCycleCountItem: (payload, locationId, itemId) =>
     apiClient.patch(CYCLE_COUNT_ITEM(locationId, itemId), payload),

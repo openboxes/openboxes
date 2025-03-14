@@ -193,7 +193,7 @@ class CycleCountService {
                         "Lot Number": item.inventoryItem.lotNumber,
                         "Expiration Date": item.inventoryItem.expirationDate
                                 ? Constants.EXPIRATION_DATE_FORMATTER.format(item.inventoryItem.expirationDate) : "",
-                        "Bin Location": item.binLocation?.locationNumber,
+                        "Bin Location": item.binLocation?.name,
                         "Quantity Counted": "",
                         "Comment": "",
                         "User Counted": "",
@@ -215,7 +215,7 @@ class CycleCountService {
                         "Lot Number": item.inventoryItem.lotNumber,
                         "Expiration Date": item.inventoryItem.expirationDate
                                 ? Constants.EXPIRATION_DATE_FORMATTER.format(item.inventoryItem.expirationDate) : "",
-                        "Bin Location": item.binLocation?.locationNumber,
+                        "Bin Location": item.binLocation?.name,
                         "Quantity Counted": item.quantityCounted,
                         "Difference": item.quantityVariance,
                         "Counted by": item.assignee,

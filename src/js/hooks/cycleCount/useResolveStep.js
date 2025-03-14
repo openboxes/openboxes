@@ -14,6 +14,7 @@ import { useHistory } from 'react-router-dom';
 
 import { fetchBinLocations, fetchUsers } from 'actions';
 import cycleCountApi from 'api/services/CycleCountApi';
+import { CYCLE_COUNT as GET_CYCLE_COUNTS } from 'api/urls';
 import { CYCLE_COUNT } from 'consts/applicationUrls';
 import { TO_RESOLVE_TAB } from 'consts/cycleCount';
 import useResolveStepValidation from 'hooks/cycleCount/useResolveStepValidation';
@@ -147,7 +148,7 @@ const useResolveStep = () => {
   const printRecountForm = async (format) => {
     show();
     await exportFileFromApi({
-      url: CYCLE_COUNT(currentLocation?.id),
+      url: GET_CYCLE_COUNTS(currentLocation?.id),
       params: { id: cycleCountIds },
       format,
     });
