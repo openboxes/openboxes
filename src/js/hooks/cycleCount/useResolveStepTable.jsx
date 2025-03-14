@@ -448,11 +448,11 @@ const useResolveStepTable = ({
 
         return (
           <TableCell className="rt-td rt-td-count-step static-cell-count-step d-flex align-items-center">
-              <ArrowValueIndicator
-                value={recountDifference}
-                variant={variant}
-                showAbsoluteValue
-              />
+            <ArrowValueIndicator
+              value={recountDifference}
+              variant={variant}
+              showAbsoluteValue
+            />
           </TableCell>
         );
       },
