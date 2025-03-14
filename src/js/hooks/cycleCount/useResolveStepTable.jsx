@@ -287,7 +287,7 @@ const useResolveStepTable = ({
         addNewRow: () => addEmptyRow(productId, cycleCountId),
         isNewRow,
       });
-      const isWiderWidth = [
+      const isAutoWidth = [
         cycleCountColumn.ROOT_CAUSE,
         cycleCountColumn.COMMENT,
         cycleCountColumn.EXPIRATION_DATE,
@@ -308,7 +308,7 @@ const useResolveStepTable = ({
             value={value}
             onChange={onChange}
             onBlur={onBlur}
-            className={`${isWiderWidth ? 'w-90' : 'w-75'} m-1 hide-arrows ${error && 'border border-danger input-has-error'}`}
+            className={`${isAutoWidth ? 'w-auto' : 'w-75'} m-1 hide-arrows ${error && 'border border-danger input-has-error'}`}
             showErrorBorder={error}
             onChangeRaw={onChangeRaw}
             hideErrorMessageWrapper
