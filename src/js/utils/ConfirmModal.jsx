@@ -13,7 +13,7 @@ const ConfirmModal = ({
   onClose,
   buttons,
   className,
-  hideCloseButton = false,
+  hideCloseButton,
 }) => (
   <div className={`d-flex flex-column custom-modal-content justify-content-between bg-white ${className}`}>
     <div className="d-flex justify-content-between">
@@ -74,6 +74,7 @@ ConfirmModal.propTypes = {
     label: PropTypes.string.isRequired,
     onClick: PropTypes.func.isRequired,
   })),
+  hideCloseButton: PropTypes.bool,
 };
 
 ConfirmModal.defaultProps = {
@@ -89,4 +90,5 @@ ConfirmModal.defaultProps = {
   },
   buttons: [],
   className: '',
+  hideCloseButton: false,
 };
