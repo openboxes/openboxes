@@ -31,6 +31,8 @@ const useResolveStep = () => {
   // Saving selected "date recounted" option, initially it's the date fetched from API
   const [dateRecounted, setDateRecounted] = useState({});
   const [isStepEditable, setIsStepEditable] = useState(true);
+  // State used to trigger focus reset when changed. When this counter changes,
+  // it will reset the focus by clearing the RowIndex and ColumnId in useEffect.
   const [refreshFocusCounter, setRefreshFocusCounter] = useState(0);
   const { show, hide } = useSpinner();
   const history = useHistory();

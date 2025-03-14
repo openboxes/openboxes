@@ -32,8 +32,10 @@ const useCountStepTable = ({
   refreshFocusCounter,
 }) => {
   const columnHelper = createColumnHelper();
-  const [focusIndex, setFocusIndex] = useState(null);
-  const [focusId, setFocusId] = useState(null);
+  const [rowIndex, setRowIndex] = useState(null);
+  const [columnId, setColumnId] = useState(null);
+  // If prevForceResetFocus is different from refreshFocusCounter,
+  // it triggers a reset of rowIndex and columnId.
   const [prevForceResetFocus, setPrevForceResetFocus] = useState(0);
 
   const translate = useTranslate();
@@ -46,8 +48,8 @@ const useCountStepTable = ({
 
   useEffect(() => {
     if (refreshFocusCounter !== prevForceResetFocus) {
-      setFocusIndex(null);
-      setFocusId(null);
+      setRowIndex(null);
+      setColumnId(null);
       setPrevForceResetFocus(refreshFocusCounter);
     }
   }, [refreshFocusCounter]);
@@ -198,8 +200,8 @@ const useCountStepTable = ({
         newRowFocusableCells,
         existingRowFocusableCells,
         tableData,
-        setFocusId,
-        setFocusIndex,
+        setColumnId,
+        setRowIndex,
         addNewRow: () => addEmptyRow(productId, cycleCountId),
         isNewRow,
       });
@@ -225,8 +227,8 @@ const useCountStepTable = ({
             focusProps={{
               fieldIndex: index,
               fieldId: columnPath,
-              focusIndex,
-              focusId,
+              rowIndex,
+              columnId,
             }}
             onWheel={(event) => event.currentTarget.blur()}
             {...fieldProps}

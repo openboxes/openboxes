@@ -40,6 +40,8 @@ const useCountStep = () => {
   // Saving selected "date counted" option, initially it's the date fetched from API
   const [dateCounted, setDateCounted] = useState({});
   const [isStepEditable, setIsStepEditable] = useState(true);
+  // State used to trigger focus reset when changed. When this counter changes,
+  // it will reset the focus by clearing the RowIndex and ColumnId in useEffect.
   const [refreshFocusCounter, setRefreshFocusCounter] = useState(0);
 
   const dispatch = useDispatch();

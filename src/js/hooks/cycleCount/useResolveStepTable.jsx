@@ -43,8 +43,10 @@ const useResolveStepTable = ({
   refreshFocusCounter,
 }) => {
   const columnHelper = createColumnHelper();
-  const [focusIndex, setFocusIndex] = useState(null);
-  const [focusId, setFocusId] = useState(null);
+  const [rowIndex, setRowIndex] = useState(null);
+  const [columnId, setColumnId] = useState(null);
+  // If prevForceResetFocus is different from refreshFocusCounter,
+  // it triggers a reset of rowIndex and columnId.
   const [prevForceResetFocus, setPrevForceResetFocus] = useState(0);
 
   // State for saving data for binLocation dropdown
@@ -72,8 +74,8 @@ const useResolveStepTable = ({
 
   useEffect(() => {
     if (refreshFocusCounter !== prevForceResetFocus) {
-      setFocusIndex(null);
-      setFocusId(null);
+      setRowIndex(null);
+      setColumnId(null);
       setPrevForceResetFocus(refreshFocusCounter);
     }
   }, [refreshFocusCounter]);
@@ -281,8 +283,8 @@ const useResolveStepTable = ({
         newRowFocusableCells,
         existingRowFocusableCells,
         tableData,
-        setFocusId,
-        setFocusIndex,
+        setColumnId,
+        setRowIndex,
         addNewRow: () => addEmptyRow(productId, cycleCountId),
         isNewRow,
       });
@@ -303,8 +305,8 @@ const useResolveStepTable = ({
             focusProps={{
               fieldIndex: index,
               fieldId: columnPath,
-              focusIndex,
-              focusId,
+              rowIndex,
+              columnId,
             }}
             onWheel={(event) => event.currentTarget.blur()}
             {...fieldProps}
