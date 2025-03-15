@@ -408,4 +408,44 @@ class CycleCountProductAvailabilityServiceSpec extends Specification implements 
         CycleCountItem recountCycleCountItem = cycleCount.getCycleCountItem(product, binLocation, inventoryItem, 1)
         assert recountCycleCountItem.quantityOnHand == 40  // QoH is updated
     }
+
+    void 'OBPIH-7097 refreshProductAvailability should not remove items that were custom added during a count when refreshing during recount'() {
+        given: 'a cycle count'
+        Location facility = new Location()
+        Product product = new Product()
+        InventoryItem inventoryItem = new InventoryItem(product: product, lotNumber: 'lotNumber')
+        Location binLocation = new Location(name: 'binLocation')
+        CycleCount cycleCount = new CycleCount(
+                facility: facility,
+                status: CycleCountStatus.INVESTIGATING,
+                cycleCountItems: [
+                        new CycleCountItem(
+                                inventoryItem: inventoryItem,
+                                location: binLocation,
+                                product: product,
+                                countIndex: 0,  // count
+                                quantityOnHand: 0,
+                                custom: true,  // this is a custom row
+                        ),
+                        new CycleCountItem(
+                                inventoryItem: inventoryItem,
+                                location: binLocation,
+                                product: product,
+                                countIndex: 1,  // recount
+                                quantityOnHand: 0,
+                                custom: false,  // this is NOT a custom row
+                        ),
+                ]
+        )
+
+        and: 'mocked available items that do not contain the item'
+        productAvailabilityServiceStub.getAvailableItems(facility, [product.id], false, true) >> []
+
+        when: 'we refresh product availability'
+        CycleCountProductAvailabilityService.CycleCountItemsForRefresh changedItems =
+                cycleCountProductAvailabilityService.refreshProductAvailability(cycleCount)
+
+        then: 'items should not have changed'
+        assert !changedItems.itemsHaveChanged()
+    }
 }
