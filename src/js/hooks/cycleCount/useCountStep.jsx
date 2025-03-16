@@ -225,16 +225,27 @@ const useCountStep = () => {
     setIsStepEditable(true);
   };
 
+  const getCountedDate = (cycleCountId) => dateCounted[cycleCountId];
+
+  const convertToUTCISO = (dateString) => {
+    const localDate = new Date(dateString);
+    // eslint-disable-next-line max-len
+    const utcDate = new Date(localDate.getTime() - localDate.getTimezoneOffset() * 60000);
+    return utcDate.toISOString();
+  };
+
   const save = async () => {
     try {
       show();
       for (const cycleCount of tableData.current) {
+        console.log('cycleCount', cycleCount);
         const cycleCountItemsToUpdate = cycleCount.cycleCountItems.filter((item) => (item.updated && !item.id.includes('newRow')));
         for (const cycleCountItem of cycleCountItemsToUpdate) {
           await cycleCountApi.updateCycleCountItem({
             ...cycleCountItem,
             recount: false,
             assignee: getCountedBy(cycleCount.id)?.id,
+            dateCounted: convertToUTCISO(getCountedDate(cycleCount.id)),
           },
           currentLocation?.id, cycleCountItem?.id);
         }
@@ -248,6 +259,7 @@ const useCountStep = () => {
               product: cycleCountItem.product?.id,
             },
             assignee: getCountedBy(cycleCount.id)?.id,
+            dateCounted: convertToUTCISO(getCountedDate(cycleCount.id)),
           }, currentLocation?.id, cycleCount?.id);
         }
 
@@ -367,9 +379,9 @@ const useCountStep = () => {
       updateRow(cycleCountId, rowId, columnId, value);
     },
   };
-  const getCountedDate = (cycleCountId) => dateCounted[cycleCountId];
 
   const setCountedDate = (cycleCountId) => (date) => {
+    markAllItemsAsUpdated(cycleCountId);
     setDateCounted((prevState) => ({
       ...prevState,
       [cycleCountId]: date,

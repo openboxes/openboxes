@@ -119,6 +119,12 @@ const useResolveStepTable = ({
       };
     }
 
+    if (fieldName === cycleCountColumn.EXPIRATION_DATE) {
+      return {
+        customDateFormat: DateFormat.DD_MMM_YYYY,
+      };
+    }
+
     return {};
   };
 
@@ -185,11 +191,11 @@ const useResolveStepTable = ({
       if (isFieldEditable || !isStepEditable) {
         return (
           <CustomTooltip
-            content={getValueToDisplay(id, value)}
+            content={getValueToDisplay(columnPath, value)}
             show={id === cycleCountColumn.COMMENT}
           >
             <TableCell className="static-cell-count-step align-items-center limit-lines-3 text-break resolve-table-limit-lines">
-              {getValueToDisplay(id, value)}
+              {getValueToDisplay(columnPath, value)}
             </TableCell>
           </CustomTooltip>
         );
