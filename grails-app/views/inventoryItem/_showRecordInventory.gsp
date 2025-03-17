@@ -148,7 +148,7 @@
                                         <g:textField id="newQuantity-${status}" type="number"
                                                      class="newQuantity text"
                                                      name="recordInventoryRows[${status }].newQuantity" size="8"
-													 onkeydown="preventFractional(event)"
+												     onkeydown="preventFractional(event)"
                                                      value="${recordInventoryRow?.newQuantity }" />
 
                                     </td>
