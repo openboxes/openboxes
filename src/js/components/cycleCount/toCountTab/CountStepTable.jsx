@@ -2,6 +2,7 @@ import React from 'react';
 
 import PropTypes from 'prop-types';
 import { RiAddCircleLine } from 'react-icons/all';
+import { RiErrorWarningLine } from 'react-icons/ri';
 import { useSelector } from 'react-redux';
 import { Tooltip } from 'react-tippy';
 
@@ -15,6 +16,7 @@ import { DateFormat } from 'consts/timeFormat';
 import useCountStepTable from 'hooks/cycleCount/useCountStepTable';
 import useTranslate from 'hooks/useTranslate';
 import { formatDate } from 'utils/translation-utils';
+import CustomTooltip from 'wrappers/CustomTooltip';
 
 import 'components/cycleCount/cycleCount.scss';
 
@@ -106,24 +108,28 @@ const CountStepTable = ({
             label={translate('react.cycleCount.countedBy.label', 'Counted by')}
             className="ml-4"
           >
-            <Tooltip
-              html={(
-                <span className="p-1">
-                  {countedByMeta?.label || translate('react.cycleCount.countedBy.label', 'Counted By')}
-                </span>
-              )}
-              style={{ width: 'fit-content' }}
-              arrow
+            <CustomTooltip
+              content={countedByMeta?.label || translate('react.cycleCount.countedBy.label', 'Counted By')}
+              show={!showCountedByErrorMessage()}
             >
-              <SelectField
-                errorMessage={showCountedByErrorMessage()}
-                placeholder="Select"
-                options={users}
-                onChange={assignCountedBy(id)}
-                className="min-width-250"
-                defaultValue={defaultCountedByMeta}
-              />
-            </Tooltip>
+              <div className="position-relative">
+                <SelectField
+                  errorMessage={showCountedByErrorMessage()}
+                  placeholder="Select"
+                  options={users}
+                  onChange={assignCountedBy(id)}
+                  className={`min-width-250 ${showCountedByErrorMessage() && 'input-has-error'}`}
+                  defaultValue={defaultCountedByMeta}
+                />
+                {showCountedByErrorMessage() && (
+                  <CustomTooltip
+                    content={translate('react.cycleCount.requiredField', 'This field is required')}
+                    className="tooltip-icon tooltip-icon--error tooltip-icon--top-40"
+                    icon={RiErrorWarningLine}
+                  />
+                )}
+              </div>
+            </CustomTooltip>
           </HeaderSelect>
         ) : (
           <HeaderLabel

@@ -41,7 +41,7 @@
             }
             thead { display: table-header-group; }
             tr { page-break-inside: avoid; page-break-after: auto; }
-            td { vertical-align: top; padding: 5px; border: 1px solid black; }
+            td { vertical-align: top; padding: 5px; border: 1px solid black; word-wrap: break-word; }
             th { font-weight: bold; padding: 5px; border: 1px solid black; }
             .no-border-table td, .no-border-table th { border: 0; }
             .small-font {font-size: xx-small; }
@@ -75,23 +75,30 @@
 
         <div class="content">
             <g:each var="cycleCount" in="${cycleCounts}">
-                <g:set var="product" value="${cycleCount.cycleCountItems?.first()?.product}"/>
+                <g:set var="firstItem" value="${cycleCount.cycleCountItems?.find { it.countIndex == 0 }}"/>
+                <g:set var="product" value="${firstItem?.product}"/>
+                <g:set var="assignee" value="${firstItem?.assignee}"/>
+                <g:set var="dateCounted" value="${firstItem?.dateCounted}"/>
                 <table>
                     <thead>
                         <tr>
                             <th colspan="4" class="b-r0 b-b0" style="padding: 10px 0 10px 10px;">
-                                ${g.message(code: 'cycleCount.product.label')} ${product?.name}
+                                ${g.message(code: 'cycleCount.product.label')}
+                                ${product?.name}
                             </th>
                             <th align="right" class="b-l0 b-b0" style="padding: 10px 10px 10px 0;">
-                                ${g.message(code: 'cycleCount.productCode.label')} ${product?.productCode}
+                                ${g.message(code: 'cycleCount.productCode.label')}
+                                ${product?.productCode}
                             </th>
                         </tr>
                         <tr>
                             <th colspan="2" class="b-r0 b-t0" style="padding: 0 0 10px 10px;">
-                                ${g.message(code: 'cycleCount.dateCounted.label')}
+                                ${g.message(code: 'cycleCount.dateCounted.label')}:
+                                <g:formatDate date="${dateCounted}" format="MMM d, yyyy"/>
                             </th>
                             <th colspan="2" class="b-r0 b-l0 b-t0" style="padding-bottom: 10px;">
-                                ${g.message(code: 'cycleCount.userCounted.label')}
+                                ${g.message(code: 'cycleCount.userCounted.label')}:
+                                ${assignee}
                             </th>
                             <th class="b-l0 b-t0" style="padding-bottom: 10px;"></th>
                         </tr>
@@ -115,9 +122,9 @@
                     </g:unless>
                     <g:each in="${cycleCount.cycleCountItems.findAll { it.countIndex == 0 }}" status="i" var="cycleCountItem">
                         <tr>
-                            <td>${cycleCountItem.binLocation?.name}</td>
-                            <td>${cycleCountItem.inventoryItem?.lotNumber}</td>
-                            <td><g:formatDate date="${cycleCountItem.inventoryItem?.expirationDate}" format="MMM d, yyyy"/></td>
+                            <td>${cycleCountItem.binLocation?.name}&nbsp;</td>
+                            <td>${cycleCountItem.inventoryItem?.lotNumber}&nbsp;</td>
+                            <td><g:formatDate date="${cycleCountItem.inventoryItem?.expirationDate}" format="MMM d, yyyy"/>&nbsp;</td>
                             <td></td>
                             <td></td>
                         </tr>

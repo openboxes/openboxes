@@ -207,6 +207,16 @@ limit-lines($lines-number) {
   &--warning {
     color: var(--blue-primary);
   }
+
+  &--top-40 {
+    top: 40%;
+    left: 5px;
+  }
+
+  &--top-60 {
+    top: 60%;
+    left: 5px;
+  }
 }
 
 .input-has-error {
@@ -230,4 +240,11 @@ input.hide-arrows::-webkit-inner-spin-button {
 /* Firefox */
 input.hide-arrows[type=number] {
   -moz-appearance: textfield;
+}
+
+.draft-modal {
+  background-color: var(--blue-200);
+  margin: 10px 16px;
+  padding: 10px 16px;
+  color: var(--blue-700);
 }

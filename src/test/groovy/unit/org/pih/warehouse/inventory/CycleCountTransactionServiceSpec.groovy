@@ -9,6 +9,9 @@ import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.CycleCount
 import org.pih.warehouse.inventory.CycleCountItem
+import org.pih.warehouse.inventory.CycleCountItemStatus
+import org.pih.warehouse.inventory.CycleCountProductAvailabilityService
+import org.pih.warehouse.inventory.CycleCountStatus
 import org.pih.warehouse.inventory.CycleCountTransactionService
 import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.InventoryItem
@@ -26,6 +29,9 @@ class CycleCountTransactionServiceSpec extends Specification implements DataTest
 
     @Shared
     CycleCountTransactionService cycleCountTransactionService
+
+    @Shared
+    CycleCountProductAvailabilityService cycleCountProductAvailabilityServiceStub
 
     @Shared
     ProductAvailabilityService productAvailabilityServiceStub
@@ -48,6 +54,12 @@ class CycleCountTransactionServiceSpec extends Specification implements DataTest
 
     void setup() {
         cycleCountTransactionService = new CycleCountTransactionService()
+
+        // Set up the stubs
+        cycleCountProductAvailabilityServiceStub = Stub(CycleCountProductAvailabilityService)
+        cycleCountTransactionService.cycleCountProductAvailabilityService = cycleCountProductAvailabilityServiceStub
+        cycleCountProductAvailabilityServiceStub.refreshProductAvailability(_ as CycleCount) >>
+                new CycleCountProductAvailabilityService.CycleCountItemsForRefresh()
 
         productInventoryTransactionServiceStub = Stub(ProductInventoryTransactionService)
         cycleCountTransactionService.productInventoryTransactionService = productInventoryTransactionServiceStub
@@ -83,6 +95,7 @@ class CycleCountTransactionServiceSpec extends Specification implements DataTest
                                 location: new Location(),
                                 product: product,
                                 countIndex: 0,
+                                status: CycleCountItemStatus.APPROVED,
                                 quantityOnHand: 10,
                                 quantityCounted: 10,
                         ),
@@ -118,6 +131,7 @@ class CycleCountTransactionServiceSpec extends Specification implements DataTest
                                 location: new Location(),
                                 product: product1,
                                 countIndex: 0,
+                                status: CycleCountItemStatus.APPROVED,
                                 quantityOnHand: 10,
                                 quantityCounted: 10,
                         ),
@@ -126,6 +140,7 @@ class CycleCountTransactionServiceSpec extends Specification implements DataTest
                                 location: new Location(),
                                 product: product2,
                                 countIndex: 0,
+                                status: CycleCountItemStatus.APPROVED,
                                 quantityOnHand: 20,
                                 quantityCounted: 20,
                         ),
@@ -162,6 +177,7 @@ class CycleCountTransactionServiceSpec extends Specification implements DataTest
                                 location: new Location(name: binNameNegativeAdjustment),
                                 product: product,
                                 countIndex: 0,
+                                status: CycleCountItemStatus.COUNTED,
                                 quantityOnHand: 20,
                                 quantityCounted: 19,  // Negative discrepancy (-1)
                         ),
@@ -170,6 +186,7 @@ class CycleCountTransactionServiceSpec extends Specification implements DataTest
                                 location: new Location(name: binNamePositiveAdjustment),
                                 product: product,
                                 countIndex: 0,
+                                status: CycleCountItemStatus.COUNTED,
                                 quantityOnHand: 30,
                                 quantityCounted: 33,  // Positive discrepancy (+3)
                         ),
@@ -178,6 +195,7 @@ class CycleCountTransactionServiceSpec extends Specification implements DataTest
                                 location: new Location(),
                                 product: product,
                                 countIndex: 0,
+                                status: CycleCountItemStatus.APPROVED,
                                 quantityOnHand: 10,
                                 quantityCounted: 10,  // No discrepancy (+0)
                         ),

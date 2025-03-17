@@ -12,10 +12,17 @@ import _ from 'lodash';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
-import { fetchBinLocations, fetchUsers, startResolution } from 'actions';
+import {
+  eraseDraft,
+  fetchBinLocations,
+  fetchUsers,
+  startResolution,
+} from 'actions';
 import cycleCountApi from 'api/services/CycleCountApi';
 import { CYCLE_COUNT as CYCLE_COUNT_URL } from 'api/urls';
 import { CYCLE_COUNT } from 'consts/applicationUrls';
+import { TO_COUNT_TAB, TO_RESOLVE_TAB } from 'consts/cycleCount';
+import cycleCountStatus from 'consts/cycleCountStatus';
 import useCountStepValidation from 'hooks/cycleCount/useCountStepValidation';
 import useSpinner from 'hooks/useSpinner';
 import confirmationModal from 'utils/confirmationModalUtils';
@@ -136,6 +143,7 @@ const useCountStep = () => {
     // for every item
     markAllItemsAsUpdated(cycleCountId);
     setCountedBy((prevState) => ({ ...prevState, [cycleCountId]: person }));
+    setDefaultCountedBy((prevState) => ({ ...prevState, [cycleCountId]: person }));
   };
 
   const getCountedBy = (cycleCountId) => countedBy?.[cycleCountId];
@@ -266,43 +274,49 @@ const useCountStep = () => {
     },
   };
 
-  const submitCount = async () => {
-    for (const cycleCount of tableData.current) {
-      await cycleCountApi.submitCount({
+  const submitCount = () =>
+    tableData.current.reduce((acc, cycleCount) => ([
+      ...acc,
+      cycleCountApi.submitCount({
         refreshQuantityOnHand: true,
         failOnOutdatedQuantity: false,
         requireRecountOnDiscrepancy: true,
         cycleCountItems: cycleCount.cycleCountItems,
       },
       currentLocation?.id,
-      cycleCount?.id);
-    }
-    dispatch(startResolution(cycleCountIds));
-    history.push(CYCLE_COUNT.resolveStep());
-  };
+      cycleCount?.id),
+    ]), []);
 
-  const resolveDiscrepanciesModalButtons = (onClose) => ([
+  const resolveDiscrepanciesModalButtons = (requestIdsWithDiscrepancies) => (onClose) => ([
     {
       variant: 'transparent',
       defaultLabel: 'Not now',
       label: 'react.cycleCount.modal.notNow.label',
-      onClick: onClose,
+      onClick: () => {
+        history.push(CYCLE_COUNT.list(TO_RESOLVE_TAB));
+        onClose?.();
+      },
     },
     {
       variant: 'primary',
       defaultLabel: 'Resolve',
       label: 'react.cycleCount.modal.resolve.label',
       onClick: async () => {
-        await submitCount();
+        await dispatch(startResolution(
+          requestIdsWithDiscrepancies,
+          currentLocation?.id,
+        ));
+        history.push(CYCLE_COUNT.resolveStep());
         onClose?.();
       },
     },
   ]);
 
-  const openResolveDiscrepanciesModal = () => {
+  const openResolveDiscrepanciesModal = (requestIdsWithDiscrepancies) => {
     confirmationModal({
-      buttons: resolveDiscrepanciesModalButtons,
+      buttons: resolveDiscrepanciesModalButtons(requestIdsWithDiscrepancies),
       ...modalLabels,
+      hideCloseButton: true,
     });
   };
 
@@ -310,20 +324,24 @@ const useCountStep = () => {
     try {
       show();
       await save();
-      const { data } = await cycleCountApi.getCycleCounts(
-        currentLocation?.id,
-        cycleCountIds,
-      );
-      const cycleCountsItems = _.flatten(
-        data?.data?.map((cycleCount) => cycleCount.cycleCountItems),
-      );
-      const hasDiscrepancies = _.some(cycleCountsItems,
-        ({ quantityVariance }) => quantityVariance !== 0);
-      if (hasDiscrepancies) {
-        openResolveDiscrepanciesModal();
+      const submittedCounts = await Promise.all(submitCount());
+
+      const requestIdsWithDiscrepancies = submittedCounts
+        .reduce((acc, submittedCycleCountRequest) => {
+          const { data } = submittedCycleCountRequest;
+          if (data.data.status === cycleCountStatus?.COUNTED) {
+            return [...acc, data?.data?.requestId];
+          }
+
+          return acc;
+        }, []);
+
+      if (requestIdsWithDiscrepancies.length > 0) {
+        openResolveDiscrepanciesModal(requestIdsWithDiscrepancies);
         return;
       }
-      await submitCount();
+      dispatch(eraseDraft());
+      history.push(CYCLE_COUNT.list(TO_COUNT_TAB));
     } finally {
       hide();
     }
