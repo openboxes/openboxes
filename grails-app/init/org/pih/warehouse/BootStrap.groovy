@@ -120,22 +120,6 @@ class BootStrap {
         uploadService.findOrCreateUploadsDirectory()
 
         refreshAnalyticsData()
-        clearCycleCountData()
-    }
-
-    @Transactional
-    void clearCycleCountData() {
-        List<Transaction> cycleCountTransactions = Transaction.createCriteria().list { isNotNull("cycleCount") }
-        List<TransactionEntry> cycleCountTransactionEntries = cycleCountTransactions.transactionEntries.flatten()
-
-        TransactionEntry.deleteAll(cycleCountTransactionEntries)
-        Transaction.deleteAll(cycleCountTransactions)
-
-        CycleCountItem.findAll().each { it.delete() }
-
-        CycleCountRequest.findAll().each { it.delete() }
-
-        CycleCount.findAll().each { it.delete() }
     }
 
     void refreshAnalyticsData() {
