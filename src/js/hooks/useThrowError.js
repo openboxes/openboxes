@@ -7,7 +7,7 @@ const useThrowError = ({
 }) => {
   const verifyCondition = async () => {
     if (!condition) {
-      notification(NotificationType.ERROR)({
+      notification(NotificationType.ERROR_OUTLINED)({
         message: translate({
           id: errorMessageLabel,
           defaultMessage: errorMessageDefault,
