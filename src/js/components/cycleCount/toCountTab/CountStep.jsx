@@ -27,6 +27,7 @@ const CountStep = () => {
     getCountedBy,
     getDefaultCountedBy,
     isFormValid,
+    triggerValidation,
     refreshFocusCounter,
   } = useCountStep();
 
@@ -62,6 +63,7 @@ const CountStep = () => {
             countedBy={getCountedBy(id)}
             defaultCountedBy={getDefaultCountedBy(id)}
             isFormValid={isFormValid}
+            triggerValidation={triggerValidation}
             refreshFocusCounter={refreshFocusCounter}
           />
         ))}

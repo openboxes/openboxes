@@ -83,7 +83,7 @@ class CycleCountApiController {
         List<CycleCountDto> cycleCounts = cycleCountService.getCycleCounts(ids)
 
         boolean isRecount = cycleCounts?.any { (it.status as CycleCountStatus).isRecounting() }
-        String facilityName = cycleCounts?.first()?.cycleCountItems?.first()?.facility?.name  ?: ""
+        String facilityName = cycleCounts?.find()?.cycleCountItems?.find()?.facility?.name  ?: ""
 
         withFormat {
             json {

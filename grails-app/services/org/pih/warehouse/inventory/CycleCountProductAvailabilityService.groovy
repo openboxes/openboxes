@@ -6,7 +6,7 @@ import grails.validation.ValidationException
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.core.User
+import org.pih.warehouse.core.Person
 import org.pih.warehouse.product.Product
 
 /**
@@ -105,19 +105,26 @@ class CycleCountProductAvailabilityService {
     private void updateRefreshStateIfItemDeleted(CycleCountRefreshState refreshState,
                                                  List<AvailableItem> availableItems, CycleCountItem cycleCountItem) {
 
-        AvailableItem availableItem = availableItems.find{
-            it.inventoryItem == cycleCountItem.inventoryItem &&
-                    it.binLocation == cycleCountItem.location }
-
         // If the available item exists, there's nothing to do.
+        AvailableItem availableItem = availableItems.find{
+                    it.inventoryItem == cycleCountItem.inventoryItem &&
+                    it.binLocation == cycleCountItem.location
+        }
         if (availableItem) {
             return
         }
 
-        // Otherwise, it does not exist, so we need to remove it from the count (unless it's a custom added row).
-        // Custom added items should not get removed from the count, even if there's no available item. We trust
-        // the user to manage items they manually added.
-        if (!cycleCountItem.custom) {
+        // Otherwise, it does not exist, so we need to remove it from the count. This can happen if all the stock of
+        // the item is moved (such as via adjust stock) while the count is in progress. However, if the item was custom
+        // added to either the count or a recount, it should not be removed here, even if there's no available item.
+        // We trust the user to manage items they manually added. (OBPIH-7097)
+        boolean wasItemEverCustomAdded = cycleCountItem.cycleCount.cycleCountItems.any {
+                    it.product == cycleCountItem.product &&
+                    it.location == cycleCountItem.location &&
+                    it.inventoryItem == cycleCountItem.inventoryItem &&
+                    it.custom
+        }
+        if (!wasItemEverCustomAdded) {
             refreshState.addItemToDelete(cycleCountItem)
             return
         }
@@ -186,7 +193,7 @@ class CycleCountProductAvailabilityService {
         // Computed fields
         Set<CycleCountItem> itemsOfMostRecentCount
         int currentCountIndex
-        User assigneeForNewItems
+        Person assigneeForNewItems
         Date dateCountedForNewItems
         CycleCountItemStatus statusForNewItems
 

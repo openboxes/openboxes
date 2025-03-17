@@ -193,7 +193,7 @@ class CycleCountService {
                         "Lot Number": item.inventoryItem.lotNumber,
                         "Expiration Date": item.inventoryItem.expirationDate
                                 ? Constants.EXPIRATION_DATE_FORMATTER.format(item.inventoryItem.expirationDate) : "",
-                        "Bin Location": item.binLocation?.locationNumber,
+                        "Bin Location": item.binLocation?.name,
                         "Quantity Counted": "",
                         "Comment": "",
                         "User Counted": "",
@@ -215,7 +215,7 @@ class CycleCountService {
                         "Lot Number": item.inventoryItem.lotNumber,
                         "Expiration Date": item.inventoryItem.expirationDate
                                 ? Constants.EXPIRATION_DATE_FORMATTER.format(item.inventoryItem.expirationDate) : "",
-                        "Bin Location": item.binLocation?.locationNumber,
+                        "Bin Location": item.binLocation?.name,
                         "Quantity Counted": item.quantityCounted,
                         "Difference": item.quantityVariance,
                         "Counted by": item.assignee,
@@ -342,8 +342,10 @@ class CycleCountService {
 
         // If there are custom items, they won't have been discovered by the above loop (because they won't have
         // a product availability record) so make sure to create new recount items for them as well.
-        // "Most recent count" in this scenario is the previous count.
-        Set<CycleCountItem> customItemsOfLastCount = cycleCount.itemsOfMostRecentCount.findAll{ it.custom }
+        int countIndexForCustomItems = cycleCount.maxCountIndex == 0 ? 0 : cycleCount.maxCountIndex - 1
+        Set<CycleCountItem> customItemsOfLastCount = cycleCount.cycleCountItems.findAll {
+            countIndexForCustomItems == it.countIndex && it.custom
+        }
         for (CycleCountItem customCycleCountItem : customItemsOfLastCount) {
             // We want to avoid a situation where we create an inventory using a custom row
             // and then someone is creating the same inventory on record stock

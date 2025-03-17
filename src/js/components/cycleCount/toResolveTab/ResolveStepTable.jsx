@@ -2,6 +2,7 @@ import React from 'react';
 
 import PropTypes from 'prop-types';
 import { RiAddCircleLine } from 'react-icons/all';
+import { RiErrorWarningLine } from 'react-icons/ri';
 import { useSelector } from 'react-redux';
 import { Tooltip } from 'react-tippy';
 
@@ -15,6 +16,7 @@ import { DateFormat } from 'consts/timeFormat';
 import useResolveStepTable from 'hooks/cycleCount/useResolveStepTable';
 import useTranslate from 'hooks/useTranslate';
 import { formatDate } from 'utils/translation-utils';
+import CustomTooltip from 'wrappers/CustomTooltip';
 
 import 'components/cycleCount/cycleCount.scss';
 
@@ -35,6 +37,7 @@ const ResolveStepTable = ({
   shouldHaveRootCause,
   isFormValid,
   isStepEditable,
+  triggerValidation,
   refreshFocusCounter,
 }) => {
   const {
@@ -51,6 +54,7 @@ const ResolveStepTable = ({
     productId: product?.id,
     addEmptyRow,
     refreshFocusCounter,
+    triggerValidation,
   });
 
   const translate = useTranslate();
@@ -116,17 +120,31 @@ const ResolveStepTable = ({
           {isStepEditable ? (
             <HeaderSelect
               label={translate('react.cycleCount.recountedBy.label', 'Recounted by')}
-              className="ml-5 count-step-select-counted-by"
+              className="ml-5"
             >
-              <SelectField
-                errorMessage={showRecountedByErrorMessage()}
-                placeholder="Select"
-                options={users}
-                onChange={assignRecountedBy(id)}
-                defaultValue={defaultRecountedByMeta}
-                hideErrorMessageWrapper
-                className="min-width-250"
-              />
+              <CustomTooltip
+                content={recountedBy?.label || translate('react.cycleCount.recountedBy.label', 'Recounted by')}
+                show={!showRecountedByErrorMessage()}
+              >
+                <div className="position-relative">
+                  <SelectField
+                    errorMessage={showRecountedByErrorMessage()}
+                    placeholder="Select"
+                    options={users}
+                    onChange={assignRecountedBy(id)}
+                    defaultValue={defaultRecountedByMeta}
+                    hideErrorMessageWrapper
+                    className={`min-width-250 ${showRecountedByErrorMessage() && 'input-has-error'}`}
+                  />
+                  {showRecountedByErrorMessage() && (
+                    <CustomTooltip
+                      content={translate('react.cycleCount.requiredField', 'This field is required')}
+                      className="tooltip-icon tooltip-icon--error tooltip-icon--top-60"
+                      icon={RiErrorWarningLine}
+                    />
+                  )}
+                </div>
+              </CustomTooltip>
             </HeaderSelect>
           ) : (
             <HeaderLabel
@@ -204,4 +222,5 @@ ResolveStepTable.propTypes = {
   isStepEditable: PropTypes.bool.isRequired,
   isFormValid: PropTypes.bool.isRequired,
   refreshFocusCounter: PropTypes.number.isRequired,
+  triggerValidation: PropTypes.func.isRequired,
 };

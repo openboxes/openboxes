@@ -29,6 +29,7 @@ const useCountStepTable = ({
   isStepEditable,
   formatLocalizedDate,
   addEmptyRow,
+  triggerValidation,
   refreshFocusCounter,
 }) => {
   const columnHelper = createColumnHelper();
@@ -147,6 +148,7 @@ const useCountStepTable = ({
         if (isEdited) {
           table.options.meta?.updateData(cycleCountId, original.id, id, value);
           setError(null);
+          triggerValidation();
         }
       };
 

@@ -5,6 +5,8 @@ import { RiErrorWarningLine } from 'react-icons/ri';
 import { Link } from 'react-router-dom';
 import { Tooltip } from 'react-tippy';
 
+import CustomTooltip from 'wrappers/CustomTooltip';
+
 const TableCell = ({
   value,
   children,
@@ -19,6 +21,7 @@ const TableCell = ({
   showError,
   tooltipForm,
   tooltipClassname,
+  customTooltip,
 }) => {
   let cellValue = children || value || defaultValue;
   const errorMessage = tdProps?.rest?.error;
@@ -56,6 +59,17 @@ const TableCell = ({
           {cellValue}
         </Tooltip>
       </div>
+    );
+  }
+
+  if (customTooltip) {
+    cellValue = (
+      <CustomTooltip
+        content={tooltipLabel || value}
+        className={tooltipClassname}
+      >
+        {cellValue}
+      </CustomTooltip>
     );
   }
 
@@ -125,6 +139,7 @@ TableCell.propTypes = {
   ]),
   tooltipForm: PropTypes.bool,
   tooltipClassname: PropTypes.string,
+  customTooltip: PropTypes.bool,
 };
 
 export default TableCell;

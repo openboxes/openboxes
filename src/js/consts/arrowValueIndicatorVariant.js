@@ -5,9 +5,9 @@ const arrowValueIndicatorVariant = {
   NEGATIVE: 'NEGATIVE',
 };
 
-export const getCycleCountDifferencesVariant = (number, rowId) => {
-  if (rowId.includes('newRow')) {
-    return arrowValueIndicatorVariant.EMPTY;
+export const getCycleCountDifferencesVariant = (number, value) => {
+  if (Number.isNaN(number) || value === null) {
+    return null;
   }
 
   if (number > 0) {

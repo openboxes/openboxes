@@ -20,8 +20,9 @@ import {
 } from 'actions';
 import cycleCountApi from 'api/services/CycleCountApi';
 import { CYCLE_COUNT as CYCLE_COUNT_URL } from 'api/urls';
+import ActivityCode from 'consts/activityCode';
 import { CYCLE_COUNT } from 'consts/applicationUrls';
-import { TO_RESOLVE_TAB } from 'consts/cycleCount';
+import { TO_COUNT_TAB, TO_RESOLVE_TAB } from 'consts/cycleCount';
 import cycleCountStatus from 'consts/cycleCountStatus';
 import useCountStepValidation from 'hooks/cycleCount/useCountStepValidation';
 import useSpinner from 'hooks/useSpinner';
@@ -65,14 +66,17 @@ const useCountStep = () => {
 
   useEffect(() => {
     if (showBinLocation) {
-      dispatch(fetchBinLocations(currentLocation?.id));
+      dispatch(fetchBinLocations(
+        currentLocation?.id,
+        [ActivityCode.RECEIVE_STOCK],
+      ));
     }
   }, [currentLocation?.id]);
 
   const {
     validationErrors,
     triggerValidation,
-    triggerRerenderAfterAddingNewRow,
+    forceRerender,
     isFormValid,
   } = useCountStepValidation({ tableData });
 
@@ -153,6 +157,7 @@ const useCountStep = () => {
     markAllItemsAsUpdated(cycleCountId);
     setCountedBy((prevState) => ({ ...prevState, [cycleCountId]: person }));
     setDefaultCountedBy((prevState) => ({ ...prevState, [cycleCountId]: person }));
+    setDefaultCountedBy((prevState) => ({ ...prevState, [cycleCountId]: person }));
     resetFocus();
   };
 
@@ -219,11 +224,12 @@ const useCountStep = () => {
 
       return data;
     });
-    triggerRerenderAfterAddingNewRow();
+    forceRerender();
   };
 
   const next = () => {
     const isValid = triggerValidation();
+    forceRerender();
     const areCountedByFilled = _.every(
       cycleCountIds,
       (id) => getCountedBy(id)?.id,
@@ -316,7 +322,7 @@ const useCountStep = () => {
       defaultLabel: 'Resolve',
       label: 'react.cycleCount.modal.resolve.label',
       onClick: async () => {
-        dispatch(startResolution(
+        await dispatch(startResolution(
           requestIdsWithDiscrepancies,
           currentLocation?.id,
         ));
@@ -330,6 +336,7 @@ const useCountStep = () => {
     confirmationModal({
       buttons: resolveDiscrepanciesModalButtons(requestIdsWithDiscrepancies),
       ...modalLabels,
+      hideCloseButton: true,
     });
   };
 
@@ -354,6 +361,7 @@ const useCountStep = () => {
         return;
       }
       dispatch(eraseDraft());
+      history.push(CYCLE_COUNT.list(TO_COUNT_TAB));
     } finally {
       resetFocus();
       hide();
@@ -397,6 +405,7 @@ const useCountStep = () => {
     tableData: tableData.current,
     tableMeta,
     validationErrors,
+    triggerValidation,
     addEmptyRow,
     removeRow,
     printCountForm,

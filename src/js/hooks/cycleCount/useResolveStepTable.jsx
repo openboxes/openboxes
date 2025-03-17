@@ -34,6 +34,7 @@ import CustomTooltip from 'wrappers/CustomTooltip';
 const useResolveStepTable = ({
   cycleCountId,
   removeRow,
+  triggerValidation,
   validationErrors,
   shouldHaveRootCause,
   isStepEditable,
@@ -187,16 +188,26 @@ const useResolveStepTable = ({
           cycleCountColumn.ROOT_CAUSE,
           cycleCountColumn.COMMENT,
         ].includes(id);
+      const showStaticTooltip = [
+        cycleCountColumn.ROOT_CAUSE,
+        cycleCountColumn.COMMENT,
+        cycleCountColumn.BIN_LOCATION,
+      ]
+        .includes(id);
       // We shouldn't allow users edit fetched data (quantityRecounted, rootCause and comment
       // field are editable)
       if (isFieldEditable || !isStepEditable) {
         return (
           <CustomTooltip
             content={getValueToDisplay(id, value)}
-            show={id === cycleCountColumn.COMMENT}
+            show={showStaticTooltip}
           >
-            <TableCell className="static-cell-count-step align-items-center limit-lines-3 text-break resolve-table-limit-lines">
-              {getValueToDisplay(id, value)}
+            <TableCell
+              className="static-cell-count-step align-items-center resolve-table-limit-lines"
+            >
+              <div className={showStaticTooltip ? 'limit-lines-1' : 'limit-lines-3 text-break'}>
+                {getValueToDisplay(id, value)}
+              </div>
             </TableCell>
           </CustomTooltip>
         );
@@ -218,6 +229,7 @@ const useResolveStepTable = ({
         ].includes(id)) {
           table.options.meta?.updateData(cycleCountId, original.id, id, value);
           setError(null);
+          triggerValidation();
         }
         if (id === cycleCountColumn.QUANTITY_RECOUNTED) {
           events.emit('refreshRecountDifference');
@@ -233,6 +245,7 @@ const useResolveStepTable = ({
         ].includes(id)) {
           setError(null);
           setWarning(null);
+          triggerValidation();
         }
         setValue(e?.target?.value ?? e);
       };
@@ -288,15 +301,28 @@ const useResolveStepTable = ({
         addNewRow: () => addEmptyRow(productId, cycleCountId),
         isNewRow,
       });
-
+      const isAutoWidth = [
+        cycleCountColumn.ROOT_CAUSE,
+        cycleCountColumn.COMMENT,
+        cycleCountColumn.EXPIRATION_DATE,
+      ].includes(columnPath);
+      const showTooltip = [
+        cycleCountColumn.ROOT_CAUSE,
+        cycleCountColumn.BIN_LOCATION,
+      ].includes(id);
       return (
-        <TableCell className="rt-td rt-td-count-step pb-0">
+        <TableCell
+          className="rt-td rt-td-count-step pb-0"
+          customTooltip={showTooltip && getValueToDisplay(id, value)}
+          tooltipClassname="w-100"
+          tooltipLabel={getValueToDisplay(id, value)}
+        >
           <Component
             type={type}
             value={value}
             onChange={onChange}
             onBlur={onBlur}
-            className={`w-75 m-1 hide-arrows ${error && 'border border-danger input-has-error'}`}
+            className={`${isAutoWidth ? 'w-auto' : 'w-75'} m-1 hide-arrows ${error && 'border border-danger input-has-error'}`}
             showErrorBorder={error}
             onChangeRaw={onChangeRaw}
             hideErrorMessageWrapper
@@ -427,24 +453,21 @@ const useResolveStepTable = ({
           {translate('react.cycleCount.table.recountDifference.label', 'Recount Difference')}
         </TableHeaderCell>
       ), []),
-      cell: ({ row: { original: { quantityOnHand, id }, index } }) => {
+      cell: ({ row: { original: { quantityOnHand }, index } }) => {
         const [value, setValue] = useState(tableData?.[index]?.quantityRecounted);
         const recountDifference = value - (quantityOnHand || 0);
-        const variant = getCycleCountDifferencesVariant(recountDifference, id);
+        const variant = getCycleCountDifferencesVariant(recountDifference, value);
         events.on('refreshRecountDifference', () => {
           setValue(tableData?.[index]?.quantityRecounted);
         });
 
         return (
           <TableCell className="rt-td rt-td-count-step static-cell-count-step d-flex align-items-center">
-            {value !== null
-              && (
-                <ArrowValueIndicator
-                  value={recountDifference}
-                  variant={variant}
-                  showAbsoluteValue
-                />
-              )}
+            <ArrowValueIndicator
+              value={recountDifference}
+              variant={variant}
+              showAbsoluteValue
+            />
           </TableCell>
         );
       },
@@ -459,7 +482,7 @@ const useResolveStepTable = ({
         </TableHeaderCell>
       ), []),
       meta: {
-        flexWidth: 120,
+        flexWidth: 160,
       },
     }),
     columnHelper.accessor(cycleCountColumn.COMMENT, {
@@ -469,7 +492,7 @@ const useResolveStepTable = ({
         </TableHeaderCell>
       ), []),
       meta: {
-        flexWidth: 228,
+        flexWidth: 160,
         getCellContext: () => ({
           className: 'overflow-hidden',
         }),
@@ -503,7 +526,7 @@ const useResolveStepTable = ({
       ), []),
       meta: {
         flexWidth: 50,
-        hide: !isStepEditable,
+        hide: !tableData.some((row) => row.id?.includes('newRow')) || !isStepEditable,
       },
     }),
   ];
