@@ -276,6 +276,7 @@ const useResolveStep = () => {
   const getRecountedDate = (cycleCountId) => dateRecounted[cycleCountId];
 
   const setRecountedDate = (cycleCountId) => (date) => {
+    console.log('date', date);
     setDateRecounted({
       ...dateRecounted,
       [cycleCountId]: date.format(),
