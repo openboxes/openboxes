@@ -92,7 +92,7 @@ const CountStepTable = ({
           >
             <DateField
               className="date-counted-date-picker date-field-input"
-              onChange={setCountedDate}
+              onChangeRaw={setCountedDate}
               value={dateCounted}
               customDateFormat={DateFormat.DD_MMM_YYYY}
             />
