@@ -141,12 +141,16 @@ const useCountStepTable = ({
       // When the input is blurred, we'll call the table meta's updateData function
       const onBlur = () => {
         if (isEdited) {
-          table.options.meta?.updateData(cycleCountId, original.id, id, value);
+          if (columnPath === cycleCountColumn.QUANTITY_COUNTED) {
+            setValue(parseInt(value, 10) || 0);
+            table.options.meta?.updateData(cycleCountId, original.id, id, parseInt(value, 10) || 0);
+          } else {
+            table.options.meta?.updateData(cycleCountId, original.id, id, value);
+          }
           setError(null);
           triggerValidation();
         }
       };
-
       // on change function expects e.target.value for text fields,
       // in other cases it expects just the value
       const onChange = (e) => {
