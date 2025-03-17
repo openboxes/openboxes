@@ -81,6 +81,7 @@ const initialState = {
   notificationAutohideDelay: 8000,
   browserConnectionTimeout: 0,
   isAutosaveEnabled: false,
+  cycleCountMaxSelectedProducts: 50,
 };
 
 export default function (state = initialState, action) {
@@ -128,6 +129,7 @@ export default function (state = initialState, action) {
         notificationAutohideDelay: _.get(action, 'payload.data.data.notificationAutohideDelay', 8000),
         browserConnectionTimeout: _.get(action, 'payload.data.data.browserConnectionTimeout', 0),
         isAutosaveEnabled: _.get(action, 'payload.data.data.isAutosaveEnabled', false),
+        cycleCountMaxSelectedProducts: _.get(action, 'payload.data.data.cycleCountMaxSelectedProducts', 50),
       };
     case FETCH_MENU_CONFIG:
       return {
