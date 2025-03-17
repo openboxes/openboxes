@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import moment from 'moment/moment';
 import { z } from 'zod';
 
 import useTranslate from 'hooks/useTranslate';
@@ -44,11 +45,18 @@ const useInventoryValidation = ({ tableData }) => {
         cycleCountItems,
         (item) => item?.inventoryItem?.lotNumber,
       );
-      const expirationDates = dataGroupedByLotNumber[row?.inventoryItem?.lotNumber]
-        .map((item) => item?.inventoryItem?.expirationDate);
-      const binLocations = dataGroupedByLotNumber[row?.inventoryItem?.lotNumber]
-        .map((item) => item?.binLocation?.id);
-      if (_.uniq(expirationDates).length !== 1 && _.uniq(binLocations).length !== 1) {
+      // The backend returns expiration date in the "MM/dd/yyyy" format, but we use the
+      // "yyyy-MM-dd'T'hh:mm:ssXXX" format when generating the dates on the frontend. We
+      // convert the dates to a moment for easy comparison.
+      const expirationDates = dataGroupedByLotNumber[row?.inventoryItem?.lotNumber].map((item) => {
+        const expirationDate = item?.inventoryItem?.expirationDate;
+        // TODO: isSame is returning false, even if the dates are the same! I suspect it's trying
+        //       to use local time when parsing "MM/dd/yyyy". Gotta find a way to make this default
+        //       to UTC. This kinda sucks though, maybe we need a more general solution to this...
+        return expirationDate == null ? null : moment(expirationDate);
+      });
+      const uniqueDates = _.uniqWith(expirationDates, (arrVal, othVal) => arrVal?.isSame(othVal));
+      if (uniqueDates.length > 1) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: translate('react.cycleCount.multipleExpirationDates.label', 'Multiple expiry dates for this lot/batch.'),
