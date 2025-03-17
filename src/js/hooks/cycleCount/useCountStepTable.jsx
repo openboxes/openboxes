@@ -140,16 +140,20 @@ const useCountStepTable = ({
       const isEdited = initialValue !== value;
       // When the input is blurred, we'll call the table meta's updateData function
       const onBlur = () => {
-        if (isEdited) {
-          if (columnPath === cycleCountColumn.QUANTITY_COUNTED) {
-            setValue(parseInt(value, 10) || 0);
-            table.options.meta?.updateData(cycleCountId, original.id, id, parseInt(value, 10) || 0);
-          } else {
-            table.options.meta?.updateData(cycleCountId, original.id, id, value);
-          }
+        if (!isEdited) return;
+
+        const parsedValue = parseInt(value, 10) || 0;
+
+        if (columnPath === cycleCountColumn.QUANTITY_COUNTED) {
+          setValue(parsedValue);
+          table.options.meta?.updateData(cycleCountId, original.id, id, parsedValue);
           setError(null);
           triggerValidation();
+          return;
         }
+        table.options.meta?.updateData(cycleCountId, original.id, id, value);
+        setError(null);
+        triggerValidation();
       };
       // on change function expects e.target.value for text fields,
       // in other cases it expects just the value

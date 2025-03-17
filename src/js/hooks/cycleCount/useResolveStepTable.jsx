@@ -225,8 +225,9 @@ const useResolveStepTable = ({
           triggerValidation();
         }
         if (id === cycleCountColumn.QUANTITY_RECOUNTED) {
-          setValue(parseInt(value, 10) || 0);
-          table.options.meta?.updateData(cycleCountId, original.id, id, parseInt(value, 10) || 0);
+          const parsedValue = parseInt(value, 10) || 0;
+          setValue(parsedValue);
+          table.options.meta?.updateData(cycleCountId, original.id, id, parsedValue);
           events.emit('refreshRecountDifference');
         }
       };
