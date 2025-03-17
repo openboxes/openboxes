@@ -45,7 +45,7 @@ const useToCountTab = ({
   } = useSelector((state) => ({
     currentLocale: state.session.activeLanguage,
     currentLocation: state.session.currentLocation,
-    cycleCountMaxSelectedProducts: state.session.cycleCountMaxSelectedProducts
+    cycleCountMaxSelectedProducts: state.session.cycleCountMaxSelectedProducts,
   }));
 
   const dispatch = useDispatch();

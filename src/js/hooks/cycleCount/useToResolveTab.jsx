@@ -20,12 +20,12 @@ import useSpinner from 'hooks/useSpinner';
 import useTableCheckboxes from 'hooks/useTableCheckboxes';
 import useTableDataV2 from 'hooks/useTableDataV2';
 import useTableSorting from 'hooks/useTableSorting';
+import useThrowError from 'hooks/useThrowError';
 import useTranslate from 'hooks/useTranslate';
 import Badge from 'utils/Badge';
 import exportFileFromAPI, { extractFilenameFromHeader } from 'utils/file-download-util';
 import { mapStringToLimitedList } from 'utils/form-values-utils';
 import StatusIndicator from 'utils/StatusIndicator';
-import useThrowError from 'hooks/useThrowError';
 
 const useToResolveTab = ({
   filterParams,
