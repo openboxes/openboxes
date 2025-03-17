@@ -29,7 +29,7 @@ class PartialReceiptContainer{
                         case "alphabetical":
                             return b.shipmentItem?.product?.name <=> a.shipmentItem?.product?.name ?:
                                     defaultOrderComparison(a, b)
-                        case "sortOrder":
+                        case "shipment":
                         default:
                             return defaultOrderComparison(a, b)
                     }
