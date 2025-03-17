@@ -148,7 +148,6 @@
                                         <g:textField id="newQuantity-${status}" type="number"
                                                      class="newQuantity text"
                                                      name="recordInventoryRows[${status }].newQuantity" size="8"
-												     onkeydown="preventFractional(event)"
                                                      value="${recordInventoryRow?.newQuantity }" />
 
                                     </td>
@@ -256,12 +255,6 @@
 
 	function changeQuantity(textField, delta){
 		textField.val(parseInt(textField.val()) + delta);
-	}
-
-	function preventFractional(event) {
-		if (event.key === "." || event.key === ",") {
-			event.preventDefault();
-		}
 	}
 
 	function removeRow(index) {
@@ -485,7 +478,6 @@
 		<g:textField
         id="newQuantity-{{= getIndex()}}" type="number" class="newQuantity text"
         name="recordInventoryRows[{{= getIndex()}}].newQuantity"
-		onkeydown="preventFractional(event)"
         size="8" value="{{= Qty}}" />
 	</td>
 	<td aria-label="Comment" class="center middle">

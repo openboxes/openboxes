@@ -16,6 +16,7 @@ import { DateFormat } from 'consts/timeFormat';
 import useArrowsNavigation from 'hooks/useArrowsNavigation';
 import useTranslate from 'hooks/useTranslate';
 import groupBinLocationsByZone from 'utils/groupBinLocationsByZone';
+import preventFractionalValues from 'utils/preventFractionalValues';
 import { checkBinLocationSupport } from 'utils/supportedActivitiesUtils';
 import CustomTooltip from 'wrappers/CustomTooltip';
 
@@ -214,7 +215,12 @@ const useCountStepTable = ({
             className={`m-1 hide-arrows ${showTooltip ? 'w-99' : 'w-75'} ${error && 'border border-danger input-has-error'}`}
             showErrorBorder={error}
             hideErrorMessageWrapper
-            onKeyDown={(e) => handleKeyDown(e, index, columnPath)}
+            onKeyDown={(e) => {
+              handleKeyDown(e, index, columnPath);
+              if (columnPath === cycleCountColumn.QUANTITY_COUNTED) {
+                preventFractionalValues(e);
+              }
+            }}
             focusProps={{
               fieldIndex: index,
               fieldId: columnPath,
