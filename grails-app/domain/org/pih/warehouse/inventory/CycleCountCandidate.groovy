@@ -20,13 +20,13 @@ class CycleCountCandidate {
 
     CycleCountCandidateStatus status
 
-    Integer inventoryItemCount
-
     String internalLocations
 
     Integer quantityOnHand
 
     Integer quantityAvailable
+
+    Integer inventoryItemCount
 
     Integer negativeItemCount
 
@@ -34,11 +34,17 @@ class CycleCountCandidate {
 
     Date dateNextCount
 
+    Integer daysUntilNextCount
+
+    Boolean hasStockOnHandOrNegativeStock
+
     Date dateLatestInventory
+
+    Integer sortOrder
 
     static constraints = {
         version false
-        table "cycle_count_session"
+        table "cycle_count_candidate"
     }
 
     Map toJson() {
@@ -49,6 +55,8 @@ class CycleCountCandidate {
                         productCode: product.productCode,
                 ],
                 dateLastCount: dateLastCount,
+                dateNextCount: dateNextCount,
+                daysUntilNextCount: daysUntilNextCount,
                 category: [
                         id: product.category?.id,
                         name: product.category?.name,
@@ -60,6 +68,10 @@ class CycleCountCandidate {
                 quantityOnHand: quantityOnHand,
                 cycleCountRequest: cycleCountRequest,
                 status: status.toString(),
+                inventoryItemCount: inventoryItemCount,
+                negativeItemCount: negativeItemCount,
+                hasStockOnHandOrNegativeStock: hasStockOnHandOrNegativeStock,
+                sortOrder: sortOrder,
         ]
     }
 
