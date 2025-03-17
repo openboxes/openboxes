@@ -20,6 +20,7 @@ import {
 } from 'actions';
 import cycleCountApi from 'api/services/CycleCountApi';
 import { CYCLE_COUNT as CYCLE_COUNT_URL } from 'api/urls';
+import ActivityCode from 'consts/activityCode';
 import { CYCLE_COUNT } from 'consts/applicationUrls';
 import { TO_COUNT_TAB, TO_RESOLVE_TAB } from 'consts/cycleCount';
 import cycleCountStatus from 'consts/cycleCountStatus';
@@ -57,14 +58,17 @@ const useCountStep = () => {
 
   useEffect(() => {
     if (showBinLocation) {
-      dispatch(fetchBinLocations(currentLocation?.id));
+      dispatch(fetchBinLocations(
+        currentLocation?.id,
+        [ActivityCode.RECEIVE_STOCK],
+      ));
     }
   }, [currentLocation?.id]);
 
   const {
     validationErrors,
     triggerValidation,
-    triggerRerenderAfterAddingNewRow,
+    forceRerender,
     isFormValid,
   } = useCountStepValidation({ tableData });
 
@@ -208,11 +212,12 @@ const useCountStep = () => {
 
       return data;
     });
-    triggerRerenderAfterAddingNewRow();
+    forceRerender();
   };
 
   const next = () => {
     const isValid = triggerValidation();
+    forceRerender();
     const areCountedByFilled = _.every(
       cycleCountIds,
       (id) => getCountedBy(id)?.id,
@@ -383,6 +388,7 @@ const useCountStep = () => {
     tableData: tableData.current,
     tableMeta,
     validationErrors,
+    triggerValidation,
     addEmptyRow,
     removeRow,
     printCountForm,

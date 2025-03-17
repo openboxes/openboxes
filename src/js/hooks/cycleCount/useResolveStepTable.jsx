@@ -34,6 +34,7 @@ import CustomTooltip from 'wrappers/CustomTooltip';
 const useResolveStepTable = ({
   cycleCountId,
   removeRow,
+  triggerValidation,
   validationErrors,
   shouldHaveRootCause,
   isStepEditable,
@@ -221,6 +222,7 @@ const useResolveStepTable = ({
         ].includes(id)) {
           table.options.meta?.updateData(cycleCountId, original.id, id, value);
           setError(null);
+          triggerValidation();
         }
         if (id === cycleCountColumn.QUANTITY_RECOUNTED) {
           events.emit('refreshRecountDifference');
@@ -238,6 +240,7 @@ const useResolveStepTable = ({
           table.options.meta?.updateData(cycleCountId, original.id, id, enteredValue);
           setError(null);
           setWarning(null);
+          triggerValidation();
         }
         setValue(enteredValue);
       };
@@ -438,24 +441,21 @@ const useResolveStepTable = ({
           {translate('react.cycleCount.table.recountDifference.label', 'Recount Difference')}
         </TableHeaderCell>
       ), []),
-      cell: ({ row: { original: { quantityOnHand, id }, index } }) => {
+      cell: ({ row: { original: { quantityOnHand }, index } }) => {
         const [value, setValue] = useState(tableData?.[index]?.quantityRecounted);
         const recountDifference = value - (quantityOnHand || 0);
-        const variant = getCycleCountDifferencesVariant(recountDifference, id);
+        const variant = getCycleCountDifferencesVariant(recountDifference, value);
         events.on('refreshRecountDifference', () => {
           setValue(tableData?.[index]?.quantityRecounted);
         });
 
         return (
           <TableCell className="rt-td rt-td-count-step static-cell-count-step d-flex align-items-center">
-            {value !== null
-              && (
-                <ArrowValueIndicator
-                  value={recountDifference}
-                  variant={variant}
-                  showAbsoluteValue
-                />
-              )}
+            <ArrowValueIndicator
+              value={recountDifference}
+              variant={variant}
+              showAbsoluteValue
+            />
           </TableCell>
         );
       },

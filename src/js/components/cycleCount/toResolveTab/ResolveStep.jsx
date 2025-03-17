@@ -31,6 +31,7 @@ const ResolveStep = () => {
     getProduct,
     getDateCounted,
     isFormValid,
+    triggerValidation,
   } = useResolveStep();
 
   return (
@@ -68,6 +69,7 @@ const ResolveStep = () => {
             recountedBy={getRecountedBy(id)}
             countedBy={getCountedBy(id)}
             isFormValid={isFormValid}
+            triggerValidation={triggerValidation}
           />
         ))}
     </PageWrapper>

@@ -35,6 +35,7 @@ const CountStepTable = ({
   countedBy,
   defaultCountedBy,
   isFormValid,
+  triggerValidation,
 }) => {
   const translate = useTranslate();
   const localize = useSelector((state) => state.localize);
@@ -53,6 +54,7 @@ const CountStepTable = ({
     isStepEditable,
     formatLocalizedDate,
     addEmptyRow,
+    triggerValidation,
   });
 
   // Default counted by needs to be stored in order to set the default select value correctly
@@ -205,4 +207,5 @@ CountStepTable.propTypes = {
   }).isRequired,
   defaultCountedBy: PropTypes.shape({}).isRequired,
   isFormValid: PropTypes.bool.isRequired,
+  triggerValidation: PropTypes.func.isRequired,
 };

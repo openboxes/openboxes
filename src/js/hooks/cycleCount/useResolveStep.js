@@ -15,6 +15,7 @@ import { useHistory } from 'react-router-dom';
 import { fetchBinLocations, fetchUsers } from 'actions';
 import cycleCountApi from 'api/services/CycleCountApi';
 import { CYCLE_COUNT as GET_CYCLE_COUNTS } from 'api/urls';
+import ActivityCode from 'consts/activityCode';
 import { CYCLE_COUNT } from 'consts/applicationUrls';
 import { TO_RESOLVE_TAB } from 'consts/cycleCount';
 import useResolveStepValidation from 'hooks/cycleCount/useResolveStepValidation';
@@ -39,6 +40,7 @@ const useResolveStep = () => {
     validationErrors,
     isRootCauseWarningSkipped,
     triggerValidation,
+    forceRerender,
     validateRootCauses,
     shouldHaveRootCause,
     showEmptyRootCauseWarning,
@@ -64,7 +66,10 @@ const useResolveStep = () => {
 
   useEffect(() => {
     if (showBinLocation) {
-      dispatch(fetchBinLocations(currentLocation?.id));
+      dispatch(fetchBinLocations(
+        currentLocation?.id,
+        [ActivityCode.RECEIVE_STOCK],
+      ));
     }
   }, [currentLocation?.id]);
 
@@ -223,11 +228,12 @@ const useResolveStep = () => {
 
       return data;
     });
-    triggerValidation();
+    forceRerender();
   };
 
   const next = () => {
     const isValid = triggerValidation();
+    forceRerender();
     const areRecountedByFilled = _.every(
       cycleCountIds,
       (id) => getRecountedBy(id)?.id,
@@ -414,6 +420,7 @@ const useResolveStep = () => {
     back,
     getProduct,
     getDateCounted,
+    triggerValidation,
   };
 };
 
