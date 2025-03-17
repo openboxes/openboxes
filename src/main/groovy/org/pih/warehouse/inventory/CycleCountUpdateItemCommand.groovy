@@ -20,7 +20,7 @@ class CycleCountUpdateItemCommand implements Validateable {
 
     Person assignee
 
-    Date dateCounted;
+    Date dateCounted
 
     def beforeValidate() {
         String cycleCountItemId = RequestContextHolder.getRequestAttributes().params?.cycleCountItemId
@@ -40,6 +40,6 @@ class CycleCountUpdateItemCommand implements Validateable {
         })
         comment(nullable: true, blank: true)
         assignee(nullable: true)
-        dateCounted(nullable: true);
+        dateCounted(nullable: true)
     }
 }
