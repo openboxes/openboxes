@@ -29,7 +29,6 @@ import groupBinLocationsByZone from 'utils/groupBinLocationsByZone';
 import { checkBinLocationSupport } from 'utils/supportedActivitiesUtils';
 import { formatDate } from 'utils/translation-utils';
 import CustomTooltip from 'wrappers/CustomTooltip';
-import preventFractionalValues from 'utils/preventFractionalValues';
 
 // Managing state for single table, mainly table configuration (from resolve step)
 const useResolveStepTable = ({
@@ -317,12 +316,7 @@ const useResolveStepTable = ({
             onChangeRaw={onChangeRaw}
             hideErrorMessageWrapper
             warning={tooltipContent && warning}
-            onKeyDown={(e) => {
-              handleKeyDown(e, index, columnPath);
-              if (columnPath === cycleCountColumn.QUANTITY_RECOUNTED) {
-                preventFractionalValues(e);
-              }
-            }}
+            onKeyDown={(e) => handleKeyDown(e, index, columnPath)}
             focusProps={{
               fieldIndex: index,
               fieldId: columnPath,

@@ -223,6 +223,13 @@ const useCountStep = () => {
       (id) => getCountedBy(id)?.id,
     );
     if (isValid && areCountedByFilled) {
+      tableData.current = tableData.current.map((item) => ({
+        ...item,
+        cycleCountItems: item.cycleCountItems.map((countItem) => ({
+          ...countItem,
+          quantityCounted: parseInt(countItem.quantityCounted, 10) || 0,
+        })),
+      }));
       setIsStepEditable(false);
     }
   };

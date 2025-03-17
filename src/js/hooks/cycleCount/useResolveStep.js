@@ -248,7 +248,13 @@ const useResolveStep = () => {
       showEmptyRootCauseWarning();
       return;
     }
-
+    tableData.current = tableData.current.map((item) => ({
+      ...item,
+      cycleCountItems: item.cycleCountItems.map((countItem) => ({
+        ...countItem,
+        quantityRecounted: parseInt(countItem.quantityRecounted, 10) || 0,
+      })),
+    }));
     setIsStepEditable(false);
   };
 
