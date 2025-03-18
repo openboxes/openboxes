@@ -135,6 +135,11 @@ const useResolveStepValidation = ({ tableData }) => {
     });
   };
 
+  const resetValidationState = () => {
+    validationErrors.current = {};
+    isValid.current = null;
+  };
+
   return {
     validationErrors: validationErrors.current,
     isFormValid: isValid.current,
@@ -146,6 +151,7 @@ const useResolveStepValidation = ({ tableData }) => {
     isRootCauseWarningSkipped,
     rowValidationSchema,
     rowsValidationSchema,
+    resetValidationState,
   };
 };
 
