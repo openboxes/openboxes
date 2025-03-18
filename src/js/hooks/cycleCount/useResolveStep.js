@@ -175,6 +175,7 @@ const useResolveStep = () => {
         await cycleCountApi.refreshItems(currentLocation?.id, cycleCountId);
       }
     } finally {
+      resetFocus();
       hide();
       await refetchData();
     }
@@ -204,7 +205,7 @@ const useResolveStep = () => {
     triggerValidation();
   };
 
-  const addEmptyRow = (productId, id) => {
+  const addEmptyRow = (productId, id, shouldResetFocus = true) => {
     // ID is needed for updating appropriate row
     const emptyRow = {
       id: _.uniqueId('newRow'),
@@ -237,6 +238,9 @@ const useResolveStep = () => {
 
       return data;
     });
+    if (shouldResetFocus) {
+      resetFocus();
+    }
     forceRerender();
   };
 
@@ -289,6 +293,7 @@ const useResolveStep = () => {
   const assignRecountedBy = (cycleCountId) => (person) => {
     markAllItemsAsUpdated(cycleCountId);
     setRecountedBy((prevState) => ({ ...prevState, [cycleCountId]: person }));
+    resetFocus();
   };
 
   const getRecountedDate = (cycleCountId) => dateRecounted[cycleCountId];

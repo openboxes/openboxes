@@ -31,6 +31,7 @@ const useCountStepTable = ({
   addEmptyRow,
   triggerValidation,
   refreshFocusCounter,
+  // forceRerender,
 }) => {
   const columnHelper = createColumnHelper();
   const [rowIndex, setRowIndex] = useState(null);
@@ -38,7 +39,7 @@ const useCountStepTable = ({
   // If prevForceResetFocus is different from refreshFocusCounter,
   // it triggers a reset of rowIndex and columnId.
   const [prevForceResetFocus, setPrevForceResetFocus] = useState(0);
-
+  console.log('validationErrors', validationErrors);
   const translate = useTranslate();
 
   const { users, currentLocation, binLocations } = useSelector((state) => ({
@@ -129,6 +130,7 @@ const useCountStepTable = ({
         cycleCountColumn.QUANTITY_COUNTED,
         cycleCountColumn.COMMENT,
       ].includes(id);
+
       // We shouldn't allow users edit fetched data (only quantity counted and comment are editable)
       if (isFieldEditable || !isStepEditable) {
         return (
@@ -152,10 +154,25 @@ const useCountStepTable = ({
         }
       };
 
+      // Resets the error when rowIndex or columnId changes
+      // since validationErrors don’t update properly.
+      // Old errors reappear on rerender, and using arrow keys
+      // triggers a rerender with every key press, causing outdated errors to show.
+      useEffect(() => {
+        if (rowIndex !== null && columnId && error !== null) {
+          setError(null);
+        }
+      }, [rowIndex, columnId]);
+
       // on change function expects e.target.value for text fields,
       // in other cases it expects just the value
       const onChange = (e) => {
         setValue(e?.target?.value ?? e);
+      };
+
+      const onChangeRaw = (e) => {
+        const valueToUpdate = (e?.target?.value ?? e)?.format();
+        setValue(valueToUpdate);
       };
 
       // After pulling the latest changes, table.options.meta?.updateData no longer
@@ -163,11 +180,6 @@ const useCountStepTable = ({
       useEffect(() => {
         table.options.meta?.updateData(cycleCountId, original.id, id, value);
       }, [value]);
-
-      const onChangeRaw = (e) => {
-        const valueToUpdate = (e?.target?.value ?? e)?.format();
-        setValue(valueToUpdate);
-      };
 
       // Table consists of text fields, one numerical field for quantity counted,
       // select field for bin locations and one date picker for the expiration date.
@@ -195,7 +207,7 @@ const useCountStepTable = ({
       ];
 
       // Checks if the row is a new one (i.e., added by user and contains 'newRow' in id),
-      // and if yes, allow navigation through `newRowFocusableCells`.
+      // and if yes, allow navigation through newRowFocusableCells.
       const isNewRow = (row) => row?.id?.includes('newRow');
 
       const { handleKeyDown } = useArrowsNavigation({
@@ -204,8 +216,9 @@ const useCountStepTable = ({
         tableData,
         setColumnId,
         setRowIndex,
-        addNewRow: () => addEmptyRow(productId, cycleCountId),
+        addNewRow: () => addEmptyRow(productId, cycleCountId, false),
         isNewRow,
+        onBlur,
       });
 
       return (

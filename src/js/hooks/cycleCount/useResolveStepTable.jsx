@@ -236,6 +236,16 @@ const useResolveStepTable = ({
         }
       };
 
+      // Resets the error when rowIndex or columnId changes
+      // since validationErrors don’t update properly.
+      // Old errors reappear on rerender, and using arrow keys
+      // triggers a rerender with every key press, causing outdated errors to show.
+      useEffect(() => {
+        if (rowIndex !== null && columnId && error !== null) {
+          setError(null);
+        }
+      }, [rowIndex, columnId]);
+
       // on change function expects e.target.value for text fields,
       // in other cases it expects just the value
       const onChange = (e) => {
@@ -298,7 +308,7 @@ const useResolveStepTable = ({
         tableData,
         setColumnId,
         setRowIndex,
-        addNewRow: () => addEmptyRow(productId, cycleCountId),
+        addNewRow: () => addEmptyRow(productId, cycleCountId, false),
         isNewRow,
       });
       const isAutoWidth = [

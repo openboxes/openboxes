@@ -193,7 +193,7 @@ const useCountStep = () => {
     }
   };
 
-  const addEmptyRow = (productId, id) => {
+  const addEmptyRow = (productId, id, shouldResetFocus = true) => {
     // ID is needed for updating appropriate row
     const emptyRow = {
       id: _.uniqueId('newRow'),
@@ -224,6 +224,9 @@ const useCountStep = () => {
 
       return data;
     });
+    if (shouldResetFocus) {
+      resetFocus();
+    }
     forceRerender();
   };
 
