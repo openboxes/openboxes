@@ -41,11 +41,16 @@ const useResolveStepTable = ({
   tableData,
   productId,
   addEmptyRow,
+  refreshFocusCounter,
 }) => {
   const columnHelper = createColumnHelper();
+  const [rowIndex, setRowIndex] = useState(null);
+  const [columnId, setColumnId] = useState(null);
+  // If prevForceResetFocus is different from refreshFocusCounter,
+  // it triggers a reset of rowIndex and columnId.
+  const [prevForceResetFocus, setPrevForceResetFocus] = useState(0);
+
   // State for saving data for binLocation dropdown
-  const [focusIndex, setFocusIndex] = useState(null);
-  const [focusId, setFocusId] = useState(null);
   const translate = useTranslate();
   const events = new EventEmitter();
 
@@ -67,6 +72,14 @@ const useResolveStepTable = ({
     checkBinLocationSupport(currentLocation.supportedActivities), [currentLocation?.id]);
 
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (refreshFocusCounter !== prevForceResetFocus) {
+      setRowIndex(null);
+      setColumnId(null);
+      setPrevForceResetFocus(refreshFocusCounter);
+    }
+  }, [refreshFocusCounter]);
 
   useEffect(() => {
     if (!reasonCodes?.length) {
@@ -160,12 +173,6 @@ const useResolveStepTable = ({
     return value;
   };
 
-  const handleAddEmptyRow = () => {
-    addEmptyRow(productId, cycleCountId);
-    setFocusIndex(null);
-    setFocusId(null);
-  };
-
   const defaultColumn = {
     cell: ({
       row: { original, index }, column: { id }, table,
@@ -229,21 +236,35 @@ const useResolveStepTable = ({
         }
       };
 
+      // Resets the error when rowIndex or columnId changes
+      // since validationErrors don’t update properly.
+      // Old errors reappear on rerender, and using arrow keys
+      // triggers a rerender with every key press, causing outdated errors to show.
+      useEffect(() => {
+        if (rowIndex !== null && columnId && error !== null) {
+          setError(null);
+        }
+      }, [rowIndex, columnId]);
+
       // on change function expects e.target.value for text fields,
       // in other cases it expects just the value
       const onChange = (e) => {
-        const enteredValue = e?.target?.value ?? e;
         if ([
           cycleCountColumn.BIN_LOCATION,
           cycleCountColumn.ROOT_CAUSE,
         ].includes(id)) {
-          table.options.meta?.updateData(cycleCountId, original.id, id, enteredValue);
           setError(null);
           setWarning(null);
           triggerValidation();
         }
-        setValue(enteredValue);
+        setValue(e?.target?.value ?? e);
       };
+
+      // After pulling the latest changes, table.options.meta?.updateData no longer
+      // works on onChange, so for now, I put it inside useEffect
+      useEffect(() => {
+        table.options.meta?.updateData(cycleCountId, original.id, id, value);
+      }, [value]);
 
       const onChangeRaw = (e) => {
         const valueToUpdate = (e?.target?.value ?? e)?.format();
@@ -285,9 +306,9 @@ const useResolveStepTable = ({
         newRowFocusableCells,
         existingRowFocusableCells,
         tableData,
-        setFocusId,
-        setFocusIndex,
-        addNewRow: () => addEmptyRow(productId, cycleCountId),
+        setColumnId,
+        setRowIndex,
+        addNewRow: () => addEmptyRow(productId, cycleCountId, false),
         isNewRow,
       });
       const isAutoWidth = [
@@ -320,9 +341,10 @@ const useResolveStepTable = ({
             focusProps={{
               fieldIndex: index,
               fieldId: columnPath,
-              focusIndex,
-              focusId,
+              rowIndex,
+              columnId,
             }}
+            onWheel={(event) => event.currentTarget.blur()}
             {...fieldProps}
           />
           {(error || warning) && tooltipContent && (
@@ -523,7 +545,6 @@ const useResolveStepTable = ({
     columns,
     defaultColumn,
     users,
-    handleAddEmptyRow,
   };
 };
 
