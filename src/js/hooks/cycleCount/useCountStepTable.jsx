@@ -31,7 +31,6 @@ const useCountStepTable = ({
   addEmptyRow,
   triggerValidation,
   refreshFocusCounter,
-  // forceRerender,
 }) => {
   const columnHelper = createColumnHelper();
   const [rowIndex, setRowIndex] = useState(null);
@@ -170,16 +169,16 @@ const useCountStepTable = ({
         setValue(e?.target?.value ?? e);
       };
 
-      const onChangeRaw = (e) => {
-        const valueToUpdate = (e?.target?.value ?? e)?.format();
-        setValue(valueToUpdate);
-      };
-
       // After pulling the latest changes, table.options.meta?.updateData no longer
       // works on onChange, so for now, I put it inside useEffect
       useEffect(() => {
         table.options.meta?.updateData(cycleCountId, original.id, id, value);
       }, [value]);
+
+      const onChangeRaw = (e) => {
+        const valueToUpdate = (e?.target?.value ?? e)?.format();
+        setValue(valueToUpdate);
+      };
 
       // Table consists of text fields, one numerical field for quantity counted,
       // select field for bin locations and one date picker for the expiration date.
@@ -207,7 +206,7 @@ const useCountStepTable = ({
       ];
 
       // Checks if the row is a new one (i.e., added by user and contains 'newRow' in id),
-      // and if yes, allow navigation through newRowFocusableCells.
+      // and if yes, allow navigation through `newRowFocusableCells`.
       const isNewRow = (row) => row?.id?.includes('newRow');
 
       const { handleKeyDown } = useArrowsNavigation({
@@ -218,7 +217,6 @@ const useCountStepTable = ({
         setRowIndex,
         addNewRow: () => addEmptyRow(productId, cycleCountId, false),
         isNewRow,
-        onBlur,
       });
 
       return (
