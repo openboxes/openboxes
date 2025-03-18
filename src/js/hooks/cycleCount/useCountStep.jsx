@@ -358,12 +358,11 @@ const useCountStep = () => {
 
           return acc;
         }, []);
-
+      dispatch(eraseDraft());
       if (requestIdsWithDiscrepancies.length > 0) {
         openResolveDiscrepanciesModal(requestIdsWithDiscrepancies);
         return;
       }
-      dispatch(eraseDraft());
       history.push(CYCLE_COUNT.list(TO_COUNT_TAB));
     } finally {
       resetFocus();
