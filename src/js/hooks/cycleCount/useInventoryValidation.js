@@ -45,15 +45,12 @@ const useInventoryValidation = ({ tableData }) => {
         cycleCountItems,
         (item) => item?.inventoryItem?.lotNumber,
       );
-      // The backend returns expiration date in the "MM/dd/yyyy" format, but we use the
-      // "yyyy-MM-dd'T'hh:mm:ssXXX" format when generating the dates on the frontend. We
-      // convert the dates to a moment for easy comparison.
+      // The backend returns expiration date in the "MM/dd/yyyy" format, but we use the ISO format
+      // "yyyy-MM-dd'T'hh:mm:ssXXX" when generating dates on the frontend. We convert the dates to
+      // a moment (defaulting to UTC if no timezone information is provided) for easy comparison.
       const expirationDates = dataGroupedByLotNumber[row?.inventoryItem?.lotNumber].map((item) => {
         const expirationDate = item?.inventoryItem?.expirationDate;
-        // TODO: isSame is returning false, even if the dates are the same! I suspect it's trying
-        //       to use local time when parsing "MM/dd/yyyy". Gotta find a way to make this default
-        //       to UTC. This kinda sucks though, maybe we need a more general solution to this...
-        return expirationDate == null ? null : moment(expirationDate);
+        return expirationDate == null ? null : moment.utc(expirationDate);
       });
       const uniqueDates = _.uniqWith(expirationDates, (arrVal, othVal) => arrVal?.isSame(othVal));
       if (uniqueDates.length > 1) {
