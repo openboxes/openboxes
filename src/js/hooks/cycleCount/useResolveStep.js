@@ -45,6 +45,7 @@ const useResolveStep = () => {
     shouldHaveRootCause,
     showEmptyRootCauseWarning,
     isFormValid,
+    resetValidationState,
   } = useResolveStepValidation({ tableData });
 
   const dispatch = useDispatch();
@@ -228,6 +229,7 @@ const useResolveStep = () => {
 
       return data;
     });
+    resetValidationState();
     forceRerender();
   };
 
@@ -310,6 +312,7 @@ const useResolveStep = () => {
   const save = async () => {
     try {
       show();
+      resetValidationState();
       for (const cycleCount of tableData.current) {
         const cycleCountItemsToUpdate = cycleCount.cycleCountItems.filter((item) => (item.updated && !item.id.includes('newRow')));
         for (const cycleCountItem of cycleCountItemsToUpdate) {

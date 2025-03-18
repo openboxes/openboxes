@@ -70,6 +70,7 @@ const useCountStep = () => {
     triggerValidation,
     forceRerender,
     isFormValid,
+    resetValidationState,
   } = useCountStepValidation({ tableData });
 
   const filterCountItems = (cycleCounts) => cycleCounts.map((cycleCount) => ({
@@ -212,6 +213,7 @@ const useCountStep = () => {
 
       return data;
     });
+    resetValidationState();
     forceRerender();
   };
 
@@ -234,6 +236,7 @@ const useCountStep = () => {
   const save = async () => {
     try {
       show();
+      resetValidationState();
       for (const cycleCount of tableData.current) {
         const cycleCountItemsToUpdate = cycleCount.cycleCountItems.filter((item) => (item.updated && !item.id.includes('newRow')));
         for (const cycleCountItem of cycleCountItemsToUpdate) {
