@@ -12,6 +12,7 @@ const confirmationModal = ({
   buttons,
   handleOnClose,
   hideCloseButton,
+  closeOnClickOutside = true,
 }) => {
   confirmAlert({
     customUI: ({ onClose }) => (
@@ -28,6 +29,7 @@ const confirmationModal = ({
         hideCloseButton={hideCloseButton}
       />
     ),
+    closeOnClickOutside,
   });
 };
 

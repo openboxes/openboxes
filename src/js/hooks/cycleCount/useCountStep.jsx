@@ -340,6 +340,7 @@ const useCountStep = () => {
       buttons: resolveDiscrepanciesModalButtons(requestIdsWithDiscrepancies),
       ...modalLabels,
       hideCloseButton: true,
+      closeOnClickOutside: false,
     });
   };
 
