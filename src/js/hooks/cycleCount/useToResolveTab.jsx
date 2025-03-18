@@ -21,6 +21,7 @@ import useSpinner from 'hooks/useSpinner';
 import useTableCheckboxes from 'hooks/useTableCheckboxes';
 import useTableDataV2 from 'hooks/useTableDataV2';
 import useTableSorting from 'hooks/useTableSorting';
+import useThrowError from 'hooks/useThrowError';
 import useTranslate from 'hooks/useTranslate';
 import Badge from 'utils/Badge';
 import exportFileFromAPI, { extractFilenameFromHeader } from 'utils/file-download-util';
@@ -37,9 +38,14 @@ const useToResolveTab = ({
   const spinner = useSpinner();
   const { tab } = useQueryParams();
 
-  const { currentLocale, currentLocation } = useSelector((state) => ({
+  const {
+    currentLocale,
+    currentLocation,
+    cycleCountMaxSelectedProducts,
+  } = useSelector((state) => ({
     currentLocale: state.session.activeLanguage,
     currentLocation: state.session.currentLocation,
+    cycleCountMaxSelectedProducts: state.session.cycleCountMaxSelectedProducts,
   }));
 
   const dispatch = useDispatch();
@@ -356,6 +362,17 @@ const useToResolveTab = ({
     }
   };
 
+  const { verifyCondition } = useThrowError({
+    condition: checkedCheckboxes.length <= cycleCountMaxSelectedProducts,
+    callWhenValid: moveToResolving,
+    errorMessageLabel: 'react.cycleCount.selectedMoreThanAllowed.error',
+    errorMessageDefault: `Sorry, we cannot support counting more than ${cycleCountMaxSelectedProducts} products at once at the moment.
+     Please start counting fewer products and then continue on the remaining products.`,
+    translateData: {
+      maxProductsNumber: cycleCountMaxSelectedProducts,
+    },
+  });
+
   return {
     tableData,
     loading,
@@ -363,7 +380,7 @@ const useToResolveTab = ({
     emptyTableMessage,
     exportTableData,
     selectedCheckboxesAmount,
-    moveToResolving,
+    moveToResolving: verifyCondition,
     printResolveForm,
   };
 };
