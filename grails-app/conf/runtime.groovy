@@ -86,6 +86,9 @@ openboxes.dashboard.backdatedShipments.monthsLimit = 6
 // Merge Products (OBPIH-5453)
 openboxes.products.merge.enabled = false
 
+// Cycle Count configuration (OBPIH-7033)
+openboxes.cycleCount.products.maxAmount = 50
+
 openboxes.security.rbac.rules = [
     [controller: '*', actions: ['delete'], accessRules: [ minimumRequiredRole: RoleType.ROLE_SUPERUSER ]],
     [controller: '*', actions: ['remove'], accessRules: [ minimumRequiredRole: RoleType.ROLE_SUPERUSER ]],

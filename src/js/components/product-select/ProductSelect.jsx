@@ -4,8 +4,6 @@ import PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
 import { Tooltip } from 'react-tippy';
 
-import componentType from 'consts/componentType';
-import useFocusOnMatch from 'hooks/useFocusOnMatch';
 import { debounceProductsFetch } from 'utils/option-utils';
 import renderHandlingIcons from 'utils/product-handling-icons';
 import Select from 'utils/Select';
@@ -43,8 +41,6 @@ const ProductSelect = ({
   locationId,
   fieldRef,
   includeUom,
-  onKeyDown,
-  focusProps = {},
   ...props
 }) => {
   const selectRef = useRef(null);
@@ -100,8 +96,6 @@ const ProductSelect = ({
     }
   }, [isExactMatch, loadedOptions, searchTerm]);
 
-  useFocusOnMatch({ ...focusProps, ref: fieldRef, type: componentType.SELECT_FIELD });
-
   const loadProductOptions = (searchString, callback) =>
     debouncedProductsFetch(searchString, (resultOptions) => {
       setLoadedOptions(resultOptions);
@@ -127,7 +121,6 @@ const ProductSelect = ({
       onEnterPress={onEnterPress}
       optionRenderer={Option}
       valueRenderer={SelectedValue}
-      onKeyDown={onKeyDown}
     />
   );
 };
@@ -142,13 +135,6 @@ ProductSelect.defaultProps = {
   fieldRef: undefined,
   loadOptions: undefined,
   includeUom: false,
-  onKeyDown: PropTypes.func,
-  focusProps: PropTypes.shape({
-    fieldIndex: PropTypes.string,
-    fieldId: PropTypes.string,
-    focusIndex: PropTypes.string,
-    focusId: PropTypes.string,
-  }),
 };
 
 ProductSelect.propTypes = {
@@ -162,8 +148,6 @@ ProductSelect.propTypes = {
   fieldRef: PropTypes.func,
   loadOptions: PropTypes.func,
   includeUom: PropTypes.bool,
-  onKeyDown: null,
-  focusProps: {},
 };
 
 export default ProductSelect;

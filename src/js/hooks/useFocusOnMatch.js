@@ -3,17 +3,17 @@ import { useEffect } from 'react';
 import componentType from 'consts/componentType';
 
 const useFocusOnMatch = ({
-  focusId,
+  columnId,
   fieldIndex,
-  focusIndex,
+  rowIndex,
   fieldId,
   ref,
   type,
 }) => {
   useEffect(() => {
-    const shouldFocus = focusId
-      && fieldIndex === focusIndex
-      && fieldId === focusId;
+    const shouldFocus = columnId
+      && fieldIndex === rowIndex
+      && fieldId === columnId;
 
     if (shouldFocus && type === componentType.DATE_FIELD) {
       ref.current?.setOpen(true);
@@ -23,7 +23,7 @@ const useFocusOnMatch = ({
     if (shouldFocus) {
       ref.current?.focus();
     }
-  }, [focusId, fieldIndex, focusIndex, fieldId, ref]);
+  }, [columnId, fieldIndex, rowIndex, fieldId, ref]);
 };
 
 export default useFocusOnMatch;

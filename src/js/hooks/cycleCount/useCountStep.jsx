@@ -41,6 +41,10 @@ const useCountStep = () => {
   // Saving selected "date counted" option, initially it's the date fetched from API
   const [dateCounted, setDateCounted] = useState({});
   const [isStepEditable, setIsStepEditable] = useState(true);
+  // State used to trigger focus reset when changed. When this counter changes,
+  // it will reset the focus by clearing the RowIndex and ColumnId in useEffect.
+  const [refreshFocusCounter, setRefreshFocusCounter] = useState(0);
+
   const dispatch = useDispatch();
   const history = useHistory();
   const { show, hide } = useSpinner();
@@ -52,6 +56,10 @@ const useCountStep = () => {
     cycleCountIds: state.cycleCount.requests,
     currentLocation: state.session.currentLocation,
   }));
+
+  const resetFocus = () => {
+    setRefreshFocusCounter((prev) => prev + 1);
+  };
 
   const showBinLocation = useMemo(() =>
     checkBinLocationSupport(currentLocation.supportedActivities), [currentLocation?.id]);
@@ -120,6 +128,7 @@ const useCountStep = () => {
       params: { id: cycleCountIds },
       format,
     });
+    resetFocus();
     hide();
   };
 
@@ -149,6 +158,8 @@ const useCountStep = () => {
     markAllItemsAsUpdated(cycleCountId);
     setCountedBy((prevState) => ({ ...prevState, [cycleCountId]: person }));
     setDefaultCountedBy((prevState) => ({ ...prevState, [cycleCountId]: person }));
+    setDefaultCountedBy((prevState) => ({ ...prevState, [cycleCountId]: person }));
+    resetFocus();
   };
 
   const getCountedBy = (cycleCountId) => countedBy?.[cycleCountId];
@@ -170,6 +181,7 @@ const useCountStep = () => {
 
         return data;
       });
+      resetFocus();
       triggerValidation();
       return;
     }
@@ -182,7 +194,7 @@ const useCountStep = () => {
     }
   };
 
-  const addEmptyRow = (productId, id) => {
+  const addEmptyRow = (productId, id, shouldResetFocus = true) => {
     // ID is needed for updating appropriate row
     const emptyRow = {
       id: _.uniqueId('newRow'),
@@ -213,6 +225,9 @@ const useCountStep = () => {
 
       return data;
     });
+    if (shouldResetFocus) {
+      resetFocus();
+    }
     resetValidationState();
     forceRerender();
   };
@@ -227,10 +242,12 @@ const useCountStep = () => {
     if (isValid && areCountedByFilled) {
       setIsStepEditable(false);
     }
+    resetFocus();
   };
 
   const back = () => {
     setIsStepEditable(true);
+    resetFocus();
   };
 
   const save = async () => {
@@ -267,6 +284,7 @@ const useCountStep = () => {
     } finally {
       // After the save, refetch cycle counts so that a new row can't be saved multiple times
       await fetchCycleCounts();
+      resetFocus();
       hide();
     }
   };
@@ -343,7 +361,7 @@ const useCountStep = () => {
 
           return acc;
         }, []);
-
+      dispatch(eraseDraft());
       if (requestIdsWithDiscrepancies.length > 0) {
         openResolveDiscrepanciesModal(requestIdsWithDiscrepancies);
         return;
@@ -351,6 +369,7 @@ const useCountStep = () => {
       dispatch(eraseDraft());
       history.push(CYCLE_COUNT.list(TO_COUNT_TAB));
     } finally {
+      resetFocus();
       hide();
     }
   };
@@ -385,6 +404,7 @@ const useCountStep = () => {
       ...date,
       [cycleCountId]: date,
     });
+    resetFocus();
   };
 
   return {
@@ -407,6 +427,7 @@ const useCountStep = () => {
     resolveDiscrepancies,
     isStepEditable,
     isFormValid,
+    refreshFocusCounter,
   };
 };
 

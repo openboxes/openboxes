@@ -33,6 +33,9 @@ const useResolveStep = () => {
   // Saving selected "date recounted" option, initially it's the date fetched from API
   const [dateRecounted, setDateRecounted] = useState({});
   const [isStepEditable, setIsStepEditable] = useState(true);
+  // State used to trigger focus reset when changed. When this counter changes,
+  // it will reset the focus by clearing the RowIndex and ColumnId in useEffect.
+  const [refreshFocusCounter, setRefreshFocusCounter] = useState(0);
   const { show, hide } = useSpinner();
   const history = useHistory();
 
@@ -61,6 +64,10 @@ const useResolveStep = () => {
     reasonCodes: state.cycleCount.reasonCodes,
     currentLocation: state.session.currentLocation,
   }));
+
+  const resetFocus = () => {
+    setRefreshFocusCounter((prev) => prev + 1);
+  };
 
   const showBinLocation = useMemo(() =>
     checkBinLocationSupport(currentLocation.supportedActivities), [currentLocation?.id]);
@@ -158,6 +165,7 @@ const useResolveStep = () => {
       params: { id: cycleCountIds },
       format,
     });
+    resetFocus();
     hide();
   };
 
@@ -168,6 +176,7 @@ const useResolveStep = () => {
         await cycleCountApi.refreshItems(currentLocation?.id, cycleCountId);
       }
     } finally {
+      resetFocus();
       hide();
       await refetchData();
     }
@@ -193,10 +202,11 @@ const useResolveStep = () => {
 
       return data;
     });
+    resetFocus();
     triggerValidation();
   };
 
-  const addEmptyRow = (productId, id) => {
+  const addEmptyRow = (productId, id, shouldResetFocus = true) => {
     // ID is needed for updating appropriate row
     const emptyRow = {
       id: _.uniqueId('newRow'),
@@ -229,11 +239,15 @@ const useResolveStep = () => {
 
       return data;
     });
+    if (shouldResetFocus) {
+      resetFocus();
+    }
     resetValidationState();
     forceRerender();
   };
 
   const next = () => {
+    resetFocus();
     const isValid = triggerValidation();
     forceRerender();
     const areRecountedByFilled = _.every(
@@ -256,6 +270,7 @@ const useResolveStep = () => {
 
   const back = () => {
     setIsStepEditable(true);
+    resetFocus();
   };
 
   const setAllItemsUpdatedState = (cycleCountId, updated) => {
@@ -280,6 +295,7 @@ const useResolveStep = () => {
   const assignRecountedBy = (cycleCountId) => (person) => {
     markAllItemsAsUpdated(cycleCountId);
     setRecountedBy((prevState) => ({ ...prevState, [cycleCountId]: person }));
+    resetFocus();
   };
 
   const getRecountedDate = (cycleCountId) => dateRecounted[cycleCountId];
@@ -290,6 +306,7 @@ const useResolveStep = () => {
       [cycleCountId]: date.format(),
     });
     markAllItemsAsUpdated(cycleCountId);
+    resetFocus();
   };
 
   const getPayload = (cycleCountItem, cycleCount) => ({
@@ -333,6 +350,7 @@ const useResolveStep = () => {
       // After the save, refetch cycle counts so that a new row can't be saved multiple times
       await refetchData();
       hide();
+      resetFocus();
     }
   };
 
@@ -423,6 +441,7 @@ const useResolveStep = () => {
     back,
     getProduct,
     getDateCounted,
+    refreshFocusCounter,
     triggerValidation,
   };
 };
