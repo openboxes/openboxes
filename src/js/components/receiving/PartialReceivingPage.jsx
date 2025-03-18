@@ -1038,10 +1038,12 @@ class PartialReceivingPage extends Component {
                   <div className="d-flex justify-content-between align-items-center">
                     <div className="width-250">
                       <Select
-                        options={receivingSortOptions}
-                        value={this.props.sort}
                         onChange={this.handleSortChange}
-                        placeholder="Select Sort Option"
+                        value={this.props.sort}
+                        options={receivingSortOptions.map(option => ({
+                          value: option.value,
+                          label: <Translate id={option.label} />,
+                        }))}
                       />
                     </div>
                     <div className="buttons-container">

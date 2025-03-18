@@ -1,6 +1,6 @@
 const receivingSortOptions = [
-  { value: 'shipment', label: 'Shipment order' },
-  { value: 'alphabetical', label: 'Alphabetical Order' },
+  { value: 'shipment', label: 'react.partialReceiving.sortOptions.shipmentOrder' },
+  { value: 'alphabetical', label: 'react.partialReceiving.sortOptions.alphabeticalOrder' },
 ];
 
 export default receivingSortOptions;
