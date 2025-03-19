@@ -305,7 +305,7 @@ const useToCountTab = ({
       ),
       cell: ({ getValue }) => (
         <TableCell className="rt-td">
-          {getValue()}
+          {getValue().toString()}
         </TableCell>
       ),
       meta: {
