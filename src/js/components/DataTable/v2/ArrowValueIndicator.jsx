@@ -40,11 +40,15 @@ const ArrowValueIndicator = ({ value, variant, showAbsoluteValue }) => {
     );
   }
 
-  return (
-    <div className="py-1 text-center value-indicator value-indicator--empty">
-      -
-    </div>
-  );
+  if (variant === ArrowValueIndicatorVariant.EMPTY) {
+    return (
+      <div className="py-1 text-center value-indicator value-indicator--empty">
+        -
+      </div>
+    );
+  }
+
+  return null;
 };
 
 export default ArrowValueIndicator;

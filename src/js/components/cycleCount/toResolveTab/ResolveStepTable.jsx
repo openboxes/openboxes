@@ -37,12 +37,13 @@ const ResolveStepTable = ({
   shouldHaveRootCause,
   isFormValid,
   isStepEditable,
+  triggerValidation,
+  refreshFocusCounter,
 }) => {
   const {
     columns,
     defaultColumn,
     users,
-    handleAddEmptyRow,
   } = useResolveStepTable({
     cycleCountId: id,
     validationErrors,
@@ -52,6 +53,8 @@ const ResolveStepTable = ({
     shouldHaveRootCause,
     productId: product?.id,
     addEmptyRow,
+    refreshFocusCounter,
+    triggerValidation,
   });
 
   const translate = useTranslate();
@@ -176,7 +179,9 @@ const ResolveStepTable = ({
           )}
         >
           <Button
-            onClick={handleAddEmptyRow}
+            onClick={() => {
+              addEmptyRow(product?.id, id);
+            }}
             label="react.cycleCount.addNewRecord.label"
             defaultLabel="Add new record"
             variant="transparent"
@@ -216,4 +221,6 @@ ResolveStepTable.propTypes = {
   shouldHaveRootCause: PropTypes.func.isRequired,
   isStepEditable: PropTypes.bool.isRequired,
   isFormValid: PropTypes.bool.isRequired,
+  refreshFocusCounter: PropTypes.number.isRequired,
+  triggerValidation: PropTypes.func.isRequired,
 };

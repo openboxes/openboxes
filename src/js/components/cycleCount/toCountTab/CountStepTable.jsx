@@ -35,6 +35,8 @@ const CountStepTable = ({
   countedBy,
   defaultCountedBy,
   isFormValid,
+  refreshFocusCounter,
+  triggerValidation,
 }) => {
   const translate = useTranslate();
   const localize = useSelector((state) => state.localize);
@@ -43,7 +45,6 @@ const CountStepTable = ({
     columns,
     defaultColumn,
     users,
-    handleAddEmptyRow,
   } = useCountStepTable({
     cycleCountId: id,
     productId: product?.id,
@@ -53,6 +54,8 @@ const CountStepTable = ({
     isStepEditable,
     formatLocalizedDate,
     addEmptyRow,
+    triggerValidation,
+    refreshFocusCounter,
   });
 
   // Default counted by needs to be stored in order to set the default select value correctly
@@ -163,7 +166,7 @@ const CountStepTable = ({
             )}
           >
             <Button
-              onClick={handleAddEmptyRow}
+              onClick={() => addEmptyRow(product?.id, id)}
               label="react.cycleCount.addNewRecord.label"
               defaultLabel="Add new record"
               variant="transparent"
@@ -205,4 +208,6 @@ CountStepTable.propTypes = {
   }).isRequired,
   defaultCountedBy: PropTypes.shape({}).isRequired,
   isFormValid: PropTypes.bool.isRequired,
+  refreshFocusCounter: PropTypes.number.isRequired,
+  triggerValidation: PropTypes.func.isRequired,
 };

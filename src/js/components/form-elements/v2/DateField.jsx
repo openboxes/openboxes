@@ -161,8 +161,8 @@ DateField.propTypes = {
   focusProps: PropTypes.shape({
     fieldIndex: PropTypes.string,
     fieldId: PropTypes.string,
-    focusIndex: PropTypes.string,
-    focusId: PropTypes.string,
+    rowIndex: PropTypes.string,
+    columnId: PropTypes.string,
   }),
 };
 

@@ -27,6 +27,7 @@ const TextInput = ({
   hideErrorMessageWrapper,
   onKeyDown,
   focusProps = {},
+  onWheel,
   ...fieldProps
 }) => {
   const inputRef = useRef(null);
@@ -83,6 +84,7 @@ const TextInput = ({
         onChange={onChangeHandler}
         onBlur={onBlurHandler}
         onKeyDown={onKeyDown}
+        onWheel={onWheel}
       />
     </InputWrapper>
   );
@@ -129,9 +131,10 @@ TextInput.propTypes = {
   focusProps: PropTypes.shape({
     fieldIndex: PropTypes.string,
     fieldId: PropTypes.string,
-    focusIndex: PropTypes.string,
-    focusId: PropTypes.string,
+    rowIndex: PropTypes.string,
+    columnId: PropTypes.string,
   }),
+  onWheel: PropTypes.func,
 };
 
 TextInput.defaultProps = {
@@ -151,4 +154,5 @@ TextInput.defaultProps = {
   hideErrorMessageWrapper: false,
   onKeyDown: null,
   focusProps: {},
+  onWheel: null,
 };

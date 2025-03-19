@@ -4,8 +4,8 @@ const useArrowsNavigation = ({
   newRowFocusableCells,
   existingRowFocusableCells,
   tableData,
-  setFocusId,
-  setFocusIndex,
+  setColumnId,
+  setRowIndex,
   addNewRow,
   isNewRow,
 }) => {
@@ -70,8 +70,8 @@ const useArrowsNavigation = ({
     if (key === navigationKey.ARROW_UP) {
       const isInArray = existingRowFocusableCells.includes(columnId);
       if (rowIndex > 0 && (isInArray || isNewRow(tableData[rowIndex - 1]))) {
-        setFocusIndex(rowIndex - 1);
-        setFocusId(columnId);
+        setRowIndex(rowIndex - 1);
+        setColumnId(columnId);
       }
       e.preventDefault();
       e.stopPropagation();
@@ -79,8 +79,8 @@ const useArrowsNavigation = ({
 
     if (key === navigationKey.ARROW_DOWN) {
       if (rowIndex < tableData.length - 1) {
-        setFocusIndex(rowIndex + 1);
-        setFocusId(columnId);
+        setRowIndex(rowIndex + 1);
+        setColumnId(columnId);
       }
       e.preventDefault();
       e.stopPropagation();
@@ -88,14 +88,14 @@ const useArrowsNavigation = ({
 
     if (key === navigationKey.ARROW_RIGHT) {
       const { newColumnId, newRowIndex } = getNextFocus(columnId, rowIndex);
-      setFocusId(newColumnId);
-      setFocusIndex(newRowIndex);
+      setColumnId(newColumnId);
+      setRowIndex(newRowIndex);
     }
 
     if (key === navigationKey.ARROW_LEFT) {
       const { newColumnId, newRowIndex } = getPreviousFocus(columnId, rowIndex);
-      setFocusId(newColumnId);
-      setFocusIndex(newRowIndex);
+      setColumnId(newColumnId);
+      setRowIndex(newRowIndex);
     }
   };
 
