@@ -128,15 +128,14 @@ const useCountStepTable = ({
       const isFieldEditable = !original.id.includes('newRow') && ![
         cycleCountColumn.QUANTITY_COUNTED,
         cycleCountColumn.COMMENT,
-      ].includes(columnPath);
+      ].includes(id);
 
       const isCustomField = original.custom && isStepEditable;
-      console.log('isCustomfield', isCustomField);
       // We shouldn't allow users edit fetched data (only quantity counted and comment are editable)
       if (!isCustomField && (isFieldEditable || !isStepEditable)) {
         return (
           <TableCell className="static-cell-count-step d-flex align-items-center">
-            {getValueToDisplay(columnPath, value)}
+            {getValueToDisplay(id, value)}
           </TableCell>
         );
       }

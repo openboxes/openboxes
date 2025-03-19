@@ -91,6 +91,16 @@ import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.shipping.ShipmentType
 
+import grails.gorm.transactions.Transactional
+
+import org.pih.warehouse.inventory.CycleCountRequest
+import org.pih.warehouse.inventory.CycleCount
+import org.pih.warehouse.inventory.CycleCountItem
+import org.pih.warehouse.inventory.Transaction
+import org.pih.warehouse.inventory.TransactionEntry
+
+
+
 class BootStrap {
 
     UploadService uploadService
@@ -112,6 +122,22 @@ class BootStrap {
         uploadService.findOrCreateUploadsDirectory()
 
         refreshAnalyticsData()
+        clearCycleCountData()
+    }
+
+    @Transactional
+    void clearCycleCountData() {
+        List<Transaction> cycleCountTransactions = Transaction.createCriteria().list { isNotNull("cycleCount") }
+        List<TransactionEntry> cycleCountTransactionEntries = cycleCountTransactions.transactionEntries.flatten()
+
+        TransactionEntry.deleteAll(cycleCountTransactionEntries)
+        Transaction.deleteAll(cycleCountTransactions)
+
+        CycleCountItem.findAll().each { it.delete() }
+
+        CycleCountRequest.findAll().each { it.delete() }
+
+        CycleCount.findAll().each { it.delete() }
     }
 
     void refreshAnalyticsData() {

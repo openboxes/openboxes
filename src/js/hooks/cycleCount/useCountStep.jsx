@@ -249,7 +249,6 @@ const useCountStep = () => {
   };
 
   const save = async () => {
-    console.log('tableData', tableData.current);
     try {
       show();
       for (const cycleCount of tableData.current) {
