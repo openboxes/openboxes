@@ -3,6 +3,7 @@ package org.pih.warehouse.inventory
 import grails.databinding.BindUsing
 import grails.validation.Validateable
 import org.pih.warehouse.DateUtil
+import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.product.Product
 import org.springframework.web.context.request.RequestContextHolder
@@ -34,6 +35,8 @@ class CycleCountUpdateItemCommand implements Validateable {
 
     CycleCountItem cycleCountItem
 
+    Location binLocation
+
     Person assignee
 
     def beforeValidate() {
@@ -54,5 +57,6 @@ class CycleCountUpdateItemCommand implements Validateable {
         })
         comment(nullable: true, blank: true)
         assignee(nullable: true)
+        binLocation(nullable: true)
     }
 }

@@ -529,6 +529,7 @@ class CycleCountService {
         cycleCountItem.countIndex = command.recount ? 1 : 0
         cycleCountItem.status = command.recount ? CycleCountItemStatus.INVESTIGATING : CycleCountItemStatus.COUNTING
         cycleCountItem.dateCounted = new Date()
+        cycleCountItem.location = command.binLocation
 
         // We've updated the status of a cycle count item so we need to also update the status of the count.
         recomputeCycleCountStatus(cycleCountItem.cycleCount)
