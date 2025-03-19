@@ -38,7 +38,7 @@ const useCountStepTable = ({
   // If prevForceResetFocus is different from refreshFocusCounter,
   // it triggers a reset of rowIndex and columnId.
   const [prevForceResetFocus, setPrevForceResetFocus] = useState(0);
-  console.log('validationErrors', validationErrors);
+
   const translate = useTranslate();
 
   const { users, currentLocation, binLocations } = useSelector((state) => ({
@@ -128,13 +128,15 @@ const useCountStepTable = ({
       const isFieldEditable = !original.id.includes('newRow') && ![
         cycleCountColumn.QUANTITY_COUNTED,
         cycleCountColumn.COMMENT,
-      ].includes(id);
+      ].includes(columnPath);
 
+      const isCustomField = original.custom && isStepEditable;
+      console.log('isCustomfield', isCustomField);
       // We shouldn't allow users edit fetched data (only quantity counted and comment are editable)
-      if (isFieldEditable || !isStepEditable) {
+      if (!isCustomField && (isFieldEditable || !isStepEditable)) {
         return (
           <TableCell className="static-cell-count-step d-flex align-items-center">
-            {getValueToDisplay(id, value)}
+            {getValueToDisplay(columnPath, value)}
           </TableCell>
         );
       }

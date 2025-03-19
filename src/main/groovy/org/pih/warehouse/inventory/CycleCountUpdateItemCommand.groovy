@@ -1,7 +1,10 @@
 package org.pih.warehouse.inventory
 
+import grails.databinding.BindUsing
 import grails.validation.Validateable
+import org.pih.warehouse.DateUtil
 import org.pih.warehouse.core.Person
+import org.pih.warehouse.product.Product
 import org.springframework.web.context.request.RequestContextHolder
 
 import org.pih.warehouse.core.ReasonCode
@@ -9,6 +12,19 @@ import org.pih.warehouse.core.ReasonCode
 class CycleCountUpdateItemCommand implements Validateable {
 
     boolean recount
+
+    @BindUsing({ obj, source ->
+        def productId = source['inventoryItem']['product'] instanceof Map ? source['inventoryItem']['product']['id'] : source['inventoryItem']['product']
+        Product product = Product.read(productId)
+        InventoryItem inventoryItem = InventoryItem.findByProductAndLotNumber(product, source['inventoryItem']['lotNumber'])
+        return inventoryItem ?: new InventoryItem(
+                product: product,
+                lotNumber: source['inventoryItem']['lotNumber'],
+                expirationDate: source['inventoryItem']['expirationDate'] ? DateUtil.asDate(source['inventoryItem']['expirationDate'].toString()) : null
+        )
+    })
+
+    InventoryItem inventoryItem
 
     Integer quantityCounted
 
