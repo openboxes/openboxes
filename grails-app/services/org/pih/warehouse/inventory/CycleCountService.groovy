@@ -469,7 +469,6 @@ class CycleCountService {
         // We've updated the status of the cycle count items so we need to also update the status of the count.
         recomputeCycleCountStatus(cycleCount)
 
-        // TODO: Investigate why status could be null here
         if (cycleCount.status?.isClosed()) {
             closeCycleCount(cycleCount, command.refreshQuantityOnHand)
         }
@@ -484,13 +483,8 @@ class CycleCountService {
      * when we want to trigger a status recalculation outside of that flow, such as when the status of a cycle
      * count item changes.
      */
-    private void recomputeCycleCountStatus(CycleCount cycleCount) {
+    private static void recomputeCycleCountStatus(CycleCount cycleCount) {
         cycleCount.status = cycleCount.recomputeStatus()
-
-        // TODO: We sometimes get errors and the status update isn't persisted unless we call save like this. GORM
-        //       should be automatically persisting the status update when its session is flushed so we shouldn't
-        //       need this save() but something weird is happening. Investigate why this line is needed.
-        cycleCount.save()
     }
 
     private void determineCycleCountItemStatusForSubmit(CycleCountItem cycleCountItem, boolean requireRecountOnDiscrepancy) {
