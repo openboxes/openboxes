@@ -108,6 +108,7 @@ const ResolveStepTable = ({
                 className="date-counted-date-picker date-field-input"
                 onChangeRaw={setRecountedDate}
                 value={dateRecounted}
+                customDateFormat={DateFormat.DD_MMM_YYYY}
                 hideErrorMessageWrapper
               />
             </HeaderSelect>

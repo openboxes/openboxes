@@ -528,7 +528,7 @@ class CycleCountService {
         cycleCountItem.properties = command.properties
         cycleCountItem.countIndex = command.recount ? 1 : 0
         cycleCountItem.status = command.recount ? CycleCountItemStatus.INVESTIGATING : CycleCountItemStatus.COUNTING
-        if (cycleCountItem.dateCounted = null) {
+        if (cycleCountItem.dateCounted == null) {
             cycleCountItem.dateCounted = new Date()
         }
 
