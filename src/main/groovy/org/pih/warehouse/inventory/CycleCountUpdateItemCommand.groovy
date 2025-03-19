@@ -16,13 +16,18 @@ class CycleCountUpdateItemCommand implements Validateable {
 
     @BindUsing({ obj, source ->
         def productId = source['inventoryItem']['product'] instanceof Map ? source['inventoryItem']['product']['id'] : source['inventoryItem']['product']
+        def lotNumber = source['inventoryItem']['lotNumber']
+        def expirationDate = source['inventoryItem']['expirationDate'] ? DateUtil.asDate(source['inventoryItem']['expirationDate'].toString()) : null
+
         Product product = Product.read(productId)
-        InventoryItem inventoryItem = InventoryItem.findByProductAndLotNumber(product, source['inventoryItem']['lotNumber'])
-        return inventoryItem ?: new InventoryItem(
-                product: product,
-                lotNumber: source['inventoryItem']['lotNumber'],
-                expirationDate: source['inventoryItem']['expirationDate'] ? DateUtil.asDate(source['inventoryItem']['expirationDate'].toString()) : null
-        )
+        InventoryItem inventoryItem = InventoryItem.findByProductAndLotNumber(product, lotNumber) ?: new InventoryItem(product: product, lotNumber: lotNumber)
+
+        if (inventoryItem.expirationDate != expirationDate) {
+            inventoryItem.expirationDate = expirationDate
+            inventoryItem.save()
+        }
+
+        inventoryItem
     })
 
     InventoryItem inventoryItem
