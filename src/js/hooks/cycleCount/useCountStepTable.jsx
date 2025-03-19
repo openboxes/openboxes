@@ -178,7 +178,7 @@ const useCountStepTable = ({
 
       const onChangeRaw = (e) => {
         const valueToUpdate = (e?.target?.value ?? e)?.format();
-        setValue(new Date(valueToUpdate).toISOString());
+        setValue(valueToUpdate);
       };
 
       // Table consists of text fields, one numerical field for quantity counted,
