@@ -109,7 +109,8 @@ const useResolveStepValidation = ({ tableData }) => {
       const recountDifference = curr.quantityRecounted - (curr.quantityOnHand || 0);
       if (recountDifference !== 0
         && !Number.isNaN(recountDifference)
-        && curr.quantityRecounted !== null) {
+        && curr.quantityRecounted !== null
+        && !curr.rootCause) {
         return [...acc, curr?.id];
       }
 
