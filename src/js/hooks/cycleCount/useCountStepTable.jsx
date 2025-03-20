@@ -210,8 +210,6 @@ const useCountStepTable = ({
 
       // Checks if the row is a new one (i.e., added by user and contains 'newRow' in id),
       // and if yes, allow navigation through `newRowFocusableCells`.
-
-
       const isNewRow = (row) => row?.id?.includes('newRow') || original.custom;
 
       const { handleKeyDown } = useArrowsNavigation({
