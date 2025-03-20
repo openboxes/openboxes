@@ -254,6 +254,8 @@ const useCountStep = () => {
     resetFocus();
   };
 
+  const getCountedDate = (cycleCountId) => dateCounted[cycleCountId];
+
   const save = async () => {
     try {
       show();
@@ -264,6 +266,7 @@ const useCountStep = () => {
             ...cycleCountItem,
             recount: false,
             assignee: getCountedBy(cycleCount.id)?.id,
+            dateCounted: getCountedDate(cycleCount.id),
           },
           currentLocation?.id, cycleCountItem?.id);
         }
@@ -277,6 +280,7 @@ const useCountStep = () => {
               product: cycleCountItem.product?.id,
             },
             assignee: getCountedBy(cycleCount.id)?.id,
+            dateCounted: getCountedDate(cycleCount.id),
           }, currentLocation?.id, cycleCount?.id);
         }
 
@@ -401,13 +405,13 @@ const useCountStep = () => {
       updateRow(cycleCountId, rowId, columnId, value);
     },
   };
-  const getCountedDate = (cycleCountId) => dateCounted[cycleCountId];
 
   const setCountedDate = (cycleCountId) => (date) => {
-    setDateCounted({
-      ...date,
-      [cycleCountId]: date,
-    });
+    markAllItemsAsUpdated(cycleCountId);
+    setDateCounted((prevState) => ({
+      ...prevState,
+      [cycleCountId]: date.format(),
+    }));
     resetFocus();
   };
 
