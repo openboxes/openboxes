@@ -436,7 +436,9 @@ const useResolveStepTable = ({
         </TableHeaderCell>
       ), []),
       cell: useCallback(({ row: { original: { quantityVariance, quantityCounted } } }) => {
-        const variant = getCycleCountDifferencesVariant(quantityVariance, quantityCounted);
+        const variant = quantityCounted
+          ? getCycleCountDifferencesVariant(quantityVariance, quantityCounted)
+          : ArrowValueIndicatorVariant.EMPTY;
         return (
           <TableCell className="rt-td rt-td-count-step static-cell-count-step d-flex align-items-center">
             <ArrowValueIndicator value={quantityVariance} variant={variant} showAbsoluteValue />

@@ -169,31 +169,33 @@ const useCountStep = () => {
 
   const getDefaultCountedBy = (cycleCountId) => defaultCountedBy?.[cycleCountId];
 
-  const removeRow = async (cycleCountId, rowId) => {
-    if (rowId.includes('newRow')) {
-      const tableIndex = tableData.current.findIndex(
-        (cycleCount) => cycleCount?.id === cycleCountId,
-      );
-      tableData.current = tableData.current.map((data, index) => {
-        if (index === tableIndex) {
-          return {
-            ...data,
-            cycleCountItems: data.cycleCountItems.filter((row) => row.id !== rowId),
-          };
-        }
+  const removeFromState = (cycleCountId, rowId) => {
+    const tableIndex = tableData.current.findIndex(
+      (cycleCount) => cycleCount?.id === cycleCountId,
+    );
+    tableData.current = tableData.current.map((data, index) => {
+      if (index === tableIndex) {
+        return {
+          ...data,
+          cycleCountItems: data.cycleCountItems.filter((row) => row.id !== rowId),
+        };
+      }
 
-        return data;
-      });
-      resetFocus();
-      triggerValidation();
-      return;
-    }
+      return data;
+    });
+    resetFocus();
+    triggerValidation();
+  };
+
+  const removeRow = async (cycleCountId, rowId) => {
     try {
       show();
-      await cycleCountApi.deleteCycleCountItem(currentLocation?.id, rowId);
+      if (!rowId.includes('newRow')) {
+        await cycleCountApi.deleteCycleCountItem(currentLocation?.id, rowId);
+      }
+      removeFromState(cycleCountId, rowId);
     } finally {
       hide();
-      await fetchCycleCounts();
     }
   };
 
