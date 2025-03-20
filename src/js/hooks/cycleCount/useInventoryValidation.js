@@ -27,10 +27,16 @@ const useInventoryValidation = ({ tableData }) => {
       );
       const key = `${row?.binLocation?.id}-${row?.inventoryItem?.lotNumber}`;
       if (dataGroupedByBinLocationAndLotNumber[key]?.length > 1) {
+        // Display the error on both the bin and lot because uniqueness is based on both of them.
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: translate('react.cycleCount.duplicatedRow.label', 'Duplicate rows for this inventory item.'),
           path: [index, 'binLocation'],
+        });
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: translate('react.cycleCount.duplicatedRow.label', 'Duplicate rows for this inventory item.'),
+          path: [index, 'inventoryItem.lotNumber'],
         });
       }
     });
