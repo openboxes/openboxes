@@ -2,11 +2,9 @@ package org.pih.warehouse.inventory
 
 import grails.databinding.BindUsing
 import grails.validation.Validateable
-import org.pih.warehouse.DateUtil
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.ReasonCode
-import org.pih.warehouse.product.Product
 import org.springframework.web.context.request.RequestContextHolder
 import grails.util.Holders
 
