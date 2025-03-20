@@ -86,6 +86,10 @@ const useCountStep = () => {
   }));
 
   const fetchCycleCounts = async () => {
+    if (!cycleCountIds.length) {
+      return;
+    }
+
     try {
       show();
       const { data } = await cycleCountApi.getCycleCounts(
@@ -325,12 +329,14 @@ const useCountStep = () => {
       defaultLabel: 'Resolve',
       label: 'react.cycleCount.modal.resolve.label',
       onClick: async () => {
+        show();
+        onClose?.();
         await dispatch(startResolution(
           requestIdsWithDiscrepancies,
           currentLocation?.id,
         ));
         history.push(CYCLE_COUNT.resolveStep());
-        onClose?.();
+        hide();
       },
     },
   ]);
