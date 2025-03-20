@@ -8,6 +8,8 @@ import org.grails.datastore.mapping.query.api.Criteria
 import org.hibernate.ObjectNotFoundException
 import org.hibernate.criterion.Order
 import org.hibernate.sql.JoinType
+
+import org.pih.warehouse.DateUtil
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Constants
@@ -604,5 +606,21 @@ class CycleCountService {
         cycleCountProductAvailabilityService.refreshProductAvailability(cycleCount)
 
         return CycleCountDto.toDto(cycleCount)
+    }
+
+    /**
+     * Used by cycle count command objects to bind input to an InventoryItem.
+     */
+    InventoryItem bindInventoryItem(Map source) {
+        String lotNumber = source['inventoryItem']['lotNumber']
+
+        Product product = Product.read(source['inventoryItem']['product'] as String)
+        InventoryItem inventoryItem = InventoryItem.findByProductAndLotNumber(product, lotNumber)
+
+        return inventoryItem ?: new InventoryItem(
+                product: product,
+                lotNumber: lotNumber,
+                expirationDate: DateUtil.asDate(source['inventoryItem']['expirationDate'] as String)
+        )
     }
 }

@@ -257,6 +257,10 @@ const useCountStep = () => {
           await cycleCountApi.updateCycleCountItem({
             ...cycleCountItem,
             recount: false,
+            inventoryItem: {
+              ...cycleCountItem.inventoryItem,
+              product: cycleCountItem.product?.id,
+            },
             assignee: getCountedBy(cycleCount.id)?.id,
           },
           currentLocation?.id, cycleCountItem?.id);
