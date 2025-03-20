@@ -528,7 +528,10 @@ class CycleCountService {
         cycleCountItem.properties = command.properties
         cycleCountItem.countIndex = command.recount ? 1 : 0
         cycleCountItem.status = command.recount ? CycleCountItemStatus.INVESTIGATING : CycleCountItemStatus.COUNTING
-        cycleCountItem.dateCounted = command.dateCounted ? command.dateCounted : new Date()
+        // If the dateCounted field is null, set it to today's date
+        if (cycleCountItem.dateCounted == null) {
+            cycleCountItem.dateCounted = new Date()
+            }
 
         // We've updated the status of a cycle count item so we need to also update the status of the count.
         recomputeCycleCountStatus(cycleCountItem.cycleCount)
