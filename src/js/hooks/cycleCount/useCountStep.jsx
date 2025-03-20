@@ -366,7 +366,6 @@ const useCountStep = () => {
         openResolveDiscrepanciesModal(requestIdsWithDiscrepancies);
         return;
       }
-      dispatch(eraseDraft());
       history.push(CYCLE_COUNT.list(TO_COUNT_TAB));
     } finally {
       resetFocus();
