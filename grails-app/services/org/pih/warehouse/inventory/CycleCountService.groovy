@@ -528,7 +528,10 @@ class CycleCountService {
         cycleCountItem.properties = command.properties
         cycleCountItem.countIndex = command.recount ? 1 : 0
         cycleCountItem.status = command.recount ? CycleCountItemStatus.INVESTIGATING : CycleCountItemStatus.COUNTING
-        cycleCountItem.dateCounted = new Date()
+        // If the dateCounted field is null, set it to today's date
+        if (cycleCountItem.dateCounted == null) {
+            cycleCountItem.dateCounted = new Date()
+            }
 
         // We've updated the status of a cycle count item so we need to also update the status of the count.
         recomputeCycleCountStatus(cycleCountItem.cycleCount)
@@ -558,7 +561,7 @@ class CycleCountService {
                 product: command.inventoryItem?.product,
                 createdBy: AuthService.currentUser,
                 updatedBy: AuthService.currentUser,
-                dateCounted: new Date(),
+                dateCounted: command.dateCounted ?: new Date(),
                 comment: command.comment,
                 discrepancyReasonCode: command.discrepancyReasonCode,
                 assignee: command.assignee,

@@ -38,6 +38,8 @@ class CycleCountItemCommand implements Validateable {
 
     Person assignee
 
+    Date dateCounted
+
     def beforeValidate() {
         String cycleCountId = RequestContextHolder.getRequestAttributes().params?.cycleCountId
         String facilityId = RequestContextHolder.getRequestAttributes().params?.facility
@@ -59,5 +61,6 @@ class CycleCountItemCommand implements Validateable {
         comment(nullable: true, blank: true)
         assignee(nullable: true)
         binLocation(nullable: true)
+        dateCounted(nullable: true)
     }
 }

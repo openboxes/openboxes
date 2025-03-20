@@ -86,6 +86,10 @@ const useCountStep = () => {
   }));
 
   const fetchCycleCounts = async () => {
+    if (!cycleCountIds.length) {
+      return;
+    }
+
     try {
       show();
       const { data } = await cycleCountApi.getCycleCounts(
@@ -165,31 +169,33 @@ const useCountStep = () => {
 
   const getDefaultCountedBy = (cycleCountId) => defaultCountedBy?.[cycleCountId];
 
-  const removeRow = async (cycleCountId, rowId) => {
-    if (rowId.includes('newRow')) {
-      const tableIndex = tableData.current.findIndex(
-        (cycleCount) => cycleCount?.id === cycleCountId,
-      );
-      tableData.current = tableData.current.map((data, index) => {
-        if (index === tableIndex) {
-          return {
-            ...data,
-            cycleCountItems: data.cycleCountItems.filter((row) => row.id !== rowId),
-          };
-        }
+  const removeFromState = (cycleCountId, rowId) => {
+    const tableIndex = tableData.current.findIndex(
+      (cycleCount) => cycleCount?.id === cycleCountId,
+    );
+    tableData.current = tableData.current.map((data, index) => {
+      if (index === tableIndex) {
+        return {
+          ...data,
+          cycleCountItems: data.cycleCountItems.filter((row) => row.id !== rowId),
+        };
+      }
 
-        return data;
-      });
-      resetFocus();
-      triggerValidation();
-      return;
-    }
+      return data;
+    });
+    resetFocus();
+    triggerValidation();
+  };
+
+  const removeRow = async (cycleCountId, rowId) => {
     try {
       show();
-      await cycleCountApi.deleteCycleCountItem(currentLocation?.id, rowId);
+      if (!rowId.includes('newRow')) {
+        await cycleCountApi.deleteCycleCountItem(currentLocation?.id, rowId);
+      }
+      removeFromState(cycleCountId, rowId);
     } finally {
       hide();
-      await fetchCycleCounts();
     }
   };
 
@@ -248,6 +254,8 @@ const useCountStep = () => {
     resetFocus();
   };
 
+  const getCountedDate = (cycleCountId) => dateCounted[cycleCountId];
+
   const save = async () => {
     try {
       show();
@@ -258,6 +266,7 @@ const useCountStep = () => {
             ...cycleCountItem,
             recount: false,
             assignee: getCountedBy(cycleCount.id)?.id,
+            dateCounted: getCountedDate(cycleCount.id),
           },
           currentLocation?.id, cycleCountItem?.id);
         }
@@ -271,6 +280,7 @@ const useCountStep = () => {
               product: cycleCountItem.product?.id,
             },
             assignee: getCountedBy(cycleCount.id)?.id,
+            dateCounted: getCountedDate(cycleCount.id),
           }, currentLocation?.id, cycleCount?.id);
         }
 
@@ -325,12 +335,14 @@ const useCountStep = () => {
       defaultLabel: 'Resolve',
       label: 'react.cycleCount.modal.resolve.label',
       onClick: async () => {
+        show();
+        onClose?.();
         await dispatch(startResolution(
           requestIdsWithDiscrepancies,
           currentLocation?.id,
         ));
         history.push(CYCLE_COUNT.resolveStep());
-        onClose?.();
+        hide();
       },
     },
   ]);
@@ -394,13 +406,13 @@ const useCountStep = () => {
       updateRow(cycleCountId, rowId, columnId, value);
     },
   };
-  const getCountedDate = (cycleCountId) => dateCounted[cycleCountId];
 
   const setCountedDate = (cycleCountId) => (date) => {
-    setDateCounted({
-      ...date,
-      [cycleCountId]: date,
-    });
+    markAllItemsAsUpdated(cycleCountId);
+    setDateCounted((prevState) => ({
+      ...prevState,
+      [cycleCountId]: date.format(),
+    }));
     resetFocus();
   };
 

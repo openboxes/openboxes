@@ -187,7 +187,7 @@ const useResolveStep = () => {
     (cycleCount) => cycleCount?.id === cycleCountId,
   )?.cycleCountItems?.find((row) => row?.countedBy)?.countedBy;
 
-  const removeRow = (cycleCountId, rowId) => {
+  const removeRowFromState = (cycleCountId, rowId) => {
     const tableIndex = tableData.current.findIndex(
       (cycleCount) => cycleCount?.id === cycleCountId,
     );
@@ -201,8 +201,20 @@ const useResolveStep = () => {
 
       return data;
     });
-    resetFocus();
-    triggerValidation();
+  };
+
+  const removeRow = (cycleCountId, rowId) => {
+    try {
+      show();
+      if (!rowId.includes('newRow')) {
+        cycleCountApi.deleteCycleCountItem(currentLocation?.id, rowId);
+      }
+      removeRowFromState(cycleCountId, rowId);
+    } finally {
+      resetFocus();
+      triggerValidation();
+      hide();
+    }
   };
 
   const addEmptyRow = (productId, id, shouldResetFocus = true) => {

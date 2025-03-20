@@ -133,6 +133,12 @@ const useResolveStepTable = ({
       };
     }
 
+    if (fieldName === cycleCountColumn.EXPIRATION_DATE) {
+      return {
+        customDateFormat: DateFormat.DD_MMM_YYYY,
+      };
+    }
+
     return {};
   };
 
@@ -199,14 +205,14 @@ const useResolveStepTable = ({
       if (isFieldEditable || !isStepEditable) {
         return (
           <CustomTooltip
-            content={getValueToDisplay(id, value)}
+            content={getValueToDisplay(columnPath, value)}
             show={showStaticTooltip}
           >
             <TableCell
               className="static-cell-count-step align-items-center resolve-table-limit-lines"
             >
               <div className={showStaticTooltip ? 'limit-lines-1' : 'limit-lines-3 text-break'}>
-                {getValueToDisplay(id, value)}
+                {getValueToDisplay(columnPath, value)}
               </div>
             </TableCell>
           </CustomTooltip>
@@ -436,7 +442,9 @@ const useResolveStepTable = ({
         </TableHeaderCell>
       ), []),
       cell: useCallback(({ row: { original: { quantityVariance, quantityCounted } } }) => {
-        const variant = getCycleCountDifferencesVariant(quantityVariance, quantityCounted);
+        const variant = quantityCounted
+          ? getCycleCountDifferencesVariant(quantityVariance, quantityCounted)
+          : ArrowValueIndicatorVariant.EMPTY;
         return (
           <TableCell className="rt-td rt-td-count-step static-cell-count-step d-flex align-items-center">
             <ArrowValueIndicator value={quantityVariance} variant={variant} showAbsoluteValue />
@@ -536,7 +544,7 @@ const useResolveStepTable = ({
       ), []),
       meta: {
         flexWidth: 50,
-        hide: !tableData.some((row) => row.id?.includes('newRow')) || !isStepEditable,
+        hide: !tableData.some((row) => row.id?.includes('newRow') || row.custom) || !isStepEditable,
       },
     }),
   ];
