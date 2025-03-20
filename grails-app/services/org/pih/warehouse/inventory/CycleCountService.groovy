@@ -14,6 +14,7 @@ import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.DateUtil
 
 @Transactional
 class CycleCountService {
@@ -523,6 +524,23 @@ class CycleCountService {
         cycleCount.cycleCountRequest.status = CycleCountRequestStatus.COMPLETED
     }
 
+
+    /**
+     * Used by cycle count command objects to bind input to an InventoryItem.
+     */
+    InventoryItem bindInventoryItem(Map source) {
+        String lotNumber = source['inventoryItem']['lotNumber']
+
+        Product product = Product.read(source['inventoryItem']['product'] as String)
+        InventoryItem inventoryItem = InventoryItem.findByProductAndLotNumber(product, lotNumber)
+
+        return inventoryItem ?: new InventoryItem(
+                product: product,
+                lotNumber: lotNumber,
+                expirationDate: DateUtil.asDate(source['inventoryItem']['expirationDate'] as String)
+        )
+    }
+
     CycleCountItemDto updateCycleCountItem(CycleCountUpdateItemCommand command) {
         CycleCountItem cycleCountItem = command.cycleCountItem
         cycleCountItem.properties = command.properties
@@ -536,7 +554,6 @@ class CycleCountService {
 
         return cycleCountItem.toDto()
     }
-
     CycleCountItemDto createCycleCountItem(CycleCountItemCommand command) {
         if (!command.inventoryItem?.id) {
             if (!command.inventoryItem.validate()) {

@@ -8,19 +8,15 @@ import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.ReasonCode
 import org.pih.warehouse.product.Product
 import org.springframework.web.context.request.RequestContextHolder
+import grails.util.Holders
 
 class CycleCountItemCommand implements Validateable {
 
     boolean recount
 
     @BindUsing({ obj, source ->
-        Product product = Product.read(source['inventoryItem']['product'])
-        InventoryItem inventoryItem = InventoryItem.findByProductAndLotNumber(product, source['inventoryItem']['lotNumber'])
-        return inventoryItem ?: new InventoryItem(
-                product: product,
-                lotNumber: source['inventoryItem']['lotNumber'],
-                expirationDate: source['inventoryItem']['expirationDate'] ? DateUtil.asDate(source['inventoryItem']['expirationDate'].toString()) : null
-        )
+        CycleCountService cycleCountService = Holders.grailsApplication.mainContext.getBean(CycleCountService)
+        return cycleCountService.bindInventoryItem(source as Map)
     })
     InventoryItem inventoryItem
 

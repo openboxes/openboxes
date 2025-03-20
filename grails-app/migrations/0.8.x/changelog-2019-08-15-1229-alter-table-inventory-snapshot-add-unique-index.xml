@@ -27,7 +27,7 @@
         </preConditions>
         <comment>Remove duplicates before creating unique constraint on inventory_snapshot.</comment>
         <sql>
-            SET sql_mode=(SELECT REPLACE(@@sql_mode, 'ONLY_FULL_GROUP_BY', ''));
+            SET PERSIST sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));
             CREATE TABLE IF NOT EXISTS inventory_snapshot_new
                 SELECT DISTINCT * FROM inventory_snapshot
                 GROUP BY  date, location_id, product_code, lot_number, bin_location_name;

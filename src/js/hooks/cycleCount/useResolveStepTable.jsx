@@ -182,21 +182,25 @@ const useResolveStepTable = ({
       // Keep and update the state of the cell during rerenders
       const [value, setValue] = useState(initialValue);
 
-      const isFieldEditable = !original.id.includes('newRow')
-        && ![
+      // All fields are editable if the row is custom added, otherwise only a subset of the fields
+      // are allowed to be modified.
+      const isFieldEditable = original.custom
+        || original.id.includes('newRow')
+        || [
           cycleCountColumn.QUANTITY_RECOUNTED,
           cycleCountColumn.ROOT_CAUSE,
           cycleCountColumn.COMMENT,
         ].includes(id);
+
       const showStaticTooltip = [
         cycleCountColumn.ROOT_CAUSE,
         cycleCountColumn.COMMENT,
         cycleCountColumn.BIN_LOCATION,
-      ]
-        .includes(id);
+      ].includes(id);
+
       // We shouldn't allow users edit fetched data (quantityRecounted, rootCause and comment
       // field are editable)
-      if (isFieldEditable || !isStepEditable) {
+      if (!isFieldEditable || !isStepEditable) {
         return (
           <CustomTooltip
             content={getValueToDisplay(id, value)}
@@ -300,7 +304,7 @@ const useResolveStepTable = ({
 
       // Checks if the row is a new one (i.e., added by user and contains 'newRow' in id),
       // and if yes, allow navigation through `newRowFocusableCells`.
-      const isNewRow = (row) => row?.id?.includes('newRow');
+      const isNewRow = (row) => row?.id?.includes('newRow') || original.custom;
 
       const { handleKeyDown } = useArrowsNavigation({
         newRowFocusableCells,
@@ -536,7 +540,7 @@ const useResolveStepTable = ({
       ), []),
       meta: {
         flexWidth: 50,
-        hide: !tableData.some((row) => row.id?.includes('newRow')) || !isStepEditable,
+        hide: !tableData.some((row) => row.id?.includes('newRow') || row.custom) || !isStepEditable,
       },
     }),
   ];
