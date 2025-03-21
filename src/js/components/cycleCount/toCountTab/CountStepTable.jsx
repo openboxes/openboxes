@@ -35,6 +35,7 @@ const CountStepTable = ({
   countedBy,
   defaultCountedBy,
   isFormValid,
+  refreshFocusCounter,
   triggerValidation,
 }) => {
   const translate = useTranslate();
@@ -44,7 +45,6 @@ const CountStepTable = ({
     columns,
     defaultColumn,
     users,
-    handleAddEmptyRow,
   } = useCountStepTable({
     cycleCountId: id,
     productId: product?.id,
@@ -55,6 +55,7 @@ const CountStepTable = ({
     formatLocalizedDate,
     addEmptyRow,
     triggerValidation,
+    refreshFocusCounter,
   });
 
   // Default counted by needs to be stored in order to set the default select value correctly
@@ -94,7 +95,7 @@ const CountStepTable = ({
           >
             <DateField
               className="date-counted-date-picker date-field-input"
-              onChange={setCountedDate}
+              onChangeRaw={setCountedDate}
               value={dateCounted}
               customDateFormat={DateFormat.DD_MMM_YYYY}
             />
@@ -165,7 +166,7 @@ const CountStepTable = ({
             )}
           >
             <Button
-              onClick={handleAddEmptyRow}
+              onClick={() => addEmptyRow(product?.id, id)}
               label="react.cycleCount.addNewRecord.label"
               defaultLabel="Add new record"
               variant="transparent"
@@ -207,5 +208,6 @@ CountStepTable.propTypes = {
   }).isRequired,
   defaultCountedBy: PropTypes.shape({}).isRequired,
   isFormValid: PropTypes.bool.isRequired,
+  refreshFocusCounter: PropTypes.number.isRequired,
   triggerValidation: PropTypes.func.isRequired,
 };

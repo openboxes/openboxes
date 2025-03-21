@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import { createColumnHelper } from '@tanstack/react-table';
 import _ from 'lodash';
@@ -30,12 +30,14 @@ const useCountStepTable = ({
   formatLocalizedDate,
   addEmptyRow,
   triggerValidation,
+  refreshFocusCounter,
 }) => {
   const columnHelper = createColumnHelper();
-  // State for saving data for binLocation dropdown
-  const [focusIndex, setFocusIndex] = useState(null);
-  const [focusId, setFocusId] = useState(null);
-
+  const [rowIndex, setRowIndex] = useState(null);
+  const [columnId, setColumnId] = useState(null);
+  // If prevForceResetFocus is different from refreshFocusCounter,
+  // it triggers a reset of rowIndex and columnId.
+  const [prevForceResetFocus, setPrevForceResetFocus] = useState(0);
   const translate = useTranslate();
 
   const { users, currentLocation, binLocations } = useSelector((state) => ({
@@ -43,6 +45,14 @@ const useCountStepTable = ({
     binLocations: state.cycleCount.binLocations,
     currentLocation: state.session.currentLocation,
   }));
+
+  useEffect(() => {
+    if (refreshFocusCounter !== prevForceResetFocus) {
+      setRowIndex(null);
+      setColumnId(null);
+      setPrevForceResetFocus(refreshFocusCounter);
+    }
+  }, [refreshFocusCounter]);
 
   const showBinLocation = useMemo(() =>
     checkBinLocationSupport(currentLocation.supportedActivities), [currentLocation?.id]);
@@ -106,12 +116,6 @@ const useCountStepTable = ({
     return value;
   };
 
-  const handleAddEmptyRow = () => {
-    addEmptyRow(productId, cycleCountId);
-    setFocusIndex(null);
-    setFocusId(null);
-  };
-
   const defaultColumn = {
     cell: ({
       row: { original, index }, column: { id }, table,
@@ -124,6 +128,7 @@ const useCountStepTable = ({
         cycleCountColumn.QUANTITY_COUNTED,
         cycleCountColumn.COMMENT,
       ].includes(id);
+
       // We shouldn't allow users edit fetched data (only quantity counted and comment are editable)
       if (isFieldEditable || !isStepEditable) {
         return (
@@ -154,11 +159,28 @@ const useCountStepTable = ({
         setError(null);
         triggerValidation();
       };
+
+      // Resets the error when rowIndex or columnId changes
+      // since validationErrors don’t update properly.
+      // Old errors reappear on rerender, and using arrow keys
+      // triggers a rerender with every key press, causing outdated errors to show.
+      useEffect(() => {
+        if (rowIndex !== null && columnId && error !== null) {
+          setError(null);
+        }
+      }, [rowIndex, columnId]);
+
       // on change function expects e.target.value for text fields,
       // in other cases it expects just the value
       const onChange = (e) => {
         setValue(e?.target?.value ?? e);
       };
+
+      // After pulling the latest changes, table.options.meta?.updateData no longer
+      // works on onChange, so for now, I put it inside useEffect
+      useEffect(() => {
+        table.options.meta?.updateData(cycleCountId, original.id, id, value);
+      }, [value]);
 
       const onChangeRaw = (e) => {
         const valueToUpdate = (e?.target?.value ?? e)?.format();
@@ -198,9 +220,9 @@ const useCountStepTable = ({
         newRowFocusableCells,
         existingRowFocusableCells,
         tableData,
-        setFocusId,
-        setFocusIndex,
-        addNewRow: () => addEmptyRow(productId, cycleCountId),
+        setColumnId,
+        setRowIndex,
+        addNewRow: () => addEmptyRow(productId, cycleCountId, false),
         isNewRow,
       });
 
@@ -225,9 +247,10 @@ const useCountStepTable = ({
             focusProps={{
               fieldIndex: index,
               fieldId: columnPath,
-              focusIndex,
-              focusId,
+              rowIndex,
+              columnId,
             }}
+            onWheel={(event) => event.currentTarget.blur()}
             {...fieldProps}
           />
           {error && (
@@ -319,10 +342,10 @@ const useCountStepTable = ({
             disabled={original.id}
           >
             {(original.id.includes('newRow') || original.custom) && isStepEditable && (
-            <RiDeleteBinLine
-              onClick={() => removeRow(cycleCountId, original.id)}
-              size={22}
-            />
+              <RiDeleteBinLine
+                onClick={() => removeRow(cycleCountId, original.id)}
+                size={22}
+              />
             )}
           </Tooltip>
         </TableCell>
@@ -340,7 +363,6 @@ const useCountStepTable = ({
     columns,
     defaultColumn,
     users,
-    handleAddEmptyRow,
   };
 };
 

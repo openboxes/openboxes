@@ -30,7 +30,11 @@ class CycleCountCandidateFilterCommand extends PaginationCommand implements Vali
 
     String format
 
-    boolean negativeQuantity = false
+    // FIXME This should be called includeNegativeQuantitiesOnly (or something similar) to be absolutely
+    //  clear about our intention.
+    Boolean negativeQuantity = Boolean.FALSE
+
+    Boolean includeStockOnHandOrNegativeStock = Boolean.TRUE
 
     static constraints = {
         statuses(nullable: true)

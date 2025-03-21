@@ -71,22 +71,36 @@ class CycleCountService {
             if (command.abcClasses) {
                 "in"("abcClass", command.abcClasses)
             }
-            if (command.sort) {
-                getCandidatesSortOrder(command.sort, command.order, delegate, usedAliases)
-            }
+
             if (!command.statuses) {
                 isNull("status")
             }
             else {
                 inList("status", command.statuses)
             }
+
             if (command.negativeQuantity) {
                 gt("negativeItemCount", 0)
             }
+
+            // FIXME It's possible we need this to be "ne" rather "gt" because we probably want to include
+            //  product/facility pairs where quantity on hand is negative.
+            // Moved this from the cycle count session view since it's a requirement of the candidate query,
+            // not the cycle count session.
+            if (command.includeStockOnHandOrNegativeStock) {
+                eq("hasStockOnHandOrNegativeStock", command.includeStockOnHandOrNegativeStock)
+            }
+
+            // FIXME Sort order should allow multiple sort order rules ("columna, -columnb"). We should consider
+            //  using a more conventional syntax for the column and direction i.e. "columna" sorts "columna" in
+            //  ascending order while "-columnb" sorts "columnb" in descending order.
+            // Don't check command.sort because we want the default case to be applied if there's no sort order
+            applySortOrder(command.sort, command.order, delegate, usedAliases)
+
         } as List<CycleCountCandidate>
     }
 
-    private static void getCandidatesSortOrder(String sortBy, String orderDirection, Criteria criteria, Set<String> usedAliases) {
+    private static void applySortOrder(String sortBy, String orderDirection, Criteria criteria, Set<String> usedAliases) {
         switch (sortBy) {
             case "product":
                 createProductAlias(criteria, usedAliases)
@@ -514,7 +528,10 @@ class CycleCountService {
         cycleCountItem.properties = command.properties
         cycleCountItem.countIndex = command.recount ? 1 : 0
         cycleCountItem.status = command.recount ? CycleCountItemStatus.INVESTIGATING : CycleCountItemStatus.COUNTING
-        cycleCountItem.dateCounted = new Date()
+        // If the dateCounted field is null, set it to today's date
+        if (cycleCountItem.dateCounted == null) {
+            cycleCountItem.dateCounted = new Date()
+            }
 
         // We've updated the status of a cycle count item so we need to also update the status of the count.
         recomputeCycleCountStatus(cycleCountItem.cycleCount)
@@ -544,7 +561,7 @@ class CycleCountService {
                 product: command.inventoryItem?.product,
                 createdBy: AuthService.currentUser,
                 updatedBy: AuthService.currentUser,
-                dateCounted: new Date(),
+                dateCounted: command.dateCounted ?: new Date(),
                 comment: command.comment,
                 discrepancyReasonCode: command.discrepancyReasonCode,
                 assignee: command.assignee,

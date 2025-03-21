@@ -31,6 +31,7 @@ const ResolveStep = () => {
     getProduct,
     getDateCounted,
     isFormValid,
+    refreshFocusCounter,
     triggerValidation,
   } = useResolveStep();
 
@@ -70,6 +71,7 @@ const ResolveStep = () => {
             countedBy={getCountedBy(id)}
             isFormValid={isFormValid}
             triggerValidation={triggerValidation}
+            refreshFocusCounter={refreshFocusCounter}
           />
         ))}
     </PageWrapper>
