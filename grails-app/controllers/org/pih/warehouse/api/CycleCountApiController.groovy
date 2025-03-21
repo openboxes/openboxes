@@ -19,6 +19,7 @@ import org.pih.warehouse.inventory.CycleCountStartRecountBatchCommand
 import org.pih.warehouse.inventory.CycleCountStatus
 import org.pih.warehouse.inventory.CycleCountSubmitCountCommand
 import org.pih.warehouse.inventory.CycleCountSubmitRecountCommand
+import org.pih.warehouse.inventory.CycleCountCandidateInProgress
 import org.pih.warehouse.inventory.CycleCountUpdateItemCommand
 
 class CycleCountApiController {
@@ -36,6 +37,12 @@ class CycleCountApiController {
             return
         }
         render([data: cycleCounts, totalCount: cycleCounts.totalCount] as JSON)
+    }
+
+    def getCandidatesInProgress(CycleCountCandidateFilterCommand filterParams) {
+        List<CycleCountCandidateInProgress> tabRecords = cycleCountService.getCandidatesInProgress(filterParams, params.facilityId)
+
+        render([data: tabRecords, totalCount: tabRecords.totalCount] as JSON)
     }
 
     def createRequests(CycleCountRequestBatchCommand command) {

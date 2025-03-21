@@ -11,6 +11,8 @@ package org.pih.warehouse
 
 import grails.converters.JSON
 import grails.util.Holders
+import org.pih.warehouse.inventory.CycleCountCandidateInProgress
+
 import java.math.RoundingMode
 import java.time.Instant
 import java.time.LocalDate
@@ -632,6 +634,10 @@ class BootStrap {
 
         JSON.registerObjectMarshaller(CycleCountRequest) { CycleCountRequest cycleCountRequest ->
             return cycleCountRequest.toJson()
+        }
+
+        JSON.registerObjectMarshaller(CycleCountCandidateInProgress) { CycleCountCandidateInProgress cycleCountCandidateInProgress ->
+            return cycleCountCandidateInProgress.toJson()
         }
     }
 

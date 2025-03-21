@@ -100,6 +100,66 @@ class CycleCountService {
         } as List<CycleCountCandidate>
     }
 
+    List<CycleCountCandidateInProgress> getCandidatesInProgress(CycleCountCandidateFilterCommand command, String facilityId) {
+        if (command.hasErrors()) {
+            throw new ValidationException("Invalid params", command.errors)
+        }
+        Integer max = command.format == "csv" ? null : command.max
+        Integer offset = command.format == "csv" ? null : command.offset
+        Location facility = Location.read(facilityId)
+        // Store added aliases to avoid duplicate alias exceptions for product
+        // This could happen when params.searchTerm and e.g. sort by product is applied
+        Set<String> usedAliases = new HashSet<>()
+        return CycleCountCandidateInProgress.createCriteria().list(max: max, offset: offset) {
+            eq("facility", facility)
+            if (command.searchTerm) {
+                createProductAlias(delegate, usedAliases)
+                or {
+                    ilike("product.productCode", "%${command.searchTerm}%")
+                    ilike("product.name", "%${command.searchTerm}%")
+                }
+            }
+            if (command.categories) {
+                usedAliases.add("product")
+                createAlias("product", "product", JoinType.INNER_JOIN)
+                "in"("product.category", command.categories)
+            }
+            if (command.internalLocations) {
+                or {
+                    command.internalLocations.each {
+                        ilike("internalLocations", "%${it}%")
+                    }
+                }
+            }
+            if (command.catalogs) {
+                createProductAlias(delegate, usedAliases)
+                createAlias("product.productCatalogItems", "productCatalogItems")
+                usedAliases.add("productCatalogItems")
+                "in"("productCatalogItems.productCatalog", command.catalogs)
+            }
+            if (command.tags) {
+                createProductAlias(delegate, usedAliases)
+                createAlias("product.tags", "tags")
+                usedAliases.add("tags")
+                "in"("tags.id", command.tags.collect { it.id })
+            }
+            if (command.abcClasses) {
+                "in"("abcClass", command.abcClasses)
+            }
+
+            if (command.statuses) {
+                inList("status", command.statuses)
+            }
+
+            if (command.negativeQuantity) {
+                gt("negativeItemCount", 0)
+            }
+
+            applySortOrder(command.sort, command.order, delegate, usedAliases)
+
+        } as List<CycleCountCandidateInProgress>
+    }
+
     private static void applySortOrder(String sortBy, String orderDirection, Criteria criteria, Set<String> usedAliases) {
         switch (sortBy) {
             case "product":

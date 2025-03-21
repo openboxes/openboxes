@@ -947,6 +947,11 @@ class UrlMappings {
             action = [GET: "getCandidates"]
         }
 
+        "/api/facilities/$facilityId/cycle-counts/candidates-in-progress" {
+            controller = "cycleCountApi"
+            action = [GET: "getCandidatesInProgress"]
+        }
+
         "/api/facilities/$facilityId/cycle-counts/requests/batch" {
             controller = "cycleCountApi"
             action = [POST: "createRequests"]
