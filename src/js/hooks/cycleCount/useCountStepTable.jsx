@@ -145,8 +145,9 @@ const useCountStepTable = ({
       const isEdited = initialValue !== value;
       // When the input is blurred, we'll call the table meta's updateData function
       const onBlur = () => {
-        if (!isEdited) return;
-
+        if (!isEdited) {
+          return;
+        }
         if (columnPath === cycleCountColumn.QUANTITY_COUNTED) {
           const parsedValue = parseInt(value, 10) || 0;
           setValue(parsedValue);
