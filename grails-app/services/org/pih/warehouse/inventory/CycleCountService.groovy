@@ -467,24 +467,13 @@ class CycleCountService {
         }
 
         // We've updated the status of the cycle count items so we need to also update the status of the count.
-        recomputeCycleCountStatus(cycleCount)
+        cycleCount.status = cycleCount.recomputeStatus()
 
         if (cycleCount.status?.isClosed()) {
             closeCycleCount(cycleCount, command.refreshQuantityOnHand)
         }
 
         return CycleCountDto.toDto(cycleCount)
-    }
-
-    /**
-     * Recalculate the status of a cycle count based on the status of its items.
-     *
-     * This status will be automatically recomputed when a cycle count is saved, so this method only needs to be called
-     * when we want to trigger a status recalculation outside of that flow, such as when the status of a cycle
-     * count item changes.
-     */
-    private static void recomputeCycleCountStatus(CycleCount cycleCount) {
-        cycleCount.status = cycleCount.recomputeStatus()
     }
 
     private void determineCycleCountItemStatusForSubmit(CycleCountItem cycleCountItem, boolean requireRecountOnDiscrepancy) {
@@ -525,7 +514,7 @@ class CycleCountService {
         cycleCountItem.dateCounted = new Date()
 
         // We've updated the status of a cycle count item so we need to also update the status of the count.
-        recomputeCycleCountStatus(cycleCountItem.cycleCount)
+        cycleCountItem.cycleCount.status = cycleCountItem.cycleCount.recomputeStatus()
 
         return cycleCountItem.toDto()
     }
@@ -565,7 +554,7 @@ class CycleCountService {
 
         // We're adding a new cycle count item to the count so we need to also update the status of the count.
         cycleCount.addToCycleCountItems(cycleCountItem)
-        recomputeCycleCountStatus(cycleCount)
+        cycleCount.status = cycleCount.recomputeStatus()
 
         return cycleCountItem.toDto()
     }
