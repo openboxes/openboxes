@@ -6,7 +6,6 @@ import React, {
 
 import { createColumnHelper } from '@tanstack/react-table';
 import _ from 'lodash';
-import moment from 'moment';
 import { RiChat3Line, RiDeleteBinLine, RiErrorWarningLine } from 'react-icons/ri';
 import { useDispatch, useSelector } from 'react-redux';
 import { Tooltip } from 'react-tippy';
@@ -26,11 +25,11 @@ import cycleCountColumn from 'consts/cycleCountColumn';
 import { DateFormat } from 'consts/timeFormat';
 import useArrowsNavigation from 'hooks/useArrowsNavigation';
 import useTranslate from 'hooks/useTranslate';
+import parseDateToUTC from 'utils/dateUtils';
 import groupBinLocationsByZone from 'utils/groupBinLocationsByZone';
 import { checkBinLocationSupport } from 'utils/supportedActivitiesUtils';
 import { formatDate } from 'utils/translation-utils';
 import CustomTooltip from 'wrappers/CustomTooltip';
-import parseDateToUTC from 'utils/dateUtils';
 
 // Managing state for single table, mainly table configuration (from resolve step)
 const useResolveStepTable = ({
@@ -272,7 +271,7 @@ const useResolveStepTable = ({
       // works on onChange, so for now, I put it inside useEffect
       useEffect(() => {
         const updatedValue = cycleCountColumn.EXPIRATION_DATE === columnPath
-          ? parseDateToUTC({ date: value, currentFormat: 'MMM DD, YYYY' })
+          ? parseDateToUTC({ date: value, currentFormat: DateFormat.MMM_DD_YYYY })
           : value;
         table.options.meta?.updateData(cycleCountId, original.id, id, updatedValue);
       }, [value]);

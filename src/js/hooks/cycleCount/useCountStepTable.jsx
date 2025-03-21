@@ -173,7 +173,7 @@ const useCountStepTable = ({
       // works on onChange, so for now, I put it inside useEffect
       useEffect(() => {
         const updatedValue = cycleCountColumn.EXPIRATION_DATE === columnPath
-          ? parseDateToUTC({ date: value, currentFormat: 'MMM DD, YYYY' })
+          ? parseDateToUTC({ date: value, currentFormat: DateFormat.MMM_DD_YYYY })
           : value;
         table.options.meta?.updateData(cycleCountId, original.id, id, updatedValue);
       }, [value]);
