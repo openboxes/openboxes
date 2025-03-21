@@ -108,10 +108,34 @@ const useResolveStep = () => {
       }
 
       const groupedByCountIndex = _.groupBy(itemsToMerge, 'countIndex');
-      const countIndexGroups = Object.values(groupedByCountIndex);
+      const maxCountIndex = _.maxBy(itemsToMerge, 'countIndex').countIndex;
+      const itemFromCount = _.find(itemsToMerge, (item) => item.countIndex === maxCountIndex - 1);
+      const itemsFromResolve = groupedByCountIndex[maxCountIndex] || [];
 
-      if (countIndexGroups.length === 1) {
-        return countIndexGroups[0].map((item) => ({
+      return itemsFromResolve.map((item, index) => {
+        // If this is the first item with maxCountIndex and itemFromCount exists,
+        // merge data from both cycles. We do this because we wanted to combine data from
+        // countIndex 0 with the first countIndex 1 to retain info from both counts.
+        if (index === 0 && itemFromCount) {
+          return {
+            ...itemFromCount,
+            ...item,
+            commentFromCount: itemFromCount?.comment,
+            quantityRecounted: item?.quantityCounted,
+            quantityCounted: itemFromCount?.quantityCounted,
+            quantityVariance: itemFromCount?.quantityVariance,
+            dateCounted: itemFromCount?.dateCounted,
+            dateRecounted: item?.dateCounted,
+            countedBy: itemFromCount?.assignee,
+            recountedBy: item?.assignee,
+            rootCause: mapRootCauseToSelectedOption(item?.discrepancyReasonCode),
+          };
+        }
+
+        // For example countIndex 0, 1, 1: the item with
+        // countIndex 0 merges with the first item with countIndex 1,
+        // while the next item with countIndex 1 remains a separate record without merging.
+        return {
           ...item,
           quantityRecounted: item?.quantityCounted,
           dateRecounted: item?.dateCounted,
@@ -122,50 +146,8 @@ const useResolveStep = () => {
           dateCounted: null,
           countedBy: null,
           rootCause: mapRootCauseToSelectedOption(item?.discrepancyReasonCode),
-        }));
-      }
-
-      const maxCountIndex = _.maxBy(itemsToMerge, 'countIndex').countIndex;
-      const itemsWithMaxCountIndex = groupedByCountIndex[maxCountIndex] || [];
-      const itemFromCount = _.find(itemsToMerge, (item) => item.countIndex === maxCountIndex - 1);
-
-      const result = [];
-
-      if (itemFromCount && itemsWithMaxCountIndex.length > 0) {
-        const firstItemWithMaxCountIndex = itemsWithMaxCountIndex[0];
-        result.push({
-          ...itemFromCount,
-          ...firstItemWithMaxCountIndex,
-          commentFromCount: itemFromCount?.comment,
-          quantityRecounted: firstItemWithMaxCountIndex?.quantityCounted,
-          quantityCounted: itemFromCount?.quantityCounted,
-          quantityVariance: itemFromCount?.quantityVariance,
-          dateCounted: itemFromCount?.dateCounted,
-          dateRecounted: firstItemWithMaxCountIndex?.dateCounted,
-          countedBy: itemFromCount?.assignee,
-          recountedBy: firstItemWithMaxCountIndex?.assignee,
-          rootCause:
-            mapRootCauseToSelectedOption(firstItemWithMaxCountIndex?.discrepancyReasonCode),
-        });
-      }
-
-      const maxCountIndexItemsToReturn = itemFromCount
-        ? itemsWithMaxCountIndex.slice(1)
-        : itemsWithMaxCountIndex;
-      result.push(...maxCountIndexItemsToReturn.map((item) => ({
-        ...item,
-        quantityRecounted: item?.quantityCounted,
-        dateRecounted: item?.dateCounted,
-        recountedBy: item?.assignee,
-        quantityVariance: null,
-        quantityCounted: null,
-        commentFromCount: null,
-        dateCounted: null,
-        countedBy: null,
-        rootCause: mapRootCauseToSelectedOption(item?.discrepancyReasonCode),
-      })));
-
-      return result;
+        };
+      });
     });
   };
 
@@ -174,6 +156,7 @@ const useResolveStep = () => {
       currentLocation?.id,
       cycleCountIds,
     );
+    console.log('dataaa', data);
     tableData.current = data?.data?.map((cycleCount) =>
       ({ ...cycleCount, cycleCountItems: mergeCycleCountItems(cycleCount.cycleCountItems) }));
     const recountedDates = tableData.current?.reduce((acc, cycleCount) => ({
