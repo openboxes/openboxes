@@ -156,7 +156,6 @@ const useResolveStep = () => {
       currentLocation?.id,
       cycleCountIds,
     );
-    console.log('dataaa', data);
     tableData.current = data?.data?.map((cycleCount) =>
       ({ ...cycleCount, cycleCountItems: mergeCycleCountItems(cycleCount.cycleCountItems) }));
     const recountedDates = tableData.current?.reduce((acc, cycleCount) => ({
@@ -169,7 +168,6 @@ const useResolveStep = () => {
     }), {});
     setDateRecounted(recountedDates);
     setRecountedBy(recountedByData);
-    console.log('tableData.current', tableData.current);
   };
 
   useEffect(() => {
