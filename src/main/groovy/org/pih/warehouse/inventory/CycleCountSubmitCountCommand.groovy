@@ -20,7 +20,7 @@ class CycleCountSubmitCountCommand implements Validateable {
         String locationId = RequestContextHolder.getRequestAttributes().params?.facility
         String cycleCountId = RequestContextHolder.getRequestAttributes().params?.cycleCountId
         facility = Location.read(locationId)
-        cycleCount = CycleCount.read(cycleCountId)
+        cycleCount = CycleCount.get(cycleCountId)
     }
 
     static constraints = {

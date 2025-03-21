@@ -43,7 +43,7 @@ class CycleCountItemCommand implements Validateable {
     def beforeValidate() {
         String cycleCountId = RequestContextHolder.getRequestAttributes().params?.cycleCountId
         String facilityId = RequestContextHolder.getRequestAttributes().params?.facility
-        cycleCount = CycleCount.read(cycleCountId)
+        cycleCount = CycleCount.get(cycleCountId)
         facility = Location.read(facilityId)
     }
 
