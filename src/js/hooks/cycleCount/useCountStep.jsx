@@ -44,6 +44,7 @@ const useCountStep = () => {
   // State used to trigger focus reset when changed. When this counter changes,
   // it will reset the focus by clearing the RowIndex and ColumnId in useEffect.
   const [refreshFocusCounter, setRefreshFocusCounter] = useState(0);
+  const [isDisabledSave, setIsDisabledSave] = useState(false);
 
   const dispatch = useDispatch();
   const history = useHistory();
@@ -378,6 +379,7 @@ const useCountStep = () => {
       }
       history.push(CYCLE_COUNT.list(TO_COUNT_TAB));
     } finally {
+      setIsDisabledSave(false);
       resetFocus();
       hide();
     }
@@ -437,6 +439,8 @@ const useCountStep = () => {
     isStepEditable,
     isFormValid,
     refreshFocusCounter,
+    isDisabledSave,
+    setIsDisabledSave,
   };
 };
 
