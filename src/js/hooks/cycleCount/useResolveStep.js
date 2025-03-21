@@ -89,10 +89,11 @@ const useResolveStep = () => {
   const mergeCycleCountItems = (items) => {
     const duplicatedItems = _.groupBy(items,
       (item) => `${item.binLocation?.id}-${item?.inventoryItem?.lotNumber}`);
-    return Object.values(duplicatedItems).map((itemsToMerge) => {
+
+    return Object.values(duplicatedItems).flatMap((itemsToMerge) => {
       if (itemsToMerge.length === 1) {
         const item = itemsToMerge[0];
-        return {
+        return [{
           ...item,
           quantityRecounted: item?.quantityCounted,
           dateRecounted: item?.dateCounted,
@@ -103,25 +104,68 @@ const useResolveStep = () => {
           dateCounted: null,
           countedBy: null,
           rootCause: mapRootCauseToSelectedOption(item?.discrepancyReasonCode),
-        };
+        }];
+      }
+
+      const groupedByCountIndex = _.groupBy(itemsToMerge, 'countIndex');
+      const countIndexGroups = Object.values(groupedByCountIndex);
+
+      if (countIndexGroups.length === 1) {
+        return countIndexGroups[0].map((item) => ({
+          ...item,
+          quantityRecounted: item?.quantityCounted,
+          dateRecounted: item?.dateCounted,
+          recountedBy: item?.assignee,
+          quantityVariance: null,
+          quantityCounted: null,
+          commentFromCount: null,
+          dateCounted: null,
+          countedBy: null,
+          rootCause: mapRootCauseToSelectedOption(item?.discrepancyReasonCode),
+        }));
       }
 
       const maxCountIndex = _.maxBy(itemsToMerge, 'countIndex').countIndex;
+      const itemsWithMaxCountIndex = groupedByCountIndex[maxCountIndex] || [];
       const itemFromCount = _.find(itemsToMerge, (item) => item.countIndex === maxCountIndex - 1);
-      const itemFromResolve = _.find(itemsToMerge, (item) => item.countIndex === maxCountIndex);
-      return {
-        ...itemFromCount,
-        ...itemFromResolve,
-        commentFromCount: itemFromCount?.comment,
-        quantityRecounted: itemFromResolve?.quantityCounted,
-        quantityCounted: itemFromCount?.quantityCounted,
-        quantityVariance: itemFromCount?.quantityVariance,
-        dateCounted: itemFromCount?.dateCounted,
-        dateRecounted: itemFromResolve?.dateCounted,
-        countedBy: itemFromCount?.assignee,
-        recountedBy: itemFromResolve?.assignee,
-        rootCause: mapRootCauseToSelectedOption(itemFromResolve?.discrepancyReasonCode),
-      };
+
+      const result = [];
+
+      if (itemFromCount && itemsWithMaxCountIndex.length > 0) {
+        const firstItemWithMaxCountIndex = itemsWithMaxCountIndex[0];
+        result.push({
+          ...itemFromCount,
+          ...firstItemWithMaxCountIndex,
+          commentFromCount: itemFromCount?.comment,
+          quantityRecounted: firstItemWithMaxCountIndex?.quantityCounted,
+          quantityCounted: itemFromCount?.quantityCounted,
+          quantityVariance: itemFromCount?.quantityVariance,
+          dateCounted: itemFromCount?.dateCounted,
+          dateRecounted: firstItemWithMaxCountIndex?.dateCounted,
+          countedBy: itemFromCount?.assignee,
+          recountedBy: firstItemWithMaxCountIndex?.assignee,
+          rootCause:
+            mapRootCauseToSelectedOption(firstItemWithMaxCountIndex?.discrepancyReasonCode),
+        });
+      }
+
+      const maxCountIndexItemsToReturn = itemFromCount
+        ? itemsWithMaxCountIndex.slice(1)
+        : itemsWithMaxCountIndex;
+      result.push(...maxCountIndexItemsToReturn.map((item) => ({
+        ...item,
+        quantityRecounted: item?.quantityCounted,
+        dateRecounted: item?.dateCounted,
+        recountedBy: item?.assignee,
+        quantityVariance: null,
+        quantityCounted: null,
+        commentFromCount: null,
+        dateCounted: null,
+        countedBy: null,
+        rootCause: mapRootCauseToSelectedOption(item?.discrepancyReasonCode),
+      })));
+
+      return result;
     });
   };
 
@@ -142,6 +186,7 @@ const useResolveStep = () => {
     }), {});
     setDateRecounted(recountedDates);
     setRecountedBy(recountedByData);
+    console.log('tableData.current', tableData.current);
   };
 
   useEffect(() => {
