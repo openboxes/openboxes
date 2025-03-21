@@ -6,6 +6,7 @@ import React, {
 
 import { createColumnHelper } from '@tanstack/react-table';
 import _ from 'lodash';
+import moment from 'moment';
 import { RiChat3Line, RiDeleteBinLine, RiErrorWarningLine } from 'react-icons/ri';
 import { useDispatch, useSelector } from 'react-redux';
 import { Tooltip } from 'react-tippy';
@@ -29,6 +30,7 @@ import groupBinLocationsByZone from 'utils/groupBinLocationsByZone';
 import { checkBinLocationSupport } from 'utils/supportedActivitiesUtils';
 import { formatDate } from 'utils/translation-utils';
 import CustomTooltip from 'wrappers/CustomTooltip';
+import parseDateToUTC from 'utils/dateUtils';
 
 // Managing state for single table, mainly table configuration (from resolve step)
 const useResolveStepTable = ({
@@ -269,13 +271,11 @@ const useResolveStepTable = ({
       // After pulling the latest changes, table.options.meta?.updateData no longer
       // works on onChange, so for now, I put it inside useEffect
       useEffect(() => {
-        table.options.meta?.updateData(cycleCountId, original.id, id, value);
+        const updatedValue = cycleCountColumn.EXPIRATION_DATE === columnPath
+          ? parseDateToUTC({ date: value, currentFormat: 'MMM DD, YYYY' })
+          : value;
+        table.options.meta?.updateData(cycleCountId, original.id, id, updatedValue);
       }, [value]);
-
-      const onChangeRaw = (e) => {
-        const valueToUpdate = (e?.target?.value ?? e)?.format();
-        setValue(valueToUpdate);
-      };
 
       // Table consists of text fields, one numerical field for quantity recounted,
       // select field for bin locations and root cause and one date picker for the expiration date.
@@ -340,7 +340,6 @@ const useResolveStepTable = ({
             onBlur={onBlur}
             className={`${isAutoWidth ? 'w-auto' : 'w-75'} m-1 hide-arrows ${error && 'border border-danger input-has-error'}`}
             showErrorBorder={error}
-            onChangeRaw={onChangeRaw}
             hideErrorMessageWrapper
             warning={tooltipContent && warning}
             onKeyDown={(e) => handleKeyDown(e, index, columnPath)}

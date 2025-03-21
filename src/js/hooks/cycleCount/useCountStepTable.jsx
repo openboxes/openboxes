@@ -15,6 +15,7 @@ import cycleCountColumn from 'consts/cycleCountColumn';
 import { DateFormat } from 'consts/timeFormat';
 import useArrowsNavigation from 'hooks/useArrowsNavigation';
 import useTranslate from 'hooks/useTranslate';
+import parseDateToUTC from 'utils/dateUtils';
 import groupBinLocationsByZone from 'utils/groupBinLocationsByZone';
 import { checkBinLocationSupport } from 'utils/supportedActivitiesUtils';
 import CustomTooltip from 'wrappers/CustomTooltip';
@@ -171,13 +172,11 @@ const useCountStepTable = ({
       // After pulling the latest changes, table.options.meta?.updateData no longer
       // works on onChange, so for now, I put it inside useEffect
       useEffect(() => {
-        table.options.meta?.updateData(cycleCountId, original.id, id, value);
+        const updatedValue = cycleCountColumn.EXPIRATION_DATE === columnPath
+          ? parseDateToUTC({ date: value, currentFormat: 'MMM DD, YYYY' })
+          : value;
+        table.options.meta?.updateData(cycleCountId, original.id, id, updatedValue);
       }, [value]);
-
-      const onChangeRaw = (e) => {
-        const valueToUpdate = (e?.target?.value ?? e)?.format();
-        setValue(valueToUpdate);
-      };
 
       // Table consists of text fields, one numerical field for quantity counted,
       // select field for bin locations and one date picker for the expiration date.
@@ -230,7 +229,6 @@ const useCountStepTable = ({
             type={type}
             value={value}
             onChange={onChange}
-            onChangeRaw={onChangeRaw}
             onBlur={onBlur}
             className={`m-1 hide-arrows ${showTooltip ? 'w-99' : 'w-75'} ${error && 'border border-danger input-has-error'}`}
             showErrorBorder={error}
