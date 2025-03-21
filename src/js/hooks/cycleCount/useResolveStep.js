@@ -115,7 +115,7 @@ const useResolveStep = () => {
       return itemsFromResolve.map((item, index) => {
         // If this is the first item with maxCountIndex and itemFromCount exists,
         // merge data from both cycles. We do this because we wanted to combine data from
-        // countIndex 0 with the first countIndex 1 to retain info from both counts.
+        // countIndex 0 with the first countIndex 1 to avoid duplicating info from both counts
         if (index === 0 && itemFromCount) {
           return {
             ...itemFromCount,
@@ -132,9 +132,9 @@ const useResolveStep = () => {
           };
         }
 
-        // For example countIndex 0, 1, 1: the item with
+        // For example we have countIndex 0, 1, 1: the item with
         // countIndex 0 merges with the first item with countIndex 1,
-        // while the next item with countIndex 1 remains a separate record without merging.
+        // while the next item with countIndex 1 remains a separate record without merging
         return {
           ...item,
           quantityRecounted: item?.quantityCounted,
