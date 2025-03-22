@@ -58,7 +58,10 @@ const useInventoryValidation = ({ tableData }) => {
         const expirationDate = item?.inventoryItem?.expirationDate;
         return expirationDate == null ? null : moment.utc(expirationDate);
       });
-      const uniqueDates = _.uniqWith(expirationDates, (arrVal, othVal) => arrVal?.isSame(othVal));
+      const uniqueDates = _.uniqWith(
+        expirationDates,
+        (arrVal, othVal) => (arrVal == null ? othVal == null : arrVal.isSame(othVal)),
+      );
       if (uniqueDates.length > 1) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
