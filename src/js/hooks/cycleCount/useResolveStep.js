@@ -112,42 +112,19 @@ const useResolveStep = () => {
       const itemFromCount = _.find(itemsToMerge, (item) => item.countIndex === maxCountIndex - 1);
       const itemsFromResolve = groupedByCountIndex[maxCountIndex] || [];
 
-      return itemsFromResolve.map((item, index) => {
-        // If this is the first item with maxCountIndex and itemFromCount exists,
-        // merge data from both cycles. We do this because we wanted to combine data from
-        // countIndex 0 with the first countIndex 1 to avoid duplicating info from both counts
-        if (index === 0 && itemFromCount) {
-          return {
-            ...itemFromCount,
-            ...item,
-            commentFromCount: itemFromCount?.comment,
-            quantityRecounted: item?.quantityCounted,
-            quantityCounted: itemFromCount?.quantityCounted,
-            quantityVariance: itemFromCount?.quantityVariance,
-            dateCounted: itemFromCount?.dateCounted,
-            dateRecounted: item?.dateCounted,
-            countedBy: itemFromCount?.assignee,
-            recountedBy: item?.assignee,
-            rootCause: mapRootCauseToSelectedOption(item?.discrepancyReasonCode),
-          };
-        }
-
-        // For example we have countIndex 0, 1, 1: the item with
-        // countIndex 0 merges with the first item with countIndex 1,
-        // while the next item with countIndex 1 remains a separate record without merging
-        return {
-          ...item,
-          quantityRecounted: item?.quantityCounted,
-          dateRecounted: item?.dateCounted,
-          recountedBy: item?.assignee,
-          quantityVariance: null,
-          quantityCounted: null,
-          commentFromCount: null,
-          dateCounted: null,
-          countedBy: null,
-          rootCause: mapRootCauseToSelectedOption(item?.discrepancyReasonCode),
-        };
-      });
+      return itemsFromResolve.map((item) => ({
+        ...itemFromCount,
+        ...item,
+        commentFromCount: itemFromCount?.comment,
+        quantityRecounted: item?.quantityCounted,
+        quantityCounted: itemFromCount?.quantityCounted,
+        quantityVariance: itemFromCount?.quantityVariance,
+        dateCounted: itemFromCount?.dateCounted,
+        dateRecounted: item?.dateCounted,
+        countedBy: itemFromCount?.assignee,
+        recountedBy: item?.assignee,
+        rootCause: mapRootCauseToSelectedOption(item?.discrepancyReasonCode),
+      }));
     });
   };
 
