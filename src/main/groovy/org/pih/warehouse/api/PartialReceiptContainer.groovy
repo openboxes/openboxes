@@ -27,7 +27,7 @@ class PartialReceiptContainer{
                 shipmentItems         : partialReceiptItems.sort { a, b ->
                     switch (sortBy) {
                         case "alphabetical":
-                            return b.shipmentItem?.product?.name <=> a.shipmentItem?.product?.name ?:
+                            return a.shipmentItem?.product?.name <=> b.shipmentItem?.product?.name ?:
                                     defaultOrderComparison(a, b)
                         case "shipment":
                         default:
