@@ -319,6 +319,7 @@ const useResolveStepTable = ({
         setRowIndex,
         addNewRow: () => addEmptyRow(productId, cycleCountId, false),
         isNewRow,
+        onBlur,
       });
       const isAutoWidth = [
         cycleCountColumn.ROOT_CAUSE,

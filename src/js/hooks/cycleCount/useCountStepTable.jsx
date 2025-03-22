@@ -225,6 +225,7 @@ const useCountStepTable = ({
         setRowIndex,
         addNewRow: () => addEmptyRow(productId, cycleCountId, false),
         isNewRow,
+        onBlur,
       });
 
       return (
