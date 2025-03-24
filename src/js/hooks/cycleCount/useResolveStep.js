@@ -125,6 +125,10 @@ const useResolveStep = () => {
     });
   };
 
+  // Function used for maintaining the same order in the resolve tab between saves.
+  // It's needed because items are returned in the same order as they are on the record stock,
+  // but we want to have editable items at the bottom in the order that those items were
+  // added to the table.
   const moveCustomItemsToTheBottom = (cycleCountItems) => {
     const { false: originalItems, true: customItems } = _.groupBy(
       cycleCountItems,
