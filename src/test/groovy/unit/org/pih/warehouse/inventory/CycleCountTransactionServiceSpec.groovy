@@ -11,7 +11,6 @@ import org.pih.warehouse.inventory.CycleCount
 import org.pih.warehouse.inventory.CycleCountItem
 import org.pih.warehouse.inventory.CycleCountItemStatus
 import org.pih.warehouse.inventory.CycleCountProductAvailabilityService
-import org.pih.warehouse.inventory.CycleCountStatus
 import org.pih.warehouse.inventory.CycleCountTransactionService
 import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.InventoryItem
@@ -223,6 +222,8 @@ class CycleCountTransactionServiceSpec extends Specification implements DataTest
         assert adjustmentTransaction.source == facility
         assert adjustmentTransaction.inventory == facility.inventory
         assert adjustmentTransaction.cycleCount == cycleCount
+        // The order of the transactions matters! The adjustment should always be applied after the product inventory.
+        assert adjustmentTransaction.transactionDate > productInventoryTransaction.transactionDate
 
         // We expect two entries because we had two discrepancy.
         List<TransactionEntry> entries = adjustmentTransaction.transactionEntries as List<TransactionEntry>
