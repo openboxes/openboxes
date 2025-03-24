@@ -27,7 +27,7 @@ class PartialReceivingApiController {
     }
 
     def read() {
-        PartialReceipt partialReceipt = receiptService.getPartialReceipt(params.id, params.stepNumber)
+        PartialReceipt partialReceipt = receiptService.getPartialReceipt(params.id, params.stepNumber, params.sort)
         render([data: partialReceipt] as JSON)
     }
 
