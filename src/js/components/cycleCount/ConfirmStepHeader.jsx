@@ -7,11 +7,11 @@ import Button from 'components/form-elements/Button';
 const ConfirmStepHeader = ({
   back,
   save,
-  isDisabledSave,
-  setIsDisabledSave,
+  isSaveDisabled,
+  setIsSaveDisabled,
 }) => {
   const handleSaveClick = () => {
-    setIsDisabledSave(true);
+    setIsSaveDisabled(true);
     save();
   };
 
@@ -28,7 +28,7 @@ const ConfirmStepHeader = ({
         label="react.default.button.save.label"
         defaultLabel="Save"
         variant="primary"
-        disabled={isDisabledSave}
+        disabled={isSaveDisabled}
       />
     </div>
   );
@@ -39,6 +39,6 @@ export default ConfirmStepHeader;
 ConfirmStepHeader.propTypes = {
   back: PropTypes.func.isRequired,
   save: PropTypes.func.isRequired,
-  isDisabledSave: PropTypes.bool.isRequired,
-  setIsDisabledSave: PropTypes.func.isRequired,
+  isSaveDisabled: PropTypes.bool.isRequired,
+  setIsSaveDisabled: PropTypes.func.isRequired,
 };

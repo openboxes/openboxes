@@ -38,6 +38,7 @@ const useResolveStep = () => {
   const [refreshFocusCounter, setRefreshFocusCounter] = useState(0);
   const { show, hide } = useSpinner();
   const history = useHistory();
+  const [isSaveDisabled, setIsSaveDisabled] = useState(false);
 
   const {
     validationErrors,
@@ -476,6 +477,8 @@ const useResolveStep = () => {
     getDateCounted,
     refreshFocusCounter,
     triggerValidation,
+    isSaveDisabled,
+    setIsSaveDisabled,
   };
 };
 

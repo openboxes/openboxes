@@ -33,6 +33,8 @@ const ResolveStep = () => {
     isFormValid,
     refreshFocusCounter,
     triggerValidation,
+    isSaveDisabled,
+    setIsSaveDisabled,
   } = useResolveStep();
 
   return (
@@ -48,6 +50,8 @@ const ResolveStep = () => {
         <ConfirmStepHeader
           back={back}
           save={submitRecount}
+          isSaveDisabled={isSaveDisabled}
+          setIsSaveDisabled={setIsSaveDisabled}
         />
       )}
       {tableData
