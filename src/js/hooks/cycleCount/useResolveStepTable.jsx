@@ -198,8 +198,7 @@ const useResolveStepTable = ({
         cycleCountColumn.ROOT_CAUSE,
         cycleCountColumn.COMMENT,
         cycleCountColumn.BIN_LOCATION,
-      ]
-        .includes(id);
+      ].includes(id);
       // We shouldn't allow users edit fetched data (quantityRecounted, rootCause and comment
       // field are editable)
       if (isFieldEditable || !isStepEditable) {
@@ -272,11 +271,6 @@ const useResolveStepTable = ({
         table.options.meta?.updateData(cycleCountId, original.id, id, value);
       }, [value]);
 
-      const onChangeRaw = (e) => {
-        const valueToUpdate = (e?.target?.value ?? e)?.format();
-        setValue(valueToUpdate);
-      };
-
       // Table consists of text fields, one numerical field for quantity recounted,
       // select field for bin locations and root cause and one date picker for the expiration date.
       const type = getFieldType(columnPath);
@@ -340,7 +334,6 @@ const useResolveStepTable = ({
             onBlur={onBlur}
             className={`${isAutoWidth ? 'w-auto' : 'w-75'} m-1 hide-arrows ${error && 'border border-danger input-has-error'}`}
             showErrorBorder={error}
-            onChangeRaw={onChangeRaw}
             hideErrorMessageWrapper
             warning={tooltipContent && warning}
             onKeyDown={(e) => handleKeyDown(e, index, columnPath)}

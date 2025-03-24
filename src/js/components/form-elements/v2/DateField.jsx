@@ -27,10 +27,10 @@ const DateField = ({
   className,
   value,
   onChange,
-  onChangeRaw,
   showTimeSelect,
   hideErrorMessageWrapper,
   customDateFormat,
+  onChangeRaw,
   focusProps = {},
   ...fieldProps
 }) => {
@@ -157,13 +157,13 @@ DateField.propTypes = {
   showTimeSelect: PropTypes.bool,
   hideErrorMessageWrapper: PropTypes.bool,
   customDateFormat: PropTypes.string,
-  onChangeRaw: PropTypes.func,
   focusProps: PropTypes.shape({
     fieldIndex: PropTypes.string,
     fieldId: PropTypes.string,
     rowIndex: PropTypes.string,
     columnId: PropTypes.string,
   }),
+  onChangeRaw: PropTypes.func,
 };
 
 DateField.defaultProps = {
@@ -180,6 +180,6 @@ DateField.defaultProps = {
   showTimeSelect: false,
   hideErrorMessageWrapper: false,
   customDateFormat: null,
-  onChangeRaw: null,
   focusProps: {},
+  onChangeRaw: null,
 };

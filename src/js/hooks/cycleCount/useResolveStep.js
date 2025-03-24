@@ -9,6 +9,7 @@ import {
 } from 'react';
 
 import _ from 'lodash';
+import moment from 'moment';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
@@ -18,6 +19,7 @@ import { CYCLE_COUNT as GET_CYCLE_COUNTS } from 'api/urls';
 import ActivityCode from 'consts/activityCode';
 import { CYCLE_COUNT } from 'consts/applicationUrls';
 import { TO_RESOLVE_TAB } from 'consts/cycleCount';
+import { DateFormat } from 'consts/timeFormat';
 import useResolveStepValidation from 'hooks/cycleCount/useResolveStepValidation';
 import useSpinner from 'hooks/useSpinner';
 import exportFileFromApi from 'utils/file-download-util';
@@ -349,6 +351,10 @@ const useResolveStep = () => {
     inventoryItem: {
       ...cycleCountItem.inventoryItem,
       product: cycleCountItem?.product?.id,
+      expirationDate: moment(
+        cycleCountItem?.inventoryItem?.expirationDate,
+        DateFormat.MMM_DD_YYYY,
+      ).format(),
     },
     binLocation: cycleCountItem?.binLocation,
     comment: cycleCountItem?.comment,

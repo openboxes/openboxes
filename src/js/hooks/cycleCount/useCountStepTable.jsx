@@ -175,11 +175,6 @@ const useCountStepTable = ({
         table.options.meta?.updateData(cycleCountId, original.id, id, value);
       }, [value]);
 
-      const onChangeRaw = (e) => {
-        const valueToUpdate = (e?.target?.value ?? e)?.format();
-        setValue(valueToUpdate);
-      };
-
       // Table consists of text fields, one numerical field for quantity counted,
       // select field for bin locations and one date picker for the expiration date.
       const type = getFieldType(columnPath);
@@ -231,7 +226,6 @@ const useCountStepTable = ({
             type={type}
             value={value}
             onChange={onChange}
-            onChangeRaw={onChangeRaw}
             onBlur={onBlur}
             className={`m-1 hide-arrows ${showTooltip ? 'w-99' : 'w-75'} ${error && 'border border-danger input-has-error'}`}
             showErrorBorder={error}
