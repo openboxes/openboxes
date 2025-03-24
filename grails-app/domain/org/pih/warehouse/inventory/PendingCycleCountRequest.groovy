@@ -6,7 +6,7 @@ import org.pih.warehouse.core.User
 import org.pih.warehouse.product.Product
 
 
-class CycleCountCandidateInProgress {
+class PendingCycleCountRequest {
 
     String id
 
@@ -17,8 +17,6 @@ class CycleCountCandidateInProgress {
     Product product
 
     CycleCountCandidateStatus status
-
-    CycleCount cycleCount
 
     String abcClass
 
@@ -41,7 +39,7 @@ class CycleCountCandidateInProgress {
     Integer negativeItemCount
 
     static mapping = {
-        table "cycle_count_candidate_in_progress"
+        table "pending_cycle_count_request"
         version false
     }
 

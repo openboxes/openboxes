@@ -1,4 +1,4 @@
-CREATE OR REPLACE VIEW cycle_count_candidate_in_progress AS
+CREATE OR REPLACE VIEW pending_cycle_count_request AS
 (
     SELECT
         CRC32(CONCAT(pa.location_id, pa.product_id)) as id,
@@ -6,7 +6,6 @@ CREATE OR REPLACE VIEW cycle_count_candidate_in_progress AS
         ccr.facility_id,
         ccr.product_id,
         COALESCE(cc.status, ccr.status) as status,
-        ccr.cycle_count_id,
         ccr.request_type,
         ccr.blind_count,
         ccr.date_created,

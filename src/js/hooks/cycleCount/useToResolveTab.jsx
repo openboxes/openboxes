@@ -8,7 +8,7 @@ import { useHistory } from 'react-router-dom';
 
 import { startResolution } from 'actions';
 import cycleCountApi from 'api/services/CycleCountApi';
-import { CYCLE_COUNT_CANDIDATES, CYCLE_COUNT_CANDIDATES_IN_PROGRESS } from 'api/urls';
+import { CYCLE_COUNT_CANDIDATES, CYCLE_COUNT_PENDING_REQUESTS } from 'api/urls';
 import { TableCell } from 'components/DataTable';
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
 import Checkbox from 'components/form-elements/v2/Checkbox';
@@ -108,7 +108,7 @@ const useToResolveTab = ({
     tableData,
     loading,
   } = useTableDataV2({
-    url: CYCLE_COUNT_CANDIDATES_IN_PROGRESS(currentLocation?.id),
+    url: CYCLE_COUNT_PENDING_REQUESTS(currentLocation?.id),
     errorMessageId: 'react.cycleCount.table.errorMessage.label',
     defaultErrorMessage: 'Unable to fetch products',
     shouldFetch: filterParams.tab && tab === filterParams.tab,

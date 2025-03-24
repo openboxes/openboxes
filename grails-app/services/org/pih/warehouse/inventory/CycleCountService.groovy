@@ -100,7 +100,7 @@ class CycleCountService {
         } as List<CycleCountCandidate>
     }
 
-    List<CycleCountCandidateInProgress> getCandidatesInProgress(CycleCountCandidateFilterCommand command, String facilityId) {
+    List<PendingCycleCountRequest> getPendingCycleCountRequests(CycleCountCandidateFilterCommand command, String facilityId) {
         if (command.hasErrors()) {
             throw new ValidationException("Invalid params", command.errors)
         }
@@ -110,7 +110,7 @@ class CycleCountService {
         // Store added aliases to avoid duplicate alias exceptions for product
         // This could happen when params.searchTerm and e.g. sort by product is applied
         Set<String> usedAliases = new HashSet<>()
-        return CycleCountCandidateInProgress.createCriteria().list(max: max, offset: offset) {
+        return PendingCycleCountRequest.createCriteria().list(max: max, offset: offset) {
             eq("facility", facility)
             if (command.searchTerm) {
                 createProductAlias(delegate, usedAliases)
@@ -157,7 +157,7 @@ class CycleCountService {
 
             applySortOrder(command.sort, command.order, delegate, usedAliases)
 
-        } as List<CycleCountCandidateInProgress>
+        } as List<PendingCycleCountRequest>
     }
 
     private static void applySortOrder(String sortBy, String orderDirection, Criteria criteria, Set<String> usedAliases) {
