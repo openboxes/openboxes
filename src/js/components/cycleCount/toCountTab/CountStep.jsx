@@ -29,6 +29,8 @@ const CountStep = () => {
     isFormValid,
     triggerValidation,
     refreshFocusCounter,
+    isDisabledSave,
+    setIsDisabledSave,
   } = useCountStep();
 
   return (
@@ -43,6 +45,8 @@ const CountStep = () => {
         <ConfirmStepHeader
           back={back}
           save={resolveDiscrepancies}
+          isDisabledSave={isDisabledSave}
+          setIsDisabledSave={setIsDisabledSave}
         />
       )}
       {tableData

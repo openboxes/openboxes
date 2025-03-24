@@ -38,6 +38,7 @@ const useCountStepTable = ({
   // If prevForceResetFocus is different from refreshFocusCounter,
   // it triggers a reset of rowIndex and columnId.
   const [prevForceResetFocus, setPrevForceResetFocus] = useState(0);
+
   const translate = useTranslate();
 
   const { users, currentLocation, binLocations } = useSelector((state) => ({
