@@ -126,13 +126,34 @@ const useResolveStep = () => {
     });
   };
 
+  // Function used for maintaining the same order in the resolve tab between saves.
+  // It's needed because items are returned in the same order as they are on the record stock,
+  // but we want to have editable items at the bottom in the order that those items were
+  // added to the table.
+  const moveCustomItemsToTheBottom = (cycleCountItems) => {
+    const { false: originalItems, true: customItems } = _.groupBy(
+      cycleCountItems,
+      'custom',
+    );
+
+    if (!customItems) {
+      return originalItems;
+    }
+
+    const customItemsSortedByCreationDate = _.sortBy(customItems, 'dateCreated');
+
+    return [...originalItems, ...customItemsSortedByCreationDate];
+  };
+
   const refetchData = async () => {
     const { data } = await cycleCountApi.getCycleCounts(
       currentLocation?.id,
       cycleCountIds,
     );
-    tableData.current = data?.data?.map((cycleCount) =>
-      ({ ...cycleCount, cycleCountItems: mergeCycleCountItems(cycleCount.cycleCountItems) }));
+    tableData.current = data?.data?.map((cycleCount) => {
+      const mergedItems = mergeCycleCountItems(cycleCount.cycleCountItems);
+      return ({ ...cycleCount, cycleCountItems: moveCustomItemsToTheBottom(mergedItems) });
+    });
     const recountedDates = tableData.current?.reduce((acc, cycleCount) => ({
       ...acc,
       [cycleCount?.id]: cycleCount?.cycleCountItems?.[0]?.dateRecounted,

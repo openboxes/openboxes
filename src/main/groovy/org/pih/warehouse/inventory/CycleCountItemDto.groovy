@@ -34,5 +34,7 @@ class CycleCountItemDto {
 
     Date dateCounted
 
+    Date dateCreated
+
     Person assignee
 }

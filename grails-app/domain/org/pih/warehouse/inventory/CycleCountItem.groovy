@@ -61,6 +61,7 @@ class CycleCountItem implements Comparable {
                 quantityVariance: quantityVariance,
                 discrepancyReasonCode: discrepancyReasonCode,
                 dateCounted: dateCounted,
+                dateCreated: dateCreated,
                 comment: comment,
                 custom: custom,
                 assignee: assignee,
