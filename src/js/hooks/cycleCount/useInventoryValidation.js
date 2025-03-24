@@ -60,7 +60,7 @@ const useInventoryValidation = ({ tableData }) => {
       });
       const uniqueDates = _.uniqWith(
         expirationDates,
-        (arrVal, othVal) => (arrVal == null ? othVal == null : arrVal.isSame(othVal)),
+        (arrVal, othVal) => (arrVal === null ? othVal === null : arrVal.isSame(othVal)),
       );
       if (uniqueDates.length > 1) {
         ctx.addIssue({
