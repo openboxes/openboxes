@@ -20,6 +20,7 @@ import org.pih.warehouse.inventory.CycleCountStatus
 import org.pih.warehouse.inventory.CycleCountSubmitCountCommand
 import org.pih.warehouse.inventory.CycleCountSubmitRecountCommand
 import org.pih.warehouse.inventory.CycleCountUpdateItemCommand
+import org.pih.warehouse.inventory.PendingCycleCountRequest
 
 class CycleCountApiController {
 
@@ -36,6 +37,12 @@ class CycleCountApiController {
             return
         }
         render([data: cycleCounts, totalCount: cycleCounts.totalCount] as JSON)
+    }
+
+    def getPendingCycleCountRequests(CycleCountCandidateFilterCommand filterParams) {
+        List<PendingCycleCountRequest> pendingCycleCountRequests = cycleCountService.getPendingCycleCountRequests(filterParams, params.facilityId)
+
+        render([data: pendingCycleCountRequests, totalCount: pendingCycleCountRequests.totalCount] as JSON)
     }
 
     def createRequests(CycleCountRequestBatchCommand command) {
