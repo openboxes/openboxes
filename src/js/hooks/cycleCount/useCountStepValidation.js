@@ -76,6 +76,10 @@ const useCountStepValidation = ({ tableData }) => {
     return isFormValid;
   };
 
+  const resetValidationState = () => {
+    validationErrors.current = {};
+    isValid.current = null;
+  };
   return {
     validationErrors: validationErrors.current,
     isFormValid: isValid.current,
@@ -83,6 +87,7 @@ const useCountStepValidation = ({ tableData }) => {
     forceRerender,
     rowValidationSchema,
     rowsValidationSchema,
+    resetValidationState,
   };
 };
 
