@@ -354,10 +354,9 @@ const useResolveStep = () => {
     inventoryItem: {
       ...cycleCountItem.inventoryItem,
       product: cycleCountItem?.product?.id,
-      expirationDate: moment(
-        cycleCountItem?.inventoryItem?.expirationDate,
-        DateFormat.MMM_DD_YYYY,
-      ).format(),
+      expirationDate: cycleCountItem?.inventoryItem?.expirationDate === null
+        ? null
+        : moment(cycleCountItem?.inventoryItem?.expirationDate, DateFormat.MMM_DD_YYYY).format(),
     },
     binLocation: cycleCountItem?.binLocation,
     comment: cycleCountItem?.comment,
