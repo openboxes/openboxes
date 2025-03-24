@@ -146,11 +146,20 @@ const useCountStepTable = ({
       const isEdited = initialValue !== value;
       // When the input is blurred, we'll call the table meta's updateData function
       const onBlur = () => {
-        if (isEdited) {
-          table.options.meta?.updateData(cycleCountId, original.id, id, value);
+        if (!isEdited) {
+          return;
+        }
+        if (columnPath === cycleCountColumn.QUANTITY_COUNTED) {
+          const parsedValue = parseInt(value, 10) || 0;
+          setValue(parsedValue);
+          table.options.meta?.updateData(cycleCountId, original.id, id, parsedValue);
           setError(null);
           triggerValidation();
+          return;
         }
+        table.options.meta?.updateData(cycleCountId, original.id, id, value);
+        setError(null);
+        triggerValidation();
       };
 
       // Resets the error when rowIndex or columnId changes
@@ -212,6 +221,7 @@ const useCountStepTable = ({
         setRowIndex,
         addNewRow: () => addEmptyRow(productId, cycleCountId, false),
         isNewRow,
+        onBlur,
       });
 
       return (

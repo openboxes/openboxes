@@ -8,6 +8,7 @@ const useArrowsNavigation = ({
   setRowIndex,
   addNewRow,
   isNewRow,
+  onBlur,
 }) => {
   const getNextFocus = (columnId, rowIndex) => {
     const currentIndex = newRowFocusableCells.indexOf(columnId);
@@ -73,6 +74,7 @@ const useArrowsNavigation = ({
         setRowIndex(rowIndex - 1);
         setColumnId(columnId);
       }
+      onBlur();
       e.preventDefault();
       e.stopPropagation();
     }
@@ -82,6 +84,7 @@ const useArrowsNavigation = ({
         setRowIndex(rowIndex + 1);
         setColumnId(columnId);
       }
+      onBlur();
       e.preventDefault();
       e.stopPropagation();
     }
@@ -90,12 +93,14 @@ const useArrowsNavigation = ({
       const { newColumnId, newRowIndex } = getNextFocus(columnId, rowIndex);
       setColumnId(newColumnId);
       setRowIndex(newRowIndex);
+      onBlur();
     }
 
     if (key === navigationKey.ARROW_LEFT) {
       const { newColumnId, newRowIndex } = getPreviousFocus(columnId, rowIndex);
       setColumnId(newColumnId);
       setRowIndex(newRowIndex);
+      onBlur();
     }
   };
 
