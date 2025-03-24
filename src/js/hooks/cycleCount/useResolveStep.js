@@ -93,10 +93,11 @@ const useResolveStep = () => {
   const mergeCycleCountItems = (items) => {
     const duplicatedItems = _.groupBy(items,
       (item) => `${item.binLocation?.id}-${item?.inventoryItem?.lotNumber}`);
-    return Object.values(duplicatedItems).map((itemsToMerge) => {
+
+    return Object.values(duplicatedItems).flatMap((itemsToMerge) => {
       if (itemsToMerge.length === 1) {
         const item = itemsToMerge[0];
-        return {
+        return [{
           ...item,
           quantityRecounted: item?.quantityCounted,
           dateRecounted: item?.dateCounted,
@@ -107,25 +108,27 @@ const useResolveStep = () => {
           dateCounted: null,
           countedBy: null,
           rootCause: mapRootCauseToSelectedOption(item?.discrepancyReasonCode),
-        };
+        }];
       }
 
+      const groupedByCountIndex = _.groupBy(itemsToMerge, 'countIndex');
       const maxCountIndex = _.maxBy(itemsToMerge, 'countIndex').countIndex;
       const itemFromCount = _.find(itemsToMerge, (item) => item.countIndex === maxCountIndex - 1);
-      const itemFromResolve = _.find(itemsToMerge, (item) => item.countIndex === maxCountIndex);
-      return {
+      const itemsFromResolve = groupedByCountIndex[maxCountIndex] || [];
+
+      return itemsFromResolve.map((item) => ({
         ...itemFromCount,
-        ...itemFromResolve,
+        ...item,
         commentFromCount: itemFromCount?.comment,
-        quantityRecounted: itemFromResolve?.quantityCounted,
+        quantityRecounted: item?.quantityCounted,
         quantityCounted: itemFromCount?.quantityCounted,
         quantityVariance: itemFromCount?.quantityVariance,
         dateCounted: itemFromCount?.dateCounted,
-        dateRecounted: itemFromResolve?.dateCounted,
+        dateRecounted: item?.dateCounted,
         countedBy: itemFromCount?.assignee,
-        recountedBy: itemFromResolve?.assignee,
-        rootCause: mapRootCauseToSelectedOption(itemFromResolve?.discrepancyReasonCode),
-      };
+        recountedBy: item?.assignee,
+        rootCause: mapRootCauseToSelectedOption(item?.discrepancyReasonCode),
+      }));
     });
   };
 

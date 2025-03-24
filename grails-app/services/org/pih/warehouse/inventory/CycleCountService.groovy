@@ -589,7 +589,7 @@ class CycleCountService {
             }
             command.inventoryItem.save()
         }
-        Integer currentQuantityOnHand = productAvailabilityService.getQuantityOnHandInBinLocation(command.inventoryItem, command.facility) ?: 0
+        Integer currentQuantityOnHand = productAvailabilityService.getQuantityOnHandInBinLocation(command.inventoryItem, command.binLocation) ?: 0
         CycleCount cycleCount = command.cycleCount
 
         CycleCountItem cycleCountItem = new CycleCountItem(
