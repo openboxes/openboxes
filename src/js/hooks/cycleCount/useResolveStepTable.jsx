@@ -25,7 +25,6 @@ import cycleCountColumn from 'consts/cycleCountColumn';
 import { DateFormat } from 'consts/timeFormat';
 import useArrowsNavigation from 'hooks/useArrowsNavigation';
 import useTranslate from 'hooks/useTranslate';
-import parseDateToUTC from 'utils/dateUtils';
 import groupBinLocationsByZone from 'utils/groupBinLocationsByZone';
 import { checkBinLocationSupport } from 'utils/supportedActivitiesUtils';
 import { formatDate } from 'utils/translation-utils';
@@ -199,8 +198,7 @@ const useResolveStepTable = ({
         cycleCountColumn.ROOT_CAUSE,
         cycleCountColumn.COMMENT,
         cycleCountColumn.BIN_LOCATION,
-      ]
-        .includes(id);
+      ].includes(id);
       // We shouldn't allow users edit fetched data (quantityRecounted, rootCause and comment
       // field are editable)
       if (isFieldEditable || !isStepEditable) {
@@ -270,10 +268,7 @@ const useResolveStepTable = ({
       // After pulling the latest changes, table.options.meta?.updateData no longer
       // works on onChange, so for now, I put it inside useEffect
       useEffect(() => {
-        const updatedValue = cycleCountColumn.EXPIRATION_DATE === columnPath
-          ? parseDateToUTC({ date: value, currentFormat: DateFormat.MMM_DD_YYYY })
-          : value;
-        table.options.meta?.updateData(cycleCountId, original.id, id, updatedValue);
+        table.options.meta?.updateData(cycleCountId, original.id, id, value);
       }, [value]);
 
       // Table consists of text fields, one numerical field for quantity recounted,

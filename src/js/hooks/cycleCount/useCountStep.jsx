@@ -9,6 +9,7 @@ import {
 } from 'react';
 
 import _ from 'lodash';
+import moment from 'moment/moment';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
@@ -24,6 +25,7 @@ import ActivityCode from 'consts/activityCode';
 import { CYCLE_COUNT } from 'consts/applicationUrls';
 import { TO_COUNT_TAB, TO_RESOLVE_TAB } from 'consts/cycleCount';
 import cycleCountStatus from 'consts/cycleCountStatus';
+import { DateFormat } from 'consts/timeFormat';
 import useCountStepValidation from 'hooks/cycleCount/useCountStepValidation';
 import useSpinner from 'hooks/useSpinner';
 import confirmationModal from 'utils/confirmationModalUtils';
@@ -256,32 +258,40 @@ const useCountStep = () => {
 
   const getCountedDate = (cycleCountId) => dateCounted[cycleCountId];
 
+  const getPayload = (cycleCountItem, cycleCount) => ({
+    ...cycleCountItem,
+    recount: false,
+    assignee: getCountedBy(cycleCount.id)?.id,
+    dateCounted: getCountedDate(cycleCount.id),
+    inventoryItem: {
+      ...cycleCountItem?.inventoryItem,
+      product: cycleCountItem.product?.id,
+      expirationDate: moment(
+        cycleCountItem?.inventoryItem?.expirationDate,
+        DateFormat.MMM_DD_YYYY,
+      ).format(),
+    },
+  });
+
   const save = async () => {
     try {
       show();
       for (const cycleCount of tableData.current) {
         const cycleCountItemsToUpdate = cycleCount.cycleCountItems.filter((item) => (item.updated && !item.id.includes('newRow')));
         for (const cycleCountItem of cycleCountItemsToUpdate) {
-          await cycleCountApi.updateCycleCountItem({
-            ...cycleCountItem,
-            recount: false,
-            assignee: getCountedBy(cycleCount.id)?.id,
-            dateCounted: getCountedDate(cycleCount.id),
-          },
-          currentLocation?.id, cycleCountItem?.id);
+          await cycleCountApi.updateCycleCountItem(
+            getPayload(cycleCountItem, cycleCount),
+            currentLocation?.id,
+            cycleCountItem?.id,
+          );
         }
         const cycleCountItemsToCreate = cycleCount.cycleCountItems.filter((item) => item.id.includes('newRow'));
         for (const cycleCountItem of cycleCountItemsToCreate) {
-          await cycleCountApi.createCycleCountItem({
-            ...cycleCountItem,
-            recount: false,
-            inventoryItem: {
-              ...cycleCountItem.inventoryItem,
-              product: cycleCountItem.product?.id,
-            },
-            assignee: getCountedBy(cycleCount.id)?.id,
-            dateCounted: getCountedDate(cycleCount.id),
-          }, currentLocation?.id, cycleCount?.id);
+          await cycleCountApi.createCycleCountItem(
+            getPayload(cycleCountItem, cycleCount),
+            currentLocation?.id,
+            cycleCount?.id,
+          );
         }
 
         // Now that we've successfully saved all the items, mark them all as not updated so that

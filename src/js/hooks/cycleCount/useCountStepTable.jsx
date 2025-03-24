@@ -15,7 +15,6 @@ import cycleCountColumn from 'consts/cycleCountColumn';
 import { DateFormat } from 'consts/timeFormat';
 import useArrowsNavigation from 'hooks/useArrowsNavigation';
 import useTranslate from 'hooks/useTranslate';
-import parseDateToUTC from 'utils/dateUtils';
 import groupBinLocationsByZone from 'utils/groupBinLocationsByZone';
 import { checkBinLocationSupport } from 'utils/supportedActivitiesUtils';
 import CustomTooltip from 'wrappers/CustomTooltip';
@@ -172,10 +171,7 @@ const useCountStepTable = ({
       // After pulling the latest changes, table.options.meta?.updateData no longer
       // works on onChange, so for now, I put it inside useEffect
       useEffect(() => {
-        const updatedValue = cycleCountColumn.EXPIRATION_DATE === columnPath
-          ? parseDateToUTC({ date: value, currentFormat: DateFormat.MMM_DD_YYYY })
-          : value;
-        table.options.meta?.updateData(cycleCountId, original.id, id, updatedValue);
+        table.options.meta?.updateData(cycleCountId, original.id, id, value);
       }, [value]);
 
       // Table consists of text fields, one numerical field for quantity counted,

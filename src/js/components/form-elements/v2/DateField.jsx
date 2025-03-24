@@ -30,6 +30,7 @@ const DateField = ({
   showTimeSelect,
   hideErrorMessageWrapper,
   customDateFormat,
+  onChangeRaw,
   focusProps = {},
   ...fieldProps
 }) => {
@@ -101,7 +102,7 @@ const DateField = ({
         popperContainer={RootPortalWrapper}
         selected={selectedDate}
         highlightDates={highlightedDates}
-        onChange={onChangeHandler}
+        onChange={onChangeRaw || onChangeHandler}
         onSelect={() => {
           // Close date picker on select - this is somewhat a workaround to close the datepicker
           // when using showTimeSelect, when we are expecting to close the datepicker
@@ -162,6 +163,7 @@ DateField.propTypes = {
     rowIndex: PropTypes.string,
     columnId: PropTypes.string,
   }),
+  onChangeRaw: PropTypes.func,
 };
 
 DateField.defaultProps = {
@@ -179,4 +181,5 @@ DateField.defaultProps = {
   hideErrorMessageWrapper: false,
   customDateFormat: null,
   focusProps: {},
+  onChangeRaw: null,
 };
