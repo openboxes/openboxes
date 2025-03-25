@@ -532,6 +532,7 @@ const useResolveStepTable = ({
           >
             {(original.id.includes('newRow') || original.custom) && (
               <RiDeleteBinLine
+                className="cursor-pointer"
                 onClick={() => removeRow(cycleCountId, original.id)}
                 size={22}
               />

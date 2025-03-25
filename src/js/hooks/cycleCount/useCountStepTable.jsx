@@ -151,8 +151,8 @@ const useCountStepTable = ({
         }
         if (columnPath === cycleCountColumn.QUANTITY_COUNTED) {
           const parsedValue = parseInt(value, 10) || 0;
-          setValue(value);
-          table.options.meta?.updateData(cycleCountId, original.id, id, value);
+          setValue(parsedValue);
+          table.options.meta?.updateData(cycleCountId, original.id, id, parsedValue);
           setError(null);
           triggerValidation();
           return;
@@ -340,6 +340,7 @@ const useCountStepTable = ({
           >
             {(original.id.includes('newRow') || original.custom) && isStepEditable && (
               <RiDeleteBinLine
+                className="cursor-pointer"
                 onClick={() => removeRow(cycleCountId, original.id)}
                 size={22}
               />
