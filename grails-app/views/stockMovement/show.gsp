@@ -52,10 +52,20 @@
                             <g:each var="document" in="${stockMovement?.documents}">
                                 <g:if test="${!document.hidden}">
                                     <div class="action-menu-item">
-                                        <g:link url="${document.uri}" target="_blank">
-                                            <img src="${resource(dir: 'images/icons/silk', file: 'page.png')}" class="middle"/>&nbsp;
-                                            ${document.name}
-                                        </g:link>
+                                        <g:if test="${document.uris}">
+                                            <g:each var="downloadOption" in="${document.uris}">
+                                                <g:link url="${downloadOption.uri}" target="_blank">
+                                                    <img src="${resource(dir: 'images/icons/silk', file: 'page.png')}" class="middle"/>&nbsp;
+                                                    ${downloadOption.name}
+                                                </g:link>
+                                            </g:each>
+                                        </g:if>
+                                        <g:else>
+                                            <g:link url="${document.uri}" target="_blank">
+                                                <img src="${resource(dir: 'images/icons/silk', file: 'page.png')}" class="middle"/>&nbsp;
+                                                ${document.name}
+                                            </g:link>
+                                        </g:else>
                                     </div>
                                 </g:if>
                             </g:each>

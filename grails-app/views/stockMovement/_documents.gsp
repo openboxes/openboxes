@@ -52,9 +52,27 @@
                                         <warehouse:message code="default.button.delete.label"/>
                                     </g:link>
                                 </g:if>
-                                <g:link url="${document.uri}" target="_blank" class="button">
-                                    <warehouse:message code="default.button.download.label"/>
-                                </g:link>
+                                <g:if test="${document.uris}">
+                                    <span class="action-menu">
+                                        <button class="action-btn button">
+                                            <warehouse:message code="default.button.download.label"/>
+                                        </button>
+                                        <div class="actions">
+                                            <g:each var="downloadOption" in="${document.uris}">
+                                                <div class="action-menu-item">
+                                                    <g:link url="${downloadOption.uri}" target="_blank">
+                                                        ${downloadOption.name}
+                                                    </g:link>
+                                                </div>
+                                            </g:each>
+                                        </div>
+                                    </span>
+                                </g:if>
+                                <g:else>
+                                    <g:link url="${document.uri}" target="_blank" class="button">
+                                        <warehouse:message code="default.button.download.label"/>
+                                    </g:link>
+                                </g:else>
                             </td>
                         </tr>
                     </g:if>
