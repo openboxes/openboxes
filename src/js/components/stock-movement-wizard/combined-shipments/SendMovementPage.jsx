@@ -789,6 +789,20 @@ class SendMovementPage extends Component {
                           if (document.hidden) {
                             return null;
                           }
+
+                          // Some documents have multiple download options so list them all out.
+                          if (document.downloadOptions) {
+                            return _.map(document.downloadOptions, (downloadOption) => (
+                              <DocumentButton
+                                link={downloadOption.uri}
+                                buttonTitle={downloadOption.name}
+                                {...document}
+                                key={idx}
+                                onClick={() => this.saveValues(values)}
+                              />
+                            ));
+                          }
+
                           return (
                             <DocumentButton
                               link={document.uri}

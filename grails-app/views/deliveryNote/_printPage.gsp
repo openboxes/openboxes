@@ -32,9 +32,6 @@
                     </td>
                 </tr>
             </g:unless>
-        <h2>
-            ${sortOrder}
-        </h2>
             <g:if test="${"PRODUCT".equalsIgnoreCase(sortOrder as String)}">
                 %{-- Requisition items are already sorted by product at this point so no need to re-sort. --}%
             </g:if>
