@@ -52,8 +52,8 @@
                             <g:each var="document" in="${stockMovement?.documents}">
                                 <g:if test="${!document.hidden}">
                                     <div class="action-menu-item">
-                                        <g:if test="${document.uris}">
-                                            <g:each var="downloadOption" in="${document.uris}">
+                                        <g:if test="${document.downloadOptions}">
+                                            <g:each var="downloadOption" in="${document.downloadOptions}">
                                                 <g:link url="${downloadOption.uri}" target="_blank">
                                                     <img src="${resource(dir: 'images/icons/silk', file: 'page.png')}" class="middle"/>&nbsp;
                                                     ${downloadOption.name}

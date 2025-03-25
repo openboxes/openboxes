@@ -3294,14 +3294,14 @@ class StockMovementService {
 
             if (!stockMovement?.origin?.isSupplier() && stockMovement?.origin?.supports(ActivityCode.MANAGE_INVENTORY)) {
                 documentList.add([
-                        name        : g.message(code: "requisition.deliveryNote.label", default: "Delivery Note"),
-                        documentType: DocumentGroupCode.DELIVERY_NOTE.name(),
-                        contentType : "text/html",
-                        stepNumber  : 5,
+                        name           : g.message(code: "requisition.deliveryNote.label", default: "Delivery Note"),
+                        documentType   : DocumentGroupCode.DELIVERY_NOTE.name(),
+                        contentType    : "text/html",
+                        stepNumber     : 5,
                         // We provide multiple sorting options for the delivery note as different download options so we
                         // need to return a list of uris. The singular 'uri' is maintained for backwards compatability.
-                        uri         : g.createLink(controller: 'deliveryNote', action: "print", id: stockMovement?.requisition?.id, absolute: true),
-                        uris        : [
+                        uri            : g.createLink(controller: 'deliveryNote', action: "print", id: stockMovement?.requisition?.id, absolute: true),
+                        downloadOptions: [
                                 [
                                         name: g.message(code: "requisition.deliveryNote.sortOrder.orderIndex.label", default: "Delivery Note (Ordered By Order Index)"),
                                         uri: g.createLink(

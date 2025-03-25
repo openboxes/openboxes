@@ -52,13 +52,13 @@
                                         <warehouse:message code="default.button.delete.label"/>
                                     </g:link>
                                 </g:if>
-                                <g:if test="${document.uris}">
+                                <g:if test="${document.downloadOptions}">
                                     <span class="action-menu">
                                         <button class="action-btn button">
                                             <warehouse:message code="default.button.download.label"/>
                                         </button>
                                         <div class="actions">
-                                            <g:each var="downloadOption" in="${document.uris}">
+                                            <g:each var="downloadOption" in="${document.downloadOptions}">
                                                 <div class="action-menu-item">
                                                     <g:link url="${downloadOption.uri}" target="_blank">
                                                         ${downloadOption.name}
