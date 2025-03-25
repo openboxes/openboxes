@@ -52,6 +52,7 @@ import {
   SHOW_INFO_BAR_MODAL,
   SHOW_SPINNER,
   START_COUNT,
+  START_FETCHING_TRANSLATIONS,
   START_RESOLUTION,
   TOGGLE_USER_ACTION_MENU,
   TRANSLATIONS_FETCHED,
@@ -213,6 +214,17 @@ export function changeCurrentLocation(location) {
 
 export function fetchTranslations(languageCode, prefix) {
   return (dispatch) => {
+    /**
+     * Before fetching/refetching the translations, set the flag of fetched translations to false,
+     * so that dependencies that rely on fetched translations will be rendered properly when
+     * the flag is set to true after the fetch. Without it the initial false
+     * flag would only work for the initial render because redux-persist would store it later on
+     * regardless the refreshes of the page
+     */
+    dispatch({
+      type: START_FETCHING_TRANSLATIONS,
+      payload: prefix,
+    });
     const url = `/api/localizations?languageCode=${languageCode
       || ''}&prefix=react.${prefix || ''}`;
 

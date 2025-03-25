@@ -5,6 +5,7 @@ import {
   CHANGE_CURRENT_LOCATION,
   FETCH_MENU_CONFIG,
   FETCH_SESSION_INFO,
+  START_FETCHING_TRANSLATIONS,
   TOGGLE_USER_ACTION_MENU,
   TRANSLATIONS_FETCHED,
 } from 'actions/types';
@@ -41,6 +42,7 @@ const initialState = {
     inboundReturns: false,
     productsConfiguration: false,
     locationsConfiguration: false,
+    cycleCount: false,
   },
   searchConfig: {
     debounceTime: 500,
@@ -149,6 +151,11 @@ export default function (state = initialState, action) {
       return {
         ...state,
         fetchedTranslations: { ...state.fetchedTranslations, [action.payload]: true },
+      };
+    case START_FETCHING_TRANSLATIONS:
+      return {
+        ...state,
+        fetchedTranslations: { ...state.fetchedTranslations, [action.payload]: false },
       };
     case TOGGLE_USER_ACTION_MENU:
       return {
