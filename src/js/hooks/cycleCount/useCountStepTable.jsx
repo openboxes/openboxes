@@ -151,8 +151,8 @@ const useCountStepTable = ({
         }
         if (columnPath === cycleCountColumn.QUANTITY_COUNTED) {
           const parsedValue = parseInt(value, 10) || 0;
-          setValue(parsedValue);
-          table.options.meta?.updateData(cycleCountId, original.id, id, parsedValue);
+          setValue(value);
+          table.options.meta?.updateData(cycleCountId, original.id, id, value);
           setError(null);
           triggerValidation();
           return;
