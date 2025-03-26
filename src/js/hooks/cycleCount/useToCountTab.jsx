@@ -43,10 +43,12 @@ const useToCountTab = ({
     currentLocale,
     currentLocation,
     cycleCountMaxSelectedProducts,
+    translationsFetched,
   } = useSelector((state) => ({
     currentLocale: state.session.activeLanguage,
     currentLocation: state.session.currentLocation,
     cycleCountMaxSelectedProducts: state.session.cycleCountMaxSelectedProducts,
+    translationsFetched: state.session.fetchedTranslations.cycleCount,
   }));
 
   const dispatch = useDispatch();
@@ -312,7 +314,7 @@ const useToCountTab = ({
         flexWidth: 150,
       },
     }),
-  ], [currentLocale, sort, order]);
+  ], [currentLocale, sort, order, translationsFetched]);
 
   const emptyTableMessage = {
     id: 'react.cycleCount.table.emptyTable.label',
