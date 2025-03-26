@@ -10,8 +10,6 @@
 package org.pih.warehouse.inventory
 
 import grails.databinding.BindUsing
-import grails.plugins.csv.CSVWriter
-import org.grails.plugins.excelimport.ExpectedPropertyType
 import org.pih.warehouse.EmptyStringsToNullBinder
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
@@ -70,6 +68,7 @@ class InventoryLevel {
     String binLocation
 
     // ABC analysis class
+    @BindUsing({ obj, source -> EmptyStringsToNullBinder.bindEmptyStringToNull(source, "abcClass") })
     String abcClass
 
     // Additional comments about
