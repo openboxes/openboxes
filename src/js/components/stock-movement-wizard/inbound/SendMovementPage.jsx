@@ -765,14 +765,19 @@ class SendMovementPage extends Component {
                           return null;
                         }
 
+                        // TODO: index shouldn't be used as the key for DocumentButton but the
+                        //       document doesn't have a unique key so we have no better option.
+                        //       StockMovementService.getDocuments should be modified to return
+                        //       an id field that we can use here.
+
                         // Some documents have multiple download options so list them all out.
                         if (document.downloadOptions) {
-                          return _.map(document.downloadOptions, (downloadOption) => (
+                          return _.map(document.downloadOptions, (downloadOption, idy) => (
                             <DocumentButton
                               link={downloadOption.uri}
                               buttonTitle={downloadOption.name}
                               {...document}
-                              key={idx}
+                              key={`${idx}-${idy}`}
                               onClick={() => this.saveValues(values)}
                             />
                           ));
