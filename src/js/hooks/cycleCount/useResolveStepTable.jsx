@@ -201,7 +201,7 @@ const useResolveStepTable = ({
       ].includes(id);
       // We shouldn't allow users edit fetched data (quantityRecounted, rootCause and comment
       // field are editable)
-      if (isFieldEditable || !isStepEditable) {
+      if (!isStepEditable) {
         return (
           <CustomTooltip
             content={getValueToDisplay(columnPath, value)}
@@ -332,6 +332,7 @@ const useResolveStepTable = ({
           tooltipLabel={getValueToDisplay(id, value)}
         >
           <Component
+            disabled={isFieldEditable}
             type={type}
             value={value}
             onChange={onChange}

@@ -131,7 +131,7 @@ const useCountStepTable = ({
       ].includes(id);
 
       // We shouldn't allow users edit fetched data (only quantity counted and comment are editable)
-      if (isFieldEditable || !isStepEditable) {
+      if (!isStepEditable) {
         return (
           <TableCell className="static-cell-count-step d-flex align-items-center">
             {getValueToDisplay(id, value)}
@@ -233,6 +233,7 @@ const useCountStepTable = ({
           tooltipLabel={value?.name || translate('react.cycleCount.table.binLocation.label', 'Bin Location')}
         >
           <Component
+            disabled={isFieldEditable}
             type={type}
             value={value}
             onChange={onChange}
