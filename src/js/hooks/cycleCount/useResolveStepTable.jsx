@@ -237,7 +237,7 @@ const useResolveStepTable = ({
           triggerValidation();
         }
         if (id === cycleCountColumn.QUANTITY_RECOUNTED) {
-          const parsedValue = parseInt(value, 10) || 0;
+          const parsedValue = value ? (parseInt(value, 10) || 0) : value;
           setValue(parsedValue);
           table.options.meta?.updateData(cycleCountId, original.id, id, parsedValue);
           events.emit('refreshRecountDifference');
