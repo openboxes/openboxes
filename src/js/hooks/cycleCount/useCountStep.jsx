@@ -89,6 +89,25 @@ const useCountStep = () => {
     cycleCountItems: cycleCount.cycleCountItems.filter((item) => item.countIndex === 0),
   }));
 
+  // Function used for maintaining the same order in the resolve tab between saves.
+  // It's needed because items are returned in the same order as they are on the record stock,
+  // but we want to have editable items at the bottom in the order that those items were
+  // added to the table.
+  const moveCustomItemsToTheBottom = (cycleCountItems) => {
+    const { false: originalItems, true: customItems } = _.groupBy(
+      cycleCountItems,
+      'custom',
+    );
+
+    if (!customItems) {
+      return originalItems;
+    }
+
+    const customItemsSortedByCreationDate = _.sortBy(customItems, 'dateCreated');
+
+    return [...originalItems, ...customItemsSortedByCreationDate];
+  };
+
   const fetchCycleCounts = async () => {
     if (!cycleCountIds.length) {
       return;
@@ -100,7 +119,10 @@ const useCountStep = () => {
         currentLocation?.id,
         cycleCountIds,
       );
-      tableData.current = filterCountItems(data?.data);
+      tableData.current = filterCountItems(data?.data)?.map((cycleCount) => ({
+        ...cycleCount,
+        cycleCountItems: moveCustomItemsToTheBottom(cycleCount?.cycleCountItems),
+      }));
       // Date counted and assignee are the same for all items,
       // so we create a map looking at first item
       const countedDates = data?.data?.reduce((acc, cycleCount) => ({

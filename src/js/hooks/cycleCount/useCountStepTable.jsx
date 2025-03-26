@@ -341,6 +341,7 @@ const useCountStepTable = ({
           >
             {(original.id.includes('newRow') || original.custom) && isStepEditable && (
               <RiDeleteBinLine
+                className="cursor-pointer"
                 onClick={() => removeRow(cycleCountId, original.id)}
                 size={22}
               />
