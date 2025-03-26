@@ -97,6 +97,7 @@ const CountStepTable = ({
               className="date-counted-date-picker date-field-input"
               onChangeRaw={setCountedDate}
               value={dateCounted}
+              clearable={false}
               customDateFormat={DateFormat.DD_MMM_YYYY}
             />
           </HeaderSelect>

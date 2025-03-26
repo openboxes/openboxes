@@ -31,6 +31,7 @@ const DateField = ({
   hideErrorMessageWrapper,
   customDateFormat,
   onChangeRaw,
+  clearable,
   focusProps = {},
   ...fieldProps
 }) => {
@@ -86,7 +87,7 @@ const DateField = ({
       <DatePicker
         {...fieldProps}
         showTimeSelect={showTimeSelect}
-        customInput={<DateFieldInput onClear={onClear} />}
+        customInput={<DateFieldInput onClear={onClear} clearable={clearable} />}
         className={`form-element-input ${errorMessage ? 'has-errors' : ''} ${className}`}
         dropdownMode="scroll"
         dateFormat={getDateFormat()}
@@ -164,6 +165,7 @@ DateField.propTypes = {
     columnId: PropTypes.string,
   }),
   onChangeRaw: PropTypes.func,
+  clearable: PropTypes.bool,
 };
 
 DateField.defaultProps = {
@@ -182,4 +184,5 @@ DateField.defaultProps = {
   customDateFormat: null,
   focusProps: {},
   onChangeRaw: null,
+  clearable: true,
 };

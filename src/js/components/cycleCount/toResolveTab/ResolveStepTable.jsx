@@ -109,6 +109,7 @@ const ResolveStepTable = ({
                 onChangeRaw={setRecountedDate}
                 value={dateRecounted}
                 customDateFormat={DateFormat.DD_MMM_YYYY}
+                clearable={false}
                 hideErrorMessageWrapper
               />
             </HeaderSelect>
