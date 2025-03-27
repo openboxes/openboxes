@@ -1,30 +1,35 @@
 
-OpenBoxes uses MySQL database to store data. The database connection is configured in 
-application.yml under the dataSource section. These settings can (and should be) overridden 
-in a production environment to ensure a secure connection (i.e. change password, enable SSL, etc).
+OpenBoxes supports MySQL 8 as its primary database (we also support MariaDB 10.x). The database 
+connection is configured in `application.yml` under the `dataSource` section. The default settings 
+should be modified in any production environment to ensure a secure connection. You should follow 
+best practices regarding security when configuring your database (i.e. change password, enable SSL, etc).
 
-You can find detailed information about data source properties here [Data Source Configuration](https://docs.grails.org/latest/guide/conf.html#dataSource)
+!!! tip
+    You can find detailed information about all available data source properties here [Data Source Configuration](https://docs.grails.org/latest/guide/conf.html#dataSource)
 
-
-## Defaults
-```yaml title="/opt/tomcat/.grails/openboxes.yml"
+## Configuration
+```yaml title="openboxes.yml"
 dataSource:
     url: jdbc:mysql://localhost:3306/openboxes?serverTimezone=UTC&useSSL=false
     username: openboxes
     password: openboxes
 ```
+
 ## Properties
 
-| Property              | Required | Description |
-|-----------------------| ---- | ---- |
-| `dataSource.url`      | Yes | JDBC connection string |
-| `dataSource.username` | Yes | JDBC username |
-| `dataSource.password` | Yes | JDBC password |
+| Property              | Description                      | Example Value |
+|-----------------------|--------------------------------|--------------|
+| `dataSource.url`      | Database connection string      | `jdbc:mysql://localhost:3306/openboxes` |
+| `dataSource.username` | Database username              | `openboxes` |
+| `dataSource.password` | Database password              | `secret` |
+
+!!! tip
+    For more details on the format for the `dataSource.url`, please refer to the 
+    [MySQL JDBC Connector docs](https://dev.mysql.com/doc/connector-j/en/connector-j-reference-jdbc-url-format.html).
 
 
-## Considerations
-* Always use strong credentials and secure database access.
-* Ensure proper indexing and query optimization for performance.
-* Enable SSL/TLS in url for secure connections (outside the scope)
-
+## Customization
+There are many more configuration properties under the `dataSource` configuration object that are not
+mentioned here. You can read more about these properties in our 
+[Connection Pool configuration](connection-pool.md) section. 
 

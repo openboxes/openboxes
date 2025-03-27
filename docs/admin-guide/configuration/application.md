@@ -1,6 +1,5 @@
 # Application properties
 
-
 ## General 
 
 ### Settings

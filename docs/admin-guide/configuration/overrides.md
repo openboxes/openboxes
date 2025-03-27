@@ -1,6 +1,9 @@
 OpenBoxes configuration properties can be overridden using multiple methods, depending on the 
 deployment environment and preference.
 
+To modify settings, update the respective configuration file and restart OpenBoxes. 
+If using environment variables, restart the application for changes to take effect.
+
 !!! important
     We currently recommend using the External Configuration File option 
     (particularly openboxes.yml), since we have not throroughly tested all of the 
@@ -54,10 +57,6 @@ haven't had a chance to validate that all properties can be passed via environme
 so your miles may vary. 
 
 ```title="/opt/tomcat/bin/setenv.sh"
-export DATASOURCE_URL="jdbc:mysql://localhost:3306/changeme?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC"
-export DATASOURCE_USERNAME=changeme
-export DATASOURCE_PASSWORD=changeme
-export GRAILS_SERVERURL=http://localhost:8080/changeme
 export OPENBOXES_UPLOADS_DIRECTORY=/tmp/uploads
 ```
 
