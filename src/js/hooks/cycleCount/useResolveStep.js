@@ -22,6 +22,7 @@ import { TO_RESOLVE_TAB } from 'consts/cycleCount';
 import { DateFormat } from 'consts/timeFormat';
 import useResolveStepValidation from 'hooks/cycleCount/useResolveStepValidation';
 import useSpinner from 'hooks/useSpinner';
+import trimLotNumberSpaces from 'utils/cycleCountUtils';
 import exportFileFromApi from 'utils/file-download-util';
 import { checkBinLocationSupport } from 'utils/supportedActivitiesUtils';
 
@@ -373,12 +374,16 @@ const useResolveStep = () => {
       show();
       resetValidationState();
       for (const cycleCount of tableData.current) {
-        const cycleCountItemsToUpdate = cycleCount.cycleCountItems.filter((item) => (item.updated && !item.id.includes('newRow')));
+        const cycleCountItemsToUpdate = cycleCount.cycleCountItems
+          .filter((item) => (item.updated && !item.id.includes('newRow')))
+          .map(trimLotNumberSpaces);
         for (const cycleCountItem of cycleCountItemsToUpdate) {
           await cycleCountApi.updateCycleCountItem(getPayload(cycleCountItem, cycleCount),
             currentLocation?.id, cycleCountItem?.id);
         }
-        const cycleCountItemsToCreate = cycleCount.cycleCountItems.filter((item) => item.id.includes('newRow'));
+        const cycleCountItemsToCreate = cycleCount.cycleCountItems
+          .filter((item) => item.id.includes('newRow'))
+          .map(trimLotNumberSpaces);
         for (const cycleCountItem of cycleCountItemsToCreate) {
           await cycleCountApi.createCycleCountItem(getPayload(cycleCountItem, cycleCount),
             currentLocation?.id, cycleCount?.id);

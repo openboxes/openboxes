@@ -29,6 +29,7 @@ import { DateFormat } from 'consts/timeFormat';
 import useCountStepValidation from 'hooks/cycleCount/useCountStepValidation';
 import useSpinner from 'hooks/useSpinner';
 import confirmationModal from 'utils/confirmationModalUtils';
+import trimLotNumberSpaces from 'utils/cycleCountUtils';
 import exportFileFromApi from 'utils/file-download-util';
 import { checkBinLocationSupport } from 'utils/supportedActivitiesUtils';
 
@@ -302,7 +303,9 @@ const useCountStep = () => {
       show();
       resetValidationState();
       for (const cycleCount of tableData.current) {
-        const cycleCountItemsToUpdate = cycleCount.cycleCountItems.filter((item) => (item.updated && !item.id.includes('newRow')));
+        const cycleCountItemsToUpdate = cycleCount.cycleCountItems
+          .filter((item) => (item.updated && !item.id.includes('newRow')))
+          .map(trimLotNumberSpaces);
         for (const cycleCountItem of cycleCountItemsToUpdate) {
           await cycleCountApi.updateCycleCountItem(
             getPayload(cycleCountItem, cycleCount),
@@ -310,7 +313,9 @@ const useCountStep = () => {
             cycleCountItem?.id,
           );
         }
-        const cycleCountItemsToCreate = cycleCount.cycleCountItems.filter((item) => item.id.includes('newRow'));
+        const cycleCountItemsToCreate = cycleCount.cycleCountItems
+          .filter((item) => item.id.includes('newRow'))
+          .map(trimLotNumberSpaces);
         for (const cycleCountItem of cycleCountItemsToCreate) {
           await cycleCountApi.createCycleCountItem(
             getPayload(cycleCountItem, cycleCount),
