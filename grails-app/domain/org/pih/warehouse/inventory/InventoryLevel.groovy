@@ -103,7 +103,7 @@ class InventoryLevel {
         preferredBinLocation(nullable: true)
         replenishmentLocation(nullable: true)
         binLocation(nullable: true)
-        abcClass(nullable: true)
+        abcClass(nullable: true, blank: false)
         preferred(nullable: true)
         comments(nullable: true)
         replenishmentPeriodDays(nullable: true)

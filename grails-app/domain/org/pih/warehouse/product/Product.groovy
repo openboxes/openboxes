@@ -311,7 +311,7 @@ class Product implements Comparable, Serializable {
         upc(nullable: true, maxSize: 255)
         ndc(nullable: true, maxSize: 255)
 
-        abcClass(nullable: true)
+        abcClass(nullable: true, blank: false)
         packageSize(nullable: true)
         brandName(nullable: true, maxSize: 255)
         vendor(nullable: true, maxSize: 255)
