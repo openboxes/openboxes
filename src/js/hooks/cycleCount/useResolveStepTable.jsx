@@ -439,7 +439,8 @@ const useResolveStepTable = ({
           {translate('react.cycleCount.table.countDifference.label', 'Count Difference')}
         </TableHeaderCell>
       ), []),
-      cell: useCallback(({ row: { original: { quantityVariance, quantityCounted } } }) => {
+      cell: useCallback(({ row: { original: { quantityOnHand, quantityCounted } } }) => {
+        const quantityVariance = quantityCounted - (quantityOnHand || 0);
         const variant = (quantityCounted || quantityCounted === 0)
           ? getCycleCountDifferencesVariant(quantityVariance, quantityCounted)
           : ArrowValueIndicatorVariant.EMPTY;
