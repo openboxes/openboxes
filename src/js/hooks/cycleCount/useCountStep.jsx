@@ -9,7 +9,6 @@ import {
 } from 'react';
 
 import _ from 'lodash';
-import moment from 'moment/moment';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
@@ -30,6 +29,7 @@ import useCountStepValidation from 'hooks/cycleCount/useCountStepValidation';
 import useSpinner from 'hooks/useSpinner';
 import confirmationModal from 'utils/confirmationModalUtils';
 import trimLotNumberSpaces from 'utils/cycleCountUtils';
+import dateWithoutTimeZone from 'utils/dateUtils';
 import exportFileFromApi from 'utils/file-download-util';
 import { checkBinLocationSupport } from 'utils/supportedActivitiesUtils';
 
@@ -292,9 +292,11 @@ const useCountStep = () => {
     inventoryItem: {
       ...cycleCountItem?.inventoryItem,
       product: cycleCountItem.product?.id,
-      expirationDate: cycleCountItem?.inventoryItem?.expirationDate === null
-        ? null
-        : moment(cycleCountItem?.inventoryItem?.expirationDate, DateFormat.MMM_DD_YYYY).format(),
+      expirationDate: dateWithoutTimeZone({
+        date: cycleCountItem?.inventoryItem?.expirationDate,
+        currentDateFormat: DateFormat.MMM_DD_YYYY,
+        outputDateFormat: DateFormat.MM_DD_YYYY,
+      }),
     },
   });
 
