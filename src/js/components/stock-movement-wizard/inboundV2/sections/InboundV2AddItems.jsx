@@ -126,8 +126,8 @@ const InboundV2AddItems = ({
             columns={columns}
             data={fields}
             defaultPageSize={4}
-            showPagination={false}
             loading={loading}
+            disablePagination
             emptyTableMessage={{
               id: 'react.stockMovement.emptyTable.label',
               defaultMessage: 'No items to display',
