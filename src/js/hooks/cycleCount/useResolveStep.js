@@ -100,10 +100,10 @@ const useResolveStep = () => {
         const item = itemsToMerge[0];
         return [{
           ...item,
+          quantityOnHand: null,
           quantityRecounted: item?.quantityCounted,
           dateRecounted: item?.dateCounted,
           recountedBy: item?.assignee,
-          quantityVariance: null,
           quantityCounted: null,
           commentFromCount: null,
           dateCounted: null,
@@ -120,10 +120,10 @@ const useResolveStep = () => {
       return itemsFromResolve.map((item) => ({
         ...itemFromCount,
         ...item,
+        quantityOnHand: item?.quantityOnHand,
         commentFromCount: itemFromCount?.comment,
         quantityRecounted: item?.quantityCounted,
         quantityCounted: itemFromCount?.quantityCounted,
-        quantityVariance: itemFromCount?.quantityVariance,
         dateCounted: itemFromCount?.dateCounted,
         dateRecounted: item?.dateCounted,
         countedBy: itemFromCount?.assignee,
