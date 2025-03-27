@@ -3303,7 +3303,7 @@ class StockMovementService {
                         uri            : g.createLink(controller: 'deliveryNote', action: "print", id: stockMovement?.requisition?.id, absolute: true),
                         downloadOptions: [
                                 [
-                                        name: g.message(code: "requisition.deliveryNote.sortOrder.orderIndex.label", default: "Delivery Note (Ordered By Order Index)"),
+                                        name: g.message(code: "requisition.deliveryNote.sortOrder.orderIndex.label", default: "Delivery Note (shipment order)"),
                                         uri: g.createLink(
                                                 controller: 'deliveryNote',
                                                 action: "print",
@@ -3312,7 +3312,7 @@ class StockMovementService {
                                         ),
                                 ],
                                 [
-                                        name: g.message(code: "requisition.deliveryNote.sortOrder.product.label", default: "Delivery Note (Ordered By Product)"),
+                                        name: g.message(code: "requisition.deliveryNote.sortOrder.product.label", default: "Delivery Note (alphabetical by product)"),
                                         uri: g.createLink(
                                                 controller: 'deliveryNote',
                                                 action: "print",
