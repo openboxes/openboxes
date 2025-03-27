@@ -32,7 +32,13 @@
                     </td>
                 </tr>
             </g:unless>
-            <g:each in="${requisitionItems?.sort()}" status="i" var="requisitionItem">
+            <g:if test="${"PRODUCT".equalsIgnoreCase(sortOrder as String)}">
+                %{-- Requisition items are already sorted by product at this point so no need to re-sort. --}%
+            </g:if>
+            <g:else>
+                <g:set var="requisitionItems" value="${requisitionItems?.sort()}"/>
+            </g:else>
+            <g:each in="${requisitionItems}" status="i" var="requisitionItem">
                 <g:if test="${picklist}">
                     <g:set var="inventoryItemMap" value="${requisitionItem?.retrievePicklistItems()?.findAll { it.quantity > 0 }?.groupBy { it?.inventoryItem }}"/>
                     <g:set var="shipmentItems" value="${requisitionItem?.requisition?.shipment?.shipmentItems?.findAll { it.requisitionItem == requisitionItem }}"/>
