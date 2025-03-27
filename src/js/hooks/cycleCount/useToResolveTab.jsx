@@ -216,6 +216,9 @@ const useToResolveTab = ({
         </TableHeaderCell>
       ),
       cell: ({ getValue }) => {
+        if (!getValue()) {
+          return null;
+        }
         const binLocationList = mapStringToLimitedList(getValue(), ',');
         const hiddenBinLocationsLength = binLocationList.length - 4 > 0
           ? binLocationList.length - 4
