@@ -2,7 +2,14 @@ import React from 'react';
 
 import PropTypes from 'prop-types';
 import { useFieldArray, useWatch } from 'react-hook-form';
-import { BiExit, BiSave, IoCloseCircleOutline } from 'react-icons/all';
+import {
+  BiDownload,
+  BiExit,
+  BiRefresh,
+  BiSave,
+  BiUpload,
+  IoCloseCircleOutline,
+} from 'react-icons/all';
 import { RiAddLine } from 'react-icons/ri';
 
 import DataTable from 'components/DataTable/v2/DataTable';
@@ -25,6 +32,9 @@ const InboundV2AddItems = ({
   removeAll,
   saveAndExit,
   previousPage,
+  refresh,
+  importTemplate,
+  exportTemplate,
 }) => {
   const hasErrors = !!Object.keys(errors).length;
   const {
@@ -97,6 +107,53 @@ const InboundV2AddItems = ({
             />
 
             <div className="buttons-container">
+              {/* <Button */}
+              {/*   id="csvInput" */}
+              {/*   type="file" */}
+              {/*   onChange={importTemplate} */}
+              {/*   StartIcon={<BiDownload className="icon" />} */}
+              {/*   defaultLabel="Import template" */}
+              {/*   label="react.default.button.importTemplate.label" */}
+              {/*   variant="primary-outline" */}
+              {/*   onClick={(event) => { */}
+              {/*     console.log('xsdsadfas'); */}
+              {/*     // eslint-disable-next-line no-param-reassign */}
+              {/*     event.target.value = null; */}
+              {/*   }} */}
+              {/*   accept=".csv" */}
+              {/* /> */}
+              <Button
+                onClick={() => {
+                  const fileInput = document.getElementById('csvInput');
+                  fileInput.value = null;
+                  fileInput?.click();
+                }}
+                StartIcon={<BiDownload className="icon" />}
+                defaultLabel="Import template"
+                label="react.default.button.importTemplate.label"
+                variant="primary-outline"
+              />
+              <input
+                id="csvInput"
+                type="file"
+                style={{ display: 'none' }}
+                onChange={importTemplate}
+                accept=".csv"
+              />
+              <Button
+                onClick={exportTemplate}
+                StartIcon={<BiUpload className="icon" />}
+                defaultLabel="Export template"
+                label="react.default.button.exportTemplate.label"
+                variant="primary-outline"
+              />
+              <Button
+                onClick={refresh}
+                StartIcon={<BiRefresh className="icon" />}
+                defaultLabel="Reload"
+                label="react.default.button.refresh.label"
+                variant="primary-outline"
+              />
               <Button
                 onClick={save}
                 StartIcon={<BiSave className="icon" />}
@@ -173,4 +230,7 @@ InboundV2AddItems.propTypes = {
   removeAll: PropTypes.func.isRequired,
   saveAndExit: PropTypes.func.isRequired,
   previousPage: PropTypes.func.isRequired,
+  refresh: PropTypes.func.isRequired,
+  importTemplate: PropTypes.func.isRequired,
+  exportTemplate: PropTypes.func.isRequired,
 };

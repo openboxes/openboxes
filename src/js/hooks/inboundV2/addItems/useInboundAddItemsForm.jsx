@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import fileDownload from 'js-file-download';
 import _ from 'lodash';
 import moment from 'moment';
 import { useForm } from 'react-hook-form';
@@ -260,9 +261,14 @@ const useInboundAddItemsForm = ({
       try {
         spinner.show();
         const resp = await apiClient.post(STOCK_MOVEMENT_UPDATE_ITEMS(queryParams.id), payload);
+        const {
+          data,
+        } = resp.data;
         const transformedData = {
-          ...resp.data.data,
-          lineItems: resp.data.data.lineItems?.map(transformLineItem),
+          ...data,
+          movementNumber: data.identifier,
+          stockMovementId: data.id,
+          lineItems: data.lineItems?.map(transformLineItem),
         };
         setValue('currentLineItems', transformedData.lineItems);
         setValue('values', transformedData);
@@ -485,9 +491,9 @@ const useInboundAddItemsForm = ({
     }
   };
 
-  const setLineItems = (response, startIndex) => {
+  const setLineItems = (response, startIndex, showOnlyImportedItems) => {
     const { data } = response.data;
-    const lineItemsData = data.length === 0 && getValues('values.lineItems').length === 0
+    const lineItemsData = !data.length && getValues('values.lineItems').length === 0
       ? [{ sortOrder: 100 }]
       : data.map((val) => ({
         ...transformLineItem(val),
@@ -496,21 +502,22 @@ const useInboundAddItemsForm = ({
       }));
     const newSortOrder = (lineItemsData.length > 0
       ? lineItemsData[lineItemsData.length - 1].sortOrder : 0) + 100;
+
     setValue('sortOrder', newSortOrder);
     setValue('currentLineItems', getValues().isPaginated ? _.uniqBy(_.concat(data, ...getValues('currentLineItems')), 'id') : data);
-    setValue('values.lineItems', getValues().isPaginated ? _.uniqBy(_.concat(lineItemsData, ...getValues('values.lineItems')), 'id') : lineItemsData);
+    setValue('values.lineItems', getValues().isPaginated && !showOnlyImportedItems ? _.uniqBy(_.concat(lineItemsData, ...getValues('values.lineItems')), 'id') : lineItemsData);
 
     if (startIndex !== null && getValues('values.lineItems').length !== getValues().totalCount) {
       loadMoreRows({ startIndex: startIndex + getValues().pageSize });
     }
   };
 
-  const fetchLineItems = async () => {
+  const fetchLineItems = async (showOnlyImportedItems = false) => {
     if (queryParams.id) {
       const url = `${STOCK_MOVEMENT_ITEMS(queryParams.id)}?stepNumber=2`;
       const response = await apiClient.get(url);
       setValue('totalCount', response.data.data.length);
-      setLineItems(response, null);
+      setLineItems(response, null, showOnlyImportedItems);
     }
   };
 
@@ -521,7 +528,7 @@ const useInboundAddItemsForm = ({
       setValue('totalCount', 1);
       setValue('currentLineItems', []);
       setValue('values', {
-        ...getValues('values'),
+        ...getValues().values,
         lineItems: new Array(1).fill({ sortOrder: 100 }),
       });
       await fetchLineItems();
@@ -554,9 +561,10 @@ const useInboundAddItemsForm = ({
       } = response.data;
       const transformedData = {
         ...data,
+        movementNumber: data.identifier,
+        stockMovementId: data.id,
         lineItems: data.lineItems?.map(transformLineItem),
       };
-
       setValue('values', transformedData);
       setValue('totalCount', totalCount || 1);
     }
@@ -574,6 +582,64 @@ const useInboundAddItemsForm = ({
       setLoading(false);
       spinner.hide();
     }
+  };
+
+  const importTemplate = async (event) => {
+    spinner.show();
+    try {
+      const formData = new FormData();
+      const file = event.target.files[0];
+      const { stockMovementId } = getValues().values;
+
+      formData.append('importFile', file.slice(0, file.size, 'text/csv'));
+      const config = {
+        headers: {
+          'content-type': 'multipart/form-data',
+        },
+      };
+
+      const url = `/stockMovement/importCsv/${stockMovementId}`;
+
+      await apiClient.post(url, formData, config);
+
+      fetchLineItems(true);
+      if (_.isNil(_.last(getValues().values.lineItems)?.product)) {
+        const updatedValues = {
+          ...getValues().values,
+          lineItems: [],
+        };
+        setValue('values', updatedValues);
+      }
+    } finally {
+      spinner.hide();
+    }
+  };
+
+  const refresh = async () => {
+    confirmAction(
+      () => fetchData(),
+      'react.stockMovement.confirmRefresh.message',
+      'Are you sure you want to refresh? Your progress since last save will be lost.',
+    );
+  };
+
+  const saveItemsAndExportTemplate = async (formValues, lineItems) => {
+    spinner.show();
+    const { movementNumber, stockMovementId } = formValues;
+    const url = `/stockMovement/exportCsv/${stockMovementId}`;
+
+    try {
+      await saveRequisitionItemsInCurrentStep(lineItems);
+      const response = await apiClient.get(url, { responseType: 'blob' });
+      fileDownload(response.data, `ItemList${movementNumber ? `-${movementNumber}` : ''}.csv`, 'text/csv');
+    } finally {
+      spinner.hide();
+    }
+  };
+
+  const exportTemplate = async () => {
+    const lineItems = _.filter(getValues().lineItems, (item) => !_.isEmpty(item));
+    saveItemsAndExportTemplate(getValues().values, lineItems);
   };
 
   useEffect(() => {
@@ -598,6 +664,9 @@ const useInboundAddItemsForm = ({
     removeAll,
     saveAndExit,
     previousPage,
+    refresh,
+    exportTemplate,
+    importTemplate,
   };
 };
 
