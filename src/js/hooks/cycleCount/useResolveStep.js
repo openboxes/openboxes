@@ -100,7 +100,6 @@ const useResolveStep = () => {
         const item = itemsToMerge[0];
         return [{
           ...item,
-          quantityOnHand: null,
           quantityRecounted: item?.quantityCounted,
           dateRecounted: item?.dateCounted,
           recountedBy: item?.assignee,
