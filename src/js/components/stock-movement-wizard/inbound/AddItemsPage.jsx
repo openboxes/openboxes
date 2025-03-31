@@ -336,6 +336,7 @@ class AddItemsPage extends Component {
   setLineItems(response, startIndex) {
     const { data } = response.data;
     let lineItemsData;
+
     if (this.state.values.lineItems.length === 0 && !data.length) {
       lineItemsData = new Array(1).fill({ sortOrder: 100 });
     } else {
@@ -347,6 +348,7 @@ class AddItemsPage extends Component {
         }),
       );
     }
+
     const sortOrder = _.toInteger(_.last(lineItemsData).sortOrder) + 100;
     this.setState((prev) => ({
       currentLineItems: this.props.isPaginated
@@ -863,6 +865,7 @@ class AddItemsPage extends Component {
    */
   exportTemplate(formValues) {
     const lineItems = _.filter(formValues.lineItems, (item) => !_.isEmpty(item));
+
     this.saveItemsAndExportTemplate(formValues, lineItems);
   }
 

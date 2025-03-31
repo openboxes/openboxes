@@ -121,7 +121,7 @@ const InboundV2AddItems = ({
               <input
                 id="csvInput"
                 type="file"
-                style={{ display: 'none' }}
+                className="d-none"
                 onChange={importTemplate}
                 accept=".csv"
               />
