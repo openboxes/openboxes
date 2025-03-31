@@ -194,7 +194,7 @@ const useInboundAddItemsForm = ({
       !isItemUpdated(item, oldItem)
       || item.palletName !== oldItem.palletName
       || item.boxName !== oldItem.boxName
-      || item.product.id !== oldItem.product.id
+      || item.product?.id !== oldItem.product.id
       || newQty !== oldQty
       || item.recipient?.id !== oldItem.recipient?.id
       || item.lotNumber !== oldItem.lotNumber
@@ -214,7 +214,7 @@ const useInboundAddItemsForm = ({
 
     const formatItem = (item) => ({
       id: item.id,
-      product: { id: item.product.id },
+      product: { id: item.product?.id },
       quantityRequested: item.quantityRequested,
       palletName: item.palletName,
       boxName: item.boxName,
@@ -233,7 +233,7 @@ const useInboundAddItemsForm = ({
     product: item.product
       ? {
         ...item.product,
-        label: item.product.label || `${item.product.id} - ${item.product.name}`,
+        label: item.product.label || `${item.product.productCode} - ${item.product.name}`,
         value: item.product.value || item.product.id,
       }
       : null,

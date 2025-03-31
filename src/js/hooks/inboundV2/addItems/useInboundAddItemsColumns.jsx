@@ -78,7 +78,11 @@ const useInboundAddItemsColumns = ({
   const columns = useMemo(() => [
     columnHelper.accessor('palletName', {
       header: () => (
-        <TableHeaderCell style={{ justifyContent: 'center' }}>
+        <TableHeaderCell
+          className="justify-content-center"
+          tooltip
+          tooltipLabel={translate('react.stockMovement.packLevel1.label', 'Pack Level 1')}
+        >
           {translate('react.stockMovement.packLevel1.label', 'Pack Level 1')}
         </TableHeaderCell>
       ),
@@ -109,7 +113,11 @@ const useInboundAddItemsColumns = ({
     }),
     columnHelper.accessor('boxName', {
       header: () => (
-        <TableHeaderCell style={{ justifyContent: 'center' }}>
+        <TableHeaderCell
+          className="justify-content-center"
+          tooltip
+          tooltipLabel={translate('react.stockMovement.packLevel2.label', 'Pack Level 2')}
+        >
           {translate('react.stockMovement.packLevel2.label', 'Pack Level 2')}
         </TableHeaderCell>
       ),
@@ -145,7 +153,11 @@ const useInboundAddItemsColumns = ({
     }),
     columnHelper.accessor('product', {
       header: () => (
-        <TableHeaderCell required>
+        <TableHeaderCell
+          required
+          tooltip
+          tooltipLabel={translate('react.stockMovement.product.label', 'Product')}
+        >
           {translate('react.stockMovement.product.label', 'Product')}
         </TableHeaderCell>
       ),
@@ -188,7 +200,11 @@ const useInboundAddItemsColumns = ({
     }),
     columnHelper.accessor('lotNumber', {
       header: () => (
-        <TableHeaderCell style={{ justifyContent: 'center' }}>
+        <TableHeaderCell
+          className="justify-content-center"
+          tooltip
+          tooltipLabel={translate('react.stockMovement.lot.label', 'Lot')}
+        >
           {translate('react.stockMovement.lot.label', 'Lot')}
         </TableHeaderCell>
       ),
@@ -209,6 +225,11 @@ const useInboundAddItemsColumns = ({
                   {...field}
                   hasErrors={hasErrors}
                   showErrorBorder={hasErrors}
+                  onChange={(e) => setValue(`values.lineItems.${row.index}.lotNumber`, e.target.value ?? null)}
+                  onBlur={() => {
+                    field.onBlur();
+                    trigger(`values.lineItems.${row.index}.lotNumber`);
+                  }}
                 />
               )}
             />
@@ -221,7 +242,11 @@ const useInboundAddItemsColumns = ({
     }),
     columnHelper.accessor('expirationDate', {
       header: () => (
-        <TableHeaderCell style={{ justifyContent: 'center' }}>
+        <TableHeaderCell
+          className="justify-content-center"
+          tooltip
+          tooltipLabel={translate('react.stockMovement.expiry.label', 'Expiry')}
+        >
           {translate('react.stockMovement.expiry.label', 'Expiry')}
         </TableHeaderCell>
       ),
@@ -259,7 +284,12 @@ const useInboundAddItemsColumns = ({
     }),
     columnHelper.accessor('quantityRequested', {
       header: () => (
-        <TableHeaderCell required style={{ justifyContent: 'center' }}>
+        <TableHeaderCell
+          required
+          className="justify-content-center"
+          tooltip
+          tooltipLabel={translate('react.stockMovement.quantity.label', 'Quantity')}
+        >
           {translate('react.stockMovement.quantity.label', 'Quantity')}
         </TableHeaderCell>
       ),
@@ -281,11 +311,10 @@ const useInboundAddItemsColumns = ({
                   type="number"
                   hasErrors={hasErrors}
                   showErrorBorder={hasErrors}
-                  onBlur={(e) => {
-                    if (e.target.value === undefined) {
-                      return;
-                    }
+                  onChange={(e) => setValue(`values.lineItems.${row.index}.quantityRequested`, e ?? null)}
+                  onBlur={() => {
                     field.onBlur();
+                    trigger(`values.lineItems.${row.index}.quantityRequested`);
                   }}
                 />
               )}
@@ -299,7 +328,11 @@ const useInboundAddItemsColumns = ({
     }),
     columnHelper.accessor('recipient', {
       header: () => (
-        <TableHeaderCell style={{ justifyContent: 'center' }}>
+        <TableHeaderCell
+          className="justify-content-center"
+          tooltip
+          tooltipLabel={translate('react.stockMovement.recipient.label', 'Recipient')}
+        >
           {translate('react.stockMovement.recipient.label', 'Recipient')}
         </TableHeaderCell>
       ),
@@ -338,7 +371,11 @@ const useInboundAddItemsColumns = ({
     columnHelper.display({
       id: 'delete',
       header: () => (
-        <TableHeaderCell style={{ justifyContent: 'center' }}>
+        <TableHeaderCell
+          className="justify-content-center"
+          tooltip
+          tooltipLabel={translate('react.default.button.delete.label', 'Delete')}
+        >
           {translate('react.default.button.delete.label', 'Delete')}
         </TableHeaderCell>
       ),
