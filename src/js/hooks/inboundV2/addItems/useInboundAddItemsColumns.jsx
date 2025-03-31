@@ -281,9 +281,11 @@ const useInboundAddItemsColumns = ({
                   type="number"
                   hasErrors={hasErrors}
                   showErrorBorder={hasErrors}
-                  onBlur={() => {
+                  onBlur={(e) => {
+                    if (e.target.value === undefined) {
+                      return;
+                    }
                     field.onBlur();
-                    trigger(`values.lineItems.${row.index}.quantityRequested`);
                   }}
                 />
               )}

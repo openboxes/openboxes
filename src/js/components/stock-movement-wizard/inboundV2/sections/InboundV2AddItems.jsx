@@ -107,21 +107,6 @@ const InboundV2AddItems = ({
             />
 
             <div className="buttons-container">
-              {/* <Button */}
-              {/*   id="csvInput" */}
-              {/*   type="file" */}
-              {/*   onChange={importTemplate} */}
-              {/*   StartIcon={<BiDownload className="icon" />} */}
-              {/*   defaultLabel="Import template" */}
-              {/*   label="react.default.button.importTemplate.label" */}
-              {/*   variant="primary-outline" */}
-              {/*   onClick={(event) => { */}
-              {/*     console.log('xsdsadfas'); */}
-              {/*     // eslint-disable-next-line no-param-reassign */}
-              {/*     event.target.value = null; */}
-              {/*   }} */}
-              {/*   accept=".csv" */}
-              {/* /> */}
               <Button
                 onClick={() => {
                   const fileInput = document.getElementById('csvInput');

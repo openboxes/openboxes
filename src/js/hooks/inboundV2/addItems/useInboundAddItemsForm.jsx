@@ -253,6 +253,7 @@ const useInboundAddItemsForm = ({
         expirationDate: item.expirationDate ? moment(item.expirationDate)
           .format(DateFormat.MM_DD_YYYY) : null,
       }));
+
     if (itemsToSave.length) {
       const payload = {
         id: queryParams.id,
@@ -261,9 +262,7 @@ const useInboundAddItemsForm = ({
       try {
         spinner.show();
         const resp = await apiClient.post(STOCK_MOVEMENT_UPDATE_ITEMS(queryParams.id), payload);
-        const {
-          data,
-        } = resp.data;
+        const { data } = resp.data;
         const transformedData = {
           ...data,
           movementNumber: data.identifier,
@@ -271,6 +270,7 @@ const useInboundAddItemsForm = ({
           lineItems: data.lineItems?.map(transformLineItem),
         };
         setValue('currentLineItems', transformedData.lineItems);
+        setValue('values.lineItems', transformedData.lineItems);
         setValue('values', transformedData);
         return resp;
       } finally {
@@ -627,7 +627,6 @@ const useInboundAddItemsForm = ({
     spinner.show();
     const { movementNumber, stockMovementId } = formValues;
     const url = `/stockMovement/exportCsv/${stockMovementId}`;
-
     try {
       await saveRequisitionItemsInCurrentStep(lineItems);
       const response = await apiClient.get(url, { responseType: 'blob' });
@@ -638,7 +637,7 @@ const useInboundAddItemsForm = ({
   };
 
   const exportTemplate = async () => {
-    const lineItems = _.filter(getValues().lineItems, (item) => !_.isEmpty(item));
+    const lineItems = _.filter(getValues().values.lineItems, (item) => !_.isEmpty(item));
     saveItemsAndExportTemplate(getValues().values, lineItems);
   };
 
