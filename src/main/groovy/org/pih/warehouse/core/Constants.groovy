@@ -43,9 +43,9 @@ class Constants {
     // Display date using day of year format. This is used by the `openboxes.display.date.format` property.
     // It is using `DD` instead `dd` because it is later used on the frontend by the moment, which interprets
     // `dd` and `DD` differently(`DD` is day of month, and `dd` is day of week, see: OBPIH-7149 and OBPIH-5397).
-    static final String DISPLAY_DATE_FORMAT = "MMM DD, yyyy"
+    static final String JS_DISPLAY_DATE_FORMAT = "MMM DD, yyyy"
     // Display date using "DOM" - day of month format
-    static final String DISPLAY_DATE_DOM_FORMAT = "MMM dd, yyyy"
+    static final String DISPLAY_DATE_FORMAT = "MMM dd, yyyy"
     static final String DISPLAY_DATE_DEFAULT_VALUE = "-"
     static final String GENERATE_NAME_DATE_FORMAT = "ddMMMyyyy"
     static final String EUROPEAN_DATE_FORMAT_WITH_TIME = "${EUROPEAN_DATE_FORMAT} HH:mm"
@@ -59,7 +59,7 @@ class Constants {
     static final DateFormat DELIVERY_DATE_FORMATTER = new SimpleDateFormat(DELIVERY_DATE_FORMAT)
     static final DateFormat EUROPEAN_DATE_FORMATTER = new SimpleDateFormat(EUROPEAN_DATE_FORMAT)
     static final DateFormat MONTH_DAY_YEAR_DATE_FORMATTER = new SimpleDateFormat(MONTH_DAY_YEAR_DATE_FORMAT)
-    static final DateFormat DISPLAY_DATE_FORMATTER = new SimpleDateFormat(DISPLAY_DATE_DOM_FORMAT)
+    static final DateFormat DISPLAY_DATE_FORMATTER = new SimpleDateFormat(DISPLAY_DATE_FORMAT)
 
     // Dimension date formats
     static DateFormat weekFormat = new SimpleDateFormat("w")
