@@ -8,8 +8,12 @@ import { useForm } from 'react-hook-form';
 import Alert from 'react-s-alert';
 
 import {
-  STOCK_MOVEMENT_BY_ID, STOCK_MOVEMENT_ITEM_REMOVE,
-  STOCK_MOVEMENT_ITEMS, STOCK_MOVEMENT_REMOVE_ALL_ITEMS,
+  STOCK_MOVEMENT_BY_ID,
+  STOCK_MOVEMENT_EXPORT_CSV,
+  STOCK_MOVEMENT_IMPORT_CSV,
+  STOCK_MOVEMENT_ITEM_REMOVE,
+  STOCK_MOVEMENT_ITEMS,
+  STOCK_MOVEMENT_REMOVE_ALL_ITEMS,
   STOCK_MOVEMENT_UPDATE_INVENTORY_ITEMS,
   STOCK_MOVEMENT_UPDATE_ITEMS,
   STOCK_MOVEMENT_UPDATE_STATUS,
@@ -598,9 +602,7 @@ const useInboundAddItemsForm = ({
         },
       };
 
-      const url = `/stockMovement/importCsv/${stockMovementId}`;
-
-      await apiClient.post(url, formData, config);
+      await apiClient.post(STOCK_MOVEMENT_IMPORT_CSV(stockMovementId), formData, config);
 
       fetchLineItems(true);
       if (_.isNil(_.last(getValues().values.lineItems)?.product)) {
@@ -626,10 +628,9 @@ const useInboundAddItemsForm = ({
   const saveItemsAndExportTemplate = async (formValues, lineItems) => {
     spinner.show();
     const { movementNumber, stockMovementId } = formValues;
-    const url = `/stockMovement/exportCsv/${stockMovementId}`;
     try {
       await saveRequisitionItemsInCurrentStep(lineItems);
-      const response = await apiClient.get(url, { responseType: 'blob' });
+      const response = await apiClient.get(STOCK_MOVEMENT_EXPORT_CSV(stockMovementId), { responseType: 'blob' });
       fileDownload(response.data, `ItemList${movementNumber ? `-${movementNumber}` : ''}.csv`, 'text/csv');
     } finally {
       spinner.hide();
