@@ -126,6 +126,7 @@ class CycleCountTransactionServiceSpec extends Specification implements DataTest
                 facility: facility,
                 cycleCountItems: [
                         new CycleCountItem(
+                                id: "3",
                                 inventoryItem: new InventoryItem(),
                                 location: new Location(),
                                 product: product1,
@@ -135,6 +136,7 @@ class CycleCountTransactionServiceSpec extends Specification implements DataTest
                                 quantityCounted: 10,
                         ),
                         new CycleCountItem(
+                                id: "4",
                                 inventoryItem: new InventoryItem(),
                                 location: new Location(),
                                 product: product2,
