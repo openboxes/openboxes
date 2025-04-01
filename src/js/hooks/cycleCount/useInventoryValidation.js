@@ -23,9 +23,9 @@ const useInventoryValidation = ({ tableData }) => {
           (item) => item?.id === row?.id))?.cycleCountItems;
       const dataGroupedByBinLocationAndLotNumber = _.groupBy(
         cycleCountItems,
-        (item) => `${item?.binLocation?.id}-${item?.inventoryItem?.lotNumber?.trim()}`,
+        (item) => `${item?.binLocation?.id}-${item?.inventoryItem?.lotNumber?.trim() || ''}`,
       );
-      const key = `${row?.binLocation?.id}-${row?.inventoryItem?.lotNumber?.trim()}`;
+      const key = `${row?.binLocation?.id}-${row?.inventoryItem?.lotNumber?.trim() || ''}`;
       if (dataGroupedByBinLocationAndLotNumber[key]?.length > 1) {
         // Display the error on both the bin and lot because uniqueness is based on both of them.
         ctx.addIssue({
@@ -49,12 +49,12 @@ const useInventoryValidation = ({ tableData }) => {
           (item) => item?.id === row?.id))?.cycleCountItems;
       const dataGroupedByLotNumber = _.groupBy(
         cycleCountItems,
-        (item) => item?.inventoryItem?.lotNumber?.trim(),
+        (item) => item?.inventoryItem?.lotNumber?.trim() || '',
       );
       // The backend returns expiration date in the "MM/dd/yyyy" format, but we use the ISO format
       // "yyyy-MM-dd'T'hh:mm:ssXXX" when generating dates on the frontend. We convert the dates to
       // a moment (defaulting to UTC if no timezone information is provided) for easy comparison.
-      const expirationDates = dataGroupedByLotNumber[row?.inventoryItem?.lotNumber?.trim()]
+      const expirationDates = dataGroupedByLotNumber[row?.inventoryItem?.lotNumber?.trim() || '']
         .map((item) => {
           const expirationDate = item?.inventoryItem?.expirationDate;
           return expirationDate == null ? null : moment.utc(expirationDate);
