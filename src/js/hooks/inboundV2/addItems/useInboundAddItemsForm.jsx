@@ -29,6 +29,10 @@ const useInboundAddItemsForm = ({
   previous,
 }) => {
   const [loading, setLoading] = useState(false);
+  // State used to trigger focus reset when changed. When this counter changes,
+  // it will reset the focus by clearing the RowIndex and ColumnId in useEffect.
+  const [refreshFocusCounter, setRefreshFocusCounter] = useState(0);
+
   const spinner = useSpinner();
   const { validationSchema } = useInboundAddItemsValidation();
   const queryParams = useQueryParams();
@@ -181,6 +185,10 @@ const useInboundAddItemsForm = ({
       buttons: modalButtons,
       ...modalLabels,
     });
+  };
+
+  const resetFocus = () => {
+    setRefreshFocusCounter((prev) => prev + 1);
   };
 
   const isItemUpdated = (item, oldItem) => !_.isEqual(_.omit(item, ['product']), _.omit(oldItem, ['product']));
@@ -345,6 +353,7 @@ const useInboundAddItemsForm = ({
 
       handleTransition(updatedValues, lineItems);
     } finally {
+      resetFocus();
       spinner.hide();
     }
   };
@@ -411,6 +420,7 @@ const useInboundAddItemsForm = ({
         { timeout: 3000 },
       );
     } finally {
+      resetFocus();
       spinner.hide();
     }
   };
@@ -455,6 +465,7 @@ const useInboundAddItemsForm = ({
       await saveRequisitionItemsInCurrentStep(lineItems);
       window.location = STOCK_MOVEMENT_URL.show(queryParams.id);
     } finally {
+      resetFocus();
       spinner.hide();
     }
   };
@@ -526,6 +537,7 @@ const useInboundAddItemsForm = ({
       });
       await fetchLineItems();
     } finally {
+      resetFocus();
       spinner.hide();
     }
   };
@@ -538,6 +550,7 @@ const useInboundAddItemsForm = ({
         await saveRequisitionItemsInCurrentStep(getValues().values.lineItems);
         previous();
       } finally {
+        resetFocus();
         spinner.hide();
       }
     } else {
@@ -598,6 +611,8 @@ const useInboundAddItemsForm = ({
     removeAll,
     saveAndExit,
     previousPage,
+    refreshFocusCounter,
+    resetFocus,
   };
 };
 

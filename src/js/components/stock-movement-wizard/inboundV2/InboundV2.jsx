@@ -97,6 +97,8 @@ const InboundV2 = () => {
     removeAll,
     saveAndExit,
     previousPage,
+    refreshFocusCounter,
+    resetFocus,
   } = useInboundAddItemsForm({ next, previous });
 
   const addItemsComponentProps = {
@@ -115,6 +117,8 @@ const InboundV2 = () => {
     removeAll,
     saveAndExit,
     previousPage,
+    refreshFocusCounter,
+    resetFocus,
   };
 
   const sendComponentProps = {

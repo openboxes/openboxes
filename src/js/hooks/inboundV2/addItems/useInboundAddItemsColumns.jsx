@@ -1,4 +1,9 @@
-import React, { useMemo } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 
 import { createColumnHelper } from '@tanstack/react-table';
 import PropTypes from 'prop-types';
@@ -11,9 +16,12 @@ import TableHeaderCell from 'components/DataTable/TableHeaderCell';
 import DateField from 'components/form-elements/v2/DateField';
 import SelectField from 'components/form-elements/v2/SelectField';
 import TextInput from 'components/form-elements/v2/TextInput';
+import inboundColumns from 'consts/inboundColumns';
 import StockMovementDirection from 'consts/StockMovementDirection';
+import { DateFormat } from 'consts/timeFormat';
+import useArrowsNavigation from 'hooks/useArrowsNavigation';
 import useTranslate from 'hooks/useTranslate';
-import { debounceProductsFetch } from 'utils/option-utils';
+import { debounceProductsFetch, debounceUsersFetch } from 'utils/option-utils';
 import Translate from 'utils/Translate';
 
 const useInboundAddItemsColumns = ({
@@ -26,7 +34,24 @@ const useInboundAddItemsColumns = ({
   removeItem,
   updateTotalCount,
   currentLineItems,
+  append,
+  refreshFocusCounter,
 }) => {
+  const [rowIndex, setRowIndex] = useState(null);
+  const [columnId, setColumnId] = useState(null);
+  console.log('rowIndex', rowIndex, 'columnId', columnId);
+  // If prevForceResetFocus is different from refreshFocusCounter,
+  // it triggers a reset of rowIndex and columnId.
+  const [prevForceResetFocus, setPrevForceResetFocus] = useState(0);
+
+  useEffect(() => {
+    if (refreshFocusCounter !== prevForceResetFocus) {
+      setRowIndex(null);
+      setColumnId(null);
+      setPrevForceResetFocus(refreshFocusCounter);
+    }
+  }, [refreshFocusCounter]);
+
   const columnHelper = createColumnHelper();
   const translate = useTranslate();
 
@@ -41,16 +66,25 @@ const useInboundAddItemsColumns = ({
     users: state.users.data,
     locale: state.session.activeLanguage,
   }));
-  const debouncedProductsFetch = debounceProductsFetch(
-    debounceTime,
-    minSearchLength,
-    null,
-    false,
-    false,
-    true,
-    false,
-    StockMovementDirection.INBOUND,
+  const debouncedProductsFetch = useCallback(
+    debounceProductsFetch(
+      debounceTime,
+      minSearchLength,
+      null,
+      false,
+      false,
+      true,
+      false,
+      StockMovementDirection.INBOUND,
+    ),
+    [debounceTime, minSearchLength],
   );
+
+  const debouncedUsersFetch = useCallback(
+    debounceUsersFetch(debounceTime, minSearchLength),
+    [debounceTime, minSearchLength],
+  );
+
   const getCustomSelectErrorPlaceholder = ({
     id,
     defaultMessage,
@@ -75,14 +109,55 @@ const useInboundAddItemsColumns = ({
     remove(row.index);
   };
 
+  const handleBlur = (field, fieldName, customLogic = null) => {
+    field.onBlur();
+    if (rowIndex !== null && columnId !== null) {
+      setRowIndex(null);
+      setColumnId(null);
+    }
+    if (fieldName) {
+      trigger(fieldName);
+    }
+    if (customLogic) {
+      customLogic();
+    }
+  };
+
+  const focusableCells = [
+    inboundColumns.PALLET_NAME,
+    inboundColumns.BOX_NAME,
+    inboundColumns.PRODUCT,
+    inboundColumns.LOT_NUMBER,
+    inboundColumns.EXPIRATION_DATE,
+    inboundColumns.QUANTITY,
+    inboundColumns.RECIPIENTS,
+  ];
+
+  const { handleKeyDown } = useArrowsNavigation({
+    newRowFocusableCells: focusableCells,
+    existingRowFocusableCells: focusableCells,
+    tableData: getValues('values.lineItems') || [],
+    setColumnId,
+    setRowIndex,
+    addNewRow: () => append({}),
+    isNewRow: () => true,
+    onBlur: () => {
+      if (columnId === inboundColumns.QUANTITY) {
+        const currentValue = getValues(`values.lineItems.${rowIndex}.quantityRequested`);
+        setValue(`values.lineItems.${rowIndex}.quantityRequested`, parseInt(currentValue, 10) || 0);
+      }
+      trigger();
+    },
+  });
+
   const columns = useMemo(() => [
-    columnHelper.accessor('palletName', {
+    columnHelper.accessor(inboundColumns.PALLET_NAME, {
       header: () => (
         <TableHeaderCell style={{ justifyContent: 'center' }}>
           {translate('react.stockMovement.packLevel1.label', 'Pack Level 1')}
         </TableHeaderCell>
       ),
-      cell: ({ row }) => {
+      cell: ({ row, column }) => {
         const hasErrors = !!errors?.[row.index]?.palletName?.message;
         return (
           <TableCell
@@ -97,6 +172,19 @@ const useInboundAddItemsColumns = ({
               render={({ field }) => (
                 <TextInput
                   {...field}
+                  onKeyDown={(e) => handleKeyDown(e, row.index, column.id)}
+                  onBlur={() => handleBlur(
+                    field,
+                    `values.lineItems.${row.index}.boxName`,
+                  )}
+                  focusProps={{
+                    fieldIndex: row.index,
+                    fieldId: column.id,
+                    rowIndex,
+                    columnId,
+                  }}
+                  onWheel={(event) => event.currentTarget.blur()}
+                  autoComplete="off"
                 />
               )}
             />
@@ -107,17 +195,13 @@ const useInboundAddItemsColumns = ({
         flexWidth: 1,
       },
     }),
-    columnHelper.accessor('boxName', {
+    columnHelper.accessor(inboundColumns.BOX_NAME, {
       header: () => (
         <TableHeaderCell style={{ justifyContent: 'center' }}>
           {translate('react.stockMovement.packLevel2.label', 'Pack Level 2')}
         </TableHeaderCell>
       ),
-      cell: ({ row }) => {
-        const isBoxNameDisabled = !getValues(`values.lineItems.${row.index}.palletName`);
-        if (isBoxNameDisabled && getValues(`values.lineItems.${row.index}.boxName`) !== '') {
-          setValue(`values.lineItems.${row.index}.boxName`, '');
-        }
+      cell: ({ row, column }) => {
         const hasErrors = !!errors?.[row.index]?.boxName?.message;
         return (
           <TableCell
@@ -132,7 +216,21 @@ const useInboundAddItemsColumns = ({
               render={({ field }) => (
                 <TextInput
                   {...field}
-                  disabled={isBoxNameDisabled}
+                  onKeyDown={(e) => handleKeyDown(e, row.index, column.id)}
+                  onBlur={() => handleBlur(
+                    field,
+                    `values.lineItems.${row.index}.boxName`,
+                  )}
+                  focusProps={{
+                    fieldIndex: row.index,
+                    fieldId: column.id,
+                    rowIndex,
+                    columnId,
+                  }}
+                  hasErrors={hasErrors}
+                  showErrorBorder={hasErrors}
+                  onChange={(e) => setValue(`values.lineItems.${row.index}.boxName`, e.target.value ?? null)}
+                  autoComplete="off"
                 />
               )}
             />
@@ -143,13 +241,13 @@ const useInboundAddItemsColumns = ({
         flexWidth: 1,
       },
     }),
-    columnHelper.accessor('product', {
+    columnHelper.accessor(inboundColumns.PRODUCT, {
       header: () => (
         <TableHeaderCell required>
           {translate('react.stockMovement.product.label', 'Product')}
         </TableHeaderCell>
       ),
-      cell: ({ row }) => {
+      cell: ({ row, column }) => {
         const hasErrors = !!errors?.[row.index]?.product?.message;
         return (
           <TableCell
@@ -175,6 +273,17 @@ const useInboundAddItemsColumns = ({
                     field?.onChange(val);
                     trigger(`values.lineItems.${row.index}.quantityRequested`);
                   }}
+                  onKeyDown={(e) => handleKeyDown(e, row.index, column.id)}
+                  onBlur={() => handleBlur(
+                    field,
+                    null,
+                  )}
+                  focusProps={{
+                    fieldIndex: row.index,
+                    fieldId: column.id,
+                    rowIndex,
+                    columnId,
+                  }}
                   hasErrors={hasErrors}
                 />
               )}
@@ -186,13 +295,13 @@ const useInboundAddItemsColumns = ({
         flexWidth: 4,
       },
     }),
-    columnHelper.accessor('lotNumber', {
+    columnHelper.accessor(inboundColumns.LOT_NUMBER, {
       header: () => (
         <TableHeaderCell style={{ justifyContent: 'center' }}>
           {translate('react.stockMovement.lot.label', 'Lot')}
         </TableHeaderCell>
       ),
-      cell: ({ row }) => {
+      cell: ({ row, column }) => {
         const hasErrors = !!errors?.[row.index]?.lotNumber?.message;
         return (
           <TableCell
@@ -209,6 +318,19 @@ const useInboundAddItemsColumns = ({
                   {...field}
                   hasErrors={hasErrors}
                   showErrorBorder={hasErrors}
+                  onKeyDown={(e) => handleKeyDown(e, row.index, column.id)}
+                  onChange={(e) => setValue(`values.lineItems.${row.index}.lotNumber`, e.target.value ?? null)}
+                  onBlur={() => handleBlur(
+                    field,
+                    `values.lineItems.${row.index}.lotNumber`,
+                  )}
+                  focusProps={{
+                    fieldIndex: row.index,
+                    fieldId: column.id,
+                    rowIndex,
+                    columnId,
+                  }}
+                  autoComplete="off"
                 />
               )}
             />
@@ -219,13 +341,13 @@ const useInboundAddItemsColumns = ({
         flexWidth: 1,
       },
     }),
-    columnHelper.accessor('expirationDate', {
+    columnHelper.accessor(inboundColumns.EXPIRATION_DATE, {
       header: () => (
         <TableHeaderCell style={{ justifyContent: 'center' }}>
           {translate('react.stockMovement.expiry.label', 'Expiry')}
         </TableHeaderCell>
       ),
-      cell: ({ row }) => {
+      cell: ({ row, column }) => {
         const hasErrors = !!errors?.[row.index]?.expirationDate?.message;
         return (
           <TableCell
@@ -246,7 +368,18 @@ const useInboundAddItemsColumns = ({
                   }}
                   hasErrors={hasErrors}
                   showErrorBorder={hasErrors}
-                  placeholder="MM/DD/YYYY"
+                  customDateFormat={DateFormat.DD_MMM_YYYY}
+                  onKeyDown={(e) => handleKeyDown(e, row.index, column.id)}
+                  onBlur={() => handleBlur(
+                    field,
+                    null,
+                  )}
+                  focusProps={{
+                    fieldIndex: row.index,
+                    fieldId: column.id,
+                    rowIndex,
+                    columnId,
+                  }}
                 />
               )}
             />
@@ -257,13 +390,13 @@ const useInboundAddItemsColumns = ({
         flexWidth: 1.5,
       },
     }),
-    columnHelper.accessor('quantityRequested', {
+    columnHelper.accessor(inboundColumns.QUANTITY, {
       header: () => (
         <TableHeaderCell required style={{ justifyContent: 'center' }}>
           {translate('react.stockMovement.quantity.label', 'Quantity')}
         </TableHeaderCell>
       ),
-      cell: ({ row }) => {
+      cell: ({ row, column }) => {
         const hasErrors = !!errors?.[row.index]?.quantityRequested?.message;
         return (
           <TableCell
@@ -279,11 +412,25 @@ const useInboundAddItemsColumns = ({
                 <TextInput
                   {...field}
                   type="number"
+                  className="hide-arrows"
                   hasErrors={hasErrors}
                   showErrorBorder={hasErrors}
-                  onBlur={() => {
-                    field.onBlur();
-                    trigger(`values.lineItems.${row.index}.quantityRequested`);
+                  onChange={(e) => setValue(`values.lineItems.${row.index}.quantityRequested`, e ?? null)}
+                  onBlur={(e) => handleBlur(
+                    field,
+                    `values.lineItems.${row.index}.quantityRequested`,
+                    () => {
+                      const parsedValue = e.target.value
+                        ? (parseInt(e.target.value, 10) || 0) : e.target.value;
+                      setValue(`values.lineItems.${row.index}.quantityRequested`, parsedValue);
+                    },
+                  )}
+                  onKeyDown={(e) => handleKeyDown(e, row.index, column.id)}
+                  focusProps={{
+                    fieldIndex: row.index,
+                    fieldId: column.id,
+                    rowIndex,
+                    columnId,
                   }}
                 />
               )}
@@ -295,13 +442,13 @@ const useInboundAddItemsColumns = ({
         flexWidth: 1,
       },
     }),
-    columnHelper.accessor('recipient', {
+    columnHelper.accessor(inboundColumns.RECIPIENTS, {
       header: () => (
         <TableHeaderCell style={{ justifyContent: 'center' }}>
           {translate('react.stockMovement.recipient.label', 'Recipient')}
         </TableHeaderCell>
       ),
-      cell: ({ row }) => {
+      cell: ({ row, column }) => {
         const hasErrors = !!errors?.[row.index]?.recipient?.message;
         return (
           <TableCell
@@ -315,14 +462,26 @@ const useInboundAddItemsColumns = ({
               control={control}
               render={({ field }) => (
                 <SelectField
+                  async
                   {...field}
-                  options={users}
+                  loadOptions={debouncedUsersFetch}
                   hasErrors={hasErrors}
                   placeholder={getCustomSelectErrorPlaceholder({
                     id: 'react.stockMovement.recipient.label',
                     defaultMessage: 'Recipient',
                     displayIcon: hasErrors,
                   })}
+                  onKeyDown={(e) => handleKeyDown(e, row.index, column.id)}
+                  onBlur={() => handleBlur(
+                    field,
+                    null,
+                  )}
+                  focusProps={{
+                    fieldIndex: row.index,
+                    fieldId: column.id,
+                    rowIndex,
+                    columnId,
+                  }}
                 />
               )}
             />
@@ -334,7 +493,7 @@ const useInboundAddItemsColumns = ({
       },
     }),
     columnHelper.display({
-      id: 'delete',
+      id: inboundColumns.DELETE,
       header: () => (
         <TableHeaderCell style={{ justifyContent: 'center' }}>
           {translate('react.default.button.delete.label', 'Delete')}
@@ -362,6 +521,8 @@ const useInboundAddItemsColumns = ({
     minSearchLength,
     users,
     locale,
+    rowIndex,
+    columnId,
   ]);
 
   return { columns };
@@ -381,4 +542,5 @@ useInboundAddItemsColumns.propTypes = {
   currentLineItems: PropTypes.arrayOf(
     PropTypes.shape({}),
   ).isRequired,
+  append: PropTypes.func.isRequired,
 };

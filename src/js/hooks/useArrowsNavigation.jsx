@@ -73,8 +73,8 @@ const useArrowsNavigation = ({
       if (rowIndex > 0 && (isInArray || isNewRow(tableData[rowIndex - 1]))) {
         setRowIndex(rowIndex - 1);
         setColumnId(columnId);
+        onBlur();
       }
-      onBlur();
       e.preventDefault();
       e.stopPropagation();
     }
@@ -83,8 +83,8 @@ const useArrowsNavigation = ({
       if (rowIndex < tableData.length - 1) {
         setRowIndex(rowIndex + 1);
         setColumnId(columnId);
+        onBlur();
       }
-      onBlur();
       e.preventDefault();
       e.stopPropagation();
     }

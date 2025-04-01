@@ -25,6 +25,8 @@ const InboundV2AddItems = ({
   removeAll,
   saveAndExit,
   previousPage,
+  refreshFocusCounter,
+  resetFocus,
 }) => {
   const hasErrors = !!Object.keys(errors).length;
   const {
@@ -59,6 +61,8 @@ const InboundV2AddItems = ({
     updateTotalCount,
     removeAll,
     currentLineItems,
+    append,
+    refreshFocusCounter,
   });
 
   const defaultTableRow = {
@@ -82,6 +86,7 @@ const InboundV2AddItems = ({
     };
     append(newRow);
     resetScrollbar();
+    resetFocus();
   };
 
   return (
@@ -173,4 +178,6 @@ InboundV2AddItems.propTypes = {
   removeAll: PropTypes.func.isRequired,
   saveAndExit: PropTypes.func.isRequired,
   previousPage: PropTypes.func.isRequired,
+  refreshFocusCounter: PropTypes.number.isRequired,
+  resetFocus: PropTypes.func.isRequired,
 };
