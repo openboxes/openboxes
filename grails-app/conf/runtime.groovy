@@ -65,7 +65,7 @@ openboxes.purchasing.updateUnitPrice.method = UpdateUnitPriceMethodCode.USER_DEF
 openboxes.browser.connection.status.timeout = 8000
 
 // Date configuration (OBPIH-5397)
-openboxes.display.date.format = Constants.DISPLAY_DATE_FORMAT
+openboxes.display.date.format = Constants.JS_DISPLAY_DATE_FORMAT
 openboxes.display.date.defaultValue = Constants.DISPLAY_DATE_DEFAULT_VALUE
 
 // OBPIH-5847
