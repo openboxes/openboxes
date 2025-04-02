@@ -42,7 +42,7 @@
     height: 100%;
 
     .inbound-bin {
-      @include set-size(20px, 20px);
+      @include set-size(18px, 18px);
       color: var(--color-red);
       cursor: pointer;
 
@@ -59,6 +59,11 @@
   width: 100%;
   display: flex;
   justify-content: space-between;
+}
+
+.short-input {
+  height: 26px;
+  padding: 4px 8px;
 }
 
 /* Chrome, Safari, Edge, Opera */

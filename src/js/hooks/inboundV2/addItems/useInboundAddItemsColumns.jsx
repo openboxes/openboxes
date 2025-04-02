@@ -8,7 +8,7 @@ import React, {
 import { createColumnHelper } from '@tanstack/react-table';
 import PropTypes from 'prop-types';
 import { Controller } from 'react-hook-form';
-import { RiDeleteBinLine, RiErrorWarningLine } from 'react-icons/ri';
+import { RiDeleteBinLine } from 'react-icons/ri';
 import { useSelector } from 'react-redux';
 
 import { TableCell } from 'components/DataTable';
@@ -22,7 +22,6 @@ import { DateFormat } from 'consts/timeFormat';
 import useArrowsNavigation from 'hooks/useArrowsNavigation';
 import useTranslate from 'hooks/useTranslate';
 import { debounceProductsFetch, debounceUsersFetch } from 'utils/option-utils';
-import Translate from 'utils/Translate';
 
 const useInboundAddItemsColumns = ({
   errors,
@@ -85,22 +84,6 @@ const useInboundAddItemsColumns = ({
     [debounceTime, minSearchLength],
   );
 
-  const getCustomSelectErrorPlaceholder = ({
-    id,
-    defaultMessage,
-    displayIcon,
-  }) => (
-    <div className="custom-select-error-placeholder">
-      {displayIcon && <RiErrorWarningLine />}
-      <span>
-        <Translate
-          id={id}
-          defaultMessage={defaultMessage}
-        />
-      </span>
-    </div>
-  );
-
   const handleDelete = async (row) => {
     if (currentLineItems.find((item) => item.id === row?.original?.itemId)) {
       await removeItem(row?.original?.itemId);
@@ -144,7 +127,10 @@ const useInboundAddItemsColumns = ({
     onBlur: () => {
       if (columnId === inboundColumns.QUANTITY) {
         const currentValue = getValues(`values.lineItems.${rowIndex}.quantityRequested`);
-        setValue(`values.lineItems.${rowIndex}.quantityRequested`, parseInt(currentValue, 10) || 0);
+        setValue(
+          `values.lineItems.${rowIndex}.quantityRequested`,
+          currentValue ? parseInt(currentValue, 10) || currentValue : undefined,
+        );
       }
       trigger();
     },
@@ -161,7 +147,7 @@ const useInboundAddItemsColumns = ({
         const hasErrors = !!errors?.[row.index]?.palletName?.message;
         return (
           <TableCell
-            className="rt-td"
+            className="rt-td rt-td-xs"
             tooltip={hasErrors}
             tooltipForm
             tooltipLabel={hasErrors && errors[row.index].palletName.message}
@@ -183,6 +169,7 @@ const useInboundAddItemsColumns = ({
                     rowIndex,
                     columnId,
                   }}
+                  className="short-input"
                   onWheel={(event) => event.currentTarget.blur()}
                   autoComplete="off"
                 />
@@ -205,7 +192,7 @@ const useInboundAddItemsColumns = ({
         const hasErrors = !!errors?.[row.index]?.boxName?.message;
         return (
           <TableCell
-            className="rt-td"
+            className="rt-td rt-td-xs"
             tooltip={hasErrors}
             tooltipForm
             tooltipLabel={hasErrors && errors[row.index].boxName.message}
@@ -229,6 +216,7 @@ const useInboundAddItemsColumns = ({
                   }}
                   hasErrors={hasErrors}
                   showErrorBorder={hasErrors}
+                  className="short-input"
                   onChange={(e) => setValue(`values.lineItems.${row.index}.boxName`, e.target.value ?? null)}
                   autoComplete="off"
                 />
@@ -251,7 +239,7 @@ const useInboundAddItemsColumns = ({
         const hasErrors = !!errors?.[row.index]?.product?.message;
         return (
           <TableCell
-            className="rt-td"
+            className="rt-td rt-td-xs"
             tooltip={getValues(`values.lineItems.${row.index}.product.label`) || hasErrors}
             tooltipForm
             tooltipLabel={hasErrors ? errors[row.index].product.message : getValues(`values.lineItems.${row.index}.product.label`)}
@@ -264,11 +252,6 @@ const useInboundAddItemsColumns = ({
                   {...field}
                   async
                   loadOptions={debouncedProductsFetch}
-                  placeholder={getCustomSelectErrorPlaceholder({
-                    id: 'react.stockMovement.product.label',
-                    defaultMessage: 'Product',
-                    displayIcon: hasErrors,
-                  })}
                   onChange={(val) => {
                     field?.onChange(val);
                     trigger(`values.lineItems.${row.index}.quantityRequested`);
@@ -278,6 +261,7 @@ const useInboundAddItemsColumns = ({
                     field,
                     null,
                   )}
+                  className="select-xs"
                   focusProps={{
                     fieldIndex: row.index,
                     fieldId: column.id,
@@ -305,7 +289,7 @@ const useInboundAddItemsColumns = ({
         const hasErrors = !!errors?.[row.index]?.lotNumber?.message;
         return (
           <TableCell
-            className="rt-td"
+            className="rt-td rt-td-xs"
             tooltip={hasErrors}
             tooltipForm
             tooltipLabel={hasErrors && errors[row.index].lotNumber.message}
@@ -324,6 +308,7 @@ const useInboundAddItemsColumns = ({
                     field,
                     `values.lineItems.${row.index}.lotNumber`,
                   )}
+                  className="short-input"
                   focusProps={{
                     fieldIndex: row.index,
                     fieldId: column.id,
@@ -351,7 +336,7 @@ const useInboundAddItemsColumns = ({
         const hasErrors = !!errors?.[row.index]?.expirationDate?.message;
         return (
           <TableCell
-            className="rt-td"
+            className="rt-td rt-td-xs"
             tooltip={hasErrors}
             tooltipForm
             tooltipLabel={hasErrors && errors[row.index].expirationDate.message}
@@ -374,6 +359,7 @@ const useInboundAddItemsColumns = ({
                     field,
                     null,
                   )}
+                  className="short-input"
                   focusProps={{
                     fieldIndex: row.index,
                     fieldId: column.id,
@@ -400,7 +386,7 @@ const useInboundAddItemsColumns = ({
         const hasErrors = !!errors?.[row.index]?.quantityRequested?.message;
         return (
           <TableCell
-            className="rt-td"
+            className="rt-td rt-td-xs"
             tooltip={hasErrors}
             tooltipForm
             tooltipLabel={hasErrors && errors[row.index].quantityRequested.message}
@@ -412,10 +398,10 @@ const useInboundAddItemsColumns = ({
                 <TextInput
                   {...field}
                   type="number"
-                  className="hide-arrows"
+                  className="hide-arrows short-input"
                   hasErrors={hasErrors}
                   showErrorBorder={hasErrors}
-                  onChange={(e) => setValue(`values.lineItems.${row.index}.quantityRequested`, e ?? null)}
+                  onChange={(e) => setValue(`values.lineItems.${row.index}.quantityRequested`, e ?? undefined)}
                   onBlur={(e) => handleBlur(
                     field,
                     `values.lineItems.${row.index}.quantityRequested`,
@@ -452,7 +438,7 @@ const useInboundAddItemsColumns = ({
         const hasErrors = !!errors?.[row.index]?.recipient?.message;
         return (
           <TableCell
-            className="rt-td"
+            className="rt-td rt-td-xs"
             tooltip={hasErrors}
             tooltipForm
             tooltipLabel={hasErrors && errors[row.index].recipient.message}
@@ -466,16 +452,12 @@ const useInboundAddItemsColumns = ({
                   {...field}
                   loadOptions={debouncedUsersFetch}
                   hasErrors={hasErrors}
-                  placeholder={getCustomSelectErrorPlaceholder({
-                    id: 'react.stockMovement.recipient.label',
-                    defaultMessage: 'Recipient',
-                    displayIcon: hasErrors,
-                  })}
                   onKeyDown={(e) => handleKeyDown(e, row.index, column.id)}
                   onBlur={() => handleBlur(
                     field,
                     null,
                   )}
+                  className="select-xs"
                   focusProps={{
                     fieldIndex: row.index,
                     fieldId: column.id,
@@ -500,7 +482,7 @@ const useInboundAddItemsColumns = ({
         </TableHeaderCell>
       ),
       cell: ({ row }) => (
-        <TableCell className="rt-td">
+        <TableCell className="rt-td rt-td-xs">
           <div className="bin-container">
             <RiDeleteBinLine
               className="inbound-bin"

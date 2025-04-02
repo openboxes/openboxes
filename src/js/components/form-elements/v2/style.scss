@@ -159,6 +159,34 @@ input, .date-field-input {
 // SELECT FIELD
 
 .select-wrapper-container {
+  .select-xs {
+    .react-select__control {
+      height: 26px !important;
+      min-height: 26px !important;
+      padding: 0;
+
+      .react-select__value-container {
+        height: 100%;
+        padding: 0 8px;
+        font-size: 12px;
+      }
+
+      &.react-select__control--is-focused {
+        outline: 0;
+        border: 1px solid var(--blue-primary) !important;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(104, 113, 130, 0.16), 0 0 0 4px rgba(34, 100, 229, 0.15) !important;
+      }
+
+      .react-select__indicators {
+        height: 100%;
+
+        svg {
+          height: 16px;
+          width: 16px;
+        }
+      }
+    }
+  }
 
   div:nth-child(2) > div:first-child {
     width: 100%;
