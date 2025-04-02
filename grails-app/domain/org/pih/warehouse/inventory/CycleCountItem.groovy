@@ -96,9 +96,10 @@ class CycleCountItem implements Comparable {
     int compareTo(Object that) {
         int diff = inventoryItem?.expirationDate <=> that.inventoryItem?.expirationDate
                 ?: location?.name <=> that.location?.name
-        if (diff == 0) {
-            return -1
-        }
+                    // This id comparison is required due to a quirk in SortedSet (CycleCount has a SortedSet of
+                    // CycleCountItem) where it uses compareTo as an equals method when adding/removing from the set,
+                    // and so we need to make sure this always resolves to a unique value for each item. (OBPIH-7128)
+                    ?: id <=> that.id
         return diff
     }
 }
