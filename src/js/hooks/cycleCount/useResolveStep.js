@@ -21,6 +21,7 @@ import { TO_RESOLVE_TAB } from 'consts/cycleCount';
 import { DateFormat } from 'consts/timeFormat';
 import useResolveStepValidation from 'hooks/cycleCount/useResolveStepValidation';
 import useSpinner from 'hooks/useSpinner';
+import confirmationModal from 'utils/confirmationModalUtils';
 import trimLotNumberSpaces from 'utils/cycleCountUtils';
 import dateWithoutTimeZone from 'utils/dateUtils';
 import exportFileFromApi from 'utils/file-download-util';
@@ -417,21 +418,70 @@ const useResolveStep = () => {
     quantityCounted: cycleCountItem?.quantityRecounted,
   });
 
+  const modalLabels = (outdatedProductsCount) => ({
+    title: {
+      label: 'react.cycleCount.modal.reviewProductsTitle.label',
+      default: `${outdatedProductsCount} products have been updated`,
+      data: {
+        outdatedProductsCount,
+      },
+    },
+    content: {
+      label: 'react.cycleCount.modal.reviewProductsContent.label',
+      default: `The inventory of ${outdatedProductsCount} products have been updated while you were working. Please review the changes and adjust your entries as needed.`,
+      data: {
+        outdatedProductsCount,
+      },
+    },
+  });
+
+  const reviewProductsModalButtons = (onClose) => ([
+    {
+      variant: 'primary',
+      defaultLabel: 'Review Products',
+      label: 'react.cycleCount.modal.reviewProducts.label',
+      onClick: async () => {
+        setIsSaveDisabled(false);
+        setIsStepEditable(true);
+        await refreshCountItems();
+        onClose?.();
+      },
+    },
+  ]);
+
+  const openReviewProductsModal = (outdatedProductsCount) => {
+    confirmationModal({
+      buttons: reviewProductsModalButtons,
+      ...modalLabels(outdatedProductsCount),
+      hideCloseButton: false,
+      closeOnClickOutside: false,
+    });
+  };
+
   const submitRecount = async () => {
+    let outdatedProducts = 0;
     try {
       show();
       await save();
       for (const cycleCount of tableData.current) {
-        await cycleCountApi.submitRecount({
-          refreshQuantityOnHand: true,
-          failOnOutdatedQuantity: true,
-          requireRecountOnDiscrepancy: false,
-          cycleCountItems: cycleCount?.cycleCountItems?.map(
-            (item) => mapItemToSubmitRecountPayload(item),
-          ),
-        },
-        currentLocation?.id,
-        cycleCount?.id);
+        try {
+          await cycleCountApi.submitRecount({
+            refreshQuantityOnHand: true,
+            failOnOutdatedQuantity: true,
+            requireRecountOnDiscrepancy: false,
+            cycleCountItems: cycleCount?.cycleCountItems?.map(
+              (item) => mapItemToSubmitRecountPayload(item),
+            ),
+          },
+          currentLocation?.id,
+          cycleCount?.id);
+        } catch {
+          outdatedProducts += 1;
+        }
+      }
+      if (outdatedProducts > 0) {
+        openReviewProductsModal(outdatedProducts);
+        return;
       }
       history.push(CYCLE_COUNT.list(TO_RESOLVE_TAB));
     } finally {
