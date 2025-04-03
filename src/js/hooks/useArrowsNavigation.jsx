@@ -96,6 +96,11 @@ const useArrowsNavigation = ({
           setValue(`values.lineItems.${nextRowIndex}.${columnId}`, currentValue);
         }
         onBlur();
+        // We add e.preventDefault(), e.stopPropagation and return here
+        // to stop further event propagation, as the next condition below
+        // might also be met and add another row unintentionally
+        e.preventDefault();
+        e.stopPropagation();
       }
 
       if (!ctrlKey && isLastRow && isLastColumn && getValues && setValue) {
@@ -103,9 +108,6 @@ const useArrowsNavigation = ({
         setRowIndex(rowIndex + 1);
         setColumnId(newRowFocusableCells[0]);
         onBlur();
-        // We add e.preventDefault(), e.stopPropagation and return here
-        // to stop further event propagation, as the next condition below
-        // might also be met and add another row unintentionally
         e.preventDefault();
         e.stopPropagation();
         return;

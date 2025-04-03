@@ -399,6 +399,7 @@ const useInboundAddItemsColumns = ({
                       const parsedValue = e.target.value
                         ? (parseInt(e.target.value, 10) || 0) : e.target.value;
                       setValue(`values.lineItems.${row.index}.quantityRequested`, parsedValue);
+                      trigger(`values.lineItems.${row.index}.quantityRequested`);
                     },
                   )}
                   onKeyDown={(e) => handleKeyDown(e, row.index, column.id)}
