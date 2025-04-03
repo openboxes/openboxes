@@ -40,7 +40,6 @@ const useInboundAddItemsColumns = ({
   // If prevForceResetFocus is different from refreshFocusCounter,
   // it triggers a reset of rowIndex and columnId.
   const [prevForceResetFocus, setPrevForceResetFocus] = useState(0);
-
   useEffect(() => {
     if (refreshFocusCounter !== prevForceResetFocus) {
       setRowIndex(null);
@@ -114,7 +113,7 @@ const useInboundAddItemsColumns = ({
     inboundColumns.LOT_NUMBER,
     inboundColumns.EXPIRATION_DATE,
     inboundColumns.QUANTITY_REQUESTED,
-    inboundColumns.RECIPIENTS,
+    inboundColumns.RECIPIENT,
   ];
 
   const { handleKeyDown } = useArrowsNavigation({
@@ -125,12 +124,14 @@ const useInboundAddItemsColumns = ({
     setRowIndex,
     addNewRow: () => append({}),
     isNewRow: () => true,
+    getValues,
+    setValue,
     onBlur: () => {
       if (columnId === inboundColumns.QUANTITY_REQUESTED) {
         const currentValue = getValues(`values.lineItems.${rowIndex}.quantityRequested`);
         setValue(
           `values.lineItems.${rowIndex}.quantityRequested`,
-          currentValue ? parseInt(currentValue, 10) || currentValue : undefined,
+          currentValue ? parseInt(currentValue, 10) || currentValue : null,
         );
       }
       trigger();
@@ -417,7 +418,7 @@ const useInboundAddItemsColumns = ({
         flexWidth: 1,
       },
     }),
-    columnHelper.accessor(inboundColumns.RECIPIENTS, {
+    columnHelper.accessor(inboundColumns.RECIPIENT, {
       header: () => (
         <TableHeaderCell style={{ justifyContent: 'center' }}>
           {translate('react.stockMovement.recipient.label', 'Recipient')}

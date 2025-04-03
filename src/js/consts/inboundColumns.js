@@ -5,7 +5,7 @@ const columns = {
   LOT_NUMBER: 'lotNumber',
   EXPIRATION_DATE: 'expirationDate',
   QUANTITY_REQUESTED: 'quantityRequested',
-  RECIPIENTS: 'recipients',
+  RECIPIENT: 'recipient',
   DELETE: 'delete',
 };
 
