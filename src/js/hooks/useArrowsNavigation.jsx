@@ -103,6 +103,7 @@ const useArrowsNavigation = ({
         // might also be met and add another row unintentionally
         e.preventDefault();
         e.stopPropagation();
+        return;
       }
 
       if (!ctrlKey && isLastRow && isLastColumn && getValues && setValue) {
