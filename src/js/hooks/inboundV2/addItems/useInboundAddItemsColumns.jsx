@@ -18,7 +18,6 @@ import SelectField from 'components/form-elements/v2/SelectField';
 import TextInput from 'components/form-elements/v2/TextInput';
 import inboundColumns from 'consts/inboundColumns';
 import StockMovementDirection from 'consts/StockMovementDirection';
-import { DateFormat } from 'consts/timeFormat';
 import useArrowsNavigation from 'hooks/useArrowsNavigation';
 import useTranslate from 'hooks/useTranslate';
 import { debounceProductsFetch, debounceUsersFetch } from 'utils/option-utils';
@@ -165,6 +164,7 @@ const useInboundAddItemsColumns = ({
                     field,
                     `values.lineItems.${row.index}.boxName`,
                   )}
+                  onChange={(e) => setValue(`values.lineItems.${row.index}.palletName`, e.target.value ?? null)}
                   focusProps={{
                     fieldIndex: row.index,
                     fieldId: column.id,
@@ -346,7 +346,6 @@ const useInboundAddItemsColumns = ({
                   }}
                   hasErrors={hasErrors}
                   showErrorBorder={hasErrors}
-                  customDateFormat={DateFormat.DD_MMM_YYYY}
                   onKeyDown={(e) => handleKeyDown(e, row.index, column.id)}
                   onBlur={() => handleBlur(field)}
                   className="input-xs"

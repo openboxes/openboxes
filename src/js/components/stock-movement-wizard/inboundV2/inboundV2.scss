@@ -7,6 +7,12 @@
   .rt-tbody {
     max-height: 400px;
 
+    .input-xs {
+      height: 26px;
+      padding: 4px 8px;
+      font-size: 14px;
+    }
+
     &::-webkit-scrollbar {
       width: 0.5em;
       height: 0.5em;
@@ -73,12 +79,6 @@
   width: 100%;
   display: flex;
   justify-content: space-between;
-}
-
-.input-xs {
-  height: 26px;
-  padding: 4px 8px;
-  font-size: 14px;
 }
 
 /* Chrome, Safari, Edge, Opera */
