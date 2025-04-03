@@ -67,7 +67,6 @@ const useArrowsNavigation = ({
 
   const handleKeyDown = (e, rowIndex, columnId) => {
     const { key } = e;
-
     if (key === navigationKey.ARROW_UP) {
       const isInArray = existingRowFocusableCells.includes(columnId);
       if (rowIndex > 0 && (isInArray || isNewRow(tableData[rowIndex - 1]))) {

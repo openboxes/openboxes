@@ -130,7 +130,6 @@ const InboundV2AddItems = ({
           <DataTable
             columns={columns}
             data={fields}
-            defaultPageSize={4}
             loading={loading}
             disablePagination
             emptyTableMessage={{
