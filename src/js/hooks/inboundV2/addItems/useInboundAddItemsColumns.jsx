@@ -126,16 +126,7 @@ const useInboundAddItemsColumns = ({
     isNewRow: () => true,
     getValues,
     setValue,
-    onBlur: () => {
-      if (columnId === inboundColumns.QUANTITY_REQUESTED) {
-        const currentValue = getValues(`values.lineItems.${rowIndex}.quantityRequested`);
-        setValue(
-          `values.lineItems.${rowIndex}.quantityRequested`,
-          currentValue ? parseInt(currentValue, 10) || currentValue : null,
-        );
-      }
-      trigger();
-    },
+    onBlur: () => {},
   });
 
   const columns = useMemo(() => [
@@ -396,9 +387,7 @@ const useInboundAddItemsColumns = ({
                     field,
                     null,
                     () => {
-                      const parsedValue = e.target.value
-                        ? (parseInt(e.target.value, 10) || 0) : e.target.value;
-                      setValue(`values.lineItems.${row.index}.quantityRequested`, parsedValue);
+                      setValue(`values.lineItems.${row.index}.quantityRequested`, e.target.value);
                       trigger(`values.lineItems.${row.index}.quantityRequested`);
                     },
                   )}
