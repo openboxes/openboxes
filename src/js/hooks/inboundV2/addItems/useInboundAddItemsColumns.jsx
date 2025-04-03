@@ -387,7 +387,9 @@ const useInboundAddItemsColumns = ({
                     field,
                     null,
                     () => {
-                      setValue(`values.lineItems.${row.index}.quantityRequested`, e.target.value);
+                      const parsedValue = e.target.value
+                        ? (parseInt(e.target.value, 10) || 0) : e.target.value;
+                      setValue(`values.lineItems.${row.index}.quantityRequested`, parsedValue);
                       trigger(`values.lineItems.${row.index}.quantityRequested`);
                     },
                   )}
