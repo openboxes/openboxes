@@ -86,6 +86,8 @@ const useArrowsNavigation = ({
       const isLastColumn = columnId
         === existingRowFocusableCells[existingRowFocusableCells.length - 1];
 
+      // Here we check getValues and setValue because in cycleCount I haven't implemented it yet.
+      // It's a safeguard to ensure they are available before using them
       if (ctrlKey && !isLastRow && getValues && setValue) {
         const currentValue = getValues(`values.lineItems.${rowIndex}.${columnId}`);
         const nextRowIndex = rowIndex + 1;
