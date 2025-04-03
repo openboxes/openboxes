@@ -126,7 +126,7 @@ const useInboundAddItemsColumns = ({
     isNewRow: () => true,
     getValues,
     setValue,
-    onBlur: () => {},
+    onBlur: () => trigger(),
   });
 
   const columns = useMemo(() => [
