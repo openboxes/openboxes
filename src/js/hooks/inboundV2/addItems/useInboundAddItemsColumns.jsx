@@ -97,12 +97,12 @@ const useInboundAddItemsColumns = ({
       setColumnId(null);
     }
 
-    if (fieldName) {
-      trigger(fieldName);
-    }
-
     if (customLogic) {
       customLogic();
+    }
+
+    if (fieldName) {
+      trigger(fieldName);
     }
   };
 
