@@ -67,6 +67,32 @@ const useArrowsNavigation = ({
     return { newColumnId, newRowIndex };
   };
 
+  const handleCtrlArrowDown = (rowIndex, columnId) => {
+    const currentValue = getValues(`values.lineItems.${rowIndex}.${columnId}`);
+    const nextRowIndex = rowIndex + 1;
+
+    setRowIndex(nextRowIndex);
+    setColumnId(columnId);
+
+    if (currentValue !== '' && currentValue !== undefined && currentValue !== null) {
+      setValue(`values.lineItems.${nextRowIndex}.${columnId}`, currentValue);
+    }
+    onBlur();
+  };
+
+  const handleArrowDownAtLastRowAndColumn = (rowIndex) => {
+    addNewRow();
+    setRowIndex(rowIndex + 1);
+    setColumnId(newRowFocusableCells[0]);
+    onBlur();
+  };
+
+  const handleArrowDown = (rowIndex, columnId) => {
+    setRowIndex(rowIndex + 1);
+    setColumnId(columnId);
+    onBlur();
+  };
+
   const handleKeyDown = (e, rowIndex, columnId) => {
     const { key, ctrlKey } = e;
 
@@ -86,50 +112,30 @@ const useArrowsNavigation = ({
       const isLastColumn = columnId
         === existingRowFocusableCells[existingRowFocusableCells.length - 1];
 
-      // Here we check getValues and setValue because in cycleCount I haven't implemented it yet.
-      // It's a safeguard to ensure they are available before using them
       if (ctrlKey && !isLastRow && getValues && setValue) {
-        const currentValue = getValues(`values.lineItems.${rowIndex}.${columnId}`);
-        const nextRowIndex = rowIndex + 1;
-        setRowIndex(nextRowIndex);
-        setColumnId(columnId);
-        // Only copy the value if it's not empty/undefined/null
-        if (currentValue !== '' && currentValue !== undefined && currentValue !== null) {
-          setValue(`values.lineItems.${nextRowIndex}.${columnId}`, currentValue);
-        }
-        onBlur();
-        // We add e.preventDefault(), e.stopPropagation and return here
-        // to stop further event propagation, as the next condition below
-        // might also be met and add another row unintentionally
+        handleCtrlArrowDown(rowIndex, columnId);
         e.preventDefault();
         e.stopPropagation();
         return;
       }
 
-      if (!ctrlKey && isLastRow && isLastColumn && getValues && setValue) {
-        addNewRow();
-        setRowIndex(rowIndex + 1);
-        setColumnId(newRowFocusableCells[0]);
-        onBlur();
+      if (isLastRow && isLastColumn) {
+        handleArrowDownAtLastRowAndColumn(rowIndex);
         e.preventDefault();
         e.stopPropagation();
         return;
-      }
-      if (!ctrlKey && isLastRow && isLastColumn) {
-        addNewRow();
-        setRowIndex(rowIndex + 1);
-        setColumnId(newRowFocusableCells[0]);
-        onBlur();
       }
 
       if (!isLastRow) {
-        setRowIndex(rowIndex + 1);
-        setColumnId(columnId);
-        onBlur();
+        handleArrowDown(rowIndex, columnId);
+        e.preventDefault();
+        e.stopPropagation();
+        return;
       }
 
       e.preventDefault();
       e.stopPropagation();
+      return;
     }
 
     if (key === navigationKey.ARROW_RIGHT) {
