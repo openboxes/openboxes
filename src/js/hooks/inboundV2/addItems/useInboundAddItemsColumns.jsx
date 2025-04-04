@@ -81,13 +81,14 @@ const useInboundAddItemsColumns = ({
 
   const handleHeaderRecipientChange = (selectedRecipient) => {
     setHeaderRecipient(selectedRecipient);
-    if (!selectedRecipient) return;
+    if (!selectedRecipient) {
+      return;
+    }
 
     const lineItems = getValues('values.lineItems');
 
     _.forEach(lineItems, (item, index) => {
       setValue(`values.lineItems.${index}.recipient`, selectedRecipient);
-      trigger(`values.lineItems.${index}.recipient`);
     });
   };
 
