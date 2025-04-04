@@ -103,7 +103,7 @@ const useInboundAddItemsColumns = ({
         const hasErrors = !!errors?.[row.index]?.palletName?.message;
         return (
           <TableCell
-            className="rt-td rt-td-xs"
+            className="rt-td rt-td-add-items"
             tooltip={hasErrors}
             tooltipForm
             tooltipLabel={hasErrors && errors[row.index].palletName.message}
@@ -139,7 +139,7 @@ const useInboundAddItemsColumns = ({
         const hasErrors = !!errors?.[row.index]?.boxName?.message;
         return (
           <TableCell
-            className="rt-td rt-td-xs"
+            className="rt-td rt-td-add-items"
             tooltip={hasErrors}
             tooltipForm
             tooltipLabel={hasErrors && errors[row.index].boxName.message}
@@ -172,7 +172,7 @@ const useInboundAddItemsColumns = ({
         const hasErrors = !!errors?.[row.index]?.product?.message;
         return (
           <TableCell
-            className="rt-td rt-td-xs"
+            className="rt-td rt-td-add-items"
             tooltip={getValues(`values.lineItems.${row.index}.product.label`) || hasErrors}
             tooltipForm
             tooltipLabel={hasErrors ? errors[row.index].product.message : getValues(`values.lineItems.${row.index}.product.label`)}
@@ -216,7 +216,7 @@ const useInboundAddItemsColumns = ({
         const hasErrors = !!errors?.[row.index]?.lotNumber?.message;
         return (
           <TableCell
-            className="rt-td rt-td-xs"
+            className="rt-td rt-td-add-items"
             tooltip={hasErrors}
             tooltipForm
             tooltipLabel={hasErrors && errors[row.index].lotNumber.message}
@@ -250,7 +250,7 @@ const useInboundAddItemsColumns = ({
         const hasErrors = !!errors?.[row.index]?.expirationDate?.message;
         return (
           <TableCell
-            className="rt-td rt-td-xs"
+            className="rt-td rt-td-add-items"
             tooltip={hasErrors}
             tooltipForm
             tooltipLabel={hasErrors && errors[row.index].expirationDate.message}
@@ -289,7 +289,7 @@ const useInboundAddItemsColumns = ({
         const hasErrors = !!errors?.[row.index]?.quantityRequested?.message;
         return (
           <TableCell
-            className="rt-td rt-td-xs"
+            className="rt-td rt-td-add-items"
             tooltip={hasErrors}
             tooltipForm
             tooltipLabel={hasErrors && errors[row.index].quantityRequested.message}
@@ -334,7 +334,7 @@ const useInboundAddItemsColumns = ({
         const hasErrors = !!errors?.[row.index]?.recipient?.message;
         return (
           <TableCell
-            className="rt-td rt-td-xs"
+            className="rt-td rt-td-add-items"
             tooltip={hasErrors}
             tooltipForm
             tooltipLabel={hasErrors && errors[row.index].recipient.message}
@@ -371,7 +371,7 @@ const useInboundAddItemsColumns = ({
         </TableHeaderCell>
       ),
       cell: ({ row }) => (
-        <TableCell className="rt-td rt-td-xs">
+        <TableCell className="rt-td rt-td-add-items">
           <div className="bin-container">
             <RiDeleteBinLine
               className="inbound-bin"
