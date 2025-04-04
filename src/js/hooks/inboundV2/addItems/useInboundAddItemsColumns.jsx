@@ -1,6 +1,7 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 
 import { createColumnHelper } from '@tanstack/react-table';
+import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { Controller } from 'react-hook-form';
 import { RiDeleteBinLine, RiErrorWarningLine } from 'react-icons/ri';
@@ -27,6 +28,8 @@ const useInboundAddItemsColumns = ({
   updateTotalCount,
   currentLineItems,
 }) => {
+  const [headerRecipient, setHeaderRecipient] = useState(null);
+
   const columnHelper = createColumnHelper();
   const translate = useTranslate();
 
@@ -51,6 +54,7 @@ const useInboundAddItemsColumns = ({
     false,
     StockMovementDirection.INBOUND,
   );
+
   const getCustomSelectErrorPlaceholder = ({
     id,
     defaultMessage,
@@ -75,10 +79,22 @@ const useInboundAddItemsColumns = ({
     remove(row.index);
   };
 
+  const handleHeaderRecipientChange = (selectedRecipient) => {
+    setHeaderRecipient(selectedRecipient);
+    if (!selectedRecipient) return;
+
+    const lineItems = getValues('values.lineItems');
+
+    _.forEach(lineItems, (item, index) => {
+      setValue(`values.lineItems.${index}.recipient`, selectedRecipient);
+      trigger(`values.lineItems.${index}.recipient`);
+    });
+  };
+
   const columns = useMemo(() => [
     columnHelper.accessor('palletName', {
       header: () => (
-        <TableHeaderCell style={{ justifyContent: 'center' }}>
+        <TableHeaderCell className="justify-content-center rt-th-add-items">
           {translate('react.stockMovement.packLevel1.label', 'Pack Level 1')}
         </TableHeaderCell>
       ),
@@ -86,7 +102,7 @@ const useInboundAddItemsColumns = ({
         const hasErrors = !!errors?.[row.index]?.palletName?.message;
         return (
           <TableCell
-            className="rt-td"
+            className="rt-td rt-td-xs"
             tooltip={hasErrors}
             tooltipForm
             tooltipLabel={hasErrors && errors[row.index].palletName.message}
@@ -96,6 +112,7 @@ const useInboundAddItemsColumns = ({
               control={control}
               render={({ field }) => (
                 <TextInput
+                  className="input-xs"
                   {...field}
                 />
               )}
@@ -109,7 +126,7 @@ const useInboundAddItemsColumns = ({
     }),
     columnHelper.accessor('boxName', {
       header: () => (
-        <TableHeaderCell style={{ justifyContent: 'center' }}>
+        <TableHeaderCell className="justify-content-center rt-th-add-items">
           {translate('react.stockMovement.packLevel2.label', 'Pack Level 2')}
         </TableHeaderCell>
       ),
@@ -121,7 +138,7 @@ const useInboundAddItemsColumns = ({
         const hasErrors = !!errors?.[row.index]?.boxName?.message;
         return (
           <TableCell
-            className="rt-td"
+            className="rt-td rt-td-xs"
             tooltip={hasErrors}
             tooltipForm
             tooltipLabel={hasErrors && errors[row.index].boxName.message}
@@ -132,6 +149,7 @@ const useInboundAddItemsColumns = ({
               render={({ field }) => (
                 <TextInput
                   {...field}
+                  className="input-xs"
                   disabled={isBoxNameDisabled}
                 />
               )}
@@ -145,7 +163,7 @@ const useInboundAddItemsColumns = ({
     }),
     columnHelper.accessor('product', {
       header: () => (
-        <TableHeaderCell required>
+        <TableHeaderCell required className="rt-th-add-items">
           {translate('react.stockMovement.product.label', 'Product')}
         </TableHeaderCell>
       ),
@@ -153,7 +171,7 @@ const useInboundAddItemsColumns = ({
         const hasErrors = !!errors?.[row.index]?.product?.message;
         return (
           <TableCell
-            className="rt-td"
+            className="rt-td rt-td-xs"
             tooltip={getValues(`values.lineItems.${row.index}.product.label`) || hasErrors}
             tooltipForm
             tooltipLabel={hasErrors ? errors[row.index].product.message : getValues(`values.lineItems.${row.index}.product.label`)}
@@ -171,6 +189,7 @@ const useInboundAddItemsColumns = ({
                     defaultMessage: 'Product',
                     displayIcon: hasErrors,
                   })}
+                  className="select-xs"
                   onChange={(val) => {
                     field?.onChange(val);
                     trigger(`values.lineItems.${row.index}.quantityRequested`);
@@ -188,7 +207,7 @@ const useInboundAddItemsColumns = ({
     }),
     columnHelper.accessor('lotNumber', {
       header: () => (
-        <TableHeaderCell style={{ justifyContent: 'center' }}>
+        <TableHeaderCell className="justify-content-center rt-th-add-items">
           {translate('react.stockMovement.lot.label', 'Lot')}
         </TableHeaderCell>
       ),
@@ -196,7 +215,7 @@ const useInboundAddItemsColumns = ({
         const hasErrors = !!errors?.[row.index]?.lotNumber?.message;
         return (
           <TableCell
-            className="rt-td"
+            className="rt-td rt-td-xs"
             tooltip={hasErrors}
             tooltipForm
             tooltipLabel={hasErrors && errors[row.index].lotNumber.message}
@@ -208,6 +227,7 @@ const useInboundAddItemsColumns = ({
                 <TextInput
                   {...field}
                   hasErrors={hasErrors}
+                  className="input-xs"
                   showErrorBorder={hasErrors}
                 />
               )}
@@ -221,7 +241,7 @@ const useInboundAddItemsColumns = ({
     }),
     columnHelper.accessor('expirationDate', {
       header: () => (
-        <TableHeaderCell style={{ justifyContent: 'center' }}>
+        <TableHeaderCell className="justify-content-center rt-th-add-items">
           {translate('react.stockMovement.expiry.label', 'Expiry')}
         </TableHeaderCell>
       ),
@@ -229,7 +249,7 @@ const useInboundAddItemsColumns = ({
         const hasErrors = !!errors?.[row.index]?.expirationDate?.message;
         return (
           <TableCell
-            className="rt-td"
+            className="rt-td rt-td-xs"
             tooltip={hasErrors}
             tooltipForm
             tooltipLabel={hasErrors && errors[row.index].expirationDate.message}
@@ -244,6 +264,7 @@ const useInboundAddItemsColumns = ({
                     field?.onChange(val);
                     trigger(`values.lineItems.${row.index}.lotNumber`);
                   }}
+                  className="input-xs"
                   hasErrors={hasErrors}
                   showErrorBorder={hasErrors}
                   placeholder="MM/DD/YYYY"
@@ -259,7 +280,7 @@ const useInboundAddItemsColumns = ({
     }),
     columnHelper.accessor('quantityRequested', {
       header: () => (
-        <TableHeaderCell required style={{ justifyContent: 'center' }}>
+        <TableHeaderCell required className="justify-content-center rt-th-add-items">
           {translate('react.stockMovement.quantity.label', 'Quantity')}
         </TableHeaderCell>
       ),
@@ -267,7 +288,7 @@ const useInboundAddItemsColumns = ({
         const hasErrors = !!errors?.[row.index]?.quantityRequested?.message;
         return (
           <TableCell
-            className="rt-td"
+            className="rt-td rt-td-xs"
             tooltip={hasErrors}
             tooltipForm
             tooltipLabel={hasErrors && errors[row.index].quantityRequested.message}
@@ -281,6 +302,7 @@ const useInboundAddItemsColumns = ({
                   type="number"
                   hasErrors={hasErrors}
                   showErrorBorder={hasErrors}
+                  className="input-xs"
                   onBlur={() => {
                     field.onBlur();
                     trigger(`values.lineItems.${row.index}.quantityRequested`);
@@ -297,15 +319,21 @@ const useInboundAddItemsColumns = ({
     }),
     columnHelper.accessor('recipient', {
       header: () => (
-        <TableHeaderCell style={{ justifyContent: 'center' }}>
-          {translate('react.stockMovement.recipient.label', 'Recipient')}
+        <TableHeaderCell className="justify-content-center">
+          <SelectField
+            className="select-xs dark-select-xs"
+            options={users}
+            onChange={handleHeaderRecipientChange}
+            value={headerRecipient}
+            placeholder={translate('react.stockMovement.recipient.label', 'Recipient')}
+          />
         </TableHeaderCell>
       ),
       cell: ({ row }) => {
         const hasErrors = !!errors?.[row.index]?.recipient?.message;
         return (
           <TableCell
-            className="rt-td"
+            className="rt-td rt-td-xs"
             tooltip={hasErrors}
             tooltipForm
             tooltipLabel={hasErrors && errors[row.index].recipient.message}
@@ -318,6 +346,7 @@ const useInboundAddItemsColumns = ({
                   {...field}
                   options={users}
                   hasErrors={hasErrors}
+                  className="select-xs"
                   placeholder={getCustomSelectErrorPlaceholder({
                     id: 'react.stockMovement.recipient.label',
                     defaultMessage: 'Recipient',
@@ -336,12 +365,12 @@ const useInboundAddItemsColumns = ({
     columnHelper.display({
       id: 'delete',
       header: () => (
-        <TableHeaderCell style={{ justifyContent: 'center' }}>
+        <TableHeaderCell className="justify-content-center rt-th-add-items">
           {translate('react.default.button.delete.label', 'Delete')}
         </TableHeaderCell>
       ),
       cell: ({ row }) => (
-        <TableCell className="rt-td">
+        <TableCell className="rt-td rt-td-xs">
           <div className="bin-container">
             <RiDeleteBinLine
               className="inbound-bin"
@@ -362,6 +391,7 @@ const useInboundAddItemsColumns = ({
     minSearchLength,
     users,
     locale,
+    headerRecipient,
   ]);
 
   return { columns };
