@@ -7,10 +7,9 @@ import moment from 'moment';
 import { useForm } from 'react-hook-form';
 import Alert from 'react-s-alert';
 
+import stockMovementApi from 'api/services/StockMovementApi';
 import {
   STOCK_MOVEMENT_BY_ID,
-  STOCK_MOVEMENT_EXPORT_CSV,
-  STOCK_MOVEMENT_IMPORT_CSV,
   STOCK_MOVEMENT_ITEM_REMOVE,
   STOCK_MOVEMENT_ITEMS,
   STOCK_MOVEMENT_REMOVE_ALL_ITEMS,
@@ -602,7 +601,7 @@ const useInboundAddItemsForm = ({
         },
       };
 
-      await apiClient.post(STOCK_MOVEMENT_IMPORT_CSV(stockMovementId), formData, config);
+      await stockMovementApi.importCsv(stockMovementId, formData, config);
 
       fetchLineItems(true);
       if (_.isNil(_.last(getValues().values.lineItems)?.product)) {
@@ -630,7 +629,7 @@ const useInboundAddItemsForm = ({
     const { movementNumber, stockMovementId } = formValues;
     try {
       await saveRequisitionItemsInCurrentStep(lineItems);
-      const response = await apiClient.get(STOCK_MOVEMENT_EXPORT_CSV(stockMovementId), { responseType: 'blob' });
+      const response = await stockMovementApi.exportCsv(stockMovementId);
       fileDownload(response.data, `ItemList${movementNumber ? `-${movementNumber}` : ''}.csv`, 'text/csv');
     } finally {
       spinner.hide();
