@@ -180,7 +180,6 @@ const useInboundAddItemsColumns = ({
                     rowIndex,
                     columnId,
                   }}
-                  className="input-xs"
                   onWheel={(event) => event.currentTarget.blur()}
                   autoComplete="off"
                 />
@@ -239,7 +238,7 @@ const useInboundAddItemsColumns = ({
     }),
     columnHelper.accessor(inboundColumns.PRODUCT, {
       header: () => (
-        <TableHeaderCell required className="rt-td rt-td-xs rt-td-add-items">
+        <TableHeaderCell required className="rt-th-add-items">
           {translate('react.stockMovement.product.label', 'Product')}
         </TableHeaderCell>
       ),
@@ -430,8 +429,9 @@ const useInboundAddItemsColumns = ({
       header: () => (
         <TableHeaderCell className="justify-content-center">
           <SelectField
+            async
+            loadOptions={debouncedUsersFetch}
             className="select-xs dark-select-xs"
-            options={users}
             onChange={handleHeaderRecipientChange}
             value={headerRecipient}
             placeholder={translate('react.stockMovement.recipient.label', 'Recipient')}
@@ -452,8 +452,8 @@ const useInboundAddItemsColumns = ({
               control={control}
               render={({ field }) => (
                 <SelectField
-                  async
                   {...field}
+                  async
                   loadOptions={debouncedUsersFetch}
                   hasErrors={hasErrors}
                   onKeyDown={(e) => handleKeyDown(e, row.index, column.id)}
