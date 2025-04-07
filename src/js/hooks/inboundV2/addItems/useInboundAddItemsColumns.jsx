@@ -388,6 +388,10 @@ const useInboundAddItemsColumns = ({
                     rowIndex,
                     columnId,
                   }}
+                  onChangeRaw={(date) => {
+                    field.onChange(date.format());
+                  }}
+                  customDateFormat={DateFormat.DD_MMM_YYYY}
                 />
               )}
             />
