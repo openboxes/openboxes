@@ -12,6 +12,7 @@ import DateField from 'components/form-elements/v2/DateField';
 import SelectField from 'components/form-elements/v2/SelectField';
 import TextInput from 'components/form-elements/v2/TextInput';
 import StockMovementDirection from 'consts/StockMovementDirection';
+import { DateFormat } from 'consts/timeFormat';
 import useTranslate from 'hooks/useTranslate';
 import { debounceProductsFetch } from 'utils/option-utils';
 import Translate from 'utils/Translate';
@@ -246,7 +247,7 @@ const useInboundAddItemsColumns = ({
                   }}
                   hasErrors={hasErrors}
                   showErrorBorder={hasErrors}
-                  placeholder="MM/DD/YYYY"
+                  customDateFormat={DateFormat.DD_MMM_YYYY}
                 />
               )}
             />

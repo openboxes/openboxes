@@ -23,6 +23,7 @@ import useSpinner from 'hooks/useSpinner';
 import useTranslate from 'hooks/useTranslate';
 import apiClient from 'utils/apiClient';
 import confirmationModal from 'utils/confirmationModalUtils';
+import dateWithoutTimeZone from 'utils/dateUtils';
 
 const useInboundAddItemsForm = ({
   next,
@@ -249,8 +250,13 @@ const useInboundAddItemsForm = ({
     const itemsToSave = getLineItemsToBeSaved(itemCandidatesToSave)
       .map((item) => ({
         ...item,
-        expirationDate: item.expirationDate ? moment(item.expirationDate)
-          .format(DateFormat.MM_DD_YYYY) : null,
+        expirationDate: item.expirationDate
+          ? dateWithoutTimeZone({
+            date: moment(item.expirationDate).format(DateFormat.MM_DD_YYYY),
+            currentDateFormat: DateFormat.MM_DD_YYYY,
+            outputDateFormat: DateFormat.MM_DD_YYYY,
+          })
+          : null,
       }));
     if (itemsToSave.length) {
       const payload = {
