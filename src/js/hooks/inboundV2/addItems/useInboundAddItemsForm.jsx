@@ -268,7 +268,7 @@ const useInboundAddItemsForm = ({
         const { data } = resp.data;
         const transformedData = {
           ...data,
-          movementNumber: data.identifier,
+          identifier: data.identifier,
           stockMovementId: data.id,
           lineItems: data.lineItems?.map(transformLineItem),
         };
@@ -564,7 +564,7 @@ const useInboundAddItemsForm = ({
       } = response.data;
       const transformedData = {
         ...data,
-        movementNumber: data.identifier,
+        identifier: data.identifier,
         stockMovementId: data.id,
         lineItems: data.lineItems?.map(transformLineItem),
       };
@@ -626,11 +626,11 @@ const useInboundAddItemsForm = ({
 
   const saveItemsAndExportTemplate = async (formValues, lineItems) => {
     spinner.show();
-    const { movementNumber, stockMovementId } = formValues;
+    const { identifier, stockMovementId } = formValues;
     try {
       await saveRequisitionItemsInCurrentStep(lineItems);
       const response = await stockMovementApi.exportCsv(stockMovementId);
-      fileDownload(response.data, `ItemList${movementNumber ? `-${movementNumber}` : ''}.csv`, 'text/csv');
+      fileDownload(response.data, `ItemList${identifier ? `-${identifier}` : ''}.csv`, 'text/csv');
     } finally {
       spinner.hide();
     }
