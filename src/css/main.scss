@@ -370,6 +370,16 @@ body {
   }
 }
 
+.dark-select-xs {
+  .react-select__control {
+    &.react-select__control--is-focused {
+      outline: 0;
+      border: 1px solid var(--blue-primary) !important;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(104, 113, 130, 0.16), 0 0 0 4px rgba(34, 100, 229, 0.15) !important;
+    }
+  }
+}
+
 .multi-select {
   height: auto !important;
 
