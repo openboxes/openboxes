@@ -110,6 +110,9 @@ const InboundV2AddItems = ({
               <Button
                 onClick={() => {
                   const fileInput = document.getElementById('csvInput');
+                  // Resetting fileInput.value to null ensures the onChange
+                  // event triggers even if the same file is selected again,
+                  // as browsers don't fire onChange for unchanged file inputs
                   fileInput.value = null;
                   fileInput?.click();
                 }}

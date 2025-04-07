@@ -24,42 +24,23 @@ const TableHeaderCell = ({
     onKeyPress: () => {},
   };
 
-  if (tooltip) {
-    return (
-      <CustomTooltip content={tooltipLabel}>
-        <div
-          {...(sortable ? sortableProps : {})}
-          style={style}
-          className={`rt-th ${className} ${dynamicClassName?.(columnId)}`}
-        >
-          {children}
-          {required && <span className="ml-1 required">&#42;</span>}
-          {sortable && (
-            <div className="sorting-arrows">
-              <RiArrowUpSFill className="arrow-up" />
-              <RiArrowDownSFill className="arrow-down" />
-            </div>
-          )}
-        </div>
-      </CustomTooltip>
-    );
-  }
-
   return (
-    <div
-      {...(sortable ? sortableProps : {})}
-      style={style}
-      className={`rt-th ${className} ${dynamicClassName?.(columnId)}`}
-    >
-      {children}
-      {required && <span className="ml-1 required">&#42;</span>}
-      {sortable && (
-      <div className="sorting-arrows">
-        <RiArrowUpSFill className="arrow-up" />
-        <RiArrowDownSFill className="arrow-down" />
+    <CustomTooltip content={tooltipLabel} show={tooltip}>
+      <div
+        {...(sortable ? sortableProps : {})}
+        style={style}
+        className={`rt-th ${className} ${dynamicClassName?.(columnId)}`}
+      >
+        {children}
+        {required && <span className="ml-1 required">&#42;</span>}
+        {sortable && (
+        <div className="sorting-arrows">
+          <RiArrowUpSFill className="arrow-up" />
+          <RiArrowDownSFill className="arrow-down" />
+        </div>
+        )}
       </div>
-      )}
-    </div>
+    </CustomTooltip>
   );
 };
 
