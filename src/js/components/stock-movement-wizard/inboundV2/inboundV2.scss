@@ -4,8 +4,24 @@
 }
 
 .inbound-add-items {
+
+  .rt-th-add-items {
+    padding-top: 19px !important;
+    padding-bottom: 19px !important;
+  }
+
+  .rt-td-add-items {
+    padding: 0 4px 4px 4px !important;
+  }
+
   .rt-tbody {
     max-height: 275px;
+
+    .input-xs {
+      height: 26px;
+      padding: 4px 8px;
+      font-size: 14px;
+    }
   }
 
   .input-wrapper-error-message {
