@@ -112,6 +112,8 @@ const useArrowsNavigation = ({
       const isLastColumn = columnId
         === existingRowFocusableCells[existingRowFocusableCells.length - 1];
 
+      // Handles Ctrl + Arrow Down: Copies current cell value to the next row's same column
+      // Result: Focus moves to the same column in the next row, with the value copied if it exists
       if (ctrlKey && !isLastRow && getValues && setValue) {
         handleCtrlArrowDown(rowIndex, columnId);
         e.preventDefault();
@@ -119,6 +121,8 @@ const useArrowsNavigation = ({
         return;
       }
 
+      // Handles Arrow Down at the last row and last column: Adds a new row and focuses first cell
+      // Result: A new row is appended, and focus shifts to the first focusable cell in that row
       if (isLastRow && isLastColumn) {
         handleArrowDownAtLastRowAndColumn(rowIndex);
         e.preventDefault();
@@ -126,6 +130,8 @@ const useArrowsNavigation = ({
         return;
       }
 
+      // Handles Arrow Down when not on the last row: Moves focus to the same column in the next row
+      // Result: Focus shifts down one row while staying in the same column
       if (!isLastRow) {
         handleArrowDown(rowIndex, columnId);
         e.preventDefault();
@@ -133,6 +139,8 @@ const useArrowsNavigation = ({
         return;
       }
 
+      // Default case: Prevents default behavior when Arrow Down is pressed in other scenarios
+      // Result: No action taken, but event propagation is stopped
       e.preventDefault();
       e.stopPropagation();
       return;
