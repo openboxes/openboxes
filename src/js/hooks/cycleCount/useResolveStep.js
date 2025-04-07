@@ -96,7 +96,13 @@ const useResolveStep = () => {
     const duplicatedItems = _.groupBy(items,
       (item) => `${item.binLocation?.id}-${item?.inventoryItem?.lotNumber}`);
 
+    const maxCountIndex = _.maxBy(items, 'countIndex').countIndex;
+
     return Object.values(duplicatedItems).flatMap((itemsToMerge) => {
+      if (_.every(itemsToMerge, (item) => item.countIndex < maxCountIndex)) {
+        return null;
+      }
+
       if (itemsToMerge.length === 1) {
         const item = itemsToMerge[0];
         return [{
@@ -113,7 +119,6 @@ const useResolveStep = () => {
       }
 
       const groupedByCountIndex = _.groupBy(itemsToMerge, 'countIndex');
-      const maxCountIndex = _.maxBy(itemsToMerge, 'countIndex').countIndex;
       const itemFromCount = _.find(itemsToMerge, (item) => item.countIndex === maxCountIndex - 1);
       const itemsFromResolve = groupedByCountIndex[maxCountIndex] || [];
 
@@ -130,7 +135,7 @@ const useResolveStep = () => {
         recountedBy: item?.assignee,
         rootCause: mapRootCauseToSelectedOption(item?.discrepancyReasonCode),
       }));
-    });
+    }).filter(Boolean);
   };
 
   // Function used for maintaining the same order in the resolve tab between saves.
