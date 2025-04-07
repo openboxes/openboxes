@@ -99,10 +99,17 @@ const useResolveStep = () => {
     const maxCountIndex = _.maxBy(items, 'countIndex').countIndex;
 
     return Object.values(duplicatedItems).flatMap((itemsToMerge) => {
+      // When inventory is deleted the QoH is zero so the recount item was deleted,
+      // but it is still returning the original count item (because QoH was not zero
+      // at the time of the original count), so when we don't have more items than those
+      // which are coming from the counting step we have to filter those items out. It is
+      // not changed on the backend, because in that case we will lose the information
+      // about the original count
       if (_.every(itemsToMerge, (item) => item.countIndex < maxCountIndex)) {
         return null;
       }
 
+      // Mapping items that are created on the recount step
       if (itemsToMerge.length === 1) {
         const item = itemsToMerge[0];
         return [{
@@ -122,6 +129,7 @@ const useResolveStep = () => {
       const itemFromCount = _.find(itemsToMerge, (item) => item.countIndex === maxCountIndex - 1);
       const itemsFromResolve = groupedByCountIndex[maxCountIndex] || [];
 
+      // Merging items coming from count + recount step
       return itemsFromResolve.map((item) => ({
         ...itemFromCount,
         ...item,
