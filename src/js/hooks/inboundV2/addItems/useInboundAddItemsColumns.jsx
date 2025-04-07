@@ -247,6 +247,9 @@ const useInboundAddItemsColumns = ({
                   }}
                   hasErrors={hasErrors}
                   showErrorBorder={hasErrors}
+                  onChangeRaw={(date) => {
+                    field.onChange(date.format());
+                  }}
                   customDateFormat={DateFormat.DD_MMM_YYYY}
                 />
               )}

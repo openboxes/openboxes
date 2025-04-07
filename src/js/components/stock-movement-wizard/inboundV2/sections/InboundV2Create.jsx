@@ -149,6 +149,9 @@ const InboundV2Create = ({
                     id: 'react.stockMovement.dateRequested.label',
                     defaultMessage: 'Date Requested',
                   }}
+                  onChangeRaw={(date) => {
+                    field.onChange(date.format());
+                  }}
                   errorMessage={errors.dateRequested?.message}
                   customDateFormat={DateFormat.DD_MMM_YYYY}
                   required

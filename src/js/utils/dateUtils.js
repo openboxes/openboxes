@@ -9,8 +9,11 @@ const dateWithoutTimeZone = ({
     return null;
   }
 
-  const parsedDate = moment(date, currentDateFormat).utcOffset(0, true);
-  return parsedDate.format(outputDateFormat);
+  const parsedDate = currentDateFormat
+    ? moment(date, currentDateFormat)
+    : moment(date);
+
+  return parsedDate.utcOffset(0, true).format(outputDateFormat);
 };
 
 export default dateWithoutTimeZone;

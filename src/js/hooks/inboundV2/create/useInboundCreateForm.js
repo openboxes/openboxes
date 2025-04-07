@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import moment from 'moment';
 import { useForm } from 'react-hook-form';
 import { useSelector } from 'react-redux';
 
@@ -62,8 +61,7 @@ const useInboundCreateForm = ({ next }) => {
       ...values,
       name: '',
       dateRequested: dateWithoutTimeZone({
-        date: moment(values.dateRequested).format(DateFormat.MM_DD_YYYY),
-        currentDateFormat: DateFormat.MM_DD_YYYY,
+        date: values.dateRequested,
         outputDateFormat: DateFormat.MM_DD_YYYY,
       }),
       origin: { id: values.origin.id },
