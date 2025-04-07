@@ -197,19 +197,6 @@ const useResolveStep = () => {
     hide();
   };
 
-  const refreshCountItems = async () => {
-    try {
-      show();
-      for (const cycleCountId of cycleCountIds) {
-        await cycleCountApi.refreshItems(currentLocation?.id, cycleCountId);
-      }
-    } finally {
-      resetFocus();
-      hide();
-      await refetchData();
-    }
-  };
-
   const getRecountedBy = (cycleCountId) => recountedBy?.[cycleCountId];
 
   const getCountedBy = (cycleCountId) => tableData?.current.find(
@@ -371,7 +358,7 @@ const useResolveStep = () => {
     recount: true,
   });
 
-  const save = async () => {
+  const save = async (shouldRefetch = true) => {
     try {
       show();
       resetValidationState();
@@ -397,9 +384,25 @@ const useResolveStep = () => {
       }
     } finally {
       // After the save, refetch cycle counts so that a new row can't be saved multiple times
-      await refetchData();
+      if (shouldRefetch) {
+        await refetchData();
+      }
       hide();
       resetFocus();
+    }
+  };
+
+  const refreshCountItems = async () => {
+    try {
+      show();
+      await save(false);
+      for (const cycleCountId of cycleCountIds) {
+        await cycleCountApi.refreshItems(currentLocation?.id, cycleCountId);
+      }
+    } finally {
+      resetFocus();
+      hide();
+      await refetchData();
     }
   };
 
