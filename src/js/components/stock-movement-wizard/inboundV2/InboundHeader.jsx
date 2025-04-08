@@ -29,11 +29,11 @@ const InboundHeader = () => {
             </>
           )}
         </h5>
-        {headerStatus && (
+        {headerStatus?.text && (
           <span
             className={headerStatus.className}
           >
-              {headerStatus.children}
+              {headerStatus.text}
           </span>
         )}
       </div>
