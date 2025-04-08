@@ -3,8 +3,9 @@ import { useEffect, useMemo, useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import moment from 'moment';
 import { useForm } from 'react-hook-form';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
+import { updateInboundHeader } from 'actions';
 import stockListApi from 'api/services/StockListApi';
 import stockMovementApi from 'api/services/StockMovementApi';
 import { STOCK_MOVEMENT_BY_ID } from 'api/urls';
@@ -17,12 +18,14 @@ import apiClient from 'utils/apiClient';
 
 const useInboundCreateForm = ({ next }) => {
   const [stockLists, setStockLists] = useState([]);
+
   const { currentLocation } = useSelector((state) => ({
     currentLocation: state.session.currentLocation,
   }));
   const spinner = useSpinner();
   const { validationSchema } = useInboundCreateValidation();
   const queryParams = useQueryParams();
+  const dispatch = useDispatch();
 
   const defaultValues = useMemo(() => {
     const values = {
@@ -128,6 +131,7 @@ const useInboundCreateForm = ({ next }) => {
 
   const fetchData = async () => {
     if (!queryParams.id) {
+      dispatch(updateInboundHeader([], {}));
       return;
     }
     spinner.show();
@@ -147,7 +151,15 @@ const useInboundCreateForm = ({ next }) => {
         label: data.requestedBy.name,
       });
       setValue('dateRequested', data.dateRequested);
-      trigger();
+      dispatch(
+        updateInboundHeader([
+          { text: data.identifier, color: '#000000', delimeter: ' - ' },
+          { text: data.origin.name, color: '#004d40', delimeter: ' to ' },
+          { text: data.destination.name, color: '#01579b', delimeter: ', ' },
+          { text: data.dateRequested, color: '#4a148c', delimeter: ', ' },
+          { text: data.description, color: '#770838', delimeter: '' },
+        ], {}),
+      );
     } finally {
       spinner.hide();
     }

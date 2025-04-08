@@ -9,8 +9,6 @@ import InboundV2Create from 'components/stock-movement-wizard/inboundV2/sections
 import InboundV2Send from 'components/stock-movement-wizard/inboundV2/sections/InboundV2Send';
 import WizardStepsV2 from 'components/wizard/v2/WizardStepsV2';
 import inboundV2Step from 'consts/InboundV2Step';
-import mockInboundV2Status from 'consts/MockInboundV2Status';
-import mockInboundV2Title from 'consts/MockInboundV2Title';
 import useInboundAddItemsForm from 'hooks/inboundV2/addItems/useInboundAddItemsForm';
 import useInboundCreateForm from 'hooks/inboundV2/create/useInboundCreateForm';
 import useTranslate from 'hooks/useTranslate';
@@ -25,7 +23,9 @@ import 'react-confirm-alert/src/react-confirm-alert.css';
 const InboundV2 = () => {
   useTranslation('stockMovement');
   const translate = useTranslate();
-  const { locale } = useSelector((state) => state.session.activeLanguage);
+  const { locale } = useSelector((state) => ({
+    locale: state.session.activeLanguage.locale,
+  }));
 
   const steps = useMemo(() => [
     {
@@ -121,18 +121,10 @@ const InboundV2 = () => {
     previous,
   };
 
-  // this will still need to be improved in the future
-  const headerStatus = is(inboundV2Step.SEND) ? mockInboundV2Status : undefined;
-  const headerTitle = is(inboundV2Step.ADD_ITEMS)
-  || is(inboundV2Step.SEND) ? mockInboundV2Title : undefined;
-
   return (
     <PageWrapper>
       <WizardStepsV2 steps={stepsTitles} currentStepKey={Step.key} />
-      <InboundHeader
-        title={headerTitle}
-        status={headerStatus}
-      />
+      <InboundHeader />
       <form onSubmit={handleSubmit(onSubmitStockMovementDetails)}>
         {is(inboundV2Step.CREATE) && (<Step.Component {...createComponentProps} />)}
       </form>

@@ -4,8 +4,10 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import _ from 'lodash';
 import moment from 'moment';
 import { useForm } from 'react-hook-form';
+import { useDispatch } from 'react-redux';
 import Alert from 'react-s-alert';
 
+import { updateInboundHeader } from 'actions';
 import {
   STOCK_MOVEMENT_BY_ID, STOCK_MOVEMENT_ITEM_REMOVE,
   STOCK_MOVEMENT_ITEMS, STOCK_MOVEMENT_REMOVE_ALL_ITEMS,
@@ -33,6 +35,7 @@ const useInboundAddItemsForm = ({
   const { validationSchema } = useInboundAddItemsValidation();
   const queryParams = useQueryParams();
   const translate = useTranslate();
+  const dispatch = useDispatch();
   const defaultValues = useMemo(() => {
     const values = {
       currentLineItems: [],
@@ -556,7 +559,15 @@ const useInboundAddItemsForm = ({
         ...data,
         lineItems: data.lineItems?.map(transformLineItem),
       };
-
+      dispatch(
+        updateInboundHeader([
+          { text: data.identifier, color: '#000000', delimeter: ' - ' },
+          { text: data.origin.name, color: '#004d40', delimeter: ' to ' },
+          { text: data.destination.name, color: '#01579b', delimeter: ', ' },
+          { text: data.dateRequested, color: '#4a148c', delimeter: ', ' },
+          { text: data.description, color: '#770838', delimeter: '' },
+        ], {}),
+      );
       setValue('values', transformedData);
       setValue('totalCount', totalCount || 1);
     }
