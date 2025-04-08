@@ -151,6 +151,9 @@ const useInboundCreateForm = ({ next }) => {
         label: data.requestedBy.name,
       });
       setValue('dateRequested', data.dateRequested);
+
+      // We Set {} for headerStatus in the create step because we only want to display it on the
+      // last step
       dispatch(
         updateInboundHeader([
           { text: data.identifier, color: '#000000', delimeter: ' - ' },
