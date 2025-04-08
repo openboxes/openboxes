@@ -56,6 +56,7 @@ import {
   START_RESOLUTION,
   TOGGLE_USER_ACTION_MENU,
   TRANSLATIONS_FETCHED,
+  UPDATE_INBOUND_HEADER,
 } from 'actions/types';
 import cycleCountApi from 'api/services/CycleCountApi';
 import genericApi from 'api/services/GenericApi';
@@ -800,4 +801,12 @@ export const startResolution = (requestIds, locationId) => async (dispatch) => {
 
 export const eraseDraft = () => ({
   type: ERASE_DRAFT,
+});
+
+export const updateInboundHeader = (headerInfo, headerStatus) => ({
+  type: UPDATE_INBOUND_HEADER,
+  payload: {
+    headerInfo,
+    headerStatus,
+  },
 });

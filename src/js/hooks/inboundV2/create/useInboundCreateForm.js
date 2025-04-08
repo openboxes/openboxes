@@ -18,6 +18,7 @@ import apiClient from 'utils/apiClient';
 
 const useInboundCreateForm = ({ next }) => {
   const [stockLists, setStockLists] = useState([]);
+
   const { currentLocation } = useSelector((state) => ({
     currentLocation: state.session.currentLocation,
   }));
@@ -130,6 +131,7 @@ const useInboundCreateForm = ({ next }) => {
 
   const fetchData = async () => {
     if (!queryParams.id) {
+      dispatch(updateInboundHeader([], {}));
       return;
     }
     spinner.show();
@@ -149,7 +151,15 @@ const useInboundCreateForm = ({ next }) => {
         label: data.requestedBy.name,
       });
       setValue('dateRequested', data.dateRequested);
-      trigger();
+      dispatch(
+        updateInboundHeader([
+          { text: data.identifier, color: '#000000', delimeter: ' - ' },
+          { text: data.origin.name, color: '#004d40', delimeter: ' to ' },
+          { text: data.destination.name, color: '#01579b', delimeter: ', ' },
+          { text: data.dateRequested, color: '#4a148c', delimeter: ', ' },
+          { text: data.description, color: '#770838', delimeter: '' },
+        ], {}),
+      );
     } finally {
       spinner.hide();
     }

@@ -10,6 +10,7 @@ import Alert from 'react-s-alert';
 
 import { fetchUsers } from 'actions';
 import stockMovementApi from 'api/services/StockMovementApi';
+import { updateInboundHeader } from 'actions';
 import {
   STOCK_MOVEMENT_BY_ID,
   STOCK_MOVEMENT_ITEM_REMOVE,
@@ -589,6 +590,15 @@ const useInboundAddItemsForm = ({
         stockMovementId: data.id,
         lineItems: data.lineItems?.map(transformLineItem),
       };
+      dispatch(
+        updateInboundHeader([
+          { text: data.identifier, color: '#000000', delimeter: ' - ' },
+          { text: data.origin.name, color: '#004d40', delimeter: ' to ' },
+          { text: data.destination.name, color: '#01579b', delimeter: ', ' },
+          { text: data.dateRequested, color: '#4a148c', delimeter: ', ' },
+          { text: data.description, color: '#770838', delimeter: '' },
+        ], {}),
+      );
       setValue('values', transformedData);
       setValue('totalCount', totalCount || 1);
     }
