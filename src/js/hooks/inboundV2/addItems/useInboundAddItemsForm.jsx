@@ -4,8 +4,10 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import _ from 'lodash';
 import moment from 'moment';
 import { useForm } from 'react-hook-form';
+import { useDispatch } from 'react-redux';
 import Alert from 'react-s-alert';
 
+import { fetchUsers } from 'actions';
 import {
   STOCK_MOVEMENT_BY_ID, STOCK_MOVEMENT_ITEM_REMOVE,
   STOCK_MOVEMENT_ITEMS, STOCK_MOVEMENT_REMOVE_ALL_ITEMS,
@@ -33,6 +35,7 @@ const useInboundAddItemsForm = ({
   const { validationSchema } = useInboundAddItemsValidation();
   const queryParams = useQueryParams();
   const translate = useTranslate();
+  const dispatch = useDispatch();
   const defaultValues = useMemo(() => {
     const values = {
       currentLineItems: [],
@@ -578,6 +581,8 @@ const useInboundAddItemsForm = ({
 
   useEffect(() => {
     if (queryParams.step === InboundV2Step.ADD_ITEMS) {
+      // Fetching data for "requested by" dropdown
+      dispatch(fetchUsers());
       fetchData();
     }
   }, [queryParams.step]);
