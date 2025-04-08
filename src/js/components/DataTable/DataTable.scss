@@ -14,13 +14,16 @@
   border: none;
   border-radius: 4px;
 
+  .overflow-visible {
+    overflow: visible !important;
+  }
+
   &.hide-data .rt-tbody {
     display: none;
   }
 
   .rt-table {
     font-size: 14px;
-    overflow: visible;
 
     &::-webkit-scrollbar {
       width: 0.5em;
