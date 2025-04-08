@@ -92,7 +92,7 @@ const useInboundAddItemsColumns = ({
     remove(row.index);
   };
 
-  const handleBlur = (field, fieldName = null, customLogic = null) => {
+  const handleBlur = (field, additionalFieldToOnBlur = null, customLogic = null) => {
     field.onBlur();
 
     if (rowIndex !== null && columnId !== null) {
@@ -104,11 +104,10 @@ const useInboundAddItemsColumns = ({
       customLogic();
     }
 
-    if (fieldName) {
-      trigger(fieldName);
+    if (additionalFieldToOnBlur) {
+      additionalFieldToOnBlur.onBlur();
     }
   };
-
   const focusableCells = [
     inboundColumns.PALLET_NAME,
     inboundColumns.BOX_NAME,
@@ -165,23 +164,26 @@ const useInboundAddItemsColumns = ({
               name={`values.lineItems.${row.index}.palletName`}
               control={control}
               render={({ field }) => (
-                <TextInput
-                  className="input-xs"
-                  {...field}
-                  onKeyDown={(e) => handleKeyDown(e, row.index, column.id)}
-                  onBlur={() => handleBlur(
-                    field,
-                    `values.lineItems.${row.index}.boxName`,
+                <Controller
+                  name={`values.lineItems.${row.index}.boxName`}
+                  control={control}
+                  render={({ field: boxField }) => (
+                    <TextInput
+                      className="input-xs"
+                      {...field}
+                      onKeyDown={(e) => handleKeyDown(e, row.index, column.id)}
+                      onBlur={() => handleBlur(field, boxField)}
+                      onChange={(e) => setValue(`values.lineItems.${row.index}.palletName`, e.target.value ?? null)}
+                      focusProps={{
+                        fieldIndex: row.index,
+                        fieldId: column.id,
+                        rowIndex,
+                        columnId,
+                      }}
+                      onWheel={(event) => event.currentTarget.blur()}
+                      autoComplete="off"
+                    />
                   )}
-                  onChange={(e) => setValue(`values.lineItems.${row.index}.palletName`, e.target.value ?? null)}
-                  focusProps={{
-                    fieldIndex: row.index,
-                    fieldId: column.id,
-                    rowIndex,
-                    columnId,
-                  }}
-                  onWheel={(event) => event.currentTarget.blur()}
-                  autoComplete="off"
                 />
               )}
             />
@@ -403,7 +405,7 @@ const useInboundAddItemsColumns = ({
                     field,
                     null,
                     () => {
-                      const parsedValue = e.target.value ? Number(e.target.value) : e.target.value;
+                      const parsedValue = e.target.value ? Number(e.target.value) : undefined;
                       setValue(`values.lineItems.${row.index}.quantityRequested`, parsedValue);
                       trigger(`values.lineItems.${row.index}.quantityRequested`);
                     },

@@ -28,10 +28,7 @@ const useInboundAddItemsV2Validation = () => {
       message: translate('react.stockMovement.error.boxWithoutPallet.label', 'Please enter Pack level 1 before Pack level 2'),
       path: ['boxName'],
     })
-    .refine((data) => {
-      const isValid = !(data.expirationDate && !data.lotNumber);
-      return isValid;
-    }, {
+    .refine((data) => !(data.expirationDate && !data.lotNumber), {
       message: translate('react.stockMovement.error.expiryWithoutLot.label', 'Items with an expiry date must also have a lot number'),
       path: ['lotNumber'],
     })
