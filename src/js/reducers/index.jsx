@@ -5,7 +5,7 @@ import approversReducer from 'reducers/approversReducer';
 import connectionReducer from 'reducers/connectionReducer';
 import cycleCountReducer from 'reducers/cycleCountReducer';
 import filterFormReducer from 'reducers/filterFormReducer';
-import inboundReducer from 'reducers/InboundReducer';
+import inboundReducer from 'reducers/inboundReducer';
 import indicatorsReducer from 'reducers/indicatorsReducer';
 import infoBarReducer from 'reducers/infoBarReducer';
 import infoBarVisibilityReducer from 'reducers/infoBarVisibilityReducer';
