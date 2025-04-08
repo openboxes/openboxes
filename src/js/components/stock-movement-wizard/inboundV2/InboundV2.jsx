@@ -22,9 +22,7 @@ import 'react-confirm-alert/src/react-confirm-alert.css';
 const InboundV2 = () => {
   useTranslation('stockMovement');
   const translate = useTranslate();
-  const { locale } = useSelector((state) => ({
-    locale: state.session.activeLanguage.locale,
-  }));
+  const { locale } = useSelector((state) => state.session.activeLanguage);
 
   const steps = useMemo(() => [
     {
