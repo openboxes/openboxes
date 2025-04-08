@@ -100,6 +100,10 @@ class CycleCountItem implements Comparable {
                     // CycleCountItem) where it uses compareTo as an equals method when adding/removing from the set,
                     // and so we need to make sure this always resolves to a unique value for each item. (OBPIH-7128)
                     ?: id <=> that.id
+                        // The identityHashCode is needed in case of adding a new item that doesn't have the id yet.
+                        // There is a case where you put the same expirationDate and location, and due to the SortedSet behavior
+                        // this would assume the items are the same and it wouldn't add more than one with the same expirationDate and location
+                        ?: System.identityHashCode(this) <=> System.identityHashCode(that)
         return diff
     }
 }
