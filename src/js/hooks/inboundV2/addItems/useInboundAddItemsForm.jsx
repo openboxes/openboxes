@@ -3,8 +3,10 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import _ from 'lodash';
 import moment from 'moment';
+import queryString from 'query-string';
 import { useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
+import { useHistory, useLocation } from 'react-router-dom';
 import Alert from 'react-s-alert';
 
 import { updateInboundHeader } from 'actions';
@@ -36,6 +38,9 @@ const useInboundAddItemsForm = ({
   const queryParams = useQueryParams();
   const translate = useTranslate();
   const dispatch = useDispatch();
+  const history = useHistory();
+  const location = useLocation();
+
   const defaultValues = useMemo(() => {
     const values = {
       currentLineItems: [],
@@ -574,19 +579,36 @@ const useInboundAddItemsForm = ({
   };
 
   const fetchData = async () => {
+    if (!queryParams.id) {
+      dispatch(updateInboundHeader([], {}));
+      previous();
+      return;
+    }
+
     setLoading(true);
     spinner.show();
+
     try {
       await fetchAddItemsPageData();
       if (getValues().isPaginated) {
         await fetchLineItems();
       }
+    } catch {
+      dispatch(updateInboundHeader([], {}));
+      // In case of an error, redirect to the "create" step without the id parameter
+      history.push({
+        pathname: location.pathname,
+        search: queryString.stringify({
+          ...queryParams,
+          id: undefined,
+          step: InboundV2Step.CREATE,
+        }, { skipNull: true }),
+      });
     } finally {
       setLoading(false);
       spinner.hide();
     }
   };
-
   useEffect(() => {
     if (queryParams.step === InboundV2Step.ADD_ITEMS) {
       fetchData();
