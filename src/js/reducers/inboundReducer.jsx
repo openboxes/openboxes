@@ -8,7 +8,9 @@ const initialState = {
 export default function inboundReducer(state = initialState, action) {
   switch (action.type) {
     case UPDATE_INBOUND_HEADER:
-      if (!action.payload) return state;
+      if (!action.payload) {
+        return state;
+      }
 
       return {
         ...state,
