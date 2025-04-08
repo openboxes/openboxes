@@ -16,7 +16,7 @@ const InboundHeader = () => {
     <HeaderWrapper className="align-items-center h-100 py-3">
       <div className="create-page-title d-flex align-items-center justify-content-between w-100">
         <h5 className="create-page-tile-main-content m-0 ">
-          {headerInfo.length > 0 && (
+          {headerInfo?.length > 0 && (
             <>
               <strong>{translate('react.stockMovement.label', 'Stock Movement')}</strong>
               <span>{' | '}</span>

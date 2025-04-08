@@ -2,8 +2,10 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import moment from 'moment';
+import queryString from 'query-string';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
+import { useHistory, useLocation } from 'react-router-dom';
 
 import { fetchUsers } from 'actions';
 import stockListApi from 'api/services/StockListApi';
@@ -26,6 +28,8 @@ const useInboundCreateForm = ({ next }) => {
   const { validationSchema } = useInboundCreateValidation();
   const queryParams = useQueryParams();
   const dispatch = useDispatch();
+  const history = useHistory();
+  const location = useLocation();
 
   const defaultValues = useMemo(() => {
     const values = {
@@ -163,6 +167,15 @@ const useInboundCreateForm = ({ next }) => {
           { text: data.description, color: '#770838', delimeter: '' },
         ], {}),
       );
+    } catch {
+      dispatch(updateInboundHeader([], {}));
+      history.push({
+        pathname: location.pathname,
+        search: queryString.stringify({
+          ...queryParams,
+          id: undefined,
+        }, { skipNull: true }),
+      });
     } finally {
       spinner.hide();
     }
