@@ -3,14 +3,14 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useFieldArray, useWatch } from 'react-hook-form';
 import {
-  BiDownload,
-  BiExit,
-  BiRefresh,
-  BiSave,
-  BiUpload,
-  IoCloseCircleOutline,
-} from 'react-icons/all';
-import { RiAddLine } from 'react-icons/ri';
+  RiAddLine,
+  RiCloseCircleLine,
+  RiDownload2Line,
+  RiPictureInPictureExitLine,
+  RiRefreshLine,
+  RiSave2Line,
+  RiUpload2Line,
+} from 'react-icons/ri';
 
 import DataTable from 'components/DataTable/v2/DataTable';
 import Button from 'components/form-elements/Button';
@@ -37,6 +37,7 @@ const InboundV2AddItems = ({
   refresh,
   importTemplate,
   exportTemplate,
+  nextPage,
 }) => {
   const hasErrors = !!Object.keys(errors).length;
   const {
@@ -121,7 +122,7 @@ const InboundV2AddItems = ({
                   fileInput.value = null;
                   fileInput?.click();
                 }}
-                StartIcon={<BiDownload className="icon" />}
+                StartIcon={<RiDownload2Line className="icon" />}
                 defaultLabel="Import template"
                 label="react.default.button.importTemplate.label"
                 variant="primary-outline"
@@ -135,21 +136,21 @@ const InboundV2AddItems = ({
               />
               <Button
                 onClick={exportTemplate}
-                StartIcon={<BiUpload className="icon" />}
+                StartIcon={<RiUpload2Line className="icon" />}
                 defaultLabel="Export template"
                 label="react.default.button.exportTemplate.label"
                 variant="primary-outline"
               />
               <Button
                 onClick={refresh}
-                StartIcon={<BiRefresh className="icon" />}
+                StartIcon={<RiRefreshLine className="icon" />}
                 defaultLabel="Reload"
                 label="react.default.button.refresh.label"
                 variant="primary-outline"
               />
               <Button
                 onClick={save}
-                StartIcon={<BiSave className="icon" />}
+                StartIcon={<RiSave2Line className="icon" />}
                 defaultLabel="Save"
                 label="react.default.button.save.label"
                 variant="primary-outline"
@@ -157,7 +158,7 @@ const InboundV2AddItems = ({
               />
               <Button
                 onClick={saveAndExit}
-                StartIcon={<BiExit className="icon" />}
+                StartIcon={<RiPictureInPictureExitLine className="icon" />}
                 defaultLabel="Save And Exit"
                 label="react.default.button.saveAndExit.label"
                 variant="primary-outline"
@@ -165,10 +166,11 @@ const InboundV2AddItems = ({
               />
               <Button
                 onClick={removeAll}
-                StartIcon={<IoCloseCircleOutline className="icon" />}
+                StartIcon={<RiCloseCircleLine className="icon" />}
                 defaultLabel="Delete All"
                 label="react.default.button.deleteAll.label"
                 variant="primary-outline"
+                disabled={hasErrors}
               />
             </div>
           </div>
@@ -196,7 +198,7 @@ const InboundV2AddItems = ({
           label="react.default.button.next.label"
           defaultLabel="Next"
           variant="primary"
-          type="submit"
+          onClick={nextPage}
           disabled={!updatedRows.some(item =>
             item.product && parseInt(item.quantityRequested, 10))}
         />
@@ -227,4 +229,5 @@ InboundV2AddItems.propTypes = {
   exportTemplate: PropTypes.func.isRequired,
   refreshFocusCounter: PropTypes.number.isRequired,
   resetFocus: PropTypes.func.isRequired,
+  nextPage: PropTypes.func.isRequired,
 };
