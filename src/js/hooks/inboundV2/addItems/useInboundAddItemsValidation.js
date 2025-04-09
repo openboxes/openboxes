@@ -17,7 +17,8 @@ const useInboundAddItemsV2Validation = () => {
     expirationDate: z.string().optional().nullable(),
     quantityRequested: z.number()
       .min(0, translate('react.stockMovement.error.enterQuantity.label', 'Enter proper quantity'))
-      .optional(),
+      .optional()
+      .nullable(),
     recipient: z.object({
       id: z.string(),
       value: z.string(),
@@ -34,7 +35,7 @@ const useInboundAddItemsV2Validation = () => {
     })
     .refine((data) => {
       if (data?.product && data?.product?.id) {
-        return data?.quantityRequested !== undefined;
+        return data?.quantityRequested !== undefined && data?.quantityRequested !== null;
       }
       return true;
     }, {

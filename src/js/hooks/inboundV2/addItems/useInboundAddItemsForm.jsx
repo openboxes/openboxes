@@ -201,19 +201,19 @@ const useInboundAddItemsForm = ({
     const oldQty = Number(oldItem.quantityRequested) || 0;
     const newQty = Number(item.quantityRequested) || 0;
 
-    const expirationDateChanged =
-      (item.expirationDate && item.inventoryItem.expirationDate !== item.expirationDate)
+    const expirationDateChanged = (item.expirationDate
+        && item.inventoryItem.expirationDate !== item.expirationDate)
       || (!item.expirationDate && oldItem.expirationDate);
 
     return (
-      !isItemUpdated(item, oldItem) ||
-      item.palletName !== oldItem.palletName ||
-      item.boxName !== oldItem.boxName ||
-      item.product.id !== oldItem.product.id ||
-      newQty !== oldQty ||
-      item.recipient?.id !== oldItem.recipient?.id ||
-      item.lotNumber !== oldItem.lotNumber ||
-      expirationDateChanged
+      !isItemUpdated(item, oldItem)
+      || item.palletName !== oldItem.palletName
+      || item.boxName !== oldItem.boxName
+      || item.product.id !== oldItem.product.id
+      || newQty !== oldQty
+      || item.recipient?.id !== oldItem.recipient?.id
+      || item.lotNumber !== oldItem.lotNumber
+      || expirationDateChanged
     );
   };
 
@@ -401,24 +401,27 @@ const useInboundAddItemsForm = ({
     lineItems.some((item) => !item.quantityRequested || item.quantityRequested === '0');
 
   const nextPage = async () => {
-    const formValues = getValues();
-    const lineItems = formValues.values.lineItems
-      .filter((item) => item?.product)
-      .map((item) => ({
-        ...item,
-        expirationDate: item.expirationDate ? moment(item.expirationDate)
-          .format(DateFormat.MM_DD_YYYY) : null,
-      }));
-    const hasInvalidQuantity = checkInvalidQuantities(lineItems);
+    await trigger();
+    if (isValid) {
+      const formValues = getValues();
+      const lineItems = formValues.values.lineItems
+        .filter((item) => item?.product)
+        .map((item) => ({
+          ...item,
+          expirationDate: item.expirationDate ? moment(item.expirationDate)
+            .format(DateFormat.MM_DD_YYYY) : null,
+        }));
+      const hasInvalidQuantity = checkInvalidQuantities(lineItems);
 
-    if (hasInvalidQuantity) {
-      confirmAction(
-        () => checkDuplicatesSaveAndTransitionToNextStep(formValues, lineItems),
-        'react.stockMovement.confirmSave.message',
-        'Are you sure you want to save? There are some lines with empty or zero quantity, those lines will be deleted.',
-      );
-    } else {
-      await checkDuplicatesSaveAndTransitionToNextStep(formValues, lineItems);
+      if (hasInvalidQuantity) {
+        confirmAction(
+          () => checkDuplicatesSaveAndTransitionToNextStep(formValues, lineItems),
+          'react.stockMovement.confirmSave.message',
+          'Are you sure you want to save? There are some lines with empty or zero quantity, those lines will be deleted.',
+        );
+      } else {
+        await checkDuplicatesSaveAndTransitionToNextStep(formValues, lineItems);
+      }
     }
   };
 
@@ -441,6 +444,7 @@ const useInboundAddItemsForm = ({
     formValues.values.lineItems.filter((item) => Object.keys(item).length > 0);
 
   const save = () => {
+    trigger();
     if (isValid) {
       const lineItems = getFilteredLineItems(getValues());
       const hasInvalidQuantity = checkInvalidQuantities(lineItems);
@@ -555,6 +559,7 @@ const useInboundAddItemsForm = ({
   };
 
   const previousPage = async () => {
+    trigger();
     if (isValid) {
       try {
         spinner.show();

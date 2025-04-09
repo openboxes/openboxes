@@ -37,6 +37,7 @@ const InboundV2AddItems = ({
   refresh,
   importTemplate,
   exportTemplate,
+  nextPage,
 }) => {
   const hasErrors = !!Object.keys(errors).length;
   const {
@@ -197,7 +198,8 @@ const InboundV2AddItems = ({
           label="react.default.button.next.label"
           defaultLabel="Next"
           variant="primary"
-          type="submit"
+          // type="submit"
+          onClick={nextPage}
           disabled={!updatedRows.some(item =>
             item.product && parseInt(item.quantityRequested, 10))}
         />
@@ -228,4 +230,5 @@ InboundV2AddItems.propTypes = {
   refresh: PropTypes.func.isRequired,
   importTemplate: PropTypes.func.isRequired,
   exportTemplate: PropTypes.func.isRequired,
+  nextPage: PropTypes.func.isRequired,
 };

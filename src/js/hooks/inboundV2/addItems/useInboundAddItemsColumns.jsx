@@ -8,7 +8,7 @@ import React, {
 import { createColumnHelper } from '@tanstack/react-table';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import { Controller } from 'react-hook-form';
+import { Controller, useController } from 'react-hook-form';
 import { RiDeleteBinLine } from 'react-icons/ri';
 import { useSelector } from 'react-redux';
 
@@ -96,7 +96,7 @@ const useInboundAddItemsColumns = ({
     additionalFieldToOnBlur = null,
     customLogic = null,
   ) => {
-    trigger(field);
+    field.onBlur();
 
     if (rowIndex !== null && columnId !== null) {
       setRowIndex(null);
@@ -104,7 +104,7 @@ const useInboundAddItemsColumns = ({
     }
 
     if (additionalFieldToOnBlur) {
-      trigger(additionalFieldToOnBlur);
+      additionalFieldToOnBlur.onBlur();
     }
 
     if (customLogic) {
@@ -160,6 +160,10 @@ const useInboundAddItemsColumns = ({
       ),
       cell: ({ row, column }) => {
         const hasErrors = !!errors?.[row.index]?.palletName?.message;
+        const { field: boxField } = useController({
+          name: `values.lineItems.${row.index}.boxName`,
+          control,
+        });
 
         return (
           <TableCell
@@ -176,10 +180,7 @@ const useInboundAddItemsColumns = ({
                   className="input-xs"
                   {...field}
                   onKeyDown={(e) => handleKeyDown(e, row.index, column.id)}
-                  onBlur={() => handleBlur(
-                    field.name,
-                    `values.lineItems.${row.index}.boxName`,
-                  )}
+                  onBlur={() => handleBlur(field, boxField)}
                   onChange={(e) => setValue(`values.lineItems.${row.index}.palletName`, e.target.value ?? null)}
                   focusProps={{
                     fieldIndex: row.index,
@@ -225,7 +226,7 @@ const useInboundAddItemsColumns = ({
                 <TextInput
                   {...field}
                   onKeyDown={(e) => handleKeyDown(e, row.index, column.id)}
-                  onBlur={() => handleBlur(field.name)}
+                  onBlur={() => handleBlur(field)}
                   focusProps={{
                     fieldIndex: row.index,
                     fieldId: column.id,
@@ -280,7 +281,7 @@ const useInboundAddItemsColumns = ({
                     trigger(`values.lineItems.${row.index}.quantityRequested`);
                   }}
                   onKeyDown={(e) => handleKeyDown(e, row.index, column.id)}
-                  onBlur={() => handleBlur(field.name)}
+                  onBlur={() => handleBlur(field)}
                   className="select-xs dark-select-xs"
                   focusProps={{
                     fieldIndex: row.index,
@@ -329,7 +330,7 @@ const useInboundAddItemsColumns = ({
                   showErrorBorder={hasErrors}
                   onKeyDown={(e) => handleKeyDown(e, row.index, column.id)}
                   onChange={(e) => setValue(`values.lineItems.${row.index}.lotNumber`, e.target.value ?? null)}
-                  onBlur={() => handleBlur(field.name)}
+                  onBlur={() => handleBlur(field)}
                   focusProps={{
                     fieldIndex: row.index,
                     fieldId: column.id,
@@ -380,7 +381,7 @@ const useInboundAddItemsColumns = ({
                   hasErrors={hasErrors}
                   showErrorBorder={hasErrors}
                   onKeyDown={(e) => handleKeyDown(e, row.index, column.id)}
-                  onBlur={() => handleBlur(field.name)}
+                  onBlur={() => handleBlur(field)}
                   focusProps={{
                     fieldIndex: row.index,
                     fieldId: column.id,
@@ -429,7 +430,7 @@ const useInboundAddItemsColumns = ({
                   showErrorBorder={hasErrors}
                   onChange={(e) => setValue(`values.lineItems.${row.index}.quantityRequested`, e ?? null)}
                   onBlur={(e) => handleBlur(
-                    field.name,
+                    field,
                     null,
                     () => {
                       const parsedValue = e.target.value ? Number(e.target.value) : undefined;
@@ -486,7 +487,7 @@ const useInboundAddItemsColumns = ({
                   loadOptions={debouncedUsersFetch}
                   hasErrors={hasErrors}
                   onKeyDown={(e) => handleKeyDown(e, row.index, column.id)}
-                  onBlur={() => handleBlur(field.name)}
+                  onBlur={() => handleBlur(field)}
                   className="select-xs dark-select-xs"
                   focusProps={{
                     fieldIndex: row.index,
