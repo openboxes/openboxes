@@ -169,6 +169,7 @@ const InboundV2AddItems = ({
                 defaultLabel="Delete All"
                 label="react.default.button.deleteAll.label"
                 variant="primary-outline"
+                disabled={hasErrors}
               />
             </div>
           </div>

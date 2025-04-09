@@ -441,7 +441,6 @@ const useInboundAddItemsForm = ({
     formValues.values.lineItems.filter((item) => Object.keys(item).length > 0);
 
   const save = () => {
-    trigger();
     if (isValid) {
       const lineItems = getFilteredLineItems(getValues());
       const hasInvalidQuantity = checkInvalidQuantities(lineItems);
@@ -556,7 +555,6 @@ const useInboundAddItemsForm = ({
   };
 
   const previousPage = async () => {
-    trigger();
     if (isValid) {
       try {
         spinner.show();

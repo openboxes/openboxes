@@ -37,7 +37,6 @@ const useInboundAddItemsColumns = ({
   refreshFocusCounter,
 }) => {
   const [headerRecipient, setHeaderRecipient] = useState(null);
-
   const [rowIndex, setRowIndex] = useState(null);
   const [columnId, setColumnId] = useState(null);
   // If prevForceResetFocus is different from refreshFocusCounter,
@@ -92,20 +91,24 @@ const useInboundAddItemsColumns = ({
     remove(row.index);
   };
 
-  const handleBlur = (field, additionalFieldToOnBlur = null, customLogic = null) => {
-    field.onBlur();
+  const handleBlur = (
+    field,
+    additionalFieldToOnBlur = null,
+    customLogic = null,
+  ) => {
+    trigger(field);
 
     if (rowIndex !== null && columnId !== null) {
       setRowIndex(null);
       setColumnId(null);
     }
 
-    if (customLogic) {
-      customLogic();
+    if (additionalFieldToOnBlur) {
+      trigger(additionalFieldToOnBlur);
     }
 
-    if (additionalFieldToOnBlur) {
-      additionalFieldToOnBlur.onBlur();
+    if (customLogic) {
+      customLogic();
     }
   };
   const focusableCells = [
@@ -157,6 +160,7 @@ const useInboundAddItemsColumns = ({
       ),
       cell: ({ row, column }) => {
         const hasErrors = !!errors?.[row.index]?.palletName?.message;
+
         return (
           <TableCell
             className="rt-td rt-td-xs rt-td-add-items"
@@ -168,26 +172,23 @@ const useInboundAddItemsColumns = ({
               name={`values.lineItems.${row.index}.palletName`}
               control={control}
               render={({ field }) => (
-                <Controller
-                  name={`values.lineItems.${row.index}.boxName`}
-                  control={control}
-                  render={({ field: boxField }) => (
-                    <TextInput
-                      className="input-xs"
-                      {...field}
-                      onKeyDown={(e) => handleKeyDown(e, row.index, column.id)}
-                      onBlur={() => handleBlur(field, boxField)}
-                      onChange={(e) => setValue(`values.lineItems.${row.index}.palletName`, e.target.value ?? null)}
-                      focusProps={{
-                        fieldIndex: row.index,
-                        fieldId: column.id,
-                        rowIndex,
-                        columnId,
-                      }}
-                      onWheel={(event) => event.currentTarget.blur()}
-                      autoComplete="off"
-                    />
+                <TextInput
+                  className="input-xs"
+                  {...field}
+                  onKeyDown={(e) => handleKeyDown(e, row.index, column.id)}
+                  onBlur={() => handleBlur(
+                    field.name,
+                    `values.lineItems.${row.index}.boxName`,
                   )}
+                  onChange={(e) => setValue(`values.lineItems.${row.index}.palletName`, e.target.value ?? null)}
+                  focusProps={{
+                    fieldIndex: row.index,
+                    fieldId: column.id,
+                    rowIndex,
+                    columnId,
+                  }}
+                  onWheel={(event) => event.currentTarget.blur()}
+                  autoComplete="off"
                 />
               )}
             />
@@ -224,7 +225,7 @@ const useInboundAddItemsColumns = ({
                 <TextInput
                   {...field}
                   onKeyDown={(e) => handleKeyDown(e, row.index, column.id)}
-                  onBlur={() => handleBlur(field)}
+                  onBlur={() => handleBlur(field.name)}
                   focusProps={{
                     fieldIndex: row.index,
                     fieldId: column.id,
@@ -279,7 +280,7 @@ const useInboundAddItemsColumns = ({
                     trigger(`values.lineItems.${row.index}.quantityRequested`);
                   }}
                   onKeyDown={(e) => handleKeyDown(e, row.index, column.id)}
-                  onBlur={() => handleBlur(field)}
+                  onBlur={() => handleBlur(field.name)}
                   className="select-xs dark-select-xs"
                   focusProps={{
                     fieldIndex: row.index,
@@ -328,7 +329,7 @@ const useInboundAddItemsColumns = ({
                   showErrorBorder={hasErrors}
                   onKeyDown={(e) => handleKeyDown(e, row.index, column.id)}
                   onChange={(e) => setValue(`values.lineItems.${row.index}.lotNumber`, e.target.value ?? null)}
-                  onBlur={() => handleBlur(field)}
+                  onBlur={() => handleBlur(field.name)}
                   focusProps={{
                     fieldIndex: row.index,
                     fieldId: column.id,
@@ -379,7 +380,7 @@ const useInboundAddItemsColumns = ({
                   hasErrors={hasErrors}
                   showErrorBorder={hasErrors}
                   onKeyDown={(e) => handleKeyDown(e, row.index, column.id)}
-                  onBlur={() => handleBlur(field)}
+                  onBlur={() => handleBlur(field.name)}
                   focusProps={{
                     fieldIndex: row.index,
                     fieldId: column.id,
@@ -428,7 +429,7 @@ const useInboundAddItemsColumns = ({
                   showErrorBorder={hasErrors}
                   onChange={(e) => setValue(`values.lineItems.${row.index}.quantityRequested`, e ?? null)}
                   onBlur={(e) => handleBlur(
-                    field,
+                    field.name,
                     null,
                     () => {
                       const parsedValue = e.target.value ? Number(e.target.value) : undefined;
@@ -485,7 +486,7 @@ const useInboundAddItemsColumns = ({
                   loadOptions={debouncedUsersFetch}
                   hasErrors={hasErrors}
                   onKeyDown={(e) => handleKeyDown(e, row.index, column.id)}
-                  onBlur={() => handleBlur(field)}
+                  onBlur={() => handleBlur(field.name)}
                   className="select-xs dark-select-xs"
                   focusProps={{
                     fieldIndex: row.index,
