@@ -544,7 +544,7 @@ const useResolveStepTable = ({
       ), []),
       meta: {
         flexWidth: 50,
-        hide: !tableData.some((row) => row.id?.includes('newRow') || row.custom) || !isStepEditable,
+        hide: !tableData?.some((row) => row.id?.includes('newRow') || row.custom) || !isStepEditable,
       },
     }),
   ];
