@@ -202,14 +202,14 @@ const useInboundAddItemsForm = ({
     const newQty = Number(item.quantityRequested) || 0;
 
     const expirationDateChanged = (item.expirationDate
-        && item.inventoryItem.expirationDate !== item.expirationDate)
+        && item.inventoryItem?.expirationDate !== item.expirationDate)
       || (!item.expirationDate && oldItem.expirationDate);
 
     return (
       !isItemUpdated(item, oldItem)
       || item.palletName !== oldItem.palletName
       || item.boxName !== oldItem.boxName
-      || item.product.id !== oldItem.product.id
+      || item.product?.id !== oldItem.product.id
       || newQty !== oldQty
       || item.recipient?.id !== oldItem.recipient?.id
       || item.lotNumber !== oldItem.lotNumber
