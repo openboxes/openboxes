@@ -2,6 +2,7 @@
 /* eslint-disable no-await-in-loop */
 
 import {
+  useCallback,
   useEffect,
   useMemo,
   useRef,
@@ -98,9 +99,17 @@ const useResolveStep = () => {
     const duplicatedItems = _.groupBy(items,
       (item) => `${item.binLocation?.id}-${item?.inventoryItem?.lotNumber}`);
 
-    const maxCountIndex = _.maxBy(items, 'countIndex').countIndex;
+    const maxCountIndex = _.maxBy(items, 'countIndex')?.countIndex;
 
-    return Object.values(duplicatedItems).flatMap((itemsToMerge) => {
+    const duplicatedItemsValues = Object.values(duplicatedItems);
+
+    const areRecountItemsExist = _.some(duplicatedItemsValues, (group) => group.length > 1);
+
+    if (!areRecountItemsExist) {
+      return [];
+    }
+
+    return duplicatedItemsValues.flatMap((itemsToMerge) => {
       // When inventory is deleted the QoH is zero so the recount item was deleted,
       // but it is still returning the original count item (because QoH was not zero
       // at the time of the original count), so when we don't have more items than those
@@ -225,11 +234,27 @@ const useResolveStep = () => {
     hide();
   };
 
+  const getField = useCallback((id, fieldName) => {
+    const findCycleCount = (data) => data?.find(
+      (cycleCount) => cycleCount.id === id,
+    );
+    const findByField = (data) => findCycleCount(data)?.cycleCountItems.find(
+      (cycleCountItem) => cycleCountItem[fieldName],
+    );
+    return findByField(tableData.current)
+      || findByField(cycleCountsWithItemsWithoutRecount.current);
+  }, []);
+
   const getRecountedBy = (cycleCountId) => recountedBy?.[cycleCountId];
 
-  const getCountedBy = (cycleCountId) => tableData?.current.find(
-    (cycleCount) => cycleCount?.id === cycleCountId,
-  )?.cycleCountItems?.find((row) => row?.countedBy)?.countedBy;
+  const getCountedBy = (cycleCountId) => {
+    const countedBy = (data) => data.find(
+      (cycleCount) => cycleCount?.id === cycleCountId,
+    )?.cycleCountItems?.find((row) => row?.countedBy || row?.assignee);
+
+    return countedBy(tableData.current)?.countedBy
+      || countedBy(cycleCountsWithItemsWithoutRecount.current)?.assignee;
+  };
 
   const removeRowFromState = (cycleCountId, rowId) => {
     const tableIndex = tableData.current.findIndex(
@@ -353,7 +378,7 @@ const useResolveStep = () => {
     resetFocus();
   };
 
-  const getRecountedDate = (cycleCountId) => dateRecounted[cycleCountId];
+  const getRecountedDate = (cycleCountId) => dateRecounted[cycleCountId] || new Date();
 
   const setRecountedDate = (cycleCountId) => (date) => {
     setDateRecounted({
@@ -549,13 +574,12 @@ const useResolveStep = () => {
     },
   };
 
-  const getProduct = (cycleCountItems) => cycleCountItems[0]?.product;
+  const getProduct = (id) => getField(id, 'product');
 
-  const getDateCounted = (cycleCountItems) =>
-    cycleCountItems?.find((row) => row.dateCounted)?.dateCounted;
+  const getDateCounted = (id) => getField(id, 'dateCounted');
 
   return {
-    tableData: tableData.current,
+    tableData: tableData.current || [],
     tableMeta,
     validationErrors,
     isStepEditable,
