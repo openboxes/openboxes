@@ -254,7 +254,7 @@ const useResolveStep = () => {
         id: productId,
       },
       inventoryItem: {
-        lotNumber: null,
+        lotNumber: '',
         expirationDate: null,
       },
       binLocation: null,
