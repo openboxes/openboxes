@@ -3,8 +3,7 @@ import React, { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
 import InboundHeader from 'components/stock-movement-wizard/inboundV2/InboundHeader';
-import InboundV2AddItems
-  from 'components/stock-movement-wizard/inboundV2/sections/InboundV2AddItems';
+import InboundV2AddItems from 'components/stock-movement-wizard/inboundV2/sections/InboundV2AddItems';
 import InboundV2Create from 'components/stock-movement-wizard/inboundV2/sections/InboundV2Create';
 import InboundV2Send from 'components/stock-movement-wizard/inboundV2/sections/InboundV2Send';
 import WizardStepsV2 from 'components/wizard/v2/WizardStepsV2';
@@ -99,6 +98,9 @@ const InboundV2 = () => {
     previousPage,
     refreshFocusCounter,
     resetFocus,
+    refresh,
+    importTemplate,
+    exportTemplate,
   } = useInboundAddItemsForm({ next, previous });
 
   const addItemsComponentProps = {
@@ -119,6 +121,9 @@ const InboundV2 = () => {
     previousPage,
     refreshFocusCounter,
     resetFocus,
+    refresh,
+    importTemplate,
+    exportTemplate,
   };
 
   const sendComponentProps = {

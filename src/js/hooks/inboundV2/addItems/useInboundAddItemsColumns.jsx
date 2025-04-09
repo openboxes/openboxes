@@ -147,7 +147,11 @@ const useInboundAddItemsColumns = ({
   const columns = useMemo(() => [
     columnHelper.accessor(inboundColumns.PALLET_NAME, {
       header: () => (
-        <TableHeaderCell className="justify-content-center rt-th-add-items">
+        <TableHeaderCell
+          className="justify-content-center rt-th-add-items"
+          tooltip
+          tooltipLabel={translate('react.stockMovement.packLevel1.label', 'Pack Level 1')}
+        >
           {translate('react.stockMovement.packLevel1.label', 'Pack Level 1')}
         </TableHeaderCell>
       ),
@@ -196,7 +200,11 @@ const useInboundAddItemsColumns = ({
     }),
     columnHelper.accessor(inboundColumns.BOX_NAME, {
       header: () => (
-        <TableHeaderCell className="justify-content-center rt-th-add-items">
+        <TableHeaderCell
+          className="justify-content-center rt-th-add-items"
+          tooltip
+          tooltipLabel={translate('react.stockMovement.packLevel2.label', 'Pack Level 2')}
+        >
           {translate('react.stockMovement.packLevel2.label', 'Pack Level 2')}
         </TableHeaderCell>
       ),
@@ -240,7 +248,12 @@ const useInboundAddItemsColumns = ({
     }),
     columnHelper.accessor(inboundColumns.PRODUCT, {
       header: () => (
-        <TableHeaderCell required className="rt-th-add-items">
+        <TableHeaderCell
+          className="rt-th-add-items"
+          required
+          tooltip
+          tooltipLabel={translate('react.stockMovement.product.label', 'Product')}
+        >
           {translate('react.stockMovement.product.label', 'Product')}
         </TableHeaderCell>
       ),
@@ -287,7 +300,11 @@ const useInboundAddItemsColumns = ({
     }),
     columnHelper.accessor(inboundColumns.LOT_NUMBER, {
       header: () => (
-        <TableHeaderCell className="justify-content-center rt-th-add-items">
+        <TableHeaderCell
+          className="justify-content-center rt-th-add-items"
+          tooltip
+          tooltipLabel={translate('react.stockMovement.lot.label', 'Lot')}
+        >
           {translate('react.stockMovement.lot.label', 'Lot')}
         </TableHeaderCell>
       ),
@@ -331,7 +348,11 @@ const useInboundAddItemsColumns = ({
     }),
     columnHelper.accessor(inboundColumns.EXPIRATION_DATE, {
       header: () => (
-        <TableHeaderCell className="justify-content-center rt-th-add-items">
+        <TableHeaderCell
+          className="justify-content-center rt-th-add-items"
+          tooltip
+          tooltipLabel={translate('react.stockMovement.expiry.label', 'Expiry')}
+        >
           {translate('react.stockMovement.expiry.label', 'Expiry')}
         </TableHeaderCell>
       ),
@@ -377,7 +398,12 @@ const useInboundAddItemsColumns = ({
     }),
     columnHelper.accessor(inboundColumns.QUANTITY_REQUESTED, {
       header: () => (
-        <TableHeaderCell required className="justify-content-center rt-th-add-items">
+        <TableHeaderCell
+          required
+          className="justify-content-center rt-th-add-items"
+          tooltip
+          tooltipLabel={translate('react.stockMovement.quantity.label', 'Quantity')}
+        >
           {translate('react.stockMovement.quantity.label', 'Quantity')}
         </TableHeaderCell>
       ),
@@ -480,7 +506,11 @@ const useInboundAddItemsColumns = ({
     columnHelper.display({
       id: inboundColumns.DELETE,
       header: () => (
-        <TableHeaderCell className="justify-content-center rt-th-add-items">
+        <TableHeaderCell
+          className="justify-content-center rt-th-add-items"
+          tooltip
+          tooltipLabel={translate('react.default.button.delete.label', 'Delete')}
+        >
           {translate('react.default.button.delete.label', 'Delete')}
         </TableHeaderCell>
       ),
