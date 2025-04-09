@@ -198,7 +198,6 @@ const InboundV2AddItems = ({
           label="react.default.button.next.label"
           defaultLabel="Next"
           variant="primary"
-          // type="submit"
           onClick={nextPage}
           disabled={!updatedRows.some(item =>
             item.product && parseInt(item.quantityRequested, 10))}

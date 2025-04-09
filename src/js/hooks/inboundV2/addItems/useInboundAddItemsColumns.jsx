@@ -160,7 +160,7 @@ const useInboundAddItemsColumns = ({
       ),
       cell: ({ row, column }) => {
         const hasErrors = !!errors?.[row.index]?.palletName?.message;
-        const { field: boxField } = useController({
+        const { field: boxNameField } = useController({
           name: `values.lineItems.${row.index}.boxName`,
           control,
         });
@@ -180,7 +180,7 @@ const useInboundAddItemsColumns = ({
                   className="input-xs"
                   {...field}
                   onKeyDown={(e) => handleKeyDown(e, row.index, column.id)}
-                  onBlur={() => handleBlur(field, boxField)}
+                  onBlur={() => handleBlur(field, boxNameField)}
                   onChange={(e) => setValue(`values.lineItems.${row.index}.palletName`, e.target.value ?? null)}
                   focusProps={{
                     fieldIndex: row.index,
