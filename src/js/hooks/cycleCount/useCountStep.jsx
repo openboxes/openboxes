@@ -234,7 +234,7 @@ const useCountStep = () => {
         id: productId,
       },
       inventoryItem: {
-        lotNumber: null,
+        lotNumber: '',
         expirationDate: null,
       },
       binLocation: null,
