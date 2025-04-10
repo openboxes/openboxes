@@ -124,7 +124,7 @@ class CycleCountProductAvailabilityService {
                     it.inventoryItem == cycleCountItem.inventoryItem &&
                     it.custom
         }
-        if (!wasItemEverCustomAdded) {
+        if (!wasItemEverCustomAdded && cycleCountItem.quantityCounted <= 0) {
             refreshState.addItemToDelete(cycleCountItem)
             return
         }

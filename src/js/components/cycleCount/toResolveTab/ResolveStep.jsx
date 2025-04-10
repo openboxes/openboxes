@@ -4,6 +4,7 @@ import ConfirmStepHeader from 'components/cycleCount/ConfirmStepHeader';
 import ResolveStepHeader from 'components/cycleCount/toResolveTab/ResolveStepHeader';
 import ResolveStepTable from 'components/cycleCount/toResolveTab/ResolveStepTable';
 import useResolveStep from 'hooks/cycleCount/useResolveStep';
+import useTranslation from 'hooks/useTranslation';
 import PageWrapper from 'wrappers/PageWrapper';
 
 import 'components/cycleCount/cycleCount.scss';
@@ -35,7 +36,9 @@ const ResolveStep = () => {
     triggerValidation,
     isSaveDisabled,
     setIsSaveDisabled,
+    cycleCountsWithItemsWithoutRecount,
   } = useResolveStep();
+  useTranslation('cycleCount');
 
   return (
     <PageWrapper>
@@ -76,6 +79,9 @@ const ResolveStep = () => {
             isFormValid={isFormValid}
             triggerValidation={triggerValidation}
             refreshFocusCounter={refreshFocusCounter}
+            cycleCountsWithItemsWithoutRecount={
+              cycleCountsWithItemsWithoutRecount.find((cycleCount) => cycleCount.id === id)
+            }
           />
         ))}
     </PageWrapper>
