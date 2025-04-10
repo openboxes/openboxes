@@ -19,7 +19,6 @@
         @bottom-center {
             content: "Page " counter(page) " of " counter(pages);
             font-size: 12px;
-            color: #333;
             font-family: sans-serif;
         }
     }
