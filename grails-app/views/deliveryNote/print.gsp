@@ -44,7 +44,12 @@
             size: letter;
             background: white;
             @top-center { content: element(header) }
-            @bottom-center { content: element(footer) }
+            @bottom-center {
+                content: "Page " counter(page) " of " counter(pages);
+                font-size: 12px;
+                color: #333;
+                font-family: sans-serif;
+            }
         }
 
         .small {font-size: xx-small;}
