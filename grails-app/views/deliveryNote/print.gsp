@@ -34,11 +34,6 @@
             text-align: center;
             position: running(header);
         }
-        div.footer {
-            display: block;
-            text-align: center;
-            position: running(footer);
-        }
 
         @page {
             size: letter;
