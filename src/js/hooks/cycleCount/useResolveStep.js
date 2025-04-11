@@ -13,6 +13,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
 import { fetchBinLocations, fetchUsers } from 'actions';
+import { UPDATE_CYCLE_COUNT_IDS } from 'actions/types';
 import cycleCountApi from 'api/services/CycleCountApi';
 import { CYCLE_COUNT as GET_CYCLE_COUNTS } from 'api/urls';
 import ActivityCode from 'consts/activityCode';
@@ -165,10 +166,10 @@ const useResolveStep = () => {
     return [...originalItems, ...customItemsSortedByCreationDate];
   };
 
-  const refetchData = async () => {
+  const refetchData = async (ids = cycleCountIds) => {
     const { data } = await cycleCountApi.getCycleCounts(
       currentLocation?.id,
-      cycleCountIds,
+      ids,
     );
     tableData.current = data?.data?.map((cycleCount) => {
       const mergedItems = mergeCycleCountItems(cycleCount.cycleCountItems);
@@ -405,17 +406,17 @@ const useResolveStep = () => {
     }
   };
 
-  const refreshCountItems = async () => {
+  const refreshCountItems = async (cycleCountIdsForOutdatedProducts = cycleCountIds) => {
     try {
       show();
       await save(false);
-      for (const cycleCountId of cycleCountIds) {
+      for (const cycleCountId of cycleCountIdsForOutdatedProducts) {
         await cycleCountApi.refreshItems(currentLocation?.id, cycleCountId);
       }
     } finally {
       resetFocus();
       hide();
-      await refetchData();
+      await refetchData(cycleCountIdsForOutdatedProducts);
     }
   };
 
@@ -450,7 +451,7 @@ const useResolveStep = () => {
     },
   });
 
-  const reviewProductsModalButtons = (onClose) => ([
+  const reviewProductsModalButtons = (cycleCountIdsForOutdatedProducts) => (onClose) => ([
     {
       variant: 'primary',
       defaultLabel: 'Review Products',
@@ -458,15 +459,15 @@ const useResolveStep = () => {
       onClick: async () => {
         setIsSaveDisabled(false);
         setIsStepEditable(true);
-        await refreshCountItems();
+        await refreshCountItems(cycleCountIdsForOutdatedProducts);
         onClose?.();
       },
     },
   ]);
 
-  const openReviewProductsModal = (outdatedProductsCount) => {
+  const openReviewProductsModal = (outdatedProductsCount, cycleCountIdsForOutdatedProducts) => {
     confirmationModal({
-      buttons: reviewProductsModalButtons,
+      buttons: reviewProductsModalButtons(cycleCountIdsForOutdatedProducts),
       ...modalLabels(outdatedProductsCount),
       hideCloseButton: false,
       closeOnClickOutside: false,
@@ -475,6 +476,7 @@ const useResolveStep = () => {
 
   const submitRecount = async () => {
     let outdatedProducts = 0;
+    const cycleCountIdsForOutdatedProducts = [];
     try {
       show();
       await save();
@@ -491,11 +493,16 @@ const useResolveStep = () => {
           currentLocation?.id,
           cycleCount?.id);
         } catch {
+          cycleCountIdsForOutdatedProducts.push(cycleCount.id);
           outdatedProducts += 1;
         }
       }
       if (outdatedProducts > 0) {
-        openReviewProductsModal(outdatedProducts);
+        dispatch({
+          type: UPDATE_CYCLE_COUNT_IDS,
+          payload: cycleCountIdsForOutdatedProducts,
+        });
+        openReviewProductsModal(outdatedProducts, cycleCountIdsForOutdatedProducts);
         return;
       }
       history.push(CYCLE_COUNT.list(TO_RESOLVE_TAB));
