@@ -62,7 +62,7 @@ const ResolveStepTable = ({
   const translate = useTranslate();
 
   const emptyTableMessage = {
-    id: 'react.cycleCount.table.emptyTable.label',
+    id: 'react.cycleCount.table.noInventoryItem.label',
     defaultMessage: 'No inventory item in stock for this product',
   };
 
