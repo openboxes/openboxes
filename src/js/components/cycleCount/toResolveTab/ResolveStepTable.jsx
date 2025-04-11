@@ -6,6 +6,7 @@ import { RiErrorWarningLine } from 'react-icons/ri';
 import { useSelector } from 'react-redux';
 import { Tooltip } from 'react-tippy';
 
+import CycleCountStockDiscrepancyInfoBar from 'components/cycleCount/CycleCountStockDiscrepancyInfoBar';
 import HeaderLabel from 'components/cycleCount/HeaderLabel';
 import HeaderSelect from 'components/cycleCount/HeaderSelect';
 import DataTable from 'components/DataTable/v2/DataTable';
@@ -39,6 +40,7 @@ const ResolveStepTable = ({
   isStepEditable,
   triggerValidation,
   refreshFocusCounter,
+  cycleCountsWithItemsWithoutRecount,
 }) => {
   const {
     columns,
@@ -80,8 +82,14 @@ const ResolveStepTable = ({
     return recountedBy?.id ? null : true;
   };
 
+  const outOfStockItems = cycleCountsWithItemsWithoutRecount
+    .cycleCountItems
+    .filter((item) => item.quantityOnHand === 0);
+
   return (
     <div className="list-page-list-section">
+      {outOfStockItems.length > 0
+        && <CycleCountStockDiscrepancyInfoBar outOfStockItems={outOfStockItems} />}
       <p className="count-step-title pt-4 pl-4">
         {product?.productCode}
         {' '}
@@ -225,4 +233,5 @@ ResolveStepTable.propTypes = {
   isFormValid: PropTypes.bool.isRequired,
   refreshFocusCounter: PropTypes.number.isRequired,
   triggerValidation: PropTypes.func.isRequired,
+  cycleCountsWithItemsWithoutRecount: PropTypes.arrayOf(PropTypes.shape({}).isRequired).isRequired,
 };

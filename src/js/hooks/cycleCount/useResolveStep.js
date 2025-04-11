@@ -32,6 +32,7 @@ const useResolveStep = () => {
   // Table data is stored using useRef to avoid re-renders onBlur
   // (it removes focus while selecting new fields)
   const tableData = useRef([]);
+  const cycleCountsWithItemsWithoutRecount = useRef([]);
   // Saving selected "recounted by" option
   const [recountedBy, setRecountedBy] = useState({});
   // Saving selected "date recounted" option, initially it's the date fetched from API
@@ -146,6 +147,15 @@ const useResolveStep = () => {
     }).filter(Boolean);
   };
 
+  const getItemsWithoutRecountIndexes = (items) => {
+    const duplicatedItems = _.groupBy(items,
+      (item) => `${item.binLocation?.id}-${item?.inventoryItem?.lotNumber}`);
+
+    const duplicatedItemsValues = Object.values(duplicatedItems);
+
+    return duplicatedItemsValues.filter((group) => group.length < 2).flat();
+  };
+
   // Function used for maintaining the same order in the resolve tab between saves.
   // It's needed because items are returned in the same order as they are on the record stock,
   // but we want to have editable items at the bottom in the order that those items were
@@ -172,8 +182,12 @@ const useResolveStep = () => {
     );
     tableData.current = data?.data?.map((cycleCount) => {
       const mergedItems = mergeCycleCountItems(cycleCount.cycleCountItems);
-      return ({ ...cycleCount, cycleCountItems: moveCustomItemsToTheBottom(mergedItems) });
+      return ({ ...cycleCount, cycleCountItems: moveCustomItemsToTheBottom(mergedItems) || [] });
     });
+    cycleCountsWithItemsWithoutRecount.current = data?.data?.map((cycleCount) => ({
+      ...cycleCount,
+      cycleCountItems: getItemsWithoutRecountIndexes(cycleCount.cycleCountItems),
+    }));
     const recountedDates = tableData.current?.reduce((acc, cycleCount) => ({
       ...acc,
       [cycleCount?.id]: cycleCount?.cycleCountItems?.[0]?.dateRecounted,
@@ -559,6 +573,7 @@ const useResolveStep = () => {
     triggerValidation,
     isSaveDisabled,
     setIsSaveDisabled,
+    cycleCountsWithItemsWithoutRecount: cycleCountsWithItemsWithoutRecount.current,
   };
 };
 
