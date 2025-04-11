@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 
 import Translate from 'utils/Translate';
 
-const CycleCountDiscrepancyInfoBar = ({ outOfStockItems }) => (
+const CycleCountStockDiscrepancyInfoBar = ({ outOfStockItems }) => (
   <div className="d-flex justify-content-between flex-column draft-modal">
     {outOfStockItems.map((item) => (
       <div key={item.id}>
@@ -23,8 +23,8 @@ const CycleCountDiscrepancyInfoBar = ({ outOfStockItems }) => (
   </div>
 );
 
-export default CycleCountDiscrepancyInfoBar;
+export default CycleCountStockDiscrepancyInfoBar;
 
-CycleCountDiscrepancyInfoBar.propTypes = {
+CycleCountStockDiscrepancyInfoBar.propTypes = {
   outOfStockItems: PropTypes.arrayOf(PropTypes.shape({}).isRequired).isRequired,
 };

@@ -6,7 +6,7 @@ import { RiErrorWarningLine } from 'react-icons/ri';
 import { useSelector } from 'react-redux';
 import { Tooltip } from 'react-tippy';
 
-import CycleCountDiscrepancyInfoBar from 'components/cycleCount/CycleCountDiscrepancyInfoBar';
+import CycleCountStockDiscrepancyInfoBar from 'components/cycleCount/CycleCountStockDiscrepancyInfoBar';
 import HeaderLabel from 'components/cycleCount/HeaderLabel';
 import HeaderSelect from 'components/cycleCount/HeaderSelect';
 import DataTable from 'components/DataTable/v2/DataTable';
@@ -89,7 +89,7 @@ const ResolveStepTable = ({
   return (
     <div className="list-page-list-section">
       {outOfStockItems.length > 0
-        && <CycleCountDiscrepancyInfoBar outOfStockItems={outOfStockItems} />}
+        && <CycleCountStockDiscrepancyInfoBar outOfStockItems={outOfStockItems} />}
       <p className="count-step-title pt-4 pl-4">
         {product?.productCode}
         {' '}
