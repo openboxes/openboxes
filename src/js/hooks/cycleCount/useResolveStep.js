@@ -27,6 +27,7 @@ import trimLotNumberSpaces from 'utils/cycleCountUtils';
 import dateWithoutTimeZone from 'utils/dateUtils';
 import exportFileFromApi from 'utils/file-download-util';
 import { checkBinLocationSupport } from 'utils/supportedActivitiesUtils';
+import moment from 'moment';
 
 // Managing state for all tables, operations on shared state (from resolve step)
 const useResolveStep = () => {
@@ -102,7 +103,9 @@ const useResolveStep = () => {
 
     const duplicatedItemsValues = Object.values(duplicatedItems);
 
-    const areRecountItemsExist = _.some(duplicatedItemsValues, (group) => group.length > 1);
+    const areRecountItemsExist = _.some(duplicatedItemsValues,
+      (group) => _.some(group,
+        (groupItem) => groupItem.countIndex === maxCountIndex && maxCountIndex > 0));
 
     if (!areRecountItemsExist) {
       return [];
@@ -115,7 +118,7 @@ const useResolveStep = () => {
       // which are coming from the counting step we have to filter those items out. It is
       // not changed on the backend, because in that case we will lose the information
       // about the original count
-      if (_.every(itemsToMerge, (item) => item.countIndex < maxCountIndex)) {
+      if (_.every(itemsToMerge, (item) => item.countIndex < maxCountIndex && maxCountIndex > 0)) {
         return null;
       }
 
@@ -181,6 +184,10 @@ const useResolveStep = () => {
 
     const customItemsSortedByCreationDate = _.sortBy(customItems, 'dateCreated');
 
+    if (!originalItems) {
+      return customItemsSortedByCreationDate;
+    }
+
     return [...originalItems, ...customItemsSortedByCreationDate];
   };
 
@@ -240,8 +247,8 @@ const useResolveStep = () => {
     const findByField = (data) => findCycleCount(data)?.cycleCountItems.find(
       (cycleCountItem) => cycleCountItem[fieldName],
     );
-    return findByField(tableData.current)
-      || findByField(cycleCountsWithItemsWithoutRecount.current);
+    return findByField(tableData.current)?.[fieldName]
+      || findByField(cycleCountsWithItemsWithoutRecount.current)?.[fieldName];
   }, []);
 
   const getRecountedBy = (cycleCountId) => recountedBy?.[cycleCountId];
@@ -377,7 +384,7 @@ const useResolveStep = () => {
     resetFocus();
   };
 
-  const getRecountedDate = (cycleCountId) => dateRecounted[cycleCountId] || new Date();
+  const getRecountedDate = (cycleCountId) => dateRecounted[cycleCountId] || moment.now();
 
   const setRecountedDate = (cycleCountId) => (date) => {
     setDateRecounted({

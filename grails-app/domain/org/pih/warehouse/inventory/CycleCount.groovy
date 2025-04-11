@@ -78,7 +78,7 @@ class CycleCount {
      */
     CycleCountStatus recomputeStatus() {
         Set<CycleCountItem> items = itemsOfMostRecentCount
-        if (items.size() && items.every { it.status.isCompleted() }) {
+        if (items.every { it.status.isCompleted() }) {
             return CycleCountStatus.COMPLETED
         }
         if (items.any { it.status == CycleCountItemStatus.INVESTIGATING }) {
