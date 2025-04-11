@@ -45,22 +45,12 @@
 
         </g:unless>
 
-        <g:if test="${sorted}">
             <!-- Sort ascending with nulls as highest values -->
             <g:set var="sortedRequisitionItems" value="${requisitionItems?.sort() { a,b -> comparator(a,b) }}"/>
-        </g:if>
-        <g:else>
-            <g:set var="sortedRequisitionItems" value="${requisitionItems?.sort()}"/>
-        </g:else>
 
         <g:each in="${sortedRequisitionItems}" status="i" var="requisitionItem">
             <g:if test="${picklist}">
-                <g:if test="${sorted}">
-                    <g:set var="picklistItems" value="${pickListItemsByRequisition[requisitionItem.id]?.sort { pickA, pickB -> pickA.binLocation?.name <=> pickB.binLocation?.name }?.findAll { it.quantity > 0 }}"/>
-                </g:if>
-                <g:else>
-                    <g:set var="picklistItems" value="${pickListItemsByRequisition[requisitionItem.id]?.findAll { it.quantity > 0 }}"/>
-                </g:else>
+                <g:set var="picklistItems" value="${pickListItemsByRequisition[requisitionItem.id]?.sort { pickA, pickB -> pickA.binLocation?.name <=> pickB.binLocation?.name }?.findAll { it.quantity > 0 }}"/>
                 <g:set var="numInventoryItem" value="${picklistItems?.size() ?: 1}"/>
             </g:if>
             <g:else>
