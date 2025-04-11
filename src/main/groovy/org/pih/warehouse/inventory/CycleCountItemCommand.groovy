@@ -15,15 +15,16 @@ class CycleCountItemCommand implements Validateable {
 
     @BindUsing({ obj, source ->
         Product product = Product.read(source['inventoryItem']['product'])
-        InventoryItem inventoryItem = InventoryItem.findByProductAndLotNumber(product, source['inventoryItem']['lotNumber'])
+        String lotNumber = source['inventoryItem']['lotNumber']
+        InventoryItem inventoryItem = InventoryItem.findByProductAndLotNumber(product, lotNumber)
 
         // Currently default lotNumbers can be null or empty string,
         // to avoid the situation of not finding appropriate one
         // we are trying to find another inventoryItem with
         // empty lot
-        if (!inventoryItem && !source['inventoryItem']['lotNumber']) {
-            String lotNumber = source['inventoryItem']['lotNumber'] == null ? '' : null
-            inventoryItem = InventoryItem.findByProductAndLotNumber(product, lotNumber)
+        if (!inventoryItem && !lotNumber) {
+            String otherBlankLotNumber = lotNumber == null ? '' : null
+            inventoryItem = InventoryItem.findByProductAndLotNumber(product, otherBlankLotNumber)
         }
 
         return inventoryItem ?: new InventoryItem(
