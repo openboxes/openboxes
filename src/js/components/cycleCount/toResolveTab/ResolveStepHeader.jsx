@@ -56,7 +56,7 @@ const ResolveStepHeader = ({
           )}
         >
           <Button
-            onClick={refreshCountItems}
+            onClick={() => refreshCountItems()}
             label="react.default.button.refresh.label"
             defaultLabel="Reload"
             variant="primary"
