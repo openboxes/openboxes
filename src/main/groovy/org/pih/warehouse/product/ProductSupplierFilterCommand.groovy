@@ -23,6 +23,8 @@ class ProductSupplierFilterCommand extends PaginationCommand implements Validate
 
     String order
 
+    Boolean unlimitedMax = false
+
 
     static constraints = {
         product nullable: true
@@ -34,5 +36,6 @@ class ProductSupplierFilterCommand extends PaginationCommand implements Validate
         searchTerm nullable: true
         sort nullable: true
         order nullable: true
+        unlimitedMax nullable: true
     }
 }

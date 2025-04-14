@@ -58,7 +58,8 @@ class ProductSupplierService {
         // This could happen when params.searchTerm and e.g. sort by productCode/productName is applied
         Set<String> usedAliases = new HashSet<>()
 
-        return ProductSupplier.createCriteria().list(command.paginationParams) {
+        def criteriaParams = command.unlimitedMax ? [:] : command.paginationParams
+        return ProductSupplier.createCriteria().list(criteriaParams) {
             if (command.searchTerm) {
                 createAlias("product", "p", JoinType.LEFT_OUTER_JOIN)
                 createAlias("supplier", "s", JoinType.LEFT_OUTER_JOIN)

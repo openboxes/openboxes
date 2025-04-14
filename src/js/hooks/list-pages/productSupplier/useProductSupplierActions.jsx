@@ -11,7 +11,7 @@ import useUserHasPermissions from 'hooks/useUserHasPermissions';
 import confirmationModal from 'utils/confirmationModalUtils';
 import translate from 'utils/Translate';
 
-const useProductSupplierActions = ({ fireFetchData }) => {
+const useProductSupplierActions = ({ fireFetchData, filterParams }) => {
   const canManageProducts = useUserHasPermissions({
     minRequiredRole: RoleType.ROLE_ADMIN,
     supplementalRoles: [RoleType.ROLE_PRODUCT_MANAGER],
@@ -35,8 +35,17 @@ const useProductSupplierActions = ({ fireFetchData }) => {
     }
   };
 
-  const exportProductSuppliers = () => {
-    window.location = PRODUCT_SUPPLIER_URL.export();
+  const exportProductSuppliers = (exportResults = false) => {
+    const transformedParams = {
+      format: 'xls',
+      exportResults,
+      ...filterParams,
+      product: filterParams.product?.id,
+      supplier: filterParams.supplier?.id,
+      defaultPreferenceTypes: (filterParams?.defaultPreferenceTypes || [])
+        .map(({ id }) => id),
+    };
+    window.location = PRODUCT_SUPPLIER_URL.export(transformedParams);
   };
 
   const modalLabels = {
