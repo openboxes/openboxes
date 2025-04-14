@@ -294,7 +294,7 @@ const useResolveStepTable = ({
         newRowFocusableCells.splice(0, 0, cycleCountColumn.BIN_LOCATION);
       }
 
-      const isNoLotNumber = columnPath === cycleCountColumn.LOT_NUMBER && value === null
+      const isNoLotNumber = columnPath === cycleCountColumn.LOT_NUMBER && initialValue === null
         && !!isFieldEditable;
 
       // Columns allowed for focus in existing rows
