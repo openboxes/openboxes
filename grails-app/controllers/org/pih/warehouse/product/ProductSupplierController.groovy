@@ -280,6 +280,7 @@ class ProductSupplierController {
     }
 
     def export() {
+
         def productSuppliers = []
 
         if (params.exportResults) {
