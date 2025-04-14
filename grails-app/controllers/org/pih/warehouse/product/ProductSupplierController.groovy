@@ -284,9 +284,9 @@ class ProductSupplierController {
 
         if (params.exportResults) {
             def command = new ProductSupplierFilterCommand(
-                    searchTerm: params.searchTerm,
+                    searchTerm: params.searchTerm ?: null,
                     product: params.product ?: null,
-                    includeInactive: params.includeInactive,
+                    includeInactive: params.includeInactive ?: null,
                     supplier: params.supplier ?: null,
                     defaultPreferenceTypes: params.defaultPreferenceTypes ? params.list('defaultPreferenceTypes') : null,
                     createdFrom: params.createdFrom ? new SimpleDateFormat("MM/dd/yyyy").parse(params.createdFrom) : null,
@@ -427,8 +427,7 @@ class ProductSupplierController {
                 return;
             default:
                 response.contentType = "text/csv"
-                response.setHeader("Content-disposition",
-                        "attachment; filename=\"ProductSuppliers-${new Date().format("yyyyMMdd-hhmmss")}.csv\"")
+                response.setHeader("Content-disposition", "attachment; filename=\"ProductSuppliers-${new Date().format("yyyyMMdd-hhmmss")}.csv\"")
                 render(contentType: "text/csv", text: dataService.generateCsv(data))
                 response.outputStream.flush()
                 return;

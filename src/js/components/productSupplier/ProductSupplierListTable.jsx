@@ -204,10 +204,7 @@ const ProductSupplierListTable = ({ filterParams }) => {
             <a
               href="#"
               className="dropdown-item"
-              onClick={(e) => {
-                e.preventDefault();
-                exportProductSuppliers();
-              }}
+              onClick={() => exportProductSuppliers()}
               role="button"
               tabIndex={0}
             >
@@ -219,10 +216,7 @@ const ProductSupplierListTable = ({ filterParams }) => {
             <a
               href="#"
               className="dropdown-item"
-              onClick={(e) => {
-                e.preventDefault();
-                exportProductSuppliers(true);
-              }}
+              onClick={() => exportProductSuppliers(true)}
               role="button"
               tabIndex={0}
             >
