@@ -10,6 +10,7 @@ import {
 } from 'react';
 
 import _ from 'lodash';
+import moment from 'moment';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
@@ -27,7 +28,6 @@ import trimLotNumberSpaces from 'utils/cycleCountUtils';
 import dateWithoutTimeZone from 'utils/dateUtils';
 import exportFileFromApi from 'utils/file-download-util';
 import { checkBinLocationSupport } from 'utils/supportedActivitiesUtils';
-import moment from 'moment';
 
 // Managing state for all tables, operations on shared state (from resolve step)
 const useResolveStep = () => {
@@ -103,9 +103,7 @@ const useResolveStep = () => {
 
     const duplicatedItemsValues = Object.values(duplicatedItems);
 
-    const areRecountItemsExist = _.some(duplicatedItemsValues,
-      (group) => _.some(group,
-        (groupItem) => groupItem.countIndex === maxCountIndex && maxCountIndex > 0));
+    const areRecountItemsExist = maxCountIndex > 0;
 
     if (!areRecountItemsExist) {
       return [];
@@ -540,6 +538,7 @@ const useResolveStep = () => {
           outdatedProducts += 1;
         }
       }
+
       if (outdatedProducts > 0) {
         openReviewProductsModal(outdatedProducts);
         return;
