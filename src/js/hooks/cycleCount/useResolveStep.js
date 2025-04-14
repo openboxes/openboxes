@@ -54,6 +54,7 @@ const useResolveStep = () => {
     showEmptyRootCauseWarning,
     isFormValid,
     resetValidationState,
+    anyCountHasNoItems,
   } = useResolveStepValidation({ tableData });
 
   const dispatch = useDispatch();
@@ -209,6 +210,8 @@ const useResolveStep = () => {
     resetFocus();
     hide();
   };
+
+  const disableNextButton = () => anyCountHasNoItems;
 
   const getRecountedBy = (cycleCountId) => recountedBy?.[cycleCountId];
 
@@ -549,6 +552,7 @@ const useResolveStep = () => {
     getRecountedDate,
     setRecountedDate,
     shouldHaveRootCause,
+    disableNextButton,
     next,
     save,
     submitRecount,
