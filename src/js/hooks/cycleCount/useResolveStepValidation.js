@@ -141,6 +141,11 @@ const useResolveStepValidation = ({ tableData }) => {
     isValid.current = null;
   };
 
+  const anyCountHasNoItems = () => _.some(
+    tableData.current.map((cycleCount) => cycleCount.cycleCountItems),
+    (cycleCountItems) => cycleCountItems.length === 0,
+  );
+
   return {
     validationErrors: validationErrors.current,
     isFormValid: isValid.current,
@@ -153,6 +158,7 @@ const useResolveStepValidation = ({ tableData }) => {
     rowValidationSchema,
     rowsValidationSchema,
     resetValidationState,
+    anyCountHasNoItems,
   };
 };
 

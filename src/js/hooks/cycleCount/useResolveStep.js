@@ -58,6 +58,7 @@ const useResolveStep = () => {
     showEmptyRootCauseWarning,
     isFormValid,
     resetValidationState,
+    anyCountHasNoItems,
   } = useResolveStepValidation({ tableData });
 
   const dispatch = useDispatch();
@@ -247,6 +248,8 @@ const useResolveStep = () => {
     return findByField(tableData.current)?.[fieldName]
       || findByField(cycleCountsWithItemsWithoutRecount.current)?.[fieldName];
   }, []);
+
+  const disableNextButton = () => anyCountHasNoItems;
 
   const getRecountedBy = (cycleCountId) => recountedBy?.[cycleCountId];
 
@@ -597,6 +600,7 @@ const useResolveStep = () => {
     getRecountedDate,
     setRecountedDate,
     shouldHaveRootCause,
+    disableNextButton,
     next,
     save,
     submitRecount,

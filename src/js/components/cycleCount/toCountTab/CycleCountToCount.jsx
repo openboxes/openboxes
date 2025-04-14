@@ -33,6 +33,7 @@ const CycleCountToCount = ({ filterParams, toCountTabCheckboxes, tablePagination
     exportTableData,
     moveToCounting,
     printCountForm,
+    openCancelCountsModal,
   } = useToCountTab({
     filterParams,
     offset,
@@ -54,6 +55,13 @@ const CycleCountToCount = ({ filterParams, toCountTabCheckboxes, tablePagination
           {translate('react.default.selected.label', 'selected')}
         </span>
         <div className="d-flex m-2 gap-8">
+          <Button
+            onClick={openCancelCountsModal}
+            label="react.cycleCount.table.cancelCount.label"
+            defaultLabel="Cancel count"
+            variant="danger-outline"
+            disabled={!selectedCheckboxesAmount}
+          />
           <Button
             onClick={moveToCounting}
             label="react.cycleCount.table.startCount.label"
