@@ -294,6 +294,9 @@ const useResolveStepTable = ({
         newRowFocusableCells.splice(0, 0, cycleCountColumn.BIN_LOCATION);
       }
 
+      const isNoLotNumber = columnPath === cycleCountColumn.LOT_NUMBER && value === null
+        && !!isFieldEditable;
+
       // Columns allowed for focus in existing rows
       const existingRowFocusableCells = [
         cycleCountColumn.QUANTITY_RECOUNTED,
@@ -334,10 +337,10 @@ const useResolveStepTable = ({
           <Component
             disabled={isFieldEditable}
             type={type}
-            value={value}
+            value={isNoLotNumber ? translate('react.cycleCount.noLot.label', 'NO LOT') : value}
             onChange={onChange}
             onBlur={onBlur}
-            className={`${isAutoWidth ? 'w-auto' : 'w-75'} m-1 hide-arrows ${error && 'border border-danger input-has-error'}`}
+            className={`${isAutoWidth ? 'w-auto' : 'w-75'} m-1 hide-arrows ${error && 'border border-danger input-has-error'} ${isNoLotNumber && 'no-lot'}`}
             showErrorBorder={error}
             hideErrorMessageWrapper
             warning={tooltipContent && warning}
