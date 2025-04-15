@@ -453,7 +453,7 @@ const useResolveStep = () => {
       show();
       await save(false);
       for (const cycleCountId of cycleCountIdsForOutdatedProducts) {
-        await cycleCountApi.refreshItems(currentLocation?.id, cycleCountId);
+        await cycleCountApi.refreshItems(currentLocation?.id, cycleCountId, true);
       }
     } finally {
       resetFocus();
