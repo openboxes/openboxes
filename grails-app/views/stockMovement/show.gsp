@@ -54,14 +54,14 @@
                                     <div class="action-menu-item">
                                         <g:if test="${document.downloadOptions}">
                                             <g:each var="downloadOption" in="${document.downloadOptions}">
-                                                <g:link url="${downloadOption.uri}" target="_blank" class="download-link">
+                                                <g:link url="${downloadOption.uri}" target="_blank">
                                                     <img src="${resource(dir: 'images/icons/silk', file: 'page.png')}" class="middle"/>&nbsp;
                                                     ${downloadOption.name}
                                                 </g:link>
                                             </g:each>
                                         </g:if>
                                         <g:else>
-                                            <g:link url="${document.uri}" target="_blank" class="download-link">
+                                            <g:link url="${document.uri}" target="_blank">
                                                 <img src="${resource(dir: 'images/icons/silk', file: 'page.png')}" class="middle"/>&nbsp;
                                                 ${document.name}
                                             </g:link>
@@ -639,17 +639,6 @@
 </div>
 
 <script type="text/javascript">
-  function handleDownloadClick(event, url) {
-    window.open(url, '_blank');
-    event.preventDefault();
-  }
-
-    document.querySelectorAll('.download-link').forEach(function(link) {
-      link.addEventListener('click', function(event) {
-        handleDownloadClick(event, this.href);
-      });
-  });
-
     $(document).ready(function() {
 
       const stockMovementDirection = ${stockMovement?.destination?.id == currentLocation?.id} ? 'inbound' : 'outbound';
