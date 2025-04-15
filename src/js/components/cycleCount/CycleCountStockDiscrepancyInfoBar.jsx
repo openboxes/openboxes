@@ -13,7 +13,7 @@ const CycleCountStockDiscrepancyInfoBar = ({ outOfStockItems }) => {
         <div key={item.id}>
           <Translate
             id="react.cycleCount.modal.outOfStockDiscrepancyFound.label"
-            defaultMessage=""
+            defaultMessage={`Inventory was updated for bin ${item.binLocation?.name ?? 'DEFAULT'}, lot ${item.inventoryItem?.lotNumber || 'NO LOT'} during your count. Discrepancy found QOH = ${item.quantityOnHand} and quantity counted = ${item.quantityCounted}`}
             data={{
               binLocation: item.binLocation?.name ?? translate('react.cycleCount.defaultBin.label', 'DEFAULT'),
               lotNumber: item.inventoryItem?.lotNumber || translate('react.cycleCount.emptyLotNumber.label', 'NO LOT'),
