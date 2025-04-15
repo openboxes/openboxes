@@ -3275,6 +3275,13 @@ class StockMovementService {
                             stepNumber  : 4,
                             uri         : g.createLink(controller: 'picklist', action: "renderPdf", id: stockMovement?.requisition?.id, absolute: true),
                             hidden      : true
+                    ],
+                    [
+                            name        : g.message(code: "picklist.button.printSortedByBins.label"),
+                            documentType: DocumentGroupCode.PICKLIST.name(),
+                            contentType : "text/html",
+                            stepNumber  : null,
+                            uri         : g.createLink(controller: 'picklist', action: "print", id: stockMovement?.requisition?.id, absolute: true, params: [sorted: true])
                     ]
             ])
 
