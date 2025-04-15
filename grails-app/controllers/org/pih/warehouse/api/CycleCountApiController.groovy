@@ -182,7 +182,8 @@ class CycleCountApiController {
     }
 
     def refreshCycleCount(String cycleCountId) {
-        CycleCountDto cycleCount = cycleCountService.refreshCycleCount(cycleCountId)
+        boolean removeOutOfStockItemsImplicitly = params.boolean("removeOutOfStockItemsImplicitly", false)
+        CycleCountDto cycleCount = cycleCountService.refreshCycleCount(cycleCountId, removeOutOfStockItemsImplicitly)
 
         render([data: cycleCount] as JSON)
     }
