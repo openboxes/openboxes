@@ -15,6 +15,20 @@
     <title>
         <warehouse:message code="stockMovement.label"/>
     </title>
+    <script type="text/javascript">
+      function handleDownloadClick(event, url) {
+        window.open(url, '_blank');
+        event.preventDefault();
+      }
+
+      document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.download-link').forEach(function(link) {
+          link.addEventListener('click', function(event) {
+            handleDownloadClick(event, this.href);
+          });
+        });
+      });
+    </script>
 </head>
 <body>
 
@@ -54,14 +68,14 @@
                                     <div class="action-menu-item">
                                         <g:if test="${document.downloadOptions}">
                                             <g:each var="downloadOption" in="${document.downloadOptions}">
-                                                <g:link url="${downloadOption.uri}" target="_blank">
+                                                <g:link url="${downloadOption.uri}" target="_blank" class="download-link">
                                                     <img src="${resource(dir: 'images/icons/silk', file: 'page.png')}" class="middle"/>&nbsp;
                                                     ${downloadOption.name}
                                                 </g:link>
                                             </g:each>
                                         </g:if>
                                         <g:else>
-                                            <g:link url="${document.uri}" target="_blank">
+                                            <g:link url="${document.uri}" target="_blank" class="download-link">
                                                 <img src="${resource(dir: 'images/icons/silk', file: 'page.png')}" class="middle"/>&nbsp;
                                                 ${document.name}
                                             </g:link>
