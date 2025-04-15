@@ -250,6 +250,11 @@ const useResolveStep = () => {
   }, []);
 
   const disableNextButton = () => anyCountHasNoItems;
+  /**
+   * Contains validation for disabling the 'Next' button during a recount. This blocks the user
+   * from being able to proceed with the count.
+   */
+  const disableNextButton = () => anyCountHasNoItems();
 
   const getRecountedBy = (cycleCountId) => recountedBy?.[cycleCountId];
 
