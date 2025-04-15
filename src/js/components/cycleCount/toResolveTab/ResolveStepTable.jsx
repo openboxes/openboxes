@@ -61,6 +61,11 @@ const ResolveStepTable = ({
 
   const translate = useTranslate();
 
+  const emptyTableMessage = {
+    id: 'react.cycleCount.table.noInventoryItem.label',
+    defaultMessage: 'No inventory item in stock for this product',
+  };
+
   const defaultRecountedByMeta = recountedBy ? {
     id: recountedBy.id,
     value: recountedBy.id,
@@ -173,6 +178,7 @@ const ResolveStepTable = ({
           defaultColumn={defaultColumn}
           meta={tableMeta}
           filterParams={{}}
+          emptyTableMessage={emptyTableMessage}
           disablePagination
         />
       </div>
@@ -219,7 +225,7 @@ ResolveStepTable.propTypes = {
   dateCounted: PropTypes.string.isRequired,
   tableData: PropTypes.arrayOf(
     PropTypes.shape({}),
-  ).isRequired,
+  ),
   tableMeta: PropTypes.shape({
     updateData: PropTypes.func.isRequired,
   }).isRequired,
@@ -234,4 +240,8 @@ ResolveStepTable.propTypes = {
   refreshFocusCounter: PropTypes.number.isRequired,
   triggerValidation: PropTypes.func.isRequired,
   cycleCountsWithItemsWithoutRecount: PropTypes.arrayOf(PropTypes.shape({}).isRequired).isRequired,
+};
+
+ResolveStepTable.defaultProps = {
+  tableData: [],
 };
