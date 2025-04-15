@@ -391,10 +391,10 @@ class InventoryItemController {
             DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy")
             // By default set last 12 months
             Integer demandPeriod = grailsApplication.config.openboxes.forecasting.demandPeriod?:365
-            // Use a first day of current month as a starting point used for the start date calculation
+            // Use the first day of current month as the starting point for the start date calculation
             Map defaultStartDateRange = DateUtil.getDateRange(new Date(), 0)
             params.startDate = params.startDate ? dateFormat.parse(params.startDate) : defaultStartDateRange.startDate - demandPeriod.days
-            // Use a last date of previous month as the end date
+            // Use the last day of previous month as the end date
             Map defaultEndDateRange = DateUtil.getDateRange(new Date(), -1)
             params.endDate = params.endDate ? dateFormat.parse(params.endDate) : defaultEndDateRange.endDate
         }
