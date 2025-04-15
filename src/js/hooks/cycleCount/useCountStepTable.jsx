@@ -82,7 +82,7 @@ const useCountStepTable = ({
   };
 
   // Get field props, for the binLocation dropdown we have to pass options
-  const getFieldProps = (fieldName, value, isFieldEditable) => {
+  const getFieldProps = (fieldName, value, isFieldDisabled) => {
     if (fieldName === cycleCountColumn.BIN_LOCATION && showBinLocation) {
       return {
         labelKey: 'name',
@@ -96,7 +96,7 @@ const useCountStepTable = ({
       };
     }
 
-    if (fieldName === cycleCountColumn.LOT_NUMBER && _.isEmpty(value) && isFieldEditable) {
+    if (fieldName === cycleCountColumn.LOT_NUMBER && _.isEmpty(value) && isFieldDisabled) {
       return {
         placeholder: translate('react.cycleCount.noLot.label', 'NO LOT'),
       };
@@ -106,16 +106,16 @@ const useCountStepTable = ({
   };
 
   // this function is required because there is a problem with getValue
-  const getValueToDisplay = (id, value) => {
-    if (id === cycleCountColumn.EXPIRATION_DATE) {
+  const getValueToDisplay = (columnPath, value) => {
+    if (columnPath === cycleCountColumn.EXPIRATION_DATE) {
       return formatLocalizedDate(value, DateFormat.DD_MMM_YYYY);
     }
 
-    if (id === cycleCountColumn.QUANTITY_COUNTED) {
+    if (columnPath === cycleCountColumn.QUANTITY_COUNTED) {
       return value?.toString();
     }
 
-    if (id === cycleCountColumn.BIN_LOCATION && showBinLocation) {
+    if (columnPath === cycleCountColumn.BIN_LOCATION && showBinLocation) {
       return value?.name;
     }
 
@@ -130,7 +130,7 @@ const useCountStepTable = ({
       const initialValue = _.get(tableData, `[${index}].${columnPath}`);
       const [value, setValue] = useState(initialValue);
 
-      const isFieldEditable = !original.id.includes('newRow') && ![
+      const isFieldDisabled = !original.id.includes('newRow') && ![
         cycleCountColumn.QUANTITY_COUNTED,
         cycleCountColumn.COMMENT,
       ].includes(id);
@@ -187,14 +187,13 @@ const useCountStepTable = ({
       // works on onChange, so for now, I put it inside useEffect
       useEffect(() => {
         table.options.meta?.updateData(cycleCountId, original.id, id, value);
-      },
-      [value]);
+      }, [value]);
 
       // Table consists of text fields, one numerical field for quantity counted,
       // select field for bin locations and one date picker for the expiration date.
       const type = getFieldType(columnPath);
       const Component = getFieldComponent(columnPath);
-      const fieldProps = getFieldProps(columnPath, value, isFieldEditable);
+      const fieldProps = getFieldProps(columnPath, value, isFieldDisabled);
       const showTooltip = columnPath === cycleCountColumn.BIN_LOCATION;
 
       // Columns allowed for focus in new rows
@@ -238,7 +237,7 @@ const useCountStepTable = ({
           tooltipLabel={value?.name || translate('react.cycleCount.table.binLocation.label', 'Bin Location')}
         >
           <Component
-            disabled={isFieldEditable}
+            disabled={isFieldDisabled}
             type={type}
             value={value}
             onChange={onChange}
