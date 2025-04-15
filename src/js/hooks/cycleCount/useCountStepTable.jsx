@@ -98,7 +98,7 @@ const useCountStepTable = ({
 
     if (fieldName === cycleCountColumn.LOT_NUMBER && _.isEmpty(value) && isFieldDisabled) {
       return {
-        placeholder: translate('react.cycleCount.noLot.label', 'NO LOT'),
+        placeholder: translate('react.cycleCount.emptyLotNumber.label', 'NO LOT'),
       };
     }
 
