@@ -159,7 +159,14 @@ const useResolveStepTable = ({
   };
 
   // this function is required because there is a problem w getValue
-  const getValueToDisplay = (id, value) => {
+  const getValueToDisplay = (id, value, emptyLotNumber = false) => {
+    if (isStepEditable) {
+      if (emptyLotNumber) {
+        return translate('react.cycleCount.noLot.label', 'NO LOT');
+      }
+      return value;
+    }
+
     if (id === cycleCountColumn.EXPIRATION_DATE) {
       return formatLocalizedDate(value, DateFormat.DD_MMM_YYYY);
     }
@@ -294,7 +301,7 @@ const useResolveStepTable = ({
         newRowFocusableCells.splice(0, 0, cycleCountColumn.BIN_LOCATION);
       }
 
-      const showNoLotNumber = columnPath === cycleCountColumn.LOT_NUMBER && initialValue === null
+      const emptyLotNumber = columnPath === cycleCountColumn.LOT_NUMBER && (initialValue === null || initialValue === '')
         && !!isFieldEditable;
 
       // Columns allowed for focus in existing rows
@@ -330,17 +337,17 @@ const useResolveStepTable = ({
       return (
         <TableCell
           className="rt-td rt-td-count-step pb-0"
-          customTooltip={showTooltip && getValueToDisplay(id, value)}
+          customTooltip={showTooltip && getValueToDisplay(columnPath, value)}
           tooltipClassname="w-100"
-          tooltipLabel={getValueToDisplay(id, value)}
+          tooltipLabel={getValueToDisplay(columnPath, value)}
         >
           <Component
             disabled={isFieldEditable}
             type={type}
-            value={showNoLotNumber ? translate('react.cycleCount.noLot.label', 'NO LOT') : value}
+            value={getValueToDisplay(columnPath, value, emptyLotNumber)}
             onChange={onChange}
             onBlur={onBlur}
-            className={`${isAutoWidth ? 'w-auto' : 'w-75'} m-1 hide-arrows ${error && 'border border-danger input-has-error'} ${showNoLotNumber && 'no-lot'}`}
+            className={`${isAutoWidth ? 'w-auto' : 'w-75'} m-1 hide-arrows ${error && 'border border-danger input-has-error'} ${emptyLotNumber && 'no-lot'}`}
             showErrorBorder={error}
             hideErrorMessageWrapper
             warning={tooltipContent && warning}

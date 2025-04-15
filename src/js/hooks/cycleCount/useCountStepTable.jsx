@@ -100,8 +100,16 @@ const useCountStepTable = ({
   };
 
   // this function is required because there is a problem with getValue
-  const getValueToDisplay = (id, value) => {
+  const getValueToDisplay = (id, value, emptyLotNumber = false) => {
     const columnPath = id.replaceAll('_', '.');
+
+    if (isStepEditable) {
+      if (emptyLotNumber) {
+        return translate('react.cycleCount.noLot.label', 'NO LOT');
+      }
+      return value;
+    }
+
     if (columnPath === cycleCountColumn.EXPIRATION_DATE) {
       return formatLocalizedDate(value, DateFormat.DD_MMM_YYYY);
     }
@@ -203,7 +211,7 @@ const useCountStepTable = ({
         newRowFocusableCells.splice(0, 0, cycleCountColumn.BIN_LOCATION);
       }
 
-      const showNoLotNumber = columnPath === cycleCountColumn.LOT_NUMBER && initialValue === null
+      const emptyLotNumber = columnPath === cycleCountColumn.LOT_NUMBER && (initialValue === null || initialValue === '')
         && !!isFieldEditable;
 
       // Columns allowed for focus in existing rows
@@ -226,7 +234,6 @@ const useCountStepTable = ({
         isNewRow,
         onBlur,
       });
-
       return (
         <TableCell
           className="rt-td rt-td-count-step pb-0"
@@ -238,10 +245,10 @@ const useCountStepTable = ({
           <Component
             disabled={isFieldEditable}
             type={type}
-            value={showNoLotNumber ? translate('react.cycleCount.noLot.label', 'NO LOT') : value}
+            value={getValueToDisplay(id, value, emptyLotNumber)}
             onChange={onChange}
             onBlur={onBlur}
-            className={`m-1 hide-arrows ${showTooltip ? 'w-99' : 'w-75'} ${error && 'border border-danger input-has-error'} ${showNoLotNumber && 'no-lot'}`}
+            className={`m-1 hide-arrows ${showTooltip ? 'w-99' : 'w-75'} ${error && 'border border-danger input-has-error'} ${emptyLotNumber && 'no-lot'}`}
             showErrorBorder={error}
             hideErrorMessageWrapper
             onKeyDown={(e) => handleKeyDown(e, index, columnPath)}
