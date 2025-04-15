@@ -644,12 +644,10 @@
     event.preventDefault();
   }
 
-  document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.download-link').forEach(function(link) {
       link.addEventListener('click', function(event) {
         handleDownloadClick(event, this.href);
       });
-    });
   });
 
     $(document).ready(function() {
