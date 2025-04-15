@@ -161,7 +161,8 @@ const useResolveStep = () => {
 
     const duplicatedItemsValues = Object.values(duplicatedItems);
 
-    return duplicatedItemsValues.filter((group) => group.length < 2).flat();
+    return duplicatedItemsValues
+      .filter((group) => group.length < 2 && group.every((item) => item.countIndex === 0)).flat();
   };
 
   // Function used for maintaining the same order in the resolve tab between saves.
