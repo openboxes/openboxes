@@ -97,20 +97,17 @@ const useResolveStep = () => {
   }) : null);
 
   const mergeCycleCountItems = (items) => {
-    const duplicatedItems = _.groupBy(items,
-      (item) => `${item.binLocation?.id}-${item?.inventoryItem?.lotNumber}`);
-
     const maxCountIndex = _.maxBy(items, 'countIndex')?.countIndex;
 
-    const duplicatedItemsValues = Object.values(duplicatedItems);
-
-    const areRecountItemsExist = maxCountIndex > 0;
-
-    if (!areRecountItemsExist) {
+    // If no recount items exist, we should have an empty table at this step
+    if (maxCountIndex === 0) {
       return [];
     }
 
-    return duplicatedItemsValues.flatMap((itemsToMerge) => {
+    const duplicatedItems = _.groupBy(items,
+      (item) => `${item.binLocation?.id}-${item?.inventoryItem?.lotNumber}`);
+
+    return Object.values(duplicatedItems).flatMap((itemsToMerge) => {
       // When inventory is deleted the QoH is zero so the recount item was deleted,
       // but it is still returning the original count item (because QoH was not zero
       // at the time of the original count), so when we don't have more items than those
