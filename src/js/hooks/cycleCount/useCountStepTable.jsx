@@ -82,7 +82,7 @@ const useCountStepTable = ({
   };
 
   // Get field props, for the binLocation dropdown we have to pass options
-  const getFieldProps = (fieldName) => {
+  const getFieldProps = (fieldName, value, isFieldEditable) => {
     if (fieldName === cycleCountColumn.BIN_LOCATION && showBinLocation) {
       return {
         labelKey: 'name',
@@ -96,29 +96,26 @@ const useCountStepTable = ({
       };
     }
 
+    if (fieldName === cycleCountColumn.LOT_NUMBER && _.isEmpty(value) && isFieldEditable) {
+      return {
+        placeholder: translate('react.cycleCount.noLot.label', 'NO LOT'),
+      };
+    }
+
     return {};
   };
 
   // this function is required because there is a problem with getValue
-  const getValueToDisplay = (id, value, emptyLotNumber = false) => {
-    const columnPath = id.replaceAll('_', '.');
-
-    if (isStepEditable) {
-      if (emptyLotNumber) {
-        return translate('react.cycleCount.noLot.label', 'NO LOT');
-      }
-      return value;
-    }
-
-    if (columnPath === cycleCountColumn.EXPIRATION_DATE) {
+  const getValueToDisplay = (id, value) => {
+    if (id === cycleCountColumn.EXPIRATION_DATE) {
       return formatLocalizedDate(value, DateFormat.DD_MMM_YYYY);
     }
 
-    if (columnPath === cycleCountColumn.QUANTITY_COUNTED) {
+    if (id === cycleCountColumn.QUANTITY_COUNTED) {
       return value?.toString();
     }
 
-    if (columnPath === cycleCountColumn.BIN_LOCATION && showBinLocation) {
+    if (id === cycleCountColumn.BIN_LOCATION && showBinLocation) {
       return value?.name;
     }
 
@@ -142,7 +139,7 @@ const useCountStepTable = ({
       if (!isStepEditable) {
         return (
           <TableCell className="static-cell-count-step d-flex align-items-center">
-            {getValueToDisplay(id, value)}
+            {getValueToDisplay(columnPath, value)}
           </TableCell>
         );
       }
@@ -190,13 +187,14 @@ const useCountStepTable = ({
       // works on onChange, so for now, I put it inside useEffect
       useEffect(() => {
         table.options.meta?.updateData(cycleCountId, original.id, id, value);
-      }, [value]);
+      },
+      [value]);
 
       // Table consists of text fields, one numerical field for quantity counted,
       // select field for bin locations and one date picker for the expiration date.
       const type = getFieldType(columnPath);
       const Component = getFieldComponent(columnPath);
-      const fieldProps = getFieldProps(columnPath);
+      const fieldProps = getFieldProps(columnPath, value, isFieldEditable);
       const showTooltip = columnPath === cycleCountColumn.BIN_LOCATION;
 
       // Columns allowed for focus in new rows
@@ -210,9 +208,6 @@ const useCountStepTable = ({
       if (showBinLocation) {
         newRowFocusableCells.splice(0, 0, cycleCountColumn.BIN_LOCATION);
       }
-
-      const emptyLotNumber = columnPath === cycleCountColumn.LOT_NUMBER && (initialValue === null || initialValue === '')
-        && !!isFieldEditable;
 
       // Columns allowed for focus in existing rows
       const existingRowFocusableCells = [
@@ -245,10 +240,10 @@ const useCountStepTable = ({
           <Component
             disabled={isFieldEditable}
             type={type}
-            value={getValueToDisplay(id, value, emptyLotNumber)}
+            value={value}
             onChange={onChange}
             onBlur={onBlur}
-            className={`m-1 hide-arrows ${showTooltip ? 'w-99' : 'w-75'} ${error && 'border border-danger input-has-error'} ${emptyLotNumber && 'no-lot'}`}
+            className={`m-1 hide-arrows ${showTooltip ? 'w-99' : 'w-75'} ${error && 'border border-danger input-has-error'}`}
             showErrorBorder={error}
             hideErrorMessageWrapper
             onKeyDown={(e) => handleKeyDown(e, index, columnPath)}

@@ -114,7 +114,7 @@ const useResolveStepTable = ({
   };
 
   // Get field props, for the binLocation dropdown we have to pass options
-  const getFieldProps = (fieldName, hasTooltipIcon) => {
+  const getFieldProps = (fieldName, hasTooltipIcon, value, isFieldEditable) => {
     if (fieldName === cycleCountColumn.BIN_LOCATION && showBinLocation) {
       return {
         labelKey: 'name',
@@ -139,6 +139,12 @@ const useResolveStepTable = ({
       };
     }
 
+    if (fieldName === cycleCountColumn.LOT_NUMBER && _.isEmpty(value) && isFieldEditable) {
+      return {
+        placeholder: translate('react.cycleCount.noLot.label', 'NO LOT'),
+      };
+    }
+
     return {};
   };
 
@@ -159,14 +165,7 @@ const useResolveStepTable = ({
   };
 
   // this function is required because there is a problem w getValue
-  const getValueToDisplay = (id, value, emptyLotNumber = false) => {
-    if (isStepEditable) {
-      if (emptyLotNumber) {
-        return translate('react.cycleCount.noLot.label', 'NO LOT');
-      }
-      return value;
-    }
-
+  const getValueToDisplay = (id, value) => {
     if (id === cycleCountColumn.EXPIRATION_DATE) {
       return formatLocalizedDate(value, DateFormat.DD_MMM_YYYY);
     }
@@ -286,7 +285,7 @@ const useResolveStepTable = ({
       const type = getFieldType(columnPath);
       const Component = getFieldComponent(columnPath);
       const tooltipContent = getTooltipMessage(errorMessage, warning, columnPath);
-      const fieldProps = getFieldProps(columnPath, tooltipContent);
+      const fieldProps = getFieldProps(columnPath, tooltipContent, value, isFieldEditable);
 
       // Columns allowed for focus in new rows
       const newRowFocusableCells = [
@@ -300,9 +299,6 @@ const useResolveStepTable = ({
       if (showBinLocation) {
         newRowFocusableCells.splice(0, 0, cycleCountColumn.BIN_LOCATION);
       }
-
-      const emptyLotNumber = columnPath === cycleCountColumn.LOT_NUMBER && (initialValue === null || initialValue === '')
-        && !!isFieldEditable;
 
       // Columns allowed for focus in existing rows
       const existingRowFocusableCells = [
@@ -344,10 +340,10 @@ const useResolveStepTable = ({
           <Component
             disabled={isFieldEditable}
             type={type}
-            value={getValueToDisplay(columnPath, value, emptyLotNumber)}
+            value={value}
             onChange={onChange}
             onBlur={onBlur}
-            className={`${isAutoWidth ? 'w-auto' : 'w-75'} m-1 hide-arrows ${error && 'border border-danger input-has-error'} ${emptyLotNumber && 'no-lot'}`}
+            className={`${isAutoWidth ? 'w-auto' : 'w-75'} m-1 hide-arrows ${error && 'border border-danger input-has-error'}`}
             showErrorBorder={error}
             hideErrorMessageWrapper
             warning={tooltipContent && warning}
