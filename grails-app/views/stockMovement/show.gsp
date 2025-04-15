@@ -15,20 +15,6 @@
     <title>
         <warehouse:message code="stockMovement.label"/>
     </title>
-    <script type="text/javascript">
-      function handleDownloadClick(event, url) {
-        window.open(url, '_blank');
-        event.preventDefault();
-      }
-
-      document.addEventListener('DOMContentLoaded', function() {
-        document.querySelectorAll('.download-link').forEach(function(link) {
-          link.addEventListener('click', function(event) {
-            handleDownloadClick(event, this.href);
-          });
-        });
-      });
-    </script>
 </head>
 <body>
 
@@ -653,6 +639,19 @@
 </div>
 
 <script type="text/javascript">
+  function handleDownloadClick(event, url) {
+    window.open(url, '_blank');
+    event.preventDefault();
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.download-link').forEach(function(link) {
+      link.addEventListener('click', function(event) {
+        handleDownloadClick(event, this.href);
+      });
+    });
+  });
+
     $(document).ready(function() {
 
       const stockMovementDirection = ${stockMovement?.destination?.id == currentLocation?.id} ? 'inbound' : 'outbound';
