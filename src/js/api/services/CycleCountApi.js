@@ -40,6 +40,8 @@ export default {
     apiClientCustomResponseHandler.post(
       CYCLE_COUNT_SUBMIT_RECOUNT(locationId, cycleCountId), payload,
     ),
-  refreshItems: (locationId, cycleCountId) =>
-    apiClient.post(CYCLE_COUNT_REFRESH_ITEMS(locationId, cycleCountId)),
+  refreshItems: (locationId, cycleCountId, removeOutOfStockItemsImplicitly) =>
+    apiClient.post(CYCLE_COUNT_REFRESH_ITEMS(locationId,
+      cycleCountId,
+      removeOutOfStockItemsImplicitly)),
 };

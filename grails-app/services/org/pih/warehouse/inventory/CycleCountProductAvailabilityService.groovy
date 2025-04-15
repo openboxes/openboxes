@@ -38,7 +38,7 @@ class CycleCountProductAvailabilityService {
      *
      * @return CycleCountItemsForRefresh the items that were created, updated, and deleted as a result of the refresh.
      */
-    CycleCountItemsForRefresh refreshProductAvailability(CycleCount cycleCount) {
+    CycleCountItemsForRefresh refreshProductAvailability(CycleCount cycleCount, boolean removeOutOfStockItemsImplicitly = false) {
 
         CycleCountRefreshState refreshState = new CycleCountRefreshState(cycleCount)
 
@@ -54,7 +54,7 @@ class CycleCountProductAvailabilityService {
 
         // Additionally, we need to remove any cycle count items for bins or lots that have been deleted.
         for (CycleCountItem cycleCountItem : refreshState.itemsOfMostRecentCount) {
-            updateRefreshStateIfItemDeleted(refreshState, availableItems, cycleCountItem)
+            updateRefreshStateIfItemDeleted(refreshState, availableItems, cycleCountItem, removeOutOfStockItemsImplicitly)
         }
 
         // Now that we've computed the changes that need to be made, persist them to the cycle count items
@@ -103,7 +103,9 @@ class CycleCountProductAvailabilityService {
      * The cycle count items themselves are NOT updated at this point, only the refresh state object.
      */
     private void updateRefreshStateIfItemDeleted(CycleCountRefreshState refreshState,
-                                                 List<AvailableItem> availableItems, CycleCountItem cycleCountItem) {
+                                                 List<AvailableItem> availableItems,
+                                                 CycleCountItem cycleCountItem,
+                                                 boolean removeOutOfStockItemsImplicitly) {
 
         // If the available item exists, there's nothing to do.
         AvailableItem availableItem = availableItems.find{
@@ -124,7 +126,7 @@ class CycleCountProductAvailabilityService {
                     it.inventoryItem == cycleCountItem.inventoryItem &&
                     it.custom
         }
-        if (!wasItemEverCustomAdded && cycleCountItem.quantityCounted <= 0) {
+        if (!wasItemEverCustomAdded && (cycleCountItem.quantityCounted <= 0 || removeOutOfStockItemsImplicitly)) {
             refreshState.addItemToDelete(cycleCountItem)
             return
         }
