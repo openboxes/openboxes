@@ -1011,6 +1011,7 @@ class PartialReceivingPage extends Component {
   };
 
   render() {
+    const { translate } = this.props;
     return (
       <div>
         <Form
@@ -1046,7 +1047,7 @@ class PartialReceivingPage extends Component {
                         value={this.props.sort}
                         options={receivingSortOptions.map(option => ({
                           value: option.value,
-                          label: <Translate id={option.label} />,
+                          label: translate(option.label),
                         }))}
                       />
                     </div>
