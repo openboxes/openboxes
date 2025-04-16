@@ -105,11 +105,13 @@ const useToResolveTab = ({
     selectedCheckboxesAmount,
     headerCheckboxProps,
     checkedCheckboxes,
+    resetCheckboxes,
   } = useTableCheckboxes();
 
   const {
     tableData,
     loading,
+    fetchData,
   } = useTableDataV2({
     url: CYCLE_COUNT_PENDING_REQUESTS(currentLocation?.id),
     errorMessageId: 'react.cycleCount.table.errorMessage.label',
@@ -364,6 +366,8 @@ const useToResolveTab = ({
       await cycleCountApi.deleteRequests(currentLocation?.id, checkedCheckboxes);
     } finally {
       spinner.hide();
+      fetchData();
+      resetCheckboxes();
     }
   };
 

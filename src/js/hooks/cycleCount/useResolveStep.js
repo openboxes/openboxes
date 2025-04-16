@@ -249,7 +249,6 @@ const useResolveStep = () => {
       || findByField(cycleCountsWithItemsWithoutRecount.current)?.[fieldName];
   }, []);
 
-  const disableNextButton = () => anyCountHasNoItems;
   /**
    * Contains validation for disabling the 'Next' button during a recount. This blocks the user
    * from being able to proceed with the count.
@@ -349,6 +348,17 @@ const useResolveStep = () => {
     if (!isValid || !areRecountedByFilled) {
       return;
     }
+
+    const productsWithNoRecount = cycleCountsWithItemsWithoutRecount.current
+      .map((cycleCount) => ({
+        cycleCountId: cycleCount.id,
+        product: cycleCount.cycleCountItems[0].product.productCode,
+      }));
+    // TODO: The const above just takes the cycle counts with items without recount and returns product code that should be displayed in the modal
+    // TODO: In my opinion we can hardcode QOH = 0 in the modal.
+
+    // TODO: Display the modal, pass the productsWithNoRecount. Remember we might have a few products (tables) empty, and we eventually want to call Cancel for every product
+    // TODO: So we need to do call Cancel for each "productsWithNoRecount" (this is why I store the cycleCountId also)
 
     const missingRootCauses = validateRootCauses();
     if (!isRootCauseWarningSkipped && missingRootCauses.length > 0) {

@@ -74,7 +74,7 @@ const ResolveStepHeader = ({
           label="react.default.button.next.label"
           defaultLabel="Next"
           variant="primary"
-          disabled={disableNextButton}
+          //disabled={disableNextButton()}
         />
       </div>
     </div>

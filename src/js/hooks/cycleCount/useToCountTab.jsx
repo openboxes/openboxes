@@ -70,6 +70,7 @@ const useToCountTab = ({
     selectHeaderCheckbox,
     headerCheckboxProps,
     checkedCheckboxes,
+    resetCheckboxes,
   } = toCountTabCheckboxes;
 
   const getParams = ({
@@ -109,6 +110,7 @@ const useToCountTab = ({
   const {
     tableData,
     loading,
+    fetchData,
   } = useTableDataV2({
     url: CYCLE_COUNT_PENDING_REQUESTS(currentLocation?.id),
     errorMessageId: 'react.cycleCount.table.errorMessage.label',
@@ -362,6 +364,8 @@ const useToCountTab = ({
       await cycleCountApi.deleteRequests(currentLocation?.id, checkedCheckboxes);
     } finally {
       spinner.hide();
+      fetchData();
+      resetCheckboxes();
     }
   };
 
