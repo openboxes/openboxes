@@ -694,10 +694,13 @@ class PartialReceivingPage extends Component {
     this.props.showSpinner();
     const url = `/api/partialReceiving/${this.props.match.params.shipmentId}?stepNumber=1`;
 
+    const emptyLinesCount = emptyLinesCounter(formValues);
+
     const payload = {
       ...formValues,
       recipient: formValues?.recipient?.id,
-      containers: getReceivingPayloadContainers(formValues),
+      containers: emptyLinesCount ? this.buildShipmentItems(formValues.containers)
+        : getReceivingPayloadContainers(formValues),
     };
     return apiClient.post(url, flattenRequest(payload));
   }
