@@ -1047,7 +1047,7 @@ class PartialReceivingPage extends Component {
                         value={this.props.sort}
                         options={receivingSortOptions.map(option => ({
                           value: option.value,
-                          label: translate(option.label),
+                          label: translate(option.label, option.defaultLabel),
                         }))}
                       />
                     </div>
