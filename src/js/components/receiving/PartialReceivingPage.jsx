@@ -696,11 +696,14 @@ class PartialReceivingPage extends Component {
 
     const emptyLinesCount = emptyLinesCounter(formValues);
 
+    const containers = emptyLinesCount
+      ? this.buildShipmentItems(formValues.containers)
+      : formValues.containers;
+
     const payload = {
       ...formValues,
       recipient: formValues?.recipient?.id,
-      containers: emptyLinesCount ? this.buildShipmentItems(formValues.containers)
-        : getReceivingPayloadContainers(formValues),
+      containers: getReceivingPayloadContainers({ ...formValues, containers }),
     };
     return apiClient.post(url, flattenRequest(payload));
   }
