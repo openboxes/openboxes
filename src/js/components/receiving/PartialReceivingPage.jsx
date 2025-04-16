@@ -1001,9 +1001,10 @@ class PartialReceivingPage extends Component {
     return !!this.state.values.containers[index];
   }
 
-  handleSortChange = (selectedOption) => {
+  handleSortChange = async (selectedOption, formValues) => {
+    await this.saveValues(formValues);
+    await this.fetchPartialReceiptCandidates(selectedOption.value);
     this.props.updateSort(selectedOption.value);
-    this.fetchPartialReceiptCandidates(selectedOption.value);
   };
 
   render() {
@@ -1038,9 +1039,10 @@ class PartialReceivingPage extends Component {
                   <div className="d-flex justify-content-between align-items-center">
                     <div className="width-250">
                       <Select
-                        onChange={this.handleSortChange}
+                        onChange={(selectedOption) =>
+                          this.handleSortChange(selectedOption, values)}
                         value={this.props.sort}
-                        options={receivingSortOptions.map(option => ({
+                        options={receivingSortOptions.map((option) => ({
                           value: option.value,
                           label: <Translate id={option.label} />,
                         }))}
@@ -1056,7 +1058,7 @@ class PartialReceivingPage extends Component {
                           <Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" />
                         </span>
                       </button>
-                      <button type="button" className="btn btn-outline-secondary float-right btn-form btn-xs" disabled={!isAnyItemSelected(values.containers) || values.shipmentStatus === 'RECEIVED'} onClick={() => this.save(values)}>
+                      <button type="button" className="btn btn-outline-secondary float-right btn-form btn-xs" disabled={!isAnyItemSelected(values.containers) || values.shipmentStatus === 'RECEIVED'} onClick={() => this.save(values, this.props.updateSort(receivingSortOptions[0].value))}>
                         <Translate id="react.default.button.save.label" defaultMessage="Save" />
                       </button>
                       <button
