@@ -114,7 +114,7 @@ const useResolveStepTable = ({
   };
 
   // Get field props, for the binLocation dropdown we have to pass options
-  const getFieldProps = (fieldName, hasTooltipIcon) => {
+  const getFieldProps = (fieldName, hasTooltipIcon, value, isFieldDisabled) => {
     if (fieldName === cycleCountColumn.BIN_LOCATION && showBinLocation) {
       return {
         labelKey: 'name',
@@ -136,6 +136,12 @@ const useResolveStepTable = ({
     if (fieldName === cycleCountColumn.EXPIRATION_DATE) {
       return {
         customDateFormat: DateFormat.DD_MMM_YYYY,
+      };
+    }
+
+    if (fieldName === cycleCountColumn.LOT_NUMBER && isFieldDisabled) {
+      return {
+        placeholder: translate('react.cycleCount.emptyLotNumber.label', 'NO LOT'),
       };
     }
 
@@ -188,7 +194,7 @@ const useResolveStepTable = ({
       // Keep and update the state of the cell during rerenders
       const [value, setValue] = useState(initialValue);
 
-      const isFieldEditable = !original.id.includes('newRow')
+      const isFieldDisabled = !original.id.includes('newRow')
         && ![
           cycleCountColumn.QUANTITY_RECOUNTED,
           cycleCountColumn.ROOT_CAUSE,
@@ -279,7 +285,7 @@ const useResolveStepTable = ({
       const type = getFieldType(columnPath);
       const Component = getFieldComponent(columnPath);
       const tooltipContent = getTooltipMessage(errorMessage, warning, columnPath);
-      const fieldProps = getFieldProps(columnPath, tooltipContent);
+      const fieldProps = getFieldProps(columnPath, tooltipContent, value, isFieldDisabled);
 
       // Columns allowed for focus in new rows
       const newRowFocusableCells = [
@@ -327,12 +333,12 @@ const useResolveStepTable = ({
       return (
         <TableCell
           className="rt-td rt-td-count-step pb-0"
-          customTooltip={showTooltip && getValueToDisplay(id, value)}
+          customTooltip={showTooltip && getValueToDisplay(columnPath, value)}
           tooltipClassname="w-100"
-          tooltipLabel={getValueToDisplay(id, value)}
+          tooltipLabel={getValueToDisplay(columnPath, value)}
         >
           <Component
-            disabled={isFieldEditable}
+            disabled={isFieldDisabled}
             type={type}
             value={value}
             onChange={onChange}
