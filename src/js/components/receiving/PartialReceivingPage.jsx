@@ -1042,7 +1042,7 @@ class PartialReceivingPage extends Component {
                         onChange={(selectedOption) =>
                           this.handleSortChange(selectedOption, values)}
                         value={this.props.sort}
-                        options={receivingSortOptions.map((option) => ({
+                        options={receivingSortOptions.map(option => ({
                           value: option.value,
                           label: <Translate id={option.label} />,
                         }))}
