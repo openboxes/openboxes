@@ -203,11 +203,13 @@ const useResolveStep = () => {
     }));
     const recountedDates = tableData.current?.reduce((acc, cycleCount) => ({
       ...acc,
-      [cycleCount?.id]: cycleCount?.cycleCountItems?.[0]?.dateRecounted,
+      [cycleCount?.id]: cycleCount?.cycleCountItems?.[0]?.dateRecounted
+      || recountedDates?.[cycleCount?.id],
     }), {});
     const recountedByData = tableData.current?.reduce((acc, cycleCount) => ({
       ...acc,
-      [cycleCount?.id]: cycleCount?.cycleCountItems?.[0]?.recountedBy,
+      [cycleCount?.id]: cycleCount?.cycleCountItems?.[0]?.recountedBy
+      || recountedBy?.[cycleCount?.id],
     }), {});
     setDateRecounted(recountedDates);
     setRecountedBy(recountedByData);
@@ -242,10 +244,10 @@ const useResolveStep = () => {
       (cycleCount) => cycleCount.id === id,
     );
     const findByField = (data) => findCycleCount(data)?.cycleCountItems.find(
-      (cycleCountItem) => cycleCountItem[fieldName],
+      (cycleCountItem) => _.get(cycleCountItem, fieldName),
     );
-    return findByField(tableData.current)?.[fieldName]
-      || findByField(cycleCountsWithItemsWithoutRecount.current)?.[fieldName];
+    return _.get(findByField(tableData.current), fieldName)
+      || _.get(findByField(cycleCountsWithItemsWithoutRecount.current), fieldName);
   }, []);
 
   const getRecountedBy = (cycleCountId) => recountedBy?.[cycleCountId];
@@ -577,7 +579,11 @@ const useResolveStep = () => {
     },
   };
 
-  const getProduct = (id) => getField(id, 'product');
+  const getProduct = (id) => ({
+    name: getField(id, 'product.name'),
+    productCode: getField(id, 'product.productCode'),
+    id: getField(id, 'product.id'),
+  });
 
   const getDateCounted = (id) => getField(id, 'dateCounted');
 
