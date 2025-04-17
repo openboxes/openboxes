@@ -58,7 +58,6 @@ const useResolveStep = () => {
     showEmptyRootCauseWarning,
     isFormValid,
     resetValidationState,
-    anyCountHasNoItems,
   } = useResolveStepValidation({ tableData });
 
   const dispatch = useDispatch();
@@ -249,12 +248,6 @@ const useResolveStep = () => {
       || findByField(cycleCountsWithItemsWithoutRecount.current)?.[fieldName];
   }, []);
 
-  /**
-   * Contains validation for disabling the 'Next' button during a recount. This blocks the user
-   * from being able to proceed with the count.
-   */
-  const disableNextButton = () => anyCountHasNoItems();
-
   const getRecountedBy = (cycleCountId) => recountedBy?.[cycleCountId];
 
   const getCountedBy = (cycleCountId) => {
@@ -336,6 +329,62 @@ const useResolveStep = () => {
     forceRerender();
   };
 
+  const cancelCounts = async (cycleCountRequestIdsToDelete) => {
+    try {
+      show();
+      await cycleCountApi.deleteRequests(currentLocation?.id, cycleCountRequestIdsToDelete);
+      await refetchData();
+
+      // If we've canceled every product in the batch, there's no reason to stay on this screen.
+      if (tableData.current.length === 0) {
+        history.push(CYCLE_COUNT.list(TO_RESOLVE_TAB));
+      }
+    } finally {
+      hide();
+    }
+  };
+
+  const zeroRecountItemsModalButtons = (cycleCountRequestIdsToDelete) => (onClose) => ([
+    {
+      variant: 'transparent',
+      label: 'react.cycleCount.modal.zeroRecountItems.back.label',
+      defaultLabel: 'Not Now',
+      onClick: () => {
+        onClose?.();
+      },
+    },
+    {
+      variant: 'primary',
+      label: 'react.cycleCount.modal.zeroRecountItems.confirm.label',
+      defaultLabel: 'Cancel Products',
+      onClick: async () => {
+        onClose?.();
+        await cancelCounts(cycleCountRequestIdsToDelete);
+      },
+    },
+  ]);
+
+  const openZeroRecountItemsModal = (productsWithNoRecountItems) => {
+    const requestIds = productsWithNoRecountItems.map((entry) => (entry.cycleCountRequestId));
+    const productCodes = productsWithNoRecountItems.map((entry) => (entry.product));
+    confirmationModal({
+      hideCloseButton: false,
+      closeOnClickOutside: true,
+      buttons: zeroRecountItemsModalButtons(requestIds),
+      title: {
+        label: 'react.cycleCount.modal.zeroRecountItems.title.label',
+        default: 'Cancel Counts?',
+      },
+      content: {
+        label: 'react.cycleCount.modal.zeroRecountItems.content.label',
+        default: `Product(s) ${productCodes} have zero quantity on hand across all inventory items. Cancel the cycle count on these products to proceed.`,
+        data: {
+          productCodes,
+        },
+      },
+    });
+  };
+
   const next = () => {
     resetFocus();
     const isValid = triggerValidation();
@@ -349,16 +398,16 @@ const useResolveStep = () => {
       return;
     }
 
-    const productsWithNoRecount = cycleCountsWithItemsWithoutRecount.current
+    const productsWithNoRecountItems = cycleCountsWithItemsWithoutRecount.current
       .map((cycleCount) => ({
-        cycleCountId: cycleCount.id,
+        cycleCountRequestId: cycleCount.requestId,
         product: cycleCount.cycleCountItems[0].product.productCode,
       }));
-    // TODO: The const above just takes the cycle counts with items without recount and returns product code that should be displayed in the modal
-    // TODO: In my opinion we can hardcode QOH = 0 in the modal.
 
-    // TODO: Display the modal, pass the productsWithNoRecount. Remember we might have a few products (tables) empty, and we eventually want to call Cancel for every product
-    // TODO: So we need to do call Cancel for each "productsWithNoRecount" (this is why I store the cycleCountId also)
+    if (productsWithNoRecountItems.length > 0) {
+      openZeroRecountItemsModal(productsWithNoRecountItems);
+      return;
+    }
 
     const missingRootCauses = validateRootCauses();
     if (!isRootCauseWarningSkipped && missingRootCauses.length > 0) {
@@ -615,7 +664,6 @@ const useResolveStep = () => {
     getRecountedDate,
     setRecountedDate,
     shouldHaveRootCause,
-    disableNextButton,
     next,
     save,
     submitRecount,

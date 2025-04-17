@@ -13,7 +13,7 @@ import Translate from 'utils/Translate';
 import CustomTooltip from 'wrappers/CustomTooltip';
 
 const ResolveStepHeader = ({
-  next, save, printRecountForm, refreshCountItems, disableNextButton,
+  next, save, printRecountForm, refreshCountItems,
 }) => {
   const translate = useTranslate();
 
@@ -74,7 +74,6 @@ const ResolveStepHeader = ({
           label="react.default.button.next.label"
           defaultLabel="Next"
           variant="primary"
-          //disabled={disableNextButton()}
         />
       </div>
     </div>
@@ -88,5 +87,4 @@ ResolveStepHeader.propTypes = {
   save: PropTypes.func.isRequired,
   printRecountForm: PropTypes.func.isRequired,
   refreshCountItems: PropTypes.func.isRequired,
-  disableNextButton: PropTypes.func.isRequired,
 };

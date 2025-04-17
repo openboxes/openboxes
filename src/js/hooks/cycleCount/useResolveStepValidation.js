@@ -141,16 +141,6 @@ const useResolveStepValidation = ({ tableData }) => {
     isValid.current = null;
   };
 
-  /**
-   * Returns true if any of the counts in the batch have no items associated with them for the
-   * current count index. This is possible if the product had its quantities zeroed out while
-   * the count was in progress via a different process (such as record stock).
-   */
-  const anyCountHasNoItems = () => _.some(
-    tableData.current.map((cycleCount) => cycleCount.cycleCountItems),
-    (cycleCountItems) => cycleCountItems.length === 0,
-  );
-
   return {
     validationErrors: validationErrors.current,
     isFormValid: isValid.current,
@@ -163,7 +153,6 @@ const useResolveStepValidation = ({ tableData }) => {
     rowValidationSchema,
     rowsValidationSchema,
     resetValidationState,
-    anyCountHasNoItems,
   };
 };
 
