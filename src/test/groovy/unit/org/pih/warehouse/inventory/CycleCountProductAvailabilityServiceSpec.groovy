@@ -268,6 +268,51 @@ class CycleCountProductAvailabilityServiceSpec extends Specification implements 
         assert cycleCount.cycleCountItems.size() == 0  // The item has been removed!
     }
 
+    void 'refreshProductAvailability should only remove items from the most recent count when not in available items'() {
+        given: 'a cycle count with a recount'
+        Location facility = new Location()
+        Product product = new Product()
+        InventoryItem inventoryItem = new InventoryItem(product: product, lotNumber: 'lotNumber')
+        Location binLocation = new Location(name: 'binLocation')
+        CycleCountItem countItem = new CycleCountItem(
+                inventoryItem: inventoryItem,
+                location: binLocation,
+                product: product,
+                countIndex: 0,  // count
+                quantityOnHand: 20,
+                custom: false,
+        )
+        countItem.id = '0'
+        CycleCountItem recountItem = new CycleCountItem(
+                inventoryItem: inventoryItem,
+                location: binLocation,
+                product: product,
+                countIndex: 1,  // recount
+                quantityOnHand: 30,
+                custom: false,
+        )
+        recountItem.id = '1'
+        CycleCount cycleCount = new CycleCount(
+                facility: facility,
+                status: CycleCountStatus.INVESTIGATING,
+                cycleCountItems: [countItem, recountItem]
+        )
+
+        and: 'mocked available items that do not contain the item'
+        productAvailabilityServiceStub.getAvailableItems(facility, [product.id], false, true) >> []
+
+        when: 'we refresh product availability'
+        CycleCountProductAvailabilityService.CycleCountItemsForRefresh changedItems =
+                cycleCountProductAvailabilityService.refreshProductAvailability(cycleCount)
+
+        then: 'items should have changed'
+        assert changedItems.itemsHaveChanged()
+        assert cycleCount.cycleCountItems.size() == 1  // Only the recount item has been removed!
+
+        CycleCountItem countCycleCountItem = cycleCount.getCycleCountItem(product, binLocation, inventoryItem, 0)
+        assert countCycleCountItem.quantityOnHand == 20  // QoH is unchanged
+    }
+
     void 'refreshProductAvailability should update QoH for custom count items when available items is deleted'() {
         given: 'a cycle count'
         Location facility = new Location()

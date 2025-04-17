@@ -649,4 +649,40 @@ class CycleCountService {
 
         return CycleCountDto.toDto(cycleCount)
     }
+
+    /**
+     * Batch deletes a list of CycleCountRequest as well as the associated CycleCount and CycleCountItems if they exist.
+     */
+    void deleteCycleCountRequests(List<String> cycleCountRequestIds) {
+        for (String cycleCountRequestId : cycleCountRequestIds) {
+            deleteCycleCountRequest(cycleCountRequestId)
+        }
+    }
+
+    private void deleteCycleCountRequest(String cycleCountRequestId) {
+        CycleCountRequest cycleCountRequest = CycleCountRequest.get(cycleCountRequestId)
+        if (!cycleCountRequest) {
+            throw new ObjectNotFoundException(cycleCountRequestId, CycleCountRequest.class.toString())
+        }
+
+        CycleCount cycleCount = cycleCountRequest.cycleCount
+        if (cycleCount) {
+            deleteCycleCount(cycleCount)
+        }
+
+        cycleCountRequest.delete()
+    }
+
+    private void deleteCycleCount(CycleCount cycleCount) {
+        if (!cycleCount) {
+            return
+        }
+
+        cycleCount.cycleCountItems.each { it.delete() }
+        cycleCount.cycleCountItems.clear()
+
+        cycleCount.cycleCountRequest?.cycleCount = null
+
+        cycleCount.delete()
+    }
 }

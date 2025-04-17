@@ -1065,6 +1065,11 @@ div.search-input:focus-within {
   &:hover {
     background: var(--red-100);
   }
+
+  &:disabled {
+    background-color: var(--blue-300) !important;
+    color: var(--red-200) !important;
+  }
 }
 
 .secondary-button {

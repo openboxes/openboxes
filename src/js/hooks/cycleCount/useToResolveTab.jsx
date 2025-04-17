@@ -24,6 +24,7 @@ import useTableSorting from 'hooks/useTableSorting';
 import useThrowError from 'hooks/useThrowError';
 import useTranslate from 'hooks/useTranslate';
 import Badge from 'utils/Badge';
+import confirmationModal from 'utils/confirmationModalUtils';
 import exportFileFromAPI, { extractFilenameFromHeader } from 'utils/file-download-util';
 import { mapStringToLimitedList } from 'utils/form-values-utils';
 import StatusIndicator from 'utils/StatusIndicator';
@@ -104,11 +105,13 @@ const useToResolveTab = ({
     selectedCheckboxesAmount,
     headerCheckboxProps,
     checkedCheckboxes,
+    resetCheckboxes,
   } = useTableCheckboxes();
 
   const {
     tableData,
     loading,
+    fetchData,
   } = useTableDataV2({
     url: CYCLE_COUNT_PENDING_REQUESTS(currentLocation?.id),
     errorMessageId: 'react.cycleCount.table.errorMessage.label',
@@ -357,6 +360,53 @@ const useToResolveTab = ({
     spinner.hide();
   };
 
+  const cancelCounts = async () => {
+    try {
+      spinner.show();
+      await cycleCountApi.deleteRequests(currentLocation?.id, checkedCheckboxes);
+    } finally {
+      spinner.hide();
+      fetchData();
+      resetCheckboxes();
+    }
+  };
+
+  const cancelCountsModalButtons = () => (onClose) => ([
+    {
+      variant: 'transparent',
+      defaultLabel: 'Back',
+      label: 'react.default.button.back.label',
+      onClick: () => {
+        onClose?.();
+      },
+    },
+    {
+      variant: 'primary',
+      defaultLabel: 'Confirm',
+      label: 'react.default.button.confirm.label',
+      onClick: async () => {
+        onClose?.();
+        await cancelCounts();
+      },
+    },
+  ]);
+
+  const openCancelCountsModal = () => {
+    confirmationModal({
+      hideCloseButton: false,
+      closeOnClickOutside: true,
+      buttons: cancelCountsModalButtons(),
+      title: {
+        label: 'react.cycleCount.modal.cancelCounts.title.label',
+        default: 'Cancel Counts?',
+      },
+      content: {
+        label: 'react.cycleCount.modal.cancelRecounts.content.label',
+        default: 'The Cycle Count will be canceled for the products selected. Your products will be removed from the To Resolve tab and brought back to Cycle Count All Products list. Your started counts on these products will be erased. Choose this option if you want to abandon the cycle count. Are you sure you want to Cancel?',
+      },
+    });
+  };
+
   const moveToResolving = async () => {
     spinner.show();
     try {
@@ -387,6 +437,7 @@ const useToResolveTab = ({
     selectedCheckboxesAmount,
     moveToResolving: verifyCondition,
     printResolveForm,
+    openCancelCountsModal,
   };
 };
 
