@@ -197,10 +197,19 @@ const useResolveStep = () => {
       const mergedItems = mergeCycleCountItems(cycleCount.cycleCountItems);
       return ({ ...cycleCount, cycleCountItems: moveCustomItemsToTheBottom(mergedItems) || [] });
     });
-    cycleCountsWithItemsWithoutRecount.current = data?.data?.map((cycleCount) => ({
-      ...cycleCount,
-      cycleCountItems: getItemsWithoutRecountIndexes(cycleCount.cycleCountItems),
-    }));
+    cycleCountsWithItemsWithoutRecount.current = data?.data?.reduce((acc, cycleCount) => {
+      const cycleCountItems = getItemsWithoutRecountIndexes(cycleCount.cycleCountItems);
+      if (!cycleCountItems.length) {
+        return acc;
+      }
+      return [
+        ...acc,
+        {
+          ...cycleCount,
+          cycleCountItems,
+        },
+      ];
+    }, []);
     const recountedDates = tableData.current?.reduce((acc, cycleCount) => ({
       ...acc,
       [cycleCount?.id]: cycleCount?.cycleCountItems?.[0]?.dateRecounted
@@ -403,7 +412,7 @@ const useResolveStep = () => {
     const productsWithNoRecountItems = cycleCountsWithItemsWithoutRecount.current
       .map((cycleCount) => ({
         cycleCountRequestId: cycleCount.requestId,
-        product: cycleCount.cycleCountItems[0].product.productCode,
+        product: getField(cycleCount?.id, 'product.productCode'),
       }));
 
     if (productsWithNoRecountItems.length > 0) {
