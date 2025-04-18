@@ -79,7 +79,7 @@ const ResolveStep = () => {
             isFormValid={isFormValid}
             triggerValidation={triggerValidation}
             refreshFocusCounter={refreshFocusCounter}
-            cycleCountsWithItemsWithoutRecount={
+            cycleCountWithItemsWithoutRecount={
               cycleCountsWithItemsWithoutRecount.find((cycleCount) => cycleCount.id === id)
             }
           />
