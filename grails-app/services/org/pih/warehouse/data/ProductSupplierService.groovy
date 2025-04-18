@@ -14,6 +14,7 @@ import grails.validation.ValidationException
 import groovy.sql.Sql
 import org.grails.datastore.mapping.query.api.Criteria
 import org.hibernate.ObjectNotFoundException
+import org.hibernate.criterion.CriteriaSpecification
 import org.hibernate.criterion.Criterion
 import org.hibernate.criterion.DetachedCriteria
 import org.hibernate.criterion.Order
@@ -35,6 +36,7 @@ import org.pih.warehouse.product.ProductSupplierDataService
 import org.pih.warehouse.product.ProductSupplierFilterCommand
 import org.pih.warehouse.product.ProductSupplierDetailsCommand
 import org.pih.warehouse.product.ProductSupplierPreference
+import org.hibernate.FetchMode
 
 import java.text.SimpleDateFormat
 
@@ -48,7 +50,7 @@ class ProductSupplierService {
     ProductSupplierIdentifierService productSupplierIdentifierService
     def dataSource
     ProductSupplierDataService productSupplierGormService
-
+    def dataService
 
     List<ProductSupplier> getProductSuppliers(ProductSupplierFilterCommand command) {
         if (command.hasErrors()) {
@@ -58,8 +60,7 @@ class ProductSupplierService {
         // This could happen when params.searchTerm and e.g. sort by productCode/productName is applied
         Set<String> usedAliases = new HashSet<>()
 
-        def pagination = command.unlimitedMax ? [:] : command.paginationParams
-        return ProductSupplier.createCriteria().list(pagination) {
+        return ProductSupplier.createCriteria().list(command.paginationParams) {
             if (command.searchTerm) {
                 createAlias("product", "p", JoinType.LEFT_OUTER_JOIN)
                 createAlias("supplier", "s", JoinType.LEFT_OUTER_JOIN)
@@ -446,5 +447,127 @@ class ProductSupplierService {
                     command?.supplier?.code)
         }
         return productSupplier
+    }
+
+    List<Map> getExportData(ProductSupplierFilterCommand filterParams) {
+
+        def productSuppliers = []
+
+        if(filterParams.exportResults) {
+            productSuppliers = getProductSuppliers(filterParams)
+
+            productSuppliers = productSuppliers.collect(({ ProductSupplier p ->
+                [
+                        active                                    : p.active,
+                        id                                        : p.id,
+                        name                                      : p.name,
+                        code                                      : p.code,
+                        productCode                               : p.product?.productCode,
+                        productName                               : p.product?.name,
+                        legacyProductCode                         : p.productCode,
+                        "supplier.name"                           : p.supplier?.name,
+                        supplierCode                              : p.supplierCode,
+                        "manufacturer.name"                       : p.manufacturer?.name,
+                        manufacturerCode                          : p.manufacturerCode,
+                        minOrderQuantity                          : p.minOrderQuantity,
+                        "contractPrice.price"                     : p.contractPrice?.price,
+                        "contractPrice.toDate"                    : p.contractPrice?.toDate,
+                        "defaultProductPackage.uom.code"          : p.defaultProductPackage?.uom?.code,
+                        "defaultProductPackage.quantity"          : p.defaultProductPackage?.quantity,
+                        "defaultProductPackage.productPrice.price": p.defaultProductPackage?.productPrice?.price,
+                        ratingTypeCode                            : p.ratingTypeCode,
+                        dateCreated                               : p.dateCreated,
+                        lastUpdated                               : p.lastUpdated
+                ]
+            } as Closure<ProductSupplier>))
+        } else {
+            productSuppliers = ProductSupplier.createCriteria().list {
+                resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
+                projections {
+                    property("active", "active")
+                    property("id", "id")
+                    property("name", "name")
+                    property("code", "code")
+                    product {
+                        property("productCode", "productCode")
+                        property("name", "productName")
+                    }
+                    property("productCode", "legacyProductCode")
+                    supplier(JoinType.LEFT_OUTER_JOIN.joinTypeValue) {
+                        property("name", "supplier.name")
+                    }
+                    property("supplierCode", "supplierCode")
+                    manufacturer(JoinType.LEFT_OUTER_JOIN.joinTypeValue) {
+                        property("name", "manufacturer.name")
+                    }
+                    property("manufacturerCode", "manufacturerCode")
+                    property("minOrderQuantity", "minOrderQuantity")
+                    contractPrice(JoinType.LEFT_OUTER_JOIN.joinTypeValue) {
+                        property("price", "contractPrice.price")
+                        property("toDate", "contractPrice.toDate")
+                    }
+                    defaultProductPackage(JoinType.LEFT_OUTER_JOIN.joinTypeValue) {
+                        uom(JoinType.LEFT_OUTER_JOIN.joinTypeValue) {
+                            property("code", "defaultProductPackage.uom.code")
+                        }
+                        property("quantity", "defaultProductPackage.quantity")
+                        productPrice(JoinType.LEFT_OUTER_JOIN.joinTypeValue) {
+                            property("price", "defaultProductPackage.productPrice.price")
+                        }
+                    }
+                    property("ratingTypeCode", "ratingTypeCode")
+                    property("dateCreated", "dateCreated")
+                    property("lastUpdated", "lastUpdated")
+                }
+            }
+        }
+
+        def productPackages = ProductPackage.createCriteria().list {
+            fetchMode("uom", FetchMode.JOIN)
+            fetchMode("productPrice", FetchMode.JOIN)
+            fetchMode("productPrice.productSupplier", FetchMode.JOIN)
+            fetchMode("productPrice.productPackage", FetchMode.JOIN)
+            isNotNull("productSupplier")
+            order("lastUpdated", "asc")
+        }
+
+        Map defaultProductPackages = productPackages.inject([:]) { result, productPackage ->
+            result[productPackage?.productSupplier?.id] = productPackage
+            return result
+        }
+
+        List<ProductSupplierPreference> globalPreferences = ProductSupplierPreference.withCriteria {
+            fetchMode("preferenceType", FetchMode.JOIN)
+            fetchMode("productSupplier", FetchMode.JOIN)
+            isNull("destinationParty")
+        }
+
+        Map globalPreferencesByProductSupplier = globalPreferences.inject([:]) { result, pref ->
+            result[pref?.productSupplier?.id] = pref
+            return result
+        }
+
+        productSuppliers.collect { Map entry ->
+            ProductSupplier productSupplier = ProductSupplier.load(entry.id)
+            ProductPackage productPackage = defaultProductPackages[productSupplier?.id]
+            boolean useDerivedPackage = !entry["defaultProductPackage.uom.code"]
+
+            entry["product"] = [
+                    "productCode": entry["productCode"],
+                    "name": productSupplier?.product?.displayNameWithLocaleCode ?: entry["productName"]
+            ]
+            entry["productCode"] = entry["legacyProductCode"]
+
+            if (useDerivedPackage) {
+                entry["defaultProductPackage.uom.code"] = productPackage?.uom?.code
+                entry["defaultProductPackage.quantity"] = productPackage?.quantity
+                entry["defaultProductPackage.productPrice.price"] = productPackage?.productPrice?.price
+            }
+
+            entry["globalProductSupplierPreference"] = globalPreferencesByProductSupplier[productSupplier?.id]
+            return entry
+        }
+
+        return productSuppliers ? dataService.transformObjects(productSuppliers as List, ProductSupplier.PROPERTIES) : [[:]]
     }
 }

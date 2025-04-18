@@ -283,88 +283,47 @@ class ProductSupplierController {
 
         def productSuppliers = []
 
-        if (params.exportResults) {
-            def command = new ProductSupplierFilterCommand(
-                    searchTerm: params.searchTerm ?: null,
-                    product: params.product ?: null,
-                    includeInactive: params.includeInactive ?: null,
-                    supplier: params.supplier ?: null,
-                    defaultPreferenceTypes: params.defaultPreferenceTypes ? params.list('defaultPreferenceTypes') : null,
-                    createdFrom: params.createdFrom ? new SimpleDateFormat("MM/dd/yyyy").parse(params.createdFrom) : null,
-                    createdTo: params.createdTo ? new SimpleDateFormat("MM/dd/yyyy").parse(params.createdTo) : null,
-                    sort: "dateCreated",
-                    order: "desc",
-                    unlimitedMax: true,
-            )
-
-            productSuppliers = productSupplierService.getProductSuppliers(command)
-
-            productSuppliers = productSuppliers.collect { ProductSupplier p ->
-                [
-                        active: p.active,
-                        id: p.id,
-                        name: p.name,
-                        code: p.code,
-                        productCode: p.product?.productCode,
-                        productName: p.product?.name,
-                        legacyProductCode: p.productCode,
-                        "supplier.name": p.supplier?.name,
-                        supplierCode: p.supplierCode,
-                        "manufacturer.name": p.manufacturer?.name,
-                        manufacturerCode: p.manufacturerCode,
-                        minOrderQuantity: p.minOrderQuantity,
-                        "contractPrice.price": p.contractPrice?.price,
-                        "contractPrice.toDate": p.contractPrice?.toDate,
-                        "defaultProductPackage.uom.code": p.defaultProductPackage?.uom?.code,
-                        "defaultProductPackage.quantity": p.defaultProductPackage?.quantity,
-                        "defaultProductPackage.productPrice.price": p.defaultProductPackage?.productPrice?.price,
-                        ratingTypeCode: p.ratingTypeCode,
-                        dateCreated: p.dateCreated,
-                        lastUpdated: p.lastUpdated
-                ]
-            }
-        } else {
-            if (params.containsKey("productSupplier.id")) {
-                productSuppliers = ProductSupplier.findAllByIdInList(params.list("productSupplier.id"))
-            } else {
-                productSuppliers = ProductSupplier.createCriteria().list {
-                    resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
-                    projections {
-                        property("active", "active")
-                        property("id", "id")
-                        property("name", "name")
-                        property("code", "code")
-                        product {
-                            property("productCode", "productCode")
-                            property("name", "productName")
-                        }
-                        property("productCode", "legacyProductCode")
-                        supplier(JoinType.LEFT_OUTER_JOIN.joinTypeValue) {
-                            property("name", "supplier.name")
-                        }
-                        property("supplierCode", "supplierCode")
-                        manufacturer(JoinType.LEFT_OUTER_JOIN.joinTypeValue) {
-                            property("name", "manufacturer.name")
-                        }
-                        property("manufacturerCode", "manufacturerCode")
-                        property("minOrderQuantity", "minOrderQuantity")
-                        contractPrice(JoinType.LEFT_OUTER_JOIN.joinTypeValue) {
-                            property("price", "contractPrice.price")
-                            property("toDate", "contractPrice.toDate")
-                        }
-                        defaultProductPackage(JoinType.LEFT_OUTER_JOIN.joinTypeValue) {
-                            uom(JoinType.LEFT_OUTER_JOIN.joinTypeValue) {
-                                property("code", "defaultProductPackage.uom.code")
-                            }
-                            property("quantity", "defaultProductPackage.quantity")
-                            productPrice(JoinType.LEFT_OUTER_JOIN.joinTypeValue) {
-                                property("price", "defaultProductPackage.productPrice.price")
-                            }
-                        }
-                        property("ratingTypeCode", "ratingTypeCode")
-                        property("dateCreated", "dateCreated")
-                        property("lastUpdated", "lastUpdated")
+        if (params.hasProperty("productSupplier.id")) {
+            productSuppliers = ProductSupplier.findAllByIdInList(params.list("productSupplier.id"))
+        }
+        else {
+            productSuppliers = ProductSupplier.createCriteria().list {
+                resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
+                projections {
+                    property("active", "active")
+                    property("id", "id")
+                    property("name", "name")
+                    property("code", "code")
+                    product {
+                        property("productCode", "productCode")
+                        property("name", "productName")
                     }
+                    property("productCode", "legacyProductCode")
+                    supplier(JoinType.LEFT_OUTER_JOIN.joinTypeValue) {
+                        property("name", "supplier.name")
+                    }
+                    property("supplierCode", "supplierCode")
+                    manufacturer(JoinType.LEFT_OUTER_JOIN.joinTypeValue) {
+                        property("name", "manufacturer.name")
+                    }
+                    property("manufacturerCode", "manufacturerCode")
+                    property("minOrderQuantity", "minOrderQuantity")
+                    contractPrice(JoinType.LEFT_OUTER_JOIN.joinTypeValue) {
+                        property("price", "contractPrice.price")
+                        property("toDate", "contractPrice.toDate")
+                    }
+                    defaultProductPackage(JoinType.LEFT_OUTER_JOIN.joinTypeValue) {
+                        uom(JoinType.LEFT_OUTER_JOIN.joinTypeValue) {
+                            property("code", "defaultProductPackage.uom.code")
+                        }
+                        property("quantity", "defaultProductPackage.quantity")
+                        productPrice(JoinType.LEFT_OUTER_JOIN.joinTypeValue) {
+                            property("price", "defaultProductPackage.productPrice.price")
+                        }
+                    }
+                    property("ratingTypeCode", "ratingTypeCode")
+                    property("dateCreated", "dateCreated")
+                    property("lastUpdated", "lastUpdated")
                 }
             }
         }
@@ -428,7 +387,8 @@ class ProductSupplierController {
                 return;
             default:
                 response.contentType = "text/csv"
-                response.setHeader("Content-disposition", "attachment; filename=\"ProductSuppliers-${new Date().format("yyyyMMdd-hhmmss")}.csv\"")
+                response.setHeader("Content-disposition",
+                        "attachment; filename=\"ProductSuppliers-${new Date().format("yyyyMMdd-hhmmss")}.csv\"")
                 render(contentType: "text/csv", text: dataService.generateCsv(data))
                 response.outputStream.flush()
                 return;

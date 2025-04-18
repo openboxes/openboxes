@@ -3,15 +3,19 @@ import React, { useCallback } from 'react';
 import { RiDeleteBinLine, RiPencilLine } from 'react-icons/ri';
 
 import productSupplierApi from 'api/services/ProductSupplierApi';
+import { PRODUCT_SUPPLIER_EXPORT } from 'api/urls';
 import notification from 'components/Layout/notifications/notification';
 import { PRODUCT_SUPPLIER_URL } from 'consts/applicationUrls';
 import NotificationType from 'consts/notificationTypes';
 import RoleType from 'consts/roleType';
+import useSpinner from 'hooks/useSpinner';
 import useUserHasPermissions from 'hooks/useUserHasPermissions';
 import confirmationModal from 'utils/confirmationModalUtils';
+import exportFileFromAPI from 'utils/file-download-util';
 import translate from 'utils/Translate';
 
 const useProductSupplierActions = ({ fireFetchData, filterParams }) => {
+  const spinner = useSpinner();
   const canManageProducts = useUserHasPermissions({
     minRequiredRole: RoleType.ROLE_ADMIN,
     supplementalRoles: [RoleType.ROLE_PRODUCT_MANAGER],
@@ -36,16 +40,24 @@ const useProductSupplierActions = ({ fireFetchData, filterParams }) => {
   };
 
   const exportProductSuppliers = (exportResults = false) => {
+    spinner.show();
     const transformedParams = {
-      format: 'xls',
       exportResults,
+      sort: 'dateCreated',
+      order: 'desc',
+      format: 'xls',
       ...filterParams,
       product: filterParams.product?.id,
       supplier: filterParams.supplier?.id,
-      defaultPreferenceTypes: (filterParams?.defaultPreferenceTypes || [])
-        .map(({ id }) => id),
+      defaultPreferenceTypes: (filterParams?.defaultPreferenceTypes || []).map(({ id }) => id),
     };
-    window.location = PRODUCT_SUPPLIER_URL.export(transformedParams);
+
+    exportFileFromAPI({
+      url: PRODUCT_SUPPLIER_EXPORT,
+      params: transformedParams,
+      format: 'xls',
+      afterExporting: () => spinner.hide(),
+    });
   };
 
   const modalLabels = {

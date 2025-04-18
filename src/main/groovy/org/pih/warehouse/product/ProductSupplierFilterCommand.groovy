@@ -23,7 +23,17 @@ class ProductSupplierFilterCommand extends PaginationCommand implements Validate
 
     String order
 
-    Boolean unlimitedMax = false
+    String format
+
+    Boolean exportResults
+
+    @Override
+    Integer getMax() {
+        if (exportResults) {
+            return Integer.MAX_VALUE
+        }
+        return super.getMax()
+    }
 
 
     static constraints = {
@@ -36,6 +46,7 @@ class ProductSupplierFilterCommand extends PaginationCommand implements Validate
         searchTerm nullable: true
         sort nullable: true
         order nullable: true
-        unlimitedMax nullable: true
+        format nullable: true
+        exportResults nullable: true
     }
 }

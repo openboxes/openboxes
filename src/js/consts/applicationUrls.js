@@ -139,11 +139,7 @@ const PRODUCT_SUPPLIER_URL = {
   list: () => `${PRODUCT_SUPPLIER_URL.base}/list`,
   create: () => `${PRODUCT_SUPPLIER_URL.base}/create`,
   edit: (id) => `${PRODUCT_SUPPLIER_URL.base}/create/${id}`,
-  export: (params = {}) =>
-    stringifyUrl({
-      url: `${PRODUCT_SUPPLIER_URL.base}/export`,
-      query: { ...params },
-    }),
+  export: () => `${PRODUCT_SUPPLIER_URL.base}/export?format=xls`,
 };
 
 const CYCLE_COUNT = {

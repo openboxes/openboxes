@@ -12,6 +12,8 @@ import org.springframework.http.HttpStatus
 class ProductSupplierApiController {
 
     ProductSupplierService productSupplierService
+    def documentService
+    def dataService
 
     def list(ProductSupplierFilterCommand filterParams) {
         List<ProductSupplier> productSuppliers = productSupplierService.getProductSuppliers(filterParams)
@@ -49,5 +51,37 @@ class ProductSupplierApiController {
         ProductSupplier updatedProductSupplier = productSupplierService.updateProductSupplier(productSupplierDetailsCommand, params.id)
 
         render([data: updatedProductSupplier] as JSON)
+    }
+
+    def export(ProductSupplierFilterCommand filterParams) {
+        def data = productSupplierService.getExportData(filterParams)
+        def fileName = "ProductSuppliers-${new Date().format('yyyyMMdd-hhmmss')}"
+        withFormat {
+            json {
+                render([data: data, totalCount: data.size()] as JSON)
+            }
+            csv {
+                exportToCsv(data, fileName)
+            }
+            xls {
+                exportToXls(data, fileName)
+            }
+        }
+    }
+
+    def exportToXls(List data, fileName) {
+        response.contentType = "application/vnd.ms-excel"
+        response.setHeader 'Content-disposition',
+                "attachment; filename=\"${fileName}.xls\""
+        documentService.generateExcel(response.outputStream, data)
+        response.outputStream.flush()
+    }
+
+    def exportToCsv(List data, fileName) {
+        response.contentType = "text/csv"
+        response.setHeader("Content-disposition",
+                "attachment; filename=\"${fileName}.csv\"")
+        render(contentType: "text/csv", text: dataService.generateCsv(data))
+        response.outputStream.flush()
     }
 }
