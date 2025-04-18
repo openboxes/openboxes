@@ -69,7 +69,6 @@
                     </g:if>
                     <g:if test="${requisitionItems.find { it.requisition?.shipment?.hasChildContainer()}}">
                         <td class="middle center">
-                            <%-- Display pack level 1 for this shipmentItem --%>
                             ${shipmentItem?.container?.parentContainer?.name ?: shipmentItem?.container?.name}
                         </td>
                     </g:if>
