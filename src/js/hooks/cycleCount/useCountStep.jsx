@@ -266,9 +266,10 @@ const useCountStep = () => {
 
   const next = () => {
     const isValid = triggerValidation();
+    const currentCycleCountIds = tableData.current.map((cycleCount) => cycleCount.id);
     forceRerender();
     const areCountedByFilled = _.every(
-      cycleCountIds,
+      currentCycleCountIds,
       (id) => getCountedBy(id)?.id,
     );
     if (isValid && areCountedByFilled) {

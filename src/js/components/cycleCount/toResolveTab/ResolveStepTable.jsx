@@ -40,7 +40,7 @@ const ResolveStepTable = ({
   isStepEditable,
   triggerValidation,
   refreshFocusCounter,
-  cycleCountsWithItemsWithoutRecount,
+  cycleCountWithItemsWithoutRecount,
 }) => {
   const {
     columns,
@@ -87,7 +87,7 @@ const ResolveStepTable = ({
     return recountedBy?.id ? null : true;
   };
 
-  const outOfStockItems = cycleCountsWithItemsWithoutRecount
+  const outOfStockItems = cycleCountWithItemsWithoutRecount
     .cycleCountItems
     .filter((item) => item.quantityOnHand === 0);
 
@@ -239,9 +239,14 @@ ResolveStepTable.propTypes = {
   isFormValid: PropTypes.bool.isRequired,
   refreshFocusCounter: PropTypes.number.isRequired,
   triggerValidation: PropTypes.func.isRequired,
-  cycleCountsWithItemsWithoutRecount: PropTypes.arrayOf(PropTypes.shape({}).isRequired).isRequired,
+  cycleCountWithItemsWithoutRecount: PropTypes.shape({
+    cycleCountItems: PropTypes.arrayOf(PropTypes.shape({})),
+  }),
 };
 
 ResolveStepTable.defaultProps = {
   tableData: [],
+  cycleCountWithItemsWithoutRecount: {
+    cycleCountItems: [],
+  },
 };
