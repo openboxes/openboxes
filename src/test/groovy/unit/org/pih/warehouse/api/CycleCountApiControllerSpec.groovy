@@ -23,6 +23,8 @@ import org.pih.warehouse.inventory.CycleCountRequestStatus
 import org.pih.warehouse.inventory.CycleCountService
 import org.pih.warehouse.inventory.CycleCountStartBatchCommand
 import org.pih.warehouse.inventory.CycleCountStartCommand
+import org.pih.warehouse.inventory.CycleCountStartRecountBatchCommand
+import org.pih.warehouse.inventory.CycleCountStartRecountCommand
 import org.pih.warehouse.inventory.PendingCycleCountRequest
 import org.pih.warehouse.product.Product
 import org.testcontainers.shaded.com.google.common.net.HttpHeaders
@@ -230,6 +232,41 @@ class CycleCountApiControllerSpec extends Specification implements DataTest, Con
 
         when:
         controller.startCycleCount(cycleCountStartBatchCommand)
+
+        then:
+        response.status == HttpStatus.SC_OK
+        response.contentType.contains(contentType)
+
+        where:
+        outputFormat || contentType
+        'json'       || JSON_FORMAT
+        'xls'        || XLS_FORMAT
+        'pdf'        || PDF_FORMAT
+    }
+
+    void 'startRecount should return cycleCounts in #contentType contentType when the #outputFormat format is used'() {
+        given:
+        BatchCommandUtils.metaClass.static.validateBatch = { Object command, String batchPropertyName ->
+            return null
+        }
+        List<CycleCountStartRecountCommand> cycleCountStartRecountCommands = [
+                Mock(CycleCountStartRecountCommand),
+                Mock(CycleCountStartRecountCommand),
+        ]
+        controller.params.facilityId = FACILITY_ID
+        controller.params.format = outputFormat
+        Location.metaClass.static.findById = {
+            String id -> Mock(Location)
+        }
+        Location mockedLocation = Stub(Location)
+        mockedLocation.name = LOCATION_NAME
+        CycleCountStartRecountBatchCommand cycleCountStarRecountBatchCommand = new CycleCountStartRecountBatchCommand(
+                requests: cycleCountStartRecountCommands,
+                facility: mockedLocation
+        )
+
+        when:
+        controller.startRecount(cycleCountStarRecountBatchCommand)
 
         then:
         response.status == HttpStatus.SC_OK
