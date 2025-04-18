@@ -400,8 +400,9 @@ const useResolveStep = () => {
     resetFocus();
     const isValid = triggerValidation();
     forceRerender();
+    const currentCycleCountIds = tableData.current.map((cycleCount) => cycleCount.id);
     const areRecountedByFilled = _.every(
-      cycleCountIds,
+      currentCycleCountIds,
       (id) => getRecountedBy(id)?.id,
     );
 
