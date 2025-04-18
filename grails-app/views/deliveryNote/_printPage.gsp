@@ -33,7 +33,7 @@
                 </tr>
             </g:unless>
             <g:if test="${"PRODUCT".equalsIgnoreCase(sortOrder as String)}">
-            %{-- Requisition items are already sorted by product at this point so no need to re-sort. --}%
+                %{-- Requisition items are already sorted by product at this point so no need to re-sort. --}%
             </g:if>
             <g:else>
                 <g:set var="requisitionItems" value="${requisitionItems?.sort()}"/>
@@ -56,13 +56,13 @@
                         <g:set var="inventoryItem" value="${shipmentItems[j].inventoryItem}"/>
                     </g:if>
                     <g:elseif test="${picklistItemsGroup}">
-                        <g:set var="inventoryItem" value="${picklistItemsGroup[j]?.first()?.inventoryItem}"/>
+                        <g:set var="inventoryItem" value="${picklistItemsGroup[j]?.first()?.inventoryItem}" />
                     </g:elseif>
                     <g:else>
                         <g:set var="inventoryItem" value="${requisitionItem?.shipmentItems?.size() > 0 ? requisitionItem?.shipmentItems?.toList()?.first()?.inventoryItem : null}"/>
                     </g:else>
                     <tr class="prop" style="background-color: ${backgroundColor}">
-                        <g:if test="${j == 0}">
+                        <g:if test="${j==0}">
                             <td class="center middle" rowspan="${numInventoryItem}">
                                 ${i + 1}
                             </td>
@@ -77,7 +77,7 @@
                                 ${shipmentItem?.container?.parentContainer ? shipmentItem?.container?.name : ''}
                             </td>
                         </g:if>
-                        <g:if test="${j == 0}">
+                        <g:if test="${j==0}">
                             <td class="center middle" rowspan="${numInventoryItem}">
                                 <g:if test="${requisitionItem?.parentRequisitionItem?.isSubstituted()}">
                                     <div class="canceled">
@@ -103,7 +103,7 @@
                                 </g:if>
                                 <g:else>
                                     <div class="${requisitionItem?.status}">
-                                        ${requisitionItem?.quantity ?: 0} ${requisitionItem?.product?.unitOfMeasure ?: "EA"}
+                                        ${requisitionItem?.totalQuantityPicked() ?: 0} ${requisitionItem?.product?.unitOfMeasure ?: "EA"}
                                     </div>
                                 </g:else>
                             </td>
@@ -117,7 +117,7 @@
                             ${inventoryItem?.lotNumber ?: ''}
                         </td>
                         <td class="middle center">
-                            <g:if test="${inventoryItem?.expirationDate}">
+                            <g:if test="${inventoryItem}">
                                 <g:formatDate date="${inventoryItem?.expirationDate}" format="d MMM yyyy"/>
                             </g:if>
                         </td>
@@ -130,7 +130,7 @@
                                 ${picklistItemsGroupQuantity ?: 0} ${requisitionItem?.product?.unitOfMeasure ?: "EA"}
                             </g:elseif>
                         </td>
-                        <g:if test="${j == 0}">
+                        <g:if test="${j==0}">
                             <td class="middle" rowspan="${numInventoryItem}">
                                 <g:if test="${requisitionItem?.parentRequisitionItem?.cancelReasonCode}">
                                     <g:if test="${requisitionItem.parentRequisitionItem?.isSubstituted()}">
@@ -170,13 +170,13 @@
                             </td>
                         </g:if>
                         <td class="middle">
-                            ${requisitionItem?.getReceiptItems(inventoryItem)?.quantityReceived?.sum() ?: ''}
+                            ${requisitionItem?.getReceiptItems(inventoryItem)?.quantityReceived?.sum()}
                         </td>
                         <td>
-                            ${requisitionItem?.getReceiptItems(inventoryItem)?.comment?.join(', ') ?: ''}
+                            ${requisitionItem?.getReceiptItems(inventoryItem)?.comment?.join(', ')}
                         </td>
+                        <% j++ %>
                     </tr>
-                    <% j++ %>
                 </g:while>
             </g:each>
         </tbody>
