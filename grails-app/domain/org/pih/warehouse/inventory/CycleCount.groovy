@@ -113,6 +113,10 @@ class CycleCount {
         return cycleCountItems.findAll{ it.countIndex == countIndex}
     }
 
+    Set<CycleCountItem> getItemsOfSpecificCount(Integer countIndex) {
+        return cycleCountItems.findAll { it.countIndex == countIndex }
+    }
+
     /**
      * @return a list of all the products being counted by the cycle count.
      */

@@ -515,7 +515,7 @@ class CycleCountService {
 
         if (command.refreshQuantityOnHand) {
             CycleCountProductAvailabilityService.CycleCountItemsForRefresh refreshedItems =
-                    cycleCountProductAvailabilityService.refreshProductAvailability(cycleCount)
+                    cycleCountProductAvailabilityService.refreshProductAvailability(cycleCount, false, 0)
 
             if (refreshedItems.itemsHaveChanged() && command.failOnOutdatedQuantity) {
                 throw new IllegalArgumentException("Quantity on hand for a cycle count item is no longer up to date")
@@ -635,7 +635,7 @@ class CycleCountService {
      * A "refresh" means fetching the product availability for the products associated with the count and updating
      * the QoH for each of the items in the most recent count.
      */
-    CycleCountDto refreshCycleCount(String cycleCountId, boolean removeOutOfStockItemsImplicitly) {
+    CycleCountDto refreshCycleCount(String cycleCountId, boolean removeOutOfStockItemsImplicitly, Integer countIndex) {
         CycleCount cycleCount = CycleCount.get(cycleCountId)
         if (!cycleCount) {
             throw new ObjectNotFoundException(cycleCountId, CycleCount.class.toString())
@@ -645,7 +645,7 @@ class CycleCountService {
             throw new IllegalArgumentException("Cycle count cannot be refreshed when in state: ${cycleCount.status}")
         }
 
-        cycleCountProductAvailabilityService.refreshProductAvailability(cycleCount, removeOutOfStockItemsImplicitly)
+        cycleCountProductAvailabilityService.refreshProductAvailability(cycleCount, removeOutOfStockItemsImplicitly, countIndex)
 
         return CycleCountDto.toDto(cycleCount)
     }

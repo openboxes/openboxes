@@ -44,8 +44,8 @@ export default {
     apiClientCustomResponseHandler.post(
       CYCLE_COUNT_SUBMIT_RECOUNT(locationId, cycleCountId), payload,
     ),
-  refreshItems: (locationId, cycleCountId, removeOutOfStockItemsImplicitly) =>
+  refreshItems: (locationId, cycleCountId, removeOutOfStockItemsImplicitly, countIndex) =>
     apiClient.post(CYCLE_COUNT_REFRESH_ITEMS(locationId,
       cycleCountId,
-      removeOutOfStockItemsImplicitly)),
+      removeOutOfStockItemsImplicitly), {}, { params: { countIndex } }),
 };
