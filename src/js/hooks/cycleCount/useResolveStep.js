@@ -375,9 +375,9 @@ const useResolveStep = () => {
     },
   ]);
 
-  const openZeroRecountItemsModal = (productsWithNoRecountItems) => {
-    const requestIds = productsWithNoRecountItems.map((entry) => (entry.cycleCountRequestId));
-    const productCodes = productsWithNoRecountItems.map((entry) => (entry.product));
+  const openZeroRecountItemsModal = (emptyCycleCounts) => {
+    const requestIds = emptyCycleCounts.map((entry) => (entry.requestId));
+    const productCodes = emptyCycleCounts.map((entry) => getField(entry.id, 'product.id'));
     confirmationModal({
       hideCloseButton: false,
       closeOnClickOutside: true,
@@ -410,14 +410,12 @@ const useResolveStep = () => {
       return;
     }
 
-    const productsWithNoRecountItems = cycleCountsWithItemsWithoutRecount.current
-      .map((cycleCount) => ({
-        cycleCountRequestId: cycleCount.requestId,
-        product: getField(cycleCount?.id, 'product.productCode'),
-      }));
+    const emptyCycleCounts = tableData.current.filter(
+      (cycleCount) => !cycleCount?.cycleCountItems?.length,
+    );
 
-    if (productsWithNoRecountItems.length > 0) {
-      openZeroRecountItemsModal(productsWithNoRecountItems);
+    if (emptyCycleCounts.length) {
+      openZeroRecountItemsModal(emptyCycleCounts);
       return;
     }
 
