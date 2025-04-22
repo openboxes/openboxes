@@ -114,7 +114,9 @@
                             </td>
                         </g:if>
                         <td class="middle center">
-                            ${inventoryItem?.lotNumber ?: ''}
+                            <g:if test="${inventoryItem}">
+                                ${inventoryItem?.lotNumber}
+                            </g:if>
                         </td>
                         <td class="middle center">
                             <g:if test="${inventoryItem}">
