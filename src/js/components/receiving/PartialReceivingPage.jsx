@@ -732,7 +732,7 @@ class PartialReceivingPage extends Component {
    * @public
    */
   save(formValues, callback) {
-    this.saveValues(formValues, true)
+    this.saveValues(formValues)
       .then((response) => {
         this.props.hideSpinner();
 
