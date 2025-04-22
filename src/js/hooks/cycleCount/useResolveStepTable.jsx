@@ -118,7 +118,7 @@ const useResolveStepTable = ({
     if (fieldName === cycleCountColumn.BIN_LOCATION && showBinLocation) {
       return {
         labelKey: 'name',
-        options: groupBinLocationsByZone(binLocations),
+        options: groupBinLocationsByZone(binLocations, translate),
       };
     }
 
