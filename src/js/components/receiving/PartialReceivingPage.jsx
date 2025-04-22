@@ -1052,6 +1052,7 @@ class PartialReceivingPage extends Component {
                           value: option.value,
                           label: translate(option.label, option.defaultLabel),
                         }))}
+                        clearable={false}
                       />
                     </div>
                     <div className="buttons-container">
