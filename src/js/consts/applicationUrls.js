@@ -51,6 +51,8 @@ const STOCK_MOVEMENT_URL = {
   editCombinedShipments: (id) => `${STOCK_MOVEMENT_URL.createCombinedShipments()}/${id}`,
   show: (id) => `${STOCK_MOVEMENT_URL.base}/show/${id}`,
   importOutbound: () => `${STOCK_MOVEMENT_URL.base}/importOutboundStockMovement`,
+  importCsv: (id) => `${STOCK_MOVEMENT_URL.base}/importCsv/${id}`,
+  exportCsv: (id) => `${STOCK_MOVEMENT_URL.base}/exportCsv/${id}`,
 };
 
 const INVOICE_URL = {
