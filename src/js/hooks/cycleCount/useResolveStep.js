@@ -402,7 +402,7 @@ const useResolveStep = () => {
       return;
     }
 
-    await save(false);
+    await save();
     setIsStepEditable(false);
   };
 
