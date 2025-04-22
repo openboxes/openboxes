@@ -15,12 +15,32 @@
   }
 
   .rt-tbody {
-    max-height: 275px;
+    max-height: 400px;
 
     .input-xs {
       height: 26px;
       padding: 4px 8px;
       font-size: 14px;
+    }
+
+    .input-xs {
+      height: 26px;
+      padding: 4px 8px;
+      font-size: 14px;
+    }
+
+    &::-webkit-scrollbar {
+      width: 0.5em;
+      height: 0.5em;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: var(--blue-200);
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: var(--blue-301);
+      border-radius: 4px;
     }
   }
 
@@ -58,12 +78,12 @@
     height: 100%;
 
     .inbound-bin {
-      @include set-size(20px, 20px);
-      color: var(--blue-primary);
+      @include set-size(18px, 18px);
+      color: var(--color-red);
       cursor: pointer;
 
       &.disabled {
-        color: var(--blue-primary);
+        color: var(--color-red);
         cursor: auto;
       }
     }
@@ -75,4 +95,16 @@
   width: 100%;
   display: flex;
   justify-content: space-between;
+}
+
+/* Chrome, Safari, Edge, Opera */
+input.hide-arrows::-webkit-outer-spin-button,
+input.hide-arrows::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input.hide-arrows[type=number] {
+  -moz-appearance: textfield;
 }
