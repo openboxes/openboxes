@@ -2,25 +2,25 @@
 <div class="page-content">
     <table id="requisition-items" class="fs-repeat-header w100">
         <thead>
-        <tr>
-            <th><warehouse:message code="report.number.label"/></th>
-            <g:if test="${requisitionItems.find { it.requisition?.shipment?.shipmentItems?.any { it.container }}}">
-                <th><warehouse:message code="packLevel1.label"/></th>
-            </g:if>
-            <g:if test="${requisitionItems.find { it.requisition?.shipment?.shipmentItems?.any { it.container && it.container?.parentContainer }}}">
-                <th><warehouse:message code="packLevel2.label"/></th>
-            </g:if>
-            <th>${g.message(code: 'product.productCode.label')}</th>
-            <th class="left">${g.message(code: 'product.label')}</th>
-            <th>${g.message(code: 'deliveryNote.totalRequested.label', default: "Total Requested")}</th>
-            <th>${g.message(code: 'deliveryNote.totalDelivered.label', default: "Total Delivered")}</th>
-            <th>${g.message(code: 'inventoryItem.lotNumber.label')}</th>
-            <th>${g.message(code: 'inventoryItem.expirationDate.label')}</th>
-            <th>${g.message(code: 'deliveryNote.deliveredByLot.label', default: "Delivered by Lot")}</th>
-            <th>${g.message(code: 'requisitionItem.cancelReasonCode.label')}</th>
-            <th>${g.message(code: 'deliveryNote.received.label', default: "Received")}</th>
-            <th>${g.message(code: 'deliveryNote.comment.label', default: "Comment")}</th>
-        </tr>
+            <tr>
+                <th><warehouse:message code="report.number.label"/></th>
+                <g:if test="${requisitionItems.find { it.requisition?.shipment?.shipmentItems?.any { it.container }}}">
+                    <th><warehouse:message code="packLevel1.label"/></th>
+                </g:if>
+                <g:if test="${requisitionItems.find { it.requisition?.shipment?.shipmentItems?.any { it.container && it.container?.parentContainer }}}">
+                    <th><warehouse:message code="packLevel2.label"/></th>
+                </g:if>
+                <th>${g.message(code: 'product.productCode.label')}</th>
+                <th class="left">${g.message(code: 'product.label')}</th>
+                <th>${g.message(code: 'deliveryNote.totalRequested.label', default: "Total Requested")}</th>
+                <th>${g.message(code: 'deliveryNote.totalDelivered.label', default: "Total Delivered")}</th>
+                <th>${g.message(code: 'inventoryItem.lotNumber.label')}</th>
+                <th>${g.message(code: 'inventoryItem.expirationDate.label')}</th>
+                <th>${g.message(code: 'deliveryNote.deliveredByLot.label', default: "Delivered by Lot")}</th>
+                <th>${g.message(code: 'requisitionItem.cancelReasonCode.label')}</th>
+                <th>${g.message(code: 'deliveryNote.received.label', default: "Received")}</th>
+                <th>${g.message(code: 'deliveryNote.comment.label', default: "Comment")}</th>
+            </tr>
         </thead>
         <tbody>
             <g:unless test="${requisitionItems}">
