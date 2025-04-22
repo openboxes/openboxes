@@ -558,6 +558,16 @@ class PartialReceivingPage extends Component {
     };
   }
 
+  static getQuantityReceiving(item, nullForEmptyQuantity = false) {
+    if (item.quantityReceiving === 0) {
+      return 0;
+    }
+    if (item.quantityReceiving) {
+      return item.quantityReceiving;
+    }
+    return nullForEmptyQuantity ? null : 0;
+  }
+
   constructor(props) {
     super(props);
     this.state = {
@@ -604,15 +614,14 @@ class PartialReceivingPage extends Component {
     });
   }
 
-  buildShipmentItems(containers) {
+  buildShipmentItems(containers, nullForEmptyQuantity = false) {
     if (!this.props.hasPartialReceivingSupport) {
       return containers?.map((container) => ({
         ...container,
-        shipmentItems: container?.shipmentItems
-          .map((item) => ({
-            ...item,
-            quantityReceiving: item.quantityReceiving ? item.quantityReceiving : 0,
-          })),
+        shipmentItems: container?.shipmentItems.map((item) => ({
+          ...item,
+          quantityReceiving: PartialReceivingPage.getQuantityReceiving(item, nullForEmptyQuantity),
+        })),
       }));
     }
     return containers?.map((container) => ({
@@ -622,7 +631,8 @@ class PartialReceivingPage extends Component {
           if (item.receiptItemId) {
             return {
               ...item,
-              quantityReceiving: item.quantityReceiving ? item.quantityReceiving : 0,
+              quantityReceiving:
+                PartialReceivingPage.getQuantityReceiving(item, nullForEmptyQuantity),
             };
           }
           return item;
@@ -697,7 +707,7 @@ class PartialReceivingPage extends Component {
     const emptyLinesCount = emptyLinesCounter(formValues);
 
     const containers = emptyLinesCount
-      ? this.buildShipmentItems(formValues.containers)
+      ? this.buildShipmentItems(formValues.containers, true)
       : formValues.containers;
 
     const payload = {
@@ -722,7 +732,7 @@ class PartialReceivingPage extends Component {
    * @public
    */
   save(formValues, callback) {
-    this.saveValues(formValues)
+    this.saveValues(formValues, true)
       .then((response) => {
         this.props.hideSpinner();
 
@@ -1052,6 +1062,7 @@ class PartialReceivingPage extends Component {
                           value: option.value,
                           label: translate(option.label, option.defaultLabel),
                         }))}
+                        clearable={false}
                       />
                     </div>
                     <div className="buttons-container">
@@ -1064,7 +1075,7 @@ class PartialReceivingPage extends Component {
                           <Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" />
                         </span>
                       </button>
-                      <button type="button" className="btn btn-outline-secondary float-right btn-form btn-xs" disabled={!isAnyItemSelected(values.containers) || values.shipmentStatus === 'RECEIVED'} onClick={() => this.save(values, this.props.updateSort(receivingSortOptions[0].value))}>
+                      <button type="button" className="btn btn-outline-secondary float-right btn-form btn-xs" disabled={!isAnyItemSelected(values.containers) || values.shipmentStatus === 'RECEIVED'} onClick={() => this.save(values, this.props.updateSort(receivingSortOptions[0].value), true)}>
                         <Translate id="react.default.button.save.label" defaultMessage="Save" />
                       </button>
                       <button
