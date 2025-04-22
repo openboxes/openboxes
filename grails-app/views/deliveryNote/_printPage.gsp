@@ -33,7 +33,7 @@
                 </tr>
             </g:unless>
             <g:if test="${"PRODUCT".equalsIgnoreCase(sortOrder as String)}">
-            %{-- Requisition items are already sorted by product at this point so no need to re-sort. --}%
+                %{-- Requisition items are already sorted by product at this point so no need to re-sort. --}%
             </g:if>
             <g:else>
                 <g:set var="requisitionItems" value="${requisitionItems?.sort()}"/>
@@ -53,7 +53,7 @@
                 <g:while test="${j < shipmentItemCount}">
                     <g:if test="${shipmentItems}">
                         <g:set var="shipmentItem" value="${shipmentItems[j]}"/>
-                        <g:set var="inventoryItem" value="${shipmentItems[j].first()?.inventoryItem}"/>
+                        <g:set var="inventoryItem" value="${shipmentItems[j].inventoryItem}"/>
                     </g:if>
                     <g:elseif test="${picklistItemsGroup}">
                         <g:set var="inventoryItem" value="${picklistItemsGroup[j]?.first()?.inventoryItem}" />
@@ -74,7 +74,7 @@
                         </g:if>
                         <g:if test="${requisitionItems.find { it.requisition?.shipment?.hasParentContainer()}}">
                             <td class="center middle">
-                                ${shipmentItem?.container?.parentContainer ? shipmentItem?.container?.name : ''}
+                                ${shipmentItem?.container?.parentContainer ? shipmentItem?.container?.name : '-'}
                             </td>
                         </g:if>
                         <g:if test="${j==0}">
