@@ -23,21 +23,21 @@
         </tr>
         </thead>
         <tbody>
-        <g:unless test="${requisitionItems}">
-            <tr>
-                <td colspan="8" class="middle center">
-                    <span class="fade">
-                        <warehouse:message code="default.none.label"/>
-                    </span>
-                </td>
-            </tr>
-        </g:unless>
-        <g:if test="${"PRODUCT".equalsIgnoreCase(sortOrder as String)}">
-        %{-- Requisition items are already sorted by product at this point so no need to re-sort. --}%
-        </g:if>
-        <g:else>
-            <g:set var="requisitionItems" value="${requisitionItems?.sort()}"/>
-        </g:else>
+            <g:unless test="${requisitionItems}">
+                <tr>
+                    <td colspan="8" class="middle center">
+                        <span class="fade">
+                            <warehouse:message code="default.none.label"/>
+                        </span>
+                    </td>
+                </tr>
+            </g:unless>
+            <g:if test="${"PRODUCT".equalsIgnoreCase(sortOrder as String)}">
+            %{-- Requisition items are already sorted by product at this point so no need to re-sort. --}%
+            </g:if>
+            <g:else>
+                <g:set var="requisitionItems" value="${requisitionItems?.sort()}"/>
+            </g:else>
             <g:each in="${requisitionItems}" status="i" var="requisitionItem">
                 <g:if test="${picklist}">
                     <g:set var="inventoryItemMap" value="${requisitionItem?.retrievePicklistItems()?.findAll { it.quantity > 0 }?.groupBy { it?.inventoryItem }}"/>
