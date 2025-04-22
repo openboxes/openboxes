@@ -278,12 +278,15 @@ class CycleCountSpec extends Specification implements DomainUnitTest<CycleCount>
         given:
         Set<CycleCountItem> cycleCountItems = new TreeSet<>()
         for (int countIndex : countIndexes) {
-            CycleCountItem cycleCountItem = Spy(CycleCountItem)
-            cycleCountItem.countIndex = countIndex
-            cycleCountItems.add(cycleCountItem)
+            CycleCountItem item = new CycleCountItem(
+                    countIndex: countIndex,
+                    location: new Location(),
+                    status: CycleCountItemStatus.APPROVED
+            )
+            item.id = 1
+            cycleCountItems.add(item)
         }
-        CycleCount cycleCount = Spy(CycleCount)
-        cycleCount.cycleCountItems = cycleCountItems
+        CycleCount cycleCount = new CycleCount(cycleCountItems: cycleCountItems)
 
         expect:
         cycleCount.maxCountIndex == maxCountIndex

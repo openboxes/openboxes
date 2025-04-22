@@ -159,9 +159,7 @@ class CycleCountApiControllerSpec extends Specification implements DataTest, Con
     void 'createRequests should fail when batch has duplicated product'() {
         given: "the following commands"
         CycleCountRequestCommand cycleCountRequestCommand = new CycleCountRequestCommand(
-                product: Spy(Product) {
-                    getProductCode() >> PRODUCT_CODE
-                },
+                product: new Product(productCode: PRODUCT_CODE),
                 blindCount: true,
         )
         CycleCountRequestBatchCommand cycleCountRequestBatchCommand = new CycleCountRequestBatchCommand(requests: [cycleCountRequestCommand])
