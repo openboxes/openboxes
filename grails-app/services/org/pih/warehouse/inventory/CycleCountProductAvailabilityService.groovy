@@ -208,7 +208,9 @@ class CycleCountProductAvailabilityService {
             this.cycleCount = cycleCount
 
             // We only want to refresh the items of the most recent count. We do this because previous counts are
-            // already completed, so their data should be considered static.
+            // already completed, so their data should be considered static. We allow countIndex to be specified
+            // for the case where the current count index has no items (QoH has been zeroed out for all items)
+            // and so we can't assume currentCountIndex == maxCountIndex.
             items = countIndex != null ? cycleCount.getItemsOfSpecificCount(countIndex) : cycleCount.getItemsOfMostRecentCount()
             currentCountIndex = countIndex ?: items.first().countIndex
 
