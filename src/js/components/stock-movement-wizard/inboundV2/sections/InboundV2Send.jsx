@@ -4,8 +4,7 @@ import PropTypes from 'prop-types';
 
 import Button from 'components/form-elements/Button';
 import Section from 'components/Layout/v2/Section';
-import InboundV2AddItems
-  from 'components/stock-movement-wizard/inboundV2/sections/InboundV2AddItems';
+import InboundV2AddItems from 'components/stock-movement-wizard/inboundV2/sections/InboundV2AddItems';
 
 const InboundV2Send = ({ previous }) => {
   console.log('InboundV2Send');
