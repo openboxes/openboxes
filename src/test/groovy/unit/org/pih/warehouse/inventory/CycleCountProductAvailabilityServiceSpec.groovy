@@ -56,9 +56,10 @@ class CycleCountProductAvailabilityServiceSpec extends Specification implements 
                                 inventoryItem: inventoryItem,
                                 location: binLocation,
                                 product: product,
-                                countIndex: 0,
+                                countIndex: 1,
                                 quantityOnHand: 20,
                                 custom: false,
+                                status: CycleCountItemStatus.COUNTED
                         ),
                 ]
         )
@@ -75,13 +76,13 @@ class CycleCountProductAvailabilityServiceSpec extends Specification implements 
 
         when: 'we refresh product availability'
         CycleCountProductAvailabilityService.CycleCountItemsForRefresh changedItems =
-                cycleCountProductAvailabilityService.refreshProductAvailability(cycleCount)
+                cycleCountProductAvailabilityService.refreshProductAvailability(cycleCount, false, 1)
 
         then: 'items should not have changed'
         assert !changedItems.itemsHaveChanged()
         assert cycleCount.cycleCountItems.size() == 1
 
-        CycleCountItem cycleCountItem = cycleCount.getCycleCountItem(product, binLocation, inventoryItem, 0)
+        CycleCountItem cycleCountItem = cycleCount.getCycleCountItem(product, binLocation, inventoryItem, 1)
         assert cycleCountItem.quantityOnHand == 20  // QoH is unchanged
     }
 
@@ -99,9 +100,10 @@ class CycleCountProductAvailabilityServiceSpec extends Specification implements 
                                 inventoryItem: inventoryItem,
                                 location: binLocation,
                                 product: product,
-                                countIndex: 0,
+                                countIndex: 1,
                                 quantityOnHand: 20,
                                 custom: false,
+                                status: CycleCountItemStatus.COUNTED
                         ),
                 ]
         )
@@ -118,13 +120,13 @@ class CycleCountProductAvailabilityServiceSpec extends Specification implements 
 
         when: 'we refresh product availability'
         CycleCountProductAvailabilityService.CycleCountItemsForRefresh changedItems =
-                cycleCountProductAvailabilityService.refreshProductAvailability(cycleCount)
+                cycleCountProductAvailabilityService.refreshProductAvailability(cycleCount, false, 1)
 
         then: 'items should have changed'
         assert changedItems.itemsHaveChanged()
         assert cycleCount.cycleCountItems.size() == 1
 
-        CycleCountItem cycleCountItem = cycleCount.getCycleCountItem(product, binLocation, inventoryItem, 0)
+        CycleCountItem cycleCountItem = cycleCount.getCycleCountItem(product, binLocation, inventoryItem, 1)
         assert cycleCountItem.quantityOnHand == 30  // QoH is updated
     }
 
@@ -152,6 +154,7 @@ class CycleCountProductAvailabilityServiceSpec extends Specification implements 
                                 // The new item will copy these fields
                                 dateCounted: existingDateCounted,
                                 assignee: existingAssignee,
+                                status: CycleCountItemStatus.COUNTED
                         ),
                 ]
         )
@@ -212,6 +215,7 @@ class CycleCountProductAvailabilityServiceSpec extends Specification implements 
                                 countIndex: 0,
                                 quantityOnHand: 20,
                                 custom: false,
+                                status: CycleCountItemStatus.COUNTED
                         ),
                 ]
         )
@@ -252,6 +256,7 @@ class CycleCountProductAvailabilityServiceSpec extends Specification implements 
                                 countIndex: 0,
                                 quantityOnHand: 20,
                                 custom: false,
+                                status: CycleCountItemStatus.COUNTED
                         ),
                 ]
         )
@@ -281,6 +286,7 @@ class CycleCountProductAvailabilityServiceSpec extends Specification implements 
                 countIndex: 0,  // count
                 quantityOnHand: 20,
                 custom: false,
+                status: CycleCountItemStatus.COUNTED
         )
         countItem.id = '0'
         CycleCountItem recountItem = new CycleCountItem(
@@ -290,6 +296,7 @@ class CycleCountProductAvailabilityServiceSpec extends Specification implements 
                 countIndex: 1,  // recount
                 quantityOnHand: 30,
                 custom: false,
+                status: CycleCountItemStatus.INVESTIGATING
         )
         recountItem.id = '1'
         CycleCount cycleCount = new CycleCount(
@@ -330,6 +337,7 @@ class CycleCountProductAvailabilityServiceSpec extends Specification implements 
                                 countIndex: 0,
                                 quantityOnHand: 20,
                                 custom: true,  // This is a custom row
+                                status: CycleCountItemStatus.COUNTED
                         ),
                 ]
         )
@@ -366,6 +374,7 @@ class CycleCountProductAvailabilityServiceSpec extends Specification implements 
                                 countIndex: 0,
                                 quantityOnHand: 20,
                                 custom: true,  // This is a custom row
+                                status: CycleCountItemStatus.COUNTED
                         ),
                 ]
         )
@@ -405,6 +414,7 @@ class CycleCountProductAvailabilityServiceSpec extends Specification implements 
                 countIndex: 0,  // count
                 quantityOnHand: 20,
                 custom: false,
+                status: CycleCountItemStatus.COUNTED
         )
         countItem.id = '0'
         CycleCountItem recountItem = new CycleCountItem(
@@ -414,6 +424,7 @@ class CycleCountProductAvailabilityServiceSpec extends Specification implements 
                 countIndex: 1,  // recount
                 quantityOnHand: 30,
                 custom: false,
+                status: CycleCountItemStatus.INVESTIGATING
         )
         recountItem.id = '1'
         CycleCount cycleCount = new CycleCount(
@@ -464,6 +475,7 @@ class CycleCountProductAvailabilityServiceSpec extends Specification implements 
                                 countIndex: 0,  // count
                                 quantityOnHand: 0,
                                 custom: true,  // this is a custom row
+                                status: CycleCountItemStatus.COUNTED
                         ),
                         new CycleCountItem(
                                 inventoryItem: inventoryItem,
@@ -472,6 +484,7 @@ class CycleCountProductAvailabilityServiceSpec extends Specification implements 
                                 countIndex: 1,  // recount
                                 quantityOnHand: 0,
                                 custom: false,  // this is NOT a custom row
+                                status: CycleCountItemStatus.INVESTIGATING
                         ),
                 ]
         )

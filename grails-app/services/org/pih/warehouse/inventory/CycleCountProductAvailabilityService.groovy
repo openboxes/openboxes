@@ -210,7 +210,7 @@ class CycleCountProductAvailabilityService {
             // We only want to refresh the items of the most recent count. We do this because previous counts are
             // already completed, so their data should be considered static.
             items = countIndex != null ? cycleCount.getItemsOfSpecificCount(countIndex) : cycleCount.getItemsOfMostRecentCount()
-            currentCountIndex = countIndex
+            currentCountIndex = countIndex ?: items.first().countIndex
 
             // Used by newly created items. We know that the frontend only supports a single assignee and date counted
             // for all items of a count, so for convenience we set the values of any new items to match.
