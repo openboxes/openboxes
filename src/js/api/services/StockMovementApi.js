@@ -5,6 +5,7 @@ import {
   STOCK_MOVEMENT_UPDATE_REQUISITION,
   STOCK_MOVEMENT_UPDATE_STATUS,
 } from 'api/urls';
+import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
 import RequisitionStatus from 'consts/requisitionStatus';
 import apiClient from 'utils/apiClient';
 
@@ -29,4 +30,8 @@ export default {
       comment,
     }),
   rollbackApproval: (id) => apiClient.put(STOCK_MOVEMENT_ROLLBACK_APPROVAL(id)),
+  importCsv: (stockMovementId, formData, config) =>
+    apiClient.post(STOCK_MOVEMENT_URL.importCsv(stockMovementId), formData, config),
+  exportCsv: (stockMovementId) =>
+    apiClient.get(STOCK_MOVEMENT_URL.exportCsv(stockMovementId), { responseType: 'blob' }),
 };
