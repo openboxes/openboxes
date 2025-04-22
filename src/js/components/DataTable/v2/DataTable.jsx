@@ -70,7 +70,7 @@ const DataTable = ({
   return (
     <div className="app-react-table-wrapper table-v2">
       <div className="ReactTable app-react-table">
-        <div className="rt-table" role="grid">
+        <div className="rt-table overflow-visible" role="grid">
           <DataTableHeader
             headerGroups={table.getHeaderGroups()}
             tableWithPinnedColumns={tableWithPinnedColumns}
