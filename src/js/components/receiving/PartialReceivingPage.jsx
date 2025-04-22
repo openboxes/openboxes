@@ -1075,7 +1075,7 @@ class PartialReceivingPage extends Component {
                           <Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" />
                         </span>
                       </button>
-                      <button type="button" className="btn btn-outline-secondary float-right btn-form btn-xs" disabled={!isAnyItemSelected(values.containers) || values.shipmentStatus === 'RECEIVED'} onClick={() => this.save(values, this.props.updateSort(receivingSortOptions[0].value), true)}>
+                      <button type="button" className="btn btn-outline-secondary float-right btn-form btn-xs" disabled={!isAnyItemSelected(values.containers) || values.shipmentStatus === 'RECEIVED'} onClick={() => this.save(values, this.props.updateSort(receivingSortOptions[0].value))}>
                         <Translate id="react.default.button.save.label" defaultMessage="Save" />
                       </button>
                       <button
