@@ -286,28 +286,6 @@ const useResolveStep = () => {
     forceRerender();
   };
 
-  const next = () => {
-    resetFocus();
-    const isValid = triggerValidation();
-    forceRerender();
-    const areRecountedByFilled = _.every(
-      cycleCountIds,
-      (id) => getRecountedBy(id)?.id,
-    );
-
-    if (!isValid || !areRecountedByFilled) {
-      return;
-    }
-
-    const missingRootCauses = validateRootCauses();
-    if (!isRootCauseWarningSkipped && missingRootCauses.length > 0) {
-      showEmptyRootCauseWarning();
-      return;
-    }
-
-    setIsStepEditable(false);
-  };
-
   const back = () => {
     setIsStepEditable(true);
     resetFocus();
@@ -405,6 +383,29 @@ const useResolveStep = () => {
     }
   };
 
+  const next = async () => {
+    resetFocus();
+    const isValid = triggerValidation();
+    forceRerender();
+    const areRecountedByFilled = _.every(
+      cycleCountIds,
+      (id) => getRecountedBy(id)?.id,
+    );
+
+    if (!isValid || !areRecountedByFilled) {
+      return;
+    }
+
+    const missingRootCauses = validateRootCauses();
+    if (!isRootCauseWarningSkipped && missingRootCauses.length > 0) {
+      showEmptyRootCauseWarning();
+      return;
+    }
+
+    await save(false);
+    setIsStepEditable(false);
+  };
+
   const refreshCountItems = async () => {
     try {
       show();
@@ -477,7 +478,6 @@ const useResolveStep = () => {
     let outdatedProducts = 0;
     try {
       show();
-      await save();
       for (const cycleCount of tableData.current) {
         try {
           await cycleCountApi.submitRecount({
