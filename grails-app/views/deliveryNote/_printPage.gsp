@@ -74,7 +74,7 @@
                         </g:if>
                         <g:if test="${requisitionItems.find { it.requisition?.shipment?.hasParentContainer()}}">
                             <td class="center middle">
-                                ${shipmentItem?.container?.parentContainer ? shipmentItem?.container?.name : '-'}
+                                ${shipmentItem?.container?.parentContainer ? shipmentItem?.container?.name : ''}
                             </td>
                         </g:if>
                         <g:if test="${j==0}">
