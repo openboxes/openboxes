@@ -8,6 +8,8 @@ const useArrowsNavigation = ({
   setRowIndex,
   addNewRow,
   isNewRow,
+  getValues,
+  setValue,
   onBlur,
 }) => {
   const getNextFocus = (columnId, rowIndex) => {
@@ -65,28 +67,83 @@ const useArrowsNavigation = ({
     return { newColumnId, newRowIndex };
   };
 
+  const handleCtrlArrowDown = (rowIndex, columnId) => {
+    const currentValue = getValues(`values.lineItems.${rowIndex}.${columnId}`);
+    const nextRowIndex = rowIndex + 1;
+
+    setRowIndex(nextRowIndex);
+    setColumnId(columnId);
+
+    if (currentValue !== '' && currentValue !== undefined && currentValue !== null) {
+      setValue(`values.lineItems.${nextRowIndex}.${columnId}`, currentValue);
+    }
+    onBlur();
+  };
+
+  const handleArrowDownAtLastRowAndColumn = (rowIndex) => {
+    addNewRow();
+    setRowIndex(rowIndex + 1);
+    setColumnId(newRowFocusableCells[0]);
+    onBlur();
+  };
+
+  const handleArrowDown = (rowIndex, columnId) => {
+    setRowIndex(rowIndex + 1);
+    setColumnId(columnId);
+    onBlur();
+  };
+
   const handleKeyDown = (e, rowIndex, columnId) => {
-    const { key } = e;
+    const { key, ctrlKey } = e;
 
     if (key === navigationKey.ARROW_UP) {
       const isInArray = existingRowFocusableCells.includes(columnId);
       if (rowIndex > 0 && (isInArray || isNewRow(tableData[rowIndex - 1]))) {
         setRowIndex(rowIndex - 1);
         setColumnId(columnId);
+        onBlur();
       }
-      onBlur();
       e.preventDefault();
       e.stopPropagation();
     }
 
     if (key === navigationKey.ARROW_DOWN) {
-      if (rowIndex < tableData.length - 1) {
-        setRowIndex(rowIndex + 1);
-        setColumnId(columnId);
+      const isLastRow = rowIndex === tableData.length - 1;
+      const isLastColumn = columnId
+        === existingRowFocusableCells[existingRowFocusableCells.length - 1];
+
+      // Handles Ctrl + Arrow Down: Copies current cell value to the next row's same column
+      // Result: Focus moves to the same column in the next row, with the value copied if it exists
+      if (ctrlKey && !isLastRow && getValues && setValue) {
+        handleCtrlArrowDown(rowIndex, columnId);
+        e.preventDefault();
+        e.stopPropagation();
+        return;
       }
-      onBlur();
+
+      // Handles Arrow Down at the last row and last column: Adds a new row and focuses first cell
+      // Result: A new row is appended, and focus shifts to the first focusable cell in that row
+      if (isLastRow && isLastColumn) {
+        handleArrowDownAtLastRowAndColumn(rowIndex);
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
+
+      // Handles Arrow Down when not on the last row: Moves focus to the same column in the next row
+      // Result: Focus shifts down one row while staying in the same column
+      if (!isLastRow) {
+        handleArrowDown(rowIndex, columnId);
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
+
+      // Default case: Prevents default behavior when Arrow Down is pressed in other scenarios
+      // Result: No action taken, but event propagation is stopped
       e.preventDefault();
       e.stopPropagation();
+      return;
     }
 
     if (key === navigationKey.ARROW_RIGHT) {
