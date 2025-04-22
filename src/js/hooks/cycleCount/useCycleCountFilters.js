@@ -105,13 +105,11 @@ const useCycleCountFilters = () => {
         fetchBins(currentLocation?.id),
       ]);
 
-      const groupedBins = groupBinLocationsByZone(binList, translate);
-
       setSelectOptions({
         categories: categoryList,
         catalogs: catalogList,
         tags: tagList,
-        internalLocations: groupedBins,
+        internalLocations: groupBinLocationsByZone(binList, translate),
         abcClasses: classificationList,
       });
 
