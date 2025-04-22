@@ -558,16 +558,6 @@ class PartialReceivingPage extends Component {
     };
   }
 
-  static getQuantityReceiving(item, nullForEmptyQuantity = false) {
-    if (item.quantityReceiving === 0) {
-      return 0;
-    }
-    if (item.quantityReceiving) {
-      return item.quantityReceiving;
-    }
-    return nullForEmptyQuantity ? null : 0;
-  }
-
   constructor(props) {
     super(props);
     this.state = {
@@ -614,14 +604,15 @@ class PartialReceivingPage extends Component {
     });
   }
 
-  buildShipmentItems(containers, nullForEmptyQuantity = false) {
+  buildShipmentItems(containers) {
     if (!this.props.hasPartialReceivingSupport) {
       return containers?.map((container) => ({
         ...container,
-        shipmentItems: container?.shipmentItems.map((item) => ({
-          ...item,
-          quantityReceiving: PartialReceivingPage.getQuantityReceiving(item, nullForEmptyQuantity),
-        })),
+        shipmentItems: container?.shipmentItems
+          .map((item) => ({
+            ...item,
+            quantityReceiving: item.quantityReceiving ? item.quantityReceiving : 0,
+          })),
       }));
     }
     return containers?.map((container) => ({
@@ -631,8 +622,7 @@ class PartialReceivingPage extends Component {
           if (item.receiptItemId) {
             return {
               ...item,
-              quantityReceiving:
-                PartialReceivingPage.getQuantityReceiving(item, nullForEmptyQuantity),
+              quantityReceiving: item.quantityReceiving ? item.quantityReceiving : 0,
             };
           }
           return item;
@@ -707,7 +697,7 @@ class PartialReceivingPage extends Component {
     const emptyLinesCount = emptyLinesCounter(formValues);
 
     const containers = emptyLinesCount
-      ? this.buildShipmentItems(formValues.containers, true)
+      ? this.buildShipmentItems(formValues.containers)
       : formValues.containers;
 
     const payload = {
