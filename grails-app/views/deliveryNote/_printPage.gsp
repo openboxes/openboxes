@@ -40,10 +40,10 @@
             </g:else>
             <g:each in="${requisitionItems}" status="i" var="requisitionItem">
                 <g:if test="${picklist}">
-                    <g:set var="shipmentItems" value="${requisitionItem?.requisition?.shipment?.shipmentItems?.findAll { it.requisitionItem == requisitionItem } ?: []}"/>
                     <g:set var="inventoryItemMap" value="${requisitionItem?.retrievePicklistItems()?.findAll { it.quantity > 0 }?.groupBy { it?.inventoryItem }}"/>
+                    <g:set var="shipmentItems" value="${requisitionItem?.requisition?.shipment?.shipmentItems?.findAll { it.requisitionItem == requisitionItem }}"/>
                     <g:set var="picklistItemsGroup" value="${inventoryItemMap?.values()?.toList()}"/>
-                    <g:set var="shipmentItemCount" value="${shipmentItems.size() ?: picklistItemsGroup?.size() ?: 1}"/>
+                    <g:set var="shipmentItemCount" value="${shipmentItems.size() ?: 1}"/>
                 </g:if>
                 <g:set var="backgroundColor" value="${(i % 2) == 0 ? '#fff' : '#f7f7f7'}"/>
                 <g:set var="j" value="${0}"/>
