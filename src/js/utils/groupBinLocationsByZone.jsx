@@ -2,12 +2,8 @@ import React from 'react';
 
 import _ from 'lodash';
 
-import useTranslate from 'hooks/useTranslate';
-
-const groupBinLocationsByZone = (binLocations) => {
-  const translate = useTranslate();
+const groupBinLocationsByZone = (binLocations, translate) => {
   const groupedByZone = _.groupBy(binLocations, (bin) => bin.zoneId || 'no-zone');
-
   return Object.entries(groupedByZone)
     .map(([zoneKey, bins]) => {
       const zoneName = bins[0].zoneName || translate('react.cycleCount.noZone', 'No Zone');
