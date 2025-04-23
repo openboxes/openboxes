@@ -16,14 +16,7 @@
                 <th>${g.message(code: 'deliveryNote.totalDelivered.label', default: "Total Delivered")}</th>
                 <th>${g.message(code: 'inventoryItem.lotNumber.label')}</th>
                 <th>${g.message(code: 'inventoryItem.expirationDate.label')}</th>
-                <th>
-                    <g:if test="${requisitionItems.find { it.requisition?.shipment?.shipmentItems?.any { it.container }}}">
-                        ${g.message(code: 'deliveryNote.deliveredByContainer.label', default: "Delivered by Container")}
-                    </g:if>
-                    <g:else>
-                        ${g.message(code: 'deliveryNote.deliveredByLot.label', default: "Delivered by Lot")}
-                    </g:else>
-                </th>
+                <th>${g.message(code: 'deliveryNote.splitQuantity.label', default: "Split Quantity")}</th>
                 <th>${g.message(code: 'requisitionItem.cancelReasonCode.label')}</th>
                 <th>${g.message(code: 'deliveryNote.received.label', default: "Received")}</th>
                 <th>${g.message(code: 'deliveryNote.comment.label', default: "Comment")}</th>
@@ -47,14 +40,11 @@
             </g:else>
             <g:each in="${requisitionItems}" status="i" var="requisitionItem">
                 <g:if test="${picklist}">
+                    <g:set var="shipmentItems" value="${requisitionItem?.requisition?.shipment?.shipmentItems?.findAll { it.requisitionItem == requisitionItem } ?: []}"/>
                     <g:set var="inventoryItemMap" value="${requisitionItem?.retrievePicklistItems()?.findAll { it.quantity > 0 }?.groupBy { it?.inventoryItem }}"/>
-                    <g:set var="shipmentItems" value="${requisitionItem?.requisition?.shipment?.shipmentItems?.findAll { it.requisitionItem == requisitionItem }}"/>
                     <g:set var="picklistItemsGroup" value="${inventoryItemMap?.values()?.toList()}"/>
-                    <g:set var="shipmentItemCount" value="${shipmentItems.size() ?: 1}"/>
+                    <g:set var="shipmentItemCount" value="${shipmentItems.size() ?: picklistItemsGroup?.size() ?: 1}"/>
                 </g:if>
-                <g:else>
-                    <g:set var="shipmentItemCount" value="${shipmentItems ? shipmentItems.size() : 1}"/>
-                </g:else>
                 <g:set var="backgroundColor" value="${(i % 2) == 0 ? '#fff' : '#f7f7f7'}"/>
                 <g:set var="j" value="${0}"/>
                 <g:while test="${j < shipmentItemCount}">
@@ -177,13 +167,13 @@
                                     </div>
                                 </g:if>
                             </td>
-                        <td class="middle" rowspan="${shipmentItemCount}">
+                        </g:if>
+                        <td class="middle">
                             ${requisitionItem?.getReceiptItems(inventoryItem)?.quantityReceived?.sum()}
                         </td>
-                        <td rowspan="${shipmentItemCount}">
+                        <td>
                             ${requisitionItem?.getReceiptItems(inventoryItem)?.comment?.join(', ')}
                         </td>
-                        </g:if>
                         <% j++ %>
                     </tr>
                 </g:while>
