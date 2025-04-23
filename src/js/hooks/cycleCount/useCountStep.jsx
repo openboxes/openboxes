@@ -264,19 +264,6 @@ const useCountStep = () => {
     forceRerender();
   };
 
-  const next = () => {
-    const isValid = triggerValidation();
-    forceRerender();
-    const areCountedByFilled = _.every(
-      cycleCountIds,
-      (id) => getCountedBy(id)?.id,
-    );
-    if (isValid && areCountedByFilled) {
-      setIsStepEditable(false);
-    }
-    resetFocus();
-  };
-
   const back = () => {
     setIsStepEditable(true);
     resetFocus();
@@ -336,6 +323,20 @@ const useCountStep = () => {
       resetFocus();
       hide();
     }
+  };
+
+  const next = async () => {
+    const isValid = triggerValidation();
+    forceRerender();
+    const areCountedByFilled = _.every(
+      cycleCountIds,
+      (id) => getCountedBy(id)?.id,
+    );
+    if (isValid && areCountedByFilled) {
+      await save();
+      setIsStepEditable(false);
+    }
+    resetFocus();
   };
 
   const modalLabels = {
@@ -401,7 +402,6 @@ const useCountStep = () => {
   const resolveDiscrepancies = async () => {
     try {
       show();
-      await save();
       const submittedCounts = await Promise.all(submitCount());
 
       const requestIdsWithDiscrepancies = submittedCounts
