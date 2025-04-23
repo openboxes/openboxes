@@ -169,10 +169,14 @@
                             </td>
                         </g:if>
                         <td class="middle">
-                            ${requisitionItem?.getReceiptItems(inventoryItem)?.quantityReceived?.sum()}
+                            <g:if test="${shipmentItem?.quantityReceived}">
+                                ${shipmentItem.quantityReceived}
+                            </g:if>
                         </td>
                         <td>
-                            ${requisitionItem?.getReceiptItems(inventoryItem)?.comment?.join(', ')}
+                            <g:if test="${shipmentItem?.comments}">
+                                ${shipmentItem?.getComments()?.join(', ')}
+                            </g:if>
                         </td>
                         <% j++ %>
                     </tr>
