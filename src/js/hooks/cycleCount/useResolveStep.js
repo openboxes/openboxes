@@ -340,14 +340,14 @@ const useResolveStep = () => {
     forceRerender();
   };
 
-  const cancelCounts = async (cycleCountRequestIdsToDelete, cycleCountsIds) => {
+  const cancelCounts = async (cycleCountRequestIdsToDelete, cycleCountIdsToDelete) => {
     try {
       show();
       await cycleCountApi.deleteRequests(currentLocation?.id, cycleCountRequestIdsToDelete);
       await refetchData();
       // Updated cycle count ids (remove from state cycle counts that have just been canceled)
       const updatedCycleCountsIds = cycleCountIds
-        .filter((id) => !cycleCountsIds.includes(id));
+        .filter((id) => !cycleCountIdsToDelete.includes(id));
       dispatch({
         type: UPDATE_CYCLE_COUNT_IDS,
         payload: updatedCycleCountsIds,
@@ -361,7 +361,7 @@ const useResolveStep = () => {
     }
   };
 
-  const zeroRecountItemsModalButtons = (cycleCountRequestIdsToDelete, cycleCountsIds) =>
+  const zeroRecountItemsModalButtons = (cycleCountRequestIdsToDelete, cycleCountIdsToDelete) =>
     (onClose) => ([
       {
         variant: 'transparent',
@@ -377,19 +377,19 @@ const useResolveStep = () => {
         defaultLabel: 'Cancel Products',
         onClick: async () => {
           onClose?.();
-          await cancelCounts(cycleCountRequestIdsToDelete, cycleCountsIds);
+          await cancelCounts(cycleCountRequestIdsToDelete, cycleCountIdsToDelete);
         },
       },
     ]);
 
   const openZeroRecountItemsModal = (emptyCycleCounts) => {
     const requestIds = emptyCycleCounts.map((entry) => (entry.requestId));
-    const cycleCountsIds = emptyCycleCounts.map((entry) => (entry.id));
+    const cycleCountsIdsToDelete = emptyCycleCounts.map((entry) => (entry.id));
     const productCodes = emptyCycleCounts.map((entry) => getField(entry.id, 'product.id'));
     confirmationModal({
       hideCloseButton: false,
       closeOnClickOutside: true,
-      buttons: zeroRecountItemsModalButtons(requestIds, cycleCountsIds),
+      buttons: zeroRecountItemsModalButtons(requestIds, cycleCountsIdsToDelete),
       title: {
         label: 'react.cycleCount.modal.zeroRecountItems.title.label',
         default: 'Cancel Counts?',
