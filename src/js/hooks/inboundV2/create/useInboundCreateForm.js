@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import moment from 'moment';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -15,6 +14,7 @@ import useInboundCreateValidation from 'hooks/inboundV2/create/useInboundCreateV
 import useQueryParams from 'hooks/useQueryParams';
 import useSpinner from 'hooks/useSpinner';
 import apiClient from 'utils/apiClient';
+import dateWithoutTimeZone from 'utils/dateUtils';
 
 const useInboundCreateForm = ({ next }) => {
   const [stockLists, setStockLists] = useState([]);
@@ -62,7 +62,10 @@ const useInboundCreateForm = ({ next }) => {
     const formattedValues = {
       ...values,
       name: '',
-      dateRequested: moment(values.dateRequested).format(DateFormat.MM_DD_YYYY),
+      dateRequested: dateWithoutTimeZone({
+        date: values.dateRequested,
+        outputDateFormat: DateFormat.MM_DD_YYYY,
+      }),
       origin: { id: values.origin.id },
       destination: { id: currentLocation.id },
       requestedBy: { id: values.requestedBy.id },
