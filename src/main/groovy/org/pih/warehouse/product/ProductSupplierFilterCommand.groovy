@@ -25,11 +25,11 @@ class ProductSupplierFilterCommand extends PaginationCommand implements Validate
 
     String format
 
-    Boolean exportResults
+    Boolean disableMaxLimit
 
     @Override
     Integer getMax() {
-        if (exportResults) {
+        if (disableMaxLimit) {
             return Integer.MAX_VALUE
         }
         return super.getMax()
@@ -47,6 +47,6 @@ class ProductSupplierFilterCommand extends PaginationCommand implements Validate
         sort nullable: true
         order nullable: true
         format nullable: true
-        exportResults nullable: true
+        disableMaxLimit nullable: true
     }
 }

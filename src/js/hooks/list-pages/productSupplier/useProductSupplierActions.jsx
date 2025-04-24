@@ -41,20 +41,25 @@ const useProductSupplierActions = ({ fireFetchData, filterParams }) => {
 
   const exportProductSuppliers = (exportResults = false) => {
     spinner.show();
-    const transformedParams = {
-      exportResults,
-      sort: 'dateCreated',
-      order: 'desc',
+    let params = {
+      includeInactive: true,
+      disableMaxLimit: true,
       format: 'xls',
-      ...filterParams,
-      product: filterParams.product?.id,
-      supplier: filterParams.supplier?.id,
-      defaultPreferenceTypes: (filterParams?.defaultPreferenceTypes || []).map(({ id }) => id),
     };
+
+    if (exportResults) {
+      params = {
+        ...params,
+        ...filterParams,
+        product: filterParams.product?.id,
+        supplier: filterParams.supplier?.id,
+        defaultPreferenceTypes: (filterParams?.defaultPreferenceTypes || []).map(({ id }) => id),
+      };
+    }
 
     exportFileFromAPI({
       url: PRODUCT_SUPPLIER_EXPORT,
-      params: transformedParams,
+      params,
       format: 'xls',
       afterExporting: () => spinner.hide(),
     });

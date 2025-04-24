@@ -3,6 +3,8 @@ package org.pih.warehouse.api
 import grails.converters.JSON
 import grails.validation.ValidationException
 import org.hibernate.ObjectNotFoundException
+import org.pih.warehouse.core.DocumentService
+import org.pih.warehouse.data.DataService
 import org.pih.warehouse.data.ProductSupplierService
 import org.pih.warehouse.product.ProductSupplier
 import org.pih.warehouse.product.ProductSupplierFilterCommand
@@ -12,8 +14,8 @@ import org.springframework.http.HttpStatus
 class ProductSupplierApiController {
 
     ProductSupplierService productSupplierService
-    def documentService
-    def dataService
+    DocumentService documentService
+    DataService dataService
 
     def list(ProductSupplierFilterCommand filterParams) {
         List<ProductSupplier> productSuppliers = productSupplierService.getProductSuppliers(filterParams)

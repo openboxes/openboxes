@@ -50,7 +50,7 @@ class ProductSupplierService {
     ProductSupplierIdentifierService productSupplierIdentifierService
     def dataSource
     ProductSupplierDataService productSupplierGormService
-    def dataService
+    DataService dataService
 
     List<ProductSupplier> getProductSuppliers(ProductSupplierFilterCommand command) {
         if (command.hasErrors()) {
@@ -169,13 +169,13 @@ class ProductSupplierService {
         // preference type as a default when the destination party is null (second statement)
         return Restrictions
                 .and(Subqueries.exists(DetachedCriteria.forClass(ProductSupplierPreference, 'pp')
-                                .createAlias("pp.preferenceType", 'pt', JoinType.LEFT_OUTER_JOIN)
-                                .setProjection(Projections.property("pp.id"))
-                                .add(Restrictions.and(
-                                        Restrictions.in("pt.id", preferenceTypes),
-                                        Restrictions.isNull("pp.destinationParty"),
-                                        // Join the product supplier preferences table by productSupplier.id = productPreference.supplierId
-                                        Restrictions.eqProperty("pp.productSupplier.id", "this.id")))))
+                        .createAlias("pp.preferenceType", 'pt', JoinType.LEFT_OUTER_JOIN)
+                        .setProjection(Projections.property("pp.id"))
+                        .add(Restrictions.and(
+                                Restrictions.in("pt.id", preferenceTypes),
+                                Restrictions.isNull("pp.destinationParty"),
+                                // Join the product supplier preferences table by productSupplier.id = productPreference.supplierId
+                                Restrictions.eqProperty("pp.productSupplier.id", "this.id")))))
     }
 
     private static Criterion getEmptyDefaultPreferenceTypeCriteria() {
@@ -244,15 +244,15 @@ class ProductSupplierService {
                 defaultProductPackage.uom = unitOfMeasure
                 defaultProductPackage.quantity = quantity
                 /**
-                    Product supplier needs to be saved here to receive an ID in order to be able to assign it to the product package
-                    otherwise the transient property value exception would be thrown
+                 Product supplier needs to be saved here to receive an ID in order to be able to assign it to the product package
+                 otherwise the transient property value exception would be thrown
                  */
                 productSupplier.save()
                 defaultProductPackage.productSupplier = productSupplier
                 /**
-                    The flush is needed because of the order Hibernate uses to save the entities in this operation -
-                    for productSupplier.defaultProductPackage to be stored properly and not be cleared after transaction commit, the flush is needed
-                    Check OBPIH-6757 for more details (#4904 PR)
+                 The flush is needed because of the order Hibernate uses to save the entities in this operation -
+                 for productSupplier.defaultProductPackage to be stored properly and not be cleared after transaction commit, the flush is needed
+                 Check OBPIH-6757 for more details (#4904 PR)
                  */
                 defaultProductPackage.save(flush: true)
                 productSupplier.defaultProductPackage = defaultProductPackage
@@ -302,10 +302,10 @@ class ProductSupplierService {
     }
 
     void assignDefaultPreferenceType(ProductSupplier productSupplier,
-                 PreferenceType preferenceType,
-                 String comments,
-                 String validityStartDate,
-                 String validityEndDate) {
+                                     PreferenceType preferenceType,
+                                     String comments,
+                                     String validityStartDate,
+                                     String validityEndDate) {
         ProductSupplierPreference productSupplierPreference = productSupplier.getGlobalProductSupplierPreference()
         if (!preferenceType && productSupplierPreference) {
             // If preference type is not provided, delete it
@@ -451,10 +451,7 @@ class ProductSupplierService {
 
     List<Map> getExportData(ProductSupplierFilterCommand filterParams) {
 
-        def productSuppliers = []
-
-        if(filterParams.exportResults) {
-            productSuppliers = getProductSuppliers(filterParams)
+        List<ProductSupplier> productSuppliers = getProductSuppliers(filterParams)
 
             productSuppliers = productSuppliers.collect(({ ProductSupplier p ->
                 [
@@ -480,47 +477,6 @@ class ProductSupplierService {
                         lastUpdated                               : p.lastUpdated
                 ]
             } as Closure<ProductSupplier>))
-        } else {
-            productSuppliers = ProductSupplier.createCriteria().list {
-                resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
-                projections {
-                    property("active", "active")
-                    property("id", "id")
-                    property("name", "name")
-                    property("code", "code")
-                    product {
-                        property("productCode", "productCode")
-                        property("name", "productName")
-                    }
-                    property("productCode", "legacyProductCode")
-                    supplier(JoinType.LEFT_OUTER_JOIN.joinTypeValue) {
-                        property("name", "supplier.name")
-                    }
-                    property("supplierCode", "supplierCode")
-                    manufacturer(JoinType.LEFT_OUTER_JOIN.joinTypeValue) {
-                        property("name", "manufacturer.name")
-                    }
-                    property("manufacturerCode", "manufacturerCode")
-                    property("minOrderQuantity", "minOrderQuantity")
-                    contractPrice(JoinType.LEFT_OUTER_JOIN.joinTypeValue) {
-                        property("price", "contractPrice.price")
-                        property("toDate", "contractPrice.toDate")
-                    }
-                    defaultProductPackage(JoinType.LEFT_OUTER_JOIN.joinTypeValue) {
-                        uom(JoinType.LEFT_OUTER_JOIN.joinTypeValue) {
-                            property("code", "defaultProductPackage.uom.code")
-                        }
-                        property("quantity", "defaultProductPackage.quantity")
-                        productPrice(JoinType.LEFT_OUTER_JOIN.joinTypeValue) {
-                            property("price", "defaultProductPackage.productPrice.price")
-                        }
-                    }
-                    property("ratingTypeCode", "ratingTypeCode")
-                    property("dateCreated", "dateCreated")
-                    property("lastUpdated", "lastUpdated")
-                }
-            }
-        }
 
         def productPackages = ProductPackage.createCriteria().list {
             fetchMode("uom", FetchMode.JOIN)
