@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import queryString from 'query-string';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
+import { useHistory, useLocation } from 'react-router-dom';
 
-import { fetchUsers } from 'actions';
+import { fetchUsers, updateWorkflowHeader } from 'actions';
 import stockListApi from 'api/services/StockListApi';
 import stockMovementApi from 'api/services/StockMovementApi';
 import { STOCK_MOVEMENT_BY_ID } from 'api/urls';
@@ -25,6 +27,8 @@ const useInboundCreateForm = ({ next }) => {
   const { validationSchema } = useInboundCreateValidation();
   const queryParams = useQueryParams();
   const dispatch = useDispatch();
+  const history = useHistory();
+  const location = useLocation();
 
   const defaultValues = useMemo(() => {
     const values = {
@@ -133,6 +137,7 @@ const useInboundCreateForm = ({ next }) => {
 
   const fetchData = async () => {
     if (!queryParams.id) {
+      dispatch(updateWorkflowHeader([], {}, 'Inbound'));
       return;
     }
     spinner.show();
@@ -152,7 +157,27 @@ const useInboundCreateForm = ({ next }) => {
         label: data.requestedBy.name,
       });
       setValue('dateRequested', data.dateRequested);
-      trigger();
+
+      // We set {} for headerStatus in the create step because we only want to display it on the
+      // last step
+      dispatch(
+        updateWorkflowHeader([
+          { text: data.identifier, color: '#000000', delimeter: ' - ' },
+          { text: data.origin.name, color: '#004d40', delimeter: ' to ' },
+          { text: data.destination.name, color: '#01579b', delimeter: ', ' },
+          { text: data.dateRequested, color: '#4a148c', delimeter: ', ' },
+          { text: data.description, color: '#770838', delimeter: '' },
+        ], {}, 'Inbound'),
+      );
+    } catch {
+      dispatch(updateWorkflowHeader([], {}, 'Inbound'));
+      history.push({
+        pathname: location.pathname,
+        search: queryString.stringify({
+          ...queryParams,
+          id: undefined,
+        }, { skipNull: true }),
+      });
     } finally {
       spinner.hide();
     }
