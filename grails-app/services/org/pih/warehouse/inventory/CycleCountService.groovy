@@ -567,6 +567,16 @@ class CycleCountService {
         cycleCount.cycleCountRequest.status = CycleCountRequestStatus.COMPLETED
     }
 
+    List<CycleCountItemDto> updateCycleCountItems(List<CycleCountUpdateItemCommand> items) {
+        List<CycleCountItemDto> updatedItems = []
+        items.each { CycleCountUpdateItemCommand item ->
+            CycleCountItemDto cycleCountItem = updateCycleCountItem(item)
+            updatedItems.add(cycleCountItem)
+        }
+
+        return updatedItems
+    }
+
     CycleCountItemDto updateCycleCountItem(CycleCountUpdateItemCommand command) {
         CycleCountItem cycleCountItem = command.cycleCountItem
         cycleCountItem.properties = command.properties
@@ -575,13 +585,24 @@ class CycleCountService {
         // If the dateCounted field is null, set it to today's date
         if (cycleCountItem.dateCounted == null) {
             cycleCountItem.dateCounted = new Date()
-            }
+        }
 
         // We've updated the status of a cycle count item so we need to also update the status of the count.
         cycleCountItem.cycleCount.status = cycleCountItem.cycleCount.recomputeStatus()
 
         return cycleCountItem.toDto()
     }
+
+    List<CycleCountItemDto> createCycleCountItems(List<CycleCountItemCommand> items) {
+        List<CycleCountItemDto> createdItems = []
+        items.each { CycleCountItemCommand item ->
+            CycleCountItemDto cycleCountItem = createCycleCountItem(item)
+            createdItems.add(cycleCountItem)
+        }
+
+        return createdItems
+    }
+
 
     CycleCountItemDto createCycleCountItem(CycleCountItemCommand command) {
         if (!command.inventoryItem?.id) {

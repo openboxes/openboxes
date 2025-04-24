@@ -2,7 +2,7 @@ import queryString from 'query-string';
 
 import {
   CYCLE_COUNT, CYCLE_COUNT_ITEM,
-  CYCLE_COUNT_ITEMS,
+  CYCLE_COUNT_ITEMS, CYCLE_COUNT_ITEMS_BATCH,
   CYCLE_COUNT_RECOUNT_START,
   CYCLE_COUNT_REFRESH_ITEMS,
   CYCLE_COUNT_REQUESTS,
@@ -48,4 +48,8 @@ export default {
     apiClient.post(CYCLE_COUNT_REFRESH_ITEMS(locationId,
       cycleCountId,
       removeOutOfStockItemsImplicitly), {}, { params: { countIndex } }),
+  createCycleCountItems: (payload, locationId, cycleCountId) =>
+    apiClient.post(CYCLE_COUNT_ITEMS_BATCH(locationId, cycleCountId), payload),
+  updateCycleCountItems: (payload, locationId, cycleCountId) =>
+    apiClient.patch(CYCLE_COUNT_ITEMS_BATCH(locationId, cycleCountId), payload),
 };

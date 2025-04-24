@@ -3,12 +3,15 @@ package org.pih.warehouse.api
 import grails.converters.JSON
 import grails.validation.ValidationException
 import org.apache.commons.csv.CSVPrinter
+import org.pih.warehouse.CommandUtils
+import org.pih.warehouse.batch.BatchController
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.DocumentService
 import org.pih.warehouse.core.dtos.BatchCommandUtils
 import org.pih.warehouse.inventory.CycleCountCandidate
 import org.pih.warehouse.inventory.CycleCountCandidateFilterCommand
 import org.pih.warehouse.inventory.CycleCountDto
+import org.pih.warehouse.inventory.CycleCountItemBatchCommand
 import org.pih.warehouse.inventory.CycleCountItemCommand
 import org.pih.warehouse.inventory.CycleCountItemDto
 import org.pih.warehouse.inventory.CycleCountRequest
@@ -19,6 +22,7 @@ import org.pih.warehouse.inventory.CycleCountStartRecountBatchCommand
 import org.pih.warehouse.inventory.CycleCountStatus
 import org.pih.warehouse.inventory.CycleCountSubmitCountCommand
 import org.pih.warehouse.inventory.CycleCountSubmitRecountCommand
+import org.pih.warehouse.inventory.CycleCountUpdateItemBatchCommand
 import org.pih.warehouse.inventory.CycleCountUpdateItemCommand
 import org.pih.warehouse.inventory.PendingCycleCountRequest
 
@@ -192,5 +196,21 @@ class CycleCountApiController {
         CycleCountDto cycleCount = cycleCountService.refreshCycleCount(cycleCountId, removeOutOfStockItemsImplicitly, params.int("countIndex"))
 
         render([data: cycleCount] as JSON)
+    }
+
+    def createCycleCountItemBatch(CycleCountItemBatchCommand command) {
+        BatchCommandUtils.validateBatch(command, "itemsToCreate")
+
+        List<CycleCountItemDto> cycleCountItems = cycleCountService.createCycleCountItems(command.itemsToCreate)
+
+        render([data: cycleCountItems] as JSON)
+    }
+
+    def updateCycleCountItemBatch(CycleCountUpdateItemBatchCommand command) {
+        BatchCommandUtils.validateBatch(command, "itemsToUpdate")
+
+        List<CycleCountItemDto> cycleCountItems = cycleCountService.updateCycleCountItems(command.itemsToUpdate)
+
+        render([data: cycleCountItems] as JSON)
     }
 }

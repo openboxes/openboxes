@@ -171,6 +171,7 @@ const useCountStep = () => {
       }
       return cycleCount;
     });
+    console.table(tableData.current);
   };
 
   const markAllItemsAsUpdated = (cycleCountId) => setAllItemsUpdatedState(cycleCountId, true);
@@ -326,23 +327,31 @@ const useCountStep = () => {
         const cycleCountItemsToUpdate = cycleCount.cycleCountItems
           .filter((item) => (item.updated && !item.id.includes('newRow')))
           .map(trimLotNumberSpaces);
-        for (const cycleCountItem of cycleCountItemsToUpdate) {
-          await cycleCountApi.updateCycleCountItem(
-            getPayload(cycleCountItem, cycleCount),
-            currentLocation?.id,
-            cycleCountItem?.id,
-          );
-        }
+        const updatePayload = {
+          itemsToUpdate: cycleCountItemsToUpdate.map((item) => getPayload(item, cycleCount)),
+        };
+        await cycleCountApi.updateCycleCountItems(updatePayload, currentLocation?.id, cycleCount.id);
+        // for (const cycleCountItem of cycleCountItemsToUpdate) {
+        //   await cycleCountApi.updateCycleCountItem(
+        //     getPayload(cycleCountItem, cycleCount),
+        //     currentLocation?.id,
+        //     cycleCountItem?.id,
+        //   );
+        // }
         const cycleCountItemsToCreate = cycleCount.cycleCountItems
           .filter((item) => item.id.includes('newRow'))
           .map(trimLotNumberSpaces);
-        for (const cycleCountItem of cycleCountItemsToCreate) {
-          await cycleCountApi.createCycleCountItem(
-            getPayload(cycleCountItem, cycleCount),
-            currentLocation?.id,
-            cycleCount?.id,
-          );
-        }
+        const createPayload = {
+          itemsToCreate: cycleCountItemsToCreate.map((item) => getPayload(item, cycleCount)),
+        };
+        await cycleCountApi.createCycleCountItems(createPayload, currentLocation?.id, cycleCount.id);
+        // for (const cycleCountItem of cycleCountItemsToCreate) {
+        //   await cycleCountApi.createCycleCountItem(
+        //     getPayload(cycleCountItem, cycleCount),
+        //     currentLocation?.id,
+        //     cycleCount?.id,
+        //   );
+        // }
 
         // Now that we've successfully saved all the items, mark them all as not updated so that
         // we don't try to update them again next time something is changed.
