@@ -57,6 +57,7 @@ import {
   START_RESOLUTION,
   TOGGLE_USER_ACTION_MENU,
   TRANSLATIONS_FETCHED,
+  UPDATE_WORKFLOW_HEADER,
 } from 'actions/types';
 import cycleCountApi from 'api/services/CycleCountApi';
 import genericApi from 'api/services/GenericApi';
@@ -808,6 +809,15 @@ export const startResolution = (requestIds, locationId) => async (dispatch) => {
 export const eraseDraft = (locationId, tab) => ({
   type: ERASE_DRAFT,
   payload: { locationId, tab },
+});
+
+export const updateWorkflowHeader = (headerInfo, headerStatus, workflowName) => ({
+  type: UPDATE_WORKFLOW_HEADER,
+  payload: {
+    headerInfo,
+    headerStatus,
+    workflowName,
+  },
 });
 
 export const fetchLotNumbersByProductIds = (productIds) => async (dispatch) => {
