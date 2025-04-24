@@ -1,22 +1,26 @@
 import React from 'react';
 
-import PropTypes from 'prop-types';
+import { useSelector } from 'react-redux';
 
 import useTranslate from 'hooks/useTranslate';
 import HeaderWrapper from 'wrappers/HeaderWrapper';
 
-const InboundHeader = ({ title, status }) => {
+const InboundHeader = () => {
+  const { headerInfo, headerStatus } = useSelector((state) => ({
+    headerInfo: state.inbound.headerInfo,
+    headerStatus: state.inbound.headerStatus,
+  }));
   const translate = useTranslate();
 
   return (
     <HeaderWrapper className="align-items-center h-100 py-3">
       <div className="create-page-title d-flex align-items-center justify-content-between w-100">
         <h5 className="create-page-tile-main-content m-0 ">
-          <strong>{translate('react.stockMovement.label', 'Stock Movement')}</strong>
-          {title && (
+          {headerInfo?.length > 0 && (
             <>
+              <strong>{translate('react.stockMovement.label', 'Stock Movement')}</strong>
               <span>{' | '}</span>
-              {title.map((item) => (
+              {headerInfo.map((item) => (
                 <>
                   <span style={{ color: item.color }}>{item.text}</span>
                   {item.delimeter && <span>{item.delimeter}</span>}
@@ -25,35 +29,16 @@ const InboundHeader = ({ title, status }) => {
             </>
           )}
         </h5>
-        {status && (
+        {headerStatus?.text && (
           <span
-            className={status.className}
+            className={headerStatus.className}
           >
-              {status.children}
+              {headerStatus.text}
           </span>
         )}
       </div>
     </HeaderWrapper>
   );
-};
-
-InboundHeader.defaultProps = {
-  title: undefined,
-  status: undefined,
-};
-
-InboundHeader.propTypes = {
-  title: PropTypes.arrayOf(
-    PropTypes.shape({
-      text: PropTypes.string.isRequired,
-      color: PropTypes.string,
-      delimeter: PropTypes.string,
-    }),
-  ),
-  status: PropTypes.shape({
-    children: PropTypes.string,
-    className: PropTypes.string,
-  }),
 };
 
 export default InboundHeader;
