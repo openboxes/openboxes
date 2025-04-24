@@ -201,6 +201,10 @@ const useInboundAddItemsForm = ({
     const oldQty = Number(oldItem.quantityRequested) || 0;
     const newQty = Number(item.quantityRequested) || 0;
 
+    const expirationDateChanged = (item.expirationDate
+        && item.inventoryItem?.expirationDate !== item.expirationDate)
+      || (!item.expirationDate && oldItem.expirationDate);
+
     return (
       !isItemUpdated(item, oldItem)
       || item.palletName !== oldItem.palletName
@@ -209,8 +213,7 @@ const useInboundAddItemsForm = ({
       || newQty !== oldQty
       || item.recipient?.id !== oldItem.recipient?.id
       || item.lotNumber !== oldItem.lotNumber
-      || (item.expirationDate
-        && item.inventoryItem.expirationDate !== item.expirationDate)
+      || expirationDateChanged
     );
   };
 
@@ -397,24 +400,27 @@ const useInboundAddItemsForm = ({
     lineItems.some((item) => !item.quantityRequested || item.quantityRequested === '0');
 
   const nextPage = async () => {
-    const formValues = getValues();
-    const lineItems = formValues.values.lineItems
-      .filter((item) => item?.product)
-      .map((item) => ({
-        ...item,
-        expirationDate: item.expirationDate ? moment(item.expirationDate)
-          .format(DateFormat.MM_DD_YYYY) : null,
-      }));
-    const hasInvalidQuantity = checkInvalidQuantities(lineItems);
+    await trigger();
+    if (isValid) {
+      const formValues = getValues();
+      const lineItems = formValues.values.lineItems
+        .filter((item) => item?.product)
+        .map((item) => ({
+          ...item,
+          expirationDate: item.expirationDate ? moment(item.expirationDate)
+            .format(DateFormat.MM_DD_YYYY) : null,
+        }));
+      const hasInvalidQuantity = checkInvalidQuantities(lineItems);
 
-    if (hasInvalidQuantity) {
-      confirmAction(
-        () => checkDuplicatesSaveAndTransitionToNextStep(formValues, lineItems),
-        'react.stockMovement.confirmSave.message',
-        'Are you sure you want to save? There are some lines with empty or zero quantity, those lines will be deleted.',
-      );
-    } else {
-      await checkDuplicatesSaveAndTransitionToNextStep(formValues, lineItems);
+      if (hasInvalidQuantity) {
+        confirmAction(
+          () => checkDuplicatesSaveAndTransitionToNextStep(formValues, lineItems),
+          'react.stockMovement.confirmSave.message',
+          'Are you sure you want to save? There are some lines with empty or zero quantity, those lines will be deleted.',
+        );
+      } else {
+        await checkDuplicatesSaveAndTransitionToNextStep(formValues, lineItems);
+      }
     }
   };
 
@@ -436,8 +442,8 @@ const useInboundAddItemsForm = ({
   const getFilteredLineItems = (formValues) =>
     formValues.values.lineItems.filter((item) => Object.keys(item).length > 0);
 
-  const save = () => {
-    trigger();
+  const save = async () => {
+    await trigger();
     if (isValid) {
       const lineItems = getFilteredLineItems(getValues());
       const hasInvalidQuantity = checkInvalidQuantities(lineItems);
@@ -552,7 +558,7 @@ const useInboundAddItemsForm = ({
   };
 
   const previousPage = async () => {
-    trigger();
+    await trigger();
     if (isValid) {
       try {
         spinner.show();
@@ -616,7 +622,11 @@ const useInboundAddItemsForm = ({
       await stockMovementApi.importCsv(stockMovementId, formData, config);
 
       fetchLineItems(true);
-      if (_.isNil(_.last(getValues().values.lineItems)?.product)) {
+      const { lineItems } = getValues().values;
+      const lastLineItem = _.last(lineItems);
+      const isLastProductNil = _.isNil(lastLineItem?.product);
+
+      if (isLastProductNil) {
         const updatedValues = {
           ...getValues().values,
           lineItems: [],
