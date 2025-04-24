@@ -3,8 +3,9 @@ import { useEffect, useMemo, useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import moment from 'moment';
 import { useForm } from 'react-hook-form';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
+import { fetchUsers } from 'actions';
 import stockListApi from 'api/services/StockListApi';
 import stockMovementApi from 'api/services/StockMovementApi';
 import { STOCK_MOVEMENT_BY_ID } from 'api/urls';
@@ -23,6 +24,7 @@ const useInboundCreateForm = ({ next }) => {
   const spinner = useSpinner();
   const { validationSchema } = useInboundCreateValidation();
   const queryParams = useQueryParams();
+  const dispatch = useDispatch();
 
   const defaultValues = useMemo(() => {
     const values = {
@@ -155,6 +157,8 @@ const useInboundCreateForm = ({ next }) => {
 
   useEffect(() => {
     if (queryParams.step !== InboundV2Step.ADD_ITEMS && queryParams.step !== InboundV2Step.SEND) {
+      // Fetching data for "requested by" dropdown
+      dispatch(fetchUsers());
       fetchData();
     }
   }, [queryParams.step]);
