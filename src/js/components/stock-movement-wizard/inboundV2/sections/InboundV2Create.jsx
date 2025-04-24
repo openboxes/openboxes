@@ -19,6 +19,7 @@ const InboundV2Create = ({
   errors,
   isValid,
   stockLists,
+  trigger,
 }) => {
   const [origin, destination] = useWatch({
     name: ['origin', 'destination'],
@@ -151,6 +152,7 @@ const InboundV2Create = ({
                   }}
                   onChangeRaw={(date) => {
                     field.onChange(date.format());
+                    trigger();
                   }}
                   errorMessage={errors.dateRequested?.message}
                   required
