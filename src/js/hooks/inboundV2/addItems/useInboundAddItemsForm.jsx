@@ -623,7 +623,11 @@ const useInboundAddItemsForm = ({
       await stockMovementApi.importCsv(stockMovementId, formData, config);
 
       fetchLineItems(true);
-      if (_.isNil(_.last(getValues().values.lineItems)?.product)) {
+      const { lineItems } = getValues().values;
+      const lastLineItem = _.last(lineItems);
+      const isLastProductNil = _.isNil(lastLineItem?.product);
+
+      if (isLastProductNil) {
         const updatedValues = {
           ...getValues().values,
           lineItems: [],
