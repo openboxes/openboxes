@@ -232,11 +232,7 @@ class CycleCountProductAvailabilityServiceSpec extends Specification implements 
 
         then: 'items should have changed'
         assert changedItems.itemsHaveChanged()
-
-        // TODO: We enter the correct flow but for some reason removeFromCycleCountItems doesn't actually remove
-        //       the item. This is almost certainly due to unit test weirdness. Possibly because the item hasn't been
-        //       initialized yet. Fix this test and then uncomment this line.
-        // assert cycleCount.cycleCountItems.size() == 0  // The item has been removed!
+        assert cycleCount.cycleCountItems.size() == 0  // The item has been removed!
     }
 
     void 'refreshProductAvailability should remove an item from the count when not in available items'() {
@@ -269,11 +265,7 @@ class CycleCountProductAvailabilityServiceSpec extends Specification implements 
 
         then: 'items should have changed'
         assert changedItems.itemsHaveChanged()
-
-        // TODO: We enter the correct flow but for some reason removeFromCycleCountItems doesn't actually remove
-        //       the item. This is almost certainly due to unit test weirdness. Possibly because the item hasn't been
-        //       initialized yet. Fix this test and then uncomment this line.
-        // assert cycleCount.cycleCountItems.size() == 0  // The item has been removed!
+        assert cycleCount.cycleCountItems.size() == 0  // The item has been removed!
     }
 
     void 'refreshProductAvailability should update QoH for custom count items when available items is deleted'() {
@@ -361,27 +353,28 @@ class CycleCountProductAvailabilityServiceSpec extends Specification implements 
         Product product = new Product()
         InventoryItem inventoryItem = new InventoryItem(product: product, lotNumber: 'lotNumber')
         Location binLocation = new Location(name: 'binLocation')
+        CycleCountItem countItem = new CycleCountItem(
+                inventoryItem: inventoryItem,
+                location: binLocation,
+                product: product,
+                countIndex: 0,  // count
+                quantityOnHand: 20,
+                custom: false,
+        )
+        countItem.id = '0'
+        CycleCountItem recountItem = new CycleCountItem(
+                inventoryItem: inventoryItem,
+                location: binLocation,
+                product: product,
+                countIndex: 1,  // recount
+                quantityOnHand: 30,
+                custom: false,
+        )
+        recountItem.id = '1'
         CycleCount cycleCount = new CycleCount(
                 facility: facility,
                 status: CycleCountStatus.INVESTIGATING,
-                cycleCountItems: [
-                        new CycleCountItem(
-                                inventoryItem: inventoryItem,
-                                location: binLocation,
-                                product: product,
-                                countIndex: 0,  // count
-                                quantityOnHand: 20,
-                                custom: false,
-                        ),
-                        new CycleCountItem(
-                                inventoryItem: inventoryItem,
-                                location: binLocation,
-                                product: product,
-                                countIndex: 1,  // recount
-                                quantityOnHand: 30,
-                                custom: false,
-                        ),
-                ]
+                cycleCountItems: [countItem, recountItem]
         )
 
         and: 'mocked available items'

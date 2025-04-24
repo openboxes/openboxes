@@ -10,7 +10,7 @@ import {
   CYCLE_COUNT_SUBMIT_COUNT,
   CYCLE_COUNT_SUBMIT_RECOUNT,
 } from 'api/urls';
-import apiClient from 'utils/apiClient';
+import apiClient, { apiClientCustomResponseHandler } from 'utils/apiClient';
 
 export default {
   createRequest: (payload, locationId) => apiClient.post(CYCLE_COUNT_REQUESTS(locationId), payload),
@@ -37,7 +37,9 @@ export default {
   submitCount: (payload, locationId, cycleCountId) =>
     apiClient.post(CYCLE_COUNT_SUBMIT_COUNT(locationId, cycleCountId), payload),
   submitRecount: (payload, locationId, cycleCountId) =>
-    apiClient.post(CYCLE_COUNT_SUBMIT_RECOUNT(locationId, cycleCountId), payload),
+    apiClientCustomResponseHandler.post(
+      CYCLE_COUNT_SUBMIT_RECOUNT(locationId, cycleCountId), payload,
+    ),
   refreshItems: (locationId, cycleCountId) =>
     apiClient.post(CYCLE_COUNT_REFRESH_ITEMS(locationId, cycleCountId)),
 };

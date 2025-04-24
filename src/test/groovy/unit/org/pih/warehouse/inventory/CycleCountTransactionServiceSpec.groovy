@@ -127,7 +127,7 @@ class CycleCountTransactionServiceSpec extends Specification implements DataTest
                 cycleCountItems: [
                         new CycleCountItem(
                                 inventoryItem: new InventoryItem(),
-                                location: new Location(),
+                                location: new Location(name: 'bin1'),
                                 product: product1,
                                 countIndex: 0,
                                 status: CycleCountItemStatus.APPROVED,
@@ -136,7 +136,7 @@ class CycleCountTransactionServiceSpec extends Specification implements DataTest
                         ),
                         new CycleCountItem(
                                 inventoryItem: new InventoryItem(),
-                                location: new Location(),
+                                location: new Location(name: 'bin2'),
                                 product: product2,
                                 countIndex: 0,
                                 status: CycleCountItemStatus.APPROVED,

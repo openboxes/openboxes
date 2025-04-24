@@ -9,7 +9,6 @@ import {
 } from 'react';
 
 import _ from 'lodash';
-import moment from 'moment';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
@@ -22,7 +21,9 @@ import { TO_RESOLVE_TAB } from 'consts/cycleCount';
 import { DateFormat } from 'consts/timeFormat';
 import useResolveStepValidation from 'hooks/cycleCount/useResolveStepValidation';
 import useSpinner from 'hooks/useSpinner';
+import confirmationModal from 'utils/confirmationModalUtils';
 import trimLotNumberSpaces from 'utils/cycleCountUtils';
+import dateWithoutTimeZone from 'utils/dateUtils';
 import exportFileFromApi from 'utils/file-download-util';
 import { checkBinLocationSupport } from 'utils/supportedActivitiesUtils';
 
@@ -95,7 +96,20 @@ const useResolveStep = () => {
     const duplicatedItems = _.groupBy(items,
       (item) => `${item.binLocation?.id}-${item?.inventoryItem?.lotNumber}`);
 
+    const maxCountIndex = _.maxBy(items, 'countIndex').countIndex;
+
     return Object.values(duplicatedItems).flatMap((itemsToMerge) => {
+      // When inventory is deleted the QoH is zero so the recount item was deleted,
+      // but it is still returning the original count item (because QoH was not zero
+      // at the time of the original count), so when we don't have more items than those
+      // which are coming from the counting step we have to filter those items out. It is
+      // not changed on the backend, because in that case we will lose the information
+      // about the original count
+      if (_.every(itemsToMerge, (item) => item.countIndex < maxCountIndex)) {
+        return null;
+      }
+
+      // Mapping items that are created on the recount step
       if (itemsToMerge.length === 1) {
         const item = itemsToMerge[0];
         return [{
@@ -103,7 +117,6 @@ const useResolveStep = () => {
           quantityRecounted: item?.quantityCounted,
           dateRecounted: item?.dateCounted,
           recountedBy: item?.assignee,
-          quantityVariance: null,
           quantityCounted: null,
           commentFromCount: null,
           dateCounted: null,
@@ -113,24 +126,24 @@ const useResolveStep = () => {
       }
 
       const groupedByCountIndex = _.groupBy(itemsToMerge, 'countIndex');
-      const maxCountIndex = _.maxBy(itemsToMerge, 'countIndex').countIndex;
       const itemFromCount = _.find(itemsToMerge, (item) => item.countIndex === maxCountIndex - 1);
       const itemsFromResolve = groupedByCountIndex[maxCountIndex] || [];
 
+      // Merging items coming from count + recount step
       return itemsFromResolve.map((item) => ({
         ...itemFromCount,
         ...item,
+        quantityOnHand: item?.quantityOnHand,
         commentFromCount: itemFromCount?.comment,
         quantityRecounted: item?.quantityCounted,
         quantityCounted: itemFromCount?.quantityCounted,
-        quantityVariance: itemFromCount?.quantityVariance,
         dateCounted: itemFromCount?.dateCounted,
         dateRecounted: item?.dateCounted,
         countedBy: itemFromCount?.assignee,
         recountedBy: item?.assignee,
         rootCause: mapRootCauseToSelectedOption(item?.discrepancyReasonCode),
       }));
-    });
+    }).filter(Boolean);
   };
 
   // Function used for maintaining the same order in the resolve tab between saves.
@@ -195,19 +208,6 @@ const useResolveStep = () => {
     });
     resetFocus();
     hide();
-  };
-
-  const refreshCountItems = async () => {
-    try {
-      show();
-      for (const cycleCountId of cycleCountIds) {
-        await cycleCountApi.refreshItems(currentLocation?.id, cycleCountId);
-      }
-    } finally {
-      resetFocus();
-      hide();
-      await refetchData();
-    }
   };
 
   const getRecountedBy = (cycleCountId) => recountedBy?.[cycleCountId];
@@ -286,28 +286,6 @@ const useResolveStep = () => {
     forceRerender();
   };
 
-  const next = () => {
-    resetFocus();
-    const isValid = triggerValidation();
-    forceRerender();
-    const areRecountedByFilled = _.every(
-      cycleCountIds,
-      (id) => getRecountedBy(id)?.id,
-    );
-
-    if (!isValid || !areRecountedByFilled) {
-      return;
-    }
-
-    const missingRootCauses = validateRootCauses();
-    if (!isRootCauseWarningSkipped && missingRootCauses.length > 0) {
-      showEmptyRootCauseWarning();
-      return;
-    }
-
-    setIsStepEditable(false);
-  };
-
   const back = () => {
     setIsStepEditable(true);
     resetFocus();
@@ -355,9 +333,11 @@ const useResolveStep = () => {
     inventoryItem: {
       ...cycleCountItem.inventoryItem,
       product: cycleCountItem?.product?.id,
-      expirationDate: cycleCountItem?.inventoryItem?.expirationDate === null
-        ? null
-        : moment(cycleCountItem?.inventoryItem?.expirationDate, DateFormat.MMM_DD_YYYY).format(),
+      expirationDate: dateWithoutTimeZone({
+        date: cycleCountItem?.inventoryItem?.expirationDate,
+        currentDateFormat: DateFormat.MMM_DD_YYYY,
+        outputDateFormat: DateFormat.MM_DD_YYYY,
+      }),
     },
     binLocation: cycleCountItem?.binLocation,
     comment: cycleCountItem?.comment,
@@ -369,7 +349,7 @@ const useResolveStep = () => {
     recount: true,
   });
 
-  const save = async () => {
+  const save = async (shouldRefetch = true) => {
     try {
       show();
       resetValidationState();
@@ -395,9 +375,48 @@ const useResolveStep = () => {
       }
     } finally {
       // After the save, refetch cycle counts so that a new row can't be saved multiple times
-      await refetchData();
+      if (shouldRefetch) {
+        await refetchData();
+      }
       hide();
       resetFocus();
+    }
+  };
+
+  const next = async () => {
+    resetFocus();
+    const isValid = triggerValidation();
+    forceRerender();
+    const areRecountedByFilled = _.every(
+      cycleCountIds,
+      (id) => getRecountedBy(id)?.id,
+    );
+
+    if (!isValid || !areRecountedByFilled) {
+      return;
+    }
+
+    const missingRootCauses = validateRootCauses();
+    if (!isRootCauseWarningSkipped && missingRootCauses.length > 0) {
+      showEmptyRootCauseWarning();
+      return;
+    }
+
+    await save();
+    setIsStepEditable(false);
+  };
+
+  const refreshCountItems = async () => {
+    try {
+      show();
+      await save(false);
+      for (const cycleCountId of cycleCountIds) {
+        await cycleCountApi.refreshItems(currentLocation?.id, cycleCountId);
+      }
+    } finally {
+      resetFocus();
+      hide();
+      await refetchData();
     }
   };
 
@@ -415,21 +434,69 @@ const useResolveStep = () => {
     quantityCounted: cycleCountItem?.quantityRecounted,
   });
 
+  const modalLabels = (outdatedProductsCount) => ({
+    title: {
+      label: 'react.cycleCount.modal.reviewProductsTitle.label',
+      default: `${outdatedProductsCount} products have been updated`,
+      data: {
+        outdatedProductsCount,
+      },
+    },
+    content: {
+      label: 'react.cycleCount.modal.reviewProductsContent.label',
+      default: `The inventory of ${outdatedProductsCount} products have been updated while you were working. Please review the changes and adjust your entries as needed.`,
+      data: {
+        outdatedProductsCount,
+      },
+    },
+  });
+
+  const reviewProductsModalButtons = (onClose) => ([
+    {
+      variant: 'primary',
+      defaultLabel: 'Review Products',
+      label: 'react.cycleCount.modal.reviewProducts.label',
+      onClick: async () => {
+        setIsSaveDisabled(false);
+        setIsStepEditable(true);
+        await refreshCountItems();
+        onClose?.();
+      },
+    },
+  ]);
+
+  const openReviewProductsModal = (outdatedProductsCount) => {
+    confirmationModal({
+      buttons: reviewProductsModalButtons,
+      ...modalLabels(outdatedProductsCount),
+      hideCloseButton: false,
+      closeOnClickOutside: false,
+    });
+  };
+
   const submitRecount = async () => {
+    let outdatedProducts = 0;
     try {
       show();
-      await save();
       for (const cycleCount of tableData.current) {
-        await cycleCountApi.submitRecount({
-          refreshQuantityOnHand: true,
-          failOnOutdatedQuantity: true,
-          requireRecountOnDiscrepancy: false,
-          cycleCountItems: cycleCount?.cycleCountItems?.map(
-            (item) => mapItemToSubmitRecountPayload(item),
-          ),
-        },
-        currentLocation?.id,
-        cycleCount?.id);
+        try {
+          await cycleCountApi.submitRecount({
+            refreshQuantityOnHand: true,
+            failOnOutdatedQuantity: true,
+            requireRecountOnDiscrepancy: false,
+            cycleCountItems: cycleCount?.cycleCountItems?.map(
+              (item) => mapItemToSubmitRecountPayload(item),
+            ),
+          },
+          currentLocation?.id,
+          cycleCount?.id);
+        } catch {
+          outdatedProducts += 1;
+        }
+      }
+      if (outdatedProducts > 0) {
+        openReviewProductsModal(outdatedProducts);
+        return;
       }
       history.push(CYCLE_COUNT.list(TO_RESOLVE_TAB));
     } finally {

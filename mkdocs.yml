@@ -48,7 +48,7 @@ theme:
     - navigation.footer
     - navigation.header
     - navigation.path
-    - navigation.prune
+    #- navigation.prune
     - navigation.sections
     - navigation.tabs
     - navigation.top
@@ -187,45 +187,70 @@ nav:
   # Configuration Guide - needs a lot of work
   - Configure:
     - Introduction: admin-guide/configuration/index.md
-    - Concepts:
-      - Configuration Defaults: admin-guide/configuration/basics.md
-      - Configuration Locations: admin-guide/configuration/locations.md
-      - Configuration Overrides: admin-guide/configuration/overrides.md
+    - Core Concepts:
+      - Default Settings: admin-guide/configuration/basics.md
+      - Configuration Sources: admin-guide/configuration/locations.md
+      - Modifying Configuration: admin-guide/configuration/overrides.md
 #      - Configuration Reloading: admin-guide/configuration/reloading.md
-    - Basic Settings:
+    - General Settings:
       - Data Source: admin-guide/configuration/database.md
-      - Outbound Mail: admin-guide/configuration/email.md
-#      - Server URL: admin-guide/configuration/server-url.md
-#     - Customization:
+      - Connection Pool: admin-guide/configuration/connection-pool.md
+      - Server URL: admin-guide/configuration/server-url.md
+      - Server Context Path: admin-guide/configuration/context-path.md
+      - SMTP (Email): admin-guide/configuration/email.md
+    - Customization Settings:
 #       - Application: admin-guide/configuration/application.md
-#       - Appearance: admin-guide/configuration/appearance.md
 #       - Feature Flags: admin-guide/configuration/feature-flags.md
-#       - File Uploads: admin-guide/configuration/uploads.md
-#       - Internationalization: admin-guide/configuration/i18n.md
-#       - Localization: admin-guide/configuration/localization.md
-#     - Integration:
-#       - Webhooks: admin-guide/configuration/webhooks.md
+#      - Internationalization: admin-guide/configuration/i18n.md
+      - File Uploads Location: admin-guide/configuration/uploads.md
+      - File Uploads Size: admin-guide/configuration/upload-max-file-size.md
+      - Localization: admin-guide/configuration/localization.md
+
+    - White-labeling:
+      - Default Logo: admin-guide/configuration/logo.md
+      - Document Logo: admin-guide/configuration/document-logo.md
+      - Label: admin-guide/configuration/label.md
+
+#    - Integration:
+#      - Webhooks: admin-guide/configuration/webhooks.md
+#      - CrowdIn: admin-guide/configuration/crowdin.md
+#      - Currency API: admin-guide/configuration/crowdin.md
+#      - Translation API :deprecated: : admin-guide/configuration/crowdin.md
 #     - Load Balancer:
-#       - SSL/HTTPS: admin-guide/configuration/https.md
 #       - Proxy Server: admin-guide/configuration/ajp.md
 #     - Logging:
 #       - Logging: admin-guide/configuration/logging.md
 #       - Logrotate.d: admin-guide/configuration/logrotate.md
+#    - Feature-Specific Settings:
+#        - Bill of Materials: admin-guide/configuration/bom.md
+#        - Product Merge: admin-guide/configuration/product-merge.md
+#    - Performance:
+#       - Caching: admin-guide/configuration/caching.md
+#       - Tomcat Server: admin-guide/configuration/tomcat.md
+#       - Thread Pool: admin-guide/configuration/thread-pool.md
 #     - Security:
+#       - Anonymization: admin-guide/configuration/anonymize.md
 #       - Access Control: admin-guide/configuration/access-control.md
 #       - CORS: admin-guide/configuration/cors.md
+#       - Firewall Rules: admin-guide/configuration/firewall.md
+#       - Recaptcha: admin-guide/configuration/recaptcha.md
+#       - SSL/HTTPS: admin-guide/configuration/https.md
 #     - Observability:
-#       - Analytics: admin-guide/configuration/analytics.md
+#       - Full Story: admin-guide/configuration/fullstory.md
+#       - Google Analytics: admin-guide/configuration/analytics.md
 #       - Health Check: admin-guide/configuration/health.md
 #       - Monitoring: admin-guide/configuration/apm.md
 #       - Sentry: admin-guide/configuration/sentry.md
+#     - User Feedback:
+#       - Zendesk Chat: admin-guide/configuration/zendesk.md
+#       - UserVoice: admin-guide/configuration/zendesk.md
+#       - Zendesk Chat: admin-guide/configuration/zendesk.md
 #     - Advanced:
 #       - Job Scheduling: admin-guide/configuration/job-scheduling.md
 #       - Hibernate: admin-guide/configuration/hibernate.md
 #       - Notifications: admin-guide/configuration/notifications.md
 #       - Performance: admin-guide/configuration/performance.md
 #       - Tomcat: admin-guide/configuration/tomcat.md
-#       - Recaptcha: admin-guide/configuration/recaptcha.md
 #       - Unattended Updates: admin-guide/configuration/unattended-updates.md
 #      - Monitoring:
 #      - Analytics:
@@ -239,7 +264,7 @@ nav:
 #     #- Onboarding: admin-guide/onboarding/index.md
 #       #- Locations:
 #       #- :
-#       #- Lanugage:
+#       #- Language:
 #     #- Data Model:
 
   # Upgrade Guide

@@ -15,10 +15,15 @@ const ConfirmStepHeader = ({
     save();
   };
 
+  const handleBackClick = () => {
+    setIsSaveDisabled(false);
+    back();
+  };
+
   return (
     <div className="confirm-step-header">
       <Button
-        onClick={back}
+        onClick={handleBackClick}
         label="react.default.button.back.label"
         defaultLabel="Back"
         variant="primary-outline"
