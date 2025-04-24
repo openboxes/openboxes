@@ -10,6 +10,7 @@ import SelectField from 'components/form-elements/v2/SelectField';
 import TextInput from 'components/form-elements/v2/TextInput';
 import Section from 'components/Layout/v2/Section';
 import StockMovementDirection from 'consts/StockMovementDirection';
+import { DateFormat } from 'consts/timeFormat';
 import { debounceLocationsFetch, debouncePeopleFetch } from 'utils/option-utils';
 import { FormErrorPropType } from 'utils/propTypes';
 
@@ -18,6 +19,7 @@ const InboundV2Create = ({
   errors,
   isValid,
   stockLists,
+  trigger,
 }) => {
   const [origin, destination] = useWatch({
     name: ['origin', 'destination'],
@@ -150,6 +152,11 @@ const InboundV2Create = ({
                   }}
                   errorMessage={errors.dateRequested?.message}
                   required
+                  onChangeRaw={(date) => {
+                    field.onChange(date.format());
+                    trigger();
+                  }}
+                  customDateFormat={DateFormat.DD_MMM_YYYY}
                   {...field}
                 />
               )}

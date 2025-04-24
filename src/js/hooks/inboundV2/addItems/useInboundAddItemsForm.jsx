@@ -3,7 +3,6 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import fileDownload from 'js-file-download';
 import _ from 'lodash';
-import moment from 'moment';
 import { useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
 import Alert from 'react-s-alert';
@@ -29,6 +28,7 @@ import useSpinner from 'hooks/useSpinner';
 import useTranslate from 'hooks/useTranslate';
 import apiClient from 'utils/apiClient';
 import confirmationModal from 'utils/confirmationModalUtils';
+import dateWithoutTimeZone from 'utils/dateUtils';
 
 const useInboundAddItemsForm = ({
   next,
@@ -267,8 +267,12 @@ const useInboundAddItemsForm = ({
     const itemsToSave = getLineItemsToBeSaved(itemCandidatesToSave)
       .map((item) => ({
         ...item,
-        expirationDate: item.expirationDate ? moment(item.expirationDate)
-          .format(DateFormat.MM_DD_YYYY) : null,
+        expirationDate: item.expirationDate
+          ? dateWithoutTimeZone({
+            date: item.expirationDate,
+            outputDateFormat: DateFormat.MM_DD_YYYY,
+          })
+          : null,
       }));
     if (itemsToSave.length) {
       const payload = {
@@ -410,8 +414,10 @@ const useInboundAddItemsForm = ({
         .filter((item) => item?.product)
         .map((item) => ({
           ...item,
-          expirationDate: item.expirationDate ? moment(item.expirationDate)
-            .format(DateFormat.MM_DD_YYYY) : null,
+          expirationDate: item.expirationDate ? dateWithoutTimeZone({
+            date: item.expirationDate,
+            outputDateFormat: DateFormat.MM_DD_YYYY,
+          }) : null,
         }));
       const hasInvalidQuantity = checkInvalidQuantities(lineItems);
 
