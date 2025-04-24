@@ -18,12 +18,15 @@ import { fetchBinLocations, fetchUsers } from 'actions';
 import { UPDATE_CYCLE_COUNT_IDS } from 'actions/types';
 import cycleCountApi from 'api/services/CycleCountApi';
 import { CYCLE_COUNT as GET_CYCLE_COUNTS } from 'api/urls';
+import notification from 'components/Layout/notifications/notification';
 import ActivityCode from 'consts/activityCode';
 import { CYCLE_COUNT } from 'consts/applicationUrls';
 import { TO_RESOLVE_TAB } from 'consts/cycleCount';
+import NotificationType from 'consts/notificationTypes';
 import { DateFormat } from 'consts/timeFormat';
 import useResolveStepValidation from 'hooks/cycleCount/useResolveStepValidation';
 import useSpinner from 'hooks/useSpinner';
+import useTranslate from 'hooks/useTranslate';
 import confirmationModal from 'utils/confirmationModalUtils';
 import trimLotNumberSpaces from 'utils/cycleCountUtils';
 import dateWithoutTimeZone from 'utils/dateUtils';
@@ -73,6 +76,8 @@ const useResolveStep = () => {
     reasonCodes: state.cycleCount.reasonCodes,
     currentLocation: state.session.currentLocation,
   }));
+
+  const translate = useTranslate();
 
   const resetFocus = () => {
     setRefreshFocusCounter((prev) => prev + 1);
@@ -189,6 +194,9 @@ const useResolveStep = () => {
   };
 
   const refetchData = async (ids = cycleCountIds) => {
+    if (ids.length === 0) {
+      return;
+    }
     const { data } = await cycleCountApi.getCycleCounts(
       currentLocation?.id,
       ids,
@@ -404,10 +412,49 @@ const useResolveStep = () => {
     });
   };
 
-  const next = () => {
+  const validateExistenceOfCycleCounts = async () => {
+    const { data } = await cycleCountApi.getCycleCounts(
+      currentLocation?.id,
+      cycleCountIds,
+    );
+    const {
+      existingCycleCountsIds,
+      canceledCycleCountsIds,
+    } = tableData.current.reduce((acc, curr) => {
+      if (data.data.find((cycleCount) => cycleCount.id === curr.id)) {
+        return {
+          ...acc,
+          existingCycleCountsIds: [...acc.existingCycleCountsIds, curr.id],
+        };
+      }
+      return {
+        ...acc,
+        canceledCycleCountsIds: [...acc.canceledCycleCountsIds, curr.id],
+      };
+    }, { existingCycleCountsIds: [], canceledCycleCountsIds: [] });
+    if (canceledCycleCountsIds.length > 0) {
+      dispatch({
+        type: UPDATE_CYCLE_COUNT_IDS,
+        payload: existingCycleCountsIds,
+      });
+      notification(NotificationType.ERROR_FILLED)({
+        message: 'Error',
+        details: translate('react.cycleCount.canceledCycleCounts.error.label',
+          'Some inventory changes may not be appearing because you canceled a product in the current count/recount. Please reload the page to continue.'),
+      });
+      return false;
+    }
+    return true;
+  };
+
+  const next = async () => {
     resetFocus();
     const isValid = triggerValidation();
     forceRerender();
+    const areCycleCountsUpToDate = await validateExistenceOfCycleCounts();
+    if (!areCycleCountsUpToDate) {
+      return;
+    }
     const currentCycleCountIds = tableData.current.map((cycleCount) => cycleCount.id);
     const areRecountedByFilled = _.every(
       currentCycleCountIds,
@@ -499,9 +546,15 @@ const useResolveStep = () => {
     recount: true,
   });
 
-  const save = async (shouldRefetch = true) => {
+  const save = async (shouldRefetch = true, shouldValidateExistence = true) => {
     try {
       show();
+      if (shouldValidateExistence) {
+        const isValid = await validateExistenceOfCycleCounts();
+        if (!isValid) {
+          return;
+        }
+      }
       resetValidationState();
       for (const cycleCount of tableData.current) {
         const cycleCountItemsToUpdate = cycleCount.cycleCountItems
@@ -536,6 +589,10 @@ const useResolveStep = () => {
   const refreshCountItems = async (cycleCountIdsForOutdatedProducts = cycleCountIds) => {
     try {
       show();
+      const isValid = await validateExistenceOfCycleCounts();
+      if (!isValid) {
+        return;
+      }
       await save(false);
       for (const cycleCountId of cycleCountIdsForOutdatedProducts) {
         await cycleCountApi.refreshItems(currentLocation?.id, cycleCountId, true, 1);
@@ -606,7 +663,11 @@ const useResolveStep = () => {
     const cycleCountIdsForOutdatedProducts = [];
     try {
       show();
-      await save();
+      const isValid = await validateExistenceOfCycleCounts();
+      if (!isValid) {
+        return;
+      }
+      await save(true, false);
       for (const cycleCount of tableData.current) {
         try {
           await cycleCountApi.submitRecount({

@@ -18,15 +18,19 @@ import {
   fetchUsers,
   startResolution,
 } from 'actions';
+import { UPDATE_CYCLE_COUNT_IDS } from 'actions/types';
 import cycleCountApi from 'api/services/CycleCountApi';
 import { CYCLE_COUNT as CYCLE_COUNT_URL } from 'api/urls';
+import notification from 'components/Layout/notifications/notification';
 import ActivityCode from 'consts/activityCode';
 import { CYCLE_COUNT } from 'consts/applicationUrls';
 import { TO_COUNT_TAB, TO_RESOLVE_TAB } from 'consts/cycleCount';
 import cycleCountStatus from 'consts/cycleCountStatus';
+import NotificationType from 'consts/notificationTypes';
 import { DateFormat } from 'consts/timeFormat';
 import useCountStepValidation from 'hooks/cycleCount/useCountStepValidation';
 import useSpinner from 'hooks/useSpinner';
+import useTranslate from 'hooks/useTranslate';
 import confirmationModal from 'utils/confirmationModalUtils';
 import trimLotNumberSpaces from 'utils/cycleCountUtils';
 import dateWithoutTimeZone from 'utils/dateUtils';
@@ -52,6 +56,7 @@ const useCountStep = () => {
   const dispatch = useDispatch();
   const history = useHistory();
   const { show, hide } = useSpinner();
+  const translate = useTranslate();
 
   const {
     cycleCountIds,
@@ -264,7 +269,42 @@ const useCountStep = () => {
     forceRerender();
   };
 
-  const next = () => {
+  const validateExistenceOfCycleCounts = async (callback) => {
+    const { data } = await cycleCountApi.getCycleCounts(
+      currentLocation?.id,
+      cycleCountIds,
+    );
+    const {
+      existingCycleCountsIds,
+      canceledCycleCountsIds,
+    } = tableData.current.reduce((acc, curr) => {
+      if (data.data.find((cycleCount) => cycleCount.id === curr.id)) {
+        return {
+          ...acc,
+          existingCycleCountsIds: [...acc.existingCycleCountsIds, curr.id],
+        };
+      }
+      return {
+        ...acc,
+        canceledCycleCountsIds: [...acc.canceledCycleCountsIds, curr.id],
+      };
+    }, { existingCycleCountsIds: [], canceledCycleCountsIds: [] });
+    if (canceledCycleCountsIds.length > 0) {
+      dispatch({
+        type: UPDATE_CYCLE_COUNT_IDS,
+        payload: existingCycleCountsIds,
+      });
+      notification(NotificationType.ERROR_FILLED)({
+        message: 'Error',
+        details: translate('react.cycleCount.canceledCycleCounts.error.label',
+          'Some inventory changes may not be appearing because you canceled a product in the current count/recount. Please reload the page to continue.'),
+      });
+      return false;
+    }
+    return callback();
+  };
+
+  const next = async () => {
     const isValid = triggerValidation();
     const currentCycleCountIds = tableData.current.map((cycleCount) => cycleCount.id);
     forceRerender();
@@ -477,6 +517,7 @@ const useCountStep = () => {
     next,
     back,
     save,
+    validateExistenceOfCycleCounts,
     resolveDiscrepancies,
     isStepEditable,
     isFormValid,
