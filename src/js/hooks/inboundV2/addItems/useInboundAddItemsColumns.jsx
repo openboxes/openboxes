@@ -8,7 +8,7 @@ import React, {
 import { createColumnHelper } from '@tanstack/react-table';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import { Controller } from 'react-hook-form';
+import { Controller, useController } from 'react-hook-form';
 import { RiDeleteBinLine } from 'react-icons/ri';
 import { useSelector } from 'react-redux';
 
@@ -37,7 +37,6 @@ const useInboundAddItemsColumns = ({
   refreshFocusCounter,
 }) => {
   const [headerRecipient, setHeaderRecipient] = useState(null);
-
   const [rowIndex, setRowIndex] = useState(null);
   const [columnId, setColumnId] = useState(null);
   // If prevForceResetFocus is different from refreshFocusCounter,
@@ -92,7 +91,11 @@ const useInboundAddItemsColumns = ({
     remove(row.index);
   };
 
-  const handleBlur = (field, fieldName = null, customLogic = null) => {
+  const handleBlur = (
+    field,
+    additionalFieldToOnBlur = null,
+    customLogic = null,
+  ) => {
     field.onBlur();
 
     if (rowIndex !== null && columnId !== null) {
@@ -100,15 +103,14 @@ const useInboundAddItemsColumns = ({
       setColumnId(null);
     }
 
+    if (additionalFieldToOnBlur) {
+      additionalFieldToOnBlur.onBlur();
+    }
+
     if (customLogic) {
       customLogic();
     }
-
-    if (fieldName) {
-      trigger(fieldName);
-    }
   };
-
   const focusableCells = [
     inboundColumns.PALLET_NAME,
     inboundColumns.BOX_NAME,
@@ -158,6 +160,11 @@ const useInboundAddItemsColumns = ({
       ),
       cell: ({ row, column }) => {
         const hasErrors = !!errors?.[row.index]?.palletName?.message;
+        const { field: boxNameField } = useController({
+          name: `values.lineItems.${row.index}.boxName`,
+          control,
+        });
+
         return (
           <TableCell
             className="rt-td rt-td-xs rt-td-add-items"
@@ -173,10 +180,7 @@ const useInboundAddItemsColumns = ({
                   className="input-xs"
                   {...field}
                   onKeyDown={(e) => handleKeyDown(e, row.index, column.id)}
-                  onBlur={() => handleBlur(
-                    field,
-                    `values.lineItems.${row.index}.boxName`,
-                  )}
+                  onBlur={() => handleBlur(field, boxNameField)}
                   onChange={(e) => setValue(`values.lineItems.${row.index}.palletName`, e.target.value ?? null)}
                   focusProps={{
                     fieldIndex: row.index,
@@ -429,7 +433,7 @@ const useInboundAddItemsColumns = ({
                     field,
                     null,
                     () => {
-                      const parsedValue = e.target.value ? Number(e.target.value) : e.target.value;
+                      const parsedValue = e.target.value ? Number(e.target.value) : undefined;
                       setValue(`values.lineItems.${row.index}.quantityRequested`, parsedValue);
                       trigger(`values.lineItems.${row.index}.quantityRequested`);
                     },
