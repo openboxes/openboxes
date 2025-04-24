@@ -146,9 +146,8 @@ const InboundV2 = () => {
         {is(inboundV2Step.CREATE) && (<Step.Component {...createComponentProps} />)}
       </form>
 
-      <form onSubmit={addItemsHandleSubmit(nextPage)}>
-        {is(inboundV2Step.ADD_ITEMS) && (<Step.Component {...addItemsComponentProps} />)}
-      </form>
+      {is(inboundV2Step.ADD_ITEMS) && (<Step.Component {...addItemsComponentProps} />)}
+
       {is(inboundV2Step.SEND) && (<Step.Component {...sendComponentProps} />)}
     </PageWrapper>
   );
