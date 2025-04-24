@@ -33,6 +33,9 @@ CREATE OR REPLACE VIEW pending_cycle_count_request AS
             LEFT OUTER JOIN product_classification
                          ON pa.product_id = product_classification.product_id AND
                             location.inventory_id = product_classification.inventory_id
+            JOIN product ON ccr.product_id = product.id
+    WHERE
+        product.active
     GROUP BY
         ccr.id,
         ccr.facility_id,
