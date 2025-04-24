@@ -10,9 +10,8 @@ import { useDispatch } from 'react-redux';
 import { useHistory, useLocation } from 'react-router-dom';
 import Alert from 'react-s-alert';
 
-import { fetchUsers } from 'actions';
+import { fetchUsers, updateWorkflowHeader } from 'actions';
 import stockMovementApi from 'api/services/StockMovementApi';
-import { updateInboundHeader } from 'actions';
 import {
   STOCK_MOVEMENT_BY_ID,
   STOCK_MOVEMENT_ITEM_REMOVE,
@@ -596,13 +595,13 @@ const useInboundAddItemsForm = ({
         lineItems: data.lineItems?.map(transformLineItem),
       };
       dispatch(
-        updateInboundHeader([
+        updateWorkflowHeader([
           { text: data.identifier, color: '#000000', delimeter: ' - ' },
           { text: data.origin.name, color: '#004d40', delimeter: ' to ' },
           { text: data.destination.name, color: '#01579b', delimeter: ', ' },
           { text: data.dateRequested, color: '#4a148c', delimeter: ', ' },
           { text: data.description, color: '#770838', delimeter: '' },
-        ], {}),
+        ], {}, 'Inbound'),
       );
       setValue('values', transformedData);
       setValue('totalCount', totalCount || 1);
@@ -611,7 +610,7 @@ const useInboundAddItemsForm = ({
 
   const fetchData = async () => {
     if (!queryParams.id) {
-      dispatch(updateInboundHeader([], {}));
+      dispatch(updateWorkflowHeader([], {}, 'Inbound'));
       previous();
       return;
     }
@@ -625,7 +624,7 @@ const useInboundAddItemsForm = ({
         await fetchLineItems();
       }
     } catch {
-      dispatch(updateInboundHeader([], {}));
+      dispatch(updateWorkflowHeader([], {}, 'Inbound'));
       // In case of an error, redirect to the "create" step without the id parameter
       history.push({
         pathname: location.pathname,
