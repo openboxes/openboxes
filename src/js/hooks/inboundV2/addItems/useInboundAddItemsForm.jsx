@@ -3,11 +3,13 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import fileDownload from 'js-file-download';
 import _ from 'lodash';
+import queryString from 'query-string';
 import { useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
+import { useHistory, useLocation } from 'react-router-dom';
 import Alert from 'react-s-alert';
 
-import { fetchUsers } from 'actions';
+import { fetchUsers, updateWorkflowHeader } from 'actions';
 import stockMovementApi from 'api/services/StockMovementApi';
 import {
   STOCK_MOVEMENT_BY_ID,
@@ -38,6 +40,8 @@ const useInboundAddItemsForm = ({
   // State used to trigger focus reset when changed. When this counter changes,
   // it will reset the focus by clearing the RowIndex and ColumnId in useEffect.
   const [refreshFocusCounter, setRefreshFocusCounter] = useState(0);
+  const history = useHistory();
+  const location = useLocation();
 
   const spinner = useSpinner();
   const { validationSchema } = useInboundAddItemsValidation();
@@ -594,20 +598,48 @@ const useInboundAddItemsForm = ({
         identifier: data.identifier,
         stockMovementId: data.id,
         lineItems: data.lineItems?.map(transformLineItem),
+
       };
+      dispatch(
+        updateWorkflowHeader([
+          { text: data.identifier, color: '#000000', delimeter: ' - ' },
+          { text: data.origin.name, color: '#004d40', delimeter: ' to ' },
+          { text: data.destination.name, color: '#01579b', delimeter: ', ' },
+          { text: data.dateRequested, color: '#4a148c', delimeter: ', ' },
+          { text: data.description, color: '#770838', delimeter: '' },
+        ], {}, 'Inbound'),
+      );
       setValue('values', transformedData);
       setValue('totalCount', totalCount || 1);
     }
   };
 
   const fetchData = async () => {
+    if (!queryParams.id) {
+      dispatch(updateWorkflowHeader([], {}, 'Inbound'));
+      previous();
+      return;
+    }
+
     setLoading(true);
     spinner.show();
+
     try {
       await fetchAddItemsPageData();
       if (getValues().isPaginated) {
         await fetchLineItems();
       }
+    } catch {
+      dispatch(updateWorkflowHeader([], {}, 'Inbound'));
+      // In case of an error, redirect to the "create" step without the id parameter
+      history.push({
+        pathname: location.pathname,
+        search: queryString.stringify({
+          ...queryParams,
+          id: undefined,
+          step: InboundV2Step.CREATE,
+        }, { skipNull: true }),
+      });
     } finally {
       setLoading(false);
       spinner.hide();
