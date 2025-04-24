@@ -453,30 +453,30 @@ class ProductSupplierService {
 
         List<ProductSupplier> productSuppliers = getProductSuppliers(filterParams)
 
-            productSuppliers = productSuppliers.collect(({ ProductSupplier p ->
-                [
-                        active                                    : p.active,
-                        id                                        : p.id,
-                        name                                      : p.name,
-                        code                                      : p.code,
-                        productCode                               : p.product?.productCode,
-                        productName                               : p.product?.name,
-                        legacyProductCode                         : p.productCode,
-                        "supplier.name"                           : p.supplier?.name,
-                        supplierCode                              : p.supplierCode,
-                        "manufacturer.name"                       : p.manufacturer?.name,
-                        manufacturerCode                          : p.manufacturerCode,
-                        minOrderQuantity                          : p.minOrderQuantity,
-                        "contractPrice.price"                     : p.contractPrice?.price,
-                        "contractPrice.toDate"                    : p.contractPrice?.toDate,
-                        "defaultProductPackage.uom.code"          : p.defaultProductPackage?.uom?.code,
-                        "defaultProductPackage.quantity"          : p.defaultProductPackage?.quantity,
-                        "defaultProductPackage.productPrice.price": p.defaultProductPackage?.productPrice?.price,
-                        ratingTypeCode                            : p.ratingTypeCode,
-                        dateCreated                               : p.dateCreated,
-                        lastUpdated                               : p.lastUpdated
-                ]
-            } as Closure<ProductSupplier>))
+        productSuppliers = productSuppliers.collect(({ ProductSupplier p ->
+            [
+                    active                                    : p.active,
+                    id                                        : p.id,
+                    name                                      : p.name,
+                    code                                      : p.code,
+                    productCode                               : p.product?.productCode,
+                    productName                               : p.product?.name,
+                    legacyProductCode                         : p.productCode,
+                    "supplier.name"                           : p.supplier?.name,
+                    supplierCode                              : p.supplierCode,
+                    "manufacturer.name"                       : p.manufacturer?.name,
+                    manufacturerCode                          : p.manufacturerCode,
+                    minOrderQuantity                          : p.minOrderQuantity,
+                    "contractPrice.price"                     : p.contractPrice?.price,
+                    "contractPrice.toDate"                    : p.contractPrice?.toDate,
+                    "defaultProductPackage.uom.code"          : p.defaultProductPackage?.uom?.code,
+                    "defaultProductPackage.quantity"          : p.defaultProductPackage?.quantity,
+                    "defaultProductPackage.productPrice.price": p.defaultProductPackage?.productPrice?.price,
+                    ratingTypeCode                            : p.ratingTypeCode,
+                    dateCreated                               : p.dateCreated,
+                    lastUpdated                               : p.lastUpdated
+            ]
+        } as Closure<ProductSupplier>))
 
         def productPackages = ProductPackage.createCriteria().list {
             fetchMode("uom", FetchMode.JOIN)
