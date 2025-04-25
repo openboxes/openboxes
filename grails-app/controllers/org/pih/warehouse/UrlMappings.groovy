@@ -896,6 +896,12 @@ class UrlMappings {
             action = [POST: "validate"]
         }
 
+        // Custom MOBILE APIs
+        "/api/mobile/putaways"(parseRequest: true) {
+            controller = "putawayApi"
+            action = [GET: "mobilePutaways"]
+        }
+
         // Standard REST APIs
 
         "/api/${resource}s"(parseRequest: true) {
