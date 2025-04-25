@@ -159,7 +159,7 @@ class OrderService {
         }
     }
 
-    def getOrders(Order orderTemplate, Date dateOrderedFrom, Date dateOrderedTo, Map params) {
+    def getOrders(Order orderTemplate, Date dateOrderedFrom = null, Date dateOrderedTo = null, Map params = [:]) {
         def orders = Order.createCriteria().list(params) {
             and {
                 if (params.q) {
@@ -167,6 +167,39 @@ class OrderService {
                         ilike("name", "%" + params.q + "%")
                         ilike("description", "%" + params.q + "%")
                         ilike("orderNumber", "%" + params.q + "%")
+                    }
+
+                    orderItems {
+                        product {
+                            or {
+                                ilike("name", "%" + params.q + "%")
+                                ilike("productCode", "%" + params.q + "%")
+                            }
+                        }
+                    }
+
+                    orderItems {
+                        inventoryItem {
+                            ilike("lotNumber", "%" + params.q + "%")
+                        }
+                    }
+
+                    orderItems {
+                        originBinLocation {
+                            or {
+                                ilike("name", "%" + params.q + "%")
+                                ilike("locationNumber", "%" + params.q + "%")
+                            }
+                        }
+                    }
+
+                    orderItems {
+                        destinationBinLocation {
+                            or {
+                                ilike("name", "%" + params.q + "%")
+                                ilike("locationNumber", "%" + params.q + "%")
+                            }
+                        }
                     }
                 }
                 if (orderTemplate.orderType) {
