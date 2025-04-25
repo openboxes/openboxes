@@ -447,43 +447,6 @@ const useResolveStep = () => {
     return true;
   };
 
-  const next = async () => {
-    resetFocus();
-    const isValid = triggerValidation();
-    forceRerender();
-    const areCycleCountsUpToDate = await validateExistenceOfCycleCounts();
-    if (!areCycleCountsUpToDate) {
-      return;
-    }
-    const currentCycleCountIds = tableData.current.map((cycleCount) => cycleCount.id);
-    const areRecountedByFilled = _.every(
-      currentCycleCountIds,
-      (id) => getRecountedBy(id)?.id,
-    );
-
-    if (!isValid || !areRecountedByFilled) {
-      return;
-    }
-
-    const emptyCycleCounts = tableData.current.filter(
-      (cycleCount) => !cycleCount?.cycleCountItems?.length,
-    );
-
-    if (emptyCycleCounts.length) {
-      openZeroRecountItemsModal(emptyCycleCounts);
-      return;
-    }
-
-    const missingRootCauses = validateRootCauses();
-    if (!isRootCauseWarningSkipped && missingRootCauses.length > 0) {
-      showEmptyRootCauseWarning();
-      return;
-    }
-
-    await save();
-    setIsStepEditable(false);
-  };
-
   const back = () => {
     setIsStepEditable(true);
     resetFocus();
@@ -585,6 +548,43 @@ const useResolveStep = () => {
       hide();
       resetFocus();
     }
+  };
+
+  const next = async () => {
+    resetFocus();
+    const isValid = triggerValidation();
+    forceRerender();
+    const areCycleCountsUpToDate = await validateExistenceOfCycleCounts();
+    if (!areCycleCountsUpToDate) {
+      return;
+    }
+    const currentCycleCountIds = tableData.current.map((cycleCount) => cycleCount.id);
+    const areRecountedByFilled = _.every(
+      currentCycleCountIds,
+      (id) => getRecountedBy(id)?.id,
+    );
+
+    if (!isValid || !areRecountedByFilled) {
+      return;
+    }
+
+    const emptyCycleCounts = tableData.current.filter(
+      (cycleCount) => !cycleCount?.cycleCountItems?.length,
+    );
+
+    if (emptyCycleCounts.length) {
+      openZeroRecountItemsModal(emptyCycleCounts);
+      return;
+    }
+
+    const missingRootCauses = validateRootCauses();
+    if (!isRootCauseWarningSkipped && missingRootCauses.length > 0) {
+      showEmptyRootCauseWarning();
+      return;
+    }
+
+    await save();
+    setIsStepEditable(false);
   };
 
   const refreshCountItems = async (cycleCountIdsForOutdatedProducts = cycleCountIds) => {

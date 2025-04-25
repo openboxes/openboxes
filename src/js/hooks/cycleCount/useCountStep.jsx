@@ -304,21 +304,6 @@ const useCountStep = () => {
     return callback();
   };
 
-  const next = async () => {
-    const isValid = triggerValidation();
-    const currentCycleCountIds = tableData.current.map((cycleCount) => cycleCount.id);
-    forceRerender();
-    const areCountedByFilled = _.every(
-      currentCycleCountIds,
-      (id) => getCountedBy(id)?.id,
-    );
-    if (isValid && areCountedByFilled) {
-      await save();
-      setIsStepEditable(false);
-    }
-    resetFocus();
-  };
-
   const back = () => {
     setIsStepEditable(true);
     resetFocus();
@@ -378,6 +363,21 @@ const useCountStep = () => {
       resetFocus();
       hide();
     }
+  };
+
+  const next = async () => {
+    const isValid = triggerValidation();
+    const currentCycleCountIds = tableData.current.map((cycleCount) => cycleCount.id);
+    forceRerender();
+    const areCountedByFilled = _.every(
+      currentCycleCountIds,
+      (id) => getCountedBy(id)?.id,
+    );
+    if (isValid && areCountedByFilled) {
+      await save();
+      setIsStepEditable(false);
+    }
+    resetFocus();
   };
 
   const modalLabels = {
