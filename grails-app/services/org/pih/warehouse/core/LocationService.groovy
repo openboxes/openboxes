@@ -719,4 +719,16 @@ class LocationService {
         }
         existingLocation.delete(flush: true)
     }
+
+    def getInternalLocation(String parentLocationId, String internalLocationId) {
+        return Location.createCriteria().get {
+            eq("active", Boolean.TRUE)
+            eq("parentLocation.id", parentLocationId)
+            or {
+                eq("id", internalLocationId)
+                eq("name", internalLocationId)
+                eq("locationNumber", internalLocationId)
+            }
+        }
+    }
 }

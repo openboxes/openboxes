@@ -13,6 +13,7 @@ import grails.converters.JSON
 import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import grails.util.Environment
+import org.grails.web.json.JSONObject
 import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.LocalizationUtil
 import org.pih.warehouse.core.ActivityCode
@@ -36,6 +37,7 @@ class ApiController {
     GrailsApplication grailsApplication
     def megamenuService
     def messageSource
+    def searchService
     GitProperties gitProperties
 
     def login() {
@@ -286,5 +288,18 @@ class ApiController {
         def resettingInstanceCommand = grailsApplication.config.openboxes.resettingInstance.command
 
         render([data: resettingInstanceCommand] as JSON)
+    }
+
+    def globalSearch() {
+        Object object = searchService.globalSearch(params.id)
+        if (object) {
+            def json = [data: object] as JSON
+            def jsonObject = new JSONObject(json.toString())
+            jsonObject.type = object?.class?.simpleName
+            render(jsonObject as JSON)
+        }
+        else {
+            throw new IllegalStateException("Unable to locate object with identifier ${params.id}")
+        }
     }
 }
