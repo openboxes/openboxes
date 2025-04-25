@@ -636,6 +636,12 @@ openboxes:
                 # this one is for testing and should be always set to true on production
                 cleanupAdjustment: true
 
+    identifier:
+        container:
+            format: 'LPN-${shipmentNumber}-${sequenceNumber}'
+        sequenceNumber:
+            format: '00000'
+
 mail:
     error:
         enabled: false

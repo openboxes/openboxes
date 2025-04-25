@@ -931,6 +931,15 @@ class UrlMappings {
             action = [GET: "list"]
         }
 
+        "/api/containers/$id/details"(parseRequest: true) {
+            controller = "containerApi"
+            action = [GET: "details"]
+        }
+        "/api/containers/$id/labels/$documentId**?" {
+            controller = { "containerApi" }
+            action = [GET: "renderLabel", POST: "printLabel", PUT: "printLabel"]
+        }
+
         // Standard REST APIs
 
         "/api/${resource}s"(parseRequest: true) {

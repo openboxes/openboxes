@@ -198,4 +198,6 @@ class Constants {
     static final String HS_CODE_PRODUCT_ATTRIBUTE_CODE = "HSCODE"
     static final String INVENTORY_BASELINE_MIGRATION_TRANSACTION_COMMENT = "Inventory baseline created during old product inventory transactions migration for products that had stock " +
             "but no inventory baseline transaction as a most recent transaction"
+
+    static final String DEFAULT_CONTAINER_LABEL_DOCUMENT_NUMBER = "barcodeLabel:container"
 }
