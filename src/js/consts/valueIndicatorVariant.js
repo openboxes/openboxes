@@ -1,8 +1,11 @@
-const arrowValueIndicatorVariant = {
+const valueIndicatorVariant = {
   EQUAL: 'EQUAL',
   EMPTY: 'EMPTY',
   POSITIVE: 'POSITIVE',
   NEGATIVE: 'NEGATIVE',
+  MORE: 'MORE',
+  LESS: 'LESS',
+  TRANSACTION: 'TRANSACTION',
 };
 
 export const getCycleCountDifferencesVariant = (number, value) => {
@@ -11,14 +14,14 @@ export const getCycleCountDifferencesVariant = (number, value) => {
   }
 
   if (number > 0) {
-    return arrowValueIndicatorVariant.POSITIVE;
+    return valueIndicatorVariant.POSITIVE;
   }
 
   if (number < 0) {
-    return arrowValueIndicatorVariant.NEGATIVE;
+    return valueIndicatorVariant.NEGATIVE;
   }
 
-  return arrowValueIndicatorVariant.EQUAL;
+  return valueIndicatorVariant.EQUAL;
 };
 
-export default arrowValueIndicatorVariant;
+export default valueIndicatorVariant;
