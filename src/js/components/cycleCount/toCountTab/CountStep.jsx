@@ -31,6 +31,7 @@ const CountStep = () => {
     refreshFocusCounter,
     isSaveDisabled,
     setIsSaveDisabled,
+    validateExistenceOfCycleCounts,
   } = useCountStep();
 
   return (
@@ -38,13 +39,13 @@ const CountStep = () => {
       {isStepEditable ? (
         <CountStepHeader
           printCountForm={printCountForm}
-          next={next}
-          save={save}
+          next={() => validateExistenceOfCycleCounts(next)}
+          save={() => validateExistenceOfCycleCounts(save)}
         />
       ) : (
         <ConfirmStepHeader
           back={back}
-          save={resolveDiscrepancies}
+          save={() => validateExistenceOfCycleCounts(resolveDiscrepancies)}
           isSaveDisabled={isSaveDisabled}
           setIsSaveDisabled={setIsSaveDisabled}
         />

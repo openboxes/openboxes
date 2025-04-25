@@ -68,8 +68,8 @@ const useCycleCountFilters = () => {
       const idList = getParamList(queryPropsParam);
       return elementsList
         .filter(({ id }) => idList.includes(id))
-        .map(({ id, label }) => ({
-          id, label, name: label, value: id,
+        .map(({ id, label, name }) => ({
+          id, label: label ?? name, name: name ?? label, value: id,
         }));
     }
     return null;

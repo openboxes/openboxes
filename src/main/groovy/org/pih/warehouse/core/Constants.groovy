@@ -40,6 +40,11 @@ class Constants {
     static final String MONTH_DAY_YEAR_DATE_FORMAT = "MM/dd/yyyy"
     static final String DELIVERY_DATE_FORMAT = "MM/dd/yyyy HH:mm XXX"
     static final String EUROPEAN_DATE_FORMAT = "dd/MM/yyyy"
+    // Display date using day of year format. This is used by the `openboxes.display.date.format` property.
+    // It is using `DD` instead `dd` because it is later used on the frontend by the moment, which interprets
+    // `dd` and `DD` differently(`DD` is day of month, and `dd` is day of week, see: OBPIH-7149 and OBPIH-5397).
+    static final String JS_DISPLAY_DATE_FORMAT = "MMM DD, yyyy"
+    // Display date using "DOM" - day of month format
     static final String DISPLAY_DATE_FORMAT = "MMM dd, yyyy"
     static final String DISPLAY_DATE_DEFAULT_VALUE = "-"
     static final String GENERATE_NAME_DATE_FORMAT = "ddMMMyyyy"

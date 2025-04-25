@@ -23,9 +23,9 @@ const useInventoryValidation = ({ tableData }) => {
           (item) => item?.id === row?.id))?.cycleCountItems;
       const dataGroupedByBinLocationAndLotNumber = _.groupBy(
         cycleCountItems,
-        (item) => `${item?.binLocation?.id}-${item?.inventoryItem?.lotNumber}`,
+        (item) => `${item?.binLocation?.id}-${item?.inventoryItem?.lotNumber?.trim() || ''}`,
       );
-      const key = `${row?.binLocation?.id}-${row?.inventoryItem?.lotNumber}`;
+      const key = `${row?.binLocation?.id}-${row?.inventoryItem?.lotNumber?.trim() || ''}`;
       if (dataGroupedByBinLocationAndLotNumber[key]?.length > 1) {
         // Display the error on both the bin and lot because uniqueness is based on both of them.
         ctx.addIssue({
@@ -49,15 +49,16 @@ const useInventoryValidation = ({ tableData }) => {
           (item) => item?.id === row?.id))?.cycleCountItems;
       const dataGroupedByLotNumber = _.groupBy(
         cycleCountItems,
-        (item) => item?.inventoryItem?.lotNumber,
+        (item) => item?.inventoryItem?.lotNumber?.trim() || '',
       );
       // The backend returns expiration date in the "MM/dd/yyyy" format, but we use the ISO format
       // "yyyy-MM-dd'T'hh:mm:ssXXX" when generating dates on the frontend. We convert the dates to
       // a moment (defaulting to UTC if no timezone information is provided) for easy comparison.
-      const expirationDates = dataGroupedByLotNumber[row?.inventoryItem?.lotNumber].map((item) => {
-        const expirationDate = item?.inventoryItem?.expirationDate;
-        return expirationDate == null ? null : moment.utc(expirationDate);
-      });
+      const expirationDates = dataGroupedByLotNumber[row?.inventoryItem?.lotNumber?.trim() || '']
+        .map((item) => {
+          const expirationDate = item?.inventoryItem?.expirationDate;
+          return expirationDate == null ? null : moment.utc(expirationDate);
+        });
       const uniqueDates = _.uniqWith(
         expirationDates,
         (arrVal, othVal) => (arrVal === null ? othVal === null : arrVal.isSame(othVal)),
@@ -82,7 +83,7 @@ const useInventoryValidation = ({ tableData }) => {
         (cycleCount) => _.find(cycleCount.cycleCountItems,
           (item) => item?.id === row?.id))?.cycleCountItems;
       const lotAndExpiryControl = cycleCountItems?.[0]?.product?.lotAndExpiryControl;
-      if (lotAndExpiryControl && !row?.inventoryItem?.lotNumber) {
+      if (lotAndExpiryControl && !row?.inventoryItem?.lotNumber?.trim()) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: translate('react.cycleCount.requiredLotAndExpirationDate.label', 'Lot number and expiry date are required.'),
@@ -100,7 +101,7 @@ const useInventoryValidation = ({ tableData }) => {
   };
 
   const checkLotNumberRequireness = (data) =>
-    data?.inventoryItem?.lotNumber || !data?.inventoryItem?.expirationDate;
+    data?.inventoryItem?.lotNumber?.trim() || !data?.inventoryItem?.expirationDate;
 
   return {
     checkDuplicatedLotNumber,

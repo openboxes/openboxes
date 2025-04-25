@@ -82,7 +82,7 @@ const useCountStepTable = ({
   };
 
   // Get field props, for the binLocation dropdown we have to pass options
-  const getFieldProps = (fieldName) => {
+  const getFieldProps = (fieldName, value, isFieldDisabled) => {
     if (fieldName === cycleCountColumn.BIN_LOCATION && showBinLocation) {
       return {
         labelKey: 'name',
@@ -96,12 +96,17 @@ const useCountStepTable = ({
       };
     }
 
+    if (fieldName === cycleCountColumn.LOT_NUMBER && isFieldDisabled) {
+      return {
+        placeholder: translate('react.cycleCount.emptyLotNumber.label', 'NO LOT'),
+      };
+    }
+
     return {};
   };
 
   // this function is required because there is a problem with getValue
-  const getValueToDisplay = (id, value) => {
-    const columnPath = id.replaceAll('_', '.');
+  const getValueToDisplay = (columnPath, value) => {
     if (columnPath === cycleCountColumn.EXPIRATION_DATE) {
       return formatLocalizedDate(value, DateFormat.DD_MMM_YYYY);
     }
@@ -125,7 +130,7 @@ const useCountStepTable = ({
       const initialValue = _.get(tableData, `[${index}].${columnPath}`);
       const [value, setValue] = useState(initialValue);
 
-      const isFieldEditable = !original.id.includes('newRow') && ![
+      const isFieldDisabled = !original.id.includes('newRow') && ![
         cycleCountColumn.QUANTITY_COUNTED,
         cycleCountColumn.COMMENT,
       ].includes(id);
@@ -134,7 +139,7 @@ const useCountStepTable = ({
       if (!isStepEditable) {
         return (
           <TableCell className="static-cell-count-step d-flex align-items-center">
-            {getValueToDisplay(id, value)}
+            {getValueToDisplay(columnPath, value)}
           </TableCell>
         );
       }
@@ -188,7 +193,7 @@ const useCountStepTable = ({
       // select field for bin locations and one date picker for the expiration date.
       const type = getFieldType(columnPath);
       const Component = getFieldComponent(columnPath);
-      const fieldProps = getFieldProps(columnPath);
+      const fieldProps = getFieldProps(columnPath, value, isFieldDisabled);
       const showTooltip = columnPath === cycleCountColumn.BIN_LOCATION;
 
       // Columns allowed for focus in new rows
@@ -223,7 +228,6 @@ const useCountStepTable = ({
         isNewRow,
         onBlur,
       });
-
       return (
         <TableCell
           className="rt-td rt-td-count-step pb-0"
@@ -233,7 +237,7 @@ const useCountStepTable = ({
           tooltipLabel={value?.name || translate('react.cycleCount.table.binLocation.label', 'Bin Location')}
         >
           <Component
-            disabled={isFieldEditable}
+            disabled={isFieldDisabled}
             type={type}
             value={value}
             onChange={onChange}

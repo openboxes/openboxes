@@ -139,14 +139,8 @@ class LocationService {
         }
 
         if (params.isReturnOrder) {
-            if (isSuperuser) {
-                return locations.findAll { Location it ->
-                    !it.supports(ActivityCode.MANAGE_INVENTORY) && it.locationType.locationTypeCode != LocationTypeCode.SUPPLIER
-                }
-            } else {
-                return locations.findAll { Location it ->
-                    !it.supports(ActivityCode.MANAGE_INVENTORY) && it.locationGroup == currentLocation.locationGroup && it.locationType.locationTypeCode != LocationTypeCode.SUPPLIER
-                }
+            return locations.findAll { Location it ->
+                !it.supports(ActivityCode.MANAGE_INVENTORY) && it.locationType.locationTypeCode != LocationTypeCode.SUPPLIER
             }
         }
         if (direction == StockMovementDirection.INBOUND.name()) {

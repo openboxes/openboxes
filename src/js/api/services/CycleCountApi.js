@@ -14,6 +14,10 @@ import apiClient, { apiClientCustomResponseHandler } from 'utils/apiClient';
 
 export default {
   createRequest: (payload, locationId) => apiClient.post(CYCLE_COUNT_REQUESTS(locationId), payload),
+  deleteRequests: (locationId, ids) => {
+    const queryParams = queryString.stringify({ id: ids });
+    return apiClient.delete(`${CYCLE_COUNT_REQUESTS(locationId)}?${queryParams}`);
+  },
   startCount: ({
     payload, locationId, format = null, config = {},
   }) => apiClient.post(
@@ -40,6 +44,8 @@ export default {
     apiClientCustomResponseHandler.post(
       CYCLE_COUNT_SUBMIT_RECOUNT(locationId, cycleCountId), payload,
     ),
-  refreshItems: (locationId, cycleCountId) =>
-    apiClient.post(CYCLE_COUNT_REFRESH_ITEMS(locationId, cycleCountId)),
+  refreshItems: (locationId, cycleCountId, removeOutOfStockItemsImplicitly, countIndex) =>
+    apiClient.post(CYCLE_COUNT_REFRESH_ITEMS(locationId,
+      cycleCountId,
+      removeOutOfStockItemsImplicitly), {}, { params: { countIndex } }),
 };

@@ -65,7 +65,7 @@ openboxes.purchasing.updateUnitPrice.method = UpdateUnitPriceMethodCode.USER_DEF
 openboxes.browser.connection.status.timeout = 8000
 
 // Date configuration (OBPIH-5397)
-openboxes.display.date.format = Constants.DISPLAY_DATE_FORMAT
+openboxes.display.date.format = Constants.JS_DISPLAY_DATE_FORMAT
 openboxes.display.date.defaultValue = Constants.DISPLAY_DATE_DEFAULT_VALUE
 
 // OBPIH-5847
@@ -337,7 +337,7 @@ openboxes {
                         [label: "product.exportAsCsv.label", defaultLabel: "Export products", href: "/product/exportAsCsv"],
                         [label: "export.productSources.label", defaultLabel: "Export product sources", href: "/productSupplier/export"],
                         [label: "export.latestInventory.label", defaultLabel: "Export latest inventory date", href: "/inventory/exportLatestInventoryDate"],
-                        [label: "export.inventoryLevels.label", defaultLabel: "Export inventory levels", href: "/inventoryLevel/export"],
+                        [label: "export.inventoryLevels.label", defaultLabel: "Export inventory levels", href: "/inventoryLevel/export?format=csv"],
                         [label: "export.requisitions.label", defaultLabel: "Export requisitions", href: "/requisition/export"],
                         [label: "export.binLocations.label", defaultLabel: "Export bin locations", href: "/report/exportBinLocation?downloadFormat=csv"],
                         [label: "export.productDemand.label", defaultLabel: "Export product demand", href: "/report/exportDemandReport?downloadFormat=csv"],

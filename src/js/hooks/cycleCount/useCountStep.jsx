@@ -19,6 +19,7 @@ import {
   fetchUsers,
   startResolution,
 } from 'actions';
+import { UPDATE_CYCLE_COUNT_IDS } from 'actions/types';
 import cycleCountApi from 'api/services/CycleCountApi';
 import { CYCLE_COUNT as CYCLE_COUNT_URL, CYCLE_COUNT_PENDING_REQUESTS } from 'api/urls';
 import notification from 'components/Layout/notifications/notification';
@@ -270,6 +271,41 @@ const useCountStep = () => {
     forceRerender();
   };
 
+  const validateExistenceOfCycleCounts = async (callback) => {
+    const { data } = await cycleCountApi.getCycleCounts(
+      currentLocation?.id,
+      cycleCountIds,
+    );
+    const {
+      existingCycleCountsIds,
+      canceledCycleCountsIds,
+    } = tableData.current.reduce((acc, curr) => {
+      if (data.data.find((cycleCount) => cycleCount.id === curr.id)) {
+        return {
+          ...acc,
+          existingCycleCountsIds: [...acc.existingCycleCountsIds, curr.id],
+        };
+      }
+      return {
+        ...acc,
+        canceledCycleCountsIds: [...acc.canceledCycleCountsIds, curr.id],
+      };
+    }, { existingCycleCountsIds: [], canceledCycleCountsIds: [] });
+    if (canceledCycleCountsIds.length > 0) {
+      dispatch({
+        type: UPDATE_CYCLE_COUNT_IDS,
+        payload: existingCycleCountsIds,
+      });
+      notification(NotificationType.ERROR_FILLED)({
+        message: 'Error',
+        details: translate('react.cycleCount.canceledCycleCounts.error.label',
+          'Some inventory changes may not be appearing because you canceled a product in the current count/recount. Please reload the page to continue.'),
+      });
+      return false;
+    }
+    return callback();
+  };
+
   const back = () => {
     setIsStepEditable(true);
     resetFocus();
@@ -333,9 +369,10 @@ const useCountStep = () => {
 
   const next = async () => {
     const isValid = triggerValidation();
+    const currentCycleCountIds = tableData.current.map((cycleCount) => cycleCount.id);
     forceRerender();
     const areCountedByFilled = _.every(
-      cycleCountIds,
+      currentCycleCountIds,
       (id) => getCountedBy(id)?.id,
     );
     if (isValid && areCountedByFilled) {
@@ -539,6 +576,7 @@ const useCountStep = () => {
     next,
     back,
     save,
+    validateExistenceOfCycleCounts,
     resolveDiscrepancies,
     isStepEditable,
     isFormValid,

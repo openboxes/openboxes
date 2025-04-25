@@ -3,7 +3,6 @@ import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { RiCalculatorLine, RiDownload2Line } from 'react-icons/ri';
 
-import AllProductsTabFooter from 'components/cycleCount/allProductsTab/AllProductsTabFooter';
 import DataTable from 'components/DataTable/v2/DataTable';
 import Button from 'components/form-elements/Button';
 import useAllProductsTab from 'hooks/cycleCount/useAllProductsTab';
@@ -56,8 +55,8 @@ const CycleCountAllProducts = ({
         </span>
         <div className="d-flex m-2 gap-8">
           <Button
-            label="react.cycleCount.table.countSelected.label"
-            defaultLabel="Count selected"
+            label="react.cycleCount.table.markAsToCount.label"
+            defaultLabel="Mark as To Count"
             variant="primary-outline"
             StartIcon={<RiCalculatorLine size={18} />}
             onClick={countSelected}
@@ -75,7 +74,6 @@ const CycleCountAllProducts = ({
       <DataTable
         columns={columns}
         data={tableData.data}
-        footerComponent={AllProductsTabFooter}
         emptyTableMessage={emptyTableMessage}
         loading={loading}
         totalCount={tableData.totalCount}
