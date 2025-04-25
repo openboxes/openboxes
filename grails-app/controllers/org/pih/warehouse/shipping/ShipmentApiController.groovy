@@ -9,8 +9,7 @@ class ShipmentApiController extends BaseDomainApiController {
 
     def shipmentService
 
-    def list = {
-        // MOBILE
+    def list() {
         Location origin = params.origin ? Location.get(params?.origin) : null
         Location destination = params.destination ? Location.get(params?.destination) : null
         ShipmentStatusCode shipmentStatusCode = params.shipmentStatusCode ? params.shipmentStatusCode as ShipmentStatusCode : null
@@ -19,8 +18,7 @@ class ShipmentApiController extends BaseDomainApiController {
         render ([data: shipments] as JSON)
     }
 
-    def read = {
-        // MOBILE
+    def read() {
         Shipment shipment = shipmentService.getShipment(params.id)
         render ([data:shipment] as JSON)
     }
