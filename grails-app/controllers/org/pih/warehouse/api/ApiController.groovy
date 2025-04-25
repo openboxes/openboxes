@@ -290,7 +290,7 @@ class ApiController {
         render([data: resettingInstanceCommand] as JSON)
     }
 
-    def globalSearch = {
+    def globalSearch() {
         Object object = searchService.globalSearch(params.id)
         if (object) {
             def json = [data: object] as JSON
