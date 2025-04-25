@@ -51,6 +51,12 @@ class CycleCountApiController {
         render([data: cycleCountRequests] as JSON)
     }
 
+    def deleteRequests() {
+        List<String> ids = params.list("id")
+        cycleCountService.deleteCycleCountRequests(ids)
+        render(status: 204)
+    }
+
     def startCycleCount(CycleCountStartBatchCommand command) {
         BatchCommandUtils.validateBatch(command, "requests")
         List<CycleCountDto> cycleCounts = cycleCountService.startCycleCount(command)
@@ -182,7 +188,8 @@ class CycleCountApiController {
     }
 
     def refreshCycleCount(String cycleCountId) {
-        CycleCountDto cycleCount = cycleCountService.refreshCycleCount(cycleCountId)
+        boolean removeOutOfStockItemsImplicitly = params.boolean("removeOutOfStockItemsImplicitly", false)
+        CycleCountDto cycleCount = cycleCountService.refreshCycleCount(cycleCountId, removeOutOfStockItemsImplicitly, params.int("countIndex"))
 
         render([data: cycleCount] as JSON)
     }

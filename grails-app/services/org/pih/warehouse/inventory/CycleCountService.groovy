@@ -589,14 +589,13 @@ class CycleCountService {
             }
             command.inventoryItem.save()
         }
-        Integer currentQuantityOnHand = productAvailabilityService.getQuantityOnHandInBinLocation(command.inventoryItem, command.binLocation) ?: 0
         CycleCount cycleCount = command.cycleCount
 
         CycleCountItem cycleCountItem = new CycleCountItem(
                 facility: command.facility,
                 status: command.recount ? CycleCountItemStatus.INVESTIGATING : CycleCountItemStatus.COUNTING,
                 countIndex: command.recount ? 1 : 0,
-                quantityOnHand: currentQuantityOnHand,
+                quantityOnHand: 0,
                 quantityCounted: command.quantityCounted,
                 cycleCount: cycleCount,
                 location: command.binLocation,
@@ -636,7 +635,7 @@ class CycleCountService {
      * A "refresh" means fetching the product availability for the products associated with the count and updating
      * the QoH for each of the items in the most recent count.
      */
-    CycleCountDto refreshCycleCount(String cycleCountId) {
+    CycleCountDto refreshCycleCount(String cycleCountId, boolean removeOutOfStockItemsImplicitly, Integer countIndex) {
         CycleCount cycleCount = CycleCount.get(cycleCountId)
         if (!cycleCount) {
             throw new ObjectNotFoundException(cycleCountId, CycleCount.class.toString())
@@ -646,8 +645,44 @@ class CycleCountService {
             throw new IllegalArgumentException("Cycle count cannot be refreshed when in state: ${cycleCount.status}")
         }
 
-        cycleCountProductAvailabilityService.refreshProductAvailability(cycleCount)
+        cycleCountProductAvailabilityService.refreshProductAvailability(cycleCount, removeOutOfStockItemsImplicitly, countIndex)
 
         return CycleCountDto.toDto(cycleCount)
+    }
+
+    /**
+     * Batch deletes a list of CycleCountRequest as well as the associated CycleCount and CycleCountItems if they exist.
+     */
+    void deleteCycleCountRequests(List<String> cycleCountRequestIds) {
+        for (String cycleCountRequestId : cycleCountRequestIds) {
+            deleteCycleCountRequest(cycleCountRequestId)
+        }
+    }
+
+    private void deleteCycleCountRequest(String cycleCountRequestId) {
+        CycleCountRequest cycleCountRequest = CycleCountRequest.get(cycleCountRequestId)
+        if (!cycleCountRequest) {
+            throw new ObjectNotFoundException(cycleCountRequestId, CycleCountRequest.class.toString())
+        }
+
+        CycleCount cycleCount = cycleCountRequest.cycleCount
+        if (cycleCount) {
+            deleteCycleCount(cycleCount)
+        }
+
+        cycleCountRequest.delete()
+    }
+
+    private void deleteCycleCount(CycleCount cycleCount) {
+        if (!cycleCount) {
+            return
+        }
+
+        cycleCount.cycleCountItems.each { it.delete() }
+        cycleCount.cycleCountItems.clear()
+
+        cycleCount.cycleCountRequest?.cycleCount = null
+
+        cycleCount.delete()
     }
 }

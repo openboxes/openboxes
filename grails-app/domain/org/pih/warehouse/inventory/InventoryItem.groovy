@@ -82,7 +82,7 @@ class InventoryItem implements Serializable {
                 "inventoryItemId": id,
                 "productId"      : product?.id,
                 "productName"    : product?.name,
-                "lotNumber"      : lotNumber,
+                "lotNumber"      : lotNumber ?: null,
                 "expirationDate" : expirationDate?.format("MM/dd/yyyy"),
                 "quantityOnHand" : quantity ?: 0,
                 "quantityATP"    : quantity ?: 0,       //todo: quantity available to promise will coming soon

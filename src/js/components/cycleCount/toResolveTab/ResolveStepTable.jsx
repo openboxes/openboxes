@@ -6,6 +6,7 @@ import { RiErrorWarningLine } from 'react-icons/ri';
 import { useSelector } from 'react-redux';
 import { Tooltip } from 'react-tippy';
 
+import CycleCountStockDiscrepancyInfoBar from 'components/cycleCount/CycleCountStockDiscrepancyInfoBar';
 import HeaderLabel from 'components/cycleCount/HeaderLabel';
 import HeaderSelect from 'components/cycleCount/HeaderSelect';
 import DataTable from 'components/DataTable/v2/DataTable';
@@ -39,6 +40,7 @@ const ResolveStepTable = ({
   isStepEditable,
   triggerValidation,
   refreshFocusCounter,
+  cycleCountWithItemsWithoutRecount,
 }) => {
   const {
     columns,
@@ -58,6 +60,11 @@ const ResolveStepTable = ({
   });
 
   const translate = useTranslate();
+
+  const emptyTableMessage = {
+    id: 'react.cycleCount.table.noInventoryItem.label',
+    defaultMessage: 'No inventory item in stock for this product',
+  };
 
   const defaultRecountedByMeta = recountedBy ? {
     id: recountedBy.id,
@@ -80,8 +87,14 @@ const ResolveStepTable = ({
     return recountedBy?.id ? null : true;
   };
 
+  const outOfStockItems = cycleCountWithItemsWithoutRecount
+    .cycleCountItems
+    .filter((item) => item.quantityOnHand === 0);
+
   return (
     <div className="list-page-list-section">
+      {outOfStockItems.length > 0
+        && <CycleCountStockDiscrepancyInfoBar outOfStockItems={outOfStockItems} />}
       <p className="count-step-title pt-4 pl-4">
         {product?.productCode}
         {' '}
@@ -165,6 +178,7 @@ const ResolveStepTable = ({
           defaultColumn={defaultColumn}
           meta={tableMeta}
           filterParams={{}}
+          emptyTableMessage={emptyTableMessage}
           disablePagination
         />
       </div>
@@ -211,7 +225,7 @@ ResolveStepTable.propTypes = {
   dateCounted: PropTypes.string.isRequired,
   tableData: PropTypes.arrayOf(
     PropTypes.shape({}),
-  ).isRequired,
+  ),
   tableMeta: PropTypes.shape({
     updateData: PropTypes.func.isRequired,
   }).isRequired,
@@ -225,4 +239,14 @@ ResolveStepTable.propTypes = {
   isFormValid: PropTypes.bool.isRequired,
   refreshFocusCounter: PropTypes.number.isRequired,
   triggerValidation: PropTypes.func.isRequired,
+  cycleCountWithItemsWithoutRecount: PropTypes.shape({
+    cycleCountItems: PropTypes.arrayOf(PropTypes.shape({})),
+  }),
+};
+
+ResolveStepTable.defaultProps = {
+  tableData: [],
+  cycleCountWithItemsWithoutRecount: {
+    cycleCountItems: [],
+  },
 };
