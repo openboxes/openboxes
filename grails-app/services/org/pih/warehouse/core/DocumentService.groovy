@@ -53,9 +53,11 @@ import org.pih.warehouse.api.Stocklist
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderType
 import org.pih.warehouse.order.OrderTypeCode
+import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductSupplier
 import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.requisition.RequisitionItemSortByCode
+import org.pih.warehouse.shipping.Container
 import org.pih.warehouse.shipping.ReferenceNumber
 import org.pih.warehouse.shipping.Shipment
 
@@ -77,6 +79,27 @@ class DocumentService {
 
     private getFormatTagLib() {
         return grailsApplication.mainContext.getBean('org.pih.warehouse.FormatTagLib')
+    }
+
+    Map getContainerBarcodeLabel(Container container) {
+        return getBarcodeLabel(Constants.DEFAULT_CONTAINER_LABEL_DOCUMENT_NUMBER,
+                "/api/containers/%s/labels/%s", container?.id)
+    }
+
+    Map getBarcodeLabel(String documentNumber, String urlTemplate, String objectId) {
+        def g = grailsApplication.mainContext.getBean('org.grails.plugins.web.taglib.ApplicationTagLib')
+        org.pih.warehouse.core.Document document = getDocument(DocumentCode.ZEBRA_TEMPLATE, documentNumber)
+        String url = String.format(urlTemplate, objectId, document?.id)
+        return document ? [id: document.id, name: document.name, url: g.createLink(uri: url, absolute: true)] : null
+    }
+
+    org.pih.warehouse.core.Document getDocument(DocumentCode documentCode, String documentNumber) {
+        return org.pih.warehouse.core.Document.createCriteria().get {
+            documentType {
+                eq("documentCode", documentCode)
+            }
+            eq("documentNumber", documentNumber)
+        } as org.pih.warehouse.core.Document
     }
 
     /**
