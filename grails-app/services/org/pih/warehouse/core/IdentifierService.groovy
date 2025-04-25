@@ -1,6 +1,7 @@
 package org.pih.warehouse.core
 
 import grails.gorm.transactions.Transactional
+import grails.util.Holders
 import org.apache.commons.lang.StringUtils
 import org.apache.commons.lang.text.StrSubstitutor
 import org.grails.datastore.gorm.GormEntity

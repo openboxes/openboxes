@@ -1,7 +1,9 @@
 package org.pih.warehouse.shipping
 
 import grails.gorm.transactions.Transactional
-
+import grails.util.Holders
+import org.apache.commons.lang.StringUtils
+import org.apache.commons.text.StringSubstitutor
 import org.pih.warehouse.core.IdentifierService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.identification.BlankIdentifierResolver
@@ -37,5 +39,18 @@ class ShipmentIdentifierService extends IdentifierService<Shipment> implements B
     @Override
     void setIdentifierOnEntity(String id, Shipment entity) {
         entity.shipmentNumber = id
+    }
+
+    def generateSequenceNumber(String sequenceNumber) {
+        String sequenceNumberFormat = Holders.grailsApplication.config.openboxes.identifier.sequenceNumber.format
+        return generateSequenceNumber(sequenceNumber, sequenceNumberFormat)
+    }
+
+    def generateSequenceNumber(String sequenceNumber, String sequenceNumberFormat) {
+        return StringUtils.leftPad(sequenceNumber, sequenceNumberFormat.length(), sequenceNumberFormat.substring(0, 1))
+    }
+
+    def renderTemplate(String template, Map model) {
+        return StringSubstitutor.replace(template, model)
     }
 }

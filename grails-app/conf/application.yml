@@ -647,6 +647,12 @@ openboxes:
         refreshProductAvailability:
             alwaysSynchronous: false
 
+    identifier:
+        container:
+            format: 'LPN-${shipmentNumber}-${sequenceNumber}'
+        sequenceNumber:
+            format: '00000'
+
 mail:
     error:
         enabled: false
