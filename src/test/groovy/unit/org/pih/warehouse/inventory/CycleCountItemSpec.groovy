@@ -25,64 +25,75 @@ class CycleCountItemSpec extends Specification implements DomainUnitTest<CycleCo
         1               | null           || null
     }
 
-    void 'compareTo should return items in order starting with expiration date and location name'() {
+    void 'sort should sort items by expiration date, then location name, then id'() {
         given:
+        CycleCountItem cycleCountItem0 = new CycleCountItem(
+                inventoryItem: new InventoryItem(
+                        expirationDate: new Date(2025, 01, 01),
+                ),
+                location: new Location(
+                        name: 'C',
+                )
+        )
+        cycleCountItem0.id = 10
+
         CycleCountItem cycleCountItem1 = new CycleCountItem(
                 inventoryItem: new InventoryItem(
-                        expirationDate: new Date(2025, 03, 02)
+                        expirationDate: new Date(2025, 01, 01),
                 ),
-                location: new Location()
+                location: new Location(
+                        name: 'C',
+                )
         )
+        cycleCountItem1.id = 11
+
         CycleCountItem cycleCountItem2 = new CycleCountItem(
                 inventoryItem: new InventoryItem(
-                        expirationDate: new Date(2025, 02, 02),
+                        expirationDate: new Date(2025, 01, 01),
+                ),
+                location: new Location(
+                        name: 'D',
+                )
+        )
+
+        cycleCountItem2.id = 3
+        CycleCountItem cycleCountItem3 = new CycleCountItem(
+                inventoryItem: new InventoryItem(
+                        expirationDate: new Date(2025, 01, 02),
                 ),
                 location: new Location(
                         name: 'A',
                 )
         )
-        CycleCountItem cycleCountItem3 = new CycleCountItem(
-                inventoryItem: new InventoryItem(
-                        expirationDate: new Date(2025, 02, 02),
-                ),
-                location: new Location(
-                        name: 'B',
-                )
-        )
+        cycleCountItem3.id = 2
+
         CycleCountItem cycleCountItem4 = new CycleCountItem(
                 inventoryItem: new InventoryItem(
                         expirationDate: new Date(2025, 01, 02),
                 ),
                 location: new Location(
-                        name: 'C',
+                        name: 'B',
                 )
         )
-        CycleCountItem cycleCountItem5 = new CycleCountItem(
-                inventoryItem: new InventoryItem(
-                        expirationDate: new Date(2025, 01, 02),
-                ),
-                location: new Location(
-                        name: 'C',
-                )
-        )
+        cycleCountItem4.id = 1
 
-        and:
+        and: 'a list of items that is unsorted'
         List<CycleCountItem> cycleCountItems = [
-                cycleCountItem5,
+                cycleCountItem1,
                 cycleCountItem4,
                 cycleCountItem3,
+                cycleCountItem0,
                 cycleCountItem2,
-                cycleCountItem1,
         ]
 
         when:
         cycleCountItems.sort()
 
         then:
-        cycleCountItems[0] == cycleCountItem5
-        cycleCountItems[1] == cycleCountItem4
-        cycleCountItems[2] == cycleCountItem2
-        cycleCountItems[3] == cycleCountItem3
-        cycleCountItems[4] == cycleCountItem1
+        cycleCountItems[0] == cycleCountItem0  // inventoryItem.expirationDate: 2025-01-01, location.name: "C", id: 10
+        cycleCountItems[1] == cycleCountItem1  // inventoryItem.expirationDate: 2025-01-01, location.name: "C", id: 11
+        cycleCountItems[2] == cycleCountItem2  // inventoryItem.expirationDate: 2025-01-01, location.name: "D", id: 3
+        cycleCountItems[3] == cycleCountItem3  // inventoryItem.expirationDate: 2025-01-02, location.name: "A", id: 2
+        cycleCountItems[4] == cycleCountItem4  // inventoryItem.expirationDate: 2025-01-02, location.name: "B", id: 1
     }
 }
