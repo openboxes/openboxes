@@ -25,14 +25,14 @@ class ContainerApiController extends BaseDomainApiController {
     def documentService
     def shipmentService
 
-    def details = {
+    def details() {
         Container container = Container.get(params.id)
         def data = container.toJson()
         data.defaultBarcodeLabelUrl = documentService.getContainerBarcodeLabel(container)
         render([data: data] as JSON)
     }
 
-    def renderLabel = {
+    def renderLabel() {
         // TODO: to be tested once we got zebra document type on the server
         Container container = Container.get(params.id)
         Document document = Document.get(params.documentId)
@@ -43,7 +43,7 @@ class ContainerApiController extends BaseDomainApiController {
         response.outputStream << zebraService.renderDocument(document, [container:container])
     }
 
-    def printLabel = {
+    def printLabel() {
         // TODO: to be tested once we got zebra document type on the server
         try {
             Container container = Container.get(params.id)
@@ -59,7 +59,7 @@ class ContainerApiController extends BaseDomainApiController {
         }
     }
 
-    def create = {
+    def create() {
         JSONObject jsonObject = request.JSON
         try {
 
@@ -94,7 +94,7 @@ class ContainerApiController extends BaseDomainApiController {
         }
     }
 
-    def updateStatus = {
+    def updateStatus() {
         Container container = Container.get(params.id)
         if (!container) {
             throw new IllegalArgumentException("Can't find container with given id: ${params.id}")
