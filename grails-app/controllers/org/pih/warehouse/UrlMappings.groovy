@@ -931,6 +931,11 @@ class UrlMappings {
             action = [GET: "mobilePutaways"]
         }
 
+        "/api/locations/$id/putawayCandidates" {
+            controller = { "putawayItemApi" }
+            action = [GET: "list"]
+        }
+
         // Standard REST APIs
 
         "/api/${resource}s"(parseRequest: true) {
