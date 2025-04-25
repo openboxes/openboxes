@@ -42,7 +42,7 @@ class Container implements Comparable, java.io.Serializable {
     static hasMany = [containers: Container]
 
 
-    static transients = ["optionValue", "shipmentItems"]
+    static transients = ["optionValue", "shipmentItems", "fullName"]
     static mapping = {
         id generator: 'uuid'
     }
@@ -104,6 +104,10 @@ class Container implements Comparable, java.io.Serializable {
                 containerStatus: this.containerStatus
         )
 
+    }
+
+    String getFullName() {
+        return [parentContainer?.name, name].findAll { it }.join(" > ")
     }
 
     List<ShipmentItem> getShipmentItems() {
@@ -195,4 +199,19 @@ class Container implements Comparable, java.io.Serializable {
         }
     }
 
+    Map toJson() {
+        [
+                id             : id,
+                name           : name,
+                fullName       : fullName,
+                containerNumber: containerNumber,
+                containerType  : containerType,
+                containerStatus: [id: containerStatus?.name(), name: containerStatus?.name],
+                "shipment.id"  : shipment?.id,
+                shipmentNumber : shipment?.shipmentNumber,
+                recipient      : recipient,
+                sortOrder      : sortOrder,
+                shipmentItems  : shipmentItems
+        ]
+    }
 }
