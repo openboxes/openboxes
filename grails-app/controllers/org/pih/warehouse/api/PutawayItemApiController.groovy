@@ -24,7 +24,7 @@ class PutawayItemApiController {
 
     def putawayService
 
-    def read = {
+    def read() {
         OrderItem orderItem = OrderItem.get(params.id)
         if (!orderItem) {
             throw new ObjectNotFoundException(params.id, OrderItem.class.simplename)
@@ -33,17 +33,17 @@ class PutawayItemApiController {
         render render ([data: putawayItem.toJson()] as JSON)
     }
 
-    def list = {
+    def list() {
         String locationId = params?.location?.id ?: session?.warehouse?.id
         Location location = Location.get(locationId)
         if (!location) {
             throw new IllegalArgumentException("Must provide location.id as request parameter")
         }
-        List putawayItems = putawayService.getPutawayCandidates(location)
+        List<PutawayItem> putawayItems = putawayService.getPutawayCandidates(location)
         render([data: putawayItems.collect { it.toJson() }] as JSON)
     }
 
-    def update = {
+    def update() {
         log.info "params " + params
         JSONObject jsonObject = request.JSON
         OrderItem orderItem = OrderItem.get(params.id)
