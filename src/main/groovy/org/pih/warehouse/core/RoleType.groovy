@@ -58,6 +58,7 @@ enum RoleType {
 
     // Warehouse roles
     ROLE_ORDER_CLERK('Order Clerk', 50),
+    ROLE_PUTAWAY('Putaway', 50),
     ROLE_PICKER('Picker', 50),
     ROLE_PACKER('Packer', 50),
     ROLE_RECEIVER('Receiver', 50),
@@ -120,6 +121,7 @@ enum RoleType {
                 ROLE_SUPERUSER,
                 ROLE_FINANCE,
                 ROLE_INVOICE,
+                ROLE_PUTAWAY,
                 ROLE_PRODUCT_MANAGER,
                 ROLE_USER_NOTIFICATION,
                 ROLE_PRODUCT_NOTIFICATION,
