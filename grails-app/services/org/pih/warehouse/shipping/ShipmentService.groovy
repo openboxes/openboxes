@@ -2402,4 +2402,21 @@ class ShipmentService {
         shipmentInstance.addToComments(comment)
         return comment
     }
+
+    String generateContainerNumber(Shipment shipment){
+        Integer sequenceNumber = getNextContainerNumberSequence(shipment)
+        String sequenceNumberStr = shipmentIdentifierService.generateSequenceNumber(sequenceNumber.toString())
+        Map model = ["shipmentNumber": shipment.shipmentNumber, "sequenceNumber": sequenceNumberStr]
+        String template = Holders.grailsApplication.config.openboxes.identifier.container.format
+        return shipmentIdentifierService.renderTemplate(template, model)
+    }
+
+    Integer getNextContainerNumberSequence(Shipment shipment){
+        return (shipment?.containers ? shipment?.containers?.size() : 0) + 1
+    }
+
+    void updateContainerStatus(Container container, ContainerStatus containerStatus) {
+        container.containerStatus = containerStatus
+        container.save()
+    }
 }

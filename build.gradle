@@ -650,6 +650,8 @@ dependencies {
     // use a release optimized for Grails 3.3.x for this `excel-import` sub-dependency
     implementation 'org.grails.plugins:joda-time:2.1.0'
 
+    implementation 'org.apache.commons:commons-text:1.9'
+
     // enable `import grails.plugins.quartz.Job*`
     compile('org.grails.plugins:quartz:2.0.13') {
         transitive = false  // we pull in quartz-scheduler directly, below
