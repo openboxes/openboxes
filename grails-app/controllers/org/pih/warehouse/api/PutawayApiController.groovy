@@ -42,20 +42,6 @@ class PutawayApiController {
         render([data: putawayItems.collect { it.toJson() }] as JSON)
     }
 
-    def listPutaways() {
-        // MOBILE
-        Location location = params["location.id"] ? Location.get(params["location.id"]) : Location.load(session.warehouse.id)
-        if (!location) {
-            throw new IllegalArgumentException("Must provide location.id as request parameter")
-        }
-        OrderType orderType = OrderType.findByCode(Constants.PUTAWAY_ORDER)
-        OrderStatus status = params.status ? params.status as OrderStatus : OrderStatus.PENDING
-        Order orderCriteria = new Order(orderType: orderType, status: status, origin: location, destination: location)
-        List<Order> orders = orderService.getOrders(orderCriteria)
-        List<Putaway> putaways = orders.collect {  Order order -> Putaway.createFromOrder(order) }
-        render([data: putaways.collect { it.toJson() }] as JSON)
-    }
-
     def read() {
         Order order = Order.get(params.id)
         if (!order) {
@@ -108,6 +94,22 @@ class PutawayApiController {
             }
         }
         render([data: putaway?.toJson()] as JSON)
+    }
+
+    // Custom MOBILE actions
+
+    def mobilePutaways() {
+        // MOBILE
+        Location location = params["location.id"] ? Location.get(params["location.id"]) : Location.load(session.warehouse.id)
+        if (!location) {
+            throw new IllegalArgumentException("Must provide location.id as request parameter")
+        }
+        OrderType orderType = OrderType.findByCode(Constants.PUTAWAY_ORDER)
+        OrderStatus status = params.status ? params.status as OrderStatus : OrderStatus.PENDING
+        Order orderCriteria = new Order(orderType: orderType, status: status, origin: location, destination: location)
+        List<Order> orders = orderService.getOrders(orderCriteria)
+        List<Putaway> putaways = orders.collect {  Order order -> Putaway.createFromOrder(order) }
+        render([data: putaways.collect { it.toJson() }] as JSON)
     }
 
 

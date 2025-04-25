@@ -439,14 +439,6 @@ class UrlMappings {
             action = [DELETE: "removingItem"]
         }
 
-        // Putaway API
-
-        // MOBILE
-        "/api/listPutaways"(parseRequest: true) {
-            controller = "putawayApi"
-            action = [GET: "listPutaways"]
-        }
-
         // Combined shipments
 
         "/api/orderNumberOptions"(parseRequest: true) {
@@ -887,6 +879,12 @@ class UrlMappings {
         "/api/fulfillments/validate" {
             controller = { "fulfillmentApi" }
             action = [POST: "validate"]
+        }
+
+        // Custom MOBILE APIs
+        "/api/mobile/putaways"(parseRequest: true) {
+            controller = "putawayApi"
+            action = [GET: "mobilePutaways"]
         }
 
         // Standard REST APIs
