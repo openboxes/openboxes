@@ -15,6 +15,8 @@ import 'bootstrap/dist/js/bootstrap';
 // eslint-disable-next-line import/extensions
 import '@fontsource/inter';
 
+import initializeSentry from './config/sentry';
+
 import 'bootstrap/dist/css/bootstrap.css';
 import 'font-awesome/css/font-awesome.min.css';
 // eslint-disable-next-line import/no-unresolved
@@ -24,6 +26,9 @@ import 'react-tippy/dist/tippy.css';
 library.add(fab, fas);
 // eslint-disable-next-line camelcase,no-undef
 __webpack_public_path__ = `${window.CONTEXT_PATH}/static/webpack/`;
+
+// Initialize Sentry as early as possible so that it can capture startup errors as well.
+initializeSentry();
 
 ReactDOM.render(
   <Provider store={store}>

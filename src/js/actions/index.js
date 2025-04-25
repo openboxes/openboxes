@@ -8,8 +8,10 @@ import {
   CHANGE_CURRENT_LOCALE,
   CHANGE_CURRENT_LOCATION,
   CLOSE_INFO_BAR,
+  ERASE_DRAFT,
   FETCH_APPROVERS,
   FETCH_ATTRIBUTES,
+  FETCH_BIN_LOCATIONS,
   FETCH_BUYERS,
   FETCH_CONFIG,
   FETCH_CONFIG_AND_SET_ACTIVE,
@@ -49,9 +51,13 @@ import {
   SHOW_INFO_BAR,
   SHOW_INFO_BAR_MODAL,
   SHOW_SPINNER,
+  START_COUNT,
+  START_FETCHING_TRANSLATIONS,
+  START_RESOLUTION,
   TOGGLE_USER_ACTION_MENU,
   TRANSLATIONS_FETCHED,
 } from 'actions/types';
+import cycleCountApi from 'api/services/CycleCountApi';
 import genericApi from 'api/services/GenericApi';
 import locationApi from 'api/services/LocationApi';
 import productSupplierApi from 'api/services/ProductSupplierApi';
@@ -62,7 +68,7 @@ import { ORGANIZATION_API } from 'api/urls';
 import RoleType from 'consts/roleType';
 import { UnitOfMeasureType } from 'consts/UnitOfMeasureType';
 import apiClient, { parseResponse } from 'utils/apiClient';
-import { mapShipmentTypes } from 'utils/option-utils';
+import { fetchBins, mapShipmentTypes } from 'utils/option-utils';
 
 export function showSpinner() {
   return {
@@ -99,13 +105,21 @@ export function hideUserActions() {
   };
 }
 
-export function fetchReasonCodes() {
-  const url = '/api/reasonCodes';
+export function fetchReasonCodes(activityCode = null, dispatchType = FETCH_REASONCODES) {
+  const url = `/api/reasonCodes${activityCode ? `?activityCode=${activityCode}` : ''}`;
+
   return (dispatch) => {
     apiClient.get(url).then((res) => {
+      const reasonCodes = res.data.data.map((reasonCode) => (
+        {
+          id: reasonCode.id,
+          value: reasonCode.id,
+          label: reasonCode.name,
+        }
+      ));
       dispatch({
-        type: FETCH_REASONCODES,
-        payload: res.data,
+        type: dispatchType,
+        payload: reasonCodes || [],
       });
     });
   };
@@ -200,6 +214,17 @@ export function changeCurrentLocation(location) {
 
 export function fetchTranslations(languageCode, prefix) {
   return (dispatch) => {
+    /**
+     * Before fetching/refetching the translations, set the flag of fetched translations to false,
+     * so that dependencies that rely on fetched translations will be rendered properly when
+     * the flag is set to true after the fetch. Without it the initial false
+     * flag would only work for the initial render because redux-persist would store it later on
+     * regardless the refreshes of the page
+     */
+    dispatch({
+      type: START_FETCHING_TRANSLATIONS,
+      payload: prefix,
+    });
     const url = `/api/localizations?languageCode=${languageCode
       || ''}&prefix=react.${prefix || ''}`;
 
@@ -542,6 +567,15 @@ export function fetchBuyers(active = false) {
   };
 }
 
+export const fetchBinLocations = (currentLocationId, ignoreActivityCodes = []) =>
+  async (dispatch) => {
+    const fetchedBins = await fetchBins(currentLocationId, ignoreActivityCodes);
+    dispatch({
+      type: FETCH_BIN_LOCATIONS,
+      payload: fetchedBins,
+    });
+  };
+
 export function fetchInvoiceStatuses() {
   return (dispatch) => {
     apiClient.get('/api/invoiceStatuses').then((res) => {
@@ -735,4 +769,35 @@ export const fetchAttributes = (config) => async (dispatch) => {
 export const setScrollToBottom = (payload) => ({
   type: SET_SCROLL_TO_BOTTOM,
   payload,
+});
+
+export const startCount = (payload, locationId) => async (dispatch) => {
+  const cycleCounts = await cycleCountApi.startCount({ payload, locationId });
+  const cycleCountIds = cycleCounts?.data?.data?.map?.((cycleCount) => cycleCount.id);
+  return dispatch({
+    type: START_COUNT,
+    payload: cycleCountIds,
+  });
+};
+
+export const startResolution = (requestIds, locationId) => async (dispatch) => {
+  const payload = {
+    requests: requestIds.map((cycleCountRequestId) => ({
+      cycleCountRequest: cycleCountRequestId,
+      countIndex: 1,
+    })),
+  };
+  const cycleCounts = await cycleCountApi.startRecount({
+    payload,
+    locationId,
+  });
+  const cycleCountIds = cycleCounts?.data?.data?.map?.((cycleCount) => cycleCount.id);
+  return dispatch({
+    type: START_RESOLUTION,
+    payload: cycleCountIds,
+  });
+};
+
+export const eraseDraft = () => ({
+  type: ERASE_DRAFT,
 });

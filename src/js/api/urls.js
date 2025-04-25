@@ -163,6 +163,9 @@ export const PRODUCT_SUPPLIER_PREFERENCE_BATCH = `${PRODUCT_SUPPLIER_PREFERENCE_
 export const PRODUCT_SUPPLIER_ATTRIBUTE_API = `${API}/productSupplierAttributes`;
 export const PRODUCT_SUPPLIER_ATTRIBUTE_BATCH = `${PRODUCT_SUPPLIER_ATTRIBUTE_API}/batch`;
 
+// PRODUCT CLASSIFICATION
+export const PRODUCT_CLASSIFICATIONS_API = (facilityId) => `${API}/facilities/${facilityId}/products/classifications`;
+
 export const PICKLIST_API = `${API}/picklists`;
 export const PICKLIST_CLEAR = (id) => `${PICKLIST_API}/${id}/items`;
 
@@ -174,3 +177,19 @@ export const FULFILLMENT_VALIDATION = `${FULFILLMENT_API}/validate`;
 
 // SELECT OPTIONS
 export const HANDLING_REQUIREMENTS_OPTIONS = `${API}/handlingRequirementsOptions`;
+
+// INTERNAL LOCATIONS
+export const INTERNAL_LOCATIONS = `${API}/internalLocations`;
+
+// CYCLE COUNT
+export const CYCLE_COUNT = (locationId) => `${API}/facilities/${locationId}/cycle-counts`;
+export const CYCLE_COUNT_CANDIDATES = (locationId) => `${CYCLE_COUNT(locationId)}/candidates`;
+export const CYCLE_COUNT_PENDING_REQUESTS = (locationId) => `${CYCLE_COUNT(locationId)}/requests/pending`;
+export const CYCLE_COUNT_REQUESTS = (locationId) => `${CYCLE_COUNT(locationId)}/requests/batch`;
+export const CYCLE_COUNT_START = (locationId, format) => `${CYCLE_COUNT(locationId)}/start/batch${format ? `?format=${format}` : ''}`;
+export const CYCLE_COUNT_RECOUNT_START = (locationId, format) => `${CYCLE_COUNT(locationId)}/recount/start/batch${format ? `?format=${format}` : ''}`;
+export const CYCLE_COUNT_ITEM = (locationId, itemId) => `${CYCLE_COUNT(locationId)}/items/${itemId}`;
+export const CYCLE_COUNT_ITEMS = (locationId, cycleCountId) => `${CYCLE_COUNT(locationId)}/${cycleCountId}/items`;
+export const CYCLE_COUNT_SUBMIT_COUNT = (locationId, cycleCountId) => `${CYCLE_COUNT(locationId)}/${cycleCountId}/count`;
+export const CYCLE_COUNT_SUBMIT_RECOUNT = (locationId, cycleCountId) => `${CYCLE_COUNT(locationId)}/${cycleCountId}/recount`;
+export const CYCLE_COUNT_REFRESH_ITEMS = (locationId, cycleCountId, removeOutOfStockItemsImplicitly) => `${CYCLE_COUNT(locationId)}/${cycleCountId}/refresh${removeOutOfStockItemsImplicitly ? '?removeOutOfStockItemsImplicitly=true' : ''}`;

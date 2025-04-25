@@ -99,7 +99,7 @@ class RoleInterceptor {
         'stockMovement'       : ['list'],
     ]
 
-    public RoleInterceptor() {
+    RoleInterceptor() {
         matchAll().except(uri: '/static/**').except(controller: "errors").except(uri: "/info").except(uri: "/health")
     }
 
@@ -112,9 +112,9 @@ class RoleInterceptor {
         }
 
         if (!rule) {
-            log.info "No rule for ${controllerName}:${actionName} -> allow anonymous"
+            log.debug "No rule for ${controllerName}:${actionName} -> allow anonymous"
         } else {
-            log.info "Found rule matching controller ${controllerName}, action ${actionName}: " + rule
+            log.debug "Found rule matching controller ${controllerName}, action ${actionName}: " + rule
             def minimumRequiredRole = rule.accessRules?.minimumRequiredRole
             def supplementalRoles = rule.accessRules?.supplementalRoles ?: []
 
@@ -131,7 +131,7 @@ class RoleInterceptor {
             }
 
             if (isAnonymous || (session.user && isMinimumRequiredRole && isUserInRole)) {
-                log.info "User has access to ${controllerName}.${actionName}"
+                log.debug "User has access to ${controllerName}.${actionName}"
                 return true
             }
             redirect(controller: "errors", action: "handleForbidden")
@@ -201,6 +201,4 @@ class RoleInterceptor {
     static Boolean needAuthenticatedActions(controllerName, actionName) {
         authenticatedActions[controllerName]?.contains(actionName)
     }
-
-
 }

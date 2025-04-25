@@ -1,0 +1,51 @@
+import queryString from 'query-string';
+
+import {
+  CYCLE_COUNT, CYCLE_COUNT_ITEM,
+  CYCLE_COUNT_ITEMS,
+  CYCLE_COUNT_RECOUNT_START,
+  CYCLE_COUNT_REFRESH_ITEMS,
+  CYCLE_COUNT_REQUESTS,
+  CYCLE_COUNT_START,
+  CYCLE_COUNT_SUBMIT_COUNT,
+  CYCLE_COUNT_SUBMIT_RECOUNT,
+} from 'api/urls';
+import apiClient, { apiClientCustomResponseHandler } from 'utils/apiClient';
+
+export default {
+  createRequest: (payload, locationId) => apiClient.post(CYCLE_COUNT_REQUESTS(locationId), payload),
+  deleteRequests: (locationId, ids) => {
+    const queryParams = queryString.stringify({ id: ids });
+    return apiClient.delete(`${CYCLE_COUNT_REQUESTS(locationId)}?${queryParams}`);
+  },
+  startCount: ({
+    payload, locationId, format = null, config = {},
+  }) => apiClient.post(
+    CYCLE_COUNT_START(locationId, format), payload, config,
+  ),
+  startRecount: ({
+    payload, locationId, format = null, config = {},
+  }) => apiClient.post(
+    CYCLE_COUNT_RECOUNT_START(locationId, format), payload, config,
+  ),
+  getCycleCounts: (locationId, ids) => {
+    const queryParams = queryString.stringify({ id: ids });
+    return apiClient.get(`${CYCLE_COUNT(locationId)}?${queryParams}`);
+  },
+  updateCycleCountItem: (payload, locationId, itemId) =>
+    apiClient.patch(CYCLE_COUNT_ITEM(locationId, itemId), payload),
+  createCycleCountItem: (payload, locationId, cycleCountId) =>
+    apiClient.post(CYCLE_COUNT_ITEMS(locationId, cycleCountId), payload),
+  deleteCycleCountItem: (locationId, itemId) =>
+    apiClient.delete(CYCLE_COUNT_ITEM(locationId, itemId)),
+  submitCount: (payload, locationId, cycleCountId) =>
+    apiClient.post(CYCLE_COUNT_SUBMIT_COUNT(locationId, cycleCountId), payload),
+  submitRecount: (payload, locationId, cycleCountId) =>
+    apiClientCustomResponseHandler.post(
+      CYCLE_COUNT_SUBMIT_RECOUNT(locationId, cycleCountId), payload,
+    ),
+  refreshItems: (locationId, cycleCountId, removeOutOfStockItemsImplicitly, countIndex) =>
+    apiClient.post(CYCLE_COUNT_REFRESH_ITEMS(locationId,
+      cycleCountId,
+      removeOutOfStockItemsImplicitly), {}, { params: { countIndex } }),
+};

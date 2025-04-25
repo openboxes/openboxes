@@ -10,13 +10,14 @@ const useSwitchTabs = ({ defaultTab }) => {
   const { pathname } = useLocation();
   const currentQueryParams = useQueryParams();
 
-  const switchTab = (tab) => {
+  const switchTab = (tab, onSwitchTab) => {
     const updatedQueryParams = {
       ...currentQueryParams,
       tab,
     };
     const stringifiedQueryParams = queryString.stringify(updatedQueryParams);
     history.push({ pathname, search: stringifiedQueryParams });
+    onSwitchTab?.();
   };
 
   useEffect(() => {

@@ -11,6 +11,7 @@ import { useSelector } from 'react-redux';
 import apiClient from 'utils/apiClient';
 import { translateWithDefaultMessage } from 'utils/Translate';
 
+// Hook for managing data which is later populated in data table component.
 const useTableData = ({
   filterParams,
   url,
@@ -55,19 +56,10 @@ const useTableData = ({
     }
   };
 
-  // If filterParams change, refetch the data with applied filters
-  useEffect(() => fireFetchData(), [filterParams]);
-
-  useEffect(() => () => {
-    if (currentLocation?.id) {
-      sourceRef.current.cancel('Fetching canceled');
-    }
-  }, [currentLocation?.id]);
-
   const onFetchHandler = useCallback((tableState) => {
     if (!_.isEmpty(filterParams)) {
       const offset = tableState.page > 0 ? (tableState.page) * tableState.pageSize : 0;
-      const sortingParams = (tableState.sorted.length > 0 ? {
+      const sortingParams = (tableState.sorted?.length > 0 ? {
         sort: tableState.sorted[0].id,
         order: tableState.sorted[0].desc ? 'desc' : 'asc',
       } : defaultSorting);
@@ -99,6 +91,17 @@ const useTableData = ({
         .finally(() => setLoading(false));
     }
   }, [filterParams]);
+
+  // If filterParams change, refetch the data with applied filters
+  useEffect(() => {
+    fireFetchData();
+  }, [filterParams]);
+
+  useEffect(() => () => {
+    if (currentLocation?.id) {
+      sourceRef.current.cancel('Fetching canceled');
+    }
+  }, [currentLocation?.id]);
 
   return {
     sourceRef,

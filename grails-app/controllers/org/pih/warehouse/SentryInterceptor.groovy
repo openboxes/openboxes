@@ -39,6 +39,10 @@ class SentryInterceptor {
     boolean before() {
         long startTime = System.currentTimeMillis()
         try {
+            if (!Sentry.isEnabled()) {
+                return true
+            }
+
             User user = authService.currentUser
             Location location = authService.currentLocation
             Map<String, String> additionalData = [:]
@@ -78,6 +82,7 @@ class SentryInterceptor {
 
         } catch (Exception e) {
             log.warn("Error setting Sentry user data for ${request.requestURI}", e)
+            return true
         }
 
         log.debug "updated Sentry context for ${request.requestURI} in ${System.currentTimeMillis() - startTime} ms"

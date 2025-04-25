@@ -25,12 +25,6 @@
         </options>
     </appender>
 
-    <!-- log levels for software we maintain -->
-    <logger name="openboxes" level="debug" />
-    <logger name="org.pih.warehouse" level="debug" />
-    <logger name="testutils" level="debug" />
-    <logger name="util" level="debug" />
-
     <!-- log levels for dependencies -->
     <logger name="asset.pipeline" level="debug" /><!-- use 'info' to hide asset-pipeline logs -->
     <logger name="ch.qos.logback" level="warn" /><!-- hide logs about logging -->
@@ -70,7 +64,7 @@
     <logger name="org.grails.config" level="info" />
     <logger name="org.grails.core.io" level="info" /><!-- use 'debug' to see StaticResourceLoader logs -->
     <logger name="org.grails.datastore" level="info" />
-    <logger name="org.grails.datastore.mapping.config" level="debug" /><!-- use 'info' to hide config at startup -->
+    <logger name="org.grails.datastore.mapping.config" level="info" /><!-- use 'debug' to show config at startup -->
     <logger name="org.grails.gsp" level="info" />
     <logger name="org.grails.orm.hibernate" level="info" />
     <logger name="org.grails.orm.hibernate5" level="info" /><!-- use 'debug' to see session lifetime logs -->
@@ -79,7 +73,7 @@
     <logger name="org.grails.web" level="info" />
     <logger name="org.hibernate.boot" level="info" />
     <logger name="org.hibernate.cache" level="info" /><!-- use 'debug' to see ehcache access -->
-    <logger name="org.hibernate.cfg" level="debug" /><!-- use 'info' to hide config at startup -->
+    <logger name="org.hibernate.cfg" level="info" /><!-- use 'debug' to show hibernate config at startup -->
     <logger name="org.hibernate.engine" level="info" /><!-- use 'debug' to begin/commit timestamps -->
     <logger name="org.hibernate.event" level="info" />
     <logger name="org.hibernate.hql" level="warn" /><!-- use 'debug' to see how Hibernate builds queries -->
@@ -127,11 +121,11 @@
     <logger name="io.sentry" level="info" />
 
     <!--
-    The parent config for all loggers. All loggers will use the log level defined here unless they specifically
-    configure their loggers to do otherwise (see above examples).
-    Logback supports the following logging levels (in order of most to least verbose): TRACE, DEBUG, INFO, WARN, ERROR
+    The parent config for all loggers. All child loggers will use the root's log level unless they specifically
+    configure their loggers to do otherwise (see above examples). The log level of the root is configured via
+    the "logging.level.root" property.
     -->
-    <root level="debug">
+    <root>
         <appender-ref ref="sentry" />
         <appender-ref ref="CONSOLE" />
     </root>

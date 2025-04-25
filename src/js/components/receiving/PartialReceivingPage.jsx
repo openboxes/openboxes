@@ -19,6 +19,7 @@ import TextField from 'components/form-elements/TextField';
 import EditLineModal from 'components/receiving/modals/EditLineModal';
 import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
 import DateFormat from 'consts/dateFormat';
+import receivingSortOptions from 'consts/receivingSortOptions';
 import apiClient, { flattenRequest, parseResponse } from 'utils/apiClient';
 import Checkbox from 'utils/Checkbox';
 import { renderFormField } from 'utils/form-utils';
@@ -559,7 +560,6 @@ class PartialReceivingPage extends Component {
 
   constructor(props) {
     super(props);
-
     this.state = {
       values: {},
       isFirstPageLoaded: false,
@@ -577,16 +577,6 @@ class PartialReceivingPage extends Component {
 
   componentDidMount() {
     this.fetchPartialReceiptCandidates();
-    if (this.props.partialReceivingTranslationsFetched) {
-      this.dataFetched = true;
-    }
-    this.props.hideSpinner();
-  }
-
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.partialReceivingTranslationsFetched && !this.dataFetched) {
-      this.dataFetched = true;
-    }
   }
 
   confirmReceive(formValues, emptyLinesCount) {
@@ -683,18 +673,18 @@ class PartialReceivingPage extends Component {
    * Fetches available receipts from API.
    * @public
    */
-  fetchPartialReceiptCandidates() {
+  fetchPartialReceiptCandidates(selectedOption) {
     this.props.showSpinner();
-    const url = `/api/partialReceiving/${this.props.match.params.shipmentId}?stepNumber=1`;
+    const url = `/api/partialReceiving/${this.props.match.params.shipmentId}?stepNumber=1&sort=${selectedOption || this.props.sort}`;
 
-    return apiClient.get(url)
+    apiClient.get(url)
       .then((response) => {
         this.setState({ values: {} }, () => {
           this.setState({
             values: parseResponse(response.data.data),
             initialReceiptCandidates: parseResponse(response.data.data),
             isFirstPageLoaded: true,
-          });
+          }, () => this.props.hideSpinner());
         });
       })
       .catch(() => this.props.hideSpinner());
@@ -704,10 +694,16 @@ class PartialReceivingPage extends Component {
     this.props.showSpinner();
     const url = `/api/partialReceiving/${this.props.match.params.shipmentId}?stepNumber=1`;
 
+    const emptyLinesCount = emptyLinesCounter(formValues);
+
+    const containers = emptyLinesCount
+      ? this.buildShipmentItems(formValues.containers)
+      : formValues.containers;
+
     const payload = {
       ...formValues,
       recipient: formValues?.recipient?.id,
-      containers: getReceivingPayloadContainers(formValues),
+      containers: getReceivingPayloadContainers({ ...formValues, containers }),
     };
     return apiClient.post(url, flattenRequest(payload));
   }
@@ -738,8 +734,6 @@ class PartialReceivingPage extends Component {
       })
       .catch(() => this.props.hideSpinner());
   }
-
-  dataFetched = false;
 
   /**
    * Autofills "to receive" cells in different ways depending on what user did.
@@ -1013,7 +1007,14 @@ class PartialReceivingPage extends Component {
     return !!this.state.values.containers[index];
   }
 
+  handleSortChange = async (selectedOption, formValues) => {
+    await this.saveValues(formValues);
+    await this.fetchPartialReceiptCandidates(selectedOption.value);
+    this.props.updateSort(selectedOption.value);
+  };
+
   render() {
+    const { translate } = this.props;
     return (
       <div>
         <Form
@@ -1042,8 +1043,19 @@ class PartialReceivingPage extends Component {
             return (
               <form onSubmit={handleSubmit}>
                 <div className="d-flex flex-column">
-                  <div>
-                    <span className="buttons-container">
+                  <div className="d-flex justify-content-between align-items-center">
+                    <div className="width-250">
+                      <Select
+                        onChange={(selectedOption) => this.handleSortChange(selectedOption, values)}
+                        value={this.props.sort}
+                        options={receivingSortOptions.map((option) => ({
+                          value: option.value,
+                          label: translate(option.label, option.defaultLabel),
+                        }))}
+                        clearable={false}
+                      />
+                    </div>
+                    <div className="buttons-container">
                       <button type="button" className="btn btn-outline-secondary float-right btn-form btn-xs" disabled={this.state.values.shipmentStatus === 'RECEIVED'} onClick={() => this.autofillLines(values)}>
                         <Translate id="react.partialReceiving.autofillQuantities.label" defaultMessage="Autofill quantities" />
                       </button>
@@ -1053,7 +1065,7 @@ class PartialReceivingPage extends Component {
                           <Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" />
                         </span>
                       </button>
-                      <button type="button" className="btn btn-outline-secondary float-right btn-form btn-xs" disabled={!isAnyItemSelected(values.containers) || values.shipmentStatus === 'RECEIVED'} onClick={() => this.save(values)}>
+                      <button type="button" className="btn btn-outline-secondary float-right btn-form btn-xs" disabled={!isAnyItemSelected(values.containers) || values.shipmentStatus === 'RECEIVED'} onClick={() => this.save(values, this.props.updateSort(receivingSortOptions[0].value))}>
                         <Translate id="react.default.button.save.label" defaultMessage="Save" />
                       </button>
                       <button
@@ -1086,7 +1098,7 @@ class PartialReceivingPage extends Component {
                           accept=".csv"
                         />
                       </label>
-                    </span>
+                    </div>
                   </div>
                   <div className="my-2 table-form" data-testid="items-table">
                     {_.map(TABLE_FIELDS, (fieldConfig, fieldName) =>
@@ -1126,7 +1138,6 @@ class PartialReceivingPage extends Component {
 
 const mapStateToProps = (state) => ({
   hasBinLocationSupport: state.session.currentLocation.hasBinLocationSupport,
-  partialReceivingTranslationsFetched: state.session.fetchedTranslations.partialReceiving,
   hasPartialReceivingSupport: state.session.currentLocation.hasPartialReceivingSupport,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
   formatLocalizedDate: formatDate(state.localize),
@@ -1146,12 +1157,13 @@ PartialReceivingPage.propTypes = {
   bins: PropTypes.arrayOf(PropTypes.shape({})),
   /** Location ID (destination). Needs to be used in /api/products request. */
   locationId: PropTypes.string.isRequired,
-  partialReceivingTranslationsFetched: PropTypes.bool.isRequired,
   nextPage: PropTypes.func.isRequired,
   /** Is true when currently selected location supports partial receiving */
   hasPartialReceivingSupport: PropTypes.bool.isRequired,
   translate: PropTypes.func.isRequired,
   formatLocalizedDate: PropTypes.func.isRequired,
+  sort: PropTypes.string.isRequired,
+  updateSort: PropTypes.func.isRequired,
 };
 
 PartialReceivingPage.defaultProps = {

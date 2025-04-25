@@ -12,6 +12,7 @@ import PartialReceivingPage from 'components/receiving/PartialReceivingPage';
 import ReceivingCheckScreen from 'components/receiving/ReceivingCheckScreen';
 import Wizard from 'components/wizard/Wizard';
 import DateFormat from 'consts/dateFormat';
+import receivingSortOptions from 'consts/receivingSortOptions';
 import apiClient, { parseResponse } from 'utils/apiClient';
 import { translateWithDefaultMessage } from 'utils/Translate';
 import { formatDate } from 'utils/translation-utils';
@@ -30,6 +31,7 @@ class ReceivingPage extends Component {
       locationId: '',
       shipmentNumber: '',
       currentPage: 1,
+      sort: receivingSortOptions[0].value,
     };
   }
 
@@ -174,9 +176,13 @@ class ReceivingPage extends Component {
       .catch(() => this.props.hideSpinner());
   }
 
+  updateSort = (newSortValue) => {
+    this.setState({ sort: newSortValue });
+  };
+
   render() {
     const {
-      formData, locationId, currentPage, bins,
+      formData, locationId, currentPage, bins, sort,
     } = this.state;
     const { match, translate } = this.props;
     const pageList = [PartialReceivingPage, ReceivingCheckScreen];
@@ -191,7 +197,7 @@ class ReceivingPage extends Component {
           currentPage={currentPage}
           prevPage={currentPage === 1 ? 1 : currentPage - 1}
           additionalProps={{
-            bins, locationId, match, translate,
+            bins, locationId, match, translate, sort, updateSort: this.updateSort,
           }}
         />
       );
@@ -215,7 +221,7 @@ export default connect(mapStateToProps, {
 })(ReceivingPage);
 
 ReceivingPage.propTypes = {
-  /** React router's object which contains information about url varaiables and params */
+  /** React router's object which contains information about url variables and params */
   match: PropTypes.shape({
     params: PropTypes.shape({ shipmentId: PropTypes.string }),
   }).isRequired,

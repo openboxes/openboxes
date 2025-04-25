@@ -10,11 +10,112 @@
 package org.pih.warehouse
 
 import grails.validation.ValidationException
-
 import java.text.SimpleDateFormat
+import java.time.Instant
+import java.time.ZoneId
+import java.time.ZoneOffset
+import java.time.ZonedDateTime
+import org.apache.commons.lang.StringUtils
 
+import org.pih.warehouse.databinding.DataBindingConstants
 
+/**
+ * Utility methods on date and datetime objects.
+ *
+ * In our system, we try to work with a small subset of the datetime-related classes:
+ *
+ * - java.time.Instant: An absolute moment in time (measured in seconds since UTC epoch). We should work with Instant
+ *                      whenever possible since it is specific enough to be convertible to other formats, while
+ *                      still being timezone agnostic (and so avoids any locale conversion and weirdness).
+ *
+ * - java.time.LocalDate: A date (day + month + year) with no time or timezone component. Useful for setting fixed
+ *                        dates, where switching to a different timezone should never change the date (ex: expiry date).
+ *
+ * - java.time.ZonedDateTime: A datetime (via LocalDateTime) in a timezone (via ZoneOffset).
+ *                            Useful for working with a human readable datetime in a specific locale, where switching
+ *                            to a different timezone should change the resulting value. Only to be used if we have
+ *                            user-locale-specific logic (ex: We need to check if some datetime would be the next
+ *                            day for the requesting user).
+ *
+ * We also have java.util.Date, which is deprecated and should not be used going forward.
+ */
 class DateUtil {
+
+    /**
+     * Null-safe conversion of a (deprecated) java.util.Date to an Instant.
+     * Useful when working with old code that uses the old format.
+     */
+    static Instant asInstant(Date date) {
+        return date ? date.toInstant() : null
+    }
+
+    /**
+     * Null-safe conversion of a ZonedDateTime to an Instant.
+     */
+    static Instant asInstant(ZonedDateTime zonedDateTime) {
+        return zonedDateTime ? zonedDateTime.toInstant() : null
+    }
+
+    /**
+     * Null-safe conversion of an Instant to a ZonedDateTime. If no timezone is provided, we assume UTC.
+     *
+     * @param zone "Z", or "UTC" or "+01:00" or "America/Anchorage" for example.
+     */
+    static ZonedDateTime asZonedDateTime(Instant instant, ZoneId zone=ZoneOffset.UTC) {
+        return instant ? instant.atZone(zone) : null
+    }
+
+    /**
+     * Null-safe conversion of a (deprecated) java.util.Date to an ZonedDateTime. If no timezone is provided,
+     * we assume UTC. Useful when working with old code that uses the old format.
+     *
+     * @param zone "Z", or "UTC" or "+01:00" or "America/Anchorage" for example.
+     */
+    static ZonedDateTime asZonedDateTime(Date date, ZoneId zone=ZoneOffset.UTC) {
+        return date ? asInstant(date).atZone(zone) : null
+    }
+
+    /**
+     * Binds a String to a (deprecated) java.util.Date. If no format is given, will use the default configured formats.
+     *
+     * @Deprecated Only exists to support old endpoints that manually bind their data. New APIs should not use this
+     *             approach, and should use Command Objects in controller method args to auto-bind the request body.
+     */
+    static Date asDate(String date, SimpleDateFormat format=null) {
+        if (StringUtils.isBlank(date)) {
+            return null
+        }
+
+        String dateSanitized = date.trim()
+
+        // If we're given a specific format, use that to parse the string directly to a Date. We shouldn't ever need
+        // to define this unless we know we're going to be given input in a non-conventional format. The flexible
+        // format should cover all the normal cases.
+        if (format != null) {
+            return format.parse(dateSanitized)
+        }
+
+        // Otherwise, try to parse using our flexible list of supported formats. We parse to an Instant and then convert
+        // to a Date since it allows us to use DateTimeFormatter, which is less error-prone than SimpleDateFormat.
+        Instant instant = Instant.from(DataBindingConstants.FLEXIBLE_DATE_TIME_ZONE_FORMAT.parse(dateSanitized))
+        return Date.from(instant)
+    }
+
+    /**
+     * Null-safe conversion of an Instant to a (deprecated) java.util.Date.
+     * Useful when working with old code that uses the old format.
+     */
+    static Date asDate(Instant instant) {
+        return instant ? Date.from(instant) : null
+    }
+
+    /**
+     * Null-safe conversion of a ZonedDateTime to a (deprecated) java.util.Date.
+     * Useful when working with old code that uses the old format.
+     */
+    static Date asDate(ZonedDateTime zonedDateTime) {
+        return zonedDateTime ? asDate(zonedDateTime.toInstant()) : null
+    }
 
     static Date clearTime(Date date) {
         Calendar calendar = Calendar.getInstance()

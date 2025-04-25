@@ -913,6 +913,14 @@ div.crossed-out .table-inner-row:before {
   color: #FFFFFF;
 }
 
+.tooltip-dark-blue {
+  background-color: var(--blue-800);
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  max-width: 250px
+}
+
 // Overriding built-in tooltip-style (react-tippy)
 .tippy-tooltip {
   padding: 0 !important;
@@ -1056,6 +1064,11 @@ div.search-input:focus-within {
 
   &:hover {
     background: var(--red-100);
+  }
+
+  &:disabled {
+    background-color: var(--blue-300) !important;
+    color: var(--red-200) !important;
   }
 }
 
@@ -1216,10 +1229,6 @@ div.search-input:focus-within {
     .filters-row {
       .filter-group > div:first-child {
         align-items: center;
-
-        label {
-          margin: 0 4px 0 0;
-        }
       }
     }
   }
@@ -1662,4 +1671,26 @@ div.search-input:focus-within {
     color: var(--blue-primary);
     box-shadow: 0 2px 0 var(--blue-primary);
   }
+}
+
+.min-width-250 {
+  min-width: 250px;
+}
+
+.w-90 {
+  width: 90%;
+}
+
+.width-250 {
+  width: 250px;
+}
+
+@for $i from 1 through 100 {
+  .pl-#{$i}px {
+    padding-left: #{$i}px;
+  }
+}
+
+.cursor-pointer {
+  cursor: pointer;
 }

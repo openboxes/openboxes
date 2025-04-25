@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useRef } from 'react';
 
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 
+import componentType from 'consts/componentType';
+import useFocusOnMatch from 'hooks/useFocusOnMatch';
 import { decimalParser } from 'utils/form-utils';
 import InputWrapper from 'wrappers/InputWrapper';
 
@@ -22,8 +24,16 @@ const TextInput = ({
   decimal,
   className,
   showErrorBorder,
+  hideErrorMessageWrapper,
+  onKeyDown,
+  focusProps = {},
+  onWheel,
   ...fieldProps
 }) => {
+  const inputRef = useRef(null);
+
+  useFocusOnMatch({ ...focusProps, ref: inputRef, type: componentType.TEXT_INPUT });
+
   const onBlurHandler = (e) => {
     if (type === 'number') {
       const valueAsNumber = decimalParser(e.target.value, decimal);
@@ -59,18 +69,22 @@ const TextInput = ({
       button={button}
       inputId={id || name}
       errorMessage={errorMessage}
+      hideErrorMessageWrapper={hideErrorMessageWrapper}
     >
       <input
+        ref={inputRef}
         id={id || name}
         name={name}
         disabled={disabled}
-        className={`form-element-input ${className} ${(errorMessage || showErrorBorder) ? 'has-errors' : ''}`}
+        className={`form-element-input ${className} ${(errorMessage || showErrorBorder) ? 'has-errors' : ''} ${hideErrorMessageWrapper && showErrorBorder && 'pl-4'}`}
         placeholder={placeholder}
         type={type}
         step={numberIncrementValue}
         {...fieldProps}
         onChange={onChangeHandler}
         onBlur={onBlurHandler}
+        onKeyDown={onKeyDown}
+        onWheel={onWheel}
       />
     </InputWrapper>
   );
@@ -112,6 +126,15 @@ TextInput.propTypes = {
   decimal: PropTypes.number,
   className: PropTypes.string,
   showErrorBorder: PropTypes.bool,
+  hideErrorMessageWrapper: PropTypes.bool,
+  onKeyDown: PropTypes.func,
+  focusProps: PropTypes.shape({
+    fieldIndex: PropTypes.string,
+    fieldId: PropTypes.string,
+    rowIndex: PropTypes.string,
+    columnId: PropTypes.string,
+  }),
+  onWheel: PropTypes.func,
 };
 
 TextInput.defaultProps = {
@@ -128,4 +151,8 @@ TextInput.defaultProps = {
   decimal: undefined,
   className: '',
   showErrorBorder: false,
+  hideErrorMessageWrapper: false,
+  onKeyDown: null,
+  focusProps: {},
+  onWheel: null,
 };

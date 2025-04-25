@@ -167,4 +167,5 @@
     <include file="0.8.x/changelog-2023-09-21-1400-add-eventtypes-for-request-approval-workflow.xml" />
     <include file="0.8.x/changelog-2023-10-11-1000-alter-table-event-add-comment-field.xml" />
     <include file="0.8.x/changelog-2023-10-19-1400-add-approval-notification-activity-codes.xml" />
+    <include file="0.8.x/changelog-2024-09-24-0000-08x-final.xml"/>
 </databaseChangeLog>

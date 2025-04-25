@@ -23,6 +23,7 @@ exports[`menuConfigurationSubsection component should match snapshot 1`] = `
   <a
     className="dropdown-item"
     href="/openboxes/admin/showSettings"
+    role="menuitem"
   >
     Settings
   </a>

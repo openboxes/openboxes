@@ -5,7 +5,9 @@ import PropTypes from 'prop-types';
 import DatePicker from 'react-datepicker';
 
 import DateFieldInput from 'components/form-elements/v2/DateFieldInput';
+import componentType from 'consts/componentType';
 import { DateFormat, TimeFormat } from 'consts/timeFormat';
+import useFocusOnMatch from 'hooks/useFocusOnMatch';
 import useTranslate from 'hooks/useTranslate';
 import InputWrapper from 'wrappers/InputWrapper';
 import RootPortalWrapper from 'wrappers/RootPortalWrapper';
@@ -26,11 +28,15 @@ const DateField = ({
   value,
   onChange,
   showTimeSelect,
+  hideErrorMessageWrapper,
+  customDateFormat,
+  onChangeRaw,
+  clearable,
+  focusProps = {},
   ...fieldProps
 }) => {
   const translate = useTranslate();
   const onClear = () => onChange(null);
-
   const onChangeHandler = (date) => {
     if (showTimeSelect) {
       onChange(date?.format(DateFormat.MMM_DD_YYYY_HH_MM_SS));
@@ -60,6 +66,15 @@ const DateField = ({
 
   const datePickerRef = useRef(null);
 
+  const getDateFormat = () => {
+    if (showTimeSelect) {
+      return customDateFormat ? `${customDateFormat} HH:mm:ss` : DateFormat.MMM_DD_YYYY_HH_MM_SS;
+    }
+    return customDateFormat || DateFormat.MMM_DD_YYYY;
+  };
+
+  useFocusOnMatch({ ...focusProps, ref: datePickerRef, type: componentType.DATE_FIELD });
+
   return (
     <InputWrapper
       title={title}
@@ -67,14 +82,15 @@ const DateField = ({
       tooltip={tooltip}
       errorMessage={errorMessage}
       button={button}
+      hideErrorMessageWrapper={hideErrorMessageWrapper}
     >
       <DatePicker
         {...fieldProps}
         showTimeSelect={showTimeSelect}
-        customInput={<DateFieldInput onClear={onClear} />}
+        customInput={<DateFieldInput onClear={onClear} clearable={clearable} />}
         className={`form-element-input ${errorMessage ? 'has-errors' : ''} ${className}`}
         dropdownMode="scroll"
-        dateFormat={showTimeSelect ? DateFormat.MMM_DD_YYYY_HH_MM_SS : DateFormat.MMM_DD_YYYY}
+        dateFormat={getDateFormat()}
         timeFormat={TimeFormat.HH_MM}
         disabled={disabled}
         timeIntervals={15}
@@ -87,7 +103,7 @@ const DateField = ({
         popperContainer={RootPortalWrapper}
         selected={selectedDate}
         highlightDates={highlightedDates}
-        onChange={onChangeHandler}
+        onChange={onChangeRaw || onChangeHandler}
         onSelect={() => {
           // Close date picker on select - this is somewhat a workaround to close the datepicker
           // when using showTimeSelect, when we are expecting to close the datepicker
@@ -140,6 +156,16 @@ DateField.propTypes = {
   value: PropTypes.string,
   onChange: PropTypes.func,
   showTimeSelect: PropTypes.bool,
+  hideErrorMessageWrapper: PropTypes.bool,
+  customDateFormat: PropTypes.string,
+  focusProps: PropTypes.shape({
+    fieldIndex: PropTypes.string,
+    fieldId: PropTypes.string,
+    rowIndex: PropTypes.string,
+    columnId: PropTypes.string,
+  }),
+  onChangeRaw: PropTypes.func,
+  clearable: PropTypes.bool,
 };
 
 DateField.defaultProps = {
@@ -154,4 +180,9 @@ DateField.defaultProps = {
   value: null,
   onChange: () => {},
   showTimeSelect: false,
+  hideErrorMessageWrapper: false,
+  customDateFormat: null,
+  focusProps: {},
+  onChangeRaw: null,
+  clearable: true,
 };

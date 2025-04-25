@@ -107,4 +107,37 @@
   <changeSet id="1580848680306-30" author="awalkowiak" runOnChange="true" runAlways="true" failOnError="true">
     <sqlFile path="views/order-item-details.sql"/>
   </changeSet>
+  <!-- views required for cycle count last counted -->
+  <changeSet id="1740696149645-1" author="jmiranda" runOnChange="true" runAlways="true" failOnError="true">
+    <sqlFile path="views/product-cycle-count-history.sql"/>
+  </changeSet>
+  <changeSet id="1740696149645-2" author="jmiranda" runOnChange="true" runAlways="true" failOnError="true">
+    <sqlFile path="views/product-physical-count-history.sql"/>
+  </changeSet>
+  <changeSet id="1740696149645-3" author="jmiranda" runOnChange="true" runAlways="true" failOnError="true">
+    <sqlFile path="views/product-receipt-history.sql"/>
+  </changeSet>
+  <changeSet id="1740696149645-4" author="jmiranda" runOnChange="true" runAlways="true" failOnError="true">
+    <sqlFile path="views/product-count-history.sql"/>
+  </changeSet>
+  <!-- views required for cycle count ranking -->
+  <changeSet id="1740696149645-7" author="jmiranda" runOnChange="true" runAlways="true" failOnError="true">
+    <sqlFile path="views/product-classification.sql"/>
+  </changeSet>
+  <changeSet id="1740696149645-6" author="jmiranda" runOnChange="true" runAlways="true" failOnError="true">
+    <sqlFile path="views/cycle-count-frequency.sql"/>
+  </changeSet>
+  <changeSet id="1740696149645-5" author="jmiranda" runOnChange="true" runAlways="true" failOnError="true">
+    <sqlFile path="views/cycle-count-metadata.sql"/>
+  </changeSet>
+  <!-- view(s) required for the cycle count session -->
+  <changeSet id="1580848680306-31" author="kchelstowski" runOnChange="true" runAlways="true" failOnError="true">
+    <sqlFile path="views/cycle-count-session.sql"/>
+  </changeSet>
+  <changeSet id="1740696149645-8" author="jmiranda" runOnChange="true" runAlways="true" failOnError="true">
+    <sqlFile path="views/cycle-count-candidate.sql"/>
+  </changeSet>
+  <changeSet id="1740696149645-9" author="kchelstowski" runOnChange="true" runAlways="true" failOnError="true">
+    <sqlFile path="views/pending_cycle_count_request.sql"/>
+  </changeSet>
 </databaseChangeLog>

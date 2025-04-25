@@ -5,6 +5,8 @@ import { RiErrorWarningLine } from 'react-icons/ri';
 import { Link } from 'react-router-dom';
 import { Tooltip } from 'react-tippy';
 
+import CustomTooltip from 'wrappers/CustomTooltip';
+
 const TableCell = ({
   value,
   children,
@@ -17,6 +19,9 @@ const TableCell = ({
   tdProps,
   style,
   showError,
+  tooltipForm,
+  tooltipClassname,
+  customTooltip,
 }) => {
   let cellValue = children || value || defaultValue;
   const errorMessage = tdProps?.rest?.error;
@@ -41,7 +46,7 @@ const TableCell = ({
 
   if (tooltip) {
     cellValue = (
-      <div className="d-flex">
+      <div className={`d-flex ${tooltipClassname}`}>
         <Tooltip
           arrow="true"
           delay="150"
@@ -49,12 +54,25 @@ const TableCell = ({
           hideDelay="50"
           className="text-overflow-ellipsis"
           html={tooltipLabel || value}
+          style={tooltipForm && { width: '100%' }}
         >
           {cellValue}
         </Tooltip>
       </div>
     );
   }
+
+  if (customTooltip) {
+    cellValue = (
+      <CustomTooltip
+        content={tooltipLabel || value}
+        className={tooltipClassname}
+      >
+        {cellValue}
+      </CustomTooltip>
+    );
+  }
+
   const cellErrorClasses = showError && errorMessage ? 'invalid-cell' : '';
   const elementClasses = `${className} text-overflow-ellipsis ${cellErrorClasses}`;
 
@@ -119,6 +137,9 @@ TableCell.propTypes = {
     PropTypes.string,
     PropTypes.number,
   ]),
+  tooltipForm: PropTypes.bool,
+  tooltipClassname: PropTypes.string,
+  customTooltip: PropTypes.bool,
 };
 
 export default TableCell;

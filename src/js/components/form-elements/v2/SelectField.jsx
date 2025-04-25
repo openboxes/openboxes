@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import PropTypes from 'prop-types';
 
 import ProductSelect from 'components/product-select/ProductSelect';
+import componentType from 'consts/componentType';
+import useFocusOnMatch from 'hooks/useFocusOnMatch';
 import Select from 'utils/Select';
 import InputWrapper from 'wrappers/InputWrapper';
 
@@ -25,9 +27,17 @@ const SelectField = ({
   productSelect,
   hasErrors,
   className,
+  warning,
+  hideErrorMessageWrapper,
+  onKeyDown,
+  focusProps = {},
   ...fieldProps
 }) => {
   const [value, setValue] = useState(defaultValue);
+
+  useEffect(() => {
+    setValue(defaultValue);
+  }, [defaultValue?.id]);
 
   const asyncProps = async ? {
     async,
@@ -43,6 +53,12 @@ const SelectField = ({
 
   const SelectComponent = productSelect ? ProductSelect : Select;
 
+  const fieldRef = useRef(null);
+
+  const refProps = productSelect ? {} : { fieldRef };
+
+  useFocusOnMatch({ ...focusProps, ref: fieldRef, type: componentType.SELECT_FIELD });
+
   return (
     <InputWrapper
       title={title}
@@ -50,15 +66,18 @@ const SelectField = ({
       button={{ ...button, onClick: () => button.onClick(fieldProps?.value?.id ?? value) }}
       tooltip={tooltip}
       required={required}
+      hideErrorMessageWrapper={hideErrorMessageWrapper}
       className="select-wrapper-container"
     >
       <SelectComponent
-        className={`form-element-select ${className} ${hasErrors ? 'has-errors' : ''}`}
+        className={`form-element-select ${className} ${errorMessage || hasErrors ? 'has-errors' : ''} ${warning ? 'has-warning' : ''}`}
         disabled={disabled}
         placeholder={placeholder}
         value={value}
         onChange={onChangeValue}
         multi={multiple}
+        onKeyDown={onKeyDown}
+        {...refProps}
         {...asyncProps}
         {...fieldProps}
       />
@@ -109,6 +128,15 @@ SelectField.propTypes = {
   // indicator whether field should be marked as invalid
   hasErrors: PropTypes.bool,
   className: PropTypes.string,
+  hideErrorMessageWrapper: PropTypes.bool,
+  warning: PropTypes.bool,
+  onKeyDown: PropTypes.func,
+  focusProps: PropTypes.shape({
+    fieldIndex: PropTypes.string,
+    fieldId: PropTypes.string,
+    rowIndex: PropTypes.string,
+    columnId: PropTypes.string,
+  }),
 };
 
 SelectField.defaultProps = {
@@ -128,4 +156,8 @@ SelectField.defaultProps = {
   productSelect: false,
   hasErrors: false,
   className: '',
+  hideErrorMessageWrapper: false,
+  warning: false,
+  onKeyDown: null,
+  focusProps: {},
 };

@@ -3275,6 +3275,13 @@ class StockMovementService {
                             stepNumber  : 4,
                             uri         : g.createLink(controller: 'picklist', action: "renderPdf", id: stockMovement?.requisition?.id, absolute: true),
                             hidden      : true
+                    ],
+                    [
+                            name        : g.message(code: "picklist.button.printSortedByBins.label"),
+                            documentType: DocumentGroupCode.PICKLIST.name(),
+                            contentType : "text/html",
+                            stepNumber  : null,
+                            uri         : g.createLink(controller: 'picklist', action: "print", id: stockMovement?.requisition?.id, absolute: true, params: [sorted: true])
                     ]
             ])
 
@@ -3294,11 +3301,34 @@ class StockMovementService {
 
             if (!stockMovement?.origin?.isSupplier() && stockMovement?.origin?.supports(ActivityCode.MANAGE_INVENTORY)) {
                 documentList.add([
-                        name        : g.message(code: "deliveryNote.label", default: "Delivery Note"),
-                        documentType: DocumentGroupCode.DELIVERY_NOTE.name(),
-                        contentType : "text/html",
-                        stepNumber  : 5,
-                        uri         : g.createLink(controller: 'deliveryNote', action: "print", id: stockMovement?.requisition?.id, absolute: true)
+                        name           : g.message(code: "requisition.deliveryNote.label", default: "Delivery Note"),
+                        documentType   : DocumentGroupCode.DELIVERY_NOTE.name(),
+                        contentType    : "text/html",
+                        stepNumber     : 5,
+                        // We provide multiple sorting options for the delivery note as different download options so we
+                        // need to return a list of uris. The singular 'uri' is maintained for backwards compatability.
+                        uri            : g.createLink(controller: 'deliveryNote', action: "print", id: stockMovement?.requisition?.id, absolute: true),
+                        downloadOptions: [
+                                [
+                                        name: g.message(code: "requisition.deliveryNote.sortOrder.orderIndex.label", default: "Delivery Note (shipment order)"),
+                                        uri: g.createLink(
+                                                controller: 'deliveryNote',
+                                                action: "print",
+                                                id: stockMovement?.requisition?.id,
+                                                absolute: true,
+                                        ),
+                                ],
+                                [
+                                        name: g.message(code: "requisition.deliveryNote.sortOrder.product.label", default: "Delivery Note (alphabetical by product)"),
+                                        uri: g.createLink(
+                                                controller: 'deliveryNote',
+                                                action: "print",
+                                                id: stockMovement?.requisition?.id,
+                                                params: [sortOrder: 'PRODUCT'],
+                                                absolute: true,
+                                        ),
+                                ],
+                        ],
                 ])
             }
         }

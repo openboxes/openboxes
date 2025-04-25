@@ -148,7 +148,8 @@ mysql -u root -p -e 'create database openboxes default charset utf8;'
 
 Create openboxes user 
 ```
-mysql -u root -p -e 'grant all on openboxes.* to "openboxes"@"localhost" identified by "openboxes";'
+mysql -u root -p -e 'CREATE USER "openboxes"@"localhost" IDENTIFIED BY "openboxes";'
+mysql -u root -p -e 'GRANT ALL ON openboxes.* TO "openboxes"@"localhost";'
 ```
 
 #### 5. Create Openboxes configuration file 

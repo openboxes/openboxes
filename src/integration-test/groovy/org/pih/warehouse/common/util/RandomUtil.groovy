@@ -11,6 +11,6 @@ class RandomUtil {
      * an easy way to identify what data is created by our tests.
      */
     String randomStringFieldValue(String fieldName) {
-        return "${fieldName}-TEST${random.nextLong()}"
+        return "${fieldName}-TEST-${Math.abs(random.nextLong())}"
     }
 }

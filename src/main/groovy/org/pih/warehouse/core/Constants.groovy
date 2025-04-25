@@ -25,6 +25,11 @@ class Constants {
     static final adminControllers = ['createProduct', 'admin']
     static final adminActions = ['product': ['create'], 'person': ['list'], 'user': ['list'], 'location': ['edit'], 'shipper': ['create'], 'locationGroup': ['create'], 'locationType': ['create'], '*': ['delete']]
 
+    // TODO: Don't add more dates here! We should refactor all backend usages (old gsp pages can continue using these)
+    //       of these constants to use the DateUtil.asDate(String) method to parse in Date types and then return Date
+    //       objects unformatted in our responses. The backend should always return dates in the same format so that
+    //       the frontend can easily parse response objects. Let the frontend decide what the display format of each
+    //       individual field should be.
     static final String DEFAULT_YEAR_FORMAT = "yyyy"
     static final String DEFAULT_DATE_FORMAT = "dd/MMM/yyyy"
     static final String DEFAULT_DATE_TIME_FORMAT = "dd/MMM/yyyy HH:mm:ss"
@@ -35,7 +40,12 @@ class Constants {
     static final String MONTH_DAY_YEAR_DATE_FORMAT = "MM/dd/yyyy"
     static final String DELIVERY_DATE_FORMAT = "MM/dd/yyyy HH:mm XXX"
     static final String EUROPEAN_DATE_FORMAT = "dd/MM/yyyy"
-    static final String DISPLAY_DATE_FORMAT = "MMM DD, yyyy"
+    // Display date using day of year format. This is used by the `openboxes.display.date.format` property.
+    // It is using `DD` instead `dd` because it is later used on the frontend by the moment, which interprets
+    // `dd` and `DD` differently(`DD` is day of month, and `dd` is day of week, see: OBPIH-7149 and OBPIH-5397).
+    static final String JS_DISPLAY_DATE_FORMAT = "MMM DD, yyyy"
+    // Display date using "DOM" - day of month format
+    static final String DISPLAY_DATE_FORMAT = "MMM dd, yyyy"
     static final String DISPLAY_DATE_DEFAULT_VALUE = "-"
     static final String GENERATE_NAME_DATE_FORMAT = "ddMMMyyyy"
     static final String EUROPEAN_DATE_FORMAT_WITH_TIME = "${EUROPEAN_DATE_FORMAT} HH:mm"
@@ -49,6 +59,7 @@ class Constants {
     static final DateFormat DELIVERY_DATE_FORMATTER = new SimpleDateFormat(DELIVERY_DATE_FORMAT)
     static final DateFormat EUROPEAN_DATE_FORMATTER = new SimpleDateFormat(EUROPEAN_DATE_FORMAT)
     static final DateFormat MONTH_DAY_YEAR_DATE_FORMATTER = new SimpleDateFormat(MONTH_DAY_YEAR_DATE_FORMAT)
+    static final DateFormat DISPLAY_DATE_FORMATTER = new SimpleDateFormat(DISPLAY_DATE_FORMAT)
 
     // Dimension date formats
     static DateFormat weekFormat = new SimpleDateFormat("w")
@@ -70,6 +81,10 @@ class Constants {
 
     static final Float POUNDS_PER_KILOGRAM = 0.45359237
     static final Float KILOGRAMS_PER_POUND = 2.20462262
+
+    static final String UOM_CODE_PALLET = "PL"
+    static final String UOM_CODE_CASE = "CS"
+    static final String UOM_CODE_EACH = "EA"
 
     static final ArrayList COLORS = ['FFFFFF', 'FFDFDF', 'FFBFBF', 'FF9F9F', 'FF7F7F', 'FF5F5F', 'FF3F3F', 'FF1F1F', 'FF0000', 'DF1F00', 'C33B00', 'A75700', '8B7300', '6F8F00', '53AB00', '37C700', '1BE300', '00FF00', '00DF1F', '00C33B', '00A757', '008B73', '006F8F', '0053AB', '0037C7', '001BE3', '0000FF', '0000df', '0000c3', '0000a7', '00008b', '00006f', '000053', '000037', '00001b', '000000']
 

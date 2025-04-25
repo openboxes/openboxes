@@ -15,6 +15,7 @@ import spock.lang.Shared
 import org.pih.warehouse.api.client.base.AuthenticatedApiContext
 import org.pih.warehouse.api.client.base.UnauthenticatedApiContext
 import org.pih.warehouse.common.base.IntegrationSpec
+import org.pih.warehouse.common.domains.builders.location.TestLocationBuilder
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.api.client.auth.AuthApiWrapper
 import org.pih.warehouse.api.util.JsonPathUtil
@@ -65,6 +66,9 @@ abstract class ApiSpec extends IntegrationSpec implements TestDataBuilder {
     @Shared
     Location location
 
+    @Shared
+    Location otherLocation
+
     @Autowired
     AuthApiWrapper authApiWrapper
 
@@ -80,7 +84,8 @@ abstract class ApiSpec extends IntegrationSpec implements TestDataBuilder {
     /**
      * Create all the data that your tests need here. You'll find the findOrBuild(<Domain>) method incredibly helpful
      * for creating Domain objects when you just need some instance of a domain to exist in the db for you to use.
-     * More info: https://longwa.github.io/build-test-data/index#findorbuild
+     * All domains that we work with should be defined in TestDataConfig.groovy so that the findOrBuild method knows
+     * what to do if a field isn't provided. More info: https://longwa.github.io/build-test-data/index#findorbuild
      *
      * Marked with @Transactional since we're working directly with Domain objects, which need a transaction.
      *
@@ -109,7 +114,6 @@ abstract class ApiSpec extends IntegrationSpec implements TestDataBuilder {
     @Transactional
     void setup() {
         setupRestAssuredGlobalConfig()
-        TestDataConfigurationHolder.reset()  // Needed so that we can regenerate new values for our random fields
 
         randomUtil = new RandomUtil()
 
@@ -117,7 +121,16 @@ abstract class ApiSpec extends IntegrationSpec implements TestDataBuilder {
         RequestSpecification baseUnauthenticatedRequestSpec = buildDefaultUnauthenticatedRequestSpec()
         unauthenticatedApiContext.loadContext(baseUnauthenticatedRequestSpec)
 
-        location = createTestLocation()
+        // Create two locations so that we can test cross-facility flows.
+        // Note that we don't attempt to clean up these locations on test teardown because if any test that uses them
+        // fails to clean up their own data, we'll fail to delete the location due to foreign key validation errors.
+        location = new TestLocationBuilder(name: "TEST LOCATION")
+                .facilityLocation()
+                .findOrBuild()
+        otherLocation = new TestLocationBuilder(name: "OTHER TEST LOCATION")
+                .facilityLocation()
+                .findOrBuild()
+
         cookie = createTestUser(location)
         RequestSpecification baseRequestSpec = buildDefaultRequestSpec(cookie)
         authenticatedApiContext.loadContext(baseRequestSpec)
@@ -127,6 +140,10 @@ abstract class ApiSpec extends IntegrationSpec implements TestDataBuilder {
 
     @Transactional
     void cleanup() {
+        // Restores the generators in TestDataConfig in case any tests overrode the behaviour. This will also cause any
+        // variables in TestDataConfig to be reset to their initial values and any randoms to be regenerated.
+        TestDataConfigurationHolder.reset()
+
         cleanupData()
     }
 
@@ -145,16 +162,6 @@ abstract class ApiSpec extends IntegrationSpec implements TestDataBuilder {
     private Cookie createTestUser(Location location) {
         Response authResponse = authApiWrapper.loginOK(username, password, location.id)
         return authResponse.getDetailedCookie("JSESSIONID")
-    }
-
-    /**
-     * Creates a new test specific location that we can log into and create data against.
-     */
-    private Location createTestLocation() {
-        // Note that we don't attempt to clean up this location on test teardown because if any test is using the
-        // location and fails to clean up their own data, we'll fail to delete the location due to foreign key
-        // validation errors. The simplest thing to do is to just leave the location in the DB.
-        return findOrBuild(Location)
     }
 
     /**

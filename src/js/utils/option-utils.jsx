@@ -5,9 +5,13 @@ import glAccountApi from 'api/services/GlAccountApi';
 import locationApi from 'api/services/LocationApi';
 import organizationApi from 'api/services/OrganizationApi';
 import productApi from 'api/services/ProductApi';
+import productClassificationApi from 'api/services/ProductClassificationApi';
 import productGroupApi from 'api/services/ProductGroupApi';
 import selectOptionsApi from 'api/services/SelectOptionsApi';
 import userApi from 'api/services/UserApi';
+import { INTERNAL_LOCATIONS } from 'api/urls';
+import ActivityCode from 'consts/activityCode';
+import locationType from 'consts/locationType';
 import apiClient from 'utils/apiClient';
 import splitTranslation from 'utils/translation-utils';
 
@@ -72,8 +76,8 @@ export const debounceLocationsFetch = (
           activityCodes,
         },
       }).then((result) => callback(_.map(result.data.data, (obj) => {
-        const locationType = withTypeDescription ? ` [${obj.locationType.description}]` : '';
-        const label = `${obj.name}${locationType}`;
+        const locationTypeData = withTypeDescription ? ` [${obj.locationType.description}]` : '';
+        const label = `${obj.name}${locationTypeData}`;
         return {
           id: obj.id,
           type: obj.locationType.locationTypeCode,
@@ -239,18 +243,31 @@ export const fetchLocationById = async (id) => {
   return response.data?.data;
 };
 
+export const fetchBins = async (locationId, ignoreActivityCodes = [ActivityCode.RECEIVE_STOCK]) => {
+  const response = await apiClient.get(INTERNAL_LOCATIONS, {
+    paramsSerializer: (parameters) => queryString.stringify(parameters),
+    params: {
+      'location.id': locationId,
+      locationTypeCode: [locationType.BIN_LOCATION, locationType.INTERNAL],
+      ignoreActivityCodes,
+    },
+  });
+
+  return response.data.data;
+};
+
 export const fetchProductsCategories = async () => {
   const response = await apiClient.get('/api/categoryOptions');
   return response.data.data;
 };
 
-export const fetchProductsCatalogs = async () => {
-  const response = await apiClient.get('/api/catalogOptions');
+export const fetchProductsCatalogs = async (params = {}) => {
+  const response = await apiClient.get('/api/catalogOptions', { params });
   return response.data.data;
 };
 
-export const fetchProductsTags = async () => {
-  const response = await apiClient.get('/api/tagOptions');
+export const fetchProductsTags = async (params = {}) => {
+  const response = await apiClient.get('/api/tagOptions', { params });
   return response.data.data;
 };
 
@@ -262,6 +279,20 @@ export const fetchProductsGlAccounts = async (params) => {
 export const fetchProductGroups = async () => {
   const { data } = await productGroupApi.getProductGroupsOptions();
   return data.data;
+};
+
+export const fetchProductClassifications = async (facilityId) => {
+  const { data } = await productClassificationApi.getProductClassifications(facilityId);
+  if (data.data) {
+    return data.data.map((obj) => (
+      {
+        id: obj.name,
+        value: obj.name,
+        label: obj.name,
+      }
+    ));
+  }
+  return null;
 };
 
 export const fetchHandlingRequirements = async () => {

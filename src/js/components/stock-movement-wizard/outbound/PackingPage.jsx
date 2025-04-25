@@ -268,15 +268,14 @@ class PackingPage extends Component {
 
   setPackPageItems(response, startIndex) {
     const { data } = response.data;
-    const { values, totalCount } = this.state;
-    this.setState({
+    this.setState((prev) => ({
       values: {
-        ...values,
-        packPageItems: _.uniqBy(_.concat(values.packPageItems, data), 'shipmentItemId'),
+        ...prev.values,
+        packPageItems: _.uniqBy(_.concat(prev.values.packPageItems, data), 'shipmentItemId'),
       },
-    }, () => {
+    }), () => {
       // eslint-disable-next-line max-len
-      if (!_.isNull(startIndex) && values.packPageItems.length !== totalCount) {
+      if (!_.isNull(startIndex) && this.state.values.packPageItems.length !== this.state.totalCount) {
         this.loadMoreRows({ startIndex: startIndex + this.props.pageSize });
       }
     });

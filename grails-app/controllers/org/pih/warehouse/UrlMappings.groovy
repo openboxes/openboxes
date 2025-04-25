@@ -125,6 +125,16 @@ class UrlMappings {
             action = [GET: "getInventoryItem"]
         }
 
+        "/api/facilities/$facilityId/products/classifications" {
+            controller = "productClassificationApi"
+            action = [GET: "list"]
+        }
+
+        "/api/facilities/$facilityId/inventory-levels(.$format)?" {
+            controller = "inventoryLevelApi"
+            action = [GET: "list"]
+        }
+
         "/api/locations/locationTypes" {
             controller = { "locationApi" }
             action = [GET: "locationTypes"]
@@ -936,6 +946,61 @@ class UrlMappings {
         "/api/generic/${resource}/$id"(parseRequest: false) {
             controller = "genericApi"
             action = [GET: "read", POST: "update", PUT: "update", DELETE: "delete"]
+        }
+
+        "/api/facilities/$facilityId/cycle-counts/candidates" {
+            controller = "cycleCountApi"
+            action = [GET: "getCandidates"]
+        }
+
+        "/api/facilities/$facilityId/cycle-counts/requests/pending" {
+            controller = "cycleCountApi"
+            action = [GET: "getPendingCycleCountRequests"]
+        }
+
+        "/api/facilities/$facilityId/cycle-counts/requests/batch" {
+            controller = "cycleCountApi"
+            action = [POST: "createRequests", DELETE: "deleteRequests"]
+        }
+
+        "/api/facilities/$facility/cycle-counts/start/batch" {
+            controller = "cycleCountApi"
+            action = [POST: "startCycleCount"]
+        }
+
+        "/api/facilities/$facility/cycle-counts/recount/start/batch" {
+            controller = "cycleCountApi"
+            action = [POST: "startRecount"]
+        }
+
+        "/api/facilities/$facility/cycle-counts" {
+            controller = "cycleCountApi"
+            action = [GET: "list"]
+        }
+
+        "/api/facilities/$facility/cycle-counts/$cycleCountId/count" {
+            controller = "cycleCountApi"
+            action = [POST: "submitCount"]
+        }
+
+        "/api/facilities/$facility/cycle-counts/$cycleCountId/recount" {
+            controller = "cycleCountApi"
+            action = [POST: "submitRecount"]
+        }
+
+        "/api/facilities/$facility/cycle-counts/items/$cycleCountItemId" {
+            controller = "cycleCountApi"
+            action = [PATCH: "updateCycleCountItem", DELETE: "deleteCycleCountItem"]
+        }
+
+        "/api/facilities/$facility/cycle-counts/$cycleCountId/items" {
+            controller = "cycleCountApi"
+            action = [POST: "createCycleCountItem"]
+        }
+
+        "/api/facilities/$facility/cycle-counts/$cycleCountId/refresh" {
+            controller = "cycleCountApi"
+            action = [POST: "refreshCycleCount"]
         }
 
         // Error handling

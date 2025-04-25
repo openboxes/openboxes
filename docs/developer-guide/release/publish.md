@@ -1,6 +1,6 @@
 1. Create a Release on GitHub (include Release Notes from JIRA)
 
-    ![Create Release on GitHub](../../img/github-create-release.png "Create Release on GitHub")
+    ![Create Release on GitHub](../../assets/img/github-create-release.png "Create Release on GitHub")
 
 1. Merge release branch into master
 
@@ -23,9 +23,9 @@
 
 1. Upload WAR to release 
 
-    ![Download latest WAR](../../img/github-upload-latest-war-to-release-details.png)
+    ![Download latest WAR](../../assets/img/github-upload-latest-war-to-release-details.png)
 
 
 1. Publish Release Notes to openboxes.com
 
-    ![Publish Release](../../img/github-publish-release.png)
+    ![Publish Release](../../assets/img/github-publish-release.png)
