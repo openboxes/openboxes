@@ -227,9 +227,9 @@ class ShipmentItem implements Comparable, Serializable {
     Integer getQuantityPicked() {
         Integer quantityPicked
         if (binLocation) {
-            quantityPicked = requisitionItem?.picklistItems?.findAll { it.inventoryItem == inventoryItem && it.binLocation == binLocation }?.sum { it.quantity }
+            quantityPicked = requisitionItem?.picklistItems?.findAll { it.inventoryItem == inventoryItem && it.binLocation == binLocation }?.sum { it.quantityPicked }
         } else {
-            quantityPicked = requisitionItem?.picklistItems?.findAll { it.inventoryItem == inventoryItem }?.sum { it.quantity }
+            quantityPicked = requisitionItem?.picklistItems?.findAll { it.inventoryItem == inventoryItem }?.sum { it.quantityPicked }
         }
         return quantityPicked?:quantity
     }
@@ -254,9 +254,9 @@ class ShipmentItem implements Comparable, Serializable {
     Integer getQuantityPickedFromOrders() {
         Integer quantityPicked
         if (binLocation) {
-            quantityPicked = orderItems.collect { it.picklistItems?.findAll { it.inventoryItem == inventoryItem && it.binLocation == binLocation }?.sum { it.quantity } }.sum()
+            quantityPicked = orderItems.collect { it.picklistItems?.findAll { it.inventoryItem == inventoryItem && it.binLocation == binLocation }?.sum { it.quantityPicked } }.sum()
         } else {
-            quantityPicked = orderItems.collect { it.picklistItems?.findAll { it.inventoryItem == inventoryItem }?.sum { it.quantity } }.sum()
+            quantityPicked = orderItems.collect { it.picklistItems?.findAll { it.inventoryItem == inventoryItem }?.sum { it.quantityPicked } }.sum()
         }
         return quantityPicked?:quantity
     }
