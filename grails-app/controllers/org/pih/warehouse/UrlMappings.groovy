@@ -940,6 +940,26 @@ class UrlMappings {
             action = [GET: "renderLabel", POST: "printLabel", PUT: "printLabel"]
         }
 
+        "/api/mobile/products/" {
+            controller = { "mobileProductApi" }
+            action = [GET: "list"]
+        }
+
+        "/api/mobile/products/search"(parseRequest: true) {
+            controller = { "mobileProductApi" }
+            action = [GET: "search", POST: "search"]
+        }
+
+        "/api/mobile/products/$id/" {
+            controller = { "mobileProductApi" }
+            action = [GET: "read"]
+        }
+
+        "/api/mobile/products/$id/details" {
+            controller = { "mobileProductApi" }
+            action = [GET: "details"]
+        }
+
         // Standard REST APIs
 
         "/api/${resource}s"(parseRequest: true) {

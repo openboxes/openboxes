@@ -81,6 +81,17 @@ class DocumentService {
         return grailsApplication.mainContext.getBean('org.pih.warehouse.FormatTagLib')
     }
 
+    Map getProductBarcodeLabel(Product product) {
+        return getBarcodeLabel(Constants.DEFAULT_PRODUCT_LABEL_DOCUMENT_NUMBER,
+                "/api/products/%s/labels/%s", product?.productCode)
+    }
+
+    Map getInternalLocationBarcodeLabel(Location location) {
+        return getBarcodeLabel(Constants.DEFAULT_INTERNAL_LOCATION_LABEL_DOCUMENT_NUMBER,
+                "/api/internalLocations/%s/labels/%s", location?.id)
+    }
+
+
     Map getContainerBarcodeLabel(Container container) {
         return getBarcodeLabel(Constants.DEFAULT_CONTAINER_LABEL_DOCUMENT_NUMBER,
                 "/api/containers/%s/labels/%s", container?.id)

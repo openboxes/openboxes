@@ -200,4 +200,6 @@ class Constants {
             "but no inventory baseline transaction as a most recent transaction"
 
     static final String DEFAULT_CONTAINER_LABEL_DOCUMENT_NUMBER = "barcodeLabel:container"
+    static final String DEFAULT_INTERNAL_LOCATION_LABEL_DOCUMENT_NUMBER = "barcodeLabel:internalLocation"
+    static final String DEFAULT_PRODUCT_LABEL_DOCUMENT_NUMBER = "barcodeLabel:product"
 }
