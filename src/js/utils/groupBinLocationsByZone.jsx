@@ -2,6 +2,11 @@ import React from 'react';
 
 import _ from 'lodash';
 
+// Stringify a bin location for display, prepending the bin's zone if it has one.
+const getBinLocationToDisplay = (bin) => (
+  bin?.zoneName == null ? bin?.name : `${bin?.zoneName}: ${bin?.name}`
+);
+
 const groupBinLocationsByZone = (binLocations, translate) => {
   const groupedByZone = _.groupBy(binLocations, (bin) => bin.zoneId || 'no-zone');
   return Object.entries(groupedByZone)
@@ -16,8 +21,8 @@ const groupBinLocationsByZone = (binLocations, translate) => {
         options: bins
           .map((bin) => ({
             id: bin.id,
-            name: bin.name,
-            label: bin.name,
+            name: getBinLocationToDisplay(bin),
+            label: getBinLocationToDisplay(bin),
             value: bin.id,
           }))
           .sort((a, b) => a.name.localeCompare(b.name)),
@@ -34,4 +39,7 @@ const groupBinLocationsByZone = (binLocations, translate) => {
     });
 };
 
-export default groupBinLocationsByZone;
+export {
+  getBinLocationToDisplay,
+  groupBinLocationsByZone,
+};

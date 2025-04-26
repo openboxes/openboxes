@@ -15,7 +15,7 @@ import cycleCountColumn from 'consts/cycleCountColumn';
 import { DateFormat } from 'consts/timeFormat';
 import useArrowsNavigation from 'hooks/useArrowsNavigation';
 import useTranslate from 'hooks/useTranslate';
-import groupBinLocationsByZone from 'utils/groupBinLocationsByZone';
+import { getBinLocationToDisplay, groupBinLocationsByZone } from 'utils/groupBinLocationsByZone';
 import { checkBinLocationSupport } from 'utils/supportedActivitiesUtils';
 import CustomTooltip from 'wrappers/CustomTooltip';
 
@@ -116,7 +116,7 @@ const useCountStepTable = ({
     }
 
     if (columnPath === cycleCountColumn.BIN_LOCATION && showBinLocation) {
-      return value?.name;
+      return getBinLocationToDisplay(value);
     }
 
     return value;
@@ -234,7 +234,7 @@ const useCountStepTable = ({
           tooltip={showTooltip}
           tooltipForm={showTooltip}
           tooltipClassname={showTooltip && 'bin-location-tooltip'}
-          tooltipLabel={value?.name || translate('react.cycleCount.table.binLocation.label', 'Bin Location')}
+          tooltipLabel={getBinLocationToDisplay(value) || translate('react.cycleCount.table.binLocation.label', 'Bin Location')}
         >
           <Component
             disabled={isFieldDisabled}
@@ -269,7 +269,8 @@ const useCountStepTable = ({
 
   const columns = [
     columnHelper.accessor(
-      (row) => (row?.binLocation?.label ? row?.binLocation : row.binLocation?.name), {
+      // TODO: This doesn't seem to do anything?????? How to change the value???
+      (row) => getBinLocationToDisplay(row?.binLocation), {
         id: cycleCountColumn.BIN_LOCATION,
         header: () => (
           <TableHeaderCell className="rt-th-count-step">

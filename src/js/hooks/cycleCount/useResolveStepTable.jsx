@@ -25,7 +25,7 @@ import cycleCountColumn from 'consts/cycleCountColumn';
 import { DateFormat } from 'consts/timeFormat';
 import useArrowsNavigation from 'hooks/useArrowsNavigation';
 import useTranslate from 'hooks/useTranslate';
-import groupBinLocationsByZone from 'utils/groupBinLocationsByZone';
+import { getBinLocationToDisplay, groupBinLocationsByZone } from 'utils/groupBinLocationsByZone';
 import { checkBinLocationSupport } from 'utils/supportedActivitiesUtils';
 import { formatDate } from 'utils/translation-utils';
 import CustomTooltip from 'wrappers/CustomTooltip';
@@ -175,7 +175,7 @@ const useResolveStepTable = ({
     }
 
     if (id === cycleCountColumn.BIN_LOCATION) {
-      return value?.name;
+      return getBinLocationToDisplay(value);
     }
 
     if (id === cycleCountColumn.ROOT_CAUSE) {
@@ -371,7 +371,8 @@ const useResolveStepTable = ({
 
   const columns = [
     columnHelper.accessor(
-      (row) => (row?.binLocation?.label ? row?.binLocation : row.binLocation?.name), {
+      // TODO: This doesn't seem to do anything?????? How to change the value???
+      (row) => getBinLocationToDisplay(row?.binLocation), {
         id: cycleCountColumn.BIN_LOCATION,
         header: useMemo(() => (
           <TableHeaderCell className="rt-th-count-step">
