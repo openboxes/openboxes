@@ -396,6 +396,18 @@ class PutawayService {
 
 
     void validatePutawayItem(PutawayItem putawayItem) {
+        // Mobile validation for scanned putaway location
+        // TODO: add a config property around this part instead checking if the scannedPutawayLocation != null
+        if (putawayItem.scannedPutawayLocation != null) {
+            Location scannedPutawayLocation =
+                    Location.findByNameOrLocationNumber(putawayItem.scannedPutawayLocation, putawayItem.scannedPutawayLocation)
+
+            if (scannedPutawayLocation != putawayItem.putawayLocation) {
+                throw new IllegalArgumentException("Expected putaway location ${putawayItem.putawayLocation?.locationNumber} " +
+                        "does not match ${putawayItem?.scannedPutawayLocation}")
+            }
+        }
+
         def quantity = putawayItem.quantity
 
         if (putawayItem.splitItems) {
