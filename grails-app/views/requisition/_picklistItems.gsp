@@ -82,7 +82,7 @@
                             <g:set var="inventoryItem" value="${availableItem.inventoryItem}"/>
                             <g:set var="picklistItems" value="${requisitionItem?.retrievePicklistItems()}"/>
                             <g:set var="picklistItem" value="${picklistItems?.find { it.binLocation == binLocation && it.inventoryItem == inventoryItem }}"/>
-                            <g:set var="quantityPicked" value="${picklistItem?.quantity ?: 0}"/>
+                            <g:set var="quantityPicked" value="${picklistItem?.quantityPicked ?: 0}"/>
                             <g:set var="quantityRemaining" value="${requisitionItem?.calculateQuantityRemaining()?: 0}"/>
                             <tr class="prop ${status % 2 ? 'odd' : 'even'}">
                                 <td class="middle">

@@ -1603,7 +1603,6 @@ class StockMovementService {
                             null,
                             false,
                     )
-
                 }
                 // Otherwise we may need to allocate a new item based on the rules
                 else {
@@ -1795,14 +1794,16 @@ class StockMovementService {
             clearPicklist(requisitionItem)
             if (suggestedItems) {
                 for (SuggestedItem suggestedItem : suggestedItems) {
+                    Integer quantityPicked = location.requiresMobilPicking() ? 0 : suggestedItem.quantityPicked.intValueExact()
                     createOrUpdatePicklistItem(requisitionItem,
                             null,
                             suggestedItem.inventoryItem,
                             suggestedItem.binLocation,
-                            suggestedItem.quantityPicked.intValueExact(),
+                            quantityPicked,
                             null,
                             null,
-                            true
+                            true,
+                            suggestedItem.quantityPicked.intValueExact()
                     )
                 }
             }
@@ -1828,7 +1829,8 @@ class StockMovementService {
 
     void createOrUpdatePicklistItem(RequisitionItem requisitionItem, PicklistItem picklistItem,
                                     InventoryItem inventoryItem, Location binLocation,
-                                    Integer quantity, String reasonCode, String comment, Boolean isAutoAllocated = true) {
+                                    Integer quantityPicked, String reasonCode, String comment,
+                                    Boolean isAutoAllocated = true, Integer quantityToPick = null) {
 
         Requisition requisition = requisitionItem.requisition
 
@@ -1853,7 +1855,7 @@ class StockMovementService {
         requisitionItem.autoAllocated = isAutoAllocated
 
         // Remove from picklist
-        if (quantity == null) {
+        if (quantityPicked == null) {
             picklist.removeFromPicklistItems(picklistItem)
         }
         // Populate picklist item
@@ -1866,7 +1868,8 @@ class StockMovementService {
             requisitionItem.addToPicklistItems(picklistItem)
             picklistItem.inventoryItem = inventoryItem
             picklistItem.binLocation = binLocation
-            picklistItem.quantity = quantity
+            picklistItem.quantity = quantityToPick ?: quantityPicked
+            picklistItem.quantityPicked = quantityPicked
             picklistItem.reasonCode = reasonCode
             picklistItem.comment = comment
             picklistItem.sortOrder = requisitionItem.orderIndex
@@ -3065,12 +3068,12 @@ class StockMovementService {
         }
 
         requisitionItem?.picklistItems?.each { PicklistItem picklistItem ->
-            if (picklistItem.quantity > 0) {
+            if (picklistItem.quantityPicked > 0) {
                 ShipmentItem shipmentItem = new ShipmentItem()
                 shipmentItem.lotNumber = picklistItem?.inventoryItem?.lotNumber
                 shipmentItem.expirationDate = picklistItem?.inventoryItem?.expirationDate
                 shipmentItem.product = picklistItem?.inventoryItem?.product
-                shipmentItem.quantity = picklistItem?.quantity
+                shipmentItem.quantity = picklistItem?.quantityPicked
                 shipmentItem.requisitionItem = picklistItem.requisitionItem
                 shipmentItem.recipient = picklistItem?.requisitionItem?.recipient ?:
                         picklistItem?.requisitionItem?.parentRequisitionItem?.recipient

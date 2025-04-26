@@ -196,6 +196,10 @@ class OutboundStockMovementService {
                     }
                 } else if (params.sort == "dateRequested") {
                     order("dateRequested", params.order ?: "desc")
+                } else if (params.sort == "expectedShippingDate") {
+                    shipment {
+                        order("expectedShippingDate", params.order ?: "desc")
+                    }
                 } else if (params.sort == "stocklist.name") {
                     requisition(JoinType.LEFT_OUTER_JOIN.joinTypeValue) {
                         requisitionTemplate(JoinType.LEFT_OUTER_JOIN.joinTypeValue) {
