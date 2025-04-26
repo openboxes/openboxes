@@ -112,6 +112,29 @@ class PutawayApiController {
         render([data: putaways.collect { it.toJson() }] as JSON)
     }
 
+    def update() {
+        JSONObject jsonObject = request.JSON
+
+        Location currentLocation = Location.get(session.warehouse.id)
+        if (!currentLocation) {
+            throw new IllegalArgumentException("User must be logged into a location to perform putaway")
+        }
+
+        User currentUser = User.get(session.user.id)
+
+        Putaway putaway = new Putaway()
+        bindPutawayData(putaway, null, currentUser, currentLocation, jsonObject)
+        Order order
+
+        // Putaway stock
+        if (putaway?.putawayStatus?.equals(PutawayStatus.COMPLETED)) {
+            order = putawayService.completePutaway(putaway)
+        } else {
+            order = putawayService.savePutaway(putaway)
+        }
+        redirect(action: "read", id: order.id)
+    }
+
 
     private Putaway bindPutawayData(Putaway putaway, Order order, User currentUser, Location currentLocation, JSONObject jsonObject) {
         // Bind the putaway
@@ -129,6 +152,22 @@ class PutawayApiController {
         }
 
         putaway.putawayAssignee = currentUser
+
+        // TODO: ensure this does not break completing putaway in web app
+        // Bind the putaway items
+        jsonObject.putawayItems.each { putawayItemMap ->
+            PutawayItem putawayItem = new PutawayItem()
+            bindData(putawayItem, putawayItemMap)
+
+            // Bind the split items
+            putawayItemMap.splitItems.each { splitItemMap ->
+                PutawayItem splitItem = new PutawayItem()
+                bindData(splitItem, splitItemMap)
+                putawayItem.splitItems.add(splitItem)
+            }
+
+            putaway.putawayItems.add(putawayItem)
+        }
 
         return putaway
     }

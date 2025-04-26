@@ -30,6 +30,8 @@ class PutawayItem implements Validateable {
     PutawayStatus putawayStatus
     Transaction transaction
     InventoryLevel inventoryLevel
+    // Mobile property
+    String scannedPutawayLocation
 
 
     Boolean delete = Boolean.FALSE
