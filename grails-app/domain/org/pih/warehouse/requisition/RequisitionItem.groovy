@@ -600,10 +600,10 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         try {
             if (substitutionItems) {
                 substitutionItems.each { substitutionItem ->
-                    quantityPicked += PicklistItem.findAllByRequisitionItem(substitutionItem).sum { it.quantity }
+                    quantityPicked += PicklistItem.findAllByRequisitionItem(substitutionItem).sum { it.quantityPicked }
                 }
             } else {
-                quantityPicked = PicklistItem.findAllByRequisitionItem(this).sum { it.quantity }
+                quantityPicked = PicklistItem.findAllByRequisitionItem(this).sum { it.quantityPicked }
             }
         } catch (Exception e) {
 

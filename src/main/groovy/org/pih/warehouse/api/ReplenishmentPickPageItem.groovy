@@ -61,7 +61,7 @@ class ReplenishmentPickPageItem {
     }
 
     Integer getQuantityPicked() {
-        return picklistItems ? picklistItems?.sum { it.quantity } : 0
+        return picklistItems ? picklistItems?.sum { it.quantityPicked } : 0
     }
 
     Integer getQuantityAvailable() {

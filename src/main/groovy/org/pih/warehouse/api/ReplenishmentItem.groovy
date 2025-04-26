@@ -77,7 +77,7 @@ class ReplenishmentItem implements Validateable {
         replenishmentItem.location = picklistItem?.orderItem?.order?.origin
         replenishmentItem.replenishmentLocation  = picklistItem?.binLocation
         replenishmentItem.binLocation = picklistItem?.orderItem?.destinationBinLocation
-        replenishmentItem.quantity = picklistItem?.quantity
+        replenishmentItem.quantity = picklistItem?.quantityPicked
         replenishmentItem.status = getItemStatus(OrderItemStatusCode.COMPLETED)
 
         return replenishmentItem

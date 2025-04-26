@@ -269,7 +269,8 @@ class EditPickModal extends Component {
           return {
             ...avItem,
             id: picklistItem.id,
-            quantityPicked: picklistItem.quantityPicked,
+            quantityPicked: picklistItem.quantityPicked > 0
+              ? picklistItem.quantityPicked : picklistItem.quantityToPick,
             binLocation: {
               id: picklistItem['binLocation.id'],
               name: picklistItem['binLocation.name'],
