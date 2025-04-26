@@ -279,4 +279,14 @@ class StockTransferApiController {
         }
         render([data: statusOptions] as JSON)
     }
+
+    def updateStatus = {
+        Order order = Order.get(params.id)
+        if (!order) {
+            throw new IllegalArgumentException("Can't find order with given id: ${params.id}")
+        }
+        def jsonObject = request.JSON
+        stockTransferService.updateStockTransferStatus(order, OrderStatus.valueOf(jsonObject.status))
+        render status: 200
+    }
 }
