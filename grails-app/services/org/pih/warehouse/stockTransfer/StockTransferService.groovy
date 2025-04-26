@@ -336,6 +336,23 @@ class StockTransferService {
         // Need to process the split items
         processSplitItems(stockTransfer)
 
+        createStockTransferTransaction(stockTransfer, order)
+
+        return order
+    }
+
+    void updateStockTransferStatus(Order order, OrderStatus orderStatus) {
+        if (orderStatus == OrderStatus.COMPLETED && order.status != OrderStatus.COMPLETED) {
+            StockTransfer stockTransfer = StockTransfer.createFromOrder(order)
+            validateStockTransfer(stockTransfer)
+            createStockTransferTransaction(stockTransfer, order)
+        }
+
+        order.status = orderStatus
+        order.save()
+    }
+
+    void createStockTransferTransaction(StockTransfer stockTransfer, Order order) {
         stockTransfer.stockTransferItems.each { StockTransferItem stockTransferItem ->
             TransferStockCommand command = new TransferStockCommand()
             command.location = stockTransferItem.location?:stockTransfer?.destination
@@ -348,8 +365,6 @@ class StockTransferService {
             command.transferOut = Boolean.TRUE
             inventoryService.transferStock(command)
         }
-
-        return order
     }
 
     void processSplitItems(StockTransfer stockTransfer) {
