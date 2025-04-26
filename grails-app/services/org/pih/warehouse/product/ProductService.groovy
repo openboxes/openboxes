@@ -13,6 +13,7 @@ import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import groovy.xml.Namespace
+import org.hibernate.ObjectNotFoundException
 import org.hibernate.criterion.CriteriaSpecification
 import org.hibernate.criterion.Restrictions
 import org.hibernate.sql.JoinType
@@ -232,6 +233,14 @@ class ProductService {
         // }
         // }
         return searchResults
+    }
+
+    def getProduct(String idOrCode) {
+        Product product = Product.findByIdOrProductCode(idOrCode, idOrCode)
+        if (!product) {
+            throw new ObjectNotFoundException(idOrCode, Product.class.simpleName)
+        }
+        return product
     }
 
     /**
