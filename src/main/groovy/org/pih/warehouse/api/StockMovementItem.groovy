@@ -688,7 +688,7 @@ class PickPageItem {
     }
 
     Integer getQuantityPicked() {
-        return picklistItems ? picklistItems?.sum { it.quantity } : 0
+        return picklistItems ? picklistItems?.sum { it.quantityPicked } : 0
     }
 
     // TODO Document the reason why the default value is null instead of 0? See OBPIH-912.
