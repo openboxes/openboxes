@@ -9,11 +9,10 @@ import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.CycleCount
+import org.pih.warehouse.inventory.CycleCountProductInventoryTransactionService
 import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.ProductAvailabilityService
-import org.pih.warehouse.inventory.ProductInventorySnapshotSource
-import org.pih.warehouse.inventory.ProductInventoryTransactionService
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.inventory.TransactionIdentifierService
@@ -21,10 +20,10 @@ import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.product.Product
 
 @Unroll
-class ProductInventoryTransactionServiceSpec extends Specification implements DataTest {
+class CycleCountProductInventoryTransactionServiceSpec extends Specification implements DataTest {
 
     @Shared
-    ProductInventoryTransactionService productInventoryTransactionService
+    CycleCountProductInventoryTransactionService cycleCountProductInventoryTransactionService
 
     @Shared
     ProductAvailabilityService productAvailabilityServiceStub
@@ -40,21 +39,21 @@ class ProductInventoryTransactionServiceSpec extends Specification implements Da
     }
 
     void setup() {
-        productInventoryTransactionService = new ProductInventoryTransactionService()
+        cycleCountProductInventoryTransactionService = new CycleCountProductInventoryTransactionService()
 
         productAvailabilityServiceStub = Stub(ProductAvailabilityService)
-        productInventoryTransactionService.productAvailabilityService = productAvailabilityServiceStub
+        cycleCountProductInventoryTransactionService.productAvailabilityService = productAvailabilityServiceStub
 
         transactionIdentifierServiceStub = Stub(TransactionIdentifierService)
-        productInventoryTransactionService.transactionIdentifierService = transactionIdentifierServiceStub
+        cycleCountProductInventoryTransactionService.transactionIdentifierService = transactionIdentifierServiceStub
 
         // Set up the transaction types
         productInventoryTransactionType = new TransactionType()
-        productInventoryTransactionType.id = Constants.PRODUCT_INVENTORY_TRANSACTION_TYPE_ID
+        productInventoryTransactionType.id = Constants.PRODUCT_INVENTORY_SNAPSHOT_TRANSACTION_TYPE_ID
         productInventoryTransactionType.save(validate: false)
     }
 
-    void 'createTransaction should succeed when some items are available'() {
+    void 'createSnapshotTransaction should succeed when some items are available'() {
         given: 'mocked inputs'
         Location facility = new Location(inventory: new Inventory())
         Product product = new Product()
@@ -81,8 +80,8 @@ class ProductInventoryTransactionServiceSpec extends Specification implements Da
                 facility, [product.id], false, true) >> availableItems
 
         when:
-        Transaction transaction = productInventoryTransactionService.createTransaction(
-                facility, product, ProductInventorySnapshotSource.CYCLE_COUNT, cycleCount, date)
+        Transaction transaction = cycleCountProductInventoryTransactionService.createSnapshotTransaction(
+                facility, product, cycleCount, date)
 
         then:
         assert transaction.transactionType == productInventoryTransactionType
