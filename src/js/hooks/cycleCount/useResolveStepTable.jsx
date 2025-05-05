@@ -14,15 +14,13 @@ import { fetchReasonCodes } from 'actions';
 import { FETCH_CYCLE_COUNT_REASON_CODES } from 'actions/types';
 import { TableCell } from 'components/DataTable';
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
-import ArrowValueIndicator from 'components/DataTable/v2/ArrowValueIndicator';
+import ValueIndicator from 'components/DataTable/v2/ValueIndicator';
 import DateField from 'components/form-elements/v2/DateField';
 import SelectField from 'components/form-elements/v2/SelectField';
 import TextInput from 'components/form-elements/v2/TextInput';
-import ArrowValueIndicatorVariant, {
-  getCycleCountDifferencesVariant,
-} from 'consts/arrowValueIndicatorVariant';
 import cycleCountColumn from 'consts/cycleCountColumn';
 import { DateFormat } from 'consts/timeFormat';
+import valueIndicatorVariant, { getCycleCountDifferencesVariant } from 'consts/valueIndicatorVariant';
 import useArrowsNavigation from 'hooks/useArrowsNavigation';
 import useTranslate from 'hooks/useTranslate';
 import groupBinLocationsByZone from 'utils/groupBinLocationsByZone';
@@ -416,7 +414,7 @@ const useResolveStepTable = ({
       cell: useCallback(({ row: { original: { quantityCounted, commentFromCount } } }) => (
         <TableCell className="rt-td rt-td-count-step static-cell-count-step d-flex align-items-center">
           {quantityCounted === null
-            ? <ArrowValueIndicator variant={ArrowValueIndicatorVariant.EMPTY} />
+            ? <ValueIndicator variant={valueIndicatorVariant.EMPTY} />
             : quantityCounted}
           {commentFromCount && (
             <Tooltip
@@ -449,10 +447,10 @@ const useResolveStepTable = ({
         const quantityVariance = quantityCounted - (quantityOnHand || 0);
         const variant = (quantityCounted || quantityCounted === 0)
           ? getCycleCountDifferencesVariant(quantityVariance, quantityCounted)
-          : ArrowValueIndicatorVariant.EMPTY;
+          : valueIndicatorVariant.EMPTY;
         return (
           <TableCell className="rt-td rt-td-count-step static-cell-count-step d-flex align-items-center">
-            <ArrowValueIndicator value={quantityVariance} variant={variant} showAbsoluteValue />
+            <ValueIndicator value={quantityVariance} variant={variant} showAbsoluteValue />
           </TableCell>
         );
       }, []),
@@ -486,7 +484,7 @@ const useResolveStepTable = ({
 
         return (
           <TableCell className="rt-td rt-td-count-step static-cell-count-step d-flex align-items-center">
-            <ArrowValueIndicator
+            <ValueIndicator
               value={recountDifference}
               variant={variant}
               showAbsoluteValue

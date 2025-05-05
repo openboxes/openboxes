@@ -3,10 +3,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { RiArrowDownLine, RiArrowUpLine } from 'react-icons/all';
 
-import ArrowValueIndicatorVariant from 'consts/arrowValueIndicatorVariant';
+import valueIndicatorVariant from 'consts/valueIndicatorVariant';
 import useTranslate from 'hooks/useTranslate';
 
-const ArrowValueIndicator = ({ value, variant, showAbsoluteValue }) => {
+const ValueIndicator = ({
+  value, variant, showAbsoluteValue, transactionType,
+}) => {
   const translate = useTranslate();
 
   const valueToDisplay = showAbsoluteValue ? Math.abs(value) : value;
@@ -14,7 +16,7 @@ const ArrowValueIndicator = ({ value, variant, showAbsoluteValue }) => {
   // Variant is passed, because this component can be reused for a values
   // that are not numerical, so we cannot decide whether other types are
   // positive / negative
-  if (variant === ArrowValueIndicatorVariant.POSITIVE) {
+  if (variant === valueIndicatorVariant.POSITIVE) {
     return (
       <div>
         <RiArrowUpLine size={18} className="arrow-value-indicator--positive" />
@@ -23,7 +25,7 @@ const ArrowValueIndicator = ({ value, variant, showAbsoluteValue }) => {
     );
   }
 
-  if (variant === ArrowValueIndicatorVariant.NEGATIVE) {
+  if (variant === valueIndicatorVariant.NEGATIVE) {
     return (
       <div>
         <RiArrowDownLine size={18} className="arrow-value-indicator--negative" />
@@ -32,15 +34,31 @@ const ArrowValueIndicator = ({ value, variant, showAbsoluteValue }) => {
     );
   }
 
-  if (variant === ArrowValueIndicatorVariant.EQUAL) {
+  if (variant === valueIndicatorVariant.EQUAL) {
     return (
       <div className="px-2 py-1 value-indicator value-indicator--equal">
-        {translate('react.cycleCount.table.equal.label', 'EQUAL')}
+        {translate('react.reactTable.equal.label', 'EQUAL')}
       </div>
     );
   }
 
-  if (variant === ArrowValueIndicatorVariant.EMPTY) {
+  if (variant === valueIndicatorVariant.MORE) {
+    return (
+      <div className="px-2 py-1 value-indicator value-indicator--more">
+        {translate('react.reactTable.more.label', 'MORE')}
+      </div>
+    );
+  }
+
+  if (variant === valueIndicatorVariant.LESS) {
+    return (
+      <div className="px-2 py-1 value-indicator value-indicator--less">
+        {translate('react.reactTable.less.label', 'LESS')}
+      </div>
+    );
+  }
+
+  if (variant === valueIndicatorVariant.EMPTY) {
     return (
       <div className="py-1 text-center value-indicator value-indicator--empty">
         -
@@ -48,23 +66,33 @@ const ArrowValueIndicator = ({ value, variant, showAbsoluteValue }) => {
     );
   }
 
+  if (variant === valueIndicatorVariant.TRANSACTION) {
+    return (
+      <div className="px-2 py-1 value-indicator value-indicator--transaction">
+        {transactionType}
+      </div>
+    );
+  }
+
   return null;
 };
 
-export default ArrowValueIndicator;
+export default ValueIndicator;
 
-ArrowValueIndicator.propTypes = {
+ValueIndicator.propTypes = {
   value: PropTypes.oneOfType([
     PropTypes.string,
     PropTypes.number,
   ]),
   variant: PropTypes.oneOf(
-    Object.keys(ArrowValueIndicatorVariant),
+    Object.keys(valueIndicatorVariant),
   ).isRequired,
   showAbsoluteValue: PropTypes.bool,
+  transactionType: PropTypes.string,
 };
 
-ArrowValueIndicator.defaultProps = {
+ValueIndicator.defaultProps = {
   value: null,
   showAbsoluteValue: false,
+  transactionType: null,
 };
