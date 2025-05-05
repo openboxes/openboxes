@@ -1,6 +1,6 @@
 import React from 'react';
 
-import CycleCountHeader from 'components/cycleCount/CycleCountHeader';
+import CycleCountReportingHeader from 'components/cycleCountReporting/CycleCountReportingHeader';
 import InventoryTransactionsTab from 'components/cycleCountReporting/InventoryTransactionsTab';
 import ProductsTab from 'components/cycleCountReporting/ProductsTab';
 import Tabs from 'components/listPagesUtils/Tabs';
@@ -40,7 +40,7 @@ const CycleCount = () => {
 
   return (
     <PageWrapper>
-      <CycleCountHeader />
+      <CycleCountReportingHeader />
       <div className="list-page-list-section">
         <Tabs config={tabs} className="m-3" />
         {tab === PRODUCTS_TAB && (
