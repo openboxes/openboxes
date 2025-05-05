@@ -1,8 +1,10 @@
 const valueIndicatorVariant = {
+  // These four values are used for displaying changes in qty difference
   EQUAL: 'EQUAL',
   EMPTY: 'EMPTY',
   POSITIVE: 'POSITIVE',
   NEGATIVE: 'NEGATIVE',
+  // These three values are used for alignment in cycle count reporting
   MORE: 'MORE',
   LESS: 'LESS',
   TRANSACTION: 'TRANSACTION',
