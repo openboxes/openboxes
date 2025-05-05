@@ -37,11 +37,11 @@ SELECT
     # Inventory Item Count
     count(product_availability.id)                                                   as inventory_item_count,
 
-    -- A comma-separated list of internal locations in the format <zone>:<bin location name>
+    -- A comma-separated list of internal locations in the format "<zone>: <bin location name>"
     GROUP_CONCAT(DISTINCT (
         IF(
             product_availability.quantity_on_hand != 0,
-            CONCAT_WS(':', zone.name, product_availability.bin_location_name),
+            CONCAT_WS(': ', zone.name, product_availability.bin_location_name),
             NULL
         )
     ))                                                                                as internal_locations,
