@@ -716,22 +716,22 @@ class ShipmentService {
                 throw new ValidationException("Shipment item is invalid", shipmentItem.errors)
             }
 
-            // Because creating picklist items triggers updates to product availability, if we're editing an existing
-            // shipment/picklist item, the calculated QATP will have already subtracted the picked quantity of the
-            // current item (QATP == QoH - quantity allocated via pending outbounds). We need to factor that into our
-            // equation so as to not double count it when validating availability.
             Integer quantityAvailableToPromise = productAvailabilityService.getQuantityAvailableToPromise(
                     origin, shipmentItem.binLocation, shipmentItem.inventoryItem)
 
             // OBS-1866: QATP should always have a value, but in case it doesn't (possibly due to a failed product
             //           availability refresh), we need to handle that case gracefully.
             if (quantityAvailableToPromise == null) {
-                // QATP == QoH - quantity allocated via pending outbounds. We assume QoH==0 when product availability
+                // QATP == QoH - quantity allocated via pending outbounds. We assume QoH == 0 when product availability
                 // does not exist for the item, so QATP will simply be a negation of the quantity picked (which will
-                // always cause an error if we've picked more than a zero quantity).
+                // cause an invalid pick exception if we've picked more than a zero quantity).
                 quantityAvailableToPromise = -shipmentItem.quantityPicked
             }
 
+            // Because creating/editing picklist items triggers updates to product availability, the pre-calculated
+            // QATP value will have already subtracted out the picked quantity of the current item. (Remember that
+            // QATP == QoH - quantity allocated via pending outbounds.) We need to factor that into our equation so
+            // as to not double count it when validating availability.
             def quantityAvailableWithPicked = quantityAvailableToPromise + shipmentItem.quantityPicked - shipmentItem.unavailableQuantityPicked
 
             def duplicatedShipmentItemsQuantity = getDuplicatedShipmentItemsQuantity(shipmentItem.shipment, shipmentItem.binLocation, shipmentItem.inventoryItem)
