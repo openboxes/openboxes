@@ -7,7 +7,7 @@ import valueIndicatorVariant from 'consts/valueIndicatorVariant';
 import useTranslate from 'hooks/useTranslate';
 
 const ValueIndicator = ({
-  value, variant, showAbsoluteValue, transactionType,
+  value, variant, showAbsoluteValue, className,
 }) => {
   const translate = useTranslate();
 
@@ -18,7 +18,7 @@ const ValueIndicator = ({
   // positive / negative
   if (variant === valueIndicatorVariant.POSITIVE) {
     return (
-      <div>
+      <div className={className}>
         <RiArrowUpLine size={18} className="arrow-value-indicator--positive" />
         <span className="value-indicator value-indicator--positive">{valueToDisplay.toString()}</span>
       </div>
@@ -27,7 +27,7 @@ const ValueIndicator = ({
 
   if (variant === valueIndicatorVariant.NEGATIVE) {
     return (
-      <div>
+      <div className={className}>
         <RiArrowDownLine size={18} className="arrow-value-indicator--negative" />
         <span className="value-indicator value-indicator--negative">{valueToDisplay.toString()}</span>
       </div>
@@ -36,7 +36,7 @@ const ValueIndicator = ({
 
   if (variant === valueIndicatorVariant.EQUAL) {
     return (
-      <div className="px-2 py-1 value-indicator value-indicator--equal">
+      <div className={`${className} px-2 py-1 value-indicator value-indicator--equal`}>
         {translate('react.reactTable.equal.label', 'EQUAL')}
       </div>
     );
@@ -44,7 +44,7 @@ const ValueIndicator = ({
 
   if (variant === valueIndicatorVariant.MORE) {
     return (
-      <div className="px-2 py-1 value-indicator value-indicator--more">
+      <div className={`${className} px-2 py-1 value-indicator value-indicator--more`}>
         {translate('react.reactTable.more.label', 'MORE')}
       </div>
     );
@@ -52,7 +52,7 @@ const ValueIndicator = ({
 
   if (variant === valueIndicatorVariant.LESS) {
     return (
-      <div className="px-2 py-1 value-indicator value-indicator--less">
+      <div className={`${className} px-2 py-1 value-indicator value-indicator--less`}>
         {translate('react.reactTable.less.label', 'LESS')}
       </div>
     );
@@ -60,7 +60,7 @@ const ValueIndicator = ({
 
   if (variant === valueIndicatorVariant.EMPTY) {
     return (
-      <div className="py-1 text-center value-indicator value-indicator--empty">
+      <div className={`${className} py-1 text-center value-indicator value-indicator--empty`}>
         -
       </div>
     );
@@ -68,8 +68,8 @@ const ValueIndicator = ({
 
   if (variant === valueIndicatorVariant.TRANSACTION) {
     return (
-      <div className="px-2 py-1 value-indicator value-indicator--transaction">
-        {transactionType}
+      <div className={`${className} px-2 py-1 value-indicator value-indicator--transaction`}>
+        {value}
       </div>
     );
   }
@@ -88,11 +88,11 @@ ValueIndicator.propTypes = {
     Object.keys(valueIndicatorVariant),
   ).isRequired,
   showAbsoluteValue: PropTypes.bool,
-  transactionType: PropTypes.string,
+  className: PropTypes.string,
 };
 
 ValueIndicator.defaultProps = {
   value: null,
   showAbsoluteValue: false,
-  transactionType: null,
+  className: '',
 };
