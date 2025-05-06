@@ -2,43 +2,45 @@ import React from 'react';
 
 import PropTypes from 'prop-types';
 
-import cycleCountFilterFields from 'components/cycleCount/CycleCountFilterFields';
 import FilterForm from 'components/Filter/FilterForm';
 import ListFilterFormWrapper from 'wrappers/ListFilterFormWrapper';
 
-const CycleCountFilters = ({
+const CycleCountReportingFilters = ({
   setFilterParams,
   defaultValues,
   formProps,
   isLoading,
+  filterFields,
 }) => (
   <ListFilterFormWrapper>
     <FilterForm
-      filterFields={cycleCountFilterFields}
+      filterFields={filterFields}
       updateFilterParams={(values) => setFilterParams({ ...values })}
       formProps={formProps}
       defaultValues={defaultValues}
       allowEmptySubmit
-      searchFieldDefaultPlaceholder="Search..."
-      searchFieldPlaceholder="react.cycleCount.filter.search.label"
       ignoreClearFilters={['tab']}
       hidden={false}
       isLoading={isLoading}
-      customSubmitButtonLabel="react.button.filter.label"
-      customSubmitButtonDefaultLabel="Filter"
+      customSubmitButtonLabel="react.cycleCountReporting.filter.loadTable.label"
+      customSubmitButtonDefaultLabel="Load table"
+      showFilterVisibilityToggler={false}
+      showSearchField={false}
     />
   </ListFilterFormWrapper>
 );
 
-export default CycleCountFilters;
+export default CycleCountReportingFilters;
 
-CycleCountFilters.propTypes = {
+CycleCountReportingFilters.propTypes = {
   setFilterParams: PropTypes.func.isRequired,
   defaultValues: PropTypes.shape({}).isRequired,
   formProps: PropTypes.shape({}),
+  filterFields: PropTypes.shape({}),
   isLoading: PropTypes.bool.isRequired,
 };
 
-CycleCountFilters.defaultProps = {
+CycleCountReportingFilters.defaultProps = {
   formProps: {},
+  filterFields: {},
 };
