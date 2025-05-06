@@ -105,8 +105,10 @@ const useCountStepTable = ({
     return {};
   };
 
-  // this function is required because there is a problem with getValue
-  const getValueToDisplay = (columnPath, value) => {
+  /**
+   * Override the behaviour of getValue when displaying fields on the confirmation step.
+   */
+  const getNonEditableValueToDisplay = (columnPath, value) => {
     if (columnPath === cycleCountColumn.EXPIRATION_DATE) {
       return formatLocalizedDate(value, DateFormat.DD_MMM_YYYY);
     }
@@ -122,6 +124,17 @@ const useCountStepTable = ({
     return value;
   };
 
+  /**
+   Override the behaviour of getValue when displaying fields on the count step.
+   */
+  const getValueToDisplay = (columnPath, value) => {
+    if (columnPath === cycleCountColumn.BIN_LOCATION && showBinLocation) {
+      return { ...value, name: getBinLocationToDisplay(value) };
+    }
+
+    return value;
+  };
+
   const defaultColumn = {
     cell: ({
       row: { original, index }, column: { id }, table,
@@ -129,6 +142,7 @@ const useCountStepTable = ({
       const columnPath = id.replaceAll('_', '.');
       const initialValue = _.get(tableData, `[${index}].${columnPath}`);
       const [value, setValue] = useState(initialValue);
+      const showTooltip = columnPath === cycleCountColumn.BIN_LOCATION;
 
       const isFieldDisabled = !original.id.includes('newRow') && ![
         cycleCountColumn.QUANTITY_COUNTED,
@@ -138,8 +152,13 @@ const useCountStepTable = ({
       // We shouldn't allow users edit fetched data (only quantity counted and comment are editable)
       if (!isStepEditable) {
         return (
-          <TableCell className="static-cell-count-step d-flex align-items-center">
-            {getValueToDisplay(columnPath, value)}
+          <TableCell
+            className="static-cell-count-step d-flex align-items-center"
+            tooltip={showTooltip}
+            tooltipForm={showTooltip}
+            tooltipLabel={getBinLocationToDisplay(value) || translate('react.cycleCount.table.binLocation.label', 'Bin Location')}
+          >
+            {getNonEditableValueToDisplay(columnPath, value)}
           </TableCell>
         );
       }
@@ -194,7 +213,6 @@ const useCountStepTable = ({
       const type = getFieldType(columnPath);
       const Component = getFieldComponent(columnPath);
       const fieldProps = getFieldProps(columnPath, value, isFieldDisabled);
-      const showTooltip = columnPath === cycleCountColumn.BIN_LOCATION;
 
       // Columns allowed for focus in new rows
       const newRowFocusableCells = [
@@ -239,7 +257,7 @@ const useCountStepTable = ({
           <Component
             disabled={isFieldDisabled}
             type={type}
-            value={value}
+            value={getValueToDisplay(columnPath, value)}
             onChange={onChange}
             onBlur={onBlur}
             className={`m-1 hide-arrows ${showTooltip ? 'w-99' : 'w-75'} ${error && 'border border-danger input-has-error'}`}
@@ -269,7 +287,6 @@ const useCountStepTable = ({
 
   const columns = [
     columnHelper.accessor(
-      // TODO: This doesn't seem to do anything?????? How to change the value???
       (row) => getBinLocationToDisplay(row?.binLocation), {
         id: cycleCountColumn.BIN_LOCATION,
         header: () => (

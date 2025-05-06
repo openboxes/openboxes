@@ -164,8 +164,10 @@ const useResolveStepTable = ({
     return null;
   };
 
-  // this function is required because there is a problem w getValue
-  const getValueToDisplay = (id, value) => {
+  /**
+   * Override the behaviour of getValue when displaying fields on the confirmation step.
+   */
+  const getNonEditableValueToDisplay = (id, value) => {
     if (id === cycleCountColumn.EXPIRATION_DATE) {
       return formatLocalizedDate(value, DateFormat.DD_MMM_YYYY);
     }
@@ -174,12 +176,23 @@ const useResolveStepTable = ({
       return value?.toString();
     }
 
-    if (id === cycleCountColumn.BIN_LOCATION) {
+    if (id === cycleCountColumn.BIN_LOCATION && showBinLocation) {
       return getBinLocationToDisplay(value);
     }
 
     if (id === cycleCountColumn.ROOT_CAUSE) {
       return value?.label;
+    }
+
+    return value;
+  };
+
+  /**
+   Override the behaviour of getValue when displaying fields on the count step.
+   */
+  const getValueToDisplay = (id, value) => {
+    if (id === cycleCountColumn.BIN_LOCATION && showBinLocation) {
+      return { ...value, name: getBinLocationToDisplay(value) };
     }
 
     return value;
@@ -193,6 +206,10 @@ const useResolveStepTable = ({
       const initialValue = _.get(tableData, `[${index}].${columnPath}`);
       // Keep and update the state of the cell during rerenders
       const [value, setValue] = useState(initialValue);
+      const showTooltip = [
+        cycleCountColumn.ROOT_CAUSE,
+        cycleCountColumn.BIN_LOCATION,
+      ].includes(id);
 
       const isFieldDisabled = !original.id.includes('newRow')
         && ![
@@ -215,9 +232,12 @@ const useResolveStepTable = ({
           >
             <TableCell
               className="static-cell-count-step align-items-center resolve-table-limit-lines"
+              tooltip={showTooltip}
+              tooltipForm={showTooltip}
+              tooltipLabel={getBinLocationToDisplay(value) || translate('react.cycleCount.table.binLocation.label', 'Bin Location')}
             >
               <div className={showStaticTooltip ? 'limit-lines-1' : 'limit-lines-3 text-break'}>
-                {getValueToDisplay(columnPath, value)}
+                {getNonEditableValueToDisplay(columnPath, value)}
               </div>
             </TableCell>
           </CustomTooltip>
@@ -326,21 +346,17 @@ const useResolveStepTable = ({
         cycleCountColumn.COMMENT,
         cycleCountColumn.EXPIRATION_DATE,
       ].includes(columnPath);
-      const showTooltip = [
-        cycleCountColumn.ROOT_CAUSE,
-        cycleCountColumn.BIN_LOCATION,
-      ].includes(id);
       return (
         <TableCell
           className="rt-td rt-td-count-step pb-0"
-          customTooltip={showTooltip && getValueToDisplay(columnPath, value)}
+          customTooltip={showTooltip && getNonEditableValueToDisplay(columnPath, value)}
           tooltipClassname="w-100"
-          tooltipLabel={getValueToDisplay(columnPath, value)}
+          tooltipLabel={getNonEditableValueToDisplay(columnPath, value)}
         >
           <Component
             disabled={isFieldDisabled}
             type={type}
-            value={value}
+            value={getValueToDisplay(columnPath, value)}
             onChange={onChange}
             onBlur={onBlur}
             className={`${isAutoWidth ? 'w-auto' : 'w-75'} m-1 hide-arrows ${error && 'border border-danger input-has-error'}`}
@@ -371,7 +387,6 @@ const useResolveStepTable = ({
 
   const columns = [
     columnHelper.accessor(
-      // TODO: This doesn't seem to do anything?????? How to change the value???
       (row) => getBinLocationToDisplay(row?.binLocation), {
         id: cycleCountColumn.BIN_LOCATION,
         header: useMemo(() => (

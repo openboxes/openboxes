@@ -2,9 +2,13 @@ import React from 'react';
 
 import _ from 'lodash';
 
-// Stringify a bin location for display, prepending the bin's zone if it has one.
+/**
+ * Stringify a bin location for display, prepending the bin's zone if it has one and the zone
+ * isn't already prepended.
+ */
 const getBinLocationToDisplay = (bin) => (
-  bin?.zoneName == null ? bin?.name : `${bin?.zoneName}: ${bin?.name}`
+  (bin?.zoneName == null || bin?.name.startsWith(`${bin?.zoneName}: `))
+    ? bin?.name : `${bin?.zoneName}: ${bin?.name}`
 );
 
 const groupBinLocationsByZone = (binLocations, translate) => {
