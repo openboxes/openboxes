@@ -70,7 +70,8 @@ const useInventoryTransactionsTab = () => {
         );
       },
       meta: {
-        flexWidth: 120,
+        width: 160,
+        fixed: true,
       },
     }),
     columnHelper.accessor(cycleCountColumn.PRODUCT, {
@@ -98,7 +99,8 @@ const useInventoryTransactionsTab = () => {
         );
       },
       meta: {
-        flexWidth: 240,
+        width: 300,
+        fixed: true,
       },
     }),
     columnHelper.accessor(cycleCountColumn.TRANSACTION_TYPE, {
@@ -118,7 +120,8 @@ const useInventoryTransactionsTab = () => {
         </TableCell>
       ),
       meta: {
-        flexWidth: 150,
+        width: 175,
+        fixed: true,
       },
     }),
     columnHelper.accessor(cycleCountColumn.RECORDED, {
@@ -139,7 +142,8 @@ const useInventoryTransactionsTab = () => {
         </div>
       ),
       meta: {
-        flexWidth: 130,
+        width: 175,
+        fixed: true,
       },
     }),
     columnHelper.accessor(cycleCountColumn.TRANSACTION_ID, {
@@ -149,7 +153,11 @@ const useInventoryTransactionsTab = () => {
         </TableHeaderCell>
       ),
       meta: {
-        flexWidth: 130,
+        width: 175,
+        getCellContext: () => ({
+          className: 'split-table-right',
+        }),
+        fixed: true,
       },
       cell: ({ getValue }) => (
         <TableCell
@@ -171,7 +179,7 @@ const useInventoryTransactionsTab = () => {
         </TableHeaderCell>
       ),
       meta: {
-        flexWidth: 130,
+        width: 175,
       },
       cell: ({ getValue }) => (
         <TableCell
@@ -189,7 +197,7 @@ const useInventoryTransactionsTab = () => {
           </TableHeaderCell>
         ),
         meta: {
-          flexWidth: 120,
+          width: 175,
         },
         cell: ({ getValue }) => (
           <TableCell
@@ -235,7 +243,7 @@ const useInventoryTransactionsTab = () => {
         );
       },
       meta: {
-        flexWidth: 120,
+        width: 160,
       },
     }),
     columnHelper.accessor(cycleCountColumn.ROOT_CAUSES, {
@@ -245,7 +253,7 @@ const useInventoryTransactionsTab = () => {
         </TableHeaderCell>
       ),
       meta: {
-        flexWidth: 200,
+        width: 250,
       },
       cell: ({ getValue }) => (
         <TableCell
@@ -266,7 +274,7 @@ const useInventoryTransactionsTab = () => {
         </TableHeaderCell>
       ),
       meta: {
-        flexWidth: 200,
+        width: 250,
       },
       cell: ({ getValue }) => (
         <TableCell

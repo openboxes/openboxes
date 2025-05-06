@@ -148,8 +148,7 @@ const useAllProductsTab = ({
       getCellContext: () => ({
         className: 'checkbox-column',
       }),
-      width: 100,
-      fixed: true,
+      flexWidth: 40,
     },
   });
 
@@ -169,8 +168,7 @@ const useAllProductsTab = ({
       </TableCell>
     ),
     meta: {
-      width: 500,
-      fixed: true,
+      flexWidth: 180,
     },
   });
 
@@ -195,11 +193,7 @@ const useAllProductsTab = ({
         </TableCell>
       ),
       meta: {
-        width: 500,
-        fixed: true,
-        getCellContext: () => ({
-          className: 'split-table-right',
-        }),
+        flexWidth: 370,
       },
     }),
     columnHelper.accessor(cycleCountColumn.CATEGORY_NAME, {
@@ -218,7 +212,7 @@ const useAllProductsTab = ({
         </TableCell>
       ),
       meta: {
-        width: 200,
+        flexWidth: 200,
       },
     }),
     columnHelper.accessor(cycleCountColumn.INTERNAL_LOCATIONS, {
@@ -248,18 +242,18 @@ const useAllProductsTab = ({
               </div>
             ))}
             {hiddenBinLocationsLength && (
-            <p>
-              +
-              {hiddenBinLocationsLength}
-              {' '}
-              more
-            </p>
+              <p>
+                +
+                {hiddenBinLocationsLength}
+                {' '}
+                more
+              </p>
             )}
           </TableCell>
         );
       },
       meta: {
-        width: 200,
+        flexWidth: 200,
       },
     }),
     columnHelper.accessor((row) =>
@@ -278,7 +272,7 @@ const useAllProductsTab = ({
         </TableCell>
       ),
       meta: {
-        width: 200,
+        flexWidth: 200,
       },
     }),
     columnHelper.accessor((row) =>
@@ -297,7 +291,7 @@ const useAllProductsTab = ({
         </TableCell>
       ),
       meta: {
-        width: 200,
+        flexWidth: 200,
       },
     }),
     columnHelper.accessor(cycleCountColumn.ABC_CLASS, {
@@ -312,7 +306,7 @@ const useAllProductsTab = ({
         </TableCell>
       ),
       meta: {
-        width: 1500,
+        flexWidth: 150,
       },
     }),
     columnHelper.accessor(cycleCountColumn.QUANTITY_ON_HAND, {
@@ -327,7 +321,7 @@ const useAllProductsTab = ({
         </TableCell>
       ),
       meta: {
-        width: 1500,
+        flexWidth: 150,
       },
     }),
   ], [currentLocale, sort, order]);
