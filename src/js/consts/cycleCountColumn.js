@@ -20,6 +20,15 @@ const columns = {
   ABC_CLASS: 'abcClass',
   QUANTITY_ON_HAND: 'quantityOnHand',
   STATUS: 'status',
+  ALIGNMENT: 'alignment',
+  TRANSACTION_TYPE: 'cycleCount.transactionType',
+  RECORDED: 'cycleCount.dateRecorded',
+  TRANSACTION_ID: 'cycleCount.transactionNumber',
+  QTY_BEFORE: 'blindCount.quantityOnHand',
+  QTY_AFTER: 'verificationCount.quantityCounted',
+  DIFFERENCE: 'difference',
+  ROOT_CAUSES: 'verificationCount.varianceReasonCode',
+  COMMENTS: 'verificationCount.varianceComment',
 };
 
 export default columns;

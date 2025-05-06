@@ -8,6 +8,7 @@ import {
   INVENTORY_TRANSACTIONS_TAB,
   PRODUCTS_TAB,
 } from 'consts/cycleCount';
+import useCycleCountPagination from 'hooks/useCycleCountPagination';
 import useQueryParams from 'hooks/useQueryParams';
 import useSwitchTabs from 'hooks/useSwitchTabs';
 import useTranslation from 'hooks/useTranslation';
@@ -15,9 +16,12 @@ import PageWrapper from 'wrappers/PageWrapper';
 
 import 'components/cycleCount/cycleCount.scss';
 
-const CycleCount = () => {
+const CycleCountReporting = () => {
   const { switchTab } = useSwitchTabs({ defaultTab: PRODUCTS_TAB });
   useTranslation('cycleCount');
+
+  // After applying filters, add them as an argument to the hook below
+  const tablePaginationProps = useCycleCountPagination({});
 
   const tabs = {
     [PRODUCTS_TAB]: {
@@ -48,11 +52,15 @@ const CycleCount = () => {
         )}
 
         {tab === INVENTORY_TRANSACTIONS_TAB && (
-          <InventoryTransactionsTab />
+          // After applying filters, add them as a param to that component
+          <InventoryTransactionsTab
+            tablePaginationProps={tablePaginationProps}
+            filterParams={{}}
+          />
         )}
       </div>
     </PageWrapper>
   );
 };
 
-export default CycleCount;
+export default CycleCountReporting;
