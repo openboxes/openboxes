@@ -206,10 +206,6 @@ const useResolveStepTable = ({
       const initialValue = _.get(tableData, `[${index}].${columnPath}`);
       // Keep and update the state of the cell during rerenders
       const [value, setValue] = useState(initialValue);
-      const showTooltip = [
-        cycleCountColumn.ROOT_CAUSE,
-        cycleCountColumn.BIN_LOCATION,
-      ].includes(id);
 
       const isFieldDisabled = !original.id.includes('newRow')
         && ![
@@ -232,9 +228,6 @@ const useResolveStepTable = ({
           >
             <TableCell
               className="static-cell-count-step align-items-center resolve-table-limit-lines"
-              tooltip={showTooltip}
-              tooltipForm={showTooltip}
-              tooltipLabel={getBinLocationToDisplay(value) || translate('react.cycleCount.table.binLocation.label', 'Bin Location')}
             >
               <div className={showStaticTooltip ? 'limit-lines-1' : 'limit-lines-3 text-break'}>
                 {getNonEditableValueToDisplay(columnPath, value)}
@@ -346,6 +339,10 @@ const useResolveStepTable = ({
         cycleCountColumn.COMMENT,
         cycleCountColumn.EXPIRATION_DATE,
       ].includes(columnPath);
+      const showTooltip = [
+        cycleCountColumn.ROOT_CAUSE,
+        cycleCountColumn.BIN_LOCATION,
+      ].includes(id);
       return (
         <TableCell
           className="rt-td rt-td-count-step pb-0"
