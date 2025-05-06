@@ -277,8 +277,9 @@ const useCountStepTable = ({
           </TableHeaderCell>
         ),
         meta: {
-          flexWidth: 100,
+          width: 1000,
           hide: !showBinLocation,
+          fixed: true,
         },
       },
     ),
@@ -289,7 +290,7 @@ const useCountStepTable = ({
         </TableHeaderCell>
       ),
       meta: {
-        flexWidth: 100,
+        width: 1000,
       },
     }),
     columnHelper.accessor(cycleCountColumn.EXPIRATION_DATE, {
@@ -299,7 +300,7 @@ const useCountStepTable = ({
         </TableHeaderCell>
       ),
       meta: {
-        flexWidth: 100,
+        width: 1000,
         getCellContext: () => ({
           className: 'split-table-right',
         }),
@@ -312,7 +313,7 @@ const useCountStepTable = ({
         </TableHeaderCell>
       ),
       meta: {
-        flexWidth: 50,
+        width: 50,
       },
     }),
     columnHelper.accessor(cycleCountColumn.COMMENT, {
@@ -322,7 +323,7 @@ const useCountStepTable = ({
         </TableHeaderCell>
       ),
       meta: {
-        flexWidth: 100,
+        width: 1000,
       },
     }),
     columnHelper.accessor(null, {
@@ -357,7 +358,7 @@ const useCountStepTable = ({
         getCellContext: () => ({
           className: 'count-step-actions',
         }),
-        flexWidth: 25,
+        width: 25,
       },
     }),
   ];

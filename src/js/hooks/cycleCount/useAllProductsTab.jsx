@@ -148,7 +148,8 @@ const useAllProductsTab = ({
       getCellContext: () => ({
         className: 'checkbox-column',
       }),
-      flexWidth: 40,
+      width: 100,
+      fixed: true,
     },
   });
 
@@ -168,7 +169,8 @@ const useAllProductsTab = ({
       </TableCell>
     ),
     meta: {
-      flexWidth: 180,
+      width: 500,
+      fixed: true,
     },
   });
 
@@ -193,7 +195,11 @@ const useAllProductsTab = ({
         </TableCell>
       ),
       meta: {
-        flexWidth: 370,
+        width: 500,
+        fixed: true,
+        getCellContext: () => ({
+          className: 'split-table-right',
+        }),
       },
     }),
     columnHelper.accessor(cycleCountColumn.CATEGORY_NAME, {
@@ -212,7 +218,7 @@ const useAllProductsTab = ({
         </TableCell>
       ),
       meta: {
-        flexWidth: 200,
+        width: 200,
       },
     }),
     columnHelper.accessor(cycleCountColumn.INTERNAL_LOCATIONS, {
@@ -253,7 +259,7 @@ const useAllProductsTab = ({
         );
       },
       meta: {
-        flexWidth: 200,
+        width: 200,
       },
     }),
     columnHelper.accessor((row) =>
@@ -272,7 +278,7 @@ const useAllProductsTab = ({
         </TableCell>
       ),
       meta: {
-        flexWidth: 200,
+        width: 200,
       },
     }),
     columnHelper.accessor((row) =>
@@ -291,7 +297,7 @@ const useAllProductsTab = ({
         </TableCell>
       ),
       meta: {
-        flexWidth: 200,
+        width: 200,
       },
     }),
     columnHelper.accessor(cycleCountColumn.ABC_CLASS, {
@@ -306,7 +312,7 @@ const useAllProductsTab = ({
         </TableCell>
       ),
       meta: {
-        flexWidth: 150,
+        width: 1500,
       },
     }),
     columnHelper.accessor(cycleCountColumn.QUANTITY_ON_HAND, {
@@ -321,7 +327,7 @@ const useAllProductsTab = ({
         </TableCell>
       ),
       meta: {
-        flexWidth: 150,
+        width: 1500,
       },
     }),
   ], [currentLocale, sort, order]);

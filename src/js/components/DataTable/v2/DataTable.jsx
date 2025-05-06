@@ -54,14 +54,14 @@ const DataTable = ({
             rowModel={table.getRowModel()}
             dataLength={data?.length}
           />
-          {shouldDisplayPagination && (
+        </div>
+        {shouldDisplayPagination && (
           <DataTableFooter
             footerComponent={footerComponent}
             totalData={totalCount}
             {...paginationProps}
           />
-          )}
-        </div>
+        )}
       </div>
     </div>
   );
