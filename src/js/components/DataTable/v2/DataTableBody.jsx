@@ -55,7 +55,6 @@ const DataTableBody = ({
                   if (fixed) {
                     fixedOffset += width || 0;
                   }
-
                   return (
                     <div
                       className={`d-flex ${className}`}
@@ -64,7 +63,7 @@ const DataTableBody = ({
                         width: width && `${width}px`,
                         flexShrink: width && 0,
                         position: fixed && 'sticky',
-                        left: leftPosition && `${leftPosition}px`,
+                        left: leftPosition !== undefined && `${leftPosition}px`,
                         zIndex: fixed && 1,
                         background: width && 'white',
                       }}
