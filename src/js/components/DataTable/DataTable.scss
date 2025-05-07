@@ -14,18 +14,12 @@
   border: none;
   border-radius: 4px;
 
-  &.hide-data .rt-tbody,
-  &.hide-data .rt-tbody-v2 {
+  &.hide-data .rt-tbody {
     display: none;
   }
 
   .rt-table {
     font-size: 14px;
-    .split-table-right {
-      box-shadow: 0 0 15px #00000040;
-      clip-path: inset(0 -15px 0 0);
-      margin-right: 5px;
-    }
 
     &::-webkit-scrollbar {
       width: 0.5em;
@@ -106,7 +100,7 @@
 
     }
 
-    .rt-tbody, .rt-tbody-v2 {
+    .rt-tbody {
       .rt-tr-group {
         border-bottom: 1px solid var(--gray-100);
       }
