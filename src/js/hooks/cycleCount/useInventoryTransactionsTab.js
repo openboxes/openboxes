@@ -179,7 +179,7 @@ const useInventoryTransactionsTab = () => {
         </TableHeaderCell>
       ),
       meta: {
-        width: 175,
+        width: 145,
       },
       cell: ({ getValue }) => (
         <TableCell
@@ -197,7 +197,7 @@ const useInventoryTransactionsTab = () => {
           </TableHeaderCell>
         ),
         meta: {
-          width: 175,
+          width: 145,
         },
         cell: ({ getValue }) => (
           <TableCell
@@ -274,7 +274,7 @@ const useInventoryTransactionsTab = () => {
         </TableHeaderCell>
       ),
       meta: {
-        width: 260,
+        width: 280,
       },
       cell: ({ getValue }) => (
         <TableCell
