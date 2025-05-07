@@ -1,33 +1,37 @@
-/* eslint-disable */
 import React, { useMemo } from 'react';
 
 import { createColumnHelper } from '@tanstack/react-table';
 import _ from 'lodash';
 import { useSelector } from 'react-redux';
 
+import { CYCLE_COUNT_DETAILS_REPORT } from 'api/urls';
 import { TableCell } from 'components/DataTable';
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
 import ValueIndicator from 'components/DataTable/v2/ValueIndicator';
 import { INVENTORY_ITEM_URL, INVENTORY_URL } from 'consts/applicationUrls';
 import cycleCountColumn from 'consts/cycleCountColumn';
-import inventoryTransactionsData from 'consts/inventoryTransactionsData.json';
 import { DateFormat } from 'consts/timeFormat';
 import transactionType from 'consts/transactionType';
 import valueIndicatorVariant, {
-  getCycleCountDifferencesVariant
+  getCycleCountDifferencesVariant,
 } from 'consts/valueIndicatorVariant';
+import useTableDataV2 from 'hooks/useTableDataV2';
 import useTableSorting from 'hooks/useTableSorting';
 import useTranslate from 'hooks/useTranslate';
 import dateWithoutTimeZone from 'utils/dateUtils';
 
-const useInventoryTransactionsTab = () => {
+const useInventoryTransactionsTab = ({
+  filterParams,
+}) => {
   const columnHelper = createColumnHelper();
   const translate = useTranslate();
 
   const {
     currentLocale,
+    currentLocation,
   } = useSelector((state) => ({
     currentLocale: state.session.activeLanguage,
+    currentLocation: state.session.currentLocation,
   }));
 
   const {
@@ -35,6 +39,28 @@ const useInventoryTransactionsTab = () => {
     sort,
     order,
   } = useTableSorting();
+
+  const getParams = () => ({
+    facility: currentLocation?.id,
+  });
+
+  const {
+    tableData,
+    loading,
+  } = useTableDataV2({
+    url: CYCLE_COUNT_DETAILS_REPORT,
+    errorMessageId: 'react.cycleCount.table.errorMessage.label',
+    defaultErrorMessage: 'Unable to fetch products',
+    // We should start fetching after initializing the filters to avoid re-fetching
+    shouldFetch: true, // filterParams.tab && tab === filterParams.tab,
+    getParams,
+    pageSize: 5,
+    offset: 0,
+    sort,
+    order,
+    searchTerm: null,
+    filterParams,
+  });
 
   const columns = useMemo(() => [
     columnHelper.accessor(cycleCountColumn.ALIGNMENT, {
@@ -46,16 +72,14 @@ const useInventoryTransactionsTab = () => {
       cell: ({
         row: {
           original: {
-            quantity_on_hand_after,
-            quantity_on_hand_before
-          }
-        }
+            quantityVariance,
+          },
+        },
       }) => {
-        const quantityVariance = quantity_on_hand_before - quantity_on_hand_after;
         if (quantityVariance === 0) {
           return (
             <div className="rt-td d-flex align-items-start">
-              <ValueIndicator variant={valueIndicatorVariant.EQUAL}/>
+              <ValueIndicator variant={valueIndicatorVariant.EQUAL} />
             </div>
           );
         }
@@ -65,7 +89,7 @@ const useInventoryTransactionsTab = () => {
           : valueIndicatorVariant.MORE;
         return (
           <div className="rt-td d-flex align-items-start">
-            <ValueIndicator variant={variant}/>
+            <ValueIndicator variant={variant} />
           </div>
         );
       },
@@ -82,21 +106,25 @@ const useInventoryTransactionsTab = () => {
       cell: ({
         row: {
           original: {
-            product_code,
-            product_name,
-            product_id,
-          }
-        }
-      }) => {
-        return (
-          <TableCell
-            link={INVENTORY_ITEM_URL.showStockCard(product_id)}
-            className="rt-td multiline-cell"
-          >
-            {product_code} {product_name}
-          </TableCell>
-        );
-      },
+            inventoryItem: {
+              product: {
+                id,
+                name,
+                productCode,
+              },
+            },
+          },
+        },
+      }) => (
+        <TableCell
+          link={INVENTORY_ITEM_URL.showStockCard(id)}
+          className="rt-td multiline-cell"
+        >
+          {productCode}
+          {' '}
+          {name}
+        </TableCell>
+      ),
       meta: {
         flexWidth: 240,
       },
@@ -127,12 +155,12 @@ const useInventoryTransactionsTab = () => {
           {translate('react.cycleCount.inventoryTransactionsTable.recorded.label', 'Recorded')}
         </TableHeaderCell>
       ),
-      cell: ({ getValue }) => (
+      cell: ({ row: { original: { dateCounted } } }) => (
         <div className="rt-td d-flex flex-column">
           <span className="font-weight-500">Devon Lane</span>
           <span>
             {dateWithoutTimeZone({
-              date: getValue(),
+              date: dateCounted,
               outputDateFormat: DateFormat.MM_DD_YYYY,
             })}
           </span>
@@ -162,7 +190,7 @@ const useInventoryTransactionsTab = () => {
             .join('-')
             .toUpperCase()}
         </TableCell>
-      )
+      ),
     }),
     columnHelper.accessor(cycleCountColumn.QTY_BEFORE, {
       header: () => (
@@ -180,27 +208,26 @@ const useInventoryTransactionsTab = () => {
           {getValue()
             .toString()}
         </TableCell>
-      )
+      ),
     }),
     columnHelper.accessor(cycleCountColumn.QTY_AFTER, {
-        header: () => (
-          <TableHeaderCell sortable columnId={cycleCountColumn.QTY_AFTER} {...sortableProps}>
-            {translate('react.cycleCount.inventoryTransactionsTable.qtyAfter.label', 'Qty After')}
-          </TableHeaderCell>
-        ),
-        meta: {
-          flexWidth: 120,
-        },
-        cell: ({ getValue }) => (
-          <TableCell
-            className="rt-td d-flex justify-content-end"
-          >
-            {getValue()
-              ?.toString()}
-          </TableCell>
-        )
-      }
-    ),
+      header: () => (
+        <TableHeaderCell sortable columnId={cycleCountColumn.QTY_AFTER} {...sortableProps}>
+          {translate('react.cycleCount.inventoryTransactionsTable.qtyAfter.label', 'Qty After')}
+        </TableHeaderCell>
+      ),
+      meta: {
+        flexWidth: 120,
+      },
+      cell: ({ getValue }) => (
+        <TableCell
+          className="rt-td d-flex justify-content-end"
+        >
+          {getValue()
+            ?.toString()}
+        </TableCell>
+      ),
+    }),
     columnHelper.accessor(cycleCountColumn.DIFFERENCE, {
       header: () => (
         <TableHeaderCell sortable columnId={cycleCountColumn.DIFFERENCE} {...sortableProps}>
@@ -210,27 +237,34 @@ const useInventoryTransactionsTab = () => {
       cell: ({
         row: {
           original: {
-            quantity_on_hand_after,
-            quantity_on_hand_before
-          }
-        }
+            quantityVariance,
+            quantityOnHand,
+            quantityCounted,
+          },
+        },
       }) => {
-        const difference = quantity_on_hand_after - quantity_on_hand_before;
-        const variant = getCycleCountDifferencesVariant(difference, quantity_on_hand_before);
+        const variant = getCycleCountDifferencesVariant(quantityVariance, quantityOnHand);
         const percentageValue = Math.round(
-          (Math.abs(difference) / (quantity_on_hand_after || quantity_on_hand_before)) * 1000
+          (Math.abs(quantityVariance) / (quantityCounted || quantityOnHand)) * 1000,
         ) / 10;
-        const className = difference > 0 ? 'value-indicator--more' : 'value-indicator--less';
+        const className = quantityVariance > 0 ? 'value-indicator--more' : 'value-indicator--less';
 
         return (
           <TableCell className="rt-td d-flex flex-column align-items-center">
             <ValueIndicator
-              className={`pr-2 pl-1 py-1 value-indicator ${difference !== 0 && className}`}
-              value={difference}
+              className={`pr-2 pl-1 py-1 value-indicator ${quantityVariance !== 0 && className}`}
+              value={quantityVariance}
               variant={variant}
               showAbsoluteValue
             />
-            {variant !== valueIndicatorVariant.EQUAL && <p>({percentageValue} %)</p>}
+            {variant !== valueIndicatorVariant.EQUAL && (
+            <p>
+              (
+              {percentageValue}
+              {' '}
+              %)
+            </p>
+            )}
           </TableCell>
         );
       },
@@ -257,7 +291,7 @@ const useInventoryTransactionsTab = () => {
             {_.capitalize(getValue())}
           </div>
         </TableCell>
-      )
+      ),
     }),
     columnHelper.accessor(cycleCountColumn.COMMENTS, {
       header: () => (
@@ -278,7 +312,7 @@ const useInventoryTransactionsTab = () => {
             {getValue()}
           </div>
         </TableCell>
-      )
+      ),
     }),
   ], [currentLocale, sort, order]);
 
@@ -293,12 +327,8 @@ const useInventoryTransactionsTab = () => {
 
   return {
     columns,
-    // Those two properties should be returned from hook making API calls
-    tableData: {
-      totalCount: inventoryTransactionsData.length,
-      data: _.take(inventoryTransactionsData, 5)
-    },
-    loading: false,
+    tableData,
+    loading,
     emptyTableMessage,
     exportData,
   };

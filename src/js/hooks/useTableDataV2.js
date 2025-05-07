@@ -72,7 +72,7 @@ const useTableDataV2 = ({
       fetchData();
     }
   }, [
-    filterParams,
+    // filterParams,
     pageSize,
     offset,
     sort,

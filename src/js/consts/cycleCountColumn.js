@@ -25,12 +25,12 @@ const columns = {
   // fix after getting appropriate property in response
   RECORDED: 'date_counted',
   // fix after getting appropriate property in response
-  TRANSACTION_ID: 'cycle_count_id',
+  TRANSACTION_ID: 'inventoryItem.id',
   // fix after getting appropriate property in response
-  QTY_BEFORE: 'quantity_on_hand_before',
-  QTY_AFTER: 'quantity_on_hand_after',
+  QTY_BEFORE: 'quantityOnHand',
+  QTY_AFTER: 'quantityCounted',
   DIFFERENCE: 'difference',
-  ROOT_CAUSES: 'root_cause',
+  ROOT_CAUSES: 'rootCause',
   COMMENTS: 'comments',
 };
 

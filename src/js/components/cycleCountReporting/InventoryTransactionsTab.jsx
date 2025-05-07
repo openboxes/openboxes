@@ -22,7 +22,9 @@ const InventoryTransactionsTab = ({
     loading,
     emptyTableMessage,
     exportData,
-  } = useInventoryTransactionsTab();
+  } = useInventoryTransactionsTab({
+    filterParams,
+  });
 
   useEffect(() => {
     setTotalCount(tableData.totalCount);
