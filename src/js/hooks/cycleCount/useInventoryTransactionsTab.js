@@ -70,7 +70,7 @@ const useInventoryTransactionsTab = () => {
         );
       },
       meta: {
-        width: 160,
+        width: 145,
         fixed: true,
       },
     }),
@@ -99,7 +99,7 @@ const useInventoryTransactionsTab = () => {
         );
       },
       meta: {
-        width: 300,
+        width: 280,
         fixed: true,
       },
     }),
@@ -120,7 +120,7 @@ const useInventoryTransactionsTab = () => {
         </TableCell>
       ),
       meta: {
-        width: 200,
+        width: 145,
         fixed: true,
       },
     }),
@@ -142,7 +142,7 @@ const useInventoryTransactionsTab = () => {
         </div>
       ),
       meta: {
-        width: 175,
+        width: 145,
         fixed: true,
       },
     }),
@@ -153,7 +153,7 @@ const useInventoryTransactionsTab = () => {
         </TableHeaderCell>
       ),
       meta: {
-        width: 175,
+        width: 145,
         getCellContext: () => ({
           className: 'split-table-right',
         }),
@@ -253,7 +253,7 @@ const useInventoryTransactionsTab = () => {
         </TableHeaderCell>
       ),
       meta: {
-        width: 250,
+        width: 260,
       },
       cell: ({ getValue }) => (
         <TableCell
@@ -274,7 +274,7 @@ const useInventoryTransactionsTab = () => {
         </TableHeaderCell>
       ),
       meta: {
-        width: 250,
+        width: 260,
       },
       cell: ({ getValue }) => (
         <TableCell

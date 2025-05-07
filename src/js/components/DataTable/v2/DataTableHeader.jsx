@@ -37,7 +37,6 @@ const DataTableHeader = ({ headerGroups }) => {
                 style={{
                   flex: !width && flexWidth,
                   width: width && `${width}px`,
-                  flexShrink: width && 0,
                   position: fixed && 'sticky',
                   left: leftPosition !== undefined && `${leftPosition}px`,
                   zIndex: fixed && 1,

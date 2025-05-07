@@ -20,6 +20,7 @@
   }
 
   .rt-table {
+    font-size: 14px;
     .split-table-right {
       box-shadow: 0 0 15px #00000040;
       clip-path: inset(0 -15px 0 0);
@@ -106,7 +107,6 @@
     }
 
     .rt-tbody, .rt-tbody-v2 {
-      font-size: 14px;
       .rt-tr-group {
         border-bottom: 1px solid var(--gray-100);
       }
