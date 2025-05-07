@@ -3,32 +3,56 @@ import React from 'react';
 import { flexRender } from '@tanstack/react-table';
 import PropTypes from 'prop-types';
 
-const DataTableHeader = ({ headerGroups }) => (
-  <div className="rt-thead -header">
-    <div className="rt-tr">
-      {headerGroups
-        .map((headerGroup) => (
+import useTableColumnMeta from 'hooks/useTableColumnMeta';
+import useTableTotalWidth from 'hooks/useTableTotalWidth';
+
+const DataTableHeader = ({ headerGroups }) => {
+  let fixedOffset = 0;
+  const totalWidth = useTableTotalWidth(headerGroups[0]?.headers || []);
+
+  return (
+    <div
+      className="rt-thead -header"
+      style={{ width: totalWidth ? 'fit-content' : 'auto' }}
+    >
+      <div className="rt-tr">
+        {headerGroups.map((headerGroup) =>
           headerGroup.headers.map((header) => {
-            if (header.column.columnDef?.meta?.hide) {
+            const {
+              hide, width, flexWidth, fixed, className,
+            } = useTableColumnMeta(header.column);
+            if (hide) {
               return null;
             }
-            const className = header.column.columnDef.meta?.getCellContext?.().className;
-            const flexWidth = header.column.columnDef.meta?.flexWidth || 1;
+
+            const leftPosition = fixed ? fixedOffset : undefined;
+            if (fixed) {
+              fixedOffset += width || 0;
+            }
+
             return (
-              <div style={{ flex: flexWidth }} className={`header-cell ${className ?? ''}`} key={header.id}>
+              <div
+                key={header.id}
+                className={`header-cell ${className}`}
+                style={{
+                  flex: !width && flexWidth,
+                  width: width && `${width}px`,
+                  position: fixed && 'sticky',
+                  left: leftPosition !== undefined && `${leftPosition}px`,
+                  zIndex: fixed && 1,
+                }}
+              >
                 {flexRender(header.column.columnDef.header, header.getContext())}
               </div>
             );
-          })
-        ))}
+          }))}
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 export default DataTableHeader;
 
 DataTableHeader.propTypes = {
-  headerGroups: PropTypes.arrayOf(
-    PropTypes.shape({}),
-  ).isRequired,
+  headerGroups: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
 };

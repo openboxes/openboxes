@@ -89,12 +89,6 @@ limit-lines($lines-number) {
 
 .count-step-table {
 
-  .split-table-right {
-    box-shadow: 0 0 15px #00000040;
-    clip-path: inset(0 -15px 0 0);
-    margin-right: 5px;
-  }
-
   .count-step-actions {
     width: 50px !important;
     align-items: center;
