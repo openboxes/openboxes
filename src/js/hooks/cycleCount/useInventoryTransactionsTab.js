@@ -120,7 +120,7 @@ const useInventoryTransactionsTab = () => {
         </TableCell>
       ),
       meta: {
-        width: 175,
+        width: 200,
         fixed: true,
       },
     }),
@@ -243,7 +243,7 @@ const useInventoryTransactionsTab = () => {
         );
       },
       meta: {
-        width: 160,
+        width: 175,
       },
     }),
     columnHelper.accessor(cycleCountColumn.ROOT_CAUSES, {

@@ -5,7 +5,8 @@ import PropTypes from 'prop-types';
 
 import TableRow from 'components/DataTable/TableRow';
 import DataTableStatus from 'components/DataTable/v2/DataTableStatus';
-import useColumnMeta from 'hooks/useColumnMeta';
+import useTableColumnMeta from 'hooks/useTableColumnMeta';
+import useTableTotalWidth from 'hooks/useTableTotalWidth';
 
 const DataTableBody = ({
   emptyTableMessage,
@@ -16,15 +17,9 @@ const DataTableBody = ({
   rowModel,
   dataLength,
 }) => {
-  const totalWidth = dataLength > 0 && rowModel.rows.length > 0
-    ? rowModel.rows[0].getVisibleCells().reduce((sum, cell) => {
-      if (cell.column.columnDef?.meta?.hide) {
-        return sum;
-      }
-      const width = cell.column.columnDef.meta?.width || 0;
-      return sum + width;
-    }, 0)
-    : 0;
+  const totalWidth = useTableTotalWidth(
+    dataLength > 0 && rowModel.rows.length > 0 ? rowModel.rows[0].getVisibleCells() : [],
+  );
   return (
     <div
       className="rt-tbody-v2"
@@ -51,7 +46,7 @@ const DataTableBody = ({
                 {row.getVisibleCells().map((cell) => {
                   const {
                     hide, width, flexWidth, fixed, className,
-                  } = useColumnMeta(cell.column);
+                  } = useTableColumnMeta(cell.column);
                   if (hide) {
                     return null;
                   }
@@ -108,7 +103,9 @@ DataTableBody.propTypes = {
   }).isRequired,
   loading: PropTypes.bool,
   rowModel: PropTypes.shape({
-    rows: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+    rows: PropTypes.arrayOf(
+      PropTypes.shape({}),
+    ).isRequired,
   }).isRequired,
   dataLength: PropTypes.number.isRequired,
 };

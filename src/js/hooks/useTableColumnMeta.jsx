@@ -1,4 +1,4 @@
-const useColumnMeta = (column) => {
+const useTableColumnMeta = (column) => {
   const meta = column.columnDef?.meta || {};
 
   return {
@@ -10,4 +10,4 @@ const useColumnMeta = (column) => {
   };
 };
 
-export default useColumnMeta;
+export default useTableColumnMeta;

@@ -242,12 +242,12 @@ const useAllProductsTab = ({
               </div>
             ))}
             {hiddenBinLocationsLength && (
-              <p>
-                +
-                {hiddenBinLocationsLength}
-                {' '}
-                more
-              </p>
+            <p>
+              +
+              {hiddenBinLocationsLength}
+              {' '}
+              more
+            </p>
             )}
           </TableCell>
         );

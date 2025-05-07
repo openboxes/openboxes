@@ -3,18 +3,12 @@ import React from 'react';
 import { flexRender } from '@tanstack/react-table';
 import PropTypes from 'prop-types';
 
-import useColumnMeta from 'hooks/useColumnMeta';
+import useTableColumnMeta from 'hooks/useTableColumnMeta';
+import useTableTotalWidth from 'hooks/useTableTotalWidth';
 
 const DataTableHeader = ({ headerGroups }) => {
   let fixedOffset = 0;
-
-  const totalWidth = headerGroups[0]?.headers.reduce((sum, header) => {
-    if (header.column.columnDef?.meta?.hide) {
-      return sum;
-    }
-    const width = header.column.columnDef.meta?.width || 0;
-    return sum + width;
-  }, 0) || 0;
+  const totalWidth = useTableTotalWidth(headerGroups[0]?.headers || []);
 
   return (
     <div
@@ -26,7 +20,7 @@ const DataTableHeader = ({ headerGroups }) => {
           headerGroup.headers.map((header) => {
             const {
               hide, width, flexWidth, fixed, className,
-            } = useColumnMeta(header.column);
+            } = useTableColumnMeta(header.column);
             if (hide) {
               return null;
             }
