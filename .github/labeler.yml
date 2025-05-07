@@ -33,6 +33,7 @@
       - 'grails-app/domain/**/*'
       - 'grails-app/jobs/**/*'
       - 'grails-app/services/**/*'
+      - 'grails-app/utils/**/*'
 
 "domain: frontend":
   - changed-files:
