@@ -52,7 +52,7 @@ const CycleCountReporting = () => {
         )}
 
         {tab === INVENTORY_TRANSACTIONS_TAB && (
-          // After applying filters, add them as an param to that component
+          // After applying filters, add them as a param to that component
           <InventoryTransactionsTab
             tablePaginationProps={tablePaginationProps}
             filterParams={{}}

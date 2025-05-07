@@ -51,8 +51,9 @@ const useInventoryTransactionsTab = ({
     url: CYCLE_COUNT_DETAILS_REPORT,
     errorMessageId: 'react.cycleCount.table.errorMessage.label',
     defaultErrorMessage: 'Unable to fetch products',
-    // We should start fetching after initializing the filters to avoid re-fetching
-    shouldFetch: true, // filterParams.tab && tab === filterParams.tab,
+    // We should start fetching only after clicking the button
+    shouldFetch: false,
+    disableInitialLoading: true,
     getParams,
     pageSize: 5,
     offset: 0,
@@ -317,8 +318,8 @@ const useInventoryTransactionsTab = ({
   ], [currentLocale, sort, order]);
 
   const emptyTableMessage = {
-    id: 'react.cycleCount.table.emptyTable.label',
-    defaultMessage: 'No products match the given criteria',
+    id: 'react.cycleCount.inventoryTransactionTable.emptyTable.label',
+    defaultMessage: 'Select a time range from above filters to load the table.',
   };
 
   const exportData = () => {
