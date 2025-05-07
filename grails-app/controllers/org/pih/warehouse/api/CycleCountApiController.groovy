@@ -1,6 +1,7 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
+import grails.orm.PagedResultList
 import grails.validation.ValidationException
 import org.apache.commons.csv.CSVPrinter
 import org.pih.warehouse.core.Constants
@@ -28,6 +29,7 @@ import org.pih.warehouse.inventory.CycleCountSubmitRecountCommand
 import org.pih.warehouse.inventory.CycleCountUpdateItemBatchCommand
 import org.pih.warehouse.inventory.CycleCountUpdateItemCommand
 import org.pih.warehouse.inventory.PendingCycleCountRequest
+import org.pih.warehouse.report.CycleCountTransactionReportCommand
 import org.springframework.web.multipart.MultipartFile
 
 class CycleCountApiController {
@@ -226,5 +228,16 @@ class CycleCountApiController {
         DataImporter cycleCountItemsExcelImporter = new CycleCountItemsExcelImporter(localFile.absolutePath)
 
         render([data: cycleCountItemsExcelImporter.data] as JSON)
+    }
+
+    def getCycleCountTransactionReport(CycleCountTransactionReportCommand command) {
+        PagedResultList data = cycleCountService.getCycleCountTransactionReport(command)
+        render([
+                data      : data,
+                count     : data?.size() ?: 0,
+                max       : command.max,
+                offset    : command.offset,
+                totalCount: data.totalCount,
+        ] as JSON)
     }
 }
