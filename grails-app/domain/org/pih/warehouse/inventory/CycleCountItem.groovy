@@ -106,4 +106,25 @@ class CycleCountItem implements Comparable {
                         ?: System.identityHashCode(this) <=> System.identityHashCode(that)
         return diff
     }
+
+    Map toJson() {
+        return [
+                id: id,
+                facility: facility.toBaseJson(),
+                product: product,
+                inventoryItem: inventoryItem,
+                binLocation: location?.toBaseJson(),
+                countIndex: countIndex,
+                status: status,
+                quantityOnHand: quantityOnHand,
+                quantityCounted: quantityCounted,
+                quantityVariance: quantityVariance,
+                discrepancyReasonCode: discrepancyReasonCode,
+                dateCounted: dateCounted,
+                dateCreated: dateCreated,
+                comment: comment,
+                custom: custom,
+                assignee: assignee,
+        ]
+    }
 }
