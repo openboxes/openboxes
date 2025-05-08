@@ -6,6 +6,7 @@ import DataTableBody from 'components/DataTable/v2/DataTableBody';
 import DataTableFooter from 'components/DataTable/v2/DataTableFooter';
 import DataTableHeader from 'components/DataTable/v2/DataTableHeader';
 import useDataTable from 'hooks/useDataTable';
+import useWindowWidthCheck from 'hooks/useWindowWidthCheck';
 
 import 'components/DataTable/DataTable.scss';
 
@@ -22,6 +23,7 @@ const DataTable = ({
   disablePagination,
   defaultColumn,
   meta,
+  tableWithPinnedColumns,
 }) => {
   const {
     defaultEmptyTableMessage,
@@ -38,12 +40,19 @@ const DataTable = ({
 
   const shouldDisplayPagination = Boolean(data?.length && !loading) && !disablePagination;
 
+  const isScreenWiderThanTable = useWindowWidthCheck(table.getTotalSize());
+
   return (
     <div className="app-react-table-wrapper table-v2">
       <div className="ReactTable app-react-table">
         <div className="rt-table" role="grid">
           <DataTableHeader
             headerGroups={table.getHeaderGroups()}
+            tableWithPinnedColumns={tableWithPinnedColumns}
+            isScreenWiderThanTable={isScreenWiderThanTable}
+            loading={loading}
+            emptyTableMessage={emptyTableMessage}
+            dataLength={data?.length}
           />
           <DataTableBody
             emptyTableMessage={emptyTableMessage}
@@ -53,15 +62,17 @@ const DataTable = ({
             loading={loading}
             rowModel={table.getRowModel()}
             dataLength={data?.length}
+            tableWithPinnedColumns={tableWithPinnedColumns}
+            isScreenWiderThanTable={isScreenWiderThanTable}
           />
-          {shouldDisplayPagination && (
+        </div>
+        {shouldDisplayPagination && (
           <DataTableFooter
             footerComponent={footerComponent}
             totalData={totalCount}
             {...paginationProps}
           />
-          )}
-        </div>
+        )}
       </div>
     </div>
   );
@@ -90,6 +101,7 @@ DataTable.propTypes = {
   filterParams: PropTypes.shape({}).isRequired,
   disablePagination: PropTypes.bool,
   paginationProps: PropTypes.shape({}),
+  tableWithPinnedColumns: PropTypes.bool,
 };
 
 DataTable.defaultProps = {
@@ -100,4 +112,5 @@ DataTable.defaultProps = {
   paginationProps: {},
   disablePagination: false,
   totalCount: 0,
+  tableWithPinnedColumns: false,
 };

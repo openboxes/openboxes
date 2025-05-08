@@ -49,6 +49,7 @@ const InventoryTransactionsTab = ({
         totalCount={tableData.totalCount}
         filterParams={filterParams}
         paginationProps={paginationProps}
+        tableWithPinnedColumns
       />
     </div>
   );
