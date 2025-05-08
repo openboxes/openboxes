@@ -686,7 +686,7 @@ const useResolveStep = () => {
           outdatedProducts += 1;
         }
       }
-      dispatch(eraseDraft('resolve'));
+      dispatch(eraseDraft(TO_RESOLVE_TAB));
       if (outdatedProducts > 0) {
         dispatch({
           type: UPDATE_CYCLE_COUNT_IDS,

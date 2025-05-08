@@ -6,6 +6,7 @@ import {
   START_RESOLUTION,
   UPDATE_CYCLE_COUNT_IDS,
 } from 'actions/types';
+import { TO_COUNT_TAB, TO_RESOLVE_TAB } from 'consts/cycleCount';
 
 const initialState = {
   requests: [],
@@ -37,13 +38,13 @@ export default function cycleCountReducer(state = initialState, action) {
         binLocations: action.payload,
       };
     case ERASE_DRAFT:
-      if (action.payload === 'count') {
+      if (action.payload === TO_COUNT_TAB) {
         return {
           ...state,
           requests: [],
         };
       }
-      if (action.payload === 'resolve') {
+      if (action.payload === TO_RESOLVE_TAB) {
         return {
           ...state,
           cycleCounts: [],
