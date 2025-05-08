@@ -5,6 +5,8 @@ import PropTypes from 'prop-types';
 
 import TableRow from 'components/DataTable/TableRow';
 import DataTableStatus from 'components/DataTable/v2/DataTableStatus';
+import useTableColumnMeta from 'hooks/useTableColumnMeta';
+import getCommonPinningStyles from 'utils/getCommonPinningStyles';
 
 const DataTableBody = ({
   emptyTableMessage,
@@ -14,43 +16,50 @@ const DataTableBody = ({
   loading,
   rowModel,
   dataLength,
+  tableWithFixedColumns,
+  isScreenWider,
 }) => (
-  <div className="rt-tbody">
+  <div
+    className="rt-tbody-v2"
+    style={{ width: (!isScreenWider && tableWithFixedColumns) ? 'fit-content' : undefined }}
+  >
     <DataTableStatus
       label={emptyTableMessage?.id || defaultEmptyTableMessage.id}
-      defaultMessage={
-          emptyTableMessage?.defaultMessage || defaultEmptyTableMessage.defaultMessage
-        }
+      defaultMessage={emptyTableMessage?.defaultMessage
+          || defaultEmptyTableMessage.defaultMessage}
       shouldDisplay={!dataLength && !loading}
     />
     <DataTableStatus
       label={loadingMessage?.id || defaultLoadingTableMessage.id}
-      defaultMessage={
-          loadingMessage?.defaultMessage || defaultLoadingTableMessage.defaultMessage
-        }
+      defaultMessage={loadingMessage?.defaultMessage || defaultLoadingTableMessage.defaultMessage}
       shouldDisplay={loading}
     />
-    {(dataLength > 0 && !loading) && rowModel
-      .rows
-      .map((row) => (
-        <div key={row.id} className="rt-tr-group cell-wrapper" role="rowgroup">
-          <TableRow key={row.id} className="rt-tr">
-            {row.getVisibleCells()
-              .map((cell) => {
-                if (cell.column.columnDef?.meta?.hide) {
+    {dataLength > 0 &&
+        !loading &&
+        rowModel.rows.map((row) => (
+          <div key={row.id} className="rt-tr-group cell-wrapper" role="rowgroup">
+            <TableRow key={row.id} className="rt-tr">
+              {row.getVisibleCells().map((cell) => {
+                const { hide, flexWidth, className } = useTableColumnMeta(cell.column);
+                if (hide) {
                   return null;
                 }
-                const className = cell.column.columnDef?.meta?.getCellContext?.()?.className;
-                const flexWidth = cell.column.columnDef.meta?.flexWidth || 1;
                 return (
-                  <div className={`d-flex ${className}`} style={{ flex: flexWidth }} key={cell.id}>
+                  <div
+                    className={`d-flex ${className}`}
+                    style={{
+                      background: tableWithFixedColumns && 'white',
+                      ...getCommonPinningStyles(cell.column, flexWidth, isScreenWider),
+                    }}
+                    key={cell.id}
+                  >
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </div>
                 );
               })}
-          </TableRow>
-        </div>
-      ))}
+            </TableRow>
+          </div>
+        ))}
   </div>
 );
 
@@ -80,10 +89,13 @@ DataTableBody.propTypes = {
     ).isRequired,
   }).isRequired,
   dataLength: PropTypes.number.isRequired,
+  tableWithFixedColumns: PropTypes.bool,
+  isScreenWider: PropTypes.bool.isRequired,
 };
 
 DataTableBody.defaultProps = {
   emptyTableMessage: null,
   loadingMessage: null,
   loading: false,
+  tableWithFixedColumns: false,
 };
