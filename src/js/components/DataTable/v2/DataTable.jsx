@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 
 import PropTypes from 'prop-types';
 
@@ -6,6 +6,7 @@ import DataTableBody from 'components/DataTable/v2/DataTableBody';
 import DataTableFooter from 'components/DataTable/v2/DataTableFooter';
 import DataTableHeader from 'components/DataTable/v2/DataTableHeader';
 import useDataTable from 'hooks/useDataTable';
+import useWindowWidthCheck from 'hooks/useWindowWidthCheck';
 
 import 'components/DataTable/DataTable.scss';
 
@@ -39,16 +40,7 @@ const DataTable = ({
 
   const shouldDisplayPagination = Boolean(data?.length && !loading) && !disablePagination;
 
-  const [isScreenWiderThanTable, setIsScreenWiderThanTable] = useState(false);
-  const totalSize = table.getTotalSize();
-  useEffect(() => {
-    const handleResize = () => {
-      setIsScreenWiderThanTable(window.innerWidth > totalSize);
-    };
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, [totalSize]);
+  const isScreenWiderThanTable = useWindowWidthCheck(table.getTotalSize());
 
   return (
     <div className="app-react-table-wrapper table-v2">
