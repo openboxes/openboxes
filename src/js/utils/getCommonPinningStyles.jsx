@@ -22,7 +22,7 @@ const getCommonPinningStyles = (column, flexWidth, isScreenWiderThanTable) => {
     left: isPinned === 'left' ? `${column.getStart('left')}px` : undefined,
     position: isPinned && !isScreenWiderThanTable && 'sticky',
     flex: flexWidth || column.getSize(),
-    width: !isScreenWiderThanTable && (flexWidth || column.getSize()),
+    width: flexWidth || column.getSize(),
     zIndex: isPinned ? 1 : 0,
     background: isPinned && 'white',
   };
