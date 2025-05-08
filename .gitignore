@@ -2,7 +2,8 @@
 .settings
 *.iml
 *.iws
-/*.sql
+*.sql
+*.log
 *Db.properties
 *Db.script
 /plugins
