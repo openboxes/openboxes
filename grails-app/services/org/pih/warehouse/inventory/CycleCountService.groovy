@@ -271,7 +271,8 @@ class CycleCountService {
                         "Quantity Counted": item.quantityCounted ?: "",
                         "Comment": item.comment ?: "",
                         "User Counted": item.assignee?.name ?: "",
-                        "Date Counted": item.dateCounted ?: "",
+                        "Date Counted": item.dateCounted
+                                ? Constants.MONTH_DAY_YEAR_DATE_FORMATTER.format(item.dateCounted) : "",
                 ]
             }
         }
