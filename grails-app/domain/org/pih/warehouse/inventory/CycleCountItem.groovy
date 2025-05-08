@@ -53,7 +53,7 @@ class CycleCountItem implements Comparable {
                 facility: facility.toBaseJson(),
                 product: product,
                 inventoryItem: inventoryItem,
-                binLocation: location?.toBaseJson(),
+                binLocation: Location.toJson(location),
                 countIndex: countIndex,
                 status: status,
                 quantityOnHand: quantityOnHand,

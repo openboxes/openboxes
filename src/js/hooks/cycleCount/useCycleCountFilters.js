@@ -8,7 +8,7 @@ import { setShouldRebuildFilterParams } from 'actions';
 import cycleCountFilterFields from 'components/cycleCount/CycleCountFilterFields';
 import useCommonFiltersCleaner from 'hooks/list-pages/useCommonFiltersCleaner';
 import useTranslate from 'hooks/useTranslate';
-import groupBinLocationsByZone from 'utils/groupBinLocationsByZone';
+import { groupBinLocationsByZone } from 'utils/groupBinLocationsByZone';
 import { getParamList, transformFilterParams } from 'utils/list-utils';
 import {
   fetchBins,
