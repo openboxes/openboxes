@@ -22,7 +22,7 @@ const DataTable = ({
   disablePagination,
   defaultColumn,
   meta,
-  tableWithFixedColumns,
+  tableWithPinnedColumns,
 }) => {
   const {
     defaultEmptyTableMessage,
@@ -39,11 +39,11 @@ const DataTable = ({
 
   const shouldDisplayPagination = Boolean(data?.length && !loading) && !disablePagination;
 
-  const [isScreenWider, setIsScreenWider] = useState(false);
+  const [isScreenWiderThanTable, setIsScreenWiderThanTable] = useState(false);
   const totalSize = table.getTotalSize();
   useEffect(() => {
     const handleResize = () => {
-      setIsScreenWider(window.innerWidth > totalSize);
+      setIsScreenWiderThanTable(window.innerWidth > totalSize);
     };
     handleResize();
     window.addEventListener('resize', handleResize);
@@ -53,14 +53,11 @@ const DataTable = ({
   return (
     <div className="app-react-table-wrapper table-v2">
       <div className="ReactTable app-react-table">
-        <div
-          className="rt-table"
-          role="grid"
-        >
+        <div className="rt-table" role="grid">
           <DataTableHeader
             headerGroups={table.getHeaderGroups()}
-            tableWithFixedColumns={tableWithFixedColumns}
-            isScreenWider={isScreenWider}
+            tableWithPinnedColumns={tableWithPinnedColumns}
+            isScreenWiderThanTable={isScreenWiderThanTable}
           />
           <DataTableBody
             emptyTableMessage={emptyTableMessage}
@@ -70,17 +67,17 @@ const DataTable = ({
             loading={loading}
             rowModel={table.getRowModel()}
             dataLength={data?.length}
-            tableWithFixedColumns={tableWithFixedColumns}
-            isScreenWider={isScreenWider}
+            tableWithPinnedColumns={tableWithPinnedColumns}
+            isScreenWiderThanTable={isScreenWiderThanTable}
           />
         </div>
-          {shouldDisplayPagination && (
+        {shouldDisplayPagination && (
           <DataTableFooter
             footerComponent={footerComponent}
             totalData={totalCount}
             {...paginationProps}
           />
-          )}
+        )}
       </div>
     </div>
   );
@@ -109,7 +106,7 @@ DataTable.propTypes = {
   filterParams: PropTypes.shape({}).isRequired,
   disablePagination: PropTypes.bool,
   paginationProps: PropTypes.shape({}),
-  tableWithFixedColumns: PropTypes.bool,
+  tableWithPinnedColumns: PropTypes.bool,
 };
 
 DataTable.defaultProps = {
@@ -120,5 +117,5 @@ DataTable.defaultProps = {
   paginationProps: {},
   disablePagination: false,
   totalCount: 0,
-  tableWithFixedColumns: false,
+  tableWithPinnedColumns: false,
 };

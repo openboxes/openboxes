@@ -6,10 +6,10 @@ import PropTypes from 'prop-types';
 import useTableColumnMeta from 'hooks/useTableColumnMeta';
 import getCommonPinningStyles from 'utils/getCommonPinningStyles';
 
-const DataTableHeader = ({ headerGroups, tableWithFixedColumns, isScreenWider }) => (
+const DataTableHeader = ({ headerGroups, tableWithPinnedColumns, isScreenWiderThanTable }) => (
   <div
     className="rt-thead -header"
-    style={{ width: (!isScreenWider && tableWithFixedColumns) ? 'fit-content' : undefined }}
+    style={{ width: (!isScreenWiderThanTable && tableWithPinnedColumns) ? 'fit-content' : undefined }}
   >
     <div className="rt-tr">
       {headerGroups.map((headerGroup) =>
@@ -24,7 +24,11 @@ const DataTableHeader = ({ headerGroups, tableWithFixedColumns, isScreenWider })
               key={header.id}
               className={`header-cell ${className}`}
               style={{
-                ...getCommonPinningStyles(header.column, flexWidth, isScreenWider),
+                ...getCommonPinningStyles(
+                  header.column,
+                  flexWidth,
+                  isScreenWiderThanTable,
+                ),
               }}
             >
               {flexRender(header.column.columnDef.header, header.getContext())}
@@ -39,10 +43,10 @@ export default DataTableHeader;
 
 DataTableHeader.propTypes = {
   headerGroups: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
-  tableWithFixedColumns: PropTypes.bool,
-  isScreenWider: PropTypes.bool.isRequired,
+  tableWithPinnedColumns: PropTypes.bool,
+  isScreenWiderThanTable: PropTypes.bool.isRequired,
 };
 
 DataTableHeader.defaultProps = {
-  tableWithFixedColumns: false,
+  tableWithPinnedColumns: false,
 };

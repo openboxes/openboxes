@@ -70,10 +70,9 @@ const useInventoryTransactionsTab = () => {
         );
       },
       meta: {
-        fixed: true,
         pinned: "left",
       },
-      size: 145,
+      size: 120,
     }),
     columnHelper.accessor(cycleCountColumn.PRODUCT, {
       header: () => (
@@ -100,11 +99,9 @@ const useInventoryTransactionsTab = () => {
         );
       },
       meta: {
-        width: 280,
-        fixed: true,
         pinned: "left",
       },
-      size: 280,
+      size: 240,
     }),
     columnHelper.accessor(cycleCountColumn.TRANSACTION_TYPE, {
       header: () => (
@@ -123,10 +120,9 @@ const useInventoryTransactionsTab = () => {
         </TableCell>
       ),
       meta: {
-        fixed: true,
         pinned: "left",
       },
-      size: 145,
+      size: 150,
     }),
     columnHelper.accessor(cycleCountColumn.RECORDED, {
       header: () => (
@@ -146,10 +142,9 @@ const useInventoryTransactionsTab = () => {
         </div>
       ),
       meta: {
-        fixed: true,
         pinned: "left",
       },
-      size: 145,
+      size: 130,
     }),
     columnHelper.accessor(cycleCountColumn.TRANSACTION_ID, {
       header: () => (
@@ -158,10 +153,9 @@ const useInventoryTransactionsTab = () => {
         </TableHeaderCell>
       ),
       meta: {
-        fixed: true,
         pinned: "left",
       },
-      size: 145,
+      size: 130,
       cell: ({ getValue }) => (
         <TableCell
           link={INVENTORY_URL.showTransaction('transaction-id')}
@@ -183,7 +177,7 @@ const useInventoryTransactionsTab = () => {
       ),
       meta: {
       },
-      size: 145,
+      size: 130,
       cell: ({ getValue }) => (
         <TableCell
           className="rt-td d-flex justify-content-end"
@@ -201,7 +195,7 @@ const useInventoryTransactionsTab = () => {
         ),
         meta: {
         },
-      size: 145,
+      size: 120,
         cell: ({ getValue }) => (
           <TableCell
             className="rt-td d-flex justify-content-end"
@@ -245,10 +239,7 @@ const useInventoryTransactionsTab = () => {
           </TableCell>
         );
       },
-      meta: {
-        width: 175,
-      },
-      size: 175,
+      size: 120,
     }),
     columnHelper.accessor(cycleCountColumn.ROOT_CAUSES, {
       header: () => (
@@ -256,10 +247,7 @@ const useInventoryTransactionsTab = () => {
           {translate('react.cycleCount.inventoryTransactionsTable.rootCauses.label', 'Root Causes')}
         </TableHeaderCell>
       ),
-      meta: {
-        width: 260,
-      },
-      size: 260,
+      size: 200,
       cell: ({ getValue }) => (
         <TableCell
           customTooltip
@@ -278,10 +266,7 @@ const useInventoryTransactionsTab = () => {
           {translate('react.cycleCount.inventoryTransactionsTable.comments.label', 'Comments')}
         </TableHeaderCell>
       ),
-      meta: {
-        width: 280,
-      },
-      size: 280,
+      size: 200,
       cell: ({ getValue }) => (
         <TableCell
           customTooltip

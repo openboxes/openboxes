@@ -16,12 +16,12 @@ const DataTableBody = ({
   loading,
   rowModel,
   dataLength,
-  tableWithFixedColumns,
-  isScreenWider,
+  tableWithPinnedColumns,
+  isScreenWiderThanTable,
 }) => (
   <div
     className="rt-tbody-v2"
-    style={{ width: (!isScreenWider && tableWithFixedColumns) ? 'fit-content' : undefined }}
+    style={{ width: (!isScreenWiderThanTable && tableWithPinnedColumns) ? 'fit-content' : undefined }}
   >
     <DataTableStatus
       label={emptyTableMessage?.id || defaultEmptyTableMessage.id}
@@ -48,8 +48,11 @@ const DataTableBody = ({
                   <div
                     className={`d-flex ${className}`}
                     style={{
-                      background: tableWithFixedColumns && 'white',
-                      ...getCommonPinningStyles(cell.column, flexWidth, isScreenWider),
+                      ...getCommonPinningStyles(
+                        cell.column,
+                        flexWidth,
+                        isScreenWiderThanTable,
+                      ),
                     }}
                     key={cell.id}
                   >
@@ -89,13 +92,13 @@ DataTableBody.propTypes = {
     ).isRequired,
   }).isRequired,
   dataLength: PropTypes.number.isRequired,
-  tableWithFixedColumns: PropTypes.bool,
-  isScreenWider: PropTypes.bool.isRequired,
+  tableWithPinnedColumns: PropTypes.bool,
+  isScreenWiderThanTable: PropTypes.bool.isRequired,
 };
 
 DataTableBody.defaultProps = {
   emptyTableMessage: null,
   loadingMessage: null,
   loading: false,
-  tableWithFixedColumns: false,
+  tableWithPinnedColumns: false,
 };
