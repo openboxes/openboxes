@@ -997,6 +997,11 @@ class UrlMappings {
             action = [POST: "refreshCycleCount"]
         }
 
+        "/api/reports/cycle-count-details" {
+            controller = "cycleCountApi"
+            action = [POST: "getCycleCountTransactionReport", GET: "getCycleCountTransactionReport"]
+        }
+
         // Error handling
 
         "401"(controller: "errors", action: "handleUnauthorized")

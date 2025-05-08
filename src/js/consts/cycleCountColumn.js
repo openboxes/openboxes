@@ -20,6 +20,18 @@ const columns = {
   ABC_CLASS: 'abcClass',
   QUANTITY_ON_HAND: 'quantityOnHand',
   STATUS: 'status',
+  ALIGNMENT: 'alignment',
+  TRANSACTION_TYPE: 'transactionType',
+  // fix after getting appropriate property in response
+  RECORDED: 'date_counted',
+  // fix after getting appropriate property in response
+  TRANSACTION_ID: 'inventoryItem.id',
+  // fix after getting appropriate property in response
+  QTY_BEFORE: 'quantityOnHand',
+  QTY_AFTER: 'quantityCounted',
+  DIFFERENCE: 'difference',
+  ROOT_CAUSES: 'rootCause',
+  COMMENTS: 'comments',
 };
 
 export default columns;

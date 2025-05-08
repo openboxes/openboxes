@@ -21,6 +21,7 @@ import org.pih.warehouse.inventory.CycleCountSubmitCountCommand
 import org.pih.warehouse.inventory.CycleCountSubmitRecountCommand
 import org.pih.warehouse.inventory.CycleCountUpdateItemCommand
 import org.pih.warehouse.inventory.PendingCycleCountRequest
+import org.pih.warehouse.report.CycleCountTransactionReportCommand
 
 class CycleCountApiController {
 
@@ -192,5 +193,10 @@ class CycleCountApiController {
         CycleCountDto cycleCount = cycleCountService.refreshCycleCount(cycleCountId, removeOutOfStockItemsImplicitly, params.int("countIndex"))
 
         render([data: cycleCount] as JSON)
+    }
+
+    def getCycleCountTransactionReport(CycleCountTransactionReportCommand command) {
+        def data = cycleCountService.getCycleCountTransactionReport(command)
+        render ([data: data] as JSON)
     }
 }

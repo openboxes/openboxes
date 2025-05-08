@@ -14,6 +14,7 @@ import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.report.CycleCountTransactionReportCommand
 
 @Transactional
 class CycleCountService {
@@ -685,4 +686,16 @@ class CycleCountService {
 
         cycleCount.delete()
     }
+
+
+    // FIXME Move to the appropriate service (if we want to separate services from reporting)
+    List<CycleCountFinalCountDetails> getCycleCountTransactionReport(CycleCountTransactionReportCommand command) {
+        return CycleCountFinalCountDetails.createCriteria().list {
+            eq("facility", command.facility)
+            if (command.products) {
+                "in"("product", command.products)
+            }
+        } as List<CycleCountFinalCountDetails>
+    }
+
 }
