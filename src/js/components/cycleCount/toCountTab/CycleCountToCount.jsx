@@ -22,9 +22,7 @@ const CycleCountToCount = ({ filterParams, toCountTabCheckboxes, tablePagination
   } = tablePaginationProps;
 
   const { selectedCheckboxesAmount } = toCountTabCheckboxes;
-
   const cycleCountIds = useSelector((state) => (state.cycleCount.requests));
-
   const {
     columns,
     tableData,
@@ -47,7 +45,7 @@ const CycleCountToCount = ({ filterParams, toCountTabCheckboxes, tablePagination
 
   return (
     <div>
-      {cycleCountIds.length !== 0 && <CycleCountDraftInfoBar />}
+      {cycleCountIds.length !== 0 && <CycleCountDraftInfoBar tab="count" />}
       <div className="d-flex justify-content-sm-between align-items-center">
         <span className="selected-rows-indicator pl-4">
           {selectedCheckboxesAmount}

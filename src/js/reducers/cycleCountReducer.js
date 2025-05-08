@@ -37,10 +37,19 @@ export default function cycleCountReducer(state = initialState, action) {
         binLocations: action.payload,
       };
     case ERASE_DRAFT:
-      return {
-        ...state,
-        requests: [],
-      };
+      if (action.payload === 'count') {
+        return {
+          ...state,
+          requests: [],
+        };
+      }
+      if (action.payload === 'resolve') {
+        return {
+          ...state,
+          cycleCounts: [],
+        };
+      }
+      return state;
     case UPDATE_CYCLE_COUNT_IDS:
       return {
         ...state,

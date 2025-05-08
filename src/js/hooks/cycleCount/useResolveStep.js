@@ -14,7 +14,7 @@ import moment from 'moment';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
-import { fetchBinLocations, fetchUsers } from 'actions';
+import { eraseDraft, fetchBinLocations, fetchUsers } from 'actions';
 import { UPDATE_CYCLE_COUNT_IDS } from 'actions/types';
 import cycleCountApi from 'api/services/CycleCountApi';
 import { CYCLE_COUNT as GET_CYCLE_COUNTS } from 'api/urls';
@@ -686,6 +686,7 @@ const useResolveStep = () => {
           outdatedProducts += 1;
         }
       }
+      dispatch(eraseDraft('resolve'));
       if (outdatedProducts > 0) {
         dispatch({
           type: UPDATE_CYCLE_COUNT_IDS,
