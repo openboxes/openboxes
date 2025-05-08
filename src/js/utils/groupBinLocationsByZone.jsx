@@ -7,7 +7,7 @@ import _ from 'lodash';
  * isn't already prepended.
  */
 const getBinLocationToDisplay = (bin) => (
-  (bin?.zoneName == null || bin?.name.startsWith(`${bin?.zoneName}: `))
+  (bin?.zoneName === null || bin?.name.startsWith(`${bin?.zoneName}: `))
     ? bin?.name : `${bin?.zoneName}: ${bin?.name}`
 );
 
