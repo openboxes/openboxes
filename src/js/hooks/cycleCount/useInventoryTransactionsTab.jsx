@@ -184,7 +184,7 @@ const useInventoryTransactionsTab = ({
       meta: {
         pinned: 'left',
       },
-      size: 130,
+      size: 145,
       cell: ({ getValue }) => (
         <TableCell
           link={INVENTORY_URL.showTransaction('transaction-id')}

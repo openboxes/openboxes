@@ -18,11 +18,10 @@ const DataTableBody = ({
   dataLength,
   tableWithPinnedColumns,
   isScreenWiderThanTable,
-  isEmptyTableMessageOrLoading,
 }) => (
   <div
     className="rt-tbody-v2"
-    style={{ width: (!isScreenWiderThanTable && tableWithPinnedColumns && !isEmptyTableMessageOrLoading) ? 'fit-content' : undefined }}
+    style={{ width: (!isScreenWiderThanTable && tableWithPinnedColumns && dataLength) ? 'fit-content' : undefined }}
   >
     <DataTableStatus
       label={emptyTableMessage?.id || defaultEmptyTableMessage.id}
@@ -53,7 +52,7 @@ const DataTableBody = ({
                         cell.column,
                         flexWidth,
                         isScreenWiderThanTable,
-                        isEmptyTableMessageOrLoading,
+                        dataLength,
                       ),
                     }}
                     key={cell.id}
@@ -96,7 +95,6 @@ DataTableBody.propTypes = {
   dataLength: PropTypes.number.isRequired,
   tableWithPinnedColumns: PropTypes.bool,
   isScreenWiderThanTable: PropTypes.bool.isRequired,
-  isEmptyTableMessageOrLoading: PropTypes.bool.isRequired,
 };
 
 DataTableBody.defaultProps = {

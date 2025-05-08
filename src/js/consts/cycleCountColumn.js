@@ -25,7 +25,7 @@ const columns = {
   // fix after getting appropriate property in response
   RECORDED: 'date_counted',
   // fix after getting appropriate property in response
-  TRANSACTION_ID: 'inventoryItem.id',
+  TRANSACTION_ID: 'inventory_item_id',
   // fix after getting appropriate property in response
   QTY_BEFORE: 'quantityOnHand',
   QTY_AFTER: 'quantityCounted',
