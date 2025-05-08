@@ -686,7 +686,6 @@ const useResolveStep = () => {
           outdatedProducts += 1;
         }
       }
-      dispatch(eraseDraft(TO_RESOLVE_TAB));
       if (outdatedProducts > 0) {
         dispatch({
           type: UPDATE_CYCLE_COUNT_IDS,
@@ -695,6 +694,7 @@ const useResolveStep = () => {
         openReviewProductsModal(outdatedProducts, cycleCountIdsForOutdatedProducts);
         return;
       }
+      dispatch(eraseDraft(TO_RESOLVE_TAB));
       history.push(CYCLE_COUNT.list(TO_RESOLVE_TAB));
     } finally {
       hide();
