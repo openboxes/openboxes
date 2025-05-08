@@ -6,10 +6,15 @@ import PropTypes from 'prop-types';
 import useTableColumnMeta from 'hooks/useTableColumnMeta';
 import getCommonPinningStyles from 'utils/getCommonPinningStyles';
 
-const DataTableHeader = ({ headerGroups, tableWithPinnedColumns, isScreenWiderThanTable }) => (
+const DataTableHeader = ({
+  headerGroups,
+  tableWithPinnedColumns,
+  isScreenWiderThanTable,
+  isEmptyTableMessageOrLoading,
+}) => (
   <div
     className="rt-thead -header"
-    style={{ width: (!isScreenWiderThanTable && tableWithPinnedColumns) ? 'fit-content' : undefined }}
+    style={{ width: (!isScreenWiderThanTable && tableWithPinnedColumns && !isEmptyTableMessageOrLoading) ? 'fit-content' : undefined }}
   >
     <div className="rt-tr">
       {headerGroups.map((headerGroup) =>
@@ -28,6 +33,7 @@ const DataTableHeader = ({ headerGroups, tableWithPinnedColumns, isScreenWiderTh
                   header.column,
                   flexWidth,
                   isScreenWiderThanTable,
+                  isEmptyTableMessageOrLoading,
                 ),
               }}
             >
@@ -45,6 +51,7 @@ DataTableHeader.propTypes = {
   headerGroups: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   tableWithPinnedColumns: PropTypes.bool,
   isScreenWiderThanTable: PropTypes.bool.isRequired,
+  isEmptyTableMessageOrLoading: PropTypes.bool.isRequired,
 };
 
 DataTableHeader.defaultProps = {

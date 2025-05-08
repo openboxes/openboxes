@@ -26,6 +26,7 @@ const useTableDataV2 = ({
   searchTerm,
   filterParams,
   shouldFetch,
+  disableInitialLoading,
 }) => {
   const sourceRef = useRef(CancelToken.source());
 
@@ -83,7 +84,9 @@ const useTableDataV2 = ({
   // Start displaying the loader in the table when
   // accessing the page first time, before sending a request
   useEffect(() => {
-    setLoading(true);
+    if (!disableInitialLoading) {
+      setLoading(true);
+    }
   }, []);
 
   useEffect(() => () => {

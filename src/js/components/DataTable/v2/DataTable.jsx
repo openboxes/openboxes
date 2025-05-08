@@ -50,6 +50,9 @@ const DataTable = ({
             headerGroups={table.getHeaderGroups()}
             tableWithPinnedColumns={tableWithPinnedColumns}
             isScreenWiderThanTable={isScreenWiderThanTable}
+            loading={loading}
+            emptyTableMessage={emptyTableMessage}
+            isEmptyTableMessageOrLoading={Boolean(emptyTableMessage || loading)}
           />
           <DataTableBody
             emptyTableMessage={emptyTableMessage}
@@ -61,6 +64,7 @@ const DataTable = ({
             dataLength={data?.length}
             tableWithPinnedColumns={tableWithPinnedColumns}
             isScreenWiderThanTable={isScreenWiderThanTable}
+            isEmptyTableMessageOrLoading={Boolean(emptyTableMessage || loading)}
           />
         </div>
         {shouldDisplayPagination && (
