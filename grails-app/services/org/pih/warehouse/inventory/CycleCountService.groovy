@@ -268,10 +268,10 @@ class CycleCountService {
                         "Expiration Date": item.inventoryItem.expirationDate
                                 ? Constants.EXPIRATION_DATE_FORMATTER.format(item.inventoryItem.expirationDate) : "",
                         "Bin Location": item.binLocation?.name,
-                        "Quantity Counted": "",
-                        "Comment": "",
-                        "User Counted": "",
-                        "Date Counted": ""
+                        "Quantity Counted": item.quantityCounted ?: "",
+                        "Comment": item.comment ?: "",
+                        "User Counted": item.assignee?.name ?: "",
+                        "Date Counted": item.dateCounted ?: "",
                 ]
             }
         }
