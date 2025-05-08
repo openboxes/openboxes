@@ -7,6 +7,7 @@ import { useSelector } from 'react-redux';
 import CycleCountDraftInfoBar from 'components/cycleCount/CycleCountDraftInfoBar';
 import DataTable from 'components/DataTable/v2/DataTable';
 import Button from 'components/form-elements/Button';
+import { TO_RESOLVE_TAB } from 'consts/cycleCount';
 import FileFormat from 'consts/fileFormat';
 import useToResolveTab from 'hooks/cycleCount/useToResolveTab';
 import useTranslate from 'hooks/useTranslate';
@@ -46,7 +47,7 @@ const CycleCountToResolve = ({
 
   return (
     <div>
-      {cycleCountIds.length !== 0 && <CycleCountDraftInfoBar tab="resolve" />}
+      {cycleCountIds.length !== 0 && <CycleCountDraftInfoBar tab={TO_RESOLVE_TAB} />}
       <div className="d-flex justify-content-sm-between align-items-center">
         <span className="selected-rows-indicator pl-4">
           {selectedCheckboxesAmount}
