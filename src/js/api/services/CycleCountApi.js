@@ -2,7 +2,6 @@ import queryString from 'query-string';
 
 import {
   CYCLE_COUNT, CYCLE_COUNT_ITEM,
-  CYCLE_COUNT_ITEMS,
   CYCLE_COUNT_ITEMS_BATCH,
   CYCLE_COUNT_RECOUNT_START,
   CYCLE_COUNT_REFRESH_ITEMS,
@@ -33,10 +32,6 @@ export default {
     const queryParams = queryString.stringify({ id: ids });
     return apiClient.get(`${CYCLE_COUNT(locationId)}?${queryParams}`);
   },
-  updateCycleCountItem: (payload, locationId, itemId) =>
-    apiClient.patch(CYCLE_COUNT_ITEM(locationId, itemId), payload),
-  createCycleCountItem: (payload, locationId, cycleCountId) =>
-    apiClient.post(CYCLE_COUNT_ITEMS(locationId, cycleCountId), payload),
   deleteCycleCountItem: (locationId, itemId) =>
     apiClient.delete(CYCLE_COUNT_ITEM(locationId, itemId)),
   submitCount: (payload, locationId, cycleCountId) =>
