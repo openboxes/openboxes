@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 import {
   ERASE_DRAFT,
   FETCH_BIN_LOCATIONS,
@@ -8,8 +10,8 @@ import {
 } from 'actions/types';
 
 const initialState = {
-  requests: [],
-  cycleCounts: [],
+  requests: {},
+  cycleCounts: {},
   reasonCodes: [],
   binLocations: [],
 };
@@ -19,12 +21,18 @@ export default function cycleCountReducer(state = initialState, action) {
     case START_COUNT:
       return {
         ...state,
-        requests: action.payload,
+        requests: {
+          ...state.requests,
+          [action.payload.locationId]: action.payload.requests,
+        },
       };
     case START_RESOLUTION:
       return {
         ...state,
-        cycleCounts: action.payload,
+        cycleCounts: {
+          ...state.cycleCounts,
+          [action.payload.locationId]: action.payload.cycleCounts,
+        },
       };
     case FETCH_CYCLE_COUNT_REASON_CODES:
       return {
@@ -39,12 +47,15 @@ export default function cycleCountReducer(state = initialState, action) {
     case ERASE_DRAFT:
       return {
         ...state,
-        requests: [],
+        requests: _.omit(state.requests, action.payload.locationId),
       };
     case UPDATE_CYCLE_COUNT_IDS:
       return {
         ...state,
-        cycleCounts: action.payload,
+        cycleCounts: {
+          ...state.cycleCounts,
+          [action.payload.locationId]: action.payload,
+        },
       };
     default:
       return state;
