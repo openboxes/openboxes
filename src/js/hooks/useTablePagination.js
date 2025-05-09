@@ -9,11 +9,20 @@ const useTablePagination = ({
     pageIndex: 0,
     pageSize: defaultPageSize || 5,
   });
+  // serializedParams triggers data fetching in useTableDataV2, preventing duplicate
+  // API calls. Previously, useEffect dependencies [filterParams, offset] caused two requests,
+  // as useTablePagination useEffect listened to filterParams and later updated offset
+  const [serializedParams, setSerializedParams] = useState('');
 
   const maxPage = useMemo(
     () => Math.floor(totalCount / pagination.pageSize),
     [totalCount, pagination.pageSize],
   );
+
+  const generateSerializedParams = (newPageIndex) => JSON.stringify({
+    ...filterParams,
+    pageIndex: newPageIndex,
+  });
 
   const onPageChange = (page) => {
     if (page > maxPage) {
@@ -21,6 +30,7 @@ const useTablePagination = ({
         ...prev,
         pageIndex: maxPage,
       }));
+      setSerializedParams(generateSerializedParams(maxPage));
       return;
     }
     if (page < 0) {
@@ -28,12 +38,14 @@ const useTablePagination = ({
         ...prev,
         pageIndex: 0,
       }));
+      setSerializedParams(generateSerializedParams(0));
       return;
     }
     setPagination((prev) => ({
       ...prev,
       pageIndex: page,
     }));
+    setSerializedParams(generateSerializedParams(page));
   };
 
   const onPageSizeChange = (selectedPageSize) => {
@@ -68,6 +80,7 @@ const useTablePagination = ({
     },
     offset: pagination.pageIndex * pagination.pageSize,
     pageSize: pagination?.pageSize,
+    serializedParams,
   };
 };
 
