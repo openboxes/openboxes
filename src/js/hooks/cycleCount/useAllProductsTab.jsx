@@ -3,6 +3,12 @@ import React, { useMemo } from 'react';
 import { createColumnHelper } from '@tanstack/react-table';
 import _ from 'lodash';
 import { useSelector } from 'react-redux';
+import {
+  getCurrentLocale,
+  getCurrentLocation,
+  getCycleCountMaxSelectedProducts,
+  getFormatLocalizedDate,
+} from 'selectors';
 
 import cycleCountApi from 'api/services/CycleCountApi';
 import { CYCLE_COUNT_CANDIDATES } from 'api/urls';
@@ -23,7 +29,6 @@ import useTranslate from 'hooks/useTranslate';
 import Badge from 'utils/Badge';
 import exportFileFromAPI from 'utils/file-download-util';
 import { mapStringToLimitedList } from 'utils/form-values-utils';
-import { formatDate } from 'utils/translation-utils';
 
 const useAllProductsTab = ({
   filterParams,
@@ -42,16 +47,12 @@ const useAllProductsTab = ({
     currentLocale,
     currentLocation,
     cycleCountMaxSelectedProducts,
-  } = useSelector((state) => ({
-    currentLocale: state.session.activeLanguage,
-    currentLocation: state.session.currentLocation,
-    cycleCountMaxSelectedProducts: state.session.cycleCountMaxSelectedProducts,
-  }));
-
-  const {
     formatLocalizedDate,
   } = useSelector((state) => ({
-    formatLocalizedDate: formatDate(state.localize),
+    currentLocale: getCurrentLocale(state),
+    currentLocation: getCurrentLocation(state),
+    cycleCountMaxSelectedProducts: getCycleCountMaxSelectedProducts(state),
+    formatLocalizedDate: getFormatLocalizedDate(state),
   }));
 
   const {

@@ -13,6 +13,12 @@ import _ from 'lodash';
 import moment from 'moment';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
+import {
+  getCurrentLocation,
+  getCycleCountsIds,
+  getReasonCodes,
+  getUsers,
+} from 'selectors';
 
 import { eraseDraft, fetchBinLocations, fetchUsers } from 'actions';
 import { UPDATE_CYCLE_COUNT_IDS } from 'actions/types';
@@ -71,10 +77,10 @@ const useResolveStep = () => {
     reasonCodes,
     users,
   } = useSelector((state) => ({
-    users: state.users.data,
-    cycleCountIds: state.cycleCount.cycleCounts,
-    reasonCodes: state.cycleCount.reasonCodes,
-    currentLocation: state.session.currentLocation,
+    users: getUsers(state),
+    cycleCountIds: getCycleCountsIds(state),
+    reasonCodes: getReasonCodes(state),
+    currentLocation: getCurrentLocation(state),
   }));
 
   const translate = useTranslate();
@@ -358,7 +364,10 @@ const useResolveStep = () => {
         .filter((id) => !cycleCountIdsToDelete.includes(id));
       dispatch({
         type: UPDATE_CYCLE_COUNT_IDS,
-        payload: updatedCycleCountsIds,
+        payload: {
+          locationId: currentLocation?.id,
+          cycleCounts: updatedCycleCountsIds,
+        },
       });
       // If we've canceled every product in the batch, there's no reason to stay on this screen.
       if (tableData.current.length === 0) {
@@ -435,7 +444,10 @@ const useResolveStep = () => {
     if (canceledCycleCountsIds.length > 0) {
       dispatch({
         type: UPDATE_CYCLE_COUNT_IDS,
-        payload: existingCycleCountsIds,
+        payload: {
+          locationId: currentLocation?.id,
+          cycleCounts: existingCycleCountsIds,
+        },
       });
       notification(NotificationType.ERROR_FILLED)({
         message: 'Error',
@@ -695,7 +707,10 @@ const useResolveStep = () => {
       if (outdatedProducts > 0) {
         dispatch({
           type: UPDATE_CYCLE_COUNT_IDS,
-          payload: cycleCountIdsForOutdatedProducts,
+          payload: {
+            locationId: currentLocation?.id,
+            cycleCounts: cycleCountIdsForOutdatedProducts,
+          },
         });
         openReviewProductsModal(outdatedProducts, cycleCountIdsForOutdatedProducts);
         return;
