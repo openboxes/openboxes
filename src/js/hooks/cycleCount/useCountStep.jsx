@@ -158,17 +158,6 @@ const useCountStep = () => {
     dispatch(fetchUsers());
   }, []);
 
-  const printCountForm = async (format) => {
-    show();
-    await exportFileFromApi({
-      url: CYCLE_COUNT_URL(currentLocation?.id),
-      params: { id: cycleCountIds },
-      format,
-    });
-    resetFocus();
-    hide();
-  };
-
   const setAllItemsUpdatedState = (cycleCountId, updated) => {
     const tableIndex = tableData.current.findIndex(
       (cycleCount) => cycleCount?.id === cycleCountId,
@@ -365,6 +354,19 @@ const useCountStep = () => {
       resetFocus();
       hide();
     }
+  };
+
+  const printCountForm = async (format) => {
+    show();
+    // The backend does the export so we need to save first to ensure it has accurate data.
+    await save();
+    await exportFileFromApi({
+      url: CYCLE_COUNT_URL(currentLocation?.id),
+      params: { id: cycleCountIds },
+      format,
+    });
+    resetFocus();
+    hide();
   };
 
   const next = async () => {
