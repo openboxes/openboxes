@@ -524,16 +524,22 @@ const useResolveStep = () => {
         const cycleCountItemsToUpdate = cycleCount.cycleCountItems
           .filter((item) => (item.updated && !item.id.includes('newRow')))
           .map(trimLotNumberSpaces);
-        for (const cycleCountItem of cycleCountItemsToUpdate) {
-          await cycleCountApi.updateCycleCountItem(getPayload(cycleCountItem, cycleCount),
-            currentLocation?.id, cycleCountItem?.id);
+        const updatePayload = {
+          itemsToUpdate: cycleCountItemsToUpdate.map((item) => getPayload(item, cycleCount)),
+        };
+        if (updatePayload.itemsToUpdate.length > 0) {
+          await cycleCountApi
+            .updateCycleCountItems(updatePayload, currentLocation?.id, cycleCount.id);
         }
         const cycleCountItemsToCreate = cycleCount.cycleCountItems
           .filter((item) => item.id.includes('newRow'))
           .map(trimLotNumberSpaces);
-        for (const cycleCountItem of cycleCountItemsToCreate) {
-          await cycleCountApi.createCycleCountItem(getPayload(cycleCountItem, cycleCount),
-            currentLocation?.id, cycleCount?.id);
+        const createPayload = {
+          itemsToCreate: cycleCountItemsToCreate.map((item) => getPayload(item, cycleCount)),
+        };
+        if (createPayload.itemsToCreate.length > 0) {
+          await cycleCountApi
+            .createCycleCountItems(createPayload, currentLocation?.id, cycleCount.id);
         }
 
         // Now that we've successfully saved all the items, mark them all as not updated so that
@@ -712,10 +718,13 @@ const useResolveStep = () => {
     // Nested path in colum names contains "_" instead of "."
     const nestedPath = columnId.replaceAll('_', '.');
     // Update data for: cycleCount (table) -> cycleCountItem (row) -> column (nestedPath)
+    const valueChanged = _.get(tableData.current, `[${tableIndex}].cycleCountItems[${rowIndex}].${nestedPath}`) !== value;
     _.set(tableData.current, `[${tableIndex}].cycleCountItems[${rowIndex}].${nestedPath}`, value);
 
     // Mark item as updated, so that the item can be easily distinguished whether it was updated
-    _.set(tableData.current, `[${tableIndex}].cycleCountItems[${rowIndex}].updated`, true);
+    if (valueChanged) {
+      _.set(tableData.current, `[${tableIndex}].cycleCountItems[${rowIndex}].updated`, true);
+    }
   };
 
   const tableMeta = {
