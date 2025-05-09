@@ -3,16 +3,17 @@ import { useHistory } from 'react-router-dom';
 
 import { eraseDraft } from 'actions';
 import { CYCLE_COUNT } from 'consts/applicationUrls';
+import { TO_COUNT_TAB } from 'consts/cycleCount';
 
-const useDraftInfoBar = () => {
+const useDraftInfoBar = (tab) => {
   const dispatch = useDispatch();
   const history = useHistory();
   const discardDraft = () => {
-    dispatch(eraseDraft());
+    dispatch(eraseDraft(tab));
   };
 
   const continueDraft = () => {
-    history.push(CYCLE_COUNT.countStep());
+    history.push(tab === TO_COUNT_TAB ? CYCLE_COUNT.countStep() : CYCLE_COUNT.resolveStep());
   };
 
   return {

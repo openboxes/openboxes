@@ -798,6 +798,7 @@ export const startResolution = (requestIds, locationId) => async (dispatch) => {
   });
 };
 
-export const eraseDraft = () => ({
+export const eraseDraft = (tab) => ({
   type: ERASE_DRAFT,
+  payload: tab,
 });
