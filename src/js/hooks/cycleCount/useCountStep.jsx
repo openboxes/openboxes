@@ -171,8 +171,6 @@ const useCountStep = () => {
       }
       return cycleCount;
     });
-    console.table(JSON.parse(JSON.stringify(tableData.current)));
-    console.table(tableData.current);
   };
 
   const markAllItemsAsUpdated = (cycleCountId) => setAllItemsUpdatedState(cycleCountId, true);
