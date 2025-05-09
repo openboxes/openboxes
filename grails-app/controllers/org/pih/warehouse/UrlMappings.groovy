@@ -874,6 +874,11 @@ class UrlMappings {
             action = [POST: "updateAttributes"]
         }
 
+        "/api/productSuppliers/export" {
+            controller = { "productSupplierApi" }
+            action = [GET: "export"]
+        }
+
         // Load Data
 
         "/api/loadData/listOfDemoData"(parseRequest: true) {
