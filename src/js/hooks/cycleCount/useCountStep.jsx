@@ -171,6 +171,7 @@ const useCountStep = () => {
       }
       return cycleCount;
     });
+    console.table(JSON.parse(JSON.stringify(tableData.current)));
     console.table(tableData.current);
   };
 
@@ -330,28 +331,20 @@ const useCountStep = () => {
         const updatePayload = {
           itemsToUpdate: cycleCountItemsToUpdate.map((item) => getPayload(item, cycleCount)),
         };
-        await cycleCountApi.updateCycleCountItems(updatePayload, currentLocation?.id, cycleCount.id);
-        // for (const cycleCountItem of cycleCountItemsToUpdate) {
-        //   await cycleCountApi.updateCycleCountItem(
-        //     getPayload(cycleCountItem, cycleCount),
-        //     currentLocation?.id,
-        //     cycleCountItem?.id,
-        //   );
-        // }
+        if (updatePayload.itemsToUpdate.length > 0) {
+          await cycleCountApi
+            .updateCycleCountItems(updatePayload, currentLocation?.id, cycleCount.id);
+        }
         const cycleCountItemsToCreate = cycleCount.cycleCountItems
           .filter((item) => item.id.includes('newRow'))
           .map(trimLotNumberSpaces);
         const createPayload = {
           itemsToCreate: cycleCountItemsToCreate.map((item) => getPayload(item, cycleCount)),
         };
-        await cycleCountApi.createCycleCountItems(createPayload, currentLocation?.id, cycleCount.id);
-        // for (const cycleCountItem of cycleCountItemsToCreate) {
-        //   await cycleCountApi.createCycleCountItem(
-        //     getPayload(cycleCountItem, cycleCount),
-        //     currentLocation?.id,
-        //     cycleCount?.id,
-        //   );
-        // }
+        if (createPayload.itemsToCreate.length > 0) {
+          await cycleCountApi
+            .createCycleCountItems(createPayload, currentLocation?.id, cycleCount.id);
+        }
 
         // Now that we've successfully saved all the items, mark them all as not updated so that
         // we don't try to update them again next time something is changed.
@@ -549,10 +542,13 @@ const useCountStep = () => {
     // Nested path in colum names contains "_" instead of "."
     const nestedPath = columnId.replaceAll('_', '.');
     // Update data for: cycleCount (table) -> cycleCountItem (row) -> column (nestedPath)
+    const valueChanged = _.get(tableData.current, `[${tableIndex}].cycleCountItems[${rowIndex}].${nestedPath}`) !== value;
     _.set(tableData.current, `[${tableIndex}].cycleCountItems[${rowIndex}].${nestedPath}`, value);
 
     // Mark item as updated, so that the item can be easily distinguished whether it was updated
-    _.set(tableData.current, `[${tableIndex}].cycleCountItems[${rowIndex}].updated`, true);
+    if (valueChanged) {
+      _.set(tableData.current, `[${tableIndex}].cycleCountItems[${rowIndex}].updated`, true);
+    }
   };
 
   const tableMeta = {
