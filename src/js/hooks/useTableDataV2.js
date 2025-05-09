@@ -23,7 +23,7 @@ const useTableDataV2 = ({
   sort,
   order,
   shouldFetch,
-  triggerFetchDataCounter,
+  serializedParams,
 }) => {
   const sourceRef = useRef(CancelToken.source());
   const translate = useTranslate();
@@ -68,7 +68,7 @@ const useTableDataV2 = ({
       fetchData();
     }
   }, [
-    triggerFetchDataCounter,
+    serializedParams,
     pageSize,
     sort,
     order,
