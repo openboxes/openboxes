@@ -10,13 +10,14 @@ import spock.lang.Specification
 import spock.lang.Unroll
 
 import org.pih.warehouse.DateUtil
+import org.pih.warehouse.databinding.DataBindingConstants
 
 @Unroll
 class DateUtilSpec extends Specification {
 
     void 'asDate should successfully parse using the default format for case: #scenario'() {
-        given: 'a format to Stringify the parsed Date as (for asserting against)'
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
+        given: 'a format to use when making assertions on the Date (we force UTC to avoid system time inconsistency)'
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX")
         format.setTimeZone(TimeZone.getTimeZone(ZoneOffset.UTC))
 
         when:
@@ -51,13 +52,32 @@ class DateUtilSpec extends Specification {
         "01/01/2000 00:00 +0500"    || "1999-12-31T19:00:00Z" | "Timezone conforming to XX format w/ positive our format"
         "01/01/2000 00:00 +05:00"   || "1999-12-31T19:00:00Z" | "Timezone conforming to XXX format w/ positive our format"
 
-        // When not given a timezone, we default to UTC.
-        "01/01/2000 00:00"          || "2000-01-01T00:00:00Z" | "No timezone our format"
-        "2000-01-01 00:00"          || "2000-01-01T00:00:00Z" | "No timezone ISO format"
+        // When not given a time, we default to midnight.
+        "01/01/2000 Z"              || "2000-01-01T00:00:00Z" | "No time our format"
+        "2000-01-01 Z"              || "2000-01-01T00:00:00Z" | "No time ISO format"
+    }
 
-        // When not given a time or timezone, we default to midnight UTC.
-        "01/01/2000"                || "2000-01-01T00:00:00Z" | "No time or timezone our format"
-        "2000-01-01"                || "2000-01-01T00:00:00Z" | "No time or timezone ISO format"
+    void 'asDate should successfully parse when no timezone is given for case: #scenario'() {
+        given: 'we parse to the server timezone for making assertions so that we can get consistent results'
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX")
+        ZoneOffset zone = DataBindingConstants.getSystemZoneOffset()
+        format.setTimeZone(TimeZone.getTimeZone(zone))
+
+        when: 'we append zone dynamically based on the current server timezone'
+        String expectedConvertedDateWithZone = expectedConvertedDate + zone
+
+        and:
+        Date date = DateUtil.asDate(givenDate)
+
+        then:
+        assert expectedConvertedDateWithZone == format.format(date)
+
+        where:
+        givenDate                   || expectedConvertedDate | scenario
+        "01/01/2000 00:00"          || "2000-01-01T00:00:00" | "No timezone our format"
+        "2000-01-01 00:00"          || "2000-01-01T00:00:00" | "No timezone ISO format"
+        "01/01/2000"                || "2000-01-01T00:00:00" | "No time or timezone our format"
+        "2000-01-01"                || "2000-01-01T00:00:00" | "No time or timezone ISO format"
     }
 
     void 'asDate should fail to parse using the default format for case: #failureReason'() {
@@ -65,12 +85,12 @@ class DateUtilSpec extends Specification {
         DateUtil.asDate(givenDate)
 
         then:
-        thrown(DateTimeParseException)
+        thrown(exception)
 
         where:
-        givenDate    || failureReason
-        "01 01 2000" || "spaces not supported as separator"
-        "01/01/00"   || "two digit year format not supported"
+        givenDate    || exception              | failureReason
+        "01 01 2000" || DateTimeParseException | "spaces not supported as separator"
+        "01/01/00"   || DateTimeParseException | "two digit year format not supported"
     }
 
     void 'asInstant should successfully convert a Date to an Instant for case: #scenario'() {
