@@ -20,6 +20,7 @@ const CycleCountToResolve = ({
     offset,
     pageSize,
     setTotalCount,
+    triggerFetchDataCounter,
   } = tablePaginationProps;
   const {
     columns,
@@ -35,6 +36,7 @@ const CycleCountToResolve = ({
     filterParams,
     offset,
     pageSize,
+    triggerFetchDataCounter,
   });
 
   useEffect(() => {
@@ -120,5 +122,6 @@ CycleCountToResolve.propTypes = {
     offset: PropTypes.number.isRequired,
     pageSize: PropTypes.number.isRequired,
     setTotalCount: PropTypes.func.isRequired,
+    triggerFetchDataCounter: PropTypes.number.isRequired,
   }).isRequired,
 };

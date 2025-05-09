@@ -9,6 +9,7 @@ const useCycleCountPagination = (filterParams, defaultPageSize = 5) => {
     paginationProps,
     offset,
     pageSize,
+    triggerFetchDataCounter,
   } = useTablePagination({
     defaultPageSize,
     totalCount,
@@ -20,6 +21,7 @@ const useCycleCountPagination = (filterParams, defaultPageSize = 5) => {
     offset,
     pageSize,
     setTotalCount,
+    triggerFetchDataCounter,
   };
 };
 

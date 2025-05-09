@@ -32,6 +32,7 @@ const useAllProductsTab = ({
   pageSize,
   resetForm,
   setToCountCheckedCheckboxes,
+  triggerFetchDataCounter,
 }) => {
   const columnHelper = createColumnHelper();
   const spinner = useSpinner();
@@ -119,6 +120,7 @@ const useAllProductsTab = ({
     order,
     searchTerm,
     filterParams,
+    triggerFetchDataCounter,
   });
 
   const productIds = tableData.data.map((row) => row.product.id);

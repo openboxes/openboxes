@@ -33,6 +33,7 @@ const useToCountTab = ({
   offset,
   pageSize,
   toCountTabCheckboxes,
+  triggerFetchDataCounter,
 }) => {
   const columnHelper = createColumnHelper();
   const translate = useTranslate();
@@ -118,11 +119,9 @@ const useToCountTab = ({
     shouldFetch: filterParams.tab && tab === filterParams.tab,
     getParams,
     pageSize,
-    offset,
     sort,
     order,
-    searchTerm,
-    filterParams,
+    triggerFetchDataCounter,
   });
 
   const getCycleCountRequestsIds = () => tableData.data.map((row) => row.cycleCountRequest.id);

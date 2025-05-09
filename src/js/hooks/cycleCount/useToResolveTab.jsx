@@ -33,6 +33,7 @@ const useToResolveTab = ({
   filterParams,
   offset,
   pageSize,
+  triggerFetchDataCounter,
 }) => {
   const columnHelper = createColumnHelper();
   const translate = useTranslate();
@@ -119,11 +120,9 @@ const useToResolveTab = ({
     shouldFetch: filterParams.tab && tab === filterParams.tab,
     getParams,
     pageSize,
-    offset,
     sort,
     order,
-    searchTerm,
-    filterParams,
+    triggerFetchDataCounter,
   });
 
   const getCycleCountRequestsIds = () => tableData.data.map((row) => row.cycleCountRequest.id);

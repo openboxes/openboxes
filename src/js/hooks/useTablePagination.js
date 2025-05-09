@@ -9,6 +9,10 @@ const useTablePagination = ({
     pageIndex: 0,
     pageSize: defaultPageSize || 5,
   });
+  // triggerFetchDataCounter triggers data fetching in useTableDataV2, preventing duplicate
+  // API calls. Previously, useEffect dependencies [filterParams, offset] caused two requests,
+  // as useTablePagination's useEffect listened to filterParams and later updated offset
+  const [triggerFetchDataCounter, setTriggerFetchDataCounter] = useState(0);
 
   const maxPage = useMemo(
     () => Math.floor(totalCount / pagination.pageSize),
@@ -34,6 +38,7 @@ const useTablePagination = ({
       ...prev,
       pageIndex: page,
     }));
+    setTriggerFetchDataCounter((prev) => prev + 1);
   };
 
   const onPageSizeChange = (selectedPageSize) => {
@@ -68,6 +73,7 @@ const useTablePagination = ({
     },
     offset: pagination.pageIndex * pagination.pageSize,
     pageSize: pagination?.pageSize,
+    triggerFetchDataCounter,
   };
 };
 

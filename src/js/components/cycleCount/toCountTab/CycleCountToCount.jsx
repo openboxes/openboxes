@@ -19,6 +19,7 @@ const CycleCountToCount = ({ filterParams, toCountTabCheckboxes, tablePagination
     offset,
     pageSize,
     setTotalCount,
+    fetchDataCounter,
   } = tablePaginationProps;
 
   const { selectedCheckboxesAmount } = toCountTabCheckboxes;
@@ -39,6 +40,7 @@ const CycleCountToCount = ({ filterParams, toCountTabCheckboxes, tablePagination
     offset,
     pageSize,
     toCountTabCheckboxes,
+    fetchDataCounter,
   });
 
   useEffect(() => {
@@ -135,5 +137,6 @@ CycleCountToCount.propTypes = {
     offset: PropTypes.number.isRequired,
     pageSize: PropTypes.number.isRequired,
     setTotalCount: PropTypes.func.isRequired,
+    fetchDataCounter: PropTypes.number.isRequired,
   }).isRequired,
 };
