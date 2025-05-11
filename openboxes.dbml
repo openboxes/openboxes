@@ -1,2719 +1,2429 @@
-Project openboxes {
-  database_type: 'MySQL'
-  Note: 'Data model for latest development version of OpenBoxes'
-}
-
-Table "DATABASECHANGELOG" {
-  "ID" varchar(63) [not null]
-  "AUTHOR" varchar(63) [not null]
-  "FILENAME" varchar(200) [not null]
-  "DATEEXECUTED" datetime [not null]
-  "MD5SUM" varchar(32) [default: NULL]
-  "DESCRIPTION" varchar(255) [default: NULL]
-  "COMMENTS" varchar(255) [default: NULL]
-  "TAG" varchar(255) [default: NULL]
-  "LIQUIBASE" varchar(10) [default: NULL]
-
-Indexes {
-  (ID, AUTHOR, FILENAME) [pk]
-}
-}
-
-Table "DATABASECHANGELOGLOCK" {
-  "ID" int(11) [pk, not null]
-  "LOCKED" tinyint(1) [not null]
-  "LOCKGRANTED" datetime [default: NULL]
-  "LOCKEDBY" varchar(255) [default: NULL]
-}
-
 Table "address" {
-  "id" char(38) [pk, not null, default: ""]
-  "version" bigint(20) [not null]
+  "id" varchar(255) [pk, not null]
+  "version" bigint [not null]
   "address" varchar(255) [not null]
-  "address2" varchar(255) [default: NULL]
-  "city" varchar(255) [default: NULL]
-  "country" varchar(255) [default: NULL]
-  "date_created" datetime [not null]
-  "last_updated" datetime [not null]
-  "postal_code" varchar(255) [default: NULL]
-  "state_or_province" varchar(255) [default: NULL]
-  "description" varchar(4000) [default: NULL]
+  "state_or_province" varchar(255)
+  "date_created" datetime(6) [not null]
+  "postal_code" varchar(255)
+  "address2" varchar(255)
+  "last_updated" datetime(6) [not null]
+  "city" varchar(255)
+  "country" varchar(255)
+  "description" varchar(4000)
 }
 
 Table "attribute" {
-  "id" char(38) [pk, not null, default: ""]
-  "version" bigint(20) [not null]
-  "date_created" datetime [not null]
-  "last_updated" datetime [not null]
+  "id" varchar(255) [pk, not null]
+  "version" bigint [not null]
+  "date_created" datetime(6) [not null]
+  "unit_of_measure_class_id" varchar(255)
+  "exportable" bit [not null]
+  "code" varchar(255) [not null]
+  "last_updated" datetime(6) [not null]
+  "active" bit [not null]
+  "allow_multiple" bit [not null]
+  "default_value" varchar(255)
   "name" varchar(255) [not null]
-  "allow_other" bit(1) [default: NULL]
-  "active" bit(1) [default: NULL]
-  "allow_multiple" bit(1) [default: NULL]
-  "code" varchar(255) [default: NULL]
-  "default_value" varchar(255) [default: NULL]
-  "description" varchar(255) [default: NULL]
-  "required" bit(1) [default: NULL]
-  "exportable" bit(1) [default: `b'1'`]
-  "unit_of_measure_class_id" char(38) [default: NULL]
-
-Indexes {
-  code [unique, name: "code"]
-  unit_of_measure_class_id [name: "FKC7AA9C4013CE80"]
-}
+  "allow_other" bit [not null]
+  "required" bit [not null]
+  "description" varchar(255)
 }
 
 Table "attribute_entity_type_codes" {
-  "attribute_id" char(38) [default: NULL]
-  "entity_type_code" varchar(255) [default: NULL]
+  "attribute_id" varchar(255) [not null]
+  "entity_type_code" varchar(255) [not null]
 
-Indexes {
-  attribute_id [name: "FK38EE09DA47B0D087"]
-}
+  Indexes {
+    (attribute_id, entity_type_code) [pk]
+  }
 }
 
 Table "attribute_options" {
-  "attribute_id" char(38) [default: NULL]
-  "options_string" varchar(255) [default: NULL]
-  "options_idx" int(11) [default: NULL]
+  "attribute_id" varchar(255) [not null]
+  "options_string" varchar(255)
+  "options_idx" integer
 }
 
 Table "budget_code" {
-  "id" char(38) [pk, not null]
-  "code" longtext [not null]
-  "name" longtext
-  "description" longtext
-  "organization_id" char(38) [default: NULL]
-  "date_created" datetime [default: NULL]
-  "last_updated" datetime [default: NULL]
-  "created_by_id" char(38) [default: NULL]
-  "updated_by_id" char(38) [default: NULL]
-
-Indexes {
-  organization_id [name: "fk_budget_code_organization"]
-  created_by_id [name: "fk_budget_code_created_by"]
-  updated_by_id [name: "fk_budget_code_updated_by"]
-}
+  "id" varchar(255) [pk, not null]
+  "date_created" datetime(6) [not null]
+  "code" varchar(255) [not null]
+  "last_updated" datetime(6) [not null]
+  "name" varchar(255)
+  "organization_id" varchar(255)
+  "active" bit
+  "updated_by_id" varchar(255)
+  "created_by_id" varchar(255)
+  "description" varchar(255)
 }
 
 Table "category" {
-  "id" char(38) [pk, not null, default: ""]
-  "version" bigint(20) [not null]
-  "date_created" datetime [not null]
-  "description" varchar(255) [default: NULL]
-  "last_updated" datetime [not null]
+  "id" varchar(255) [pk, not null]
+  "version" bigint [not null]
+  "parent_category_id" varchar(255)
+  "date_created" datetime(6) [not null]
+  "last_updated" datetime(6) [not null]
+  "is_root" bit
+  "sort_order" integer
+  "gl_account_id" varchar(255)
   "name" varchar(255) [not null]
-  "parent_category_id" char(38) [default: NULL]
-  "sort_order" int(11) [default: NULL]
-  "is_root" tinyint(4) [default: NULL]
-  "gl_account_id" char(38) [default: NULL]
-
-Indexes {
-  parent_category_id [name: "FK302BCFE619A2EF8"]
-  gl_account_id [name: "fk_category_gl_account"]
-}
-}
-
-Table "click_stream" {
-  "id" bigint(20) [pk, not null]
-  "date_created" datetime [not null]
-  "hostname" varchar(255) [default: NULL]
-  "last_updated" datetime [not null]
-  "referrer" varchar(255) [default: NULL]
-  "session_id" varchar(255) [not null]
-}
-
-Table "click_stream_request" {
-  "id" bigint(20) [pk, not null]
-  "click_stream_id" bigint(20) [not null]
-  "date_created" datetime [not null]
-  "port" int(11) [default: NULL]
-  "protocol" varchar(8) [not null]
-  "query" varchar(255) [default: NULL]
-  "server" varchar(255) [not null]
-  "uri" varchar(255) [not null]
-  "person" varchar(255) [default: NULL]
-
-Indexes {
-  click_stream_id [name: "FKFD8E50671A43AB29"]
-}
+  "description" varchar(255)
 }
 
 Table "comment" {
-  "id" char(38) [pk, not null, default: ""]
-  "version" bigint(20) [not null]
-  "comment" text
-  "date_created" datetime [not null]
-  "date_read" datetime [default: NULL]
-  "date_sent" datetime [default: NULL]
-  "last_updated" datetime [not null]
-  "recipient_id" char(38) [default: NULL]
-  "sender_id" char(38) [default: NULL]
-
-Indexes {
-  recipient_id [name: "FK38A5EE5FF885F087"]
-  sender_id [name: "FK38A5EE5FAF1302EB"]
-}
-}
-
-Table "consumption" {
-  "id" char(38) [pk, not null, default: ""]
-  "version" bigint(20) [not null]
-  "day" int(11) [default: NULL]
-  "inventory_item_id" char(38) [default: NULL]
-  "month" int(11) [default: NULL]
-  "product_id" char(38) [default: NULL]
-  "year" int(11) [default: NULL]
-  "location_id" char(38) [default: NULL]
-  "transaction_date" datetime [default: NULL]
-  "date_created" datetime [default: NULL]
-  "last_updated" datetime [default: NULL]
-  "quantity" int(11) [default: NULL]
-
-Indexes {
-  inventory_item_id [name: "FKCD71F39BAA992CED"]
-  location_id [name: "FKCD71F39B8ABEBD5"]
-  product_id [name: "FKCD71F39BDED5FAE7"]
-}
+  "id" varchar(255) [pk, not null]
+  "version" bigint [not null]
+  "date_read" datetime(6)
+  "sender_id" varchar(255)
+  "comment" varchar(255) [not null]
+  "date_created" datetime(6) [not null]
+  "last_updated" datetime(6) [not null]
+  "date_sent" datetime(6)
+  "recipient_id" varchar(255)
 }
 
 Table "consumption_fact" {
-  "id" bigint(20) [pk, not null, increment]
-  "version" bigint(20) [not null]
-  "date_created" datetime [not null]
-  "last_updated" datetime [not null]
-  "location_key_id" bigint(20) [not null]
-  "lot_key_id" bigint(20) [not null]
-  "product_key_id" bigint(20) [not null]
-  "quantity" decimal(19,2) [not null]
-  "transaction_code" varchar(255) [not null]
-  "transaction_date_key_id" bigint(20) [not null]
-  "transaction_number" varchar(255) [not null]
-  "transaction_type" varchar(255) [not null]
-  "unit_cost" decimal(19,2) [not null]
+  "id" bigint [pk, not null]
+  "version" bigint [not null]
   "unit_price" decimal(19,2) [not null]
-
-Indexes {
-  location_key_id [name: "FKA8B7A490A27827C2"]
-  lot_key_id [name: "FKA8B7A490D1F27172"]
-  product_key_id [name: "FKA8B7A49072882836"]
-  transaction_date_key_id [name: "FKA8B7A490CA32CFEF"]
-}
+  "lot_key_id" bigint [not null]
+  "date_created" datetime(6) [not null]
+  "transaction_date_key_id" bigint [not null]
+  "last_updated" datetime(6) [not null]
+  "transaction_number" varchar(255) [not null]
+  "transaction_code" varchar(255) [not null]
+  "location_key_id" bigint [not null]
+  "product_key_id" bigint [not null]
+  "unit_cost" decimal(19,2) [not null]
+  "transaction_type" varchar(255) [not null]
+  "quantity" decimal(19,2) [not null]
 }
 
 Table "container" {
-  "id" char(38) [pk, not null, default: ""]
-  "version" bigint(20) [not null]
-  "container_number" varchar(255) [default: NULL]
-  "container_type_id" char(38) [default: NULL]
-  "date_created" datetime [not null]
-  "description" varchar(255) [default: NULL]
-  "height" float(12,3) [default: NULL]
-  "last_updated" datetime [not null]
-  "length" float(12,3) [default: NULL]
-  "name" varchar(255) [default: NULL]
-  "parent_container_id" char(38) [default: NULL]
-  "recipient_id" char(38) [default: NULL]
-  "shipment_id" char(38) [default: NULL]
-  "volume_units" varchar(255) [default: NULL]
-  "weight" float(12,3) [default: NULL]
-  "weight_units" varchar(255) [default: NULL]
-  "width" float(12,3) [default: NULL]
-  "container_status" varchar(255) [default: NULL]
-  "sort_order" int(11) [default: NULL]
-
-Indexes {
-  container_type_id [name: "FKE7814C8117A6E251"]
-  parent_container_id [name: "FKE7814C814B6A2E03"]
-  recipient_id [name: "FKE7814C8144979D51"]
-  shipment_id [name: "FKE7814C813B5F6286"]
-}
+  "id" varchar(255) [pk, not null]
+  "version" bigint [not null]
+  "width" float
+  "date_created" datetime(6) [not null]
+  "last_updated" datetime(6) [not null]
+  "container_number" varchar(255)
+  "parent_container_id" varchar(255)
+  "weight_units" varchar(255)
+  "container_type_id" varchar(255) [not null]
+  "weight" float
+  "container_status" varchar(255)
+  "sort_order" integer
+  "height" float
+  "shipment_id" varchar(255) [not null]
+  "name" varchar(255) [not null]
+  "recipient_id" varchar(255)
+  "length" float
+  "description" varchar(255)
+  "volume_units" varchar(255)
 }
 
 Table "container_type" {
-  "id" char(38) [pk, not null, default: ""]
-  "version" bigint(20) [not null]
-  "date_created" datetime [not null]
-  "description" varchar(255) [default: NULL]
-  "last_updated" datetime [not null]
+  "id" varchar(255) [pk, not null]
+  "version" bigint [not null]
+  "sort_order" integer
+  "date_created" datetime(6) [not null]
+  "last_updated" datetime(6) [not null]
   "name" varchar(255) [not null]
-  "sort_order" int(11) [default: NULL]
+  "description" varchar(255)
 }
 
 Table "date_dimension" {
-  "id" bigint(20) [pk, not null, increment]
-  "version" bigint(20) [not null]
-  "date" datetime [not null]
-  "day_of_month" int(11) [not null]
-  "day_of_week" int(11) [not null]
-  "month" int(11) [not null]
-  "month_name" varchar(255) [not null]
+  "id" bigint [pk, not null]
+  "version" bigint [not null]
   "month_year" varchar(255) [not null]
-  "week" int(11) [not null]
+  "date" datetime(6) [not null]
+  "week" integer [not null]
+  "month_name" varchar(255) [not null]
+  "month" integer [not null]
   "weekday_name" varchar(255) [not null]
-  "year" int(11) [not null]
-
-Indexes {
-  date [unique, name: "date_dimension_date_idx"]
-}
+  "year" integer [not null]
+  "day_of_month" integer [not null]
+  "day_of_week" integer [not null]
 }
 
 Table "document" {
-  "id" char(38) [pk, not null, default: ""]
-  "version" bigint(20) [not null]
-  "content_type" varchar(255) [default: NULL]
-  "date_created" datetime [not null]
-  "document_number" varchar(255) [default: NULL]
-  "document_type_id" char(38) [default: NULL]
-  "extension" varchar(255) [default: NULL]
+  "id" varchar(255) [pk, not null]
+  "version" bigint [not null]
+  "date_created" datetime(6) [not null]
+  "last_updated" datetime(6) [not null]
+  "extension" varchar(255)
+  "document_type_id" varchar(255)
+  "file_uri" varchar(255)
+  "document_number" varchar(255)
   "file_contents" mediumblob
-  "file_uri" longtext
-  "filename" varchar(255) [default: NULL]
-  "last_updated" datetime [not null]
-  "name" varchar(255) [default: NULL]
-
-Indexes {
-  document_type_id [name: "FK335CD11B6631D8CC"]
-}
+  "name" varchar(255)
+  "filename" varchar(255)
+  "content_type" varchar(255)
 }
 
 Table "document_type" {
-  "id" char(38) [pk, not null, default: ""]
-  "version" bigint(20) [not null]
-  "date_created" datetime [not null]
-  "description" varchar(255) [default: NULL]
-  "last_updated" datetime [not null]
+  "id" varchar(255) [pk, not null]
+  "version" bigint [not null]
+  "sort_order" integer
+  "date_created" datetime(6) [not null]
+  "last_updated" datetime(6) [not null]
   "name" varchar(255) [not null]
-  "sort_order" int(11) [default: NULL]
-  "document_code" varchar(255) [default: NULL]
+  "document_code" varchar(255)
+  "description" varchar(255)
 }
 
 Table "donor" {
-  "id" char(38) [pk, not null, default: ""]
-  "version" bigint(20) [not null]
-  "date_created" datetime [default: NULL]
-  "description" varchar(255) [default: NULL]
-  "last_updated" datetime [default: NULL]
+  "id" varchar(255) [pk, not null]
+  "version" bigint [not null]
+  "date_created" datetime(6)
+  "last_updated" datetime(6)
   "name" varchar(255) [not null]
+  "description" varchar(255)
 }
 
 Table "event" {
-  "id" char(38) [pk, not null, default: ""]
-  "version" bigint(20) [not null]
-  "date_created" datetime [not null]
-  "event_date" datetime [default: NULL]
-  "event_location_id" char(38) [default: NULL]
-  "event_type_id" char(38) [default: NULL]
-  "last_updated" datetime [not null]
-
-Indexes {
-  event_location_id [name: "FK5C6729A4415A5B0"]
-  event_type_id [name: "FK5C6729A3D970DB4"]
-}
+  "id" varchar(255) [pk, not null]
+  "version" bigint [not null]
+  "event_location_id" varchar(255)
+  "event_date" datetime(6)
+  "comment_id" varchar(255)
+  "date_created" datetime(6) [not null]
+  "last_updated" datetime(6) [not null]
+  "created_by_id" varchar(255)
+  "event_type_id" varchar(255)
 }
 
 Table "event_type" {
-  "id" char(38) [pk, not null, default: ""]
-  "version" bigint(20) [not null]
-  "date_created" datetime [not null]
-  "description" varchar(255) [default: NULL]
-  "event_code" varchar(255) [default: NULL]
-  "last_updated" datetime [not null]
+  "id" varchar(255) [pk, not null]
+  "version" bigint [not null]
+  "event_code" varchar(255) [not null]
+  "sort_order" integer
+  "date_created" datetime(6) [not null]
+  "last_updated" datetime(6) [not null]
   "name" varchar(255) [not null]
-  "sort_order" int(11) [default: NULL]
+  "description" varchar(255)
 }
 
 Table "fulfillment" {
-  "id" char(38) [pk, not null, default: ""]
-  "version" bigint(20) [not null]
-  "date_created" datetime [not null]
-  "date_fulfilled" datetime [default: NULL]
-  "fulfilled_by_id" char(38) [default: NULL]
-  "last_updated" datetime [not null]
-  "status" varchar(255) [default: NULL]
-
-Indexes {
-  fulfilled_by_id [name: "FK5A2551DEAC392B33"]
-}
+  "id" varchar(255) [pk, not null]
+  "version" bigint [not null]
+  "date_created" datetime(6) [not null]
+  "date_fulfilled" datetime(6)
+  "last_updated" datetime(6) [not null]
+  "status" varchar(255)
+  "fulfilled_by_id" varchar(255)
 }
 
 Table "fulfillment_item" {
-  "id" char(38) [pk, not null, default: ""]
-  "version" bigint(20) [not null]
-  "date_created" datetime [not null]
-  "fulfillment_id" char(38) [default: NULL]
-  "inventory_item_id" char(38) [default: NULL]
-  "last_updated" datetime [not null]
-  "quantity" int(11) [default: NULL]
-  "requisition_item_id" char(38) [default: NULL]
-
-Indexes {
-  fulfillment_id [name: "FKEDC55CD494567276"]
-  inventory_item_id [name: "FKEDC55CD4AA992CED"]
-  requisition_item_id [name: "FKEDC55CD447EBE106"]
-}
-}
-
-Table "fulfillment_item_shipment_item" {
-  "fulfillment_item_shipment_items_id" char(38) [default: NULL]
-  "shipment_item_id" char(38) [default: NULL]
-
-Indexes {
-  fulfillment_item_shipment_items_id [name: "FKE071DE6DB42751E1"]
-  shipment_item_id [name: "FKE071DE6DB06EC4FB"]
-}
+  "id" varchar(255) [pk, not null]
+  "version" bigint [not null]
+  "date_created" datetime(6) [not null]
+  "last_updated" datetime(6) [not null]
+  "quantity" integer
+  "requisition_item_id" varchar(255)
+  "fulfillment_id" varchar(255) [not null]
+  "inventory_item_id" varchar(255)
 }
 
 Table "gl_account" {
-  "id" char(38) [pk, not null]
-  "code" longtext [not null]
-  "name" longtext
-  "description" longtext
-  "gl_account_type_id" char(38) [default: NULL]
-  "date_created" datetime [default: NULL]
-  "last_updated" datetime [default: NULL]
-  "created_by_id" char(38) [default: NULL]
-  "updated_by_id" char(38) [default: NULL]
-
-Indexes {
-  gl_account_type_id [name: "fk_gl_account_gl_account_type"]
-  created_by_id [name: "fk_gl_account_created_by"]
-  updated_by_id [name: "fk_gl_account_updated_by"]
-}
+  "id" varchar(255) [pk, not null]
+  "date_created" datetime(6) [not null]
+  "code" varchar(255) [not null]
+  "gl_account_type_id" varchar(255) [not null]
+  "last_updated" datetime(6) [not null]
+  "name" varchar(255)
+  "active" bit [not null]
+  "updated_by_id" varchar(255)
+  "created_by_id" varchar(255)
+  "description" varchar(255)
 }
 
 Table "gl_account_type" {
-  "id" char(38) [pk, not null]
-  "code" longtext [not null]
-  "name" longtext
-  "gl_account_type_code" varchar(100) [default: "ASSET"]
-  "date_created" datetime [default: NULL]
-  "last_updated" datetime [default: NULL]
-  "created_by_id" char(38) [default: NULL]
-  "updated_by_id" char(38) [default: NULL]
-
-Indexes {
-  created_by_id [name: "fk_gl_account_type_created_by"]
-  updated_by_id [name: "fk_gl_account_type_updated_by"]
-}
+  "id" varchar(255) [pk, not null]
+  "date_created" datetime(6) [not null]
+  "code" varchar(255) [not null]
+  "gl_account_type_code" varchar(255) [not null]
+  "last_updated" datetime(6) [not null]
+  "name" varchar(255)
+  "updated_by_id" varchar(255)
+  "created_by_id" varchar(255)
 }
 
 Table "indicator" {
-  "id" char(38) [pk, not null]
-  "version" bigint(20) [not null]
+  "id" varchar(255) [pk, not null]
+  "version" bigint [not null]
+  "expression" varchar(255) [not null]
+  "date_created" datetime(6) [not null]
+  "last_updated" datetime(6) [not null]
   "name" varchar(255) [not null]
-  "description" varchar(2000) [not null]
-  "expression" text [not null]
-  "date_created" datetime [not null]
-  "last_updated" datetime [not null]
+  "description" varchar(255) [not null]
 }
 
 Table "inventory" {
-  "id" char(38) [pk, not null, default: ""]
-  "version" bigint(20) [not null]
-  "last_inventory_date" datetime [default: NULL]
-  "date_created" datetime [default: NULL]
-  "last_updated" datetime [default: NULL]
+  "id" varchar(255) [pk, not null]
+  "version" bigint [not null]
+  "date_created" datetime(6) [not null]
+  "last_updated" datetime(6) [not null]
 }
 
 Table "inventory_item" {
-  "id" char(38) [pk, not null, default: ""]
-  "version" bigint(20) [not null]
-  "date_created" datetime [not null]
-  "last_updated" datetime [not null]
-  "lot_number" varchar(255) [default: NULL]
-  "product_id" char(38) [default: NULL]
-  "expiration_date" datetime [default: NULL]
-  "comments" varchar(255) [default: NULL]
-
-Indexes {
-  (product_id, lot_number) [unique, name: "product_id"]
+  "id" varchar(255) [pk, not null]
+  "version" bigint [not null]
+  "product_id" varchar(255) [not null]
+  "date_created" datetime(6) [not null]
+  "last_updated" datetime(6) [not null]
+  "lot_number" varchar(255)
+  "comments" varchar(255)
+  "lot_status" varchar(255)
+  "expiration_date" datetime(6)
 }
+
+Table "inventory_item_snapshot" {
+  "id" varchar(255) [pk, not null]
+  "version" bigint [not null]
+  "product_id" varchar(255) [not null]
+  "quantity_on_hand" integer
+  "date" datetime(6)
+  "date_created" datetime(6) [not null]
+  "quantity_inbound" integer
+  "last_updated" datetime(6) [not null]
+  "location_id" varchar(255) [not null]
+  "inventory_item_id" varchar(255)
+  "quantity_outbound" integer
 }
 
 Table "inventory_level" {
-  "id" char(38) [pk, not null, default: ""]
-  "version" bigint(20) [not null]
-  "inventory_id" char(38) [default: NULL]
-  "min_quantity" int(11) [default: NULL]
-  "product_id" char(38) [default: NULL]
-  "reorder_quantity" int(11) [default: NULL]
-  "date_created" datetime [default: NULL]
-  "last_updated" datetime [default: NULL]
-  "status" varchar(255) [default: NULL]
-  "max_quantity" int(11) [default: NULL]
-  "bin_location" varchar(255) [default: NULL]
-  "abc_class" varchar(255) [default: NULL]
-  "preferred" tinyint(4) [default: NULL]
-  "expected_lead_time_days" decimal(19,2) [default: NULL]
-  "forecast_period_days" decimal(19,2) [default: NULL]
-  "forecast_quantity" decimal(19,2) [default: NULL]
-  "preferred_bin_location_id" char(38) [default: NULL]
-  "replenishment_location_id" char(38) [default: NULL]
-  "comments" varchar(255) [default: NULL]
+  "id" varchar(255) [pk, not null]
+  "version" bigint [not null]
+  "product_id" varchar(255)
+  "forecast_period_days" decimal(19,2)
+  "reorder_quantity" integer
+  "date_created" datetime(6) [not null]
+  "last_updated" datetime(6) [not null]
+  "bin_location" varchar(255)
+  "replenishment_location_id" varchar(255)
+  "abc_class" varchar(255)
+  "min_quantity" integer
+  "preferred" bit
+  "comments" varchar(255)
+  "forecast_quantity" decimal(19,2)
+  "demand_time_period_days" decimal(19,2)
+  "inventory_id" varchar(255) [not null]
+  "expected_lead_time_days" decimal(19,2)
+  "preferred_bin_location_id" varchar(255)
+  "replenishment_period_days" decimal(19,2)
+  "status" varchar(255)
+  "internal_location_id" varchar(255)
+  "max_quantity" integer
 
-Indexes {
-  inventory_id [name: "FKC254A2E172A2C5B4"]
-  product_id [name: "FKC254A2E1DED5FAE7"]
-  preferred_bin_location_id [name: "FKC254A2E1CFDCB4DF"]
-  replenishment_location_id [name: "FKC254A2E1F07D879A"]
-}
+  Indexes {
+    (product_id, inventory_id) [name: "inventory_level_prod_inv_idx"]
+  }
 }
 
 Table "inventory_snapshot" {
-  "id" char(38) [default: NULL]
-  "version" int(11) [default: NULL]
-  "product_id" char(38) [default: NULL]
-  "location_id" char(38) [default: NULL]
-  "inventory_item_id" char(38) [default: NULL]
-  "quantity_on_hand" int(11) [default: NULL]
-  "quantity_available_to_promise" int(11) [default: NULL]
-  "quantity_inbound" int(11) [default: NULL]
-  "quantity_outbound" int(11) [default: NULL]
-  "last_updated" datetime [default: NULL]
-  "date_created" datetime [default: NULL]
-  "date" datetime [default: NULL]
-  "bin_location_id" char(38) [default: NULL]
+  "id" varchar(255) [pk, not null]
+  "version" bigint [not null]
+  "product_id" varchar(255) [not null]
+  "date" datetime(6)
+  "date_created" datetime(6) [not null]
+  "quantity_inbound" integer
+  "last_updated" datetime(6) [not null]
+  "location_id" varchar(255) [not null]
+  "lot_number" varchar(255) [not null]
+  "bin_location_id" varchar(255)
+  "quantity_outbound" integer
+  "quantity_on_hand" integer
+  "bin_location_name" varchar(255) [not null]
   "product_code" varchar(255) [not null]
-  "lot_number" varchar(255) [default: "DEFAULT"]
-  "expiration_date" datetime [default: NULL]
-  "bin_location_name" varchar(255) [default: "DEFAULT"]
-
-Indexes {
-  (date, location_id, product_code, lot_number, bin_location_name) [unique, name: "inventory_snapshot_uniq_idx"]
-  inventory_item_id [name: "FK740B547AA992CED"]
-  product_id [name: "FK740B547DED5FAE7"]
-  bin_location_id [name: "FK740B54769DB749D"]
-  date [name: "inventory_snapshot_date_idx"]
-  (location_id, last_updated) [name: "inventory_snapshot_last_updated_idx"]
-}
+  "inventory_item_id" varchar(255)
 }
 
 Table "invoice" {
-  "id" char(38) [pk, not null]
+  "id" varchar(255) [pk, not null]
+  "version" bigint [not null]
+  "date_created" datetime(6) [not null]
+  "date_paid" datetime(6)
+  "last_updated" datetime(6) [not null]
+  "updated_by_id" varchar(255)
+  "date_submitted" datetime(6)
+  "date_invoiced" datetime(6)
+  "party_id" varchar(255)
+  "invoice_type_id" varchar(255)
+  "date_due" datetime(6)
   "invoice_number" varchar(255) [not null]
-  "name" varchar(255) [default: NULL]
-  "description" varchar(255) [default: NULL]
-  "invoice_type_id" char(38) [default: NULL]
-  "party_from_id" char(38) [default: NULL]
-  "party_id" char(38) [default: NULL]
-  "date_invoiced" datetime [default: NULL]
-  "date_submitted" datetime [default: NULL]
-  "date_due" datetime [default: NULL]
-  "date_paid" datetime [default: NULL]
-  "currency_uom_id" char(38) [default: NULL]
-  "date_created" datetime [default: NULL]
-  "last_updated" datetime [default: NULL]
-  "created_by_id" char(38) [default: NULL]
-  "updated_by_id" char(38) [default: NULL]
-  "version" bigint(20) [not null]
-
-Indexes {
-  invoice_type_id [name: "fk_invoice_invoice_type"]
-  party_from_id [name: "fk_invoice_party_from"]
-  party_id [name: "fk_invoice_party"]
-  currency_uom_id [name: "fk_invoice_currency_uom"]
-  created_by_id [name: "fk_invoice_created_by"]
-  updated_by_id [name: "fk_invoice_updated_by"]
+  "name" varchar(255)
+  "created_by_id" varchar(255)
+  "party_from_id" varchar(255)
+  "date_posted" datetime(6)
+  "description" varchar(255)
+  "currency_uom_id" varchar(255)
 }
+
+Table "invoice_document" {
+  "invoice_id" varchar(255) [not null]
+  "document_id" varchar(255)
 }
 
 Table "invoice_item" {
-  "id" char(38) [pk, not null]
-  "invoice_id" char(38) [not null]
-  "product_id" char(38) [default: NULL]
-  "gl_account_id" char(38) [default: NULL]
-  "budget_code_id" char(38) [default: NULL]
-  "quantity" decimal(19,2) [not null]
-  "quantity_uom_id" char(38) [default: NULL]
+  "id" varchar(255) [pk, not null]
+  "version" bigint [not null]
+  "product_id" varchar(255)
+  "unit_price" decimal(19,2)
+  "date_created" datetime(6) [not null]
+  "quantity_uom_id" varchar(255)
+  "last_updated" datetime(6) [not null]
   "quantity_per_uom" decimal(19,2) [not null]
-  "amount" decimal(19,4) [default: NULL]
-  "date_created" datetime [default: NULL]
-  "last_updated" datetime [default: NULL]
-  "created_by_id" char(38) [default: NULL]
-  "updated_by_id" char(38) [default: NULL]
-  "version" bigint(20) [not null]
-
-Indexes {
-  invoice_id [name: "fk_invoice_item_invoice"]
-  product_id [name: "fk_invoice_item_product"]
-  gl_account_id [name: "fk_invoice_item_gl_account"]
-  budget_code_id [name: "fk_invoice_item_budget_code"]
-  quantity_uom_id [name: "fk_invoice_item_quantity_uom"]
-  created_by_id [name: "fk_invoice_item_created_by"]
-  updated_by_id [name: "fk_invoice_item_updated_by"]
+  "updated_by_id" varchar(255)
+  "gl_account_id" varchar(255)
+  "quantity" integer [not null]
+  "created_by_id" varchar(255)
+  "budget_code_id" varchar(255)
+  "invoice_id" varchar(255) [not null]
+  "amount" decimal(19,2)
 }
+
+Table "invoice_item_candidate" {
+  "id" varchar(255) [pk, not null]
+  "unit_price" decimal(19,2) [not null]
+  "supplier_code" varchar(255) [not null]
+  "quantity_uom_id" varchar(255) [not null]
+  "quantity_per_uom" decimal(19,2) [not null]
+  "vendor_id" varchar(255) [not null]
+  "order_id" varchar(255) [not null]
+  "adjustment_amount" decimal(19,2) [not null]
+  "gl_account_id" varchar(255) [not null]
+  "shipment_id" varchar(255) [not null]
+  "quantity" integer [not null]
+  "product_code" varchar(255) [not null]
+  "quantity_to_invoice" integer [not null]
+  "currency_code" varchar(255) [not null]
+  "adjustment_percentage" decimal(19,2) [not null]
+  "order_item_quantity" integer [not null]
+  "budget_code_id" varchar(255) [not null]
+  "shipment_number" varchar(255) [not null]
+  "description" varchar(255) [not null]
+  "order_number" varchar(255) [not null]
+}
+
+Table "invoice_list" {
+  "invoice_id" varchar(255) [not null]
+  "vendor_invoice_number" varchar(255) [not null]
+  "party_id" varchar(255) [not null]
+  "date_created" datetime(6) [not null]
+  "party_code" varchar(255) [not null]
+  "created_by_name" varchar(255) [not null]
+  "created_by_id" varchar(255) [not null]
+  "invoice_type_code" varchar(255) [not null]
+  "party_name" varchar(255) [not null]
+  "date_invoiced" datetime(6) [not null]
+  "party_from_id" varchar(255) [not null]
+  "currency" varchar(255) [not null]
+  "invoice_number" varchar(255) [not null]
+  "item_count" varchar(255) [not null]
+  "status" varchar(255) [not null]
+
+  Indexes {
+    (invoice_id, vendor_invoice_number) [pk]
+  }
 }
 
 Table "invoice_reference_number" {
-  "invoice_reference_numbers_id" char(38) [default: NULL]
-  "reference_number_id" char(38) [default: NULL]
-  "reference_numbers_idx" int(11) [default: NULL]
-
-Indexes {
-  invoice_reference_numbers_id [name: "fk_invoice_reference_number_invoice_id"]
-  reference_number_id [name: "fk_invoice_reference_number_reference_number_id"]
-}
+  "invoice_reference_numbers_id" varchar(255) [not null]
+  "reference_number_id" varchar(255)
 }
 
 Table "invoice_type" {
-  "id" char(38) [pk, not null]
+  "id" varchar(255) [pk, not null]
+  "version" bigint [not null]
+  "date_created" datetime(6) [not null]
+  "code" varchar(255) [not null]
+  "last_updated" datetime(6) [not null]
   "name" varchar(255) [not null]
-  "description" varchar(255) [default: NULL]
-  "code" varchar(100) [default: "INVOICE"]
-  "date_created" datetime [default: NULL]
-  "last_updated" datetime [default: NULL]
-  "created_by_id" char(38) [default: NULL]
-  "updated_by_id" char(38) [default: NULL]
-  "version" bigint(20) [not null]
-
-Indexes {
-  created_by_id [name: "fk_invoice_type_created_by"]
-  updated_by_id [name: "fk_invoice_type_updated_by"]
-}
+  "updated_by_id" varchar(255)
+  "created_by_id" varchar(255)
+  "description" varchar(255)
 }
 
 Table "local_transfer" {
-  "id" char(38) [pk, not null, default: ""]
-  "source_transaction_id" char(38) [default: NULL]
-  "destination_transaction_id" char(38) [default: NULL]
-  "version" bigint(20) [not null]
-  "date_created" datetime [not null]
-  "last_updated" datetime [not null]
-
-Indexes {
-  destination_transaction_id [name: "FK7975323F4CC49445"]
-  source_transaction_id [name: "FK7975323F57563498"]
-}
+  "id" varchar(255) [pk, not null]
+  "version" bigint [not null]
+  "destination_transaction_id" varchar(255) [not null]
+  "date_created" datetime(6) [not null]
+  "last_updated" datetime(6) [not null]
+  "source_transaction_id" varchar(255) [not null]
 }
 
 Table "localization" {
-  "id" char(38) [pk, not null]
-  "version" bigint(20) [not null]
-  "code" varchar(250) [not null]
-  "date_created" datetime [not null]
-  "last_updated" datetime [not null]
-  "locale" varchar(255) [not null]
-  "text" varchar(2000) [not null]
-
-Indexes {
-  (code, locale) [unique, name: "localization_code_locale_idx"]
-}
+  "id" varchar(255) [pk, not null]
+  "version" bigint [not null]
+  "date_created" datetime(6) [not null]
+  "code" varchar(255) [not null]
+  "locale" varchar(255)
+  "last_updated" datetime(6) [not null]
+  "text" varchar(255)
 }
 
 Table "location" {
-  "id" char(38) [pk, not null, default: ""]
-  "version" bigint(20) [not null]
-  "address_id" char(38) [default: NULL]
-  "date_created" datetime [not null]
-  "last_updated" datetime [not null]
-  "logo_url" varchar(255) [default: NULL]
-  "name" varchar(255) [not null]
-  "inventory_id" char(38) [default: NULL]
-  "manager_id" char(38) [default: NULL]
+  "id" varchar(255) [pk, not null]
+  "version" bigint [not null]
+  "date_created" datetime(6) [not null]
   "logo" mediumblob
-  "managed_locally" bit(1) [default: NULL]
-  "active" bit(1) [default: NULL]
-  "location_type_id" char(38) [default: NULL]
-  "parent_location_id" char(38) [default: NULL]
-  "local" bit(1) [default: NULL]
-  "bg_color" varchar(255) [default: NULL]
-  "fg_color" varchar(255) [default: NULL]
-  "location_group_id" char(38) [default: NULL]
-  "sort_order" int(11) [default: "0"]
-  "location_number" varchar(255) [default: NULL]
-  "description" varchar(255) [default: NULL]
-  "organization_id" varchar(255) [default: NULL]
-
-Indexes {
-  address_id [name: "FK714F9FB561ED379F"]
-  inventory_id [name: "FK714F9FB572A2C5B4"]
-  location_group_id [name: "FK714F9FB53BB36E94"]
-  location_type_id [name: "FK714F9FB528F75F00"]
-  manager_id [name: "FK714F9FB541E07A73"]
-  parent_location_id [name: "FK714F9FB57AF9A3C0"]
-  organization_id [name: "FK714F9FB5606C7D95"]
-}
+  "last_updated" datetime(6) [not null]
+  "organization_id" varchar(255)
+  "active" bit [not null]
+  "zone_id" varchar(255)
+  "location_number" varchar(255)
+  "address_id" varchar(255)
+  "sort_order" integer
+  "manager_id" varchar(255)
+  "location_group_id" varchar(255)
+  "bg_color" varchar(255)
+  "name" varchar(255) [not null]
+  "inventory_id" varchar(255)
+  "location_type_id" varchar(255) [not null]
+  "parent_location_id" varchar(255)
+  "fg_color" varchar(255)
+  "description" varchar(255)
 }
 
 Table "location_dimension" {
-  "id" bigint(20) [pk, not null, increment]
-  "version" bigint(20) [not null]
-  "location_group_name" varchar(255) [default: NULL]
-  "location_id" varchar(255) [not null]
+  "id" bigint [pk, not null]
+  "version" bigint [not null]
   "location_name" varchar(255) [not null]
-  "location_number" varchar(255) [default: NULL]
+  "parent_location_name" varchar(255)
+  "location_group_name" varchar(255)
+  "location_id" varchar(255) [not null]
   "location_type_code" varchar(255) [not null]
+  "location_number" varchar(255)
   "location_type_name" varchar(255) [not null]
-  "parent_location_name" varchar(255) [default: NULL]
-
-Indexes {
-  location_id [name: "FK1143A95C8ABEBD5"]
-}
 }
 
 Table "location_group" {
-  "id" char(38) [pk, not null, default: ""]
-  "version" bigint(20) [not null]
-  "date_created" datetime [not null]
-  "last_updated" datetime [not null]
-  "name" varchar(255) [default: NULL]
-  "address_id" char(38) [default: NULL]
-
-Indexes {
-  address_id [name: "FK7A19D7561ED379F"]
-}
+  "id" varchar(255) [pk, not null]
+  "version" bigint [not null]
+  "address_id" varchar(255)
+  "date_created" datetime(6) [not null]
+  "last_updated" datetime(6) [not null]
+  "name" varchar(255)
 }
 
 Table "location_role" {
-  "user_id" char(38) [default: NULL]
-  "location_id" char(38) [default: NULL]
-  "role_id" char(38) [default: NULL]
-  "version" int(11) [default: NULL]
-  "id" char(38) [default: NULL]
-  "location_roles_idx" int(11) [default: NULL]
-
-Indexes {
-  location_id [name: "location_role_ibfk_3"]
-  role_id [name: "location_role_ibfk_2"]
-  user_id [name: "location_role_ibfk_1"]
-}
+  "id" varchar(255) [pk, not null]
+  "version" bigint [not null]
+  "role_id" varchar(255) [not null]
+  "location_id" varchar(255) [not null]
+  "user_id" varchar(255) [not null]
+  "location_roles_idx" integer
 }
 
 Table "location_supported_activities" {
-  "location_id" char(38) [default: NULL]
-  "supported_activities_string" varchar(255) [default: NULL]
-
-Indexes {
-  location_id [name: "FKF58372688ABEBD5"]
-}
+  "location_id" varchar(255) [not null]
+  "supported_activities_string" varchar(255)
 }
 
 Table "location_type" {
-  "id" char(38) [pk, not null, default: ""]
-  "version" bigint(20) [not null]
-  "date_created" datetime [not null]
-  "description" varchar(255) [default: NULL]
-  "last_updated" datetime [not null]
+  "id" varchar(255) [pk, not null]
+  "version" bigint [not null]
+  "date_created" datetime(6) [not null]
+  "location_type_code" varchar(255)
+  "last_updated" datetime(6) [not null]
+  "sort_order" integer
   "name" varchar(255) [not null]
-  "sort_order" int(11) [default: NULL]
-  "location_type_code" varchar(100) [default: NULL]
+  "description" varchar(255)
 }
 
 Table "location_type_supported_activities" {
-  "location_type_id" char(38) [default: NULL]
-  "supported_activities_string" varchar(255) [default: NULL]
-
-Indexes {
-  location_type_id [name: "FK7AFF67F928F75F00"]
-}
+  "location_type_id" varchar(255) [not null]
+  "supported_activities_string" varchar(255)
 }
 
 Table "lot_dimension" {
-  "id" bigint(20) [pk, not null, increment]
-  "version" bigint(20) [not null]
-  "expiration_date" datetime [default: NULL]
-  "inventory_item_id" varchar(255) [not null]
-  "lot_number" varchar(255) [default: NULL]
+  "id" bigint [pk, not null]
+  "version" bigint [not null]
   "product_code" varchar(255) [not null]
+  "inventory_item_id" varchar(255) [not null]
+  "lot_number" varchar(255)
+  "expiration_date" datetime(6)
 }
 
 Table "order" {
-  "id" char(38) [pk, not null, default: ""]
-  "version" bigint(20) [not null]
-  "date_created" datetime [default: NULL]
-  "date_ordered" datetime [default: NULL]
-  "description" varchar(255) [default: NULL]
-  "destination_id" char(38) [default: NULL]
-  "last_updated" datetime [default: NULL]
-  "order_number" varchar(255) [default: NULL]
-  "ordered_by_id" char(38) [default: NULL]
-  "origin_id" char(38) [default: NULL]
-  "recipient_id" char(38) [default: NULL]
-  "status" varchar(255) [default: NULL]
-  "completed_by_id" char(38) [default: NULL]
-  "date_completed" datetime [default: NULL]
+  "id" varchar(255) [pk, not null]
+  "version" bigint [not null]
+  "payment_term_id" varchar(255)
+  "origin_id" varchar(255) [not null]
+  "date_created" datetime(6)
+  "updated_by_id" varchar(255)
+  "origin_party_id" varchar(255)
+  "payment_method_type_id" varchar(255)
+  "destination_party_id" varchar(255)
+  "ordered_by_id" varchar(255) [not null]
+  "date_ordered" datetime(6)
   "name" varchar(255) [not null]
-  "order_type_code" varchar(100) [default: "PURCHASE_ORDER"]
-  "currency_code" char(3) [default: NULL]
-  "exchange_rate" decimal(19,8) [default: NULL]
-  "payment_method_type_id" char(38) [default: NULL]
-  "payment_term_id" char(38) [default: NULL]
-  "approved_by_id" char(38) [default: NULL]
-  "date_approved" datetime [default: NULL]
-  "destination_party_id" char(38) [default: NULL]
-  "origin_party_id" char(38) [default: NULL]
-  "created_by_id" char(38) [default: NULL]
-  "updated_by_id" char(38) [default: NULL]
-
-Indexes {
-  destination_id [name: "FK651874E1E2B3CDC"]
-  ordered_by_id [name: "FK651874EAF6D8801"]
-  origin_id [name: "FK651874EDBDEDAC4"]
-  recipient_id [name: "FK651874E44979D51"]
-  completed_by_id [name: "FK651874E41B7275F"]
-  payment_method_type_id [name: "FK651874E6A8010C1"]
-  payment_term_id [name: "FK651874E9E52B00C"]
-  approved_by_id [name: "FK651874E240896CB"]
-  destination_party_id [name: "FK651874E35D76CB0"]
-  created_by_id [name: "FK651874E6D91063C"]
-  updated_by_id [name: "FK651874E8E7F7DCF"]
-}
+  "recipient_id" varchar(255)
+  "destination_id" varchar(255) [not null]
+  "completed_by_id" varchar(255)
+  "currency_code" varchar(255)
+  "order_number" varchar(255)
+  "date_approved" datetime(6)
+  "order_type_id" varchar(255) [not null]
+  "last_updated" datetime(6)
+  "exchange_rate" decimal(19,2)
+  "date_completed" datetime(6)
+  "created_by_id" varchar(255)
+  "approved_by_id" varchar(255)
+  "status" varchar(255)
+  "description" varchar(255)
 }
 
 Table "order_adjustment" {
-  "id" char(38) [pk, not null]
-  "version" bigint(20) [not null]
-  "order_id" char(38) [not null]
-  "order_item_id" char(38) [default: NULL]
-  "order_adjustment_type_id" char(38) [default: NULL]
-  "amount" decimal(19,4) [default: NULL]
-  "percentage" decimal(19,2) [default: NULL]
-  "description" varchar(255) [default: NULL]
-  "comments" varchar(255) [default: NULL]
-  "date_created" datetime [not null]
-  "last_updated" datetime [not null]
-  "budget_code_id" char(38) [default: NULL]
-  "gl_account_id" char(38) [default: NULL]
-  "canceled" bit(1) [default: NULL]
-
-Indexes {
-  order_adjustment_type_id [name: "FK4A1ABEFEE1A39520"]
-  order_id [name: "FK4A1ABEFED08EDBE6"]
-  order_item_id [name: "FK4A1ABEFE3BE9D843"]
-  budget_code_id [name: "fk_order_adjustment_budget_code"]
-  gl_account_id [name: "fk_order_adjustment_gl_account"]
-}
+  "id" varchar(255) [pk, not null]
+  "version" bigint [not null]
+  "order_adjustment_type_id" varchar(255)
+  "date_created" datetime(6) [not null]
+  "last_updated" datetime(6) [not null]
+  "order_id" varchar(255) [not null]
+  "percentage" decimal(19,2)
+  "comments" varchar(255)
+  "gl_account_id" varchar(255)
+  "canceled" bit
+  "budget_code_id" varchar(255)
+  "amount" decimal(19,2)
+  "description" varchar(255) [not null]
+  "order_item_id" varchar(255)
 }
 
 Table "order_adjustment_invoice" {
-  "invoice_item_id" char(38) [default: NULL]
-  "order_adjustment_id" char(38) [default: NULL]
+  "order_adjustment_id" varchar(255) [not null]
+  "invoice_item_id" varchar(255) [not null]
 
-Indexes {
-  order_adjustment_id [name: "order_adjustment_invoice_ibfk_1"]
-  invoice_item_id [name: "order_adjustment_invoice_ibfk_2"]
-}
+  Indexes {
+    (order_adjustment_id, invoice_item_id) [pk]
+  }
 }
 
 Table "order_adjustment_type" {
-  "id" char(38) [pk, not null]
-  "version" bigint(20) [not null]
-  "name" varchar(255) [not null]
+  "id" varchar(255) [pk, not null]
+  "version" bigint [not null]
+  "date_created" datetime(6) [not null]
   "code" varchar(255) [not null]
-  "description" varchar(255) [default: NULL]
-  "date_created" datetime [not null]
-  "last_updated" datetime [not null]
-  "gl_account_id" char(38) [default: NULL]
-
-Indexes {
-  gl_account_id [name: "fk_order_adjustment_type_gl_account"]
-}
+  "gl_account_id" varchar(255)
+  "last_updated" datetime(6) [not null]
+  "name" varchar(255) [not null]
+  "description" varchar(255)
 }
 
 Table "order_comment" {
-  "order_comments_id" char(38) [default: NULL]
-  "comment_id" char(38) [default: NULL]
-
-Indexes {
-  comment_id [name: "FK2DE9EE6EC4A49BBF"]
-  order_comments_id [name: "FK2DE9EE6EB8839C0F"]
-}
+  "order_comments_id" varchar(255) [not null]
+  "comment_id" varchar(255)
 }
 
 Table "order_document" {
-  "order_documents_id" char(38) [default: NULL]
-  "document_id" char(38) [default: NULL]
-
-Indexes {
-  document_id [name: "FKE698D2ECC800AA15"]
-  order_documents_id [name: "FKE698D2ECFE10118D"]
-}
+  "order_documents_id" varchar(255) [not null]
+  "document_id" varchar(255)
 }
 
 Table "order_event" {
-  "order_events_id" char(38) [default: NULL]
-  "event_id" char(38) [default: NULL]
-
-Indexes {
-  event_id [name: "FK74D92A69786431F"]
-  order_events_id [name: "FK74D92A693D2E628A"]
+  "order_events_id" varchar(255) [not null]
+  "event_id" varchar(255)
 }
+
+Table "order_invoice" {
+  "invoice_item_id" varchar(255) [not null]
+  "order_item_id" varchar(255) [not null]
+
+  Indexes {
+    (order_item_id, invoice_item_id) [pk]
+  }
 }
 
 Table "order_item" {
-  "id" char(38) [pk, not null, default: ""]
-  "version" bigint(20) [not null]
-  "category_id" char(38) [default: NULL]
-  "date_created" datetime [not null]
-  "description" varchar(255) [default: NULL]
-  "inventory_item_id" char(38) [default: NULL]
-  "last_updated" datetime [not null]
-  "order_id" char(38) [default: NULL]
-  "product_id" char(38) [default: NULL]
-  "quantity" int(11) [not null]
-  "requested_by_id" char(38) [default: NULL]
-  "unit_price" decimal(19,4) [default: NULL]
-  "order_item_status_code" varchar(100) [default: "PENDING"]
-  "parent_order_item_id" char(38) [default: NULL]
-  "recipient_id" char(38) [default: NULL]
-  "destination_bin_location_id" char(38) [default: NULL]
-  "origin_bin_location_id" char(38) [default: NULL]
-  "currency_code" char(3) [default: NULL]
-  "product_supplier_id" char(38) [default: NULL]
-  "estimated_ready_date" datetime [default: NULL]
-  "estimated_ship_date" datetime [default: NULL]
-  "estimated_delivery_date" datetime [default: NULL]
-  "actual_ready_date" datetime [default: NULL]
-  "actual_ship_date" datetime [default: NULL]
-  "actual_delivery_date" datetime [default: NULL]
-  "product_package_id" char(38) [default: NULL]
-  "quantity_per_uom" decimal(19,2) [default: NULL]
-  "quantity_uom_id" char(38) [default: NULL]
-  "budget_code_id" char(38) [default: NULL]
-  "gl_account_id" char(38) [default: NULL]
-  "order_index" int(11) [default: NULL]
-
-Indexes {
-  category_id [name: "FK2D110D64EF4C770D"]
-  inventory_item_id [name: "FK2D110D64AA992CED"]
-  order_id [name: "FK2D110D64D08EDBE6"]
-  product_id [name: "FK2D110D64DED5FAE7"]
-  requested_by_id [name: "FK2D110D64911E7578"]
-  destination_bin_location_id [name: "FK2D110D64605326C"]
-  origin_bin_location_id [name: "FK2D110D6418D76D84"]
-  parent_order_item_id [name: "FK2D110D6451A9416E"]
-  recipient_id [name: "FK2D110D6444979D51"]
-  product_supplier_id [name: "FK2D110D6429542386"]
-  product_package_id [name: "FK2D110D6429B2552E"]
-  quantity_uom_id [name: "FK2D110D645ED93B03"]
-  budget_code_id [name: "fk_order_item_budget_code"]
-  gl_account_id [name: "fk_order_item_gl_account"]
-}
+  "id" varchar(255) [pk, not null]
+  "version" bigint [not null]
+  "product_id" varchar(255) [not null]
+  "unit_price" decimal(19,2)
+  "date_created" datetime(6) [not null]
+  "quantity_uom_id" varchar(255)
+  "quantity_per_uom" decimal(19,2) [not null]
+  "order_id" varchar(255) [not null]
+  "requested_by_id" varchar(255)
+  "estimated_ship_date" datetime(6)
+  "order_index" integer
+  "product_package_id" varchar(255)
+  "estimated_ready_date" datetime(6)
+  "gl_account_id" varchar(255)
+  "recipient_id" varchar(255)
+  "estimated_delivery_date" datetime(6)
+  "parent_order_item_id" varchar(255)
+  "actual_ship_date" datetime(6)
+  "currency_code" varchar(255)
+  "budget_code_id" varchar(255)
+  "inventory_item_id" varchar(255)
+  "actual_ready_date" datetime(6)
+  "last_updated" datetime(6) [not null]
+  "order_item_status_code" varchar(255)
+  "product_supplier_id" varchar(255)
+  "quantity" integer [not null]
+  "origin_bin_location_id" varchar(255)
+  "category_id" varchar(255)
+  "actual_delivery_date" datetime(6)
+  "destination_bin_location_id" varchar(255)
+  "description" varchar(255)
 }
 
-Table "order_item_comment" {
-  "order_item_comments_id" char(38) [default: NULL]
-  "comment_id" char(38) [default: NULL]
-
-Indexes {
-  comment_id [name: "FKB5A4FE84C4A49BBF"]
+Table "order_item_details" {
+  "id" varchar(255) [pk, not null]
+  "product_id" varchar(255)
+  "unit_price" decimal(19,2)
+  "quantity_uom_id" varchar(255)
+  "quantity_per_uom" decimal(19,2)
+  "order_id" varchar(255)
+  "quantity" integer
+  "order_item_status" varchar(255)
+  "order_number" varchar(255)
+  "order_item_id" varchar(255) [not null]
 }
+
+Table "order_item_summary" {
+  "id" varchar(255) [pk, not null]
+  "quantity_ordered" integer
+  "product_id" varchar(255)
+  "unit_price" decimal(19,2)
+  "quantity_uom_id" varchar(255)
+  "quantity_per_uom" decimal(19,2)
+  "quantity_shipped" integer
+  "order_id" varchar(255)
+  "is_item_fully_invoiced" bit
+  "is_item_fully_ordered" bit
+  "is_item_fully_shipped" bit
+  "is_item_fully_received" bit
+  "derived_status" varchar(255)
+  "quantity_canceled" integer
+  "quantity_received" integer
+  "quantity" integer
+  "order_item_status" varchar(255)
+  "quantity_invoiced" integer
+  "order_number" varchar(255)
 }
 
 Table "order_shipment" {
-  "order_item_id" char(38) [default: NULL]
-  "shipment_item_id" char(38) [default: NULL]
+  "shipment_item_id" varchar(255) [not null]
+  "order_item_id" varchar(255) [not null]
 
-Indexes {
-  order_item_id [name: "FK9475736B3BE9D843"]
-  shipment_item_id [name: "FK9475736BB06EC4FB"]
+  Indexes {
+    (order_item_id, shipment_item_id) [pk]
+  }
 }
+
+Table "order_summary_mv" {
+  "id" varchar(255) [pk, not null]
+  "quantity_ordered" integer
+  "order_status" varchar(255)
+  "items_invoiced" integer
+  "quantity_shipped" integer
+  "shipment_status" varchar(255)
+  "order_id" varchar(255) [not null]
+  "items_ordered" integer
+  "derived_status" varchar(255)
+  "quantity_canceled" integer
+  "quantity_received" integer
+  "items_shipped" integer
+  "quantity_invoiced" integer
+  "payment_status" varchar(255)
+  "receipt_status" varchar(255)
+  "items_received" integer
+}
+
+Table "order_type" {
+  "id" varchar(255) [pk, not null]
+  "version" bigint [not null]
+  "date_created" datetime(6) [not null]
+  "code" varchar(100) [not null]
+  "last_updated" datetime(6) [not null]
+  "updated_by_id" varchar(255)
+  "name" varchar(255) [not null]
+  "created_by_id" varchar(255)
+  "order_type_code" varchar(255) [not null]
+  "description" varchar(255)
 }
 
 Table "organization_sequences" {
-  "sequences" varchar(255) [default: NULL]
-  "sequences_idx" varchar(255) [default: NULL]
+  "sequences" varchar(255) [not null]
+  "sequences_string" varchar(255)
+  "sequences_idx" varchar(255)
   "sequences_elt" varchar(255) [not null]
 }
 
 Table "party" {
   "id" varchar(255) [pk, not null]
-  "version" bigint(20) [not null]
-  "date_created" datetime [not null]
-  "last_updated" datetime [not null]
+  "version" bigint [not null]
+  "date_created" datetime(6) [not null]
   "party_type_id" varchar(255) [not null]
+  "last_updated" datetime(6) [not null]
   "class" varchar(255) [not null]
-  "code" varchar(255) [default: NULL]
-  "description" varchar(255) [default: NULL]
-  "name" varchar(255) [default: NULL]
-  "default_location_id" char(38) [default: NULL]
-
-Indexes {
-  party_type_id [name: "FK6581AE69DFE4C4C"]
-  default_location_id [name: "FK6581AE6D1DFC6D7"]
-}
+  "code" varchar(10)
+  "active" bit
+  "name" varchar(255)
+  "description" varchar(255)
+  "default_location_id" varchar(255)
 }
 
 Table "party_role" {
   "id" varchar(255) [pk, not null]
-  "version" bigint(20) [not null]
-  "end_date" datetime [default: NULL]
+  "version" bigint [not null]
+  "start_date" datetime(6)
   "party_id" varchar(255) [not null]
   "role_type" varchar(255) [not null]
-  "start_date" datetime [default: NULL]
-
-Indexes {
-  party_id [name: "FK1C92FE2F3E67CF9F"]
-}
+  "end_date" datetime(6)
 }
 
 Table "party_type" {
   "id" varchar(255) [pk, not null]
-  "version" bigint(20) [not null]
+  "version" bigint [not null]
+  "date_created" datetime(6) [not null]
   "code" varchar(255) [not null]
-  "date_created" datetime [not null]
-  "description" varchar(255) [default: NULL]
-  "last_updated" datetime [not null]
+  "last_updated" datetime(6) [not null]
   "name" varchar(255) [not null]
   "party_type_code" varchar(255) [not null]
+  "description" varchar(255)
 }
 
 Table "payment_method_type" {
-  "id" char(38) [pk, not null]
-  "version" bigint(20) [not null]
+  "id" varchar(255) [pk, not null]
+  "version" bigint [not null]
+  "date_created" datetime(6) [not null]
+  "last_updated" datetime(6) [not null]
   "name" varchar(255) [not null]
-  "description" varchar(255) [default: NULL]
+  "active" bit [not null]
+  "description" varchar(255)
   "payment_method_type_code" varchar(255) [not null]
-  "active" bit(1) [not null]
-  "date_created" datetime [not null]
-  "last_updated" datetime [not null]
 }
 
 Table "payment_term" {
-  "id" char(38) [pk, not null]
-  "version" bigint(20) [not null]
-  "name" varchar(255) [not null]
+  "id" varchar(255) [pk, not null]
+  "version" bigint [not null]
+  "days_to_payment" integer
+  "date_created" datetime(6) [not null]
   "code" varchar(255) [not null]
-  "description" varchar(255) [default: NULL]
-  "date_created" datetime [not null]
-  "last_updated" datetime [not null]
-  "prepayment_percent" decimal(19,2) [default: NULL]
-  "days_to_payment" int(11) [default: NULL]
+  "last_updated" datetime(6) [not null]
+  "name" varchar(255) [not null]
+  "prepayment_percent" decimal(19,2)
+  "description" varchar(255)
 }
 
 Table "person" {
-  "id" char(38) [pk, not null, default: ""]
-  "version" bigint(20) [not null]
-  "date_created" datetime [not null]
-  "email" varchar(255) [default: NULL]
-  "first_name" varchar(255) [default: NULL]
-  "last_name" varchar(255) [default: NULL]
-  "last_updated" datetime [not null]
-  "phone_number" varchar(255) [default: NULL]
+  "id" varchar(255) [pk, not null]
+  "version" bigint [not null]
+  "date_created" datetime(6) [not null]
+  "first_name" varchar(255) [not null]
+  "last_updated" datetime(6) [not null]
+  "active" bit
+  "last_name" varchar(255) [not null]
+  "email" varchar(255)
+  "phone_number" varchar(255)
 }
 
 Table "picklist" {
-  "id" char(38) [pk, not null]
-  "name" varchar(255) [default: NULL]
-  "description" varchar(255) [default: NULL]
-  "picker_id" char(38) [default: NULL]
-  "date_picked" datetime [default: NULL]
-  "version" bigint(20) [not null]
-  "date_created" datetime [not null]
-  "last_updated" datetime [not null]
-  "created_by_id" char(38) [default: NULL]
-  "updated_by_id" char(38) [default: NULL]
-  "requisition_id" char(38) [default: NULL]
-
-Indexes {
-  created_by_id [name: "FKD3F8383F217F5972"]
-  picker_id [name: "FKD3F8383FA3E976BC"]
-  updated_by_id [name: "FKD3F8383F426DD105"]
-  requisition_id [name: "FKD3F8383F5DE9E374"]
-}
+  "id" varchar(255) [pk, not null]
+  "version" bigint [not null]
+  "date_created" datetime(6)
+  "last_updated" datetime(6)
+  "updated_by_id" varchar(255)
+  "order_id" varchar(255) [not null]
+  "picker_id" varchar(255)
+  "requisition_id" varchar(255) [not null]
+  "name" varchar(255)
+  "created_by_id" varchar(255)
+  "date_picked" datetime(6)
+  "description" varchar(255)
 }
 
 Table "picklist_item" {
-  "id" char(38) [pk, not null]
-  "quantity" int(11) [default: NULL]
-  "picklist_id" char(38) [default: NULL]
-  "inventory_item_id" char(38) [default: NULL]
-  "version" bigint(20) [not null]
-  "date_created" datetime [not null]
-  "last_updated" datetime [not null]
-  "created_by_id" char(38) [default: NULL]
-  "updated_by_id" char(38) [default: NULL]
-  "status" varchar(255) [default: NULL]
-  "reason_code" varchar(255) [default: NULL]
-  "comment" varchar(255) [default: NULL]
-  "requisition_item_id" char(38) [default: NULL]
-  "picklist_items_idx" int(11) [default: NULL]
-  "bin_location_id" char(38) [default: NULL]
-  "sort_order" int(11) [default: NULL]
-
-Indexes {
-  created_by_id [name: "picklist_item_ibfk_3"]
-  inventory_item_id [name: "picklist_item_ibfk_5"]
-  picklist_id [name: "picklist_item_ibfk_2"]
-  requisition_item_id [name: "picklist_item_ibfk_1"]
-  updated_by_id [name: "picklist_item_ibfk_4"]
-  bin_location_id [name: "FKE7584B1369DB749D"]
-}
+  "id" varchar(255) [pk, not null]
+  "version" bigint [not null]
+  "picklist_id" varchar(255) [not null]
+  "date_created" datetime(6) [not null]
+  "last_updated" datetime(6) [not null]
+  "bin_location_id" varchar(255)
+  "reason_code" varchar(255)
+  "sort_order" integer
+  "comment" varchar(255)
+  "quantity" integer [not null]
+  "requisition_item_id" varchar(255)
+  "status" varchar(255)
+  "inventory_item_id" varchar(255)
+  "order_item_id" varchar(255)
 }
 
 Table "preference_type" {
-  "id" char(38) [pk, not null]
+  "id" varchar(255) [pk, not null]
+  "version" bigint [not null]
+  "date_created" datetime(6) [not null]
+  "last_updated" datetime(6) [not null]
   "name" varchar(255) [not null]
-  "validation_code" varchar(100) [default: "DEFAULT"]
-  "date_created" datetime [default: NULL]
-  "last_updated" datetime [default: NULL]
-  "created_by_id" char(38) [default: NULL]
-  "updated_by_id" char(38) [default: NULL]
-  "version" bigint(20) [not null]
-
-Indexes {
-  name [unique, name: "name"]
-  created_by_id [name: "fk_preference_type_created_by"]
-  updated_by_id [name: "fk_preference_type_updated_by"]
-}
+  "updated_by_id" varchar(255)
+  "created_by_id" varchar(255)
+  "validation_code" varchar(255)
 }
 
 Table "product" {
-  "id" char(38) [pk, not null, default: ""]
-  "version" bigint(20) [not null]
-  "category_id" char(38) [default: NULL]
-  "date_created" datetime [not null]
-  "description" mediumtext
-  "last_updated" datetime [not null]
+  "id" varchar(255) [pk, not null]
+  "version" bigint [not null]
+  "manufacturer" varchar(255)
+  "cold_chain" bit
+  "hazardous_material" bit
+  "date_created" datetime(6) [not null]
+  "essential" bit
+  "package_size" integer
+  "product_family_id" varchar(255)
+  "active" bit
+  "updated_by_id" varchar(255)
+  "abc_class" varchar(255)
+  "manufacturer_code" varchar(255)
+  "upc" varchar(255)
+  "brand_name" varchar(255)
+  "gl_account_id" varchar(255)
+  "manufacturer_name" varchar(255)
   "name" varchar(255) [not null]
-  "product_code" varchar(255) [default: NULL]
-  "unit_of_measure_id" char(38) [default: NULL]
-  "cold_chain" bit(1) [default: NULL]
-  "manufacturer" varchar(255) [default: NULL]
-  "manufacturer_code" varchar(255) [default: NULL]
-  "ndc" varchar(255) [default: NULL]
-  "upc" varchar(255) [default: NULL]
-  "unit_of_measure" varchar(255) [default: NULL]
-  "created_by_id" char(38) [default: NULL]
-  "updated_by_id" char(38) [default: NULL]
-  "default_uom_id" char(38) [default: NULL]
-  "brand_name" varchar(255) [default: NULL]
-  "vendor" varchar(255) [default: NULL]
-  "vendor_code" varchar(255) [default: NULL]
-  "package_size" int(11) [default: NULL]
-  "model_number" varchar(255) [default: NULL]
-  "manufacturer_name" varchar(255) [default: NULL]
-  "vendor_name" varchar(255) [default: NULL]
-  "active" bit(1) [default: NULL]
-  "controlled_substance" bit(1) [default: NULL]
-  "essential" bit(1) [default: NULL]
-  "hazardous_material" bit(1) [default: NULL]
-  "lot_control" bit(1) [default: NULL]
-  "serialized" bit(1) [default: NULL]
-  "price_per_unit" decimal(19,4) [default: NULL]
-  "reconditioned" bit(1) [default: NULL]
-  "product_type_id" char(38) [default: NULL]
-  "abc_class" varchar(255) [default: NULL]
-  "cost_per_unit" decimal(19,4) [default: NULL]
-  "gl_account_id" char(38) [default: NULL]
-
-Indexes {
-  product_code [unique, name: "product_code"]
-  category_id [name: "FKED8DCCEFEF4C770D"]
-  created_by_id [name: "FKED8DCCEF217F5972"]
-  default_uom_id [name: "FKED8DCCEFEEB2908D"]
-  updated_by_id [name: "FKED8DCCEF426DD105"]
-  product_type_id [name: "FKED8DCCEFABD88AC6"]
-  gl_account_id [name: "fk_product_gl_account"]
-}
+  "default_uom_id" varchar(255)
+  "price_per_unit" decimal(19,2)
+  "reconditioned" bit
+  "vendor_name" varchar(255)
+  "unit_of_measure" varchar(255)
+  "serialized" bit
+  "lot_control" bit
+  "model_number" varchar(255)
+  "last_updated" datetime(6) [not null]
+  "vendor" varchar(255)
+  "lot_and_expiry_control" bit
+  "cost_per_unit" decimal(19,2)
+  "controlled_substance" bit
+  "product_type_id" varchar(255) [not null]
+  "product_code" varchar(255)
+  "vendor_code" varchar(255)
+  "category_id" varchar(255) [not null]
+  "created_by_id" varchar(255)
+  "description" varchar(255)
+  "ndc" varchar(255)
 }
 
 Table "product_association" {
-  "id" char(38) [pk, not null]
-  "code" varchar(100) [not null]
-  "product_id" char(38) [not null]
-  "associated_product_id" char(38) [not null]
-  "quantity" decimal(19,2) [not null]
-  "comments" varchar(255) [default: NULL]
-  "version" bigint(20) [not null]
-  "date_created" datetime [not null]
-  "last_updated" datetime [not null]
-
-Indexes {
-  associated_product_id [name: "FKED441931C8653BC0"]
-  product_id [name: "FKED441931DED5FAE7"]
-}
+  "id" varchar(255) [pk, not null]
+  "version" bigint [not null]
+  "comments" varchar(255)
+  "product_id" varchar(255) [not null]
+  "associated_product_id" varchar(255) [not null]
+  "date_created" datetime(6) [not null]
+  "mutual_association_id" varchar(255)
+  "code" varchar(255) [not null]
+  "last_updated" datetime(6) [not null]
+  "quantity" decimal(19,2)
 }
 
 Table "product_attribute" {
-  "id" char(38) [pk, not null, default: ""]
-  "version" bigint(20) [not null]
-  "attribute_id" char(38) [default: NULL]
-  "product_id" char(38) [default: NULL]
-  "attributes_idx" int(11) [default: NULL]
-  "value" varchar(255) [default: NULL]
-  "unit_of_measure_id" char(38) [default: NULL]
-  "product_supplier_id" char(38) [default: NULL]
-
-Indexes {
-  attribute_id [name: "FK94A534C47B0D087"]
-  product_id [name: "FK94A534CDED5FAE7"]
-  unit_of_measure_id [name: "FK94A534C24DEBC91"]
-  product_supplier_id [name: "FK94A534C29542386"]
-}
+  "id" varchar(255) [pk, not null]
+  "version" bigint [not null]
+  "product_id" varchar(255) [not null]
+  "unit_of_measure_id" varchar(255)
+  "attribute_id" varchar(255) [not null]
+  "value" varchar(255) [not null]
+  "product_supplier_id" varchar(255)
+  "attributes_idx" integer
 }
 
 Table "product_availability" {
-  "id" char(38) [pk, not null]
-  "version" int(11) [not null]
-  "bin_location_id" char(38) [default: NULL]
-  "inventory_item_id" char(38) [not null]
-  "location_id" char(38) [not null]
-  "product_id" char(38) [not null]
-  "product_code" varchar(100) [not null]
-  "lot_number" varchar(100) [not null, default: "DEFAULT"]
-  "bin_location_name" varchar(100) [not null, default: "DEFAULT"]
-  "quantity_allocated" int(11) [default: NULL]
-  "quantity_on_hand" int(11) [not null]
-  "date_created" datetime [not null]
-  "last_updated" datetime [not null]
-
-Indexes {
-  (location_id, product_code, lot_number, bin_location_name) [unique, name: "product_availability_uniq_idx"]
-  bin_location_id [name: "FKD3FC6EAB69DB749D"]
-  inventory_item_id [name: "FKD3FC6EABAA992CED"]
-  product_id [name: "FKD3FC6EABDED5FAE7"]
-}
+  "id" varchar(255) [pk, not null]
+  "version" bigint [not null]
+  "product_id" varchar(255) [not null]
+  "quantity_on_hold" integer
+  "date_created" datetime(6) [not null]
+  "last_updated" datetime(6) [not null]
+  "location_id" varchar(255) [not null]
+  "lot_number" varchar(255) [not null]
+  "bin_location_id" varchar(255)
+  "quantity_on_hand" integer [not null]
+  "bin_location_name" varchar(255) [not null]
+  "quantity_available_to_promise" integer
+  "product_code" varchar(255) [not null]
+  "quantity_allocated" integer
+  "inventory_item_id" varchar(255) [not null]
 }
 
 Table "product_catalog" {
-  "id" char(38) [pk, not null]
-  "version" bigint(20) [not null]
-  "active" bit(1) [default: NULL]
+  "id" varchar(255) [pk, not null]
+  "version" bigint [not null]
+  "date_created" datetime(6) [not null]
   "code" varchar(255) [not null]
-  "date_created" datetime [not null]
-  "description" longtext
-  "last_updated" datetime [not null]
+  "last_updated" datetime(6) [not null]
   "name" varchar(255) [not null]
-  "color" varchar(255) [default: NULL]
+  "active" bit
+  "color" varchar(255)
+  "description" longtext
 
-Indexes {
-  code [unique, name: "code_idx"]
-}
+  Indexes {
+    code [name: "code_idx"]
+  }
 }
 
 Table "product_catalog_item" {
-  "id" char(38) [pk, not null]
-  "version" bigint(20) [not null]
-  "active" bit(1) [not null]
-  "date_created" datetime [not null]
-  "last_updated" datetime [not null]
-  "product_id" char(38) [not null]
-  "product_catalog_id" char(38) [not null]
-
-Indexes {
-  product_catalog_id [name: "FK187E54C9FB5E604E"]
-  product_id [name: "FK187E54C9DED5FAE7"]
-}
+  "id" varchar(255) [pk, not null]
+  "version" bigint [not null]
+  "product_id" varchar(255) [not null]
+  "date_created" datetime(6) [not null]
+  "last_updated" datetime(6) [not null]
+  "active" bit [not null]
+  "product_catalog_id" varchar(255) [not null]
 }
 
 Table "product_category" {
-  "product_id" char(38) [default: NULL]
-  "category_id" char(38) [default: NULL]
-  "categories_idx" int(11) [default: NULL]
-
-Indexes {
-  product_id [name: "FKA0303E4EDED5FAE7"]
-  category_id [name: "FKA0303E4EEF4C770D"]
-}
+  "product_id" varchar(255) [not null]
+  "category_id" varchar(255)
+  "categories_idx" integer
 }
 
 Table "product_component" {
-  "id" char(38) [pk, not null]
-  "assembly_product_id" char(38) [not null]
-  "component_product_id" char(38) [not null]
+  "id" varchar(255) [pk, not null]
+  "version" bigint [not null]
+  "unit_of_measure_id" varchar(255) [not null]
+  "assembly_product_id" varchar(255) [not null]
+  "component_product_id" varchar(255) [not null]
+  "date_created" datetime(6) [not null]
+  "last_updated" datetime(6) [not null]
   "quantity" decimal(19,2) [not null]
-  "unit_of_measure_id" char(38) [not null]
-  "version" bigint(20) [not null]
-  "date_created" datetime [not null]
-  "last_updated" datetime [not null]
-  "product_components_idx" int(11) [default: NULL]
-
-Indexes {
-  component_product_id [name: "FKB511C5AD20E351EA"]
-  unit_of_measure_id [name: "FKB511C5AD24DEBC91"]
-  assembly_product_id [name: "FKB511C5ADFB4C199C"]
-}
-}
-
-Table "product_demand_details" {
-  "request_id" char(38) [not null, default: ""]
-  "request_status" varchar(255) [default: NULL]
-  "request_number" varchar(255) [default: NULL]
-  "date_created" datetime [default: NULL]
-  "date_requested" datetime [not null]
-  "date_issued" datetime
-  "origin_id" char(38) [not null, default: ""]
-  "origin_name" varchar(255) [not null]
-  "destination_id" char(38) [not null, default: ""]
-  "destination_name" varchar(255) [not null]
-  "request_item_id" char(38) [not null, default: ""]
-  "product_id" char(38) [not null, default: ""]
-  "product_code" varchar(255) [default: NULL]
-  "product_name" varchar(255) [not null]
-  "quantity_requested" int(11) [not null]
-  "quantity_canceled" bigint(11) [not null, default: "0"]
-  "quantity_approved" bigint(11) [not null, default: "0"]
-  "quantity_modified" decimal(32,0) [not null, default: "0"]
-  "quantity_picked" decimal(32,0) [not null, default: "0"]
-  "quantity_demand" decimal(32,0) [not null, default: "0"]
-  "reason_code" varchar(255) [default: NULL]
-  "reason_code_classification" varchar(31) [default: NULL]
-
-Indexes {
-  (product_id, origin_id, destination_id, date_issued, date_requested) [name: "product_id"]
-}
-}
-
-Table "product_demand_details_tmp" {
-  "request_id" char(38) [not null, default: ""]
-  "request_status" varchar(255) [default: NULL]
-  "request_number" varchar(255) [default: NULL]
-  "date_created" datetime [default: NULL]
-  "date_requested" datetime [not null]
-  "date_issued" datetime
-  "origin_id" char(38) [not null, default: ""]
-  "origin_name" varchar(255) [not null]
-  "destination_id" char(38) [not null, default: ""]
-  "destination_name" varchar(255) [not null]
-  "request_item_id" char(38) [not null, default: ""]
-  "product_id" char(38) [not null, default: ""]
-  "product_code" varchar(255) [default: NULL]
-  "product_name" varchar(255) [not null]
-  "quantity_requested" int(11) [not null]
-  "quantity_canceled" bigint(11) [not null, default: "0"]
-  "quantity_approved" bigint(11) [not null, default: "0"]
-  "quantity_modified" decimal(32,0) [not null, default: "0"]
-  "quantity_picked" decimal(32,0) [not null, default: "0"]
-  "quantity_demand" decimal(32,0) [not null, default: "0"]
-  "reason_code" varchar(255) [default: NULL]
-  "reason_code_classification" varchar(31) [default: NULL]
+  "product_components_idx" integer
 }
 
 Table "product_dimension" {
-  "id" bigint(20) [pk, not null, increment]
-  "version" bigint(20) [not null]
-  "abc_class" varchar(255) [default: NULL]
-  "active" bit(1) [not null]
+  "id" bigint [pk, not null]
+  "version" bigint [not null]
+  "unit_price" decimal(19,2)
+  "product_name" varchar(255) [not null]
+  "generic_product" varchar(255)
+  "unit_cost" decimal(19,2)
   "category_name" varchar(255) [not null]
-  "generic_product" varchar(255) [default: NULL]
+  "active" bit [not null]
   "product_code" varchar(255) [not null]
   "product_id" varchar(255) [not null]
-  "product_name" varchar(255) [not null]
-  "unit_cost" decimal(19,2) [default: NULL]
-  "unit_price" decimal(19,2) [default: NULL]
-
-Indexes {
-  product_id [name: "FKC73E1616DED5FAE7"]
-}
+  "abc_class" varchar(255)
 }
 
 Table "product_document" {
-  "product_id" char(38) [default: NULL]
-  "document_id" char(38) [default: NULL]
-
-Indexes {
-  document_id [name: "FKD08A526BC800AA15"]
-  product_id [name: "FKD08A526BDED5FAE7"]
-}
+  "product_id" varchar(255) [not null]
+  "document_id" varchar(255)
 }
 
 Table "product_group" {
-  "id" char(38) [pk, not null]
-  "name" varchar(255) [default: NULL]
-  "description" varchar(255) [default: NULL]
-  "version" bigint(20) [not null]
-  "date_created" datetime [not null]
-  "last_updated" datetime [not null]
-  "category_id" char(38) [default: NULL]
-
-Indexes {
-  category_id [name: "FK51F3772FEF4C770D"]
-}
+  "id" varchar(255) [pk, not null]
+  "version" bigint [not null]
+  "date_created" datetime(6) [not null]
+  "last_updated" datetime(6) [not null]
+  "name" varchar(255) [not null]
+  "category_id" varchar(255)
+  "description" varchar(255)
 }
 
 Table "product_group_product" {
-  "product_group_id" char(38) [default: NULL]
-  "product_id" char(38) [default: NULL]
-  "products_idx" int(11) [default: NULL]
+  "product_group_id" varchar(255) [not null]
+  "product_id" varchar(255) [not null]
 
-Indexes {
-  product_group_id [name: "FK313A4BDF14F7BB8E"]
-  product_id [name: "FK313A4BDFDED5FAE7"]
+  Indexes {
+    (product_group_id, product_id) [pk]
+  }
 }
+
+Table "product_merge_logger" {
+  "id" varchar(255) [pk, not null]
+  "related_object_id" varchar(255) [not null]
+  "obsolete_product_id" varchar(255) [not null]
+  "date_created" datetime(6) [not null]
+  "date_merged" datetime(6) [not null]
+  "last_updated" datetime(6) [not null]
+  "date_reverted" datetime(6)
+  "updated_by_id" varchar(255)
+  "comments" varchar(255)
+  "related_object_class_name" varchar(255) [not null]
+  "created_by_id" varchar(255)
+  "primary_product_id" varchar(255) [not null]
 }
 
 Table "product_package" {
-  "id" char(38) [pk, not null]
-  "name" varchar(255) [default: NULL]
-  "gtin" varchar(255) [default: NULL]
-  "description" varchar(255) [default: NULL]
-  "uom_id" char(38) [default: NULL]
-  "product_id" char(38) [default: NULL]
-  "version" bigint(20) [not null]
-  "date_created" datetime [not null]
-  "last_updated" datetime [not null]
-  "created_by_id" char(38) [default: NULL]
-  "updated_by_id" char(38) [default: NULL]
-  "quantity" int(11) [not null]
-  "product_supplier_id" char(38) [default: NULL]
-  "product_price_id" char(38) [default: NULL]
-
-Indexes {
-  (product_id, product_supplier_id, uom_id, quantity) [unique, name: "product_package_uniq_idx"]
-  created_by_id [name: "FK615A48F6217F5972"]
-  uom_id [name: "FK615A48F63906C4CF"]
-  updated_by_id [name: "FK615A48F6426DD105"]
-  product_supplier_id [name: "FK615A48F629542386"]
-}
+  "id" varchar(255) [pk, not null]
+  "version" bigint [not null]
+  "product_id" varchar(255)
+  "date_created" datetime(6) [not null]
+  "gtin" varchar(255)
+  "last_updated" datetime(6) [not null]
+  "updated_by_id" varchar(255)
+  "uom_id" varchar(255)
+  "product_supplier_id" varchar(255)
+  "product_price_id" varchar(255)
+  "quantity" integer [not null]
+  "name" varchar(255)
+  "created_by_id" varchar(255)
+  "description" varchar(255)
 }
 
 Table "product_price" {
-  "id" char(38) [pk, not null]
-  "version" bigint(20) [not null]
+  "id" varchar(255) [pk, not null]
+  "version" bigint [not null]
+  "date_created" datetime(6) [not null]
+  "price" decimal(19,2) [not null]
+  "last_updated" datetime(6) [not null]
+  "updated_by_id" varchar(255)
+  "to_date" datetime(6)
+  "currency_id" varchar(255)
+  "from_date" datetime(6)
   "type" varchar(255) [not null]
-  "price" decimal(19,4) [not null]
-  "currency_id" char(38) [default: NULL]
-  "from_date" datetime [default: NULL]
-  "to_date" datetime [default: NULL]
-  "date_created" datetime [default: NULL]
-  "last_updated" datetime [default: NULL]
-  "created_by_id" char(38) [default: NULL]
-  "updated_by_id" char(38) [default: NULL]
-
-Indexes {
-  currency_id [name: "fk_product_price_unit_of_measure"]
-  created_by_id [name: "fk_product_price_created_by"]
-  updated_by_id [name: "fk_product_price_updated_by"]
+  "created_by_id" varchar(255)
 }
+
+Table "product_summary" {
+  "product_id" varchar(255) [not null]
+  "location_id" varchar(255) [not null]
+  "quantity_on_hand" decimal(19,2) [not null]
+  "quantity_on_order" decimal(19,2)
+  "quantity_on_order_not_received" decimal(19,2)
+  "quantity_on_order_not_shipped" decimal(19,2)
+
+  Indexes {
+    (product_id, location_id) [pk]
+  }
 }
 
 Table "product_supplier" {
   "id" varchar(255) [pk, not null]
-  "version" bigint(20) [not null]
-  "brand_name" varchar(255) [default: NULL]
-  "code" varchar(255) [default: NULL]
-  "comments" varchar(255) [default: NULL]
-  "date_created" datetime [not null]
-  "description" longtext
-  "last_updated" datetime [not null]
-  "manufacturer_id" varchar(255) [default: NULL]
-  "manufacturer_code" varchar(255) [default: NULL]
-  "manufacturer_name" varchar(255) [default: NULL]
-  "min_order_quantity" decimal(19,2) [default: NULL]
-  "model_number" varchar(255) [default: NULL]
-  "name" varchar(255) [not null]
-  "ndc" varchar(255) [default: NULL]
+  "version" bigint [not null]
   "product_id" varchar(255) [not null]
-  "product_code" varchar(255) [default: NULL]
-  "rating_type_code" varchar(255) [default: NULL]
-  "standard_lead_time_days" decimal(19,2) [default: NULL]
-  "supplier_id" varchar(255) [default: NULL]
-  "supplier_code" varchar(255) [default: NULL]
-  "supplier_name" varchar(255) [default: NULL]
-  "unit_of_measure_id" varchar(255) [default: NULL]
-  "unit_price" decimal(19,4) [default: NULL]
-  "upc" varchar(255) [default: NULL]
-  "unit_cost" decimal(19,4) [default: NULL]
-  "contract_price_id" char(38) [default: NULL]
-
-Indexes {
-  manufacturer_id [name: "FK3A097B1C2A475A37"]
-  product_id [name: "FK3A097B1CDED5FAE7"]
-  supplier_id [name: "FK3A097B1CF42F7E5C"]
-  unit_of_measure_id [name: "FK3A097B1C24DEBC91"]
-}
+  "manufacturer_id" varchar(255)
+  "supplier_code" varchar(255)
+  "date_created" datetime(6) [not null]
+  "code" varchar(255)
+  "model_number" varchar(255)
+  "last_updated" datetime(6) [not null]
+  "default_product_package_id" varchar(255)
+  "active" bit
+  "standard_lead_time_days" decimal(19,2)
+  "tiered_pricing" bit [not null]
+  "supplier_id" varchar(255)
+  "manufacturer_code" varchar(255)
+  "comments" varchar(255)
+  "upc" varchar(255)
+  "brand_name" varchar(255)
+  "rating_type_code" varchar(255)
+  "manufacturer_name" varchar(255)
+  "name" varchar(255) [not null]
+  "product_code" varchar(255)
+  "supplier_name" varchar(255)
+  "contract_price_id" varchar(255)
+  "description" longtext
+  "min_order_quantity" decimal(19,2)
+  "ndc" varchar(255)
 }
 
 Table "product_supplier_preference" {
-  "id" char(38) [pk, not null]
-  "product_supplier_id" char(38) [default: NULL]
-  "destination_party_id" char(38) [default: NULL]
-  "preference_type_id" char(38) [default: NULL]
-  "comments" varchar(255) [default: NULL]
-  "validity_start_date" datetime [default: NULL]
-  "validity_end_date" datetime [default: NULL]
-  "date_created" datetime [default: NULL]
-  "last_updated" datetime [default: NULL]
-  "created_by_id" char(38) [default: NULL]
-  "updated_by_id" char(38) [default: NULL]
-  "version" bigint(20) [not null]
-
-Indexes {
-  product_supplier_id [name: "fk_product_supplier_preference_product_supplier"]
-  destination_party_id [name: "fk_product_supplier_preference_destination_party"]
-  preference_type_id [name: "fk_product_supplier_preference_preference_type"]
-  created_by_id [name: "fk_product_supplier_preference_created_by"]
-  updated_by_id [name: "fk_product_supplier_preference_updated_by"]
-}
+  "id" varchar(255) [pk, not null]
+  "version" bigint [not null]
+  "date_created" datetime(6) [not null]
+  "validity_start_date" datetime(6)
+  "validity_end_date" datetime(6)
+  "last_updated" datetime(6) [not null]
+  "updated_by_id" varchar(255)
+  "product_supplier_id" varchar(255) [not null]
+  "comments" varchar(255)
+  "destination_party_id" varchar(255)
+  "preference_type_id" varchar(255) [not null]
+  "created_by_id" varchar(255)
 }
 
 Table "product_tag" {
+  "tag_id" varchar(255) [not null]
   "product_id" varchar(255) [not null]
-  "tag_id" varchar(255) [default: NULL]
 
-Indexes {
-  product_id [name: "FKA71CAC4ADED5FAE7"]
-  tag_id [name: "FKA71CAC4A9740C85F"]
-}
+  Indexes {
+    (product_id, tag_id) [pk]
+  }
 }
 
 Table "product_type" {
-  "id" char(38) [pk, not null]
-  "version" bigint(20) [not null]
-  "date_created" datetime [not null]
-  "last_updated" datetime [not null]
-  "name" varchar(255) [not null]
+  "id" varchar(255) [pk, not null]
+  "version" bigint [not null]
+  "date_created" datetime(6) [not null]
+  "code" varchar(255)
+  "last_updated" datetime(6) [not null]
   "product_type_code" varchar(255) [not null]
-  "product_identifier_format" varchar(255) [default: NULL]
-  "code" varchar(255) [default: NULL]
-  "sequence_number" int(11) [default: NULL]
+  "product_identifier_format" varchar(255)
+  "name" varchar(255) [not null]
+  "sequence_number" integer
 }
 
 Table "product_type_displayed_fields" {
-  "product_type_id" char(38) [default: NULL]
-  "product_field" varchar(255) [default: NULL]
+  "product_type_id" varchar(255) [not null]
+  "product_field" varchar(255) [not null]
 
-Indexes {
-  product_type_id [name: "fk_product_type_displayed_fields_product_type"]
-}
+  Indexes {
+    (product_type_id, product_field) [pk]
+  }
 }
 
 Table "product_type_required_fields" {
-  "product_type_id" char(38) [default: NULL]
-  "product_field" varchar(255) [default: NULL]
+  "product_type_id" varchar(255) [not null]
+  "product_field" varchar(255) [not null]
 
-Indexes {
-  product_type_id [name: "fk_product_type_required_fields_product_type"]
-}
+  Indexes {
+    (product_type_id, product_field) [pk]
+  }
 }
 
 Table "product_type_supported_activities" {
-  "product_type_id" char(38) [default: NULL]
-  "product_activity_code" varchar(255) [default: NULL]
+  "product_type_id" varchar(255) [not null]
+  "product_activity_code" varchar(255) [not null]
 
-Indexes {
-  product_type_id [name: "fk_product_type_supported_activities_product_type"]
-}
+  Indexes {
+    (product_type_id, product_activity_code) [pk]
+  }
 }
 
 Table "receipt" {
-  "id" char(38) [pk, not null, default: ""]
-  "version" bigint(20) [not null]
-  "actual_delivery_date" datetime [default: NULL]
-  "date_created" datetime [not null]
-  "expected_delivery_date" datetime [default: NULL]
-  "last_updated" datetime [not null]
-  "recipient_id" char(38) [default: NULL]
-  "shipment_id" char(38) [default: NULL]
-  "receipt_number" varchar(255) [default: NULL]
-  "receipt_status_code" varchar(255) [default: NULL]
-
-Indexes {
-  recipient_id [name: "FK4082723844979D51"]
-  shipment_id [name: "FK408272383B5F6286"]
-}
+  "id" varchar(255) [pk, not null]
+  "version" bigint [not null]
+  "date_created" datetime(6) [not null]
+  "expected_delivery_date" datetime(6)
+  "receipt_number" varchar(255)
+  "last_updated" datetime(6) [not null]
+  "receipt_status_code" varchar(255)
+  "shipment_id" varchar(255)
+  "recipient_id" varchar(255)
+  "actual_delivery_date" datetime(6) [not null]
 }
 
 Table "receipt_item" {
-  "id" char(38) [pk, not null, default: ""]
-  "version" bigint(20) [not null]
-  "comment_id" char(38) [default: NULL]
-  "date_created" datetime [not null]
-  "expiration_date" datetime [default: NULL]
-  "last_updated" datetime [not null]
-  "lot_number" varchar(255) [default: NULL]
-  "product_id" char(38) [default: NULL]
-  "quantity_shipped" int(11) [default: NULL]
-  "quantity_received" int(11) [default: NULL]
-  "receipt_id" char(38) [default: NULL]
-  "recipient_id" char(38) [default: NULL]
-  "comment" varchar(255) [default: NULL]
-  "shipment_item_id" char(38) [default: NULL]
-  "inventory_item_id" char(38) [default: NULL]
-  "bin_location_id" char(38) [default: NULL]
-  "quantity_canceled" int(11) [default: NULL]
-  "is_split_item" bit(1) [default: NULL]
-  "sort_order" int(11) [default: NULL]
-
-Indexes {
-  product_id [name: "FKAE3064BADED5FAE7"]
-  receipt_id [name: "FKAE3064BAF7076438"]
-  recipient_id [name: "FKAE3064BA44979D51"]
-  shipment_item_id [name: "FKAE3064BAB06EC4FB"]
-  inventory_item_id [name: "FKAE3064BAAA992CED"]
-  bin_location_id [name: "FKAE3064BA69DB749D"]
-}
+  "id" char(38) [pk, not null]
+  "version" bigint [not null]
+  "product_id" varchar(255) [not null]
+  "date_created" datetime(6) [not null]
+  "shipment_item_id" varchar(255)
+  "last_updated" datetime(6) [not null]
+  "lot_number" varchar(255)
+  "bin_location_id" varchar(255)
+  "quantity_shipped" integer [not null]
+  "receipt_id" varchar(255) [not null]
+  "is_split_item" bit
+  "quantity_canceled" integer
+  "sort_order" integer
+  "comment" varchar(255)
+  "quantity_received" integer
+  "recipient_id" varchar(255)
+  "inventory_item_id" varchar(255)
+  "expiration_date" datetime(6)
 }
 
 Table "reference_number" {
-  "id" char(38) [pk, not null, default: ""]
-  "version" bigint(20) [not null]
-  "identifier" varchar(255) [default: NULL]
-  "reference_number_type_id" char(38) [default: NULL]
-
-Indexes {
-  reference_number_type_id [name: "FKD790DEBD154F600"]
-}
+  "id" varchar(255) [pk, not null]
+  "version" bigint [not null]
+  "reference_number_type_id" varchar(255)
+  "identifier" varchar(255)
 }
 
 Table "reference_number_type" {
-  "id" char(38) [pk, not null, default: ""]
-  "version" bigint(20) [not null]
-  "date_created" datetime [not null]
-  "description" varchar(255) [default: NULL]
-  "last_updated" datetime [not null]
+  "id" varchar(255) [pk, not null]
+  "version" bigint [not null]
+  "sort_order" integer
+  "date_created" datetime(6) [not null]
+  "last_updated" datetime(6) [not null]
   "name" varchar(255) [not null]
-  "sort_order" int(11) [default: NULL]
+  "description" varchar(255)
+}
+
+Table "requirement" {
+  "id" varchar(255) [pk, not null]
+  "product_id" varchar(255)
+  "reorder_quantity" integer
+  "location_id" varchar(255)
+  "bin_location_id" varchar(255)
+  "quantity_in_bin" integer
+  "min_quantity" integer
+  "total_quantity_available_to_promise" integer
+  "quantity_available" integer
+  "status" varchar(255)
+  "max_quantity" integer
 }
 
 Table "requisition" {
-  "id" char(38) [pk, not null, default: ""]
-  "version" bigint(20) [not null]
-  "date_created" datetime [default: NULL]
-  "date_requested" datetime [not null]
-  "description" varchar(255) [default: NULL]
-  "destination_id" char(38) [default: NULL]
-  "last_updated" datetime [default: NULL]
-  "origin_id" char(38) [default: NULL]
-  "recipient_id" char(38) [default: NULL]
-  "request_number" varchar(255) [default: NULL]
-  "requested_by_id" char(38) [default: NULL]
-  "status" varchar(255) [default: NULL]
-  "fulfillment_id" char(38) [default: NULL]
-  "created_by_id" char(38) [default: NULL]
-  "updated_by_id" char(38) [default: NULL]
-  "name" varchar(255) [default: NULL]
-  "date_valid_from" datetime [default: NULL]
-  "date_valid_to" datetime [default: NULL]
-  "recipient_program" varchar(255) [default: NULL]
-  "requested_delivery_date" datetime [not null]
-  "type" varchar(255) [default: NULL]
-  "commodity_class" varchar(255) [default: NULL]
-  "is_template" tinyint(4) [default: NULL]
-  "is_published" tinyint(4) [default: NULL]
-  "date_published" datetime [default: NULL]
-  "verified_by_id" char(38) [default: NULL]
-  "date_verified" datetime [default: NULL]
-  "reviewed_by_id" char(38) [default: NULL]
-  "date_reviewed" datetime [default: NULL]
-  "delivered_by_id" char(38) [default: NULL]
-  "date_delivered" datetime [default: NULL]
-  "received_by_id" char(38) [default: NULL]
-  "date_received" datetime [default: NULL]
-  "checked_by_id" char(38) [default: NULL]
-  "date_checked" datetime [default: NULL]
-  "issued_by_id" char(38) [default: NULL]
-  "date_issued" datetime [default: NULL]
-  "requisition_template_id" char(38) [default: NULL]
-  "replenishment_period" int(11) [default: NULL]
-  "sort_by_code" varchar(255) [default: NULL]
-  "source_type" varchar(255) [default: NULL]
-
-Indexes {
-  destination_id [name: "FK414EF28F1E2B3CDC"]
-  fulfillment_id [name: "FK414EF28F94567276"]
-  origin_id [name: "FK414EF28FDBDEDAC4"]
-  recipient_id [name: "FK414EF28F44979D51"]
-  requested_by_id [name: "FK414EF28FDD302242"]
-  checked_by_id [name: "FK1799509CD2CB8BBB"]
-  created_by_id [name: "FK1799509C217F5972"]
-  delivered_by_id [name: "FK1799509C4CF042D8"]
-  issued_by_id [name: "FK1799509CD196DBBF"]
-  received_by_id [name: "FK1799509C36C69275"]
-  reviewed_by_id [name: "FK1799509CDFA74E0B"]
-  updated_by_id [name: "FK1799509C426DD105"]
-  verified_by_id [name: "FK1799509C20E33E1C"]
-  requisition_template_id [name: "FK1799509C2BDD17B3"]
+  "id" varchar(255) [pk, not null]
+  "version" bigint [not null]
+  "issued_by_id" varchar(255)
+  "origin_id" varchar(255) [not null]
+  "date_created" datetime(6)
+  "received_by_id" varchar(255)
+  "verified_by_id" varchar(255)
+  "updated_by_id" varchar(255)
+  "date_issued" datetime(6)
+  "date_delivered" datetime(6)
+  "is_template" bit
+  "requested_by_id" varchar(255) [not null]
+  "rejected_by_id" varchar(255)
+  "source_type" varchar(255)
+  "date_valid_from" datetime(6)
+  "is_published" bit
+  "name" varchar(255) [not null]
+  "recipient_id" varchar(255)
+  "replenishment_period" integer
+  "destination_id" varchar(255) [not null]
+  "reviewed_by_id" varchar(255)
+  "fulfillment_id" varchar(255)
+  "date_requested" datetime(6) [not null]
+  "approval_required" bit
+  "date_approved" datetime(6)
+  "requested_delivery_date" datetime(6) [not null]
+  "replenishment_type_code" varchar(255)
+  "requisition_template_id" varchar(255)
+  "last_updated" datetime(6)
+  "sort_by_code" varchar(255)
+  "date_rejected" datetime(6)
+  "date_checked" datetime(6)
+  "request_number" varchar(255)
+  "date_received" datetime(6)
+  "date_valid_to" datetime(6)
+  "checked_by_id" varchar(255)
+  "date_reviewed" datetime(6)
+  "delivered_by_id" varchar(255)
+  "date_verified" datetime(6)
+  "date_published" datetime(6)
+  "commodity_class" varchar(255)
+  "type" varchar(255)
+  "created_by_id" varchar(255)
+  "approved_by_id" varchar(255)
+  "status" varchar(255)
+  "recipient_program" varchar(255)
+  "description" varchar(255)
 }
+
+Table "requisition_approvers" {
+  "requisition_id" varchar(255) [not null]
+  "person_id" varchar(255)
+}
+
+Table "requisition_comment" {
+  "requisition_id" varchar(255) [not null]
+  "comment_id" varchar(255)
+}
+
+Table "requisition_event" {
+  "requisition_id" varchar(255) [not null]
+  "event_id" varchar(255)
 }
 
 Table "requisition_item" {
-  "id" char(38) [pk, not null, default: ""]
-  "version" bigint(20) [not null]
-  "category_id" char(38) [default: NULL]
-  "date_created" datetime [not null]
-  "description" varchar(255) [default: NULL]
-  "inventory_item_id" char(38) [default: NULL]
-  "last_updated" datetime [not null]
-  "product_id" char(38) [not null]
-  "quantity" int(11) [not null]
-  "requisition_id" char(38) [default: NULL]
-  "requested_by_id" char(38) [default: NULL]
-  "unit_price" float(12,0) [default: NULL]
-  "product_group_id" char(38) [default: NULL]
-  "comment" varchar(255) [default: NULL]
-  "recipient_id" varchar(255) [default: NULL]
-  "substitutable" bit(1) [not null]
-  "order_index" int(11) [default: NULL]
-  "requisition_items_idx" int(11) [default: NULL]
-  "quantity_canceled" int(11) [default: NULL]
-  "cancel_reason_code" varchar(255) [default: NULL]
-  "cancel_comments" varchar(255) [default: NULL]
-  "parent_requisition_item_id" char(38) [default: NULL]
-  "product_package_id" char(38) [default: NULL]
-  "requisition_item_type" varchar(255) [default: NULL]
-  "quantity_approved" int(11) [default: NULL]
-  "created_by_id" char(38) [default: NULL]
-  "updated_by_id" char(38) [default: NULL]
-  "substitution_item_id" char(38) [default: NULL]
-  "modification_item_id" char(38) [default: NULL]
-  "pallet_name" varchar(255) [default: NULL]
-  "box_name" varchar(255) [default: NULL]
-  "lot_number" varchar(255) [default: NULL]
-  "expiration_date" datetime [default: NULL]
-  "pick_reason_code" varchar(255) [default: NULL]
-
-Indexes {
-  category_id [name: "FK4DA982C3EF4C770D"]
-  inventory_item_id [name: "FK4DA982C3AA992CED"]
-  product_id [name: "FK4DA982C3DED5FAE7"]
-  requisition_id [name: "FK4DA982C35DE21C87"]
-  created_by_id [name: "FK5358E4D6217F5972"]
-  product_group_id [name: "FK5358E4D614F7BB8E"]
-  requested_by_id [name: "FK5358E4D6DD302242"]
-  updated_by_id [name: "FK5358E4D6426DD105"]
-  product_package_id [name: "FK5358E4D629B2552E"]
-  modification_item_id [name: "FK5358E4D6405AC22D"]
-  parent_requisition_item_id [name: "FK5358E4D6F84BDE18"]
-  substitution_item_id [name: "FK5358E4D61594028E"]
-  recipient_id [name: "FK5358E4D644979D51"]
-}
+  "id" varchar(255) [pk, not null]
+  "version" bigint [not null]
+  "product_id" varchar(255) [not null]
+  "unit_price" float
+  "date_created" datetime(6) [not null]
+  "updated_by_id" varchar(255)
+  "lot_number" varchar(255)
+  "requisition_item_type" varchar(255)
+  "cancel_comments" varchar(255)
+  "requested_by_id" varchar(255)
+  "box_name" varchar(255)
+  "order_index" integer
+  "product_package_id" varchar(255)
+  "comment" varchar(255)
+  "quantity_approved" integer
+  "cancel_reason_code" varchar(255)
+  "product_group_id" varchar(255)
+  "quantity_counted" integer
+  "recipient_id" varchar(255)
+  "modification_item_id" varchar(255)
+  "pick_reason_code" varchar(255)
+  "inventory_item_id" varchar(255)
+  "expiration_date" datetime(6)
+  "last_updated" datetime(6) [not null]
+  "substitution_item_id" varchar(255)
+  "substitutable" bit [not null]
+  "requisition_id" varchar(255) [not null]
+  "quantity_canceled" integer
+  "pallet_name" varchar(255)
+  "parent_requisition_item_id" varchar(255)
+  "quantity" integer [not null]
+  "category_id" varchar(255)
+  "created_by_id" varchar(255)
+  "description" varchar(255)
 }
 
 Table "role" {
-  "id" char(38) [pk, not null, default: ""]
-  "version" bigint(20) [not null]
-  "description" varchar(255) [default: NULL]
+  "id" varchar(255) [pk, not null]
+  "version" bigint [not null]
+  "name" varchar(255) [not null]
   "role_type" varchar(255) [not null]
-  "name" varchar(255) [default: NULL]
+  "description" varchar(255)
 }
 
 Table "shipment" {
-  "id" char(38) [pk, not null, default: ""]
-  "version" bigint(20) [not null]
-  "carrier_id" char(38) [default: NULL]
-  "date_created" datetime [default: NULL]
-  "destination_id" char(38) [default: NULL]
-  "donor_id" char(38) [default: NULL]
-  "expected_delivery_date" datetime [default: NULL]
-  "expected_shipping_date" datetime [default: NULL]
-  "last_updated" datetime [default: NULL]
-  "name" varchar(255) [not null]
-  "origin_id" char(38) [default: NULL]
-  "recipient_id" char(38) [default: NULL]
-  "shipment_method_id" char(38) [default: NULL]
-  "shipment_number" varchar(255) [default: NULL]
-  "shipment_type_id" char(38) [default: NULL]
-  "total_value" float(12,2) [default: NULL]
+  "id" varchar(255) [pk, not null]
+  "version" bigint [not null]
+  "origin_id" varchar(255) [not null]
+  "date_created" datetime(6)
+  "expected_delivery_date" datetime(6)
+  "updated_by_id" varchar(255)
+  "weight_units" varchar(255)
   "additional_information" longtext
-  "stated_value" float(12,2) [default: NULL]
-  "weight" float(12,0) [default: NULL]
-  "weight_units" varchar(255) [default: NULL]
-  "current_status" varchar(255) [default: NULL]
-  "current_event_id" char(38) [default: NULL]
-  "created_by_id" char(38) [default: NULL]
-  "updated_by_id" char(38) [default: NULL]
-  "requisition_id" char(38) [default: NULL]
-  "description" text
-  "driver_name" varchar(255) [default: NULL]
-
-Indexes {
-  carrier_id [name: "FKE139719A294C1012"]
-  destination_id [name: "FKE139719A1E2B3CDC"]
-  donor_id [name: "FKE139719A49AB6B52"]
-  origin_id [name: "FKE139719ADBDEDAC4"]
-  recipient_id [name: "FKE139719A44979D51"]
-  shipment_method_id [name: "FKE139719AA28CC5FB"]
-  shipment_type_id [name: "FKE139719AFF77FF9B"]
-  current_event_id [name: "FKE139719AD95ACF25"]
-  created_by_id [name: "FKE139719A217F5972"]
-  updated_by_id [name: "FKE139719A426DD105"]
-  requisition_id [name: "FKE139719A5DE9E374"]
-}
+  "shipment_type_id" varchar(255) [not null]
+  "name" varchar(255) [not null]
+  "recipient_id" varchar(255)
+  "destination_id" varchar(255) [not null]
+  "shipment_method_id" varchar(255)
+  "total_value" float
+  "shipment_number" varchar(255)
+  "current_status" varchar(255)
+  "last_updated" datetime(6)
+  "stated_value" float
+  "current_event_id" varchar(255)
+  "driver_name" varchar(255)
+  "carrier_id" varchar(255)
+  "weight" float
+  "requisition_id" varchar(255)
+  "created_by_id" varchar(255)
+  "expected_shipping_date" datetime(6) [not null]
+  "description" varchar(255)
+  "donor_id" varchar(255)
 }
 
 Table "shipment_comment" {
-  "shipment_comments_id" char(38) [default: NULL]
-  "comment_id" char(38) [default: NULL]
-  "comments_idx" int(11) [default: NULL]
-
-Indexes {
-  comment_id [name: "FKC398CCBAC4A49BBF"]
-}
+  "shipment_comments_id" varchar(255) [not null]
+  "comment_id" varchar(255)
+  "comments_idx" integer
 }
 
 Table "shipment_document" {
-  "shipment_documents_id" char(38) [default: NULL]
-  "document_id" char(38) [default: NULL]
-  "documents_idx" int(11) [default: NULL]
-
-Indexes {
-  document_id [name: "FK6C5BE20C800AA15"]
-}
+  "shipment_documents_id" varchar(255) [not null]
+  "document_id" varchar(255)
+  "documents_idx" integer
 }
 
 Table "shipment_event" {
-  "shipment_events_id" char(38) [default: NULL]
-  "event_id" char(38) [default: NULL]
-
-Indexes {
-  event_id [name: "FK6D032BB5786431F"]
-  shipment_events_id [name: "FK6D032BB53B350242"]
-}
+  "shipment_events_id" varchar(255) [not null]
+  "event_id" varchar(255)
 }
 
 Table "shipment_invoice" {
-  "invoice_item_id" char(38) [default: NULL]
-  "shipment_item_id" char(38) [default: NULL]
+  "invoice_item_id" varchar(255) [not null]
+  "shipment_item_id" varchar(255) [not null]
 
-Indexes {
-  shipment_item_id [name: "shipment_invoice_ibfk_1"]
-  invoice_item_id [name: "shipment_invoice_ibfk_2"]
-}
+  Indexes {
+    (shipment_item_id, invoice_item_id) [pk]
+  }
 }
 
 Table "shipment_item" {
-  "id" char(38) [pk, not null, default: ""]
-  "version" bigint(20) [not null]
-  "container_id" char(38) [default: NULL]
-  "date_created" datetime [not null]
-  "donor_id" char(38) [default: NULL]
-  "last_updated" datetime [not null]
-  "lot_number" varchar(255) [default: NULL]
-  "product_id" char(38) [default: NULL]
-  "quantity" int(11) [not null]
-  "recipient_id" char(38) [default: NULL]
-  "shipment_items_idx" int(11) [default: NULL]
-  "shipment_id" char(38) [default: NULL]
-  "expiration_date" datetime [default: NULL]
-  "inventory_item_id" char(38) [default: NULL]
-  "bin_location_id" char(38) [default: NULL]
-  "requisition_item_id" char(38) [default: NULL]
-  "sort_order" int(11) [default: NULL]
-
-Indexes {
-  container_id [name: "FKDA3BB2987400E88E"]
-  donor_id [name: "FKDA3BB29849AB6B52"]
-  product_id [name: "FKDA3BB298DED5FAE7"]
-  recipient_id [name: "FKDA3BB29844979D51"]
-  shipment_id [name: "FKDA3BB2983B5F6286"]
-  inventory_item_id [name: "FKDA3BB298AA992CED"]
-  bin_location_id [name: "FKDA3BB29869DB749D"]
-  requisition_item_id [name: "FKDA3BB2981CD3412D"]
-}
+  "id" varchar(255) [pk, not null]
+  "version" bigint [not null]
+  "product_id" varchar(255) [not null]
+  "date_created" datetime(6) [not null]
+  "container_id" varchar(255)
+  "last_updated" datetime(6) [not null]
+  "bin_location_id" varchar(255)
+  "sort_order" integer
+  "shipment_id" varchar(255)
+  "quantity" integer [not null]
+  "recipient_id" varchar(255)
+  "requisition_item_id" varchar(255)
+  "inventory_item_id" varchar(255)
+  "donor_id" varchar(255)
 }
 
 Table "shipment_method" {
-  "id" char(38) [pk, not null, default: ""]
-  "version" bigint(20) [not null]
-  "date_created" datetime [not null]
-  "last_updated" datetime [not null]
-  "shipper_service_id" char(38) [default: NULL]
-  "tracking_number" varchar(255) [default: NULL]
-  "shipper_id" char(38) [default: NULL]
-
-Indexes {
-  shipper_id [name: "FK40203B263896C98E"]
-  shipper_service_id [name: "FK40203B26296B2CA3"]
-}
+  "id" varchar(255) [pk, not null]
+  "version" bigint [not null]
+  "date_created" datetime(6) [not null]
+  "tracking_number" varchar(255)
+  "last_updated" datetime(6) [not null]
+  "shipper_service_id" varchar(255)
+  "shipper_id" varchar(255)
 }
 
 Table "shipment_reference_number" {
-  "shipment_reference_numbers_id" char(38) [default: NULL]
-  "reference_number_id" char(38) [default: NULL]
-  "reference_numbers_idx" int(11) [default: NULL]
-
-Indexes {
-  reference_number_id [name: "FK312F6C292388BC5"]
-}
+  "shipment_reference_numbers_id" varchar(255) [not null]
+  "reference_number_id" varchar(255)
+  "reference_numbers_idx" integer
 }
 
 Table "shipment_type" {
-  "id" char(38) [pk, not null, default: ""]
-  "version" bigint(20) [not null]
-  "date_created" datetime [not null]
-  "description" varchar(255) [default: NULL]
-  "last_updated" datetime [not null]
+  "id" varchar(255) [pk, not null]
+  "version" bigint [not null]
+  "sort_order" integer
+  "date_created" datetime(6) [not null]
+  "last_updated" datetime(6) [not null]
   "name" varchar(255) [not null]
-  "sort_order" int(11) [default: NULL]
+  "description" varchar(255)
 }
 
 Table "shipment_workflow" {
-  "id" char(38) [pk, not null, default: ""]
-  "version" bigint(20) [not null]
-  "date_created" datetime [not null]
-  "last_updated" datetime [not null]
+  "id" varchar(255) [pk, not null]
+  "version" bigint [not null]
+  "shipment_type_id" varchar(255) [not null]
+  "date_created" datetime(6)
+  "excluded_fields" varchar(255)
+  "last_updated" datetime(6)
   "name" varchar(255) [not null]
-  "shipment_type_id" char(38) [default: NULL]
-  "excluded_fields" varchar(255) [default: NULL]
-  "document_template" varchar(255) [default: NULL]
-
-Indexes {
-  shipment_type_id [name: "FKD584C4C4FF77FF9B"]
-}
+  "document_template" varchar(255)
 }
 
 Table "shipment_workflow_container_type" {
-  "shipment_workflow_container_types_id" char(38) [default: NULL]
-  "container_type_id" char(38) [default: NULL]
-  "container_types_idx" int(11) [default: NULL]
-
-Indexes {
-  container_type_id [name: "FKDEF5AD1317A6E251"]
-}
+  "shipment_workflow_container_types_id" varchar(255) [not null]
+  "container_type_id" varchar(255)
+  "container_types_idx" integer
 }
 
 Table "shipment_workflow_document" {
-  "shipment_workflow_id" char(38) [not null]
-  "document_id" char(38) [default: NULL]
-
-Indexes {
-  document_id [name: "FK9A945A36C800AA15"]
-  shipment_workflow_id [name: "FK9A945A36EC587CFB"]
-}
-}
-
-Table "shipment_workflow_document_template" {
-  "shipment_workflow_id" char(38) [default: NULL]
-  "document_id" char(38) [default: NULL]
+  "shipment_workflow_id" varchar(255) [not null]
+  "document_id" varchar(255)
 }
 
 Table "shipment_workflow_reference_number_type" {
-  "shipment_workflow_reference_number_types_id" char(38) [default: NULL]
-  "reference_number_type_id" char(38) [default: NULL]
-  "reference_number_types_idx" int(11) [default: NULL]
-
-Indexes {
-  reference_number_type_id [name: "FK4BB27241154F600"]
-}
+  "shipment_workflow_reference_number_types_id" varchar(255) [not null]
+  "reference_number_type_id" varchar(255)
+  "reference_number_types_idx" integer
 }
 
 Table "shipper" {
-  "id" char(38) [pk, not null, default: ""]
-  "version" bigint(20) [not null]
-  "date_created" datetime [default: NULL]
-  "description" varchar(255) [default: NULL]
-  "last_updated" datetime [default: NULL]
+  "id" varchar(255) [pk, not null]
+  "version" bigint [not null]
+  "parameter_name" varchar(255)
+  "date_created" datetime(6) [not null]
+  "tracking_format" varchar(255)
+  "last_updated" datetime(6) [not null]
   "name" varchar(255) [not null]
-  "parameter_name" varchar(255) [default: NULL]
-  "tracking_format" varchar(255) [default: NULL]
-  "tracking_url" varchar(255) [default: NULL]
+  "tracking_url" varchar(255)
+  "description" varchar(255)
 }
 
 Table "shipper_service" {
-  "id" char(38) [pk, not null, default: ""]
-  "version" bigint(20) [not null]
-  "description" varchar(255) [default: NULL]
-  "name" varchar(255) [default: NULL]
-  "shipper_id" char(38) [default: NULL]
-
-Indexes {
-  shipper_id [name: "FKDF7559D73896C98E"]
-}
+  "id" varchar(255) [pk, not null]
+  "version" bigint [not null]
+  "name" varchar(255)
+  "description" varchar(255)
+  "shipper_id" varchar(255)
 }
 
-Table "stockout_fact" {
-  "date_dimension_id" bigint(20) [not null]
-  "location_dimension_id" bigint(20) [not null]
-  "product_dimension_id" bigint(20) [not null]
-  "quantity_on_hand" smallint(6) [default: NULL]
-
-Indexes {
-  (date_dimension_id, location_dimension_id, product_dimension_id) [pk]
+Table "stock_movement" {
+  "id" varchar(255) [pk, not null]
+  "origin_id" varchar(255) [not null]
+  "date_created" datetime(6)
+  "expected_delivery_date" datetime(6)
+  "updated_by_id" varchar(255) [not null]
+  "stock_movement_type" varchar(255)
+  "order_id" varchar(255)
+  "requested_by_id" varchar(255) [not null]
+  "source_type" varchar(255)
+  "shipment_type_id" varchar(255)
+  "tracking_number" varchar(255)
+  "name" varchar(255)
+  "destination_id" varchar(255) [not null]
+  "request_type" varchar(255)
+  "identifier" varchar(255) [not null]
+  "date_requested" datetime(6) [not null]
+  "line_item_count" integer [not null]
+  "last_updated" datetime(6)
+  "shipment_status" varchar(255) [not null]
+  "stocklist_id" varchar(255)
+  "driver_name" varchar(255)
+  "date_shipped" datetime(6)
+  "comments" varchar(255)
+  "requisition_id" varchar(255)
+  "shipment_id" varchar(255)
+  "status_code" varchar(255)
+  "created_by_id" varchar(255) [not null]
+  "status" varchar(255) [not null]
+  "description" varchar(255)
 }
+
+Table "stock_movement_list_item" {
+  "id" varchar(255) [pk, not null]
+  "origin_id" varchar(255) [not null]
+  "date_created" datetime(6)
+  "last_updated" datetime(6)
+  "updated_by_id" varchar(255) [not null]
+  "shipment_status" varchar(255) [not null]
+  "stock_movement_type" varchar(255)
+  "order_id" varchar(255)
+  "requested_by_id" varchar(255) [not null]
+  "stocklist_id" varchar(255)
+  "source_type" varchar(255)
+  "requisition_id" varchar(255)
+  "shipment_id" varchar(255)
+  "name" varchar(255)
+  "status_code" varchar(255)
+  "destination_id" varchar(255) [not null]
+  "created_by_id" varchar(255) [not null]
+  "status" varchar(255) [not null]
+  "request_type" varchar(255)
+  "description" varchar(255)
+  "identifier" varchar(255) [not null]
+  "date_requested" datetime(6) [not null]
+}
+
+Table "supplier" {
+  "id" varchar(255) [pk, not null]
+  "pending_orders_count" integer [not null]
+  "name" varchar(255) [not null]
+  "organization_id" varchar(255) [not null]
+  "pending_shipments_count" integer [not null]
 }
 
 Table "synonym" {
-  "id" char(38) [pk, not null]
-  "version" bigint(20) [not null]
+  "id" varchar(255) [pk, not null]
+  "version" bigint [not null]
+  "product_id" varchar(255) [not null]
+  "date_created" datetime(6) [not null]
+  "locale" varchar(255) [not null]
+  "last_updated" datetime(6) [not null]
   "name" varchar(255) [not null]
-  "product_id" char(38) [not null]
-  "date_created" datetime [not null]
-  "last_updated" datetime [not null]
-  "created_by_id" char(38) [default: NULL]
-  "updated_by_id" char(38) [default: NULL]
-  "locale" varchar(50) [default: NULL]
-
-Indexes {
-  created_by_id [name: "FK98293BFB217F5972"]
-  updated_by_id [name: "FK98293BFB426DD105"]
-  product_id [name: "FK299E50ABDED5FAE7"]
-}
+  "updated_by_id" varchar(255)
+  "created_by_id" varchar(255)
+  "synonym_type_code" varchar(255) [not null]
 }
 
 Table "tag" {
   "id" varchar(255) [pk, not null]
-  "version" bigint(20) [not null]
-  "created_by_id" varchar(255) [default: NULL]
-  "date_created" datetime [not null]
-  "last_updated" datetime [not null]
+  "version" bigint [not null]
+  "is_active" bit
+  "date_created" datetime(6) [not null]
+  "last_updated" datetime(6) [not null]
+  "updated_by_id" varchar(255)
+  "created_by_id" varchar(255)
   "tag" varchar(255) [not null]
-  "updated_by_id" varchar(255) [default: NULL]
-  "is_active" tinyint(4) [default: NULL]
-
-Indexes {
-  created_by_id [name: "FK1BF9A217F5972"]
-  updated_by_id [name: "FK1BF9A426DD105"]
-}
 }
 
 Table "transaction" {
-  "id" char(38) [pk, not null, default: ""]
-  "version" bigint(20) [not null]
-  "created_by_id" char(38) [default: NULL]
-  "date_created" datetime [not null]
-  "destination_id" char(38) [default: NULL]
-  "inventory_id" char(38) [default: NULL]
-  "last_updated" datetime [not null]
-  "source_id" char(38) [default: NULL]
-  "transaction_date" datetime [not null]
-  "transaction_type_id" char(38) [default: NULL]
-  "confirmed" bit(1) [default: NULL]
-  "confirmed_by_id" char(38) [default: NULL]
-  "date_confirmed" datetime [default: NULL]
-  "comment" varchar(255) [default: NULL]
-  "incoming_shipment_id" char(38) [default: NULL]
-  "outgoing_shipment_id" char(38) [default: NULL]
-  "updated_by_id" char(38) [default: NULL]
-  "transaction_number" varchar(255) [default: NULL]
-  "requisition_id" char(38) [default: NULL]
-  "order_id" char(38) [default: NULL]
-  "receipt_id" char(38) [default: NULL]
-
-Indexes {
-  confirmed_by_id [name: "FK7FA0D2DE3265A8A9"]
-  created_by_id [name: "FK7FA0D2DE217F5972"]
-  destination_id [name: "FK7FA0D2DE1E2B3CDC"]
-  inventory_id [name: "FK7FA0D2DE72A2C5B4"]
-  source_id [name: "FK7FA0D2DE828481AF"]
-  transaction_type_id [name: "FK7FA0D2DEB3FB7111"]
-  updated_by_id [name: "FK7FA0D2DE426DD105"]
-  requisition_id [name: "FK7FA0D2DE5DE9E374"]
-  incoming_shipment_id [name: "FK7FA0D2DE5F12AFED"]
-  outgoing_shipment_id [name: "FK7FA0D2DEB80B3233"]
-  order_id [name: "FK7FA0D2DED08EDBE6"]
-  receipt_id [name: "FK7FA0D2DEF7076438"]
-}
+  "id" varchar(255) [pk, not null]
+  "version" bigint [not null]
+  "date_created" datetime(6) [not null]
+  "transaction_number" varchar(255)
+  "last_updated" datetime(6) [not null]
+  "incoming_shipment_id" varchar(255)
+  "updated_by_id" varchar(255)
+  "order_id" varchar(255)
+  "receipt_id" varchar(255) [not null]
+  "date_confirmed" datetime(6)
+  "confirmed_by_id" varchar(255)
+  "outgoing_shipment_id" varchar(255)
+  "source_id" varchar(255)
+  "requisition_id" varchar(255)
+  "transaction_date" datetime(6) [not null]
+  "comment" varchar(255)
+  "transaction_type_id" varchar(255) [not null]
+  "inventory_id" varchar(255) [not null]
+  "destination_id" varchar(255)
+  "created_by_id" varchar(255)
+  "confirmed" bit
 }
 
 Table "transaction_entry" {
-  "id" char(38) [pk, not null, default: ""]
-  "version" bigint(20) [not null]
-  "inventory_item_id" char(38) [default: NULL]
-  "quantity" int(11) [not null]
-  "transaction_id" char(38) [default: NULL]
-  "comments" varchar(255) [default: NULL]
-  "transaction_entries_idx" int(11) [default: NULL]
-  "bin_location_id" char(38) [default: NULL]
-  "product_id" char(38) [default: NULL]
-  "reason_code" varchar(255) [default: NULL]
-
-Indexes {
-  inventory_item_id [name: "FKABC21FD1AA992CED"]
-  transaction_id [name: "FKABC21FD12EF4C7F4"]
-  bin_location_id [name: "FKABC21FD169DB749D"]
-  product_id [name: "FKABC21FD1DED5FAE7"]
-}
+  "id" varchar(255) [pk, not null]
+  "version" bigint [not null]
+  "product_id" varchar(255)
+  "comments" varchar(255)
+  "transaction_id" varchar(255) [not null]
+  "quantity" integer [not null]
+  "bin_location_id" varchar(255)
+  "reason_code" varchar(255)
+  "inventory_item_id" varchar(255) [not null]
+  "transaction_entries_idx" integer
 }
 
 Table "transaction_fact" {
-  "id" bigint(20) [pk, not null, increment]
-  "version" bigint(20) [not null]
-  "location_key_id" bigint(20) [not null]
-  "lot_key_id" bigint(20) [not null]
-  "product_key_id" bigint(20) [not null]
-  "quantity" decimal(19,2) [default: NULL]
-  "transaction_date" datetime [not null]
-  "transaction_date_key_id" bigint(20) [not null]
+  "id" bigint [pk, not null]
+  "version" bigint [not null]
+  "lot_key_id" bigint [not null]
+  "transaction_date_key_id" bigint [not null]
   "transaction_number" varchar(255) [not null]
-  "transaction_type_key_id" bigint(20) [not null]
-
-Indexes {
-  location_key_id [name: "FK1E50D72DA27827C2"]
-  lot_key_id [name: "FK1E50D72DD1F27172"]
-  product_key_id [name: "FK1E50D72D72882836"]
-  transaction_date_key_id [name: "FK1E50D72DCA32CFEF"]
-  transaction_type_key_id [name: "FK1E50D72DCA354381"]
-}
+  "transaction_type_key_id" bigint [not null]
+  "transaction_date" datetime(6) [not null]
+  "location_key_id" bigint [not null]
+  "product_key_id" bigint [not null]
+  "quantity" decimal(19,2)
 }
 
 Table "transaction_type" {
-  "id" char(38) [pk, not null, default: ""]
-  "version" bigint(20) [not null]
-  "date_created" datetime [not null]
-  "description" varchar(255) [default: NULL]
-  "last_updated" datetime [not null]
+  "id" varchar(255) [pk, not null]
+  "version" bigint [not null]
+  "sort_order" integer
+  "date_created" datetime(6) [not null]
+  "last_updated" datetime(6) [not null]
   "name" varchar(255) [not null]
-  "sort_order" int(11) [default: NULL]
+  "description" varchar(255)
   "transaction_code" varchar(255) [not null]
 }
 
 Table "transaction_type_dimension" {
-  "id" bigint(20) [pk, not null, increment]
-  "version" bigint(20) [not null]
-  "transaction_code" varchar(255) [not null]
-  "transaction_type_id" varchar(255) [not null]
+  "id" bigint [pk, not null]
+  "version" bigint [not null]
   "transaction_type_name" varchar(255) [not null]
+  "transaction_type_id" varchar(255) [not null]
+  "transaction_code" varchar(255) [not null]
 }
 
 Table "unit_of_measure" {
-  "id" char(38) [pk, not null, default: ""]
-  "version" bigint(20) [not null]
+  "id" varchar(255) [pk, not null]
+  "version" bigint [not null]
+  "date_created" datetime(6) [not null]
   "code" varchar(255) [not null]
-  "description" varchar(255) [default: NULL]
+  "last_updated" datetime(6) [not null]
   "name" varchar(255) [not null]
-  "uom_class_id" char(38) [default: NULL]
-  "date_created" datetime [not null]
-  "last_updated" datetime [not null]
-  "created_by_id" char(38) [default: NULL]
-  "updated_by_id" char(38) [default: NULL]
-
-Indexes {
-  created_by_id [name: "FK7348B491217F5972"]
-  updated_by_id [name: "FK7348B491426DD105"]
-  uom_class_id [name: "FK7348B49197D8303E"]
-}
+  "updated_by_id" varchar(255)
+  "uom_class_id" varchar(255)
+  "created_by_id" varchar(255)
+  "description" varchar(255)
 }
 
 Table "unit_of_measure_class" {
-  "id" char(38) [pk, not null]
-  "active" bit(1) [default: `b'1'`]
-  "name" varchar(255) [default: NULL]
-  "code" varchar(255) [default: NULL]
-  "description" varchar(255) [default: NULL]
-  "base_uom_id" char(38) [default: NULL]
-  "version" bigint(20) [not null]
-  "date_created" datetime [not null]
-  "last_updated" datetime [not null]
-  "type" varchar(255) [default: NULL]
-  "created_by_id" char(38) [default: NULL]
-  "updated_by_id" char(38) [default: NULL]
-
-Indexes {
-  base_uom_id [name: "FK5D1B504A6B9DFD"]
-  created_by_id [name: "FK5D1B504A217F5972"]
-  updated_by_id [name: "FK5D1B504A426DD105"]
-}
+  "id" varchar(255) [pk, not null]
+  "version" bigint [not null]
+  "date_created" datetime(6) [not null]
+  "code" varchar(255) [not null]
+  "last_updated" datetime(6) [not null]
+  "name" varchar(255) [not null]
+  "active" bit
+  "updated_by_id" varchar(255)
+  "type" varchar(255) [not null]
+  "created_by_id" varchar(255)
+  "base_uom_id" varchar(255)
+  "description" varchar(255)
 }
 
 Table "unit_of_measure_conversion" {
-  "id" char(38) [pk, not null]
-  "version" bigint(20) [not null]
-  "active" bit(1) [not null]
-  "from_unit_of_measure_id" char(38) [not null]
-  "to_unit_of_measure_id" char(38) [not null]
-  "conversion_rate" decimal(19,8) [not null]
-  "date_created" datetime [not null]
-  "last_updated" datetime [not null]
-
-Indexes {
-  from_unit_of_measure_id [name: "FK2E4511844A3E746"]
-  to_unit_of_measure_id [name: "FK2E4511849B9434D5"]
-}
+  "id" varchar(255) [pk, not null]
+  "version" bigint [not null]
+  "date_created" datetime(6) [not null]
+  "last_updated" datetime(6) [not null]
+  "from_unit_of_measure_id" varchar(255) [not null]
+  "active" bit [not null]
+  "to_unit_of_measure_id" varchar(255) [not null]
+  "conversion_rate" decimal(19,2) [not null]
 }
 
 Table "user" {
-  "id" char(38) [pk, not null, default: ""]
-  "active" bit(1) [default: NULL]
-  "last_login_date" datetime [default: NULL]
-  "manager_id" char(38) [default: NULL]
-  "password" varchar(255) [default: NULL]
-  "username" varchar(255) [default: NULL]
-  "warehouse_id" char(38) [default: NULL]
+  "id" varchar(255) [pk, not null]
+  "locale" varchar(255)
   "photo" mediumblob
-  "locale" varchar(255) [default: NULL]
-  "remember_last_location" bit(1) [default: NULL]
-  "timezone" varchar(255) [default: NULL]
+  "warehouse_id" varchar(255)
+  "last_login_date" datetime(6)
+  "timezone" varchar(255)
+  "manager_id" varchar(255)
   "dashboard_config" longblob
-
-Indexes {
-  username [unique, name: "username"]
-  manager_id [name: "FK36EBCB41E07A73"]
-  warehouse_id [name: "FK36EBCB1F28CE07"]
-}
+  "username" varchar(255) [not null]
+  "password" varchar(255) [not null]
+  "remember_last_location" bit
 }
 
 Table "user_role" {
-  "user_id" char(38) [default: NULL]
-  "role_id" char(38) [default: NULL]
-
-Indexes {
-  role_id [name: "FK143BF46AFF37FDB5"]
-  user_id [name: "FK143BF46AA462C195"]
-}
+  "user_id" varchar(255) [not null]
+  "role_id" varchar(255)
 }
 
-Ref:"unit_of_measure_class"."id" < "attribute"."unit_of_measure_class_id"
+Ref "FKt5wwnl0ohrrg479jkbbnglm7f":"unit_of_measure_class"."id" < "attribute"."unit_of_measure_class_id"
 
-Ref:"attribute"."id" < "attribute_entity_type_codes"."attribute_id"
+Ref "FKlld2dakbuv7bqvdvvu67p234w":"attribute"."id" < "attribute_entity_type_codes"."attribute_id"
 
-Ref:"party"."id" < "budget_code"."organization_id"
+Ref "FK83ggftiw8kfjir6wk305g9kp9":"party"."id" < "budget_code"."organization_id"
 
-Ref:"user"."id" < "budget_code"."created_by_id"
+Ref "FKlv74xo9wur6ok9vqmhtp4iq19":"user"."id" < "budget_code"."updated_by_id"
 
-Ref:"user"."id" < "budget_code"."updated_by_id"
+Ref "FKani7po01pyo2ov3p3b3p3yg92":"user"."id" < "budget_code"."created_by_id"
 
-Ref:"category"."id" < "category"."parent_category_id"
+Ref "FKs2ride9gvilxy2tcuv7witnxc":"category"."id" < "category"."parent_category_id"
 
-Ref:"gl_account"."id" < "category"."gl_account_id"
+Ref "FKt2lyw6siflc614qfu0ydi7bf1":"gl_account"."id" < "category"."gl_account_id"
 
-Ref:"click_stream"."id" < "click_stream_request"."click_stream_id"
+Ref "FK3e118piqtgu2s98ral0ds3x04":"user"."id" < "comment"."sender_id"
 
-Ref:"user"."id" < "comment"."recipient_id"
+Ref "FK75qkpt2prgip3esbb2mqjyg11":"user"."id" < "comment"."recipient_id"
 
-Ref:"user"."id" < "comment"."sender_id"
+Ref "FK9fsjpsedqwm0ft36obpxyp554":"lot_dimension"."id" < "consumption_fact"."lot_key_id"
 
-Ref:"inventory_item"."id" < "consumption"."inventory_item_id"
+Ref "FK79oxyhkajkxu1js19c2lh2a5b":"date_dimension"."id" < "consumption_fact"."transaction_date_key_id"
 
-Ref:"product"."id" < "consumption"."product_id"
+Ref "FKniahocy00895tkiav1j0sq51y":"location_dimension"."id" < "consumption_fact"."location_key_id"
 
-Ref:"location"."id" < "consumption"."location_id"
+Ref "FKgy23kakc2v90nhjho906lokvw":"product_dimension"."id" < "consumption_fact"."product_key_id"
 
-Ref:"location_dimension"."id" < "consumption_fact"."location_key_id"
+Ref "FK36h2kanlldanq2skci5l0s8d6":"container"."id" < "container"."parent_container_id"
 
-Ref:"lot_dimension"."id" < "consumption_fact"."lot_key_id"
+Ref "FKo0e6aretxxa91ofsg6dmd35fd":"container_type"."id" < "container"."container_type_id"
 
-Ref:"product_dimension"."id" < "consumption_fact"."product_key_id"
+Ref "FK2mi8evqsym7372qfj2t50xcy":"shipment"."id" < "container"."shipment_id"
 
-Ref:"date_dimension"."id" < "consumption_fact"."transaction_date_key_id"
+Ref "FKdev969si06qy9eshefb7y52ob":"person"."id" < "container"."recipient_id"
 
-Ref:"container_type"."id" < "container"."container_type_id"
+Ref "FKe2no7rafy2kby8devwkuyfak3":"document_type"."id" < "document"."document_type_id"
 
-Ref:"container"."id" < "container"."parent_container_id"
+Ref "FKapq895sei5ui623a23usjgwvm":"location"."id" < "event"."event_location_id"
 
-Ref:"person"."id" < "container"."recipient_id"
+Ref "FKglmuvwbtdlhha3hqjd24gehq8":"comment"."id" < "event"."comment_id"
 
-Ref:"shipment"."id" < "container"."shipment_id"
+Ref "FKgb9v8mov1cdjxswbsfrhm58s5":"user"."id" < "event"."created_by_id"
 
-Ref:"document_type"."id" < "document"."document_type_id"
+Ref "FKgxoo7ftgbsrwr4i27wb9ylu1":"event_type"."id" < "event"."event_type_id"
 
-Ref:"location"."id" < "event"."event_location_id"
+Ref "FKkinmf4fg7tm021ewatlufrv3h":"person"."id" < "fulfillment"."fulfilled_by_id"
 
-Ref:"event_type"."id" < "event"."event_type_id"
+Ref "FKj95undegrd12dqy85exqwkru":"requisition_item"."id" < "fulfillment_item"."requisition_item_id"
 
-Ref:"person"."id" < "fulfillment"."fulfilled_by_id"
+Ref "FK5p2oelb3wie05dwgsjg89mqve":"fulfillment"."id" < "fulfillment_item"."fulfillment_id"
 
-Ref:"fulfillment"."id" < "fulfillment_item"."fulfillment_id"
+Ref "FKf166do7mbtsh4nvkrhe2vyxty":"inventory_item"."id" < "fulfillment_item"."inventory_item_id"
 
-Ref:"inventory_item"."id" < "fulfillment_item"."inventory_item_id"
+Ref "FKemkovkckllyqtb142vicee2e1":"gl_account_type"."id" < "gl_account"."gl_account_type_id"
 
-Ref:"requisition_item"."id" < "fulfillment_item"."requisition_item_id"
+Ref "FKk6sm114dvox8xou13nyc5wuvr":"user"."id" < "gl_account"."updated_by_id"
 
-Ref:"fulfillment_item"."id" < "fulfillment_item_shipment_item"."fulfillment_item_shipment_items_id"
+Ref "FKg4aei8fdfxek4q5w3j3ghongu":"user"."id" < "gl_account"."created_by_id"
 
-Ref:"shipment_item"."id" < "fulfillment_item_shipment_item"."shipment_item_id"
+Ref "FKgruyb51mnp2c3r40rxkxi336c":"user"."id" < "gl_account_type"."updated_by_id"
 
-Ref:"gl_account_type"."id" < "gl_account"."gl_account_type_id"
+Ref "FK6slaejb929i5kpknjfk2a1kbn":"user"."id" < "gl_account_type"."created_by_id"
 
-Ref:"user"."id" < "gl_account"."created_by_id"
+Ref "FKnlagkg4wldbng04fndb117wai":"product"."id" < "inventory_item"."product_id"
 
-Ref:"user"."id" < "gl_account"."updated_by_id"
+Ref "FKn9yjrsryk4j7peyx678xosb3e":"product"."id" < "inventory_item_snapshot"."product_id"
 
-Ref:"user"."id" < "gl_account_type"."created_by_id"
+Ref "FKasco7sxs0cggok86lm4q9swys":"location"."id" < "inventory_item_snapshot"."location_id"
 
-Ref:"user"."id" < "gl_account_type"."updated_by_id"
+Ref "FKdn3jc0kwvkglwrokyhqdoijf":"inventory_item"."id" < "inventory_item_snapshot"."inventory_item_id"
 
-Ref:"product"."id" < "inventory_item"."product_id"
+Ref "FKp6fopwrvgnid9jxhufmapd33w":"product"."id" < "inventory_level"."product_id"
 
-Ref:"inventory"."id" < "inventory_level"."inventory_id"
+Ref "FKmk9mpnomrni5trsm0e1yqysah":"location"."id" < "inventory_level"."replenishment_location_id"
 
-Ref:"product"."id" < "inventory_level"."product_id"
+Ref "FK86ehh4eax04f91b2ckphovi33":"inventory"."id" < "inventory_level"."inventory_id"
 
-Ref:"location"."id" < "inventory_level"."preferred_bin_location_id"
+Ref "FKkcuo3q89jh5b3248uptrl1cda":"location"."id" < "inventory_level"."preferred_bin_location_id"
 
-Ref:"location"."id" < "inventory_level"."replenishment_location_id"
+Ref "FKm4d9pdif5ihkis5mtnvc08fh2":"location"."id" < "inventory_level"."internal_location_id"
 
-Ref:"product"."id" < "inventory_snapshot"."product_id"
+Ref "FKl6qiuejl2kva4rplshvbn41nu":"product"."id" < "inventory_snapshot"."product_id"
 
-Ref:"location"."id" < "inventory_snapshot"."location_id"
+Ref "FKj2sky1kfeyjbxubwyihhpoet3":"location"."id" < "inventory_snapshot"."location_id"
 
-Ref:"inventory_item"."id" < "inventory_snapshot"."inventory_item_id"
+Ref "FK2fn0lhohvohhp1f6j987ms1tm":"location"."id" < "inventory_snapshot"."bin_location_id"
 
-Ref:"location"."id" < "inventory_snapshot"."bin_location_id"
+Ref "FKm3agf1by5v01v18aluywie5v7":"inventory_item"."id" < "inventory_snapshot"."inventory_item_id"
 
-Ref:"invoice_type"."id" < "invoice"."invoice_type_id"
+Ref "FK5j9572x7a129jhx46y8fv5ve3":"user"."id" < "invoice"."updated_by_id"
 
-Ref:"party"."id" < "invoice"."party_from_id"
+Ref "FKenykvbomb8288pqnsm4ud343c":"party"."id" < "invoice"."party_id"
 
-Ref:"party"."id" < "invoice"."party_id"
+Ref "FKqss90tikrowtmcc9gw6hegq7d":"invoice_type"."id" < "invoice"."invoice_type_id"
 
-Ref:"unit_of_measure"."id" < "invoice"."currency_uom_id"
+Ref "FK6gcy07e5ofsooe4ivmukvdvkc":"user"."id" < "invoice"."created_by_id"
 
-Ref:"user"."id" < "invoice"."created_by_id"
+Ref "FKeltofhvvpj9wa637r9xwbqs8n":"party"."id" < "invoice"."party_from_id"
 
-Ref:"user"."id" < "invoice"."updated_by_id"
+Ref "FKkwwr1mykm65507r8d7la8tixw":"unit_of_measure"."id" < "invoice"."currency_uom_id"
 
-Ref:"invoice"."id" < "invoice_item"."invoice_id"
+Ref "FK6fqlo1hv61ch0k3k66vmih92m":"document"."id" < "invoice_document"."document_id"
 
-Ref:"product"."id" < "invoice_item"."product_id"
+Ref "FK2br51txkmrkpn0bk8bp9217ox":"invoice"."id" < "invoice_document"."invoice_id"
 
-Ref:"gl_account"."id" < "invoice_item"."gl_account_id"
+Ref "FKdlrd6r1hiahn8botv6xhatjc2":"product"."id" < "invoice_item"."product_id"
 
-Ref:"budget_code"."id" < "invoice_item"."budget_code_id"
+Ref "FKs5jj264piu5erpaesqoncnhwd":"unit_of_measure"."id" < "invoice_item"."quantity_uom_id"
 
-Ref:"unit_of_measure"."id" < "invoice_item"."quantity_uom_id"
+Ref "FK2nka51opyvtu6i3yfhy2o7jkv":"user"."id" < "invoice_item"."updated_by_id"
 
-Ref:"user"."id" < "invoice_item"."created_by_id"
+Ref "FKawpyw6d9xoc74wy6mwkhy5ba1":"gl_account"."id" < "invoice_item"."gl_account_id"
 
-Ref:"user"."id" < "invoice_item"."updated_by_id"
+Ref "FKmt4u6dm0jioow6qihogwdqhku":"user"."id" < "invoice_item"."created_by_id"
 
-Ref:"invoice"."id" < "invoice_reference_number"."invoice_reference_numbers_id"
+Ref "FKmv47e8k3gx71sfjnxluoi26e3":"budget_code"."id" < "invoice_item"."budget_code_id"
 
-Ref:"reference_number"."id" < "invoice_reference_number"."reference_number_id"
+Ref "FKbu6tmpd0mtgu9wrw5bj5uv09v":"invoice"."id" < "invoice_item"."invoice_id"
 
-Ref:"user"."id" < "invoice_type"."created_by_id"
+Ref "FKme65a7agj6u7vxkxx15q0djm":"unit_of_measure"."id" < "invoice_item_candidate"."quantity_uom_id"
 
-Ref:"user"."id" < "invoice_type"."updated_by_id"
+Ref "FK4s8cgfupein4y208ntncme75h":"party"."id" < "invoice_item_candidate"."vendor_id"
 
-Ref:"transaction"."id" < "local_transfer"."source_transaction_id"
+Ref "FKipsxo3p1x3flbslcpq1unmgv7":"order"."id" < "invoice_item_candidate"."order_id"
 
-Ref:"transaction"."id" < "local_transfer"."destination_transaction_id"
+Ref "FKahdifa3dok26nb4vehylpm7nx":"gl_account"."id" < "invoice_item_candidate"."gl_account_id"
 
-Ref:"address"."id" < "location"."address_id"
+Ref "FKajeffgmj3erfpo14ptc8r2dxt":"shipment"."id" < "invoice_item_candidate"."shipment_id"
 
-Ref:"inventory"."id" < "location"."inventory_id"
+Ref "FKdp1frt1tgw2fgo55fifam33ri":"budget_code"."id" < "invoice_item_candidate"."budget_code_id"
 
-Ref:"user"."id" < "location"."manager_id"
+Ref "FKhs3ryaw7qhqd7mrut0dcwu51d":"invoice"."id" < "invoice_list"."invoice_id"
 
-Ref:"location_type"."id" < "location"."location_type_id"
+Ref "FKphwbj8pyx0jlqxmj1f9ne1a8r":"reference_number"."id" < "invoice_reference_number"."reference_number_id"
 
-Ref:"location"."id" < "location"."parent_location_id"
+Ref "FKk8owi39adujrwdc1vsjhxnj05":"invoice"."id" < "invoice_reference_number"."invoice_reference_numbers_id"
 
-Ref:"location_group"."id" < "location"."location_group_id"
+Ref "FKp3hwgt6uyljx5cy8xamm3eqg3":"user"."id" < "invoice_type"."updated_by_id"
 
-Ref:"party"."id" < "location"."organization_id"
+Ref "FK4v2f86ltvfl02wtlu9vnghe4q":"user"."id" < "invoice_type"."created_by_id"
 
-Ref:"location"."id" < "location_dimension"."location_id"
+Ref "FKcoq7tfcptydfvxu7mt2y6wum4":"transaction"."id" < "local_transfer"."destination_transaction_id"
 
-Ref:"address"."id" < "location_group"."address_id"
+Ref "FKdm8nr21fl896k9jyxgptoeukt":"transaction"."id" < "local_transfer"."source_transaction_id"
 
-Ref:"user"."id" < "location_role"."user_id"
+Ref "FK5oo3fgtt1i537jwpra1v0x4m1":"party"."id" < "location"."organization_id"
 
-Ref:"location"."id" < "location_role"."location_id"
+Ref "FKnfgho0jcam42kv3g7u2tew84j":"location"."id" < "location"."zone_id"
 
-Ref:"role"."id" < "location_role"."role_id"
+Ref "FKt8psi9b5mkkfc0r9fgptngwhg":"address"."id" < "location"."address_id"
 
-Ref:"location"."id" < "location_supported_activities"."location_id"
+Ref "FKqsuvieev9qthilbxu8ammqyqi":"user"."id" < "location"."manager_id"
 
-Ref:"location_type"."id" < "location_type_supported_activities"."location_type_id"
+Ref "FK251odyb4jjqxqm3wo99yp1lw3":"location_group"."id" < "location"."location_group_id"
 
-Ref:"location"."id" < "order"."destination_id"
+Ref "FKmgaxi8ktqsjd8ekyyp4rmquno":"inventory"."id" < "location"."inventory_id"
 
-Ref:"person"."id" < "order"."ordered_by_id"
+Ref "FK47pk9c008u23eol1yijbo817":"location_type"."id" < "location"."location_type_id"
 
-Ref:"location"."id" < "order"."origin_id"
+Ref "FK9s1sco601u8l6ptdxf432h4kb":"location"."id" < "location"."parent_location_id"
 
-Ref:"person"."id" < "order"."recipient_id"
+Ref "FKcugf2pfmh0o8wuhe2f0r0kqpi":"address"."id" < "location_group"."address_id"
 
-Ref:"person"."id" < "order"."completed_by_id"
+Ref "FKqgt7226c9020djpskjxhef1my":"role"."id" < "location_role"."role_id"
 
-Ref:"payment_method_type"."id" < "order"."payment_method_type_id"
+Ref "FK4vdohntcgsbi0e3ndkmn3v40j":"location"."id" < "location_role"."location_id"
 
-Ref:"payment_term"."id" < "order"."payment_term_id"
+Ref "FKh79977ruq89aqsrxqrfqp6022":"user"."id" < "location_role"."user_id"
 
-Ref:"person"."id" < "order"."approved_by_id"
+Ref "FKndb3thx04nd7etj65q57ao8ma":"location"."id" < "location_supported_activities"."location_id"
 
-Ref:"party"."id" < "order"."destination_party_id"
+Ref "FKpi0svp0hns84wjyahmxqag4qy":"location_type"."id" < "location_type_supported_activities"."location_type_id"
 
-Ref:"person"."id" < "order"."created_by_id"
+Ref "FK9qr73wrphxxskwdcgiwqq11q2":"payment_term"."id" < "order"."payment_term_id"
 
-Ref:"person"."id" < "order"."updated_by_id"
+Ref "FKsvqyxqbn3o019yhhmjr6oxu6a":"location"."id" < "order"."origin_id"
 
-Ref:"order"."id" < "order_adjustment"."order_id"
+Ref "FK9qpuglhik9esl6ekqk44cuvbu":"person"."id" < "order"."updated_by_id"
 
-Ref:"order_item"."id" < "order_adjustment"."order_item_id"
+Ref "FK1y5uokvme5fm2qo0t2w4bm0tb":"party"."id" < "order"."origin_party_id"
 
-Ref:"order_adjustment_type"."id" < "order_adjustment"."order_adjustment_type_id"
+Ref "FKawdxelt4tx2a8q7aylhkh4ykn":"payment_method_type"."id" < "order"."payment_method_type_id"
 
-Ref:"budget_code"."id" < "order_adjustment"."budget_code_id"
+Ref "FK9an6jtra11iijtcbw25j2b8af":"party"."id" < "order"."destination_party_id"
 
-Ref:"gl_account"."id" < "order_adjustment"."gl_account_id"
+Ref "FK5vpxxly74h2vu9em514s2apl":"person"."id" < "order"."ordered_by_id"
 
-Ref:"invoice_item"."id" < "order_adjustment_invoice"."invoice_item_id"
+Ref "FK4ulc9bp8ql87t42p934xs3esj":"person"."id" < "order"."recipient_id"
 
-Ref:"order_adjustment"."id" < "order_adjustment_invoice"."order_adjustment_id"
+Ref "FKd2pyp13cyqxl843svki89algi":"location"."id" < "order"."destination_id"
 
-Ref:"gl_account"."id" < "order_adjustment_type"."gl_account_id"
+Ref "FKrf9637xwklkfesamf1xn837un":"person"."id" < "order"."completed_by_id"
 
-Ref:"order"."id" < "order_comment"."order_comments_id"
+Ref "FK6d6j6fpy2s92e9xrcaf3l2h86":"order_type"."id" < "order"."order_type_id"
 
-Ref:"comment"."id" < "order_comment"."comment_id"
+Ref "FKafsessj9mmosulwhnxfe8eeox":"person"."id" < "order"."created_by_id"
 
-Ref:"order"."id" < "order_document"."order_documents_id"
+Ref "FKhwdl990lor7oer47srkffdfgo":"person"."id" < "order"."approved_by_id"
 
-Ref:"document"."id" < "order_document"."document_id"
+Ref "FKt9pqpr4gja5od7wlhjr0q6t60":"order_adjustment_type"."id" < "order_adjustment"."order_adjustment_type_id"
 
-Ref:"order"."id" < "order_event"."order_events_id"
+Ref "FK1w09l84cbelvsxsl4h0tjhndl":"order"."id" < "order_adjustment"."order_id"
 
-Ref:"event"."id" < "order_event"."event_id"
+Ref "FKmp9699x3mvmatceyorvn5gxql":"gl_account"."id" < "order_adjustment"."gl_account_id"
 
-Ref:"category"."id" < "order_item"."category_id"
+Ref "FK5ttb3vnglykvq9fc072koy9yw":"budget_code"."id" < "order_adjustment"."budget_code_id"
 
-Ref:"inventory_item"."id" < "order_item"."inventory_item_id"
+Ref "FKimapod3d523pev3iflg4gevp3":"order_item"."id" < "order_adjustment"."order_item_id"
 
-Ref:"order"."id" < "order_item"."order_id"
+Ref "FKfghij8195tn2f43j4rmpclp3d":"invoice_item"."id" < "order_adjustment_invoice"."invoice_item_id"
 
-Ref:"product"."id" < "order_item"."product_id"
+Ref "FKrrq4uxfsd9hb8gipniuj0q6er":"order_adjustment"."id" < "order_adjustment_invoice"."order_adjustment_id"
 
-Ref:"user"."id" < "order_item"."requested_by_id"
+Ref "FKdw56g8b9sufx4iv95ijrxxbs6":"gl_account"."id" < "order_adjustment_type"."gl_account_id"
 
-Ref:"order_item"."id" < "order_item"."parent_order_item_id"
+Ref "FKoufxuo2pmiqvftuhfa8le6df":"comment"."id" < "order_comment"."comment_id"
 
-Ref:"person"."id" < "order_item"."recipient_id"
+Ref "FK35brcmi9kg39dd3ln20fdassn":"order"."id" < "order_comment"."order_comments_id"
 
-Ref:"location"."id" < "order_item"."destination_bin_location_id"
+Ref "FKivobyxod8bdy1at7jyebadjk9":"document"."id" < "order_document"."document_id"
 
-Ref:"location"."id" < "order_item"."origin_bin_location_id"
+Ref "FK8vghkm2l6neii2tx43r3o41ir":"order"."id" < "order_document"."order_documents_id"
 
-Ref:"product_supplier"."id" < "order_item"."product_supplier_id"
+Ref "FKitt5e97sotx5sl8hvl6iw6oe2":"event"."id" < "order_event"."event_id"
 
-Ref:"product_package"."id" < "order_item"."product_package_id"
+Ref "FKawkh4ye4oshhhqv8i41g5v79j":"order"."id" < "order_event"."order_events_id"
 
-Ref:"unit_of_measure"."id" < "order_item"."quantity_uom_id"
+Ref "FK8ca8ate3dw4jtru9tuu3heo35":"order_item"."id" < "order_invoice"."order_item_id"
 
-Ref:"budget_code"."id" < "order_item"."budget_code_id"
+Ref "FK4grb36byvs37foo0ijgit0dhu":"invoice_item"."id" < "order_invoice"."invoice_item_id"
 
-Ref:"gl_account"."id" < "order_item"."gl_account_id"
+Ref "FK551losx9j75ss5d6bfsqvijna":"product"."id" < "order_item"."product_id"
 
-Ref:"order_item"."id" < "order_shipment"."order_item_id"
+Ref "FKi84pjb0whjok1cl1pj06ee7tj":"unit_of_measure"."id" < "order_item"."quantity_uom_id"
 
-Ref:"shipment_item"."id" < "order_shipment"."shipment_item_id"
+Ref "FKs234mi6jususbx4b37k44cipy":"order"."id" < "order_item"."order_id"
 
-Ref:"party_type"."id" < "party"."party_type_id"
+Ref "FK9be2lv0nsh8x16er7c6prku9k":"user"."id" < "order_item"."requested_by_id"
 
-Ref:"location"."id" < "party"."default_location_id"
+Ref "FKt66lqcawx3wq5y8883ppsaa5m":"product_package"."id" < "order_item"."product_package_id"
 
-Ref:"party"."id" < "party_role"."party_id"
+Ref "FKfvneavee76lqv4953v2ruqeh":"gl_account"."id" < "order_item"."gl_account_id"
 
-Ref:"person"."id" < "picklist"."picker_id"
+Ref "FKaf6y4nmiyl3lqp76h73b0lrdm":"person"."id" < "order_item"."recipient_id"
 
-Ref:"user"."id" < "picklist"."created_by_id"
+Ref "FKamn4oxxqf03bebymwtsq1m23q":"order_item"."id" < "order_item"."parent_order_item_id"
 
-Ref:"user"."id" < "picklist"."updated_by_id"
+Ref "FKesfloctcpf6ki6dabyfpjrkjs":"budget_code"."id" < "order_item"."budget_code_id"
 
-Ref:"requisition"."id" < "picklist"."requisition_id"
+Ref "FK49sgp05n6vmx0hahfqfpxnnid":"inventory_item"."id" < "order_item"."inventory_item_id"
 
-Ref:"picklist"."id" < "picklist_item"."picklist_id"
+Ref "FKcugnx9esky05gh7nlxmrrk0o1":"product_supplier"."id" < "order_item"."product_supplier_id"
 
-Ref:"inventory_item"."id" < "picklist_item"."inventory_item_id"
+Ref "FKvpgfd1fg0o3g851bbu5b8x51":"location"."id" < "order_item"."origin_bin_location_id"
 
-Ref:"user"."id" < "picklist_item"."created_by_id"
+Ref "FKafhqkbhqer7b4s6c9sgko47c6":"category"."id" < "order_item"."category_id"
 
-Ref:"user"."id" < "picklist_item"."updated_by_id"
+Ref "FKntbwadand68iqhk4eosng2vwj":"location"."id" < "order_item"."destination_bin_location_id"
 
-Ref:"requisition_item"."id" < "picklist_item"."requisition_item_id"
+Ref "FK13f9c2ffku9lfe8ycu36doui0":"product"."id" < "order_item_details"."product_id"
 
-Ref:"location"."id" < "picklist_item"."bin_location_id"
+Ref "FK97whadk6su838tfepc0pf55f3":"unit_of_measure"."id" < "order_item_details"."quantity_uom_id"
 
-Ref:"user"."id" < "preference_type"."created_by_id"
+Ref "FKkas9uiisocm8rcs6lcg7ai1e6":"order"."id" < "order_item_details"."order_id"
 
-Ref:"user"."id" < "preference_type"."updated_by_id"
+Ref "FKabkt4plulk17dck4ra7qx5u6":"order_item"."id" < "order_item_details"."order_item_id"
 
-Ref:"category"."id" < "product"."category_id"
+Ref "FKihcg9m4p827l3b2oogei5wvr1":"product"."id" < "order_item_summary"."product_id"
 
-Ref:"user"."id" < "product"."created_by_id"
+Ref "FKb0jfws77pdqkq1gx05ci6hrwm":"unit_of_measure"."id" < "order_item_summary"."quantity_uom_id"
 
-Ref:"user"."id" < "product"."updated_by_id"
+Ref "FKgihlpsmj84s5njlhl52o3c5q5":"order"."id" < "order_item_summary"."order_id"
 
-Ref:"unit_of_measure"."id" < "product"."default_uom_id"
+Ref "FKq80h1ptsew7o8bg89jxq58dif":"order_item"."id" < "order_shipment"."order_item_id"
 
-Ref:"product_type"."id" < "product"."product_type_id"
+Ref "FK7doagcr0jurtiywcof0gienc2":"shipment_item"."id" < "order_shipment"."shipment_item_id"
 
-Ref:"gl_account"."id" < "product"."gl_account_id"
+Ref "FKtnpafhqejrv9hlc4swtstsf14":"order"."id" < "order_summary_mv"."order_id"
 
-Ref:"product"."id" < "product_association"."product_id"
+Ref "FK8a53i44ugcgrinxamyx4fmmw0":"user"."id" < "order_type"."updated_by_id"
 
-Ref:"product"."id" < "product_association"."associated_product_id"
+Ref "FK422yq5mi92p5ks6321q66je58":"user"."id" < "order_type"."created_by_id"
 
-Ref:"attribute"."id" < "product_attribute"."attribute_id"
+Ref "FK8md8mp19gfe8lpe5x546xmsau":"party_type"."id" < "party"."party_type_id"
 
-Ref:"product"."id" < "product_attribute"."product_id"
+Ref "FK5rvscrwk5rf4eje5324mlato3":"location"."id" < "party"."default_location_id"
 
-Ref:"unit_of_measure"."id" < "product_attribute"."unit_of_measure_id"
+Ref "FKl2wdhtgceql7lj645k23crm3w":"party"."id" < "party_role"."party_id"
 
-Ref:"product_supplier"."id" < "product_attribute"."product_supplier_id"
+Ref "FK9aouwwxs2pk0dux61ih7r500":"user"."id" < "picklist"."updated_by_id"
 
-Ref:"location"."id" < "product_availability"."bin_location_id"
+Ref "FKgjsh850nso4uf2tolqnbb0pka":"order"."id" < "picklist"."order_id"
 
-Ref:"inventory_item"."id" < "product_availability"."inventory_item_id"
+Ref "FKj6381so5bbfo5b6hj6a40ywxg":"person"."id" < "picklist"."picker_id"
 
-Ref:"location"."id" < "product_availability"."location_id"
+Ref "FK4m2i12vsduhg3pnob2hjcuorv":"requisition"."id" < "picklist"."requisition_id"
 
-Ref:"product"."id" < "product_availability"."product_id"
+Ref "FK1b0mn7axsa0unoh6dl376ncvl":"user"."id" < "picklist"."created_by_id"
 
-Ref:"product"."id" < "product_catalog_item"."product_id"
+Ref "FKp9jwnicfuu0lcy9vjk8t4ovue":"picklist"."id" < "picklist_item"."picklist_id"
 
-Ref:"product_catalog"."id" < "product_catalog_item"."product_catalog_id"
+Ref "FKjapf4ftf93msoy5huygmahh96":"location"."id" < "picklist_item"."bin_location_id"
 
-Ref:"category"."id" < "product_category"."category_id"
+Ref "FKfw9l10ba6133hv7kkuplardnc":"requisition_item"."id" < "picklist_item"."requisition_item_id"
 
-Ref:"product"."id" < "product_component"."assembly_product_id"
+Ref "FKq576qe22xgfow2ldhneh6scko":"inventory_item"."id" < "picklist_item"."inventory_item_id"
 
-Ref:"product"."id" < "product_component"."component_product_id"
+Ref "FK32wui57dasc80cvfbaocmm66k":"order_item"."id" < "picklist_item"."order_item_id"
 
-Ref:"unit_of_measure"."id" < "product_component"."unit_of_measure_id"
+Ref "FKks52kn3ubbr9o7espahde8ft9":"user"."id" < "preference_type"."updated_by_id"
 
-Ref:"product"."id" < "product_dimension"."product_id"
+Ref "FKrv5cylu4wkukglm0nd1p3ws02":"user"."id" < "preference_type"."created_by_id"
 
-Ref:"product"."id" < "product_document"."product_id"
+Ref "FKjqm41ofk4pc2iu86vae1eunrh":"product_group"."id" < "product"."product_family_id"
 
-Ref:"document"."id" < "product_document"."document_id"
+Ref "FKryyfatig2wf1avk5x3571mm7m":"user"."id" < "product"."updated_by_id"
 
-Ref:"category"."id" < "product_group"."category_id"
+Ref "FK6fqjsgv7b6xomu9s3i1s2giyh":"gl_account"."id" < "product"."gl_account_id"
 
-Ref:"product_group"."id" < "product_group_product"."product_group_id"
+Ref "FK42bturtc6l8g3ucb8ub5eep5p":"unit_of_measure"."id" < "product"."default_uom_id"
 
-Ref:"product"."id" < "product_group_product"."product_id"
+Ref "FKlabq3c2e90ybbxk58rc48byqo":"product_type"."id" < "product"."product_type_id"
 
-Ref:"unit_of_measure"."id" < "product_package"."uom_id"
+Ref "FK1mtsbur82frn64de7balymq9s":"category"."id" < "product"."category_id"
 
-Ref:"product"."id" < "product_package"."product_id"
+Ref "FKxkdlsb8nvamkr24g4ejew0h2":"user"."id" < "product"."created_by_id"
 
-Ref:"user"."id" < "product_package"."created_by_id"
+Ref "FK7pyxsjb9fmjk1rawodf1hj6wy":"product"."id" < "product_association"."product_id"
 
-Ref:"user"."id" < "product_package"."updated_by_id"
+Ref "FKp6ksvck4sjm0rtyujnj96psde":"product"."id" < "product_association"."associated_product_id"
 
-Ref:"product_supplier"."id" < "product_package"."product_supplier_id"
+Ref "FK77xl1urf2l7i2igbvwkpdth4v":"product_association"."id" < "product_association"."mutual_association_id"
 
-Ref:"unit_of_measure"."id" < "product_price"."currency_id"
+Ref "FKlefs59y5kmsbu017n1wp10gf2":"product"."id" < "product_attribute"."product_id"
 
-Ref:"user"."id" < "product_price"."created_by_id"
+Ref "FKieotw38m4pfyr2qm2owwd3h5k":"unit_of_measure"."id" < "product_attribute"."unit_of_measure_id"
 
-Ref:"user"."id" < "product_price"."updated_by_id"
+Ref "FKefc9famxhv98xs6686269a79":"attribute"."id" < "product_attribute"."attribute_id"
 
-Ref:"party"."id" < "product_supplier"."manufacturer_id"
+Ref "FKmm9lrlaf9nixl81stgobgjjx1":"product_supplier"."id" < "product_attribute"."product_supplier_id"
 
-Ref:"product"."id" < "product_supplier"."product_id"
+Ref "FK3sgpu0mqt3cncaw0k1x3okkq8":"product"."id" < "product_availability"."product_id"
 
-Ref:"party"."id" < "product_supplier"."supplier_id"
+Ref "FKnm9rjc5gy37wpg1dc7uixafn4":"location"."id" < "product_availability"."location_id"
 
-Ref:"unit_of_measure"."id" < "product_supplier"."unit_of_measure_id"
+Ref "FK481h238ng5kbrq1tru4ehl30c":"location"."id" < "product_availability"."bin_location_id"
 
-Ref:"product_supplier"."id" < "product_supplier_preference"."product_supplier_id"
+Ref "FKexogk3lt0f2bawa530exrtot7":"inventory_item"."id" < "product_availability"."inventory_item_id"
 
-Ref:"party"."id" < "product_supplier_preference"."destination_party_id"
+Ref "FKpi2modlpavnm1ltx3poer6uek":"product"."id" < "product_catalog_item"."product_id"
 
-Ref:"preference_type"."id" < "product_supplier_preference"."preference_type_id"
+Ref "FK68fuc6aubfv5ug382o402ixm4":"product_catalog"."id" < "product_catalog_item"."product_catalog_id"
 
-Ref:"user"."id" < "product_supplier_preference"."created_by_id"
+Ref "FKkud35ls1d40wpjb5htpp14q4e":"category"."id" < "product_category"."category_id"
 
-Ref:"user"."id" < "product_supplier_preference"."updated_by_id"
+Ref "FK2unf6whmcdr39en1mkwsxl9w8":"unit_of_measure"."id" < "product_component"."unit_of_measure_id"
 
-Ref:"product"."id" < "product_tag"."product_id"
+Ref "FKfmtq0y4u7w2obj6x4xyu4k6tl":"product"."id" < "product_component"."assembly_product_id"
 
-Ref:"tag"."id" < "product_tag"."tag_id"
+Ref "FKqk0sp1m62q94wqi4dy87fsv3m":"product"."id" < "product_component"."component_product_id"
 
-Ref:"product_type"."id" < "product_type_displayed_fields"."product_type_id"
+Ref "FKbswa92s1wqmo0n03qf1n8a39y":"document"."id" < "product_document"."document_id"
 
-Ref:"product_type"."id" < "product_type_required_fields"."product_type_id"
+Ref "FKobqa0l5dnxb8x8gx50gall4uj":"product"."id" < "product_document"."product_id"
 
-Ref:"product_type"."id" < "product_type_supported_activities"."product_type_id"
+Ref "FKdreaf3fj3s32hmbf6m4ivvj66":"category"."id" < "product_group"."category_id"
 
-Ref:"person"."id" < "receipt"."recipient_id"
+Ref "FKcih1hwql5mxvv7mekhy8ynjs3":"product"."id" < "product_group_product"."product_id"
 
-Ref:"shipment"."id" < "receipt"."shipment_id"
+Ref "FK2dl5ei533oxftyieeiru4icw9":"product_group"."id" < "product_group_product"."product_group_id"
 
-Ref:"product"."id" < "receipt_item"."product_id"
+Ref "FKo9tawrpjfxd6ur1fciqs33137":"product"."id" < "product_merge_logger"."obsolete_product_id"
 
-Ref:"receipt"."id" < "receipt_item"."receipt_id"
+Ref "FKq6y6evsx97061s267u61mr9y5":"user"."id" < "product_merge_logger"."updated_by_id"
 
-Ref:"person"."id" < "receipt_item"."recipient_id"
+Ref "FK9o0h0flof6pulj1jxp176di08":"user"."id" < "product_merge_logger"."created_by_id"
 
-Ref:"shipment_item"."id" < "receipt_item"."shipment_item_id"
+Ref "FKsui155754fxxhqxhanwf413mh":"product"."id" < "product_merge_logger"."primary_product_id"
 
-Ref:"inventory_item"."id" < "receipt_item"."inventory_item_id"
+Ref "FK8ynmpjkyue5pw52n8gq7x2r4t":"product"."id" < "product_package"."product_id"
 
-Ref:"location"."id" < "receipt_item"."bin_location_id"
+Ref "FKjk2cj5esr3pssrceqbrlnmwpn":"user"."id" < "product_package"."updated_by_id"
 
-Ref:"reference_number_type"."id" < "reference_number"."reference_number_type_id"
+Ref "FKajt160o4kqidhl1nyqtqdbg80":"unit_of_measure"."id" < "product_package"."uom_id"
 
-Ref:"location"."id" < "requisition"."destination_id"
+Ref "FKbpbdv6m005o4qlcpegkt6krkn":"product_supplier"."id" < "product_package"."product_supplier_id"
 
-Ref:"location"."id" < "requisition"."origin_id"
+Ref "FKc3u9opfqa5ngxetlk4pqigb4j":"product_price"."id" < "product_package"."product_price_id"
 
-Ref:"person"."id" < "requisition"."recipient_id"
+Ref "FKnvm96ijy28xkbk1mxdbyvgyve":"user"."id" < "product_package"."created_by_id"
 
-Ref:"person"."id" < "requisition"."requested_by_id"
+Ref "FKq7jux194oogas2huorshix0xy":"user"."id" < "product_price"."updated_by_id"
 
-Ref:"fulfillment"."id" < "requisition"."fulfillment_id"
+Ref "FKqmj9o875nsbqx2abc5jxnavkp":"unit_of_measure"."id" < "product_price"."currency_id"
 
-Ref:"user"."id" < "requisition"."created_by_id"
+Ref "FKfbl6kxkr2asbc5riribmxgofr":"user"."id" < "product_price"."created_by_id"
 
-Ref:"user"."id" < "requisition"."updated_by_id"
+Ref "FKbv8lrj3icyv9i1brx3ttjgvht":"product"."id" < "product_summary"."product_id"
 
-Ref:"person"."id" < "requisition"."verified_by_id"
+Ref "FKfxe19nrj2vhfghivho5wni8fg":"location"."id" < "product_summary"."location_id"
 
-Ref:"person"."id" < "requisition"."reviewed_by_id"
+Ref "FK9ycab4fchfe9g9uxleti557pv":"product"."id" < "product_supplier"."product_id"
 
-Ref:"person"."id" < "requisition"."delivered_by_id"
+Ref "FKdl19f9w52mhwa37yenly4auv3":"party"."id" < "product_supplier"."manufacturer_id"
 
-Ref:"person"."id" < "requisition"."received_by_id"
+Ref "FKagt76ho2x4i0uua2gjvjmongx":"product_package"."id" < "product_supplier"."default_product_package_id"
 
-Ref:"person"."id" < "requisition"."checked_by_id"
+Ref "FKk3ch4p9btq6fr5bf0h3dtrfh2":"party"."id" < "product_supplier"."supplier_id"
 
-Ref:"person"."id" < "requisition"."issued_by_id"
+Ref "FKtmi3pl7ljts8asvwvntx6ohpl":"product_price"."id" < "product_supplier"."contract_price_id"
 
-Ref:"requisition"."id" < "requisition"."requisition_template_id"
+Ref "FKoygxvrvtuou9g7huf5kdm3pux":"user"."id" < "product_supplier_preference"."updated_by_id"
 
-Ref:"category"."id" < "requisition_item"."category_id"
+Ref "FKkttlavh3nscjnwp0rh1rij5xo":"product_supplier"."id" < "product_supplier_preference"."product_supplier_id"
 
-Ref:"inventory_item"."id" < "requisition_item"."inventory_item_id"
+Ref "FK7txca25uetyx444omtrn3u32a":"party"."id" < "product_supplier_preference"."destination_party_id"
 
-Ref:"product"."id" < "requisition_item"."product_id"
+Ref "FK2jcr3fws929al17c4pr8k9ekd":"preference_type"."id" < "product_supplier_preference"."preference_type_id"
 
-Ref:"requisition"."id" < "requisition_item"."requisition_id"
+Ref "FK879gmyp3s36ddyuyww1h7gf21":"user"."id" < "product_supplier_preference"."created_by_id"
 
-Ref:"user"."id" < "requisition_item"."requested_by_id"
+Ref "FK2rf7w3d88x20p7vuc2m9mvv91":"product"."id" < "product_tag"."product_id"
 
-Ref:"person"."id" < "requisition_item"."requested_by_id"
+Ref "FK3b3a7hu5g2kh24wf0cwv3lgsm":"tag"."id" < "product_tag"."tag_id"
 
-Ref:"product_group"."id" < "requisition_item"."product_group_id"
+Ref "FKsudcuk4u66lfewj99gio5dx4b":"product_type"."id" < "product_type_displayed_fields"."product_type_id"
 
-Ref:"person"."id" < "requisition_item"."recipient_id"
+Ref "FKs39xly3kbqimonhd0ekduwer3":"product_type"."id" < "product_type_required_fields"."product_type_id"
 
-Ref:"requisition_item"."id" < "requisition_item"."parent_requisition_item_id"
+Ref "FKb90i9eawwq81lfu9adkgfwad8":"product_type"."id" < "product_type_supported_activities"."product_type_id"
 
-Ref:"product_package"."id" < "requisition_item"."product_package_id"
+Ref "FK94m1emdpv4wvkqwjagmnivklm":"shipment"."id" < "receipt"."shipment_id"
 
-Ref:"user"."id" < "requisition_item"."created_by_id"
+Ref "FKdjee92f9q72lmjurg0x8by1wn":"person"."id" < "receipt"."recipient_id"
 
-Ref:"user"."id" < "requisition_item"."updated_by_id"
+Ref "FKadhg4s6y4syjwnexabmyxkuyn":"product"."id" < "receipt_item"."product_id"
 
-Ref:"requisition_item"."id" < "requisition_item"."substitution_item_id"
+Ref "FKobm3eawjbdijk8wcba99u9wi":"shipment_item"."id" < "receipt_item"."shipment_item_id"
 
-Ref:"requisition_item"."id" < "requisition_item"."modification_item_id"
+Ref "FK5cin053gopotdpk2097vidcsf":"location"."id" < "receipt_item"."bin_location_id"
 
-Ref:"person"."id" < "shipment"."carrier_id"
+Ref "FKsohgmt8ntavcgj10ha2duc8la":"receipt"."id" < "receipt_item"."receipt_id"
 
-Ref:"location"."id" < "shipment"."destination_id"
+Ref "FKo9q0p7agyv7eoidfk046yxcx3":"person"."id" < "receipt_item"."recipient_id"
 
-Ref:"donor"."id" < "shipment"."donor_id"
+Ref "FKbc45ostc4gq0kol594qy9bd7l":"inventory_item"."id" < "receipt_item"."inventory_item_id"
 
-Ref:"location"."id" < "shipment"."origin_id"
+Ref "FK8ovlrp4de4hpav0886ccqs51t":"reference_number_type"."id" < "reference_number"."reference_number_type_id"
 
-Ref:"person"."id" < "shipment"."recipient_id"
+Ref "FKpwk2oyj6u58ntcg35hgx763dk":"product"."id" < "requirement"."product_id"
 
-Ref:"shipment_method"."id" < "shipment"."shipment_method_id"
+Ref "FK6ecec9574sufgv3snqwhiqjm2":"location"."id" < "requirement"."location_id"
 
-Ref:"shipment_type"."id" < "shipment"."shipment_type_id"
+Ref "FK1axplw2k6e74xny66347m4y9p":"location"."id" < "requirement"."bin_location_id"
 
-Ref:"event"."id" < "shipment"."current_event_id"
+Ref "FK7nc4uakya6uy2kh1sdom9y7e4":"person"."id" < "requisition"."issued_by_id"
 
-Ref:"user"."id" < "shipment"."created_by_id"
+Ref "FK8efqeci7mysug44a06o1r6njb":"location"."id" < "requisition"."origin_id"
 
-Ref:"user"."id" < "shipment"."updated_by_id"
+Ref "FKfpkqn5yb8d9tn9vaj95ifo74y":"person"."id" < "requisition"."received_by_id"
 
-Ref:"requisition"."id" < "shipment"."requisition_id"
+Ref "FK9xodmcgn1om99fg3ai535ny4b":"person"."id" < "requisition"."verified_by_id"
 
-Ref:"comment"."id" < "shipment_comment"."comment_id"
+Ref "FKqaopl8vlusolbupi5xkt265f2":"user"."id" < "requisition"."updated_by_id"
 
-Ref:"document"."id" < "shipment_document"."document_id"
+Ref "FK9b0gfysjn4vqir16gsui4bv84":"person"."id" < "requisition"."requested_by_id"
 
-Ref:"shipment"."id" < "shipment_event"."shipment_events_id"
+Ref "FKomnch1v8adwbv3j5oorumq4ky":"person"."id" < "requisition"."rejected_by_id"
 
-Ref:"event"."id" < "shipment_event"."event_id"
+Ref "FKc6ofakariuyalsrcb180enemg":"person"."id" < "requisition"."recipient_id"
 
-Ref:"invoice_item"."id" < "shipment_invoice"."invoice_item_id"
+Ref "FKscvphhexj2idnga23snul9rxi":"location"."id" < "requisition"."destination_id"
 
-Ref:"shipment_item"."id" < "shipment_invoice"."shipment_item_id"
+Ref "FK8r9l73pdp49b2852rhj43qa1i":"person"."id" < "requisition"."reviewed_by_id"
 
-Ref:"container"."id" < "shipment_item"."container_id"
+Ref "FK7fo0qiid83oa46twyqbk8js0v":"fulfillment"."id" < "requisition"."fulfillment_id"
 
-Ref:"donor"."id" < "shipment_item"."donor_id"
+Ref "FKed3hhyo54sslabbhpy5qh8ih":"requisition"."id" < "requisition"."requisition_template_id"
 
-Ref:"product"."id" < "shipment_item"."product_id"
+Ref "FK3mb3li6bt5pblmhrmq16jo5ai":"person"."id" < "requisition"."checked_by_id"
 
-Ref:"person"."id" < "shipment_item"."recipient_id"
+Ref "FK450jpat1pwtqh8andbp6pm8yb":"person"."id" < "requisition"."delivered_by_id"
 
-Ref:"shipment"."id" < "shipment_item"."shipment_id"
+Ref "FK1hoy1cms3y60ja6d74fg1nksp":"user"."id" < "requisition"."created_by_id"
 
-Ref:"inventory_item"."id" < "shipment_item"."inventory_item_id"
+Ref "FKejftjwdppfmkr3gvs6gxrxupy":"person"."id" < "requisition"."approved_by_id"
 
-Ref:"location"."id" < "shipment_item"."bin_location_id"
+Ref "FKfkteseanxiiih7yqsbww32e97":"person"."id" < "requisition_approvers"."person_id"
 
-Ref:"requisition_item"."id" < "shipment_item"."requisition_item_id"
+Ref "FKtr24ti3xufwaocrsnqrha473x":"requisition"."id" < "requisition_approvers"."requisition_id"
 
-Ref:"shipper_service"."id" < "shipment_method"."shipper_service_id"
+Ref "FK83njqrkjmwxo18rugsmfg6oh":"comment"."id" < "requisition_comment"."comment_id"
 
-Ref:"shipper"."id" < "shipment_method"."shipper_id"
+Ref "FKoyl61m7arivcmrfo9l97dm11q":"requisition"."id" < "requisition_comment"."requisition_id"
 
-Ref:"reference_number"."id" < "shipment_reference_number"."reference_number_id"
+Ref "FKptce6t3kgwaqyb6dlceai2uek":"event"."id" < "requisition_event"."event_id"
 
-Ref:"shipment_type"."id" < "shipment_workflow"."shipment_type_id"
+Ref "FK9bhrd651agomeoj6weocky3se":"requisition"."id" < "requisition_event"."requisition_id"
 
-Ref:"container_type"."id" < "shipment_workflow_container_type"."container_type_id"
+Ref "FKdu8umog29uw3nnkc7qy6gwvbw":"product"."id" < "requisition_item"."product_id"
 
-Ref:"shipment_workflow"."id" < "shipment_workflow_document"."shipment_workflow_id"
+Ref "FK3qb8sa18q511ntdlacd1kcr83":"user"."id" < "requisition_item"."updated_by_id"
 
-Ref:"document"."id" < "shipment_workflow_document"."document_id"
+Ref "FKltgut7g6779mw0398f9bkuir2":"person"."id" < "requisition_item"."requested_by_id"
 
-Ref:"reference_number_type"."id" < "shipment_workflow_reference_number_type"."reference_number_type_id"
+Ref "FKu3rae3haxtofumdd6yvo7svf":"product_package"."id" < "requisition_item"."product_package_id"
 
-Ref:"shipper"."id" < "shipper_service"."shipper_id"
+Ref "FK7tj7drxy7fcyfb76x3wqbxcgu":"product_group"."id" < "requisition_item"."product_group_id"
 
-Ref:"product"."id" < "synonym"."product_id"
+Ref "FK6rppql2hgwkpsb6quinnqa36h":"person"."id" < "requisition_item"."recipient_id"
 
-Ref:"user"."id" < "synonym"."created_by_id"
+Ref "FKlitkdcqvjk43dfcfu5qp4klsv":"requisition_item"."id" < "requisition_item"."modification_item_id"
 
-Ref:"user"."id" < "synonym"."updated_by_id"
+Ref "FKrbpvoh2icj4gtoedbedipvkjn":"inventory_item"."id" < "requisition_item"."inventory_item_id"
 
-Ref:"user"."id" < "tag"."created_by_id"
+Ref "FK59djdiyk9t8o31l83ydevq7xw":"requisition_item"."id" < "requisition_item"."substitution_item_id"
 
-Ref:"user"."id" < "tag"."updated_by_id"
+Ref "FKo48i0qobcf2heq4bqppwcnhv2":"requisition"."id" < "requisition_item"."requisition_id"
 
-Ref:"user"."id" < "transaction"."created_by_id"
+Ref "FKoj8loi0d4q6ltuy55bpdlr7e5":"requisition_item"."id" < "requisition_item"."parent_requisition_item_id"
 
-Ref:"location"."id" < "transaction"."destination_id"
+Ref "FKh1tlxyugs2laayr04mkbp9a3g":"category"."id" < "requisition_item"."category_id"
 
-Ref:"inventory"."id" < "transaction"."inventory_id"
+Ref "FKrp3qj53k0md3nq1vsfhl5ggx1":"user"."id" < "requisition_item"."created_by_id"
 
-Ref:"location"."id" < "transaction"."source_id"
+Ref "FK682enm8bnets9y0h4h1ed68uv":"location"."id" < "shipment"."origin_id"
 
-Ref:"transaction_type"."id" < "transaction"."transaction_type_id"
+Ref "FKq74xq3d3x5d0lsihty6nrkem0":"user"."id" < "shipment"."updated_by_id"
 
-Ref:"user"."id" < "transaction"."confirmed_by_id"
+Ref "FKsk91l7crsh6f8ady88oqa6c0g":"shipment_type"."id" < "shipment"."shipment_type_id"
 
-Ref:"shipment"."id" < "transaction"."incoming_shipment_id"
+Ref "FKejksnwq23e89wyldmij6qj1ey":"person"."id" < "shipment"."recipient_id"
 
-Ref:"shipment"."id" < "transaction"."outgoing_shipment_id"
+Ref "FKebpqd6did06nlnymup4rjjf2e":"location"."id" < "shipment"."destination_id"
 
-Ref:"user"."id" < "transaction"."updated_by_id"
+Ref "FKix3h4ddin8875m4kxepqhxnm0":"shipment_method"."id" < "shipment"."shipment_method_id"
 
-Ref:"requisition"."id" < "transaction"."requisition_id"
+Ref "FK4f2vjd7bj64p1adequupr80vl":"event"."id" < "shipment"."current_event_id"
 
-Ref:"order"."id" < "transaction"."order_id"
+Ref "FKn9mv3o6usup2vvyqkrtccujim":"person"."id" < "shipment"."carrier_id"
 
-Ref:"receipt"."id" < "transaction"."receipt_id"
+Ref "FKtaecr1r4sd8doa7mfwhpp0txu":"requisition"."id" < "shipment"."requisition_id"
 
-Ref:"inventory_item"."id" < "transaction_entry"."inventory_item_id"
+Ref "FKsiqeuasgi34s3q17ax3q1gvp0":"user"."id" < "shipment"."created_by_id"
 
-Ref:"transaction"."id" < "transaction_entry"."transaction_id"
+Ref "FKs4wmvwgy7ds0vsqygjhh0a5dx":"donor"."id" < "shipment"."donor_id"
 
-Ref:"location"."id" < "transaction_entry"."bin_location_id"
+Ref "FKl38av7el6n09h9pneihxluwye":"comment"."id" < "shipment_comment"."comment_id"
 
-Ref:"product"."id" < "transaction_entry"."product_id"
+Ref "FKn0w8x500i5nrbjfmjl44d7nqu":"document"."id" < "shipment_document"."document_id"
 
-Ref:"location_dimension"."id" < "transaction_fact"."location_key_id"
+Ref "FKtlpvhdk485b0mk3j1fxrlxetx":"event"."id" < "shipment_event"."event_id"
 
-Ref:"lot_dimension"."id" < "transaction_fact"."lot_key_id"
+Ref "FKdd5sa4byqw2l6r17l2h2gnav7":"shipment"."id" < "shipment_event"."shipment_events_id"
 
-Ref:"product_dimension"."id" < "transaction_fact"."product_key_id"
+Ref "FKj4vh34cbdq4ac7j00pllla8g8":"shipment_item"."id" < "shipment_invoice"."shipment_item_id"
 
-Ref:"date_dimension"."id" < "transaction_fact"."transaction_date_key_id"
+Ref "FKb4w3yplgx06uslq6a1wu3vika":"invoice_item"."id" < "shipment_invoice"."invoice_item_id"
 
-Ref:"transaction_type_dimension"."id" < "transaction_fact"."transaction_type_key_id"
+Ref "FKe9r9fdlxibf8msfdbkxn6wblw":"product"."id" < "shipment_item"."product_id"
 
-Ref:"unit_of_measure_class"."id" < "unit_of_measure"."uom_class_id"
+Ref "FKrc242lipfvxgyn675g7677u4u":"container"."id" < "shipment_item"."container_id"
 
-Ref:"user"."id" < "unit_of_measure"."created_by_id"
+Ref "FKlvrjp86jcc9338vqx0fpvt2wn":"location"."id" < "shipment_item"."bin_location_id"
 
-Ref:"user"."id" < "unit_of_measure"."updated_by_id"
+Ref "FKg9el7ry7yhoj8nwhe98iajd4d":"shipment"."id" < "shipment_item"."shipment_id"
 
-Ref:"unit_of_measure"."id" < "unit_of_measure_class"."base_uom_id"
+Ref "FK1h3l8jeych5eifjncai1ccmh2":"person"."id" < "shipment_item"."recipient_id"
 
-Ref:"user"."id" < "unit_of_measure_class"."created_by_id"
+Ref "FKny2hls1ujy8pmpslisyfokgaa":"requisition_item"."id" < "shipment_item"."requisition_item_id"
 
-Ref:"user"."id" < "unit_of_measure_class"."updated_by_id"
+Ref "FKmrw567m27t63wjapdpt7wet6g":"inventory_item"."id" < "shipment_item"."inventory_item_id"
 
-Ref:"unit_of_measure"."id" < "unit_of_measure_conversion"."from_unit_of_measure_id"
+Ref "FKm8g9sflh7t0lm5528aehac4on":"donor"."id" < "shipment_item"."donor_id"
 
-Ref:"unit_of_measure"."id" < "unit_of_measure_conversion"."to_unit_of_measure_id"
+Ref "FKrqau1fpdlqkiyvsmopui2bynq":"shipper_service"."id" < "shipment_method"."shipper_service_id"
 
-Ref:"user"."id" < "user"."manager_id"
+Ref "FKhnuat9n8rf3fxv7uxeueae2nm":"shipper"."id" < "shipment_method"."shipper_id"
 
-Ref:"location"."id" < "user"."warehouse_id"
+Ref "FKmn6mw43522ol8vo4j5onj8bwc":"reference_number"."id" < "shipment_reference_number"."reference_number_id"
 
-Ref:"user"."id" < "user_role"."user_id"
+Ref "FKa1wjinknbu050p4g71nju9fc7":"shipment_type"."id" < "shipment_workflow"."shipment_type_id"
 
-Ref:"role"."id" < "user_role"."role_id"
+Ref "FK5rxk79s7jscls4tgfs957bjm7":"container_type"."id" < "shipment_workflow_container_type"."container_type_id"
+
+Ref "FK1ym1mir8122icr2surg45f0i1":"document"."id" < "shipment_workflow_document"."document_id"
+
+Ref "FK32i80qjfkano6ac4dapt7rcer":"shipment_workflow"."id" < "shipment_workflow_document"."shipment_workflow_id"
+
+Ref "FK9a2vwaqhgjte2j55khd74joh1":"reference_number_type"."id" < "shipment_workflow_reference_number_type"."reference_number_type_id"
+
+Ref "FKsrtatwj35ktj80n331v5q1epq":"shipper"."id" < "shipper_service"."shipper_id"
+
+Ref "FKgxvomgcthrwudb9k1uhuhrg34":"location"."id" < "stock_movement"."origin_id"
+
+Ref "FK87fmcutq6lpp2qqireeky2h2v":"person"."id" < "stock_movement"."updated_by_id"
+
+Ref "FK74vq67ghwytqafoux6e2fmh4q":"order"."id" < "stock_movement"."order_id"
+
+Ref "FKghukgx9hrqbbh4y8fkv6w6beu":"person"."id" < "stock_movement"."requested_by_id"
+
+Ref "FK1n9mw2yp53r1sjwnlx7d0efpk":"shipment_type"."id" < "stock_movement"."shipment_type_id"
+
+Ref "FKaii5gfn0lsxgnwxeymj0jgmn9":"location"."id" < "stock_movement"."destination_id"
+
+Ref "FK5uxhjcf1idlfb8x8el7bapmy":"requisition"."id" < "stock_movement"."stocklist_id"
+
+Ref "FKrya9orp2e2gb6k4rd8a8u5yiw":"requisition"."id" < "stock_movement"."requisition_id"
+
+Ref "FKc9aojijq1nimq1257oyvlowfy":"shipment"."id" < "stock_movement"."shipment_id"
+
+Ref "FKac8cfck1yixr9rxjrpqu5kyd5":"person"."id" < "stock_movement"."created_by_id"
+
+Ref "FKj6i0ncjogg687vmt1bxapoqe1":"location"."id" < "stock_movement_list_item"."origin_id"
+
+Ref "FKgrtvf6h8yn1r4vlyeyq1xejna":"person"."id" < "stock_movement_list_item"."updated_by_id"
+
+Ref "FKk7fy7q12vvx224t83swdo0h2h":"order"."id" < "stock_movement_list_item"."order_id"
+
+Ref "FK798beaheshf2niamok5hoex63":"person"."id" < "stock_movement_list_item"."requested_by_id"
+
+Ref "FK39hh7d7nn0lrm6fiwa7wv0g7r":"requisition"."id" < "stock_movement_list_item"."stocklist_id"
+
+Ref "FKiw6m9nq1enswvr49dntdq0qmu":"requisition"."id" < "stock_movement_list_item"."requisition_id"
+
+Ref "FKdrwdqd1jefm2u8n3sxfvvr69e":"shipment"."id" < "stock_movement_list_item"."shipment_id"
+
+Ref "FKs222rs0rkao6f2d9gxej0ye3u":"location"."id" < "stock_movement_list_item"."destination_id"
+
+Ref "FK9yfel7y5k6f58nbsiekmsilf":"person"."id" < "stock_movement_list_item"."created_by_id"
+
+Ref "FK9j61mwl8cynsy2ffp1gvneeol":"party"."id" < "supplier"."organization_id"
+
+Ref "FKbvcykyci49ui9ax8hq21jniq4":"product"."id" < "synonym"."product_id"
+
+Ref "FKdqkwnhb8e6kv2p6hck8cm7qlw":"user"."id" < "synonym"."updated_by_id"
+
+Ref "FKjhpu26erv28cm45pigw4us6gf":"user"."id" < "synonym"."created_by_id"
+
+Ref "FK99w3j9v6f5ll34kpygduygu41":"user"."id" < "tag"."updated_by_id"
+
+Ref "FKeiq6b1pvj9e7hdj3rdh3tmc9o":"user"."id" < "tag"."created_by_id"
+
+Ref "FK936jt3buqu1hyd3b0jk53n3yp":"shipment"."id" < "transaction"."incoming_shipment_id"
+
+Ref "FK3s1b7njlkk256f5atfvds8fkq":"user"."id" < "transaction"."updated_by_id"
+
+Ref "FKa7f7f1byoxjtc8gsr5onejwo1":"order"."id" < "transaction"."order_id"
+
+Ref "FK5buxbbxmyy5rko9qil7dqdxto":"receipt"."id" < "transaction"."receipt_id"
+
+Ref "FK86ut95rrqk18o6starjp3s5es":"user"."id" < "transaction"."confirmed_by_id"
+
+Ref "FKqj0d492c62ivn1lncsql78n1a":"shipment"."id" < "transaction"."outgoing_shipment_id"
+
+Ref "FK6nq0d6yuynly4eoxu8lkvrsm":"location"."id" < "transaction"."source_id"
+
+Ref "FK2icxa2x2ay8ihg1bl4g7kpf0k":"requisition"."id" < "transaction"."requisition_id"
+
+Ref "FKnl0vpl01y6vu03hkpi4xupugo":"transaction_type"."id" < "transaction"."transaction_type_id"
+
+Ref "FK3mc8hl0ht9m9q95pkuynij9cd":"inventory"."id" < "transaction"."inventory_id"
+
+Ref "FKcq0j0gy8yn9ctm32g5syv67j9":"location"."id" < "transaction"."destination_id"
+
+Ref "FKjss2r1o7pwqra6g18mlohlu53":"user"."id" < "transaction"."created_by_id"
+
+Ref "FK35410c0cyt0ib3pyvypg7m5et":"product"."id" < "transaction_entry"."product_id"
+
+Ref "FKtd2dqlavv7jv0w156t354o1sx":"transaction"."id" < "transaction_entry"."transaction_id"
+
+Ref "FK12b63ulp97xckrcc9i6awl37y":"location"."id" < "transaction_entry"."bin_location_id"
+
+Ref "FKgox9mkypcxll7sgnv3hw13cct":"inventory_item"."id" < "transaction_entry"."inventory_item_id"
+
+Ref "FKhludywjchxvshuybopm10049k":"lot_dimension"."id" < "transaction_fact"."lot_key_id"
+
+Ref "FK9d82o0vjhc4rtxkkp67ocw6ui":"date_dimension"."id" < "transaction_fact"."transaction_date_key_id"
+
+Ref "FKflu9m3g3i76lxaduc5dx39ik9":"transaction_type_dimension"."id" < "transaction_fact"."transaction_type_key_id"
+
+Ref "FKe4ffn6ik65qf6h1gm0h428gyr":"location_dimension"."id" < "transaction_fact"."location_key_id"
+
+Ref "FKarcfystdrgtoln5obk0kj58k3":"product_dimension"."id" < "transaction_fact"."product_key_id"
+
+Ref "FK8dqiq00qoraomcyaey17vr8k8":"user"."id" < "unit_of_measure"."updated_by_id"
+
+Ref "FKtmr6m7q4cb7h5vrb65b2j5fwy":"unit_of_measure_class"."id" < "unit_of_measure"."uom_class_id"
+
+Ref "FK2jjub7ynbsg6m21p5y6yvcl70":"user"."id" < "unit_of_measure"."created_by_id"
+
+Ref "FK7sfeuvibsb572bxuxhatvkhqa":"user"."id" < "unit_of_measure_class"."updated_by_id"
+
+Ref "FKoffjonj8pwacewii7ucdv0xpn":"user"."id" < "unit_of_measure_class"."created_by_id"
+
+Ref "FK6buy29grn9c2ythlwlhyeebki":"unit_of_measure"."id" < "unit_of_measure_class"."base_uom_id"
+
+Ref "FKay3faqdmt6utltmiqgmunhjc9":"unit_of_measure"."id" < "unit_of_measure_conversion"."from_unit_of_measure_id"
+
+Ref "FKcuvmoi236x280p26pt57v6707":"unit_of_measure"."id" < "unit_of_measure_conversion"."to_unit_of_measure_id"
+
+Ref "FKkv2jywk8elm811x0qqy5vos07":"location"."id" < "user"."warehouse_id"
+
+Ref "FKhbd6r1wwgnpx3gga8eh96e71j":"user"."id" < "user"."manager_id"
+
+Ref "FKa68196081fvovjhkek5m97n3y":"role"."id" < "user_role"."role_id"
+
+Ref "FKfgsgxvihks805qcq8sq26ab7c":"user"."id" < "user_role"."user_id"
