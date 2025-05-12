@@ -13,7 +13,7 @@ export const getCurrentLocale = (state) => state.session.activeLanguage;
 export const getUsers = (state) => state.users.data;
 
 export const getCycleCountsIds = (state) =>
-  state.cycleCount.cycleCounts[state.session.currentLocation?.id];
+  state.cycleCount.cycleCounts[state.session.currentLocation?.id] || [];
 
 export const getReasonCodes = (state) => state.cycleCount.reasonCodes;
 

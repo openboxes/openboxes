@@ -3,6 +3,7 @@ import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { RiCalculatorLine, RiDownload2Line, RiPrinterLine } from 'react-icons/ri';
 import { useSelector } from 'react-redux';
+import { getCycleCountsIds } from 'selectors';
 
 import CycleCountDraftInfoBar from 'components/cycleCount/CycleCountDraftInfoBar';
 import DataTable from 'components/DataTable/v2/DataTable';
@@ -39,7 +40,7 @@ const CycleCountToResolve = ({
     offset,
     pageSize,
   });
-  const cycleCountIds = useSelector((state) => (state.cycleCount.cycleCounts));
+  const cycleCountIds = useSelector(getCycleCountsIds);
 
   useEffect(() => {
     setTotalCount(tableData.totalCount);

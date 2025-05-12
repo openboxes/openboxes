@@ -55,7 +55,7 @@ export default function cycleCountReducer(state = initialState, action) {
       if (action.payload.tab === TO_RESOLVE_TAB) {
         return {
           ...state,
-          requests: _.omit(state.requests, action.payload.locationId),
+          cycleCounts: _.omit(state.cycleCounts, action.payload.locationId),
         };
       }
       return state;

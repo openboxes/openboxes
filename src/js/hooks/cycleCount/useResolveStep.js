@@ -715,7 +715,7 @@ const useResolveStep = () => {
         openReviewProductsModal(outdatedProducts, cycleCountIdsForOutdatedProducts);
         return;
       }
-      dispatch(eraseDraft(TO_RESOLVE_TAB));
+      dispatch(eraseDraft(currentLocation?.id, TO_RESOLVE_TAB));
       history.push(CYCLE_COUNT.list(TO_RESOLVE_TAB));
     } finally {
       hide();

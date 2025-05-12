@@ -1,10 +1,10 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
+import { getCurrentLocation } from 'selectors';
 
 import { eraseDraft } from 'actions';
 import { CYCLE_COUNT } from 'consts/applicationUrls';
 import { TO_COUNT_TAB } from 'consts/cycleCount';
-import { getCurrentLocation } from 'selectors';
 
 const useDraftInfoBar = (tab) => {
   const dispatch = useDispatch();
@@ -14,7 +14,7 @@ const useDraftInfoBar = (tab) => {
   }));
 
   const discardDraft = () => {
-    dispatch(eraseDraft(currentLocation, tab));
+    dispatch(eraseDraft(currentLocation?.id, tab));
   };
 
   const continueDraft = () => {
