@@ -512,7 +512,7 @@ const useCountStep = () => {
 
           return acc;
         }, []);
-      dispatch(eraseDraft());
+      dispatch(eraseDraft(TO_COUNT_TAB));
       const requestIdsWithoutDiscrepancies
         = submittedCounts.length - requestIdsWithDiscrepancies.length;
       if (requestIdsWithDiscrepancies.length > 0) {
