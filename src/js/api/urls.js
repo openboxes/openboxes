@@ -190,6 +190,7 @@ export const CYCLE_COUNT_START = (locationId, format) => `${CYCLE_COUNT(location
 export const CYCLE_COUNT_RECOUNT_START = (locationId, format) => `${CYCLE_COUNT(locationId)}/recount/start/batch${format ? `?format=${format}` : ''}`;
 export const CYCLE_COUNT_ITEM = (locationId, itemId) => `${CYCLE_COUNT(locationId)}/items/${itemId}`;
 export const CYCLE_COUNT_ITEMS = (locationId, cycleCountId) => `${CYCLE_COUNT(locationId)}/${cycleCountId}/items`;
+export const CYCLE_COUNT_ITEMS_BATCH = (locationId, cycleCountId) => `${CYCLE_COUNT(locationId)}/${cycleCountId}/items/batch`;
 export const CYCLE_COUNT_SUBMIT_COUNT = (locationId, cycleCountId) => `${CYCLE_COUNT(locationId)}/${cycleCountId}/count`;
 export const CYCLE_COUNT_SUBMIT_RECOUNT = (locationId, cycleCountId) => `${CYCLE_COUNT(locationId)}/${cycleCountId}/recount`;
 export const CYCLE_COUNT_REFRESH_ITEMS = (locationId, cycleCountId, removeOutOfStockItemsImplicitly) => `${CYCLE_COUNT(locationId)}/${cycleCountId}/refresh${removeOutOfStockItemsImplicitly ? '?removeOutOfStockItemsImplicitly=true' : ''}`;
