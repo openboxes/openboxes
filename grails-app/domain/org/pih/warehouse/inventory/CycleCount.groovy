@@ -137,4 +137,16 @@ class CycleCount {
                     it.countIndex == countIndex }
     }
 
+    Map toJson() {
+        return [
+                id: id,
+                facility: facility,
+                dateLastRefreshed: dateLastRefreshed,
+                status: status,
+                dateCreated: dateCreated,
+                lastUpdated: lastUpdated,
+                createdBy: createdBy,
+                updatedBy: updatedBy
+        ]
+    }
 }
