@@ -1,5 +1,6 @@
 package org.pih.warehouse.inventory
 
+import grails.gorm.PagedResultList
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import org.apache.commons.csv.CSVPrinter
@@ -689,13 +690,14 @@ class CycleCountService {
 
 
     // FIXME Move to the appropriate service (if we want to separate services from reporting)
-    List<CycleCountFinalCountDetails> getCycleCountTransactionReport(CycleCountTransactionReportCommand command) {
-        return CycleCountFinalCountDetails.createCriteria().list {
+    @Transactional(readOnly=true)
+    PagedResultList getCycleCountTransactionReport(CycleCountTransactionReportCommand command) {
+        return CycleCountFinalCountDetails.createCriteria().list(command.paginationParams) {
             eq("facility", command.facility)
             if (command.products) {
                 "in"("product", command.products)
             }
-        } as List<CycleCountFinalCountDetails>
+        }
     }
 
 }
