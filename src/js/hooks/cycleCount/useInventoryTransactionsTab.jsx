@@ -22,6 +22,7 @@ import dateWithoutTimeZone from 'utils/dateUtils';
 
 const useInventoryTransactionsTab = ({
   filterParams,
+  paginationProps,
 }) => {
   const columnHelper = createColumnHelper();
   const translate = useTranslate();
@@ -47,6 +48,7 @@ const useInventoryTransactionsTab = ({
   const {
     tableData,
     loading,
+    fetchData,
   } = useTableDataV2({
     url: CYCLE_COUNT_DETAILS_REPORT,
     errorMessageId: 'react.cycleCount.table.errorMessage.label',
@@ -55,8 +57,8 @@ const useInventoryTransactionsTab = ({
     shouldFetch: false,
     disableInitialLoading: true,
     getParams,
-    pageSize: 5,
-    offset: 0,
+    pageSize: `${paginationProps.pageSize}`,
+    offset: `${paginationProps.offset}`,
     sort,
     order,
     searchTerm: null,
@@ -159,12 +161,12 @@ const useInventoryTransactionsTab = ({
           {translate('react.cycleCount.inventoryTransactionsTable.recorded.label', 'Recorded')}
         </TableHeaderCell>
       ),
-      cell: ({ row: { original: { dateCounted } } }) => (
+      cell: ({ row: { original: { transactionDetails: { transactionDate } } } }) => (
         <div className="rt-td d-flex flex-column">
           <span className="font-weight-500">Devon Lane</span>
           <span>
             {dateWithoutTimeZone({
-              date: dateCounted,
+              date: transactionDate,
               outputDateFormat: DateFormat.MM_DD_YYYY,
             })}
           </span>
@@ -185,16 +187,16 @@ const useInventoryTransactionsTab = ({
         pinned: 'left',
       },
       size: 145,
-      cell: ({ getValue }) => (
+      cell: ({
+        getValue,
+        row: { original: { transactionDetails: { id } } },
+      }) => (
         <TableCell
-          link={INVENTORY_URL.showTransaction('transaction-id')}
+          link={INVENTORY_URL.showTransaction(id)}
           className="rt-td"
         >
-          {_.take(getValue(), 9)
-            .join('')
-            .match(/.{1,3}/g)
-            .join('-')
-            .toUpperCase()}
+          {getValue()
+            .toString()}
         </TableCell>
       ),
     }),
@@ -239,9 +241,13 @@ const useInventoryTransactionsTab = ({
       cell: ({
         row: {
           original: {
-            quantityVariance,
-            quantityOnHand,
-            quantityCounted,
+            initialCount: {
+              quantityOnHand,
+            },
+            finalCount: {
+              quantityVariance,
+              quantityCounted,
+            },
           },
         },
       }) => {
@@ -260,12 +266,12 @@ const useInventoryTransactionsTab = ({
               showAbsoluteValue
             />
             {variant !== valueIndicatorVariant.EQUAL && (
-            <p>
-              (
-              {percentageValue}
-              {' '}
-              %)
-            </p>
+              <p>
+                (
+                {percentageValue}
+                {' '}
+                %)
+              </p>
             )}
           </TableCell>
         );
@@ -310,7 +316,7 @@ const useInventoryTransactionsTab = ({
         </TableCell>
       ),
     }),
-  ], [currentLocale, sort, order]);
+  ], [currentLocale]);
 
   const emptyTableMessage = {
     id: 'react.cycleCount.inventoryTransactionTable.emptyTable.label',
@@ -326,6 +332,7 @@ const useInventoryTransactionsTab = ({
     tableData,
     loading,
     emptyTableMessage,
+    fetchData,
     exportData,
   };
 };

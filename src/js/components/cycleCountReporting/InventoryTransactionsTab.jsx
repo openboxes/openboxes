@@ -22,7 +22,9 @@ const InventoryTransactionsTab = ({
     loading,
     emptyTableMessage,
     exportData,
+    fetchData,
   } = useInventoryTransactionsTab({
+    paginationProps,
     filterParams,
   });
 
@@ -33,6 +35,9 @@ const InventoryTransactionsTab = ({
   return (
     <div>
       <div className="d-flex m-2 justify-content-end">
+        <button onClick={() => fetchData()} type="button">
+          load
+        </button>
         <Button
           onClick={exportData}
           defaultLabel="Export"

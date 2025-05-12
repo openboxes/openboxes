@@ -23,12 +23,12 @@ const columns = {
   ALIGNMENT: 'alignment',
   TRANSACTION_TYPE: 'transactionType',
   // fix after getting appropriate property in response
-  RECORDED: 'date_counted',
+  RECORDED: 'transactionDetails.transactionDate',
   // fix after getting appropriate property in response
-  TRANSACTION_ID: 'inventory_item_id',
+  TRANSACTION_ID: 'transactionDetails.transactionNumber',
   // fix after getting appropriate property in response
-  QTY_BEFORE: 'quantityOnHand',
-  QTY_AFTER: 'quantityCounted',
+  QTY_BEFORE: 'initialCount.quantityOnHand',
+  QTY_AFTER: 'finalCount.quantityCounted',
   DIFFERENCE: 'difference',
   ROOT_CAUSES: 'rootCause',
   COMMENTS: 'comments',
