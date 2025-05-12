@@ -1,10 +1,11 @@
 package org.pih.warehouse.report
 
 import grails.validation.Validateable
+import org.pih.warehouse.api.PaginationCommand
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
 
-class CycleCountTransactionReportCommand implements Validateable {
+class CycleCountTransactionReportCommand extends PaginationCommand implements Validateable {
 
     Location facility
     List<Product> products

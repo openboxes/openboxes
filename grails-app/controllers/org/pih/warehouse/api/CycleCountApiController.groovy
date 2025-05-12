@@ -1,6 +1,7 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
+import grails.orm.PagedResultList
 import grails.validation.ValidationException
 import org.apache.commons.csv.CSVPrinter
 import org.pih.warehouse.core.Constants
@@ -196,7 +197,15 @@ class CycleCountApiController {
     }
 
     def getCycleCountTransactionReport(CycleCountTransactionReportCommand command) {
-        def data = cycleCountService.getCycleCountTransactionReport(command)
-        render ([data: data] as JSON)
+        PagedResultList data = cycleCountService.getCycleCountTransactionReport(command)
+        render([
+                data      : data,
+                totalCount: data.totalCount,
+                metadata  : [
+                        developerNotes: [
+                                "Transaction details and initial count data are not yet available. Current values are mocked.",
+                        ]
+                ]
+        ] as JSON)
     }
 }
