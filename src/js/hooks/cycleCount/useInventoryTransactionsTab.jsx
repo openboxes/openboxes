@@ -51,10 +51,10 @@ const useInventoryTransactionsTab = ({
   }) => _.omitBy({
     offset: `${offset}`,
     max: `${pageSize}`,
-    facility: currentLocation?.id,
     ...sortingParams,
     ...filterParams,
     products: products?.map?.(({ id }) => id),
+    facility: currentLocation?.id,
   }, (val) => {
     if (typeof val === 'boolean') {
       return !val;

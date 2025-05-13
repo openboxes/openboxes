@@ -26,7 +26,6 @@ const useCycleCountReportingFilters = () => {
       (acc, key) => ({ ...acc, [key]: '' }),
       { tab: queryProps.tab },
     );
-    console.log('defaultValues', defaultValues);
     const transformedParams = transformFilterParams(defaultValues, {
       tab: { name: 'tab' },
     });

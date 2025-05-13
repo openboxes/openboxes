@@ -5,7 +5,7 @@ export default {
   createdBefore: {
     type: DateFilter,
     attributes: {
-      label: 'react.cycleCountReporting.filter.createdBefore.label',
+      label: 'react.cycleCountReporting.filters.createdBefore.label',
       defaultMessage: 'Created before',
       dateFormat: 'MM/DD/YYYY',
       showLabelTooltip: true,
@@ -16,7 +16,7 @@ export default {
   createdAfter: {
     type: DateFilter,
     attributes: {
-      label: 'react.cycleCountReporting.filter.createdAfter.label',
+      label: 'react.cycleCountReporting.filters.createdAfter.label',
       defaultMessage: 'Created after',
       dateFormat: 'MM/DD/YYYY',
       showLabelTooltip: true,

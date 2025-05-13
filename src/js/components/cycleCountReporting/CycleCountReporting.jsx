@@ -23,11 +23,9 @@ const CycleCountReporting = () => {
   const { switchTab } = useSwitchTabs({ defaultTab: PRODUCTS_TAB });
   useTranslation('cycleCount');
 
-  // After applying filters, add them as an argument to the hook below
   const {
     defaultFilterValues,
     setFilterValues,
-    alignment,
     isLoading,
     filterParams,
     resetForm,
@@ -64,14 +62,12 @@ const CycleCountReporting = () => {
           setFilterParams={setFilterValues}
           filterFields={cycleCountReportingFilterFields}
           isLoading={isLoading}
-          formProps={{ alignment }}
         />
         {tab === PRODUCTS_TAB && (
           <ProductsTab />
         )}
 
         {tab === INVENTORY_TRANSACTIONS_TAB && (
-          // After applying filters, add them as a param to that component
           <InventoryTransactionsTab
             tablePaginationProps={tablePaginationProps}
             filterParams={filterParams}

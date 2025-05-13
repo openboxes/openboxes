@@ -162,7 +162,8 @@ const FilterForm = ({
 
                 <div className="d-flex pt-2 flex-wrap gap-8 align-items-center filters-row">
                   {!filtersHidden &&
-                    _.map(// Render filters with top: false
+                    _.map(
+                      // Render filters with top: false
                       _.pickBy(filterFields, (field) => !field.attributes?.top),
                       (fieldConfig, fieldName) =>
                         renderFormField(fieldConfig, fieldName, formProps),
