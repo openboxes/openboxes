@@ -5,32 +5,35 @@ import { useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
 import { setShouldRebuildFilterParams } from 'actions';
-import cycleCountReportingFilterFields
-  from 'components/cycleCountReporting/CycleCountReportingFilterFields';
+import cycleCountReportingFilterFields from 'components/cycleCountReporting/CycleCountReportingFilterFields';
 import useCommonFiltersCleaner from 'hooks/list-pages/useCommonFiltersCleaner';
 import { transformFilterParams } from 'utils/list-utils';
+import { fetchProduct } from 'utils/option-utils';
 
 const useCycleCountReportingFilters = () => {
   const [filterParams, setFilterParams] = useState({});
   const [defaultFilterValues, setDefaultFilterValues] = useState({});
-  const [createdBefore] = useState(null);
-  const [createdAfter] = useState(null);
   const [filtersInitialized, setFiltersInitialized] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [resetInitialFetch, setResetInitialFetch] = useState(true);
 
   const dispatch = useDispatch();
   const history = useHistory();
 
   const clearFilterValues = () => {
     const queryProps = queryString.parse(history.location.search);
-    const defaultValues = Object.keys(cycleCountReportingFilterFields)
-      .reduce((acc, key) => ({ ...acc, [key]: '' }), { tab: queryProps.tab });
+    const defaultValues = Object.keys(cycleCountReportingFilterFields).reduce(
+      (acc, key) => ({ ...acc, [key]: '' }),
+      { tab: queryProps.tab },
+    );
+    console.log('defaultValues', defaultValues);
     const transformedParams = transformFilterParams(defaultValues, {
       tab: { name: 'tab' },
     });
     const queryFilterParams = queryString.stringify(transformedParams);
     const { pathname } = history.location;
     history.push({ pathname, search: queryFilterParams });
+    setResetInitialFetch(true);
   };
 
   const resetForm = () => {
@@ -42,11 +45,29 @@ const useCycleCountReportingFilters = () => {
     setIsLoading(true);
     try {
       const queryProps = queryString.parse(history.location.search);
-      const defaultValues = {
-        tab: queryProps.tab,
-        createdBefore: queryProps.createdBefore || '',
-        createdAfter: queryProps.createdAfter || '',
-      };
+      const defaultValues = Object.keys(cycleCountReportingFilterFields).reduce(
+        (acc, key) => ({ ...acc, [key]: '' }),
+        { tab: queryProps.tab },
+      );
+
+      if (queryProps.createdBefore) {
+        defaultValues.createdBefore = queryProps.createdBefore;
+      }
+      if (queryProps.createdAfter) {
+        defaultValues.createdAfter = queryProps.createdAfter;
+      }
+
+      if (queryProps.products) {
+        const productIds = queryProps.products;
+        const products = await Promise.all(
+          productIds.map((id) => fetchProduct(id)),
+        );
+        defaultValues.products = products.map((product) => ({
+          ...product,
+          label: `${product.productCode} - ${product.displayName ?? product.name}`,
+          value: product.id,
+        }));
+      }
 
       setDefaultFilterValues(defaultValues);
       setFiltersInitialized(true);
@@ -65,6 +86,7 @@ const useCycleCountReportingFilters = () => {
     const filterAccessors = {
       createdBefore: { name: 'createdBefore' },
       createdAfter: { name: 'createdAfter' },
+      products: { name: 'products', accessor: 'id' },
       tab: { name: 'tab' },
     };
     const transformedParams = transformFilterParams(values, filterAccessors);
@@ -81,9 +103,9 @@ const useCycleCountReportingFilters = () => {
     setFilterValues,
     resetForm,
     filterParams,
-    createdBefore,
-    createdAfter,
     isLoading,
+    resetInitialFetch,
+    setResetInitialFetch,
   };
 };
 

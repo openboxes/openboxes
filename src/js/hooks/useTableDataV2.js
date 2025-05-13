@@ -27,6 +27,8 @@ const useTableDataV2 = ({
   filterParams,
   shouldFetch,
   disableInitialLoading,
+  resetInitialFetch,
+  setResetInitialFetch,
 }) => {
   const sourceRef = useRef(CancelToken.source());
 
@@ -69,9 +71,16 @@ const useTableDataV2 = ({
 
   // fetching data after changing page size, filters, page number and sorting
   useEffect(() => {
-    if (shouldFetch) {
-      fetchData();
+    if (!shouldFetch) {
+      return;
     }
+    // Prevents automatic data fetching when resetInitialFetch is true,
+    // allowing fetch only on submit button click
+    if (resetInitialFetch && setResetInitialFetch) {
+      setResetInitialFetch(false);
+      return;
+    }
+    fetchData();
   }, [
     filterParams,
     pageSize,

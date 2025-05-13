@@ -15,6 +15,7 @@ import transactionType from 'consts/transactionType';
 import valueIndicatorVariant, {
   getCycleCountDifferencesVariant,
 } from 'consts/valueIndicatorVariant';
+import useQueryParams from 'hooks/useQueryParams';
 import useTableDataV2 from 'hooks/useTableDataV2';
 import useTableSorting from 'hooks/useTableSorting';
 import useTranslate from 'hooks/useTranslate';
@@ -22,11 +23,15 @@ import dateWithoutTimeZone from 'utils/dateUtils';
 
 const useInventoryTransactionsTab = ({
   filterParams,
-  paginationProps,
+  offset,
+  pageSize,
+  resetInitialFetch,
+  setResetInitialFetch,
 }) => {
   const columnHelper = createColumnHelper();
   const translate = useTranslate();
-
+  const { tab } = useQueryParams();
+  const { products } = filterParams;
   const {
     currentLocale,
     currentLocation,
@@ -41,28 +46,41 @@ const useInventoryTransactionsTab = ({
     order,
   } = useTableSorting();
 
-  const getParams = () => ({
+  const getParams = ({
+    sortingParams,
+  }) => _.omitBy({
+    offset: `${offset}`,
+    max: `${pageSize}`,
     facility: currentLocation?.id,
+    ...sortingParams,
+    ...filterParams,
+    products: products?.map?.(({ id }) => id),
+  }, (val) => {
+    if (typeof val === 'boolean') {
+      return !val;
+    }
+    return _.isEmpty(val);
   });
 
   const {
     tableData,
     loading,
-    fetchData,
   } = useTableDataV2({
     url: CYCLE_COUNT_DETAILS_REPORT,
     errorMessageId: 'react.cycleCount.table.errorMessage.label',
     defaultErrorMessage: 'Unable to fetch products',
     // We should start fetching only after clicking the button
-    shouldFetch: false,
+    shouldFetch: filterParams.tab && tab === filterParams.tab,
     disableInitialLoading: true,
     getParams,
-    pageSize: `${paginationProps.pageSize}`,
-    offset: `${paginationProps.offset}`,
+    pageSize,
+    offset,
     sort,
     order,
     searchTerm: null,
     filterParams,
+    resetInitialFetch,
+    setResetInitialFetch,
   });
 
   const columns = useMemo(() => [
@@ -332,7 +350,6 @@ const useInventoryTransactionsTab = ({
     tableData,
     loading,
     emptyTableMessage,
-    fetchData,
     exportData,
   };
 };

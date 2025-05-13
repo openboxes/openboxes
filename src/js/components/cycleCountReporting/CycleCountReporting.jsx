@@ -24,32 +24,36 @@ const CycleCountReporting = () => {
   useTranslation('cycleCount');
 
   // After applying filters, add them as an argument to the hook below
-  const tablePaginationProps = useCycleCountPagination({});
-
   const {
     defaultFilterValues,
     setFilterValues,
+    alignment,
     isLoading,
+    filterParams,
+    resetForm,
+    resetInitialFetch,
+    setResetInitialFetch,
   } = useCycleCountReportingFilters();
-
+  const tablePaginationProps = useCycleCountPagination(filterParams);
   const tabs = {
     [PRODUCTS_TAB]: {
       label: {
         id: 'react.cycleCount.products.label',
         defaultMessage: 'Products',
       },
-      onClick: (tab) => switchTab(tab),
+      onClick: (tab) => switchTab(tab, resetForm),
     },
     [INVENTORY_TRANSACTIONS_TAB]: {
       label: {
         id: 'react.cycleCount.inventoryTransactions.label',
         defaultMessage: 'Inventory Transactions',
       },
-      onClick: (tab) => switchTab(tab),
+      onClick: (tab) => switchTab(tab, resetForm),
     },
   };
 
   const { tab } = useQueryParams();
+
   return (
     <PageWrapper>
       <CycleCountReportingHeader />
@@ -60,6 +64,7 @@ const CycleCountReporting = () => {
           setFilterParams={setFilterValues}
           filterFields={cycleCountReportingFilterFields}
           isLoading={isLoading}
+          formProps={{ alignment }}
         />
         {tab === PRODUCTS_TAB && (
           <ProductsTab />
@@ -69,7 +74,9 @@ const CycleCountReporting = () => {
           // After applying filters, add them as a param to that component
           <InventoryTransactionsTab
             tablePaginationProps={tablePaginationProps}
-            filterParams={{}}
+            filterParams={filterParams}
+            resetInitialFetch={resetInitialFetch}
+            setResetInitialFetch={setResetInitialFetch}
           />
         )}
       </div>
