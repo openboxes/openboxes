@@ -1,8 +1,5 @@
 package org.pih.warehouse.databinding
 
-import java.time.Instant
-import java.time.ZoneId
-import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeFormatterBuilder
 import java.time.temporal.ChronoField
@@ -93,15 +90,12 @@ class DataBindingConstants {
             .parseDefaulting(ChronoField.MINUTE_OF_HOUR, 0)
             .parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0)
             .parseDefaulting(ChronoField.MILLI_OF_SECOND, 0)
+            // TODO: This is imperfect because if the server is in a timezone that has multiple offsets depending on the
+            //       the time of year (due to daylight savings time), this will break. It's unlikely that a server would
+            //       be configured this way, but still worth noting. Once we upgrade to Java 9+, remove this offset
+            //       default and replace it with "withZone" when parsing (see DateUtil.asDate).
+            //       https://stackoverflow.com/questions/41999421/how-does-datetimeformatters-override-zone-work-when-parsing
             // Defaults to the current timezone offset of the system if timezone is not provided in the String.
-            .parseDefaulting(ChronoField.OFFSET_SECONDS, getSystemZoneOffset().getTotalSeconds())
+            .parseDefaulting(ChronoField.OFFSET_SECONDS, DateUtil.getSystemZoneOffset().getTotalSeconds())
             .toFormatter()
-
-    /**
-     * Fetches the ZoneOffset of the system at a given point in time. If no instant is provided, will return
-     * the current timezone offset of the system.
-     */
-    static ZoneOffset getSystemZoneOffset(Instant instant=null) {
-        return ZoneId.systemDefault().getRules().getOffset(instant ?: Instant.now())
-    }
 }
