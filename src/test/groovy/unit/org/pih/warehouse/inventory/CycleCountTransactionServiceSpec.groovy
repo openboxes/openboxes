@@ -249,7 +249,7 @@ class CycleCountTransactionServiceSpec extends Specification implements DataTest
                 transactionType: productInventoryTransactionType,
         )
 
-        cycleCountProductInventoryTransactionServiceStub.createSnapshotTransaction(
+        cycleCountProductInventoryTransactionServiceStub.createInventoryBaselineTransaction(
                 facility, product, cycleCount, date) >> transaction
 
         return transaction

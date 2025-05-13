@@ -24,11 +24,17 @@ abstract class ProductInventoryTransactionService<T> {
     abstract void setSourceObject(Transaction transaction, T transactionSource)
 
     /**
-     * Create a new product inventory transaction based on the current QoH in product availability.
+     * Create a new "inventory baseline" product inventory transaction based on the current QoH in product availability.
      *
-     * We refer to this transaction as a product inventory "snapshot" because it's functionally a copy of what the
-     * quantity on hand (determined by product availability) was for each [bin location + lot number] of the product at
-     * the time. As such, transactions created via this method should NOT result in any quantity changes/adjustments.
+     * We refer to this transaction as a "baseline" because it gives us two things:
+     *
+     * 1) It sets a new baseline for the stock of the product. Any transactions on the product that are backdated to
+     *    before the most recent baseline will NOT have any effect on quantity on hand.
+     *
+     * 2) It acts as a "snapshot" of what the quantity on hand (determined by product availability) was for each
+     *    [bin location + lot number] of the product at the time of the transaction. As such, transactions created via
+     *    this method should NOT result in any quantity changes/adjustments. (However if transactions are backdated to
+     *    before the baseline, the baseline will have an implied quantity adjustment.)
      *
      * @param facility The Location to take the product inventory snapshot at
      * @param product The Product to take the product inventory snapshot for
@@ -36,13 +42,13 @@ abstract class ProductInventoryTransactionService<T> {
      * @param transactionDate The datetime that the transaction should be marked with
      * @return The Transaction that was created
      */
-    Transaction createSnapshotTransaction(
+    Transaction createInventoryBaselineTransaction(
             Location facility,
             Product product,
             T sourceObject,
             Date transactionDate=new Date()) {
 
-        TransactionType transactionType = TransactionType.read(Constants.PRODUCT_INVENTORY_SNAPSHOT_TRANSACTION_TYPE_ID)
+        TransactionType transactionType = TransactionType.read(Constants.INVENTORY_BASELINE_TRANSACTION_TYPE_ID)
 
         Transaction transaction = new Transaction(
                 source: facility,

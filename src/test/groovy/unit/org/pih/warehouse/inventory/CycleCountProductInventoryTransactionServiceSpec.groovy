@@ -49,11 +49,11 @@ class CycleCountProductInventoryTransactionServiceSpec extends Specification imp
 
         // Set up the transaction types
         productInventoryTransactionType = new TransactionType()
-        productInventoryTransactionType.id = Constants.PRODUCT_INVENTORY_SNAPSHOT_TRANSACTION_TYPE_ID
+        productInventoryTransactionType.id = Constants.INVENTORY_BASELINE_TRANSACTION_TYPE_ID
         productInventoryTransactionType.save(validate: false)
     }
 
-    void 'createSnapshotTransaction should succeed when some items are available'() {
+    void 'createInventoryBaselineTransaction should succeed when some items are available'() {
         given: 'mocked inputs'
         Location facility = new Location(inventory: new Inventory())
         Product product = new Product()
@@ -80,7 +80,7 @@ class CycleCountProductInventoryTransactionServiceSpec extends Specification imp
                 facility, [product.id], false, true) >> availableItems
 
         when:
-        Transaction transaction = cycleCountProductInventoryTransactionService.createSnapshotTransaction(
+        Transaction transaction = cycleCountProductInventoryTransactionService.createInventoryBaselineTransaction(
                 facility, product, cycleCount, date)
 
         then:

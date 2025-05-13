@@ -126,7 +126,7 @@ class CycleCountTransactionService {
             // quantity to be represented by a separate adjustment transaction. It's important to note that the quantity
             // values for this transaction will be a pure copy of QoH in product availability, NOT the quantityOnHand of
             // the cycle count items.
-            Transaction transaction = cycleCountProductInventoryTransactionService.createSnapshotTransaction(
+            Transaction transaction = cycleCountProductInventoryTransactionService.createInventoryBaselineTransaction(
                     cycleCount.facility,
                     product,
                     cycleCount,

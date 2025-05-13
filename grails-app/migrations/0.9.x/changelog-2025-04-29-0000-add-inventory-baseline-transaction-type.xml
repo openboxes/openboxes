@@ -11,7 +11,7 @@
         <insert tableName="transaction_type">
             <column name="id" value="12" />
             <column name="version" value="0" />
-            <column name="name" value="Product Inventory Snapshot" />
+            <column name="name" value="Inventory Baseline" />
             <column name="sort_order" value="0" />
             <column name="date_created" value="2025-04-29T00:00" />
             <column name="last_updated" value="2025-04-29T00:00" />
