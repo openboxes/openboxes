@@ -32,6 +32,7 @@ const useCycleCountReportingFilters = () => {
     const queryFilterParams = queryString.stringify(transformedParams);
     const { pathname } = history.location;
     history.push({ pathname, search: queryFilterParams });
+    setResetInitialFetch(true);
   };
 
   const resetForm = () => {
