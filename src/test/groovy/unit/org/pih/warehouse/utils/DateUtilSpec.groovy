@@ -327,10 +327,10 @@ class DateUtilSpec extends Specification {
         assert DateUtil.asDateTimeForDisplay(date, zone) == expectedConvertedDate
 
         where:
-        givenDate              | timezoneToDisplay || expectedConvertedDate      | scenario
-        "2000-01-01T00:00:00Z" | 'Z'               || "01/Jan/2000 00:00 Z"      | "UTC timezone"
-        "2000-01-01T00:00:00Z" | '+05:00'          || "01/Jan/2000 05:00 +05:00" | "timezone ahead of UTC"
-        "2000-01-01T00:00:00Z" | '-05:00'          || "31/Dec/1999 19:00 -05:00" | "timezone behind UTC"
+        givenDate           | timezoneToDisplay || expectedConvertedDate      | scenario
+        "2000-01-01T00:00Z" | 'Z'               || "01/Jan/2000 00:00 Z"      | "UTC timezone"
+        "2000-01-01T00:00Z" | '+05:00'          || "01/Jan/2000 05:00 +05:00" | "timezone ahead of UTC"
+        "2000-01-01T00:00Z" | '-05:00'          || "31/Dec/1999 19:00 -05:00" | "timezone behind UTC"
     }
 
     void 'asDateForDisplay should successfully convert a Date to a String'() {
