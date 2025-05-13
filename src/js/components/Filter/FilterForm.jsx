@@ -224,8 +224,8 @@ FilterForm.defaultProps = {
   onClear: undefined,
   ignoreClearFilters: [],
   isLoading: false,
-  showFilterVisibilityToggler: true,
-  showSearchField: true,
   customSubmitButtonLabel: null,
+  showSearchField: true,
   customSubmitButtonDefaultLabel: null,
+  showFilterVisibilityToggler: true,
 };
