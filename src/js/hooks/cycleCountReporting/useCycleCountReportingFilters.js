@@ -32,7 +32,6 @@ const useCycleCountReportingFilters = () => {
     const queryFilterParams = queryString.stringify(transformedParams);
     const { pathname } = history.location;
     history.push({ pathname, search: queryFilterParams });
-    setResetInitialFetch(true);
   };
 
   const resetForm = () => {
@@ -49,11 +48,11 @@ const useCycleCountReportingFilters = () => {
         { tab: queryProps.tab },
       );
 
-      if (queryProps.createdBefore) {
-        defaultValues.createdBefore = queryProps.createdBefore;
+      if (queryProps.startDate) {
+        defaultValues.startDate = queryProps.startDate;
       }
-      if (queryProps.createdAfter) {
-        defaultValues.createdAfter = queryProps.createdAfter;
+      if (queryProps.endDate) {
+        defaultValues.endDate = queryProps.endDate;
       }
 
       if (queryProps.products) {
@@ -87,8 +86,8 @@ const useCycleCountReportingFilters = () => {
 
   const setFilterValues = (values) => {
     const filterAccessors = {
-      createdBefore: { name: 'createdBefore' },
-      createdAfter: { name: 'createdAfter' },
+      startDate: { name: 'startDate' },
+      endDate: { name: 'endDate' },
       products: { name: 'products', accessor: 'id' },
       tab: { name: 'tab' },
     };

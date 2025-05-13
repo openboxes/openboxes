@@ -2,7 +2,7 @@ import DateFilter from 'components/form-elements/DateFilter/DateFilter';
 import FilterSelectField from 'components/form-elements/FilterSelectField';
 
 export default {
-  createdBefore: {
+  startDate: {
     type: DateFilter,
     attributes: {
       label: 'react.cycleCountReporting.filters.createdBefore.label',
@@ -13,7 +13,7 @@ export default {
       top: true,
     },
   },
-  createdAfter: {
+  endDate: {
     type: DateFilter,
     attributes: {
       label: 'react.cycleCountReporting.filters.createdAfter.label',
