@@ -57,10 +57,14 @@ const useCycleCountReportingFilters = () => {
       }
 
       if (queryProps.products) {
-        const productIds = queryProps.products;
+        const productIds = Array.isArray(queryProps.products)
+          ? queryProps.products
+          : [queryProps.products];
+
         const products = await Promise.all(
           productIds.map((id) => fetchProduct(id)),
         );
+
         defaultValues.products = products.map((product) => ({
           ...product,
           label: `${product.productCode} - ${product.displayName ?? product.name}`,
