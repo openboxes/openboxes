@@ -10,11 +10,10 @@ const DataTableHeader = ({
   headerGroups,
   tableWithPinnedColumns,
   isScreenWiderThanTable,
-  dataLength,
 }) => (
   <div
     className="rt-thead -header"
-    style={{ width: (!isScreenWiderThanTable && tableWithPinnedColumns && dataLength) ? 'fit-content' : undefined }}
+    style={{ width: (!isScreenWiderThanTable && tableWithPinnedColumns) ? 'fit-content' : undefined }}
   >
     <div className="rt-tr">
       {headerGroups.map((headerGroup) =>
@@ -33,7 +32,8 @@ const DataTableHeader = ({
                   header.column,
                   flexWidth,
                   isScreenWiderThanTable,
-                  dataLength,
+                  true,
+                  false,
                 ),
               }}
             >
@@ -51,7 +51,6 @@ DataTableHeader.propTypes = {
   headerGroups: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   tableWithPinnedColumns: PropTypes.bool,
   isScreenWiderThanTable: PropTypes.bool.isRequired,
-  dataLength: PropTypes.number.isRequired,
 };
 
 DataTableHeader.defaultProps = {

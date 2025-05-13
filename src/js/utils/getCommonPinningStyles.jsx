@@ -3,6 +3,7 @@ const getCommonPinningStyles = (
   flexWidth,
   isScreenWiderThanTable,
   dataLength,
+  loading,
 ) => {
   const isPinned = column.getIsPinned();
   const isLastLeftPinnedColumn = isPinned === 'left' && column.getIsLastColumn('left');
@@ -12,7 +13,7 @@ const getCommonPinningStyles = (
     clipPath: isLastLeftPinnedColumn ? 'inset(0 -15px 0 0)' : undefined,
     marginRight: isLastLeftPinnedColumn ? '5px' : undefined,
     left: isPinned === 'left' ? `${column.getStart('left')}px` : undefined,
-    position: isPinned && !isScreenWiderThanTable && dataLength && 'sticky',
+    position: isPinned && !isScreenWiderThanTable && dataLength && !loading && 'sticky',
     flex: flexWidth || column.getSize(),
     width: flexWidth || column.getSize(),
     zIndex: isPinned ? 1 : 0,

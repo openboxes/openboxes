@@ -26,6 +26,7 @@ const useTableDataV2 = ({
   searchTerm,
   filterParams,
   shouldFetch,
+  setShouldFetch,
   disableInitialLoading,
 }) => {
   const sourceRef = useRef(CancelToken.source());
@@ -64,7 +65,12 @@ const useTableDataV2 = ({
         });
       })
       .catch(() => Promise.reject(new Error(translate(errorMessageId, defaultErrorMessage))))
-      .finally(() => setLoading(false));
+      .finally(() => {
+        if (setShouldFetch) {
+          setShouldFetch(false);
+        }
+        setLoading(false);
+      });
   };
 
   // fetching data after changing page size, filters, page number and sorting

@@ -22,11 +22,14 @@ import dateWithoutTimeZone from 'utils/dateUtils';
 
 const useInventoryTransactionsTab = ({
   filterParams,
-  paginationProps,
+  offset,
+  pageSize,
+  shouldFetch,
+  setShouldFetch,
 }) => {
   const columnHelper = createColumnHelper();
   const translate = useTranslate();
-
+  const { products } = filterParams;
   const {
     currentLocale,
     currentLocation,
@@ -41,24 +44,36 @@ const useInventoryTransactionsTab = ({
     order,
   } = useTableSorting();
 
-  const getParams = () => ({
+  const getParams = ({
+    sortingParams,
+  }) => _.omitBy({
+    offset: `${offset}`,
+    max: `${pageSize}`,
+    ...sortingParams,
+    ...filterParams,
+    products: products?.map?.(({ id }) => id),
     facility: currentLocation?.id,
+  }, (val) => {
+    if (typeof val === 'boolean') {
+      return !val;
+    }
+    return _.isEmpty(val);
   });
 
   const {
     tableData,
     loading,
-    fetchData,
   } = useTableDataV2({
     url: CYCLE_COUNT_DETAILS_REPORT,
     errorMessageId: 'react.cycleCount.table.errorMessage.label',
     defaultErrorMessage: 'Unable to fetch products',
     // We should start fetching only after clicking the button
-    shouldFetch: false,
+    shouldFetch,
+    setShouldFetch,
     disableInitialLoading: true,
     getParams,
-    pageSize: `${paginationProps.pageSize}`,
-    offset: `${paginationProps.offset}`,
+    pageSize,
+    offset,
     sort,
     order,
     searchTerm: null,
@@ -332,7 +347,6 @@ const useInventoryTransactionsTab = ({
     tableData,
     loading,
     emptyTableMessage,
-    fetchData,
     exportData,
   };
 };
