@@ -50,9 +50,7 @@ const DataTable = ({
             headerGroups={table.getHeaderGroups()}
             tableWithPinnedColumns={tableWithPinnedColumns}
             isScreenWiderThanTable={isScreenWiderThanTable}
-            loading={loading}
             emptyTableMessage={emptyTableMessage}
-            dataLength={data?.length}
           />
           <DataTableBody
             emptyTableMessage={emptyTableMessage}

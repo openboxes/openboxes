@@ -10,10 +10,14 @@ import useInventoryTransactionsTab from 'hooks/cycleCount/useInventoryTransactio
 const InventoryTransactionsTab = ({
   filterParams,
   tablePaginationProps,
+  shouldFetch,
+  setShouldFetch,
 }) => {
   const {
     paginationProps,
     setTotalCount,
+    pageSize,
+    offset,
   } = tablePaginationProps;
 
   const {
@@ -22,10 +26,13 @@ const InventoryTransactionsTab = ({
     loading,
     emptyTableMessage,
     exportData,
-    fetchData,
   } = useInventoryTransactionsTab({
     paginationProps,
     filterParams,
+    pageSize,
+    offset,
+    shouldFetch,
+    setShouldFetch,
   });
 
   useEffect(() => {
@@ -35,9 +42,6 @@ const InventoryTransactionsTab = ({
   return (
     <div>
       <div className="d-flex m-2 justify-content-end">
-        <button onClick={() => fetchData()} type="button">
-          load
-        </button>
         <Button
           onClick={exportData}
           defaultLabel="Export"
@@ -70,4 +74,6 @@ InventoryTransactionsTab.propTypes = {
     pageSize: PropTypes.number.isRequired,
     setTotalCount: PropTypes.func.isRequired,
   }).isRequired,
+  shouldFetch: PropTypes.bool.isRequired,
+  setShouldFetch: PropTypes.func.isRequired,
 };

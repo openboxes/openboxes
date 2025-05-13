@@ -21,7 +21,7 @@ const DataTableBody = ({
 }) => (
   <div
     className="rt-tbody-v2"
-    style={{ width: (!isScreenWiderThanTable && tableWithPinnedColumns && dataLength) ? 'fit-content' : undefined }}
+    style={{ width: (!isScreenWiderThanTable && tableWithPinnedColumns && dataLength && !loading) ? 'fit-content' : undefined }}
   >
     <DataTableStatus
       label={emptyTableMessage?.id || defaultEmptyTableMessage.id}
@@ -53,6 +53,7 @@ const DataTableBody = ({
                         flexWidth,
                         isScreenWiderThanTable,
                         dataLength,
+                        loading,
                       ),
                     }}
                     key={cell.id}
