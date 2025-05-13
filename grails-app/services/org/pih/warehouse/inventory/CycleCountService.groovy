@@ -693,7 +693,9 @@ class CycleCountService {
     @Transactional(readOnly=true)
     PagedResultList getCycleCountTransactionReport(CycleCountTransactionReportCommand command) {
         return CycleCountFinalCountDetails.createCriteria().list(command.paginationParams) {
-            eq("facility", command.facility)
+            if (command.facility) {
+                eq("facility", command.facility)
+            }
             if (command.products) {
                 "in"("product", command.products)
             }

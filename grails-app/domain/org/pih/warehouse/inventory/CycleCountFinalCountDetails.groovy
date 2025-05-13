@@ -2,7 +2,7 @@ package org.pih.warehouse.inventory
 
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationTypeCode
-import org.pih.warehouse.core.User
+import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.VarianceTypeCode
 import org.pih.warehouse.product.Product
 
@@ -13,24 +13,31 @@ class CycleCountFinalCountDetails implements Serializable {
     Product product
     InventoryItem inventoryItem
 
-    CycleCount cycleCount
-    CycleCountItem cycleCountItem
-    Date dateCounted
-
-    User countAssignee
-    User recountAssignee
-
+    // Transaction details
     String transactionNumber
     Date transactionDate
+    Date dateRequested
+    Person requestedBy
+    Date dateStarted
+    Person startedBy
+    Date dateRecorded
+    Person recordedBy
 
+    // Final count details
+    Date dateCounted
+    Person countAssignee
     Integer quantityOnHand
     Integer quantityCounted
     Integer quantityVariance
 
-    String comments
-
     // FIXME Should eventually be a list of enums
-    String rootCause
+    String varianceReasonCode
+    String varianceComments
+
+    // Additional details
+    CycleCount cycleCount
+    CycleCountItem cycleCountItem
+
 
     static transients = ["varianceTypeCode"]
 
@@ -49,6 +56,18 @@ class CycleCountFinalCountDetails implements Serializable {
 
     Map toJson() {
         return [
+                transactionDetails: [
+                        id               : "TBD",
+                        transactionNumber: transactionNumber,
+                        transactionType  : "Cycle Count",
+                        transactionDate  : transactionDate,
+                        dateRequested    : dateRequested,
+                        requestedBy      : [id: requestedBy?.id, name: requestedBy?.name],
+                        dateStarted      : dateStarted,
+                        startedBy        : [id: startedBy?.id, name: startedBy?.name],
+                        dateRecorded     : dateRecorded,
+                        recordedBy       : [id: recordedBy?.id, name: recordedBy?.name],
+                ],
                 inventoryItem     : [
                         product         : [
                                 id         : product.id,
@@ -59,31 +78,27 @@ class CycleCountFinalCountDetails implements Serializable {
                         expirationDate  : inventoryItem.expirationDate,
                         internalLocation: location.toJson(LocationTypeCode.INTERNAL),
                 ],
-                transactionDetails: [
-                        id               : "TBD",
-                        transactionNumber: transactionNumber,
-                        transactionType  : "Cycle Count",
-                        transactionDate  : transactionDate,
-                ],
                 initialCount      : [
-                        dateCounted     : dateCounted,
-                        quantityOnHand  : quantityOnHand,
-                        quantityCounted : quantityCounted,
-                        quantityVariance: quantityVariance,
-                        varianceTypeCode: varianceTypeCode.name(),
-                        assignee        : [id: countAssignee?.id, name: countAssignee?.name],
+                        assignee          : [id: countAssignee?.id, name: countAssignee?.name],
+                        dateCounted       : dateCounted,
+                        quantityOnHand    : quantityOnHand,
+                        quantityCounted   : quantityCounted,
+                        quantityVariance  : quantityVariance,
+                        varianceTypeCode  : varianceTypeCode.name(),
+                        varianceReasonCode: varianceReasonCode,
+                        varianceComments  : varianceComments,
+
                 ],
                 finalCount        : [
-                        dateCounted     : dateCounted,
-                        quantityOnHand  : quantityOnHand,
-                        quantityCounted : quantityCounted,
-                        quantityVariance: quantityVariance,
-                        varianceTypeCode: varianceTypeCode.name(),
-                        assignee        : [id: recountAssignee?.id, name: recountAssignee?.name],
+                        assignee          : [id: countAssignee?.id, name: countAssignee?.name],
+                        dateCounted       : dateCounted,
+                        quantityOnHand    : quantityOnHand,
+                        quantityCounted   : quantityCounted,
+                        quantityVariance  : quantityVariance,
+                        varianceTypeCode  : varianceTypeCode.name(),
+                        varianceReasonCode: varianceReasonCode,
+                        varianceComments  : varianceComments,
                 ],
-                comments          : comments,
-                rootCause         : rootCause,
         ]
     }
-
 }
