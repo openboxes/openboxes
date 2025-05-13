@@ -15,7 +15,7 @@ const useCycleCountReportingFilters = () => {
   const [defaultFilterValues, setDefaultFilterValues] = useState({});
   const [filtersInitialized, setFiltersInitialized] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [resetInitialFetch, setResetInitialFetch] = useState(true);
+  const [shouldFetch, setShouldFetch] = useState(false);
 
   const dispatch = useDispatch();
   const history = useHistory();
@@ -32,7 +32,7 @@ const useCycleCountReportingFilters = () => {
     const queryFilterParams = queryString.stringify(transformedParams);
     const { pathname } = history.location;
     history.push({ pathname, search: queryFilterParams });
-    setResetInitialFetch(true);
+    setShouldFetch(false);
   };
 
   const resetForm = () => {
@@ -107,8 +107,8 @@ const useCycleCountReportingFilters = () => {
     resetForm,
     filterParams,
     isLoading,
-    resetInitialFetch,
-    setResetInitialFetch,
+    shouldFetch,
+    setShouldFetch,
   };
 };
 

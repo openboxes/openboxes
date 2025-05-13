@@ -13,6 +13,7 @@ const CycleCountReportingFilters = ({
   formProps,
   isLoading,
   filterFields,
+  setShouldFetch,
 }) => {
   const {
     debounceTime,
@@ -32,7 +33,10 @@ const CycleCountReportingFilters = ({
     <ListFilterFormWrapper>
       <FilterForm
         filterFields={filterFields}
-        updateFilterParams={(values) => setFilterParams({ ...values })}
+        updateFilterParams={(values) => {
+          setFilterParams({ ...values });
+          return setShouldFetch(true);
+        }}
         formProps={{
           ...formProps,
           debouncedProductsFetch,
@@ -46,6 +50,7 @@ const CycleCountReportingFilters = ({
         customSubmitButtonDefaultLabel="Load table"
         showFilterVisibilityToggler={false}
         showSearchField={false}
+        disableAutoUpdateFilterParams
       />
     </ListFilterFormWrapper>
   );
@@ -59,9 +64,11 @@ CycleCountReportingFilters.propTypes = {
   formProps: PropTypes.shape({}),
   filterFields: PropTypes.shape({}),
   isLoading: PropTypes.bool.isRequired,
+  setShouldFetch: PropTypes.func,
 };
 
 CycleCountReportingFilters.defaultProps = {
   formProps: {},
   filterFields: {},
+  setShouldFetch: null,
 };

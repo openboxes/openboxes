@@ -29,10 +29,11 @@ const CycleCountReporting = () => {
     isLoading,
     filterParams,
     resetForm,
-    resetInitialFetch,
-    setResetInitialFetch,
+    shouldFetch,
+    setShouldFetch,
   } = useCycleCountReportingFilters();
-  const tablePaginationProps = useCycleCountPagination(filterParams);
+
+  const tablePaginationProps = useCycleCountPagination(filterParams, setShouldFetch);
   const tabs = {
     [PRODUCTS_TAB]: {
       label: {
@@ -62,6 +63,7 @@ const CycleCountReporting = () => {
           setFilterParams={setFilterValues}
           filterFields={cycleCountReportingFilterFields}
           isLoading={isLoading}
+          setShouldFetch={setShouldFetch}
         />
         {tab === PRODUCTS_TAB && (
           <ProductsTab />
@@ -71,8 +73,8 @@ const CycleCountReporting = () => {
           <InventoryTransactionsTab
             tablePaginationProps={tablePaginationProps}
             filterParams={filterParams}
-            resetInitialFetch={resetInitialFetch}
-            setResetInitialFetch={setResetInitialFetch}
+            shouldFetch={shouldFetch}
+            setShouldFetch={setShouldFetch}
           />
         )}
       </div>

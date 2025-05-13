@@ -26,9 +26,8 @@ const useTableDataV2 = ({
   searchTerm,
   filterParams,
   shouldFetch,
+  setShouldFetch,
   disableInitialLoading,
-  resetInitialFetch,
-  setResetInitialFetch,
 }) => {
   const sourceRef = useRef(CancelToken.source());
 
@@ -66,21 +65,19 @@ const useTableDataV2 = ({
         });
       })
       .catch(() => Promise.reject(new Error(translate(errorMessageId, defaultErrorMessage))))
-      .finally(() => setLoading(false));
+      .finally(() => {
+        if (setShouldFetch) {
+          setShouldFetch(false);
+        }
+        setLoading(false);
+      });
   };
 
   // fetching data after changing page size, filters, page number and sorting
   useEffect(() => {
-    if (!shouldFetch) {
-      return;
+    if (shouldFetch) {
+      fetchData();
     }
-    // Prevents automatic data fetching when resetInitialFetch is true,
-    // allowing fetch only on submit button click
-    if (resetInitialFetch && setResetInitialFetch) {
-      setResetInitialFetch(false);
-      return;
-    }
-    fetchData();
   }, [
     filterParams,
     pageSize,

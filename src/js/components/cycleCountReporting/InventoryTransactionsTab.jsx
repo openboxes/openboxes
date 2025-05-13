@@ -10,8 +10,8 @@ import useInventoryTransactionsTab from 'hooks/cycleCount/useInventoryTransactio
 const InventoryTransactionsTab = ({
   filterParams,
   tablePaginationProps,
-  resetInitialFetch,
-  setResetInitialFetch,
+  shouldFetch,
+  setShouldFetch,
 }) => {
   const {
     paginationProps,
@@ -31,8 +31,8 @@ const InventoryTransactionsTab = ({
     filterParams,
     pageSize,
     offset,
-    resetInitialFetch,
-    setResetInitialFetch,
+    shouldFetch,
+    setShouldFetch,
   });
 
   useEffect(() => {
@@ -74,6 +74,6 @@ InventoryTransactionsTab.propTypes = {
     pageSize: PropTypes.number.isRequired,
     setTotalCount: PropTypes.func.isRequired,
   }).isRequired,
-  resetInitialFetch: PropTypes.bool.isRequired,
-  setResetInitialFetch: PropTypes.func.isRequired,
+  shouldFetch: PropTypes.bool.isRequired,
+  setShouldFetch: PropTypes.func.isRequired,
 };

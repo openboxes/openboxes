@@ -15,7 +15,6 @@ import transactionType from 'consts/transactionType';
 import valueIndicatorVariant, {
   getCycleCountDifferencesVariant,
 } from 'consts/valueIndicatorVariant';
-import useQueryParams from 'hooks/useQueryParams';
 import useTableDataV2 from 'hooks/useTableDataV2';
 import useTableSorting from 'hooks/useTableSorting';
 import useTranslate from 'hooks/useTranslate';
@@ -25,12 +24,11 @@ const useInventoryTransactionsTab = ({
   filterParams,
   offset,
   pageSize,
-  resetInitialFetch,
-  setResetInitialFetch,
+  shouldFetch,
+  setShouldFetch,
 }) => {
   const columnHelper = createColumnHelper();
   const translate = useTranslate();
-  const { tab } = useQueryParams();
   const { products } = filterParams;
   const {
     currentLocale,
@@ -70,7 +68,8 @@ const useInventoryTransactionsTab = ({
     errorMessageId: 'react.cycleCount.table.errorMessage.label',
     defaultErrorMessage: 'Unable to fetch products',
     // We should start fetching only after clicking the button
-    shouldFetch: filterParams.tab && tab === filterParams.tab,
+    shouldFetch,
+    setShouldFetch,
     disableInitialLoading: true,
     getParams,
     pageSize,
@@ -79,8 +78,6 @@ const useInventoryTransactionsTab = ({
     order,
     searchTerm: null,
     filterParams,
-    resetInitialFetch,
-    setResetInitialFetch,
   });
 
   const columns = useMemo(() => [

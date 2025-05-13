@@ -36,6 +36,7 @@ const FilterForm = ({
   customSubmitButtonDefaultLabel,
   showFilterVisibilityToggler,
   showSearchField,
+  disableAutoUpdateFilterParams,
 }) => {
   const [amountFilled, setAmountFilled] = useState(0);
   const [filtersHidden, setFiltersHidden] = useState(hidden);
@@ -63,7 +64,9 @@ const FilterForm = ({
   // Default values can change based on currentLocation
   // or any async data defaultValues are waiting for
   useEffect(() => {
-    updateFilterParams({ ...defaultValues });
+    if (!disableAutoUpdateFilterParams) {
+      updateFilterParams({ ...defaultValues });
+    }
   }, [defaultValues]);
 
   useTranslation('button');
@@ -211,6 +214,7 @@ FilterForm.propTypes = {
   showSearchField: PropTypes.bool,
   customSubmitButtonDefaultLabel: PropTypes.string,
   showFilterVisibilityToggler: PropTypes.bool,
+  disableAutoUpdateFilterParams: PropTypes.bool,
 };
 
 FilterForm.defaultProps = {
@@ -228,4 +232,5 @@ FilterForm.defaultProps = {
   showSearchField: true,
   customSubmitButtonDefaultLabel: null,
   showFilterVisibilityToggler: true,
+  disableAutoUpdateFilterParams: false,
 };
