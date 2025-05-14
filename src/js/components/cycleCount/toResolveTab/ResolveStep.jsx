@@ -1,8 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
+
+import _ from 'lodash';
+import { useSelector } from 'react-redux';
+import { getCycleCountsIds } from 'selectors';
 
 import ConfirmStepHeader from 'components/cycleCount/ConfirmStepHeader';
 import ResolveStepHeader from 'components/cycleCount/toResolveTab/ResolveStepHeader';
 import ResolveStepTable from 'components/cycleCount/toResolveTab/ResolveStepTable';
+import { TO_RESOLVE_TAB } from 'consts/cycleCount';
 import useResolveStep from 'hooks/cycleCount/useResolveStep';
 import useTranslation from 'hooks/useTranslation';
 import PageWrapper from 'wrappers/PageWrapper';
@@ -10,6 +15,9 @@ import PageWrapper from 'wrappers/PageWrapper';
 import 'components/cycleCount/cycleCount.scss';
 
 const ResolveStep = () => {
+  const cycleCountIds = useSelector(getCycleCountsIds);
+  const [currentCycleCountIds] = useState(cycleCountIds);
+  const isUIBlocked = !_.isEqual(cycleCountIds, currentCycleCountIds);
   const {
     tableData,
     validationErrors,
@@ -48,6 +56,7 @@ const ResolveStep = () => {
           refreshCountItems={refreshCountItems}
           next={next}
           save={save}
+          isUIBlocked={isUIBlocked}
         />
       ) : (
         <ConfirmStepHeader
@@ -55,6 +64,10 @@ const ResolveStep = () => {
           save={submitRecount}
           isSaveDisabled={isSaveDisabled}
           setIsSaveDisabled={setIsSaveDisabled}
+          isUIBlocked={isUIBlocked}
+          redirectTab={TO_RESOLVE_TAB}
+          redirectLabel="react.cycleCount.redirectToResolveTab.label"
+          redirectDefaultMessage="Back to Resolve tab"
         />
       )}
       {tableData
@@ -82,6 +95,7 @@ const ResolveStep = () => {
             cycleCountWithItemsWithoutRecount={
               cycleCountsWithItemsWithoutRecount.find((cycleCount) => cycleCount.id === id)
             }
+            isUIBlocked={isUIBlocked}
           />
         ))}
     </PageWrapper>

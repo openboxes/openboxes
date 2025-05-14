@@ -10,7 +10,12 @@ import FileFormat from 'consts/fileFormat';
 import RedirectButton from 'utils/RedirectButton';
 import Translate from 'utils/Translate';
 
-const CountStepHeader = ({ printCountForm, next, save }) => (
+const CountStepHeader = ({
+  printCountForm,
+  next,
+  save,
+  isUIBlocked,
+}) => (
   <div className="d-flex justify-content-sm-between align-items-end">
     <RedirectButton
       label="react.cycleCount.redirectToList.label"
@@ -26,15 +31,16 @@ const CountStepHeader = ({ printCountForm, next, save }) => (
           label="react.cycleCount.printCountForm.label"
           variant="primary-outline"
           StartIcon={<RiPrinterLine size={18} />}
+          disabled={isUIBlocked}
         />
         <div className="dropdown-menu dropdown-menu-right nav-item padding-8" aria-labelledby="dropdownMenuButton">
-          <a href="#" className="dropdown-item" onClick={() => printCountForm(FileFormat.PDF)} role="button">
+          <a href="#" className="dropdown-item" onClick={() => printCountForm(FileFormat.PDF)} role="button" aria-disabled={isUIBlocked}>
             <Translate
               id="react.cycleCount.printCountFormPdf.label"
               defaultMessage="Print Count form PDF"
             />
           </a>
-          <a href="#" className="dropdown-item" onClick={() => printCountForm(FileFormat.XLS)} role="button">
+          <a href="#" className="dropdown-item" onClick={() => printCountForm(FileFormat.XLS)} role="button" aria-disabled={isUIBlocked}>
             <Translate
               id="react.cycleCount.exportCountSheet.label"
               defaultMessage="Export Count sheet"
@@ -48,12 +54,14 @@ const CountStepHeader = ({ printCountForm, next, save }) => (
         defaultLabel="Save progress"
         variant="primary"
         StartIcon={<RiSave2Line size={18} />}
+        disabled={isUIBlocked}
       />
       <Button
         onClick={next}
         label="react.default.button.next.label"
         defaultLabel="Next"
         variant="primary"
+        disabled={isUIBlocked}
       />
     </div>
   </div>
@@ -65,4 +73,5 @@ CountStepHeader.propTypes = {
   printCountForm: PropTypes.func.isRequired,
   next: PropTypes.func.isRequired,
   save: PropTypes.func.isRequired,
+  isUIBlocked: PropTypes.func.isRequired,
 };

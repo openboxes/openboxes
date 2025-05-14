@@ -1,14 +1,22 @@
-import React from 'react';
+import React, { useState } from 'react';
+
+import _ from 'lodash';
+import { useSelector } from 'react-redux';
+import { getCycleCountRequestIds } from 'selectors';
 
 import ConfirmStepHeader from 'components/cycleCount/ConfirmStepHeader';
 import CountStepHeader from 'components/cycleCount/toCountTab/CountStepHeader';
 import CountStepTable from 'components/cycleCount/toCountTab/CountStepTable';
+import { TO_COUNT_TAB } from 'consts/cycleCount';
 import useCountStep from 'hooks/cycleCount/useCountStep';
 import PageWrapper from 'wrappers/PageWrapper';
 
 import 'components/cycleCount/cycleCount.scss';
 
 const CountStep = () => {
+  const cycleCountIds = useSelector(getCycleCountRequestIds);
+  const [currentCycleCountIds] = useState(cycleCountIds);
+  const isUIBlocked = !_.isEqual(cycleCountIds, currentCycleCountIds);
   const {
     tableData,
     printCountForm,
@@ -41,6 +49,7 @@ const CountStep = () => {
           printCountForm={printCountForm}
           next={() => validateExistenceOfCycleCounts(next)}
           save={() => validateExistenceOfCycleCounts(save)}
+          isUIBlocked={isUIBlocked}
         />
       ) : (
         <ConfirmStepHeader
@@ -48,6 +57,10 @@ const CountStep = () => {
           save={() => validateExistenceOfCycleCounts(resolveDiscrepancies)}
           isSaveDisabled={isSaveDisabled}
           setIsSaveDisabled={setIsSaveDisabled}
+          isUIBlocked={isUIBlocked}
+          redirectTab={TO_COUNT_TAB}
+          redirectLabel="react.cycleCount.redirectToList.label"
+          redirectDefaultMessage="Back to Cycle Count List"
         />
       )}
       {tableData
@@ -70,6 +83,7 @@ const CountStep = () => {
             isFormValid={isFormValid}
             triggerValidation={triggerValidation}
             refreshFocusCounter={refreshFocusCounter}
+            isUIBlocked={isUIBlocked}
           />
         ))}
     </PageWrapper>

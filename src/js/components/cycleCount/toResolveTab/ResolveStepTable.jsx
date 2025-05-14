@@ -41,6 +41,7 @@ const ResolveStepTable = ({
   triggerValidation,
   refreshFocusCounter,
   cycleCountWithItemsWithoutRecount,
+  isUIBlocked,
 }) => {
   const {
     columns,
@@ -57,6 +58,7 @@ const ResolveStepTable = ({
     addEmptyRow,
     refreshFocusCounter,
     triggerValidation,
+    isUIBlocked,
   });
 
   const translate = useTranslate();
@@ -124,6 +126,7 @@ const ResolveStepTable = ({
                 customDateFormat={DateFormat.DD_MMM_YYYY}
                 clearable={false}
                 hideErrorMessageWrapper
+                disabled={isUIBlocked}
               />
             </HeaderSelect>
           ) : (
@@ -150,6 +153,7 @@ const ResolveStepTable = ({
                     defaultValue={defaultRecountedByMeta}
                     hideErrorMessageWrapper
                     className={`min-width-250 ${showRecountedByErrorMessage() && 'input-has-error'}`}
+                    disabled={isUIBlocked}
                   />
                   {showRecountedByErrorMessage() && (
                     <CustomTooltip
@@ -202,6 +206,7 @@ const ResolveStepTable = ({
             defaultLabel="Add new record"
             variant="transparent"
             StartIcon={<RiAddCircleLine size={18} />}
+            disabled={isUIBlocked}
           />
         </Tooltip>
         )}
@@ -242,6 +247,7 @@ ResolveStepTable.propTypes = {
   cycleCountWithItemsWithoutRecount: PropTypes.shape({
     cycleCountItems: PropTypes.arrayOf(PropTypes.shape({})),
   }),
+  isUIBlocked: PropTypes.bool.isRequired,
 };
 
 ResolveStepTable.defaultProps = {

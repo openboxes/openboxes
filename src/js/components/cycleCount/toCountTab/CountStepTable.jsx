@@ -37,6 +37,7 @@ const CountStepTable = ({
   isFormValid,
   refreshFocusCounter,
   triggerValidation,
+  isUIBlocked,
 }) => {
   const translate = useTranslate();
   const localize = useSelector((state) => state.localize);
@@ -56,6 +57,7 @@ const CountStepTable = ({
     addEmptyRow,
     triggerValidation,
     refreshFocusCounter,
+    isUIBlocked,
   });
 
   // Default counted by needs to be stored in order to set the default select value correctly
@@ -99,6 +101,7 @@ const CountStepTable = ({
               value={dateCounted}
               clearable={false}
               customDateFormat={DateFormat.DD_MMM_YYYY}
+              disabled={isUIBlocked}
             />
           </HeaderSelect>
         ) : (
@@ -124,6 +127,7 @@ const CountStepTable = ({
                   onChange={assignCountedBy(id)}
                   className={`min-width-250 ${showCountedByErrorMessage() && 'input-has-error'}`}
                   defaultValue={defaultCountedByMeta}
+                  disabled={isUIBlocked}
                 />
                 {showCountedByErrorMessage() && (
                   <CustomTooltip
@@ -172,6 +176,7 @@ const CountStepTable = ({
               defaultLabel="Add new record"
               variant="transparent"
               StartIcon={<RiAddCircleLine size={18} />}
+              disabled={isUIBlocked}
             />
           </Tooltip>
         </div>
@@ -211,4 +216,5 @@ CountStepTable.propTypes = {
   isFormValid: PropTypes.bool.isRequired,
   refreshFocusCounter: PropTypes.number.isRequired,
   triggerValidation: PropTypes.func.isRequired,
+  isUIBlocked: PropTypes.bool.isRequired,
 };
