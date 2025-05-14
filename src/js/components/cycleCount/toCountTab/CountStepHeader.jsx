@@ -11,10 +11,7 @@ import RedirectButton from 'utils/RedirectButton';
 import Translate from 'utils/Translate';
 
 const CountStepHeader = ({
-  printCountForm,
-  next,
-  save,
-  isUIBlocked,
+  printCountForm, next, save, isUIBlocked,
 }) => (
   <div className="d-flex justify-content-sm-between align-items-end">
     <RedirectButton

@@ -1041,7 +1041,6 @@ div.search-input:focus-within {
   background-color: transparent;
   border: none;
   color: var(--blue-700);
-  cursor: pointer;
 
   &:not(:disabled):hover {
     background-color: var(--blue-200);
@@ -1051,7 +1050,6 @@ div.search-input:focus-within {
   &:disabled {
     opacity: 0.5;
     background: transparent;
-    cursor: default;
   }
 }
 
