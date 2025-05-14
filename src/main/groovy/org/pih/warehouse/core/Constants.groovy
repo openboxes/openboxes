@@ -25,11 +25,11 @@ class Constants {
     static final adminControllers = ['createProduct', 'admin']
     static final adminActions = ['product': ['create'], 'person': ['list'], 'user': ['list'], 'location': ['edit'], 'shipper': ['create'], 'locationGroup': ['create'], 'locationType': ['create'], '*': ['delete']]
 
-    // TODO: Don't add more dates here! We should refactor all backend usages (old gsp pages can continue using these)
-    //       of these constants to use the DateUtil.asDate(String) method to parse in Date types and then return Date
-    //       objects unformatted in our responses. The backend should always return dates in the same format so that
-    //       the frontend can easily parse response objects. Let the frontend decide what the display format of each
-    //       individual field should be.
+    // TODO: Don't add more dates here! When reading in date objects from API calls, use DateUtil.asZonedDateTime or
+    //       asInstant (or asDate for old code that still uses the Date type). When returning dates to the client,
+    //       GSPs and file exporters should use DateUtil.toDisplayFormat, and everything else should simply return date
+    //       objects unformatted (which results in them being ISO format) so that the frontend can easily parse
+    //       response objects. The frontend can decide what the display format of each individual field should be.
     static final String DEFAULT_YEAR_FORMAT = "yyyy"
     static final String DEFAULT_DATE_FORMAT = "dd/MMM/yyyy"
     static final String DEFAULT_DATE_TIME_FORMAT = "dd/MMM/yyyy HH:mm:ss"
