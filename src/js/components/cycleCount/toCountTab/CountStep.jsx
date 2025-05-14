@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef } from 'react';
 
 import _ from 'lodash';
 import { useSelector } from 'react-redux';
@@ -15,8 +15,9 @@ import 'components/cycleCount/cycleCount.scss';
 
 const CountStep = () => {
   const cycleCountIds = useSelector(getCycleCountRequestIds);
-  const [currentCycleCountIds] = useState(cycleCountIds);
-  const isUIBlocked = !_.isEqual(cycleCountIds, currentCycleCountIds);
+  // Stores initial cycleCountIds to detect changes when switching locations
+  const initialCycleCountIds = useRef(cycleCountIds);
+  const isUIBlocked = !_.isEqual(cycleCountIds, initialCycleCountIds.current);
   const {
     tableData,
     printCountForm,
