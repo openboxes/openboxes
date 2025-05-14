@@ -12,6 +12,7 @@ import _ from 'lodash';
 import queryString from 'query-string';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
+import { getCurrentLocation, getCycleCountRequestIds } from 'selectors';
 
 import {
   eraseDraft,
@@ -64,8 +65,8 @@ const useCountStep = () => {
     cycleCountIds,
     currentLocation,
   } = useSelector((state) => ({
-    cycleCountIds: state.cycleCount.requests,
-    currentLocation: state.session.currentLocation,
+    cycleCountIds: getCycleCountRequestIds(state),
+    currentLocation: getCurrentLocation(state),
   }));
 
   const resetFocus = () => {
@@ -283,7 +284,10 @@ const useCountStep = () => {
     if (canceledCycleCountsIds.length > 0) {
       dispatch({
         type: UPDATE_CYCLE_COUNT_IDS,
-        payload: existingCycleCountsIds,
+        payload: {
+          locationId: currentLocation?.id,
+          cycleCounts: existingCycleCountsIds,
+        },
       });
       notification(NotificationType.ERROR_FILLED)({
         message: 'Error',
@@ -512,7 +516,7 @@ const useCountStep = () => {
 
           return acc;
         }, []);
-      dispatch(eraseDraft(TO_COUNT_TAB));
+      dispatch(eraseDraft(currentLocation?.id, TO_COUNT_TAB));
       const requestIdsWithoutDiscrepancies
         = submittedCounts.length - requestIdsWithDiscrepancies.length;
       if (requestIdsWithDiscrepancies.length > 0) {
