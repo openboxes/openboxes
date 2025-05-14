@@ -12,7 +12,7 @@ package org.pih.warehouse
 import grails.converters.JSON
 import grails.util.Holders
 import org.pih.warehouse.inventory.CycleCount
-import org.pih.warehouse.inventory.CycleCountFinalCountDetails
+import org.pih.warehouse.inventory.CycleCountDetails
 import org.pih.warehouse.inventory.CycleCountItem
 import org.pih.warehouse.inventory.PendingCycleCountRequest
 
@@ -643,8 +643,8 @@ class BootStrap {
             return cycleCountCandidate.toJson()
         }
 
-        JSON.registerObjectMarshaller(CycleCountFinalCountDetails) { CycleCountFinalCountDetails cycleCountFinalCountDetails ->
-            return cycleCountFinalCountDetails.toJson()
+        JSON.registerObjectMarshaller(CycleCountDetails) { CycleCountDetails cycleCountDetails ->
+            return cycleCountDetails.toJson()
         }
 
         JSON.registerObjectMarshaller(CycleCountRequest) { CycleCountRequest cycleCountRequest ->

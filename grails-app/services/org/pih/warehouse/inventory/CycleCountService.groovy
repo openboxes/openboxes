@@ -692,7 +692,7 @@ class CycleCountService {
     // FIXME Move to the appropriate service (if we want to separate services from reporting)
     @Transactional(readOnly=true)
     PagedResultList getCycleCountTransactionReport(CycleCountTransactionReportCommand command) {
-        return CycleCountFinalCountDetails.createCriteria().list(command.paginationParams) {
+        return CycleCountDetails.createCriteria().list(command.paginationParams) {
             if (command.facility) {
                 eq("facility", command.facility)
             }
