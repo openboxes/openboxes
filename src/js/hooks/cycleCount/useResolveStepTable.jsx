@@ -40,7 +40,7 @@ const useResolveStepTable = ({
   productId,
   addEmptyRow,
   refreshFocusCounter,
-  isUIBlocked,
+  isFormDisabled,
 }) => {
   const columnHelper = createColumnHelper();
   const [rowIndex, setRowIndex] = useState(null);
@@ -350,7 +350,7 @@ const useResolveStepTable = ({
           tooltipLabel={getNonEditableValueToDisplay(columnPath, value)}
         >
           <Component
-            disabled={isFieldDisabled || isUIBlocked}
+            disabled={isFieldDisabled || isFormDisabled}
             type={type}
             value={getValueToDisplay(columnPath, value)}
             onChange={onChange}

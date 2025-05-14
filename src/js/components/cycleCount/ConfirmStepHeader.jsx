@@ -11,7 +11,7 @@ const ConfirmStepHeader = ({
   save,
   isSaveDisabled,
   setIsSaveDisabled,
-  isUIBlocked,
+  isFormDisabled,
   redirectTab,
   redirectLabel,
   redirectDefaultMessage,
@@ -40,14 +40,14 @@ const ConfirmStepHeader = ({
           label="react.default.button.back.label"
           defaultLabel="Back"
           variant="primary-outline"
-          disabled={isUIBlocked}
+          disabled={isFormDisabled}
         />
         <Button
           onClick={handleSaveClick}
           label="react.default.button.save.label"
           defaultLabel="Save"
           variant="primary"
-          disabled={isSaveDisabled || isUIBlocked}
+          disabled={isSaveDisabled || isFormDisabled}
         />
       </div>
     </div>
@@ -61,7 +61,7 @@ ConfirmStepHeader.propTypes = {
   save: PropTypes.func.isRequired,
   isSaveDisabled: PropTypes.bool.isRequired,
   setIsSaveDisabled: PropTypes.func.isRequired,
-  isUIBlocked: PropTypes.bool.isRequired,
+  isFormDisabled: PropTypes.bool.isRequired,
   redirectTab: PropTypes.string.isRequired,
   redirectLabel: PropTypes.string.isRequired,
   redirectDefaultMessage: PropTypes.string.isRequired,

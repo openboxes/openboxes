@@ -17,7 +17,7 @@ const CountStep = () => {
   const cycleCountIds = useSelector(getCycleCountRequestIds);
   // Stores initial cycleCountIds to detect changes when switching locations
   const initialCycleCountIds = useRef(cycleCountIds);
-  const isUIBlocked = !_.isEqual(cycleCountIds, initialCycleCountIds.current);
+  const isFormDisabled = !_.isEqual(cycleCountIds, initialCycleCountIds.current);
   const {
     tableData,
     printCountForm,
@@ -50,7 +50,7 @@ const CountStep = () => {
           printCountForm={printCountForm}
           next={() => validateExistenceOfCycleCounts(next)}
           save={() => validateExistenceOfCycleCounts(save)}
-          isUIBlocked={isUIBlocked}
+          isFormDisabled={isFormDisabled}
         />
       ) : (
         <ConfirmStepHeader
@@ -58,7 +58,7 @@ const CountStep = () => {
           save={() => validateExistenceOfCycleCounts(resolveDiscrepancies)}
           isSaveDisabled={isSaveDisabled}
           setIsSaveDisabled={setIsSaveDisabled}
-          isUIBlocked={isUIBlocked}
+          isFormDisabled={isFormDisabled}
           redirectTab={TO_COUNT_TAB}
           redirectLabel="react.cycleCount.redirectToList.label"
           redirectDefaultMessage="Back to Cycle Count List"
@@ -84,7 +84,7 @@ const CountStep = () => {
             isFormValid={isFormValid}
             triggerValidation={triggerValidation}
             refreshFocusCounter={refreshFocusCounter}
-            isUIBlocked={isUIBlocked}
+            isFormDisabled={isFormDisabled}
           />
         ))}
     </PageWrapper>

@@ -13,7 +13,7 @@ import Translate from 'utils/Translate';
 import CustomTooltip from 'wrappers/CustomTooltip';
 
 const ResolveStepHeader = ({
-  next, save, printRecountForm, refreshCountItems, isUIBlocked,
+  next, save, printRecountForm, refreshCountItems, isFormDisabled,
 }) => {
   const translate = useTranslate();
 
@@ -33,16 +33,16 @@ const ResolveStepHeader = ({
             label="react.cycleCount.printRecountForm.label"
             variant="primary-outline"
             StartIcon={<RiPrinterLine size={18} />}
-            disabled={isUIBlocked}
+            disabled={isFormDisabled}
           />
           <div className="dropdown-menu dropdown-menu-right nav-item padding-8" aria-labelledby="dropdownMenuButton">
-            <a href="#" className="dropdown-item" onClick={() => printRecountForm(FileFormat.PDF)} role="button" aria-disabled={isUIBlocked}>
+            <a href="#" className="dropdown-item" onClick={() => printRecountForm(FileFormat.PDF)} role="button" aria-disabled={isFormDisabled}>
               <Translate
                 id="react.cycleCount.printRecountFormPdf.label"
                 defaultMessage="Print Recount Form PDF"
               />
             </a>
-            <a href="#" className="dropdown-item" onClick={() => printRecountForm(FileFormat.XLS)} role="button" aria-disabled={isUIBlocked}>
+            <a href="#" className="dropdown-item" onClick={() => printRecountForm(FileFormat.XLS)} role="button" aria-disabled={isFormDisabled}>
               <Translate
                 id="react.cycleCount.exportRecountSheet.label"
                 defaultMessage="Export Recount Sheet"
@@ -61,7 +61,7 @@ const ResolveStepHeader = ({
             label="react.default.button.refresh.label"
             defaultLabel="Reload"
             variant="primary"
-            disabled={isUIBlocked}
+            disabled={isFormDisabled}
           />
         </CustomTooltip>
         <Button
@@ -70,14 +70,14 @@ const ResolveStepHeader = ({
           defaultLabel="Save progress"
           variant="primary"
           StartIcon={<RiSave2Line size={18} />}
-          disabled={isUIBlocked}
+          disabled={isFormDisabled}
         />
         <Button
           onClick={next}
           label="react.default.button.next.label"
           defaultLabel="Next"
           variant="primary"
-          disabled={isUIBlocked}
+          disabled={isFormDisabled}
         />
       </div>
     </div>
@@ -91,5 +91,5 @@ ResolveStepHeader.propTypes = {
   save: PropTypes.func.isRequired,
   printRecountForm: PropTypes.func.isRequired,
   refreshCountItems: PropTypes.func.isRequired,
-  isUIBlocked: PropTypes.bool.isRequired,
+  isFormDisabled: PropTypes.bool.isRequired,
 };

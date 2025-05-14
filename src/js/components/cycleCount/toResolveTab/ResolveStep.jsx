@@ -18,7 +18,7 @@ const ResolveStep = () => {
   const cycleCountIds = useSelector(getCycleCountsIds);
   // Stores initial cycleCountIds to detect changes when switching locations
   const initialCycleCountIds = useRef(cycleCountIds);
-  const isUIBlocked = !_.isEqual(cycleCountIds, initialCycleCountIds.current);
+  const isFormDisabled = !_.isEqual(cycleCountIds, initialCycleCountIds.current);
   const {
     tableData,
     validationErrors,
@@ -57,7 +57,7 @@ const ResolveStep = () => {
           refreshCountItems={refreshCountItems}
           next={next}
           save={save}
-          isUIBlocked={isUIBlocked}
+          isFormDisabled={isFormDisabled}
         />
       ) : (
         <ConfirmStepHeader
@@ -65,7 +65,7 @@ const ResolveStep = () => {
           save={submitRecount}
           isSaveDisabled={isSaveDisabled}
           setIsSaveDisabled={setIsSaveDisabled}
-          isUIBlocked={isUIBlocked}
+          isFormDisabled={isFormDisabled}
           redirectTab={TO_RESOLVE_TAB}
           redirectLabel="react.cycleCount.redirectToResolveTab.label"
           redirectDefaultMessage="Back to Resolve tab"
@@ -96,7 +96,7 @@ const ResolveStep = () => {
             cycleCountWithItemsWithoutRecount={
               cycleCountsWithItemsWithoutRecount.find((cycleCount) => cycleCount.id === id)
             }
-            isUIBlocked={isUIBlocked}
+            isFormDisabled={isFormDisabled}
           />
         ))}
     </PageWrapper>

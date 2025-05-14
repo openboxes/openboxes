@@ -31,7 +31,7 @@ const useCountStepTable = ({
   addEmptyRow,
   triggerValidation,
   refreshFocusCounter,
-  isUIBlocked,
+  isFormDisabled,
 }) => {
   const columnHelper = createColumnHelper();
   const [rowIndex, setRowIndex] = useState(null);
@@ -256,7 +256,7 @@ const useCountStepTable = ({
           tooltipLabel={getBinLocationToDisplay(value) || translate('react.cycleCount.table.binLocation.label', 'Bin Location')}
         >
           <Component
-            disabled={isFieldDisabled || isUIBlocked}
+            disabled={isFieldDisabled || isFormDisabled}
             type={type}
             value={getValueToDisplay(columnPath, value)}
             onChange={onChange}
