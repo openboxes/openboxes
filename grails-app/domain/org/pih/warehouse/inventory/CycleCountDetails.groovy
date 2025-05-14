@@ -48,8 +48,6 @@ class CycleCountDetails implements Serializable {
 
     static constraints = {
         version false
-        // FIXME - this is not the correct approach, but i needed a temporary solution to get this domain working
-        id composite: ['cycleCount', 'product', 'inventoryItem', 'location']
         table "cycle_count_details"
     }
 
@@ -61,8 +59,9 @@ class CycleCountDetails implements Serializable {
 
     Map toJson() {
         return [
+                id: id,
                 cycleCount       : [
-                        id               : cycleCount.id,
+                        id               : cycleCount?.id,
                         transactionNumber: transactionNumber,
                         transactionType  : "Cycle Count",
                         dateRequested    : dateRequested,
@@ -71,19 +70,17 @@ class CycleCountDetails implements Serializable {
                         requestedBy      : [id: requestedBy?.id, name: requestedBy?.name],
                         initiatedBy      : [id: initiatedBy?.id, name: initiatedBy?.name],
                         recordedBy       : [id: recordedBy?.id, name: recordedBy?.name],
-                        //createdBy        : [id: createdBy?.id, name: createdBy?.name],
-                        //updatedBy        : [id: updatedBy?.id, name: updatedBy?.name],
 
                 ],
                 inventoryItem    : [
                         product         : [
-                                id         : product.id,
-                                name       : product.name,
-                                productCode: product.productCode
+                                id         : product?.id,
+                                name       : product?.name,
+                                productCode: product?.productCode
                         ],
-                        lotNumber       : inventoryItem.lotNumber,
-                        expirationDate  : inventoryItem.expirationDate,
-                        internalLocation: location.toJson(LocationTypeCode.INTERNAL),
+                        lotNumber       : inventoryItem?.lotNumber,
+                        expirationDate  : inventoryItem?.expirationDate,
+                        internalLocation: location?.toJson(LocationTypeCode.INTERNAL)
                 ],
                 blindCount       : [
                         assignee          : [id: blindCountAssignee?.id, name: blindCountAssignee?.name],

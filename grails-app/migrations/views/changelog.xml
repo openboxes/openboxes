@@ -141,6 +141,6 @@
     <sqlFile path="views/pending_cycle_count_request.sql"/>
   </changeSet>
   <changeSet id="1746501428101-" author="jmiranda" runOnChange="true" runAlways="true" failOnError="true">
-    <sqlFile path="views/cycle-count-final-count-details.sql"/>
+    <sqlFile path="views/cycle-count-details.sql"/>
   </changeSet>
 </databaseChangeLog>

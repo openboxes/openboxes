@@ -81,6 +81,7 @@ transaction_details AS (
 )
 SELECT
 
+    id,
     # transaction details
     cycle_count_id,
     transaction_number,
@@ -117,9 +118,11 @@ SELECT
     verification_count_variance_percentage,
     verification_count_variance_reason_code,
     verification_count_variance_comment,
-    verification_count_count_index,
-    empty_column
+    verification_count_count_index
 from (select
+          # Generate a unique identifier to represent an inventory item being cycle counted
+          CRC32(CONCAT(cycle_count.id, product.product_code, coalesce(inventory_item.lot_number, 'DEFAULT'), coalesce(bin_location.name, 'DEFAULT'))) as id,
+
           # cycle count details
           cycle_count.id as cycle_count_id,
           cycle_count_request.date_created                                      as date_requested,
@@ -158,29 +161,24 @@ from (select
           (abs(icd.quantity_variance) / icd.quantity_on_hand) as verification_count_variance_percentage,
           fcd.variance_reason_code as verification_count_variance_reason_code,
           fcd.variance_comment as verification_count_variance_comment,
-          fcd.count_index as verification_count_count_index,
-
-          null as empty_column
-
+          fcd.count_index as verification_count_count_index
       FROM cycle_count_item_details cycle_count_item
               JOIN cycle_count ON cycle_count_item.cycle_count_id = cycle_count.id
               JOIN cycle_count_request ON cycle_count.id = cycle_count_request.cycle_count_id
           JOIN location facility on facility.id = cycle_count.facility_id
           JOIN inventory_item on cycle_count_item.inventory_item_id = inventory_item.id
           JOIN product on inventory_item.product_id = product.id
-          LEFT OUTER JOIN location bin_location
-               ON ((cycle_count_item.location_id = bin_location.id) OR
-                   (cycle_count_item.location_id IS NULL AND bin_location.id IS NULL))
+          LEFT OUTER JOIN location bin_location ON ((cycle_count_item.location_id = bin_location.id)
+                                                        OR (cycle_count_item.location_id IS NULL AND bin_location.id IS NULL))
           LEFT OUTER JOIN transaction_details ON cycle_count.id = transaction_details.cycle_count_id
           LEFT OUTER JOIN cycle_count_initial_count_details icd ON cycle_count_item.cycle_count_id = icd.cycle_count_id
-          AND icd.product_id = cycle_count_item.product_id
-          AND icd.inventory_item_id = cycle_count_item.inventory_item_id
-          AND ((icd.location_id = cycle_count_item.location_id) OR (icd.location_id IS NULL AND cycle_count_item.location_id IS NULL))
-              LEFT OUTER JOIN cycle_count_final_count_details fcd ON fcd.cycle_count_id = cycle_count_item.cycle_count_id
-          AND fcd.product_id = cycle_count_item.product_id
-          AND fcd.inventory_item_id = cycle_count_item.inventory_item_id
-          AND ((fcd.location_id = cycle_count_item.location_id) OR (fcd.location_id IS NULL AND cycle_count_item.location_id IS NULL))
-
+                                                                       AND icd.product_id = cycle_count_item.product_id
+                                                                       AND icd.inventory_item_id = cycle_count_item.inventory_item_id
+                                                                       AND ((icd.location_id = cycle_count_item.location_id) OR (icd.location_id IS NULL AND cycle_count_item.location_id IS NULL))
+          LEFT OUTER JOIN cycle_count_final_count_details fcd ON fcd.cycle_count_id = cycle_count_item.cycle_count_id
+                                                                     AND fcd.product_id = cycle_count_item.product_id
+                                                                     AND fcd.inventory_item_id = cycle_count_item.inventory_item_id
+                                                                     AND ((fcd.location_id = cycle_count_item.location_id) OR (fcd.location_id IS NULL AND cycle_count_item.location_id IS NULL))
       WHERE cycle_count_request.status = 'COMPLETED'
 
       ) as cycle_count_details

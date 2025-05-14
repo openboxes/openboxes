@@ -200,12 +200,10 @@ class CycleCountApiController {
         PagedResultList data = cycleCountService.getCycleCountTransactionReport(command)
         render([
                 data      : data,
+                count     : data?.size() ?: 0,
+                max       : command.max,
+                offset    : command.offset,
                 totalCount: data.totalCount,
-                metadata  : [
-                        developerNotes: [
-                                "Transaction details and initial count data are not yet available. Current values are mocked.",
-                        ]
-                ]
         ] as JSON)
     }
 }

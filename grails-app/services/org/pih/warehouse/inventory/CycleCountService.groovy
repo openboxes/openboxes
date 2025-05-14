@@ -696,10 +696,18 @@ class CycleCountService {
             if (command.facility) {
                 eq("facility", command.facility)
             }
+            if (command.startDate && command.endDate) {
+                between("dateRecorded", command.startDate, command.endDate)
+            }
+            else if (command.startDate) {
+                gte("dateRecorded", command.startDate)
+            }
+            else if (command.endDate) {
+                lte("dateRecorded", command.endDate)
+            }
             if (command.products) {
                 "in"("product", command.products)
             }
         }
     }
-
 }
