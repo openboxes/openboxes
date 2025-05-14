@@ -29,13 +29,13 @@ class CycleCountItemsExcelImporter extends AbstractExcelImporter implements Data
 
     static Map PROPERTY_MAP = [
             cycleCountId:             ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
-            productCode:                ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
-            "product.name":         ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
-            "lotNumber":            ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
-            "expirationDate":       ([expectedType: ExpectedPropertyType.DateJavaType, defaultValue: null]),
-            "binLocation":          ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
-            "quantityCounted":       ([expectedType: ExpectedPropertyType.IntType, defaultValue: null]),
-            "comment":            ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            productCode:              ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            "product.name":           ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            "lotNumber":              ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            "expirationDate":         ([expectedType: ExpectedPropertyType.DateJavaType, defaultValue: null]),
+            "binLocation":            ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            "quantityCounted":        ([expectedType: ExpectedPropertyType.IntType, defaultValue: null]),
+            "comment":                ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
     ]
 
     CycleCountItemsExcelImporter(String fileName) {
