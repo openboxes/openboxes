@@ -8,7 +8,7 @@ import {
   CYCLE_COUNT_REQUESTS,
   CYCLE_COUNT_START,
   CYCLE_COUNT_SUBMIT_COUNT,
-  CYCLE_COUNT_SUBMIT_RECOUNT,
+  CYCLE_COUNT_SUBMIT_RECOUNT, IMPORT_CYCLE_COUNT_ITEMS, IMPORT_PACKING_LIST,
 } from 'api/urls';
 import apiClient, { apiClientCustomResponseHandler } from 'utils/apiClient';
 
@@ -48,4 +48,14 @@ export default {
     apiClient.post(CYCLE_COUNT_ITEMS_BATCH(locationId, cycleCountId), payload),
   updateCycleCountItems: (payload, locationId, cycleCountId) =>
     apiClient.patch(CYCLE_COUNT_ITEMS_BATCH(locationId, cycleCountId), payload),
+  importCycleCountItems: (file, locationId) => {
+    const formData = new FormData();
+    formData.append('importFile', file);
+    const config = {
+      headers: {
+        'content-type': 'multipart/form-data',
+      },
+    };
+    return apiClient.post(IMPORT_CYCLE_COUNT_ITEMS(locationId), formData, config);
+  },
 };

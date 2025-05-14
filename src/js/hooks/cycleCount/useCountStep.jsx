@@ -54,6 +54,7 @@ const useCountStep = () => {
   // it will reset the focus by clearing the RowIndex and ColumnId in useEffect.
   const [refreshFocusCounter, setRefreshFocusCounter] = useState(0);
   const [isSaveDisabled, setIsSaveDisabled] = useState(false);
+  const [importFile, setImportFile] = useState(null);
 
   const dispatch = useDispatch();
   const history = useHistory();
@@ -564,6 +565,23 @@ const useCountStep = () => {
     resetFocus();
   };
 
+  const applyImportFile = async (e) => {
+    if (e instanceof File) {
+      setImportFile(e);
+    }
+  };
+
+  const importItems = async () => {
+    try {
+      show();
+      const response = await cycleCountApi.importCycleCountItems(importFile, currentLocation?.id);
+      console.log(response);
+    } finally {
+      hide();
+    }
+    // TODO: Map items to the table
+  };
+
   return {
     tableData: tableData.current,
     tableMeta,
@@ -588,6 +606,9 @@ const useCountStep = () => {
     refreshFocusCounter,
     isSaveDisabled,
     setIsSaveDisabled,
+    applyImportFile,
+    importItems,
+    importFile,
   };
 };
 
