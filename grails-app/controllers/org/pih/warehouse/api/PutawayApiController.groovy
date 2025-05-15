@@ -153,22 +153,6 @@ class PutawayApiController {
 
         putaway.putawayAssignee = currentUser
 
-        // TODO: ensure this does not break completing putaway in web app
-        // Bind the putaway items
-        jsonObject.putawayItems.each { putawayItemMap ->
-            PutawayItem putawayItem = new PutawayItem()
-            bindData(putawayItem, putawayItemMap)
-
-            // Bind the split items
-            putawayItemMap.splitItems.each { splitItemMap ->
-                PutawayItem splitItem = new PutawayItem()
-                bindData(splitItem, splitItemMap)
-                putawayItem.splitItems.add(splitItem)
-            }
-
-            putaway.putawayItems.add(putawayItem)
-        }
-
         return putaway
     }
 
