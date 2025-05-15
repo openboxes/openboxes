@@ -24,7 +24,8 @@ const CycleCountFilters = ({
       ignoreClearFilters={['tab']}
       hidden={false}
       isLoading={isLoading}
-      isCycleCountTab
+      customSubmitButtonLabel="react.button.filter.label"
+      customSubmitButtonDefaultLabel="Filter"
     />
   </ListFilterFormWrapper>
 );

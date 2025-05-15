@@ -4,6 +4,7 @@ const useTablePagination = ({
   defaultPageSize,
   totalCount,
   filterParams,
+  setShouldFetch,
 }) => {
   const [pagination, setPagination] = useState({
     pageIndex: 0,
@@ -16,6 +17,9 @@ const useTablePagination = ({
   );
 
   const onPageChange = (page) => {
+    if (setShouldFetch) {
+      setShouldFetch(true);
+    }
     if (page > maxPage) {
       setPagination((prev) => ({
         ...prev,
@@ -44,6 +48,9 @@ const useTablePagination = ({
       pageIndex: newPageIndex,
       pageSize: selectedPageSize,
     });
+    if (setShouldFetch) {
+      setShouldFetch(true);
+    }
   };
 
   const pages = Math.ceil(totalCount / pagination.pageSize);
