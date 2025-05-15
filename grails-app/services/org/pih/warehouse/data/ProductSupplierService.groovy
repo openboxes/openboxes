@@ -471,7 +471,7 @@ class ProductSupplierService {
 
         productSuppliers = productSuppliers.collect { ProductSupplier p ->
             ProductPackage productPackage = p.defaultProductPackage ?: p.getDefaultProductPackageDerived()
-            def globalPreference = p.productSupplierPreferences?.find { it.destinationParty == null }
+            ProductSupplierPreference globalPreference = p.productSupplierPreferences?.find { it.destinationParty == null }
             [
                     active                                    : p.active,
                     id                                        : p.id,
