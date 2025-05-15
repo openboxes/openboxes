@@ -3,13 +3,13 @@ import queryString from 'query-string';
 import {
   CYCLE_COUNT, CYCLE_COUNT_ITEM,
   CYCLE_COUNT_ITEMS_BATCH,
+  CYCLE_COUNT_ITEMS_IMPORT,
   CYCLE_COUNT_RECOUNT_START,
   CYCLE_COUNT_REFRESH_ITEMS,
   CYCLE_COUNT_REQUESTS,
   CYCLE_COUNT_START,
   CYCLE_COUNT_SUBMIT_COUNT,
   CYCLE_COUNT_SUBMIT_RECOUNT,
-  IMPORT_CYCLE_COUNT_ITEMS,
 } from 'api/urls';
 import apiClient, { apiClientCustomResponseHandler } from 'utils/apiClient';
 
@@ -57,6 +57,6 @@ export default {
         'content-type': 'multipart/form-data',
       },
     };
-    return apiClient.post(IMPORT_CYCLE_COUNT_ITEMS(locationId), formData, config);
+    return apiClient.post(CYCLE_COUNT_ITEMS_IMPORT(locationId), formData, config);
   },
 };
