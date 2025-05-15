@@ -9,36 +9,46 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
 
 /**
- * Responsible for managing product inventory transactions.
+ * Responsible for managing product inventory transactions. To be extended by feature-specific implementations.
  */
 @Transactional
-class ProductInventoryTransactionService {
+abstract class ProductInventoryTransactionService<T> {
 
     ProductAvailabilityService productAvailabilityService
     TransactionIdentifierService transactionIdentifierService
 
     /**
-     * Create a new product inventory transaction based on the current QoH in product availability.
+     * Transactions will often have a source object (not to be confused with the "source" field) that is responsible
+     * for the creation of the transaction. This method sets that source object on the given Transaction.
+     */
+    abstract void setSourceObject(Transaction transaction, T transactionSource)
+
+    /**
+     * Create a new "inventory baseline" product inventory transaction based on the current QoH in product availability.
      *
-     * We refer to this transaction as a product inventory "snapshot" because it's functionally a copy of what the
-     * quantity on hand (determined by product availability) was for each [bin location + lot number] of the product at
-     * the time. As such, transactions created via this method should NOT result in any quantity changes/adjustments.
+     * We refer to this transaction as a "baseline" because it gives us two things:
+     *
+     * 1) It sets a new baseline for the stock of the product. Any transactions on the product that are backdated to
+     *    before the most recent baseline will NOT have any effect on quantity on hand.
+     *
+     * 2) It acts as a "snapshot" of what the quantity on hand (determined by product availability) was for each
+     *    [bin location + lot number] of the product at the time of the transaction. As such, transactions created via
+     *    this method should NOT result in any quantity changes/adjustments. (However if transactions are backdated to
+     *    before the baseline, the baseline will have an implied quantity adjustment.)
      *
      * @param facility The Location to take the product inventory snapshot at
      * @param product The Product to take the product inventory snapshot for
-     * @param sourceType The feature triggering the product inventory snapshot
-     * @param source The source object to be associated with the Transaction, such as CycleCount, Order, Requisition...
+     * @param sourceObject The source object that caused the Transaction. Ex: CycleCount, Order, Requisition...
      * @param transactionDate The datetime that the transaction should be marked with
      * @return The Transaction that was created
      */
-    Transaction createTransaction(
+    Transaction createInventoryBaselineTransaction(
             Location facility,
             Product product,
-            ProductInventorySnapshotSource sourceType,
-            Object source,
+            T sourceObject,
             Date transactionDate=new Date()) {
 
-        TransactionType transactionType = TransactionType.read(Constants.PRODUCT_INVENTORY_TRANSACTION_TYPE_ID)
+        TransactionType transactionType = TransactionType.read(Constants.INVENTORY_BASELINE_TRANSACTION_TYPE_ID)
 
         Transaction transaction = new Transaction(
                 source: facility,
@@ -49,11 +59,7 @@ class ProductInventoryTransactionService {
 
         transaction.transactionNumber = transactionIdentifierService.generate(transaction)
 
-        switch (sourceType) {
-            case ProductInventorySnapshotSource.CYCLE_COUNT:
-                transaction.cycleCount = source as CycleCount
-                break
-        }
+        setSourceObject(transaction, sourceObject)
 
         // Create a transaction entry for every [bin location + lot number] pair that the product currently has.
         // We don't need to include zero quantity items. Excluding them from the transaction achieves the same result.

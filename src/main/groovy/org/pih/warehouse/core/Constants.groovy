@@ -96,6 +96,7 @@ class Constants {
     static final String TRANSFER_OUT_TRANSACTION_TYPE_ID = "9"
     static final String ADJUSTMENT_DEBIT_TRANSACTION_TYPE_ID = "10"
     static final String PRODUCT_INVENTORY_TRANSACTION_TYPE_ID = "11"
+    static final String INVENTORY_BASELINE_TRANSACTION_TYPE_ID = "12"
 
     // direct references to locations by primary key
     static final String WAREHOUSE_LOCATION_TYPE_ID = "2"

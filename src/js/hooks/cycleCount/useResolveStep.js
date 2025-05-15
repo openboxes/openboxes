@@ -13,8 +13,14 @@ import _ from 'lodash';
 import moment from 'moment';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
+import {
+  getCurrentLocation,
+  getCycleCountsIds,
+  getReasonCodes,
+  getUsers,
+} from 'selectors';
 
-import { fetchBinLocations, fetchUsers } from 'actions';
+import { eraseDraft, fetchBinLocations, fetchUsers } from 'actions';
 import { UPDATE_CYCLE_COUNT_IDS } from 'actions/types';
 import cycleCountApi from 'api/services/CycleCountApi';
 import { CYCLE_COUNT as GET_CYCLE_COUNTS } from 'api/urls';
@@ -71,10 +77,10 @@ const useResolveStep = () => {
     reasonCodes,
     users,
   } = useSelector((state) => ({
-    users: state.users.data,
-    cycleCountIds: state.cycleCount.cycleCounts,
-    reasonCodes: state.cycleCount.reasonCodes,
-    currentLocation: state.session.currentLocation,
+    users: getUsers(state),
+    cycleCountIds: getCycleCountsIds(state),
+    reasonCodes: getReasonCodes(state),
+    currentLocation: getCurrentLocation(state),
   }));
 
   const translate = useTranslate();
@@ -358,7 +364,10 @@ const useResolveStep = () => {
         .filter((id) => !cycleCountIdsToDelete.includes(id));
       dispatch({
         type: UPDATE_CYCLE_COUNT_IDS,
-        payload: updatedCycleCountsIds,
+        payload: {
+          locationId: currentLocation?.id,
+          cycleCounts: updatedCycleCountsIds,
+        },
       });
       // If we've canceled every product in the batch, there's no reason to stay on this screen.
       if (tableData.current.length === 0) {
@@ -435,7 +444,10 @@ const useResolveStep = () => {
     if (canceledCycleCountsIds.length > 0) {
       dispatch({
         type: UPDATE_CYCLE_COUNT_IDS,
-        payload: existingCycleCountsIds,
+        payload: {
+          locationId: currentLocation?.id,
+          cycleCounts: existingCycleCountsIds,
+        },
       });
       notification(NotificationType.ERROR_FILLED)({
         message: 'Error',
@@ -524,16 +536,22 @@ const useResolveStep = () => {
         const cycleCountItemsToUpdate = cycleCount.cycleCountItems
           .filter((item) => (item.updated && !item.id.includes('newRow')))
           .map(trimLotNumberSpaces);
-        for (const cycleCountItem of cycleCountItemsToUpdate) {
-          await cycleCountApi.updateCycleCountItem(getPayload(cycleCountItem, cycleCount),
-            currentLocation?.id, cycleCountItem?.id);
+        const updatePayload = {
+          itemsToUpdate: cycleCountItemsToUpdate.map((item) => getPayload(item, cycleCount)),
+        };
+        if (updatePayload.itemsToUpdate.length > 0) {
+          await cycleCountApi
+            .updateCycleCountItems(updatePayload, currentLocation?.id, cycleCount.id);
         }
         const cycleCountItemsToCreate = cycleCount.cycleCountItems
           .filter((item) => item.id.includes('newRow'))
           .map(trimLotNumberSpaces);
-        for (const cycleCountItem of cycleCountItemsToCreate) {
-          await cycleCountApi.createCycleCountItem(getPayload(cycleCountItem, cycleCount),
-            currentLocation?.id, cycleCount?.id);
+        const createPayload = {
+          itemsToCreate: cycleCountItemsToCreate.map((item) => getPayload(item, cycleCount)),
+        };
+        if (createPayload.itemsToCreate.length > 0) {
+          await cycleCountApi
+            .createCycleCountItems(createPayload, currentLocation?.id, cycleCount.id);
         }
 
         // Now that we've successfully saved all the items, mark them all as not updated so that
@@ -689,11 +707,15 @@ const useResolveStep = () => {
       if (outdatedProducts > 0) {
         dispatch({
           type: UPDATE_CYCLE_COUNT_IDS,
-          payload: cycleCountIdsForOutdatedProducts,
+          payload: {
+            locationId: currentLocation?.id,
+            cycleCounts: cycleCountIdsForOutdatedProducts,
+          },
         });
         openReviewProductsModal(outdatedProducts, cycleCountIdsForOutdatedProducts);
         return;
       }
+      dispatch(eraseDraft(currentLocation?.id, TO_RESOLVE_TAB));
       history.push(CYCLE_COUNT.list(TO_RESOLVE_TAB));
     } finally {
       hide();
@@ -712,10 +734,13 @@ const useResolveStep = () => {
     // Nested path in colum names contains "_" instead of "."
     const nestedPath = columnId.replaceAll('_', '.');
     // Update data for: cycleCount (table) -> cycleCountItem (row) -> column (nestedPath)
+    const valueChanged = _.get(tableData.current, `[${tableIndex}].cycleCountItems[${rowIndex}].${nestedPath}`) !== value;
     _.set(tableData.current, `[${tableIndex}].cycleCountItems[${rowIndex}].${nestedPath}`, value);
 
     // Mark item as updated, so that the item can be easily distinguished whether it was updated
-    _.set(tableData.current, `[${tableIndex}].cycleCountItems[${rowIndex}].updated`, true);
+    if (valueChanged) {
+      _.set(tableData.current, `[${tableIndex}].cycleCountItems[${rowIndex}].updated`, true);
+    }
   };
 
   const tableMeta = {

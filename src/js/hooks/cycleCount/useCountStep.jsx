@@ -9,8 +9,10 @@ import {
 } from 'react';
 
 import _ from 'lodash';
+import queryString from 'query-string';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
+import { getCurrentLocation, getCycleCountRequestIds } from 'selectors';
 
 import {
   eraseDraft,
@@ -20,17 +22,18 @@ import {
 } from 'actions';
 import { UPDATE_CYCLE_COUNT_IDS } from 'actions/types';
 import cycleCountApi from 'api/services/CycleCountApi';
-import { CYCLE_COUNT as CYCLE_COUNT_URL } from 'api/urls';
+import { CYCLE_COUNT as CYCLE_COUNT_URL, CYCLE_COUNT_PENDING_REQUESTS } from 'api/urls';
 import notification from 'components/Layout/notifications/notification';
 import ActivityCode from 'consts/activityCode';
 import { CYCLE_COUNT } from 'consts/applicationUrls';
-import { TO_COUNT_TAB, TO_RESOLVE_TAB } from 'consts/cycleCount';
+import { ALL_PRODUCTS_TAB, TO_COUNT_TAB, TO_RESOLVE_TAB } from 'consts/cycleCount';
 import cycleCountStatus from 'consts/cycleCountStatus';
 import NotificationType from 'consts/notificationTypes';
 import { DateFormat } from 'consts/timeFormat';
 import useCountStepValidation from 'hooks/cycleCount/useCountStepValidation';
 import useSpinner from 'hooks/useSpinner';
 import useTranslate from 'hooks/useTranslate';
+import apiClient from 'utils/apiClient';
 import confirmationModal from 'utils/confirmationModalUtils';
 import trimLotNumberSpaces from 'utils/cycleCountUtils';
 import dateWithoutTimeZone from 'utils/dateUtils';
@@ -62,8 +65,8 @@ const useCountStep = () => {
     cycleCountIds,
     currentLocation,
   } = useSelector((state) => ({
-    cycleCountIds: state.cycleCount.requests,
-    currentLocation: state.session.currentLocation,
+    cycleCountIds: getCycleCountRequestIds(state),
+    currentLocation: getCurrentLocation(state),
   }));
 
   const resetFocus = () => {
@@ -155,17 +158,6 @@ const useCountStep = () => {
   useEffect(() => {
     dispatch(fetchUsers());
   }, []);
-
-  const printCountForm = async (format) => {
-    show();
-    await exportFileFromApi({
-      url: CYCLE_COUNT_URL(currentLocation?.id),
-      params: { id: cycleCountIds },
-      format,
-    });
-    resetFocus();
-    hide();
-  };
 
   const setAllItemsUpdatedState = (cycleCountId, updated) => {
     const tableIndex = tableData.current.findIndex(
@@ -292,7 +284,10 @@ const useCountStep = () => {
     if (canceledCycleCountsIds.length > 0) {
       dispatch({
         type: UPDATE_CYCLE_COUNT_IDS,
-        payload: existingCycleCountsIds,
+        payload: {
+          locationId: currentLocation?.id,
+          cycleCounts: existingCycleCountsIds,
+        },
       });
       notification(NotificationType.ERROR_FILLED)({
         message: 'Error',
@@ -335,22 +330,22 @@ const useCountStep = () => {
         const cycleCountItemsToUpdate = cycleCount.cycleCountItems
           .filter((item) => (item.updated && !item.id.includes('newRow')))
           .map(trimLotNumberSpaces);
-        for (const cycleCountItem of cycleCountItemsToUpdate) {
-          await cycleCountApi.updateCycleCountItem(
-            getPayload(cycleCountItem, cycleCount),
-            currentLocation?.id,
-            cycleCountItem?.id,
-          );
+        const updatePayload = {
+          itemsToUpdate: cycleCountItemsToUpdate.map((item) => getPayload(item, cycleCount)),
+        };
+        if (updatePayload.itemsToUpdate.length > 0) {
+          await cycleCountApi
+            .updateCycleCountItems(updatePayload, currentLocation?.id, cycleCount.id);
         }
         const cycleCountItemsToCreate = cycleCount.cycleCountItems
           .filter((item) => item.id.includes('newRow'))
           .map(trimLotNumberSpaces);
-        for (const cycleCountItem of cycleCountItemsToCreate) {
-          await cycleCountApi.createCycleCountItem(
-            getPayload(cycleCountItem, cycleCount),
-            currentLocation?.id,
-            cycleCount?.id,
-          );
+        const createPayload = {
+          itemsToCreate: cycleCountItemsToCreate.map((item) => getPayload(item, cycleCount)),
+        };
+        if (createPayload.itemsToCreate.length > 0) {
+          await cycleCountApi
+            .createCycleCountItems(createPayload, currentLocation?.id, cycleCount.id);
         }
 
         // Now that we've successfully saved all the items, mark them all as not updated so that
@@ -363,6 +358,19 @@ const useCountStep = () => {
       resetFocus();
       hide();
     }
+  };
+
+  const printCountForm = async (format) => {
+    show();
+    // The backend does the export so we need to save first to ensure it has accurate data.
+    await save();
+    await exportFileFromApi({
+      url: CYCLE_COUNT_URL(currentLocation?.id),
+      params: { id: cycleCountIds },
+      format,
+    });
+    resetFocus();
+    hide();
   };
 
   const next = async () => {
@@ -380,16 +388,17 @@ const useCountStep = () => {
     resetFocus();
   };
 
-  const modalLabels = {
+  const modalLabels = (count) => ({
     title: {
       label: 'react.cycleCount.modal.resolveDiscrepanciesTitle.label',
       default: 'Resolve discrepancies?',
     },
     content: {
       label: 'react.cycleCount.modal.resolveDiscrepanciesContent.label',
-      default: 'There are discrepancies to resolve. Would you like to resolve them?',
+      default: `There are ${count} products with a discrepancy to resolve. Would you like to resolve them?`,
+      data: { count },
     },
-  };
+  });
 
   const submitCount = () =>
     tableData.current.reduce((acc, cycleCount) => ([
@@ -404,12 +413,28 @@ const useCountStep = () => {
       cycleCount?.id),
     ]), []);
 
-  const resolveDiscrepanciesModalButtons = (requestIdsWithDiscrepancies) => (onClose) => ([
+  const showSuccessNotification = (count) => {
+    notification(NotificationType.SUCCESS)({
+      message: translate(
+        'react.cycleCount.popup.success.label',
+        `Successfully counted ${count} products`,
+        {
+          data: { count },
+        },
+      ),
+    });
+  };
+
+  const resolveDiscrepanciesModalButtons = (requestIdsWithDiscrepancies,
+    requestIdsWithoutDiscrepancies) => (onClose) => ([
     {
       variant: 'transparent',
       defaultLabel: 'Not now',
       label: 'react.cycleCount.modal.notNow.label',
       onClick: () => {
+        if (requestIdsWithoutDiscrepancies > 0) {
+          showSuccessNotification(requestIdsWithoutDiscrepancies);
+        }
         history.push(CYCLE_COUNT.list(TO_RESOLVE_TAB));
         onClose?.();
       },
@@ -425,26 +450,63 @@ const useCountStep = () => {
           requestIdsWithDiscrepancies,
           currentLocation?.id,
         ));
+        if (requestIdsWithoutDiscrepancies > 0) {
+          showSuccessNotification(requestIdsWithoutDiscrepancies);
+        }
         history.push(CYCLE_COUNT.resolveStep());
         hide();
       },
     },
   ]);
 
-  const openResolveDiscrepanciesModal = (requestIdsWithDiscrepancies) => {
+  const openResolveDiscrepanciesModal = (requestIdsWithDiscrepancies,
+    requestIdsWithoutDiscrepancies) => {
     confirmationModal({
-      buttons: resolveDiscrepanciesModalButtons(requestIdsWithDiscrepancies),
-      ...modalLabels,
+      buttons: resolveDiscrepanciesModalButtons(requestIdsWithDiscrepancies,
+        requestIdsWithoutDiscrepancies),
+      ...modalLabels(requestIdsWithDiscrepancies.length),
       hideCloseButton: true,
       closeOnClickOutside: false,
     });
+  };
+
+  const redirectToNextTab = async () => {
+    const statusConfigs = [
+      { statuses: [cycleCountStatus.COUNTED, cycleCountStatus.INVESTIGATING], tab: TO_RESOLVE_TAB },
+      {
+        statuses: [cycleCountStatus.CREATED, cycleCountStatus.REQUESTED, cycleCountStatus.COUNTING],
+        tab: TO_COUNT_TAB,
+      },
+    ];
+
+    for (const { statuses, tab } of statusConfigs) {
+      const { data } = await apiClient.get(
+        CYCLE_COUNT_PENDING_REQUESTS(currentLocation?.id),
+        {
+          params: {
+            facility: currentLocation?.id,
+            statuses,
+            tab,
+            max: 1,
+            offset: 0,
+          },
+          paramsSerializer: (params) => queryString.stringify(params),
+        },
+      );
+
+      if (data.totalCount > 0) {
+        history.push(CYCLE_COUNT.list(tab));
+        return;
+      }
+    }
+
+    history.push(CYCLE_COUNT.list(ALL_PRODUCTS_TAB));
   };
 
   const resolveDiscrepancies = async () => {
     try {
       show();
       const submittedCounts = await Promise.all(submitCount());
-
       const requestIdsWithDiscrepancies = submittedCounts
         .reduce((acc, submittedCycleCountRequest) => {
           const { data } = submittedCycleCountRequest;
@@ -454,12 +516,15 @@ const useCountStep = () => {
 
           return acc;
         }, []);
-      dispatch(eraseDraft());
+      dispatch(eraseDraft(currentLocation?.id, TO_COUNT_TAB));
+      const requestIdsWithoutDiscrepancies
+        = submittedCounts.length - requestIdsWithDiscrepancies.length;
       if (requestIdsWithDiscrepancies.length > 0) {
-        openResolveDiscrepanciesModal(requestIdsWithDiscrepancies);
+        openResolveDiscrepanciesModal(requestIdsWithDiscrepancies, requestIdsWithoutDiscrepancies);
         return;
       }
-      history.push(CYCLE_COUNT.list(TO_COUNT_TAB));
+      showSuccessNotification(submittedCounts.length);
+      await redirectToNextTab();
     } finally {
       setIsSaveDisabled(false);
       resetFocus();
@@ -479,10 +544,13 @@ const useCountStep = () => {
     // Nested path in colum names contains "_" instead of "."
     const nestedPath = columnId.replaceAll('_', '.');
     // Update data for: cycleCount (table) -> cycleCountItem (row) -> column (nestedPath)
+    const valueChanged = _.get(tableData.current, `[${tableIndex}].cycleCountItems[${rowIndex}].${nestedPath}`) !== value;
     _.set(tableData.current, `[${tableIndex}].cycleCountItems[${rowIndex}].${nestedPath}`, value);
 
     // Mark item as updated, so that the item can be easily distinguished whether it was updated
-    _.set(tableData.current, `[${tableIndex}].cycleCountItems[${rowIndex}].updated`, true);
+    if (valueChanged) {
+      _.set(tableData.current, `[${tableIndex}].cycleCountItems[${rowIndex}].updated`, true);
+    }
   };
 
   const tableMeta = {
