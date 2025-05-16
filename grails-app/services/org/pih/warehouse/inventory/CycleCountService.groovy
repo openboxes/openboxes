@@ -607,10 +607,18 @@ class CycleCountService {
 
     CycleCountItemDto createCycleCountItem(CycleCountItemCommand command) {
         if (!command.inventoryItem?.id) {
+            // Make sure the inventory item for a particular product and lot has not just been created - this might be a case for a batch operation,
+            // where a few products might share the same inventory item. Since the batch list is bound at the beginning, e.g. 5th item might not know that 2nd item
+            // has already initialized and potentially created the inventory item that should be used by the 5th item afterwards.
+            InventoryItem inventoryItem = InventoryItem.findByProductAndLotNumber(command.inventoryItem.product, command.inventoryItem.lotNumber)
+            if (inventoryItem){
+                command.inventoryItem = inventoryItem
+            }
             if (!command.inventoryItem.validate()) {
                 throw new ValidationException("Invalid inventory item", command.inventoryItem.errors)
             }
-            command.inventoryItem.save()
+            // Flush is needed for the batch operation, so that for next iterations we are able to fetch just created inventory item in any previous row (look above for details)
+            command.inventoryItem.save(flush: true)
         }
         CycleCount cycleCount = command.cycleCount
 
