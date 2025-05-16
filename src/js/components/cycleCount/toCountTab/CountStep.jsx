@@ -32,6 +32,9 @@ const CountStep = () => {
     isSaveDisabled,
     setIsSaveDisabled,
     validateExistenceOfCycleCounts,
+    applyImportFile,
+    importItems,
+    importFile,
   } = useCountStep();
 
   return (
@@ -41,6 +44,9 @@ const CountStep = () => {
           printCountForm={printCountForm}
           next={() => validateExistenceOfCycleCounts(next)}
           save={() => validateExistenceOfCycleCounts(save)}
+          applyImportFile={applyImportFile}
+          importItems={importItems}
+          importFile={importFile}
         />
       ) : (
         <ConfirmStepHeader
