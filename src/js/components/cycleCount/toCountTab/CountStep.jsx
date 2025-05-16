@@ -1,14 +1,23 @@
-import React from 'react';
+import React, { useRef } from 'react';
+
+import _ from 'lodash';
+import { useSelector } from 'react-redux';
+import { getCycleCountRequestIds } from 'selectors';
 
 import ConfirmStepHeader from 'components/cycleCount/ConfirmStepHeader';
 import CountStepHeader from 'components/cycleCount/toCountTab/CountStepHeader';
 import CountStepTable from 'components/cycleCount/toCountTab/CountStepTable';
+import { TO_COUNT_TAB } from 'consts/cycleCount';
 import useCountStep from 'hooks/cycleCount/useCountStep';
 import PageWrapper from 'wrappers/PageWrapper';
 
 import 'components/cycleCount/cycleCount.scss';
 
 const CountStep = () => {
+  const cycleCountIds = useSelector(getCycleCountRequestIds);
+  // Stores initial cycleCountIds to detect changes when switching locations
+  const initialCycleCountIds = useRef(cycleCountIds);
+  const isFormDisabled = !_.isEqual(cycleCountIds, initialCycleCountIds.current);
   const {
     tableData,
     printCountForm,
@@ -44,6 +53,7 @@ const CountStep = () => {
           printCountForm={printCountForm}
           next={() => validateExistenceOfCycleCounts(next)}
           save={() => validateExistenceOfCycleCounts(save)}
+          isFormDisabled={isFormDisabled}
           applyImportFile={applyImportFile}
           importItems={importItems}
           importFile={importFile}
@@ -54,6 +64,10 @@ const CountStep = () => {
           save={() => validateExistenceOfCycleCounts(resolveDiscrepancies)}
           isSaveDisabled={isSaveDisabled}
           setIsSaveDisabled={setIsSaveDisabled}
+          isFormDisabled={isFormDisabled}
+          redirectTab={TO_COUNT_TAB}
+          redirectLabel="react.cycleCount.redirectToList.label"
+          redirectDefaultMessage="Back to Cycle Count List"
         />
       )}
       {tableData
@@ -76,6 +90,7 @@ const CountStep = () => {
             isFormValid={isFormValid}
             triggerValidation={triggerValidation}
             refreshFocusCounter={refreshFocusCounter}
+            isFormDisabled={isFormDisabled}
           />
         ))}
     </PageWrapper>

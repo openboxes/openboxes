@@ -19,6 +19,7 @@ const FileSelect = ({
   multiple,
   maxFiles,
   allowedExtensions,
+  isFormDisabled,
   ...fieldProps
 }) => {
   const onDrop = useCallback((acceptedFiles) => {
@@ -53,6 +54,7 @@ const FileSelect = ({
     validator: validateFileType,
     multiple,
     maxFiles,
+    disabled: isFormDisabled,
   });
 
   const mapFiles = (files) => files.map((file) => {
@@ -81,7 +83,7 @@ const FileSelect = ({
       <div {...getRootProps({ className: `dropzone d-flex flex-column justify-content-center align-items-center p-3 bg-light ${className}` })} {...fieldProps}>
         <input {...getInputProps()} />
         <h5 className="text-secondary font-italic">{translate(dropzoneText.id, dropzoneText.defaultMessage)}</h5>
-        <Button className="mt-3" onClick={open} variant={buttonVariant} defaultLabel={buttonLabel.defaultMessage} label={buttonLabel.id} />
+        <Button disabled={isFormDisabled} className="mt-3" onClick={open} variant={buttonVariant} defaultLabel={buttonLabel.defaultMessage} label={buttonLabel.id} />
       </div>
       {acceptedFiles.length ? (
         <aside>
@@ -136,6 +138,7 @@ FileSelect.propTypes = {
   maxFiles: PropTypes.number,
   // allowed extensions for importing (disabled when set to empty array)
   allowedExtensions: PropTypes.arrayOf(PropTypes.string),
+  isFormDisabled: PropTypes.bool,
 };
 
 FileSelect.defaultProps = {
@@ -155,4 +158,5 @@ FileSelect.defaultProps = {
   multiple: false,
   maxFiles: null,
   allowedExtensions: [],
+  isFormDisabled: false,
 };

@@ -12,7 +12,7 @@ import RedirectButton from 'utils/RedirectButton';
 import Translate from 'utils/Translate';
 
 const CountStepHeader = ({
-  printCountForm, next, save, applyImportFile, importItems, importFile,
+  printCountForm, next, save, applyImportFile, importItems, importFile, isFormDisabled,
 }) => (
   <div>
     <div className="d-flex justify-content-sm-between align-items-end">
@@ -30,6 +30,7 @@ const CountStepHeader = ({
             label="react.cycleCount.printCountForm.label"
             variant="primary-outline"
             StartIcon={<RiPrinterLine size={18} />}
+            disabled={isFormDisabled}
           />
           <div className="dropdown-menu dropdown-menu-right nav-item padding-8" aria-labelledby="dropdownMenuButton">
             <a href="#" className="dropdown-item" onClick={() => printCountForm(FileFormat.PDF)} role="button">
@@ -52,12 +53,14 @@ const CountStepHeader = ({
           defaultLabel="Save progress"
           variant="primary"
           StartIcon={<RiSave2Line size={18} />}
+          disabled={isFormDisabled}
         />
         <Button
           onClick={next}
           label="react.default.button.next.label"
           defaultLabel="Next"
           variant="primary"
+          disabled={isFormDisabled}
         />
       </div>
     </div>
@@ -71,13 +74,14 @@ const CountStepHeader = ({
         }}
         minHeight=""
         onChange={applyImportFile}
+        isFormDisabled={isFormDisabled}
       />
       <Button
         variant="primary"
         onClick={importItems}
         label="react.cycleCount.confirmImport.label"
         defaultLabel="Confirm import"
-        disabled={!importFile}
+        disabled={!importFile || isFormDisabled}
       />
     </div>
   </div>
@@ -89,6 +93,7 @@ CountStepHeader.propTypes = {
   printCountForm: PropTypes.func.isRequired,
   next: PropTypes.func.isRequired,
   save: PropTypes.func.isRequired,
+  isFormDisabled: PropTypes.func.isRequired,
   applyImportFile: PropTypes.func.isRequired,
   importItems: PropTypes.func.isRequired,
   importFile: PropTypes.shape({}).isRequired,
