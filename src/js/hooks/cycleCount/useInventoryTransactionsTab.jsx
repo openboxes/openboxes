@@ -30,7 +30,7 @@ const useInventoryTransactionsTab = ({
 }) => {
   const columnHelper = createColumnHelper();
   const translate = useTranslate();
-  const { products } = filterParams;
+  const { products, endDate, startDate } = filterParams;
   const {
     currentLocale,
     currentLocation,
@@ -52,6 +52,16 @@ const useInventoryTransactionsTab = ({
     max: `${pageSize}`,
     ...sortingParams,
     ...filterParams,
+    endDate: dateWithoutTimeZone({
+      date: endDate,
+      currentDateFormat: DateFormat.DD_MMM_YYYY,
+      outputDateFormat: DateFormat.MM_DD_YYYY,
+    }),
+    startDate: dateWithoutTimeZone({
+      date: startDate,
+      currentDateFormat: DateFormat.DD_MMM_YYYY,
+      outputDateFormat: DateFormat.MM_DD_YYYY,
+    }),
     products: products?.map?.(({ id }) => id),
     facility: currentLocation?.id,
   }, (val) => {
