@@ -987,6 +987,11 @@ class UrlMappings {
             action = [PATCH: "updateCycleCountItem", DELETE: "deleteCycleCountItem"]
         }
 
+        "/api/facilities/$facility/cycle-counts/items/upload/count" {
+            controller = "cycleCountApi"
+            action = [POST: "uploadCycleCountItems"]
+        }
+
         "/api/facilities/$facility/cycle-counts/$cycleCountId/items" {
             controller = "cycleCountApi"
             action = [POST: "createCycleCountItem"]

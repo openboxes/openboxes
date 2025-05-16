@@ -3,11 +3,14 @@ package org.pih.warehouse.api
 import grails.converters.JSON
 import grails.validation.ValidationException
 import org.apache.commons.csv.CSVPrinter
-import org.pih.warehouse.CommandUtils
-import org.pih.warehouse.batch.BatchController
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.DocumentService
+import org.pih.warehouse.core.UploadService
 import org.pih.warehouse.core.dtos.BatchCommandUtils
+import org.pih.warehouse.importer.CycleCountItemsExcelImporter
+import org.pih.warehouse.importer.DataImporter
+import org.pih.warehouse.importer.ImportDataCommand
+import org.pih.warehouse.importer.PackingListExcelImporter
 import org.pih.warehouse.inventory.CycleCountCandidate
 import org.pih.warehouse.inventory.CycleCountCandidateFilterCommand
 import org.pih.warehouse.inventory.CycleCountDto
@@ -25,11 +28,13 @@ import org.pih.warehouse.inventory.CycleCountSubmitRecountCommand
 import org.pih.warehouse.inventory.CycleCountUpdateItemBatchCommand
 import org.pih.warehouse.inventory.CycleCountUpdateItemCommand
 import org.pih.warehouse.inventory.PendingCycleCountRequest
+import org.springframework.web.multipart.MultipartFile
 
 class CycleCountApiController {
 
     CycleCountService cycleCountService
     DocumentService documentService
+    UploadService uploadService
 
     def getCandidates(CycleCountCandidateFilterCommand filterParams) {
         List<CycleCountCandidate> cycleCounts = cycleCountService.getCandidates(filterParams, params.facilityId)
@@ -212,5 +217,14 @@ class CycleCountApiController {
         List<CycleCountItemDto> cycleCountItems = cycleCountService.updateCycleCountItems(command.itemsToUpdate)
 
         render([data: cycleCountItems] as JSON)
+    }
+
+    def uploadCycleCountItems(ImportDataCommand command) {
+        MultipartFile importFile = command.importFile
+        File localFile = uploadService.createLocalFile(importFile.originalFilename)
+        importFile.transferTo(localFile)
+        DataImporter cycleCountItemsExcelImporter = new CycleCountItemsExcelImporter(localFile.absolutePath)
+
+        render([data: cycleCountItemsExcelImporter.data] as JSON)
     }
 }

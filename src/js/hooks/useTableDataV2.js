@@ -19,18 +19,14 @@ const useTableDataV2 = ({
   errorMessageId,
   defaultErrorMessage,
   getParams,
-  offset,
   pageSize,
   sort,
   order,
-  searchTerm,
-  filterParams,
   shouldFetch,
+  serializedParams,
 }) => {
   const sourceRef = useRef(CancelToken.source());
-
   const translate = useTranslate();
-
   const [loading, setLoading] = useState(false);
   const [tableData, setTableData] = useState({
     data: [],
@@ -72,12 +68,10 @@ const useTableDataV2 = ({
       fetchData();
     }
   }, [
-    filterParams,
+    serializedParams,
     pageSize,
-    offset,
     sort,
     order,
-    searchTerm,
   ]);
 
   // Start displaying the loader in the table when

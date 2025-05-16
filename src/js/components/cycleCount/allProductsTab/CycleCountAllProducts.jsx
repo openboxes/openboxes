@@ -20,6 +20,7 @@ const CycleCountAllProducts = ({
     offset,
     pageSize,
     setTotalCount,
+    serializedParams,
   } = tablePaginationProps;
 
   const {
@@ -37,6 +38,7 @@ const CycleCountAllProducts = ({
     pageSize,
     resetForm,
     setToCountCheckedCheckboxes,
+    serializedParams,
   });
 
   const translate = useTranslate();
@@ -96,5 +98,6 @@ CycleCountAllProducts.propTypes = {
     offset: PropTypes.number.isRequired,
     pageSize: PropTypes.number.isRequired,
     setTotalCount: PropTypes.func.isRequired,
+    serializedParams: PropTypes.number.isRequired,
   }).isRequired,
 };
