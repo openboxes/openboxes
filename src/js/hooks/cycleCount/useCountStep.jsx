@@ -12,7 +12,7 @@ import _ from 'lodash';
 import queryString from 'query-string';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
-import { getCurrentLocation, getCycleCountRequestIds } from 'selectors';
+import { getBinLocations, getCurrentLocation, getCycleCountRequestIds } from 'selectors';
 
 import {
   eraseDraft,
@@ -64,9 +64,11 @@ const useCountStep = () => {
   const {
     cycleCountIds,
     currentLocation,
+    binLocations,
   } = useSelector((state) => ({
     cycleCountIds: getCycleCountRequestIds(state),
     currentLocation: getCurrentLocation(state),
+    binLocations: getBinLocations(state),
   }));
 
   const resetFocus = () => {
@@ -569,6 +571,33 @@ const useCountStep = () => {
   };
 
   const importItems = async (importFile) => {
+  const applyImportFile = async (e) => {
+    if (e instanceof File) {
+      setImportFile(e);
+    }
+  };
+
+  const createCustomItemsFromImport = (items) => items.map((item) => ({
+    // FIXME: Think if it's not better to implicilty build the item without the spreading of ...item
+    ...item,
+    countIndex: 0,
+    id: _.uniqueId('newRow'),
+    custom: true,
+    inventoryItem: {
+      lotNumber: item.lotNumber,
+      expirationDate: item.expirationDate,
+    },
+    product: {
+      // FIXME: Since we provide only productCode,
+      // FIXME: we probably need to fetch a product by productCode to have "id" in order
+      // FIXME: for it to be bound further on backend
+      // FIXME: Or change the binding in the command to find by code/id (using BindUsing)
+      id: null,
+      productCode: item.productCode,
+    },
+  }));
+
+  const importItems = async () => {
     try {
       show();
       const response = await cycleCountApi.importCycleCountItems(
@@ -576,10 +605,41 @@ const useCountStep = () => {
         currentLocation?.id,
       );
       console.log(response);
+      const response = await cycleCountApi.importCycleCountItems(importFile, currentLocation?.id);
+      const cycleCounts = _.groupBy(response.data.data, 'cycleCountId');
+      console.log(cycleCounts);
+      console.log(tableData.current);
+      tableData.current = tableData.current.map((cycleCount) => ({
+        ...cycleCount,
+        cycleCountItems: [
+          ...cycleCount.cycleCountItems
+            .map((item) => {
+              // eslint-disable-next-line max-len
+              const correspondingImportItem = cycleCounts[cycleCount.id].find((cycleCountItem) => cycleCountItem.cycleCountItemId === item.id);
+
+              return {
+                ...item,
+                ...correspondingImportItem,
+                // FIXME: Think of another way to bind binLocation.It doesn't work for receving bins
+                // FIXME: feels like a cycle count item might be created for e.g. "R-561BCE",
+                // FIXME: but such bin locations are not fetched in the getBinLocations method.
+                // FIXME: We probably intentionally don't fetch them as far as I'm concerned.
+                binLocation: binLocations.find((location) =>
+                  location.name === correspondingImportItem.binLocation),
+              };
+            }),
+          // FIXME: For now I find custom items in import by just looking
+          // if the cycleCountItemId column is empty. This is dangerous though,
+          // because a user might input something there, and the item
+          // would not be treated as custom anymore
+          // eslint-disable-next-line max-len
+          ...createCustomItemsFromImport(cycleCounts[cycleCount.id].filter((item) => !item.cycleCountItemId)),
+        ],
+      }));
+      console.log(tableData.current);
     } finally {
       hide();
     }
-    // TODO: Map items to the table
   };
 
   return {

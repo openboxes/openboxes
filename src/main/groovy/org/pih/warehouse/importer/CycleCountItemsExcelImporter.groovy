@@ -17,18 +17,20 @@ class CycleCountItemsExcelImporter extends AbstractExcelImporter implements Data
             startRow : 1,
             columnMap: [
                     A: "cycleCountId",
-                    B: "productCode",
-                    C: "product.name",
-                    D: "lotNumber",
-                    E: "expirationDate",
-                    F: "binLocation",
-                    G: "quantityCounted",
-                    H: "comment",
+                    B: "cycleCountItemId",
+                    C: "productCode",
+                    D: "product.name",
+                    E: "lotNumber",
+                    F: "expirationDate",
+                    G: "binLocation",
+                    H: "quantityCounted",
+                    I: "comment",
             ]
     ]
 
     static Map PROPERTY_MAP = [
             cycleCountId:             ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            cycleCountItemId:         ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
             productCode:              ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
             "product.name":           ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
             "lotNumber":              ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
