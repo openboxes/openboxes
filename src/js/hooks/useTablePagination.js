@@ -5,6 +5,7 @@ const useTablePagination = ({
   totalCount,
   filterParams,
   setShouldFetch,
+  disableAutoUpdateFilterParams,
 }) => {
   const [pagination, setPagination] = useState({
     pageIndex: 0,
@@ -72,7 +73,9 @@ const useTablePagination = ({
   const canPrevious = () => pagination.pageIndex > 0;
 
   useEffect(() => {
-    onPageChange(0);
+    if (!disableAutoUpdateFilterParams) {
+      onPageChange(0);
+    }
   }, [filterParams]);
 
   return {
@@ -88,6 +91,7 @@ const useTablePagination = ({
     offset: pagination.pageIndex * pagination.pageSize,
     pageSize: pagination?.pageSize,
     serializedParams,
+    setSerializedParams,
   };
 };
 

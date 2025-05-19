@@ -18,8 +18,8 @@ const InventoryTransactionsTab = ({
     setTotalCount,
     pageSize,
     offset,
+    serializedParams,
   } = tablePaginationProps;
-
   const {
     columns,
     tableData,
@@ -33,6 +33,7 @@ const InventoryTransactionsTab = ({
     offset,
     shouldFetch,
     setShouldFetch,
+    serializedParams,
   });
 
   useEffect(() => {
@@ -73,6 +74,7 @@ InventoryTransactionsTab.propTypes = {
     offset: PropTypes.number.isRequired,
     pageSize: PropTypes.number.isRequired,
     setTotalCount: PropTypes.func.isRequired,
+    serializedParams: PropTypes.number.isRequired,
   }).isRequired,
   shouldFetch: PropTypes.bool.isRequired,
   setShouldFetch: PropTypes.func.isRequired,

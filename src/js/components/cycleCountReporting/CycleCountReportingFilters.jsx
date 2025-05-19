@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useRef } from 'react';
 
 import PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
@@ -14,7 +14,9 @@ const CycleCountReportingFilters = ({
   isLoading,
   filterFields,
   setShouldFetch,
+  tablePaginationProps,
 }) => {
+  const updateCounter = useRef(0);
   const {
     debounceTime,
     minSearchLength,
@@ -22,7 +24,7 @@ const CycleCountReportingFilters = ({
     debounceTime: state.session.searchConfig.debounceTime,
     minSearchLength: state.session.searchConfig.minSearchLength,
   }));
-
+  const { setSerializedParams } = tablePaginationProps;
   const debouncedProductsFetch = useCallback(
     debounceProductsFetch(
       debounceTime,
@@ -34,8 +36,14 @@ const CycleCountReportingFilters = ({
       <FilterForm
         filterFields={filterFields}
         updateFilterParams={(values) => {
+          updateCounter.current += 1;
+          const valuesWithCounter = {
+            ...values,
+            updateCounter: updateCounter.current,
+          };
           setFilterParams({ ...values });
-          return setShouldFetch(true);
+          setShouldFetch(true);
+          setSerializedParams(JSON.stringify(valuesWithCounter));
         }}
         formProps={{
           ...formProps,
@@ -65,6 +73,7 @@ CycleCountReportingFilters.propTypes = {
   filterFields: PropTypes.shape({}),
   isLoading: PropTypes.bool.isRequired,
   setShouldFetch: PropTypes.func,
+  tablePaginationProps: PropTypes.shape({}).isRequired,
 };
 
 CycleCountReportingFilters.defaultProps = {
