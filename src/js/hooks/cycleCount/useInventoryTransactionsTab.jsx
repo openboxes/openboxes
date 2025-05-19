@@ -26,6 +26,7 @@ const useInventoryTransactionsTab = ({
   pageSize,
   shouldFetch,
   setShouldFetch,
+  serializedParams,
 }) => {
   const columnHelper = createColumnHelper();
   const translate = useTranslate();
@@ -78,6 +79,7 @@ const useInventoryTransactionsTab = ({
     order,
     searchTerm: null,
     filterParams,
+    serializedParams,
   });
 
   const columns = useMemo(() => [columnHelper.accessor(cycleCountColumn.ALIGNMENT, {
