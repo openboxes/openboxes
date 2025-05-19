@@ -37,6 +37,7 @@ const useAllProductsTab = ({
   pageSize,
   resetForm,
   setToCountCheckedCheckboxes,
+  serializedParams,
 }) => {
   const columnHelper = createColumnHelper();
   const spinner = useSpinner();
@@ -120,6 +121,7 @@ const useAllProductsTab = ({
     order,
     searchTerm,
     filterParams,
+    serializedParams,
   });
 
   const productIds = tableData.data.map((row) => row.product.id);

@@ -8,6 +8,7 @@ const useCycleCountPagination = (filterParams, setShouldFetch, defaultPageSize =
     paginationProps,
     offset,
     pageSize,
+    serializedParams,
   } = useTablePagination({
     defaultPageSize,
     totalCount,
@@ -20,6 +21,7 @@ const useCycleCountPagination = (filterParams, setShouldFetch, defaultPageSize =
     offset,
     pageSize,
     setTotalCount,
+    serializedParams,
   };
 };
 

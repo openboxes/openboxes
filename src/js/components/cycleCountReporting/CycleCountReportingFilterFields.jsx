@@ -2,22 +2,22 @@ import DateFilter from 'components/form-elements/DateFilter/DateFilter';
 import FilterSelectField from 'components/form-elements/FilterSelectField';
 
 export default {
-  startDate: {
+  endDate: {
     type: DateFilter,
     attributes: {
-      label: 'react.cycleCountReporting.filters.createdBefore.label',
-      defaultMessage: 'Created before',
+      label: 'react.cycleCountReporting.filters.createdAfter.label',
+      defaultMessage: 'Created after',
       dateFormat: 'MM/DD/YYYY',
       showLabelTooltip: true,
       filterElement: true,
       top: true,
     },
   },
-  endDate: {
+  startDate: {
     type: DateFilter,
     attributes: {
-      label: 'react.cycleCountReporting.filters.createdAfter.label',
-      defaultMessage: 'Created after',
+      label: 'react.cycleCountReporting.filters.createdBefore.label',
+      defaultMessage: 'Created before',
       dateFormat: 'MM/DD/YYYY',
       showLabelTooltip: true,
       filterElement: true,

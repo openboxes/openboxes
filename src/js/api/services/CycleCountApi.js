@@ -3,6 +3,7 @@ import queryString from 'query-string';
 import {
   CYCLE_COUNT, CYCLE_COUNT_ITEM,
   CYCLE_COUNT_ITEMS_BATCH,
+  CYCLE_COUNT_ITEMS_IMPORT,
   CYCLE_COUNT_RECOUNT_START,
   CYCLE_COUNT_REFRESH_ITEMS,
   CYCLE_COUNT_REQUESTS,
@@ -48,4 +49,14 @@ export default {
     apiClient.post(CYCLE_COUNT_ITEMS_BATCH(locationId, cycleCountId), payload),
   updateCycleCountItems: (payload, locationId, cycleCountId) =>
     apiClient.patch(CYCLE_COUNT_ITEMS_BATCH(locationId, cycleCountId), payload),
+  importCycleCountItems: (file, locationId) => {
+    const formData = new FormData();
+    formData.append('importFile', file);
+    const config = {
+      headers: {
+        'content-type': 'multipart/form-data',
+      },
+    };
+    return apiClient.post(CYCLE_COUNT_ITEMS_IMPORT(locationId), formData, config);
+  },
 };
