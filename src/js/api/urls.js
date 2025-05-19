@@ -199,4 +199,3 @@ export const CYCLE_COUNT_ITEMS_IMPORT = (locationId) => `${CYCLE_COUNT(locationI
 // REPORTING
 export const REPORTS = `${API}/reports`;
 export const CYCLE_COUNT_DETAILS_REPORT = `${REPORTS}/cycle-count-details`;
-
