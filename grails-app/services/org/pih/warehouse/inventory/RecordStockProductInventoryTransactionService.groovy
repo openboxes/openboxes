@@ -17,9 +17,9 @@ class RecordStockProductInventoryTransactionService {
 
     Transaction createInventoryBaselineTransaction(
             Location facility,
-            Date transactionDate=new Date(),
-            List<AvailableItem> items) {
-
+            Date transactionDate = new Date(),
+            List<AvailableItem> items
+    ) {
         TransactionType transactionType = TransactionType.read(Constants.INVENTORY_BASELINE_TRANSACTION_TYPE_ID)
 
         Transaction transaction = new Transaction(
@@ -36,8 +36,8 @@ class RecordStockProductInventoryTransactionService {
                     quantity: availableItem.quantityOnHand,
                     binLocation: availableItem.binLocation,
                     inventoryItem: availableItem.inventoryItem,
-                    transaction: transaction,
             )
+
             transaction.addToTransactionEntries(transactionEntry)
         }
 
