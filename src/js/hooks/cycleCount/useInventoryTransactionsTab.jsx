@@ -1,14 +1,16 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 
 import { createColumnHelper } from '@tanstack/react-table';
 import _ from 'lodash';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
+import { fetchReasonCodes } from 'actions';
+import { FETCH_CYCLE_COUNT_REASON_CODES } from 'actions/types';
 import { CYCLE_COUNT_DETAILS_REPORT } from 'api/urls';
 import { TableCell } from 'components/DataTable';
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
 import ValueIndicator from 'components/DataTable/v2/ValueIndicator';
-import { INVENTORY_ITEM_URL, INVENTORY_URL } from 'consts/applicationUrls';
+import { INVENTORY_ITEM_URL } from 'consts/applicationUrls';
 import cycleCountColumn from 'consts/cycleCountColumn';
 import { DateFormat } from 'consts/timeFormat';
 import transactionType from 'consts/transactionType';
@@ -34,11 +36,13 @@ const useInventoryTransactionsTab = ({
   const {
     currentLocale,
     currentLocation,
+    reasonCodes,
   } = useSelector((state) => ({
     currentLocale: state.session.activeLanguage,
     currentLocation: state.session.currentLocation,
+    reasonCodes: state.cycleCount.reasonCodes,
   }));
-
+  const dispatch = useDispatch();
   const {
     sortableProps,
     sort,
@@ -64,6 +68,7 @@ const useInventoryTransactionsTab = ({
   const {
     tableData,
     loading,
+    setTableData,
   } = useTableDataV2({
     url: CYCLE_COUNT_DETAILS_REPORT,
     errorMessageId: 'react.cycleCount.table.errorMessage.label',
@@ -81,6 +86,15 @@ const useInventoryTransactionsTab = ({
     filterParams,
     serializedParams,
   });
+  useEffect(() => {
+    if (!reasonCodes?.length) {
+      dispatch(fetchReasonCodes('ADJUST_INVENTORY', FETCH_CYCLE_COUNT_REASON_CODES));
+    }
+  }, []);
+
+  useEffect(() => {
+    setTableData({ data: [], totalCount: 0 });
+  }, [currentLocation?.id]);
 
   const columns = useMemo(() => [columnHelper.accessor(cycleCountColumn.ALIGNMENT, {
     header: () => (
@@ -104,7 +118,7 @@ const useInventoryTransactionsTab = ({
     meta: {
       pinned: 'left',
     },
-    size: 120,
+    size: 100,
   }), columnHelper.accessor(cycleCountColumn.PRODUCT, {
     header: () => (
       <TableHeaderCell sortable columnId={cycleCountColumn.PRODUCT} {...sortableProps}>
@@ -127,20 +141,24 @@ const useInventoryTransactionsTab = ({
       <TableCell
         link={INVENTORY_ITEM_URL.showStockCard(id)}
         className="rt-td multiline-cell"
+        customTooltip
+        tooltipLabel={`${productCode} ${name}`}
       >
-        {productCode}
-        {' '}
-        {name}
+        <div className="limit-lines-2">
+          {productCode}
+          {' '}
+          {name}
+        </div>
       </TableCell>
     ),
     meta: {
       pinned: 'left',
     },
-    size: 240,
+    size: 360,
   }), columnHelper.accessor(cycleCountColumn.TRANSACTION_TYPE, {
     header: () => (
       <TableHeaderCell sortable columnId={cycleCountColumn.TRANSACTION_TYPE} {...sortableProps}>
-        {translate('react.cycleCount.inventoryTransactionsTable.transactionType.label', 'Transaction Type')}
+        {translate('react.cycleCount.inventoryTransactionsTable.type.label', 'Type')}
       </TableHeaderCell>
     ),
     cell: ({ getValue }) => {
@@ -161,7 +179,7 @@ const useInventoryTransactionsTab = ({
     meta: {
       pinned: 'left',
     },
-    size: 150,
+    size: 75,
   }), columnHelper.accessor(cycleCountColumn.RECORDED, {
     header: () => (
       <TableHeaderCell>
@@ -202,12 +220,8 @@ const useInventoryTransactionsTab = ({
       pinned: 'left',
     },
     size: 145,
-    cell: ({
-      getValue,
-      row: { original: { cycleCount: { id } } },
-    }) => (
+    cell: ({ getValue }) => (
       <TableCell
-        link={INVENTORY_URL.showTransaction(id)}
         className="rt-td"
       >
         {getValue()?.toString()}
@@ -219,12 +233,10 @@ const useInventoryTransactionsTab = ({
         {translate('react.cycleCount.inventoryTransactionsTable.qtyBefore.label', 'Qty Before')}
       </TableHeaderCell>
     ),
-    size: 130,
+    size: 100,
     cell: ({ getValue }) => (
-      <TableCell
-        className="rt-td d-flex justify-content-end"
-      >
-        {getValue()?.toString()}
+      <TableCell className="rt-td d-flex justify-content-end">
+        {(getValue() ?? 0).toString()}
       </TableCell>
     ),
   }), columnHelper.accessor(cycleCountColumn.QTY_AFTER, {
@@ -233,7 +245,7 @@ const useInventoryTransactionsTab = ({
         {translate('react.cycleCount.inventoryTransactionsTable.qtyAfter.label', 'Qty After')}
       </TableHeaderCell>
     ),
-    size: 120,
+    size: 100,
     cell: ({ getValue }) => (
       <TableCell
         className="rt-td d-flex justify-content-end"
@@ -253,15 +265,15 @@ const useInventoryTransactionsTab = ({
           verificationCount: {
             quantityOnHand,
             quantityVariance,
-            quantityCounted,
           },
         },
       },
     }) => {
       const variant = getCycleCountDifferencesVariant(quantityVariance, quantityOnHand);
-      const percentageValue = Math.round(
-        (Math.abs(quantityVariance) / (quantityCounted || quantityOnHand)) * 1000,
-      ) / 10;
+      const percentageValue =
+        quantityOnHand !== 0
+          ? Math.round((Math.abs(quantityVariance) / Math.abs(quantityOnHand)) * 100)
+          : 100;
       const className = quantityVariance > 0 ? 'value-indicator--more' : 'value-indicator--less';
 
       return (
@@ -298,7 +310,7 @@ const useInventoryTransactionsTab = ({
         className="rt-td multiline-cell"
       >
         <div className="limit-lines-1">
-          {_.capitalize(getValue())}
+          {reasonCodes.find((c) => c.value === getValue())?.label}
         </div>
       </TableCell>
     ),
@@ -322,11 +334,15 @@ const useInventoryTransactionsTab = ({
     ),
   })], [currentLocale]);
 
-  const emptyTableMessage = {
-    id: 'react.cycleCount.inventoryTransactionTable.emptyTable.label',
-    defaultMessage: 'Select a time range from above filters to load the table.',
-  };
-
+  const emptyTableMessage = !filterParams.startDate && !filterParams.endDate
+    ? {
+      id: 'react.cycleCount.inventoryTransactionTable.emptyTable.label',
+      defaultMessage: 'Select a time range from above filters to load the table.',
+    }
+    : {
+      id: 'react.cycleCount.table.noResultFound.label',
+      defaultMessage: 'No result found.',
+    };
   const exportData = () => {
     console.log('Button pressed');
   };

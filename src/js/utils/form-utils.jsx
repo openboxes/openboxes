@@ -15,7 +15,6 @@ import 'react-tippy/dist/tippy.css';
 
 export const renderFormField = (fieldConfig, fieldName, props = {}) => {
   const FieldType = fieldConfig.type;
-
   return (
     <FieldType
       key={fieldName}
@@ -39,7 +38,7 @@ export const renderFormFields = ({
   translate,
   meta: { touched, error },
 }) => {
-  const attr = { id: input.name, ...otherAttributes };
+  const attr = { id: input.name, required, ...otherAttributes };
   const { filterElement, className: supplementClass, ...otherAttr } = attr;
   const filterElementClass = filterElement ? 'filter-group' : 'mb-0 mx-1 form-group';
   const requiredClass = required ? 'required' : '';

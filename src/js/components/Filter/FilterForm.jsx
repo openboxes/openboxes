@@ -105,6 +105,21 @@ const FilterForm = ({
     form.reset(clearedFilterList);
   };
 
+  const isSubmitDisabled = (values) => {
+    const allFiltersEmpty = !allowEmptySubmit && _.every(values, (value) => !value);
+
+    const requiredFiltersMissing = !_.every(filterFields, (fieldConfig, fieldName) => {
+      const isRequired = _.get(fieldConfig, 'attributes.required');
+      if (!isRequired) {
+        return true;
+      }
+
+      return !!values[fieldName];
+    });
+
+    return allFiltersEmpty || requiredFiltersMissing;
+  };
+
   useEffect(() => {
     if (formRef.current) {
       onClearHandler(formRef.current);
@@ -156,7 +171,7 @@ const FilterForm = ({
                     <Button
                       defaultLabel={customSubmitButtonDefaultLabel || 'Search'}
                       label={customSubmitButtonLabel || 'react.button.search.label'}
-                      disabled={!allowEmptySubmit && _.every(values, (value) => !value)}
+                      disabled={isSubmitDisabled(values)}
                       variant="primary"
                       type="submit"
                     />
@@ -164,8 +179,8 @@ const FilterForm = ({
                 </div>
 
                 <div className="d-flex pt-2 flex-wrap gap-8 align-items-center filters-row">
-                  {!filtersHidden &&
-                    _.map(
+                  {!filtersHidden
+                    && _.map(
                       // Render filters with top: false
                       _.pickBy(filterFields, (field) => !field.attributes?.top),
                       (fieldConfig, fieldName) =>
