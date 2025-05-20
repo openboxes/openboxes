@@ -101,6 +101,7 @@ const useTableDataV2 = ({
     setLoading,
     tableData,
     fetchData,
+    setTableData,
   };
 };
 

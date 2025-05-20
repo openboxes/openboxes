@@ -50,11 +50,10 @@ const CycleCountReportingFilters = ({
           debouncedProductsFetch,
         }}
         defaultValues={defaultValues}
-        allowEmptySubmit
         ignoreClearFilters={['tab']}
         hidden={false}
         isLoading={isLoading}
-        customSubmitButtonLabel="react.cycleCountReporting.filter.loadTable.label"
+        customSubmitButtonLabel="react.cycleCount.filters.loadTable.label"
         customSubmitButtonDefaultLabel="Load table"
         showFilterVisibilityToggler={false}
         showSearchField={false}
