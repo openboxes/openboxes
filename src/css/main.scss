@@ -1042,9 +1042,14 @@ div.search-input:focus-within {
   border: none;
   color: var(--blue-700);
 
-  &:hover {
+  &:not(:disabled):hover {
     background-color: var(--blue-200);
     color: var(--blue-primary);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    background: transparent;
   }
 }
 

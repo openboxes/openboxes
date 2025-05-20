@@ -1,8 +1,13 @@
-import React from 'react';
+import React, { useRef } from 'react';
+
+import _ from 'lodash';
+import { useSelector } from 'react-redux';
+import { getCycleCountsIds } from 'selectors';
 
 import ConfirmStepHeader from 'components/cycleCount/ConfirmStepHeader';
 import ResolveStepHeader from 'components/cycleCount/toResolveTab/ResolveStepHeader';
 import ResolveStepTable from 'components/cycleCount/toResolveTab/ResolveStepTable';
+import { TO_RESOLVE_TAB } from 'consts/cycleCount';
 import useResolveStep from 'hooks/cycleCount/useResolveStep';
 import useTranslation from 'hooks/useTranslation';
 import PageWrapper from 'wrappers/PageWrapper';
@@ -10,6 +15,10 @@ import PageWrapper from 'wrappers/PageWrapper';
 import 'components/cycleCount/cycleCount.scss';
 
 const ResolveStep = () => {
+  const cycleCountIds = useSelector(getCycleCountsIds);
+  // Stores initial cycleCountIds to detect changes when switching locations
+  const initialCycleCountIds = useRef(cycleCountIds);
+  const isFormDisabled = !_.isEqual(cycleCountIds, initialCycleCountIds.current);
   const {
     tableData,
     validationErrors,
@@ -48,6 +57,7 @@ const ResolveStep = () => {
           refreshCountItems={refreshCountItems}
           next={next}
           save={save}
+          isFormDisabled={isFormDisabled}
         />
       ) : (
         <ConfirmStepHeader
@@ -55,6 +65,10 @@ const ResolveStep = () => {
           save={submitRecount}
           isSaveDisabled={isSaveDisabled}
           setIsSaveDisabled={setIsSaveDisabled}
+          isFormDisabled={isFormDisabled}
+          redirectTab={TO_RESOLVE_TAB}
+          redirectLabel="react.cycleCount.redirectToResolveTab.label"
+          redirectDefaultMessage="Back to Resolve tab"
         />
       )}
       {tableData
@@ -82,6 +96,7 @@ const ResolveStep = () => {
             cycleCountWithItemsWithoutRecount={
               cycleCountsWithItemsWithoutRecount.find((cycleCount) => cycleCount.id === id)
             }
+            isFormDisabled={isFormDisabled}
           />
         ))}
     </PageWrapper>
