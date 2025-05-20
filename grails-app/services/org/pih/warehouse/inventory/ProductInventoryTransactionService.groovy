@@ -26,6 +26,34 @@ abstract class ProductInventoryTransactionService<T> {
     /**
      * Create a new "inventory baseline" product inventory transaction based on the current QoH in product availability.
      *
+     * If you already have access to available items, it's better to use createInventoryBaselineTransactionForGivenStock
+     * and pass them in to avoid needlessly re-computing computing QoH / available items (which can be slow).
+     *
+     * @param facility The Location to take the baseline snapshot at
+     * @param sourceObject The source object that caused the Transaction. Ex: CycleCount, Order, Requisition...
+     * @param products The Products to take the baseline snapshot for
+     * @param transactionDate The datetime that the transaction should be marked with. If left blank will be
+     *                        the current time.
+     * @param comment An optional comment to associate with the transaction
+     * @return The Transaction that was created
+     */
+    Transaction createInventoryBaselineTransaction(
+            Location facility,
+            T sourceObject,
+            List<Product> products,
+            Date transactionDate=null,
+            String comment=null) {
+
+        List<AvailableItem> availableItems = productAvailabilityService.getAvailableItemsAtDate(
+                facility, products, transactionDate)
+
+        createInventoryBaselineTransactionForGivenStock(
+                facility, sourceObject, availableItems, transactionDate, comment)
+    }
+
+    /**
+     * Create a new "inventory baseline" product inventory transaction based on the given product availability.
+     *
      * We refer to this transaction as a "baseline" because it gives us two things:
      *
      * 1) It sets a new baseline for the stock of the product. Any transactions on the product that are backdated to
@@ -36,35 +64,33 @@ abstract class ProductInventoryTransactionService<T> {
      *    this method should NOT result in any quantity changes/adjustments. (However if transactions are backdated to
      *    before the baseline, the baseline will have an implied quantity adjustment.)
      *
-     * @param facility The Location to take the product inventory snapshot at
-     * @param product The Product to take the product inventory snapshot for
+     * @param facility The Location to take the baseline snapshot at
      * @param sourceObject The source object that caused the Transaction. Ex: CycleCount, Order, Requisition...
-     * @param transactionDate The datetime that the transaction should be marked with
+     * @partam availableItems The stock to take a baseline snapshot against.
+     * @param transactionDate The datetime that the transaction should be marked with. If left blank will be
+     *                        the current time.
+     * @param comment An optional comment to associate with the transaction
      * @return The Transaction that was created
      */
-    Transaction createInventoryBaselineTransaction(
+    Transaction createInventoryBaselineTransactionForGivenStock(
             Location facility,
-            Product product,
             T sourceObject,
-            Date transactionDate=new Date()) {
+            Collection<AvailableItem> availableItems,
+            Date transactionDate=new Date(),
+            String comment=null) {
 
         TransactionType transactionType = TransactionType.read(Constants.INVENTORY_BASELINE_TRANSACTION_TYPE_ID)
 
         Transaction transaction = new Transaction(
-                source: facility,
                 inventory: facility.inventory,
                 transactionDate: transactionDate,
                 transactionType: transactionType,
+                comment: comment,
         )
 
         transaction.transactionNumber = transactionIdentifierService.generate(transaction)
 
         setSourceObject(transaction, sourceObject)
-
-        // Create a transaction entry for every [bin location + lot number] pair that the product currently has.
-        // We don't need to include zero quantity items. Excluding them from the transaction achieves the same result.
-        List<AvailableItem> availableItems = productAvailabilityService.getAvailableItems(
-                facility, [product.id], false, true)
 
         for (AvailableItem availableItem : availableItems) {
             TransactionEntry transactionEntry = new TransactionEntry(

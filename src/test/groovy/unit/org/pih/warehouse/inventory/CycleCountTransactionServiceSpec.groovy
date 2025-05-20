@@ -250,7 +250,7 @@ class CycleCountTransactionServiceSpec extends Specification implements DataTest
         )
 
         cycleCountProductInventoryTransactionServiceStub.createInventoryBaselineTransaction(
-                facility, product, cycleCount, date) >> transaction
+                facility, cycleCount, [product], date) >> transaction
 
         return transaction
     }

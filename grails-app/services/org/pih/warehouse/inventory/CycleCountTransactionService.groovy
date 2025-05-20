@@ -128,8 +128,8 @@ class CycleCountTransactionService {
             // the cycle count items.
             Transaction transaction = cycleCountProductInventoryTransactionService.createInventoryBaselineTransaction(
                     cycleCount.facility,
-                    product,
                     cycleCount,
+                    [product],
                     transactionDate)
 
             transactions.add(transaction)

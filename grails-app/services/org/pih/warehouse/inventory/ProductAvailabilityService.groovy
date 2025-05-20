@@ -666,6 +666,74 @@ class ProductAvailabilityService {
         return data
     }
 
+    /**
+     * Initializes a String comprising of [product code + bin location name + lot number], to be used to uniquely
+     * identify a product availability entry.
+     */
+    static String constructAvailableItemKey(Location binLocation, InventoryItem inventoryItem) {
+        return "${inventoryItem.product.productCode}-${binLocation?.name}-${inventoryItem?.lotNumber}"
+    }
+
+    /**
+     * Fetches the stock of a list of products at a facility at a given moment in time.
+     *
+     * @param facility
+     * @param products
+     * @param at The moment in time to fetch stock for. If not provided, will fetch the current stock of each item.
+     * @return a map of AvailableItem keyed on [product code + bin location name + lot number]
+     */
+    Map<String, AvailableItem> getAvailableItemsAtDateAsMap(Location facility, List<Product> products, Date at=null) {
+        List<AvailableItem> availableItems = getAvailableItemsAtDate(facility, products, at)
+
+        Map<String, AvailableItem> availableItemsMap = [:]
+        for (AvailableItem availableItem : availableItems) {
+            String key = constructAvailableItemKey(availableItem.binLocation, availableItem.inventoryItem)
+            availableItemsMap.put(key, availableItem)
+        }
+        return availableItemsMap
+    }
+
+    /**
+     * Fetches the stock of a list of products at a facility at a given moment in time.
+     *
+     * @param facility
+     * @param products
+     * @param at The moment in time to fetch stock for. If not provided, will fetch the current stock of each item.
+     */
+    List<AvailableItem> getAvailableItemsAtDate(Location facility, List<Product> products, Date at=null) {
+        if (at != null && at > new Date()) {
+            throw new IllegalArgumentException("Date cannot be in the future.")
+        }
+
+        // If no instant is provided, we fetch the stock as it is currently. This means we're allowed to simply query
+        // product availability since it contains up to date stock.
+        if (at == null) {
+            return getAvailableItems(facility, products.collect{ it.id }, false, true)
+        }
+
+        // Otherwise we're trying to fetch stock at a specific moment in time, so we need to calculate it ourselves
+        // by iterating though transaction history and summing it up to that moment.
+        // TODO: only fetch transactions older than "at"!! Otherwise QoH won't be accurate
+        List<TransactionEntry> transactionEntries = inventoryService.getTransactionEntriesByInventoryAndProduct(
+                facility.inventory, products)
+
+        // TODO: Write a new method in inventoryService that directly returns a list of AvailableItem so that we
+        //       don't have to bother remapping BinLocationItem to AvailableItem. Also, this currently throws:
+        //       Batch update returned unexpected row count from update [0]; actual row count: 0; expected: 1;
+        List<BinLocationItem> binLocationItems = inventoryService.getQuantityByBinLocation(transactionEntries)
+
+        List<AvailableItem> availableItems = new ArrayList<>()
+        for (BinLocationItem binLocationItem : binLocationItems) {
+            AvailableItem availableItem = new AvailableItem(
+                    quantityAvailable: binLocationItem.quantity,
+                    binLocation: binLocationItem.binLocation,
+                    inventoryItem: binLocationItem.inventoryItem,
+            )
+            availableItems.add(availableItem)
+        }
+        return availableItems
+    }
+
     List getAvailableItems(Location location, List<String> productsIds, boolean excludeNegativeQuantity = false, boolean excludeZeroQuantity = false) {
         log.info("getQuantityOnHandByBinLocation: location=${location} product=${productsIds}")
         String quantityCondition = ((excludeNegativeQuantity && excludeZeroQuantity) || excludeZeroQuantity) ? "and pa.quantityOnHand <> 0"

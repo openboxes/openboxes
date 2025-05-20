@@ -81,7 +81,7 @@ class CycleCountProductInventoryTransactionServiceSpec extends Specification imp
 
         when:
         Transaction transaction = cycleCountProductInventoryTransactionService.createInventoryBaselineTransaction(
-                facility, product, cycleCount, date)
+                facility, cycleCount, [product], date)
 
         then:
         assert transaction.transactionType == productInventoryTransactionType
