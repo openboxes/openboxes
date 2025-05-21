@@ -27,9 +27,9 @@ import useTableSorting from 'hooks/useTableSorting';
 import useThrowError from 'hooks/useThrowError';
 import useTranslate from 'hooks/useTranslate';
 import Badge from 'utils/Badge';
+import dateWithoutTimeZone from 'utils/dateUtils';
 import exportFileFromAPI from 'utils/file-download-util';
 import { mapStringToLimitedList } from 'utils/form-values-utils';
-import formatDateWithoutTimeZone from 'utils/formatDateWithoutTimeZone';
 
 const useAllProductsTab = ({
   filterParams,
@@ -86,7 +86,9 @@ const useAllProductsTab = ({
     ...sortingParams,
     ...filterParams,
     searchTerm,
-    dateLastCount: formatDateWithoutTimeZone(dateLastCount),
+    dateLastCount: dateWithoutTimeZone({
+      date: dateLastCount,
+    }),
     categories: categories?.map?.(({ id }) => id),
     internalLocations: internalLocations?.map?.(({ name }) => name),
     tags: tags?.map?.(({ id }) => id),

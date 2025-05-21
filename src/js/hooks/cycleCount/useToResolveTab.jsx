@@ -16,6 +16,7 @@ import { CYCLE_COUNT, INVENTORY_ITEM_URL } from 'consts/applicationUrls';
 import CycleCountCandidateStatus from 'consts/cycleCountCandidateStatus';
 import cycleCountColumn from 'consts/cycleCountColumn';
 import MimeType from 'consts/mimeType';
+import { DateFormat } from 'consts/timeFormat';
 import useQueryParams from 'hooks/useQueryParams';
 import useSpinner from 'hooks/useSpinner';
 import useTableCheckboxes from 'hooks/useTableCheckboxes';
@@ -25,9 +26,9 @@ import useThrowError from 'hooks/useThrowError';
 import useTranslate from 'hooks/useTranslate';
 import Badge from 'utils/Badge';
 import confirmationModal from 'utils/confirmationModalUtils';
+import dateWithoutTimeZone from 'utils/dateUtils';
 import exportFileFromAPI, { extractFilenameFromHeader } from 'utils/file-download-util';
 import { mapStringToLimitedList } from 'utils/form-values-utils';
-import formatDateWithoutTimeZone from 'utils/formatDateWithoutTimeZone';
 import StatusIndicator from 'utils/StatusIndicator';
 
 const useToResolveTab = ({
@@ -80,7 +81,9 @@ const useToResolveTab = ({
     ...filterParams,
     searchTerm,
     facility: currentLocation?.id,
-    dateLastCount: formatDateWithoutTimeZone(dateLastCount),
+    dateLastCount: dateWithoutTimeZone({
+      date: dateLastCount,
+    }),
     categories: categories?.map?.(({ id }) => id),
     internalLocations: internalLocations?.map?.(({ name }) => name),
     tags: tags?.map?.(({ id }) => id),
