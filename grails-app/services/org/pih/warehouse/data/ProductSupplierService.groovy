@@ -36,7 +36,6 @@ import org.pih.warehouse.product.ProductSupplierDataService
 import org.pih.warehouse.product.ProductSupplierFilterCommand
 import org.pih.warehouse.product.ProductSupplierDetailsCommand
 import org.pih.warehouse.product.ProductSupplierPreference
-import org.hibernate.FetchMode
 
 import java.text.SimpleDateFormat
 
