@@ -2,16 +2,15 @@ import React, { useEffect, useMemo } from 'react';
 
 import { createColumnHelper } from '@tanstack/react-table';
 import _ from 'lodash';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 
-import { fetchReasonCodes } from 'actions';
-import { FETCH_CYCLE_COUNT_REASON_CODES } from 'actions/types';
 import { CYCLE_COUNT_DETAILS_REPORT } from 'api/urls';
 import { TableCell } from 'components/DataTable';
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
 import ValueIndicator from 'components/DataTable/v2/ValueIndicator';
 import { INVENTORY_ITEM_URL } from 'consts/applicationUrls';
 import cycleCountColumn from 'consts/cycleCountColumn';
+import reasonCodes from 'consts/reasonCodes';
 import { DateFormat } from 'consts/timeFormat';
 import transactionType from 'consts/transactionType';
 import valueIndicatorVariant, {
@@ -36,13 +35,10 @@ const useInventoryTransactionsTab = ({
   const {
     currentLocale,
     currentLocation,
-    reasonCodes,
   } = useSelector((state) => ({
     currentLocale: state.session.activeLanguage,
     currentLocation: state.session.currentLocation,
-    reasonCodes: state.cycleCount.reasonCodes,
   }));
-  const dispatch = useDispatch();
   const {
     sortableProps,
     sort,
@@ -86,11 +82,6 @@ const useInventoryTransactionsTab = ({
     filterParams,
     serializedParams,
   });
-  useEffect(() => {
-    if (!reasonCodes?.length) {
-      dispatch(fetchReasonCodes('ADJUST_INVENTORY', FETCH_CYCLE_COUNT_REASON_CODES));
-    }
-  }, []);
 
   useEffect(() => {
     setTableData({ data: [], totalCount: 0 });
@@ -310,7 +301,7 @@ const useInventoryTransactionsTab = ({
         className="rt-td multiline-cell"
       >
         <div className="limit-lines-1">
-          {reasonCodes.find((c) => c.value === getValue())?.label}
+          {reasonCodes[getValue()]}
         </div>
       </TableCell>
     ),
