@@ -1886,16 +1886,12 @@ class ShipmentService {
     }
 
     ShipmentItem packItem(String shipmentItemId, String containerId, Integer quantityToPack) {
-
         ShipmentItem shipmentItem = ShipmentItem.get(shipmentItemId)
         if (!shipmentItem) {
             throw new ObjectNotFoundException(shipmentItemId, ShipmentItem.class.toString())
         }
 
         Shipment shipment = shipmentItem.shipment
-//        if (shipment.hasShipped()) {
-//            throw new IllegalStateException("Shipment ${shipment.shipmentNumber} has already been shipped")
-//        }
 
         if (quantityToPack > shipmentItem.quantity) {
             throw new IllegalArgumentException("Cannot pack more quantity (${quantityToPack}) than quantity available (${shipmentItem.quantity})")

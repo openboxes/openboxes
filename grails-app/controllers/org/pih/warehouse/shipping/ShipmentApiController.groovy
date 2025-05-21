@@ -24,7 +24,7 @@ class ShipmentApiController extends BaseDomainApiController {
         render ([data:shipment] as JSON)
     }
 
-    def update = {
+    def update() {
         JSONObject jsonObject = request.JSON
         log.info "Update shipment " + jsonObject.toString(4)
 
