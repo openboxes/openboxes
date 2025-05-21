@@ -16,8 +16,16 @@ import 'components/form-elements/DateFilter/DateFilter.scss';
 
 const CustomInput = React.forwardRef((props, ref) => {
   const {
-    onClick, title, value, placeholder, onClear, defaultMessage, formatDateToDisplay,
+    onClick,
+    title,
+    value,
+    placeholder,
+    onClear,
+    defaultMessage,
+    formatDateToDisplay,
+    required,
   } = props;
+
   const onKeypressHandler = (event) => {
     if (event.key === 'Enter') onClick();
   };
@@ -33,6 +41,7 @@ const CustomInput = React.forwardRef((props, ref) => {
     >
       <span className="flex-grow-1 date-picker__input">
         <Translate id={title} defaultMessage={defaultMessage} />
+        {required && <span className="text-danger">*</span>}
         <span>{formatDateToDisplay(value) || placeholder}</span>
       </span>
       <div className="date-picker__icon-wrapper">
@@ -91,7 +100,6 @@ const DateFilter = (props) => {
   const highlightedDates = [selectedDate || moment(new Date(), dateFormat)];
 
   const localeCodeToDisplay = localizeDate ? localeCode : null;
-
   return (
     <div className={`date-picker__wrapper ${isFocusedClass} ${isValidClass}`} data-testid="date-filter">
       <DatePicker
