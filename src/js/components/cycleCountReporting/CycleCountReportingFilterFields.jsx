@@ -6,23 +6,25 @@ export default {
   endDate: {
     type: DateFilter,
     attributes: {
-      label: 'react.cycleCountReporting.filters.createdAfter.label',
-      defaultMessage: 'Created after',
+      label: 'react.cycleCount.filters.recordedAfter.label',
+      defaultMessage: 'Recorded after',
       dateFormat: DateFormat.DD_MMM_YYYY,
       showLabelTooltip: true,
       filterElement: true,
       top: true,
+      required: true,
     },
   },
   startDate: {
     type: DateFilter,
     attributes: {
-      label: 'react.cycleCountReporting.filters.createdBefore.label',
-      defaultMessage: 'Created before',
+      label: 'react.cycleCount.filters.recordedBefore.label',
+      defaultMessage: 'Recorded before',
       dateFormat: DateFormat.DD_MMM_YYYY,
       showLabelTooltip: true,
       filterElement: true,
       top: true,
+      required: true,
     },
   },
   products: {
@@ -38,7 +40,7 @@ export default {
       options: [],
       filterOptions: (options) => options,
       filterElement: true,
-      placeholder: 'react.cycleCountReporting.filters.product.label',
+      placeholder: 'react.cycleCount.filters.product.label',
       defaultPlaceholder: 'Product',
       showLabelTooltip: true,
     },

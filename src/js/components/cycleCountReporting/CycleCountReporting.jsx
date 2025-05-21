@@ -10,7 +10,7 @@ import {
   INVENTORY_TRANSACTIONS_TAB,
   PRODUCTS_TAB,
 } from 'consts/cycleCount';
-import useCycleCountReportingFilters from 'hooks/cycleCountReporting/useCycleCountReportingFilters';
+import useCycleCountReportingFilters from 'hooks/cycleCount/useCycleCountReportingFilters';
 import useCycleCountPagination from 'hooks/useCycleCountPagination';
 import useQueryParams from 'hooks/useQueryParams';
 import useSwitchTabs from 'hooks/useSwitchTabs';
