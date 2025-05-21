@@ -712,26 +712,11 @@ class ProductAvailabilityService {
         }
 
         // Otherwise we're trying to fetch stock at a specific moment in time, so we need to calculate it ourselves
-        // by iterating though transaction history and summing it up to that moment.
-        // TODO: only fetch transactions older than "at"!! Otherwise QoH won't be accurate
-        List<TransactionEntry> transactionEntries = inventoryService.getTransactionEntriesByInventoryAndProduct(
-                facility.inventory, products)
+        // by iterating though transaction history and summing up all the quantities until that moment.
+        List<TransactionEntry> transactionEntries = inventoryService.getTransactionEntriesBeforeDate(
+                facility, products, at)
 
-        // TODO: Write a new method in inventoryService that directly returns a list of AvailableItem so that we
-        //       don't have to bother remapping BinLocationItem to AvailableItem. Also, this currently throws:
-        //       Batch update returned unexpected row count from update [0]; actual row count: 0; expected: 1;
-        List<BinLocationItem> binLocationItems = inventoryService.getQuantityByBinLocation(transactionEntries)
-
-        List<AvailableItem> availableItems = new ArrayList<>()
-        for (BinLocationItem binLocationItem : binLocationItems) {
-            AvailableItem availableItem = new AvailableItem(
-                    quantityAvailable: binLocationItem.quantity,
-                    binLocation: binLocationItem.binLocation,
-                    inventoryItem: binLocationItem.inventoryItem,
-            )
-            availableItems.add(availableItem)
-        }
-        return availableItems
+        return inventoryService.getQuantityAsAvailableItems(transactionEntries)
     }
 
     List getAvailableItems(Location location, List<String> productsIds, boolean excludeNegativeQuantity = false, boolean excludeZeroQuantity = false) {

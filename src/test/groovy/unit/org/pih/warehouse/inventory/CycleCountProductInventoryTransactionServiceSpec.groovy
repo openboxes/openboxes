@@ -86,7 +86,6 @@ class CycleCountProductInventoryTransactionServiceSpec extends Specification imp
         then:
         assert transaction.transactionType == productInventoryTransactionType
         assert transaction.transactionDate == date
-        assert transaction.source == facility
         assert transaction.transactionNumber == "123ABC"
 
         List<TransactionEntry> transactionEntries = transaction.transactionEntries as List<TransactionEntry>

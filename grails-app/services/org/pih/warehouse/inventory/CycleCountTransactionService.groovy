@@ -98,7 +98,6 @@ class CycleCountTransactionService {
         // Now that we know there is at least one discrepancy, create the transaction itself and map it to the entries.
         TransactionType transactionType = TransactionType.read(Constants.ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID)
         Transaction transaction = new Transaction(
-                source: cycleCount.facility,
                 inventory: cycleCount.facility.inventory,
                 transactionDate: transactionDate,
                 transactionType: transactionType,

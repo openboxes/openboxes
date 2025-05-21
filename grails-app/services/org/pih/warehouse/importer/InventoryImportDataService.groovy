@@ -145,16 +145,16 @@ class InventoryImportDataService implements ImportDataService {
                 new ArrayList<Product>(inventoryImportData.products),
                 command.date)
 
-        // Date objects are mutable, so we use Instant to clone the date in the command and avoid directly modifying it.
-        // -1 (instead of +1 to the adjustment transaction date) because transaction date can't be in the future.
-        Date baselineTransactionDate = DateUtil.asDate(DateUtil.asInstant(command.date).minusSeconds(1))
-
         String comment = "Imported from ${command.filename} on ${new Date()}"
 
         inventoryImportProductInventoryTransactionService.createInventoryBaselineTransactionForGivenStock(
-                command.location, command, availableItems.values(), baselineTransactionDate, comment)
+                command.location, command, availableItems.values(), command.date, comment)
 
-        createAdjustmentTransaction(command.location, inventoryImportData, availableItems, command.date, comment)
+        // Date objects are mutable, so we use Instant to clone the date in the command and avoid directly modifying it.
+        Date adjustmentTransactionDate = DateUtil.asDate(DateUtil.asInstant(command.date).plusSeconds(1))
+
+        createAdjustmentTransaction(
+                command.location, inventoryImportData, availableItems, adjustmentTransactionDate, comment)
     }
 
     /**
@@ -164,8 +164,8 @@ class InventoryImportDataService implements ImportDataService {
     private Transaction createAdjustmentTransaction(Location facility,
                                                     InventoryImportData inventoryImportData,
                                                     Map<String, AvailableItem> availableItems,
-                                                    Date transactionDate=null,
-                                                    String comment=null) {
+                                                    Date transactionDate,
+                                                    String comment) {
 
         // Don't bother populating the transaction's fields until we know we'll need one.
         Transaction transaction = new Transaction()
@@ -291,6 +291,9 @@ class InventoryImportDataService implements ImportDataService {
         }
     }
 
+    /**
+     * Convenience POJO for holding the results of an individual inventory import row/entry.
+     */
     private class InventoryImportDataRow {
         Product product
         Location binLocation
