@@ -16,7 +16,6 @@ import { CYCLE_COUNT, INVENTORY_ITEM_URL } from 'consts/applicationUrls';
 import CycleCountCandidateStatus from 'consts/cycleCountCandidateStatus';
 import cycleCountColumn from 'consts/cycleCountColumn';
 import MimeType from 'consts/mimeType';
-import { DateFormat } from 'consts/timeFormat';
 import useQueryParams from 'hooks/useQueryParams';
 import useSpinner from 'hooks/useSpinner';
 import useTableDataV2 from 'hooks/useTableDataV2';
