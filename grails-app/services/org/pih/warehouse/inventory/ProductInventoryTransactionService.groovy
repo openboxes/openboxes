@@ -76,14 +76,14 @@ abstract class ProductInventoryTransactionService<T> {
             Location facility,
             T sourceObject,
             Collection<AvailableItem> availableItems,
-            Date transactionDate=new Date(),
+            Date transactionDate=null,
             String comment=null) {
 
         TransactionType transactionType = TransactionType.read(Constants.INVENTORY_BASELINE_TRANSACTION_TYPE_ID)
 
         Transaction transaction = new Transaction(
                 inventory: facility.inventory,
-                transactionDate: transactionDate,
+                transactionDate: transactionDate ?: new Date(),
                 transactionType: transactionType,
                 comment: comment,
         )
