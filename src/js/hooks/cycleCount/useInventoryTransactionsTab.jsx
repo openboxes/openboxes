@@ -19,6 +19,7 @@ import useTableDataV2 from 'hooks/useTableDataV2';
 import useTableSorting from 'hooks/useTableSorting';
 import useTranslate from 'hooks/useTranslate';
 import dateWithoutTimeZone from 'utils/dateUtils';
+import formatDateWithoutTimeZone from 'utils/formatDateWithoutTimeZone';
 
 const useInventoryTransactionsTab = ({
   filterParams,
@@ -52,16 +53,8 @@ const useInventoryTransactionsTab = ({
     max: `${pageSize}`,
     ...sortingParams,
     ...filterParams,
-    endDate: dateWithoutTimeZone({
-      date: endDate,
-      currentDateFormat: DateFormat.DD_MMM_YYYY,
-      outputDateFormat: DateFormat.MM_DD_YYYY,
-    }),
-    startDate: dateWithoutTimeZone({
-      date: startDate,
-      currentDateFormat: DateFormat.DD_MMM_YYYY,
-      outputDateFormat: DateFormat.MM_DD_YYYY,
-    }),
+    endDate: formatDateWithoutTimeZone(endDate),
+    startDate: formatDateWithoutTimeZone(startDate),
     products: products?.map?.(({ id }) => id),
     facility: currentLocation?.id,
   }, (val) => {
