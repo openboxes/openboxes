@@ -154,7 +154,7 @@ const useInventoryTransactionsTab = ({
     meta: {
       pinned: 'left',
     },
-    size: 400,
+    size: 360,
   }), columnHelper.accessor(cycleCountColumn.TRANSACTION_TYPE, {
     header: () => (
       <TableHeaderCell sortable columnId={cycleCountColumn.TRANSACTION_TYPE} {...sortableProps}>
@@ -179,7 +179,7 @@ const useInventoryTransactionsTab = ({
     meta: {
       pinned: 'left',
     },
-    size: 100,
+    size: 75,
   }), columnHelper.accessor(cycleCountColumn.RECORDED, {
     header: () => (
       <TableHeaderCell>

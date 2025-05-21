@@ -38,7 +38,7 @@ export const renderFormFields = ({
   translate,
   meta: { touched, error },
 }) => {
-  const attr = { id: input.name, isFilterRequired: required, ...otherAttributes };
+  const attr = { id: input.name, required, ...otherAttributes };
   const { filterElement, className: supplementClass, ...otherAttr } = attr;
   const filterElementClass = filterElement ? 'filter-group' : 'mb-0 mx-1 form-group';
   const requiredClass = required ? 'required' : '';

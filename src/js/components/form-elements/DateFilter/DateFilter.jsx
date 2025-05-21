@@ -23,7 +23,7 @@ const CustomInput = React.forwardRef((props, ref) => {
     onClear,
     defaultMessage,
     formatDateToDisplay,
-    isFilterRequired,
+    required,
   } = props;
 
   const onKeypressHandler = (event) => {
@@ -41,7 +41,7 @@ const CustomInput = React.forwardRef((props, ref) => {
     >
       <span className="flex-grow-1 date-picker__input">
         <Translate id={title} defaultMessage={defaultMessage} />
-        {isFilterRequired && <span className="text-danger">*</span>}
+        {required && <span className="text-danger">*</span>}
         <span>{formatDateToDisplay(value) || placeholder}</span>
       </span>
       <div className="date-picker__icon-wrapper">
@@ -62,7 +62,7 @@ const CustomInput = React.forwardRef((props, ref) => {
 const DateFilter = (props) => {
   const {
     value, onChange, dateFormat, placeholder, label, timeFormat, defaultMessage,
-    localizeDate, localizedDateFormat, isFilterRequired,
+    localizeDate, localizedDateFormat,
   } = props;
   const { localeCode, formatLocalizedDate } = useSelector((state) => ({
     localeCode: getLocaleCode(state.localize),
@@ -109,7 +109,6 @@ const DateFilter = (props) => {
             formatDateToDisplay={formatDateToDisplay}
             onClear={onClear}
             defaultMessage={defaultMessage}
-            isFilterRequired={isFilterRequired}
           />
         )}
         className="date-picker__input"
@@ -153,7 +152,6 @@ DateFilter.defaultProps = {
   value: null,
   localizeDate: false,
   localizedDateFormat: DateFormat.DEFAULT,
-  isFilterRequired: false,
 };
 
 DateFilter.propTypes = {
@@ -166,7 +164,6 @@ DateFilter.propTypes = {
   timeFormat: PropTypes.string,
   localizeDate: PropTypes.bool,
   localizedDateFormat: PropTypes.string,
-  isFilterRequired: PropTypes.bool,
 };
 
 export default DateFilterBaseInput;

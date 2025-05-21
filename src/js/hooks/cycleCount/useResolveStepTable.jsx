@@ -65,6 +65,7 @@ const useResolveStepTable = ({
     reasonCodes: state.cycleCount.reasonCodes,
     binLocations: state.cycleCount.binLocations,
   }));
+
   const showBinLocation = useMemo(() =>
     checkBinLocationSupport(currentLocation.supportedActivities), [currentLocation?.id]);
 
