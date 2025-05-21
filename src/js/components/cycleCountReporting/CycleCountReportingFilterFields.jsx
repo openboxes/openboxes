@@ -1,5 +1,6 @@
 import DateFilter from 'components/form-elements/DateFilter/DateFilter';
 import FilterSelectField from 'components/form-elements/FilterSelectField';
+import { DateFormat } from 'consts/timeFormat';
 
 export default {
   endDate: {
@@ -7,7 +8,7 @@ export default {
     attributes: {
       label: 'react.cycleCountReporting.filters.createdAfter.label',
       defaultMessage: 'Created after',
-      dateFormat: 'MM/DD/YYYY',
+      dateFormat: DateFormat.DD_MMM_YYYY,
       showLabelTooltip: true,
       filterElement: true,
       top: true,
@@ -18,7 +19,7 @@ export default {
     attributes: {
       label: 'react.cycleCountReporting.filters.createdBefore.label',
       defaultMessage: 'Created before',
-      dateFormat: 'MM/DD/YYYY',
+      dateFormat: DateFormat.DD_MMM_YYYY,
       showLabelTooltip: true,
       filterElement: true,
       top: true,

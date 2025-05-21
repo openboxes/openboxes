@@ -25,6 +25,7 @@ import useThrowError from 'hooks/useThrowError';
 import useTranslate from 'hooks/useTranslate';
 import Badge from 'utils/Badge';
 import confirmationModal from 'utils/confirmationModalUtils';
+import dateWithoutTimeZone from 'utils/dateUtils';
 import exportFileFromAPI, { extractFilenameFromHeader } from 'utils/file-download-util';
 import { mapStringToLimitedList } from 'utils/form-values-utils';
 import StatusIndicator from 'utils/StatusIndicator';
@@ -79,7 +80,9 @@ const useToResolveTab = ({
     ...filterParams,
     searchTerm,
     facility: currentLocation?.id,
-    dateLastCount,
+    dateLastCount: dateWithoutTimeZone({
+      date: dateLastCount,
+    }),
     categories: categories?.map?.(({ id }) => id),
     internalLocations: internalLocations?.map?.(({ name }) => name),
     tags: tags?.map?.(({ id }) => id),
