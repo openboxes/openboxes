@@ -23,7 +23,6 @@ export default function cycleCountReducer(state = initialState, action) {
       return {
         ...state,
         requests: {
-          ...state.requests,
           [action.payload.locationId]: action.payload.requests,
         },
       };
@@ -31,7 +30,6 @@ export default function cycleCountReducer(state = initialState, action) {
       return {
         ...state,
         cycleCounts: {
-          ...state.cycleCounts,
           [action.payload.locationId]: action.payload.cycleCounts,
         },
       };
