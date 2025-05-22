@@ -1885,6 +1885,68 @@ class ShipmentService {
         }
     }
 
+    ShipmentItem packItem(String shipmentItemId, String containerId, Integer quantityToPack) {
+        ShipmentItem shipmentItem = ShipmentItem.get(shipmentItemId)
+        if (!shipmentItem) {
+            throw new ObjectNotFoundException(shipmentItemId, ShipmentItem.class.toString())
+        }
+
+        Shipment shipment = shipmentItem.shipment
+
+        if (quantityToPack > shipmentItem.quantity) {
+            throw new IllegalArgumentException("Cannot pack more quantity (${quantityToPack}) than quantity available (${shipmentItem.quantity})")
+        }
+
+        Container container = Container.get(containerId)
+        if (shipmentItem.container == container) {
+            throw new IllegalStateException("Shipment item is already in container ${container?.name}")
+        }
+
+        // Move the entire shipment item into the specified container
+        if (quantityToPack == shipmentItem.quantity) {
+            ShipmentItem existingShipmentItem = shipment.shipmentItems.find { it.container == container &&
+                    it.binLocation == shipmentItem.binLocation && it.inventoryItem == shipmentItem.inventoryItem }
+            if (existingShipmentItem) {
+                shipmentItem.quantity = existingShipmentItem.quantity + quantityToPack
+                shipment.removeFromShipmentItems(existingShipmentItem)
+                existingShipmentItem.delete(flush:true)
+            }
+            else {
+                shipmentItem.container = container
+                shipmentItem.save(flush: true)
+            }
+
+        }
+        // Split the shipment item between the given container and leave the rest as is
+        else {
+            // Split shipment item into two
+            ShipmentItem shipmentItemClone = shipmentItem.cloneShipmentItem()
+            shipmentItemClone.quantity = shipmentItem.quantity - quantityToPack
+            shipment.addToShipmentItems(shipmentItemClone)
+
+            // See whether there's a matching item in the new container and add its quantity to this shipment item
+            ShipmentItem existingShipmentItem = shipment.shipmentItems.find { it.container == container &&
+                    it.binLocation == shipmentItem.binLocation && it.inventoryItem == shipmentItem.inventoryItem }
+            if (existingShipmentItem) {
+                shipmentItem.quantity = existingShipmentItem.quantity + quantityToPack
+                shipment.removeFromShipmentItems(existingShipmentItem)
+                existingShipmentItem.delete()
+            }
+            // Otherwise move the shipment item
+            else {
+                shipmentItem.container = container
+                shipmentItem.quantity = quantityToPack
+            }
+
+            if (shipment.validate()) {
+                shipment.save(flush: true, failOnError: true)
+            } else {
+                throw new ValidationException("Unable to split shipment item", shipment.errors)
+            }
+        }
+        return shipmentItem
+    }
+
     boolean moveItem(ShipmentItem itemToMove, Map<String, Integer> containerIdToQuantityMap) {
         def totalQuantity = 0
         containerIdToQuantityMap.each { String k, Integer v ->
