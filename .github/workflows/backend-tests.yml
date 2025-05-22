@@ -17,7 +17,7 @@ jobs:
     strategy:
       matrix:
         # If we start actively supporting other databases, they should be added here so that we can test against them.
-        testdatabase: ["mysql:5.7.44", "mysql:8.0.36", "mariadb:10.3.39"]
+        testdatabase: ["mysql:8.0.36", "mariadb:10.3.39"]
 
     steps:
       - name: Checkout Code
