@@ -91,13 +91,18 @@ https://openboxes.atlassian.net/wiki/spaces/OBW/pages/1719435265/Push-button+dep
 #### Required
 * [Java 8 (must install Java 8)](https://www.oracle.com/pl/java/technologies/javase/javase8-archive-downloads.html) or via SDK
 * [MySQL 5.7 or MySQL 8.0](https://downloads.mysql.com/archives/community/) or [MariaDB 10.11.4](https://mariadb.com/kb/en/mariadb-10-11-4-release-notes/)
-  * Mac users: 5.7.31 is the latest 5.7.x with a pre-built installer and works fine
+  * Mac users: 5.7.31 is the latest 5.7.x with a pre-built installer. However, it will not work on a modern machine that uses Apple Silicon.
   * Issues related to the MySQL 8 upgrade could be found [here](https://github.com/openboxes/openboxes/issues?q=is%3Aissue+mysql+8+is%3Aopen+)
 * [SDK Man](https://sdkman.io/install)
 * [Grails 3.3.18](https://grails.org/download.html)
 * NPM 6.14.6
 * Node 14+
 
+##### Installation notes for M-series (Apple Silicon) Macs
+
+* The database we use in production won't run natively on modern Macs.
+  * Easiest way to install a compatible database is by using [`brew install mariadb`](https://mariadb.com/kb/en/installing-mariadb-on-macos-using-homebrew/).
+  * Alternatively, ARM builds of MySQL 8 are available. Consider downloading [8.x LTS here](https://dev.mysql.com/downloads/mysql/).
 #### Optional
 * [IntelliJ IDEA](https://www.jetbrains.com/idea/download/)
 * Chrome
@@ -173,6 +178,15 @@ NOTE: If you are running in development mode with a copy of an existing producti
 instruct the application to not setup test fixtures automatically by uncommenting the above property:
 ```
 openboxes.fixtures.enabled=false
+```
+
+##### Note for MariaDB users
+
+If using MariaDB the configuration file needs to be slightly different. You'll need to edit `dataSource.url` and specify `dataSource.driverClassName`, as follows.
+
+```conf
+dataSource.url=jdbc:mariadb://localhost:3306/openboxes?serverTimezone=UTC
+dataSource.driverClassName: org.mariadb.jdbc.Driver
 ```
 
 #### 6. Install NPM dependencies
