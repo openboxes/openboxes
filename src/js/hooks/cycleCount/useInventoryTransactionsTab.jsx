@@ -198,7 +198,7 @@ const useInventoryTransactionsTab = ({
         <span>
           {dateWithoutTimeZone({
             date: dateRecorded,
-            outputDateFormat: DateFormat.MM_DD_YYYY,
+            outputDateFormat: DateFormat.DD_MMM_YYYY,
           })}
         </span>
       </div>

@@ -23,7 +23,6 @@ const CustomInput = React.forwardRef((props, ref) => {
     onClear,
     defaultMessage,
     formatDateToDisplay,
-    required,
   } = props;
 
   const onKeypressHandler = (event) => {
@@ -41,7 +40,6 @@ const CustomInput = React.forwardRef((props, ref) => {
     >
       <span className="flex-grow-1 date-picker__input">
         <Translate id={title} defaultMessage={defaultMessage} />
-        {required && <span className="text-danger">*</span>}
         <span>{formatDateToDisplay(value) || placeholder}</span>
       </span>
       <div className="date-picker__icon-wrapper">
@@ -69,7 +67,6 @@ const DateFilter = (props) => {
     formatLocalizedDate: formatDate(state.localize),
   }));
   const [isFocused, setIsFocused] = useState(false);
-
   const onChangeHandler = (date) => onChange(date.format(dateFormat));
 
   const onClear = (e) => {

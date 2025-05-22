@@ -193,6 +193,21 @@ body {
 .filter-group {
   font-size: 14px;
   min-width: 200px;
+
+  &.required {
+    .date-picker__input {
+      position: relative;
+      padding-right: 15px;
+
+      &:after {
+        content: "*";
+        color: red;
+        right: 5px;
+        font-size: 14px;
+        position: absolute;
+      }
+    }
+  }
 }
 
 .filter-form {
