@@ -45,6 +45,7 @@ class InventoryService implements ApplicationContextAware {
     def persistenceInterceptor
     TransactionEntryDataService transactionEntryDataService
     RecordStockProductInventoryTransactionService recordStockProductInventoryTransactionService
+    ProductAvailabilityService productAvailabilityService
 
     def authService
     def dataService
@@ -1380,27 +1381,19 @@ class InventoryService implements ApplicationContextAware {
 
         try {
             // 1. Calculate the current available items for the given product
-            List<AvailableItem> availableItems = recordStockProductInventoryTransactionService.getAvailableItems(
-                    cmd.inventory,
-                    cmd.product
+            Map<String, AvailableItem> availableItems = productAvailabilityService.getAvailableItemsAtDateAsMap(
+                    currentLocation,
+                    [cmd.product],
+                    adjustmentTransactionDate
             )
 
-            // 2. Create the baseline transaction
-            if (isInventoryBaselineEnabled) {
-                recordStockProductInventoryTransactionService.createInventoryBaselineTransaction(
-                        currentLocation,
-                        inventoryBaselineTransactionDate,
-                        availableItems
-                )
-            }
-
-            // 3. Create a new adjustment transaction
+            // 2. Create a new adjustment transaction
             Transaction adjustmentTransaction = recordStockProductInventoryTransactionService.createAdjustmentTransaction(
                     cmd,
                     adjustmentTransactionDate
             )
 
-            // 4. Process each row added to the record inventory page
+            // 3. Process each row added to the record inventory page
             cmd.recordInventoryRows.each { RecordInventoryRowCommand row ->
                 if (!row) {
                     return
@@ -1448,15 +1441,18 @@ class InventoryService implements ApplicationContextAware {
                         inventoryItem,
                         availableItems
                 )
-                adjustmentTransaction.addToTransactionEntries(transactionEntry)
+
+                if (transactionEntry) {
+                    adjustmentTransaction.addToTransactionEntries(transactionEntry)
+                }
             }
 
-            // 5. Check whether any errors didn't come up
+            // 4. Check whether any errors didn't come up
             if (cmd.hasErrors()) {
                 return
             }
 
-            // 6. Check if there are any changes recorded
+            // 5. Check if there are any changes recorded
             if (!adjustmentTransaction.transactionEntries) {
                 cmd.errors.reject("transaction.noChanges", "There are no quantity changes in the current transaction")
                 return
@@ -1479,6 +1475,17 @@ class InventoryService implements ApplicationContextAware {
                             "Property [${error.field}] of [${adjustmentTransaction.class.name}] with value [${error.rejectedValue}] is invalid"
                     )
                 }
+                return
+            }
+
+            // 6. Create the baseline transaction if the adjustment transaction is saved
+            if (isInventoryBaselineEnabled) {
+                recordStockProductInventoryTransactionService.createInventoryBaselineTransactionForGivenStock(
+                        currentLocation,
+                        null,
+                        availableItems.values() as List<AvailableItem>,
+                        inventoryBaselineTransactionDate,
+                )
             }
         } catch (Exception e) {
             log.error("Error saving an inventory record to the database ", e)
