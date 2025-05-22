@@ -507,7 +507,7 @@ class BootStrap {
                 inventoryItem: shipmentItem?.inventoryItem,
                 quantity     : shipmentItem.quantity,
                 recipient    : shipmentItem.recipient,
-                shipment     : [id: shipmentItem?.shipment?.id, name: shipmentItem?.shipment?.name],
+                shipment     : [id: shipmentItem?.shipment?.id, name: shipmentItem?.shipment?.name, shipmentNumber: shipmentItem?.shipment?.shipmentNumber],
                 container    : container
             ]
         }
