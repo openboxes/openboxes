@@ -103,6 +103,21 @@ https://openboxes.atlassian.net/wiki/spaces/OBW/pages/1719435265/Push-button+dep
 * The database we use in production won't run natively on modern Macs.
   * Easiest way to install a compatible database is by using [`brew install mariadb`](https://mariadb.com/kb/en/installing-mariadb-on-macos-using-homebrew/).
   * Alternatively, ARM builds of MySQL 8 are available. Consider downloading [8.x LTS here](https://dev.mysql.com/downloads/mysql/).
+* No ARM build of Node 14 exists either.
+  * But you can run it via x86 emulation as follows:
+    1. `/usr/sbin/softwareupdate --install-rosetta --agree-to-license`
+    2. Install `nvm` (_only_ – do _not_ install `node` itself) using [these instructions](https://nodejs.org/en/download)
+    3. Launch a terminal that uses Rosetta to pretend to be an x86 host: `arch -x86_64 bash`
+    4. Within that terminal, run `nvm install 14`
+    5. Open up a new terminal and run the following command; you should see an `x86_64` binary, which should be able to run successfully on an ARM host.
+      ```bash
+      $ hash -r && type node | awk '{print $3}' | xargs file
+      \*\*/.nvm/versions/node/v14.21.3/bin/node: Mach-O 64-bit executable x86_64
+      $ arch; node --version
+      arm64
+      v14.21.3
+      ```
+
 #### Optional
 * [IntelliJ IDEA](https://www.jetbrains.com/idea/download/)
 * Chrome
