@@ -117,7 +117,10 @@ class Shipment implements Comparable, Serializable, Historizable {
             "isFromPutawayOrder",
             "isFromTransferOrder",
             "returnOrder",
-            "disableRefresh"
+            "disableRefresh",
+            "packingScheduled",
+            "loadingScheduled",
+            "receivingScheduled",
     ]
 
     static mappedBy = [
@@ -689,6 +692,59 @@ class Shipment implements Comparable, Serializable, Historizable {
         return event?.eventDate
     }
 
+    void createOrUpdateEvent(Event event) {
+        createOrUpdateEvent(event.eventType.eventCode, event.eventLocation, event.eventDate, event.observedBy)
+    }
+
+    void createOrUpdateEvent(EventCode eventTypeCode, Location eventLocation, Date eventDate, User observedBy) {
+        EventType eventType = EventType.findByEventCode(eventTypeCode)
+        if (!eventType) {
+            throw new IllegalArgumentException("Unable to save event because there is no event type for ${eventTypeCode}")
+        }
+
+        Event event = events.find { Event event -> event?.eventType == eventType }
+        if (!event) {
+            event = new Event(eventType: eventType)
+        }
+        event.eventLocation = eventLocation
+        event.eventDate = eventDate
+        addToEvents(event)
+    }
+
+    void removeEvent(Event event) {
+        if (event) {
+            if (currentEvent == event) {
+                currentEvent = null
+            }
+            removeFromEvents(event)
+            event.delete()
+        }
+    }
+
+    Event getPackingScheduled() {
+        return events.find { Event event -> event?.eventType?.eventCode == EventCode.PACKING_SCHEDULED }
+    }
+
+    void setPackingScheduled(Location eventLocation, Date eventDate, User observedBy) {
+        createOrUpdateEvent(EventCode.PACKING_SCHEDULED, eventLocation, eventDate, observedBy)
+    }
+
+    Event getLoadingScheduled() {
+        return events.find { Event event -> event?.eventType?.eventCode == EventCode.LOADING_SCHEDULED }
+    }
+
+    void setLoadingScheduled(Location eventLocation, Date eventDate, User observedBy) {
+        createOrUpdateEvent(EventCode.LOADING_SCHEDULED, eventLocation, eventDate, observedBy)
+    }
+
+    Event getReceivingScheduled() {
+        return events.find { Event event -> event?.eventType?.eventCode == EventCode.RECEIVING_SCHEDULED }
+    }
+
+    void setReceivingScheduled(Location eventLocation, Date eventDate, User observedBy) {
+        createOrUpdateEvent(EventCode.RECEIVING_SCHEDULED, eventLocation, eventDate, observedBy)
+    }
+
     boolean hasInvoicedItem() {
         shipmentItems.any { it.quantityInvoiced > 0 }
     }
@@ -800,6 +856,11 @@ class Shipment implements Comparable, Serializable, Historizable {
                 actualShippingDate  : actualShippingDate?.format("MM/dd/yyyy HH:mm XXX"),
                 expectedDeliveryDate: expectedDeliveryDate?.format("MM/dd/yyyy HH:mm XXX"),
                 actualDeliveryDate  : actualDeliveryDate?.format("MM/dd/yyyy HH:mm XXX"),
+
+                packingLocation     : packingScheduled?.eventLocation?.name ?: "Unassigned",
+                loadingLocation     : loadingScheduled?.eventLocation?.name ?: "Unassigned",
+                receivingLocation   : receivingScheduled?.eventLocation?.name ?: "Unassigned",
+
                 shipmentItems       : shipmentItems,
                 containers          : containerList,
 
