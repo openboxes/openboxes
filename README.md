@@ -195,13 +195,8 @@ npm run watch
 ```
 
 #### 9. Upgrade the project to the currently installed grails version 
-Either of the following actions (upgrade, compile, run-app) should generate the all important Spring configuration 
+Either of the following actions (compile, run-app) should generate the all important Spring configuration 
 (`/WEB-INF/applicationContext.xml`) and start the dependency resolution process.  
-
-```    
-grails upgrade
-```
-OR
 
 ```    
 grails compile
