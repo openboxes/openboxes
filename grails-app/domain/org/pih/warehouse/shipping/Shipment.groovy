@@ -554,7 +554,6 @@ class Shipment implements Comparable, Serializable, Historizable {
         }
     }
 
-
     Container addNewPallet(String name) {
         return addNewContainer(name, ContainerType.findById(Constants.PALLET_CONTAINER_TYPE_ID))
     }
@@ -834,7 +833,7 @@ class Shipment implements Comparable, Serializable, Historizable {
         def containerList = []
         def shipmentItemsByContainer = shipmentItems?.groupBy { it.container }
         shipmentItemsByContainer.each { container, shipmentItems ->
-            containerList << [id: container?.id, name: container?.name, status: container?.containerStatus?.name(), type: container?.containerType?.name, shipmentItems: shipmentItems]
+            containerList << [id: container?.id, name: container?.name, status: container?.containerStatus?.name(), type: container?.containerType?.name, containerNumber: container?.containerNumber, shipmentItems: shipmentItems]
         }
 
         return [
@@ -859,6 +858,7 @@ class Shipment implements Comparable, Serializable, Historizable {
 
                 packingLocation     : packingScheduled?.eventLocation?.name ?: "Unassigned",
                 loadingLocation     : loadingScheduled?.eventLocation?.name ?: "Unassigned",
+                loadingLocationNumber: loadingScheduled?.eventLocation?.locationNumber ?: "",
                 receivingLocation   : receivingScheduled?.eventLocation?.name ?: "Unassigned",
 
                 shipmentItems       : shipmentItems,
