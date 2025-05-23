@@ -73,6 +73,7 @@ const CountStepHeader = ({
         onChange={applyImportFile}
       />
       <Button
+        className="mt-2"
         variant="primary"
         onClick={importItems}
         label="react.cycleCount.confirmImport.label"
