@@ -26,11 +26,10 @@ const ProductSupplierListTable = ({ filterParams }) => {
     loading,
     fireFetchData,
   } = useProductSupplierListTableData(filterParams);
-
   const {
     getActions,
     exportProductSuppliers,
-  } = useProductSupplierActions({ fireFetchData });
+  } = useProductSupplierActions({ fireFetchData, filterParams });
 
   const canManageProducts = useUserHasPermissions({
     minRequiredRole: RoleType.ROLE_ADMIN,
@@ -212,6 +211,18 @@ const ProductSupplierListTable = ({ filterParams }) => {
               <Translate
                 id="react.productSupplier.exportAll.label"
                 defaultMessage="Export All"
+              />
+            </a>
+            <a
+              href="#"
+              className="dropdown-item"
+              onClick={() => exportProductSuppliers(true)}
+              role="button"
+              tabIndex={0}
+            >
+              <Translate
+                id="react.productSupplier.exportResults.label"
+                defaultMessage="Export Results"
               />
             </a>
           </div>
