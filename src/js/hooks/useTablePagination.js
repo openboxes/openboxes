@@ -31,7 +31,7 @@ const useTablePagination = ({
 
   const generateSerializedParams = (newPageIndex) => JSON.stringify({
     ...filterParams,
-    currentLocation: currentLocation?.id,
+    facilityId: currentLocation?.id,
     pageIndex: newPageIndex,
   });
 
