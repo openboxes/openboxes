@@ -388,7 +388,7 @@ class InventoryService implements ApplicationContextAware {
     }
 
 
-    def getProductsByTagId(List<String> tagIds) {
+    List<Product> getProductsByTagId(List<String> tagIds) {
         def products = Product.withCriteria {
             tags {
                 'in'('id', tagIds)
@@ -893,6 +893,33 @@ class InventoryService implements ApplicationContextAware {
         return getQuantityByBinLocation(entries, false)
     }
 
+    /**
+     * Given a list of transaction entries, compute the total quantity for each bin + inventory item pair, then
+     * convert them to an available item.
+     */
+    List<AvailableItem> getQuantityAsAvailableItems(List<TransactionEntry> entries) {
+
+        // quantityMap is: Map<Product, Map<InventoryItem, Map<Location, Integer>>>
+        Map quantityMap = getQuantityByProductAndInventoryItemMap(entries, true) as Map<Product, Map>
+
+        List<AvailableItem> availableItems = []
+        for (productEntry in quantityMap.entrySet()) {
+
+            for (inventoryItemEntry in productEntry.value.entrySet()) {
+
+                InventoryItem inventoryItem = inventoryItemEntry.key as InventoryItem
+                for (binLocationEntry in (inventoryItemEntry.value as Map<Location, Integer>).entrySet()) {
+                    AvailableItem availableItem = new AvailableItem(
+                            quantityOnHand: binLocationEntry.value,
+                            binLocation: binLocationEntry.key,
+                            inventoryItem: inventoryItem,
+                    )
+                    availableItems.add(availableItem)
+                }
+            }
+        }
+        return availableItems
+    }
 
     def getQuantityByProductGroup(Location location) {
         def quantityMap = getQuantityByProductMap(location.inventory)
@@ -2630,31 +2657,37 @@ class InventoryService implements ApplicationContextAware {
     }
 
     def getTransactionEntriesBeforeDate(Location location, Date date, List tagIds) {
+        if (!date) {
+            return []
+        }
 
-        def startTime = System.currentTimeMillis()
-        def transactionEntries = []
-        if (date) {
-            def products = tagIds ? getProductsByTagId(tagIds) : []
-            def criteria = TransactionEntry.createCriteria()
-            transactionEntries = criteria.list {
-                if (products) {
-                    inventoryItem {
-                        'in'("product", products)
-                    }
-                }
-                transaction {
-                    // All transactions before given date
-                    lt("transactionDate", date)
-                    eq("inventory", location?.inventory)
-                    order("transactionDate", "asc")
-                    order("dateCreated", "asc")
+        List<Product> products = tagIds ? getProductsByTagId(tagIds) : []
+        return getTransactionEntriesBeforeDate(location, products, date)
+    }
 
+    /**
+     * @return All transaction entries for the given products at a facility older than the given date. Entries are
+     *         ordered by transaction date to make it easy to iterate through them chronologically.
+     */
+    List<TransactionEntry> getTransactionEntriesBeforeDate(Location facility, List<Product> products, Date date) {
+        if (!date) {
+            return []
+        }
+
+        def criteria = TransactionEntry.createCriteria()
+        return criteria.list {
+            if (products) {
+                inventoryItem {
+                    'in'("product", products)
                 }
             }
-
-            log.debug "Get transaction entries before date: " + (System.currentTimeMillis() - startTime) + " ms"
-        }
-        return transactionEntries
+            transaction {
+                lt("transactionDate", date)
+                eq("inventory", facility?.inventory)
+                order("transactionDate", "asc")
+                order("dateCreated", "asc")
+            }
+        } as List<TransactionEntry>
     }
 
     /**

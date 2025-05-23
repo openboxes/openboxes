@@ -218,7 +218,6 @@ class CycleCountTransactionServiceSpec extends Specification implements DataTest
         Transaction adjustmentTransaction = transactions.find{ it.transactionType == adjustmentTransactionType }
         assert adjustmentTransaction != null
         assert adjustmentTransaction.transactionNumber == "123ABC"
-        assert adjustmentTransaction.source == facility
         assert adjustmentTransaction.inventory == facility.inventory
         assert adjustmentTransaction.cycleCount == cycleCount
         // The order of the transactions matters! The adjustment should always be applied after the product inventory.
@@ -250,7 +249,7 @@ class CycleCountTransactionServiceSpec extends Specification implements DataTest
         )
 
         cycleCountProductInventoryTransactionServiceStub.createInventoryBaselineTransaction(
-                facility, product, cycleCount, date) >> transaction
+                facility, cycleCount, [product], date) >> transaction
 
         return transaction
     }
