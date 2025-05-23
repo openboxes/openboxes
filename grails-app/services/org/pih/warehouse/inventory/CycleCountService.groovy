@@ -265,6 +265,7 @@ class CycleCountService {
             cycleCount.cycleCountItems.each { CycleCountItemDto item ->
                 data << [
                         "Cycle count id": cycleCount.id,
+                        "Cycle count item id": item.id,
                         "Product Code": item.product.productCode,
                         "Product Name": item.product.name,
                         "Lot Number": item.inventoryItem.lotNumber,

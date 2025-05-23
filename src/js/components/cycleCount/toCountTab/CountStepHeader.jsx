@@ -77,6 +77,7 @@ const CountStepHeader = ({
         isFormDisabled={isFormDisabled}
       />
       <Button
+        className="mt-2"
         variant="primary"
         onClick={importItems}
         label="react.cycleCount.confirmImport.label"
