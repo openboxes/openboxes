@@ -135,6 +135,8 @@ bootRun {
         '-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005'
     ]
     systemProperties System.properties
+    // instruct Spring Boot to set catalina.base for embedded Tomcat
+    systemProperty "server.tomcat.basedir", "${projectDir}"
 }
 
 configurations {
@@ -223,6 +225,11 @@ configurations {
                     } else {
                         details.useVersion(jacksonVersion)
                     }
+                }
+
+                if (details.requested.group == 'net.java.dev.jna') {
+                    details.because 'enforce consistent JNA versioning and aarch64 support'
+                    details.useVersion(jnaVersion)
                 }
 
                 if (details.requested.group == 'org.apache.httpcomponents') {
