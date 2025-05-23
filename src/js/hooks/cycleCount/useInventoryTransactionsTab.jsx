@@ -268,7 +268,7 @@ const useInventoryTransactionsTab = ({
     }) => {
       const variant = getCycleCountDifferencesVariant(quantityVariance, quantityOnHand);
       const percentageValue =
-        quantityOnHand !== 0
+        quantityOnHand > 0
           ? Math.round((Math.abs(quantityVariance) / Math.abs(quantityOnHand)) * 100)
           : 100;
       const className = quantityVariance > 0 ? 'value-indicator--more' : 'value-indicator--less';
