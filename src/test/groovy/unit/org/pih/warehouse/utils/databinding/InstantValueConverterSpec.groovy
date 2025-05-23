@@ -1,5 +1,6 @@
 package unit.org.pih.warehouse.utils.databinding
 
+import java.time.DateTimeException
 import java.time.format.DateTimeParseException
 import spock.lang.Shared
 import spock.lang.Specification
@@ -25,16 +26,6 @@ class InstantValueConverterSpec extends Specification {
         givenDate                   || expectedConvertedDate  | scenario
         "2000-01-01T00:00:00.000Z"  || "2000-01-01T00:00:00Z" | "Full string in proper ISO format"
         "2000-01-01T00:00:00.000 Z" || "2000-01-01T00:00:00Z" | "Full string, space before timezone"
-        "2000-01-01T00:00:00.000"   || "2000-01-01T00:00:00Z" | "Full string, no timezone"
-        "2000-01-01T00:00:00.00"    || "2000-01-01T00:00:00Z" | "Shorter millis"
-        "2000-01-01T00:00:00.0"     || "2000-01-01T00:00:00Z" | "Shorter millis"
-        "2000-01-01T00:00:00"       || "2000-01-01T00:00:00Z" | "No millis"
-        "2000-01-01T00:00"          || "2000-01-01T00:00:00Z" | "No seconds"
-        "2000-01-01"                || "2000-01-01T00:00:00Z" | "No time"
-        "2000 01 01"                || "2000-01-01T00:00:00Z" | "Date with spaces"
-        "2000/01/01"                || "2000-01-01T00:00:00Z" | "Date with slashes"
-        "01/01/2000"                || "2000-01-01T00:00:00Z" | "Date with slashes, Excel format"
-        "20000101"                  || "2000-01-01T00:00:00Z" | "Date with no separator"
         "2000-01-01 00:00:00.000Z"  || "2000-01-01T00:00:00Z" | "Replace 'T' with space"
         "2000-01-01T000000000Z"     || "2000-01-01T00:00:00Z" | "Time with no separator"
         "2000-01-01T00000000Z"      || "2000-01-01T00:00:00Z" | "Time with no separator, shorter millis"
@@ -44,6 +35,9 @@ class InstantValueConverterSpec extends Specification {
         "2000-01-01T00:00:00:000Z"  || "2000-01-01T00:00:00Z" | "Time with millis replace '.' with ':'"
         "2000-01-01T00:00:00:00Z"   || "2000-01-01T00:00:00Z" | "Time with millis replace '.' with ':', shorter millis"
         "2000-01-01T00:00:00:0Z"    || "2000-01-01T00:00:00Z" | "Time with millis replace '.' with ':', shorter millis"
+
+        // Note that even though timezone-specific dates are given, Instant is always in reference to UTC so timezone
+        // information is lost (unlike ZonedDateTime, where it is preserved).
         "2000-01-01T00:00:00-05"    || "2000-01-01T05:00:00Z" | "Timezone conforming to X format w/ negative"
         "2000-01-01T00:00:00-0500"  || "2000-01-01T05:00:00Z" | "Timezone conforming to XX format w/ negative"
         "2000-01-01T00:00:00-05:00" || "2000-01-01T05:00:00Z" | "Timezone conforming to XXX format w/ negative"
@@ -60,13 +54,23 @@ class InstantValueConverterSpec extends Specification {
         converter.convertString(givenDate)
 
         then:
-        thrown(DateTimeParseException)
+        thrown(exception)
 
         where:
-        givenDate     || failureReason
-        "2000-01-32"  || "day out of range"
-        "2000-13-01"  || "month out of range"
-        "10000-13-01" || "year out of range"
-        "00-01-01"    || "two digit year format not supported"
+        givenDate                 || exception              | failureReason
+        "2000-01-32T00:00Z"       || DateTimeParseException | "day out of range"
+        "2000-13-01T00:00Z"       || DateTimeParseException | "month out of range"
+        "10000-13-01T00:00Z"      || DateTimeParseException | "year out of range"
+        "00-01-01T00:00Z"         || DateTimeParseException | "two digit year format not supported"
+        "2000-01-01T00:00:00.000" || DateTimeException      | "full datetime, no timezone"
+        "2000-01-01T00:00:00.00"  || DateTimeException      | "Shorter millis, no timezone"
+        "2000-01-01T00:00:00.0"   || DateTimeException      | "Ever shorter millis, no timezone"
+        "2000-01-01T00:00:00"     || DateTimeException      | "No millis, no timezone"
+        "2000-01-01T00:00"        || DateTimeException      | "No seconds, no timezone"
+        "2000-01-01"              || DateTimeException      | "No time"
+        "2000 01 01"              || DateTimeException      | "Date with spaces, no time"
+        "2000/01/01"              || DateTimeException      | "Date with slashes, no time"
+        "01/01/2000"              || DateTimeException      | "Date with slashes, Excel format, no time"
+        "20000101"                || DateTimeException      | "Date with no separator, no time"
     }
 }
