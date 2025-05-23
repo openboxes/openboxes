@@ -3,7 +3,7 @@ import FilterSelectField from 'components/form-elements/FilterSelectField';
 import { DateFormat } from 'consts/timeFormat';
 
 export default {
-  endDate: {
+  startDate: {
     type: DateFilter,
     attributes: {
       label: 'react.cycleCount.filters.recordedAfter.label',
@@ -15,7 +15,7 @@ export default {
       required: true,
     },
   },
-  startDate: {
+  endDate: {
     type: DateFilter,
     attributes: {
       label: 'react.cycleCount.filters.recordedBefore.label',

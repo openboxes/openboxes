@@ -344,7 +344,6 @@ exports[`wizard component should match snapshot 1`] = `
                   onKeyPress={[Function]}
                   onKeyUp={[Function]}
                   onWheel={[Function]}
-                  required={true}
                   type="text"
                   value=""
                 />
@@ -404,7 +403,6 @@ exports[`wizard component should match snapshot 1`] = `
                         onFocus={[Function]}
                         onKeyDown={[Function]}
                         readOnly={false}
-                        required={true}
                         type="text"
                         value=""
                       />
@@ -855,7 +853,6 @@ exports[`wizardPage component should match snapshot 1`] = `
               onKeyPress={[Function]}
               onKeyUp={[Function]}
               onWheel={[Function]}
-              required={true}
               type="text"
               value=""
             />
@@ -915,7 +912,6 @@ exports[`wizardPage component should match snapshot 1`] = `
                     onFocus={[Function]}
                     onKeyDown={[Function]}
                     readOnly={false}
-                    required={true}
                     type="text"
                     value=""
                   />
