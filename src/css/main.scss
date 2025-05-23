@@ -1703,3 +1703,9 @@ div.search-input:focus-within {
 .font-weight-500 {
   font-weight: 500;
 }
+
+.disabled-icon {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
