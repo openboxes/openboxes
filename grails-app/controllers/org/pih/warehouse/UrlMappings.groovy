@@ -1009,7 +1009,12 @@ class UrlMappings {
 
         "/api/reports/cycle-count-details" {
             controller = "cycleCountApi"
-            action = [POST: "getCycleCountTransactionReport", GET: "getCycleCountTransactionReport"]
+            action = [POST: "getCycleCountDetails", GET: "getCycleCountDetails"]
+        }
+
+        "/api/reports/cycle-count-summary" {
+            controller = "cycleCountApi"
+            action = [POST: "getCycleCountSummary", GET: "getCycleCountSummary"]
         }
 
         // Error handling

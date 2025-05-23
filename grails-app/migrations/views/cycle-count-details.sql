@@ -31,7 +31,7 @@ create or replace view cycle_count_details AS
                                            JOIN cycle_count_request ON cycle_count.id = cycle_count_request.cycle_count_id
                                            WHERE cycle_count_item.count_index = 0
 ),
-     -- Get blind count details
+     -- Get verification count details
      cycle_count_final_count_details AS (SELECT cycle_count.id                                                        as cycle_count_id,
                                                 cycle_count_item.date_counted                                         as date_counted,
                                                 cycle_count.facility_id,
