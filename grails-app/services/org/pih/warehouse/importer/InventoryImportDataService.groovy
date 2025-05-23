@@ -142,7 +142,7 @@ class InventoryImportDataService implements ImportDataService {
 
         Map<String, AvailableItem> availableItems = productAvailabilityService.getAvailableItemsAtDateAsMap(
                 command.location,
-                new ArrayList<Product>(inventoryImportData.products),
+                inventoryImportData.products.toList(),
                 command.date)
 
         String comment = "Imported from ${command.filename} on ${new Date()}"
