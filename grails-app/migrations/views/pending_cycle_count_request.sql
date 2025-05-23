@@ -14,6 +14,7 @@ CREATE OR REPLACE VIEW pending_cycle_count_request AS
         ccr.updated_by_id,
         product_classification.abc_class as abc_class,
         SUM(pa.quantity_on_hand) AS quantity_on_hand,
+        SUM(pa.quantity_allocated) AS quantity_allocated,
         SUM(CASE WHEN pa.quantity_on_hand < 0 THEN 1 ELSE 0 END) as negative_item_count,
         -- A comma-separated list of internal locations in the format "<zone>: <bin location name>"
         GROUP_CONCAT(DISTINCT (

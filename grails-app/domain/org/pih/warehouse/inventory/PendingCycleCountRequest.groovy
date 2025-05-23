@@ -34,6 +34,8 @@ class PendingCycleCountRequest {
 
     Integer quantityOnHand
 
+    Integer quantityAllocated
+
     String internalLocations
 
     Integer negativeItemCount
@@ -62,6 +64,7 @@ class PendingCycleCountRequest {
                 productCatalogs: product.productCatalogs,
                 abcClass: abcClass,
                 quantityOnHand: quantityOnHand,
+                quantityAllocated: quantityAllocated,
                 status: status.toString(),
                 negativeItemCount: negativeItemCount,
                 requestType: requestType.toString(),

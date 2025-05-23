@@ -54,7 +54,7 @@ SELECT
     --  quantities in the main query. If we wanted to pull the sum for just on hand quantities we could do
     --  that via the on_hand_summary subquery JOIN.
     sum(product_availability.quantity_on_hand)                                       as quantity_on_hand,
-    sum(product_availability.quantity_available_to_promise)                          as quantity_available,
+    sum(product_availability.quantity_allocated)                                     as quantity_allocated,
 
     -- Negative item count
     SUM(CASE WHEN product_availability.quantity_on_hand < 0 THEN 1 ELSE 0 END)       as negative_item_count,
