@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 
+import { useSelector } from 'react-redux';
+
 const useTablePagination = ({
   defaultPageSize,
   totalCount,
@@ -16,6 +18,12 @@ const useTablePagination = ({
   // as useTablePagination useEffect listened to filterParams and later updated offset
   const [serializedParams, setSerializedParams] = useState('');
 
+  const {
+    currentLocation,
+  } = useSelector((state) => ({
+    currentLocation: state.session.currentLocation,
+  }));
+
   const maxPage = useMemo(
     () => Math.floor(totalCount / pagination.pageSize),
     [totalCount, pagination.pageSize],
@@ -23,6 +31,7 @@ const useTablePagination = ({
 
   const generateSerializedParams = (newPageIndex) => JSON.stringify({
     ...filterParams,
+    currentLocation: currentLocation?.id,
     pageIndex: newPageIndex,
   });
 
