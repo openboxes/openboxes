@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 
 import TableRow from 'components/DataTable/TableRow';
 import DataTableStatus from 'components/DataTable/v2/DataTableStatus';
-import useCheckCycleCountStatus from 'hooks/cycleCount/useCheckCycleCountStatus';
+import useCycleCountProductAvailability from 'hooks/cycleCount/useCycleCountProductAvailability';
 import useTableColumnMeta from 'hooks/useTableColumnMeta';
 import useTranslate from 'hooks/useTranslate';
 import getCommonPinningStyles from 'utils/getCommonPinningStyles';
@@ -46,7 +46,7 @@ const DataTableBody = ({
         !loading &&
         rowModel.rows.map((row, index) => {
           const { isProductDisabled, label, defaultMessage } = showDisabledProducts
-            ? useCheckCycleCountStatus(data[index]?.status)
+            ? useCycleCountProductAvailability(data[index].status)
             : { isProductDisabled: false, label: '', defaultMessage: '' };
 
           return (
