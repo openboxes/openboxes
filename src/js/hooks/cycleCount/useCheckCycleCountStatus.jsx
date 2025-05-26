@@ -1,6 +1,6 @@
 import CycleCountCandidateStatus from 'consts/cycleCountCandidateStatus';
 
-const useCheckCycleCountStep = (status) => {
+const useCheckCycleCountStatus = (status) => {
   if (
     status === CycleCountCandidateStatus.CREATED
     || status === CycleCountCandidateStatus.REQUESTED
@@ -31,4 +31,4 @@ const useCheckCycleCountStep = (status) => {
   };
 };
 
-export default useCheckCycleCountStep;
+export default useCheckCycleCountStatus;

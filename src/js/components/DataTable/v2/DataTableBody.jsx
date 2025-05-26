@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 
 import TableRow from 'components/DataTable/TableRow';
 import DataTableStatus from 'components/DataTable/v2/DataTableStatus';
-import useCheckCycleCountStep from 'hooks/cycleCount/useCheckCycleCountStep';
+import useCheckCycleCountStatus from 'hooks/cycleCount/useCheckCycleCountStatus';
 import useTableColumnMeta from 'hooks/useTableColumnMeta';
 import useTranslate from 'hooks/useTranslate';
 import getCommonPinningStyles from 'utils/getCommonPinningStyles';
@@ -45,11 +45,9 @@ const DataTableBody = ({
       {dataLength > 0 &&
         !loading &&
         rowModel.rows.map((row, index) => {
-          const {
-            isProductDisabled,
-            label,
-            defaultMessage,
-          } = useCheckCycleCountStep(data[index].status);
+          const { isProductDisabled, label, defaultMessage } = showDisabledProducts
+            ? useCheckCycleCountStatus(data[index]?.status)
+            : { isProductDisabled: false, label: '', defaultMessage: '' };
 
           return (
             <CustomTooltip
