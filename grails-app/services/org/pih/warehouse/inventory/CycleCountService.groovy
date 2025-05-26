@@ -78,7 +78,12 @@ class CycleCountService {
                 isNull("status")
             }
             else {
-                inList("status", command.statuses)
+                or {
+                    inList("status", command.statuses)
+                    if (command.includeNullStatus) {
+                        isNull("status")
+                    }
+                }
             }
 
             if (command.negativeQuantity) {

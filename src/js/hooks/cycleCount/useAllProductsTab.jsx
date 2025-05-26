@@ -17,8 +17,10 @@ import TableHeaderCell from 'components/DataTable/TableHeaderCell';
 import Checkbox from 'components/form-elements/v2/Checkbox';
 import { INVENTORY_ITEM_URL } from 'consts/applicationUrls';
 import { TO_COUNT_TAB } from 'consts/cycleCount';
+import CycleCountCandidateStatus from 'consts/cycleCountCandidateStatus';
 import cycleCountColumn from 'consts/cycleCountColumn';
 import { DateFormat } from 'consts/timeFormat';
+import useCheckCycleCountStep from 'hooks/cycleCount/useCheckCycleCountStep';
 import useQueryParams from 'hooks/useQueryParams';
 import useSpinner from 'hooks/useSpinner';
 import useTableCheckboxes from 'hooks/useTableCheckboxes';
@@ -81,6 +83,14 @@ const useAllProductsTab = ({
   const getParams = ({
     sortingParams,
   }) => _.omitBy({
+    statuses: [
+      CycleCountCandidateStatus.CREATED,
+      CycleCountCandidateStatus.REQUESTED,
+      CycleCountCandidateStatus.COUNTING,
+      CycleCountCandidateStatus.COUNTED,
+      CycleCountCandidateStatus.INVESTIGATING,
+    ],
+    includeNullStatus: true,
     offset: `${offset}`,
     max: `${pageSize}`,
     ...sortingParams,
@@ -127,7 +137,9 @@ const useAllProductsTab = ({
     serializedParams,
   });
 
-  const productIds = tableData.data.map((row) => row.product.id);
+  const productIds = tableData.data
+    .filter((row) => !useCheckCycleCountStep(row.status).isProductDisabled)
+    .map((row) => row.product.id);
 
   // Separated from columns to reduce the amount of rerenders of
   // the rest columns (on checked checkboxes change)
@@ -141,15 +153,19 @@ const useAllProductsTab = ({
         />
       </TableHeaderCell>
     ),
-    cell: ({ row }) => (
-      <TableCell className="rt-td">
-        <Checkbox
-          noWrapper
-          onChange={selectRow(row.original.product.id)}
-          value={isChecked(row.original.product.id)}
-        />
-      </TableCell>
-    ),
+    cell: ({ row }) => {
+      const { isProductDisabled } = useCheckCycleCountStep(row.original.status);
+      return (
+        <TableCell className="rt-td">
+          <Checkbox
+            noWrapper
+            onChange={selectRow(row.original.product.id)}
+            value={isProductDisabled ? true : isChecked(row.original.product.id)}
+            disabled={isProductDisabled}
+          />
+        </TableCell>
+      );
+    },
     meta: {
       getCellContext: () => ({
         className: 'checkbox-column',
@@ -186,18 +202,21 @@ const useAllProductsTab = ({
           {translate('react.cycleCount.table.products.label', 'Products')}
         </TableHeaderCell>
       ),
-      cell: ({ getValue, row }) => (
-        <TableCell
-          tooltip
-          tooltipLabel={getValue()}
-          link={INVENTORY_ITEM_URL.showStockCard(row.original.product.id)}
-          className="rt-td multiline-cell"
-        >
-          <div className="limit-lines-2">
-            {getValue()}
-          </div>
-        </TableCell>
-      ),
+      cell: ({ getValue, row }) => {
+        const { isProductDisabled } = useCheckCycleCountStep(row.original.status);
+        return (
+          <TableCell
+            tooltip
+            tooltipLabel={getValue()}
+            link={!isProductDisabled && INVENTORY_ITEM_URL.showStockCard(row.original.product.id)}
+            className="rt-td multiline-cell"
+          >
+            <div className="limit-lines-2">
+              {getValue()}
+            </div>
+          </TableCell>
+        );
+      },
       meta: {
         flexWidth: 370,
       },
@@ -270,13 +289,16 @@ const useAllProductsTab = ({
           {translate('react.cycleCount.table.tag.label', 'Tag')}
         </TableHeaderCell>
       ),
-      cell: ({ getValue }) => (
-        <TableCell className="rt-td multiline-cell">
-          <div className="badge-container">
-            {getValue()}
-          </div>
-        </TableCell>
-      ),
+      cell: ({ getValue, row }) => {
+        const { isProductDisabled } = useCheckCycleCountStep(row.original.status);
+        return (
+          <TableCell className="rt-td multiline-cell">
+            <div className={`badge-container ${isProductDisabled && 'disabled'}`}>
+              {getValue()}
+            </div>
+          </TableCell>
+        );
+      },
       meta: {
         flexWidth: 200,
       },
@@ -289,13 +311,16 @@ const useAllProductsTab = ({
           {translate('react.cycleCount.table.productCatalogue.label', 'Product Catalogue')}
         </TableHeaderCell>
       ),
-      cell: ({ getValue }) => (
-        <TableCell className="rt-td multiline-cell">
-          <div className="badge-container">
-            {getValue()}
-          </div>
-        </TableCell>
-      ),
+      cell: ({ getValue, row }) => {
+        const { isProductDisabled } = useCheckCycleCountStep(row.original.status);
+        return (
+          <TableCell className="rt-td multiline-cell">
+            <div className={`badge-container ${isProductDisabled && 'disabled'}`}>
+              {getValue()}
+            </div>
+          </TableCell>
+        );
+      },
       meta: {
         flexWidth: 200,
       },
