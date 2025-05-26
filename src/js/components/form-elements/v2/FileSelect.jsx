@@ -38,7 +38,7 @@ const FileSelect = ({
     return {
       code: 'invalid-extension',
       message: translate(
-        'react.default.error.invalidFileExtension.label',
+        'react.default.error.invalidFilesExtension.label',
         `File extension should be one of: ${allowedExtensions.join(', ')}`,
         [allowedExtensions.join(', ')],
       ),
