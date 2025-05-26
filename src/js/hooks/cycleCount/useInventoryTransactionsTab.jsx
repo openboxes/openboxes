@@ -93,6 +93,29 @@ const useInventoryTransactionsTab = ({
     setTableData({ data: [], totalCount: 0 });
   }, [currentLocation?.id]);
 
+  const calculatePercentage = (quantityOnHand, quantityCounted, quantityVariance) => {
+    let percentageValue = 100; // Default to 100%
+
+    // If quantityOnHand is less than or equal to 0 and quantityCounted is 0,
+    // set percentageValue to 0
+    if (quantityOnHand <= 0 && quantityCounted === 0) {
+      percentageValue = 0;
+    }
+
+    // If quantityOnHand is less than or equal to 0 and quantityCounted is not 0,
+    // set percentageValue to 100
+    if (quantityOnHand <= 0 && quantityCounted !== 0) {
+      percentageValue = 100;
+    }
+
+    // Calculate percentage value only if quantityOnHand is greater than 0
+    if (quantityOnHand > 0) {
+      percentageValue = Math.round((Math.abs(quantityVariance) / Math.abs(quantityOnHand)) * 100);
+    }
+
+    return percentageValue;
+  };
+
   const columns = useMemo(() => [columnHelper.accessor(cycleCountColumn.ALIGNMENT, {
     header: () => (
       <TableHeaderCell sortable columnId={cycleCountColumn.ALIGNMENT} {...sortableProps}>
@@ -268,16 +291,8 @@ const useInventoryTransactionsTab = ({
       },
     }) => {
       const variant = getCycleCountDifferencesVariant(quantityVariance, quantityOnHand);
-      let percentageValue = 100;
-      if (quantityOnHand <= 0 && quantityCounted === 0) {
-        percentageValue = 0;
-      }
-      if (quantityOnHand > 0) {
-        percentageValue = Math.round((Math.abs(quantityVariance) / Math.abs(quantityOnHand)) * 100);
-      }
-      if (quantityOnHand <= 0 && quantityCounted !== 0) {
-        percentageValue = 100;
-      }
+      const percentageValue =
+        calculatePercentage(quantityOnHand, quantityCounted, quantityVariance);
       const className = quantityVariance > 0 ? 'value-indicator--more' : 'value-indicator--less';
 
       return (
