@@ -261,16 +261,23 @@ const useInventoryTransactionsTab = ({
         original: {
           verificationCount: {
             quantityOnHand,
+            quantityCounted,
             quantityVariance,
           },
         },
       },
     }) => {
       const variant = getCycleCountDifferencesVariant(quantityVariance, quantityOnHand);
-      const percentageValue =
-        quantityOnHand > 0
-          ? Math.round((Math.abs(quantityVariance) / Math.abs(quantityOnHand)) * 100)
-          : 100;
+      let percentageValue = 100;
+      if (quantityOnHand <= 0 && quantityCounted === 0) {
+        percentageValue = 0;
+      }
+      if (quantityOnHand > 0) {
+        percentageValue = Math.round((Math.abs(quantityVariance) / Math.abs(quantityOnHand)) * 100);
+      }
+      if (quantityOnHand <= 0 && quantityCounted !== 0) {
+        percentageValue = 100;
+      }
       const className = quantityVariance > 0 ? 'value-indicator--more' : 'value-indicator--less';
 
       return (
