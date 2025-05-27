@@ -25,7 +25,6 @@ import { UPDATE_CYCLE_COUNT_IDS } from 'actions/types';
 import cycleCountApi from 'api/services/CycleCountApi';
 import { CYCLE_COUNT as GET_CYCLE_COUNTS } from 'api/urls';
 import notification from 'components/Layout/notifications/notification';
-import ActivityCode from 'consts/activityCode';
 import { CYCLE_COUNT } from 'consts/applicationUrls';
 import { TO_RESOLVE_TAB } from 'consts/cycleCount';
 import NotificationType from 'consts/notificationTypes';
@@ -96,7 +95,8 @@ const useResolveStep = () => {
     if (showBinLocation) {
       dispatch(fetchBinLocations(
         currentLocation?.id,
-        [ActivityCode.RECEIVE_STOCK],
+        [],
+        'sortOrder,locationType,name',
       ));
     }
   }, [currentLocation?.id]);

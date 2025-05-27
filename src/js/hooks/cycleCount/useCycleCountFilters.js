@@ -102,7 +102,7 @@ const useCycleCountFilters = () => {
         fetchProductsTags({ hideNumbers: true }),
         fetchProductsCatalogs({ hideNumbers: true }),
         fetchProductClassifications(currentLocation?.id),
-        fetchBins(currentLocation?.id),
+        fetchBins(currentLocation?.id, [], 'sortOrder,locationType,name'),
       ]);
 
       setSelectOptions({
