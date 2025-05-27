@@ -8,7 +8,7 @@ import useTranslate from 'hooks/useTranslate';
 
 import './style.scss';
 
-const FileSelect = ({
+const DropzoneFileSelect = ({
   height,
   width,
   minHeight,
@@ -111,9 +111,9 @@ const FileSelect = ({
   );
 };
 
-export default FileSelect;
+export default DropzoneFileSelect;
 
-FileSelect.propTypes = {
+DropzoneFileSelect.propTypes = {
   // Text displayed on the dropzone
   dropzoneText: PropTypes.shape({
     id: PropTypes.string,
@@ -141,7 +141,7 @@ FileSelect.propTypes = {
   isFormDisabled: PropTypes.bool,
 };
 
-FileSelect.defaultProps = {
+DropzoneFileSelect.defaultProps = {
   dropzoneText: {
     id: 'react.default.dragDropHere.label',
     defaultMessage: 'Drag and drop file here.',
