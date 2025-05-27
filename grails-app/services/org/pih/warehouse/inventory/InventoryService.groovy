@@ -1371,20 +1371,15 @@ class InventoryService implements ApplicationContextAware {
     RecordInventoryCommand saveRecordInventoryCommand(RecordInventoryCommand cmd, Map params) {
         log.debug "Saving record inventory command params: " + params
 
-        Instant now = Instant.now()
-        // -1 (instead of +1 to the adjustment transaction date) because transaction date can't be in the future.
-        Date inventoryBaselineTransactionDate = DateUtil.asDate(now.minusSeconds(1))
-        Date adjustmentTransactionDate = DateUtil.asDate(now)
-        // If record stock inventory baseline is enabled we want to create inventory baseline transaction matching
-        // the adjustment transaction
         Boolean isInventoryBaselineEnabled = Holders.config.openboxes.transactions.recordStock.inventoryBaseline.enabled
+        Date adjustmentTransactionDate = new Date(cmd.transactionDate.time + 1000)
 
         try {
             // 1. Calculate the current available items for the given product
             Map<String, AvailableItem> availableItems = productAvailabilityService.getAvailableItemsAtDateAsMap(
                     currentLocation,
                     [cmd.product],
-                    adjustmentTransactionDate
+                    cmd.transactionDate
             )
 
             // 2. Create a new adjustment transaction
@@ -1484,7 +1479,7 @@ class InventoryService implements ApplicationContextAware {
                         currentLocation,
                         null,
                         availableItems.values() as List<AvailableItem>,
-                        inventoryBaselineTransactionDate,
+                        cmd.transactionDate
                 )
             }
         } catch (Exception e) {
