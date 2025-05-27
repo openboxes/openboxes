@@ -90,7 +90,7 @@ const useAllProductsTab = ({
       CycleCountCandidateStatus.COUNTED,
       CycleCountCandidateStatus.INVESTIGATING,
     ],
-    showCountAndResolveProducts: true,
+    showCycleCountsInProgress: true,
     offset: `${offset}`,
     max: `${pageSize}`,
     ...sortingParams,

@@ -80,7 +80,7 @@ class CycleCountService {
             else {
                 or {
                     inList("status", command.statuses)
-                    if (command.showCountAndResolveProducts) {
+                    if (command.showCycleCountsInProgress) {
                         isNull("status")
                     }
                 }
@@ -94,20 +94,16 @@ class CycleCountService {
             //  product/facility pairs where quantity on hand is negative.
             // Moved this from the cycle count session view since it's a requirement of the candidate query,
             // not the cycle count session.
-            if (command.includeStockOnHandOrNegativeStock && !command.showCountAndResolveProducts) {
+            if (command.includeStockOnHandOrNegativeStock && !command.showCycleCountsInProgress) {
                 eq("hasStockOnHandOrNegativeStock", command.includeStockOnHandOrNegativeStock)
             }
 
             // Products from the "To Count" and "To Resolve" tabs can have negative stock,
             // but we want to include them in the results
-            if (command.showCountAndResolveProducts) {
+            if (command.showCycleCountsInProgress) {
                 or {
-                    if (command.statuses) {
-                        inList("status", command.statuses)
-                    }
-                    and {
-                        eq("hasStockOnHandOrNegativeStock", command.includeStockOnHandOrNegativeStock)
-                    }
+                    inList("status", command.statuses)
+                    eq("hasStockOnHandOrNegativeStock", command.includeStockOnHandOrNegativeStock)
                 }
             }
 

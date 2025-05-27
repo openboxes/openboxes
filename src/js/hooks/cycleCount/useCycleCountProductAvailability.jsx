@@ -1,11 +1,7 @@
-import CycleCountCandidateStatus from 'consts/cycleCountCandidateStatus';
+import { isCounting, isResolving } from 'utils/checkCycleCountStatus';
 
 const useCycleCountProductAvailability = (status) => {
-  if (
-    status === CycleCountCandidateStatus.CREATED
-    || status === CycleCountCandidateStatus.REQUESTED
-    || status === CycleCountCandidateStatus.COUNTING
-  ) {
+  if (isCounting(status)) {
     return {
       isProductDisabled: true,
       label: 'react.cycleCount.status.counting.label',
@@ -13,10 +9,7 @@ const useCycleCountProductAvailability = (status) => {
     };
   }
 
-  if (
-    status === CycleCountCandidateStatus.COUNTED
-    || status === CycleCountCandidateStatus.INVESTIGATING
-  ) {
+  if (isResolving(status)) {
     return {
       isProductDisabled: true,
       label: 'react.cycleCount.status.resolving.label',
