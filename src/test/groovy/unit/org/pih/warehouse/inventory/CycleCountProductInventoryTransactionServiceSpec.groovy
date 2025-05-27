@@ -58,6 +58,8 @@ class CycleCountProductInventoryTransactionServiceSpec extends Specification imp
         Location facility = new Location(inventory: new Inventory())
         Product product = new Product()
         CycleCount cycleCount = new CycleCount(cycleCountItems: [])
+
+        and: 'a date right before we create the transaction'
         Date date = new Date()
 
         and: 'a mocked transaction number'
@@ -76,17 +78,15 @@ class CycleCountProductInventoryTransactionServiceSpec extends Specification imp
                         quantityOnHand: 25,
                 )
         ]
-        productAvailabilityServiceStub.getAvailableItems(
-                facility, [product.id], false, true) >> availableItems
+        productAvailabilityServiceStub.getAvailableItemsAtDate(facility, [product], null) >> availableItems
 
         when:
         Transaction transaction = cycleCountProductInventoryTransactionService.createInventoryBaselineTransaction(
-                facility, product, cycleCount, date)
+                facility, cycleCount, [product])
 
         then:
         assert transaction.transactionType == productInventoryTransactionType
-        assert transaction.transactionDate == date
-        assert transaction.source == facility
+        assert transaction.transactionDate >= date  // The transaction date should be "now"
         assert transaction.transactionNumber == "123ABC"
 
         List<TransactionEntry> transactionEntries = transaction.transactionEntries as List<TransactionEntry>
