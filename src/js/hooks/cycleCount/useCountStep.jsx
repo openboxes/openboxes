@@ -569,13 +569,6 @@ const useCountStep = () => {
     resetFocus();
   };
 
-  const importItems = async (importFile) => {
-  const applyImportFile = async (e) => {
-    if (e instanceof File) {
-      setImportFile(e);
-    }
-  };
-
   const createCustomItemsFromImport = (items) => (items
     ? items.map((item) => ({
       ...item,
@@ -614,7 +607,7 @@ const useCountStep = () => {
     },
   });
 
-  const importItems = async () => {
+  const importItems = async (importFile) => {
     try {
       show();
       const response = await cycleCountApi.importCycleCountItems(
@@ -622,7 +615,6 @@ const useCountStep = () => {
         currentLocation?.id,
       );
       console.log(response);
-      const response = await cycleCountApi.importCycleCountItems(importFile, currentLocation?.id);
       let cycleCounts = _.groupBy(response.data.data, 'cycleCountId');
       tableData.current = tableData.current.map((cycleCount) => ({
         ...cycleCount,

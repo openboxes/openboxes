@@ -76,26 +76,6 @@ const CountStepHeader = ({
         />
       </div>
     </div>
-    <div className="px-2 pt-2">
-      <FileSelect
-        allowedExtensions={[FileFormat.XLS]}
-        buttonVariant="primary"
-        dropzoneText={{
-          id: 'react.cycleCount.importDropzone.label',
-          defaultMessage: 'Import cycle count items',
-        }}
-        minHeight=""
-        onChange={applyImportFile}
-      />
-      <Button
-        className="mt-2"
-        variant="primary"
-        onClick={importItems}
-        label="react.cycleCount.confirmImport.label"
-        defaultLabel="Confirm import"
-        disabled={!importFile}
-      />
-    </div>
   </div>
 );
 
