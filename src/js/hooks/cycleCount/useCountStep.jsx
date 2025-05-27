@@ -571,7 +571,10 @@ const useCountStep = () => {
   const importItems = async (importFile) => {
     try {
       show();
-      const response = await cycleCountApi.importCycleCountItems(importFile, currentLocation?.id);
+      const response = await cycleCountApi.importCycleCountItems(
+        importFile[0],
+        currentLocation?.id,
+      );
       console.log(response);
     } finally {
       hide();

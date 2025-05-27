@@ -1,15 +1,15 @@
 import React from 'react';
 
+import _ from 'lodash';
 import PropTypes from 'prop-types';
 
 import notification from 'components/Layout/notifications/notification';
-import FileFormat from 'consts/fileFormat';
 import NotificationType from 'consts/notificationTypes';
 import useTranslate from 'hooks/useTranslate';
 import Translate from 'utils/Translate';
 
 const ButtonFileSelect = ({
-  allowedExtension,
+  allowedExtensions,
   onFileUpload,
   label,
   defaultLabel,
@@ -20,22 +20,26 @@ const ButtonFileSelect = ({
 
   const getFileExtension = (file) => file.name.split('.')?.[1];
 
-  const validateFileType = (file) => {
-    if (allowedExtension === getFileExtension(file)) {
+  const validateFileType = (files) => {
+    if (!allowedExtensions.length
+        || _.every(files, (file) => allowedExtensions.includes(getFileExtension(file)))) {
       return true;
     }
 
     notification(NotificationType.ERROR_FILLED)({
       message: 'Invalid file extension',
       details: translate(
-        'react.default.error.invalidFileExtension.label',
-        `File extension should be: ${allowedExtension}`,
-        [allowedExtension],
+        'react.default.error.invalidFilesExtension.label',
+        `File extension should be one of: ${allowedExtensions.join(', ')}`,
+        [allowedExtensions.join(', ')],
       ),
     });
 
     return false;
   };
+
+  const getAcceptableExtensions = () =>
+    allowedExtensions.map((extension) => `.${extension}`).join(',');
 
   return (
     <label
@@ -56,12 +60,12 @@ const ButtonFileSelect = ({
         style={{ display: 'none' }}
         disabled={disabled}
         onChange={(e) => {
-          const file = e.target.files[0];
-          if (validateFileType(file)) {
-            onFileUpload(file);
+          const { files } = e.target;
+          if (validateFileType(files)) {
+            onFileUpload(files);
           }
         }}
-        accept={allowedExtension}
+        accept={getAcceptableExtensions()}
       />
     </label>
   );
@@ -70,7 +74,9 @@ const ButtonFileSelect = ({
 export default ButtonFileSelect;
 
 ButtonFileSelect.propTypes = {
-  allowedExtension: PropTypes.oneOf(Object.values(FileFormat)).isRequired,
+  allowedExtensions: PropTypes.arrayOf(
+    PropTypes.string,
+  ).isRequired,
   onFileUpload: PropTypes.func.isRequired,
   label: PropTypes.string,
   defaultLabel: PropTypes.string,

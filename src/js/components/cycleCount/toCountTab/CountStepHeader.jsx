@@ -55,7 +55,7 @@ const CountStepHeader = ({
           onFileUpload={importItems}
           defaultLabel="Import Count"
           label="react.cycleCount.importCount.label"
-          allowedExtension={FileFormat.XLS}
+          allowedExtensions={[FileFormat.XLS]}
           disabled={isFormDisabled}
           variant="primary-outline"
         />
