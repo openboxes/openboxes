@@ -94,7 +94,6 @@ const useInventoryTransactionsTab = ({
   }, [currentLocation?.id]);
 
   const calculatePercentage = (quantityOnHand, quantityCounted, quantityVariance) => {
-
     // If quantityOnHand is less than or equal to 0 and quantityCounted is 0,
     // set percentageValue to 0
     if (quantityOnHand <= 0 && quantityCounted === 0) {
