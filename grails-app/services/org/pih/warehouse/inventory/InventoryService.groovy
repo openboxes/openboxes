@@ -1794,7 +1794,6 @@ class InventoryService implements ApplicationContextAware {
      * @param params
      */
     boolean adjustStock(AdjustStockCommand command) {
-
         def newQuantity = command.newQuantity
         def location = command.location
         def inventory = command.location.inventory
@@ -1817,6 +1816,7 @@ class InventoryService implements ApplicationContextAware {
             transaction.inventory = inventory
             transaction.comment = command.comment
             transaction.transactionNumber = generateTransactionNumber(transaction)
+            transaction.disableRefresh = Boolean.TRUE
 
             // Add transaction entry to transaction
             def transactionEntry = new TransactionEntry()
@@ -1830,6 +1830,7 @@ class InventoryService implements ApplicationContextAware {
                 throw new ValidationException("Error saving transaction", transaction.errors)
             }
         }
+
         return command
     }
 

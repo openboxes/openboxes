@@ -11,7 +11,7 @@ package org.pih.warehouse.api
 
 import grails.converters.JSON
 import grails.gorm.transactions.Transactional
-import org.grails.web.json.JSONArray
+import grails.validation.ValidationException
 import org.grails.web.json.JSONObject
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.inventory.AdjustStockCommand
@@ -22,6 +22,7 @@ import org.pih.warehouse.product.Product
 class StockAdjustmentApiController {
 
     def inventoryService
+    def productAvailabilityService
 
     def create() {
         String locationId = params?.location?.id ?: session?.warehouse?.id
@@ -33,34 +34,37 @@ class StockAdjustmentApiController {
 
         def jsonObject = request.JSON
         List<StockAdjustment> stockAdjustments = new ArrayList<StockAdjustment>()
-        bindStockAdjustments(stockAdjustments, jsonObject)
+        bindStockAdjustmentData(stockAdjustments, jsonObject)
 
         // FIXME Forgot there was already a command object for this
         stockAdjustments.each { StockAdjustment stockAdjustment ->
             AdjustStockCommand adjustStockCommand = new AdjustStockCommand()
             adjustStockCommand.inventoryItem = stockAdjustment.inventoryItem
-            adjustStockCommand.quantity = stockAdjustment.quantityAdjusted
+            adjustStockCommand.currentQuantity = stockAdjustment.quantityAvailable
+            adjustStockCommand.newQuantity = stockAdjustment.quantityAdjusted
             adjustStockCommand.comment = stockAdjustment.comments
             adjustStockCommand.location = location
             adjustStockCommand.binLocation = stockAdjustment.binLocation
+            adjustStockCommand.reasonCode = stockAdjustment.reasonCode
             inventoryService.adjustStock(adjustStockCommand)
+
+            if (adjustStockCommand.hasErrors()) {
+                throw new ValidationException("Unable to adjust stock", adjustStockCommand.errors)
+            }
         }
+
+        def productIds = stockAdjustments*.inventoryItem*.product*.id.unique()
+        productAvailabilityService.triggerRefreshProductAvailabilityWithDelay(locationId, productIds, Boolean.FALSE,
+                Constants.MILLISECONDS_IN_ONE_SECOND)
 
         render([data: stockAdjustments] as JSON)
     }
 
-
-    private void bindStockAdjustments(List<StockAdjustment> stockAdjustments, JSONArray jsonArray) {
-        jsonArray.each {
-            stockAdjustments << bindStockAdjustment(new StockAdjustment(), it)
-        }
+    void bindStockAdjustmentData(List<StockAdjustment> stockAdjustments, JSONObject jsonObject) {
+        stockAdjustments << bindStockAdjustment(new StockAdjustment(), jsonObject)
     }
 
-//    void bindStockAdjustmentData(List<StockAdjustment> stockAdjustments, JSONObject jsonObject) {
-//        stockAdjustments << bindStockAdjustmentData(new StockAdjustment(), jsonObject)
-//    }
-
-    private StockAdjustment bindStockAdjustment(StockAdjustment stockAdjustment, JSONObject jsonObject) {
+    StockAdjustment bindStockAdjustment(StockAdjustment stockAdjustment, JSONObject jsonObject) {
         bindData(stockAdjustment, jsonObject)
 
         if (!stockAdjustment.inventoryItem) {
@@ -71,6 +75,5 @@ class StockAdjustmentApiController {
 
         return stockAdjustment
     }
-
 }
 

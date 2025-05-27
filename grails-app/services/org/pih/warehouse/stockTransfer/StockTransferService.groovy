@@ -17,6 +17,7 @@ import org.pih.warehouse.api.DocumentGroupCode
 import org.pih.warehouse.api.StockTransfer
 import org.pih.warehouse.api.StockTransferItem
 import org.pih.warehouse.api.StockTransferStatus
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.TransferStockCommand
@@ -363,8 +364,13 @@ class StockTransferService {
             command.otherBinLocation = stockTransferItem.destinationBinLocation
             command.order = order
             command.transferOut = Boolean.TRUE
+            command.disableRefresh = Boolean.TRUE
             inventoryService.transferStock(command)
         }
+
+        def productIds = stockTransfer.stockTransferItems*.product*.id.findAll { it }.unique()
+        productAvailabilityService.triggerRefreshProductAvailabilityWithDelay(stockTransfer.origin.id, productIds,
+                Boolean.FALSE, Constants.MILLISECONDS_IN_ONE_SECOND)
     }
 
     void processSplitItems(StockTransfer stockTransfer) {
