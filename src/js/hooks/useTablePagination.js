@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 
 import { useSelector } from 'react-redux';
+import { getCurrentLocation } from 'selectors';
 
 const useTablePagination = ({
   defaultPageSize,
@@ -21,7 +22,7 @@ const useTablePagination = ({
   const {
     currentLocation,
   } = useSelector((state) => ({
-    currentLocation: state.session.currentLocation,
+    currentLocation: getCurrentLocation(state),
   }));
 
   const maxPage = useMemo(

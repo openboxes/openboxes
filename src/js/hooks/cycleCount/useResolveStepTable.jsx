@@ -559,7 +559,7 @@ const useResolveStepTable = ({
             )}
           </Tooltip>
         </TableCell>
-      ), [isFormDisabled, removeRow, cycleCountId, translate]),
+      ), [isFormDisabled]),
       meta: {
         flexWidth: 50,
         hide: !tableData?.some((row) => row.id?.includes('newRow') || row.custom) || !isStepEditable,
