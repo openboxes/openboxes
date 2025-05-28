@@ -22,7 +22,7 @@ import StockMovementDirection from 'consts/StockMovementDirection';
 import { DateFormat } from 'consts/timeFormat';
 import useArrowsNavigation from 'hooks/useArrowsNavigation';
 import useTranslate from 'hooks/useTranslate';
-import { debounceProductsFetch, debounceUsersFetch } from 'utils/option-utils';
+import { debouncePeopleFetch, debounceProductsFetch } from 'utils/option-utils';
 
 const useInboundAddItemsColumns = ({
   errors,
@@ -79,8 +79,8 @@ const useInboundAddItemsColumns = ({
     [debounceTime, minSearchLength],
   );
 
-  const debouncedUsersFetch = useCallback(
-    debounceUsersFetch(debounceTime, minSearchLength),
+  const debouncedPeopleFetch = useCallback(
+    debouncePeopleFetch(debounceTime, minSearchLength),
     [debounceTime, minSearchLength],
   );
 
@@ -462,7 +462,7 @@ const useInboundAddItemsColumns = ({
         <TableHeaderCell className="justify-content-center">
           <SelectField
             async
-            loadOptions={debouncedUsersFetch}
+            loadOptions={debouncedPeopleFetch}
             className="select-xs dark-select-xs"
             onChange={handleHeaderRecipientChange}
             value={headerRecipient}
@@ -486,7 +486,7 @@ const useInboundAddItemsColumns = ({
                 <SelectField
                   {...field}
                   async
-                  loadOptions={debouncedUsersFetch}
+                  loadOptions={debouncedPeopleFetch}
                   hasErrors={hasErrors}
                   onKeyDown={(e) => handleKeyDown(e, row.index, column.id)}
                   onBlur={() => handleBlur(field)}
