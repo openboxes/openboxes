@@ -78,7 +78,12 @@ class CycleCountService {
                 isNull("status")
             }
             else {
-                inList("status", command.statuses)
+                or {
+                    inList("status", command.statuses)
+                    if (command.showCycleCountsInProgress) {
+                        isNull("status")
+                    }
+                }
             }
 
             if (command.negativeQuantity) {
@@ -89,8 +94,17 @@ class CycleCountService {
             //  product/facility pairs where quantity on hand is negative.
             // Moved this from the cycle count session view since it's a requirement of the candidate query,
             // not the cycle count session.
-            if (command.includeStockOnHandOrNegativeStock) {
+            if (command.includeStockOnHandOrNegativeStock && !command.showCycleCountsInProgress) {
                 eq("hasStockOnHandOrNegativeStock", command.includeStockOnHandOrNegativeStock)
+            }
+
+            // Products from the "To Count" and "To Resolve" tabs can have negative stock,
+            // but we want to include them in the results
+            if (command.showCycleCountsInProgress) {
+                or {
+                    inList("status", command.statuses)
+                    eq("hasStockOnHandOrNegativeStock", command.includeStockOnHandOrNegativeStock)
+                }
             }
 
             // FIXME Sort order should allow multiple sort order rules ("columna, -columnb"). We should consider
