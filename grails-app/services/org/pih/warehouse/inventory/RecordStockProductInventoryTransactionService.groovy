@@ -14,16 +14,17 @@ class RecordStockProductInventoryTransactionService extends ProductInventoryTran
             RecordInventoryCommand recordInventoryCommand,
             Date transactionDate
     ) {
-        Transaction transaction = new Transaction(recordInventoryCommand.properties)
-        transaction.transactionType = TransactionType.get(Constants.ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID)
-        transaction.inventory = recordInventoryCommand.inventory
-        transaction.comment = recordInventoryCommand.comment
+        Transaction transaction = new Transaction(
+                transactionType: TransactionType.get(Constants.ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID),
+                inventory: recordInventoryCommand.inventory,
+                comment: recordInventoryCommand.comment,
+                transactionDate: transactionDate
+        )
         transaction.transactionNumber = inventoryService.generateTransactionNumber(transaction)
-        transaction.transactionDate = transactionDate
         return transaction
     }
 
-    TransactionEntry createTransactionEntry(
+    TransactionEntry createAdjustmentTransactionEntry(
             RecordInventoryRowCommand recordInventoryRowCommand,
             InventoryItem inventoryItem,
             Map<String, AvailableItem> availableItems
@@ -34,11 +35,14 @@ class RecordStockProductInventoryTransactionService extends ProductInventoryTran
         if (adjustmentQuantity == 0) {
             return null
         }
-        TransactionEntry transactionEntry = new TransactionEntry(recordInventoryRowCommand.properties)
-        transactionEntry.quantity = adjustmentQuantity
-        transactionEntry.product = inventoryItem?.product
-        transactionEntry.inventoryItem = inventoryItem
-        transactionEntry.comments = recordInventoryRowCommand.comment
+        TransactionEntry transactionEntry = new TransactionEntry(
+                quantity: adjustmentQuantity,
+                product: inventoryItem?.product,
+                inventoryItem: inventoryItem,
+                comments: recordInventoryRowCommand.comment,
+                binLocation: recordInventoryRowCommand.binLocation,
+
+        )
         return transactionEntry
     }
 

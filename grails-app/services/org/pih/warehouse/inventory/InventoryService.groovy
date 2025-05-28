@@ -16,6 +16,7 @@ import org.hibernate.criterion.CriteriaSpecification
 import org.pih.warehouse.DateUtil
 import org.pih.warehouse.PaginatedList
 import org.pih.warehouse.api.AvailableItem
+import org.pih.warehouse.core.ConfigService
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Tag
@@ -46,6 +47,7 @@ class InventoryService implements ApplicationContextAware {
     TransactionEntryDataService transactionEntryDataService
     RecordStockProductInventoryTransactionService recordStockProductInventoryTransactionService
     ProductAvailabilityService productAvailabilityService
+    ConfigService configService
 
     def authService
     def dataService
@@ -1371,7 +1373,10 @@ class InventoryService implements ApplicationContextAware {
     RecordInventoryCommand saveRecordInventoryCommand(RecordInventoryCommand cmd, Map params) {
         log.debug "Saving record inventory command params: " + params
 
-        Boolean isInventoryBaselineEnabled = Holders.config.openboxes.transactions.recordStock.inventoryBaseline.enabled
+        Boolean isInventoryBaselineEnabled = configService.getProperty(
+                "openboxes.transactions.recordStock.inventoryBaseline.enabled",
+                Boolean
+        )
         Date adjustmentTransactionDate = new Date(cmd.transactionDate.time + 1000)
 
         try {
@@ -1431,7 +1436,7 @@ class InventoryService implements ApplicationContextAware {
                 }
 
                 // c) Create a new transaction entry (even if quantity didn't change)
-                TransactionEntry transactionEntry = recordStockProductInventoryTransactionService.createTransactionEntry(
+                TransactionEntry transactionEntry = recordStockProductInventoryTransactionService.createAdjustmentTransactionEntry(
                         row,
                         inventoryItem,
                         availableItems
