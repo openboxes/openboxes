@@ -694,10 +694,11 @@ class ProductAvailabilityService {
     }
 
     /**
-     * Fetches the stock of a list of products at a facility at a given moment in time.
+     * Fetches the stock of a list of products at a facility at a given moment in time. Excludes any items where
+     * quantity on hand is zero.
      *
-     * @param facility
-     * @param products
+     * @param facility The location to fetch stock for.
+     * @param products The products to fetch stock for.
      * @param at The moment in time to fetch stock for. If not provided, will fetch the current stock of each item.
      */
     List<AvailableItem> getAvailableItemsAtDate(Location facility, List<Product> products, Date at=null) {
@@ -705,18 +706,19 @@ class ProductAvailabilityService {
             throw new IllegalArgumentException("Date cannot be in the future.")
         }
 
-        // If no instant is provided, we fetch the stock as it is currently. This means we're allowed to simply query
-        // product availability since it contains up to date stock.
+        // If no date is provided, we fetch the stock as it is currently (filtering out any items with no quantity).
+        // This means we're allowed to simply query product availability since it contains up to date stock.
         if (at == null) {
             return getAvailableItems(facility, products.collect{ it.id }, false, true)
         }
 
         // Otherwise we're trying to fetch stock at a specific moment in time, so we need to calculate it ourselves
-        // by iterating though transaction history and summing up all the quantities until that moment.
+        // by iterating through transaction history and summing up all the quantities until that moment.
         List<TransactionEntry> transactionEntries = inventoryService.getTransactionEntriesBeforeDate(
                 facility, products, at)
 
-        return inventoryService.getQuantityAsAvailableItems(transactionEntries)
+        // Filter out any items where QoH == 0 because we have no need to operate on items with no quantity.
+        return inventoryService.getQuantityAsAvailableItems(transactionEntries).findAll{ it.quantityOnHand != 0 }
     }
 
     List getAvailableItems(Location location, List<String> productsIds, boolean excludeNegativeQuantity = false, boolean excludeZeroQuantity = false) {

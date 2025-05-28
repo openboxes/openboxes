@@ -2670,7 +2670,7 @@ class InventoryService implements ApplicationContextAware {
      *         ordered by transaction date to make it easy to iterate through them chronologically.
      */
     List<TransactionEntry> getTransactionEntriesBeforeDate(Location facility, List<Product> products, Date date) {
-        if (!date) {
+        if (!date || !products) {
             return []
         }
 
@@ -2685,6 +2685,34 @@ class InventoryService implements ApplicationContextAware {
                 lt("transactionDate", date)
                 eq("inventory", facility?.inventory)
                 order("transactionDate", "asc")
+                order("dateCreated", "asc")
+            }
+        } as List<TransactionEntry>
+    }
+
+    /**
+     * @return True if there are any transactions on the given inventory items at a facility at a specific moment
+     *         in time.
+     */
+    boolean hasTransactionEntriesOnDate(Location facility, Date date, List<InventoryItem> inventoryItems) {
+        return getTransactionEntriesOnDate(facility, date, inventoryItems).size() > 0
+    }
+
+    /**
+     * @return All transaction entries for the given inventory items at a facility at a specific moment in time.
+     */
+    List<TransactionEntry> getTransactionEntriesOnDate(
+            Location facility, Date date, List<InventoryItem> inventoryItems) {
+        if (!date || !inventoryItems) {
+            return []
+        }
+
+        def criteria = TransactionEntry.createCriteria()
+        return criteria.list {
+            'in'("inventoryItem", inventoryItems)
+            transaction {
+                eq("transactionDate", date)
+                eq("inventory", facility?.inventory)
                 order("dateCreated", "asc")
             }
         } as List<TransactionEntry>
