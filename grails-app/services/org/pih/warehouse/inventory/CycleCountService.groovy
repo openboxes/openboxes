@@ -16,6 +16,7 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.report.CycleCountTransactionReportCommand
+import org.hibernate.criterion.CriteriaSpecification
 
 @Transactional
 class CycleCountService {
@@ -182,6 +183,13 @@ class CycleCountService {
                 break
             case "quantityOnHand":
                 criteria.addOrder(getOrderDirection("quantityOnHand", orderDirection))
+                break
+            case "productName":
+                criteria.createAlias("cycleCountItems", "item", JoinType.LEFT_OUTER_JOIN)
+                criteria.createAlias("item.product", "product", JoinType.INNER_JOIN)
+                usedAliases.add("item")
+                usedAliases.add("product")
+                criteria.addOrder(getOrderDirection("product.name", orderDirection))
                 break
             default:
                 break
@@ -502,11 +510,14 @@ class CycleCountService {
         )
     }
 
-    List<CycleCountDto> getCycleCounts(List<String> ids) {
+    List<CycleCountDto> getCycleCounts(List<String> ids, String sortBy) {
+        Set<String> usedAliases = new HashSet<>()
         List<CycleCount> cycleCounts = CycleCount.createCriteria().list {
             if (ids) {
                 'in'("id", ids)
             }
+            applySortOrder(sortBy, "asc", delegate, usedAliases)
+            setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY)
         } as List<CycleCount>
         return cycleCounts.collect { CycleCountDto.toDto(it) }
     }

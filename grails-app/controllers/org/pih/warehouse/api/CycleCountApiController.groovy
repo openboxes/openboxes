@@ -104,11 +104,11 @@ class CycleCountApiController {
 
     def list() {
         List<String> ids = params.list("id")
-        List<CycleCountDto> cycleCounts = cycleCountService.getCycleCounts(ids)
+        String sortBy = params.sortBy;
+        List<CycleCountDto> cycleCounts = cycleCountService.getCycleCounts(ids, sortBy)
 
         boolean isRecount = cycleCounts?.any { (it.status as CycleCountStatus).isRecounting() }
-        String facilityName = cycleCounts?.find()?.cycleCountItems?.find()?.facility?.name  ?: ""
-
+        String facilityName = cycleCounts?.find()?.cycleCountItems?.find()?.facility?.name ?: ""
         withFormat {
             json {
                 render([data: cycleCounts] as JSON)

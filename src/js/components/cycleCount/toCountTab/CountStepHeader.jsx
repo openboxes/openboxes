@@ -12,7 +12,15 @@ import RedirectButton from 'utils/RedirectButton';
 import Translate from 'utils/Translate';
 
 const CountStepHeader = ({
-  printCountForm, next, save, applyImportFile, importItems, importFile, isFormDisabled,
+  printCountForm,
+  next,
+  save,
+  applyImportFile,
+  importItems,
+  importFile,
+  isFormDisabled,
+  sortByProductName,
+  setSortByProductName,
 }) => (
   <div>
     <div className="d-flex justify-content-sm-between align-items-end">
@@ -47,6 +55,13 @@ const CountStepHeader = ({
             </a>
           </div>
         </div>
+        <Button
+          onClick={() => setSortByProductName((prev) => !prev)}
+          label="react.cycleCount.sortAlphabetically.label"
+          defaultLabel="Sort alphabetically"
+          variant={sortByProductName ? 'primary-outline' : 'secondary'}
+          disabled={isFormDisabled}
+        />
         <Button
           onClick={save}
           label="react.cycleCount.save.label"
@@ -97,4 +112,6 @@ CountStepHeader.propTypes = {
   applyImportFile: PropTypes.func.isRequired,
   importItems: PropTypes.func.isRequired,
   importFile: PropTypes.shape({}).isRequired,
+  sortByProductName: PropTypes.bool.isRequired,
+  setSortByProductName: PropTypes.func.isRequired,
 };

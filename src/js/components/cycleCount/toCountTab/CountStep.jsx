@@ -44,6 +44,8 @@ const CountStep = () => {
     applyImportFile,
     importItems,
     importFile,
+    sortByProductName,
+    setSortByProductName,
   } = useCountStep();
 
   return (
@@ -57,6 +59,8 @@ const CountStep = () => {
           applyImportFile={applyImportFile}
           importItems={importItems}
           importFile={importFile}
+          sortByProductName={sortByProductName}
+          setSortByProductName={setSortByProductName}
         />
       ) : (
         <ConfirmStepHeader

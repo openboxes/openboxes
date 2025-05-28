@@ -56,7 +56,7 @@ const useResolveStep = () => {
   const { show, hide } = useSpinner();
   const history = useHistory();
   const [isSaveDisabled, setIsSaveDisabled] = useState(false);
-
+  const [sortByProductName, setSortByProductName] = useState(false);
   const {
     validationErrors,
     isRootCauseWarningSkipped,
@@ -206,6 +206,7 @@ const useResolveStep = () => {
     const { data } = await cycleCountApi.getCycleCounts(
       currentLocation?.id,
       ids,
+      sortByProductName && 'productName',
     );
     tableData.current = data?.data?.map((cycleCount) => {
       const mergedItems = mergeCycleCountItems(cycleCount.cycleCountItems);
@@ -242,7 +243,7 @@ const useResolveStep = () => {
     (async () => {
       await refetchData();
     })();
-  }, [cycleCountIds]);
+  }, [cycleCountIds, sortByProductName]);
 
   // Fetching data for "recounted by" dropdown
   useEffect(() => {
@@ -255,7 +256,7 @@ const useResolveStep = () => {
     show();
     await exportFileFromApi({
       url: GET_CYCLE_COUNTS(currentLocation?.id),
-      params: { id: cycleCountIds },
+      params: { id: cycleCountIds, sortBy: sortByProductName && 'productName' },
       format,
     });
     resetFocus();
@@ -784,6 +785,8 @@ const useResolveStep = () => {
     isSaveDisabled,
     setIsSaveDisabled,
     cycleCountsWithItemsWithoutRecount: cycleCountsWithItemsWithoutRecount.current,
+    sortByProductName,
+    setSortByProductName,
   };
 };
 

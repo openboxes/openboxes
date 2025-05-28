@@ -56,7 +56,7 @@ const useCountStep = () => {
   const [refreshFocusCounter, setRefreshFocusCounter] = useState(0);
   const [isSaveDisabled, setIsSaveDisabled] = useState(false);
   const [importFile, setImportFile] = useState(null);
-
+  const [sortByProductName, setSortByProductName] = useState(false);
   const dispatch = useDispatch();
   const history = useHistory();
   const { show, hide } = useSpinner();
@@ -128,6 +128,7 @@ const useCountStep = () => {
       const { data } = await cycleCountApi.getCycleCounts(
         currentLocation?.id,
         cycleCountIds,
+        sortByProductName && 'productName',
       );
       tableData.current = filterCountItems(data?.data)?.map((cycleCount) => ({
         ...cycleCount,
@@ -153,7 +154,7 @@ const useCountStep = () => {
 
   useEffect(() => {
     fetchCycleCounts();
-  }, [cycleCountIds]);
+  }, [cycleCountIds, sortByProductName]);
 
   // Fetching data for "counted by" dropdown
   useEffect(() => {
@@ -367,7 +368,7 @@ const useCountStep = () => {
     await save();
     await exportFileFromApi({
       url: CYCLE_COUNT_URL(currentLocation?.id),
-      params: { id: cycleCountIds },
+      params: { id: cycleCountIds, sortBy: sortByProductName && 'productName' },
       format,
     });
     resetFocus();
@@ -613,6 +614,8 @@ const useCountStep = () => {
     applyImportFile,
     importItems,
     importFile,
+    sortByProductName,
+    setSortByProductName,
   };
 };
 
