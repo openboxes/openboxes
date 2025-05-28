@@ -75,6 +75,7 @@ class MobileProductApiController extends BaseDomainApiController {
 
         data.inventoryItems = product.inventoryItems
         data.defaultInventoryItem = product.inventoryItems.find { it.lotNumber == null }
+        data.productType = product.productType
 
         render([data: data] as JSON)
     }
