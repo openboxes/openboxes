@@ -60,6 +60,7 @@ class ProductSupplierService {
         Set<String> usedAliases = new HashSet<>()
         return ProductSupplier.createCriteria().list(command.paginationParams) {
             if (forExport) {
+                createAlias("p.synonyms", "ps", JoinType.LEFT_OUTER_JOIN)
                 createAlias("product", "p", JoinType.INNER_JOIN)
                 createAlias("supplier", "s", JoinType.LEFT_OUTER_JOIN)
                 createAlias("manufacturer", "m", JoinType.LEFT_OUTER_JOIN)
