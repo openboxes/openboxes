@@ -53,13 +53,6 @@ const CountStepHeader = ({
             </a>
           </div>
         </div>
-        <Button
-          onClick={() => setSortByProductName((prev) => !prev)}
-          label="react.cycleCount.sortAlphabetically.label"
-          defaultLabel="Sort alphabetically"
-          variant={sortByProductName ? 'primary-outline' : 'secondary'}
-          disabled={isFormDisabled}
-        />
         <ButtonFileSelect
           onFileUpload={importItems}
           defaultLabel="Import Count"
@@ -67,6 +60,13 @@ const CountStepHeader = ({
           allowedExtensions={[FileFormat.XLS]}
           disabled={isFormDisabled}
           variant="primary-outline"
+        />
+        <Button
+          onClick={() => setSortByProductName((prev) => !prev)}
+          label="react.cycleCount.sortAlphabetically.label"
+          defaultLabel="Sort alphabetically"
+          variant={sortByProductName ? 'primary-outline' : 'secondary'}
+          disabled={isFormDisabled}
         />
         <Button
           onClick={save}
