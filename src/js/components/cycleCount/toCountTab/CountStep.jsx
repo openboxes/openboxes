@@ -42,6 +42,9 @@ const CountStep = () => {
     setIsSaveDisabled,
     validateExistenceOfCycleCounts,
     importItems,
+    importFile,
+    sortByProductName,
+    setSortByProductName,
   } = useCountStep();
 
   return (
@@ -53,6 +56,9 @@ const CountStep = () => {
           save={() => validateExistenceOfCycleCounts(save)}
           isFormDisabled={isFormDisabled}
           importItems={importItems}
+          importFile={importFile}
+          sortByProductName={sortByProductName}
+          setSortByProductName={setSortByProductName}
         />
       ) : (
         <ConfirmStepHeader

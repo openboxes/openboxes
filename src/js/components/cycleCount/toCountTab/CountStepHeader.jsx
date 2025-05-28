@@ -17,6 +17,8 @@ const CountStepHeader = ({
   save,
   importItems,
   isFormDisabled,
+  sortByProductName,
+  setSortByProductName,
 }) => (
   <div>
     <div className="d-flex justify-content-sm-between align-items-end">
@@ -51,6 +53,13 @@ const CountStepHeader = ({
             </a>
           </div>
         </div>
+        <Button
+          onClick={() => setSortByProductName((prev) => !prev)}
+          label="react.cycleCount.sortAlphabetically.label"
+          defaultLabel="Sort alphabetically"
+          variant={sortByProductName ? 'primary-outline' : 'secondary'}
+          disabled={isFormDisabled}
+        />
         <ButtonFileSelect
           onFileUpload={importItems}
           defaultLabel="Import Count"
@@ -87,4 +96,7 @@ CountStepHeader.propTypes = {
   save: PropTypes.func.isRequired,
   isFormDisabled: PropTypes.func.isRequired,
   importItems: PropTypes.func.isRequired,
+  importFile: PropTypes.shape({}).isRequired,
+  sortByProductName: PropTypes.bool.isRequired,
+  setSortByProductName: PropTypes.func.isRequired,
 };

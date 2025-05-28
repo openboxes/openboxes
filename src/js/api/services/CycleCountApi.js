@@ -29,8 +29,11 @@ export default {
   }) => apiClient.post(
     CYCLE_COUNT_RECOUNT_START(locationId, format), payload, config,
   ),
-  getCycleCounts: (locationId, ids) => {
-    const queryParams = queryString.stringify({ id: ids });
+  getCycleCounts: (locationId, ids, sortBy) => {
+    const queryParams = queryString.stringify({
+      id: ids,
+      sortBy,
+    });
     return apiClient.get(`${CYCLE_COUNT(locationId)}?${queryParams}`);
   },
   deleteCycleCountItem: (locationId, itemId) =>
