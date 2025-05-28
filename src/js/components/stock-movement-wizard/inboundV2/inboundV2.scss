@@ -14,14 +14,9 @@
     padding: 0 4px 4px 4px !important;
   }
 
-  .rt-tbody {
+  .rt-tbody-v2 {
     max-height: 400px;
-
-    .input-xs {
-      height: 26px;
-      padding: 4px 8px;
-      font-size: 14px;
-    }
+    overflow: auto;
 
     .input-xs {
       height: 26px;
