@@ -36,6 +36,8 @@ class CycleCountCandidateFilterCommand extends PaginationCommand implements Vali
 
     Boolean includeStockOnHandOrNegativeStock = Boolean.TRUE
 
+    Boolean showCycleCountsInProgress = Boolean.FALSE
+
     static constraints = {
         statuses(nullable: true)
         searchTerm(nullable: true)
@@ -49,5 +51,6 @@ class CycleCountCandidateFilterCommand extends PaginationCommand implements Vali
         order(nullable: true)
         format(nullable: true)
         negativeQuantity(nullable: true)
+        showCycleCountsInProgress(nullable: true)
     }
 }

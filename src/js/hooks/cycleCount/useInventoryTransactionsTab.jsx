@@ -4,7 +4,7 @@ import { createColumnHelper } from '@tanstack/react-table';
 import _ from 'lodash';
 import { useSelector } from 'react-redux';
 
-import { CYCLE_COUNT_DETAILS_REPORT } from 'api/urls';
+import { CYCLE_COUNT_SUMMARY_REPORT } from 'api/urls';
 import { TableCell } from 'components/DataTable';
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
 import ValueIndicator from 'components/DataTable/v2/ValueIndicator';
@@ -72,7 +72,7 @@ const useInventoryTransactionsTab = ({
     loading,
     setTableData,
   } = useTableDataV2({
-    url: CYCLE_COUNT_DETAILS_REPORT,
+    url: CYCLE_COUNT_SUMMARY_REPORT,
     errorMessageId: 'react.cycleCount.table.errorMessage.label',
     defaultErrorMessage: 'Unable to fetch products',
     // We should start fetching only after clicking the button
@@ -146,12 +146,10 @@ const useInventoryTransactionsTab = ({
     cell: ({
       row: {
         original: {
-          inventoryItem: {
-            product: {
-              id,
-              name,
-              productCode,
-            },
+          product: {
+            id,
+            name,
+            productCode,
           },
         },
       },

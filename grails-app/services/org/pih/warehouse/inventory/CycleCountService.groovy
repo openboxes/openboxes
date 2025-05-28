@@ -17,6 +17,7 @@ import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.report.CycleCountTransactionReportCommand
 import org.hibernate.criterion.CriteriaSpecification
+import org.pih.warehouse.report.CycleCountReportCommand
 
 @Transactional
 class CycleCountService {
@@ -79,7 +80,12 @@ class CycleCountService {
                 isNull("status")
             }
             else {
-                inList("status", command.statuses)
+                or {
+                    inList("status", command.statuses)
+                    if (command.showCycleCountsInProgress) {
+                        isNull("status")
+                    }
+                }
             }
 
             if (command.negativeQuantity) {
@@ -90,8 +96,17 @@ class CycleCountService {
             //  product/facility pairs where quantity on hand is negative.
             // Moved this from the cycle count session view since it's a requirement of the candidate query,
             // not the cycle count session.
-            if (command.includeStockOnHandOrNegativeStock) {
+            if (command.includeStockOnHandOrNegativeStock && !command.showCycleCountsInProgress) {
                 eq("hasStockOnHandOrNegativeStock", command.includeStockOnHandOrNegativeStock)
+            }
+
+            // Products from the "To Count" and "To Resolve" tabs can have negative stock,
+            // but we want to include them in the results
+            if (command.showCycleCountsInProgress) {
+                or {
+                    inList("status", command.statuses)
+                    eq("hasStockOnHandOrNegativeStock", command.includeStockOnHandOrNegativeStock)
+                }
             }
 
             // FIXME Sort order should allow multiple sort order rules ("columna, -columnb"). We should consider
@@ -731,9 +746,8 @@ class CycleCountService {
     }
 
 
-    // FIXME Move to the appropriate service (if we want to separate services from reporting)
     @Transactional(readOnly=true)
-    PagedResultList getCycleCountTransactionReport(CycleCountTransactionReportCommand command) {
+    PagedResultList getCycleCountDetailsReport(CycleCountReportCommand command) {
         return CycleCountDetails.createCriteria().list(command.paginationParams) {
             if (command.facility) {
                 eq("facility", command.facility)
@@ -752,4 +766,27 @@ class CycleCountService {
             }
         }
     }
+
+    @Transactional(readOnly=true)
+    PagedResultList getCycleCountSummaryReport(CycleCountReportCommand command) {
+        return CycleCountSummary.createCriteria().list(command.paginationParams) {
+            if (command.facility) {
+                eq("facility", command.facility)
+            }
+            if (command.startDate && command.endDate) {
+                between("dateRecorded", command.startDate, command.endDate)
+            }
+            else if (command.startDate) {
+                gte("dateRecorded", command.startDate)
+            }
+            else if (command.endDate) {
+                lte("dateRecorded", command.endDate)
+            }
+            if (command.products) {
+                "in"("product", command.products)
+            }
+        }
+    }
+
+
 }

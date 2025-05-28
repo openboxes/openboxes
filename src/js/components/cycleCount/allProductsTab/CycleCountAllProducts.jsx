@@ -81,6 +81,7 @@ const CycleCountAllProducts = ({
         totalCount={tableData.totalCount}
         filterParams={filterParams}
         paginationProps={paginationProps}
+        showDisabledProducts
       />
     </div>
   );

@@ -29,7 +29,7 @@ import org.pih.warehouse.inventory.CycleCountSubmitRecountCommand
 import org.pih.warehouse.inventory.CycleCountUpdateItemBatchCommand
 import org.pih.warehouse.inventory.CycleCountUpdateItemCommand
 import org.pih.warehouse.inventory.PendingCycleCountRequest
-import org.pih.warehouse.report.CycleCountTransactionReportCommand
+import org.pih.warehouse.report.CycleCountReportCommand
 import org.springframework.web.multipart.MultipartFile
 
 class CycleCountApiController {
@@ -231,8 +231,19 @@ class CycleCountApiController {
         render([data: cycleCountItemsExcelImporter.data] as JSON)
     }
 
-    def getCycleCountTransactionReport(CycleCountTransactionReportCommand command) {
-        PagedResultList data = cycleCountService.getCycleCountTransactionReport(command)
+    def getCycleCountDetails(CycleCountReportCommand command) {
+        PagedResultList data = cycleCountService.getCycleCountDetailsReport(command)
+        render([
+                data      : data,
+                count     : data?.size() ?: 0,
+                max       : command.max,
+                offset    : command.offset,
+                totalCount: data.totalCount,
+        ] as JSON)
+    }
+
+    def getCycleCountSummary(CycleCountReportCommand command) {
+        PagedResultList data = cycleCountService.getCycleCountSummaryReport(command)
         render([
                 data      : data,
                 count     : data?.size() ?: 0,
