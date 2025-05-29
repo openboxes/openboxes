@@ -150,6 +150,7 @@ const useInboundAddItemsColumns = ({
 
   const handleFocus = (e) => {
     const input = e.target;
+    // We use setTimeout to wait for the input to fully render before calling select()
     setTimeout(() => {
       input.select();
     }, 0);
