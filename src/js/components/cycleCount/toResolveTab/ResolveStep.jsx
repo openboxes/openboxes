@@ -2,6 +2,7 @@ import React, { useRef } from 'react';
 
 import _ from 'lodash';
 import { useSelector } from 'react-redux';
+import { getCurrentLocation } from 'selectors';
 
 import ConfirmStepHeader from 'components/cycleCount/ConfirmStepHeader';
 import ResolveStepHeader from 'components/cycleCount/toResolveTab/ResolveStepHeader';
@@ -17,7 +18,7 @@ const ResolveStep = () => {
   const {
     currentLocation,
   } = useSelector((state) => ({
-    currentLocation: state.session.currentLocation,
+    currentLocation: getCurrentLocation(state),
   }));
   const initialCurrentLocation = useRef(currentLocation?.id);
   const isFormDisabled = !_.isEqual(currentLocation?.id, initialCurrentLocation.current);
