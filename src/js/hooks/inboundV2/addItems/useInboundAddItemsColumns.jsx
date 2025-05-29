@@ -148,6 +148,14 @@ const useInboundAddItemsColumns = ({
     });
   };
 
+  const handleFocus = (e) => {
+    const input = e.target;
+    // We use setTimeout to wait for the input to fully render before calling select()
+    setTimeout(() => {
+      input.select();
+    }, 0);
+  };
+
   const columns = useMemo(() => [
     columnHelper.accessor(inboundColumns.PALLET_NAME, {
       header: () => (
@@ -189,6 +197,7 @@ const useInboundAddItemsColumns = ({
                     rowIndex,
                     columnId,
                   }}
+                  onFocus={handleFocus}
                   onWheel={(event) => event.currentTarget.blur()}
                   autoComplete="off"
                 />
@@ -234,6 +243,7 @@ const useInboundAddItemsColumns = ({
                     rowIndex,
                     columnId,
                   }}
+                  onFocus={handleFocus}
                   hasErrors={hasErrors}
                   showErrorBorder={hasErrors}
                   className="input-xs"
@@ -332,6 +342,7 @@ const useInboundAddItemsColumns = ({
                   onKeyDown={(e) => handleKeyDown(e, row.index, column.id)}
                   onChange={(e) => setValue(`values.lineItems.${row.index}.lotNumber`, e.target.value ?? null)}
                   onBlur={() => handleBlur(field)}
+                  onFocus={handleFocus}
                   focusProps={{
                     fieldIndex: row.index,
                     fieldId: column.id,
@@ -440,6 +451,7 @@ const useInboundAddItemsColumns = ({
                       trigger(`values.lineItems.${row.index}.quantityRequested`);
                     },
                   )}
+                  onFocus={handleFocus}
                   onKeyDown={(e) => handleKeyDown(e, row.index, column.id)}
                   focusProps={{
                     fieldIndex: row.index,
