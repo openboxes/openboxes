@@ -12,7 +12,6 @@ package org.pih.warehouse.api
 import grails.converters.JSON
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
-import org.pih.warehouse.core.Constants
 import org.pih.warehouse.inventory.AdjustStockCommand
 import org.pih.warehouse.core.Location
 
@@ -36,10 +35,6 @@ class StockAdjustmentApiController {
         if (adjustStockCommand.hasErrors()) {
             throw new ValidationException("Unable to adjust stock", adjustStockCommand.errors)
         }
-
-        def productId = adjustStockCommand.inventoryItem?.product?.id
-        productAvailabilityService.triggerRefreshProductAvailabilityWithDelay(locationId, [productId],
-                Boolean.FALSE, Constants.MILLISECONDS_IN_ONE_SECOND)
 
         render([data: adjustStockCommand] as JSON)
     }

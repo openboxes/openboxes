@@ -64,14 +64,6 @@ class ProductAvailabilityService {
             [locationId: locationId, productIds: productIds, forceRefresh: forceRefresh])
     }
 
-    def triggerRefreshProductAvailabilityWithDelay(String locationId, List<String> productIds,
-                                                          Boolean forceRefresh, Integer delayInMilliseconds) {
-        Date runAt = new Date(System.currentTimeMillis() + Integer.valueOf(delayInMilliseconds))
-        log.info "Triggering refresh product availability with ${delayInMilliseconds} ms delay"
-        RefreshProductAvailabilityJob.schedule(runAt,
-                [locationId: locationId, productIds: productIds, forceRefresh: forceRefresh])
-    }
-
     def refreshProductsAvailability(String locationId, List<String> productIds, Boolean forceRefresh) {
         // Calculate product availability for a single location/product, or all products within a single location
         if (locationId) {

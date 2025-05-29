@@ -1816,7 +1816,6 @@ class InventoryService implements ApplicationContextAware {
             transaction.inventory = inventory
             transaction.comment = command.comment
             transaction.transactionNumber = generateTransactionNumber(transaction)
-            transaction.disableRefresh = Boolean.TRUE
 
             // Add transaction entry to transaction
             def transactionEntry = new TransactionEntry()

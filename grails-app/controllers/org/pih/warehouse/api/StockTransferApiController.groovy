@@ -77,7 +77,13 @@ class StockTransferApiController {
         // We don't have the order yet so can't use it when generating the stockTransferNumber
         bindStockTransferData(stockTransfer, null, currentUser, currentLocation, jsonObject)
 
-        Order order = stockTransferService.completeStockTransfer(stockTransfer)
+        Order order
+        if (stockTransfer.status == StockTransferStatus.COMPLETED) {
+            order = stockTransferService.completeStockTransfer(stockTransfer)
+        } else {
+            order = stockTransferService.createOrUpdateOrderFromStockTransfer(stockTransfer)
+        }
+
 
         // TODO: Refactor - Return only status
         stockTransfer = StockTransfer.createFromOrder(order)
@@ -159,10 +165,10 @@ class StockTransferApiController {
             StockTransferItem stockTransferItem = new StockTransferItem()
             stockTransferItem.id = stockTransferItemMap["id"] ? stockTransferItemMap["id"] : null
             stockTransferItem.productAvailabilityId = stockTransferItemMap["productAvailabilityId"] ? stockTransferItemMap["productAvailabilityId"] : null
-            stockTransferItem.product = stockTransferItemMap?.productId ? Product.load(stockTransferItemMap?.productId) : null
-            stockTransferItem.originBinLocation = stockTransferItemMap?.originBinLocationId ? Location.load(stockTransferItemMap?.originBinLocationId) : null
-            stockTransferItem.destinationBinLocation = stockTransferItemMap?.destinationBinLocationId ? Location.load(stockTransferItemMap?.destinationBinLocationId) : null
-            stockTransferItem.inventoryItem = stockTransferItemMap?.inventoryItemId ? InventoryItem.load(stockTransferItemMap?.inventoryItemId) : null
+            stockTransferItem.product = stockTransferItemMap?.product?.id ? Product.load(stockTransferItemMap?.product?.id) : null
+            stockTransferItem.originBinLocation = stockTransferItemMap?.originBinLocation?.id ? Location.load(stockTransferItemMap?.originBinLocation?.id) : null
+            stockTransferItem.destinationBinLocation = stockTransferItemMap?.destinationBinLocation?.id ? Location.load(stockTransferItemMap?.destinationBinLocation?.id) : null
+            stockTransferItem.inventoryItem = stockTransferItemMap?.inventoryItem?.id ? InventoryItem.load(stockTransferItemMap?.inventoryItem?.id) : null
             stockTransferItem.quantityOnHand = stockTransferItemMap["quantityOnHand"] ? stockTransferItemMap["quantityOnHand"] : 0
             stockTransferItem.quantityNotPicked = stockTransferItemMap["quantityNotPicked"] ? stockTransferItemMap["quantityNotPicked"] : 0
             stockTransferItem.quantity = stockTransferItemMap["quantity"] ? new BigDecimal(stockTransferItemMap["quantity"]) : 0
@@ -180,6 +186,17 @@ class StockTransferApiController {
                     splitItem.location = stockTransfer.origin
                 }
                 stockTransferItem.splitItems.add(splitItem)
+            }
+
+            // For inbound returns
+            if (stockTransfer.type == OrderType.findByCode(Constants.RETURN_ORDER)) {
+                Date expirationDate = stockTransferItemMap.expirationDate ? Constants.EXPIRATION_DATE_FORMATTER.parse(stockTransferItemMap.expirationDate) : null
+                String lotNumber = stockTransferItemMap.lotNumber ? stockTransferItemMap.lotNumber : null
+                stockTransferItem.inventoryItem = inventoryService.findAndUpdateOrCreateInventoryItem(
+                        stockTransferItem.product,
+                        lotNumber,
+                        expirationDate
+                )
             }
 
             if (stockTransferItemMap.sortOrder) {
