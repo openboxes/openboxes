@@ -1374,7 +1374,7 @@ class InventoryService implements ApplicationContextAware {
         log.debug "Saving record inventory command params: " + params
 
         Boolean isInventoryBaselineEnabled = configService.getProperty(
-                "openboxes.transactions.recordStock.inventoryBaseline.enabled",
+                "openboxes.transactions.inventoryBaseline.recordStock.enabled",
                 Boolean
         )
         Date adjustmentTransactionDate = new Date(cmd.transactionDate.time + 1000)
