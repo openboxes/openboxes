@@ -603,6 +603,7 @@ const useCountStep = () => {
       lotNumber: importedItem?.lotNumber || originalItem?.inventoryItem?.lotNumber,
       expirationDate: importedItem?.expirationDate || originalItem?.inventoryItem?.expirationDate,
     },
+    updated: true,
   });
 
   const importItems = async (importFile) => {
