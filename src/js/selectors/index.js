@@ -18,3 +18,5 @@ export const getCycleCountsIds = (state) =>
 export const getReasonCodes = (state) => state.cycleCount.reasonCodes;
 
 export const getFormatLocalizedDate = (state) => formatDate(state.localize);
+
+export const getBinLocations = (state) => state.cycleCount.binLocations;
