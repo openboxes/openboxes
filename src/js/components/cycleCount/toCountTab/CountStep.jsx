@@ -2,7 +2,7 @@ import React, { useRef } from 'react';
 
 import _ from 'lodash';
 import { useSelector } from 'react-redux';
-import { getCycleCountRequestIds } from 'selectors';
+import { getCurrentLocation } from 'selectors';
 
 import ConfirmStepHeader from 'components/cycleCount/ConfirmStepHeader';
 import CountStepHeader from 'components/cycleCount/toCountTab/CountStepHeader';
@@ -14,10 +14,13 @@ import PageWrapper from 'wrappers/PageWrapper';
 import 'components/cycleCount/cycleCount.scss';
 
 const CountStep = () => {
-  const cycleCountIds = useSelector(getCycleCountRequestIds);
-  // Stores initial cycleCountIds to detect changes when switching locations
-  const initialCycleCountIds = useRef(cycleCountIds);
-  const isFormDisabled = !_.isEqual(cycleCountIds, initialCycleCountIds.current);
+  const {
+    currentLocation,
+  } = useSelector((state) => ({
+    currentLocation: getCurrentLocation(state),
+  }));
+  const initialCurrentLocation = useRef(currentLocation?.id);
+  const isFormDisabled = !_.isEqual(currentLocation?.id, initialCurrentLocation.current);
   const {
     tableData,
     printCountForm,
