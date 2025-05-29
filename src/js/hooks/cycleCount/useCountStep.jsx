@@ -12,7 +12,7 @@ import _ from 'lodash';
 import queryString from 'query-string';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
-import { getBinLocations, getCurrentLocation, getCycleCountRequestIds } from 'selectors';
+import { getCurrentLocation, getCycleCountRequestIds } from 'selectors';
 
 import {
   eraseDraft,
@@ -31,7 +31,6 @@ import cycleCountStatus from 'consts/cycleCountStatus';
 import NotificationType from 'consts/notificationTypes';
 import { DateFormat } from 'consts/timeFormat';
 import useCountStepValidation from 'hooks/cycleCount/useCountStepValidation';
-import useForceRender from 'hooks/useForceRender';
 import useSpinner from 'hooks/useSpinner';
 import useTranslate from 'hooks/useTranslate';
 import apiClient from 'utils/apiClient';
@@ -65,11 +64,9 @@ const useCountStep = () => {
   const {
     cycleCountIds,
     currentLocation,
-    binLocations,
   } = useSelector((state) => ({
     cycleCountIds: getCycleCountRequestIds(state),
     currentLocation: getCurrentLocation(state),
-    binLocations: getBinLocations(state),
   }));
 
   const resetFocus = () => {
@@ -519,7 +516,8 @@ const useCountStep = () => {
           return acc;
         }, []);
       dispatch(eraseDraft(currentLocation?.id, TO_COUNT_TAB));
-      const requestIdsWithoutDiscrepancies = submittedCounts.length - requestIdsWithDiscrepancies.length;
+      const requestIdsWithoutDiscrepancies =
+        submittedCounts.length - requestIdsWithDiscrepancies.length;
       if (requestIdsWithDiscrepancies.length > 0) {
         openResolveDiscrepanciesModal(requestIdsWithDiscrepancies, requestIdsWithoutDiscrepancies);
         return;
