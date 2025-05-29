@@ -9,7 +9,7 @@ import { useDispatch } from 'react-redux';
 import { useHistory, useLocation } from 'react-router-dom';
 import Alert from 'react-s-alert';
 
-import { fetchUsers, updateWorkflowHeader } from 'actions';
+import { updateWorkflowHeader } from 'actions';
 import stockMovementApi from 'api/services/StockMovementApi';
 import {
   STOCK_MOVEMENT_BY_ID,
@@ -706,8 +706,6 @@ const useInboundAddItemsForm = ({
 
   useEffect(() => {
     if (queryParams.step === InboundV2Step.ADD_ITEMS) {
-      // Fetching data for "recipients" dropdown
-      dispatch(fetchUsers());
       fetchData();
     }
   }, [queryParams.step]);
