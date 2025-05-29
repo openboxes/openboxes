@@ -1,4 +1,4 @@
-package org.pih.warehouse
+package org.pih.warehouse.sort
 
 /**
  * A POJO for holding a sorting condition on an entity.

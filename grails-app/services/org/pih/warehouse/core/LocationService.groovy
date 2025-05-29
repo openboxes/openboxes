@@ -20,8 +20,8 @@ import org.apache.poi.ss.usermodel.Row
 import grails.plugins.csv.CSVMapReader
 import org.hibernate.sql.JoinType
 
-import org.pih.warehouse.SortParam
-import org.pih.warehouse.SortUtil
+import org.pih.warehouse.sort.SortParamList
+import org.pih.warehouse.sort.SortUtil
 import org.pih.warehouse.api.StockMovementDirection
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.importer.LocationImportDataService
@@ -370,7 +370,9 @@ class LocationService {
             eq("parentLocation", command.location)
             or {
                 locationType {
-                    'in'("locationTypeCode", command.locationTypeCode)
+                    // For some reason this throws a "String cannot be cast to java.lang.Enum" error if we leave
+                    // command.locationTypeCode as a list. Must be some kind of Grails weirdness...
+                    'in'("locationTypeCode", command.locationTypeCode.toArray() as LocationTypeCode[])
                 }
                 if (locationNames) {
                     'in'("name", locationNames)
@@ -405,10 +407,10 @@ class LocationService {
         }
         internalLocations += includedLocations
 
-        return sortLocations(internalLocations, command.sortParams)
+        return sortLocations(internalLocations, command.sort)
     }
 
-    private List<Location> sortLocations(List<Location> locations, List<SortParam> sortParams) {
+    private List<Location> sortLocations(List<Location> locations, SortParamList sortParams) {
         if (locations == null) {
             return null
         }

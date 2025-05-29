@@ -28,8 +28,7 @@ const groupBinLocationsByZone = (binLocations, translate) => {
             name: getBinLocationToDisplay(bin),
             label: getBinLocationToDisplay(bin),
             value: bin.id,
-          }))
-          .sort((a, b) => a.name.localeCompare(b.name)),
+          })),
       };
     })
     .sort((a, b) => {

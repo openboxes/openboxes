@@ -1,10 +1,8 @@
 package org.pih.warehouse.core
 
-import grails.databinding.BindUsing
 import grails.validation.Validateable
 
-import org.pih.warehouse.SortParam
-import org.pih.warehouse.SortUtil
+import org.pih.warehouse.sort.SortParamList
 
 /**
  * Used to filter the returned results when listing/searching internal locations.
@@ -21,8 +19,7 @@ class InternalLocationSearchCommand implements Validateable {
     List<ActivityCode> anyActivityCodes = []
     List<ActivityCode> ignoreActivityCodes = []
 
-    @BindUsing({ obj, source -> SortUtil.bindSortParams(Location, source['sort'] as String) })
-    List<SortParam> sortParams
+    SortParamList sort
 
     static constraints = {
         location(nullable: true)
