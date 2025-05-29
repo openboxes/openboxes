@@ -112,7 +112,7 @@ class CycleCountService {
             //  using a more conventional syntax for the column and direction i.e. "columna" sorts "columna" in
             //  ascending order while "-columnb" sorts "columnb" in descending order.
             // Don't check command.sort because we want the default case to be applied if there's no sort order
-            applySortOrder(command.sort, command.order, delegate, usedAliases)
+            applySortOrderForCandidates(command.sort, command.order, delegate, usedAliases)
 
         } as List<CycleCountCandidate>
     }
@@ -172,12 +172,12 @@ class CycleCountService {
                 gt("negativeItemCount", 0)
             }
 
-            applySortOrder(command.sort, command.order, delegate, usedAliases)
+            applySortOrderForCandidates(command.sort, command.order, delegate, usedAliases)
 
         } as List<PendingCycleCountRequest>
     }
 
-    private static void applySortOrder(String sortBy, String orderDirection, Criteria criteria, Set<String> usedAliases) {
+    private static void applySortOrderForCandidates(String sortBy, String orderDirection, Criteria criteria, Set<String> usedAliases) {
         switch (sortBy) {
             case "product":
                 createProductAlias(criteria, usedAliases)
@@ -198,12 +198,19 @@ class CycleCountService {
             case "quantityOnHand":
                 criteria.addOrder(getOrderDirection("quantityOnHand", orderDirection))
                 break
+            default:
+                break
+        }
+    }
+
+    private static void applySortOrderForCycleCounts(String sortBy, String orderDirection, Criteria criteria, Set<String> usedAliases) {
+        switch (sortBy) {
             case "productName":
                 criteria.createAlias("cycleCountItems", "item", JoinType.LEFT_OUTER_JOIN)
                 criteria.createAlias("item.product", "product", JoinType.INNER_JOIN)
-                usedAliases.add("item")
-                usedAliases.add("product")
+                usedAliases.addAll(["item", "product"])
                 criteria.addOrder(getOrderDirection("product.name", orderDirection))
+                criteria.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY)
                 break
             default:
                 break
@@ -530,8 +537,7 @@ class CycleCountService {
             if (ids) {
                 'in'("id", ids)
             }
-            applySortOrder(sortBy, "asc", delegate, usedAliases)
-            setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY)
+            applySortOrderForCycleCounts(sortBy, "asc", delegate, usedAliases)
         } as List<CycleCount>
         return cycleCounts.collect { CycleCountDto.toDto(it) }
     }

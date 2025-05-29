@@ -104,7 +104,7 @@ class CycleCountApiController {
 
     def list() {
         List<String> ids = params.list("id")
-        String sortBy = params.sortBy;
+        String sortBy = params.sortBy
         List<CycleCountDto> cycleCounts = cycleCountService.getCycleCounts(ids, sortBy)
 
         boolean isRecount = cycleCounts?.any { (it.status as CycleCountStatus).isRecounting() }

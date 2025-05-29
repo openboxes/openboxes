@@ -96,7 +96,6 @@ CountStepHeader.propTypes = {
   save: PropTypes.func.isRequired,
   isFormDisabled: PropTypes.func.isRequired,
   importItems: PropTypes.func.isRequired,
-  importFile: PropTypes.shape({}).isRequired,
   sortByProductName: PropTypes.bool.isRequired,
   setSortByProductName: PropTypes.func.isRequired,
 };
