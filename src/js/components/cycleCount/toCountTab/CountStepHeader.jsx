@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { RiPrinterLine, RiSave2Line } from 'react-icons/ri';
 
 import Button from 'components/form-elements/Button';
-import FileSelect from 'components/form-elements/v2/FileSelect';
+import ButtonFileSelect from 'components/form-elements/v2/ButtonFileSelect';
 import { CYCLE_COUNT } from 'consts/applicationUrls';
 import { TO_COUNT_TAB } from 'consts/cycleCount';
 import FileFormat from 'consts/fileFormat';
@@ -12,7 +12,11 @@ import RedirectButton from 'utils/RedirectButton';
 import Translate from 'utils/Translate';
 
 const CountStepHeader = ({
-  printCountForm, next, save, applyImportFile, importItems, importFile, isFormDisabled,
+  printCountForm,
+  next,
+  save,
+  importItems,
+  isFormDisabled,
 }) => (
   <div>
     <div className="d-flex justify-content-sm-between align-items-end">
@@ -47,6 +51,14 @@ const CountStepHeader = ({
             </a>
           </div>
         </div>
+        <ButtonFileSelect
+          onFileUpload={importItems}
+          defaultLabel="Import Count"
+          label="react.cycleCount.importCount.label"
+          allowedExtensions={[FileFormat.XLS]}
+          disabled={isFormDisabled}
+          variant="primary-outline"
+        />
         <Button
           onClick={save}
           label="react.cycleCount.save.label"
@@ -64,26 +76,6 @@ const CountStepHeader = ({
         />
       </div>
     </div>
-    <div className="px-2 pt-2">
-      <FileSelect
-        allowedExtensions={[FileFormat.XLS]}
-        buttonVariant="primary"
-        dropzoneText={{
-          id: 'react.cycleCount.importDropzone.label',
-          defaultMessage: 'Import cycle count items',
-        }}
-        minHeight=""
-        onChange={applyImportFile}
-        isFormDisabled={isFormDisabled}
-      />
-      <Button
-        variant="primary"
-        onClick={importItems}
-        label="react.cycleCount.confirmImport.label"
-        defaultLabel="Confirm import"
-        disabled={!importFile || isFormDisabled}
-      />
-    </div>
   </div>
 );
 
@@ -94,7 +86,5 @@ CountStepHeader.propTypes = {
   next: PropTypes.func.isRequired,
   save: PropTypes.func.isRequired,
   isFormDisabled: PropTypes.func.isRequired,
-  applyImportFile: PropTypes.func.isRequired,
   importItems: PropTypes.func.isRequired,
-  importFile: PropTypes.shape({}).isRequired,
 };

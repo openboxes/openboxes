@@ -4,7 +4,7 @@ import { createColumnHelper } from '@tanstack/react-table';
 import _ from 'lodash';
 import { useSelector } from 'react-redux';
 
-import { CYCLE_COUNT_DETAILS_REPORT } from 'api/urls';
+import { CYCLE_COUNT_SUMMARY_REPORT } from 'api/urls';
 import { TableCell } from 'components/DataTable';
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
 import ValueIndicator from 'components/DataTable/v2/ValueIndicator';
@@ -72,7 +72,7 @@ const useInventoryTransactionsTab = ({
     loading,
     setTableData,
   } = useTableDataV2({
-    url: CYCLE_COUNT_DETAILS_REPORT,
+    url: CYCLE_COUNT_SUMMARY_REPORT,
     errorMessageId: 'react.cycleCount.table.errorMessage.label',
     defaultErrorMessage: 'Unable to fetch products',
     // We should start fetching only after clicking the button
@@ -92,6 +92,27 @@ const useInventoryTransactionsTab = ({
   useEffect(() => {
     setTableData({ data: [], totalCount: 0 });
   }, [currentLocation?.id]);
+
+  const calculatePercentage = (quantityOnHand, quantityCounted, quantityVariance) => {
+    // If quantityOnHand is less than or equal to 0 and quantityCounted is 0,
+    // set percentageValue to 0
+    if (quantityOnHand <= 0 && quantityCounted === 0) {
+      return 0;
+    }
+
+    // If quantityOnHand is less than or equal to 0 and quantityCounted is not 0,
+    // set percentageValue to 100
+    if (quantityOnHand <= 0 && quantityCounted !== 0) {
+      return 100;
+    }
+
+    // Calculate percentage value only if quantityOnHand is greater than 0
+    if (quantityOnHand > 0) {
+      return Math.round((Math.abs(quantityVariance) / Math.abs(quantityOnHand)) * 100);
+    }
+
+    return 100;
+  };
 
   const columns = useMemo(() => [columnHelper.accessor(cycleCountColumn.ALIGNMENT, {
     header: () => (
@@ -125,12 +146,10 @@ const useInventoryTransactionsTab = ({
     cell: ({
       row: {
         original: {
-          inventoryItem: {
-            product: {
-              id,
-              name,
-              productCode,
-            },
+          product: {
+            id,
+            name,
+            productCode,
           },
         },
       },
@@ -261,6 +280,7 @@ const useInventoryTransactionsTab = ({
         original: {
           verificationCount: {
             quantityOnHand,
+            quantityCounted,
             quantityVariance,
           },
         },
@@ -268,9 +288,7 @@ const useInventoryTransactionsTab = ({
     }) => {
       const variant = getCycleCountDifferencesVariant(quantityVariance, quantityOnHand);
       const percentageValue =
-        quantityOnHand !== 0
-          ? Math.round((Math.abs(quantityVariance) / Math.abs(quantityOnHand)) * 100)
-          : 100;
+        calculatePercentage(quantityOnHand, quantityCounted, quantityVariance);
       const className = quantityVariance > 0 ? 'value-indicator--more' : 'value-indicator--less';
 
       return (

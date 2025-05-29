@@ -1129,6 +1129,11 @@ div.search-input:focus-within {
   }
 }
 
+.primary-outline-disabled {
+  background-color: var(--blue-300) !important;
+  color: var(--blue-400) !important;
+}
+
 .active-button {
   @extend %button-base;
 

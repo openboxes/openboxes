@@ -17,7 +17,7 @@
                     <label><warehouse:message code="default.date.label"/></label>
                 </td>
                 <td class="value">
-                    <g:jqueryDatePicker id="date" name="date" value="${new Date()}" placeholder="Only required for Inventory imports"/>
+                    <g:datePicker name="date" value="none" precision="minute" relativeYears="[-20..0]" noSelection="['':'']"/>
                 </td>
             </tr>
             <tr class="prop">

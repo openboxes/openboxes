@@ -8,7 +8,7 @@ import { useDispatch } from 'react-redux';
 import { hideSpinner, showSpinner } from 'actions';
 import { PACKING_LIST_TEMPLATE } from 'api/urls';
 import Button from 'components/form-elements/Button';
-import FileSelect from 'components/form-elements/v2/FileSelect';
+import DropzoneFileSelect from 'components/form-elements/v2/DropzoneFileSelect';
 import Subsection from 'components/Layout/v2/Subsection';
 import FileFormat from 'consts/fileFormat';
 import exportFileFromAPI from 'utils/file-download-util';
@@ -45,7 +45,7 @@ const OutboundImportDropzone = ({ control, errors }) => {
           name="packingList"
           control={control}
           render={({ field }) => (
-            <FileSelect
+            <DropzoneFileSelect
               allowedExtensions={[FileFormat.XLS]}
               errorMessage={errors.packingList?.message}
               buttonVariant="primary"

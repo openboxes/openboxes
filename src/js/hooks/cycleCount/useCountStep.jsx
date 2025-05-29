@@ -55,7 +55,6 @@ const useCountStep = () => {
   // it will reset the focus by clearing the RowIndex and ColumnId in useEffect.
   const [refreshFocusCounter, setRefreshFocusCounter] = useState(0);
   const [isSaveDisabled, setIsSaveDisabled] = useState(false);
-  const [importFile, setImportFile] = useState(null);
 
   const dispatch = useDispatch();
   const history = useHistory();
@@ -317,7 +316,6 @@ const useCountStep = () => {
       product: cycleCountItem.product?.id,
       expirationDate: dateWithoutTimeZone({
         date: cycleCountItem?.inventoryItem?.expirationDate,
-        currentDateFormat: DateFormat.MMM_DD_YYYY,
         outputDateFormat: DateFormat.MM_DD_YYYY,
       }),
     },
@@ -518,8 +516,8 @@ const useCountStep = () => {
           return acc;
         }, []);
       dispatch(eraseDraft(currentLocation?.id, TO_COUNT_TAB));
-      const requestIdsWithoutDiscrepancies
-        = submittedCounts.length - requestIdsWithDiscrepancies.length;
+      const requestIdsWithoutDiscrepancies =
+        submittedCounts.length - requestIdsWithDiscrepancies.length;
       if (requestIdsWithDiscrepancies.length > 0) {
         openResolveDiscrepanciesModal(requestIdsWithDiscrepancies, requestIdsWithoutDiscrepancies);
         return;
@@ -569,21 +567,82 @@ const useCountStep = () => {
     resetFocus();
   };
 
-  const applyImportFile = async (e) => {
-    if (e instanceof File) {
-      setImportFile(e);
-    }
-  };
+  const createCustomItemsFromImport = (items) => (items
+    ? items.map((item) => ({
+      ...item,
+      countIndex: 0,
+      id: _.uniqueId('newRow'),
+      custom: true,
+      inventoryItem: {
+        lotNumber: item.lotNumber,
+        expirationDate: item.expirationDate,
+      },
+      product: {
+        id: item.product.id,
+        productCode: item.product.productCode,
+      },
+    }))
+    : []);
 
-  const importItems = async () => {
+  const removeItemFromCycleCounts = (cycleCounts, cycleCountId, itemId) => ({
+    ...cycleCounts,
+    [cycleCountId]: cycleCounts[cycleCountId]
+      .filter((item) => item.cycleCountItemId !== itemId),
+  });
+
+  const mergeImportItems = (originalItem, importedItem) => ({
+    ...originalItem,
+    ...importedItem,
+    inventoryItem: {
+      product: {
+        id: importedItem?.product?.id || originalItem?.inventoryItem?.product?.id,
+        name: importedItem?.product?.name || originalItem?.inventoryItem?.product?.name,
+        productCode: importedItem?.product?.productCode
+            || originalItem?.inventoryItem?.product?.productCode,
+      },
+      lotNumber: importedItem?.lotNumber || originalItem?.inventoryItem?.lotNumber,
+      expirationDate: importedItem?.expirationDate || originalItem?.inventoryItem?.expirationDate,
+    },
+    updated: true,
+  });
+
+  const importItems = async (importFile) => {
     try {
       show();
-      const response = await cycleCountApi.importCycleCountItems(importFile, currentLocation?.id);
+      const response = await cycleCountApi.importCycleCountItems(
+        importFile[0],
+        currentLocation?.id,
+      );
       console.log(response);
+      let cycleCounts = _.groupBy(response.data.data, 'cycleCountId');
+      tableData.current = tableData.current.map((cycleCount) => ({
+        ...cycleCount,
+        cycleCountItems: [
+          ...cycleCount.cycleCountItems
+            .map((item) => {
+              const correspondingImportItem = cycleCounts[cycleCount.id]?.find(
+                (cycleCountItem) => cycleCountItem.cycleCountItemId === item.id,
+              );
+
+              if (correspondingImportItem) {
+                // Remove items from the import that have a corresponding item
+                // in the current cycle count. It allows us to treat items with
+                // the wrong ID as new rows that do not already exist.
+                cycleCounts = removeItemFromCycleCounts(
+                  cycleCounts,
+                  cycleCount.id,
+                  correspondingImportItem.cycleCountItemId,
+                );
+              }
+
+              return mergeImportItems(item, correspondingImportItem);
+            }),
+          ...createCustomItemsFromImport(cycleCounts[cycleCount.id]),
+        ],
+      }));
     } finally {
       hide();
     }
-    // TODO: Map items to the table
   };
 
   return {
@@ -610,9 +669,7 @@ const useCountStep = () => {
     refreshFocusCounter,
     isSaveDisabled,
     setIsSaveDisabled,
-    applyImportFile,
     importItems,
-    importFile,
   };
 };
 
