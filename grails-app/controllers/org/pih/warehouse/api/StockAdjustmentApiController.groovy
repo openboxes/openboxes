@@ -11,19 +11,17 @@ package org.pih.warehouse.api
 
 import grails.converters.JSON
 import grails.gorm.transactions.Transactional
-import org.grails.web.json.JSONArray
-import org.grails.web.json.JSONObject
-import org.pih.warehouse.core.Constants
+import grails.validation.ValidationException
 import org.pih.warehouse.inventory.AdjustStockCommand
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.product.Product
 
 @Transactional
 class StockAdjustmentApiController {
 
     def inventoryService
+    def productAvailabilityService
 
-    def create() {
+    def create(AdjustStockCommand adjustStockCommand) {
         String locationId = params?.location?.id ?: session?.warehouse?.id
         Location location = Location.get(locationId)
 
@@ -31,46 +29,14 @@ class StockAdjustmentApiController {
             throw new IllegalArgumentException("Cannot create stock adjustments without a location - sign in or provide location.id as a request parameter")
         }
 
-        def jsonObject = request.JSON
-        List<StockAdjustment> stockAdjustments = new ArrayList<StockAdjustment>()
-        bindStockAdjustments(stockAdjustments, jsonObject)
+        adjustStockCommand.location = location
+        inventoryService.adjustStock(adjustStockCommand)
 
-        // FIXME Forgot there was already a command object for this
-        stockAdjustments.each { StockAdjustment stockAdjustment ->
-            AdjustStockCommand adjustStockCommand = new AdjustStockCommand()
-            adjustStockCommand.inventoryItem = stockAdjustment.inventoryItem
-            adjustStockCommand.quantity = stockAdjustment.quantityAdjusted
-            adjustStockCommand.comment = stockAdjustment.comments
-            adjustStockCommand.location = location
-            adjustStockCommand.binLocation = stockAdjustment.binLocation
-            inventoryService.adjustStock(adjustStockCommand)
+        if (adjustStockCommand.hasErrors()) {
+            throw new ValidationException("Unable to adjust stock", adjustStockCommand.errors)
         }
 
-        render([data: stockAdjustments] as JSON)
+        render([data: adjustStockCommand] as JSON)
     }
-
-
-    private void bindStockAdjustments(List<StockAdjustment> stockAdjustments, JSONArray jsonArray) {
-        jsonArray.each {
-            stockAdjustments << bindStockAdjustment(new StockAdjustment(), it)
-        }
-    }
-
-//    void bindStockAdjustmentData(List<StockAdjustment> stockAdjustments, JSONObject jsonObject) {
-//        stockAdjustments << bindStockAdjustmentData(new StockAdjustment(), jsonObject)
-//    }
-
-    private StockAdjustment bindStockAdjustment(StockAdjustment stockAdjustment, JSONObject jsonObject) {
-        bindData(stockAdjustment, jsonObject)
-
-        if (!stockAdjustment.inventoryItem) {
-            Product product = Product.get(jsonObject.productId)
-            Date expirationDate = jsonObject.expirationDate ? Constants.EXPIRATION_DATE_FORMATTER.parse(jsonObject.expirationDate) : null
-            stockAdjustment.inventoryItem = inventoryService.findOrCreateInventoryItem(product, jsonObject.lotNumber, expirationDate)
-        }
-
-        return stockAdjustment
-    }
-
 }
 

@@ -77,7 +77,13 @@ class StockTransferApiController {
         // We don't have the order yet so can't use it when generating the stockTransferNumber
         bindStockTransferData(stockTransfer, null, currentUser, currentLocation, jsonObject)
 
-        Order order = stockTransferService.createOrUpdateOrderFromStockTransfer(stockTransfer)
+        Order order
+        if (stockTransfer.status == StockTransferStatus.COMPLETED) {
+            order = stockTransferService.completeStockTransfer(stockTransfer)
+        } else {
+            order = stockTransferService.createOrUpdateOrderFromStockTransfer(stockTransfer)
+        }
+
 
         // TODO: Refactor - Return only status
         stockTransfer = StockTransfer.createFromOrder(order)
@@ -183,13 +189,15 @@ class StockTransferApiController {
             }
 
             // For inbound returns
-            Date expirationDate = stockTransferItemMap.expirationDate ? Constants.EXPIRATION_DATE_FORMATTER.parse(stockTransferItemMap.expirationDate) : null
-            String lotNumber = stockTransferItemMap.lotNumber ? stockTransferItemMap.lotNumber : null
-            stockTransferItem.inventoryItem = inventoryService.findAndUpdateOrCreateInventoryItem(
-                    stockTransferItem.product,
-                    lotNumber,
-                    expirationDate
-            )
+            if (stockTransfer.type == OrderType.findByCode(Constants.RETURN_ORDER)) {
+                Date expirationDate = stockTransferItemMap.expirationDate ? Constants.EXPIRATION_DATE_FORMATTER.parse(stockTransferItemMap.expirationDate) : null
+                String lotNumber = stockTransferItemMap.lotNumber ? stockTransferItemMap.lotNumber : null
+                stockTransferItem.inventoryItem = inventoryService.findAndUpdateOrCreateInventoryItem(
+                        stockTransferItem.product,
+                        lotNumber,
+                        expirationDate
+                )
+            }
 
             if (stockTransferItemMap.sortOrder) {
                 stockTransferItem.orderIndex = stockTransferItemMap.sortOrder
