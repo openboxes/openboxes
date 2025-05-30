@@ -69,11 +69,7 @@ transaction_details AS (
             transaction.date_created,
             transaction.last_updated
             from transaction
-                join transaction_entry on transaction.id = transaction_entry.transaction_id
                 join transaction_type on transaction.transaction_type_id = transaction_type.id
-                join inventory_item on transaction_entry.inventory_item_id = inventory_item.id
-                join product on inventory_item.product_id = product.id
-                join location bin_location on transaction_entry.bin_location_id = bin_location.id
                 join inventory on transaction.inventory_id = inventory.id
                 join location facility on facility.inventory_id = inventory.id
             where transaction_type.transaction_code = 'PRODUCT_INVENTORY'
@@ -158,7 +154,7 @@ from (select
           fcd.quantity_on_hand as verification_count_quantity_on_hand,
           fcd.quantity_counted as verification_count_quantity_counted,
           fcd.quantity_variance as verification_count_quantity_variance,
-          (abs(icd.quantity_variance) / icd.quantity_on_hand) as verification_count_variance_percentage,
+          (abs(fcd.quantity_variance) / fcd.quantity_on_hand) as verification_count_variance_percentage,
           fcd.variance_reason_code as verification_count_variance_reason_code,
           fcd.variance_comment as verification_count_variance_comment,
           fcd.count_index as verification_count_count_index
