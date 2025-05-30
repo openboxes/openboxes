@@ -3,6 +3,7 @@ package org.pih.warehouse.inventory
 import grails.validation.Validateable
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.product.ProductAvailability
 import org.springframework.web.context.request.RequestContextHolder
 
 class CycleCountRequestCommand implements Validateable {
@@ -27,8 +28,9 @@ class CycleCountRequestCommand implements Validateable {
 
             // If a product is in a pending outbound, we don't allow you to proceed with the count. There is too much
             // stock uncertainty in that scenario so to avoid confusion we require the outbound to be resolved first.
-            CycleCountCandidate candidate = CycleCountCandidate.findByFacilityAndProduct(obj.facility, product)
-            if (candidate != null && candidate.quantityAllocated > 0) {
+            int quantityAllocatedForProduct = ProductAvailability.findAllByLocationAndProduct(obj.facility, product)
+                    ?.sum{ it.quantityAllocated ?: 0 } as Integer ?: 0
+            if (quantityAllocatedForProduct > 0) {
                 return ['hasQuantityAllocated', product.productCode]
             }
 
