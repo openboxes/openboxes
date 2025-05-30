@@ -11,6 +11,7 @@ package org.pih.warehouse.data
 
 import grails.gorm.transactions.Transactional
 import grails.plugins.csv.CSVMapReader
+import grails.validation.ValidationException
 import org.pih.warehouse.DateUtil
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.core.*
@@ -26,6 +27,7 @@ import org.pih.warehouse.inventory.InventoryService
 import org.pih.warehouse.inventory.ProductAvailabilityService
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionEntry
+import org.pih.warehouse.inventory.TransactionIdentifierService
 import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductCatalog
@@ -51,6 +53,7 @@ class LoadDataService {
     InventoryImportProductInventoryTransactionService inventoryImportProductInventoryTransactionService
     ProductAvailabilityService productAvailabilityService
     ConfigService configService
+    TransactionIdentifierService transactionIdentifierService
 
     def importLocations(URL csvURL) {
         CSVMapReader csvReader = new CSVMapReader(csvURL.newInputStream().newReader());
@@ -210,11 +213,13 @@ class LoadDataService {
     }
 
     private Transaction createAdjustmentTransaction(Date transactionDate, Inventory inventory) {
-        return new Transaction(
+        Transaction transaction =  new Transaction(
                 transactionDate: transactionDate,
                 transactionType: TransactionType.get(Constants.ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID),
                 inventory: inventory
         )
+        transaction.transactionNumber = transactionIdentifierService.generate(transaction)
+        return transaction
     }
 
     private TransactionEntry createAdjustmentTransactionEntry(
@@ -223,11 +228,10 @@ class LoadDataService {
             Location binLocation,
             Map<String, AvailableItem> availableItems
     ) {
-        DateFormat dateFormat = new SimpleDateFormat('DD/mm/yyyy')
         InventoryItem inventoryItem = inventoryService.findAndUpdateOrCreateInventoryItem(
                 product,
                 csvReaderRow["Lot number"],
-                DateUtil.asDate(csvReaderRow["Expiration date"], dateFormat)
+                DateUtil.asDate(csvReaderRow["Expiration date"], Constants.EXPIRATION_DATE_FORMATTER)
         )
         String key = ProductAvailabilityService.constructAvailableItemKey(binLocation, inventoryItem)
         int newQuantity = csvReaderRow["Physical QOH"] as int
@@ -319,8 +323,9 @@ class LoadDataService {
             }
         }
 
-        adjustmentTransaction.forceRefresh = Boolean.TRUE
-        adjustmentTransaction.save(flush: true, failOnError: true)
+        if (adjustmentTransaction.transactionEntries && !adjustmentTransaction.save()) {
+            throw new ValidationException("Invalid transaction", adjustmentTransaction.errors)
+        }
 
         csvReader.close()
     }
