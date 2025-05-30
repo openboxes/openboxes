@@ -14,6 +14,7 @@ import org.pih.warehouse.product.Product
 @Transactional
 abstract class ProductInventoryTransactionService<T> {
 
+    InventoryService inventoryService
     ProductAvailabilityService productAvailabilityService
     TransactionIdentifierService transactionIdentifierService
 
@@ -79,11 +80,24 @@ abstract class ProductInventoryTransactionService<T> {
             Date transactionDate=null,
             String comment=null) {
 
+        // If there are no available items, there would be no transaction entries, so skip creating the transaction.
+        if (!availableItems) {
+            return null
+        }
+
         TransactionType transactionType = TransactionType.read(Constants.INVENTORY_BASELINE_TRANSACTION_TYPE_ID)
+
+        // We'd have weird behaviour if we allowed two transactions to exist at the same exact time (precision at the
+        // database level is to the second) so fail if there's already a transaction on the product for the given date.
+        Date actualTransactionDate = transactionDate ?: new Date()
+        List<InventoryItem> inventoryItems = availableItems.collect{ it.inventoryItem }
+        if (inventoryService.hasTransactionEntriesOnDate(facility, actualTransactionDate, inventoryItems)) {
+            throw new IllegalArgumentException("A baseline transaction already exists at time ${actualTransactionDate}")
+        }
 
         Transaction transaction = new Transaction(
                 inventory: facility.inventory,
-                transactionDate: transactionDate ?: new Date(),
+                transactionDate: actualTransactionDate,
                 transactionType: transactionType,
                 comment: comment,
         )
