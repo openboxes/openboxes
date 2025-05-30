@@ -550,6 +550,7 @@ const useInboundAddItemsForm = ({
       const response = await apiClient.get(url);
       setValue('totalCount', response.data.data.length);
       setLineItems(response, null, showOnlyImportedItems);
+      await trigger();
     }
   };
 
