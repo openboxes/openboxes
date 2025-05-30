@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect } from 'react';
 
 import { createColumnHelper } from '@tanstack/react-table';
 import { useSelector } from 'react-redux';
@@ -95,9 +95,10 @@ const useAssignCountModal = ({
     };
   }, []);
 
-  const columns = useMemo(
-    () => [
-      columnHelper.accessor((row) => `${row.product.productCode} ${row.product.name}`, {
+  const columns = [
+    columnHelper.accessor(
+      (row) => `${row.product.productCode} ${row.product.name}`,
+      {
         id: cycleCountColumn.PRODUCT,
         header: () => (
           <TableHeaderCell>
@@ -115,74 +116,74 @@ const useAssignCountModal = ({
           </TableCell>
         ),
         size: 250,
-      }),
-      columnHelper.accessor(cycleCountColumn.ASSIGNEE, {
-        id: cycleCountColumn.ASSIGNEE,
-        header: () => (
-          <TableHeaderCell>
-            {translate('react.cycleCount.table.assignee.label', 'Assignee')}
-          </TableHeaderCell>
-        ),
-        cell: ({ getValue, row }) => (
-          <TableCell className="rt-td">
-            <SelectField
-              placeholder={translate('react.cycleCount.selectAssigneePlaceholder.label', 'Select Assignee')}
-              async
-              loadOptions={debouncedPeopleFetch}
-              defaultValue={getValue()}
-              onChange={(selectedOption) =>
-                handleUpdateAssignees(
-                  row.original.cycleCountRequestId,
-                  cycleCountColumn.ASSIGNEE,
-                  selectedOption,
-                )}
-            />
-          </TableCell>
-        ),
-        size: 150,
-      }),
-      columnHelper.accessor(cycleCountColumn.DEADLINE, {
-        id: cycleCountColumn.DEADLINE,
-        header: () => (
-          <TableHeaderCell>
-            {translate('react.cycleCount.table.deadline.label', 'Deadline')}
-          </TableHeaderCell>
-        ),
-        cell: ({ getValue, row }) => (
-          <TableCell className="rt-td">
-            <DateField
-              className="date-counted-date-picker date-field-input"
-              placeholder={translate('react.cycleCount.selectDate.label', 'Select Date')}
-              value={getValue()}
-              clearable
-              customDateFormat={DateFormat.DD_MMM_YYYY}
-              onChange={(newDate) =>
-                handleUpdateAssignees(
-                  row.original.cycleCountRequestId,
-                  cycleCountColumn.DEADLINE,
-                  newDate,
-                )}
-            />
-          </TableCell>
-        ),
-        size: 150,
-      }),
-      columnHelper.accessor(cycleCountColumn.INVENTORY_ITEMS, {
-        id: cycleCountColumn.INVENTORY_ITEMS,
-        header: () => (
-          <TableHeaderCell>
-            #
-            {' '}
-            {translate('react.cycleCount.table.inventoryItems.label', 'Inventory Items')}
-          </TableHeaderCell>
-        ),
-        cell: ({ getValue }) => <TableCell className="rt-td text-center">{getValue()}</TableCell>,
-        size: 100,
-      }),
-    ],
-    [],
-  );
-
+      },
+    ),
+    columnHelper.accessor(cycleCountColumn.ASSIGNEE, {
+      id: cycleCountColumn.ASSIGNEE,
+      header: () => (
+        <TableHeaderCell>
+          {translate('react.cycleCount.table.assignee.label', 'Assignee')}
+        </TableHeaderCell>
+      ),
+      cell: ({ getValue, row }) => (
+        <TableCell className="rt-td">
+          <SelectField
+            placeholder={translate('react.cycleCount.selectAssigneePlaceholder.label', 'Select Assignee')}
+            async
+            loadOptions={debouncedPeopleFetch}
+            defaultValue={getValue()}
+            onChange={(selectedOption) =>
+              handleUpdateAssignees(
+                row.original.cycleCountRequestId,
+                cycleCountColumn.ASSIGNEE,
+                selectedOption,
+              )}
+          />
+        </TableCell>
+      ),
+      size: 150,
+    }),
+    columnHelper.accessor(cycleCountColumn.DEADLINE, {
+      id: cycleCountColumn.DEADLINE,
+      header: () => (
+        <TableHeaderCell>
+          {translate('react.cycleCount.table.deadline.label', 'Deadline')}
+        </TableHeaderCell>
+      ),
+      cell: ({ getValue, row }) => (
+        <TableCell className="rt-td">
+          <DateField
+            className="date-counted-date-picker date-field-input"
+            placeholder={translate('react.cycleCount.selectDate.label', 'Select Date')}
+            value={getValue()}
+            clearable
+            customDateFormat={DateFormat.DD_MMM_YYYY}
+            onChange={(newDate) =>
+              handleUpdateAssignees(
+                row.original.cycleCountRequestId,
+                cycleCountColumn.DEADLINE,
+                newDate,
+              )}
+          />
+        </TableCell>
+      ),
+      size: 150,
+    }),
+    columnHelper.accessor(cycleCountColumn.INVENTORY_ITEMS, {
+      id: cycleCountColumn.INVENTORY_ITEMS,
+      header: () => (
+        <TableHeaderCell>
+          #
+          {' '}
+          {translate('react.cycleCount.table.inventoryItems.label', 'Inventory Items')}
+        </TableHeaderCell>
+      ),
+      cell: ({ getValue }) => (
+        <TableCell className="rt-td text-center">{getValue()}</TableCell>
+      ),
+      size: 100,
+    }),
+  ];
   return {
     handleAssign,
     handleUpdateAssignees,

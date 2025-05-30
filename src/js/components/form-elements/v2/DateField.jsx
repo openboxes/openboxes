@@ -16,6 +16,7 @@ import RootPortalWrapper from 'wrappers/RootPortalWrapper';
 import 'react-datepicker/dist/react-datepicker.css';
 import 'components/form-elements/DateFilter/DateFilter.scss';
 import './style.scss';
+import { getCurrentLocale } from 'selectors';
 
 const DateField = ({
   title,
@@ -46,7 +47,7 @@ const DateField = ({
     onChange(date?.format(DateFormat.MMM_DD_YYYY));
   };
   const { locale } = useSelector((state) => ({
-    locale: state.session.activeLanguage,
+    locale: getCurrentLocale(state),
   }));
 
   const formatDate = (dateToFormat) => {
