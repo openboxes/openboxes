@@ -140,18 +140,19 @@ class InventoryImportDataService implements ImportDataService {
     void importData(ImportDataCommand command) {
         InventoryImportData inventoryImportData = parseData(command)
 
+        Date baselineTransactionDate = command.date
         Map<String, AvailableItem> availableItems = productAvailabilityService.getAvailableItemsAtDateAsMap(
                 command.location,
                 inventoryImportData.products.toList(),
-                command.date)
+                baselineTransactionDate)
 
         String comment = "Imported from ${command.filename} on ${new Date()}"
 
         inventoryImportProductInventoryTransactionService.createInventoryBaselineTransactionForGivenStock(
-                command.location, command, availableItems.values(), command.date, comment)
+                command.location, command, availableItems.values(), baselineTransactionDate, comment)
 
         // Date objects are mutable, so we use Instant to clone the date in the command and avoid directly modifying it.
-        Date adjustmentTransactionDate = DateUtil.asDate(DateUtil.asInstant(command.date).plusSeconds(1))
+        Date adjustmentTransactionDate = DateUtil.asDate(DateUtil.asInstant(baselineTransactionDate).plusSeconds(1))
 
         createAdjustmentTransaction(
                 command.location, inventoryImportData, availableItems, adjustmentTransactionDate, comment)
@@ -166,6 +167,13 @@ class InventoryImportDataService implements ImportDataService {
                                                     Map<String, AvailableItem> availableItems,
                                                     Date transactionDate,
                                                     String comment) {
+
+        // We'd have weird behaviour if we allowed two transactions to exist at the same exact time (precision at the
+        // database level is to the second) so fail if there's already a transaction on the items for the given date.
+        List<InventoryItem> inventoryItems = availableItems.values().collect{ it.inventoryItem }
+        if (inventoryService.hasTransactionEntriesOnDate(facility, transactionDate, inventoryItems)) {
+            throw new IllegalArgumentException("A transaction already exists at time ${transactionDate}")
+        }
 
         // Don't bother populating the transaction's fields until we know we'll need one.
         Transaction transaction = new Transaction()

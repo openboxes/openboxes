@@ -8,8 +8,6 @@ import grails.gorm.transactions.Transactional
 @Transactional
 class RecordStockProductInventoryTransactionService extends ProductInventoryTransactionService<RecordInventoryCommand> {
 
-    InventoryService inventoryService
-
     Transaction createAdjustmentTransaction(
             RecordInventoryCommand recordInventoryCommand,
             Date transactionDate

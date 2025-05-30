@@ -702,10 +702,6 @@ class ProductAvailabilityService {
      * @param at The moment in time to fetch stock for. If not provided, will fetch the current stock of each item.
      */
     List<AvailableItem> getAvailableItemsAtDate(Location facility, List<Product> products, Date at=null) {
-        if (at != null && at > new Date()) {
-            throw new IllegalArgumentException("Date cannot be in the future.")
-        }
-
         // If no date is provided, we fetch the stock as it is currently (filtering out any items with no quantity).
         // This means we're allowed to simply query product availability since it contains up to date stock.
         if (at == null) {

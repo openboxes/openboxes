@@ -25,6 +25,14 @@ abstract class ProductInventoryTransactionService<T> {
     abstract void setSourceObject(Transaction transaction, T transactionSource)
 
     /**
+     * Returns true if baseline transactions are enabled for the feature. Defaults to enabled.
+     * To be overwritten by feature-specific implementations that provide their own feature-switch.
+     */
+    protected boolean baselineTransactionsEnabled() {
+        return true
+    }
+
+    /**
      * Create a new "inventory baseline" product inventory transaction based on the current QoH in product availability.
      *
      * If you already have access to available items, it's better to use createInventoryBaselineTransactionForGivenStock
@@ -81,18 +89,18 @@ abstract class ProductInventoryTransactionService<T> {
             String comment=null) {
 
         // If there are no available items, there would be no transaction entries, so skip creating the transaction.
-        if (!availableItems) {
+        if (!availableItems || !baselineTransactionsEnabled()) {
             return null
         }
 
         TransactionType transactionType = TransactionType.read(Constants.INVENTORY_BASELINE_TRANSACTION_TYPE_ID)
 
         // We'd have weird behaviour if we allowed two transactions to exist at the same exact time (precision at the
-        // database level is to the second) so fail if there's already a transaction on the product for the given date.
+        // database level is to the second) so fail if there's already a transaction on the items for the given date.
         Date actualTransactionDate = transactionDate ?: new Date()
         List<InventoryItem> inventoryItems = availableItems.collect{ it.inventoryItem }
         if (inventoryService.hasTransactionEntriesOnDate(facility, actualTransactionDate, inventoryItems)) {
-            throw new IllegalArgumentException("A baseline transaction already exists at time ${actualTransactionDate}")
+            throw new IllegalArgumentException("A transaction already exists at time ${actualTransactionDate}")
         }
 
         Transaction transaction = new Transaction(
