@@ -3,6 +3,7 @@ import React, { useRef } from 'react';
 import moment from 'moment';
 import PropTypes from 'prop-types';
 import DatePicker from 'react-datepicker';
+import { useSelector } from 'react-redux';
 
 import DateFieldInput from 'components/form-elements/v2/DateFieldInput';
 import componentType from 'consts/componentType';
@@ -44,6 +45,9 @@ const DateField = ({
     }
     onChange(date?.format(DateFormat.MMM_DD_YYYY));
   };
+  const { locale } = useSelector((state) => ({
+    locale: state.session.activeLanguage,
+  }));
 
   const formatDate = (dateToFormat) => {
     if (!dateToFormat) {
@@ -86,6 +90,7 @@ const DateField = ({
     >
       <DatePicker
         {...fieldProps}
+        locale={locale}
         showTimeSelect={showTimeSelect}
         customInput={<DateFieldInput onClear={onClear} clearable={clearable} />}
         className={`form-element-input ${errorMessage ? 'has-errors' : ''} ${className}`}
