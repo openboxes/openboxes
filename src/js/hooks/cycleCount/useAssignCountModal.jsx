@@ -128,7 +128,7 @@ const useAssignCountModal = ({
       cell: ({ getValue, row }) => (
         <TableCell className="rt-td">
           <SelectField
-            placeholder={translate('react.cycleCount.selectAssigneePlaceholder.label', 'Select Assignee')}
+            placeholder={translate('react.cycleCount.selectAnAssignee.placeholder.label', 'Select an assignee')}
             async
             loadOptions={debouncedPeopleFetch}
             defaultValue={getValue()}
@@ -154,7 +154,7 @@ const useAssignCountModal = ({
         <TableCell className="rt-td">
           <DateField
             className="date-counted-date-picker date-field-input"
-            placeholder={translate('react.cycleCount.selectDate.label', 'Select Date')}
+            placeholder={translate('react.default.dateInput.placeholder.label', 'Select a date')}
             value={getValue()}
             clearable
             customDateFormat={DateFormat.DD_MMM_YYYY}
