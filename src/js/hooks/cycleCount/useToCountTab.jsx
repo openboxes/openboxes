@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 
 import { createColumnHelper } from '@tanstack/react-table';
 import fileDownload from 'js-file-download';
@@ -36,8 +36,6 @@ const useToCountTab = ({
   toCountTabCheckboxes,
   serializedParams,
 }) => {
-  const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
-  const [selectedCycleCountItems, setSelectedCycleCountItems] = useState([]);
   const columnHelper = createColumnHelper();
   const translate = useTranslate();
   const spinner = useSpinner();
@@ -435,37 +433,6 @@ const useToCountTab = ({
     },
   });
 
-  const handleUpdateCycleCountItems = (cycleCountRequestId, field, value) => {
-    setSelectedCycleCountItems((prevItems) =>
-      prevItems.map((item) =>
-        (item.cycleCountRequestId === cycleCountRequestId
-          ? { ...item, [field]: value }
-          : item)));
-  };
-
-  useEffect(() => {
-    const newSelectedCycleCountItems = tableData.data
-      .filter((row) => checkedCheckboxes.includes(row.cycleCountRequest.id))
-      .map((row) => ({
-        cycleCountRequestId: row.cycleCountRequest.id,
-        product: row.product,
-        assignee: {
-          email: 'seba6@gmail.com',
-          firstName: 'seba6',
-          id: 'ff8081819667a44a019667a7a9c70000',
-          label: 'seba6 seba6',
-          lastName: 'seba6',
-          name: 'seba6 seba6',
-          roles: [],
-          username: 'seba6',
-          value: 'ff8081819667a44a019667a7a9c70000',
-        },
-        deadline: null,
-        inventoryItems: 5,
-      }));
-    setSelectedCycleCountItems(newSelectedCycleCountItems);
-  }, [checkedCheckboxes]);
-
   return {
     tableData,
     loading,
@@ -475,10 +442,6 @@ const useToCountTab = ({
     moveToCounting: verifyCondition,
     printCountForm,
     openCancelCountsModal,
-    isAssignModalOpen,
-    setIsAssignModalOpen,
-    selectedCycleCountItems,
-    handleUpdateCycleCountItems,
     fetchData,
   };
 };

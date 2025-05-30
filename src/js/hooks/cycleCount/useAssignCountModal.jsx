@@ -1,8 +1,10 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 
 import { createColumnHelper } from '@tanstack/react-table';
 import { useSelector } from 'react-redux';
+import { getCurrentLocation } from 'selectors';
 
+import cycleCountApi from 'api/services/CycleCountApi';
 import { TableCell } from 'components/DataTable';
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
 import DateField from 'components/form-elements/v2/DateField';
@@ -10,24 +12,89 @@ import SelectField from 'components/form-elements/v2/SelectField';
 import { INVENTORY_ITEM_URL } from 'consts/applicationUrls';
 import cycleCountColumn from 'consts/cycleCountColumn';
 import { DateFormat } from 'consts/timeFormat';
+import useSpinner from 'hooks/useSpinner';
 import useTranslate from 'hooks/useTranslate';
+import dateWithoutTimeZone from 'utils/dateUtils';
 import { debouncePeopleFetch } from 'utils/option-utils';
 
-const useAssignModalTable = ({ onUpdate }) => {
-  const translate = useTranslate();
+const useAssignCountModal = ({
+  selectedCycleCountItems,
+  setSelectedCycleCountItems,
+  isCount,
+  refetchData,
+  closeModal,
+}) => {
+  const spinner = useSpinner();
   const {
+    currentLocation,
     debounceTime,
     minSearchLength,
   } = useSelector((state) => ({
     debounceTime: state.session.searchConfig.debounceTime,
     minSearchLength: state.session.searchConfig.minSearchLength,
+    currentLocation: getCurrentLocation(state),
   }));
   const debouncedPeopleFetch = useCallback(
     debouncePeopleFetch(debounceTime, minSearchLength),
     [debounceTime, minSearchLength],
   );
-
+  const translate = useTranslate();
   const columnHelper = createColumnHelper();
+
+  const handleUpdateAssignees = (cycleCountRequestId, field, value) => {
+    setSelectedCycleCountItems((prevItems) =>
+      prevItems.map((item) =>
+        (item.cycleCountRequestId === cycleCountRequestId
+          ? { ...item, [field]: value }
+          : item)));
+  };
+
+  const handleAssign = async () => {
+    try {
+      spinner.show();
+      const requests = selectedCycleCountItems.map((item) => {
+        const { cycleCountRequestId, assignee, deadline } = item;
+
+        const payload = isCount
+          ? {
+            requestedCountBy: assignee?.id,
+            requestedCountDate: dateWithoutTimeZone({
+              date: deadline,
+              outputDateFormat: 'MM/DD/YYYY',
+            }),
+          }
+          : {
+            requestedRecountBy: assignee?.id,
+            requestedRecountDate: dateWithoutTimeZone({
+              date: deadline,
+              outputDateFormat: 'MM/DD/YYYY',
+            }),
+          };
+
+        return cycleCountApi.updateCycleCountItemsRequests(
+          currentLocation?.id,
+          cycleCountRequestId,
+          payload,
+        );
+      });
+      await Promise.all(requests);
+
+      if (refetchData) {
+        refetchData();
+      }
+    } finally {
+      closeModal();
+      spinner.hide();
+    }
+  };
+
+  useEffect(() => {
+    document.body.style.overflowY = 'hidden';
+    return () => {
+      document.body.style.overflowY = 'auto';
+    };
+  }, []);
+
   const columns = useMemo(
     () => [
       columnHelper.accessor((row) => `${row.product.productCode} ${row.product.name}`, {
@@ -64,7 +131,7 @@ const useAssignModalTable = ({ onUpdate }) => {
               loadOptions={debouncedPeopleFetch}
               defaultValue={getValue()}
               onChange={(selectedOption) =>
-                onUpdate(
+                handleUpdateAssignees(
                   row.original.cycleCountRequestId,
                   cycleCountColumn.ASSIGNEE,
                   selectedOption,
@@ -90,7 +157,11 @@ const useAssignModalTable = ({ onUpdate }) => {
               clearable
               customDateFormat={DateFormat.DD_MMM_YYYY}
               onChange={(newDate) =>
-                onUpdate(row.original.cycleCountRequestId, cycleCountColumn.DEADLINE, newDate)}
+                handleUpdateAssignees(
+                  row.original.cycleCountRequestId,
+                  cycleCountColumn.DEADLINE,
+                  newDate,
+                )}
             />
           </TableCell>
         ),
@@ -111,9 +182,12 @@ const useAssignModalTable = ({ onUpdate }) => {
     ],
     [],
   );
+
   return {
+    handleAssign,
+    handleUpdateAssignees,
     columns,
   };
 };
 
-export default useAssignModalTable;
+export default useAssignCountModal;

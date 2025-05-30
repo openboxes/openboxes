@@ -5,7 +5,6 @@ import { RiCalculatorLine, RiDownload2Line, RiPrinterLine } from 'react-icons/ri
 import { useSelector } from 'react-redux';
 import { getCycleCountRequestIds } from 'selectors';
 
-import AssignCountModal from 'components/cycleCount/AssignCountModal';
 import CycleCountDraftInfoBar from 'components/cycleCount/CycleCountDraftInfoBar';
 import DataTable from 'components/DataTable/v2/DataTable';
 import Button from 'components/form-elements/Button';
@@ -38,11 +37,6 @@ const CycleCountToCount = ({ filterParams, toCountTabCheckboxes, tablePagination
     moveToCounting,
     printCountForm,
     openCancelCountsModal,
-    isAssignModalOpen,
-    setIsAssignModalOpen,
-    selectedCycleCountItems,
-    handleUpdateCycleCountItems,
-    fetchData,
   } = useToCountTab({
     filterParams,
     offset,
@@ -65,23 +59,6 @@ const CycleCountToCount = ({ filterParams, toCountTabCheckboxes, tablePagination
           {translate('react.default.selected.label', 'selected')}
         </span>
         <div className="d-flex m-2 gap-8">
-          <Button
-            onClick={() => setIsAssignModalOpen(true)}
-            defaultLabel="Assign Count"
-            label="react.cycleCount.assignCount.label"
-            variant="primary-outline"
-            disabled={!selectedCheckboxesAmount}
-          />
-          <AssignCountModal
-            isOpen={isAssignModalOpen}
-            closeModal={() => setIsAssignModalOpen(false)}
-            defaultTitleLabel="Assign products to count"
-            titleLabel="react.cycleCount.modal.assignProductsToCount.title.label"
-            selectedCycleCountItems={selectedCycleCountItems}
-            onUpdate={handleUpdateCycleCountItems}
-            isCount
-            refetchData={fetchData}
-          />
           <Button
             onClick={openCancelCountsModal}
             label="react.cycleCount.table.cancelCount.label"

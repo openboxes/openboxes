@@ -60,7 +60,7 @@ export default {
     };
     return apiClient.post(CYCLE_COUNT_ITEMS_IMPORT(locationId), formData, config);
   },
-  updateCycleCountRequest(locationId, requestId, payload) {
+  updateCycleCountItemsRequests(locationId, requestId, payload) {
     return apiClient.patch(CYCLE_COUNT_ITEMS_REQUESTS(locationId, requestId), payload);
   },
 };

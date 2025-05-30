@@ -1,19 +1,13 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 
 import PropTypes from 'prop-types';
 import { RiCloseFill } from 'react-icons/all';
 import Modal from 'react-modal';
-import { useSelector } from 'react-redux';
-import { getCurrentLocation } from 'selectors';
 
-import cycleCountApi from 'api/services/CycleCountApi';
 import DataTable from 'components/DataTable/v2/DataTable';
 import Button from 'components/form-elements/Button';
-import { DateFormat } from 'consts/timeFormat';
-import useAssignModalTable from 'hooks/cycleCount/useAssignModalTable';
-import useSpinner from 'hooks/useSpinner';
-import dateWithoutTimeZone from 'utils/dateUtils';
-import Translate from 'utils/Translate';
+import useAssignCountModal from 'hooks/cycleCount/useAssignCountModal';
+import useTranslate from 'hooks/useTranslate';
 
 const AssignCountModal = ({
   isOpen,
@@ -21,66 +15,19 @@ const AssignCountModal = ({
   defaultTitleLabel,
   titleLabel,
   selectedCycleCountItems,
-  onUpdate,
+  setSelectedCycleCountItems,
   isCount,
   refetchData,
 }) => {
-  const spinner = useSpinner();
-  const {
-    currentLocation,
-  } = useSelector((state) => ({
-    currentLocation: getCurrentLocation(state),
-  }));
-  const { columns } = useAssignModalTable({ onUpdate });
+  const translate = useTranslate();
 
-  const handleAssign = async () => {
-    try {
-      spinner.show();
-
-      const requests = selectedCycleCountItems.map((item) => {
-        const { cycleCountRequestId, assignee, deadline } = item;
-
-        const payload = isCount
-          ? {
-            requestedCountBy: assignee?.id,
-            requestedCountDate: dateWithoutTimeZone({
-              date: deadline,
-              outputDateFormat: DateFormat.MM_DD_YYYY,
-            }),
-          }
-          : {
-            requestedRecountBy: assignee?.id,
-            requestedRecountDate: dateWithoutTimeZone({
-              date: deadline,
-              outputDateFormat: DateFormat.MM_DD_YYYY,
-            }),
-          };
-
-        return cycleCountApi.updateCycleCountRequest(
-          currentLocation?.id,
-          cycleCountRequestId,
-          payload,
-        );
-      });
-
-      await Promise.all(requests);
-      if (refetchData) {
-        refetchData();
-      }
-    } finally {
-      closeModal();
-      spinner.hide();
-    }
-  };
-
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflowY = 'hidden';
-    }
-    return () => {
-      document.body.style.overflowY = 'auto';
-    };
-  }, [isOpen]);
+  const { columns, handleAssign } = useAssignCountModal({
+    selectedCycleCountItems,
+    setSelectedCycleCountItems,
+    isCount,
+    refetchData,
+    closeModal,
+  });
 
   return (
     <Modal
@@ -90,7 +37,7 @@ const AssignCountModal = ({
       <div>
         <div className="d-flex justify-content-between align-items-center">
           <p className="assign-count-modal-header">
-            <Translate id={titleLabel} defaultMessage={defaultTitleLabel} />
+            {translate(titleLabel, defaultTitleLabel)}
           </p>
           <RiCloseFill
             size="32px"
@@ -130,20 +77,8 @@ AssignCountModal.propTypes = {
   closeModal: PropTypes.func.isRequired,
   defaultTitleLabel: PropTypes.string.isRequired,
   titleLabel: PropTypes.string.isRequired,
-  selectedCycleCountItems: PropTypes.arrayOf(
-    PropTypes.shape({
-      cycleCountRequestId: PropTypes.string.isRequired,
-      product: PropTypes.shape({
-        id: PropTypes.string.isRequired,
-        productCode: PropTypes.string.isRequired,
-        name: PropTypes.string.isRequired,
-      }).isRequired,
-      assignee: PropTypes.string.isRequired,
-      deadline: PropTypes.string.isRequired,
-      inventoryItems: PropTypes.number.isRequired,
-    }),
-  ).isRequired,
-  onUpdate: PropTypes.func.isRequired,
+  selectedCycleCountItems: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  setSelectedCycleCountItems: PropTypes.func.isRequired,
   isCount: PropTypes.bool,
   refetchData: PropTypes.func,
 };
