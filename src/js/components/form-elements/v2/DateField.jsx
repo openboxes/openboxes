@@ -4,6 +4,7 @@ import moment from 'moment';
 import PropTypes from 'prop-types';
 import DatePicker from 'react-datepicker';
 import { useSelector } from 'react-redux';
+import { getCurrentLocale } from 'selectors';
 
 import DateFieldInput from 'components/form-elements/v2/DateFieldInput';
 import componentType from 'consts/componentType';
@@ -16,7 +17,6 @@ import RootPortalWrapper from 'wrappers/RootPortalWrapper';
 import 'react-datepicker/dist/react-datepicker.css';
 import 'components/form-elements/DateFilter/DateFilter.scss';
 import './style.scss';
-import { getCurrentLocale } from 'selectors';
 
 const DateField = ({
   title,

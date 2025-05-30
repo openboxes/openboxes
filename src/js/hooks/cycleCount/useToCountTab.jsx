@@ -442,7 +442,6 @@ const useToCountTab = ({
     moveToCounting: verifyCondition,
     printCountForm,
     openCancelCountsModal,
-    fetchData,
   };
 };
 
