@@ -179,10 +179,9 @@ class OutboundStockMovementListItem implements Serializable, Validateable {
                 expectedShippingDate : shipment?.expectedShippingDate?.format("MM/dd/yyyy HH:mm XXX"),
                 requestedDeliveryDate: requisition?.requestedDeliveryDate?.format("MM/dd/yyyy HH:mm XXX"),
                 picklist             : requisition?.picklist,
-                // Needs to be added to OutboundStockMovementListItem (or moved to the StockMovement :thinking:)
-                //receivingLocation: receivingLocation?.toJson(LocationTypeCode.INTERNAL),
-                //packingLocation  : packingLocation?.toJson(LocationTypeCode.INTERNAL),
-                //loadingLocation  : loadingLocation?.toJson(LocationTypeCode.INTERNAL),
+                receivingLocation: shipment?.receivingScheduled?.eventLocation?.name ?: "Unassigned",
+                packingLocation  : shipment?.packingScheduled?.eventLocation?.name ?: "Unassigned",
+                loadingLocation  : shipment?.loadingScheduled?.eventLocation?.name ?: "Unassigned",
         ]
     }
 
