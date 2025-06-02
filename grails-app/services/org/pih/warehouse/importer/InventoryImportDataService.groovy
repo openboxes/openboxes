@@ -145,7 +145,7 @@ class InventoryImportDataService implements ImportDataService {
         // Get the stock for all items in the import at the date that the baseline transaction will be created.
         Map<String, AvailableItem> availableItems = productAvailabilityService.getAvailableItemsAtDateAsMap(
                 command.location,
-                inventoryImportData.products.toList(),
+                inventoryImportData.products,
                 baselineTransactionDate)
 
         String comment = "Imported from ${command.filename} on ${new Date()}"
@@ -157,9 +157,9 @@ class InventoryImportDataService implements ImportDataService {
         Date adjustmentTransactionDate = DateUtil.asDate(DateUtil.asInstant(baselineTransactionDate).plusSeconds(1))
 
         // We let the adjustment transaction be built from the same available items that we built the baseline
-        // transaction with. Despite the fact that the adjustment transaction is dated one second after the baseline
-        // transaction, and so could have a different stock history, we will error if there are any other transactions
-        // that exist at that time, so we can guarantee that the available items will be the same for both the baseline
+        // transaction with. The adjustment transaction is dated one second after the baseline transaction so it
+        // could have a different stock history, but we error if there are any other transactions that exist at
+        // that time, so we can guarantee that the available items will be the same for both the baseline
         // and adjustment. This avoids needing to fetch available items twice (which is slow).
         createAdjustmentTransaction(
                 command.location, inventoryImportData, availableItems, adjustmentTransactionDate, comment)
