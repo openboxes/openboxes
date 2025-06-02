@@ -702,7 +702,7 @@ class ProductAvailabilityService {
      * @param at The moment in time to fetch stock for. If not provided, will fetch the current stock of each item.
      */
     List<AvailableItem> getAvailableItemsAtDate(Location facility, List<Product> products, Date at=null) {
-        if (at != null && at > new Date()) {
+        if (at != null && at.after(new Date())) {
             throw new IllegalArgumentException("Date cannot be in the future.")
         }
 

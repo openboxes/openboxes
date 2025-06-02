@@ -89,8 +89,9 @@ openboxes.products.merge.enabled = false
 // Cycle Count configuration (OBPIH-7033)
 openboxes.cycleCount.products.maxAmount = 50
 
-// Inventory snapshot configuration (OBPIH-7194)
+// Inventory baseline transaction configuration (OBPIH-7194, OBPIH-7195)
 openboxes.transactions.inventoryBaseline.recordStock.enabled = true
+openboxes.transactions.inventoryBaseline.inventoryImport.enabled = true
 
 // Inventory snapshot configuration (OBPIH-7254)
 openboxes.transactions.inventoryBaseline.loadDemoData.enabled = true
