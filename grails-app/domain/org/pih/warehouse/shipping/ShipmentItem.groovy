@@ -338,7 +338,8 @@ class ShipmentItem implements Comparable, Serializable {
                 quantity: this.quantity,
                 recipient: this.recipient,
                 donor: this.donor,
-                container: this.container
+                container: this.container,
+                requisitionItem: this.requisitionItem
         )
     }
 }
