@@ -92,6 +92,9 @@ openboxes.cycleCount.products.maxAmount = 50
 // Inventory snapshot configuration (OBPIH-7194)
 openboxes.transactions.inventoryBaseline.recordStock.enabled = true
 
+// Inventory snapshot configuration (OBPIH-7254)
+openboxes.transactions.inventoryBaseline.loadDemoData.enabled = true
+
 openboxes.security.rbac.rules = [
     [controller: '*', actions: ['delete'], accessRules: [ minimumRequiredRole: RoleType.ROLE_SUPERUSER ]],
     [controller: '*', actions: ['remove'], accessRules: [ minimumRequiredRole: RoleType.ROLE_SUPERUSER ]],
