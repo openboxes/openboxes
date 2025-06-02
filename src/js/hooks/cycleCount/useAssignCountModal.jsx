@@ -60,14 +60,12 @@ const useAssignCountModal = ({
             requestedCountBy: assignee?.id,
             requestedCountDate: dateWithoutTimeZone({
               date: deadline,
-              outputDateFormat: 'MM/DD/YYYY',
             }),
           }
           : {
             requestedRecountBy: assignee?.id,
             requestedRecountDate: dateWithoutTimeZone({
               date: deadline,
-              outputDateFormat: 'MM/DD/YYYY',
             }),
           };
 

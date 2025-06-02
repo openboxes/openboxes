@@ -51,7 +51,6 @@ const AssignCountModal = ({
           <DataTable
             columns={columns}
             data={selectedCycleCountItems}
-            loading={false}
             disablePagination
             totalCount={selectedCycleCountItems.length}
             filterParams={{}}

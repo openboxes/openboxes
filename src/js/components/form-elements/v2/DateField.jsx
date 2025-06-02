@@ -91,7 +91,7 @@ const DateField = ({
     >
       <DatePicker
         {...fieldProps}
-        locale={locale}
+        locale={locale === 'ar' ? 'en' : locale}
         showTimeSelect={showTimeSelect}
         customInput={<DateFieldInput onClear={onClear} clearable={clearable} />}
         className={`form-element-input ${errorMessage ? 'has-errors' : ''} ${className}`}
