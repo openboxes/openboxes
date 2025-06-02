@@ -64,11 +64,12 @@ const useCountStep = () => {
   const {
     cycleCountIds,
     currentLocation,
+    currentUser,
   } = useSelector((state) => ({
     cycleCountIds: getCycleCountRequestIds(state),
     currentLocation: getCurrentLocation(state),
+    currentUser: state.session.user,
   }));
-
   const resetFocus = () => {
     setRefreshFocusCounter((prev) => prev + 1);
   };
@@ -89,7 +90,6 @@ const useCountStep = () => {
     validationErrors,
     triggerValidation,
     forceRerender,
-    isFormValid,
     resetValidationState,
   } = useCountStepValidation({ tableData });
 
@@ -309,7 +309,7 @@ const useCountStep = () => {
   const getPayload = (cycleCountItem, cycleCount) => ({
     ...cycleCountItem,
     recount: false,
-    assignee: getCountedBy(cycleCount.id)?.id,
+    assignee: getCountedBy(cycleCount.id)?.id ?? currentUser.id,
     dateCounted: getCountedDate(cycleCount.id),
     inventoryItem: {
       ...cycleCountItem?.inventoryItem,
@@ -374,13 +374,8 @@ const useCountStep = () => {
 
   const next = async () => {
     const isValid = triggerValidation();
-    const currentCycleCountIds = tableData.current.map((cycleCount) => cycleCount.id);
     forceRerender();
-    const areCountedByFilled = _.every(
-      currentCycleCountIds,
-      (id) => getCountedBy(id)?.id,
-    );
-    if (isValid && areCountedByFilled) {
+    if (isValid) {
       await save();
       setIsStepEditable(false);
     }
@@ -665,7 +660,6 @@ const useCountStep = () => {
     validateExistenceOfCycleCounts,
     resolveDiscrepancies,
     isStepEditable,
-    isFormValid,
     refreshFocusCounter,
     isSaveDisabled,
     setIsSaveDisabled,

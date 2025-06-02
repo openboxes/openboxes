@@ -82,7 +82,6 @@ const useCountStepValidation = ({ tableData }) => {
   };
   return {
     validationErrors: validationErrors.current,
-    isFormValid: isValid.current,
     triggerValidation,
     forceRerender,
     rowValidationSchema,

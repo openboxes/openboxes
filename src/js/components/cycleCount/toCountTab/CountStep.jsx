@@ -38,7 +38,6 @@ const CountStep = () => {
     isStepEditable,
     getCountedBy,
     getDefaultCountedBy,
-    isFormValid,
     triggerValidation,
     refreshFocusCounter,
     isSaveDisabled,
@@ -86,7 +85,6 @@ const CountStep = () => {
             isStepEditable={isStepEditable}
             countedBy={getCountedBy(id)}
             defaultCountedBy={getDefaultCountedBy(id)}
-            isFormValid={isFormValid}
             triggerValidation={triggerValidation}
             refreshFocusCounter={refreshFocusCounter}
             isFormDisabled={isFormDisabled}

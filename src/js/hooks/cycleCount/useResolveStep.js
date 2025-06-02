@@ -65,7 +65,6 @@ const useResolveStep = () => {
     validateRootCauses,
     shouldHaveRootCause,
     showEmptyRootCauseWarning,
-    isFormValid,
     resetValidationState,
   } = useResolveStepValidation({ tableData });
 
@@ -76,11 +75,13 @@ const useResolveStep = () => {
     currentLocation,
     reasonCodes,
     users,
+    currentUser,
   } = useSelector((state) => ({
     users: getUsers(state),
     cycleCountIds: getCycleCountsIds(state),
     reasonCodes: getReasonCodes(state),
     currentLocation: getCurrentLocation(state),
+    currentUser: state.session.user,
   }));
 
   const translate = useTranslate();
@@ -518,7 +519,7 @@ const useResolveStep = () => {
     id: cycleCountItem?.id,
     facility: cycleCountItem?.facility,
     discrepancyReasonCode: cycleCountItem?.rootCause?.id,
-    assignee: getRecountedBy(cycleCount.id)?.id,
+    assignee: getRecountedBy(cycleCount.id)?.id ?? currentUser.id,
     recount: true,
   });
 
@@ -576,13 +577,7 @@ const useResolveStep = () => {
     if (!areCycleCountsUpToDate) {
       return;
     }
-    const currentCycleCountIds = tableData.current.map((cycleCount) => cycleCount.id);
-    const areRecountedByFilled = _.every(
-      currentCycleCountIds,
-      (id) => getRecountedBy(id)?.id,
-    );
-
-    if (!isValid || !areRecountedByFilled) {
+    if (!isValid) {
       return;
     }
 
@@ -762,7 +757,6 @@ const useResolveStep = () => {
     tableMeta,
     validationErrors,
     isStepEditable,
-    isFormValid,
     getRecountedBy,
     getCountedBy,
     addEmptyRow,

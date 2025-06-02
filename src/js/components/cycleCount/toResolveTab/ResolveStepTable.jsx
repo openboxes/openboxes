@@ -2,7 +2,6 @@ import React from 'react';
 
 import PropTypes from 'prop-types';
 import { RiAddCircleLine } from 'react-icons/all';
-import { RiErrorWarningLine } from 'react-icons/ri';
 import { useSelector } from 'react-redux';
 import { Tooltip } from 'react-tippy';
 
@@ -36,7 +35,6 @@ const ResolveStepTable = ({
   setRecountedDate,
   validationErrors,
   shouldHaveRootCause,
-  isFormValid,
   isStepEditable,
   triggerValidation,
   refreshFocusCounter,
@@ -80,14 +78,6 @@ const ResolveStepTable = ({
   } = useSelector((state) => ({
     formatLocalizedDate: formatDate(state.localize),
   }));
-
-  const showRecountedByErrorMessage = () => {
-    if (isFormValid === null) {
-      return null;
-    }
-
-    return recountedBy?.id ? null : true;
-  };
 
   const outOfStockItems = cycleCountWithItemsWithoutRecount
     .cycleCountItems
@@ -142,26 +132,17 @@ const ResolveStepTable = ({
             >
               <CustomTooltip
                 content={recountedBy?.label || translate('react.cycleCount.recountedBy.label', 'Recounted by')}
-                show={!showRecountedByErrorMessage()}
               >
                 <div className="position-relative">
                   <SelectField
-                    errorMessage={showRecountedByErrorMessage()}
                     placeholder="Select"
                     options={users}
                     onChange={assignRecountedBy(id)}
                     defaultValue={defaultRecountedByMeta}
                     hideErrorMessageWrapper
-                    className={`min-width-250 ${showRecountedByErrorMessage() && 'input-has-error'}`}
+                    className="min-width-250"
                     disabled={isFormDisabled}
                   />
-                  {showRecountedByErrorMessage() && (
-                    <CustomTooltip
-                      content={translate('react.cycleCount.requiredField', 'This field is required')}
-                      className="tooltip-icon tooltip-icon--error tooltip-icon--top-60"
-                      icon={RiErrorWarningLine}
-                    />
-                  )}
                 </div>
               </CustomTooltip>
             </HeaderSelect>
@@ -241,7 +222,6 @@ ResolveStepTable.propTypes = {
   setRecountedDate: PropTypes.func.isRequired,
   shouldHaveRootCause: PropTypes.func.isRequired,
   isStepEditable: PropTypes.bool.isRequired,
-  isFormValid: PropTypes.bool.isRequired,
   refreshFocusCounter: PropTypes.number.isRequired,
   triggerValidation: PropTypes.func.isRequired,
   cycleCountWithItemsWithoutRecount: PropTypes.shape({
