@@ -267,8 +267,8 @@ class LoadDataService {
         }
 
         // Calculate dates for inventory baseline and adjustment transactions
-        Date inventoryBaselineTransactionDate = new Date()
-        Date adjustmentTransactionDate = DateUtil.asDate(DateUtil.asInstant(inventoryBaselineTransactionDate).plusSeconds(1))
+        Date adjustmentTransactionDate = DateUtil.asDate(Instant.now())
+        Date inventoryBaselineTransactionDate = DateUtil.asDate(DateUtil.asInstant(adjustmentTransactionDate).minusSeconds(1))
 
         // 1. Calculate the current available items from product availability - one snapshot transaction for all products
         Map<String, AvailableItem> availableItems = productAvailabilityService.getAvailableItemsAtDateAsMap(
