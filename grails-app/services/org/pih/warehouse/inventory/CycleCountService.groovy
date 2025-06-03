@@ -286,7 +286,7 @@ class CycleCountService {
                         "Expiration Date": item.inventoryItem.expirationDate
                                 ? Constants.EXPIRATION_DATE_FORMATTER.format(item.inventoryItem.expirationDate) : "",
                         "Bin Location": item.binLocation?.name,
-                        "Quantity Counted": item.quantityCounted ?: "",
+                        "Quantity Counted": item.quantityCounted != null ? item.quantityCounted : "",
                         "Comment": item.comment ?: "",
                         "User Counted": item.assignee?.name ?: "",
                         "Date Counted": item.dateCounted
