@@ -2,7 +2,6 @@ import React from 'react';
 
 import PropTypes from 'prop-types';
 import { RiAddCircleLine } from 'react-icons/all';
-import { RiErrorWarningLine } from 'react-icons/ri';
 import { useSelector } from 'react-redux';
 import { Tooltip } from 'react-tippy';
 
@@ -34,7 +33,6 @@ const CountStepTable = ({
   isStepEditable,
   countedBy,
   defaultCountedBy,
-  isFormValid,
   refreshFocusCounter,
   triggerValidation,
   isFormDisabled,
@@ -75,14 +73,6 @@ const CountStepTable = ({
     name: `${countedBy.firstName} ${countedBy.lastName}`,
   } : undefined;
 
-  const showCountedByErrorMessage = () => {
-    if (isFormValid === null) {
-      return null;
-    }
-
-    return countedBy?.id ? null : true;
-  };
-
   return (
     <div className="list-page-list-section">
       <p className="count-step-title pt-4 pl-4">
@@ -117,25 +107,16 @@ const CountStepTable = ({
           >
             <CustomTooltip
               content={countedByMeta?.label || translate('react.cycleCount.countedBy.label', 'Counted By')}
-              show={!showCountedByErrorMessage()}
             >
               <div className="position-relative">
                 <SelectField
-                  errorMessage={showCountedByErrorMessage()}
                   placeholder="Select"
                   options={users}
                   onChange={assignCountedBy(id)}
-                  className={`min-width-250 ${showCountedByErrorMessage() && 'input-has-error'}`}
+                  className="min-width-250"
                   defaultValue={defaultCountedByMeta}
                   disabled={isFormDisabled}
                 />
-                {showCountedByErrorMessage() && (
-                  <CustomTooltip
-                    content={translate('react.cycleCount.requiredField', 'This field is required')}
-                    className="tooltip-icon tooltip-icon--error tooltip-icon--top-40"
-                    icon={RiErrorWarningLine}
-                  />
-                )}
               </div>
             </CustomTooltip>
           </HeaderSelect>
@@ -213,7 +194,6 @@ CountStepTable.propTypes = {
     name: PropTypes.string.isRequired,
   }).isRequired,
   defaultCountedBy: PropTypes.shape({}).isRequired,
-  isFormValid: PropTypes.bool.isRequired,
   refreshFocusCounter: PropTypes.number.isRequired,
   triggerValidation: PropTypes.func.isRequired,
   isFormDisabled: PropTypes.bool.isRequired,

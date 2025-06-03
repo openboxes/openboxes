@@ -43,7 +43,6 @@ const ResolveStep = () => {
     submitRecount,
     getProduct,
     getDateCounted,
-    isFormValid,
     refreshFocusCounter,
     triggerValidation,
     isSaveDisabled,
@@ -93,7 +92,6 @@ const ResolveStep = () => {
             isStepEditable={isStepEditable}
             recountedBy={getRecountedBy(id)}
             countedBy={getCountedBy(id)}
-            isFormValid={isFormValid}
             triggerValidation={triggerValidation}
             refreshFocusCounter={refreshFocusCounter}
             cycleCountWithItemsWithoutRecount={
