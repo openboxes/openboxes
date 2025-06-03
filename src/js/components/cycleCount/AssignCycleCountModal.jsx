@@ -6,10 +6,10 @@ import Modal from 'react-modal';
 
 import DataTable from 'components/DataTable/v2/DataTable';
 import Button from 'components/form-elements/Button';
-import useAssignCountModal from 'hooks/cycleCount/useAssignCountModal';
+import useAssignCycleCountModal from 'hooks/cycleCount/useAssignCycleCountModal';
 import useTranslate from 'hooks/useTranslate';
 
-const AssignCountModal = ({
+const AssignCycleCountModal = ({
   isOpen,
   closeModal,
   defaultTitleLabel,
@@ -21,7 +21,7 @@ const AssignCountModal = ({
 }) => {
   const translate = useTranslate();
 
-  const { columns, handleAssign } = useAssignCountModal({
+  const { columns, handleAssign } = useAssignCycleCountModal({
     selectedCycleCountItems,
     setSelectedCycleCountItems,
     isCount,
@@ -35,7 +35,7 @@ const AssignCountModal = ({
       className="modal-content"
     >
       <div>
-        <div className="d-flex justify-content-between align-items-center">
+        <div className="d-flex justify-content-between">
           <p className="assign-count-modal-header">
             {translate(titleLabel, defaultTitleLabel)}
           </p>
@@ -53,7 +53,6 @@ const AssignCountModal = ({
             data={selectedCycleCountItems}
             disablePagination
             totalCount={selectedCycleCountItems.length}
-            filterParams={{}}
           />
         </div>
         <div className="d-flex justify-content-end mt-3">
@@ -69,20 +68,22 @@ const AssignCountModal = ({
   );
 };
 
-export default AssignCountModal;
+export default AssignCycleCountModal;
 
-AssignCountModal.propTypes = {
+AssignCycleCountModal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   closeModal: PropTypes.func.isRequired,
-  defaultTitleLabel: PropTypes.string.isRequired,
-  titleLabel: PropTypes.string.isRequired,
+  defaultTitleLabel: PropTypes.string,
+  titleLabel: PropTypes.string,
   selectedCycleCountItems: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   setSelectedCycleCountItems: PropTypes.func.isRequired,
   isCount: PropTypes.bool,
   refetchData: PropTypes.func,
 };
 
-AssignCountModal.defaultProps = {
+AssignCycleCountModal.defaultProps = {
+  titleLabel: 'react.cycleCount.modal.assignProductsToCount.title.label',
+  defaultTitleLabel: 'Assign products to count',
   isCount: false,
   refetchData: null,
 };

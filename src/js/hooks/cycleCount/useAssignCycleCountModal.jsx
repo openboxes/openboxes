@@ -2,7 +2,7 @@ import React, { useCallback, useEffect } from 'react';
 
 import { createColumnHelper } from '@tanstack/react-table';
 import { useSelector } from 'react-redux';
-import { getCurrentLocation } from 'selectors';
+import { getCurrentLocation, getDebounceTime, getMinSearchLength } from 'selectors';
 
 import cycleCountApi from 'api/services/CycleCountApi';
 import { TableCell } from 'components/DataTable';
@@ -17,7 +17,7 @@ import useTranslate from 'hooks/useTranslate';
 import dateWithoutTimeZone from 'utils/dateUtils';
 import { debouncePeopleFetch } from 'utils/option-utils';
 
-const useAssignCountModal = ({
+const useAssignCycleCountModal = ({
   selectedCycleCountItems,
   setSelectedCycleCountItems,
   isCount,
@@ -30,8 +30,8 @@ const useAssignCountModal = ({
     debounceTime,
     minSearchLength,
   } = useSelector((state) => ({
-    debounceTime: state.session.searchConfig.debounceTime,
-    minSearchLength: state.session.searchConfig.minSearchLength,
+    debounceTime: getDebounceTime(state),
+    minSearchLength: getMinSearchLength(state),
     currentLocation: getCurrentLocation(state),
   }));
   const debouncedPeopleFetch = useCallback(
@@ -189,4 +189,4 @@ const useAssignCountModal = ({
   };
 };
 
-export default useAssignCountModal;
+export default useAssignCycleCountModal;
