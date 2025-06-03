@@ -319,7 +319,7 @@ const useInventoryTransactionsTab = ({
     ),
     size: 200,
     cell: ({ getValue }) => {
-      const rootCauses = getValue() ? getValue().split(',').map(cause => reasonCodes[cause] || cause).join(', ') : '';
+      const rootCauses = getValue() ? getValue().split(',').map(cause => reasonCodes[cause]).join(', ') : '';
       return (
         <TableCell
           customTooltip
