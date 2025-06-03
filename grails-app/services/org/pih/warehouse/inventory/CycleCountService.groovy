@@ -375,6 +375,7 @@ class CycleCountService {
 
                 // Recount-specific fields
                 "Quantity Recounted": recountItem.quantityCounted != null ? recountItem.quantityCounted : "",
+                "Root Cause": recountItem.discrepancyReasonCode ?: "",
                 "Comment": recountItem.comment ?: "",
                 "Recounted By": recountItem.assignee ?: "",
                 "Date Recounted": recountItem.dateCounted
