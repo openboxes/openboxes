@@ -69,7 +69,7 @@ const useAssignCycleCountModal = ({
             }),
           };
 
-        return cycleCountApi.updateCycleCountItemsRequests(
+        return cycleCountApi.updateCycleCountRequest(
           currentLocation?.id,
           cycleCountRequestId,
           payload,
