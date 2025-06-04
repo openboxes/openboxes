@@ -8,6 +8,7 @@ import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.DocumentService
 import org.pih.warehouse.core.UploadService
 import org.pih.warehouse.core.dtos.BatchCommandUtils
+import org.pih.warehouse.core.dtos.BulkCommand
 import org.pih.warehouse.importer.CycleCountItemsExcelImporter
 import org.pih.warehouse.importer.DataImporter
 import org.pih.warehouse.importer.ImportDataCommand
@@ -20,6 +21,7 @@ import org.pih.warehouse.inventory.CycleCountItemCommand
 import org.pih.warehouse.inventory.CycleCountItemDto
 import org.pih.warehouse.inventory.CycleCountRequest
 import org.pih.warehouse.inventory.CycleCountRequestBatchCommand
+import org.pih.warehouse.inventory.CycleCountRequestUpdateCommand
 import org.pih.warehouse.inventory.CycleCountService
 import org.pih.warehouse.inventory.CycleCountStartBatchCommand
 import org.pih.warehouse.inventory.CycleCountStartRecountBatchCommand
@@ -59,6 +61,12 @@ class CycleCountApiController {
     def createRequests(CycleCountRequestBatchCommand command) {
         BatchCommandUtils.validateBatch(command, "requests")
         List<CycleCountRequest> cycleCountRequests = cycleCountService.createRequests(command)
+        render([data: cycleCountRequests] as JSON)
+    }
+
+    def updateRequests(BulkCommand<CycleCountRequestUpdateCommand> command) {
+        BatchCommandUtils.validateBulk(command)
+        List<CycleCountRequest> cycleCountRequests = cycleCountService.updateRequests(command)
         render([data: cycleCountRequests] as JSON)
     }
 

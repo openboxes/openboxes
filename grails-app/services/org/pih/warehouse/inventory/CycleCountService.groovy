@@ -9,10 +9,13 @@ import org.grails.datastore.mapping.query.api.Criteria
 import org.hibernate.ObjectNotFoundException
 import org.hibernate.criterion.Order
 import org.hibernate.sql.JoinType
+import org.springframework.validation.BindingResult
+
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.dtos.BulkCommand
 import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.product.Product
 import org.hibernate.criterion.CriteriaSpecification
@@ -252,6 +255,27 @@ class CycleCountService {
             cycleCountRequest.save()
         }
         return cycleCountsRequests
+    }
+
+    /**
+     * Bulk updates a given list of cycle count requests.
+     */
+    List<CycleCountRequest> updateRequests(BulkCommand<CycleCountRequestUpdateCommand> command) {
+        List<CycleCountRequest> updatedRequests = []
+        for (CycleCountRequestUpdateCommand requestToUpdate in command.commands) {
+            CycleCountRequest updatedRequest = updateRequest(requestToUpdate)
+            updatedRequests.add(updatedRequest)
+        }
+        return updatedRequests
+    }
+
+    private CycleCountRequest updateRequest(CycleCountRequestUpdateCommand command) {
+        CycleCountRequest cycleCountRequest = command.cycleCountRequest
+        cycleCountRequest.properties = command.properties as BindingResult
+        if (!cycleCountRequest.save()) {
+            throw new ValidationException("Invalid cycle count request", cycleCountRequest.errors)
+        }
+        return cycleCountRequest
     }
 
     CSVPrinter getCycleCountCsv(List<CycleCountCandidate> candidates) {

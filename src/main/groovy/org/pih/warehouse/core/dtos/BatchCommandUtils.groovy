@@ -8,6 +8,16 @@ import org.springframework.validation.Errors
 class BatchCommandUtils {
 
     /**
+     * Validates a bulk command, throwing a ValidationException if the root level bulk object or any of
+     * the individual commands being bulked fail validation.
+     *
+     * @param bulkCommand the root level command to validate
+     */
+    static void validateBulk(BulkCommand bulkCommand) {
+        validateBatch(bulkCommand, BulkCommand.BULK_FIELD_NAME)
+    }
+
+    /**
      * Validates a batch command, throwing an error if the root level batch object or any of the commands
      * being batched fail validation.
      *
