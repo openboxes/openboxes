@@ -17,6 +17,8 @@ const CountStepHeader = ({
   save,
   importItems,
   isFormDisabled,
+  sortByProductName,
+  setSortByProductName,
 }) => (
   <div>
     <div className="d-flex justify-content-sm-between align-items-end">
@@ -60,6 +62,13 @@ const CountStepHeader = ({
           variant="primary-outline"
         />
         <Button
+          onClick={() => setSortByProductName((prev) => !prev)}
+          label="react.cycleCount.sortAlphabetically.label"
+          defaultLabel="Sort alphabetically"
+          variant={sortByProductName ? 'primary-outline' : 'secondary'}
+          disabled={isFormDisabled}
+        />
+        <Button
           onClick={save}
           label="react.cycleCount.save.label"
           defaultLabel="Save progress"
@@ -87,4 +96,6 @@ CountStepHeader.propTypes = {
   save: PropTypes.func.isRequired,
   isFormDisabled: PropTypes.func.isRequired,
   importItems: PropTypes.func.isRequired,
+  sortByProductName: PropTypes.bool.isRequired,
+  setSortByProductName: PropTypes.func.isRequired,
 };

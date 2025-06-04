@@ -13,7 +13,13 @@ import Translate from 'utils/Translate';
 import CustomTooltip from 'wrappers/CustomTooltip';
 
 const ResolveStepHeader = ({
-  next, save, printRecountForm, refreshCountItems, isFormDisabled,
+  next,
+  save,
+  printRecountForm,
+  refreshCountItems,
+  isFormDisabled,
+  sortByProductName,
+  setSortByProductName,
 }) => {
   const translate = useTranslate();
 
@@ -50,6 +56,13 @@ const ResolveStepHeader = ({
             </a>
           </div>
         </div>
+        <Button
+          onClick={() => setSortByProductName((prev) => !prev)}
+          label="react.cycleCount.sortAlphabetically.label"
+          defaultLabel="Sort alphabetically"
+          variant={sortByProductName ? 'primary-outline' : 'secondary'}
+          disabled={isFormDisabled}
+        />
         <CustomTooltip
           content={translate(
             'react.cycleCount.table.refreshQuantitiesTooltip.label',
@@ -92,4 +105,6 @@ ResolveStepHeader.propTypes = {
   printRecountForm: PropTypes.func.isRequired,
   refreshCountItems: PropTypes.func.isRequired,
   isFormDisabled: PropTypes.bool.isRequired,
+  sortByProductName: PropTypes.bool.isRequired,
+  setSortByProductName: PropTypes.func.isRequired,
 };

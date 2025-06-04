@@ -48,6 +48,8 @@ const ResolveStep = () => {
     isSaveDisabled,
     setIsSaveDisabled,
     cycleCountsWithItemsWithoutRecount,
+    sortByProductName,
+    setSortByProductName,
   } = useResolveStep();
   useTranslation('cycleCount');
 
@@ -60,6 +62,8 @@ const ResolveStep = () => {
           next={next}
           save={save}
           isFormDisabled={isFormDisabled}
+          sortByProductName={sortByProductName}
+          setSortByProductName={setSortByProductName}
         />
       ) : (
         <ConfirmStepHeader
