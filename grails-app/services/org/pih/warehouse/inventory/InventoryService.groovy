@@ -2695,7 +2695,7 @@ class InventoryService implements ApplicationContextAware {
      * @return All transaction entries for the given products at a facility older than the given date. Entries are
      *         ordered by transaction date to make it easy to iterate through them chronologically.
      */
-    List<TransactionEntry> getTransactionEntriesBeforeDate(Location facility, List<Product> products, Date date) {
+    List<TransactionEntry> getTransactionEntriesBeforeDate(Location facility, Collection<Product> products, Date date) {
         if (!date || !products) {
             return []
         }

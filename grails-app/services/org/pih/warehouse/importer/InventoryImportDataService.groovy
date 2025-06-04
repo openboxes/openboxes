@@ -141,9 +141,11 @@ class InventoryImportDataService implements ImportDataService {
         InventoryImportData inventoryImportData = parseData(command)
 
         Date baselineTransactionDate = command.date
+
+        // Get the stock for all items in the import at the date that the baseline transaction will be created.
         Map<String, AvailableItem> availableItems = productAvailabilityService.getAvailableItemsAtDateAsMap(
                 command.location,
-                inventoryImportData.products.toList(),
+                inventoryImportData.products,
                 baselineTransactionDate)
 
         String comment = "Imported from ${command.filename} on ${new Date()}"
@@ -154,6 +156,11 @@ class InventoryImportDataService implements ImportDataService {
         // Date objects are mutable, so we use Instant to clone the date in the command and avoid directly modifying it.
         Date adjustmentTransactionDate = DateUtil.asDate(DateUtil.asInstant(baselineTransactionDate).plusSeconds(1))
 
+        // We let the adjustment transaction be built from the same available items that we built the baseline
+        // transaction with. The adjustment transaction is dated one second after the baseline transaction so it
+        // could have a different stock history, but we error if there are any other transactions that exist at
+        // that time, so we can guarantee that the available items will be the same for both the baseline
+        // and adjustment. This avoids needing to fetch available items twice (which is slow).
         createAdjustmentTransaction(
                 command.location, inventoryImportData, availableItems, adjustmentTransactionDate, comment)
     }
@@ -170,8 +177,7 @@ class InventoryImportDataService implements ImportDataService {
 
         // We'd have weird behaviour if we allowed two transactions to exist at the same exact time (precision at the
         // database level is to the second) so fail if there's already a transaction on the items for the given date.
-        List<InventoryItem> inventoryItems = availableItems.values().collect{ it.inventoryItem }
-        if (inventoryService.hasTransactionEntriesOnDate(facility, transactionDate, inventoryItems)) {
+        if (inventoryService.hasTransactionEntriesOnDate(facility, transactionDate, inventoryImportData.inventoryItems)) {
             throw new IllegalArgumentException("A transaction already exists at time ${transactionDate}")
         }
 
@@ -296,6 +302,10 @@ class InventoryImportDataService implements ImportDataService {
         InventoryImportDataRow get(Location binLocation, InventoryItem inventoryItem) {
             String key = ProductAvailabilityService.constructAvailableItemKey(binLocation, inventoryItem)
             return rows.get(key)
+        }
+
+        List<InventoryItem> getInventoryItems() {
+            return rows.values().inventoryItem
         }
     }
 

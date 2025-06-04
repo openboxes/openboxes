@@ -49,7 +49,7 @@ abstract class ProductInventoryTransactionService<T> {
     Transaction createInventoryBaselineTransaction(
             Location facility,
             T sourceObject,
-            List<Product> products,
+            Collection<Product> products,
             Date transactionDate=null,
             String comment=null) {
 

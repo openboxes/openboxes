@@ -682,7 +682,7 @@ class ProductAvailabilityService {
      * @param at The moment in time to fetch stock for. If not provided, will fetch the current stock of each item.
      * @return a map of AvailableItem keyed on [product code + bin location name + lot number]
      */
-    Map<String, AvailableItem> getAvailableItemsAtDateAsMap(Location facility, List<Product> products, Date at=null) {
+    Map<String, AvailableItem> getAvailableItemsAtDateAsMap(Location facility, Collection<Product> products, Date at=null) {
         List<AvailableItem> availableItems = getAvailableItemsAtDate(facility, products, at)
 
         Map<String, AvailableItem> availableItemsMap = [:]
@@ -701,7 +701,7 @@ class ProductAvailabilityService {
      * @param products The products to fetch stock for.
      * @param at The moment in time to fetch stock for. If not provided, will fetch the current stock of each item.
      */
-    List<AvailableItem> getAvailableItemsAtDate(Location facility, List<Product> products, Date at=null) {
+    List<AvailableItem> getAvailableItemsAtDate(Location facility, Collection<Product> products, Date at=null) {
         if (at != null && at.after(new Date())) {
             throw new IllegalArgumentException("Date cannot be in the future.")
         }
