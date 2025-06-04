@@ -21,6 +21,8 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.SynonymTypeCode
 import org.pih.warehouse.inventory.Inventory
+import org.pih.warehouse.inventory.InventoryAuditDetails
+import org.pih.warehouse.inventory.InventoryAuditSummary
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.invoice.InvoiceType
@@ -31,6 +33,7 @@ import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.reporting.DateDimension
 import org.pih.warehouse.LocalizationUtil
+import org.pih.warehouse.reporting.GetInventoryAuditReportCommand
 import org.springframework.context.ApplicationContext
 import org.springframework.context.ApplicationContextAware
 import org.xhtmlrenderer.pdf.ITextRenderer
@@ -1069,5 +1072,49 @@ class ReportService implements ApplicationContextAware {
         numberFormat.maximumFractionDigits = 2
         numberFormat.minimumFractionDigits = 2
         return numberFormat
+    }
+
+
+    def getInventoryAuditReportDetails(GetInventoryAuditReportCommand command) {
+        return InventoryAuditDetails.createCriteria().list {
+            eq("facility", command.facility)
+            if (command.startDate && command.endDate) {
+                between("transactionDate", command.startDate, command.endDate)
+            }
+            else if (command.startDate) {
+                gt("transactionDate", command.startDate)
+            }
+            else if (command.endDate) {
+                lt("transactionDate", command.endDate)
+            }
+        }
+    }
+
+    def getInventoryAuditReportSummary(GetInventoryAuditReportCommand command) {
+        return InventoryAuditDetails.createCriteria().list {
+            projections {
+                groupProperty('facility')
+                groupProperty('product')
+                sum('quantity', 'quantityTotal')
+                max('abcClass', 'abcClass')
+            }
+
+            eq("facility", command.facility)
+            if (command.startDate && command.endDate) {
+                between("transactionDate", command.startDate, command.endDate)
+            } else if (command.startDate) {
+                gt("transactionDate", command.startDate)
+            } else if (command.endDate) {
+                lt("transactionDate", command.endDate)
+            }
+        }.collect {
+            new InventoryAuditSummary(
+                    facility: it[0],
+                    product: it[1],
+                    quantityTotal: it[2] ?: 0,
+                    //totalAdjustments: it[3] ?: 0,
+                    //totalItems: it[2] ?: 0
+            )
+        }
     }
 }
