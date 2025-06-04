@@ -91,6 +91,8 @@ const DateField = ({
     >
       <DatePicker
         {...fieldProps}
+        // Temporary workaround: using 'ar' locale causes the app to crash when selecting a date.
+        // Fallback to 'en' to avoid the crash
         locale={locale === 'ar' ? 'en' : locale}
         showTimeSelect={showTimeSelect}
         customInput={<DateFieldInput onClear={onClear} clearable={clearable} />}
