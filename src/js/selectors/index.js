@@ -20,3 +20,7 @@ export const getReasonCodes = (state) => state.cycleCount.reasonCodes;
 export const getFormatLocalizedDate = (state) => formatDate(state.localize);
 
 export const getBinLocations = (state) => state.cycleCount.binLocations;
+
+export const getDebounceTime = (state) => state.session.searchConfig.debounceTime;
+
+export const getMinSearchLength = (state) => state.session.searchConfig.minSearchLength;
