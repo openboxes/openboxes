@@ -4,6 +4,7 @@ import grails.validation.Validateable
 import org.pih.warehouse.api.StockMovementType
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.LocationTypeCode
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
@@ -179,10 +180,9 @@ class OutboundStockMovementListItem implements Serializable, Validateable {
                 expectedShippingDate : shipment?.expectedShippingDate?.format("MM/dd/yyyy HH:mm XXX"),
                 requestedDeliveryDate: requisition?.requestedDeliveryDate?.format("MM/dd/yyyy HH:mm XXX"),
                 picklist             : requisition?.picklist,
-                // Needs to be added to OutboundStockMovementListItem (or moved to the StockMovement :thinking:)
-                //receivingLocation: receivingLocation?.toJson(LocationTypeCode.INTERNAL),
-                //packingLocation  : packingLocation?.toJson(LocationTypeCode.INTERNAL),
-                //loadingLocation  : loadingLocation?.toJson(LocationTypeCode.INTERNAL),
+                receivingLocation: shipment?.receivingScheduled?.eventLocation?.toJson(LocationTypeCode.INTERNAL),
+                packingLocation  : shipment?.packingScheduled?.eventLocation?.toJson(LocationTypeCode.INTERNAL),
+                loadingLocation  : shipment?.loadingScheduled?.eventLocation?.toJson(LocationTypeCode.INTERNAL),
         ]
     }
 
