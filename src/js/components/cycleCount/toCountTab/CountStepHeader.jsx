@@ -58,7 +58,7 @@ const CountStepHeader = ({
           allowedExtensions={[FileFormat.XLS]}
           disabled={isFormDisabled}
           variant="primary-outline"
-          removeBtnClassName
+          className="no-transition"
         />
         <Button
           onClick={save}
