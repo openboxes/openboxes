@@ -1,11 +1,11 @@
-import { TO_COUNT_TAB, TO_RESOLVE_TAB } from 'consts/cycleCount';
+import { ALL_PRODUCTS_TAB, TO_COUNT_TAB, TO_RESOLVE_TAB } from 'consts/cycleCount';
 import useQueryParams from 'hooks/useQueryParams';
 import { isCounting, isResolving } from 'utils/checkCycleCountStatus';
 
 const useCycleCountProductAvailability = (row) => {
   const { tab } = useQueryParams();
 
-  if (isCounting(row.status) && tab !== TO_COUNT_TAB) {
+  if (isCounting(row.status) && tab === ALL_PRODUCTS_TAB) {
     return {
       isProductDisabled: true,
       label: 'react.cycleCount.status.counting.label',
@@ -14,7 +14,7 @@ const useCycleCountProductAvailability = (row) => {
     };
   }
 
-  if (isResolving(row.status) && tab !== TO_RESOLVE_TAB) {
+  if (isResolving(row.status) && tab === ALL_PRODUCTS_TAB) {
     return {
       isProductDisabled: true,
       label: 'react.cycleCount.status.resolving.label',
@@ -35,7 +35,7 @@ const useCycleCountProductAvailability = (row) => {
   if (row.quantityAllocated > 0 && tab === TO_RESOLVE_TAB) {
     return {
       isProductDisabled: true,
-      label: 'react.cycleCount.pendingStockMovement.warning',
+      label: 'react.cycleCount.pendingStockMovement.warning.label',
       defaultMessage: 'This product is in a pending stock movement. Check quantity input carefully',
       isCheckboxChecked: false,
     };

@@ -15,7 +15,6 @@ import SelectField from 'components/form-elements/v2/SelectField';
 import { DateFormat } from 'consts/timeFormat';
 import useResolveStepTable from 'hooks/cycleCount/useResolveStepTable';
 import useTranslate from 'hooks/useTranslate';
-import Translate from 'utils/Translate';
 import { formatDate } from 'utils/translation-utils';
 import CustomTooltip from 'wrappers/CustomTooltip';
 
@@ -83,16 +82,11 @@ const ResolveStepTable = ({
   const outOfStockItems = cycleCountWithItemsWithoutRecount
     .cycleCountItems
     .filter((item) => item.quantityOnHand === 0);
+
   return (
     <div className="list-page-list-section">
       {outOfStockItems.length > 0
         && <CycleCountStockDiscrepancyInfoBar outOfStockItems={outOfStockItems} />}
-      <div className="d-flex justify-content-between flex-column draft-modal">
-        <Translate
-          id="react.cycleCount.pendingStockMovement.warning"
-          defaultMessage="This product is in a pending stock movement. Check quantity input carefully"
-        />
-      </div>
       <p className="count-step-title pt-4 pl-4">
         {product?.productCode}
         {' '}
@@ -177,25 +171,25 @@ const ResolveStepTable = ({
         className={`ml-4 mb-3 d-flex ${isStepEditable ? '' : 'pt-3'}`}
       >
         {isStepEditable && (
-          <Tooltip
-            className="d-flex align-items-center"
-            html={(
-              <span className="p-1">
-                {translate('react.cycleCount.addNewRecord.tooltip', 'Use this button to change lot number or bin location.')}
-              </span>
-            )}
-          >
-            <Button
-              onClick={() => {
-                addEmptyRow(product?.id, id);
-              }}
-              label="react.cycleCount.addNewRecord.label"
-              defaultLabel="Add new record"
-              variant="transparent"
-              StartIcon={<RiAddCircleLine size={18} />}
-              disabled={isFormDisabled}
-            />
-          </Tooltip>
+        <Tooltip
+          className="d-flex align-items-center"
+          html={(
+            <span className="p-1">
+              {translate('react.cycleCount.addNewRecord.tooltip', 'Use this button to change lot number or bin location.')}
+            </span>
+          )}
+        >
+          <Button
+            onClick={() => {
+              addEmptyRow(product?.id, id);
+            }}
+            label="react.cycleCount.addNewRecord.label"
+            defaultLabel="Add new record"
+            variant="transparent"
+            StartIcon={<RiAddCircleLine size={18} />}
+            disabled={isFormDisabled}
+          />
+        </Tooltip>
         )}
       </div>
     </div>

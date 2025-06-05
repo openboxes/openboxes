@@ -174,7 +174,7 @@ const useToCountTab = ({
       },
       content: {
         label: 'react.cycleCount.modal.cancelCounts.content.label',
-        default: 'The Cycle Count will be canceled for the products selected. Your products will be removed from the To Resolve tab and brought back to Cycle Count All Products list. If you have started a count on these products, it will be erased. Choose this option if you want to abandon the cycle count. Are you sure you want to Cancel?',
+        default: 'The Cycle Count will be canceled for the products selected. Your products will be removed from the To Count tab and brought back to Cycle Count All Products list. If you have started a count on these products, it will be erased. Choose this option if you want to abandon the cycle count. Are you sure you want to Cancel?',
       },
     });
   };
@@ -241,21 +241,18 @@ const useToCountTab = ({
           {translate('react.cycleCount.table.products.label', 'Products')}
         </TableHeaderCell>
       ),
-      cell: ({ getValue, row }) => {
-        const { isProductDisabled } = useCycleCountProductAvailability(row.original);
-        return (
-          <TableCell
-            tooltip
-            tooltipLabel={getValue()}
-            link={!isProductDisabled && INVENTORY_ITEM_URL.showStockCard(row.original.product.id)}
-            className="rt-td multiline-cell"
-          >
-            <div className="limit-lines-2">
-              {getValue()}
-            </div>
-          </TableCell>
-        );
-      },
+      cell: ({ getValue, row }) => (
+        <TableCell
+          tooltip
+          tooltipLabel={getValue()}
+          link={INVENTORY_ITEM_URL.showStockCard(row.original.product.id)}
+          className="rt-td multiline-cell"
+        >
+          <div className="limit-lines-2">
+            {getValue()}
+          </div>
+        </TableCell>
+      ),
       meta: {
         flexWidth: 370,
       },

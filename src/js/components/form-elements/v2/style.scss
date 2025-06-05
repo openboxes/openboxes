@@ -293,9 +293,10 @@ input, .date-field-input {
   }
 
   &.cancel-icon {
-    background-color: var(--color-red) !important;
-    border-color: var(--color-red) !important;
-    cursor: pointer !important;
+    position: relative;
+    background-color: var(--color-red);
+    border-color: var(--color-red);
+    cursor: pointer;
 
     &::after {
       content: '';

@@ -164,8 +164,8 @@ const useAllProductsTab = ({
             noWrapper
             onChange={selectRow(row.original.product.id)}
             value={isProductDisabled && isCheckboxChecked
-              ? true :
-              isChecked(row.original.product.id)}
+              ? true
+              : isChecked(row.original.product.id)}
             disabled={isProductDisabled}
           />
         </TableCell>
@@ -208,12 +208,12 @@ const useAllProductsTab = ({
         </TableHeaderCell>
       ),
       cell: ({ getValue, row }) => {
-        const { isProductDisabled } = useCycleCountProductAvailability(row.original);
+        const { isCheckboxChecked } = useCycleCountProductAvailability(row.original);
         return (
           <TableCell
             tooltip
             tooltipLabel={getValue()}
-            link={!isProductDisabled && INVENTORY_ITEM_URL.showStockCard(row.original.product.id)}
+            link={!isCheckboxChecked && INVENTORY_ITEM_URL.showStockCard(row.original.product.id)}
             className="rt-td multiline-cell"
           >
             <div className="limit-lines-2">
