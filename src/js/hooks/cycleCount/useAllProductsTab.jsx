@@ -156,14 +156,14 @@ const useAllProductsTab = ({
     cell: ({ row }) => {
       const {
         isProductDisabled,
-        isCheckboxChecked,
+        isFromOtherTab,
       } = useCycleCountProductAvailability(row.original);
       return (
         <TableCell className="rt-td">
           <Checkbox
             noWrapper
             onChange={selectRow(row.original.product.id)}
-            value={isProductDisabled && isCheckboxChecked
+            value={isProductDisabled && isFromOtherTab
               ? true
               : isChecked(row.original.product.id)}
             disabled={isProductDisabled}
@@ -208,12 +208,14 @@ const useAllProductsTab = ({
         </TableHeaderCell>
       ),
       cell: ({ getValue, row }) => {
-        const { isCheckboxChecked } = useCycleCountProductAvailability(row.original);
+        const { isFromOtherTab } = useCycleCountProductAvailability(row.original);
         return (
           <TableCell
             tooltip
             tooltipLabel={getValue()}
-            link={!isCheckboxChecked && INVENTORY_ITEM_URL.showStockCard(row.original.product.id)}
+            // If isFromOtherTab is true, we don't want the link to work.
+            // This means that the product is already in To Count tab or To Resolve tab.
+            link={!isFromOtherTab && INVENTORY_ITEM_URL.showStockCard(row.original.product.id)}
             className="rt-td multiline-cell"
           >
             <div className="limit-lines-2">
