@@ -139,7 +139,6 @@ enum ActivityCode {
                 DYNAMIC_CREATION,
                 AUTOSAVE,
                 ALLOW_OVERPICK,
-                REQUIRE_MOBILE_PICKING,
                 NONE,
 
                 // Integration
