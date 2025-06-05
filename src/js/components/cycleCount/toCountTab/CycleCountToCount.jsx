@@ -115,6 +115,7 @@ const CycleCountToCount = ({ filterParams, toCountTabCheckboxes, tablePagination
         totalCount={tableData.totalCount}
         filterParams={filterParams}
         paginationProps={paginationProps}
+        showDisabledProducts
       />
     </div>
   );

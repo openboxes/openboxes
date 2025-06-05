@@ -283,9 +283,40 @@ input, .date-field-input {
     }
   }
 
-  &:checked:disabled {
-    background-color: var(--gray-300);
-    border-color: var(--gray-300);
+  &:disabled {
     cursor: not-allowed;
+    border-color: var(--gray-300);
+
+    &:checked {
+      background-color: var(--gray-300);
+    }
+  }
+
+  &.cancel-icon {
+    background-color: var(--color-red) !important;
+    border-color: var(--color-red) !important;
+    cursor: pointer !important;
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(45deg);
+      width: 10px;
+      height: 2px;
+      background-color: white !important;
+    }
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(-45deg);
+      width: 10px;
+      height: 2px;
+      background-color: white !important;
+    }
   }
 }

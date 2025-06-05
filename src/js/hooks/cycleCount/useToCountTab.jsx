@@ -16,6 +16,7 @@ import { CYCLE_COUNT, INVENTORY_ITEM_URL } from 'consts/applicationUrls';
 import CycleCountCandidateStatus from 'consts/cycleCountCandidateStatus';
 import cycleCountColumn from 'consts/cycleCountColumn';
 import MimeType from 'consts/mimeType';
+import useCycleCountProductAvailability from 'hooks/cycleCount/useCycleCountProductAvailability';
 import useQueryParams from 'hooks/useQueryParams';
 import useSpinner from 'hooks/useSpinner';
 import useTableDataV2 from 'hooks/useTableDataV2';
@@ -127,7 +128,56 @@ const useToCountTab = ({
     serializedParams,
   });
 
-  const getCycleCountRequestsIds = () => tableData.data.map((row) => row.cycleCountRequest.id);
+  const getCycleCountRequestsIds = () => tableData.data
+    .filter((row) => !useCycleCountProductAvailability(row).isProductDisabled)
+    .map((row) => row.cycleCountRequest.id);
+
+  const cancelCounts = async (id) => {
+    try {
+      spinner.show();
+      await cycleCountApi.deleteRequests(currentLocation?.id, id || checkedCheckboxes);
+    } finally {
+      spinner.hide();
+      fetchData();
+      resetCheckboxes();
+    }
+  };
+
+  const cancelCountsModalButtons = (id) => (onClose) => ([
+    {
+      variant: 'transparent',
+      defaultLabel: 'Back',
+      label: 'react.default.button.back.label',
+      onClick: () => {
+        onClose?.();
+      },
+    },
+    {
+      variant: 'primary',
+      defaultLabel: 'Confirm',
+      label: 'react.default.button.confirm.label',
+      onClick: async () => {
+        onClose?.();
+        await cancelCounts(id);
+      },
+    },
+  ]);
+
+  const openCancelCountsModal = (id) => {
+    confirmationModal({
+      hideCloseButton: false,
+      closeOnClickOutside: true,
+      buttons: cancelCountsModalButtons(id),
+      title: {
+        label: 'react.cycleCount.modal.cancelCounts.title.label',
+        default: 'Cancel Counts?',
+      },
+      content: {
+        label: 'react.cycleCount.modal.cancelCounts.content.label',
+        default: 'The Cycle Count will be canceled for the products selected. Your products will be removed from the To Resolve tab and brought back to Cycle Count All Products list. If you have started a count on these products, it will be erased. Choose this option if you want to abandon the cycle count. Are you sure you want to Cancel?',
+      },
+    });
+  };
 
   const checkboxesColumn = columnHelper.accessor(cycleCountColumn.SELECTED, {
     header: () => (
@@ -139,15 +189,24 @@ const useToCountTab = ({
         />
       </TableHeaderCell>
     ),
-    cell: ({ row }) => (
-      <TableCell className="rt-td">
-        <Checkbox
-          noWrapper
-          onChange={selectRow(row.original.cycleCountRequest.id)}
-          value={isChecked(row.original.cycleCountRequest.id)}
-        />
-      </TableCell>
-    ),
+    cell: ({ row }) => {
+      const { isProductDisabled } = useCycleCountProductAvailability(row.original);
+      return (
+        <TableCell className="rt-td">
+          <Checkbox
+            noWrapper
+            onChange={isProductDisabled ? null : selectRow(row.original.cycleCountRequest.id)}
+            value={isChecked(row.original.cycleCountRequest.id)}
+            className={`${isProductDisabled && 'cancel-icon'}`}
+            onClick={() => {
+              if (isProductDisabled) {
+                openCancelCountsModal(row.original.cycleCountRequest.id);
+              }
+            }}
+          />
+        </TableCell>
+      );
+    },
     meta: {
       getCellContext: () => ({
         className: 'checkbox-column',
@@ -182,18 +241,21 @@ const useToCountTab = ({
           {translate('react.cycleCount.table.products.label', 'Products')}
         </TableHeaderCell>
       ),
-      cell: ({ getValue, row }) => (
-        <TableCell
-          tooltip
-          tooltipLabel={getValue()}
-          link={INVENTORY_ITEM_URL.showStockCard(row.original.product.id)}
-          className="rt-td multiline-cell"
-        >
-          <div className="limit-lines-2">
-            {getValue()}
-          </div>
-        </TableCell>
-      ),
+      cell: ({ getValue, row }) => {
+        const { isProductDisabled } = useCycleCountProductAvailability(row.original);
+        return (
+          <TableCell
+            tooltip
+            tooltipLabel={getValue()}
+            link={!isProductDisabled && INVENTORY_ITEM_URL.showStockCard(row.original.product.id)}
+            className="rt-td multiline-cell"
+          >
+            <div className="limit-lines-2">
+              {getValue()}
+            </div>
+          </TableCell>
+        );
+      },
       meta: {
         flexWidth: 370,
       },
@@ -262,13 +324,16 @@ const useToCountTab = ({
           {translate('react.cycleCount.table.tag.label', 'Tag')}
         </TableHeaderCell>
       ),
-      cell: ({ getValue }) => (
-        <TableCell className="rt-td multiline-cell">
-          <div className="badge-container">
-            {getValue()}
-          </div>
-        </TableCell>
-      ),
+      cell: ({ getValue, row }) => {
+        const { isProductDisabled } = useCycleCountProductAvailability(row.original);
+        return (
+          <TableCell className="rt-td multiline-cell">
+            <div className={`badge-container ${isProductDisabled && 'disabled'}`}>
+              {getValue()}
+            </div>
+          </TableCell>
+        );
+      },
       meta: {
         flexWidth: 200,
       },
@@ -281,13 +346,16 @@ const useToCountTab = ({
           {translate('react.cycleCount.table.productCatalogue.label', 'Product Catalogue')}
         </TableHeaderCell>
       ),
-      cell: ({ getValue }) => (
-        <TableCell className="rt-td multiline-cell">
-          <div className="badge-container">
-            {getValue()}
-          </div>
-        </TableCell>
-      ),
+      cell: ({ getValue, row }) => {
+        const { isProductDisabled } = useCycleCountProductAvailability(row.original);
+        return (
+          <TableCell className="rt-td multiline-cell">
+            <div className={`badge-container ${isProductDisabled && 'disabled'}`}>
+              {getValue()}
+            </div>
+          </TableCell>
+        );
+      },
       meta: {
         flexWidth: 200,
       },
@@ -358,53 +426,6 @@ const useToCountTab = ({
     const filename = extractFilenameFromHeader(response.headers['content-disposition']);
     fileDownload(response.data, filename, MimeType[format]);
     spinner.hide();
-  };
-
-  const cancelCounts = async () => {
-    try {
-      spinner.show();
-      await cycleCountApi.deleteRequests(currentLocation?.id, checkedCheckboxes);
-    } finally {
-      spinner.hide();
-      fetchData();
-      resetCheckboxes();
-    }
-  };
-
-  const cancelCountsModalButtons = () => (onClose) => ([
-    {
-      variant: 'transparent',
-      defaultLabel: 'Back',
-      label: 'react.default.button.back.label',
-      onClick: () => {
-        onClose?.();
-      },
-    },
-    {
-      variant: 'primary',
-      defaultLabel: 'Confirm',
-      label: 'react.default.button.confirm.label',
-      onClick: async () => {
-        onClose?.();
-        await cancelCounts();
-      },
-    },
-  ]);
-
-  const openCancelCountsModal = () => {
-    confirmationModal({
-      hideCloseButton: false,
-      closeOnClickOutside: true,
-      buttons: cancelCountsModalButtons(),
-      title: {
-        label: 'react.cycleCount.modal.cancelCounts.title.label',
-        default: 'Cancel Counts?',
-      },
-      content: {
-        label: 'react.cycleCount.modal.cancelCounts.content.label',
-        default: 'The Cycle Count will be canceled for the products selected. Your products will be removed from the To Resolve tab and brought back to Cycle Count All Products list. If you have started a count on these products, it will be erased. Choose this option if you want to abandon the cycle count. Are you sure you want to Cancel?',
-      },
-    });
   };
 
   const moveToCounting = async () => {

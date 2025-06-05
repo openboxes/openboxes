@@ -16,6 +16,7 @@ import { CYCLE_COUNT, INVENTORY_ITEM_URL } from 'consts/applicationUrls';
 import CycleCountCandidateStatus from 'consts/cycleCountCandidateStatus';
 import cycleCountColumn from 'consts/cycleCountColumn';
 import MimeType from 'consts/mimeType';
+import useCycleCountProductAvailability from 'hooks/cycleCount/useCycleCountProductAvailability';
 import useQueryParams from 'hooks/useQueryParams';
 import useSpinner from 'hooks/useSpinner';
 import useTableCheckboxes from 'hooks/useTableCheckboxes';
@@ -183,18 +184,21 @@ const useToResolveTab = ({
           {translate('react.cycleCount.table.products.label', 'Products')}
         </TableHeaderCell>
       ),
-      cell: ({ getValue, row }) => (
-        <TableCell
-          tooltip
-          tooltipLabel={getValue()}
-          link={INVENTORY_ITEM_URL.showStockCard(row.original.product.id)}
-          className="rt-td multiline-cell"
-        >
-          <div className="limit-lines-2">
-            {getValue()}
-          </div>
-        </TableCell>
-      ),
+      cell: ({ getValue, row }) => {
+        const { isProductDisabled } = useCycleCountProductAvailability(row.original);
+        return (
+          <TableCell
+            tooltip
+            tooltipLabel={getValue()}
+            link={!isProductDisabled && INVENTORY_ITEM_URL.showStockCard(row.original.product.id)}
+            className="rt-td multiline-cell"
+          >
+            <div className="limit-lines-2">
+              {getValue()}
+            </div>
+          </TableCell>
+        );
+      },
       meta: {
         flexWidth: 370,
       },
@@ -263,13 +267,16 @@ const useToResolveTab = ({
           {translate('react.cycleCount.table.tag.label', 'Tag')}
         </TableHeaderCell>
       ),
-      cell: ({ getValue }) => (
-        <TableCell className="rt-td multiline-cell">
-          <div className="badge-container">
-            {getValue()}
-          </div>
-        </TableCell>
-      ),
+      cell: ({ getValue, row }) => {
+        const { isProductDisabled } = useCycleCountProductAvailability(row.original);
+        return (
+          <TableCell className="rt-td multiline-cell">
+            <div className={`badge-container ${isProductDisabled && 'disabled'}`}>
+              {getValue()}
+            </div>
+          </TableCell>
+        );
+      },
       meta: {
         flexWidth: 200,
       },
@@ -282,13 +289,16 @@ const useToResolveTab = ({
           {translate('react.cycleCount.table.productCatalogue.label', 'Product Catalogue')}
         </TableHeaderCell>
       ),
-      cell: ({ getValue }) => (
-        <TableCell className="rt-td multiline-cell">
-          <div className="badge-container">
-            {getValue()}
-          </div>
-        </TableCell>
-      ),
+      cell: ({ getValue, row }) => {
+        const { isProductDisabled } = useCycleCountProductAvailability(row.original);
+        return (
+          <TableCell className="rt-td multiline-cell">
+            <div className={`badge-container ${isProductDisabled && 'disabled'}`}>
+              {getValue()}
+            </div>
+          </TableCell>
+        );
+      },
       meta: {
         flexWidth: 200,
       },

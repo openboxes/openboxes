@@ -21,7 +21,6 @@ const DataTableBody = ({
   dataLength,
   tableWithPinnedColumns,
   isScreenWiderThanTable,
-  data,
   showDisabledProducts,
 }) => {
   const translate = useTranslate();
@@ -44,11 +43,10 @@ const DataTableBody = ({
       />
       {dataLength > 0 &&
         !loading &&
-        rowModel.rows.map((row, index) => {
+        rowModel.rows.map((row) => {
           const { isProductDisabled, label, defaultMessage } = showDisabledProducts
-            ? useCycleCountProductAvailability(data[index].status)
+            ? useCycleCountProductAvailability(row.original)
             : { isProductDisabled: false, label: '', defaultMessage: '' };
-
           return (
             <CustomTooltip
               content={isProductDisabled && translate(label, defaultMessage)}
@@ -116,9 +114,6 @@ DataTableBody.propTypes = {
   dataLength: PropTypes.number.isRequired,
   tableWithPinnedColumns: PropTypes.bool,
   isScreenWiderThanTable: PropTypes.bool.isRequired,
-  data: PropTypes.arrayOf(
-    PropTypes.shape({}),
-  ).isRequired,
   showDisabledProducts: PropTypes.bool,
 };
 

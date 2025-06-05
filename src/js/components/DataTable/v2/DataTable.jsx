@@ -63,7 +63,6 @@ const DataTable = ({
             dataLength={data?.length}
             tableWithPinnedColumns={tableWithPinnedColumns}
             isScreenWiderThanTable={isScreenWiderThanTable}
-            data={data}
             showDisabledProducts={showDisabledProducts}
           />
         </div>
