@@ -35,7 +35,7 @@ const useCycleCountProductAvailability = (row) => {
   if (row.quantityAllocated > 0) {
     return {
       isProductDisabled: true,
-      label: 'react.cycleCount.pendingStockMovement.label',
+      label: 'react.cycleCount.pendingStockMovement.info.label',
       defaultMessage: 'Cannot start count on this product with pending stock movement',
       isFromOtherTab: false,
     };
