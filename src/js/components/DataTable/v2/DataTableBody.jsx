@@ -5,7 +5,6 @@ import PropTypes from 'prop-types';
 
 import TableRow from 'components/DataTable/TableRow';
 import DataTableStatus from 'components/DataTable/v2/DataTableStatus';
-import useCycleCountProductAvailability from 'hooks/cycleCount/useCycleCountProductAvailability';
 import useTableColumnMeta from 'hooks/useTableColumnMeta';
 import useTranslate from 'hooks/useTranslate';
 import getCommonPinningStyles from 'utils/getCommonPinningStyles';
@@ -21,7 +20,6 @@ const DataTableBody = ({
   dataLength,
   tableWithPinnedColumns,
   isScreenWiderThanTable,
-  showDisabledProducts,
 }) => {
   const translate = useTranslate();
 
@@ -44,16 +42,18 @@ const DataTableBody = ({
       {dataLength > 0 &&
         !loading &&
         rowModel.rows.map((row) => {
-          const { isProductDisabled, label, defaultMessage } = showDisabledProducts
-            ? useCycleCountProductAvailability(row.original)
-            : { isProductDisabled: false, label: '', defaultMessage: '' };
+          const { isProductDisabled, label, defaultMessage } = row.original?.meta || {
+            isProductDisabled: false,
+            label: '',
+            defaultMessage: '',
+          };
           return (
             <CustomTooltip
               content={isProductDisabled && translate(label, defaultMessage)}
-              show={isProductDisabled && showDisabledProducts}
+              show={isProductDisabled}
             >
               <div key={row.id} className="rt-tr-group cell-wrapper" role="rowgroup">
-                <TableRow key={row.id} className={`rt-tr ${isProductDisabled && showDisabledProducts && 'bg-light'}`}>
+                <TableRow key={row.id} className={`rt-tr ${isProductDisabled && 'bg-light'}`}>
                   {row.getVisibleCells().map((cell) => {
                     const { hide, flexWidth, className } = useTableColumnMeta(cell.column);
                     if (hide) {
@@ -114,7 +114,6 @@ DataTableBody.propTypes = {
   dataLength: PropTypes.number.isRequired,
   tableWithPinnedColumns: PropTypes.bool,
   isScreenWiderThanTable: PropTypes.bool.isRequired,
-  showDisabledProducts: PropTypes.bool,
 };
 
 DataTableBody.defaultProps = {
@@ -122,5 +121,4 @@ DataTableBody.defaultProps = {
   loadingMessage: null,
   loading: false,
   tableWithPinnedColumns: false,
-  showDisabledProducts: false,
 };

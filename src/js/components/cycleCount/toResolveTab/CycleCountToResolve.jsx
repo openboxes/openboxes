@@ -114,7 +114,6 @@ const CycleCountToResolve = ({
         totalCount={tableData.totalCount}
         filterParams={filterParams}
         paginationProps={paginationProps}
-        showDisabledProducts
       />
     </div>
   );
