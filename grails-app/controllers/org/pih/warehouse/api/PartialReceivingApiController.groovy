@@ -12,7 +12,9 @@ package org.pih.warehouse.api
 import grails.converters.JSON
 import org.grails.web.json.JSONObject
 import org.pih.warehouse.core.Constants
+import org.pih.warehouse.core.Location
 import org.pih.warehouse.importer.ImportDataCommand
+import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.product.Product
 
@@ -201,6 +203,18 @@ class PartialReceivingApiController {
                 partialReceiptItem.shouldSave = newLine || originalLine || partialReceiptItem.quantityReceiving != null || partialReceiptItem.receiptItem
             }
         }
+    }
+
+    def createReceivingBinLocation() {
+        Shipment shipment = Shipment.get(params.id)
+
+        if (!shipment) {
+            throw new IllegalStateException("Unable to find shipment with id ${params.id}")
+        }
+
+        Location receivingBinLocation = receiptService.createTemporaryReceivingBin(shipment)
+
+        render([data: receivingBinLocation] as JSON)
     }
 }
 
