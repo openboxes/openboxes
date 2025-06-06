@@ -1729,3 +1729,7 @@ div.search-input:focus-within {
   cursor: not-allowed;
   pointer-events: none;
 }
+
+.no-transition {
+  transition: none;
+}
