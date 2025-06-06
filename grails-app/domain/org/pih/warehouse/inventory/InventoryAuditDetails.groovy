@@ -5,19 +5,23 @@ import org.pih.warehouse.product.Product
 
 class InventoryAuditDetails implements Serializable {
 
+    // Inventory item dimensions
     Product product
     InventoryItem inventoryItem
     Location facility
     Location location
+    String abcClass
 
+    // Transaction dimensions
+    CycleCount cycleCount
     Date transactionDate
     TransactionType transactionType
     String transactionNumber
 
-    String abcClass
-    Integer quantity
+    // Facts
+    Integer quantityAdjusted
     Integer quantityOnHand
-
+    BigDecimal pricePerUnit
 
     static mapping = {
         version false
@@ -32,19 +36,25 @@ class InventoryAuditDetails implements Serializable {
     Map toJson() {
         return [
                 facility         : [id: facility.id, name: facility.name],
-                inventoryItem    : inventoryItem,
+                inventoryItem    : [
+                        id: inventoryItem?.id,
+                        product: [id: product?.id, productCode: product?.productCode, name: product.name],
+                        lotNumber: inventoryItem?.lotNumber,
+                        expirationDate: inventoryItem?.expirationDate
+                ],
                 location         : [id: location.id, name: location.name],
-                transactionType  : transactionType,
+                transactionType  : [id: transactionType?.id, name: transactionType?.name, operation: transactionType?.transactionCode?.name()],
                 transactionNumber: transactionNumber,
-                transactionDate  : transactionType,
-                quantityAdjusted : quantity?:0,
-                amountAdjusted   : quantity?:0 * (product?.pricePerUnit ?: 0),
-                quantityOnHand   : quantityOnHand?:0,
-                amountOnHand     : quantityOnHand?:0 * (product?.pricePerUnit ?: 0),
-                tags             : product.tags.collect { [id: it.id, name: it.tag ]},
-                category         : product?.category?.name,
-                catalogs         : product?.productCatalogs.collect { [id: it.id, name: it.name ]},
+                transactionDate  : transactionDate,
+                cycleCount       : [id: cycleCount?.id, status: cycleCount?.status?.name()],
+                quantityAdjusted : quantityAdjusted ?: 0,
+                amountAdjusted   : quantityAdjusted ?: 0 * (product?.pricePerUnit ?: 0),
+                quantityOnHand   : quantityOnHand ?: 0,
+                amountOnHand     : quantityOnHand ?: 0 * (product?.pricePerUnit ?: 0),
                 abcClass         : abcClass,
+                category   : product?.category?.name,
+                tags       : product.tags.collect { [id: it.id, name: it.tag] },
+                catalogs   : product?.productCatalogs.collect { [id: it.id, name: it.name] },
         ]
     }
 

@@ -11,11 +11,13 @@ package org.pih.warehouse.report
 
 import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
+import grails.orm.PagedResultList
 import org.apache.http.client.HttpClient
 import org.apache.http.client.ResponseHandler
 import org.apache.http.client.methods.HttpGet
 import org.apache.http.impl.client.BasicResponseHandler
 import org.apache.http.impl.client.DefaultHttpClient
+import org.pih.warehouse.PaginatedList
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Organization
@@ -1076,45 +1078,59 @@ class ReportService implements ApplicationContextAware {
 
 
     def getInventoryAuditReportDetails(GetInventoryAuditReportCommand command) {
-        return InventoryAuditDetails.createCriteria().list {
+        return InventoryAuditDetails.createCriteria().list(max: command.max, offset: command.offset) {
             eq("facility", command.facility)
+
+            if (command.product) {
+                eq("product", command.product)
+            }
+
             if (command.startDate && command.endDate) {
                 between("transactionDate", command.startDate, command.endDate)
             }
             else if (command.startDate) {
-                gt("transactionDate", command.startDate)
+                gte("transactionDate", command.startDate)
             }
             else if (command.endDate) {
-                lt("transactionDate", command.endDate)
+                lte("transactionDate", command.endDate)
             }
         }
     }
 
     def getInventoryAuditReportSummary(GetInventoryAuditReportCommand command) {
-        return InventoryAuditDetails.createCriteria().list {
+        def results = InventoryAuditDetails.createCriteria().list(max: command.max, offset: command.offset) {
             projections {
                 groupProperty('facility')
                 groupProperty('product')
-                sum('quantity', 'quantityTotal')
+                sum('quantityAdjusted', 'quantityAdjusted')
                 max('abcClass', 'abcClass')
             }
 
             eq("facility", command.facility)
+
+            if (command.product) {
+                eq("product", command.product)
+            }
+
             if (command.startDate && command.endDate) {
                 between("transactionDate", command.startDate, command.endDate)
             } else if (command.startDate) {
-                gt("transactionDate", command.startDate)
+                gte("transactionDate", command.startDate)
             } else if (command.endDate) {
-                lt("transactionDate", command.endDate)
+                lte("transactionDate", command.endDate)
             }
-        }.collect {
+        }
+
+        // Transform the results to a summary object
+        def data = results.collect {
             new InventoryAuditSummary(
                     facility: it[0],
                     product: it[1],
-                    quantityTotal: it[2] ?: 0,
-                    //totalAdjustments: it[3] ?: 0,
-                    //totalItems: it[2] ?: 0
+                    quantityAdjusted: it[2] ?: 0,
+                    abcClass: it[3]
             )
         }
+
+        return new PaginatedList<InventoryAuditSummary>(data, results.totalCount);
     }
 }

@@ -10,7 +10,7 @@ class InventoryAuditSummary implements Serializable {
 
     String abcClass
 
-    Integer quantityTotal
+    Integer quantityAdjusted
 
     static mapping = {
         version false
@@ -29,7 +29,7 @@ class InventoryAuditSummary implements Serializable {
                 catalogs           : product?.productCatalogs?.collect { [id: it.id, name: it.name] },
                 abcClass           : abcClass,
                 lastCounted        : new Date(),
-                quantityTotal      : quantityTotal,
+                quantityTotal      : quantityAdjusted,
                 numberOfCounts     : 0,
                 numberOfAdjustments: 0,
                 quantityAdjusted   : 0,
