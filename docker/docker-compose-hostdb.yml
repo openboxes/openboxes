@@ -2,7 +2,7 @@ version: "3.8"
 services:
     app:
       extends: 
-        file: docker-compose-generic.yml
+        file: docker-compose-base.yml
         service: app
       image: ghcr.io/openboxes/openboxes:feature-upgrade-to-grails-3.3.10
       # Use below 'image' property (with proper tag) if you use locally-built image
@@ -14,7 +14,7 @@ services:
 
     nginx:
       extends: 
-        file: docker-compose-generic.yml
+        file: docker-compose-base.yml
         service: nginx
       depends_on:
           - app
