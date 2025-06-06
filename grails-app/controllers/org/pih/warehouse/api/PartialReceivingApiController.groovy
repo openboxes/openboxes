@@ -205,7 +205,7 @@ class PartialReceivingApiController {
         }
     }
 
-    def createTempBin() {
+    def createReceivingBinLocation() {
         Shipment shipment = Shipment.get(params.id)
 
         if (!shipment) {

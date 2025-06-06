@@ -386,9 +386,9 @@ class UrlMappings {
             action = [POST: "exportCsv"]
         }
 
-        "/api/partialReceiving/$id/createTempBin"(parseRequest: true) {
+        "/api/partialReceiving/$id/receivingBinLocation"(parseRequest: true) {
             controller = "partialReceivingApi"
-            action = [POST: "createTempBin"]
+            action = [POST: "createReceivingBinLocation"]
         }
 
 
