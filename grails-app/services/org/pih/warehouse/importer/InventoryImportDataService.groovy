@@ -142,11 +142,10 @@ class InventoryImportDataService implements ImportDataService {
 
         Date baselineTransactionDate = command.date
 
-        // An inventory import will set the quantity for an entire inventory of a facility, so we need to fetch
-        // ALL available items at the date that the baseline transaction will be created.
+        // Get the stock for all items in the import at the date that the baseline transaction will be created.
         Map<String, AvailableItem> availableItems = productAvailabilityService.getAvailableItemsAtDateAsMap(
                 command.location,
-                null,
+                inventoryImportData.products,
                 baselineTransactionDate)
 
         String comment = "Imported from ${command.filename} on ${new Date()}"
@@ -217,7 +216,8 @@ class InventoryImportDataService implements ImportDataService {
             }
         }
 
-        // Any available items that exist in the system but were not in the import should be set to quantity 0.
+        // For all products in the import, any other bins/lots of those products that exist in the system (ie have
+        // a product availability entry) but were not in the import should have their quantity set to zero.
         Set<String> keysInImport = inventoryImportData.rows.keySet()
         for (entry in availableItems) {
             AvailableItem availableItem = entry.value
@@ -321,8 +321,11 @@ class InventoryImportDataService implements ImportDataService {
          * because there can be duplicates. (This is a valid scenario. It's an easy way for users to merge products.)
          */
         Map<String, List<InventoryImportDataRow>> rows = [:]
+        Set<Product> products = []
 
         void put(Location binLocation, InventoryItem inventoryItem, def rowRaw) {
+            products.add(inventoryItem.product)
+
             String key = ProductAvailabilityService.constructAvailableItemKey(binLocation, inventoryItem)
             rows.computeIfAbsent(key, { k -> [] }).add(new InventoryImportDataRow(
                     binLocation,
