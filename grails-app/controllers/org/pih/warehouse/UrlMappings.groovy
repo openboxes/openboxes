@@ -386,6 +386,12 @@ class UrlMappings {
             action = [POST: "exportCsv"]
         }
 
+        "/api/partialReceiving/$id/createTempBin"(parseRequest: true) {
+            controller = "partialReceivingApi"
+            action = [POST: "createTempBin"]
+        }
+
+
         // Internal Locations API
 
         "/api/internalLocations/receiving"(parseRequest: true) {
