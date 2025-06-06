@@ -56,6 +56,7 @@ const useCountStep = () => {
   const [refreshFocusCounter, setRefreshFocusCounter] = useState(0);
   const [isSaveDisabled, setIsSaveDisabled] = useState(false);
   const [sortByProductName, setSortByProductName] = useState(false);
+  const [importErrors, setImportErrors] = useState([]);
 
   const dispatch = useDispatch();
   const history = useHistory();
@@ -578,6 +579,10 @@ const useCountStep = () => {
         id: item.product.id,
         productCode: item.product.productCode,
       },
+      binLocation: item.binLocation?.id ? {
+        id: item.binLocation.id,
+        name: item.binLocation.name,
+      } : null,
     }))
     : []);
 
@@ -589,17 +594,8 @@ const useCountStep = () => {
 
   const mergeImportItems = (originalItem, importedItem) => ({
     ...originalItem,
-    ...importedItem,
-    inventoryItem: {
-      product: {
-        id: importedItem?.product?.id || originalItem?.inventoryItem?.product?.id,
-        name: importedItem?.product?.name || originalItem?.inventoryItem?.product?.name,
-        productCode: importedItem?.product?.productCode
-            || originalItem?.inventoryItem?.product?.productCode,
-      },
-      lotNumber: importedItem?.lotNumber || originalItem?.inventoryItem?.lotNumber,
-      expirationDate: importedItem?.expirationDate || originalItem?.inventoryItem?.expirationDate,
-    },
+    quantityCounted: importedItem ? importedItem.quantityCounted : originalItem.quantityCounted,
+    comment: importedItem ? importedItem.comment : originalItem.comment,
     updated: true,
   });
 
@@ -610,7 +606,7 @@ const useCountStep = () => {
         importFile[0],
         currentLocation?.id,
       );
-      console.log(response);
+      setImportErrors(response.data.errors);
       let cycleCounts = _.groupBy(response.data.data, 'cycleCountId');
       tableData.current = tableData.current.map((cycleCount) => ({
         ...cycleCount,
@@ -638,6 +634,9 @@ const useCountStep = () => {
         ],
       }));
     } finally {
+      // After import we want to trigger the validation on fields,
+      // so that a user knows what fields to correct from the UI
+      triggerValidation();
       hide();
     }
   };
@@ -668,6 +667,7 @@ const useCountStep = () => {
     importItems,
     sortByProductName,
     setSortByProductName,
+    importErrors,
   };
 };
 
