@@ -3,6 +3,8 @@ package org.pih.warehouse.inventory
 import grails.gorm.PagedResultList
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
+import org.apache.commons.collections4.keyvalue.MultiKey
+import org.apache.commons.collections4.map.MultiKeyMap
 import org.apache.commons.csv.CSVPrinter
 import org.apache.commons.lang.StringEscapeUtils
 import org.grails.datastore.mapping.query.api.Criteria
@@ -21,9 +23,13 @@ import org.pih.warehouse.report.CycleCountReportCommand
 @Transactional
 class CycleCountService {
 
+    /**
+     * The count index representing the initial count.
+     */
+    static final int INITIAL_COUNT_INDEX = 0
+
     CycleCountTransactionService cycleCountTransactionService
     CycleCountProductAvailabilityService cycleCountProductAvailabilityService
-    ProductAvailabilityService productAvailabilityService
 
     List<CycleCountCandidate> getCandidates(CycleCountCandidateFilterCommand command, String facilityId) {
         if (command.hasErrors()) {
@@ -316,27 +322,80 @@ class CycleCountService {
     List<Map> getRecountFormXls(List<CycleCountDto> cycleCounts) {
         List<Map> data = []
         cycleCounts.each { CycleCountDto cycleCount ->
-            cycleCount.cycleCountItems?.findAll { it.countIndex == 0 }?.each { CycleCountItemDto item ->
-                data << [
-                        "Product Code": item.product.productCode,
-                        "Product Name": item.product.name,
-                        "Lot Number": item.inventoryItem.lotNumber,
-                        "Expiration Date": item.inventoryItem.expirationDate
-                                ? Constants.EXPIRATION_DATE_FORMATTER.format(item.inventoryItem.expirationDate) : "",
-                        "Bin Location": item.binLocation?.name,
-                        "Quantity Counted": item.quantityCounted,
-                        "Difference": item.quantityVariance,
-                        "Counted by": item.assignee,
-                        "Date Counted": item.dateCounted ? Constants.EXPIRATION_DATE_FORMATTER.format(item.dateCounted) : "",
-                        "Quantity Recounted": "",
-                        "Comment": "",
-                        "Recounted By": "",
-                        "Date Recounted": ""
-                ]
-            }
+            data.addAll(getRecountAsXlsMap(cycleCount))
         }
 
         return data
+    }
+
+    /**
+     * Converts a CycleCountDto to a list of rows/maps. For use when exporting to XLS.
+     */
+    private List<Map> getRecountAsXlsMap(CycleCountDto cycleCount) {
+        int currentCountIndex = cycleCount.maxCountIndex
+
+        // Build a map to make it easier to group the count and recount items into one row in the XLS.
+        // The outer map is keyed on [product code + lot + bin]. The inner map is keyed on count index.
+        MultiKeyMap<String, Map<Integer, CycleCountItemDto>> countItemsMap = [:]
+        List<CycleCountItemDto> customRecountItems = []
+        for (CycleCountItemDto item in cycleCount.cycleCountItems) {
+            // Keep custom recount items separate because they can have duplicate keys and don't have a count item.
+            if (item.countIndex == currentCountIndex && item.custom) {
+                customRecountItems.add(item)
+                continue
+            }
+
+            MultiKey<String> key = new MultiKey(
+                    item.product.productCode,
+                    item.inventoryItem?.lotNumber,
+                    item.binLocation?.get('name'),
+            )
+            Map<Integer, CycleCountItemDto> countItemByIndex = countItemsMap.computeIfAbsent(key, { k -> [:] })
+            countItemByIndex.put(item.countIndex, item)
+        }
+
+        List<Map> data = []
+        for (itemsEntry in countItemsMap.entrySet()) {
+            CycleCountItemDto countItem = itemsEntry.value.get(INITIAL_COUNT_INDEX)
+            CycleCountItemDto recountItem = itemsEntry.value.get(currentCountIndex)
+            data << mergeCountAndRecountItemAsXlsMap(countItem, recountItem)
+        }
+
+        for (CycleCountItemDto customItem in customRecountItems) {
+            data << mergeCountAndRecountItemAsXlsMap(null, customItem)
+        }
+        return data
+    }
+
+    /**
+     * Merge two CycleCountItemDtos together into a single map/row. For use when exporting to XLS.
+     * @param countItem Represents the item in the original count
+     * @param recountItem Represents the item in the current recount
+     */
+    private Map mergeCountAndRecountItemAsXlsMap(CycleCountItemDto countItem, CycleCountItemDto recountItem) {
+        return [
+                "Product Code": recountItem.product.productCode,
+                "Product Name": recountItem.product.name,
+                "Lot Number": recountItem.inventoryItem.lotNumber,
+                "Expiration Date": recountItem.inventoryItem.expirationDate
+                        ? Constants.EXPIRATION_DATE_FORMATTER.format(recountItem.inventoryItem.expirationDate) : "",
+                "Bin Location": recountItem.binLocation?.name,
+
+                // Count-specific fields
+                "Quantity Counted": countItem?.quantityCounted != null ? countItem.quantityCounted : "",
+                "Difference": countItem?.quantityVariance ?: "",
+                "Counted by": countItem?.assignee ?: "",
+                "Date Counted": countItem?.dateCounted
+                        ? Constants.MONTH_DAY_YEAR_DATE_FORMATTER.format(countItem.dateCounted) : "",
+
+                // Recount-specific fields
+                "Quantity Recounted": recountItem.quantityCounted != null ? recountItem.quantityCounted : "",
+                "Root Cause": recountItem.discrepancyReasonCode ?: "",
+                "Comment": recountItem.comment ?: "",
+                "Recounted By": recountItem.assignee ?: "",
+                "Date Recounted": recountItem.dateCounted
+                        ? Constants.MONTH_DAY_YEAR_DATE_FORMATTER.format(recountItem.dateCounted) : "",
+        ]
     }
 
     /**
