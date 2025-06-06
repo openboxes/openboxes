@@ -232,7 +232,7 @@ class InventoryImportDataService implements ImportDataService {
                     product: availableItem.inventoryItem.product,
                     binLocation: availableItem.binLocation,
                     inventoryItem: availableItem.inventoryItem,
-                    comments: 'Quantity set to zero due to item not being defined in the inventory import file.',
+                    comments: 'Item was not in inventory import file so quantity was assumed to be zero.',
             )
             transaction.addToTransactionEntries(transactionEntry)
         }

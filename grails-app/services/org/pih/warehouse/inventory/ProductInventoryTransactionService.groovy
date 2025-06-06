@@ -117,6 +117,7 @@ abstract class ProductInventoryTransactionService<T> {
         for (AvailableItem availableItem : availableItems) {
             TransactionEntry transactionEntry = new TransactionEntry(
                     quantity: availableItem.quantityOnHand,
+                    product: availableItem.inventoryItem.product,
                     binLocation: availableItem.binLocation,
                     inventoryItem: availableItem.inventoryItem,
                     transaction: transaction,
