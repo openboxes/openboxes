@@ -6,50 +6,50 @@
     <changeSet author="ewaterman" id="050620250000-0">
         <preConditions onFail="MARK_RAN">
             <not>
-                <columnExists tableName="cycle_count_request" columnName="count_assigned_to"/>
+                <columnExists tableName="cycle_count_request" columnName="count_assignee"/>
             </not>
             <not>
-                <foreignKeyConstraintExists foreignKeyName="fk_cycle_count_request_count_assigned_to"/>
+                <foreignKeyConstraintExists foreignKeyName="fk_cycle_count_request_count_assignee"/>
             </not>
         </preConditions>
         <addColumn tableName="cycle_count_request">
-            <column name="count_assigned_to" type="CHAR(38)">
+            <column name="count_assignee" type="CHAR(38)">
                 <constraints nullable="true" />
             </column>
         </addColumn>
         <addForeignKeyConstraint
-                baseColumnNames="count_assigned_to"
+                baseColumnNames="count_assignee"
                 baseTableName="cycle_count_request"
-                constraintName="fk_cycle_count_request_count_assigned_to"
+                constraintName="fk_cycle_count_request_count_assignee"
                 deferrable="false"
                 initiallyDeferred="false"
                 referencedColumnNames="id"
-                referencedTableName="user"
+                referencedTableName="person"
         />
     </changeSet>
 
     <changeSet author="ewaterman" id="050620250000-1">
         <preConditions onFail="MARK_RAN">
             <not>
-                <columnExists tableName="cycle_count_request" columnName="recount_assigned_to"/>
+                <columnExists tableName="cycle_count_request" columnName="recount_assignee"/>
             </not>
             <not>
-                <foreignKeyConstraintExists foreignKeyName="fk_cycle_count_request_recount_assigned_to"/>
+                <foreignKeyConstraintExists foreignKeyName="fk_cycle_count_request_recount_assignee"/>
             </not>
         </preConditions>
         <addColumn tableName="cycle_count_request">
-            <column name="recount_assigned_to" type="CHAR(38)">
+            <column name="recount_assignee" type="CHAR(38)">
                 <constraints nullable="true" />
             </column>
         </addColumn>
         <addForeignKeyConstraint
-                baseColumnNames="recount_assigned_to"
+                baseColumnNames="recount_assignee"
                 baseTableName="cycle_count_request"
-                constraintName="fk_cycle_count_request_recount_assigned_to"
+                constraintName="fk_cycle_count_request_recount_assignee"
                 deferrable="false"
                 initiallyDeferred="false"
                 referencedColumnNames="id"
-                referencedTableName="user"
+                referencedTableName="person"
         />
     </changeSet>
 

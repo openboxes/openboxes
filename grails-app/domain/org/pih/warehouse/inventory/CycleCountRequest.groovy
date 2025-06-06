@@ -28,7 +28,7 @@ class CycleCountRequest {
      * The person who is responsible for performing the count. Note that this might be different from
      * the person who *actually* performs the count.
      */
-    Person countAssignedTo
+    Person countAssignee
 
     /**
      * The date that the count should be performed by.
@@ -39,7 +39,7 @@ class CycleCountRequest {
      * The person who is responsible for performing the recount. Note that this might be different from
      * the person who *actually* performs the recount.
      */
-    Person recountAssignedTo
+    Person recountAssignee
 
     /**
      * The date that the recount should be performed by.
@@ -69,9 +69,9 @@ class CycleCountRequest {
         createdBy(nullable: true)
         updatedBy(nullable: true)
         cycleCount(unique: true, nullable: true) // Unique: true determines the unidirectional 1:1 association between cycle count request and cycle count
-        countAssignedTo(nullable: true)
+        countAssignee(nullable: true)
         countDeadline(nullable: true)
-        recountAssignedTo(nullable: true)
+        recountAssignee(nullable: true)
         recountDeadline(nullable: true)
     }
 

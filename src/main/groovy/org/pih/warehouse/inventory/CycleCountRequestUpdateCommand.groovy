@@ -11,15 +11,15 @@ class CycleCountRequestUpdateCommand implements Validateable {
     @BindUsing({ obj, source -> CycleCountRequest.get(source['id'] as Serializable) })
     CycleCountRequest cycleCountRequest
 
-    Person countAssignedTo
+    Person countAssignee
     LocalDate countDeadline
-    Person recountAssignedTo
+    Person recountAssignee
     LocalDate recountDeadline
 
     static constraints = {
-        countAssignedTo(nullable: true)
+        countAssignee(nullable: true)
         countDeadline(nullable: true)
-        recountAssignedTo(nullable: true)
+        recountAssignee(nullable: true)
         recountDeadline(nullable: true)
     }
 }
