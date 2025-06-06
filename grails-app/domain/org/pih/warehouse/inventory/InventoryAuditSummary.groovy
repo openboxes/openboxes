@@ -22,17 +22,22 @@ class InventoryAuditSummary implements Serializable {
 
     Map toJson() {
         return [
-                facility           : [id: facility?.id, name: facility?.name],
-                product            : [id: product?.id, name: product?.name],
-                category           : product?.category?.name,
-                tags               : product.tags.collect { [id: it.id, name: it.tag] },
-                catalogs           : product?.productCatalogs?.collect { [id: it.id, name: it.name] },
-                abcClass           : abcClass,
+                facility           : [
+                        id  : facility?.id,
+                        name: facility?.name
+                ],
+                product            : [
+                        id      : product?.id,
+                        name    : product?.name,
+                        category: product?.category?.name,
+                        abcClass: abcClass,
+                        tags    : product.tags.collect { [id: it.id, name: it.tag] },
+                        catalogs: product?.productCatalogs?.collect { [id: it.id, name: it.name] },
+                ],
                 lastCounted        : new Date(),
-                quantityTotal      : quantityAdjusted,
                 numberOfCounts     : 0,
+                quantityAdjusted   : quantityAdjusted,
                 numberOfAdjustments: 0,
-                quantityAdjusted   : 0,
                 valueAdjusted      : 0,
                 monthsOfStockChange: 0,
                 quantityOnHand     : 0,
@@ -40,6 +45,4 @@ class InventoryAuditSummary implements Serializable {
 
         ]
     }
-
-
 }

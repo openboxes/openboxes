@@ -35,14 +35,25 @@ class InventoryAuditDetails implements Serializable {
 
     Map toJson() {
         return [
-                facility         : [id: facility.id, name: facility.name],
+                facility         : [
+                        id            : facility.id,
+                        locationNumber: facility.locationNumber,
+                        name          : facility.name],
                 inventoryItem    : [
-                        id: inventoryItem?.id,
-                        product: [id: product?.id, productCode: product?.productCode, name: product.name],
-                        lotNumber: inventoryItem?.lotNumber,
+                        id            : inventoryItem?.id,
+                        location      : [id: location.id, name: location.name],
+                        product       : [
+                                id         : product?.id,
+                                productCode: product?.productCode,
+                                name       : product.name,
+                                abcClass   : abcClass,
+                                category   : product?.category?.name,
+                                tags       : product.tags.collect { [id: it.id, name: it.tag] },
+                                catalogs   : product?.productCatalogs.collect { [id: it.id, name: it.name] }
+                        ],
+                        lotNumber     : inventoryItem?.lotNumber,
                         expirationDate: inventoryItem?.expirationDate
                 ],
-                location         : [id: location.id, name: location.name],
                 transactionType  : [id: transactionType?.id, name: transactionType?.name, operation: transactionType?.transactionCode?.name()],
                 transactionNumber: transactionNumber,
                 transactionDate  : transactionDate,
@@ -50,11 +61,7 @@ class InventoryAuditDetails implements Serializable {
                 quantityAdjusted : quantityAdjusted ?: 0,
                 amountAdjusted   : quantityAdjusted ?: 0 * (product?.pricePerUnit ?: 0),
                 quantityOnHand   : quantityOnHand ?: 0,
-                amountOnHand     : quantityOnHand ?: 0 * (product?.pricePerUnit ?: 0),
-                abcClass         : abcClass,
-                category   : product?.category?.name,
-                tags       : product.tags.collect { [id: it.id, name: it.tag] },
-                catalogs   : product?.productCatalogs.collect { [id: it.id, name: it.name] },
+                amountOnHand     : quantityOnHand ?: 0 * (product?.pricePerUnit ?: 0)
         ]
     }
 
