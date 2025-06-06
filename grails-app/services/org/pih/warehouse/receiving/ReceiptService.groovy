@@ -476,7 +476,7 @@ class ReceiptService {
         }
     }
 
-    void createTemporaryReceivingBin(Shipment shipment) {
+    Location createTemporaryReceivingBin(Shipment shipment) {
         // Create temporary receiving area for the Partial Receipt process
         if (Holders.grailsApplication.config.openboxes.receiving.createReceivingLocation.enabled && shipment?.destination?.hasBinLocationSupport()) {
             LocationType locationType = LocationType.findByName("Receiving")
@@ -484,8 +484,10 @@ class ReceiptService {
                 throw new IllegalArgumentException("Unable to find location type 'Receiving'")
             }
 
-            locationService.findOrCreateInternalLocation(shipment.shipmentNumber,
+            return locationService.findOrCreateInternalLocation(shipment.shipmentNumber,
                     shipment.shipmentNumber, locationType, shipment.destination)
         }
+
+        return null
     }
 }

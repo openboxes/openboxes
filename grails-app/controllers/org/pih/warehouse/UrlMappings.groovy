@@ -401,6 +401,12 @@ class UrlMappings {
             action = [POST: "exportCsv"]
         }
 
+        "/api/partialReceiving/$id/receivingBinLocation"(parseRequest: true) {
+            controller = "partialReceivingApi"
+            action = [POST: "createReceivingBinLocation"]
+        }
+
+
         // Internal Locations API
 
         "/api/internalLocations/receiving"(parseRequest: true) {
