@@ -6,11 +6,13 @@ import org.grails.plugins.excelimport.DefaultImportCellCollector
 import org.grails.plugins.excelimport.ExcelImportService
 import org.grails.plugins.excelimport.ExpectedPropertyType
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.inventory.CycleCountImportService
 import org.pih.warehouse.product.Product
 
 class CycleCountItemsExcelImporter extends AbstractExcelImporter implements DataImporter {
 
     ExcelImportService excelImportService
+    CycleCountImportService cycleCountImportService
 
     static CELL_REPORTER = new DefaultImportCellCollector()
 
@@ -35,7 +37,7 @@ class CycleCountItemsExcelImporter extends AbstractExcelImporter implements Data
             cycleCountItemId:         ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
             productCode:              ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
             "product.name":           ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
-            "lotNumber":              ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            "lotNumber":              ([expectedType: ExpectedPropertyType.StringType, defaultValue: ""]),
             "expirationDate":         ([expectedType: ExpectedPropertyType.DateJavaType, defaultValue: null]),
             "binLocation":            ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
             "quantityCounted":        ([expectedType: ExpectedPropertyType.IntType, defaultValue: null]),
@@ -46,6 +48,7 @@ class CycleCountItemsExcelImporter extends AbstractExcelImporter implements Data
         super()
         read(fileName)
         excelImportService = Holders.grailsApplication.mainContext.getBean("excelImportService")
+        cycleCountImportService = Holders.grailsApplication.mainContext.getBean(CycleCountImportService)
     }
 
     @Override
@@ -71,10 +74,10 @@ class CycleCountItemsExcelImporter extends AbstractExcelImporter implements Data
 
         // 3. Replace data from importer with the fetched data
         data.each { row ->
-            row.binLocation = [
+            row.binLocation = (locationMap[row.binLocation] && row.binLocation) ? [
                     id: locationMap[row.binLocation]?.id,
                     name: locationMap[row.binLocation]?.name
-            ]
+            ] : null
             row.product = [
                     id: productMap[row.productCode]?.id,
                     name: productMap[row.productCode]?.name,
@@ -88,7 +91,7 @@ class CycleCountItemsExcelImporter extends AbstractExcelImporter implements Data
 
     @Override
     void validateData(ImportDataCommand command) {
-        throw new UnsupportedOperationException("This operation is not supported")
+        cycleCountImportService.validateCountImport(command)
     }
 
     @Override
