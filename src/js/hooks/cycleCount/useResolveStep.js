@@ -605,9 +605,7 @@ const useResolveStep = () => {
       return;
     }
 
-    await save({
-      shouldSetDefaultAssignee: true,
-    });
+    await save({ shouldSetDefaultAssignee: true });
     setIsStepEditable(false);
   };
 
