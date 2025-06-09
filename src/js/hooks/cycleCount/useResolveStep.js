@@ -606,8 +606,6 @@ const useResolveStep = () => {
     }
 
     await save({
-      shouldRefetch: true,
-      shouldValidateExistence: true,
       shouldSetDefaultAssignee: true,
     });
     setIsStepEditable(false);
