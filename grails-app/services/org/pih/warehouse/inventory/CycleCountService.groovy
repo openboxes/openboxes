@@ -15,7 +15,6 @@ import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.core.dtos.BulkCommand
 import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.product.Product
 import org.hibernate.criterion.CriteriaSpecification
@@ -260,7 +259,7 @@ class CycleCountService {
     /**
      * Bulk updates a given list of cycle count requests.
      */
-    List<CycleCountRequest> updateRequests(BulkCommand<CycleCountRequestUpdateCommand> command) {
+    List<CycleCountRequest> updateRequests(CycleCountRequestUpdateBulkCommand command) {
         List<CycleCountRequest> updatedRequests = []
         for (CycleCountRequestUpdateCommand requestToUpdate in command.commands) {
             CycleCountRequest updatedRequest = updateRequest(requestToUpdate)

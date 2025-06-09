@@ -1,6 +1,5 @@
 package org.pih.warehouse.inventory
 
-import grails.databinding.BindUsing
 import grails.validation.Validateable
 import java.time.LocalDate
 
@@ -8,9 +7,12 @@ import org.pih.warehouse.core.Person
 
 class CycleCountRequestUpdateCommand implements Validateable {
 
-    @BindUsing({ obj, source -> CycleCountRequest.get(source['id'] as Serializable) })
+    /**
+     * The request to update.
+     */
     CycleCountRequest cycleCountRequest
 
+    // The fields of the request that the user is allowed to update
     Person countAssignee
     LocalDate countDeadline
     Person recountAssignee
