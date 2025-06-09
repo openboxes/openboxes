@@ -189,7 +189,7 @@ const useToCountTab = ({
   }, [tableData]);
 
   const getCycleCountRequestsIds = () => extendedDataTable.data
-    .filter((row) => !row.meta.isProductDisabled)
+    .filter((row) => !row.meta.isRowDisabled)
     .map((row) => row.cycleCountRequest.id);
 
   const checkboxesColumn = columnHelper.accessor(cycleCountColumn.SELECTED, {
@@ -203,16 +203,16 @@ const useToCountTab = ({
       </TableHeaderCell>
     ),
     cell: ({ row }) => {
-      const { isProductDisabled } = row.original.meta;
+      const { isRowDisabled } = row.original.meta;
       return (
         <TableCell className="rt-td">
           <Checkbox
             noWrapper
-            onChange={isProductDisabled ? null : selectRow(row.original.cycleCountRequest.id)}
+            onChange={isRowDisabled ? null : selectRow(row.original.cycleCountRequest.id)}
             value={isChecked(row.original.cycleCountRequest.id)}
-            className={`${isProductDisabled && 'cancel-icon'}`}
+            className={`${isRowDisabled && 'cancel-icon'}`}
             onClick={() => {
-              if (isProductDisabled) {
+              if (isRowDisabled) {
                 openCancelCountsModal(row.original.cycleCountRequest.id);
               }
             }}
@@ -336,7 +336,7 @@ const useToCountTab = ({
       ),
       cell: ({ getValue, row }) => (
         <TableCell className="rt-td multiline-cell">
-          <div className={`badge-container ${row.original.meta.isProductDisabled && 'disabled'}`}>
+          <div className={`badge-container ${row.original.meta.isRowDisabled && 'disabled'}`}>
             {getValue()}
           </div>
         </TableCell>
@@ -355,7 +355,7 @@ const useToCountTab = ({
       ),
       cell: ({ getValue, row }) => (
         <TableCell className="rt-td multiline-cell">
-          <div className={`badge-container ${row.original.meta.isProductDisabled && 'disabled'}`}>
+          <div className={`badge-container ${row.original.meta.isRowDisabled && 'disabled'}`}>
             {getValue()}
           </div>
         </TableCell>

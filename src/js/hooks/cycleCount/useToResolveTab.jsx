@@ -182,7 +182,7 @@ const useToResolveTab = ({
       cell: ({ getValue, row }) => (
         <TableCell className="rt-td">
           <StatusIndicator
-            variant={row.original.meta.isProductDisabled ? 'gray' : 'primary'}
+            variant={row.original.meta.isRowDisabled ? 'gray' : 'primary'}
             status={translate(`react.cycleCount.CycleCountCandidateStatus.${getValue()}.label`, 'To resolve')}
           />
         </TableCell>
@@ -280,7 +280,7 @@ const useToResolveTab = ({
       ),
       cell: ({ getValue, row }) => (
         <TableCell className="rt-td multiline-cell">
-          <div className={`badge-container ${row.original.meta.isProductDisabled && 'disabled'}`}>
+          <div className={`badge-container ${row.original.meta.isRowDisabled && 'disabled'}`}>
             {getValue()}
           </div>
         </TableCell>
@@ -299,7 +299,7 @@ const useToResolveTab = ({
       ),
       cell: ({ getValue, row }) => (
         <TableCell className="rt-td multiline-cell">
-          <div className={`badge-container ${row.original.meta.isProductDisabled && 'disabled'}`}>
+          <div className={`badge-container ${row.original.meta.isRowDisabled && 'disabled'}`}>
             {getValue()}
           </div>
         </TableCell>

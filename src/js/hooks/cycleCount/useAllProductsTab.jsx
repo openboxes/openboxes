@@ -152,7 +152,7 @@ const useAllProductsTab = ({
   }, [tableData]);
 
   const productIds = extendedDataTable.data
-    .filter((row) => !row.meta.isProductDisabled)
+    .filter((row) => !row.meta.isRowDisabled)
     .map((row) => row.product.id);
 
   // Separated from columns to reduce the amount of rerenders of
@@ -168,16 +168,16 @@ const useAllProductsTab = ({
       </TableHeaderCell>
     ),
     cell: ({ row }) => {
-      const { isProductDisabled, isFromOtherTab } = row.original.meta;
+      const { isRowDisabled, isFromOtherTab } = row.original.meta;
       return (
         <TableCell className="rt-td">
           <Checkbox
             noWrapper
             onChange={selectRow(row.original.product.id)}
-            value={isProductDisabled && isFromOtherTab
+            value={isRowDisabled && isFromOtherTab
               ? true
               : isChecked(row.original.product.id)}
-            disabled={isProductDisabled}
+            disabled={isRowDisabled}
           />
         </TableCell>
       );
@@ -307,7 +307,7 @@ const useAllProductsTab = ({
       ),
       cell: ({ getValue, row }) => (
         <TableCell className="rt-td multiline-cell">
-          <div className={`badge-container ${row.original.meta.isProductDisabled && 'disabled'}`}>
+          <div className={`badge-container ${row.original.meta.isRowDisabled && 'disabled'}`}>
             {getValue()}
           </div>
         </TableCell>
@@ -326,7 +326,7 @@ const useAllProductsTab = ({
       ),
       cell: ({ getValue, row }) => (
         <TableCell className="rt-td multiline-cell">
-          <div className={`badge-container ${row.original.meta.isProductDisabled && 'disabled'}`}>
+          <div className={`badge-container ${row.original.meta.isRowDisabled && 'disabled'}`}>
             {getValue()}
           </div>
         </TableCell>

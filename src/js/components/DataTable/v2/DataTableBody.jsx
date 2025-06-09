@@ -42,18 +42,18 @@ const DataTableBody = ({
       {dataLength > 0 &&
         !loading &&
         rowModel.rows.map((row) => {
-          const { isProductDisabled, label, defaultMessage } = row.original?.meta || {
-            isProductDisabled: false,
+          const { isRowDisabled, label, defaultMessage } = row.original?.meta || {
+            isRowDisabled: false,
             label: '',
             defaultMessage: '',
           };
           return (
             <CustomTooltip
-              content={isProductDisabled && translate(label, defaultMessage)}
-              show={isProductDisabled}
+              content={isRowDisabled && translate(label, defaultMessage)}
+              show={isRowDisabled}
             >
               <div key={row.id} className="rt-tr-group cell-wrapper" role="rowgroup">
-                <TableRow key={row.id} className={`rt-tr ${isProductDisabled && 'bg-light'}`}>
+                <TableRow key={row.id} className={`rt-tr ${isRowDisabled && 'bg-light'}`}>
                   {row.getVisibleCells().map((cell) => {
                     const { hide, flexWidth, className } = useTableColumnMeta(cell.column);
                     if (hide) {
@@ -61,7 +61,7 @@ const DataTableBody = ({
                     }
                     return (
                       <div
-                        className={`d-flex ${className} ${isProductDisabled && 'text-muted'}`}
+                        className={`d-flex ${className} ${isRowDisabled && 'text-muted'}`}
                         style={{
                           ...getCommonPinningStyles(
                             cell.column,
