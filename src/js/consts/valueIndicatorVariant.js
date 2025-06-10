@@ -10,8 +10,8 @@ const valueIndicatorVariant = {
   TRANSACTION: 'TRANSACTION',
 };
 
-export const getCycleCountDifferencesVariant = (number, value) => {
-  if (Number.isNaN(number) || value === null) {
+export const getCycleCountDifferencesVariant = (number) => {
+  if (Number.isNaN(number)) {
     return null;
   }
 

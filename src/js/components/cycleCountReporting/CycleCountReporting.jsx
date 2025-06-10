@@ -67,7 +67,12 @@ const CycleCountReporting = () => {
           tablePaginationProps={tablePaginationProps}
         />
         {tab === PRODUCTS_TAB && (
-          <ProductsTab />
+          <ProductsTab
+            tablePaginationProps={tablePaginationProps}
+            filterParams={filterParams}
+            shouldFetch={shouldFetch}
+            setShouldFetch={setShouldFetch}
+          />
         )}
 
         {tab === INVENTORY_TRANSACTIONS_TAB && (

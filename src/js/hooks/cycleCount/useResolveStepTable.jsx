@@ -460,7 +460,7 @@ const useResolveStepTable = ({
       cell: useCallback(({ row: { original: { quantityOnHand, quantityCounted } } }) => {
         const quantityVariance = quantityCounted - (quantityOnHand || 0);
         const variant = (quantityCounted || quantityCounted === 0)
-          ? getCycleCountDifferencesVariant(quantityVariance, quantityCounted)
+          ? getCycleCountDifferencesVariant(quantityVariance)
           : valueIndicatorVariant.EMPTY;
         return (
           <TableCell className="rt-td rt-td-count-step static-cell-count-step d-flex align-items-center">
@@ -491,7 +491,7 @@ const useResolveStepTable = ({
       cell: ({ row: { original: { quantityOnHand }, index } }) => {
         const [value, setValue] = useState(tableData?.[index]?.quantityRecounted);
         const recountDifference = value - (quantityOnHand || 0);
-        const variant = getCycleCountDifferencesVariant(recountDifference, value);
+        const variant = getCycleCountDifferencesVariant(recountDifference);
         events.on('refreshRecountDifference', () => {
           setValue(tableData?.[index]?.quantityRecounted);
         });
