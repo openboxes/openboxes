@@ -13,7 +13,6 @@ import { INVENTORY_ITEM_URL } from 'consts/applicationUrls';
 import cycleCountColumn from 'consts/cycleCountColumn';
 import { DateFormat } from 'consts/timeFormat';
 import { getCycleCountDifferencesVariant } from 'consts/valueIndicatorVariant';
-import useCycleCountProductAvailability from 'hooks/cycleCount/useCycleCountProductAvailability';
 import useTableDataV2 from 'hooks/useTableDataV2';
 import useTableSorting from 'hooks/useTableSorting';
 import useTranslate from 'hooks/useTranslate';
