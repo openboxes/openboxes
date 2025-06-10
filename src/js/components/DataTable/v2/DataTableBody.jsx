@@ -5,7 +5,6 @@ import PropTypes from 'prop-types';
 
 import TableRow from 'components/DataTable/TableRow';
 import DataTableStatus from 'components/DataTable/v2/DataTableStatus';
-import useCycleCountProductAvailability from 'hooks/cycleCount/useCycleCountProductAvailability';
 import useTableColumnMeta from 'hooks/useTableColumnMeta';
 import useTranslate from 'hooks/useTranslate';
 import getCommonPinningStyles from 'utils/getCommonPinningStyles';
@@ -21,8 +20,6 @@ const DataTableBody = ({
   dataLength,
   tableWithPinnedColumns,
   isScreenWiderThanTable,
-  data,
-  showDisabledProducts,
 }) => {
   const translate = useTranslate();
 
@@ -44,18 +41,19 @@ const DataTableBody = ({
       />
       {dataLength > 0 &&
         !loading &&
-        rowModel.rows.map((row, index) => {
-          const { isProductDisabled, label, defaultMessage } = showDisabledProducts
-            ? useCycleCountProductAvailability(data[index].status)
-            : { isProductDisabled: false, label: '', defaultMessage: '' };
-
+        rowModel.rows.map((row) => {
+          const { isRowDisabled, label, defaultMessage } = row.original?.meta || {
+            isRowDisabled: false,
+            label: '',
+            defaultMessage: '',
+          };
           return (
             <CustomTooltip
-              content={isProductDisabled && translate(label, defaultMessage)}
-              show={isProductDisabled && showDisabledProducts}
+              content={isRowDisabled && translate(label, defaultMessage)}
+              show={isRowDisabled}
             >
               <div key={row.id} className="rt-tr-group cell-wrapper" role="rowgroup">
-                <TableRow key={row.id} className={`rt-tr ${isProductDisabled && showDisabledProducts && 'bg-light'}`}>
+                <TableRow key={row.id} className={`rt-tr ${isRowDisabled && 'bg-light'}`}>
                   {row.getVisibleCells().map((cell) => {
                     const { hide, flexWidth, className } = useTableColumnMeta(cell.column);
                     if (hide) {
@@ -63,7 +61,7 @@ const DataTableBody = ({
                     }
                     return (
                       <div
-                        className={`d-flex ${className} ${isProductDisabled && 'text-muted'}`}
+                        className={`d-flex ${className} ${isRowDisabled && 'text-muted'}`}
                         style={{
                           ...getCommonPinningStyles(
                             cell.column,
@@ -116,10 +114,6 @@ DataTableBody.propTypes = {
   dataLength: PropTypes.number.isRequired,
   tableWithPinnedColumns: PropTypes.bool,
   isScreenWiderThanTable: PropTypes.bool.isRequired,
-  data: PropTypes.arrayOf(
-    PropTypes.shape({}),
-  ).isRequired,
-  showDisabledProducts: PropTypes.bool,
 };
 
 DataTableBody.defaultProps = {
@@ -127,5 +121,4 @@ DataTableBody.defaultProps = {
   loadingMessage: null,
   loading: false,
   tableWithPinnedColumns: false,
-  showDisabledProducts: false,
 };
