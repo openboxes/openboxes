@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 const valueIndicatorVariant = {
   // These four values are used for displaying changes in qty difference
   EQUAL: 'EQUAL',
@@ -11,7 +13,7 @@ const valueIndicatorVariant = {
 };
 
 export const getCycleCountDifferencesVariant = (number) => {
-  if (Number.isNaN(number)) {
+  if (_.isNaN(number) || _.isNil(number)) {
     return null;
   }
 

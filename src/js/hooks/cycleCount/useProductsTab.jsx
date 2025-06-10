@@ -5,7 +5,7 @@ import _ from 'lodash';
 import { useSelector } from 'react-redux';
 import { getFormatLocalizedDate } from 'selectors';
 
-import { CYCLE_COUNT_INVENTORY_AUDIT_SUMMARY } from 'api/urls';
+import { INVENTORY_AUDIT_SUMMARY_REPORT } from 'api/urls';
 import { TableCell } from 'components/DataTable';
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
 import ValueIndicator from 'components/DataTable/v2/ValueIndicator';
@@ -76,7 +76,7 @@ const useProductsTab = ({
     loading,
     setTableData,
   } = useTableDataV2({
-    url: CYCLE_COUNT_INVENTORY_AUDIT_SUMMARY,
+    url: INVENTORY_AUDIT_SUMMARY_REPORT,
     errorMessageId: 'react.cycleCount.table.errorMessage.label',
     defaultErrorMessage: 'Unable to fetch products',
     // We should start fetching only after clicking the "Load Table" button
@@ -253,7 +253,7 @@ const useProductsTab = ({
       ),
       cell: ({ getValue }) => (
         <TableCell className="rt-td d-flex justify-content-end">
-          {getValue().toString()}
+          {getValue()?.toString()}
         </TableCell>
       ),
       size: 160,
@@ -270,7 +270,7 @@ const useProductsTab = ({
       ),
       cell: ({ getValue }) => (
         <TableCell className="rt-td d-flex justify-content-end">
-          {getValue().toString()}
+          {getValue()?.toString()}
         </TableCell>
       ),
       size: 200,
@@ -294,7 +294,7 @@ const useProductsTab = ({
             <div>
               <ValueIndicator
                 className={`pr-2 pl-1 py-1 value-indicator ${value !== 0 && className}`}
-                value={value.toString()}
+                value={value?.toString()}
                 variant={variant}
                 showAbsoluteValue
               />
@@ -356,7 +356,7 @@ const useProductsTab = ({
       ),
       cell: ({ getValue }) => (
         <TableCell className="rt-td d-flex justify-content-end">
-          {getValue().toString()}
+          {getValue()?.toString()}
         </TableCell>
       ),
       size: 155,
@@ -373,7 +373,7 @@ const useProductsTab = ({
       ),
       cell: ({ getValue }) => (
         <TableCell className="rt-td d-flex justify-content-end font-weight-bold">
-          {`$ ${getValue().toString()}`}
+          {`$ ${getValue()?.toString()}`}
         </TableCell>
       ),
       size: 130,
