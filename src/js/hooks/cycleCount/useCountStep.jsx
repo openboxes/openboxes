@@ -309,10 +309,12 @@ const useCountStep = () => {
 
   const getCountedDate = (cycleCountId) => dateCounted[cycleCountId];
 
-  const getPayload = (cycleCountItem, cycleCount) => ({
+  const getPayload = (cycleCountItem, cycleCount, shouldSetDefaultAssignee) => ({
     ...cycleCountItem,
     recount: false,
-    assignee: getCountedBy(cycleCount.id)?.id ?? currentUser.id,
+    assignee: shouldSetDefaultAssignee
+      ? getCountedBy(cycleCount.id)?.id ?? currentUser.id
+      : getCountedBy(cycleCount.id)?.id,
     dateCounted: getCountedDate(cycleCount.id),
     inventoryItem: {
       ...cycleCountItem?.inventoryItem,
@@ -324,16 +326,17 @@ const useCountStep = () => {
     },
   });
 
-  const save = async () => {
+  const save = async (shouldSetDefaultAssignee = false) => {
     try {
       show();
       resetValidationState();
       for (const cycleCount of tableData.current) {
         const cycleCountItemsToUpdate = cycleCount.cycleCountItems
-          .filter((item) => (item.updated && !item.id.includes('newRow')))
+          .filter((item) => ((item.updated || !item.assignee) && !item.id.includes('newRow')))
           .map(trimLotNumberSpaces);
         const updatePayload = {
-          itemsToUpdate: cycleCountItemsToUpdate.map((item) => getPayload(item, cycleCount)),
+          itemsToUpdate: cycleCountItemsToUpdate.map((item) =>
+            getPayload(item, cycleCount, shouldSetDefaultAssignee)),
         };
         if (updatePayload.itemsToUpdate.length > 0) {
           await cycleCountApi
@@ -343,7 +346,8 @@ const useCountStep = () => {
           .filter((item) => item.id.includes('newRow'))
           .map(trimLotNumberSpaces);
         const createPayload = {
-          itemsToCreate: cycleCountItemsToCreate.map((item) => getPayload(item, cycleCount)),
+          itemsToCreate: cycleCountItemsToCreate.map((item) =>
+            getPayload(item, cycleCount, shouldSetDefaultAssignee)),
         };
         if (createPayload.itemsToCreate.length > 0) {
           await cycleCountApi
@@ -379,7 +383,7 @@ const useCountStep = () => {
     const isValid = triggerValidation();
     forceRerender();
     if (isValid) {
-      await save();
+      await save(true);
       setIsStepEditable(false);
     }
     resetFocus();
