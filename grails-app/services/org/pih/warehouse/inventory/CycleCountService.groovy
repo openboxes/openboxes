@@ -3,6 +3,7 @@ package org.pih.warehouse.inventory
 import grails.gorm.PagedResultList
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
+import java.time.LocalDate
 import org.apache.commons.csv.CSVPrinter
 import org.apache.commons.lang.StringEscapeUtils
 import org.grails.datastore.mapping.query.api.Criteria
@@ -15,6 +16,7 @@ import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.Person
 import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.product.Product
 import org.hibernate.criterion.CriteriaSpecification
@@ -270,7 +272,11 @@ class CycleCountService {
 
     private CycleCountRequest updateRequest(CycleCountRequestUpdateCommand command) {
         CycleCountRequest cycleCountRequest = command.cycleCountRequest
-        cycleCountRequest.properties = command.properties as BindingResult
+        cycleCountRequest.countAssignee = command.countAssignee
+        cycleCountRequest.countDeadline = command.countDeadline
+        cycleCountRequest.recountAssignee = command.recountAssignee
+        cycleCountRequest.recountDeadline = command.recountDeadline
+
         if (!cycleCountRequest.save()) {
             throw new ValidationException("Invalid cycle count request", cycleCountRequest.errors)
         }

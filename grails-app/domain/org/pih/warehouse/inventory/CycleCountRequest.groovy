@@ -83,6 +83,10 @@ class CycleCountRequest {
                 status: status.toString(),
                 requestType: requestType.toString(),
                 blindCount: blindCount,
+                countAssignee: countAssignee,
+                countDeadline: countDeadline,
+                recountAssignee: recountAssignee,
+                recountDeadline: recountDeadline,
                 dateCreated: dateCreated,
                 lastUpdated: lastUpdated,
         ]
