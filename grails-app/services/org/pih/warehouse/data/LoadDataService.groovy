@@ -259,7 +259,7 @@ class LoadDataService {
         List<String> binLocationNames = rows.collect { it["Bin location"] }.unique() as List<String>
 
         // Get all locations and products at one DB call
-        Map<String, Location> locationMap = Location.findAllByNameInList(binLocationNames).collectEntries {
+        Map<String, Location> locationMap = Location.findAllByParentLocationAndNameInList(targetWarehouse, binLocationNames).collectEntries {
             [it.name, it]
         }
         Map<String, Product> productMap = Product.findAllByProductCodeInList(productCodes).collectEntries {
