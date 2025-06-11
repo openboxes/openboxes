@@ -129,7 +129,7 @@ const useInventoryTransactionsTab = ({
         },
       },
     }) => (
-      <div className="rt-td d-flex align-items-start">
+      <div className="rt-td pb-0 d-flex align-items-start">
         <ValueIndicator variant={valueIndicatorVariant[varianceTypeCode]} />
       </div>
     ),
@@ -156,7 +156,7 @@ const useInventoryTransactionsTab = ({
     }) => (
       <TableCell
         link={INVENTORY_ITEM_URL.showStockCard(id)}
-        className="rt-td multiline-cell"
+        className="rt-td pb-0 multiline-cell"
         customTooltip
         tooltipLabel={`${productCode} ${name}`}
       >
@@ -183,7 +183,7 @@ const useInventoryTransactionsTab = ({
         .replaceAll(' ', '_');
       return (
         <TableCell
-          className="rt-td d-flex align-items-start"
+          className="rt-td pb-0 d-flex align-items-start"
         >
           <ValueIndicator
             variant={valueIndicatorVariant.TRANSACTION}
@@ -212,7 +212,7 @@ const useInventoryTransactionsTab = ({
         },
       },
     }) => (
-      <div className="rt-td d-flex flex-column">
+      <div className="rt-td pb-0 d-flex flex-column">
         <span className="font-weight-500">{name}</span>
         <span>
           {dateWithoutTimeZone({
@@ -238,7 +238,7 @@ const useInventoryTransactionsTab = ({
     size: 145,
     cell: ({ getValue }) => (
       <TableCell
-        className="rt-td"
+        className="rt-td pb-0"
       >
         {getValue()?.toString()}
       </TableCell>
@@ -251,7 +251,7 @@ const useInventoryTransactionsTab = ({
     ),
     size: 100,
     cell: ({ getValue }) => (
-      <TableCell className="rt-td d-flex justify-content-end">
+      <TableCell className="rt-td pb-0 d-flex justify-content-end">
         {(getValue() ?? 0).toString()}
       </TableCell>
     ),
@@ -264,7 +264,7 @@ const useInventoryTransactionsTab = ({
     size: 100,
     cell: ({ getValue }) => (
       <TableCell
-        className="rt-td d-flex justify-content-end"
+        className="rt-td pb-0 d-flex justify-content-end"
       >
         {getValue()?.toString()}
       </TableCell>
@@ -292,7 +292,7 @@ const useInventoryTransactionsTab = ({
       const className = quantityVariance > 0 ? 'value-indicator--more' : 'value-indicator--less';
 
       return (
-        <TableCell className="rt-td d-flex flex-column align-items-center">
+        <TableCell className="rt-td pb-0 d-flex flex-column align-items-center">
           <ValueIndicator
             className={`pr-2 pl-1 py-1 value-indicator ${quantityVariance !== 0 && className}`}
             value={quantityVariance}
@@ -318,17 +318,20 @@ const useInventoryTransactionsTab = ({
       </TableHeaderCell>
     ),
     size: 200,
-    cell: ({ getValue }) => (
-      <TableCell
-        customTooltip
-        tooltipLabel={getValue()}
-        className="rt-td multiline-cell"
-      >
-        <div className="limit-lines-1">
-          {reasonCodes[getValue()]}
-        </div>
-      </TableCell>
-    ),
+    cell: ({ getValue }) => {
+      const rootCauses = getValue() ? getValue().split(',').map(cause => reasonCodes[cause]).join(', ') : '';
+      return (
+        <TableCell
+          customTooltip
+          tooltipLabel={rootCauses}
+          className="rt-td pb-0 multiline-cell"
+        >
+          <div className="limit-lines-2">
+            {rootCauses}
+          </div>
+        </TableCell>
+      );
+    },
   }), columnHelper.accessor(cycleCountColumn.COMMENTS, {
     header: () => (
       <TableHeaderCell>
@@ -336,17 +339,20 @@ const useInventoryTransactionsTab = ({
       </TableHeaderCell>
     ),
     size: 200,
-    cell: ({ getValue }) => (
-      <TableCell
-        customTooltip
-        tooltipLabel={getValue()}
-        className="rt-td multiline-cell"
-      >
-        <div className="limit-lines-2">
-          {getValue()}
-        </div>
-      </TableCell>
-    ),
+    cell: ({ getValue }) => {
+      const comments = getValue() ? getValue().split(/,(?=\S)/).join(', ') : '';
+      return (
+        <TableCell
+          customTooltip
+          tooltipLabel={comments}
+          className="rt-td pb-0 multiline-cell"
+        >
+          <div className="limit-lines-2">
+            {comments}
+          </div>
+        </TableCell>
+      );
+    },
   })], [currentLocale]);
 
   const emptyTableMessage = !filterParams.startDate && !filterParams.endDate

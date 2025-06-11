@@ -502,7 +502,7 @@ const useResolveStep = () => {
     resetFocus();
   };
 
-  const getPayload = (cycleCountItem, cycleCount) => ({
+  const getPayload = (cycleCountItem, cycleCount, shouldSetDefaultAssignee) => ({
     quantityCounted: cycleCountItem?.quantityRecounted,
     countIndex: 1,
     inventoryItem: {
@@ -520,11 +520,17 @@ const useResolveStep = () => {
     id: cycleCountItem?.id,
     facility: cycleCountItem?.facility,
     discrepancyReasonCode: cycleCountItem?.rootCause?.id,
-    assignee: getRecountedBy(cycleCount.id)?.id ?? currentUser.id,
+    assignee: shouldSetDefaultAssignee
+      ? getRecountedBy(cycleCount.id)?.id ?? currentUser.id
+      : getRecountedBy(cycleCount.id)?.id,
     recount: true,
   });
 
-  const save = async (shouldRefetch = true, shouldValidateExistence = true) => {
+  const save = async ({
+    shouldRefetch = true,
+    shouldValidateExistence = true,
+    shouldSetDefaultAssignee = false,
+  }) => {
     try {
       show();
       if (shouldValidateExistence) {
@@ -536,10 +542,11 @@ const useResolveStep = () => {
       resetValidationState();
       for (const cycleCount of tableData.current) {
         const cycleCountItemsToUpdate = cycleCount.cycleCountItems
-          .filter((item) => (item.updated && !item.id.includes('newRow')))
+          .filter((item) => ((item.updated || !item.assignee) && !item.id.includes('newRow')))
           .map(trimLotNumberSpaces);
         const updatePayload = {
-          itemsToUpdate: cycleCountItemsToUpdate.map((item) => getPayload(item, cycleCount)),
+          itemsToUpdate: cycleCountItemsToUpdate.map((item) =>
+            getPayload(item, cycleCount, shouldSetDefaultAssignee)),
         };
         if (updatePayload.itemsToUpdate.length > 0) {
           await cycleCountApi
@@ -549,7 +556,8 @@ const useResolveStep = () => {
           .filter((item) => item.id.includes('newRow'))
           .map(trimLotNumberSpaces);
         const createPayload = {
-          itemsToCreate: cycleCountItemsToCreate.map((item) => getPayload(item, cycleCount)),
+          itemsToCreate: cycleCountItemsToCreate.map((item) =>
+            getPayload(item, cycleCount, shouldSetDefaultAssignee)),
         };
         if (createPayload.itemsToCreate.length > 0) {
           await cycleCountApi
@@ -597,7 +605,7 @@ const useResolveStep = () => {
       return;
     }
 
-    await save();
+    await save({ shouldSetDefaultAssignee: true });
     setIsStepEditable(false);
   };
 
@@ -608,7 +616,7 @@ const useResolveStep = () => {
       if (!isValid) {
         return;
       }
-      await save(false);
+      await save({ shouldRefetch: false });
       for (const cycleCountId of cycleCountIdsForOutdatedProducts) {
         await cycleCountApi.refreshItems(currentLocation?.id, cycleCountId, true, 1);
       }
@@ -682,7 +690,10 @@ const useResolveStep = () => {
       if (!isValid) {
         return;
       }
-      await save(true, false);
+      await save({
+        shouldRefetch: true,
+        shouldValidateExistence: false,
+      });
       for (const cycleCount of tableData.current) {
         try {
           await cycleCountApi.submitRecount({

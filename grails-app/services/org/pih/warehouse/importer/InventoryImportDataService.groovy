@@ -185,24 +185,54 @@ class InventoryImportDataService implements ImportDataService {
         Transaction transaction = new Transaction()
 
         for (entry in inventoryImportData.rows) {
-            String key = entry.key
-            InventoryImportDataRow row = entry.value
+            List<InventoryImportDataRow> rowsForKey = entry.value
 
             // If we have no product availability record for the item, we assume that means we have no quantity.
-            int quantityOnHand = availableItems.get(key)?.quantityOnHand ?: 0
+            int quantityOnHandToUse = availableItems.get(entry.key)?.quantityOnHand ?: 0
 
-            int adjustmentQuantity = row.quantity - quantityOnHand
-            if (adjustmentQuantity == 0) {
+            for (InventoryImportDataRow row in rowsForKey) {
+                int adjustmentQuantity = row.quantity - quantityOnHandToUse
+
+                // Update QoH so that we don't double count it while computing adjustmentQuantity when we have multiple
+                // rows with the same key (which results in rowsForKey having more than one entry). For example, if a
+                // [product + bin + lot] has a QoH of 5, the following rows should create the following adjustments:
+                // - row with the same [product + bin + lot] and quantity == 6  -> should cause a +1 adjustment
+                // - row with the same [product + bin + lot] and quantity == 10 -> should cause a +10 adjustment
+                quantityOnHandToUse = Math.max(quantityOnHandToUse - row.quantity, 0)
+
+                if (adjustmentQuantity == 0) {
+                    continue
+                }
+
+                TransactionEntry transactionEntry = new TransactionEntry(
+                        transaction: transaction,
+                        quantity: adjustmentQuantity,
+                        product: row.product,
+                        binLocation: row.binLocation,
+                        inventoryItem: row.inventoryItem,
+                        comments: row.comments,
+                )
+                transaction.addToTransactionEntries(transactionEntry)
+            }
+        }
+
+        // For all products in the import, any other bins/lots of those products that exist in the system (ie have
+        // a product availability entry) but were not in the import should have their quantity set to zero.
+        Set<String> keysInImport = inventoryImportData.rows.keySet()
+        for (entry in availableItems) {
+            AvailableItem availableItem = entry.value
+
+            if (keysInImport.contains(entry.key)) {
                 continue
             }
 
             TransactionEntry transactionEntry = new TransactionEntry(
                     transaction: transaction,
-                    quantity: adjustmentQuantity,
-                    product: row.product,
-                    binLocation: row.binLocation,
-                    inventoryItem: row.inventoryItem,
-                    comments: row.comments,
+                    quantity: -availableItem.quantityOnHand,
+                    product: availableItem.inventoryItem.product,
+                    binLocation: availableItem.binLocation,
+                    inventoryItem: availableItem.inventoryItem,
+                    comments: 'Item was not in inventory import file so quantity was assumed to be zero.',
             )
             transaction.addToTransactionEntries(transactionEntry)
         }
@@ -285,27 +315,39 @@ class InventoryImportDataService implements ImportDataService {
      * Convenience POJO for holding the results of the inventory import.
      */
     private class InventoryImportData {
-        Map<String, InventoryImportDataRow> rows = [:]
+
+        /**
+         * Map the imported rows by [product code + bin location name + lot number]. We store the rows as a list
+         * because there can be duplicates. (This is a valid scenario. It's an easy way for users to merge products.)
+         */
+        Map<String, List<InventoryImportDataRow>> rows = [:]
         Set<Product> products = []
 
         void put(Location binLocation, InventoryItem inventoryItem, def rowRaw) {
             products.add(inventoryItem.product)
 
             String key = ProductAvailabilityService.constructAvailableItemKey(binLocation, inventoryItem)
-            rows.put(key, new InventoryImportDataRow(
+            rows.computeIfAbsent(key, { k -> [] }).add(new InventoryImportDataRow(
                     binLocation,
                     inventoryItem,
                     rowRaw.quantity.toInteger() as Integer,
                     rowRaw.comments as String))
         }
 
-        InventoryImportDataRow get(Location binLocation, InventoryItem inventoryItem) {
+        List<InventoryImportDataRow> get(Location binLocation, InventoryItem inventoryItem) {
             String key = ProductAvailabilityService.constructAvailableItemKey(binLocation, inventoryItem)
             return rows.get(key)
         }
 
         List<InventoryItem> getInventoryItems() {
-            return rows.values().inventoryItem
+            List<InventoryItem> items = []
+            for (List<InventoryImportDataRow> rowsWithSameKey : rows.values()) {
+                if (rowsWithSameKey) {
+                    // Rows with the same key have the same inventory item so only add it to the list once.
+                    items.add(rowsWithSameKey[0].inventoryItem)
+                }
+            }
+            return items
         }
     }
 

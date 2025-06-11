@@ -17,6 +17,7 @@ const Checkbox = ({
   name,
   noWrapper,
   indeterminate,
+  className,
   ...fieldProps
 }) => {
   const checkbox = (
@@ -25,7 +26,7 @@ const Checkbox = ({
       name={name}
       type="checkbox"
       disabled={disabled}
-      className={`checkbox-v2 ${errorMessage ? 'has-errors' : ''}`}
+      className={`checkbox-v2 ${errorMessage ? 'has-errors' : ''} ${className}`}
       {...fieldProps}
       checked={fieldProps.value}
       ref={(checkboxRef) => {
@@ -89,6 +90,7 @@ Checkbox.propTypes = {
   // it is needed to remove additional padding
   noWrapper: PropTypes.bool,
   indeterminate: PropTypes.bool,
+  className: PropTypes.string,
 };
 
 Checkbox.defaultProps = {
@@ -102,4 +104,5 @@ Checkbox.defaultProps = {
   labelPosition: 'right',
   noWrapper: false,
   indeterminate: false,
+  className: '',
 };

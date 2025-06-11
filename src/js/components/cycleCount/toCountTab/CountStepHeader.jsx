@@ -8,6 +8,7 @@ import ButtonFileSelect from 'components/form-elements/v2/ButtonFileSelect';
 import { CYCLE_COUNT } from 'consts/applicationUrls';
 import { TO_COUNT_TAB } from 'consts/cycleCount';
 import FileFormat from 'consts/fileFormat';
+import AlertMessage from 'utils/AlertMessage';
 import RedirectButton from 'utils/RedirectButton';
 import Translate from 'utils/Translate';
 
@@ -19,6 +20,7 @@ const CountStepHeader = ({
   isFormDisabled,
   sortByProductName,
   setSortByProductName,
+  importErrors,
 }) => (
   <div>
     <div className="d-flex justify-content-sm-between align-items-end">
@@ -60,12 +62,13 @@ const CountStepHeader = ({
           allowedExtensions={[FileFormat.XLS]}
           disabled={isFormDisabled}
           variant="primary-outline"
+          className="no-transition"
         />
         <Button
           onClick={() => setSortByProductName((prev) => !prev)}
           label="react.cycleCount.sortAlphabetically.label"
           defaultLabel="Sort alphabetically"
-          variant={sortByProductName ? 'primary-outline' : 'secondary'}
+          variant={sortByProductName ? 'secondary' : 'primary-outline'}
           disabled={isFormDisabled}
         />
         <Button
@@ -85,6 +88,7 @@ const CountStepHeader = ({
         />
       </div>
     </div>
+    <AlertMessage show={importErrors.length > 0} message={importErrors} danger />
   </div>
 );
 
@@ -98,4 +102,5 @@ CountStepHeader.propTypes = {
   importItems: PropTypes.func.isRequired,
   sortByProductName: PropTypes.bool.isRequired,
   setSortByProductName: PropTypes.func.isRequired,
+  importErrors: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
 };

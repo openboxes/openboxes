@@ -60,7 +60,7 @@ const ResolveStepHeader = ({
           onClick={() => setSortByProductName((prev) => !prev)}
           label="react.cycleCount.sortAlphabetically.label"
           defaultLabel="Sort alphabetically"
-          variant={sortByProductName ? 'primary-outline' : 'secondary'}
+          variant={sortByProductName ? 'secondary' : 'primary-outline'}
           disabled={isFormDisabled}
         />
         <CustomTooltip

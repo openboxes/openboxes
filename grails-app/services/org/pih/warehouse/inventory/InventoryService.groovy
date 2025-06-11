@@ -2696,7 +2696,7 @@ class InventoryService implements ApplicationContextAware {
      *         ordered by transaction date to make it easy to iterate through them chronologically.
      */
     List<TransactionEntry> getTransactionEntriesBeforeDate(Location facility, Collection<Product> products, Date date) {
-        if (!date || !products) {
+        if (!date) {
             return []
         }
 

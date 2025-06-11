@@ -16,6 +16,7 @@ import { CYCLE_COUNT, INVENTORY_ITEM_URL } from 'consts/applicationUrls';
 import CycleCountCandidateStatus from 'consts/cycleCountCandidateStatus';
 import cycleCountColumn from 'consts/cycleCountColumn';
 import MimeType from 'consts/mimeType';
+import useCycleCountProductAvailability from 'hooks/cycleCount/useCycleCountProductAvailability';
 import useQueryParams from 'hooks/useQueryParams';
 import useSpinner from 'hooks/useSpinner';
 import useTableCheckboxes from 'hooks/useTableCheckboxes';
@@ -128,7 +129,21 @@ const useToResolveTab = ({
     serializedParams,
   });
 
-  const getCycleCountRequestsIds = () => tableData.data.map((row) => row.cycleCountRequest.id);
+  const extendedDataTable = useMemo(() => {
+    if (!tableData.data) {
+      return tableData;
+    }
+    return {
+      ...tableData,
+      data: tableData.data.map((row) => ({
+        ...row,
+        meta: useCycleCountProductAvailability(row),
+      })),
+    };
+  }, [tableData]);
+
+  const getCycleCountRequestsIds = () =>
+    extendedDataTable.data.map((row) => row.cycleCountRequest.id);
 
   const checkboxesColumn = columnHelper.accessor(cycleCountColumn.SELECTED, {
     header: () => (
@@ -164,10 +179,10 @@ const useToResolveTab = ({
           {translate('react.cycleCount.table.status.label', 'Status')}
         </TableHeaderCell>
       ),
-      cell: ({ getValue }) => (
+      cell: ({ getValue, row }) => (
         <TableCell className="rt-td">
           <StatusIndicator
-            variant="primary"
+            variant={row.original.meta.isRowDisabled ? 'gray' : 'primary'}
             status={translate(`react.cycleCount.CycleCountCandidateStatus.${getValue()}.label`, 'To resolve')}
           />
         </TableCell>
@@ -263,9 +278,9 @@ const useToResolveTab = ({
           {translate('react.cycleCount.table.tag.label', 'Tag')}
         </TableHeaderCell>
       ),
-      cell: ({ getValue }) => (
+      cell: ({ getValue, row }) => (
         <TableCell className="rt-td multiline-cell">
-          <div className="badge-container">
+          <div className={`badge-container ${row.original.meta.isRowDisabled && 'disabled'}`}>
             {getValue()}
           </div>
         </TableCell>
@@ -282,9 +297,9 @@ const useToResolveTab = ({
           {translate('react.cycleCount.table.productCatalogue.label', 'Product Catalogue')}
         </TableHeaderCell>
       ),
-      cell: ({ getValue }) => (
+      cell: ({ getValue, row }) => (
         <TableCell className="rt-td multiline-cell">
-          <div className="badge-container">
+          <div className={`badge-container ${row.original.meta.isRowDisabled && 'disabled'}`}>
             {getValue()}
           </div>
         </TableCell>
@@ -431,7 +446,7 @@ const useToResolveTab = ({
   });
 
   return {
-    tableData,
+    tableData: extendedDataTable,
     loading,
     columns: [checkboxesColumn, ...columns],
     emptyTableMessage,

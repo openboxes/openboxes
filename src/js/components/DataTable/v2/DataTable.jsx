@@ -24,7 +24,6 @@ const DataTable = ({
   defaultColumn,
   meta,
   tableWithPinnedColumns,
-  showDisabledProducts,
 }) => {
   const {
     defaultEmptyTableMessage,
@@ -63,8 +62,6 @@ const DataTable = ({
             dataLength={data?.length}
             tableWithPinnedColumns={tableWithPinnedColumns}
             isScreenWiderThanTable={isScreenWiderThanTable}
-            data={data}
-            showDisabledProducts={showDisabledProducts}
           />
         </div>
         {shouldDisplayPagination && (
@@ -99,11 +96,10 @@ DataTable.propTypes = {
     defaultMessage: PropTypes.string.isRequired,
   }),
   totalCount: PropTypes.number,
-  filterParams: PropTypes.shape({}).isRequired,
+  filterParams: PropTypes.shape({}),
   disablePagination: PropTypes.bool,
   paginationProps: PropTypes.shape({}),
   tableWithPinnedColumns: PropTypes.bool,
-  showDisabledProducts: PropTypes.bool,
 };
 
 DataTable.defaultProps = {
@@ -112,8 +108,8 @@ DataTable.defaultProps = {
   loadingMessage: null,
   emptyTableMessage: null,
   paginationProps: {},
+  filterParams: {},
   disablePagination: false,
   totalCount: 0,
   tableWithPinnedColumns: false,
-  showDisabledProducts: false,
 };

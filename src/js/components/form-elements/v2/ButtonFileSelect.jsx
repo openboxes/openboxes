@@ -15,6 +15,7 @@ const ButtonFileSelect = ({
   defaultLabel,
   variant,
   disabled,
+  className,
 }) => {
   const translate = useTranslate();
 
@@ -44,7 +45,7 @@ const ButtonFileSelect = ({
   return (
     <label
       htmlFor="csvInput"
-      className={`btn ${variant}-button ${disabled ? `${variant}-disabled` : ''} align-self-end btn-xs`}
+      className={`${className} btn ${variant}-button ${disabled ? `${variant}-disabled` : ''} align-self-end btn-xs`}
     >
       <span>
         <i className="fa fa-download pr-2" />
@@ -88,6 +89,7 @@ ButtonFileSelect.propTypes = {
     'grayed',
   ]),
   disabled: PropTypes.bool,
+  className: PropTypes.string,
 };
 
 ButtonFileSelect.defaultProps = {
@@ -95,4 +97,5 @@ ButtonFileSelect.defaultProps = {
   defaultLabel: 'Import File',
   variant: 'primary',
   disabled: false,
+  className: '',
 };

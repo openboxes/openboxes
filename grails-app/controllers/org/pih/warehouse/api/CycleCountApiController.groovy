@@ -15,6 +15,7 @@ import org.pih.warehouse.importer.PackingListExcelImporter
 import org.pih.warehouse.inventory.CycleCountCandidate
 import org.pih.warehouse.inventory.CycleCountCandidateFilterCommand
 import org.pih.warehouse.inventory.CycleCountDto
+import org.pih.warehouse.inventory.CycleCountImportService
 import org.pih.warehouse.inventory.CycleCountItemBatchCommand
 import org.pih.warehouse.inventory.CycleCountItemCommand
 import org.pih.warehouse.inventory.CycleCountItemDto
@@ -38,6 +39,7 @@ class CycleCountApiController {
     CycleCountService cycleCountService
     DocumentService documentService
     UploadService uploadService
+    CycleCountImportService cycleCountImportService
 
     def getCandidates(CycleCountCandidateFilterCommand filterParams) {
         List<CycleCountCandidate> cycleCounts = cycleCountService.getCandidates(filterParams, params.facilityId)
@@ -234,8 +236,12 @@ class CycleCountApiController {
         File localFile = uploadService.createLocalFile(importFile.originalFilename)
         importFile.transferTo(localFile)
         DataImporter cycleCountItemsExcelImporter = new CycleCountItemsExcelImporter(localFile.absolutePath)
-
-        render([data: cycleCountItemsExcelImporter.data] as JSON)
+        // After importer takes care of parsing the data, assign it to the import data command that is further validated
+        command.data = cycleCountItemsExcelImporter.data
+        cycleCountItemsExcelImporter.validateData(command)
+        // Collect the errors after validating the data to readable state
+        List<String> errors = cycleCountImportService.buildErrors(command)
+        render([data: command.data, errors: errors] as JSON)
     }
 
     def getCycleCountDetails(CycleCountReportCommand command) {

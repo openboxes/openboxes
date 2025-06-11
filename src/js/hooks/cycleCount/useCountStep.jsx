@@ -56,6 +56,7 @@ const useCountStep = () => {
   const [refreshFocusCounter, setRefreshFocusCounter] = useState(0);
   const [isSaveDisabled, setIsSaveDisabled] = useState(false);
   const [sortByProductName, setSortByProductName] = useState(false);
+  const [importErrors, setImportErrors] = useState([]);
 
   const dispatch = useDispatch();
   const history = useHistory();
@@ -308,10 +309,12 @@ const useCountStep = () => {
 
   const getCountedDate = (cycleCountId) => dateCounted[cycleCountId];
 
-  const getPayload = (cycleCountItem, cycleCount) => ({
+  const getPayload = (cycleCountItem, cycleCount, shouldSetDefaultAssignee) => ({
     ...cycleCountItem,
     recount: false,
-    assignee: getCountedBy(cycleCount.id)?.id ?? currentUser.id,
+    assignee: shouldSetDefaultAssignee
+      ? getCountedBy(cycleCount.id)?.id ?? currentUser.id
+      : getCountedBy(cycleCount.id)?.id,
     dateCounted: getCountedDate(cycleCount.id),
     inventoryItem: {
       ...cycleCountItem?.inventoryItem,
@@ -323,16 +326,17 @@ const useCountStep = () => {
     },
   });
 
-  const save = async () => {
+  const save = async (shouldSetDefaultAssignee = false) => {
     try {
       show();
       resetValidationState();
       for (const cycleCount of tableData.current) {
         const cycleCountItemsToUpdate = cycleCount.cycleCountItems
-          .filter((item) => (item.updated && !item.id.includes('newRow')))
+          .filter((item) => ((item.updated || !item.assignee) && !item.id.includes('newRow')))
           .map(trimLotNumberSpaces);
         const updatePayload = {
-          itemsToUpdate: cycleCountItemsToUpdate.map((item) => getPayload(item, cycleCount)),
+          itemsToUpdate: cycleCountItemsToUpdate.map((item) =>
+            getPayload(item, cycleCount, shouldSetDefaultAssignee)),
         };
         if (updatePayload.itemsToUpdate.length > 0) {
           await cycleCountApi
@@ -342,7 +346,8 @@ const useCountStep = () => {
           .filter((item) => item.id.includes('newRow'))
           .map(trimLotNumberSpaces);
         const createPayload = {
-          itemsToCreate: cycleCountItemsToCreate.map((item) => getPayload(item, cycleCount)),
+          itemsToCreate: cycleCountItemsToCreate.map((item) =>
+            getPayload(item, cycleCount, shouldSetDefaultAssignee)),
         };
         if (createPayload.itemsToCreate.length > 0) {
           await cycleCountApi
@@ -378,7 +383,7 @@ const useCountStep = () => {
     const isValid = triggerValidation();
     forceRerender();
     if (isValid) {
-      await save();
+      await save(true);
       setIsStepEditable(false);
     }
     resetFocus();
@@ -578,6 +583,10 @@ const useCountStep = () => {
         id: item.product.id,
         productCode: item.product.productCode,
       },
+      binLocation: item.binLocation?.id ? {
+        id: item.binLocation.id,
+        name: item.binLocation.name,
+      } : null,
     }))
     : []);
 
@@ -589,17 +598,8 @@ const useCountStep = () => {
 
   const mergeImportItems = (originalItem, importedItem) => ({
     ...originalItem,
-    ...importedItem,
-    inventoryItem: {
-      product: {
-        id: importedItem?.product?.id || originalItem?.inventoryItem?.product?.id,
-        name: importedItem?.product?.name || originalItem?.inventoryItem?.product?.name,
-        productCode: importedItem?.product?.productCode
-            || originalItem?.inventoryItem?.product?.productCode,
-      },
-      lotNumber: importedItem?.lotNumber || originalItem?.inventoryItem?.lotNumber,
-      expirationDate: importedItem?.expirationDate || originalItem?.inventoryItem?.expirationDate,
-    },
+    quantityCounted: importedItem ? importedItem.quantityCounted : originalItem.quantityCounted,
+    comment: importedItem ? importedItem.comment : originalItem.comment,
     updated: true,
   });
 
@@ -610,7 +610,7 @@ const useCountStep = () => {
         importFile[0],
         currentLocation?.id,
       );
-      console.log(response);
+      setImportErrors(response.data.errors);
       let cycleCounts = _.groupBy(response.data.data, 'cycleCountId');
       tableData.current = tableData.current.map((cycleCount) => ({
         ...cycleCount,
@@ -638,6 +638,9 @@ const useCountStep = () => {
         ],
       }));
     } finally {
+      // After import we want to trigger the validation on fields,
+      // so that a user knows what fields to correct from the UI
+      triggerValidation();
       hide();
     }
   };
@@ -668,6 +671,7 @@ const useCountStep = () => {
     importItems,
     sortByProductName,
     setSortByProductName,
+    importErrors,
   };
 };
 
