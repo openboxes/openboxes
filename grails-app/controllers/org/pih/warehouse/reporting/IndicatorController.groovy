@@ -8,8 +8,14 @@
  * You must not remove this notice, or any other, from this software.
  * */
 package org.pih.warehouse.reporting
+import grails.converters.JSON
+import grails.validation.Validateable
+import org.pih.warehouse.core.Location
+import org.pih.warehouse.report.ReportService
 
 class IndicatorController {
+
+    ReportService reportService
 
     static scaffold = Indicator
 
@@ -26,7 +32,37 @@ class IndicatorController {
         // String code, boolean captureStdout, request
         render consoleService.eval(code, true, request)
     }
+
+    def getTotalCount(IndicatorCommand command) {
+        def data = reportService.getTotalCount(command)
+        render([data: data] as JSON)
+    }
+
+    def getItemsCounted(IndicatorCommand command) {
+        def data = reportService.getItemsCounted(command)
+        render([data: data] as JSON)
+    }
+
+    def getTargetProgress(IndicatorCommand command) {
+        def data = reportService.getTargetProgress(command)
+        render([data: data] as JSON)
+    }
+
+    def getNotFinishedItems(IndicatorCommand command) {
+        def data = reportService.getNotFinishedItems(command)
+        render([data: data] as JSON)
+    }
 }
 
+class IndicatorCommand implements Validateable {
+    Location facility
+    Date startDate
+    Date endDate
 
+    static constraints = {
+        facility(nullable: false)
+        startDate(nullable: false)
+        endDate(nullable: false)
+    }
+}
 

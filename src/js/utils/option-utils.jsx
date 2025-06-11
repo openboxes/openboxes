@@ -311,6 +311,26 @@ export const fetchOrganization = async (id) => {
   return data.data;
 };
 
+export const fetchIndicatorTotalCount = async (params = {}) => {
+  const { data } = await apiClient.get('/api/reports/indicators/totalCount', { params });
+  return data.data;
+};
+
+export const fetchIndicatorItemsCounted = async (params = {}) => {
+  const { data } = await apiClient.get('/api/reports/indicators/itemsCounted', { params });
+  return data.data;
+};
+
+export const fetchIndicatorTargetProgress = async (params = {}) => {
+  const { data } = await apiClient.get('/api/reports/indicators/targetProgress', { params });
+  return data.data;
+};
+
+export const fetchIndicatorNotFinishedItems = async (params = {}) => {
+  const { data } = await apiClient.get('/api/reports/indicators/notFinishedItems', { params });
+  return data.data;
+};
+
 const mapShipmentType = (shipmentType) => {
   // Enum keys can be e.g. AIR, LAND, SEA etc.
   const enumKey = splitTranslation(shipmentType?.name, null)?.toUpperCase();

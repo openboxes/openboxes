@@ -10,6 +10,7 @@ import { Tooltip } from 'react-tippy';
 import DragHandle from 'components/dashboard/DragHandle';
 import { getColorByName } from 'consts/dataFormat/colorMapping';
 import { translateWithDefaultMessage } from 'utils/Translate';
+import CustomTooltip from 'wrappers/CustomTooltip';
 
 import 'components/dashboard/Dashboard.scss';
 
@@ -101,16 +102,22 @@ const NumberSparklineCard = ({
 
 const NumberCard = SortableElement(({
   cardTitle,
+  cardTitleDefaultValue,
   cardNumber,
   cardNumberType,
   cardSubtitle,
+  cardSubtitleDefaultValue,
+  cardSubtitleValue,
   cardLink,
   cardDataTooltip,
   cardInfo,
+  cardInfoDefaultValue,
   sparklineData = null,
   translate,
   currencyCode,
   hideDraghandle,
+  showPercentSign,
+  infoIcon,
 }) => {
   let isSparkline = false;
   if (sparklineData != null) {
@@ -135,32 +142,30 @@ const NumberCard = SortableElement(({
       <div className="number-div">
         <div className="number-body">
           <span className="title-card">
-            {translate(cardTitle, cardTitle)}
+            {translate(cardTitle, cardTitleDefaultValue || cardTitle)}
           </span>
           <span className="result-card">
             {' '}
-            {cardNumberType === 'number' ? cardNumberLocale : `${cardNumberLocale} ${currencyCode}`}
+            {cardNumberType === 'number' ? `${cardNumberLocale}${showPercentSign ? '%' : ''}` : `${cardNumberLocale} ${currencyCode}`}
             {' '}
           </span>
           <span className="subtitle-card text-overflow-ellipsis text-nowrap">
-            {translate(cardSubtitle, cardSubtitle)}
+            {cardSubtitleValue}
+            {' '}
+            {translate(cardSubtitle, cardSubtitleDefaultValue || cardSubtitle)}
           </span>
         </div>
         {
           cardInfo
             ? (
               <div className="number-infos">
-                <Tooltip
-                  html={(
-                    <p>
-                      {translate(cardInfo, cardInfo)}
-                    </p>
-                )}
+                <CustomTooltip
+                  content={translate(cardInfo, cardInfoDefaultValue || cardInfo)}
                   theme="transparent"
                   arrow="true"
                 >
-                  <i className="fa fa-info-circle" />
-                </Tooltip>
+                  {infoIcon || <i className="fa fa-info-circle" />}
+                </CustomTooltip>
               </div>
             )
             : null
@@ -194,19 +199,34 @@ const mapStateToProps = (state) => ({
 export default (connect(mapStateToProps)(NumberCard));
 
 NumberCard.defaultProps = {
+  cardTitleDefaultValue: '',
   cardSubtitle: '',
+  cardSubtitleDefaultValue: '',
+  cardSubtitleValue: '',
+  cardLink: '',
+  cardDataTooltip: '',
+  cardInfoDefaultValue: '',
+  sparklineData: null,
+  showPercentSign: false,
+  infoIcon: null,
 };
 
 NumberCard.propTypes = {
   cardTitle: PropTypes.string.isRequired,
+  cardTitleDefaultValue: PropTypes.string,
   cardNumber: PropTypes.number,
   cardNumberType: PropTypes.string,
   cardSubtitle: PropTypes.string,
+  cardSubtitleDefaultValue: PropTypes.string,
+  cardSubtitleValue: PropTypes.string,
   cardLink: PropTypes.string,
   cardDataTooltip: PropTypes.string,
   cardInfo: PropTypes.string.isRequired,
+  cardInfoDefaultValue: PropTypes.string,
   translate: PropTypes.func.isRequired,
   currencyCode: PropTypes.string.isRequired,
+  showPercentSign: PropTypes.bool,
+  infoIcon: PropTypes.node,
 };
 
 NumberSparklineCard.propTypes = {

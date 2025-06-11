@@ -35,6 +35,7 @@ import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.reporting.DateDimension
 import org.pih.warehouse.LocalizationUtil
+import org.pih.warehouse.reporting.IndicatorCommand
 import org.pih.warehouse.reporting.GetInventoryAuditReportCommand
 import org.springframework.context.ApplicationContext
 import org.springframework.context.ApplicationContextAware
@@ -1132,5 +1133,34 @@ class ReportService implements ApplicationContextAware {
         }
 
         return new PaginatedList<InventoryAuditSummary>(data, results.totalCount);
+    }
+
+    def getTotalCount(IndicatorCommand command) {
+        return [
+                type: 'totalCount',
+                number: 1500
+        ]
+    }
+
+    def getItemsCounted(IndicatorCommand command) {
+        return [
+                type: 'itemsCounted',
+                number: 1200
+        ]
+    }
+
+    def getTargetProgress(IndicatorCommand command) {
+        return [
+                type: 'targetProgress',
+                number: 42,
+                subtitleValue: '1281/26182'
+        ]
+    }
+
+    def getNotFinishedItems(IndicatorCommand command) {
+        return [
+                type: 'notFinishedItems',
+                number: 300
+        ]
     }
 }

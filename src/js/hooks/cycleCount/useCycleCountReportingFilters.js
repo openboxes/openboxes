@@ -19,11 +19,9 @@ const useCycleCountReportingFilters = ({ filterFields }) => {
   const [filtersInitialized, setFiltersInitialized] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [shouldFetch, setShouldFetch] = useState(false);
-
   const dispatch = useDispatch();
   const history = useHistory();
   const { tab } = useQueryParams();
-
   const clearFilterValues = () => {
     const queryProps = queryString.parse(history.location.search);
     const defaultValues = Object.keys(filterFields).reduce(
@@ -37,6 +35,7 @@ const useCycleCountReportingFilters = ({ filterFields }) => {
     const { pathname } = history.location;
     history.push({ pathname, search: queryFilterParams });
     setShouldFetch(false);
+    setFiltersInitialized(false);
     setFilterParams(queryFilterParams);
   };
 
@@ -54,18 +53,19 @@ const useCycleCountReportingFilters = ({ filterFields }) => {
         { tab: queryProps.tab },
       );
 
-      if (queryProps.startDate || tab === INDICATORS_TAB) {
+      if (queryProps.startDate || (tab === INDICATORS_TAB && !filtersInitialized)) {
         // If tab === INDICATORS_TAB and queryProps.startDate is not provided,
         // we want to use data from the last 3 months as the default.
         defaultValues.startDate = queryProps.startDate || moment()
           .subtract(3, 'months').format(DateFormat.DD_MMM_YYYY);
       }
-      if (queryProps.endDate || tab === INDICATORS_TAB) {
+      if (queryProps.endDate || (tab === INDICATORS_TAB && !filtersInitialized)) {
         // If tab === INDICATORS_TAB and queryProps.endDate is not provided,
         // we want to use the current day as the default.
         defaultValues.endDate = queryProps.endDate
           || moment().format(DateFormat.DD_MMM_YYYY);
       }
+
       if (queryProps.products) {
         const productIds = Array.isArray(queryProps.products)
           ? queryProps.products
@@ -83,6 +83,7 @@ const useCycleCountReportingFilters = ({ filterFields }) => {
       }
 
       setDefaultFilterValues(defaultValues);
+      setFilterParams(defaultValues);
       setFiltersInitialized(true);
     } finally {
       setIsLoading(false);
