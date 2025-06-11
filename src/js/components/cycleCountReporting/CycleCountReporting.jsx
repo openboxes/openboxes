@@ -61,6 +61,20 @@ const CycleCountReporting = () => {
 
   const { tab } = useQueryParams();
 
+  // Each tab has different filters, that's why we need this function
+  const getFilterFields = () => {
+    switch (tab) {
+      case PRODUCTS_TAB:
+        return cycleCountReportingFilterFields.products;
+      case INVENTORY_TRANSACTIONS_TAB:
+        return cycleCountReportingFilterFields.inventoryTransactions;
+      case INDICATORS_TAB:
+        return cycleCountReportingFilterFields.indicators;
+      default:
+        return cycleCountReportingFilterFields.products;
+    }
+  };
+
   return (
     <PageWrapper>
       <CycleCountReportingHeader />
@@ -69,9 +83,7 @@ const CycleCountReporting = () => {
         <CycleCountReportingFilters
           defaultValues={defaultFilterValues}
           setFilterParams={setFilterValues}
-          filterFields={tab === INDICATORS_TAB
-            ? cycleCountReportingFilterFields.indicators
-            : cycleCountReportingFilterFields.default}
+          filterFields={getFilterFields()}
           isLoading={isLoading}
           setShouldFetch={setShouldFetch}
           tablePaginationProps={tablePaginationProps}
