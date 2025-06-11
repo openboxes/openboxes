@@ -82,11 +82,16 @@ class CycleCountRequest {
                 product: product,
                 status: status.toString(),
                 requestType: requestType.toString(),
+                initialCount: [
+                        deadline: countDeadline,
+                        assignee: countAssignee
+                ],
+                verificationCount: [
+                        deadline: recountDeadline,
+                        assignee: recountAssignee
+                ],
+                inventoryItemsCount: cycleCount?.cycleCountItems?.size(),
                 blindCount: blindCount,
-                countAssignee: countAssignee,
-                countDeadline: countDeadline,
-                recountAssignee: recountAssignee,
-                recountDeadline: recountDeadline,
                 dateCreated: dateCreated,
                 lastUpdated: lastUpdated,
         ]
