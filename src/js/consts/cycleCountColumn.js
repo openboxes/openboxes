@@ -31,7 +31,11 @@ const columns = {
   COMMENTS: 'verificationCount.varianceComment',
   ASSIGNEE: 'assignee',
   DEADLINE: 'deadline',
-  INVENTORY_ITEMS: 'inventoryItems',
+  INVENTORY_ITEMS: 'cycleCountRequest.inventoryItemsCount',
+  INITIAL_COUNT_ASSIGNEE: 'cycleCountRequest.initialCount.assignee',
+  INITIAL_COUNT_DEADLINE: 'cycleCountRequest.initialCount.deadline',
+  VERIFICATION_COUNT_ASSIGNEE: 'cycleCountRequest.verificationCount.assignee',
+  VERIFICATION_COUNT_DEADLINE: 'cycleCountRequest.verificationCount.deadline',
 };
 
 export default columns;

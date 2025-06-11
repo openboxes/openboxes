@@ -5,6 +5,13 @@ import fileDownload from 'js-file-download';
 import _ from 'lodash';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
+import {
+  getCurrentLocale,
+  getCurrentLocation,
+  getCycleCountMaxSelectedProducts,
+  getCycleCountTranslations,
+  getFormatLocalizedDate,
+} from 'selectors';
 
 import { startResolution } from 'actions';
 import cycleCountApi from 'api/services/CycleCountApi';
@@ -16,6 +23,7 @@ import { CYCLE_COUNT, INVENTORY_ITEM_URL } from 'consts/applicationUrls';
 import CycleCountCandidateStatus from 'consts/cycleCountCandidateStatus';
 import cycleCountColumn from 'consts/cycleCountColumn';
 import MimeType from 'consts/mimeType';
+import { DateFormat } from 'consts/timeFormat';
 import useCycleCountProductAvailability from 'hooks/cycleCount/useCycleCountProductAvailability';
 import useQueryParams from 'hooks/useQueryParams';
 import useSpinner from 'hooks/useSpinner';
@@ -47,11 +55,13 @@ const useToResolveTab = ({
     currentLocation,
     cycleCountMaxSelectedProducts,
     translationsFetched,
+    formatLocalizedDate,
   } = useSelector((state) => ({
-    currentLocale: state.session.activeLanguage,
-    currentLocation: state.session.currentLocation,
-    cycleCountMaxSelectedProducts: state.session.cycleCountMaxSelectedProducts,
-    translationsFetched: state.session.fetchedTranslations.cycleCount,
+    currentLocale: getCurrentLocale(state),
+    currentLocation: getCurrentLocation(state),
+    cycleCountMaxSelectedProducts: getCycleCountMaxSelectedProducts(state),
+    translationsFetched: getCycleCountTranslations(state),
+    formatLocalizedDate: getFormatLocalizedDate(state),
   }));
 
   const dispatch = useDispatch();
@@ -267,56 +277,64 @@ const useToResolveTab = ({
         );
       },
       meta: {
-        flexWidth: 200,
+        flexWidth: 150,
       },
     }),
-    columnHelper.accessor((row) =>
-      row?.tags?.map?.((tag) => <Badge label={tag?.tag} variant="badge--purple" tooltip key={tag.id} />), {
-      id: cycleCountColumn.TAGS,
+    columnHelper.accessor(cycleCountColumn.VERIFICATION_COUNT_ASSIGNEE, {
       header: () => (
         <TableHeaderCell>
-          {translate('react.cycleCount.table.tag.label', 'Tag')}
+          {translate('react.cycleCount.table.assignee.label', 'Assignee')}
         </TableHeaderCell>
       ),
-      cell: ({ getValue, row }) => (
-        <TableCell className="rt-td multiline-cell">
-          <div className={`badge-container ${row.original.meta.isRowDisabled && 'disabled'}`}>
-            {getValue()}
-          </div>
-        </TableCell>
-      ),
+      cell: ({ getValue }) => {
+        const value = getValue();
+        return (
+          <TableCell className="rt-td badge-container">
+            <Badge
+              label={value?.name?.toString()}
+              variant="badge--purple"
+              tooltip
+            />
+          </TableCell>
+        );
+      },
       meta: {
-        flexWidth: 200,
+        flexWidth: 150,
       },
     }),
-    columnHelper.accessor((row) =>
-      row?.productCatalogs?.map((catalog) => <Badge label={catalog?.name} variant="badge--blue" tooltip key={catalog.id} />), {
-      id: cycleCountColumn.PRODUCT_CATALOGS,
+    columnHelper.accessor(cycleCountColumn.VERIFICATION_COUNT_DEADLINE, {
       header: () => (
         <TableHeaderCell>
-          {translate('react.cycleCount.table.productCatalogue.label', 'Product Catalogue')}
+          {translate('react.cycleCount.table.deadline.label', 'Deadline')}
         </TableHeaderCell>
       ),
-      cell: ({ getValue, row }) => (
-        <TableCell className="rt-td multiline-cell">
-          <div className={`badge-container ${row.original.meta.isRowDisabled && 'disabled'}`}>
-            {getValue()}
-          </div>
-        </TableCell>
-      ),
+      cell: ({ getValue }) => {
+        const date = formatLocalizedDate(getValue(), DateFormat.DD_MMM_YYYY);
+        return (
+          <TableCell className="rt-td badge-container">
+            <Badge
+              label={date}
+              variant="badge--blue"
+              tooltip
+            />
+          </TableCell>
+        );
+      },
       meta: {
-        flexWidth: 200,
+        flexWidth: 150,
       },
     }),
-    columnHelper.accessor(cycleCountColumn.ABC_CLASS, {
+    columnHelper.accessor(cycleCountColumn.INVENTORY_ITEMS, {
       header: () => (
-        <TableHeaderCell sortable columnId={cycleCountColumn.ABC_CLASS} {...sortableProps}>
-          {translate('react.cycleCount.table.abcClass.label', 'ABC Class')}
+        <TableHeaderCell>
+          #
+          {' '}
+          {translate('react.cycleCount.table.inventoryItems.label', 'Inventory Items')}
         </TableHeaderCell>
       ),
       cell: ({ getValue }) => (
         <TableCell className="rt-td">
-          {getValue()}
+          {getValue()?.toString()}
         </TableCell>
       ),
       meta: {

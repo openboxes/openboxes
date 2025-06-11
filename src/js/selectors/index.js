@@ -24,3 +24,5 @@ export const getBinLocations = (state) => state.cycleCount.binLocations;
 export const getDebounceTime = (state) => state.session.searchConfig.debounceTime;
 
 export const getMinSearchLength = (state) => state.session.searchConfig.minSearchLength;
+
+export const getCycleCountTranslations = (state) => state.session.fetchedTranslations.cycleCount;
