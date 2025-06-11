@@ -54,15 +54,13 @@ const useCycleCountReportingFilters = () => {
         (acc, key) => ({ ...acc, [key]: '' }),
         { tab: queryProps.tab },
       );
-
       if (queryProps.startDate || tab === INDICATORS_TAB) {
         defaultValues.startDate = queryProps.startDate || moment()
-          .subtract(3, 'months')
-          .format(DateFormat.MM_DD_YYYY);
+          .subtract(3, 'months').format(DateFormat.DD_MMM_YYYY);
       }
       if (queryProps.endDate || tab === INDICATORS_TAB) {
         defaultValues.endDate = queryProps.endDate
-          || moment().format(DateFormat.MM_DD_YYYY);
+          || moment().format(DateFormat.DD_MMM_YYYY);
       }
       if (queryProps.products) {
         const productIds = Array.isArray(queryProps.products)
