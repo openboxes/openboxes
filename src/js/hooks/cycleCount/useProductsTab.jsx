@@ -93,7 +93,7 @@ const useProductsTab = ({
     serializedParams,
   });
 
-  const formatValue = (value) => {
+  const formatCurrency = (value) => {
     if (value < 0) {
       return {
         formattedValue: `- $ ${Math.abs(value)}`,
@@ -315,7 +315,7 @@ const useProductsTab = ({
         </TableHeaderCell>
       ),
       cell: ({ getValue }) => {
-        const { formattedValue, className } = formatValue(getValue());
+        const { formattedValue, className } = formatCurrency(getValue());
         return (
           <TableCell className={`rt-td d-flex justify-content-end ${className}`}>
             {formattedValue}
@@ -335,10 +335,10 @@ const useProductsTab = ({
         </TableHeaderCell>
       ),
       cell: ({ getValue }) => {
-        const { formattedValue, className } = formatValue(getValue());
+        const value = getValue();
         return (
-          <TableCell className={`rt-td d-flex justify-content-end ${className}`}>
-            {formattedValue}
+          <TableCell className={`rt-td d-flex justify-content-end ${value > 0 ? 'font-green-ob' : value < 0 && 'font-red-ob'}`}>
+            {value?.toString()}
           </TableCell>
         );
       },
@@ -371,11 +371,14 @@ const useProductsTab = ({
           {translate('react.cycleCount.table.valueInStock.label', 'Value in Stock')}
         </TableHeaderCell>
       ),
-      cell: ({ getValue }) => (
-        <TableCell className="rt-td d-flex justify-content-end font-weight-bold">
-          {`$ ${getValue()?.toString()}`}
-        </TableCell>
-      ),
+      cell: ({ getValue }) => {
+        const { formattedValue } = formatCurrency(getValue());
+        return (
+          <TableCell className="rt-td d-flex justify-content-end font-weight-bold">
+            {formattedValue}
+          </TableCell>
+        );
+      },
       size: 130,
     }),
   ], [currentLocale]);

@@ -491,7 +491,7 @@ const useResolveStepTable = ({
       cell: ({ row: { original: { quantityOnHand }, index } }) => {
         const [value, setValue] = useState(tableData?.[index]?.quantityRecounted);
         const recountDifference = value - (quantityOnHand || 0);
-        const variant = getCycleCountDifferencesVariant(recountDifference);
+        const variant = value && getCycleCountDifferencesVariant(recountDifference);
         events.on('refreshRecountDifference', () => {
           setValue(tableData?.[index]?.quantityRecounted);
         });
