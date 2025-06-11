@@ -3,10 +3,12 @@ import React from 'react';
 import cycleCountReportingFilterFields from 'components/cycleCountReporting/CycleCountReportingFilterFields';
 import CycleCountReportingFilters from 'components/cycleCountReporting/CycleCountReportingFilters';
 import CycleCountReportingHeader from 'components/cycleCountReporting/CycleCountReportingHeader';
+import IndicatorsTab from 'components/cycleCountReporting/IndicatorsTab';
 import InventoryTransactionsTab from 'components/cycleCountReporting/InventoryTransactionsTab';
 import ProductsTab from 'components/cycleCountReporting/ProductsTab';
 import Tabs from 'components/listPagesUtils/Tabs';
 import {
+  INDICATORS_TAB,
   INVENTORY_TRANSACTIONS_TAB,
   PRODUCTS_TAB,
 } from 'consts/cycleCount';
@@ -22,7 +24,6 @@ import 'components/cycleCount/cycleCount.scss';
 const CycleCountReporting = () => {
   const { switchTab } = useSwitchTabs({ defaultTab: PRODUCTS_TAB });
   useTranslation('cycleCount');
-
   const {
     defaultFilterValues,
     setFilterValues,
@@ -49,6 +50,13 @@ const CycleCountReporting = () => {
       },
       onClick: (tab) => switchTab(tab, resetForm),
     },
+    [INDICATORS_TAB]: {
+      label: {
+        id: 'react.cycleCount.indicators.label',
+        defaultMessage: 'Indicators',
+      },
+      onClick: (tab) => switchTab(tab, resetForm),
+    },
   };
 
   const { tab } = useQueryParams();
@@ -61,7 +69,9 @@ const CycleCountReporting = () => {
         <CycleCountReportingFilters
           defaultValues={defaultFilterValues}
           setFilterParams={setFilterValues}
-          filterFields={cycleCountReportingFilterFields}
+          filterFields={tab === INDICATORS_TAB
+            ? cycleCountReportingFilterFields.indicators
+            : cycleCountReportingFilterFields.default}
           isLoading={isLoading}
           setShouldFetch={setShouldFetch}
           tablePaginationProps={tablePaginationProps}
@@ -69,7 +79,6 @@ const CycleCountReporting = () => {
         {tab === PRODUCTS_TAB && (
           <ProductsTab />
         )}
-
         {tab === INVENTORY_TRANSACTIONS_TAB && (
           <InventoryTransactionsTab
             tablePaginationProps={tablePaginationProps}
@@ -77,6 +86,9 @@ const CycleCountReporting = () => {
             shouldFetch={shouldFetch}
             setShouldFetch={setShouldFetch}
           />
+        )}
+        {tab === INDICATORS_TAB && (
+          <IndicatorsTab />
         )}
       </div>
     </PageWrapper>

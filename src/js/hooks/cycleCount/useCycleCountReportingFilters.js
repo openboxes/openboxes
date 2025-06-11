@@ -1,12 +1,16 @@
 import { useState } from 'react';
 
+import moment from 'moment';
 import queryString from 'query-string';
 import { useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
 import { setShouldRebuildFilterParams } from 'actions';
 import cycleCountReportingFilterFields from 'components/cycleCountReporting/CycleCountReportingFilterFields';
+import { INDICATORS_TAB } from 'consts/cycleCount';
+import { DateFormat } from 'consts/timeFormat';
 import useCommonFiltersCleaner from 'hooks/list-pages/useCommonFiltersCleaner';
+import useQueryParams from 'hooks/useQueryParams';
 import { transformFilterParams } from 'utils/list-utils';
 import { fetchProduct } from 'utils/option-utils';
 
@@ -19,6 +23,7 @@ const useCycleCountReportingFilters = () => {
 
   const dispatch = useDispatch();
   const history = useHistory();
+  const { tab } = useQueryParams();
 
   const clearFilterValues = () => {
     const queryProps = queryString.parse(history.location.search);
@@ -50,13 +55,15 @@ const useCycleCountReportingFilters = () => {
         { tab: queryProps.tab },
       );
 
-      if (queryProps.startDate) {
-        defaultValues.startDate = queryProps.startDate;
+      if (queryProps.startDate || tab === INDICATORS_TAB) {
+        defaultValues.startDate = queryProps.startDate || moment()
+          .subtract(3, 'months')
+          .format(DateFormat.MM_DD_YYYY);
       }
-      if (queryProps.endDate) {
-        defaultValues.endDate = queryProps.endDate;
+      if (queryProps.endDate || tab === INDICATORS_TAB) {
+        defaultValues.endDate = queryProps.endDate
+          || moment().format(DateFormat.MM_DD_YYYY);
       }
-
       if (queryProps.products) {
         const productIds = Array.isArray(queryProps.products)
           ? queryProps.products
