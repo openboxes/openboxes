@@ -56,7 +56,9 @@ const CycleCountReportingFilters = ({
         ignoreClearFilters={['tab']}
         hidden={false}
         isLoading={isLoading}
-        customSubmitButtonLabel={tab === INDICATORS_TAB ? 'react.cycleCount.filters.loadData.label' : 'react.cycleCount.filters.loadTable.label'}
+        customSubmitButtonLabel={tab === INDICATORS_TAB
+          ? 'react.cycleCount.filters.loadData.label'
+          : 'react.cycleCount.filters.loadTable.label'}
         customSubmitButtonDefaultLabel={tab === INDICATORS_TAB ? 'Load data' : 'Load table'}
         showFilterVisibilityToggler={false}
         showSearchField={false}
