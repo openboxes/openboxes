@@ -159,7 +159,7 @@ const useToCountTab = ({
     },
   ]);
 
-  const openCancelCountsModal = (id) => {
+  const openCancelCountsModal = ({ id }) => {
     confirmationModal({
       hideCloseButton: false,
       closeOnClickOutside: true,
@@ -213,7 +213,7 @@ const useToCountTab = ({
             className={`${isRowDisabled && 'cancel-icon'}`}
             onClick={() => {
               if (isRowDisabled) {
-                openCancelCountsModal(row.original.cycleCountRequest.id);
+                openCancelCountsModal({ id: row.original.cycleCountRequest.id });
               }
             }}
           />
