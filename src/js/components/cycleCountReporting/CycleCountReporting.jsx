@@ -61,7 +61,7 @@ const CycleCountReporting = () => {
 
   const { tab } = useQueryParams();
 
-  // Each tab has different filters, that's why we need this function
+  // Each tab will have different filters, that's why we will need this function
   const getFilterFields = () => {
     switch (tab) {
       case PRODUCTS_TAB:
