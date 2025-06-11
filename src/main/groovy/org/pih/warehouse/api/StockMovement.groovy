@@ -7,6 +7,7 @@ import grails.validation.Validateable
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.LocationTypeCode
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
@@ -130,6 +131,10 @@ class StockMovement implements Validateable{
         lastUpdated(nullable: true)
         requestType(nullable: true)
         sourceType(nullable: true)
+
+        packingLocation(nullable: true)
+        receivingLocation(nullable: true)
+        loadingLocation(nullable: true)
     }
 
     Map toJson() {

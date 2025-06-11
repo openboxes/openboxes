@@ -32,6 +32,7 @@ import org.pih.warehouse.requisition.RequisitionSourceType
 import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.requisition.RequisitionType
 import org.pih.warehouse.shipping.Shipment
+import org.pih.warehouse.shipping.ShipmentService
 import org.pih.warehouse.shipping.ShipmentStatusCode
 import org.pih.warehouse.stockTransfer.StockTransferService
 
@@ -44,6 +45,7 @@ class StockMovementApiController {
     UserService userService
     DocumentService documentService
     LocationService locationService
+    ShipmentService shipmentService
 
     def list() {
         Location destination = params.destination ? Location.get(params.destination) : null
@@ -791,6 +793,8 @@ class StockMovementApiController {
 
         // Setting packing location
         stockMovement.shipment.setPackingScheduled(packingLocation, new Date(), User.load(session.user.id))
+
+        shipmentService.saveShipment(stockMovement.shipment)
 
         render status: 200
     }

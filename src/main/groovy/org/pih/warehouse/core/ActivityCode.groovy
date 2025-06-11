@@ -126,6 +126,7 @@ enum ActivityCode {
                 CROSS_DOCKING,
                 PUTAWAY_STOCK,
                 PICK_STOCK,
+                PACK_STOCK,
                 EXTERNAL,
                 ENABLE_NOTIFICATIONS,
                 ENABLE_WEBHOOKS,
