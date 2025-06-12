@@ -11,11 +11,12 @@ package org.pih.warehouse.api
 
 import grails.converters.JSON
 import org.grails.web.json.JSONObject
-
+import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.DateUtil
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.DocumentService
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.LocationService
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.StockMovementParamsCommand
 import org.pih.warehouse.core.User
@@ -31,6 +32,7 @@ import org.pih.warehouse.requisition.RequisitionSourceType
 import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.requisition.RequisitionType
 import org.pih.warehouse.shipping.Shipment
+import org.pih.warehouse.shipping.ShipmentService
 import org.pih.warehouse.shipping.ShipmentStatusCode
 import org.pih.warehouse.stockTransfer.StockTransferService
 
@@ -42,6 +44,8 @@ class StockMovementApiController {
     StockTransferService stockTransferService
     UserService userService
     DocumentService documentService
+    LocationService locationService
+    ShipmentService shipmentService
 
     def list() {
         Location destination = params.destination ? Location.get(params.destination) : null
@@ -763,5 +767,35 @@ class StockMovementApiController {
         } catch (FileNotFoundException e) {
             render status: 404
         }
+    }
+
+    def packingLocation() {
+        JSONObject jsonObject = request.JSON
+        String packingLocationId = jsonObject["packingLocation.id"]
+        Location packingLocation = packingLocationId ? locationService.getLocation(packingLocationId) : null
+        if (!packingLocation) {
+            throw new ObjectNotFoundException(packingLocationId, Location.class)
+        }
+
+        if (!packingLocation.supports(ActivityCode.PACK_STOCK)) {
+            throw new IllegalArgumentException("Location ${packingLocation?.name} should be an internal location with supported activities that include ${ActivityCode.PACK_STOCK}")
+        }
+
+        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
+        if (!stockMovement) {
+            throw new ObjectNotFoundException(params.id, StockMovement.class)
+        }
+
+        // If the packing location is already set and doesn't match the given packing location
+        if (stockMovement?.packingLocation && stockMovement?.packingLocation != packingLocation) {
+            throw new IllegalArgumentException("Stock movement ${stockMovement.identifier} is already assigned to packing location ${stockMovement?.packingLocation?.name}")
+        }
+
+        // Setting packing location
+        stockMovement.shipment.setPackingScheduled(packingLocation, new Date(), User.load(session.user.id))
+
+        shipmentService.saveShipment(stockMovement.shipment)
+
+        render status: 200
     }
 }
