@@ -7,6 +7,7 @@ import grails.validation.Validateable
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.LocationTypeCode
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
@@ -58,6 +59,10 @@ class StockMovement implements Validateable{
     String comments
     String currentStatus
     Float totalValue
+
+    Location packingLocation
+    Location loadingLocation
+    Location receivingLocation
 
     StockMovementDirection stockMovementDirection
     StockMovementStatusCode stockMovementStatusCode
@@ -126,6 +131,10 @@ class StockMovement implements Validateable{
         lastUpdated(nullable: true)
         requestType(nullable: true)
         sourceType(nullable: true)
+
+        packingLocation(nullable: true)
+        receivingLocation(nullable: true)
+        loadingLocation(nullable: true)
     }
 
     Map toJson() {
@@ -207,6 +216,9 @@ class StockMovement implements Validateable{
             picklist            : [
                 id: requisition?.picklist?.id
             ],
+            receivingLocation: receivingLocation?.toJson(LocationTypeCode.INTERNAL),
+            packingLocation  : packingLocation?.toJson(LocationTypeCode.INTERNAL),
+            loadingLocation  : loadingLocation?.toJson(LocationTypeCode.INTERNAL),
         ]
     }
 
@@ -358,6 +370,9 @@ class StockMovement implements Validateable{
                 createdBy: shipment.createdBy,
                 updatedBy: shipment.updatedBy,
                 shipment: shipment,
+                receivingLocation: shipment?.receivingScheduled?.eventLocation,
+                packingLocation: shipment?.packingScheduled?.eventLocation,
+                loadingLocation: shipment?.loadingScheduled?.eventLocation,
                 order: shipment?.returnOrder,
                 isReturn: shipment?.isFromReturnOrder,
                 isFromOrder: shipment?.isFromPurchaseOrder,
@@ -412,6 +427,9 @@ class StockMovement implements Validateable{
             shipmentType: shipment?.shipmentType,
             dateShipped: shipment?.expectedShippingDate,
             expectedDeliveryDate: shipment?.expectedDeliveryDate,
+            receivingLocation: shipment?.receivingScheduled?.eventLocation,
+            packingLocation: shipment?.packingScheduled?.eventLocation,
+            loadingLocation: shipment?.loadingScheduled?.eventLocation,
             driverName: shipment?.driverName,
             trackingNumber: trackingNumber?.identifier,
             currentStatus: shipment?.currentStatus,

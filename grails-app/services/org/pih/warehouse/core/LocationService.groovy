@@ -18,6 +18,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.Row
 import grails.plugins.csv.CSVMapReader
+import org.hibernate.ObjectNotFoundException
 import org.hibernate.sql.JoinType
 
 import org.pih.warehouse.sort.SortParamList
@@ -83,6 +84,17 @@ class LocationService {
                 'in'("locationTypeCode", LocationTypeCode.listInternalTypeCodes())
             }
         }
+    }
+
+    def getLocation(String idOrCode) {
+        Location location = Location.get(idOrCode)
+        if (!location) {
+            location = Location.findByNameOrLocationNumber(idOrCode, idOrCode)
+            if (!location) {
+                throw new ObjectNotFoundException(idOrCode, Location.class.simpleName)
+            }
+        }
+        return location
     }
 
     def getAllLocations() {
