@@ -54,11 +54,16 @@ const useCycleCountReportingFilters = () => {
         (acc, key) => ({ ...acc, [key]: '' }),
         { tab: queryProps.tab },
       );
+
       if (queryProps.startDate || tab === INDICATORS_TAB) {
+        // If tab === INDICATORS_TAB and queryProps.startDate is not provided,
+        // we want to use data from the last 3 months as the default.
         defaultValues.startDate = queryProps.startDate || moment()
           .subtract(3, 'months').format(DateFormat.DD_MMM_YYYY);
       }
       if (queryProps.endDate || tab === INDICATORS_TAB) {
+        // If tab === INDICATORS_TAB and queryProps.endDate is not provided,
+        // we want to use the current day as the default.
         defaultValues.endDate = queryProps.endDate
           || moment().format(DateFormat.DD_MMM_YYYY);
       }
