@@ -10,6 +10,7 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
+import grails.validation.ValidationException
 import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
@@ -19,7 +20,12 @@ import org.pih.warehouse.order.OrderStatus
 import org.pih.warehouse.order.OrderSummary
 import org.pih.warehouse.order.OrderSummaryService
 import org.pih.warehouse.order.OrderSummaryStatus
+import org.pih.warehouse.order.OrderType
+import org.pih.warehouse.order.OrderTypeCode
+import org.pih.warehouse.order.CreatePurchaseOrderCommand
+import org.pih.warehouse.order.UpdatePurchaseOrderCommand
 
+import javax.transaction.Transactional
 import java.math.RoundingMode
 
 class PurchaseOrderApiController {
@@ -53,6 +59,83 @@ class PurchaseOrderApiController {
         }
 
         render([data: order] as JSON)
+    }
+
+    @Transactional
+    def create(CreatePurchaseOrderCommand command) {
+        command.applyDefaults()
+
+        if (command.hasErrors()) {
+            throw new ValidationException("Invalid purchase order command", command.errors)
+        }
+
+        Order order = new Order()
+        order.orderType = OrderType.findByCode(OrderTypeCode.PURCHASE_ORDER.name())
+        order.name = command.name
+        order.origin = command.origin
+        order.destination = command.destination
+        order.destinationParty = command.destinationParty
+        order.dateOrdered = command.dateOrdered
+        order.orderedBy = command.orderedBy
+        order.currencyCode = command.currencyCode
+        order.paymentMethodType = command.paymentMethodType
+        order.paymentTerm = command.paymentTerm
+        command.items?.each { item ->
+            item.applyDefaults()
+            OrderItem orderItem = new OrderItem()
+            orderItem.product = item.product
+            orderItem.quantity = item.quantity
+            orderItem.unitPrice = item.unitPrice
+            orderItem.quantityUom = item.quantityUom
+            order.addToOrderItems(orderItem)
+        }
+
+        orderService.saveOrder(order)
+
+        return [order: order] as JSON
+    }
+
+    @Transactional
+    def update(UpdatePurchaseOrderCommand command) {
+        Order order = Order.get(params.id)
+        if (!order) {
+            def message = "${warehouse.message(code: 'default.not.found.message', args:[warehouse.message(code: 'order.label', default: 'order'), params.id])}"
+            render(status: 404, text: message)
+            return
+        }
+
+        if (command.hasErrors()) {
+            throw new ValidationException("Invalid purchase order command", command.errors)
+        }
+
+        if (command.name) order.name = command.name
+        if (command.origin) order.origin = command.origin
+        if (command.destination) order.destination = command.destination
+        if (command.destinationParty) order.destinationParty = command.destinationParty
+        if (command.dateOrdered) order.dateOrdered = command.dateOrdered
+        if (command.orderedBy) order.orderedBy = command.orderedBy
+        if (command.currencyCode) order.currencyCode = command.currencyCode
+        if (command.paymentMethodType) order.paymentMethodType = command.paymentMethodType
+        if (command.paymentTerm) order.paymentTerm = command.paymentTerm
+
+        command.items?.each { item ->
+            OrderItem orderItem
+            if (item.id) {
+                orderItem = OrderItem.get(item.id)
+            } else {
+                orderItem = new OrderItem()
+                order.addToOrderItems(orderItem)
+            }
+
+            if (item.product) orderItem.product = item.product
+            if (item.quantity) orderItem.quantity = item.quantity
+            if (item.unitPrice) orderItem.unitPrice = item.unitPrice
+            if (item.quantityUom) orderItem.quantityUom = item.quantityUom
+        }
+
+        orderService.saveOrder(order)
+
+        return [order: order] as JSON
     }
 
     def delete() {
