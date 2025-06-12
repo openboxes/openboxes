@@ -10,7 +10,6 @@ import productGroupApi from 'api/services/ProductGroupApi';
 import selectOptionsApi from 'api/services/SelectOptionsApi';
 import userApi from 'api/services/UserApi';
 import { INTERNAL_LOCATIONS } from 'api/urls';
-import ActivityCode from 'consts/activityCode';
 import locationType from 'consts/locationType';
 import apiClient from 'utils/apiClient';
 import splitTranslation from 'utils/translation-utils';
@@ -243,13 +242,15 @@ export const fetchLocationById = async (id) => {
   return response.data?.data;
 };
 
-export const fetchBins = async (locationId, ignoreActivityCodes = [ActivityCode.RECEIVE_STOCK]) => {
+export const fetchBins = async (
+  locationId, ignoreActivityCodes = [], sort = null) => {
   const response = await apiClient.get(INTERNAL_LOCATIONS, {
     paramsSerializer: (parameters) => queryString.stringify(parameters),
     params: {
       'location.id': locationId,
       locationTypeCode: [locationType.BIN_LOCATION, locationType.INTERNAL],
       ignoreActivityCodes,
+      sort,
     },
   });
 

@@ -11,30 +11,22 @@ package org.pih.warehouse.api
 
 import grails.converters.JSON
 import grails.gorm.transactions.Transactional
+
 import org.pih.warehouse.core.ActivityCode
+import org.pih.warehouse.core.InternalLocationSearchCommand
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationTypeCode
+import org.pih.warehouse.core.ReceivingLocationSearchCommand
 
 @Transactional
 class InternalLocationApiController {
 
     def locationService
 
-    def list() {
-        String locationId = params?.location?.id ?: session?.warehouse?.id
-        Location parentLocation = locationId ? Location.get(locationId) : null
-        if (!parentLocation) {
-            throw new IllegalArgumentException("Must provide location.id as a request parameter")
-        }
+    def list(InternalLocationSearchCommand command) {
+        command.location = getFacility(command)
 
-        LocationTypeCode[] locationTypeCodes = params.locationTypeCode ? params.list("locationTypeCode") : [LocationTypeCode.INTERNAL, LocationTypeCode.BIN_LOCATION]
-
-        Map activityCodeParams = [:]
-        activityCodeParams.allActivityCodes = params.allActivityCodes ? params.list("allActivityCodes") as ActivityCode[]: []
-        activityCodeParams.anyActivityCodes = params.anyActivityCodes ? params.list("anyActivityCodes") as ActivityCode[]: []
-        activityCodeParams.ignoreActivityCodes = params.ignoreActivityCodes ? params.list("ignoreActivityCodes") as ActivityCode[] : []
-
-        List<Location> locations = locationService.getInternalLocations(parentLocation, locationTypeCodes, activityCodeParams)
+        List<Location> locations = locationService.getInternalLocations(command)
         render([data: locations?.collect { [id: it.id, name: it.name, zoneId: it.zone?.id, zoneName: it.zone?.name] }] as JSON)
     }
 
@@ -44,27 +36,19 @@ class InternalLocationApiController {
         render([data: locations, totalCount: locations?.totalCount] as JSON)
     }
 
-    def listReceiving() {
-        String locationId = params?.location?.id ?: session?.warehouse?.id
-        Location parentLocation = locationId ? Location.get(locationId) : null
-        if (!parentLocation) {
-            throw new IllegalArgumentException("Must provide location.id as a request parameter")
-        }
-        String shipmentNumber = params?.shipmentNumber
-        if (!shipmentNumber) {
-            throw new IllegalArgumentException("Must provide shipmentNumber as a request parameter")
-        }
+    def listReceiving(ReceivingLocationSearchCommand command) {
+        command.location = getFacility(command)
 
-        LocationTypeCode[] locationTypeCodes = params.locationTypeCode ? params.list("locationTypeCode") : [LocationTypeCode.BIN_LOCATION]
+        // When searching receiving bins, we need different default search parameters. Mainly we want to include
+        // the normal bin locations as well as only the receiving bins that match the given shipment number.
+        command.locationTypeCode = params.locationTypeCode ? params.list("locationTypeCode") : [LocationTypeCode.BIN_LOCATION]
+        command.ignoreActivityCodes = params.ignoreActivityCodes ? params.list("ignoreActivityCodes") : [ActivityCode.RECEIVE_STOCK]
+        command.locationNames = [
+                locationService.getReceivingLocationName(command.shipmentNumber),
+                "Receiving ${command.shipmentNumber}"
+        ]
 
-        Map activityCodeParams = [:]
-        activityCodeParams.allActivityCodes = params.allActivityCodes ? params.list("allActivityCodes") as ActivityCode[]: []
-        activityCodeParams.anyActivityCodes = params.anyActivityCodes ? params.list("anyActivityCodes") as ActivityCode[]: []
-        activityCodeParams.ignoreActivityCodes = params.ignoreActivityCodes ? params.list("ignoreActivityCodes") as ActivityCode[] : [ActivityCode.RECEIVE_STOCK]
-
-        String[] receivingLocationNames = [locationService.getReceivingLocationName(shipmentNumber), "Receiving ${shipmentNumber}"]
-        List<Location> locations = locationService.getInternalLocations(parentLocation, locationTypeCodes, activityCodeParams, receivingLocationNames)
-
+        List<Location> locations = locationService.getInternalLocations(command)
         render([data: locations?.collect { [id: it.id, name: it.name, zoneId: it.zone?.id, zoneName: it.zone?.name] }] as JSON)
     }
 
@@ -73,4 +57,19 @@ class InternalLocationApiController {
         render([data: location] as JSON)
     }
 
+    /**
+     * Computes the parent location, ie facility of a given internal location search request.
+     */
+    private Location getFacility(InternalLocationSearchCommand command) {
+        if (command.location != null) {
+            return command.location
+        }
+
+        // We need to do this fallback here instead of in a BindUsing in the command because the command doesn't
+        // have access to the session.
+        command.location = Location.get(session?.warehouse?.id)
+        if (command.location == null) {
+            throw new IllegalArgumentException("Must provide location.id as a request parameter")
+        }
+    }
 }
