@@ -3,7 +3,7 @@ package org.pih.warehouse.core
 /**
  * Used to filter the returned results when listing/searching internal receiving bin locations.
  */
-class ReceivingBinSearchCommand extends InternalLocationSearchCommand {
+class ReceivingLocationSearchCommand extends InternalLocationSearchCommand {
 
     String shipmentNumber
 

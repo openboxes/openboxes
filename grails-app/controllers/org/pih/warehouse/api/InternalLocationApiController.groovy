@@ -16,7 +16,7 @@ import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.InternalLocationSearchCommand
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationTypeCode
-import org.pih.warehouse.core.ReceivingBinSearchCommand
+import org.pih.warehouse.core.ReceivingLocationSearchCommand
 
 @Transactional
 class InternalLocationApiController {
@@ -36,7 +36,7 @@ class InternalLocationApiController {
         render([data: locations, totalCount: locations?.totalCount] as JSON)
     }
 
-    def listReceiving(ReceivingBinSearchCommand command) {
+    def listReceiving(ReceivingLocationSearchCommand command) {
         command.location = getFacility(command)
 
         // When searching receiving bins, we need different default search parameters. Mainly we want to include
