@@ -392,6 +392,7 @@ const useProductsTab = ({
       id: 'react.cycleCount.table.noResultFound.label',
       defaultMessage: 'No result found.',
     };
+    
   const exportData = () => {
     console.log('Button pressed');
   };
