@@ -32,6 +32,7 @@ enum ActivityCode {
     CROSS_DOCKING('CROSS_DOCKING'),
     PUTAWAY_STOCK('PUTAWAY_STOCK'),
     PICK_STOCK('PICK_STOCK'),
+    PACK_STOCK('PACK_STOCK'),
     HOLD_STOCK('HOLD_STOCK'),
 
     // Requisition reason codes
@@ -125,6 +126,7 @@ enum ActivityCode {
                 CROSS_DOCKING,
                 PUTAWAY_STOCK,
                 PICK_STOCK,
+                PACK_STOCK,
                 EXTERNAL,
                 ENABLE_NOTIFICATIONS,
                 ENABLE_WEBHOOKS,
