@@ -189,7 +189,7 @@ const useToCountTab = ({
   }, [tableData]);
 
   const getCycleCountRequestsIds = () => extendedDataTable.data
-    .filter((row) => !row.meta.isRowDisabled)
+    .filter((row) => !row.meta.showCancelCheckbox)
     .map((row) => row.cycleCountRequest.id);
 
   const checkboxesColumn = columnHelper.accessor(cycleCountColumn.SELECTED, {
@@ -203,16 +203,18 @@ const useToCountTab = ({
       </TableHeaderCell>
     ),
     cell: ({ row }) => {
-      const { isRowDisabled } = row.original.meta;
+      const { showCancelCheckbox } = row.original.meta;
       return (
         <TableCell className="rt-td">
           <Checkbox
             noWrapper
-            onChange={isRowDisabled ? null : selectRow(row.original.cycleCountRequest.id)}
+            onChange={showCancelCheckbox
+              ? null
+              : selectRow(row.original.cycleCountRequest.id)}
             value={isChecked(row.original.cycleCountRequest.id)}
-            className={`${isRowDisabled && 'cancel-icon'}`}
+            className={`${showCancelCheckbox && 'cancel-icon'}`}
             onClick={() => {
-              if (isRowDisabled) {
+              if (showCancelCheckbox) {
                 openCancelCountsModal({ id: row.original.cycleCountRequest.id });
               }
             }}
@@ -235,10 +237,10 @@ const useToCountTab = ({
           {translate('react.cycleCount.table.status.label', 'Status')}
         </TableHeaderCell>
       ),
-      cell: ({ getValue }) => (
+      cell: ({ getValue, row }) => (
         <TableCell className="rt-td">
           <StatusIndicator
-            variant="danger"
+            variant={row.original.meta.isRowDisabled ? 'gray' : 'danger'}
             status={translate(`react.cycleCount.CycleCountCandidateStatus.${getValue()}.label`, 'To count')}
           />
         </TableCell>

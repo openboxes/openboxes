@@ -9,7 +9,6 @@ const CycleCountCandidateStatus = {
   REVIEWED: 'REVIEWED',
   COMPLETED: 'COMPLETED',
   CANCELED: 'CANCELED',
-  IN_PROGRESS: 'IN_PROGRESS',
 };
 
 export default CycleCountCandidateStatus;
