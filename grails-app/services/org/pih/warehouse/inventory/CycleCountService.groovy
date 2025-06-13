@@ -136,6 +136,9 @@ class CycleCountService {
         Set<String> usedAliases = new HashSet<>()
         return PendingCycleCountRequest.createCriteria().list(max: max, offset: offset) {
             eq("facility", facility)
+            if(command.requestIds) {
+                "in"("cycleCountRequest.id", command.requestIds)
+            }
             if (command.searchTerm) {
                 createProductAlias(delegate, usedAliases)
                 or {
