@@ -435,8 +435,8 @@ const useCountStep = () => {
       product: cycleCount?.cycleCountItems?.[0]?.product,
       cycleCountRequestId: cycleCount?.requestId,
       inventoryItemsCount: cycleCount?.cycleCountItems?.length || 0,
-      assignee: null,
-      deadline: null,
+      assignee: cycleCount?.verificationCount?.assignee,
+      deadline: cycleCount?.verificationCount?.deadline,
     }));
     setAssignCountModalData(modalData);
   };
