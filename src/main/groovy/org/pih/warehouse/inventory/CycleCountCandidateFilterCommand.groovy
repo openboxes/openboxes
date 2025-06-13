@@ -10,6 +10,9 @@ class CycleCountCandidateFilterCommand extends PaginationCommand implements Vali
 
     List<CycleCountCandidateStatus> statuses
 
+    // Filter param for populating data related to exact ids
+    List<String> requestIds
+
     String searchTerm
 
     List<Category> categories
