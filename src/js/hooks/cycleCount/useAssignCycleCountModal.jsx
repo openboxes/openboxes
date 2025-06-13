@@ -52,30 +52,32 @@ const useAssignCycleCountModal = ({
   const handleAssign = async () => {
     try {
       spinner.show();
-      const requests = selectedCycleCountItems.map((item) => {
+      const commands = selectedCycleCountItems.map((item) => {
         const { cycleCountRequestId, assignee, deadline } = item;
 
-        const payload = isCount
+        return isCount
           ? {
-            requestedCountBy: assignee?.id,
-            requestedCountDate: dateWithoutTimeZone({
+            cycleCountRequest: cycleCountRequestId,
+            countAssignee: assignee?.id,
+            countDeadline: dateWithoutTimeZone({
               date: deadline,
             }),
           }
           : {
-            requestedRecountBy: assignee?.id,
-            requestedRecountDate: dateWithoutTimeZone({
+            cycleCountRequest: cycleCountRequestId,
+            recountAssignee: assignee?.id,
+            recountDeadline: dateWithoutTimeZone({
               date: deadline,
             }),
           };
-
-        return cycleCountApi.updateCycleCountRequest(
-          currentLocation?.id,
-          cycleCountRequestId,
-          payload,
-        );
       });
-      await Promise.all(requests);
+
+      await cycleCountApi.updateCycleCountRequests(
+        currentLocation?.id,
+        {
+          commands,
+        },
+      );
 
       if (refetchData) {
         refetchData();
@@ -167,8 +169,8 @@ const useAssignCycleCountModal = ({
       ),
       size: 150,
     }),
-    columnHelper.accessor(cycleCountColumn.INVENTORY_ITEMS, {
-      id: cycleCountColumn.INVENTORY_ITEMS,
+    columnHelper.accessor(cycleCountColumn.INVENTORY_ITEMS_COUNT, {
+      id: cycleCountColumn.INVENTORY_ITEMS_COUNT,
       header: () => (
         <TableHeaderCell>
           #

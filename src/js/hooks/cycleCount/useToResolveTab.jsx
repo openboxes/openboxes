@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 
 import { createColumnHelper } from '@tanstack/react-table';
 import fileDownload from 'js-file-download';
@@ -45,6 +45,8 @@ const useToResolveTab = ({
   pageSize,
   serializedParams,
 }) => {
+  const [assignCountModalData, setAssignCountModalData] = useState([]);
+  const [isAssignCountModalOpen, setIsAssignCountModalOpen] = useState(false);
   const columnHelper = createColumnHelper();
   const translate = useTranslate();
   const spinner = useSpinner();
@@ -463,6 +465,53 @@ const useToResolveTab = ({
     },
   });
 
+  const mapSelectedRowsToModalData = async () => {
+    spinner.show();
+    const { data } = await cycleCountApi.getPendingRequests({
+      locationId: currentLocation?.id,
+      requestIds: checkedCheckboxes,
+    });
+    const modalData = data.data.map((pendingCycleCountRequest) => {
+      const {
+        cycleCountRequest: {
+          verificationCount: {
+            assignee,
+            deadline,
+          },
+          inventoryItemsCount,
+          product,
+          id,
+        },
+      } = pendingCycleCountRequest;
+      return {
+        cycleCountRequestId: id,
+        product,
+        assignee: assignee
+          ? {
+            ...assignee,
+            // Properties for displaying already selected assignee as a default
+            // value on the select field
+            value: assignee?.id,
+            label: assignee?.name,
+          } : null,
+        deadline,
+        inventoryItemsCount,
+      };
+    });
+    spinner.hide();
+    setAssignCountModalData(modalData);
+  };
+
+  const closeAssignCountModal = () => {
+    setIsAssignCountModalOpen(false);
+    setAssignCountModalData([]);
+  };
+
+  const openAssignCountModal = async () => {
+    await mapSelectedRowsToModalData();
+    setIsAssignCountModalOpen(true);
+  };
+
   return {
     tableData: extendedDataTable,
     loading,
@@ -473,6 +522,12 @@ const useToResolveTab = ({
     moveToResolving: verifyCondition,
     printResolveForm,
     openCancelCountsModal,
+    fetchData,
+    isAssignCountModalOpen,
+    assignCountModalData,
+    setAssignCountModalData,
+    openAssignCountModal,
+    closeAssignCountModal,
   };
 };
 
