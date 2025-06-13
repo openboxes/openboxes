@@ -42,6 +42,10 @@ import { checkBinLocationSupport } from 'utils/supportedActivitiesUtils';
 
 // Managing state for all tables, operations on shared state (from count step)
 const useCountStep = () => {
+  const [isAssignCountModalOpen, setIsAssignCountModalOpen] = useState(false);
+  const [assignCountModalData, setAssignCountModalData] = useState([]);
+  // Page on which user should land after closing assign cycle count modal
+  const redirectAfterClosingModal = useRef(null);
   // Table data is stored using useRef to avoid re-renders onBlur
   // (it removes focus while selecting new fields)
   const tableData = useRef([]);
@@ -426,6 +430,28 @@ const useCountStep = () => {
     });
   };
 
+  const mapSelectedRowsToModalData = () => {
+    const modalData = tableData.current.map((cycleCount) => ({
+      product: cycleCount?.cycleCountItems?.[0]?.product,
+      cycleCountRequestId: cycleCount?.requestId,
+      inventoryItemsCount: cycleCount?.cycleCountItems?.length || 0,
+      assignee: null,
+      deadline: null,
+    }));
+    setAssignCountModalData(modalData);
+  };
+
+  const closeAssignCountModal = () => {
+    setIsAssignCountModalOpen(false);
+    setAssignCountModalData([]);
+    history.push(redirectAfterClosingModal.current);
+  };
+
+  const openAssignCountModal = () => {
+    mapSelectedRowsToModalData();
+    setIsAssignCountModalOpen(true);
+  };
+
   const resolveDiscrepanciesModalButtons = (requestIdsWithDiscrepancies,
     requestIdsWithoutDiscrepancies) => (onClose) => ([
     {
@@ -436,8 +462,10 @@ const useCountStep = () => {
         if (requestIdsWithoutDiscrepancies > 0) {
           showSuccessNotification(requestIdsWithoutDiscrepancies);
         }
-        history.push(CYCLE_COUNT.list(TO_RESOLVE_TAB));
-        onClose?.();
+        hide();
+        onClose()?.();
+        redirectAfterClosingModal.current = CYCLE_COUNT.list(TO_RESOLVE_TAB);
+        openAssignCountModal();
       },
     },
     {
@@ -454,8 +482,9 @@ const useCountStep = () => {
         if (requestIdsWithoutDiscrepancies > 0) {
           showSuccessNotification(requestIdsWithoutDiscrepancies);
         }
-        history.push(CYCLE_COUNT.resolveStep());
         hide();
+        redirectAfterClosingModal.current = CYCLE_COUNT.resolveStep();
+        openAssignCountModal();
       },
     },
   ]);
@@ -672,6 +701,10 @@ const useCountStep = () => {
     sortByProductName,
     setSortByProductName,
     importErrors,
+    isAssignCountModalOpen,
+    closeAssignCountModal,
+    assignCountModalData,
+    setAssignCountModalData,
   };
 };
 

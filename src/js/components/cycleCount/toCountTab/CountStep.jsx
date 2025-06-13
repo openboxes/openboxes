@@ -47,6 +47,10 @@ const CountStep = () => {
     sortByProductName,
     setSortByProductName,
     importErrors,
+    isAssignCountModalOpen,
+    closeAssignCountModal,
+    assignCountModalData,
+    setAssignCountModalData,
   } = useCountStep();
 
   return (
@@ -94,6 +98,10 @@ const CountStep = () => {
             triggerValidation={triggerValidation}
             refreshFocusCounter={refreshFocusCounter}
             isFormDisabled={isFormDisabled}
+            isAssignCountModalOpen={isAssignCountModalOpen}
+            closeAssignCountModal={closeAssignCountModal}
+            assignCountModalData={assignCountModalData}
+            setAssignCountModalData={setAssignCountModalData}
           />
         ))}
     </PageWrapper>
