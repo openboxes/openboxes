@@ -185,35 +185,32 @@ class InventoryImportDataService implements ImportDataService {
         Transaction transaction = new Transaction()
 
         for (entry in inventoryImportData.rows) {
+            // Merge all rows with the same key (ie the same product + bin + lot) into a single transaction entry.
             List<InventoryImportDataRow> rowsForKey = entry.value
+            if (!rowsForKey) {
+                continue
+            }
 
             // If we have no product availability record for the item, we assume that means we have no quantity.
-            int quantityOnHandToUse = availableItems.get(entry.key)?.quantityOnHand ?: 0
-
-            for (InventoryImportDataRow row in rowsForKey) {
-                int adjustmentQuantity = row.quantity - quantityOnHandToUse
-
-                // Update QoH so that we don't double count it while computing adjustmentQuantity when we have multiple
-                // rows with the same key (which results in rowsForKey having more than one entry). For example, if a
-                // [product + bin + lot] has a QoH of 5, the following rows should create the following adjustments:
-                // - row with the same [product + bin + lot] and quantity == 6  -> should cause a +1 adjustment
-                // - row with the same [product + bin + lot] and quantity == 10 -> should cause a +10 adjustment
-                quantityOnHandToUse = Math.max(quantityOnHandToUse - row.quantity, 0)
-
-                if (adjustmentQuantity == 0) {
-                    continue
-                }
-
-                TransactionEntry transactionEntry = new TransactionEntry(
-                        transaction: transaction,
-                        quantity: adjustmentQuantity,
-                        product: row.product,
-                        binLocation: row.binLocation,
-                        inventoryItem: row.inventoryItem,
-                        comments: row.comments,
-                )
-                transaction.addToTransactionEntries(transactionEntry)
+            int quantityOnHand = availableItems.get(entry.key)?.quantityOnHand ?: 0
+            int totalQuantity = rowsForKey.sum { it.quantity ?: 0 } as int
+            int adjustmentQuantity = totalQuantity - quantityOnHand
+            if (adjustmentQuantity == 0) {
+                continue
             }
+
+            // We know we have at least one row for the key at this point so this is safe to do.
+            InventoryImportDataRow row = rowsForKey[0]
+
+            TransactionEntry transactionEntry = new TransactionEntry(
+                    transaction: transaction,
+                    quantity: adjustmentQuantity,
+                    product: row.product,
+                    binLocation: row.binLocation,
+                    inventoryItem: row.inventoryItem,
+                    comments: rowsForKey.comments.join(", "),
+            )
+            transaction.addToTransactionEntries(transactionEntry)
         }
 
         // For all products in the import, any other bins/lots of those products that exist in the system (ie have
