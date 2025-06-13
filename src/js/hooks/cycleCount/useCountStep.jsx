@@ -57,6 +57,7 @@ const useCountStep = () => {
   const [isSaveDisabled, setIsSaveDisabled] = useState(false);
   const [sortByProductName, setSortByProductName] = useState(false);
   const [importErrors, setImportErrors] = useState([]);
+  const assigneeImported = useRef(null);
 
   const dispatch = useDispatch();
   const history = useHistory();
@@ -612,31 +613,48 @@ const useCountStep = () => {
       );
       setImportErrors(response.data.errors);
       let cycleCounts = _.groupBy(response.data.data, 'cycleCountId');
-      tableData.current = tableData.current.map((cycleCount) => ({
-        ...cycleCount,
-        cycleCountItems: [
-          ...cycleCount.cycleCountItems
-            .map((item) => {
-              const correspondingImportItem = cycleCounts[cycleCount.id]?.find(
-                (cycleCountItem) => cycleCountItem.cycleCountItemId === item.id,
-              );
+      tableData.current = tableData.current.map((cycleCount) => {
+        // After each iteration assign it to false again, so that the flag
+        // can be reused for next cycle counts in the loop
+        assigneeImported.current = false;
+        return {
+          ...cycleCount,
+          cycleCountItems: [
+            ...cycleCount.cycleCountItems
+              .map((item) => {
+                const correspondingImportItem = cycleCounts[cycleCount.id]?.find(
+                  (cycleCountItem) => cycleCountItem.cycleCountItemId === item.id,
+                );
+                // Assign counted by and date counted only once to prevent performance issues
+                // At this point, every item after being validated on the backend,
+                // should have the same assignee and dateCounted set,
+                // so we can make this operation only once
+                // this is why we introduce the assigneeImported boolean flag
+                if (correspondingImportItem && !assigneeImported.current[cycleCount.id]) {
+                  assignCountedBy(cycleCount.id)(correspondingImportItem.assignee);
+                  setDateCounted((prevState) =>
+                    ({ ...prevState, [cycleCount.id]: correspondingImportItem.dateCounted }));
+                  // Mark the flag as true, so that it's not triggered for each item
+                  assigneeImported.current = true;
+                }
 
-              if (correspondingImportItem) {
+                if (correspondingImportItem) {
                 // Remove items from the import that have a corresponding item
                 // in the current cycle count. It allows us to treat items with
                 // the wrong ID as new rows that do not already exist.
-                cycleCounts = removeItemFromCycleCounts(
-                  cycleCounts,
-                  cycleCount.id,
-                  correspondingImportItem.cycleCountItemId,
-                );
-              }
+                  cycleCounts = removeItemFromCycleCounts(
+                    cycleCounts,
+                    cycleCount.id,
+                    correspondingImportItem.cycleCountItemId,
+                  );
+                }
 
-              return mergeImportItems(item, correspondingImportItem);
-            }),
-          ...createCustomItemsFromImport(cycleCounts[cycleCount.id]),
-        ],
-      }));
+                return mergeImportItems(item, correspondingImportItem);
+              }),
+            ...createCustomItemsFromImport(cycleCounts[cycleCount.id]),
+          ],
+        };
+      });
     } finally {
       // After import we want to trigger the validation on fields,
       // so that a user knows what fields to correct from the UI
