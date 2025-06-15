@@ -145,6 +145,7 @@ export const PRODUCT_SUPPLIER_API = `${API}/productSuppliers`;
 export const PRODUCT_SUPPLIER_BY_ID = (id) => `${PRODUCT_SUPPLIER_API}/${id}`;
 export const PRODUCT_SUPPLIER_PREFERENCES_API = `${API}/productSupplierPreferences`;
 export const PRODUCT_SUPPLIER_PREFERENCES_BY_ID = (id) => `${PRODUCT_SUPPLIER_PREFERENCES_API}/${id}`;
+export const PRODUCT_SUPPLIER_EXPORT = `${PRODUCT_SUPPLIER_API}/export`;
 
 // UNIT OF MEASURE
 export const UNIT_OF_MEASURE_API = `${API}/unitOfMeasures`;
@@ -195,7 +196,8 @@ export const CYCLE_COUNT_SUBMIT_COUNT = (locationId, cycleCountId) => `${CYCLE_C
 export const CYCLE_COUNT_SUBMIT_RECOUNT = (locationId, cycleCountId) => `${CYCLE_COUNT(locationId)}/${cycleCountId}/recount`;
 export const CYCLE_COUNT_REFRESH_ITEMS = (locationId, cycleCountId, removeOutOfStockItemsImplicitly) => `${CYCLE_COUNT(locationId)}/${cycleCountId}/refresh${removeOutOfStockItemsImplicitly ? '?removeOutOfStockItemsImplicitly=true' : ''}`;
 export const CYCLE_COUNT_ITEMS_IMPORT = (locationId) => `${CYCLE_COUNT(locationId)}/items/upload/count`;
+export const CYCLE_COUNT_REQUEST = (locationId, requestId) => `${CYCLE_COUNT(locationId)}/requests/${requestId}`;
 
 // REPORTING
 export const REPORTS = `${API}/reports`;
-export const CYCLE_COUNT_DETAILS_REPORT = `${REPORTS}/cycle-count-details`;
+export const CYCLE_COUNT_SUMMARY_REPORT = `${REPORTS}/cycle-count-summary`;

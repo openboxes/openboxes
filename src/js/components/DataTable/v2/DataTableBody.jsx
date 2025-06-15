@@ -6,7 +6,9 @@ import PropTypes from 'prop-types';
 import TableRow from 'components/DataTable/TableRow';
 import DataTableStatus from 'components/DataTable/v2/DataTableStatus';
 import useTableColumnMeta from 'hooks/useTableColumnMeta';
+import useTranslate from 'hooks/useTranslate';
 import getCommonPinningStyles from 'utils/getCommonPinningStyles';
+import CustomTooltip from 'wrappers/CustomTooltip';
 
 const DataTableBody = ({
   emptyTableMessage,
@@ -18,55 +20,71 @@ const DataTableBody = ({
   dataLength,
   tableWithPinnedColumns,
   isScreenWiderThanTable,
-}) => (
-  <div
-    className="rt-tbody-v2"
-    style={{ width: (!isScreenWiderThanTable && tableWithPinnedColumns && dataLength && !loading) ? 'fit-content' : undefined }}
-  >
-    <DataTableStatus
-      label={emptyTableMessage?.id || defaultEmptyTableMessage.id}
-      defaultMessage={emptyTableMessage?.defaultMessage
+}) => {
+  const translate = useTranslate();
+
+  return (
+    <div
+      className="rt-tbody-v2"
+      style={{ width: (!isScreenWiderThanTable && tableWithPinnedColumns && dataLength && !loading) ? 'fit-content' : undefined }}
+    >
+      <DataTableStatus
+        label={emptyTableMessage?.id || defaultEmptyTableMessage.id}
+        defaultMessage={emptyTableMessage?.defaultMessage
           || defaultEmptyTableMessage.defaultMessage}
-      shouldDisplay={!dataLength && !loading}
-    />
-    <DataTableStatus
-      label={loadingMessage?.id || defaultLoadingTableMessage.id}
-      defaultMessage={loadingMessage?.defaultMessage || defaultLoadingTableMessage.defaultMessage}
-      shouldDisplay={loading}
-    />
-    {dataLength > 0 &&
+        shouldDisplay={!dataLength && !loading}
+      />
+      <DataTableStatus
+        label={loadingMessage?.id || defaultLoadingTableMessage.id}
+        defaultMessage={loadingMessage?.defaultMessage || defaultLoadingTableMessage.defaultMessage}
+        shouldDisplay={loading}
+      />
+      {dataLength > 0 &&
         !loading &&
-        rowModel.rows.map((row) => (
-          <div key={row.id} className="rt-tr-group cell-wrapper" role="rowgroup">
-            <TableRow key={row.id} className="rt-tr">
-              {row.getVisibleCells().map((cell) => {
-                const { hide, flexWidth, className } = useTableColumnMeta(cell.column);
-                if (hide) {
-                  return null;
-                }
-                return (
-                  <div
-                    className={`d-flex ${className}`}
-                    style={{
-                      ...getCommonPinningStyles(
-                        cell.column,
-                        flexWidth,
-                        isScreenWiderThanTable,
-                        dataLength,
-                        loading,
-                      ),
-                    }}
-                    key={cell.id}
-                  >
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </div>
-                );
-              })}
-            </TableRow>
-          </div>
-        ))}
-  </div>
-);
+        rowModel.rows.map((row) => {
+          const { isRowDisabled, label, defaultMessage } = row.original?.meta || {
+            isRowDisabled: false,
+            label: '',
+            defaultMessage: '',
+          };
+          return (
+            <CustomTooltip
+              content={isRowDisabled && translate(label, defaultMessage)}
+              show={isRowDisabled}
+            >
+              <div key={row.id} className="rt-tr-group cell-wrapper" role="rowgroup">
+                <TableRow key={row.id} className={`rt-tr ${isRowDisabled && 'bg-light'}`}>
+                  {row.getVisibleCells().map((cell) => {
+                    const { hide, flexWidth, className } = useTableColumnMeta(cell.column);
+                    if (hide) {
+                      return null;
+                    }
+                    return (
+                      <div
+                        className={`d-flex ${className} ${isRowDisabled && 'text-muted'}`}
+                        style={{
+                          ...getCommonPinningStyles(
+                            cell.column,
+                            flexWidth,
+                            isScreenWiderThanTable,
+                            dataLength,
+                            loading,
+                          ),
+                        }}
+                        key={cell.id}
+                      >
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </div>
+                    );
+                  })}
+                </TableRow>
+              </div>
+            </CustomTooltip>
+          );
+        })}
+    </div>
+  );
+};
 
 export default DataTableBody;
 

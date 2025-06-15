@@ -567,9 +567,9 @@ export function fetchBuyers(active = false) {
   };
 }
 
-export const fetchBinLocations = (currentLocationId, ignoreActivityCodes = []) =>
+export const fetchBinLocations = (currentLocationId, ignoreActivityCodes = [], sort = null) =>
   async (dispatch) => {
-    const fetchedBins = await fetchBins(currentLocationId, ignoreActivityCodes);
+    const fetchedBins = await fetchBins(currentLocationId, ignoreActivityCodes, sort);
     dispatch({
       type: FETCH_BIN_LOCATIONS,
       payload: fetchedBins,

@@ -4,7 +4,7 @@ import { createColumnHelper } from '@tanstack/react-table';
 import _ from 'lodash';
 import { useSelector } from 'react-redux';
 
-import { CYCLE_COUNT_DETAILS_REPORT } from 'api/urls';
+import { CYCLE_COUNT_SUMMARY_REPORT } from 'api/urls';
 import { TableCell } from 'components/DataTable';
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
 import ValueIndicator from 'components/DataTable/v2/ValueIndicator';
@@ -72,7 +72,7 @@ const useInventoryTransactionsTab = ({
     loading,
     setTableData,
   } = useTableDataV2({
-    url: CYCLE_COUNT_DETAILS_REPORT,
+    url: CYCLE_COUNT_SUMMARY_REPORT,
     errorMessageId: 'react.cycleCount.table.errorMessage.label',
     defaultErrorMessage: 'Unable to fetch products',
     // We should start fetching only after clicking the button
@@ -93,6 +93,27 @@ const useInventoryTransactionsTab = ({
     setTableData({ data: [], totalCount: 0 });
   }, [currentLocation?.id]);
 
+  const calculatePercentage = (quantityOnHand, quantityCounted, quantityVariance) => {
+    // If quantityOnHand is less than or equal to 0 and quantityCounted is 0,
+    // set percentageValue to 0
+    if (quantityOnHand <= 0 && quantityCounted === 0) {
+      return 0;
+    }
+
+    // If quantityOnHand is less than or equal to 0 and quantityCounted is not 0,
+    // set percentageValue to 100
+    if (quantityOnHand <= 0 && quantityCounted !== 0) {
+      return 100;
+    }
+
+    // Calculate percentage value only if quantityOnHand is greater than 0
+    if (quantityOnHand > 0) {
+      return Math.round((Math.abs(quantityVariance) / Math.abs(quantityOnHand)) * 100);
+    }
+
+    return 100;
+  };
+
   const columns = useMemo(() => [columnHelper.accessor(cycleCountColumn.ALIGNMENT, {
     header: () => (
       <TableHeaderCell sortable columnId={cycleCountColumn.ALIGNMENT} {...sortableProps}>
@@ -108,7 +129,7 @@ const useInventoryTransactionsTab = ({
         },
       },
     }) => (
-      <div className="rt-td d-flex align-items-start">
+      <div className="rt-td pb-0 d-flex align-items-start">
         <ValueIndicator variant={valueIndicatorVariant[varianceTypeCode]} />
       </div>
     ),
@@ -125,19 +146,17 @@ const useInventoryTransactionsTab = ({
     cell: ({
       row: {
         original: {
-          inventoryItem: {
-            product: {
-              id,
-              name,
-              productCode,
-            },
+          product: {
+            id,
+            name,
+            productCode,
           },
         },
       },
     }) => (
       <TableCell
         link={INVENTORY_ITEM_URL.showStockCard(id)}
-        className="rt-td multiline-cell"
+        className="rt-td pb-0 multiline-cell"
         customTooltip
         tooltipLabel={`${productCode} ${name}`}
       >
@@ -164,7 +183,7 @@ const useInventoryTransactionsTab = ({
         .replaceAll(' ', '_');
       return (
         <TableCell
-          className="rt-td d-flex align-items-start"
+          className="rt-td pb-0 d-flex align-items-start"
         >
           <ValueIndicator
             variant={valueIndicatorVariant.TRANSACTION}
@@ -193,7 +212,7 @@ const useInventoryTransactionsTab = ({
         },
       },
     }) => (
-      <div className="rt-td d-flex flex-column">
+      <div className="rt-td pb-0 d-flex flex-column">
         <span className="font-weight-500">{name}</span>
         <span>
           {dateWithoutTimeZone({
@@ -219,7 +238,7 @@ const useInventoryTransactionsTab = ({
     size: 145,
     cell: ({ getValue }) => (
       <TableCell
-        className="rt-td"
+        className="rt-td pb-0"
       >
         {getValue()?.toString()}
       </TableCell>
@@ -232,7 +251,7 @@ const useInventoryTransactionsTab = ({
     ),
     size: 100,
     cell: ({ getValue }) => (
-      <TableCell className="rt-td d-flex justify-content-end">
+      <TableCell className="rt-td pb-0 d-flex justify-content-end">
         {(getValue() ?? 0).toString()}
       </TableCell>
     ),
@@ -245,7 +264,7 @@ const useInventoryTransactionsTab = ({
     size: 100,
     cell: ({ getValue }) => (
       <TableCell
-        className="rt-td d-flex justify-content-end"
+        className="rt-td pb-0 d-flex justify-content-end"
       >
         {getValue()?.toString()}
       </TableCell>
@@ -261,6 +280,7 @@ const useInventoryTransactionsTab = ({
         original: {
           verificationCount: {
             quantityOnHand,
+            quantityCounted,
             quantityVariance,
           },
         },
@@ -268,13 +288,11 @@ const useInventoryTransactionsTab = ({
     }) => {
       const variant = getCycleCountDifferencesVariant(quantityVariance, quantityOnHand);
       const percentageValue =
-        quantityOnHand !== 0
-          ? Math.round((Math.abs(quantityVariance) / Math.abs(quantityOnHand)) * 100)
-          : 100;
+        calculatePercentage(quantityOnHand, quantityCounted, quantityVariance);
       const className = quantityVariance > 0 ? 'value-indicator--more' : 'value-indicator--less';
 
       return (
-        <TableCell className="rt-td d-flex flex-column align-items-center">
+        <TableCell className="rt-td pb-0 d-flex flex-column align-items-center">
           <ValueIndicator
             className={`pr-2 pl-1 py-1 value-indicator ${quantityVariance !== 0 && className}`}
             value={quantityVariance}
@@ -300,17 +318,20 @@ const useInventoryTransactionsTab = ({
       </TableHeaderCell>
     ),
     size: 200,
-    cell: ({ getValue }) => (
-      <TableCell
-        customTooltip
-        tooltipLabel={getValue()}
-        className="rt-td multiline-cell"
-      >
-        <div className="limit-lines-1">
-          {reasonCodes[getValue()]}
-        </div>
-      </TableCell>
-    ),
+    cell: ({ getValue }) => {
+      const rootCauses = getValue() ? getValue().split(',').map(cause => reasonCodes[cause]).join(', ') : '';
+      return (
+        <TableCell
+          customTooltip
+          tooltipLabel={rootCauses}
+          className="rt-td pb-0 multiline-cell"
+        >
+          <div className="limit-lines-2">
+            {rootCauses}
+          </div>
+        </TableCell>
+      );
+    },
   }), columnHelper.accessor(cycleCountColumn.COMMENTS, {
     header: () => (
       <TableHeaderCell>
@@ -318,17 +339,20 @@ const useInventoryTransactionsTab = ({
       </TableHeaderCell>
     ),
     size: 200,
-    cell: ({ getValue }) => (
-      <TableCell
-        customTooltip
-        tooltipLabel={getValue()}
-        className="rt-td multiline-cell"
-      >
-        <div className="limit-lines-2">
-          {getValue()}
-        </div>
-      </TableCell>
-    ),
+    cell: ({ getValue }) => {
+      const comments = getValue() ? getValue().split(/,(?=\S)/).join(', ') : '';
+      return (
+        <TableCell
+          customTooltip
+          tooltipLabel={comments}
+          className="rt-td pb-0 multiline-cell"
+        >
+          <div className="limit-lines-2">
+            {comments}
+          </div>
+        </TableCell>
+      );
+    },
   })], [currentLocale]);
 
   const emptyTableMessage = !filterParams.startDate && !filterParams.endDate

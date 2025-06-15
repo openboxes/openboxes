@@ -552,14 +552,14 @@ const useResolveStepTable = ({
           >
             {(original.id.includes('newRow') || original.custom) && (
               <RiDeleteBinLine
-                className="cursor-pointer"
+                className={isFormDisabled ? 'disabled-icon' : 'cursor-pointer'}
                 onClick={() => removeRow(cycleCountId, original.id)}
                 size={22}
               />
             )}
           </Tooltip>
         </TableCell>
-      ), []),
+      ), [isFormDisabled]),
       meta: {
         flexWidth: 50,
         hide: !tableData?.some((row) => row.id?.includes('newRow') || row.custom) || !isStepEditable,

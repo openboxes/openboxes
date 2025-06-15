@@ -1,10 +1,9 @@
-version: "3.8"
 services:
     app:
       extends: 
-        file: docker-compose-generic.yml
+        file: docker-compose-base.yml
         service: app
-      image: ghcr.io/openboxes/openboxes:feature-upgrade-to-grails-3.3.10
+      image: ghcr.io/openboxes/openboxes:v0.9.3
       # Use below 'image' property (with proper tag) if you use locally-built image
       # image: openboxes/openboxes:latest
       environment:
@@ -16,13 +15,13 @@ services:
 
     nginx:
       extends: 
-        file: docker-compose-generic.yml
+        file: docker-compose-base.yml
         service: nginx
       depends_on:
         - app
 
     db:
-      image: mysql:5.7
+      image: mariadb:10
       container_name: openboxes-db
       environment:
         MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}

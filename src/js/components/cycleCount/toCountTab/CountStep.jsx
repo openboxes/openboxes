@@ -2,7 +2,7 @@ import React, { useRef } from 'react';
 
 import _ from 'lodash';
 import { useSelector } from 'react-redux';
-import { getCycleCountRequestIds } from 'selectors';
+import { getCurrentLocation } from 'selectors';
 
 import ConfirmStepHeader from 'components/cycleCount/ConfirmStepHeader';
 import CountStepHeader from 'components/cycleCount/toCountTab/CountStepHeader';
@@ -14,10 +14,13 @@ import PageWrapper from 'wrappers/PageWrapper';
 import 'components/cycleCount/cycleCount.scss';
 
 const CountStep = () => {
-  const cycleCountIds = useSelector(getCycleCountRequestIds);
-  // Stores initial cycleCountIds to detect changes when switching locations
-  const initialCycleCountIds = useRef(cycleCountIds);
-  const isFormDisabled = !_.isEqual(cycleCountIds, initialCycleCountIds.current);
+  const {
+    currentLocation,
+  } = useSelector((state) => ({
+    currentLocation: getCurrentLocation(state),
+  }));
+  const initialCurrentLocation = useRef(currentLocation?.id);
+  const isFormDisabled = !_.isEqual(currentLocation?.id, initialCurrentLocation.current);
   const {
     tableData,
     printCountForm,
@@ -35,15 +38,15 @@ const CountStep = () => {
     isStepEditable,
     getCountedBy,
     getDefaultCountedBy,
-    isFormValid,
     triggerValidation,
     refreshFocusCounter,
     isSaveDisabled,
     setIsSaveDisabled,
     validateExistenceOfCycleCounts,
-    applyImportFile,
     importItems,
-    importFile,
+    sortByProductName,
+    setSortByProductName,
+    importErrors,
   } = useCountStep();
 
   return (
@@ -54,9 +57,10 @@ const CountStep = () => {
           next={() => validateExistenceOfCycleCounts(next)}
           save={() => validateExistenceOfCycleCounts(save)}
           isFormDisabled={isFormDisabled}
-          applyImportFile={applyImportFile}
           importItems={importItems}
-          importFile={importFile}
+          sortByProductName={sortByProductName}
+          setSortByProductName={setSortByProductName}
+          importErrors={importErrors}
         />
       ) : (
         <ConfirmStepHeader
@@ -87,7 +91,6 @@ const CountStep = () => {
             isStepEditable={isStepEditable}
             countedBy={getCountedBy(id)}
             defaultCountedBy={getDefaultCountedBy(id)}
-            isFormValid={isFormValid}
             triggerValidation={triggerValidation}
             refreshFocusCounter={refreshFocusCounter}
             isFormDisabled={isFormDisabled}

@@ -71,7 +71,7 @@
                                         <label><warehouse:message code="default.date.label"/></label>
                                     </td>
                                     <td class="value">
-                                        <g:jqueryDatePicker id="date" name="date" value="${commandInstance?.date}" format="MM/dd/yyyy" size="20"/>
+                                        <g:datePicker name="date" value="${commandInstance?.date}" precision="minute"/>
                                     </td>
                                 </tr>
                             </g:if>

@@ -29,6 +29,9 @@ const columns = {
   DIFFERENCE: 'difference',
   ROOT_CAUSES: 'verificationCount.varianceReasonCode',
   COMMENTS: 'verificationCount.varianceComment',
+  ASSIGNEE: 'assignee',
+  DEADLINE: 'deadline',
+  INVENTORY_ITEMS: 'inventoryItems',
 };
 
 export default columns;

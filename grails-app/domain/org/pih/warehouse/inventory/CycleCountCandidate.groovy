@@ -24,7 +24,7 @@ class CycleCountCandidate {
 
     Integer quantityOnHand
 
-    Integer quantityAvailable
+    Integer quantityAllocated
 
     Integer inventoryItemCount
 
@@ -66,6 +66,7 @@ class CycleCountCandidate {
                 productCatalogs: product.productCatalogs,
                 abcClass: abcClass,
                 quantityOnHand: quantityOnHand,
+                quantityAllocated: quantityAllocated,
                 cycleCountRequest: cycleCountRequest,
                 status: status.toString(),
                 inventoryItemCount: inventoryItemCount,

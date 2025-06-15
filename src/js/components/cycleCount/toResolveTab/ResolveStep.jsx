@@ -2,7 +2,7 @@ import React, { useRef } from 'react';
 
 import _ from 'lodash';
 import { useSelector } from 'react-redux';
-import { getCycleCountsIds } from 'selectors';
+import { getCurrentLocation } from 'selectors';
 
 import ConfirmStepHeader from 'components/cycleCount/ConfirmStepHeader';
 import ResolveStepHeader from 'components/cycleCount/toResolveTab/ResolveStepHeader';
@@ -15,10 +15,13 @@ import PageWrapper from 'wrappers/PageWrapper';
 import 'components/cycleCount/cycleCount.scss';
 
 const ResolveStep = () => {
-  const cycleCountIds = useSelector(getCycleCountsIds);
-  // Stores initial cycleCountIds to detect changes when switching locations
-  const initialCycleCountIds = useRef(cycleCountIds);
-  const isFormDisabled = !_.isEqual(cycleCountIds, initialCycleCountIds.current);
+  const {
+    currentLocation,
+  } = useSelector((state) => ({
+    currentLocation: getCurrentLocation(state),
+  }));
+  const initialCurrentLocation = useRef(currentLocation?.id);
+  const isFormDisabled = !_.isEqual(currentLocation?.id, initialCurrentLocation.current);
   const {
     tableData,
     validationErrors,
@@ -40,12 +43,13 @@ const ResolveStep = () => {
     submitRecount,
     getProduct,
     getDateCounted,
-    isFormValid,
     refreshFocusCounter,
     triggerValidation,
     isSaveDisabled,
     setIsSaveDisabled,
     cycleCountsWithItemsWithoutRecount,
+    sortByProductName,
+    setSortByProductName,
   } = useResolveStep();
   useTranslation('cycleCount');
 
@@ -58,6 +62,8 @@ const ResolveStep = () => {
           next={next}
           save={save}
           isFormDisabled={isFormDisabled}
+          sortByProductName={sortByProductName}
+          setSortByProductName={setSortByProductName}
         />
       ) : (
         <ConfirmStepHeader
@@ -90,7 +96,6 @@ const ResolveStep = () => {
             isStepEditable={isStepEditable}
             recountedBy={getRecountedBy(id)}
             countedBy={getCountedBy(id)}
-            isFormValid={isFormValid}
             triggerValidation={triggerValidation}
             refreshFocusCounter={refreshFocusCounter}
             cycleCountWithItemsWithoutRecount={

@@ -24,7 +24,6 @@ import { UPDATE_CYCLE_COUNT_IDS } from 'actions/types';
 import cycleCountApi from 'api/services/CycleCountApi';
 import { CYCLE_COUNT as CYCLE_COUNT_URL, CYCLE_COUNT_PENDING_REQUESTS } from 'api/urls';
 import notification from 'components/Layout/notifications/notification';
-import ActivityCode from 'consts/activityCode';
 import { CYCLE_COUNT } from 'consts/applicationUrls';
 import { ALL_PRODUCTS_TAB, TO_COUNT_TAB, TO_RESOLVE_TAB } from 'consts/cycleCount';
 import cycleCountStatus from 'consts/cycleCountStatus';
@@ -55,7 +54,8 @@ const useCountStep = () => {
   // it will reset the focus by clearing the RowIndex and ColumnId in useEffect.
   const [refreshFocusCounter, setRefreshFocusCounter] = useState(0);
   const [isSaveDisabled, setIsSaveDisabled] = useState(false);
-  const [importFile, setImportFile] = useState(null);
+  const [sortByProductName, setSortByProductName] = useState(false);
+  const [importErrors, setImportErrors] = useState([]);
 
   const dispatch = useDispatch();
   const history = useHistory();
@@ -65,11 +65,12 @@ const useCountStep = () => {
   const {
     cycleCountIds,
     currentLocation,
+    currentUser,
   } = useSelector((state) => ({
     cycleCountIds: getCycleCountRequestIds(state),
     currentLocation: getCurrentLocation(state),
+    currentUser: state.session.user,
   }));
-
   const resetFocus = () => {
     setRefreshFocusCounter((prev) => prev + 1);
   };
@@ -81,7 +82,8 @@ const useCountStep = () => {
     if (showBinLocation) {
       dispatch(fetchBinLocations(
         currentLocation?.id,
-        [ActivityCode.RECEIVE_STOCK],
+        [],
+        'sortOrder,locationType,name',
       ));
     }
   }, [currentLocation?.id]);
@@ -90,7 +92,6 @@ const useCountStep = () => {
     validationErrors,
     triggerValidation,
     forceRerender,
-    isFormValid,
     resetValidationState,
   } = useCountStepValidation({ tableData });
 
@@ -128,6 +129,7 @@ const useCountStep = () => {
       const { data } = await cycleCountApi.getCycleCounts(
         currentLocation?.id,
         cycleCountIds,
+        sortByProductName && 'productName',
       );
       tableData.current = filterCountItems(data?.data)?.map((cycleCount) => ({
         ...cycleCount,
@@ -153,7 +155,7 @@ const useCountStep = () => {
 
   useEffect(() => {
     fetchCycleCounts();
-  }, [cycleCountIds]);
+  }, [cycleCountIds, sortByProductName]);
 
   // Fetching data for "counted by" dropdown
   useEffect(() => {
@@ -307,32 +309,34 @@ const useCountStep = () => {
 
   const getCountedDate = (cycleCountId) => dateCounted[cycleCountId];
 
-  const getPayload = (cycleCountItem, cycleCount) => ({
+  const getPayload = (cycleCountItem, cycleCount, shouldSetDefaultAssignee) => ({
     ...cycleCountItem,
     recount: false,
-    assignee: getCountedBy(cycleCount.id)?.id,
+    assignee: shouldSetDefaultAssignee
+      ? getCountedBy(cycleCount.id)?.id ?? currentUser.id
+      : getCountedBy(cycleCount.id)?.id,
     dateCounted: getCountedDate(cycleCount.id),
     inventoryItem: {
       ...cycleCountItem?.inventoryItem,
       product: cycleCountItem.product?.id,
       expirationDate: dateWithoutTimeZone({
         date: cycleCountItem?.inventoryItem?.expirationDate,
-        currentDateFormat: DateFormat.MMM_DD_YYYY,
         outputDateFormat: DateFormat.MM_DD_YYYY,
       }),
     },
   });
 
-  const save = async () => {
+  const save = async (shouldSetDefaultAssignee = false) => {
     try {
       show();
       resetValidationState();
       for (const cycleCount of tableData.current) {
         const cycleCountItemsToUpdate = cycleCount.cycleCountItems
-          .filter((item) => (item.updated && !item.id.includes('newRow')))
+          .filter((item) => ((item.updated || !item.assignee) && !item.id.includes('newRow')))
           .map(trimLotNumberSpaces);
         const updatePayload = {
-          itemsToUpdate: cycleCountItemsToUpdate.map((item) => getPayload(item, cycleCount)),
+          itemsToUpdate: cycleCountItemsToUpdate.map((item) =>
+            getPayload(item, cycleCount, shouldSetDefaultAssignee)),
         };
         if (updatePayload.itemsToUpdate.length > 0) {
           await cycleCountApi
@@ -342,7 +346,8 @@ const useCountStep = () => {
           .filter((item) => item.id.includes('newRow'))
           .map(trimLotNumberSpaces);
         const createPayload = {
-          itemsToCreate: cycleCountItemsToCreate.map((item) => getPayload(item, cycleCount)),
+          itemsToCreate: cycleCountItemsToCreate.map((item) =>
+            getPayload(item, cycleCount, shouldSetDefaultAssignee)),
         };
         if (createPayload.itemsToCreate.length > 0) {
           await cycleCountApi
@@ -367,7 +372,7 @@ const useCountStep = () => {
     await save();
     await exportFileFromApi({
       url: CYCLE_COUNT_URL(currentLocation?.id),
-      params: { id: cycleCountIds },
+      params: { id: cycleCountIds, sortBy: sortByProductName && 'productName' },
       format,
     });
     resetFocus();
@@ -376,14 +381,9 @@ const useCountStep = () => {
 
   const next = async () => {
     const isValid = triggerValidation();
-    const currentCycleCountIds = tableData.current.map((cycleCount) => cycleCount.id);
     forceRerender();
-    const areCountedByFilled = _.every(
-      currentCycleCountIds,
-      (id) => getCountedBy(id)?.id,
-    );
-    if (isValid && areCountedByFilled) {
-      await save();
+    if (isValid) {
+      await save(true);
       setIsStepEditable(false);
     }
     resetFocus();
@@ -518,8 +518,8 @@ const useCountStep = () => {
           return acc;
         }, []);
       dispatch(eraseDraft(currentLocation?.id, TO_COUNT_TAB));
-      const requestIdsWithoutDiscrepancies
-        = submittedCounts.length - requestIdsWithDiscrepancies.length;
+      const requestIdsWithoutDiscrepancies =
+        submittedCounts.length - requestIdsWithDiscrepancies.length;
       if (requestIdsWithDiscrepancies.length > 0) {
         openResolveDiscrepanciesModal(requestIdsWithDiscrepancies, requestIdsWithoutDiscrepancies);
         return;
@@ -569,21 +569,80 @@ const useCountStep = () => {
     resetFocus();
   };
 
-  const applyImportFile = async (e) => {
-    if (e instanceof File) {
-      setImportFile(e);
-    }
-  };
+  const createCustomItemsFromImport = (items) => (items
+    ? items.map((item) => ({
+      ...item,
+      countIndex: 0,
+      id: _.uniqueId('newRow'),
+      custom: true,
+      inventoryItem: {
+        lotNumber: item.lotNumber,
+        expirationDate: item.expirationDate,
+      },
+      product: {
+        id: item.product.id,
+        productCode: item.product.productCode,
+      },
+      binLocation: item.binLocation?.id ? {
+        id: item.binLocation.id,
+        name: item.binLocation.name,
+      } : null,
+    }))
+    : []);
 
-  const importItems = async () => {
+  const removeItemFromCycleCounts = (cycleCounts, cycleCountId, itemId) => ({
+    ...cycleCounts,
+    [cycleCountId]: cycleCounts[cycleCountId]
+      .filter((item) => item.cycleCountItemId !== itemId),
+  });
+
+  const mergeImportItems = (originalItem, importedItem) => ({
+    ...originalItem,
+    quantityCounted: importedItem ? importedItem.quantityCounted : originalItem.quantityCounted,
+    comment: importedItem ? importedItem.comment : originalItem.comment,
+    updated: true,
+  });
+
+  const importItems = async (importFile) => {
     try {
       show();
-      const response = await cycleCountApi.importCycleCountItems(importFile, currentLocation?.id);
-      console.log(response);
+      const response = await cycleCountApi.importCycleCountItems(
+        importFile[0],
+        currentLocation?.id,
+      );
+      setImportErrors(response.data.errors);
+      let cycleCounts = _.groupBy(response.data.data, 'cycleCountId');
+      tableData.current = tableData.current.map((cycleCount) => ({
+        ...cycleCount,
+        cycleCountItems: [
+          ...cycleCount.cycleCountItems
+            .map((item) => {
+              const correspondingImportItem = cycleCounts[cycleCount.id]?.find(
+                (cycleCountItem) => cycleCountItem.cycleCountItemId === item.id,
+              );
+
+              if (correspondingImportItem) {
+                // Remove items from the import that have a corresponding item
+                // in the current cycle count. It allows us to treat items with
+                // the wrong ID as new rows that do not already exist.
+                cycleCounts = removeItemFromCycleCounts(
+                  cycleCounts,
+                  cycleCount.id,
+                  correspondingImportItem.cycleCountItemId,
+                );
+              }
+
+              return mergeImportItems(item, correspondingImportItem);
+            }),
+          ...createCustomItemsFromImport(cycleCounts[cycleCount.id]),
+        ],
+      }));
     } finally {
+      // After import we want to trigger the validation on fields,
+      // so that a user knows what fields to correct from the UI
+      triggerValidation();
       hide();
     }
-    // TODO: Map items to the table
   };
 
   return {
@@ -606,13 +665,13 @@ const useCountStep = () => {
     validateExistenceOfCycleCounts,
     resolveDiscrepancies,
     isStepEditable,
-    isFormValid,
     refreshFocusCounter,
     isSaveDisabled,
     setIsSaveDisabled,
-    applyImportFile,
     importItems,
-    importFile,
+    sortByProductName,
+    setSortByProductName,
+    importErrors,
   };
 };
 

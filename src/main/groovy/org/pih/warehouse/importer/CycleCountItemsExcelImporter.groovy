@@ -5,10 +5,14 @@ import org.grails.plugins.excelimport.AbstractExcelImporter
 import org.grails.plugins.excelimport.DefaultImportCellCollector
 import org.grails.plugins.excelimport.ExcelImportService
 import org.grails.plugins.excelimport.ExpectedPropertyType
+import org.pih.warehouse.core.Location
+import org.pih.warehouse.inventory.CycleCountImportService
+import org.pih.warehouse.product.Product
 
 class CycleCountItemsExcelImporter extends AbstractExcelImporter implements DataImporter {
 
     ExcelImportService excelImportService
+    CycleCountImportService cycleCountImportService
 
     static CELL_REPORTER = new DefaultImportCellCollector()
 
@@ -17,21 +21,23 @@ class CycleCountItemsExcelImporter extends AbstractExcelImporter implements Data
             startRow : 1,
             columnMap: [
                     A: "cycleCountId",
-                    B: "productCode",
-                    C: "product.name",
-                    D: "lotNumber",
-                    E: "expirationDate",
-                    F: "binLocation",
-                    G: "quantityCounted",
-                    H: "comment",
+                    B: "cycleCountItemId",
+                    C: "productCode",
+                    D: "product.name",
+                    E: "lotNumber",
+                    F: "expirationDate",
+                    G: "binLocation",
+                    H: "quantityCounted",
+                    I: "comment",
             ]
     ]
 
     static Map PROPERTY_MAP = [
             cycleCountId:             ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            cycleCountItemId:         ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
             productCode:              ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
             "product.name":           ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
-            "lotNumber":              ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            "lotNumber":              ([expectedType: ExpectedPropertyType.StringType, defaultValue: ""]),
             "expirationDate":         ([expectedType: ExpectedPropertyType.DateJavaType, defaultValue: null]),
             "binLocation":            ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
             "quantityCounted":        ([expectedType: ExpectedPropertyType.IntType, defaultValue: null]),
@@ -42,23 +48,50 @@ class CycleCountItemsExcelImporter extends AbstractExcelImporter implements Data
         super()
         read(fileName)
         excelImportService = Holders.grailsApplication.mainContext.getBean("excelImportService")
-
+        cycleCountImportService = Holders.grailsApplication.mainContext.getBean(CycleCountImportService)
     }
 
     @Override
     List<Map> getData() {
-        excelImportService.columns(
+        List<Map> data = excelImportService.columns(
                 workbook,
                 COLUMN_MAP,
                 CELL_REPORTER,
                 PROPERTY_MAP
-        )
+        ) as List<Map>
+
+        // 1. Collect all uniques bin location names and product codes
+        List<String> locationNames = data*.binLocation.unique()
+        List<String> productCodes  = data*.productCode.unique()
+
+        // 2. Fetch all of the necessary data in single database call
+        Map<String, Location> locationMap = Location.findAllByNameInList(locationNames).collectEntries {
+            [it.name, it]
+        }
+        Map<String, Product> productMap = Product.findAllByProductCodeInList(productCodes).collectEntries {
+            [it.productCode, it]
+        }
+
+        // 3. Replace data from importer with the fetched data
+        data.each { row ->
+            row.binLocation = (locationMap[row.binLocation] && row.binLocation) ? [
+                    id: locationMap[row.binLocation]?.id,
+                    name: locationMap[row.binLocation]?.name
+            ] : null
+            row.product = [
+                    id: productMap[row.productCode]?.id,
+                    name: productMap[row.productCode]?.name,
+                    productCode: productMap[row.productCode]?.productCode
+            ]
+        }
+
+        return data
     }
 
 
     @Override
     void validateData(ImportDataCommand command) {
-        throw new UnsupportedOperationException("This operation is not supported")
+        cycleCountImportService.validateCountImport(command)
     }
 
     @Override

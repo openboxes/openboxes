@@ -3,6 +3,8 @@ package org.pih.warehouse.inventory
 import grails.gorm.PagedResultList
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
+import org.apache.commons.collections4.keyvalue.MultiKey
+import org.apache.commons.collections4.map.MultiKeyMap
 import org.apache.commons.csv.CSVPrinter
 import org.apache.commons.lang.StringEscapeUtils
 import org.grails.datastore.mapping.query.api.Criteria
@@ -15,14 +17,19 @@ import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.product.Product
-import org.pih.warehouse.report.CycleCountTransactionReportCommand
+import org.hibernate.criterion.CriteriaSpecification
+import org.pih.warehouse.report.CycleCountReportCommand
 
 @Transactional
 class CycleCountService {
 
+    /**
+     * The count index representing the initial count.
+     */
+    static final int INITIAL_COUNT_INDEX = 0
+
     CycleCountTransactionService cycleCountTransactionService
     CycleCountProductAvailabilityService cycleCountProductAvailabilityService
-    ProductAvailabilityService productAvailabilityService
 
     List<CycleCountCandidate> getCandidates(CycleCountCandidateFilterCommand command, String facilityId) {
         if (command.hasErrors()) {
@@ -78,7 +85,12 @@ class CycleCountService {
                 isNull("status")
             }
             else {
-                inList("status", command.statuses)
+                or {
+                    inList("status", command.statuses)
+                    if (command.showCycleCountsInProgress) {
+                        isNull("status")
+                    }
+                }
             }
 
             if (command.negativeQuantity) {
@@ -89,15 +101,24 @@ class CycleCountService {
             //  product/facility pairs where quantity on hand is negative.
             // Moved this from the cycle count session view since it's a requirement of the candidate query,
             // not the cycle count session.
-            if (command.includeStockOnHandOrNegativeStock) {
+            if (command.includeStockOnHandOrNegativeStock && !command.showCycleCountsInProgress) {
                 eq("hasStockOnHandOrNegativeStock", command.includeStockOnHandOrNegativeStock)
+            }
+
+            // Products from the "To Count" and "To Resolve" tabs can have negative stock,
+            // but we want to include them in the results
+            if (command.showCycleCountsInProgress) {
+                or {
+                    inList("status", command.statuses)
+                    eq("hasStockOnHandOrNegativeStock", command.includeStockOnHandOrNegativeStock)
+                }
             }
 
             // FIXME Sort order should allow multiple sort order rules ("columna, -columnb"). We should consider
             //  using a more conventional syntax for the column and direction i.e. "columna" sorts "columna" in
             //  ascending order while "-columnb" sorts "columnb" in descending order.
             // Don't check command.sort because we want the default case to be applied if there's no sort order
-            applySortOrder(command.sort, command.order, delegate, usedAliases)
+            applySortOrderForCandidates(command.sort, command.order, delegate, usedAliases)
 
         } as List<CycleCountCandidate>
     }
@@ -157,12 +178,12 @@ class CycleCountService {
                 gt("negativeItemCount", 0)
             }
 
-            applySortOrder(command.sort, command.order, delegate, usedAliases)
+            applySortOrderForCandidates(command.sort, command.order, delegate, usedAliases)
 
         } as List<PendingCycleCountRequest>
     }
 
-    private static void applySortOrder(String sortBy, String orderDirection, Criteria criteria, Set<String> usedAliases) {
+    private static void applySortOrderForCandidates(String sortBy, String orderDirection, Criteria criteria, Set<String> usedAliases) {
         switch (sortBy) {
             case "product":
                 createProductAlias(criteria, usedAliases)
@@ -182,6 +203,20 @@ class CycleCountService {
                 break
             case "quantityOnHand":
                 criteria.addOrder(getOrderDirection("quantityOnHand", orderDirection))
+                break
+            default:
+                break
+        }
+    }
+
+    private static void applySortOrderForCycleCounts(String sortBy, String orderDirection, Criteria criteria, Set<String> usedAliases) {
+        switch (sortBy) {
+            case "productName":
+                criteria.createAlias("cycleCountItems", "item", JoinType.LEFT_OUTER_JOIN)
+                criteria.createAlias("item.product", "product", JoinType.INNER_JOIN)
+                usedAliases.addAll(["item", "product"])
+                criteria.addOrder(getOrderDirection("product.name", orderDirection))
+                criteria.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY)
                 break
             default:
                 break
@@ -264,14 +299,15 @@ class CycleCountService {
         cycleCounts.each { CycleCountDto cycleCount ->
             cycleCount.cycleCountItems.each { CycleCountItemDto item ->
                 data << [
-                        "Cycle count id": cycleCount.id,
+                        "Product cycle count id": cycleCount.id,
+                        "Cycle count item id": item.id,
                         "Product Code": item.product.productCode,
                         "Product Name": item.product.name,
                         "Lot Number": item.inventoryItem.lotNumber,
                         "Expiration Date": item.inventoryItem.expirationDate
                                 ? Constants.EXPIRATION_DATE_FORMATTER.format(item.inventoryItem.expirationDate) : "",
                         "Bin Location": item.binLocation?.name,
-                        "Quantity Counted": item.quantityCounted ?: "",
+                        "Quantity Counted": item.quantityCounted != null ? item.quantityCounted : "",
                         "Comment": item.comment ?: "",
                         "User Counted": item.assignee?.name ?: "",
                         "Date Counted": item.dateCounted
@@ -286,27 +322,80 @@ class CycleCountService {
     List<Map> getRecountFormXls(List<CycleCountDto> cycleCounts) {
         List<Map> data = []
         cycleCounts.each { CycleCountDto cycleCount ->
-            cycleCount.cycleCountItems?.findAll { it.countIndex == 0 }?.each { CycleCountItemDto item ->
-                data << [
-                        "Product Code": item.product.productCode,
-                        "Product Name": item.product.name,
-                        "Lot Number": item.inventoryItem.lotNumber,
-                        "Expiration Date": item.inventoryItem.expirationDate
-                                ? Constants.EXPIRATION_DATE_FORMATTER.format(item.inventoryItem.expirationDate) : "",
-                        "Bin Location": item.binLocation?.name,
-                        "Quantity Counted": item.quantityCounted,
-                        "Difference": item.quantityVariance,
-                        "Counted by": item.assignee,
-                        "Date Counted": item.dateCounted ? Constants.EXPIRATION_DATE_FORMATTER.format(item.dateCounted) : "",
-                        "Quantity Recounted": "",
-                        "Comment": "",
-                        "Recounted By": "",
-                        "Date Recounted": ""
-                ]
-            }
+            data.addAll(getRecountAsXlsMap(cycleCount))
         }
 
         return data
+    }
+
+    /**
+     * Converts a CycleCountDto to a list of rows/maps. For use when exporting to XLS.
+     */
+    private List<Map> getRecountAsXlsMap(CycleCountDto cycleCount) {
+        int currentCountIndex = cycleCount.maxCountIndex
+
+        // Build a map to make it easier to group the count and recount items into one row in the XLS.
+        // The outer map is keyed on [product code + lot + bin]. The inner map is keyed on count index.
+        MultiKeyMap<String, Map<Integer, CycleCountItemDto>> countItemsMap = [:]
+        List<CycleCountItemDto> customRecountItems = []
+        for (CycleCountItemDto item in cycleCount.cycleCountItems) {
+            // Keep custom recount items separate because they can have duplicate keys and don't have a count item.
+            if (item.countIndex == currentCountIndex && item.custom) {
+                customRecountItems.add(item)
+                continue
+            }
+
+            MultiKey<String> key = new MultiKey(
+                    item.product.productCode,
+                    item.inventoryItem?.lotNumber,
+                    item.binLocation?.get('name'),
+            )
+            Map<Integer, CycleCountItemDto> countItemByIndex = countItemsMap.computeIfAbsent(key, { k -> [:] })
+            countItemByIndex.put(item.countIndex, item)
+        }
+
+        List<Map> data = []
+        for (itemsEntry in countItemsMap.entrySet()) {
+            CycleCountItemDto countItem = itemsEntry.value.get(INITIAL_COUNT_INDEX)
+            CycleCountItemDto recountItem = itemsEntry.value.get(currentCountIndex)
+            data << mergeCountAndRecountItemAsXlsMap(countItem, recountItem)
+        }
+
+        for (CycleCountItemDto customItem in customRecountItems) {
+            data << mergeCountAndRecountItemAsXlsMap(null, customItem)
+        }
+        return data
+    }
+
+    /**
+     * Merge two CycleCountItemDtos together into a single map/row. For use when exporting to XLS.
+     * @param countItem Represents the item in the original count
+     * @param recountItem Represents the item in the current recount
+     */
+    private Map mergeCountAndRecountItemAsXlsMap(CycleCountItemDto countItem, CycleCountItemDto recountItem) {
+        return [
+                "Product Code": recountItem.product.productCode,
+                "Product Name": recountItem.product.name,
+                "Lot Number": recountItem.inventoryItem.lotNumber,
+                "Expiration Date": recountItem.inventoryItem.expirationDate
+                        ? Constants.EXPIRATION_DATE_FORMATTER.format(recountItem.inventoryItem.expirationDate) : "",
+                "Bin Location": recountItem.binLocation?.name,
+
+                // Count-specific fields
+                "Quantity Counted": countItem?.quantityCounted != null ? countItem.quantityCounted : "",
+                "Difference": countItem?.quantityVariance ?: "",
+                "Counted by": countItem?.assignee ?: "",
+                "Date Counted": countItem?.dateCounted
+                        ? Constants.MONTH_DAY_YEAR_DATE_FORMATTER.format(countItem.dateCounted) : "",
+
+                // Recount-specific fields
+                "Quantity Recounted": recountItem.quantityCounted != null ? recountItem.quantityCounted : "",
+                "Root Cause": recountItem.discrepancyReasonCode ?: "",
+                "Comment": recountItem.comment ?: "",
+                "Recounted By": recountItem.assignee ?: "",
+                "Date Recounted": recountItem.dateCounted
+                        ? Constants.MONTH_DAY_YEAR_DATE_FORMATTER.format(recountItem.dateCounted) : "",
+        ]
     }
 
     /**
@@ -502,11 +591,13 @@ class CycleCountService {
         )
     }
 
-    List<CycleCountDto> getCycleCounts(List<String> ids) {
+    List<CycleCountDto> getCycleCounts(List<String> ids, String sortBy) {
+        Set<String> usedAliases = new HashSet<>()
         List<CycleCount> cycleCounts = CycleCount.createCriteria().list {
             if (ids) {
                 'in'("id", ids)
             }
+            applySortOrderForCycleCounts(sortBy, "asc", delegate, usedAliases)
         } as List<CycleCount>
         return cycleCounts.collect { CycleCountDto.toDto(it) }
     }
@@ -720,9 +811,8 @@ class CycleCountService {
     }
 
 
-    // FIXME Move to the appropriate service (if we want to separate services from reporting)
     @Transactional(readOnly=true)
-    PagedResultList getCycleCountTransactionReport(CycleCountTransactionReportCommand command) {
+    PagedResultList getCycleCountDetailsReport(CycleCountReportCommand command) {
         return CycleCountDetails.createCriteria().list(command.paginationParams) {
             if (command.facility) {
                 eq("facility", command.facility)
@@ -741,4 +831,27 @@ class CycleCountService {
             }
         }
     }
+
+    @Transactional(readOnly=true)
+    PagedResultList getCycleCountSummaryReport(CycleCountReportCommand command) {
+        return CycleCountSummary.createCriteria().list(command.paginationParams) {
+            if (command.facility) {
+                eq("facility", command.facility)
+            }
+            if (command.startDate && command.endDate) {
+                between("dateRecorded", command.startDate, command.endDate)
+            }
+            else if (command.startDate) {
+                gte("dateRecorded", command.startDate)
+            }
+            else if (command.endDate) {
+                lte("dateRecorded", command.endDate)
+            }
+            if (command.products) {
+                "in"("product", command.products)
+            }
+        }
+    }
+
+
 }

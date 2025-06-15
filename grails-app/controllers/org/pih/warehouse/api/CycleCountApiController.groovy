@@ -15,6 +15,7 @@ import org.pih.warehouse.importer.PackingListExcelImporter
 import org.pih.warehouse.inventory.CycleCountCandidate
 import org.pih.warehouse.inventory.CycleCountCandidateFilterCommand
 import org.pih.warehouse.inventory.CycleCountDto
+import org.pih.warehouse.inventory.CycleCountImportService
 import org.pih.warehouse.inventory.CycleCountItemBatchCommand
 import org.pih.warehouse.inventory.CycleCountItemCommand
 import org.pih.warehouse.inventory.CycleCountItemDto
@@ -29,7 +30,7 @@ import org.pih.warehouse.inventory.CycleCountSubmitRecountCommand
 import org.pih.warehouse.inventory.CycleCountUpdateItemBatchCommand
 import org.pih.warehouse.inventory.CycleCountUpdateItemCommand
 import org.pih.warehouse.inventory.PendingCycleCountRequest
-import org.pih.warehouse.report.CycleCountTransactionReportCommand
+import org.pih.warehouse.report.CycleCountReportCommand
 import org.springframework.web.multipart.MultipartFile
 
 class CycleCountApiController {
@@ -37,6 +38,7 @@ class CycleCountApiController {
     CycleCountService cycleCountService
     DocumentService documentService
     UploadService uploadService
+    CycleCountImportService cycleCountImportService
 
     def getCandidates(CycleCountCandidateFilterCommand filterParams) {
         List<CycleCountCandidate> cycleCounts = cycleCountService.getCandidates(filterParams, params.facilityId)
@@ -104,7 +106,8 @@ class CycleCountApiController {
 
     def list() {
         List<String> ids = params.list("id")
-        List<CycleCountDto> cycleCounts = cycleCountService.getCycleCounts(ids)
+        String sortBy = params.sortBy
+        List<CycleCountDto> cycleCounts = cycleCountService.getCycleCounts(ids, sortBy)
 
         boolean isRecount = cycleCounts?.any { (it.status as CycleCountStatus).isRecounting() }
         String facilityName = cycleCounts?.find()?.cycleCountItems?.find()?.facility?.name  ?: ""
@@ -226,12 +229,27 @@ class CycleCountApiController {
         File localFile = uploadService.createLocalFile(importFile.originalFilename)
         importFile.transferTo(localFile)
         DataImporter cycleCountItemsExcelImporter = new CycleCountItemsExcelImporter(localFile.absolutePath)
-
-        render([data: cycleCountItemsExcelImporter.data] as JSON)
+        // After importer takes care of parsing the data, assign it to the import data command that is further validated
+        command.data = cycleCountItemsExcelImporter.data
+        cycleCountItemsExcelImporter.validateData(command)
+        // Collect the errors after validating the data to readable state
+        List<String> errors = cycleCountImportService.buildErrors(command)
+        render([data: command.data, errors: errors] as JSON)
     }
 
-    def getCycleCountTransactionReport(CycleCountTransactionReportCommand command) {
-        PagedResultList data = cycleCountService.getCycleCountTransactionReport(command)
+    def getCycleCountDetails(CycleCountReportCommand command) {
+        PagedResultList data = cycleCountService.getCycleCountDetailsReport(command)
+        render([
+                data      : data,
+                count     : data?.size() ?: 0,
+                max       : command.max,
+                offset    : command.offset,
+                totalCount: data.totalCount,
+        ] as JSON)
+    }
+
+    def getCycleCountSummary(CycleCountReportCommand command) {
+        PagedResultList data = cycleCountService.getCycleCountSummaryReport(command)
         render([
                 data      : data,
                 count     : data?.size() ?: 0,

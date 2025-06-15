@@ -17,8 +17,10 @@ import TableHeaderCell from 'components/DataTable/TableHeaderCell';
 import Checkbox from 'components/form-elements/v2/Checkbox';
 import { INVENTORY_ITEM_URL } from 'consts/applicationUrls';
 import { TO_COUNT_TAB } from 'consts/cycleCount';
+import CycleCountCandidateStatus from 'consts/cycleCountCandidateStatus';
 import cycleCountColumn from 'consts/cycleCountColumn';
 import { DateFormat } from 'consts/timeFormat';
+import useCycleCountProductAvailability from 'hooks/cycleCount/useCycleCountProductAvailability';
 import useQueryParams from 'hooks/useQueryParams';
 import useSpinner from 'hooks/useSpinner';
 import useTableCheckboxes from 'hooks/useTableCheckboxes';
@@ -81,6 +83,14 @@ const useAllProductsTab = ({
   const getParams = ({
     sortingParams,
   }) => _.omitBy({
+    statuses: [
+      CycleCountCandidateStatus.CREATED,
+      CycleCountCandidateStatus.REQUESTED,
+      CycleCountCandidateStatus.COUNTING,
+      CycleCountCandidateStatus.COUNTED,
+      CycleCountCandidateStatus.INVESTIGATING,
+    ],
+    showCycleCountsInProgress: true,
     offset: `${offset}`,
     max: `${pageSize}`,
     ...sortingParams,
@@ -127,7 +137,23 @@ const useAllProductsTab = ({
     serializedParams,
   });
 
-  const productIds = tableData.data.map((row) => row.product.id);
+  const extendedDataTable = useMemo(() => {
+    if (!tableData.data) {
+      return tableData;
+    }
+    return {
+      ...tableData,
+      data: tableData.data.map((row) => ({
+        ...row,
+        // Added meta to rows because TanStack Table doesn't support meta at the row level
+        meta: useCycleCountProductAvailability(row),
+      })),
+    };
+  }, [tableData]);
+
+  const productIds = extendedDataTable.data
+    .filter((row) => !row.meta.isRowDisabled)
+    .map((row) => row.product.id);
 
   // Separated from columns to reduce the amount of rerenders of
   // the rest columns (on checked checkboxes change)
@@ -141,15 +167,21 @@ const useAllProductsTab = ({
         />
       </TableHeaderCell>
     ),
-    cell: ({ row }) => (
-      <TableCell className="rt-td">
-        <Checkbox
-          noWrapper
-          onChange={selectRow(row.original.product.id)}
-          value={isChecked(row.original.product.id)}
-        />
-      </TableCell>
-    ),
+    cell: ({ row }) => {
+      const { isRowDisabled, isFromOtherTab } = row.original.meta;
+      return (
+        <TableCell className="rt-td">
+          <Checkbox
+            noWrapper
+            onChange={selectRow(row.original.product.id)}
+            value={isRowDisabled && isFromOtherTab
+              ? true
+              : isChecked(row.original.product.id)}
+            disabled={isRowDisabled}
+          />
+        </TableCell>
+      );
+    },
     meta: {
       getCellContext: () => ({
         className: 'checkbox-column',
@@ -190,7 +222,10 @@ const useAllProductsTab = ({
         <TableCell
           tooltip
           tooltipLabel={getValue()}
-          link={INVENTORY_ITEM_URL.showStockCard(row.original.product.id)}
+          // If isFromOtherTab is true, we don't want the link to work.
+          // This means that the product is already in To Count tab or To Resolve tab.
+          link={!row.original.meta.isFromOtherTab
+            && INVENTORY_ITEM_URL.showStockCard(row.original.product.id)}
           className="rt-td multiline-cell"
         >
           <div className="limit-lines-2">
@@ -270,9 +305,9 @@ const useAllProductsTab = ({
           {translate('react.cycleCount.table.tag.label', 'Tag')}
         </TableHeaderCell>
       ),
-      cell: ({ getValue }) => (
+      cell: ({ getValue, row }) => (
         <TableCell className="rt-td multiline-cell">
-          <div className="badge-container">
+          <div className={`badge-container ${row.original.meta.isRowDisabled && 'disabled'}`}>
             {getValue()}
           </div>
         </TableCell>
@@ -289,9 +324,9 @@ const useAllProductsTab = ({
           {translate('react.cycleCount.table.productCatalogue.label', 'Product Catalogue')}
         </TableHeaderCell>
       ),
-      cell: ({ getValue }) => (
+      cell: ({ getValue, row }) => (
         <TableCell className="rt-td multiline-cell">
-          <div className="badge-container">
+          <div className={`badge-container ${row.original.meta.isRowDisabled && 'disabled'}`}>
             {getValue()}
           </div>
         </TableCell>
@@ -382,7 +417,7 @@ const useAllProductsTab = ({
 
   return {
     columns: [checkboxesColumn, dateLastCountColumn, ...columns],
-    tableData,
+    tableData: extendedDataTable,
     loading,
     emptyTableMessage,
     exportTableData,
