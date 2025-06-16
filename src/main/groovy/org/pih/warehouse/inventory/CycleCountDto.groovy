@@ -1,5 +1,9 @@
 package org.pih.warehouse.inventory
 
+import org.pih.warehouse.core.Person
+
+import java.time.LocalDate
+
 class CycleCountDto {
 
     String id
@@ -10,10 +14,24 @@ class CycleCountDto {
 
     List<CycleCountItemDto> cycleCountItems
 
+    CountDto initialCount
+
+    CountDto verificationCount
+
     static CycleCountDto toDto(CycleCount cycleCount) {
+        CycleCountRequest cycleCountRequest = cycleCount?.cycleCountRequest
+
         return new CycleCountDto(
                 id: cycleCount.id,
-                requestId: cycleCount?.cycleCountRequest?.id,
+                requestId: cycleCountRequest?.id,
+                initialCount: new CountDto(
+                        assignee: cycleCountRequest?.countAssignee,
+                        deadline: cycleCountRequest?.countDeadline
+                ),
+                verificationCount: new CountDto(
+                        assignee: cycleCountRequest?.recountAssignee,
+                        deadline: cycleCountRequest?.recountDeadline
+                ),
                 status: cycleCount.status.toString(),
                 cycleCountItems: cycleCount.cycleCountItems.collect { it.toDto() }
         )
@@ -25,4 +43,9 @@ class CycleCountDto {
     Integer getMaxCountIndex() {
         return cycleCountItems.max{ it.countIndex }?.countIndex
     }
+}
+
+class CountDto {
+    Person assignee
+    LocalDate deadline
 }
