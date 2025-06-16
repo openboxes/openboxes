@@ -6,7 +6,6 @@ import { useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
 import { setShouldRebuildFilterParams } from 'actions';
-import cycleCountReportingFilterFields from 'components/cycleCountReporting/CycleCountReportingFilterFields';
 import { INDICATORS_TAB } from 'consts/cycleCount';
 import { DateFormat } from 'consts/timeFormat';
 import useCommonFiltersCleaner from 'hooks/list-pages/useCommonFiltersCleaner';
@@ -14,7 +13,7 @@ import useQueryParams from 'hooks/useQueryParams';
 import { transformFilterParams } from 'utils/list-utils';
 import { fetchProduct } from 'utils/option-utils';
 
-const useCycleCountReportingFilters = () => {
+const useCycleCountReportingFilters = ({ filterFields }) => {
   const [filterParams, setFilterParams] = useState({});
   const [defaultFilterValues, setDefaultFilterValues] = useState({});
   const [filtersInitialized, setFiltersInitialized] = useState(false);
@@ -27,7 +26,7 @@ const useCycleCountReportingFilters = () => {
 
   const clearFilterValues = () => {
     const queryProps = queryString.parse(history.location.search);
-    const defaultValues = Object.keys(cycleCountReportingFilterFields).reduce(
+    const defaultValues = Object.keys(filterFields).reduce(
       (acc, key) => ({ ...acc, [key]: '' }),
       { tab: queryProps.tab },
     );
@@ -50,7 +49,7 @@ const useCycleCountReportingFilters = () => {
     setIsLoading(true);
     try {
       const queryProps = queryString.parse(history.location.search);
-      const defaultValues = Object.keys(cycleCountReportingFilterFields).reduce(
+      const defaultValues = Object.keys(filterFields).reduce(
         (acc, key) => ({ ...acc, [key]: '' }),
         { tab: queryProps.tab },
       );
