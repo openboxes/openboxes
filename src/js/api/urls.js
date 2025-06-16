@@ -201,3 +201,4 @@ export const CYCLE_COUNT_REQUEST = (locationId, requestId) => `${CYCLE_COUNT(loc
 // REPORTING
 export const REPORTS = `${API}/reports`;
 export const CYCLE_COUNT_SUMMARY_REPORT = `${REPORTS}/cycle-count-summary`;
+export const INVENTORY_AUDIT_SUMMARY_REPORT = `${REPORTS}/inventory-audit-summary`;

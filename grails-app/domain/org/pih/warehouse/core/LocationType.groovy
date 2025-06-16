@@ -14,7 +14,7 @@ package org.pih.warehouse.core
  * Represents the type of a Location
  *
  */
-class LocationType implements Comparable, Serializable {
+class LocationType implements Comparable<LocationType>, Serializable {
 
     String id
     String name
@@ -115,8 +115,10 @@ class LocationType implements Comparable, Serializable {
         return "${name}"
     }
 
-    int compareTo(obj) {
-        return name <=> obj?.name
+    int compareTo(LocationType obj) {
+        return sortOrder <=> obj?.sortOrder ?:
+                locationTypeCode?.sortOrder <=> obj?.locationTypeCode?.sortOrder ?:
+                        name <=> obj?.name
     }
 
     Boolean isDepot() {

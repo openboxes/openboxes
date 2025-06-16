@@ -65,6 +65,9 @@ const ButtonFileSelect = ({
           if (validateFileType(files)) {
             onFileUpload(files);
           }
+          // After upload, we need to clear the value,
+          // due to the bug on Chrome that the same file can't be uploaded twice
+          e.target.value = null;
         }}
         accept={getAcceptableExtensions()}
       />

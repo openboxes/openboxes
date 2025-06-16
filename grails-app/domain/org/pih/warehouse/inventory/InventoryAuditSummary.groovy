@@ -1,0 +1,49 @@
+package org.pih.warehouse.inventory
+
+import org.pih.warehouse.core.Location
+import org.pih.warehouse.product.Product
+
+class InventoryAuditSummary implements Serializable {
+
+    Product product
+    Location facility
+
+    String abcClass
+
+    Integer quantityAdjusted
+
+    static mapping = {
+        version false
+    }
+
+    static constraints = {
+        id composite: ['facility', 'product']
+    }
+
+    Map toJson() {
+        return [
+                facility           : [
+                        id  : facility?.id,
+                        name: facility?.name
+                ],
+                product            : [
+                        id         : product?.id,
+                        name       : product?.name,
+                        productCode: product?.productCode,
+                        category   : product?.category?.name,
+                        abcClass   : abcClass,
+                        tags       : product.tags.collect { [id: it.id, name: it.tag] },
+                        catalogs   : product?.productCatalogs?.collect { [id: it.id, name: it.name] },
+                ],
+                lastCounted        : new Date(),
+                numberOfCounts     : 0,
+                quantityAdjusted   : quantityAdjusted,
+                numberOfAdjustments: 0,
+                valueAdjusted      : 0,
+                monthsOfStockChange: 0,
+                quantityOnHand     : 0,
+                valueOnHand        : 0,
+
+        ]
+    }
+}

@@ -11,16 +11,20 @@ package org.pih.warehouse.report
 
 import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
+import grails.orm.PagedResultList
 import org.apache.http.client.HttpClient
 import org.apache.http.client.ResponseHandler
 import org.apache.http.client.methods.HttpGet
 import org.apache.http.impl.client.BasicResponseHandler
 import org.apache.http.impl.client.DefaultHttpClient
+import org.pih.warehouse.PaginatedList
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.SynonymTypeCode
 import org.pih.warehouse.inventory.Inventory
+import org.pih.warehouse.inventory.InventoryAuditDetails
+import org.pih.warehouse.inventory.InventoryAuditSummary
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.invoice.InvoiceType
@@ -31,6 +35,7 @@ import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.reporting.DateDimension
 import org.pih.warehouse.LocalizationUtil
+import org.pih.warehouse.reporting.GetInventoryAuditReportCommand
 import org.springframework.context.ApplicationContext
 import org.springframework.context.ApplicationContextAware
 import org.xhtmlrenderer.pdf.ITextRenderer
@@ -1069,5 +1074,63 @@ class ReportService implements ApplicationContextAware {
         numberFormat.maximumFractionDigits = 2
         numberFormat.minimumFractionDigits = 2
         return numberFormat
+    }
+
+
+    def getInventoryAuditReportDetails(GetInventoryAuditReportCommand command) {
+        return InventoryAuditDetails.createCriteria().list(max: command.max, offset: command.offset) {
+            eq("facility", command.facility)
+
+            if (command.product) {
+                eq("product", command.product)
+            }
+
+            if (command.startDate && command.endDate) {
+                between("transactionDate", command.startDate, command.endDate)
+            }
+            else if (command.startDate) {
+                gte("transactionDate", command.startDate)
+            }
+            else if (command.endDate) {
+                lte("transactionDate", command.endDate)
+            }
+        }
+    }
+
+    def getInventoryAuditReportSummary(GetInventoryAuditReportCommand command) {
+        def results = InventoryAuditDetails.createCriteria().list(max: command.max, offset: command.offset) {
+            projections {
+                groupProperty('facility')
+                groupProperty('product')
+                sum('quantityAdjusted', 'quantityAdjusted')
+                max('abcClass', 'abcClass')
+            }
+
+            eq("facility", command.facility)
+
+            if (command.product) {
+                eq("product", command.product)
+            }
+
+            if (command.startDate && command.endDate) {
+                between("transactionDate", command.startDate, command.endDate)
+            } else if (command.startDate) {
+                gte("transactionDate", command.startDate)
+            } else if (command.endDate) {
+                lte("transactionDate", command.endDate)
+            }
+        }
+
+        // Transform the results to a summary object
+        def data = results.collect {
+            new InventoryAuditSummary(
+                    facility: it[0],
+                    product: it[1],
+                    quantityAdjusted: it[2] ?: 0,
+                    abcClass: it[3]
+            )
+        }
+
+        return new PaginatedList<InventoryAuditSummary>(data, results.totalCount);
     }
 }

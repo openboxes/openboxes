@@ -1022,6 +1022,17 @@ class UrlMappings {
             action = [POST: "getCycleCountSummary", GET: "getCycleCountSummary"]
         }
 
+        "/api/reports/inventory-audit-details" {
+            controller = "inventoryAuditReport"
+            action = [POST: "getInventoryAuditDetails", GET: "getInventoryAuditDetails"]
+
+        }
+
+        "/api/reports/inventory-audit-summary" {
+            controller = "inventoryAuditReport"
+            action = [POST: "getInventoryAuditSummary", GET: "getInventoryAuditSummary"]
+        }
+
         // Error handling
 
         "401"(controller: "errors", action: "handleUnauthorized")
