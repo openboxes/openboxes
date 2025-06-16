@@ -303,7 +303,8 @@ class BootStrap {
                 picker          : picklist.picker,
                 datePicked      : picklist.datePicked?.format("MM/dd/yyyy"),
                 picklistItems   : picklist.picklistItems,
-                "requisition.id": picklist?.requisition?.id
+                "requisition.id": picklist?.requisition?.id,
+                statusMessage   : picklist.statusMessage
             ]
         }
 
