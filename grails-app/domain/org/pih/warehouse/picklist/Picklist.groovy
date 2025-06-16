@@ -91,6 +91,18 @@ class Picklist implements Serializable {
         return getPicklistItems(product)?.groupBy {it.inventoryItem.lotNumber}
     }
 
+    def getTotalPicklistItemCount() {
+        return picklistItems?.size() ?: 0
+    }
+
+    String getCompletedPicklistItemCount() {
+        return picklistItems.findAll { it.quantityRemaining == 0 }?.size() ?: 0
+    }
+
+    String getStatusMessage() {
+        return "${completedPicklistItemCount} / ${totalPicklistItemCount}"
+    }
+
     String toString() {
         "id: ${id}, name:${name}"
     }
