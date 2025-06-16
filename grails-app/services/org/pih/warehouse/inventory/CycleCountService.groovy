@@ -11,15 +11,18 @@ import org.grails.datastore.mapping.query.api.Criteria
 import org.hibernate.ObjectNotFoundException
 import org.hibernate.criterion.Order
 import org.hibernate.sql.JoinType
-
+import org.pih.warehouse.DateUtil
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.Person
 import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.product.Product
 import org.hibernate.criterion.CriteriaSpecification
 import org.pih.warehouse.report.CycleCountReportCommand
+
+import java.time.LocalDate
 
 @Transactional
 class CycleCountService {
@@ -472,13 +475,19 @@ class CycleCountService {
         // 1:1 association between cycle count and cycle count request
         request.cycleCountRequest.cycleCount = newCycleCount
         request.cycleCountRequest.status = CycleCountRequestStatus.IN_PROGRESS
+        Person assignee = request.cycleCountRequest.countAssignee
+        LocalDate countDeadline = request.cycleCountRequest.countDeadline
+        Date deadline = countDeadline ? DateUtil.asDate(countDeadline) : new Date()
         itemsToSave.each { AvailableItem availableItem ->
             CycleCountItem cycleCountItem = initCycleCountItem(
                     facility,
                     availableItem,
                     newCycleCount,
                     0,  // countIndex is always zero for the initial count
-                    CycleCountItemStatus.READY_TO_COUNT)
+                    CycleCountItemStatus.READY_TO_COUNT,
+                    assignee,
+                    deadline
+            )
 
             newCycleCount.addToCycleCountItems(cycleCountItem)
         }
@@ -525,13 +534,19 @@ class CycleCountService {
         // exist at the time of the initial count.
         List<AvailableItem> availableItemsToRecount = cycleCountProductAvailabilityService.getAvailableItems(
                 facility, product)
+        Person assignee = command.cycleCountRequest.recountAssignee
+        LocalDate recountDeadline = command.cycleCountRequest.recountDeadline
+        Date deadline = recountDeadline ? DateUtil.asDate(recountDeadline) : new Date()
         for (AvailableItem availableItemToRecount : availableItemsToRecount) {
             CycleCountItem cycleCountItem = initCycleCountItem(
                     facility,
                     availableItemToRecount,
                     cycleCount,
                     countIndex,
-                    CycleCountItemStatus.INVESTIGATING)
+                    CycleCountItemStatus.INVESTIGATING,
+                    assignee,
+                    deadline
+            )
 
             cycleCount.addToCycleCountItems(cycleCountItem)
         }
@@ -572,7 +587,10 @@ class CycleCountService {
             AvailableItem availableItem,
             CycleCount cycleCount,
             int countIndex,
-            CycleCountItemStatus status) {
+            CycleCountItemStatus status,
+            Person assignee = null,
+            Date dateCounted = new Date()
+    ) {
 
         return new CycleCountItem(
                 status: status,
@@ -586,7 +604,8 @@ class CycleCountService {
                 product: availableItem.inventoryItem.product,
                 createdBy: AuthService.currentUser,
                 updatedBy: AuthService.currentUser,
-                dateCounted: new Date(),
+                dateCounted: dateCounted,
+                assignee: assignee,
                 custom: false,
         )
     }
