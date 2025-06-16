@@ -32,6 +32,17 @@ const columns = {
   ASSIGNEE: 'assignee',
   DEADLINE: 'deadline',
   INVENTORY_ITEMS: 'inventoryItems',
+  PRODUCTS_TAB_CATEGORY: 'product.category',
+  PRODUCTS_TAB_TAGS: 'product.tags',
+  PRODUCTS_TAB_CATALOGS: 'product.catalogs',
+  PRODUCTS_TAB_ABC_CLASS: 'product.abcClass',
+  LAST_COUNTED: 'lastCounted',
+  NUMBER_OF_COUNTS: 'numberOfCounts',
+  NUMBER_OF_ADJUSTMENTS: 'numberOfAdjustments',
+  TOTAL_OF_ADJUSTMENTS: 'quantityAdjusted',
+  ADJUSTMENTS_VALUE: 'valueAdjusted',
+  MONTHS_OF_STOCK_CHANGE: 'monthsOfStockChange',
+  VALUE_ON_HAND: 'valueOnHand',
 };
 
 export default columns;
