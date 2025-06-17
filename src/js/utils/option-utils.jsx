@@ -2,6 +2,7 @@ import _ from 'lodash';
 import queryString from 'query-string';
 
 import glAccountApi from 'api/services/GlAccountApi';
+import indicatorsApi from 'api/services/IndicatorsApi';
 import locationApi from 'api/services/LocationApi';
 import organizationApi from 'api/services/OrganizationApi';
 import productApi from 'api/services/ProductApi';
@@ -312,22 +313,22 @@ export const fetchOrganization = async (id) => {
 };
 
 export const fetchIndicatorTotalCount = async (params = {}) => {
-  const { data } = await apiClient.get('/api/reports/indicators/totalCount', { params });
+  const { data } = await indicatorsApi.getTotalCount(params);
   return data.data;
 };
 
 export const fetchIndicatorItemsCounted = async (params = {}) => {
-  const { data } = await apiClient.get('/api/reports/indicators/itemsCounted', { params });
+  const { data } = await indicatorsApi.getItemsCounted(params);
   return data.data;
 };
 
 export const fetchIndicatorTargetProgress = async (params = {}) => {
-  const { data } = await apiClient.get('/api/reports/indicators/targetProgress', { params });
+  const { data } = await indicatorsApi.getTargetProgress(params);
   return data.data;
 };
 
 export const fetchIndicatorNotFinishedItems = async (params = {}) => {
-  const { data } = await apiClient.get('/api/reports/indicators/notFinishedItems', { params });
+  const { data } = await indicatorsApi.getNotFinishedItems(params);
   return data.data;
 };
 

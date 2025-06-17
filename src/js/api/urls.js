@@ -202,3 +202,11 @@ export const CYCLE_COUNT_REQUEST = (locationId, requestId) => `${CYCLE_COUNT(loc
 export const REPORTS = `${API}/reports`;
 export const CYCLE_COUNT_SUMMARY_REPORT = `${REPORTS}/cycle-count-summary`;
 export const INVENTORY_AUDIT_SUMMARY_REPORT = `${REPORTS}/inventory-audit-summary`;
+
+// INDICATORS
+export const INDICATORS_REPORT = `${API}/reports/indicators`;
+
+export const INDICATORS_TOTAL_COUNT = `${INDICATORS_REPORT}/totalCount`;
+export const INDICATORS_ITEMS_COUNTED = `${INDICATORS_REPORT}/itemsCounted`;
+export const INDICATORS_TARGET_PROGRESS = `${INDICATORS_REPORT}/targetProgress`;
+export const INDICATORS_NOT_FINISHED_ITEMS = `${INDICATORS_REPORT}/notFinishedItems`;

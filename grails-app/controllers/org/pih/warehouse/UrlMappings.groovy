@@ -1034,22 +1034,22 @@ class UrlMappings {
         }
 
         "/api/reports/indicators/totalCount" {
-            controller = "indicator"
+            controller = "indicatorApi"
             action = [GET: "getTotalCount"]
         }
 
         "/api/reports/indicators/itemsCounted" {
-            controller = "indicator"
+            controller = "indicatorApi"
             action = [GET: "getItemsCounted"]
         }
 
         "/api/reports/indicators/targetProgress" {
-            controller = "indicator"
+            controller = "indicatorApi"
             action = [GET: "getTargetProgress"]
         }
 
         "/api/reports/indicators/notFinishedItems" {
-            controller = "indicator"
+            controller = "indicatorApi"
             action = [GET: "getNotFinishedItems"]
         }
 

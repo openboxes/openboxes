@@ -1135,31 +1135,31 @@ class ReportService implements ApplicationContextAware {
         return new PaginatedList<InventoryAuditSummary>(data, results.totalCount);
     }
 
-    def getTotalCount(IndicatorCommand command) {
+    Map getTotalCount(IndicatorCommand command) {
         return [
-                type: 'totalCount',
+                type: "totalCount",
                 number: 1500
         ]
     }
 
-    def getItemsCounted(IndicatorCommand command) {
+    Map getItemsCounted(IndicatorCommand command) {
         return [
-                type: 'itemsCounted',
+                type: "itemsCounted",
                 number: 1200
         ]
     }
 
-    def getTargetProgress(IndicatorCommand command) {
+    Map getTargetProgress(IndicatorCommand command) {
         return [
-                type: 'targetProgress',
+                type: "targetProgress",
                 number: 42,
-                subtitleValue: '1281/26182'
+                subtitleValue: "1281/26182",
         ]
     }
 
-    def getNotFinishedItems(IndicatorCommand command) {
+    Map getNotFinishedItems(IndicatorCommand command) {
         return [
-                type: 'notFinishedItems',
+                type: "notFinishedItems",
                 number: 300
         ]
     }

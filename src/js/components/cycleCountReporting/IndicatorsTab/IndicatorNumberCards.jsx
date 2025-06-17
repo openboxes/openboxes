@@ -1,48 +1,23 @@
 import React from 'react';
 
 import PropTypes from 'prop-types';
-import { RiInformationLine } from 'react-icons/ri';
-import { SortableContainer } from 'react-sortable-hoc';
 
+import SortableIndicatorCards
+  from 'components/cycleCountReporting/IndicatorsTab/SortableIndicatorCards';
 import LoadingNumbers from 'components/dashboard/LoadingNumbers';
-import NumberCard from 'components/dashboard/NumberCard';
-
-const SortableIndicatorCards = SortableContainer(({ data }) => (
-  <div className="card-component">
-    {data.map((card, index) => (
-      <NumberCard
-        index={index}
-        cardTitle={card.title}
-        cardTitleDefaultValue={card.titleDefaultValue}
-        cardNumberType={card.numberType}
-        cardNumber={card.number}
-        cardType={card.type}
-        cardSubtitle={card.subtitle}
-        cardSubtitleDefaultValue={card.subtitleDefaultValue}
-        cardSubtitleValue={card.subtitleValue}
-        cardInfo={card.info}
-        cardInfoDefaultValue={card.infoDefaultValue}
-        showPercentSign={card.showPercentSign}
-        infoIcon={<RiInformationLine size={20} />}
-        disabled
-        hideDraghandle
-      />
-    ))}
-  </div>
-));
 
 const IndicatorNumberCards = ({
   loading,
-  numberCards,
+  tiles,
 }) => (
   <div className="cards-container">
-    {loading ? <LoadingNumbers /> : <SortableIndicatorCards data={numberCards} /> }
+    {loading ? <LoadingNumbers /> : <SortableIndicatorCards data={tiles} /> }
   </div>
 );
 
 IndicatorNumberCards.propTypes = {
   loading: PropTypes.bool.isRequired,
-  numberCards: PropTypes.arrayOf(PropTypes.shape({
+  tiles: PropTypes.arrayOf(PropTypes.shape({
     title: PropTypes.string,
     titleDefaultValue: PropTypes.string,
     numberType: PropTypes.string,
@@ -58,7 +33,7 @@ IndicatorNumberCards.propTypes = {
 };
 
 IndicatorNumberCards.defaultProps = {
-  numberCards: [],
+  tiles: [],
 };
 
 export default IndicatorNumberCards;

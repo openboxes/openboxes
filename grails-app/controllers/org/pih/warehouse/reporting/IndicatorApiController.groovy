@@ -13,7 +13,7 @@ import grails.validation.Validateable
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.report.ReportService
 
-class IndicatorController {
+class IndicatorApiController {
 
     ReportService reportService
 
@@ -34,22 +34,22 @@ class IndicatorController {
     }
 
     def getTotalCount(IndicatorCommand command) {
-        def data = reportService.getTotalCount(command)
+        Map data = reportService.getTotalCount(command)
         render([data: data] as JSON)
     }
 
     def getItemsCounted(IndicatorCommand command) {
-        def data = reportService.getItemsCounted(command)
+        Map data = reportService.getItemsCounted(command)
         render([data: data] as JSON)
     }
 
     def getTargetProgress(IndicatorCommand command) {
-        def data = reportService.getTargetProgress(command)
+        Map data = reportService.getTargetProgress(command)
         render([data: data] as JSON)
     }
 
     def getNotFinishedItems(IndicatorCommand command) {
-        def data = reportService.getNotFinishedItems(command)
+        Map data = reportService.getNotFinishedItems(command)
         render([data: data] as JSON)
     }
 }
@@ -58,11 +58,5 @@ class IndicatorCommand implements Validateable {
     Location facility
     Date startDate
     Date endDate
-
-    static constraints = {
-        facility(nullable: false)
-        startDate(nullable: false)
-        endDate(nullable: false)
-    }
 }
 

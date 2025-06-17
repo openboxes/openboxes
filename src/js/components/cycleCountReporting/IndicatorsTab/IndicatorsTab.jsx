@@ -13,14 +13,14 @@ const IndicatorsTab = ({
 }) => {
   const {
     loading,
-    numberCards,
+    tiles,
   } = useIndicatorsTab({
     filterParams,
   });
 
   return (
     <div className="dashboard-container">
-      <IndicatorNumberCards loading={loading} numberCards={numberCards} />
+      <IndicatorNumberCards loading={loading} tiles={tiles} />
     </div>
   );
 };

@@ -16,8 +16,8 @@ const useIndicatorsTab = ({
   filterParams,
 }) => {
   const [loading, setLoading] = useState(false);
-  // In numberCards, we will store all the filtered data that we will render in IndicatorNumberCards
-  const [numberCards, setNumberCards] = useState([]);
+  // In tiles, we will store all the filtered data that we will render in IndicatorNumberCards
+  const [tiles, setTiles] = useState([]);
   const {
     currentLocation,
   } = useSelector((state) => ({
@@ -48,7 +48,7 @@ const useIndicatorsTab = ({
           ...item,
         }));
 
-      setNumberCards(mergedNumberCards);
+      setTiles(mergedNumberCards);
     } finally {
       setLoading(false);
     }
@@ -62,7 +62,7 @@ const useIndicatorsTab = ({
 
   return {
     loading,
-    numberCards,
+    tiles,
   };
 };
 
