@@ -10,6 +10,7 @@ import TableHeaderCell from 'components/DataTable/TableHeaderCell';
 import DateField from 'components/form-elements/v2/DateField';
 import SelectField from 'components/form-elements/v2/SelectField';
 import { INVENTORY_ITEM_URL } from 'consts/applicationUrls';
+import CountIndex from 'consts/countIndex';
 import cycleCountColumn from 'consts/cycleCountColumn';
 import { DateFormat } from 'consts/timeFormat';
 import useSpinner from 'hooks/useSpinner';
@@ -57,7 +58,7 @@ const useAssignCycleCountModal = ({
 
         const assignments = isRecount
           ? {
-            1: {
+            [CountIndex.RECOUNT_INDEX]: {
               assignee: assignee?.id,
               deadline: dateWithoutTimeZone({
                 date: deadline,
@@ -65,7 +66,7 @@ const useAssignCycleCountModal = ({
             },
           }
           : {
-            0: {
+            [CountIndex.COUNT_INDEX]: {
               assignee: assignee?.id,
               deadline: dateWithoutTimeZone({
                 date: deadline,

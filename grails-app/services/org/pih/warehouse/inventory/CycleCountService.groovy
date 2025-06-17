@@ -281,12 +281,12 @@ class CycleCountService {
 
     private CycleCountRequest updateRequest(CycleCountRequestUpdateCommand command) {
         CycleCountRequest cycleCountRequest = command.cycleCountRequest
-        CycleCountAssignmentCommand countAssignment = command.getAssignmentByCountIndex("0")
+        CycleCountAssignmentCommand countAssignment = command.getAssignmentByCountIndex(Constants.COUNT_INDEX)
         if (countAssignment) {
             cycleCountRequest.countAssignee = countAssignment.assignee
             cycleCountRequest.countDeadline = countAssignment.deadline
         }
-        CycleCountAssignmentCommand recountAssignment = command.getAssignmentByCountIndex("1")
+        CycleCountAssignmentCommand recountAssignment = command.getAssignmentByCountIndex(Constants.RECOUNT_INDEX)
         if (recountAssignment) {
             cycleCountRequest.recountAssignee = recountAssignment.assignee
             cycleCountRequest.recountDeadline = recountAssignment.deadline
