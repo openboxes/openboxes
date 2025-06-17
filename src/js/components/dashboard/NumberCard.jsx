@@ -54,7 +54,7 @@ const options = {
 const ZERO = 0;
 
 const NumberSparklineCard = ({
-  cardTitle, cardInfo, color, value, goalDifference, sparklineData, translate,
+  cardTitle, cardInfo, color, value, goalDifference, sparklineData, translate, cardInfoDefaultValue,
 }) => (
   <div className="number-div">
     <div className="number-body">
@@ -81,20 +81,12 @@ const NumberSparklineCard = ({
       />
     </div>
     <div className="number-infos">
-      <Tooltip
-        html={(
-          <p>
-            {' '}
-            {translate(cardInfo, cardInfo)}
-            {' '}
-          </p>
-        )}
-        theme="transparent"
-        arrow="true"
-        disabled={!cardInfo}
+      <CustomTooltip
+        content={translate(cardInfo, cardInfoDefaultValue || cardInfo)}
+        show={cardInfo}
       >
         <i className="fa fa-info-circle" />
-      </Tooltip>
+      </CustomTooltip>
     </div>
     <DragHandle />
   </div>
@@ -178,6 +170,7 @@ const NumberCard = SortableElement(({
       <NumberSparklineCard
         cardTitle={cardTitle}
         cardInfo={cardInfo}
+        cardInfoDefaultValue={cardInfoDefaultValue}
         color={sparklineData.colorNumber.color}
         value={sparklineData.colorNumber.value}
         goalDifference={sparklineData.colorNumber.value2}
@@ -232,9 +225,14 @@ NumberCard.propTypes = {
 NumberSparklineCard.propTypes = {
   cardTitle: PropTypes.string.isRequired,
   cardInfo: PropTypes.string.isRequired,
+  cardInfoDefaultValue: PropTypes.string,
   color: PropTypes.string.isRequired,
   value: PropTypes.string.isRequired,
   goalDifference: PropTypes.string.isRequired,
   sparklineData: PropTypes.shape({}).isRequired,
   translate: PropTypes.func.isRequired,
+};
+
+NumberSparklineCard.defaultProps = {
+  cardInfoDefaultValue: '',
 };
