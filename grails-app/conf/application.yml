@@ -518,11 +518,17 @@ openboxes:
             cronExpression: "0 0 * * * ?" # every hour
 
         automaticSlottingJob:
+            enabled: true
+            cronExpression: "0 */5 * * * ?"     # every five minutes
             defaultPutawayAssignee: "admin"
 
         automaticStateTransitionJob:
             enabled: true
             delayInMilliseconds: 1000
+
+        automaticStateTransitionPollingJob:
+            enabled: true
+            cronExpression: "0 */5 * * * ?"     # every five minutes
 
     # LDAP configuration
     ldap:
