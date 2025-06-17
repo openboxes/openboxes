@@ -62,15 +62,14 @@ const CycleCountToResolve = ({
 
   return (
     <>
-      {isAssignCountModalOpen && (
-        <AssignCycleCountModal
-          isOpen={isAssignCountModalOpen}
-          closeModal={closeAssignCountModal}
-          selectedCycleCountItems={assignCountModalData}
-          setSelectedCycleCountItems={setAssignCountModalData}
-          refetchData={fetchData}
-        />
-      )}
+      <AssignCycleCountModal
+        isOpen={isAssignCountModalOpen}
+        closeModal={closeAssignCountModal}
+        selectedCycleCounts={assignCountModalData}
+        setSelectedCycleCounts={setAssignCountModalData}
+        refetchData={fetchData}
+        isRecount
+      />
       <div>
         {cycleCountIds.length !== 0 && <CycleCountDraftInfoBar tab={TO_RESOLVE_TAB} />}
         <div className="d-flex justify-content-sm-between align-items-center">
