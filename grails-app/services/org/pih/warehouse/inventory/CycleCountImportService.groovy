@@ -9,6 +9,17 @@ class CycleCountImportService {
 
     LocalizationService localizationService
 
+    /**
+     * Util function to normalize the default lot number - default lot number can be represented
+     * by either empty string or null. If we compare lot numbers where one of them is empty string
+     * and the other is null, we want them to be treated as equal.
+     * @param lotNumber
+     * @return
+     */
+    private static normalizeLotNumber(String lotNumber) {
+        return lotNumber ?: null
+    }
+
     void validateCountImport(ImportDataCommand command) {
         // Firstly clear the command's errors, as it might contain some additional errors related to the file itself
         // that we do not care about while validating the data, and we don't them to be visible for a user
@@ -52,7 +63,7 @@ class CycleCountImportService {
                     row.dateCounted = null
                 }
             }
-            command.errors.reject("Product cycle count with id ${it.key} must have the same date counted set up for all rows")
+            command.errors.reject("Product cycle count with id ${it.key} must have the same date counted set up for all rows and it must not be empty")
         }
 
         command.data.eachWithIndex { row, index ->
@@ -95,7 +106,7 @@ class CycleCountImportService {
                 if (row.binLocation?.id != cycleCountItem.location?.id) {
                     command.errors.reject("Row ${index + 1}: You cannot update bin location for an existing item")
                 }
-                if (row.lotNumber != cycleCountItem.inventoryItem?.lotNumber) {
+                if (normalizeLotNumber(row.lotNumber) != normalizeLotNumber(cycleCountItem.inventoryItem?.lotNumber)) {
                     command.errors.reject("Row ${index + 1}: You cannot update lot number for an existing item")
                 }
                 if (row.expirationDate != cycleCountItem.inventoryItem.expirationDate) {
