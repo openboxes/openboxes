@@ -182,4 +182,8 @@ class Constants {
     static final String FOUR_OR_MORE = "4+"
 
     static final String NONE = 'None'
+
+    // Cycle count indexes
+    static final String COUNT_INDEX = "0"
+    static final String RECOUNT_INDEX = "1"
 }

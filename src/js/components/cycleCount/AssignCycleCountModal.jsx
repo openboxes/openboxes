@@ -14,17 +14,25 @@ const AssignCycleCountModal = ({
   closeModal,
   defaultTitleLabel,
   titleLabel,
-  selectedCycleCountItems,
-  setSelectedCycleCountItems,
-  isCount,
+  selectedCycleCounts,
+  setSelectedCycleCounts,
+  isRecount,
   refetchData,
 }) => {
+  // When the modal is not displayed we want to show the scrollbar to users.
+  // The return below is necessary to block executing hooks that are related to
+  // the hidden modal.
+  if (!isOpen) {
+    document.body.style.overflowY = 'auto';
+    return null;
+  }
+
   const translate = useTranslate();
 
   const { columns, handleAssign } = useAssignCycleCountModal({
-    selectedCycleCountItems,
-    setSelectedCycleCountItems,
-    isCount,
+    selectedCycleCounts,
+    setSelectedCycleCounts,
+    isRecount,
     refetchData,
     closeModal,
   });
@@ -50,9 +58,9 @@ const AssignCycleCountModal = ({
         <div className="assign-count-modal-container">
           <DataTable
             columns={columns}
-            data={selectedCycleCountItems}
+            data={selectedCycleCounts}
             disablePagination
-            totalCount={selectedCycleCountItems.length}
+            totalCount={selectedCycleCounts.length}
           />
         </div>
         <div className="d-flex justify-content-end mt-3">
@@ -75,15 +83,15 @@ AssignCycleCountModal.propTypes = {
   closeModal: PropTypes.func.isRequired,
   defaultTitleLabel: PropTypes.string,
   titleLabel: PropTypes.string,
-  selectedCycleCountItems: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
-  setSelectedCycleCountItems: PropTypes.func.isRequired,
-  isCount: PropTypes.bool,
+  selectedCycleCounts: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  setSelectedCycleCounts: PropTypes.func.isRequired,
+  isRecount: PropTypes.bool,
   refetchData: PropTypes.func,
 };
 
 AssignCycleCountModal.defaultProps = {
   titleLabel: 'react.cycleCount.modal.assignProductsToCount.title.label',
   defaultTitleLabel: 'Assign products to count',
-  isCount: false,
+  isRecount: false,
   refetchData: null,
 };
