@@ -19,6 +19,7 @@ import org.pih.warehouse.api.PutawayStatus
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.LocationTypeCode
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.TransferStockCommand
@@ -44,13 +45,10 @@ class PutawayService {
     def grailsApplication
 
     void generatePutaways(Location location, User putawayAssignee) {
-        def putawayCandidates = getPutawayCandidates(location)
+        List<PutawayItem> putawayCandidates = getPutawayCandidates(location)
         for (PutawayItem putawayCandidate in putawayCandidates) {
-
-
             // Ignore putaway candidates that already have a putaway order associated with it
             if (!putawayCandidate.id) {
-
                 log.info "Attempting to generate putaway for putaway candidate ..." + new JSONObject(putawayCandidate?.toJson()).toString(4)
 
                 // Get the next available putaway location based on criteria (available vs unavailable, volume, weight, etc)
@@ -161,7 +159,7 @@ class PutawayService {
         return availableLocations
     }
 
-    def getPutawayCandidates(Location location) {
+    List<PutawayItem> getPutawayCandidates(Location location) {
         List binLocationEntries = productAvailabilityService.getAvailableQuantityOnHandByBinLocation(location)
 
         List<PutawayItem> putawayItems = binLocationEntries.inject ([], { putawayItems,  binLocationEntry ->
