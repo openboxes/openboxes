@@ -11,16 +11,15 @@ const SortableIndicatorCards = SortableContainer(({ data }) => (
       <NumberCard
         key={card.type}
         index={index}
-        cardTitle={card.title}
-        cardTitleDefaultValue={card.titleDefaultValue}
+        cardTitle={card.titleLabel}
+        cardTitleDefaultValue={card.defaultTitle}
         cardNumberType={card.numberType}
-        cardNumber={card.number}
-        cardType={card.type}
-        cardSubtitle={card.subtitle}
-        cardSubtitleDefaultValue={card.subtitleDefaultValue}
-        cardSubtitleValue={card.subtitleValue}
-        cardInfo={card.info}
-        cardInfoDefaultValue={card.infoDefaultValue}
+        cardNumber={card.value}
+        cardSubtitle={card.subtitleLabel}
+        cardSubtitleDefaultValue={card.defaultSubtitle}
+        cardSubtitleValue={card.subValue}
+        cardInfo={card.infoLabel}
+        cardInfoDefaultValue={card.defaultInfo}
         showPercentSign={card.showPercentSign}
         infoIcon={<RiInformationLine size={20} />}
         disabled

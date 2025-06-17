@@ -33,30 +33,24 @@ class IndicatorApiController {
         render consoleService.eval(code, true, request)
     }
 
-    def getTotalCount(IndicatorCommand command) {
+    def getTotalCount(IndicatorApiCommand command) {
         Map data = reportService.getTotalCount(command)
         render([data: data] as JSON)
     }
 
-    def getItemsCounted(IndicatorCommand command) {
+    def getItemsCounted(IndicatorApiCommand command) {
         Map data = reportService.getItemsCounted(command)
         render([data: data] as JSON)
     }
 
-    def getTargetProgress(IndicatorCommand command) {
+    def getTargetProgress(IndicatorApiCommand command) {
         Map data = reportService.getTargetProgress(command)
         render([data: data] as JSON)
     }
 
-    def getNotFinishedItems(IndicatorCommand command) {
+    def getNotFinishedItems(IndicatorApiCommand command) {
         Map data = reportService.getNotFinishedItems(command)
         render([data: data] as JSON)
     }
-}
-
-class IndicatorCommand implements Validateable {
-    Location facility
-    Date startDate
-    Date endDate
 }
 

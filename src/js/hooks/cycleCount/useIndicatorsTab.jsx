@@ -41,14 +41,13 @@ const useIndicatorsTab = ({
         fetchIndicatorNotFinishedItems(params),
       ]);
 
-      const mergedNumberCards = responses
-        .filter(item => cycleCountReportingIndicators[item.type])
+      const mergedTiles = responses
+        .filter(item => cycleCountReportingIndicators[item.name])
         .map(item => ({
-          ...cycleCountReportingIndicators[item.type],
+          ...cycleCountReportingIndicators[item.name],
           ...item,
         }));
-
-      setTiles(mergedNumberCards);
+      setTiles(mergedTiles);
     } finally {
       setLoading(false);
     }
