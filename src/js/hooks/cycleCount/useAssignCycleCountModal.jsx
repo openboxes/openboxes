@@ -97,9 +97,6 @@ const useAssignCycleCountModal = ({
 
   useEffect(() => {
     document.body.style.overflowY = 'hidden';
-    return () => {
-      document.body.style.overflowY = 'auto';
-    };
   }, []);
 
   const columns = [

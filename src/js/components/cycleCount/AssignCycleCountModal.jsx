@@ -19,6 +19,14 @@ const AssignCycleCountModal = ({
   isRecount,
   refetchData,
 }) => {
+  // When the modal is not displayed we want to show the scrollbar to users.
+  // The return below is necessary to block executing hooks that are related to
+  // the hidden modal.
+  if (!isOpen) {
+    document.body.style.overflowY = 'auto';
+    return null;
+  }
+
   const translate = useTranslate();
 
   const { columns, handleAssign } = useAssignCycleCountModal({
@@ -30,43 +38,41 @@ const AssignCycleCountModal = ({
   });
 
   return (
-    isOpen ? (
-      <Modal
-        isOpen={isOpen}
-        className="modal-content"
-      >
-        <div>
-          <div className="d-flex justify-content-between">
-            <p className="assign-count-modal-header">
-              {translate(titleLabel, defaultTitleLabel)}
-            </p>
-            <RiCloseFill
-              size="32px"
-              className="cursor-pointer"
-              role="button"
-              aria-label="Close modal"
-              onClick={closeModal}
-            />
-          </div>
-          <div className="assign-count-modal-container">
-            <DataTable
-              columns={columns}
-              data={selectedCycleCounts}
-              disablePagination
-              totalCount={selectedCycleCounts.length}
-            />
-          </div>
-          <div className="d-flex justify-content-end mt-3">
-            <Button
-              defaultLabel="Assign"
-              label="react.cycleCount.assign.label"
-              variant="primary"
-              onClick={handleAssign}
-            />
-          </div>
+    <Modal
+      isOpen={isOpen}
+      className="modal-content"
+    >
+      <div>
+        <div className="d-flex justify-content-between">
+          <p className="assign-count-modal-header">
+            {translate(titleLabel, defaultTitleLabel)}
+          </p>
+          <RiCloseFill
+            size="32px"
+            className="cursor-pointer"
+            role="button"
+            aria-label="Close modal"
+            onClick={closeModal}
+          />
         </div>
-      </Modal>
-    ) : null
+        <div className="assign-count-modal-container">
+          <DataTable
+            columns={columns}
+            data={selectedCycleCounts}
+            disablePagination
+            totalCount={selectedCycleCounts.length}
+          />
+        </div>
+        <div className="d-flex justify-content-end mt-3">
+          <Button
+            defaultLabel="Assign"
+            label="react.cycleCount.assign.label"
+            variant="primary"
+            onClick={handleAssign}
+          />
+        </div>
+      </div>
+    </Modal>
   );
 };
 
