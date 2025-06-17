@@ -137,6 +137,26 @@ class StockMovement implements Validateable{
         loadingLocation(nullable: true)
     }
 
+    Map toBaseJson() {
+        return [
+            id                  : id,
+            name                : name,
+            description         : description,
+            statusCode          : statusCode,
+            identifier          : identifier,
+            origin              : [
+                    id                  : origin?.id,
+                    name                : origin?.name,
+            ],
+            destination         : [
+                    id                  : destination?.id,
+                    name                : destination?.name,
+            ],
+            requestedBy         : requestedBy,
+            lineItems           : lineItems
+        ]
+    }
+
     Map toJson() {
         return [
             id                  : id,

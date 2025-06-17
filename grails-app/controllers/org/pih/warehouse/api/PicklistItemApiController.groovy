@@ -48,8 +48,8 @@ class PicklistItemApiController extends BaseDomainApiController {
         String productId = jsonObject["product.id"]
         BigDecimal quantityPicked = new BigDecimal(jsonObject.quantityPicked)
         String pickedById = session?.user?.id
-        String reasonCode = params?.shortageReasonCode
-        Boolean shortage = params.boolean("shortage")
+        String reasonCode = jsonObject.shortageReasonCode
+        Boolean shortage = jsonObject.shortage
 
         if (shortage && !reasonCode) {
             throw new IllegalArgumentException("Must include reason code when entering a shortage")

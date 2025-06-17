@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.picklist
 
+import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import org.hibernate.ObjectNotFoundException
@@ -20,6 +21,7 @@ import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.inventory.ProductAvailabilityService
+import org.pih.warehouse.inventory.RefreshPicklistStatusEvent
 import org.pih.warehouse.inventory.StockMovementService
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
@@ -33,6 +35,7 @@ class PicklistService {
 
     ProductAvailabilityService productAvailabilityService
     StockMovementService stockMovementService
+    GrailsApplication grailsApplication
 
     Picklist save(Map data) {
         def itemsData = data.picklistItems ?: []
@@ -247,15 +250,14 @@ class PicklistService {
             Location currentLocation = picklistItem?.requisitionItem?.requisition?.origin
             if (currentLocation?.supports(ActivityCode.PICKING_STRATEGY_AUTOMATIC_REALLOCATION)) {
                 log.info "Automatically generate new picklist item for shortage: ${picklistItem?.toJson()}"
-                stockMovementService.createPicklist(picklistItem, Boolean.TRUE)
+                stockMovementService.createPicklistAfterShortage(picklistItem, Boolean.TRUE)
             }
         }
 
         // Check if the picklist has been completed
         String requisitionId = picklistItem?.picklist?.requisition?.id
         if (requisitionId) {
-            // TODO: To be implemented if needed
-            // grailsApplication.mainContext.publishEvent(new RefreshPicklistStatusEvent(requisitionId))
+            grailsApplication.mainContext.publishEvent(new RefreshPicklistStatusEvent(requisitionId))
         }
     }
 
