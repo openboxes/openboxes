@@ -1,16 +1,19 @@
 import { useState } from 'react';
 
+import moment from 'moment';
 import queryString from 'query-string';
 import { useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
 import { setShouldRebuildFilterParams } from 'actions';
-import cycleCountReportingFilterFields from 'components/cycleCountReporting/CycleCountReportingFilterFields';
+import { INDICATORS_TAB } from 'consts/cycleCount';
+import { DateFormat } from 'consts/timeFormat';
 import useCommonFiltersCleaner from 'hooks/list-pages/useCommonFiltersCleaner';
+import useQueryParams from 'hooks/useQueryParams';
 import { transformFilterParams } from 'utils/list-utils';
 import { fetchProduct } from 'utils/option-utils';
 
-const useCycleCountReportingFilters = () => {
+const useCycleCountReportingFilters = ({ filterFields }) => {
   const [filterParams, setFilterParams] = useState({});
   const [defaultFilterValues, setDefaultFilterValues] = useState({});
   const [filtersInitialized, setFiltersInitialized] = useState(false);
@@ -19,10 +22,11 @@ const useCycleCountReportingFilters = () => {
 
   const dispatch = useDispatch();
   const history = useHistory();
+  const { tab } = useQueryParams();
 
   const clearFilterValues = () => {
     const queryProps = queryString.parse(history.location.search);
-    const defaultValues = Object.keys(cycleCountReportingFilterFields).reduce(
+    const defaultValues = Object.keys(filterFields).reduce(
       (acc, key) => ({ ...acc, [key]: '' }),
       { tab: queryProps.tab },
     );
@@ -45,18 +49,23 @@ const useCycleCountReportingFilters = () => {
     setIsLoading(true);
     try {
       const queryProps = queryString.parse(history.location.search);
-      const defaultValues = Object.keys(cycleCountReportingFilterFields).reduce(
+      const defaultValues = Object.keys(filterFields).reduce(
         (acc, key) => ({ ...acc, [key]: '' }),
         { tab: queryProps.tab },
       );
 
-      if (queryProps.startDate) {
-        defaultValues.startDate = queryProps.startDate;
+      if (queryProps.startDate || tab === INDICATORS_TAB) {
+        // If tab === INDICATORS_TAB and queryProps.startDate is not provided,
+        // we want to use data from the last 3 months as the default.
+        defaultValues.startDate = queryProps.startDate || moment()
+          .subtract(3, 'months').format(DateFormat.DD_MMM_YYYY);
       }
-      if (queryProps.endDate) {
-        defaultValues.endDate = queryProps.endDate;
+      if (queryProps.endDate || tab === INDICATORS_TAB) {
+        // If tab === INDICATORS_TAB and queryProps.endDate is not provided,
+        // we want to use the current day as the default.
+        defaultValues.endDate = queryProps.endDate
+          || moment().format(DateFormat.DD_MMM_YYYY);
       }
-
       if (queryProps.products) {
         const productIds = Array.isArray(queryProps.products)
           ? queryProps.products

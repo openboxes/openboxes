@@ -4,6 +4,8 @@ import PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
 
 import FilterForm from 'components/Filter/FilterForm';
+import { INDICATORS_TAB } from 'consts/cycleCount';
+import useQueryParams from 'hooks/useQueryParams';
 import { debounceProductsFetch } from 'utils/option-utils';
 import ListFilterFormWrapper from 'wrappers/ListFilterFormWrapper';
 
@@ -24,6 +26,7 @@ const CycleCountReportingFilters = ({
     debounceTime: state.session.searchConfig.debounceTime,
     minSearchLength: state.session.searchConfig.minSearchLength,
   }));
+  const { tab } = useQueryParams();
   const { setSerializedParams } = tablePaginationProps;
   const debouncedProductsFetch = useCallback(
     debounceProductsFetch(
@@ -53,8 +56,10 @@ const CycleCountReportingFilters = ({
         ignoreClearFilters={['tab']}
         hidden={false}
         isLoading={isLoading}
-        customSubmitButtonLabel="react.cycleCount.filters.loadTable.label"
-        customSubmitButtonDefaultLabel="Load table"
+        customSubmitButtonLabel={tab === INDICATORS_TAB
+          ? 'react.cycleCount.filters.loadData.label'
+          : 'react.cycleCount.filters.loadTable.label'}
+        customSubmitButtonDefaultLabel={tab === INDICATORS_TAB ? 'Load data' : 'Load table'}
         showFilterVisibilityToggler={false}
         showSearchField={false}
         disableAutoUpdateFilterParams
