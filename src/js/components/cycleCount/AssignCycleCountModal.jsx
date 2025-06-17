@@ -14,57 +14,59 @@ const AssignCycleCountModal = ({
   closeModal,
   defaultTitleLabel,
   titleLabel,
-  selectedCycleCountItems,
-  setSelectedCycleCountItems,
-  isCount,
+  selectedCycleCounts,
+  setSelectedCycleCounts,
+  isRecount,
   refetchData,
 }) => {
   const translate = useTranslate();
 
   const { columns, handleAssign } = useAssignCycleCountModal({
-    selectedCycleCountItems,
-    setSelectedCycleCountItems,
-    isCount,
+    selectedCycleCounts,
+    setSelectedCycleCounts,
+    isRecount,
     refetchData,
     closeModal,
   });
 
   return (
-    <Modal
-      isOpen={isOpen}
-      className="modal-content"
-    >
-      <div>
-        <div className="d-flex justify-content-between">
-          <p className="assign-count-modal-header">
-            {translate(titleLabel, defaultTitleLabel)}
-          </p>
-          <RiCloseFill
-            size="32px"
-            className="cursor-pointer"
-            role="button"
-            aria-label="Close modal"
-            onClick={closeModal}
-          />
+    isOpen ? (
+      <Modal
+        isOpen={isOpen}
+        className="modal-content"
+      >
+        <div>
+          <div className="d-flex justify-content-between">
+            <p className="assign-count-modal-header">
+              {translate(titleLabel, defaultTitleLabel)}
+            </p>
+            <RiCloseFill
+              size="32px"
+              className="cursor-pointer"
+              role="button"
+              aria-label="Close modal"
+              onClick={closeModal}
+            />
+          </div>
+          <div className="assign-count-modal-container">
+            <DataTable
+              columns={columns}
+              data={selectedCycleCounts}
+              disablePagination
+              totalCount={selectedCycleCounts.length}
+            />
+          </div>
+          <div className="d-flex justify-content-end mt-3">
+            <Button
+              defaultLabel="Assign"
+              label="react.cycleCount.assign.label"
+              variant="primary"
+              onClick={handleAssign}
+            />
+          </div>
         </div>
-        <div className="assign-count-modal-container">
-          <DataTable
-            columns={columns}
-            data={selectedCycleCountItems}
-            disablePagination
-            totalCount={selectedCycleCountItems.length}
-          />
-        </div>
-        <div className="d-flex justify-content-end mt-3">
-          <Button
-            defaultLabel="Assign"
-            label="react.cycleCount.assign.label"
-            variant="primary"
-            onClick={handleAssign}
-          />
-        </div>
-      </div>
-    </Modal>
+      </Modal>
+    ) : null
   );
 };
 
@@ -75,15 +77,15 @@ AssignCycleCountModal.propTypes = {
   closeModal: PropTypes.func.isRequired,
   defaultTitleLabel: PropTypes.string,
   titleLabel: PropTypes.string,
-  selectedCycleCountItems: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
-  setSelectedCycleCountItems: PropTypes.func.isRequired,
-  isCount: PropTypes.bool,
+  selectedCycleCounts: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  setSelectedCycleCounts: PropTypes.func.isRequired,
+  isRecount: PropTypes.bool,
   refetchData: PropTypes.func,
 };
 
 AssignCycleCountModal.defaultProps = {
   titleLabel: 'react.cycleCount.modal.assignProductsToCount.title.label',
   defaultTitleLabel: 'Assign products to count',
-  isCount: false,
+  isRecount: false,
   refetchData: null,
 };

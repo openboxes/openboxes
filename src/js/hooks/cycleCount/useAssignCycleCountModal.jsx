@@ -18,9 +18,9 @@ import dateWithoutTimeZone from 'utils/dateUtils';
 import { debouncePeopleFetch } from 'utils/option-utils';
 
 const useAssignCycleCountModal = ({
-  selectedCycleCountItems,
-  setSelectedCycleCountItems,
-  isCount,
+  selectedCycleCounts,
+  setSelectedCycleCounts,
+  isRecount,
   refetchData,
   closeModal,
 }) => {
@@ -42,7 +42,7 @@ const useAssignCycleCountModal = ({
   const columnHelper = createColumnHelper();
 
   const handleUpdateAssignees = (cycleCountRequestId, field, value) => {
-    setSelectedCycleCountItems((prevItems) =>
+    setSelectedCycleCounts((prevItems) =>
       prevItems.map((item) =>
         (item.cycleCountRequestId === cycleCountRequestId
           ? { ...item, [field]: value }
@@ -52,24 +52,31 @@ const useAssignCycleCountModal = ({
   const handleAssign = async () => {
     try {
       spinner.show();
-      const commands = selectedCycleCountItems.map((item) => {
+      const commands = selectedCycleCounts.map((item) => {
         const { cycleCountRequestId, assignee, deadline } = item;
 
-        return isCount
+        const assignments = isRecount
           ? {
-            cycleCountRequest: cycleCountRequestId,
-            countAssignee: assignee?.id,
-            countDeadline: dateWithoutTimeZone({
-              date: deadline,
-            }),
+            1: {
+              assignee: assignee?.id,
+              deadline: dateWithoutTimeZone({
+                date: deadline,
+              }),
+            },
           }
           : {
-            cycleCountRequest: cycleCountRequestId,
-            recountAssignee: assignee?.id,
-            recountDeadline: dateWithoutTimeZone({
-              date: deadline,
-            }),
+            0: {
+              assignee: assignee?.id,
+              deadline: dateWithoutTimeZone({
+                date: deadline,
+              }),
+            },
           };
+
+        return {
+          assignments,
+          cycleCountRequest: cycleCountRequestId,
+        };
       });
 
       await cycleCountApi.updateCycleCountRequests(

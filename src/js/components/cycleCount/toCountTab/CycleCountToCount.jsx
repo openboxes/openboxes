@@ -63,16 +63,13 @@ const CycleCountToCount = ({ filterParams, toCountTabCheckboxes, tablePagination
 
   return (
     <>
-      {isAssignCountModalOpen && (
       <AssignCycleCountModal
         isOpen={isAssignCountModalOpen}
         closeModal={closeAssignCountModal}
-        selectedCycleCountItems={assignCountModalData}
-        setSelectedCycleCountItems={setAssignCountModalData}
+        selectedCycleCounts={assignCountModalData}
+        setSelectedCycleCounts={setAssignCountModalData}
         refetchData={fetchData}
-        isCount
       />
-      )}
       <div>
         {cycleCountIds.length !== 0 && <CycleCountDraftInfoBar tab={TO_COUNT_TAB} />}
         <div className="d-flex justify-content-sm-between align-items-center">
