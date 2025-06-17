@@ -130,7 +130,7 @@
 					</g:isSuperuser>
 					<g:isUserInRole roles="[RoleType.ROLE_ASSISTANT]">
 						<div class="action-menu-item">
-							<g:link controller="order" action="remove" id="${orderInstance?.id}"
+							<g:link controller="order" action="remove" id="${orderInstance?.id}" params="${params}"
 									disabled="${orderInstance?.status != OrderStatus.PENDING}"
 									disabledMessage="${g.message(code:'order.errors.delete.message')}"
 									onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
@@ -144,7 +144,7 @@
 			<g:elseif test="${orderInstance?.orderType == PUTAWAY_ORDER && orderInstance?.status != OrderStatus.COMPLETED}">
 				<g:isUserInRole roles="[RoleType.ROLE_ASSISTANT]">
 					<div class="action-menu-item">
-						<g:link controller="order" action="remove" id="${orderInstance?.id}"
+						<g:link controller="order" action="remove" id="${orderInstance?.id}" params="${params}"
 								disabled="${orderInstance?.status != OrderStatus.PENDING}"
 								disabledMessage="${g.message(code: 'order.errors.delete.message')}"
 								onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">

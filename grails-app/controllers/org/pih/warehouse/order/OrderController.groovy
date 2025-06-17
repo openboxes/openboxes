@@ -310,14 +310,17 @@ class OrderController {
                 try {
                     orderService.deleteOrder(orderInstance)
                     flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'order.label', default: 'Order'), orderInstance.orderNumber])}"
+                    redirect(action: "list", params: params)
                 } catch (org.springframework.dao.DataIntegrityViolationException e) {
                     flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'order.label', default: 'Order'), orderInstance.orderNumber])}"
+                    redirect(action: "list", id: params.id, params: params)
                 }
             } else {
                 flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'order.label', default: 'Order'), orderInstance.orderNumber])}"
             }
         } else {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
+            redirect(action: "list", params: params)
         }
 
         if (orderInstance.orderType?.code == OrderTypeCode.PURCHASE_ORDER.name()) {
