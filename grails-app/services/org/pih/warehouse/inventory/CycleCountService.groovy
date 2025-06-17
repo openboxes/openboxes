@@ -281,10 +281,16 @@ class CycleCountService {
 
     private CycleCountRequest updateRequest(CycleCountRequestUpdateCommand command) {
         CycleCountRequest cycleCountRequest = command.cycleCountRequest
-        cycleCountRequest.countAssignee = command.countAssignee
-        cycleCountRequest.countDeadline = command.countDeadline
-        cycleCountRequest.recountAssignee = command.recountAssignee
-        cycleCountRequest.recountDeadline = command.recountDeadline
+        CycleCountAssignmentCommand countAssignment = command.getAssignmentByCountIndex(Constants.COUNT_INDEX)
+        if (countAssignment) {
+            cycleCountRequest.countAssignee = countAssignment.assignee
+            cycleCountRequest.countDeadline = countAssignment.deadline
+        }
+        CycleCountAssignmentCommand recountAssignment = command.getAssignmentByCountIndex(Constants.RECOUNT_INDEX)
+        if (recountAssignment) {
+            cycleCountRequest.recountAssignee = recountAssignment.assignee
+            cycleCountRequest.recountDeadline = recountAssignment.deadline
+        }
 
         if (!cycleCountRequest.save()) {
             throw new ValidationException("Invalid cycle count request", cycleCountRequest.errors)

@@ -1,27 +1,30 @@
 package org.pih.warehouse.inventory
 
-import grails.validation.Validateable
+import grails.databinding.SimpleMapDataBindingSource
+import grails.web.databinding.DataBindingUtils
+
 import java.time.LocalDate
 
 import org.pih.warehouse.core.Person
 
-class CycleCountRequestUpdateCommand implements Validateable {
-
-    /**
-     * The request to update.
-     */
+class CycleCountRequestUpdateCommand {
+    Map<String, CycleCountAssignmentCommand> assignments
     CycleCountRequest cycleCountRequest
 
-    // The fields of the request that the user is allowed to update
-    Person countAssignee
-    LocalDate countDeadline
-    Person recountAssignee
-    LocalDate recountDeadline
-
-    static constraints = {
-        countAssignee(nullable: true)
-        countDeadline(nullable: true)
-        recountAssignee(nullable: true)
-        recountDeadline(nullable: true)
+    void setAssignments(Map input) {
+        assignments = input.collectEntries { k, v ->
+            CycleCountAssignmentCommand command = new CycleCountAssignmentCommand()
+            DataBindingUtils.bindObjectToInstance(command, new SimpleMapDataBindingSource(v))
+            [(k): command]
+        }
     }
+
+    CycleCountAssignmentCommand getAssignmentByCountIndex(String countIndex) {
+        return assignments.get(countIndex)
+    }
+}
+
+class CycleCountAssignmentCommand {
+    Person assignee
+    LocalDate deadline
 }

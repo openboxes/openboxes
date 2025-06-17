@@ -10,6 +10,7 @@ import TableHeaderCell from 'components/DataTable/TableHeaderCell';
 import DateField from 'components/form-elements/v2/DateField';
 import SelectField from 'components/form-elements/v2/SelectField';
 import { INVENTORY_ITEM_URL } from 'consts/applicationUrls';
+import CountIndex from 'consts/countIndex';
 import cycleCountColumn from 'consts/cycleCountColumn';
 import { DateFormat } from 'consts/timeFormat';
 import useSpinner from 'hooks/useSpinner';
@@ -18,9 +19,9 @@ import dateWithoutTimeZone from 'utils/dateUtils';
 import { debouncePeopleFetch } from 'utils/option-utils';
 
 const useAssignCycleCountModal = ({
-  selectedCycleCountItems,
-  setSelectedCycleCountItems,
-  isCount,
+  selectedCycleCounts,
+  setSelectedCycleCounts,
+  isRecount,
   refetchData,
   closeModal,
 }) => {
@@ -42,7 +43,7 @@ const useAssignCycleCountModal = ({
   const columnHelper = createColumnHelper();
 
   const handleUpdateAssignees = (cycleCountRequestId, field, value) => {
-    setSelectedCycleCountItems((prevItems) =>
+    setSelectedCycleCounts((prevItems) =>
       prevItems.map((item) =>
         (item.cycleCountRequestId === cycleCountRequestId
           ? { ...item, [field]: value }
@@ -52,24 +53,31 @@ const useAssignCycleCountModal = ({
   const handleAssign = async () => {
     try {
       spinner.show();
-      const commands = selectedCycleCountItems.map((item) => {
+      const commands = selectedCycleCounts.map((item) => {
         const { cycleCountRequestId, assignee, deadline } = item;
 
-        return isCount
+        const assignments = isRecount
           ? {
-            cycleCountRequest: cycleCountRequestId,
-            countAssignee: assignee?.id,
-            countDeadline: dateWithoutTimeZone({
-              date: deadline,
-            }),
+            [CountIndex.RECOUNT_INDEX]: {
+              assignee: assignee?.id,
+              deadline: dateWithoutTimeZone({
+                date: deadline,
+              }),
+            },
           }
           : {
-            cycleCountRequest: cycleCountRequestId,
-            recountAssignee: assignee?.id,
-            recountDeadline: dateWithoutTimeZone({
-              date: deadline,
-            }),
+            [CountIndex.COUNT_INDEX]: {
+              assignee: assignee?.id,
+              deadline: dateWithoutTimeZone({
+                date: deadline,
+              }),
+            },
           };
+
+        return {
+          assignments,
+          cycleCountRequest: cycleCountRequestId,
+        };
       });
 
       await cycleCountApi.updateCycleCountRequests(
@@ -90,9 +98,6 @@ const useAssignCycleCountModal = ({
 
   useEffect(() => {
     document.body.style.overflowY = 'hidden';
-    return () => {
-      document.body.style.overflowY = 'auto';
-    };
   }, []);
 
   const columns = [
