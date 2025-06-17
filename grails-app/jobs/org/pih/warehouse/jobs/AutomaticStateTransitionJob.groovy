@@ -2,14 +2,15 @@ package org.pih.warehouse.jobs
 
 import grails.util.Holders
 import org.pih.warehouse.api.StockMovement
-import org.quartz.DisallowConcurrentExecution
+import org.pih.warehouse.integration.StateTransitionService
+import org.pih.warehouse.requisition.Requisition
 import org.quartz.JobExecutionContext
 
-@DisallowConcurrentExecution
 class AutomaticStateTransitionJob {
 
-    def tmsIntegrationService
-    def stockMovementService
+    StateTransitionService stateTransitionService
+
+    def sessionRequired = false
 
     static triggers = {
         /* should only be triggered programmatically */
@@ -21,10 +22,14 @@ class AutomaticStateTransitionJob {
             return
         }
         String id = context.mergedJobDataMap.get("id")
-        StockMovement stockMovement = stockMovementService.getStockMovement(id, false)
-        if (stockMovement) {
-            log.info "Transition stock movement " + stockMovement.identifier + " status = " + stockMovement.status
-            tmsIntegrationService.triggerStockMovementStatusUpdate(stockMovement)
+        Requisition requisition = Requisition.get(id)
+        if (!requisition) {
+            log.warn "Requisition with id ${id} not found, cannot transition state"
+            return
         }
+
+        StockMovement stockMovement = StockMovement.createFromRequisition(requisition, true)
+        log.info "Transition stock movement " + stockMovement.identifier + " status = " + stockMovement.status
+        stateTransitionService.triggerStockMovementStatusUpdate(stockMovement)
     }
 }

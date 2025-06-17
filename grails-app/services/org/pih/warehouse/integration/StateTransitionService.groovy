@@ -9,6 +9,7 @@
 **/
 package org.pih.warehouse.integration
 
+import org.grails.web.json.JSONObject
 import org.pih.warehouse.api.StockMovement
 
 import org.pih.warehouse.inventory.StockMovementStatusCode
@@ -16,14 +17,9 @@ import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionStatus
 
-class TmsIntegrationService {
+class StateTransitionService {
 
     def stockMovementService
-
-    def triggerStockMovementStatusUpdate(String id) {
-        StockMovement stockMovement = stockMovementService.getStockMovement(id, false)
-        triggerStockMovementStatusUpdate(stockMovement)
-    }
 
     def triggerStockMovementStatusUpdate(StockMovement stockMovement) {
 
@@ -40,7 +36,7 @@ class TmsIntegrationService {
             if (!picklist?.picklistItems?.empty) {
                 if (picklist.isFullyPicked) {
                     log.info "Stock movement ${stockMovement.identifier} has been picked"
-                    stockMovementService.transitionRequisitionBasedStockMovement(stockMovement, StockMovementStatusCode.PICKED)
+                    stockMovementService.transitionRequisitionBasedStockMovement(stockMovement, [status: StockMovementStatusCode.PICKED] as JSONObject)
                 }
             }
         }

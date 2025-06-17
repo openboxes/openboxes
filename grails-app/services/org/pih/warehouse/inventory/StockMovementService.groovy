@@ -143,7 +143,7 @@ class StockMovementService {
         Comment comment = null
         // Update status only
         if (status && statusOnly) {
-            RequisitionStatus requisitionStatus = RequisitionStatus.fromStockMovementStatus(stockMovementStatus)
+            RequisitionStatus requisitionStatus = RequisitionStatus.fromStockMovementStatus(status)
             updateRequisitionStatus(stockMovement.id, requisitionStatus, comment)
         }
         // Determine whether we need to rollback change,
@@ -1788,7 +1788,7 @@ class StockMovementService {
             clearPicklist(requisitionItem)
             if (suggestedItems) {
                 for (SuggestedItem suggestedItem : suggestedItems) {
-                    Integer quantityPicked = location.requiresMobilPicking() ? 0 : suggestedItem.quantityPicked.intValueExact()
+                    Integer quantityPicked = location.requiresMobilePicking() ? 0 : suggestedItem.quantityPicked.intValueExact()
                     createOrUpdatePicklistItem(requisitionItem,
                             null,
                             suggestedItem.inventoryItem,
@@ -1808,6 +1808,58 @@ class StockMovementService {
                 ].toArray(), errorMessage)
 
                 // FIXME: consider not allowing zeroing out picked stock
+                throw new ValidationException(errorMessage, requisitionItem.errors)
+            }
+        }
+    }
+
+    void createPicklistAfterShortage(PicklistItem picklistItem, Boolean validateQuantityAvailable) {
+        createPicklist(picklistItem.requisitionItem, picklistItem?.quantityCanceled, Boolean.FALSE, validateQuantityAvailable, picklistItem)
+    }
+
+    void createPicklist(RequisitionItem requisitionItem, Integer quantityRequired, Boolean shouldClearPicklist = Boolean.TRUE, Boolean validateQuantityAvailable = Boolean.FALSE, PicklistItem excludedPicklistItem = null) {
+        Location location = requisitionItem?.requisition?.origin
+
+        log.info "QUANTITY REQUIRED: ${quantityRequired}"
+        if (quantityRequired) {
+            List<AvailableItem> availableItems = getAvailableItems(location, requisitionItem)
+
+            // If a picklist item was passed as an argument, remove the picklist item for which we're trying to create an alternative pick
+            if (excludedPicklistItem) {
+                availableItems.removeAll { AvailableItem availableItem ->
+                    availableItem.binLocation?.id == excludedPicklistItem?.binLocation?.id &&
+                            availableItem?.inventoryItem?.id == excludedPicklistItem?.inventoryItem?.id
+                }
+            }
+
+            List<SuggestedItem> suggestedItems = getSuggestedItems(availableItems, quantityRequired)
+            log.info "Suggested items " + suggestedItems
+
+            // The only time we don't want to clear the picklist is if we're generating new picklist items due to a shortage
+            if (shouldClearPicklist) {
+                clearPicklist(requisitionItem)
+            }
+
+            if (suggestedItems) {
+                for (SuggestedItem suggestedItem : suggestedItems) {
+                    createOrUpdatePicklistItem(
+                            requisitionItem,
+                            null,
+                            suggestedItem.inventoryItem,
+                            suggestedItem.binLocation,
+                            // if requires mobile picking, then quantity picked is 0, otherwise quantity picked is quantity to pick
+                            (requisitionItem.requisition.origin.requiresMobilePicking() ? 0 : suggestedItem.quantityPicked.intValueExact()),
+                            null,
+                            null,
+                            true,
+                            suggestedItem.quantityPicked.intValueExact(),)
+                }
+            }
+            if (validateQuantityAvailable && !suggestedItems) {
+                String errorMessage = "Product " + requisitionItem.product.productCode + " has no available inventory. Please go back to edit page and revise quantity"
+                requisitionItem.errors.rejectValue("picklistItems", errorMessage, [
+                        requisitionItem?.product?.productCode,
+                ].toArray(), errorMessage)
                 throw new ValidationException(errorMessage, requisitionItem.errors)
             }
         }
@@ -2020,7 +2072,7 @@ class StockMovementService {
      * @param stockMovementItem
      * @return
      */
-    List getSuggestedItems(List<AvailableItem> availableItems, Integer quantityRequested) {
+    List<SuggestedItem> getSuggestedItems(List<AvailableItem> availableItems, Integer quantityRequested) {
 
         List suggestedItems = []
         List<AvailableItem> autoPickableItems = availableItems?.findAll { it.quantityAvailable > 0 && it.pickable }
@@ -2789,7 +2841,7 @@ class StockMovementService {
 
     // TODO: Refactor - Move entire shipment logic to the shipmentService
     Shipment createShipment(StockMovement stockMovement) {
-        log.info "create shipment " + (new JSONObject(stockMovement.toJson())).toString(4)
+        log.info "create shipment " + (new JSONObject(stockMovement.toBaseJson())).toString(4)
 
         Requisition requisition = stockMovement.requisition
 
