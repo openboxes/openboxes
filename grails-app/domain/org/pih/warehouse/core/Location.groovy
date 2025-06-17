@@ -365,7 +365,7 @@ class Location implements Comparable<Location>, java.io.Serializable {
         return supports(ActivityCode.APPROVE_REQUEST)
     }
 
-    Boolean requiresMobilPicking() {
+    Boolean requiresMobilePicking() {
         return supports(ActivityCode.REQUIRE_MOBILE_PICKING)
     }
 
