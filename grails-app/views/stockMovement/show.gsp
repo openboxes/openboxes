@@ -642,6 +642,16 @@
                             </g:link>
                         </li>
                     </g:if>
+                    <li role="tab">
+                          <g:link controller="stockMovement"
+                                  action="schedule"
+                                  id="${stockMovement?.id}"
+                                  params="[id: stockMovement?.id]">
+                            <warehouse:message
+                              code="stockMovement.schedule.label"
+                              default="Scheduling"/>
+                          </g:link>
+                    </li>
                 </ul>
             </div>
         </div>
