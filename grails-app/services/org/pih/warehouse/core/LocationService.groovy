@@ -317,6 +317,10 @@ class LocationService {
         return getInternalLocations(parentLocation, null)
     }
 
+    List getInternalLocations(Location parentLocation, List<ActivityCode> activityCodes) {
+        return getInternalLocations(parentLocation, [LocationTypeCode.INTERNAL] as LocationTypeCode[], activityCodes as ActivityCode[])
+    }
+
     List getInternalLocations(Location parentLocation, ActivityCode[] activityCodes) {
         return getInternalLocations(parentLocation, [LocationTypeCode.INTERNAL] as LocationTypeCode[], activityCodes)
     }

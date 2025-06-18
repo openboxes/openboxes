@@ -25,6 +25,7 @@ import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.DocumentCommand
 import org.pih.warehouse.core.DocumentService
 import org.pih.warehouse.core.DocumentType
+import org.pih.warehouse.core.Event
 import org.pih.warehouse.core.HistoryItem
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Comment
@@ -39,6 +40,8 @@ import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentStatusCode
+
+import javax.transaction.Transactional
 
 class StockMovementController {
 
@@ -302,6 +305,11 @@ class StockMovementController {
 
     }
 
+    def schedule = {
+        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
+        render(template: "schedule", model: [stockMovement: stockMovement])
+    }
+
     def updateStatus() {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
 
@@ -444,6 +452,39 @@ class StockMovementController {
     def packingList() {
         def stockMovement = getStockMovement(params.id)
         render(template: "packingList", model: [stockMovement: stockMovement])
+    }
+
+    def saveSchedule() {
+        log.info "save schedule " + params
+        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
+
+        Requisition requisition = stockMovement.requisition
+        if (requisition) {
+            requisition.requestedDeliveryDate = params.requestedDeliveryDate
+            requisition.save()
+        }
+
+        Shipment shipment = stockMovement.shipment
+        if (shipment) {
+            shipment.expectedDeliveryDate = params.expectedDeliveryDate
+            shipment.expectedShippingDate = params.expectedShippingDate
+
+            if (params?.receivingLocation?.id) {
+                shipment.setReceivingScheduled(Location.load(params.receivingLocation.id), new Date(), User.load(session.user.id))
+            }
+            if (params?.packingLocation?.id) {
+                shipment.setPackingScheduled(Location.load(params.packingLocation.id), new Date(), User.load(session.user.id))
+            }
+            if (params?.loadingLocation?.id) {
+                shipment.setLoadingScheduled(Location.load(params.loadingLocation.id), new Date(), User.load(session.user.id))
+            }
+
+            shipment.save()
+        }
+
+        flash.message = "Saved scheduling information"
+
+        redirect(action: "show", id: stockMovement.id)
     }
 
     def receipts() {
