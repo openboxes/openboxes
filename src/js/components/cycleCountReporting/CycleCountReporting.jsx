@@ -3,7 +3,7 @@ import React from 'react';
 import cycleCountReportingFilterFields from 'components/cycleCountReporting/CycleCountReportingFilterFields';
 import CycleCountReportingFilters from 'components/cycleCountReporting/CycleCountReportingFilters';
 import CycleCountReportingHeader from 'components/cycleCountReporting/CycleCountReportingHeader';
-import IndicatorsTab from 'components/cycleCountReporting/IndicatorsTab';
+import IndicatorsTab from 'components/cycleCountReporting/IndicatorsTab/IndicatorsTab';
 import InventoryTransactionsTab from 'components/cycleCountReporting/InventoryTransactionsTab';
 import ProductsTab from 'components/cycleCountReporting/ProductsTab';
 import Tabs from 'components/listPagesUtils/Tabs';
@@ -39,7 +39,6 @@ const CycleCountReporting = () => {
         return cycleCountReportingFilterFields.products;
     }
   };
-
   const filterFields = getFilterFields();
   const {
     defaultFilterValues,
@@ -50,7 +49,6 @@ const CycleCountReporting = () => {
     shouldFetch,
     setShouldFetch,
   } = useCycleCountReportingFilters({ filterFields });
-
   const tablePaginationProps = useCycleCountPagination(filterParams, setShouldFetch, null, true);
   const tabs = {
     [PRODUCTS_TAB]: {
@@ -106,7 +104,9 @@ const CycleCountReporting = () => {
           />
         )}
         {currentTab === INDICATORS_TAB && (
-          <IndicatorsTab />
+          <IndicatorsTab
+            filterParams={filterParams}
+          />
         )}
       </div>
     </PageWrapper>

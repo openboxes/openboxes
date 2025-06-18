@@ -1033,6 +1033,26 @@ class UrlMappings {
             action = [POST: "getInventoryAuditSummary", GET: "getInventoryAuditSummary"]
         }
 
+        "/api/reports/indicators/totalCount" {
+            controller = "indicatorApi"
+            action = [GET: "getTotalCount"]
+        }
+
+        "/api/reports/indicators/itemsCounted" {
+            controller = "indicatorApi"
+            action = [GET: "getItemsCounted"]
+        }
+
+        "/api/reports/indicators/targetProgress" {
+            controller = "indicatorApi"
+            action = [GET: "getTargetProgress"]
+        }
+
+        "/api/reports/indicators/notFinishedItems" {
+            controller = "indicatorApi"
+            action = [GET: "getNotFinishedItems"]
+        }
+
         // Error handling
 
         "401"(controller: "errors", action: "handleUnauthorized")
