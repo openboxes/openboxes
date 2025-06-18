@@ -618,6 +618,26 @@ class SelectTagLib {
         out << g.select(attrs)
     }
 
+    def selectInternalLocation = { attrs, body ->
+
+        // If attrs.from is populated use that by default even if it's empty
+        if (!attrs.containsKey("from")) {
+            ActivityCode activityCode = attrs.activityCode as ActivityCode
+            Location parentLocation = Location.get(session.warehouse.id)
+            attrs.from = locationService.getInternalLocations(parentLocation, [activityCode])
+        }
+
+        attrs.optionKey = 'id'
+        attrs.groupBy = 'locationType'
+        if (attrs.groupBy) {
+            attrs.optionValue = { it.name }
+        } else {
+            attrs.optionValue = { it.name + " [" + format.metadata(obj: it?.locationType) + "]" }
+        }
+
+        out << g.select(attrs)
+    }
+
     def selectTransactionType = { attrs, body ->
 
         List transactionTypes = (attrs.transactionCode) ?

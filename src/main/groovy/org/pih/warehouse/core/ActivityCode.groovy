@@ -33,6 +33,7 @@ enum ActivityCode {
     PUTAWAY_STOCK('PUTAWAY_STOCK'),
     PICK_STOCK('PICK_STOCK'),
     PACK_STOCK('PACK_STOCK'),
+    LOAD_STOCK('LOAD_STOCK'),
     HOLD_STOCK('HOLD_STOCK'),
 
     // Requisition reason codes
@@ -127,6 +128,7 @@ enum ActivityCode {
                 PUTAWAY_STOCK,
                 PICK_STOCK,
                 PACK_STOCK,
+                LOAD_STOCK,
                 EXTERNAL,
                 ENABLE_NOTIFICATIONS,
                 DYNAMIC_RECEIVING,
