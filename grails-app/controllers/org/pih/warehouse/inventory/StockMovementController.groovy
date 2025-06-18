@@ -456,35 +456,9 @@ class StockMovementController {
 
     def saveSchedule() {
         log.info "save schedule " + params
-        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
-
-        Requisition requisition = stockMovement.requisition
-        if (requisition) {
-            requisition.requestedDeliveryDate = params.requestedDeliveryDate
-            requisition.save()
-        }
-
-        Shipment shipment = stockMovement.shipment
-        if (shipment) {
-            shipment.expectedDeliveryDate = params.expectedDeliveryDate
-            shipment.expectedShippingDate = params.expectedShippingDate
-
-            if (params?.receivingLocation?.id) {
-                shipment.setReceivingScheduled(Location.load(params.receivingLocation.id), new Date(), User.load(session.user.id))
-            }
-            if (params?.packingLocation?.id) {
-                shipment.setPackingScheduled(Location.load(params.packingLocation.id), new Date(), User.load(session.user.id))
-            }
-            if (params?.loadingLocation?.id) {
-                shipment.setLoadingScheduled(Location.load(params.loadingLocation.id), new Date(), User.load(session.user.id))
-            }
-
-            shipment.save()
-        }
-
+        stockMovementService.saveSchedule(params, session.user.id)
         flash.message = "Saved scheduling information"
-
-        redirect(action: "show", id: stockMovement.id)
+        redirect(action: "show", id: params.id)
     }
 
     def receipts() {

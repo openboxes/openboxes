@@ -3601,4 +3601,32 @@ class StockMovementService {
     ApplicationTagLib getApplicationTagLib() {
         return grailsApplication.mainContext.getBean(ApplicationTagLib)
     }
+
+    void saveSchedule(Map params, String userId) {
+        StockMovement stockMovement = getStockMovement(params.id)
+
+        Requisition requisition = stockMovement.requisition
+        if (requisition) {
+            requisition.requestedDeliveryDate = params.requestedDeliveryDate
+            requisition.save()
+        }
+
+        Shipment shipment = stockMovement.shipment
+        if (shipment) {
+            shipment.expectedDeliveryDate = params.expectedDeliveryDate
+            shipment.expectedShippingDate = params.expectedShippingDate
+
+            if (params?.receivingLocation?.id) {
+                shipment.setReceivingScheduled(Location.load(params.receivingLocation.id), new Date(), User.load(userId))
+            }
+            if (params?.packingLocation?.id) {
+                shipment.setPackingScheduled(Location.load(params.packingLocation.id), new Date(), User.load(userId))
+            }
+            if (params?.loadingLocation?.id) {
+                shipment.setLoadingScheduled(Location.load(params.loadingLocation.id), new Date(), User.load(userId))
+            }
+
+            shipment.save()
+        }
+    }
 }
