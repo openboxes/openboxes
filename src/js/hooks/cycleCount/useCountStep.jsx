@@ -632,8 +632,12 @@ const useCountStep = () => {
                 // this is why we introduce the assigneeImported boolean flag
                 if (correspondingImportItem && !assigneeImported.current[cycleCount.id]) {
                   assignCountedBy(cycleCount.id)(correspondingImportItem.assignee);
-                  setDateCounted((prevState) =>
-                    ({ ...prevState, [cycleCount.id]: correspondingImportItem.dateCounted }));
+                  // Do not allow to clear the date counted dropdown
+                  // if dateCounted was not set in the sheet
+                  if (correspondingImportItem.dateCounted) {
+                    setDateCounted((prevState) =>
+                      ({ ...prevState, [cycleCount.id]: correspondingImportItem.dateCounted }));
+                  }
                   // Mark the flag as true, so that it's not triggered for each item
                   assigneeImported.current = true;
                 }

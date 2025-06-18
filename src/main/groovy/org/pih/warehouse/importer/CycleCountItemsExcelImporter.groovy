@@ -83,7 +83,7 @@ class CycleCountItemsExcelImporter extends AbstractExcelImporter implements Data
 
         // 3. Replace data from importer with the fetched data
         data.each { row ->
-            row.binLocation = (locationMap[row.binLocation] && row.binLocation) ? [
+            row.binLocation = row.binLocation ? [
                     id: locationMap[row.binLocation]?.id,
                     name: locationMap[row.binLocation]?.name
             ] : null
