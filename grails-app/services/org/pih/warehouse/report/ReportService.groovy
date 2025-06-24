@@ -11,7 +11,6 @@ package org.pih.warehouse.report
 
 import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
-import grails.orm.PagedResultList
 import org.apache.http.client.HttpClient
 import org.apache.http.client.ResponseHandler
 import org.apache.http.client.methods.HttpGet
@@ -428,8 +427,7 @@ class ReportService implements ApplicationContextAware {
             (minTransactionDate..today).each { Date date ->
                 saveDateDimension(date)
             }
-        }
-        else {
+        } else {
             saveDateDimension(today)
         }
     }
@@ -552,7 +550,7 @@ class ReportService implements ApplicationContextAware {
             AND location_id = :locationId
             AND date BETWEEN (CURDATE() - INTERVAL :days DAY) AND NOW();
         """
-        return dataService.executeQuery(query, [locationId:location.id,productId:product.id, days: days])
+        return dataService.executeQuery(query, [locationId: location.id, productId: product.id, days: days])
     }
 
     void createStockoutFact() {
@@ -573,9 +571,9 @@ class ReportService implements ApplicationContextAware {
     }
 
     void buildStockoutFact() {
-        def yesterday = new Date()-1
-        def monthAgo = new Date()-30
-        (monthAgo .. yesterday).each { Date date ->
+        def yesterday = new Date() - 1
+        def monthAgo = new Date() - 30
+        (monthAgo..yesterday).each { Date date ->
             buildStockoutFact(date)
         }
     }
@@ -701,7 +699,7 @@ class ReportService implements ApplicationContextAware {
                 and ps.location_id = oos.destination_id)
             where destination_id = :locationId
             """
-        def results = dataService.executeQuery(query,  [synonymTypeCode: SynonymTypeCode.DISPLAY_NAME.name(), locale: locale, locationId: location.id])
+        def results = dataService.executeQuery(query, [synonymTypeCode: SynonymTypeCode.DISPLAY_NAME.name(), locale: locale, locationId: location.id])
         def data = results.collect {
             def qtyOnHand = it.qtyOnHand ? it.qtyOnHand.toInteger() : 0
             def qtyOrderedNotShipped = it.qtyOrderedNotShipped ? it.qtyOrderedNotShipped.toInteger() : 0
@@ -709,24 +707,24 @@ class ReportService implements ApplicationContextAware {
             def displayNameWithLocaleCode = "${it.productName}${it.displayName ? " (${locale?.toUpperCase()}: ${it.displayName})" : ''}"
             println displayNameWithLocaleCode
             [
-                    productCode                 : it.productCode,
-                    productName                 : it.productName,
-                    displayNameWithLocaleCode   : displayNameWithLocaleCode,
-                    displayName                 : it.displayName,
-                    productFamily               : it.productFamilyName ?: '',
-                    category                    : it.productCategoryName ?: '',
-                    productCatalogs             : it.productCatalogs ?: '',
-                    qtyOrderedNotShipped        : qtyOrderedNotShipped ?: '',
-                    qtyShippedNotReceived       : qtyShippedNotReceived ?: '',
-                    totalOnOrder                : qtyOrderedNotShipped + qtyShippedNotReceived,
-                    totalOnHand                 : qtyOnHand,
-                    totalOnHandAndOnOrder       : qtyOrderedNotShipped + qtyShippedNotReceived + qtyOnHand,
+                    productCode              : it.productCode,
+                    productName              : it.productName,
+                    displayNameWithLocaleCode: displayNameWithLocaleCode,
+                    displayName              : it.displayName,
+                    productFamily            : it.productFamilyName ?: '',
+                    category                 : it.productCategoryName ?: '',
+                    productCatalogs          : it.productCatalogs ?: '',
+                    qtyOrderedNotShipped     : qtyOrderedNotShipped ?: '',
+                    qtyShippedNotReceived    : qtyShippedNotReceived ?: '',
+                    totalOnOrder             : qtyOrderedNotShipped + qtyShippedNotReceived,
+                    totalOnHand              : qtyOnHand,
+                    totalOnHandAndOnOrder    : qtyOrderedNotShipped + qtyShippedNotReceived + qtyOnHand,
             ]
         }
         return data
     }
 
-    Map getQuantityOnOrder (String locationId, List<String> productIds) {
+    Map getQuantityOnOrder(String locationId, List<String> productIds) {
         def products = []
         productIds.each { products << Product.findById(it) }
         def location = Location.get(locationId)
@@ -737,14 +735,14 @@ class ReportService implements ApplicationContextAware {
         items.collect {
             def isOrderItem = it instanceof OrderItem
             [
-                    productId  : it.product?.id,
+                    productId            : it.product?.id,
                     qtyOrderedNotShipped : isOrderItem ? (it.quantityRemaining * it.quantityPerUom) : 0,
-                    qtyShippedNotReceived : isOrderItem ? 0 : it.quantityRemaining.toInteger(),
+                    qtyShippedNotReceived: isOrderItem ? 0 : it.quantityRemaining.toInteger(),
             ]
         }.groupBy { it.productId }.collect { k, v ->
             itemsMap.put(k, [
                     qtyOrderedNotShipped : v.qtyOrderedNotShipped.sum(),
-                    qtyShippedNotReceived : v.qtyShippedNotReceived.sum(),
+                    qtyShippedNotReceived: v.qtyShippedNotReceived.sum(),
             ]
             )
         }
@@ -770,9 +768,9 @@ class ReportService implements ApplicationContextAware {
             Integer qtyOrderedNotShipped = onOrder[it.productId] ? onOrder[it.productId].qtyOrderedNotShipped.toInteger() : 0
             Integer qtyShippedNotReceived = onOrder[it.productId] ? onOrder[it.productId].qtyShippedNotReceived.toInteger() : 0
             [
-                    productId            : it.productId,
-                    totalOnOrder         : qtyOrderedNotShipped + qtyShippedNotReceived,
-                    totalOnHand          : it.qtyOnHand ? it.qtyOnHand.toInteger() : 0,
+                    productId   : it.productId,
+                    totalOnOrder: qtyOrderedNotShipped + qtyShippedNotReceived,
+                    totalOnHand : it.qtyOnHand ? it.qtyOnHand.toInteger() : 0,
             ]
         }
         return data
@@ -843,14 +841,14 @@ class ReportService implements ApplicationContextAware {
 
             def results = dataService.executeQuery(query, params)
             if (results) {
-                def onOrderData = getOnOrderData(params.originId, results.collect{it.product_id}.unique())
+                def onOrderData = getOnOrderData(params.originId, results.collect { it.product_id }.unique())
                 def monthsInPeriod = (params.endDate - params.startDate) / 30
-                data = results.groupBy { it.product_id}.collect { productId, demandDetails ->
+                data = results.groupBy { it.product_id }.collect { productId, demandDetails ->
                     [
-                            productId             : productId,
-                            totalOnOrder          : onOrderData.find {it.productId == productId}?.totalOnOrder ?: '',
-                            totalOnHand           : onOrderData.find {it.productId == productId}?.totalOnHand ?: '',
-                            averageMonthlyDemand  : demandDetails.collect {it.quantity_demand}.sum() / monthsInPeriod
+                            productId           : productId,
+                            totalOnOrder        : onOrderData.find { it.productId == productId }?.totalOnOrder ?: '',
+                            totalOnHand         : onOrderData.find { it.productId == productId }?.totalOnHand ?: '',
+                            averageMonthlyDemand: demandDetails.collect { it.quantity_demand }.sum() / monthsInPeriod
                     ]
                 }
             }
@@ -960,16 +958,16 @@ class ReportService implements ApplicationContextAware {
         List orderAdjustmentResults = dataService.executeQuery(orderAdjustmentsQuery, queryParams)
 
         List rows = parseItemsForAmountOutstandingOnOrdersReport(orderItemResults) +
-            parseAdjustmentsForAmountOutstandingOnOrdersReport(orderAdjustmentResults)
+                parseAdjustmentsForAmountOutstandingOnOrdersReport(orderAdjustmentResults)
 
         if (rows.size() == 0) {
             String currencyCode = grailsApplication.config.openboxes.locale.defaultCurrencyCode ?: "USD"
-            return [["Supplier": "", "Destination Name": "", "PO Number": "", "Type": "", "Code": "", "Description": "",
-                 "UOM": "", "Cost per UOM (${currencyCode})": "", "Qty Ordered not shipped (UOM)": "",
-                 "Qty Ordered not shipped (Each)": "", "Value ordered not shipped": "", "Qty Shipped not Invoiced (UOM)": "",
-                 "Qty Shipped not Invoiced (Each)": "", "Value Shipped not invoiced": "", "Total Qty not Invoiced (UOM)": "",
-                 "Total Qty not Invoiced (Each)": "", "Total Value not invoiced": "", "Budget Code": "", "Payment Terms": "",
-                 "Recipient": "", "Estimated Ready Date": "", "Actual Ready Date": ""]]
+            return [["Supplier"                       : "", "Destination Name": "", "PO Number": "", "Type": "", "Code": "", "Description": "",
+                     "UOM"                            : "", "Cost per UOM (${currencyCode})": "", "Qty Ordered not shipped (UOM)": "",
+                     "Qty Ordered not shipped (Each)" : "", "Value ordered not shipped": "", "Qty Shipped not Invoiced (UOM)": "",
+                     "Qty Shipped not Invoiced (Each)": "", "Value Shipped not invoiced": "", "Total Qty not Invoiced (UOM)": "",
+                     "Total Qty not Invoiced (Each)"  : "", "Total Value not invoiced": "", "Budget Code": "", "Payment Terms": "",
+                     "Recipient"                      : "", "Estimated Ready Date": "", "Actual Ready Date": ""]]
         }
 
         return rows.sort { it["PO Number"] }
@@ -993,31 +991,31 @@ class ReportService implements ApplicationContextAware {
             def quantityNotInvoiced = quantityOrdered - quantityInvoiced > 0 ? quantityOrdered - quantityInvoiced : 0
 
             NumberFormat currencyNumberFormat = getCurrencyNumberFormat()
-            NumberFormat integerFormat =  NumberFormat.getIntegerInstance()
+            NumberFormat integerFormat = NumberFormat.getIntegerInstance()
 
             def printRow = [
-                "Supplier"                                          : "${organization?.code} - ${organization?.name}",
-                "Destination Name"                                  : orderItem?.order?.destination?.name,
-                "PO Number"                                         : orderItem?.order?.orderNumber,
-                "Type"                                              : "Item",
-                "Code"                                              : orderItem?.product?.productCode,
-                "Product name"                                      : orderItem?.product?.displayNameOrDefaultName,
-                "UOM"                                               : orderItem?.unitOfMeasure,
-                "Cost per UOM (${currencyNumberFormat.currency})"   : currencyNumberFormat.format(orderItem?.unitPrice ?: 0),
-                "Qty Ordered not shipped (UOM)"                     : integerFormat.format(orderedNotShipped),
-                "Qty Ordered not shipped (Each)"                    : integerFormat.format(orderedNotShipped * orderItem?.quantityPerUom),
-                "Value ordered not shipped"                         : currencyNumberFormat.format(orderedNotShipped * (orderItem?.unitPrice ?: 0)),
-                "Qty Shipped not Invoiced (UOM)"                    : integerFormat.format(shippedNotInvoiced),
-                "Qty Shipped not Invoiced (Each)"                   : integerFormat.format(shippedNotInvoiced * orderItem?.quantityPerUom),
-                "Value Shipped not invoiced"                        : currencyNumberFormat.format(shippedNotInvoiced * (orderItem?.unitPrice ?: 0)),
-                "Total Qty not Invoiced (UOM)"                      : integerFormat.format(quantityNotInvoiced),
-                "Total Qty not Invoiced (Each)"                     : integerFormat.format(quantityNotInvoiced * orderItem?.quantityPerUom),
-                "Total Value not invoiced"                          : currencyNumberFormat.format(quantityNotInvoiced * (orderItem?.unitPrice ?: 0)),
-                "Budget Code"                                       : orderItem?.budgetCode?.code,
-                "Payment Terms"                                     : orderItem?.order.paymentTerm?.name,
-                "Recipient"                                         : orderItem?.recipient?.name,
-                "Estimated Ready Date"                              : orderItem?.estimatedReadyDate?.format("MM/dd/yyyy"),
-                "Actual Ready Date"                                 : orderItem?.actualReadyDate?.format("MM/dd/yyyy"),
+                    "Supplier"                                       : "${organization?.code} - ${organization?.name}",
+                    "Destination Name"                               : orderItem?.order?.destination?.name,
+                    "PO Number"                                      : orderItem?.order?.orderNumber,
+                    "Type"                                           : "Item",
+                    "Code"                                           : orderItem?.product?.productCode,
+                    "Product name"                                   : orderItem?.product?.displayNameOrDefaultName,
+                    "UOM"                                            : orderItem?.unitOfMeasure,
+                    "Cost per UOM (${currencyNumberFormat.currency})": currencyNumberFormat.format(orderItem?.unitPrice ?: 0),
+                    "Qty Ordered not shipped (UOM)"                  : integerFormat.format(orderedNotShipped),
+                    "Qty Ordered not shipped (Each)"                 : integerFormat.format(orderedNotShipped * orderItem?.quantityPerUom),
+                    "Value ordered not shipped"                      : currencyNumberFormat.format(orderedNotShipped * (orderItem?.unitPrice ?: 0)),
+                    "Qty Shipped not Invoiced (UOM)"                 : integerFormat.format(shippedNotInvoiced),
+                    "Qty Shipped not Invoiced (Each)"                : integerFormat.format(shippedNotInvoiced * orderItem?.quantityPerUom),
+                    "Value Shipped not invoiced"                     : currencyNumberFormat.format(shippedNotInvoiced * (orderItem?.unitPrice ?: 0)),
+                    "Total Qty not Invoiced (UOM)"                   : integerFormat.format(quantityNotInvoiced),
+                    "Total Qty not Invoiced (Each)"                  : integerFormat.format(quantityNotInvoiced * orderItem?.quantityPerUom),
+                    "Total Value not invoiced"                       : currencyNumberFormat.format(quantityNotInvoiced * (orderItem?.unitPrice ?: 0)),
+                    "Budget Code"                                    : orderItem?.budgetCode?.code,
+                    "Payment Terms"                                  : orderItem?.order.paymentTerm?.name,
+                    "Recipient"                                      : orderItem?.recipient?.name,
+                    "Estimated Ready Date"                           : orderItem?.estimatedReadyDate?.format("MM/dd/yyyy"),
+                    "Actual Ready Date"                              : orderItem?.actualReadyDate?.format("MM/dd/yyyy"),
             ]
 
             rows << printRow
@@ -1038,28 +1036,28 @@ class ReportService implements ApplicationContextAware {
             NumberFormat currencyNumberFormat = getCurrencyNumberFormat()
 
             def printRow = [
-                "Supplier"                                          : "${organization?.code} - ${organization?.name}",
-                "Destination Name"                                  : orderAdjustment?.order?.destination?.name,
-                "PO Number"                                         : orderAdjustment?.order?.orderNumber,
-                "Type"                                              : "Adjustment",
-                "Code"                                              : orderAdjustment?.orderItem?.product?.productCode ?: "",
-                "Product name"                                      : orderAdjustment?.orderItem?.product?.displayNameOrDefaultName,
-                "UOM"                                               : "",
-                "Cost per UOM (${currencyNumberFormat.currency})"   : currencyNumberFormat.format((orderAdjustment?.totalAdjustments) ?: 0),
-                "Qty Ordered not shipped (UOM)"                     : "",
-                "Qty Ordered not shipped (Each)"                    : "",
-                "Value ordered not shipped"                         : "",
-                "Qty Shipped not Invoiced (UOM)"                    : "",
-                "Qty Shipped not Invoiced (Each)"                   : "",
-                "Value Shipped not invoiced"                        : "",
-                "Total Qty not Invoiced (UOM)"                      : "",
-                "Total Qty not Invoiced (Each)"                     : 1,
-                "Total Value not invoiced"                          : currencyNumberFormat.format((orderAdjustment?.totalAmountNotInvoiced) ?: 0),
-                "Budget Code"                                       : orderAdjustment?.budgetCode?.code,
-                "Payment Terms"                                     : orderAdjustment?.order?.paymentTerm?.name,
-                "Recipient"                                         : "",
-                "Estimated Ready Date"                              : "",
-                "Actual Ready Date"                                 : "",
+                    "Supplier"                                       : "${organization?.code} - ${organization?.name}",
+                    "Destination Name"                               : orderAdjustment?.order?.destination?.name,
+                    "PO Number"                                      : orderAdjustment?.order?.orderNumber,
+                    "Type"                                           : "Adjustment",
+                    "Code"                                           : orderAdjustment?.orderItem?.product?.productCode ?: "",
+                    "Product name"                                   : orderAdjustment?.orderItem?.product?.displayNameOrDefaultName,
+                    "UOM"                                            : "",
+                    "Cost per UOM (${currencyNumberFormat.currency})": currencyNumberFormat.format((orderAdjustment?.totalAdjustments) ?: 0),
+                    "Qty Ordered not shipped (UOM)"                  : "",
+                    "Qty Ordered not shipped (Each)"                 : "",
+                    "Value ordered not shipped"                      : "",
+                    "Qty Shipped not Invoiced (UOM)"                 : "",
+                    "Qty Shipped not Invoiced (Each)"                : "",
+                    "Value Shipped not invoiced"                     : "",
+                    "Total Qty not Invoiced (UOM)"                   : "",
+                    "Total Qty not Invoiced (Each)"                  : 1,
+                    "Total Value not invoiced"                       : currencyNumberFormat.format((orderAdjustment?.totalAmountNotInvoiced) ?: 0),
+                    "Budget Code"                                    : orderAdjustment?.budgetCode?.code,
+                    "Payment Terms"                                  : orderAdjustment?.order?.paymentTerm?.name,
+                    "Recipient"                                      : "",
+                    "Estimated Ready Date"                           : "",
+                    "Actual Ready Date"                              : "",
             ]
 
             rows << printRow
@@ -1088,11 +1086,9 @@ class ReportService implements ApplicationContextAware {
 
             if (command.startDate && command.endDate) {
                 between("transactionDate", command.startDate, command.endDate)
-            }
-            else if (command.startDate) {
+            } else if (command.startDate) {
                 gte("transactionDate", command.startDate)
-            }
-            else if (command.endDate) {
+            } else if (command.endDate) {
                 lte("transactionDate", command.endDate)
             }
         }
@@ -1138,14 +1134,16 @@ class ReportService implements ApplicationContextAware {
     Map getTotalCount(IndicatorApiCommand command) {
         return [
                 name : "totalCount",
-                value: 1500
+                value: 1500,
+                type : TileType.SINGLE.toString(),
         ]
     }
 
     Map getItemsCounted(IndicatorApiCommand command) {
         return [
                 name : "itemsCounted",
-                value: 1200
+                value: 1200,
+                type : TileType.SINGLE.toString(),
         ]
     }
 
@@ -1153,14 +1151,55 @@ class ReportService implements ApplicationContextAware {
         return [
                 name    : "targetProgress",
                 value   : 42,
-                subValue: "1281/26182"
+                subValue: "1281/26182",
+                type    : TileType.SINGLE.toString(),
         ]
     }
 
     Map getNotFinishedItems(IndicatorApiCommand command) {
         return [
                 name : "notFinishedItems",
-                value: 300
+                value: 300,
+                type : TileType.SINGLE.toString(),
+        ]
+    }
+
+    Map getInventoryLoss(IndicatorApiCommand command) {
+        def results = InventoryAuditDetails.createCriteria().list {
+            projections {
+                groupProperty("product")
+                groupProperty("facility")
+                sum("quantityAdjusted", "quantitySum")
+                property("pricePerUnit", "unitPrice")
+            }
+            eq("facility", command.facility)
+
+            if (command.startDate && command.endDate) {
+                between("transactionDate", command.startDate, command.endDate)
+            } else if (command.startDate) {
+                ge("transactionDate", command.startDate)
+            } else if (command.endDate) {
+                le("transactionDate", command.endDate)
+            }
+        }
+
+        def negativeResults = results.findAll { row ->
+            (row[2] ?: 0) < 0
+        }
+
+        def productCount = negativeResults.size()
+
+        def totalLoss = negativeResults.collect { row ->
+            def quantitySum = row[2] ?: 0
+            def unitPrice = row[3] ?: 0
+            quantitySum * unitPrice
+        }.sum() ?: 0
+
+        return [
+                name       : "inventoryLoss",
+                firstValue : productCount,
+                secondValue: totalLoss.abs(),
+                type       : TileType.DOUBLE.toString(),
         ]
     }
 }

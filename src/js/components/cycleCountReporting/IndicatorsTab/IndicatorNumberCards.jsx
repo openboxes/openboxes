@@ -2,8 +2,8 @@ import React from 'react';
 
 import PropTypes from 'prop-types';
 
-import SortableIndicatorCards
-  from 'components/cycleCountReporting/IndicatorsTab/SortableIndicatorCards';
+import IndicatorCards
+  from 'components/cycleCountReporting/IndicatorsTab/IndicatorCards';
 import LoadingNumbers from 'components/dashboard/LoadingNumbers';
 
 const IndicatorNumberCards = ({
@@ -11,7 +11,7 @@ const IndicatorNumberCards = ({
   tiles,
 }) => (
   <div className="cards-container">
-    {loading ? <LoadingNumbers /> : <SortableIndicatorCards data={tiles} /> }
+    {loading ? <LoadingNumbers LoadingNumberCards={5} /> : <IndicatorCards data={tiles} />}
   </div>
 );
 
@@ -29,6 +29,13 @@ IndicatorNumberCards.propTypes = {
     infoLabel: PropTypes.string,
     defaultInfo: PropTypes.string,
     showPercentSign: PropTypes.bool,
+    type: PropTypes.string,
+    firstValue: PropTypes.number,
+    secondValue: PropTypes.number,
+    firstSubtitleLabel: PropTypes.string,
+    defaultFirstSubtitle: PropTypes.string,
+    secondSubtitleLabel: PropTypes.string,
+    defaultSecondSubtitle: PropTypes.string,
   })),
 };
 
