@@ -21,32 +21,42 @@ const DoubleTile = ({
   formatSecondValueAsCurrency,
 }) => {
   const translate = useTranslate();
+
+  const formatCurrency = (value) => {
+    if (value >= 1000000) {
+      return `${(value / 1000000).toFixed(3)} million ${currencyCode}`;
+    }
+
+    return `${value.toLocaleString(undefined, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })} ${currencyCode}`;
+  };
+
   return (
     <div className="double-tile">
       <div className="double-tile__container">
-        <div className="double-tile__body">
-          <span className="double-tile__title">
-            {translate(cardTitle, cardTitleDefaultValue || cardTitle)}
-          </span>
-          <div className="double-tile__values">
-            <div className="double-tile__value--left">
-              <span className="double-tile__value-number text-center">
-                {cardFirstValue}
-              </span>
-              <span className="double-tile__subtitle text-center">
-                {translate(cardFirstSubtitle, cardDefaultFirstSubtitle)}
-              </span>
-            </div>
-            <div className="double-tile__value--right">
-              <span className="double-tile__value-number text-center">
-                {formatSecondValueAsCurrency
-                  ? `${cardSecondValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${currencyCode}`
-                  : cardSecondValue}
-              </span>
-              <span className="double-tile__subtitle text-center">
-                {translate(cardSecondSubtitle, cardDefaultSecondSubtitle)}
-              </span>
-            </div>
+        <span className="double-tile__title">
+          {translate(cardTitle, cardTitleDefaultValue || cardTitle)}
+        </span>
+        <div className="double-tile__values">
+          <div className="double-tile__value--left">
+            <span className="double-tile__value-number">
+              {cardFirstValue}
+            </span>
+            <span className="double-tile__subtitle">
+              {translate(cardFirstSubtitle, cardDefaultFirstSubtitle)}
+            </span>
+          </div>
+          <div className="double-tile__value--right">
+            <span className="double-tile__value-number">
+              {formatSecondValueAsCurrency
+                ? formatCurrency(cardSecondValue)
+                : cardSecondValue}
+            </span>
+            <span className="double-tile__subtitle">
+              {translate(cardSecondSubtitle, cardDefaultSecondSubtitle)}
+            </span>
           </div>
         </div>
         {cardInfo && (
