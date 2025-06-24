@@ -61,7 +61,7 @@
     "@hookform/resolvers": "3.3.4",
     "@sentry/react": "7.119.2",
     "@tanstack/react-table": "8.20.5",
-    "@tanstack/react-virtual": "^3.13.10",
+    "@tanstack/react-virtual": "3.13.10",
     "@testing-library/react-hooks": "8.0.1",
     "axios": "1.6.8",
     "bootstrap": "4.6.2",
