@@ -20,13 +20,24 @@ const DataTableBody = ({
   dataLength,
   tableWithPinnedColumns,
   isScreenWiderThanTable,
+  isVirtualizationEnabled,
+  isCustomRowsHeightEnabled,
+  tableVirtualizer,
 }) => {
   const translate = useTranslate();
+
+  const dataToMap = isVirtualizationEnabled
+    ? tableVirtualizer.getVirtualItems()
+    : rowModel.rows;
 
   return (
     <div
       className="rt-tbody-v2"
-      style={{ width: (!isScreenWiderThanTable && tableWithPinnedColumns && dataLength && !loading) ? 'fit-content' : undefined }}
+      style={{
+        width: (!isScreenWiderThanTable && tableWithPinnedColumns && dataLength && !loading) ? 'fit-content' : undefined,
+        height: isVirtualizationEnabled ? `${tableVirtualizer.getTotalSize()}px` : 'auto',
+        position: isVirtualizationEnabled ? 'relative' : 'static',
+      }}
     >
       <DataTableStatus
         label={emptyTableMessage?.id || defaultEmptyTableMessage.id}
@@ -39,10 +50,26 @@ const DataTableBody = ({
         defaultMessage={loadingMessage?.defaultMessage || defaultLoadingTableMessage.defaultMessage}
         shouldDisplay={loading}
       />
-      {dataLength > 0 &&
-        !loading &&
-        rowModel.rows.map((row) => {
-          const { isRowDisabled, label, defaultMessage } = row.original?.meta || {
+      {dataLength > 0
+        && !loading
+        && dataToMap.map((row) => {
+          const rowProps = isVirtualizationEnabled
+            ? {
+              'data-index': row.index,
+              ref: isCustomRowsHeightEnabled
+                ? tableVirtualizer.measureElement
+                : null,
+              style: {
+                position: 'absolute',
+                top: 0,
+                transform: `translateY(${row.start}px)`,
+                width: '100%',
+              },
+            } : {};
+          const rowData = isVirtualizationEnabled
+            ? rowModel.rows[row.index]
+            : row;
+          const { isRowDisabled, label, defaultMessage } = rowData.original?.meta || {
             isRowDisabled: false,
             label: '',
             defaultMessage: '',
@@ -52,9 +79,14 @@ const DataTableBody = ({
               content={isRowDisabled && translate(label, defaultMessage)}
               show={isRowDisabled}
             >
-              <div key={row.id} className="rt-tr-group cell-wrapper" role="rowgroup">
-                <TableRow key={row.id} className={`rt-tr ${isRowDisabled && 'bg-light'}`}>
-                  {row.getVisibleCells().map((cell) => {
+              <div
+                key={rowData.id}
+                className="rt-tr-group cell-wrapper"
+                role="rowgroup"
+                {...rowProps}
+              >
+                <TableRow key={rowData.id} className={`rt-tr ${isRowDisabled && 'bg-light'}`}>
+                  {rowData.getVisibleCells().map((cell) => {
                     const { hide, flexWidth, className } = useTableColumnMeta(cell.column);
                     if (hide) {
                       return null;
@@ -114,6 +146,9 @@ DataTableBody.propTypes = {
   dataLength: PropTypes.number.isRequired,
   tableWithPinnedColumns: PropTypes.bool,
   isScreenWiderThanTable: PropTypes.bool.isRequired,
+  isVirtualizationEnabled: PropTypes.bool,
+  isCustomRowsHeightEnabled: PropTypes.bool,
+  tableVirtualizer: PropTypes.shape({}),
 };
 
 DataTableBody.defaultProps = {
@@ -121,4 +156,7 @@ DataTableBody.defaultProps = {
   loadingMessage: null,
   loading: false,
   tableWithPinnedColumns: false,
+  isVirtualizationEnabled: false,
+  isCustomRowsHeightEnabled: false,
+  tableVirtualizer: {},
 };
