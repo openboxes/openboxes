@@ -59,7 +59,7 @@ const useIndicatorsTab = ({
     if (startDate && endDate) {
       fetchData();
     }
-  }, [startDate, endDate, currentLocation?.id]);
+  }, [startDate, endDate]);
 
   return {
     loading,

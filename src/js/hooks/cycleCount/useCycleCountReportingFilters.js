@@ -1,13 +1,12 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import moment from 'moment';
 import queryString from 'query-string';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
 import { setShouldRebuildFilterParams } from 'actions';
 import { INDICATORS_TAB } from 'consts/cycleCount';
-import { DateFormat } from 'consts/timeFormat';
 import useCommonFiltersCleaner from 'hooks/list-pages/useCommonFiltersCleaner';
 import useQueryParams from 'hooks/useQueryParams';
 import { transformFilterParams } from 'utils/list-utils';
@@ -22,6 +21,13 @@ const useCycleCountReportingFilters = ({ filterFields }) => {
   const dispatch = useDispatch();
   const history = useHistory();
   const { tab } = useQueryParams();
+  const {
+    currentLocation,
+  } = useSelector((state) => ({
+    currentLocation: state.session.currentLocation,
+  }));
+  const [previousLocation, setPreviousLocation] = useState(currentLocation?.id);
+
   const clearFilterValues = () => {
     const queryProps = queryString.parse(history.location.search);
     const defaultValues = Object.keys(filterFields).reduce(
@@ -57,13 +63,13 @@ const useCycleCountReportingFilters = ({ filterFields }) => {
         // If tab === INDICATORS_TAB and queryProps.startDate is not provided,
         // we want to use data from the last 3 months as the default.
         defaultValues.startDate = queryProps.startDate || moment()
-          .subtract(3, 'months').format(DateFormat.DD_MMM_YYYY);
+          .subtract(3, 'months');
       }
       if (queryProps.endDate || (tab === INDICATORS_TAB && !filtersInitialized)) {
         // If tab === INDICATORS_TAB and queryProps.endDate is not provided,
         // we want to use the current day as the default.
         defaultValues.endDate = queryProps.endDate
-          || moment().format(DateFormat.DD_MMM_YYYY);
+          || moment();
       }
 
       if (queryProps.products) {
@@ -81,9 +87,10 @@ const useCycleCountReportingFilters = ({ filterFields }) => {
           value: product.id,
         }));
       }
-
+      if (tab === INDICATORS_TAB) {
+        setFilterParams(defaultValues);
+      }
       setDefaultFilterValues(defaultValues);
-      setFilterParams(defaultValues);
       setFiltersInitialized(true);
     } finally {
       setIsLoading(false);
@@ -111,6 +118,14 @@ const useCycleCountReportingFilters = ({ filterFields }) => {
     }
     setFilterParams(values);
   };
+
+  useEffect(() => {
+    // Reset filters when location changes to avoid stale data
+    if (previousLocation !== currentLocation?.id) {
+      resetForm();
+      setPreviousLocation(currentLocation?.id);
+    }
+  }, [currentLocation?.id]);
 
   return {
     defaultFilterValues,

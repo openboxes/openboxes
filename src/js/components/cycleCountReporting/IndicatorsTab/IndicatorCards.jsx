@@ -43,7 +43,6 @@ const IndicatorCards = SortableContainer(({ data }) => (
           cardDefaultSecondSubtitle={card.defaultSecondSubtitle}
           cardInfo={card.infoLabel}
           cardInfoDefaultValue={card.defaultInfo}
-          infoIcon={<RiInformationLine size={20} />}
           formatSecondValueAsCurrency
         />
       )))}

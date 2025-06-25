@@ -1,10 +1,12 @@
 import React, { useCallback, useRef } from 'react';
 
+import moment from 'moment';
 import PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
 
 import FilterForm from 'components/Filter/FilterForm';
 import { INDICATORS_TAB } from 'consts/cycleCount';
+import { DateFormat } from 'consts/timeFormat';
 import useQueryParams from 'hooks/useQueryParams';
 import { debounceProductsFetch } from 'utils/option-utils';
 import ListFilterFormWrapper from 'wrappers/ListFilterFormWrapper';
@@ -39,12 +41,18 @@ const CycleCountReportingFilters = ({
       <FilterForm
         filterFields={filterFields}
         updateFilterParams={(values) => {
+          const formattedValues = {
+            ...values,
+            startDate: moment(values.startDate).format(DateFormat.DD_MMM_YYYY),
+            endDate: moment(values.endDate).format(DateFormat.DD_MMM_YYYY),
+          };
+
           updateCounter.current += 1;
           const valuesWithCounter = {
-            ...values,
+            ...formattedValues,
             updateCounter: updateCounter.current,
           };
-          setFilterParams({ ...values });
+          setFilterParams(formattedValues);
           setShouldFetch(true);
           setSerializedParams(JSON.stringify(valuesWithCounter));
         }}

@@ -10,10 +10,10 @@ class InventoryLossResult implements Serializable {
     BigDecimal unitPrice
 
     BigDecimal getTotalLoss() {
-        (quantitySum ?: 0) * (unitPrice ?: 0)
+        return (quantitySum ?: 0) * (unitPrice ?: 0)
     }
 
     boolean isTotalAdjustmentNegative() {
-        (quantitySum ?: 0) < 0
+        return (quantitySum ?: 0) < 0
     }
 }

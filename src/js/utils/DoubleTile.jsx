@@ -1,6 +1,7 @@
 import React from 'react';
 
 import PropTypes from 'prop-types';
+import { RiInformationLine } from 'react-icons/ri';
 
 import useTranslate from 'hooks/useTranslate';
 import CustomTooltip from 'wrappers/CustomTooltip';
@@ -16,7 +17,6 @@ const DoubleTile = ({
   cardDefaultSecondSubtitle,
   cardInfo,
   cardInfoDefaultValue,
-  infoIcon,
   currencyCode,
   formatSecondValueAsCurrency,
 }) => {
@@ -27,10 +27,9 @@ const DoubleTile = ({
       return `${(value / 1000000).toFixed(3)} ${translate('react.cycleCount.indicators.million.label', 'million')} ${currencyCode}`;
     }
 
-    return `${value.toLocaleString('en-US', {
-      minimumFractionDigits: 2,
+    return `${new Intl.NumberFormat('en-US', {
       maximumFractionDigits: 2,
-    })} ${currencyCode}`;
+    }).format(value)} ${currencyCode}`;
   };
 
   return (
@@ -63,7 +62,7 @@ const DoubleTile = ({
           <CustomTooltip
             content={translate(cardInfo, cardInfoDefaultValue)}
           >
-            {infoIcon || <i className="fa fa-info-circle" />}
+            <RiInformationLine size={20} />
           </CustomTooltip>
         </div>
       )}
@@ -74,7 +73,6 @@ const DoubleTile = ({
 export default DoubleTile;
 
 DoubleTile.defaultProps = {
-  infoIcon: null,
   currencyCode: 'USD',
   formatSecondValueAsCurrency: false,
 };
@@ -90,7 +88,6 @@ DoubleTile.propTypes = {
   cardDefaultSecondSubtitle: PropTypes.string.isRequired,
   cardInfo: PropTypes.string.isRequired,
   cardInfoDefaultValue: PropTypes.string.isRequired,
-  infoIcon: PropTypes.node,
   currencyCode: PropTypes.string,
   formatSecondValueAsCurrency: PropTypes.bool,
 };

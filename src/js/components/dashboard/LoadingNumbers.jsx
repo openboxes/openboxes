@@ -6,9 +6,9 @@ import ReactLoading from 'react-loading';
 
 import { getRandomColor } from 'consts/dataFormat/colorMapping';
 
-const LoadingNumbers = ({ LoadingNumberCards }) => {
+const LoadingNumbers = ({ numberOfLoadingCards }) => {
   const loadingNumbers = [];
-  for (let i = 0; i < LoadingNumberCards; i += 1) {
+  for (let i = 0; i < numberOfLoadingCards; i += 1) {
     loadingNumbers.push(<div className="number-card" key={i}>
       <div className="loader-div">
         <ReactLoading
@@ -29,11 +29,11 @@ const LoadingNumbers = ({ LoadingNumberCards }) => {
 };
 
 LoadingNumbers.propTypes = {
-  LoadingNumberCards: PropTypes.number,
+  numberOfLoadingCards: PropTypes.number,
 };
 
 LoadingNumbers.defaultProps = {
-  LoadingNumberCards: 4,
+  numberOfLoadingCards: 4,
 };
 
 export default LoadingNumbers;
