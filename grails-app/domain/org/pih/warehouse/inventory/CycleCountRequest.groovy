@@ -1,5 +1,8 @@
 package org.pih.warehouse.inventory
 
+import grails.util.Holders
+import org.pih.warehouse.api.AvailableItem
+
 import java.time.LocalDate
 
 import org.pih.warehouse.auth.AuthService
@@ -75,6 +78,24 @@ class CycleCountRequest {
         recountDeadline(nullable: true)
     }
 
+    // Access to the information about available cycle count items before creating the cycle count
+    List<AvailableItem> getItemsAvailableForCycleCount() {
+        CycleCountProductAvailabilityService cycleCountProductAvailabilityService = Holders.grailsApplication.mainContext.getBean(CycleCountProductAvailabilityService)
+        return cycleCountProductAvailabilityService.getAvailableItems(facility, product)
+    }
+
+    Integer getNumberOfItemsAvailableForCycleCount() {
+        return getItemsAvailableForCycleCount()?.size()
+    }
+
+    Integer getInventoryItemsCount() {
+        if (!cycleCount) {
+            return getNumberOfItemsAvailableForCycleCount()
+        }
+
+        return cycleCount.numberOfItemsOfMostRecentCount
+    }
+
     Map toJson() {
         return [
                 id: id,
@@ -90,7 +111,7 @@ class CycleCountRequest {
                         deadline: recountDeadline,
                         assignee: recountAssignee
                 ],
-                inventoryItemsCount: cycleCount?.numberOfItemsOfMostRecentCount,
+                inventoryItemsCount: getInventoryItemsCount(),
                 blindCount: blindCount,
                 dateCreated: dateCreated,
                 lastUpdated: lastUpdated,
