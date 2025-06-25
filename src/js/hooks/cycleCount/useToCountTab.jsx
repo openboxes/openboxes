@@ -485,6 +485,7 @@ const useToCountTab = ({
     const { data } = await cycleCountApi.getPendingRequests({
       locationId: currentLocation?.id,
       requestIds: checkedCheckboxes,
+      max: checkedCheckboxes.length,
     });
     const modalData = data.data.map((pendingCycleCountRequest) => {
       const {
