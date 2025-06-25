@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 
 import { createColumnHelper } from '@tanstack/react-table';
 import fileDownload from 'js-file-download';
@@ -45,7 +45,7 @@ const useToResolveTab = ({
   pageSize,
   serializedParams,
 }) => {
-  const [assignCountModalData, setAssignCountModalData] = useState([]);
+  const assignCountModalData = useRef([]);
   const [isAssignCountModalOpen, setIsAssignCountModalOpen] = useState(false);
   const columnHelper = createColumnHelper();
   const translate = useTranslate();
@@ -499,12 +499,12 @@ const useToResolveTab = ({
       };
     });
     spinner.hide();
-    setAssignCountModalData(modalData);
+    assignCountModalData.current = modalData;
   };
 
   const closeAssignCountModal = () => {
     setIsAssignCountModalOpen(false);
-    setAssignCountModalData([]);
+    assignCountModalData.current = [];
   };
 
   const openAssignCountModal = async () => {
@@ -525,7 +525,6 @@ const useToResolveTab = ({
     fetchData,
     isAssignCountModalOpen,
     assignCountModalData,
-    setAssignCountModalData,
     openAssignCountModal,
     closeAssignCountModal,
   };

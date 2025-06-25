@@ -47,7 +47,6 @@ const CycleCountToCount = ({ filterParams, toCountTabCheckboxes, tablePagination
     closeAssignCountModal,
     isAssignCountModalOpen,
     assignCountModalData,
-    setAssignCountModalData,
     fetchData,
   } = useToCountTab({
     filterParams,
@@ -67,7 +66,6 @@ const CycleCountToCount = ({ filterParams, toCountTabCheckboxes, tablePagination
         isOpen={isAssignCountModalOpen}
         closeModal={closeAssignCountModal}
         selectedCycleCounts={assignCountModalData}
-        setSelectedCycleCounts={setAssignCountModalData}
         refetchData={fetchData}
       />
       <div>

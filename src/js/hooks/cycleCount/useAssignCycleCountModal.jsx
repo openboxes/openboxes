@@ -13,6 +13,7 @@ import { INVENTORY_ITEM_URL } from 'consts/applicationUrls';
 import CountIndex from 'consts/countIndex';
 import cycleCountColumn from 'consts/cycleCountColumn';
 import { DateFormat } from 'consts/timeFormat';
+import useForceRender from 'hooks/useForceRender';
 import useSpinner from 'hooks/useSpinner';
 import useTranslate from 'hooks/useTranslate';
 import dateWithoutTimeZone from 'utils/dateUtils';
@@ -20,7 +21,6 @@ import { debouncePeopleFetch } from 'utils/option-utils';
 
 const useAssignCycleCountModal = ({
   selectedCycleCounts,
-  setSelectedCycleCounts,
   isRecount,
   refetchData,
   closeModal,
@@ -41,19 +41,20 @@ const useAssignCycleCountModal = ({
   );
   const translate = useTranslate();
   const columnHelper = createColumnHelper();
+  const { forceRerender } = useForceRender();
 
   const handleUpdateAssignees = (cycleCountRequestId, field, value) => {
-    setSelectedCycleCounts((prevItems) =>
-      prevItems.map((item) =>
-        (item.cycleCountRequestId === cycleCountRequestId
-          ? { ...item, [field]: value }
-          : item)));
+    // eslint-disable-next-line no-param-reassign
+    selectedCycleCounts.current = selectedCycleCounts.current.map((item) =>
+      (item.cycleCountRequestId === cycleCountRequestId
+        ? { ...item, [field]: value }
+        : item));
   };
 
   const handleAssign = async () => {
     try {
       spinner.show();
-      const commands = selectedCycleCounts.map((item) => {
+      const commands = selectedCycleCounts.current.map((item) => {
         const { cycleCountRequestId, assignee, deadline } = item;
 
         const assignments = isRecount
@@ -163,12 +164,15 @@ const useAssignCycleCountModal = ({
             value={getValue()}
             clearable
             customDateFormat={DateFormat.DD_MMM_YYYY}
-            onChange={(newDate) =>
+            onChange={(newDate) => {
               handleUpdateAssignees(
                 row.original.cycleCountRequestId,
                 cycleCountColumn.DEADLINE,
                 newDate,
-              )}
+              );
+              // Rerender to display date in date field
+              forceRerender();
+            }}
           />
         </TableCell>
       ),

@@ -15,7 +15,6 @@ const AssignCycleCountModal = ({
   defaultTitleLabel,
   titleLabel,
   selectedCycleCounts,
-  setSelectedCycleCounts,
   isRecount,
   refetchData,
 }) => {
@@ -31,7 +30,6 @@ const AssignCycleCountModal = ({
 
   const { columns, handleAssign } = useAssignCycleCountModal({
     selectedCycleCounts,
-    setSelectedCycleCounts,
     isRecount,
     refetchData,
     closeModal,
@@ -58,9 +56,9 @@ const AssignCycleCountModal = ({
         <div className="assign-count-modal-container">
           <DataTable
             columns={columns}
-            data={selectedCycleCounts}
+            data={selectedCycleCounts.current}
             disablePagination
-            totalCount={selectedCycleCounts.length}
+            totalCount={selectedCycleCounts.current?.length || 0}
           />
         </div>
         <div className="d-flex justify-content-end mt-3">
@@ -84,7 +82,6 @@ AssignCycleCountModal.propTypes = {
   defaultTitleLabel: PropTypes.string,
   titleLabel: PropTypes.string,
   selectedCycleCounts: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
-  setSelectedCycleCounts: PropTypes.func.isRequired,
   isRecount: PropTypes.bool,
   refetchData: PropTypes.func,
 };

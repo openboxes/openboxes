@@ -44,7 +44,6 @@ const CycleCountToResolve = ({
     openCancelCountsModal,
     isAssignCountModalOpen,
     fetchData,
-    setAssignCountModalData,
     assignCountModalData,
     closeAssignCountModal,
     openAssignCountModal,
@@ -66,7 +65,6 @@ const CycleCountToResolve = ({
         isOpen={isAssignCountModalOpen}
         closeModal={closeAssignCountModal}
         selectedCycleCounts={assignCountModalData}
-        setSelectedCycleCounts={setAssignCountModalData}
         refetchData={fetchData}
         isRecount
       />
