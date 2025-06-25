@@ -90,7 +90,7 @@ class CycleCountRequest {
                         deadline: recountDeadline,
                         assignee: recountAssignee
                 ],
-                inventoryItemsCount: cycleCount?.cycleCountItems?.size(),
+                inventoryItemsCount: cycleCount?.numberOfItemsOfMostRecentCount,
                 blindCount: blindCount,
                 dateCreated: dateCreated,
                 lastUpdated: lastUpdated,
