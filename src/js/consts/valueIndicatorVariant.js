@@ -12,8 +12,14 @@ const valueIndicatorVariant = {
   TRANSACTION: 'TRANSACTION',
 };
 
-export const getCycleCountDifferencesVariant = (number) => {
+// 'checkValue' was added to optionally check `value`,
+// since it's not always passed and shouldn't always be checked
+export const getCycleCountDifferencesVariant = (number, value = null, checkValue = false) => {
   if (_.isNaN(number) || _.isNil(number)) {
+    return null;
+  }
+
+  if (checkValue && _.isNil(value)) {
     return null;
   }
 
