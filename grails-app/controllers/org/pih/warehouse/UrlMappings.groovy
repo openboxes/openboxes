@@ -1053,6 +1053,11 @@ class UrlMappings {
             action = [GET: "getNotFinishedItems"]
         }
 
+        "/api/reports/indicators/inventoryLoss" {
+            controller = "indicatorApi"
+            action = [GET: "getInventoryLoss"]
+        }
+
         // Error handling
 
         "401"(controller: "errors", action: "handleUnauthorized")

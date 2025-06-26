@@ -6,6 +6,7 @@ import { getCurrentLocation } from 'selectors';
 import cycleCountReportingIndicators from 'consts/cycleCountReportingIndicators';
 import dateWithoutTimeZone from 'utils/dateUtils';
 import {
+  fetchIndicatorInventoryLoss,
   fetchIndicatorItemsCounted,
   fetchIndicatorNotFinishedItems,
   fetchIndicatorTargetProgress,
@@ -39,6 +40,7 @@ const useIndicatorsTab = ({
         fetchIndicatorItemsCounted(params),
         fetchIndicatorTargetProgress(params),
         fetchIndicatorNotFinishedItems(params),
+        fetchIndicatorInventoryLoss(params),
       ]);
 
       const mergedTiles = responses
@@ -57,7 +59,7 @@ const useIndicatorsTab = ({
     if (startDate && endDate) {
       fetchData();
     }
-  }, [startDate, endDate, currentLocation?.id]);
+  }, [startDate, endDate]);
 
   return {
     loading,

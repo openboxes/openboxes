@@ -36,6 +36,16 @@ const cycleCountReportingIndicators = {
     infoLabel: 'react.cycleCount.indicators.cardInfo.notFinishedItems.label',
     defaultInfo: 'Items remaining to be counted or processed',
   },
+  inventoryLoss: {
+    titleLabel: 'react.cycleCount.indicators.cardTitle.inventoryLoss.label',
+    defaultTitle: 'Inventory loss',
+    firstSubtitleLabel: 'react.cycleCount.indicators.cardSubtitle.countedLess.label',
+    defaultFirstSubtitle: 'counted less than in system',
+    secondSubtitleLabel: 'react.cycleCount.indicators.cardSubtitle.overallLost.label',
+    defaultSecondSubtitle: 'overall $ lost',
+    infoLabel: 'react.cycleCount.indicators.cardInfo.inventoryLoss.label',
+    defaultInfo: 'Inventory loss',
+  },
 };
 
 export default cycleCountReportingIndicators;

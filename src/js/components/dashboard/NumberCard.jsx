@@ -110,6 +110,7 @@ const NumberCard = SortableElement(({
   hideDraghandle,
   showPercentSign,
   infoIcon,
+  disableSubtitleEllipsis,
 }) => {
   let isSparkline = false;
   if (sparklineData != null) {
@@ -141,7 +142,7 @@ const NumberCard = SortableElement(({
             {cardNumberType === 'number' ? `${cardNumberLocale}${showPercentSign ? '%' : ''}` : `${cardNumberLocale} ${currencyCode}`}
             {' '}
           </span>
-          <span className="subtitle-card text-overflow-ellipsis text-nowrap">
+          <span className={`subtitle-card ${disableSubtitleEllipsis ? '' : ' text-overflow-ellipsis text-nowrap'}`}>
             {cardSubtitleValue}
             {' '}
             {translate(cardSubtitle, cardSubtitleDefaultValue || cardSubtitle)}
@@ -202,6 +203,7 @@ NumberCard.defaultProps = {
   sparklineData: null,
   showPercentSign: false,
   infoIcon: null,
+  disableSubtitleEllipsis: false,
 };
 
 NumberCard.propTypes = {
@@ -220,6 +222,7 @@ NumberCard.propTypes = {
   currencyCode: PropTypes.string.isRequired,
   showPercentSign: PropTypes.bool,
   infoIcon: PropTypes.node,
+  disableSubtitleEllipsis: PropTypes.bool,
 };
 
 NumberSparklineCard.propTypes = {

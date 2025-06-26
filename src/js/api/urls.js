@@ -210,3 +210,4 @@ export const INDICATORS_TOTAL_COUNT = `${INDICATORS_REPORT}/totalCount`;
 export const INDICATORS_ITEMS_COUNTED = `${INDICATORS_REPORT}/itemsCounted`;
 export const INDICATORS_TARGET_PROGRESS = `${INDICATORS_REPORT}/targetProgress`;
 export const INDICATORS_NOT_FINISHED_ITEMS = `${INDICATORS_REPORT}/notFinishedItems`;
+export const INDICATORS_INVENTORY_LOSS = `${INDICATORS_REPORT}/inventoryLoss`;

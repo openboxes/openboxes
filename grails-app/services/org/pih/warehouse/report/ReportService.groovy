@@ -37,6 +37,7 @@ import org.pih.warehouse.reporting.DateDimension
 import org.pih.warehouse.LocalizationUtil
 import org.pih.warehouse.reporting.IndicatorApiCommand
 import org.pih.warehouse.reporting.GetInventoryAuditReportCommand
+import org.pih.warehouse.reporting.InventoryLossResult
 import org.springframework.context.ApplicationContext
 import org.springframework.context.ApplicationContextAware
 import org.xhtmlrenderer.pdf.ITextRenderer
@@ -1138,14 +1139,16 @@ class ReportService implements ApplicationContextAware {
     Map getTotalCount(IndicatorApiCommand command) {
         return [
                 name : "totalCount",
-                value: 1500
+                value: 1500,
+                type : TileType.SINGLE.toString(),
         ]
     }
 
     Map getItemsCounted(IndicatorApiCommand command) {
         return [
                 name : "itemsCounted",
-                value: 1200
+                value: 1200,
+                type : TileType.SINGLE.toString(),
         ]
     }
 
@@ -1153,14 +1156,57 @@ class ReportService implements ApplicationContextAware {
         return [
                 name    : "targetProgress",
                 value   : 42,
-                subValue: "1281/26182"
+                subValue: "1281/26182",
+                type    : TileType.SINGLE.toString(),
         ]
     }
 
     Map getNotFinishedItems(IndicatorApiCommand command) {
         return [
                 name : "notFinishedItems",
-                value: 300
+                value: 300,
+                type : TileType.SINGLE.toString(),
+        ]
+    }
+
+    Map getInventoryLoss(IndicatorApiCommand command) {
+        List<Object[]> results = InventoryAuditDetails.createCriteria().list {
+            projections {
+                groupProperty("product")
+                groupProperty("facility")
+                sum("quantityAdjusted", "quantitySum")
+                property("pricePerUnit", "unitPrice")
+            }
+            eq("facility", command.facility)
+
+            if (command.startDate) {
+                ge("transactionDate", command.startDate)
+            }
+            if (command.endDate) {
+                le("transactionDate", command.endDate)
+            }
+        } as List<Object[]>
+
+        List<InventoryLossResult> inventoryLossResults = results.collect {
+            new InventoryLossResult(
+                    product     : it[0],
+                    facility    : it[1],
+                    quantitySum : it[2],
+                    unitPrice   : it[3]
+            )
+        }
+
+        List<InventoryLossResult> negativeResults = inventoryLossResults.findAll { it.totalAdjustmentNegative }
+
+        int productCount = negativeResults.size()
+
+        BigDecimal totalLoss = negativeResults.sum { it.getTotalLoss() } ?: 0
+
+        return [
+                name        : "inventoryLoss",
+                firstValue  : productCount,
+                secondValue : totalLoss.abs(),
+                type        : TileType.DOUBLE.toString(),
         ]
     }
 }

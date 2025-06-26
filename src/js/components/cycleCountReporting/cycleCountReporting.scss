@@ -35,3 +35,30 @@
     }
   }
 }
+
+@media (min-width: 535px) {
+  .double-tile {
+    width: 96%;
+  }
+  .number-card {
+    width: 47%;
+  }
+}
+
+@media (min-width: 868px) {
+  .double-tile {
+    width: 47%;
+  }
+  .number-card {
+    width: 22.5%;
+  }
+}
+
+@media (min-width: 1368px) {
+  .double-tile {
+    width: 29.5%;
+  }
+  .number-card {
+    width: 14.5%;
+  }
+}
