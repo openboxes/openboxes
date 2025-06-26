@@ -489,4 +489,38 @@ class ReceiptService {
 
         return null
     }
+
+    void createAutomaticReceipt(Shipment shipment) {
+        PartialReceipt partialReceipt = getPartialReceipt(shipment.id, "1")
+        partialReceipt.dateShipped = shipment.expectedShippingDate
+
+        shipment.shipmentItems.each { item ->
+            PartialReceiptContainer partialReceiptContainer =
+                    partialReceipt.findDefaultPartialReceiptContainer()
+            if (!partialReceiptContainer) {
+                partialReceiptContainer = new PartialReceiptContainer()
+                partialReceipt.partialReceiptContainers.add(partialReceiptContainer)
+            }
+
+            PartialReceiptItem partialReceiptItem = partialReceiptContainer.partialReceiptItems.find {
+                it?.shipmentItem?.id == item.id
+            }
+
+            if (!partialReceiptItem) {
+                partialReceiptItem = new PartialReceiptItem()
+            }
+
+            partialReceiptItem.quantityReceiving = item.quantity
+            partialReceiptItem.binLocation = createTemporaryReceivingBin(shipment)
+            partialReceiptItem.product = item.product
+            partialReceiptItem.shouldSave = item.quantity != null
+            partialReceiptContainer.partialReceiptItems.add(partialReceiptItem)
+        }
+
+        savePartialReceipt(partialReceipt, true)
+
+        //does not change status
+        shipment.setCurrentStatus(ShipmentStatusCode.RECEIVED)
+        shipmentService.saveShipment(shipment)
+    }
 }

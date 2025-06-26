@@ -19,6 +19,7 @@ import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.RefreshOrderSummaryEvent
+import org.pih.warehouse.receiving.AutomaticReceiptEvent
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.requisition.Requisition
 import util.StringUtil
@@ -27,6 +28,10 @@ class Shipment implements Comparable, Serializable, Historizable {
 
     def publishRefreshEvent() {
         Holders.grailsApplication.mainContext.publishEvent(new RefreshOrderSummaryEvent(this))
+    }
+
+    def publishAutomaticReceiptEvent() {
+        Holders.grailsApplication.mainContext.publishEvent(new AutomaticReceiptEvent(this.id))
     }
 
     def beforeInsert() {
@@ -44,10 +49,12 @@ class Shipment implements Comparable, Serializable, Historizable {
 
     def afterInsert() {
         publishRefreshEvent()
+        publishAutomaticReceiptEvent()
     }
 
     def afterUpdate() {
         publishRefreshEvent()
+        publishAutomaticReceiptEvent()
     }
 
     String id
