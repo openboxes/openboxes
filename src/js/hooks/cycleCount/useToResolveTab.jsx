@@ -32,7 +32,6 @@ import useTableDataV2 from 'hooks/useTableDataV2';
 import useTableSorting from 'hooks/useTableSorting';
 import useThrowError from 'hooks/useThrowError';
 import useTranslate from 'hooks/useTranslate';
-import Badge from 'utils/Badge';
 import confirmationModal from 'utils/confirmationModalUtils';
 import dateWithoutTimeZone from 'utils/dateUtils';
 import exportFileFromAPI, { extractFilenameFromHeader } from 'utils/file-download-util';
@@ -292,11 +291,7 @@ const useToResolveTab = ({
         const value = getValue();
         return (
           <TableCell className="rt-td badge-container">
-            <Badge
-              label={value?.name?.toString()}
-              variant="badge--purple"
-              tooltip
-            />
+            {value?.name?.toString()}
           </TableCell>
         );
       },
@@ -314,11 +309,7 @@ const useToResolveTab = ({
         const date = formatLocalizedDate(getValue(), DateFormat.DD_MMM_YYYY);
         return (
           <TableCell className="rt-td badge-container">
-            <Badge
-              label={date}
-              variant="badge--blue"
-              tooltip
-            />
+            {date}
           </TableCell>
         );
       },
