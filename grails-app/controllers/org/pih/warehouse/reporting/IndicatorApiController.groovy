@@ -9,8 +9,6 @@
  * */
 package org.pih.warehouse.reporting
 import grails.converters.JSON
-import grails.validation.Validateable
-import org.pih.warehouse.core.Location
 import org.pih.warehouse.report.ReportService
 
 class IndicatorApiController {
@@ -33,23 +31,8 @@ class IndicatorApiController {
         render consoleService.eval(code, true, request)
     }
 
-    def getTotalCount(IndicatorApiCommand command) {
-        Map data = reportService.getTotalCount(command)
-        render([data: data] as JSON)
-    }
-
-    def getItemsCounted(IndicatorApiCommand command) {
-        Map data = reportService.getItemsCounted(command)
-        render([data: data] as JSON)
-    }
-
-    def getTargetProgress(IndicatorApiCommand command) {
-        Map data = reportService.getTargetProgress(command)
-        render([data: data] as JSON)
-    }
-
-    def getNotFinishedItems(IndicatorApiCommand command) {
-        Map data = reportService.getNotFinishedItems(command)
+    def getProductsInventoried(IndicatorApiCommand command) {
+        Map data = reportService.getProductsInventoried(command)
         render([data: data] as JSON)
     }
 

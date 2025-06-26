@@ -17,11 +17,14 @@ import org.apache.http.client.ResponseHandler
 import org.apache.http.client.methods.HttpGet
 import org.apache.http.impl.client.BasicResponseHandler
 import org.apache.http.impl.client.DefaultHttpClient
+import org.hibernate.sql.JoinType
 import org.pih.warehouse.PaginatedList
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.SynonymTypeCode
+import org.pih.warehouse.inventory.CycleCount
+import org.pih.warehouse.inventory.CycleCountStatus
 import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.InventoryAuditDetails
 import org.pih.warehouse.inventory.InventoryAuditSummary
@@ -1136,35 +1139,29 @@ class ReportService implements ApplicationContextAware {
         return new PaginatedList<InventoryAuditSummary>(data, results.totalCount);
     }
 
-    Map getTotalCount(IndicatorApiCommand command) {
-        return [
-                name : "totalCount",
-                value: 1500,
-                type : TileType.SINGLE.toString(),
-        ]
-    }
+    Map getProductsInventoried(IndicatorApiCommand command) {
+        int result = CycleCount.createCriteria().get {
+            createAlias("cycleCountItems", "cci", JoinType.INNER_JOIN)
+            createAlias("facility", "f", JoinType.INNER_JOIN)
 
-    Map getItemsCounted(IndicatorApiCommand command) {
-        return [
-                name : "itemsCounted",
-                value: 1200,
-                type : TileType.SINGLE.toString(),
-        ]
-    }
+            projections {
+                countDistinct("cci.product.id", "distinct_product_count")
+            }
 
-    Map getTargetProgress(IndicatorApiCommand command) {
-        return [
-                name    : "targetProgress",
-                value   : 42,
-                subValue: "1281/26182",
-                type    : TileType.SINGLE.toString(),
-        ]
-    }
+            eq("status", CycleCountStatus.COMPLETED)
+            eq("f.id", command.facility.id)
 
-    Map getNotFinishedItems(IndicatorApiCommand command) {
+            if (command.startDate) {
+                ge("dateCreated", command.startDate)
+            }
+            if (command.endDate) {
+                le("dateCreated", command.endDate)
+            }
+        } as int
+
         return [
-                name : "notFinishedItems",
-                value: 300,
+                name  : "productsInventoried",
+                value : result ?: 0,
                 type : TileType.SINGLE.toString(),
         ]
     }
