@@ -287,7 +287,7 @@ const useProductsTab = ({
       ),
       cell: ({ getValue }) => {
         const value = getValue();
-        const variant = getCycleCountDifferencesVariant(value);
+        const variant = getCycleCountDifferencesVariant({ firstValue: value });
         const className = value > 0 ? 'value-indicator--more' : 'value-indicator--less';
         return (
           <TableCell className="rt-td d-flex justify-content-end">

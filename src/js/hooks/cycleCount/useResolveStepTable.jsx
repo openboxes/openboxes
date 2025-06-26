@@ -460,7 +460,7 @@ const useResolveStepTable = ({
       cell: useCallback(({ row: { original: { quantityOnHand, quantityCounted } } }) => {
         const quantityVariance = quantityCounted - (quantityOnHand || 0);
         const variant = (quantityCounted || quantityCounted === 0)
-          ? getCycleCountDifferencesVariant(quantityVariance)
+          ? getCycleCountDifferencesVariant({ firstValue: quantityVariance })
           : valueIndicatorVariant.EMPTY;
         return (
           <TableCell className="rt-td rt-td-count-step static-cell-count-step d-flex align-items-center">
@@ -492,7 +492,11 @@ const useResolveStepTable = ({
         const [value, setValue] = useState(tableData?.[index]?.quantityRecounted);
         const recountDifference = value - (quantityOnHand || 0);
         // We want to show variant only when value is not null
-        const variant = getCycleCountDifferencesVariant(recountDifference, value, true);
+        const variant = getCycleCountDifferencesVariant({
+          firstValue: recountDifference,
+          secondValue: value,
+          shouldCheckSecondValue: true,
+        });
         events.on('refreshRecountDifference', () => {
           setValue(tableData?.[index]?.quantityRecounted);
         });
