@@ -1140,7 +1140,7 @@ class ReportService implements ApplicationContextAware {
     }
 
     Map getProductsInventoried(IndicatorApiCommand command) {
-        int result = CycleCount.createCriteria().get {
+        Integer result = CycleCount.createCriteria().get {
             createAlias("cycleCountItems", "cci", JoinType.INNER_JOIN)
 
             projections {
@@ -1156,7 +1156,7 @@ class ReportService implements ApplicationContextAware {
             if (command.endDate) {
                 le("dateCreated", command.endDate)
             }
-        } as int
+        } as Integer
 
         return [
                 name  : "productsInventoried",
