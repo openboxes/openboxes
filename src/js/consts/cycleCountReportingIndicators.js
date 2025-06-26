@@ -12,7 +12,7 @@ const cycleCountReportingIndicators = {
     firstSubtitleLabel: 'react.cycleCount.indicators.cardSubtitle.countedLess.label',
     defaultFirstSubtitle: 'counted less than in system',
     secondSubtitleLabel: 'react.cycleCount.indicators.cardSubtitle.overallLost.label',
-    defaultSecondSubtitle: 'overall $ lost',
+    defaultSecondSubtitle: 'overall financial value lost',
     infoLabel: 'react.cycleCount.indicators.cardInfo.inventoryLoss.label',
     defaultInfo: 'Inventory loss',
   },
