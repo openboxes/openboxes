@@ -17,6 +17,7 @@ const AssignCycleCountModal = ({
   selectedCycleCounts,
   isRecount,
   refetchData,
+  assignDataDirectly,
 }) => {
   // When the modal is not displayed we want to show the scrollbar to users.
   // The return below is necessary to block executing hooks that are related to
@@ -33,6 +34,10 @@ const AssignCycleCountModal = ({
     isRecount,
     refetchData,
     closeModal,
+    // Props used to assign count data directly to the cycle count
+    // used in a case, when assigning data takes place after creating
+    // the cycle count (for example, assigning after the discrepancy modal)
+    assignDataDirectly,
   });
 
   return (
@@ -84,6 +89,7 @@ AssignCycleCountModal.propTypes = {
   selectedCycleCounts: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   isRecount: PropTypes.bool,
   refetchData: PropTypes.func,
+  assignDataDirectly: PropTypes.bool,
 };
 
 AssignCycleCountModal.defaultProps = {
@@ -91,4 +97,5 @@ AssignCycleCountModal.defaultProps = {
   defaultTitleLabel: 'Assign products to count',
   isRecount: false,
   refetchData: null,
+  assignDataDirectly: false,
 };
