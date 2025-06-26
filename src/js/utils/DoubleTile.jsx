@@ -24,7 +24,7 @@ const DoubleTile = ({
 
   const formatCurrency = (value) => {
     if (value >= 1000000) {
-      return `${(value / 1000000).toFixed(3)} ${translate('react.cycleCount.indicators.million.label', 'million')} ${currencyCode}`;
+      return `${(value / 1000000).toFixed(3)} ${translate('react.default.million.label', 'million')} ${currencyCode}`;
     }
 
     return `${new Intl.NumberFormat('en-US', {

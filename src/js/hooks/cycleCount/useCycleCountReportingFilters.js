@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 
 import moment from 'moment';
 import queryString from 'query-string';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
+import { getCurrentLocation } from 'selectors';
 
 import { setShouldRebuildFilterParams } from 'actions';
 import { INDICATORS_TAB } from 'consts/cycleCount';
@@ -24,9 +25,9 @@ const useCycleCountReportingFilters = ({ filterFields }) => {
   const {
     currentLocation,
   } = useSelector((state) => ({
-    currentLocation: state.session.currentLocation,
+    currentLocation: getCurrentLocation(state),
   }));
-  const [previousLocation, setPreviousLocation] = useState(currentLocation?.id);
+  const previousLocation = useRef(currentLocation?.id);
 
   const clearFilterValues = () => {
     const queryProps = queryString.parse(history.location.search);
@@ -120,10 +121,9 @@ const useCycleCountReportingFilters = ({ filterFields }) => {
   };
 
   useEffect(() => {
-    // Reset filters when location changes to avoid stale data
-    if (previousLocation !== currentLocation?.id) {
+    if (previousLocation.current !== currentLocation?.id) {
       resetForm();
-      setPreviousLocation(currentLocation?.id);
+      previousLocation.current = currentLocation?.id;
     }
   }, [currentLocation?.id]);
 

@@ -1170,7 +1170,7 @@ class ReportService implements ApplicationContextAware {
     }
 
     Map getInventoryLoss(IndicatorApiCommand command) {
-        def results = InventoryAuditDetails.createCriteria().list {
+        List<Object[]> results = InventoryAuditDetails.createCriteria().list {
             projections {
                 groupProperty("product")
                 groupProperty("facility")
@@ -1179,14 +1179,13 @@ class ReportService implements ApplicationContextAware {
             }
             eq("facility", command.facility)
 
-            if (command.startDate && command.endDate) {
-                between("transactionDate", command.startDate, command.endDate)
-            } else if (command.startDate) {
+            if (command.startDate) {
                 ge("transactionDate", command.startDate)
-            } else if (command.endDate) {
+            }
+            if (command.endDate) {
                 le("transactionDate", command.endDate)
             }
-        }
+        } as List<Object[]>
 
         List<InventoryLossResult> inventoryLossResults = results.collect {
             new InventoryLossResult(
@@ -1204,10 +1203,10 @@ class ReportService implements ApplicationContextAware {
         BigDecimal totalLoss = negativeResults.sum { it.getTotalLoss() } ?: 0
 
         return [
-                name       : "inventoryLoss",
-                firstValue : productCount,
-                secondValue: totalLoss.abs(),
-                type       : TileType.DOUBLE.toString(),
+                name        : "inventoryLoss",
+                firstValue  : productCount,
+                secondValue : totalLoss.abs(),
+                type        : TileType.DOUBLE.toString(),
         ]
     }
 }
