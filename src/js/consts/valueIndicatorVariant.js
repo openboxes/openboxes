@@ -12,16 +12,26 @@ const valueIndicatorVariant = {
   TRANSACTION: 'TRANSACTION',
 };
 
-export const getCycleCountDifferencesVariant = (number) => {
-  if (_.isNaN(number) || _.isNil(number)) {
+// 'shouldCheckSecondValue' was added to optionally check `secondValue`,
+// since it's not always passed and shouldn't always be checked
+export const getCycleCountDifferencesVariant = ({
+  firstValue,
+  secondValue = null,
+  shouldCheckSecondValue = false,
+}) => {
+  if (_.isNaN(firstValue) || _.isNil(firstValue)) {
     return null;
   }
 
-  if (number > 0) {
+  if (shouldCheckSecondValue && _.isNil(secondValue)) {
+    return null;
+  }
+
+  if (firstValue > 0) {
     return valueIndicatorVariant.POSITIVE;
   }
 
-  if (number < 0) {
+  if (firstValue < 0) {
     return valueIndicatorVariant.NEGATIVE;
   }
 
