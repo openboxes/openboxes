@@ -51,7 +51,6 @@ const CountStep = () => {
     isAssignCountModalOpen,
     closeAssignCountModal,
     assignCountModalData,
-    setAssignCountModalData,
   } = useCountStep();
 
   const tableVirtualizer = useWindowVirtualizer({
@@ -131,7 +130,6 @@ const CountStep = () => {
                   isAssignCountModalOpen={isAssignCountModalOpen}
                   closeAssignCountModal={closeAssignCountModal}
                   assignCountModalData={assignCountModalData}
-                  setAssignCountModalData={setAssignCountModalData}
                 />
               </div>
             );
