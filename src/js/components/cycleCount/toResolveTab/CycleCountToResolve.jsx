@@ -65,6 +65,8 @@ const CycleCountToResolve = ({
         isOpen={isAssignCountModalOpen}
         closeModal={closeAssignCountModal}
         selectedCycleCounts={assignCountModalData}
+        defaultTitleLabel="Assign products to recount"
+        titleLabel="react.cycleCount.modal.assignProductsToRecount.title.label"
         refetchData={fetchData}
         isRecount
       />
