@@ -9,9 +9,11 @@ import { TableCell } from 'components/DataTable';
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
 import DateField from 'components/form-elements/v2/DateField';
 import SelectField from 'components/form-elements/v2/SelectField';
+import notification from 'components/Layout/notifications/notification';
 import { INVENTORY_ITEM_URL } from 'consts/applicationUrls';
 import CountIndex from 'consts/countIndex';
 import cycleCountColumn from 'consts/cycleCountColumn';
+import NotificationType from 'consts/notificationTypes';
 import { DateFormat } from 'consts/timeFormat';
 import useForceRender from 'hooks/useForceRender';
 import useSpinner from 'hooks/useSpinner';
@@ -81,12 +83,21 @@ const useAssignCycleCountModal = ({
         };
       });
 
-      await cycleCountApi.updateCycleCountRequests(
+      const response = await cycleCountApi.updateCycleCountRequests(
         currentLocation?.id,
         {
           commands,
         },
       );
+
+      if (response.status === 200) {
+        notification(NotificationType.SUCCESS)({
+          message: translate(
+            'react.cycleCount.assignSuccessfully.label',
+            'Products were assigned successfully',
+          ),
+        });
+      }
 
       if (refetchData) {
         refetchData();

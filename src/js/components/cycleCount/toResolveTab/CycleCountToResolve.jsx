@@ -86,8 +86,8 @@ const CycleCountToResolve = ({
             />
             <Button
               onClick={openAssignCountModal}
-              label="react.cycleCount.assignCount.label"
-              defaultLabel="Assign count"
+              label="react.cycleCount.assignRecount.label"
+              defaultLabel="Assign recount"
               StartIcon={<RiUserLine size={18} />}
               variant="primary-outline"
               disabled={!selectedCheckboxesAmount}
