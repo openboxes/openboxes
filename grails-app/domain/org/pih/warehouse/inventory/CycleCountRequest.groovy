@@ -57,6 +57,8 @@ class CycleCountRequest {
 
     User updatedBy
 
+    Integer inventoryItemsCount
+
     def beforeInsert() {
         createdBy = AuthService.currentUser
         updatedBy = AuthService.currentUser
@@ -65,6 +67,10 @@ class CycleCountRequest {
     def beforeUpdate() {
         updatedBy = AuthService.currentUser
     }
+
+    static transients = [
+            "inventoryItemsCount",
+    ]
 
     static constraints = {
         id generator: "uuid"
@@ -76,24 +82,6 @@ class CycleCountRequest {
         countDeadline(nullable: true)
         recountAssignee(nullable: true)
         recountDeadline(nullable: true)
-    }
-
-    // Access to the information about available cycle count items before creating the cycle count
-    List<AvailableItem> getItemsAvailableForCycleCount() {
-        CycleCountProductAvailabilityService cycleCountProductAvailabilityService = Holders.grailsApplication.mainContext.getBean(CycleCountProductAvailabilityService)
-        return cycleCountProductAvailabilityService.getAvailableItems(facility, product)
-    }
-
-    Integer getNumberOfItemsAvailableForCycleCount() {
-        return getItemsAvailableForCycleCount()?.size()
-    }
-
-    Integer getInventoryItemsCount() {
-        if (!cycleCount) {
-            return getNumberOfItemsAvailableForCycleCount()
-        }
-
-        return cycleCount.numberOfItemsOfMostRecentCount
     }
 
     Map toJson() {
@@ -111,7 +99,7 @@ class CycleCountRequest {
                         deadline: recountDeadline,
                         assignee: recountAssignee
                 ],
-                inventoryItemsCount: getInventoryItemsCount(),
+                inventoryItemsCount: inventoryItemsCount,
                 blindCount: blindCount,
                 dateCreated: dateCreated,
                 lastUpdated: lastUpdated,

@@ -127,6 +127,17 @@ class CycleCountService {
         } as List<CycleCountCandidate>
     }
 
+    Integer getInventoryItemsCount(CycleCountRequest cycleCountRequest) {
+        if (!cycleCountRequest.cycleCount) {
+            return cycleCountProductAvailabilityService.getAvailableItems(
+                    cycleCountRequest.facility,
+                    cycleCountRequest.product
+            )?.size()
+        }
+
+        return cycleCountRequest.cycleCount.numberOfItemsOfMostRecentCount
+    }
+
     List<PendingCycleCountRequest> getPendingCycleCountRequests(CycleCountCandidateFilterCommand command, String facilityId) {
         if (command.hasErrors()) {
             throw new ValidationException("Invalid params", command.errors)
@@ -137,7 +148,7 @@ class CycleCountService {
         // Store added aliases to avoid duplicate alias exceptions for product
         // This could happen when params.searchTerm and e.g. sort by product is applied
         Set<String> usedAliases = new HashSet<>()
-        return PendingCycleCountRequest.createCriteria().list(max: max, offset: offset) {
+        List<PendingCycleCountRequest> pendingCycleCountRequests = PendingCycleCountRequest.createCriteria().list(max: max, offset: offset) {
             eq("facility", facility)
             if(command.requestIds) {
                 "in"("cycleCountRequest.id", command.requestIds)
@@ -188,6 +199,14 @@ class CycleCountService {
             applySortOrderForCandidates(command.sort, command.order, delegate, usedAliases)
 
         } as List<PendingCycleCountRequest>
+
+        // Access to the information about available cycle count items before creating the cycle count
+        pendingCycleCountRequests.each {
+            Integer inventoryItemsCount = getInventoryItemsCount(it.cycleCountRequest)
+            it.cycleCountRequest.setInventoryItemsCount(inventoryItemsCount)
+        }
+
+        return pendingCycleCountRequests
     }
 
     private static void applySortOrderForCandidates(String sortBy, String orderDirection, Criteria criteria, Set<String> usedAliases) {
