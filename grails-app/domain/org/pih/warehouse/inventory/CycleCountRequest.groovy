@@ -1,5 +1,8 @@
 package org.pih.warehouse.inventory
 
+import grails.util.Holders
+import org.pih.warehouse.api.AvailableItem
+
 import java.time.LocalDate
 
 import org.pih.warehouse.auth.AuthService
@@ -54,6 +57,8 @@ class CycleCountRequest {
 
     User updatedBy
 
+    Integer inventoryItemsCount
+
     def beforeInsert() {
         createdBy = AuthService.currentUser
         updatedBy = AuthService.currentUser
@@ -62,6 +67,10 @@ class CycleCountRequest {
     def beforeUpdate() {
         updatedBy = AuthService.currentUser
     }
+
+    static transients = [
+            "inventoryItemsCount",
+    ]
 
     static constraints = {
         id generator: "uuid"
@@ -90,7 +99,7 @@ class CycleCountRequest {
                         deadline: recountDeadline,
                         assignee: recountAssignee
                 ],
-                inventoryItemsCount: cycleCount?.cycleCountItems?.size(),
+                inventoryItemsCount: inventoryItemsCount,
                 blindCount: blindCount,
                 dateCreated: dateCreated,
                 lastUpdated: lastUpdated,

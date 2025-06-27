@@ -42,7 +42,7 @@ import { checkBinLocationSupport } from 'utils/supportedActivitiesUtils';
 // Managing state for all tables, operations on shared state (from count step)
 const useCountStep = () => {
   const [isAssignCountModalOpen, setIsAssignCountModalOpen] = useState(false);
-  const [assignCountModalData, setAssignCountModalData] = useState([]);
+  const assignCountModalData = useRef([]);
   // Page on which user should land after closing assign cycle count modal
   const redirectAfterClosingModal = useRef(null);
   // Table data is stored using useRef to avoid re-renders onBlur
@@ -439,12 +439,12 @@ const useCountStep = () => {
       assignee: cycleCount?.verificationCount?.assignee,
       deadline: cycleCount?.verificationCount?.deadline,
     }));
-    setAssignCountModalData(modalData);
+    assignCountModalData.current = modalData;
   };
 
   const closeAssignCountModal = () => {
     setIsAssignCountModalOpen(false);
-    setAssignCountModalData([]);
+    assignCountModalData.current = [];
     history.push(redirectAfterClosingModal.current);
   };
 
@@ -726,7 +726,6 @@ const useCountStep = () => {
     isAssignCountModalOpen,
     closeAssignCountModal,
     assignCountModalData,
-    setAssignCountModalData,
   };
 };
 

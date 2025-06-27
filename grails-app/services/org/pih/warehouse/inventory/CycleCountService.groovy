@@ -127,6 +127,17 @@ class CycleCountService {
         } as List<CycleCountCandidate>
     }
 
+    Integer getInventoryItemsCount(CycleCountRequest cycleCountRequest) {
+        if (!cycleCountRequest.cycleCount) {
+            return cycleCountProductAvailabilityService.getAvailableItems(
+                    cycleCountRequest.facility,
+                    cycleCountRequest.product
+            )?.size()
+        }
+
+        return cycleCountRequest.cycleCount.numberOfItemsOfMostRecentCount
+    }
+
     List<PendingCycleCountRequest> getPendingCycleCountRequests(CycleCountCandidateFilterCommand command, String facilityId) {
         if (command.hasErrors()) {
             throw new ValidationException("Invalid params", command.errors)
@@ -137,7 +148,7 @@ class CycleCountService {
         // Store added aliases to avoid duplicate alias exceptions for product
         // This could happen when params.searchTerm and e.g. sort by product is applied
         Set<String> usedAliases = new HashSet<>()
-        return PendingCycleCountRequest.createCriteria().list(max: max, offset: offset) {
+        List<PendingCycleCountRequest> pendingCycleCountRequests = PendingCycleCountRequest.createCriteria().list(max: max, offset: offset) {
             eq("facility", facility)
             if(command.requestIds) {
                 "in"("cycleCountRequest.id", command.requestIds)
@@ -188,6 +199,14 @@ class CycleCountService {
             applySortOrderForCandidates(command.sort, command.order, delegate, usedAliases)
 
         } as List<PendingCycleCountRequest>
+
+        // Access to the information about available cycle count items before creating the cycle count
+        pendingCycleCountRequests.each {
+            Integer inventoryItemsCount = getInventoryItemsCount(it.cycleCountRequest)
+            it.cycleCountRequest.setInventoryItemsCount(inventoryItemsCount)
+        }
+
+        return pendingCycleCountRequests
     }
 
     private static void applySortOrderForCandidates(String sortBy, String orderDirection, Criteria criteria, Set<String> usedAliases) {
@@ -460,9 +479,37 @@ class CycleCountService {
             return createCycleCount(command, facility)
         }
 
+        updateCountAssigneeData(cycleCount)
+
         // Otherwise the count has already been started so simply return it as is. We allow this behaviour of
         // "starting" already started counts (instead of throwing an error) because it's simpler for the frontend.
         return CycleCountDto.toDto(cycleCount)
+    }
+
+    void updateCountAssigneeData(CycleCount cycleCount) {
+        Person assignee = cycleCount.cycleCountRequest.countAssignee
+        LocalDate countDeadlineLocalDate = cycleCount.cycleCountRequest.countDeadline
+        Date countDeadline = countDeadlineLocalDate ? DateUtil.asDate(countDeadlineLocalDate) : new Date()
+        // We want to override assignee while starting the count, but the date should stay as is
+        cycleCount.cycleCountItems.each {
+            if (it.countIndex == 0) {
+                it.assignee = assignee
+                it.dateCounted = it.dateCounted ?: countDeadline
+            }
+        }
+    }
+
+    void updateRecountAssigneeData(CycleCount cycleCount) {
+        Person assignee = cycleCount.cycleCountRequest.recountAssignee
+        LocalDate recountDeadlineLocalDate = cycleCount.cycleCountRequest.recountDeadline
+        Date recountDeadline = recountDeadlineLocalDate ? DateUtil.asDate(recountDeadlineLocalDate) : new Date()
+        // We want to override assignee while starting the count, but the date should stay as is
+        cycleCount.cycleCountItems.each {
+            if (it.countIndex > 0) {
+                it.assignee = assignee
+                it.dateCounted = it.dateCounted ?: recountDeadline
+            }
+        }
     }
 
     /**
@@ -482,8 +529,8 @@ class CycleCountService {
         request.cycleCountRequest.cycleCount = newCycleCount
         request.cycleCountRequest.status = CycleCountRequestStatus.IN_PROGRESS
         Person assignee = request.cycleCountRequest.countAssignee
-        LocalDate countDeadline = request.cycleCountRequest.countDeadline
-        Date deadline = countDeadline ? DateUtil.asDate(countDeadline) : new Date()
+        LocalDate countDeadlineLocalDate = request.cycleCountRequest.countDeadline
+        Date countDeadline = countDeadlineLocalDate ? DateUtil.asDate(countDeadlineLocalDate) : new Date()
         itemsToSave.each { AvailableItem availableItem ->
             CycleCountItem cycleCountItem = initCycleCountItem(
                     facility,
@@ -492,7 +539,7 @@ class CycleCountService {
                     0,  // countIndex is always zero for the initial count
                     CycleCountItemStatus.READY_TO_COUNT,
                     assignee,
-                    deadline
+                    countDeadline
             )
 
             newCycleCount.addToCycleCountItems(cycleCountItem)
@@ -531,6 +578,7 @@ class CycleCountService {
         // If there are already items for the requested count index, simply return the count as it is since the recount
         // has already been started. We do this (instead of throwing an error) because it's convenient for the frontend.
         if (cycleCount.maxCountIndex >= countIndex) {
+            updateRecountAssigneeData(cycleCount)
             return CycleCountDto.toDto(cycleCount)
         }
 
@@ -541,8 +589,8 @@ class CycleCountService {
         List<AvailableItem> availableItemsToRecount = cycleCountProductAvailabilityService.getAvailableItems(
                 facility, product)
         Person assignee = command.cycleCountRequest.recountAssignee
-        LocalDate recountDeadline = command.cycleCountRequest.recountDeadline
-        Date deadline = recountDeadline ? DateUtil.asDate(recountDeadline) : new Date()
+        LocalDate recountDeadlineLocalDate = command.cycleCountRequest.recountDeadline
+        Date recountDeadline = recountDeadlineLocalDate ? DateUtil.asDate(recountDeadlineLocalDate) : new Date()
         for (AvailableItem availableItemToRecount : availableItemsToRecount) {
             CycleCountItem cycleCountItem = initCycleCountItem(
                     facility,
@@ -551,7 +599,7 @@ class CycleCountService {
                     countIndex,
                     CycleCountItemStatus.INVESTIGATING,
                     assignee,
-                    deadline
+                    recountDeadline
             )
 
             cycleCount.addToCycleCountItems(cycleCountItem)

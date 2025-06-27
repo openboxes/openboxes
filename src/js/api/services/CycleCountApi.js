@@ -67,9 +67,10 @@ export default {
   updateCycleCountRequests(locationId, payload) {
     return apiClient.patch(CYCLE_COUNT_REQUESTS_BATCH(locationId), payload);
   },
-  getPendingRequests: ({ locationId, requestIds }) => {
+  getPendingRequests: ({ locationId, requestIds, max }) => {
     const queryParams = queryString.stringify({
       requestIds,
+      max,
     });
     return apiClient.get(`${CYCLE_COUNT_PENDING_REQUESTS(locationId)}?${queryParams}`);
   },

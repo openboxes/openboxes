@@ -40,7 +40,6 @@ const CountStepTable = ({
   isAssignCountModalOpen,
   closeAssignCountModal,
   assignCountModalData,
-  setAssignCountModalData,
 }) => {
   const translate = useTranslate();
   const localize = useSelector((state) => state.localize);
@@ -84,8 +83,11 @@ const CountStepTable = ({
       <AssignCycleCountModal
         isOpen={isAssignCountModalOpen}
         closeModal={closeAssignCountModal}
-        selectedCycleCountItems={assignCountModalData}
-        setSelectedCycleCountItems={setAssignCountModalData}
+        selectedCycleCounts={assignCountModalData}
+        defaultTitleLabel="Assign products to recount"
+        titleLabel="react.cycleCount.modal.assignProductsToRecount.title.label"
+        assignDataDirectly
+        isRecount
       />
       )}
       <div className="list-page-list-section">
@@ -217,5 +219,4 @@ CountStepTable.propTypes = {
   assignCountModalData: PropTypes.arrayOf(
     PropTypes.shape({}),
   ).isRequired,
-  setAssignCountModalData: PropTypes.func.isRequired,
 };

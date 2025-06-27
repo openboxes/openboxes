@@ -15,9 +15,9 @@ const AssignCycleCountModal = ({
   defaultTitleLabel,
   titleLabel,
   selectedCycleCounts,
-  setSelectedCycleCounts,
   isRecount,
   refetchData,
+  assignDataDirectly,
 }) => {
   // When the modal is not displayed we want to show the scrollbar to users.
   // The return below is necessary to block executing hooks that are related to
@@ -31,10 +31,13 @@ const AssignCycleCountModal = ({
 
   const { columns, handleAssign } = useAssignCycleCountModal({
     selectedCycleCounts,
-    setSelectedCycleCounts,
     isRecount,
     refetchData,
     closeModal,
+    // Props used to assign count data directly to the cycle count
+    // used in a case, when assigning data takes place after creating
+    // the cycle count (for example, assigning after the discrepancy modal)
+    assignDataDirectly,
   });
 
   return (
@@ -58,9 +61,9 @@ const AssignCycleCountModal = ({
         <div className="assign-count-modal-container">
           <DataTable
             columns={columns}
-            data={selectedCycleCounts}
+            data={selectedCycleCounts.current}
             disablePagination
-            totalCount={selectedCycleCounts.length}
+            totalCount={selectedCycleCounts.current?.length || 0}
           />
         </div>
         <div className="d-flex justify-content-end mt-3">
@@ -84,9 +87,9 @@ AssignCycleCountModal.propTypes = {
   defaultTitleLabel: PropTypes.string,
   titleLabel: PropTypes.string,
   selectedCycleCounts: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
-  setSelectedCycleCounts: PropTypes.func.isRequired,
   isRecount: PropTypes.bool,
   refetchData: PropTypes.func,
+  assignDataDirectly: PropTypes.bool,
 };
 
 AssignCycleCountModal.defaultProps = {
@@ -94,4 +97,5 @@ AssignCycleCountModal.defaultProps = {
   defaultTitleLabel: 'Assign products to count',
   isRecount: false,
   refetchData: null,
+  assignDataDirectly: false,
 };
