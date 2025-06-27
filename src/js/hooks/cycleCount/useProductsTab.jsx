@@ -94,20 +94,27 @@ const useProductsTab = ({
   });
 
   const formatCurrency = (value) => {
+    const formattedValue = new Intl.NumberFormat('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(Math.abs(value));
+
     if (value < 0) {
       return {
-        formattedValue: `- $ ${Math.abs(value)}`,
+        formattedValue: `- $ ${formattedValue}`,
         className: 'font-red-ob',
       };
     }
+
     if (value > 0) {
       return {
-        formattedValue: `+ $ ${value}`,
+        formattedValue: `+ $ ${formattedValue}`,
         className: 'font-green-ob',
       };
     }
+
     return {
-      formattedValue: `$ ${value}`,
+      formattedValue: `$ ${formattedValue}`,
       className: '',
     };
   };
@@ -338,7 +345,7 @@ const useProductsTab = ({
         const value = getValue();
         return (
           <TableCell className={`rt-td d-flex justify-content-end ${value > 0 ? 'font-green-ob' : value < 0 && 'font-red-ob'}`}>
-            {value?.toString()}
+            {value?.toFixed(2)}
           </TableCell>
         );
       },
