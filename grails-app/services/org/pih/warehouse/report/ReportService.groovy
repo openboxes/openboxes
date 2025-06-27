@@ -1106,21 +1106,12 @@ class ReportService implements ApplicationContextAware {
         }
     }
 
-    def getInventoryAuditReportSummary(GetInventoryAuditReportCommand command) {
-        def results = InventoryAuditDetails.createCriteria().list(max: command.max, offset: command.offset) {
-            projections {
-                groupProperty('facility')
-                groupProperty('product')
-                sum('quantityAdjusted', 'quantityAdjusted')
-                max('abcClass', 'abcClass')
-            }
-
+    Closure buildInventoryAuditSummaryFilters = { GetInventoryAuditReportCommand command ->
+        return {
             eq("facility", command.facility)
-
             if (command.product) {
                 eq("product", command.product)
             }
-
             if (command.startDate && command.endDate) {
                 between("transactionDate", command.startDate, command.endDate)
             } else if (command.startDate) {
@@ -1129,13 +1120,37 @@ class ReportService implements ApplicationContextAware {
                 lte("transactionDate", command.endDate)
             }
         }
+    }
+
+    def getInventoryAuditReportSummary(GetInventoryAuditReportCommand command) {
+
+        def inventoryAuditFilters = buildInventoryAuditSummaryFilters(command)
+        def results = InventoryAuditDetails.createCriteria().list([max: command.max, offset: command.offset]) {
+            projections {
+                groupProperty('facility')
+                groupProperty('product')
+                max('abcClass', 'abcClass')
+            }
+            inventoryAuditFilters.delegate = delegate
+            inventoryAuditFilters.resolveStrategy = Closure.DELEGATE_FIRST
+            inventoryAuditFilters()
+        }
+
+        Integer totalCount = InventoryAuditDetails.createCriteria().get() {
+            projections {
+                countDistinct("product")
+            }
+            inventoryAuditFilters.delegate = delegate
+            inventoryAuditFilters.resolveStrategy = Closure.DELEGATE_FIRST
+            inventoryAuditFilters()
+        }
 
         // Transform the results to a summary object
         def data = results.collect {
 
             Location facility = (Location) it[0]
             Product product = (Product) it[1]
-            String abcClass = it[3]
+            String abcClass = it[2]
 
             // Retrieve all cycle counts completed during the given date range
             List<CycleCountSummary> cycleCountSummaries =
@@ -1171,8 +1186,7 @@ class ReportService implements ApplicationContextAware {
                     abcClass: abcClass
             )
         }
-
-        return new PaginatedList<InventoryAuditSummary>(data, results.totalCount);
+        return new PaginatedList<InventoryAuditSummary>(data, totalCount);
     }
 
     Map getTotalCount(IndicatorApiCommand command) {

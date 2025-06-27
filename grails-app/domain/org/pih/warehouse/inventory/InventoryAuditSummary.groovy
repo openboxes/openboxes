@@ -42,14 +42,14 @@ class InventoryAuditSummary implements Serializable {
                 ],
                 lastCounted        : lastCounted,
                 pricePerUnit       : product?.pricePerUnit,
-                countCycleCounts   : countCycleCounts,
-                countAdjustments   : countAdjustments,
+                numberOfCounts   : countCycleCounts,
+                numberOfAdjustments   : countAdjustments,
                 quantityAdjusted   : quantityAdjusted,
-                amountAdjusted     : amountAdjusted,
+                valueAdjusted     : amountAdjusted,
                 quantityDemanded   : quantityDemanded,
                 monthsOfStockChange: quantityDemanded > 0 ? (quantityAdjusted / quantityDemanded) : 0,
                 quantityOnHand     : quantityOnHand,
-                amountOnHand       : amountOnHand
+                valueOnHand       : amountOnHand
         ]
     }
 }
