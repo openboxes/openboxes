@@ -127,10 +127,9 @@ class ShipmentService {
         return Shipment.list()
     }
 
-    List<Shipment> getAllShippedShipments() {
-        return getShipmentsByCriteria(null, null, ShipmentStatusCode.SHIPPED, [])
+    List<Shipment> getShippedShipmentsByDestination(Location destination) {
+        return getShipmentsByCriteria(null, destination, ShipmentStatusCode.SHIPPED, [])
     }
-
 
     /**
      *

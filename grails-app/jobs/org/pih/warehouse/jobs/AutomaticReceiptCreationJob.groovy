@@ -1,6 +1,8 @@
 package org.pih.warehouse.jobs
 
 import grails.util.Holders
+import org.pih.warehouse.core.ActivityCode
+import org.pih.warehouse.core.Location
 import org.pih.warehouse.shipping.Shipment
 import org.quartz.JobExecutionContext
 
@@ -8,6 +10,7 @@ class AutomaticReceiptCreationJob {
 
     def shipmentService
     def receiptService
+    def locationService
 
     def sessionRequired = false
 
@@ -23,10 +26,13 @@ class AutomaticReceiptCreationJob {
         }
 
         log.info "Running automatic receipt creation job... "
-        List<Shipment> shippedShipments = shipmentService.getAllShippedShipments()
-        shippedShipments.each {
-            if (!it.isFullyReceived()) {
-                receiptService.createAutomaticReceipt(it)
+        List<Location> autoReceivingLocations = locationService.getLocationsSupportingActivities([ActivityCode.AUTO_RECEIVING])
+        autoReceivingLocations.each {
+            List<Shipment> shippedShipments = shipmentService.getShippedShipmentsByDestination(it)
+            shippedShipments.each {
+                if (!it.isFullyReceived()) {
+                    receiptService.createAutomaticReceipt(it)
+                }
             }
         }
     }
