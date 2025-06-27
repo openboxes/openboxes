@@ -23,10 +23,10 @@ class AutomaticReceiptCreationJob {
         }
 
         log.info "Running automatic receipt creation job ... "
-        List<Shipment> shipments = shipmentService.getAllShippedShipments()
-        shipments.each {
+        List<Shipment> shippedShipments = shipmentService.getAllShippedShipments()
+        shippedShipments.each {
             if (!it.isFullyReceived()) {
-                receiptService.createAutomaticReceipt(it)
+//                receiptService.createAutomaticReceipt(it)
             }
         }
     }

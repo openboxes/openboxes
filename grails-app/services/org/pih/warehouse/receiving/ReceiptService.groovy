@@ -269,6 +269,8 @@ class ReceiptService {
             }
         }
 
+        partialReceipt.receipt = receipt
+
         // Save shipment
         shipment.save()
     }
@@ -517,10 +519,6 @@ class ReceiptService {
             partialReceiptContainer.partialReceiptItems.add(partialReceiptItem)
         }
 
-        savePartialReceipt(partialReceipt, true)
-
-        //does not change status
-        shipment.setCurrentStatus(ShipmentStatusCode.RECEIVED)
-        shipmentService.saveShipment(shipment)
+        saveAndCompletePartialReceipt(partialReceipt)
     }
 }
