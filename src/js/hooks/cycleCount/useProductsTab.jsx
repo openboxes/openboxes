@@ -99,7 +99,7 @@ const useProductsTab = ({
 
     if (value < 0) {
       return {
-        formattedValue: `${formattedValue}`,
+        formattedValue,
         className: 'font-red-ob',
       };
     }
