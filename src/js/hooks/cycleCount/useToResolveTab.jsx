@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 
 import { createColumnHelper } from '@tanstack/react-table';
 import fileDownload from 'js-file-download';
@@ -32,7 +32,6 @@ import useTableDataV2 from 'hooks/useTableDataV2';
 import useTableSorting from 'hooks/useTableSorting';
 import useThrowError from 'hooks/useThrowError';
 import useTranslate from 'hooks/useTranslate';
-import Badge from 'utils/Badge';
 import confirmationModal from 'utils/confirmationModalUtils';
 import dateWithoutTimeZone from 'utils/dateUtils';
 import exportFileFromAPI, { extractFilenameFromHeader } from 'utils/file-download-util';
@@ -45,7 +44,7 @@ const useToResolveTab = ({
   pageSize,
   serializedParams,
 }) => {
-  const [assignCountModalData, setAssignCountModalData] = useState([]);
+  const assignCountModalData = useRef([]);
   const [isAssignCountModalOpen, setIsAssignCountModalOpen] = useState(false);
   const columnHelper = createColumnHelper();
   const translate = useTranslate();
@@ -292,11 +291,7 @@ const useToResolveTab = ({
         const value = getValue();
         return (
           <TableCell className="rt-td badge-container">
-            <Badge
-              label={value?.name?.toString()}
-              variant="badge--purple"
-              tooltip
-            />
+            {value?.name?.toString()}
           </TableCell>
         );
       },
@@ -314,11 +309,7 @@ const useToResolveTab = ({
         const date = formatLocalizedDate(getValue(), DateFormat.DD_MMM_YYYY);
         return (
           <TableCell className="rt-td badge-container">
-            <Badge
-              label={date}
-              variant="badge--blue"
-              tooltip
-            />
+            {date}
           </TableCell>
         );
       },
@@ -470,6 +461,7 @@ const useToResolveTab = ({
     const { data } = await cycleCountApi.getPendingRequests({
       locationId: currentLocation?.id,
       requestIds: checkedCheckboxes,
+      max: checkedCheckboxes.length,
     });
     const modalData = data.data.map((pendingCycleCountRequest) => {
       const {
@@ -499,12 +491,12 @@ const useToResolveTab = ({
       };
     });
     spinner.hide();
-    setAssignCountModalData(modalData);
+    assignCountModalData.current = modalData;
   };
 
   const closeAssignCountModal = () => {
     setIsAssignCountModalOpen(false);
-    setAssignCountModalData([]);
+    assignCountModalData.current = [];
   };
 
   const openAssignCountModal = async () => {
@@ -525,7 +517,6 @@ const useToResolveTab = ({
     fetchData,
     isAssignCountModalOpen,
     assignCountModalData,
-    setAssignCountModalData,
     openAssignCountModal,
     closeAssignCountModal,
   };

@@ -44,7 +44,6 @@ const CycleCountToResolve = ({
     openCancelCountsModal,
     isAssignCountModalOpen,
     fetchData,
-    setAssignCountModalData,
     assignCountModalData,
     closeAssignCountModal,
     openAssignCountModal,
@@ -66,7 +65,8 @@ const CycleCountToResolve = ({
         isOpen={isAssignCountModalOpen}
         closeModal={closeAssignCountModal}
         selectedCycleCounts={assignCountModalData}
-        setSelectedCycleCounts={setAssignCountModalData}
+        defaultTitleLabel="Assign products to recount"
+        titleLabel="react.cycleCount.modal.assignProductsToRecount.title.label"
         refetchData={fetchData}
         isRecount
       />
@@ -88,8 +88,8 @@ const CycleCountToResolve = ({
             />
             <Button
               onClick={openAssignCountModal}
-              label="react.cycleCount.assignCount.label"
-              defaultLabel="Assign count"
+              label="react.cycleCount.assignRecount.label"
+              defaultLabel="Assign recount"
               StartIcon={<RiUserLine size={18} />}
               variant="primary-outline"
               disabled={!selectedCheckboxesAmount}

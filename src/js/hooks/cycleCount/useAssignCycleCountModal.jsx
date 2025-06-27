@@ -1,18 +1,30 @@
+/* eslint-disable no-restricted-syntax */
+/* eslint-disable no-await-in-loop */
+
 import React, { useCallback, useEffect } from 'react';
 
 import { createColumnHelper } from '@tanstack/react-table';
+import _ from 'lodash';
 import { useSelector } from 'react-redux';
-import { getCurrentLocation, getDebounceTime, getMinSearchLength } from 'selectors';
+import {
+  getCurrentLocation,
+  getCycleCountsIds,
+  getDebounceTime,
+  getMinSearchLength,
+} from 'selectors';
 
 import cycleCountApi from 'api/services/CycleCountApi';
 import { TableCell } from 'components/DataTable';
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
 import DateField from 'components/form-elements/v2/DateField';
 import SelectField from 'components/form-elements/v2/SelectField';
+import notification from 'components/Layout/notifications/notification';
 import { INVENTORY_ITEM_URL } from 'consts/applicationUrls';
 import CountIndex from 'consts/countIndex';
 import cycleCountColumn from 'consts/cycleCountColumn';
+import NotificationType from 'consts/notificationTypes';
 import { DateFormat } from 'consts/timeFormat';
+import useForceRender from 'hooks/useForceRender';
 import useSpinner from 'hooks/useSpinner';
 import useTranslate from 'hooks/useTranslate';
 import dateWithoutTimeZone from 'utils/dateUtils';
@@ -20,20 +32,22 @@ import { debouncePeopleFetch } from 'utils/option-utils';
 
 const useAssignCycleCountModal = ({
   selectedCycleCounts,
-  setSelectedCycleCounts,
   isRecount,
   refetchData,
   closeModal,
+  assignDataDirectly,
 }) => {
   const spinner = useSpinner();
   const {
     currentLocation,
     debounceTime,
     minSearchLength,
+    cycleCountIds,
   } = useSelector((state) => ({
     debounceTime: getDebounceTime(state),
     minSearchLength: getMinSearchLength(state),
     currentLocation: getCurrentLocation(state),
+    cycleCountIds: getCycleCountsIds(state),
   }));
   const debouncedPeopleFetch = useCallback(
     debouncePeopleFetch(debounceTime, minSearchLength),
@@ -41,19 +55,36 @@ const useAssignCycleCountModal = ({
   );
   const translate = useTranslate();
   const columnHelper = createColumnHelper();
+  const { forceRerender } = useForceRender();
 
   const handleUpdateAssignees = (cycleCountRequestId, field, value) => {
-    setSelectedCycleCounts((prevItems) =>
-      prevItems.map((item) =>
-        (item.cycleCountRequestId === cycleCountRequestId
-          ? { ...item, [field]: value }
-          : item)));
+    // eslint-disable-next-line no-param-reassign
+    selectedCycleCounts.current = selectedCycleCounts.current.map((item) =>
+      (item.cycleCountRequestId === cycleCountRequestId
+        ? { ...item, [field]: value }
+        : item));
+  };
+
+  const getCycleCountItemsWithAssignedCountData = (cycleCounts, assigneeData) => {
+    const mappedData = cycleCounts.map((cycleCount) => {
+      const dataToAssign = assigneeData.find((data) =>
+        data.cycleCountRequest === cycleCount.requestId)?.assignments;
+      const cycleCountItems = cycleCount.cycleCountItems.filter((item) =>
+        item.countIndex === cycleCount.maxCountIndex);
+      return cycleCountItems.map((item) => ({
+        id: item.id,
+        recount: true,
+        assignee: dataToAssign?.[cycleCount.maxCountIndex]?.assignee,
+        dateCounted: dataToAssign?.[cycleCount.maxCountIndex]?.deadline,
+      }));
+    });
+    return _.flatten(mappedData);
   };
 
   const handleAssign = async () => {
     try {
       spinner.show();
-      const commands = selectedCycleCounts.map((item) => {
+      const commands = selectedCycleCounts.current.map((item) => {
         const { cycleCountRequestId, assignee, deadline } = item;
 
         const assignments = isRecount
@@ -80,12 +111,34 @@ const useAssignCycleCountModal = ({
         };
       });
 
-      await cycleCountApi.updateCycleCountRequests(
+      const response = await cycleCountApi.updateCycleCountRequests(
         currentLocation?.id,
         {
           commands,
         },
       );
+
+      if (assignDataDirectly) {
+        const { data } = await cycleCountApi.getCycleCounts(
+          currentLocation?.id,
+          cycleCountIds,
+        );
+        const countData = getCycleCountItemsWithAssignedCountData(data.data, commands);
+        for (const cycleCount of cycleCountIds) {
+          await cycleCountApi
+            .updateCycleCountItems({
+              itemsToUpdate: countData,
+            }, currentLocation?.id, cycleCount);
+        }
+      }
+      if (response.status === 200) {
+        notification(NotificationType.SUCCESS)({
+          message: translate(
+            'react.cycleCount.assignSuccessfully.label',
+            'Products were assigned successfully',
+          ),
+        });
+      }
 
       if (refetchData) {
         refetchData();
@@ -163,12 +216,15 @@ const useAssignCycleCountModal = ({
             value={getValue()}
             clearable
             customDateFormat={DateFormat.DD_MMM_YYYY}
-            onChange={(newDate) =>
+            onChange={(newDate) => {
               handleUpdateAssignees(
                 row.original.cycleCountRequestId,
                 cycleCountColumn.DEADLINE,
                 newDate,
-              )}
+              );
+              // Rerender to display date in date field
+              forceRerender();
+            }}
           />
         </TableCell>
       ),
