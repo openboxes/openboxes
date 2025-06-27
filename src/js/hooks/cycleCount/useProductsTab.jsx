@@ -94,7 +94,7 @@ const useProductsTab = ({
     serializedParams,
   });
 
-  const getFormattedCurrency = (value) => {
+  const getStyledCurrency = (value) => {
     const formattedValue = formatCurrency(value);
 
     if (value < 0) {
@@ -320,7 +320,7 @@ const useProductsTab = ({
         </TableHeaderCell>
       ),
       cell: ({ getValue }) => {
-        const { formattedValue, className } = getFormattedCurrency(getValue());
+        const { formattedValue, className } = getStyledCurrency(getValue());
         return (
           <TableCell className={`rt-td d-flex justify-content-end ${className}`}>
             {formattedValue}
