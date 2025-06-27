@@ -530,6 +530,7 @@ openboxes:
         automaticReceiptCreationJob:
             enabled: true
             cronExpression: "0 */5 * * * ?"     # every five minutes
+            delayInMilliseconds: 1000
 
     # LDAP configuration
     ldap:
@@ -607,6 +608,8 @@ openboxes:
     shipping:
         search:
             maxResults: 1000
+        notifications:
+            enabled: false
 
     # Automatically create temporary receiving locations for shipments
     receiving:

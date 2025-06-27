@@ -112,7 +112,7 @@ class RoleInterceptor {
         }
 
         if (!rule) {
-//            log.debug "No rule for ${controllerName}:${actionName} -> allow anonymous"
+            log.debug "No rule for ${controllerName}:${actionName} -> allow anonymous"
         } else {
             log.debug "Found rule matching controller ${controllerName}, action ${actionName}: " + rule
             def minimumRequiredRole = rule.accessRules?.minimumRequiredRole

@@ -9,18 +9,26 @@
  **/
 package org.pih.warehouse.shipping
 
+import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import org.pih.warehouse.core.RoleType
-import org.pih.warehouse.shipping.ShipmentStatusTransitionEvent
 import org.springframework.context.ApplicationListener
 
 @Transactional
 class ShipmentStatusTransitionEventService implements ApplicationListener<ShipmentStatusTransitionEvent> {
 
+    GrailsApplication grailsApplication
     def notificationService
     def webhookPublisherService
 
     void onApplicationEvent(ShipmentStatusTransitionEvent event) {
+
+        def areNotificationsEnabled = grailsApplication.config.openboxes.shipping.notifications.enabled ?: false
+        if (!areNotificationsEnabled) {
+            log.info "Shipment notifications are disabled so they will not be sent"
+            return
+        }
+
         log.info "Application event ${event} has been published!"
         Shipment shipment = Shipment.get(event?.source?.id)
         log.info "Shipment ${shipment?.shipmentNumber} from ${shipment?.origin} to ${shipment.destination}"
@@ -34,23 +42,19 @@ class ShipmentStatusTransitionEventService implements ApplicationListener<Shipme
         if (event.shipmentStatusCode == ShipmentStatusCode.CREATED) {
             notificationService.sendShipmentCreatedNotification(shipment, shipment.origin, outboundCreatedRoleTypes)
             notificationService.sendShipmentCreatedNotification(shipment, shipment.destination, inboundCreatedRoleTypes)
-        }
-        else if(event.shipmentStatusCode == ShipmentStatusCode.SHIPPED) {
+        } else if (event.shipmentStatusCode == ShipmentStatusCode.SHIPPED) {
             notificationService.sendShipmentIssuedNotification(shipment, shipment.origin, outboundShippedRoleTypes)
             notificationService.sendShipmentIssuedNotification(shipment, shipment.destination, inboundShippedRoleTypes)
             notificationService.sendShipmentItemsShippedNotification(shipment)
 
             // Temporarily hard-code publishing webhook events for shipped events
             webhookPublisherService.publishShippedEvent(shipment)
-        }
-        else if (event.shipmentStatusCode in [ShipmentStatusCode.RECEIVED, ShipmentStatusCode.PARTIALLY_RECEIVED]) {
+        } else if (event.shipmentStatusCode in [ShipmentStatusCode.RECEIVED, ShipmentStatusCode.PARTIALLY_RECEIVED]) {
             notificationService.sendShipmentReceiptNotification(shipment, shipment.origin, outboundReceivedRoleTypes)
             notificationService.sendShipmentReceiptNotification(shipment, shipment.destination, inboundReceivedRoleTypes)
 
             // Send notification email to recipients on completed receipt
             notificationService.sendReceiptNotifications(event?.partialReceipt)
         }
-
     }
-
 }
