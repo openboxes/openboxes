@@ -637,7 +637,12 @@ class InventorySnapshotService {
             Integer openingBalance = calculateBalance(value, closingBalance)
             Integer credits = getCreditTransactionEntries(value).sum { it.quantity } as Integer ?: 0
             Integer debits = getDebitTransactionEntries(value).sum { Math.abs(it.quantity) } as Integer ?: 0
-            Integer adjustments = closingBalance - openingBalance - credits + debits
+            // In the new version of the report, it's not based on the inventory snapshot.
+            // So we don't have to calculate it in the following way:
+            // closingBalance - openingBalance - credits + debits,
+            // because the data is accurate, so we can just compare
+            // the closing and opening balance
+            Integer adjustments = closingBalance - openingBalance
 
             return [:].with {
                 it["Code"] = key.productCode
