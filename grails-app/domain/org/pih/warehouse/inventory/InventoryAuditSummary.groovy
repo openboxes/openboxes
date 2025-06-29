@@ -25,6 +25,12 @@ class InventoryAuditSummary implements Serializable {
         id composite: ['facility', 'product']
     }
 
+    static transients = ["monthsOfStockChange"]
+
+    BigDecimal getMonthsOfStockChange() {
+        return quantityDemanded > 0 ? (quantityAdjusted / quantityDemanded) : 0
+    }
+
     Map toJson() {
         return [
                 facility           : [
@@ -47,9 +53,31 @@ class InventoryAuditSummary implements Serializable {
                 quantityAdjusted   : quantityAdjusted,
                 valueAdjusted     : amountAdjusted,
                 quantityDemanded   : quantityDemanded,
-                monthsOfStockChange: quantityDemanded > 0 ? (quantityAdjusted / quantityDemanded) : 0,
+                monthsOfStockChange: monthsOfStockChange,
                 quantityOnHand     : quantityOnHand,
                 valueOnHand       : amountOnHand
+        ]
+    }
+
+    Map toCsv() {
+        return [
+                facility           : facility?.name,
+                name               : product?.name,
+                productCode        : product?.productCode,
+                category           : product?.category?.name,
+                abcClass           : abcClass,
+                tags               : product.tags.collect { it.tag }?.join(","),
+                catalogs           : product?.productCatalogs?.collect { it.name }?.join(","),
+                lastCounted        : lastCounted,
+                pricePerUnit       : product?.pricePerUnit,
+                numberOfCounts     : countCycleCounts,
+                numberOfAdjustments: countAdjustments,
+                quantityAdjusted   : quantityAdjusted,
+                valueAdjusted      : amountAdjusted,
+                quantityDemanded   : quantityDemanded,
+                monthsOfStockChange: monthsOfStockChange,
+                quantityOnHand     : quantityOnHand,
+                valueOnHand        : amountOnHand
         ]
     }
 }

@@ -36,11 +36,10 @@ import org.pih.warehouse.order.OrderAdjustment
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
-import org.pih.warehouse.product.ProductService
 import org.pih.warehouse.reporting.DateDimension
 import org.pih.warehouse.LocalizationUtil
 import org.pih.warehouse.reporting.IndicatorApiCommand
-import org.pih.warehouse.reporting.GetInventoryAuditReportCommand
+import org.pih.warehouse.reporting.InventoryAuditCommand
 import org.pih.warehouse.reporting.InventoryLossResult
 import org.springframework.context.ApplicationContext
 import org.springframework.context.ApplicationContextAware
@@ -1085,13 +1084,12 @@ class ReportService implements ApplicationContextAware {
         return numberFormat
     }
 
-
-    def getInventoryAuditReportDetails(GetInventoryAuditReportCommand command) {
+    def getInventoryAuditDetails(InventoryAuditCommand command) {
         return InventoryAuditDetails.createCriteria().list(max: command.max, offset: command.offset) {
             eq("facility", command.facility)
 
             if (command.product) {
-                eq("product", command.product)
+                'in'("products", command.products)
             }
 
             if (command.startDate && command.endDate) {
@@ -1106,11 +1104,11 @@ class ReportService implements ApplicationContextAware {
         }
     }
 
-    Closure buildInventoryAuditSummaryFilters = { GetInventoryAuditReportCommand command ->
+    Closure buildInventoryAuditSummaryFilters = { InventoryAuditCommand command ->
         return {
             eq("facility", command.facility)
-            if (command.product) {
-                eq("product", command.product)
+            if (command.products) {
+                'in'("product", command.products)
             }
             if (command.startDate && command.endDate) {
                 between("transactionDate", command.startDate, command.endDate)
@@ -1122,7 +1120,7 @@ class ReportService implements ApplicationContextAware {
         }
     }
 
-    def getInventoryAuditReportSummary(GetInventoryAuditReportCommand command) {
+    def getInventoryAuditSummary(InventoryAuditCommand command) {
 
         def inventoryAuditFilters = buildInventoryAuditSummaryFilters(command)
         def results = InventoryAuditDetails.createCriteria().list([max: command.max, offset: command.offset]) {
