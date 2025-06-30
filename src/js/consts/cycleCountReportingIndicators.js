@@ -6,6 +6,14 @@ const cycleCountReportingIndicators = {
     infoLabel: 'react.cycleCount.indicators.cardInfo.productsInventoried.label',
     defaultInfo: 'Items remaining to be counted or processed',
   },
+  getInventoryAccuracy: {
+    titleLabel: 'react.cycleCount.indicators.cardTitle.inventoryAccuracy.label',
+    defaultTitle: 'Not finished items',
+    numberType: 'number',
+    infoLabel: 'react.cycleCount.indicators.cardInfo.inventoryAccuracy.label',
+    defaultInfo: 'Items remaining to be counted or processed',
+    showPercentSign: true,
+  },
   inventoryLoss: {
     titleLabel: 'react.cycleCount.indicators.cardTitle.inventoryLoss.label',
     defaultTitle: 'Inventory loss',

@@ -49,10 +49,13 @@ import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.OrderService
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.reporting.CycleCountProductSummary
 import org.pih.warehouse.product.ProductCatalog
 import org.pih.warehouse.reporting.DateDimension
 import org.pih.warehouse.LocalizationUtil
 import org.pih.warehouse.reporting.IndicatorApiCommand
+import org.pih.warehouse.reporting.GetInventoryAuditReportCommand
+import org.pih.warehouse.reporting.InventoryAccuracyResult
 import org.pih.warehouse.reporting.InventoryAuditCommand
 import org.pih.warehouse.reporting.InventoryLossResult
 import org.pih.warehouse.shipping.ShipmentService
@@ -1227,6 +1230,36 @@ class ReportService implements ApplicationContextAware {
                 name  : "productsInventoried",
                 value : result ?: 0,
                 type : TileType.SINGLE.toString(),
+        ]
+    }
+
+    Map getInventoryAccuracy(IndicatorApiCommand command) {
+        String hql = """
+        SELECT 
+            SUM(CASE WHEN cps.hasVariance = false THEN 1 ELSE 0 END),
+            COUNT(cps)
+        FROM CycleCountProductSummary cps
+        WHERE cps.dateCounted BETWEEN :startDate AND :endDate
+          AND cps.facility = :facility
+    """
+
+        List<Object[]> result = CycleCountProductSummary.executeQuery(hql, [
+                startDate: command.startDate,
+                endDate  : command.endDate,
+                facility : command.facility
+        ])
+
+        Object[] resultRow = result?.getAt(0) ?: [0, 0]
+
+        InventoryAccuracyResult accuracyResult = new InventoryAccuracyResult(
+                accurateCount: resultRow[0] as Integer,
+                totalCount   : resultRow[1] as Integer
+        )
+
+        return [
+                name : "getInventoryAccuracy",
+                value: accuracyResult.accuracyPercentage,
+                type : TileType.SINGLE.toString()
         ]
     }
 

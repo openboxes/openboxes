@@ -8,6 +8,7 @@ import dateWithoutTimeZone from 'utils/dateUtils';
 import {
   fetchIndicatorInventoryLoss,
   fetchIndicatorProductsInventoried,
+  fetchInventoryAccuracy,
 } from 'utils/option-utils';
 
 const useIndicatorsTab = ({
@@ -34,6 +35,7 @@ const useIndicatorsTab = ({
     try {
       const responses = await Promise.all([
         fetchIndicatorProductsInventoried(params),
+        fetchInventoryAccuracy(params),
         fetchIndicatorInventoryLoss(params),
       ]);
 
