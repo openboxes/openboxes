@@ -36,6 +36,11 @@ class IndicatorApiController {
         render([data: data] as JSON)
     }
 
+    def getInventoryAccuracy(IndicatorApiCommand command) {
+        Map data = reportService.getInventoryAccuracy(command)
+        render([data: data] as JSON)
+    }
+
     def getInventoryLoss(IndicatorApiCommand command) {
         Map data = reportService.getInventoryLoss(command)
         render([data: data] as JSON)

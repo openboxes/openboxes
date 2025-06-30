@@ -1038,6 +1038,11 @@ class UrlMappings {
             action = [GET: "getProductsInventoried"]
         }
 
+        "/api/reports/indicators/inventoryAccuracy" {
+            controller = "indicatorApi"
+            action = [GET: "getInventoryAccuracy"]
+        }
+
         "/api/reports/indicators/inventoryLoss" {
             controller = "indicatorApi"
             action = [GET: "getInventoryLoss"]
