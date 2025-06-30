@@ -4,14 +4,14 @@ const cycleCountReportingIndicators = {
     defaultTitle: 'Products inventoried',
     numberType: 'number',
     infoLabel: 'react.cycleCount.indicators.cardInfo.productsInventoried.label',
-    defaultInfo: 'Items remaining to be counted or processed',
+    defaultInfo: 'Number of products that were counted at least once during the time range',
   },
   getInventoryAccuracy: {
     titleLabel: 'react.cycleCount.indicators.cardTitle.inventoryAccuracy.label',
     defaultTitle: 'Not finished items',
     numberType: 'number',
     infoLabel: 'react.cycleCount.indicators.cardInfo.inventoryAccuracy.label',
-    defaultInfo: 'Items remaining to be counted or processed',
+    defaultInfo: 'Percentage of products cycle counted with an equal count, compared to all products cycle counted during the time range (equal and non equal counts). This represents the share of inventory for which OpenBoxes inventory is accurately representing the physical inventory.',
     showPercentSign: true,
   },
   inventoryLoss: {
@@ -22,7 +22,7 @@ const cycleCountReportingIndicators = {
     secondSubtitleLabel: 'react.cycleCount.indicators.cardSubtitle.overallLost.label',
     defaultSecondSubtitle: 'overall financial value lost',
     infoLabel: 'react.cycleCount.indicators.cardInfo.inventoryLoss.label',
-    defaultInfo: 'Inventory loss',
+    defaultInfo: 'Inventory loss count is the number of products for which the overall inventory change over the time range selected is a negative adjustment (qty at the beginning of the time range is more than qty at the end). The financial inventory loss is the equivalent of the inventory decrease for these products in USD.',
   },
 };
 
