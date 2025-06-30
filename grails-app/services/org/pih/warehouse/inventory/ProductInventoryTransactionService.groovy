@@ -51,13 +51,14 @@ abstract class ProductInventoryTransactionService<T> {
             T sourceObject,
             Collection<Product> products,
             Date transactionDate=null,
-            String comment=null) {
+            String comment=null,
+            Map<Map<String, Object>, String> transactionEntriesComments = null) {
 
         List<AvailableItem> availableItems = productAvailabilityService.getAvailableItemsAtDate(
                 facility, products, transactionDate)
 
         createInventoryBaselineTransactionForGivenStock(
-                facility, sourceObject, availableItems, transactionDate, comment)
+                facility, sourceObject, availableItems, transactionDate, comment, transactionEntriesComments)
     }
 
     /**
@@ -86,7 +87,8 @@ abstract class ProductInventoryTransactionService<T> {
             T sourceObject,
             Collection<AvailableItem> availableItems,
             Date transactionDate=null,
-            String comment=null) {
+            String comment=null,
+            Map<Map<String, Object>, String> transactionEntriesComments = null) {
 
         // If there are no available items, there would be no transaction entries, so skip creating the transaction.
         if (!availableItems || !baselineTransactionsEnabled()) {
@@ -121,6 +123,7 @@ abstract class ProductInventoryTransactionService<T> {
                     binLocation: availableItem.binLocation,
                     inventoryItem: availableItem.inventoryItem,
                     transaction: transaction,
+                    comments: transactionEntriesComments.get([inventoryItem: availableItem.inventoryItem, binLocation: availableItem.binLocation]),
             )
             transaction.addToTransactionEntries(transactionEntry)
         }
