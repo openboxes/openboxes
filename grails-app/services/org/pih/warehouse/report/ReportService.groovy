@@ -1182,7 +1182,7 @@ class ReportService implements ApplicationContextAware {
                 facility : command.facility
         ])
 
-        Object[] resultRow = result?.getAt(0) ?: [0, 0]
+        Object[] resultRow = result[0] ?: [0, 0]
 
         InventoryAccuracyResult accuracyResult = new InventoryAccuracyResult(
                 accurateCount: resultRow[0] as Integer,
