@@ -1234,7 +1234,7 @@ class ReportService implements ApplicationContextAware {
     }
 
     Map getInventoryAccuracy(IndicatorApiCommand command) {
-        String hql = """
+        String query = """
         SELECT 
             SUM(CASE WHEN cps.hasVariance = false THEN 1 ELSE 0 END),
             COUNT(cps)
@@ -1243,7 +1243,7 @@ class ReportService implements ApplicationContextAware {
           AND cps.facility = :facility
     """
 
-        List<Object[]> result = CycleCountProductSummary.executeQuery(hql, [
+        List<Object[]> result = CycleCountProductSummary.executeQuery(query, [
                 startDate: command.startDate,
                 endDate  : command.endDate,
                 facility : command.facility
