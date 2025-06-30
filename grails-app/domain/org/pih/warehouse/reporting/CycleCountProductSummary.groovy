@@ -9,7 +9,7 @@ class CycleCountProductSummary implements Serializable {
     Date dateCounted
     Location facility
     Product product
-    Number hasVariance
+    Integer hasVariance
 
     static mapping = {
         version false
