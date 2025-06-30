@@ -434,6 +434,8 @@ openboxes:
             #  Print barcode labels via RAW
             ipAddress: "127.0.0.1"
             port: 9100
+        labelaryApi:
+            url: "https://api.labelary.com/v1/printers/12dpmm/labels/2x1/0/"
 
     # Default delay and min length for typeahead components
     typeahead:
