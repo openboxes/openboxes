@@ -5,7 +5,7 @@ import org.pih.warehouse.product.Product
 
 class CycleCountProductSummary implements Serializable {
 
-    String cycleCountId
+    Long cycleCountId
     Date dateCounted
     Location facility
     Product product
@@ -13,11 +13,10 @@ class CycleCountProductSummary implements Serializable {
 
     static mapping = {
         version false
-        id composite: ['facility', 'product']
     }
 
     static constraints = {
-
+        id composite: ['facility', 'product', 'cycleCountId']
     }
 
     Map toJson() {
