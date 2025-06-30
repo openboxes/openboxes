@@ -18,6 +18,7 @@ import useTableSorting from 'hooks/useTableSorting';
 import useTranslate from 'hooks/useTranslate';
 import Badge from 'utils/Badge';
 import dateWithoutTimeZone from 'utils/dateUtils';
+import formatCurrency from 'utils/formatCurrency';
 
 const useProductsTab = ({
   filterParams,
@@ -93,21 +94,25 @@ const useProductsTab = ({
     serializedParams,
   });
 
-  const formatCurrency = (value) => {
+  const getStyledCurrency = (value) => {
+    const formattedValue = formatCurrency(value);
+
     if (value < 0) {
       return {
-        formattedValue: `- $ ${Math.abs(value)}`,
+        formattedValue,
         className: 'font-red-ob',
       };
     }
+
     if (value > 0) {
       return {
-        formattedValue: `+ $ ${value}`,
+        formattedValue: `+${formattedValue}`,
         className: 'font-green-ob',
       };
     }
+
     return {
-      formattedValue: `$ ${value}`,
+      formattedValue,
       className: '',
     };
   };
@@ -315,7 +320,7 @@ const useProductsTab = ({
         </TableHeaderCell>
       ),
       cell: ({ getValue }) => {
-        const { formattedValue, className } = formatCurrency(getValue());
+        const { formattedValue, className } = getStyledCurrency(getValue());
         return (
           <TableCell className={`rt-td d-flex justify-content-end ${className}`}>
             {formattedValue}
@@ -338,7 +343,7 @@ const useProductsTab = ({
         const value = getValue();
         return (
           <TableCell className={`rt-td d-flex justify-content-end ${value > 0 ? 'font-green-ob' : value < 0 && 'font-red-ob'}`}>
-            {value?.toString()}
+            {value?.toFixed(1)}
           </TableCell>
         );
       },
@@ -371,14 +376,11 @@ const useProductsTab = ({
           {translate('react.cycleCount.table.valueInStock.label', 'Value in Stock')}
         </TableHeaderCell>
       ),
-      cell: ({ getValue }) => {
-        const { formattedValue } = formatCurrency(getValue());
-        return (
-          <TableCell className="rt-td d-flex justify-content-end font-weight-bold">
-            {formattedValue}
-          </TableCell>
-        );
-      },
+      cell: ({ getValue }) => (
+        <TableCell className="rt-td d-flex justify-content-end font-weight-bold">
+          {formatCurrency(getValue())}
+        </TableCell>
+      ),
       size: 130,
     }),
   ], [currentLocale]);

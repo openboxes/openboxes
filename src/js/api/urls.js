@@ -196,7 +196,7 @@ export const CYCLE_COUNT_SUBMIT_COUNT = (locationId, cycleCountId) => `${CYCLE_C
 export const CYCLE_COUNT_SUBMIT_RECOUNT = (locationId, cycleCountId) => `${CYCLE_COUNT(locationId)}/${cycleCountId}/recount`;
 export const CYCLE_COUNT_REFRESH_ITEMS = (locationId, cycleCountId, removeOutOfStockItemsImplicitly) => `${CYCLE_COUNT(locationId)}/${cycleCountId}/refresh${removeOutOfStockItemsImplicitly ? '?removeOutOfStockItemsImplicitly=true' : ''}`;
 export const CYCLE_COUNT_ITEMS_IMPORT = (locationId) => `${CYCLE_COUNT(locationId)}/items/upload/count`;
-export const CYCLE_COUNT_REQUEST = (locationId, requestId) => `${CYCLE_COUNT(locationId)}/requests/${requestId}`;
+export const CYCLE_COUNT_REQUESTS_BATCH = (locationId) => `${CYCLE_COUNT(locationId)}/requests/batch`;
 
 // REPORTING
 export const REPORTS = `${API}/reports`;
@@ -206,8 +206,5 @@ export const INVENTORY_AUDIT_SUMMARY_REPORT = `${REPORTS}/inventory-audit-summar
 // INDICATORS
 export const INDICATORS_REPORT = `${API}/reports/indicators`;
 
-export const INDICATORS_TOTAL_COUNT = `${INDICATORS_REPORT}/totalCount`;
-export const INDICATORS_ITEMS_COUNTED = `${INDICATORS_REPORT}/itemsCounted`;
-export const INDICATORS_TARGET_PROGRESS = `${INDICATORS_REPORT}/targetProgress`;
-export const INDICATORS_NOT_FINISHED_ITEMS = `${INDICATORS_REPORT}/notFinishedItems`;
+export const INDICATORS_PRODUCTS_INVENTORIED = `${INDICATORS_REPORT}/productsInventoried`;
 export const INDICATORS_INVENTORY_LOSS = `${INDICATORS_REPORT}/inventoryLoss`;

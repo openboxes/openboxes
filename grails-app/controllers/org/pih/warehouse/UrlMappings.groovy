@@ -959,7 +959,7 @@ class UrlMappings {
 
         "/api/facilities/$facilityId/cycle-counts/requests/batch" {
             controller = "cycleCountApi"
-            action = [POST: "createRequests", DELETE: "deleteRequests"]
+            action = [POST: "createRequests", PATCH: "updateRequests", DELETE: "deleteRequests"]
         }
 
         "/api/facilities/$facility/cycle-counts/start/batch" {
@@ -1033,24 +1033,9 @@ class UrlMappings {
             action = [POST: "getInventoryAuditSummary", GET: "getInventoryAuditSummary"]
         }
 
-        "/api/reports/indicators/totalCount" {
+        "/api/reports/indicators/productsInventoried" {
             controller = "indicatorApi"
-            action = [GET: "getTotalCount"]
-        }
-
-        "/api/reports/indicators/itemsCounted" {
-            controller = "indicatorApi"
-            action = [GET: "getItemsCounted"]
-        }
-
-        "/api/reports/indicators/targetProgress" {
-            controller = "indicatorApi"
-            action = [GET: "getTargetProgress"]
-        }
-
-        "/api/reports/indicators/notFinishedItems" {
-            controller = "indicatorApi"
-            action = [GET: "getNotFinishedItems"]
+            action = [GET: "getProductsInventoried"]
         }
 
         "/api/reports/indicators/inventoryLoss" {

@@ -48,6 +48,9 @@ const CountStep = () => {
     sortByProductName,
     setSortByProductName,
     importErrors,
+    isAssignCountModalOpen,
+    closeAssignCountModal,
+    assignCountModalData,
   } = useCountStep();
 
   const tableVirtualizer = useWindowVirtualizer({
@@ -124,6 +127,9 @@ const CountStep = () => {
                   triggerValidation={triggerValidation}
                   refreshFocusCounter={refreshFocusCounter}
                   isFormDisabled={isFormDisabled}
+                  isAssignCountModalOpen={isAssignCountModalOpen}
+                  closeAssignCountModal={closeAssignCountModal}
+                  assignCountModalData={assignCountModalData}
                 />
               </div>
             );
