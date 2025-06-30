@@ -424,6 +424,11 @@ class UrlMappings {
             action = [GET: "search"]
         }
 
+        "/api/internalLocations/$id/labels/$documentId**?" {
+            controller = { "internalLocationApi" }
+            action = [GET: "renderLabel", POST: "printLabel", PUT: "printLabel"]
+        }
+
         // Stocklist Item API
 
         "/api/stocklistItems/availableStocklists"(parseRequest: true) {
@@ -946,6 +951,7 @@ class UrlMappings {
             controller = "containerApi"
             action = [GET: "details"]
         }
+
         "/api/containers/$id/labels/$documentId**?" {
             controller = { "containerApi" }
             action = [GET: "renderLabel", POST: "printLabel", PUT: "printLabel"]
@@ -964,6 +970,11 @@ class UrlMappings {
         "/api/mobile/products/$id/" {
             controller = { "mobileProductApi" }
             action = [GET: "read"]
+        }
+
+        "/api/products/$id/labels/$documentId**?" {
+            controller = { "mobileProductApi" }
+            action = [GET: "renderLabel", POST: "printLabel", PUT: "printLabel"]
         }
 
         "/api/mobile/products/$id/details" {
