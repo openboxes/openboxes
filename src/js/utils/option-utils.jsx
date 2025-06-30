@@ -312,23 +312,8 @@ export const fetchOrganization = async (id) => {
   return data.data;
 };
 
-export const fetchIndicatorTotalCount = async (params = {}) => {
-  const { data } = await indicatorsApi.getTotalCount(params);
-  return data.data;
-};
-
-export const fetchIndicatorItemsCounted = async (params = {}) => {
-  const { data } = await indicatorsApi.getItemsCounted(params);
-  return data.data;
-};
-
-export const fetchIndicatorTargetProgress = async (params = {}) => {
-  const { data } = await indicatorsApi.getTargetProgress(params);
-  return data.data;
-};
-
-export const fetchIndicatorNotFinishedItems = async (params = {}) => {
-  const { data } = await indicatorsApi.getNotFinishedItems(params);
+export const fetchIndicatorProductsInventoried = async (params = {}) => {
+  const { data } = await indicatorsApi.getProductsInventoried(params);
   return data.data;
 };
 

@@ -11,7 +11,7 @@ const IndicatorNumberCards = ({
   tiles,
 }) => (
   <div className="cards-container">
-    {loading ? <LoadingNumbers numberOfLoadingCards={5} /> : <IndicatorCards data={tiles} />}
+    {loading ? <LoadingNumbers numberOfLoadingCards={2} /> : <IndicatorCards data={tiles} />}
   </div>
 );
 

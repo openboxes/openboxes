@@ -7,10 +7,7 @@ import cycleCountReportingIndicators from 'consts/cycleCountReportingIndicators'
 import dateWithoutTimeZone from 'utils/dateUtils';
 import {
   fetchIndicatorInventoryLoss,
-  fetchIndicatorItemsCounted,
-  fetchIndicatorNotFinishedItems,
-  fetchIndicatorTargetProgress,
-  fetchIndicatorTotalCount,
+  fetchIndicatorProductsInventoried,
 } from 'utils/option-utils';
 
 const useIndicatorsTab = ({
@@ -36,10 +33,7 @@ const useIndicatorsTab = ({
     setLoading(true);
     try {
       const responses = await Promise.all([
-        fetchIndicatorTotalCount(params),
-        fetchIndicatorItemsCounted(params),
-        fetchIndicatorTargetProgress(params),
-        fetchIndicatorNotFinishedItems(params),
+        fetchIndicatorProductsInventoried(params),
         fetchIndicatorInventoryLoss(params),
       ]);
 
