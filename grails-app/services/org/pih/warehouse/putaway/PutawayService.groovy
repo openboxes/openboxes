@@ -164,10 +164,13 @@ class PutawayService {
 
         List<PutawayItem> putawayItems = binLocationEntries.inject ([], { putawayItems,  binLocationEntry ->
             if (binLocationEntry.binLocation?.supports(ActivityCode.RECEIVE_STOCK)) {
+                InventoryLevel inventoryLevel = InventoryLevel.findByProductAndInventory(binLocationEntry.product, location.inventory)
+
                 return putawayItems + new PutawayItem(
                         putawayStatus: PutawayStatus.READY,
                         product: binLocationEntry.product,
                         inventoryItem: binLocationEntry.inventoryItem,
+                        inventoryLevel: inventoryLevel,
                         currentLocation: binLocationEntry.binLocation,
                         currentFacility: location,
                         putawayFacility: null,
