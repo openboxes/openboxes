@@ -11,17 +11,21 @@ package org.pih.warehouse.api
 
 import grails.converters.JSON
 import grails.gorm.transactions.Transactional
-
+import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.core.ActivityCode
+import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.InternalLocationSearchCommand
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.LocationService
 import org.pih.warehouse.core.LocationTypeCode
 import org.pih.warehouse.core.ReceivingLocationSearchCommand
+import org.pih.warehouse.core.ZebraService
 
 @Transactional
 class InternalLocationApiController {
 
-    def locationService
+    LocationService locationService
+    ZebraService zebraService
 
     def list(InternalLocationSearchCommand command) {
         command.location = getFacility(command)
@@ -72,4 +76,31 @@ class InternalLocationApiController {
             throw new IllegalArgumentException("Must provide location.id as a request parameter")
         }
     }
+    def renderLabel = {
+        Location internalLocation = locationService.getInternalLocation(session?.warehouse?.id, params.id)
+        Document document = Document.get(params.documentId)
+        if (!document) {
+            throw new ObjectNotFoundException(params.documentId, Document.class.simpleName)
+        }
+        response.contentType = "image/png"
+        response.outputStream << zebraService.renderDocument(document, [internalLocation: internalLocation])
+    }
+
+    def printLabel = {
+        try {
+            Document document = Document.get(params.documentId)
+            if (!document) {
+                throw new ObjectNotFoundException(params.documentId, Document.class.simpleName)
+            }
+
+            Location internalLocation = locationService.getInternalLocation(session?.warehouse?.id, params.id)
+            zebraService.printDocument(document, [internalLocation:internalLocation])
+
+            render([data: "Barcode label has been printed"] as JSON)
+            return
+        } catch (Exception e) {
+            render([errorCode: 500, cause: e?.class, errorMessage: e?.message] as JSON)
+        }
+    }
+
 }
