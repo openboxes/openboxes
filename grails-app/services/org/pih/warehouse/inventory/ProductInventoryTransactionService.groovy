@@ -88,7 +88,7 @@ abstract class ProductInventoryTransactionService<T> {
             Collection<AvailableItem> availableItems,
             Date transactionDate=null,
             String comment=null,
-            Map<Map<String, Object>, String> transactionEntriesComments = null) {
+            Map<Map<String, Object>, String> transactionEntriesComments = [:]) {
 
         // If there are no available items, there would be no transaction entries, so skip creating the transaction.
         if (!availableItems || !baselineTransactionsEnabled()) {
