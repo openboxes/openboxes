@@ -13,6 +13,7 @@ import grails.validation.ValidationException
 import java.text.SimpleDateFormat
 import java.time.Instant
 import java.time.LocalDate
+import java.time.LocalTime
 import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
@@ -52,7 +53,7 @@ class DateUtil {
      */
     static final DateTimeFormatter DISPLAY_DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MMM/yyyy")
     static final DateTimeFormatter DISPLAY_DATE_TIME_OFFSET_FORMATTER = DateTimeFormatter.ofPattern("dd/MMM/yyyy HH:mm XXX")
-
+    static final DateTimeFormatter DISPLAY_TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss")
     /**
      * Converts a LocalDate to a date-only string for display. This method should only be used by GSPs and file
      * exporters. Otherwise we should return the date object as is and let the frontend decide the display format.
@@ -234,6 +235,20 @@ class DateUtil {
         // then uses those rules to determine the offset (ex: '-05:00') for the given instant. This check is required
         // because a zone can be in one of many offsets depending on the time of year due to daylight savings.
         return ZoneId.systemDefault().getRules().getOffset(instant ?: Instant.now())
+    }
+
+    /**
+     * Converts a Date to a time-only string for display.
+     */
+    static String asTimeForDisplay(Date date) {
+        if (!date) {
+            return null
+        }
+        LocalTime time = date.toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalTime()
+
+        return DISPLAY_TIME_FORMATTER.format(time)
     }
 
     static Date clearTime(Date date) {
