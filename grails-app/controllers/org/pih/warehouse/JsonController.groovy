@@ -1455,7 +1455,7 @@ class JsonController {
         }
 
         Boolean isCsvReport = params.format == "text/csv"
-        List<Object> data = inventorySnapshotService.getTransactionReport(location, categories, tagList, catalogList, startDate, endDate, isCsvReport)
+        List<Object> data = reportService.getTransactionReport(location, categories, tagList, catalogList, startDate, endDate, isCsvReport)
 
         if (isCsvReport) {
             String csv = dataService.generateCsv(data)
@@ -1473,88 +1473,7 @@ class JsonController {
         Date startDate = command.startDate
         Date endDate = command.endDate + 1
 
-        def balanceOpeningBinLocations = inventorySnapshotService.getQuantityOnHandByBinLocation(location, startDate, [product])
-        def balanceClosingBinLocations = inventorySnapshotService.getQuantityOnHandByBinLocation(location, endDate, [product])
-
-        def transactionsByTransactionCode = TransactionFact.createCriteria().list {
-            projections {
-                productKey {
-                    property("productCode")
-                }
-                transactionDateKey {
-                    property("date")
-                }
-                transactionTypeKey {
-                    property("transactionCode")
-                    property("transactionTypeName")
-                }
-                property("quantity")
-            }
-
-            transactionDateKey {
-                between("date", startDate, endDate)
-            }
-            locationKey {
-                eq("locationId", location.id)
-            }
-            productKey {
-                eq("productCode", product.productCode)
-            }
-
-            transactionDateKey {
-                order("date")
-            }
-        }
-
-
-        def balanceOpening = balanceOpeningBinLocations.quantity?.sum() ?: 0
-        def balanceClosing = balanceClosingBinLocations.quantity?.sum() ?: 0
-        def balanceRunning = balanceOpening
-        transactionsByTransactionCode = transactionsByTransactionCode.collect {
-            def quantity = it[4]
-            def transactionCode = it[2]
-
-            if (transactionCode == "PRODUCT_INVENTORY") {
-                balanceRunning = quantity
-                quantity = null
-            } else if (transactionCode == "DEBIT") {
-                balanceRunning -= quantity
-            } else if (transactionCode == "CREDIT") {
-                balanceRunning += quantity
-            }
-
-            [
-                    transactionDate    : it[1]?.format("dd MMM yyyy"),
-                    transactionTime    : it[1]?.format("HH:mm:ss"),
-                    transactionCode    : transactionCode,
-                    transactionTypeName: LocalizationUtil.getLocalizedString(it[3], session.locale),
-                    quantity           : quantity,
-                    balance            : balanceRunning,
-            ]
-        }
-
-        log.info("balanceOpening: " + balanceOpening)
-
-        transactionsByTransactionCode.add(0, [
-                transactionDate    : startDate?.format("dd MMM yyyy"),
-                transactionTime    : startDate?.format("HH:mm:ss"),
-                transactionCode    : "BALANCE_OPENING",
-                transactionTypeName: "Opening Balance",
-                quantity           : null,
-                balance            : balanceOpening])
-
-        transactionsByTransactionCode.add([
-                transactionDate    : endDate?.format("dd MMM yyyy"),
-                transactionTime    : endDate?.format("HH:mm:ss"),
-                transactionCode    : "BALANCE_CLOSING",
-                transactionTypeName: "Closing Balance",
-                quantity           : null,
-                balance            : balanceClosing])
-
-        log.info "transactionsByTransactionCode: " + transactionsByTransactionCode
-
-        // Flatten the data to make it easier to display
-        def data = transactionsByTransactionCode
+        List<Object> data = reportService.getTransactionReportModalData(location, product, startDate, endDate)
 
         render(["aaData": data] as JSON)
     }
