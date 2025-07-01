@@ -52,7 +52,7 @@ abstract class ProductInventoryTransactionService<T> {
             Collection<Product> products,
             Date transactionDate=null,
             String comment=null,
-            Map<Map<String, Object>, String> transactionEntriesComments = null) {
+            Map<Map<String, Object>, String> transactionEntriesComments = [:]) {
 
         List<AvailableItem> availableItems = productAvailabilityService.getAvailableItemsAtDate(
                 facility, products, transactionDate)
