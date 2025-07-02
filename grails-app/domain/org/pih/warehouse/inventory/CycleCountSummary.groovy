@@ -42,7 +42,7 @@ class CycleCountSummary implements Serializable {
     // Additional details
     CycleCount cycleCount
 
-    static constraints = {
+    static mapping = {
         version false
         table "cycle_count_summary"
     }
@@ -52,6 +52,15 @@ class CycleCountSummary implements Serializable {
         else if (quantityVariance < 0) return VarianceTypeCode.LESS
         else return VarianceTypeCode.EQUAL
     }
+
+    VarianceTypeCode getBlindCountVarianceTypeCode() {
+        return getVarianceTypeCode(blindCountQuantityVariance)
+    }
+
+    VarianceTypeCode getVerificationCountVarianceTypeCode() {
+        return getVarianceTypeCode(verificationCountQuantityVariance)
+    }
+
 
     Map toJson() {
         return [
@@ -79,7 +88,7 @@ class CycleCountSummary implements Serializable {
                         quantityOnHand    : blindCountQuantityOnHand,
                         quantityCounted   : blindCountQuantityCounted,
                         quantityVariance  : blindCountQuantityVariance,
-                        varianceTypeCode  : getVarianceTypeCode(blindCountQuantityVariance)?.name(),
+                        varianceTypeCode  : blindCountVarianceTypeCode?.name(),
                         varianceReasonCode: blindCountVarianceReasonCode,
                         varianceComment   : blindCountVarianceComment,
 
@@ -90,7 +99,7 @@ class CycleCountSummary implements Serializable {
                         quantityOnHand    : verificationCountQuantityOnHand,
                         quantityCounted   : verificationCountQuantityCounted,
                         quantityVariance  : verificationCountQuantityVariance,
-                        varianceTypeCode  : getVarianceTypeCode(verificationCountQuantityVariance)?.name(),
+                        varianceTypeCode  : verificationCountVarianceTypeCode?.name(),
                         varianceReasonCode: verificationCountVarianceReasonCode,
                         varianceComment   : verificationCountVarianceComment,
                 ],

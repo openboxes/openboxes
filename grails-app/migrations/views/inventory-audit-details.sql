@@ -1,5 +1,5 @@
 CREATE OR REPLACE VIEW inventory_audit_details AS
-WITH product_availability_summary
+    WITH product_availability_summary
          AS (SELECT location_id as facility_id,
                     product_id,
                     bin_location_id as location_id,
@@ -8,7 +8,7 @@ WITH product_availability_summary
                     SUM(quantity_available_to_promise) AS quantity_available,
                     SUM(quantity_allocated) AS quantity_allocated
 FROM product_availability
-GROUP BY product_id, location_id, inventory_item_id, bin_location_id
+GROUP BY product_id, facility_id, inventory_item_id, bin_location_id
     )
 select facility.id                                            as facility_id,
        product.id                                             as product_id,
@@ -17,6 +17,7 @@ select facility.id                                            as facility_id,
        transaction.transaction_number,
        transaction.transaction_date,
        transaction.transaction_type_id,
+       transaction_type.name,
        inventory_item.id                                      as inventory_item_id,
        transaction_entry.bin_location_id                      as location_id,
        transaction.transaction_date                           as date_last_counted,

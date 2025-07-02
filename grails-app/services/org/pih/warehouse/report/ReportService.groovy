@@ -11,7 +11,6 @@ package org.pih.warehouse.report
 
 import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
-import grails.orm.PagedResultList
 import org.apache.http.client.HttpClient
 import org.apache.http.client.ResponseHandler
 import org.apache.http.client.methods.HttpGet
@@ -23,8 +22,12 @@ import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.SynonymTypeCode
+import org.pih.warehouse.core.VarianceTypeCode
+import org.pih.warehouse.forecasting.ForecastingService
 import org.pih.warehouse.inventory.CycleCount
+import org.pih.warehouse.inventory.CycleCountService
 import org.pih.warehouse.inventory.CycleCountStatus
+import org.pih.warehouse.inventory.CycleCountSummary
 import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.InventoryAuditDetails
 import org.pih.warehouse.inventory.InventoryAuditSummary
@@ -39,7 +42,7 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.reporting.DateDimension
 import org.pih.warehouse.LocalizationUtil
 import org.pih.warehouse.reporting.IndicatorApiCommand
-import org.pih.warehouse.reporting.GetInventoryAuditReportCommand
+import org.pih.warehouse.reporting.InventoryAuditCommand
 import org.pih.warehouse.reporting.InventoryLossResult
 import org.springframework.context.ApplicationContext
 import org.springframework.context.ApplicationContextAware
@@ -48,6 +51,7 @@ import util.InventoryUtil
 
 import java.text.NumberFormat
 
+@Transactional
 class ReportService implements ApplicationContextAware {
 
     def dataService
@@ -57,6 +61,8 @@ class ReportService implements ApplicationContextAware {
     def userService
     def orderService
     def shipmentService
+    ForecastingService forecastingService
+    CycleCountService cycleCountService
 
     ApplicationContext applicationContext
 
@@ -1081,13 +1087,12 @@ class ReportService implements ApplicationContextAware {
         return numberFormat
     }
 
-
-    def getInventoryAuditReportDetails(GetInventoryAuditReportCommand command) {
+    def getInventoryAuditDetails(InventoryAuditCommand command) {
         return InventoryAuditDetails.createCriteria().list(max: command.max, offset: command.offset) {
             eq("facility", command.facility)
 
             if (command.product) {
-                eq("product", command.product)
+                'in'("products", command.products)
             }
 
             if (command.startDate && command.endDate) {
@@ -1102,21 +1107,12 @@ class ReportService implements ApplicationContextAware {
         }
     }
 
-    def getInventoryAuditReportSummary(GetInventoryAuditReportCommand command) {
-        def results = InventoryAuditDetails.createCriteria().list(max: command.max, offset: command.offset) {
-            projections {
-                groupProperty('facility')
-                groupProperty('product')
-                sum('quantityAdjusted', 'quantityAdjusted')
-                max('abcClass', 'abcClass')
-            }
-
+    Closure buildInventoryAuditSummaryFilters = { InventoryAuditCommand command ->
+        return {
             eq("facility", command.facility)
-
-            if (command.product) {
-                eq("product", command.product)
+            if (command.products) {
+                'in'("product", command.products)
             }
-
             if (command.startDate && command.endDate) {
                 between("transactionDate", command.startDate, command.endDate)
             } else if (command.startDate) {
@@ -1125,18 +1121,73 @@ class ReportService implements ApplicationContextAware {
                 lte("transactionDate", command.endDate)
             }
         }
+    }
+
+    def getInventoryAuditSummary(InventoryAuditCommand command) {
+
+        def inventoryAuditFilters = buildInventoryAuditSummaryFilters(command)
+        def results = InventoryAuditDetails.createCriteria().list([max: command.max, offset: command.offset]) {
+            projections {
+                groupProperty('facility')
+                groupProperty('product')
+                max('abcClass', 'abcClass')
+            }
+            inventoryAuditFilters.delegate = delegate
+            inventoryAuditFilters.resolveStrategy = Closure.DELEGATE_FIRST
+            inventoryAuditFilters()
+        }
+
+        Integer totalCount = InventoryAuditDetails.createCriteria().get() {
+            projections {
+                countDistinct("product")
+            }
+            inventoryAuditFilters.delegate = delegate
+            inventoryAuditFilters.resolveStrategy = Closure.DELEGATE_FIRST
+            inventoryAuditFilters()
+        }
 
         // Transform the results to a summary object
         def data = results.collect {
+
+            Location facility = (Location) it[0]
+            Product product = (Product) it[1]
+            String abcClass = it[2]
+
+            // Retrieve all cycle counts completed during the given date range
+            List<CycleCountSummary> cycleCountSummaries =
+                    cycleCountService.getCycleCountSummaryReport(new CycleCountReportCommand(facility: facility, products: [product], startDate: command.startDate, endDate: command.endDate))
+
+            // Get metadata related to cycle counts completed within date range
+            Integer countCycleCounts = cycleCountSummaries.size()
+            Date lastCounted = cycleCountSummaries.dateRecorded.max()
+
+            // Calculate number of adjustments, quantity adjusted, and amount adjusted based on verification count data
+            Integer countAdjustments = (cycleCountSummaries.count { it.verificationCountVarianceTypeCode != VarianceTypeCode.EQUAL }) as Integer
+            Integer quantityAdjusted = (cycleCountSummaries.sum { it.verificationCountQuantityVariance } ?: 0) as Integer
+            BigDecimal amountAdjusted = (quantityAdjusted?:0) * (product?.pricePerUnit?:0)
+
+            // Retrieve demand data, which includes currently quantity on hand as well
+            def demandData = forecastingService.getDemand(facility, null, product)
+            Integer quantityDemanded = demandData.monthlyDemand?:0
+            Integer quantityOnHand = demandData.quantityOnHand?:0
+            BigDecimal amountOnHand = (quantityOnHand?:0) * (product?.pricePerUnit?:0)
+
             new InventoryAuditSummary(
-                    facility: it[0],
-                    product: it[1],
-                    quantityAdjusted: it[2] ?: 0,
-                    abcClass: it[3]
+                    facility: facility,
+                    product: product,
+                    countAdjustments: countAdjustments,
+                    countCycleCounts: countCycleCounts,
+                    lastCounted: lastCounted,
+                    quantityAdjusted: quantityAdjusted,
+                    amountAdjusted: amountAdjusted,
+                    quantityDemanded: quantityDemanded,
+                    quantityOnHand: quantityOnHand,
+                    amountOnHand: amountOnHand,
+                    cycleCountSummaries: cycleCountSummaries,
+                    abcClass: abcClass
             )
         }
-
-        return new PaginatedList<InventoryAuditSummary>(data, results.totalCount);
+        return new PaginatedList<InventoryAuditSummary>(data, totalCount);
     }
 
     Map getProductsInventoried(IndicatorApiCommand command) {
