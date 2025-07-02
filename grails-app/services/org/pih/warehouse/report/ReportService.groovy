@@ -54,7 +54,6 @@ import org.pih.warehouse.product.ProductCatalog
 import org.pih.warehouse.reporting.DateDimension
 import org.pih.warehouse.LocalizationUtil
 import org.pih.warehouse.reporting.IndicatorApiCommand
-import org.pih.warehouse.reporting.GetInventoryAuditReportCommand
 import org.pih.warehouse.reporting.InventoryAccuracyResult
 import org.pih.warehouse.reporting.InventoryAuditCommand
 import org.pih.warehouse.reporting.InventoryLossResult

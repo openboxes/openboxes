@@ -5,7 +5,7 @@ import org.pih.warehouse.product.Product
 
 class CycleCountProductSummary implements Serializable {
 
-    Long cycleCountId
+    String cycleCountId
     Date dateCounted
     Location facility
     Product product

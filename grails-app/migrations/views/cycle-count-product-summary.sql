@@ -43,6 +43,6 @@ SELECT
     date_counted,
     facility_id,
     product_id,
-    COALESCE(has_variance) AS has_variance
+    has_variance
 FROM cycle_count_item_final_count
 GROUP BY cycle_count_id, facility_id, product_id;
