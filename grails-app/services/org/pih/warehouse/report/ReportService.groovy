@@ -53,6 +53,7 @@ import org.pih.warehouse.product.ProductCatalog
 import org.pih.warehouse.reporting.DateDimension
 import org.pih.warehouse.LocalizationUtil
 import org.pih.warehouse.reporting.IndicatorApiCommand
+import org.pih.warehouse.reporting.InventoryAccuracyResult
 import org.pih.warehouse.reporting.InventoryAuditCommand
 import org.pih.warehouse.reporting.InventoryLossResult
 import org.pih.warehouse.shipping.ShipmentService
@@ -1227,6 +1228,36 @@ class ReportService implements ApplicationContextAware {
                 name  : "productsInventoried",
                 value : result ?: 0,
                 type : TileType.SINGLE.toString(),
+        ]
+    }
+
+    Map getInventoryAccuracy(IndicatorApiCommand command) {
+        String query = """
+        SELECT 
+            SUM(CASE WHEN cps.hasVariance = false THEN 1 ELSE 0 END),
+ COUNT(cps)
+        FROM CycleCountProductSummary cps
+        WHERE cps.dateCounted BETWEEN :startDate AND :endDate
+          AND cps.facility = :facility
+    """
+
+        List<Object[]> result = CycleCountProductSummary.executeQuery(query, [
+                startDate: command.startDate,
+                endDate  : command.endDate,
+                facility : command.facility
+        ])
+
+        Object[] resultRow = result[0] ?: [0, 0]
+
+        InventoryAccuracyResult accuracyResult = new InventoryAccuracyResult(
+                accurateCount: resultRow[0] as Integer,
+                totalCount   : resultRow[1] as Integer
+        )
+
+        return [
+                name : "getInventoryAccuracy",
+                value: accuracyResult.accuracyPercentage,
+                type : TileType.SINGLE.toString()
         ]
     }
 

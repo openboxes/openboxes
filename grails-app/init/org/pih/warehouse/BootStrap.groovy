@@ -18,6 +18,7 @@ import org.pih.warehouse.inventory.CycleCountSummary
 import org.pih.warehouse.inventory.InventoryAuditDetails
 import org.pih.warehouse.inventory.InventoryAuditSummary
 import org.pih.warehouse.inventory.PendingCycleCountRequest
+import org.pih.warehouse.reporting.CycleCountProductSummary
 
 import java.math.RoundingMode
 import java.time.Instant
@@ -668,6 +669,10 @@ class BootStrap {
 
         JSON.registerObjectMarshaller(InventoryAuditSummary) { InventoryAuditSummary inventoryAuditSummary ->
             return inventoryAuditSummary.toJson()
+        }
+
+        JSON.registerObjectMarshaller(CycleCountProductSummary) { CycleCountProductSummary cycleCountProductSummary ->
+            return cycleCountProductSummary.toJson()
         }
     }
 
