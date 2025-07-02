@@ -19,7 +19,6 @@ import org.apache.http.impl.client.DefaultHttpClient
 import org.hibernate.sql.JoinType
 import org.pih.warehouse.DateUtil
 import org.pih.warehouse.PaginatedList
-import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.DashboardService
 import org.pih.warehouse.core.LocalizationService
