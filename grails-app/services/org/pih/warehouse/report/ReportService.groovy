@@ -11,6 +11,7 @@ package org.pih.warehouse.report
 
 import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
+import grails.orm.PagedResultList
 import org.apache.http.client.HttpClient
 import org.apache.http.client.ResponseHandler
 import org.apache.http.client.methods.HttpGet
@@ -1129,6 +1130,7 @@ class ReportService implements ApplicationContextAware {
             if (command.products) {
                 'in'("product", command.products)
             }
+
             if (command.startDate && command.endDate) {
                 between("transactionDate", command.startDate, command.endDate)
             } else if (command.startDate) {
