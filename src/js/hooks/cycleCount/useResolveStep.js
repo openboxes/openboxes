@@ -676,7 +676,7 @@ const useResolveStep = () => {
     confirmationModal({
       buttons: reviewProductsModalButtons(cycleCountIdsForOutdatedProducts),
       ...modalLabels(outdatedProductsCount),
-      hideCloseButton: false,
+      hideCloseButton: true,
       closeOnClickOutside: false,
     });
   };
