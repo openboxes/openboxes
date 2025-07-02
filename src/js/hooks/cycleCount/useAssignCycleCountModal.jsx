@@ -75,7 +75,6 @@ const useAssignCycleCountModal = ({
         id: item.id,
         recount: true,
         assignee: dataToAssign?.[cycleCount.maxCountIndex]?.assignee,
-        dateCounted: dataToAssign?.[cycleCount.maxCountIndex]?.deadline,
       }));
     });
     return _.flatten(mappedData);
