@@ -488,26 +488,20 @@ class CycleCountService {
 
     void updateCountAssigneeData(CycleCount cycleCount) {
         Person assignee = cycleCount.cycleCountRequest.countAssignee
-        LocalDate countDeadlineLocalDate = cycleCount.cycleCountRequest.countDeadline
-        Date countDeadline = countDeadlineLocalDate ? DateUtil.asDate(countDeadlineLocalDate) : new Date()
-        // We want to override assignee while starting the count, but the date should stay as is
+        // We want to override assignee while starting the count
         cycleCount.cycleCountItems.each {
             if (it.countIndex == 0) {
                 it.assignee = assignee
-                it.dateCounted = it.dateCounted ?: countDeadline
             }
         }
     }
 
     void updateRecountAssigneeData(CycleCount cycleCount) {
         Person assignee = cycleCount.cycleCountRequest.recountAssignee
-        LocalDate recountDeadlineLocalDate = cycleCount.cycleCountRequest.recountDeadline
-        Date recountDeadline = recountDeadlineLocalDate ? DateUtil.asDate(recountDeadlineLocalDate) : new Date()
-        // We want to override assignee while starting the count, but the date should stay as is
+        // We want to override assignee while starting the recount
         cycleCount.cycleCountItems.each {
             if (it.countIndex > 0) {
                 it.assignee = assignee
-                it.dateCounted = it.dateCounted ?: recountDeadline
             }
         }
     }
@@ -529,8 +523,6 @@ class CycleCountService {
         request.cycleCountRequest.cycleCount = newCycleCount
         request.cycleCountRequest.status = CycleCountRequestStatus.IN_PROGRESS
         Person assignee = request.cycleCountRequest.countAssignee
-        LocalDate countDeadlineLocalDate = request.cycleCountRequest.countDeadline
-        Date countDeadline = countDeadlineLocalDate ? DateUtil.asDate(countDeadlineLocalDate) : new Date()
         itemsToSave.each { AvailableItem availableItem ->
             CycleCountItem cycleCountItem = initCycleCountItem(
                     facility,
@@ -539,7 +531,6 @@ class CycleCountService {
                     0,  // countIndex is always zero for the initial count
                     CycleCountItemStatus.READY_TO_COUNT,
                     assignee,
-                    countDeadline
             )
 
             newCycleCount.addToCycleCountItems(cycleCountItem)
@@ -589,8 +580,6 @@ class CycleCountService {
         List<AvailableItem> availableItemsToRecount = cycleCountProductAvailabilityService.getAvailableItems(
                 facility, product)
         Person assignee = command.cycleCountRequest.recountAssignee
-        LocalDate recountDeadlineLocalDate = command.cycleCountRequest.recountDeadline
-        Date recountDeadline = recountDeadlineLocalDate ? DateUtil.asDate(recountDeadlineLocalDate) : new Date()
         for (AvailableItem availableItemToRecount : availableItemsToRecount) {
             CycleCountItem cycleCountItem = initCycleCountItem(
                     facility,
@@ -599,7 +588,6 @@ class CycleCountService {
                     countIndex,
                     CycleCountItemStatus.INVESTIGATING,
                     assignee,
-                    recountDeadline
             )
 
             cycleCount.addToCycleCountItems(cycleCountItem)
@@ -642,8 +630,7 @@ class CycleCountService {
             CycleCount cycleCount,
             int countIndex,
             CycleCountItemStatus status,
-            Person assignee = null,
-            Date dateCounted = new Date()
+            Person assignee = null
     ) {
 
         return new CycleCountItem(
@@ -658,7 +645,7 @@ class CycleCountService {
                 product: availableItem.inventoryItem.product,
                 createdBy: AuthService.currentUser,
                 updatedBy: AuthService.currentUser,
-                dateCounted: dateCounted,
+                dateCounted: new Date(),
                 assignee: assignee,
                 custom: false,
         )
