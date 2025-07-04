@@ -105,6 +105,7 @@ const CycleCountReporting = () => {
         )}
         {currentTab === INDICATORS_TAB && (
           <IndicatorsTab
+            tablePaginationProps={tablePaginationProps}
             filterParams={filterParams}
           />
         )}
