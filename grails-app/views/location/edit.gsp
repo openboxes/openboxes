@@ -696,16 +696,21 @@
           cookie: {
             expires: 1
           },
+          beforeLoad: function(event, ui) {
+            $('.loading').show();
+          },
+          load: function(event, ui) {
+            $('.loading').hide();
+            $('.dataTable').dataTable({
+                "bJQueryUI": true,
+                "bDestroy": true,
+                "sPaginationType": "full_numbers"
+            });
+          },
           ajaxOptions: {
             error: function (xhr, status, index, anchor) {
               $(anchor.hash).html();
             },
-            beforeSend: function () {
-              $('.loading').show();
-            },
-            complete: function () {
-              $(".loading").hide();
-            }
           }
         }
     );
