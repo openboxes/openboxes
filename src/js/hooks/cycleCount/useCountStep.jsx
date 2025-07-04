@@ -61,6 +61,7 @@ const useCountStep = () => {
   const [sortByProductName, setSortByProductName] = useState(false);
   const [importErrors, setImportErrors] = useState([]);
   const assigneeImported = useRef(null);
+  const requestIdsWithDiscrepancies = useRef([]);
 
   const dispatch = useDispatch();
   const history = useHistory();
@@ -432,14 +433,17 @@ const useCountStep = () => {
   };
 
   const mapSelectedRowsToModalData = () => {
-    const modalData = tableData.current.map((cycleCount) => ({
+    const modalDataWithDisrepancies = tableData.current.filter(
+      (cycleCount) => requestIdsWithDiscrepancies.current.includes(cycleCount?.requestId),
+    );
+
+    assignCountModalData.current = modalDataWithDisrepancies.map((cycleCount) => ({
       product: cycleCount?.cycleCountItems?.[0]?.product,
       cycleCountRequestId: cycleCount?.requestId,
       inventoryItemsCount: cycleCount?.cycleCountItems?.length || 0,
       assignee: cycleCount?.verificationCount?.assignee,
       deadline: cycleCount?.verificationCount?.deadline,
     }));
-    assignCountModalData.current = modalData;
   };
 
   const closeAssignCountModal = () => {
@@ -453,15 +457,15 @@ const useCountStep = () => {
     setIsAssignCountModalOpen(true);
   };
 
-  const resolveDiscrepanciesModalButtons = (requestIdsWithDiscrepancies,
-    requestIdsWithoutDiscrepancies) => (onClose) => ([
+  const resolveDiscrepanciesModalButtons = (requestIdsWithDiscrepanciesData,
+    requestIdsWithoutDiscrepanciesData) => (onClose) => ([
     {
       variant: 'transparent',
       defaultLabel: 'Not now',
       label: 'react.cycleCount.modal.notNow.label',
       onClick: () => {
-        if (requestIdsWithoutDiscrepancies > 0) {
-          showSuccessNotification(requestIdsWithoutDiscrepancies);
+        if (requestIdsWithoutDiscrepanciesData > 0) {
+          showSuccessNotification(requestIdsWithoutDiscrepanciesData);
         }
         hide();
         onClose()?.();
@@ -477,11 +481,11 @@ const useCountStep = () => {
         show();
         onClose?.();
         await dispatch(startResolution(
-          requestIdsWithDiscrepancies,
+          requestIdsWithDiscrepanciesData,
           currentLocation?.id,
         ));
-        if (requestIdsWithoutDiscrepancies > 0) {
-          showSuccessNotification(requestIdsWithoutDiscrepancies);
+        if (requestIdsWithoutDiscrepanciesData > 0) {
+          showSuccessNotification(requestIdsWithoutDiscrepanciesData);
         }
         hide();
         redirectAfterClosingModal.current = CYCLE_COUNT.resolveStep();
@@ -490,12 +494,12 @@ const useCountStep = () => {
     },
   ]);
 
-  const openResolveDiscrepanciesModal = (requestIdsWithDiscrepancies,
-    requestIdsWithoutDiscrepancies) => {
+  const openResolveDiscrepanciesModal = (requestIdsWithDiscrepanciesData,
+    requestIdsWithoutDiscrepanciesData) => {
     confirmationModal({
-      buttons: resolveDiscrepanciesModalButtons(requestIdsWithDiscrepancies,
-        requestIdsWithoutDiscrepancies),
-      ...modalLabels(requestIdsWithDiscrepancies.length),
+      buttons: resolveDiscrepanciesModalButtons(requestIdsWithDiscrepanciesData,
+        requestIdsWithoutDiscrepanciesData),
+      ...modalLabels(requestIdsWithDiscrepanciesData.length),
       hideCloseButton: true,
       closeOnClickOutside: false,
     });
@@ -538,7 +542,7 @@ const useCountStep = () => {
     try {
       show();
       const submittedCounts = await Promise.all(submitCount());
-      const requestIdsWithDiscrepancies = submittedCounts
+      requestIdsWithDiscrepancies.current = submittedCounts
         .reduce((acc, submittedCycleCountRequest) => {
           const { data } = submittedCycleCountRequest;
           if (data.data.status === cycleCountStatus?.COUNTED) {
@@ -549,9 +553,12 @@ const useCountStep = () => {
         }, []);
       dispatch(eraseDraft(currentLocation?.id, TO_COUNT_TAB));
       const requestIdsWithoutDiscrepancies =
-        submittedCounts.length - requestIdsWithDiscrepancies.length;
-      if (requestIdsWithDiscrepancies.length > 0) {
-        openResolveDiscrepanciesModal(requestIdsWithDiscrepancies, requestIdsWithoutDiscrepancies);
+        submittedCounts.length - requestIdsWithDiscrepancies.current.length;
+      if (requestIdsWithDiscrepancies.current.length > 0) {
+        openResolveDiscrepanciesModal(
+          requestIdsWithDiscrepancies.current,
+          requestIdsWithoutDiscrepancies,
+        );
         return;
       }
       showSuccessNotification(submittedCounts.length);
