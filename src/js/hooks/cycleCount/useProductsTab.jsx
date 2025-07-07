@@ -363,7 +363,7 @@ const useProductsTab = ({
       ),
       cell: ({ getValue }) => (
         <TableCell className="rt-td d-flex justify-content-end">
-          {formatNumber(getValue())}
+          {formatNumber(getValue()?.toString())}
         </TableCell>
       ),
       size: 155,
