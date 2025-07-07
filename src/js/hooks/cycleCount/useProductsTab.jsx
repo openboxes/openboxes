@@ -19,6 +19,7 @@ import useTranslate from 'hooks/useTranslate';
 import Badge from 'utils/Badge';
 import dateWithoutTimeZone from 'utils/dateUtils';
 import formatCurrency from 'utils/formatCurrency';
+import formatNumber from 'utils/formatNumber';
 
 const useProductsTab = ({
   filterParams,
@@ -343,6 +344,7 @@ const useProductsTab = ({
         const value = getValue();
         return (
           <TableCell className={`rt-td d-flex justify-content-end ${value > 0 ? 'font-green-ob' : value < 0 && 'font-red-ob'}`}>
+            {value > 0 && '+'}
             {value?.toFixed(1)}
           </TableCell>
         );
@@ -361,7 +363,7 @@ const useProductsTab = ({
       ),
       cell: ({ getValue }) => (
         <TableCell className="rt-td d-flex justify-content-end">
-          {getValue()?.toString()}
+          {formatNumber(getValue())}
         </TableCell>
       ),
       size: 155,
