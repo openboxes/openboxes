@@ -31,6 +31,7 @@ import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.UserService
 import org.pih.warehouse.data.DataService
 import org.pih.warehouse.inventory.CycleCount
+import org.pih.warehouse.inventory.CycleCountCandidate
 import org.pih.warehouse.inventory.CycleCountService
 import org.pih.warehouse.inventory.CycleCountStatus
 import org.pih.warehouse.inventory.CycleCountSummary
@@ -1205,28 +1206,25 @@ class ReportService implements ApplicationContextAware {
     }
 
     Map getProductsInventoried(IndicatorApiCommand command) {
-        Integer result = CycleCount.createCriteria().get {
-            createAlias("cycleCountItems", "cci", JoinType.INNER_JOIN)
-
+        Integer result = CycleCountCandidate.createCriteria().get {
             projections {
-                countDistinct("cci.product.id", "distinct_product_count")
+                countDistinct("product.id")
             }
 
             eq("facility", command.facility)
-            eq("status", CycleCountStatus.COMPLETED)
 
             if (command.startDate) {
-                ge("dateCreated", command.startDate)
+                ge("dateLastCount", command.startDate)
             }
             if (command.endDate) {
-                le("dateCreated", command.endDate)
+                le("dateLastCount", command.endDate)
             }
         } as Integer
 
         return [
                 name  : "productsInventoried",
                 value : result ?: 0,
-                type : TileType.SINGLE.toString(),
+                type  : TileType.SINGLE.toString(),
         ]
     }
 

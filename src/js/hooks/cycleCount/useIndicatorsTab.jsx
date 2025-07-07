@@ -12,6 +12,7 @@ import {
 
 const useIndicatorsTab = ({
   filterParams,
+  serializedParams,
 }) => {
   const [loading, setLoading] = useState(false);
   // In tiles, we will store all the filtered data that we will render in IndicatorNumberCards
@@ -53,7 +54,7 @@ const useIndicatorsTab = ({
     if (startDate && endDate) {
       fetchData();
     }
-  }, [startDate, endDate]);
+  }, [startDate, endDate, serializedParams]);
 
   return {
     loading,
