@@ -1412,7 +1412,7 @@ class ReportService implements ApplicationContextAware {
                 catalogsList,
                 location,
                 null,
-                'transactionDate'
+                "transactionDate"
         )
 
         // Grouping transaction entries by product to get the desired report granularity
@@ -1507,7 +1507,7 @@ class ReportService implements ApplicationContextAware {
                 endDate,
                 location,
                 product,
-                'transactionDate',
+                "transactionDate",
                 "asc"
         )
 
@@ -1519,7 +1519,7 @@ class ReportService implements ApplicationContextAware {
                 null,
                 location,
                 product,
-                'transactionDate'
+                "transactionDate"
         )
 
         // Current balance, used for closing balance calculation
