@@ -20,6 +20,7 @@ import org.hibernate.sql.JoinType
 import org.pih.warehouse.DateUtil
 import org.pih.warehouse.PaginatedList
 import org.pih.warehouse.core.ActivityCode
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.DashboardService
 import org.pih.warehouse.core.LocalizationService
 import org.pih.warehouse.core.Location
@@ -1274,8 +1275,8 @@ class ReportService implements ApplicationContextAware {
     Integer calculateBalance(List<TransactionEntry> transactionEntries, Integer balance) {
         List<TransactionEntry> credits = getCreditTransactionEntries(transactionEntries)
         List<TransactionEntry> debits = getDebitTransactionEntries(transactionEntries)
-        Integer quantityFromCredits = credits.sum { Math.abs(it.quantity) } as Integer ?: 0
-        Integer quantityFromDebits = debits.sum { Math.abs(it.quantity) } as Integer ?: 0
+        Integer quantityFromCredits = credits.sum { it.quantity } as Integer ?: 0
+        Integer quantityFromDebits = debits.sum { it.quantity } as Integer ?: 0
 
         return balance - quantityFromCredits + quantityFromDebits
     }
@@ -1379,6 +1380,48 @@ class ReportService implements ApplicationContextAware {
         }
     }
 
+    Map<String, String> getTransactionReportRow(Map data) {
+        return [
+            "Code": data.productCode,
+            "Name": data.name,
+            "Display Name": data.displayName,
+            "Category": data.categoryName,
+            "Unit Cost": data.pricePerUnit,
+            "Opening": data.openingBalance,
+            "Credits": data.credits,
+            "Debits": data.debits,
+            "Adjustments": data.adjustments,
+            "Closing": data.closingBalance,
+        ]
+    }
+
+    Map<String, String> getTransactionReportDetailedRow(Map data) {
+        Map<String, String> row = [
+            "Code": data.productCode,
+            "Name": data.name,
+            "Product Family": data.productFamilyName,
+            "Display Name": data.displayName,
+            "Category": data.categoryName,
+            "Formulary": data.formulary,
+            "Tag": data.tag,
+            "Unit Cost": data.pricePerUnit,
+            "Opening": data.openingBalance,
+            "Credits": data.credits,
+            "Debits": data.debits,
+            "Adjustment (Credit and Debit)": data.credits - data.debits
+        ]
+
+        data.availableTransactionTypes.each{ transactionType ->
+            String columnName = LocalizationUtil.getLocalizedString(transactionType?.name)
+            row[columnName] = data.detailedReportData?.get(transactionType?.name) ?: 0
+        }
+
+        return row + [
+                "Closing": data.closingBalance,
+                "Has Backdated Transactions": data.hasBackdatedTransactions
+        ]
+    }
+
     List<Object> getTransactionReport(Location location, List<Category> categories, List<Tag> tagsList, List<ProductCatalog> catalogsList, Date startDate, Date endDate, Boolean includeDetails) {
         List<TransactionCode> adjustmentTransactionCodes = [
                 TransactionCode.CREDIT,
@@ -1430,7 +1473,15 @@ class ReportService implements ApplicationContextAware {
         // The CSV file should contain additional information about the product and the transaction
         // entries should be grouped by transaction types (greater granularity)
         List<TransactionType> availableTransactionTypes = includeDetails
-                ? TransactionType.createCriteria().list { 'in'("transactionCode", adjustmentTransactionCodes) }
+                ? TransactionType.createCriteria().list {
+                    'in'("transactionCode", adjustmentTransactionCodes)
+                    not {
+                        'in'("id", [
+                                Constants.ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID,
+                                Constants.ADJUSTMENT_DEBIT_TRANSACTION_TYPE_ID
+                        ])
+                    }
+                }
                 : []
 
         Map<Product, List<Integer>> detailedReportData = includeDetails
@@ -1462,32 +1513,38 @@ class ReportService implements ApplicationContextAware {
             // the closing and opening balance
             Integer adjustments = closingBalance - openingBalance
 
-            return [:].with {
-                it["Code"] = key.productCode
-                it["Name"] = key.name
-                if (includeDetails) {
-                    it["Product Family"] = key.productFamily?.name ?: ''
-                }
-                it["Display Name"] = key?.displayName ?: ''
-                it["Category"] = key.category.name
-                if (includeDetails) {
-                    it["Formulary"] = key.productCatalogsToString()
-                    it["Tag"] = key.tagsToString()
-                }
-                it["Unit Cost"] = key.pricePerUnit ?: ''
-                it["Opening"] = openingBalance
-                it["Credits"] = credits
-                it["Debits"] = debits
-                if (includeDetails) {
-                    availableTransactionTypes.each{ transactionType ->
-                        String columnName = LocalizationUtil.getLocalizedString(transactionType?.name)
-                        it[columnName] = detailedReportData[key]?.get(transactionType?.name) ?: 0
-                    }
-                }
-                it["Adjustments"] = adjustments
-                it["Closing"] = closingBalance
-                it
+            if (includeDetails) {
+                return getTransactionReportDetailedRow(
+                        productCode: key.productCode,
+                        name: key.name,
+                        productFamilyName: key.productFamily?.name ?: '',
+                        displayName: key.displayName ?: '',
+                        categoryName: key.category.name,
+                        formulary: key.productCatalogsToString(),
+                        tag: key.tagsToString(),
+                        pricePerUnit: key.pricePerUnit ?: '',
+                        openingBalance: openingBalance,
+                        credits: credits,
+                        debits: debits,
+                        closingBalance: closingBalance,
+                        detailedReportData: detailedReportData[key],
+                        availableTransactionTypes: availableTransactionTypes,
+                        hasBackdatedTransactions: value.transaction.any { it.dateCreated > (it.transactionDate + 1) }
+                )
             }
+
+            return getTransactionReportRow(
+                    productCode: key.productCode,
+                    name: key.name,
+                    displayName: key?.displayName ?: '',
+                    categoryName: key.category.name,
+                    pricePerUnit: key.pricePerUnit ?: '',
+                    openingBalance: openingBalance,
+                    credits: credits,
+                    debits: debits,
+                    adjustments: adjustments,
+                    closingBalance: closingBalance
+            )
         }
     }
 
