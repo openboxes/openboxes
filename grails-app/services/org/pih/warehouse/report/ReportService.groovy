@@ -1279,16 +1279,20 @@ class ReportService implements ApplicationContextAware {
     }
 
     List<TransactionEntry> getCreditTransactionEntries(List<TransactionEntry> transactionEntries) {
-        return transactionEntries.findAll { !isTransactionEntryDebit(it) }
+        return transactionEntries.findAll { isTransactionEntryCredit(it) }
     }
 
     List<TransactionEntry> getDebitTransactionEntries(List<TransactionEntry> transactionEntries) {
-        return transactionEntries.findAll {isTransactionEntryDebit(it) }
+        return transactionEntries.findAll { isTransactionEntryDebit(it) }
     }
 
     Boolean isTransactionEntryDebit(TransactionEntry transactionEntry) {
         return transactionEntry.transaction.transactionType.transactionCode == TransactionCode.DEBIT ||
                 (transactionEntry.transaction.transactionType.transactionCode == TransactionCode.CREDIT && transactionEntry.quantity < 0)
+    }
+
+    Boolean isTransactionEntryCredit(TransactionEntry transactionEntry) {
+        return transactionEntry.transaction.transactionType.transactionCode == TransactionCode.CREDIT && transactionEntry.quantity > 0
     }
 
     List<TransactionEntry> getFilteredTransactionEntries(
@@ -1300,7 +1304,8 @@ class ReportService implements ApplicationContextAware {
             List<ProductCatalog> catalogsList,
             Location location,
             Product productData,
-            String orderBy
+            String orderBy,
+            String sortOrder = "desc"
     ) {
         return TransactionEntry.createCriteria().list {
             inventoryItem {
@@ -1349,15 +1354,15 @@ class ReportService implements ApplicationContextAware {
                     }
                 }
 
-                if (orderBy) {
-                    order(orderBy, 'desc')
+                if (orderBy && sortOrder) {
+                    order(orderBy, sortOrder)
                 }
             }
         } as List<TransactionEntry>
     }
 
-    List<TransactionEntry> getFilteredTransactionEntries(List<TransactionCode> transactionCodes, Date startDate, Date endDate, Location location, Product product, String orderBy) {
-        return getFilteredTransactionEntries(transactionCodes, startDate, endDate, null, null, null, location, product, orderBy)
+    List<TransactionEntry> getFilteredTransactionEntries(List<TransactionCode> transactionCodes, Date startDate, Date endDate, Location location, Product product, String orderBy, String sortOrder = "desc") {
+        return getFilteredTransactionEntries(transactionCodes, startDate, endDate, null, null, null, location, product, orderBy, sortOrder)
     }
 
     Map<Product, Map<String, Integer>> getDetailedTransactionReportData(Map<Product, List<TransactionEntry>> transactionEntries) {
@@ -1492,17 +1497,18 @@ class ReportService implements ApplicationContextAware {
     List<Object> getTransactionReportModalData(Location location, Product product, Date startDate, Date endDate) {
         List<TransactionCode> adjustmentTransactionCodes = [
                 TransactionCode.CREDIT,
-                TransactionCode.DEBIT
+                TransactionCode.DEBIT,
         ]
 
         // Get transaction entries ordered by transaction date that were created between startDate and endDate
         List<TransactionEntry> transactionEntriesWithinDateRange = getFilteredTransactionEntries(
-                adjustmentTransactionCodes,
+                adjustmentTransactionCodes + TransactionCode.PRODUCT_INVENTORY,
                 startDate,
                 endDate,
                 location,
                 product,
-                'transactionDate'
+                'transactionDate',
+                "asc"
         )
 
         // Transaction entries that have relation to the transactions happened between endDate <-> today
@@ -1537,9 +1543,11 @@ class ReportService implements ApplicationContextAware {
 
         // Add transaction entries to the list that took place within selected time range
         transactionEntriesWithinDateRange.each { TransactionEntry it ->
-            openingBalance = isTransactionEntryDebit(it)
-                    ? openingBalance - Math.abs(it.quantity)
-                    : openingBalance + Math.abs(it.quantity)
+            if (it.transaction.transactionType.transactionCode != TransactionCode.PRODUCT_INVENTORY) {
+                openingBalance = isTransactionEntryDebit(it)
+                        ? openingBalance - Math.abs(it.quantity)
+                        : openingBalance + Math.abs(it.quantity)
+            }
 
             entries.add([
                     transactionDate: DateUtil.asDateForDisplay(it.transaction.transactionDate),
