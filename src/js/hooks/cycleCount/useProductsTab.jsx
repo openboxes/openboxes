@@ -13,13 +13,13 @@ import { INVENTORY_ITEM_URL } from 'consts/applicationUrls';
 import cycleCountColumn from 'consts/cycleCountColumn';
 import { DateFormat } from 'consts/timeFormat';
 import { getCycleCountDifferencesVariant } from 'consts/valueIndicatorVariant';
+import useFormatNumber from 'hooks/useFormatNumber';
 import useTableDataV2 from 'hooks/useTableDataV2';
 import useTableSorting from 'hooks/useTableSorting';
 import useTranslate from 'hooks/useTranslate';
 import Badge from 'utils/Badge';
 import dateWithoutTimeZone from 'utils/dateUtils';
 import formatCurrency from 'utils/formatCurrency';
-import formatNumber from 'utils/formatNumber';
 
 const useProductsTab = ({
   filterParams,
@@ -50,6 +50,7 @@ const useProductsTab = ({
     sort,
     order,
   } = useTableSorting();
+  const formatNumber = useFormatNumber();
 
   const getParams = ({
     sortingParams,
