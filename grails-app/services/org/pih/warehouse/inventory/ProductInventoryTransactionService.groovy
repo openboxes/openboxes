@@ -44,6 +44,11 @@ abstract class ProductInventoryTransactionService<T> {
      * @param transactionDate The datetime that the transaction should be marked with. If left blank will be
      *                        the current time.
      * @param comment An optional comment to associate with the transaction
+     * @param validateTransactionDates An optional param to disable validation of transactions at the same time
+     *                                 (Used when for some reason we want to allow multiple transactions at the
+     *                                 same time). By default it's true.
+     * @param disableRefresh An optional param to disable the automatic refresh of the product availability when
+     *                       the transaction is created. By default it's false.
      * @return The Transaction that was created
      */
     Transaction createInventoryBaselineTransaction(
@@ -52,13 +57,18 @@ abstract class ProductInventoryTransactionService<T> {
             Collection<Product> products,
             Date transactionDate=null,
             String comment=null,
-            Map<Map<String, Object>, String> transactionEntriesComments = [:]) {
+            Map<Map<String, Object>, String> transactionEntriesComments = [:],
+            Boolean validateTransactionDates = true,
+            Boolean disableRefresh = false
+    ) {
 
         List<AvailableItem> availableItems = productAvailabilityService.getAvailableItemsAtDate(
                 facility, products, transactionDate)
 
         createInventoryBaselineTransactionForGivenStock(
-                facility, sourceObject, availableItems, transactionDate, comment, transactionEntriesComments)
+                facility, sourceObject, availableItems, transactionDate, comment, transactionEntriesComments,
+                validateTransactionDates, disableRefresh
+        )
     }
 
     /**
@@ -80,6 +90,11 @@ abstract class ProductInventoryTransactionService<T> {
      * @param transactionDate The datetime that the transaction should be marked with. If left blank will be
      *                        the current time.
      * @param comment An optional comment to associate with the transaction
+     * @param validateTransactionDates An optional param to disable validation of transactions at the same time
+     *                                 (Used when for some reason we want to allow multiple transactions at the
+     *                                 same time). By default it's true.
+     * @param disableRefresh An optional param to disable the automatic refresh of the product availability when
+     *                       the transaction is created. By default it's false.
      * @return The Transaction that was created
      */
     Transaction createInventoryBaselineTransactionForGivenStock(
@@ -88,7 +103,10 @@ abstract class ProductInventoryTransactionService<T> {
             Collection<AvailableItem> availableItems,
             Date transactionDate=null,
             String comment=null,
-            Map<Map<String, Object>, String> transactionEntriesComments = [:]) {
+            Map<Map<String, Object>, String> transactionEntriesComments = [:],
+            validateTransactionDates = true,
+            disableRefresh = false
+    ) {
 
         // If there are no available items, there would be no transaction entries, so skip creating the transaction.
         if (!availableItems || !baselineTransactionsEnabled()) {
@@ -101,7 +119,7 @@ abstract class ProductInventoryTransactionService<T> {
         // database level is to the second) so fail if there's already a transaction on the items for the given date.
         Date actualTransactionDate = transactionDate ?: new Date()
         List<InventoryItem> inventoryItems = availableItems.collect{ it.inventoryItem }
-        if (inventoryService.hasTransactionEntriesOnDate(facility, actualTransactionDate, inventoryItems)) {
+        if (validateTransactionDates && inventoryService.hasTransactionEntriesOnDate(facility, actualTransactionDate, inventoryItems)) {
             throw new IllegalArgumentException("A transaction already exists at time ${actualTransactionDate}")
         }
 
@@ -110,6 +128,7 @@ abstract class ProductInventoryTransactionService<T> {
                 transactionDate: actualTransactionDate,
                 transactionType: transactionType,
                 comment: comment,
+                disableRefresh: disableRefresh
         )
 
         transaction.transactionNumber = transactionIdentifierService.generate(transaction)
@@ -123,7 +142,7 @@ abstract class ProductInventoryTransactionService<T> {
                     binLocation: availableItem.binLocation,
                     inventoryItem: availableItem.inventoryItem,
                     transaction: transaction,
-                    comments: transactionEntriesComments.get([inventoryItem: availableItem.inventoryItem, binLocation: availableItem.binLocation]),
+                    comments: transactionEntriesComments?.get([inventoryItem: availableItem.inventoryItem, binLocation: availableItem.binLocation]),
             )
             transaction.addToTransactionEntries(transactionEntry)
         }

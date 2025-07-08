@@ -97,6 +97,9 @@ openboxes.transactions.inventoryBaseline.inventoryImport.enabled = true
 // Inventory snapshot configuration (OBPIH-7254)
 openboxes.transactions.inventoryBaseline.loadDemoData.enabled = true
 
+// Inventory snapshot configuration (OBPIH-7198)
+openboxes.transactions.inventoryBaseline.migration.enabled = true
+
 openboxes.security.rbac.rules = [
     [controller: '*', actions: ['delete'], accessRules: [ minimumRequiredRole: RoleType.ROLE_SUPERUSER ]],
     [controller: '*', actions: ['remove'], accessRules: [ minimumRequiredRole: RoleType.ROLE_SUPERUSER ]],
