@@ -3,7 +3,7 @@ package org.pih.warehouse.receiving
 import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import grails.util.Holders
-import org.pih.warehouse.jobs.AutomaticReceiptCreationJob
+import org.pih.warehouse.jobs.AutomaticReceiptJob
 import org.pih.warehouse.shipping.Shipment
 import org.springframework.context.ApplicationListener
 
@@ -15,7 +15,7 @@ class AutomaticReceiptEventService implements ApplicationListener<AutomaticRecei
 
     @Override
     void onApplicationEvent(AutomaticReceiptEvent event) {
-        if (!Holders.config.openboxes.jobs.automaticReceiptCreationJob.enabled) {
+        if (!Holders.config.openboxes.jobs.automaticReceiptJob.enabled) {
             log.info"Automatic receipt creation job is disabled"
             return
         }
@@ -29,10 +29,10 @@ class AutomaticReceiptEventService implements ApplicationListener<AutomaticRecei
 
         if (shipment.hasShipped() && !shipment.isFullyReceived()) {
             def delayInMilliseconds =
-                    Integer.valueOf(grailsApplication.config.openboxes.jobs.automaticReceiptCreationJob.delayInMilliseconds) ?: 0
+                    Integer.valueOf(grailsApplication.config.openboxes.jobs.automaticReceiptJob.delayInMilliseconds) ?: 0
             Date runAt = new Date(System.currentTimeMillis() + delayInMilliseconds)
             log.info "Triggering automatic receipt job with ${delayInMilliseconds} ms delay"
-            AutomaticReceiptCreationJob.schedule(runAt)
+            AutomaticReceiptJob.schedule(runAt, [shipmentId: event.source])
         }
     }
 }

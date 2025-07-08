@@ -49,7 +49,6 @@ class Shipment implements Comparable, Serializable, Historizable {
 
     def afterInsert() {
         publishRefreshEvent()
-        publishAutomaticReceiptEvent()
     }
 
     def afterUpdate() {
