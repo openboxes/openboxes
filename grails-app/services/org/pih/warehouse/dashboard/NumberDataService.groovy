@@ -102,19 +102,24 @@ class NumberDataService {
 
     @Cacheable(value = "dashboardCache", key = { "getItemsInventoried-${location?.id}" })
     NumberData getItemsInventoried(Location location) {
-        Date firstOfMonth = LocalDate.now().withDayOfMonth(1).toDate();
+        Date firstOfMonth = LocalDate.now().withDayOfMonth(1).toDate()
+        List<String> transactionTypeIds = [
+                Constants.ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID,
+                Constants.PRODUCT_INVENTORY_TRANSACTION_TYPE_ID,
+                Constants.INVENTORY_BASELINE_TRANSACTION_TYPE_ID
+        ]
 
-        def itemsInventoried = TransactionEntry.executeQuery("""
+        List<TransactionEntry> itemsInventoried = TransactionEntry.executeQuery("""
             SELECT COUNT(distinct ii.product.id) from TransactionEntry te
             INNER JOIN te.inventoryItem ii
             INNER JOIN te.transaction t
             WHERE t.inventory = :inventory
-            AND t.transactionType.transactionCode = :transactionCode 
+            AND t.transactionType.id IN :transactionTypeIds 
             AND t.transactionDate >= :firstOfMonth""",
                 [
-                        inventory      : location?.inventory,
-                        transactionCode: TransactionCode.PRODUCT_INVENTORY,
-                        firstOfMonth   : firstOfMonth,
+                        inventory          : location?.inventory,
+                        transactionTypeIds : transactionTypeIds,
+                        firstOfMonth       : firstOfMonth,
                 ])
 
         return new NumberData(itemsInventoried[0])
