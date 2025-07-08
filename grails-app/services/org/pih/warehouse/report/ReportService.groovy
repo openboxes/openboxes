@@ -1140,7 +1140,6 @@ class ReportService implements ApplicationContextAware {
     }
 
     def getInventoryAuditSummary(InventoryAuditCommand command) {
-
         def inventoryAuditFilters = buildInventoryAuditSummaryFilters(command)
         def results = InventoryAuditDetails.createCriteria().list([max: command.max, offset: command.offset]) {
             projections {
@@ -1233,30 +1232,31 @@ class ReportService implements ApplicationContextAware {
     }
 
     Map getInventoryAccuracy(IndicatorApiCommand command) {
-        String query = """
-        SELECT 
-            SUM(CASE WHEN cps.hasVariance = false THEN 1 ELSE 0 END),
- COUNT(cps)
-        FROM CycleCountProductSummary cps
-        WHERE cps.dateCounted BETWEEN :startDate AND :endDate
-          AND cps.facility = :facility
-    """
+        List<Object[]> results = CycleCountProductSummary.createCriteria().list {
+            projections {
+                groupProperty('product')
+                sum('quantityVariance')
+            }
+            eq('facility', command.facility)
 
-        List<Object[]> result = CycleCountProductSummary.executeQuery(query, [
-                startDate: command.startDate,
-                endDate  : command.endDate,
-                facility : command.facility
-        ])
+            if (command.startDate) {
+                ge("lastUpdated", command.startDate)
+            }
+            if (command.endDate) {
+                le("lastUpdated", command.endDate)
+            }
+        }
 
-        Object[] resultRow = result[0] ?: [0, 0]
+        Integer accurateCount = results.count { it[1] == null || it[1] == 0 }
+        Integer totalCount = results.size()
 
         InventoryAccuracyResult accuracyResult = new InventoryAccuracyResult(
-                accurateCount: resultRow[0] as Integer,
-                totalCount   : resultRow[1] as Integer
+                accurateCount: accurateCount,
+                totalCount: totalCount
         )
 
         return [
-                name : "getInventoryAccuracy",
+                name : "inventoryAccuracy",
                 value: accuracyResult.accuracyPercentage,
                 type : TileType.SINGLE.toString()
         ]

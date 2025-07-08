@@ -6,7 +6,7 @@ const cycleCountReportingIndicators = {
     infoLabel: 'react.cycleCount.indicators.cardInfo.productsInventoried.label',
     defaultInfo: 'Number of products that were counted at least once during the time range',
   },
-  getInventoryAccuracy: {
+  inventoryAccuracy: {
     titleLabel: 'react.cycleCount.indicators.cardTitle.inventoryAccuracy.label',
     defaultTitle: 'Not finished items',
     numberType: 'number',

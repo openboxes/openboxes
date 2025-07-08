@@ -9,7 +9,8 @@ class CycleCountProductSummary implements Serializable {
     Date dateCounted
     Location facility
     Product product
-    Boolean hasVariance
+    Integer quantityVariance
+    Date lastUpdated
 
     static mapping = {
         version false
@@ -21,11 +22,18 @@ class CycleCountProductSummary implements Serializable {
 
     Map toJson() {
         return [
-                cycleCountId: cycleCountId,
-                dateCounted : dateCounted,
-                facility    : [id: facility?.id, name: facility?.name],
-                product     : [id: product?.id, name: product?.name],
-                hasVariance : hasVariance
+                cycleCountId     : cycleCountId,
+                dateCounted      : dateCounted,
+                facility         : [
+                        id  : facility?.id,
+                        name: facility?.name
+                ],
+                product          : [
+                        id  : product?.id,
+                        name: product?.name
+                ],
+                quantityVariance : quantityVariance,
+                lastUpdated      : lastUpdated
         ]
     }
 }
