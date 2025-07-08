@@ -13,6 +13,7 @@ import { INVENTORY_ITEM_URL } from 'consts/applicationUrls';
 import cycleCountColumn from 'consts/cycleCountColumn';
 import { DateFormat } from 'consts/timeFormat';
 import { getCycleCountDifferencesVariant } from 'consts/valueIndicatorVariant';
+import useFormatNumber from 'hooks/useFormatNumber';
 import useTableDataV2 from 'hooks/useTableDataV2';
 import useTableSorting from 'hooks/useTableSorting';
 import useTranslate from 'hooks/useTranslate';
@@ -49,6 +50,7 @@ const useProductsTab = ({
     sort,
     order,
   } = useTableSorting();
+  const formatNumber = useFormatNumber();
 
   const getParams = ({
     sortingParams,
@@ -343,6 +345,7 @@ const useProductsTab = ({
         const value = getValue();
         return (
           <TableCell className={`rt-td d-flex justify-content-end ${value > 0 ? 'font-green-ob' : value < 0 && 'font-red-ob'}`}>
+            {value > 0 && '+'}
             {value?.toFixed(1)}
           </TableCell>
         );
@@ -361,7 +364,7 @@ const useProductsTab = ({
       ),
       cell: ({ getValue }) => (
         <TableCell className="rt-td d-flex justify-content-end">
-          {getValue()?.toString()}
+          {formatNumber(getValue()?.toString())}
         </TableCell>
       ),
       size: 155,
