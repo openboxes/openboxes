@@ -103,6 +103,12 @@ class NumberDataService {
     @Cacheable(value = "dashboardCache", key = { "getItemsInventoried-${location?.id}" })
     NumberData getItemsInventoried(Location location) {
         Date firstOfMonth = LocalDate.now().withDayOfMonth(1).toDate()
+        /**
+        * After migrating from single product inventory transaction to baseline + adjustment transactions
+        * there is a case when we might have only an adjustment if it's first inventory record
+        * and we can't rely on CREDIT type code for this case and ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID
+        * is only used for baseline + adjustment and for manual stock adjustment
+        */
         List<String> transactionTypeIds = [
                 Constants.ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID,
                 Constants.PRODUCT_INVENTORY_TRANSACTION_TYPE_ID,
