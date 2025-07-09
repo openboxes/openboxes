@@ -52,7 +52,7 @@ class AutomaticReceiptJob {
             return
         }
 
-        if (Holders.config.openboxes.jobs.automaticReceiptJob.shipmentStatusCheckerEnabled) {
+        if (Holders.config.openboxes.jobs.automaticReceiptJob.bulkShipmentAutoReceipt) {
             log.info "Running automatic receipt job for all shipped shipments... "
             List<Location> autoReceivingLocations = locationService.getLocationsSupportingActivities([ActivityCode.AUTO_RECEIVING])
             autoReceivingLocations.each {
