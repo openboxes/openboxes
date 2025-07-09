@@ -1206,18 +1206,18 @@ class ReportService implements ApplicationContextAware {
     }
 
     Map getProductsInventoried(IndicatorApiCommand command) {
-        Integer result = CycleCountCandidate.createCriteria().get {
+        Integer result = InventoryAuditDetails.createCriteria().get {
             projections {
-                countDistinct("product.id")
+                countDistinct("product")
             }
 
             eq("facility", command.facility)
 
             if (command.startDate) {
-                ge("dateLastCount", command.startDate)
+                ge("transactionDate", command.startDate)
             }
             if (command.endDate) {
-                le("dateLastCount", command.endDate)
+                le("transactionDate", command.endDate)
             }
         } as Integer
 
