@@ -6,11 +6,10 @@ import org.pih.warehouse.product.Product
 class CycleCountProductSummary implements Serializable {
 
     String cycleCountId
-    Date dateCounted
+    Date transactionDate
     Location facility
     Product product
     Integer quantityVariance
-    Date lastUpdated
 
     static mapping = {
         version false
@@ -23,7 +22,7 @@ class CycleCountProductSummary implements Serializable {
     Map toJson() {
         return [
                 cycleCountId     : cycleCountId,
-                dateCounted      : dateCounted,
+                transactionDate  : transactionDate,
                 facility         : [
                         id  : facility?.id,
                         name: facility?.name
@@ -33,7 +32,6 @@ class CycleCountProductSummary implements Serializable {
                         name: product?.name
                 ],
                 quantityVariance : quantityVariance,
-                lastUpdated      : lastUpdated
         ]
     }
 }

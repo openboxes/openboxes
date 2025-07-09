@@ -3,7 +3,8 @@ WITH cycle_count_item_variance AS (
     SELECT *
     FROM (
         SELECT cycle_count.id                                                             AS cycle_count_id,
-               cycle_count_item.id                                                        AS cycle_count_item_id,
+               cycle_count_item.id AS cycle_count_item_id,
+               ltp.latest_transaction_date AS transaction_date,
                cycle_count_item.date_counted,
                cycle_count.facility_id,
                cycle_count_item.product_id,
@@ -13,12 +14,11 @@ WITH cycle_count_item_variance AS (
                cycle_count_item.quantity_counted,
                cycle_count_item.discrepancy_reason_code                                   AS variance_reason_code,
                cycle_count_item.comment,
-               cycle_count_item.count_index,
-               cycle_count_item.last_updated
+               cycle_count_item.count_index
         FROM cycle_count_item
                  LEFT OUTER JOIN cycle_count ON cycle_count_item.cycle_count_id = cycle_count.id
                  LEFT OUTER JOIN cycle_count_request ON cycle_count.id = cycle_count_request.cycle_count_id
-                 LEFT OUTER JOIN transaction ON transaction.cycle_count_id = cycle_count.id
+                 INNER JOIN latest_transaction_per_cycle_count ltp ON ltp.cycle_count_id = cycle_count.id
         WHERE cycle_count_request.status = 'COMPLETED'
     ) AS cycle_count_item_variance
 ),
@@ -39,10 +39,9 @@ cycle_count_item_final_count AS (
 
 SELECT
     cycle_count_id,
-    date_counted,
+    transaction_date,
     facility_id,
     product_id,
-    last_updated,
     SUM(quantity_counted - quantity_on_hand) AS quantity_variance
 FROM cycle_count_item_final_count
 GROUP BY cycle_count_id, facility_id, product_id;

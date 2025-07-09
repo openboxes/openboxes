@@ -1240,10 +1240,10 @@ class ReportService implements ApplicationContextAware {
             eq('facility', command.facility)
 
             if (command.startDate) {
-                ge("lastUpdated", command.startDate)
+                ge("transactionDate", command.startDate)
             }
             if (command.endDate) {
-                le("lastUpdated", command.endDate)
+                le("transactionDate", command.endDate)
             }
         }
 
