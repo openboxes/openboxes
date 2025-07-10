@@ -67,6 +67,9 @@ enum ActivityCode {
     // Receiving
     PARTIAL_RECEIVING('PARTIAL_RECEIVING'),
 
+    // Auto receiving
+    AUTO_RECEIVING('AUTO_RECEIVING'),
+
     // Accounting (Budget Code, GL Account)
     REQUIRE_ACCOUNTING('REQUIRE_ACCOUNTING'),
 
@@ -135,6 +138,7 @@ enum ActivityCode {
                 ENABLE_NOTIFICATIONS,
                 DYNAMIC_RECEIVING,
                 PARTIAL_RECEIVING,
+                AUTO_RECEIVING,
                 DYNAMIC_SLOTTING,
                 STATIC_SLOTTING,
                 ENABLE_WEBHOOKS,
