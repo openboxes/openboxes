@@ -43,6 +43,9 @@ const useTableDataV2 = ({
   }));
 
   const fetchData = () => {
+    if (sourceRef.current) {
+      sourceRef.current.cancel('Cancelled due to new request');
+    }
     // Each time we fetch, we want to 'reset' the token/signal
     sourceRef.current = CancelToken.source();
     const params = getParams({
