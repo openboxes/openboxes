@@ -532,6 +532,12 @@ openboxes:
             enabled: true
             cronExpression: "0 */5 * * * ?"     # every five minutes
 
+        automaticReceiptJob:
+            enabled: true
+            cronExpression: "0 */5 * * * ?"     # every five minutes
+            delayInMilliseconds: 1000
+            bulkShipmentAutoReceipt: true
+
     # LDAP configuration
     ldap:
         enabled: false

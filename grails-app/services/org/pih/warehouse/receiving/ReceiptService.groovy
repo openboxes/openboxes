@@ -270,6 +270,8 @@ class ReceiptService {
             }
         }
 
+        partialReceipt.receipt = receipt
+
         // Save shipment
         shipment.save()
     }
@@ -489,5 +491,36 @@ class ReceiptService {
         }
 
         return null
+    }
+
+    void createAutomaticReceipt(Shipment shipment) {
+        PartialReceipt partialReceipt = getPartialReceipt(shipment.id, "1")
+        partialReceipt.dateShipped = shipment.expectedShippingDate
+
+        def receivingBin = createTemporaryReceivingBin(shipment)
+        shipment.shipmentItems.each { ShipmentItem item ->
+            PartialReceiptContainer partialReceiptContainer =
+                    partialReceipt.findDefaultPartialReceiptContainer()
+            if (!partialReceiptContainer) {
+                partialReceiptContainer = new PartialReceiptContainer()
+                partialReceipt.partialReceiptContainers.add(partialReceiptContainer)
+            }
+
+            PartialReceiptItem partialReceiptItem = partialReceiptContainer.partialReceiptItems.find {
+                it?.shipmentItem?.id == item.id
+            }
+
+            if (!partialReceiptItem) {
+                partialReceiptItem = new PartialReceiptItem()
+            }
+
+            partialReceiptItem.quantityReceiving = item.quantityRemaining
+            partialReceiptItem.binLocation = receivingBin
+            partialReceiptItem.product = item.product
+            partialReceiptItem.shouldSave = item.quantity != null
+            partialReceiptContainer.partialReceiptItems.add(partialReceiptItem)
+        }
+
+        saveAndCompletePartialReceipt(partialReceipt)
     }
 }
