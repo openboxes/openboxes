@@ -3,6 +3,7 @@ package org.pih.warehouse.jobs
 import grails.util.Holders
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.receiving.ReceiptStatusCode
 import org.pih.warehouse.shipping.Shipment
 import org.quartz.JobExecutionContext
 
@@ -44,6 +45,11 @@ class AutomaticReceiptJob {
                     return
                 }
 
+                if (hasPendingReceipt(shipment)) {
+                    log.debug "Shipment ${shipmentId} has a pending receipt"
+                    return
+                }
+
                 log.info("Creating automatic receipt for shipment ${shipmentId}")
                 receiptService.createAutomaticReceipt(shipment)
             } catch (Exception e) {
@@ -58,11 +64,23 @@ class AutomaticReceiptJob {
             autoReceivingLocations.each {
                 List<Shipment> shippedShipments = shipmentService.getShippedShipmentsByDestination(it)
                 shippedShipments.each {
-                    if (!it.isFullyReceived()) {
-                        receiptService.createAutomaticReceipt(it)
+                    if (it.isFullyReceived()) {
+                        log.debug("Shipment ${it.id} already fully received")
+                        return
                     }
+
+                    if (hasPendingReceipt(it)) {
+                        log.debug "Shipment ${it.id} has a pending receipt"
+                        return
+                    }
+
+                    receiptService.createAutomaticReceipt(it)
                 }
             }
         }
+    }
+
+    private static boolean hasPendingReceipt(Shipment shipment) {
+        shipment.receipts.any { it.receiptStatusCode == ReceiptStatusCode.PENDING }
     }
 }

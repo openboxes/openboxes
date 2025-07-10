@@ -497,7 +497,7 @@ class ReceiptService {
         partialReceipt.dateShipped = shipment.expectedShippingDate
 
         def receivingBin = createTemporaryReceivingBin(shipment)
-        shipment.shipmentItems.each { item ->
+        shipment.shipmentItems.each { ShipmentItem item ->
             PartialReceiptContainer partialReceiptContainer =
                     partialReceipt.findDefaultPartialReceiptContainer()
             if (!partialReceiptContainer) {
@@ -513,7 +513,7 @@ class ReceiptService {
                 partialReceiptItem = new PartialReceiptItem()
             }
 
-            partialReceiptItem.quantityReceiving = item.quantity
+            partialReceiptItem.quantityReceiving = item.quantityRemaining
             partialReceiptItem.binLocation = receivingBin
             partialReceiptItem.product = item.product
             partialReceiptItem.shouldSave = item.quantity != null
