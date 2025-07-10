@@ -88,10 +88,10 @@ class Constants {
 
     // these are direct references to transaction types by primary key
     static final String CONSUMPTION_TRANSACTION_TYPE_ID = "2"
-    // Deprecated - This transaction type should not be used to create new transactions
     static final String ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID = "3"
     static final String EXPIRATION_TRANSACTION_TYPE_ID = "4"
     static final String DAMAGE_TRANSACTION_TYPE_ID = "5"
+    // Deprecated - This transaction type should not be used to create new transactions
     static final String INVENTORY_TRANSACTION_TYPE_ID = "7"
     static final String TRANSFER_IN_TRANSACTION_TYPE_ID = "8"
     static final String TRANSFER_OUT_TRANSACTION_TYPE_ID = "9"

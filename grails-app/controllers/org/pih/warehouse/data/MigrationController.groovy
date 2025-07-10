@@ -379,7 +379,8 @@ class MigrationController {
         Map results = migrationService.migrateProductInventoryTransactions(location, performMigration)
 
         long responseTime = System.currentTimeMillis() - startTime
-        String responseTimeMessage = "${performMigration ? 'Migration' : 'Generating preview'} took ${(responseTime)} ms"
+        String responseTimeMessage = "${performMigration ? 'Migration' : 'Generating preview'} of product inventory " +
+                "transactions at location ${location.name} took ${(responseTime)} ms"
         log.info "$responseTimeMessage"
 
         render([responseTime: "$responseTimeMessage", results: results] as JSON)

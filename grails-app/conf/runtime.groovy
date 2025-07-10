@@ -90,16 +90,6 @@ openboxes.products.merge.enabled = false
 // Cycle Count configuration (OBPIH-7033)
 openboxes.cycleCount.products.maxAmount = 50
 
-// Inventory baseline transaction configuration (OBPIH-7194, OBPIH-7195)
-openboxes.transactions.inventoryBaseline.recordStock.enabled = true
-openboxes.transactions.inventoryBaseline.inventoryImport.enabled = true
-
-// Inventory snapshot configuration (OBPIH-7254)
-openboxes.transactions.inventoryBaseline.loadDemoData.enabled = true
-
-// Inventory snapshot configuration (OBPIH-7198)
-openboxes.transactions.inventoryBaseline.migration.enabled = true
-
 openboxes.security.rbac.rules = [
     [controller: '*', actions: ['delete'], accessRules: [ minimumRequiredRole: RoleType.ROLE_SUPERUSER ]],
     [controller: '*', actions: ['remove'], accessRules: [ minimumRequiredRole: RoleType.ROLE_SUPERUSER ]],

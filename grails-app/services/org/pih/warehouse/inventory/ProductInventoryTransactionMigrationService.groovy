@@ -15,7 +15,7 @@ class ProductInventoryTransactionMigrationService extends ProductInventoryTransa
 
     @Override
     void setSourceObject(Transaction transaction, ImportDataCommand sourceObject) {
-        // Inventory Import has no source object.
+        // Transaction migration has no source object.
     }
 
     @Override

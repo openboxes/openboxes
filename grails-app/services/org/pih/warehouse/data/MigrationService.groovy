@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.data
 
+import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import groovy.sql.Sql
@@ -49,6 +50,7 @@ class MigrationService {
     ProductInventoryTransactionMigrationService productInventoryTransactionMigrationService
     def persistenceInterceptor
     def dataSource
+    GrailsApplication grailsApplication
 
     def getStockMovementsWithoutShipmentItems() {
         String query = """
@@ -404,7 +406,7 @@ class MigrationService {
 
         // 1. Find all transactions with the old Product Inventory type (by PRODUCT_INVENTORY_TRANSACTION_TYPE_ID)
         TransactionType oldProductInventoryType = TransactionType.get(Constants.PRODUCT_INVENTORY_TRANSACTION_TYPE_ID)
-        List transactions = Transaction.findAllByInventoryAndTransactionType(location.inventory, oldProductInventoryType)?.sort { it.transactionDate}
+        List<Transaction> transactions = Transaction.findAllByInventoryAndTransactionType(location.inventory, oldProductInventoryType)?.sort { it.transactionDate}
 
 
         Map<String, List<String>> results = [:]
@@ -436,54 +438,46 @@ class MigrationService {
                 Map<String, AvailableItem> availableItems = productAvailabilityService.getAvailableItemsAtDateAsMap(
                         location, currentTransactionProducts, it.transactionDate)
 
+                String newComment = "Migrated from single Product Inventory transaction to Baseline + Adjustment pair. " +
+                        "Old transaction number: ${it.transactionNumber}, " +
+                        "created by: ${it.createdBy.username}"
+                        "${it.comment ? ', comment: ' + it.comment : ''}"
+
+                // In case old comment is too long, truncate new comment to 255 characters
+                if (newComment.length() > 255) {
+                    newComment = newComment.substring(0, 255)
+                }
+
                 Transaction baselineTransaction = productInventoryTransactionMigrationService.createInventoryBaselineTransactionForGivenStock(
                         location,
                         null,
                         availableItems.values(),
                         it.transactionDate,
-                        "Migrated from single Product Inventory transaction to Baseline + Adjustment pair",
+                        newComment,
                         null,
                         // don't validate transaction date, there is old transaction at the same time, that will be removed
                         false,
                         true
                 )
                 if (baselineTransaction) {
-                    baselineTransaction.disableRefresh = true
-                    // Ugly workaround to omit auto-timestamping dateCreated
-                    // Needs to flush it first to be able to overwrite dateCreated
-                    baselineTransaction.save(flush: true)
-                    // Unfortunately, we need to use raw SQL to update the dateCreated field (otherwise it will be
-                    // auto-timestamped)
-                    def sql = new Sql(dataSource)
-                    sql.executeUpdate(
-                            """UPDATE transaction set date_created = ? WHERE id = ?""",
-                            [it.dateCreated, baselineTransaction.id]
-                    )
-
+                    changeDateCreatedOnTransaction(baselineTransaction, it.dateCreated)
                     recordMigrationResult(results, [baselineTransaction])
                 }
 
                 // 4. Create adjustment transactions for the old transaction that is being migrated
                 // Date objects are mutable, so we use Instant to clone the date in the command and avoid directly modifying it.
+                // FIXME Standardize the +1 second for adjustment transaction's transaction date, should be configurable
                 Date adjustmentTransactionDate = DateUtil.asDate(DateUtil.asInstant(it.transactionDate).plusSeconds(1))
                 Transaction adjustmentTransaction = createAdjustmentTransaction(
                         location,
                         it.transactionEntries,
                         availableItems,
                         adjustmentTransactionDate,
-                        "Migrated from single Product Inventory transaction to Baseline + Adjustment pair"
+                        newComment
                 )
-                // Ugly workaround to omit auto-timestamping dateCreated
-                if (adjustmentTransaction?.id) {
-                    Date adjustmentCreatedDate = DateUtil.asDate(DateUtil.asInstant(it.dateCreated).plusSeconds(1))
-                    // Unfortunately, we need to use raw SQL to update the dateCreated field (otherwise it will be
-                    // auto-timestamped)
-                    def sql = new Sql(dataSource)
-                    sql.executeUpdate(
-                            """UPDATE transaction set date_created = ? WHERE id = ?""",
-                            [adjustmentCreatedDate, adjustmentTransaction.id]
-                    )
-
+                if (adjustmentTransaction) {
+                    Date adjustmentDateCreated = DateUtil.asDate(DateUtil.asInstant(it.dateCreated).plusSeconds(1))
+                    changeDateCreatedOnTransaction(adjustmentTransaction, adjustmentDateCreated)
                     recordMigrationResult(results, [adjustmentTransaction])
                 }
 
@@ -493,8 +487,9 @@ class MigrationService {
             }
 
             // Zero out stock for products that were migrated but had no stock initially (hence hand no baseline created)
+            def cleanupAdjustmentEnabled = grailsApplication.config.openboxes.transactions.inventoryBaseline.migration.cleanupAdjustment
             List<Product> shouldBeZeroedOut = products - currentInventoryBaseline?.transactionEntries?.collect { it.inventoryItem.product }?.unique()
-            if (shouldBeZeroedOut) {
+            if (cleanupAdjustmentEnabled && shouldBeZeroedOut) {
                 log.debug("Check if there is need for 'zeroing out' adjustments for products that had no stock before migration")
 
                 Map<String, AvailableItem> availableItems = productAvailabilityService.getAvailableItemsAtDateAsMap(
@@ -839,7 +834,7 @@ class MigrationService {
         transaction.disableRefresh = true
 
         // Needs to be flushed here already, to be able to swap date created on that entry
-        if (!transaction.save(flush: true, failOnError: true)) {
+        if (!transaction.save()) {
             throw new ValidationException("Invalid transaction", transaction.errors)
         }
 
@@ -911,5 +906,26 @@ class MigrationService {
                         "${te.quantity.toString().padRight(10)}"
             }
         }
+    }
+
+
+    // FIXME Ugly workaround to omit auto-timestamping dateCreated, we cannot temporarily disable autotimestamping,
+    //  it's available starting at Grails 6
+    private void changeDateCreatedOnTransaction(Transaction transaction, Date date = new Date()) {
+        if (!transaction) {
+            return
+        }
+
+        // Needs to flush it first to be able to overwrite dateCreated
+        transaction.disableRefresh = true
+        transaction.save(flush: true)
+
+        // Unfortunately, we need to use raw SQL to update the dateCreated field (otherwise it will be
+        // auto-timestamped)
+        def sql = new Sql(dataSource)
+        sql.executeUpdate(
+                """UPDATE transaction set date_created = ? WHERE id = ?""",
+                [date, transaction.id]
+        )
     }
 }
