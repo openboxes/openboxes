@@ -24,7 +24,6 @@
                     <th><g:message code="location.binLocation.label" default="Bin Location"/></th>
                     <th><g:message code="location.zone.label"/></th>
                     <th><g:message code="location.locationType.label"/></th>
-                    <th><g:message code="location.zone.label"/></th>
                     <th><g:message code="default.actions.label"></g:message></th>
                 </tr>
                 </thead>
