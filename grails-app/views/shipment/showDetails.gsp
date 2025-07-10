@@ -50,6 +50,16 @@
 									<format:metadata obj="${shipmentInstance?.currentStatus}"/>
 								</td>
 							</tr>
+                            <g:if test="${shipmentInstance?.isFromPurchaseOrder}">
+                                <tr class="prop">
+                                    <td valign="top" class="name">
+                                        <label><warehouse:message code="shipping.originCode.label" /></label>
+                                    </td>
+                                    <td valign="top" id="shipmentStatus" class="value">
+                                        <format:metadata obj="${shipmentInstance?.origin?.organization?.code}"/>
+                                    </td>
+                                </tr>
+                            </g:if>
 							<tr class="prop">
 								<td valign="top" class="name">
 									<g:if test="${shipmentInstance?.status.code in [org.pih.warehouse.shipping.ShipmentStatusCode.SHIPPED, org.pih.warehouse.shipping.ShipmentStatusCode.RECEIVED]}">
