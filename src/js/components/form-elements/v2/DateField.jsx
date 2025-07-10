@@ -3,6 +3,8 @@ import React, { useRef } from 'react';
 import moment from 'moment';
 import PropTypes from 'prop-types';
 import DatePicker from 'react-datepicker';
+import { useSelector } from 'react-redux';
+import { getCurrentLocale } from 'selectors';
 
 import DateFieldInput from 'components/form-elements/v2/DateFieldInput';
 import componentType from 'consts/componentType';
@@ -44,6 +46,9 @@ const DateField = ({
     }
     onChange(date?.format(DateFormat.MMM_DD_YYYY));
   };
+  const { locale } = useSelector((state) => ({
+    locale: getCurrentLocale(state),
+  }));
 
   const formatDate = (dateToFormat) => {
     if (!dateToFormat) {
@@ -86,6 +91,9 @@ const DateField = ({
     >
       <DatePicker
         {...fieldProps}
+        // Temporary workaround: using 'ar' locale causes the app to crash when selecting a date.
+        // Fallback to 'en' to avoid the crash
+        locale={locale === 'ar' ? 'en' : locale}
         showTimeSelect={showTimeSelect}
         customInput={<DateFieldInput onClear={onClear} clearable={clearable} />}
         className={`form-element-input ${errorMessage ? 'has-errors' : ''} ${className}`}

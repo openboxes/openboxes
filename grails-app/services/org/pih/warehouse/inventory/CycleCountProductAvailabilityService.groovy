@@ -38,9 +38,9 @@ class CycleCountProductAvailabilityService {
      *
      * @return CycleCountItemsForRefresh the items that were created, updated, and deleted as a result of the refresh.
      */
-    CycleCountItemsForRefresh refreshProductAvailability(CycleCount cycleCount) {
+    CycleCountItemsForRefresh refreshProductAvailability(CycleCount cycleCount, boolean removeOutOfStockItemsImplicitly = false, Integer countIndex = null) {
 
-        CycleCountRefreshState refreshState = new CycleCountRefreshState(cycleCount)
+        CycleCountRefreshState refreshState = new CycleCountRefreshState(cycleCount, countIndex)
 
         // The refresh is based on the current product availability in all [product + bin location + lot] combinations
         // of the count. We need to fetch all available items (instead of simply looping the cycle count items) because
@@ -53,12 +53,14 @@ class CycleCountProductAvailabilityService {
         }
 
         // Additionally, we need to remove any cycle count items for bins or lots that have been deleted.
-        for (CycleCountItem cycleCountItem : refreshState.itemsOfMostRecentCount) {
-            updateRefreshStateIfItemDeleted(refreshState, availableItems, cycleCountItem)
+        for (CycleCountItem cycleCountItem : refreshState.items) {
+            updateRefreshStateIfItemDeleted(refreshState, availableItems, cycleCountItem, removeOutOfStockItemsImplicitly)
         }
 
         // Now that we've computed the changes that need to be made, persist them to the cycle count items
         updateCycleCountItems(refreshState)
+
+        cycleCount.status = cycleCount.recomputeStatus()
 
         return refreshState.cycleCountItemsForRefresh
     }
@@ -70,7 +72,7 @@ class CycleCountProductAvailabilityService {
      */
     private void updateRefreshStateForItem(CycleCountRefreshState refreshState, AvailableItem availableItem) {
 
-        CycleCountItem existingCycleCountItem = refreshState.itemsOfMostRecentCount.find{
+        CycleCountItem existingCycleCountItem = refreshState.items.find{
                     it.inventoryItem == availableItem.inventoryItem &&
                     it.location == availableItem.binLocation }
 
@@ -103,7 +105,9 @@ class CycleCountProductAvailabilityService {
      * The cycle count items themselves are NOT updated at this point, only the refresh state object.
      */
     private void updateRefreshStateIfItemDeleted(CycleCountRefreshState refreshState,
-                                                 List<AvailableItem> availableItems, CycleCountItem cycleCountItem) {
+                                                 List<AvailableItem> availableItems,
+                                                 CycleCountItem cycleCountItem,
+                                                 boolean removeOutOfStockItemsImplicitly) {
 
         // If the available item exists, there's nothing to do.
         AvailableItem availableItem = availableItems.find{
@@ -124,7 +128,7 @@ class CycleCountProductAvailabilityService {
                     it.inventoryItem == cycleCountItem.inventoryItem &&
                     it.custom
         }
-        if (!wasItemEverCustomAdded) {
+        if (!wasItemEverCustomAdded && (cycleCountItem.quantityCounted <= 0 || removeOutOfStockItemsImplicitly)) {
             refreshState.addItemToDelete(cycleCountItem)
             return
         }
@@ -191,7 +195,7 @@ class CycleCountProductAvailabilityService {
         CycleCount cycleCount
 
         // Computed fields
-        Set<CycleCountItem> itemsOfMostRecentCount
+        Set<CycleCountItem> items
         int currentCountIndex
         Person assigneeForNewItems
         Date dateCountedForNewItems
@@ -200,18 +204,20 @@ class CycleCountProductAvailabilityService {
         // Output fields
         CycleCountItemsForRefresh cycleCountItemsForRefresh
 
-        CycleCountRefreshState(CycleCount cycleCount) {
+        CycleCountRefreshState(CycleCount cycleCount, Integer countIndex) {
             this.cycleCount = cycleCount
 
             // We only want to refresh the items of the most recent count. We do this because previous counts are
-            // already completed, so their data should be considered static.
-            itemsOfMostRecentCount = cycleCount.getItemsOfMostRecentCount()
-            currentCountIndex = itemsOfMostRecentCount.first().countIndex
+            // already completed, so their data should be considered static. We allow countIndex to be specified
+            // for the case where the current count index has no items (QoH has been zeroed out for all items)
+            // and so we can't assume currentCountIndex == maxCountIndex.
+            items = countIndex != null ? cycleCount.getItemsOfSpecificCount(countIndex) : cycleCount.getItemsOfMostRecentCount()
+            currentCountIndex = countIndex ?: items.first().countIndex
 
             // Used by newly created items. We know that the frontend only supports a single assignee and date counted
             // for all items of a count, so for convenience we set the values of any new items to match.
-            assigneeForNewItems = itemsOfMostRecentCount.find{ it.assignee }?.assignee
-            dateCountedForNewItems = itemsOfMostRecentCount.find{ it.dateCounted }?.dateCounted ?: new Date()
+            assigneeForNewItems = items.find{ it.assignee }?.assignee
+            dateCountedForNewItems = items.find{ it.dateCounted }?.dateCounted ?: new Date()
 
             // This logic is shared between count and recount flows so we need to check which we're in.
             statusForNewItems = cycleCount.status.isCounting() ?

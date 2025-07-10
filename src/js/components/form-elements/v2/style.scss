@@ -282,4 +282,42 @@ input, .date-field-input {
       background-color: #ffffff;
     }
   }
+
+  &:disabled {
+    cursor: not-allowed;
+    border-color: var(--gray-300);
+
+    &:checked {
+      background-color: var(--gray-300);
+    }
+  }
+
+  &.cancel-icon {
+    position: relative;
+    background-color: var(--color-red);
+    border-color: var(--color-red);
+    cursor: pointer;
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(45deg);
+      width: 10px;
+      height: 2px;
+      background-color: white !important;
+    }
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(-45deg);
+      width: 10px;
+      height: 2px;
+      background-color: white !important;
+    }
+  }
 }

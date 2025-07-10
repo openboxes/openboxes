@@ -2,10 +2,10 @@ import React from 'react';
 
 import PropTypes from 'prop-types';
 import { RiAddCircleLine } from 'react-icons/all';
-import { RiErrorWarningLine } from 'react-icons/ri';
 import { useSelector } from 'react-redux';
 import { Tooltip } from 'react-tippy';
 
+import CycleCountStockDiscrepancyInfoBar from 'components/cycleCount/CycleCountStockDiscrepancyInfoBar';
 import HeaderLabel from 'components/cycleCount/HeaderLabel';
 import HeaderSelect from 'components/cycleCount/HeaderSelect';
 import DataTable from 'components/DataTable/v2/DataTable';
@@ -35,10 +35,11 @@ const ResolveStepTable = ({
   setRecountedDate,
   validationErrors,
   shouldHaveRootCause,
-  isFormValid,
   isStepEditable,
   triggerValidation,
   refreshFocusCounter,
+  cycleCountWithItemsWithoutRecount,
+  isFormDisabled,
 }) => {
   const {
     columns,
@@ -55,9 +56,15 @@ const ResolveStepTable = ({
     addEmptyRow,
     refreshFocusCounter,
     triggerValidation,
+    isFormDisabled,
   });
 
   const translate = useTranslate();
+
+  const emptyTableMessage = {
+    id: 'react.cycleCount.table.noInventoryItem.label',
+    defaultMessage: 'No inventory item in stock for this product',
+  };
 
   const defaultRecountedByMeta = recountedBy ? {
     id: recountedBy.id,
@@ -72,16 +79,14 @@ const ResolveStepTable = ({
     formatLocalizedDate: formatDate(state.localize),
   }));
 
-  const showRecountedByErrorMessage = () => {
-    if (isFormValid === null) {
-      return null;
-    }
-
-    return recountedBy?.id ? null : true;
-  };
+  const outOfStockItems = cycleCountWithItemsWithoutRecount
+    .cycleCountItems
+    .filter((item) => item.quantityOnHand === 0);
 
   return (
     <div className="list-page-list-section">
+      {outOfStockItems.length > 0
+        && <CycleCountStockDiscrepancyInfoBar outOfStockItems={outOfStockItems} />}
       <p className="count-step-title pt-4 pl-4">
         {product?.productCode}
         {' '}
@@ -111,6 +116,7 @@ const ResolveStepTable = ({
                 customDateFormat={DateFormat.DD_MMM_YYYY}
                 clearable={false}
                 hideErrorMessageWrapper
+                disabled={isFormDisabled}
               />
             </HeaderSelect>
           ) : (
@@ -126,25 +132,17 @@ const ResolveStepTable = ({
             >
               <CustomTooltip
                 content={recountedBy?.label || translate('react.cycleCount.recountedBy.label', 'Recounted by')}
-                show={!showRecountedByErrorMessage()}
               >
                 <div className="position-relative">
                   <SelectField
-                    errorMessage={showRecountedByErrorMessage()}
                     placeholder="Select"
                     options={users}
                     onChange={assignRecountedBy(id)}
                     defaultValue={defaultRecountedByMeta}
                     hideErrorMessageWrapper
-                    className={`min-width-250 ${showRecountedByErrorMessage() && 'input-has-error'}`}
+                    className="min-width-250"
+                    disabled={isFormDisabled}
                   />
-                  {showRecountedByErrorMessage() && (
-                    <CustomTooltip
-                      content={translate('react.cycleCount.requiredField', 'This field is required')}
-                      className="tooltip-icon tooltip-icon--error tooltip-icon--top-60"
-                      icon={RiErrorWarningLine}
-                    />
-                  )}
                 </div>
               </CustomTooltip>
             </HeaderSelect>
@@ -165,6 +163,7 @@ const ResolveStepTable = ({
           defaultColumn={defaultColumn}
           meta={tableMeta}
           filterParams={{}}
+          emptyTableMessage={emptyTableMessage}
           disablePagination
         />
       </div>
@@ -188,6 +187,7 @@ const ResolveStepTable = ({
             defaultLabel="Add new record"
             variant="transparent"
             StartIcon={<RiAddCircleLine size={18} />}
+            disabled={isFormDisabled}
           />
         </Tooltip>
         )}
@@ -211,7 +211,7 @@ ResolveStepTable.propTypes = {
   dateCounted: PropTypes.string.isRequired,
   tableData: PropTypes.arrayOf(
     PropTypes.shape({}),
-  ).isRequired,
+  ),
   tableMeta: PropTypes.shape({
     updateData: PropTypes.func.isRequired,
   }).isRequired,
@@ -222,7 +222,17 @@ ResolveStepTable.propTypes = {
   setRecountedDate: PropTypes.func.isRequired,
   shouldHaveRootCause: PropTypes.func.isRequired,
   isStepEditable: PropTypes.bool.isRequired,
-  isFormValid: PropTypes.bool.isRequired,
   refreshFocusCounter: PropTypes.number.isRequired,
   triggerValidation: PropTypes.func.isRequired,
+  cycleCountWithItemsWithoutRecount: PropTypes.shape({
+    cycleCountItems: PropTypes.arrayOf(PropTypes.shape({})),
+  }),
+  isFormDisabled: PropTypes.bool.isRequired,
+};
+
+ResolveStepTable.defaultProps = {
+  tableData: [],
+  cycleCountWithItemsWithoutRecount: {
+    cycleCountItems: [],
+  },
 };

@@ -14,8 +14,18 @@
           type="text/css" media="all"/>
     <link rel="stylesheet" href="${resource(dir:'css',file:'buttons.css')}" type="text/css" media="all" />
 
+    <style>
+    @page {
+        @bottom-center {
+            content: "Page " counter(page) " of " counter(pages);
+            font-size: 12px;
+            font-family: sans-serif;
+        }
+    }
+    </style>
 </head>
 <body>
+
 <div id="print-header">
     <div class="right button-container">
         <g:select id="select-page-break" name="pageBreak" from="['', 'Disable page break', 'Enable page break']" value="${params.pageBreak}" />

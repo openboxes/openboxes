@@ -567,9 +567,9 @@ export function fetchBuyers(active = false) {
   };
 }
 
-export const fetchBinLocations = (currentLocationId, ignoreActivityCodes = []) =>
+export const fetchBinLocations = (currentLocationId, ignoreActivityCodes = [], sort = null) =>
   async (dispatch) => {
-    const fetchedBins = await fetchBins(currentLocationId, ignoreActivityCodes);
+    const fetchedBins = await fetchBins(currentLocationId, ignoreActivityCodes, sort);
     dispatch({
       type: FETCH_BIN_LOCATIONS,
       payload: fetchedBins,
@@ -776,7 +776,10 @@ export const startCount = (payload, locationId) => async (dispatch) => {
   const cycleCountIds = cycleCounts?.data?.data?.map?.((cycleCount) => cycleCount.id);
   return dispatch({
     type: START_COUNT,
-    payload: cycleCountIds,
+    payload: {
+      locationId,
+      requests: cycleCountIds,
+    },
   });
 };
 
@@ -794,10 +797,14 @@ export const startResolution = (requestIds, locationId) => async (dispatch) => {
   const cycleCountIds = cycleCounts?.data?.data?.map?.((cycleCount) => cycleCount.id);
   return dispatch({
     type: START_RESOLUTION,
-    payload: cycleCountIds,
+    payload: {
+      locationId,
+      cycleCounts: cycleCountIds,
+    },
   });
 };
 
-export const eraseDraft = () => ({
+export const eraseDraft = (locationId, tab) => ({
   type: ERASE_DRAFT,
+  payload: { locationId, tab },
 });

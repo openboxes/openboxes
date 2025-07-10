@@ -11,12 +11,11 @@ import org.pih.warehouse.inventory.CycleCount
 import org.pih.warehouse.inventory.CycleCountItem
 import org.pih.warehouse.inventory.CycleCountItemStatus
 import org.pih.warehouse.inventory.CycleCountProductAvailabilityService
+import org.pih.warehouse.inventory.CycleCountProductInventoryTransactionService
 import org.pih.warehouse.inventory.CycleCountTransactionService
 import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.ProductAvailabilityService
-import org.pih.warehouse.inventory.ProductInventorySnapshotSource
-import org.pih.warehouse.inventory.ProductInventoryTransactionService
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.inventory.TransactionIdentifierService
@@ -36,7 +35,7 @@ class CycleCountTransactionServiceSpec extends Specification implements DataTest
     ProductAvailabilityService productAvailabilityServiceStub
 
     @Shared
-    ProductInventoryTransactionService productInventoryTransactionServiceStub
+    CycleCountProductInventoryTransactionService cycleCountProductInventoryTransactionServiceStub
 
     @Shared
     TransactionIdentifierService transactionIdentifierServiceStub
@@ -60,8 +59,8 @@ class CycleCountTransactionServiceSpec extends Specification implements DataTest
         cycleCountProductAvailabilityServiceStub.refreshProductAvailability(_ as CycleCount) >>
                 new CycleCountProductAvailabilityService.CycleCountItemsForRefresh()
 
-        productInventoryTransactionServiceStub = Stub(ProductInventoryTransactionService)
-        cycleCountTransactionService.productInventoryTransactionService = productInventoryTransactionServiceStub
+        cycleCountProductInventoryTransactionServiceStub = Stub(CycleCountProductInventoryTransactionService)
+        cycleCountTransactionService.cycleCountProductInventoryTransactionService = cycleCountProductInventoryTransactionServiceStub
 
         productAvailabilityServiceStub = Stub(ProductAvailabilityService)
         cycleCountTransactionService.productAvailabilityService = productAvailabilityServiceStub
@@ -102,7 +101,7 @@ class CycleCountTransactionServiceSpec extends Specification implements DataTest
         )
 
         and: 'a mocked product inventory transaction'
-        createExpectedProductInventoryTransaction(facility, product, date)
+        createExpectedProductInventoryTransaction(facility, product, cycleCount, date)
 
         when:
         List<Transaction> transactions = cycleCountTransactionService.createTransactions(cycleCount, true)
@@ -147,8 +146,8 @@ class CycleCountTransactionServiceSpec extends Specification implements DataTest
         )
 
         and: 'mocked product inventory transactions'
-        createExpectedProductInventoryTransaction(facility, product1, date)
-        createExpectedProductInventoryTransaction(facility, product2, date)
+        createExpectedProductInventoryTransaction(facility, product1, cycleCount, date)
+        createExpectedProductInventoryTransaction(facility, product2, cycleCount, date)
 
         when:
         List<Transaction> transactions = cycleCountTransactionService.createTransactions(cycleCount, true)
@@ -205,7 +204,7 @@ class CycleCountTransactionServiceSpec extends Specification implements DataTest
         transactionIdentifierServiceStub.generate(_ as Transaction) >> "123ABC"
 
         and: 'a mocked product inventory transaction'
-        createExpectedProductInventoryTransaction(facility, product, date)
+        createExpectedProductInventoryTransaction(facility, product, cycleCount, date)
 
         when:
         List<Transaction> transactions = cycleCountTransactionService.createTransactions(cycleCount, true)
@@ -219,7 +218,6 @@ class CycleCountTransactionServiceSpec extends Specification implements DataTest
         Transaction adjustmentTransaction = transactions.find{ it.transactionType == adjustmentTransactionType }
         assert adjustmentTransaction != null
         assert adjustmentTransaction.transactionNumber == "123ABC"
-        assert adjustmentTransaction.source == facility
         assert adjustmentTransaction.inventory == facility.inventory
         assert adjustmentTransaction.cycleCount == cycleCount
         // The order of the transactions matters! The adjustment should always be applied after the product inventory.
@@ -242,14 +240,16 @@ class CycleCountTransactionServiceSpec extends Specification implements DataTest
         assert positiveTransactionEntry.quantity == 3
     }
 
-    private Transaction createExpectedProductInventoryTransaction(Location facility, Product product, Date date) {
+    private Transaction createExpectedProductInventoryTransaction(
+            Location facility, Product product, CycleCount cycleCount, Date date) {
+
         // This is mocked data so we don't really care about any of the other fields, not even the transaction entries.
         Transaction transaction = new Transaction(
                 transactionType: productInventoryTransactionType,
         )
 
-        productInventoryTransactionServiceStub.createTransaction(
-                facility, product, ProductInventorySnapshotSource.CYCLE_COUNT, date) >> transaction
+        cycleCountProductInventoryTransactionServiceStub.createInventoryBaselineTransaction(
+                facility, cycleCount, [product], date) >> transaction
 
         return transaction
     }

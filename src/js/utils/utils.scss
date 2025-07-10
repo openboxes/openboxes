@@ -3,6 +3,7 @@
   min-width: 600px;
   box-shadow: 0 0 4px 0 #00000040;
   padding: 20px;
+  max-width: 1200px;
 
   div {
     gap: 15px;
@@ -92,6 +93,13 @@
   flex-wrap: wrap;
   align-items: flex-start;
   gap: 2px;
+
+  &.disabled {
+    .badge {
+      background-color: var(--gray-200);
+      color: var(--gray-350);
+    }
+  }
 
   .badge {
     padding: 4px 10px;

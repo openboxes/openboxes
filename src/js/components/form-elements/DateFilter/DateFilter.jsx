@@ -16,8 +16,15 @@ import 'components/form-elements/DateFilter/DateFilter.scss';
 
 const CustomInput = React.forwardRef((props, ref) => {
   const {
-    onClick, title, value, placeholder, onClear, defaultMessage, formatDateToDisplay,
+    onClick,
+    title,
+    value,
+    placeholder,
+    onClear,
+    defaultMessage,
+    formatDateToDisplay,
   } = props;
+
   const onKeypressHandler = (event) => {
     if (event.key === 'Enter') onClick();
   };
@@ -60,7 +67,6 @@ const DateFilter = (props) => {
     formatLocalizedDate: formatDate(state.localize),
   }));
   const [isFocused, setIsFocused] = useState(false);
-
   const onChangeHandler = (date) => onChange(date.format(dateFormat));
 
   const onClear = (e) => {
@@ -91,7 +97,6 @@ const DateFilter = (props) => {
   const highlightedDates = [selectedDate || moment(new Date(), dateFormat)];
 
   const localeCodeToDisplay = localizeDate ? localeCode : null;
-
   return (
     <div className={`date-picker__wrapper ${isFocusedClass} ${isValidClass}`} data-testid="date-filter">
       <DatePicker

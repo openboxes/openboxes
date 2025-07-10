@@ -273,4 +273,52 @@ class CycleCountSpec extends Specification implements DomainUnitTest<CycleCount>
         expect:
         assert cycleCount.recomputeStatus() == CycleCountStatus.COMPLETED
     }
+
+    void 'getMaxCountIndex should return #maxCountIndex when there are items with #countIndexes count indexes'() {
+        given:
+        Set<CycleCountItem> cycleCountItems = new TreeSet<>()
+        for (int countIndex : countIndexes) {
+            CycleCountItem item = new CycleCountItem(
+                    countIndex: countIndex,
+                    location: new Location(),
+                    status: CycleCountItemStatus.APPROVED
+            )
+            item.id = 1
+            cycleCountItems.add(item)
+        }
+        CycleCount cycleCount = new CycleCount(cycleCountItems: cycleCountItems)
+
+        expect:
+        cycleCount.maxCountIndex == maxCountIndex
+
+        where:
+        countIndexes || maxCountIndex
+        [0, 1]       || 1
+        [0, 1, 0]    || 1
+        [1, 11, 49]  || 49
+        null         || null
+    }
+
+    void 'getItemsOfMostRecountCount should return #numberOfItems items with the highest count index: #highestCountIndex when there #countIndexes count indexes'() {
+        given:
+        Set<CycleCountItem> cycleCountItems = new TreeSet<>()
+        for (int countIndex : countIndexes) {
+            CycleCountItem cycleCountItem = Spy(CycleCountItem)
+            cycleCountItem.countIndex = countIndex
+            cycleCountItems.add(cycleCountItem)
+        }
+        CycleCount cycleCount = Spy(CycleCount)
+        cycleCount.cycleCountItems = cycleCountItems
+
+        expect:
+        cycleCount.itemsOfMostRecentCount?.size() == numberOfItems
+        cycleCount.itemsOfMostRecentCount?.getAt(0)?.countIndex == highestCountIndex
+
+        where:
+        countIndexes  || highestCountIndex | numberOfItems
+        [0, 1, 0, 0]  || 1                 | 1
+        [1, 1, 1, 1]  || 1                 | 4
+        [49, 11, 49]  || 49                | 2
+        null          || null              | 0
+    }
 }

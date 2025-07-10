@@ -160,11 +160,8 @@ const FilterSelectField = (props) => {
   const renderInput = ({ className, ...attributes }) => {
     const [input, setInput] = useState('');
 
-    const handleInputChange = (value, action) => {
-      // only set the input when the action that caused the
-      // change equals to "input-change" and ignore the other
-      // ones like: "set-value", "input-blur", and "menu-close"
-      if (action.action === 'input-change') setInput(value);
+    const handleInputChange = (value) => {
+      setInput(value);
     };
 
     const handleKeyDown = (event) => {

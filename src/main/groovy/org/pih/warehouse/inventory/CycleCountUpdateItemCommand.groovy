@@ -8,6 +8,8 @@ import org.pih.warehouse.core.ReasonCode
 
 class CycleCountUpdateItemCommand implements Validateable {
 
+    String id
+
     boolean recount
 
     Integer quantityCounted
@@ -23,7 +25,7 @@ class CycleCountUpdateItemCommand implements Validateable {
     Date dateCounted
 
     def beforeValidate() {
-        String cycleCountItemId = RequestContextHolder.getRequestAttributes().params?.cycleCountItemId
+        String cycleCountItemId = RequestContextHolder.getRequestAttributes().params?.cycleCountItemId ?: id
         cycleCountItem = CycleCountItem.get(cycleCountItemId)
     }
 

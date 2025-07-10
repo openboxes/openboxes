@@ -5,7 +5,7 @@ SELECT
     CRC32(CONCAT(product_availability.location_id, product_availability.product_id)) as id,
 
     # Core properties
-    location.inventory_id                                                            as inventory_id,
+    facility.inventory_id                                                            as inventory_id,
     product_availability.product_id                                                  as product_id,
     product_availability.location_id                                                 as facility_id,
 
@@ -34,24 +34,27 @@ SELECT
     --  certain queries).
     MAX(cycle_count_request_summary.status)                                          as status,
 
+    -- Product fields
+    product.active                                                                   as product_active,
+
     # Inventory Item Count
     count(product_availability.id)                                                   as inventory_item_count,
 
-    # Comma-separated list of internal locations
+    -- A comma-separated list of internal locations in the format "<zone>: <bin location name>"
     GROUP_CONCAT(DISTINCT (
-        CASE
-            WHEN product_availability.quantity_on_hand != 0 THEN product_availability.bin_location_name
-            ELSE NULL
-            END
+        IF(
+            product_availability.quantity_on_hand != 0,
+            CONCAT_WS(': ', zone.name, product_availability.bin_location_name),
+            NULL
         )
-    )                                                                                as internal_locations,
+    ))                                                                                as internal_locations,
 
     # Quantities by SKU
     -- FIXME The sum could include both positive and negative quantities since we no longer exclude negative
     --  quantities in the main query. If we wanted to pull the sum for just on hand quantities we could do
     --  that via the on_hand_summary subquery JOIN.
     sum(product_availability.quantity_on_hand)                                       as quantity_on_hand,
-    sum(product_availability.quantity_available_to_promise)                          as quantity_available,
+    sum(product_availability.quantity_allocated)                                     as quantity_allocated,
 
     -- Negative item count
     SUM(CASE WHEN product_availability.quantity_on_hand < 0 THEN 1 ELSE 0 END)       as negative_item_count,
@@ -64,14 +67,17 @@ SELECT
     NULL                                                                             as date_latest_inventory
 
 FROM product_availability
-         JOIN location ON product_availability.location_id = location.id
+         JOIN location facility ON product_availability.location_id = facility.id
          JOIN product ON product_availability.product_id = product.id
+
+         LEFT OUTER JOIN location bin_location ON product_availability.bin_location_id = bin_location.id
+         LEFT OUTER JOIN location zone ON bin_location.zone_id = zone.id
 
     # FIXME need to add a unique constraint to prevent duplicate inventory levels for a single facility / product
     # Using min(abc_class) means we'll return the highest value if there are multiple inventory levels with different abc classes (A, B, C)
          LEFT OUTER JOIN product_classification
                          ON product_availability.product_id = product_classification.product_id AND
-                            location.inventory_id = product_classification.inventory_id
+                            facility.inventory_id = product_classification.inventory_id
 
     -- The following subquery pulls the latest cycle count request data
          LEFT OUTER JOIN (SELECT cycle_count_request.facility_id                          as facility_id,
@@ -97,9 +103,9 @@ FROM product_availability
                                  max(days_until_next_count) as days_until_next_count
                           FROM cycle_count_metadata
                           GROUP BY inventory_id, product_id) as cycle_count_metadata
-                         on cycle_count_metadata.inventory_id = location.inventory_id and
+                         on cycle_count_metadata.inventory_id = facility.inventory_id and
                             cycle_count_metadata.product_id = product_availability.product_id
 
-GROUP BY product_availability.location_id, product_availability.product_id, location.inventory_id
+GROUP BY product_availability.location_id, product_availability.product_id, facility.inventory_id
     );
 

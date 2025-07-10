@@ -546,7 +546,18 @@ class Product implements Comparable, Serializable {
 
 
     Date latestInventoryDate(String locationId) {
-        return latestTransactionDate(locationId, [TransactionCode.PRODUCT_INVENTORY])
+        /**
+         * After migrating from single product inventory transaction to baseline + adjustment transactions
+         * there is a case when we might have only an adjustment if it's first inventory record
+         * and we can't rely on CREDIT type code for this case and ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID
+         * is only used for baseline + adjustment and for manual stock adjustment
+         */
+        List<String> transactionTypeIds = [
+                Constants.ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID,
+                Constants.PRODUCT_INVENTORY_TRANSACTION_TYPE_ID,
+                Constants.INVENTORY_BASELINE_TRANSACTION_TYPE_ID
+        ]
+        return latestTransactionDate(locationId, transactionTypeIds)
     }
 
     Date earliestReceivingDate(String locationId) {
@@ -559,7 +570,7 @@ class Product implements Comparable, Serializable {
      * @param locationId
      * @return
      */
-    Date latestTransactionDate(String locationId, List<TransactionCode> transactionCodes) {
+    Date latestTransactionDate(String locationId, List<String> transactionTypeIds) {
         def inventory = Location.get(locationId).inventory
         def date = TransactionEntry.executeQuery("""
           select 
@@ -569,8 +580,8 @@ class Product implements Comparable, Serializable {
           left join te.transaction as t 
           where ii.product= :product 
           and t.inventory = :inventory 
-          and t.transactionType.transactionCode in (:transactionCodes)
-          """, [product: this, inventory: inventory, transactionCodes: transactionCodes]).first()
+          and t.transactionType.id in (:transactionTypeIds)
+          """, [product: this, inventory: inventory, transactionTypeIds: transactionTypeIds]).first()
         return date
     }
 

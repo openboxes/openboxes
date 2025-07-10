@@ -16,7 +16,7 @@ class CycleCountTransactionService {
 
     CycleCountProductAvailabilityService cycleCountProductAvailabilityService
     ProductAvailabilityService productAvailabilityService
-    ProductInventoryTransactionService productInventoryTransactionService
+    CycleCountProductInventoryTransactionService cycleCountProductInventoryTransactionService
     TransactionIdentifierService transactionIdentifierService
 
     /**
@@ -48,6 +48,13 @@ class CycleCountTransactionService {
         }
 
         return transactions
+    }
+
+    private static String buildRecountComment(CycleCountItem cycleCountItem) {
+        if (cycleCountItem.comment) {
+            return "${cycleCountItem.discrepancyReasonCode ? "[${cycleCountItem.discrepancyReasonCode}]" : ''} ${cycleCountItem.comment}"
+        }
+        return null
     }
 
     private Transaction createAdjustmentTransaction(
@@ -87,6 +94,7 @@ class CycleCountTransactionService {
                     binLocation: cycleCountItem.location,
                     inventoryItem: cycleCountItem.inventoryItem,
                     product: cycleCountItem.product,
+                    comments: buildRecountComment(cycleCountItem)
             )
             entries.add(transactionEntry)
         }
@@ -98,7 +106,6 @@ class CycleCountTransactionService {
         // Now that we know there is at least one discrepancy, create the transaction itself and map it to the entries.
         TransactionType transactionType = TransactionType.read(Constants.ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID)
         Transaction transaction = new Transaction(
-                source: cycleCount.facility,
                 inventory: cycleCount.facility.inventory,
                 transactionDate: transactionDate,
                 transactionType: transactionType,
@@ -119,19 +126,30 @@ class CycleCountTransactionService {
 
     private List<Transaction> createProductInventoryTransactions(CycleCount cycleCount, Date transactionDate) {
         List<Transaction> transactions = []
-
+        // We have to create a map keyed by inventoryItem and binLocation, because we further access it via AvailableItem properties
+        // and the inventoryItem + binLocation pair indicates the uniqueness in comparison with the CycleCountItem
+        Map<Map<String, Object>, String> commentsPerCycleCountItem = new HashMap<>()
+        cycleCount.cycleCountItems.each {
+            // We want to add a comment to product inventory transaction if we know,
+            // that no adjustment transaction would be created afterwards, that would contain the comment
+            if (it.comment && !it.quantityVariance) {
+                commentsPerCycleCountItem.put([inventoryItem: it.inventoryItem, binLocation: it.location], buildRecountComment(it))
+            }
+        }
         // A cycle count can count multiple products. Each product needs their own product inventory transaction.
         for (Product product : cycleCount.products) {
             // Creates a "snapshot style" product inventory transaction. We do this because we want any changes in
             // quantity to be represented by a separate adjustment transaction. It's important to note that the quantity
             // values for this transaction will be a pure copy of QoH in product availability, NOT the quantityOnHand of
             // the cycle count items.
-            Transaction transaction = productInventoryTransactionService.createTransaction(
+            Transaction transaction = cycleCountProductInventoryTransactionService.createInventoryBaselineTransaction(
                     cycleCount.facility,
-                    product,
-                    ProductInventorySnapshotSource.CYCLE_COUNT,
                     cycleCount,
-                    transactionDate)
+                    [product],
+                    transactionDate,
+                    null,
+                    commentsPerCycleCountItem
+                    )
 
             transactions.add(transaction)
         }

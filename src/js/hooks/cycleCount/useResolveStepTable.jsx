@@ -14,18 +14,16 @@ import { fetchReasonCodes } from 'actions';
 import { FETCH_CYCLE_COUNT_REASON_CODES } from 'actions/types';
 import { TableCell } from 'components/DataTable';
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
-import ArrowValueIndicator from 'components/DataTable/v2/ArrowValueIndicator';
+import ValueIndicator from 'components/DataTable/v2/ValueIndicator';
 import DateField from 'components/form-elements/v2/DateField';
 import SelectField from 'components/form-elements/v2/SelectField';
 import TextInput from 'components/form-elements/v2/TextInput';
-import ArrowValueIndicatorVariant, {
-  getCycleCountDifferencesVariant,
-} from 'consts/arrowValueIndicatorVariant';
 import cycleCountColumn from 'consts/cycleCountColumn';
 import { DateFormat } from 'consts/timeFormat';
+import valueIndicatorVariant, { getCycleCountDifferencesVariant } from 'consts/valueIndicatorVariant';
 import useArrowsNavigation from 'hooks/useArrowsNavigation';
 import useTranslate from 'hooks/useTranslate';
-import groupBinLocationsByZone from 'utils/groupBinLocationsByZone';
+import { getBinLocationToDisplay, groupBinLocationsByZone } from 'utils/groupBinLocationsByZone';
 import { checkBinLocationSupport } from 'utils/supportedActivitiesUtils';
 import { formatDate } from 'utils/translation-utils';
 import CustomTooltip from 'wrappers/CustomTooltip';
@@ -42,6 +40,7 @@ const useResolveStepTable = ({
   productId,
   addEmptyRow,
   refreshFocusCounter,
+  isFormDisabled,
 }) => {
   const columnHelper = createColumnHelper();
   const [rowIndex, setRowIndex] = useState(null);
@@ -114,11 +113,11 @@ const useResolveStepTable = ({
   };
 
   // Get field props, for the binLocation dropdown we have to pass options
-  const getFieldProps = (fieldName, hasTooltipIcon) => {
+  const getFieldProps = (fieldName, hasTooltipIcon, value, isFieldDisabled) => {
     if (fieldName === cycleCountColumn.BIN_LOCATION && showBinLocation) {
       return {
         labelKey: 'name',
-        options: groupBinLocationsByZone(binLocations),
+        options: groupBinLocationsByZone(binLocations, translate),
       };
     }
 
@@ -136,6 +135,12 @@ const useResolveStepTable = ({
     if (fieldName === cycleCountColumn.EXPIRATION_DATE) {
       return {
         customDateFormat: DateFormat.DD_MMM_YYYY,
+      };
+    }
+
+    if (fieldName === cycleCountColumn.LOT_NUMBER && isFieldDisabled) {
+      return {
+        placeholder: translate('react.cycleCount.emptyLotNumber.label', 'NO LOT'),
       };
     }
 
@@ -158,8 +163,10 @@ const useResolveStepTable = ({
     return null;
   };
 
-  // this function is required because there is a problem w getValue
-  const getValueToDisplay = (id, value) => {
+  /**
+   * Override the behaviour of getValue when displaying fields on the confirmation step.
+   */
+  const getNonEditableValueToDisplay = (id, value) => {
     if (id === cycleCountColumn.EXPIRATION_DATE) {
       return formatLocalizedDate(value, DateFormat.DD_MMM_YYYY);
     }
@@ -168,12 +175,23 @@ const useResolveStepTable = ({
       return value?.toString();
     }
 
-    if (id === cycleCountColumn.BIN_LOCATION) {
-      return value?.name;
+    if (id === cycleCountColumn.BIN_LOCATION && showBinLocation) {
+      return getBinLocationToDisplay(value);
     }
 
     if (id === cycleCountColumn.ROOT_CAUSE) {
       return value?.label;
+    }
+
+    return value;
+  };
+
+  /**
+   Override the behaviour of getValue when displaying fields on the count step.
+   */
+  const getValueToDisplay = (id, value) => {
+    if (id === cycleCountColumn.BIN_LOCATION && showBinLocation) {
+      return { ...value, name: getBinLocationToDisplay(value) };
     }
 
     return value;
@@ -188,7 +206,7 @@ const useResolveStepTable = ({
       // Keep and update the state of the cell during rerenders
       const [value, setValue] = useState(initialValue);
 
-      const isFieldEditable = !original.id.includes('newRow')
+      const isFieldDisabled = !original.id.includes('newRow')
         && ![
           cycleCountColumn.QUANTITY_RECOUNTED,
           cycleCountColumn.ROOT_CAUSE,
@@ -211,7 +229,7 @@ const useResolveStepTable = ({
               className="static-cell-count-step align-items-center resolve-table-limit-lines"
             >
               <div className={showStaticTooltip ? 'limit-lines-1' : 'limit-lines-3 text-break'}>
-                {getValueToDisplay(columnPath, value)}
+                {getNonEditableValueToDisplay(columnPath, value)}
               </div>
             </TableCell>
           </CustomTooltip>
@@ -279,7 +297,7 @@ const useResolveStepTable = ({
       const type = getFieldType(columnPath);
       const Component = getFieldComponent(columnPath);
       const tooltipContent = getTooltipMessage(errorMessage, warning, columnPath);
-      const fieldProps = getFieldProps(columnPath, tooltipContent);
+      const fieldProps = getFieldProps(columnPath, tooltipContent, value, isFieldDisabled);
 
       // Columns allowed for focus in new rows
       const newRowFocusableCells = [
@@ -327,14 +345,14 @@ const useResolveStepTable = ({
       return (
         <TableCell
           className="rt-td rt-td-count-step pb-0"
-          customTooltip={showTooltip && getValueToDisplay(id, value)}
+          customTooltip={showTooltip && getNonEditableValueToDisplay(columnPath, value)}
           tooltipClassname="w-100"
-          tooltipLabel={getValueToDisplay(id, value)}
+          tooltipLabel={getNonEditableValueToDisplay(columnPath, value)}
         >
           <Component
-            disabled={isFieldEditable}
+            disabled={isFieldDisabled || isFormDisabled}
             type={type}
-            value={value}
+            value={getValueToDisplay(columnPath, value)}
             onChange={onChange}
             onBlur={onBlur}
             className={`${isAutoWidth ? 'w-auto' : 'w-75'} m-1 hide-arrows ${error && 'border border-danger input-has-error'}`}
@@ -365,7 +383,7 @@ const useResolveStepTable = ({
 
   const columns = [
     columnHelper.accessor(
-      (row) => (row?.binLocation?.label ? row?.binLocation : row.binLocation?.name), {
+      (row) => getBinLocationToDisplay(row?.binLocation), {
         id: cycleCountColumn.BIN_LOCATION,
         header: useMemo(() => (
           <TableHeaderCell className="rt-th-count-step">
@@ -410,7 +428,7 @@ const useResolveStepTable = ({
       cell: useCallback(({ row: { original: { quantityCounted, commentFromCount } } }) => (
         <TableCell className="rt-td rt-td-count-step static-cell-count-step d-flex align-items-center">
           {quantityCounted === null
-            ? <ArrowValueIndicator variant={ArrowValueIndicatorVariant.EMPTY} />
+            ? <ValueIndicator variant={valueIndicatorVariant.EMPTY} />
             : quantityCounted}
           {commentFromCount && (
             <Tooltip
@@ -442,11 +460,11 @@ const useResolveStepTable = ({
       cell: useCallback(({ row: { original: { quantityOnHand, quantityCounted } } }) => {
         const quantityVariance = quantityCounted - (quantityOnHand || 0);
         const variant = (quantityCounted || quantityCounted === 0)
-          ? getCycleCountDifferencesVariant(quantityVariance, quantityCounted)
-          : ArrowValueIndicatorVariant.EMPTY;
+          ? getCycleCountDifferencesVariant({ firstValue: quantityVariance })
+          : valueIndicatorVariant.EMPTY;
         return (
           <TableCell className="rt-td rt-td-count-step static-cell-count-step d-flex align-items-center">
-            <ArrowValueIndicator value={quantityVariance} variant={variant} showAbsoluteValue />
+            <ValueIndicator value={quantityVariance} variant={variant} showAbsoluteValue />
           </TableCell>
         );
       }, []),
@@ -473,14 +491,19 @@ const useResolveStepTable = ({
       cell: ({ row: { original: { quantityOnHand }, index } }) => {
         const [value, setValue] = useState(tableData?.[index]?.quantityRecounted);
         const recountDifference = value - (quantityOnHand || 0);
-        const variant = getCycleCountDifferencesVariant(recountDifference, value);
+        // We want to show variant only when value is not null
+        const variant = getCycleCountDifferencesVariant({
+          firstValue: recountDifference,
+          secondValue: value,
+          shouldCheckSecondValue: true,
+        });
         events.on('refreshRecountDifference', () => {
           setValue(tableData?.[index]?.quantityRecounted);
         });
 
         return (
           <TableCell className="rt-td rt-td-count-step static-cell-count-step d-flex align-items-center">
-            <ArrowValueIndicator
+            <ValueIndicator
               value={recountDifference}
               variant={variant}
               showAbsoluteValue
@@ -534,17 +557,17 @@ const useResolveStepTable = ({
           >
             {(original.id.includes('newRow') || original.custom) && (
               <RiDeleteBinLine
-                className="cursor-pointer"
+                className={isFormDisabled ? 'disabled-icon' : 'cursor-pointer'}
                 onClick={() => removeRow(cycleCountId, original.id)}
                 size={22}
               />
             )}
           </Tooltip>
         </TableCell>
-      ), []),
+      ), [isFormDisabled]),
       meta: {
         flexWidth: 50,
-        hide: !tableData.some((row) => row.id?.includes('newRow') || row.custom) || !isStepEditable,
+        hide: !tableData?.some((row) => row.id?.includes('newRow') || row.custom) || !isStepEditable,
       },
     }),
   ];

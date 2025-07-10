@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="jmiranda" id="1749057610379-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="idx_location_name"/>
+            </not>
+        </preConditions>
+        <createIndex tableName="location" indexName="idx_location_name">
+            <column name="name" />
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda" id="1749057610379-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="idx_transaction_transaction_date"/>
+            </not>
+        </preConditions>
+        <createIndex tableName="transaction" indexName="idx_transaction_transaction_date">
+            <column name="transaction_date" />
+        </createIndex>
+    </changeSet>
+    <changeSet author="jmiranda" id="1749057610379-3">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="idx_transaction_type_transaction_code"/>
+            </not>
+        </preConditions>
+        <createIndex tableName="transaction_type" indexName="idx_transaction_type_transaction_code">
+            <column name="transaction_code" />
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>

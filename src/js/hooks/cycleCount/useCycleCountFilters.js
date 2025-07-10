@@ -7,6 +7,8 @@ import { useHistory } from 'react-router-dom';
 import { setShouldRebuildFilterParams } from 'actions';
 import cycleCountFilterFields from 'components/cycleCount/CycleCountFilterFields';
 import useCommonFiltersCleaner from 'hooks/list-pages/useCommonFiltersCleaner';
+import useTranslate from 'hooks/useTranslate';
+import { groupBinLocationsByZone } from 'utils/groupBinLocationsByZone';
 import { getParamList, transformFilterParams } from 'utils/list-utils';
 import {
   fetchBins,
@@ -42,6 +44,7 @@ const useCycleCountFilters = () => {
   const dispatch = useDispatch();
 
   const history = useHistory();
+  const translate = useTranslate();
 
   const clearFilterValues = () => {
     const queryProps = queryString.parse(history.location.search);
@@ -65,8 +68,8 @@ const useCycleCountFilters = () => {
       const idList = getParamList(queryPropsParam);
       return elementsList
         .filter(({ id }) => idList.includes(id))
-        .map(({ id, label }) => ({
-          id, label, name: label, value: id,
+        .map(({ id, label, name }) => ({
+          id, label: label ?? name, name: name ?? label, value: id,
         }));
     }
     return null;
@@ -99,14 +102,14 @@ const useCycleCountFilters = () => {
         fetchProductsTags({ hideNumbers: true }),
         fetchProductsCatalogs({ hideNumbers: true }),
         fetchProductClassifications(currentLocation?.id),
-        fetchBins(currentLocation?.id),
+        fetchBins(currentLocation?.id, [], 'sortOrder,locationType,name'),
       ]);
 
       setSelectOptions({
         categories: categoryList,
         catalogs: catalogList,
         tags: tagList,
-        internalLocations: binList,
+        internalLocations: groupBinLocationsByZone(binList, translate),
         abcClasses: classificationList,
       });
 

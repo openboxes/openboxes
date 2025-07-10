@@ -34,17 +34,16 @@
             text-align: center;
             position: running(header);
         }
-        div.footer {
-            display: block;
-            text-align: center;
-            position: running(footer);
-        }
 
         @page {
             size: letter;
             background: white;
             @top-center { content: element(header) }
-            @bottom-center { content: element(footer) }
+            @bottom-center {
+                content: "Page " counter(page) " of " counter(pages);
+                font-size: 12px;
+                font-family: sans-serif;
+            }
         }
 
         .small {font-size: xx-small;}

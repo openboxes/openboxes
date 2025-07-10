@@ -65,7 +65,7 @@ openboxes.purchasing.updateUnitPrice.method = UpdateUnitPriceMethodCode.USER_DEF
 openboxes.browser.connection.status.timeout = 8000
 
 // Date configuration (OBPIH-5397)
-openboxes.display.date.format = Constants.DISPLAY_DATE_FORMAT
+openboxes.display.date.format = Constants.JS_DISPLAY_DATE_FORMAT
 openboxes.display.date.defaultValue = Constants.DISPLAY_DATE_DEFAULT_VALUE
 
 // OBPIH-5847
@@ -82,12 +82,20 @@ openboxes.client.autosave.enabled = false
 // Backdata configuration (OBPIH-6332)
 openboxes.dashboard.backdatedShipments.daysOffset = 1
 openboxes.dashboard.backdatedShipments.monthsLimit = 6
+openboxes.report.backdatedTransactions.daysOffset = 1
 
 // Merge Products (OBPIH-5453)
 openboxes.products.merge.enabled = false
 
 // Cycle Count configuration (OBPIH-7033)
 openboxes.cycleCount.products.maxAmount = 50
+
+// Inventory baseline transaction configuration (OBPIH-7194, OBPIH-7195)
+openboxes.transactions.inventoryBaseline.recordStock.enabled = true
+openboxes.transactions.inventoryBaseline.inventoryImport.enabled = true
+
+// Inventory snapshot configuration (OBPIH-7254)
+openboxes.transactions.inventoryBaseline.loadDemoData.enabled = true
 
 openboxes.security.rbac.rules = [
     [controller: '*', actions: ['delete'], accessRules: [ minimumRequiredRole: RoleType.ROLE_SUPERUSER ]],
@@ -187,6 +195,7 @@ openboxes {
                         menuItems: [
                                 [label: "inventory.manageCycleCount.label", defaultLabel: "Manage Cycle Count", href: "/inventory/cycleCount"],
                                 [label: "inventory.performCycleCount.label", defaultLabel: "Perform Cycle Count", href: "/inventory/cycleCount?tab=TO_COUNT"],
+                                [label: "inventory.reporting.label", defaultLabel: "Reporting", href: "/inventory/cycleCount/reporting?tab=PRODUCTS"],
                         ]
                 ]
             ]
@@ -337,7 +346,7 @@ openboxes {
                         [label: "product.exportAsCsv.label", defaultLabel: "Export products", href: "/product/exportAsCsv"],
                         [label: "export.productSources.label", defaultLabel: "Export product sources", href: "/productSupplier/export"],
                         [label: "export.latestInventory.label", defaultLabel: "Export latest inventory date", href: "/inventory/exportLatestInventoryDate"],
-                        [label: "export.inventoryLevels.label", defaultLabel: "Export inventory levels", href: "/inventoryLevel/export"],
+                        [label: "export.inventoryLevels.label", defaultLabel: "Export inventory levels", href: "/inventoryLevel/export?format=csv"],
                         [label: "export.requisitions.label", defaultLabel: "Export requisitions", href: "/requisition/export"],
                         [label: "export.binLocations.label", defaultLabel: "Export bin locations", href: "/report/exportBinLocation?downloadFormat=csv"],
                         [label: "export.productDemand.label", defaultLabel: "Export product demand", href: "/report/exportDemandReport?downloadFormat=csv"],

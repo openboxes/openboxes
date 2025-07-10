@@ -35,12 +35,15 @@ class ForecastingService {
         boolean forecastingEnabled = Holders.config.openboxes.forecasting.enabled ?: false
         Integer demandPeriod = grailsApplication.config.openboxes.forecasting.demandPeriod ?: 365
         if (forecastingEnabled) {
-            Map defaultDateRange = DateUtil.getDateRange(new Date(), -1)
+            // Use the first day of current month as the starting point for the start date calculation
+            Map defaultStartDateRange = DateUtil.getDateRange(new Date(), 0)
             use(TimeCategory) {
-                defaultDateRange.startDate = defaultDateRange.endDate - demandPeriod.days
+                defaultStartDateRange.startDate = defaultStartDateRange.startDate - demandPeriod.days
             }
+            // Use the last day of previous month as the end date
+            Map defaultEndDateRange = DateUtil.getDateRange(new Date(), -1)
 
-            def rows = getDemandDetails(origin, destination, product, defaultDateRange.startDate, defaultDateRange.endDate)
+            def rows = getDemandDetails(origin, destination, product, defaultStartDateRange.startDate, defaultEndDateRange.endDate)
             def totalDemand = rows.sum { it.quantity_demand } ?: 0
             def dailyDemand = (totalDemand && demandPeriod) ? (totalDemand / demandPeriod) : 0
             def monthlyDemand = totalDemand / Math.floor((demandPeriod / 30))

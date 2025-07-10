@@ -32,7 +32,11 @@ const FilterForm = ({
   translate,
   setShouldRebuildFilterValues,
   isLoading,
-  isCycleCountTab,
+  customSubmitButtonLabel,
+  customSubmitButtonDefaultLabel,
+  showFilterVisibilityToggler,
+  showSearchField,
+  disableAutoUpdateFilterParams,
 }) => {
   const [amountFilled, setAmountFilled] = useState(0);
   const [filtersHidden, setFiltersHidden] = useState(hidden);
@@ -60,7 +64,9 @@ const FilterForm = ({
   // Default values can change based on currentLocation
   // or any async data defaultValues are waiting for
   useEffect(() => {
-    updateFilterParams({ ...defaultValues });
+    if (!disableAutoUpdateFilterParams) {
+      updateFilterParams({ ...defaultValues });
+    }
   }, [defaultValues]);
 
   useTranslation('button');
@@ -99,6 +105,21 @@ const FilterForm = ({
     form.reset(clearedFilterList);
   };
 
+  const isSubmitDisabled = (values) => {
+    const allFiltersEmpty = !allowEmptySubmit && _.every(values, (value) => !value);
+
+    const requiredFiltersMissing = !_.every(filterFields, (fieldConfig, fieldName) => {
+      const isRequired = _.get(fieldConfig, 'attributes.required');
+      if (!isRequired) {
+        return true;
+      }
+
+      return !!values[fieldName];
+    });
+
+    return allFiltersEmpty || requiredFiltersMissing;
+  };
+
   useEffect(() => {
     if (formRef.current) {
       onClearHandler(formRef.current);
@@ -122,12 +143,22 @@ const FilterForm = ({
               <div className="classic-form with-description align-items-center flex-wrap">
                 <div className="w-100 d-flex filter-header align-items-center">
                   <div className="min-w-50 d-flex align-items-center gap-8">
-                    {renderFormField(searchField, searchFieldId)}
+                    {_.map(
+                      // Render filters with top: true
+                      _.pickBy(filterFields, (field) => field.attributes?.top),
+                      (fieldConfig, fieldName) =>
+                        renderFormField(fieldConfig, fieldName, formProps),
+                    )}
+                    {showSearchField && (
+                      renderFormField(searchField, searchFieldId, formProps)
+                    )}
+                    {showFilterVisibilityToggler && (
                     <FilterVisibilityToggler
                       amountFilled={amountFilled}
                       filtersHidden={filtersHidden}
                       setFiltersHidden={setFiltersHidden}
                     />
+                    )}
                   </div>
                   <div className="d-flex justify-content-end buttons">
                     <Button
@@ -138,9 +169,9 @@ const FilterForm = ({
                       type="button"
                     />
                     <Button
-                      defaultLabel={isCycleCountTab ? 'Filter' : 'Search'}
-                      label={isCycleCountTab ? 'react.button.filter.label' : 'react.button.search.label'}
-                      disabled={!allowEmptySubmit && _.every(values, (value) => !value)}
+                      defaultLabel={customSubmitButtonDefaultLabel || 'Search'}
+                      label={customSubmitButtonLabel || 'react.button.search.label'}
+                      disabled={isSubmitDisabled(values)}
                       variant="primary"
                       type="submit"
                     />
@@ -148,8 +179,13 @@ const FilterForm = ({
                 </div>
 
                 <div className="d-flex pt-2 flex-wrap gap-8 align-items-center filters-row">
-                  {!filtersHidden && _.map(filterFields, (fieldConfig, fieldName) =>
-                    renderFormField(fieldConfig, fieldName, formProps))}
+                  {!filtersHidden
+                    && _.map(
+                      // Render filters with top: false
+                      _.pickBy(filterFields, (field) => !field.attributes?.top),
+                      (fieldConfig, fieldName) =>
+                        renderFormField(fieldConfig, fieldName, formProps),
+                    )}
                 </div>
               </div>
             </form>
@@ -175,7 +211,7 @@ FilterForm.propTypes = {
   filterFields: PropTypes.shape({}).isRequired,
   updateFilterParams: PropTypes.func.isRequired,
   onClear: PropTypes.func,
-  searchFieldPlaceholder: PropTypes.string.isRequired,
+  searchFieldPlaceholder: PropTypes.string,
   searchFieldDefaultPlaceholder: PropTypes.string,
   formProps: PropTypes.shape({}),
   searchFieldId: PropTypes.string,
@@ -189,10 +225,15 @@ FilterForm.propTypes = {
   translate: PropTypes.func.isRequired,
   setShouldRebuildFilterValues: PropTypes.func.isRequired,
   isLoading: PropTypes.bool,
-  isCycleCountTab: PropTypes.bool,
+  customSubmitButtonLabel: PropTypes.string,
+  showSearchField: PropTypes.bool,
+  customSubmitButtonDefaultLabel: PropTypes.string,
+  showFilterVisibilityToggler: PropTypes.bool,
+  disableAutoUpdateFilterParams: PropTypes.bool,
 };
 
 FilterForm.defaultProps = {
+  searchFieldPlaceholder: '',
   searchFieldDefaultPlaceholder: 'Search',
   searchFieldId: 'searchTerm',
   formProps: {},
@@ -202,5 +243,9 @@ FilterForm.defaultProps = {
   onClear: undefined,
   ignoreClearFilters: [],
   isLoading: false,
-  isCycleCountTab: false,
+  customSubmitButtonLabel: null,
+  showSearchField: true,
+  customSubmitButtonDefaultLabel: null,
+  showFilterVisibilityToggler: true,
+  disableAutoUpdateFilterParams: false,
 };
