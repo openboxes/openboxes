@@ -4,13 +4,11 @@ import CycleCountAllProducts from 'components/cycleCount/allProductsTab/CycleCou
 import cycleCountFilterFields from 'components/cycleCount/CycleCountFilterFields';
 import CycleCountFilters from 'components/cycleCount/CycleCountFilters';
 import CycleCountHeader from 'components/cycleCount/CycleCountHeader';
-import CycleCountToApprove from 'components/cycleCount/CycleCountToApprove';
 import CycleCountToCount from 'components/cycleCount/toCountTab/CycleCountToCount';
 import CycleCountToResolve from 'components/cycleCount/toResolveTab/CycleCountToResolve';
 import Tabs from 'components/listPagesUtils/Tabs';
 import {
   ALL_PRODUCTS_TAB,
-  TO_APPROVE_TAB,
   TO_COUNT_TAB,
   TO_RESOLVE_TAB,
 } from 'consts/cycleCount';
@@ -73,13 +71,6 @@ const CycleCount = () => {
       },
       onClick: (tab) => switchTab(tab, resetForm),
     },
-    [TO_APPROVE_TAB]: {
-      label: {
-        id: 'react.cycleCount.toApprove.label',
-        defaultMessage: 'To approve',
-      },
-      onClick: (tab) => switchTab(tab, resetForm),
-    },
   };
 
   const { tab } = useQueryParams();
@@ -133,7 +124,6 @@ const CycleCount = () => {
             tablePaginationProps={tablePaginationProps}
           />
         )}
-        {tab === TO_APPROVE_TAB && <CycleCountToApprove />}
       </div>
     </PageWrapper>
   );
