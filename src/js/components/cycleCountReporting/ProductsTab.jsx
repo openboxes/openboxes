@@ -12,6 +12,8 @@ const ProductsTab = ({
   tablePaginationProps,
   shouldFetch,
   setShouldFetch,
+  filtersInitialized,
+  defaultFilterValues,
 }) => {
   const {
     paginationProps,
@@ -34,6 +36,8 @@ const ProductsTab = ({
     shouldFetch,
     setShouldFetch,
     serializedParams,
+    filtersInitialized,
+    defaultFilterValues,
   });
 
   useEffect(() => {

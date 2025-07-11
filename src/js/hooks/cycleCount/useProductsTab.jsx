@@ -28,6 +28,8 @@ const useProductsTab = ({
   shouldFetch,
   setShouldFetch,
   serializedParams,
+  filtersInitialized,
+  defaultFilterValues,
 }) => {
   const columnHelper = createColumnHelper();
   const translate = useTranslate();
@@ -60,12 +62,12 @@ const useProductsTab = ({
     ...sortingParams,
     ...filterParams,
     endDate: dateWithoutTimeZone({
-      date: endDate,
+      date: endDate || defaultFilterValues.endDate,
     }),
     startDate: dateWithoutTimeZone({
-      date: startDate,
+      date: startDate || defaultFilterValues.startDate,
     }),
-    products: products?.map?.(({ id }) => id),
+    products: (products || defaultFilterValues.products)?.map?.(({ id }) => id),
     facility: currentLocation?.id,
   }, (val) => {
     if (typeof val === 'boolean') {
@@ -94,6 +96,7 @@ const useProductsTab = ({
     searchTerm: null,
     filterParams,
     serializedParams,
+    filtersInitialized,
   });
 
   const getStyledCurrency = (value) => {
