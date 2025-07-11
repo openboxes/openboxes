@@ -52,9 +52,11 @@ import org.pih.warehouse.order.OrderService
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductCatalog
+import org.pih.warehouse.reporting.CycleCountProductSummary
 import org.pih.warehouse.reporting.DateDimension
 import org.pih.warehouse.LocalizationUtil
 import org.pih.warehouse.reporting.IndicatorApiCommand
+import org.pih.warehouse.reporting.InventoryAccuracyResult
 import org.pih.warehouse.reporting.InventoryAuditCommand
 import org.pih.warehouse.reporting.InventoryLossResult
 import org.pih.warehouse.shipping.ShipmentService
@@ -1140,7 +1142,6 @@ class ReportService implements ApplicationContextAware {
     }
 
     def getInventoryAuditSummary(InventoryAuditCommand command) {
-
         def inventoryAuditFilters = buildInventoryAuditSummaryFilters(command)
         def results = InventoryAuditDetails.createCriteria().list([max: command.max, offset: command.offset]) {
             projections {
@@ -1226,6 +1227,37 @@ class ReportService implements ApplicationContextAware {
                 name  : "productsInventoried",
                 value : result ?: 0,
                 type  : TileType.SINGLE.toString(),
+        ]
+    }
+
+    Map getInventoryAccuracy(IndicatorApiCommand command) {
+        List<Object[]> results = CycleCountProductSummary.createCriteria().list {
+            projections {
+                groupProperty('product')
+                sum('quantityVariance')
+            }
+            eq('facility', command.facility)
+
+            if (command.startDate) {
+                ge("transactionDate", command.startDate)
+            }
+            if (command.endDate) {
+                le("transactionDate", command.endDate)
+            }
+        }
+
+        Integer accurateCount = results.count { it[1] == null || it[1] == 0 }
+        Integer totalCount = results.size()
+
+        InventoryAccuracyResult accuracyResult = new InventoryAccuracyResult(
+                accurateCount: accurateCount,
+                totalCount: totalCount
+        )
+
+        return [
+                name : "inventoryAccuracy",
+                value: accuracyResult.accuracyPercentage,
+                type : TileType.SINGLE.toString()
         ]
     }
 
