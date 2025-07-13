@@ -17,6 +17,7 @@ import org.pih.warehouse.inventory.CycleCountItem
 import org.pih.warehouse.inventory.CycleCountSummary
 import org.pih.warehouse.inventory.InventoryAuditDetails
 import org.pih.warehouse.inventory.InventoryAuditSummary
+import org.pih.warehouse.inventory.InventoryTransactionsSummary
 import org.pih.warehouse.inventory.PendingCycleCountRequest
 import org.pih.warehouse.reporting.CycleCountProductSummary
 
@@ -673,6 +674,10 @@ class BootStrap {
 
         JSON.registerObjectMarshaller(CycleCountProductSummary) { CycleCountProductSummary cycleCountProductSummary ->
             return cycleCountProductSummary.toJson()
+        }
+
+        JSON.registerObjectMarshaller(InventoryTransactionsSummary) { InventoryTransactionsSummary inventoryTransactionsSummary ->
+            return inventoryTransactionsSummary.toJson()
         }
     }
 

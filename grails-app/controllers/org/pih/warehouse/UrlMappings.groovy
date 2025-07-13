@@ -1033,6 +1033,11 @@ class UrlMappings {
             action = [POST: "getInventoryAuditSummary", GET: "getInventoryAuditSummary"]
         }
 
+        "/api/reports/inventory-transactions-summary" {
+            controller = "cycleCountApi"
+            action = [GET: "getInventoryTransactionsSummary"]
+        }
+
         "/api/reports/indicators/productsInventoried" {
             controller = "indicatorApi"
             action = [GET: "getProductsInventoried"]

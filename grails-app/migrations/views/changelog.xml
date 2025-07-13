@@ -158,4 +158,7 @@
   <changeSet id="1748970410098-4" author="slib" runOnChange="true" runAlways="true" failOnError="true">
     <sqlFile path="views/cycle-count-product-summary.sql"/>
   </changeSet>
+  <changeSet id="1748970410098-5" author="kchelstowski" runOnChange="true" runAlways="true" failOnError="true">
+    <sqlFile path="views/inventory-transactions-summary.sql"/>
+  </changeSet>
 </databaseChangeLog>
