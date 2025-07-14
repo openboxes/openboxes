@@ -1375,7 +1375,7 @@ class ReportService implements ApplicationContextAware {
                     }
                     .collectEntries { transactionTypeName, entriesByType ->
                         Integer total = entriesByType.sum { entry ->
-                            Math.abs(entry.quantity as Integer)
+                            entry.quantity as Integer
                         }
                         [(transactionTypeName): total]
                     }
