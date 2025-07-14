@@ -19,6 +19,7 @@ import org.apache.http.impl.client.DefaultHttpClient
 import org.hibernate.sql.JoinType
 import org.pih.warehouse.DateUtil
 import org.pih.warehouse.PaginatedList
+import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.DashboardService
@@ -1406,7 +1407,7 @@ class ReportService implements ApplicationContextAware {
                     }
                     .collectEntries { transactionTypeName, entriesByType ->
                         Integer total = entriesByType.sum { entry ->
-                            Math.abs(entry.quantity as Integer)
+                            entry.quantity as Integer
                         }
                         [(transactionTypeName): total]
                     }
@@ -1431,6 +1432,17 @@ class ReportService implements ApplicationContextAware {
     }
 
     Map<String, String> getTransactionReportDetailedRow(Map data) {
+        List<String> adjustmentTransactionTypes = [
+                Constants.ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID,
+                Constants.ADJUSTMENT_DEBIT_TRANSACTION_TYPE_ID
+        ]
+
+        TransactionType creditTransactionType = data.availableTransactionTypes.find { it.id ==  Constants.ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID }
+        TransactionType debitTransactionType = data.availableTransactionTypes.find { it.id ==  Constants.ADJUSTMENT_DEBIT_TRANSACTION_TYPE_ID }
+
+        Integer adjustmentCredit = data.detailedReportData?.get(creditTransactionType?.name) ?: 0
+        Integer adjustmentDebit = data.detailedReportData?.get(debitTransactionType?.name) ?: 0
+
         Map<String, String> row = [
             "Code": data.productCode,
             "Name": data.name,
@@ -1443,10 +1455,13 @@ class ReportService implements ApplicationContextAware {
             "Opening": data.openingBalance,
             "Credits": data.credits,
             "Debits": data.debits,
-            "Adjustment (Credit and Debit)": data.credits - data.debits
+            "Adjustment (Credit and Debit)": adjustmentCredit - adjustmentDebit
         ]
 
-        data.availableTransactionTypes.each{ transactionType ->
+        data.availableTransactionTypes.each { transactionType ->
+            if (adjustmentTransactionTypes.contains(transactionType.id)) {
+                return
+            }
             String columnName = LocalizationUtil.getLocalizedString(transactionType?.name)
             row[columnName] = data.detailedReportData?.get(transactionType?.name) ?: 0
         }
@@ -1476,33 +1491,19 @@ class ReportService implements ApplicationContextAware {
                 null,
                 null
         )
-        // Transaction entries that have relation to the transactions happened between endDate <-> today
-        // with appropriate filter and sorting by transaction date applied
-        List<TransactionEntry> transactionsEntriesAfterEndDate = getFilteredTransactionEntries(
-                adjustmentTransactionCodes,
-                endDate,
-                null,
-                categories,
-                tagsList,
-                catalogsList,
-                location,
-                null,
-                "transactionDate"
-        )
 
         // Grouping transaction entries by product to get the desired report granularity
         Map<Product, List<TransactionEntry>> productsMap = transactionEntriesWithinDateRange.groupBy {
             it.inventoryItem.product
         }
-        Map<Product, List<TransactionEntry>> productsMapAfterEndDate = transactionsEntriesAfterEndDate.groupBy {
-            it.inventoryItem.product
-        }
 
-        // QoH available at the time of running the report - the closing balance is calculated by
-        // adding / subtracting all of the credits / debits that happened between endDate <-> today
-        Map<Product, Integer> initialQuantityForBalanceCalculations = !productsMap.isEmpty()
-                ? productAvailabilityService.getQuantityOnHandByProduct(location, productsMap.keySet().toList())
-                : [:]
+        // Calculate items available at the endDate to get quantity on hand for found products
+        Map<String, AvailableItem> availableItemMap = productAvailabilityService.getAvailableItemsAtDateAsMap(
+                location,
+                productsMap.keySet().toList(),
+                // 1 Day is subtracted from the endDate, because without that, the last date is in the future
+                endDate - 1
+        )
 
         // AvailableTransactionTypes and detailedReportData are only used in case of generating CSV.
         // The CSV file should contain additional information about the product and the transaction
@@ -1510,12 +1511,6 @@ class ReportService implements ApplicationContextAware {
         List<TransactionType> availableTransactionTypes = includeDetails
                 ? TransactionType.createCriteria().list {
                     'in'("transactionCode", adjustmentTransactionCodes)
-                    not {
-                        'in'("id", [
-                                Constants.ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID,
-                                Constants.ADJUSTMENT_DEBIT_TRANSACTION_TYPE_ID
-                        ])
-                    }
                 }
                 : []
 
@@ -1525,7 +1520,7 @@ class ReportService implements ApplicationContextAware {
 
         // Final calculations of data:
         // 1. Get the current QoH
-        // 2. Calculate closing balance using transaction entries between endDate <-> today
+        // 2. Calculate closing balance using available items at endDate
         // 3. Calculate opening balance using transaction entries between startDate <-> endDate
         // Additional calculation info:
         // 1. CREDITS = transaction entries in relation with transactions that are CREDIT type
@@ -1533,11 +1528,9 @@ class ReportService implements ApplicationContextAware {
         // 2. DEBITS = transaction entries in relation with transaction that are DEBIT type
         // and transaction that are CREDIT type, but with quantity lower than 0
         return productsMap.collect { key, value ->
-            List<TransactionEntry> entriesAfterEndDate = productsMapAfterEndDate[key] ?: []
-            Integer initialQuantity = initialQuantityForBalanceCalculations[key] ?: 0
-            Integer closingBalance = entriesAfterEndDate.size()
-                    ? calculateBalance(entriesAfterEndDate, initialQuantity)
-                    : initialQuantity
+            Integer closingBalance = availableItemMap.findAll { entry ->
+                entry.key.startsWith(key.productCode)
+            }.values().quantityOnHand.sum() ?: 0
             Integer openingBalance = calculateBalance(value, closingBalance)
             Integer credits = getCreditTransactionEntries(value).sum { it.quantity } as Integer ?: 0
             Integer debits = getDebitTransactionEntries(value).sum { Math.abs(it.quantity) } as Integer ?: 0
@@ -1600,22 +1593,16 @@ class ReportService implements ApplicationContextAware {
                 "asc"
         )
 
-        // Transaction entries that have relation to the transactions happened between endDate <-> today
-        // with appropriate filter and sorting by transaction date applied
-        List<TransactionEntry> transactionsEntriesAfterEndDate = getFilteredTransactionEntries(
-                adjustmentTransactionCodes,
-                endDate,
-                null,
+        // Calculate items available at the endDate to get quantity on hand for found products
+        Map<String, AvailableItem> availableItemMap = productAvailabilityService.getAvailableItemsAtDateAsMap(
                 location,
-                product,
-                "transactionDate"
+                [product],
+                // 1 Day is subtracted from the end Date, because without that, the last date is in the future
+                endDate - 1
         )
 
-        // Current balance, used for closing balance calculation
-        Map<Product, Integer> initialQuantityForBalanceCalculations = productAvailabilityService.getQuantityOnHandByProduct(location, [product])
-
         // Calculating closing & opening balances for selected product
-        Integer closingBalance = calculateBalance(transactionsEntriesAfterEndDate, initialQuantityForBalanceCalculations[product] as Integer)
+        Integer closingBalance = availableItemMap.values().quantityOnHand.sum() ?: 0
         Integer openingBalance = calculateBalance(transactionEntriesWithinDateRange, closingBalance)
 
         // Create a list with only opening balance
