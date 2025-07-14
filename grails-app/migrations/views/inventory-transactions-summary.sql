@@ -13,6 +13,19 @@ CREATE OR REPLACE VIEW inventory_transactions_summary AS
             JOIN inventory_item ON inventory_item.id = transaction_entry.inventory_item_id
             WHERE transaction_type.id = '12' -- baseline inventory transaction
             GROUP BY transaction.id
+    ),
+    -- Helper view for adjustments to query against while searching for the latest baseline transaction
+    -- without any adjustment transaction between queried adjustment and the latest baseline
+    -- Without the helper view, when making the EXISTS statement explicit, it caused performance issues
+    -- because the select was called for each row
+    adjustments_candidates AS (
+       SELECT ii.id as inventory_item_id,
+              t.transaction_date as transaction_date,
+              t.inventory_id as inventory_id
+           FROM transaction t
+                    JOIN transaction_entry te ON te.transaction_id = t.id
+                    JOIN inventory_item ii ON ii.id = te.inventory_item_id
+           WHERE t.transaction_type_id = '3'
     )
 
 SELECT
@@ -42,6 +55,14 @@ FROM transaction_entry
                            WHERE pis2.product_id = inventory_item.product_id
                              AND pis2.facility_id = facility.id
                              AND pis2.baseline_transaction_date < transaction.transaction_date
+                             AND NOT EXISTS (
+                               SELECT 1
+                               FROM adjustments_candidates ac
+                               WHERE ac.inventory_item_id = inventory_item.id
+                                 AND ac.inventory_id = transaction.inventory_id
+                                 AND ac.transaction_date > pis2.baseline_transaction_date
+                                 AND ac.transaction_date < transaction.transaction_date
+                           )
                        )
 WHERE transaction.transaction_type_id = '3' -- Adjustments
 GROUP BY transaction.id, inventory_item.product_id, facility.id;
