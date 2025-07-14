@@ -53,7 +53,7 @@
                             <g:if test="${shipmentInstance?.isFromPurchaseOrder}">
                                 <tr class="prop">
                                     <td valign="top" class="name">
-                                        <label><warehouse:message code="shipping.originCode.label" /></label>
+                                        <label><g:message code="shipping.originCode.label" /></label>
                                     </td>
                                     <td valign="top" id="shipmentStatus" class="value">
                                         <format:metadata obj="${shipmentInstance?.origin?.organization?.code}"/>
