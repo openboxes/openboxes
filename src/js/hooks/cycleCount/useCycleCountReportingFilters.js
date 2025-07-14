@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
+import _ from 'lodash';
 import moment from 'moment';
 import queryString from 'query-string';
 import { useDispatch, useSelector } from 'react-redux';
@@ -98,6 +99,14 @@ const useCycleCountReportingFilters = ({ filterFields }) => {
     }
   };
 
+  // Set that filters are initialized reactively,
+  // to avoid race condition while using useStates.
+  useEffect(() => {
+    if (!_.isEmpty(defaultFilterValues)) {
+      setFiltersInitialized(true);
+    }
+  }, [defaultFilterValues]);
+
   useCommonFiltersCleaner({
     filtersInitialized,
     initializeDefaultFilterValues,
@@ -135,6 +144,7 @@ const useCycleCountReportingFilters = ({ filterFields }) => {
     isLoading,
     shouldFetch,
     setShouldFetch,
+    filtersInitialized,
   };
 };
 

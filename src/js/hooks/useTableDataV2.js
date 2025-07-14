@@ -26,6 +26,7 @@ const useTableDataV2 = ({
   serializedParams,
   setShouldFetch,
   disableInitialLoading,
+  filtersInitialized = true,
 }) => {
   const sourceRef = useRef(CancelToken.source());
   const translate = useTranslate();
@@ -43,6 +44,9 @@ const useTableDataV2 = ({
   }));
 
   const fetchData = () => {
+    if (sourceRef.current) {
+      sourceRef.current.cancel('Cancelled due to new request');
+    }
     // Each time we fetch, we want to 'reset' the token/signal
     sourceRef.current = CancelToken.source();
     const params = getParams({
@@ -71,7 +75,7 @@ const useTableDataV2 = ({
 
   // fetching data after changing page size, filters, page number and sorting
   useEffect(() => {
-    if (shouldFetch) {
+    if (shouldFetch && filtersInitialized) {
       fetchData();
     }
   }, [
@@ -79,6 +83,7 @@ const useTableDataV2 = ({
     pageSize,
     sort,
     order,
+    filtersInitialized,
   ]);
 
   // Start displaying the loader in the table when

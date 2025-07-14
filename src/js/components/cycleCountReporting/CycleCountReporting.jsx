@@ -48,8 +48,9 @@ const CycleCountReporting = () => {
     resetForm,
     shouldFetch,
     setShouldFetch,
+    filtersInitialized,
   } = useCycleCountReportingFilters({ filterFields });
-  const tablePaginationProps = useCycleCountPagination(filterParams, setShouldFetch, null, true);
+  const tablePaginationProps = useCycleCountPagination(filterParams, setShouldFetch, null, false);
   const tabs = {
     [PRODUCTS_TAB]: {
       label: {
@@ -93,6 +94,8 @@ const CycleCountReporting = () => {
             filterParams={filterParams}
             shouldFetch={shouldFetch}
             setShouldFetch={setShouldFetch}
+            filtersInitialized={filtersInitialized}
+            defaultFilterValues={defaultFilterValues}
           />
         )}
         {currentTab === INVENTORY_TRANSACTIONS_TAB && (
@@ -101,6 +104,8 @@ const CycleCountReporting = () => {
             filterParams={filterParams}
             shouldFetch={shouldFetch}
             setShouldFetch={setShouldFetch}
+            filtersInitialized={filtersInitialized}
+            defaultFilterValues={defaultFilterValues}
           />
         )}
         {currentTab === INDICATORS_TAB && (
