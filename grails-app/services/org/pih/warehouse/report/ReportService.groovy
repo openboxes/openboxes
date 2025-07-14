@@ -1469,6 +1469,7 @@ class ReportService implements ApplicationContextAware {
         Map<String, AvailableItem> availableItemMap = productAvailabilityService.getAvailableItemsAtDateAsMap(
                 location,
                 productsMap.keySet().toList(),
+                // 1 Day is subtracted from the endDate, because without that, the last date is in the future
                 endDate - 1
         )
 
@@ -1564,6 +1565,7 @@ class ReportService implements ApplicationContextAware {
         Map<String, AvailableItem> availableItemMap = productAvailabilityService.getAvailableItemsAtDateAsMap(
                 location,
                 [product],
+                // 1 Day is subtracted from the end Date, because without that, the last date is in the future
                 endDate - 1
         )
 
