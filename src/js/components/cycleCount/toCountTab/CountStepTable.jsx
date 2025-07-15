@@ -88,6 +88,7 @@ const CountStepTable = ({
         titleLabel="react.cycleCount.modal.assignProductsToRecount.title.label"
         assignDataDirectly
         isRecount
+        showSkipButton
       />
       )}
       <div className="list-page-list-section">

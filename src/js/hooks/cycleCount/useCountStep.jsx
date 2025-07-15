@@ -469,8 +469,7 @@ const useCountStep = () => {
         }
         hide();
         onClose()?.();
-        redirectAfterClosingModal.current = CYCLE_COUNT.list(TO_RESOLVE_TAB);
-        openAssignCountModal();
+        history.push(CYCLE_COUNT.list(TO_RESOLVE_TAB));
       },
     },
     {
