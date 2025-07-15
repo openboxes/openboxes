@@ -1318,8 +1318,8 @@ class ReportService implements ApplicationContextAware {
     Integer calculateBalance(List<TransactionEntry> transactionEntries, Integer balance) {
         List<TransactionEntry> credits = getCreditTransactionEntries(transactionEntries)
         List<TransactionEntry> debits = getDebitTransactionEntries(transactionEntries)
-        Integer quantityFromCredits = credits.sum { it.quantity } as Integer ?: 0
-        Integer quantityFromDebits = debits.sum { it.quantity } as Integer ?: 0
+        Integer quantityFromCredits = credits.sum { Math.abs(it.quantity) } as Integer ?: 0
+        Integer quantityFromDebits = debits.sum { Math.abs(it.quantity) } as Integer ?: 0
 
         return balance - quantityFromCredits + Math.abs(quantityFromDebits)
     }
@@ -1513,8 +1513,7 @@ class ReportService implements ApplicationContextAware {
         Map<String, AvailableItem> availableItemMap = productAvailabilityService.getAvailableItemsAtDateAsMap(
                 location,
                 productsMap.keySet().toList(),
-                // 1 Day is subtracted from the endDate, because without that, the last date is in the future
-                endDate - 1
+                endDate.before(new Date()) ? endDate : new Date()
         )
 
         // AvailableTransactionTypes and detailedReportData are only used in case of generating CSV.
@@ -1609,8 +1608,7 @@ class ReportService implements ApplicationContextAware {
         Map<String, AvailableItem> availableItemMap = productAvailabilityService.getAvailableItemsAtDateAsMap(
                 location,
                 [product],
-                // 1 Day is subtracted from the end Date, because without that, the last date is in the future
-                endDate - 1
+                endDate.before(new Date()) ? endDate : new Date()
         )
 
         // Calculating closing & opening balances for selected product
