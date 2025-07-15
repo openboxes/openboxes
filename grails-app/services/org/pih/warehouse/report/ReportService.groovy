@@ -1321,7 +1321,7 @@ class ReportService implements ApplicationContextAware {
         Integer quantityFromCredits = credits.sum { it.quantity } as Integer ?: 0
         Integer quantityFromDebits = debits.sum { it.quantity } as Integer ?: 0
 
-        return balance - quantityFromCredits + quantityFromDebits
+        return balance - quantityFromCredits + Math.abs(quantityFromDebits)
     }
 
     List<TransactionEntry> getCreditTransactionEntries(List<TransactionEntry> transactionEntries) {
@@ -1652,7 +1652,7 @@ class ReportService implements ApplicationContextAware {
 
         // Add closing balance as a last element
         entries.add([
-            transactionDate     : DateUtil.asDateForDisplay(endDate),
+            transactionDate     : DateUtil.asDateForDisplay(endDate - 1),
             transactionTime     : DateUtil.asTimeForDisplay(endDate),
             transactionCode     : "BALANCE_CLOSING",
             transactionTypeName : "Closing Balance",
