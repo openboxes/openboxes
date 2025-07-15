@@ -1513,6 +1513,9 @@ class ReportService implements ApplicationContextAware {
         Map<String, AvailableItem> availableItemMap = productAvailabilityService.getAvailableItemsAtDateAsMap(
                 location,
                 productsMap.keySet().toList(),
+                // EndDate cannot be a date in the future, because of the validation
+                // in getAvailableItemsAtDateAsMap. Current endDate value is endDate + 1,
+                // because it's used in that way in the createCriteria (+1 is added in the controller)
                 endDate.before(new Date()) ? endDate : new Date()
         )
 
@@ -1608,6 +1611,9 @@ class ReportService implements ApplicationContextAware {
         Map<String, AvailableItem> availableItemMap = productAvailabilityService.getAvailableItemsAtDateAsMap(
                 location,
                 [product],
+                // EndDate cannot be a date in the future, because of the validation
+                // in getAvailableItemsAtDateAsMap. Current endDate value is endDate + 1,
+                // because it's used in that way in the createCriteria (+1 is added in the controller)
                 endDate.before(new Date()) ? endDate : new Date()
         )
 
