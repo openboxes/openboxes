@@ -37,6 +37,33 @@ class TransactionEntry implements Comparable, Serializable {
         comments(nullable: true, maxSize: 255)
     }
 
+    static namedQueries = {
+        countByTransactionTypes { Location facility, Product product, List<TransactionType> transactionTypes, Date startDate, Date endDate ->
+            createAlias 'transaction', 'transaction'
+            createAlias 'inventoryItem', 'inventoryItem'
+            projections {
+                countDistinct('transaction.id', 'transactionCount')
+            }
+            eq 'product', product
+            eq 'transaction.inventory', facility.inventory
+            'in'('transaction.transactionType', transactionTypes)
+            between 'transaction.transactionDate', startDate, endDate
+        }
+        dateLastCounted { Location facility, Product product ->
+            createAlias "transaction", "transaction"
+            createAlias "inventoryItem", "inventoryItem"
+            createAlias "transaction.transactionType", "transactionType"
+            projections {
+                max("transaction.transactionDate", "dateLastCounted")
+            }
+            eq 'inventoryItem.product', product
+            eq 'transaction.inventory', facility.inventory
+            eq "transactionType.transactionCode", TransactionCode.PRODUCT_INVENTORY
+        }
+
+    }
+
+
     /**
      * Sort by the sort parameters of the parent transaction
      */

@@ -85,6 +85,29 @@ class CycleCountItem implements Comparable {
         location(nullable: true)
     }
 
+    static namedQueries = {
+        countCompletedCycleCounts { Location facility, Product product, Date startDate, Date endDate ->
+            createAlias "cycleCount", "cycleCount"
+            projections {
+                countDistinct('cycleCount.id', 'countCycleCounts')
+            }
+            eq 'product', product
+            eq 'cycleCount.facility', facility
+            eq 'cycleCount.status', CycleCountStatus.COMPLETED
+            between 'dateCounted', startDate, endDate
+        }
+
+        dateLastCounted { Location facility, Product product ->
+            createAlias 'cycleCount', 'cycleCount'
+            projections {
+                max('dateCounted', 'dateLastCounted')
+            }
+            eq 'product', product
+            eq 'cycleCount.facility', facility
+            eq 'cycleCount.status', CycleCountStatus.COMPLETED
+        }
+    }
+
     Integer getQuantityVariance() {
         if (quantityCounted != null && quantityOnHand != null) {
             return quantityCounted - quantityOnHand
