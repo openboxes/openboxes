@@ -88,6 +88,7 @@ class Constants {
 
     // these are direct references to transaction types by primary key
     static final String CONSUMPTION_TRANSACTION_TYPE_ID = "2"
+    // FIXME rename this to ADJUSTMENT_TRANSACTION_TYPE once we migrate old debit adjustments
     static final String ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID = "3"
     static final String EXPIRATION_TRANSACTION_TYPE_ID = "4"
     static final String DAMAGE_TRANSACTION_TYPE_ID = "5"

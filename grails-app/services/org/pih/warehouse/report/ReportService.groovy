@@ -16,7 +16,6 @@ import org.apache.http.client.ResponseHandler
 import org.apache.http.client.methods.HttpGet
 import org.apache.http.impl.client.BasicResponseHandler
 import org.apache.http.impl.client.DefaultHttpClient
-import org.hibernate.sql.JoinType
 import org.pih.warehouse.DateUtil
 import org.pih.warehouse.PaginatedList
 import org.pih.warehouse.api.AvailableItem
@@ -32,13 +31,11 @@ import org.pih.warehouse.forecasting.ForecastingService
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.UserService
 import org.pih.warehouse.data.DataService
-import org.pih.warehouse.inventory.CycleCount
-import org.pih.warehouse.inventory.CycleCountCandidate
+import org.pih.warehouse.inventory.CycleCountItem
 import org.pih.warehouse.inventory.CycleCountService
-import org.pih.warehouse.inventory.CycleCountStatus
-import org.pih.warehouse.inventory.CycleCountSummary
 import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.InventoryAuditDetails
+import org.pih.warehouse.inventory.InventoryAuditRollup
 import org.pih.warehouse.inventory.InventoryAuditSummary
 import org.pih.warehouse.inventory.ProductAvailabilityService
 import org.pih.warehouse.inventory.Transaction
@@ -1139,23 +1136,28 @@ class ReportService implements ApplicationContextAware {
             } else if (command.endDate) {
                 lte("transactionDate", command.endDate)
             }
+            ne("varianceTypeCode", VarianceTypeCode.EQUAL)
         }
     }
 
     def getInventoryAuditSummary(InventoryAuditCommand command) {
         def inventoryAuditFilters = buildInventoryAuditSummaryFilters(command)
-        def results = InventoryAuditDetails.createCriteria().list([max: command.max, offset: command.offset]) {
+        def results = InventoryAuditRollup.createCriteria().list([max: command.max, offset: command.offset]) {
             projections {
                 groupProperty('facility')
                 groupProperty('product')
                 max('abcClass', 'abcClass')
+                sum('quantityAdjusted', 'quantityAdjusted')
+                countDistinct('transaction', 'adjustmentsCount')
             }
             inventoryAuditFilters.delegate = delegate
             inventoryAuditFilters.resolveStrategy = Closure.DELEGATE_FIRST
             inventoryAuditFilters()
         }
 
-        Integer totalCount = InventoryAuditDetails.createCriteria().get() {
+
+
+        Integer totalCount = InventoryAuditRollup.createCriteria().get() {
             projections {
                 countDistinct("product")
             }
@@ -1164,24 +1166,34 @@ class ReportService implements ApplicationContextAware {
             inventoryAuditFilters()
         }
 
+
         // Transform the results to a summary object
         def data = results.collect {
 
             Location facility = (Location) it[0]
             Product product = (Product) it[1]
             String abcClass = it[2]
+            Integer quantityAdjusted = it[3]
+            Integer countAdjustments = it[4]
 
-            // Retrieve all cycle counts completed during the given date range
-            List<CycleCountSummary> cycleCountSummaries =
-                    cycleCountService.getCycleCountSummaryReport(new CycleCountReportCommand(facility: facility, products: [product], startDate: command.startDate, endDate: command.endDate))
+            // Retrieve all product inventories completed during the given date range
+            List<TransactionType> inventoryTypes = TransactionType.findAllByTransactionCode(TransactionCode.PRODUCT_INVENTORY)
+            Integer countCycleCounts = TransactionEntry.countByTransactionTypes(facility, product, inventoryTypes, command.startDate, command.endDate).get()
 
-            // Get metadata related to cycle counts completed within date range
-            Integer countCycleCounts = cycleCountSummaries.size()
-            Date lastCounted = cycleCountSummaries.dateRecorded.max()
+            // FIXME We needed to separate queries since there's not an easy way to get the two values in a single query
+            //  at the moment. We created a view for the last counted date for the All Products tab but it's super slow
+            //  so it would be best to materialize the last count date at the facility-product level at some point.
 
-            // Calculate number of adjustments, quantity adjusted, and amount adjusted based on verification count data
-            Integer countAdjustments = (cycleCountSummaries.count { it.verificationCountVarianceTypeCode != VarianceTypeCode.EQUAL }) as Integer
-            Integer quantityAdjusted = (cycleCountSummaries.sum { it.verificationCountQuantityVariance } ?: 0) as Integer
+            // Get the date of the latest cycle count
+            Date lastCycleCount = CycleCountItem.dateLastCounted(facility, product).get()
+
+            // Get the date of the latest record stock, import inventory, or cycle count transaction
+            Date lastInventoryCount = TransactionEntry.dateLastCounted(facility, product).get()
+
+            // Compare the two last count dates
+            Date lastCounted = [lastCycleCount, lastInventoryCount].max()
+
+            // Inventory value of adjusted quantity
             BigDecimal amountAdjusted = (quantityAdjusted?:0) * (product?.pricePerUnit?:0)
 
             // Retrieve demand data, which includes currently quantity on hand as well
@@ -1190,6 +1202,7 @@ class ReportService implements ApplicationContextAware {
             Integer quantityOnHand = demandData.quantityOnHand?:0
             BigDecimal amountOnHand = (quantityOnHand?:0) * (product?.pricePerUnit?:0)
 
+            // Transform response into an inventory audit summary record (one row per facility-product)
             new InventoryAuditSummary(
                     facility: facility,
                     product: product,
@@ -1201,7 +1214,6 @@ class ReportService implements ApplicationContextAware {
                     quantityDemanded: quantityDemanded,
                     quantityOnHand: quantityOnHand,
                     amountOnHand: amountOnHand,
-                    cycleCountSummaries: cycleCountSummaries,
                     abcClass: abcClass
             )
         }
