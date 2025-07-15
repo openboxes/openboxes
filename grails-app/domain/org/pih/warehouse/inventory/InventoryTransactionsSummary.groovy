@@ -1,5 +1,7 @@
 package org.pih.warehouse.inventory
 
+import grails.util.Holders
+import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.ReasonCode
 import org.pih.warehouse.core.User
@@ -37,7 +39,7 @@ class InventoryTransactionsSummary implements Serializable {
     /**
      * Root causes are only captured for the cycle count
      */
-    List<String> getRootCauses() {
+    Set<String> getRootCauses() {
         if (transaction.cycleCount) {
             return transaction
                     .cycleCount
@@ -46,6 +48,7 @@ class InventoryTransactionsSummary implements Serializable {
                     // filter out null/empty
                     .findAll { it }
                     .collect { it.name() }
+                    .toSet()
         }
         return null
     }
@@ -68,17 +71,23 @@ class InventoryTransactionsSummary implements Serializable {
      * Transaction type display name used in the "Inventory Transactions" table
      * possible options are: CC (Cycle count transaction), IA (Inventory adjustment), RS (Record stock), II (Inventory import)
      */
-    String getTransactionTypeDisplayName() {
+    TransactionAction getTransactionAction() {
         if (transaction.cycleCount) {
-            return "CC"
+            return TransactionAction.CYCLE_COUNT
         }
+        // FIXME: For now we don't have any clear way to distinguish inventory import vs record stock
         if (transaction.comment?.contains("Imported from")) {
-            return "II"
+            return TransactionAction.INVENTORY_IMPORT
         }
         if (!baselineTransaction) {
-            return "IA"
+            return TransactionAction.INVENTORY_ADJUSTMENT
         }
-        return "RS"
+        return TransactionAction.RECORD_STOCK
+    }
+
+    String getTransactionActionDisplayName(TransactionAction action) {
+        ApplicationTagLib g = Holders.grailsApplication.mainContext.getBean(ApplicationTagLib)
+        return g.message(code: "enum.TransactionAction.${action.name()}")
     }
 
     Map toJson() {
@@ -104,7 +113,7 @@ class InventoryTransactionsSummary implements Serializable {
                 rootCauses: rootCauses,
                 comments: comments,
                 varianceTypeCode: varianceTypeCode?.name(),
-                transactionTypeDisplayName: transactionTypeDisplayName,
+                transactionAction: getTransactionActionDisplayName(transactionAction),
         ]
     }
 }

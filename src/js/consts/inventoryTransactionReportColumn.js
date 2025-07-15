@@ -1,7 +1,7 @@
 const columns = {
   PRODUCT: 'product',
   ALIGNMENT: 'alignment',
-  TRANSACTION_TYPE: 'transactionTypeDisplayName',
+  TRANSACTION_TYPE: 'transactionAction',
   RECORDED: 'dateRecorded',
   TRANSACTION_ID: 'transaction.transactionNumber',
   QTY_BEFORE: 'quantityBefore',

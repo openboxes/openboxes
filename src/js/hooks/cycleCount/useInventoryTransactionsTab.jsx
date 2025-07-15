@@ -190,9 +190,7 @@ const useInventoryTransactionsTab = ({
       </TableHeaderCell>
     ),
     cell: ({ getValue }) => {
-      const value = getValue()
-        .toUpperCase()
-        .replaceAll(' ', '_');
+      const value = getValue()?.toUpperCase().replaceAll(' ', '_');
       return (
         <TableCell
           className="rt-td pb-0 d-flex align-items-start"

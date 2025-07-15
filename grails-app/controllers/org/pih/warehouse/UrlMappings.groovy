@@ -1034,7 +1034,7 @@ class UrlMappings {
         }
 
         "/api/reports/inventory-transactions-summary" {
-            controller = "cycleCountApi"
+            controller = "inventoryTransactionSummaryApi"
             action = [GET: "getInventoryTransactionsSummary"]
         }
 
