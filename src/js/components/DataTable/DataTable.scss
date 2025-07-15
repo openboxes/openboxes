@@ -14,7 +14,8 @@
   border: none;
   border-radius: 4px;
 
-  &.hide-data .rt-tbody {
+  &.hide-data .rt-tbody,
+  &.hide-data .rt-tbody-v2 {
     display: none;
   }
 
@@ -100,7 +101,7 @@
 
     }
 
-    .rt-tbody {
+    .rt-tbody, .rt-tbody-v2 {
       .rt-tr-group {
         border-bottom: 1px solid var(--gray-100);
       }

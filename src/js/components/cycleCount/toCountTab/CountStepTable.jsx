@@ -2,10 +2,10 @@ import React from 'react';
 
 import PropTypes from 'prop-types';
 import { RiAddCircleLine } from 'react-icons/all';
-import { RiErrorWarningLine } from 'react-icons/ri';
 import { useSelector } from 'react-redux';
 import { Tooltip } from 'react-tippy';
 
+import AssignCycleCountModal from 'components/cycleCount/AssignCycleCountModal';
 import HeaderLabel from 'components/cycleCount/HeaderLabel';
 import HeaderSelect from 'components/cycleCount/HeaderSelect';
 import DataTable from 'components/DataTable/v2/DataTable';
@@ -34,9 +34,12 @@ const CountStepTable = ({
   isStepEditable,
   countedBy,
   defaultCountedBy,
-  isFormValid,
   refreshFocusCounter,
   triggerValidation,
+  isFormDisabled,
+  isAssignCountModalOpen,
+  closeAssignCountModal,
+  assignCountModalData,
 }) => {
   const translate = useTranslate();
   const localize = useSelector((state) => state.localize);
@@ -56,6 +59,7 @@ const CountStepTable = ({
     addEmptyRow,
     triggerValidation,
     refreshFocusCounter,
+    isFormDisabled,
   });
 
   // Default counted by needs to be stored in order to set the default select value correctly
@@ -73,110 +77,109 @@ const CountStepTable = ({
     name: `${countedBy.firstName} ${countedBy.lastName}`,
   } : undefined;
 
-  const showCountedByErrorMessage = () => {
-    if (isFormValid === null) {
-      return null;
-    }
-
-    return countedBy?.id ? null : true;
-  };
-
   return (
-    <div className="list-page-list-section">
-      <p className="count-step-title pt-4 pl-4">
-        {product?.productCode}
-        {' '}
-        {product?.name}
-      </p>
-      <div className="pt-3 pl-4 d-flex align-items-center">
-        {isStepEditable ? (
-          <HeaderSelect
-            label={translate('react.cycleCount.dateCounted.label', 'Date counted')}
-          >
-            <DateField
-              className="date-counted-date-picker date-field-input"
-              onChangeRaw={setCountedDate}
-              value={dateCounted}
-              clearable={false}
-              customDateFormat={DateFormat.DD_MMM_YYYY}
-            />
-          </HeaderSelect>
-        ) : (
-          <HeaderLabel
-            label={translate('react.cycleCount.dateCounted.label', 'Date counted')}
-            value={formatLocalizedDate(dateCounted, DateFormat.DD_MMM_YYYY)}
-          />
-        )}
-        {isStepEditable ? (
-          <HeaderSelect
-            label={translate('react.cycleCount.countedBy.label', 'Counted by')}
-            className="ml-4"
-          >
-            <CustomTooltip
-              content={countedByMeta?.label || translate('react.cycleCount.countedBy.label', 'Counted By')}
-              show={!showCountedByErrorMessage()}
-            >
-              <div className="position-relative">
-                <SelectField
-                  errorMessage={showCountedByErrorMessage()}
-                  placeholder="Select"
-                  options={users}
-                  onChange={assignCountedBy(id)}
-                  className={`min-width-250 ${showCountedByErrorMessage() && 'input-has-error'}`}
-                  defaultValue={defaultCountedByMeta}
-                />
-                {showCountedByErrorMessage() && (
-                  <CustomTooltip
-                    content={translate('react.cycleCount.requiredField', 'This field is required')}
-                    className="tooltip-icon tooltip-icon--error tooltip-icon--top-40"
-                    icon={RiErrorWarningLine}
-                  />
-                )}
-              </div>
-            </CustomTooltip>
-          </HeaderSelect>
-        ) : (
-          <HeaderLabel
-            label={translate('react.cycleCount.countedBy.label', 'Counted by')}
-            value={countedByMeta?.label}
-            className="ml-4"
-          />
-        )}
-      </div>
-      <div className="mx-4 count-step-table">
-        <DataTable
-          columns={columns}
-          data={tableData}
-          totalCount={tableData.length}
-          defaultColumn={defaultColumn}
-          meta={tableMeta}
-          filterParams={{}}
-          disablePagination
-        />
-      </div>
-      {isStepEditable && (
-        <div
-          className="ml-4 mb-3 d-flex"
-        >
-          <Tooltip
-            className="d-flex align-items-center"
-            html={(
-              <span className="p-1">
-                {translate('react.cycleCount.addNewRecord.tooltip', 'Use this button to change lot number or bin location.')}
-              </span>
-            )}
-          >
-            <Button
-              onClick={() => addEmptyRow(product?.id, id)}
-              label="react.cycleCount.addNewRecord.label"
-              defaultLabel="Add new record"
-              variant="transparent"
-              StartIcon={<RiAddCircleLine size={18} />}
-            />
-          </Tooltip>
-        </div>
+    <>
+      {isAssignCountModalOpen && (
+      <AssignCycleCountModal
+        isOpen={isAssignCountModalOpen}
+        closeModal={closeAssignCountModal}
+        selectedCycleCounts={assignCountModalData}
+        defaultTitleLabel="Assign products to recount"
+        titleLabel="react.cycleCount.modal.assignProductsToRecount.title.label"
+        assignDataDirectly
+        isRecount
+      />
       )}
-    </div>
+      <div className="list-page-list-section">
+        <p className="count-step-title pt-4 pl-4">
+          {product?.productCode}
+          {' '}
+          {product?.name}
+        </p>
+        <div className="pt-3 pl-4 d-flex align-items-center">
+          {isStepEditable ? (
+            <HeaderSelect
+              label={translate('react.cycleCount.dateCounted.label', 'Date counted')}
+            >
+              <DateField
+                className="date-counted-date-picker date-field-input"
+                onChangeRaw={setCountedDate}
+                value={dateCounted}
+                clearable={false}
+                customDateFormat={DateFormat.DD_MMM_YYYY}
+                disabled={isFormDisabled}
+              />
+            </HeaderSelect>
+          ) : (
+            <HeaderLabel
+              label={translate('react.cycleCount.dateCounted.label', 'Date counted')}
+              value={formatLocalizedDate(dateCounted, DateFormat.DD_MMM_YYYY)}
+            />
+          )}
+          {isStepEditable ? (
+            <HeaderSelect
+              label={translate('react.cycleCount.countedBy.label', 'Counted by')}
+              className="ml-4"
+            >
+              <CustomTooltip
+                content={countedByMeta?.label || translate('react.cycleCount.countedBy.label', 'Counted By')}
+              >
+                <div className="position-relative">
+                  <SelectField
+                    placeholder="Select"
+                    options={users}
+                    onChange={assignCountedBy(id)}
+                    className="min-width-250"
+                    defaultValue={defaultCountedByMeta}
+                    disabled={isFormDisabled}
+                  />
+                </div>
+              </CustomTooltip>
+            </HeaderSelect>
+          ) : (
+            <HeaderLabel
+              label={translate('react.cycleCount.countedBy.label', 'Counted by')}
+              value={countedByMeta?.label}
+              className="ml-4"
+            />
+          )}
+        </div>
+        <div className="mx-4 count-step-table">
+          <DataTable
+            columns={columns}
+            data={tableData}
+            totalCount={tableData.length}
+            defaultColumn={defaultColumn}
+            meta={tableMeta}
+            filterParams={{}}
+            disablePagination
+          />
+        </div>
+        {isStepEditable && (
+          <div
+            className="ml-4 mb-3 d-flex"
+          >
+            <Tooltip
+              className="d-flex align-items-center"
+              html={(
+                <span className="p-1">
+                  {translate('react.cycleCount.addNewRecord.tooltip', 'Use this button to change lot number or bin location.')}
+                </span>
+              )}
+            >
+              <Button
+                onClick={() => addEmptyRow(product?.id, id)}
+                label="react.cycleCount.addNewRecord.label"
+                defaultLabel="Add new record"
+                variant="transparent"
+                StartIcon={<RiAddCircleLine size={18} />}
+                disabled={isFormDisabled}
+              />
+            </Tooltip>
+          </div>
+        )}
+      </div>
+    </>
   );
 };
 
@@ -208,7 +211,12 @@ CountStepTable.propTypes = {
     name: PropTypes.string.isRequired,
   }).isRequired,
   defaultCountedBy: PropTypes.shape({}).isRequired,
-  isFormValid: PropTypes.bool.isRequired,
   refreshFocusCounter: PropTypes.number.isRequired,
   triggerValidation: PropTypes.func.isRequired,
+  isFormDisabled: PropTypes.bool.isRequired,
+  isAssignCountModalOpen: PropTypes.bool.isRequired,
+  closeAssignCountModal: PropTypes.func.isRequired,
+  assignCountModalData: PropTypes.arrayOf(
+    PropTypes.shape({}),
+  ).isRequired,
 };

@@ -874,6 +874,11 @@ class UrlMappings {
             action = [POST: "updateAttributes"]
         }
 
+        "/api/productSuppliers/export" {
+            controller = { "productSupplierApi" }
+            action = [GET: "export"]
+        }
+
         // Load Data
 
         "/api/loadData/listOfDemoData"(parseRequest: true) {
@@ -954,7 +959,7 @@ class UrlMappings {
 
         "/api/facilities/$facilityId/cycle-counts/requests/batch" {
             controller = "cycleCountApi"
-            action = [POST: "createRequests", DELETE: "deleteRequests"]
+            action = [POST: "createRequests", PATCH: "updateRequests", DELETE: "deleteRequests"]
         }
 
         "/api/facilities/$facility/cycle-counts/start/batch" {
@@ -987,14 +992,60 @@ class UrlMappings {
             action = [PATCH: "updateCycleCountItem", DELETE: "deleteCycleCountItem"]
         }
 
+        "/api/facilities/$facility/cycle-counts/items/upload/count" {
+            controller = "cycleCountApi"
+            action = [POST: "uploadCycleCountItems"]
+        }
+
         "/api/facilities/$facility/cycle-counts/$cycleCountId/items" {
             controller = "cycleCountApi"
             action = [POST: "createCycleCountItem"]
         }
 
+        "/api/facilities/$facility/cycle-counts/$cycleCountId/items/batch" {
+            controller = "cycleCountApi"
+            action = [POST: "createCycleCountItemBatch", PATCH: "updateCycleCountItemBatch"]
+        }
+
         "/api/facilities/$facility/cycle-counts/$cycleCountId/refresh" {
             controller = "cycleCountApi"
             action = [POST: "refreshCycleCount"]
+        }
+
+        "/api/reports/cycle-count-details" {
+            controller = "cycleCountApi"
+            action = [POST: "getCycleCountDetails", GET: "getCycleCountDetails"]
+        }
+
+        "/api/reports/cycle-count-summary" {
+            controller = "cycleCountApi"
+            action = [POST: "getCycleCountSummary", GET: "getCycleCountSummary"]
+        }
+
+        "/api/reports/inventory-audit-details" {
+            controller = "inventoryAuditReport"
+            action = [POST: "getInventoryAuditDetails", GET: "getInventoryAuditDetails"]
+
+        }
+
+        "/api/reports/inventory-audit-summary(.$format)?" {
+            controller = "inventoryAuditReport"
+            action = [POST: "getInventoryAuditSummary", GET: "getInventoryAuditSummary"]
+        }
+
+        "/api/reports/indicators/productsInventoried" {
+            controller = "indicatorApi"
+            action = [GET: "getProductsInventoried"]
+        }
+
+        "/api/reports/indicators/inventoryAccuracy" {
+            controller = "indicatorApi"
+            action = [GET: "getInventoryAccuracy"]
+        }
+
+        "/api/reports/indicators/inventoryLoss" {
+            controller = "indicatorApi"
+            action = [GET: "getInventoryLoss"]
         }
 
         // Error handling

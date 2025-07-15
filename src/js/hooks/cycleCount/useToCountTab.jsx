@@ -1,10 +1,17 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 
 import { createColumnHelper } from '@tanstack/react-table';
 import fileDownload from 'js-file-download';
 import _ from 'lodash';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
+import {
+  getCurrentLocale,
+  getCurrentLocation,
+  getCycleCountMaxSelectedProducts,
+  getCycleCountTranslations,
+  getFormatLocalizedDate,
+} from 'selectors';
 
 import { startCount } from 'actions';
 import cycleCountApi from 'api/services/CycleCountApi';
@@ -16,14 +23,16 @@ import { CYCLE_COUNT, INVENTORY_ITEM_URL } from 'consts/applicationUrls';
 import CycleCountCandidateStatus from 'consts/cycleCountCandidateStatus';
 import cycleCountColumn from 'consts/cycleCountColumn';
 import MimeType from 'consts/mimeType';
+import { DateFormat } from 'consts/timeFormat';
+import useCycleCountProductAvailability from 'hooks/cycleCount/useCycleCountProductAvailability';
 import useQueryParams from 'hooks/useQueryParams';
 import useSpinner from 'hooks/useSpinner';
 import useTableDataV2 from 'hooks/useTableDataV2';
 import useTableSorting from 'hooks/useTableSorting';
 import useThrowError from 'hooks/useThrowError';
 import useTranslate from 'hooks/useTranslate';
-import Badge from 'utils/Badge';
 import confirmationModal from 'utils/confirmationModalUtils';
+import dateWithoutTimeZone from 'utils/dateUtils';
 import exportFileFromAPI, { extractFilenameFromHeader } from 'utils/file-download-util';
 import { mapStringToLimitedList } from 'utils/form-values-utils';
 import StatusIndicator from 'utils/StatusIndicator';
@@ -33,7 +42,10 @@ const useToCountTab = ({
   offset,
   pageSize,
   toCountTabCheckboxes,
+  serializedParams,
 }) => {
+  const assignCountModalData = useRef([]);
+  const [isAssignCountModalOpen, setIsAssignCountModalOpen] = useState(false);
   const columnHelper = createColumnHelper();
   const translate = useTranslate();
   const spinner = useSpinner();
@@ -45,11 +57,13 @@ const useToCountTab = ({
     currentLocation,
     cycleCountMaxSelectedProducts,
     translationsFetched,
+    formatLocalizedDate,
   } = useSelector((state) => ({
-    currentLocale: state.session.activeLanguage,
-    currentLocation: state.session.currentLocation,
-    cycleCountMaxSelectedProducts: state.session.cycleCountMaxSelectedProducts,
-    translationsFetched: state.session.fetchedTranslations.cycleCount,
+    currentLocale: getCurrentLocale(state),
+    currentLocation: getCurrentLocation(state),
+    cycleCountMaxSelectedProducts: getCycleCountMaxSelectedProducts(state),
+    translationsFetched: getCycleCountTranslations(state),
+    formatLocalizedDate: getFormatLocalizedDate(state),
   }));
 
   const dispatch = useDispatch();
@@ -87,7 +101,9 @@ const useToCountTab = ({
     ...filterParams,
     searchTerm,
     facility: currentLocation?.id,
-    dateLastCount,
+    dateLastCount: dateWithoutTimeZone({
+      date: dateLastCount,
+    }),
     categories: categories?.map?.(({ id }) => id),
     internalLocations: internalLocations?.map?.(({ name }) => name),
     tags: tags?.map?.(({ id }) => id),
@@ -118,14 +134,74 @@ const useToCountTab = ({
     shouldFetch: filterParams.tab && tab === filterParams.tab,
     getParams,
     pageSize,
-    offset,
     sort,
     order,
-    searchTerm,
-    filterParams,
+    serializedParams,
   });
 
-  const getCycleCountRequestsIds = () => tableData.data.map((row) => row.cycleCountRequest.id);
+  const cancelCounts = async (id) => {
+    try {
+      spinner.show();
+      await cycleCountApi.deleteRequests(currentLocation?.id, id || checkedCheckboxes);
+    } finally {
+      spinner.hide();
+      fetchData();
+      resetCheckboxes();
+    }
+  };
+
+  const cancelCountsModalButtons = (id) => (onClose) => ([
+    {
+      variant: 'transparent',
+      defaultLabel: 'Back',
+      label: 'react.default.button.back.label',
+      onClick: () => {
+        onClose?.();
+      },
+    },
+    {
+      variant: 'primary',
+      defaultLabel: 'Confirm',
+      label: 'react.default.button.confirm.label',
+      onClick: async () => {
+        onClose?.();
+        await cancelCounts(id);
+      },
+    },
+  ]);
+
+  const openCancelCountsModal = ({ id }) => {
+    confirmationModal({
+      hideCloseButton: false,
+      closeOnClickOutside: true,
+      buttons: cancelCountsModalButtons(id),
+      title: {
+        label: 'react.cycleCount.modal.cancelCounts.title.label',
+        default: 'Cancel Counts?',
+      },
+      content: {
+        label: 'react.cycleCount.modal.cancelCounts.content.label',
+        default: 'The Cycle Count will be canceled for the products selected. Your products will be removed from the To Count tab and brought back to Cycle Count All Products list. If you have started a count on these products, it will be erased. Choose this option if you want to abandon the cycle count. Are you sure you want to Cancel?',
+      },
+    });
+  };
+
+  const extendedDataTable = useMemo(() => {
+    if (!tableData.data) {
+      return tableData;
+    }
+    return {
+      ...tableData,
+      data: tableData.data.map((row) => ({
+        ...row,
+        meta: useCycleCountProductAvailability(row),
+      })),
+    };
+  }, [tableData]);
+
+  const getCycleCountRequestsIds = () => extendedDataTable.data
+    .filter((row) => !row.meta.showCancelCheckbox)
+    .map((row) => row.cycleCountRequest.id);
 
   const checkboxesColumn = columnHelper.accessor(cycleCountColumn.SELECTED, {
     header: () => (
@@ -137,15 +213,26 @@ const useToCountTab = ({
         />
       </TableHeaderCell>
     ),
-    cell: ({ row }) => (
-      <TableCell className="rt-td">
-        <Checkbox
-          noWrapper
-          onChange={selectRow(row.original.cycleCountRequest.id)}
-          value={isChecked(row.original.cycleCountRequest.id)}
-        />
-      </TableCell>
-    ),
+    cell: ({ row }) => {
+      const { showCancelCheckbox } = row.original.meta;
+      return (
+        <TableCell className="rt-td">
+          <Checkbox
+            noWrapper
+            onChange={showCancelCheckbox
+              ? null
+              : selectRow(row.original.cycleCountRequest.id)}
+            value={isChecked(row.original.cycleCountRequest.id)}
+            className={`${showCancelCheckbox && 'cancel-icon'}`}
+            onClick={() => {
+              if (showCancelCheckbox) {
+                openCancelCountsModal({ id: row.original.cycleCountRequest.id });
+              }
+            }}
+          />
+        </TableCell>
+      );
+    },
     meta: {
       getCellContext: () => ({
         className: 'checkbox-column',
@@ -161,10 +248,10 @@ const useToCountTab = ({
           {translate('react.cycleCount.table.status.label', 'Status')}
         </TableHeaderCell>
       ),
-      cell: ({ getValue }) => (
+      cell: ({ getValue, row }) => (
         <TableCell className="rt-td">
           <StatusIndicator
-            variant="danger"
+            variant={row.original.meta.isRowDisabled ? 'gray' : 'danger'}
             status={translate(`react.cycleCount.CycleCountCandidateStatus.${getValue()}.label`, 'To count')}
           />
         </TableCell>
@@ -249,56 +336,56 @@ const useToCountTab = ({
         );
       },
       meta: {
-        flexWidth: 200,
+        flexWidth: 150,
       },
     }),
-    columnHelper.accessor((row) =>
-      row?.tags?.map?.((tag) => <Badge label={tag?.tag} variant="badge--purple" tooltip key={tag.id} />), {
-      id: cycleCountColumn.TAGS,
+    columnHelper.accessor(cycleCountColumn.INITIAL_COUNT_ASSIGNEE, {
       header: () => (
         <TableHeaderCell>
-          {translate('react.cycleCount.table.tag.label', 'Tag')}
+          {translate('react.cycleCount.table.assignee.label', 'Assignee')}
         </TableHeaderCell>
       ),
-      cell: ({ getValue }) => (
-        <TableCell className="rt-td multiline-cell">
-          <div className="badge-container">
-            {getValue()}
-          </div>
-        </TableCell>
-      ),
+      cell: ({ getValue }) => {
+        const value = getValue();
+        return (
+          <TableCell className="rt-td badge-container">
+            {value?.name?.toString()}
+          </TableCell>
+        );
+      },
       meta: {
-        flexWidth: 200,
+        flexWidth: 150,
       },
     }),
-    columnHelper.accessor((row) =>
-      row?.productCatalogs?.map((catalog) => <Badge label={catalog?.name} variant="badge--blue" tooltip key={catalog.id} />), {
-      id: cycleCountColumn.PRODUCT_CATALOGS,
+    columnHelper.accessor(cycleCountColumn.INITIAL_COUNT_DEADLINE, {
       header: () => (
         <TableHeaderCell>
-          {translate('react.cycleCount.table.productCatalogue.label', 'Product Catalogue')}
+          {translate('react.cycleCount.table.deadline.label', 'Deadline')}
         </TableHeaderCell>
       ),
-      cell: ({ getValue }) => (
-        <TableCell className="rt-td multiline-cell">
-          <div className="badge-container">
-            {getValue()}
-          </div>
-        </TableCell>
-      ),
+      cell: ({ getValue }) => {
+        const date = formatLocalizedDate(getValue(), DateFormat.DD_MMM_YYYY);
+        return (
+          <TableCell className="rt-td badge-container">
+            {date}
+          </TableCell>
+        );
+      },
       meta: {
-        flexWidth: 200,
+        flexWidth: 150,
       },
     }),
-    columnHelper.accessor(cycleCountColumn.ABC_CLASS, {
+    columnHelper.accessor(cycleCountColumn.INVENTORY_ITEMS, {
       header: () => (
-        <TableHeaderCell sortable columnId={cycleCountColumn.ABC_CLASS} {...sortableProps}>
-          {translate('react.cycleCount.table.abcClass.label', 'ABC Class')}
+        <TableHeaderCell>
+          #
+          {' '}
+          {translate('react.cycleCount.table.inventoryItems.label', 'Inventory Items')}
         </TableHeaderCell>
       ),
       cell: ({ getValue }) => (
         <TableCell className="rt-td">
-          {getValue()}
+          {getValue()?.toString()}
         </TableCell>
       ),
       meta: {
@@ -358,53 +445,6 @@ const useToCountTab = ({
     spinner.hide();
   };
 
-  const cancelCounts = async () => {
-    try {
-      spinner.show();
-      await cycleCountApi.deleteRequests(currentLocation?.id, checkedCheckboxes);
-    } finally {
-      spinner.hide();
-      fetchData();
-      resetCheckboxes();
-    }
-  };
-
-  const cancelCountsModalButtons = () => (onClose) => ([
-    {
-      variant: 'transparent',
-      defaultLabel: 'Back',
-      label: 'react.default.button.back.label',
-      onClick: () => {
-        onClose?.();
-      },
-    },
-    {
-      variant: 'primary',
-      defaultLabel: 'Confirm',
-      label: 'react.default.button.confirm.label',
-      onClick: async () => {
-        onClose?.();
-        await cancelCounts();
-      },
-    },
-  ]);
-
-  const openCancelCountsModal = () => {
-    confirmationModal({
-      hideCloseButton: false,
-      closeOnClickOutside: true,
-      buttons: cancelCountsModalButtons(),
-      title: {
-        label: 'react.cycleCount.modal.cancelCounts.title.label',
-        default: 'Cancel Counts?',
-      },
-      content: {
-        label: 'react.cycleCount.modal.cancelCounts.content.label',
-        default: 'The Cycle Count will be canceled for the products selected. Your products will be removed from the To Resolve tab and brought back to Cycle Count All Products list. If you have started a count on these products, it will be erased. Choose this option if you want to abandon the cycle count. Are you sure you want to Cancel?',
-      },
-    });
-  };
-
   const moveToCounting = async () => {
     const payload = {
       requests: checkedCheckboxes.map((cycleCountRequestId) => ({
@@ -431,8 +471,56 @@ const useToCountTab = ({
     },
   });
 
+  const mapSelectedRowsToModalData = async () => {
+    spinner.show();
+    const { data } = await cycleCountApi.getPendingRequests({
+      locationId: currentLocation?.id,
+      requestIds: checkedCheckboxes,
+      max: checkedCheckboxes.length,
+    });
+    const modalData = data.data.map((pendingCycleCountRequest) => {
+      const {
+        cycleCountRequest: {
+          initialCount: {
+            assignee,
+            deadline,
+          },
+          inventoryItemsCount,
+          product,
+          id,
+        },
+      } = pendingCycleCountRequest;
+      return {
+        cycleCountRequestId: id,
+        product,
+        assignee: assignee
+          ? {
+            ...assignee,
+            // Properties for displaying already selected assignee as a default
+            // value on the select field
+            value: assignee?.id,
+            label: assignee?.name,
+          } : null,
+        deadline,
+        inventoryItemsCount,
+      };
+    });
+    spinner.hide();
+    assignCountModalData.current = modalData;
+  };
+
+  const closeAssignCountModal = () => {
+    setIsAssignCountModalOpen(false);
+    assignCountModalData.current = [];
+  };
+
+  const openAssignCountModal = async () => {
+    await mapSelectedRowsToModalData();
+    setIsAssignCountModalOpen(true);
+  };
+
   return {
-    tableData,
+    tableData: extendedDataTable,
     loading,
     columns: [checkboxesColumn, ...columns],
     emptyTableMessage,
@@ -440,6 +528,11 @@ const useToCountTab = ({
     moveToCounting: verifyCondition,
     printCountForm,
     openCancelCountsModal,
+    openAssignCountModal,
+    closeAssignCountModal,
+    fetchData,
+    isAssignCountModalOpen,
+    assignCountModalData,
   };
 };
 

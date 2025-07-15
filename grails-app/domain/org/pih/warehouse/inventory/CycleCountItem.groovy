@@ -53,7 +53,7 @@ class CycleCountItem implements Comparable {
                 facility: facility.toBaseJson(),
                 product: product,
                 inventoryItem: inventoryItem,
-                binLocation: location?.toBaseJson(),
+                binLocation: Location.toJson(location),
                 countIndex: countIndex,
                 status: status,
                 quantityOnHand: quantityOnHand,
@@ -85,6 +85,29 @@ class CycleCountItem implements Comparable {
         location(nullable: true)
     }
 
+    static namedQueries = {
+        countCompletedCycleCounts { Location facility, Product product, Date startDate, Date endDate ->
+            createAlias "cycleCount", "cycleCount"
+            projections {
+                countDistinct('cycleCount.id', 'countCycleCounts')
+            }
+            eq 'product', product
+            eq 'cycleCount.facility', facility
+            eq 'cycleCount.status', CycleCountStatus.COMPLETED
+            between 'dateCounted', startDate, endDate
+        }
+
+        dateLastCounted { Location facility, Product product ->
+            createAlias 'cycleCount', 'cycleCount'
+            projections {
+                max('dateCounted', 'dateLastCounted')
+            }
+            eq 'product', product
+            eq 'cycleCount.facility', facility
+            eq 'cycleCount.status', CycleCountStatus.COMPLETED
+        }
+    }
+
     Integer getQuantityVariance() {
         if (quantityCounted != null && quantityOnHand != null) {
             return quantityCounted - quantityOnHand
@@ -105,5 +128,26 @@ class CycleCountItem implements Comparable {
                         // this would assume the items are the same and it wouldn't add more than one with the same expirationDate and location
                         ?: System.identityHashCode(this) <=> System.identityHashCode(that)
         return diff
+    }
+
+    Map toJson() {
+        return [
+                id: id,
+                facility: facility.toBaseJson(),
+                product: product,
+                inventoryItem: inventoryItem,
+                binLocation: location?.toBaseJson(),
+                countIndex: countIndex,
+                status: status,
+                quantityOnHand: quantityOnHand,
+                quantityCounted: quantityCounted,
+                quantityVariance: quantityVariance,
+                discrepancyReasonCode: discrepancyReasonCode,
+                dateCounted: dateCounted,
+                dateCreated: dateCreated,
+                comment: comment,
+                custom: custom,
+                assignee: assignee,
+        ]
     }
 }

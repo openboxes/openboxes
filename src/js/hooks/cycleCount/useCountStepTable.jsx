@@ -15,7 +15,7 @@ import cycleCountColumn from 'consts/cycleCountColumn';
 import { DateFormat } from 'consts/timeFormat';
 import useArrowsNavigation from 'hooks/useArrowsNavigation';
 import useTranslate from 'hooks/useTranslate';
-import groupBinLocationsByZone from 'utils/groupBinLocationsByZone';
+import { getBinLocationToDisplay, groupBinLocationsByZone } from 'utils/groupBinLocationsByZone';
 import { checkBinLocationSupport } from 'utils/supportedActivitiesUtils';
 import CustomTooltip from 'wrappers/CustomTooltip';
 
@@ -31,6 +31,7 @@ const useCountStepTable = ({
   addEmptyRow,
   triggerValidation,
   refreshFocusCounter,
+  isFormDisabled,
 }) => {
   const columnHelper = createColumnHelper();
   const [rowIndex, setRowIndex] = useState(null);
@@ -105,8 +106,10 @@ const useCountStepTable = ({
     return {};
   };
 
-  // this function is required because there is a problem with getValue
-  const getValueToDisplay = (columnPath, value) => {
+  /**
+   * Override the behaviour of getValue when displaying fields on the confirmation step.
+   */
+  const getNonEditableValueToDisplay = (columnPath, value) => {
     if (columnPath === cycleCountColumn.EXPIRATION_DATE) {
       return formatLocalizedDate(value, DateFormat.DD_MMM_YYYY);
     }
@@ -116,7 +119,18 @@ const useCountStepTable = ({
     }
 
     if (columnPath === cycleCountColumn.BIN_LOCATION && showBinLocation) {
-      return value?.name;
+      return getBinLocationToDisplay(value);
+    }
+
+    return value;
+  };
+
+  /**
+   Override the behaviour of getValue when displaying fields on the count step.
+   */
+  const getValueToDisplay = (columnPath, value) => {
+    if (columnPath === cycleCountColumn.BIN_LOCATION && showBinLocation) {
+      return { ...value, name: getBinLocationToDisplay(value) };
     }
 
     return value;
@@ -129,6 +143,7 @@ const useCountStepTable = ({
       const columnPath = id.replaceAll('_', '.');
       const initialValue = _.get(tableData, `[${index}].${columnPath}`);
       const [value, setValue] = useState(initialValue);
+      const showTooltip = columnPath === cycleCountColumn.BIN_LOCATION;
 
       const isFieldDisabled = !original.id.includes('newRow') && ![
         cycleCountColumn.QUANTITY_COUNTED,
@@ -138,8 +153,13 @@ const useCountStepTable = ({
       // We shouldn't allow users edit fetched data (only quantity counted and comment are editable)
       if (!isStepEditable) {
         return (
-          <TableCell className="static-cell-count-step d-flex align-items-center">
-            {getValueToDisplay(columnPath, value)}
+          <TableCell
+            className="static-cell-count-step d-flex align-items-center"
+            tooltip={showTooltip}
+            tooltipForm={showTooltip}
+            tooltipLabel={getBinLocationToDisplay(value) || translate('react.cycleCount.table.binLocation.label', 'Bin Location')}
+          >
+            {getNonEditableValueToDisplay(columnPath, value)}
           </TableCell>
         );
       }
@@ -194,7 +214,6 @@ const useCountStepTable = ({
       const type = getFieldType(columnPath);
       const Component = getFieldComponent(columnPath);
       const fieldProps = getFieldProps(columnPath, value, isFieldDisabled);
-      const showTooltip = columnPath === cycleCountColumn.BIN_LOCATION;
 
       // Columns allowed for focus in new rows
       const newRowFocusableCells = [
@@ -234,12 +253,12 @@ const useCountStepTable = ({
           tooltip={showTooltip}
           tooltipForm={showTooltip}
           tooltipClassname={showTooltip && 'bin-location-tooltip'}
-          tooltipLabel={value?.name || translate('react.cycleCount.table.binLocation.label', 'Bin Location')}
+          tooltipLabel={getBinLocationToDisplay(value) || translate('react.cycleCount.table.binLocation.label', 'Bin Location')}
         >
           <Component
-            disabled={isFieldDisabled}
+            disabled={isFieldDisabled || isFormDisabled}
             type={type}
-            value={value}
+            value={getValueToDisplay(columnPath, value)}
             onChange={onChange}
             onBlur={onBlur}
             className={`m-1 hide-arrows ${showTooltip ? 'w-99' : 'w-75'} ${error && 'border border-danger input-has-error'}`}
@@ -269,7 +288,7 @@ const useCountStepTable = ({
 
   const columns = [
     columnHelper.accessor(
-      (row) => (row?.binLocation?.label ? row?.binLocation : row.binLocation?.name), {
+      (row) => getBinLocationToDisplay(row?.binLocation), {
         id: cycleCountColumn.BIN_LOCATION,
         header: () => (
           <TableHeaderCell className="rt-th-count-step">
@@ -345,7 +364,7 @@ const useCountStepTable = ({
           >
             {(original.id.includes('newRow') || original.custom) && isStepEditable && (
               <RiDeleteBinLine
-                className="cursor-pointer"
+                className={isFormDisabled ? 'disabled-icon' : 'cursor-pointer'}
                 onClick={() => removeRow(cycleCountId, original.id)}
                 size={22}
               />

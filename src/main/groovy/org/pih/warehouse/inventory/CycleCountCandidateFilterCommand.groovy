@@ -10,6 +10,9 @@ class CycleCountCandidateFilterCommand extends PaginationCommand implements Vali
 
     List<CycleCountCandidateStatus> statuses
 
+    // Filter param for populating data related to exact ids
+    List<String> requestIds
+
     String searchTerm
 
     List<Category> categories
@@ -36,6 +39,8 @@ class CycleCountCandidateFilterCommand extends PaginationCommand implements Vali
 
     Boolean includeStockOnHandOrNegativeStock = Boolean.TRUE
 
+    Boolean showCycleCountsInProgress = Boolean.FALSE
+
     static constraints = {
         statuses(nullable: true)
         searchTerm(nullable: true)
@@ -49,5 +54,6 @@ class CycleCountCandidateFilterCommand extends PaginationCommand implements Vali
         order(nullable: true)
         format(nullable: true)
         negativeQuantity(nullable: true)
+        showCycleCountsInProgress(nullable: true)
     }
 }

@@ -1048,6 +1048,7 @@ class PartialReceivingPage extends Component {
                       <Select
                         onChange={(selectedOption) => this.handleSortChange(selectedOption, values)}
                         value={this.props.sort}
+                        dataTestId="custom-select-ordering"
                         options={receivingSortOptions.map((option) => ({
                           value: option.value,
                           label: translate(option.label, option.defaultLabel),

@@ -59,7 +59,9 @@
     "@fortawesome/free-solid-svg-icons": "5.14.0",
     "@fortawesome/react-fontawesome": "0.1.8",
     "@hookform/resolvers": "3.3.4",
+    "@sentry/react": "7.119.2",
     "@tanstack/react-table": "8.20.5",
+    "@tanstack/react-virtual": "3.13.10",
     "@testing-library/react-hooks": "8.0.1",
     "axios": "1.6.8",
     "bootstrap": "4.6.2",
@@ -112,7 +114,6 @@
     "redux-persist": "6.0.0",
     "redux-promise": "0.6.0",
     "redux-thunk": "2.4.2",
-    "@sentry/react": "7.119.2",
     "zod": "3.22.4"
   },
   "devDependencies": {

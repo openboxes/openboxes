@@ -2,6 +2,7 @@ import _ from 'lodash';
 import queryString from 'query-string';
 
 import glAccountApi from 'api/services/GlAccountApi';
+import indicatorsApi from 'api/services/IndicatorsApi';
 import locationApi from 'api/services/LocationApi';
 import organizationApi from 'api/services/OrganizationApi';
 import productApi from 'api/services/ProductApi';
@@ -10,7 +11,6 @@ import productGroupApi from 'api/services/ProductGroupApi';
 import selectOptionsApi from 'api/services/SelectOptionsApi';
 import userApi from 'api/services/UserApi';
 import { INTERNAL_LOCATIONS } from 'api/urls';
-import ActivityCode from 'consts/activityCode';
 import locationType from 'consts/locationType';
 import apiClient from 'utils/apiClient';
 import splitTranslation from 'utils/translation-utils';
@@ -243,13 +243,15 @@ export const fetchLocationById = async (id) => {
   return response.data?.data;
 };
 
-export const fetchBins = async (locationId, ignoreActivityCodes = [ActivityCode.RECEIVE_STOCK]) => {
+export const fetchBins = async (
+  locationId, ignoreActivityCodes = [], sort = null) => {
   const response = await apiClient.get(INTERNAL_LOCATIONS, {
     paramsSerializer: (parameters) => queryString.stringify(parameters),
     params: {
       'location.id': locationId,
       locationTypeCode: [locationType.BIN_LOCATION, locationType.INTERNAL],
       ignoreActivityCodes,
+      sort,
     },
   });
 
@@ -307,6 +309,21 @@ export const fetchProduct = async (id) => {
 
 export const fetchOrganization = async (id) => {
   const { data } = await organizationApi.getOrganization(id);
+  return data.data;
+};
+
+export const fetchIndicatorProductsInventoried = async (params = {}) => {
+  const { data } = await indicatorsApi.getProductsInventoried(params);
+  return data.data;
+};
+
+export const fetchIndicatorInventoryLoss = async (params = {}) => {
+  const { data } = await indicatorsApi.getInventoryLoss(params);
+  return data.data;
+};
+
+export const fetchInventoryAccuracy = async (params = {}) => {
+  const { data } = await indicatorsApi.getInventoryAccuracy(params);
   return data.data;
 };
 

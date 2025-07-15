@@ -173,14 +173,6 @@ limit-lines($lines-number) {
   }
 }
 
-.confirm-step-header {
-  display: flex;
-  justify-content: end;
-  align-items: center;
-  gap: 8px;
-  padding-top: 40px;
-}
-
 .bin-location-tooltip {
   width: 75%;
 }
@@ -247,3 +239,33 @@ input.hide-arrows[type=number] {
   padding: 10px 16px;
   color: var(--blue-700);
 }
+
+.modal-content {
+  min-width: 1000px;
+
+  .assign-count-modal-header {
+    font-size: 24px;
+    margin-left: 6px;
+  }
+
+  .assign-count-modal-container {
+    padding: 0 4px 0 4px;
+    overflow-y: auto;
+    max-height: 400px;
+
+    &::-webkit-scrollbar {
+      width: 0.5em;
+      height: 0.5em;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: var(--blue-200);
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: var(--blue-301);
+      border-radius: 4px;
+    }
+  }
+}
+

@@ -143,7 +143,6 @@ const useResolveStepValidation = ({ tableData }) => {
 
   return {
     validationErrors: validationErrors.current,
-    isFormValid: isValid.current,
     triggerValidation,
     validateRootCauses,
     shouldHaveRootCause,

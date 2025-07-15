@@ -110,7 +110,11 @@ class CycleCount {
      */
     Set<CycleCountItem> getItemsOfMostRecentCount() {
         Integer countIndex = maxCountIndex
-        return cycleCountItems.findAll{ it.countIndex == countIndex}
+        return cycleCountItems.findAll { it.countIndex == countIndex}
+    }
+
+    Integer getNumberOfItemsOfMostRecentCount() {
+        return getItemsOfMostRecentCount()?.size()
     }
 
     Set<CycleCountItem> getItemsOfSpecificCount(Integer countIndex) {
@@ -137,4 +141,16 @@ class CycleCount {
                     it.countIndex == countIndex }
     }
 
+    Map toJson() {
+        return [
+                id: id,
+                facility: facility,
+                dateLastRefreshed: dateLastRefreshed,
+                status: status,
+                dateCreated: dateCreated,
+                lastUpdated: lastUpdated,
+                createdBy: createdBy,
+                updatedBy: updatedBy
+        ]
+    }
 }

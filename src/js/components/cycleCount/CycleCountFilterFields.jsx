@@ -1,6 +1,7 @@
 import CheckboxField from 'components/form-elements/CheckboxField';
 import DateFilter from 'components/form-elements/DateFilter/DateFilter';
 import FilterSelectField from 'components/form-elements/FilterSelectField';
+import { DateFormat } from 'consts/timeFormat';
 
 export default {
   dateLastCount: {
@@ -8,7 +9,7 @@ export default {
     attributes: {
       label: 'react.cycleCount.filter.lastCountedDate.label',
       defaultMessage: 'Last counted date',
-      dateFormat: 'MM/DD/YYYY',
+      dateFormat: DateFormat.DD_MMM_YYYY,
       showLabelTooltip: true,
       filterElement: true,
     },

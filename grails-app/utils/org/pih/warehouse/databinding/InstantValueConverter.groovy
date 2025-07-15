@@ -16,23 +16,18 @@ class InstantValueConverter extends StringValueConverter<Instant> {
      * Binds a given user-input String to an Instant.
      *
      * An Instant is an absolute moment in time, so to construct it we need a full datetime with timezone included.
-     * As such, if the given string doesn't provide a time, we default to "00:00.000" (aka the start of the day),
-     * and if it doesn't provide a timezone, we default to "Z" (aka UTC).
+     * As such, if the given string doesn't provide time or timezone information, we error.
      *
-     * This defaulting to UTC is important. We don't want to rely on the system local time, which can vary from host
-     * to host, and can change over time within a single host. Our app should behave the same way no matter where it is
-     * hosted. We also don't want to make assumptions about the timezone that the end user is sending data in/from.
+     * We could have been more forgiving and allow for time and time zone to be omitted (and default the resulting
+     * Instant to midnight server time), but we've encountered many timezone related issues in the past, so to be safe
+     * we require the client to always provide all the information required to build the Instant.
      *
-     * The universally accepted "default" timezone is UTC, so for the sake of simplicity, we use that as a fallback if
-     * the client doesn't provide timezone information. However, as much as possible we should insist that the client
-     * DOES provide timezone information so that there is no ambiguity as to the precise datetime being provided.
-     *
-     * @param value "2000-01-01", "2000-01-01T00:00", "2000-01-01T00:00Z", "2000-01-01T00:00+05:00" for example
+     * @param value "2000-01-01T00:00Z", or "2000-01-01T00:00+05:00" for example
      */
     @Override
     Instant convertString(String value) {
         return StringUtils.isBlank(value) ?
                 null :
-                Instant.from(DataBindingConstants.FLEXIBLE_DATE_TIME_ZONE_FORMAT.parse(value.trim()))
+                Instant.from(DataBindingConstants.DATE_TIME_ZONE_FORMAT.parse(value.trim()))
     }
 }

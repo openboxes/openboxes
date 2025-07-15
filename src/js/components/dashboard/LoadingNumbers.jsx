@@ -1,13 +1,14 @@
 /* eslint-disable react/jsx-closing-tag-location */
 import React from 'react';
 
+import PropTypes from 'prop-types';
 import ReactLoading from 'react-loading';
 
 import { getRandomColor } from 'consts/dataFormat/colorMapping';
 
-const LoadingNumbers = () => {
+const LoadingNumbers = ({ numberOfLoadingCards }) => {
   const loadingNumbers = [];
-  for (let i = 0; i < 4; i += 1) {
+  for (let i = 0; i < numberOfLoadingCards; i += 1) {
     loadingNumbers.push(<div className="number-card" key={i}>
       <div className="loader-div">
         <ReactLoading
@@ -25,6 +26,14 @@ const LoadingNumbers = () => {
       {loadingNumbers}
     </div>
   );
+};
+
+LoadingNumbers.propTypes = {
+  numberOfLoadingCards: PropTypes.number,
+};
+
+LoadingNumbers.defaultProps = {
+  numberOfLoadingCards: 4,
 };
 
 export default LoadingNumbers;

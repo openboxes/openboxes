@@ -107,6 +107,11 @@ const INVENTORY_ITEM_URL = {
   }),
 };
 
+const INVENTORY_URL = {
+  base: `${CONTEXT_PATH}/inventory`,
+  showTransaction: (id) => `${INVENTORY_URL.base}/showTransaction/${id}`,
+};
+
 const REQUISITION_TEMPLATE_URL = {
   base: `${CONTEXT_PATH}/requisitionTemplate`,
   create: () => `${REQUISITION_TEMPLATE_URL.base}/create`,
@@ -154,6 +159,7 @@ export {
   CYCLE_COUNT,
   DASHBOARD_URL,
   INVENTORY_ITEM_URL,
+  INVENTORY_URL,
   INVOICE_URL,
   LOCATION_CONFIGURATION_URL,
   LOCATION_URL,

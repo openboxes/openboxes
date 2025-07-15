@@ -30,4 +30,7 @@
     <include file="0.9.x/changelog-2025-03-11-1300-drop-user-foreign-key-from-assignee-in-cycle-count-item.xml" />
     <include file="0.9.x/changelog-2025-03-11-1400-add-person-foreign-key-for-assignee-in-cycle-count-item.xml" />
     <include file="0.9.x/changelog-2025-03-26-2057-update-abc-class-convert-empty-string-to-null.xml" />
+    <include file="0.9.x/changelog-2025-04-29-0000-add-inventory-baseline-transaction-type.xml" />
+    <include file="0.9.x/changelog-2025-06-04-1219-create-missing-indexes.xml" />
+    <include file="0.9.x/changelog-2025-06-05-0000-add-assignment-columns-to-cycle-count-request.xml" />
 </databaseChangeLog>

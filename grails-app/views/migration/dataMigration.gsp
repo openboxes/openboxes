@@ -57,6 +57,36 @@
                     </div>
                 </td>
             </tr>
+            <tr class="prop">
+                <td class="name">Product Inventory transactions that should be replaced by Inventory Baseline and Adjustment pair</td>
+                <td class="value">
+                    ${productInventoryTransactionCount} (total), ${productInventoryTransactionInCurrentLocationCount} (current location)
+                    <br>
+                    Products: ${productsWithProductInventoryTransactionInCurrentLocation.join(', ') ?: 'None'}
+                </td>
+                <td>
+                    <div class="button-group">
+                        <g:link controller="migration" action="locationsWithProductInventoryTransactions" class="button" target="_blank">
+                            View All Locations with deprecated Product Inventory transaction
+                        </g:link>
+                        <g:link controller="migration" action="downloadCurrentInventory" params="[format: 'csv']" class="button" target="_blank">
+                            Download Inventory (.csv)
+                        </g:link>
+                        <g:link controller="migration" action="migrateProductInventoryTransactions" params="[performMigration:false]" class="button mt-3" target="_blank">
+                            <b>Preview</b> Migration for Current Location
+                        </g:link>
+                        <g:link controller="migration" action="migrateProductInventoryTransactions" params="[performMigration:true]" class="button my-3" target="_blank">
+                            <b>Migrate</b> Current Location
+                        </g:link>
+                    </div>
+                    <h1 class=""><b>Warning!</b> Currently it takes about 1-2 minutes to migrate about ~100 transactions. Results will
+                    be visible in the new tab after everything is processed (for your convenience do not close it).
+                    Do not trigger migration for the same location twice (ideally each location should be processed one by one).
+                    <br/>
+                    Preview displays all transaction entries within this location grouped by product.
+                    </h1>
+                </td>
+            </tr>
             </tbody>
         </table>
     </div>

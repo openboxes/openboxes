@@ -8,7 +8,7 @@ Notes:
 -  in each docker-compose configuration there are default values which are used in case of not providing env variables. E.g. `${DATASOURCE_USERNAME:-openboxes}`
 
 Docker-compose config structure:
--  `docker-compose-generic.yml` - generic configuration which every other docker-compose config extends. It defines generic OpenBoxes `app` and `nginx` services.
+-  `docker-compose-base.yml` - generic configuration which every other docker-compose config extends. It defines generic OpenBoxes `app` and `nginx` services.
 -  `docker-compose.yml` - default config, which expects all env variables to be set in `.env` file or via command line. E.g. it requires proper definition of `DATASOURCE_URL` variable.
 -  `docker-compose-containerdb.yml` - it extends generic configuration with `db` service - MySQL docker container.
 -  `docker-compose-hostdb.yml` - it extends generic configuration with database connection to host's MySQL instance (via `host.docker.internal`).

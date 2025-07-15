@@ -82,6 +82,7 @@ openboxes.client.autosave.enabled = false
 // Backdata configuration (OBPIH-6332)
 openboxes.dashboard.backdatedShipments.daysOffset = 1
 openboxes.dashboard.backdatedShipments.monthsLimit = 6
+openboxes.report.backdatedTransactions.daysOffset = 1
 
 // Merge Products (OBPIH-5453)
 openboxes.products.merge.enabled = false

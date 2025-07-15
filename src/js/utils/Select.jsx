@@ -361,7 +361,7 @@ class Select extends Component {
     };
 
     return (
-      <div id={`${this.state.id}-container`} data-testid="custom-select-element">
+      <div id={`${this.state.id}-container`} data-testid={attributes?.dataTestId ?? 'custom-select-element'}>
         <Tooltip
           html={this.getTooltipHtml()}
           disabled={isTooltipDisabled()}

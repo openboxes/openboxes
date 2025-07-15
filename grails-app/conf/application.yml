@@ -612,6 +612,23 @@ openboxes:
             enabled: true
             pageSize: 10
 
+    transactions:
+        inventoryBaseline:
+            # OBPIH-7194
+            recordStock:
+                enabled: true
+            # OBPIH-7195
+            inventoryImport:
+                enabled: true
+            # OBPIH-7254
+            loadDemoData:
+                enabled: true
+            # OBPIH-7198
+            migration:
+                enabled: true
+                # this one is for testing and should be always set to true on production
+                cleanupAdjustment: true
+
 mail:
     error:
         enabled: false
