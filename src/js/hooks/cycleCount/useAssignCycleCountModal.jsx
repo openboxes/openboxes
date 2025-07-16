@@ -183,6 +183,8 @@ const useAssignCycleCountModal = ({
             placeholder={translate('react.cycleCount.table.assignee.label', 'Assignee')}
             async
             loadOptions={debouncedPeopleFetch}
+            hideErrorMessageWrapper
+            className="pb-1"
             onChange={(selectedOption) => {
               handleUpdateAssignees(
                 selectedCycleCounts.current.map((item) => item.cycleCountRequestId),
@@ -219,9 +221,11 @@ const useAssignCycleCountModal = ({
         <TableHeaderCell>
           <DateField
             className="date-counted-date-picker date-field-input"
+            wrapperClassName="pb-1"
             placeholder={translate('react.cycleCount.table.deadline.label', 'Deadline')}
             clearable
             customDateFormat={DateFormat.DD_MMM_YYYY}
+            hideErrorMessageWrapper
             onChange={(newDate) => {
               handleUpdateAssignees(
                 selectedCycleCounts.current.map((item) => item.cycleCountRequestId),
