@@ -114,26 +114,31 @@ class GenericApiService {
     }
 
     Criterion buildCriterion(String propertyName, String operator, String value) {
-        if (!propertyName || !value) {
+        if (!propertyName || (value == null && operator != "isNull")) {
             throw new IllegalArgumentException("Property and value are required in order to perform searches")
         }
 
         // Default operator should be eq
         operator = operator ?: "eq"
+        Criterion criterion = null
 
         switch (operator) {
-
             case "eq":
-                Restrictions.eq(propertyName, value)
+                criterion = Restrictions.eq(propertyName, value)
                 break
             case "like":
-                Restrictions.like(propertyName, value)
+                criterion = Restrictions.like(propertyName, value)
                 break
             case "ilike":
-                Restrictions.ilike(propertyName, value)
+                criterion = Restrictions.ilike(propertyName, value)
+                break
+            case "isNull":
+                criterion = Restrictions.isNull(propertyName)
                 break
             default:
                 throw new UnsupportedOperationException("Operator ${operator} is not supported at this time")
         }
+
+        return criterion
     }
 }
