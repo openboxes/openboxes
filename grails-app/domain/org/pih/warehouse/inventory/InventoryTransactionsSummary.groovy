@@ -1,9 +1,6 @@
 package org.pih.warehouse.inventory
 
-import grails.util.Holders
-import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.core.ReasonCode
 import org.pih.warehouse.core.User
 import org.pih.warehouse.core.VarianceTypeCode
 import org.pih.warehouse.product.Product
@@ -85,11 +82,6 @@ class InventoryTransactionsSummary implements Serializable {
         return TransactionAction.RECORD_STOCK
     }
 
-    String getTransactionActionDisplayName(TransactionAction action) {
-        ApplicationTagLib g = Holders.grailsApplication.mainContext.getBean(ApplicationTagLib)
-        return g.message(code: "enum.TransactionAction.${action.name()}")
-    }
-
     Map toJson() {
         [
                 id: id,
@@ -113,7 +105,7 @@ class InventoryTransactionsSummary implements Serializable {
                 rootCauses: rootCauses,
                 comments: comments,
                 varianceTypeCode: varianceTypeCode?.name(),
-                transactionAction: getTransactionActionDisplayName(transactionAction),
+                transactionAction: transactionAction.name(),
         ]
     }
 }

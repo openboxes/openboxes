@@ -36,9 +36,11 @@ const useInventoryTransactionsTab = ({
   const {
     currentLocale,
     currentLocation,
+    defaultTranslationsFetched,
   } = useSelector((state) => ({
     currentLocale: state.session.activeLanguage,
     currentLocation: state.session.currentLocation,
+    defaultTranslationsFetched: state.session.fetchedTranslations.default,
   }));
   const {
     sortableProps,
@@ -190,14 +192,15 @@ const useInventoryTransactionsTab = ({
       </TableHeaderCell>
     ),
     cell: ({ getValue }) => {
-      const value = getValue()?.toUpperCase().replaceAll(' ', '_');
+      const value = getValue()?.toUpperCase()?.replaceAll(' ', '_');
+      const translatedValue = translate(`react.default.enum.TransactionAction.${value}`, value);
       return (
         <TableCell
           className="rt-td pb-0 d-flex align-items-start"
         >
           <ValueIndicator
             variant={valueIndicatorVariant.TRANSACTION}
-            value={value}
+            value={translatedValue}
           />
         </TableCell>
       );
@@ -375,7 +378,7 @@ const useInventoryTransactionsTab = ({
         </TableCell>
       );
     },
-  })], [currentLocale]);
+  })], [currentLocale, defaultTranslationsFetched]);
 
   const emptyTableMessage = !filterParams.startDate && !filterParams.endDate
     ? {
