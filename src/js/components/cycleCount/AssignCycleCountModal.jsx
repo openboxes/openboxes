@@ -18,6 +18,7 @@ const AssignCycleCountModal = ({
   isRecount,
   refetchData,
   assignDataDirectly,
+  showSkipButton,
 }) => {
   // When the modal is not displayed we want to show the scrollbar to users.
   // The return below is necessary to block executing hooks that are related to
@@ -66,7 +67,15 @@ const AssignCycleCountModal = ({
             totalCount={selectedCycleCounts.current?.length || 0}
           />
         </div>
-        <div className="d-flex justify-content-end mt-3">
+        <div className="d-flex justify-content-end mt-3 gap-8">
+          {showSkipButton && (
+            <Button
+              defaultLabel="Skip"
+              label="react.cycleCount.assign.skip.label"
+              variant="secondary"
+              onClick={closeModal}
+            />
+          )}
           <Button
             defaultLabel="Assign"
             label="react.cycleCount.assign.label"
@@ -90,6 +99,7 @@ AssignCycleCountModal.propTypes = {
   isRecount: PropTypes.bool,
   refetchData: PropTypes.func,
   assignDataDirectly: PropTypes.bool,
+  showSkipButton: PropTypes.bool,
 };
 
 AssignCycleCountModal.defaultProps = {
@@ -98,4 +108,5 @@ AssignCycleCountModal.defaultProps = {
   isRecount: false,
   refetchData: null,
   assignDataDirectly: false,
+  showSkipButton: false,
 };

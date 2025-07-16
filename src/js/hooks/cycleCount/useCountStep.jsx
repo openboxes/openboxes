@@ -43,8 +43,6 @@ import { checkBinLocationSupport } from 'utils/supportedActivitiesUtils';
 const useCountStep = () => {
   const [isAssignCountModalOpen, setIsAssignCountModalOpen] = useState(false);
   const assignCountModalData = useRef([]);
-  // Page on which user should land after closing assign cycle count modal
-  const redirectAfterClosingModal = useRef(null);
   // Table data is stored using useRef to avoid re-renders onBlur
   // (it removes focus while selecting new fields)
   const tableData = useRef([]);
@@ -449,7 +447,7 @@ const useCountStep = () => {
   const closeAssignCountModal = () => {
     setIsAssignCountModalOpen(false);
     assignCountModalData.current = [];
-    history.push(redirectAfterClosingModal.current);
+    history.push(CYCLE_COUNT.resolveStep());
   };
 
   const openAssignCountModal = () => {
@@ -469,8 +467,7 @@ const useCountStep = () => {
         }
         hide();
         onClose()?.();
-        redirectAfterClosingModal.current = CYCLE_COUNT.list(TO_RESOLVE_TAB);
-        openAssignCountModal();
+        history.push(CYCLE_COUNT.list(TO_RESOLVE_TAB));
       },
     },
     {
@@ -488,7 +485,6 @@ const useCountStep = () => {
           showSuccessNotification(requestIdsWithoutDiscrepanciesData);
         }
         hide();
-        redirectAfterClosingModal.current = CYCLE_COUNT.resolveStep();
         openAssignCountModal();
       },
     },
