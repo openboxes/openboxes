@@ -57,10 +57,10 @@ const useAssignCycleCountModal = ({
   const columnHelper = createColumnHelper();
   const { forceRerender } = useForceRender();
 
-  const handleUpdateAssignees = (cycleCountRequestId, field, value) => {
+  const handleUpdateAssignees = (cycleCountRequestIds, field, value) => {
     // eslint-disable-next-line no-param-reassign
     selectedCycleCounts.current = selectedCycleCounts.current.map((item) =>
-      (item.cycleCountRequestId === cycleCountRequestId
+      (cycleCountRequestIds.includes(item.cycleCountRequestId)
         ? { ...item, [field]: value }
         : item));
   };
@@ -179,7 +179,22 @@ const useAssignCycleCountModal = ({
       id: cycleCountColumn.ASSIGNEE,
       header: () => (
         <TableHeaderCell>
-          {translate('react.cycleCount.table.assignee.label', 'Assignee')}
+          <SelectField
+            placeholder={translate('react.cycleCount.table.assignee.label', 'Assignee')}
+            async
+            loadOptions={debouncedPeopleFetch}
+            hideErrorMessageWrapper
+            className="pb-1"
+            onChange={(selectedOption) => {
+              handleUpdateAssignees(
+                selectedCycleCounts.current.map((item) => item.cycleCountRequestId),
+                cycleCountColumn.ASSIGNEE,
+                selectedOption,
+              );
+              // Force a re-render so that all rows are updated to display the selected value
+              forceRerender();
+            }}
+          />
         </TableHeaderCell>
       ),
       cell: ({ getValue, row }) => (
@@ -191,7 +206,7 @@ const useAssignCycleCountModal = ({
             defaultValue={getValue()}
             onChange={(selectedOption) =>
               handleUpdateAssignees(
-                row.original.cycleCountRequestId,
+                [row.original.cycleCountRequestId],
                 cycleCountColumn.ASSIGNEE,
                 selectedOption,
               )}
@@ -204,7 +219,23 @@ const useAssignCycleCountModal = ({
       id: cycleCountColumn.DEADLINE,
       header: () => (
         <TableHeaderCell>
-          {translate('react.cycleCount.table.deadline.label', 'Deadline')}
+          <DateField
+            className="date-counted-date-picker date-field-input"
+            wrapperClassName="pb-1"
+            placeholder={translate('react.cycleCount.table.deadline.label', 'Deadline')}
+            clearable
+            customDateFormat={DateFormat.DD_MMM_YYYY}
+            hideErrorMessageWrapper
+            onChange={(newDate) => {
+              handleUpdateAssignees(
+                selectedCycleCounts.current.map((item) => item.cycleCountRequestId),
+                cycleCountColumn.DEADLINE,
+                newDate,
+              );
+              // Force a re-render so that all rows are updated to display the selected value
+              forceRerender();
+            }}
+          />
         </TableHeaderCell>
       ),
       cell: ({ getValue, row }) => (
@@ -217,7 +248,7 @@ const useAssignCycleCountModal = ({
             customDateFormat={DateFormat.DD_MMM_YYYY}
             onChange={(newDate) => {
               handleUpdateAssignees(
-                row.original.cycleCountRequestId,
+                [row.original.cycleCountRequestId],
                 cycleCountColumn.DEADLINE,
                 newDate,
               );
