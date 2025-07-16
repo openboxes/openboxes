@@ -35,6 +35,11 @@ class AutomaticReceiptJob {
                     return
                 }
 
+                if (!shipment.hasShipped()) {
+                    log.warn("Shipment ${shipmentId} has no SHIPPED event associated")
+                    return
+                }
+
                 if (!shipment.destination?.supports(ActivityCode.AUTO_RECEIVING)) {
                     log.debug("Shipment ${shipmentId}: origin does not support AUTO_RECEIVING")
                     return
@@ -66,6 +71,11 @@ class AutomaticReceiptJob {
                 shippedShipments.each {
                     if (it.isFullyReceived()) {
                         log.debug("Shipment ${it.id} already fully received")
+                        return
+                    }
+
+                    if (!it.hasShipped()) {
+                        log.warn("Shipment ${it.id} has no SHIPPED event associated")
                         return
                     }
 
