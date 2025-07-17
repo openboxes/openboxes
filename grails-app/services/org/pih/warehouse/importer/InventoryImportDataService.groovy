@@ -150,8 +150,20 @@ class InventoryImportDataService implements ImportDataService {
 
         String comment = "Imported from ${command.filename} on ${new Date()}"
 
+        // We normally put comments in the adjustment transaction entries, but if we know that there won't be
+        // an adjustment transaction entry for an item (because there's no quantity change), we add the comment
+        // to the baseline transaction entry instead so that the comment is not lost.
+        Map<Map<String, Object>, String> commentsForBaselineTransactionEntries =
+                getCommentsForBaselineTransactionEntries(inventoryImportData.rows, availableItems)
+
         inventoryImportProductInventoryTransactionService.createInventoryBaselineTransactionForGivenStock(
-                command.location, command, availableItems.values(), baselineTransactionDate, comment)
+                command.location,
+                command,
+                availableItems.values(),
+                baselineTransactionDate,
+                comment,
+                commentsForBaselineTransactionEntries,
+        )
 
         // Date objects are mutable, so we use Instant to clone the date in the command and avoid directly modifying it.
         Date adjustmentTransactionDate = DateUtil.asDate(DateUtil.asInstant(baselineTransactionDate).plusSeconds(1))
@@ -163,6 +175,53 @@ class InventoryImportDataService implements ImportDataService {
         // and adjustment. This avoids needing to fetch available items twice (which is slow).
         createAdjustmentTransaction(
                 command.location, inventoryImportData, availableItems, adjustmentTransactionDate, comment)
+    }
+
+    /**
+     * Builds a map keyed on inventory item + bin location of all the comments from InventoryImportDataRow objects
+     * that have a comment but won't have an adjustment transaction item (because the quantity input is equal to
+     * the current quantity on hand for the item).
+     */
+    private Map<Map<String, Object>, String> getCommentsForBaselineTransactionEntries(
+            Map<String, List<InventoryImportDataRow>> rowsMap, Map<String, AvailableItem> availableItems) {
+
+        Map<Map<String, Object>, String> baselineTransactionEntryComments = [:]
+        for (rowsEntry in rowsMap.entrySet()) {
+            List<InventoryImportDataRow> rowsForKey = rowsEntry.value
+
+            String comment = buildTransactionEntryComment(rowsForKey)
+            if (StringUtils.isBlank(comment)) {
+                continue
+            }
+
+            AvailableItem availableItem = availableItems.get(rowsEntry.key)
+            int adjustmentQuantity = getAdjustmentQuantity(rowsForKey, availableItem)
+            if (adjustmentQuantity == 0) {
+                baselineTransactionEntryComments.put(
+                        [inventoryItem: availableItem.inventoryItem, binLocation: availableItem.binLocation],
+                        comment)
+            }
+        }
+
+        return baselineTransactionEntryComments
+    }
+
+    /**
+     * Given a list of import data rows with the same [product + lot + bin], join their comments into a single string
+     * for use in the comment of a transaction entry.
+     */
+    private String buildTransactionEntryComment(List<InventoryImportDataRow> rows) {
+        return rows.comments.join(", ")
+    }
+
+    /**
+     * Return the quantity adjustment that will result from the given import rows. We assume the given rows all share
+     * the same [product + lot + bin] key, meaning they will share an adjustment transaction entry.
+     */
+    private int getAdjustmentQuantity(List<InventoryImportDataRow> rows, AvailableItem availableItem) {
+        int quantityOnHand = availableItem?.quantityOnHand ?: 0
+        int quantityImported = rows.sum { it.quantity ?: 0 } as int
+        return quantityImported - quantityOnHand
     }
 
     /**
@@ -191,10 +250,7 @@ class InventoryImportDataService implements ImportDataService {
                 continue
             }
 
-            // If we have no product availability record for the item, we assume that means we have no quantity.
-            int quantityOnHand = availableItems.get(entry.key)?.quantityOnHand ?: 0
-            int totalQuantity = rowsForKey.sum { it.quantity ?: 0 } as int
-            int adjustmentQuantity = totalQuantity - quantityOnHand
+            int adjustmentQuantity = getAdjustmentQuantity(rowsForKey, availableItems.get(entry.key))
             if (adjustmentQuantity == 0) {
                 continue
             }
@@ -208,7 +264,7 @@ class InventoryImportDataService implements ImportDataService {
                     product: row.product,
                     binLocation: row.binLocation,
                     inventoryItem: row.inventoryItem,
-                    comments: rowsForKey.comments.join(", "),
+                    comments: buildTransactionEntryComment(rowsForKey),
             )
             transaction.addToTransactionEntries(transactionEntry)
         }
