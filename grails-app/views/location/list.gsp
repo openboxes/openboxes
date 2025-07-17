@@ -5,6 +5,16 @@
         <meta name="layout" content="custom" />
         <title><warehouse:message code="locations.label" /></title>
 
+        <style>
+          .table-container {
+            overflow-x: auto;
+          }
+          .table-container table {
+            width: 100%;
+            min-width: 1200px;
+            border-collapse: collapse;
+          }
+        </style>
     </head>
     <body>
         <div class="body">
@@ -82,55 +92,46 @@
                                 ${warehouse.message(code: 'default.searchResults.label',
                                         args: [locationInstanceTotal]) }
                             </h2>
-                            <table>
-                                <thead>
-                                    <tr style="height: 100px;">
-                                        <th></th>
-                                        <g:sortableColumn property="name" title="${warehouse.message(code: 'default.name.label')}" class="bottom"/>
-                                        <g:sortableColumn property="locationNumber" title="${warehouse.message(code: 'location.locationNumber.label')}" class="bottom"/>
-                                        <g:sortableColumn property="locationType" title="${warehouse.message(code: 'location.locationType.label')}" class="bottom"/>
-                                        <g:sortableColumn property="locationGroup" title="${warehouse.message(code: 'location.locationGroup.label')}" class="bottom"/>
-                                        <g:sortableColumn property="status" title="${warehouse.message(code: 'location.status.label')}" class="bottom"/>
-                                        <th class="bottom"><span class="vertical-text"><warehouse:message code="warehouse.active.label" /></span></th>
-                                        <g:each var="activity" in="${ActivityCode.list()}">
-                                            <th class="bottom">
-                                                <span class="vertical-text"><warehouse:message code="enum.ActivityCode.${activity}"/></span>
-                                            </th>
-                                        </g:each>
-                                        <th class="left bottom"><warehouse:message code="default.color.label" /></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <g:each in="${locationInstanceList}" status="i" var="locationInstance">
-                                        <tr class="prop ${(i % 2) == 0 ? 'odd' : 'even'}">
-                                            <td class="middle" aria-label="Actions">
-                                                <g:render template="actions" model="[locationInstance:locationInstance]"/>
-                                            </td>
-                                            <td class="middle" aria-label="Name">
-                                                <g:link action="edit" id="${locationInstance.id}">${fieldValue(bean: locationInstance, field: "name")}</g:link>
-                                            </td>
-                                            <td class="middle" aria-label="Location number">
-                                                <g:link action="edit" id="${locationInstance.id}">${fieldValue(bean: locationInstance, field: "locationNumber")}</g:link>
-                                            </td>
-                                            <td class="left middle" aria-label="Location type"><format:metadata obj="${locationInstance?.locationType}"/></td>
-                                            <td class="left middle" aria-label="Location group">${locationInstance?.locationGroup?:warehouse.message(code:'default.none.label')}</td>
-                                            <td class="middle" aria-label="Status">
-                                                <span class="${locationInstance?.status == LocationStatus.ENABLED ? 'active' : 'inactive' }">
-                                                    <format:metadata obj="${locationInstance?.status}"/>
-                                                </span>
-                                            </td>
-                                            <td class="left middle" aria-label="Active">
-                                                <g:if test="${locationInstance.active }">
-                                                    <img class="middle" src="${resource(dir:'images/icons/silk',file:'tick.png')}" alt="${warehouse.message(code: 'default.yes.label') }" title="${warehouse.message(code: 'default.yes.label') }"/>
-                                                </g:if>
-                                                <g:else>
-                                                    <img class="middle" src="${resource(dir:'images/icons/silk',file:'cross.png')}" alt="${warehouse.message(code: 'default.no.label') }" title="${warehouse.message(code: 'default.no.label') }"/>
-                                                </g:else>
-
-                                            </td>
-                                            <g:each var="activity" in="${ActivityCode.list()}">
-                                                <td class="left middle" aria-label="${activity}">
-                                                    <g:if test="${locationInstance?.supports(activity) }">
+                            <div class="table-container">
+                                <table>
+                                    <thead>
+                                        <tr style="height: 100px;">
+                                            <th></th>
+                                            <g:sortableColumn property="name" title="${warehouse.message(code: 'default.name.label')}" class="bottom"/>
+                                            <g:sortableColumn property="locationNumber" title="${warehouse.message(code: 'location.locationNumber.label')}" class="bottom"/>
+                                            <g:sortableColumn property="locationType" title="${warehouse.message(code: 'location.locationType.label')}" class="bottom"/>
+                                            <g:sortableColumn property="locationGroup" title="${warehouse.message(code: 'location.locationGroup.label')}" class="bottom"/>
+                                            <g:sortableColumn property="status" title="${warehouse.message(code: 'location.status.label')}" class="bottom"/>
+                                            <th class="bottom"><span class="vertical-text"><warehouse:message code="warehouse.active.label" /></span></th>
+                                            <g:each var="activity" in="${ActivityCode.list().unique()}">
+                                                <th class="bottom">
+                                                    <span class="vertical-text"><warehouse:message code="enum.ActivityCode.${activity}"/></span>
+                                                </th>
+                                            </g:each>
+                                            <th class="left bottom"><warehouse:message code="default.color.label" /></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <g:each in="${locationInstanceList}" status="i" var="locationInstance">
+                                            <tr class="prop ${(i % 2) == 0 ? 'odd' : 'even'}">
+                                                <td class="middle" aria-label="Actions">
+                                                    <g:render template="actions" model="[locationInstance:locationInstance]"/>
+                                                </td>
+                                                <td class="middle" aria-label="Name">
+                                                    <g:link action="edit" id="${locationInstance.id}">${fieldValue(bean: locationInstance, field: "name")}</g:link>
+                                                </td>
+                                                <td class="middle" aria-label="Location number">
+                                                    <g:link action="edit" id="${locationInstance.id}">${fieldValue(bean: locationInstance, field: "locationNumber")}</g:link>
+                                                </td>
+                                                <td class="left middle" aria-label="Location type"><format:metadata obj="${locationInstance?.locationType}"/></td>
+                                                <td class="left middle" aria-label="Location group">${locationInstance?.locationGroup?:warehouse.message(code:'default.none.label')}</td>
+                                                <td class="middle" aria-label="Status">
+                                                    <span class="${locationInstance?.status == LocationStatus.ENABLED ? 'active' : 'inactive' }">
+                                                        <format:metadata obj="${locationInstance?.status}"/>
+                                                    </span>
+                                                </td>
+                                                <td class="left middle" aria-label="Active">
+                                                    <g:if test="${locationInstance.active }">
                                                         <img class="middle" src="${resource(dir:'images/icons/silk',file:'tick.png')}" alt="${warehouse.message(code: 'default.yes.label') }" title="${warehouse.message(code: 'default.yes.label') }"/>
                                                     </g:if>
                                                     <g:else>
@@ -138,16 +139,27 @@
                                                     </g:else>
 
                                                 </td>
-                                            </g:each>
-                                            <td class="center middle border-right" aria-label="Color">
-                                                <div style="border: 1px solid lightgrey; color:${locationInstance?.fgColor?:'black' }; background-color: ${locationInstance?.bgColor?:'white' }; padding: 5px;">
-                                                    ${locationInstance?.name }
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    </g:each>
-                                </tbody>
-                            </table>
+                                                <g:each var="activity" in="${ActivityCode.list().unique()}">
+                                                    <td class="left middle" aria-label="${activity}">
+                                                        <g:if test="${locationInstance?.supports(activity) }">
+                                                            <img class="middle" src="${resource(dir:'images/icons/silk',file:'tick.png')}" alt="${warehouse.message(code: 'default.yes.label') }" title="${warehouse.message(code: 'default.yes.label') }"/>
+                                                        </g:if>
+                                                        <g:else>
+                                                            <img class="middle" src="${resource(dir:'images/icons/silk',file:'cross.png')}" alt="${warehouse.message(code: 'default.no.label') }" title="${warehouse.message(code: 'default.no.label') }"/>
+                                                        </g:else>
+
+                                                    </td>
+                                                </g:each>
+                                                <td class="center middle border-right" aria-label="Color">
+                                                    <div style="border: 1px solid lightgrey; color:${locationInstance?.fgColor?:'black' }; background-color: ${locationInstance?.bgColor?:'white' }; padding: 5px;">
+                                                        ${locationInstance?.name }
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </g:each>
+                                    </tbody>
+                                </table>
+                            </div>
 
                             <g:set var="pageParams"
                                    value="${['locationType.id': params?.locationType?.id, 'locationGroup.id': params?.locationGroup?.id, q: params.q, 'organization.id': params?.organization?.id].findAll {it.value}}"/>
