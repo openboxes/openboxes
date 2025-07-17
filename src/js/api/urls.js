@@ -192,6 +192,8 @@ export const CYCLE_COUNT_RECOUNT_START = (locationId, format) => `${CYCLE_COUNT(
 export const CYCLE_COUNT_ITEM = (locationId, itemId) => `${CYCLE_COUNT(locationId)}/items/${itemId}`;
 export const CYCLE_COUNT_ITEMS = (locationId, cycleCountId) => `${CYCLE_COUNT(locationId)}/${cycleCountId}/items`;
 export const CYCLE_COUNT_ITEMS_BATCH = (locationId, cycleCountId) => `${CYCLE_COUNT(locationId)}/${cycleCountId}/items/batch`;
+// Root endpoint doesn't require the cycleCountId - we can send items from multiple cycle counts
+export const CYCLE_COUNT_ITEMS_BATCH_ROOT = (locationId) => `${CYCLE_COUNT(locationId)}/items/batch`;
 export const CYCLE_COUNT_SUBMIT_COUNT = (locationId, cycleCountId) => `${CYCLE_COUNT(locationId)}/${cycleCountId}/count`;
 export const CYCLE_COUNT_SUBMIT_RECOUNT = (locationId, cycleCountId) => `${CYCLE_COUNT(locationId)}/${cycleCountId}/recount`;
 export const CYCLE_COUNT_REFRESH_ITEMS = (locationId, cycleCountId, removeOutOfStockItemsImplicitly) => `${CYCLE_COUNT(locationId)}/${cycleCountId}/refresh${removeOutOfStockItemsImplicitly ? '?removeOutOfStockItemsImplicitly=true' : ''}`;
