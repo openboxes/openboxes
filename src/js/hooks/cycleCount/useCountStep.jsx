@@ -192,7 +192,6 @@ const useCountStep = () => {
     markAllItemsAsUpdated(cycleCountId);
     setCountedBy((prevState) => ({ ...prevState, [cycleCountId]: person }));
     setDefaultCountedBy((prevState) => ({ ...prevState, [cycleCountId]: person }));
-    setDefaultCountedBy((prevState) => ({ ...prevState, [cycleCountId]: person }));
     resetFocus();
   };
 
@@ -313,13 +312,13 @@ const useCountStep = () => {
 
   const getCountedDate = (cycleCountId) => dateCounted[cycleCountId];
 
-  const getPayload = (cycleCountItem, cycleCount, shouldSetDefaultAssignee) => ({
+  const getPayload = (cycleCountItem, shouldSetDefaultAssignee) => ({
     ...cycleCountItem,
     recount: false,
     assignee: shouldSetDefaultAssignee
-      ? getCountedBy(cycleCount.id)?.id ?? currentUser.id
-      : getCountedBy(cycleCount.id)?.id,
-    dateCounted: getCountedDate(cycleCount.id),
+      ? getCountedBy(cycleCountItem.cycleCountId)?.id ?? currentUser.id
+      : getCountedBy(cycleCountItem.cycleCountId)?.id,
+    dateCounted: getCountedDate(cycleCountItem.cycleCountId),
     inventoryItem: {
       ...cycleCountItem?.inventoryItem,
       product: cycleCountItem.product?.id,
@@ -328,40 +327,47 @@ const useCountStep = () => {
         outputDateFormat: DateFormat.MM_DD_YYYY,
       }),
     },
+    cycleCount: cycleCountItem.cycleCountId,
   });
 
   const save = async (shouldSetDefaultAssignee = false) => {
     try {
       show();
       resetValidationState();
+      const cycleCountItemsToUpdateBatch = [];
+      const cycleCountItemsToCreateBatch = [];
       for (const cycleCount of tableData.current) {
         const cycleCountItemsToUpdate = cycleCount.cycleCountItems
           .filter((item) => ((item.updated || !item.assignee) && !item.id.includes('newRow')))
-          .map(trimLotNumberSpaces);
-        const updatePayload = {
-          itemsToUpdate: cycleCountItemsToUpdate.map((item) =>
-            getPayload(item, cycleCount, shouldSetDefaultAssignee)),
-        };
-        if (updatePayload.itemsToUpdate.length > 0) {
-          await cycleCountApi
-            .updateCycleCountItems(updatePayload, currentLocation?.id, cycleCount.id);
+          .map((item) => ({ ...trimLotNumberSpaces(item), cycleCountId: cycleCount.id }));
+
+        if (cycleCountItemsToUpdate.length > 0) {
+          cycleCountItemsToUpdateBatch.push(cycleCountItemsToUpdate);
         }
         const cycleCountItemsToCreate = cycleCount.cycleCountItems
           .filter((item) => item.id.includes('newRow'))
-          .map(trimLotNumberSpaces);
-        const createPayload = {
-          itemsToCreate: cycleCountItemsToCreate.map((item) =>
-            getPayload(item, cycleCount, shouldSetDefaultAssignee)),
-        };
-        if (createPayload.itemsToCreate.length > 0) {
-          await cycleCountApi
-            .createCycleCountItems(createPayload, currentLocation?.id, cycleCount.id);
+          .map((item) => ({ ...trimLotNumberSpaces(item), cycleCountId: cycleCount.id }));
+
+        if (cycleCountItemsToCreate.length > 0) {
+          cycleCountItemsToCreateBatch.push(cycleCountItemsToCreate);
         }
 
         // Now that we've successfully saved all the items, mark them all as not updated so that
         // we don't try to update them again next time something is changed.
         markAllItemsAsNotUpdated(cycleCount.id);
       }
+      const updatePayload = {
+        itemsToUpdate: cycleCountItemsToUpdateBatch.flat().map((item) =>
+          getPayload(item, shouldSetDefaultAssignee)),
+      };
+      await cycleCountApi
+        .updateCycleCountItemsBatch(updatePayload, currentLocation?.id);
+      const createPayload = {
+        itemsToCreate: cycleCountItemsToCreateBatch.flat().map((item) =>
+          getPayload(item, shouldSetDefaultAssignee)),
+      };
+      await cycleCountApi
+        .createCycleCountItemsBatch(createPayload, currentLocation?.id);
     } finally {
       // After the save, refetch cycle counts so that a new row can't be saved multiple times
       await fetchCycleCounts();
@@ -645,6 +651,9 @@ const useCountStep = () => {
       );
       setImportErrors(response.data.errors);
       let cycleCounts = _.groupBy(response.data.data, 'cycleCountId');
+      const countedByUpdates = {};
+      const dateCountedUpdates = {};
+
       tableData.current = tableData.current.map((cycleCount) => {
         // After each iteration assign it to false again, so that the flag
         // can be reused for next cycle counts in the loop
@@ -663,12 +672,11 @@ const useCountStep = () => {
                 // so we can make this operation only once
                 // this is why we introduce the assigneeImported boolean flag
                 if (correspondingImportItem && !assigneeImported.current[cycleCount.id]) {
-                  assignCountedBy(cycleCount.id)(correspondingImportItem.assignee);
+                  countedByUpdates[cycleCount.id] = correspondingImportItem.assignee;
                   // Do not allow to clear the date counted dropdown
                   // if dateCounted was not set in the sheet
                   if (correspondingImportItem.dateCounted) {
-                    setDateCounted((prevState) =>
-                      ({ ...prevState, [cycleCount.id]: correspondingImportItem.dateCounted }));
+                    dateCountedUpdates[cycleCount.id] = correspondingImportItem.dateCounted;
                   }
                   // Mark the flag as true, so that it's not triggered for each item
                   assigneeImported.current = true;
@@ -691,9 +699,14 @@ const useCountStep = () => {
           ],
         };
       });
+      // Batch update state
+      setCountedBy((prevState) => ({ ...prevState, ...countedByUpdates }));
+      setDefaultCountedBy((prevState) => ({ ...prevState, ...countedByUpdates }));
+      setDateCounted((prevState) => ({ ...prevState, ...dateCountedUpdates }));
+
+      // Reset focus once
+      resetFocus();
     } finally {
-      // After import we want to trigger the validation on fields,
-      // so that a user knows what fields to correct from the UI
       triggerValidation();
       hide();
     }

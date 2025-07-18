@@ -1007,6 +1007,11 @@ class UrlMappings {
             action = [POST: "createCycleCountItemBatch", PATCH: "updateCycleCountItemBatch"]
         }
 
+        "/api/facilities/$facility/cycle-counts/items/batch" {
+            controller = "cycleCountApi"
+            action = [POST: "createCycleCountItemBatch", PATCH: "updateCycleCountItemBatch"]
+        }
+
         "/api/facilities/$facility/cycle-counts/$cycleCountId/refresh" {
             controller = "cycleCountApi"
             action = [POST: "refreshCycleCount"]
