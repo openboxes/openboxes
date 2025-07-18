@@ -8,8 +8,12 @@
  * You must not remove this notice, or any other, from this software.
  * */
 package org.pih.warehouse.reporting
+import grails.converters.JSON
+import org.pih.warehouse.report.ReportService
 
-class IndicatorController {
+class IndicatorApiController {
+
+    ReportService reportService
 
     static scaffold = Indicator
 
@@ -26,7 +30,20 @@ class IndicatorController {
         // String code, boolean captureStdout, request
         render consoleService.eval(code, true, request)
     }
+
+    def getProductsInventoried(IndicatorApiCommand command) {
+        Map data = reportService.getProductsInventoried(command)
+        render([data: data] as JSON)
+    }
+
+    def getInventoryAccuracy(IndicatorApiCommand command) {
+        Map data = reportService.getInventoryAccuracy(command)
+        render([data: data] as JSON)
+    }
+
+    def getInventoryLoss(IndicatorApiCommand command) {
+        Map data = reportService.getInventoryLoss(command)
+        render([data: data] as JSON)
+    }
 }
-
-
 

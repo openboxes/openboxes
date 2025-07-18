@@ -12,6 +12,8 @@ const InventoryTransactionsTab = ({
   tablePaginationProps,
   shouldFetch,
   setShouldFetch,
+  filtersInitialized,
+  defaultFilterValues,
 }) => {
   const {
     paginationProps,
@@ -34,6 +36,8 @@ const InventoryTransactionsTab = ({
     shouldFetch,
     setShouldFetch,
     serializedParams,
+    filtersInitialized,
+    defaultFilterValues,
   });
 
   useEffect(() => {

@@ -28,6 +28,8 @@ const useInventoryTransactionsTab = ({
   shouldFetch,
   setShouldFetch,
   serializedParams,
+  filtersInitialized,
+  defaultFilterValues,
 }) => {
   const columnHelper = createColumnHelper();
   const translate = useTranslate();
@@ -53,12 +55,12 @@ const useInventoryTransactionsTab = ({
     ...sortingParams,
     ...filterParams,
     endDate: dateWithoutTimeZone({
-      date: endDate,
+      date: endDate || defaultFilterValues.endDate,
     }),
     startDate: dateWithoutTimeZone({
-      date: startDate,
+      date: startDate || defaultFilterValues.startDate,
     }),
-    products: products?.map?.(({ id }) => id),
+    products: (products || defaultFilterValues.products)?.map?.(({ id }) => id),
     facility: currentLocation?.id,
   }, (val) => {
     if (typeof val === 'boolean') {
@@ -87,6 +89,7 @@ const useInventoryTransactionsTab = ({
     searchTerm: null,
     filterParams,
     serializedParams,
+    filtersInitialized,
   });
 
   useEffect(() => {
@@ -117,7 +120,7 @@ const useInventoryTransactionsTab = ({
   const columns = useMemo(() => [columnHelper.accessor(cycleCountColumn.ALIGNMENT, {
     header: () => (
       <TableHeaderCell sortable columnId={cycleCountColumn.ALIGNMENT} {...sortableProps}>
-        {translate('react.cycleCount.inventoryTransactionsTable.alignment.label', 'Alignment')}
+        {translate('react.cycleCount.table.alignment.label', 'Alignment')}
       </TableHeaderCell>
     ),
     cell: ({
@@ -140,7 +143,7 @@ const useInventoryTransactionsTab = ({
   }), columnHelper.accessor(cycleCountColumn.PRODUCT, {
     header: () => (
       <TableHeaderCell sortable columnId={cycleCountColumn.PRODUCT} {...sortableProps}>
-        {translate('react.cycleCount.inventoryTransactionsTable.product.label', 'Product')}
+        {translate('react.cycleCount.table.product.label', 'Product')}
       </TableHeaderCell>
     ),
     cell: ({
@@ -174,7 +177,7 @@ const useInventoryTransactionsTab = ({
   }), columnHelper.accessor(cycleCountColumn.TRANSACTION_TYPE, {
     header: () => (
       <TableHeaderCell sortable columnId={cycleCountColumn.TRANSACTION_TYPE} {...sortableProps}>
-        {translate('react.cycleCount.inventoryTransactionsTable.type.label', 'Type')}
+        {translate('react.cycleCount.table.type.label', 'Type')}
       </TableHeaderCell>
     ),
     cell: ({ getValue }) => {
@@ -199,7 +202,7 @@ const useInventoryTransactionsTab = ({
   }), columnHelper.accessor(cycleCountColumn.RECORDED, {
     header: () => (
       <TableHeaderCell>
-        {translate('react.cycleCount.inventoryTransactionsTable.recorded.label', 'Recorded')}
+        {translate('react.cycleCount.table.recorded.label', 'Recorded')}
       </TableHeaderCell>
     ),
     cell: ({
@@ -229,7 +232,7 @@ const useInventoryTransactionsTab = ({
   }), columnHelper.accessor(cycleCountColumn.TRANSACTION_ID, {
     header: () => (
       <TableHeaderCell sortable columnId={cycleCountColumn.TRANSACTION_ID} {...sortableProps}>
-        {translate('react.cycleCount.inventoryTransactionsTable.transactionId.label', 'Transaction ID')}
+        {translate('react.cycleCount.table.transactionId.label', 'Transaction ID')}
       </TableHeaderCell>
     ),
     meta: {
@@ -246,7 +249,7 @@ const useInventoryTransactionsTab = ({
   }), columnHelper.accessor(cycleCountColumn.QTY_BEFORE, {
     header: () => (
       <TableHeaderCell sortable columnId={cycleCountColumn.QTY_BEFORE} {...sortableProps}>
-        {translate('react.cycleCount.inventoryTransactionsTable.qtyBefore.label', 'Qty Before')}
+        {translate('react.cycleCount.table.qtyBefore.label', 'Qty Before')}
       </TableHeaderCell>
     ),
     size: 100,
@@ -258,7 +261,7 @@ const useInventoryTransactionsTab = ({
   }), columnHelper.accessor(cycleCountColumn.QTY_AFTER, {
     header: () => (
       <TableHeaderCell sortable columnId={cycleCountColumn.QTY_AFTER} {...sortableProps}>
-        {translate('react.cycleCount.inventoryTransactionsTable.qtyAfter.label', 'Qty After')}
+        {translate('react.cycleCount.table.qtyAfter.label', 'Qty After')}
       </TableHeaderCell>
     ),
     size: 100,
@@ -272,7 +275,7 @@ const useInventoryTransactionsTab = ({
   }), columnHelper.accessor(cycleCountColumn.DIFFERENCE, {
     header: () => (
       <TableHeaderCell sortable columnId={cycleCountColumn.DIFFERENCE} {...sortableProps}>
-        {translate('react.cycleCount.inventoryTransactionsTable.difference.label', 'Difference')}
+        {translate('react.cycleCount.table.difference.label', 'Difference')}
       </TableHeaderCell>
     ),
     cell: ({
@@ -286,7 +289,7 @@ const useInventoryTransactionsTab = ({
         },
       },
     }) => {
-      const variant = getCycleCountDifferencesVariant(quantityVariance, quantityOnHand);
+      const variant = getCycleCountDifferencesVariant({ firstValue: quantityVariance });
       const percentageValue =
         calculatePercentage(quantityOnHand, quantityCounted, quantityVariance);
       const className = quantityVariance > 0 ? 'value-indicator--more' : 'value-indicator--less';
@@ -314,7 +317,7 @@ const useInventoryTransactionsTab = ({
   }), columnHelper.accessor(cycleCountColumn.ROOT_CAUSES, {
     header: () => (
       <TableHeaderCell>
-        {translate('react.cycleCount.inventoryTransactionsTable.rootCauses.label', 'Root Causes')}
+        {translate('react.cycleCount.table.rootCauses.label', 'Root Causes')}
       </TableHeaderCell>
     ),
     size: 200,
@@ -335,7 +338,7 @@ const useInventoryTransactionsTab = ({
   }), columnHelper.accessor(cycleCountColumn.COMMENTS, {
     header: () => (
       <TableHeaderCell>
-        {translate('react.cycleCount.inventoryTransactionsTable.comments.label', 'Comments')}
+        {translate('react.cycleCount.table.comments.label', 'Comments')}
       </TableHeaderCell>
     ),
     size: 200,
@@ -357,7 +360,7 @@ const useInventoryTransactionsTab = ({
 
   const emptyTableMessage = !filterParams.startDate && !filterParams.endDate
     ? {
-      id: 'react.cycleCount.inventoryTransactionTable.emptyTable.label',
+      id: 'react.cycleCount.reporting.emptyTable.label',
       defaultMessage: 'Select a time range from above filters to load the table.',
     }
     : {

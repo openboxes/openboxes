@@ -19,6 +19,7 @@ import org.apache.commons.lang.StringUtils
 import org.grails.web.json.JSONObject
 import grails.plugins.csv.CSVWriter
 import org.hibernate.Criteria
+import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.ApiException
 import org.pih.warehouse.core.Constants
@@ -1425,45 +1426,20 @@ class JsonController {
     }
 
     def getTransactionReport(TransactionReportCommand command) {
-
         Date startDate = command.startDate
         Date endDate = command.endDate + 1
-        Location location = command.location ?: Location.get(session.warehouse.id)
+        Location location = command.location ?: AuthService.currentLocation
 
-        Category category = command.category
-        List<Tag> tagList = []
-        List<ProductCatalog> catalogList = []
-
-        if (params.tags) {
-            params.tags.split(",").each { tagId ->
-                Tag tag = Tag.findById(tagId)
-                if (tag) {
-                    tagList << tag
-                }
-            }
-        }
-
-        if (params.catalogs) {
-            params.catalogs.split(",").each { catalogId ->
-                ProductCatalog catalog = ProductCatalog.findById(catalogId)
-                if (catalog) {
-                    catalogList << catalog
-                }
-            }
-        }
-
-        if (!category) {
-            category = productService.getRootCategory()
-        }
-
-        List<Category> categories = []
-        Boolean includeCategoryChildren = params.includeCategoryChildren
-        if (includeCategoryChildren) {
-            categories = category.children
-            categories << category
-        } else {
-            categories << category
-        }
+        Category category = command.category ?: productService.getRootCategory()
+        List<Tag> tagList = params.tags
+                ? Tag.findAllById(params.list('tags'))
+                : []
+        List<ProductCatalog> catalogList = params.catalogs
+                ? ProductCatalog.findAllById(params.list('catalogs'))
+                : []
+        List<Category> categories = params.includeCategoryChildren
+                ? category.children + category
+                : [category]
 
         // FIXME Command validation not working so we're doing it manually
         if (!startDate || !endDate || !location) {
@@ -1474,19 +1450,14 @@ class JsonController {
             throw new IllegalArgumentException("Start date must occur before end date")
         }
 
-        if (endDate.after(new Date()+1)) {
+        if (endDate.after(new Date() + 1)) {
             throw new IllegalArgumentException("End date must occur on or before today")
         }
 
-        log.info "Refreshing inventory snapshot for startDate=${startDate}, endDate=${endDate}, and location=${location}"
-        inventorySnapshotService.populateInventorySnapshots(startDate, command.location, false)
-        inventorySnapshotService.populateInventorySnapshots(endDate, command.location, false)
+        Boolean isCsvReport = params.format == "text/csv"
+        List<Object> data = reportService.getTransactionReport(location, categories, tagList, catalogList, startDate, endDate, isCsvReport)
 
-        def data = (params.format == "text/csv") ?
-                inventorySnapshotService.getTransactionReportDetails(location, categories, tagList, catalogList, startDate, endDate) :
-                inventorySnapshotService.getTransactionReportSummary(location, categories, tagList, catalogList, startDate, endDate)
-
-        if (params.format == "text/csv") {
+        if (isCsvReport) {
             String csv = dataService.generateCsv(data)
             response.setHeader("Content-disposition", "attachment; filename=\"Transaction-Report-${startDate.format("yyyyMMdd")}-${(endDate - 1).format("yyyyMMdd")}.csv\"")
             render(contentType: "text/csv", text: csv.toString(), encoding: "UTF-8")
@@ -1502,88 +1473,7 @@ class JsonController {
         Date startDate = command.startDate
         Date endDate = command.endDate + 1
 
-        def balanceOpeningBinLocations = inventorySnapshotService.getQuantityOnHandByBinLocation(location, startDate, [product])
-        def balanceClosingBinLocations = inventorySnapshotService.getQuantityOnHandByBinLocation(location, endDate, [product])
-
-        def transactionsByTransactionCode = TransactionFact.createCriteria().list {
-            projections {
-                productKey {
-                    property("productCode")
-                }
-                transactionDateKey {
-                    property("date")
-                }
-                transactionTypeKey {
-                    property("transactionCode")
-                    property("transactionTypeName")
-                }
-                property("quantity")
-            }
-
-            transactionDateKey {
-                between("date", startDate, endDate)
-            }
-            locationKey {
-                eq("locationId", location.id)
-            }
-            productKey {
-                eq("productCode", product.productCode)
-            }
-
-            transactionDateKey {
-                order("date")
-            }
-        }
-
-
-        def balanceOpening = balanceOpeningBinLocations.quantity?.sum() ?: 0
-        def balanceClosing = balanceClosingBinLocations.quantity?.sum() ?: 0
-        def balanceRunning = balanceOpening
-        transactionsByTransactionCode = transactionsByTransactionCode.collect {
-            def quantity = it[4]
-            def transactionCode = it[2]
-
-            if (transactionCode == "PRODUCT_INVENTORY") {
-                balanceRunning = quantity
-                quantity = null
-            } else if (transactionCode == "DEBIT") {
-                balanceRunning -= quantity
-            } else if (transactionCode == "CREDIT") {
-                balanceRunning += quantity
-            }
-
-            [
-                    transactionDate    : it[1]?.format("dd MMM yyyy"),
-                    transactionTime    : it[1]?.format("HH:mm:ss"),
-                    transactionCode    : transactionCode,
-                    transactionTypeName: LocalizationUtil.getLocalizedString(it[3], session.locale),
-                    quantity           : quantity,
-                    balance            : balanceRunning,
-            ]
-        }
-
-        log.info("balanceOpening: " + balanceOpening)
-
-        transactionsByTransactionCode.add(0, [
-                transactionDate    : startDate?.format("dd MMM yyyy"),
-                transactionTime    : startDate?.format("HH:mm:ss"),
-                transactionCode    : "BALANCE_OPENING",
-                transactionTypeName: "Opening Balance",
-                quantity           : null,
-                balance            : balanceOpening])
-
-        transactionsByTransactionCode.add([
-                transactionDate    : endDate?.format("dd MMM yyyy"),
-                transactionTime    : endDate?.format("HH:mm:ss"),
-                transactionCode    : "BALANCE_CLOSING",
-                transactionTypeName: "Closing Balance",
-                quantity           : null,
-                balance            : balanceClosing])
-
-        log.info "transactionsByTransactionCode: " + transactionsByTransactionCode
-
-        // Flatten the data to make it easier to display
-        def data = transactionsByTransactionCode
+        List<Object> data = reportService.getTransactionReportModalData(location, product, startDate, endDate)
 
         render(["aaData": data] as JSON)
     }

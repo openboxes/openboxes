@@ -2,6 +2,7 @@ import _ from 'lodash';
 import queryString from 'query-string';
 
 import glAccountApi from 'api/services/GlAccountApi';
+import indicatorsApi from 'api/services/IndicatorsApi';
 import locationApi from 'api/services/LocationApi';
 import organizationApi from 'api/services/OrganizationApi';
 import productApi from 'api/services/ProductApi';
@@ -308,6 +309,21 @@ export const fetchProduct = async (id) => {
 
 export const fetchOrganization = async (id) => {
   const { data } = await organizationApi.getOrganization(id);
+  return data.data;
+};
+
+export const fetchIndicatorProductsInventoried = async (params = {}) => {
+  const { data } = await indicatorsApi.getProductsInventoried(params);
+  return data.data;
+};
+
+export const fetchIndicatorInventoryLoss = async (params = {}) => {
+  const { data } = await indicatorsApi.getInventoryLoss(params);
+  return data.data;
+};
+
+export const fetchInventoryAccuracy = async (params = {}) => {
+  const { data } = await indicatorsApi.getInventoryAccuracy(params);
   return data.data;
 };
 

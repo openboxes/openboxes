@@ -959,7 +959,7 @@ class UrlMappings {
 
         "/api/facilities/$facilityId/cycle-counts/requests/batch" {
             controller = "cycleCountApi"
-            action = [POST: "createRequests", DELETE: "deleteRequests"]
+            action = [POST: "createRequests", PATCH: "updateRequests", DELETE: "deleteRequests"]
         }
 
         "/api/facilities/$facility/cycle-counts/start/batch" {
@@ -1020,6 +1020,32 @@ class UrlMappings {
         "/api/reports/cycle-count-summary" {
             controller = "cycleCountApi"
             action = [POST: "getCycleCountSummary", GET: "getCycleCountSummary"]
+        }
+
+        "/api/reports/inventory-audit-details" {
+            controller = "inventoryAuditReport"
+            action = [POST: "getInventoryAuditDetails", GET: "getInventoryAuditDetails"]
+
+        }
+
+        "/api/reports/inventory-audit-summary(.$format)?" {
+            controller = "inventoryAuditReport"
+            action = [POST: "getInventoryAuditSummary", GET: "getInventoryAuditSummary"]
+        }
+
+        "/api/reports/indicators/productsInventoried" {
+            controller = "indicatorApi"
+            action = [GET: "getProductsInventoried"]
+        }
+
+        "/api/reports/indicators/inventoryAccuracy" {
+            controller = "indicatorApi"
+            action = [GET: "getInventoryAccuracy"]
+        }
+
+        "/api/reports/indicators/inventoryLoss" {
+            controller = "indicatorApi"
+            action = [GET: "getInventoryLoss"]
         }
 
         // Error handling

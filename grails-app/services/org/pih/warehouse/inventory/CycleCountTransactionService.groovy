@@ -50,6 +50,13 @@ class CycleCountTransactionService {
         return transactions
     }
 
+    private static String buildRecountComment(CycleCountItem cycleCountItem) {
+        if (cycleCountItem.comment) {
+            return "${cycleCountItem.discrepancyReasonCode ? "[${cycleCountItem.discrepancyReasonCode}]" : ''} ${cycleCountItem.comment}"
+        }
+        return null
+    }
+
     private Transaction createAdjustmentTransaction(
             CycleCount cycleCount, Date transactionDate, boolean itemQuantityOnHandIsUpToDate) {
 
@@ -87,6 +94,7 @@ class CycleCountTransactionService {
                     binLocation: cycleCountItem.location,
                     inventoryItem: cycleCountItem.inventoryItem,
                     product: cycleCountItem.product,
+                    comments: buildRecountComment(cycleCountItem)
             )
             entries.add(transactionEntry)
         }
@@ -118,7 +126,16 @@ class CycleCountTransactionService {
 
     private List<Transaction> createProductInventoryTransactions(CycleCount cycleCount, Date transactionDate) {
         List<Transaction> transactions = []
-
+        // We have to create a map keyed by inventoryItem and binLocation, because we further access it via AvailableItem properties
+        // and the inventoryItem + binLocation pair indicates the uniqueness in comparison with the CycleCountItem
+        Map<Map<String, Object>, String> commentsPerCycleCountItem = new HashMap<>()
+        cycleCount.cycleCountItems.each {
+            // We want to add a comment to product inventory transaction if we know,
+            // that no adjustment transaction would be created afterwards, that would contain the comment
+            if (it.comment && !it.quantityVariance) {
+                commentsPerCycleCountItem.put([inventoryItem: it.inventoryItem, binLocation: it.location], buildRecountComment(it))
+            }
+        }
         // A cycle count can count multiple products. Each product needs their own product inventory transaction.
         for (Product product : cycleCount.products) {
             // Creates a "snapshot style" product inventory transaction. We do this because we want any changes in
@@ -129,7 +146,10 @@ class CycleCountTransactionService {
                     cycleCount.facility,
                     cycleCount,
                     [product],
-                    transactionDate)
+                    transactionDate,
+                    null,
+                    commentsPerCycleCountItem
+                    )
 
             transactions.add(transaction)
         }

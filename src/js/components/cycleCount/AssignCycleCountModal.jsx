@@ -14,19 +14,31 @@ const AssignCycleCountModal = ({
   closeModal,
   defaultTitleLabel,
   titleLabel,
-  selectedCycleCountItems,
-  setSelectedCycleCountItems,
-  isCount,
+  selectedCycleCounts,
+  isRecount,
   refetchData,
+  assignDataDirectly,
+  showSkipButton,
 }) => {
+  // When the modal is not displayed we want to show the scrollbar to users.
+  // The return below is necessary to block executing hooks that are related to
+  // the hidden modal.
+  if (!isOpen) {
+    document.body.style.overflowY = 'auto';
+    return null;
+  }
+
   const translate = useTranslate();
 
   const { columns, handleAssign } = useAssignCycleCountModal({
-    selectedCycleCountItems,
-    setSelectedCycleCountItems,
-    isCount,
+    selectedCycleCounts,
+    isRecount,
     refetchData,
     closeModal,
+    // Props used to assign count data directly to the cycle count
+    // used in a case, when assigning data takes place after creating
+    // the cycle count (for example, assigning after the discrepancy modal)
+    assignDataDirectly,
   });
 
   return (
@@ -50,12 +62,20 @@ const AssignCycleCountModal = ({
         <div className="assign-count-modal-container">
           <DataTable
             columns={columns}
-            data={selectedCycleCountItems}
+            data={selectedCycleCounts.current}
             disablePagination
-            totalCount={selectedCycleCountItems.length}
+            totalCount={selectedCycleCounts.current?.length || 0}
           />
         </div>
-        <div className="d-flex justify-content-end mt-3">
+        <div className="d-flex justify-content-end mt-3 gap-8">
+          {showSkipButton && (
+            <Button
+              defaultLabel="Skip"
+              label="react.cycleCount.assign.skip.label"
+              variant="secondary"
+              onClick={closeModal}
+            />
+          )}
           <Button
             defaultLabel="Assign"
             label="react.cycleCount.assign.label"
@@ -75,15 +95,18 @@ AssignCycleCountModal.propTypes = {
   closeModal: PropTypes.func.isRequired,
   defaultTitleLabel: PropTypes.string,
   titleLabel: PropTypes.string,
-  selectedCycleCountItems: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
-  setSelectedCycleCountItems: PropTypes.func.isRequired,
-  isCount: PropTypes.bool,
+  selectedCycleCounts: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  isRecount: PropTypes.bool,
   refetchData: PropTypes.func,
+  assignDataDirectly: PropTypes.bool,
+  showSkipButton: PropTypes.bool,
 };
 
 AssignCycleCountModal.defaultProps = {
   titleLabel: 'react.cycleCount.modal.assignProductsToCount.title.label',
   defaultTitleLabel: 'Assign products to count',
-  isCount: false,
+  isRecount: false,
   refetchData: null,
+  assignDataDirectly: false,
+  showSkipButton: false,
 };

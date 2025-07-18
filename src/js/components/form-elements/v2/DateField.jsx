@@ -34,6 +34,7 @@ const DateField = ({
   customDateFormat,
   onChangeRaw,
   clearable,
+  wrapperClassName,
   focusProps = {},
   ...fieldProps
 }) => {
@@ -88,6 +89,7 @@ const DateField = ({
       errorMessage={errorMessage}
       button={button}
       hideErrorMessageWrapper={hideErrorMessageWrapper}
+      className={wrapperClassName}
     >
       <DatePicker
         {...fieldProps}
@@ -174,6 +176,7 @@ DateField.propTypes = {
   }),
   onChangeRaw: PropTypes.func,
   clearable: PropTypes.bool,
+  wrapperClassName: PropTypes.string,
 };
 
 DateField.defaultProps = {
@@ -185,6 +188,7 @@ DateField.defaultProps = {
   disabled: false,
   placeholder: '',
   className: '',
+  wrapperClassName: '',
   value: null,
   onChange: () => {},
   showTimeSelect: false,

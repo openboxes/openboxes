@@ -76,6 +76,10 @@ class Person implements Comparable, Serializable {
         return null
     }
 
+    static List<Person> findAllByNameOrEmail(List<String> searchTerms) {
+        return searchTerms.collect { findByNameOrEmail(it) }.findAll { it }
+    }
+
     Map toJson() {
         Boolean anonymize = Holders.config.getProperty("openboxes.anonymize.enabled", Boolean.class, Boolean.FALSE)
         return [
