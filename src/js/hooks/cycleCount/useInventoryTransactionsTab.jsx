@@ -4,15 +4,14 @@ import { createColumnHelper } from '@tanstack/react-table';
 import _ from 'lodash';
 import { useSelector } from 'react-redux';
 
-import { CYCLE_COUNT_SUMMARY_REPORT } from 'api/urls';
+import { INVENTORY_TRANSACTIONS_SUMMARY } from 'api/urls';
 import { TableCell } from 'components/DataTable';
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
 import ValueIndicator from 'components/DataTable/v2/ValueIndicator';
 import { INVENTORY_ITEM_URL } from 'consts/applicationUrls';
-import cycleCountColumn from 'consts/cycleCountColumn';
+import inventoryTransactionReportColumn from 'consts/inventoryTransactionReportColumn';
 import reasonCodes from 'consts/reasonCodes';
 import { DateFormat } from 'consts/timeFormat';
-import transactionType from 'consts/transactionType';
 import valueIndicatorVariant, {
   getCycleCountDifferencesVariant,
 } from 'consts/valueIndicatorVariant';
@@ -37,9 +36,11 @@ const useInventoryTransactionsTab = ({
   const {
     currentLocale,
     currentLocation,
+    defaultTranslationsFetched,
   } = useSelector((state) => ({
     currentLocale: state.session.activeLanguage,
     currentLocation: state.session.currentLocation,
+    defaultTranslationsFetched: state.session.fetchedTranslations.default,
   }));
   const {
     sortableProps,
@@ -74,7 +75,7 @@ const useInventoryTransactionsTab = ({
     loading,
     setTableData,
   } = useTableDataV2({
-    url: CYCLE_COUNT_SUMMARY_REPORT,
+    url: INVENTORY_TRANSACTIONS_SUMMARY,
     errorMessageId: 'react.cycleCount.table.errorMessage.label',
     defaultErrorMessage: 'Unable to fetch products',
     // We should start fetching only after clicking the button
@@ -117,18 +118,20 @@ const useInventoryTransactionsTab = ({
     return 100;
   };
 
-  const columns = useMemo(() => [columnHelper.accessor(cycleCountColumn.ALIGNMENT, {
+  const columns = useMemo(() => [columnHelper.accessor(inventoryTransactionReportColumn.ALIGNMENT, {
     header: () => (
-      <TableHeaderCell sortable columnId={cycleCountColumn.ALIGNMENT} {...sortableProps}>
+      <TableHeaderCell
+        sortable
+        columnId={inventoryTransactionReportColumn.ALIGNMENT}
+        {...sortableProps}
+      >
         {translate('react.cycleCount.table.alignment.label', 'Alignment')}
       </TableHeaderCell>
     ),
     cell: ({
       row: {
         original: {
-          verificationCount: {
-            varianceTypeCode,
-          },
+          varianceTypeCode,
         },
       },
     }) => (
@@ -140,9 +143,13 @@ const useInventoryTransactionsTab = ({
       pinned: 'left',
     },
     size: 100,
-  }), columnHelper.accessor(cycleCountColumn.PRODUCT, {
+  }), columnHelper.accessor(inventoryTransactionReportColumn.PRODUCT, {
     header: () => (
-      <TableHeaderCell sortable columnId={cycleCountColumn.PRODUCT} {...sortableProps}>
+      <TableHeaderCell
+        sortable
+        columnId={inventoryTransactionReportColumn.PRODUCT}
+        {...sortableProps}
+      >
         {translate('react.cycleCount.table.product.label', 'Product')}
       </TableHeaderCell>
     ),
@@ -174,23 +181,26 @@ const useInventoryTransactionsTab = ({
       pinned: 'left',
     },
     size: 360,
-  }), columnHelper.accessor(cycleCountColumn.TRANSACTION_TYPE, {
+  }), columnHelper.accessor(inventoryTransactionReportColumn.TRANSACTION_TYPE, {
     header: () => (
-      <TableHeaderCell sortable columnId={cycleCountColumn.TRANSACTION_TYPE} {...sortableProps}>
+      <TableHeaderCell
+        sortable
+        columnId={inventoryTransactionReportColumn.TRANSACTION_TYPE}
+        {...sortableProps}
+      >
         {translate('react.cycleCount.table.type.label', 'Type')}
       </TableHeaderCell>
     ),
     cell: ({ getValue }) => {
-      const value = getValue()
-        .toUpperCase()
-        .replaceAll(' ', '_');
+      const value = getValue()?.toUpperCase()?.replaceAll(' ', '_');
+      const translatedValue = translate(`react.default.enum.TransactionAction.${value}`, value);
       return (
         <TableCell
           className="rt-td pb-0 d-flex align-items-start"
         >
           <ValueIndicator
             variant={valueIndicatorVariant.TRANSACTION}
-            value={transactionType[value]}
+            value={translatedValue}
           />
         </TableCell>
       );
@@ -199,7 +209,7 @@ const useInventoryTransactionsTab = ({
       pinned: 'left',
     },
     size: 75,
-  }), columnHelper.accessor(cycleCountColumn.RECORDED, {
+  }), columnHelper.accessor(inventoryTransactionReportColumn.RECORDED, {
     header: () => (
       <TableHeaderCell>
         {translate('react.cycleCount.table.recorded.label', 'Recorded')}
@@ -208,10 +218,8 @@ const useInventoryTransactionsTab = ({
     cell: ({
       row: {
         original: {
-          cycleCount: {
-            dateRecorded,
-            recordedBy: { name },
-          },
+          dateRecorded,
+          recordedBy: { name },
         },
       },
     }) => (
@@ -229,9 +237,13 @@ const useInventoryTransactionsTab = ({
       pinned: 'left',
     },
     size: 130,
-  }), columnHelper.accessor(cycleCountColumn.TRANSACTION_ID, {
+  }), columnHelper.accessor(inventoryTransactionReportColumn.TRANSACTION_ID, {
     header: () => (
-      <TableHeaderCell sortable columnId={cycleCountColumn.TRANSACTION_ID} {...sortableProps}>
+      <TableHeaderCell
+        sortable
+        columnId={inventoryTransactionReportColumn.TRANSACTION_ID}
+        {...sortableProps}
+      >
         {translate('react.cycleCount.table.transactionId.label', 'Transaction ID')}
       </TableHeaderCell>
     ),
@@ -246,9 +258,13 @@ const useInventoryTransactionsTab = ({
         {getValue()?.toString()}
       </TableCell>
     ),
-  }), columnHelper.accessor(cycleCountColumn.QTY_BEFORE, {
+  }), columnHelper.accessor(inventoryTransactionReportColumn.QTY_BEFORE, {
     header: () => (
-      <TableHeaderCell sortable columnId={cycleCountColumn.QTY_BEFORE} {...sortableProps}>
+      <TableHeaderCell
+        sortable
+        columnId={inventoryTransactionReportColumn.QTY_BEFORE}
+        {...sortableProps}
+      >
         {translate('react.cycleCount.table.qtyBefore.label', 'Qty Before')}
       </TableHeaderCell>
     ),
@@ -258,9 +274,13 @@ const useInventoryTransactionsTab = ({
         {(getValue() ?? 0).toString()}
       </TableCell>
     ),
-  }), columnHelper.accessor(cycleCountColumn.QTY_AFTER, {
+  }), columnHelper.accessor(inventoryTransactionReportColumn.QTY_AFTER, {
     header: () => (
-      <TableHeaderCell sortable columnId={cycleCountColumn.QTY_AFTER} {...sortableProps}>
+      <TableHeaderCell
+        sortable
+        columnId={inventoryTransactionReportColumn.QTY_AFTER}
+        {...sortableProps}
+      >
         {translate('react.cycleCount.table.qtyAfter.label', 'Qty After')}
       </TableHeaderCell>
     ),
@@ -272,33 +292,35 @@ const useInventoryTransactionsTab = ({
         {getValue()?.toString()}
       </TableCell>
     ),
-  }), columnHelper.accessor(cycleCountColumn.DIFFERENCE, {
+  }), columnHelper.accessor(inventoryTransactionReportColumn.QTY_DIFFERENCE, {
     header: () => (
-      <TableHeaderCell sortable columnId={cycleCountColumn.DIFFERENCE} {...sortableProps}>
+      <TableHeaderCell
+        sortable
+        columnId={inventoryTransactionReportColumn.QTY_DIFFERENCE}
+        {...sortableProps}
+      >
         {translate('react.cycleCount.table.difference.label', 'Difference')}
       </TableHeaderCell>
     ),
     cell: ({
       row: {
         original: {
-          verificationCount: {
-            quantityOnHand,
-            quantityCounted,
-            quantityVariance,
-          },
+          quantityBefore,
+          quantityAfter,
+          quantityDifference,
         },
       },
     }) => {
-      const variant = getCycleCountDifferencesVariant({ firstValue: quantityVariance });
+      const variant = getCycleCountDifferencesVariant({ firstValue: quantityDifference });
       const percentageValue =
-        calculatePercentage(quantityOnHand, quantityCounted, quantityVariance);
-      const className = quantityVariance > 0 ? 'value-indicator--more' : 'value-indicator--less';
+        calculatePercentage(quantityBefore, quantityAfter, quantityDifference);
+      const className = quantityDifference > 0 ? 'value-indicator--more' : 'value-indicator--less';
 
       return (
         <TableCell className="rt-td pb-0 d-flex flex-column align-items-center">
           <ValueIndicator
-            className={`pr-2 pl-1 py-1 value-indicator ${quantityVariance !== 0 && className}`}
-            value={quantityVariance}
+            className={`pr-2 pl-1 py-1 value-indicator ${quantityDifference !== 0 && className}`}
+            value={quantityDifference}
             variant={variant}
             showAbsoluteValue
           />
@@ -314,7 +336,7 @@ const useInventoryTransactionsTab = ({
       );
     },
     size: 120,
-  }), columnHelper.accessor(cycleCountColumn.ROOT_CAUSES, {
+  }), columnHelper.accessor(inventoryTransactionReportColumn.ROOT_CAUSES, {
     header: () => (
       <TableHeaderCell>
         {translate('react.cycleCount.table.rootCauses.label', 'Root Causes')}
@@ -322,7 +344,7 @@ const useInventoryTransactionsTab = ({
     ),
     size: 200,
     cell: ({ getValue }) => {
-      const rootCauses = getValue() ? getValue().split(',').map(cause => reasonCodes[cause]).join(', ') : '';
+      const rootCauses = getValue() ? getValue().map((cause) => reasonCodes[cause]).join(', ') : '';
       return (
         <TableCell
           customTooltip
@@ -335,7 +357,7 @@ const useInventoryTransactionsTab = ({
         </TableCell>
       );
     },
-  }), columnHelper.accessor(cycleCountColumn.COMMENTS, {
+  }), columnHelper.accessor(inventoryTransactionReportColumn.COMMENTS, {
     header: () => (
       <TableHeaderCell>
         {translate('react.cycleCount.table.comments.label', 'Comments')}
@@ -343,7 +365,7 @@ const useInventoryTransactionsTab = ({
     ),
     size: 200,
     cell: ({ getValue }) => {
-      const comments = getValue() ? getValue().split(/,(?=\S)/).join(', ') : '';
+      const comments = getValue() ? getValue().join(', ') : '';
       return (
         <TableCell
           customTooltip
@@ -356,7 +378,7 @@ const useInventoryTransactionsTab = ({
         </TableCell>
       );
     },
-  })], [currentLocale]);
+  })], [currentLocale, defaultTranslationsFetched]);
 
   const emptyTableMessage = !filterParams.startDate && !filterParams.endDate
     ? {

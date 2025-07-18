@@ -202,6 +202,7 @@ export const CYCLE_COUNT_REQUESTS_BATCH = (locationId) => `${CYCLE_COUNT(locatio
 export const REPORTS = `${API}/reports`;
 export const CYCLE_COUNT_SUMMARY_REPORT = `${REPORTS}/cycle-count-summary`;
 export const INVENTORY_AUDIT_SUMMARY_REPORT = `${REPORTS}/inventory-audit-summary`;
+export const INVENTORY_TRANSACTIONS_SUMMARY = `${REPORTS}/inventory-transactions-summary`;
 
 // INDICATORS
 export const INDICATORS_REPORT = `${API}/reports/indicators`;
