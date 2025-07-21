@@ -79,6 +79,7 @@ const useInventoryTransactionsTab = ({
     errorMessageId: 'react.cycleCount.table.errorMessage.label',
     defaultErrorMessage: 'Unable to fetch products',
     // We should start fetching only after clicking the button
+    // or after refreshing the page with filters selected
     shouldFetch: shouldFetch
       && (endDate || defaultFilterValues.endDate)
       && (startDate || defaultFilterValues.startDate),
