@@ -85,7 +85,9 @@ const useProductsTab = ({
     errorMessageId: 'react.cycleCount.table.errorMessage.label',
     defaultErrorMessage: 'Unable to fetch products',
     // We should start fetching only after clicking the "Load Table" button
-    shouldFetch,
+    shouldFetch: shouldFetch
+      && (endDate || defaultFilterValues.endDate)
+      && (startDate || defaultFilterValues.startDate),
     setShouldFetch,
     disableInitialLoading: true,
     getParams,
