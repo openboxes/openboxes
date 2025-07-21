@@ -44,6 +44,7 @@ abstract class ProductInventoryTransactionService<T> {
      * @param transactionDate The datetime that the transaction should be marked with. If left blank will be
      *                        the current time.
      * @param comment An optional comment to associate with the transaction
+     * @param transactionEntriesComments A map of transaction entry comments keyed on inventory item and bin location
      * @param validateTransactionDates An optional param to disable validation of transactions at the same time
      *                                 (Used when for some reason we want to allow multiple transactions at the
      *                                 same time). By default it's true.
@@ -90,6 +91,7 @@ abstract class ProductInventoryTransactionService<T> {
      * @param transactionDate The datetime that the transaction should be marked with. If left blank will be
      *                        the current time.
      * @param comment An optional comment to associate with the transaction
+     * @param transactionEntriesComments A map of transaction entry comments keyed on inventory item and bin location
      * @param validateTransactionDates An optional param to disable validation of transactions at the same time
      *                                 (Used when for some reason we want to allow multiple transactions at the
      *                                 same time). By default it's true.
