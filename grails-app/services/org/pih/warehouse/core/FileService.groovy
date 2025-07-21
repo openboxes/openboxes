@@ -42,7 +42,7 @@ import org.docx4j.wml.TrPr
 import org.grails.datastore.mapping.model.PersistentEntity
 import org.grails.datastore.mapping.model.PersistentProperty
 import org.pih.warehouse.FormatTagLib
-import org.pih.warehouse.product.ProductAttribute
+import org.pih.warehouse.product.Attribute
 import org.pih.warehouse.shipping.ReferenceNumber
 import org.pih.warehouse.shipping.ReferenceNumberType
 import org.pih.warehouse.shipping.Shipment
@@ -176,9 +176,10 @@ class FileService {
             BigDecimal totalCost = quantity * unitCost
             def manufacturerNames = shipmentItem?.orderItems?.collect { it?.productSupplier?.manufacturer?.name }?.unique()
             def manufacturerName = manufacturerNames ? manufacturerNames.first() : ''
+            Attribute hsCodeAttribute = Attribute.findByCode(Constants.HS_CODE_PRODUCT_ATTRIBUTE_CODE)
 
             return [
-                    hsCode           : shipmentItem.inventoryItem?.product?.attributes?.find { ProductAttribute pa -> pa.attribute.code == Constants.HS_CODE_PRODUCT_ATTRIBUTE_CODE }?.value ?: "",
+                    hsCode           : shipmentItem.inventoryItem?.product?.getProductAttribute(hsCodeAttribute)?.value ?: "",
                     productCode      : shipmentItem.inventoryItem?.product?.productCode,
                     productName      : shipmentItem.inventoryItem?.product?.displayNameOrDefaultName,
                     manufacturerName : manufacturerName,
