@@ -189,4 +189,6 @@ class Constants {
     // Cycle count indexes
     static final String COUNT_INDEX = "0"
     static final String RECOUNT_INDEX = "1"
+
+    static final String HS_CODE_PRODUCT_ATTRIBUTE_CODE = "HSCODE"
 }
