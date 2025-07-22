@@ -1387,15 +1387,15 @@ class InventoryService implements ApplicationContextAware {
                     new Date(cmd.transactionDate.time + 2000)
             )
 
+            // We'd have weird behaviour if we allowed two transactions to exist at the same exact time (precision at the
+            // database level is to the second) so fail if there's already a transaction on the items for the given date.
+            List<InventoryItem> inventoryItems = availableItems.values().collect{ it.inventoryItem }
+            if (hasTransactionEntriesOnDate(currentLocation, adjustmentTransactionDate, inventoryItems)) {
+                throw new IllegalArgumentException("A transaction already exists at time ${adjustmentTransactionDate}")
+            }
+
             // 1. Create the baseline transaction
             if (isInventoryBaselineEnabled) {
-                // We'd have weird behaviour if we allowed two transactions to exist at the same exact time (precision at the
-                // database level is to the second) so fail if there's already a transaction on the items for the given date.
-                List<InventoryItem> inventoryItems = availableItems.values().collect{ it.inventoryItem }
-                if (hasTransactionEntriesOnDate(currentLocation, adjustmentTransactionDate, inventoryItems)) {
-                    throw new IllegalArgumentException("A transaction already exists at time ${adjustmentTransactionDate}")
-                }
-
                 recordStockProductInventoryTransactionService.createInventoryBaselineTransactionForGivenStock(
                         currentLocation,
                         null,
