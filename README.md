@@ -1,9 +1,9 @@
-<div style="text-align: center;">
+<div align="center">
   <a href="https://www.openboxes.com">
     <img src="/docs/assets/img/logo-background.png" alt="OpenBoxes logo" width="110">
   </a>
   <h1 style="margin-top:0; padding-top:0">OpenBoxes</h1>
-  <h4>A lightweight, open-source inventory and supply chain management system.</h4>
+  <h4>A lightweight and open-source inventory and supply chain management system.</h4>
 
   [![status of develop branch](https://github.com/openboxes/openboxes/actions/workflows/on-change.yml/badge.svg)](https://github.com/openboxes/openboxes/actions/workflows/on-change.yml)
   [![status of documentation build](https://readthedocs.org/projects/openboxes/badge/?version=develop)](https://readthedocs.org/projects/openboxes/?badge=develop)
@@ -21,13 +21,15 @@
   <hr>
 
   <p>
-    <a href="#bulb-about">About</a> •
-    <a href="#question-support">Get Support</a> •
-    <a href="#handshake-contributing">Contribute</a> •
-    <a href="#rocket-quickstart-guide">Quickstart Guide</a> •
-    <a href="#page_with_curl-license">License</a>
+    <a href="#-about">About</a> •
+    <a href="#-support">Get Support</a> •
+    <a href="#-contributing">Contribute</a> •
+    <a href="#-quickstart-guide">Quickstart Guide</a> •
+    <a href="#-license">License</a>
   </p>
 </div>
+
+<br>
 
 ## 💡 About
 OpenBoxes was initially created to assist with inventory management and to digitize the stock movements of emergency medical supplies to healthcare facilities in Haiti in the aftermath of the 2010 earthquake. As such, the application was designed to be able to run smoothly and reliably in low-resource environments, and for it to be quick and intuitive to get up and running.
@@ -36,8 +38,12 @@ The application has grown significantly since its conception, and is now used to
 
 See [our website](https://openboxes.com/features/) for a list of some of the primary features of the application or check out our [demo site](https://demo.openboxes.com/openboxes/auth/signup) to experiment with the application yourself!
 
+<br>
+
 ## ❓ Support
 Do you need assistance running or using the app? Have you encountered an issue/bug? See our [support guide](/SUPPORT.md) for more information.
+
+<br>
 
 ## 🤝 Contributing
 Are you looking to help out the project? Please see our [contributor guide](https://openboxes.gitbook.io/contributor-guide/).
@@ -62,6 +68,8 @@ We are incredibly grateful for all our financial contributors:
 <a href="https://opencollective.com/openboxes/organization/7/website"><img src="https://opencollective.com/openboxes/organization/7/avatar.svg"></a>
 <a href="https://opencollective.com/openboxes/organization/8/website"><img src="https://opencollective.com/openboxes/organization/8/avatar.svg"></a>
 <a href="https://opencollective.com/openboxes/organization/9/website"><img src="https://opencollective.com/openboxes/organization/9/avatar.svg"></a>
+
+<br>
 
 ## 🚀 Quickstart Guide
 The following instructions describe the minimum steps required to build and run the application on a Linux machine. For Mac users, or anyone looking to contribute to the project, please see our [in-depth setup instructions](https://openboxes.gitbook.io/contributor-guide/).
@@ -122,6 +130,8 @@ This will start the application in development mode using an internal Tomcat ins
 ### 6. Log into OpenBoxes
 Navigate to `http://localhost:8080/openboxes` and log in as an admin using the default credentials (username: `admin` and password: `password`). From there, you can create further accounts as needed.
 
+<br>
+
 ## 📃 License
 This project is licensed under the [Eclipse Public License 1.0](https://opensource.org/license/epl-1-0). See the [LICENSE.md](/LICENSE.md) file for a copy of the full license.
 
@@ -129,7 +139,7 @@ By using or contributing to this software in any fashion, you are agreeing to be
 
 You must not remove this licensing notice or any other notices from this software.
 
-<div style="text-align: center;">
+<div align="center">
   <br>
   <hr>
   <a href="#">Back To Top</a>
