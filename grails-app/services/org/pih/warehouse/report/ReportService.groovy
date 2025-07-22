@@ -1243,11 +1243,25 @@ class ReportService implements ApplicationContextAware {
         ]
     }
 
+    /**
+     * Fetch the percentage of accurate counts (ie counts with no quantity variance) within the given time range.
+     * Each count is on a single product and a product can be counted multiple times within the given time range.
+     *
+     * The quantity variance for a single count represents the sum of quantity discrepancies across all bins + lots
+     * of the product. As such, even if there were multiple quantity discrepancies in the count, they might not result
+     * in a quantity variance if the discrepancies cancel each other out.
+     *
+     * For example, a product with two bins was counted:
+     * - Bin 1 had quantity 10 but 15 was counted -> +5 discrepancy
+     * - Bin 2 had quantity 30 but 25 was counted -> -5 discrepancy
+     *
+     * Then the total variance for the count would be 5 (from bin 1) - 5 (from bin 2) == 0. So from the perspective
+     * of inventory accuracy, this would be an accurate count, even though there were discrepancies.
+     */
     Map getInventoryAccuracy(IndicatorApiCommand command) {
-        List<Object[]> results = CycleCountProductSummary.createCriteria().list {
+        List<Integer> results = CycleCountProductSummary.createCriteria().list {
             projections {
-                groupProperty('product')
-                sum('quantityVariance')
+                property('quantityVariance')
             }
             eq('facility', command.facility)
 
@@ -1257,9 +1271,9 @@ class ReportService implements ApplicationContextAware {
             if (command.endDate) {
                 le("transactionDate", command.endDate)
             }
-        }
+        } as List<Integer>
 
-        Integer accurateCount = results.count { it[1] == null || it[1] == 0 }
+        Integer accurateCount = results.count { it == null || it == 0 } as Integer
         Integer totalCount = results.size()
 
         InventoryAccuracyResult accuracyResult = new InventoryAccuracyResult(
