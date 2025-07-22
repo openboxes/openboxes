@@ -27,12 +27,13 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.SynonymTypeCode
 import org.pih.warehouse.core.VarianceTypeCode
+import org.pih.warehouse.dashboard.NumberData
+import org.pih.warehouse.dashboard.NumberDataService
 import org.pih.warehouse.forecasting.ForecastingService
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.UserService
 import org.pih.warehouse.data.DataService
 import org.pih.warehouse.inventory.CycleCountItem
-import org.pih.warehouse.inventory.CycleCountService
 import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.InventoryAuditDetails
 import org.pih.warehouse.inventory.InventoryAuditRollup
@@ -78,7 +79,7 @@ class ReportService implements ApplicationContextAware {
     ShipmentService shipmentService
     LocalizationService localizationService
     ForecastingService forecastingService
-    CycleCountService cycleCountService
+    NumberDataService numberDataService
 
     ApplicationContext applicationContext
 
@@ -1220,25 +1221,17 @@ class ReportService implements ApplicationContextAware {
         return new PaginatedList<InventoryAuditSummary>(data, totalCount);
     }
 
+    /**
+     * Fetch the count of distinct products that have been inventoried in the given time range.
+     * "Inventoried" means any operation that performs a full quantity count for the product.
+     */
     Map getProductsInventoried(IndicatorApiCommand command) {
-        Integer result = InventoryAuditDetails.createCriteria().get {
-            projections {
-                countDistinct("product")
-            }
-
-            eq("facility", command.facility)
-
-            if (command.startDate) {
-                ge("transactionDate", command.startDate)
-            }
-            if (command.endDate) {
-                le("transactionDate", command.endDate)
-            }
-        } as Integer
+        NumberData numberData = numberDataService.getItemsInventoriedInRange(
+                command.facility, command.startDate, command.endDate)
 
         return [
                 name  : "productsInventoried",
-                value : result ?: 0,
+                value : numberData?.number?.intValue() ?: 0,
                 type  : TileType.SINGLE.toString(),
         ]
     }

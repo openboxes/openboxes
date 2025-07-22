@@ -54,6 +54,12 @@ class DateUtil {
     static final DateTimeFormatter DISPLAY_DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MMM/yyyy")
     static final DateTimeFormatter DISPLAY_DATE_TIME_OFFSET_FORMATTER = DateTimeFormatter.ofPattern("dd/MMM/yyyy HH:mm XXX")
     static final DateTimeFormatter DISPLAY_TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss")
+
+    /**
+     * A Date representing the epoch instant, which is January 1, 1970, 00:00:00 GMT.
+     */
+    static final Date EPOCH_DATE = new Date(0)
+
     /**
      * Converts a LocalDate to a date-only string for display. This method should only be used by GSPs and file
      * exporters. Otherwise we should return the date object as is and let the frontend decide the display format.
