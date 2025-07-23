@@ -24,7 +24,6 @@ const IndicatorCards = SortableContainer(({ data }) => (
           cardSubtitleValue={card.subValue}
           cardInfo={card.infoLabel}
           cardInfoDefaultValue={card.defaultInfo}
-          showPercentSign={card.showPercentSign}
           infoIcon={<RiInformationLine size={20} />}
           disabled
           hideDraghandle

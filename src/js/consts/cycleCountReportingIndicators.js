@@ -14,7 +14,7 @@ const cycleCountReportingIndicators = {
     secondSubtitleLabel: 'react.cycleCount.indicators.cardSubtitle.cycleCountsRecorded.label',
     defaultSecondSubtitle: 'cycle counts recorded',
     infoLabel: 'react.cycleCount.indicators.cardInfo.inventoryAccuracy.label',
-    defaultInfo: 'Percentage of products cycle counted with an equal count, compared to all products cycle counted during the time range (equal and non equal counts). This represents the share of inventory for which OpenBoxes inventory is accurately representing the physical inventory.',
+    defaultInfo: 'Percentage of cycle counts with an equal count, compared to all cycle counts recorded during the time range (equal and non equal counts). This represents the share of inventory for which OpenBoxes inventory is accurately representing the physical inventory.',
     showFirstValuePercentSign: true,
   },
   inventoryShrinkage: {

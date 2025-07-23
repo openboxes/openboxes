@@ -28,7 +28,6 @@ IndicatorNumberCards.propTypes = {
     subValue: PropTypes.string,
     infoLabel: PropTypes.string,
     defaultInfo: PropTypes.string,
-    showPercentSign: PropTypes.bool,
     type: PropTypes.string,
     firstValue: PropTypes.number,
     secondValue: PropTypes.number,
