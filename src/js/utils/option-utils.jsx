@@ -322,7 +322,7 @@ export const fetchIndicatorInventoryShrinkage = async (params = {}) => {
   return data.data;
 };
 
-export const fetchInventoryAccuracy = async (params = {}) => {
+export const fetchIndicatorInventoryAccuracy = async (params = {}) => {
   const { data } = await indicatorsApi.getInventoryAccuracy(params);
   return data.data;
 };

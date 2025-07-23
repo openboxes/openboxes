@@ -6,9 +6,9 @@ import { getCurrentLocation } from 'selectors';
 import cycleCountReportingIndicators from 'consts/cycleCountReportingIndicators';
 import dateWithoutTimeZone from 'utils/dateUtils';
 import {
+  fetchIndicatorInventoryAccuracy,
   fetchIndicatorInventoryShrinkage,
   fetchIndicatorProductsInventoried,
-  fetchInventoryAccuracy,
 } from 'utils/option-utils';
 
 const useIndicatorsTab = ({
@@ -36,7 +36,7 @@ const useIndicatorsTab = ({
     try {
       const responses = await Promise.all([
         fetchIndicatorProductsInventoried(params),
-        fetchInventoryAccuracy(params),
+        fetchIndicatorInventoryAccuracy(params),
         fetchIndicatorInventoryShrinkage(params),
       ]);
 
