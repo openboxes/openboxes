@@ -584,8 +584,9 @@ class InventoryItemController {
         }
 
         log.info("User chose to validate or there are errors")
-        def warehouseInstance = Location.get(session?.warehouse?.id)
+        Location warehouseInstance = Location.get(session?.warehouse?.id)
 
+        commandInstance.product = Product.load(commandInstance.product.id)
         commandInstance.inventory = warehouseInstance?.inventory
         commandInstance.inventoryLevel = InventoryLevel.findByProductAndInventory(commandInstance?.product, commandInstance?.inventory)
 

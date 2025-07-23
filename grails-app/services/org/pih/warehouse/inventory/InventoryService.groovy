@@ -1384,8 +1384,25 @@ class InventoryService implements ApplicationContextAware {
             Map<String, AvailableItem> availableItems = productAvailabilityService.getAvailableItemsAtDateAsMap(
                     currentLocation,
                     [cmd.product],
-                    cmd.transactionDate
+                    new Date(cmd.transactionDate.time + 2000)
             )
+
+            // We'd have weird behaviour if we allowed two transactions to exist at the same exact time (precision at the
+            // database level is to the second) so fail if there's already a transaction on the items for the given date.
+            List<InventoryItem> inventoryItems = availableItems.values().collect{ it.inventoryItem }
+            if (hasTransactionEntriesOnDate(currentLocation, adjustmentTransactionDate, inventoryItems)) {
+                throw new IllegalArgumentException("A transaction already exists at time ${adjustmentTransactionDate}")
+            }
+
+            // 1. Create the baseline transaction
+            if (isInventoryBaselineEnabled) {
+                recordStockProductInventoryTransactionService.createInventoryBaselineTransactionForGivenStock(
+                        currentLocation,
+                        null,
+                        availableItems.values() as List<AvailableItem>,
+                        cmd.transactionDate
+                )
+            }
 
             // 2. Create a new adjustment transaction
             Transaction adjustmentTransaction = recordStockProductInventoryTransactionService.createAdjustmentTransaction(
@@ -1477,19 +1494,8 @@ class InventoryService implements ApplicationContextAware {
                 }
                 return
             }
-
-            // 6. Create the baseline transaction if the adjustment transaction is saved
-            if (isInventoryBaselineEnabled) {
-                recordStockProductInventoryTransactionService.createInventoryBaselineTransactionForGivenStock(
-                        currentLocation,
-                        null,
-                        availableItems.values() as List<AvailableItem>,
-                        cmd.transactionDate
-                )
-            }
         } catch (Exception e) {
-            log.error("Error saving an inventory record to the database ", e)
-            throw e
+            cmd.errors.reject("Error saving an inventory record to the database: " + e.message)
         }
 
         return cmd
