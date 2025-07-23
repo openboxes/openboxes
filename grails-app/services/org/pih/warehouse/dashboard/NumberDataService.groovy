@@ -4,6 +4,8 @@ import grails.core.GrailsApplication
 import grails.plugin.cache.Cacheable
 import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.joda.time.LocalDate
+
+import org.pih.warehouse.DateUtil
 import org.pih.warehouse.api.StockMovementDirection
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
@@ -103,6 +105,18 @@ class NumberDataService {
     @Cacheable(value = "dashboardCache", key = { "getItemsInventoried-${location?.id}" })
     NumberData getItemsInventoried(Location location) {
         Date firstOfMonth = LocalDate.now().withDayOfMonth(1).toDate()
+        return getItemsInventoriedInRange(location, firstOfMonth)
+    }
+
+    /**
+     * Fetch the count of distinct products that have been inventoried in the given time range.
+     * "Inventoried" means any operation that performs a full quantity count for the product.
+     *
+     * @param location The facility that we want the count at.
+     * @param startDate The datetime in the past to start the check at. If null, will use the start of time.
+     * @param endDate The datetime in the past to check up until. If null, will use the current time.
+     */
+    NumberData getItemsInventoriedInRange(Location location, Date startDate=null, Date endDate=null) {
         /**
         * After migrating from single product inventory transaction to baseline + adjustment transactions
         * there is a case when we might have only an adjustment if it's first inventory record
@@ -121,14 +135,15 @@ class NumberDataService {
             INNER JOIN te.transaction t
             WHERE t.inventory = :inventory
             AND t.transactionType.id IN :transactionTypeIds 
-            AND t.transactionDate >= :firstOfMonth""",
+            AND t.transactionDate BETWEEN :startDate AND :endDate""",
                 [
                         inventory          : location?.inventory,
                         transactionTypeIds : transactionTypeIds,
-                        firstOfMonth       : firstOfMonth,
+                        startDate          : startDate ?: DateUtil.EPOCH_DATE,
+                        endDate            : endDate ?: new Date(),
                 ])
 
-        return new NumberData(itemsInventoried[0])
+        return new NumberData(itemsInventoried[0] as Double)
     }
 
     @Cacheable(value = "dashboardCache", key = { "getDefaultBin-${location?.id}" })
