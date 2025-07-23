@@ -1487,7 +1487,9 @@ class ReportService implements ApplicationContextAware {
 
         return row + [
                 "Closing": data.closingBalance,
-                "Has Backdated Transactions": data.hasBackdatedTransactions
+                "Backdated inventory correction": data.backdatedTransactionEntries?.sum {
+                    isTransactionEntryCredit(it) ? Math.abs(it.quantity) : -Math.abs(it.quantity)
+                } ?: 0
         ]
     }
 
@@ -1516,13 +1518,17 @@ class ReportService implements ApplicationContextAware {
             it.inventoryItem.product
         }
 
-        // Calculate items available at the endDate to get quantity on hand for found products
-        Map<String, AvailableItem> availableItemMap = productAvailabilityService.getAvailableItemsAtDateAsMap(
+        // Calculate items available at the startDate to get quantity on hand for found products
+        Map<String, AvailableItem> availableItemStartDateMap = productAvailabilityService.getAvailableItemsAtDateAsMap(
                 location,
                 productsMap.keySet().toList(),
-                // EndDate cannot be a date in the future, because of the validation
-                // in getAvailableItemsAtDateAsMap. Current endDate value is endDate + 1,
-                // because it's used in that way in the createCriteria (+1 is added in the controller)
+                startDate
+        )
+
+        // Calculate items available at the startDate to get quantity on hand for found products
+        Map<String, AvailableItem> availableItemEndDateMap = productAvailabilityService.getAvailableItemsAtDateAsMap(
+                location,
+                productsMap.keySet().toList(),
                 endDate.before(new Date()) ? endDate : new Date()
         )
 
@@ -1549,10 +1555,12 @@ class ReportService implements ApplicationContextAware {
         // 2. DEBITS = transaction entries in relation with transaction that are DEBIT type
         // and transaction that are CREDIT type, but with quantity lower than 0
         return productsMap.collect { key, value ->
-            Integer closingBalance = availableItemMap.findAll { entry ->
+            Integer openingBalance = availableItemStartDateMap.findAll { entry ->
                 entry.key.startsWith(key.productCode)
             }.values().quantityOnHand.sum() ?: 0
-            Integer openingBalance = calculateBalance(value, closingBalance)
+            Integer closingBalance = availableItemEndDateMap.findAll { entry ->
+                entry.key.startsWith(key.productCode)
+            }.values().quantityOnHand.sum() ?: 0
             Integer credits = getCreditTransactionEntries(value).sum { it.quantity } as Integer ?: 0
             Integer debits = getDebitTransactionEntries(value).sum { Math.abs(it.quantity) } as Integer ?: 0
             // In the new version of the report, it's not based on the inventory snapshot.
@@ -1563,6 +1571,13 @@ class ReportService implements ApplicationContextAware {
             Integer adjustments = closingBalance - openingBalance
 
             if (includeDetails) {
+                List<TransactionEntry> backdatedTransactionEntries = value.transaction
+                        .unique()
+                        .findAll {it.dateCreated > (it.transactionDate + 1) }
+                        .transactionEntries
+                        .flatten()
+                        .findAll { it.inventoryItem.product == key }
+
                 return getTransactionReportDetailedRow(
                         productCode: key.productCode,
                         name: key.name,
@@ -1578,7 +1593,7 @@ class ReportService implements ApplicationContextAware {
                         closingBalance: closingBalance,
                         detailedReportData: detailedReportData[key],
                         availableTransactionTypes: availableTransactionTypes,
-                        hasBackdatedTransactions: value.transaction.any { it.dateCreated > (it.transactionDate + 1) }
+                        backdatedTransactionEntries: backdatedTransactionEntries
                 )
             }
 
@@ -1614,8 +1629,14 @@ class ReportService implements ApplicationContextAware {
                 "asc"
         )
 
+        Map<String, AvailableItem> availableItemStartDateMap = productAvailabilityService.getAvailableItemsAtDateAsMap(
+                location,
+                [product],
+                startDate
+        )
+
         // Calculate items available at the endDate to get quantity on hand for found products
-        Map<String, AvailableItem> availableItemMap = productAvailabilityService.getAvailableItemsAtDateAsMap(
+        Map<String, AvailableItem> availableItemEndDateMap = productAvailabilityService.getAvailableItemsAtDateAsMap(
                 location,
                 [product],
                 // EndDate cannot be a date in the future, because of the validation
@@ -1625,8 +1646,8 @@ class ReportService implements ApplicationContextAware {
         )
 
         // Calculating closing & opening balances for selected product
-        Integer closingBalance = availableItemMap.values().quantityOnHand.sum() ?: 0
-        Integer openingBalance = calculateBalance(transactionEntriesWithinDateRange, closingBalance)
+        Integer openingBalance = availableItemStartDateMap.values().quantityOnHand.sum() ?: 0
+        Integer closingBalance = availableItemEndDateMap.values().quantityOnHand.sum() ?: 0
 
         // Create a list with only opening balance
         List<Object> entries = [
