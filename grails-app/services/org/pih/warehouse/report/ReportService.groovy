@@ -1548,7 +1548,7 @@ class ReportService implements ApplicationContextAware {
         // Final calculations of data:
         // 1. Get the current QoH
         // 2. Calculate closing balance using available items at endDate
-        // 3. Calculate opening balance using transaction entries between startDate <-> endDate
+        // 3. Calculate opening balance using available items at startDate
         // Additional calculation info:
         // 1. CREDITS = transaction entries in relation with transactions that are CREDIT type
         // and the quantity of that transaction entry is greater than 0
@@ -1629,6 +1629,7 @@ class ReportService implements ApplicationContextAware {
                 "asc"
         )
 
+        // Calculate items available at the startDate to get quantity on hand for found products
         Map<String, AvailableItem> availableItemStartDateMap = productAvailabilityService.getAvailableItemsAtDateAsMap(
                 location,
                 [product],
