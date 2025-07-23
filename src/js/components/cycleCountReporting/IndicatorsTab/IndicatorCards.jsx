@@ -43,7 +43,8 @@ const IndicatorCards = SortableContainer(({ data }) => (
           cardDefaultSecondSubtitle={card.defaultSecondSubtitle}
           cardInfo={card.infoLabel}
           cardInfoDefaultValue={card.defaultInfo}
-          formatSecondValueAsCurrency
+          showFirstValuePercentSign={card.showFirstValuePercentSign}
+          formatSecondValueAsCurrency={card.formatSecondValueAsCurrency}
         />
       )))}
   </div>
@@ -71,6 +72,8 @@ IndicatorCards.propTypes = {
     defaultFirstSubtitle: PropTypes.string,
     secondSubtitleLabel: PropTypes.string,
     defaultSecondSubtitle: PropTypes.string,
+    showFirstValuePercentSign: PropTypes.bool,
+    formatSecondValueAsCurrency: PropTypes.bool,
   })),
 };
 

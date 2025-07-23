@@ -50,7 +50,11 @@ const CycleCountReporting = () => {
     setShouldFetch,
     filtersInitialized,
   } = useCycleCountReportingFilters({ filterFields });
-  const tablePaginationProps = useCycleCountPagination(filterParams, setShouldFetch, null, false);
+  const tablePaginationProps = useCycleCountPagination({
+    filterParams,
+    setShouldFetch,
+    disableAutoUpdateFilterParams: currentTab === INDICATORS_TAB,
+  });
   const tabs = {
     [PRODUCTS_TAB]: {
       label: {

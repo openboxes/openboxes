@@ -6,7 +6,7 @@ import { getCurrentLocation } from 'selectors';
 import cycleCountReportingIndicators from 'consts/cycleCountReportingIndicators';
 import dateWithoutTimeZone from 'utils/dateUtils';
 import {
-  fetchIndicatorInventoryLoss,
+  fetchIndicatorInventoryShrinkage,
   fetchIndicatorProductsInventoried,
   fetchInventoryAccuracy,
 } from 'utils/option-utils';
@@ -37,7 +37,7 @@ const useIndicatorsTab = ({
       const responses = await Promise.all([
         fetchIndicatorProductsInventoried(params),
         fetchInventoryAccuracy(params),
-        fetchIndicatorInventoryLoss(params),
+        fetchIndicatorInventoryShrinkage(params),
       ]);
 
       const mergedTiles = responses

@@ -210,5 +210,5 @@ export const INVENTORY_TRANSACTIONS_SUMMARY = `${REPORTS}/inventory-transactions
 export const INDICATORS_REPORT = `${API}/reports/indicators`;
 
 export const INDICATORS_PRODUCTS_INVENTORIED = `${INDICATORS_REPORT}/productsInventoried`;
-export const INDICATORS_INVENTORY_LOSS = `${INDICATORS_REPORT}/inventoryLoss`;
+export const INDICATORS_INVENTORY_SHRINKAGE = `${INDICATORS_REPORT}/inventoryShrinkage`;
 export const INDICATORS_INVENTORY_ACCURACY = `${INDICATORS_REPORT}/inventoryAccuracy`;

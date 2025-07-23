@@ -36,6 +36,8 @@ IndicatorNumberCards.propTypes = {
     defaultFirstSubtitle: PropTypes.string,
     secondSubtitleLabel: PropTypes.string,
     defaultSecondSubtitle: PropTypes.string,
+    showFirstValuePercentSign: PropTypes.bool,
+    formatSecondValueAsCurrency: PropTypes.bool,
   })),
 };
 
