@@ -13,6 +13,7 @@ import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import groovy.xml.Namespace
+import org.apache.commons.lang.StringUtils
 import org.hibernate.criterion.CriteriaSpecification
 import org.hibernate.criterion.Restrictions
 import org.hibernate.sql.JoinType
@@ -717,7 +718,6 @@ class ProductService {
 
             ProductGroup productFamily = productFamilyName ? productGroupService.findOrCreateProductGroup(productFamilyName) : null
 
-            def category = findOrCreateCategory(categoryName)
             def product = Product.findByIdOrProductCode(productId, productCode)
 
             // If the identifier is incorrect/missing we should display the ID of the product found using the product code instead of the missing/incorrect product identifier
@@ -726,7 +726,7 @@ class ProductService {
                 name                : productName,
                 productType         : productType,
                 productFamily       : productFamily,
-                category            : category,
+                category            : categoryName,
                 glAccount           : glAccount,
                 description         : description,
                 productCode         : productCode,
@@ -768,30 +768,48 @@ class ProductService {
         return importProducts(products, null)
     }
 
-    def importProducts(products, tags) {
-        log.info("Importing products " + products + " tags: " + tags)
+    /**
+     * Creates or updates the given list of imported products.
+     *
+     * @param products The products (as key value maps) to import
+     * @param tagNamesForAllProducts A list of tags to assign to all products being imported
+     */
+    void importProducts(List<Map<String, Object>> products, List<String> tagNamesForAllProducts) {
+        log.info("Importing products " + products + " tags: " + tagNamesForAllProducts)
 
-        // Create all tags that don't already exist
-        tags.each { tagName ->
-            Tag tag = Tag.findByTag(tagName)
-            if (!tag) {
-                log.info "Tag ${tagName} does not exist so creating it"
-                tag = new Tag(tag: tagName)
-                tag.save(flush: true)
-            }
-        }
+        // The imported categories and tags are just names at this point. Get or create the actual entities now
+        // so that we can assign them to the products in the below loop.
+        List<String> allCategoryNames = products.category as List<String>
+        Map<String, Category> categoriesMap = findOrCreateCategoriesAsMap(allCategoryNames)
+
+        List<String> allTagNames = tagNamesForAllProducts + products.tags.flatten() as List<String>
+        Map<String, Tag> tagsMap = getOrCreateTagsAsMap(allTagNames)
 
         products.each { productProperties ->
-
             log.info "Import product code = " + productProperties.productCode + ", name = " + productProperties.name
-            // Update existing
-            def product = Product.findByIdOrProductCode(productProperties.id, productProperties.productCode)
-            def productTags = productProperties.remove("tags")
 
+            // Assign the category to the product. If the product wasn't assigned a category, assign it the root category.
+            String categoryName = (productProperties.category as String)?.trim()
+            productProperties.category = categoryName ? categoriesMap.get(categoryName) : Category.getRootCategory()
+
+            // Assign both the product-specific tags and the globally defined tags to the product.
+            List<String> tagNames = []
+            List<String> productTagNames = productProperties.tags as List<String>
+            if (productTagNames) {
+                tagNames.addAll(productTagNames)
+            }
+            if (tagNamesForAllProducts) {
+                tagNames.addAll(tagNamesForAllProducts)
+            }
+            tagNames = removeBlanksAndDuplicates(tagNames)
+            productProperties.tags = tagNames.collect{ tagsMap.get(it) }
+
+            // If the product already exists, update it
+            def product = Product.findByIdOrProductCode(productProperties.id, productProperties.productCode)
             if (product) {
                 product.properties = productProperties
             }
-            // ... or create a new product
+            // ... else create a new product
             else {
                 product = new Product(productProperties)
             }
@@ -799,9 +817,6 @@ class ProductService {
             if (!product.validate()) {
                 throw new ValidationException("Product is invalid", product.errors)
             }
-
-            addTagsToProduct(product, tags)
-            addTagsToProduct(product, productTags)
 
             if (!product?.id || product.validate()) {
                 if (!product.productCode) {
@@ -889,21 +904,54 @@ class ProductService {
     }
 
     /**
-     * Find or create a category with the given name.
-     *
-     * @param categoryName
-     * @return
+     * Find or create a list of categories with the given names as a map keyed on category name. Nulls, duplicates,
+     * and whitespace will be ignored.
      */
-    Category findOrCreateCategory(String categoryName) {
-        def rootCategory = Category.getRootCategory()
+    private Map<String, Category> findOrCreateCategoriesAsMap(List<String> categoryNames) {
+        return findOrCreateCategories(categoryNames).collectEntries{ [ it.name, it ] }
+    }
 
-        if (!categoryName)
-            return rootCategory
+    /**
+     * Find or create a list of categories with the given names. Nulls, duplicates, and whitespace will be ignored.
+     */
+    private List<Category> findOrCreateCategories(List<String> categoryNames) {
+        List<String> categoryNamesSanitized = removeBlanksAndDuplicates(categoryNames)
+        if (!categoryNamesSanitized) {
+            return Collections.emptyList()
+        }
 
-        def category = Category.findByName(categoryName)
-        if (!category) {
-            category = new Category(parentCategory: rootCategory, name: categoryName)
-            category.save(failOnError: true)
+        List<Category> categories = []
+        for (categoryName in categoryNamesSanitized) {
+            Category category = findOrCreateCategory(categoryName)
+            categories.add(category)
+        }
+        return categories
+    }
+
+    private static List<String> removeBlanksAndDuplicates(List<String> strings){
+        if (!strings) {
+            return Collections.emptyList()
+        }
+
+        return strings.findAll{ StringUtils.isNotBlank(it) }
+                .collect{ it.trim() }
+                .unique()
+    }
+
+    /**
+     * Find or create a category with the given name. If the category doesn't exist, its parent category will be root.
+     */
+    private Category findOrCreateCategory(String categoryName) {
+        Category category = Category.findByName(categoryName)
+        if (category) {
+            return category
+        }
+
+        Category rootCategory = Category.getRootCategory()
+        category = new Category(parentCategory: rootCategory, name: categoryName)
+
+        if (!category.save()) {
+            throw new ValidationException("Could not save category: '${categoryName}'", category.errors)
         }
         return category
     }
@@ -1025,67 +1073,46 @@ class ProductService {
         return getPopularTags(0)
     }
 
-
     /**
-     * Add a list of tags to each of the given products.
-     *
-     * @param products
-     * @param tags
-     * @return
+     * Find or create a list of product tags with the given names as a map keyed on tag name. Nulls, duplicates,
+     * and whitespace will be ignored.
      */
-    def addTagsToProducts(products, tags) {
-        log.info "Add tags ${tags} to products ${products}"
-        products.each { product ->
-            addTagsToProduct(product, tags)
-        }
+    private Map<String, Tag> getOrCreateTagsAsMap(List<String> tagNames) {
+        return getOrCreateTags(tagNames).collectEntries{ [ it.tag, it ] }
     }
 
     /**
-     * Add the list of tags to the given product.
-     *
-     * @param product
-     * @param tags
+     * Find or create a list of product tags with the given names. Nulls, duplicates, and whitespace will be ignored.
      */
-    def addTagsToProduct(product, tags) {
-        log.info "Add tags ${tags} to product ${product}"
-        if (tags) {
-            tags.each { tagName ->
-                if (tagName) {
-                    addTagToProduct(product, tagName)
-                }
-            }
+    private List<Tag> getOrCreateTags(List<String> tagNames) {
+        List<String> tagNamesSanitized = removeBlanksAndDuplicates(tagNames)
+        if (!tagNamesSanitized) {
+            return Collections.emptyList()
         }
+
+        List<Tag> tags = []
+        for (tagName in tagNamesSanitized) {
+            Tag tag = findOrCreateTag(tagName)
+            tags.add(tag)
+        }
+        return tags
     }
 
     /**
-     * Add the given tag to the given product.
-     *
-     * @param product
-     * @param tagName
-     * @return
+     * Find or create a tag with the given name.
      */
-    def addTagToProduct(product, tagName) {
-        log.info "Add tags ${tagName} to product ${product}"
-
-        // Check if the product already has the given tag
-        def tag = product.tags.find { it.tag == tagName }
-
-        if (!tag) {
-            // Otherwise try to find an existing tag that matches the tag
-            tag = Tag.findByTag(tagName)
-            // Or create a brand new one
-            if (!tag) {
-                log.info "Tag ${tagName} does not exist so creating it"
-                tag = new Tag(tag: tagName)
-                tag.save(flush: true)
-            }
-            product.addToTags(tag)
-            product.save(flush: true)
-        } else {
-            log.info "Product ${product} already contains tag ${tag}"
+    private Tag findOrCreateTag(String tagName) {
+        Tag tag = Tag.findByTag(tagName)
+        if (tag) {
+            return tag
         }
-    }
 
+        tag = new Tag(tag: tagName)
+        if (!tag.save()) {
+            throw new ValidationException("Could not save tag: '${tagName}'", tag.errors)
+        }
+        return tag
+    }
 
     /**
      * Delete a tag from the given product and delete the tag.
@@ -1146,21 +1173,6 @@ class ProductService {
 
             return product.save(flush: true)
         }
-    }
-
-    /**
-     * Find or create a tag with the given tag text.
-     *
-     * @param tagText
-     * @return
-     */
-    def findOrCreateTag(tagText) {
-        Tag tag = Tag.findByTagAndIsActive(tagText, true)
-        if (!tag) {
-            tag = new Tag(tag: tagText)
-            tag.save()
-        }
-        return tag
     }
 
     Product addProductComponent(String assemblyProductId, String componentProductId, BigDecimal quantity, String unitOfMeasureId) {

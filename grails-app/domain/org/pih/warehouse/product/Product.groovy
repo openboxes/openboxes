@@ -641,6 +641,12 @@ class Product implements Comparable, Serializable {
         }
     }
 
+    void addAllToTags(List<Tag> tags) {
+        for (tag in tags) {
+            addToTags(tag)
+        }
+    }
+
     Boolean hasOneOfCatalogs(List<ProductCatalog> catalogs) {
         return catalogs.find { catalog ->
             productCatalogs?.contains(catalog)
