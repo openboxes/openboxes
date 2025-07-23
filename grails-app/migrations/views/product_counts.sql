@@ -1,4 +1,4 @@
-CREATE OR REPLACE VIEW counts AS
+CREATE OR REPLACE VIEW product_counts AS
     -- First, just get all of the baseline transactions and adjustment transactions separately, so we can join them later
     WITH inventory_baseline_candidates AS (
         SELECT t.id AS transaction_id,

@@ -3,7 +3,7 @@ package org.pih.warehouse.inventory
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
 
-class Count implements Serializable {
+class ProductCount implements Serializable {
 
     String id
 
@@ -26,7 +26,7 @@ class Count implements Serializable {
     Transaction associatedTransaction
 
     static constraints = {
-        table "counts"
+        table "product_counts"
         version false
     }
 }

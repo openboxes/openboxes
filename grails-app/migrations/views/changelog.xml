@@ -165,6 +165,6 @@
     <sqlFile path="views/inventory-transactions-summary.sql"/>
   </changeSet>
   <changeSet id="1748970410098-6" author="kchelstowski" runOnChange="true" runAlways="true" failOnError="true">
-    <sqlFile path="views/counts.sql"/>
+    <sqlFile path="views/product_counts.sql"/>
   </changeSet>
 </databaseChangeLog>

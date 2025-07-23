@@ -31,7 +31,7 @@ import org.pih.warehouse.forecasting.ForecastingService
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.UserService
 import org.pih.warehouse.data.DataService
-import org.pih.warehouse.inventory.Count
+import org.pih.warehouse.inventory.ProductCount
 import org.pih.warehouse.inventory.CycleCountItem
 import org.pih.warehouse.inventory.CycleCountService
 import org.pih.warehouse.inventory.Inventory
@@ -1179,7 +1179,7 @@ class ReportService implements ApplicationContextAware {
 
             // Retrieve all product inventories completed during the given date range
             List<TransactionType> inventoryTypes = TransactionType.findAllByTransactionCode(TransactionCode.PRODUCT_INVENTORY)
-            Long counts = Count.createCriteria().get {
+            Long counts = ProductCount.createCriteria().get {
                 projections {
                     rowCount()
                 }
