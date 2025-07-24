@@ -49,7 +49,7 @@ class InventoryExcelImporter extends AbstractExcelImporter implements DataImport
             binLocation    : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
             quantityOnHand: ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
             quantity        : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
-            comments        : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null])
+            comments        : ([expectedType: ExpectedPropertyType.StringType, defaultValue: ''])
     ]
 
 
