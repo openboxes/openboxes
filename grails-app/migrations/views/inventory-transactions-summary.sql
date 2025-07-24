@@ -12,7 +12,7 @@ CREATE OR REPLACE VIEW inventory_transactions_summary AS
             JOIN location facility ON transaction.inventory_id = facility.inventory_id
             JOIN inventory_item ON inventory_item.id = transaction_entry.inventory_item_id
             WHERE transaction_type.id = '12' -- baseline inventory transaction
-            GROUP BY transaction.id
+            GROUP BY transaction.id, inventory_item.product_id
     ),
     -- Helper view for adjustments to query against while searching for the latest baseline transaction
     -- without any adjustment transaction between queried adjustment and the latest baseline
