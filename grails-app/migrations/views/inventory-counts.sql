@@ -1,4 +1,4 @@
-CREATE OR REPLACE VIEW product_counts AS
+CREATE OR REPLACE VIEW inventory_counts AS
     -- First, just get all of the baseline transactions and adjustment transactions separately, so we can join them later
     WITH inventory_baseline_candidates AS (
         SELECT t.id AS transaction_id,
@@ -8,7 +8,7 @@ CREATE OR REPLACE VIEW product_counts AS
         FROM transaction t
         JOIN transaction_entry te ON te.transaction_id = t.id
         JOIN inventory_item ii ON ii.id = te.inventory_item_id
-        WHERE t.transaction_type_id = '12'
+        WHERE t.transaction_type_id = '12' -- baseline inventory transaction
     ),
     adjustments_candidates AS (
         SELECT t.id AS transaction_id,
@@ -18,7 +18,7 @@ CREATE OR REPLACE VIEW product_counts AS
         FROM transaction t
         JOIN transaction_entry te ON te.transaction_id = t.id
         JOIN inventory_item ii ON ii.id = te.inventory_item_id
-        WHERE t.transaction_type_id = '3'
+        WHERE t.transaction_type_id = '3' -- adjustments
     ),
 
     -- Having baselines and adjustments above in the helper views, we can now create pairs, when they appear together
@@ -44,14 +44,14 @@ CREATE OR REPLACE VIEW product_counts AS
             ii.product_id AS product_id,
             facility.id AS facility_id,
             t.transaction_date AS date_recorded,
-            'BASELINE_WITH_ADJUSTMENT' as transaction_profile,
+            'BASELINE_ADJUSTMENT' as inventory_count_type_code,
             bam.adjustment_id as associated_transaction_id
             FROM transaction t
             JOIN baseline_adjustment_matches bam ON t.id = bam.baseline_id
             JOIN transaction_entry te ON te.transaction_id = t.id
             JOIN inventory_item ii ON ii.id = te.inventory_item_id
             JOIN location facility ON facility.inventory_id = t.inventory_id
-            WHERE t.transaction_type_id = '12'
+            WHERE t.transaction_type_id = '12' -- baseline inventory transaction
     ),
 
     -- Case 2: Adjustment without baseline ("alone" adjustment) - e.g. record stock for the first time/adjust inventory
@@ -65,14 +65,14 @@ CREATE OR REPLACE VIEW product_counts AS
             ii.product_id AS product_id,
             facility.id AS facility_id,
             t.transaction_date AS date_recorded,
-            'ADJUSTMENT_WITHOUT_BASELINE' as transaction_profile,
+            'ADJUSTMENT' as inventory_count_type_code,
             -- Alone adjustment doesn't have any associated transaction (like baseline + adjustment), so hardcode it to NULL
             NULL as associated_transaction_id
         FROM transaction t
         JOIN transaction_entry te ON te.transaction_id = t.id
         JOIN inventory_item ii ON ii.id = te.inventory_item_id
         JOIN location facility ON facility.inventory_id = t.inventory_id
-        WHERE t.transaction_type_id = '3'
+        WHERE t.transaction_type_id = '3' -- adjustments
         AND NOT EXISTS (
               SELECT 1
               FROM baseline_adjustment_matches bam
@@ -91,14 +91,14 @@ CREATE OR REPLACE VIEW product_counts AS
             ii.product_id AS product_id,
             facility.id AS facility_id,
             t.transaction_date AS date_recorded,
-            'BASELINE_WITHOUT_ADJUSTMENT' as transaction_profile,
+            'BASELINE' as inventory_count_type_code,
             -- Alone baseline doesn't have any associated transaction (like baseline + adjustment), so hardcode it to NULL
             NULL as associated_transaction_id
         FROM transaction t
         JOIN transaction_entry te ON te.transaction_id = t.id
         JOIN inventory_item ii ON ii.id = te.inventory_item_id
         JOIN location facility ON facility.inventory_id = t.inventory_id
-        WHERE t.transaction_type_id = '12'
+        WHERE t.transaction_type_id = '12' -- baseline inventory transaction
           AND NOT EXISTS (
               SELECT 1
               FROM baseline_adjustment_matches bam

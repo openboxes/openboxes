@@ -3,7 +3,7 @@ package org.pih.warehouse.inventory
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
 
-class ProductCount implements Serializable {
+class InventoryCount implements Serializable {
 
     String id
 
@@ -15,7 +15,7 @@ class ProductCount implements Serializable {
 
     Date dateRecorded
 
-    TransactionProfile transactionProfile
+    InventoryCountTypeCode inventoryCountTypeCode
 
     /**
      * Counts can be created via baseline transaction + adjustment transaction together, alone adjustment or alone baseline.
@@ -26,7 +26,7 @@ class ProductCount implements Serializable {
     Transaction associatedTransaction
 
     static constraints = {
-        table "product_counts"
+        table "inventory_counts"
         version false
     }
 }
