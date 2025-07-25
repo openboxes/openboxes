@@ -3,7 +3,7 @@ package org.pih.warehouse.reporting
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
 
-class InventoryLossResult implements Serializable {
+class InventoryShrinkageResult implements Serializable {
     Product product
     Location facility
     Integer quantitySum

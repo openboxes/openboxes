@@ -58,7 +58,7 @@ import org.pih.warehouse.LocalizationUtil
 import org.pih.warehouse.reporting.IndicatorApiCommand
 import org.pih.warehouse.reporting.InventoryAccuracyResult
 import org.pih.warehouse.reporting.InventoryAuditCommand
-import org.pih.warehouse.reporting.InventoryLossResult
+import org.pih.warehouse.reporting.InventoryShrinkageResult
 import org.pih.warehouse.shipping.ShipmentService
 import org.springframework.context.ApplicationContext
 import org.springframework.context.ApplicationContextAware
@@ -1283,12 +1283,13 @@ class ReportService implements ApplicationContextAware {
 
         return [
                 name : "inventoryAccuracy",
-                value: accuracyResult.accuracyPercentage,
-                type : TileType.SINGLE.toString()
+                firstValue  : accuracyResult.accuracyPercentage,
+                secondValue : totalCount,
+                type        : TileType.DOUBLE.toString(),
         ]
     }
 
-    Map getInventoryLoss(IndicatorApiCommand command) {
+    Map getInventoryShrinkage(IndicatorApiCommand command) {
         List<Object[]> results = InventoryAuditDetails.createCriteria().list {
             projections {
                 groupProperty("product")
@@ -1306,8 +1307,8 @@ class ReportService implements ApplicationContextAware {
             }
         } as List<Object[]>
 
-        List<InventoryLossResult> inventoryLossResults = results.collect {
-            new InventoryLossResult(
+        List<InventoryShrinkageResult> inventoryShrinkageResults = results.collect {
+            new InventoryShrinkageResult(
                     product     : it[0],
                     facility    : it[1],
                     quantitySum : it[2],
@@ -1315,14 +1316,14 @@ class ReportService implements ApplicationContextAware {
             )
         }
 
-        List<InventoryLossResult> negativeResults = inventoryLossResults.findAll { it.totalAdjustmentNegative }
+        List<InventoryShrinkageResult> negativeResults = inventoryShrinkageResults.findAll { it.totalAdjustmentNegative }
 
         int productCount = negativeResults.size()
 
         BigDecimal totalLoss = negativeResults.sum { it.getTotalLoss() } ?: 0
 
         return [
-                name        : "inventoryLoss",
+                name        : "inventoryShrinkage",
                 firstValue  : productCount,
                 secondValue : totalLoss.abs(),
                 type        : TileType.DOUBLE.toString(),

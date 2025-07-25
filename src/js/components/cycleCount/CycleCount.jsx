@@ -46,7 +46,7 @@ const CycleCount = () => {
   const { setCheckedCheckboxes } = toCountTabCheckboxes;
 
   // Moved this here to prevent resetting number of rows per page when switching tabs.
-  const tablePaginationProps = useCycleCountPagination(filterParams);
+  const tablePaginationProps = useCycleCountPagination({ filterParams });
   const { pageSize, offset } = tablePaginationProps;
 
   const tabs = {

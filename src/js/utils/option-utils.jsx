@@ -317,12 +317,12 @@ export const fetchIndicatorProductsInventoried = async (params = {}) => {
   return data.data;
 };
 
-export const fetchIndicatorInventoryLoss = async (params = {}) => {
-  const { data } = await indicatorsApi.getInventoryLoss(params);
+export const fetchIndicatorInventoryShrinkage = async (params = {}) => {
+  const { data } = await indicatorsApi.getInventoryShrinkage(params);
   return data.data;
 };
 
-export const fetchInventoryAccuracy = async (params = {}) => {
+export const fetchIndicatorInventoryAccuracy = async (params = {}) => {
   const { data } = await indicatorsApi.getInventoryAccuracy(params);
   return data.data;
 };

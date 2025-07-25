@@ -1053,9 +1053,9 @@ class UrlMappings {
             action = [GET: "getInventoryAccuracy"]
         }
 
-        "/api/reports/indicators/inventoryLoss" {
+        "/api/reports/indicators/inventoryShrinkage" {
             controller = "indicatorApi"
-            action = [GET: "getInventoryLoss"]
+            action = [GET: "getInventoryShrinkage"]
         }
 
         // Error handling
