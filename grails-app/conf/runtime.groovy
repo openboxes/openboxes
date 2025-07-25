@@ -1390,3 +1390,9 @@ openboxes {
         }
     }
 }
+
+openboxes.inventoryCount.transactionTypes = [
+        Constants.ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID,
+        Constants.PRODUCT_INVENTORY_TRANSACTION_TYPE_ID,
+        Constants.INVENTORY_BASELINE_TRANSACTION_TYPE_ID
+]

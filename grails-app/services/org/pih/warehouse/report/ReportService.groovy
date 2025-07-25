@@ -33,6 +33,7 @@ import org.pih.warehouse.forecasting.ForecastingService
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.UserService
 import org.pih.warehouse.data.DataService
+import org.pih.warehouse.inventory.InventoryCount
 import org.pih.warehouse.inventory.CycleCountItem
 import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.InventoryAuditDetails
@@ -1177,9 +1178,15 @@ class ReportService implements ApplicationContextAware {
             Integer quantityAdjusted = it[3]
             Integer countAdjustments = it[4]
 
-            // Retrieve all product inventories completed during the given date range
-            List<TransactionType> inventoryTypes = TransactionType.findAllByTransactionCode(TransactionCode.PRODUCT_INVENTORY)
-            Integer countCycleCounts = TransactionEntry.countByTransactionTypes(facility, product, inventoryTypes, command.startDate, command.endDate).get()
+            // Retrieve the number of counts during the given date range
+            Long inventoryCounts = InventoryCount.createCriteria().get {
+                projections {
+                    rowCount()
+                }
+                eq("facility", facility)
+                eq("product", product)
+                between("dateRecorded", command.startDate, command.endDate)
+            }
 
             // FIXME We needed to separate queries since there's not an easy way to get the two values in a single query
             //  at the moment. We created a view for the last counted date for the All Products tab but it's super slow
@@ -1189,7 +1196,7 @@ class ReportService implements ApplicationContextAware {
             Date lastCycleCount = CycleCountItem.dateLastCounted(facility, product).get()
 
             // Get the date of the latest record stock, import inventory, or cycle count transaction
-            Date lastInventoryCount = TransactionEntry.dateLastCounted(facility, product).get()
+            Date lastInventoryCount = product.latestInventoryDate(facility.id)
 
             // Compare the two last count dates
             Date lastCounted = [lastCycleCount, lastInventoryCount].max()
@@ -1208,7 +1215,7 @@ class ReportService implements ApplicationContextAware {
                     facility: facility,
                     product: product,
                     countAdjustments: countAdjustments,
-                    countCycleCounts: countCycleCounts,
+                    countCycleCounts: inventoryCounts,
                     lastCounted: lastCounted,
                     quantityAdjusted: quantityAdjusted,
                     amountAdjusted: amountAdjusted,
