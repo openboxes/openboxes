@@ -1151,10 +1151,12 @@ class ReportService implements ApplicationContextAware {
                 max('abcClass', 'abcClass')
                 sum('quantityAdjusted', 'quantityAdjusted')
                 countDistinct('transaction', 'adjustmentsCount')
+                max('transactionDate', 'transactionDate')
             }
             inventoryAuditFilters.delegate = delegate
             inventoryAuditFilters.resolveStrategy = Closure.DELEGATE_FIRST
             inventoryAuditFilters()
+            order('transactionDate', 'desc')
         }
 
 

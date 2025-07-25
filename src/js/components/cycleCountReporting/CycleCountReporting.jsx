@@ -53,6 +53,7 @@ const CycleCountReporting = () => {
   const tablePaginationProps = useCycleCountPagination({
     filterParams,
     setShouldFetch,
+    defaultPageSize: 25,
     // In the INDICATORS_TAB we immediately load indicators,
     // so we set disableAutoUpdateFilterParams to true to prevent duplicated fetching
     disableAutoUpdateFilterParams: currentTab === INDICATORS_TAB,
