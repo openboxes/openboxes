@@ -10,6 +10,7 @@ const useTablePagination = ({
   setShouldFetch,
   disableAutoUpdateFilterParams,
 }) => {
+
   const [pagination, setPagination] = useState({
     pageIndex: 0,
     pageSize: defaultPageSize || 5,
