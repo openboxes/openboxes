@@ -15,7 +15,6 @@ import { DateFormat } from 'consts/timeFormat';
 import { getCycleCountDifferencesVariant } from 'consts/valueIndicatorVariant';
 import useFormatNumber from 'hooks/useFormatNumber';
 import useTableDataV2 from 'hooks/useTableDataV2';
-import useTableSorting from 'hooks/useTableSorting';
 import useTranslate from 'hooks/useTranslate';
 import Badge from 'utils/Badge';
 import dateWithoutTimeZone from 'utils/dateUtils';
@@ -47,10 +46,6 @@ const useProductsTab = ({
     currentLocation: state.session.currentLocation,
     formatLocalizedDate: getFormatLocalizedDate(state),
   }));
-  const {
-    sort,
-    order,
-  } = useTableSorting();
   const formatNumber = useFormatNumber();
 
   const getParams = ({
@@ -93,8 +88,6 @@ const useProductsTab = ({
     getParams,
     pageSize,
     offset,
-    sort,
-    order,
     searchTerm: null,
     filterParams,
     serializedParams,
