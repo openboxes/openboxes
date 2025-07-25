@@ -16,7 +16,6 @@ import valueIndicatorVariant, {
   getCycleCountDifferencesVariant,
 } from 'consts/valueIndicatorVariant';
 import useTableDataV2 from 'hooks/useTableDataV2';
-import useTableSorting from 'hooks/useTableSorting';
 import useTranslate from 'hooks/useTranslate';
 import dateWithoutTimeZone from 'utils/dateUtils';
 
@@ -42,11 +41,6 @@ const useInventoryTransactionsTab = ({
     currentLocation: state.session.currentLocation,
     defaultTranslationsFetched: state.session.fetchedTranslations.default,
   }));
-  const {
-    sortableProps,
-    sort,
-    order,
-  } = useTableSorting();
 
   const getParams = ({
     sortingParams,
@@ -88,8 +82,6 @@ const useInventoryTransactionsTab = ({
     getParams,
     pageSize,
     offset,
-    sort,
-    order,
     searchTerm: null,
     filterParams,
     serializedParams,
@@ -123,11 +115,7 @@ const useInventoryTransactionsTab = ({
 
   const columns = useMemo(() => [columnHelper.accessor(inventoryTransactionReportColumn.ALIGNMENT, {
     header: () => (
-      <TableHeaderCell
-        sortable
-        columnId={inventoryTransactionReportColumn.ALIGNMENT}
-        {...sortableProps}
-      >
+      <TableHeaderCell columnId={inventoryTransactionReportColumn.ALIGNMENT}>
         {translate('react.cycleCount.table.alignment.label', 'Alignment')}
       </TableHeaderCell>
     ),
@@ -148,11 +136,7 @@ const useInventoryTransactionsTab = ({
     size: 100,
   }), columnHelper.accessor(inventoryTransactionReportColumn.PRODUCT, {
     header: () => (
-      <TableHeaderCell
-        sortable
-        columnId={inventoryTransactionReportColumn.PRODUCT}
-        {...sortableProps}
-      >
+      <TableHeaderCell columnId={inventoryTransactionReportColumn.PRODUCT}>
         {translate('react.cycleCount.table.product.label', 'Product')}
       </TableHeaderCell>
     ),
@@ -186,11 +170,7 @@ const useInventoryTransactionsTab = ({
     size: 360,
   }), columnHelper.accessor(inventoryTransactionReportColumn.TRANSACTION_TYPE, {
     header: () => (
-      <TableHeaderCell
-        sortable
-        columnId={inventoryTransactionReportColumn.TRANSACTION_TYPE}
-        {...sortableProps}
-      >
+      <TableHeaderCell columnId={inventoryTransactionReportColumn.TRANSACTION_TYPE}>
         {translate('react.cycleCount.table.type.label', 'Type')}
       </TableHeaderCell>
     ),
@@ -242,11 +222,7 @@ const useInventoryTransactionsTab = ({
     size: 130,
   }), columnHelper.accessor(inventoryTransactionReportColumn.TRANSACTION_ID, {
     header: () => (
-      <TableHeaderCell
-        sortable
-        columnId={inventoryTransactionReportColumn.TRANSACTION_ID}
-        {...sortableProps}
-      >
+      <TableHeaderCell columnId={inventoryTransactionReportColumn.TRANSACTION_ID}>
         {translate('react.cycleCount.table.transactionId.label', 'Transaction ID')}
       </TableHeaderCell>
     ),
@@ -263,11 +239,7 @@ const useInventoryTransactionsTab = ({
     ),
   }), columnHelper.accessor(inventoryTransactionReportColumn.QTY_BEFORE, {
     header: () => (
-      <TableHeaderCell
-        sortable
-        columnId={inventoryTransactionReportColumn.QTY_BEFORE}
-        {...sortableProps}
-      >
+      <TableHeaderCell columnId={inventoryTransactionReportColumn.QTY_BEFORE}>
         {translate('react.cycleCount.table.qtyBefore.label', 'Qty Before')}
       </TableHeaderCell>
     ),
@@ -279,11 +251,7 @@ const useInventoryTransactionsTab = ({
     ),
   }), columnHelper.accessor(inventoryTransactionReportColumn.QTY_AFTER, {
     header: () => (
-      <TableHeaderCell
-        sortable
-        columnId={inventoryTransactionReportColumn.QTY_AFTER}
-        {...sortableProps}
-      >
+      <TableHeaderCell columnId={inventoryTransactionReportColumn.QTY_AFTER}>
         {translate('react.cycleCount.table.qtyAfter.label', 'Qty After')}
       </TableHeaderCell>
     ),
@@ -297,11 +265,7 @@ const useInventoryTransactionsTab = ({
     ),
   }), columnHelper.accessor(inventoryTransactionReportColumn.QTY_DIFFERENCE, {
     header: () => (
-      <TableHeaderCell
-        sortable
-        columnId={inventoryTransactionReportColumn.QTY_DIFFERENCE}
-        {...sortableProps}
-      >
+      <TableHeaderCell columnId={inventoryTransactionReportColumn.QTY_DIFFERENCE}>
         {translate('react.cycleCount.table.difference.label', 'Difference')}
       </TableHeaderCell>
     ),
