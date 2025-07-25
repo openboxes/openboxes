@@ -18,6 +18,7 @@ const useTablePagination = ({
   // API calls. Previously, useEffect dependencies [filterParams, offset] caused two requests,
   // as useTablePagination useEffect listened to filterParams and later updated offset
   const [serializedParams, setSerializedParams] = useState('');
+
   const {
     currentLocation,
   } = useSelector((state) => ({
