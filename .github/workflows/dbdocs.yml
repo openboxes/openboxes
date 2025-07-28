@@ -31,7 +31,7 @@ jobs:
       - name: Install dbdocs
         run: sudo npm install -g dbdocs
 
-      - name: Install dbdocs
+      - name: Install dbml/cli (for converting .sql to .dbml)
         run: sudo npm install -g @dbml/cli
 
       - name: Check dbdocs
@@ -40,7 +40,7 @@ jobs:
       - name: Generate ddl.sql file
         run: ./grailsw schema-export
 
-      - name: Convert ddl.sql file to dbml
+      - name: Convert ddl.sql file to .dbml
         run: sql2dbml ./build/ddl.sql --mysql -o openboxes.dbml
 
       - name: Update dbdocs project
