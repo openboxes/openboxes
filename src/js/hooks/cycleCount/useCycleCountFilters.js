@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 
 import queryString from 'query-string';
 import { useDispatch, useSelector } from 'react-redux';
@@ -10,6 +10,7 @@ import useTranslate from 'hooks/useTranslate';
 import { groupBinLocationsByZone } from 'utils/groupBinLocationsByZone';
 import { getParamList, transformFilterParams } from 'utils/list-utils';
 import {
+  debouncePeopleFetch,
   fetchBins,
   fetchProductClassifications,
   fetchProductsCatalogs,
@@ -41,8 +42,12 @@ const useCycleCountFilters = ({ filterFields }) => {
 
   const {
     currentLocation,
+    debounceTime,
+    minSearchLength,
   } = useSelector((state) => ({
     currentLocation: state.session.currentLocation,
+    debounceTime: state.session.searchConfig.debounceTime,
+    minSearchLength: state.session.searchConfig.minSearchLength,
   }));
 
   const dispatch = useDispatch();
@@ -199,6 +204,11 @@ const useCycleCountFilters = ({ filterFields }) => {
     setFilterParams(values);
   };
 
+  const debouncedPeopleFetch = useCallback(
+    debouncePeopleFetch(debounceTime, minSearchLength),
+    [debounceTime, minSearchLength],
+  );
+
   return {
     defaultFilterValues,
     setFilterValues,
@@ -209,6 +219,7 @@ const useCycleCountFilters = ({ filterFields }) => {
     recountDeadline,
     negativeQuantity,
     isLoading,
+    debouncedPeopleFetch,
     ...selectOptions,
   };
 };

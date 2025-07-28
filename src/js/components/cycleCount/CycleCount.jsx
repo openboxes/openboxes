@@ -60,6 +60,7 @@ const CycleCount = () => {
     filterParams,
     resetForm,
     isLoading,
+    debouncedPeopleFetch,
   } = useCycleCountFilters({ filterFields });
 
   // This is needed to pass the selected checkboxes state from "All Products" to "To Count"
@@ -122,6 +123,7 @@ const CycleCount = () => {
             recountAssignees,
             recountDeadline,
             negativeQuantity,
+            debouncedPeopleFetch,
           }}
           isLoading={isLoading}
         />
