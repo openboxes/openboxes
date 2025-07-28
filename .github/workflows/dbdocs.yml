@@ -1,10 +1,11 @@
 name: dbdocs
 
 on:
-  # Update the docs whenever a new change is pushed to the develop branch. As such, dbdocs will always
+  # Update the docs whenever a new database change is pushed to the develop branch. As such, the docs will always
   # contain the 'latest' database state (instead of being in sync with 'main' / the latest stable release).
   push:
     branches: [ develop ]
+    paths: [ 'grails-app/migrations/**' ]
 
   # Also allow the build to be run manually in case we need to trigger a release of the docs ourselves.
   workflow_dispatch:
