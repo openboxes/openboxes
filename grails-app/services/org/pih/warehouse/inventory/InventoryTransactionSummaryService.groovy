@@ -16,6 +16,7 @@ class InventoryTransactionSummaryService {
             if (command.products) {
                 "in"("product", command.products)
             }
+            order("dateRecorded", "desc")
         }
 
         return inventoryTransactions
