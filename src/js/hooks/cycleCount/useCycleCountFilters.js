@@ -26,6 +26,7 @@ const useCycleCountFilters = ({ filterFields }) => {
   const [countDeadline] = useState(null);
   const [recountDeadline] = useState(null);
   const [filtersInitialized, setFiltersInitialized] = useState(false);
+  // This boolean ensures that we avoid issues with outdated bin location data
   const [isLoading, setIsLoading] = useState(false);
 
   const [selectOptions, setSelectOptions] = useState({
@@ -150,8 +151,8 @@ const useCycleCountFilters = ({ filterFields }) => {
         tags: tagList,
         internalLocations: groupBinLocationsByZone(binList, translate),
         abcClasses: classificationList,
-        countAssignees: defaultValues.countAssignees || [],
-        recountAssignees: defaultValues.recountAssignees || [],
+        countAssignees: defaultValues.countAssignees,
+        recountAssignees: defaultValues.recountAssignees,
       });
 
       defaultValues.catalogs = setDefaultValue(queryProps.catalogs, catalogList);
