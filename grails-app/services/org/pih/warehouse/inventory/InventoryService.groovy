@@ -1452,7 +1452,7 @@ class InventoryService implements ApplicationContextAware {
                     }
                 }
 
-                // c) Create a new transaction entry (even if quantity didn't change)
+                // c) Create a new transaction entry (but only if the quantity changed)
                 TransactionEntry transactionEntry = recordStockProductInventoryTransactionService.createAdjustmentTransactionEntry(
                         row,
                         inventoryItem,
@@ -1469,10 +1469,9 @@ class InventoryService implements ApplicationContextAware {
                 return
             }
 
-            // 5. Check if there are any changes recorded
+            // 5. Check if there are any changes in quantity recorded. If there aren't, we're done.
             if (!adjustmentTransaction.transactionEntries) {
-                cmd.errors.reject("transaction.noChanges", "There are no quantity changes in the current transaction")
-                return
+                return cmd
             }
 
             // Quantity available to promise will be manually calculated,
