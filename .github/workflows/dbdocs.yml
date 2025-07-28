@@ -1,35 +1,47 @@
-# This is a basic workflow to help you get started with Actions
+name: Update dbdocs
 
-name: dbdocs
-
-# Controls when the action will run. 
 on:
-  # Triggers the workflow on push or pull request events but only for the develop branch
+  # TODO: TEMPORARY FOR TESTING. REMOVE ONCE THIS WORKS!
+  pull_request:
+
+  # Update the dbdocs (https://dbdocs.io/jmiranda/openboxes) whenever a database change is pushed to the develop branch.
+  # We chose develop over main because the docs are primarily used by developers who want to see the latest db state.
   push:
     branches: [ develop ]
-  pull_request:
-    branches: [ develop ]
+    paths: [ 'grails-app/migrations/**' ]
 
-  # Allows you to run this workflow manually from the Actions tab
+  # Also allow the build to be run manually in case we need to trigger a release of the docs ourselves.
   workflow_dispatch:
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
   build:
-    # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{vars.JAVA_VERSION}}
+          distribution: zulu
+          cache: gradle
 
       - name: Install dbdocs
         run: sudo npm install -g dbdocs
 
+      - name: Install dbdocs
+        run: sudo npm install -g @dbml/cli
+
       - name: Check dbdocs
         run: dbdocs
+
+      - name: Generate ddl.sql file
+        run: ./grailsw schema-export
+
+      - name: Convert ddl.sql file to dbml
+        run: sql2dbml ./build/ddl.sql --mysql -o openboxes.dbml
 
       - name: Update dbdocs project
         env:
