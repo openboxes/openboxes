@@ -91,12 +91,32 @@ https://openboxes.atlassian.net/wiki/spaces/OBW/pages/1719435265/Push-button+dep
 #### Required
 * [Java 8 (must install Java 8)](https://www.oracle.com/pl/java/technologies/javase/javase8-archive-downloads.html) or via SDK
 * [MySQL 5.7 or MySQL 8.0](https://downloads.mysql.com/archives/community/) or [MariaDB 10.11.4](https://mariadb.com/kb/en/mariadb-10-11-4-release-notes/)
-  * Mac users: 5.7.31 is the latest 5.7.x with a pre-built installer and works fine
+  * Mac users: 5.7.31 is the latest 5.7.x with a pre-built installer. However, it will not work on a modern machine that uses Apple Silicon.
   * Issues related to the MySQL 8 upgrade could be found [here](https://github.com/openboxes/openboxes/issues?q=is%3Aissue+mysql+8+is%3Aopen+)
 * [SDK Man](https://sdkman.io/install)
-* [Grails 3.3.17](https://grails.org/download.html)
+* [Grails 3.3.18](https://grails.org/download.html)
 * NPM 6.14.6
 * Node 14+
+
+##### Installation notes for M-series (Apple Silicon) Macs
+
+* The database we use in production won't run natively on modern Macs.
+  * Easiest way to install a compatible database is by using [`brew install mariadb`](https://mariadb.com/kb/en/installing-mariadb-on-macos-using-homebrew/).
+  * Alternatively, ARM builds of MySQL 8 are available. Consider downloading [8.x LTS here](https://dev.mysql.com/downloads/mysql/).
+* No ARM build of Node 14 exists either.
+  * But you can run it via x86 emulation as follows:
+    1. `/usr/sbin/softwareupdate --install-rosetta --agree-to-license`
+    2. Install `nvm` (_only_ – do _not_ install `node` itself) using [these instructions](https://nodejs.org/en/download)
+    3. Launch a terminal that uses Rosetta to pretend to be an x86 host: `arch -x86_64 bash`
+    4. Within that terminal, run `nvm install 14`
+    5. Open up a new terminal and run the following command; you should see an `x86_64` binary, which should be able to run successfully on an ARM host.
+      ```bash
+      $ hash -r && type node | awk '{print $3}' | xargs file
+      \*\*/.nvm/versions/node/v14.21.3/bin/node: Mach-O 64-bit executable x86_64
+      $ arch; node --version
+      arm64
+      v14.21.3
+      ```
 
 #### Optional
 * [IntelliJ IDEA](https://www.jetbrains.com/idea/download/)
@@ -117,14 +137,14 @@ $ sdk version
 SDKMAN 5.13.2
 ```
 
-Install Grails 3.3.10
+Install Grails 3.3.18
 ```
-$ sdk install grails 3.3.10
+$ sdk install grails 3.3.18
 ```
 
 Install Java 8*
 ```
-$ sdk install java 8.0.332-zulu
+$ sdk install java 8.0.452-zulu
 ```
 
 `*` - in case you have not installed Java yet.
@@ -175,6 +195,15 @@ instruct the application to not setup test fixtures automatically by uncommentin
 openboxes.fixtures.enabled=false
 ```
 
+##### Note for MariaDB users
+
+If using MariaDB the configuration file needs to be slightly different. You'll need to edit `dataSource.url` and specify `dataSource.driverClassName`, as follows.
+
+```conf
+dataSource.url=jdbc:mariadb://localhost:3306/openboxes?serverTimezone=UTC
+dataSource.driverClassName: org.mariadb.jdbc.Driver
+```
+
 #### 6. Install NPM dependencies
 ```    
 npm config set engine-strict true
@@ -195,13 +224,8 @@ npm run watch
 ```
 
 #### 9. Upgrade the project to the currently installed grails version 
-Either of the following actions (upgrade, compile, run-app) should generate the all important Spring configuration 
+Either of the following actions (compile, run-app) should generate the all important Spring configuration 
 (`/WEB-INF/applicationContext.xml`) and start the dependency resolution process.  
-
-```    
-grails upgrade
-```
-OR
 
 ```    
 grails compile
