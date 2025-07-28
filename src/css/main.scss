@@ -1720,6 +1720,12 @@ div.search-input:focus-within {
   }
 }
 
+@for $i from 1 through 10 {
+  .t-#{$i} {
+    top: #{$i}rem;
+  }
+}
+
 .cursor-pointer {
   cursor: pointer;
 }
