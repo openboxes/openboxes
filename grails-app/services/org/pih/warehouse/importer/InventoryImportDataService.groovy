@@ -211,7 +211,7 @@ class InventoryImportDataService implements ImportDataService {
      * for use in the comment of a transaction entry.
      */
     private String buildTransactionEntryComment(List<InventoryImportDataRow> rows) {
-        return rows.comments.join(", ")
+        return rows.comments.findAll { it }.join(", ")
     }
 
     /**
