@@ -583,27 +583,8 @@ class InventoryItemController {
             return
         }
 
-        log.info("User chose to validate or there are errors")
-        Location warehouseInstance = Location.get(session?.warehouse?.id)
-
-        commandInstance.product = Product.load(commandInstance.product.id)
-        commandInstance.inventory = warehouseInstance?.inventory
-        commandInstance.inventoryLevel = InventoryLevel.findByProductAndInventory(commandInstance?.product, commandInstance?.inventory)
-
-        Product productInstance = commandInstance.product
-        List transactionEntryList = inventoryService.getTransactionEntriesByInventoryAndProduct(commandInstance?.inventory, [productInstance])
-
-        // Get the inventory warning level for the given product and inventory
-        commandInstance.inventoryLevel = InventoryLevel.findByProductAndInventory(commandInstance?.product, commandInstance?.inventory)
-
-        commandInstance.totalQuantity = inventoryService.getQuantityByProductMap(transactionEntryList)[productInstance] ?: 0
-
-        log.info "commandInstance.recordInventoryRows: "
-        commandInstance?.recordInventoryRows.each {
-            log.info "it ${it?.id}:${it?.lotNumber}:${it?.oldQuantity}:${it?.newQuantity}"
-        }
-
-        render(view: "showRecordInventory", model: [commandInstance: commandInstance])
+        flash.errors = commandInstance.errors
+        redirect(action: "showRecordInventory", params: ['product.id': commandInstance.product.id])
     }
 
     def showTransactions() {
