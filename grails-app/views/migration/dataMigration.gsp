@@ -60,9 +60,14 @@
             <tr class="prop">
                 <td class="name">Product Inventory transactions that should be replaced by Inventory Baseline and Adjustment pair</td>
                 <td class="value">
-                    ${productInventoryTransactionCount} (total), ${productInventoryTransactionInCurrentLocationCount} (current location)
+                    <p>${productInventoryTransactionCount} (total), ${productInventoryTransactionInCurrentLocationCount} (current location)</p>
                     <br>
-                    Products: ${productsWithProductInventoryTransactionInCurrentLocation.join(', ') ?: 'None'}
+                    <p>Products that have a product inventory transaction overlapping with other type of transaction:</p>
+                    <g:each var="product" in="${groupedOverlappingTransactions}">
+                        <p>${product}</p>
+                    </g:each>
+                    <br>
+                    <p>Products with old transaction: ${productsWithProductInventoryTransactionInCurrentLocation.join(', ') ?: 'None'}</p>
                 </td>
                 <td>
                     <div class="button-group">

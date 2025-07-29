@@ -60,6 +60,20 @@ class MigrationController {
         Location currentLocation = Location.get(session.warehouse.id)
         Integer productInventoryTransactionInCurrentLocationCount = Transaction.countByTransactionTypeAndInventory(productInventoryTransactionType, currentLocation.inventory)
         List<Product> productsWithProductInventoryTransactionInCurrentLocation = migrationService.getProductsWithTransactions(currentLocation, productInventoryTransactionType)
+        def groupedOverlappingTransactions = [:]
+        def overlappingTransactions = migrationService.getOtherOverlappingTransactions(currentLocation, productInventoryTransactionType)?.each { it ->
+            if (!groupedOverlappingTransactions[it.product_id]) {
+                groupedOverlappingTransactions[it.product_id] = [it.transaction1_number, it.transaction2_number]
+                return
+            }
+            if (!groupedOverlappingTransactions[it.product_id].contains(it.transaction1_number)) {
+                groupedOverlappingTransactions[it.product_id].add(it.transaction1_number)
+            }
+            if (!groupedOverlappingTransactions[it.product_id].contains(it.transaction2_number)) {
+                groupedOverlappingTransactions[it.product_id].add(it.transaction2_number)
+            }
+        }
+
 
         [
                 organizationCount        : organizations.size(),
@@ -68,7 +82,7 @@ class MigrationController {
                 productInventoryTransactionInCurrentLocationCount: productInventoryTransactionInCurrentLocationCount,
                 productsWithProductInventoryTransactionInCurrentLocation: productsWithProductInventoryTransactionInCurrentLocation?.productCode,
                 productSupplierCount     : productSuppliers.size(),
-
+                groupedOverlappingTransactions: groupedOverlappingTransactions
         ]
     }
 

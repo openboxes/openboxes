@@ -493,7 +493,7 @@ class MigrationService {
         }
 
         return [
-                "Location": location?.name,
+                "Location"         : location?.name,
                 "Migration Results": results
         ]
     }
@@ -507,7 +507,7 @@ class MigrationService {
         transactions.each { Transaction it ->
             if (previousTransactionDate && it.transactionDate == previousTransactionDate) {
                 log.debug "Transaction ${it.transactionNumber} has a transaction date equal to the previously processed " +
-                          "transaction. Skipping migrating this one as it won't have effect on the stock."
+                        "transaction. Skipping migrating this one as it won't have effect on the stock."
                 it.disableRefresh = true
                 it.delete(flush: true, failOnError: true)
                 return
@@ -863,7 +863,7 @@ class MigrationService {
         // Don't bother populating the transaction's fields until we know we'll need one.
         Transaction transaction = new Transaction()
 
-        transactionEntries?.each {  TransactionEntry entry ->
+        transactionEntries?.each { TransactionEntry entry ->
             // Assuming there is no duplicated product-lot-bin combination in the transaction entries
             // If there are, it need to be done similarly like in the Inventory Import
             String key = productAvailabilityService.constructAvailableItemKey(entry.binLocation, entry.inventoryItem)
@@ -955,7 +955,7 @@ class MigrationService {
     }
 
     private static void recordMigrationResult(Map migrationResults, List<Transaction> transactions, Boolean before = false) {
-        transactions.each {Transaction t ->
+        transactions.each { Transaction t ->
             t.transactionEntries.each { TransactionEntry te ->
                 if (!migrationResults.containsKey(te.inventoryItem.product.productCode)) {
                     migrationResults[te.inventoryItem.product.productCode] = [
@@ -992,5 +992,34 @@ class MigrationService {
                 """UPDATE transaction set date_created = ?, created_by_id = ?, updated_by_id = ? WHERE id = ?""",
                 [date, user.id, user.id, transaction.id]
         )
+    }
+
+    def getOtherOverlappingTransactions(Location location, TransactionType transactionType) {
+        def sql = new Sql(dataSource)
+        sql.rows("""
+            SELECT
+                ii1.product_id AS product_id,
+                t1.transaction_number AS transaction1_number,
+                t1.transaction_date AS transaction1_date, 
+                t2.transaction_number AS transaction2_number,
+                t2.transaction_date AS transaction2_date
+            FROM transaction_entry te1
+                     JOIN inventory_item ii1 ON te1.inventory_item_id = ii1.id
+                     JOIN transaction t1 ON te1.transaction_id = t1.id
+                     JOIN transaction_entry te2 ON te1.inventory_item_id != te2.inventory_item_id
+                     JOIN inventory_item ii2 ON te2.inventory_item_id = ii2.id
+                     JOIN transaction t2 ON te2.transaction_id = t2.id
+            WHERE
+              ii1.product_id = ii2.product_id
+              AND t1.transaction_date = t2.transaction_date
+              AND t1.id < t2.id
+              AND (
+                (t1.transaction_type_id = :transactionTypeId and t2.transaction_type_id != :transactionTypeId) 
+                OR 
+                (t1.transaction_type_id != :transactionTypeId and t2.transaction_type_id = :transactionTypeId)
+              )
+              AND t1.inventory_id = :inventoryId
+              AND t2.inventory_id = :inventoryId
+        """, [inventoryId: location.inventory.id, transactionTypeId: transactionType.id])
     }
 }
