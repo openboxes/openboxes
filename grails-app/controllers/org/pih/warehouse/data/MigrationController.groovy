@@ -60,6 +60,8 @@ class MigrationController {
         Location currentLocation = Location.get(session.warehouse.id)
         Integer productInventoryTransactionInCurrentLocationCount = Transaction.countByTransactionTypeAndInventory(productInventoryTransactionType, currentLocation.inventory)
         List<Product> productsWithProductInventoryTransactionInCurrentLocation = migrationService.getProductsWithTransactions(currentLocation, productInventoryTransactionType)
+        Map<String, List<String>> overlappingTransactions = migrationService.getOtherOverlappingTransactions(currentLocation, productInventoryTransactionType)
+
 
         [
                 organizationCount        : organizations.size(),
@@ -68,7 +70,7 @@ class MigrationController {
                 productInventoryTransactionInCurrentLocationCount: productInventoryTransactionInCurrentLocationCount,
                 productsWithProductInventoryTransactionInCurrentLocation: productsWithProductInventoryTransactionInCurrentLocation?.productCode,
                 productSupplierCount     : productSuppliers.size(),
-
+                overlappingTransactions  : overlappingTransactions
         ]
     }
 
