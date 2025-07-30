@@ -75,7 +75,9 @@ const useAssignCycleCountModal = ({
         id: item.id,
         recount: true,
         assignee: dataToAssign?.[cycleCount.maxCountIndex]?.assignee,
-      }));
+      }))
+        // we only want to include items that have an assignee
+        .filter(item => item.assignee);
     });
     return _.flatten(mappedData);
   };
@@ -123,11 +125,13 @@ const useAssignCycleCountModal = ({
           cycleCountIds,
         );
         const countData = getCycleCountItemsWithAssignedCountData(data.data, commands);
-        for (const cycleCount of cycleCountIds) {
-          await cycleCountApi
-            .updateCycleCountItems({
-              itemsToUpdate: countData,
-            }, currentLocation?.id, cycleCount);
+
+        if (countData.length > 0) {
+          await cycleCountApi.updateCycleCountItems(
+            { itemsToUpdate: countData },
+            currentLocation?.id,
+            cycleCountIds,
+          );
         }
       }
       if (response.status === 200) {
@@ -207,12 +211,14 @@ const useAssignCycleCountModal = ({
             async
             loadOptions={debouncedPeopleFetch}
             defaultValue={getValue()}
-            onChange={(selectedOption) =>
+            onChange={(selectedOption) => {
               handleUpdateAssignees(
                 [row.original.cycleCountRequestId],
                 cycleCountColumn.ASSIGNEE,
                 selectedOption,
-              )}
+              );
+              forceRerender();
+            }}
           />
         </TableCell>
       ),

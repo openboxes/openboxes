@@ -78,7 +78,6 @@ const ResolveStepTable = ({
   } = useSelector((state) => ({
     formatLocalizedDate: formatDate(state.localize),
   }));
-
   const outOfStockItems = cycleCountWithItemsWithoutRecount
     .cycleCountItems
     .filter((item) => item.quantityOnHand === 0);
