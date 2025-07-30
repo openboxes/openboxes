@@ -42,7 +42,7 @@ const AssignCycleCountModal = ({
   });
 
   const isAssignButtonDisabled = !selectedCycleCounts.current?.some(
-    (item) => item.assignee,
+    (item) => item.assignee || item.deadline,
   );
 
   return (

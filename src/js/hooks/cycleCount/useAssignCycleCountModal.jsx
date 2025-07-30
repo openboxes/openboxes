@@ -127,10 +127,9 @@ const useAssignCycleCountModal = ({
         const countData = getCycleCountItemsWithAssignedCountData(data.data, commands);
 
         if (countData.length > 0) {
-          await cycleCountApi.updateCycleCountItems(
+          await cycleCountApi.updateCycleCountItemsBatch(
             { itemsToUpdate: countData },
             currentLocation?.id,
-            cycleCountIds,
           );
         }
       }
