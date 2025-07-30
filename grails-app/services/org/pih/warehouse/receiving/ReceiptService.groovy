@@ -264,10 +264,8 @@ class ReceiptService {
             if (partialReceiptItem.shouldSave) {
                 ReceiptItem receiptItem = createOrUpdateReceiptItem(partialReceiptItem)
                 receipt.addToReceiptItems(receiptItem)
-                receiptItem.save(failOnError: true)
                 ShipmentItem shipmentItem = partialReceiptItem.shipmentItem
                 shipmentItem.addToReceiptItems(receiptItem)
-                shipmentItem.save()
             }
         }
 
