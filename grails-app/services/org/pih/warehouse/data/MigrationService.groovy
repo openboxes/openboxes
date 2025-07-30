@@ -20,6 +20,8 @@ import org.pih.warehouse.DateUtil
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Constants
+import org.pih.warehouse.core.Document
+import org.pih.warehouse.core.DocumentType
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.core.LocationTypeCode
@@ -462,7 +464,7 @@ class MigrationService {
                         log.debug "Migrating transactions for product: " +
                                 "${transactionList?.transactionEntries?.inventoryItem?.product?.productCode?.unique()} " +
                                 "at location ${location.name}"
-                        processProductInventoryTransactions(transactionList, location, migratedBy, results)
+                        processProductInventoryTransactions(transactionList, location, migratedBy, results, true)
                     }
                 }
             }
@@ -490,22 +492,42 @@ class MigrationService {
 
             // Refresh PA for all products that were migrated
             productAvailabilityService.triggerRefreshProductAvailability(location.id, products?.id, true)
+
+            createCSVMigrationReportForResults(location, results)
         }
 
         return [
                 "Location"         : location?.name,
-                "Migration Results": results
+                "Migration Results": results.collectEntries { key, values ->
+                    [(key): [] <<
+                        ["Status".padRight(10) +
+                        "Transaction name".padRight(25) +
+                        "Transaction Number".padRight(25) +
+                        "Transaction date".padRight(35) +
+                        "QTY".padRight(10) +
+                        "ITEMKEY".padRight(70)] +
+                        values.collect {
+                            "${it.status}".padRight(10) +
+                            "${it.transactionTypeName}".padRight(25) +
+                            "${it.transactionNumber}".padRight(25) +
+                            "${it.transactionDate}".padRight(35) +
+                            "${it.quantity}".padRight(10) +
+                            "${it.product}:${it.lotNumber}:${it.binLocation}".padRight(70)
+                        }
+                    ]
+                },
         ]
     }
 
-    void processProductInventoryTransactions(List<Transaction> transactions, Location location, User migratedBy, Map results) {
+    void processProductInventoryTransactions(List<Transaction> transactions, Location location, User migratedBy, Map results, boolean singleProduct = false) {
         if (!transactions) {
             return
         }
 
         Date previousTransactionDate = null
         transactions.each { Transaction it ->
-            if (previousTransactionDate && it.transactionDate == previousTransactionDate) {
+            // For single product transactions, we can keep only the newest transaction with the same transaction date
+            if (singleProduct && previousTransactionDate && it.transactionDate == previousTransactionDate) {
                 log.debug "Transaction ${it.transactionNumber} has a transaction date equal to the previously processed " +
                         "transaction. Skipping migrating this one as it won't have effect on the stock."
                 it.disableRefresh = true
@@ -863,12 +885,22 @@ class MigrationService {
         // Don't bother populating the transaction's fields until we know we'll need one.
         Transaction transaction = new Transaction()
 
-        transactionEntries?.each { TransactionEntry entry ->
+        Map<String, Map> groupedEntries = transactionEntries?.groupBy { [it.inventoryItem, it.binLocation] }?.collectEntries { key, entries ->
+            String itemKey = productAvailabilityService.constructAvailableItemKey(key[1], key[0])
+            String comments = entries.comments.findAll { it }.join(', ')
+            [(itemKey): [
+                binLocation: key[1],
+                inventoryItem: key[0],
+                quantity: entries.sum { it.quantity },
+                comments: comments.length() > 255 ? comments.substring(0, 255) : comments
+            ]]
+        }
+
+        groupedEntries?.each { String key, Map value ->
             // Assuming there is no duplicated product-lot-bin combination in the transaction entries
             // If there are, it need to be done similarly like in the Inventory Import
-            String key = productAvailabilityService.constructAvailableItemKey(entry.binLocation, entry.inventoryItem)
             int quantityOnHand = availableItems.get(key)?.quantityOnHand ?: 0
-            int adjustmentQuantity = entry.quantity - quantityOnHand
+            int adjustmentQuantity = value.quantity - quantityOnHand
             if (adjustmentQuantity == 0) {
                 return
             }
@@ -876,10 +908,31 @@ class MigrationService {
             TransactionEntry transactionEntry = new TransactionEntry(
                     transaction: transaction,
                     quantity: adjustmentQuantity,
-                    product: entry.product,
-                    binLocation: entry.binLocation,
-                    inventoryItem: entry.inventoryItem,
-                    comments: entry.comments
+                    product: value.inventoryItem.product,
+                    binLocation: value.binLocation,
+                    inventoryItem: value.inventoryItem,
+                    comments: value.comments
+            )
+            transaction.addToTransactionEntries(transactionEntry)
+        }
+
+        // For all products in the transaction, any other bins/lots of those products that exist in the system (ie have
+        // a product availability entry) but were not in the migrated transaction should have their quantity set to zero.
+        Set<String> keysInTransaction = groupedEntries.keySet()
+        availableItems.each { entry ->
+            AvailableItem availableItem = entry.value
+
+            if (keysInTransaction.contains(entry.key)) {
+                return
+            }
+
+            TransactionEntry transactionEntry = new TransactionEntry(
+                    transaction: transaction,
+                    quantity: -availableItem.quantityOnHand,
+                    product: availableItem.inventoryItem.product,
+                    binLocation: availableItem.binLocation,
+                    inventoryItem: availableItem.inventoryItem,
+                    comments: 'This item was not in migrated transaction so quantity was assumed to be zero.',
             )
             transaction.addToTransactionEntries(transactionEntry)
         }
@@ -958,21 +1011,23 @@ class MigrationService {
         transactions.each { Transaction t ->
             t.transactionEntries.each { TransactionEntry te ->
                 if (!migrationResults.containsKey(te.inventoryItem.product.productCode)) {
-                    migrationResults[te.inventoryItem.product.productCode] = [
-                            "Status".padRight(10) + "Transaction name".padRight(25) + "Transaction Number".padRight(25) + "Transaction date".padRight(35) + "QTY".padRight(10) + "ITEMKEY".padRight(70)
-                    ]
+                    migrationResults[te.inventoryItem.product.productCode] = []
                 }
-                migrationResults[te.inventoryItem.product.productCode] << "${before ? "BEFORE" : "AFTER"}".padRight(10) +
+                migrationResults[te.inventoryItem.product.productCode] << [
+                        status: before ? "BEFORE" : "AFTER",
                         // name split by "|", because the old inline translation
-                        "${t.transactionType.name.split("\\|")[0].padRight(25)}" +
-                        "${t.transactionNumber.padRight(25)}" +
-                        "${DateUtil.asDateTimeForDisplay(t.transactionDate).padRight(35)}" +
-                        "${te.quantity.toString().padRight(10)}" +
-                        "${te.inventoryItem.product.productCode}:${te.inventoryItem.lotNumber}:${te.binLocation?.name}".padRight(70)
+                        transactionTypeName: t.transactionType.name.split("\\|")[0],
+                        transactionNumber: t.transactionNumber,
+                        transactionDate: DateUtil.asDateTimeForDisplay(t.transactionDate),
+                        dateCreated: DateUtil.asDateTimeForDisplay(t.dateCreated),
+                        quantity: te.quantity,
+                        product: te.inventoryItem.product.productCode,
+                        lotNumber: te.inventoryItem?.lotNumber,
+                        binLocation: te.binLocation?.name ?: ""
+                ]
             }
         }
     }
-
 
     // FIXME Ugly workaround to omit auto-timestamping dateCreated, we cannot temporarily disable autotimestamping,
     //  it's available starting at Grails 6
@@ -1034,5 +1089,45 @@ class MigrationService {
             }
         }
         return groupedData
+    }
+
+    /**
+     * Creates a CSV migration report for the given results of the old product inventory transacitons migration
+     *
+     * @param location The location for which the migration was performed.
+     * @param results  The results for each migrated transaction entry grouped by product.
+     */
+    void createCSVMigrationReportForResults(Location location, Map results) {
+        if (!results) {
+            return
+        }
+
+        // Prepare data
+        Map props = [
+            "Status": "status",
+            "Transaction Type Name": "transactionTypeName",
+            "Transaction Number": "transactionNumber",
+            "Transaction Date": "transactionDate",
+            "Date Created": "dateCreated",
+            "Quantity": "quantity",
+            "Product": "product",
+            "Lot Number": "lotNumber",
+            "Bin Location": "binLocation"
+        ]
+        List<Map> data = dataService.transformObjects(results.values().flatten(), props)
+        String csvData = dataService.generateCsv(data)
+
+        // Store the data in a Document
+        DocumentType defaultDocumentType = DocumentType.get(Constants.DEFAULT_DOCUMENT_TYPE_ID)
+        Document migrationReport = new Document()
+        migrationReport.documentType = defaultDocumentType
+        migrationReport.name = "Product Inventory Migration Report for ${location.name}"
+        migrationReport.filename = "Product Inventory Migration Report for ${location.name}.csv"
+        migrationReport.extension = "csv"
+        migrationReport.fileContents = csvData
+        if (!migrationReport.validate() || !migrationReport.save() ) {
+            // if for some reason we could not save the migration report, then log the results and don't fail over it
+            log.info("Could not save migration report for location ${location.name}: ${results}")
+        }
     }
 }
