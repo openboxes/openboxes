@@ -12,6 +12,7 @@ package org.pih.warehouse.data
 import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
+import groovy.sql.GroovyRowResult
 import groovy.sql.Sql
 import org.hibernate.Criteria
 import org.hibernate.criterion.CriteriaSpecification
@@ -1050,8 +1051,8 @@ class MigrationService {
     }
 
     Map<String, List<String>> getOtherOverlappingTransactions(Location location, TransactionType transactionType) {
-        def sql = new Sql(dataSource)
-        def data = sql.rows("""
+        Sql sql = new Sql(dataSource)
+        List<GroovyRowResult> data = sql.rows("""
             SELECT
                 ii1.product_id AS product_id,
                 t1.transaction_number AS transaction1_number,
