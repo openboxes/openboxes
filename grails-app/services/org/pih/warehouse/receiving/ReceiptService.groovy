@@ -265,16 +265,14 @@ class ReceiptService {
             if (partialReceiptItem.shouldSave) {
                 ReceiptItem receiptItem = createOrUpdateReceiptItem(partialReceiptItem)
                 receipt.addToReceiptItems(receiptItem)
-                receiptItem.save()
                 ShipmentItem shipmentItem = partialReceiptItem.shipmentItem
                 shipmentItem.addToReceiptItems(receiptItem)
-                shipmentItem.save()
             }
         }
 
         partialReceipt.receipt = receipt
 
-        receipt.save()
+        receipt.save(failOnError: true)
         // Save shipment
         shipment.save()
     }
@@ -522,6 +520,10 @@ class ReceiptService {
             partialReceiptItem.product = item.product
             partialReceiptItem.shouldSave = item.quantity != null
             partialReceiptItem.shipmentItem = item
+            partialReceiptItem.lotNumber = item.lotNumber
+            partialReceiptItem.expirationDate = item.expirationDate
+            partialReceiptItem.quantityShipped = item.quantity
+
             partialReceiptContainer.partialReceiptItems.add(partialReceiptItem)
         }
 
