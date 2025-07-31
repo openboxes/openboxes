@@ -98,6 +98,26 @@ class CycleCountService {
                 }
             }
 
+            if (command.countAssignees) {
+                createCycleCountRequestAlias(delegate, usedAliases)
+                "in"("ccr.countAssignee", command.countAssignees)
+            }
+
+            if (command.recountAssignees) {
+                createCycleCountRequestAlias(delegate, usedAliases)
+                "in"("ccr.recountAssignee", command.recountAssignees)
+            }
+
+            if (command.countDeadline) {
+                createCycleCountRequestAlias(delegate, usedAliases)
+                lte("ccr.countDeadline", command.countDeadline)
+            }
+
+            if (command.recountDeadline) {
+                createCycleCountRequestAlias(delegate, usedAliases)
+                lte("ccr.recountDeadline", command.recountDeadline)
+            }
+
             if (command.negativeQuantity) {
                 gt("negativeItemCount", 0)
             }
@@ -193,6 +213,26 @@ class CycleCountService {
                 inList("status", command.statuses)
             }
 
+            if (command.countAssignees) {
+                createCycleCountRequestAlias(delegate, usedAliases)
+                "in"("ccr.countAssignee", command.countAssignees)
+            }
+
+            if (command.recountAssignees) {
+                createCycleCountRequestAlias(delegate, usedAliases)
+                "in"("ccr.recountAssignee", command.recountAssignees)
+            }
+
+            if (command.countDeadline) {
+                createCycleCountRequestAlias(delegate, usedAliases)
+                lte("ccr.countDeadline", command.countDeadline)
+            }
+
+            if (command.recountDeadline) {
+                createCycleCountRequestAlias(delegate, usedAliases)
+                lte("ccr.recountDeadline", command.recountDeadline)
+            }
+
             if (command.negativeQuantity) {
                 gt("negativeItemCount", 0)
             }
@@ -261,6 +301,14 @@ class CycleCountService {
         if (!usedAliases.contains("product")) {
             usedAliases.add("product")
             criteria.createAlias("product", "product", JoinType.INNER_JOIN)
+        }
+    }
+
+    // Prevents duplicate alias 'ccr' creation, which can happen when filtering by assignees and deadlines simultaneously.
+    private static void createCycleCountRequestAlias(Criteria criteria, Set<String> usedAliases) {
+        if (!usedAliases.contains("ccr")) {
+            usedAliases.add("ccr")
+            criteria.createAlias("cycleCountRequest", "ccr", JoinType.INNER_JOIN)
         }
     }
 
