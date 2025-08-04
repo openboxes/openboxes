@@ -1,0 +1,89 @@
+import React from 'react';
+
+import { render, screen, within } from '@testing-library/react';
+
+import DoubleTile from 'utils/DoubleTile';
+
+import '@testing-library/jest-dom';
+
+const mockTranslate = jest.fn((key, defaultValue) => defaultValue);
+
+jest.mock('hooks/useTranslate', () => () => mockTranslate);
+
+describe('DoubleTile component', () => {
+  const mockProps = {
+    cardTitle: 'react.doubleTile.title',
+    cardTitleDefaultValue: 'Card Title',
+    cardFirstValue: 75,
+    cardSecondValue: 1500,
+    cardFirstSubtitle: 'react.doubleTile.firstSubtitle',
+    cardDefaultFirstSubtitle: 'First Subtitle',
+    cardSecondSubtitle: 'react.doubleTile.secondSubtitle',
+    cardDefaultSecondSubtitle: 'Second Subtitle',
+    cardInfo: 'react.doubleTile.info',
+    cardInfoDefaultValue: 'Info Text',
+    currencyCode: 'USD',
+    showFirstValuePercentSign: false,
+    formatSecondValueAsCurrency: false,
+  };
+
+  beforeEach(() => {
+    mockTranslate.mockReset();
+    mockTranslate.mockImplementation((key, defaultValue) => defaultValue);
+  });
+
+  it('should match snapshot for sample props', () => {
+    const { asFragment } = render(<DoubleTile {...mockProps} />);
+    expect(asFragment()).toMatchSnapshot();
+  });
+
+  it('renders title, first value, second value, and subtitles correctly', () => {
+    render(<DoubleTile {...mockProps} />);
+    const { getByText } = within(screen.getByTestId('double-tile'));
+    expect(getByText('Card Title')).toBeInTheDocument();
+    expect(getByText('75')).toBeInTheDocument();
+    expect(getByText('First Subtitle')).toBeInTheDocument();
+    expect(getByText('1500')).toBeInTheDocument();
+    expect(getByText('Second Subtitle')).toBeInTheDocument();
+  });
+
+  it('renders first value with percent sign when showFirstValuePercentSign is true', () => {
+    render(<DoubleTile {...mockProps} showFirstValuePercentSign />);
+    const { getByText } = within(screen.getByTestId('double-tile'));
+    expect(getByText('75%')).toBeInTheDocument();
+  });
+
+  it('formats second value as currency when formatSecondValueAsCurrency is true', () => {
+    render(<DoubleTile {...mockProps} formatSecondValueAsCurrency />);
+    const { getByText } = within(screen.getByTestId('double-tile'));
+    expect(getByText('1,500.00 USD')).toBeInTheDocument();
+  });
+
+  it('formats second value as million when value is >= 1,000,000', () => {
+    render(<DoubleTile {...mockProps} cardSecondValue={1500000} formatSecondValueAsCurrency />);
+    const { getByText } = within(screen.getByTestId('double-tile'));
+    expect(getByText('1.500 million USD')).toBeInTheDocument();
+  });
+
+  it('uses translate function for title, subtitles, and tooltip', () => {
+    render(<DoubleTile {...mockProps} />);
+    expect(mockTranslate).toHaveBeenCalledWith('react.doubleTile.title', 'Card Title');
+    expect(mockTranslate).toHaveBeenCalledWith('react.doubleTile.firstSubtitle', 'First Subtitle');
+    expect(mockTranslate).toHaveBeenCalledWith('react.doubleTile.secondSubtitle', 'Second Subtitle');
+    expect(mockTranslate).toHaveBeenCalledWith('react.doubleTile.info', 'Info Text');
+  });
+
+  it('renders correctly when optional props are undefined', () => {
+    const propsWithOptionalDefaults = {
+      ...mockProps,
+      currencyCode: undefined,
+      showFirstValuePercentSign: undefined,
+      formatSecondValueAsCurrency: undefined,
+    };
+    render(<DoubleTile {...propsWithOptionalDefaults} />);
+    const { getByText, queryByText } = within(screen.getByTestId('double-tile'));
+    expect(getByText('75')).toBeInTheDocument();
+    expect(getByText('1500')).toBeInTheDocument();
+    expect(queryByText('1,500.00 USD')).not.toBeInTheDocument();
+  });
+});

@@ -1,0 +1,68 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`getBinLocationToDisplay should match snapshot for sample bin 1`] = `"ZoneA: Bin123"`;
+
+exports[`groupBinLocationsByZone should match snapshot for sample bin locations 1`] = `
+[
+  {
+    "id": "zone-no-zone",
+    "isDisabled": true,
+    "label": <span
+      className="zone-label"
+    >
+      No Zone
+    </span>,
+    "name": "No Zone",
+    "options": [
+      {
+        "id": "4",
+        "label": "Bin4",
+        "name": "Bin4",
+        "value": "4",
+      },
+    ],
+  },
+  {
+    "id": "zone-zone1",
+    "isDisabled": true,
+    "label": <span
+      className="zone-label"
+    >
+      ZoneA
+    </span>,
+    "name": "ZoneA",
+    "options": [
+      {
+        "id": "1",
+        "label": "ZoneA: Bin1",
+        "name": "ZoneA: Bin1",
+        "value": "1",
+      },
+      {
+        "id": "2",
+        "label": "ZoneA: Bin2",
+        "name": "ZoneA: Bin2",
+        "value": "2",
+      },
+    ],
+  },
+  {
+    "id": "zone-zone2",
+    "isDisabled": true,
+    "label": <span
+      className="zone-label"
+    >
+      ZoneB
+    </span>,
+    "name": "ZoneB",
+    "options": [
+      {
+        "id": "3",
+        "label": "ZoneB: Bin3",
+        "name": "ZoneB: Bin3",
+        "value": "3",
+      },
+    ],
+  },
+]
+`;
