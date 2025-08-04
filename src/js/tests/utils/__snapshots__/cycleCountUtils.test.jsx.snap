@@ -1,0 +1,19 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`trimLotNumberSpaces should match snapshot for sample item 1`] = `
+{
+  "id": "ff808181985f4b620198609307eb0074",
+  "inventoryItem": {
+    "id": "09f5e1167edca0ea017efcdc20903661",
+    "lotNumber": "ABC123",
+    "pricePerUnit": 150.68,
+    "product": {
+      "id": "ff80808174dd934401751d1cc01d5ff0",
+      "name": "Printer Toner, Xerox",
+      "productCode": "ZU857",
+    },
+    "unitOfMeasure": "Each",
+  },
+  "quantityCounted": 43,
+}
+`;

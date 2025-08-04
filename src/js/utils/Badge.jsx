@@ -6,14 +6,19 @@ import CustomTooltip from 'wrappers/CustomTooltip';
 
 import './utils.scss';
 
-const Badge = ({ label, variant, tooltip }) => (
-  <CustomTooltip
-    content={label}
-    show={tooltip}
-  >
-    <span className={`badge ${variant}`}>{label}</span>
-  </CustomTooltip>
-);
+const Badge = ({ label, variant, tooltip }) => {
+  if (!label) {
+    return null;
+  }
+  return (
+    <CustomTooltip
+      content={label}
+      show={tooltip}
+    >
+      <span className={`badge ${variant}`} data-testid="badge">{label}</span>
+    </CustomTooltip>
+  );
+};
 
 Badge.propTypes = {
   label: PropTypes.string.isRequired,

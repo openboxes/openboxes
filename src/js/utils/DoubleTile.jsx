@@ -35,7 +35,7 @@ const DoubleTile = ({
   };
 
   return (
-    <div className="double-tile">
+    <div className="double-tile" data-testid="double-tile">
       <span className="double-tile__title">
         {translate(cardTitle, cardTitleDefaultValue || cardTitle)}
       </span>
