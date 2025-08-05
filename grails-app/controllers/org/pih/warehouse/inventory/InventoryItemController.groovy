@@ -543,7 +543,12 @@ class InventoryItemController {
         if (!commandInstance.inventory) {
             commandInstance.inventory = locationInstance?.inventory
         }
-        inventoryService.populateRecordInventoryCommand(commandInstance, params)
+
+        if (flash.recordInventoryRows) {
+            commandInstance.recordInventoryRows = flash.recordInventoryRows
+        } else {
+            inventoryService.populateRecordInventoryCommand(commandInstance, params)
+        }
 
         Product productInstance = commandInstance.product
         List transactionEntryList = inventoryService.getTransactionEntriesByInventoryAndProduct(commandInstance?.inventory, [productInstance])
@@ -583,6 +588,7 @@ class InventoryItemController {
             return
         }
 
+        flash.recordInventoryRows = commandInstance.recordInventoryRows
         flash.errors = commandInstance.errors
         redirect(action: "showRecordInventory", params: ['product.id': commandInstance.product.id])
     }
