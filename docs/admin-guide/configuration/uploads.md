@@ -12,7 +12,7 @@ openboxes:
 ```
 
 The specified directory is a relative path starting from the base Tomcat directory as defined by the `$CATALINA_HOME` environment variable. This will typically be one of:
-- `/var/lib/tomcatX` (where X is the Tomcat version) if you've installed via apt
+- `/var/lib/tomcatX` (where X is the Tomcat version, ex: `/var/lib/tomcat9`) if you've installed via apt
 - `/opt/tomcat` if you've installed manually
 
 So for example, if `$CATALINA_HOME=/opt/tomcat` and you are using the default configuration of "uploads", uploads would be created under `/opt/tomcat/uploads`.
@@ -42,14 +42,14 @@ Unable to upload file due to exception:
         /var/lib/tomcat9/uploads/locations.xls (Read-only file system)
 ```
 
-If you encounter an error like these, add the absolute path to the uploads directory as a ReadWritePaths config option under the Security section in `/etc/systemd/system/multi-user.target.wants/tomcat9.service`.
+If you encounter an error like these, add the absolute path to the uploads directory as a ReadWritePaths config option under the Security section in `/etc/systemd/system/multi-user.target.wants/tomcatX.service` (where X is the Tomcat version, ex: `/etc/.../tomcat9.service`).
 
-For example, if `$CATALINA_HOME=/var/lib/tomcat9` and you're using the default configuration of "uploads":
+For example, if `$CATALINA_HOME=/opt/tomcat` and you're using the default configuration of "uploads":
 
 ```
 # Security
 ...
-ReadWritePaths=/var/lib/tomcat9/uploads/
+ReadWritePaths=/opt/tomcat/uploads/
 ```
 
 Then restart the Tomcat server.
@@ -71,12 +71,12 @@ ERROR core.FileService  - - Directory /uploads cannot be created
 
 If you encounter the above error, change the upload location property to be an absolute path.
 
-For example, if `$CATALINA_HOME=/var/lib/tomcat9`: 
+For example, if `$CATALINA_HOME=/opt/tomcat`: 
 
 ```yaml
 openboxes:
     uploads:
-        location: "/var/lib/tomcat9/uploads"
+        location: "/opt/tomcat/uploads"
 ```
 
 See this community post for more details: https://community.openboxes.com/t/filenotfoundexception-tp-link-eap245-ac1750-wireless-gigabit-ceil-eap245-jpg-permission-denied/281
