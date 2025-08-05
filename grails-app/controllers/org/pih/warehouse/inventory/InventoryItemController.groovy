@@ -544,6 +544,7 @@ class InventoryItemController {
             commandInstance.inventory = locationInstance?.inventory
         }
 
+        // We need if/else statement to avoid duplication data (OBPIH-7438)
         if (flash.recordInventoryRows) {
             commandInstance.recordInventoryRows = flash.recordInventoryRows
         } else {
@@ -588,6 +589,7 @@ class InventoryItemController {
             return
         }
 
+        // We pass the data to flash to preserve data after a redirect, so it can be used in the showRecordInventory method (OBPIH-7438)
         flash.recordInventoryRows = commandInstance.recordInventoryRows
         flash.errors = commandInstance.errors
         redirect(action: "showRecordInventory", params: ['product.id': commandInstance.product.id])
