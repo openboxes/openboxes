@@ -2707,6 +2707,10 @@ class InventoryService implements ApplicationContextAware {
 
         def criteria = TransactionEntry.createCriteria()
         return criteria.list {
+            // TODO: Consider refactoring this logic to distinguish between products==null and products.?isEmpty().
+            //       The former should give the current behaviour (fetch ALL products) and the latter should return an
+            //       empty list. Existing flows will need to be refactored to default to either passing null or []
+            //       depending on their desired behaviour. See OBPIH-7437.
             if (products) {
                 inventoryItem {
                     'in'("product", products)
