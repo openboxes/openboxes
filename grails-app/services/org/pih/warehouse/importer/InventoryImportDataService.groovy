@@ -140,6 +140,13 @@ class InventoryImportDataService implements ImportDataService {
     void importData(ImportDataCommand command) {
         InventoryImportData inventoryImportData = parseData(command)
 
+        // (OBPIH-7437) If there's nothing in the import, or everything is getting skipped, return early.
+        //  Without this, ALL products at the facility will have their quantities zeroed out! (When the TODO
+        //  in InventoryService.getTransactionEntriesBeforeDate is resolved, this will no longer be true.)
+        if (!inventoryImportData.products) {
+            return
+        }
+
         Date baselineTransactionDate = command.date
 
         // Get the stock for all items in the import at the date that the baseline transaction will be created.
