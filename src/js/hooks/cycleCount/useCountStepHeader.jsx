@@ -12,15 +12,14 @@ const useCountStepHeader = ({
   const [countedBy, setCountedBy] = useState(initialCountedBy);
   const [defaultCountedBy, setDefaultCountedBy] = useState(initialDefaultCountedBy);
 
-  // Sync state with initial props when they change
   useEffect(() => {
     if (dateCounted !== initialDateCounted) {
       setDateCounted(initialDateCounted);
     }
-    if (countedBy !== initialCountedBy) {
+    if (countedBy?.id !== initialCountedBy?.id) {
       setCountedBy(initialCountedBy);
     }
-    if (defaultCountedBy !== initialDefaultCountedBy) {
+    if (defaultCountedBy?.id !== initialDefaultCountedBy?.id) {
       setDefaultCountedBy(initialDefaultCountedBy);
     }
   }, [initialDateCounted, initialCountedBy, initialDefaultCountedBy]);

@@ -114,7 +114,7 @@ const ResolveStep = () => {
                 <ResolveStepTable
                   key={id}
                   id={id}
-                  product={getProduct(id) || {}}
+                  product={getProduct(id)}
                   dateCounted={getDateCounted(id)}
                   dateRecounted={getRecountedDate(id)}
                   tableData={cycleCountItems}

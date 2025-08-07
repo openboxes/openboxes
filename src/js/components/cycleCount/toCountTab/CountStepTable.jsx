@@ -59,7 +59,6 @@ const CountStepTable = ({
     updateDateCounted,
     assignCountedBy,
   });
-  console.log('rerender');
   const {
     columns,
     defaultColumn,
@@ -110,7 +109,6 @@ const CountStepTable = ({
                 clearable={false}
                 customDateFormat={DateFormat.DD_MMM_YYYY}
                 disabled={isFormDisabled}
-                id="count-step-date-counted"
               />
             </HeaderSelect>
           ) : (
@@ -135,7 +133,6 @@ const CountStepTable = ({
                     className="min-width-250"
                     defaultValue={defaultCountedByMeta}
                     disabled={isFormDisabled}
-                    id="count-step-counted-by"
                   />
                 </div>
               </CustomTooltip>
@@ -208,7 +205,12 @@ CountStepTable.propTypes = {
   validationErrors: PropTypes.shape({}).isRequired,
   updateDateCounted: PropTypes.func.isRequired,
   isStepEditable: PropTypes.bool.isRequired,
-  countedBy: PropTypes.shape({}).isRequired,
+  countedBy: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    value: PropTypes.string.isRequired,
+    label: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+  }).isRequired,
   defaultCountedBy: PropTypes.shape({}).isRequired,
   triggerValidation: PropTypes.func.isRequired,
   isFormDisabled: PropTypes.bool.isRequired,

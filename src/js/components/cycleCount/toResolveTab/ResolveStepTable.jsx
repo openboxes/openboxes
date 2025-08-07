@@ -25,14 +25,11 @@ const ResolveStepTable = ({
   id,
   product,
   dateCounted,
-  dateRecounted: initialDateRecounted,
   tableData,
   tableMeta,
   addEmptyRow,
   removeRow,
   assignRecountedBy,
-  recountedBy: initialRecountedBy,
-  defaultRecountedBy: initialDefaultRecountedBy,
   countedBy,
   updateRecountedDate,
   validationErrors,
@@ -41,14 +38,11 @@ const ResolveStepTable = ({
   triggerValidation,
   cycleCountWithItemsWithoutRecount,
   isFormDisabled,
+  dateRecounted: initialDateRecounted,
+  recountedBy: initialRecountedBy,
+  defaultRecountedBy: initialDefaultRecountedBy,
   forceRerender,
 }) => {
-  const {
-    formatLocalizedDate,
-  } = useSelector((state) => ({
-    formatLocalizedDate: formatDate(state.localize),
-  }));
-
   const {
     dateRecounted,
     recountedByMeta,
@@ -63,7 +57,6 @@ const ResolveStepTable = ({
     updateRecountedDate,
     assignRecountedBy,
   });
-  console.log('rerender');
   const {
     columns,
     defaultColumn,
@@ -83,6 +76,12 @@ const ResolveStepTable = ({
   });
 
   const translate = useTranslate();
+
+  const {
+    formatLocalizedDate,
+  } = useSelector((state) => ({
+    formatLocalizedDate: formatDate(state.localize),
+  }));
 
   const emptyTableMessage = {
     id: 'react.cycleCount.table.noInventoryItem.label',
@@ -127,7 +126,6 @@ const ResolveStepTable = ({
                 clearable={false}
                 hideErrorMessageWrapper
                 disabled={isFormDisabled}
-                id="resolve-step-date-counted"
               />
             </HeaderSelect>
           ) : (
@@ -153,7 +151,6 @@ const ResolveStepTable = ({
                     hideErrorMessageWrapper
                     className="min-width-250"
                     disabled={isFormDisabled}
-                    id="resolve-step-counted-by"
                   />
                 </div>
               </CustomTooltip>

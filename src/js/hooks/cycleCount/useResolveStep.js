@@ -47,13 +47,15 @@ const useResolveStep = () => {
   // Saving selected "recounted by" and "date recounted" options using useRef
   const recountedBy = useRef({});
   const defaultRecountedBy = useRef({});
-  const dateRecountedRef = useRef({});
+  const dateRecounted = useRef({});
   const [isStepEditable, setIsStepEditable] = useState(true);
   const { show, hide } = useSpinner();
   const history = useHistory();
   const [isSaveDisabled, setIsSaveDisabled] = useState(false);
   const [sortByProductName, setSortByProductName] = useState(false);
-  const itemsToUpdateRef = useRef([]);
+  // Here we store cycle count IDs that were updated,
+  // and we will mark them as updated before saving.
+  const itemsToUpdate = useRef([]);
   const {
     validationErrors,
     isRootCauseWarningSkipped,
@@ -230,7 +232,7 @@ const useResolveStep = () => {
         ...acc,
         [cycleCount?.id]: cycleCount?.cycleCountItems?.[0]?.recountedBy || null,
       }), {});
-      dateRecountedRef.current = recountedDates;
+      dateRecounted.current = recountedDates;
       recountedBy.current = recountedByData;
       defaultRecountedBy.current = recountedByData;
     } finally {
@@ -478,17 +480,17 @@ const useResolveStep = () => {
   const markAllItemsAsNotUpdated = (cycleCountId) => setAllItemsUpdatedState(cycleCountId, false);
 
   const assignRecountedBy = (cycleCountId) => (person) => {
-    itemsToUpdateRef.current = [...itemsToUpdateRef.current, cycleCountId];
+    itemsToUpdate.current = [...itemsToUpdate.current, cycleCountId];
     recountedBy.current = { ...recountedBy.current, [cycleCountId]: person };
     defaultRecountedBy.current = { ...defaultRecountedBy.current, [cycleCountId]: person };
   };
 
-  const getRecountedDate = (cycleCountId) => dateRecountedRef.current[cycleCountId] || moment.now();
+  const getRecountedDate = (cycleCountId) => dateRecounted.current[cycleCountId] || moment.now();
 
   const updateRecountedDate = (cycleCountId) => (date) => {
-    itemsToUpdateRef.current = [...itemsToUpdateRef.current, cycleCountId];
-    dateRecountedRef.current = {
-      ...dateRecountedRef.current,
+    itemsToUpdate.current = [...itemsToUpdate.current, cycleCountId];
+    dateRecounted.current = {
+      ...dateRecounted.current,
       [cycleCountId]: date ? date.format() : null,
     };
   };
@@ -524,8 +526,9 @@ const useResolveStep = () => {
   }) => {
     try {
       show();
-      itemsToUpdateRef.current.map((cycleCountId) => setAllItemsUpdatedState(cycleCountId, true));
-      itemsToUpdateRef.current = [];
+      // Before saving, we need to change the state updated to true for all items that were changed
+      itemsToUpdate.current.map((cycleCountId) => setAllItemsUpdatedState(cycleCountId, true));
+      itemsToUpdate.current = [];
       if (shouldValidateExistence) {
         const isValid = await validateExistenceOfCycleCounts();
         if (!isValid) {

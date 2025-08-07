@@ -16,10 +16,10 @@ const useResolveStepHeader = ({
     if (dateRecounted !== initialDateRecounted) {
       setDateRecounted(initialDateRecounted);
     }
-    if (recountedBy !== initialRecountedBy) {
+    if (recountedBy?.id !== initialRecountedBy?.id) {
       setRecountedBy(initialRecountedBy);
     }
-    if (defaultRecountedBy !== initialDefaultRecountedBy) {
+    if (defaultRecountedBy?.id !== initialDefaultRecountedBy?.id) {
       setDefaultRecountedBy(initialDefaultRecountedBy);
     }
   }, [initialDateRecounted, initialRecountedBy, initialDefaultRecountedBy]);

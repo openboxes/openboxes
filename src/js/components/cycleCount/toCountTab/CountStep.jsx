@@ -114,11 +114,11 @@ const CountStep = () => {
                   id={id}
                   product={cycleCountItems[0]?.product}
                   dateCounted={getCountedDate(id)}
-                  updateDateCounted={updateDateCounted(id)}
                   tableData={cycleCountItems}
                   tableMeta={tableMeta}
                   addEmptyRow={addEmptyRow}
                   removeRow={removeRow}
+                  updateDateCounted={updateDateCounted(id)}
                   assignCountedBy={assignCountedBy}
                   validationErrors={validationErrors}
                   isStepEditable={isStepEditable}

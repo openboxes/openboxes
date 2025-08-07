@@ -49,14 +49,16 @@ const useCountStep = () => {
   // Saving selected "counted by" option
   const countedBy = useRef({});
   const defaultCountedBy = useRef({});
-  const dateCountedRef = useRef({});
+  const dateCounted = useRef({});
   const [isStepEditable, setIsStepEditable] = useState(true);
   const [isSaveDisabled, setIsSaveDisabled] = useState(false);
   const [sortByProductName, setSortByProductName] = useState(false);
   const [importErrors, setImportErrors] = useState([]);
   const assigneeImported = useRef(null);
   const requestIdsWithDiscrepancies = useRef([]);
-  const itemsToUpdateRef = useRef([]);
+  // Here we store cycle count IDs that were updated,
+  // and we will mark them as updated before saving.
+  const itemsToUpdate = useRef([]);
 
   const dispatch = useDispatch();
   const history = useHistory();
@@ -143,7 +145,7 @@ const useCountStep = () => {
         ...acc,
         [cycleCount?.id]: cycleCount?.cycleCountItems[0]?.assignee,
       }), {});
-      dateCountedRef.current = countedDates;
+      dateCounted.current = countedDates;
       countedBy.current = countedByMap;
       defaultCountedBy.current = countedByMap;
     } finally {
@@ -181,7 +183,7 @@ const useCountStep = () => {
     // We need to mark all items as updated if we change the counted by person,
     // because counted by is associated with every cycle count item and needs to be set
     // for every item
-    itemsToUpdateRef.current = [...itemsToUpdateRef.current, cycleCountId];
+    itemsToUpdate.current = [...itemsToUpdate.current, cycleCountId];
     countedBy.current = { ...countedBy.current, [cycleCountId]: person };
     defaultCountedBy.current = { ...defaultCountedBy.current, [cycleCountId]: person };
   };
@@ -296,7 +298,7 @@ const useCountStep = () => {
     setIsStepEditable(true);
   };
 
-  const getCountedDate = (cycleCountId) => dateCountedRef.current[cycleCountId];
+  const getCountedDate = (cycleCountId) => dateCounted.current[cycleCountId];
 
   const getPayload = (cycleCountItem, shouldSetDefaultAssignee) => ({
     ...cycleCountItem,
@@ -319,8 +321,9 @@ const useCountStep = () => {
   const save = async (shouldSetDefaultAssignee = false) => {
     try {
       show();
-      itemsToUpdateRef.current.map((cycleCountId) => setAllItemsUpdatedState(cycleCountId, true));
-      itemsToUpdateRef.current = [];
+      // Before saving, we need to change the state updated to true for all items that were changed
+      itemsToUpdate.current.map((cycleCountId) => setAllItemsUpdatedState(cycleCountId, true));
+      itemsToUpdate.current = [];
       resetValidationState();
       const cycleCountItemsToUpdateBatch = [];
       const cycleCountItemsToCreateBatch = [];
@@ -570,6 +573,7 @@ const useCountStep = () => {
     // Update data for: cycleCount (table) -> cycleCountItem (row) -> column (nestedPath)
     const valueChanged = _.get(tableData.current, `[${tableIndex}].cycleCountItems[${rowIndex}].${nestedPath}`) !== value;
     _.set(tableData.current, `[${tableIndex}].cycleCountItems[${rowIndex}].${nestedPath}`, value);
+
     // Mark item as updated, so that the item can be easily distinguished whether it was updated
     if (valueChanged) {
       _.set(tableData.current, `[${tableIndex}].cycleCountItems[${rowIndex}].updated`, true);
@@ -583,9 +587,9 @@ const useCountStep = () => {
   };
 
   const updateDateCounted = (cycleCountId) => (date) => {
-    itemsToUpdateRef.current = [...itemsToUpdateRef.current, cycleCountId];
-    dateCountedRef.current = {
-      ...dateCountedRef.current,
+    itemsToUpdate.current = [...itemsToUpdate.current, cycleCountId];
+    dateCounted.current = {
+      ...dateCounted.current,
       [cycleCountId]: date ? date.format() : null,
     };
   };
@@ -684,7 +688,7 @@ const useCountStep = () => {
       // Batch update refs
       countedBy.current = { ...countedBy.current, ...countedByUpdates };
       defaultCountedBy.current = { ...defaultCountedBy.current, ...countedByUpdates };
-      dateCountedRef.current = { ...dateCountedRef.current, ...dateCountedUpdates };
+      dateCounted.current = { ...dateCounted.current, ...dateCountedUpdates };
     } finally {
       triggerValidation();
       hide();
