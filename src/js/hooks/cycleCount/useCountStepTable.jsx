@@ -30,16 +30,12 @@ const useCountStepTable = ({
   formatLocalizedDate,
   addEmptyRow,
   triggerValidation,
-  refreshFocusCounter,
   isFormDisabled,
+  forceRerender,
 }) => {
   const columnHelper = createColumnHelper();
   const [rowIndex, setRowIndex] = useState(null);
   const [columnId, setColumnId] = useState(null);
-  // If prevForceResetFocus is different from refreshFocusCounter,
-  // it triggers a reset of rowIndex and columnId.
-  const [prevForceResetFocus, setPrevForceResetFocus] = useState(0);
-
   const translate = useTranslate();
 
   const { users, currentLocation, binLocations } = useSelector((state) => ({
@@ -47,14 +43,6 @@ const useCountStepTable = ({
     binLocations: state.cycleCount.binLocations,
     currentLocation: state.session.currentLocation,
   }));
-
-  useEffect(() => {
-    if (refreshFocusCounter !== prevForceResetFocus) {
-      setRowIndex(null);
-      setColumnId(null);
-      setPrevForceResetFocus(refreshFocusCounter);
-    }
-  }, [refreshFocusCounter]);
 
   const showBinLocation = useMemo(() =>
     checkBinLocationSupport(currentLocation.supportedActivities), [currentLocation?.id]);
@@ -195,6 +183,23 @@ const useCountStepTable = ({
         if (rowIndex !== null && columnId && error !== null) {
           setError(null);
         }
+        const handleClick = (event) => {
+          if (rowIndex !== null || columnId !== null) {
+            const isInputElement = event.target.closest('input, select, textarea, .date-field-input');
+            const isCountDateCounted = event.target.closest('#count-step-date-counted');
+            const isCountStepCountedBy = event.target.closest('#count-step-counted-by');
+            if (!isInputElement || isCountDateCounted || isCountStepCountedBy) {
+              setRowIndex(null);
+              setColumnId(null);
+              forceRerender();
+            }
+          }
+        };
+        document.addEventListener('click', handleClick);
+
+        return () => {
+          document.removeEventListener('click', handleClick);
+        };
       }, [rowIndex, columnId]);
 
       // on change function expects e.target.value for text fields,

@@ -39,15 +39,12 @@ const useResolveStepTable = ({
   tableData,
   productId,
   addEmptyRow,
-  refreshFocusCounter,
   isFormDisabled,
+  forceRerender,
 }) => {
   const columnHelper = createColumnHelper();
   const [rowIndex, setRowIndex] = useState(null);
   const [columnId, setColumnId] = useState(null);
-  // If prevForceResetFocus is different from refreshFocusCounter,
-  // it triggers a reset of rowIndex and columnId.
-  const [prevForceResetFocus, setPrevForceResetFocus] = useState(0);
 
   // State for saving data for binLocation dropdown
   const translate = useTranslate();
@@ -71,14 +68,6 @@ const useResolveStepTable = ({
     checkBinLocationSupport(currentLocation.supportedActivities), [currentLocation?.id]);
 
   const dispatch = useDispatch();
-
-  useEffect(() => {
-    if (refreshFocusCounter !== prevForceResetFocus) {
-      setRowIndex(null);
-      setColumnId(null);
-      setPrevForceResetFocus(refreshFocusCounter);
-    }
-  }, [refreshFocusCounter]);
 
   useEffect(() => {
     if (!reasonCodes?.length) {
@@ -270,6 +259,23 @@ const useResolveStepTable = ({
         if (rowIndex !== null && columnId && error !== null) {
           setError(null);
         }
+        const handleClick = (event) => {
+          if (rowIndex !== null || columnId !== null) {
+            const isInputElement = event.target.closest('input, select, textarea, .date-field-input');
+            const isCountDateCounted = event.target.closest('#resolve-step-date-counted');
+            const isCountStepCountedBy = event.target.closest('#resolve-step-counted-by');
+            if (!isInputElement || isCountDateCounted || isCountStepCountedBy) {
+              setRowIndex(null);
+              setColumnId(null);
+              forceRerender();
+            }
+          }
+        };
+        document.addEventListener('click', handleClick);
+
+        return () => {
+          document.removeEventListener('click', handleClick);
+        };
       }, [rowIndex, columnId]);
 
       // on change function expects e.target.value for text fields,

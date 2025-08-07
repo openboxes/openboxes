@@ -13,6 +13,7 @@ import Button from 'components/form-elements/Button';
 import DateField from 'components/form-elements/v2/DateField';
 import SelectField from 'components/form-elements/v2/SelectField';
 import { DateFormat } from 'consts/timeFormat';
+import useResolveStepHeader from 'hooks/cycleCount/useResolveStepHeader';
 import useResolveStepTable from 'hooks/cycleCount/useResolveStepTable';
 import useTranslate from 'hooks/useTranslate';
 import { formatDate } from 'utils/translation-utils';
@@ -24,23 +25,45 @@ const ResolveStepTable = ({
   id,
   product,
   dateCounted,
-  dateRecounted,
+  dateRecounted: initialDateRecounted,
   tableData,
   tableMeta,
   addEmptyRow,
   removeRow,
   assignRecountedBy,
-  recountedBy,
+  recountedBy: initialRecountedBy,
+  defaultRecountedBy: initialDefaultRecountedBy,
   countedBy,
-  setRecountedDate,
+  updateRecountedDate,
   validationErrors,
   shouldHaveRootCause,
   isStepEditable,
   triggerValidation,
-  refreshFocusCounter,
   cycleCountWithItemsWithoutRecount,
   isFormDisabled,
+  forceRerender,
 }) => {
+  const {
+    formatLocalizedDate,
+  } = useSelector((state) => ({
+    formatLocalizedDate: formatDate(state.localize),
+  }));
+
+  const {
+    dateRecounted,
+    recountedByMeta,
+    defaultRecountedByMeta,
+    handleDateRecountedChange,
+    handleRecountedByChange,
+  } = useResolveStepHeader({
+    id,
+    initialDateRecounted,
+    initialRecountedBy,
+    initialDefaultRecountedBy,
+    updateRecountedDate,
+    assignRecountedBy,
+  });
+  console.log('rerender');
   const {
     columns,
     defaultColumn,
@@ -54,9 +77,9 @@ const ResolveStepTable = ({
     shouldHaveRootCause,
     productId: product?.id,
     addEmptyRow,
-    refreshFocusCounter,
     triggerValidation,
     isFormDisabled,
+    forceRerender,
   });
 
   const translate = useTranslate();
@@ -65,19 +88,6 @@ const ResolveStepTable = ({
     id: 'react.cycleCount.table.noInventoryItem.label',
     defaultMessage: 'No inventory item in stock for this product',
   };
-
-  const defaultRecountedByMeta = recountedBy ? {
-    id: recountedBy.id,
-    value: recountedBy.id,
-    label: recountedBy.label ?? `${recountedBy.firstName} ${recountedBy.lastName}`,
-    name: `${recountedBy.firstName} ${recountedBy.lastName}`,
-  } : undefined;
-
-  const {
-    formatLocalizedDate,
-  } = useSelector((state) => ({
-    formatLocalizedDate: formatDate(state.localize),
-  }));
 
   const outOfStockItems = cycleCountWithItemsWithoutRecount
     .cycleCountItems
@@ -111,12 +121,13 @@ const ResolveStepTable = ({
             >
               <DateField
                 className="date-counted-date-picker date-field-input"
-                onChangeRaw={setRecountedDate}
+                onChangeRaw={handleDateRecountedChange}
                 value={dateRecounted}
                 customDateFormat={DateFormat.DD_MMM_YYYY}
                 clearable={false}
                 hideErrorMessageWrapper
                 disabled={isFormDisabled}
+                id="resolve-step-date-counted"
               />
             </HeaderSelect>
           ) : (
@@ -131,17 +142,18 @@ const ResolveStepTable = ({
               className="ml-5"
             >
               <CustomTooltip
-                content={recountedBy?.label || translate('react.cycleCount.recountedBy.label', 'Recounted by')}
+                content={recountedByMeta?.label || translate('react.cycleCount.recountedBy.label', 'Recounted by')}
               >
                 <div className="position-relative">
                   <SelectField
                     placeholder="Select"
                     options={users}
-                    onChange={assignRecountedBy(id)}
+                    onChange={handleRecountedByChange}
                     defaultValue={defaultRecountedByMeta}
                     hideErrorMessageWrapper
                     className="min-width-250"
                     disabled={isFormDisabled}
+                    id="resolve-step-counted-by"
                   />
                 </div>
               </CustomTooltip>
@@ -149,7 +161,7 @@ const ResolveStepTable = ({
           ) : (
             <HeaderLabel
               label={translate('react.cycleCount.recountedBy.label', 'Recounted by')}
-              value={recountedBy?.name}
+              value={recountedByMeta?.label}
               className="ml-4"
             />
           )}
@@ -219,15 +231,16 @@ ResolveStepTable.propTypes = {
   removeRow: PropTypes.func.isRequired,
   assignRecountedBy: PropTypes.func.isRequired,
   validationErrors: PropTypes.shape({}).isRequired,
-  setRecountedDate: PropTypes.func.isRequired,
+  defaultRecountedBy: PropTypes.shape({}).isRequired,
+  updateRecountedDate: PropTypes.func.isRequired,
   shouldHaveRootCause: PropTypes.func.isRequired,
   isStepEditable: PropTypes.bool.isRequired,
-  refreshFocusCounter: PropTypes.number.isRequired,
   triggerValidation: PropTypes.func.isRequired,
   cycleCountWithItemsWithoutRecount: PropTypes.shape({
     cycleCountItems: PropTypes.arrayOf(PropTypes.shape({})),
   }),
   isFormDisabled: PropTypes.bool.isRequired,
+  forceRerender: PropTypes.func.isRequired,
 };
 
 ResolveStepTable.defaultProps = {

@@ -34,13 +34,12 @@ const CountStep = () => {
     removeRow,
     assignCountedBy,
     getCountedDate,
-    setCountedDate,
+    updateDateCounted,
     validationErrors,
     isStepEditable,
     getCountedBy,
     getDefaultCountedBy,
     triggerValidation,
-    refreshFocusCounter,
     isSaveDisabled,
     setIsSaveDisabled,
     validateExistenceOfCycleCounts,
@@ -51,13 +50,14 @@ const CountStep = () => {
     isAssignCountModalOpen,
     closeAssignCountModal,
     assignCountModalData,
+    forceRerender,
   } = useCountStep();
 
   const tableVirtualizer = useWindowVirtualizer({
     count: tableData.length,
     // table with ~ 5 rows, average size of the count table
     estimateSize: () => 518,
-    overscan: 5,
+    overscan: 10,
   });
 
   return (
@@ -114,22 +114,22 @@ const CountStep = () => {
                   id={id}
                   product={cycleCountItems[0]?.product}
                   dateCounted={getCountedDate(id)}
+                  updateDateCounted={updateDateCounted(id)}
                   tableData={cycleCountItems}
                   tableMeta={tableMeta}
                   addEmptyRow={addEmptyRow}
                   removeRow={removeRow}
-                  setCountedDate={setCountedDate(id)}
                   assignCountedBy={assignCountedBy}
                   validationErrors={validationErrors}
                   isStepEditable={isStepEditable}
                   countedBy={getCountedBy(id)}
                   defaultCountedBy={getDefaultCountedBy(id)}
                   triggerValidation={triggerValidation}
-                  refreshFocusCounter={refreshFocusCounter}
                   isFormDisabled={isFormDisabled}
                   isAssignCountModalOpen={isAssignCountModalOpen}
                   closeAssignCountModal={closeAssignCountModal}
                   assignCountModalData={assignCountModalData}
+                  forceRerender={forceRerender}
                 />
               </div>
             );

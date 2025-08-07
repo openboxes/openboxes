@@ -44,18 +44,16 @@ const useResolveStep = () => {
   // (it removes focus while selecting new fields)
   const tableData = useRef([]);
   const cycleCountsWithItemsWithoutRecount = useRef([]);
-  // Saving selected "recounted by" option
-  const [recountedBy, setRecountedBy] = useState({});
-  // Saving selected "date recounted" option, initially it's the date fetched from API
-  const [dateRecounted, setDateRecounted] = useState({});
+  // Saving selected "recounted by" and "date recounted" options using useRef
+  const recountedBy = useRef({});
+  const defaultRecountedBy = useRef({});
+  const dateRecountedRef = useRef({});
   const [isStepEditable, setIsStepEditable] = useState(true);
-  // State used to trigger focus reset when changed. When this counter changes,
-  // it will reset the focus by clearing the RowIndex and ColumnId in useEffect.
-  const [refreshFocusCounter, setRefreshFocusCounter] = useState(0);
   const { show, hide } = useSpinner();
   const history = useHistory();
   const [isSaveDisabled, setIsSaveDisabled] = useState(false);
   const [sortByProductName, setSortByProductName] = useState(false);
+  const itemsToUpdateRef = useRef([]);
   const {
     validationErrors,
     isRootCauseWarningSkipped,
@@ -84,10 +82,6 @@ const useResolveStep = () => {
   }));
 
   const translate = useTranslate();
-
-  const resetFocus = () => {
-    setRefreshFocusCounter((prev) => prev + 1);
-  };
 
   const showBinLocation = useMemo(() =>
     checkBinLocationSupport(currentLocation.supportedActivities), [currentLocation?.id]);
@@ -204,40 +198,44 @@ const useResolveStep = () => {
     if (ids.length === 0) {
       return;
     }
-    const { data } = await cycleCountApi.getCycleCounts(
-      currentLocation?.id,
-      ids,
-      sortByProductName && 'productName',
-    );
-    tableData.current = data?.data?.map((cycleCount) => {
-      const mergedItems = mergeCycleCountItems(cycleCount.cycleCountItems);
-      return ({ ...cycleCount, cycleCountItems: moveCustomItemsToTheBottom(mergedItems) || [] });
-    });
-    cycleCountsWithItemsWithoutRecount.current = data?.data?.reduce((acc, cycleCount) => {
-      const cycleCountItems = getItemsWithoutRecountIndexes(cycleCount.cycleCountItems);
-      if (!cycleCountItems.length) {
-        return acc;
-      }
-      return [
+    try {
+      show();
+      const { data } = await cycleCountApi.getCycleCounts(
+        currentLocation?.id,
+        ids,
+        sortByProductName && 'productName',
+      );
+      tableData.current = data?.data?.map((cycleCount) => {
+        const mergedItems = mergeCycleCountItems(cycleCount.cycleCountItems);
+        return ({ ...cycleCount, cycleCountItems: moveCustomItemsToTheBottom(mergedItems) || [] });
+      });
+      cycleCountsWithItemsWithoutRecount.current = data?.data?.reduce((acc, cycleCount) => {
+        const cycleCountItems = getItemsWithoutRecountIndexes(cycleCount.cycleCountItems);
+        if (!cycleCountItems.length) {
+          return acc;
+        }
+        return [
+          ...acc,
+          {
+            ...cycleCount,
+            cycleCountItems,
+          },
+        ];
+      }, []);
+      const recountedDates = tableData.current?.reduce((acc, cycleCount) => ({
         ...acc,
-        {
-          ...cycleCount,
-          cycleCountItems,
-        },
-      ];
-    }, []);
-    const recountedDates = tableData.current?.reduce((acc, cycleCount) => ({
-      ...acc,
-      [cycleCount?.id]: cycleCount?.cycleCountItems?.[0]?.dateRecounted
-      || recountedDates?.[cycleCount?.id],
-    }), {});
-    const recountedByData = tableData.current?.reduce((acc, cycleCount) => ({
-      ...acc,
-      [cycleCount?.id]: cycleCount?.cycleCountItems?.[0]?.recountedBy
-      || recountedBy?.[cycleCount?.id],
-    }), {});
-    setDateRecounted(recountedDates);
-    setRecountedBy(recountedByData);
+        [cycleCount?.id]: cycleCount?.cycleCountItems?.[0]?.dateRecounted || null,
+      }), {});
+      const recountedByData = tableData.current?.reduce((acc, cycleCount) => ({
+        ...acc,
+        [cycleCount?.id]: cycleCount?.cycleCountItems?.[0]?.recountedBy || null,
+      }), {});
+      dateRecountedRef.current = recountedDates;
+      recountedBy.current = recountedByData;
+      defaultRecountedBy.current = recountedByData;
+    } finally {
+      hide();
+    }
   };
 
   useEffect(() => {
@@ -260,7 +258,6 @@ const useResolveStep = () => {
       params: { id: cycleCountIds, sortBy: sortByProductName && 'productName' },
       format,
     });
-    resetFocus();
     hide();
   };
 
@@ -275,7 +272,9 @@ const useResolveStep = () => {
       || _.get(findByField(cycleCountsWithItemsWithoutRecount.current), fieldName);
   }, []);
 
-  const getRecountedBy = (cycleCountId) => recountedBy?.[cycleCountId];
+  const getRecountedBy = (cycleCountId) => recountedBy.current?.[cycleCountId];
+
+  const getDefaultRecountedBy = (cycleCountId) => defaultRecountedBy.current?.[cycleCountId];
 
   const getCountedBy = (cycleCountId) => {
     const countedBy = (data) => data.find(
@@ -310,13 +309,12 @@ const useResolveStep = () => {
       }
       removeRowFromState(cycleCountId, rowId);
     } finally {
-      resetFocus();
       triggerValidation();
       hide();
     }
   };
 
-  const addEmptyRow = (productId, id, shouldResetFocus = true) => {
+  const addEmptyRow = (productId, id) => {
     // ID is needed for updating appropriate row
     const emptyRow = {
       id: _.uniqueId('newRow'),
@@ -349,9 +347,6 @@ const useResolveStep = () => {
 
       return data;
     });
-    if (shouldResetFocus) {
-      resetFocus();
-    }
     resetValidationState();
     forceRerender();
   };
@@ -463,7 +458,6 @@ const useResolveStep = () => {
 
   const back = () => {
     setIsStepEditable(true);
-    resetFocus();
   };
 
   const setAllItemsUpdatedState = (cycleCountId, updated) => {
@@ -481,25 +475,22 @@ const useResolveStep = () => {
     });
   };
 
-  const markAllItemsAsUpdated = (cycleCountId) => setAllItemsUpdatedState(cycleCountId, true);
-
   const markAllItemsAsNotUpdated = (cycleCountId) => setAllItemsUpdatedState(cycleCountId, false);
 
   const assignRecountedBy = (cycleCountId) => (person) => {
-    markAllItemsAsUpdated(cycleCountId);
-    setRecountedBy((prevState) => ({ ...prevState, [cycleCountId]: person }));
-    resetFocus();
+    itemsToUpdateRef.current = [...itemsToUpdateRef.current, cycleCountId];
+    recountedBy.current = { ...recountedBy.current, [cycleCountId]: person };
+    defaultRecountedBy.current = { ...defaultRecountedBy.current, [cycleCountId]: person };
   };
 
-  const getRecountedDate = (cycleCountId) => dateRecounted[cycleCountId] || moment.now();
+  const getRecountedDate = (cycleCountId) => dateRecountedRef.current[cycleCountId] || moment.now();
 
-  const setRecountedDate = (cycleCountId) => (date) => {
-    setDateRecounted({
-      ...dateRecounted,
-      [cycleCountId]: date.format(),
-    });
-    markAllItemsAsUpdated(cycleCountId);
-    resetFocus();
+  const updateRecountedDate = (cycleCountId) => (date) => {
+    itemsToUpdateRef.current = [...itemsToUpdateRef.current, cycleCountId];
+    dateRecountedRef.current = {
+      ...dateRecountedRef.current,
+      [cycleCountId]: date ? date.format() : null,
+    };
   };
 
   const getPayload = (cycleCountItem, cycleCount, shouldSetDefaultAssignee) => ({
@@ -533,6 +524,8 @@ const useResolveStep = () => {
   }) => {
     try {
       show();
+      itemsToUpdateRef.current.map((cycleCountId) => setAllItemsUpdatedState(cycleCountId, true));
+      itemsToUpdateRef.current = [];
       if (shouldValidateExistence) {
         const isValid = await validateExistenceOfCycleCounts();
         if (!isValid) {
@@ -574,12 +567,10 @@ const useResolveStep = () => {
         await refetchData();
       }
       hide();
-      resetFocus();
     }
   };
 
   const next = async () => {
-    resetFocus();
     const isValid = triggerValidation();
     forceRerender();
     const areCycleCountsUpToDate = await validateExistenceOfCycleCounts();
@@ -621,7 +612,6 @@ const useResolveStep = () => {
         await cycleCountApi.refreshItems(currentLocation?.id, cycleCountId, true, 1);
       }
     } finally {
-      resetFocus();
       hide();
       await refetchData(cycleCountIdsForOutdatedProducts);
     }
@@ -770,6 +760,7 @@ const useResolveStep = () => {
     validationErrors,
     isStepEditable,
     getRecountedBy,
+    getDefaultRecountedBy,
     getCountedBy,
     addEmptyRow,
     removeRow,
@@ -777,7 +768,7 @@ const useResolveStep = () => {
     refreshCountItems,
     assignRecountedBy,
     getRecountedDate,
-    setRecountedDate,
+    updateRecountedDate,
     shouldHaveRootCause,
     next,
     save,
@@ -785,13 +776,13 @@ const useResolveStep = () => {
     back,
     getProduct,
     getDateCounted,
-    refreshFocusCounter,
     triggerValidation,
     isSaveDisabled,
     setIsSaveDisabled,
     cycleCountsWithItemsWithoutRecount: cycleCountsWithItemsWithoutRecount.current,
     sortByProductName,
     setSortByProductName,
+    forceRerender,
   };
 };
 

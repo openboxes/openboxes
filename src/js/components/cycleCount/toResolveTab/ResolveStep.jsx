@@ -34,23 +34,24 @@ const ResolveStep = () => {
     removeRow,
     assignRecountedBy,
     getRecountedDate,
-    setRecountedDate,
+    updateRecountedDate,
     shouldHaveRootCause,
     back,
     save,
     isStepEditable,
     getRecountedBy,
+    getDefaultRecountedBy,
     getCountedBy,
     submitRecount,
     getProduct,
     getDateCounted,
-    refreshFocusCounter,
     triggerValidation,
     isSaveDisabled,
     setIsSaveDisabled,
     cycleCountsWithItemsWithoutRecount,
     sortByProductName,
     setSortByProductName,
+    forceRerender,
   } = useResolveStep();
   useTranslation('cycleCount');
 
@@ -58,7 +59,7 @@ const ResolveStep = () => {
     count: tableData.length,
     // table with ~ 5 rows, average size of the recount table
     estimateSize: () => 518,
-    overscan: 5,
+    overscan: 10,
   });
 
   return (
@@ -113,26 +114,27 @@ const ResolveStep = () => {
                 <ResolveStepTable
                   key={id}
                   id={id}
-                  product={getProduct(id)}
+                  product={getProduct(id) || {}}
                   dateCounted={getDateCounted(id)}
                   dateRecounted={getRecountedDate(id)}
                   tableData={cycleCountItems}
                   tableMeta={tableMeta}
                   addEmptyRow={addEmptyRow}
                   removeRow={removeRow}
-                  setRecountedDate={setRecountedDate(id)}
+                  updateRecountedDate={updateRecountedDate(id)}
                   assignRecountedBy={assignRecountedBy}
                   validationErrors={validationErrors}
                   shouldHaveRootCause={shouldHaveRootCause}
                   isStepEditable={isStepEditable}
                   recountedBy={getRecountedBy(id)}
+                  defaultRecountedBy={getDefaultRecountedBy(id)}
                   countedBy={getCountedBy(id)}
                   triggerValidation={triggerValidation}
-                  refreshFocusCounter={refreshFocusCounter}
                   cycleCountWithItemsWithoutRecount={
                     cycleCountsWithItemsWithoutRecount.find((cycleCount) => cycleCount.id === id)
                   }
                   isFormDisabled={isFormDisabled}
+                  forceRerender={forceRerender}
                 />
               </div>
             );
