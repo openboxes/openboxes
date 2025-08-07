@@ -49,6 +49,7 @@ const useCountStep = () => {
   // Saving selected "counted by" option
   const countedBy = useRef({});
   const defaultCountedBy = useRef({});
+  // Saving selected "date counted" option, initially it's the date fetched from API
   const dateCounted = useRef({});
   const [isStepEditable, setIsStepEditable] = useState(true);
   const [isSaveDisabled, setIsSaveDisabled] = useState(false);

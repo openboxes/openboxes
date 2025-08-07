@@ -200,44 +200,41 @@ const useResolveStep = () => {
     if (ids.length === 0) {
       return;
     }
-    try {
-      show();
-      const { data } = await cycleCountApi.getCycleCounts(
-        currentLocation?.id,
-        ids,
-        sortByProductName && 'productName',
-      );
-      tableData.current = data?.data?.map((cycleCount) => {
-        const mergedItems = mergeCycleCountItems(cycleCount.cycleCountItems);
-        return ({ ...cycleCount, cycleCountItems: moveCustomItemsToTheBottom(mergedItems) || [] });
-      });
-      cycleCountsWithItemsWithoutRecount.current = data?.data?.reduce((acc, cycleCount) => {
-        const cycleCountItems = getItemsWithoutRecountIndexes(cycleCount.cycleCountItems);
-        if (!cycleCountItems.length) {
-          return acc;
-        }
-        return [
-          ...acc,
-          {
-            ...cycleCount,
-            cycleCountItems,
-          },
-        ];
-      }, []);
-      const recountedDates = tableData.current?.reduce((acc, cycleCount) => ({
+    const { data } = await cycleCountApi.getCycleCounts(
+      currentLocation?.id,
+      ids,
+      sortByProductName && 'productName',
+    );
+    tableData.current = data?.data?.map((cycleCount) => {
+      const mergedItems = mergeCycleCountItems(cycleCount.cycleCountItems);
+      return ({ ...cycleCount, cycleCountItems: moveCustomItemsToTheBottom(mergedItems) || [] });
+    });
+    cycleCountsWithItemsWithoutRecount.current = data?.data?.reduce((acc, cycleCount) => {
+      const cycleCountItems = getItemsWithoutRecountIndexes(cycleCount.cycleCountItems);
+      if (!cycleCountItems.length) {
+        return acc;
+      }
+      return [
         ...acc,
-        [cycleCount?.id]: cycleCount?.cycleCountItems?.[0]?.dateRecounted || null,
-      }), {});
-      const recountedByData = tableData.current?.reduce((acc, cycleCount) => ({
-        ...acc,
-        [cycleCount?.id]: cycleCount?.cycleCountItems?.[0]?.recountedBy || null,
-      }), {});
-      dateRecounted.current = recountedDates;
-      recountedBy.current = recountedByData;
-      defaultRecountedBy.current = recountedByData;
-    } finally {
-      hide();
-    }
+        {
+          ...cycleCount,
+          cycleCountItems,
+        },
+      ];
+    }, []);
+    const recountedDates = tableData.current?.reduce((acc, cycleCount) => ({
+      ...acc,
+      [cycleCount?.id]: cycleCount?.cycleCountItems?.[0]?.dateRecounted
+        || recountedDates?.[cycleCount?.id],
+    }), {});
+    const recountedByData = tableData.current?.reduce((acc, cycleCount) => ({
+      ...acc,
+      [cycleCount?.id]: cycleCount?.cycleCountItems?.[0]?.recountedBy
+        || recountedBy?.[cycleCount?.id],
+    }), {});
+    dateRecounted.current = recountedDates;
+    recountedBy.current = recountedByData;
+    defaultRecountedBy.current = recountedByData;
   };
 
   useEffect(() => {
