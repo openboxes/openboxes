@@ -780,17 +780,22 @@ class ProductService {
         // The imported categories and tags are just names at this point. Get or create the actual entities now
         // so that we can assign them to the products in the below loop.
         List<String> allCategoryNames = products.category as List<String>
-        Map<String, Category> categoriesMap = findOrCreateCategoriesAsMap(allCategoryNames)
+        CategoriesByDesensitizedName importedCategories = findOrCreateCategoriesAsMap(allCategoryNames)
 
-        List<String> allTagNames = tagNamesForAllProducts + products.tags.flatten() as List<String>
+        List<String> allTagNames = products.tags.flatten() as List<String>
+        if (tagNamesForAllProducts) {
+            allTagNames.addAll(tagNamesForAllProducts)
+        }
         Map<String, Tag> tagsMap = getOrCreateTagsAsMap(allTagNames)
 
         products.each { productProperties ->
             log.info "Import product code = " + productProperties.productCode + ", name = " + productProperties.name
 
-            // Assign the category to the product. If the product wasn't assigned a category, assign it the root category.
-            String categoryName = (productProperties.category as String)?.trim()
-            productProperties.category = categoryName ? categoriesMap.get(categoryName) : Category.getRootCategory()
+            // The product category is still just a name at this point so assign the product a proper Category instance
+            // now that they've been created. If the product wasn't assigned a category, assign it the root category.
+            productProperties.category = productProperties.category ?
+                    importedCategories.get((productProperties.category as String)) :
+                    Category.getRootCategory()
 
             // Assign both the product-specific tags and the globally defined tags to the product.
             List<String> tagNames = []
@@ -904,11 +909,47 @@ class ProductService {
     }
 
     /**
-     * Find or create a list of categories with the given names as a map keyed on category name. Nulls, duplicates,
-     * and whitespace will be ignored.
+     * A map of Category keyed on the "desensitized" (ie trimmed and lower-cased) category name.
+     *
+     * We desensitize the name because we want to treat names like "NAME" and "name  " as equivalent, which is useful
+     * when importing data since user input errors are common. In other scenarios this equivalency might not be useful
+     * (we might want to treat "name" and "NAME" as different), so make sure to be intentional when using this class.
      */
-    private Map<String, Category> findOrCreateCategoriesAsMap(List<String> categoryNames) {
-        return findOrCreateCategories(categoryNames).collectEntries{ [ it.name, it ] }
+    private class CategoriesByDesensitizedName {
+        Map<String, Category> categoryByDesensitizedName = [:]
+
+        CategoriesByDesensitizedName(List<Category> categories) {
+            putAll(categories)
+        }
+
+        List<Category> putAll(List<Category> categories) {
+            categories.each { put(it) }
+        }
+
+        Category put(Category category) {
+            String desensitizedName = desensitizeName(category.name)
+            return categoryByDesensitizedName.put(desensitizedName, category)
+        }
+
+        Category get(String categoryName) {
+            String desensitizedName = desensitizeName(categoryName)
+            return categoryByDesensitizedName.get(desensitizedName)
+        }
+
+        private String desensitizeName(String categoryName) {
+            if (StringUtils.isBlank(categoryName)) {
+                return categoryName
+            }
+            return categoryName.trim().toLowerCase()
+        }
+    }
+
+    /**
+     * Find or create a list of categories with the given names as a map keyed on "desensitized" (ie trimmed
+     * and lower-cased) category name. Nulls, duplicates, and whitespace will be ignored.
+     */
+    private CategoriesByDesensitizedName findOrCreateCategoriesAsMap(List<String> categoryNames) {
+        return new CategoriesByDesensitizedName(findOrCreateCategories(categoryNames))
     }
 
     /**
