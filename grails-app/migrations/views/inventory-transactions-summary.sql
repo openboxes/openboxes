@@ -128,4 +128,4 @@ FROM transaction_entry
                -- An adjustment is treated as associated with the baseline if the time diff between them is 1 second (baseline is created 1 second before the adjustment)
                AND TIMESTAMPDIFF(SECOND, pis.baseline_transaction_date, transaction.transaction_date) = 1
 WHERE transaction.transaction_type_id = '3' -- Adjustments
-GROUP BY transaction.id, inventory_item.product_id, facility.id;
+GROUP BY transaction.id, inventory_item.product_id;
