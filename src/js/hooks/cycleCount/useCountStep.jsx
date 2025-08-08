@@ -184,7 +184,9 @@ const useCountStep = () => {
     // We need to mark all items as updated if we change the counted by person,
     // because counted by is associated with every cycle count item and needs to be set
     // for every item
-    itemsToUpdate.current = [...itemsToUpdate.current, cycleCountId];
+    if (!itemsToUpdate.current.includes(cycleCountId)) {
+      itemsToUpdate.current = [...itemsToUpdate.current, cycleCountId];
+    }
     countedBy.current = { ...countedBy.current, [cycleCountId]: person };
     defaultCountedBy.current = { ...defaultCountedBy.current, [cycleCountId]: person };
   };
@@ -588,7 +590,9 @@ const useCountStep = () => {
   };
 
   const updateDateCounted = (cycleCountId) => (date) => {
-    itemsToUpdate.current = [...itemsToUpdate.current, cycleCountId];
+    if (!itemsToUpdate.current.includes(cycleCountId)) {
+      itemsToUpdate.current = [...itemsToUpdate.current, cycleCountId];
+    }
     dateCounted.current = {
       ...dateCounted.current,
       [cycleCountId]: date ? date.format() : null,

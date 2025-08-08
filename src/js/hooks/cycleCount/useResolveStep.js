@@ -480,7 +480,9 @@ const useResolveStep = () => {
   const markAllItemsAsNotUpdated = (cycleCountId) => setAllItemsUpdatedState(cycleCountId, false);
 
   const assignRecountedBy = (cycleCountId) => (person) => {
-    itemsToUpdate.current = [...itemsToUpdate.current, cycleCountId];
+    if (!itemsToUpdate.current.includes(cycleCountId)) {
+      itemsToUpdate.current = [...itemsToUpdate.current, cycleCountId];
+    }
     recountedBy.current = { ...recountedBy.current, [cycleCountId]: person };
     defaultRecountedBy.current = { ...defaultRecountedBy.current, [cycleCountId]: person };
   };
@@ -488,7 +490,9 @@ const useResolveStep = () => {
   const getRecountedDate = (cycleCountId) => dateRecounted.current[cycleCountId] || moment.now();
 
   const updateRecountedDate = (cycleCountId) => (date) => {
-    itemsToUpdate.current = [...itemsToUpdate.current, cycleCountId];
+    if (!itemsToUpdate.current.includes(cycleCountId)) {
+      itemsToUpdate.current = [...itemsToUpdate.current, cycleCountId];
+    }
     dateRecounted.current = {
       ...dateRecounted.current,
       [cycleCountId]: date ? date.format() : null,
