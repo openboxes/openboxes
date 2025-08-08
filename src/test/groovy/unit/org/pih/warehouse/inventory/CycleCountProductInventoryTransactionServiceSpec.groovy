@@ -75,21 +75,20 @@ class CycleCountProductInventoryTransactionServiceSpec extends Specification imp
         and: 'mocked available items'
         List<AvailableItem> availableItems = [
                 new AvailableItem(
-                        inventoryItem: new InventoryItem(),
+                        inventoryItem: new InventoryItem(product: product),
                         binLocation: new Location(),
                         quantityOnHand: 50,
                 ),
                 new AvailableItem(
-                        inventoryItem: new InventoryItem(),
+                        inventoryItem: new InventoryItem(product: product),
                         binLocation: new Location(),
                         quantityOnHand: 25,
                 )
         ]
-        List<InventoryItem> inventoryItems = availableItems.collect{ it.inventoryItem }
         productAvailabilityServiceStub.getAvailableItemsAtDate(facility, [product], null) >> availableItems
 
         and: 'no other transactions exist at that time'
-        inventoryServiceStub.hasTransactionEntriesOnDate(facility, _ as Date, inventoryItems) >> false
+        inventoryServiceStub.hasTransactionEntriesOnDate(facility, _ as Date, [product]) >> false
 
         when: 'we create a baseline with no date provided'
         Transaction transaction = cycleCountProductInventoryTransactionService.createInventoryBaselineTransaction(
@@ -119,21 +118,20 @@ class CycleCountProductInventoryTransactionServiceSpec extends Specification imp
         and: 'mocked available items'
         List<AvailableItem> availableItems = [
                 new AvailableItem(
-                        inventoryItem: new InventoryItem(),
+                        inventoryItem: new InventoryItem(product: product),
                         binLocation: new Location(),
                         quantityOnHand: 50,
                 ),
                 new AvailableItem(
-                        inventoryItem: new InventoryItem(),
+                        inventoryItem: new InventoryItem(product: product),
                         binLocation: new Location(),
                         quantityOnHand: 25,
                 )
         ]
-        List<InventoryItem> inventoryItems = availableItems.collect{ it.inventoryItem }
         productAvailabilityServiceStub.getAvailableItemsAtDate(facility, [product], transactionDate) >> availableItems
 
         and: 'no other transactions exist at that time'
-        inventoryServiceStub.hasTransactionEntriesOnDate(facility, transactionDate, inventoryItems) >> false
+        inventoryServiceStub.hasTransactionEntriesOnDate(facility, transactionDate, [product]) >> false
 
         when: 'we create a baseline with date provided'
         Transaction transaction = cycleCountProductInventoryTransactionService.createInventoryBaselineTransaction(
@@ -177,16 +175,15 @@ class CycleCountProductInventoryTransactionServiceSpec extends Specification imp
         and: 'mocked available items'
         List<AvailableItem> availableItems = [
                 new AvailableItem(
-                        inventoryItem: new InventoryItem(),
+                        inventoryItem: new InventoryItem(product: product),
                         binLocation: new Location(),
                         quantityOnHand: 50,
                 ),
         ]
-        List<InventoryItem> inventoryItems = availableItems.collect{ it.inventoryItem }
         productAvailabilityServiceStub.getAvailableItemsAtDate(facility, [product], transactionDate) >> availableItems
 
         and: 'other transactions do exist at that time'
-        inventoryServiceStub.hasTransactionEntriesOnDate(facility, transactionDate, inventoryItems) >> true
+        inventoryServiceStub.hasTransactionEntriesOnDate(facility, transactionDate, [product]) >> true
 
         when:
         cycleCountProductInventoryTransactionService.createInventoryBaselineTransaction(
