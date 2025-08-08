@@ -1373,6 +1373,29 @@ class InventoryService implements ApplicationContextAware {
     RecordInventoryCommand saveRecordInventoryCommand(RecordInventoryCommand cmd, Map params) {
         log.debug "Saving record inventory command params: " + params
 
+        // First, we need to check if there is no validation error (OBPIH-7438)
+        cmd.recordInventoryRows.each { RecordInventoryRowCommand row ->
+            if (!row) {
+                return
+            }
+
+            if (row.expirationDate && !row.lotNumber) {
+                cmd.errors.reject("inventoryItem.invalid", "Items with an expiry date must also have a lot number")
+                row.error = true
+                return cmd
+            }
+
+            if (cmd.product && cmd.product.lotAndExpiryControl && (!row.expirationDate || !row.lotNumber)) {
+                cmd.errors.reject("inventoryItem.invalid", "Both lot number and expiry date are required for this product.")
+                row.error = true
+                return cmd
+            }
+        }
+
+        if (cmd.hasErrors()) {
+            return cmd
+        }
+
         Boolean isInventoryBaselineEnabled = configService.getProperty(
                 "openboxes.transactions.inventoryBaseline.recordStock.enabled",
                 Boolean
@@ -1414,18 +1437,6 @@ class InventoryService implements ApplicationContextAware {
             cmd.recordInventoryRows.each { RecordInventoryRowCommand row ->
                 if (!row) {
                     return
-                }
-
-                if (row.expirationDate && !row.lotNumber) {
-                    cmd.errors.reject("inventoryItem.invalid", "Items with an expiry date must also have a lot number")
-                    row.error = true
-                    return cmd
-                }
-
-                if (cmd.product && cmd.product.lotAndExpiryControl && (!row.expirationDate || !row.lotNumber)) {
-                    cmd.errors.reject("inventoryItem.invalid", "Both lot number and expiry date are required for this product.")
-                    row.error = true
-                    return cmd
                 }
 
                 // a) Find an existing inventory item for the given lot number and product and description
