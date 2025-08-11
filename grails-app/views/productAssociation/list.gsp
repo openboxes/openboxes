@@ -109,7 +109,7 @@
                                         </td>
 
                                         <td>
-                                            <g:link controller="product" action="edit" id="${productAssociationInstance?.product?.id}">
+                                            <g:link controller="product" action="edit" id="${productAssociationInstance?.associatedProduct?.id ?: productAssociationInstance?.product?.id}">
                                                 ${fieldValue(bean: productAssociationInstance?.associatedProduct, field: "productCode")}
                                                 ${fieldValue(bean: productAssociationInstance?.associatedProduct, field: "name")}
                                             </g:link>
