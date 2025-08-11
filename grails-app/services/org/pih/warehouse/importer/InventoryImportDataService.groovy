@@ -243,7 +243,7 @@ class InventoryImportDataService implements ImportDataService {
 
         // We'd have weird behaviour if we allowed two transactions to exist at the same exact time (precision at the
         // database level is to the second) so fail if there's already a transaction on the items for the given date.
-        if (inventoryService.hasTransactionEntriesOnDate(facility, transactionDate, inventoryImportData.inventoryItems)) {
+        if (inventoryService.hasTransactionEntriesOnDate(facility, transactionDate, inventoryImportData.products as List<Product>)) {
             throw new IllegalArgumentException("A transaction already exists at time ${transactionDate}")
         }
 

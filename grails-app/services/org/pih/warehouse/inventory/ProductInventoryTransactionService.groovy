@@ -120,8 +120,8 @@ abstract class ProductInventoryTransactionService<T> {
         // We'd have weird behaviour if we allowed two transactions to exist at the same exact time (precision at the
         // database level is to the second) so fail if there's already a transaction on the items for the given date.
         Date actualTransactionDate = transactionDate ?: new Date()
-        List<InventoryItem> inventoryItems = availableItems.collect{ it.inventoryItem }
-        if (validateTransactionDates && inventoryService.hasTransactionEntriesOnDate(facility, actualTransactionDate, inventoryItems)) {
+        List<Product> products = availableItems.collect{ it.inventoryItem.product }.unique()
+        if (validateTransactionDates && inventoryService.hasTransactionEntriesOnDate(facility, actualTransactionDate, products)) {
             throw new IllegalArgumentException("A transaction already exists at time ${actualTransactionDate}")
         }
 

@@ -1389,8 +1389,7 @@ class InventoryService implements ApplicationContextAware {
 
             // We'd have weird behaviour if we allowed two transactions to exist at the same exact time (precision at the
             // database level is to the second) so fail if there's already a transaction on the items for the given date.
-            List<InventoryItem> inventoryItems = availableItems.values().collect{ it.inventoryItem }
-            if (hasTransactionEntriesOnDate(currentLocation, adjustmentTransactionDate, inventoryItems)) {
+            if (hasTransactionEntriesOnDate(currentLocation, adjustmentTransactionDate, [cmd.product])) {
                 throw new IllegalArgumentException("A transaction already exists at time ${adjustmentTransactionDate}")
             }
 
@@ -1860,16 +1859,22 @@ class InventoryService implements ApplicationContextAware {
         def binLocation = command.binLocation
         def availableQuantity = getQuantityFromBinLocation(location, binLocation, inventoryItem)
         def adjustedQuantity = newQuantity - availableQuantity
+        Date transactionDate = new Date()
 
         log.info "Check quantity: ${newQuantity} vs ${availableQuantity}: ${availableQuantity == newQuantity}"
         if (availableQuantity == newQuantity || adjustedQuantity == 0) {
             command.errors.rejectValue("newQuantity", "adjustStock.invalid.quantity.message")
         }
 
+        // Reports and QoH calculations get messed up if two transactions for a product exist at the same exact time.
+        if (hasTransactionEntriesOnDate(location, transactionDate, [inventoryItem.product])) {
+            command.errors.rejectValue("transactionDate", "adjustStock.invalid.transactionDate.duplicate.message")
+        }
+
         if (command.validate() && !command.hasErrors()) {
             // Need to create a transaction if we want the inventory item to show up in the stock card
             def transaction = new Transaction()
-            transaction.transactionDate = new Date()
+            transaction.transactionDate = transactionDate
             transaction.transactionType =
                     TransactionType.get(Constants.ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID)
             transaction.inventory = inventory
@@ -2726,25 +2731,31 @@ class InventoryService implements ApplicationContextAware {
     }
 
     /**
-     * @return True if there are any transactions on the given inventory items at a facility at a specific moment
+     * @return True if there are any transactions on the given products at a facility at a specific moment
      *         in time.
      */
-    boolean hasTransactionEntriesOnDate(Location facility, Date date, List<InventoryItem> inventoryItems) {
-        return getTransactionEntriesOnDate(facility, date, inventoryItems).size() > 0
+    boolean hasTransactionEntriesOnDate(Location facility, Date date, List<Product> products) {
+        return getTransactionEntriesOnDate(facility, date, products).size() > 0
     }
 
     /**
-     * @return All transaction entries for the given inventory items at a facility at a specific moment in time.
+     * @return All transaction entries for the given products at a facility at a specific moment in time.
      */
-    List<TransactionEntry> getTransactionEntriesOnDate(
-            Location facility, Date date, List<InventoryItem> inventoryItems) {
-        if (!date || !inventoryItems) {
+    private List<TransactionEntry> getTransactionEntriesOnDate(
+            Location facility, Date date, List<Product> products) {
+        if (!date || !products) {
             return []
         }
 
         def criteria = TransactionEntry.createCriteria()
         return criteria.list {
-            'in'("inventoryItem", inventoryItems)
+            // TransactionEntry.product is optional, so we need to check the inventory item of the entry as well.
+            or {
+                inList("product", products)
+                inventoryItem {
+                    inList("product", products)
+                }
+            }
             transaction {
                 eq("transactionDate", date)
                 eq("inventory", facility?.inventory)
