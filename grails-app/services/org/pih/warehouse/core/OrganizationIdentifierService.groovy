@@ -1,6 +1,7 @@
 package org.pih.warehouse.core
 
 import grails.gorm.transactions.Transactional
+import org.apache.commons.lang.StringUtils
 import org.apache.commons.lang.WordUtils
 
 // TODO: Try to merge this logic into IdentifierService. We'd need to support a new ${abbreviation} keyword in the
@@ -16,35 +17,16 @@ class OrganizationIdentifierService {
      * Generates a unique id that resembles the given name.
      *
      * Ex: Given a name "Big Bad Guys" it might generate "BBG", or "BB0" if "BBG" already exists (up to "BB9").
-     * Ex: Given a name "Biggie" it might generate "BIG", or "BI0" if "BIG" already exists (up to "BB9").
+     * Ex: Given a name "Biggie" it might generate "BIG", or "BI0" if "BIG" already exists (up to "BI9").
      */
     String generate(String name) {
         Integer minSize = configService.getProperty('openboxes.identifier.organization.minSize', Integer)
         Integer maxSize = configService.getProperty('openboxes.identifier.organization.maxSize', Integer)
 
-        // There are some organization names formatted like: "Name, Inc." so we trim everything after the comma
-        // to get a cleaner name.
-        String sanitizedName = name.split(",")[0]
-
-        // This turns strings like "big bad guys" into "bbg"
-        String identifier = WordUtils.initials(sanitizedName)?.replaceAll("[^a-zA-Z0-9]", "")
-
-        // If there are too few initials, take the original identifier and chop off words until you have the smallest
-        // that fits within the limit, then trim further if needed. For example, given the string "biggie bad":
-        // outputs "biggi" if maxSize == 5 (and "bigg" if maxSize == 4, "big" if maxSize == 3, ...)
-        // outputs "biggie" if maxSize is between 6-9
-        // outputs "biggie bad" if maxSize > 9.
-        if (identifier.length() < minSize) {
-            identifier = WordUtils.abbreviate(sanitizedName, minSize, maxSize, null)
+        String identifier = generateOrganizationIdentifier(name, minSize, maxSize)
+        if (StringUtils.isBlank(name)) {
+            return null
         }
-
-        // If the given name had too many words and we end up with a string of initials that is still too long,
-        // trim it until it fits. Ex: If maxSize == 3 and we're given the initials "rbbg" trim them down to "rbb"
-        else if (identifier.length() > maxSize) {
-            identifier = identifier.substring(0, maxSize)
-        }
-
-        identifier = identifier.toUpperCase()
 
         if (!idAlreadyExists(identifier)) {
             return identifier
@@ -65,6 +47,39 @@ class OrganizationIdentifierService {
             return identifier.toUpperCase().substring(0, identifier.size() -1) + suffix
         }
         return identifier.length() < maxSize ? identifier.toUpperCase() + '0': identifier.toUpperCase().substring(0, maxSize - 1) + '0'
+    }
+
+    private String generateOrganizationIdentifier(String name, Integer minSize, Integer maxSize) {
+        // There are some organization names formatted like: "Name, Inc." so we trim everything after the comma
+        // to get a cleaner name. Then remove all other special characters (except spaces).
+        String sanitizedName = name? name.split(",")[0]?.replaceAll("[^a-zA-Z0-9 ]", "") : null
+
+        // In case we're given a null or blank name or a name that's all special characters or starts with a comma.
+        if (StringUtils.isBlank(sanitizedName)) {
+            return null
+        }
+
+        String initials = WordUtils.initials(sanitizedName)
+
+        // If the given name is only one word or the initials are too short, remove all spaces from the original name
+        // then trim it until it fits.
+        String identifier
+        if (initials.length() == 1 || initials.length() < minSize) {
+            // TODO: If this is still too short, consider padding with a special character ('0' probably).
+            //       Ex: if minLength == 5 and you have "HI" -> "HI000"
+            String sanitizedNameNoSpaces = StringUtils.deleteWhitespace(sanitizedName)
+            identifier = StringUtils.substring(sanitizedNameNoSpaces, 0, maxSize)
+        }
+        // If the initials of the given name are too long, trim them until they fit.
+        else if (initials.length() > maxSize) {
+            identifier = StringUtils.substring(initials, 0, maxSize)
+        }
+        // Otherwise the initials fit, so use them.
+        else {
+            identifier = initials
+        }
+
+        return identifier.toUpperCase()
     }
 
     private boolean idAlreadyExists(String id) {
