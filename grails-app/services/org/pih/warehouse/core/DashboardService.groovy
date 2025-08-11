@@ -11,7 +11,10 @@ package org.pih.warehouse.core
 
 import grails.gorm.transactions.Transactional
 import grails.plugins.csv.CSVWriter
+import grails.util.Holders
 import org.hibernate.sql.JoinType
+import org.pih.warehouse.inventory.CycleCountItem
+import org.pih.warehouse.inventory.CycleCountStatus
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.inventory.InventoryStatus
@@ -333,20 +336,30 @@ class DashboardService {
         Map<Product, Object> inventoryItemsMap = getTotalStock(location).collectEntries { [it.product, it ] }
         Set<Product> products = inventoryItemsMap.keySet()
 
-        List<Object> latestInventoryDates = TransactionEntry.executeQuery("""
-                select ii.product.id, max(t.transactionDate)
-                from TransactionEntry as te
-                left join te.inventoryItem as ii
-                left join te.transaction as t
-                where t.inventory = :inventory
-                and t.transactionType.transactionCode in (:transactionCodes)
-                group by ii.product
-                """,
-                [inventory: location.inventory, transactionCodes: [TransactionCode.PRODUCT_INVENTORY, TransactionCode.INVENTORY]])
+        List transactionTypes = Holders.grailsApplication.config.openboxes.inventoryCount.transactionTypes
 
+        // Fetch latest inventory counts for all products in a single query to avoid N+1 query issue
+        // This improves performance by reducing the number of database calls (OBPIH-7449)
+        Map<String, Timestamp> lastInventoryCountMap = TransactionEntry.createCriteria().list {
+            createAlias("inventoryItem", "ii")
+            createAlias("transaction", "t")
+            projections {
+                groupProperty("ii.product.id")
+                max("t.transactionDate")
+            }
+            eq("t.inventory", location.inventory)
+            inList("t.transactionType.id", transactionTypes)
+        }.collectEntries { [it[0], it[1]] }
 
-        // Convert to map
-        Map<String, Timestamp> latestInventoryDateMap = latestInventoryDates.collectEntries { [it[0], it[1]] }
+        Map<String, Timestamp> lastCycleCountDateMap = CycleCountItem.createCriteria().list {
+            createAlias("cycleCount", "cc")
+            projections {
+                groupProperty("product.id")
+                max("dateCounted")
+            }
+            eq("cc.facility", location)
+            eq("cc.status", CycleCountStatus.COMPLETED)
+        }.collectEntries { [it[0], it[1]] }
 
         Map<Product, InventoryLevel> inventoryLevelMap = InventoryLevel
                 .findAllByInventory(location.inventory)
@@ -362,13 +375,13 @@ class DashboardService {
         })
 
         products.each { product ->
-            Timestamp latestInventoryDate = latestInventoryDateMap[product.id]
+            Timestamp lastCounted = [lastInventoryCountMap[product.id], lastCycleCountDateMap[product.id]].max()
             csvWriter << [
                     productCode        : product.productCode ?: "",
                     name               : product.name,
                     unitOfMeasure      : product.unitOfMeasure ?: "",
                     abcClass           : inventoryLevelMap[product]?.abcClass ?: "",
-                    latestInventoryDate: latestInventoryDate ? "${formatDate.format(latestInventoryDate)}" : "",
+                    latestInventoryDate: lastCounted ? "${formatDate.format(lastCounted)}" : "",
                     quantityOnHand     : inventoryItemsMap[product]?.quantity ?: ""
             ]
         }
