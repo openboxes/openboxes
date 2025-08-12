@@ -11,14 +11,10 @@ package org.pih.warehouse.core
 
 import grails.gorm.transactions.Transactional
 import grails.plugins.csv.CSVWriter
-import grails.util.Holders
 import org.hibernate.sql.JoinType
-import org.pih.warehouse.inventory.CycleCountItem
-import org.pih.warehouse.inventory.CycleCountStatus
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.inventory.InventoryStatus
-import org.pih.warehouse.inventory.TransactionCode
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
@@ -30,7 +26,7 @@ import java.text.SimpleDateFormat
 
 @Transactional(readOnly=true)
 class DashboardService {
-
+    ConfigService configService
     def productAvailabilityService
 
     /**
@@ -336,30 +332,21 @@ class DashboardService {
         Map<Product, Object> inventoryItemsMap = getTotalStock(location).collectEntries { [it.product, it ] }
         Set<Product> products = inventoryItemsMap.keySet()
 
-        List transactionTypes = Holders.grailsApplication.config.openboxes.inventoryCount.transactionTypes
+        List<String> transactionTypes = configService.getProperty('openboxes.inventoryCount.transactionTypes', List) as List<String>
 
-        // Fetch latest inventory counts for all products in a single query to avoid N+1 query issue
-        // This improves performance by reducing the number of database calls (OBPIH-7449)
-        Map<String, Timestamp> lastInventoryCountMap = TransactionEntry.createCriteria().list {
-            createAlias("inventoryItem", "ii")
-            createAlias("transaction", "t")
-            projections {
-                groupProperty("ii.product.id")
-                max("t.transactionDate")
-            }
-            eq("t.inventory", location.inventory)
-            inList("t.transactionType.id", transactionTypes)
-        }.collectEntries { [it[0], it[1]] }
+        List<Object[]> latestInventoryDatesList = TransactionEntry.executeQuery("""
+                select ii.product.id, max(t.transactionDate)
+                from TransactionEntry as te
+                join te.inventoryItem as ii
+                join te.transaction as t
+                where t.inventory = :inventory
+                and t.transactionType.id in (:transactionTypeIds)
+                group by ii.product.id
+                """,
+                [inventory: location.inventory, transactionTypeIds: transactionTypes])
 
-        Map<String, Timestamp> lastCycleCountDateMap = CycleCountItem.createCriteria().list {
-            createAlias("cycleCount", "cc")
-            projections {
-                groupProperty("product.id")
-                max("dateCounted")
-            }
-            eq("cc.facility", location)
-            eq("cc.status", CycleCountStatus.COMPLETED)
-        }.collectEntries { [it[0], it[1]] }
+        // Convert to map
+        Map<String, Timestamp> latestInventoryDates = latestInventoryDatesList.collectEntries { [it[0], it[1]] }
 
         Map<Product, InventoryLevel> inventoryLevelMap = InventoryLevel
                 .findAllByInventory(location.inventory)
@@ -375,13 +362,13 @@ class DashboardService {
         })
 
         products.each { product ->
-            Timestamp lastCounted = [lastInventoryCountMap[product.id], lastCycleCountDateMap[product.id]].max()
+            Timestamp latestInventoryDate = latestInventoryDates[product.id]
             csvWriter << [
                     productCode        : product.productCode ?: "",
                     name               : product.name,
                     unitOfMeasure      : product.unitOfMeasure ?: "",
                     abcClass           : inventoryLevelMap[product]?.abcClass ?: "",
-                    latestInventoryDate: lastCounted ? "${formatDate.format(lastCounted)}" : "",
+                    latestInventoryDate: latestInventoryDate ? "${formatDate.format(latestInventoryDate)}" : "",
                     quantityOnHand     : inventoryItemsMap[product]?.quantity ?: ""
             ]
         }
