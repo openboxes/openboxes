@@ -335,19 +335,19 @@ class DashboardService {
 
         List<String> transactionTypes = configService.getProperty('openboxes.inventoryCount.transactionTypes', List) as List<String>
 
-        List<Object[]> latestInventoryDatesList = TransactionEntry.executeQuery("""
+        List<Object[]> latestInventoryDates = TransactionEntry.executeQuery("""
                 select ii.product.id, max(t.transactionDate)
                 from TransactionEntry as te
                 left join te.inventoryItem as ii
                 left join te.transaction as t
                 where t.inventory = :inventory
                 and t.transactionType.id in (:transactionTypeIds)
-                group by ii.product.id
+                group by ii.product
                 """,
                 [inventory: location.inventory, transactionTypeIds: transactionTypes])
 
         // Convert to map
-        Map<String, Timestamp> latestInventoryDates = latestInventoryDatesList.collectEntries { [it[0], it[1]] }
+        Map<String, Timestamp> latestInventoryDateMap = latestInventoryDates.collectEntries { [it[0], it[1]] }
 
         Map<Product, InventoryLevel> inventoryLevelMap = InventoryLevel
                 .findAllByInventory(location.inventory)
@@ -363,7 +363,7 @@ class DashboardService {
         })
 
         products.each { product ->
-            Timestamp latestInventoryDate = latestInventoryDates[product.id]
+            Timestamp latestInventoryDate = latestInventoryDateMap[product.id]
             csvWriter << [
                     productCode        : product.productCode ?: "",
                     name               : product.name,
