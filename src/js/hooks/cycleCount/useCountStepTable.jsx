@@ -183,28 +183,37 @@ const useCountStepTable = ({
         if (rowIndex !== null && columnId && error !== null) {
           setError(null);
         }
+
+        // Thanks to this function, we can reset the focus only after finishing arrow navigation.
+        // Previously, we triggered a focus reset on almost every user interaction,
+        // which caused excessive re-renders in all tables
         const handleClick = (event) => {
           if (rowIndex === null && columnId === null) {
             return;
           }
-
           const { target } = event;
+
+          // Elements that should keep focus (avoid resetting)
           const isInputElement = target.closest('input, select, textarea, .date-field-input, .react-datepicker, .react-select__control');
-          const isDatePickerDay = target.closest('.react-datepicker__day');
-          const isSelectOption = target.closest('.react-select__option');
+
+          // Specific clickable UI parts that should reset focus
+          // These are elements that close components, e.g. a date picker when clicking a day,
+          // or a select dropdown when selecting an option
+          const isDatePickerDayElement = target.closest('.react-datepicker__day');
+          const isDropdownOptionElement = target.closest('.react-select__option');
 
           // if this is input element, then we don't want to reset rowIndex and columnId,
           // and re-render the component again because then all tables will be re-rendered
           // which will cause performance issues
-          if (!isInputElement && !isDatePickerDay && !isSelectOption) {
+          if (!isInputElement && !isDatePickerDayElement && !isDropdownOptionElement) {
             setRowIndex(null);
             setColumnId(null);
             forceRerender();
           }
 
-          // if this is date picker day or select option, then we want to reset rowIndex
-          // and columnId because then we close the date picker or select dropdown
-          if (isDatePickerDay || isSelectOption) {
+          // if this is isDatePickerDayElement or isDropdownOptionElement, then we want to reset
+          // rowIndex and columnId because then we close the date picker or select dropdown
+          if (isDatePickerDayElement || isDropdownOptionElement) {
             setRowIndex(null);
             setColumnId(null);
           }
