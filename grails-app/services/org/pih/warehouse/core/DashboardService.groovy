@@ -26,6 +26,7 @@ import java.text.SimpleDateFormat
 
 @Transactional(readOnly=true)
 class DashboardService {
+
     ConfigService configService
     def productAvailabilityService
 
@@ -337,8 +338,8 @@ class DashboardService {
         List<Object[]> latestInventoryDatesList = TransactionEntry.executeQuery("""
                 select ii.product.id, max(t.transactionDate)
                 from TransactionEntry as te
-                join te.inventoryItem as ii
-                join te.transaction as t
+                left join te.inventoryItem as ii
+                left join te.transaction as t
                 where t.inventory = :inventory
                 and t.transactionType.id in (:transactionTypeIds)
                 group by ii.product.id
