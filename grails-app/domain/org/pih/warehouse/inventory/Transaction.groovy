@@ -48,7 +48,7 @@ class Transaction implements Comparable, Serializable {
 
     def publishSaveEvent() {
         Holders.grailsApplication.mainContext.publishEvent(new RefreshProductAvailabilityEvent(this, forceRefresh))
-        Holders.grailsApplication.mainContext.publishEvent(new RefreshCycleCountReportViewsEvent(this))
+        Holders.grailsApplication.mainContext.publishEvent(new RefreshInventoryCountEvent(this))
     }
 
     def publishDeleteEvent() {

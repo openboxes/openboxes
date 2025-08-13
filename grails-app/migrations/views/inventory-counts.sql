@@ -8,8 +8,8 @@ CREATE OR REPLACE VIEW inventory_counts AS
             b.transaction_id AS baseline_id,
             a.product_id AS product_id,
             a.facility_id AS facility_id
-        FROM adjustments_candidates a
-        JOIN inventory_baseline_candidates b
+        FROM adjustment_candidate a
+        JOIN inventory_baseline_candidate b
           ON a.product_id = b.product_id
           AND a.inventory_id = b.inventory_id
           AND TIMESTAMPDIFF(SECOND, a.transaction_date, b.transaction_date) = -1

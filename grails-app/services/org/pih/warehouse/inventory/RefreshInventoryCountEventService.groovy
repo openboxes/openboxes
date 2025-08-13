@@ -5,12 +5,12 @@ import org.pih.warehouse.core.Constants
 import org.springframework.context.ApplicationListener
 
 @Transactional
-class RefreshCycleCountReportViewsEventService implements ApplicationListener<RefreshCycleCountReportViewsEvent> {
+class RefreshInventoryCountEventService implements ApplicationListener<RefreshInventoryCountEvent> {
 
     InventoryCountService inventoryCountService
 
     @Override
-    void onApplicationEvent(RefreshCycleCountReportViewsEvent event) {
+    void onApplicationEvent(RefreshInventoryCountEvent event) {
         if (event.transactionTypeId == Constants.ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID) {
             inventoryCountService.refreshAdjustmentCandidatesView(event.inventory, event.productIds, event.transactionId, event.transactionDate)
         }

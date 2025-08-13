@@ -19,6 +19,7 @@ import org.hibernate.criterion.Restrictions
 import org.hibernate.sql.JoinType
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.ApiException
+import org.pih.warehouse.core.ConfigService
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.GlAccount
 import org.pih.warehouse.core.Location
@@ -46,6 +47,7 @@ class ProductService {
     def userService
     def dataService
     ProductGroupService productGroupService
+    ConfigService configService
 
     def getNdcResults(operation, q) {
         def hipaaspaceApiKey = grailsApplication.config.hipaaspace.api.key
@@ -1490,11 +1492,7 @@ class ProductService {
     }
 
     Map<String, Timestamp> latestInventoryDateForProducts(Location location, List<String> productIds) {
-        List<String> transactionTypeIds = [
-                Constants.ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID,
-                Constants.PRODUCT_INVENTORY_TRANSACTION_TYPE_ID,
-                Constants.INVENTORY_BASELINE_TRANSACTION_TYPE_ID
-        ]
+        List<String> transactionTypeIds = configService.getProperty('openboxes.inventoryCount.transactionTypes', List) as List<String>
 
         Inventory inventory = location.inventory
 

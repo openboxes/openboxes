@@ -1,18 +1,29 @@
 package org.pih.warehouse.inventory
 
 import grails.gorm.transactions.Transactional
-import org.pih.warehouse.data.DataService
+import groovy.sql.Sql
+import org.pih.warehouse.core.Constants
+
+import javax.sql.DataSource
 
 @Transactional
 class InventoryCountService {
 
-    DataService dataService
+    DataSource dataSource
 
     void refreshAdjustmentCandidatesView(Inventory inventory, List<String> productIds, String transactionId, Date transactionDate) {
         productIds.each {
-            String dateString = transactionDate.format("yyyy-MM-dd HH:mm:ss")
+            String dateString = transactionDate.format(Constants.ISO_DATE_TIME_FORMAT)
+            Sql sql = new Sql(dataSource)
+            Map<String, Object> params = [
+                    transactionId: transactionId,
+                    productId: it,
+                    transactionDate: dateString,
+                    inventoryId: inventory.id,
+                    facilityId: inventory.warehouse.id
+            ]
             String query = """
-                INSERT INTO adjustments_candidates (
+                INSERT INTO adjustment_candidate (
                     transaction_id,
                     product_id,
                     transaction_date,
@@ -20,23 +31,30 @@ class InventoryCountService {
                     facility_id
                 )
                 VALUES (
-                    '${transactionId}',
-                    '${it}',
-                    '${dateString}',
-                    '${inventory.id}',
-                    '${inventory.warehouse.id}'
+                    :transactionId,
+                    :productId,
+                    :transactionDate,
+                    :inventoryId,
+                    :facilityId
                 )
             """
-
-            dataService.executeStatement(query, true)
+            sql.executeInsert(params, query)
         }
     }
 
     void refreshInventoryBaselineCandidatesView(Inventory inventory, List<String> productIds, String transactionId, Date transactionDate) {
         productIds.each {
-            String dateString = transactionDate.format("yyyy-MM-dd HH:mm:ss")
+            String dateString = transactionDate.format(Constants.ISO_DATE_TIME_FORMAT)
+            Sql sql = new Sql(dataSource)
+            Map<String, Object> params = [
+                    transactionId: transactionId,
+                    productId: it,
+                    transactionDate: dateString,
+                    inventoryId: inventory.id,
+                    facilityId: inventory.warehouse.id
+            ]
             String query = """
-                INSERT INTO inventory_baseline_candidates (
+                INSERT INTO inventory_baseline_candidate (
                     transaction_id,
                     product_id,
                     transaction_date,
@@ -44,15 +62,14 @@ class InventoryCountService {
                     facility_id
                 )
                 VALUES (
-                    '${transactionId}',
-                    '${it}',
-                    '${dateString}',
-                    '${inventory.id}',
-                    '${inventory.warehouse.id}'
+                    :transactionId,
+                    :productId,
+                    :transactionDate,
+                    :inventoryId,
+                    :facilityId
                 )
             """
-
-            dataService.executeStatement(query, true)
+            sql.executeInsert(params, query)
         }
     }
 }

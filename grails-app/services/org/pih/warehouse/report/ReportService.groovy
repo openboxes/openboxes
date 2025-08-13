@@ -1183,6 +1183,7 @@ class ReportService implements ApplicationContextAware {
             inList("product", results.collect { it[1] })
             between("dateRecorded", command.startDate, command.endDate)
         }
+        Map<String, Long> inventoryCountMap = inventoryCountList.collectEntries { [ (it[0]): it[1] ] }
         log.info("Fetch time for inventory-count call: " + (System.currentTimeMillis() - inventoryCountTime) + " ms")
 
         // Transform the results to a summary object
@@ -1212,7 +1213,7 @@ class ReportService implements ApplicationContextAware {
                     facility: facility,
                     product: product,
                     countAdjustments: countAdjustments,
-                    countCycleCounts: inventoryCountList.find { it[1] == product },
+                    countCycleCounts: inventoryCountMap[product],
                     lastCounted: null, // Last counted is sometimes expected to be an expensive call, and is calculated separately
                     quantityAdjusted: quantityAdjusted,
                     amountAdjusted: amountAdjusted,

@@ -2,7 +2,7 @@ package org.pih.warehouse.inventory
 
 import org.springframework.context.ApplicationEvent
 
-class RefreshCycleCountReportViewsEvent extends ApplicationEvent {
+class RefreshInventoryCountEvent extends ApplicationEvent {
 
     Inventory inventory
     List<String> productIds
@@ -10,7 +10,7 @@ class RefreshCycleCountReportViewsEvent extends ApplicationEvent {
     String transactionId
     String transactionTypeId
 
-    RefreshCycleCountReportViewsEvent(Transaction source) {
+    RefreshInventoryCountEvent(Transaction source) {
         super(source)
         this.inventory = source.inventory
         this.productIds = source.associatedProducts
@@ -19,7 +19,7 @@ class RefreshCycleCountReportViewsEvent extends ApplicationEvent {
         this.transactionTypeId = source.transactionType.id
     }
 
-    RefreshCycleCountReportViewsEvent(Transaction source, boolean isDelete) {
+    RefreshInventoryCountEvent(Transaction source, boolean isDelete) {
         super(source)
         this.transactionId = source.id
     }
