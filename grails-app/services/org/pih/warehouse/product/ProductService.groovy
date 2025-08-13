@@ -17,6 +17,7 @@ import org.apache.commons.lang.StringUtils
 import org.hibernate.criterion.CriteriaSpecification
 import org.hibernate.criterion.Restrictions
 import org.hibernate.sql.JoinType
+import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.ApiException
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.GlAccount
@@ -26,7 +27,11 @@ import org.pih.warehouse.core.SynonymTypeCode
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.LocalizationUtil
+import org.pih.warehouse.inventory.Inventory
+import org.pih.warehouse.inventory.TransactionEntry
 import util.ReportUtil
+
+import java.sql.Timestamp
 import java.text.SimpleDateFormat
 /**
  * @author jmiranda*
@@ -1479,4 +1484,39 @@ class ProductService {
         }
         return synonym
     }
+
+    Map<String, Timestamp> latestInventoryDateForProducts(List<String> productIds) {
+        return latestInventoryDateForProducts(AuthService.currentLocation, productIds)
+    }
+
+    Map<String, Timestamp> latestInventoryDateForProducts(Location location, List<String> productIds) {
+        List<String> transactionTypeIds = [
+                Constants.ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID,
+                Constants.PRODUCT_INVENTORY_TRANSACTION_TYPE_ID,
+                Constants.INVENTORY_BASELINE_TRANSACTION_TYPE_ID
+        ]
+
+        Inventory inventory = location.inventory
+
+        String hql = """
+            select ii.product.id, max(t.transactionDate)
+            from TransactionEntry te
+            join te.transaction t
+            join te.inventoryItem ii
+            where ii.product.id in (:productIds)
+              and t.inventory = :inventory
+              and t.transactionType.id in (:transactionTypeIds)
+            group by ii.product.id
+        """
+
+        List<Object[]> results = TransactionEntry.executeQuery(hql, [
+                productIds: productIds,
+                inventory: inventory,
+                transactionTypeIds: transactionTypeIds
+        ])
+
+        // Convert list to a map for O(1) accessibility further
+        return results.collectEntries { [ (it[0]): it[1] ] }
+    }
+
 }
