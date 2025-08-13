@@ -5,10 +5,13 @@ import { render, screen, within } from '@testing-library/react';
 import DoubleTile from 'utils/DoubleTile';
 
 import '@testing-library/jest-dom';
+import renderer from 'react-test-renderer';
 
 const mockTranslate = jest.fn((key, defaultValue) => defaultValue);
 
 jest.mock('hooks/useTranslate', () => () => mockTranslate);
+
+jest.mock('wrappers/CustomTooltip', () => ({ children }) => <div>{children}</div>);
 
 describe('DoubleTile component', () => {
   const mockProps = {
@@ -27,14 +30,9 @@ describe('DoubleTile component', () => {
     formatSecondValueAsCurrency: false,
   };
 
-  beforeEach(() => {
-    mockTranslate.mockReset();
-    mockTranslate.mockImplementation((key, defaultValue) => defaultValue);
-  });
-
   it('should match snapshot for sample props', () => {
-    const { asFragment } = render(<DoubleTile {...mockProps} />);
-    expect(asFragment()).toMatchSnapshot();
+    const tree = renderer.create(<DoubleTile {...mockProps} />).toJSON();
+    expect(tree).toMatchSnapshot();
   });
 
   it('renders title, first value, second value, and subtitles correctly', () => {

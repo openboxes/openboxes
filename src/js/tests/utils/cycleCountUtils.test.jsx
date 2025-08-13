@@ -23,14 +23,14 @@ describe('trimLotNumberSpaces', () => {
   });
 
   it('trims leading and trailing spaces from lotNumber', () => {
-    const input = {
+    const props = {
       ...mockCycleCountItem,
       inventoryItem: {
         ...mockCycleCountItem.inventoryItem,
         lotNumber: '   ABC123   ',
       },
     };
-    const result = trimLotNumberSpaces(input);
+    const result = trimLotNumberSpaces(props);
     expect(result.inventoryItem.lotNumber).toBe('ABC123');
   });
 
@@ -41,7 +41,7 @@ describe('trimLotNumberSpaces', () => {
   });
 
   it('handles missing lotNumber safely', () => {
-    const input = {
+    const props = {
       ...mockCycleCountItem,
       inventoryItem: {
         ...mockCycleCountItem.inventoryItem,
@@ -49,18 +49,17 @@ describe('trimLotNumberSpaces', () => {
       },
     };
 
-    const result = trimLotNumberSpaces(input);
+    const result = trimLotNumberSpaces(props);
     expect(result.inventoryItem.lotNumber).toBeUndefined();
   });
 
   it('handles missing inventoryItem safely', () => {
-    const input = {
-      id: 'test',
-      quantityCounted: 10,
+    const props = {
+      ...mockCycleCountItem,
       inventoryItem: undefined,
     };
 
-    const result = trimLotNumberSpaces(input);
+    const result = trimLotNumberSpaces(props);
     expect(result.inventoryItem).toEqual({ lotNumber: undefined });
   });
 });
