@@ -1,87 +1,76 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`DoubleTile component should match snapshot for sample props 1`] = `
-<DocumentFragment>
-  <div
-    class="double-tile"
-    data-testid="double-tile"
+<div
+  className="double-tile"
+  data-testid="double-tile"
+>
+  <span
+    className="double-tile__title"
   >
-    <span
-      class="double-tile__title"
-    >
-      Card Title
-    </span>
+    Card Title
+  </span>
+  <div
+    className="d-flex"
+  >
     <div
-      class="d-flex"
+      className="double-tile__first-value-block"
     >
-      <div
-        class="double-tile__first-value-block"
+      <span
+        className="double-tile__value-number"
       >
-        <span
-          class="double-tile__value-number"
-        >
-          75
-        </span>
-        <span
-          class="double-tile__subtitle"
-        >
-          First Subtitle
-        </span>
-      </div>
-      <div
-        class="double-tile__second-value-block"
+        75
+      </span>
+      <span
+        className="double-tile__subtitle"
       >
-        <span
-          class="double-tile__value-number"
-        >
-          1500
-        </span>
-        <span
-          class="double-tile__subtitle"
-        >
-          Second Subtitle
-        </span>
-      </div>
+        First Subtitle
+      </span>
     </div>
     <div
-      class="double-tile__tooltip"
+      className="double-tile__second-value-block"
     >
-      <div
-        class=""
+      <span
+        className="double-tile__value-number"
       >
-        <div
-          aria-describedby="tippy-tooltip-1"
-          class="w-100"
-          data-original-title="undefined"
-          data-tooltipped=""
-          style="display: inline;"
-        >
-          <div
-            class="flex items-center"
-          >
-            <svg
-              fill="currentColor"
-              height="20"
-              stroke="currentColor"
-              stroke-width="0"
-              viewBox="0 0 24 24"
-              width="20"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <g>
-                <path
-                  d="M0 0h24v24H0z"
-                  fill="none"
-                />
-                <path
-                  d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm0-2a8 8 0 1 0 0-16 8 8 0 0 0 0 16zM11 7h2v2h-2V7zm0 4h2v6h-2v-6z"
-                />
-              </g>
-            </svg>
-          </div>
-        </div>
-      </div>
+        1500
+      </span>
+      <span
+        className="double-tile__subtitle"
+      >
+        Second Subtitle
+      </span>
     </div>
   </div>
-</DocumentFragment>
+  <div
+    className="double-tile__tooltip"
+  >
+    <div>
+      <svg
+        fill="currentColor"
+        height={20}
+        stroke="currentColor"
+        strokeWidth="0"
+        style={
+          {
+            "color": undefined,
+          }
+        }
+        viewBox="0 0 24 24"
+        width={20}
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <g>
+          <path
+            d="M0 0h24v24H0z"
+            fill="none"
+          />
+          <path
+            d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm0-2a8 8 0 1 0 0-16 8 8 0 0 0 0 16zM11 7h2v2h-2V7zm0 4h2v6h-2v-6z"
+          />
+        </g>
+      </svg>
+    </div>
+  </div>
+</div>
 `;

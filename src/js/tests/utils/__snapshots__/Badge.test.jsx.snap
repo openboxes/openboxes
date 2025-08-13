@@ -26,3 +26,12 @@ exports[`Badge component matches snapshot 1`] = `
   </div>
 </DocumentFragment>
 `;
+
+exports[`Badge component should match snapshot 1`] = `
+<span
+  className="badge warning"
+  data-testid="badge"
+>
+  Tooltip Badge
+</span>
+`;

@@ -1,46 +1,53 @@
 import React from 'react';
 
-import { render, screen, within } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
+import renderer from 'react-test-renderer';
 
 import Badge from 'utils/Badge';
 
 import '@testing-library/jest-dom';
 
+jest.mock('wrappers/CustomTooltip', () => ({ children }) => <>{children}</>);
+
+let badgePrimary;
+let badgeWithTooltip;
+let badgeEmptyVariant;
+
 describe('Badge component', () => {
-  it('matches snapshot', () => {
-    const { asFragment } = render(<Badge label="Snapshot Test" variant="warning" tooltip />);
-    expect(asFragment()).toMatchSnapshot();
+  beforeEach(() => {
+    badgePrimary = <Badge label="Primary Badge" variant="primary" />;
+    badgeWithTooltip = <Badge label="Tooltip Badge" variant="warning" tooltip />;
+    badgeEmptyVariant = <Badge label="Empty Variant" variant="" />;
+  });
+
+  it('should match snapshot', () => {
+    const badge = renderer.create(badgeWithTooltip).toJSON();
+    expect(badge).toMatchSnapshot();
   });
 
   it('renders the label text', () => {
-    render(<Badge label="Test Label" variant="primary" />);
-    const { getByText } = within(screen.getByTestId('badge'));
-    expect(getByText('Test Label')).toBeInTheDocument();
+    render(badgePrimary);
+    expect(screen.getByText('Primary Badge')).toBeInTheDocument();
   });
 
   it('applies the correct variant class', () => {
-    render(<Badge label="Info" variant="info" />);
-    const { getByText } = within(screen.getByTestId('badge'));
-    expect(getByText('Info')).toHaveClass('badge');
-    expect(getByText('Info')).toHaveClass('info');
+    render(badgePrimary);
+    const badgeElement = screen.getByTestId('badge');
+    expect(badgeElement).toHaveClass('badge');
+    expect(badgeElement).toHaveClass('primary');
   });
 
   it('renders nothing when label prop is undefined', () => {
     const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-    const propsWithoutLabel = {
-      variant: 'primary',
-      tooltip: undefined,
-    };
-    render(<Badge {...propsWithoutLabel} />);
-    const { queryByTestId } = screen;
-    expect(queryByTestId('badge')).not.toBeInTheDocument();
+    render(<Badge variant="primary" />);
+    expect(screen.queryByTestId('badge')).not.toBeInTheDocument();
     consoleSpy.mockRestore();
   });
 
   it('applies only base class when variant is empty string', () => {
-    render(<Badge label="Empty Variant" variant="" />);
-    const { getByText } = within(screen.getByTestId('badge'));
-    expect(getByText('Empty Variant')).toHaveClass('badge');
-    expect(getByText('Empty Variant')).not.toHaveClass('primary', 'success', 'info', 'warning', 'danger');
+    render(badgeEmptyVariant);
+    const badgeElement = screen.getByTestId('badge');
+    expect(badgeElement).toHaveClass('badge');
+    expect(badgeElement).not.toHaveClass('primary', 'success', 'info', 'warning', 'danger');
   });
 });
