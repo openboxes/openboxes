@@ -150,6 +150,6 @@ DataTable.defaultProps = {
     enabled: false,
     customRowsHeight: false,
     estimatedSize: 50,
-    overscan: 5,
+    overscan: 10,
   },
 };
