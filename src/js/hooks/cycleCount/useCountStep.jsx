@@ -59,7 +59,7 @@ const useCountStep = () => {
   const requestIdsWithDiscrepancies = useRef([]);
   // Here we store cycle count IDs that were updated,
   // and we will mark them as updated before saving.
-  const itemsToUpdate = useRef([]);
+  const cycleCountsMarkedToUpdate = useRef([]);
 
   const dispatch = useDispatch();
   const history = useHistory();
@@ -178,14 +178,21 @@ const useCountStep = () => {
     });
   };
 
+  const markAllItemsAsUpdated = () => {
+    cycleCountsMarkedToUpdate.current.forEach((cycleCountId) => {
+      setAllItemsUpdatedState(cycleCountId, true);
+    });
+    cycleCountsMarkedToUpdate.current = [];
+  };
+
   const markAllItemsAsNotUpdated = (cycleCountId) => setAllItemsUpdatedState(cycleCountId, false);
 
   const assignCountedBy = (cycleCountId) => (person) => {
     // We need to mark all items as updated if we change the counted by person,
     // because counted by is associated with every cycle count item and needs to be set
     // for every item
-    if (!itemsToUpdate.current.includes(cycleCountId)) {
-      itemsToUpdate.current = [...itemsToUpdate.current, cycleCountId];
+    if (!cycleCountsMarkedToUpdate.current.includes(cycleCountId)) {
+      cycleCountsMarkedToUpdate.current = [...cycleCountsMarkedToUpdate.current, cycleCountId];
     }
     countedBy.current = { ...countedBy.current, [cycleCountId]: person };
     defaultCountedBy.current = { ...defaultCountedBy.current, [cycleCountId]: person };
@@ -324,9 +331,7 @@ const useCountStep = () => {
   const save = async (shouldSetDefaultAssignee = false) => {
     try {
       show();
-      // Before saving, we need to change the state updated to true for all items that were changed
-      itemsToUpdate.current.map((cycleCountId) => setAllItemsUpdatedState(cycleCountId, true));
-      itemsToUpdate.current = [];
+      markAllItemsAsUpdated();
       resetValidationState();
       const cycleCountItemsToUpdateBatch = [];
       const cycleCountItemsToCreateBatch = [];
@@ -590,8 +595,8 @@ const useCountStep = () => {
   };
 
   const updateDateCounted = (cycleCountId) => (date) => {
-    if (!itemsToUpdate.current.includes(cycleCountId)) {
-      itemsToUpdate.current = [...itemsToUpdate.current, cycleCountId];
+    if (!cycleCountsMarkedToUpdate.current.includes(cycleCountId)) {
+      cycleCountsMarkedToUpdate.current = [...cycleCountsMarkedToUpdate.current, cycleCountId];
     }
     dateCounted.current = {
       ...dateCounted.current,

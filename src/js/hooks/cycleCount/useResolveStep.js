@@ -55,7 +55,7 @@ const useResolveStep = () => {
   const [sortByProductName, setSortByProductName] = useState(false);
   // Here we store cycle count IDs that were updated,
   // and we will mark them as updated before saving.
-  const itemsToUpdate = useRef([]);
+  const cycleCountsMarkedToUpdate = useRef([]);
   const {
     validationErrors,
     isRootCauseWarningSkipped,
@@ -477,11 +477,18 @@ const useResolveStep = () => {
     });
   };
 
+  const markAllItemsAsUpdated = () => {
+    cycleCountsMarkedToUpdate.current.forEach((cycleCountId) => {
+      setAllItemsUpdatedState(cycleCountId, true);
+    });
+    cycleCountsMarkedToUpdate.current = [];
+  };
+
   const markAllItemsAsNotUpdated = (cycleCountId) => setAllItemsUpdatedState(cycleCountId, false);
 
   const assignRecountedBy = (cycleCountId) => (person) => {
-    if (!itemsToUpdate.current.includes(cycleCountId)) {
-      itemsToUpdate.current = [...itemsToUpdate.current, cycleCountId];
+    if (!cycleCountsMarkedToUpdate.current.includes(cycleCountId)) {
+      cycleCountsMarkedToUpdate.current = [...cycleCountsMarkedToUpdate.current, cycleCountId];
     }
     recountedBy.current = { ...recountedBy.current, [cycleCountId]: person };
     defaultRecountedBy.current = { ...defaultRecountedBy.current, [cycleCountId]: person };
@@ -490,8 +497,8 @@ const useResolveStep = () => {
   const getRecountedDate = (cycleCountId) => dateRecounted.current[cycleCountId] || moment.now();
 
   const updateRecountedDate = (cycleCountId) => (date) => {
-    if (!itemsToUpdate.current.includes(cycleCountId)) {
-      itemsToUpdate.current = [...itemsToUpdate.current, cycleCountId];
+    if (!cycleCountsMarkedToUpdate.current.includes(cycleCountId)) {
+      cycleCountsMarkedToUpdate.current = [...cycleCountsMarkedToUpdate.current, cycleCountId];
     }
     dateRecounted.current = {
       ...dateRecounted.current,
@@ -530,9 +537,7 @@ const useResolveStep = () => {
   }) => {
     try {
       show();
-      // Before saving, we need to change the state updated to true for all items that were changed
-      itemsToUpdate.current.map((cycleCountId) => setAllItemsUpdatedState(cycleCountId, true));
-      itemsToUpdate.current = [];
+      markAllItemsAsUpdated();
       if (shouldValidateExistence) {
         const isValid = await validateExistenceOfCycleCounts();
         if (!isValid) {
