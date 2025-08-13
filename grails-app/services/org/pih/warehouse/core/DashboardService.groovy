@@ -15,7 +15,6 @@ import org.hibernate.sql.JoinType
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.inventory.InventoryStatus
-import org.pih.warehouse.inventory.TransactionCode
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
@@ -28,6 +27,7 @@ import java.text.SimpleDateFormat
 @Transactional(readOnly=true)
 class DashboardService {
 
+    ConfigService configService
     def productAvailabilityService
 
     /**
@@ -333,17 +333,18 @@ class DashboardService {
         Map<Product, Object> inventoryItemsMap = getTotalStock(location).collectEntries { [it.product, it ] }
         Set<Product> products = inventoryItemsMap.keySet()
 
-        List<Object> latestInventoryDates = TransactionEntry.executeQuery("""
+        List<String> transactionTypes = configService.getProperty('openboxes.inventoryCount.transactionTypes', List) as List<String>
+
+        List<Object[]> latestInventoryDates = TransactionEntry.executeQuery("""
                 select ii.product.id, max(t.transactionDate)
                 from TransactionEntry as te
                 left join te.inventoryItem as ii
                 left join te.transaction as t
                 where t.inventory = :inventory
-                and t.transactionType.transactionCode in (:transactionCodes)
+                and t.transactionType.id in (:transactionTypeIds)
                 group by ii.product
                 """,
-                [inventory: location.inventory, transactionCodes: [TransactionCode.PRODUCT_INVENTORY, TransactionCode.INVENTORY]])
-
+                [inventory: location.inventory, transactionTypeIds: transactionTypes])
 
         // Convert to map
         Map<String, Timestamp> latestInventoryDateMap = latestInventoryDates.collectEntries { [it[0], it[1]] }
