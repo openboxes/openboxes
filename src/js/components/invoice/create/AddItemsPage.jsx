@@ -470,8 +470,10 @@ class AddItemsPage extends Component {
 
       return null;
     }
-
-    return this.saveInvoiceItems(values);
+    return this.saveInvoiceItems(values).then(() => {
+      // after saving invoice items, we need to reload the items list to see new total price
+      this.loadMoreRows({ startIndex: 0 });
+    });
   }
 
   saveAndExit(formValues) {
