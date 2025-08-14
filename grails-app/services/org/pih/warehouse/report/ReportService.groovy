@@ -1183,7 +1183,7 @@ class ReportService implements ApplicationContextAware {
             inList("product", results.collect { it[1] })
             between("dateRecorded", command.startDate, command.endDate)
         }
-        Map<String, Long> inventoryCountMap = inventoryCountList.collectEntries { [ (it[0]): it[1] ] }
+        Map<String, Long> inventoryCountMap = inventoryCountList.collectEntries { [ (it[1]): it[0] ] }
         log.info("Fetch time for inventory-count call: " + (System.currentTimeMillis() - inventoryCountTime) + " ms")
 
         // Transform the results to a summary object
