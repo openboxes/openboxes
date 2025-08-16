@@ -661,7 +661,7 @@ class ShipmentService {
         shipment.shipmentItems.each { shipmentItem ->
             // FIXME this seems a little expensive so we should rework validateShipmentItem to not throw an exception
             try {
-                validateShipmentItem(shipmentItem, true)
+                validateShipmentItem(shipmentItem)
             } catch (ValidationException e) {
                 log.warn("Validation error " + e.message)
                 if (!errors) {
@@ -700,25 +700,14 @@ class ShipmentService {
     }
 
     /**
-     *
-     * @param shipmentItem
-     * @return
-     */
-    boolean validateShipmentItem(ShipmentItem shipmentItem) {
-        boolean binLocationRequired = (shipmentItem.binLocation ?: false)
-        return validateShipmentItem(shipmentItem, binLocationRequired)
-    }
-
-    /**
      * Validate the shipment item when it's being added to the shipment.
      *
      * @param shipmentItem shipment item to validate
-     * @param binLocationRequired if shipment item has a bin location we validate quantity only against that bin
      * @return
      */
-    boolean validateShipmentItem(ShipmentItem shipmentItem, boolean binLocationRequired) {
+    boolean validateShipmentItem(ShipmentItem shipmentItem) {
         def origin = Location.get(shipmentItem?.shipment?.origin?.id)
-        log.info("Validating shipment item at ${origin?.name} for product=${shipmentItem.product}, lotNumber=${shipmentItem.inventoryItem}, binLocation=${shipmentItem.binLocation}, binLocationRequired=${binLocationRequired}")
+        log.info("Validating shipment item at ${origin?.name} for product=${shipmentItem.product}, lotNumber=${shipmentItem.inventoryItem}, binLocation=${shipmentItem.binLocation}")
 
         // Location must be locally managed and
         if (origin.requiresOutboundQuantityValidation()) {
@@ -727,7 +716,22 @@ class ShipmentService {
                 throw new ValidationException("Shipment item is invalid", shipmentItem.errors)
             }
 
-            def quantityAvailableToPromise = productAvailabilityService.getQuantityAvailableToPromise(origin, shipmentItem.binLocation, shipmentItem.inventoryItem)
+            Integer quantityAvailableToPromise = productAvailabilityService.getQuantityAvailableToPromise(
+                    origin, shipmentItem.binLocation, shipmentItem.inventoryItem)
+
+            // OBS-1866: QATP should always have a value, but in case it doesn't (possibly due to a failed product
+            //           availability refresh), we need to handle that case gracefully.
+            if (quantityAvailableToPromise == null) {
+                // QATP == QoH - quantity allocated via pending outbounds. We assume QoH == 0 when product availability
+                // does not exist for the item, so QATP will simply be a negation of the quantity picked (which will
+                // cause an invalid pick exception if we've picked more than a zero quantity).
+                quantityAvailableToPromise = -shipmentItem.quantityPicked
+            }
+
+            // Because creating/editing picklist items triggers updates to product availability, the pre-calculated
+            // QATP value will have already subtracted out the picked quantity of the current item. (Remember that
+            // QATP == QoH - quantity allocated via pending outbounds.) We need to factor that into our equation so
+            // as to not double count it when validating availability.
             def quantityAvailableWithPicked = quantityAvailableToPromise + shipmentItem.quantityPicked - shipmentItem.unavailableQuantityPicked
 
             def duplicatedShipmentItemsQuantity = getDuplicatedShipmentItemsQuantity(shipmentItem.shipment, shipmentItem.binLocation, shipmentItem.inventoryItem)

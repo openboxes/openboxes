@@ -1104,9 +1104,13 @@ class ProductAvailabilityService {
         }
     }
 
-    // Get quantity available to promise (with negative values)
-    def getQuantityAvailableToPromise(Location location, Location binLocation, InventoryItem inventoryItem) {
-         def quantityAvailableToPromise = ProductAvailability.createCriteria().get {
+    /**
+     * Fetches the quantity available to promise (QATP) for the given item in the given bin. QATP can become negative
+     * if quantity on hand (QoH) is lowered (via a record stock for example) to be less than the quantity allocated
+     * across all pending outbounds for the item + bin.
+     */
+    Integer getQuantityAvailableToPromise(Location location, Location binLocation, InventoryItem inventoryItem) {
+         return ProductAvailability.createCriteria().get {
             projections {
                 sum("quantityAvailableToPromise")
             }
@@ -1118,9 +1122,7 @@ class ProductAvailabilityService {
             } else {
                 isNull("binLocation")
             }
-        }
-
-        return quantityAvailableToPromise ?: 0
+        } as Integer
     }
 
     def getQuantityAvailableToPromiseByProductNotInBin(Location location, Location binLocation, Product product) {

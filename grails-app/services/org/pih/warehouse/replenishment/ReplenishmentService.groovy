@@ -202,7 +202,7 @@ class ReplenishmentService {
             replenishingLocation,
             picklistItem.binLocation,
             picklistItem.inventoryItem,
-        )
+        ) ?: 0
 
         Integer quantityAvailableWithPicked = quantityAvailable + quantityPicked >= 0 ? quantityAvailable + quantityPicked : 0
         log.info "Quantity: ${quantityPicked} vs ${quantityAvailableWithPicked}"
