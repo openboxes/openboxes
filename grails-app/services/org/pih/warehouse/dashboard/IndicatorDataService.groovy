@@ -1186,7 +1186,7 @@ class IndicatorDataService {
             (Constants.THREE)          : 0,
             (Constants.FOUR_OR_MORE)   : 0,
         ]
-        String transactionTypeIds = (configService.getProperty('openboxes.inventoryCount.transactionTypes', List) as List<String>).join(", ")
+        String transactionTypeIds = configService.getTransactionTypesString()
 
         String query = """
             SELECT 

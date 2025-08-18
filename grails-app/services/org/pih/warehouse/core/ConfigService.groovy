@@ -34,4 +34,9 @@ class ConfigService {
     String getProperty(String property) {
         return getProperty(property, String)
     }
+
+    String getTransactionTypesString() {
+        List<String> transactionTypes = getProperty('openboxes.inventoryCount.transactionTypes', List) as List<String>
+        return transactionTypes.join(", ")
+    }
 }
