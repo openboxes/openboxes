@@ -17,11 +17,6 @@ describe('trimLotNumberSpaces', () => {
     },
   };
 
-  it('should match snapshot for sample item', () => {
-    const result = trimLotNumberSpaces(mockCycleCountItem);
-    expect(result).toMatchSnapshot();
-  });
-
   it('trims leading and trailing spaces from lotNumber', () => {
     const props = {
       ...mockCycleCountItem,

@@ -31,8 +31,8 @@ describe('DoubleTile component', () => {
   };
 
   it('should match snapshot for sample props', () => {
-    const tree = renderer.create(<DoubleTile {...mockProps} />).toJSON();
-    expect(tree).toMatchSnapshot();
+    const doubleTile = renderer.create(<DoubleTile {...mockProps} />).toJSON();
+    expect(doubleTile).toMatchSnapshot();
   });
 
   it('renders title, first value, second value, and subtitles correctly', () => {

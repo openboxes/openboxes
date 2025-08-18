@@ -7,34 +7,25 @@ import Badge from 'utils/Badge';
 
 import '@testing-library/jest-dom';
 
-jest.mock('wrappers/CustomTooltip', () => ({ children }) => <>{children}</>);
+const mockCustomTooltip = jest.fn(({ children }) => <>{children}</>);
 
-let badgePrimary;
-let badgeWithTooltip;
-let badgeEmptyVariant;
+jest.mock('wrappers/CustomTooltip', () => (props) => mockCustomTooltip(props));
 
 describe('Badge component', () => {
-  beforeEach(() => {
-    badgePrimary = <Badge label="Primary Badge" variant="primary" />;
-    badgeWithTooltip = <Badge label="Tooltip Badge" variant="warning" tooltip />;
-    badgeEmptyVariant = <Badge label="Empty Variant" variant="" />;
-  });
-
   it('should match snapshot', () => {
-    const badge = renderer.create(badgeWithTooltip).toJSON();
+    const badge = renderer.create(<Badge label="Tooltip Badge" variant="warning" tooltip />).toJSON();
     expect(badge).toMatchSnapshot();
   });
 
   it('renders the label text', () => {
-    render(badgePrimary);
+    render(<Badge label="Primary Badge" variant="primary" />);
     expect(screen.getByText('Primary Badge')).toBeInTheDocument();
   });
 
   it('applies the correct variant class', () => {
-    render(badgePrimary);
+    render(<Badge label="Primary Badge" variant="primary" />);
     const badgeElement = screen.getByTestId('badge');
-    expect(badgeElement).toHaveClass('badge');
-    expect(badgeElement).toHaveClass('primary');
+    expect(badgeElement).toHaveClass('badge', 'primary');
   });
 
   it('renders nothing when label prop is undefined', () => {
@@ -45,9 +36,20 @@ describe('Badge component', () => {
   });
 
   it('applies only base class when variant is empty string', () => {
-    render(badgeEmptyVariant);
+    render(<Badge label="Empty Variant" variant="" />);
     const badgeElement = screen.getByTestId('badge');
     expect(badgeElement).toHaveClass('badge');
     expect(badgeElement).not.toHaveClass('primary', 'success', 'info', 'warning', 'danger');
+  });
+
+  it('passes correct props to CustomTooltip when tooltip is enabled', () => {
+    render(<Badge label="Tooltip Badge" variant="warning" tooltip />);
+    expect(mockCustomTooltip).toHaveBeenCalledWith(
+      expect.objectContaining({
+        content: 'Tooltip Badge',
+        show: true,
+        children: expect.any(Object),
+      }),
+    );
   });
 });
