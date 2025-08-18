@@ -1186,7 +1186,7 @@ class IndicatorDataService {
             (Constants.THREE)          : 0,
             (Constants.FOUR_OR_MORE)   : 0,
         ]
-        String transactionTypesIds = (configService.getProperty('openboxes.inventoryCount.transactionTypes', List) as List<String>).join(", ")
+        String transactionTypeIds = (configService.getProperty('openboxes.inventoryCount.transactionTypes', List) as List<String>).join(", ")
 
         String query = """
             SELECT 
@@ -1237,7 +1237,7 @@ class IndicatorDataService {
                     LEFT JOIN inventory_item ii ON te.inventory_item_id = ii.id 
                     LEFT JOIN `transaction` t ON t.id = te.transaction_id
                     WHERE t.inventory_id = :inventoryId
-                    AND t.transaction_type_id IN (${transactionTypesIds})
+                    AND t.transaction_type_id IN (${transactionTypeIds})
                     GROUP BY ii.product_id 
                 ) as stock_count ON stock_count.product_id = ii.product_id
             ) as dashboard_data
