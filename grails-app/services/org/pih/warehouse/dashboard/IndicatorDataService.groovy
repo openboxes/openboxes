@@ -12,6 +12,7 @@ import org.grails.web.json.JSONObject
 import org.joda.time.LocalDate
 import org.pih.warehouse.LocalizationUtil
 import org.pih.warehouse.api.StockMovementDirection
+import org.pih.warehouse.core.ConfigService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.InventorySnapshot
 import org.pih.warehouse.inventory.TransactionCode
@@ -35,6 +36,7 @@ class IndicatorDataService {
     def dataService
     GrailsApplication grailsApplication
     def messageService
+    ConfigService configService
 
     ApplicationTagLib getApplicationTagLib() {
         return Holders.grailsApplication.mainContext.getBean(ApplicationTagLib)
@@ -1184,8 +1186,9 @@ class IndicatorDataService {
             (Constants.THREE)          : 0,
             (Constants.FOUR_OR_MORE)   : 0,
         ]
+        String transactionTypesIds = (configService.getProperty('openboxes.inventoryCount.transactionTypes', List) as List<String>).join(", ")
 
-        String query = '''
+        String query = """
             SELECT 
                 product_code,
                 COUNT(DISTINCT backdated_shipment) as shipments_with_backdated_product,
@@ -1233,21 +1236,19 @@ class IndicatorDataService {
                     FROM transaction_entry te 
                     LEFT JOIN inventory_item ii ON te.inventory_item_id = ii.id 
                     LEFT JOIN `transaction` t ON t.id = te.transaction_id
-                    LEFT JOIN transaction_type tt ON tt.id = t.transaction_type_id 
                     WHERE t.inventory_id = :inventoryId
-                    AND tt.transaction_code = :transactionCode
+                    AND t.transaction_type_id IN (${transactionTypesIds})
                     GROUP BY ii.product_id 
                 ) as stock_count ON stock_count.product_id = ii.product_id
             ) as dashboard_data
             WHERE dashboard_data.date_created > dashboard_data.last_stock_count OR dashboard_data.last_stock_count IS NULL
             GROUP BY product_code, last_stock_count
             ORDER BY shipments_with_backdated_product DESC
-        '''
+        """
 
         List<GroovyRowResult> results = dataService.executeQuery(query, [
                 locationId: location?.id,
                 inventoryId: location?.inventory?.id,
-                transactionCode: TransactionCode.PRODUCT_INVENTORY.name(),
                 daysOffset: Holders.config.openboxes.dashboard.backdatedShipments.daysOffset,
                 timeLimit: timeLimit,
         ])
