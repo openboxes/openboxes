@@ -108,7 +108,7 @@ class InventoryTransactionSummaryService {
                 INSERT INTO product_inventory_summary (
                     transaction_id,
                     product_id,
-                    transaction_date,
+                    baseline_transaction_date,
                     facility_id,
                     product_code,
                     quantity_balance
