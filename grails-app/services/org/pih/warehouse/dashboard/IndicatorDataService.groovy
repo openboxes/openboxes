@@ -5,10 +5,10 @@ import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import grails.plugin.cache.Cacheable
 import grails.util.Holders
-import groovy.sql.GroovyRowResult
 import groovy.transform.TypeCheckingMode
 import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.grails.web.json.JSONObject
+import org.hibernate.SessionFactory
 import org.joda.time.LocalDate
 import org.pih.warehouse.LocalizationUtil
 import org.pih.warehouse.api.StockMovementDirection
@@ -37,6 +37,7 @@ class IndicatorDataService {
     GrailsApplication grailsApplication
     def messageService
     ConfigService configService
+    SessionFactory sessionFactory
 
     ApplicationTagLib getApplicationTagLib() {
         return Holders.grailsApplication.mainContext.getBean(ApplicationTagLib)
@@ -1186,7 +1187,7 @@ class IndicatorDataService {
             (Constants.THREE)          : 0,
             (Constants.FOUR_OR_MORE)   : 0,
         ]
-        String transactionTypeIds = configService.getTransactionTypesString()
+        List<String> transactionTypeIds = configService.getProperty('openboxes.inventoryCount.transactionTypes', List) as List<String>
 
         String query = """
             SELECT 
@@ -1237,7 +1238,7 @@ class IndicatorDataService {
                     LEFT JOIN inventory_item ii ON te.inventory_item_id = ii.id 
                     LEFT JOIN `transaction` t ON t.id = te.transaction_id
                     WHERE t.inventory_id = :inventoryId
-                    AND t.transaction_type_id IN (${transactionTypeIds})
+                    AND t.transaction_type_id IN (:transactionTypeIds)
                     GROUP BY ii.product_id 
                 ) as stock_count ON stock_count.product_id = ii.product_id
             ) as dashboard_data
@@ -1246,12 +1247,13 @@ class IndicatorDataService {
             ORDER BY shipments_with_backdated_product DESC
         """
 
-        List<GroovyRowResult> results = dataService.executeQuery(query, [
-                locationId: location?.id,
-                inventoryId: location?.inventory?.id,
-                daysOffset: Holders.config.openboxes.dashboard.backdatedShipments.daysOffset,
-                timeLimit: timeLimit,
-        ])
+        List<Object[]> results = sessionFactory.getCurrentSession().createNativeQuery(query)
+                .setParameter("locationId", location?.id)
+                .setParameter("inventoryId", location?.inventory?.id)
+                .setParameter("daysOffset", Holders.config.openboxes.dashboard.backdatedShipments.daysOffset)
+                .setParameter("timeLimit", timeLimit)
+                .setParameter("transactionTypeIds", transactionTypeIds)
+                .list()
 
         List<TableData> tableData = results.collect {
             List<String> shipmentNumbers = it[2].split(' ')
