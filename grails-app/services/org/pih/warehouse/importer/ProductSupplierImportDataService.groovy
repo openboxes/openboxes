@@ -64,8 +64,16 @@ class ProductSupplierImportDataService implements ImportDataService {
                 command.errors.reject("Row ${index + 1}: Supplier with name '${params.supplierName}' does not exist")
             }
 
-            if (params.manufacturerName && !Organization.findByName(params.manufacturerName)?.hasRoleType(RoleType.ROLE_MANUFACTURER)) {
-                command.errors.reject("Row ${index + 1}: Manufacturer with name '${params.manufacturerName}' does not exist")
+            if (params.manufacturerName) {
+                Organization manufacturer = Organization.findByName(params.manufacturerName)
+
+                if (!manufacturer) {
+                    command.errors.reject("Row ${index + 1}: Manufacturer with name '${params.manufacturerName}' does not exist")
+                }
+
+                if (manufacturer && !manufacturer.hasRoleType(RoleType.ROLE_MANUFACTURER)) {
+                    command.errors.reject("Row ${index + 1}: Organization '${params.manufacturerName}' is not a manufacturer")
+                }
             }
 
             try {
