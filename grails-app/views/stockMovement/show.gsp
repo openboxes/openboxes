@@ -119,6 +119,14 @@
                     <img src="${resource(dir: 'images/icons/', file: 'handtruck.png')}" />&nbsp;
                     <warehouse:message code="default.button.receive.label" />
                 </g:link>
+
+                <g:if test="${grailsApplication.config.openboxes.receiving.showAutoReceiveButton}">
+                    <g:link controller="partialReceiving" action="autoreceive" id="${stockMovement?.shipment?.id}" class="button">
+                        <img src="${resource(dir: 'images/icons/', file: 'handtruck.png')}" />&nbsp;
+                        <warehouse:message code="default.button.autoreceive.label" />
+                    </g:link>
+                </g:if>
+
                 <g:isUserAdmin>
                     <g:if test="${stockMovement?.hasBeenReceived() || stockMovement?.hasBeenPartiallyReceived()}">
                         <g:link controller="partialReceiving" action="rollbackLastReceipt" id="${stockMovement?.shipment?.id}" class="button">
