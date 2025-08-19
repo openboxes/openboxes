@@ -164,6 +164,25 @@
   <changeSet id="1748970410098-5" author="kchelstowski" runOnChange="true" runAlways="true" failOnError="true">
     <sqlFile path="views/inventory-transaction-summary-helper-views.sql"/>
   </changeSet>
+  <changeSet id="1748970410098-5b" author="kchelstowski" runOnChange="true" runAlways="true" failOnError="true">
+    <preConditions onFail="MARK_RAN">
+      <and>
+        <not>
+          <indexExists indexName="idx_product_code_inventory" schemaName="inventory_movement_summary" />
+        </not>
+        <not>
+          <indexExists indexName="idx_product_code_facility" schemaName="product_inventory_summary" />
+        </not>
+        <not>
+          <indexExists indexName="idx_product_id_facility" schemaName="product_inventory_summary" />
+        </not>
+        <not>
+          <indexExists indexName="idx_product_inventory_summary_lookup" schemaName="product_inventory_summary" />
+        </not>
+      </and>
+    </preConditions>
+    <sqlFile path="views/inventory-transaction-summary-helper-views-indexes.sql"/>
+  </changeSet>
   <changeSet id="1748970410098-6" author="kchelstowski" runOnChange="true" runAlways="true" failOnError="true">
     <sqlFile path="views/inventory-transactions-summary.sql"/>
   </changeSet>

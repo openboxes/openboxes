@@ -15,7 +15,12 @@ class RefreshInventoryTransactionsSummaryEventService implements ApplicationList
             inventoryTransactionSummaryService.refreshProductInventorySummaryView(event)
             return
         }
-        inventoryTransactionSummaryService.refreshInventoryMovementSummaryView(event)
+        if (event.transactionTypeId in [Constants.ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID,
+                                        Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID,
+                                        Constants.TRANSFER_IN_TRANSACTION_TYPE_ID]) {
+            inventoryTransactionSummaryService.refreshInventoryMovementSummaryView(event)
+        }
+
     }
 
 }
