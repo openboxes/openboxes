@@ -4,7 +4,6 @@ import grails.gorm.transactions.Transactional
 import groovy.sql.Sql
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.product.Product
 import org.pih.warehouse.report.CycleCountReportCommand
 
 import javax.sql.DataSource
@@ -45,8 +44,7 @@ class InventoryTransactionSummaryService {
             sql.executeUpdate(params, query)
             return
         }
-        event.products.each { key, entries ->
-            Product product = Product.read(key)
+        event.entriesByProduct.each { product, entries ->
             Timestamp transactionDate = new Timestamp(event.transactionDate.time)
 
             Map<String, Object> params = [
@@ -94,8 +92,7 @@ class InventoryTransactionSummaryService {
             return
         }
         Location facility = Location.findByInventory(Inventory.read(event.inventoryId))
-        event.products.each { key, entries ->
-            Product product = Product.read(key)
+        event.entriesByProduct.each { product, entries ->
             Timestamp transactionDate = new Timestamp(event.transactionDate.time)
 
             Map<String, Object> params = [

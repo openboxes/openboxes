@@ -12,7 +12,7 @@ SELECT
 FROM (
          SELECT id, transaction_date, inventory_id, transaction_type_id
          FROM transaction
-         WHERE transaction_type_id IN ('3','8','9')
+         WHERE transaction_type_id IN ('3','8','9') -- adjustments, transfer ins, transfer outs
            AND transaction.order_id IS NULL
      ) t
          JOIN transaction_entry te ON te.transaction_id = t.id
