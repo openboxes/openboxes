@@ -1189,7 +1189,7 @@ class IndicatorDataService {
         ]
         List<String> transactionTypeIds = configService.getProperty('openboxes.inventoryCount.transactionTypes', List) as List<String>
 
-        String query = """
+        String query = '''
             SELECT 
                 product_code,
                 COUNT(DISTINCT backdated_shipment) as shipments_with_backdated_product,
@@ -1245,7 +1245,7 @@ class IndicatorDataService {
             WHERE dashboard_data.date_created > dashboard_data.last_stock_count OR dashboard_data.last_stock_count IS NULL
             GROUP BY product_code, last_stock_count
             ORDER BY shipments_with_backdated_product DESC
-        """
+        '''
 
         List<Object[]> results = sessionFactory.getCurrentSession().createNativeQuery(query)
                 .setParameter("locationId", location?.id)
