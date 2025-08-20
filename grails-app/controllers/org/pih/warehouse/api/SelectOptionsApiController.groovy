@@ -118,13 +118,11 @@ class SelectOptionsApiController {
             ])
         }
 
-        List<Map<String, String>> preferenceTypes = genericApiService.getList(PreferenceType.class.simpleName, [:]).collect {
-            [
-                id: it.id,
-                value: it.id,
-                label: it.name
-            ]
-        }
+        List<Map<String, String>> preferenceTypes = genericApiService.getList(PreferenceType.class.simpleName, [:])
+                .findAll { it?.name }
+                .collect {
+                    [id: it.id, label: it.name, value: it.id ]
+                }
 
         preferenceTypeOptions.addAll(preferenceTypes)
 
