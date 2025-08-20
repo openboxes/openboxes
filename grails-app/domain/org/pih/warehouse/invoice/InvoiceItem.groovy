@@ -81,10 +81,15 @@ class InvoiceItem implements Serializable {
         glAccount(nullable: true)
         budgetCode(nullable: true)
         quantity(nullable: false, min: 0, validator: { Integer quantity, InvoiceItem obj ->
+            // Order adjustments are not quantity-based, they should always have quantity = 1
+            if(obj.orderAdjustment && quantity > 1) {
+                return ['invoiceItem.invalidQuantity.label']
+            }
+
             // If the invoice is a prepayment or the item is an order adjustment,
             // the validation below doesn't make sense, because
             // we do not have shipmentItem at this point.
-            if (obj.invoice?.isPrepaymentInvoice || obj.orderAdjustment || obj.inverse) {
+            if (obj.invoice?.isPrepaymentInvoice || obj.inverse) {
                 return true
             }
 
