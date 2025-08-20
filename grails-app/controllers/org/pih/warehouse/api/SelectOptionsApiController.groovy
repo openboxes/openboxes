@@ -47,26 +47,31 @@ class SelectOptionsApiController {
     def catalogOptions() {
         boolean hideNumbers = params.boolean("hideNumbers", false)
 
-        def catalogs = genericApiService.getList(ProductCatalog.class.simpleName, [sort: "name"]).collect {
-            String label = hideNumbers ? it.name : "${it.name} (${it?.productCatalogItems?.size()})"
-            [id: it.id, label: label]
-        }
+        def catalogs = genericApiService.getList(ProductCatalog.class.simpleName, [sort: "name"])
+                .findAll { it?.name }
+                .collect {
+                    [id: it.id, label: hideNumbers ? it.name : "${it.name} (${it?.productCatalogItems?.size()})"]
+                }
         render([data: catalogs] as JSON)
     }
 
     def categoryOptions() {
-        List<Category> categories = genericApiService.getList(Category.class.simpleName, [:]).collect {
-            [id: it.id, label: it.getHierarchyAsString(" > ")]
-        }
+        List<Category> categories = genericApiService.getList(Category.class.simpleName, [:])
+                .findAll { it.getHierarchyAsString(" > ") }
+                .collect {
+                    [id: it.id, label: it.getHierarchyAsString(" > ")]
+                }
         render([data: categories] as JSON)
     }
 
     def tagOptions() {
         boolean hideNumbers = params.boolean("hideNumbers", false)
 
-        def tags = genericApiService.getList(Tag.class.simpleName, [sort: "tag"]).collect {
-            [id: it.id, label: hideNumbers ? it.tag : "${it.tag} (${it?.products?.size()})"]
-        }
+        def tags = genericApiService.getList(Tag.class.simpleName, [sort: "tag"])
+                .findAll { it?.tag }
+                .collect {
+                    [id: it.id, label: hideNumbers ? it.tag : "${it.tag} (${it?.products?.size()})"]
+                }
         render([data: tags] as JSON)
     }
 
