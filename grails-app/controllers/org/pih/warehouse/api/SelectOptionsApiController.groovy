@@ -31,16 +31,20 @@ class SelectOptionsApiController {
     UserService userService
 
     def glAccountOptions() {
-        List<GlAccount> glAccounts = glAccountService.getGlAccounts(params).collect {
-            [id: it.id, label: "${it.code} - ${it.name}"]
-        }
+        List<GlAccount> glAccounts = glAccountService.getGlAccounts(params)
+                .findAll { it?.code && it?.name }
+                .collect {
+                    [id: it.id, label: "${it.code} - ${it.name}"]
+                }
         render([data: glAccounts] as JSON)
     }
 
     def productGroupOptions() {
-        List<ProductGroup> productGroups = genericApiService.getList(ProductGroup.class.simpleName, [:]).collect {
-            [id: it.id, label: "${it.name}"]
-        }
+        List<ProductGroup> productGroups = genericApiService.getList(ProductGroup.class.simpleName, [:])
+                .findAll { it?.name }
+                .collect {
+                    [id: it.id, label: "${it.name}"]
+                }
         render([data: productGroups] as JSON)
     }
 
@@ -76,9 +80,11 @@ class SelectOptionsApiController {
     }
 
     def paymentTermOptions() {
-        List<PaymentTerm> paymentTerms = genericApiService.getList(PaymentTerm.class.simpleName, [sort: "name"]).collect {
-            [id: it.id, label: it.name, value: it.id ]
-        }
+        List<PaymentTerm> paymentTerms = genericApiService.getList(PaymentTerm.class.simpleName, [sort: "name"])
+                .findAll { it?.name }
+                .collect {
+                    [id: it.id, label: it.name, value: it.id ]
+                }
         render([data: paymentTerms] as JSON)
     }
 
