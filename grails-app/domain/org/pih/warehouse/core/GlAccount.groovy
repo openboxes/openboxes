@@ -43,7 +43,7 @@ class GlAccount implements Serializable {
 
     static constraints = {
         code(nullable: false, blank: false, unique: true)
-        name(nullable: true, blank: false)
+        name(nullable: true)
         description(nullable: true)
         glAccountType(nullable: false)
         updatedBy(nullable: true)

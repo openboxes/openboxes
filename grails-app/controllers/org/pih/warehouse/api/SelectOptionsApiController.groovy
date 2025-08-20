@@ -32,7 +32,7 @@ class SelectOptionsApiController {
 
     def glAccountOptions() {
         List<GlAccount> glAccounts = glAccountService.getGlAccounts(params)
-                .findAll { it?.code && it?.name }
+                .findAll { it?.code }
                 .collect {
                     [id: it.id, label: "${it.code} - ${it.name}"]
                 }
@@ -61,7 +61,7 @@ class SelectOptionsApiController {
 
     def categoryOptions() {
         List<Category> categories = genericApiService.getList(Category.class.simpleName, [:])
-                .findAll { it.getHierarchyAsString(" > ") }
+                .findAll { it.name }
                 .collect {
                     [id: it.id, label: it.getHierarchyAsString(" > ")]
                 }
