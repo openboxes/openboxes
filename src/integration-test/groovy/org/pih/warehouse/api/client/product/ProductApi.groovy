@@ -18,6 +18,14 @@ class ProductApi extends AuthenticatedApi {
         return request(null, responseSpec, Method.GET, "/products")
     }
 
+    Response save(String body, ResponseSpecification responseSpec) {
+        RequestSpecification requestSpec = new RequestSpecBuilder()
+                .setBody(body)
+                .build()
+
+        return request(requestSpec, responseSpec, Method.POST, "/products/save")
+    }
+
     Response getDemand(String productId, ResponseSpecification responseSpec) {
         RequestSpecification requestSpec = new RequestSpecBuilder()
                 .addPathParam("productId", productId)
@@ -40,5 +48,13 @@ class ProductApi extends AuthenticatedApi {
                 .build()
 
         return request(requestSpec, responseSpec, Method.GET, "/products/{productId}/productSummary")
+    }
+
+    Response getProductAvailability(String productId, ResponseSpecification responseSpec) {
+        RequestSpecification requestSpec = new RequestSpecBuilder()
+                .addPathParam("productId", productId)
+                .build()
+
+        return request(requestSpec, responseSpec, Method.GET, "/products/{productId}/productAvailability")
     }
 }
