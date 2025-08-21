@@ -15,6 +15,7 @@ import spock.lang.Shared
 
 import org.pih.warehouse.api.client.base.AuthenticatedApiContext
 import org.pih.warehouse.api.client.base.UnauthenticatedApiContext
+import org.pih.warehouse.api.client.inventory.RecordStockApiWrapper
 import org.pih.warehouse.api.client.product.CategoryApiWrapper
 import org.pih.warehouse.api.client.product.ProductApiWrapper
 import org.pih.warehouse.api.util.JsonObjectUtil
@@ -23,7 +24,7 @@ import org.pih.warehouse.common.domain.builder.core.LocationTestBuilder
 import org.pih.warehouse.common.domain.builder.inventory.RecordInventoryCommandTestBuilder
 import org.pih.warehouse.common.domain.builder.product.CategoryTestBuilder
 import org.pih.warehouse.common.domain.builder.product.ProductTestBuilder
-import org.pih.warehouse.common.service.RecordStockTestService
+import org.pih.warehouse.common.service.TransactionTestService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.api.client.auth.AuthApiWrapper
 import org.pih.warehouse.api.util.JsonPathUtil
@@ -85,7 +86,10 @@ abstract class ApiSpec extends IntegrationSpec {
     Category rootCategory
 
     @Autowired
-    RecordStockTestService recordStockTestService
+    TransactionTestService transactionTestService
+
+    @Autowired
+    RecordStockApiWrapper recordStockApiWrapper
 
     @Autowired
     ProductApiWrapper productApiWrapper
@@ -161,7 +165,7 @@ abstract class ApiSpec extends IntegrationSpec {
         product = createMainProduct()
 
         // In case the product already existed, wipe out any transactions on it so that we start from a fresh product.
-        recordStockTestService.deleteAllTransactions(facility, product)
+        transactionTestService.deleteAllTransactions(facility, product)
 
         setupData()
     }
@@ -248,7 +252,7 @@ abstract class ApiSpec extends IntegrationSpec {
      * RecordInventoryCommandTestBuilder will likely be useful for constructing the command object.
      */
     void setStock(RecordInventoryCommand command) {
-        recordStockTestService.recordStock(facility, command)
+        recordStockApiWrapper.saveRecordStockOK(facility, command)
     }
 
     /**
@@ -271,7 +275,7 @@ abstract class ApiSpec extends IntegrationSpec {
         // that were created this second (which is very likely to happen during tests since they run really fast).
         // If we don't do this, duplicate transaction exceptions will be thrown or we'll end up with unexpected
         // QoH due to multiple baselines or adjustments existing at the same exact time.
-        recordStockTestService.deleteTransactionsOnOrAfterDate(facility, product, command.transactionDate)
+        transactionTestService.deleteTransactionsOnOrAfterDate(facility, product, command.transactionDate)
 
         setStock(command)
     }

@@ -1,40 +1,15 @@
 package org.pih.warehouse.common.service
 
 import grails.gorm.transactions.Transactional
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.TestComponent
 
-import org.pih.warehouse.api.client.inventory.RecordStockApiWrapper
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.inventory.InventoryService
-import org.pih.warehouse.inventory.ProductAvailabilityService
-import org.pih.warehouse.inventory.RecordInventoryCommand
 import org.pih.warehouse.inventory.TransactionEntry
-import org.pih.warehouse.inventory.TransactionIdentifierService
 import org.pih.warehouse.product.Product
 
 @Transactional
 @TestComponent
-class RecordStockTestService implements BaseTestService {
-
-    @Autowired
-    TransactionIdentifierService transactionIdentifierService
-
-    @Autowired
-    InventoryService inventoryService
-
-    @Autowired
-    ProductAvailabilityService productAvailabilityService
-
-    @Autowired
-    RecordStockApiWrapper recordStockApiWrapper
-
-    /**
-     * Performs a Record Stock operation, setting the quantity of a given item.
-     */
-    void recordStock(Location facility, RecordInventoryCommand command) {
-        recordStockApiWrapper.saveRecordStockOK(facility, command)
-    }
+class TransactionTestService implements BaseTestService {
 
     /**
      * Deletes all transactions and their entries for the given product and facility that occur on the given
