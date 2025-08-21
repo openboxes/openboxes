@@ -82,7 +82,7 @@ class InvoiceItem implements Serializable {
         budgetCode(nullable: true)
         quantity(nullable: false, min: 0, validator: { Integer quantity, InvoiceItem obj ->
             // Order adjustments are not quantity-based, they should always have quantity = 1
-            if(obj.orderAdjustment && quantity > 1) {
+            if (obj.orderAdjustment && quantity > 1) {
                 return ['invoiceItem.invalidQuantity.label']
             }
 
