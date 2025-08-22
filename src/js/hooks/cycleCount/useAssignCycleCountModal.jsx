@@ -191,6 +191,7 @@ const useAssignCycleCountModal = ({
             loadOptions={debouncedPeopleFetch}
             hideErrorMessageWrapper
             className="pb-1"
+            backspaceRemovesValue={false}
             onChange={(selectedOption) => {
               handleUpdateAssignees(
                 selectedCycleCounts.current.map((item) => item.cycleCountRequestId),
@@ -210,6 +211,7 @@ const useAssignCycleCountModal = ({
             async
             loadOptions={debouncedPeopleFetch}
             defaultValue={getValue()}
+            backspaceRemovesValue={false}
             onChange={(selectedOption) => {
               handleUpdateAssignees(
                 [row.original.cycleCountRequestId],
