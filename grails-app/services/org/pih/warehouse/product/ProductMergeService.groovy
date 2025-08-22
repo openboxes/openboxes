@@ -15,7 +15,9 @@ import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.Inventory
+import org.pih.warehouse.inventory.InventoryCountService
 import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.inventory.InventoryTransactionSummaryService
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.inventory.TransactionType
@@ -32,6 +34,8 @@ class ProductMergeService {
     def invoiceService
     def productAvailabilityService
     def requisitionService
+    InventoryCountService inventoryCountService
+    InventoryTransactionSummaryService inventoryTransactionSummaryService
 
     /**
      * Preforms product swapping for a product pairs passed as params
@@ -320,6 +324,31 @@ class ProductMergeService {
             // (this was an issue on grails 1.3.9, might not be a case anymore)
             obsoleteTransactionEntry.save(flush: true)
         }
+
+        // 3.1. Refresh inventory count and inventory transaction summary views (reporting section)
+        // Collect unique transactions for obsolete product
+        Set<Transaction> obsoleteTransactions = obsoleteTransactionEntries.transaction
+        // Group transactions by transaction type, and loop through every transaction type and its associated transactions
+        Map<TransactionType, List<Transaction>> obsoleteTransactionsByTransactionType = obsoleteTransactions.groupBy { it.transactionType }
+        obsoleteTransactionsByTransactionType.each { TransactionType transactionType, List<Transaction> transactions ->
+            // For adjustment transactions we have to refresh adjustment_candidate and inventory_movement_summary views
+            if (transactionType.id == Constants.ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID) {
+                inventoryCountService.refreshAdjustmentCandidatesViewAfterProductMerge(transactions.id.toSet(), obsolete.id, primary.id)
+                inventoryTransactionSummaryService.refreshInventoryMovementSummaryViewAfterProductMerge(transactions.id.toSet(), obsolete, primary)
+                return
+            }
+            // For baseline transactions we have to refresh product_inventory_summary views
+            if (transactionType.id == Constants.INVENTORY_BASELINE_TRANSACTION_TYPE_ID) {
+                inventoryTransactionSummaryService.refreshProductInventorySummaryViewAfterProductMerge(transactions.id.toSet(), obsolete, primary)
+                inventoryCountService.refreshInventoryBaselineCandidatesViewAfterProductMerge(transactions.id.toSet(), obsolete.id, primary.id)
+                return
+            }
+            // For transfer in/out transactions we have to refresh inventory_movement_summary view
+            if (transactionType.id in [Constants.TRANSFER_IN_TRANSACTION_TYPE_ID, Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID]) {
+                inventoryTransactionSummaryService.refreshInventoryMovementSummaryViewAfterProductMerge(transactions.id.toSet(), obsolete, primary)
+            }
+        }
+
 
         // 4. Find all items with obsolete product and swap products and inventory items
 
