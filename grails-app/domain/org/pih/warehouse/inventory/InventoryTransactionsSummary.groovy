@@ -51,9 +51,12 @@ class InventoryTransactionsSummary implements Serializable {
     }
 
     List<String> getComments() {
-        return transaction.transactionEntries
+        List<String> entriesComments = transaction.transactionEntries
                 .findAll { it.product?.id == product?.id && it.comments }
                 .collect { it.comments }
+        String transactionComment = transaction.comment
+        // Concat "global" transaction comment with entries comments and filter out empty comments
+        return [transactionComment, entriesComments].findAll { it }
     }
 
     VarianceTypeCode getVarianceTypeCode() {

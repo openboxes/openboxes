@@ -1174,7 +1174,7 @@ class ReportService implements ApplicationContextAware {
         }
 
         long inventoryCountTime = System.currentTimeMillis()
-        List<Object[]> inventoryCountList = InventoryCount.createCriteria().list {
+        List<Object[]> inventoryCountList = results ? InventoryCount.createCriteria().list {
             projections {
                 rowCount()
                 groupProperty("product")
@@ -1182,7 +1182,7 @@ class ReportService implements ApplicationContextAware {
             eq("facility", org.pih.warehouse.auth.AuthService.currentLocation)
             inList("product", results.collect { it[1] })
             between("dateRecorded", command.startDate, command.endDate)
-        }
+        } : []
         Map<String, Long> inventoryCountMap = inventoryCountList.collectEntries { [ (it[1]): it[0] ] }
         log.info("Fetch time for inventory-count call: " + (System.currentTimeMillis() - inventoryCountTime) + " ms")
 
