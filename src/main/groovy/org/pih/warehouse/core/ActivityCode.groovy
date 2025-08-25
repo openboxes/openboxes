@@ -135,7 +135,6 @@ enum ActivityCode {
                 EXTERNAL,
                 ENABLE_NOTIFICATIONS,
                 DYNAMIC_RECEIVING,
-                PARTIAL_RECEIVING,
                 AUTO_RECEIVING,
                 DYNAMIC_SLOTTING,
                 STATIC_SLOTTING,

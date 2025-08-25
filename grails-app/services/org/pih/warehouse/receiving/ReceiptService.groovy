@@ -496,7 +496,7 @@ class ReceiptService {
         PartialReceipt partialReceipt = getPartialReceipt(shipment.id, "1")
         partialReceipt.dateShipped = shipment.expectedShippingDate
 
-        def receivingBin = createTemporaryReceivingBin(shipment)
+        def receivingBin = findReceiveLocation(shipment)
         shipment.shipmentItems.each { ShipmentItem item ->
             PartialReceiptContainer partialReceiptContainer =
                     partialReceipt.findDefaultPartialReceiptContainer()
@@ -527,5 +527,15 @@ class ReceiptService {
         }
 
         saveAndCompletePartialReceipt(partialReceipt)
+    }
+
+    Location findReceiveLocation(Shipment shipment) {
+        def inboundSortationLocation = Location.findByName(Constants.INBOUND_SORTATION_LOCATION_NAME)
+        if (!inboundSortationLocation) {
+            log.warn("Location with name $Constants.INBOUND_SORTATION_LOCATION_NAME not found. Temporary receiving bin will be created.")
+            return createTemporaryReceivingBin(shipment)
+        }
+
+        return inboundSortationLocation
     }
 }
