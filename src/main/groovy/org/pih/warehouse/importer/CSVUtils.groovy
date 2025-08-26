@@ -11,6 +11,7 @@ package org.pih.warehouse.importer
 
 import grails.plugins.csv.CSVMapReader
 import org.apache.commons.csv.CSVFormat
+import org.apache.commons.csv.CSVParser
 import org.apache.commons.csv.CSVPrinter
 import org.apache.commons.lang.StringUtils
 import org.mozilla.universalchardet.UniversalDetector
@@ -199,5 +200,14 @@ class CSVUtils {
         detector.handleData(fileBytes, 0, fileBytes.length - 1);
         detector.dataEnd();
         return detector.getDetectedCharset() ?: 'MacRoman';
+    }
+
+    static List<String> getColumnData(String csvString, String columnName) {
+        CSVParser parser = CSVParser.parse(csvString, CSVFormat.DEFAULT.withFirstRecordAsHeader())
+        List<Map> rows = parser.collect { record ->
+            record.toMap()
+        }
+
+        return rows[columnName]
     }
 }
