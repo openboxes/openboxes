@@ -1404,11 +1404,18 @@ class InventoryService implements ApplicationContextAware {
 
         try {
             // 1. Calculate the current available items for the given product
+            Date inventoryBaselineDate = new Date(cmd.transactionDate.time + 2000)
             Map<String, AvailableItem> availableItems = productAvailabilityService.getAvailableItemsAtDateAsMap(
                     currentLocation,
                     [cmd.product],
-                    new Date(cmd.transactionDate.time + 2000)
+                    inventoryBaselineDate
             )
+
+            Date currentDate = new Date()
+            currentDate.setSeconds(0)
+            Map<String, AvailableItem> currentAvailableItems = currentDate == inventoryBaselineDate
+                    ? availableItems
+                    : productAvailabilityService.getAvailableItemsAtDateAsMap(currentLocation, [cmd.product], currentDate)
 
             // We'd have weird behaviour if we allowed two transactions to exist at the same exact time (precision at the
             // database level is to the second) so fail if there's already a transaction on the items for the given date.
@@ -1462,15 +1469,16 @@ class InventoryService implements ApplicationContextAware {
                     }
                 }
 
-                // c) Create a new transaction entry (but only if the quantity changed)
-                TransactionEntry transactionEntry = recordStockProductInventoryTransactionService.createAdjustmentTransactionEntry(
+                // c) Create new transaction entries (but only if the quantity changed)
+                List<TransactionEntry> transactionEntries = recordStockProductInventoryTransactionService.createAdjustmentTransactionEntries(
                         row,
                         inventoryItem,
-                        availableItems
+                        availableItems,
+                        currentAvailableItems
                 )
 
-                if (transactionEntry) {
-                    adjustmentTransaction.addToTransactionEntries(transactionEntry)
+                if (transactionEntries.size() > 0) {
+                    transactionEntries.each(adjustmentTransaction.&addToTransactionEntries)
                 }
             }
 
