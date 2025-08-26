@@ -92,7 +92,7 @@ class InventoryLevel {
     static constraints = {
         status(nullable: true)
         inventory(nullable: false)
-        product(nullable: false)
+        product(nullable: true)
         internalLocation(nullable: true, unique: ["inventory", "product"])
         minQuantity(nullable: true, range: 0..2147483646)
         reorderQuantity(nullable: true, range: 0..2147483646)
