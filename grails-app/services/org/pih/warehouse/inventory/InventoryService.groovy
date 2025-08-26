@@ -3377,4 +3377,29 @@ class InventoryService implements ApplicationContextAware {
         inventoryItem.disableRefresh = Boolean.TRUE
         inventoryItem.save(flush: true)
     }
+
+    /**
+     * Returns a list of the most recent transaction type ids for each product in the provided list as a
+     * list of 3 element list [[Product, transaction date, transaction type id]]
+     * */
+    List getMostRecentTransactionTypeForProductsInInventory(Inventory inventory, List<Product> products) {
+        List results = Transaction.executeQuery('''
+            SELECT 
+                ii.product, MAX(t.transactionDate), t.transactionType.id
+            FROM Transaction t
+            LEFT JOIN t.transactionEntries te
+            JOIN te.inventoryItem ii
+            WHERE t.inventory.id = :inventoryId
+             AND ii.product.id in :productIds
+            GROUP BY ii.product.id, t.transactionType
+        ''', [inventoryId: inventory.id, productIds: products.id])
+
+        // Results are returning most recent transactions for product with a transaction type (can be multiple
+        // different types), need to find the most recent transaction with this grouping
+        return results?.groupBy { it[0] }?.collect { product, entries ->
+            entries.max { a, b ->
+                a[1].toString() <=> b[1].toString()
+            }
+        }
+    }
 }
