@@ -21,7 +21,6 @@ import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Event
 import org.pih.warehouse.core.EventCode
-import org.pih.warehouse.core.IdentifierService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationService
 import org.pih.warehouse.core.LocationType
@@ -523,6 +522,7 @@ class ReceiptService {
             partialReceiptItem.lotNumber = item.lotNumber
             partialReceiptItem.expirationDate = item.expirationDate
             partialReceiptItem.quantityShipped = item.quantity
+            partialReceiptItem.recipient = item.recipient
 
             partialReceiptContainer.partialReceiptItems.add(partialReceiptItem)
         }

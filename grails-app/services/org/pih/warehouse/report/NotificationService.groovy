@@ -166,12 +166,12 @@ class NotificationService {
     def sendReceiptNotifications(PartialReceipt partialReceipt) {
         Shipment shipment = partialReceipt?.shipment
         def emailValidator = EmailValidator.getInstance()
-        def g = grailsApplication.mainContext.getBean('org.grails.plugins.web.taglib.ApplicationTagLib')
         def recipientItems = partialReceipt.partialReceiptItems.groupBy {it.recipient }
         recipientItems.each { Person recipient, items ->
             if (emailValidator.isValid(recipient?.email)) {
-                def subject = g.message(code: "email.yourItemReceived.message", args: [shipment.destination.name, shipment.shipmentNumber])
-                def body = "${g.render(template: "/email/shipmentItemReceived", model: [shipmentInstance: shipment, receiptItems: items, recipient: recipient, receivedBy: partialReceipt.recipient])}"
+                def locale = new Locale(grailsApplication.config.openboxes.locale.defaultLocale)
+                def subject = messageSource.getMessage('email.yourItemReceived.message', [shipment.destination.name, shipment.shipmentNumber].toArray(), locale)
+                def body = renderTemplate("/email/shipmentItemReceived", [shipmentInstance: shipment, receiptItems: items, recipient: recipient, receivedBy: partialReceipt.recipient])
                 mailService.sendHtmlMail(subject, body.toString(), recipient.email)
             }
         }
