@@ -3380,7 +3380,7 @@ class InventoryService implements ApplicationContextAware {
 
     /**
      * Returns a list of the most recent transaction type ids for each product in the provided list as a
-     * list of 3 element list [[Product, transaction date, transaction type id]]
+     * list of maps [[product: <Product>, transactionDate: <transaction date>, transactionTypeId: <transaction type id>]]
      * */
     List getMostRecentTransactionTypeForProductsInInventory(Inventory inventory, List<Product> products) {
         List results = Transaction.executeQuery('''
@@ -3397,9 +3397,14 @@ class InventoryService implements ApplicationContextAware {
         // Results are returning most recent transactions for product with a transaction type (can be multiple
         // different types), need to find the most recent transaction with this grouping
         return results?.groupBy { it[0] }?.collect { product, entries ->
-            entries.max { a, b ->
+            List latest = entries.max { a, b ->
                 a[1].toString() <=> b[1].toString()
             }
+            [
+                    product: latest[0],
+                    transactionDate: latest[1],
+                    transactionTypeId: latest[2]
+            ]
         }
     }
 }
