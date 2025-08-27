@@ -9,7 +9,6 @@
  **/
 package org.pih.warehouse.data
 
-import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import groovy.sql.GroovyRowResult
@@ -48,6 +47,7 @@ import org.pih.warehouse.shipping.ShipmentStatusCode
 @Transactional
 class MigrationService {
 
+    def configService
     def dataService
     def gparsService
     def inventoryService
@@ -55,7 +55,6 @@ class MigrationService {
     ProductInventoryTransactionMigrationService productInventoryTransactionMigrationService
     def persistenceInterceptor
     def dataSource
-    GrailsApplication grailsApplication
 
     def getStockMovementsWithoutShipmentItems() {
         String query = """
@@ -411,9 +410,15 @@ class MigrationService {
 
         // Find all transactions with the old Product Inventory type (by PRODUCT_INVENTORY_TRANSACTION_TYPE_ID)
         TransactionType oldProductInventoryType = TransactionType.get(Constants.PRODUCT_INVENTORY_TRANSACTION_TYPE_ID)
+
+        Integer batchSize = configService.getProperty("openboxes.transactions.inventoryBaseline.migration.batchSize", Integer) ?: 5000
+        boolean requiresBatching = Transaction.countByInventoryAndTransactionType(location.inventory, oldProductInventoryType) > batchSize
+
+        log.info("Fetching ${requiresBatching ? batchSize : 'all'} transactions candidates for migration")
         List<Transaction> transactions = Transaction.findAllByInventoryAndTransactionType(
-                location.inventory, oldProductInventoryType
-        )?.sort { [it.transactionDate, it.dateCreated] }?.reverse()
+                location.inventory, oldProductInventoryType,
+                [max: requiresBatching ? batchSize : -1, sort: [transactionDate: "desc", dateCreated: "desc"]]
+        )
 
         if (!transactions) {
             log.info("No transactions found for location ${location.name} with transaction type ${oldProductInventoryType.name}")
@@ -427,6 +432,7 @@ class MigrationService {
             User migratedBy = AuthService.currentUser
             // Split transactions into those with no entries, single product (record stock and single product's inventory import)
             // and those with multiple products (only inventory import)
+            log.info("Grouping transactions into empty, single product and multi-product transactions")
             List<Transaction> transactionsWithNoEntries = transactions.findAll { it.transactionEntries?.isEmpty() }
             List<Transaction> singleProductTransactions = (transactions - transactionsWithNoEntries).findAll {
                 (it.transactionEntries?.inventoryItem?.product?.unique()?.size() ?: 0) == 1
@@ -440,65 +446,89 @@ class MigrationService {
                 [(productId): values*.id]
             }
 
-            List<Product> products = transactions.transactionEntries?.flatten()?.collect { TransactionEntry te -> te.inventoryItem.product }?.unique()
+            log.info("Checking which products need an inventory baseline transaction of current stock")
+            List<Product> allProducts = transactions.transactionEntries?.flatten()?.collect { TransactionEntry te -> te.inventoryItem.product }?.unique()
             // Always create a stock snapshot before modifying any transactions in order to prevent quantity on hand
-            // differences for edge cases that were not addressed
-            log.debug("Creating inventory baseline for current stock for products found in old transactions")
-            Transaction currentInventoryBaseline = productInventoryTransactionMigrationService.createInventoryBaselineTransaction(
+            // differences for edge cases that were not addressed (if a product already has baseline as a most recent
+            // transaction, in this location, we can skip it)
+            // mostRecentTransactionTypeByProduct contains a list of maps like:
+            //   [[product: Product, transactionDate: transaction date, transaction type id]]
+            List mostRecentTransactionTypeByProduct = inventoryService.getMostRecentTransactionTypeForProductsInInventory(location.inventory, allProducts)
+            List<Product> productsToBaseline = mostRecentTransactionTypeByProduct?.findAll { it.transactionTypeId != Constants.INVENTORY_BASELINE_TRANSACTION_TYPE_ID }?.collect { it.product } ?: []
+            log.info("Creating inventory baseline for current stock for ${productsToBaseline?.size()} products found in old transactions")
+            Transaction currentInventoryBaseline = productsToBaseline ? productInventoryTransactionMigrationService.createInventoryBaselineTransaction(
                     location,
                     null,
-                    products,
+                    productsToBaseline,
                     null,
-                    "Inventory baseline created during old product inventory transactions migration for products that had stock",
+                    "Inventory baseline created during old product inventory transactions migration for products that had stock " +
+                            "but no inventory baseline transaction as a most recent transaction",
                     null,
                     true,
                     true
-            )
+            ) : null
 
-            processProductInventoryTransactions(transactionsWithNoEntries, location, migratedBy, results)
-            gparsService.withPool('migrateProductInventoryTransactionsPool') {
-                transactionIdsGroupedByProduct.values().eachParallel { List<String> transactionIds ->
-                    Transaction.withNewSession {
-                        List<Transaction> transactionList = Transaction.findAllByIdInList(
-                                transactionIds
-                        )?.sort { [it.transactionDate, it.dateCreated] }?.reverse()
-                        log.debug "Migrating transactions for product: " +
-                                "${transactionList?.transactionEntries?.inventoryItem?.product?.productCode?.unique()} " +
-                                "at location ${location.name}"
-                        processProductInventoryTransactions(transactionList, location, migratedBy, results, true)
+            try {
+                log.info("Processing ${transactionsWithNoEntries.size()} transactions with no entries")
+                processProductInventoryTransactions(transactionsWithNoEntries, location, migratedBy, results)
+                log.info("Processing ${singleProductTransactions.size()} single product transactions")
+                gparsService.withPool('migrateProductInventoryTransactionsPool') {
+                    transactionIdsGroupedByProduct.values().eachParallel { List<String> transactionIds ->
+                        Transaction.withNewSession {
+                            List<Transaction> transactionList = Transaction.findAllByIdInList(
+                                    transactionIds
+                            )?.sort { [it.transactionDate, it.dateCreated] }?.reverse()
+                            log.debug "Migrating transactions for product: " +
+                                    "${transactionList?.transactionEntries?.inventoryItem?.product?.productCode?.unique()} " +
+                                    "at location ${location.name}"
+                            processProductInventoryTransactions(transactionList, location, migratedBy, results, true)
+                        }
                     }
                 }
-            }
-            processProductInventoryTransactions(multiProductTransactions, location, migratedBy, results)
+                log.info("Processing ${multiProductTransactions.size()} multi-product transactions")
+                processProductInventoryTransactions(multiProductTransactions, location, migratedBy, results)
 
-            // Zero out stock for products that were migrated but had no stock initially (hence hand no baseline created)
-            def cleanupAdjustmentEnabled = grailsApplication.config.openboxes.transactions.inventoryBaseline.migration.cleanupAdjustment
-            List<Product> shouldBeZeroedOut = products - currentInventoryBaseline?.transactionEntries?.collect { it.inventoryItem.product }?.unique()
-            if (cleanupAdjustmentEnabled && shouldBeZeroedOut) {
-                log.debug("Check if there is need for 'zeroing out' adjustments for products that had no stock before migration")
+                // Zero out stock for products that were migrated but had no stock initially (hence hand no baseline created)
+                Boolean cleanupAdjustmentEnabled = configService.getProperty("openboxes.transactions.inventoryBaseline.migration.cleanupAdjustmentEnabled", Boolean)
+                List<Product> shouldBeZeroedOut = productsToBaseline - currentInventoryBaseline?.transactionEntries?.collect { it.inventoryItem.product }?.unique()
+                if (cleanupAdjustmentEnabled && shouldBeZeroedOut) {
+                    log.info("Check if there is need for 'zeroing out' adjustments for products that had no stock before migration")
 
-                Map<String, AvailableItem> availableItems = productAvailabilityService.getAvailableItemsAtDateAsMap(
-                        location,
-                        shouldBeZeroedOut
-                )
+                    Map<String, AvailableItem> availableItems = productAvailabilityService.getAvailableItemsAtDateAsMap(
+                            location,
+                            shouldBeZeroedOut
+                    )
 
-                createCleanupAdjustment(
-                        location,
-                        availableItems,
-                        "After migration from single Product Inventory transaction to Baseline + Adjustment pair " +
-                                "this transaction is created to ensure that products that had no stock before, " +
-                                "are currently zeroed out too"
-                )
+                    createCleanupAdjustment(
+                            location,
+                            availableItems,
+                            "After migration from single Product Inventory transaction to Baseline + Adjustment pair " +
+                                    "this transaction is created to ensure that products that had no stock before, " +
+                                    "are currently zeroed out too"
+                    )
+                }
+            } catch (Exception e) {
+                // Catch and exception during migration and log it but do not break the migration process
+                // It will be re-processed later
+                log.error("Error during migration of product inventory transactions at location ${location.name}", e)
             }
 
             // Refresh PA for all products that were migrated
-            productAvailabilityService.triggerRefreshProductAvailability(location.id, products?.id, true)
+            productAvailabilityService.triggerRefreshProductAvailability(location.id, allProducts?.id, true)
 
             createCSVMigrationReportForResults(location, results)
         }
 
+        String batchMessage = "No batching required, all transactions ${performMigration ? 'were' : 'will be'} processed."
+        if (requiresBatching) {
+            batchMessage = "This location has more transactions than specified allowed batch size: ${batchSize}. " +
+                    (performMigration ? "Migration was run only for ${batchSize} most recent transactions." :
+                    "Migration will be run in batches of ${batchSize} most recent transactions.")
+        }
+
         return [
                 "Location"         : location?.name,
+                "Run in batches"   : batchMessage,
                 "Migration Results": results.collectEntries { key, values ->
                     [(key): [] <<
                         ["Status".padRight(10) +
@@ -1123,7 +1153,7 @@ class MigrationService {
         Document migrationReport = new Document()
         migrationReport.documentType = defaultDocumentType
         migrationReport.name = "Product Inventory Migration Report for ${location.name}"
-        migrationReport.filename = "Product Inventory Migration Report for ${location.name}.csv"
+        migrationReport.filename = "Product Inventory Migration Report for ${location.name} ${Constants.DISPLAY_DATE_FORMATTER.format(new Date())}.csv"
         migrationReport.extension = "csv"
         migrationReport.fileContents = csvData
         if (!migrationReport.validate() || !migrationReport.save() ) {

@@ -626,6 +626,7 @@ openboxes:
             # OBPIH-7198
             migration:
                 enabled: true
+                batchSize: 5000
                 # this one is for testing and should be always set to true on production
                 cleanupAdjustment: true
 
