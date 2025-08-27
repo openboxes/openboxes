@@ -382,10 +382,6 @@ const useProductsTab = ({
       defaultMessage: 'No result found.',
     };
 
-  const exportData = () => {
-    console.log('Button pressed');
-  };
-
   return {
     columns: [
       ...columns.slice(0, 5),
@@ -395,7 +391,6 @@ const useProductsTab = ({
     tableData,
     loading,
     emptyTableMessage,
-    exportData,
   };
 };
 
