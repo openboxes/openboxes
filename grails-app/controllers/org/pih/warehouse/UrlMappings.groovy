@@ -130,10 +130,6 @@ class UrlMappings {
             action = [GET: "getLatestInventoryCountDate"]
         }
 
-        "/api/products/import" {
-            controller = { "productApi" }
-            action = [POST: "importCsv"]
-        }
 
         "/api/facilities/$facilityId/products/classifications" {
             controller = "productClassificationApi"
@@ -804,6 +800,15 @@ class UrlMappings {
         "/api/dashboard/itemsWithBackdatedShipments" {
             controller = { "dashboardApi" }
             action = [GET: "getItemsWithBackdatedShipments"]
+        }
+
+        /**
+         * Inventory API endpoints
+         */
+
+        "/api/inventories/import" {
+            controller = { "inventoryApi" }
+            action = "importCsv"
         }
 
         /**
