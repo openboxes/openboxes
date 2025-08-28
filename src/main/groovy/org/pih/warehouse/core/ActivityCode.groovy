@@ -70,6 +70,9 @@ enum ActivityCode {
     // Auto receiving
     AUTO_RECEIVING('AUTO_RECEIVING'),
 
+    // Auto putaway creation
+    AUTO_PUTAWAY_CREATION('AUTO_PUTAWAY_CREATION'),
+
     // Accounting (Budget Code, GL Account)
     REQUIRE_ACCOUNTING('REQUIRE_ACCOUNTING'),
 
@@ -139,6 +142,7 @@ enum ActivityCode {
                 ENABLE_NOTIFICATIONS,
                 DYNAMIC_RECEIVING,
                 AUTO_RECEIVING,
+                AUTO_PUTAWAY_CREATION,
                 DYNAMIC_SLOTTING,
                 STATIC_SLOTTING,
                 ENABLE_WEBHOOKS,

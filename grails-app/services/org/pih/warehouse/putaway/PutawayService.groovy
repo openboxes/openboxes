@@ -34,6 +34,9 @@ import org.pih.warehouse.inventory.InventoryLevel
 import org.grails.web.json.JSONObject
 import org.pih.warehouse.core.User
 import org.pih.warehouse.order.OrderIdentifierService
+import org.pih.warehouse.receiving.ReceiptItem
+import org.pih.warehouse.shipping.Shipment
+import org.pih.warehouse.shipping.ShipmentItem
 
 @Transactional
 class PutawayService {
@@ -438,4 +441,33 @@ class PutawayService {
 
     }
 
+    void createAutomaticPutaway(Shipment shipment) {
+        if (!shipment.destination.supports(ActivityCode.AUTO_PUTAWAY_CREATION)) {
+            log.info"Shipment destination ${shipment.destination.name} does not support automatic putaway creation"
+            return
+        }
+
+        Putaway putaway = new Putaway()
+        putaway.origin = shipment.destination
+        putaway.destination = shipment.destination
+        putaway.putawayNumber = orderIdentifierService.generate(new Order())
+        putaway.putawayAssignee = shipment.createdBy
+        putaway.putawayStatus = PutawayStatus.PENDING
+
+        shipment.shipmentItems?.each { ShipmentItem shipmentItem ->
+            PutawayItem putawayItem = new PutawayItem()
+            putawayItem.product = shipmentItem.product
+            putawayItem.inventoryItem = shipmentItem.inventoryItem
+            putawayItem.quantity = shipmentItem.quantity
+            putawayItem.recipient = shipmentItem.recipient
+            putawayItem.currentFacility = shipment.destination
+            putawayItem.putawayFacility = shipment.destination
+            putawayItem.currentLocation = ReceiptItem.findByShipmentItem(shipmentItem)?.binLocation
+            putawayItem.putawayLocation = null // TODO
+            putawayItem.putawayStatus = PutawayStatus.PENDING
+            putaway.putawayItems.add(putawayItem)
+        }
+
+        savePutaway(putaway)
+    }
 }

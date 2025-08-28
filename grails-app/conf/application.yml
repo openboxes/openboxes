@@ -640,6 +640,10 @@ openboxes:
         sequenceNumber:
             format: '00000'
 
+    putaway:
+        automaticPutawayCreation:
+            enabled: false
+
 mail:
     error:
         enabled: false

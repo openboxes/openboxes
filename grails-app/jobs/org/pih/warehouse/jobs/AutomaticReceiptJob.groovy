@@ -12,6 +12,7 @@ class AutomaticReceiptJob {
     def shipmentService
     def receiptService
     def locationService
+    def putawayService
 
     def sessionRequired = false
 
@@ -57,6 +58,9 @@ class AutomaticReceiptJob {
 
                 log.info("Creating automatic receipt for shipment ${shipmentId}")
                 receiptService.createAutomaticReceipt(shipment)
+                if (Holders.config.openboxes.putaway.automaticPutawayCreation.enabled) {
+                    putawayService.createAutomaticPutaway(shipment)
+                }
             } catch (Exception e) {
                 log.error("Error processing shipment ${shipmentId}", e)
             }
