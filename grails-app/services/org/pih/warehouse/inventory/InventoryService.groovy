@@ -1470,16 +1470,26 @@ class InventoryService implements ApplicationContextAware {
                 }
 
                 // c) Create new transaction entries (but only if the quantity changed)
-                List<TransactionEntry> transactionEntries = recordStockProductInventoryTransactionService.createAdjustmentTransactionEntries(
+                TransactionEntry transactionEntry = recordStockProductInventoryTransactionService.createAdjustmentTransactionEntry(
                         row,
                         inventoryItem,
                         availableItems,
-                        currentAvailableItems
                 )
 
-                if (transactionEntries.size() > 0) {
-                    transactionEntries.each(adjustmentTransaction.&addToTransactionEntries)
+                if (transactionEntry) {
+                    adjustmentTransaction.addToTransactionEntries(transactionEntry)
                 }
+            }
+
+            // For those products that exist in the system (ie have a product availability entry) but were not
+            // on the record stock while creating backdated entry, should have their quantity set to zero.
+            List<TransactionEntry> transactionEntries = recordStockProductInventoryTransactionService.createZeroingTransactionEntries(
+                    availableItems,
+                    currentAvailableItems
+            )
+
+            if (transactionEntries.size() > 0) {
+                transactionEntries.each(adjustmentTransaction.&addToTransactionEntries)
             }
 
             // 4. Check whether any errors didn't come up

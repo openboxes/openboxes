@@ -22,13 +22,11 @@ class RecordStockProductInventoryTransactionService extends ProductInventoryTran
         return transaction
     }
 
-    List<TransactionEntry> createAdjustmentTransactionEntries(
+    TransactionEntry createAdjustmentTransactionEntry(
             RecordInventoryRowCommand recordInventoryRowCommand,
             InventoryItem inventoryItem,
-            Map<String, AvailableItem> availableItems,
-            Map<String, AvailableItem> currentAvailableItems
+            Map<String, AvailableItem> availableItems
     ) {
-        List<TransactionEntry> transactionEntries = []
         String key = ProductAvailabilityService.constructAvailableItemKey(recordInventoryRowCommand.binLocation, inventoryItem)
         int quantityOnHand = availableItems.get(key)?.quantityOnHand ?: 0
         // When the row has old qty set to 0, it means that it is a new row.
@@ -49,31 +47,31 @@ class RecordStockProductInventoryTransactionService extends ProductInventoryTran
         if (adjustmentQuantity == 0) {
             return null
         }
-        transactionEntries.add(new TransactionEntry(
+
+        return new TransactionEntry(
                 quantity: adjustmentQuantity,
                 product: inventoryItem?.product,
                 inventoryItem: inventoryItem,
                 comments: recordInventoryRowCommand.comment,
                 binLocation: recordInventoryRowCommand.binLocation,
 
-        ))
+        )
+    }
 
-        // For those products that exist in the system (ie have a product availability entry) but were not
-        // on the record stock while creating backdated entry, should have their quantity set to zero.
-        for (AvailableItem availableItem : availableItems.values()) {
-            if (currentAvailableItems.containsValue(availableItem)) {
-                continue
-            }
-
-            transactionEntries.add(new TransactionEntry(
-                    quantity: -availableItem.quantityOnHand,
-                    product: availableItem.inventoryItem.product,
-                    binLocation: availableItem.binLocation,
-                    inventoryItem: availableItem.inventoryItem,
-            ))
-        }
-
-        return transactionEntries
+    List<TransactionEntry> createZeroingTransactionEntries(
+            Map<String, AvailableItem> availableItems,
+            Map<String, AvailableItem> currentAvailableItems
+    ) {
+        availableItems.values()
+                .findAll { !currentAvailableItems.containsValue(it) }
+                .collect { availableItem ->
+                    new TransactionEntry(
+                            quantity: -availableItem.quantityOnHand,
+                            product: availableItem.inventoryItem.product,
+                            binLocation: availableItem.binLocation,
+                            inventoryItem: availableItem.inventoryItem,
+                    )
+                }
     }
 
     @Override
