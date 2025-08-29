@@ -19,30 +19,38 @@ class InboundSortationService {
     void execute(Receipt receipt) {
         Shipment shipment = receipt.shipment
 
-        Putaway putaway = new Putaway()
-        putaway.origin = shipment.destination
-        putaway.destination = shipment.destination
-        putaway.putawayNumber = orderIdentifierService.generate(new Order())
-        putaway.putawayAssignee = shipment.createdBy
-        putaway.putawayStatus = PutawayStatus.PENDING
-
         receipt.receiptItems.each { ReceiptItem receiptItem ->
             if (!receiptItem.binLocation?.supports(ActivityCode.INBOUND_SORTATION)) {
                 log.info"Receipt item destination does not support ${ActivityCode.INBOUND_SORTATION} activity code"
                 return
             }
 
-            PutawayItem putawayItem = new PutawayItem()
-            putawayItem.product = receiptItem.product
-            putawayItem.inventoryItem = receiptItem.inventoryItem
-            putawayItem.quantity = receiptItem.quantityReceived
-            putawayItem.recipient = receiptItem.recipient
-            putawayItem.currentFacility = shipment.destination
-            putawayItem.currentLocation = receiptItem.binLocation
-            putawayItem.putawayLocation = receiptItem.product.getInventoryLevel(shipment.destination.id)?.preferredBinLocation
-            putawayItem.putawayStatus = PutawayStatus.PENDING
-            putaway.putawayItems.add(putawayItem)
+            Putaway putaway = createPutaway(shipment)
+            putaway.putawayItems.add(createPutawayItem(receiptItem, shipment))
             putawayService.savePutaway(putaway)
         }
+    }
+
+    private Putaway createPutaway(Shipment shipment) {
+        new Putaway(
+                origin: shipment.destination,
+                destination: shipment.destination,
+                putawayNumber: orderIdentifierService.generate(new Order()),
+                putawayAssignee: shipment.createdBy,
+                putawayStatus: PutawayStatus.PENDING
+        )
+    }
+
+    private PutawayItem createPutawayItem(ReceiptItem receiptItem, Shipment shipment) {
+        new PutawayItem(
+                product: receiptItem.product,
+                inventoryItem: receiptItem.inventoryItem,
+                quantity: receiptItem.quantityReceived,
+                recipient: receiptItem.recipient,
+                currentFacility: shipment.destination,
+                currentLocation: receiptItem.binLocation,
+                putawayLocation: receiptItem.product.getInventoryLevel(shipment.destination.id)?.preferredBinLocation,
+                putawayStatus: PutawayStatus.PENDING
+        )
     }
 }
