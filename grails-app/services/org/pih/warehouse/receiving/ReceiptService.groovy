@@ -497,7 +497,7 @@ class ReceiptService {
         PartialReceipt partialReceipt = getPartialReceipt(shipment.id, "1")
         partialReceipt.dateShipped = shipment.expectedShippingDate
 
-        def receivingBin = createTemporaryReceivingBin(shipment)
+        def receivingBin = findReceivingLocation(shipment)
         shipment.shipmentItems.each { ShipmentItem item ->
             PartialReceiptContainer partialReceiptContainer =
                     partialReceipt.findDefaultPartialReceiptContainer()
@@ -528,5 +528,19 @@ class ReceiptService {
         }
 
         saveAndCompletePartialReceipt(partialReceipt)
+    }
+
+    Location findReceivingLocation(Shipment shipment) {
+        // TODO: below code returns first matching internal location that supports inbound sortation
+        //  In case of multiple such locations TBD how to handle it
+        def inboundSortationLocation = shipment.destination.internalLocations
+                .find { it.supports(ActivityCode.INBOUND_SORTATION) }
+
+        if (!inboundSortationLocation) {
+            log.warn("Internal location supporting $ActivityCode.INBOUND_SORTATION not found. Temporary receiving bin will be created.")
+            return createTemporaryReceivingBin(shipment)
+        }
+
+        return inboundSortationLocation
     }
 }

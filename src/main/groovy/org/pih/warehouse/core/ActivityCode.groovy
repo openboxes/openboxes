@@ -110,6 +110,9 @@ enum ActivityCode {
     // Picking strategies
     PICKING_STRATEGY_AUTOMATIC_REALLOCATION('PICKING_STRATEGY_AUTOMATIC_REALLOCATION'),
 
+    // Inbound sortation
+    INBOUND_SORTATION('INBOUND_SORTATION'),
+
     NONE('NONE')
 
     final String id
@@ -137,7 +140,6 @@ enum ActivityCode {
                 EXTERNAL,
                 ENABLE_NOTIFICATIONS,
                 DYNAMIC_RECEIVING,
-                PARTIAL_RECEIVING,
                 AUTO_RECEIVING,
                 DYNAMIC_SLOTTING,
                 STATIC_SLOTTING,
@@ -177,6 +179,8 @@ enum ActivityCode {
 
                 // Picking strategies
                 PICKING_STRATEGY_AUTOMATIC_REALLOCATION,
+
+                INBOUND_SORTATION
         ]
     }
 
