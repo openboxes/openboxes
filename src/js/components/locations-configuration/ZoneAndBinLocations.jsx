@@ -15,6 +15,7 @@ import BinTable from 'components/locations-configuration/BinTable';
 import AddBinModal from 'components/locations-configuration/modals/AddBinModal';
 import AddZoneModal from 'components/locations-configuration/modals/AddZoneModal';
 import ImportBinModal from 'components/locations-configuration/modals/ImportBinModal';
+import SuccessMessage from 'components/locations-configuration/SuccessMessage';
 import ZoneTable from 'components/locations-configuration/ZoneTable';
 import apiClient, { flattenRequest } from 'utils/apiClient';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
@@ -142,6 +143,7 @@ class ZoneAndBinLocations extends Component {
       values: this.props.initialValues,
       zoneTypes: [],
       binTypes: [],
+      showSuccessMessage: false,
     };
     this.updateZoneData = this.updateZoneData.bind(this);
     this.updateBinData = this.updateBinData.bind(this);
@@ -149,6 +151,8 @@ class ZoneAndBinLocations extends Component {
     this.refetchZoneTable = this.refetchZoneTable.bind(this);
     this.deleteLocation = this.deleteLocation.bind(this);
     this.handleLocationEdit = this.handleLocationEdit.bind(this);
+    this.setShowSuccessMessage = this.setShowSuccessMessage.bind(this);
+    this.finish = this.finish.bind(this);
     this.refBinTable = React.createRef();
     this.refZoneTable = React.createRef();
   }
@@ -261,8 +265,19 @@ class ZoneAndBinLocations extends Component {
     this.setState({ binData: data });
   }
 
-  nextPage() {
-    this.props.nextPage(this.state.values);
+  setShowSuccessMessage() {
+    this.setState((prev) => ({ showSuccessMessage: !prev.showSuccessMessage }));
+  }
+
+  finish() {
+    Alert.success(
+      this.props.translate(
+        'react.locationsConfiguration.alert.configurationCompleted.label',
+        'Location configuration completed!',
+      ),
+      { timeout: 3000 },
+    );
+    this.setState({ showSuccessMessage: true });
   }
 
   previousPage() {
@@ -272,6 +287,10 @@ class ZoneAndBinLocations extends Component {
   render() {
     return (
       <div className="d-flex flex-column">
+        <SuccessMessage
+          successMessageOpen={this.state.showSuccessMessage}
+          setShowSuccessMessage={this.setShowSuccessMessage}
+        />
         <div className="configuration-wizard-content flex-column">
           <div className="classic-form with-description">
             <div className="form-title">
@@ -360,8 +379,8 @@ class ZoneAndBinLocations extends Component {
             <button type="button" onClick={() => this.previousPage()} className="btn btn-outline-primary float-left btn-xs">
               <Translate id="react.default.button.previous.label" defaultMessage="Previous" />
             </button>
-            <button type="button" onClick={() => this.nextPage()} className="btn btn-outline-primary float-left btn-xs">
-              <Translate id="react.default.button.next.label" defaultMessage="Next" />
+            <button type="button" onClick={() => this.finish()} className="btn btn-outline-primary float-right btn-xs">
+              <Translate id="react.default.button.finish.label" defaultMessage="Finish" />
             </button>
           </div>
         </div>
@@ -383,7 +402,6 @@ const mapDispatchToProps = {
 export default connect(mapStateToProps, mapDispatchToProps)(ZoneAndBinLocations);
 
 ZoneAndBinLocations.propTypes = {
-  nextPage: PropTypes.func.isRequired,
   previousPage: PropTypes.func.isRequired,
   translate: PropTypes.func.isRequired,
   initialValues: PropTypes.shape({
