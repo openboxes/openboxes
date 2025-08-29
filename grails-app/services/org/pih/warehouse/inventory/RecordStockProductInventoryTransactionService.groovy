@@ -60,19 +60,21 @@ class RecordStockProductInventoryTransactionService extends ProductInventoryTran
 
     List<TransactionEntry> createZeroingTransactionEntries(
             Map<String, AvailableItem> availableItems,
-            Map<String, AvailableItem> currentAvailableItems
+            List<AvailableItem> currentRecordStockItems
     ) {
-        availableItems.values()
-                .findAll { !currentAvailableItems.containsValue(it) }
-                .collect { availableItem ->
-                    new TransactionEntry(
-                            quantity: -availableItem.quantityOnHand,
-                            product: availableItem.inventoryItem.product,
-                            binLocation: availableItem.binLocation,
-                            inventoryItem: availableItem.inventoryItem,
-                    )
-                }
+        List<String> recordStockKeys = currentRecordStockItems.collect {
+            ProductAvailabilityService.constructAvailableItemKey(it.binLocation, it.inventoryItem)
+        }
+
+        return availableItems.findAll { key, item -> !(key in recordStockKeys)}
+                .collect { new TransactionEntry(
+                        quantity: -it.value.quantityOnHand,
+                        product: it.value.inventoryItem.product,
+                        binLocation: it.value.binLocation,
+                        inventoryItem: it.value.inventoryItem,
+                )}
     }
+
 
     @Override
     void setSourceObject(Transaction transaction, RecordInventoryCommand transactionSource) {
