@@ -353,7 +353,7 @@ const StockMovementOutboundTable = ({
         />
       ),
     },
-  ], [requisitionStatuses, translate]);
+  ], [requisitionStatuses, translate, isRequestsOpen]);
 
   return (
     <>
