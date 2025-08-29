@@ -202,12 +202,29 @@ class CSVUtils {
         return detector.getDetectedCharset() ?: 'MacRoman';
     }
 
-    static List<String> getColumnData(String csvString, String columnName) {
-        CSVParser parser = CSVParser.parse(csvString, CSVFormat.DEFAULT.withFirstRecordAsHeader())
-        List<Map> rows = parser.collect { record ->
-            record.toMap()
-        }
+    static List<Map<String, String>> csvToObjects(String csvString) {
+        CSVParser parser = CSVParser.parse(
+                csvString,
+                CSVFormat.DEFAULT.withFirstRecordAsHeader().withTrim()
+        )
 
+        return parser.collect { record ->
+            record.toMap().collectEntries { k, v ->
+                [(toCamelCase(k)): v]
+            }
+        }
+    }
+
+    private static String toCamelCase(String text) {
+        String[] parts = text.trim().toLowerCase().split(/[^a-zA-Z0-9]+/)
+        if (parts.size() == 0) {
+            return ""
+        }
+        return parts[0] + parts.tail().collect { it.capitalize() }.join()
+    }
+
+    static List<String> getColumnData(String csvString, String columnName) {
+        List<Map> rows = csvToObjects(csvString)
         return rows[columnName]
     }
 }

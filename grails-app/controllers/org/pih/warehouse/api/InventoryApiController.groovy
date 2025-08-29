@@ -1,8 +1,13 @@
 package org.pih.warehouse.api
 
-import grails.converters.JSON
+import org.pih.warehouse.importer.CSVUtils
+import org.pih.warehouse.importer.ImportDataCommand
+import org.pih.warehouse.importer.InventoryImportDataService
 
 class InventoryApiController {
+
+    InventoryImportDataService inventoryImportDataService
+
     def importCsv() {
         String fileData = request.inputStream.text
 
@@ -14,6 +19,14 @@ class InventoryApiController {
             throw new IllegalArgumentException("File must be in CSV format")
         }
 
-        render([data: []] as JSON)
+        ImportDataCommand command = new ImportDataCommand(
+                data: CSVUtils.csvToObjects(fileData),
+                date: new Date()
+        )
+
+        inventoryImportDataService.validateData(command)
+        inventoryImportDataService.importData(command)
+
+        render(status: 200)
     }
 }
