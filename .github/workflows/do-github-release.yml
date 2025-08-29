@@ -15,7 +15,6 @@ on:
         default: v0.0.0
 
 env:
-  JAVA_VERSION: 8
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   TAG_NAME: ${{ (contains(github.ref, 'tag') && github.ref_name) || github.event.inputs.tag }}
 
@@ -35,7 +34,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: ${{env.JAVA_VERSION}}
+          java-version: ${{vars.JAVA_VERSION}}
           distribution: zulu
           cache: 'gradle'
 
