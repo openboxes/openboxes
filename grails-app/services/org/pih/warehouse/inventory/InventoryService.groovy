@@ -1404,18 +1404,11 @@ class InventoryService implements ApplicationContextAware {
 
         try {
             // 1. Calculate the current available items for the given product
-            Date inventoryBaselineDate = new Date(cmd.transactionDate.time + 2000)
             Map<String, AvailableItem> availableItems = productAvailabilityService.getAvailableItemsAtDateAsMap(
                     currentLocation,
                     [cmd.product],
-                    inventoryBaselineDate
+                    new Date(cmd.transactionDate.time + 2000)
             )
-
-            Date currentDate = new Date()
-            currentDate.setSeconds(0)
-            Map<String, AvailableItem> currentAvailableItems = currentDate == inventoryBaselineDate
-                    ? availableItems
-                    : productAvailabilityService.getAvailableItemsAtDateAsMap(currentLocation, [cmd.product], currentDate)
 
             // We'd have weird behaviour if we allowed two transactions to exist at the same exact time (precision at the
             // database level is to the second) so fail if there's already a transaction on the items for the given date.
@@ -1439,6 +1432,7 @@ class InventoryService implements ApplicationContextAware {
                     adjustmentTransactionDate
             )
 
+            List<AvailableItem> currentRecordStockItems = []
             // 3. Process each row added to the record inventory page
             cmd.recordInventoryRows.each { RecordInventoryRowCommand row ->
                 if (!row) {
@@ -1479,13 +1473,21 @@ class InventoryService implements ApplicationContextAware {
                 if (transactionEntry) {
                     adjustmentTransaction.addToTransactionEntries(transactionEntry)
                 }
+
+                currentRecordStockItems.add(
+                        new AvailableItem(
+                                quantityOnHand: row.oldQuantity,
+                                inventoryItem: inventoryItem,
+                                binLocation: row.binLocation,
+                        )
+                )
             }
 
             // For those products that exist in the system (ie have a product availability entry) but were not
             // on the record stock while creating backdated entry, should have their quantity set to zero.
             List<TransactionEntry> transactionEntries = recordStockProductInventoryTransactionService.createZeroingTransactionEntries(
                     availableItems,
-                    currentAvailableItems
+                    currentRecordStockItems
             )
 
             if (transactionEntries.size() > 0) {
