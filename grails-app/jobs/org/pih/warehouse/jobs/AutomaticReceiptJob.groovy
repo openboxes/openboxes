@@ -13,6 +13,7 @@ class AutomaticReceiptJob {
     def receiptService
     def locationService
     def putawayService
+    def inboundSortationService
 
     def sessionRequired = false
 
@@ -58,8 +59,8 @@ class AutomaticReceiptJob {
 
                 log.info("Creating automatic receipt for shipment ${shipmentId}")
                 receiptService.createAutomaticReceipt(shipment)
-                if (Holders.config.openboxes.putaway.automaticPutawayCreation.enabled) {
-                    putawayService.createAutomaticPutaway(shipment)
+                if (Holders.config.openboxes.inboundSortation.enabled) {
+                    inboundSortationService.execute(shipment.receipt)
                 }
             } catch (Exception e) {
                 log.error("Error processing shipment ${shipmentId}", e)
@@ -89,6 +90,9 @@ class AutomaticReceiptJob {
                     }
 
                     receiptService.createAutomaticReceipt(it)
+                    if (Holders.config.openboxes.inboundSortation.enabled) {
+                        inboundSortationService.execute(it.receipt)
+                    }
                 }
             }
         }
