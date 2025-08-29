@@ -34,9 +34,6 @@ import org.pih.warehouse.inventory.InventoryLevel
 import org.grails.web.json.JSONObject
 import org.pih.warehouse.core.User
 import org.pih.warehouse.order.OrderIdentifierService
-import org.pih.warehouse.receiving.ReceiptItem
-import org.pih.warehouse.shipping.Shipment
-import org.pih.warehouse.shipping.ShipmentItem
 
 @Transactional
 class PutawayService {
@@ -440,4 +437,5 @@ class PutawayService {
         }
 
     }
+
 }
