@@ -291,7 +291,7 @@ class UserService {
         User user = getUser(userId)
         return getEffectiveRoles(user).any { Role role ->
             boolean acceptedRoleType = acceptedRoleTypes.contains(role.roleType)
-            log.debug "Is role ${role.roleType} in ${acceptedRoleTypes} = ${acceptedRoleType}"
+            log.trace "Is role ${role.roleType} in ${acceptedRoleTypes} = ${acceptedRoleType}"
             return acceptedRoleType
         }
     }

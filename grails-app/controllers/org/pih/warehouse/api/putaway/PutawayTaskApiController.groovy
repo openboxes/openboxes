@@ -1,6 +1,7 @@
 package org.pih.warehouse.api.putaway
 
 import grails.converters.JSON
+import grails.rest.RestfulController
 import org.pih.warehouse.api.StatusCategory
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
@@ -8,7 +9,7 @@ import org.pih.warehouse.putaway.PutawayTask
 import org.pih.warehouse.putaway.PutawayTaskService
 import org.springframework.http.HttpStatus
 
-class PutawayTaskApiController {
+class PutawayTaskApiController extends RestfulController<PutawayTask> {
 
     static responseFormats = ['json']
     static allowedMethods = [
@@ -23,6 +24,10 @@ class PutawayTaskApiController {
 
     PutawayTaskService putawayTaskService
 
+    PutawayTaskApiController() {
+        super(PutawayTask)
+    }
+
     def search(SearchPutawayTaskCommand command) {
         log.info "search params " + params
         // Return a not found error if request specifies a product, but the product does not exist
@@ -33,15 +38,18 @@ class PutawayTaskApiController {
 
         def tasks = putawayTaskService.search(command.facility, command.product, params)
 
-        render ([data: tasks, totalCount: tasks.totalCount] as JSON)
+        render ([data: tasks, totalCount: tasks.totalCount?:0] as JSON)
     }
 
-    def read(String id) {
-        def task = putawayTaskService.get(id)
-        if (!task) {
-            return render(status: HttpStatus.NOT_FOUND.value())
-        }
-        render([data: task] as JSON)
+    // FIXME I think I was experimenting with the data binding mechanism to see if this would work
+    //  It does but I wanted to keep the original code in case we wanted to rollback.
+    def read(PutawayTask putawayTask) {
+//        def task = putawayTaskService.get(id)
+//        if (!task) {
+//            return render(status: HttpStatus.NOT_FOUND.value())
+//        }
+//        render([data: task] as JSON)
+        respond ([data: putawayTask])
     }
 
     def save() {
@@ -67,14 +75,12 @@ class PutawayTaskApiController {
     def patch() {
         def jsonBody = request.JSON ?: [:]
         // FIXME Improve error handling
-        PutawayTask putawayTask = putawayTaskService.patch(params.id, (String) jsonBody.action, jsonBody)
-        if (!putawayTask) {
+        PutawayTask task = putawayTaskService.patch(params.id, jsonBody)
+        if (!task) {
             return render(status: HttpStatus.NOT_FOUND.value())
         }
-        render([data: putawayTask] as JSON)
+        render([data: task] as JSON)
     }
-
-
 }
 
 class SearchPutawayTaskCommand {

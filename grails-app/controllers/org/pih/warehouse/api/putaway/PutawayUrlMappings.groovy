@@ -3,9 +3,10 @@ package org.pih.warehouse.api.putaway
 class PutawayUrlMappings {
 
     static mappings = {
+
         "/api/facilities/$facility/putaway-tasks" {
             controller = "putawayTaskApi"
-            action = [GET: "search", POST: "create"]
+            action = [GET: "search", POST: "save"]
         }
 
         "/api/facilities/$facility/putaway-tasks/$id" {

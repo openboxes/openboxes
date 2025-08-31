@@ -9,7 +9,7 @@ enum PutawayTaskStatus {
     CANCELED(StatusCategory.CLOSED)
 
     // from -> allowed next states
-    private static final Map<String, Set<String>> ALLOWED_STATE_TRANSITIONS = [
+    static final Map<PutawayTaskStatus, Set<PutawayTaskStatus>> ALLOWED_STATE_TRANSITIONS = [
             (PENDING)    : [IN_PROGRESS, COMPLETED, CANCELED] as Set,
             (IN_PROGRESS): [IN_TRANSIT, COMPLETED, CANCELED] as Set,
             (IN_TRANSIT) : [COMPLETED, CANCELED] as Set,
@@ -17,7 +17,13 @@ enum PutawayTaskStatus {
             (CANCELED)   : [] as Set,
     ]
 
-
+    static final Map<PutawayTaskStatus, PutawayTaskStatus> ROLLBACK_STATE_TRANSITIONS = [
+            (PENDING)    : PENDING,
+            (IN_PROGRESS): PENDING,
+            (IN_TRANSIT) : PENDING,
+            (COMPLETED)  : PENDING,
+            (CANCELED)   : PENDING,
+    ]
 
     final StatusCategory statusCategory
 
@@ -39,6 +45,10 @@ enum PutawayTaskStatus {
 
     static Boolean validateTransition(PutawayTaskStatus from, PutawayTaskStatus to) {
         return ALLOWED_STATE_TRANSITIONS.get(from, Collections.emptySet()).contains(to)
+    }
+
+    static Boolean validateRollback(PutawayTaskStatus from, PutawayTaskStatus to) {
+        return ROLLBACK_STATE_TRANSITIONS.get(from).equals(to)
     }
 
 

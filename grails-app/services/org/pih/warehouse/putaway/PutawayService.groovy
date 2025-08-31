@@ -9,19 +9,26 @@
  **/
 package org.pih.warehouse.putaway
 
+import grails.events.Event
+import grails.events.EventPublisher
+import grails.events.annotation.Publisher
+import grails.events.annotation.Subscriber
 import grails.gorm.transactions.Transactional
 import org.apache.commons.beanutils.BeanUtils
+import org.hibernate.ObjectNotFoundException
 import org.hibernate.criterion.CriteriaSpecification
 import org.hibernate.sql.JoinType
 import org.pih.warehouse.api.Putaway
 import org.pih.warehouse.api.PutawayItem
 import org.pih.warehouse.api.PutawayStatus
+import org.pih.warehouse.api.PutawayTaskStatus
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationTypeCode
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransferStockCommand
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
@@ -34,15 +41,22 @@ import org.pih.warehouse.inventory.InventoryLevel
 import org.grails.web.json.JSONObject
 import org.pih.warehouse.core.User
 import org.pih.warehouse.order.OrderIdentifierService
+import org.springframework.context.event.EventListener
 
 @Transactional
-class PutawayService {
+class PutawayService implements EventPublisher  {
 
     def userService
     def inventoryService
     def productAvailabilityService
     OrderIdentifierService orderIdentifierService
     def grailsApplication
+
+
+    Putaway getPutaway(String id) {
+        Order putawayOrder = Order.get(id)
+        return Putaway.createFromOrder(putawayOrder)
+    }
 
     void generatePutaways(Location location, User putawayAssignee) {
         List<PutawayItem> putawayCandidates = getPutawayCandidates(location)
@@ -438,4 +452,24 @@ class PutawayService {
 
     }
 
+    @Publisher('putaway.rollback')
+    Putaway rollbackPutaway(Putaway putaway) {
+        Order order = Order.get(putaway.id)
+        if (!order) {
+            throw new ObjectNotFoundException(putaway.id, "Putaway ${putaway.id} not found")
+        }
+
+        // Get transaction
+        Transaction transaction = Transaction.where {
+            order == order
+        }.get()
+
+        // If exists, delete the transaction and reset status of putaway
+        if (order.status == OrderStatus.COMPLETED && transaction) {
+            transaction.delete()
+            putaway.putawayStatus = PutawayStatus.PENDING
+            savePutaway(putaway)
+        }
+        return putaway
+    }
 }
