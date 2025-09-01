@@ -11,7 +11,6 @@ import { withRouter } from 'react-router-dom';
 import { hideSpinner, showSpinner } from 'actions';
 import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
-import activityCode from 'consts/activityCode';
 import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
 import apiClient from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
@@ -19,6 +18,7 @@ import { debounceLocationsFetch } from 'utils/option-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
+import activityCode from 'consts/activityCode';
 
 const { orderId } = queryString.parse(window.location.search);
 
@@ -99,6 +99,15 @@ class CreateStockMovement extends Component {
     this.debouncedOriginLocationsFetch = debounceLocationsFetch(
       this.props.debounceTime,
       this.props.minSearchLength,
+      null, // activityCodes
+      false, // fetchAll
+      true, // withOrgCode
+      false, // withTypeDescription
+    );
+
+    this.debouncedDestinationLocationsFetch = debounceLocationsFetch(
+      this.props.debounceTime,
+      this.props.minSearchLength,
       [activityCode.RECEIVE_STOCK], // activityCodes
       true, // fetchAll
       true, // withOrgCode
@@ -106,13 +115,6 @@ class CreateStockMovement extends Component {
       false, // isReturnOrder
       null, // direction
       true, // withOrganization
-    );
-
-    this.debouncedDestinationLocationsFetch = debounceLocationsFetch(
-      this.props.debounceTime,
-      this.props.minSearchLength,
-      null,
-      true,
     );
   }
 
