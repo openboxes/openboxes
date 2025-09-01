@@ -619,6 +619,8 @@ openboxes:
         receivingLocation:
             prefix: "R"
         showAutoReceiveButton: true
+        inboundSortation:
+            enabled: true
 
     # Indicates which activities are required for a location to allow logins
     chooseLocation:
@@ -639,9 +641,6 @@ openboxes:
             format: 'LPN-${shipmentNumber}-${sequenceNumber}'
         sequenceNumber:
             format: '00000'
-
-    inboundSortation:
-        enabled: true
 
 mail:
     error:

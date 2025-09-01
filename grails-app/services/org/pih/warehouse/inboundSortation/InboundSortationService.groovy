@@ -5,51 +5,68 @@ import org.pih.warehouse.api.Putaway
 import org.pih.warehouse.api.PutawayItem
 import org.pih.warehouse.api.PutawayStatus
 import org.pih.warehouse.core.ActivityCode
+import org.pih.warehouse.core.User
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.receiving.ReceiptItem
-import org.pih.warehouse.shipping.Shipment
 
 @Transactional
 class InboundSortationService {
 
     def orderIdentifierService
     def putawayService
+    def slottingService
 
-    void execute(Receipt receipt) {
-        Shipment shipment = receipt.shipment
-
+    void createPutawayOrdersFromReceipt(Receipt receipt) {
         receipt.receiptItems.each { ReceiptItem receiptItem ->
             if (!receiptItem.binLocation?.supports(ActivityCode.INBOUND_SORTATION)) {
-                log.info"Receipt item destination does not support ${ActivityCode.INBOUND_SORTATION} activity code"
+                log.warn "Receipt item destination does not support ${ActivityCode.INBOUND_SORTATION} activity code. " +
+                        "Putaway order will not be created."
                 return
             }
 
-            Putaway putaway = createPutaway(shipment)
-            putaway.putawayItems.add(createPutawayItem(receiptItem, shipment))
-            putawayService.savePutaway(putaway)
+            PutawayContext putawayContext = createPutawayContext(receiptItem)
+            List<PutawayTask> tasks = slottingService.execute(putawayContext)
+            tasks.each { PutawayTask task ->
+                Putaway putaway = createPutaway(putawayContext, receipt.shipment?.createdBy)
+                putaway.putawayItems.add(createPutawayItem(task))
+                putawayService.savePutaway(putaway)
+            }
         }
     }
 
-    private Putaway createPutaway(Shipment shipment) {
+    private PutawayContext createPutawayContext(ReceiptItem receiptItem) {
+        def shipment = receiptItem.receipt.shipment
+        new PutawayContext(
+                facility: shipment.destination,
+                product: receiptItem.product,
+                inventoryItem: receiptItem.inventoryItem,
+                lotNumber: receiptItem.inventoryItem.lotNumber,
+                expirationDate: receiptItem.inventoryItem.expirationDate,
+                currentBinLocation: receiptItem.binLocation,
+                preferredBin: receiptItem.product.getInventoryLevel(shipment.destination.id)?.preferredBinLocation,
+                quantity: receiptItem.quantityReceived
+        )
+    }
+
+    private Putaway createPutaway(PutawayContext putawayContext, User createdBy) {
         new Putaway(
-                origin: shipment.destination,
-                destination: shipment.destination,
+                origin: putawayContext.facility,
+                destination: putawayContext.facility,
                 putawayNumber: orderIdentifierService.generate(new Order()),
-                putawayAssignee: shipment.createdBy,
+                putawayAssignee: createdBy,
                 putawayStatus: PutawayStatus.PENDING
         )
     }
 
-    private PutawayItem createPutawayItem(ReceiptItem receiptItem, Shipment shipment) {
+    private PutawayItem createPutawayItem(PutawayTask task) {
         new PutawayItem(
-                product: receiptItem.product,
-                inventoryItem: receiptItem.inventoryItem,
-                quantity: receiptItem.quantityReceived,
-                recipient: receiptItem.recipient,
-                currentFacility: shipment.destination,
-                currentLocation: receiptItem.binLocation,
-                putawayLocation: receiptItem.product.getInventoryLevel(shipment.destination.id)?.preferredBinLocation,
+                product: task.product,
+                inventoryItem: task.inventoryItem,
+                quantity: task.quantity,
+                currentFacility: task.facility,
+                currentLocation: task.currentBinLocation,
+                putawayLocation: task.putawayLocation,
                 putawayStatus: PutawayStatus.PENDING
         )
     }
