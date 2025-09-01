@@ -266,11 +266,11 @@ class SendMovementPage extends Component {
     this.toggleDropdown = this.toggleDropdown.bind(this);
     this.validate = this.validate.bind(this);
 
-    this.debouncedOriginLocationsFetch = debounceLocationsFetch(
+    this.debouncedLocationsFetch = debounceLocationsFetch(
       this.props.debounceTime,
       this.props.minSearchLength,
       [activityCode.RECEIVE_STOCK], // activityCodes
-      false, // fetchAll
+      true, // fetchAll
       true, // withOrgCode
       false, // withTypeDescription
       false, // isReturnOrder

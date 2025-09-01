@@ -100,7 +100,7 @@ class CreateStockMovement extends Component {
       this.props.debounceTime,
       this.props.minSearchLength,
       [activityCode.RECEIVE_STOCK], // activityCodes
-      false, // fetchAll
+      true, // fetchAll
       true, // withOrgCode
       false, // withTypeDescription
       false, // isReturnOrder
