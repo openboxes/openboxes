@@ -6,7 +6,7 @@ CREATE OR REPLACE VIEW putaway_task AS
         CASE `order`.status
             WHEN 'PENDING'   THEN 'PENDING'
             WHEN 'APPROVED'    THEN 'IN_PROGRESS'
-            WHEN 'PLACED' THEN 'IN_TRANSIT'
+            WHEN 'PLACED'       THEN 'IN_TRANSIT'
             WHEN 'COMPLETED' THEN 'COMPLETED'
             WHEN 'CANCELED' THEN 'CANCELED'
             ELSE 'PENDING' END AS status,
@@ -16,7 +16,7 @@ CREATE OR REPLACE VIEW putaway_task AS
         order_item.origin_bin_location_id as location_id,
         -- FIXME we don't have a way to deal with this at the moment
         --  so we'll need to add a new container location to order item
-        null as container_id,
+        order_item.container_location_id as container_id,
         order_item.destination_bin_location_id as destination_id,
         order_item.quantity,
         `order`.id as putaway_order_id,

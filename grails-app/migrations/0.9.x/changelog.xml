@@ -33,4 +33,5 @@
     <include file="0.9.x/changelog-2025-04-29-0000-add-inventory-baseline-transaction-type.xml" />
     <!-- Disabled until we decide we need to materialize putaway tasks -->
 <!--    <include file="0.9.x/changelog-2025-08-25-1347-create-table-putaway-task.xml" />-->
+    <include file="0.9.x/changelog-2025-08-31-1654-add-column-order-item-container-location.xml" />
 </databaseChangeLog>

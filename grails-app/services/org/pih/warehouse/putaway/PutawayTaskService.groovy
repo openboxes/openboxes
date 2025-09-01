@@ -26,19 +26,22 @@ class PutawayTaskService {
 
     @Transactional(readOnly = true)
     List search(Location facility, Product product, Map params) {
-        log.info "search putaway tasks " + params + " product=" + product.toJson() + " facility " + facility
+        log.info "search putaway tasks " + params + " product=" + product?.toJson() + " facility " + facility
         Integer max = Math.min((params.int('max') ?: 10), 100) as Integer
         Integer offset = params.int('offset') ?: 0 as Integer
         String sort = params.sort ?: 'dateCreated'
         String order = (params.order ?: 'desc').toLowerCase() in ['asc', 'desc'] ? params.order : 'desc' as Integer
 
         // Get user-provided statuses
-        List<PutawayTaskStatus> statuses = params.list("status")
+        List<PutawayTaskStatus> statuses = params.list("status").collect { it as PutawayTaskStatus }
 
         // Resolve the status category to a set of statuses and added to user-provided
         StatusCategory statusCategory = params.statusCategory as StatusCategory
         List<PutawayTaskStatus> statusesByStatusCategory = PutawayTaskStatus.toSet(statusCategory)
         statuses += statusesByStatusCategory
+
+        // Search for putaway tasks in a container
+        Location container = params.container ? Location.get(params.container) : null
 
         // Search for putaway tasks based on user-provided search parameters
         List<PutawayTask> tasks = PutawayTask.where {
@@ -50,6 +53,9 @@ class PutawayTaskService {
             }
             if (facility) {
                 facility == facility
+            }
+            if (container) {
+                container == container
             }
 
         }.list(max: max, offset: offset, sort: sort, order: order)
@@ -86,7 +92,7 @@ class PutawayTaskService {
                 break;
 
             case 'assign':
-                assign(task, data.container as String, data.assignee as String)
+                assign(task, data.container as String, data.assignee as String, data.override as Boolean)
                 break;
 
             case 'start':
@@ -127,6 +133,9 @@ class PutawayTaskService {
     void save(PutawayTask task) {
         OrderItem existingOrderItem = OrderItem.get(task.putawayOrderItem.id)
         OrderItem orderItem = PutawayTaskAdapter.toOrderItem(task, existingOrderItem)
+        log.info "dirty: " + orderItem.dirtyPropertyNames
+        log.info "dirty: " + orderItem.order.dirtyPropertyNames
+
         orderItem.save(cascade: true, failOnError:true)
         task.discard()
     }
@@ -139,15 +148,29 @@ class PutawayTaskService {
      * @param containerId
      * @param assigneeId
      */
-    void assign(PutawayTask task, String containerId, String assigneeId) {
+    void assign(PutawayTask task, String containerId, String assigneeId, Boolean override = false) {
         if (task.status != PutawayTaskStatus.PENDING) {
-            throw new IllegalStateException("Must be pending to assign a putaway container")
+            throw new IllegalStateException("Putaway container can only be assigned when the task is PENDING (current status: ${task.status}).")
         }
         Location container = containerId ? Location.get(containerId) : null
-        Person assignee = assigneeId ? Person.get(assigneeId) : null
+        if (task.facility != container.parentLocation || !container.internalLocation) {
+            throw new IllegalArgumentException("Putaway container ${container?.name} must be an internal location within facility ${task?.facility?.name}")
+        }
+
+        if (task.container && container != task.container && !override) {
+            throw new IllegalArgumentException("Putaway container is already assigned: ${task?.container?.name}. Must override to re-assign it to putaway constainer ${container?.name}")
+        }
+        if (task.container == container) {
+            log.warn "Putaway container for task ${task.identifier} has already been set to ${container}"
+        }
 
         if (container) task.container = container
+
+        // Set the assignee if one is provided
+        Person assignee = assigneeId ? Person.get(assigneeId) : null
         if (assignee) task.assignee = assignee
+        save(task)
+
     }
 
     /**
@@ -171,6 +194,8 @@ class PutawayTaskService {
      * @param override
      */
     void load(PutawayTask task, String containerId, Boolean override = false) {
+
+        log.info "Loading item into putaway constainer ${containerId}"
 
         // Validate the container location exists
         Location container = Location.get(containerId)
@@ -266,14 +291,10 @@ class PutawayTaskService {
         command.location = task.facility
 
         // If direct putaway (null container) then we transfer from origin to destination
-        if (!task.container) {
-            command.binLocation = task.location
-        }
-        // Else if two-step putaway, we'll transfer from container destination
-        else {
-            command.binLocation = task.container
-        }
-        command.binLocation = task.location
+        if (!task.container) command.binLocation = task.location
+        // otherwise if we're performing a two-step putaway, we'll transfer from container destination
+        else command.binLocation = task.container
+
         command.inventoryItem = task.inventoryItem
         command.quantity = task.quantity.toInteger()
         command.otherLocation = task.facility
@@ -314,17 +335,18 @@ class PutawayTaskService {
         //  in the two step (origin -> container -> destination) once that has been implemented.
         if (order.status == OrderStatus.COMPLETED) {
             // Get transaction we need to rollback
-            Transaction transaction = Transaction.where {
+            List<Transaction> transactions = Transaction.where {
                 order == order
-            }.get()
+            }.list()
 
-            // If transaction exists, delete the transaction and reset status of putaway
-            if (transaction) {
-                if (transaction.localTransfer) {
-                    transaction.localTransfer.delete()
-                }
-                else {
-                    transaction.delete()
+            for (Transaction transaction : transactions) {
+                // If transaction exists, delete the transaction and reset status of putaway
+                if (transaction) {
+                    if (transaction.localTransfer) {
+                        transaction.localTransfer.delete()
+                    } else {
+                        transaction.delete()
+                    }
                 }
             }
         }

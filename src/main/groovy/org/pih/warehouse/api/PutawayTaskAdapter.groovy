@@ -44,15 +44,15 @@ class PutawayTaskAdapter {
         order.approvedBy = task.assignee
         order.dateApproved = task.dateStarted
 
-        // load - putaway task has been loaded into putaway container (change if user provided override)
-        //orderItem.container = task.container
-
-        // In order to update timestamp on putaway task
-        orderItem.lastUpdated = new Date()
+        // assign - putaway task has been loaded into putaway container (change if user provided override)
+        orderItem.containerLocation = task.container
 
         // complete - task is completed
         order.completedBy = task.completedBy
         order.dateCompleted = task.dateCompleted
+
+        // In order to update timestamp on putaway task (order.lastUpdated should be updated on its own)
+        orderItem.lastUpdated = new Date()
 
         return orderItem
     }
