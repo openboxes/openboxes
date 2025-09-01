@@ -18,6 +18,7 @@ import DateField from 'components/form-elements/DateField';
 import LabelField from 'components/form-elements/LabelField';
 import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
+import activityCode from 'consts/activityCode';
 import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
 import apiClient from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
@@ -265,9 +266,16 @@ class SendMovementPage extends Component {
     this.toggleDropdown = this.toggleDropdown.bind(this);
     this.validate = this.validate.bind(this);
 
-    this.debouncedLocationsFetch = debounceLocationsFetch(
+    this.debouncedOriginLocationsFetch = debounceLocationsFetch(
       this.props.debounceTime,
       this.props.minSearchLength,
+      [activityCode.RECEIVE_STOCK], // activityCodes
+      false, // fetchAll
+      true, // withOrgCode
+      false, // withTypeDescription
+      false, // isReturnOrder
+      null, // direction
+      true, // withOrganization
     );
   }
 

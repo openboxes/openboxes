@@ -11,6 +11,7 @@ import { withRouter } from 'react-router-dom';
 import { hideSpinner, showSpinner } from 'actions';
 import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
+import activityCode from 'consts/activityCode';
 import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
 import apiClient from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
@@ -98,10 +99,13 @@ class CreateStockMovement extends Component {
     this.debouncedOriginLocationsFetch = debounceLocationsFetch(
       this.props.debounceTime,
       this.props.minSearchLength,
-      null, // activityCodes
+      [activityCode.RECEIVE_STOCK], // activityCodes
       false, // fetchAll
       true, // withOrgCode
       false, // withTypeDescription
+      false, // isReturnOrder
+      null, // direction
+      true, // withOrganization
     );
 
     this.debouncedDestinationLocationsFetch = debounceLocationsFetch(
