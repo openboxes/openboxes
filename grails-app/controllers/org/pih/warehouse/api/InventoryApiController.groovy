@@ -1,5 +1,6 @@
 package org.pih.warehouse.api
 
+import org.pih.warehouse.core.Location
 import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.importer.InventoryImportDataService
@@ -21,7 +22,8 @@ class InventoryApiController {
 
         ImportDataCommand command = new ImportDataCommand(
                 data: CSVUtils.csvToObjects(fileData),
-                date: new Date()
+                date: new Date(),
+                location: Location.get(params.id)
         )
 
         inventoryImportDataService.validateData(command)
