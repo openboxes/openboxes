@@ -75,7 +75,7 @@ export const debounceLocationsFetch = (
           direction: fetchAll ? undefined : (direction || queryParams?.direction),
           isReturnOrder: isReturnOrder || undefined,
           activityCodes,
-          withOrganization,
+          withOrganization: withOrganization || undefined,
         },
       }).then((result) => callback(_.map(result.data.data, (obj) => {
         const locationTypeData = withTypeDescription ? ` [${obj.locationType.description}]` : '';
