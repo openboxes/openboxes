@@ -63,6 +63,7 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
     // Transfer order
     Location originBinLocation
     Location destinationBinLocation
+    Location containerLocation
 
     Date estimatedReadyDate
     Date estimatedShipDate
@@ -150,6 +151,7 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
         parentOrderItem(nullable: true)
         originBinLocation(nullable: true)
         destinationBinLocation(nullable: true)
+        containerLocation(nullable: true)
         recipient(nullable: true)
         currencyCode(nullable: true)
         productSupplier(nullable: true)
