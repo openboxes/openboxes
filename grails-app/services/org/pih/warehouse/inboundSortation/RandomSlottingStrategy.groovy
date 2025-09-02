@@ -5,11 +5,11 @@ import org.pih.warehouse.core.Location
 class RandomSlottingStrategy implements PutawayStrategy {
 
     @Override
-    List<PutawayTask> execute(PutawayContext context, List<Location> locations, Integer quantityRemaining) {
-        List<PutawayTask> putawayTasks = []
+    List<PutawayResult> execute(PutawayContext context, List<Location> locations, Integer quantityRemaining) {
+        List<PutawayResult> putawayTasks = []
         Location randomLocation = getRandomLocation(locations)
         if (randomLocation) {
-            putawayTasks << new PutawayTask(
+            putawayTasks << new PutawayResult(
                     facility: context.facility,
                     product: context.product,
                     inventoryItem: context.inventoryItem,

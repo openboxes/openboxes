@@ -3,8 +3,8 @@ package org.pih.warehouse.inboundSortation
 class SlottingService {
     List<PutawayStrategy> strategies
 
-    List<PutawayTask> execute(PutawayContext context) {
-        List<PutawayTask> putawayTasks = []
+    List<PutawayResult> execute(PutawayContext context) {
+        List<PutawayResult> putawayTasks = []
         int quantityRemaining = context.quantity
         def locations = context.facility.internalLocations
 
@@ -18,8 +18,11 @@ class SlottingService {
             }
         }
 
+        // FIXME There should not be any quantity remaining at this point unless
+        //  we've create a strategy that takes location capacity into account
+        //  (i.e. strategies that limit the quantity allowed per strategy)
         if (quantityRemaining > 0) {
-            throw RuntimeException("Quantity remaining should not be 0 at this point. Something went wrong.")
+            throw RuntimeException("Quantity remaining should be 0 at this point. Something went wrong.")
         }
 
         return putawayTasks
