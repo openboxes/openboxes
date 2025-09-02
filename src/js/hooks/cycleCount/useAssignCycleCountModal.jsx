@@ -37,6 +37,7 @@ const useAssignCycleCountModal = ({
   closeModal,
   assignDataDirectly,
 }) => {
+  console.log(selectedCycleCounts);
   const spinner = useSpinner();
   const {
     currentLocation,
@@ -83,6 +84,7 @@ const useAssignCycleCountModal = ({
   };
 
   const handleAssign = async () => {
+    console.log('assigning', selectedCycleCounts.current);
     try {
       spinner.show();
       const commands = selectedCycleCounts.current.map((item) => {

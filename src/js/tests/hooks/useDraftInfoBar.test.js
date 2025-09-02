@@ -16,7 +16,7 @@ jest.mock('react-router-dom', () => ({
   useHistory: jest.fn(),
 }));
 jest.mock('selectors', () => ({
-  getCurrentLocation: jest.fn(() => ({ id: 'random-location' })),
+  getCurrentLocation: jest.fn(),
 }));
 
 describe('useDraftInfoBar', () => {
@@ -29,8 +29,9 @@ describe('useDraftInfoBar', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+
     useDispatch.mockReturnValue(mockDispatch);
-    useSelector.mockImplementation((cb) => cb({ currentLocation: { id: 'random-location' } }));
+    useSelector.mockImplementation(() => ({ currentLocation: { id: 'loc-123' } }));
     useHistory.mockReturnValue({ push: mockPush });
   });
 
@@ -45,7 +46,7 @@ describe('useDraftInfoBar', () => {
 
     act(() => result.current.discardDraft());
 
-    expect(eraseDraftSpy).toHaveBeenCalledWith('random-locateion', TO_RESOLVE_TAB);
+    expect(eraseDraftSpy).toHaveBeenCalledWith('loc-123', TO_RESOLVE_TAB);
     expect(mockDispatch).toHaveBeenCalledWith(eraseDraftSpy.mock.results[0].value);
   });
 

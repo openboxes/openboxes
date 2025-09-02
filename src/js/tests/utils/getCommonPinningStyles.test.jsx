@@ -8,7 +8,7 @@ describe('getCommonPinningStyles', () => {
     getSize: jest.fn(),
   };
 
-  const mockProps = {
+  const defaultProps = {
     column: mockColumn,
     flexWidth: undefined,
     isScreenWiderThanTable: false,
@@ -16,8 +16,8 @@ describe('getCommonPinningStyles', () => {
     loading: false,
   };
 
-  const getProps = (overrides = {}) => {
-    const props = { ...mockProps, ...overrides };
+  const getProps = (customProps = {}) => {
+    const props = { ...defaultProps, ...customProps };
     return getCommonPinningStyles(
       props.column,
       props.flexWidth,
@@ -84,10 +84,10 @@ describe('getCommonPinningStyles', () => {
     };
     expect(getCommonPinningStyles(
       undefinedColumn,
-      mockProps.flexWidth,
-      mockProps.isScreenWiderThanTable,
-      mockProps.dataLength,
-      mockProps.loading,
+      defaultProps.flexWidth,
+      defaultProps.isScreenWiderThanTable,
+      defaultProps.dataLength,
+      defaultProps.loading,
     )).toEqual({
       boxShadow: undefined,
       clipPath: undefined,
