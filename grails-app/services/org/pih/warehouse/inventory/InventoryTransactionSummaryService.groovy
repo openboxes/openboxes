@@ -171,7 +171,6 @@ class InventoryTransactionSummaryService {
                         dateRecorded: it[6],
                         recordedBy: User.read(it[7]),
                         baselineTransaction: Transaction.read(it[8])
-
                 )}
 
         String totalCountQuery = """
@@ -192,7 +191,6 @@ class InventoryTransactionSummaryService {
             AND transaction.transaction_date BETWEEN :startDate AND :endDate 
             ${command.products ? 'AND product.id IN (:products)' : ''}
             GROUP BY transaction.id, inventory_item.product_id
-            
         """
 
         int totalCount = buildInventoryTransactionsQuery(totalCountQuery, command, false)
