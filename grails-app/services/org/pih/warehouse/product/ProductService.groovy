@@ -17,6 +17,8 @@ import org.apache.commons.lang.StringUtils
 import org.hibernate.criterion.CriteriaSpecification
 import org.hibernate.criterion.Restrictions
 import org.hibernate.sql.JoinType
+import org.springframework.beans.factory.annotation.Autowired
+
 import org.pih.warehouse.core.ApiException
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.GlAccount
@@ -27,7 +29,9 @@ import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.LocalizationUtil
 import util.ReportUtil
-import java.text.SimpleDateFormat
+
+import org.pih.warehouse.core.date.DateFormatterManager
+
 /**
  * @author jmiranda*
  */
@@ -41,6 +45,7 @@ class ProductService {
     def userService
     def dataService
     ProductGroupService productGroupService
+    @Autowired DateFormatterManager dateFormatter
 
     def getNdcResults(operation, q) {
         def hipaaspaceApiKey = grailsApplication.config.hipaaspace.api.key
@@ -853,7 +858,6 @@ class ProductService {
      */
     String exportProducts(List<Product> products, boolean includeAttributes) {
 
-        def formatDate = new SimpleDateFormat("dd/MMM/yyyy hh:mm:ss")
         def attributes = Attribute.findAllByExportableAndActive(true, true)
         def formatTagLib = grailsApplication.mainContext.getBean('org.pih.warehouse.FormatTagLib')
         boolean hasRoleFinance = userService.hasRoleFinance()
@@ -887,8 +891,8 @@ class ProductService {
                 VendorName          : product.vendorName ?: '',
                 UPC                 : product.upc ?: '',
                 NDC                 : product.ndc ?: '',
-                Created             : product.dateCreated ? "${formatDate.format(product.dateCreated)}" : "",
-                Updated             : product.lastUpdated ? "${formatDate.format(product.lastUpdated)}" : "",
+                Created             : dateFormatter.formatForExport(product.dateCreated),
+                Updated             : dateFormatter.formatForExport(product.lastUpdated),
             ]
 
             if (includeAttributes) {

@@ -9,9 +9,12 @@
  **/
 package org.pih.warehouse
 
+import grails.util.Holders
+import java.time.temporal.TemporalAccessor
 import org.ocpsoft.prettytime.PrettyTime
 import groovy.time.TimeDuration
 import org.pih.warehouse.core.Constants
+import org.pih.warehouse.core.date.DateFormatterManager
 
 class DateTagLib {
 
@@ -22,7 +25,33 @@ class DateTagLib {
         out << (new Date().format(org.pih.warehouse.core.Constants.DEFAULT_YEAR_FORMAT))
     }
 
+    /**
+     * Formats a date for display and localizes it to a given locale and timezone.
+     */
     Closure formatDate = { attrs, body ->
+        if (!attrs.containsKey('date')) {
+            throwTagError("Attribute [date] is required.")
+        }
+
+        switch (attrs.date) {
+            // All dates going forward should be java.time classes
+            case TemporalAccessor:
+                out << formatJavaTimeDate(attrs)
+                return
+            // Old dates are java.util.Date instances so we keep this for backwards compatability.
+            case Date:
+                out << formatJavaUtilDate(attrs)
+                return
+            default:
+                throwTagError("Attribute [date] does not support type [${attrs.date.class}].")
+        }
+    }
+
+    /**
+     * Overrides Grails' built-in FormatTagLib, wrapping it with custom functionality.
+     * See https://gsp.grails.org/latest/ref/Tags/formatDate.html for more information.
+     */
+    private String formatJavaUtilDate(Object attrs) {
         def formatTagLib = grailsApplication.mainContext.getBean('org.grails.plugins.web.taglib.FormatTagLib')
 
         if (!attrs.format) {
@@ -31,7 +60,14 @@ class DateTagLib {
         if (!attrs.timeZone && session.timezone) {
             attrs.timeZone = session.timezone
         }
-        out << formatTagLib.formatDate.call(attrs)
+        return formatTagLib.formatDate.call(attrs)
+    }
+
+    private String formatJavaTimeDate(Object attrs) {
+        DateFormatterManager dateFormatterManager =
+                Holders.grailsApplication.mainContext.getBean("dateFormatterManager") as DateFormatterManager
+
+        return dateFormatterManager.format(attrs.date)
     }
 
     def expirationDate = { attrs, body ->
