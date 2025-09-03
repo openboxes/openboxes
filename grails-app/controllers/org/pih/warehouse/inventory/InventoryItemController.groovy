@@ -546,7 +546,21 @@ class InventoryItemController {
 
         // We need if/else statement to avoid duplication data (OBPIH-7438)
         if (flash.recordInventoryRows) {
-            commandInstance.recordInventoryRows = flash.recordInventoryRows
+            commandInstance.recordInventoryRows = flash.recordInventoryRows.collect { RecordInventoryRowCommand it ->
+                Location binLocation = it?.binLocation ? Location.get(it.binLocation.id) : null
+                [
+                    id: it.id,
+                    lotNumber: it.lotNumber,
+                    binLocation: binLocation,
+                    inventoryItem: it.inventoryItem,
+                    expirationDate: it.expirationDate,
+                    description: it.description,
+                    oldQuantity: it.oldQuantity,
+                    newQuantity: it.newQuantity,
+                    comment: it.comment,
+                    error: it.error,
+                ]
+            }
         } else {
             inventoryService.populateRecordInventoryCommand(commandInstance, params)
         }
