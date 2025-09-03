@@ -2,9 +2,7 @@ package org.pih.warehouse.api.putaway
 
 import grails.converters.JSON
 import grails.rest.RestfulController
-import org.pih.warehouse.api.StatusCategory
-import org.pih.warehouse.core.Location
-import org.pih.warehouse.product.Product
+import grails.validation.ValidationException
 import org.pih.warehouse.putaway.PutawayTask
 import org.pih.warehouse.putaway.PutawayTaskService
 import org.springframework.http.HttpStatus
@@ -30,13 +28,13 @@ class PutawayTaskApiController extends RestfulController<PutawayTask> {
 
     def search(SearchPutawayTaskCommand command) {
         log.info "search params " + params
-        // Return a not found error if request specifies a product, but the product does not exist
-        if (command.product && !command.product) {
-            render(status: HttpStatus.NOT_FOUND.value())
-            return;
+
+        if (command.hasErrors()) {
+            throw new ValidationException("validation errors", command.errors)
         }
 
-        def tasks = putawayTaskService.search(command.facility, command.product, params)
+        def tasks =
+                putawayTaskService.search(command.facility, command.product, command.container, command.statusCategory, params)
 
         render ([data: tasks, totalCount: tasks.totalCount?:0] as JSON)
     }
@@ -83,8 +81,3 @@ class PutawayTaskApiController extends RestfulController<PutawayTask> {
     }
 }
 
-class SearchPutawayTaskCommand {
-    Location facility
-    Product product
-    StatusCategory statusCategory
-}

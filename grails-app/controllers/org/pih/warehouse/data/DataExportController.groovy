@@ -12,10 +12,11 @@ package org.pih.warehouse.data
 import grails.converters.JSON
 import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.DocumentCode
-import org.pih.warehouse.core.DocumentType
+import grails.gorm.transactions.Transactional
 
 import java.nio.charset.Charset
 
+@Transactional
 class DataExportController {
 
     def dataService
@@ -39,7 +40,43 @@ class DataExportController {
             return
         }
         render document as JSON
-
     }
+
+    def editDialog() {
+        Document document = Document.get(params.id)
+        render(template: "editDialog", model: [documentInstance:document])
+    }
+
+    def update() {
+        def documentInstance = Document.get(params.id)
+        if (documentInstance) {
+            if (params.version) {
+                def version = params.version.toLong()
+                if (documentInstance.version > version) {
+                    documentInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [warehouse.message(code: 'document.label', default: 'Document')] as Object[], "Another user has updated this Document while you were editing")
+                    render(view: "edit", model: [documentInstance: documentInstance])
+                    return
+                }
+            }
+
+            String fileContents = params.remove("fileContents")
+            if (fileContents) {
+                documentInstance.fileContents = fileContents.bytes
+            }
+
+            documentInstance.properties = params
+
+            if (!documentInstance.hasErrors() && documentInstance.save(flush: true)) {
+                flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'document.label', default: 'Document'), documentInstance.id])}"
+            }
+            else {
+                // render errors somehow
+            }
+        } else {
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'document.label', default: 'Document'), params.id])}"
+        }
+        redirect(action: "index")
+    }
+
 
 }

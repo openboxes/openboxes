@@ -25,7 +25,7 @@ class PutawayTaskService {
     InventoryService inventoryService
 
     @Transactional(readOnly = true)
-    List search(Location facility, Product product, Map params) {
+    List search(Location facility, Product product, Location container, StatusCategory statusCategory, Map params) {
         log.info "search putaway tasks " + params + " product=" + product?.toJson() + " facility " + facility
         Integer max = Math.min((params.int('max') ?: 10), 100) as Integer
         Integer offset = params.int('offset') ?: 0 as Integer
@@ -36,12 +36,9 @@ class PutawayTaskService {
         List<PutawayTaskStatus> statuses = params.list("status").collect { it as PutawayTaskStatus }
 
         // Resolve the status category to a set of statuses and added to user-provided
-        StatusCategory statusCategory = params.statusCategory as StatusCategory
+        //StatusCategory statusCategory = params.statusCategory as StatusCategory
         List<PutawayTaskStatus> statusesByStatusCategory = PutawayTaskStatus.toSet(statusCategory)
         statuses += statusesByStatusCategory
-
-        // Search for putaway tasks in a container
-        Location container = params.container ? Location.get(params.container) : null
 
         // Search for putaway tasks based on user-provided search parameters
         List<PutawayTask> tasks = PutawayTask.where {
