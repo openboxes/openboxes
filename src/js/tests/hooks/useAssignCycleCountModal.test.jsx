@@ -142,7 +142,6 @@ describe('useAssignCycleCountModal', () => {
       ...defaultProps,
       isRecount: true,
     }));
-
     await result.current.handleAssign();
 
     const [, { commands }] = cycleCountApi.updateCycleCountRequests.mock.calls[0];
@@ -150,7 +149,6 @@ describe('useAssignCycleCountModal', () => {
   });
 
   it('should show and hide spinner when assigning successfully', async () => {
-
     const { result } = renderHook(() => useAssignCycleCountModal(defaultProps));
     await result.current.handleAssign();
 

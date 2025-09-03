@@ -1,11 +1,11 @@
 import React from 'react';
 
 import { render, screen, within } from '@testing-library/react';
+import renderer from 'react-test-renderer';
 
 import DoubleTile from 'utils/DoubleTile';
 
 import '@testing-library/jest-dom';
-import renderer from 'react-test-renderer';
 
 const mockTranslate = jest.fn((key, defaultValue) => defaultValue);
 
@@ -29,6 +29,10 @@ describe('DoubleTile component', () => {
     showFirstValuePercentSign: false,
     formatSecondValueAsCurrency: false,
   };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
 
   it('should match snapshot', () => {
     const doubleTile = renderer.create(<DoubleTile {...defaultProps} />).toJSON();

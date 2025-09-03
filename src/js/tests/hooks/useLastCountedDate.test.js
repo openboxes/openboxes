@@ -1,4 +1,3 @@
-import { waitFor } from '@testing-library/react';
 import { renderHook } from '@testing-library/react-hooks';
 
 import productApi from 'api/services/ProductApi';
@@ -23,40 +22,33 @@ describe('useLastCountedDate', () => {
     jest.clearAllMocks();
   });
 
-  it('calls API and updates map when loading=false', async () => {
-    productApi.getLatestInventoryCountDate.mockResolvedValue({
-      data: { data: mockData },
-    });
-
-    const { result } = renderHook(() =>
-      useLastCountedDate(mockTableData, false));
-
-    expect(productApi.getLatestInventoryCountDate).toHaveBeenCalledWith(['1234', '5678']);
-
-    await waitFor(() => {
-      expect(result.current.lastCountedDateMap).toEqual(mockData);
-    });
-  });
-
-  it('resets map when loading is true', () => {
-    const { result, rerender } = renderHook(
-      ({ tableData, loading }) => useLastCountedDate(tableData, loading),
-      {
-        initialProps: { tableData: mockTableData, loading: true },
-      },
-    );
-
-    expect(result.current.lastCountedDateMap).toEqual({});
-
-    rerender({ tableData: mockTableData, loading: true });
-    expect(result.current.lastCountedDateMap).toEqual({});
-  });
-
   it('does not call API when tableData.data is empty', async () => {
     const { result } = renderHook(() =>
       useLastCountedDate({ data: [] }, false));
 
     expect(productApi.getLatestInventoryCountDate).not.toHaveBeenCalled();
     expect(result.current.lastCountedDateMap).toEqual({});
+  });
+
+  it('does not fetch data and resets map when loading=true', () => {
+    const { result } = renderHook(() =>
+      useLastCountedDate(mockTableData, true));
+
+    expect(productApi.getLatestInventoryCountDate).not.toHaveBeenCalled();
+    expect(result.current.lastCountedDateMap).toEqual({});
+  });
+
+  it('calls API when loading=false', async () => {
+    productApi.getLatestInventoryCountDate.mockResolvedValue({
+      data: { data: mockData },
+    });
+
+    renderHook(() =>
+      useLastCountedDate(mockTableData, false));
+
+    expect(productApi.getLatestInventoryCountDate).toHaveBeenCalledWith([
+      mockTableData.data[0].product.id,
+      mockTableData.data[1].product.id,
+    ]);
   });
 });

@@ -2,10 +2,10 @@ import getCommonPinningStyles from 'utils/getCommonPinningStyles';
 
 describe('getCommonPinningStyles', () => {
   const mockColumn = {
-    getIsPinned: jest.fn(),
-    getIsLastColumn: jest.fn(),
-    getStart: jest.fn(),
-    getSize: jest.fn(),
+    getIsPinned: jest.fn().mockReturnValue(false),
+    getIsLastColumn: jest.fn().mockReturnValue(false),
+    getStart: jest.fn().mockReturnValue(0),
+    getSize: jest.fn().mockReturnValue(100),
   };
 
   const defaultProps = {
@@ -29,14 +29,12 @@ describe('getCommonPinningStyles', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockColumn.getIsPinned.mockReturnValue(false);
-    mockColumn.getIsLastColumn.mockReturnValue(false);
-    mockColumn.getStart.mockReturnValue(0);
-    mockColumn.getSize.mockReturnValue(100);
   });
 
   it('returns styles for non-pinned column', () => {
-    expect(getProps()).toEqual({
+    const result = getProps();
+
+    expect(result).toEqual({
       boxShadow: undefined,
       clipPath: undefined,
       marginRight: undefined,
@@ -54,7 +52,9 @@ describe('getCommonPinningStyles', () => {
     mockColumn.getIsLastColumn.mockReturnValue(true);
     mockColumn.getStart.mockReturnValue(50);
 
-    expect(getProps()).toEqual({
+    const result = getProps();
+
+    expect(result).toEqual({
       boxShadow: '0 0 15px #00000040',
       clipPath: 'inset(0 -15px 0 0)',
       marginRight: '5px',
@@ -70,25 +70,25 @@ describe('getCommonPinningStyles', () => {
   it('disables sticky position when conditions are not met', () => {
     mockColumn.getIsPinned.mockReturnValue('left');
 
-    expect(getProps({ isScreenWiderThanTable: true }).position).toBeFalsy();
-    expect(getProps({ dataLength: 0 }).position).toBeFalsy();
-    expect(getProps({ loading: true }).position).toBeFalsy();
+    let result = getProps({ isScreenWiderThanTable: true });
+    expect(result.position).toBeFalsy();
+
+    result = getProps({ dataLength: 0 });
+    expect(result.position).toBeFalsy();
+
+    result = getProps({ loading: true });
+    expect(result.position).toBeFalsy();
   });
 
   it('handles undefined column methods safely', () => {
-    const undefinedColumn = {
-      getIsPinned: jest.fn().mockReturnValue(undefined),
-      getIsLastColumn: jest.fn().mockReturnValue(undefined),
-      getStart: jest.fn().mockReturnValue(undefined),
-      getSize: jest.fn().mockReturnValue(undefined),
-    };
-    expect(getCommonPinningStyles(
-      undefinedColumn,
-      defaultProps.flexWidth,
-      defaultProps.isScreenWiderThanTable,
-      defaultProps.dataLength,
-      defaultProps.loading,
-    )).toEqual({
+    mockColumn.getIsPinned.mockReturnValue(undefined);
+    mockColumn.getIsLastColumn.mockReturnValue(undefined);
+    mockColumn.getStart.mockReturnValue(undefined);
+    mockColumn.getSize.mockReturnValue(undefined);
+
+    const result = getProps();
+
+    expect(result).toEqual({
       boxShadow: undefined,
       clipPath: undefined,
       marginRight: undefined,

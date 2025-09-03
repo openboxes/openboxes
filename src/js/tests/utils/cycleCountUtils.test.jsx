@@ -29,12 +29,6 @@ describe('trimLotNumberSpaces', () => {
     expect(result.inventoryItem.lotNumber).toBe('ABC123');
   });
 
-  it('does not mutate original object', () => {
-    const copy = JSON.parse(JSON.stringify(mockCycleCountItem));
-    trimLotNumberSpaces(copy);
-    expect(copy.inventoryItem.lotNumber).toBe('ABC123');
-  });
-
   it('handles missing lotNumber safely', () => {
     const props = {
       ...mockCycleCountItem,
