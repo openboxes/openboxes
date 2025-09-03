@@ -1,6 +1,5 @@
 import { act, renderHook } from '@testing-library/react-hooks';
 import moment from 'moment/moment';
-import { useSelector } from 'react-redux';
 
 import cycleCountApi from 'api/services/CycleCountApi';
 import notification from 'components/Layout/notifications/notification';
@@ -10,15 +9,15 @@ import NotificationType from 'consts/notificationTypes';
 import useAssignCycleCountModal from 'hooks/cycleCount/useAssignCycleCountModal';
 
 jest.mock('react-redux', () => ({
-  useSelector: jest.fn(),
+  useSelector: jest.fn().mockImplementation(() => ({
+    currentLocation: { id: 'loc-123' },
+    cycleCountIds: ['req-1'],
+  })),
   connect: jest.fn(() => (Component) => Component),
 }));
-jest.mock('selectors', () => ({
-  getCurrentLocation: jest.fn(),
-  getCycleCountsIds: jest.fn(),
-}));
 jest.mock('hooks/useTranslate', () => jest.fn(() => (key) => key));
-jest.mock('hooks/useSpinner', () => jest.fn(() => ({ show: jest.fn(), hide: jest.fn() })));
+const mockSpinner = { show: jest.fn(), hide: jest.fn() };
+jest.mock('hooks/useSpinner', () => jest.fn(() => mockSpinner));
 jest.mock('utils/dateUtils', () => jest.fn());
 jest.mock('api/services/CycleCountApi', () => ({
   updateCycleCountRequests: jest.fn().mockResolvedValue({ status: 200 }),
@@ -37,7 +36,6 @@ describe('useAssignCycleCountModal', () => {
       },
     ],
   };
-
   const defaultProps = {
     selectedCycleCounts,
     isRecount: false,
@@ -48,11 +46,6 @@ describe('useAssignCycleCountModal', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-
-    useSelector.mockImplementation(() => ({
-      currentLocation: { id: 'loc-123' },
-      cycleCountIds: ['req-1'],
-    }));
   });
 
   it('should initialize with correct columns', () => {
@@ -131,8 +124,6 @@ describe('useAssignCycleCountModal', () => {
   });
 
   it('should execute handleAssign and call closeModal & refetchData with notification', async () => {
-    cycleCountApi.updateCycleCountRequests.mockResolvedValue({ status: 200 });
-
     const { result } = renderHook(() => useAssignCycleCountModal(defaultProps));
     await result.current.handleAssign();
 
@@ -147,8 +138,6 @@ describe('useAssignCycleCountModal', () => {
   });
 
   it('should use RECOUNT_INDEX when isRecount = true', async () => {
-    cycleCountApi.updateCycleCountRequests.mockResolvedValue({ status: 200 });
-
     const { result } = renderHook(() => useAssignCycleCountModal({
       ...defaultProps,
       isRecount: true,
@@ -158,5 +147,14 @@ describe('useAssignCycleCountModal', () => {
 
     const [, { commands }] = cycleCountApi.updateCycleCountRequests.mock.calls[0];
     expect(commands[0].assignments).toHaveProperty(countIndex.RECOUNT_INDEX);
+  });
+
+  it('should show and hide spinner when assigning successfully', async () => {
+
+    const { result } = renderHook(() => useAssignCycleCountModal(defaultProps));
+    await result.current.handleAssign();
+
+    expect(mockSpinner.show).toHaveBeenCalled();
+    expect(mockSpinner.hide).toHaveBeenCalled();
   });
 });

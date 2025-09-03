@@ -114,4 +114,26 @@ describe('useCycleCountProductAvailability', () => {
       showCancelCheckbox: false,
     });
   });
+
+  it('calls isCounting with the correct status', () => {
+    useQueryParams.mockReturnValue({ tab: ALL_PRODUCTS_TAB });
+
+    const isCountingSpy = jest.spyOn(checkStatusUtils, 'isCounting').mockReturnValue(true);
+
+    const row = { status: cycleCountCandidateStatus.COUNTING, quantityAllocated: 0 };
+    renderHook(() => useCycleCountProductAvailability(row));
+
+    expect(isCountingSpy).toHaveBeenCalledWith(row.status);
+  });
+
+  it('calls isResolving with the correct status', () => {
+    useQueryParams.mockReturnValue({ tab: ALL_PRODUCTS_TAB });
+
+    const isResolvingSpy = jest.spyOn(checkStatusUtils, 'isResolving').mockReturnValue(true);
+
+    const row = { status: cycleCountCandidateStatus.INVESTIGATING, quantityAllocated: 0 };
+    renderHook(() => useCycleCountProductAvailability(row));
+
+    expect(isResolvingSpy).toHaveBeenCalledWith(row.status);
+  });
 });

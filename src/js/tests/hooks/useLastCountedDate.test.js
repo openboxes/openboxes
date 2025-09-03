@@ -21,12 +21,13 @@ describe('useLastCountedDate', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    productApi.getLatestInventoryCountDate.mockResolvedValue({
-      data: { data: mockData },
-    });
   });
 
   it('calls API and updates map when loading=false', async () => {
+    productApi.getLatestInventoryCountDate.mockResolvedValue({
+      data: { data: mockData },
+    });
+
     const { result } = renderHook(() =>
       useLastCountedDate(mockTableData, false));
 

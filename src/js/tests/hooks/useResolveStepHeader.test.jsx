@@ -28,7 +28,7 @@ describe('useResolveStepHeader', () => {
     initialRecountedBy: baseUser,
     initialDefaultRecountedBy: baseUser,
     updateRecountedDate: jest.fn(),
-    assignRecountedBy: jest.fn(() => jest.fn()),
+    assignRecountedBy: jest.fn(),
   };
 
   it('initializes with correct values', () => {
@@ -62,7 +62,7 @@ describe('useResolveStepHeader', () => {
   it('updates recountedBy and defaultRecountedBy and calls assignRecountedBy', () => {
     const { result } = renderHook(() => useResolveStepHeader(props));
     const assignFn = jest.fn();
-    props.assignRecountedBy.mockReturnValue(assignFn);
+    consoleSpy props.assignRecountedBy.mockReturnValue(assignFn);
 
     act(() => result.current.handleRecountedByChange(newUser));
 

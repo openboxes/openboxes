@@ -1,38 +1,34 @@
 import { act, renderHook } from '@testing-library/react-hooks';
-import { useDispatch, useSelector } from 'react-redux';
-import { MemoryRouter, useHistory } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { MemoryRouter } from 'react-router-dom';
 
 import * as actions from 'actions';
 import { CYCLE_COUNT } from 'consts/applicationUrls';
 import { TO_COUNT_TAB, TO_RESOLVE_TAB } from 'consts/cycleCount';
 import useDraftInfoBar from 'hooks/cycleCount/useDraftInfoBar';
 
+const mockDispatch = jest.fn();
+const mockPush = jest.fn();
+const eraseDraftSpy = jest.spyOn(actions, 'eraseDraft');
+
 jest.mock('react-redux', () => ({
-  useDispatch: jest.fn(),
-  useSelector: jest.fn(),
+  useDispatch: jest.fn(() => mockDispatch),
+  useSelector: jest.fn(() => ({ currentLocation: { id: 'loc-123' } })),
   connect: jest.fn(() => (Component) => Component),
 }));
 jest.mock('react-router-dom', () => ({
-  useHistory: jest.fn(),
+  useHistory: jest.fn(() => ({ push: mockPush })),
 }));
 jest.mock('selectors', () => ({
   getCurrentLocation: jest.fn(),
 }));
 
 describe('useDraftInfoBar', () => {
-  const mockDispatch = jest.fn();
-  const mockPush = jest.fn();
-  const eraseDraftSpy = jest.spyOn(actions, 'eraseDraft');
-
   const renderUseDraftInfoBar = (tab) =>
     renderHook(() => useDraftInfoBar(tab), { wrapper: MemoryRouter });
 
   beforeEach(() => {
     jest.clearAllMocks();
-
-    useDispatch.mockReturnValue(mockDispatch);
-    useSelector.mockImplementation(() => ({ currentLocation: { id: 'loc-123' } }));
-    useHistory.mockReturnValue({ push: mockPush });
   });
 
   it('returns discardDraft and continueDraft functions', () => {

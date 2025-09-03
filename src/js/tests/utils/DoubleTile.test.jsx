@@ -30,7 +30,7 @@ describe('DoubleTile component', () => {
     formatSecondValueAsCurrency: false,
   };
 
-  it('should match snapshot for sample props', () => {
+  it('should match snapshot', () => {
     const doubleTile = renderer.create(<DoubleTile {...defaultProps} />).toJSON();
     expect(doubleTile).toMatchSnapshot();
   });

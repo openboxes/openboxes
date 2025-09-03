@@ -26,8 +26,8 @@ describe('useCountStepHeader', () => {
     initialDateCounted: moment('2025-08-25T09:00:00Z'),
     initialCountedBy: baseUser,
     initialDefaultCountedBy: baseUser,
-    updateDateCounted: jest.fn(() => jest.fn()),
-    assignCountedBy: jest.fn(() => jest.fn()),
+    updateDateCounted: jest.fn(),
+    assignCountedBy: jest.fn(),
   };
 
   it('initializes with correct values', () => {
