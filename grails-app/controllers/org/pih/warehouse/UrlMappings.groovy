@@ -108,17 +108,12 @@ class UrlMappings {
 
         "/api/products"(parseRequest: true) {
             controller = { "productApi" }
-            action = [GET: "list"]
+            action = [GET: "list", POST: "save"]
         }
 
         "/api/products/search"(parseRequest: true) {
             controller = { "productApi" }
             action = [GET: "search"]
-        }
-
-        "/api/products/save"(parseRequest: true) {
-            controller = { "productApi" }
-            action = [POST: "save"]
         }
 
         "/api/products/$id/$action" {

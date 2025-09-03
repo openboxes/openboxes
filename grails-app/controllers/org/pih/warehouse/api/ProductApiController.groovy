@@ -325,6 +325,6 @@ class ProductApiController extends BaseDomainApiController {
         // TODO: Add this back in once we move this logic to the service
         //sendProductCreatedNotification(product)
 
-        render([product: product.toJsonFull()] as JSON)
+        render([product: product.toFullJson()] as JSON)
     }
 }

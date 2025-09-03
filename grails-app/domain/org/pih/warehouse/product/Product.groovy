@@ -816,7 +816,7 @@ class Product implements Comparable, Serializable {
         ]
     }
 
-    Map toJsonFull() {
+    Map toFullJson() {
         [
                 id                  : id,
                 productCode         : productCode,

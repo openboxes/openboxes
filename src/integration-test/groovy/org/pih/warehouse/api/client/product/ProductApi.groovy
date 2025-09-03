@@ -23,7 +23,7 @@ class ProductApi extends AuthenticatedApi {
                 .setBody(body)
                 .build()
 
-        return request(requestSpec, responseSpec, Method.POST, "/products/save")
+        return request(requestSpec, responseSpec, Method.POST, "/products")
     }
 
     Response getDemand(String productId, ResponseSpecification responseSpec) {
