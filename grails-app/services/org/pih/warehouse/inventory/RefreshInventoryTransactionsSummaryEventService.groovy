@@ -17,7 +17,10 @@ class RefreshInventoryTransactionsSummaryEventService implements ApplicationList
         }
         if (event.transactionTypeId in [Constants.ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID,
                                         Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID,
-                                        Constants.TRANSFER_IN_TRANSACTION_TYPE_ID]) {
+                                        Constants.TRANSFER_IN_TRANSACTION_TYPE_ID,
+                                        Constants.EXPIRATION_TRANSACTION_TYPE_ID,
+                                        Constants.DAMAGE_TRANSACTION_TYPE_ID,
+                                        Constants.CONSUMPTION_TRANSACTION_TYPE_ID]) {
             inventoryTransactionSummaryService.refreshInventoryMovementSummaryView(event)
         }
 
