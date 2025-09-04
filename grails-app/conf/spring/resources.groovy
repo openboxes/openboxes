@@ -1,5 +1,6 @@
 package spring
 
+import org.pih.warehouse.inboundSortation.CrossDockingStrategy
 import org.pih.warehouse.inboundSortation.DefaultSlottingStrategy
 import org.pih.warehouse.inboundSortation.RandomSlottingStrategy
 import org.pih.warehouse.inboundSortation.SlottingService
@@ -15,10 +16,14 @@ beans = {
 
 
     // Slotting strategies
+    crossDockingStrategy(CrossDockingStrategy) {
+        demandService = ref('demandService')
+    }
     defaultSlottingStrategy(DefaultSlottingStrategy)
     randomSlottingStrategy(RandomSlottingStrategy)
     slottingService(SlottingService) {
         strategies = [
+                ref('crossDockingStrategy'), //cross docking
                 ref('defaultSlottingStrategy'), // directed putaway to preferred bin
                 ref('randomSlottingStrategy') // fallback if none of the strategies worked, executed as the last one
         ]

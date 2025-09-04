@@ -419,6 +419,15 @@ class Requisition implements Comparable<Requisition>, Serializable {
         return sourceType == RequisitionSourceType.ELECTRONIC
     }
 
+    DemandTypeCode getDemandTypeCode() {
+        if (description.length() >= 2) {
+            String codeFromDescription = description[0..1]
+            return DemandTypeCode.findByCode(codeFromDescription) ?: DemandTypeCode.DEFAULT
+        }
+
+        return null
+    }
+
     Map toJson() {
         [
                 id                   : id,
