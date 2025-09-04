@@ -214,7 +214,10 @@ class InventoryTransactionSummaryService {
         }
         event.entriesByProduct.each { product, entries ->
             Timestamp transactionDate = new Timestamp(event.transactionDate.time)
-
+            List<String> debitTransactionTypes = [Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID,
+                                                  Constants.EXPIRATION_TRANSACTION_TYPE_ID,
+                                                  Constants.DAMAGE_TRANSACTION_TYPE_ID,
+                                                  Constants.CONSUMPTION_TRANSACTION_TYPE_ID]
             Map<String, Object> params = [
                     transactionId: event.transactionId,
                     productId: product.id,
@@ -222,7 +225,7 @@ class InventoryTransactionSummaryService {
                     inventoryId: event.inventoryId,
                     productCode: product.productCode,
                     quantitySum: entries.sum { entry ->
-                        event.transactionTypeId == Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID ? -entry.quantity : entry.quantity
+                        debitTransactionTypes.contains(event.transactionTypeId) ? -entry.quantity : entry.quantity
                     }
             ]
             String query = """
