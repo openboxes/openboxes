@@ -128,7 +128,7 @@ describe('useCycleCountProductAvailability', () => {
 
   it('calls isResolving with the correct status', () => {
     useQueryParams.mockReturnValue({ tab: ALL_PRODUCTS_TAB });
-
+    jest.spyOn(checkStatusUtils, 'isCounting').mockReturnValue(false);
     const isResolvingSpy = jest.spyOn(checkStatusUtils, 'isResolving').mockReturnValue(true);
 
     const row = { status: cycleCountCandidateStatus.INVESTIGATING, quantityAllocated: 0 };

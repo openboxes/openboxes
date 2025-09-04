@@ -22,7 +22,7 @@ describe('useLastCountedDate', () => {
     jest.clearAllMocks();
   });
 
-  it('does not call API when tableData.data is empty', async () => {
+  it('does not call API when tableData.data is empty', () => {
     const { result } = renderHook(() =>
       useLastCountedDate({ data: [] }, false));
 
@@ -38,7 +38,7 @@ describe('useLastCountedDate', () => {
     expect(result.current.lastCountedDateMap).toEqual({});
   });
 
-  it('calls API when loading=false', async () => {
+  it('calls API when loading = false', () => {
     productApi.getLatestInventoryCountDate.mockResolvedValue({
       data: { data: mockData },
     });

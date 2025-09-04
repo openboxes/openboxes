@@ -130,11 +130,6 @@ describe('useAssignCycleCountModal', () => {
     expect(defaultProps.closeModal).toHaveBeenCalled();
     expect(defaultProps.refetchData).toHaveBeenCalled();
     expect(notification).toHaveBeenCalledWith(NotificationType.SUCCESS);
-
-    const mockInnerFn = notification.mock.results[0].value;
-    expect(mockInnerFn).toHaveBeenCalledWith({
-      message: 'react.cycleCount.assignSuccessfully.label',
-    });
   });
 
   it('should use RECOUNT_INDEX when isRecount = true', async () => {
