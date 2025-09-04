@@ -6,14 +6,16 @@ SELECT
     t.inventory_id,
     t.id AS transaction_id,
     SUM(
-        -- If it's outbound (transfer out), negate the quantity, as its entries have positive quantity
-        CASE WHEN t.transaction_type_id = '9' THEN -te.quantity ELSE te.quantity END
+        -- If it's outbound (transfer out), expired, damaged, consumption, negate the quantity, as its entries have positive quantity
+        CASE
+            WHEN t.transaction_type_id IN ('2', '4', '5', '9') THEN -te.quantity
+            ELSE te.quantity END
     ) AS quantity_sum
 FROM (
          SELECT id, transaction_date, inventory_id, transaction_type_id
          FROM transaction
-         WHERE transaction_type_id IN ('3','8','9') -- adjustments, transfer ins, transfer outs
-           AND transaction.order_id IS NULL
+         WHERE transaction_type_id IN ('2', '3', '4', '5', '8','9') -- adjustments, transfer ins, transfer outs, expired, damaged, consumption
+         AND transaction.order_id IS NULL
      ) t
          JOIN transaction_entry te ON te.transaction_id = t.id
          JOIN inventory_item ii ON ii.id = te.inventory_item_id
