@@ -26,6 +26,10 @@ class FormatTagLib {
     def date = { attrs, body ->
         if (attrs.obj != null) {
             DateFormat df = new SimpleDateFormat((attrs.format) ?: Constants.DEFAULT_DATE_FORMAT)
+            TimeZone tz = session.timezone
+            if (tz != null) {
+                df.setTimeZone(tz)
+            }
             out << df.format(attrs.obj)
         }
     }
