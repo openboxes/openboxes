@@ -225,7 +225,6 @@ class PutawayTaskService {
         save(task)
     }
 
-
     void complete(PutawayTask task, String destinationId, String completedById, Boolean force = false) {
         log.info "complete putaway "
         if (!task) {
@@ -244,7 +243,7 @@ class PutawayTaskService {
         }
 
         // validate destination
-        if (task.destination != destination) {
+        if (task.destination != destination && !force) {
             task.errors.reject("destination", "Destination provided does not match expected destination")
         }
 

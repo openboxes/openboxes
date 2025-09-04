@@ -47,6 +47,8 @@ class PutawayTaskAdapter {
         // assign - putaway task has been loaded into putaway container (change if user provided override)
         orderItem.containerLocation = task.container
 
+        orderItem.destinationBinLocation = task.destination
+
         // complete - task is completed
         order.completedBy = task.completedBy
         order.dateCompleted = task.dateCompleted
