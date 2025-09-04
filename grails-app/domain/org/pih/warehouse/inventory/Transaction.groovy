@@ -48,6 +48,9 @@ class Transaction implements Comparable, Serializable {
 
     def publishSaveEvent() {
         Holders.grailsApplication.mainContext.publishEvent(new RefreshProductAvailabilityEvent(this, forceRefresh))
+    }
+
+    void publishReportsEvents() {
         Holders.grailsApplication.mainContext.publishEvent(new RefreshInventoryCountEvent(this))
         Holders.grailsApplication.mainContext.publishEvent(new RefreshInventoryTransactionsSummaryEvent(this))
     }
@@ -60,6 +63,7 @@ class Transaction implements Comparable, Serializable {
     // ID won't be available until after the record is inserted
     def afterInsert() {
         publishSaveEvent()
+        publishReportsEvents()
     }
 
     def afterUpdate() {
