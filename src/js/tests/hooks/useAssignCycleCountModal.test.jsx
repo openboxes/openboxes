@@ -8,6 +8,8 @@ import cycleCountColumn from 'consts/cycleCountColumn';
 import NotificationType from 'consts/notificationTypes';
 import useAssignCycleCountModal from 'hooks/cycleCount/useAssignCycleCountModal';
 
+import { baseUser } from '../__mocks__/users';
+
 jest.mock('react-redux', () => ({
   useSelector: jest.fn().mockImplementation(() => ({
     currentLocation: { id: 'loc-123' },
@@ -71,17 +73,16 @@ describe('useAssignCycleCountModal', () => {
 
   it('should update assignee for a specific cycle count', () => {
     const { result } = renderHook(() => useAssignCycleCountModal(defaultProps));
-    const selectedOption = { id: 'user-1', label: 'User 1' };
 
     act(() => {
       result.current.handleUpdateAssignees(
         ['req-1'],
         cycleCountColumn.ASSIGNEE,
-        selectedOption,
+        baseUser,
       );
     });
 
-    expect(selectedCycleCounts.current[0].assignee).toEqual(selectedOption);
+    expect(selectedCycleCounts.current[0].assignee).toEqual(baseUser);
   });
 
   it('should update deadline for a specific cycle count', () => {
@@ -109,18 +110,17 @@ describe('useAssignCycleCountModal', () => {
     });
 
     const { result } = renderHook(() => useAssignCycleCountModal(defaultProps));
-    const selectedOption = { id: 'user-3', label: 'User 3' };
 
     act(() => {
       result.current.handleUpdateAssignees(
         ['req-1', 'req-2'],
         cycleCountColumn.ASSIGNEE,
-        selectedOption,
+        baseUser,
       );
     });
 
-    expect(selectedCycleCounts.current[0].assignee).toEqual(selectedOption);
-    expect(selectedCycleCounts.current[1].assignee).toEqual(selectedOption);
+    expect(selectedCycleCounts.current[0].assignee).toEqual(baseUser);
+    expect(selectedCycleCounts.current[1].assignee).toEqual(baseUser);
   });
 
   it('should execute handleAssign and call closeModal & refetchData with notification', async () => {

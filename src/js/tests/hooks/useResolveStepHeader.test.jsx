@@ -3,25 +3,9 @@ import moment from 'moment';
 
 import useResolveStepHeader from 'hooks/cycleCount/useResolveStepHeader';
 
+import { baseUser, newUser } from '../__mocks__/users';
+
 describe('useResolveStepHeader', () => {
-  const baseUser = {
-    id: 'user-1',
-    firstName: 'John',
-    lastName: 'Doe',
-    name: 'John Doe',
-    label: 'John Doe',
-    value: 'user-1',
-  };
-
-  const newUser = {
-    id: 'user-2',
-    firstName: 'Alice',
-    lastName: 'Wonder',
-    name: 'Alice Wonder',
-    label: 'Alice Wonder',
-    value: 'user-2',
-  };
-
   const props = {
     id: 'random-id',
     initialDateRecounted: moment('2025-08-25T09:00:00Z'),

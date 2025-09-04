@@ -29,6 +29,18 @@ describe('trimLotNumberSpaces', () => {
     expect(result.inventoryItem.lotNumber).toBe('ABC123');
   });
 
+  it('handles lotNumber with internal spaces correctly', () => {
+    const props = {
+      ...mockCycleCountItem,
+      inventoryItem: {
+        ...mockCycleCountItem.inventoryItem,
+        lotNumber: '  A B C 1 2 3  ',
+      },
+    };
+    const result = trimLotNumberSpaces(props);
+    expect(result.inventoryItem.lotNumber).toBe('A B C 1 2 3');
+  });
+
   it('handles missing lotNumber safely', () => {
     const props = {
       ...mockCycleCountItem,

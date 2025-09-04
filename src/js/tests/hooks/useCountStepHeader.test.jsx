@@ -3,25 +3,9 @@ import moment from 'moment';
 
 import useCountStepHeader from 'hooks/cycleCount/useCountStepHeader';
 
+import { baseUser, newUser } from '../__mocks__/users';
+
 describe('useCountStepHeader', () => {
-  const baseUser = {
-    id: 'user-1',
-    firstName: 'John',
-    lastName: 'Doe',
-    name: 'John Doe',
-    label: 'John Doe',
-    value: 'user-1',
-  };
-
-  const newUser = {
-    id: 'user-2',
-    firstName: 'Alice',
-    lastName: 'Wonder',
-    name: 'Alice Wonder',
-    label: 'Alice Wonder',
-    value: 'user-2',
-  };
-
   const props = {
     id: 'random-id',
     initialDateCounted: moment('2025-08-25T09:00:00Z'),
