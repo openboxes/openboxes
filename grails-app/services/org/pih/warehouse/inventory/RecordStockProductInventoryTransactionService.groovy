@@ -31,7 +31,7 @@ class RecordStockProductInventoryTransactionService extends ProductInventoryTran
         Integer quantityOnHand = availableItems.get(key)?.quantityOnHand
         // When the row doesn't already have an existing quantity on hand on the date of creation, it means that it is a new
         // row. In that case, we should add the whole value from that row to the already existing corresponding line. If
-        //The quantity in the already existing row is 5, and the new row has a quantity of 2. We should get one line with qty 7,
+        // The quantity in the already existing row is 5, and the new row has a quantity of 2. We should get one line with qty 7,
         // and the transaction entry should contain quantity 2. In case we are editing an already existing line (old quantity
         // greater than 0), we should set the new value for that line. The adjustment entry should be the difference between
         // the new value and the original value. When we had quantity 5, and then we changed it to 7, the row should have
@@ -50,7 +50,6 @@ class RecordStockProductInventoryTransactionService extends ProductInventoryTran
                 inventoryItem: inventoryItem,
                 comments: recordInventoryRowCommand.comment,
                 binLocation: recordInventoryRowCommand.binLocation,
-
         )
     }
 

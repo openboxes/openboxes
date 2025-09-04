@@ -1370,6 +1370,27 @@ class InventoryService implements ApplicationContextAware {
         }
     }
 
+    List<RecordInventoryRowCommand> groupDuplicatedRecordInventoryRows(RecordInventoryCommand cmd) {
+        return cmd.recordInventoryRows
+                .groupBy { row ->
+                    ProductAvailabilityService.constructAvailableItemKey(
+                            row?.binLocation?.name,
+                            row?.lotNumber,
+                            cmd?.product?.productCode
+                    )
+                }
+                .collect { key, rows ->
+                    Integer totalNewQty = rows.sum { it.newQuantity ?: 0 }
+                    Integer existingOldQty = rows.find { it.oldQuantity > 0 }?.oldQuantity ?: 0
+
+                    RecordInventoryRowCommand merged = rows[0]
+                    merged.newQuantity = totalNewQty
+                    merged.oldQuantity = existingOldQty
+                    return merged
+                }
+    }
+
+
     RecordInventoryCommand saveRecordInventoryCommand(RecordInventoryCommand cmd, Map params) {
         log.debug "Saving record inventory command params: " + params
 
@@ -1434,7 +1455,7 @@ class InventoryService implements ApplicationContextAware {
 
             List<AvailableItem> currentRecordStockItems = []
             // 3. Process each row added to the record inventory page
-            cmd.recordInventoryRows.each { RecordInventoryRowCommand row ->
+            groupDuplicatedRecordInventoryRows(cmd).each { RecordInventoryRowCommand row ->
                 if (!row) {
                     return
                 }
