@@ -337,6 +337,10 @@ openboxes:
                 labelYearPrefix: ""
                 yearFormat: "yyyy"
 
+    interceptor:
+      basicAuth:
+        enabled: false
+
     order:
         orderStatusPropertyMap:
             PLACED: ["productCode", "sourceName", "supplierCode", "manufacturer", "manufacturerCode", "quantity", "unitPrice", "unitOfMeasure", "budgetCode"]
