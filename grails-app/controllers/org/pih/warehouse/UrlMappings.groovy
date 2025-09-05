@@ -863,12 +863,12 @@ class UrlMappings {
 
         "/api/purchaseOrders"(parseRequest: true) {
             controller = { "purchaseOrderApi" }
-            action = [GET: "list"]
+            action = [GET: "list", POST: "create"]
         }
 
         "/api/purchaseOrders/$id"(parseRequest: true) {
             controller = { "purchaseOrderApi" }
-            action = [GET: "read", DELETE: "delete"]
+            action = [GET: "read", DELETE: "delete", PUT: "update"]
         }
 
         /**
