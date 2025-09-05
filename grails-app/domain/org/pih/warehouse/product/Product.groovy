@@ -11,6 +11,7 @@ package org.pih.warehouse.product
 
 import grails.databinding.BindUsing
 import grails.util.Holders
+import java.time.Instant
 import org.apache.commons.collections.FactoryUtils
 import org.apache.commons.collections.list.LazyList
 import org.apache.commons.lang.NotImplementedException
@@ -229,8 +230,8 @@ class Product implements Comparable, Serializable {
     GlAccount glAccount
 
     // Auditing
-    Date dateCreated
-    Date lastUpdated
+    Instant dateCreated
+    Instant lastUpdated
     User createdBy
     User updatedBy
 
