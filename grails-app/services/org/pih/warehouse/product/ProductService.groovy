@@ -45,7 +45,9 @@ class ProductService {
     def userService
     def dataService
     ProductGroupService productGroupService
-    @Autowired DateFormatterManager dateFormatter
+
+    @Autowired
+    DateFormatterManager dateFormatter
 
     def getNdcResults(operation, q) {
         def hipaaspaceApiKey = grailsApplication.config.hipaaspace.api.key

@@ -1,4 +1,5 @@
-<%@ page import="org.pih.warehouse.DateUtil; org.pih.warehouse.inventory.InventoryStatus" %>
+<%@ page import="org.pih.warehouse.DateUtil" %>
+<%@ page import="org.pih.warehouse.inventory.InventoryStatus" %>
 <style>
 .nailthumb-container {
     width: 100%;
