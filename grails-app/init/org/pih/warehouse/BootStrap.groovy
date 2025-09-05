@@ -16,6 +16,7 @@ import org.pih.warehouse.inventory.CycleCountDetails
 import org.pih.warehouse.inventory.CycleCountItem
 import org.pih.warehouse.inventory.CycleCountSummary
 import org.pih.warehouse.inventory.PendingCycleCountRequest
+import org.pih.warehouse.putaway.PutawayTask
 
 import java.math.RoundingMode
 import java.time.Instant
@@ -636,6 +637,10 @@ class BootStrap {
 
         JSON.registerObjectMarshaller(PendingCycleCountRequest) { PendingCycleCountRequest pendingCycleCountRequest ->
             return pendingCycleCountRequest.toJson()
+        }
+
+        JSON.registerObjectMarshaller(PutawayTask) { PutawayTask putawayTask ->
+            return putawayTask.toJson()
         }
     }
 

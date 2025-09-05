@@ -23,6 +23,7 @@ import org.pih.warehouse.core.User
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.requisition.RequisitionType
 import org.springframework.boot.info.GitProperties
+import org.springframework.http.HttpStatus
 import util.ConfigHelper
 
 import java.text.DateFormat
@@ -302,4 +303,14 @@ class ApiController {
             throw new IllegalStateException("Unable to locate object with identifier ${params.id}")
         }
     }
+
+    def barcodes() {
+        Product product = Product.findByProductCodeOrUpc(params.id, params.id)
+        if (!product) {
+            render(status: HttpStatus.NOT_FOUND.value())
+            return
+        }
+        render([data: product] as JSON)
+    }
+
 }
