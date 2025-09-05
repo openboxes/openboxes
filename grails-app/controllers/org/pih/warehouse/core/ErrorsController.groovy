@@ -12,6 +12,7 @@ package org.pih.warehouse.core
 import grails.converters.JSON
 import grails.core.GrailsApplication
 import org.grails.exceptions.ExceptionUtils
+import org.grails.web.errors.GrailsWrappedRuntimeException
 import org.pih.warehouse.RequestUtil
 import org.springframework.http.HttpMethod
 import org.springframework.validation.BeanPropertyBindingResult
@@ -90,7 +91,7 @@ class ErrorsController {
 
     def handleMethodNotAllowed() {
         if (RequestUtil.isAjax(request)) {
-            render([errorCode: 405, errorMessage: "Method not allowed"] as JSON)
+            render([errorCode: 405, errorMessage: "Method ${request.method} not allowed for ${controllerName}:${actionName}"] as JSON)
             return
         }
         render(view: "/errors/methodNotAllowed")
@@ -127,7 +128,8 @@ class ErrorsController {
             }
 
             Throwable root = ExceptionUtils.getRootCause(request.getAttribute('exception'))
-            render([errorCode: 500, errorMessage: root.getMessage()])
+            render([errorCode: 500, errorMessage: root.getMessage()] as JSON)
+            return
         }
 
         render(view: '/error')

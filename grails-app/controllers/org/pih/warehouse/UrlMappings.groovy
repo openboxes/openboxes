@@ -51,6 +51,17 @@ class UrlMappings {
             action = [GET: "read", POST: "save", PUT: "save", DELETE: "delete"]
         }
 
+        "/api/categories:bulk"(parseRequest: true) {
+            controller = { "categoryApi" }
+            action = [GET: "list", POST: "save"]
+        }
+
+        "/api/categories/$id:sortToContainer"(parseRequest: true) {
+            controller = { "categoryApi" }
+            action = [GET: "list", PATCH: "list"]
+        }
+
+
         // Category options for filters on  product list page
         "/api/categoryOptions"(parseRequest: true) {
             controller = { "selectOptionsApi" }
@@ -1152,7 +1163,7 @@ class UrlMappings {
         // Error handling
 
         "401"(controller: "errors", action: "handleUnauthorized")
-        "404"(controller: "errors", action: "handleNotFound")
+        //"404"(controller: "errors", action: "handleNotFound")
         "405"(controller: "errors", action: "handleMethodNotAllowed")
         "500"(controller: "errors", action: "handleException")
         "500"(controller: "errors", action: "handleNotFound", exception: ObjectNotFoundException)

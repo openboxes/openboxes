@@ -101,6 +101,7 @@
     -->
     <logger name="org.hibernate.type" level="info" />
     <logger name="org.hibernate.validator" level="info" />
+    <logger name="org.quartz" level="info" />
     <logger name="org.springframework.aop" level="info" />
     <logger name="org.springframework.beans" level="info" />
     <logger name="org.springframework.boot.actuate" level="warn" />

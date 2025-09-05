@@ -19,6 +19,7 @@ import org.pih.warehouse.inventory.InventoryAuditDetails
 import org.pih.warehouse.inventory.InventoryAuditSummary
 import org.pih.warehouse.inventory.InventoryTransactionsSummary
 import org.pih.warehouse.inventory.PendingCycleCountRequest
+import org.pih.warehouse.putaway.PutawayTask
 import org.pih.warehouse.reporting.CycleCountProductSummary
 
 import java.math.RoundingMode
@@ -656,6 +657,10 @@ class BootStrap {
 
         JSON.registerObjectMarshaller(InventoryTransactionsSummary) { InventoryTransactionsSummary inventoryTransactionsSummary ->
             return inventoryTransactionsSummary.toJson()
+        }
+
+        JSON.registerObjectMarshaller(PutawayTask) { PutawayTask putawayTask ->
+            return putawayTask.toJson()
         }
     }
 
