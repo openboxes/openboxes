@@ -1,9 +1,8 @@
 import { act, renderHook } from '@testing-library/react-hooks';
 import moment from 'moment';
+import { baseUser, newUser } from 'tests/__mocks__/users';
 
 import useResolveStepHeader from 'hooks/cycleCount/useResolveStepHeader';
-
-import { baseUser, newUser } from '../__mocks__/users';
 
 describe('useResolveStepHeader', () => {
   const props = {

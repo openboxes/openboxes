@@ -1,9 +1,8 @@
 import { act, renderHook } from '@testing-library/react-hooks';
 import moment from 'moment';
+import { baseUser, newUser } from 'tests/__mocks__/users';
 
 import useCountStepHeader from 'hooks/cycleCount/useCountStepHeader';
-
-import { baseUser, newUser } from '../__mocks__/users';
 
 describe('useCountStepHeader', () => {
   const props = {

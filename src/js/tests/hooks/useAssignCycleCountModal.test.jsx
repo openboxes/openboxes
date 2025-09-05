@@ -1,5 +1,6 @@
 import { act, renderHook } from '@testing-library/react-hooks';
 import moment from 'moment/moment';
+import { baseUser } from 'tests/__mocks__/users';
 
 import cycleCountApi from 'api/services/CycleCountApi';
 import notification from 'components/Layout/notifications/notification';
@@ -7,8 +8,6 @@ import countIndex from 'consts/countIndex';
 import cycleCountColumn from 'consts/cycleCountColumn';
 import NotificationType from 'consts/notificationTypes';
 import useAssignCycleCountModal from 'hooks/cycleCount/useAssignCycleCountModal';
-
-import { baseUser } from '../__mocks__/users';
 
 jest.mock('react-redux', () => ({
   useSelector: jest.fn().mockImplementation(() => ({
