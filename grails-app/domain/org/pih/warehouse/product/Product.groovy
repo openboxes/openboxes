@@ -816,4 +816,62 @@ class Product implements Comparable, Serializable {
                 lotAndExpiryControl : lotAndExpiryControl,
         ]
     }
+
+    Map toFullJson() {
+        [
+                id                  : id,
+                productCode         : productCode,
+                name                : name,
+                description         : description,
+                productType         : [
+                        id: productType?.id,
+                ],
+                category            : [
+                        id: category?.id,
+                ],
+                defaultUom          : [
+                        id: defaultUom?.id,
+                ],
+                glAccount           : [
+                        id: glAccount?.id,
+                ],
+                productFamily       : [
+                        id: productFamily?.id,
+                ],
+                createdBy           : [
+                        id: createdBy?.id,
+                ],
+                updatedBy           : [
+                        id: updatedBy?.id,
+                ],
+                unitOfMeasure       : unitOfMeasure,
+                abcClass            : abcClass,
+                upc                 : upc,
+                ndc                 : ndc,
+                attributes          : attributes,
+                costPerUnit         : costPerUnit,
+                controlledSubstance : controlledSubstance,
+                hazardousMaterial   : hazardousMaterial,
+                active              : active,
+                coldChain           : coldChain,
+                serialized          : serialized,
+                lotControl          : lotControl,
+                essential           : essential,
+                reconditioned       : reconditioned,
+                manufacturer        : manufacturer,
+                manufacturerCode    : manufacturerCode,
+                manufacturerName    : manufacturerName,
+                brandName           : brandName,
+                modelNumber         : modelNumber,
+                vendor              : vendor,
+                vendorCode          : vendorCode,
+                vendorName          : vendorName,
+                packageSize         : packageSize,
+                pricePerUnit        : pricePerUnit,
+                dateCreated         : dateCreated,
+                lastUpdated         : lastUpdated,
+                color               : color,
+                lotAndExpiryControl : lotAndExpiryControl,
+        ]
+    }
 }

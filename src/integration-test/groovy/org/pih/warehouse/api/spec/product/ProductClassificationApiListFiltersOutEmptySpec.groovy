@@ -1,6 +1,5 @@
 package org.pih.warehouse.api.spec.product
 
-import grails.gorm.transactions.Transactional
 import org.springframework.beans.factory.annotation.Autowired
 import spock.lang.Shared
 
@@ -16,21 +15,19 @@ class ProductClassificationApiListFiltersOutEmptySpec extends ApiSpec {
     ProductClassificationApiWrapper productClassificationApiWrapper
 
     @Shared
-    Product product
+    Product productBlankAbcClass
 
     @Shared
     InventoryLevel inventoryLevel
 
-    @Transactional
     void setupData() {
-        product = Product.build(abcClass: "")
-        inventoryLevel= InventoryLevel.build(abcClass: "", inventory: location.inventory)
+        productBlankAbcClass = Product.build(abcClass: "")
+        inventoryLevel = InventoryLevel.build(abcClass: "", inventory: facility.inventory)
     }
 
-    @Transactional
     void cleanupData() {
-        if (product) {
-            product.delete()
+        if (productBlankAbcClass) {
+            productBlankAbcClass.delete()
         }
         if (inventoryLevel) {
             inventoryLevel.delete()
@@ -39,7 +36,7 @@ class ProductClassificationApiListFiltersOutEmptySpec extends ApiSpec {
 
     void 'given a valid facility, list excludes the empty string'() {
         when:
-        List<ProductClassificationDto> classifications = productClassificationApiWrapper.listOK(location.id)
+        List<ProductClassificationDto> classifications = productClassificationApiWrapper.listOK(facility.id)
 
         then:
         assert !asNames(classifications).contains("")

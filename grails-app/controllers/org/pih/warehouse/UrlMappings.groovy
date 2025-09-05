@@ -108,7 +108,7 @@ class UrlMappings {
 
         "/api/products"(parseRequest: true) {
             controller = { "productApi" }
-            action = [GET: "list"]
+            action = [GET: "list", POST: "save"]
         }
 
         "/api/products/search"(parseRequest: true) {
@@ -1056,6 +1056,11 @@ class UrlMappings {
         "/api/reports/indicators/inventoryShrinkage" {
             controller = "indicatorApi"
             action = [GET: "getInventoryShrinkage"]
+        }
+
+        "/api/facilities/$facility/inventory/record-stock/save" {
+            controller = "recordStockApi"
+            action = [POST: "saveRecordStock"]
         }
 
         // Error handling
