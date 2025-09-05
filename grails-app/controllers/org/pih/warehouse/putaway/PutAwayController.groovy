@@ -1,5 +1,6 @@
 package org.pih.warehouse.putaway
 
+import grails.events.annotation.Publisher
 import grails.gorm.transactions.Transactional
 import org.grails.web.json.JSONObject
 import org.pih.warehouse.api.Putaway
@@ -11,6 +12,7 @@ import org.pih.warehouse.order.Order
 class PutAwayController {
 
     def productAvailabilityService
+    PutawayService putawayService
 
     def index() {
         redirect(action: "create")
@@ -24,6 +26,25 @@ class PutAwayController {
     def create() {
         render(view: "/common/react")
     }
+
+    def rollback(String id) {
+        Putaway putaway = putawayService.getPutaway(id)
+        putawayService.rollbackPutaway(putaway)
+
+        flash.message = "Rollback was completed successfully for putaway ${putaway.putawayNumber}"
+
+        redirect(controller: "order", action: "show", id: id)
+    }
+
+    def generateTasks(String id) {
+        Putaway putaway = putawayService.getPutaway(id)
+        putawayService.generatePutawayTasks(putaway)
+
+        flash.message = "Successfully generated tasks for putaway ${putaway.putawayNumber}"
+
+        redirect(controller: "order", action: "show", id: id)
+    }
+
 
     def generatePdf() {
         log.info "Params " + params

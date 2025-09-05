@@ -1,5 +1,6 @@
 package org.pih.warehouse.api
 
+import grails.events.annotation.Subscriber
 import grails.validation.Validateable
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
@@ -18,10 +19,11 @@ class Putaway implements Validateable {
     Person orderedBy
     String sortBy
 
+    Order order
     PutawayStatus putawayStatus
     List<PutawayItem> putawayItems = []
 
-    static constrants = {
+    static constraints = {
         origin(nullable: true)
         destination(nullable: true)
         putawayNumber(nullable: true)
@@ -31,6 +33,7 @@ class Putaway implements Validateable {
         putawayItems(nullable: true)
         dateCreated(nullable: true)
         orderedBy(nullable: true)
+        order nullable: true
     }
 
     List<PutawayItem> getPutawayItems() {
@@ -72,7 +75,8 @@ class Putaway implements Validateable {
                 putawayAssignee: order.completedBy,
                 putawayDate: order.dateCompleted,
                 dateCreated: order.dateOrdered,
-                orderedBy: order.orderedBy
+                orderedBy: order.orderedBy,
+                order: order,
         )
 
 

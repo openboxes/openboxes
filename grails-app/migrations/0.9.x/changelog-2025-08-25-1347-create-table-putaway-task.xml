@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <changeSet id="1756153390755-0" author="jmiranda">
+        <preConditions onFail="MARK_RAN">
+            <viewExists viewName="putaway_task"/>
+        </preConditions>
+        <dropView viewName="putaway_task"/>
+    </changeSet>
+
+    <changeSet id="1756147725914-1" author="jmiranda" >
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="putaway_task"/>
+            </not>
+        </preConditions>
+        <createTable tableName="putaway_task">
+            <column name="id" type="CHAR(38)">
+                <constraints primaryKey="true" primaryKeyName="pk_putaway_task" nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+
+            <!-- Inventory item details -->
+            <column name="product_id" type="CHAR(38)"/>
+            <column name="inventory_item_id" type="CHAR(38)"/>
+            <column name="facility_id" type="CHAR(38)"/>
+            <column name="location_id" type="CHAR(38)"/>
+            <column name="quantity" type="DECIMAL(19,3)" defaultValueNumeric="0"/>
+
+            <!-- Putaway task details -->
+            <column name="status" type="VARCHAR(32)" defaultValue="PENDING">
+                <constraints nullable="false"/>
+            </column>
+            <column name="identifier" type="VARCHAR(255)"/>
+            <column name="assignee_id" type="CHAR(38)"/>
+            <column name="container_id" type="CHAR(38)"/>
+            <column name="destination_id" type="CHAR(38)"/>
+            <column name="date_started" type="DATETIME"/>
+            <column name="date_canceled" type="DATETIME"/>
+            <column name="date_completed" type="DATETIME"/>
+
+            <!-- Associations -->
+            <column name="putaway_order_id" type="CHAR(38)"/>
+            <column name="putaway_order_item_id" type="CHAR(38)"/>
+
+            <!-- Auditing details -->
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_updated" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint
+                baseTableName="putaway_task"
+                baseColumnNames="product_id"
+                constraintName="fk_putaway_task_product"
+                referencedTableName="product"
+                referencedColumnNames="id"
+                onDelete="SET NULL"
+                onUpdate="RESTRICT"/>
+
+        <addForeignKeyConstraint
+                baseTableName="putaway_task"
+                baseColumnNames="inventory_item_id"
+                constraintName="fk_putaway_task_inventory_item"
+                referencedTableName="inventory_item"
+                referencedColumnNames="id"
+                onDelete="SET NULL"
+                onUpdate="RESTRICT"/>
+
+        <addForeignKeyConstraint
+                baseTableName="putaway_task"
+                baseColumnNames="facility_id"
+                constraintName="fk_putaway_task_facility"
+                referencedTableName="location"
+                referencedColumnNames="id"
+                onDelete="SET NULL"
+                onUpdate="RESTRICT"/>
+
+        <addForeignKeyConstraint
+                baseTableName="putaway_task"
+                baseColumnNames="location_id"
+                constraintName="fk_putaway_task_location"
+                referencedTableName="location"
+                referencedColumnNames="id"
+                onDelete="SET NULL"
+                onUpdate="RESTRICT"/>
+
+        <addForeignKeyConstraint
+                baseTableName="putaway_task"
+                baseColumnNames="container_id"
+                constraintName="fk_putaway_task_container"
+                referencedTableName="location"
+                referencedColumnNames="id"
+                onDelete="SET NULL"
+                onUpdate="RESTRICT"/>
+
+        <addForeignKeyConstraint
+                baseTableName="putaway_task"
+                baseColumnNames="destination_id"
+                constraintName="fk_putaway_task_destination"
+                referencedTableName="location"
+                referencedColumnNames="id"
+                onDelete="SET NULL"
+                onUpdate="RESTRICT"/>
+
+        <addForeignKeyConstraint
+                baseTableName="putaway_task"
+                baseColumnNames="assignee_id"
+                constraintName="fk_putaway_task_assignee"
+                referencedTableName="user"
+                referencedColumnNames="id"
+                onDelete="SET NULL"
+                onUpdate="RESTRICT"/>
+
+        <addForeignKeyConstraint
+                baseTableName="putaway_task"
+                baseColumnNames="putaway_order_id"
+                constraintName="fk_putaway_task_order"
+                referencedTableName="order"
+                referencedColumnNames="id"
+                onDelete="CASCADE"
+                onUpdate="RESTRICT"/>
+
+        <addForeignKeyConstraint
+                baseTableName="putaway_task"
+                baseColumnNames="putaway_order_item_id"
+                constraintName="fk_putaway_task_order_item"
+                referencedTableName="order_item"
+                referencedColumnNames="id"
+                onDelete="CASCADE"
+                onUpdate="RESTRICT"/>
+
+        <!--        <createIndex indexName="idx_putaway_order_item" tableName="putaway_task">-->
+<!--            <column name="putaway_order_item_id"/>-->
+<!--        </createIndex>-->
+<!--        <createIndex indexName="idx_putaway_product" tableName="putaway_task">-->
+<!--            <column name="product_id"/>-->
+<!--        </createIndex>-->
+<!--        <createIndex indexName="idx_putaway_assignee" tableName="putaway_task">-->
+<!--            <column name="product_id"/>-->
+<!--        </createIndex>-->
+<!--        <createIndex indexName="idx_putaway_inventory_item" tableName="putaway_task">-->
+<!--            <column name="inventory_item_id"/>-->
+<!--        </createIndex>-->
+<!--        <createIndex indexName="idx_putaway_status" tableName="putaway_task">-->
+<!--            <column name="status"/>-->
+<!--        </createIndex>-->
+<!--        <createIndex indexName="idx_putaway_facility" tableName="putaway_task">-->
+<!--            <column name="facility_id"/>-->
+<!--        </createIndex>-->
+<!--        <createIndex indexName="idx_putaway_location" tableName="putaway_task">-->
+<!--            <column name="location_id"/>-->
+<!--        </createIndex>-->
+<!--        <createIndex indexName="idx_putaway_destination" tableName="putaway_task">-->
+<!--            <column name="destination_id"/>-->
+<!--        </createIndex>-->
+<!--        <createIndex indexName="idx_putaway_container" tableName="putaway_task">-->
+<!--            <column name="container_id"/>-->
+<!--        </createIndex>-->
+    </changeSet>
+</databaseChangeLog>
