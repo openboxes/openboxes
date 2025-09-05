@@ -1,4 +1,4 @@
-package org.pih.warehouse.requisition
+package org.pih.warehouse.inboundSortation
 
 enum DemandTypeCode {
     BACK_COUNTER('BC', 0),

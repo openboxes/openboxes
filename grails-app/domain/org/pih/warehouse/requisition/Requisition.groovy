@@ -9,6 +9,7 @@
  * */
 package org.pih.warehouse.requisition
 
+import org.pih.warehouse.inboundSortation.DemandTypeCode
 import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.auth.AuthService

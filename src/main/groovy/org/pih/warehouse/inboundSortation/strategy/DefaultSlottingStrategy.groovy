@@ -1,6 +1,8 @@
-package org.pih.warehouse.inboundSortation
+package org.pih.warehouse.inboundSortation.strategy
 
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.inboundSortation.PutawayContext
+import org.pih.warehouse.inboundSortation.PutawayResult
 
 class DefaultSlottingStrategy implements PutawayStrategy {
 
@@ -12,8 +14,8 @@ class DefaultSlottingStrategy implements PutawayStrategy {
                     facility: context.facility,
                     product: context.product,
                     inventoryItem: context.inventoryItem,
-                    currentBinLocation: context.currentBinLocation,
-                    putawayLocation: context.preferredBin,
+                    location: context.currentBinLocation,
+                    destination: context.preferredBin,
                     quantity: quantityRemaining,
             )
         }

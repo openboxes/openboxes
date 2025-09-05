@@ -1,8 +1,8 @@
 package spring
 
-import org.pih.warehouse.inboundSortation.CrossDockingStrategy
-import org.pih.warehouse.inboundSortation.DefaultSlottingStrategy
-import org.pih.warehouse.inboundSortation.RandomSlottingStrategy
+import org.pih.warehouse.inboundSortation.strategy.CrossDockingStrategy
+import org.pih.warehouse.inboundSortation.strategy.DefaultSlottingStrategy
+import org.pih.warehouse.inboundSortation.strategy.RandomSlottingStrategy
 import org.pih.warehouse.inboundSortation.SlottingService
 import org.springframework.boot.web.servlet.FilterRegistrationBean
 import org.springframework.core.Ordered

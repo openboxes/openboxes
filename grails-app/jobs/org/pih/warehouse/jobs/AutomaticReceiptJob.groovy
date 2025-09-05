@@ -12,7 +12,6 @@ class AutomaticReceiptJob {
     def shipmentService
     def receiptService
     def locationService
-    def putawayService
     def inboundSortationService
 
     def sessionRequired = false

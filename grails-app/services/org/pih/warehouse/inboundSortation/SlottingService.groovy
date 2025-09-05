@@ -1,6 +1,7 @@
 package org.pih.warehouse.inboundSortation
 
 import grails.gorm.transactions.Transactional
+import org.pih.warehouse.inboundSortation.strategy.PutawayStrategy
 
 @Transactional
 class SlottingService {

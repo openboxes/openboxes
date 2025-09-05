@@ -8,7 +8,8 @@ class PutawayResult {
     Location facility
     Product product
     InventoryItem inventoryItem
-    Location currentBinLocation
-    Location putawayLocation
+    Location location
+    Location container
+    Location destination
     Integer quantity
 }

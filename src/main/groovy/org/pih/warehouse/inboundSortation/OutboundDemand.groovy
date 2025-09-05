@@ -1,4 +1,4 @@
-package org.pih.warehouse.requisition
+package org.pih.warehouse.inboundSortation
 
 import org.pih.warehouse.product.Product
 

@@ -65,8 +65,8 @@ class InboundSortationService {
                 inventoryItem: task.inventoryItem,
                 quantity: task.quantity,
                 currentFacility: task.facility,
-                currentLocation: task.currentBinLocation,
-                putawayLocation: task.putawayLocation,
+                currentLocation: task.location,
+                putawayLocation: task.destination,
                 putawayStatus: PutawayStatus.PENDING
         )
     }

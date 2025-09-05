@@ -1,6 +1,8 @@
-package org.pih.warehouse.inboundSortation
+package org.pih.warehouse.inboundSortation.strategy
 
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.inboundSortation.PutawayContext
+import org.pih.warehouse.inboundSortation.PutawayResult
 
 class RandomSlottingStrategy implements PutawayStrategy {
 
@@ -13,8 +15,8 @@ class RandomSlottingStrategy implements PutawayStrategy {
                     facility: context.facility,
                     product: context.product,
                     inventoryItem: context.inventoryItem,
-                    currentBinLocation: context.currentBinLocation,
-                    putawayLocation: randomLocation,
+                    location: context.currentBinLocation,
+                    destination: randomLocation,
                     quantity: quantityRemaining,
             )
         }

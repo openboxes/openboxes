@@ -2,8 +2,6 @@ package org.pih.warehouse.inboundSortation
 
 import grails.gorm.transactions.Transactional
 import org.hibernate.FetchMode
-import org.pih.warehouse.requisition.DemandTypeCode
-import org.pih.warehouse.requisition.OutboundDemand
 import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.requisition.RequisitionStatus
 
