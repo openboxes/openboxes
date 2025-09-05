@@ -9,6 +9,7 @@
  * */
 package org.pih.warehouse.requisition
 
+import org.pih.warehouse.inboundSortation.DemandTypeCode
 import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.auth.AuthService
@@ -417,6 +418,15 @@ class Requisition implements Comparable<Requisition>, Serializable {
 
     boolean isElectronicType() {
         return sourceType == RequisitionSourceType.ELECTRONIC
+    }
+
+    DemandTypeCode getDemandTypeCode() {
+        if (description.length() >= 2) {
+            String codeFromDescription = description[0..1]
+            return DemandTypeCode.findByCode(codeFromDescription) ?: DemandTypeCode.DEFAULT
+        }
+
+        return null
     }
 
     Map toJson() {

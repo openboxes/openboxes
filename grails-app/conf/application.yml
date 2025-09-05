@@ -619,6 +619,8 @@ openboxes:
         receivingLocation:
             prefix: "R"
         showAutoReceiveButton: true
+        inboundSortation:
+            enabled: true
 
     # Indicates which activities are required for a location to allow logins
     chooseLocation:
