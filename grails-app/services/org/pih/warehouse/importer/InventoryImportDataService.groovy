@@ -343,6 +343,10 @@ class InventoryImportDataService implements ImportDataService {
     }
 
     private Date parseExpirationDate(Object expirationDateRaw) {
+        if (!expirationDateRaw) {
+            return null
+        }
+
         if (expirationDateRaw instanceof String) {
             Date expirationDate = EXPIRATION_DATE_FORMAT.parse(expirationDateRaw)
             Calendar calendar = Calendar.getInstance()
