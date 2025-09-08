@@ -337,7 +337,7 @@ class InventoryImportDataService implements ImportDataService {
     }
 
     private InventoryItem parseInventoryItem(Product product, def lotNumberRaw, def expirationDateRaw) {
-        Date expirationDate = parseExpirationDate(expirationDateRaw)
+        Date expirationDate = expirationDateRaw ? parseExpirationDate(expirationDateRaw) : null
         String lotNumber = lotNumberRaw instanceof Double ? lotNumberRaw.toInteger() : lotNumberRaw
         return inventoryService.findAndUpdateOrCreateInventoryItem(product, lotNumber, expirationDate)
     }
