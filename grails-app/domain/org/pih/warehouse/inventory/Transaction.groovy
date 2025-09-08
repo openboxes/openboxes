@@ -179,7 +179,7 @@ class Transaction implements Comparable, Serializable {
         comment(nullable: true)
         // transaction date cannot be in the future
         transactionDate(nullable: false,
-                validator: { value -> value <= new Date() })
+            validator: { value -> value <= new Date() })
 
 
         source(nullable: true,

@@ -337,25 +337,32 @@ class InventoryImportDataService implements ImportDataService {
     }
 
     private InventoryItem parseInventoryItem(Product product, def lotNumberRaw, def expirationDateRaw) {
+        Date expirationDate = parseExpirationDate(expirationDateRaw)
         String lotNumber = lotNumberRaw instanceof Double ? lotNumberRaw.toInteger() : lotNumberRaw
-
-        Date expirationDate = null
-        if (expirationDateRaw instanceof String) {
-            expirationDate = EXPIRATION_DATE_FORMAT.parse(expirationDateRaw)
-            Calendar calendar = Calendar.getInstance()
-            calendar.setTime(expirationDate)
-            expirationDate = calendar.getTime()
-        } else if (expirationDateRaw instanceof Date) {
-            expirationDate = expirationDateRaw
-        } else if (expirationDateRaw instanceof LocalDate) {
-            expirationDate = expirationDateRaw.toDate()
-        }
-
         return inventoryService.findAndUpdateOrCreateInventoryItem(product, lotNumber, expirationDate)
     }
 
+    private Date parseExpirationDate(Object expirationDateRaw) {
+        if (expirationDateRaw instanceof String) {
+            Date expirationDate = EXPIRATION_DATE_FORMAT.parse(expirationDateRaw)
+            Calendar calendar = Calendar.getInstance()
+            calendar.setTime(expirationDate)
+            return calendar.getTime()
+        }
+
+        if (expirationDateRaw instanceof Date) {
+            return expirationDateRaw
+        }
+
+        if (expirationDateRaw instanceof LocalDate) {
+            return expirationDateRaw.toDate()
+        }
+
+        return null
+    }
+
     private Location parseBinLocation(String binLocationName, Location parentLocation) {
-        if (binLocationName == null) {
+        if (!binLocationName) {
             return null
         }
 

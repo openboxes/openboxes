@@ -15,10 +15,10 @@ import grails.core.GrailsApplication
 import grails.util.Holders
 import grails.validation.ValidationException
 import org.grails.plugins.web.taglib.ApplicationTagLib
-
 import org.pih.warehouse.core.GlAccount
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Tag
+import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
@@ -326,5 +326,24 @@ class ProductApiController extends BaseDomainApiController {
         //sendProductCreatedNotification(product)
 
         render([product: product.toFullJson()] as JSON)
+    }
+
+    def importCsv() {
+        String fileData = request.inputStream.text
+
+        if (fileData.isEmpty()) {
+            throw new IllegalArgumentException("File cannot be empty")
+        }
+
+        if (request.contentType != "text/csv") {
+            throw new IllegalArgumentException("File must be in CSV format")
+        }
+
+        List<String> tags = CSVUtils.getColumnData(fileData, 'Tags')
+        List<Map<String, Object>> products = productService.validateProducts(fileData)
+
+        List<Product> importedProducts = productService.importProducts(products, tags)
+
+        render([data: importedProducts] as JSON)
     }
 }

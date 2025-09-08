@@ -781,7 +781,7 @@ class ProductService {
      * @param products The products (as key value maps) to import
      * @param tagNamesForAllProducts A list of tags to assign to all products being imported
      */
-    void importProducts(List<Map<String, Object>> products, List<String> tagNamesForAllProducts) {
+    List<Product> importProducts(List<Map<String, Object>> products, List<String> tagNamesForAllProducts) {
         log.info("Importing products " + products + " tags: " + tagNamesForAllProducts)
 
         // The imported categories and tags are just names at this point. Get or create the actual entities now
@@ -792,6 +792,7 @@ class ProductService {
         List<String> allTagNames = tagNamesForAllProducts + products.tags.flatten() as List<String>
         Map<String, Tag> tagsMap = getOrCreateTagsAsMap(allTagNames)
 
+        List<Product> importedProducts = []
         products.each { productProperties ->
             log.info "Import product code = " + productProperties.productCode + ", name = " + productProperties.name
 
@@ -834,7 +835,10 @@ class ProductService {
             if (!product.save(flush: true)) {
                 throw new ValidationException("Could not save product '" + product.name + "'", product.errors)
             }
+            importedProducts.add(product)
         }
+
+        return importedProducts
     }
 
 

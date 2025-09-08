@@ -11,6 +11,7 @@ package org.pih.warehouse.importer
 
 import grails.plugins.csv.CSVMapReader
 import org.apache.commons.csv.CSVFormat
+import org.apache.commons.csv.CSVParser
 import org.apache.commons.csv.CSVPrinter
 import org.apache.commons.lang.StringUtils
 import org.mozilla.universalchardet.UniversalDetector
@@ -199,5 +200,31 @@ class CSVUtils {
         detector.handleData(fileBytes, 0, fileBytes.length - 1);
         detector.dataEnd();
         return detector.getDetectedCharset() ?: 'MacRoman';
+    }
+
+    static List<Map<String, String>> csvToObjects(String csvString) {
+        CSVParser parser = CSVParser.parse(
+                csvString,
+                CSVFormat.DEFAULT.withFirstRecordAsHeader().withTrim()
+        )
+
+        return parser.collect { record ->
+            record.toMap().collectEntries { k, v ->
+                [(toCamelCase(k)): v]
+            }
+        }
+    }
+
+    private static String toCamelCase(String text) {
+        String[] parts = text.trim().toLowerCase().split(/[^a-zA-Z0-9]+/)
+        if (parts.size() == 0) {
+            return ""
+        }
+        return parts[0] + parts.tail().collect { it.capitalize() }.join()
+    }
+
+    static List<String> getColumnData(String csvString, String columnName) {
+        List<Map> rows = csvToObjects(csvString)
+        return rows[columnName]
     }
 }
