@@ -805,7 +805,7 @@ class UrlMappings {
          * Inventory API endpoints
          */
 
-        "/api/locations/$id/inventories/import"(parseRequest: true) {
+        "/api/facilities/$facilityId/inventories/import" {
             controller = { "inventoryApi" }
             action = "importCsv"
         }

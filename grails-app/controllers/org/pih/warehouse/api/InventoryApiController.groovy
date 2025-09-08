@@ -22,8 +22,8 @@ class InventoryApiController {
 
         ImportDataCommand command = new ImportDataCommand(
                 data: CSVUtils.csvToObjects(fileData),
-                date: new Date(),
-                location: Location.get(params.id)
+                date: new Date(System.currentTimeMillis() - 1000),
+                location: Location.get(params.facilityId)
         )
 
         inventoryImportDataService.validateData(command)

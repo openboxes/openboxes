@@ -832,11 +832,10 @@ class ProductService {
                 }
             }
 
-            Product savedProduct = product.save(flush: true)
-            if (!savedProduct) {
+            if (!product.save(flush: true)) {
                 throw new ValidationException("Could not save product '" + product.name + "'", product.errors)
             }
-            importedProducts.add(savedProduct)
+            importedProducts.add(product)
         }
 
         return importedProducts
