@@ -31,49 +31,60 @@ class SelectOptionsApiController {
     UserService userService
 
     def glAccountOptions() {
-        List<GlAccount> glAccounts = glAccountService.getGlAccounts(params).collect {
-            [id: it.id, label: "${it.code} - ${it.name}"]
-        }
+        List<GlAccount> glAccounts = glAccountService.getGlAccounts(params)
+                .findAll { it?.code }
+                .collect {
+                    [id: it.id, label: "${it.code} - ${it.name}"]
+                }
         render([data: glAccounts] as JSON)
     }
 
     def productGroupOptions() {
-        List<ProductGroup> productGroups = genericApiService.getList(ProductGroup.class.simpleName, [:]).collect {
-            [id: it.id, label: "${it.name}"]
-        }
+        List<ProductGroup> productGroups = genericApiService.getList(ProductGroup.class.simpleName, [:])
+                .findAll { it?.name }
+                .collect {
+                    [id: it.id, label: "${it.name}"]
+                }
         render([data: productGroups] as JSON)
     }
 
     def catalogOptions() {
         boolean hideNumbers = params.boolean("hideNumbers", false)
 
-        def catalogs = genericApiService.getList(ProductCatalog.class.simpleName, [sort: "name"]).collect {
-            String label = hideNumbers ? it.name : "${it.name} (${it?.productCatalogItems?.size()})"
-            [id: it.id, label: label]
-        }
+        def catalogs = genericApiService.getList(ProductCatalog.class.simpleName, [sort: "name"])
+                .findAll { it?.name }
+                .collect {
+                    [id: it.id, label: hideNumbers ? it.name : "${it.name} (${it?.productCatalogItems?.size()})"]
+                }
         render([data: catalogs] as JSON)
     }
 
     def categoryOptions() {
-        List<Category> categories = genericApiService.getList(Category.class.simpleName, [:]).collect {
-            [id: it.id, label: it.getHierarchyAsString(" > ")]
-        }
+        List<Category> categories = genericApiService.getList(Category.class.simpleName, [:])
+                .findAll { it.name }
+                .collect {
+                    [id: it.id, label: it.getHierarchyAsString(" > ")]
+                }
         render([data: categories] as JSON)
     }
 
     def tagOptions() {
         boolean hideNumbers = params.boolean("hideNumbers", false)
 
-        def tags = genericApiService.getList(Tag.class.simpleName, [sort: "tag"]).collect {
-            [id: it.id, label: hideNumbers ? it.tag : "${it.tag} (${it?.products?.size()})"]
-        }
+        def tags = genericApiService.getList(Tag.class.simpleName, [sort: "tag"])
+                .findAll { it?.tag }
+                .collect {
+                    [id: it.id, label: hideNumbers ? it.tag : "${it.tag} (${it?.products?.size()})"]
+                }
         render([data: tags] as JSON)
     }
 
     def paymentTermOptions() {
-        List<PaymentTerm> paymentTerms = genericApiService.getList(PaymentTerm.class.simpleName, [sort: "name"]).collect {
-            [id: it.id, label: it.name, value: it.id ]
-        }
+        List<PaymentTerm> paymentTerms = genericApiService.getList(PaymentTerm.class.simpleName, [sort: "name"])
+                .findAll { it?.name }
+                .collect {
+                    [id: it.id, label: it.name, value: it.id ]
+                }
         render([data: paymentTerms] as JSON)
     }
 
@@ -107,13 +118,11 @@ class SelectOptionsApiController {
             ])
         }
 
-        List<Map<String, String>> preferenceTypes = genericApiService.getList(PreferenceType.class.simpleName, [:]).collect {
-            [
-                id: it.id,
-                value: it.id,
-                label: it.name
-            ]
-        }
+        List<Map<String, String>> preferenceTypes = genericApiService.getList(PreferenceType.class.simpleName, [:])
+                .findAll { it?.name }
+                .collect {
+                    [id: it.id, label: it.name, value: it.id ]
+                }
 
         preferenceTypeOptions.addAll(preferenceTypes)
 

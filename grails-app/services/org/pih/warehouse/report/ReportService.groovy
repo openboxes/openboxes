@@ -52,6 +52,7 @@ import org.pih.warehouse.order.OrderService
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductCatalog
+import org.pih.warehouse.product.ProductService
 import org.pih.warehouse.reporting.CycleCountProductSummary
 import org.pih.warehouse.reporting.DateDimension
 import org.pih.warehouse.LocalizationUtil
@@ -81,6 +82,7 @@ class ReportService implements ApplicationContextAware {
     LocalizationService localizationService
     ForecastingService forecastingService
     NumberDataService numberDataService
+    ProductService productService
 
     ApplicationContext applicationContext
 
@@ -1144,6 +1146,7 @@ class ReportService implements ApplicationContextAware {
 
     def getInventoryAuditSummary(InventoryAuditCommand command) {
         def inventoryAuditFilters = buildInventoryAuditSummaryFilters(command)
+        long rollupCallTime = System.currentTimeMillis()
         def results = InventoryAuditRollup.createCriteria().list([max: command.max, offset: command.offset]) {
             projections {
                 groupProperty('facility')
@@ -1158,7 +1161,7 @@ class ReportService implements ApplicationContextAware {
             inventoryAuditFilters()
             order('transactionDate', 'desc')
         }
-
+        log.info("Fetch from inventory-audit-rollup took " + (System.currentTimeMillis() - rollupCallTime) + " ms")
 
 
         Integer totalCount = InventoryAuditRollup.createCriteria().get() {
@@ -1170,6 +1173,18 @@ class ReportService implements ApplicationContextAware {
             inventoryAuditFilters()
         }
 
+        long inventoryCountTime = System.currentTimeMillis()
+        List<Object[]> inventoryCountList = results ? InventoryCount.createCriteria().list {
+            projections {
+                rowCount()
+                groupProperty("product")
+            }
+            eq("facility", org.pih.warehouse.auth.AuthService.currentLocation)
+            inList("product", results.collect { it[1] })
+            between("dateRecorded", command.startDate, command.endDate)
+        } : []
+        Map<String, Long> inventoryCountMap = inventoryCountList.collectEntries { [ (it[1]): it[0] ] }
+        log.info("Fetch time for inventory-count call: " + (System.currentTimeMillis() - inventoryCountTime) + " ms")
 
         // Transform the results to a summary object
         def data = results.collect {
@@ -1180,28 +1195,9 @@ class ReportService implements ApplicationContextAware {
             Integer quantityAdjusted = it[3]
             Integer countAdjustments = it[4]
 
-            // Retrieve the number of counts during the given date range
-            Long inventoryCounts = InventoryCount.createCriteria().get {
-                projections {
-                    rowCount()
-                }
-                eq("facility", facility)
-                eq("product", product)
-                between("dateRecorded", command.startDate, command.endDate)
-            }
-
             // FIXME We needed to separate queries since there's not an easy way to get the two values in a single query
             //  at the moment. We created a view for the last counted date for the All Products tab but it's super slow
             //  so it would be best to materialize the last count date at the facility-product level at some point.
-
-            // Get the date of the latest cycle count
-            Date lastCycleCount = CycleCountItem.dateLastCounted(facility, product).get()
-
-            // Get the date of the latest record stock, import inventory, or cycle count transaction
-            Date lastInventoryCount = product.latestInventoryDate(facility.id)
-
-            // Compare the two last count dates
-            Date lastCounted = [lastCycleCount, lastInventoryCount].max()
 
             // Inventory value of adjusted quantity
             BigDecimal amountAdjusted = (quantityAdjusted?:0) * (product?.pricePerUnit?:0)
@@ -1217,8 +1213,8 @@ class ReportService implements ApplicationContextAware {
                     facility: facility,
                     product: product,
                     countAdjustments: countAdjustments,
-                    countCycleCounts: inventoryCounts,
-                    lastCounted: lastCounted,
+                    countCycleCounts: inventoryCountMap[product],
+                    lastCounted: null, // Last counted is sometimes expected to be an expensive call, and is calculated separately
                     quantityAdjusted: quantityAdjusted,
                     amountAdjusted: amountAdjusted,
                     quantityDemanded: quantityDemanded,
@@ -1227,7 +1223,7 @@ class ReportService implements ApplicationContextAware {
                     abcClass: abcClass
             )
         }
-        return new PaginatedList<InventoryAuditSummary>(data, totalCount);
+        return new PaginatedList<InventoryAuditSummary>(data, totalCount)
     }
 
     /**

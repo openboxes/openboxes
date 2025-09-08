@@ -18,6 +18,7 @@ class CycleCountTransactionService {
     ProductAvailabilityService productAvailabilityService
     CycleCountProductInventoryTransactionService cycleCountProductInventoryTransactionService
     TransactionIdentifierService transactionIdentifierService
+    InventoryService inventoryService
 
     /**
      * Given a completed cycle count, will create and persist the resulting product inventory transaction,
@@ -59,6 +60,11 @@ class CycleCountTransactionService {
 
     private Transaction createAdjustmentTransaction(
             CycleCount cycleCount, Date transactionDate, boolean itemQuantityOnHandIsUpToDate) {
+
+        // Reports and QoH calculations get messed up if two transactions for a product exist at the same exact time.
+        if (inventoryService.hasTransactionEntriesOnDate(cycleCount.facility, transactionDate, cycleCount.products)) {
+            throw new IllegalArgumentException("A transaction already exists at time ${transactionDate}")
+        }
 
         // We need to compare the quantity counted against the most up to date QoH in product availability.
         // However, if the cycle count items already have an up to date QoH (which will be the case if

@@ -13,13 +13,14 @@ import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import groovy.xml.Namespace
+import java.sql.Timestamp
 import org.apache.commons.lang.StringUtils
 import org.hibernate.criterion.CriteriaSpecification
 import org.hibernate.criterion.Restrictions
 import org.hibernate.sql.JoinType
-import org.springframework.beans.factory.annotation.Autowired
-
+import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.ApiException
+import org.pih.warehouse.core.ConfigService
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.GlAccount
 import org.pih.warehouse.core.Location
@@ -27,10 +28,12 @@ import org.pih.warehouse.core.Synonym
 import org.pih.warehouse.core.SynonymTypeCode
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.UnitOfMeasure
-import org.pih.warehouse.LocalizationUtil
-import util.ReportUtil
-
 import org.pih.warehouse.core.date.DateFormatterManager
+import org.pih.warehouse.LocalizationUtil
+import org.pih.warehouse.inventory.Inventory
+import org.pih.warehouse.inventory.TransactionEntry
+import org.springframework.beans.factory.annotation.Autowired
+import util.ReportUtil
 
 /**
  * @author jmiranda*
@@ -45,6 +48,7 @@ class ProductService {
     def userService
     def dataService
     ProductGroupService productGroupService
+    ConfigService configService
 
     @Autowired
     DateFormatterManager dateFormatter
@@ -787,18 +791,23 @@ class ProductService {
         // The imported categories and tags are just names at this point. Get or create the actual entities now
         // so that we can assign them to the products in the below loop.
         List<String> allCategoryNames = products.category as List<String>
-        Map<String, Category> categoriesMap = findOrCreateCategoriesAsMap(allCategoryNames)
+        CategoriesByDesensitizedName importedCategories = findOrCreateCategoriesAsMap(allCategoryNames)
 
-        List<String> allTagNames = tagNamesForAllProducts + products.tags.flatten() as List<String>
+        List<String> allTagNames = products.tags.flatten() as List<String>
+        if (tagNamesForAllProducts) {
+            allTagNames.addAll(tagNamesForAllProducts)
+        }
         Map<String, Tag> tagsMap = getOrCreateTagsAsMap(allTagNames)
 
         List<Product> importedProducts = []
         products.each { productProperties ->
             log.info "Import product code = " + productProperties.productCode + ", name = " + productProperties.name
 
-            // Assign the category to the product. If the product wasn't assigned a category, assign it the root category.
-            String categoryName = (productProperties.category as String)?.trim()
-            productProperties.category = categoryName ? categoriesMap.get(categoryName) : Category.getRootCategory()
+            // The product category is still just a name at this point so assign the product a proper Category instance
+            // now that they've been created. If the product wasn't assigned a category, assign it the root category.
+            productProperties.category = productProperties.category ?
+                    importedCategories.get((productProperties.category as String)) :
+                    Category.getRootCategory()
 
             // Assign both the product-specific tags and the globally defined tags to the product.
             List<String> tagNames = []
@@ -914,11 +923,47 @@ class ProductService {
     }
 
     /**
-     * Find or create a list of categories with the given names as a map keyed on category name. Nulls, duplicates,
-     * and whitespace will be ignored.
+     * A map of Category keyed on the "desensitized" (ie trimmed and lower-cased) category name.
+     *
+     * We desensitize the name because we want to treat names like "NAME" and "name  " as equivalent, which is useful
+     * when importing data since user input errors are common. In other scenarios this equivalency might not be useful
+     * (we might want to treat "name" and "NAME" as different), so make sure to be intentional when using this class.
      */
-    private Map<String, Category> findOrCreateCategoriesAsMap(List<String> categoryNames) {
-        return findOrCreateCategories(categoryNames).collectEntries{ [ it.name, it ] }
+    private class CategoriesByDesensitizedName {
+        Map<String, Category> categoryByDesensitizedName = [:]
+
+        CategoriesByDesensitizedName(List<Category> categories) {
+            putAll(categories)
+        }
+
+        List<Category> putAll(List<Category> categories) {
+            categories.each { put(it) }
+        }
+
+        Category put(Category category) {
+            String desensitizedName = desensitizeName(category.name)
+            return categoryByDesensitizedName.put(desensitizedName, category)
+        }
+
+        Category get(String categoryName) {
+            String desensitizedName = desensitizeName(categoryName)
+            return categoryByDesensitizedName.get(desensitizedName)
+        }
+
+        private String desensitizeName(String categoryName) {
+            if (StringUtils.isBlank(categoryName)) {
+                return categoryName
+            }
+            return categoryName.trim().toLowerCase()
+        }
+    }
+
+    /**
+     * Find or create a list of categories with the given names as a map keyed on "desensitized" (ie trimmed
+     * and lower-cased) category name. Nulls, duplicates, and whitespace will be ignored.
+     */
+    private CategoriesByDesensitizedName findOrCreateCategoriesAsMap(List<String> categoryNames) {
+        return new CategoriesByDesensitizedName(findOrCreateCategories(categoryNames))
     }
 
     /**
@@ -1489,4 +1534,35 @@ class ProductService {
         }
         return synonym
     }
+
+    Map<String, Timestamp> latestInventoryDateForProducts(List<String> productIds) {
+        return latestInventoryDateForProducts(AuthService.currentLocation, productIds)
+    }
+
+    Map<String, Timestamp> latestInventoryDateForProducts(Location location, List<String> productIds) {
+        List<String> transactionTypeIds = configService.getProperty('openboxes.inventoryCount.transactionTypes', List) as List<String>
+
+        Inventory inventory = location.inventory
+
+        String hql = """
+            select ii.product.id, max(t.transactionDate)
+            from TransactionEntry te
+            join te.transaction t
+            join te.inventoryItem ii
+            where ii.product.id in (:productIds)
+              and t.inventory = :inventory
+              and t.transactionType.id in (:transactionTypeIds)
+            group by ii.product.id
+        """
+
+        List<Object[]> results = TransactionEntry.executeQuery(hql, [
+                productIds: productIds,
+                inventory: inventory,
+                transactionTypeIds: transactionTypeIds
+        ])
+
+        // Convert list to a map for O(1) accessibility further
+        return results.collectEntries { [ (it[0]): it[1] ] }
+    }
+
 }

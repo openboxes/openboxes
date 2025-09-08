@@ -356,16 +356,12 @@ const useInventoryTransactionsTab = ({
       id: 'react.cycleCount.table.noResultFound.label',
       defaultMessage: 'No result found.',
     };
-  const exportData = () => {
-    console.log('Button pressed');
-  };
 
   return {
     columns,
     tableData,
     loading,
     emptyTableMessage,
-    exportData,
   };
 };
 

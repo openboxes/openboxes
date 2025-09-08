@@ -30,6 +30,8 @@ import org.pih.warehouse.product.ProductGroup
 import org.pih.warehouse.product.ProductListItem
 import org.pih.warehouse.product.ProductType
 
+import java.sql.Timestamp
+
 @Transactional
 class ProductApiController extends BaseDomainApiController {
 
@@ -291,6 +293,12 @@ class ProductApiController extends BaseDomainApiController {
             return
         }
         render([inventoryItem: inventoryItem, quantityOnHand: 0] as JSON)
+    }
+
+    def getLatestInventoryCountDate() {
+        Map<String, Timestamp> latestInventoryDateMap = productService.latestInventoryDateForProducts(params.list("productIds"))
+
+        render([data: latestInventoryDateMap] as JSON)
     }
 
     // TODO: This was copied almost directly from ProductController. Refactor both methods to shift this logic into

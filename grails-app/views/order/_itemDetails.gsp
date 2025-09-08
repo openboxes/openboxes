@@ -38,8 +38,8 @@
                 <th class="center"><warehouse:message code="orderItem.quantity.label"/></th>
                 <th class="center"><warehouse:message code="product.uom.label"/></th>
                 <th class="center"><warehouse:message code="orderItem.recipient.label"/></th>
-                <th class="center"><warehouse:message code="orderItem.estimatedReadyDate.label"/></th>
-                <th class="center"><warehouse:message code="orderItem.actualReadyDate.label"/></th>
+                <th class="center"><warehouse:message code="orderItem.quotedShipDate.label"/></th>
+                <th class="center"><warehouse:message code="orderItem.currentExpectedShipDate.label"/></th>
                 <th class="center"><warehouse:message code="orderItem.budgetCode.label"/></th>
                 %{-- When adding/removing a column, make sure to check the filterCell in function for filtering above --}%
             </tr>

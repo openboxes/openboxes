@@ -13,6 +13,7 @@ import grails.gorm.transactions.Transactional
 import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.PreferenceType
 import org.pih.warehouse.core.RatingTypeCode
+import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.data.ProductSupplierService
 import org.pih.warehouse.product.Product
@@ -63,8 +64,16 @@ class ProductSupplierImportDataService implements ImportDataService {
                 command.errors.reject("Row ${index + 1}: Supplier with name '${params.supplierName}' does not exist")
             }
 
-            if (params.manufacturerName && !Organization.findByName(params.manufacturerName)) {
-                command.errors.reject("Row ${index + 1}: Manufacturer with name '${params.manufacturerName}' does not exist")
+            if (params.manufacturerName) {
+                Organization manufacturer = Organization.findByName(params.manufacturerName)
+
+                if (!manufacturer) {
+                    command.errors.reject("Row ${index + 1}: Manufacturer with name '${params.manufacturerName}' does not exist")
+                }
+
+                if (manufacturer && !manufacturer.hasRoleType(RoleType.ROLE_MANUFACTURER)) {
+                    command.errors.reject("Row ${index + 1}: Organization '${params.manufacturerName}' is not a manufacturer")
+                }
             }
 
             try {

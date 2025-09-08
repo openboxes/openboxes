@@ -47,19 +47,19 @@ const useCountStep = () => {
   // (it removes focus while selecting new fields)
   const tableData = useRef([]);
   // Saving selected "counted by" option
-  const [countedBy, setCountedBy] = useState({});
-  const [defaultCountedBy, setDefaultCountedBy] = useState({});
+  const countedBy = useRef({});
+  const defaultCountedBy = useRef({});
   // Saving selected "date counted" option, initially it's the date fetched from API
-  const [dateCounted, setDateCounted] = useState({});
+  const dateCounted = useRef({});
   const [isStepEditable, setIsStepEditable] = useState(true);
-  // State used to trigger focus reset when changed. When this counter changes,
-  // it will reset the focus by clearing the RowIndex and ColumnId in useEffect.
-  const [refreshFocusCounter, setRefreshFocusCounter] = useState(0);
   const [isSaveDisabled, setIsSaveDisabled] = useState(false);
   const [sortByProductName, setSortByProductName] = useState(false);
   const [importErrors, setImportErrors] = useState([]);
   const assigneeImported = useRef(null);
   const requestIdsWithDiscrepancies = useRef([]);
+  // Here we store cycle count IDs that were updated,
+  // and we will mark them as updated before saving.
+  const cycleCountsMarkedToUpdate = useRef([]);
 
   const dispatch = useDispatch();
   const history = useHistory();
@@ -75,9 +75,6 @@ const useCountStep = () => {
     currentLocation: getCurrentLocation(state),
     currentUser: state.session.user,
   }));
-  const resetFocus = () => {
-    setRefreshFocusCounter((prev) => prev + 1);
-  };
 
   const showBinLocation = useMemo(() =>
     checkBinLocationSupport(currentLocation.supportedActivities), [currentLocation?.id]);
@@ -145,13 +142,13 @@ const useCountStep = () => {
         ...acc,
         [cycleCount?.id]: cycleCount?.cycleCountItems[0]?.dateCounted,
       }), {});
-      setDateCounted(countedDates);
       const countedByMap = data?.data?.reduce((acc, cycleCount) => ({
         ...acc,
         [cycleCount?.id]: cycleCount?.cycleCountItems[0]?.assignee,
       }), {});
-      setCountedBy(countedByMap);
-      setDefaultCountedBy(countedByMap);
+      dateCounted.current = countedDates;
+      countedBy.current = countedByMap;
+      defaultCountedBy.current = countedByMap;
     } finally {
       hide();
     }
@@ -181,7 +178,12 @@ const useCountStep = () => {
     });
   };
 
-  const markAllItemsAsUpdated = (cycleCountId) => setAllItemsUpdatedState(cycleCountId, true);
+  const markAllItemsAsUpdated = () => {
+    cycleCountsMarkedToUpdate.current.forEach((cycleCountId) => {
+      setAllItemsUpdatedState(cycleCountId, true);
+    });
+    cycleCountsMarkedToUpdate.current = [];
+  };
 
   const markAllItemsAsNotUpdated = (cycleCountId) => setAllItemsUpdatedState(cycleCountId, false);
 
@@ -189,15 +191,16 @@ const useCountStep = () => {
     // We need to mark all items as updated if we change the counted by person,
     // because counted by is associated with every cycle count item and needs to be set
     // for every item
-    markAllItemsAsUpdated(cycleCountId);
-    setCountedBy((prevState) => ({ ...prevState, [cycleCountId]: person }));
-    setDefaultCountedBy((prevState) => ({ ...prevState, [cycleCountId]: person }));
-    resetFocus();
+    if (!cycleCountsMarkedToUpdate.current.includes(cycleCountId)) {
+      cycleCountsMarkedToUpdate.current = [...cycleCountsMarkedToUpdate.current, cycleCountId];
+    }
+    countedBy.current = { ...countedBy.current, [cycleCountId]: person };
+    defaultCountedBy.current = { ...defaultCountedBy.current, [cycleCountId]: person };
   };
 
-  const getCountedBy = (cycleCountId) => countedBy?.[cycleCountId];
+  const getCountedBy = (cycleCountId) => countedBy.current?.[cycleCountId];
 
-  const getDefaultCountedBy = (cycleCountId) => defaultCountedBy?.[cycleCountId];
+  const getDefaultCountedBy = (cycleCountId) => defaultCountedBy.current?.[cycleCountId];
 
   const removeFromState = (cycleCountId, rowId) => {
     const tableIndex = tableData.current.findIndex(
@@ -213,7 +216,6 @@ const useCountStep = () => {
 
       return data;
     });
-    resetFocus();
     triggerValidation();
   };
 
@@ -229,7 +231,7 @@ const useCountStep = () => {
     }
   };
 
-  const addEmptyRow = (productId, id, shouldResetFocus = true) => {
+  const addEmptyRow = (productId, id) => {
     // ID is needed for updating appropriate row
     const emptyRow = {
       id: _.uniqueId('newRow'),
@@ -260,9 +262,6 @@ const useCountStep = () => {
 
       return data;
     });
-    if (shouldResetFocus) {
-      resetFocus();
-    }
     resetValidationState();
     forceRerender();
   };
@@ -307,10 +306,9 @@ const useCountStep = () => {
 
   const back = () => {
     setIsStepEditable(true);
-    resetFocus();
   };
 
-  const getCountedDate = (cycleCountId) => dateCounted[cycleCountId];
+  const getCountedDate = (cycleCountId) => dateCounted.current[cycleCountId];
 
   const getPayload = (cycleCountItem, shouldSetDefaultAssignee) => ({
     ...cycleCountItem,
@@ -333,6 +331,7 @@ const useCountStep = () => {
   const save = async (shouldSetDefaultAssignee = false) => {
     try {
       show();
+      markAllItemsAsUpdated();
       resetValidationState();
       const cycleCountItemsToUpdateBatch = [];
       const cycleCountItemsToCreateBatch = [];
@@ -371,7 +370,6 @@ const useCountStep = () => {
     } finally {
       // After the save, refetch cycle counts so that a new row can't be saved multiple times
       await fetchCycleCounts();
-      resetFocus();
       hide();
     }
   };
@@ -385,7 +383,6 @@ const useCountStep = () => {
       params: { id: cycleCountIds, sortBy: sortByProductName && 'productName' },
       format,
     });
-    resetFocus();
     hide();
   };
 
@@ -396,7 +393,6 @@ const useCountStep = () => {
       await save(true);
       setIsStepEditable(false);
     }
-    resetFocus();
   };
 
   const modalLabels = (count) => ({
@@ -567,7 +563,6 @@ const useCountStep = () => {
       await redirectToNextTab();
     } finally {
       setIsSaveDisabled(false);
-      resetFocus();
       hide();
     }
   };
@@ -599,13 +594,14 @@ const useCountStep = () => {
     },
   };
 
-  const setCountedDate = (cycleCountId) => (date) => {
-    markAllItemsAsUpdated(cycleCountId);
-    setDateCounted((prevState) => ({
-      ...prevState,
-      [cycleCountId]: date.format(),
-    }));
-    resetFocus();
+  const updateDateCounted = (cycleCountId) => (date) => {
+    if (!cycleCountsMarkedToUpdate.current.includes(cycleCountId)) {
+      cycleCountsMarkedToUpdate.current = [...cycleCountsMarkedToUpdate.current, cycleCountId];
+    }
+    dateCounted.current = {
+      ...dateCounted.current,
+      [cycleCountId]: date ? date.format() : null,
+    };
   };
 
   const createCustomItemsFromImport = (items) => (items
@@ -699,13 +695,10 @@ const useCountStep = () => {
           ],
         };
       });
-      // Batch update state
-      setCountedBy((prevState) => ({ ...prevState, ...countedByUpdates }));
-      setDefaultCountedBy((prevState) => ({ ...prevState, ...countedByUpdates }));
-      setDateCounted((prevState) => ({ ...prevState, ...dateCountedUpdates }));
-
-      // Reset focus once
-      resetFocus();
+      // Batch update refs
+      countedBy.current = { ...countedBy.current, ...countedByUpdates };
+      defaultCountedBy.current = { ...defaultCountedBy.current, ...countedByUpdates };
+      dateCounted.current = { ...dateCounted.current, ...dateCountedUpdates };
     } finally {
       triggerValidation();
       hide();
@@ -723,16 +716,14 @@ const useCountStep = () => {
     assignCountedBy,
     getCountedBy,
     getDefaultCountedBy,
-    countedBy,
     getCountedDate,
-    setCountedDate,
+    updateDateCounted,
     next,
     back,
     save,
     validateExistenceOfCycleCounts,
     resolveDiscrepancies,
     isStepEditable,
-    refreshFocusCounter,
     isSaveDisabled,
     setIsSaveDisabled,
     importItems,
@@ -742,6 +733,7 @@ const useCountStep = () => {
     isAssignCountModalOpen,
     closeAssignCountModal,
     assignCountModalData,
+    forceRerender,
   };
 };
 

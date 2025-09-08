@@ -9,7 +9,7 @@ CREATE OR REPLACE VIEW inventory_audit_details AS
                     SUM(quantity_on_hand)              AS quantity_on_hand,
                     SUM(quantity_available_to_promise) AS quantity_available,
                     SUM(quantity_allocated)            AS quantity_allocated
-             FROM product_availability
+             FROM product_availability USE INDEX(product_availability_product_location_idx)
              GROUP BY product_id, facility_id)
 select facility.id                                            as facility_id,
        facility.name as facility_name,

@@ -30,16 +30,12 @@ const useCountStepTable = ({
   formatLocalizedDate,
   addEmptyRow,
   triggerValidation,
-  refreshFocusCounter,
   isFormDisabled,
+  forceRerender,
 }) => {
   const columnHelper = createColumnHelper();
   const [rowIndex, setRowIndex] = useState(null);
   const [columnId, setColumnId] = useState(null);
-  // If prevForceResetFocus is different from refreshFocusCounter,
-  // it triggers a reset of rowIndex and columnId.
-  const [prevForceResetFocus, setPrevForceResetFocus] = useState(0);
-
   const translate = useTranslate();
 
   const { users, currentLocation, binLocations } = useSelector((state) => ({
@@ -47,14 +43,6 @@ const useCountStepTable = ({
     binLocations: state.cycleCount.binLocations,
     currentLocation: state.session.currentLocation,
   }));
-
-  useEffect(() => {
-    if (refreshFocusCounter !== prevForceResetFocus) {
-      setRowIndex(null);
-      setColumnId(null);
-      setPrevForceResetFocus(refreshFocusCounter);
-    }
-  }, [refreshFocusCounter]);
 
   const showBinLocation = useMemo(() =>
     checkBinLocationSupport(currentLocation.supportedActivities), [currentLocation?.id]);
@@ -195,6 +183,46 @@ const useCountStepTable = ({
         if (rowIndex !== null && columnId && error !== null) {
           setError(null);
         }
+
+        // Thanks to this function, we can reset the focus only after finishing arrow navigation.
+        // Previously, we triggered a focus reset on almost every user interaction,
+        // which caused excessive re-renders in all tables
+        const handleClick = (event) => {
+          if (rowIndex === null && columnId === null) {
+            return;
+          }
+          const { target } = event;
+
+          // Elements that should keep focus (avoid resetting)
+          const isInputElement = target.closest('input, select, textarea, .date-field-input, .react-datepicker, .react-select__control');
+
+          // Specific clickable UI parts that should reset focus
+          // These are elements that close components, e.g. a date picker when clicking a day,
+          // or a select dropdown when selecting an option
+          const isDatePickerDayElement = target.closest('.react-datepicker__day');
+          const isDropdownOptionElement = target.closest('.react-select__option');
+
+          // if this is input element, then we don't want to reset rowIndex and columnId,
+          // and re-render the component again because then all tables will be re-rendered
+          // which will cause performance issues
+          if (!isInputElement && !isDatePickerDayElement && !isDropdownOptionElement) {
+            setRowIndex(null);
+            setColumnId(null);
+            forceRerender();
+          }
+
+          // if this is isDatePickerDayElement or isDropdownOptionElement, then we want to reset
+          // rowIndex and columnId because then we close the date picker or select dropdown
+          if (isDatePickerDayElement || isDropdownOptionElement) {
+            setRowIndex(null);
+            setColumnId(null);
+          }
+        };
+        document.addEventListener('click', handleClick);
+
+        return () => {
+          document.removeEventListener('click', handleClick);
+        };
       }, [rowIndex, columnId]);
 
       // on change function expects e.target.value for text fields,

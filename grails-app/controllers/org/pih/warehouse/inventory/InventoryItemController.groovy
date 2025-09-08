@@ -543,7 +543,27 @@ class InventoryItemController {
         if (!commandInstance.inventory) {
             commandInstance.inventory = locationInstance?.inventory
         }
-        inventoryService.populateRecordInventoryCommand(commandInstance, params)
+
+        // We need if/else statement to avoid duplication data (OBPIH-7438)
+        if (flash.recordInventoryRows) {
+            commandInstance.recordInventoryRows = flash.recordInventoryRows.collect { RecordInventoryRowCommand it ->
+                Location binLocation = it?.binLocation ? Location.get(it.binLocation.id) : null
+                [
+                    id: it.id,
+                    lotNumber: it.lotNumber,
+                    binLocation: binLocation,
+                    inventoryItem: it.inventoryItem,
+                    expirationDate: it.expirationDate,
+                    description: it.description,
+                    oldQuantity: it.oldQuantity,
+                    newQuantity: it.newQuantity,
+                    comment: it.comment,
+                    error: it.error,
+                ]
+            }
+        } else {
+            inventoryService.populateRecordInventoryCommand(commandInstance, params)
+        }
 
         Product productInstance = commandInstance.product
         List transactionEntryList = inventoryService.getTransactionEntriesByInventoryAndProduct(commandInstance?.inventory, [productInstance])
@@ -583,6 +603,8 @@ class InventoryItemController {
             return
         }
 
+        // We pass the data to flash to preserve data after a redirect, so it can be used in the showRecordInventory method (OBPIH-7438)
+        flash.recordInventoryRows = commandInstance.recordInventoryRows
         flash.errors = commandInstance.errors
         redirect(action: "showRecordInventory", params: ['product.id': commandInstance.product.id])
     }

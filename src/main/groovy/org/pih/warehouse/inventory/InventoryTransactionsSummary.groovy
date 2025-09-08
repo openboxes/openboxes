@@ -5,9 +5,7 @@ import org.pih.warehouse.core.User
 import org.pih.warehouse.core.VarianceTypeCode
 import org.pih.warehouse.product.Product
 
-class InventoryTransactionsSummary implements Serializable {
-
-    String id
+class InventoryTransactionsSummary {
 
     Transaction transaction
 
@@ -27,12 +25,6 @@ class InventoryTransactionsSummary implements Serializable {
 
     Transaction baselineTransaction
 
-
-    static constraints = {
-        table "inventory_transactions_summary"
-        version false
-    }
-
     /**
      * Root causes are only captured for the cycle count
      */
@@ -51,9 +43,12 @@ class InventoryTransactionsSummary implements Serializable {
     }
 
     List<String> getComments() {
-        return transaction.transactionEntries
+        List<String> entriesComments = transaction.transactionEntries
                 .findAll { it.product?.id == product?.id && it.comments }
                 .collect { it.comments }
+        String transactionComment = transaction.comment
+        // Concat "global" transaction comment with entries comments and filter out empty comments
+        return [transactionComment, entriesComments].findAll { it }
     }
 
     VarianceTypeCode getVarianceTypeCode() {
@@ -86,7 +81,6 @@ class InventoryTransactionsSummary implements Serializable {
 
     Map toJson() {
         [
-                id: id,
                 transaction: [
                     transactionNumber: transaction.transactionNumber
                 ],

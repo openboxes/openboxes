@@ -63,9 +63,14 @@
                     <h1>${productInventoryTransactionCount} (total), ${productInventoryTransactionInCurrentLocationCount} (current location)</h1>
                     <br>
                     <h1>Products that have a product inventory transaction overlapping with other type of transaction <b>PLEASE REVIEW THESE BEFORE (OR AFTER MIGRATION)</b>:</h1>
-                    <g:each var="product" in="${overlappingTransactions}">
-                        <h1>${product}</h1>
-                    </g:each>
+                    <g:if test="${overlappingTransactions?.size()}">
+                        <g:each var="product" in="${overlappingTransactions}">
+                            <h1>${product}</h1>
+                        </g:each>
+                    </g:if>
+                    <g:else>
+                        <h1>None</h1>
+                    </g:else>
                     <br>
                     <h1>Products with old transaction: ${productsWithProductInventoryTransactionInCurrentLocation.join(', ') ?: 'None'}</h1>
                 </td>

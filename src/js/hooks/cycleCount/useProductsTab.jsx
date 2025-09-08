@@ -9,10 +9,12 @@ import { INVENTORY_AUDIT_SUMMARY_REPORT } from 'api/urls';
 import { TableCell } from 'components/DataTable';
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
 import ValueIndicator from 'components/DataTable/v2/ValueIndicator';
+import Spinner from 'components/spinner/Spinner';
 import { INVENTORY_ITEM_URL } from 'consts/applicationUrls';
 import cycleCountColumn from 'consts/cycleCountColumn';
 import { DateFormat } from 'consts/timeFormat';
 import { getCycleCountDifferencesVariant } from 'consts/valueIndicatorVariant';
+import useLastCountedDate from 'hooks/cycleCount/useLastCountedDate';
 import useFormatNumber from 'hooks/useFormatNumber';
 import useTableDataV2 from 'hooks/useTableDataV2';
 import useTranslate from 'hooks/useTranslate';
@@ -94,6 +96,10 @@ const useProductsTab = ({
     filtersInitialized,
   });
 
+  const {
+    lastCountedDateMap,
+  } = useLastCountedDate(tableData, loading);
+
   const getStyledCurrency = (value) => {
     const formattedValue = formatCurrency(value);
 
@@ -132,9 +138,19 @@ const useProductsTab = ({
         {translate('react.cycleCount.table.lastCounted.label', 'Last Counted')}
       </TableHeaderCell>
     ),
-    cell: ({ getValue }) => (
+    cell: ({
+      row: {
+        original: {
+          product: {
+            id,
+          },
+        },
+      },
+    }) => (
       <TableCell className="rt-td">
-        {formatLocalizedDate(getValue(), DateFormat.DD_MMM_YYYY)}
+        {lastCountedDateMap[id]
+          ? formatLocalizedDate(lastCountedDateMap[id], DateFormat.DD_MMM_YYYY)
+          : <Spinner useSpinnerStyling={false} />}
       </TableCell>
     ),
     size: 160,
@@ -366,10 +382,6 @@ const useProductsTab = ({
       defaultMessage: 'No result found.',
     };
 
-  const exportData = () => {
-    console.log('Button pressed');
-  };
-
   return {
     columns: [
       ...columns.slice(0, 5),
@@ -379,7 +391,6 @@ const useProductsTab = ({
     tableData,
     loading,
     emptyTableMessage,
-    exportData,
   };
 };
 
