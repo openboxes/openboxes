@@ -12,6 +12,10 @@ package org.pih.warehouse.core
 import grails.core.GrailsApplication
 import java.text.SimpleDateFormat
 
+/**
+ * @deprecated Use org.pih.warehouse.core.localization.MessageLocalizer instead
+ */
+@Deprecated
 class MessageService {
 
     GrailsApplication grailsApplication

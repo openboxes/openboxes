@@ -1,15 +1,15 @@
 package org.pih.warehouse.core.date
 
 /**
- * The different ways that we display dates
+ * The different data formats that we display dates in.
  */
 enum DateDisplayFormat {
 
     /**
      * As used by our APIs.
      *
-     * This enum value is likely to be unused since our APIs simply call toString() on dates but we add it here
-     * for the sake of clarity.
+     * This enum value is likely to be unused since dates are automatically bound to JSON in our APIs, but we add
+     * it here for the sake of clarity.
      */
     JSON,
 

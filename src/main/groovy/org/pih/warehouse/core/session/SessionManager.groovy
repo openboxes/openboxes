@@ -27,18 +27,21 @@ class SessionManager {
         return timezone ?: TimeZone.getTimeZone(DateUtil.getSystemZoneId().getId())
     }
 
-    private <T> T getAttribute(SessionAttribute attribute, Class<T> type) {
+    /**
+     * @return HttpSession Fetch the session of the user associated with the current request.
+     */
+    HttpSession getSession() {
         RequestAttributes requestAttributes = RequestContextHolder.currentRequestAttributes()
         if (!requestAttributes instanceof ServletRequestAttributes) {
-            throw new UnsupportedOperationException("Cannot get request attributes of type: ${requestAttributes?.getClass()}")
+            throw new UnsupportedOperationException(
+                    "Cannot get request attributes of type: ${requestAttributes?.getClass()}")
         }
-        HttpSession session = (requestAttributes as ServletRequestAttributes).session
-        if (!session) {
-            // Return without error if there's no active session, which can happen if we're not in the context
-            // of an HTTP request. Ex: unit tests or running console commands
-            return null
-        }
+        // Return without error if there's no active session, which can happen if we're not in the context
+        // of an HTTP request. Ex: unit tests or running console commands
+        return (requestAttributes as ServletRequestAttributes).request?.session
+    }
 
+    private <T> T getAttribute(SessionAttribute attribute, Class<T> type) {
         return type.cast(session.getAttribute(attribute.attributeName))
     }
 }

@@ -4,21 +4,25 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.ZonedDateTime
-import org.grails.web.servlet.mvc.GrailsWebRequest
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
+import org.pih.warehouse.core.localization.LocaleDeterminer
 import org.pih.warehouse.core.session.SessionManager
 
 /**
- * Formats date objects for display. For use only by data exporters and GSPs. APIs should always return dates in
- * ISO format using UTC.
+ * Formats date objects for display. Acts as a factory class for the individual formatters.
+ *
+ * For use only by data exporters and GSPs. APIs should always return dates in ISO format using UTC.
  */
 @Component
 class DateFormatterManager {
 
     @Autowired
     SessionManager sessionManager
+
+    @Autowired
+    LocaleDeterminer localeDeterminer
 
     /**
      * Convenience method for converting the given date object to a String for use by file exporters.
@@ -36,21 +40,21 @@ class DateFormatterManager {
 
         Locale locale = context?.localeOverride ?: getLocale()
         ZoneId timezone = context?.timezoneOverride ?: getTimezone()
+
+        // We default to the GSP format simply because we have more GSPs than we do CSV exporters.
+        // (And because our JSON APIs probably won't even bother using this manager since they always use ISO format.)
         DateDisplayFormat displayFormat = context?.displayFormat ?: DateDisplayFormat.GSP
 
         DateFormatter<?> formatter
         switch (date) {
             case Instant:
-                formatter = new TemporalAccessorDateTimeFormatter<Instant>(
-                        locale, context?.patternOverride, displayFormat, timezone)
+                formatter = initInstantFormatter(locale, displayFormat, context, timezone)
                 break
             case ZonedDateTime:
-                formatter = new TemporalAccessorDateTimeFormatter<ZonedDateTime>(
-                        locale, context?.patternOverride, displayFormat, timezone)
+                formatter = initZonedDateTimeFormatter(locale, displayFormat, context, timezone)
                 break
             case LocalDate:
-                formatter = new TemporalAccessorDateFormatter<LocalDate>(
-                        locale, context?.patternOverride, displayFormat)
+                formatter = initLocalDateFormatter(locale, displayFormat, context)
                 break
             default:
                 throw new UnsupportedOperationException("Cannot format date of type [${date.class}]")
@@ -60,57 +64,29 @@ class DateFormatterManager {
     }
 
     private Locale getLocale() {
-        // Extracts the locale from the request. We need a fallback for when we're not in the context of an HTTP
-        // request, such as when running unit tests or console commands.
-        return GrailsWebRequest.lookup()?.getLocale() ?: Locale.getDefault()
+        // We trust the locale resolver to provide a default locale if there is no valid session.
+        return localeDeterminer.currentLocale
     }
 
     private ZoneId getTimezone(){
-        // We trust session manager to provide a default timezone if there is no valid session.
+        // We trust the session manager to provide a default timezone if there is no valid session.
         return sessionManager.timezone.toZoneId()
     }
 
-    /**
-     * Context objects containing the configuration fields for formatting dates.
-     * For a majority of cases the default settings can be used and so this object will not be required.
-     */
-    static class DateFormatterContext {
-        Locale localeOverride
-        String patternOverride
-        ZoneId timezoneOverride
-        DateDisplayFormat displayFormat
-
-        static DateFormatterContextBuilder builder() {
-            return new DateFormatterContextBuilder()
-        }
+    // Pull the init logic for the formatters into methods so they can be easily stubbed in tests.
+    TemporalAccessorDateTimeFormatter<Instant> initInstantFormatter(
+            Locale locale, DateDisplayFormat displayFormat, DateFormatterContext context, ZoneId timezone) {
+        return new TemporalAccessorDateTimeFormatter<Instant>(
+                locale, displayFormat, context?.patternOverride, context?.displayStyleOverride, timezone)
     }
-
-    private static class DateFormatterContextBuilder {
-
-        DateFormatterContext context = new DateFormatterContext()
-
-        DateFormatterContext build() {
-            return context
-        }
-
-        DateFormatterContextBuilder withLocaleOverride(Locale localeOverride) {
-            context.localeOverride = localeOverride
-            return this
-        }
-
-        DateFormatterContextBuilder withPatternOverride(String patternOverride) {
-            context.patternOverride = patternOverride
-            return this
-        }
-
-        DateFormatterContextBuilder withTimezoneOverride(ZoneId timezoneOverride) {
-            context.timezoneOverride = timezoneOverride
-            return this
-        }
-
-        DateFormatterContextBuilder withDisplayFormat(DateDisplayFormat displayFormat) {
-            context.displayFormat = displayFormat
-            return this
-        }
+    TemporalAccessorDateTimeFormatter<ZonedDateTime> initZonedDateTimeFormatter(
+            Locale locale, DateDisplayFormat displayFormat, DateFormatterContext context, ZoneId timezone) {
+        return new TemporalAccessorDateTimeFormatter<ZonedDateTime>(
+                locale, displayFormat, context?.patternOverride, context?.displayStyleOverride, timezone)
+    }
+    TemporalAccessorDateFormatter<LocalDate> initLocalDateFormatter(
+            Locale locale, DateDisplayFormat displayFormat, DateFormatterContext context) {
+        return new TemporalAccessorDateFormatter<LocalDate>(
+                locale, displayFormat, context?.patternOverride, context?.displayStyleOverride)
     }
 }
