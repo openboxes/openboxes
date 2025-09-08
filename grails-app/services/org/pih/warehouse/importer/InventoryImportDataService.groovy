@@ -337,12 +337,16 @@ class InventoryImportDataService implements ImportDataService {
     }
 
     private InventoryItem parseInventoryItem(Product product, def lotNumberRaw, def expirationDateRaw) {
-        Date expirationDate = expirationDateRaw ? parseExpirationDate(expirationDateRaw) : null
+        Date expirationDate = parseExpirationDate(expirationDateRaw)
         String lotNumber = lotNumberRaw instanceof Double ? lotNumberRaw.toInteger() : lotNumberRaw
         return inventoryService.findAndUpdateOrCreateInventoryItem(product, lotNumber, expirationDate)
     }
 
     private Date parseExpirationDate(Object expirationDateRaw) {
+        if (!expirationDateRaw) {
+            return null
+        }
+
         if (expirationDateRaw instanceof String) {
             Date expirationDate = EXPIRATION_DATE_FORMAT.parse(expirationDateRaw)
             Calendar calendar = Calendar.getInstance()
