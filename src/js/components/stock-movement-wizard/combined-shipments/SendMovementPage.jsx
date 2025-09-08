@@ -271,8 +271,8 @@ class SendMovementPage extends Component {
       this.props.minSearchLength,
       [activityCode.RECEIVE_STOCK], // activityCodes
       true, // fetchAll
-      true, // withOrgCode
-      false, // withTypeDescription
+      false, // withOrgCode
+      true, // withTypeDescription
       false, // isReturnOrder
       null, // direction
       true, // withOrganization
