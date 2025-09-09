@@ -33,6 +33,12 @@ class DateTagLib {
             throwTagError("Attribute [date] is required.")
         }
 
+        // Make sure to handle optional date fields gracefully.
+        if (attrs.date == null) {
+            out << ''
+            return
+        }
+
         switch (attrs.date) {
             // All dates going forward should be java.time classes
             case TemporalAccessor:
