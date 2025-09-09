@@ -187,17 +187,17 @@ class PutawayTaskService {
      * a different putaway container (i.e. as long as it's not the destination location).
      *
      * @param task
-     * @param containerId
+     * @param containerNumberOrId
      * @param override
      */
-    void load(PutawayTask task, String containerId, Boolean override = false) {
+    void load(PutawayTask task, String containerNumberOrId, Boolean override = false) {
 
-        log.info "Loading item into putaway constainer ${containerId}"
+        log.info "Loading item into putaway container ${containerNumberOrId}"
 
         // Validate the container location exists
-        Location container = Location.get(containerId)
+        Location container = Location.findByLocationNumberOrId(containerNumberOrId, containerNumberOrId)
         if (!container) {
-            throw new IllegalStateException("Must provide putaway container when loading")
+            throw new IllegalStateException("Container does not exist")
         }
 
         // validate that the container matches the task putaway container
@@ -208,7 +208,7 @@ class PutawayTaskService {
 
             // Cannot load the item into the destination
             if (container == task.destination) {
-                throw new IllegalStateException("Cannot load into the destination")
+                throw new IllegalStateException("Cannot load into this destination")
             }
 
             // otherwise, allow the container to change if the user has requested a force
