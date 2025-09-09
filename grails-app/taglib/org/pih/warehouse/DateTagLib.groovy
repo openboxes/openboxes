@@ -42,6 +42,10 @@ class DateTagLib {
             case Date:
                 out << formatJavaUtilDate(attrs)
                 return
+            // Make sure to handle optional date fields gracefully.
+            case null:
+                out << ''
+                return
             default:
                 throwTagError("Attribute [date] does not support type [${attrs.date.class}].")
         }
