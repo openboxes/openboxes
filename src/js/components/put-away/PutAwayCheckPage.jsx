@@ -387,6 +387,7 @@ class PutAwayCheckPage extends Component {
               data-toggle="button"
               aria-pressed="false"
               onClick={toggleTree}
+              data-testid="show-by-button"
             >
               {pivotBy && pivotBy.length
                 ? <Translate id="react.putAway.stockMovement.label" defaultMessage="Stock Movement" />
@@ -400,6 +401,7 @@ class PutAwayCheckPage extends Component {
                   type="button"
                   className="btn btn-outline-secondary btn-xs mr-3"
                   onClick={() => this.goToFirstPage()}
+                  data-testid="back-button"
                 >
                   <Translate id="react.putAway.goBack.label" defaultMessage="Go back to putaway list" />
                 </button>
@@ -414,6 +416,7 @@ class PutAwayCheckPage extends Component {
                       expanded: this.state.expanded,
                     })}
                     className="btn btn-outline-secondary btn-xs mr-3"
+                    data-testid="edit-button"
                   >
                     <Translate id="react.default.button.edit.label" defaultMessage="Edit" />
                   </button>
@@ -421,6 +424,7 @@ class PutAwayCheckPage extends Component {
                     type="button"
                     onClick={() => this.completePutAway()}
                     className="btn btn-outline-secondary btn-xs mr-3"
+                    data-testid="complete-putaway-button"
                   >
                     <Translate id="react.putAway.completePutAway.label" defaultMessage="Complete Putaway" />
                   </button>
@@ -442,6 +446,9 @@ class PutAwayCheckPage extends Component {
                 showPaginationBottom={false}
                 filterable
                 defaultFilterMethod={this.filterMethod}
+                getTdProps={(state, rowInfo) => ({
+                  'data-testid': `row-${rowInfo.level}-${rowInfo.index}`,
+                })}
               />
             )
             : null
@@ -464,6 +471,7 @@ class PutAwayCheckPage extends Component {
                     type="button"
                     onClick={() => this.completePutAway()}
                     className="btn btn-outline-primary btn-form float-right btn-xs"
+                    data-testid="complete-putaway-button"
                   >
                     <Translate id="react.putAway.completePutAway.label" defaultMessage="Complete Putaway" />
                   </button>
@@ -475,6 +483,7 @@ class PutAwayCheckPage extends Component {
                       expanded: this.state.expanded,
                     })}
                     className="btn btn-outline-primary btn-form btn-xs"
+                    data-testid="edit-button"
                   >
                     <Translate id="react.default.button.edit.label" defaultMessage="Edit" />
                   </button>
