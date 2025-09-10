@@ -10,7 +10,7 @@ enum PutawayTaskStatus {
 
     // from -> allowed next states
     static final Map<PutawayTaskStatus, Set<PutawayTaskStatus>> ALLOWED_STATE_TRANSITIONS = [
-            (PENDING)    : [IN_PROGRESS, COMPLETED, CANCELED] as Set,
+            (PENDING)    : [IN_PROGRESS, IN_TRANSIT, COMPLETED, CANCELED] as Set,
             (IN_PROGRESS): [IN_TRANSIT, COMPLETED, CANCELED] as Set,
             (IN_TRANSIT) : [COMPLETED, CANCELED] as Set,
             (COMPLETED)  : [] as Set,
