@@ -7,7 +7,7 @@ import org.apache.commons.lang.StringUtils
 import org.pih.warehouse.app.ApplicationContextProvider
 
 /**
- * A formatter that converts date objects to strings.
+ * A formatter that converts TemporalAccessors to strings.
  */
 abstract class TemporalAccessorFormatter<T extends TemporalAccessor> implements DateFormatter<T> {
 
@@ -78,15 +78,8 @@ abstract class TemporalAccessorFormatter<T extends TemporalAccessor> implements 
             return getFormatterFromDisplayStyle(displayStyleOverride)
         }
 
-        // Otherwise choose the formatter that is relevant to the display format that we'll be formatting to. We opt to
-        // not make any assumptions about the format to use, so if not format and no overrides are specified, error.
-        if (!displayFormat) {
-            throw new IllegalArgumentException(
-                    'One (and only one) of the following fields must be set when formatting a date: patternOverride, ' +
-                    'displayFormat, displayStyleOverride')
-        }
-
-        DateTimeFormatter formatter
+        // Otherwise choose the formatter that is relevant to the display format that we'll be formatting to.
+        DateTimeFormatter formatter = null
         switch (displayFormat) {
             case DateDisplayFormat.JSON:
                 formatter = getJsonFormatter()
@@ -97,6 +90,11 @@ abstract class TemporalAccessorFormatter<T extends TemporalAccessor> implements 
             case DateDisplayFormat.CSV:
                 formatter = getCsvFormatter()
                 break
+            // We opt to not make assumptions about the format, so if no format and no overrides are specified, error.
+            case null:
+                throw new IllegalArgumentException(
+                        'One (and only one) of the following fields must be set when formatting a date: ' +
+                        'patternOverride, displayFormat, displayStyleOverride')
         }
         return formatter
     }
@@ -129,7 +127,7 @@ abstract class TemporalAccessorFormatter<T extends TemporalAccessor> implements 
         return DateTimeFormatter.ofPattern(pattern)
     }
 
-    static DatePatternLocalizer getLocalizer() {
+    DatePatternLocalizer getLocalizer() {
         // Better would be to have this be non-statically accessed but this is fine for now.
         return ApplicationContextProvider.getBean(DatePatternLocalizer.class)
     }

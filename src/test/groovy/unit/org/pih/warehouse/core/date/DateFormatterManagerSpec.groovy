@@ -24,7 +24,7 @@ import org.pih.warehouse.core.session.SessionManager
 class DateFormatterManagerSpec extends Specification {
 
     // We don't care that this isn't a real date since we're not testing the formatters themselves
-    static final FORMATTED_DATE_STRING = 'FORMATTED!'
+    static final String FORMATTED_DATE_STRING = 'FORMATTED!'
 
     @Shared
     DateFormatterManager dateFormatterManager

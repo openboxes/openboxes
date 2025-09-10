@@ -1,13 +1,11 @@
 package org.pih.warehouse.core.localization
 
 import org.apache.commons.lang3.StringUtils
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.stereotype.Component
 
 import org.pih.warehouse.LocalizationUtil
-import org.pih.warehouse.core.session.SessionManager
 
 /**
  * Handles fetching locales.
@@ -16,9 +14,6 @@ import org.pih.warehouse.core.session.SessionManager
  */
 @Component
 class LocaleDeterminer {  // Note I wanted to call this LocaleResolver but that's already a Spring component
-
-    @Autowired
-    SessionManager sessionManager
 
     @Value('${openboxes.locale.defaultLocale}')
     String defaultLocale

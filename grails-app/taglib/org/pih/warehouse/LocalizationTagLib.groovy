@@ -8,7 +8,8 @@ class LocalizationTagLib {
 
     // Use Grails' namespace because we're overriding the default behaviour and so that the tag lib
     // is accessible automatically throughout the app.
-    static namespace = 'g'
+    // TODO: switch this to 'g' once we're comfortable enough with it to start using it everywhere
+    static namespace = 'UNUSED'
 
     MessageLocalizer messageLocalizer
 
