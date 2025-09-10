@@ -300,7 +300,6 @@ class PutawayService implements EventPublisher  {
         return order
     }
 
-
     Order savePutaway(Putaway putaway) {
 
         Order order = Order.get(putaway.id)
@@ -454,22 +453,46 @@ class PutawayService implements EventPublisher  {
 
     @Publisher('putaway.rollback')
     Putaway rollbackPutaway(Putaway putaway) {
+
         Order order = Order.get(putaway.id)
         if (!order) {
             throw new ObjectNotFoundException(putaway.id, "Putaway ${putaway.id} not found")
         }
 
-        // Get transaction
-        Transaction transaction = Transaction.where {
-            order == order
-        }.get()
-
+        log.info "Rollback putaway " + putaway.id + " with status: ${order.status}"
         // If exists, delete the transaction and reset status of putaway
-        if (order.status == OrderStatus.COMPLETED && transaction) {
-            transaction.delete()
-            putaway.putawayStatus = PutawayStatus.PENDING
-            savePutaway(putaway)
+        if (order.status in [OrderStatus.APPROVED, OrderStatus.PLACED, OrderStatus.COMPLETED, OrderStatus.CANCELED]) {
+
+            // Get transaction
+            List<Transaction> transactions = Transaction.where {
+                order == order
+            }.list()
+
+            log.info "Rolling back ${transactions.size()} transactions"
+
+            if (transactions) {
+                for (Transaction transaction : transactions) {
+                    if (transaction.localTransfer) {
+                        transaction.localTransfer.delete()
+                    }
+                    transaction.delete()
+                }
+            }
+
+            // Revert order item status
+            order.orderItems.each { OrderItem orderItem ->
+                orderItem.orderItemStatusCode = OrderItemStatusCode.PENDING
+            }
+
+            order.status = OrderStatus.PENDING
+            order.completedBy = null
+            order.dateCompleted = null
+            order.approvedBy = null
+            order.dateApproved = null
+            order.save(flush:true)
         }
+
+        // Returned only so that we have a payload for the event
         return putaway
     }
 }
