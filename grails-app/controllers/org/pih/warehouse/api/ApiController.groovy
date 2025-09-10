@@ -17,6 +17,7 @@ import org.grails.web.json.JSONObject
 import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.LocalizationUtil
 import org.pih.warehouse.core.ActivityCode
+import org.pih.warehouse.core.ApiException
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
@@ -307,8 +308,11 @@ class ApiController {
     def barcodes() {
         Product product = Product.findByProductCodeOrUpc(params.id, params.id)
         if (!product) {
-            render(status: HttpStatus.NOT_FOUND.value())
-            return
+            throw new ApiException("Product ${params.id} not found")
+            // FIXME We should be able to render a not found error here since the API specs
+            //  call for a 404 error code. But this isn't a huge priority at the moment.
+            //render(status: HttpStatus.NOT_FOUND.value())
+            //return
         }
         render([data: product] as JSON)
     }
