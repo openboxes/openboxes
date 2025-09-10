@@ -557,7 +557,7 @@ class Product implements Comparable, Serializable {
                 Constants.PRODUCT_INVENTORY_TRANSACTION_TYPE_ID,
                 Constants.INVENTORY_BASELINE_TRANSACTION_TYPE_ID
         ]
-        return latestTransactionDate(locationId, transactionTypeIds)
+        return latestTransactionDate(locationId, transactionTypeIds, Constants.INVENTORY_BASELINE_MIGRATION_TRANSACTION_COMMENT)
     }
 
     Date earliestReceivingDate(String locationId) {
@@ -570,7 +570,7 @@ class Product implements Comparable, Serializable {
      * @param locationId
      * @return
      */
-    Date latestTransactionDate(String locationId, List<String> transactionTypeIds) {
+    Date latestTransactionDate(String locationId, List<String> transactionTypeIds, String commentToFilter) {
         def inventory = Location.get(locationId).inventory
         def date = TransactionEntry.executeQuery("""
           select 
@@ -581,7 +581,11 @@ class Product implements Comparable, Serializable {
           where ii.product= :product 
           and t.inventory = :inventory 
           and t.transactionType.id in (:transactionTypeIds)
-          """, [product: this, inventory: inventory, transactionTypeIds: transactionTypeIds]).first()
+          and t.comment <> :commentToFilter
+          """, [product: this,
+                inventory: inventory,
+                transactionTypeIds: transactionTypeIds,
+                commentToFilter: commentToFilter]).first()
         return date
     }
 
