@@ -460,13 +460,20 @@ class PutawayService implements EventPublisher  {
         }
 
         // Get transaction
-        Transaction transaction = Transaction.where {
+        List<Transaction> transactions = Transaction.where {
             order == order
-        }.get()
+        }.list()
 
         // If exists, delete the transaction and reset status of putaway
-        if (order.status == OrderStatus.COMPLETED && transaction) {
-            transaction.delete()
+        if (order.status == OrderStatus.COMPLETED && transactions) {
+            if (transactions) {
+                for (Transaction transaction : transactions) {
+                    if (transaction.localTransfer) {
+                        transaction.localTransfer.delete()
+                    }
+                    transaction.delete()
+                }
+            }
             putaway.putawayStatus = PutawayStatus.PENDING
             savePutaway(putaway)
         }
