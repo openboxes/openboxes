@@ -44,10 +44,10 @@
                             </a>
                         </td>
                         <td>
-                            ${binLocation?.locationType?.name}
+                            ${binLocation?.zone?.name}
                         </td>
                         <td>
-                            ${binLocation?.zone?.name}
+                            ${binLocation?.locationType?.name}
                         </td>
 
                         <td>
