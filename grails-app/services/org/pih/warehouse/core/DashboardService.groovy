@@ -342,9 +342,10 @@ class DashboardService {
                 left join te.transaction as t
                 where t.inventory = :inventory
                 and t.transactionType.id in (:transactionTypeIds)
+                and t.comment <> :commentToFilter
                 group by ii.product
                 """,
-                [inventory: location.inventory, transactionTypeIds: transactionTypes])
+                [inventory: location.inventory, transactionTypeIds: transactionTypes, commentToFilter: Constants.INVENTORY_BASELINE_MIGRATION_TRANSACTION_COMMENT])
 
         // Convert to map
         Map<String, Timestamp> latestInventoryDateMap = latestInventoryDates.collectEntries { [it[0], it[1]] }

@@ -1545,13 +1545,15 @@ class ProductService {
             where ii.product.id in (:productIds)
               and t.inventory = :inventory
               and t.transactionType.id in (:transactionTypeIds)
+              and t.comment <> :commentToFilter
             group by ii.product.id
         """
 
         List<Object[]> results = TransactionEntry.executeQuery(hql, [
                 productIds: productIds,
                 inventory: inventory,
-                transactionTypeIds: transactionTypeIds
+                transactionTypeIds: transactionTypeIds,
+                commentToFilter: Constants.INVENTORY_BASELINE_MIGRATION_TRANSACTION_COMMENT
         ])
 
         // Convert list to a map for O(1) accessibility further
