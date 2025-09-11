@@ -1239,6 +1239,7 @@ class IndicatorDataService {
                     LEFT JOIN `transaction` t ON t.id = te.transaction_id
                     WHERE t.inventory_id = :inventoryId
                     AND t.transaction_type_id IN (:transactionTypeIds)
+                    AND t.comment <> :commentToFilter
                     GROUP BY ii.product_id 
                 ) as stock_count ON stock_count.product_id = ii.product_id
             ) as dashboard_data
@@ -1253,6 +1254,7 @@ class IndicatorDataService {
                 .setParameter("daysOffset", Holders.config.openboxes.dashboard.backdatedShipments.daysOffset)
                 .setParameter("timeLimit", timeLimit)
                 .setParameter("transactionTypeIds", transactionTypeIds)
+                .setParameter("commentToFilter", Constants.INVENTORY_BASELINE_MIGRATION_TRANSACTION_COMMENT)
                 .list()
 
         List<TableData> tableData = results.collect {
