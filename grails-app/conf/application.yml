@@ -334,6 +334,7 @@ openboxes:
                 labelYearPrefix: ""
                 yearFormat: "yyyy"
 
+    # Basic Auth interceptor
     interceptor:
       basicAuth:
         enabled: false
