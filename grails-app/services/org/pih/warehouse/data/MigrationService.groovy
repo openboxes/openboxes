@@ -461,8 +461,7 @@ class MigrationService {
                     null,
                     productsToBaseline,
                     null,
-                    "Inventory baseline created during old product inventory transactions migration for products that had stock " +
-                            "but no inventory baseline transaction as a most recent transaction",
+                    Constants.INVENTORY_BASELINE_MIGRATION_TRANSACTION_COMMENT,
                     null,
                     true,
                     true

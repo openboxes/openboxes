@@ -582,7 +582,11 @@ class Product implements Comparable, Serializable {
           where ii.product= :product 
           and t.inventory = :inventory 
           and t.transactionType.id in (:transactionTypeIds)
-          """, [product: this, inventory: inventory, transactionTypeIds: transactionTypeIds]).first()
+          and t.comment <> :commentToFilter
+          """, [product: this,
+                inventory: inventory,
+                transactionTypeIds: transactionTypeIds,
+                commentToFilter: Constants.INVENTORY_BASELINE_MIGRATION_TRANSACTION_COMMENT]).first()
         return date
     }
 
