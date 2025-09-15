@@ -98,10 +98,12 @@ const useResolveStep = () => {
   }, [tableData.current]);
 
   useEffect(() => {
+    // we want to fetch lot numbers only when the step is editable and there are products
+    // in the table because if the step is not editable, there is no need to fetch lot numbers
     if (isStepEditable && productIds.length > 0) {
       dispatch(fetchLotNumbersByProductIds(productIds));
     }
-  }, [productIds[0], isStepEditable]);
+  }, [JSON.stringify(productIds), isStepEditable]);
 
   useEffect(() => {
     if (showBinLocation) {

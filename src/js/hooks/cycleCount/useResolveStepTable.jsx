@@ -16,7 +16,7 @@ import { FETCH_CYCLE_COUNT_REASON_CODES } from 'actions/types';
 import { TableCell } from 'components/DataTable';
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
 import ValueIndicator from 'components/DataTable/v2/ValueIndicator';
-import LotNumberSelect from 'components/form-elements/LotNumberSelect';
+import LotSelectorField from 'components/form-elements/LotSelectorField';
 import DateField from 'components/form-elements/v2/DateField';
 import SelectField from 'components/form-elements/v2/SelectField';
 import TextInput from 'components/form-elements/v2/TextInput';
@@ -91,7 +91,7 @@ const useResolveStepTable = ({
     }
 
     if (fieldName === cycleCountColumn.LOT_NUMBER) {
-      return LotNumberSelect;
+      return LotSelectorField;
     }
 
     return TextInput;

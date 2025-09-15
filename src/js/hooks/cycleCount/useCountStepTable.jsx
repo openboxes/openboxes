@@ -9,7 +9,7 @@ import { getLotNumbersByProductId } from 'selectors';
 
 import { TableCell } from 'components/DataTable';
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
-import LotNumberSelect from 'components/form-elements/LotNumberSelect';
+import LotSelectorField from 'components/form-elements/LotSelectorField';
 import DateField from 'components/form-elements/v2/DateField';
 import SelectField from 'components/form-elements/v2/SelectField';
 import TextInput from 'components/form-elements/v2/TextInput';
@@ -67,7 +67,7 @@ const useCountStepTable = ({
     }
 
     if (fieldName === cycleCountColumn.LOT_NUMBER) {
-      return LotNumberSelect;
+      return LotSelectorField;
     }
 
     return TextInput;

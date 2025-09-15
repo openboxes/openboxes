@@ -1571,7 +1571,7 @@ class ProductService {
         }
 
         products.collect { product ->
-            def lotNumbers = product.inventoryItems
+            List<Map<String, Date>> lotNumbers = product.inventoryItems
                     .findAll { it.lotNumber }
                     .collect {
                         [

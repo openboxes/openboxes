@@ -6,7 +6,7 @@ import { getLotNumbersByProductId } from 'selectors';
 
 import SelectField from 'components/form-elements/v2/SelectField';
 
-const LotNumberSelect = ({ productId, ...props }) => {
+const LotSelectorField = ({ productId, ...props }) => {
   const { lotNumbers } = useSelector((state) => ({
     lotNumbers: getLotNumbersByProductId(state, productId),
   }));
@@ -14,6 +14,8 @@ const LotNumberSelect = ({ productId, ...props }) => {
   return (
     <SelectField
       options={lotNumbers.map((item) => ({
+        id: item.lotNumber,
+        name: item.lotNumber,
         label: item.lotNumber,
         value: item.lotNumber,
       }))}
@@ -23,8 +25,8 @@ const LotNumberSelect = ({ productId, ...props }) => {
   );
 };
 
-LotNumberSelect.propTypes = {
+LotSelectorField.propTypes = {
   productId: PropTypes.string.isRequired,
 };
 
-export default LotNumberSelect;
+export default LotSelectorField;
