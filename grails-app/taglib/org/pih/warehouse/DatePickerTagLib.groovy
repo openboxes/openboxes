@@ -9,16 +9,67 @@
  **/
 package org.pih.warehouse
 
-import java.text.SimpleDateFormat
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
+import org.apache.commons.lang.StringUtils
+import org.grails.plugins.web.taglib.FormTagLib
+
+import org.pih.warehouse.core.Constants
 
 class DatePickerTagLib {
 
+    /**
+     * Simple date + time form field selectors for dates.
+     * More info: https://docs.grails.org/latest/ref/Tags%20-%20GSP/datePicker.html
+     */
     Closure datePicker = { attrs, body ->
-        def datePickerTagLib = grailsApplication.mainContext.getBean('org.grails.plugins.web.taglib.FormTagLib')
+        FormTagLib datePickerTagLib = grailsApplication.mainContext.getBean(
+                'org.grails.plugins.web.taglib.FormTagLib') as FormTagLib
+
+        // Grails' date picker taglib doesn't support java.time classes and so the simplest thing we can
+        // do is to convert those types to Date before passing them to the taglib.
+        switch (attrs.value) {
+            case (Instant):
+                attrs.value = DateUtil.asDate(attrs.value as Instant)
+                attrs.precision = 'minute'
+                break
+            case (ZonedDateTime):
+                attrs.value = DateUtil.asDate(attrs.value as ZonedDateTime)
+                attrs.precision = 'minute'
+                break
+            case (LocalDate):
+                attrs.value = DateUtil.asDate(attrs.value as LocalDate)
+                attrs.precision = 'day'
+                break
+            default:
+                break
+        }
+
         out << datePickerTagLib.datePicker.call(attrs)
     }
 
-    def jqueryDatePicker = { attrs, body ->
+    /**
+     * A date picker widget for date-only dates.
+     * More info: https://jqueryui.com/datepicker/
+     *
+     * @attr id The id of the datepicker element. If not set, will use the value of name.
+     * @attr name Required. The name of the field to bind the date to.
+     * @attr value A Date or LocalDate instance to populate the field with initially.
+     * @attr autoSize If true, automatically resizes the input field to fit the date string.
+     *                Defaults to true if size is null, otherwise defaults to false.
+     * @attr size The number of characters wide the input field should be. Defaults to 10.
+     * @attr cssClass An optional CSS class to associate with the date picker element.
+     * @attr changeMonthAndYear If true, shows month and year as dropdown selectors. Defaults to true.
+     * @attr numberOfMonths The number of months to display at one time in the picker. Defaults to 1.
+     * @attr readOnly If true, the picker will be disabled. Defaults to false.
+     * @attr minDate Date string representing the earliest date that can be selected. Defaults to no limit.
+     * @attr maxDate Date string representing the latest date that can be selected. Defaults to no limit.
+     * @attr placeholder The text to display in the input field before any date has been selected. Defaults to empty.
+     * @attr autocomplete If true, enables autocomplete for the input field. Defaults to false.
+     */
+    Closure jqueryDatePicker = { attrs, body ->
 
         def id = attrs.id ? attrs.id : attrs.name
         def name = attrs.name
@@ -28,7 +79,6 @@ class DatePickerTagLib {
         def showOn = attrs.showOn ?: "both"
         def showTrigger = Boolean.valueOf(attrs.showTrigger ?: "true")
         def changeMonthAndYear = attrs.changeMonthAndYear ?: true
-        def value = attrs.value
         def numberOfMonths = attrs.numberOfMonths ?: 1
         def readOnly = attrs.readOnly ?: false
         def minDate = attrs.minDate ? "new Date('${attrs.minDate}')" : null
@@ -38,10 +88,28 @@ class DatePickerTagLib {
         def autocomplete = attrs.autocomplete ?: 'off'
         def dataTestId = attrs['data-testid'] ?: 'date-picker'
 
-        if (value) {
-            if (value instanceof Date) {
-                value = (attrs.format && attrs.value) ? new SimpleDateFormat(attrs.format).format(attrs.value) : ""
-            }
+        // If a value was provided on page load, stringify it for the date picker to use as a default. Note that the
+        // date picker uses the javascript Date type (not java.util.Date), which has a different pattern/format rules
+        // and a constructor that defaults to midnight in the server timezone if given date-only (no time or offset).
+        // It's unclear why, but the date string must be formatted to match the 'altFormat' format (MM/dd/yyyy).
+        // Otherwise we get weird behaviour (the selected dates shift by one day every time the page refreshes).
+        String value
+        switch (attrs.value) {
+            case Date:
+                value = Constants.MONTH_DAY_YEAR_DATE_FORMATTER.format(attrs.value)
+                break
+            case LocalDate:
+                value = DateTimeFormatter.ofPattern('MM/dd/yyyy').format(attrs.value as LocalDate)
+                break
+            case String:
+                String stringValue = attrs.value as String
+                value = StringUtils.isBlank(stringValue) || stringValue == 'null' ? null : attrs.value
+                break
+            case null:
+                value = null
+                break
+            default:
+                throw new IllegalArgumentException("Can't populate datepicker with value of type: ${attrs.value.class}")
         }
 
         if (name == null) {
@@ -63,6 +131,11 @@ class DatePickerTagLib {
 					});
 
 					jQuery('#${id}-datepicker').datepicker({
+                        // We use the alt field so that we can continue to display the date in a user friendly format
+                        // while doing all logical operations on the date (including data binding) in another format.
+                        // It would have been better to use ISO format (yy-mm-dd) but many usages of this picker
+                        // expect the mm/dd/yy format so we're stuck with it. Also note that the format rules for
+                        // javascript's 'Date is different from the format for java.util.Date
 						altField: '#${id}',
 						altFormat: 'mm/dd/yy',
 						dateFormat: 'dd/M/yy',

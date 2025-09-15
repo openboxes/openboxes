@@ -99,7 +99,7 @@
 								  <label for="dateCreated"><warehouse:message code="productAssociation.dateCreated.label" default="Date Created" /></label>
 								</td>
 								<td valign="top" class="value ${hasErrors(bean: productAssociationInstance, field: 'dateCreated', 'errors')}">
-									<g:datePicker name="dateCreated" precision="minute" value="${productAssociationInstance?.dateCreated}"  />
+									<g:datePicker name="dateCreated" value="${productAssociationInstance?.dateCreated}"  />
 								</td>
 							</tr>
 						
