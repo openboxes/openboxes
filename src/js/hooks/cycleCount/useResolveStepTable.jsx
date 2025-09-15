@@ -185,6 +185,22 @@ const useResolveStepTable = ({
     return value;
   };
 
+  const getValueToDisplayTooltipLabel = (id, value) => {
+    if (id === cycleCountColumn.BIN_LOCATION) {
+      return getBinLocationToDisplay(value) || translate('react.cycleCount.table.binLocation.label', 'Bin Location');
+    }
+
+    if (id === cycleCountColumn.LOT_NUMBER) {
+      return value || translate('react.cycleCount.table.lotNumber.label', 'Serial / Lot Number');
+    }
+
+    if (id === cycleCountColumn.ROOT_CAUSE) {
+      return value?.label || translate('react.cycleCount.table.rootCause.label', 'Root Cause');
+    }
+
+    return value;
+  };
+
   /**
    Override the behaviour of getValue when displaying fields on the count step.
    */
@@ -225,23 +241,20 @@ const useResolveStepTable = ({
         cycleCountColumn.ROOT_CAUSE,
         cycleCountColumn.COMMENT,
         cycleCountColumn.BIN_LOCATION,
-      ].includes(id);
+      ].includes(columnPath);
       // We shouldn't allow users edit fetched data (quantityRecounted, rootCause and comment
       // field are editable)
       if (!isStepEditable) {
         return (
-          <CustomTooltip
-            content={getValueToDisplay(columnPath, value)}
-            show={showStaticTooltip}
+          <TableCell
+            className="static-cell-count-step align-items-center resolve-table-limit-lines"
+            customTooltip={showStaticTooltip && getValueToDisplayTooltipLabel(columnPath, value)}
+            tooltipLabel={getValueToDisplayTooltipLabel(columnPath, value)}
           >
-            <TableCell
-              className="static-cell-count-step align-items-center resolve-table-limit-lines"
-            >
-              <div className={showStaticTooltip ? 'limit-lines-1' : 'limit-lines-3 text-break'}>
-                {getNonEditableValueToDisplay(columnPath, value)}
-              </div>
-            </TableCell>
-          </CustomTooltip>
+            <div className={showStaticTooltip ? 'limit-lines-1' : 'limit-lines-3 text-break'}>
+              {getNonEditableValueToDisplay(columnPath, value)}
+            </div>
+          </TableCell>
         );
       }
       const errorMessage = validationErrors?.[cycleCountId]?.errors?.[index]?.[columnPath]?._errors;
@@ -322,11 +335,11 @@ const useResolveStepTable = ({
       }, [rowIndex, columnId]);
 
       const handleLotNumberChange = (selectedLotNumber) => {
-        const isLotAlreadyExist = !!lotNumbers.find(lot => lot.lotNumber === selectedLotNumber);
+        const isLotAlreadyExist = lotNumbers.find(lot => lot.lotNumber === selectedLotNumber);
 
         setDisabledExpirationDateFields(prev => ({
           ...prev,
-          [original.id]: isLotAlreadyExist,
+          [original.id]: !!isLotAlreadyExist,
         }));
 
         table.options.meta?.updateData(
@@ -338,11 +351,12 @@ const useResolveStepTable = ({
 
         const formattedExpirationDate = isLotAlreadyExist
           ? formatLocalizedDate(
-            lotNumbers.find(lot => lot.lotNumber === selectedLotNumber).expirationDate,
+            isLotAlreadyExist.expirationDate,
             DateFormat.DD_MMM_YYYY,
           )
           : null;
 
+        // when we change the lot number, we also want to update the expiration date
         table.options.meta?.updateData(
           cycleCountId,
           original.id,
@@ -431,9 +445,9 @@ const useResolveStepTable = ({
       return (
         <TableCell
           className="rt-td rt-td-count-step pb-0"
-          customTooltip={showTooltip && getNonEditableValueToDisplay(columnPath, value)}
+          customTooltip={showTooltip && getValueToDisplayTooltipLabel(columnPath, value)}
           tooltipClassname="w-100"
-          tooltipLabel={getNonEditableValueToDisplay(columnPath, value)}
+          tooltipLabel={getValueToDisplayTooltipLabel(columnPath, value)}
         >
           <Component
             disabled={isFieldDisabled || isFormDisabled}

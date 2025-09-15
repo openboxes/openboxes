@@ -342,7 +342,10 @@ const useCountStep = () => {
     cycleCount: cycleCountItem.cycleCountId,
   });
 
-  const save = async (shouldSetDefaultAssignee = false, shouldRefetchLotNumbers = false) => {
+  const save = async ({
+    shouldSetDefaultAssignee = false,
+    shouldRefetchLotNumbers = false,
+  }) => {
     try {
       show();
       markAllItemsAsUpdated();
@@ -411,7 +414,7 @@ const useCountStep = () => {
     const isValid = triggerValidation();
     forceRerender();
     if (isValid) {
-      await save(true);
+      await save({ shouldSetDefaultAssignee: true });
       setIsStepEditable(false);
     }
   };

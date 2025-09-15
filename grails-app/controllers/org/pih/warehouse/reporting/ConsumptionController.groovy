@@ -339,7 +339,7 @@ class ConsumptionController {
 
                 if (command.includeLocationBreakdown) {
                     command.selectedLocations.each { location ->
-                        csvrow[location?.name] = row.transferOutMap[location] ?: ""
+                        csvrow[location.locationNumber ?: location?.name] = row.transferOutMap[location] ?: ""
                     }
                 }
 

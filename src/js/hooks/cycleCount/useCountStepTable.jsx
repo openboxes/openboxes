@@ -250,11 +250,11 @@ const useCountStepTable = ({
       }, [rowIndex, columnId]);
 
       const handleLotNumberChange = (selectedLotNumber) => {
-        const isLotAlreadyExist = !!lotNumbers.find(lot => lot.lotNumber === selectedLotNumber);
+        const isLotAlreadyExist = lotNumbers.find(lot => lot.lotNumber === selectedLotNumber);
 
         setDisabledExpirationDateFields(prev => ({
           ...prev,
-          [original.id]: isLotAlreadyExist,
+          [original.id]: !!isLotAlreadyExist,
         }));
 
         table.options.meta?.updateData(
@@ -266,11 +266,12 @@ const useCountStepTable = ({
 
         const formattedExpirationDate = isLotAlreadyExist
           ? formatLocalizedDate(
-            lotNumbers.find(lot => lot.lotNumber === selectedLotNumber).expirationDate,
+            isLotAlreadyExist.expirationDate,
             DateFormat.DD_MMM_YYYY,
           )
           : null;
 
+        // when we change the lot number, we also want to update the expiration date
         table.options.meta?.updateData(
           cycleCountId,
           original.id,
