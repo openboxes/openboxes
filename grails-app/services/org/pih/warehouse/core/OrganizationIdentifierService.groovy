@@ -1,7 +1,7 @@
 package org.pih.warehouse.core
 
-import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
+import org.apache.commons.lang.StringUtils
 import org.apache.commons.lang.WordUtils
 
 // TODO: Try to merge this logic into IdentifierService. We'd need to support a new ${abbreviation} keyword in the
@@ -11,37 +11,22 @@ import org.apache.commons.lang.WordUtils
 @Transactional
 class OrganizationIdentifierService {
 
-    GrailsApplication grailsApplication
+    ConfigService configService
 
     /**
      * Generates a unique id that resembles the given name.
      *
      * Ex: Given a name "Big Bad Guys" it might generate "BBG", or "BB0" if "BBG" already exists (up to "BB9").
-     * Ex: Given a name "Biggie" it might generate "BIG", or "BI0" if "BIG" already exists (up to "BB9").
+     * Ex: Given a name "Biggie" it might generate "BIG", or "BI0" if "BIG" already exists (up to "BI9").
      */
     String generate(String name) {
-        Integer minSize = grailsApplication.config.getProperty('openboxes.identifier.organization.minSize', Integer)
-        Integer maxSize = grailsApplication.config.getProperty('openboxes.identifier.organization.maxSize', Integer)
+        Integer minSize = configService.getProperty('openboxes.identifier.organization.minSize', Integer)
+        Integer maxSize = configService.getProperty('openboxes.identifier.organization.maxSize', Integer)
 
-        // There are some organization names formatted like: "Name, Inc." so we trim everything after the comma
-        // to get a cleaner name.
-        String sanitizedName = name.split(",")[0]
-
-        // This turns strings like "big bad guys" into "bbg"
-        String identifier = WordUtils.initials(sanitizedName)?.replaceAll("[^a-zA-Z0-9]", "")
-
-        // If there are too few initials, take the original identifier and chop off words until you have the smallest
-        // that fits within the limit. This turns strings like "biggie bad" into "biggie" if maxSize is <= 6.
-        if (identifier.length() < minSize) {
-            identifier = WordUtils.abbreviate(sanitizedName, minSize, maxSize, null)
+        String identifier = generateOrganizationIdentifier(name, minSize, maxSize)
+        if (StringUtils.isBlank(name)) {
+            return null
         }
-
-        // If we end up with a string like "biggie" that is still too long, trim it until it fits.
-        else if (identifier.length() > maxSize) {
-            identifier = identifier.substring(0, maxSize)
-        }
-
-        identifier = identifier.toUpperCase()
 
         if (!idAlreadyExists(identifier)) {
             return identifier
@@ -54,11 +39,47 @@ class OrganizationIdentifierService {
         String identifierWithHighestNumber = getIdentifierWithHighestSuffix(identifier.substring(0, identifier.size() - 1))
         if (identifierWithHighestNumber) {
             char suffix = identifierWithHighestNumber.charAt(identifierWithHighestNumber.size() - 1)
+            // TODO: If suffix is '9', doing suffix++ produces ':', which is garbage! We need to either error or make
+            //       '9' become '10' but need to also consider maxSize. Ex: if code is "BB9" and maxSize is 3, we could
+            //       either make code "B10" or error.
             suffix++
 
             return identifier.toUpperCase().substring(0, identifier.size() -1) + suffix
         }
         return identifier.length() < maxSize ? identifier.toUpperCase() + '0': identifier.toUpperCase().substring(0, maxSize - 1) + '0'
+    }
+
+    private String generateOrganizationIdentifier(String name, Integer minSize, Integer maxSize) {
+        // There are some organization names formatted like: "Name, Inc." so we trim everything after the comma
+        // to get a cleaner name. Then remove all other special characters (except spaces).
+        String sanitizedName = name? name.split(",")[0]?.replaceAll("[^a-zA-Z0-9 ]", "") : null
+
+        // In case we're given a null or blank name or a name that's all special characters or starts with a comma.
+        if (StringUtils.isBlank(sanitizedName)) {
+            return null
+        }
+
+        String initials = WordUtils.initials(sanitizedName)
+
+        // If the given name is only one word or the initials are too short, remove all spaces from the original name
+        // then trim it until it fits.
+        String identifier
+        if (initials.length() == 1 || initials.length() < minSize) {
+            // TODO: If this is still too short, consider padding with a special character ('0' probably).
+            //       Ex: if minLength == 5 and you have "HI" -> "HI000"
+            String sanitizedNameNoSpaces = StringUtils.deleteWhitespace(sanitizedName)
+            identifier = StringUtils.substring(sanitizedNameNoSpaces, 0, maxSize)
+        }
+        // If the initials of the given name are too long, trim them until they fit.
+        else if (initials.length() > maxSize) {
+            identifier = StringUtils.substring(initials, 0, maxSize)
+        }
+        // Otherwise the initials fit, so use them.
+        else {
+            identifier = initials
+        }
+
+        return identifier.toUpperCase()
     }
 
     private boolean idAlreadyExists(String id) {
@@ -67,9 +88,17 @@ class OrganizationIdentifierService {
     }
 
     private String getIdentifierWithHighestSuffix(String identifier) {
-        List organizations = Organization.executeQuery(
-                "select o.code from Organization o where code like :identifier", [identifier: identifier + '%'] )
-        organizations = organizations.findAll { Character.isDigit(it.charAt(it.size() - 1)) }
-        return organizations ? organizations.sort()?.last() : null
+        List<String> organizationCodes = Organization.withCriteria {
+            projections {
+                property('code')
+            }
+            like('code', identifier + '%')
+        } as List<String>
+
+        // Filter down to only the codes ending in a digit. Ex: ["a", "a0", "a1"] will filter to ["a0", "a1"]
+        organizationCodes = organizationCodes.findAll { Character.isDigit(it.charAt(it.size() - 1)) }
+
+        // Return the code with the largest numerical suffix. Ex: given ["a0", "a1", ..., "a99"], will return "a99"
+        return organizationCodes ? organizationCodes.sort()?.last() : null
     }
 }
