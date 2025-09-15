@@ -8,9 +8,7 @@ class ProductPackageService {
 
     ProductSupplier save(ProductPackageCommand command) {
         setPackageData(command)
-        if (command.contractPricePrice) {
-            setContractPriceData(command.productSupplier, command.contractPricePrice, command.contractPriceValidUntil)
-        }
+        setContractPriceData(command.productSupplier, command.contractPricePrice, command.contractPriceValidUntil)
         return command.productSupplier
     }
 
@@ -52,10 +50,28 @@ class ProductPackageService {
     }
 
     private static void setContractPriceData(ProductSupplier productSupplier, BigDecimal contractPricePrice, Date validUntil) {
-        if (!productSupplier.contractPrice) {
-            productSupplier.contractPrice = new ProductPrice()
+        ProductPrice contractPrice = productSupplier.contractPrice
+
+        // 1. Contract price doesn't exist, and no data is passed, so we don't need to create a new object
+        if (!contractPrice && !contractPricePrice && !validUntil) {
+            return
         }
-        productSupplier.contractPrice.price = contractPricePrice
-        productSupplier.contractPrice.toDate = validUntil
+
+        // 2. Contract price exists, but we want to set the price and date to null, so we can't just delete that object
+        if (contractPrice && !contractPricePrice && !validUntil) {
+            contractPrice.delete()
+            productSupplier.contractPrice = null
+            return
+        }
+
+        // 3. If the contract price doesn't exist, create a new one
+        if (!contractPrice) {
+            contractPrice = new ProductPrice()
+            productSupplier.contractPrice = contractPrice
+        }
+
+        // 4. Set passed data
+        contractPrice.price = contractPricePrice
+        contractPrice.toDate = validUntil
     }
 }
