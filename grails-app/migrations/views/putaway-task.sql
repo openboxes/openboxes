@@ -3,7 +3,7 @@ CREATE OR REPLACE VIEW putaway_task AS
         order_item.id as id,
         CONCAT('PT-', CRC32(order_item.id)) as identifier,
         -- FIXME derive status based on order item and order status
-        CASE `order`.status
+        CASE `order_item`.order_item_status_code
             WHEN 'PENDING'   THEN 'PENDING'
             WHEN 'APPROVED'    THEN 'IN_PROGRESS'
             WHEN 'PLACED'       THEN 'IN_TRANSIT'

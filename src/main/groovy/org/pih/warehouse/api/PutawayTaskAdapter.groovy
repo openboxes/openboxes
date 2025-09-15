@@ -3,6 +3,7 @@ package org.pih.warehouse.api
 
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
+import org.pih.warehouse.order.OrderItemStatusCode
 import org.pih.warehouse.order.OrderStatus
 import org.pih.warehouse.putaway.PutawayTask
 
@@ -34,24 +35,13 @@ class PutawayTaskAdapter {
      * @return
      */
     static OrderItem toOrderItem(PutawayTask task, OrderItem orderItem) {
-
-        Order order = orderItem.order
-
         // In most cases, we just want to make sure we're setting the most recent status
-        order.status = toOrderStatus(task.status)
-
-        // start - putaway task has been assigned and has been started
-        order.approvedBy = task.assignee
-        order.dateApproved = task.dateStarted
+        orderItem.orderItemStatusCode = toOrderItemStatusCode(task.status)
 
         // assign - putaway task has been loaded into putaway container (change if user provided override)
         orderItem.containerLocation = task.container
 
         orderItem.destinationBinLocation = task.destination
-
-        // complete - task is completed
-        order.completedBy = task.completedBy
-        order.dateCompleted = task.dateCompleted
 
         // In order to update timestamp on putaway task (order.lastUpdated should be updated on its own)
         orderItem.lastUpdated = new Date()
@@ -119,14 +109,11 @@ class PutawayTaskAdapter {
         }
     }
 
-    static OrderStatus toOrderStatus(PutawayTaskStatus putawayTaskStatus) {
+    static OrderItemStatusCode toOrderItemStatusCode(PutawayTaskStatus putawayTaskStatus) {
         switch (putawayTaskStatus) {
-            case PutawayTaskStatus.PENDING: return OrderStatus.PENDING
-            case PutawayTaskStatus.IN_PROGRESS: return OrderStatus.APPROVED
-            case PutawayTaskStatus.IN_TRANSIT: return OrderStatus.PLACED
-            case PutawayTaskStatus.COMPLETED: return OrderStatus.COMPLETED
-            case PutawayTaskStatus.CANCELED: return OrderStatus.CANCELED
-            default: return OrderStatus.PENDING
+            case PutawayTaskStatus.COMPLETED: return OrderItemStatusCode.COMPLETED
+            case PutawayTaskStatus.CANCELED: return OrderItemStatusCode.CANCELED
+            default: return OrderItemStatusCode.PENDING
         }
     }
 }

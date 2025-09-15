@@ -15,6 +15,7 @@ import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransferStockCommand
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
+import org.pih.warehouse.order.OrderItemStatusCode
 import org.pih.warehouse.order.OrderStatus
 import org.pih.warehouse.product.Product
 
@@ -133,6 +134,26 @@ class PutawayTaskService {
         log.info "dirty: " + orderItem.dirtyPropertyNames
         log.info "dirty: " + orderItem.order.dirtyPropertyNames
 
+        Order order = orderItem.order
+        // start - putaway task has been assigned and has been started
+        order.approvedBy = task.assignee
+        order.dateApproved = task.dateStarted
+
+        if (task.status == PutawayTaskStatus.COMPLETED) {
+            def allOrderItems = order.orderItems
+
+            boolean allItemsCompleted = allOrderItems.every {
+                it.id == orderItem.id || it.orderItemStatusCode == OrderItemStatusCode.COMPLETED
+            }
+
+            // complete - task is fully completed
+            if (allItemsCompleted) {
+                order.status = OrderStatus.COMPLETED
+                order.completedBy = task.completedBy
+                order.dateCompleted = task.dateCompleted
+            }
+        }
+
         orderItem.save(cascade: true, failOnError:true)
         task.discard()
     }
@@ -226,14 +247,9 @@ class PutawayTaskService {
     }
 
     void complete(PutawayTask task, String destinationId, String completedById, Boolean force = false) {
-        log.info "complete putaway "
+        log.info "complete putaway"
         if (!task) {
             throw new ObjectNotFoundException(task.id, "Unable to locate putaway task with id ${task.id}")
-        }
-
-        Person completedBy = completedById ? Person.get(completedById) : AuthService.currentUser
-        if (!completedBy) {
-            task.errors.reject("completedBy", "Must provide a valid person or user who completed the putaway task")
         }
 
         // validate destination or user has forced a destination change
@@ -254,6 +270,11 @@ class PutawayTaskService {
         // Update the task destination if the destinations do not match, but user forced change
         if (task.destination != destination && force) {
             task.destination = destination
+        }
+
+        Person completedBy = completedById ? Person.get(completedById) : AuthService.currentUser
+        if (!completedBy) {
+            task.errors.reject("completedBy", "Must provide a valid person or user who completed the putaway task")
         }
 
         task.dateCompleted = new Date()
