@@ -354,4 +354,15 @@ class ProductApiController extends BaseDomainApiController {
 
         render([data: importedProducts] as JSON)
     }
+
+    def getLotNumbersWithExpiration() {
+        List<Long> productIds = params.list("productId")*.toLong()
+
+        def result = productIds.collect { productId ->
+            def lotNumbers = productService.getLotNumbersWithExpiration(productId)
+            return [productId: productId, lotNumbers: lotNumbers]
+        }
+
+        render([data: result] as JSON)
+    }
 }

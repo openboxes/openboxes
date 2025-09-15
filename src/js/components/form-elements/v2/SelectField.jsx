@@ -137,6 +137,7 @@ SelectField.propTypes = {
     rowIndex: PropTypes.string,
     columnId: PropTypes.string,
   }),
+  creatable: PropTypes.bool,
 };
 
 SelectField.defaultProps = {
@@ -160,4 +161,5 @@ SelectField.defaultProps = {
   warning: false,
   onKeyDown: null,
   focusProps: {},
+  creatable: false,
 };

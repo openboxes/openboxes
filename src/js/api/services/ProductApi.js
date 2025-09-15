@@ -15,4 +15,9 @@ export default {
     },
     paramsSerializer: (parameters) => queryString.stringify(parameters),
   }),
+  getLotNumbersByProductIds: (productIds) =>
+    apiClient.get(`${PRODUCT_API}/getLotNumbersWithExpiration`, {
+      params: { productId: productIds },
+      paramsSerializer: (params) => queryString.stringify(params, { arrayFormat: 'repeat' }),
+    }),
 };

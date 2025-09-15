@@ -69,7 +69,7 @@ const ResolveStep = () => {
           printRecountForm={printRecountForm}
           refreshCountItems={refreshCountItems}
           next={next}
-          save={save}
+          save={() => save({ shouldRefetchLotNumbers: true })}
           isFormDisabled={isFormDisabled}
           sortByProductName={sortByProductName}
           setSortByProductName={setSortByProductName}

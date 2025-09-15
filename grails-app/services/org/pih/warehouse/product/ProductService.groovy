@@ -1565,4 +1565,20 @@ class ProductService {
         return results.collectEntries { [ (it[0]): it[1] ] }
     }
 
+    List<Map> getLotNumbersWithExpiration(Long productId) {
+        Product product = Product.get(productId)
+        if (!product) {
+            return []
+        }
+
+        return product.inventoryItems
+                .findAll { it.lotNumber }
+                .collect {
+                    [
+                            lotNumber     : it.lotNumber,
+                            expirationDate: it.expirationDate
+                    ]
+                }
+                .unique { it.lotNumber }
+    }
 }

@@ -9,12 +9,14 @@ import _ from 'lodash';
 import { RiChat3Line, RiDeleteBinLine, RiErrorWarningLine } from 'react-icons/ri';
 import { useDispatch, useSelector } from 'react-redux';
 import { Tooltip } from 'react-tippy';
+import { getLotNumbersByProductId } from 'selectors';
 
 import { fetchReasonCodes } from 'actions';
 import { FETCH_CYCLE_COUNT_REASON_CODES } from 'actions/types';
 import { TableCell } from 'components/DataTable';
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
 import ValueIndicator from 'components/DataTable/v2/ValueIndicator';
+import LotNumberSelect from 'components/form-elements/LotNumberSelect';
 import DateField from 'components/form-elements/v2/DateField';
 import SelectField from 'components/form-elements/v2/SelectField';
 import TextInput from 'components/form-elements/v2/TextInput';
@@ -45,6 +47,7 @@ const useResolveStepTable = ({
   const columnHelper = createColumnHelper();
   const [rowIndex, setRowIndex] = useState(null);
   const [columnId, setColumnId] = useState(null);
+  const [disabledExpirationDateFields, setDisabledExpirationDateFields] = useState({});
 
   // State for saving data for binLocation dropdown
   const translate = useTranslate();
@@ -56,12 +59,14 @@ const useResolveStepTable = ({
     formatLocalizedDate,
     reasonCodes,
     binLocations,
+    lotNumbers,
   } = useSelector((state) => ({
     users: state.users.data,
     currentLocation: state.session.currentLocation,
     formatLocalizedDate: formatDate(state.localize),
     reasonCodes: state.cycleCount.reasonCodes,
     binLocations: state.cycleCount.binLocations,
+    lotNumbers: getLotNumbersByProductId(state, productId),
   }));
 
   const showBinLocation = useMemo(() =>
@@ -83,6 +88,10 @@ const useResolveStepTable = ({
 
     if ([cycleCountColumn.BIN_LOCATION, cycleCountColumn.ROOT_CAUSE].includes(fieldName)) {
       return SelectField;
+    }
+
+    if (fieldName === cycleCountColumn.LOT_NUMBER) {
+      return LotNumberSelect;
     }
 
     return TextInput;
@@ -127,9 +136,10 @@ const useResolveStepTable = ({
       };
     }
 
-    if (fieldName === cycleCountColumn.LOT_NUMBER && isFieldDisabled) {
+    if (fieldName === cycleCountColumn.LOT_NUMBER) {
       return {
-        placeholder: translate('react.cycleCount.emptyLotNumber.label', 'NO LOT'),
+        placeholder: isFieldDisabled && translate('react.cycleCount.emptyLotNumber.label', 'NO LOT'),
+        productId,
       };
     }
 
@@ -182,7 +192,9 @@ const useResolveStepTable = ({
     if (id === cycleCountColumn.BIN_LOCATION && showBinLocation) {
       return { ...value, name: getBinLocationToDisplay(value) };
     }
-
+    if (id === cycleCountColumn.LOT_NUMBER && value) {
+      return { label: value, value };
+    }
     return value;
   };
 
@@ -195,12 +207,20 @@ const useResolveStepTable = ({
       // Keep and update the state of the cell during rerenders
       const [value, setValue] = useState(initialValue);
 
-      const isFieldDisabled = !original.id.includes('newRow')
-        && ![
-          cycleCountColumn.QUANTITY_RECOUNTED,
-          cycleCountColumn.ROOT_CAUSE,
-          cycleCountColumn.COMMENT,
-        ].includes(id);
+      const isFieldDisabled =
+        (
+          !original.id.includes('newRow') &&
+          ![
+            cycleCountColumn.QUANTITY_RECOUNTED,
+            cycleCountColumn.ROOT_CAUSE,
+            cycleCountColumn.COMMENT,
+          ].includes(id)
+        ) ||
+        (
+          columnPath === cycleCountColumn.EXPIRATION_DATE &&
+          disabledExpirationDateFields[original.id]
+        );
+
       const showStaticTooltip = [
         cycleCountColumn.ROOT_CAUSE,
         cycleCountColumn.COMMENT,
@@ -301,9 +321,45 @@ const useResolveStepTable = ({
         };
       }, [rowIndex, columnId]);
 
+      const handleLotNumberChange = (selectedLotNumber) => {
+        const isLotAlreadyExist = !!lotNumbers.find(lot => lot.lotNumber === selectedLotNumber);
+
+        setDisabledExpirationDateFields(prev => ({
+          ...prev,
+          [original.id]: isLotAlreadyExist,
+        }));
+
+        table.options.meta?.updateData(
+          cycleCountId,
+          original.id,
+          cycleCountColumn.LOT_NUMBER,
+          selectedLotNumber,
+        );
+
+        const formattedExpirationDate = isLotAlreadyExist
+          ? formatLocalizedDate(
+            lotNumbers.find(lot => lot.lotNumber === selectedLotNumber).expirationDate,
+            DateFormat.DD_MMM_YYYY,
+          )
+          : null;
+
+        table.options.meta?.updateData(
+          cycleCountId,
+          original.id,
+          cycleCountColumn.EXPIRATION_DATE,
+          formattedExpirationDate,
+        );
+
+        setValue(selectedLotNumber);
+      };
+
       // on change function expects e.target.value for text fields,
       // in other cases it expects just the value
       const onChange = (e) => {
+        if (columnPath === cycleCountColumn.LOT_NUMBER) {
+          return handleLotNumberChange(e?.value);
+        }
+
         if ([
           cycleCountColumn.BIN_LOCATION,
           cycleCountColumn.ROOT_CAUSE,
@@ -312,7 +368,7 @@ const useResolveStepTable = ({
           setWarning(null);
           triggerValidation();
         }
-        setValue(e?.target?.value ?? e);
+        return setValue(e?.target?.value ?? e);
       };
 
       // After pulling the latest changes, table.options.meta?.updateData no longer
@@ -330,12 +386,12 @@ const useResolveStepTable = ({
 
       // Columns allowed for focus in new rows
       const newRowFocusableCells = [
-        cycleCountColumn.LOT_NUMBER,
+        disabledExpirationDateFields && cycleCountColumn.LOT_NUMBER,
         cycleCountColumn.EXPIRATION_DATE,
         cycleCountColumn.QUANTITY_RECOUNTED,
         cycleCountColumn.ROOT_CAUSE,
         cycleCountColumn.COMMENT,
-      ];
+      ].filter(Boolean);
 
       if (showBinLocation) {
         newRowFocusableCells.splice(0, 0, cycleCountColumn.BIN_LOCATION);
@@ -370,7 +426,8 @@ const useResolveStepTable = ({
       const showTooltip = [
         cycleCountColumn.ROOT_CAUSE,
         cycleCountColumn.BIN_LOCATION,
-      ].includes(id);
+        cycleCountColumn.LOT_NUMBER,
+      ].includes(columnPath);
       return (
         <TableCell
           className="rt-td rt-td-count-step pb-0"

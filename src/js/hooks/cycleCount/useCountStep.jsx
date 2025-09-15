@@ -17,6 +17,7 @@ import { getCurrentLocation, getCycleCountRequestIds } from 'selectors';
 import {
   eraseDraft,
   fetchBinLocations,
+  fetchLotNumbersByProductIds,
   fetchUsers,
   startResolution,
 } from 'actions';
@@ -78,6 +79,19 @@ const useCountStep = () => {
 
   const showBinLocation = useMemo(() =>
     checkBinLocationSupport(currentLocation.supportedActivities), [currentLocation?.id]);
+
+  const productIds = useMemo(() => {
+    const ids = tableData.current
+      .flatMap((cycleCount) => cycleCount.cycleCountItems)
+      .map((item) => item.product?.id);
+    return Array.from(new Set(ids));
+  }, [tableData.current]);
+
+  useEffect(() => {
+    if (isStepEditable && productIds.length > 0) {
+      dispatch(fetchLotNumbersByProductIds(productIds));
+    }
+  }, [productIds[0], isStepEditable]);
 
   useEffect(() => {
     if (showBinLocation) {
@@ -328,7 +342,7 @@ const useCountStep = () => {
     cycleCount: cycleCountItem.cycleCountId,
   });
 
-  const save = async (shouldSetDefaultAssignee = false) => {
+  const save = async (shouldSetDefaultAssignee = false, shouldRefetchLotNumbers = false) => {
     try {
       show();
       markAllItemsAsUpdated();
@@ -370,6 +384,13 @@ const useCountStep = () => {
     } finally {
       // After the save, refetch cycle counts so that a new row can't be saved multiple times
       await fetchCycleCounts();
+
+      if (shouldRefetchLotNumbers) {
+        // When we click "Save progress", we want to refetch the lot numbers
+        // because the user may have created new ones and, without refetching,
+        // they won't be available in the dropdown.
+        dispatch(fetchLotNumbersByProductIds(productIds));
+      }
       hide();
     }
   };
