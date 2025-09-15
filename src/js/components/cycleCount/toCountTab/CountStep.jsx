@@ -66,7 +66,7 @@ const CountStep = () => {
         <CountStepHeader
           printCountForm={printCountForm}
           next={() => validateExistenceOfCycleCounts(next)}
-          save={() => validateExistenceOfCycleCounts(save({ shouldRefetchLotNumbers: true }))}
+          save={() => validateExistenceOfCycleCounts(() => save({ shouldRefetchLotNumbers: true }))}
           isFormDisabled={isFormDisabled}
           importItems={importItems}
           sortByProductName={sortByProductName}

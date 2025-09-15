@@ -90,12 +90,13 @@ const useResolveStep = () => {
   const showBinLocation = useMemo(() =>
     checkBinLocationSupport(currentLocation.supportedActivities), [currentLocation?.id]);
 
-  const productIds = useMemo(() => {
-    const ids = tableData.current
-      .flatMap((cycleCount) => cycleCount.cycleCountItems)
-      .map((item) => item.product?.id);
-    return Array.from(new Set(ids));
-  }, [tableData.current]);
+  const productIds = Array.from(
+    new Set(
+      tableData.current
+        .flatMap((cycleCount) => cycleCount.cycleCountItems)
+        .map((item) => item.product?.id),
+    ),
+  );
 
   useEffect(() => {
     // we want to fetch lot numbers only when the step is editable and there are products

@@ -400,8 +400,8 @@ const useResolveStepTable = ({
 
       // Columns allowed for focus in new rows
       const newRowFocusableCells = [
-        disabledExpirationDateFields && cycleCountColumn.LOT_NUMBER,
-        cycleCountColumn.EXPIRATION_DATE,
+        cycleCountColumn.LOT_NUMBER,
+        !disabledExpirationDateFields[original.id] ? cycleCountColumn.EXPIRATION_DATE : null,
         cycleCountColumn.QUANTITY_RECOUNTED,
         cycleCountColumn.ROOT_CAUSE,
         cycleCountColumn.COMMENT,
