@@ -36,6 +36,7 @@ class DatePickerTagLib {
         def dataBind = attrs.dataBind ? "data-bind='${attrs.dataBind}'" : ""
         def placeholder = attrs.placeholder ?: ''
         def autocomplete = attrs.autocomplete ?: 'off'
+        def dataTestId = attrs['data-testid'] ?: 'date-picker'
 
         if (value) {
             if (value instanceof Date) {
@@ -50,7 +51,7 @@ class DatePickerTagLib {
         def html = """
 			<input id='${id}' name='${name}' type='hidden' ${dataBind}/>
 			<input id='${id}-datepicker' name='${name}-datepicker' autocomplete ='${autocomplete}' type='text'
-					placeholder='${placeholder}' class='${cssClass} text large' size="${size}" ${
+					data-testid='${dataTestId}' placeholder='${placeholder}' class='${cssClass} text large' size="${size}" ${
             readOnly ? "readonly='readonly'" : ""
         }/>
 			<script type=\'text/javascript\'>

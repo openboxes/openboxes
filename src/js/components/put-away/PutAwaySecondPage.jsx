@@ -273,6 +273,7 @@ class PutAwaySecondPage extends Component {
               putawayItems: { [cellInfo.index]: { putawayLocation: { $set: value } } },
             }))}
             className="select-xs"
+            dataTestId="select-bin"
           />
         );
       },
@@ -294,6 +295,7 @@ class PutAwaySecondPage extends Component {
             type="button"
             className="btn btn-outline-primary btn-xs mr-1 mb-1"
             onClick={() => this.editItem(cellInfo.index)}
+            data-testid="edit-button"
           >
             <Translate id="react.default.button.edit.label" defaultMessage="Edit" />
           </button>
@@ -301,6 +303,7 @@ class PutAwaySecondPage extends Component {
             type="button"
             className="btn btn-outline-danger btn-xs mb-1"
             onClick={() => this.deleteItem(cellInfo.index)}
+            data-testid="delete-button"
           >
             <Translate id="react.default.button.delete.label" defaultMessage="Delete" />
           </button>
@@ -640,6 +643,7 @@ class PutAwaySecondPage extends Component {
           <span className="buttons-container classic-form-buttons">
             <button
               type="button"
+              data-testid="sort-button"
               onClick={() => this.savePutAways(
                 this.state.putAway,
                 () => this.sortPutawayItems(),
@@ -657,6 +661,7 @@ class PutAwaySecondPage extends Component {
             <button
               type="button"
               className="btn btn-outline-secondary btn-xs mr-3"
+              data-testid="export-button"
               onClick={() => this.savePutAways(
                 this.state.putAway,
                 () => this.generatePutAwayList(),
@@ -669,6 +674,7 @@ class PutAwaySecondPage extends Component {
             </button>
             <button
               type="button"
+              data-testid="save-button"
               onClick={() => this.savePutAways(this.state.putAway)}
               className="btn btn-outline-secondary btn-xs"
               disabled={_.some(this.state.putAway.putawayItems, (putawayItem) =>
@@ -692,6 +698,9 @@ class PutAwaySecondPage extends Component {
                 showPaginationBottom={false}
                 filterable
                 defaultFilterMethod={this.filterMethod}
+                getTdProps={(state, rowInfo) => ({
+                  'data-testid': `row-${rowInfo.level}-${rowInfo.index}`,
+                })}
               />
             )
             : null
@@ -703,6 +712,7 @@ class PutAwaySecondPage extends Component {
             type="button"
             onClick={() => this.nextPage()}
             className="btn btn-outline-primary btn-form float-right btn-xs"
+            data-testid="next-button"
           >
             <Translate id="react.default.button.next.label" defaultMessage="Next" />
           </button>

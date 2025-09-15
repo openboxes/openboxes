@@ -35,7 +35,7 @@ export default (Component) => {
         cell.props.style.borderBottom = '1px solid rgba(128,128,128,0.2)';
 
         return (
-          <div className={`rt-tr ${rest.className}`} style={rest.style}>
+          <div data-testid={`table-group-${ri.level}`} className={`rt-tr ${rest.className}`} style={rest.style}>
             {cell}
           </div>
         );
