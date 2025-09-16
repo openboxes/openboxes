@@ -1570,6 +1570,7 @@ class ProductService {
             'in'('id', productIds)
             inventoryItems {
                 isNotNull('lotNumber')
+                ne('lotNumber', '')
                 projections {
                     property('product.id', 'productId')
                     property('lotNumber', 'lotNumber')
@@ -1588,7 +1589,6 @@ class ProductService {
                                     expirationDate: row[2]
                             ]
                         }
-                        .findAll { it.lotNumber?.trim() }
                         .unique { it.lotNumber }
                 ]
             }
