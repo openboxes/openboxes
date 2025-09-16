@@ -52,6 +52,8 @@ class FormatTagLib {
     }
 
     /**
+     * @deprecated use g:formatDate from DateTagLib
+     *
      * Formats an Expiration Date
      * @attr obj REQUIRED the date to format
      */
