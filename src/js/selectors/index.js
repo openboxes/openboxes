@@ -30,4 +30,4 @@ export const getCurrentUser = (state) => state.session.user;
 export const getCycleCountTranslations = (state) => state.session.fetchedTranslations.cycleCount;
 
 export const getLotNumbersByProductId = (state, productId) =>
-  state.lotNumbers.lotNumbers[productId] || [];
+  state.lotNumbers?.lotNumbersWithExpiration?.[productId] || [];

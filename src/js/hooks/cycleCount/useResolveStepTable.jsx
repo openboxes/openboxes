@@ -59,14 +59,14 @@ const useResolveStepTable = ({
     formatLocalizedDate,
     reasonCodes,
     binLocations,
-    lotNumbers,
+    lotNumbersWithExpiration,
   } = useSelector((state) => ({
     users: state.users.data,
     currentLocation: state.session.currentLocation,
     formatLocalizedDate: formatDate(state.localize),
     reasonCodes: state.cycleCount.reasonCodes,
     binLocations: state.cycleCount.binLocations,
-    lotNumbers: getLotNumbersByProductId(state, productId),
+    lotNumbersWithExpiration: getLotNumbersByProductId(state, productId),
   }));
 
   const showBinLocation = useMemo(() =>
@@ -139,7 +139,7 @@ const useResolveStepTable = ({
     if (fieldName === cycleCountColumn.LOT_NUMBER) {
       return {
         placeholder: isFieldDisabled && translate('react.cycleCount.emptyLotNumber.label', 'NO LOT'),
-        options: lotNumbers.map((item) => ({
+        options: lotNumbersWithExpiration.map((item) => ({
           id: item.lotNumber,
           name: item.lotNumber,
           label: item.lotNumber,
@@ -340,7 +340,8 @@ const useResolveStepTable = ({
       }, [rowIndex, columnId]);
 
       const handleLotNumberChange = (selectedLotNumber) => {
-        const existingLot = lotNumbers.find((lot) => lot.lotNumber === selectedLotNumber);
+        const existingLot = lotNumbersWithExpiration.find((lot) =>
+          lot.lotNumber === selectedLotNumber);
         const lotAlreadyExist = Boolean(existingLot);
 
         // Disable the expiration date field for this row if the selected lot already exists.

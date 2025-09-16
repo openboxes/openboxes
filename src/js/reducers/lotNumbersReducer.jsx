@@ -1,7 +1,7 @@
 import { FETCH_LOT_NUMBERS_BY_PRODUCT_IDS } from 'actions/types';
 
 const initialState = {
-  lotNumbers: {},
+  lotNumbersWithExpiration: {},
 };
 
 export default function lotNumbersReducer(state = initialState, action) {
@@ -9,8 +9,8 @@ export default function lotNumbersReducer(state = initialState, action) {
     case FETCH_LOT_NUMBERS_BY_PRODUCT_IDS: {
       return {
         ...state,
-        lotNumbers: {
-          ...state.lotNumbers,
+        lotNumbersWithExpiration: {
+          ...state.lotNumbersWithExpiration,
           ...action.payload,
         },
       };
