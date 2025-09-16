@@ -23,6 +23,7 @@ import org.hibernate.criterion.Projections
 import org.hibernate.criterion.Restrictions
 import org.hibernate.criterion.Subqueries
 import org.hibernate.SQLQuery
+import org.hibernate.sql.JoinType
 import org.hibernate.type.StandardBasicTypes
 import org.pih.warehouse.PaginatedList
 import org.pih.warehouse.api.AllocatedItem
@@ -1068,16 +1069,22 @@ class ProductAvailabilityService {
         return new PaginatedList(items, products.totalCount)
     }
 
-    List<ProductAvailability> getStockTransferCandidates(Location location) {
+    List<ProductAvailability> getStockTransferCandidates(Location location, Boolean showExpiredItemsOnly = false) {
         return ProductAvailability.createCriteria().list {
             eq("location", location)
             gt("quantityOnHand", 0)
+
+            if (showExpiredItemsOnly) {
+                inventoryItem(JoinType.LEFT_OUTER_JOIN.joinTypeValue) {
+                    lt('expirationDate', new Date())
+                }
+            }
         }
     }
 
-    List<ProductAvailability> getStockTransferCandidates(Location location, Map params) {
+    List<ProductAvailability> getStockTransferCandidates(Location location, Map params, Boolean showExpiredItemsOnly = false) {
         if (!params) {
-            return getStockTransferCandidates(location)
+            return getStockTransferCandidates(location, showExpiredItemsOnly)
         }
 
         Location bin = params.binLocationId ? Location.get(params.binLocationId) : null

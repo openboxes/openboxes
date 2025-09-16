@@ -102,10 +102,10 @@ class StockTransferService {
         return orders
     }
 
-    def getStockTransferCandidates(Location location, params) {
+    def getStockTransferCandidates(Location location, Map params, Boolean showExpiredItemsOnly = false) {
         List<StockTransferItem> stockTransferItems = []
 
-        List stockTransferCandidates = productAvailabilityService.getStockTransferCandidates(location, params)
+        List stockTransferCandidates = productAvailabilityService.getStockTransferCandidates(location, params, showExpiredItemsOnly)
 
         stockTransferCandidates?.each { ProductAvailability productAvailability ->
             stockTransferItems << StockTransferItem.createFromProductAvailability(productAvailability)
