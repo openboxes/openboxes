@@ -811,10 +811,10 @@ export const eraseDraft = (locationId, tab) => ({
 });
 
 export const fetchLotNumbersByProductIds = (productIds) => async (dispatch) => {
-  const lotNumbers = await getLotNumbersByProductIds(productIds);
+  const lotNumbersWithExpiration = await getLotNumbersByProductIds(productIds);
 
   dispatch({
     type: FETCH_LOT_NUMBERS_BY_PRODUCT_IDS,
-    payload: lotNumbers,
+    payload: lotNumbersWithExpiration,
   });
 };

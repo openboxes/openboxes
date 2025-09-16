@@ -21,7 +21,10 @@ import {
 } from 'selectors';
 
 import {
-  eraseDraft, fetchBinLocations, fetchLotNumbersByProductIds, fetchUsers,
+  eraseDraft,
+  fetchBinLocations,
+  fetchLotNumbersByProductIds,
+  fetchUsers,
 } from 'actions';
 import { UPDATE_CYCLE_COUNT_IDS } from 'actions/types';
 import cycleCountApi from 'api/services/CycleCountApi';
@@ -90,21 +93,19 @@ const useResolveStep = () => {
   const showBinLocation = useMemo(() =>
     checkBinLocationSupport(currentLocation.supportedActivities), [currentLocation?.id]);
 
-  const productIds = Array.from(
-    new Set(
-      tableData.current
-        .flatMap((cycleCount) => cycleCount.cycleCountItems)
-        .map((item) => item.product?.id),
-    ),
+  // Collect unique product IDs from the tableData to fetch lot numbers for those products
+  const uniqueProductIds = _.uniq(
+    tableData.current.flatMap((c) => c.cycleCountItems)
+      .map((i) => i.product?.id),
   );
 
   useEffect(() => {
     // we want to fetch lot numbers only when the step is editable and there are products
     // in the table because if the step is not editable, there is no need to fetch lot numbers
-    if (isStepEditable && productIds.length > 0) {
-      dispatch(fetchLotNumbersByProductIds(productIds));
+    if (isStepEditable && uniqueProductIds.length > 0) {
+      dispatch(fetchLotNumbersByProductIds(uniqueProductIds));
     }
-  }, [JSON.stringify(productIds), isStepEditable]);
+  }, [JSON.stringify(uniqueProductIds), isStepEditable]);
 
   useEffect(() => {
     if (showBinLocation) {
@@ -601,7 +602,7 @@ const useResolveStep = () => {
         // When we click "Save progress", we want to refetch the lot numbers
         // because the user may have created new ones and, without refetching,
         // they won't be available in the dropdown.
-        dispatch(fetchLotNumbersByProductIds(productIds));
+        dispatch(fetchLotNumbersByProductIds(uniqueProductIds));
       }
       hide();
     }

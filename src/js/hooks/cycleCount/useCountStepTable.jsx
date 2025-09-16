@@ -9,11 +9,11 @@ import { getLotNumbersByProductId } from 'selectors';
 
 import { TableCell } from 'components/DataTable';
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
-import LotSelectorField from 'components/form-elements/LotSelectorField';
 import DateField from 'components/form-elements/v2/DateField';
 import SelectField from 'components/form-elements/v2/SelectField';
 import TextInput from 'components/form-elements/v2/TextInput';
 import cycleCountColumn from 'consts/cycleCountColumn';
+import navigationKey from 'consts/navigationKey';
 import { DateFormat } from 'consts/timeFormat';
 import useArrowsNavigation from 'hooks/useArrowsNavigation';
 import useTranslate from 'hooks/useTranslate';
@@ -62,12 +62,8 @@ const useCountStepTable = ({
       return DateField;
     }
 
-    if (fieldName === cycleCountColumn.BIN_LOCATION) {
+    if ([cycleCountColumn.BIN_LOCATION, cycleCountColumn.LOT_NUMBER].includes(fieldName)) {
       return SelectField;
-    }
-
-    if (fieldName === cycleCountColumn.LOT_NUMBER) {
-      return LotSelectorField;
     }
 
     return TextInput;
@@ -101,7 +97,13 @@ const useCountStepTable = ({
     if (fieldName === cycleCountColumn.LOT_NUMBER) {
       return {
         placeholder: isFieldDisabled && translate('react.cycleCount.emptyLotNumber.label', 'NO LOT'),
-        productId,
+        options: lotNumbers.map((item) => ({
+          id: item.lotNumber,
+          name: item.lotNumber,
+          label: item.lotNumber,
+          value: item.lotNumber,
+        })),
+        creatable: true,
       };
     }
 
@@ -156,8 +158,8 @@ const useCountStepTable = ({
         !original.id.includes('newRow')
           && ![cycleCountColumn.QUANTITY_COUNTED, cycleCountColumn.COMMENT].includes(id)
       )
-        || (columnPath === cycleCountColumn.EXPIRATION_DATE &&
-          disabledExpirationDateFields[original.id]);
+        || (columnPath === cycleCountColumn.EXPIRATION_DATE
+          && disabledExpirationDateFields[original.id]);
 
       const tooltipLabel = columnPath === cycleCountColumn.BIN_LOCATION
         ? getBinLocationToDisplay(value) || translate('react.cycleCount.table.binLocation.label', 'Bin Location')
@@ -250,11 +252,14 @@ const useCountStepTable = ({
       }, [rowIndex, columnId]);
 
       const handleLotNumberChange = (selectedLotNumber) => {
-        const isLotAlreadyExist = lotNumbers.find(lot => lot.lotNumber === selectedLotNumber);
+        const existingLot = lotNumbers.find((lot) => lot.lotNumber === selectedLotNumber);
+        const lotAlreadyExist = Boolean(existingLot);
 
-        setDisabledExpirationDateFields(prev => ({
+        // Disable the expiration date field for this row if the selected lot already exists.
+        // This prevents users from editing the expiration date for a pre-existing lot
+        setDisabledExpirationDateFields((prev) => ({
           ...prev,
-          [original.id]: !!isLotAlreadyExist,
+          [original.id]: lotAlreadyExist,
         }));
 
         table.options.meta?.updateData(
@@ -264,11 +269,8 @@ const useCountStepTable = ({
           selectedLotNumber,
         );
 
-        const formattedExpirationDate = isLotAlreadyExist
-          ? formatLocalizedDate(
-            isLotAlreadyExist.expirationDate,
-            DateFormat.DD_MMM_YYYY,
-          )
+        const formattedExpirationDate = existingLot
+          ? formatLocalizedDate(existingLot.expirationDate, DateFormat.DD_MMM_YYYY)
           : null;
 
         // when we change the lot number, we also want to update the expiration date
@@ -336,6 +338,26 @@ const useCountStepTable = ({
         onBlur,
       });
 
+      const handleArrowNavigation = (e) => {
+        // Before calling handleKeyDown, we check two cases where arrow navigation should be blocked
+        // these cases are not handled inside useArrowsNavigation
+        if (
+          e.key === navigationKey.ARROW_UP
+          && columnPath === cycleCountColumn.EXPIRATION_DATE
+          && disabledExpirationDateFields[tableData[index - 1]?.id]
+        ) {
+          return;
+        }
+        if (
+          e.key === navigationKey.ARROW_DOWN
+          && columnPath === cycleCountColumn.EXPIRATION_DATE
+          && disabledExpirationDateFields[tableData[index + 1]?.id]
+        ) {
+          return;
+        }
+        handleKeyDown(e, index, columnPath);
+      };
+
       return (
         <TableCell
           className="rt-td rt-td-count-step pb-0"
@@ -352,7 +374,7 @@ const useCountStepTable = ({
             className={`m-1 hide-arrows ${showTooltip ? 'w-99' : 'w-75'} ${error && 'border border-danger input-has-error'}`}
             showErrorBorder={error}
             hideErrorMessageWrapper
-            onKeyDown={(e) => handleKeyDown(e, index, columnPath)}
+            onKeyDown={(e) => handleArrowNavigation(e)}
             focusProps={{
               fieldIndex: index,
               fieldId: columnPath,

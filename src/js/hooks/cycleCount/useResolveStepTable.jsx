@@ -16,11 +16,11 @@ import { FETCH_CYCLE_COUNT_REASON_CODES } from 'actions/types';
 import { TableCell } from 'components/DataTable';
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
 import ValueIndicator from 'components/DataTable/v2/ValueIndicator';
-import LotSelectorField from 'components/form-elements/LotSelectorField';
 import DateField from 'components/form-elements/v2/DateField';
 import SelectField from 'components/form-elements/v2/SelectField';
 import TextInput from 'components/form-elements/v2/TextInput';
 import cycleCountColumn from 'consts/cycleCountColumn';
+import navigationKey from 'consts/navigationKey';
 import { DateFormat } from 'consts/timeFormat';
 import valueIndicatorVariant, { getCycleCountDifferencesVariant } from 'consts/valueIndicatorVariant';
 import useArrowsNavigation from 'hooks/useArrowsNavigation';
@@ -86,12 +86,12 @@ const useResolveStepTable = ({
       return DateField;
     }
 
-    if ([cycleCountColumn.BIN_LOCATION, cycleCountColumn.ROOT_CAUSE].includes(fieldName)) {
+    if ([
+      cycleCountColumn.BIN_LOCATION,
+      cycleCountColumn.ROOT_CAUSE,
+      cycleCountColumn.LOT_NUMBER,
+    ].includes(fieldName)) {
       return SelectField;
-    }
-
-    if (fieldName === cycleCountColumn.LOT_NUMBER) {
-      return LotSelectorField;
     }
 
     return TextInput;
@@ -139,7 +139,13 @@ const useResolveStepTable = ({
     if (fieldName === cycleCountColumn.LOT_NUMBER) {
       return {
         placeholder: isFieldDisabled && translate('react.cycleCount.emptyLotNumber.label', 'NO LOT'),
-        productId,
+        options: lotNumbers.map((item) => ({
+          id: item.lotNumber,
+          name: item.lotNumber,
+          label: item.lotNumber,
+          value: item.lotNumber,
+        })),
+        creatable: true,
       };
     }
 
@@ -223,18 +229,17 @@ const useResolveStepTable = ({
       // Keep and update the state of the cell during rerenders
       const [value, setValue] = useState(initialValue);
 
-      const isFieldDisabled =
-        (
-          !original.id.includes('newRow') &&
-          ![
+      const isFieldDisabled = (
+        !original.id.includes('newRow')
+          && ![
             cycleCountColumn.QUANTITY_RECOUNTED,
             cycleCountColumn.ROOT_CAUSE,
             cycleCountColumn.COMMENT,
           ].includes(id)
-        ) ||
-        (
-          columnPath === cycleCountColumn.EXPIRATION_DATE &&
-          disabledExpirationDateFields[original.id]
+      )
+        || (
+          columnPath === cycleCountColumn.EXPIRATION_DATE
+          && disabledExpirationDateFields[original.id]
         );
 
       const showStaticTooltip = [
@@ -335,11 +340,14 @@ const useResolveStepTable = ({
       }, [rowIndex, columnId]);
 
       const handleLotNumberChange = (selectedLotNumber) => {
-        const isLotAlreadyExist = lotNumbers.find(lot => lot.lotNumber === selectedLotNumber);
+        const existingLot = lotNumbers.find((lot) => lot.lotNumber === selectedLotNumber);
+        const lotAlreadyExist = Boolean(existingLot);
 
-        setDisabledExpirationDateFields(prev => ({
+        // Disable the expiration date field for this row if the selected lot already exists.
+        // This prevents users from editing the expiration date for a pre-existing lot
+        setDisabledExpirationDateFields((prev) => ({
           ...prev,
-          [original.id]: !!isLotAlreadyExist,
+          [original.id]: lotAlreadyExist,
         }));
 
         table.options.meta?.updateData(
@@ -349,11 +357,8 @@ const useResolveStepTable = ({
           selectedLotNumber,
         );
 
-        const formattedExpirationDate = isLotAlreadyExist
-          ? formatLocalizedDate(
-            isLotAlreadyExist.expirationDate,
-            DateFormat.DD_MMM_YYYY,
-          )
+        const formattedExpirationDate = existingLot
+          ? formatLocalizedDate(existingLot.expirationDate, DateFormat.DD_MMM_YYYY)
           : null;
 
         // when we change the lot number, we also want to update the expiration date
@@ -432,6 +437,27 @@ const useResolveStepTable = ({
         isNewRow,
         onBlur,
       });
+
+      const handleArrowNavigation = (e) => {
+        // Before calling handleKeyDown, we check two cases where arrow navigation should be blocked
+        // these cases are not handled inside useArrowsNavigation
+        if (
+          e.key === navigationKey.ARROW_UP
+          && columnPath === cycleCountColumn.EXPIRATION_DATE
+          && disabledExpirationDateFields[tableData[index - 1]?.id]
+        ) {
+          return;
+        }
+        if (
+          e.key === navigationKey.ARROW_DOWN
+          && columnPath === cycleCountColumn.EXPIRATION_DATE
+          && disabledExpirationDateFields[tableData[index + 1]?.id]
+        ) {
+          return;
+        }
+        handleKeyDown(e, index, columnPath);
+      };
+
       const isAutoWidth = [
         cycleCountColumn.ROOT_CAUSE,
         cycleCountColumn.COMMENT,
@@ -459,7 +485,7 @@ const useResolveStepTable = ({
             showErrorBorder={error}
             hideErrorMessageWrapper
             warning={tooltipContent && warning}
-            onKeyDown={(e) => handleKeyDown(e, index, columnPath)}
+            onKeyDown={(e) => handleArrowNavigation(e)}
             focusProps={{
               fieldIndex: index,
               fieldId: columnPath,

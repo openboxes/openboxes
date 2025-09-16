@@ -26,7 +26,6 @@ const CountStep = () => {
     tableData,
     printCountForm,
     next,
-    save,
     resolveDiscrepancies,
     back,
     tableMeta,
@@ -51,6 +50,7 @@ const CountStep = () => {
     closeAssignCountModal,
     assignCountModalData,
     forceRerender,
+    handleCountStepHeaderSave,
   } = useCountStep();
 
   const tableVirtualizer = useWindowVirtualizer({
@@ -66,7 +66,7 @@ const CountStep = () => {
         <CountStepHeader
           printCountForm={printCountForm}
           next={() => validateExistenceOfCycleCounts(next)}
-          save={() => validateExistenceOfCycleCounts(() => save({ shouldRefetchLotNumbers: true }))}
+          save={handleCountStepHeaderSave}
           isFormDisabled={isFormDisabled}
           importItems={importItems}
           sortByProductName={sortByProductName}

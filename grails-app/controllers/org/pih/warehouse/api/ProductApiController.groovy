@@ -358,8 +358,8 @@ class ProductApiController extends BaseDomainApiController {
     def getLotNumbersWithExpirationDate() {
         List<String> productIds = params.list("productIds")
 
-        List<Map<String, Object>> lotNumbersWithExpiration = productService.getLotNumbersWithExpirationDate(productIds)
+        Map<String, List<Map<String, Object>>> productLotNumbersWithExpiration = productService.getLotNumbersWithExpirationDate(productIds)
 
-        render([data: lotNumbersWithExpiration] as JSON)
+        render([data: productLotNumbersWithExpiration] as JSON)
     }
 }
