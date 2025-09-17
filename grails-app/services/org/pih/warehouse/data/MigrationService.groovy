@@ -1090,18 +1090,14 @@ class MigrationService {
             FROM transaction_entry te1
                      JOIN inventory_item ii1 ON te1.inventory_item_id = ii1.id
                      JOIN transaction t1 ON te1.transaction_id = t1.id
-                     JOIN transaction_entry te2 ON te1.inventory_item_id != te2.inventory_item_id
+                     JOIN transaction_entry te2 ON te1.transaction_id != te2.transaction_id
                      JOIN inventory_item ii2 ON te2.inventory_item_id = ii2.id
                      JOIN transaction t2 ON te2.transaction_id = t2.id
             WHERE
               ii1.product_id = ii2.product_id
               AND t1.transaction_date = t2.transaction_date
               AND t1.id < t2.id
-              AND (
-                (t1.transaction_type_id = :transactionTypeId and t2.transaction_type_id != :transactionTypeId) 
-                OR 
-                (t1.transaction_type_id != :transactionTypeId and t2.transaction_type_id = :transactionTypeId)
-              )
+              AND (t1.transaction_type_id = :transactionTypeId OR t2.transaction_type_id = :transactionTypeId)
               AND t1.inventory_id = :inventoryId
               AND t2.inventory_id = :inventoryId
         """, [inventoryId: location.inventory.id, transactionTypeId: transactionType.id])
