@@ -77,6 +77,8 @@ CREATE OR REPLACE VIEW inventory_counts AS
         JOIN inventory_item ii ON ii.id = te.inventory_item_id
         JOIN location facility ON facility.inventory_id = t.inventory_id
         WHERE t.transaction_type_id = '12' -- baseline inventory transaction
+        AND (t.comment <> 'Inventory baseline created during old product inventory transactions migration for products that had stock but no inventory baseline transaction as a most recent transaction'
+            OR t.comment IS NULL)
         AND NOT EXISTS (
               SELECT 1
               FROM baseline_adjustment_matches bam
