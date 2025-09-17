@@ -1239,7 +1239,7 @@ class IndicatorDataService {
                     LEFT JOIN `transaction` t ON t.id = te.transaction_id
                     WHERE t.inventory_id = :inventoryId
                     AND t.transaction_type_id IN (:transactionTypeIds)
-                    AND t.comment <> :commentToFilter
+                    AND (t.comment <> :commentToFilter OR t.comment IS NULL)
                     GROUP BY ii.product_id 
                 ) as stock_count ON stock_count.product_id = ii.product_id
             ) as dashboard_data

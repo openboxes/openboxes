@@ -1545,7 +1545,7 @@ class ProductService {
             where ii.product.id in (:productIds)
               and t.inventory = :inventory
               and t.transactionType.id in (:transactionTypeIds)
-              and t.comment <> :commentToFilter
+              and (t.comment <> :commentToFilter or t.comment IS NULL)
             group by ii.product.id
         """
 

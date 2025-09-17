@@ -581,7 +581,7 @@ class Product implements Comparable, Serializable {
           where ii.product= :product 
           and t.inventory = :inventory 
           and t.transactionType.id in (:transactionTypeIds)
-          and t.comment <> :commentToFilter
+          and (t.comment <> :commentToFilter or t.comment IS NULL)
           """, [product: this,
                 inventory: inventory,
                 transactionTypeIds: transactionTypeIds,

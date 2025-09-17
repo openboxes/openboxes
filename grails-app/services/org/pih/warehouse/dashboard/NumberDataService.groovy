@@ -134,13 +134,15 @@ class NumberDataService {
             INNER JOIN te.inventoryItem ii
             INNER JOIN te.transaction t
             WHERE t.inventory = :inventory
-            AND t.transactionType.id IN :transactionTypeIds 
+            AND t.transactionType.id IN :transactionTypeIds
+            AND (t.comment <> :commentToFilter OR t.comment IS NULL)
             AND t.transactionDate BETWEEN :startDate AND :endDate""",
                 [
                         inventory          : location?.inventory,
                         transactionTypeIds : transactionTypeIds,
                         startDate          : startDate ?: DateUtil.EPOCH_DATE,
                         endDate            : endDate ?: new Date(),
+                        commentToFilter    : Constants.INVENTORY_BASELINE_MIGRATION_TRANSACTION_COMMENT
                 ])
 
         return new NumberData(itemsInventoried[0] as Double)
