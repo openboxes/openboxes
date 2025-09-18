@@ -4,16 +4,17 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.ZonedDateTime
-import org.apache.commons.lang.StringUtils
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
 
 import org.pih.warehouse.core.date.DateDisplayFormat
+import org.pih.warehouse.core.date.DateFormatterContext
 import org.pih.warehouse.core.date.DateFormatterManager
+import org.pih.warehouse.core.date.TemporalAccessorDateFormatter
+import org.pih.warehouse.core.date.TemporalAccessorDateTimeFormatter
+import org.pih.warehouse.core.localization.LocaleDeterminer
 import org.pih.warehouse.core.session.SessionManager
-
-import static org.pih.warehouse.core.date.DateFormatterManager.DateFormatterContext
 
 /**
  * Tests the DateFormatterManager.
@@ -22,39 +23,56 @@ import static org.pih.warehouse.core.date.DateFormatterManager.DateFormatterCont
 @Unroll
 class DateFormatterManagerSpec extends Specification {
 
+    // We don't care that this isn't a real date since we're not testing the formatters themselves
+    static final String FORMATTED_DATE_STRING = 'FORMATTED!'
+
     @Shared
     DateFormatterManager dateFormatterManager
 
     @Shared
     SessionManager sessionManagerStub
 
+    @Shared
+    LocaleDeterminer localeDeterminerStub
+
     void setup() {
-        dateFormatterManager = new DateFormatterManager()
+        // Spy because we need to stub the formatter init methods.
+        // We don't actually care what formatters do, so we simply stub them to always return the same thing.
+        dateFormatterManager = Spy(DateFormatterManager) {
+            initInstantFormatter(_, _, _, _) >> Stub(TemporalAccessorDateTimeFormatter) {
+                format(_) >> FORMATTED_DATE_STRING
+            }
+            initZonedDateTimeFormatter(_, _, _, _) >> Stub(TemporalAccessorDateTimeFormatter) {
+                format(_) >> FORMATTED_DATE_STRING
+            }
+            initLocalDateFormatter(_, _, _) >> Stub(TemporalAccessorDateFormatter) {
+                format(_) >> FORMATTED_DATE_STRING
+            }
+        }
 
         sessionManagerStub = Stub(SessionManager)
         dateFormatterManager.sessionManager = sessionManagerStub
+
+        localeDeterminerStub = Stub(LocaleDeterminer)
+        dateFormatterManager.localeDeterminer = localeDeterminerStub
     }
 
     void 'format does not error when given an Instant and no override'() {
         given:
         sessionManagerStub.timezone >> TimeZone.getTimeZone('UTC')
+        localeDeterminerStub.currentLocale >> Locale.ENGLISH
 
         and:
         Instant instant = Instant.now()
 
-        when:
-        String result = dateFormatterManager.format(instant)
-
-        then:
-        assert StringUtils.isNotBlank(result)
-        assert result.endsWith('Z')
+        expect:
+        dateFormatterManager.format(instant) == FORMATTED_DATE_STRING
     }
 
     void 'format does not error when given an Instant and overrides'() {
         given:
         DateFormatterContext context = DateFormatterContext.builder()
                 .withLocaleOverride(Locale.ENGLISH)
-                .withPatternOverride('XXX')
                 .withTimezoneOverride(ZoneId.of('+01:00'))
                 .withDisplayFormat(DateDisplayFormat.GSP)
                 .build()
@@ -62,33 +80,26 @@ class DateFormatterManagerSpec extends Specification {
         and:
         Instant instant = Instant.now()
 
-        when:
-        String result = dateFormatterManager.format(instant, context)
-
-        then:
-        assert result == '+01:00'
+        expect:
+        dateFormatterManager.format(instant, context) == FORMATTED_DATE_STRING
     }
 
     void 'format does not error when given a ZonedDateTime and no override'() {
         given:
         sessionManagerStub.timezone >> TimeZone.getTimeZone('UTC')
+        localeDeterminerStub.currentLocale >> Locale.ENGLISH
 
         and:
         ZonedDateTime zdt = ZonedDateTime.now()
 
-        when:
-        String result = dateFormatterManager.format(zdt)
-
-        then:
-        assert StringUtils.isNotBlank(result)
-        assert result.endsWith('Z')
+        expect:
+        dateFormatterManager.format(zdt) == FORMATTED_DATE_STRING
     }
 
     void 'format does not error when given a ZonedDateTime and overrides'() {
         given:
         DateFormatterContext context = DateFormatterContext.builder()
                 .withLocaleOverride(Locale.ENGLISH)
-                .withPatternOverride('XXX')
                 .withTimezoneOverride(ZoneId.of('+01:00'))
                 .withDisplayFormat(DateDisplayFormat.GSP)
                 .build()
@@ -96,43 +107,33 @@ class DateFormatterManagerSpec extends Specification {
         and:
         ZonedDateTime zdt = ZonedDateTime.now()
 
-        when:
-        String result = dateFormatterManager.format(zdt, context)
-
-        then:
-        assert result == '+01:00'
+        expect:
+        dateFormatterManager.format(zdt, context) == FORMATTED_DATE_STRING
     }
 
     void 'format does not error when given a LocalDate and no override'() {
         given:
-        sessionManagerStub.timezone >> TimeZone.getTimeZone('UTC')
+        localeDeterminerStub.currentLocale >> Locale.ENGLISH
 
         and:
-        LocalDate localDate = LocalDate.of(2000, 1, 1)
+        LocalDate localDate = LocalDate.now()
 
-        when:
-        String result = dateFormatterManager.format(localDate)
-
-        then:
-        assert result == '01/Jan/2000'
+        expect:
+        dateFormatterManager.format(localDate) == FORMATTED_DATE_STRING
     }
 
     void 'format does not error when given a LocalDate and overrides'() {
         given:
         DateFormatterContext context = DateFormatterContext.builder()
                 .withLocaleOverride(Locale.ENGLISH)
-                .withPatternOverride('yyyy-MM-dd')
                 .withTimezoneOverride(ZoneId.of('+01:00'))  // Does nothing for LocalDate
                 .withDisplayFormat(DateDisplayFormat.GSP)
                 .build()
 
         and:
-        LocalDate localDate = LocalDate.of(2000, 1, 1)
+        LocalDate localDate = LocalDate.now()
 
-        when:
-        String result = dateFormatterManager.format(localDate, context)
-
-        then:
-        assert result == '2000-01-01'
+        expect:
+        dateFormatterManager.format(localDate, context) == FORMATTED_DATE_STRING
     }
 }
