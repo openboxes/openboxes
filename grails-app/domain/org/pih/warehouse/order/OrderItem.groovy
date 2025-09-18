@@ -15,6 +15,7 @@ import org.pih.warehouse.core.BudgetCode
 import org.pih.warehouse.core.GlAccount
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
+import org.pih.warehouse.core.ReasonCode
 import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryItem
@@ -78,6 +79,8 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
     GlAccount glAccount
 
     Integer orderIndex = 0
+
+    ReasonCode reasonCode
 
     // Audit fields
     Date dateCreated
@@ -164,6 +167,7 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
         budgetCode(nullable: true)
         glAccount(nullable: true)
         orderIndex(nullable: true)
+        reasonCode(nullable: true)
     }
 
     String getUnitOfMeasure() {

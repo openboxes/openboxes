@@ -4,6 +4,7 @@ import org.pih.warehouse.api.Putaway
 import org.pih.warehouse.api.PutawayTaskStatus
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
+import org.pih.warehouse.core.ReasonCode
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
@@ -42,6 +43,7 @@ class PutawayTask {
     Location facility
     Location container                  // container scanned during putaway
     Location destination                // target storage or outbound staging
+    ReasonCode reasonCode
 
     // Auditing fields
     Date dateCreated
@@ -63,6 +65,7 @@ class PutawayTask {
         completedBy nullable: true
         putawayOrder nullable: true
         putawayOrderItem nullable: true
+        reasonCode nullable: true
     }
 
     static mapping = {
@@ -92,5 +95,54 @@ class PutawayTask {
                 lastUpdated  : lastUpdated,
                 dateCreated  : dateCreated,
         ]
+    }
+
+    static PutawayTask createFromOrderItem(OrderItem orderItem) {
+        if (!orderItem) {
+            return null
+        }
+
+        Order order = orderItem.order
+        PutawayTask task = new PutawayTask()
+
+        task.id = orderItem.id
+        task.product = orderItem.product
+        task.inventoryItem = orderItem.inventoryItem
+        task.location = orderItem.originBinLocation
+        task.quantity = orderItem.quantity
+        task.destination = orderItem.destinationBinLocation
+        task.status = convertFromOrderItemStatus(orderItem.orderItemStatusCode)
+        task.putawayOrderItemStatus = orderItem.orderItemStatusCode
+        task.facility = order.origin
+        task.identifier = order.orderNumber
+        task.assignee = order.orderedBy
+        task.completedBy = order.completedBy
+        task.orderedBy = order.orderedBy
+        task.putawayOrder = order
+        task.putawayOrderStatus = order.status
+        task.dateStarted = order.dateOrdered
+        task.dateCompleted = order.dateCompleted
+        task.dateCanceled = (orderItem.orderItemStatusCode == OrderItemStatusCode.CANCELED) ? orderItem.lastUpdated : null
+        task.dateCreated = orderItem.dateCreated
+        task.lastUpdated = orderItem.lastUpdated
+        task.putawayOrderItem = orderItem
+
+        return task
+    }
+
+    static PutawayTaskStatus convertFromOrderItemStatus(OrderItemStatusCode orderItemStatusCode) {
+        if (!orderItemStatusCode) {
+            return PutawayTaskStatus.PENDING
+        }
+        switch (orderItemStatusCode) {
+            case OrderItemStatusCode.PENDING:
+                return PutawayTaskStatus.PENDING
+            case OrderItemStatusCode.COMPLETED:
+                return PutawayTaskStatus.COMPLETED
+            case OrderItemStatusCode.CANCELED:
+                return PutawayTaskStatus.CANCELED
+            default:
+                return PutawayTaskStatus.PENDING
+        }
     }
 }

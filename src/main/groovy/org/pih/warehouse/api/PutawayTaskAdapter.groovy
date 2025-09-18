@@ -3,6 +3,7 @@ package org.pih.warehouse.api
 
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
+import org.pih.warehouse.order.OrderItemStatusCode
 import org.pih.warehouse.order.OrderStatus
 import org.pih.warehouse.putaway.PutawayTask
 
@@ -39,6 +40,7 @@ class PutawayTaskAdapter {
 
         // In most cases, we just want to make sure we're setting the most recent status
         order.status = toOrderStatus(task.status)
+        orderItem.orderItemStatusCode = toOrderItemStatusCode(task.status)
 
         // start - putaway task has been assigned and has been started
         order.approvedBy = task.assignee
@@ -52,6 +54,8 @@ class PutawayTaskAdapter {
         // complete - task is completed
         order.completedBy = task.completedBy
         order.dateCompleted = task.dateCompleted
+
+        orderItem.reasonCode = task.reasonCode
 
         // In order to update timestamp on putaway task (order.lastUpdated should be updated on its own)
         orderItem.lastUpdated = new Date()
@@ -127,6 +131,14 @@ class PutawayTaskAdapter {
             case PutawayTaskStatus.COMPLETED: return OrderStatus.COMPLETED
             case PutawayTaskStatus.CANCELED: return OrderStatus.CANCELED
             default: return OrderStatus.PENDING
+        }
+    }
+
+    static OrderItemStatusCode toOrderItemStatusCode(PutawayTaskStatus putawayTaskStatus) {
+        switch (putawayTaskStatus) {
+            case PutawayTaskStatus.COMPLETED: return OrderItemStatusCode.COMPLETED
+            case PutawayTaskStatus.CANCELED: return OrderItemStatusCode.CANCELED
+            default: return OrderItemStatusCode.PENDING
         }
     }
 }

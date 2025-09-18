@@ -30,6 +30,7 @@
                     <th><warehouse:message code="inventoryItem.expirationDate.label" /></th>
                     <th><warehouse:message code="orderItem.originBinLocation.label" /></th>
                     <th><warehouse:message code="orderItem.destinationBinLocation.label" /></th>
+                    <th><warehouse:message code="requisitionItem.cancelReasonCode.label" /></th>
                 </g:elseif>
                 %{-- When adding/removing a column, make sure to check the filterCell in function for filtering above --}%
             </tr>
@@ -104,6 +105,9 @@
                     </td>
                     <td>
                         ${orderItem?.destinationBinLocation}
+                    </td>
+                    <td>
+                        ${orderItem?.reasonCode}
                     </td>
                 </g:elseif>
             </tr>

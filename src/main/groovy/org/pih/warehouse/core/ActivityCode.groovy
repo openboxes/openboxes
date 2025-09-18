@@ -111,6 +111,9 @@ enum ActivityCode {
     // Inbound sortation
     INBOUND_SORTATION('INBOUND_SORTATION'),
 
+    // Putaway discrepancy
+    PUTAWAY_DISCREPANCY('PUTAWAY_DISCREPANCY'),
+
     NONE('NONE')
 
     final String id
@@ -177,7 +180,8 @@ enum ActivityCode {
                 // Picking strategies
                 PICKING_STRATEGY_AUTOMATIC_REALLOCATION,
 
-                INBOUND_SORTATION
+                INBOUND_SORTATION,
+                PUTAWAY_DISCREPANCY
         ]
     }
 

@@ -34,4 +34,5 @@
     <!-- Disabled until we decide we need to materialize putaway tasks -->
 <!--    <include file="0.9.x/changelog-2025-08-25-1347-create-table-putaway-task.xml" />-->
     <include file="0.9.x/changelog-2025-08-31-1654-add-column-order-item-container-location.xml" />
+    <include file="0.9.x/changelog-2025-09-17-1435-add-column-order-item-reason-code.xml" />
 </databaseChangeLog>
