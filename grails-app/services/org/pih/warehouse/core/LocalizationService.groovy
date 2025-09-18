@@ -12,13 +12,13 @@ package org.pih.warehouse.core
 import grails.core.GrailsApplication
 import org.grails.core.io.ResourceLocator
 import org.pih.warehouse.LocalizationUtil
-import org.springframework.context.i18n.LocaleContextHolder
+import org.pih.warehouse.core.localization.LocaleDeterminer
 
 class LocalizationService {
 
-    // inject the grails application so we can access the default locale
     GrailsApplication grailsApplication
     ResourceLocator grailsResourceLocator
+    LocaleDeterminer localeDeterminer
 
     String formatMetadata(Object object) {
         def format = grailsApplication.mainContext.getBean('org.pih.warehouse.FormatTagLib')
@@ -50,14 +50,14 @@ class LocalizationService {
      * @return
      */
     Locale getLocale(String languageCode) {
-        return languageCode ? LocalizationUtil.getLocale(languageCode) : currentLocale
+        return languageCode ? localeDeterminer.asLocale(languageCode) : currentLocale
     }
 
     /**
      * Gets the current locale or return default locale.
      */
     Locale getCurrentLocale() {
-        return LocaleContextHolder.locale ?: new Locale(grailsApplication.config.openboxes.locale.defaultLocale ?: "en")
+        return localeDeterminer.getCurrentLocale()
     }
 
     /**
