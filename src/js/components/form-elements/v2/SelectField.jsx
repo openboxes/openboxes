@@ -31,6 +31,7 @@ const SelectField = ({
   hideErrorMessageWrapper,
   onKeyDown,
   focusProps = {},
+  creatable,
   ...fieldProps
 }) => {
   const [value, setValue] = useState(defaultValue);
@@ -77,6 +78,7 @@ const SelectField = ({
         onChange={onChangeValue}
         multi={multiple}
         onKeyDown={onKeyDown}
+        creatable={creatable}
         {...refProps}
         {...asyncProps}
         {...fieldProps}
@@ -137,6 +139,7 @@ SelectField.propTypes = {
     rowIndex: PropTypes.string,
     columnId: PropTypes.string,
   }),
+  // boolean that enables creating new options in the dropdown
   creatable: PropTypes.bool,
 };
 
