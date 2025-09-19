@@ -17,6 +17,7 @@ import { getCurrentLocation, getCycleCountRequestIds } from 'selectors';
 import {
   eraseDraft,
   fetchBinLocations,
+  fetchLotNumbersByProductIds,
   fetchUsers,
   startResolution,
 } from 'actions';
@@ -78,6 +79,20 @@ const useCountStep = () => {
 
   const showBinLocation = useMemo(() =>
     checkBinLocationSupport(currentLocation.supportedActivities), [currentLocation?.id]);
+
+  // Collect unique product IDs from the tableData to fetch lot numbers for those products
+  const uniqueProductIds = _.uniq(
+    tableData.current.flatMap((c) => c.cycleCountItems)
+      .map((i) => i.product?.id),
+  );
+
+  useEffect(() => {
+    // we want to fetch lot numbers only when the step is editable and there are products
+    // in the table because if the step is not editable, there is no need to fetch lot numbers
+    if (isStepEditable && uniqueProductIds.length > 0) {
+      dispatch(fetchLotNumbersByProductIds(uniqueProductIds));
+    }
+  }, [JSON.stringify(uniqueProductIds), isStepEditable]);
 
   useEffect(() => {
     if (showBinLocation) {
@@ -390,7 +405,7 @@ const useCountStep = () => {
     const isValid = triggerValidation();
     forceRerender();
     if (isValid) {
-      await save(true);
+      await save({ shouldSetDefaultAssignee: true });
       setIsStepEditable(false);
     }
   };
@@ -705,6 +720,15 @@ const useCountStep = () => {
     }
   };
 
+  const handleCountStepHeaderSave = async () => {
+    await validateExistenceOfCycleCounts(save);
+
+    // When we click "Save progress", we want to refetch the lot numbers
+    // because the user may have created new ones and, without refetching,
+    // they won't be available in the dropdown.
+    dispatch(fetchLotNumbersByProductIds(uniqueProductIds));
+  };
+
   return {
     tableData: tableData.current,
     tableMeta,
@@ -720,7 +744,6 @@ const useCountStep = () => {
     updateDateCounted,
     next,
     back,
-    save,
     validateExistenceOfCycleCounts,
     resolveDiscrepancies,
     isStepEditable,
@@ -734,6 +757,7 @@ const useCountStep = () => {
     closeAssignCountModal,
     assignCountModalData,
     forceRerender,
+    handleCountStepHeaderSave,
   };
 };
 

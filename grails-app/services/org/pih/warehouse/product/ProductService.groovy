@@ -1567,4 +1567,34 @@ class ProductService {
         return results.collectEntries { [ (it[0]): it[1] ] }
     }
 
+    Map<String, List<Map<String, Object>>> getLotNumbersWithExpirationDate(List<String> productIds) {
+        List<Object[]> productLotRows = Product.createCriteria().list {
+            'in'('id', productIds)
+            inventoryItems {
+                isNotNull('lotNumber')
+                ne('lotNumber', '')
+                projections {
+                    property('product.id', 'productId')
+                    property('lotNumber', 'lotNumber')
+                    property('expirationDate', 'expirationDate')
+                }
+            }
+        }
+
+        Map<String, List<Map<String, Object>>> result = productLotRows.groupBy { it[0] as String }
+            .collectEntries {String productId, List<Object[]> lots ->
+                [
+                        productId,
+                        lots.collect { Object[] row ->
+                            [
+                                    lotNumber     : row[1],
+                                    expirationDate: row[2]
+                            ]
+                        }
+                        .unique { it.lotNumber }
+                ]
+            }
+
+        return result
+    }
 }

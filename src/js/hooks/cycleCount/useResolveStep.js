@@ -20,7 +20,12 @@ import {
   getUsers,
 } from 'selectors';
 
-import { eraseDraft, fetchBinLocations, fetchUsers } from 'actions';
+import {
+  eraseDraft,
+  fetchBinLocations,
+  fetchLotNumbersByProductIds,
+  fetchUsers,
+} from 'actions';
 import { UPDATE_CYCLE_COUNT_IDS } from 'actions/types';
 import cycleCountApi from 'api/services/CycleCountApi';
 import { CYCLE_COUNT as GET_CYCLE_COUNTS } from 'api/urls';
@@ -87,6 +92,20 @@ const useResolveStep = () => {
 
   const showBinLocation = useMemo(() =>
     checkBinLocationSupport(currentLocation.supportedActivities), [currentLocation?.id]);
+
+  // Collect unique product IDs from the tableData to fetch lot numbers for those products
+  const uniqueProductIds = _.uniq(
+    tableData.current.flatMap((c) => c.cycleCountItems)
+      .map((i) => i.product?.id),
+  );
+
+  useEffect(() => {
+    // we want to fetch lot numbers only when the step is editable and there are products
+    // in the table because if the step is not editable, there is no need to fetch lot numbers
+    if (isStepEditable && uniqueProductIds.length > 0) {
+      dispatch(fetchLotNumbersByProductIds(uniqueProductIds));
+    }
+  }, [JSON.stringify(uniqueProductIds), isStepEditable]);
 
   useEffect(() => {
     if (showBinLocation) {
@@ -534,6 +553,7 @@ const useResolveStep = () => {
     shouldRefetch = true,
     shouldValidateExistence = true,
     shouldSetDefaultAssignee = false,
+    shouldRefetchLotNumbers = false,
   }) => {
     try {
       show();
@@ -577,6 +597,12 @@ const useResolveStep = () => {
       // After the save, refetch cycle counts so that a new row can't be saved multiple times
       if (shouldRefetch) {
         await refetchData();
+      }
+      if (shouldRefetchLotNumbers) {
+        // When we click "Save progress", we want to refetch the lot numbers
+        // because the user may have created new ones and, without refetching,
+        // they won't be available in the dropdown.
+        dispatch(fetchLotNumbersByProductIds(uniqueProductIds));
       }
       hide();
     }

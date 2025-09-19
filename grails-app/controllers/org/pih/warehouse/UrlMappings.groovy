@@ -135,6 +135,11 @@ class UrlMappings {
             action = [POST: "importCsv"]
         }
 
+        "/api/products/inventoryItems/lotNumbersWithExpirationDate" {
+            controller = { "productApi" }
+            action = [GET: "getLotNumbersWithExpirationDate"]
+        }
+
         "/api/facilities/$facilityId/products/classifications" {
             controller = "productClassificationApi"
             action = [GET: "list"]

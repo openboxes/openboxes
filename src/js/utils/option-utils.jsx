@@ -329,6 +329,11 @@ export const fetchIndicatorInventoryAccuracy = async (params = {}) => {
   return data.data;
 };
 
+export const getLotNumbersByProductIds = async (productIds) => {
+  const { data } = await productApi.getLotNumbersByProductIds(productIds);
+  return data.data;
+};
+
 const mapShipmentType = (shipmentType) => {
   // Enum keys can be e.g. AIR, LAND, SEA etc.
   const enumKey = splitTranslation(shipmentType?.name, null)?.toUpperCase();

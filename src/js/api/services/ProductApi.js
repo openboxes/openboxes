@@ -1,7 +1,12 @@
 import axios from 'axios';
 import queryString from 'query-string';
 
-import { GENERIC_API, INVENTORY_ITEM, PRODUCT_API } from 'api/urls';
+import {
+  GENERIC_API,
+  INVENTORY_ITEM,
+  LOT_NUMBERS_WITH_EXPIRATION_DATE,
+  PRODUCT_API,
+} from 'api/urls';
 import apiClient from 'utils/apiClient';
 
 export default {
@@ -15,4 +20,9 @@ export default {
     },
     paramsSerializer: (parameters) => queryString.stringify(parameters),
   }),
+  getLotNumbersByProductIds: (productIds) =>
+    apiClient.get(LOT_NUMBERS_WITH_EXPIRATION_DATE, {
+      params: { productIds },
+      paramsSerializer: (parameters) => queryString.stringify(parameters),
+    }),
 };
