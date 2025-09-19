@@ -1081,6 +1081,10 @@ class MigrationService {
 
     Map<String, List<String>> getOtherOverlappingTransactions(Location location, TransactionType transactionType) {
         Sql sql = new Sql(dataSource)
+        // Find all transactions on the same item at the same time at the same facility.
+        // For each pair of transactions, we need to mark them to be resolved manually if:
+        // - Only one of the transactions is of the given type
+        // - Both transactions are of the given type and at least one of them has multiple products
         List<GroovyRowResult> data = sql.rows("""
             SELECT
                 ii1.product_id AS product_id,
@@ -1090,20 +1094,36 @@ class MigrationService {
             FROM transaction_entry te1
                      JOIN inventory_item ii1 ON te1.inventory_item_id = ii1.id
                      JOIN transaction t1 ON te1.transaction_id = t1.id
-                     JOIN transaction_entry te2 ON te1.inventory_item_id != te2.inventory_item_id
+                     JOIN transaction_entry te2 ON te1.transaction_id != te2.transaction_id
                      JOIN inventory_item ii2 ON te2.inventory_item_id = ii2.id
                      JOIN transaction t2 ON te2.transaction_id = t2.id
             WHERE
               ii1.product_id = ii2.product_id
               AND t1.transaction_date = t2.transaction_date
               AND t1.id < t2.id
-              AND (
-                (t1.transaction_type_id = :transactionTypeId and t2.transaction_type_id != :transactionTypeId) 
-                OR 
-                (t1.transaction_type_id != :transactionTypeId and t2.transaction_type_id = :transactionTypeId)
-              )
               AND t1.inventory_id = :inventoryId
               AND t2.inventory_id = :inventoryId
+              AND (
+                (t1.transaction_type_id = :transactionTypeId AND t2.transaction_type_id != :transactionTypeId)
+                OR (t1.transaction_type_id != :transactionTypeId AND t2.transaction_type_id = :transactionTypeId)
+                OR (
+                  (t1.transaction_type_id = :transactionTypeId AND t2.transaction_type_id = :transactionTypeId)
+                  AND (
+                    (
+                      SELECT COUNT(DISTINCT ii1_inner.product_id) as t1_num_products
+                      FROM transaction_entry te1_inner
+                      JOIN inventory_item ii1_inner ON te1_inner.inventory_item_id = ii1_inner.id
+                      WHERE te1_inner.transaction_id = t1.id
+                    ) > 1
+                    OR (
+                      SELECT COUNT(DISTINCT ii2_inner.product_id) as t2_num_products
+                      FROM transaction_entry te2_inner
+                      JOIN inventory_item ii2_inner ON te2_inner.inventory_item_id = ii2_inner.id
+                      WHERE te2_inner.transaction_id = t2.id
+                    ) > 1
+                  )
+                )
+              )
         """, [inventoryId: location.inventory.id, transactionTypeId: transactionType.id])
         Map groupedData = [:]
         data?.each { it ->
