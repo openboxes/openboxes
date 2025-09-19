@@ -26,6 +26,23 @@ class DatePickerTagLib {
 
     /**
      * Simple date + time form field selectors for dates.
+     *
+     * Prefer using jqueryDatePicker for date-only fields since it's more user friendly and supports java.time
+     * classes in a more straightforward way.
+     *
+     * Will produce a structure of params based on the selected date. For example, if name="startDate", the date
+     * picker might produce the following params:
+     *
+     *   startDate:date.struct
+     *   startDate_day:1
+     *   startDate_month:1
+     *   startDate_year:1980
+     *   startDate_hour:00
+     *   startDate_minute:00
+     *
+     * See {@link org.pih.warehouse.databinding.CustomDateBindingEditor} implementations to understand how
+     * these params are bound to individual fields.
+     *
      * More info: https://docs.grails.org/latest/ref/Tags%20-%20GSP/datePicker.html
      */
     Closure datePicker = { attrs, body ->
@@ -37,24 +54,32 @@ class DatePickerTagLib {
         // they pick will be in the server timezone.
         ZoneId zoneId = sessionManager.timezone.toZoneId()
 
-        // Grails' date picker taglib doesn't support java.time classes so the best we can do is pass it ISO-formatted
-        // date Strings.
+        // Grails' date picker only supports java.util.Date and so we have to convert java.time classes to Dates.
         switch (attrs.value) {
             case (Instant):
-                attrs.value = (attrs.value as Instant).atZone(zoneId).toString()
-                attrs.precision = 'minute'
+                // We have to do a dirty trick to get the date picker to display the date in the user's timezone.
+                // We convert to a zoned date time in the user's timezone, then modify it to be in the server's timezone
+                // without also modifying the time.
+                // Ex: If the user is in UTC-1, "2000-01-01T00:00UTC-1" becomes "2000-01-01T00:00Z"
+                // This will result in the instant changing if we don't convert back when doing the data binding,
+                // so we need to be very careful about this. See InstantBindingEditor for details.
+                ZonedDateTime zonedDateTime = DateUtil.asZonedDateTime(attrs.value as Instant, zoneId)
+                attrs.value = DateUtil.asDate(zonedDateTime.withZoneSameLocal(DateUtil.systemZoneId))
+                attrs.precision = attrs.precision ?: 'minute'
                 break
             case (ZonedDateTime):
-                // Converting to the user's zone should change the date that is displayed. We want to preserve the
-                // instant, not the text that we see on screen.
-                attrs.value = (attrs.value as ZonedDateTime).withZoneSameInstant(zoneId).toString()
-                attrs.precision = 'minute'
+                // Similar to Instant, we need to convert the datetime to display in the user's timezone.
+                // This will result in the instant changing if we don't convert back when doing the data binding,
+                // so we need to be very careful about this. See ZonedDateTimeBindingEditor for details.
+                ZonedDateTime zonedDateTime = (attrs.value as ZonedDateTime).withZoneSameInstant(zoneId)
+                attrs.value = DateUtil.asDate(zonedDateTime.withZoneSameLocal(DateUtil.systemZoneId))
+                attrs.precision = attrs.precision ?: 'minute'
                 break
             case (LocalDate):
                 // We don't need to provide timezone here because we want to preserve the fact that it's midnight
-                // on the given date, so we let the date be in the server's timezone so that no conversion happens.
-                attrs.value = (attrs.value as LocalDate).toString()
-                attrs.precision = 'day'
+                // on the given date. We let the date be in the server's timezone so that no conversion happens.
+                attrs.value = DateUtil.asDate(attrs.value as LocalDate)
+                attrs.precision = attrs.precision ?: 'day'
                 break
             // For everything else, (including java.time.Date) we simply pass through to the Grails taglib.
             default:
@@ -67,7 +92,7 @@ class DatePickerTagLib {
         // the server timezone so that we don't try to convert it to server timezone later which can cause
         // off-by-one errors on the date.
         if (attrs.value == null && attrs.default == null && (['hour', 'minute'].contains(attrs.precision))) {
-            attrs.default = ZonedDateTime.now(zoneId).toString()
+            attrs.value = DateUtil.asDate(ZonedDateTime.now(zoneId))
         }
 
         out << datePickerTagLib.datePicker.call(attrs)

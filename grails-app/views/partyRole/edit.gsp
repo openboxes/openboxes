@@ -54,7 +54,7 @@
 								  <label for="startDate"><warehouse:message code="partyRole.startDate.label" default="Start Date" /></label>
 								</td>
 								<td valign="top" class="value ${hasErrors(bean: partyRoleInstance, field: 'startDate', 'errors')}">
-									<g:datePicker name="startDate" precision="minute" value="${partyRoleInstance?.startDate}" noSelection="['': '']" />
+									<g:datePicker name="startDate" value="${partyRoleInstance?.startDate}" noSelection="['': '']" />
 								</td>
 							</tr>
 
@@ -63,7 +63,7 @@
 								  <label for="endDate"><warehouse:message code="partyRole.endDate.label" default="End Date" /></label>
 								</td>
 								<td valign="top" class="value ${hasErrors(bean: partyRoleInstance, field: 'endDate', 'errors')}">
-									<g:datePicker name="endDate" precision="minute" value="${partyRoleInstance?.endDate}" noSelection="['': '']" />
+									<g:datePicker name="endDate" value="${partyRoleInstance?.endDate}" noSelection="['': '']" />
 								</td>
 							</tr>
 
