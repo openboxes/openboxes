@@ -2,14 +2,13 @@ import { UPDATE_WORKFLOW_HEADER } from 'actions/types';
 
 const initialState = {
   headerInfo: [],
-  headerStatus: {},
-  workflowName: 'Inbound',
+  headerStatus: null,
 };
 
 export default function inboundReducer(state = initialState, action) {
   switch (action.type) {
     case UPDATE_WORKFLOW_HEADER:
-      if (!action.payload || action.payload.workflowName !== 'Inbound') {
+      if (!action.payload) {
         return state;
       }
 

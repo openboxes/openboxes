@@ -50,7 +50,7 @@ const useInboundCreateForm = ({ next }) => {
     control,
     getValues,
     handleSubmit,
-    formState: { errors, isValid },
+    formState: { errors },
     trigger,
     setValue,
     watch,
@@ -137,7 +137,7 @@ const useInboundCreateForm = ({ next }) => {
 
   const fetchData = async () => {
     if (!queryParams.id) {
-      dispatch(updateWorkflowHeader([], {}, 'Inbound'));
+      dispatch(updateWorkflowHeader([]));
       return;
     }
     spinner.show();
@@ -167,10 +167,10 @@ const useInboundCreateForm = ({ next }) => {
           { text: data.destination.name, color: '#01579b', delimeter: ', ' },
           { text: data.dateRequested, color: '#4a148c', delimeter: ', ' },
           { text: data.description, color: '#770838', delimeter: '' },
-        ], {}, 'Inbound'),
+        ]),
       );
     } catch {
-      dispatch(updateWorkflowHeader([], {}, 'Inbound'));
+      dispatch(updateWorkflowHeader([]));
       history.push({
         pathname: location.pathname,
         search: queryString.stringify({
@@ -196,7 +196,6 @@ const useInboundCreateForm = ({ next }) => {
     setValue,
     handleSubmit,
     errors,
-    isValid,
     trigger,
     onSubmitStockMovementDetails,
     stockLists,

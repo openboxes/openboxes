@@ -608,7 +608,7 @@ const useInboundAddItemsForm = ({
           { text: data.destination.name, color: '#01579b', delimeter: ', ' },
           { text: data.dateRequested, color: '#4a148c', delimeter: ', ' },
           { text: data.description, color: '#770838', delimeter: '' },
-        ], {}, 'Inbound'),
+        ]),
       );
       setValue('values', transformedData);
       setValue('totalCount', totalCount || 1);
@@ -617,7 +617,7 @@ const useInboundAddItemsForm = ({
 
   const fetchData = async () => {
     if (!queryParams.id) {
-      dispatch(updateWorkflowHeader([], {}, 'Inbound'));
+      dispatch(updateWorkflowHeader([]));
       previous();
       return;
     }
@@ -631,7 +631,7 @@ const useInboundAddItemsForm = ({
         await fetchLineItems();
       }
     } catch {
-      dispatch(updateWorkflowHeader([], {}, 'Inbound'));
+      dispatch(updateWorkflowHeader([]));
       // In case of an error, redirect to the "create" step without the id parameter
       history.push({
         pathname: location.pathname,
