@@ -83,7 +83,7 @@ class PutawayTask {
                 identifier   : identifier,
                 inventoryItem: inventoryItem,
                 facility     : facility?.toBaseJson(),
-                location     : location.toJson(location?.locationType?.locationTypeCode),
+                location     : location?.toJson(location?.locationType?.locationTypeCode),
                 quantity     : quantity,
                 container    : container?.toJson(container?.locationType?.locationTypeCode),
                 destination  : destination?.toJson(destination?.locationType?.locationTypeCode),
