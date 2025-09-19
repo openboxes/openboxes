@@ -3,7 +3,6 @@ package org.pih.warehouse.putaway
 import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
-import org.apache.commons.beanutils.BeanUtils
 import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.api.Putaway
 import org.pih.warehouse.api.PutawayItem
@@ -13,6 +12,7 @@ import org.pih.warehouse.api.PutawayTaskStatus
 import org.pih.warehouse.api.StatusCategory
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.ActivityCode
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.ReasonCode
@@ -151,6 +151,31 @@ class PutawayTaskService {
         log.info "dirty: " + orderItem.dirtyPropertyNames
         log.info "dirty: " + orderItem.order.dirtyPropertyNames
 
+        Order order = orderItem.order
+        // start - putaway task has been assigned and has been started
+        order.approvedBy = task.assignee
+        order.dateApproved = task.dateStarted
+
+        if (task.status == PutawayTaskStatus.COMPLETED) {
+            def allSplitTasks = order.orderItems.findAll {
+                it.parentOrderItem != null &&
+                it.orderItemStatusCode != OrderItemStatusCode.CANCELED
+            }
+
+            boolean allItemsCompleted = allSplitTasks.every {
+                it.orderItemStatusCode == OrderItemStatusCode.COMPLETED
+            }
+
+            // complete - task is fully completed
+            if (allItemsCompleted) {
+                order.status = OrderStatus.COMPLETED
+                order.completedBy = task.completedBy
+                order.dateCompleted = task.dateCompleted
+            }
+        } else {
+            order.status = PutawayTaskAdapter.toOrderStatus(task.status)
+        }
+
         orderItem.save(cascade: true, failOnError:true)
         task.discard()
     }
@@ -244,14 +269,9 @@ class PutawayTaskService {
     }
 
     void complete(PutawayTask task, String destinationId, String completedById, Boolean force = false) {
-        log.info "complete putaway "
+        log.info "complete putaway"
         if (!task) {
             throw new ObjectNotFoundException(task.id, "Unable to locate putaway task with id ${task.id}")
-        }
-
-        Person completedBy = completedById ? Person.get(completedById) : AuthService.currentUser
-        if (!completedBy) {
-            task.errors.reject("completedBy", "Must provide a valid person or user who completed the putaway task")
         }
 
         // validate destination or user has forced a destination change
@@ -272,6 +292,11 @@ class PutawayTaskService {
         // Update the task destination if the destinations do not match, but user forced change
         if (task.destination != destination && force) {
             task.destination = destination
+        }
+
+        Person completedBy = completedById ? Person.get(completedById) : AuthService.currentUser
+        if (!completedBy) {
+            task.errors.reject("completedBy", "Must provide a valid person or user who completed the putaway task")
         }
 
         task.dateCompleted = new Date()
@@ -341,16 +366,17 @@ class PutawayTaskService {
                     it.orderItemStatusCode == OrderItemStatusCode.PENDING
         } as OrderItem
 
-        return PutawayTask.createFromOrderItem(remainingOrderItem)
+        return PutawayTaskAdapter.toPutawayTask(remainingOrderItem)
     }
 
     void shortage(PutawayTask task, ReasonCode reasonCode) {
         def putawayDiscrepancyLocation = task.facility.internalLocations
-            .find { it.supports(ActivityCode.PUTAWAY_DISCREPANCY) }
-        if (putawayDiscrepancyLocation) {
-            task.destination = putawayDiscrepancyLocation
+            .find { it.locationType.name == Constants.DISCREPANCY_LOCATION_TYPE}
+        if (!putawayDiscrepancyLocation) {
+            throw new IllegalStateException("No discrepancy location found")
         }
 
+        task.destination = putawayDiscrepancyLocation
         task.dateCompleted = new Date()
         task.completedBy = AuthService.currentUser
         task.reasonCode = reasonCode

@@ -112,7 +112,7 @@ enum ActivityCode {
     INBOUND_SORTATION('INBOUND_SORTATION'),
 
     // Putaway discrepancy
-    PUTAWAY_DISCREPANCY('PUTAWAY_DISCREPANCY'),
+    LOST_AND_FOUND('LOST_AND_FOUND'),
 
     NONE('NONE')
 
@@ -181,7 +181,7 @@ enum ActivityCode {
                 PICKING_STRATEGY_AUTOMATIC_REALLOCATION,
 
                 INBOUND_SORTATION,
-                PUTAWAY_DISCREPANCY
+                LOST_AND_FOUND
         ]
     }
 
