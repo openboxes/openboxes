@@ -100,7 +100,7 @@ class Putaway implements Validateable {
             case OrderStatus.CANCELED:
                 return PutawayStatus.CANCELED
             default:
-                return null
+                return PutawayStatus.PENDING
         }
 
     }

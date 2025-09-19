@@ -1095,6 +1095,11 @@ class UrlMappings {
             action = [POST: "getCycleCountSummary", GET: "getCycleCountSummary"]
         }
 
+        "/api/reasonCodes"(parseRequest: true) {
+            controller = "reasonCodeApi"
+            action = [GET: "list"]
+        }
+
         // Error handling
 
         "401"(controller: "errors", action: "handleUnauthorized")

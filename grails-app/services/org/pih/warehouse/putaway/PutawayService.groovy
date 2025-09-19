@@ -365,7 +365,7 @@ class PutawayService implements EventPublisher  {
             }
         }
 
-        order.save(failOnError: true)
+        order.save(flush: true, failOnError: true)
         return order
     }
 
