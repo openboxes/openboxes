@@ -9,6 +9,8 @@
  **/
 package org.pih.warehouse.product
 
+import java.time.Instant
+
 /**
  * Represents an association between two products.
  */
@@ -31,8 +33,8 @@ class ProductAssociation {
 
     ProductAssociation mutualAssociation
 
-    Date dateCreated
-    Date lastUpdated
+    Instant dateCreated
+    Instant lastUpdated
 
     static belongsTo = [product: Product]
 

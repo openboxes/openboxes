@@ -10,6 +10,8 @@
 package org.pih.warehouse.report
 
 import grails.validation.Validateable
+import java.time.LocalDate
+
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
@@ -18,8 +20,8 @@ class InventoryReportCommand implements Validateable {
 
     Product product
     Location location
-    Date startDate
-    Date endDate
+    LocalDate startDate
+    LocalDate endDate
     Category category
     Category rootCategory
     String status

@@ -51,12 +51,10 @@
 									<warehouse:message code="report.startDate.label"/>
 								</label>
 
-								<g:jqueryDatePicker id="startDate"
-													name="startDate"
+								<g:jqueryDatePicker name="startDate"
 													cssClass="filter"
-													value="${command?.startDate }"
-													format="MM/dd/yyyy"
-													autocomplete="off"/>
+													value="${command?.startDate}"
+                                />
 
 							</div>
 							<div class="filter-list-item">
@@ -65,12 +63,10 @@
 									<warehouse:message code="report.endDate.label"/>
 								</label>
 
-								<g:jqueryDatePicker id="endDate"
-													name="endDate"
+								<g:jqueryDatePicker name="endDate"
 													cssClass="filter"
-													value="${command?.endDate }"
-													format="MM/dd/yyyy"
-													autocomplete="off"/>
+													value="${command?.endDate}"
+                                />
 							</div>
 							<div class="filter-list-item">
 								<label>

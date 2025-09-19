@@ -41,14 +41,14 @@
                         <tr class="prop">
                             <td valign="top" class="name"><warehouse:message code="partyRole.startDate.label" default="Start Date" /></td>
                             
-                            <td valign="top" class="value"><format:datetime obj="${partyRoleInstance?.startDate}" /></td>
+                            <td valign="top" class="value"><g:formatDate date="${partyRoleInstance?.startDate}" /></td>
                             
                         </tr>
                     
                         <tr class="prop">
                             <td valign="top" class="name"><warehouse:message code="partyRole.endDate.label" default="End Date" /></td>
                             
-                            <td valign="top" class="value"><format:datetime obj="${partyRoleInstance?.endDate}" /></td>
+                            <td valign="top" class="value"><g:formatDate date="${partyRoleInstance?.endDate}" /></td>
                             
                         </tr>
                     
