@@ -15,6 +15,14 @@ const useProductSupplierValidation = () => {
   } = useProductSupplierAttributes();
 
   const validationSchema = (data) => {
+    const checkNecessityOfContractPrice = () => {
+      if (data.fixedPrice.contractPricePrice) {
+        return true;
+      }
+
+      return !data.fixedPrice.contractPriceValidUntil;
+    };
+
     const checkDestinationPartyUniqueness = (destinationParty) => {
       const groupedData = _.groupBy(
         data.productSupplierPreferences.map((preference) => preference?.destinationParty?.id),
@@ -221,7 +229,10 @@ const useProductSupplierValidation = () => {
     const fixedPriceSchema = z.object({
       contractPricePrice: z
         .number()
-        .optional(),
+        .optional()
+        .refine(checkNecessityOfContractPrice, {
+          message: 'Contract price is required',
+        }),
       contractPriceValidUntil: z
         .string()
         .nullish(),

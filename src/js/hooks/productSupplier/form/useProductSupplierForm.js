@@ -258,6 +258,7 @@ const useProductSupplierForm = () => {
     return {
       ...omitEmptyValues(packageSpecification),
       ...omitEmptyValues(fixedPrice),
+      contractPricePrice: fixedPrice?.contractPricePrice ?? null,
       contractPriceValidUntil: fixedPrice?.contractPriceValidUntil
         ? moment(fixedPrice?.contractPriceValidUntil).format(DateFormat.MM_DD_YYYY)
         : null,
