@@ -10,10 +10,9 @@
 package org.pih.warehouse.inventory
 
 import grails.gorm.transactions.Transactional
-import grails.util.Holders
 import grails.validation.ValidationException
 import org.hibernate.criterion.CriteriaSpecification
-import org.pih.warehouse.DateUtil
+
 import org.pih.warehouse.PaginatedList
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.core.ConfigService
@@ -23,6 +22,7 @@ import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.User
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.importer.ImporterUtil
+import org.pih.warehouse.inventory.product.availability.AvailableItemMap
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductAvailability
@@ -37,7 +37,6 @@ import org.springframework.validation.Errors
 import java.sql.Timestamp
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
-import java.time.Instant
 
 @Transactional
 class InventoryService implements ApplicationContextAware {
@@ -1425,7 +1424,7 @@ class InventoryService implements ApplicationContextAware {
 
         try {
             // 1. Calculate the current available items for the given product
-            Map<String, AvailableItem> availableItems = productAvailabilityService.getAvailableItemsAtDateAsMap(
+            AvailableItemMap availableItems = productAvailabilityService.getAvailableItemsAtDateAsMap(
                     currentLocation,
                     [cmd.product],
                     new Date(cmd.transactionDate.time + 2000)

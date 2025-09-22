@@ -5,6 +5,9 @@ import org.pih.warehouse.core.Constants
 
 import grails.gorm.transactions.Transactional
 
+import org.pih.warehouse.inventory.product.availability.AvailableItemKey
+import org.pih.warehouse.inventory.product.availability.AvailableItemMap
+
 @Transactional
 class RecordStockProductInventoryTransactionService extends ProductInventoryTransactionService<RecordInventoryCommand> {
 
@@ -25,10 +28,9 @@ class RecordStockProductInventoryTransactionService extends ProductInventoryTran
     TransactionEntry createAdjustmentTransactionEntry(
             RecordInventoryRowCommand recordInventoryRowCommand,
             InventoryItem inventoryItem,
-            Map<String, AvailableItem> availableItems
+            AvailableItemMap availableItems
     ) {
-        String key = ProductAvailabilityService.constructAvailableItemKey(recordInventoryRowCommand.binLocation, inventoryItem)
-        Integer quantityOnHand = availableItems.get(key)?.quantityOnHand
+        Integer quantityOnHand = availableItems.get(recordInventoryRowCommand.binLocation, inventoryItem)?.quantityOnHand
         // When the row doesn't already have an existing quantity on hand on the date of creation, it means that it is a new
         // row. In that case, we should add the whole value from that row to the already existing corresponding line. If
         // The quantity in the already existing row is 5, and the new row has a quantity of 2. We should get one line with qty 7,
@@ -54,14 +56,14 @@ class RecordStockProductInventoryTransactionService extends ProductInventoryTran
     }
 
     List<TransactionEntry> createZeroingTransactionEntries(
-            Map<String, AvailableItem> availableItems,
+            AvailableItemMap availableItems,
             List<AvailableItem> currentRecordStockItems
     ) {
-        List<String> recordStockKeys = currentRecordStockItems.collect {
-            ProductAvailabilityService.constructAvailableItemKey(it.binLocation, it.inventoryItem)
+        List<AvailableItemKey> recordStockKeys = currentRecordStockItems.collect {
+            new AvailableItemKey(it.binLocation, it.inventoryItem)
         }
 
-        return availableItems.findAll { key, item -> !(key in recordStockKeys)}
+        return availableItems.map.findAll { key, item -> !(key in recordStockKeys)}
                 .collect { new TransactionEntry(
                         quantity: -it.value.quantityOnHand,
                         product: it.value.inventoryItem.product,

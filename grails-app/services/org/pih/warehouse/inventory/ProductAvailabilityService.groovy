@@ -30,6 +30,7 @@ import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.core.ApplicationExceptionEvent
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.inventory.product.availability.AvailableItemMap
 import org.pih.warehouse.jobs.RefreshProductAvailabilityJob
 import org.pih.warehouse.order.OrderStatus
 import org.pih.warehouse.product.Category
@@ -666,14 +667,6 @@ class ProductAvailabilityService {
         return data
     }
 
-    /**
-     * Initializes a String comprising of [product code + bin location name + lot number], to be used to uniquely
-     * identify a product availability entry.
-     */
-    static String constructAvailableItemKey(Location binLocation, InventoryItem inventoryItem) {
-        return "${inventoryItem.product.productCode}-${binLocation?.name}-${inventoryItem?.lotNumber}"
-    }
-
     static String constructAvailableItemKey(String binLocationName, String lotNumber, String productCode) {
         return "${productCode}-${binLocationName}-${lotNumber}"
     }
@@ -684,16 +677,17 @@ class ProductAvailabilityService {
      * @param facility
      * @param products
      * @param at The moment in time to fetch stock for. If not provided, will fetch the current stock of each item.
-     * @return a map of AvailableItem keyed on [product code + bin location name + lot number]
+     * @return a map of AvailableItem keyed on ProductAvailabilityKey
      */
-    Map<String, AvailableItem> getAvailableItemsAtDateAsMap(Location facility, Collection<Product> products, Date at=null) {
+    AvailableItemMap getAvailableItemsAtDateAsMap(
+            Location facility,
+            Collection<Product> products,
+            Date at=null) {
+
         List<AvailableItem> availableItems = getAvailableItemsAtDate(facility, products, at)
 
-        Map<String, AvailableItem> availableItemsMap = [:]
-        for (AvailableItem availableItem : availableItems) {
-            String key = constructAvailableItemKey(availableItem.binLocation, availableItem.inventoryItem)
-            availableItemsMap.put(key, availableItem)
-        }
+        AvailableItemMap availableItemsMap = new AvailableItemMap()
+        availableItemsMap.putAll(availableItems)
         return availableItemsMap
     }
 
