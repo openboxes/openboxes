@@ -169,7 +169,7 @@ DateFieldDateFns.propTypes = {
     PropTypes.string,
     PropTypes.shape({
       id: PropTypes.string.isRequired,
-      defaultMessage: PropTypes.string.isRequired,
+      default: PropTypes.string.isRequired,
     }),
   ]),
   className: PropTypes.string,
