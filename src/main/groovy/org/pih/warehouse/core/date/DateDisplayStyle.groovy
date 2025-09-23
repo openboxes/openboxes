@@ -17,10 +17,10 @@ enum DateDisplayStyle {
      * We should strive to only ever use a single format per date type. For example, we should only have one format
      * for displaying day + month + year. This allows us to be consistent in how we display date fields in the app.
      */
-    DATE('date.format.date.label', DateTimeFormatter.ofPattern('dd/MMM/yyyy')),
-    DATE_TIME('date.format.dateTime.label', DateTimeFormatter.ofPattern('dd/MMM/yyyy HH:mm:ss')),
-    DATE_TIME_ZONE('date.format.dateTimeZone.label', DateTimeFormatter.ofPattern('dd/MMM/yyyy HH:mm:ss XXX')),
-    TIME('date.format.time.label', DateTimeFormatter.ofPattern('HH:mm:ss'))
+    DATE('default.date.format.date', DateTimeFormatter.ofPattern('dd/MMM/yyyy')),
+    DATE_TIME('default.date.format.dateTime', DateTimeFormatter.ofPattern('dd/MMM/yyyy HH:mm:ss')),
+    DATE_TIME_ZONE('default.date.format.dateTimeZone', DateTimeFormatter.ofPattern('dd/MMM/yyyy HH:mm:ss XXX')),
+    TIME('default.date.format.time', DateTimeFormatter.ofPattern('HH:mm:ss'))
 
     /**
      * The key in message.properties containing the pattern for the given style.
