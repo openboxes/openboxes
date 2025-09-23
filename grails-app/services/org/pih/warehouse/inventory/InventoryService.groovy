@@ -22,6 +22,7 @@ import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.User
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.importer.ImporterUtil
+import org.pih.warehouse.inventory.product.availability.AvailableItemKey
 import org.pih.warehouse.inventory.product.availability.AvailableItemMap
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
@@ -1372,10 +1373,10 @@ class InventoryService implements ApplicationContextAware {
     List<RecordInventoryRowCommand> groupDuplicatedRecordInventoryRows(RecordInventoryCommand cmd) {
         return cmd.recordInventoryRows
                 .groupBy { row ->
-                    ProductAvailabilityService.constructAvailableItemKey(
-                            row?.binLocation?.name,
-                            row?.lotNumber,
-                            cmd?.product?.productCode
+                    new AvailableItemKey(
+                            cmd?.product?.id,
+                            row?.lotNumber as String,
+                            row?.binLocation?.name as String
                     )
                 }
                 .collect { key, rows ->

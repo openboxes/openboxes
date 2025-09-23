@@ -8,34 +8,43 @@ import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.product.Product
 
 /**
- * A key on [bin location + inventory item] for uniquely identifying an available item record
+ * A key on [productId + bin location name + lot number] for uniquely identifying an available item record.
+ *
+ * We opt to key on these fields (instead of on [bin location id + inventory item id]) to support the case
+ * where we're in the process of creating the bin or lot and so don't have an id field for them yet.
  */
-@EqualsAndHashCode(excludes=["inventoryItem", "binLocation"])
+@EqualsAndHashCode
 class AvailableItemKey {
 
-    Location binLocation
-    InventoryItem inventoryItem
-    String key
+    String productId
+    String productLot
+    String binLocationName
 
     AvailableItemKey(AvailableItem availableItem) {
         this(availableItem?.binLocation, availableItem?.inventoryItem)
     }
 
     AvailableItemKey(Location binLocation, InventoryItem inventoryItem) {
-        this.binLocation = binLocation
-        this.inventoryItem = inventoryItem
-        key = asKey(binLocation, inventoryItem)
+        this(inventoryItem?.productId as String, inventoryItem?.lotNumber, binLocation?.name)
     }
 
-    String asKey(Location binLocation, InventoryItem inventoryItem) {
-        return "${binLocation?.id}-${inventoryItem?.id}"
+    AvailableItemKey(String productId, String productLot, String binLocationName) {
+        this.productId = productId
+        this.productLot = productLot
+        this.binLocationName = binLocationName
     }
 
     boolean equals(Location binLocation, InventoryItem inventoryItem) {
-        return key == asKey(binLocation, inventoryItem)
+        return equals(inventoryItem?.productId as String, inventoryItem?.lotNumber, binLocation?.name)
+    }
+
+    boolean equals(String productId, String productLot, String binLocationName) {
+        return this.productId == productId &&
+                this.productLot == productLot &&
+                this.binLocationName == binLocationName
     }
 
     boolean isForProduct(Product product) {
-        return inventoryItem?.productId == product.id
+        return productId == product.id
     }
 }

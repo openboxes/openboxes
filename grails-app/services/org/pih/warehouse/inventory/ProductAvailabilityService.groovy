@@ -667,10 +667,6 @@ class ProductAvailabilityService {
         return data
     }
 
-    static String constructAvailableItemKey(String binLocationName, String lotNumber, String productCode) {
-        return "${productCode}-${binLocationName}-${lotNumber}"
-    }
-
     /**
      * Fetches the stock of a list of products at a facility at a given moment in time.
      *
