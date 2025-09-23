@@ -42,23 +42,12 @@ class PutawayTaskAdapter {
 
         orderItem.destinationBinLocation = task.destination
 
-        orderItem.reasonCode = task.reasonCode
+        orderItem.discrepancyReasonCode = task.discrepancyReasonCode
 
         // In order to update timestamp on putaway task (order.lastUpdated should be updated on its own)
         orderItem.lastUpdated = new Date()
 
         return orderItem
-    }
-
-    static PutawayTaskStatus toPutawayTaskStatus(OrderStatus orderStatus) {
-        switch (orderStatus) {
-            case OrderStatus.PENDING: return PutawayTaskStatus.PENDING
-            case OrderStatus.APPROVED: return PutawayTaskStatus.IN_PROGRESS
-            case OrderStatus.PLACED: return PutawayTaskStatus.IN_TRANSIT
-            case OrderStatus.COMPLETED: return PutawayTaskStatus.COMPLETED
-            case OrderStatus.CANCELED: return PutawayTaskStatus.CANCELED
-            default: return PutawayTaskStatus.PENDING
-        }
     }
 
     static OrderStatus toOrderStatus(PutawayTaskStatus putawayTaskStatus) {
@@ -74,7 +63,9 @@ class PutawayTaskAdapter {
 
     static OrderItemStatusCode toOrderItemStatusCode(PutawayTaskStatus putawayTaskStatus) {
         switch (putawayTaskStatus) {
-            case PutawayTaskStatus.IN_TRANSIT: return OrderItemStatusCode.IN_TRANSIT
+            case PutawayTaskStatus.PENDING: return OrderItemStatusCode.PENDING
+            case PutawayTaskStatus.IN_PROGRESS: return OrderItemStatusCode.STARTED
+            case PutawayTaskStatus.IN_TRANSIT: return OrderItemStatusCode.IN_PROGRESS
             case PutawayTaskStatus.COMPLETED: return OrderItemStatusCode.COMPLETED
             case PutawayTaskStatus.CANCELED: return OrderItemStatusCode.CANCELED
             default: return OrderItemStatusCode.PENDING
@@ -94,23 +85,24 @@ class PutawayTaskAdapter {
         task.inventoryItem = orderItem.inventoryItem
         task.location = orderItem.originBinLocation
         task.quantity = orderItem.quantity
-        task.destination = orderItem.destinationBinLocation
         task.status = convertFromOrderItemStatus(orderItem.orderItemStatusCode)
+        task.dateStarted = order.dateOrdered
+        task.dateCanceled = (orderItem.orderItemStatusCode == OrderItemStatusCode.CANCELED) ? orderItem.lastUpdated : null
+        task.dateCompleted = order.dateCompleted
+        task.putawayOrder = order
+        task.putawayOrderItem = orderItem
+        task.putawayOrderStatus = order.status
         task.putawayOrderItemStatus = orderItem.orderItemStatusCode
-        task.facility = order.origin
         task.identifier = order.orderNumber
         task.assignee = order.orderedBy
         task.completedBy = order.completedBy
         task.orderedBy = order.orderedBy
-        task.putawayOrder = order
-        task.putawayOrderStatus = order.status
-        task.dateStarted = order.dateOrdered
-        task.dateCompleted = order.dateCompleted
-        task.dateCanceled = (orderItem.orderItemStatusCode == OrderItemStatusCode.CANCELED) ? orderItem.lastUpdated : null
+        task.facility = order.origin
+        task.container = orderItem.containerLocation
+        task.destination = orderItem.destinationBinLocation
+        task.discrepancyReasonCode = orderItem.discrepancyReasonCode
         task.dateCreated = orderItem.dateCreated
         task.lastUpdated = orderItem.lastUpdated
-        task.putawayOrderItem = orderItem
-
         return task
     }
 
@@ -120,8 +112,8 @@ class PutawayTaskAdapter {
         }
         switch (orderItemStatusCode) {
             case OrderItemStatusCode.PENDING: return PutawayTaskStatus.PENDING
-            case OrderItemStatusCode.IN_PROGRESS: return PutawayTaskStatus.IN_PROGRESS
-            case OrderItemStatusCode.IN_TRANSIT: return PutawayTaskStatus.IN_TRANSIT
+            case OrderItemStatusCode.STARTED: return PutawayTaskStatus.IN_PROGRESS
+            case OrderItemStatusCode.IN_PROGRESS: return PutawayTaskStatus.IN_TRANSIT
             case OrderItemStatusCode.COMPLETED: return PutawayTaskStatus.COMPLETED
             case OrderItemStatusCode.CANCELED: return PutawayTaskStatus.CANCELED
             default: return PutawayTaskStatus.PENDING

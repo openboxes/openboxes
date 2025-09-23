@@ -51,34 +51,6 @@ enum PutawayTaskStatus {
         return ROLLBACK_STATE_TRANSITIONS.get(from).equals(to)
     }
 
-
-    /**
-     * Convert the putaway task status to putaway status.
-     *
-     * FIXME We don't currently have a way of going in the opposite direction, so we should probably combine the two
-     *  statuses into one, but I haven't figured out the right way to do that yet.
-     * @return
-     */
-    PutawayStatus toPutawayStatus() {
-        switch (this) {
-            case PENDING:
-                return PutawayStatus.READY
-                break
-            case IN_PROGRESS:
-                return PutawayStatus.PENDING
-                break
-            case IN_TRANSIT:
-                return PutawayStatus.PENDING
-                break
-            case COMPLETED:
-                return PutawayStatus.COMPLETED
-                break
-            case CANCELED:
-                return PutawayStatus.CANCELED
-                break
-        }
-    }
-
     static toSet(StatusCategory statusCategory) {
         return values().findAll { it.statusCategory == statusCategory }.toSet() as List<PutawayTaskStatus>
     }

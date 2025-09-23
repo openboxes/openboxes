@@ -113,11 +113,7 @@ class PutawayTaskService {
                 break
 
             case 'partialComplete':
-                task = partialComplete(task, data.quantity as BigDecimal, data.destination as String, data.force as Boolean)
-                break
-
-            case 'shortage':
-                shortage(task, data.reasonCode as ReasonCode)
+                task = partialComplete(task, data.quantity as BigDecimal, data.destination as String, data.force as Boolean, data.reasonCode as ReasonCode)
                 break
 
             case 'rollback':
@@ -210,7 +206,6 @@ class PutawayTaskService {
         Person assignee = assigneeId ? Person.get(assigneeId) : null
         if (assignee) task.assignee = assignee
         save(task)
-
     }
 
     /**
@@ -241,6 +236,16 @@ class PutawayTaskService {
         Location container = Location.findByLocationNumberOrId(containerNumberOrId, containerNumberOrId)
         if (!container) {
             throw new IllegalStateException("Container does not exist")
+        }
+
+        def allowedActivityCodes = [
+                ActivityCode.PUTAWAY_CART,
+                ActivityCode.PICK_CART,
+                ActivityCode.OUTBOUND_STAGING
+        ]
+        if (!container.supportsAny(allowedActivityCodes as ActivityCode[])) {
+            throw new IllegalArgumentException("Container ${container?.name} must support at least one of the following activities: " +
+                    "PUTAWAY_CART, PICK_CART, or OUTBOUND_STAGING.")
         }
 
         // validate that the container matches the task putaway container
@@ -310,7 +315,7 @@ class PutawayTaskService {
         save(task)
     }
 
-    PutawayTask partialComplete(PutawayTask task, BigDecimal quantity, String destinationId, Boolean force = false) {
+    PutawayTask partialComplete(PutawayTask task, BigDecimal quantity, String destinationId, Boolean force = false, ReasonCode reasonCode = null) {
         if (quantity > task.quantity) {
             throw new IllegalArgumentException("Quantity provided is more than requested. Please re-enter quantity")
         }
@@ -336,19 +341,32 @@ class PutawayTaskService {
             task.destination = destination
         }
 
+        if (reasonCode) {
+            task.discrepancyReasonCode = reasonCode
+            def discrepancyLocation = task.facility.internalLocations
+                    .find { it.locationType.name == Constants.DISCREPANCY_LOCATION_TYPE}
+            if (!discrepancyLocation) {
+                throw new IllegalStateException("No discrepancy location found")
+            }
+            task.destination = discrepancyLocation
+        }
+
         if (task.hasErrors() || !task.validate()) {
             throw new ValidationException("Validation errors occurred during complete action", task.errors)
         }
 
+        task.discard()
+
         OrderItem currentItem = OrderItem.get(task.putawayOrderItem.id)
+        def currentItemParent = currentItem.parentOrderItem
+        currentItem.parentOrderItem = null
         Order order = currentItem.order
-        OrderItem originalItem = order.orderItems.find { it.parentOrderItem == null } as OrderItem
 
         Putaway putaway = Putaway.createFromOrder(order)
         if (!putaway.putawayAssignee) {
             putaway.putawayAssignee = AuthService.currentUser
         }
-        PutawayItem itemToSplit = putaway.putawayItems.find { it.id == originalItem.id}
+        PutawayItem itemToSplit = putaway.putawayItems.find { it.id == currentItem.id }
 
         PutawayItem completedSplitItem = createSplitPutawayItem(task, quantity, PutawayStatus.COMPLETED)
         PutawayItem remainingSplitItem = createSplitPutawayItem(task, quantityRemaining, PutawayStatus.PENDING)
@@ -357,34 +375,21 @@ class PutawayTaskService {
             itemToSplit.splitItems = [completedSplitItem, remainingSplitItem]
         }
         putawayService.savePutaway(putaway)
+
+        transferToDestination(task)
+        save(task)
+
+        currentItem.parentOrderItem = currentItemParent
         currentItem.orderItemStatusCode = OrderItemStatusCode.CANCELED
         currentItem.save(flush: true, failOnError: true)
 
         OrderItem remainingOrderItem = order.orderItems.find {
-            it.parentOrderItem?.id == originalItem.id &&
+            it.parentOrderItem?.id == currentItem.id &&
                     it.quantity == quantityRemaining &&
                     it.orderItemStatusCode == OrderItemStatusCode.PENDING
         } as OrderItem
 
         return PutawayTaskAdapter.toPutawayTask(remainingOrderItem)
-    }
-
-    void shortage(PutawayTask task, ReasonCode reasonCode) {
-        def putawayDiscrepancyLocation = task.facility.internalLocations
-            .find { it.locationType.name == Constants.DISCREPANCY_LOCATION_TYPE}
-        if (!putawayDiscrepancyLocation) {
-            throw new IllegalStateException("No discrepancy location found")
-        }
-
-        task.destination = putawayDiscrepancyLocation
-        task.dateCompleted = new Date()
-        task.completedBy = AuthService.currentUser
-        task.reasonCode = reasonCode
-        executeStateTransition(task, PutawayTaskStatus.COMPLETED)
-
-        transferToDestination(task)
-
-        save(task)
     }
 
     void transferToContainer(PutawayTask task) {
@@ -499,7 +504,8 @@ class PutawayTaskService {
                 inventoryItem: task.inventoryItem,
                 product: task.product,
                 currentFacility: task.facility,
-                currentLocation: task.location
+                currentLocation: task.location,
+                containerLocation: task.container
         )
     }
 }

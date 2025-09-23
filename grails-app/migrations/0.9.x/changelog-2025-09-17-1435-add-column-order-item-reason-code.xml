@@ -6,12 +6,12 @@
     <changeSet author="druchniewicz" id="170920251435-0">
         <preConditions onFail="MARK_RAN">
             <not>
-                <columnExists tableName="order_item" columnName="reason_code"/>
+                <columnExists tableName="order_item" columnName="discrepancy_reason_code"/>
             </not>
         </preConditions>
 
         <addColumn tableName="order_item">
-            <column name="reason_code" type="VARCHAR(255)"/>
+            <column name="discrepancy_reason_code" type="VARCHAR(255)"/>
         </addColumn>
     </changeSet>
 </databaseChangeLog>

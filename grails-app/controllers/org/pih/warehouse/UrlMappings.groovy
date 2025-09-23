@@ -1095,7 +1095,7 @@ class UrlMappings {
             action = [POST: "getCycleCountSummary", GET: "getCycleCountSummary"]
         }
 
-        "/api/reasonCodes"(parseRequest: true) {
+        "/api/reason-codes"(parseRequest: true) {
             controller = "reasonCodeApi"
             action = [GET: "list"]
         }

@@ -80,7 +80,7 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
 
     Integer orderIndex = 0
 
-    ReasonCode reasonCode
+    ReasonCode discrepancyReasonCode
 
     // Audit fields
     Date dateCreated
@@ -167,7 +167,7 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
         budgetCode(nullable: true)
         glAccount(nullable: true)
         orderIndex(nullable: true)
-        reasonCode(nullable: true)
+        discrepancyReasonCode(nullable: true)
     }
 
     String getUnitOfMeasure() {

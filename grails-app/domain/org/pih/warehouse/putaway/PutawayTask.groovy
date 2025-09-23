@@ -43,7 +43,7 @@ class PutawayTask {
     Location facility
     Location container                  // container scanned during putaway
     Location destination                // target storage or outbound staging
-    ReasonCode reasonCode
+    ReasonCode discrepancyReasonCode
 
     // Auditing fields
     Date dateCreated
@@ -65,7 +65,7 @@ class PutawayTask {
         completedBy nullable: true
         putawayOrder nullable: true
         putawayOrderItem nullable: true
-        reasonCode nullable: true
+        discrepancyReasonCode nullable: true
     }
 
     static mapping = {

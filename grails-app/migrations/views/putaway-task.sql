@@ -5,8 +5,8 @@ CREATE OR REPLACE VIEW putaway_task AS
         -- FIXME derive status based on order item and order status
         CASE `order_item`.order_item_status_code
             WHEN 'PENDING' THEN 'PENDING'
-            WHEN 'IN_PROGRESS' THEN 'IN_PROGRESS'
-            WHEN 'IN_TRANSIT' THEN 'IN_TRANSIT'
+            WHEN 'STARTED' THEN 'IN_PROGRESS'
+            WHEN 'IN_PROGRESS' THEN 'IN_TRANSIT'
             WHEN 'COMPLETED' THEN 'COMPLETED'
             WHEN 'CANCELED' THEN 'CANCELED'
             WHEN 'BACKORDER' THEN 'BACKORDER'
@@ -20,7 +20,7 @@ CREATE OR REPLACE VIEW putaway_task AS
         order_item.container_location_id as container_id,
         order_item.destination_bin_location_id as destination_id,
         order_item.quantity,
-        order_item.reason_code,
+        order_item.discrepancy_reason_code,
         `order`.id as putaway_order_id,
         `order_item`.id as putaway_order_item_id,
         -- FIXME need to resolve these
