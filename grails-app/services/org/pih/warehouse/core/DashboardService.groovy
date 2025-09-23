@@ -12,6 +12,8 @@ package org.pih.warehouse.core
 import grails.gorm.transactions.Transactional
 import grails.plugins.csv.CSVWriter
 import org.hibernate.sql.JoinType
+
+import org.pih.warehouse.DateUtil
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.inventory.InventoryStatus
@@ -163,11 +165,11 @@ class DashboardService {
             }
 
             if (command.startDate) {
-                ge("expirationDate", command.startDate + 1)
+                ge("expirationDate", DateUtil.asDate(command.startDate.plusDays(1)))
             }
 
             if (command.endDate) {
-                le("expirationDate", command.endDate)
+                le("expirationDate", DateUtil.asDate(command.endDate))
             }
 
             order("expirationDate", "desc")
@@ -206,11 +208,11 @@ class DashboardService {
             }
 
             if (command.startDate) {
-                ge("expirationDate", command.startDate + 1)
+                ge("expirationDate", DateUtil.asDate(command.startDate.plusDays(1)))
             }
 
             if (command.endDate) {
-                le("expirationDate", command.endDate)
+                le("expirationDate", DateUtil.asDate(command.endDate))
             }
 
             order("expirationDate", "asc")

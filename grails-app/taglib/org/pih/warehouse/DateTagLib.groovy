@@ -105,6 +105,10 @@ class DateTagLib {
         return dateFormatterManager.format(attrs.date, context)
     }
 
+    /**
+     * Renders expiration dates, displaying the date differently depending on if it's expired or nearing expiry.
+     * Eventually calls back in to g:formatDate so see that method for the list of valid attrs.
+     */
     def expirationDate = { attrs, body ->
         out << g.render(template: '/taglib/expirationDate', model: [attrs: attrs])
     }
