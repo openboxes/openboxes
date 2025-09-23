@@ -273,14 +273,30 @@ body {
 .font-size-label {
   font-size: .8rem;
 }
-
 .font-size-xs {
-  font-size: .875rem;
+  font-size: 0.875rem;
+}
+.font-size-sm {
+  font-size: 1rem;
+}
+.font-size-md {
+  font-size: 1.25rem;
+}
+.font-size-lg {
+  font-size: 1.5rem;
+}
+.font-size-xl {
+  font-size: 2rem;
+}
 
-  &.required::after {
-    content: "*";
-    color: red;
-  }
+.font-size-xs.required::after,
+.font-size-sm.required::after,
+.font-size-md.required::after,
+.font-size-lg.required::after,
+.font-size-xl.required::after {
+  content: "*";
+  color: red;
+  margin-left: 2px;
 }
 
 .btn-link {
