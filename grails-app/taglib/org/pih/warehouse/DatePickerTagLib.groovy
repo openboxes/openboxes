@@ -63,29 +63,24 @@ class DatePickerTagLib {
         // they pick will be in the server timezone.
         ZoneId zoneId = sessionManager.timezone.toZoneId()
 
-        // Grails' date picker only supports java.util.Date and so we have to convert java.time classes to Dates.
+        // Grails' date picker only supports java.util.Date and Calendar types. When working with java.time classes
+        // we opt to covert to Calendar because it supports zones which makes our logic simpler. We just convert the
+        // date to the user's timezone.
+        // Note that the Grails datepicker actually ignores the zone set in the Calendar instance (crazy!) so our
+        // BindingEditor classes need to manually set the user's zone again when marshalling fields.
         switch (attrs.value) {
             case (Instant):
-                // We have to do a dirty trick to get the date picker to display the date in the user's timezone.
-                // We convert to a zoned date time in the user's timezone, then modify it to be in the server's timezone
-                // without also modifying the time.
-                // Ex: If the user is in UTC-1, "2000-01-01T00:00UTC-1" becomes "2000-01-01T00:00Z"
-                // This will result in the instant changing if we don't convert back when doing the data binding,
-                // so we need to be very careful about this. See InstantBindingEditor for details.
                 ZonedDateTime zonedDateTime = DateUtil.asZonedDateTime(attrs.value as Instant, zoneId)
-                attrs.value = DateUtil.asDate(zonedDateTime.withZoneSameLocal(DateUtil.systemZoneId))
+                attrs.value = GregorianCalendar.from(zonedDateTime)
                 break
             case (ZonedDateTime):
-                // Similar to Instant, we need to convert the datetime to display in the user's timezone.
-                // This will result in the instant changing if we don't convert back when doing the data binding,
-                // so we need to be very careful about this. See ZonedDateTimeBindingEditor for details.
                 ZonedDateTime zonedDateTime = (attrs.value as ZonedDateTime).withZoneSameInstant(zoneId)
-                attrs.value = DateUtil.asDate(zonedDateTime.withZoneSameLocal(DateUtil.systemZoneId))
+                attrs.value = GregorianCalendar.from(zonedDateTime)
                 break
             case (LocalDate):
-                // We don't need to provide timezone here because we want to preserve the fact that it's midnight
-                // on the given date. We let the date be in the server's timezone so that no conversion happens.
-                attrs.value = DateUtil.asDate(attrs.value as LocalDate)
+                LocalDate localDate = attrs.value as LocalDate
+                // -1 to month because Calendar is zero-indexed but LocalDate is not.
+                attrs.value = new GregorianCalendar(localDate.year, localDate.monthValue - 1, localDate.dayOfMonth)
 
                 if (['hour', 'minute'].contains(attrs.precision)) {
                     throw new IllegalArgumentException(
@@ -97,12 +92,10 @@ class DatePickerTagLib {
                 break
         }
 
-        // If we don't specify a value or a default when displaying the date picker, then the Grails date picker will
-        // default to selecting "new Date()", which uses the server timezone. We want to use the user's timezone
-        // instead, so we do the same trick that we do above to find the time in the user's timezone then change the
-        // timezone to be the server's timezone without changing the time.
+        // If we don't specify a value or a default then the Grails date picker will default to selecting "new Date()",
+        // which uses the server timezone. We want to use the user's timezone instead.
         if (attrs.value == null && attrs.default == null) {
-            attrs.value = DateUtil.asDate(ZonedDateTime.now(zoneId).withZoneSameLocal(DateUtil.systemZoneId))
+            attrs.value = GregorianCalendar.from(ZonedDateTime.now(zoneId))
         }
 
         out << datePickerTagLib.datePicker.call(attrs)
