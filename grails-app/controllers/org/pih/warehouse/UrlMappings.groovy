@@ -1165,6 +1165,11 @@ class UrlMappings {
             action = [POST: "saveRecordStock"]
         }
 
+        "/api/reason-codes"(parseRequest: true) {
+            controller = "reasonCodeApi"
+            action = [GET: "list"]
+        }
+
         /**
          * Inventory API endpoints
          */

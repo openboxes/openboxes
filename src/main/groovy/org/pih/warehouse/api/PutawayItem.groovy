@@ -32,7 +32,7 @@ class PutawayItem implements Validateable {
     InventoryLevel inventoryLevel
     // Mobile property
     String scannedPutawayLocation
-
+    Location containerLocation
 
     Boolean delete = Boolean.FALSE
     List<PutawayItem> splitItems = []
@@ -75,6 +75,7 @@ class PutawayItem implements Validateable {
         putawayItem.putawayFacility = orderItem.order.destination
         putawayItem.putawayLocation = orderItem.destinationBinLocation
         putawayItem.recipient = orderItem.recipient ?: orderItem.order.recipient
+        putawayItem.containerLocation = orderItem.containerLocation
 
         orderItem.orderItems?.each { item ->
             putawayItem.splitItems.add(PutawayItem.createFromOrderItem(item))
@@ -132,7 +133,8 @@ class PutawayItem implements Validateable {
                 "putawayLocation.zoneName"    : putawayLocation?.zone?.name,
                 quantity                      : quantity,
                 quantityAvailable             : quantityAvailable,
-                splitItems                    : splitItems.collect { it?.toJson() }
+                splitItems                    : splitItems.collect { it?.toJson() },
+                containerLocation             : containerLocation
         ]
     }
 }

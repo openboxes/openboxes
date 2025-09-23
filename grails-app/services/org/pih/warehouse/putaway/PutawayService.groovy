@@ -365,7 +365,7 @@ class PutawayService implements EventPublisher  {
             }
         }
 
-        order.save(failOnError: true)
+        order.save(flush: true, failOnError: true)
         return order
     }
 
@@ -399,6 +399,7 @@ class PutawayService implements EventPublisher  {
         orderItem.recipient = putawayItem.recipient
         orderItem.originBinLocation = putawayItem.currentLocation
         orderItem.destinationBinLocation = putawayItem.putawayLocation
+        orderItem.containerLocation = putawayItem.containerLocation
         return orderItem
     }
 

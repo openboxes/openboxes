@@ -4,6 +4,7 @@ import org.pih.warehouse.api.Putaway
 import org.pih.warehouse.api.PutawayTaskStatus
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
+import org.pih.warehouse.core.ReasonCode
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
@@ -42,6 +43,7 @@ class PutawayTask {
     Location facility
     Location container                  // container scanned during putaway
     Location destination                // target storage or outbound staging
+    ReasonCode discrepancyReasonCode
 
     // Auditing fields
     Date dateCreated
@@ -63,6 +65,7 @@ class PutawayTask {
         completedBy nullable: true
         putawayOrder nullable: true
         putawayOrderItem nullable: true
+        discrepancyReasonCode nullable: true
     }
 
     static mapping = {
@@ -80,7 +83,7 @@ class PutawayTask {
                 identifier   : identifier,
                 inventoryItem: inventoryItem,
                 facility     : facility?.toBaseJson(),
-                location     : location.toJson(location?.locationType?.locationTypeCode),
+                location     : location?.toJson(location?.locationType?.locationTypeCode),
                 quantity     : quantity,
                 container    : container?.toJson(container?.locationType?.locationTypeCode),
                 destination  : destination?.toJson(destination?.locationType?.locationTypeCode),
