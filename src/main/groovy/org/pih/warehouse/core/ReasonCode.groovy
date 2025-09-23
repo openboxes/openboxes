@@ -68,8 +68,14 @@ enum ReasonCode {
     INSUFFICIENT_QUANTITY_AVAILABLE(36),
     BACKORDER(37),
     DUPLICATE_REQUEST(38),
+    QUARANTINE(39),
+    LOCATION_CAPACITY_INSUFFICIENT(40),
+    LOCATION_BLOCKED(41),
+    LOCATION_RESTRICTED(42),
+    LOCATION_MISMATCH(43),
+    OVERAGE(44),
+    WRONG_ITEM(45),
     OTHER(100)
-
 
     final Integer sortOrder
 
@@ -205,6 +211,21 @@ enum ReasonCode {
         [
                 CLINICAL_JUDGMENT,
                 INSUFFICIENT_QUANTITY_AVAILABLE,
+        ]
+    }
+
+    static listPutawayDiscrepancyCodes() {
+        [
+                MISSING,
+                DAMAGED,
+                EXPIRED,
+                QUARANTINE,
+                LOCATION_CAPACITY_INSUFFICIENT,
+                LOCATION_BLOCKED,
+                LOCATION_RESTRICTED,
+                LOCATION_MISMATCH,
+                OVERAGE,
+                WRONG_ITEM
         ]
     }
 }

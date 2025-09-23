@@ -111,6 +111,13 @@ enum ActivityCode {
     // Inbound sortation
     INBOUND_SORTATION('INBOUND_SORTATION'),
 
+    // Putaway discrepancy
+    PUTAWAY_DISCREPANCY('PUTAWAY_DISCREPANCY'),
+    LOST_AND_FOUND('LOST_AND_FOUND'),
+
+    // Putaway container codes
+    PUTAWAY_CART('PUTAWAY_CART'),
+
     NONE('NONE')
 
     final String id
@@ -177,7 +184,9 @@ enum ActivityCode {
                 // Picking strategies
                 PICKING_STRATEGY_AUTOMATIC_REALLOCATION,
 
-                INBOUND_SORTATION
+                INBOUND_SORTATION,
+                LOST_AND_FOUND,
+                PUTAWAY_CART
         ]
     }
 

@@ -31,6 +31,8 @@ class ReasonCodeApiController {
             reasonCodes.addAll(getReasonCodes(ReasonCode.listRequisitionQuantityChangeReasonCodes()))
         } else if (ActivityCode.ADJUST_INVENTORY in activityCodes) {
             reasonCodes.addAll(getReasonCodes(ReasonCode.listInventoryAdjustmentReasonCodes()))
+        } else if (ActivityCode.PUTAWAY_DISCREPANCY in activityCodes) {
+            reasonCodes.addAll(getReasonCodes(ReasonCode.listPutawayDiscrepancyCodes()))
         } else {
             reasonCodes.addAll(getReasonCodes(ReasonCode.listDefault()))
         }
