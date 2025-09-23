@@ -1,11 +1,12 @@
 import React from 'react';
 
+import PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
 
 import useTranslate from 'hooks/useTranslate';
 import HeaderWrapper from 'wrappers/HeaderWrapper';
 
-const InboundHeader = () => {
+const InboundHeader = ({ showHeaderStatus }) => {
   const { headerInfo, headerStatus } = useSelector((state) => ({
     headerInfo: state.inbound.headerInfo,
     headerStatus: state.inbound.headerStatus,
@@ -29,11 +30,9 @@ const InboundHeader = () => {
             </>
           )}
         </h5>
-        {headerStatus?.text && (
-          <span
-            className={headerStatus.className}
-          >
-              {headerStatus.text}
+        {showHeaderStatus && headerStatus && (
+          <span className="shipment-status">
+            {headerStatus}
           </span>
         )}
       </div>
@@ -42,3 +41,11 @@ const InboundHeader = () => {
 };
 
 export default InboundHeader;
+
+InboundHeader.propTypes = {
+  showHeaderStatus: PropTypes.bool,
+};
+
+InboundHeader.defaultProps = {
+  showHeaderStatus: false,
+};
