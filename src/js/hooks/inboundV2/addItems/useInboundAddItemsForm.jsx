@@ -30,6 +30,7 @@ import useSpinner from 'hooks/useSpinner';
 import useTranslate from 'hooks/useTranslate';
 import apiClient from 'utils/apiClient';
 import confirmationModal from 'utils/confirmationModalUtils';
+import createInboundWorkflowHeader from 'utils/createInboundWorkflowHeader';
 import dateWithoutTimeZone from 'utils/dateUtils';
 
 const useInboundAddItemsForm = ({
@@ -602,13 +603,7 @@ const useInboundAddItemsForm = ({
 
       };
       dispatch(
-        updateWorkflowHeader([
-          { text: data.identifier, color: '#000000', delimeter: ' - ' },
-          { text: data.origin.name, color: '#004d40', delimeter: ' to ' },
-          { text: data.destination.name, color: '#01579b', delimeter: ', ' },
-          { text: data.dateRequested, color: '#4a148c', delimeter: ', ' },
-          { text: data.description, color: '#770838', delimeter: '' },
-        ], {}, 'Inbound'),
+        updateWorkflowHeader(createInboundWorkflowHeader(data), data.displayStatus.name),
       );
       setValue('values', transformedData);
       setValue('totalCount', totalCount || 1);
@@ -617,7 +612,7 @@ const useInboundAddItemsForm = ({
 
   const fetchData = async () => {
     if (!queryParams.id) {
-      dispatch(updateWorkflowHeader([], {}, 'Inbound'));
+      dispatch(updateWorkflowHeader([], null));
       previous();
       return;
     }
@@ -631,7 +626,7 @@ const useInboundAddItemsForm = ({
         await fetchLineItems();
       }
     } catch {
-      dispatch(updateWorkflowHeader([], {}, 'Inbound'));
+      dispatch(updateWorkflowHeader([], null));
       // In case of an error, redirect to the "create" step without the id parameter
       history.push({
         pathname: location.pathname,

@@ -810,11 +810,10 @@ export const eraseDraft = (locationId, tab) => ({
   payload: { locationId, tab },
 });
 
-export const updateWorkflowHeader = (headerInfo, headerStatus, workflowName) => ({
+export const updateWorkflowHeader = (headerInfo, headerStatus) => ({
   type: UPDATE_WORKFLOW_HEADER,
   payload: {
     headerInfo,
     headerStatus,
-    workflowName,
   },
 });
