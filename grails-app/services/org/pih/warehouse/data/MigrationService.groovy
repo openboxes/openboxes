@@ -565,7 +565,7 @@ class MigrationService {
                         "transaction. Skipping migrating this one as it won't have effect on the stock."
                 it.disableRefresh = true
                 it.delete(flush: true, failOnError: true)
-                return
+                continue
             }
             previousTransactionDate = it.transactionDate
 
@@ -576,7 +576,7 @@ class MigrationService {
             if (!entries) {
                 it.disableRefresh = true
                 it.delete(flush: true, failOnError: true)
-                return
+                continue
             }
 
             // Find all products in entries (and create inventory baseline for these)
