@@ -16,6 +16,7 @@ import useInboundCreateValidation from 'hooks/inboundV2/create/useInboundCreateV
 import useQueryParams from 'hooks/useQueryParams';
 import useSpinner from 'hooks/useSpinner';
 import apiClient from 'utils/apiClient';
+import createInboundWorkflowHeader from 'utils/createInboundWorkflowHeader';
 import dateWithoutTimeZone from 'utils/dateUtils';
 
 const useInboundCreateForm = ({ next }) => {
@@ -137,7 +138,7 @@ const useInboundCreateForm = ({ next }) => {
 
   const fetchData = async () => {
     if (!queryParams.id) {
-      dispatch(updateWorkflowHeader([]));
+      dispatch(updateWorkflowHeader([], null));
       return;
     }
     spinner.show();
@@ -161,16 +162,10 @@ const useInboundCreateForm = ({ next }) => {
       // We set {} for headerStatus in the create step because we only want to display it on the
       // last step
       dispatch(
-        updateWorkflowHeader([
-          { text: data.identifier, color: '#000000', delimeter: ' - ' },
-          { text: data.origin.name, color: '#004d40', delimeter: ' to ' },
-          { text: data.destination.name, color: '#01579b', delimeter: ', ' },
-          { text: data.dateRequested, color: '#4a148c', delimeter: ', ' },
-          { text: data.description, color: '#770838', delimeter: '' },
-        ]),
+        updateWorkflowHeader(createInboundWorkflowHeader(data), data.displayStatus?.name),
       );
     } catch {
-      dispatch(updateWorkflowHeader([]));
+      dispatch(updateWorkflowHeader([], null));
       history.push({
         pathname: location.pathname,
         search: queryString.stringify({

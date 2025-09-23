@@ -16,6 +16,7 @@ import useQueryParams from 'hooks/useQueryParams';
 import useSpinner from 'hooks/useSpinner';
 import useTranslate from 'hooks/useTranslate';
 import apiClient from 'utils/apiClient';
+import createInboundWorkflowHeader from 'utils/createInboundWorkflowHeader';
 
 const useInboundSendForm = () => {
   const {
@@ -97,13 +98,10 @@ const useInboundSendForm = () => {
       });
 
       dispatch(
-        updateWorkflowHeader([
-          { text: data.identifier, color: '#000000', delimeter: ' - ' },
-          { text: data.origin.name, color: '#004d40', delimeter: ' to ' },
-          { text: data.destination.name, color: '#01579b', delimeter: ', ' },
-          { text: data.dateRequested, color: '#4a148c', delimeter: ', ' },
-          { text: data.description, color: '#770838', delimeter: '' },
-        ], data.displayStatus.name),
+        updateWorkflowHeader(
+          createInboundWorkflowHeader(data),
+          data.displayStatus.name,
+        ),
       );
     } finally {
       spinner.hide();

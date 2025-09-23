@@ -14,8 +14,8 @@ export default function inboundReducer(state = initialState, action) {
 
       return {
         ...state,
-        headerInfo: action.payload.headerInfo ?? state.headerInfo,
-        headerStatus: action.payload.headerStatus ?? state.headerStatus,
+        headerInfo: action.payload.headerInfo,
+        headerStatus: action.payload.headerStatus,
       };
 
     default:
