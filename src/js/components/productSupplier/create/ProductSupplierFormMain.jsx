@@ -57,6 +57,7 @@ const ProductSupplierFormMain = ({ formProps }) => {
           packageSpecification: errors?.packageSpecification,
           fixedPrice: errors?.fixedPrice,
         }}
+        triggerValidation={triggerValidation}
         setProductPackageQuantity={setProductPackageQuantity}
       />
       <AttributesSection
