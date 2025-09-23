@@ -24,41 +24,44 @@ class PutawayTaskService {
     GrailsApplication grailsApplication
     InventoryService inventoryService
 
-    @Transactional(readOnly = true)
-    List search(Location facility, Product product, Location container, StatusCategory statusCategory, Map params) {
-        log.info "search putaway tasks " + params + " product=" + product?.toJson() + " facility " + facility
-        Integer max = Math.min((params.int('max') ?: 10), 100) as Integer
-        Integer offset = params.int('offset') ?: 0 as Integer
-        String sort = params.sort ?: 'dateCreated'
-        String order = (params.order ?: 'desc').toLowerCase() in ['asc', 'desc'] ? params.order : 'desc' as Integer
+        @Transactional(readOnly = true)
+        List search(Location facility, Product product, Location container, StatusCategory statusCategory, Order order, Map params) {
+            log.info "search putaway tasks " + params + " product=" + product?.toJson() + " facility " + facility
+            Integer max = Math.min((params.int('max') ?: 10), 100) as Integer
+            Integer offset = params.int('offset') ?: 0 as Integer
+            String sort = params.sort ?: 'dateCreated'
+            String orderDir = (params.order ?: 'desc').toLowerCase() in ['asc', 'desc'] ? params.order : 'desc' as Integer
 
-        // Get user-provided statuses
-        List<PutawayTaskStatus> statuses = params.list("status").collect { it as PutawayTaskStatus }
+            // Get user-provided statuses
+            List<PutawayTaskStatus> statuses = params.list("status").collect { it as PutawayTaskStatus }
 
-        // Resolve the status category to a set of statuses and added to user-provided
-        //StatusCategory statusCategory = params.statusCategory as StatusCategory
-        List<PutawayTaskStatus> statusesByStatusCategory = PutawayTaskStatus.toSet(statusCategory)
-        statuses += statusesByStatusCategory
+            // Resolve the status category to a set of statuses and added to user-provided
+            //StatusCategory statusCategory = params.statusCategory as StatusCategory
+            List<PutawayTaskStatus> statusesByStatusCategory = PutawayTaskStatus.toSet(statusCategory)
+            statuses += statusesByStatusCategory
 
-        // Search for putaway tasks based on user-provided search parameters
-        List<PutawayTask> tasks = PutawayTask.where {
-            if (statuses) {
-                status in statuses
-            }
-            if (product) {
-                product == product
-            }
-            if (facility) {
-                facility == facility
-            }
-            if (container) {
-                container == container
-            }
+            // Search for putaway tasks based on user-provided search parameters
+            List<PutawayTask> tasks = PutawayTask.where {
+                if (statuses) {
+                    status in statuses
+                }
+                if (product) {
+                    product == product
+                }
+                if (facility) {
+                    facility == facility
+                }
+                if (container) {
+                    container == container
+                }
+                if (order) {
+                    putawayOrder == order
+                }
 
-        }.list(max: max, offset: offset, sort: sort, order: order)
+            }.list(max: max, offset: offset, sort: sort, order: orderDir)
 
-        return tasks
-    }
+            return tasks
+        }
 
     PutawayTask get(String id) {
         if (!id) return null
