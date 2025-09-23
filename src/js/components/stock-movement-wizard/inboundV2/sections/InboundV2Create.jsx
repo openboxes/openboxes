@@ -17,7 +17,6 @@ import { FormErrorPropType } from 'utils/propTypes';
 const InboundV2Create = ({
   control,
   errors,
-  isValid,
   stockLists,
   trigger,
 }) => {
@@ -170,7 +169,7 @@ const InboundV2Create = ({
           defaultLabel="Next"
           variant="primary"
           type="submit"
-          disabled={!isValid}
+          disabled={!!Object.keys(errors).length}
         />
       </div>
     </>
@@ -189,7 +188,6 @@ InboundV2Create.propTypes = {
     dateRequested: FormErrorPropType,
   }).isRequired,
   control: PropTypes.shape({}).isRequired,
-  isValid: PropTypes.bool.isRequired,
   trigger: PropTypes.func.isRequired,
   stockLists: PropTypes.arrayOf(PropTypes.shape({
     id: PropTypes.string.isRequired,
