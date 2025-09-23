@@ -43,14 +43,6 @@
     min-height: unset;
   }
 
-  .buttons-container {
-    display: flex;
-    gap: 4px;
-    .icon {
-      @include set-size(16px, 16px);
-    }
-  }
-
   .custom-select-error-placeholder {
 
     svg {
@@ -102,4 +94,12 @@ input.hide-arrows::-webkit-inner-spin-button {
 /* Firefox */
 input.hide-arrows[type=number] {
   -moz-appearance: textfield;
+}
+
+.buttons-container {
+  display: flex;
+  gap: 4px;
+  .icon {
+    @include set-size(16px, 16px);
+  }
 }

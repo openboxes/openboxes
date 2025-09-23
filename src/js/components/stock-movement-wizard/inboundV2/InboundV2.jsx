@@ -62,7 +62,6 @@ const InboundV2 = () => {
   const {
     errors,
     control,
-    isValid,
     trigger,
     handleSubmit,
     onSubmitStockMovementDetails,
@@ -72,7 +71,6 @@ const InboundV2 = () => {
   const createComponentProps = {
     control,
     errors,
-    isValid,
     next,
     trigger,
     stockLists,
@@ -124,21 +122,17 @@ const InboundV2 = () => {
     exportTemplate,
   };
 
-  const sendComponentProps = {
-    previous,
-  };
-
   return (
     <PageWrapper>
       <WizardStepsV2 steps={stepsTitles} currentStepKey={Step.key} />
-      <InboundHeader />
+      <InboundHeader showHeaderStatus={is(inboundV2Step.SEND)} />
       <form onSubmit={handleSubmit(onSubmitStockMovementDetails)}>
         {is(inboundV2Step.CREATE) && (<Step.Component {...createComponentProps} />)}
       </form>
 
       {is(inboundV2Step.ADD_ITEMS) && (<Step.Component {...addItemsComponentProps} />)}
 
-      {is(inboundV2Step.SEND) && (<Step.Component {...sendComponentProps} />)}
+      {is(inboundV2Step.SEND) && (<Step.Component previous={previous} />)}
     </PageWrapper>
   );
 };
