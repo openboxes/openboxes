@@ -15,7 +15,7 @@ const useProductSupplierValidation = () => {
   } = useProductSupplierAttributes();
 
   const validationSchema = (data) => {
-    const checkNecessityOfContractPrice = () => {
+    const requiresContractPrice = () => {
       if (data.fixedPrice.contractPricePrice) {
         return true;
       }
@@ -230,7 +230,7 @@ const useProductSupplierValidation = () => {
       contractPricePrice: z
         .number()
         .optional()
-        .refine(checkNecessityOfContractPrice, {
+        .refine(requiresContractPrice, {
           message: 'Contract price is required',
         }),
       contractPriceValidUntil: z
