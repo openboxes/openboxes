@@ -61,7 +61,7 @@ class PutawayController {
 
         flash.message = "Rollback was completed successfully for putaway ${putaway.putawayNumber}"
 
-        redirect(controller: "order", action: "show", id: id)
+        redirect(controller: "putaway", action: "show", id: id)
     }
 
     def generateTasks(String id) {
@@ -70,7 +70,7 @@ class PutawayController {
 
         flash.message = "Successfully generated tasks for putaway ${putaway.putawayNumber}"
 
-        redirect(controller: "order", action: "show", id: id)
+        redirect(controller: "putaway", action: "show", id: id)
     }
 
 
@@ -95,7 +95,7 @@ class PutawayController {
         }
 
         renderPdf(
-                template: "/putAway/print",
+                template: "/putaway/print",
                 model: [jsonObject: jsonObject],
                 filename: "Putaway ${putaway?.putawayNumber}.pdf"
         )

@@ -102,7 +102,7 @@
                         <img src="${resource(dir: 'images/icons/silk', file: 'page_add.png')}" />&nbsp;
                         <warehouse:message code="order.addDocument.label" default="Add document"/>
                     </g:link>
-                    <g:link controller="putAway" action="generatePdf" id="${orderInstance?.id}" class="button" target="_blank">
+                    <g:link controller="putaway" action="generatePdf" id="${orderInstance?.id}" class="button" target="_blank">
                         <img src="${resource(dir: 'images/icons', file: 'pdf.png')}" />&nbsp;
                         <warehouse:message code="putaway.generatePutawayList.label" default="Generate Putaway List"/>
                     </g:link>
@@ -113,15 +113,15 @@
                         <warehouse:message code="order.wizard.showOrder.label" default="Show Putaway"/>
                     </g:link>
                     <g:set var="disabled" value="${orderInstance?.status in [OrderStatus.COMPLETED, OrderStatus.CANCELED]}"/>
-                    <g:link controller="putAway" action="create" id="${orderInstance?.id}" class="button" disabled="${disabled}" disabledMessage="This feature is not available for completed and canceled putaways">
+                    <g:link controller="putaway" action="create" id="${orderInstance?.id}" class="button" disabled="${disabled}" disabledMessage="This feature is not available for completed and canceled putaways">
                         <img src="${resource(dir: 'images/icons/silk', file: 'cart_edit.png')}" />&nbsp;
                         <warehouse:message code="default.edit.label" args="[warehouse.message(code:'putawayOrder.label')]"/>
                     </g:link>
-                    <g:link controller="putAway" action="rollback" id="${orderInstance.id}" class="button">
+                    <g:link controller="putaway" action="rollback" id="${orderInstance.id}" class="button">
                         <img src="${resource(dir: 'images/icons/silk', file: 'arrow_undo.png')}" />&nbsp;
                         <g:message code="default.rollback.label" args="[g.message(code: 'order.label')]" default="Rollback Putaway"/>
                     </g:link>
-%{--                    <g:link controller="putAway" action="generateTasks" id="${orderInstance.id}" class="button">--}%
+%{--                    <g:link controller="putaway" action="generateTasks" id="${orderInstance.id}" class="button">--}%
 %{--                        <img src="${resource(dir: 'images/icons/silk', file: 'lightning.png')}" />&nbsp;--}%
 %{--                        <g:message code="default.generate.label" args="[g.message(code: 'tasks.label')]" default="Generate Tasks"/>--}%
 %{--                    </g:link>--}%

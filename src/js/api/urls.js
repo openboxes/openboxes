@@ -115,7 +115,7 @@ export const LOCATION_IMPORT = `${CONTEXT_PATH}${LOCATION_API}/importCsv`;
 export const LOCATION = (id) => `${LOCATION_API}/${id}`;
 
 // PUTAWAY
-export const PUTAWAY_GENERATE_PDF = (id) => `/putAway/generatePdf/${id}`;
+export const PUTAWAY_GENERATE_PDF = (id) => `/putaway/generatePdf/${id}`;
 
 // SUPPORT LINKS
 export const SUPPORT_LINKS = `${CONTEXT_PATH}${API}/supportLinks`;
