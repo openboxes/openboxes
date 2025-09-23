@@ -117,8 +117,6 @@ enum ActivityCode {
 
     // Putaway container codes
     PUTAWAY_CART('PUTAWAY_CART'),
-    PICK_CART("PICK_CART"),
-    OUTBOUND_STAGING('OUTBOUND_STAGING'),
 
     NONE('NONE')
 
@@ -188,9 +186,7 @@ enum ActivityCode {
 
                 INBOUND_SORTATION,
                 LOST_AND_FOUND,
-                PUTAWAY_CART,
-                PICK_CART,
-                OUTBOUND_STAGING
+                PUTAWAY_CART
         ]
     }
 

@@ -238,14 +238,8 @@ class PutawayTaskService {
             throw new IllegalStateException("Container does not exist")
         }
 
-        def allowedActivityCodes = [
-                ActivityCode.PUTAWAY_CART,
-                ActivityCode.PICK_CART,
-                ActivityCode.OUTBOUND_STAGING
-        ]
-        if (!container.supportsAny(allowedActivityCodes as ActivityCode[])) {
-            throw new IllegalArgumentException("Container ${container?.name} must support at least one of the following activities: " +
-                    "PUTAWAY_CART, PICK_CART, or OUTBOUND_STAGING.")
+        if (!container.supports(ActivityCode.PUTAWAY_CART)) {
+            throw new IllegalArgumentException("Container ${container?.name} must support PUTAWAY_CART activity")
         }
 
         // validate that the container matches the task putaway container
