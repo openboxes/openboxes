@@ -2,10 +2,11 @@ import * as locales from 'date-fns/locale';
 
 import { DateFormatDateFns } from 'consts/timeFormat';
 import {
+  displayTimezoneOffset,
   formatDateToDateOnlyString,
-  formatDateToLocalDateString,
-  formatDateToZonedDateTimeString,
-  parseDateToString,
+  formatDateToDatetimeString,
+  formatDateToString,
+  formatDateToZonedDateTimeString, getTimezone, getTimezoneOffset, getUserTimezone,
   parseStringToDate,
 } from 'utils/dateUtils';
 
@@ -13,9 +14,11 @@ describe('parseStringToDate()', () => {
   it('should return null if date is empty', () => {
     const nullDate = parseStringToDate({
       date: null,
+      dateOnly: true,
     });
     const emptyStringDate = parseStringToDate({
       date: '',
+      dateOnly: true,
     });
     expect(nullDate).toBe(null);
     expect(emptyStringDate).toBe(null);
@@ -24,7 +27,7 @@ describe('parseStringToDate()', () => {
   it('should return parsed date without time when date without time is passed', () => {
     const date = parseStringToDate({
       date: '2025-09-18',
-      localDate: false,
+      dateOnly: true,
       options: {
         providedDateFormat: DateFormatDateFns.YYYY_MM_DD,
       },
@@ -40,7 +43,7 @@ describe('parseStringToDate()', () => {
   it('should return parsed date without time when date with time is passed', () => {
     const date = parseStringToDate({
       date: '2025-09-18T14:30:15',
-      localDate: false,
+      dateOnly: true,
       options: {
         providedDateFormat: DateFormatDateFns.YYYY_MM_DD_HH_MM_SS,
       },
@@ -80,7 +83,7 @@ describe('parseStringToDate()', () => {
   it('should return the same date when timezone is ahead of UTC', () => {
     const date = parseStringToDate({
       date: '2025-01-01T00:00+07:00',
-      localDate: false,
+      dateOnly: true,
       options: {
         providedDateFormat: DateFormatDateFns.YYYY_MM_DD_HH_MM_Z,
       },
@@ -106,12 +109,12 @@ describe('parseStringToDate()', () => {
   });
 });
 
-describe('parseDateToString()', () => {
+describe('formatDateToString()', () => {
   it('should return null if date is empty', () => {
-    const nullDate = parseDateToString({
+    const nullDate = formatDateToString({
       date: null,
     });
-    const emptyStringDate = parseDateToString({
+    const emptyStringDate = formatDateToString({
       date: '',
     });
     expect(nullDate).toBe(null);
@@ -119,15 +122,7 @@ describe('parseDateToString()', () => {
   });
 
   it('should format date properly', () => {
-    const date = parseDateToString({
-      date: new Date(2025, 8, 19),
-      dateFormat: DateFormatDateFns.MM_DD_YYYY,
-    });
-    expect(date).toBe('09/19/2025');
-  });
-
-  it('should format date properly', () => {
-    const date = parseDateToString({
+    const date = formatDateToString({
       date: new Date(2025, 8, 19),
       dateFormat: DateFormatDateFns.MM_DD_YYYY,
     });
@@ -135,17 +130,17 @@ describe('parseDateToString()', () => {
   });
 
   it('should format date in specified locale properly', () => {
-    const esDate = parseDateToString({
+    const esDate = formatDateToString({
       date: new Date(2025, 8, 19),
       dateFormat: DateFormatDateFns.MMM_DD_YYYY,
       options: { locale: locales.es },
     });
-    const frDate = parseDateToString({
+    const frDate = formatDateToString({
       date: new Date(2025, 8, 19),
       dateFormat: DateFormatDateFns.MMM_DD_YYYY,
       options: { locale: locales.fr },
     });
-    const plDate = parseDateToString({
+    const plDate = formatDateToString({
       date: new Date(2025, 8, 19),
       dateFormat: DateFormatDateFns.MMM_DD_YYYY,
       options: { locale: locales.pl },
@@ -154,6 +149,29 @@ describe('parseDateToString()', () => {
     expect(frDate).toBe('sept. 19, 2025');
     expect(plDate).toBe('wrz 19, 2025');
   });
+
+  it('should format date with time component properly', () => {
+    const date = formatDateToString({
+      date: new Date(2025, 8, 19, 15, 10, 5),
+      dateFormat: DateFormatDateFns.MMM_DD_YYYY_HH_MM_SS,
+    });
+    expect(date).toBe('Sep 19, 2025 15:10:05');
+  });
+
+  it('should format date with time component in specified locale properly', () => {
+    const esDate = formatDateToString({
+      date: new Date(2025, 8, 19, 15, 10, 5),
+      dateFormat: DateFormatDateFns.MMM_DD_YYYY_HH_MM_SS,
+      options: { locale: locales.es },
+    });
+    const frDate = formatDateToString({
+      date: new Date(2025, 8, 19, 15, 10, 5),
+      dateFormat: DateFormatDateFns.MMM_DD_YYYY_HH_MM_SS,
+      options: { locale: locales.fr },
+    });
+    expect(esDate).toBe('sep 19, 2025 15:10:05');
+    expect(frDate).toBe('sept. 19, 2025 15:10:05');
+  });
 });
 
 describe('formatDateToZonedDateTimeString()', () => {
@@ -161,36 +179,43 @@ describe('formatDateToZonedDateTimeString()', () => {
     const date = formatDateToZonedDateTimeString(
       new Date(2025, 8, 19),
     );
-    // examples that should match the following expression:
+    // examples that should pass the following comparison:
     // 09/19/2025 00:00 +02:00
     // 09/19/2025 00:00 -05:00
-    expect(date).toMatch(/^09\/19\/2025 00:00 [+-]\d{2}:\d{2}$/);
+    expect(date).toBe(`09/19/2025 00:00 ${displayTimezoneOffset()}`);
   });
 });
 
-describe('formatDateToLocalDateString()', () => {
+describe('formatDateToDatetimeString()', () => {
   it('should return date string without timezone', () => {
-    const date = formatDateToLocalDateString(
+    const date = formatDateToDatetimeString(
       new Date(2025, 8, 19),
     );
 
-    expect(date).not.toMatch(/^19\/Sep\/2025 00:00 [+-]\d{2}:\d{2}$/);
-    expect(date).toMatch(/^19\/Sep\/2025/);
+    expect(date).toBe('19/Sep/2025');
   });
 
   it('should return date in proper locale', () => {
-    const esDate = formatDateToLocalDateString(
+    const esDate = formatDateToDatetimeString(
       new Date(2025, 8, 19),
       locales.es,
     );
 
-    const frDate = formatDateToLocalDateString(
+    const frDate = formatDateToDatetimeString(
       new Date(2025, 8, 19),
       locales.fr,
     );
 
     expect(esDate).toBe('19/sep/2025');
     expect(frDate).toBe('19/sept./2025');
+  });
+
+  it('should return date-only when date with time component is passed', () => {
+    const date = formatDateToDatetimeString(
+      new Date(2025, 8, 19, 15, 10, 5),
+    );
+
+    expect(date).toBe('19/Sep/2025');
   });
 });
 
@@ -203,7 +228,7 @@ describe('formatDateToDateOnlyString()', () => {
   it('should skip timezone', () => {
     const date = parseStringToDate({
       date: '2025-09-19T1:22+07:00',
-      localDate: false,
+      dateOnly: true,
       options: {
         providedDateFormat: DateFormatDateFns.YYYY_MM_DD_HH_MM_Z,
       },
@@ -225,5 +250,27 @@ describe('formatDateToDateOnlyString()', () => {
 
     expect(esDate).toBe('19/sep/2025');
     expect(frDate).toBe('19/sept./2025');
+  });
+
+  describe('displayTimezoneOffset()', () => {
+    it('should return offset behind UTC', () => {
+      const offset = displayTimezoneOffset(-120);
+      expect(offset).toBe('+02:00');
+    });
+
+    it('should return offset after UTC', () => {
+      const offset = displayTimezoneOffset(180);
+      expect(offset).toBe('-03:00');
+    });
+
+    it('should return offset with minutes greater than 0', () => {
+      const offset = displayTimezoneOffset(-150);
+      expect(offset).toBe('+02:30');
+    });
+
+    it('should return 0 offset', () => {
+      const offset = displayTimezoneOffset(0);
+      expect(offset).toBe('+00:00');
+    });
   });
 });
