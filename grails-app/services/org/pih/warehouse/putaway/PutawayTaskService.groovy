@@ -216,7 +216,7 @@ class PutawayTaskService {
     void start(PutawayTask task) {
         task.dateStarted = new Date()
         task.assignee = AuthService.currentUser
-        executeStateTransition(task, PutawayTaskStatus.IN_PROGRESS)
+        executeStateTransition(task, PutawayTaskStatus.STARTED)
         save(task)
     }
 
@@ -258,7 +258,7 @@ class PutawayTaskService {
         }
 
         // Execute state transition
-        executeStateTransition(task, PutawayTaskStatus.IN_TRANSIT)
+        executeStateTransition(task, PutawayTaskStatus.IN_PROGRESS)
 
         // Transfer stock from origin to putaway container
         // FIXME can't figure out the best way to make this
