@@ -89,10 +89,6 @@
                     <img src="${resource(dir: 'images/icons/silk', file: 'application_view_list.png')}" />&nbsp;
                     <warehouse:message code="default.list.label" args="[g.message(code: 'orders.label')]" default="List orders"/>
                 </g:link>
-                <g:link controller="order" action="create" class="button">
-                    <img src="${resource(dir: 'images/icons/silk', file: 'add.png')}" />&nbsp;
-                    <warehouse:message code="default.create.label" args="[g.message(code: 'order.label')]" default="Create order" />
-                </g:link>
                 <div class="button-group right">
                     <g:link controller="order" action="addComment" id="${orderInstance?.id}" class="button">
                         <img src="${resource(dir: 'images/icons/silk', file: 'comment_add.png')}" />&nbsp;
