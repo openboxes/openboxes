@@ -9,6 +9,8 @@
  * */
 package org.pih.warehouse.requisition
 
+import org.pih.warehouse.core.DeliveryTypeCode
+import org.pih.warehouse.core.OrderTypeCode
 import org.pih.warehouse.inboundSortation.DemandTypeCode
 import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.shipping.Shipment
@@ -124,6 +126,13 @@ class Requisition implements Comparable<Requisition>, Serializable {
     Date dateRejected
     Boolean approvalRequired
 
+    // Temporary until we add the original order associated with this request
+    OrderTypeCode orderTypeCode
+
+    // Fulfillment properties
+    Integer priority
+    DeliveryTypeCode deliveryTypeCode
+
     // Removed comments, documents, events for the time being.
     static transients = [
             "sortedStocklistItems",
@@ -153,6 +162,8 @@ class Requisition implements Comparable<Requisition>, Serializable {
         comments joinTable: [name: "requisition_comment", key: "requisition_id"], cascade: "all-delete-orphan"
         events joinTable: [name: "requisition_event", key: "requisition_id"]
         approvers joinTable: [name: "requisition_approvers", key: "requisition_id"]
+        deliveryTypeCode enumType: "string"
+        orderTypeCode enumType: "string"
     }
 
     static constraints = {
