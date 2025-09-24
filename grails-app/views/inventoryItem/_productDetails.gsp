@@ -51,6 +51,12 @@
                     <td class="value">
                         <div>
                             ${g.formatNumber(number: totalQuantityAvailableToPromise, format: '###,###,###') }
+                            <g:if test="${productInstance?.unitOfMeasure }">
+                                <format:metadata obj="${productInstance?.unitOfMeasure}"/>
+                            </g:if>
+                            <g:else>
+                                ${warehouse.message(code:'default.each.label') }
+                            </g:else>
                         </div>
                     </td>
                 </tr>
@@ -158,6 +164,22 @@
                         </td>
                     </tr>
                 </g:if>
+                <g:if test="${inventoryLevel?.assignedLocations}">
+                    <tr class="prop">
+                        <td class="label">
+                            <label><warehouse:message code="inventoryLevel.assignedLocations.label" default="Assigned locations"/></label>
+                        </td>
+                        <td class="value">
+                            <g:if test="${inventoryLevel.assignedLocations}">
+                                ${inventoryLevel?.assignedLocations.join(" : ")}
+                            </g:if>
+                            <g:else>
+                                ${warehouse.message(code:'default.none.label')}
+                            </g:else>
+                        </td>
+                    </tr>
+                </g:if>
+
             </g:if>
             <g:set var="latestInventoryDate"
                value="${productInstance?.latestInventoryDate(session.warehouse.id)}" />
