@@ -63,16 +63,6 @@
                                         <format:metadata obj="${orderInstance?.orderType?.name}"/>
                                     </td>
                                 </tr>
-                                <g:if test="${orderInstance.orderType?.code == OrderTypeCode.PURCHASE_ORDER.name()}">
-                                    <tr class="prop">
-                                        <td valign="top" class="name">
-                                            <label><warehouse:message code="order.originCode.label"/></label>
-                                        </td>
-                                        <td valign="top" class="value">
-                                            ${orderInstance?.origin?.organization?.code }
-                                        </td>
-                                    </tr>
-                                </g:if>
                                 <tr class="prop">
                                     <td valign="top" class="name">
                                         <label><warehouse:message code="order.origin.label"/></label>
