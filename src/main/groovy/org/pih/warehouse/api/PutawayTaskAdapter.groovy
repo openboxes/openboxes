@@ -53,8 +53,8 @@ class PutawayTaskAdapter {
     static OrderStatus toOrderStatus(PutawayTaskStatus putawayTaskStatus) {
         switch (putawayTaskStatus) {
             case PutawayTaskStatus.PENDING: return OrderStatus.PENDING
-            case PutawayTaskStatus.IN_PROGRESS: return OrderStatus.APPROVED
-            case PutawayTaskStatus.IN_TRANSIT: return OrderStatus.PLACED
+            case PutawayTaskStatus.STARTED: return OrderStatus.APPROVED
+            case PutawayTaskStatus.IN_PROGRESS: return OrderStatus.PLACED
             case PutawayTaskStatus.COMPLETED: return OrderStatus.COMPLETED
             case PutawayTaskStatus.CANCELED: return OrderStatus.CANCELED
             default: return OrderStatus.PENDING
@@ -64,8 +64,8 @@ class PutawayTaskAdapter {
     static OrderItemStatusCode toOrderItemStatusCode(PutawayTaskStatus putawayTaskStatus) {
         switch (putawayTaskStatus) {
             case PutawayTaskStatus.PENDING: return OrderItemStatusCode.PENDING
-            case PutawayTaskStatus.IN_PROGRESS: return OrderItemStatusCode.STARTED
-            case PutawayTaskStatus.IN_TRANSIT: return OrderItemStatusCode.IN_PROGRESS
+            case PutawayTaskStatus.STARTED: return OrderItemStatusCode.STARTED
+            case PutawayTaskStatus.IN_PROGRESS: return OrderItemStatusCode.IN_PROGRESS
             case PutawayTaskStatus.COMPLETED: return OrderItemStatusCode.COMPLETED
             case PutawayTaskStatus.CANCELED: return OrderItemStatusCode.CANCELED
             default: return OrderItemStatusCode.PENDING
@@ -112,8 +112,8 @@ class PutawayTaskAdapter {
         }
         switch (orderItemStatusCode) {
             case OrderItemStatusCode.PENDING: return PutawayTaskStatus.PENDING
-            case OrderItemStatusCode.STARTED: return PutawayTaskStatus.IN_PROGRESS
-            case OrderItemStatusCode.IN_PROGRESS: return PutawayTaskStatus.IN_TRANSIT
+            case OrderItemStatusCode.STARTED: return PutawayTaskStatus.STARTED
+            case OrderItemStatusCode.IN_PROGRESS: return PutawayTaskStatus.IN_PROGRESS
             case OrderItemStatusCode.COMPLETED: return PutawayTaskStatus.COMPLETED
             case OrderItemStatusCode.CANCELED: return PutawayTaskStatus.CANCELED
             default: return PutawayTaskStatus.PENDING
