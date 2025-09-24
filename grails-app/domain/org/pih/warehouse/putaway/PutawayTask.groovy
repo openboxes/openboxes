@@ -2,8 +2,11 @@ package org.pih.warehouse.putaway
 
 import org.pih.warehouse.api.Putaway
 import org.pih.warehouse.api.PutawayTaskStatus
+import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
+import org.pih.warehouse.core.PutawayTypeCode
+import org.pih.warehouse.core.ReasonCode
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
@@ -42,6 +45,7 @@ class PutawayTask {
     Location facility
     Location container                  // container scanned during putaway
     Location destination                // target storage or outbound staging
+    ReasonCode discrepancyReasonCode
 
     // Auditing fields
     Date dateCreated
@@ -63,6 +67,7 @@ class PutawayTask {
         completedBy nullable: true
         putawayOrder nullable: true
         putawayOrderItem nullable: true
+        discrepancyReasonCode nullable: true
     }
 
     static mapping = {
@@ -73,14 +78,22 @@ class PutawayTask {
         version false // Important: Disable optimistic locking for views
     }
 
+    PutawayTypeCode getPutawayTypeCode() {
+        if (!destination) return PutawayTypeCode.UNASSIGNED
+        else if (destination.supports(ActivityCode.CROSS_DOCKING)) { return PutawayTypeCode.CROSS_DOCK }
+        else if (destination.supports(ActivityCode.LOST_AND_FOUND)) { return PutawayTypeCode.QUARANTINE }
+        else { return PutawayTypeCode.STANDARD }
+    }
+
     Map toJson() {
         return [
                 id           : id,
+                type         : putawayTypeCode?.name(),
                 status       : status?.name(),
                 identifier   : identifier,
                 inventoryItem: inventoryItem,
                 facility     : facility?.toBaseJson(),
-                location     : location.toJson(location?.locationType?.locationTypeCode),
+                location     : location?.toJson(location?.locationType?.locationTypeCode),
                 quantity     : quantity,
                 container    : container?.toJson(container?.locationType?.locationTypeCode),
                 destination  : destination?.toJson(destination?.locationType?.locationTypeCode),

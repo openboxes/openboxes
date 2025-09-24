@@ -4,17 +4,24 @@ import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import org.hibernate.ObjectNotFoundException
+import org.pih.warehouse.api.Putaway
+import org.pih.warehouse.api.PutawayItem
+import org.pih.warehouse.api.PutawayStatus
 import org.pih.warehouse.api.PutawayTaskAdapter
 import org.pih.warehouse.api.PutawayTaskStatus
 import org.pih.warehouse.api.StatusCategory
 import org.pih.warehouse.auth.AuthService
+import org.pih.warehouse.core.ActivityCode
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
+import org.pih.warehouse.core.ReasonCode
 import org.pih.warehouse.inventory.InventoryService
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransferStockCommand
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
+import org.pih.warehouse.order.OrderItemStatusCode
 import org.pih.warehouse.order.OrderStatus
 import org.pih.warehouse.product.Product
 
@@ -23,11 +30,12 @@ class PutawayTaskService {
 
     GrailsApplication grailsApplication
     InventoryService inventoryService
+    PutawayService putawayService
 
     @Transactional(readOnly = true)
     List search(Location facility, Product product, Location container, StatusCategory statusCategory, Order order, Map params) {
         log.info "search putaway tasks " + params + " product=" + product?.toJson() + " facility " + facility
-        Integer max = Math.min((params.int('max') ?: 10), 100) as Integer
+        Integer max = Math.min((params.int('max') ?: 50), 100) as Integer
         Integer offset = params.int('offset') ?: 0 as Integer
         String sort = params.sort ?: 'dateCreated'
         String orderDir = (params.order ?: 'desc').toLowerCase() in ['asc', 'desc'] ? params.order : 'desc' as Integer
@@ -107,6 +115,10 @@ class PutawayTaskService {
                 complete(task, data.destination as String, data.completedBy as String, data.force as Boolean)
                 break
 
+            case 'partialComplete':
+                task = partialComplete(task, data.quantity as BigDecimal, data.destination as String, data.force as Boolean, data.reasonCode as ReasonCode)
+                break
+
             case 'rollback':
                 rollback(task)
                 break
@@ -122,7 +134,9 @@ class PutawayTaskService {
 
         // FIXME The putaway task is a view-backed domain, but Grails doesn't know that so any changes to the
         //  task triggers a persistence event. I need to figure out how to make it a read-only domain class.
-        task.discard()
+        if (task) {
+            task.discard()
+        }
 
         // Eventually, we want to save any changes made to the putaway task as a putaway.
         // FIXME  For now the PutawayTask will be a wrapper around Putaway. However, we may want to use just the
@@ -135,6 +149,31 @@ class PutawayTaskService {
         OrderItem orderItem = PutawayTaskAdapter.toOrderItem(task, existingOrderItem)
         log.info "dirty: " + orderItem.dirtyPropertyNames
         log.info "dirty: " + orderItem.order.dirtyPropertyNames
+
+        Order order = orderItem.order
+        // start - putaway task has been assigned and has been started
+        order.approvedBy = task.assignee
+        order.dateApproved = task.dateStarted
+
+        if (task.status == PutawayTaskStatus.COMPLETED) {
+            def allSplitTasks = order.orderItems.findAll {
+                it.parentOrderItem != null &&
+                it.orderItemStatusCode != OrderItemStatusCode.CANCELED
+            }
+
+            boolean allItemsCompleted = allSplitTasks.every {
+                it.orderItemStatusCode == OrderItemStatusCode.COMPLETED
+            }
+
+            // complete - task is fully completed
+            if (allItemsCompleted) {
+                order.status = OrderStatus.COMPLETED
+                order.completedBy = task.completedBy
+                order.dateCompleted = task.dateCompleted
+            }
+        } else {
+            order.status = PutawayTaskAdapter.toOrderStatus(task.status)
+        }
 
         orderItem.save(cascade: true, failOnError:true)
         task.discard()
@@ -170,7 +209,6 @@ class PutawayTaskService {
         Person assignee = assigneeId ? Person.get(assigneeId) : null
         if (assignee) task.assignee = assignee
         save(task)
-
     }
 
     /**
@@ -203,6 +241,10 @@ class PutawayTaskService {
             throw new IllegalStateException("Container does not exist")
         }
 
+        if (!container.supports(ActivityCode.PUTAWAY_CART)) {
+            throw new IllegalArgumentException("Container ${container?.name} must support PUTAWAY_CART activity")
+        }
+
         // validate that the container matches the task putaway container
         if (container != task.container) {
             if (!override) {
@@ -229,14 +271,9 @@ class PutawayTaskService {
     }
 
     void complete(PutawayTask task, String destinationId, String completedById, Boolean force = false) {
-        log.info "complete putaway "
+        log.info "complete putaway"
         if (!task) {
             throw new ObjectNotFoundException(task.id, "Unable to locate putaway task with id ${task.id}")
-        }
-
-        Person completedBy = completedById ? Person.get(completedById) : AuthService.currentUser
-        if (!completedBy) {
-            task.errors.reject("completedBy", "Must provide a valid person or user who completed the putaway task")
         }
 
         // validate destination or user has forced a destination change
@@ -259,6 +296,11 @@ class PutawayTaskService {
             task.destination = destination
         }
 
+        Person completedBy = completedById ? Person.get(completedById) : AuthService.currentUser
+        if (!completedBy) {
+            task.errors.reject("completedBy", "Must provide a valid person or user who completed the putaway task")
+        }
+
         task.dateCompleted = new Date()
         task.completedBy = completedBy
         executeStateTransition(task, PutawayTaskStatus.COMPLETED)
@@ -270,6 +312,82 @@ class PutawayTaskService {
         save(task)
     }
 
+    PutawayTask partialComplete(PutawayTask task, BigDecimal quantity, String destinationId, Boolean force = false, ReasonCode reasonCode = null) {
+        if (quantity > task.quantity) {
+            throw new IllegalArgumentException("Quantity provided is more than requested. Please re-enter quantity")
+        }
+
+        BigDecimal quantityRemaining = task.quantity - quantity
+        if (quantityRemaining <= 0) {
+            throw new IllegalArgumentException("Quantity provided is more than requested. Please re-enter quantity")
+        }
+
+        // validate destination or user has forced a destination change
+        Location destination = Location.get(destinationId)
+        if (!destination) {
+            task.errors.reject("destination", "Destination is required")
+        }
+
+        // validate destination
+        if (task.destination != destination && !force) {
+            task.errors.reject("destination", "Destination provided does not match expected destination")
+        }
+
+        // Update the task destination if the destinations do not match, but user forced change
+        if (task.destination != destination && force) {
+            task.destination = destination
+        }
+
+        if (reasonCode) {
+            task.discrepancyReasonCode = reasonCode
+            def discrepancyLocation = task.facility.internalLocations
+                    .find { it.locationType.name == Constants.DISCREPANCY_LOCATION_TYPE}
+            if (!discrepancyLocation) {
+                throw new IllegalStateException("No discrepancy location found")
+            }
+            task.destination = discrepancyLocation
+        }
+
+        if (task.hasErrors() || !task.validate()) {
+            throw new ValidationException("Validation errors occurred during complete action", task.errors)
+        }
+
+        task.discard()
+
+        OrderItem currentItem = OrderItem.get(task.putawayOrderItem.id)
+        def currentItemParent = currentItem.parentOrderItem
+        currentItem.parentOrderItem = null
+        Order order = currentItem.order
+
+        Putaway putaway = Putaway.createFromOrder(order)
+        if (!putaway.putawayAssignee) {
+            putaway.putawayAssignee = AuthService.currentUser
+        }
+        PutawayItem itemToSplit = putaway.putawayItems.find { it.id == currentItem.id }
+
+        PutawayItem completedSplitItem = createSplitPutawayItem(task, quantity, PutawayStatus.COMPLETED)
+        PutawayItem remainingSplitItem = createSplitPutawayItem(task, quantityRemaining, PutawayStatus.PENDING)
+
+        if (itemToSplit) {
+            itemToSplit.splitItems = [completedSplitItem, remainingSplitItem]
+        }
+        putawayService.savePutaway(putaway)
+
+        transferToDestination(task)
+        save(task)
+
+        currentItem.parentOrderItem = currentItemParent
+        currentItem.orderItemStatusCode = OrderItemStatusCode.CANCELED
+        currentItem.save(flush: true, failOnError: true)
+
+        OrderItem remainingOrderItem = order.orderItems.find {
+            it.parentOrderItem?.id == currentItem.id &&
+                    it.quantity == quantityRemaining &&
+                    it.orderItemStatusCode == OrderItemStatusCode.PENDING
+        } as OrderItem
+
+        return PutawayTaskAdapter.toPutawayTask(remainingOrderItem)
+    }
 
     void transferToContainer(PutawayTask task) {
         TransferStockCommand command = new TransferStockCommand()
@@ -375,7 +493,16 @@ class PutawayTaskService {
         task.status = to
     }
 
-
-
-
+    private PutawayItem createSplitPutawayItem(PutawayTask task, BigDecimal quantity, PutawayStatus status) {
+        return new PutawayItem(
+                quantity: quantity,
+                putawayStatus: status,
+                putawayLocation: task.destination,
+                inventoryItem: task.inventoryItem,
+                product: task.product,
+                currentFacility: task.facility,
+                currentLocation: task.location,
+                containerLocation: task.container
+        )
+    }
 }
