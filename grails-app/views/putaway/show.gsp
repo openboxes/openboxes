@@ -39,112 +39,74 @@
                             </h2>
                             <table>
                                 <tbody>
-                                <tr class="prop">
-                                    <td valign="top" class="name">
-                                        <label><warehouse:message code="order.orderNumber.label"/></label>
-                                    </td>
-                                    <td valign="top" class="value">
-                                        ${orderInstance?.orderNumber}
-                                    </td>
-                                </tr>
-                                <tr class="prop">
-                                    <td valign="top" class="name">
-                                        <label><warehouse:message code="default.status.label" /></label>
-                                    </td>
-                                    <td valign="top" id="status" class="value">
-                                        <span class="${orderInstance?.id}">${g.message(code: 'default.loading.label')}</span>
-                                    </td>
-                                </tr>
-                                <tr class="prop">
-                                    <td valign="top" class="name">
-                                        <label><warehouse:message code="order.orderTypeCode.label" /></label>
-                                    </td>
-                                    <td valign="top" id="orderTypeCode" class="value">
-                                        <format:metadata obj="${orderInstance?.orderType?.name}"/>
-                                    </td>
-                                </tr>
-                                <g:if test="${orderInstance.orderType?.code == OrderTypeCode.PURCHASE_ORDER.name()}">
                                     <tr class="prop">
                                         <td valign="top" class="name">
-                                            <label><warehouse:message code="order.originCode.label"/></label>
+                                            <label><warehouse:message code="order.orderNumber.label"/></label>
                                         </td>
                                         <td valign="top" class="value">
-                                            ${orderInstance?.origin?.organization?.code }
-                                        </td>
-                                    </tr>
-                                </g:if>
-                                <tr class="prop">
-                                    <td valign="top" class="name">
-                                        <label><warehouse:message code="order.origin.label"/></label>
-                                    </td>
-                                    <td valign="top" class="value">
-                                        ${orderInstance?.origin?.name}
-                                    </td>
-                                </tr>
-                                <tr class="prop">
-                                    <td valign="top" class="name">
-                                        <label><warehouse:message code="order.destination.label"/></label>
-                                    </td>
-                                    <td valign="top" class="value">
-                                        ${orderInstance?.destination?.name}
-                                    </td>
-                                </tr>
-                                <g:if test="${orderInstance.orderType?.code == OrderTypeCode.PURCHASE_ORDER.name()}">
-                                    <tr class="prop">
-                                        <td valign="top" class="name">
-                                            <label><warehouse:message code="paymentTerm.label"/></label>
-                                        </td>
-                                        <td valign="top" class="value">
-                                            <g:if test="${orderInstance?.paymentTerm}">
-                                                <div>${orderInstance?.paymentTerm?.name}</div>
-                                            </g:if>
-                                            <g:else>
-                                                <g:message code="default.none.label"/>
-                                            </g:else>
+                                            ${orderInstance?.orderNumber}
                                         </td>
                                     </tr>
                                     <tr class="prop">
                                         <td valign="top" class="name">
-                                            <label><warehouse:message code="order.paymentMethodType.label"/></label>
+                                            <label><warehouse:message code="default.status.label" /></label>
                                         </td>
-                                        <td valign="top" class="value">
-                                            <g:if test="${orderInstance?.paymentMethodType}">
-                                                <div>${orderInstance?.paymentMethodType?.name}</div>
-                                            </g:if>
-                                            <g:else>
-                                                <g:message code="default.none.label"/>
-                                            </g:else>
+                                        <td valign="top" id="status" class="value">
+                                            <span class="${orderInstance?.id}">${g.message(code: 'default.loading.label')}</span>
                                         </td>
                                     </tr>
-                                </g:if>
-                                <tr class="prop">
-                                    <td valign="top" class="name">
-                                        <label><warehouse:message code="order.subtotal.label"/></label>
-                                    </td>
-                                    <td valign="top" class="value">
-                                        <g:formatNumber number="${orderInstance?.subtotal?:0 }"/>
-                                        ${orderInstance?.currencyCode?:grailsApplication.config.openboxes.locale.defaultCurrencyCode}
-                                    </td>
-                                </tr>
-                                <tr class="prop">
-                                    <td valign="top" class="name">
-                                        <label><warehouse:message code="orderAdjustments.label"/></label>
-                                    </td>
-                                    <td valign="top" class="value">
-                                        <g:formatNumber number="${orderInstance?.totalAdjustments?:0 }"/>
-                                        ${orderInstance?.currencyCode?:grailsApplication.config.openboxes.locale.defaultCurrencyCode}
-                                    </td>
-                                </tr>
-                                <tr class="prop">
-                                    <td valign="top" class="name">
-                                        <label><warehouse:message code="order.totalPrice.label"/></label>
-                                    </td>
-                                    <td valign="top" class="value">
-                                        <g:formatNumber number="${orderInstance?.total?:0 }"/>
-                                        ${orderInstance?.currencyCode?:grailsApplication.config.openboxes.locale.defaultCurrencyCode}
-                                    </td>
-                                </tr>
-
+                                    <tr class="prop">
+                                        <td valign="top" class="name">
+                                            <label><warehouse:message code="order.orderTypeCode.label" /></label>
+                                        </td>
+                                        <td valign="top" id="orderTypeCode" class="value">
+                                            <format:metadata obj="${orderInstance?.orderType?.name}"/>
+                                        </td>
+                                    </tr>
+                                    <tr class="prop">
+                                        <td valign="top" class="name">
+                                            <label><warehouse:message code="order.origin.label"/></label>
+                                        </td>
+                                        <td valign="top" class="value">
+                                            ${orderInstance?.origin?.name}
+                                        </td>
+                                    </tr>
+                                    <tr class="prop">
+                                        <td valign="top" class="name">
+                                            <label><warehouse:message code="order.destination.label"/></label>
+                                        </td>
+                                        <td valign="top" class="value">
+                                            ${orderInstance?.destination?.name}
+                                        </td>
+                                    </tr>
+                                    <g:if test="${orderInstance.orderType?.code == OrderTypeCode.PURCHASE_ORDER.name()}">
+                                        <tr class="prop">
+                                            <td valign="top" class="name">
+                                                <label><warehouse:message code="paymentTerm.label"/></label>
+                                            </td>
+                                            <td valign="top" class="value">
+                                                <g:if test="${orderInstance?.paymentTerm}">
+                                                    <div>${orderInstance?.paymentTerm?.name}</div>
+                                                </g:if>
+                                                <g:else>
+                                                    <g:message code="default.none.label"/>
+                                                </g:else>
+                                            </td>
+                                        </tr>
+                                        <tr class="prop">
+                                            <td valign="top" class="name">
+                                                <label><warehouse:message code="order.paymentMethodType.label"/></label>
+                                            </td>
+                                            <td valign="top" class="value">
+                                                <g:if test="${orderInstance?.paymentMethodType}">
+                                                    <div>${orderInstance?.paymentMethodType?.name}</div>
+                                                </g:if>
+                                                <g:else>
+                                                    <g:message code="default.none.label"/>
+                                                </g:else>
+                                            </td>
+                                        </tr>
+                                    </g:if>
                                 </tbody>
                             </table>
                         </div>
@@ -232,9 +194,7 @@
 
         <script>
             $(document).ready(function() {
-
-              const orderType = ${orderInstance.orderType.isPutawayOrder()} ? 'inbound' : 'purchasing';
-              applyActiveSection(orderType);
+              applyActiveSection('inbound');
 
                 $(".tabs").tabs({
                     cookie: {
@@ -257,51 +217,6 @@
                     selected: ${params.tab ? params.tab : 0}
                 });
             });
-
-            function filterTableItems(cellsIndex, filterValue, tableRows) {
-              // Loop through all table rows, and hide those who don't match the search query
-              $.each(tableRows, function(index, currentRow) {
-                // If filter matches text value then we display, otherwise hide
-
-                // Make one string from cells values at given indexes
-                const txtValue = cellsIndex.reduce((acc, index) => {
-                  const cellValue = $(currentRow)
-                    .find("td")
-                    .eq(index)
-                    .text();
-                  return acc + cellValue
-                }, '');
-                // If concated string includes the filter value, show the row, otherwise hide
-                if (txtValue.toUpperCase().includes(filterValue)) {
-                  $(currentRow).show();
-                  return;
-                }
-                $(currentRow).hide();
-              });
-            }
-
-            function fetchOrderItemsDerivedStatus() {
-              const orderId = $('#orderId').val();
-              $.ajax({
-                url: "${request.contextPath}/purchaseOrderApi/orderItemsDerivedStatus",
-                data: "id=" + orderId,
-                success: function(data, textStatus, jqXHR){
-                  if (data && Object.keys(data)) {
-                    Object.keys(data).forEach(
-                      orderItemId => $("." + orderItemId).text(data[orderItemId])
-                    );
-                  }
-                },
-                error: function (jqXHR, textStatus, errorThrown) {
-                  console.error(jqXHR, textStatus, errorThrown);
-                  if (jqXHR.responseText) {
-                    $.notify(jqXHR.responseText, "error");
-                  } else {
-                    $.notify("An error occurred", "error");
-                  }
-                }
-              });
-            }
         </script>
     </body>
 </html>

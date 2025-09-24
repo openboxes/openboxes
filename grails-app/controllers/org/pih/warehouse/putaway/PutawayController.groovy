@@ -4,6 +4,7 @@ import grails.gorm.transactions.Transactional
 import org.grails.web.json.JSONObject
 import org.pih.warehouse.api.Putaway
 import org.pih.warehouse.api.PutawayItem
+import org.pih.warehouse.api.PutawayTaskAdapter
 import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.order.Order
 
@@ -44,14 +45,11 @@ class PutawayController {
             render status: 404, text: "Order not found"
             return
         }
-        List<PutawayTask> tasks = putawayTaskService.search(
-                order.destination,
-                null,
-                null,
-                null,
-                order,
-                params
-        )
+
+        List<PutawayTask> tasks = order.orderItems.collect { orderItem ->
+            PutawayTaskAdapter.toPutawayTask(orderItem)
+        }.findAll { it != null }
+
         render(template: "putawayTasks", model: [orderInstance: order, putawayTasks: tasks])
     }
 
@@ -63,16 +61,6 @@ class PutawayController {
 
         redirect(controller: "putaway", action: "show", id: id)
     }
-
-    def generateTasks(String id) {
-        Putaway putaway = putawayService.getPutaway(id)
-        putawayService.generatePutawayTasks(putaway)
-
-        flash.message = "Successfully generated tasks for putaway ${putaway.putawayNumber}"
-
-        redirect(controller: "putaway", action: "show", id: id)
-    }
-
 
     def generatePdf() {
         log.info "Params " + params

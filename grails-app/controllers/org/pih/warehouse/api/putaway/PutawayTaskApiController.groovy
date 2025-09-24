@@ -34,7 +34,7 @@ class PutawayTaskApiController extends RestfulController<PutawayTask> {
         }
 
         def tasks =
-                putawayTaskService.search(command.facility, command.product, command.container, command.statusCategory, command.order, params)
+                putawayTaskService.search(command.facility, command.product, command.container, command.statusCategory, params)
 
         render ([data: tasks, totalCount: tasks.totalCount?:0] as JSON)
     }

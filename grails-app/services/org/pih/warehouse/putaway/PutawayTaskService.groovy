@@ -33,12 +33,12 @@ class PutawayTaskService {
     PutawayService putawayService
 
     @Transactional(readOnly = true)
-    List search(Location facility, Product product, Location container, StatusCategory statusCategory, Order order, Map params) {
+    List search(Location facility, Product product, Location container, StatusCategory statusCategory, Map params) {
         log.info "search putaway tasks " + params + " product=" + product?.toJson() + " facility " + facility
         Integer max = Math.min((params.int('max') ?: 50), 100) as Integer
         Integer offset = params.int('offset') ?: 0 as Integer
         String sort = params.sort ?: 'dateCreated'
-        String orderDir = (params.order ?: 'desc').toLowerCase() in ['asc', 'desc'] ? params.order : 'desc' as Integer
+        String order = (params.order ?: 'desc').toLowerCase() in ['asc', 'desc'] ? params.order : 'desc' as Integer
 
         // Get user-provided statuses
         List<PutawayTaskStatus> statuses = params.list("status").collect { it as PutawayTaskStatus }
@@ -62,11 +62,8 @@ class PutawayTaskService {
             if (container) {
                 container == container
             }
-            if (order) {
-                putawayOrder == order
-            }
 
-        }.list(max: max, offset: offset, sort: sort, order: orderDir)
+        }.list(max: max, offset: offset, sort: sort, order: order)
 
         return tasks
     }

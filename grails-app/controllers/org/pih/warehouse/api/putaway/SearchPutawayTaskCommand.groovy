@@ -5,7 +5,6 @@ import grails.databinding.DataBindingSource
 import org.pih.warehouse.api.PutawayTaskStatus
 import org.pih.warehouse.api.StatusCategory
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.order.Order
 import org.pih.warehouse.product.Product
 import org.springframework.validation.Errors
 
@@ -13,22 +12,6 @@ class SearchPutawayTaskCommand {
 
     StatusCategory statusCategory
     List<PutawayTaskStatus> status
-
-    @BindUsing({ SearchPutawayTaskCommand obj, DataBindingSource src ->
-        String identifier = src['order']
-        obj.orderIdentifier = identifier
-        if (!identifier) return null
-
-        Order order = Order.find('from Order o where o.id = :id or o.orderNumber = :orderNumber',
-                [id: identifier, orderNumber: identifier])
-
-        if (identifier && !order) {
-            obj.errors.rejectValue("order", "notFound", [identifier].toArray(), "Order {0} could not be found")
-        }
-        return order
-    })
-    Order order
-    String orderIdentifier
 
     // Should be bound from the URL
     Location facility
