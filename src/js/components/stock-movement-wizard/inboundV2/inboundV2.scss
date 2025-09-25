@@ -3,6 +3,10 @@
   height: $height;
 }
 
+.inbound-wrapper {
+  min-height: 800px;
+}
+
 .inbound-add-items {
 
   .rt-th-add-items {
@@ -12,31 +16,6 @@
 
   .rt-td-add-items {
     padding: 0 4px 4px 4px !important;
-  }
-
-  .rt-tbody-v2 {
-    max-height: 400px;
-    overflow: auto;
-
-    .input-xs {
-      height: 26px;
-      padding: 4px 8px;
-      font-size: 14px;
-    }
-
-    &::-webkit-scrollbar {
-      width: 0.5em;
-      height: 0.5em;
-    }
-
-    &::-webkit-scrollbar-track {
-      background: var(--blue-200);
-    }
-
-    &::-webkit-scrollbar-thumb {
-      background-color: var(--blue-301);
-      border-radius: 4px;
-    }
   }
 
   .input-wrapper-error-message {
@@ -101,5 +80,34 @@ input.hide-arrows[type=number] {
   gap: 4px;
   .icon {
     @include set-size(16px, 16px);
+  }
+}
+
+.rt-td-send-step {
+  padding: 4px 12px;
+}
+
+.rt-tbody-v2 {
+  max-height: 400px;
+  overflow: auto;
+
+  .input-xs {
+    height: 26px;
+    padding: 4px 8px;
+    font-size: 14px;
+  }
+
+  &::-webkit-scrollbar {
+    width: 0.5em;
+    height: 0.5em;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: var(--blue-200);
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--blue-301);
+    border-radius: 4px;
   }
 }
