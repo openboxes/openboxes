@@ -183,6 +183,7 @@ const InboundV2AddItems = ({
               id: 'react.stockMovement.emptyTable.label',
               defaultMessage: 'No items to display',
             }}
+            overflowVisible
           />
         </div>
       </Section>

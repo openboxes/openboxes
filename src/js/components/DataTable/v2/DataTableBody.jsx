@@ -23,6 +23,7 @@ const DataTableBody = ({
   isVirtualizationEnabled,
   isCustomRowsHeightEnabled,
   tableVirtualizer,
+  overflowVisible,
 }) => {
   const translate = useTranslate();
 
@@ -32,7 +33,7 @@ const DataTableBody = ({
 
   return (
     <div
-      className="rt-tbody-v2"
+      className={`rt-tbody-v2 ${overflowVisible && 'overflow-visible'}`}
       style={{
         width: (!isScreenWiderThanTable && tableWithPinnedColumns && dataLength && !loading) ? 'fit-content' : undefined,
         height: isVirtualizationEnabled ? `${tableVirtualizer.getTotalSize()}px` : 'auto',
@@ -149,6 +150,7 @@ DataTableBody.propTypes = {
   isVirtualizationEnabled: PropTypes.bool,
   isCustomRowsHeightEnabled: PropTypes.bool,
   tableVirtualizer: PropTypes.shape({}),
+  overflowVisible: PropTypes.bool,
 };
 
 DataTableBody.defaultProps = {
@@ -159,4 +161,6 @@ DataTableBody.defaultProps = {
   isVirtualizationEnabled: false,
   isCustomRowsHeightEnabled: false,
   tableVirtualizer: {},
+  // it allows tooltips to overflow outside the table
+  overflowVisible: false,
 };
