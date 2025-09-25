@@ -19,6 +19,8 @@ import org.pih.warehouse.api.StockMovementItem
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.LocationService
+import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.inventory.BinLocationItem
 import org.pih.warehouse.inventory.InventoryLevel
@@ -26,6 +28,7 @@ import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.product.ProductAvailability
 import org.pih.warehouse.report.ChecklistReportCommand
 import org.pih.warehouse.report.InventoryReportCommand
 import org.pih.warehouse.report.MultiLocationInventoryReportCommand
@@ -54,6 +57,7 @@ class ReportController {
     def shipmentService
     def orderService
     def userService
+    LocationService locationService
     StdScheduler quartzScheduler
 
     def refreshProductDemand() {
@@ -396,6 +400,30 @@ class ReportController {
     def clearBinLocationCache() {
         flash.message = "Cache have been flushed"
         redirect(action: "showBinLocationReport")
+    }
+
+    def showLostAndFoundReport() {
+        String locationId = params?.location?.id ?: session?.warehouse?.id
+        Location facility = Location.get(locationId)
+
+        log.info "Generating Lost & Found Report for location ${locationId}"
+
+        def lostAndFoundLocations = locationService.getLocationsSupportingActivity(ActivityCode.LOST_AND_FOUND)
+        def locationIds = lostAndFoundLocations.findAll { it.parentLocation?.id == facility.id }*.id
+
+        List<ProductAvailability> entries = []
+        if (locationIds) {
+            entries = ProductAvailability.executeQuery("""
+                SELECT pa
+                FROM ProductAvailability pa
+                WHERE pa.location = :facility
+                  AND pa.binLocation.id IN (:locationIds)
+            """, [facility: facility, locationIds: locationIds])
+        }
+
+        log.info "Lost & Found report for facility ${facility?.id} returned ${entries?.size() ?: 0} entries"
+
+        return [location: facility, entries: entries]
     }
 
     def showBinLocationReport() {

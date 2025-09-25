@@ -161,6 +161,11 @@ class UrlMappings {
             action = [GET: "list"]
         }
 
+        "/api/facilities/$facilityId/inventory-items"(parseRequest: true) {
+            controller = "inventoryItemApi"
+            action = [GET: "listByActivity"]
+        }
+
         "/api/locations/locationTypes" {
             controller = { "locationApi" }
             action = [GET: "locationTypes"]
@@ -686,6 +691,11 @@ class UrlMappings {
         "/api/dashboard/inventoryByLotAndBin"(parseRequest: true) {
             controller = { "dashboardApi" }
             action = [GET: "getInventoryByLotAndBin"]
+        }
+
+        "/api/dashboard/lostAndFound"(parseRequest: true) {
+            controller = { "dashboardApi" }
+            action = [GET: "getLostAndFoundInventoryItems"]
         }
 
         "/api/dashboard/inProgressShipments"(parseRequest: true) {
