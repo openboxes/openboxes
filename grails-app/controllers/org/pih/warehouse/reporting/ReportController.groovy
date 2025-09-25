@@ -403,9 +403,10 @@ class ReportController {
     }
 
     def showLostAndFoundReport() {
-        log.info "Generating Lost & Found Report for location ${session?.warehouse?.id}"
+        String locationId = params?.location?.id ?: session?.warehouse?.id
+        Location facility = Location.get(locationId)
 
-        Location facility = Location.get(session.warehouse.id)
+        log.info "Generating Lost & Found Report for location ${locationId}"
 
         def lostAndFoundLocations = locationService.getLocationsSupportingActivity(ActivityCode.LOST_AND_FOUND)
         def locationIds = lostAndFoundLocations.findAll { it.parentLocation?.id == facility.id }*.id
