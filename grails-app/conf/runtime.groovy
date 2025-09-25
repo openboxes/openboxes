@@ -608,6 +608,10 @@ openboxes {
                             widgetId: "inProgressPutaways",
                             order   : 4
                         ],
+                        [
+                            widgetId: "lostAndFoundInventory",
+                            order   : 5
+                        ],
 
                         [
                             widgetId: "inventorySummary",
@@ -707,8 +711,12 @@ openboxes {
                             order   : 5
                         ],
                         [
-                                widgetId: "requestsPendingApproval",
-                                order   : 6
+                            widgetId: "requestsPendingApproval",
+                            order   : 6
+                        ],
+                        [
+                            widgetId: "lostAndFoundInventory",
+                            order   : 7
                         ],
 
                         [
@@ -813,6 +821,15 @@ openboxes {
                 numberType = 'number'
                 type = 'number'
                 endpoint = "/api/dashboard/inventoryByLotAndBin"
+            }
+            lostAndFoundInventory {
+                enabled = true
+                title = "react.dashboard.lostAndFound.title.label"
+                info = "react.dashboard.lostAndFound.info.label"
+                subtitle = "react.dashboard.subtitle.products.label"
+                numberType = 'number'
+                type = 'number'
+                endpoint = "/api/dashboard/lostAndFound"
             }
             inProgressShipments {
                 enabled = true
