@@ -317,7 +317,8 @@ openboxes {
                         [label: "report.inventoryByLocationReport.label", defaultLabel: "Inventory By Location Report", href: "/report/showInventoryByLocationReport"],
                         [label: "report.cycleCount.label", defaultLabel: "Cycle Count Report", href: "/report/showCycleCountReport"],
                         [label: "report.baselineQohReport.label", defaultLabel: "Baseline QoH Report", href: "/inventory/show"],
-                        [label: "report.onOrderReport.label", defaultLabel: "On Order Report", href: "/report/showOnOrderReport"]
+                        [label: "report.onOrderReport.label", defaultLabel: "On Order Report", href: "/report/showOnOrderReport"],
+                        [label: "report.lostAndFound.label", defaultLabel: "Lost & Found Report", href: "/report/showLostAndFoundReport"]
                     ]
                 ],
                 [
