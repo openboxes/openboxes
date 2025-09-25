@@ -31,7 +31,7 @@ class InventoryItemApiController {
         def items = InventoryItem.executeQuery("""
             SELECT DISTINCT pa.inventoryItem
             FROM ProductAvailability pa
-            WHERE pa.facility = :facility
+            WHERE pa.location = :facility
               AND pa.binLocation.id IN (:locationIds)
         """, [facility: facility, locationIds: locationIds])
 
