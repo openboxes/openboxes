@@ -113,6 +113,7 @@ TableCell.defaultProps = {
   openLinkInNewTab: false,
   showError: false,
   tdProps: {},
+  tooltipLabel: '',
 };
 
 TableCell.propTypes = {

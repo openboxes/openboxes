@@ -42,6 +42,7 @@ const DataTable = ({
   meta,
   tableWithPinnedColumns,
   virtualize,
+  overflowVisible,
 }) => {
   const {
     defaultEmptyTableMessage,
@@ -71,7 +72,7 @@ const DataTable = ({
   return (
     <div className="app-react-table-wrapper table-v2">
       <div className="ReactTable app-react-table">
-        <div className="rt-table overflow-visible" role="grid">
+        <div className={`rt-table ${overflowVisible && 'overflow-visible'}`} role="grid">
           <DataTableHeader
             headerGroups={table.getHeaderGroups()}
             tableWithPinnedColumns={tableWithPinnedColumns}
@@ -91,6 +92,7 @@ const DataTable = ({
             dataLength={totalCount}
             tableWithPinnedColumns={tableWithPinnedColumns}
             isScreenWiderThanTable={isScreenWiderThanTable}
+            overflowVisible={overflowVisible}
           />
         </div>
         {shouldDisplayPagination && (
@@ -135,6 +137,7 @@ DataTable.propTypes = {
     estimatedSize: PropTypes.number,
     overscan: PropTypes.number,
   }),
+  overflowVisible: PropTypes.bool,
 };
 
 DataTable.defaultProps = {
@@ -153,4 +156,6 @@ DataTable.defaultProps = {
     estimatedSize: 50,
     overscan: 10,
   },
+  // it allows tooltips to overflow outside the table
+  overflowVisible: false,
 };

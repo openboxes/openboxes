@@ -7,15 +7,15 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getCurrentLocale, getCurrentLocation, getShipmentTypes } from 'selectors';
 
 import { fetchShipmentTypes, updateWorkflowHeader } from 'actions';
-import { STOCK_MOVEMENT_BY_ID } from 'api/urls';
+import stockMovementApi from 'api/services/StockMovementApi';
 import notification from 'components/Layout/notifications/notification';
 import locationType from 'consts/locationType';
 import NotificationType from 'consts/notificationTypes';
+import { OutboundWorkflowState } from 'consts/WorkflowState';
 import useInboundSendValidation from 'hooks/inboundV2/send/useInboundSendValidation';
 import useQueryParams from 'hooks/useQueryParams';
 import useSpinner from 'hooks/useSpinner';
 import useTranslate from 'hooks/useTranslate';
-import apiClient from 'utils/apiClient';
 import createInboundWorkflowHeader from 'utils/createInboundWorkflowHeader';
 
 const useInboundSendForm = () => {
@@ -67,7 +67,8 @@ const useInboundSendForm = () => {
   const fetchStockMovementData = async () => {
     try {
       spinner.show();
-      const response = await apiClient.get(STOCK_MOVEMENT_BY_ID(queryParams.id));
+      const response = await stockMovementApi.getStockMovementById(queryParams.id,
+        { stepNumber: OutboundWorkflowState.SEND_SHIPMENT });
 
       const { data } = response.data;
 
