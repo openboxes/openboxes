@@ -1,6 +1,7 @@
 import {
   STOCK_MOVEMENT_API,
   STOCK_MOVEMENT_BY_ID,
+  STOCK_MOVEMENT_ITEMS,
   STOCK_MOVEMENT_ROLLBACK_APPROVAL,
   STOCK_MOVEMENT_UPDATE_REQUISITION,
   STOCK_MOVEMENT_UPDATE_STATUS,
@@ -34,4 +35,8 @@ export default {
     apiClient.post(STOCK_MOVEMENT_URL.importCsv(stockMovementId), formData, config),
   exportCsv: (stockMovementId) =>
     apiClient.get(STOCK_MOVEMENT_URL.exportCsv(stockMovementId), { responseType: 'blob' }),
+  getStockMovementById: (id, params) =>
+    apiClient.get(STOCK_MOVEMENT_BY_ID(id), { params }),
+  getStockMovementItems: (id, params) =>
+    apiClient.get(STOCK_MOVEMENT_ITEMS(id), { params }),
 };
