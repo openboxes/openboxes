@@ -7,10 +7,12 @@ import org.joda.time.LocalDate
 
 import org.pih.warehouse.DateUtil
 import org.pih.warehouse.api.StockMovementDirection
+import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
+import org.pih.warehouse.core.LocationService
 import org.pih.warehouse.inventory.TransactionCode
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.order.Order
@@ -27,6 +29,7 @@ import util.ConfigHelper
 class NumberDataService {
 
     def dataService
+    LocationService locationService
     GrailsApplication grailsApplication
 
     @Cacheable(value = "dashboardCache", key = { "getInventoryByLotAndBin-${location?.id}"})
@@ -36,6 +39,30 @@ class NumberDataService {
 
         String urlContextPath = ConfigHelper.contextPath
         return new NumberData(binLocations[0], "${urlContextPath}/report/showBinLocationReport?location.id=" + location.id + "&status=inStock")
+    }
+
+    @Cacheable(value = "dashboardCache", key = { "getLostAndFoundInventoryItems-${location?.id}" })
+    NumberData getLostAndFoundInventoryItems(Location location) {
+
+        def lostAndFoundLocations = locationService.getLocationsSupportingActivity(ActivityCode.LOST_AND_FOUND)
+        def locationIds = lostAndFoundLocations.findAll { it.parentLocation?.id == location.id }*.id
+
+        Long countLostAndFound = 0
+        if (locationIds) {
+            def results = ProductAvailability.executeQuery("""
+                SELECT COUNT(DISTINCT pa.id)
+                FROM ProductAvailability pa
+                WHERE pa.location = :facility
+                  AND pa.binLocation.id IN (:locationIds)
+            """, [facility: location, locationIds: locationIds])
+            countLostAndFound = results[0] ?: 0
+        }
+
+        String urlContextPath = ConfigHelper.contextPath
+        return new NumberData(
+                countLostAndFound,
+                "${urlContextPath}/report/showLostAndFoundReport?location.id=${location.id}"
+        )
     }
 
     @Cacheable(value = "dashboardCache", key = { "getInProgressShipments-${location?.id}${user?.id}" })
