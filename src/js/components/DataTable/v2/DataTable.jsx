@@ -91,6 +91,7 @@ const DataTable = ({
             dataLength={data?.length}
             tableWithPinnedColumns={tableWithPinnedColumns}
             isScreenWiderThanTable={isScreenWiderThanTable}
+            overflowVisible={overflowVisible}
           />
         </div>
         {shouldDisplayPagination && (
@@ -154,6 +155,6 @@ DataTable.defaultProps = {
     estimatedSize: 50,
     overscan: 10,
   },
-  // it allows header tooltips to overflow outside the table
+  // it allows tooltips to overflow outside the table
   overflowVisible: false,
 };

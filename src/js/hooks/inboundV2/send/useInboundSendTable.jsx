@@ -75,7 +75,7 @@ const useInboundSendTable = () => {
         <TableCell
           className="rt-td-send-step"
           customTooltip
-          tooltipLabel={getValue()?.toString()}
+          tooltipLabel={getValue()}
         >
           <div className="text-truncate">
             {getValue()}
@@ -100,7 +100,7 @@ const useInboundSendTable = () => {
         <TableCell
           className="rt-td-send-step"
           customTooltip
-          tooltipLabel={getValue()?.toString()}
+          tooltipLabel={getValue()}
         >
           <div className="text-truncate">
             {getValue()}
@@ -125,7 +125,7 @@ const useInboundSendTable = () => {
         <TableCell
           className="rt-td-send-step"
           customTooltip
-          tooltipLabel={getValue()?.toString()}
+          tooltipLabel={getValue()}
         >
           <div className="text-truncate">
             {getValue()}
@@ -147,7 +147,7 @@ const useInboundSendTable = () => {
         <TableCell
           className="rt-td-send-step"
           customTooltip
-          tooltipLabel={getValue()?.toString()}
+          tooltipLabel={getValue()}
         >
           <div className="text-truncate">
             {getValue()}
@@ -169,7 +169,7 @@ const useInboundSendTable = () => {
         <TableCell
           className="rt-td-send-step"
           customTooltip
-          tooltipLabel={getValue()?.toString()}
+          tooltipLabel={getValue()}
         >
           <div className="text-truncate">
             {getValue()}
@@ -191,7 +191,7 @@ const useInboundSendTable = () => {
         <TableCell
           className="rt-td-send-step"
           customTooltip
-          tooltipLabel={getValue()?.toString()}
+          tooltipLabel={getValue()}
         >
           {formatLocalizedDate(getValue(), DateFormat.DD_MMM_YYYY)}
         </TableCell>
@@ -214,7 +214,7 @@ const useInboundSendTable = () => {
           tooltipLabel={getValue()?.toString()}
         >
           <div className="text-truncate">
-            {getValue()}
+            {getValue()?.toString()}
           </div>
         </TableCell>
       ),
@@ -233,7 +233,7 @@ const useInboundSendTable = () => {
         <TableCell
           className="rt-td-send-step"
           customTooltip
-          tooltipLabel={getValue()?.toString()}
+          tooltipLabel={getValue()}
         >
           <div className="text-truncate">
             {getValue()}
