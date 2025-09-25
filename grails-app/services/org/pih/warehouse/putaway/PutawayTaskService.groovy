@@ -12,7 +12,6 @@ import org.pih.warehouse.api.PutawayTaskStatus
 import org.pih.warehouse.api.StatusCategory
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.ActivityCode
-import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.ReasonCode
@@ -109,11 +108,11 @@ class PutawayTaskService {
                 break
 
             case 'complete':
-                complete(task, data.destination as String, data.completedBy as String, data.force as Boolean)
+                complete(task, data.destination as String, data.completedBy as String, data.force as Boolean, data.isCancelRemaining as Boolean)
                 break
 
             case 'partialComplete':
-                task = partialComplete(task, data.quantity as BigDecimal, data.destination as String, data.force as Boolean, data.reasonCode as ReasonCode)
+                task = partialComplete(task, data.quantity as BigDecimal, data.destination as String, data.reasonCode as ReasonCode)
                 break
 
             case 'rollback':
@@ -267,7 +266,7 @@ class PutawayTaskService {
         save(task)
     }
 
-    void complete(PutawayTask task, String destinationId, String completedById, Boolean force = false) {
+    void complete(PutawayTask task, String destinationId, String completedById, Boolean force = false, Boolean isCancelRemaining) {
         log.info "complete putaway"
         if (!task) {
             throw new ObjectNotFoundException(task.id, "Unable to locate putaway task with id ${task.id}")
@@ -298,6 +297,14 @@ class PutawayTaskService {
             task.errors.reject("completedBy", "Must provide a valid person or user who completed the putaway task")
         }
 
+        if (isCancelRemaining) {
+            def discrepancyLocation = findDiscrepancyLocation(task)
+            if (!discrepancyLocation) {
+                throw new IllegalStateException("No discrepancy location found")
+            }
+            task.destination = discrepancyLocation
+        }
+
         task.dateCompleted = new Date()
         task.completedBy = completedBy
         executeStateTransition(task, PutawayTaskStatus.COMPLETED)
@@ -309,7 +316,7 @@ class PutawayTaskService {
         save(task)
     }
 
-    PutawayTask partialComplete(PutawayTask task, BigDecimal quantity, String destinationId, Boolean force = false, ReasonCode reasonCode = null) {
+    PutawayTask partialComplete(PutawayTask task, BigDecimal quantity, String destinationId, ReasonCode reasonCode) {
         if (quantity > task.quantity) {
             throw new IllegalArgumentException("Quantity provided is more than requested. Please re-enter quantity")
         }
@@ -319,31 +326,16 @@ class PutawayTaskService {
             throw new IllegalArgumentException("Quantity provided is more than requested. Please re-enter quantity")
         }
 
-        // validate destination or user has forced a destination change
-        Location destination = Location.get(destinationId)
-        if (!destination) {
-            task.errors.reject("destination", "Destination is required")
-        }
-
-        // validate destination
-        if (task.destination != destination && !force) {
-            task.errors.reject("destination", "Destination provided does not match expected destination")
-        }
-
-        // Update the task destination if the destinations do not match, but user forced change
-        if (task.destination != destination && force) {
-            task.destination = destination
-        }
-
-        if (reasonCode) {
-            task.discrepancyReasonCode = reasonCode
-            def discrepancyLocation = task.facility.internalLocations
-                    .find { it.locationType.name == Constants.DISCREPANCY_LOCATION_TYPE}
+        Location alternativeDestination = Location.get(destinationId)
+        if (!alternativeDestination) {
+            def discrepancyLocation = findDiscrepancyLocation(task)
             if (!discrepancyLocation) {
                 throw new IllegalStateException("No discrepancy location found")
             }
             task.destination = discrepancyLocation
         }
+
+        task.discrepancyReasonCode = reasonCode
 
         if (task.hasErrors() || !task.validate()) {
             throw new ValidationException("Validation errors occurred during complete action", task.errors)
@@ -362,8 +354,8 @@ class PutawayTaskService {
         }
         PutawayItem itemToSplit = putaway.putawayItems.find { it.id == currentItem.id }
 
-        PutawayItem completedSplitItem = createSplitPutawayItem(task, quantity, PutawayStatus.COMPLETED)
-        PutawayItem remainingSplitItem = createSplitPutawayItem(task, quantityRemaining, PutawayStatus.PENDING)
+        PutawayItem completedSplitItem = createSplitPutawayItem(task, quantity, PutawayStatus.COMPLETED, task.destination)
+        PutawayItem remainingSplitItem = createSplitPutawayItem(task, quantityRemaining, PutawayStatus.PENDING, alternativeDestination)
 
         if (itemToSplit) {
             itemToSplit.splitItems = [completedSplitItem, remainingSplitItem]
@@ -490,16 +482,26 @@ class PutawayTaskService {
         task.status = to
     }
 
-    private PutawayItem createSplitPutawayItem(PutawayTask task, BigDecimal quantity, PutawayStatus status) {
+    private PutawayItem createSplitPutawayItem(PutawayTask task, BigDecimal quantity, PutawayStatus status, Location destination) {
         return new PutawayItem(
                 quantity: quantity,
                 putawayStatus: status,
-                putawayLocation: task.destination,
+                putawayLocation: destination,
                 inventoryItem: task.inventoryItem,
                 product: task.product,
                 currentFacility: task.facility,
                 currentLocation: task.location,
                 containerLocation: task.container
         )
+    }
+
+    private Location findDiscrepancyLocation(PutawayTask task) {
+        def discrepancyLocation = task.facility.internalLocations
+                .find { it.supports(ActivityCode.LOST_AND_FOUND) }
+        if (!discrepancyLocation) {
+            throw new IllegalStateException("No discrepancy location found")
+        }
+
+        return discrepancyLocation
     }
 }
