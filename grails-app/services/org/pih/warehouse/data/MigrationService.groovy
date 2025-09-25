@@ -926,7 +926,7 @@ class MigrationService {
                     AvailableItemKey itemKey = new AvailableItemKey(binLocation, inventoryItem)
                     String comments = entries.comments.findAll { it }.join(', ')
                     [(itemKey): [
-                        binLocation: inventoryItem,
+                        binLocation: binLocation,
                         inventoryItem: inventoryItem,
                         quantity: entries.sum { it.quantity },
                         comments: comments.length() > 255 ? comments.substring(0, 255) : comments
