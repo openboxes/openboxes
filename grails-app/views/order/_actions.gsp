@@ -33,12 +33,20 @@
 				<hr/>
 			</div>
 
-			<div class="action-menu-item">
-				<g:link controller="order" action="show" id="${orderInstance?.id}">
-					<img src="${resource(dir:'images/icons/silk',file:'zoom.png')}" alt="Edit" style="vertical-align: middle" />
-					&nbsp;${warehouse.message(code: 'order.viewDetails.label')}
-				</g:link>
-			</div>
+            <div class="action-menu-item">
+                <g:if test="${orderInstance?.orderType == PUTAWAY_ORDER}">
+                    <g:link controller="putaway" action="show" id="${orderInstance?.id}">
+                        <img src="${resource(dir:'images/icons/silk',file:'zoom.png')}" />
+                        &nbsp;${warehouse.message(code: 'putaway.viewDetails.label', default: 'View Putaway')}
+                    </g:link>
+                </g:if>
+                <g:else>
+                    <g:link controller="order" action="show" id="${orderInstance?.id}">
+                        <img src="${resource(dir:'images/icons/silk',file:'zoom.png')}" />
+                        &nbsp;${warehouse.message(code: 'order.viewDetails.label')}
+                    </g:link>
+                </g:else>
+            </div>
 			<g:if test="${orderInstance?.orderType != PURCHASE_ORDER || Location.load(session?.warehouse?.id).supports(ActivityCode.PLACE_ORDER)}">
 				<div class="action-menu-item">
 					<g:link controller="order" action="addComment" id="${orderInstance?.id}">

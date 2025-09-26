@@ -1,18 +1,19 @@
 package org.pih.warehouse.putaway
 
-import grails.events.annotation.Publisher
 import grails.gorm.transactions.Transactional
 import org.grails.web.json.JSONObject
 import org.pih.warehouse.api.Putaway
 import org.pih.warehouse.api.PutawayItem
+import org.pih.warehouse.api.PutawayTaskAdapter
 import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.order.Order
 
 @Transactional
-class PutAwayController {
+class PutawayController {
 
     def productAvailabilityService
     PutawayService putawayService
+    PutawayTaskService putawayTaskService
 
     def index() {
         redirect(action: "create")
@@ -27,24 +28,39 @@ class PutAwayController {
         render(view: "/common/react")
     }
 
+    @Transactional(readOnly = true)
+    def show(String id) {
+        Order order = Order.get(id)
+        if (!order) {
+            flash.message = "Order not found with id ${id}"
+            redirect(controller: "order", action: "list")
+            return
+        }
+        [orderInstance: order]
+    }
+
+    def putawayTasks(String id) {
+        Order order = Order.get(id)
+        if (!order) {
+            render status: 404, text: "Order not found"
+            return
+        }
+
+        List<PutawayTask> tasks = order.orderItems.collect { orderItem ->
+            PutawayTaskAdapter.toPutawayTask(orderItem)
+        }.findAll { it != null }
+
+        render(template: "putawayTasks", model: [orderInstance: order, putawayTasks: tasks])
+    }
+
     def rollback(String id) {
         Putaway putaway = putawayService.getPutaway(id)
         putawayService.rollbackPutaway(putaway)
 
         flash.message = "Rollback was completed successfully for putaway ${putaway.putawayNumber}"
 
-        redirect(controller: "order", action: "show", id: id)
+        redirect(controller: "putaway", action: "show", id: id)
     }
-
-    def generateTasks(String id) {
-        Putaway putaway = putawayService.getPutaway(id)
-        putawayService.generatePutawayTasks(putaway)
-
-        flash.message = "Successfully generated tasks for putaway ${putaway.putawayNumber}"
-
-        redirect(controller: "order", action: "show", id: id)
-    }
-
 
     def generatePdf() {
         log.info "Params " + params
@@ -67,7 +83,7 @@ class PutAwayController {
         }
 
         renderPdf(
-                template: "/putAway/print",
+                template: "/putaway/print",
                 model: [jsonObject: jsonObject],
                 filename: "Putaway ${putaway?.putawayNumber}.pdf"
         )
