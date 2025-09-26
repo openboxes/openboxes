@@ -130,8 +130,8 @@ class Requisition implements Comparable<Requisition>, Serializable {
     OrderTypeCode orderTypeCode
 
     // Fulfillment properties
-    Integer priority
-    DeliveryTypeCode deliveryTypeCode
+    Integer priority = 0
+    DeliveryTypeCode deliveryTypeCode = DeliveryTypeCode.DEFAULT
 
     // Removed comments, documents, events for the time being.
     static transients = [
@@ -219,6 +219,9 @@ class Requisition implements Comparable<Requisition>, Serializable {
         dateApproved(nullable: true)
         dateRejected(nullable: true)
         approvalRequired(nullable: true)
+        deliveryTypeCode(nullable: true)
+        orderTypeCode(nullable: true)
+        priority(nullable: true)
     }
 
     Comment getRecentComment() {
