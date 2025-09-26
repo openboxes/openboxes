@@ -3,6 +3,7 @@ package org.pih.warehouse.api.putaway
 import grails.converters.JSON
 import grails.rest.RestfulController
 import grails.validation.ValidationException
+import org.pih.warehouse.core.Location
 import org.pih.warehouse.putaway.PutawayTask
 import org.pih.warehouse.putaway.PutawayTaskService
 import org.springframework.http.HttpStatus
@@ -78,6 +79,11 @@ class PutawayTaskApiController extends RestfulController<PutawayTask> {
             return render(status: HttpStatus.NOT_FOUND.value())
         }
         render([data: task] as JSON)
+    }
+
+    def alternateDestinations(PutawayTask task) {
+        List<Location> locations = putawayTaskService.getAlternateDestinations(task)
+        render ([data:locations] as JSON)
     }
 }
 

@@ -14,6 +14,11 @@ class PutawayUrlMappings {
             action = [GET: "read", PUT: "update", PATCH: "patch", DELETE: "delete"]
         }
 
+        "/api/facilities/$facility/putaway-tasks/$id/alternate-destinations" {
+            controller = "putawayTaskApi"
+            action = [GET: "alternateDestinations"]
+        }
+
         // FIXME Not used for now since we can use the patch method in the previous UrlMapping, but we might want to
         //  bring this back at some point
         "/api/facilities/$facility/putaway-tasks/$id/status" {
