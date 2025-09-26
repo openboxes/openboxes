@@ -49,6 +49,9 @@ enum RoleType {
     ROLE_ITEM_LOW_STOCK_NOTIFICATION('Low Stock Notifications', 100),
     ROLE_ITEM_OUT_OF_STOCK_NOTIFICATION('Out of Stock Notifications', 100),
 
+    // Notification roles for putaway discrepancy alerts
+    ROLE_DISCREPANCY_NOTIFICATION('Discrepancy Notifications', 100),
+
     // Employee role types
     ROLE_EMPLOYEE('Employee', 50),
 

@@ -22,6 +22,7 @@ import org.pih.warehouse.core.MailService
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
+import org.pih.warehouse.putaway.PutawayTask
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionSourceType
 import org.pih.warehouse.requisition.RequisitionStatus
@@ -208,6 +209,24 @@ class NotificationService {
 
         } catch (EmailException e) {
             log.error("Unable to send creation email: " + e.message, e)
+        }
+    }
+
+    def sendPutawayDiscrepancyNotification(PutawayTask putawayTask) {
+        try {
+            def emailValidator = EmailValidator.getInstance()
+            def discrepancyReason = putawayTask.discrepancyReasonCode.toString()
+            def recipients = userService.findUsersByRoleType(RoleType.ROLE_DISCREPANCY_NOTIFICATION)
+            recipients.each {
+                if (emailValidator.isValid(it.email)) {
+                    def locale = new Locale(grailsApplication.config.openboxes.locale.defaultLocale)
+                    def subject = messageSource.getMessage('email.putawayDiscrepancy.message', [discrepancyReason].toArray(), locale)
+                    def body = renderTemplate("/email/putawayDiscrepancy", [discrepancyReason: discrepancyReason])
+                    mailService.sendHtmlMail(subject, body.toString(), it.email)
+                }
+            }
+        } catch (EmailException e) {
+            log.error("Unable to send an email: " + e.message, e)
         }
     }
 
