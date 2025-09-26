@@ -215,13 +215,12 @@ class NotificationService {
     def sendPutawayDiscrepancyNotification(PutawayTask putawayTask) {
         try {
             def emailValidator = EmailValidator.getInstance()
-            def discrepancyReason = putawayTask.discrepancyReasonCode.toString()
-            def recipients = userService.findUsersByRoleType(RoleType.ROLE_DISCREPANCY_NOTIFICATION)
+            def recipients = userService.findUsersByRoleType(RoleType.ROLE_ERROR_NOTIFICATION)
             recipients.each {
                 if (emailValidator.isValid(it.email)) {
                     def locale = new Locale(grailsApplication.config.openboxes.locale.defaultLocale)
-                    def subject = messageSource.getMessage('email.putawayDiscrepancy.message', [discrepancyReason].toArray(), locale)
-                    def body = renderTemplate("/email/putawayDiscrepancy", [discrepancyReason: discrepancyReason])
+                    def subject = messageSource.getMessage('email.putawayDiscrepancy.message', null, locale)
+                    def body = renderTemplate("/email/putawayDiscrepancy", [putawayTask: putawayTask])
                     mailService.sendHtmlMail(subject, body.toString(), it.email)
                 }
             }

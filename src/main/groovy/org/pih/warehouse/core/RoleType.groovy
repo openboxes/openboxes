@@ -136,7 +136,8 @@ enum RoleType {
                 ROLE_ITEM_REORDER_NOTIFICATION,
                 ROLE_ITEM_LOW_STOCK_NOTIFICATION,
                 ROLE_ITEM_OUT_OF_STOCK_NOTIFICATION,
-                ROLE_REQUISITION_APPROVER
+                ROLE_REQUISITION_APPROVER,
+                ROLE_DISCREPANCY_NOTIFICATION
         ]
     }
 
