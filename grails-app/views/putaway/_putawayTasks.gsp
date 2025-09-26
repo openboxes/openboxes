@@ -17,6 +17,7 @@
             <th><warehouse:message code="putawayTask.dateStarted.label" default="Date Started"/></th>
             <th><warehouse:message code="putawayTask.dateCompleted.label" default="Date Completed"/></th>
             <th><warehouse:message code="putawayTask.dateCanceled.label" default="Date Canceled"/></th>
+            <th><warehouse:message code="putawayTask.discrepancyReasonCode.label" default="Date Canceled"/></th>
         </tr>
         </thead>
         <tbody>
@@ -33,6 +34,7 @@
                 <td><g:formatDate date="${task.dateStarted}" format="dd/MM/yyyy"/></td>
                 <td><g:formatDate date="${task.dateCompleted}" format="dd/MM/yyyy"/></td>
                 <td><g:formatDate date="${task.dateCanceled}" format="dd/MM/yyyy"/></td>
+                <td>${task.discrepancyReasonCode}</td>
             </tr>
         </g:each>
 

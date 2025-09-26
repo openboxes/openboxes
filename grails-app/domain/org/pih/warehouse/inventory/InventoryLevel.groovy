@@ -143,7 +143,6 @@ class InventoryLevel {
         }.get() as Location
     }
 
-
     Location getFacilityLocation() {
         return inventory?.warehouse
     }
