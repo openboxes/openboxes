@@ -251,7 +251,7 @@ const Router = () => {
       <BrowserRouter>
         <FlashScopeListenerWrapper>
           <Switch>
-            <MainLayoutRoute path="**/putAway/create/:putAwayId?" component={AsyncPutAwayMainPage} />
+            <MainLayoutRoute path="**/putaway/create/:putAwayId?" component={AsyncPutAwayMainPage} />
             <MainLayoutRoute path="**/stockMovement/list" component={StockMovementList} />
             <MainLayoutRoute path="**/stockMovement/createOutbound/:stockMovementId?" component={AsyncStockMovement} />
             <MainLayoutRoute path="**/stockMovement/importOutboundStockMovement" component={AsyncOutboundImport} />

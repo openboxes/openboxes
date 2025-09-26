@@ -67,7 +67,7 @@ describe('checkActiveSection', () => {
           menuItems: [
             {
               label: 'Create Putaway',
-              href: '/openboxes/putAway/create',
+              href: '/openboxes/putaway/create',
             },
             {
               label: 'List Putaways',
@@ -101,13 +101,13 @@ describe('checkActiveSection', () => {
   });
   it('should skip id in path', () => {
     params = { ...params, id: 'randomId' };
-    const path = { pathname: '/openboxes/putAway/create', search: '' };
+    const path = { pathname: '/openboxes/putaway/create', search: '' };
     expect(checkActiveSection({
       menuUrls, path, params, menuSectionsUrlParts: {},
     })).toBe('inbound');
   });
   it('should match path without params', () => {
-    const path = { pathname: '/openboxes/putAway/create', search: '' };
+    const path = { pathname: '/openboxes/putaway/create', search: '' };
     expect(checkActiveSection({
       menuUrls, path, params, menuSectionsUrlParts: {},
     })).toBe('inbound');
