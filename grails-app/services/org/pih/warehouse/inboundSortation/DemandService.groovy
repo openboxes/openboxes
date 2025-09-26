@@ -17,7 +17,6 @@ class DemandService {
 
     PutawayTaskService putawayTaskService
 
-
     def calculateUnmetDemand(Location facility, Product product) {
         def allocations = getAllocations(facility, product)
         def demands = getDemands(facility, product)
@@ -28,9 +27,10 @@ class DemandService {
         def unmetDemand = allKeys
                 // Tranform to map of unmet quantity demand based on delivery type code
                 .collectEntries { deliveryTypeCode ->
-                    def quantityDemanded = demands.get(deliveryTypeCode) ?: 0
-                    def quantityAllocated = allocations.get(deliveryTypeCode) ?: 0
-                    [deliveryTypeCode, (quantityDemanded - quantityAllocated).max(0)]
+                    Integer quantityDemanded = demands.get(deliveryTypeCode) ?: 0
+                    Integer quantityAllocated = allocations.get(deliveryTypeCode) ?: 0
+                    Integer quantityBackordered = Math.max((quantityDemanded - quantityAllocated), 0)
+                    [deliveryTypeCode, quantityBackordered]
                 }
                 // Sort by delivery type code priority (ascending)
                 .sort { a, b ->
@@ -38,7 +38,6 @@ class DemandService {
                 }
 
         return unmetDemand
-
     }
 
     def getAllocations(Location facility, Product product) {

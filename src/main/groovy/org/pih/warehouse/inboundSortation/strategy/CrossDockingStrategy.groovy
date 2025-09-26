@@ -25,7 +25,8 @@ class CrossDockingStrategy implements PutawayStrategy {
         //
         // TODO The crucial part of getting this to work will be to make sure the putaway tasks are persisted immediately
         //  after each execution of the strategies so the calculation takes these into account.
-        Map<DeliveryTypeCode, Integer> unmetDemandsByDeliveryType = demandService.calculateUnmetDemand(context.facility, context.product)
+        Map<DeliveryTypeCode, Integer> unmetDemandsByDeliveryType =
+                demandService.calculateUnmetDemand(context.facility, context.product)
 
         // Walk through each of the delivery type codes to check if there's unmet demand. The DEFAULT delivery type
         // code just means that there is none, so it's ok ignore this demand type (it'll be ignored because there
