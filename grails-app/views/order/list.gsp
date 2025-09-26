@@ -104,16 +104,30 @@
 										<td class="middle">
 											<format:metadata obj="${orderInstance?.orderType?.code}"/>
 										</td>
-										<td class="middle">
-											<g:link action="show" id="${orderInstance.id}">
-												${fieldValue(bean: orderInstance, field: "orderNumber")}
-											</g:link>
-										</td>
-										<td class="middle">
-											<g:link action="show" id="${orderInstance.id}">
-												${fieldValue(bean: orderInstance, field: "name")}
-											</g:link>
-										</td>
+                                        <td class="middle">
+                                            <g:if test="${orderType == OrderType.findByCode(Constants.PUTAWAY_ORDER)}">
+                                                <g:link controller="putaway" action="show" id="${orderInstance.id}">
+                                                    ${fieldValue(bean: orderInstance, field: "orderNumber")}
+                                                </g:link>
+                                            </g:if>
+                                            <g:else>
+                                                <g:link controller="order" action="show" id="${orderInstance.id}">
+                                                    ${fieldValue(bean: orderInstance, field: "orderNumber")}
+                                                </g:link>
+                                            </g:else>
+                                        </td>
+                                        <td class="middle">
+                                            <g:if test="${orderType == OrderType.findByCode(Constants.PUTAWAY_ORDER)}">
+                                                <g:link controller="putaway" action="show" id="${orderInstance.id}">
+                                                    ${fieldValue(bean: orderInstance, field: "name")}
+                                                </g:link>
+                                            </g:if>
+                                            <g:else>
+                                                <g:link controller="order" action="show" id="${orderInstance.id}">
+                                                    ${fieldValue(bean: orderInstance, field: "name")}
+                                                </g:link>
+                                            </g:else>
+                                        </td>
                                         <g:if test="${orderType != OrderType.findByCode(Constants.PUTAWAY_ORDER)}">
                                             <td class="middle">
                                                 ${fieldValue(bean: orderInstance, field: "origin.name")}

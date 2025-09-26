@@ -254,7 +254,7 @@ openboxes {
                     defaultLabel: "Putaways",
                     requiredActivitiesAll: ActivityCode.binTrackingList(),
                     menuItems: [
-                        [label: "react.putAway.createPutAway.label", defaultLabel: "Create Putaway", href: "/putAway/create"],
+                        [label: "react.putAway.createPutAway.label", defaultLabel: "Create Putaway", href: "/putaway/create"],
                         [label: "react.putAway.list.label", defaultLabel: "List Putaways", href: "/order/list?orderType=PUTAWAY_ORDER&status=PENDING"]
                     ]
                 ],
@@ -317,7 +317,8 @@ openboxes {
                         [label: "report.inventoryByLocationReport.label", defaultLabel: "Inventory By Location Report", href: "/report/showInventoryByLocationReport"],
                         [label: "report.cycleCount.label", defaultLabel: "Cycle Count Report", href: "/report/showCycleCountReport"],
                         [label: "report.baselineQohReport.label", defaultLabel: "Baseline QoH Report", href: "/inventory/show"],
-                        [label: "report.onOrderReport.label", defaultLabel: "On Order Report", href: "/report/showOnOrderReport"]
+                        [label: "report.onOrderReport.label", defaultLabel: "On Order Report", href: "/report/showOnOrderReport"],
+                        [label: "report.lostAndFound.label", defaultLabel: "Lost & Found Report", href: "/report/showLostAndFoundReport"]
                     ]
                 ],
                 [
@@ -608,6 +609,10 @@ openboxes {
                             widgetId: "inProgressPutaways",
                             order   : 4
                         ],
+                        [
+                            widgetId: "lostAndFoundInventory",
+                            order   : 5
+                        ],
 
                         [
                             widgetId: "inventorySummary",
@@ -707,8 +712,12 @@ openboxes {
                             order   : 5
                         ],
                         [
-                                widgetId: "requestsPendingApproval",
-                                order   : 6
+                            widgetId: "requestsPendingApproval",
+                            order   : 6
+                        ],
+                        [
+                            widgetId: "lostAndFoundInventory",
+                            order   : 7
                         ],
 
                         [
@@ -813,6 +822,15 @@ openboxes {
                 numberType = 'number'
                 type = 'number'
                 endpoint = "/api/dashboard/inventoryByLotAndBin"
+            }
+            lostAndFoundInventory {
+                enabled = true
+                title = "react.dashboard.lostAndFound.title.label"
+                info = "react.dashboard.lostAndFound.info.label"
+                subtitle = "react.dashboard.subtitle.products.label"
+                numberType = 'number'
+                type = 'number'
+                endpoint = "/api/dashboard/lostAndFound"
             }
             inProgressShipments {
                 enabled = true

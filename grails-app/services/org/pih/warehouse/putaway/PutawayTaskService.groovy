@@ -12,10 +12,10 @@ import org.pih.warehouse.api.PutawayTaskStatus
 import org.pih.warehouse.api.StatusCategory
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.ActivityCode
-import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.ReasonCode
+import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.inventory.InventoryService
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransferStockCommand
@@ -109,11 +109,12 @@ class PutawayTaskService {
                 break
 
             case 'complete':
-                complete(task, data.destination as String, data.completedBy as String, data.force as Boolean)
+                complete(task, data.destination as String, data.completedBy as String, data.force as Boolean,
+                        data.isCancelRemaining as Boolean, data.reasonCode as ReasonCode)
                 break
 
             case 'partialComplete':
-                task = partialComplete(task, data.quantity as BigDecimal, data.destination as String, data.force as Boolean, data.reasonCode as ReasonCode)
+                task = partialComplete(task, data.quantity as BigDecimal, data.destination as String, data.reasonCode as ReasonCode)
                 break
 
             case 'rollback':
@@ -216,7 +217,7 @@ class PutawayTaskService {
     void start(PutawayTask task) {
         task.dateStarted = new Date()
         task.assignee = AuthService.currentUser
-        executeStateTransition(task, PutawayTaskStatus.IN_PROGRESS)
+        executeStateTransition(task, PutawayTaskStatus.STARTED)
         save(task)
     }
 
@@ -258,7 +259,7 @@ class PutawayTaskService {
         }
 
         // Execute state transition
-        executeStateTransition(task, PutawayTaskStatus.IN_TRANSIT)
+        executeStateTransition(task, PutawayTaskStatus.IN_PROGRESS)
 
         // Transfer stock from origin to putaway container
         // FIXME can't figure out the best way to make this
@@ -267,7 +268,8 @@ class PutawayTaskService {
         save(task)
     }
 
-    void complete(PutawayTask task, String destinationId, String completedById, Boolean force = false) {
+    void complete(PutawayTask task, String destinationId, String completedById, Boolean force = false,
+                  Boolean isCancelRemaining, ReasonCode reasonCode) {
         log.info "complete putaway"
         if (!task) {
             throw new ObjectNotFoundException(task.id, "Unable to locate putaway task with id ${task.id}")
@@ -298,6 +300,16 @@ class PutawayTaskService {
             task.errors.reject("completedBy", "Must provide a valid person or user who completed the putaway task")
         }
 
+        if (isCancelRemaining) {
+            def discrepancyLocation = findDiscrepancyLocation(task)
+            if (!discrepancyLocation) {
+                throw new IllegalStateException("No discrepancy location found")
+            }
+            task.destination = discrepancyLocation
+        }
+
+        task.discrepancyReasonCode = reasonCode
+
         task.dateCompleted = new Date()
         task.completedBy = completedBy
         executeStateTransition(task, PutawayTaskStatus.COMPLETED)
@@ -309,7 +321,7 @@ class PutawayTaskService {
         save(task)
     }
 
-    PutawayTask partialComplete(PutawayTask task, BigDecimal quantity, String destinationId, Boolean force = false, ReasonCode reasonCode = null) {
+    PutawayTask partialComplete(PutawayTask task, BigDecimal quantity, String destinationId, ReasonCode reasonCode) {
         if (quantity > task.quantity) {
             throw new IllegalArgumentException("Quantity provided is more than requested. Please re-enter quantity")
         }
@@ -319,31 +331,16 @@ class PutawayTaskService {
             throw new IllegalArgumentException("Quantity provided is more than requested. Please re-enter quantity")
         }
 
-        // validate destination or user has forced a destination change
-        Location destination = Location.get(destinationId)
-        if (!destination) {
-            task.errors.reject("destination", "Destination is required")
-        }
-
-        // validate destination
-        if (task.destination != destination && !force) {
-            task.errors.reject("destination", "Destination provided does not match expected destination")
-        }
-
-        // Update the task destination if the destinations do not match, but user forced change
-        if (task.destination != destination && force) {
-            task.destination = destination
-        }
-
-        if (reasonCode) {
-            task.discrepancyReasonCode = reasonCode
-            def discrepancyLocation = task.facility.internalLocations
-                    .find { it.locationType.name == Constants.DISCREPANCY_LOCATION_TYPE}
+        Location alternativeDestination = Location.get(destinationId)
+        if (!alternativeDestination) {
+            def discrepancyLocation = findDiscrepancyLocation(task)
             if (!discrepancyLocation) {
                 throw new IllegalStateException("No discrepancy location found")
             }
-            task.destination = discrepancyLocation
+            alternativeDestination = discrepancyLocation
         }
+
+        task.discrepancyReasonCode = reasonCode
 
         if (task.hasErrors() || !task.validate()) {
             throw new ValidationException("Validation errors occurred during complete action", task.errors)
@@ -362,8 +359,8 @@ class PutawayTaskService {
         }
         PutawayItem itemToSplit = putaway.putawayItems.find { it.id == currentItem.id }
 
-        PutawayItem completedSplitItem = createSplitPutawayItem(task, quantity, PutawayStatus.COMPLETED)
-        PutawayItem remainingSplitItem = createSplitPutawayItem(task, quantityRemaining, PutawayStatus.PENDING)
+        PutawayItem completedSplitItem = createSplitPutawayItem(task, quantity, PutawayStatus.COMPLETED, task.destination)
+        PutawayItem remainingSplitItem = createSplitPutawayItem(task, quantityRemaining, PutawayStatus.PENDING, alternativeDestination)
 
         if (itemToSplit) {
             itemToSplit.splitItems = [completedSplitItem, remainingSplitItem]
@@ -490,16 +487,43 @@ class PutawayTaskService {
         task.status = to
     }
 
-    private PutawayItem createSplitPutawayItem(PutawayTask task, BigDecimal quantity, PutawayStatus status) {
+    private PutawayItem createSplitPutawayItem(PutawayTask task, BigDecimal quantity, PutawayStatus status, Location destination) {
         return new PutawayItem(
                 quantity: quantity,
                 putawayStatus: status,
-                putawayLocation: task.destination,
+                putawayLocation: destination,
                 inventoryItem: task.inventoryItem,
                 product: task.product,
                 currentFacility: task.facility,
                 currentLocation: task.location,
                 containerLocation: task.container
         )
+    }
+
+    private Location findDiscrepancyLocation(PutawayTask task) {
+        def discrepancyLocation = task.facility.internalLocations
+                .find { it.supports(ActivityCode.LOST_AND_FOUND) }
+        if (!discrepancyLocation) {
+            throw new IllegalStateException("No discrepancy location found")
+        }
+
+        return discrepancyLocation
+    }
+
+    List<Location> getAlternateDestinations(PutawayTask task) {
+        if (task.destination) {
+            // We're cross-docking so we want to find similar locations in the same cross-docking zone
+            if (task?.destination?.supports(ActivityCode.CROSS_DOCKING)) {
+                if (task.destination.zone) {
+                    return Location.findAllByParentLocationAndZone(task.facility, task.destination.zone)
+                }
+                else {
+                    // TODO return the locations that share the same DeliveryTypeCode as the destination
+                    //  need to wait until we merge the code from OBLS-180, OBLS-187
+                }
+            }
+        }
+        // return preferred putaway locations
+        return InventoryLevel.getPutawayLocations(task.facility, task.product)
     }
 }

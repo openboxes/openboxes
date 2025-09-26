@@ -51,6 +51,12 @@ class DashboardApiController {
         render(numberData as JSON)
     }
 
+    def getLostAndFoundInventoryItems() {
+        Location location = Location.get(params.locationId)
+        NumberData numberData = numberDataService.getLostAndFoundInventoryItems(location)
+        render(numberData as JSON)
+    }
+
     def getInProgressShipments() {
         Location location = Location.get(params.locationId)
         User user = params.userId ? User.get(params.userId) : null

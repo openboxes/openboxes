@@ -10,6 +10,7 @@
 package org.pih.warehouse.inventory
 
 import grails.databinding.BindUsing
+import org.apache.commons.lang.StringUtils
 import org.pih.warehouse.EmptyStringsToNullBinder
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
@@ -87,7 +88,15 @@ class InventoryLevel {
         cache true
     }
 
-    static transients = ["facilityLocation", "forecastPeriod", "forecastPeriodOptions", "monthlyForecastQuantity"]
+    static transients = [
+            "facilityLocation",
+            "forecastPeriod",
+            "forecastPeriodOptions",
+            "monthlyForecastQuantity",
+            "assignedLocations",
+            "putawayLocations",
+            "defaultPutawayLocation"
+    ]
 
     static constraints = {
         status(nullable: true)
@@ -110,9 +119,69 @@ class InventoryLevel {
         demandTimePeriodDays(nullable: true)
     }
 
+    static List<Location> getPutawayLocations(Location facility, Product product) {
+        List<Location> putawayLocations = where {
+            product == product && inventory == facility.inventory &&
+                    internalLocation != null
+        }.projections {
+            property "internalLocation"
+        }.list() as List<Location>
+
+        Location defaultPutawayLocation = getDefaultPutawayLocation(facility, product)
+        if (defaultPutawayLocation) {
+            putawayLocations.add(0, defaultPutawayLocation)
+        }
+        return putawayLocations
+    }
+
+    static Location getDefaultPutawayLocation(Location facility, Product product) {
+        return where {
+            product == product && inventory == facility.inventory &&
+                    internalLocation == null
+        }.projections {
+            property "preferredBinLocation"
+        }.get() as Location
+    }
+
     Location getFacilityLocation() {
         return inventory?.warehouse
     }
+
+    @Deprecated
+    List<Location> getAssignedLocations() {
+        List<Location> assignedLocations = []
+        // The preferred locations are only available at the facility level replenishment rule
+        if (!internalLocation) {
+            assignedLocations = getAssignedLocationsFromInventoryLevels()
+            // Make sure the preferred bin specified on the facility level rule is the at the top of the list
+            if (preferredBinLocation) assignedLocations.add(0, preferredBinLocation)
+        }
+        return assignedLocations.unique()
+    }
+
+    @Deprecated
+    List<Location> getAssignedLocationsFromBinLocation() {
+        return binLocation
+                .split(",")
+                .collect { it.trim() }
+                .findAll { StringUtils.isNotBlank(it) }
+                .collect { String locationNumber ->
+                    Location.findByLocationNumber(locationNumber)
+                }
+                .findAll { it } // remove nulls
+    }
+
+    @Deprecated
+    List<Location> getAssignedLocationsFromInventoryLevels() {
+        return InventoryLevel.where {
+            product == this.product &&
+                    inventory == this.inventory &&
+                    internalLocation != null
+        }.projections {
+            property "internalLocation"
+        }.list()
+    }
+
 
     def statusMessage(Long currentQuantity) {
         return InventoryUtil.getStatusMessage(status, minQuantity, reorderQuantity, maxQuantity, currentQuantity)

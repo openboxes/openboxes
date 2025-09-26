@@ -40,7 +40,7 @@ class LocationApiController extends BaseDomainApiController {
     LocationDataService locationGormService
 
     def read() {
-        Location location = Location.get(params.id)
+        Location location = Location.findByIdOrLocationNumber(params.id, params.id)
         render([data: location] as JSON)
     }
 

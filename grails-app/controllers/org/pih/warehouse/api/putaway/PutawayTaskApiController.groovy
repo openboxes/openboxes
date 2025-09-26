@@ -46,11 +46,6 @@ class PutawayTaskApiController extends RestfulController<PutawayTask> {
     // FIXME I think I was experimenting with the data binding mechanism to see if this would work
     //  It does but I wanted to keep the original code in case we wanted to rollback.
     def read(PutawayTask putawayTask) {
-//        def task = putawayTaskService.get(id)
-//        if (!task) {
-//            return render(status: HttpStatus.NOT_FOUND.value())
-//        }
-//        render([data: task] as JSON)
         respond ([data: putawayTask])
     }
 
@@ -85,7 +80,6 @@ class PutawayTaskApiController extends RestfulController<PutawayTask> {
     }
 
     def suggestions(SuggestInboundRoutingCommand command) {
-
         if (command.hasErrors()) {
             throw new ValidationException("validation errors", command.errors)
         }
@@ -97,5 +91,9 @@ class PutawayTaskApiController extends RestfulController<PutawayTask> {
         render([data: [allocations: allocations, demands: demands, unmetDemands: unmetDemands]] as JSON)
     }
 
+    def alternateDestinations(PutawayTask task) {
+        List<Location> locations = putawayTaskService.getAlternateDestinations(task)
+        render ([data:locations] as JSON)
+    }
 }
 
