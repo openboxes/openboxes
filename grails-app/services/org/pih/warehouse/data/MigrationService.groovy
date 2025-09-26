@@ -31,12 +31,15 @@ import org.pih.warehouse.core.PartyType
 import org.pih.warehouse.core.RatingTypeCode
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
+import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.ProductAvailabilityService
 import org.pih.warehouse.inventory.ProductInventoryTransactionMigrationService
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionCode
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.inventory.TransactionType
+import org.pih.warehouse.inventory.product.availability.AvailableItemKey
+import org.pih.warehouse.inventory.product.availability.AvailableItemMap
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductSupplier
 import org.pih.warehouse.receiving.Receipt
@@ -493,7 +496,7 @@ class MigrationService {
                 if (cleanupAdjustmentEnabled && shouldBeZeroedOut) {
                     log.info("Check if there is need for 'zeroing out' adjustments for products that had no stock before migration")
 
-                    Map<String, AvailableItem> availableItems = productAvailabilityService.getAvailableItemsAtDateAsMap(
+                    AvailableItemMap availableItems = productAvailabilityService.getAvailableItemsAtDateAsMap(
                             location,
                             shouldBeZeroedOut
                     )
@@ -555,14 +558,14 @@ class MigrationService {
         }
 
         Date previousTransactionDate = null
-        transactions.each { Transaction it ->
+        for (Transaction it in transactions) {
             // For single product transactions, we can keep only the newest transaction with the same transaction date
             if (singleProduct && previousTransactionDate && it.transactionDate == previousTransactionDate) {
                 log.debug "Transaction ${it.transactionNumber} has a transaction date equal to the previously processed " +
                         "transaction. Skipping migrating this one as it won't have effect on the stock."
                 it.disableRefresh = true
                 it.delete(flush: true, failOnError: true)
-                return
+                continue
             }
             previousTransactionDate = it.transactionDate
 
@@ -573,14 +576,14 @@ class MigrationService {
             if (!entries) {
                 it.disableRefresh = true
                 it.delete(flush: true, failOnError: true)
-                return
+                continue
             }
 
             // Find all products in entries (and create inventory baseline for these)
             List<Product> currentTransactionProducts = entries?.collect { TransactionEntry te -> te.inventoryItem.product }?.unique()
 
             // Create inventory baseline for old transaction that is being migrated (if enabled)
-            Map<String, AvailableItem> availableItems = productAvailabilityService.getAvailableItemsAtDateAsMap(
+            AvailableItemMap availableItems = productAvailabilityService.getAvailableItemsAtDateAsMap(
                     location, currentTransactionProducts, it.transactionDate)
 
             String newComment = "Migrated from single Product Inventory transaction to Baseline + Adjustment pair. " +
@@ -909,24 +912,28 @@ class MigrationService {
      */
     private Transaction createAdjustmentTransaction(Location facility,
                                                     List<TransactionEntry> transactionEntries,
-                                                    Map<String, AvailableItem> availableItems,
+                                                    AvailableItemMap availableItems,
                                                     Date transactionDate,
                                                     String comment) {
         // Don't bother populating the transaction's fields until we know we'll need one.
         Transaction transaction = new Transaction()
 
-        Map<String, Map> groupedEntries = transactionEntries?.groupBy { [it.inventoryItem, it.binLocation] }?.collectEntries { key, entries ->
-            String itemKey = productAvailabilityService.constructAvailableItemKey(key[1], key[0])
-            String comments = entries.comments.findAll { it }.join(', ')
-            [(itemKey): [
-                binLocation: key[1],
-                inventoryItem: key[0],
-                quantity: entries.sum { it.quantity },
-                comments: comments.length() > 255 ? comments.substring(0, 255) : comments
-            ]]
-        }
+        Map<AvailableItemKey, Map> groupedEntries = transactionEntries
+                ?.groupBy { [it.inventoryItem, it.binLocation] }
+                ?.collectEntries { key, entries ->
+                    InventoryItem inventoryItem = key[0] as InventoryItem
+                    Location binLocation = key[1] as Location
+                    AvailableItemKey itemKey = new AvailableItemKey(binLocation, inventoryItem)
+                    String comments = entries.comments.findAll { it }.join(', ')
+                    [(itemKey): [
+                        binLocation: binLocation,
+                        inventoryItem: inventoryItem,
+                        quantity: entries.sum { it.quantity },
+                        comments: comments.length() > 255 ? comments.substring(0, 255) : comments
+                    ]]
+        } as Map<AvailableItemKey, Map>
 
-        groupedEntries?.each { String key, Map value ->
+        groupedEntries?.each { AvailableItemKey key, Map value ->
             // Assuming there is no duplicated product-lot-bin combination in the transaction entries
             // If there are, it need to be done similarly like in the Inventory Import
             int quantityOnHand = availableItems.get(key)?.quantityOnHand ?: 0
@@ -948,12 +955,12 @@ class MigrationService {
 
         // For all products in the transaction, any other bins/lots of those products that exist in the system (ie have
         // a product availability entry) but were not in the migrated transaction should have their quantity set to zero.
-        Set<String> keysInTransaction = groupedEntries.keySet()
-        availableItems.each { entry ->
+        Set<AvailableItemKey> keysInTransaction = groupedEntries.keySet()
+        for (entry in availableItems.entrySet()) {
             AvailableItem availableItem = entry.value
 
             if (keysInTransaction.contains(entry.key)) {
-                return
+                continue
             }
 
             TransactionEntry transactionEntry = new TransactionEntry(
@@ -993,13 +1000,13 @@ class MigrationService {
      * the migration process and somehow it's not empty (it might happen due to the backdated transecations)
      */
     private Transaction createCleanupAdjustment(Location facility,
-                                                Map<String, AvailableItem> availableItems,
+                                                AvailableItemMap availableItems,
                                                 String comment) {
         // Don't bother populating the transaction's fields until we know we'll need one.
         Transaction transaction = new Transaction()
 
         if (availableItems) {
-            availableItems.each { String key, AvailableItem it ->
+            availableItems.values().each {
                 int quantityOnHand = it?.quantityOnHand ?: 0
                 // If there is already a item with qoh zero, we can skip it
                 if (quantityOnHand == 0) {

@@ -6,6 +6,7 @@ import java.time.Instant
 
 import org.pih.warehouse.DateUtil
 import org.pih.warehouse.core.Constants
+import org.pih.warehouse.inventory.product.availability.AvailableItemKey
 import org.pih.warehouse.product.Product
 
 /**
@@ -132,14 +133,12 @@ class CycleCountTransactionService {
 
     private List<Transaction> createProductInventoryTransactions(CycleCount cycleCount, Date transactionDate) {
         List<Transaction> transactions = []
-        // We have to create a map keyed by inventoryItem and binLocation, because we further access it via AvailableItem properties
-        // and the inventoryItem + binLocation pair indicates the uniqueness in comparison with the CycleCountItem
-        Map<Map<String, Object>, String> commentsPerCycleCountItem = new HashMap<>()
+        Map<AvailableItemKey, String> commentsPerCycleCountItem = new HashMap<>()
         cycleCount.cycleCountItems.each {
             // We want to add a comment to product inventory transaction if we know,
             // that no adjustment transaction would be created afterwards, that would contain the comment
             if (it.comment && !it.quantityVariance) {
-                commentsPerCycleCountItem.put([inventoryItem: it.inventoryItem, binLocation: it.location], buildRecountComment(it))
+                commentsPerCycleCountItem.put(new AvailableItemKey(it.location, it.inventoryItem), buildRecountComment(it))
             }
         }
         // A cycle count can count multiple products. Each product needs their own product inventory transaction.
