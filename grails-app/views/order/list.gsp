@@ -104,16 +104,30 @@
 										<td data-testid="order-type-${i}" class="middle">
 											<format:metadata obj="${orderInstance?.orderType?.code}"/>
 										</td>
-										<td class="middle">
-											<g:link data-testid="order-number-${i}" action="show" id="${orderInstance.id}">
-												${fieldValue(bean: orderInstance, field: "orderNumber")}
-											</g:link>
-										</td>
-										<td class="middle">
-											<g:link data-testid="name-${i}" action="show" id="${orderInstance.id}">
-												${fieldValue(bean: orderInstance, field: "name")}
-											</g:link>
-										</td>
+                                        <td class="middle">
+                                            <g:if test="${orderType == OrderType.findByCode(Constants.PUTAWAY_ORDER)}">
+                                                <g:link data-testid="order-number-${i}" controller="putaway" action="show" id="${orderInstance.id}">
+                                                    ${fieldValue(bean: orderInstance, field: "orderNumber")}
+                                                </g:link>
+                                            </g:if>
+                                            <g:else>
+                                                <g:link data-testid="order-number-${i}" controller="order" action="show" id="${orderInstance.id}">
+                                                    ${fieldValue(bean: orderInstance, field: "orderNumber")}
+                                                </g:link>
+                                            </g:else>
+                                        </td>
+                                        <td class="middle">
+                                            <g:if test="${orderType == OrderType.findByCode(Constants.PUTAWAY_ORDER)}">
+                                                <g:link data-testid="name-${i}" controller="putaway" action="show" id="${orderInstance.id}">
+                                                    ${fieldValue(bean: orderInstance, field: "name")}
+                                                </g:link>
+                                            </g:if>
+                                            <g:else>
+                                                <g:link data-testid="name-${i}" controller="order" action="show" id="${orderInstance.id}">
+                                                    ${fieldValue(bean: orderInstance, field: "name")}
+                                                </g:link>
+                                            </g:else>
+                                        </td>
                                         <g:if test="${orderType != OrderType.findByCode(Constants.PUTAWAY_ORDER)}">
                                             <td data-testid="origin-organization-code-${i}" class="middle">
                                                 ${fieldValue(bean: orderInstance, field: "origin.name")}

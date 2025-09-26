@@ -62,7 +62,7 @@ const INVOICE_URL = {
 };
 
 const PUTAWAY_URL = {
-  base: `${CONTEXT_PATH}/putAway`,
+  base: `${CONTEXT_PATH}/putaway`,
   create: () => `${PUTAWAY_URL.base}/create`,
   edit: (id) => `${PUTAWAY_URL.create()}/${id}`,
 };
