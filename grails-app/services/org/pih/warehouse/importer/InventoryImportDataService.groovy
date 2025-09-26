@@ -240,7 +240,7 @@ class InventoryImportDataService implements ImportDataService {
      */
     private Transaction createAdjustmentTransaction(Location facility,
                                                     InventoryImportData inventoryImportData,
-                                                    Map<String, AvailableItem> availableItems,
+                                                    AvailableItemMap availableItems,
                                                     Date transactionDate,
                                                     String comment) {
 
@@ -281,8 +281,8 @@ class InventoryImportDataService implements ImportDataService {
 
         // For all products in the import, any other bins/lots of those products that exist in the system (ie have
         // a product availability entry) but were not in the import should have their quantity set to zero.
-        Set<String> keysInImport = inventoryImportData.rows.keySet()
-        for (entry in availableItems) {
+        Set<AvailableItemKey> keysInImport = inventoryImportData.rows.keySet()
+        for (entry in availableItems.map) {
             AvailableItem availableItem = entry.value
 
             if (keysInImport.contains(entry.key)) {
