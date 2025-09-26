@@ -88,7 +88,15 @@ class InventoryLevel {
         cache true
     }
 
-    static transients = ["facilityLocation", "forecastPeriod", "forecastPeriodOptions", "monthlyForecastQuantity"]
+    static transients = [
+            "facilityLocation",
+            "forecastPeriod",
+            "forecastPeriodOptions",
+            "monthlyForecastQuantity",
+            "assignedLocations",
+            "putawayLocations",
+            "defaultPutawayLocation"
+    ]
 
     static constraints = {
         status(nullable: true)
@@ -111,10 +119,36 @@ class InventoryLevel {
         demandTimePeriodDays(nullable: true)
     }
 
+    static List<Location> getPutawayLocations(Location facility, Product product) {
+        List<Location> putawayLocations = where {
+            product == product && inventory == facility.inventory &&
+                    internalLocation != null
+        }.projections {
+            property "internalLocation"
+        }.list() as List<Location>
+
+        Location defaultPutawayLocation = getDefaultPutawayLocation(facility, product)
+        if (defaultPutawayLocation) {
+            putawayLocations.add(0, defaultPutawayLocation)
+        }
+        return putawayLocations
+    }
+
+    static Location getDefaultPutawayLocation(Location facility, Product product) {
+        return where {
+            product == product && inventory == facility.inventory &&
+                    internalLocation == null
+        }.projections {
+            property "preferredBinLocation"
+        }.get() as Location
+    }
+
+
     Location getFacilityLocation() {
         return inventory?.warehouse
     }
 
+    @Deprecated
     List<Location> getAssignedLocations() {
         List<Location> assignedLocations = []
         // The preferred locations are only available at the facility level replenishment rule
@@ -126,6 +160,7 @@ class InventoryLevel {
         return assignedLocations.unique()
     }
 
+    @Deprecated
     List<Location> getAssignedLocationsFromBinLocation() {
         return binLocation
                 .split(",")
@@ -137,6 +172,7 @@ class InventoryLevel {
                 .findAll { it } // remove nulls
     }
 
+    @Deprecated
     List<Location> getAssignedLocationsFromInventoryLevels() {
         return InventoryLevel.where {
             product == this.product &&
