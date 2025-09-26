@@ -248,7 +248,7 @@ openboxes {
                     defaultLabel: "Putaways",
                     requiredActivitiesAll: ActivityCode.binTrackingList(),
                     menuItems: [
-                        [label: "react.putAway.createPutAway.label", defaultLabel: "Create Putaway", href: "/putAway/create"],
+                        [label: "react.putAway.createPutAway.label", defaultLabel: "Create Putaway", href: "/putaway/create"],
                         [label: "react.putAway.list.label", defaultLabel: "List Putaways", href: "/order/list?orderType=PUTAWAY_ORDER&status=PENDING"]
                     ]
                 ],
