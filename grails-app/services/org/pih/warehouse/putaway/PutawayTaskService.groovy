@@ -487,10 +487,6 @@ class PutawayTaskService {
         task.status = to
     }
 
-    List<Location> getAlternateDestinations(PutawayTask task) {
-        return InventoryLevel.getPutawayLocations(task.facility, task.product)
-    }
-
     private PutawayItem createSplitPutawayItem(PutawayTask task, BigDecimal quantity, PutawayStatus status, Location destination) {
         return new PutawayItem(
                 quantity: quantity,
@@ -512,5 +508,22 @@ class PutawayTaskService {
         }
 
         return discrepancyLocation
+    }
+
+    List<Location> getAlternateDestinations(PutawayTask task) {
+        if (task.destination) {
+            // We're cross-docking so we want to find similar locations in the same cross-docking zone
+            if (task?.destination?.supports(ActivityCode.CROSS_DOCKING)) {
+                if (task.destination.zone) {
+                    return Location.findAllByParentLocationAndZone(task.facility, task.destination.zone)
+                }
+                else {
+                    // TODO return the locations that share the same DeliveryTypeCode as the destination
+                    //  need to wait until we merge the code from OBLS-180, OBLS-187
+                }
+            }
+        }
+        // return preferred putaway locations
+        return InventoryLevel.getPutawayLocations(task.facility, task.product)
     }
 }
