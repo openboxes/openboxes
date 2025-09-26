@@ -9,10 +9,16 @@ import {
 } from 'react-icons/ri';
 
 import Button from 'components/form-elements/Button';
+import requisitionStatus from 'consts/requisitionStatus';
 import { FormErrorPropType } from 'utils/propTypes';
 import Translate from 'utils/Translate';
 
-const InboundSendFormHeader = ({ errors }) => (
+const InboundSendFormHeader = ({
+  errors,
+  saveAndExit,
+  onSave,
+  statusCode,
+}) => (
   <div className="d-flex justify-content-between align-items-center mb-3">
     <div className="font-size-md font-weight-normal">
       <Translate
@@ -28,6 +34,7 @@ const InboundSendFormHeader = ({ errors }) => (
         defaultLabel="Upload documents"
         label="react.stockMovement.uploadDocuments.label"
         variant="primary-outline"
+        disabled={statusCode === requisitionStatus.DISPATCHED}
       />
       <div className="btn-group">
         <Button
@@ -35,7 +42,7 @@ const InboundSendFormHeader = ({ errors }) => (
           defaultLabel="Export"
           label="react.default.button.export.label"
           variant="primary-outline"
-          EndIcon={<RiDownload2Line />}
+          StartIcon={<RiDownload2Line />}
         />
         <div
           className="dropdown-menu dropdown-menu-right nav-item padding-8"
@@ -77,14 +84,14 @@ const InboundSendFormHeader = ({ errors }) => (
         </div>
       </div>
       <Button
-        onClick={() => console.log('click')}
+        onClick={saveAndExit}
         StartIcon={<RiPictureInPictureExitLine className="icon" />}
         defaultLabel="Save and exit"
         label="react.default.button.saveAndExit.label"
         variant="primary-outline"
       />
       <Button
-        onClick={() => console.log('click')}
+        onClick={onSave}
         StartIcon={<RiSave2Line className="icon" />}
         defaultLabel="Save"
         label="react.default.button.save.label"
@@ -107,5 +114,13 @@ InboundSendFormHeader.propTypes = {
     driverName: FormErrorPropType,
     comments: FormErrorPropType,
     expectedDeliveryDate: FormErrorPropType,
-  }).isRequired,
+  }),
+  saveAndExit: PropTypes.func.isRequired,
+  onSave: PropTypes.func.isRequired,
+  statusCode: PropTypes.string,
+};
+
+InboundSendFormHeader.defaultProps = {
+  errors: {},
+  statusCode: '',
 };

@@ -4,33 +4,44 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import _ from 'lodash';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { getCurrentLocale, getCurrentLocation, getShipmentTypes } from 'selectors';
+import {
+  getAdminStatus,
+  getCurrentLocale,
+  getCurrentLocation,
+  getShipmentTypes,
+} from 'selectors';
 
 import { fetchShipmentTypes, updateWorkflowHeader } from 'actions';
 import stockMovementApi from 'api/services/StockMovementApi';
 import notification from 'components/Layout/notifications/notification';
+import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
 import locationType from 'consts/locationType';
 import NotificationType from 'consts/notificationTypes';
+import requisitionStatus from 'consts/requisitionStatus';
+import { DateFormat } from 'consts/timeFormat';
 import { OutboundWorkflowState } from 'consts/WorkflowState';
 import useInboundSendValidation from 'hooks/inboundV2/send/useInboundSendValidation';
 import useQueryParams from 'hooks/useQueryParams';
 import useSpinner from 'hooks/useSpinner';
 import useTranslate from 'hooks/useTranslate';
+import confirmationModal from 'utils/confirmationModalUtils';
 import createInboundWorkflowHeader from 'utils/createInboundWorkflowHeader';
+import dateWithoutTimeZone from 'utils/dateUtils';
 
-const useInboundSendForm = () => {
+const useInboundSendForm = ({ previous }) => {
   const {
     currentLocation,
     currentLocale,
     shipmentTypes,
+    hasAdminRights,
   } = useSelector((state) => ({
     currentLocation: getCurrentLocation(state),
     currentLocale: getCurrentLocale(state),
     shipmentTypes: getShipmentTypes(state),
+    hasAdminRights: getAdminStatus(state),
   }));
-
   const translate = useTranslate();
-  const queryParams = useQueryParams();
+  const { id: stockMovementId } = useQueryParams();
   const dispatch = useDispatch();
   const spinner = useSpinner();
   const { validationSchema } = useInboundSendValidation();
@@ -48,7 +59,10 @@ const useInboundSendForm = () => {
     driverName: '',
     comments: '',
     expectedDeliveryDate: null,
-  }), [currentLocation]);
+    hasManageInventory: false,
+    statusCode: '',
+    shipped: false,
+  }), [currentLocation?.id]);
 
   const {
     control,
@@ -56,18 +70,44 @@ const useInboundSendForm = () => {
     handleSubmit,
     formState: { errors },
     trigger,
-    setValue,
     reset,
   } = useForm({
     mode: 'onBlur',
     defaultValues,
     resolver: zodResolver(validationSchema()),
   });
+  const { statusCode, shipped } = getValues();
+
+  const getShipmentPayload = () => {
+    const {
+      shipDate,
+      shipmentType,
+      trackingNumber,
+      driverName,
+      comments,
+      expectedDeliveryDate,
+    } = getValues();
+
+    return {
+      dateShipped: dateWithoutTimeZone({
+        date: shipDate,
+        outputDateFormat: DateFormat.MM_DD_YYYY,
+      }),
+      shipmentType: shipmentType.id || null,
+      trackingNumber: trackingNumber || '',
+      driverName: driverName || '',
+      comments: comments || '',
+      expectedDeliveryDate: dateWithoutTimeZone({
+        date: expectedDeliveryDate,
+        outputDateFormat: DateFormat.MM_DD_YYYY,
+      }),
+    };
+  };
 
   const fetchStockMovementData = async () => {
     try {
       spinner.show();
-      const response = await stockMovementApi.getStockMovementById(queryParams.id,
+      const response = await stockMovementApi.getStockMovementById(stockMovementId,
         { stepNumber: OutboundWorkflowState.SEND_SHIPMENT });
 
       const { data } = response.data;
@@ -84,18 +124,19 @@ const useInboundSendForm = () => {
           label: `${data.destination.name} [${data.destination.locationType ? data.destination.locationType.description : null}]`,
         } || null,
         shipDate: data.dateShipped || null,
-        shipmentType: data.shipmentType
-          ? {
-            id: data.shipmentType.id,
-            name: data.shipmentType.name,
-            label: data.shipmentType.displayName,
-            value: data.shipmentType.id,
-          }
-          : null,
+        shipmentType: {
+          id: data.shipmentType.id,
+          name: data.shipmentType.name,
+          label: data.shipmentType.displayName,
+          value: data.shipmentType.id,
+        } || null,
         trackingNumber: data.trackingNumber || '',
         driverName: data.driverName || '',
         comments: data.comments || '',
         expectedDeliveryDate: data.expectedDeliveryDate || null,
+        statusCode: data.statusCode || '',
+        hasManageInventory: data.hasManageInventory || false,
+        shipped: data.shipped || false,
       });
 
       dispatch(
@@ -109,12 +150,11 @@ const useInboundSendForm = () => {
     }
   };
 
-  const onSubmit = async (values) => {
-    console.log(values);
-
+  const validateAndBuildShipmentPayload = (values) => {
     if (
-      (currentLocation?.id !== values.origin?.id) &&
-      (values.origin?.type !== locationType.SUPPLIER && values.hasManageInventory)
+      currentLocation?.id !== values.origin?.id
+      && values.origin?.type !== locationType.SUPPLIER
+      && values.hasManageInventory
     ) {
       notification(NotificationType.ERROR_FILLED)({
         message: 'Error',
@@ -123,7 +163,7 @@ const useInboundSendForm = () => {
           'You are not able to send shipment from a location other than origin. Change your current location.',
         ),
       });
-      return;
+      return null;
     }
 
     const defaultShipmentType = _.find(shipmentTypes, (shipmentType) => shipmentType.name === 'Default');
@@ -137,26 +177,196 @@ const useInboundSendForm = () => {
           'Please populate shipment type before continuing',
         ),
       });
+      return null;
     }
+
+    return getShipmentPayload();
+  };
+
+  // sends the whole stock movement
+  const sendShipment = async (values) => {
+    try {
+      spinner.show();
+      const payload = validateAndBuildShipmentPayload(values);
+      if (!payload) {
+        return;
+      }
+      await stockMovementApi.updateStockMovementShipment(stockMovementId, payload);
+      await stockMovementApi.updateStatus(stockMovementId,
+        { status: requisitionStatus.DISPATCHED });
+      window.location = STOCK_MOVEMENT_URL.show(stockMovementId);
+    } finally {
+      spinner.hide();
+    }
+  };
+
+  // Rollback stock movement if it has been shipped
+  const rollbackStockMovement = async () => {
+    try {
+      spinner.show();
+      const { origin, destination, hasManageInventory } = getValues();
+      const matchesOrigin = currentLocation?.id === origin?.id;
+      const matchesDestination = currentLocation?.id === destination?.id;
+
+      const canRollback = (hasManageInventory && matchesOrigin)
+        || (!hasManageInventory && matchesDestination);
+
+      if (!canRollback) {
+        notification(NotificationType.ERROR_FILLED)({
+          message: 'Error',
+          details: translate(
+            'react.stockMovement.alert.rollbackShipment.label',
+            'You are not able to rollback shipment from your location.',
+          ),
+        });
+        return;
+      }
+
+      await stockMovementApi.updateStatus(stockMovementId, { rollback: true });
+      window.location.reload();
+    } finally {
+      spinner.hide();
+    }
+  };
+
+  // save the whole stock movement
+  const onSave = async () => {
+    try {
+      spinner.show();
+      await stockMovementApi.updateStockMovementShipment(stockMovementId, getShipmentPayload());
+
+      if (statusCode === requisitionStatus.DISPATCHED) {
+        await fetchStockMovementData();
+      }
+
+      notification(NotificationType.SUCCESS)({
+        message: translate(
+          'react.stockMovement.alert.saveSuccess.label',
+          'Changes saved successfully',
+        ),
+      });
+    } finally {
+      spinner.hide();
+    }
+  };
+
+  const confirmActionModal = ({
+    titleId = 'react.stockMovement.message.confirmSave.label',
+    titleDefault = 'Confirm save',
+    messageId,
+    messageDefault,
+    buttons,
+    onConfirm,
+  }) => {
+    const modalLabels = {
+      title: { label: titleId, default: titleDefault },
+      content: { label: messageId, default: messageDefault },
+    };
+
+    const modalButtons = (onClose) => {
+      if (buttons) {
+        return buttons(onClose);
+      }
+      return [
+        {
+          variant: 'transparent',
+          defaultLabel: 'No',
+          label: 'react.default.no.label',
+          onClick: () => onClose(),
+        },
+        {
+          variant: 'primary',
+          defaultLabel: 'Yes',
+          label: 'react.default.yes.label',
+          onClick: () => {
+            onConfirm?.();
+            onClose();
+          },
+        },
+      ];
+    };
+
+    confirmationModal({
+      buttons: modalButtons,
+      ...modalLabels,
+    });
+  };
+
+  // Saves changes made by user in this step and go back to previous page
+  const previousPage = async () => {
+    await trigger();
+    if (Object.keys(errors).length === 0) {
+      await stockMovementApi.updateStockMovementShipment(stockMovementId, getShipmentPayload());
+      return previous();
+    }
+
+    return confirmActionModal({
+      titleId: 'react.stockMovement.confirmPreviousPage.label',
+      titleDefault: 'Validation error',
+      messageId: 'react.stockMovement.confirmPreviousPage.message.label',
+      messageDefault: 'Cannot save due to validation error on page',
+      buttons: (onClose) => [
+        {
+          variant: 'primary',
+          defaultLabel: 'Correct error',
+          label: 'react.stockMovement.confirmPreviousPage.correctError.label',
+          onClick: () => onClose(),
+        },
+        {
+          variant: 'danger',
+          defaultLabel: 'Continue (lose unsaved work)',
+          label: 'react.stockMovement.confirmPreviousPage.continue.label',
+          onClick: async () => {
+            previous();
+            onClose();
+          },
+        },
+      ],
+    });
+  };
+
+  // Saves changes made by user in this step and redirects to the shipment view page
+  const saveAndExit = async () => {
+    await trigger();
+
+    if (Object.keys(errors).length === 0) {
+      await stockMovementApi.updateStockMovementShipment(stockMovementId, getShipmentPayload());
+      window.location = STOCK_MOVEMENT_URL.show(stockMovementId);
+      return;
+    }
+
+    confirmActionModal({
+      messageId: 'react.stockMovement.confirmExit.message',
+      messageDefault: 'Validation errors occurred. Are you sure you want to exit and lose unsaved data?',
+      onConfirm: () => {
+        window.location = STOCK_MOVEMENT_URL.show(stockMovementId);
+      },
+    });
   };
 
   useEffect(() => {
     dispatch(fetchShipmentTypes());
-  }, [currentLocale]);
+  }, [currentLocale, stockMovementId]);
 
   useEffect(() => {
     fetchStockMovementData();
-  }, []);
+  }, [stockMovementId]);
 
   return {
     control,
     getValues,
-    setValue,
     handleSubmit,
     errors,
     trigger,
-    onSubmit,
+    sendShipment,
     shipmentTypes,
+    rollbackStockMovement,
+    onSave,
+    previousPage,
+    saveAndExit,
+    statusCode,
+    hasAdminRights,
+    shipped,
   };
 };
 

@@ -2,6 +2,7 @@ import React from 'react';
 
 import PropTypes from 'prop-types';
 import { Controller } from 'react-hook-form';
+import { RiArrowGoBackFill } from 'react-icons/ri';
 
 import Button from 'components/form-elements/Button';
 import DateField from 'components/form-elements/v2/DateField';
@@ -10,6 +11,7 @@ import TextInput from 'components/form-elements/v2/TextInput';
 import Section from 'components/Layout/v2/Section';
 import InboundSendFormHeader
   from 'components/stock-movement-wizard/inboundV2/sections/InboundSendFormHeader';
+import requisitionStatus from 'consts/requisitionStatus';
 import { DateFormat } from 'consts/timeFormat';
 import useInboundSendForm from 'hooks/inboundV2/send/useInboundSendForm';
 
@@ -19,14 +21,26 @@ const InboundSendForm = ({ previous }) => {
     control,
     errors,
     trigger,
-    onSubmit,
+    sendShipment,
     shipmentTypes,
-  } = useInboundSendForm();
+    rollbackStockMovement,
+    onSave,
+    previousPage,
+    saveAndExit,
+    statusCode,
+    hasAdminRights,
+    shipped,
+  } = useInboundSendForm({ previous });
 
   return (
     <>
-      <InboundSendFormHeader errors={errors} />
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <InboundSendFormHeader
+        errors={errors}
+        saveAndExit={saveAndExit}
+        onSave={onSave}
+        statusCode={statusCode}
+      />
+      <form onSubmit={handleSubmit(sendShipment)}>
         <Section title="Send Shipment">
           <div className="row">
             <div className="col-lg-3 col-md-6 px-2 pt-2">
@@ -185,14 +199,29 @@ const InboundSendForm = ({ previous }) => {
             label="react.default.button.previous.label"
             defaultLabel="Previous"
             variant="primary"
-            onClick={previous}
+            onClick={previousPage}
+            disabled={statusCode === requisitionStatus.DISPATCHED}
           />
-          <Button
-            label="shipping.sendShipment.label"
-            defaultLabel="Send shipment"
-            variant="primary"
-            type="submit"
-          />
+          <div className="buttons-container">
+            {(hasAdminRights && shipped) && (
+              <Button
+                label="react.default.button.rollback.label"
+                defaultLabel="Rollback"
+                variant="primary-outline"
+                onClick={rollbackStockMovement}
+                StartIcon={<RiArrowGoBackFill className="icon" />}
+                disabled={Object.keys(errors).length > 0
+                  || statusCode !== requisitionStatus.DISPATCHED}
+              />
+            )}
+            <Button
+              label="shipping.sendShipment.label"
+              defaultLabel="Send shipment"
+              variant="primary"
+              type="submit"
+              disabled={statusCode === requisitionStatus.DISPATCHED}
+            />
+          </div>
         </div>
       </form>
     </>

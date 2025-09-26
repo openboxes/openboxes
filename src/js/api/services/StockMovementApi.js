@@ -4,6 +4,7 @@ import {
   STOCK_MOVEMENT_ITEMS,
   STOCK_MOVEMENT_ROLLBACK_APPROVAL,
   STOCK_MOVEMENT_UPDATE_REQUISITION,
+  STOCK_MOVEMENT_UPDATE_SHIPMENT,
   STOCK_MOVEMENT_UPDATE_STATUS,
 } from 'api/urls';
 import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
@@ -17,7 +18,7 @@ export default {
   ),
   getStockMovements: (config) => apiClient.get(STOCK_MOVEMENT_API, config),
   deleteStockMovement: (id) => apiClient.delete(STOCK_MOVEMENT_BY_ID(id)),
-  updateStatus: (id, status) => apiClient.post(STOCK_MOVEMENT_UPDATE_STATUS(id), { status }),
+  updateStatus: (id, payload) => apiClient.post(STOCK_MOVEMENT_UPDATE_STATUS(id), payload),
   rejectRequest: ({
     id,
     sender,
@@ -39,4 +40,7 @@ export default {
     apiClient.get(STOCK_MOVEMENT_BY_ID(id), { params }),
   getStockMovementItems: (id, params) =>
     apiClient.get(STOCK_MOVEMENT_ITEMS(id), { params }),
+  updateStockMovementShipment: (id, payload) => apiClient.post(
+    STOCK_MOVEMENT_UPDATE_SHIPMENT(id), payload,
+  ),
 };
