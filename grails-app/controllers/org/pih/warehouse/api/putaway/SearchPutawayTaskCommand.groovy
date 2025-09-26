@@ -2,13 +2,14 @@ package org.pih.warehouse.api.putaway
 
 import grails.databinding.BindUsing
 import grails.databinding.DataBindingSource
+import grails.validation.Validateable
 import org.pih.warehouse.api.PutawayTaskStatus
 import org.pih.warehouse.api.StatusCategory
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
 import org.springframework.validation.Errors
 
-class SearchPutawayTaskCommand {
+class SearchPutawayTaskCommand implements Validateable {
 
     StatusCategory statusCategory
     List<PutawayTaskStatus> status

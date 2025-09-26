@@ -3,6 +3,9 @@ package org.pih.warehouse.api.putaway
 import grails.converters.JSON
 import grails.rest.RestfulController
 import grails.validation.ValidationException
+import org.pih.warehouse.core.Location
+import org.pih.warehouse.inboundSortation.DemandService
+import org.pih.warehouse.product.Product
 import org.pih.warehouse.putaway.PutawayTask
 import org.pih.warehouse.putaway.PutawayTaskService
 import org.springframework.http.HttpStatus
@@ -20,6 +23,7 @@ class PutawayTaskApiController extends RestfulController<PutawayTask> {
             generateForOrder: 'POST'
     ]
 
+    DemandService demandService
     PutawayTaskService putawayTaskService
 
     PutawayTaskApiController() {
@@ -79,5 +83,19 @@ class PutawayTaskApiController extends RestfulController<PutawayTask> {
         }
         render([data: task] as JSON)
     }
+
+    def suggestions(SuggestInboundRoutingCommand command) {
+
+        if (command.hasErrors()) {
+            throw new ValidationException("validation errors", command.errors)
+        }
+
+        def allocations = demandService.getAllocations(command.facility, command.product)
+        def demands = demandService.getDemands(command.facility, command.product)
+        def unmetDemands = demandService.calculateUnmetDemand(command.facility, command.product)
+
+        render([data: [allocations: allocations, demands: demands, unmetDemands: unmetDemands]] as JSON)
+    }
+
 }
 
