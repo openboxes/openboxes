@@ -148,7 +148,7 @@ class CycleCountProductInventoryTransactionServiceSpec extends Specification imp
         assert transactionEntries.collect{ it.quantity }.containsAll([50, 25])
     }
 
-    void 'createInventoryBaselineTransaction should do nothing when there are no available items'() {
+    void 'createInventoryBaselineTransaction should create an empty baseline when there are no available items'() {
         given: 'mocked inputs'
         Location facility = new Location(inventory: new Inventory())
         Product product = new Product()
@@ -160,9 +160,23 @@ class CycleCountProductInventoryTransactionServiceSpec extends Specification imp
         and: 'no other transactions exist at that time'
         inventoryServiceStub.hasTransactionEntriesOnDate(facility, _ as Date, []) >> false
 
-        expect:
-        assert cycleCountProductInventoryTransactionService.createInventoryBaselineTransaction(
-                facility, cycleCount, [product], null, null) == null
+        and: 'the default inventory item exists'
+        inventoryServiceStub.findOrCreateDefaultInventoryItem(product) >> new InventoryItem(lotNumber: 'DEFAULT')
+
+        when:
+        Transaction transaction = cycleCountProductInventoryTransactionService.createInventoryBaselineTransaction(
+                facility, cycleCount, [product], null, null)
+
+        then:
+        assert transaction.transactionType == productInventoryTransactionType
+
+        List<TransactionEntry> transactionEntries = transaction.transactionEntries as List<TransactionEntry>
+        assert transactionEntries.size() == 1
+
+        TransactionEntry transactionEntry = transactionEntries.get(0)
+        assert transactionEntry.quantity == 0
+        assert transactionEntry.inventoryItem.lotNumber == 'DEFAULT'
+        assert transactionEntry.binLocation == null
     }
 
     void 'createInventoryBaselineTransaction should fail when other transactions exist for that date'() {

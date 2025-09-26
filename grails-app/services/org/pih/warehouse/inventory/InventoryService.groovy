@@ -1442,6 +1442,7 @@ class InventoryService implements ApplicationContextAware {
                 recordStockProductInventoryTransactionService.createInventoryBaselineTransactionForGivenStock(
                         currentLocation,
                         null,
+                        [cmd.product],
                         availableItems.values() as List<AvailableItem>,
                         cmd.transactionDate
                 )
@@ -1721,6 +1722,14 @@ class InventoryService implements ApplicationContextAware {
      */
     InventoryItem findOrCreateInventoryItem(InventoryItem inventoryItem) {
         return findOrCreateInventoryItem(inventoryItem.product, inventoryItem.lotNumber, inventoryItem.expirationDate)
+    }
+
+    /**
+     * Fetches the inventory item associated with the default lot of the given product,
+     * creating it if it does not exist.
+     */
+    InventoryItem findOrCreateDefaultInventoryItem(Product product) {
+        return findOrCreateInventoryItem(product, null, null)
     }
 
     /**

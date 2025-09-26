@@ -168,6 +168,7 @@ class InventoryImportDataService implements ImportDataService {
         inventoryImportProductInventoryTransactionService.createInventoryBaselineTransactionForGivenStock(
                 command.location,
                 command,
+                inventoryImportData.products,
                 availableItems.values(),
                 baselineTransactionDate,
                 comment,
