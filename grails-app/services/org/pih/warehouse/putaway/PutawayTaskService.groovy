@@ -15,6 +15,7 @@ import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.ReasonCode
+import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.inventory.InventoryService
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransferStockCommand
@@ -108,7 +109,8 @@ class PutawayTaskService {
                 break
 
             case 'complete':
-                complete(task, data.destination as String, data.completedBy as String, data.force as Boolean, data.isCancelRemaining as Boolean)
+                complete(task, data.destination as String, data.completedBy as String, data.force as Boolean,
+                        data.isCancelRemaining as Boolean, data.reasonCode as ReasonCode)
                 break
 
             case 'partialComplete':
@@ -266,7 +268,8 @@ class PutawayTaskService {
         save(task)
     }
 
-    void complete(PutawayTask task, String destinationId, String completedById, Boolean force = false, Boolean isCancelRemaining) {
+    void complete(PutawayTask task, String destinationId, String completedById, Boolean force = false,
+                  Boolean isCancelRemaining, ReasonCode reasonCode) {
         log.info "complete putaway"
         if (!task) {
             throw new ObjectNotFoundException(task.id, "Unable to locate putaway task with id ${task.id}")
@@ -305,6 +308,8 @@ class PutawayTaskService {
             task.destination = discrepancyLocation
         }
 
+        task.discrepancyReasonCode = reasonCode
+
         task.dateCompleted = new Date()
         task.completedBy = completedBy
         executeStateTransition(task, PutawayTaskStatus.COMPLETED)
@@ -332,7 +337,7 @@ class PutawayTaskService {
             if (!discrepancyLocation) {
                 throw new IllegalStateException("No discrepancy location found")
             }
-            task.destination = discrepancyLocation
+            alternativeDestination = discrepancyLocation
         }
 
         task.discrepancyReasonCode = reasonCode
@@ -480,6 +485,10 @@ class PutawayTaskService {
             throw new IllegalStateException("Invalid transition ${from} -> ${to}")
         }
         task.status = to
+    }
+
+    List<Location> getAlternateDestinations(PutawayTask task) {
+        return InventoryLevel.getPutawayLocations(task.facility, task.product)
     }
 
     private PutawayItem createSplitPutawayItem(PutawayTask task, BigDecimal quantity, PutawayStatus status, Location destination) {
