@@ -139,8 +139,8 @@ class InventoryLevel {
 
     List<Location> getAssignedLocationsFromInventoryLevels() {
         return InventoryLevel.where {
-            product == product &&
-                    inventory == inventory &&
+            product == this.product &&
+                    inventory == this.inventory &&
                     internalLocation != null
         }.projections {
             property "internalLocation"
