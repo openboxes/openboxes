@@ -24,6 +24,7 @@ import org.pih.warehouse.core.EventCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationService
 import org.pih.warehouse.core.LocationType
+import org.pih.warehouse.inboundSortation.InboundSortationService
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryService
 import org.pih.warehouse.inventory.ProductAvailabilityService
@@ -49,6 +50,7 @@ class ReceiptService {
     TransactionIdentifierService transactionIdentifierService
     GrailsApplication grailsApplication
     ProductAvailabilityService productAvailabilityService
+    InboundSortationService inboundSortationService
 
     @Transactional(readOnly=true)
     PartialReceipt getPartialReceipt(String id, String stepNumber, String sort = null) {
@@ -492,7 +494,50 @@ class ReceiptService {
         return null
     }
 
-    void createAutomaticReceipt(Shipment shipment) {
+    void receiveInboundShipments(Location facility) {
+        log.info "Detecting candidates for auto receipt - inbound shipments in-transit to facility ${facility}"
+        List<Shipment> shippedShipments = shipmentService.getShippedShipmentsByDestination(facility)
+        shippedShipments.each {Shipment shipment ->
+
+            log.info "Creating automated receipt for shipment ${shipment}"
+            receiveInboundShipment(shipment)
+        }
+    }
+
+    void receiveInboundShipment(Shipment shipment) {
+
+        log.info "Receive inbound shipment ${shipment}"
+        // Validate that the shipment is valid and ready to be received
+        if (!shipment) return
+        if (shipment.isFullyReceived()) { log.info("Shipment ${shipment?.id} already fully received"); return; }
+        if (!shipment.hasShipped()) { log.warn("Shipment ${shipment?.id} has no SHIPPED event associated"); return }
+        if (!shipment.destination?.supports(ActivityCode.AUTO_RECEIVING)) {
+            log.info("Shipment ${shipment?.id}: destination ${shipment?.destination} does not support activity code ${ActivityCode.AUTO_RECEIVING}")
+            return
+        }
+
+        // FIXME Consider moving the logic to the shipment
+        Boolean hasPendingReceipt = shipment.receipts.any { Receipt receipt -> receipt.receiptStatusCode == ReceiptStatusCode.PENDING }
+        if (hasPendingReceipt) {
+            log.debug "Shipment ${shipment.id} has a pending receipt"
+            return
+        }
+
+        // Create the partial receipt
+        PartialReceipt partialReceipt = createAutomaticReceipt(shipment)
+
+        // Automatically complete the partial receipt
+        saveAndCompletePartialReceipt(partialReceipt)
+
+        // FIXME We should consider eventing (shipment.received) and have an event service determine whether
+        //  the shipment should be auto received
+        log.info "Creating putaway tasks for receipt ${shipment.receipt} "
+        if (shipment.destination.supports(ActivityCode.DYNAMIC_SLOTTING)) {
+            inboundSortationService.createPutawayOrdersFromReceipt(shipment.receipt)
+        }
+    }
+
+    PartialReceipt createAutomaticReceipt(Shipment shipment) {
         PartialReceipt partialReceipt = getPartialReceipt(shipment.id, "1")
         partialReceipt.dateShipped = shipment.expectedShippingDate
 
@@ -525,8 +570,7 @@ class ReceiptService {
 
             partialReceiptContainer.partialReceiptItems.add(partialReceiptItem)
         }
-
-        saveAndCompletePartialReceipt(partialReceipt)
+        return partialReceipt
     }
 
     Location findReceivingLocation(Shipment shipment) {

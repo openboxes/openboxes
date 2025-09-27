@@ -33,17 +33,17 @@ class PartialReceivingController {
     }
 
     def autoreceive() {
-        Location currentLocation = Location.get(session.warehouse.id)
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
         Shipment shipment = stockMovement?.shipment
 
+        Location currentLocation = Location.get(session.warehouse.id)
         if (!stockMovement.isReceivingAuthorized(currentLocation)) {
             flash.error = stockMovementService.getDisabledMessage(stockMovement, currentLocation)
             redirect(controller: "stockMovement", action: "show", id: params.id)
             return
         }
 
-        receiptService.createAutomaticReceipt(shipment)
+        receiptService.receiveInboundShipment(shipment)
 
         redirect(controller: "stockMovement", action: "show", id: params.id)
     }
