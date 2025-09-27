@@ -25,7 +25,6 @@ import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.DocumentCommand
 import org.pih.warehouse.core.DocumentService
 import org.pih.warehouse.core.DocumentType
-import org.pih.warehouse.core.Event
 import org.pih.warehouse.core.HistoryItem
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Comment
@@ -40,8 +39,6 @@ import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentStatusCode
-
-import javax.transaction.Transactional
 
 class StockMovementController {
 

@@ -311,9 +311,11 @@ class OrderController {
                     orderService.deleteOrder(orderInstance)
                     flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'order.label', default: 'Order'), orderInstance.orderNumber])}"
                     redirect(action: "list", params: params)
+                    return
                 } catch (org.springframework.dao.DataIntegrityViolationException e) {
                     flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'order.label', default: 'Order'), orderInstance.orderNumber])}"
                     redirect(action: "list", id: params.id, params: params)
+                    return
                 }
             } else {
                 flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'order.label', default: 'Order'), orderInstance.orderNumber])}"
@@ -321,15 +323,17 @@ class OrderController {
         } else {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
             redirect(action: "list", params: params)
+            return
         }
 
         if (orderInstance.orderType?.code == OrderTypeCode.PURCHASE_ORDER.name()) {
             redirect(controller: "purchaseOrder", action: "list")
+            return
         } else if (orderInstance.orderType.code == Constants.PUTAWAY_ORDER) {
             redirect(controller: "order", action: "list", params: [orderType: Constants.PUTAWAY_ORDER, status: OrderStatus.PENDING])
-        } else {
-            redirect(controller: "order", action: "list")
+            return
         }
+        redirect(controller: "order", action: "list")
     }
 
     def addAdjustment() {
