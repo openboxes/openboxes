@@ -26,11 +26,13 @@ class InboundSortationService {
             }
 
             PutawayContext putawayContext = createPutawayContext(receiptItem)
-            List<PutawayResult> tasks = slottingService.execute(putawayContext)
-            tasks.each { PutawayResult task ->
-                Putaway putaway = createPutaway(putawayContext, receipt.shipment?.createdBy)
-                putaway.putawayItems.add(createPutawayItem(task))
-                putawayService.savePutaway(putaway)
+            List<PutawayResult> results = slottingService.execute(putawayContext)
+            results.each { PutawayResult result ->
+                if (result.quantity > 0) {
+                    Putaway putaway = createPutaway(putawayContext, receipt.shipment?.createdBy)
+                    putaway.putawayItems.add(createPutawayItem(result))
+                    putawayService.savePutaway(putaway)
+                }
             }
         }
     }
