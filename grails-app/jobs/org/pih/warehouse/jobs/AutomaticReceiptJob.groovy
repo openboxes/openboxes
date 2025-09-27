@@ -35,69 +35,24 @@ class AutomaticReceiptJob {
                     log.warn("Shipment ${shipmentId} not found, skipping")
                     return
                 }
-
-                if (!shipment.hasShipped()) {
-                    log.warn("Shipment ${shipmentId} has no SHIPPED event associated")
-                    return
-                }
-
-                if (!shipment.destination?.supports(ActivityCode.AUTO_RECEIVING)) {
-                    log.debug("Shipment ${shipmentId}: origin does not support AUTO_RECEIVING")
-                    return
-                }
-
-                if (shipment.isFullyReceived()) {
-                    log.debug("Shipment ${shipmentId} already fully received")
-                    return
-                }
-
-                if (hasPendingReceipt(shipment)) {
-                    log.debug "Shipment ${shipmentId} has a pending receipt"
-                    return
-                }
-
                 log.info("Creating automatic receipt for shipment ${shipmentId}")
-                receiptService.createAutomaticReceipt(shipment)
-                if (Holders.config.openboxes.receiving.inboundSortation.enabled) {
-                    inboundSortationService.createPutawayOrdersFromReceipt(shipment.receipt)
-                }
+                receiptService.receiveInboundShipment(shipment)
+
             } catch (Exception e) {
                 log.error("Error processing shipment ${shipmentId}", e)
             }
             return
         }
-
+        // FIXME This probably shouldn't be run during the same execution as the above code as it has the potential
+        //  to create a race condition or duplicate receipts
+        // Fallback in case the auto receipt job was not triggered for a specific shipment
         if (Holders.config.openboxes.jobs.automaticReceiptJob.bulkShipmentAutoReceipt) {
+            List<Location> autoReceiptFacilities = locationService.getLocationsSupportingActivities([ActivityCode.AUTO_RECEIVING]) as List<Location>
             log.info "Running automatic receipt job for all shipped shipments... "
-            List<Location> autoReceivingLocations = locationService.getLocationsSupportingActivities([ActivityCode.AUTO_RECEIVING])
-            autoReceivingLocations.each {
-                List<Shipment> shippedShipments = shipmentService.getShippedShipmentsByDestination(it)
-                shippedShipments.each {
-                    if (it.isFullyReceived()) {
-                        log.debug("Shipment ${it.id} already fully received")
-                        return
-                    }
-
-                    if (!it.hasShipped()) {
-                        log.warn("Shipment ${it.id} has no SHIPPED event associated")
-                        return
-                    }
-
-                    if (hasPendingReceipt(it)) {
-                        log.debug "Shipment ${it.id} has a pending receipt"
-                        return
-                    }
-
-                    receiptService.createAutomaticReceipt(it)
-                    if (Holders.config.openboxes.receiving.inboundSortation.enabled) {
-                        inboundSortationService.createPutawayOrdersFromReceipt(it.receipt)
-                    }
-                }
+            autoReceiptFacilities.each { Location facility ->
+                receiptService.receiveInboundShipments(facility)
             }
         }
     }
 
-    private static boolean hasPendingReceipt(Shipment shipment) {
-        shipment.receipts.any { it.receiptStatusCode == ReceiptStatusCode.PENDING }
-    }
 }
