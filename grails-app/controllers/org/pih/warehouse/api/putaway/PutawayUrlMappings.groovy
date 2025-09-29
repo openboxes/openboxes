@@ -26,6 +26,12 @@ class PutawayUrlMappings {
             action = [PATCH: "patch"]
         }
 
+        // FIXME This endpoint is used for testing purposes only at this point
+        "/api/facilities/$facility/inbound-items/$product/routing-suggestions" {
+            controller = "putawayTaskApi"
+            action = [GET: "suggestions"]
+        }
+
     }
 
 }

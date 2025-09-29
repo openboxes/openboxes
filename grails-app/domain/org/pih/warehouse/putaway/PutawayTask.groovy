@@ -1,7 +1,7 @@
 package org.pih.warehouse.putaway
 
-import org.pih.warehouse.api.Putaway
 import org.pih.warehouse.api.PutawayTaskStatus
+import org.pih.warehouse.core.DeliveryTypeCode
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
@@ -46,6 +46,7 @@ class PutawayTask {
     Location container                  // container scanned during putaway
     Location destination                // target storage or outbound staging
     ReasonCode discrepancyReasonCode
+    DeliveryTypeCode deliveryTypeCode
 
     // Auditing fields
     Date dateCreated
@@ -87,23 +88,23 @@ class PutawayTask {
 
     Map toJson() {
         return [
-                id           : id,
-                type         : putawayTypeCode?.name(),
-                status       : status?.name(),
-                identifier   : identifier,
-                inventoryItem: inventoryItem,
-                facility     : facility?.toBaseJson(),
-                location     : location?.toJson(location?.locationType?.locationTypeCode),
-                quantity     : quantity,
-                container    : container?.toJson(container?.locationType?.locationTypeCode),
-                destination  : destination?.toJson(destination?.locationType?.locationTypeCode),
-                assignee     : assignee,
-                orderedBy    : orderedBy,
-                dateStarted  : dateStarted,
-                dateCompleted: dateCompleted,
-                dateCanceled : dateCanceled,
-                lastUpdated  : lastUpdated,
-                dateCreated  : dateCreated,
+                id              : id,
+                status          : status?.name(),
+                identifier      : identifier,
+                inventoryItem   : inventoryItem,
+                facility        : facility?.toBaseJson(),
+                location        : location?.toJson(location?.locationType?.locationTypeCode),
+                quantity        : quantity,
+                container       : container?.toJson(container?.locationType?.locationTypeCode),
+                destination     : destination?.toJson(destination?.locationType?.locationTypeCode),
+                deliveryTypeCode: deliveryTypeCode?.name(),
+                assignee        : assignee,
+                orderedBy       : orderedBy,
+                dateStarted     : dateStarted,
+                dateCompleted   : dateCompleted,
+                dateCanceled    : dateCanceled,
+                lastUpdated     : lastUpdated,
+                dateCreated     : dateCreated,
         ]
     }
 }
