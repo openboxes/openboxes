@@ -600,7 +600,7 @@ class MigrationService {
                     location,
                     null,
                     currentTransactionProducts,
-                    availableItems.values(),
+                    availableItems,
                     it.transactionDate,
                     newComment,
                     null,

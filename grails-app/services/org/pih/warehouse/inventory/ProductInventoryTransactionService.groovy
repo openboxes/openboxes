@@ -7,6 +7,7 @@ import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.product.availability.AvailableItemKey
+import org.pih.warehouse.inventory.product.availability.AvailableItemMap
 import org.pih.warehouse.product.Product
 
 /**
@@ -64,7 +65,7 @@ abstract class ProductInventoryTransactionService<T> {
             Boolean disableRefresh = false
     ) {
 
-        List<AvailableItem> availableItems = productAvailabilityService.getAvailableItemsAtDate(
+        AvailableItemMap availableItems = productAvailabilityService.getAvailableItemsAtDateAsMap(
                 facility, products, transactionDate)
 
         createInventoryBaselineTransactionForGivenStock(
@@ -112,7 +113,7 @@ abstract class ProductInventoryTransactionService<T> {
             Location facility,
             T sourceObject,
             Collection<Product> products,
-            Collection<AvailableItem> availableItems,
+            AvailableItemMap availableItems,
             Date transactionDate=null,
             String comment=null,
             Map<AvailableItemKey, String> transactionEntriesComments = [:],
@@ -124,6 +125,8 @@ abstract class ProductInventoryTransactionService<T> {
             return null
         }
 
+        TransactionType transactionType = TransactionType.read(Constants.INVENTORY_BASELINE_TRANSACTION_TYPE_ID)
+
         // We'd have weird behaviour if we allowed two transactions to exist at the same exact time (precision at the
         // database level is to the second) so fail if there's already a transaction on the items for the given date.
         Date actualTransactionDate = transactionDate ?: new Date()
@@ -132,118 +135,53 @@ abstract class ProductInventoryTransactionService<T> {
             throw new IllegalArgumentException("A transaction already exists at time ${actualTransactionDate}")
         }
 
-        // If there are no available items, there is no stock for the products. We still want to create a baseline
-        // though so create one representing zero stock for the products in the default lot and bin.
-        Transaction transaction
-        if (!availableItems) {
-            transaction = initEmptyBaselineTransaction(
-                    facility,
-                    sourceObject,
-                    products,
-                    actualTransactionDate,
-                    comment,
-                    transactionEntriesComments,
-                    disableRefresh,
-            )
-        }
-        // Otherwise we do have some stock for the products so create the baseline as normal.
-        else {
-            transaction = initNonEmptyBaselineTransaction(
-                    facility,
-                    sourceObject,
-                    availableItems,
-                    actualTransactionDate,
-                    comment,
-                    transactionEntriesComments,
-                    disableRefresh,
-            )
+        Transaction transaction = new Transaction(
+                inventory: facility.inventory,
+                transactionDate: actualTransactionDate,
+                transactionType: transactionType,
+                comment: comment,
+                disableRefresh: disableRefresh
+        )
+
+        transaction.transactionNumber = transactionIdentifierService.generate(transaction)
+
+        setSourceObject(transaction, sourceObject)
+
+        for (Product product in products) {
+            // If the product does not have any stock at the time of the baseline, we still want to take a "snapshot"
+            // of the product so add an entry representing zero stock for the products in the default lot and bin.
+            List<AvailableItem> availableItemsForProduct = availableItems?.getAllByProduct(product)
+            if (!availableItemsForProduct) {
+                InventoryItem defaultInventoryItem = inventoryService.findOrCreateDefaultInventoryItem(product)
+                TransactionEntry transactionEntry = new TransactionEntry(
+                        quantity: 0,
+                        product: product,
+                        binLocation: null,
+                        inventoryItem: defaultInventoryItem,
+                        transaction: transaction,
+                        comments: transactionEntriesComments?.get(new AvailableItemKey(null, defaultInventoryItem)),
+                )
+                transaction.addToTransactionEntries(transactionEntry)
+                continue
+            }
+
+            // Otherwise we do have stock for the product at that time so use it to build the transaction entries.
+            for (AvailableItem availableItem in availableItemsForProduct) {
+                TransactionEntry transactionEntry = new TransactionEntry(
+                        quantity: availableItem.quantityOnHand,
+                        product: availableItem.inventoryItem.product,
+                        binLocation: availableItem.binLocation,
+                        inventoryItem: availableItem.inventoryItem,
+                        transaction: transaction,
+                        comments: transactionEntriesComments?.get(new AvailableItemKey(availableItem)),
+                )
+                transaction.addToTransactionEntries(transactionEntry)
+            }
         }
 
         if (!transaction.save()) {
             throw new ValidationException("Invalid transaction", transaction.errors)
         }
-        return transaction
-    }
-
-    /**
-     * Initializes (but does not persist) an "empty" baseline transaction containing one entry for each of the given
-     * products that sets zero stock/quantity in the default bin and lot.
-     */
-    private Transaction initEmptyBaselineTransaction(Location facility,
-                                                     T sourceObject,
-                                                     Collection<Product> products,
-                                                     Date transactionDate,
-                                                     String comment,
-                                                     Map<AvailableItemKey, String> transactionEntriesComments,
-                                                     boolean disableRefresh) {
-
-        Transaction transaction = initTransaction(facility, sourceObject, transactionDate, comment, disableRefresh)
-
-        for (Product product in products) {
-            InventoryItem defaultInventoryItem = inventoryService.findOrCreateDefaultInventoryItem(product)
-            TransactionEntry transactionEntry = new TransactionEntry(
-                    quantity: 0,
-                    product: product,
-                    binLocation: null,
-                    inventoryItem: defaultInventoryItem,
-                    transaction: transaction,
-                    comments: transactionEntriesComments?.get(new AvailableItemKey(null, defaultInventoryItem)),
-            )
-            transaction.addToTransactionEntries(transactionEntry)
-        }
-
-        return transaction
-    }
-
-    /**
-     * Initializes (but does not persist) a baseline transaction containing one entry for each available item.
-     */
-    private Transaction initNonEmptyBaselineTransaction(Location facility,
-                                                        T sourceObject,
-                                                        Collection<AvailableItem> availableItems,
-                                                        Date transactionDate,
-                                                        String comment,
-                                                        Map<AvailableItemKey, String> transactionEntriesComments,
-                                                        boolean disableRefresh) {
-
-        Transaction transaction = initTransaction(facility, sourceObject, transactionDate, comment, disableRefresh)
-
-        for (AvailableItem availableItem : availableItems) {
-            TransactionEntry transactionEntry = new TransactionEntry(
-                    quantity: availableItem.quantityOnHand,
-                    product: availableItem.inventoryItem.product,
-                    binLocation: availableItem.binLocation,
-                    inventoryItem: availableItem.inventoryItem,
-                    transaction: transaction,
-                    comments: transactionEntriesComments?.get(new AvailableItemKey(availableItem)),
-            )
-            transaction.addToTransactionEntries(transactionEntry)
-        }
-
-        return transaction
-    }
-
-    /**
-     * Initializes (but does not persist) a Transaction instance for the baseline.
-     */
-    private Transaction initTransaction(Location facility,
-                                        T sourceObject,
-                                        Date transactionDate,
-                                        String comment,
-                                        boolean disableRefresh) {
-
-        TransactionType transactionType = TransactionType.read(Constants.INVENTORY_BASELINE_TRANSACTION_TYPE_ID)
-
-        Transaction transaction = new Transaction(
-                inventory: facility.inventory,
-                transactionDate: transactionDate,
-                transactionType: transactionType,
-                comment: comment,
-                disableRefresh: disableRefresh,
-        )
-        transaction.transactionNumber = transactionIdentifierService.generate(transaction)
-        setSourceObject(transaction, sourceObject)
-
         return transaction
     }
 }

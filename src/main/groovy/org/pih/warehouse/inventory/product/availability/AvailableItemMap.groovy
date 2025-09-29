@@ -23,7 +23,7 @@ class AvailableItemMap {
     }
 
     List<AvailableItem> getAllByProduct(Product product) {
-        return map.collect { key, value -> key.isForProduct(product) } as List<AvailableItem>
+        return map.findAll { key, value -> key.isForProduct(product) }.values().asList()
     }
 
     boolean contains(AvailableItem availableItem) {
@@ -54,5 +54,9 @@ class AvailableItemMap {
 
     Set<Map.Entry<AvailableItemKey, AvailableItem>> entrySet() {
         return map.entrySet()
+    }
+
+    boolean isEmpty() {
+        return map.isEmpty()
     }
 }

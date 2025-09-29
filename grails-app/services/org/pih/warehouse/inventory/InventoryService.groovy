@@ -1443,7 +1443,7 @@ class InventoryService implements ApplicationContextAware {
                         currentLocation,
                         null,
                         [cmd.product],
-                        availableItems.values() as List<AvailableItem>,
+                        availableItems,
                         cmd.transactionDate
                 )
             }

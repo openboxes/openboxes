@@ -290,7 +290,7 @@ class LoadDataService {
                     targetWarehouse,
                     null,
                     products,
-                    availableItems.values(),
+                    availableItems,
                     inventoryBaselineTransactionDate
             )
         }

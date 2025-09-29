@@ -169,7 +169,7 @@ class InventoryImportDataService implements ImportDataService {
                 command.location,
                 command,
                 inventoryImportData.products,
-                availableItems.values(),
+                availableItems,
                 baselineTransactionDate,
                 comment,
                 commentsForBaselineTransactionEntries,
