@@ -907,6 +907,11 @@ class ProductAvailabilityService {
     }
 
     void updateProductAvailability(InventoryItem inventoryItem) {
+        // OBPIH-7506: Only use the default lot if the lot number is null because we have valid inventory items in our
+        //             system with blank string lot numbers (ie " "). Until we can fix our importers and migrate our
+        //             data to not allow blank lots, we have to continue to allow both null and " " lots to coexist.
+        String lotNumber = inventoryItem.lotNumber == null ? Constants.DEFAULT_LOT_NUMBER : inventoryItem.lotNumber
+
         def results = ProductAvailability.executeUpdate(
                 "update ProductAvailability a " +
                         "set a.lotNumber=:lotNumber " +
@@ -914,12 +919,11 @@ class ProductAvailabilityService {
                         "and a.lotNumber != :lotNumber",
                 [
                         inventoryItemId: inventoryItem.id,
-                        lotNumber      : inventoryItem.lotNumber?:Constants.DEFAULT_LOT_NUMBER
+                        lotNumber      : lotNumber
                 ]
         )
-        log.info "Updated ${results} product availability records for inventory item ${inventoryItem?.lotNumber?:Constants.DEFAULT_LOT_NUMBER}"
+        log.info "Updated ${results} product availability records for inventory item with lot number [${lotNumber}]"
     }
-
 
     void updateProductAvailability(Location location) {
         def isBinLocation = location?.isInternalLocation()
