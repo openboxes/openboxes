@@ -12,6 +12,8 @@ import org.pih.warehouse.api.PutawayTaskStatus
 import org.pih.warehouse.api.StatusCategory
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.ActivityCode
+import org.pih.warehouse.core.ApplicationExceptionEvent
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.ReasonCode
@@ -24,6 +26,7 @@ import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.OrderItemStatusCode
 import org.pih.warehouse.order.OrderStatus
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.putaway.discrepancy.PutawayDiscrepancyEvent
 
 @Transactional
 class PutawayTaskService {
@@ -319,6 +322,10 @@ class PutawayTaskService {
 
         // Save the task
         save(task)
+
+        if (isCancelRemaining) {
+            sendDiscrepancyNotification(task)
+        }
     }
 
     PutawayTask partialComplete(PutawayTask task, BigDecimal quantity, String destinationId, ReasonCode reasonCode) {
@@ -525,5 +532,13 @@ class PutawayTaskService {
         }
         // return preferred putaway locations
         return InventoryLevel.getPutawayLocations(task.facility, task.product)
+    }
+
+    void sendDiscrepancyNotification(PutawayTask task) {
+        try {
+            grailsApplication.mainContext.publishEvent(new PutawayDiscrepancyEvent(task))
+        } catch (Exception e) {
+            log.error("Error while processing PutawayDiscrepancyEvent", e)
+        }
     }
 }
