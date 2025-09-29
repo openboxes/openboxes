@@ -1,12 +1,13 @@
 package org.pih.warehouse.api
 
+import grails.converters.JSON
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.inventory.InventoryItemService
 
 class InventoryItemApiController {
 
-    def locationService
+    InventoryItemService inventoryItemService
 
     def listByActivity() {
         Location facility = Location.get(params.facilityId)
@@ -19,22 +20,11 @@ class InventoryItemApiController {
             return
         }
 
-        def locations = locationService.getLocationsSupportingActivity(activityCode)
-        def locationIds = locations.findAll { it.parentLocation?.id == facility.id }*.id
+        def result = inventoryItemService.listByActivity(facility, activityCode)
 
-        if (!locationIds) {
-            render([])
-            return
-        }
-
-        // Fetch all inventory items for those bin locations
-        def items = InventoryItem.executeQuery("""
-            SELECT DISTINCT pa.inventoryItem
-            FROM ProductAvailability pa
-            WHERE pa.location = :facility
-              AND pa.binLocation.id IN (:locationIds)
-        """, [facility: facility, locationIds: locationIds])
-
-        render(items.collect { it.toJson() })
+        render([
+                data      : result.items.collect { it.toJson() },
+                totalCount: result.totalCount
+        ] as JSON)
     }
 }
