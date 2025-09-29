@@ -249,4 +249,22 @@ class DashboardApiController {
         GraphData graphData = indicatorDataService.getItemsWithBackdatedShipments(location)
         render(graphData as JSON)
     }
+
+    def getOpenPutawayTasks() {
+        Location location = Location.get(params.locationId)
+        NumberData numberData = numberDataService.getOpenPutawayTasks(location)
+        render(numberData as JSON)
+    }
+
+    def getInboundSortationItems() {
+        Location location = Location.get(params.locationId)
+        NumberData numberData = numberDataService.getInboundSortationItems(location)
+        render(numberData as JSON)
+    }
+
+    def getAverageInboundSortationTime() {
+        Location location = Location.get(params.locationId)
+        NumberData numberData = numberDataService.getAverageInboundSortationTime(location)
+        render(numberData as JSON)
+    }
 }

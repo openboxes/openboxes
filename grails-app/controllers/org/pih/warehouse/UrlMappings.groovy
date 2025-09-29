@@ -833,6 +833,21 @@ class UrlMappings {
             action = [GET: "getItemsWithBackdatedShipments"]
         }
 
+        "/api/dashboard/openPutawayTasks"(parseRequest: true) {
+            controller = { "dashboardApi" }
+            action = [GET: "getOpenPutawayTasks"]
+        }
+
+        "/api/dashboard/inboundSortationItems"(parseRequest: true) {
+            controller = { "dashboardApi" }
+            action = [GET: "getInboundSortationItems"]
+        }
+
+        "/api/dashboard/averageInboundSortationTime"(parseRequest: true) {
+            controller = { "dashboardApi" }
+            action = [GET: "getAverageInboundSortationTime"]
+        }
+
         /**
         * Purchase Orders API endpoints
         */

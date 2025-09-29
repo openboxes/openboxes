@@ -4,6 +4,10 @@ import grails.core.GrailsApplication
 import grails.plugin.cache.Cacheable
 import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.joda.time.LocalDate
+import org.pih.warehouse.inventory.InventoryItemService
+import org.springframework.web.context.request.RequestContextHolder
+import grails.web.servlet.mvc.GrailsParameterMap
+import org.pih.warehouse.api.StatusCategory
 import org.pih.warehouse.api.StockMovementDirection
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
@@ -18,6 +22,7 @@ import org.pih.warehouse.order.OrderStatus
 import org.pih.warehouse.order.OrderType
 import org.pih.warehouse.order.OrderTypeCode
 import org.pih.warehouse.product.ProductAvailability
+import org.pih.warehouse.putaway.PutawayTaskService
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionSourceType
 import org.pih.warehouse.requisition.RequisitionStatus
@@ -28,7 +33,9 @@ class NumberDataService {
 
     def dataService
     LocationService locationService
+    PutawayTaskService putawayTaskService
     GrailsApplication grailsApplication
+    InventoryItemService inventoryItemService
 
     @Cacheable(value = "dashboardCache", key = { "getInventoryByLotAndBin-${location?.id}"})
     NumberData getInventoryByLotAndBin(Location location) {
@@ -309,5 +316,39 @@ class NumberDataService {
         }
 
         return new NumberData(openPurchaseOrdersCount)
+    }
+
+    @Cacheable(value = "dashboardCache", key = { "getOpenPutawayTasks-${location?.id}" })
+    NumberData getOpenPutawayTasks(Location location) {
+        def webRequest = RequestContextHolder.requestAttributes
+        def grailsParams = new GrailsParameterMap([:], webRequest.request)
+        def tasks = putawayTaskService.search(location, null, null, StatusCategory.OPEN, grailsParams)
+
+        String urlContextPath = ConfigHelper.contextPath
+        return new NumberData(
+                tasks?.totalCount ?: 0,
+                "${urlContextPath}/order/list?orderType=PUTAWAY_ORDER&status=PENDING"
+        )
+    }
+
+    @Cacheable(value = "dashboardCache", key = { "getInboundSortationItems-${location?.id}" })
+    NumberData getInboundSortationItems(Location location) {
+        Long countInbound = inventoryItemService.countByActivity(location, ActivityCode.INBOUND_SORTATION)
+        String urlContextPath = ConfigHelper.contextPath
+        // TODO: Must implement filtering by the activity code to ensure the report matches the dashboard count.
+        return new NumberData(
+                countInbound,
+                "${urlContextPath}/report/showBinLocationReport?location.id=${location.id}&status=inStock&activityCode=INBOUND_SORTATION"
+        )
+    }
+
+    @Cacheable(value = "dashboardCache", key = { "getAverageInboundSortationTime-${location?.id}" })
+    NumberData getAverageInboundSortationTime(Location location) {
+        // TODO: Replace mock with call to {{baseUrl}}/openboxes/api/facilities/1/putaway-metrics?period=today endpoint
+        Long avgMinutes = 0
+        return new NumberData(
+                avgMinutes,
+                null
+        )
     }
 }

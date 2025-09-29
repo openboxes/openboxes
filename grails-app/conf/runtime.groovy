@@ -615,6 +615,21 @@ openboxes {
                         ],
 
                         [
+                            widgetId: "openPutawayTasks",
+                            order   : 6
+                        ],
+
+                        [
+                            widgetId: "inboundSortationItems",
+                            order   : 7
+                        ],
+
+                        [
+                            widgetId: "averageInboundSortationTime",
+                            order   : 8
+                        ],
+
+                        [
                             widgetId: "inventorySummary",
                             order   : 1
                         ],
@@ -1200,6 +1215,31 @@ openboxes {
                 disableTruncation {
                     name = true
                 }
+            }
+            openPutawayTasks {
+                enabled = true
+                title = "react.dashboard.openPutawayTasks.title.label"
+                info = "react.dashboard.openPutawayTasks.info.label"
+                numberType = 'number'
+                type = 'number'
+                endpoint = "/api/dashboard/openPutawayTasks"
+            }
+            inboundSortationItems {
+                enabled = true
+                title = "react.dashboard.inboundSortationItems.title.label"
+                info = "react.dashboard.inboundSortationItems.info.label"
+                numberType = 'number'
+                type = 'number'
+                endpoint = "/api/dashboard/inboundSortationItems"
+            }
+            averageInboundSortationTime {
+                enabled = true
+                title = "react.dashboard.averageInboundSortationTime.title.label"
+                info = "react.dashboard.averageInboundSortationTime.info.label"
+                subtitle = "react.dashboard.subtitle.minutes"
+                numberType = 'number'
+                type = 'number'
+                endpoint = "/api/dashboard/averageInboundSortationTime"
             }
         }
     }
