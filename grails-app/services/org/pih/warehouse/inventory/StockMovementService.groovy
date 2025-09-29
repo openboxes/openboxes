@@ -3620,6 +3620,8 @@ class StockMovementService {
 
         Requisition requisition = stockMovement.requisition
         if (requisition) {
+            requisition.priority = params.priority as int
+            requisition.deliveryTypeCode = params.deliveryTypeCode
             requisition.requestedDeliveryDate = params.requestedDeliveryDate
             requisition.save()
         }

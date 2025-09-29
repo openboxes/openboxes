@@ -30,9 +30,6 @@
                         <g:else>
                             <div class="title" id="name"><g:message code="requisition.new.label"/></div>
                         </g:else>
-
-
-                        </div>
                     </td>
                     <td>
                         <div class="top title right">

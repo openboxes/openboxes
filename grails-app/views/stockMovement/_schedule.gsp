@@ -9,6 +9,29 @@
 			<g:hiddenField name="id" value="${stockMovement?.id}" />
 			<table>
 				<tbody>
+                <tr class="prop">
+                    <td valign="top" class="name"><label><warehouse:message
+                            code="requisition.priority.label" default="Priority"/></label>
+                    </td>
+                    <td valign="top"
+                        class="value ${hasErrors(bean: stockMovement, field: 'priority', 'errors')}">
+                        <g:textField name="priority" value="${stockMovement.requisition.priority}" class="text medium"/>
+                    </td>
+                </tr>
+                <tr class="prop">
+                    <td valign="top" class="name"><label><warehouse:message
+                            code="requisition.deliveryTypeCode.label" default="Delivery Type"/></label>
+                    </td>
+                    <td valign="top"
+                        class="value ${hasErrors(bean: stockMovement, field: 'deliveryTypeCode', 'errors')}">
+                        <g:select name="deliveryTypeCode"
+                                  class="chzn-select-deselect"
+                                  noSelection="['null': '']"
+                                  from="${org.pih.warehouse.core.DeliveryTypeCode.values()}"
+                                  value="${stockMovement.requisition.deliveryTypeCode}"/>
+
+                    </td>
+                </tr>
 				<tr class="prop">
 					<td valign="top" class="name"><label><warehouse:message
 							code="requisition.requestedDeliveryDate.label" /></label>

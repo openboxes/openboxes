@@ -19,6 +19,24 @@ CREATE OR REPLACE VIEW putaway_task AS
         --  so we'll need to add a new container location to order item
         order_item.container_location_id as container_id,
         order_item.destination_bin_location_id as destination_id,
+        CASE
+            WHEN EXISTS (SELECT 1 FROM location_effective_supported_activities supported_activities
+                         WHERE supported_activities.location_id = order_item.destination_bin_location_id
+                           AND supported_activities.supported_activities_string='DELIVERY_TYPE_WILL_CALL') THEN 'WILL_CALL'
+            WHEN EXISTS (SELECT 1 FROM location_effective_supported_activities supported_activities
+                         WHERE supported_activities.location_id = order_item.destination_bin_location_id
+                           AND supported_activities.supported_activities_string='DELIVERY_TYPE_PICKUP') THEN 'PICK_UP'
+            WHEN EXISTS (SELECT 1 FROM location_effective_supported_activities supported_activities
+                         WHERE supported_activities.location_id = order_item.destination_bin_location_id
+                           AND supported_activities.supported_activities_string='DELIVERY_TYPE_SERVICE') THEN 'SERVICE'
+            WHEN EXISTS (SELECT 1 FROM location_effective_supported_activities supported_activities
+                         WHERE supported_activities.location_id = order_item.destination_bin_location_id
+                           AND supported_activities.supported_activities_string='DELIVERY_TYPE_SHIPPING') THEN 'SHIP_TO'
+            WHEN EXISTS (SELECT 1 FROM location_effective_supported_activities supported_activities
+                         WHERE supported_activities.location_id = order_item.destination_bin_location_id
+                           AND supported_activities.supported_activities_string='DELIVERY_TYPE_LOCAL_DELIVERY') THEN 'LOCAL_DELIVERY'
+            ELSE 'DEFAULT'
+            END AS delivery_type_code,
         order_item.quantity,
         order_item.discrepancy_reason_code,
         `order`.id as putaway_order_id,
@@ -37,7 +55,6 @@ CREATE OR REPLACE VIEW putaway_task AS
         --  date_completed IFF the status = CANCELED, null otherwise
         null as date_canceled,
         `order`.date_completed as date_completed,
-
         order_item.date_created,
         order_item.last_updated
     from order_item

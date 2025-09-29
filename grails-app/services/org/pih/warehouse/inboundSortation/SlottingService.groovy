@@ -8,7 +8,7 @@ class SlottingService {
     List<PutawayStrategy> strategies
 
     List<PutawayResult> execute(PutawayContext context) {
-        List<PutawayResult> putawayTasks = []
+        List<PutawayResult> results = []
         int quantityRemaining = context.quantity
         def locations = context.facility.internalLocations
 
@@ -17,7 +17,7 @@ class SlottingService {
             def tasks = strategy.execute(context, locations, quantityRemaining)
 
             if (tasks) {
-                putawayTasks.addAll(tasks)
+                results.addAll(tasks)
                 quantityRemaining -= tasks*.quantity.sum(0) as int
             }
         }
@@ -26,9 +26,9 @@ class SlottingService {
         //  we've create a strategy that takes location capacity into account
         //  (i.e. strategies that limit the quantity allowed per strategy)
         if (quantityRemaining > 0) {
-            throw RuntimeException("Quantity remaining should be 0 at this point. Something went wrong.")
+            throw new RuntimeException("Quantity remaining should be 0 at this point. Something went wrong.")
         }
 
-        return putawayTasks
+        return results
     }
 }
