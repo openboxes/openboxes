@@ -215,7 +215,7 @@ class NotificationService {
     def sendPutawayDiscrepancyNotification(PutawayTask putawayTask) {
         try {
             def emailValidator = EmailValidator.getInstance()
-            def recipients = userService.findUsersByRoleType(RoleType.ROLE_ERROR_NOTIFICATION)
+            def recipients = userService.findUsersByRoleType(RoleType.ROLE_DISCREPANCY_NOTIFICATION)
             recipients.each {
                 if (emailValidator.isValid(it.email)) {
                     def locale = new Locale(grailsApplication.config.openboxes.locale.defaultLocale)

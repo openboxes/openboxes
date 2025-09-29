@@ -117,7 +117,7 @@ grails:
         copyright: ""
         footer: ""
     mail:
-        enabled: true
+        enabled: false
         from: "info@openboxes.com"
         prefix: "[OpenBoxes]"
         host: "localhost"
