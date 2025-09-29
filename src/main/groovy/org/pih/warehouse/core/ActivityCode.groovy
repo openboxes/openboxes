@@ -105,6 +105,13 @@ enum ActivityCode {
     PUTAWAY_STRATEGY_SINGLE_SKU('PUTAWAY_STRATEGY_SINGLE_SKU'),
     PUTAWAY_STRATEGY_SINGLE_LPN('PUTAWAY_STRATEGY_SINGLE_LPN'),
 
+    // Delivery type
+    DELIVERY_TYPE_LOCAL_DELIVERY('DELIVERY_TYPE_LOCAL_DELIVERY'),
+    DELIVERY_TYPE_PICKUP('DELIVERY_TYPE_PICKUP'),
+    DELIVERY_TYPE_SERVICE('DELIVERY_TYPE_SERVICE'),
+    DELIVERY_TYPE_SHIPPING('DELIVERY_TYPE_SHIPPING'),
+    DELIVERY_TYPE_WILL_CALL('DELIVERY_TYPE_WILL_CALL'),
+
     // Picking strategies
     PICKING_STRATEGY_AUTOMATIC_REALLOCATION('PICKING_STRATEGY_AUTOMATIC_REALLOCATION'),
 
@@ -125,7 +132,7 @@ enum ActivityCode {
     ActivityCode(String id) { this.id = id }
 
     static list() {
-         [
+        [
                 MANAGE_INVENTORY,
                 ADJUST_INVENTORY,
                 APPROVE_ORDER,
@@ -184,16 +191,24 @@ enum ActivityCode {
                 // Picking strategies
                 PICKING_STRATEGY_AUTOMATIC_REALLOCATION,
 
+                // Internal locations used for inbound sortation and putaway
                 INBOUND_SORTATION,
                 LOST_AND_FOUND,
-                PUTAWAY_CART
+                PUTAWAY_CART,
+
+                // Allows classification of location by delivery type
+                DELIVERY_TYPE_LOCAL_DELIVERY,
+                DELIVERY_TYPE_PICKUP,
+                DELIVERY_TYPE_SERVICE,
+                DELIVERY_TYPE_SHIPPING,
+                DELIVERY_TYPE_WILL_CALL
         ]
     }
 
     static binTrackingList() {
         [
                 PICK_STOCK,
-                PUTAWAY_STOCK
+                PUTAWAY_STOCK,
         ]
     }
 }

@@ -192,4 +192,7 @@
   <changeSet id="1755658709578-1" author="jmiranda" runOnChange="true" runAlways="true" failOnError="true">
     <sqlFile path="views/putaway-task.sql"/>
   </changeSet>
+    <changeSet id="1758732196425-1" author="jmiranda" runOnChange="true" runAlways="true" failOnError="true">
+        <sqlFile path="views/location-effective-supported-activities.sql"/>
+    </changeSet>
 </databaseChangeLog>
