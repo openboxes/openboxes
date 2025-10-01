@@ -132,7 +132,7 @@ class NumberDataService {
                 ])
 
         String urlContextPath = ConfigHelper.contextPath
-        return new NumberData(receivingBin[0], "${urlContextPath}/report/showBinLocationReport?status=inStock")
+        return new NumberData(receivingBin[0], "${urlContextPath}/report/showBinLocationReport?status=inStock&activityCode=RECEIVE_STOCK")
     }
 
     @Cacheable(value = "dashboardCache", key = { "getItemsInventoried-${location?.id}" })

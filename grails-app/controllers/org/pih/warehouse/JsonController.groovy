@@ -1352,11 +1352,20 @@ class JsonController {
         log.info "binLocationReport: " + params
         String locationId = params?.location?.id ?: session?.warehouse?.id
         Location location = Location.get(locationId)
+        ActivityCode activityCode = params.activityCode ? params.activityCode as ActivityCode : null
+
         def data = productAvailabilityService.getQuantityOnHandByBinLocation(location)
 
         if (params.status) {
             data = data.findAll { it.status == params.status }
         }
+
+        if (activityCode) {
+            data = data.findAll {
+                it.binLocation && it.binLocation.supports(activityCode)
+            }
+        }
+
 
         def hasRoleFinance = userService.hasRoleFinance(session?.user)
 
