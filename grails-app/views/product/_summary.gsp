@@ -1,4 +1,4 @@
-<%@ page import="org.pih.warehouse.inventory.InventoryStatus" %>
+<%@ page import="org.pih.warehouse.core.Document; org.pih.warehouse.inventory.InventoryStatus" %>
 <div id="product-summary" productid="${productInstance?.id}" class="summary">
 	<table id="product-summary-table" border="0">
 		<tbody>
@@ -96,11 +96,10 @@
 							</g:link>
 						</g:isUserManager>
 						<g:link controller="stocklistManagement" action="index" id="${productInstance?.id}" class="button">
-							<img src="${resource(dir: 'images/icons/silk', file: 'application_side_list.png')}"/>&nbsp;
+							<img src="${resource(dir: 'images/icons/silk', file: 'text_list_numbers.png')}"/>&nbsp;
 							${warehouse.message(code: 'default.manage.label', default: 'Manage stock lists', args:[warehouse.message(code:'requisitionTemplates.label')])}
 						</g:link>
 					</div>
-
 					<g:isSuperuser>
 						<div class="button-group">
 							<g:if test="${grailsApplication.config.openboxes.products.merge.enabled}">
@@ -112,8 +111,20 @@
 							</g:if>
 						</div>
 					</g:isSuperuser>
+
 					<div class="button-group right">
-						<g:link controller="product" action="addDocument" id="${productInstance?.id}" class="button">
+
+                        <g:set var="templates" value="${Document.listBarcodeTemplates("barcode:product").list()}"/>
+                        <g:if test="${templates}">
+                            <g:each in="${templates}" var="template">
+                                <g:link controller="document" action="printZebraTemplate" id="${template.id}" params="['product.id': productInstance?.id, protocol: 'raw']" class="button">
+                                    <img src="${resource(dir: 'images/icons', file: 'printer.png')}"/>&nbsp;
+                                    <g:message code="default.print.label" args="[template.name]"/>
+                                </g:link>
+                            </g:each>
+                        </g:if>
+
+                        <g:link controller="product" action="addDocument" id="${productInstance?.id}" class="button">
 							<img src="${resource(dir: 'images/icons/silk', file: 'page_add.png')}" />&nbsp;
 							<warehouse:message code="product.addDocument.label" default="Add document"/>
 						</g:link>

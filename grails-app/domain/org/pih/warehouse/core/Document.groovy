@@ -36,7 +36,6 @@ class Document implements Serializable {
     // Shipment (and other entities) should create a join table for documents.
     static mapping = {
         id generator: 'uuid'
-        cache true
     }
 
     static transients = ["size", "image", 'link']
@@ -94,5 +93,12 @@ class Document implements Serializable {
                 eq("documentCode", documentCode)
             }
         }
+        listBarcodeTemplates { String documentNumber ->
+            documentType {
+                eq("documentCode", DocumentCode.ZEBRA_TEMPLATE)
+            }
+            eq("documentNumber", documentNumber)
+        }
+
     }
 }
