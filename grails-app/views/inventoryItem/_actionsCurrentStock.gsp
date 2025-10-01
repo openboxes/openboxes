@@ -1,7 +1,7 @@
 <div class="action-menu">
     <g:set var="dialogId" value="${itemInstance?.id}-${binLocation?.id}"/>
     <button class="action-btn">
-        <img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}"/>
+        <img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" style="vertical-align: middle;"/>
     </button>
     <div class="actions">
         <div class="action-menu-item">
@@ -19,12 +19,12 @@
                     <g:message code="inventory.adjustStock.label"/>
                 </a>
             </div>
-	    </g:supports>
+        </g:supports>
         <div class="action-menu-item">
             <a href="javascript:void(0);" class="btn-show-dialog" data-title="${g.message(code:'inventory.transferStock.label')}"
                data-url="${request.contextPath}/inventoryItem/showDialog?id=${itemInstance?.id}&binLocation=${binLocation?.id}&template=transferStock">
                 <img src="${resource(dir: 'images/icons/silk', file: 'book_next.png')}"/>&nbsp;
-            <g:message code="inventory.transferStock.label" default="Issue stock"/>
+                <g:message code="inventory.transferStock.label" default="Issue stock"/>
             </a>
         </div>
         <div class="action-menu-item">
@@ -44,42 +44,33 @@
         <g:if test="${isSuperuser}">
             <g:set var="templates" value="${org.pih.warehouse.core.Document.findAllByDocumentCode(org.pih.warehouse.core.DocumentCode.ZEBRA_TEMPLATE)}"/>
             <g:each in="${templates}" var="template">
-                <hr/>
-                <div class="action-menu-item">
-                    <a href="javascript:void(-1)">
-                        <label>${template.name}</label>
-                    </a>
-                </div>
-                <div class="action-menu-item">
-                    <g:link controller="document" action="buildZebraTemplate" id="${template.id}" params="['inventoryItem.id': itemInstance?.id]" target="_blank">
-                        <img src="${resource(dir: 'images/icons/silk', file: 'brick.png')}"/>&nbsp;
-                        <g:message code="default.build.label" args="[template.name]"/>
-                    </g:link>
-                </div>
-                <div class="action-menu-item">
-                    <g:link controller="document" action="renderZebraTemplate" id="${template.id}" params="['inventoryItem.id': itemInstance?.id]" target="_blank">
-                        <img src="${resource(dir: 'images/icons', file: 'barcode.png')}"/>&nbsp;
-                        <g:message code="default.render.label" args="[template.name]"/>
-                    </g:link>
-                </div>
-                <div class="action-menu-item">
-                    <g:link controller="document" action="exportZebraTemplate" id="${template.id}" params="['inventoryItem.id': itemInstance?.id]" target="_blank">
-                        <img src="${resource(dir: 'images/icons/silk', file: 'application_link.png')}"/>&nbsp;
-                        <g:message code="default.export.label" args="[template.name]"/>
-                    </g:link>
-                </div>
-                <div class="action-menu-item">
-                    <g:link controller="document" action="printZebraTemplate" id="${template.id}" params="['inventoryItem.id': itemInstance?.id, protocol: 'usb']">
-                        <img src="${resource(dir: 'images/icons/silk', file: 'printer.png')}"/>&nbsp;
-                        <g:message code="default.print.label" args="[template.name]"/> (USB)
-                    </g:link>
-                </div>
-                <div class="action-menu-item">
-                    <g:link controller="document" action="printZebraTemplate" id="${template.id}" params="['inventoryItem.id': itemInstance?.id, protocol: 'raw']">
-                        <img src="${resource(dir: 'images/icons/silk', file: 'printer.png')}"/>&nbsp;
-                        <g:message code="default.print.label" args="[template.name]"/> (RAW)
-                    </g:link>
-                </div>
+                <g:if test="${template?.documentNumber && template?.documentNumber in ['barcode:product', 'barcode:inventoryItem']}">
+                    <hr/>
+                    <div class="action-menu-item">
+                        <g:link controller="document" action="printZebraTemplate" id="${template.id}" params="['inventoryItem.id': itemInstance?.id, 'location.id': binLocation?.id, protocol: 'raw']">
+                            <img src="${resource(dir: 'images/icons/silk', file: 'printer.png')}"/>&nbsp;
+                            <g:message code="default.print.label" args="[template.name]"/> (RAW)
+                        </g:link>
+                    </div>
+                    <div class="action-menu-item">
+                        <g:link controller="document" action="buildZebraTemplate" id="${template.id}" params="['inventoryItem.id': itemInstance?.id, 'location.id': binLocation?.id]" target="_blank">
+                            <img src="${createLinkTo(dir: 'images/icons/silk', file: 'brick.png')}"/>&nbsp;
+                            <g:message code="default.build.label" args="[template.name]"/>
+                        </g:link>
+                    </div>
+                    <div class="action-menu-item">
+                        <g:link controller="document" action="renderZebraTemplate" id="${template.id}" params="['inventoryItem.id': itemInstance?.id, 'location.id':binLocation?.id]" target="_blank">
+                            <img src="${resource(dir: 'images/icons', file: 'barcode.png')}"/>&nbsp;
+                            <g:message code="default.render.label" args="[template.name]"/>
+                        </g:link>
+                    </div>
+                    <div class="action-menu-item">
+                        <g:link controller="document" action="exportZebraTemplate" id="${template.id}" params="['inventoryItem.id': itemInstance?.id, 'location.id':binLocation?.id]" target="_blank">
+                            <img src="${resource(dir: 'images/icons/silk', file: 'application_link.png')}"/>&nbsp;
+                            <g:message code="default.export.label" args="[template.name]"/>
+                        </g:link>
+                    </div>
+                </g:if>
             </g:each>
         </g:if>
     </div>
