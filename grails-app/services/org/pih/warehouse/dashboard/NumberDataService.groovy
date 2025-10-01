@@ -342,13 +342,11 @@ class NumberDataService {
         )
     }
 
-    @Cacheable(value = "dashboardCache", key = { "getAverageInboundSortationTime-${location?.id}" })
-    NumberData getAverageInboundSortationTime(Location location) {
+    @Cacheable(value = "dashboardCache", key = { "getAverageInboundSortationTime-${facility?.id}" })
+    NumberData getAverageInboundSortationTime(Location facility) {
         // TODO: Replace mock with call to {{baseUrl}}/openboxes/api/facilities/1/putaway-metrics?period=today endpoint
-        Long avgMinutes = 0
-        return new NumberData(
-                avgMinutes,
-                null
-        )
+        BigDecimal averageMinutes = putawayTaskService.getAveragePutawayCycleTime(facility, new Date()-1, new Date())
+        return new NumberData(averageMinutes, null)
+
     }
 }
