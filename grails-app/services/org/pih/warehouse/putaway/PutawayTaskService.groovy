@@ -12,8 +12,6 @@ import org.pih.warehouse.api.PutawayTaskStatus
 import org.pih.warehouse.api.StatusCategory
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.ActivityCode
-import org.pih.warehouse.core.ApplicationExceptionEvent
-import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.ReasonCode
@@ -34,6 +32,8 @@ class PutawayTaskService {
     GrailsApplication grailsApplication
     InventoryService inventoryService
     PutawayService putawayService
+    def sessionFactory
+
 
     @Transactional(readOnly = true)
     List search(Location facility, Product product, Location container, StatusCategory statusCategory, Map params) {
@@ -541,4 +541,26 @@ class PutawayTaskService {
             log.error("Error while processing PutawayDiscrepancyEvent", e)
         }
     }
+
+    // FIXME Move to PutawayMetricService if we need to calculate more metrics
+    BigDecimal getAveragePutawayCycleTime(Location facility, Date startAt, Date endAt) {
+        def session = sessionFactory.currentSession
+        String sql = '''
+            SELECT COALESCE(AVG(TIMESTAMPDIFF(SECOND, putaway_task.date_created, putaway_task.date_completed)), 0)
+            FROM putaway_task
+            WHERE putaway_task.date_completed IS NOT NULL
+              AND putaway_task.status = 'COMPLETED'
+              AND putaway_task.facility_id = :facilityId
+              AND putaway_task.date_created >= :startAt
+              AND putaway_task.date_created <  :endAt
+        '''
+
+        Number seconds = (Number) session.createNativeQuery(sql)
+                .setParameter('facilityId', facility.id)
+                .setParameter('startAt', startAt)
+                .setParameter('endAt', endAt)
+                .uniqueResult()
+        return (seconds?.toBigDecimal() ?: 0) / 60
+    }
+
 }

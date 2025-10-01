@@ -842,7 +842,7 @@ openboxes {
                 enabled = true
                 title = "react.dashboard.lostAndFound.title.label"
                 info = "react.dashboard.lostAndFound.info.label"
-                subtitle = "react.dashboard.subtitle.products.label"
+                subtitle = "react.dashboard.subtitle.items.label"
                 numberType = 'number'
                 type = 'number'
                 endpoint = "/api/dashboard/lostAndFound"
@@ -1220,6 +1220,7 @@ openboxes {
                 enabled = true
                 title = "react.dashboard.openPutawayTasks.title.label"
                 info = "react.dashboard.openPutawayTasks.info.label"
+                subtitle = "react.dashboard.subtitle.putaways.label"
                 numberType = 'number'
                 type = 'number'
                 endpoint = "/api/dashboard/openPutawayTasks"
@@ -1228,6 +1229,7 @@ openboxes {
                 enabled = true
                 title = "react.dashboard.inboundSortationItems.title.label"
                 info = "react.dashboard.inboundSortationItems.info.label"
+                subtitle = "react.dashboard.subtitle.items.label"
                 numberType = 'number'
                 type = 'number'
                 endpoint = "/api/dashboard/inboundSortationItems"
@@ -1236,7 +1238,7 @@ openboxes {
                 enabled = true
                 title = "react.dashboard.averageInboundSortationTime.title.label"
                 info = "react.dashboard.averageInboundSortationTime.info.label"
-                subtitle = "react.dashboard.subtitle.minutes"
+                subtitle = "react.dashboard.subtitle.minutes.label"
                 numberType = 'number'
                 type = 'number'
                 endpoint = "/api/dashboard/averageInboundSortationTime"

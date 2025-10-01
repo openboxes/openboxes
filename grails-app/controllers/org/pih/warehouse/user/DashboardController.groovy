@@ -14,8 +14,8 @@ import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import grails.plugin.cache.CacheEvict
 import org.apache.commons.lang.StringEscapeUtils
+import org.grails.gsp.GroovyPagesTemplateEngine
 import org.pih.warehouse.core.ActivityCode
-import grails.util.Holders
 import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.RoleType
@@ -46,6 +46,7 @@ class DashboardController {
     GitProperties gitProperties
     def userAgentIdentService
     def megamenuService
+    GroovyPagesTemplateEngine groovyPagesTemplateEngine
 
     def showCacheStatistics() {
         def statistics = sessionFactory.statistics
@@ -195,6 +196,8 @@ class DashboardController {
         flash.message = "Data caches have been flushed and inventory snapshot job was triggered"
         RefreshProductAvailabilityJob.triggerNow([locationId: session.warehouse.id, forceRefresh: true])
         RefreshOrderSummaryJob.triggerNow()
+        // Required in order to refresh the GSP template cache (primarily for barcode label templates)
+        groovyPagesTemplateEngine.clearPageCache()
         redirect(action: "index")
     }
 
