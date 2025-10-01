@@ -16,6 +16,7 @@ import grails.gorm.transactions.Transactional
 import grails.validation.Validateable
 import org.apache.http.client.fluent.Request
 import org.apache.http.entity.ContentType
+import org.hibernate.SessionFactory
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.OutboundStockMovementService
 import org.pih.warehouse.inventory.StockMovementService
@@ -27,6 +28,7 @@ import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentWorkflow
 import org.springframework.web.multipart.MultipartFile
 import util.FileUtil
+import util.RedirectUtil
 
 import static org.springframework.util.StringUtils.stripFilenameExtension
 
@@ -36,6 +38,8 @@ class DocumentController {
     def documentTemplateService
     def fileService
     def shipmentService
+    ZebraService zebraService
+    SessionFactory sessionFactory
     GrailsApplication grailsApplication
     TemplateService templateService
     StockMovementService stockMovementService
@@ -342,20 +346,20 @@ class DocumentController {
                 }
             }
 
-            def file = request.getFile("fileContents")
-            if (file?.empty) {
+            def multipartFile = request.getFile("fileContents")
+            if (multipartFile?.empty) {
                 flash.message = "${g.message(code: 'file')}"
             } else {
 
                 // Only change the name if it was never modified from the original filename
                 if (documentInstance.filename == documentInstance.name) {
-                    documentInstance.name = file.originalFilename
+                    documentInstance.name = multipartFile.originalFilename
                 }
 
-                documentInstance.filename = file.originalFilename
-                documentInstance.fileContents = file.bytes
-                documentInstance.extension = FileUtil.getExtension(file.originalFilename)
-                documentInstance.contentType = file.contentType
+                documentInstance.filename = multipartFile.originalFilename
+                documentInstance.fileContents = multipartFile.bytes
+                documentInstance.extension = FileUtil.getExtension(multipartFile.originalFilename)
+                documentInstance.contentType = multipartFile.contentType
             }
 
             if (!documentInstance.hasErrors() && documentInstance.save(flush: true)) {
@@ -391,6 +395,10 @@ class DocumentController {
 
     def preview() {
         def documentInstance = Document.get(params.id)
+        if (documentInstance?.documentType?.documentCode == DocumentCode.DATA_EXPORT) {
+            render(controller: "dataExport", action: "render", id: documentInstance.id)
+            return
+        }
         render(template: "preview", model: [documentInstance: documentInstance])
     }
 
@@ -521,14 +529,13 @@ class DocumentController {
         documentInstance.documentType = DocumentType.get(command.typeId)
 
         // If a new file is passed we should update all of the read-only properties
-        def file = command.fileContents
-
-        if (file && !file.empty) {
-            documentInstance.name = command.name ?: file.originalFilename
-            documentInstance.filename = file.originalFilename
-            documentInstance.fileContents = file.bytes
-            documentInstance.extension = FileUtil.getExtension(file.originalFilename)
-            documentInstance.contentType = file.contentType
+        def multipartFile = command.fileContents
+        if (multipartFile && !multipartFile.empty) {
+            documentInstance.name = command.name ?: multipartFile.originalFilename
+            documentInstance.filename = multipartFile.originalFilename
+            documentInstance.fileContents = multipartFile.bytes
+            documentInstance.extension = FileUtil.getExtension(multipartFile.originalFilename)
+            documentInstance.contentType = multipartFile.contentType
         }
 
         if (!documentInstance.hasErrors()) {
@@ -557,12 +564,14 @@ class DocumentController {
     }
 
     def printZebraTemplate() {
-        Document document = Document.load(params.id)
-        Location location = Location.load(session.warehouse.id)
-        InventoryItem inventoryItem = InventoryItem.load(params?.inventoryItem?.id)
+        Document document = Document.get(params.id)
+        Product product = Product.get(params?.product?.id)
+        Location facility = Location.get(session.warehouse.id)
+        Location location = Location.get(params?.location?.id)
+        InventoryItem inventoryItem = InventoryItem.get(params?.inventoryItem?.id)
 
-        Map model = [document: document, inventoryItem: inventoryItem, location: location]
-        String renderedContent = templateService.renderTemplate(document, model)
+        Map context = [document: document, inventoryItem: inventoryItem, product: inventoryItem?.product?:product, facility: facility, location: location]
+        String renderedContent = templateService.renderTemplate(document, context)
 
         try {
             if (params.protocol=="usb") {
@@ -586,29 +595,31 @@ class DocumentController {
             flash.message = e.message
         }
 
-        redirect(controller: "inventoryItem", action: "showStockCard", id: inventoryItem?.product?.id)
+        RedirectUtil.redirect(this, [location: location, product: product])
     }
 
     def buildZebraTemplate() {
-        Document document = Document.load(params.id)
-        InventoryItem inventoryItem = InventoryItem.load(params.inventoryItem?.id)
-        Location location = Location.load(session.warehouse.id)
-        Map model = [document: document, inventoryItem: inventoryItem, location: location]
+        Document document = Document.get(params.id)
+        InventoryItem inventoryItem = InventoryItem.get(params.inventoryItem?.id)
+        Location facility = Location.get(session.warehouse.id)
+        Location location = Location.get(params.location.id)
+        Map model = [document: document, inventoryItem: inventoryItem, product: inventoryItem?.product, facility: facility, location: location]
         String renderedContent = templateService.renderTemplate(document, model)
         log.info "renderedContent: ${renderedContent}"
         render(renderedContent)
     }
 
     def renderZebraTemplate() {
-        Document document = Document.load(params.id)
-        InventoryItem inventoryItem = InventoryItem.load(params.inventoryItem?.id)
-        Location location = Location.load(session.warehouse.id)
-        Map model = [document: document, inventoryItem: inventoryItem, location: location]
+        Document document = Document.get(params.id)
+        InventoryItem inventoryItem = InventoryItem.get(params.inventoryItem?.id)
+        Location facility = Location.get(session.warehouse.id)
+        Location location = Location.get(params.location.id)
+        Map model = [document: document, inventoryItem: inventoryItem, product: inventoryItem?.product, facility: facility, location: location]
         String body = templateService.renderTemplate(document, model)
 
         response.contentType = 'image/png'
         // TODO Move labelary URL to application.yml
-        response.outputStream << Request.Post('http://api.labelary.com/v1/printers/8dpmm/labels/4x6/0/')
+        response.outputStream << Request.Post('https://api.labelary.com/v1/printers/8dpmm/labels/4x6/0/')
             .bodyString(body, ContentType.APPLICATION_FORM_URLENCODED)
             .execute()
             .returnContent()
@@ -617,10 +628,11 @@ class DocumentController {
 
 
     def exportZebraTemplate() {
-        Document document = Document.load(params.id)
+        Document document = Document.get(params.id)
         InventoryItem inventoryItem = InventoryItem.load(params.inventoryItem?.id)
-        Location location = Location.load(session.warehouse.id)
-        Map model = [document: document, inventoryItem: inventoryItem, location: location]
+        Location facility = Location.get(session.warehouse.id)
+        Location location = Location.get(params.location.id)
+        Map model = [document: document, inventoryItem: inventoryItem, product: inventoryItem?.product, facility: facility, location: location]
         String renderedContent = templateService.renderTemplate(document, model)
         // TODO Move labelary URL to application.yml
         String url = "http://labelary.com/viewer.html?zpl=" + renderedContent
