@@ -108,7 +108,7 @@ class PutawayTaskService {
                 break
 
             case 'load':
-                load(task, data.container as String, data.override as Boolean)
+                load(task, data.quantity as BigDecimal, data.container as String, data.override as Boolean)
                 break
 
             case 'complete':
@@ -232,9 +232,12 @@ class PutawayTaskService {
      * @param containerNumberOrId
      * @param override
      */
-    void load(PutawayTask task, String containerNumberOrId, Boolean override = false) {
-
+    void load(PutawayTask task, BigDecimal quantity, String containerNumberOrId, Boolean override = false) {
         log.info "Loading item into putaway container ${containerNumberOrId}"
+
+        if (quantity > task.quantity) {
+            throw new IllegalArgumentException("Quantity provided is more than requested. Please re-enter quantity")
+        }
 
         // Validate the container location exists
         Location container = Location.findByLocationNumberOrId(containerNumberOrId, containerNumberOrId)
@@ -260,6 +263,8 @@ class PutawayTaskService {
             // otherwise, allow the container to change if the user has requested a force
             task.container = container
         }
+
+        task.quantity = quantity
 
         // Execute state transition
         executeStateTransition(task, PutawayTaskStatus.IN_PROGRESS)
