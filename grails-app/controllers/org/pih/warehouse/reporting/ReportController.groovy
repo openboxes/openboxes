@@ -432,17 +432,26 @@ class ReportController {
         def startTime = System.currentTimeMillis()
         String locationId = params?.location?.id ?: session?.warehouse?.id
         Location location = Location.get(locationId)
+        ActivityCode activityCode = params.get("activityCode") as ActivityCode
 
         try {
             if (params.downloadAction == "downloadStockReport") {
-                def binLocations = productAvailabilityService.getQuantityOnHandByBinLocation(location)
+                def data = productAvailabilityService.getQuantityOnHandByBinLocation(location)
 
                 // Filter on status
                 if (params.status) {
-                    binLocations = binLocations.findAll { it.status == params.status }
+                    data = data.findAll { it.status == params.status }
                 }
 
-                String csv = ReportUtil.getCsvForListOfMapEntries(binLocations, this.&binLocationCsvHeader, this.&binLocationCsvRow)
+                // Filter on activity code
+                if (activityCode) {
+                    data = data.findAll {
+                        Location binLocation = it.binLocation
+                        binLocation.supports(activityCode)
+                    }
+                }
+
+                String csv = ReportUtil.getCsvForListOfMapEntries(data, this.&binLocationCsvHeader, this.&binLocationCsvRow)
                 def filename = "Bin Location Report - ${location?.name} - ${params.status ?: 'All'}.csv"
                 response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
                 render(contentType: "text/csv", text: csv)
