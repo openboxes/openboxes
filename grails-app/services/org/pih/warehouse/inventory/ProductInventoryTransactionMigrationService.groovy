@@ -8,7 +8,6 @@ import org.pih.warehouse.core.ConfigService
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.importer.ImportDataCommand
-import org.pih.warehouse.inventory.product.availability.AvailableItemKey
 import org.pih.warehouse.product.Product
 
 /**
@@ -42,7 +41,7 @@ class ProductInventoryTransactionMigrationService extends ProductInventoryTransa
             Collection<AvailableItem> availableItems,
             Date transactionDate=null,
             String comment=null,
-            Map<AvailableItemKey, String> transactionEntriesComments = [:],
+            Map<Map<String, Object>, String> transactionEntriesComments = [:],
             validateTransactionDates = true,
             disableRefresh = false
     ) {
@@ -84,7 +83,7 @@ class ProductInventoryTransactionMigrationService extends ProductInventoryTransa
                         binLocation: null,
                         inventoryItem: defaultInventoryItem,
                         transaction: transaction,
-                        comments: transactionEntriesComments?.get(new AvailableItemKey(null, defaultInventoryItem)),
+                        comments: transactionEntriesComments?.get([inventoryItem: defaultInventoryItem, binLocation: null]),
                 )
                 transaction.addToTransactionEntries(transactionEntry)
                 continue
@@ -98,7 +97,7 @@ class ProductInventoryTransactionMigrationService extends ProductInventoryTransa
                         binLocation: availableItem.binLocation,
                         inventoryItem: availableItem.inventoryItem,
                         transaction: transaction,
-                        comments: transactionEntriesComments?.get(new AvailableItemKey(availableItem)),
+                        comments: transactionEntriesComments?.get([inventoryItem: availableItem.inventoryItem, binLocation: availableItem.binLocation]),
                 )
                 transaction.addToTransactionEntries(transactionEntry)
             }
