@@ -1,4 +1,4 @@
-<%@ page contentType="text/html;charset=UTF-8" defaultCodec="html" %>
+<%@ page import="org.pih.warehouse.core.ActivityCode" contentType="text/html;charset=UTF-8" defaultCodec="html" %>
 <html>
 <head>
     <title><g:message code="report.inventoryDetails.label" default="Inventory Details Report"/></title>
@@ -165,6 +165,7 @@
                 console.log("server params ");
                 data.push({ name: "location.id", value: "${params?.location?.id}"});
                 data.push({ name: "status", value: "${params.status}"});
+                data.push({ name: "activityCode", value: "${params.activityCode}"})
             },
             "fnServerData": function ( sSource, aoData, fnCallback ) {
                 console.log("fnServerData", aoData);
