@@ -190,4 +190,6 @@ class Constants {
     static final String DEFAULT_CONTAINER_LABEL_DOCUMENT_NUMBER = "barcodeLabel:container"
     static final String DEFAULT_INTERNAL_LOCATION_LABEL_DOCUMENT_NUMBER = "barcodeLabel:internalLocation"
     static final String DEFAULT_PRODUCT_LABEL_DOCUMENT_NUMBER = "barcodeLabel:product"
+
+    static final String PUTAWAY_CONTAINER_TYPE = "Putaway Container"
 }

@@ -1,5 +1,6 @@
 package org.pih.warehouse.inboundSortation.strategy
 
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.DeliveryTypeCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inboundSortation.PutawayContext
@@ -49,6 +50,13 @@ class CrossDockingStrategy implements PutawayStrategy {
             //  want to signal or log something to ensure
             if (destination) {
 
+                Location putawayContainer = locations.find { Location candidate ->
+                    boolean supportsActivity = candidate.supports(deliveryTypeCode.activityCode)
+                    boolean isPutawayContainerType = candidate.locationType?.name == Constants.PUTAWAY_CONTAINER_TYPE
+
+                    return supportsActivity && isPutawayContainerType
+                }
+
                 Integer quantityDemanded = unmetDemandsByDeliveryType.get(deliveryTypeCode)
                 int quantityForDemand = Math.min(quantityDemanded, availableQuantity)
                 putawayTasks << new PutawayResult(
@@ -57,7 +65,8 @@ class CrossDockingStrategy implements PutawayStrategy {
                         inventoryItem: context.inventoryItem,
                         location: context.currentBinLocation,
                         destination: destination,
-                        quantity: quantityForDemand
+                        quantity: quantityForDemand,
+                        container: putawayContainer
                 )
 
                 availableQuantity -= quantityForDemand
