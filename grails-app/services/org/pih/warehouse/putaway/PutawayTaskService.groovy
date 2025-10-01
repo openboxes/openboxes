@@ -379,7 +379,8 @@ class PutawayTaskService {
         }
         putawayService.savePutaway(putaway)
 
-        transferToDestination(task)
+        def taskToTransfer = PutawayTaskAdapter.toPutawayTask(completedSplitItem, order)
+        transferToDestination(taskToTransfer)
         save(task)
 
         currentItem.parentOrderItem = currentItemParent

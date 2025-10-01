@@ -106,6 +106,24 @@ class PutawayTaskAdapter {
         return task
     }
 
+    static PutawayTask toPutawayTask(PutawayItem putawayItem, Order order) {
+        if (!putawayItem) {
+            return null
+        }
+
+        return new PutawayTask(
+                id: putawayItem.id,
+                putawayOrder: order,
+                quantity: putawayItem.quantity,
+                inventoryItem: putawayItem.inventoryItem,
+                product: putawayItem.product,
+                facility: putawayItem.currentFacility,
+                location: putawayItem.currentLocation,
+                destination: putawayItem.putawayLocation,
+                container: putawayItem.containerLocation
+        )
+    }
+
     static PutawayTaskStatus convertFromOrderItemStatus(OrderItemStatusCode orderItemStatusCode) {
         if (!orderItemStatusCode) {
             return PutawayTaskStatus.PENDING
