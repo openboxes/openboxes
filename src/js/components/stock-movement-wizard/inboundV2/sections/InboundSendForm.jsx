@@ -2,6 +2,7 @@ import React from 'react';
 
 import PropTypes from 'prop-types';
 import { Controller } from 'react-hook-form';
+import { RiArrowGoBackFill } from 'react-icons/ri';
 
 import Button from 'components/form-elements/Button';
 import DateField from 'components/form-elements/v2/DateField';
@@ -10,6 +11,7 @@ import TextInput from 'components/form-elements/v2/TextInput';
 import Section from 'components/Layout/v2/Section';
 import InboundSendFormHeader
   from 'components/stock-movement-wizard/inboundV2/sections/InboundSendFormHeader';
+import requisitionStatus from 'consts/requisitionStatus';
 import { DateFormat } from 'consts/timeFormat';
 import useInboundSendForm from 'hooks/inboundV2/send/useInboundSendForm';
 
@@ -19,14 +21,43 @@ const InboundSendForm = ({ previous }) => {
     control,
     errors,
     trigger,
-    onSubmit,
-    shipmentTypes,
-  } = useInboundSendForm();
+    sendShipment,
+    shipmentTypesWithoutDefaultValue,
+    rollbackStockMovement,
+    onSave,
+    previousPage,
+    saveAndExit,
+    statusCode,
+    hasRoleAdmin,
+    shipped,
+    hasErrors,
+    matchesDestination,
+  } = useInboundSendForm({ previous });
+
+  // Rollback button is visible only for admins when shipment has been dispatched
+  const rollbackButtonVisible = hasRoleAdmin && shipped;
+
+  // button is disabled when there are form errors
+  // or when the shipment status is not dispatched
+  // or selected destination doesn't match current location
+  const shouldDisableRollbackButton =
+    hasErrors || statusCode !== requisitionStatus.DISPATCHED || !matchesDestination;
+
+  // Disable navigation buttons if shipment is already dispatched
+  // or selected destination doesn't match current location
+  const navigationButtonDisabled =
+    statusCode === requisitionStatus.DISPATCHED || !matchesDestination;
 
   return (
     <>
-      <InboundSendFormHeader errors={errors} />
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <InboundSendFormHeader
+        saveAndExit={saveAndExit}
+        onSave={onSave}
+        statusCode={statusCode}
+        hasErrors={hasErrors}
+        matchesDestination={matchesDestination}
+      />
+      <form onSubmit={handleSubmit(sendShipment)}>
         <Section title="Send Shipment">
           <div className="row">
             <div className="col-lg-3 col-md-6 px-2 pt-2">
@@ -67,6 +98,7 @@ const InboundSendForm = ({ previous }) => {
               <Controller
                 name="shipDate"
                 control={control}
+                disabled={!matchesDestination}
                 render={({ field }) => (
                   <DateField
                     title={{
@@ -89,6 +121,7 @@ const InboundSendForm = ({ previous }) => {
               <Controller
                 name="shipmentType"
                 control={control}
+                disabled={!matchesDestination}
                 render={({ field }) => (
                   <SelectField
                     title={{
@@ -97,7 +130,7 @@ const InboundSendForm = ({ previous }) => {
                     }}
                     required
                     errorMessage={errors.shipmentType?.message}
-                    options={shipmentTypes.map((item) => ({
+                    options={shipmentTypesWithoutDefaultValue.map((item) => ({
                       id: item.id,
                       name: item.name,
                       label: item.displayName,
@@ -112,6 +145,7 @@ const InboundSendForm = ({ previous }) => {
               <Controller
                 name="trackingNumber"
                 control={control}
+                disabled={!matchesDestination}
                 render={({ field }) => (
                   <TextInput
                     title={{
@@ -128,6 +162,7 @@ const InboundSendForm = ({ previous }) => {
               <Controller
                 name="driverName"
                 control={control}
+                disabled={!matchesDestination}
                 render={({ field }) => (
                   <TextInput
                     title={{
@@ -144,6 +179,7 @@ const InboundSendForm = ({ previous }) => {
               <Controller
                 name="comments"
                 control={control}
+                disabled={!matchesDestination}
                 render={({ field }) => (
                   <TextInput
                     title={{
@@ -160,6 +196,7 @@ const InboundSendForm = ({ previous }) => {
               <Controller
                 name="expectedDeliveryDate"
                 control={control}
+                disabled={!matchesDestination}
                 render={({ field }) => (
                   <DateField
                     title={{
@@ -185,14 +222,28 @@ const InboundSendForm = ({ previous }) => {
             label="react.default.button.previous.label"
             defaultLabel="Previous"
             variant="primary"
-            onClick={previous}
+            onClick={() => previousPage()}
+            disabled={navigationButtonDisabled}
           />
-          <Button
-            label="shipping.sendShipment.label"
-            defaultLabel="Send shipment"
-            variant="primary"
-            type="submit"
-          />
+          <div className="buttons-container">
+            {rollbackButtonVisible && (
+              <Button
+                label="react.default.button.rollback.label"
+                defaultLabel="Rollback"
+                variant="primary-outline"
+                onClick={() => rollbackStockMovement()}
+                StartIcon={<RiArrowGoBackFill className="icon" />}
+                disabled={shouldDisableRollbackButton}
+              />
+            )}
+            <Button
+              label="react.shipping.sendShipment.label"
+              defaultLabel="Send shipment"
+              variant="primary"
+              type="submit"
+              disabled={navigationButtonDisabled}
+            />
+          </div>
         </div>
       </form>
     </>
