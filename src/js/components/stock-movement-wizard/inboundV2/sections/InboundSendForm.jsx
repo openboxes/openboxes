@@ -28,14 +28,14 @@ const InboundSendForm = ({ previous }) => {
     previousPage,
     saveAndExit,
     statusCode,
-    isUserAdmin,
+    hasRoleAdmin,
     shipped,
     hasErrors,
     matchesDestination,
   } = useInboundSendForm({ previous });
 
   // Rollback button is visible only for admins when shipment has been dispatched
-  const rollbackButtonVisible = isUserAdmin && shipped;
+  const rollbackButtonVisible = hasRoleAdmin && shipped;
 
   // button is disabled when there are form errors
   // or when the shipment status is not dispatched

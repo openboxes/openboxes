@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
   getCurrentLocale,
   getCurrentLocation,
-  getShipmentTypes, getUserRights,
+  getShipmentTypes,
 } from 'selectors';
 
 import { fetchShipmentTypes, updateWorkflowHeader } from 'actions';
@@ -16,12 +16,14 @@ import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
 import locationType from 'consts/locationType';
 import NotificationType from 'consts/notificationTypes';
 import requisitionStatus from 'consts/requisitionStatus';
+import RoleType from 'consts/roleType';
 import { DateFormat } from 'consts/timeFormat';
 import { OutboundWorkflowState } from 'consts/WorkflowState';
 import useInboundSendValidation from 'hooks/inboundV2/send/useInboundSendValidation';
 import useQueryParams from 'hooks/useQueryParams';
 import useSpinner from 'hooks/useSpinner';
 import useTranslate from 'hooks/useTranslate';
+import useUserHasPermissions from 'hooks/useUserHasPermissions';
 import confirmationModal from 'utils/confirmationModalUtils';
 import createInboundWorkflowHeader from 'utils/createInboundWorkflowHeader';
 import dateWithoutTimeZone from 'utils/dateUtils';
@@ -31,14 +33,14 @@ const useInboundSendForm = ({ previous }) => {
     currentLocation,
     currentLocale,
     shipmentTypes,
-    userRights,
   } = useSelector((state) => ({
     currentLocation: getCurrentLocation(state),
     currentLocale: getCurrentLocale(state),
     shipmentTypes: getShipmentTypes(state),
-    userRights: getUserRights(state),
   }));
-  const { isUserAdmin } = userRights;
+  const hasRoleAdmin = useUserHasPermissions({
+    minRequiredRole: RoleType.ROLE_ADMIN,
+  });
   const translate = useTranslate();
   const { id: stockMovementId } = useQueryParams();
   const dispatch = useDispatch();
@@ -214,7 +216,7 @@ const useInboundSendForm = ({ previous }) => {
       }
 
       await stockMovementApi.updateStatus(stockMovementId, { rollback: true });
-      window.location.reload();
+      await fetchStockMovementData();
     } finally {
       spinner.hide();
     }
@@ -360,7 +362,7 @@ const useInboundSendForm = ({ previous }) => {
     previousPage,
     saveAndExit,
     statusCode,
-    isUserAdmin,
+    hasRoleAdmin,
     shipped,
     hasErrors,
     matchesDestination,
