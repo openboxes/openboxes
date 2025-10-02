@@ -31,4 +31,10 @@ export const getCycleCountTranslations = (state) => state.session.fetchedTransla
 
 export const getShipmentTypes = (state) => state.stockMovementCommon.shipmentTypes;
 
-export const getAdminStatus = (state) => state.session.isUserAdmin;
+export const getUserRights = (state) => ({
+  isUserAdmin: state.session.isUserAdmin,
+  isUserApprover: state.session.isUserApprover,
+  isUserManager: state.session.isUserManager,
+  isUserRequestApprover: state.session.isUserRequestApprover,
+  isSuperuser: state.session.isSuperuser,
+});

@@ -40,7 +40,7 @@ export default {
     apiClient.get(STOCK_MOVEMENT_BY_ID(id), { params }),
   getStockMovementItems: (id, params) =>
     apiClient.get(STOCK_MOVEMENT_ITEMS(id), { params }),
-  updateStockMovementShipment: (id, payload) => apiClient.post(
+  updateShipment: (id, payload) => apiClient.post(
     STOCK_MOVEMENT_UPDATE_SHIPMENT(id), payload,
   ),
 };

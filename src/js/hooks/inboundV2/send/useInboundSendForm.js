@@ -1,14 +1,12 @@
 import { useEffect, useMemo } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import _ from 'lodash';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import {
-  getAdminStatus,
   getCurrentLocale,
   getCurrentLocation,
-  getShipmentTypes,
+  getShipmentTypes, getUserRights,
 } from 'selectors';
 
 import { fetchShipmentTypes, updateWorkflowHeader } from 'actions';
@@ -33,18 +31,25 @@ const useInboundSendForm = ({ previous }) => {
     currentLocation,
     currentLocale,
     shipmentTypes,
-    hasAdminRights,
+    userRights,
   } = useSelector((state) => ({
     currentLocation: getCurrentLocation(state),
     currentLocale: getCurrentLocale(state),
     shipmentTypes: getShipmentTypes(state),
-    hasAdminRights: getAdminStatus(state),
+    userRights: getUserRights(state),
   }));
+  const { isUserAdmin } = userRights;
   const translate = useTranslate();
   const { id: stockMovementId } = useQueryParams();
   const dispatch = useDispatch();
   const spinner = useSpinner();
   const { validationSchema } = useInboundSendValidation();
+
+  // We don't want to allow users to select "Default" shipment type, so we filter it out
+  const shipmentTypesWithoutDefaultValue = useMemo(
+    () => shipmentTypes.filter((item) => item.name !== 'Default'),
+    [shipmentTypes],
+  );
 
   const defaultValues = useMemo(() => ({
     origin: null,
@@ -76,7 +81,15 @@ const useInboundSendForm = ({ previous }) => {
     defaultValues,
     resolver: zodResolver(validationSchema()),
   });
-  const { statusCode, shipped } = getValues();
+  const { statusCode, shipped, destination } = getValues();
+
+  // True when destination matches current location (valid case)
+  // or when destination is not yet loaded from backend (to avoid showing incorrect UI state
+  // during initial loading)
+  const matchesDestination = currentLocation?.id && destination?.id
+    ? currentLocation.id === destination.id
+    : true;
+  const hasErrors = Object.keys(errors).length > 0;
 
   const getShipmentPayload = () => {
     const {
@@ -93,10 +106,10 @@ const useInboundSendForm = ({ previous }) => {
         date: shipDate,
         outputDateFormat: DateFormat.MM_DD_YYYY,
       }),
-      shipmentType: shipmentType.id || null,
-      trackingNumber: trackingNumber || '',
-      driverName: driverName || '',
-      comments: comments || '',
+      shipmentType: shipmentType.id,
+      trackingNumber: trackingNumber ?? '',
+      driverName: driverName ?? '',
+      comments: comments ?? '',
       expectedDeliveryDate: dateWithoutTimeZone({
         date: expectedDeliveryDate,
         outputDateFormat: DateFormat.MM_DD_YYYY,
@@ -113,30 +126,36 @@ const useInboundSendForm = ({ previous }) => {
       const { data } = response.data;
 
       reset({
-        origin: {
-          id: data.origin.id,
-          name: data.origin.name,
-          label: `${data.origin.name} [${data.origin.locationType.description}]`,
-        } || null,
-        destination: {
-          id: data.destination.id,
-          name: data.destination.name,
-          label: `${data.destination.name} [${data.destination.locationType ? data.destination.locationType.description : null}]`,
-        } || null,
-        shipDate: data.dateShipped || null,
-        shipmentType: {
-          id: data.shipmentType.id,
-          name: data.shipmentType.name,
-          label: data.shipmentType.displayName,
-          value: data.shipmentType.id,
-        } || null,
-        trackingNumber: data.trackingNumber || '',
-        driverName: data.driverName || '',
-        comments: data.comments || '',
-        expectedDeliveryDate: data.expectedDeliveryDate || null,
-        statusCode: data.statusCode || '',
-        hasManageInventory: data.hasManageInventory || false,
-        shipped: data.shipped || false,
+        origin: data.origin
+          ? {
+            id: data.origin.id,
+            name: data.origin.name,
+            label: `${data.origin.name} [${data.origin.locationType?.description ?? ''}]`,
+          }
+          : null,
+        destination: data.destination
+          ? {
+            id: data.destination.id,
+            name: data.destination.name,
+            label: `${data.destination.name} [${data.destination.locationType?.description ?? ''}]`,
+          }
+          : null,
+        shipDate: data.dateShipped ?? null,
+        shipmentType: data.shipmentType && data.shipmentType.name !== 'Default'
+          ? {
+            id: data.shipmentType.id,
+            name: data.shipmentType.name,
+            label: data.shipmentType.displayName,
+            value: data.shipmentType.id,
+          }
+          : null,
+        trackingNumber: data.trackingNumber ?? '',
+        driverName: data.driverName ?? '',
+        comments: data.comments ?? '',
+        expectedDeliveryDate: data.expectedDeliveryDate ?? null,
+        statusCode: data.statusCode ?? '',
+        hasManageInventory: data.hasManageInventory ?? false,
+        shipped: data.shipped ?? false,
       });
 
       dispatch(
@@ -150,48 +169,21 @@ const useInboundSendForm = ({ previous }) => {
     }
   };
 
-  const validateAndBuildShipmentPayload = (values) => {
-    if (
-      currentLocation?.id !== values.origin?.id
-      && values.origin?.type !== locationType.SUPPLIER
-      && values.hasManageInventory
-    ) {
-      notification(NotificationType.ERROR_FILLED)({
-        message: 'Error',
-        details: translate(
-          'react.stockMovement.alert.sendStockMovement.label',
-          'You are not able to send shipment from a location other than origin. Change your current location.',
-        ),
-      });
-      return null;
-    }
-
-    const defaultShipmentType = _.find(shipmentTypes, (shipmentType) => shipmentType.name === 'Default');
-
-    // check if shipment type is default
-    if (values.shipmentType?.id === defaultShipmentType?.id) {
-      notification(NotificationType.ERROR_FILLED)({
-        message: 'Error',
-        details: translate(
-          'react.stockMovement.alert.populateShipmentType.label',
-          'Please populate shipment type before continuing',
-        ),
-      });
-      return null;
-    }
-
-    return getShipmentPayload();
-  };
-
   // sends the whole stock movement
   const sendShipment = async (values) => {
     try {
       spinner.show();
-      const payload = validateAndBuildShipmentPayload(values);
-      if (!payload) {
+      if (values.origin?.type !== locationType.SUPPLIER && values.hasManageInventory) {
+        notification(NotificationType.ERROR_FILLED)({
+          message: 'Error',
+          details: translate(
+            'react.stockMovement.alert.sendStockMovement.label',
+            'You are not able to send shipment from a location other than origin. Change your current location.',
+          ),
+        });
         return;
       }
-      await stockMovementApi.updateStockMovementShipment(stockMovementId, payload);
+      await stockMovementApi.updateShipment(stockMovementId, getShipmentPayload());
       await stockMovementApi.updateStatus(stockMovementId,
         { status: requisitionStatus.DISPATCHED });
       window.location = STOCK_MOVEMENT_URL.show(stockMovementId);
@@ -204,9 +196,8 @@ const useInboundSendForm = ({ previous }) => {
   const rollbackStockMovement = async () => {
     try {
       spinner.show();
-      const { origin, destination, hasManageInventory } = getValues();
+      const { origin, hasManageInventory } = getValues();
       const matchesOrigin = currentLocation?.id === origin?.id;
-      const matchesDestination = currentLocation?.id === destination?.id;
 
       const canRollback = (hasManageInventory && matchesOrigin)
         || (!hasManageInventory && matchesDestination);
@@ -231,9 +222,13 @@ const useInboundSendForm = ({ previous }) => {
 
   // save the whole stock movement
   const onSave = async () => {
+    await trigger();
+    if (hasErrors) {
+      return;
+    }
     try {
       spinner.show();
-      await stockMovementApi.updateStockMovementShipment(stockMovementId, getShipmentPayload());
+      await stockMovementApi.updateShipment(stockMovementId, getShipmentPayload());
 
       if (statusCode === requisitionStatus.DISPATCHED) {
         await fetchStockMovementData();
@@ -295,8 +290,8 @@ const useInboundSendForm = ({ previous }) => {
   // Saves changes made by user in this step and go back to previous page
   const previousPage = async () => {
     await trigger();
-    if (Object.keys(errors).length === 0) {
-      await stockMovementApi.updateStockMovementShipment(stockMovementId, getShipmentPayload());
+    if (!hasErrors) {
+      await stockMovementApi.updateShipment(stockMovementId, getShipmentPayload());
       return previous();
     }
 
@@ -329,8 +324,8 @@ const useInboundSendForm = ({ previous }) => {
   const saveAndExit = async () => {
     await trigger();
 
-    if (Object.keys(errors).length === 0) {
-      await stockMovementApi.updateStockMovementShipment(stockMovementId, getShipmentPayload());
+    if (!hasErrors) {
+      await stockMovementApi.updateShipment(stockMovementId, getShipmentPayload());
       window.location = STOCK_MOVEMENT_URL.show(stockMovementId);
       return;
     }
@@ -359,14 +354,16 @@ const useInboundSendForm = ({ previous }) => {
     errors,
     trigger,
     sendShipment,
-    shipmentTypes,
+    shipmentTypesWithoutDefaultValue,
     rollbackStockMovement,
     onSave,
     previousPage,
     saveAndExit,
     statusCode,
-    hasAdminRights,
+    isUserAdmin,
     shipped,
+    hasErrors,
+    matchesDestination,
   };
 };
 
