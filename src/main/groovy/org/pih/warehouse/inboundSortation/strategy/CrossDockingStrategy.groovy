@@ -42,9 +42,10 @@ class CrossDockingStrategy implements PutawayStrategy {
             //  or we need to figure out which order is associated the location so we put items
             //  from the same order in the same place.
             // FIXME We also probably need to find a solution when delivery type code is DeliveryTypeCode.DEFAULT
+            // TODO Temp solution for demo. To be implemented later in a better way.
             Location destination = locations.find { Location location ->
                 def supportsActivity = deliveryTypeCode.activityCode && location.supports(deliveryTypeCode.activityCode)
-                def isNotPutawayContainer = location.locationType?.name != Constants.PUTAWAY_CONTAINER_TYPE
+                def isNotPutawayContainer = location.locationType?.name != Constants.PUTAWAY_CONTAINER_TYPE_NAME
 
                 return supportsActivity && isNotPutawayContainer
             }
@@ -52,9 +53,10 @@ class CrossDockingStrategy implements PutawayStrategy {
             // FIXME If there's no suitable destination for the demand type, but there is quantity demanded we might
             //  want to signal or log something to ensure
             if (destination) {
+                // TODO Temp solution for demo. To be implemented later in a better way.
                 Location putawayContainer = locations.find { Location candidate ->
                     boolean supportsActivity = candidate.supports(deliveryTypeCode.activityCode)
-                    boolean isPutawayContainerType = candidate.locationType?.name == Constants.PUTAWAY_CONTAINER_TYPE
+                    boolean isPutawayContainerType = candidate.locationType?.name == Constants.PUTAWAY_CONTAINER_TYPE_NAME
 
                     return supportsActivity && isPutawayContainerType
                 }
