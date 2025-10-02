@@ -1,9 +1,6 @@
 name: Update dbdocs
 
 on:
-  # TODO: TEMPORARY FOR TESTING. REMOVE ONCE THIS WORKS!
-  pull_request:
-
   # Update the dbdocs (https://dbdocs.io/jmiranda/openboxes) whenever a database change is pushed to the develop branch.
   # We chose develop over main because the docs are primarily used by developers who want to see the latest db state.
   push:
