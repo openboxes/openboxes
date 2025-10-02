@@ -64,7 +64,7 @@ const OutboundImportSendingOptions = ({ control, errors, trigger }) => {
                 }}
                 placeholder={{
                   id: 'react.default.dateInput.placeholder.label',
-                  default: 'Select a date',
+                  defaultMessage: 'Select a date',
                 }}
                 errorMessage={errors.dateShipped?.message}
                 required
@@ -90,7 +90,7 @@ const OutboundImportSendingOptions = ({ control, errors, trigger }) => {
                 }}
                 placeholder={{
                   id: 'react.default.dateInput.placeholder.label',
-                  default: 'Select a date',
+                  defaultMessage: 'Select a date',
                 }}
                 errorMessage={errors.expectedDeliveryDate?.message}
                 required

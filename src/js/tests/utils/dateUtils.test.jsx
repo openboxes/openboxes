@@ -10,6 +10,9 @@ import {
   parseStringToDate,
 } from 'utils/dateUtils';
 
+const DATE_WITH_DAY = new Date(2025, 8, 19);
+const DATE_WITH_SECONDS = new Date(2025, 8, 19, 15, 10, 5);
+
 describe('parseStringToDate()', () => {
   it('should return null if date is empty', () => {
     const nullDate = parseStringToDate({
@@ -123,7 +126,7 @@ describe('formatDateToString()', () => {
 
   it('should format date properly', () => {
     const date = formatDateToString({
-      date: new Date(2025, 8, 19),
+      date: DATE_WITH_DAY,
       dateFormat: DateFormatDateFns.MM_DD_YYYY,
     });
     expect(date).toBe('09/19/2025');
@@ -131,17 +134,17 @@ describe('formatDateToString()', () => {
 
   it('should format date in specified locale properly', () => {
     const esDate = formatDateToString({
-      date: new Date(2025, 8, 19),
+      date: DATE_WITH_DAY,
       dateFormat: DateFormatDateFns.MMM_DD_YYYY,
       options: { locale: locales.es },
     });
     const frDate = formatDateToString({
-      date: new Date(2025, 8, 19),
+      date: DATE_WITH_DAY,
       dateFormat: DateFormatDateFns.MMM_DD_YYYY,
       options: { locale: locales.fr },
     });
     const plDate = formatDateToString({
-      date: new Date(2025, 8, 19),
+      date: DATE_WITH_DAY,
       dateFormat: DateFormatDateFns.MMM_DD_YYYY,
       options: { locale: locales.pl },
     });
@@ -152,7 +155,7 @@ describe('formatDateToString()', () => {
 
   it('should format date with time component properly', () => {
     const date = formatDateToString({
-      date: new Date(2025, 8, 19, 15, 10, 5),
+      date: DATE_WITH_SECONDS,
       dateFormat: DateFormatDateFns.MMM_DD_YYYY_HH_MM_SS,
     });
     expect(date).toBe('Sep 19, 2025 15:10:05');
@@ -160,12 +163,12 @@ describe('formatDateToString()', () => {
 
   it('should format date with time component in specified locale properly', () => {
     const esDate = formatDateToString({
-      date: new Date(2025, 8, 19, 15, 10, 5),
+      date: DATE_WITH_SECONDS,
       dateFormat: DateFormatDateFns.MMM_DD_YYYY_HH_MM_SS,
       options: { locale: locales.es },
     });
     const frDate = formatDateToString({
-      date: new Date(2025, 8, 19, 15, 10, 5),
+      date: DATE_WITH_SECONDS,
       dateFormat: DateFormatDateFns.MMM_DD_YYYY_HH_MM_SS,
       options: { locale: locales.fr },
     });
@@ -176,9 +179,7 @@ describe('formatDateToString()', () => {
 
 describe('formatDateToZonedDateTimeString()', () => {
   it('should return ISO-formatted date', () => {
-    const date = formatDateToZonedDateTimeString(
-      new Date(2025, 8, 19),
-    );
+    const date = formatDateToZonedDateTimeString(DATE_WITH_DAY);
     // examples that should pass the following comparison:
     // 09/19/2025 00:00 +02:00
     // 09/19/2025 00:00 -05:00
@@ -188,21 +189,19 @@ describe('formatDateToZonedDateTimeString()', () => {
 
 describe('formatDateToDatetimeString()', () => {
   it('should return date string without timezone', () => {
-    const date = formatDateToDatetimeString(
-      new Date(2025, 8, 19),
-    );
+    const date = formatDateToDatetimeString(DATE_WITH_DAY);
 
     expect(date).toBe('19/Sep/2025');
   });
 
   it('should return date in proper locale', () => {
     const esDate = formatDateToDatetimeString(
-      new Date(2025, 8, 19),
+      DATE_WITH_DAY,
       locales.es,
     );
 
     const frDate = formatDateToDatetimeString(
-      new Date(2025, 8, 19),
+      DATE_WITH_DAY,
       locales.fr,
     );
 
@@ -212,7 +211,7 @@ describe('formatDateToDatetimeString()', () => {
 
   it('should return date-only when date with time component is passed', () => {
     const date = formatDateToDatetimeString(
-      new Date(2025, 8, 19, 15, 10, 5),
+      DATE_WITH_SECONDS,
     );
 
     expect(date).toBe('19/Sep/2025');
@@ -221,7 +220,7 @@ describe('formatDateToDatetimeString()', () => {
 
 describe('formatDateToDateOnlyString()', () => {
   it('should parse date correctly', () => {
-    const date = formatDateToDateOnlyString(new Date(2025, 8, 19));
+    const date = formatDateToDateOnlyString(DATE_WITH_DAY);
     expect(date).toBe('19/Sep/2025');
   });
 
@@ -239,12 +238,12 @@ describe('formatDateToDateOnlyString()', () => {
 
   it('should return date in proper locale', () => {
     const esDate = formatDateToDateOnlyString(
-      new Date(2025, 8, 19),
+      DATE_WITH_DAY,
       locales.es,
     );
 
     const frDate = formatDateToDateOnlyString(
-      new Date(2025, 8, 19),
+      DATE_WITH_DAY,
       locales.fr,
     );
 

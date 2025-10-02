@@ -129,7 +129,7 @@ const OutboundImportBasicDetails = ({ control, errors }) => {
                 }}
                 placeholder={{
                   id: 'react.default.dateInput.placeholder.label',
-                  default: 'Select a date',
+                  defaultMessage: 'Select a date',
                 }}
                 errorMessage={errors.dateRequested?.message}
                 required

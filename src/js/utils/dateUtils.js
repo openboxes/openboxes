@@ -55,7 +55,7 @@ export const parseStringToDate = ({
   }
 
   if (dateOnly && !options.providedDateFormat) {
-    throw new Error('ProvidedDateFormat is required when dateOnly is set to false');
+    throw new Error('ProvidedDateFormat is required when dateOnly is set to true');
   }
 
   // If dateOnly is set to true, we are converting the date to the date object with the appropriate

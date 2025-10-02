@@ -74,7 +74,7 @@ const DateFieldDateFns = ({
   const highlightedDates = [selectedDate || new Date()];
 
   const placeholderText = typeof placeholder === 'object'
-    ? translate(placeholder?.id, placeholder?.default)
+    ? translate(placeholder?.id, placeholder?.defaultMessage)
     : placeholder;
 
   const datePickerRef = useRef(null);
@@ -90,6 +90,8 @@ const DateFieldDateFns = ({
   };
 
   const dateFnsLocale = () => {
+    // Temporary workaround: using 'ar' locale causes the app to crash when selecting a date.
+    // Fallback to 'en' to avoid the crash
     if (!currentLocale || ['en', 'ar'].includes(currentLocale)) {
       return locales.enUS;
     }
@@ -169,7 +171,7 @@ DateFieldDateFns.propTypes = {
     PropTypes.string,
     PropTypes.shape({
       id: PropTypes.string.isRequired,
-      default: PropTypes.string.isRequired,
+      defaultMessage: PropTypes.string.isRequired,
     }),
   ]),
   className: PropTypes.string,

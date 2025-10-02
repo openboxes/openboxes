@@ -34,7 +34,7 @@ describe('DateFieldDateFns', () => {
       <DateFieldDateFns
         placeholder={{
           id: 'placeholder.translated.label',
-          default: 'translated placeholder',
+          defaultMessage: 'translated placeholder',
         }}
       />,
     );
