@@ -112,8 +112,8 @@ class PutawayTaskService {
                 break
 
             case 'complete':
-                complete(task, data.destination as String, data.completedBy as String, data.force as Boolean,
-                        data.isCancelRemaining as Boolean, data.reasonCode as ReasonCode)
+                complete(task, data.destination as String, data.completedBy as String, data.isCancelRemaining as Boolean,
+                        data.reasonCode as ReasonCode)
                 break
 
             case 'partialComplete':
@@ -276,8 +276,7 @@ class PutawayTaskService {
         save(task)
     }
 
-    void complete(PutawayTask task, String destinationId, String completedById, Boolean force = false,
-                  Boolean isCancelRemaining, ReasonCode reasonCode) {
+    void complete(PutawayTask task, String destinationId, String completedById, Boolean isCancelRemaining, ReasonCode reasonCode) {
         log.info "complete putaway"
         if (!task) {
             throw new ObjectNotFoundException(task.id, "Unable to locate putaway task with id ${task.id}")
@@ -289,19 +288,11 @@ class PutawayTaskService {
             task.errors.reject("destination", "Destination is required")
         }
 
-        // validate destination
-        if (task.destination != destination && !force) {
-            task.errors.reject("destination", "Destination provided does not match expected destination")
-        }
-
         if (task.hasErrors() || !task.validate()) {
             throw new ValidationException("Validation errors occurred during complete action", task.errors)
         }
 
-        // Update the task destination if the destinations do not match, but user forced change
-        if (task.destination != destination && force) {
-            task.destination = destination
-        }
+        task.destination = destination
 
         Person completedBy = completedById ? Person.get(completedById) : AuthService.currentUser
         if (!completedBy) {
@@ -334,6 +325,7 @@ class PutawayTaskService {
     }
 
     PutawayTask partialComplete(PutawayTask task, BigDecimal quantity, String destinationId, ReasonCode reasonCode) {
+        log.info "partial complete putaway"
         if (quantity > task.quantity) {
             throw new IllegalArgumentException("Quantity provided is more than requested. Please re-enter quantity")
         }
