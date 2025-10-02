@@ -138,7 +138,7 @@ const useOutboundListTableData = (filterParams) => {
   const approveRequest = async (id, identifier) => {
     dispatch(showSpinner());
     try {
-      await stockMovementApi.updateStatus(id, RequisitionStatus.APPROVED);
+      await stockMovementApi.updateStatus(id, { status: RequisitionStatus.APPROVED });
       notification(NotificationType.SUCCESS)({
         message: `You have successfully Approved the request ${identifier}`,
       });
