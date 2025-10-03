@@ -32,6 +32,11 @@ const InboundSendForm = ({ previous }) => {
     shipped,
     hasErrors,
     matchesDestination,
+    documents,
+    handleExportFile,
+    handleDownloadFiles,
+    files,
+    handleRemoveFile,
   } = useInboundSendForm({ previous });
 
   // Rollback button is visible only for admins when shipment has been dispatched
@@ -56,6 +61,11 @@ const InboundSendForm = ({ previous }) => {
         statusCode={statusCode}
         hasErrors={hasErrors}
         matchesDestination={matchesDestination}
+        documents={documents}
+        handleExportFile={handleExportFile}
+        handleDownloadFiles={handleDownloadFiles}
+        files={files}
+        handleRemoveFile={handleRemoveFile}
       />
       <form onSubmit={handleSubmit(sendShipment)}>
         <Section title="Send Shipment">

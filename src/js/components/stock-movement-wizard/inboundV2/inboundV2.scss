@@ -56,6 +56,30 @@
   }
 }
 
+.inbound-send-shipment {
+  margin-bottom: 20px;
+
+  .rt-td-send-step {
+    padding: 4px 12px;
+  }
+
+  .uploaded-file {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 10px;
+    font-weight: bold;
+    max-width: 180px;
+    margin-top: 4px;
+    padding: 8px;
+    background-color: white;
+
+    span {
+      max-width: 145px;
+    }
+  }
+}
+
 .submit-buttons {
   margin-top: 18px;
   width: 100%;
@@ -81,10 +105,6 @@ input.hide-arrows[type=number] {
   .icon {
     @include set-size(16px, 16px);
   }
-}
-
-.rt-td-send-step {
-  padding: 4px 12px;
 }
 
 .rt-tbody-v2 {
