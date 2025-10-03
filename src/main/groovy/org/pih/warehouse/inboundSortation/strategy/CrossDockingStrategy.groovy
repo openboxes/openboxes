@@ -1,5 +1,7 @@
 package org.pih.warehouse.inboundSortation.strategy
 
+import org.pih.warehouse.core.ActivityCode
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.DeliveryTypeCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inboundSortation.PutawayContext
@@ -41,13 +43,21 @@ class CrossDockingStrategy implements PutawayStrategy {
             //  or we need to figure out which order is associated the location so we put items
             //  from the same order in the same place.
             // FIXME We also probably need to find a solution when delivery type code is DeliveryTypeCode.DEFAULT
-            Location destination = locations.find { Location location ->
-                deliveryTypeCode.activityCode && location.supports(deliveryTypeCode.activityCode)
+            // TODO Temp solution for demo. To be implemented later in a better way.
+            Location destination = locations.find { Location candidate ->
+                deliveryTypeCode.activityCode &&
+                candidate.supports(deliveryTypeCode.activityCode) &&
+                !candidate.supports(ActivityCode.PUTAWAY_CART)
             }
 
             // FIXME If there's no suitable destination for the demand type, but there is quantity demanded we might
             //  want to signal or log something to ensure
             if (destination) {
+                // TODO Temp solution for demo. To be implemented later in a better way.
+                Location putawayContainer = locations.find { Location candidate ->
+                    deliveryTypeCode.activityCode &&
+                    candidate.supportsAll([deliveryTypeCode.activityCode, ActivityCode.PUTAWAY_CART] as ActivityCode[])
+                }
 
                 Integer quantityDemanded = unmetDemandsByDeliveryType.get(deliveryTypeCode)
                 int quantityForDemand = Math.min(quantityDemanded, availableQuantity)
@@ -57,7 +67,8 @@ class CrossDockingStrategy implements PutawayStrategy {
                         inventoryItem: context.inventoryItem,
                         location: context.currentBinLocation,
                         destination: destination,
-                        quantity: quantityForDemand
+                        quantity: quantityForDemand,
+                        container: putawayContainer
                 )
 
                 availableQuantity -= quantityForDemand
