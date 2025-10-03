@@ -7,9 +7,6 @@ on:
       CODECOV_TOKEN:
         required: true
 
-env:
-  JAVA_VERSION: 8
-
 jobs:
   run-backend-tests:
     runs-on: ubuntu-latest
@@ -26,7 +23,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: ${{env.JAVA_VERSION}}
+          java-version: ${{vars.JAVA_VERSION}}
           distribution: zulu
           cache: gradle
 
