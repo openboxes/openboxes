@@ -480,9 +480,23 @@ class PutawayService implements EventPublisher  {
                 }
             }
 
-            // Revert order item status
-            order.orderItems.each { OrderItem orderItem ->
-                orderItem.orderItemStatusCode = OrderItemStatusCode.PENDING
+            def allItems = order.orderItems.toList()
+            def itemsToKeep = allItems.findAll { it.parentOrderItem == null }
+            def itemsToDelete = allItems.findAll { it.parentOrderItem != null }
+
+            itemsToDelete.toList().each { item ->
+                def parent = item.parentOrderItem
+                if (parent) {
+                    parent.removeFromOrderItems(item)
+                    item.parentOrderItem = null
+                }
+                order.removeFromOrderItems(item)
+                item.delete(flush: false)
+            }
+
+            itemsToKeep.each { item ->
+                item.orderItemStatusCode = OrderItemStatusCode.PENDING
+                item.discrepancyReasonCode = null
             }
 
             order.status = OrderStatus.PENDING
