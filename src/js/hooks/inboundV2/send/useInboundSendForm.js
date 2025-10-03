@@ -25,9 +25,11 @@ import useQueryParams from 'hooks/useQueryParams';
 import useSpinner from 'hooks/useSpinner';
 import useTranslate from 'hooks/useTranslate';
 import useUserHasPermissions from 'hooks/useUserHasPermissions';
+import useWindowOpen from 'hooks/useWindowOpen';
 import confirmationModal from 'utils/confirmationModalUtils';
 import createInboundWorkflowHeader from 'utils/createInboundWorkflowHeader';
 import dateWithoutTimeZone from 'utils/dateUtils';
+import filterDocumentsByStepNumber from 'utils/filterDocumentsByStepNumber';
 
 const useInboundSendForm = ({ previous }) => {
   const [files, setFiles] = useState([]);
@@ -48,6 +50,7 @@ const useInboundSendForm = ({ previous }) => {
   const dispatch = useDispatch();
   const spinner = useSpinner();
   const { validationSchema } = useInboundSendValidation();
+  const { openWindow } = useWindowOpen();
 
   // We don't want to allow users to select "Default" shipment type, so we filter it out
   const shipmentTypesWithoutDefaultValue = useMemo(
@@ -166,7 +169,7 @@ const useInboundSendForm = ({ previous }) => {
         statusCode: data.statusCode ?? '',
         hasManageInventory: data.hasManageInventory ?? false,
         shipped: data.shipped ?? false,
-        documents: _.filter(data.associations.documents, (document) => document.stepNumber === 5),
+        documents: filterDocumentsByStepNumber(data.associations.documents, 5),
       });
 
       dispatch(
@@ -263,6 +266,7 @@ const useInboundSendForm = ({ previous }) => {
 
   // save the whole stock movement
   const onSave = async ({ showNotification = true }) => {
+    // trigger() runs form validation and returns a boolean (true if valid, false otherwise).
     const isValid = await trigger();
     if (!isValid) {
       return;
@@ -332,6 +336,7 @@ const useInboundSendForm = ({ previous }) => {
 
   // Saves changes made by user in this step and go back to previous page
   const previousPage = async () => {
+    // trigger() runs form validation and returns a boolean (true if valid, false otherwise).
     const isValid = await trigger();
     if (isValid) {
       await stockMovementApi.updateShipment(stockMovementId, getShipmentPayload());
@@ -365,6 +370,7 @@ const useInboundSendForm = ({ previous }) => {
 
   // Saves changes made by user in this step and redirects to the shipment view page
   const saveAndExit = async () => {
+    // trigger() runs form validation and returns a boolean (true if valid, false otherwise).
     const isValid = await trigger();
 
     if (isValid) {
@@ -383,21 +389,22 @@ const useInboundSendForm = ({ previous }) => {
   };
 
   const handleExportFile = async (doc) => {
+    // trigger() runs form validation and returns a boolean (true if valid, false otherwise).
     const isValid = await trigger();
     if (!isValid || !doc?.uri) {
       return;
     }
     await onSave({ showNotification: false });
-    window.open(doc.uri, '_blank');
+    openWindow(doc.uri, '_blank');
   };
 
   const handleDownloadFiles = (newFiles) => {
     setFiles((prevFiles) =>
-      _.unionBy([...prevFiles, ...newFiles], 'name'));
+      _.unionBy([...newFiles, ...prevFiles], 'name'));
   };
 
   const handleRemoveFile = (fileToRemove) => {
-    setFiles((prevFiles) => prevFiles.filter((f) => f.name !== fileToRemove.name));
+    setFiles((prevFiles) => prevFiles.filter((file) => file.name !== fileToRemove.name));
   };
 
   useEffect(() => {
