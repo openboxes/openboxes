@@ -1,5 +1,6 @@
 package org.pih.warehouse.inboundSortation.strategy
 
+import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.DeliveryTypeCode
 import org.pih.warehouse.core.Location
@@ -43,11 +44,10 @@ class CrossDockingStrategy implements PutawayStrategy {
             //  from the same order in the same place.
             // FIXME We also probably need to find a solution when delivery type code is DeliveryTypeCode.DEFAULT
             // TODO Temp solution for demo. To be implemented later in a better way.
-            Location destination = locations.find { Location location ->
-                def supportsActivity = deliveryTypeCode.activityCode && location.supports(deliveryTypeCode.activityCode)
-                def isNotPutawayContainer = location.locationType?.name != Constants.PUTAWAY_CONTAINER_TYPE_NAME
-
-                return supportsActivity && isNotPutawayContainer
+            Location destination = locations.find { Location candidate ->
+                deliveryTypeCode.activityCode &&
+                candidate.supports(deliveryTypeCode.activityCode) &&
+                !candidate.supports(ActivityCode.PUTAWAY_CART)
             }
 
             // FIXME If there's no suitable destination for the demand type, but there is quantity demanded we might
@@ -55,10 +55,8 @@ class CrossDockingStrategy implements PutawayStrategy {
             if (destination) {
                 // TODO Temp solution for demo. To be implemented later in a better way.
                 Location putawayContainer = locations.find { Location candidate ->
-                    boolean supportsActivity = candidate.supports(deliveryTypeCode.activityCode)
-                    boolean isPutawayContainerType = candidate.locationType?.name == Constants.PUTAWAY_CONTAINER_TYPE_NAME
-
-                    return supportsActivity && isPutawayContainerType
+                    deliveryTypeCode.activityCode &&
+                    candidate.supportsAll([deliveryTypeCode.activityCode, ActivityCode.PUTAWAY_CART] as ActivityCode[])
                 }
 
                 Integer quantityDemanded = unmetDemandsByDeliveryType.get(deliveryTypeCode)
