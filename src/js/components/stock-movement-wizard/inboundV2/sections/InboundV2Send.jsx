@@ -6,7 +6,7 @@ import InboundSendForm from 'components/stock-movement-wizard/inboundV2/sections
 import InboundSendTable from 'components/stock-movement-wizard/inboundV2/sections/InboundSendTable';
 
 const InboundV2Send = ({ previous }) => (
-  <div className="mb-4">
+  <div className="inbound-send-shipment">
     <InboundSendForm previous={previous} />
     <InboundSendTable />
   </div>
