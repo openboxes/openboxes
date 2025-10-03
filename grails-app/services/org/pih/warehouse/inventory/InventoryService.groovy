@@ -1948,51 +1948,6 @@ class InventoryService implements ApplicationContextAware {
         return command
     }
 
-
-    def createStockSnapshot(Location location, Product product) {
-        List lineItems = getProductQuantityByBinLocation(location, product)
-
-        // If there's no stock we should record that as well
-        if (!lineItems || lineItems?.empty) {
-            InventoryItem inventoryItem = findOrCreateInventoryItem(product, null, null)
-            lineItems << [binLocation: null, inventoryItem: inventoryItem, quantity: 0]
-        }
-
-
-        recordStock(location, lineItems)
-    }
-
-
-    def recordStock(Location location, List lineItems) {
-
-        if (!location || !location.inventory) {
-            throw new IllegalArgumentException("Record stock transactions require a location")
-        }
-
-        Transaction transaction = new Transaction()
-        transaction.transactionDate = new Date()
-        transaction.inventory = location.inventory
-        transaction.transactionNumber = generateTransactionNumber(transaction)
-        transaction.transactionType = TransactionType.get(Constants.PRODUCT_INVENTORY_TRANSACTION_TYPE_ID)
-
-        lineItems.each { lineItem ->
-            // Add transaction entry to transaction
-            TransactionEntry transactionEntry = new TransactionEntry()
-            transactionEntry.binLocation = lineItem.binLocation
-            transactionEntry.inventoryItem = lineItem.inventoryItem
-            transactionEntry.quantity = lineItem.quantity
-            transactionEntry.comments = lineItem.comments
-            transaction.addToTransactionEntries(transactionEntry)
-        }
-
-        if (!transaction.hasErrors() && transaction.save()) {
-            log.info("Transaction saved: " + transaction)
-        }
-
-        return transaction
-    }
-
-
     /**
      * Adjusts the stock level by adding a new transaction entry with a
      * quantity change.
