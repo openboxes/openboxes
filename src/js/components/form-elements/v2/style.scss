@@ -154,6 +154,10 @@ input, .date-field-input {
       color: var(--gray-600)
     }
   }
+
+  .react-datepicker__aria-live {
+    display: none !important;
+  }
 }
 
 // SELECT FIELD
