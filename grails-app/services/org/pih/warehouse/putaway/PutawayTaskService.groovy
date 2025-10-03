@@ -363,7 +363,7 @@ class PutawayTaskService {
         }
         PutawayItem itemToSplit = putaway.putawayItems.find { it.id == currentItem.id }
 
-        PutawayItem completedSplitItem = createSplitPutawayItem(task, quantity, PutawayStatus.COMPLETED, task.destination)
+        PutawayItem completedSplitItem = createSplitPutawayItem(task, quantity, PutawayStatus.COMPLETED, alternativeDestination)
         PutawayItem remainingSplitItem = createSplitPutawayItem(task, quantityRemaining, PutawayStatus.PENDING, alternativeDestination)
 
         if (itemToSplit) {
