@@ -174,6 +174,17 @@
                         </g:link>
                     </g:if>
 
+                <g:if test="${grailsApplication.config.openboxes.rollback.showRollbackToCreatedButton}">
+                    <g:isUserAdmin>
+                        <g:if test="${stockMovement?.hasBeenReceived() || stockMovement?.hasBeenPartiallyReceived()}">
+                            <g:link controller="stockMovement" action="rollbackToCreated" id="${stockMovement?.shipment?.id}" class="button">
+                                <img src="${resource(dir: 'images/icons/silk', file: 'arrow_rotate_anticlockwise.png')}" />&nbsp;
+                                <warehouse:message code="stockMovement.rollbackToCreated.label" />
+                            </g:link>
+                        </g:if>
+                    </g:isUserAdmin>
+                </g:if>
+
                 <g:isSuperuser>
                     <a href="javascript:void(0);" class="button btn-show-dialog"
                         data-height="600" data-width="1000"
