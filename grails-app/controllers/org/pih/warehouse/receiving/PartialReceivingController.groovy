@@ -38,12 +38,11 @@ class PartialReceivingController {
 
         Location currentLocation = Location.get(session.warehouse.id)
         if (!stockMovement.isReceivingAuthorized(currentLocation)) {
-            flash.error = stockMovementService.getDisabledMessage(stockMovement, currentLocation)
+            flash.message = stockMovementService.getDisabledMessage(stockMovement, currentLocation)
             redirect(controller: "stockMovement", action: "show", id: params.id)
             return
         }
-
-        receiptService.receiveInboundShipment(shipment)
+        receiptService.receiveInboundShipment(shipment, true)
 
         redirect(controller: "stockMovement", action: "show", id: params.id)
     }
