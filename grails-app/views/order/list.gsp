@@ -118,9 +118,16 @@
                                         </td>
                                         <td class="middle">
                                             <g:if test="${orderType == OrderType.findByCode(Constants.PUTAWAY_ORDER)}">
-                                                <g:link data-testid="name-${i}" controller="putaway" action="show" id="${orderInstance.id}">
-                                                    ${fieldValue(bean: orderInstance, field: "name")}
-                                                </g:link>
+                                                <g:if test="${orderInstance?.associatedProductsAsString}">
+                                                    ${orderInstance?.associatedProductsAsString}
+                                                </g:if>
+                                                <g:else>
+                                                    <g:link data-testid="name-${i}" controller="putaway" action="show" id="${orderInstance.id}">
+                                                        ${fieldValue(bean: orderInstance, field: "name")}
+                                                    </g:link>
+                                                </g:else>
+
+
                                             </g:if>
                                             <g:else>
                                                 <g:link data-testid="name-${i}" controller="order" action="show" id="${orderInstance.id}">

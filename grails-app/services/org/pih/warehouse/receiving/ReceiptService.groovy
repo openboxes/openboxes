@@ -505,14 +505,14 @@ class ReceiptService {
         }
     }
 
-    void receiveInboundShipment(Shipment shipment) {
+    void receiveInboundShipment(Shipment shipment, Boolean forceAutoReceipt = false) {
 
-        log.info "Receive inbound shipment ${shipment}"
+        log.info "Receive inbound shipment ${shipment}  forceAutoReceipt${forceAutoReceipt}"
         // Validate that the shipment is valid and ready to be received
         if (!shipment) return
         if (shipment.isFullyReceived()) { log.info("Shipment ${shipment?.id} already fully received"); return; }
         if (!shipment.hasShipped()) { log.warn("Shipment ${shipment?.id} has no SHIPPED event associated"); return }
-        if (!shipment.destination?.supports(ActivityCode.AUTO_RECEIVING)) {
+        if (!forceAutoReceipt && !shipment.destination?.supports(ActivityCode.AUTO_RECEIVING)) {
             log.info("Shipment ${shipment?.id}: destination ${shipment?.destination} does not support activity code ${ActivityCode.AUTO_RECEIVING}")
             return
         }
