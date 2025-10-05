@@ -186,7 +186,10 @@ class LocationService {
         def terms = "%" + query + "%"
         def locations = Location.createCriteria().list(max: max, offset: offset) {
             if (query) {
-                ilike("name", terms)
+                or {
+                    ilike("name", terms)
+                    ilike("locationNumber", terms)
+                }
             }
 
             if (organization) {
@@ -201,10 +204,8 @@ class LocationService {
                 eq("locationGroup", locationGroup)
             }
 
-            if (locationType?.locationTypeCode == LocationTypeCode.BIN_LOCATION) {
+            if (locationType?.locationTypeCode == LocationTypeCode.BIN_LOCATION || locationType?.locationTypeCode == LocationTypeCode.INTERNAL) {
                 isNotNull("parentLocation")
-            } else {
-                isNull("parentLocation")
             }
             order("name")
         }

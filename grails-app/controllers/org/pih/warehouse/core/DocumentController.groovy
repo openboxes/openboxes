@@ -16,6 +16,7 @@ import grails.gorm.transactions.Transactional
 import grails.validation.Validateable
 import org.apache.http.client.fluent.Request
 import org.apache.http.entity.ContentType
+import org.grails.gsp.GroovyPagesTemplateEngine
 import org.hibernate.SessionFactory
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.OutboundStockMovementService
@@ -40,6 +41,7 @@ class DocumentController {
     def shipmentService
     ZebraService zebraService
     SessionFactory sessionFactory
+    GroovyPagesTemplateEngine groovyPagesTemplateEngine
     GrailsApplication grailsApplication
     TemplateService templateService
     StockMovementService stockMovementService
@@ -363,6 +365,10 @@ class DocumentController {
             }
 
             if (!documentInstance.hasErrors() && documentInstance.save(flush: true)) {
+
+                // Required in order to refresh the GSP template cache (primarily for barcode label templates)
+                groovyPagesTemplateEngine.clearPageCache()
+
                 flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'document.label', default: 'Document'), documentInstance.id])}"
                 redirect(action: "edit", id: documentInstance.id)
             } else {
@@ -600,26 +606,29 @@ class DocumentController {
 
     def buildZebraTemplate() {
         Document document = Document.get(params.id)
-        InventoryItem inventoryItem = InventoryItem.get(params.inventoryItem?.id)
+        Product product = Product.get(params?.product?.id)
+        InventoryItem inventoryItem = InventoryItem.get(params?.inventoryItem?.id)
         Location facility = Location.get(session.warehouse.id)
-        Location location = Location.get(params.location.id)
-        Map model = [document: document, inventoryItem: inventoryItem, product: inventoryItem?.product, facility: facility, location: location]
+        Location location = Location.get(params?.location?.id)
+        Map model = [document: document, inventoryItem: inventoryItem, product: product?:inventoryItem?.product, facility: facility, location: location]
         String renderedContent = templateService.renderTemplate(document, model)
         log.info "renderedContent: ${renderedContent}"
-        render(renderedContent)
+        response.setHeader("Content-disposition", "attachment; filename=\"${product?.productCode?:location?.locationNumber}.zpl\"")
+        render(contentType: "text/csv", text: renderedContent, encoding: "UTF-8")
     }
 
     def renderZebraTemplate() {
         Document document = Document.get(params.id)
-        InventoryItem inventoryItem = InventoryItem.get(params.inventoryItem?.id)
+        Product product = Product.get(params?.product?.id)
+        InventoryItem inventoryItem = InventoryItem.get(params?.inventoryItem?.id)
         Location facility = Location.get(session.warehouse.id)
-        Location location = Location.get(params.location.id)
-        Map model = [document: document, inventoryItem: inventoryItem, product: inventoryItem?.product, facility: facility, location: location]
+        Location location = Location.get(params?.location?.id)
+        Map model = [document: document, inventoryItem: inventoryItem, product: product?:inventoryItem?.product, facility: facility, location: location]
         String body = templateService.renderTemplate(document, model)
 
         response.contentType = 'image/png'
         // TODO Move labelary URL to application.yml
-        response.outputStream << Request.Post('https://api.labelary.com/v1/printers/8dpmm/labels/4x6/0/')
+        response.outputStream << Request.Post('https://api.labelary.com/v1/printers/8dpmm/labels/3x2/0/')
             .bodyString(body, ContentType.APPLICATION_FORM_URLENCODED)
             .execute()
             .returnContent()
@@ -629,13 +638,14 @@ class DocumentController {
 
     def exportZebraTemplate() {
         Document document = Document.get(params.id)
-        InventoryItem inventoryItem = InventoryItem.load(params.inventoryItem?.id)
+        Product product = Product.get(params?.product?.id)
+        InventoryItem inventoryItem = InventoryItem.load(params?.inventoryItem?.id)
         Location facility = Location.get(session.warehouse.id)
-        Location location = Location.get(params.location.id)
-        Map model = [document: document, inventoryItem: inventoryItem, product: inventoryItem?.product, facility: facility, location: location]
+        Location location = Location.get(params?.location?.id)
+        Map model = [document: document, inventoryItem: inventoryItem, product: product?:inventoryItem?.product, facility: facility, location: location]
         String renderedContent = templateService.renderTemplate(document, model)
         // TODO Move labelary URL to application.yml
-        String url = "http://labelary.com/viewer.html?zpl=" + renderedContent
+        String url = "https://labelary.com/viewer.html?zpl=" + renderedContent
         redirect(url: url)
     }
 
