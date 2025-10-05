@@ -68,7 +68,9 @@ class CrossDockingStrategy implements PutawayStrategy {
                         location: context.currentBinLocation,
                         destination: destination,
                         quantity: quantityForDemand,
-                        container: putawayContainer
+                        // FIXME OBLS-269 Assigning a putaway container causes bug when performing a direct putaway so
+                        //  we're going to disable this feature and require a putaway container override for each sortation.
+                        container: null
                 )
 
                 availableQuantity -= quantityForDemand
