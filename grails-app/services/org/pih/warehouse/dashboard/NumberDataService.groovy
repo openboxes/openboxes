@@ -5,9 +5,9 @@ import grails.plugin.cache.Cacheable
 import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.joda.time.LocalDate
 import org.pih.warehouse.DateUtil
-import org.pih.warehouse.inventory.InventoryItemService
 import org.springframework.web.context.request.RequestContextHolder
 import grails.web.servlet.mvc.GrailsParameterMap
+import org.pih.warehouse.api.PutawayTaskStatus
 import org.pih.warehouse.api.StatusCategory
 import org.pih.warehouse.api.StockMovementDirection
 import org.pih.warehouse.core.ActivityCode
@@ -16,6 +16,7 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
 import org.pih.warehouse.core.LocationService
+import org.pih.warehouse.inventory.InventoryItemService
 import org.pih.warehouse.inventory.TransactionCode
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.order.Order
@@ -349,11 +350,11 @@ class NumberDataService {
     NumberData getOpenPutawayTasks(Location location) {
         def webRequest = RequestContextHolder.requestAttributes
         def grailsParams = new GrailsParameterMap([:], webRequest.request)
-        def tasks = putawayTaskService.search(location, null, null, StatusCategory.OPEN, grailsParams)
-
+        grailsParams.status = PutawayTaskStatus.PENDING
+        def tasks = putawayTaskService.search(location, null, null, null, grailsParams)
         String urlContextPath = ConfigHelper.contextPath
         return new NumberData(
-                tasks?.totalCount ?: 0,
+                tasks?.size() ?: 0,
                 "${urlContextPath}/order/list?orderType=PUTAWAY_ORDER&status=PENDING"
         )
     }

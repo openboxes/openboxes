@@ -39,6 +39,7 @@ class InventoryItemService {
             FROM ProductAvailability pa
             WHERE pa.location = :facility
               AND pa.binLocation.id IN (:locationIds)
+              AND pa.quantityOnHand > 0
         """, [facility: facility, locationIds: locationIds])
 
         return results[0] as Long ?: 0L

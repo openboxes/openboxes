@@ -16,6 +16,7 @@ import org.pih.warehouse.core.*
 import org.pih.warehouse.invoice.InvoiceItem
 import org.pih.warehouse.invoice.InvoiceTypeCode
 import org.pih.warehouse.picklist.Picklist
+import org.pih.warehouse.product.Product
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentStatusCode
 
@@ -125,7 +126,9 @@ class Order implements Serializable {
             "canceled",
             "completed",
             'activeOrderAdjustments',
-            'activeOrderItems'
+            'activeOrderItems',
+            'associatedProducts',
+            'associatedProductsAsString',
     ]
 
     static hasMany = [
@@ -608,4 +611,13 @@ class Order implements Serializable {
                 return toJson()
         }
     }
+
+    Set<Product> getAssociatedProducts() {
+        orderItems?.collect { it?.product }?.findAll { it }?.toSet() ?: [] as Set
+    }
+
+    String getAssociatedProductsAsString() {
+        associatedProducts?.join(":")
+    }
+
 }
