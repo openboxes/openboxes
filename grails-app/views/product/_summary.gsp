@@ -114,21 +114,51 @@
 
 					<div class="button-group right">
 
-                        <g:set var="templates" value="${Document.listBarcodeTemplates("barcode:product").list()}"/>
-                        <g:if test="${templates}">
-                            <g:each in="${templates}" var="template">
-                                <g:link controller="document" action="printZebraTemplate" id="${template.id}" params="['product.id': productInstance?.id, protocol: 'raw']" class="button">
-                                    <img src="${resource(dir: 'images/icons', file: 'printer.png')}"/>&nbsp;
-                                    <g:message code="default.print.label" args="[template.name]"/>
-                                </g:link>
-                            </g:each>
-                        </g:if>
-
                         <g:link controller="product" action="addDocument" id="${productInstance?.id}" class="button">
 							<img src="${resource(dir: 'images/icons/silk', file: 'page_add.png')}" />&nbsp;
 							<warehouse:message code="product.addDocument.label" default="Add document"/>
 						</g:link>
-					</div>
+
+                        <span class="action-menu">
+                            <button class="action-btn button">
+                                <img src="${resource(dir: 'images/icons/silk', file: 'folder.png')}" />
+                                &nbsp; <g:message code="shipping.downloadBarcodeLabels.label"/>
+                                <img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" />
+                            </button>
+                            <div class="actions">
+                                <g:set var="templates" value="${Document.listBarcodeTemplates("barcode:product").list()}"/>
+                                <g:if test="${templates}">
+                                    <g:each in="${templates}" var="template">
+                                        <hr/>
+                                        <div class="action-menu-item">
+                                            <g:link controller="document" action="printZebraTemplate" id="${template.id}" params="['product.id': productInstance?.id, protocol: 'raw']">
+                                                <img src="${resource(dir: 'images/icons/silk', file: 'printer.png')}"/>&nbsp;
+                                                <g:message code="default.print.label" args="[template.name]"/> (RAW)
+                                            </g:link>
+                                        </div>
+                                        <div class="action-menu-item">
+                                            <g:link controller="document" action="buildZebraTemplate" id="${template.id}" params="['product.id': productInstance?.id]" target="_blank">
+                                                <img src="${createLinkTo(dir: 'images/icons/silk', file: 'brick.png')}"/>&nbsp;
+                                                <g:message code="default.build.label" args="[template.name]"/>
+                                            </g:link>
+                                        </div>
+                                        <div class="action-menu-item">
+                                            <g:link controller="document" action="renderZebraTemplate" id="${template.id}" params="['product.id': productInstance?.id]" target="_blank">
+                                                <img src="${resource(dir: 'images/icons', file: 'barcode.png')}"/>&nbsp;
+                                                <g:message code="default.render.label" args="[template.name]"/>
+                                            </g:link>
+                                        </div>
+                                        <div class="action-menu-item">
+                                            <g:link controller="document" action="exportZebraTemplate" id="${template.id}" params="['product.id': productInstance?.id]" target="_blank">
+                                                <img src="${resource(dir: 'images/icons/silk', file: 'application_link.png')}"/>&nbsp;
+                                                <g:message code="default.export.label" args="[template.name]"/>
+                                            </g:link>
+                                        </div>
+                                    </g:each>
+                                </g:if>
+                            </div>
+                        </span>
+                    </div>
                 </div>
             </td>
         </tr>
