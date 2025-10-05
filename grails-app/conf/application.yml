@@ -522,7 +522,7 @@ openboxes:
             cronExpression: "0 0 * * * ?" # every hour
 
         automaticSlottingJob:
-            enabled: true
+            enabled: false
             cronExpression: "0 */5 * * * ?"     # every five minutes
             defaultPutawayAssignee: "admin"
 
