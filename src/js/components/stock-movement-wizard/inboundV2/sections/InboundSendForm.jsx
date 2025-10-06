@@ -30,13 +30,13 @@ const InboundSendForm = ({ previous }) => {
     statusCode,
     hasRoleAdmin,
     shipped,
-    hasErrors,
     matchesDestination,
     documents,
     handleExportFile,
     handleDownloadFiles,
     files,
     handleRemoveFile,
+    isValid,
   } = useInboundSendForm({ previous });
 
   // Rollback button is visible only for admins when shipment has been dispatched
@@ -46,7 +46,7 @@ const InboundSendForm = ({ previous }) => {
   // or when the shipment status is not dispatched
   // or selected destination doesn't match current location
   const shouldDisableRollbackButton =
-    hasErrors || statusCode !== requisitionStatus.DISPATCHED || !matchesDestination;
+    !isValid || statusCode !== requisitionStatus.DISPATCHED || !matchesDestination;
 
   // Disable navigation buttons if shipment is already dispatched
   // or selected destination doesn't match current location
@@ -59,7 +59,7 @@ const InboundSendForm = ({ previous }) => {
         saveAndExit={saveAndExit}
         onSave={onSave}
         statusCode={statusCode}
-        hasErrors={hasErrors}
+        isValid={isValid}
         matchesDestination={matchesDestination}
         documents={documents}
         handleExportFile={handleExportFile}

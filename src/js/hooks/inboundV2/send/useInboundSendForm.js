@@ -1,7 +1,6 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import _ from 'lodash';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -20,19 +19,18 @@ import requisitionStatus from 'consts/requisitionStatus';
 import RoleType from 'consts/roleType';
 import { DateFormat } from 'consts/timeFormat';
 import { OutboundWorkflowState } from 'consts/WorkflowState';
+import useInboundFileActions from 'hooks/inboundV2/send/useInboundFileActions';
 import useInboundSendValidation from 'hooks/inboundV2/send/useInboundSendValidation';
 import useQueryParams from 'hooks/useQueryParams';
 import useSpinner from 'hooks/useSpinner';
 import useTranslate from 'hooks/useTranslate';
 import useUserHasPermissions from 'hooks/useUserHasPermissions';
-import useWindowOpen from 'hooks/useWindowOpen';
 import confirmationModal from 'utils/confirmationModalUtils';
 import createInboundWorkflowHeader from 'utils/createInboundWorkflowHeader';
 import dateWithoutTimeZone from 'utils/dateUtils';
 import filterDocumentsByStepNumber from 'utils/filterDocumentsByStepNumber';
 
 const useInboundSendForm = ({ previous }) => {
-  const [files, setFiles] = useState([]);
   const {
     currentLocation,
     currentLocale,
@@ -50,7 +48,6 @@ const useInboundSendForm = ({ previous }) => {
   const dispatch = useDispatch();
   const spinner = useSpinner();
   const { validationSchema } = useInboundSendValidation();
-  const { openWindow } = useWindowOpen();
 
   // We don't want to allow users to select "Default" shipment type, so we filter it out
   const shipmentTypesWithoutDefaultValue = useMemo(
@@ -81,7 +78,7 @@ const useInboundSendForm = ({ previous }) => {
     control,
     getValues,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isValid },
     trigger,
     reset,
   } = useForm({
@@ -102,7 +99,6 @@ const useInboundSendForm = ({ previous }) => {
   const matchesDestination = currentLocation?.id && destination?.id
     ? currentLocation.id === destination.id
     : true;
-  const hasErrors = Object.keys(errors).length > 0;
 
   const getShipmentPayload = () => {
     const {
@@ -183,30 +179,47 @@ const useInboundSendForm = ({ previous }) => {
     }
   };
 
-  const sendFiles = async () => {
-    const data = new FormData();
-
-    files.forEach((file, idx) => {
-      data.append(`filesContents[${idx}]`, file);
-    });
-
-    await stockMovementApi.uploadDocuments(stockMovementId, data);
-    if (files.length > 1) {
-      notification(NotificationType.SUCCESS)({
-        message: translate(
-          'react.stockMovement.alert.filesSuccess.label',
-          'Files uploaded successfully!',
-        ),
-      });
+  /**
+   * Saves the whole stock movement
+   * @param {boolean} showNotification - Determines whether to show a success toast after saving.
+   */
+  const onSave = async ({ showNotification = true }) => {
+    if (!isValid) {
       return;
     }
-    notification(NotificationType.SUCCESS)({
-      message: translate(
-        'react.stockMovement.alert.fileSuccess.label',
-        'File uploaded successfully!',
-      ),
-    });
+    try {
+      spinner.show();
+      await stockMovementApi.updateShipment(stockMovementId, getShipmentPayload());
+
+      if (statusCode === requisitionStatus.DISPATCHED) {
+        await fetchStockMovementData();
+      }
+
+      if (showNotification) {
+        notification(NotificationType.SUCCESS)({
+          message: translate(
+            'react.stockMovement.alert.saveSuccess.label',
+            'Changes saved successfully',
+          ),
+        });
+      }
+    } finally {
+      spinner.hide();
+    }
   };
+
+  const {
+    files,
+    handleDownloadFiles,
+    handleRemoveFile,
+    sendFiles,
+    handleExportFile,
+  } = useInboundFileActions({
+    stockMovementId,
+    onSave,
+    spinner,
+    isValid,
+  });
 
   // sends the whole stock movement
   const sendShipment = async (values) => {
@@ -264,34 +277,6 @@ const useInboundSendForm = ({ previous }) => {
     }
   };
 
-  // save the whole stock movement
-  const onSave = async ({ showNotification = true }) => {
-    // trigger() runs form validation and returns a boolean (true if valid, false otherwise).
-    const isValid = await trigger();
-    if (!isValid) {
-      return;
-    }
-    try {
-      spinner.show();
-      await stockMovementApi.updateShipment(stockMovementId, getShipmentPayload());
-
-      if (statusCode === requisitionStatus.DISPATCHED) {
-        await fetchStockMovementData();
-      }
-
-      if (showNotification) {
-        notification(NotificationType.SUCCESS)({
-          message: translate(
-            'react.stockMovement.alert.saveSuccess.label',
-            'Changes saved successfully',
-          ),
-        });
-      }
-    } finally {
-      spinner.hide();
-    }
-  };
-
   const confirmActionModal = ({
     titleId = 'react.stockMovement.message.confirmSave.label',
     titleDefault = 'Confirm save',
@@ -336,8 +321,7 @@ const useInboundSendForm = ({ previous }) => {
 
   // Saves changes made by user in this step and go back to previous page
   const previousPage = async () => {
-    // trigger() runs form validation and returns a boolean (true if valid, false otherwise).
-    const isValid = await trigger();
+    await trigger();
     if (isValid) {
       await stockMovementApi.updateShipment(stockMovementId, getShipmentPayload());
       return previous();
@@ -370,41 +354,25 @@ const useInboundSendForm = ({ previous }) => {
 
   // Saves changes made by user in this step and redirects to the shipment view page
   const saveAndExit = async () => {
-    // trigger() runs form validation and returns a boolean (true if valid, false otherwise).
-    const isValid = await trigger();
+    await trigger();
+    if (!isValid) {
+      confirmActionModal({
+        messageId: 'react.stockMovement.confirmExit.message',
+        messageDefault: 'Validation errors occurred. Are you sure you want to exit and lose unsaved data?',
+        onConfirm: () => {
+          window.location = STOCK_MOVEMENT_URL.show(stockMovementId);
+        },
+      });
+      return;
+    }
 
-    if (isValid) {
+    try {
+      spinner.show();
       await stockMovementApi.updateShipment(stockMovementId, getShipmentPayload());
       window.location = STOCK_MOVEMENT_URL.show(stockMovementId);
-      return;
+    } finally {
+      spinner.hide();
     }
-
-    confirmActionModal({
-      messageId: 'react.stockMovement.confirmExit.message',
-      messageDefault: 'Validation errors occurred. Are you sure you want to exit and lose unsaved data?',
-      onConfirm: () => {
-        window.location = STOCK_MOVEMENT_URL.show(stockMovementId);
-      },
-    });
-  };
-
-  const handleExportFile = async (doc) => {
-    // trigger() runs form validation and returns a boolean (true if valid, false otherwise).
-    const isValid = await trigger();
-    if (!isValid || !doc?.uri) {
-      return;
-    }
-    await onSave({ showNotification: false });
-    openWindow(doc.uri, '_blank');
-  };
-
-  const handleDownloadFiles = (newFiles) => {
-    setFiles((prevFiles) =>
-      _.unionBy([...newFiles, ...prevFiles], 'name'));
-  };
-
-  const handleRemoveFile = (fileToRemove) => {
-    setFiles((prevFiles) => prevFiles.filter((file) => file.name !== fileToRemove.name));
   };
 
   useEffect(() => {
@@ -430,13 +398,13 @@ const useInboundSendForm = ({ previous }) => {
     statusCode,
     hasRoleAdmin,
     shipped,
-    hasErrors,
     matchesDestination,
     documents,
     handleExportFile,
     handleDownloadFiles,
     files,
     handleRemoveFile,
+    isValid,
   };
 };
 

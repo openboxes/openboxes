@@ -21,7 +21,7 @@ const InboundSendFormHeader = ({
   saveAndExit,
   onSave,
   statusCode,
-  hasErrors,
+  isValid,
   matchesDestination,
   documents,
   handleExportFile,
@@ -81,7 +81,7 @@ const InboundSendFormHeader = ({
             label="react.default.button.download.label"
             variant="primary-outline"
             StartIcon={<RiDownload2Line />}
-            disabled={hasErrors || !matchesDestination}
+            disabled={!isValid || !matchesDestination}
           />
           <div
             className="dropdown-menu dropdown-menu-right nav-item padding-8"
@@ -117,7 +117,7 @@ const InboundSendFormHeader = ({
           defaultLabel="Save"
           label="react.default.button.save.label"
           variant="primary-outline"
-          disabled={hasErrors || !matchesDestination}
+          disabled={!isValid || !matchesDestination}
         />
         {!matchesDestination && (
           <Button
@@ -139,7 +139,7 @@ InboundSendFormHeader.propTypes = {
   saveAndExit: PropTypes.func.isRequired,
   onSave: PropTypes.func.isRequired,
   statusCode: PropTypes.string,
-  hasErrors: PropTypes.bool.isRequired,
+  isValid: PropTypes.bool.isRequired,
   matchesDestination: PropTypes.bool.isRequired,
   documents: PropTypes.arrayOf(PropTypes.shape({})),
   handleExportFile: PropTypes.func.isRequired,
