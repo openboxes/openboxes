@@ -46,9 +46,7 @@ class PutawayController {
             return
         }
 
-        List<PutawayTask> tasks = order.orderItems.collect { orderItem ->
-            PutawayTaskAdapter.toPutawayTask(orderItem)
-        }.findAll { it != null }
+        List<PutawayTask> tasks = putawayTaskService.search(order.destination, null, null, null, order, params)
 
         render(template: "putawayTasks", model: [orderInstance: order, putawayTasks: tasks])
     }
