@@ -35,12 +35,20 @@ class DateFormatterContext {
      */
     DateDisplayStyle displayStyleOverride
 
+    /**
+     * The default value to return if the given date object is null.
+     */
+    String defaultValue
+
     static DateFormatterContextBuilder builder() {
         return new DateFormatterContextBuilder()
     }
 
     DateFormatterContext validate() {
-        if (!(patternOverride != null ^ displayFormat != null ^ displayStyleOverride != null)) {
+        int numFormatOverrides = (patternOverride != null ? 1 : 0) +
+                                 (displayFormat != null ? 1 : 0) +
+                                 (displayStyleOverride != null ? 1 : 0)
+        if (numFormatOverrides > 1) {
             throw new IllegalArgumentException(
                     'One (and only one) of the following fields must be set when formatting a date: patternOverride, ' +
                             'displayFormat, displayStyleOverride')
@@ -78,6 +86,11 @@ class DateFormatterContext {
 
         DateFormatterContextBuilder withDisplayStyleOverride(DateDisplayStyle displayStyleOverride) {
             context.displayStyleOverride = displayStyleOverride
+            return this
+        }
+
+        DateFormatterContextBuilder withDefaultValue(String defaultValue) {
+            context.defaultValue = defaultValue
             return this
         }
     }

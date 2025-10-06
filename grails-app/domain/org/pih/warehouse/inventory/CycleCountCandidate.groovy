@@ -1,5 +1,7 @@
 package org.pih.warehouse.inventory
 
+import java.time.LocalDate
+
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.product.Product
@@ -30,15 +32,15 @@ class CycleCountCandidate {
 
     Integer negativeItemCount
 
-    Date dateLastCount
+    LocalDate dateLastCount
 
-    Date dateNextCount
+    LocalDate dateNextCount
 
     Integer daysUntilNextCount
 
     Boolean hasStockOnHandOrNegativeStock
 
-    Date dateLatestInventory
+    LocalDate dateLatestInventory
 
     Integer sortOrder
 

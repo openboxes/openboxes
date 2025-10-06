@@ -30,6 +30,8 @@ class DateFormatterManager {
     String formatForExport(Object date) {
         return format(date, DateFormatterContext.builder()
                 .withDisplayFormat(DateDisplayFormat.CSV)
+                // Return an empty string when given no date because CSVs don't handle nulls well.
+                .withDefaultValue('')
                 .build())
     }
 
@@ -37,6 +39,9 @@ class DateFormatterManager {
      * Converts the given date object to a String in the locale and timezone of the requesting user.
      */
     String format(Object date, DateFormatterContext context=null) {
+        if (date == null) {
+            return context?.defaultValue ?: null
+        }
 
         Locale locale = context?.localeOverride ?: getLocale()
         ZoneId timezone = context?.timezoneOverride ?: getTimezone()
