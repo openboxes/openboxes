@@ -33,6 +33,7 @@ import org.pih.warehouse.inventory.TransferStockCommand
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.OrderItemStatusCode
+import org.pih.warehouse.order.OrderService
 import org.pih.warehouse.order.OrderStatus
 import org.pih.warehouse.order.OrderType
 import org.pih.warehouse.product.Product
@@ -50,6 +51,7 @@ class PutawayService implements EventPublisher  {
     def inventoryService
     def productAvailabilityService
     OrderIdentifierService orderIdentifierService
+    OrderService orderService
     def grailsApplication
 
 
@@ -461,7 +463,25 @@ class PutawayService implements EventPublisher  {
         }
 
         log.info "Rollback putaway " + putaway.id + " with status: ${order.status}"
+        rollbackOrder(order)
+
+        // Returned only so that we have a payload for the event
+        return putaway
+    }
+
+    void rollbackAndDelete(Putaway putaway) {
+        Order order = Order.get(putaway.id)
+        if (!order) {
+            throw new ObjectNotFoundException(putaway.id, "Putaway ${putaway.id} not found")
+        }
+
+        log.info "Rollback and delete putaway " + putaway.id + " with status: ${order.status}"
         // If exists, delete the transaction and reset status of putaway
+        rollbackOrder(order)
+        orderService.deleteOrder(order)
+    }
+
+    void rollbackOrder(Order order) {
         if (order.status in [OrderStatus.APPROVED, OrderStatus.PLACED, OrderStatus.COMPLETED, OrderStatus.CANCELED]) {
 
             // Get transaction
@@ -495,7 +515,7 @@ class PutawayService implements EventPublisher  {
             }
 
             itemsToKeep.each { item ->
-                item.orderItemStatusCode = OrderItemStatusCode.PENDING
+                item.orderItemStatusCode = OrderItemStatusCode.IN_PROGRESS
                 item.discrepancyReasonCode = null
             }
 
@@ -506,8 +526,5 @@ class PutawayService implements EventPublisher  {
             order.dateApproved = null
             order.save(flush:true)
         }
-
-        // Returned only so that we have a payload for the event
-        return putaway
     }
 }

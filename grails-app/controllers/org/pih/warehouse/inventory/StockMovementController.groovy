@@ -191,25 +191,22 @@ class StockMovementController {
         redirect(action: "show", id: params.id)
     }
 
-    def rollbackToCreated() {
-        Shipment shipment = Shipment.get(params.id)
+    def rollbackAndDelete() {
+        try {
+            StockMovement stockMovement = stockMovementService.rollbackAndDelete(params.id)
 
-        if (shipment) {
-            try {
-                receiptService.rollbackLastReceipt(shipment)
-                Location currentLocation = Location.get(session.warehouse.id)
-                StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
-                if (stockMovement.isDeleteOrRollbackAuthorized(currentLocation) ||
-                        (stockMovement.isFromOrder && currentLocation?.supports(ActivityCode.ENABLE_CENTRAL_PURCHASING))) {
-                    stockMovementService.rollbackStockMovement(params.id)
-                }
-            } catch (Exception e) {
-                log.error("Unable to rollback stock movement with ID ${params.id}: " + e.message)
-                flash.message = "Unable to rollback stock movement with ID ${params.id}: " + e.message
-            }
+            flash.message = "Successfully rolled back and deleted stock movement."
+
+            Location currentLocation = Location.get(session.warehouse.id)
+            // We need to set the correct parameter so stock movement list is displayed properly
+            params.direction = (currentLocation == stockMovement.origin) ? StockMovementDirection.OUTBOUND :
+                    (currentLocation == stockMovement.destination) ? StockMovementDirection.INBOUND : "ALL"
+            redirect(action: "list", params: params << ["flash": flash as JSON])
+        } catch (Exception e) {
+            log.error("Failed to rollback and delete stock movement with ID ${params.id}: ${e.message}", e)
+            flash.error = "Operation failed: ${e.message}"
+            redirect(action: "show", id: params.id)
         }
-
-        redirect(action: "show", id: params.id)
     }
 
     def synchronizeDialog() {
