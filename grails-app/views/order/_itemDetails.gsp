@@ -7,7 +7,7 @@
 <script>
   $(document).ready(function() {
     $("#orderItemsDetailsFilter").keyup(function(event){
-      const filterCells = [0, 1]; // filter by product code or name
+      const filterCells = [0, 1, 2]; // filter by product code, product name, or supplier code
       const filterValue = $("#orderItemsDetailsFilter")
         .val()
         .toUpperCase();
@@ -24,7 +24,7 @@
         <warehouse:message code="order.itemDetails.label" default="Item Details"/>
     </h2>
     <g:if test="${orderInstance.orderType != OrderType.findByCode(Constants.PUTAWAY_ORDER)}">
-        <input type="text" id="orderItemsDetailsFilter" class="text large" placeholder="${g.message(code: 'order.filterByProduct.label', default: 'Filter by product name or code')}"/>
+        <input type="text" id="orderItemsDetailsFilter" class="text large" placeholder="${g.message(code: 'order.filterByProductOrSupplier.label', default: 'Filter by product name, code, or supplier code')}"/>
     </g:if>
     <g:if test="${orderInstance?.orderItems }">
         <table class="table table-bordered" id="order-items-details">

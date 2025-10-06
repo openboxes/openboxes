@@ -3,7 +3,7 @@
         <warehouse:message code="default.summary.label"/>
     </h2>
     <g:if test="${!isPutawayOrder}">
-        <input type="text" id="orderItemsFilter" class="text large" placeholder="${g.message(code: 'order.filterByProduct.label', default: 'Filter by product name or code')}"/>
+        <input type="text" id="orderItemsFilter" class="text large" placeholder="${g.message(code: 'order.filterByProductOrSupplier.label', default: 'Filter by product name, code, or supplier code')}"/>
     </g:if>
     <g:if test="${orderItems}">
         <g:set var="status" value="${0}"/>
@@ -159,7 +159,7 @@
     setTimeout(fetchOrderItemsDerivedStatus, ${grailsApplication.config.openboxes.purchaseOrder.derivedStatusFetch.delay});
 
     $("#orderItemsFilter").keyup(function(event){
-      const filterCells = [1, 2]; // filter by product code or name
+      const filterCells = [1, 2, 3]; // filter by product code, product name, or supplier code
       const filterValue = $("#orderItemsFilter")
         .val()
         .toUpperCase();
