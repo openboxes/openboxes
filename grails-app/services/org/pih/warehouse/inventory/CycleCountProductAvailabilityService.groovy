@@ -2,6 +2,7 @@ package org.pih.warehouse.inventory
 
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
+import java.time.LocalDate
 
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.auth.AuthService
@@ -198,7 +199,7 @@ class CycleCountProductAvailabilityService {
         Set<CycleCountItem> items
         int currentCountIndex
         Person assigneeForNewItems
-        Date dateCountedForNewItems
+        LocalDate dateCountedForNewItems
         CycleCountItemStatus statusForNewItems
 
         // Output fields
@@ -217,7 +218,7 @@ class CycleCountProductAvailabilityService {
             // Used by newly created items. We know that the frontend only supports a single assignee and date counted
             // for all items of a count, so for convenience we set the values of any new items to match.
             assigneeForNewItems = items.find{ it.assignee }?.assignee
-            dateCountedForNewItems = items.find{ it.dateCounted }?.dateCounted ?: new Date()
+            dateCountedForNewItems = items.find{ it.dateCounted }?.dateCounted ?: LocalDate.now()
 
             // This logic is shared between count and recount flows so we need to check which we're in.
             statusForNewItems = cycleCount.status.isCounting() ?
