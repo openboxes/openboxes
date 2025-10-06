@@ -117,6 +117,8 @@ const DateFieldDateFns = ({
     >
       <DatePicker
         {...fieldProps}
+        // ariaLiveMessages is a new prop for displaying a message above the date field.
+        // By passing an empty object, we are hiding that message.
         ariaLiveMessages={{}}
         locale={dateFnsLocale()}
         showTimeSelect={showTimeSelect}
