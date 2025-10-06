@@ -62,14 +62,20 @@ class DateFormatterManagerSpec extends Specification {
         dateFormatterManager.format(null) == null
     }
 
-    void 'format returns the default value when given a null date and a default is specified'() {
+    void 'format returns #expectedValue when given a null date and a default value of #defaultValue'() {
         given:
         DateFormatterContext context = DateFormatterContext.builder()
-                .withDefaultValue('DEFAULT')
+                .withDefaultValue(defaultValue)
                 .build()
 
         expect:
-        dateFormatterManager.format(null, context) == 'DEFAULT'
+        dateFormatterManager.format(null, context) == expectedValue
+
+        where:
+        defaultValue | expectedValue
+        null         | null
+        ''           | ''
+        'DEFAULT'    | 'DEFAULT'
     }
 
     void 'format does not error when given an Instant and no override'() {

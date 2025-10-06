@@ -40,7 +40,7 @@ class DateFormatterManager {
      */
     String format(Object date, DateFormatterContext context=null) {
         if (date == null) {
-            return context?.defaultValue ?: null
+            return context?.defaultValue  // If no default value is specified, will return null.
         }
 
         Locale locale = context?.localeOverride ?: getLocale()
