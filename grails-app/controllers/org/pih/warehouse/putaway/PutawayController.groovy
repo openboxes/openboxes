@@ -62,6 +62,15 @@ class PutawayController {
         redirect(controller: "putaway", action: "show", id: id)
     }
 
+    def rollbackAndDelete(String id) {
+        Putaway putaway = putawayService.getPutaway(id)
+        putawayService.rollbackAndDelete(putaway)
+
+        flash.message = "Putaway has been deleted successfully for putaway ${putaway.putawayNumber}"
+
+        redirect(controller: "order", action: "list", params: [orderType: "PUTAWAY_ORDER", status: "PENDING"])
+    }
+
     def generatePdf() {
         log.info "Params " + params
 

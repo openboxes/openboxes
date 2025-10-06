@@ -625,8 +625,11 @@ openboxes:
             prefix: "R"
         showAutoReceiveButton: true
 
-    rollback:
-        showRollbackToCreatedButton: true
+    stockMovement:
+        showRollbackAndDeleteButton: true
+
+    putaway:
+      showRollbackAndDeleteButton: true
 
     # Indicates which activities are required for a location to allow logins
     chooseLocation:
