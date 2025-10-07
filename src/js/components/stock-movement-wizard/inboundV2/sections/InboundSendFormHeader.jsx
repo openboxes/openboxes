@@ -57,7 +57,7 @@ const InboundSendFormHeader = ({
             }}
             buttonVariant="primary-outline"
           />
-          <div className="d-flex flex-column">
+          <div className="d-flex flex-column align-items-center justify-content-center">
             {files.map((file) => (
               <CustomTooltip key={file.name} content={file.name}>
                 <div className="uploaded-file">

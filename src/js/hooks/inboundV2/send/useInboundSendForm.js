@@ -181,9 +181,10 @@ const useInboundSendForm = ({ previous }) => {
 
   /**
    * Saves the whole stock movement
-   * @param {boolean} showNotification - Determines whether to show a success toast after saving.
+   * @param {boolean} showSuccessNotification - Determines whether to show a success toast
+   * after saving.
    */
-  const onSave = async ({ showNotification = true }) => {
+  const onSave = async ({ showSuccessNotification = true }) => {
     if (!isValid) {
       return;
     }
@@ -195,7 +196,7 @@ const useInboundSendForm = ({ previous }) => {
         await fetchStockMovementData();
       }
 
-      if (showNotification) {
+      if (showSuccessNotification) {
         notification(NotificationType.SUCCESS)({
           message: translate(
             'react.stockMovement.alert.saveSuccess.label',

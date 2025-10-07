@@ -35,36 +35,32 @@ const useInboundFileActions = ({
     files.forEach((file, idx) => {
       data.append(`filesContents[${idx}]`, file);
     });
-    try {
-      spinner.show();
-      await stockMovementApi.uploadDocuments(stockMovementId, data);
-      if (files.length > 1) {
-        notification(NotificationType.SUCCESS)({
-          message: translate(
-            'react.stockMovement.alert.filesSuccess.label',
-            'Files uploaded successfully!',
-          ),
-        });
-        return;
-      }
+    await stockMovementApi.uploadDocuments(stockMovementId, data);
+    if (files.length > 1) {
       notification(NotificationType.SUCCESS)({
         message: translate(
-          'react.stockMovement.alert.fileSuccess.label',
-          'File uploaded successfully!',
+          'react.stockMovement.alert.filesSuccess.label',
+          'Files uploaded successfully!',
         ),
       });
-    } finally {
-      spinner.hide();
+      return;
     }
+    notification(NotificationType.SUCCESS)({
+      message: translate(
+        'react.stockMovement.alert.fileSuccess.label',
+        'File uploaded successfully!',
+      ),
+    });
   };
 
   const handleExportFile = async (document) => {
     if (!isValid || !document?.uri) {
       return;
     }
+
     try {
       spinner.show();
-      await onSave({ showNotification: false });
+      await onSave({ showSuccessNotification: false });
       openWindow(document.uri, '_blank');
     } finally {
       spinner.hide();
