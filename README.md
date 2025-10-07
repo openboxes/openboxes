@@ -50,7 +50,7 @@ If you're a system administrator looking to deploy the application to a producti
 ## Support
 Do you need assistance running or using the app? Have you encountered an issue/bug?
 
-See our [support guide](/SUPPORT.md) for more information.
+See our [support guide](https://github.com/openboxes/.github/blob/main/.github/SUPPORT.md) for more information.
 
 <br>
 
