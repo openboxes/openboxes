@@ -4,7 +4,7 @@
 }
 
 .inbound-wrapper {
-  min-height: 800px;
+  min-height: 900px;
 }
 
 .inbound-add-items {
@@ -56,6 +56,30 @@
   }
 }
 
+.inbound-send-shipment {
+  margin-bottom: 20px;
+
+  .rt-td-send-step {
+    padding: 4px 12px;
+  }
+
+  .uploaded-file {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 10px;
+    font-weight: bold;
+    max-width: 180px;
+    margin-top: 4px;
+    padding: 8px;
+    background-color: white;
+
+    span {
+      max-width: 145px;
+    }
+  }
+}
+
 .submit-buttons {
   margin-top: 18px;
   width: 100%;
@@ -83,12 +107,8 @@ input.hide-arrows[type=number] {
   }
 }
 
-.rt-td-send-step {
-  padding: 4px 12px;
-}
-
 .rt-tbody-v2 {
-  max-height: 400px;
+  max-height: 500px;
   overflow: auto;
 
   .input-xs {

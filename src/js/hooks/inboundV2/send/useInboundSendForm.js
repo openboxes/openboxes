@@ -20,6 +20,7 @@ import RoleType from 'consts/roleType';
 import { DateFormat } from 'consts/timeFormat';
 import { OutboundWorkflowState } from 'consts/WorkflowState';
 import useInboundSendValidation from 'hooks/inboundV2/send/useInboundSendValidation';
+import useFileActions from 'hooks/useFileActions';
 import useQueryParams from 'hooks/useQueryParams';
 import useSpinner from 'hooks/useSpinner';
 import useTranslate from 'hooks/useTranslate';
@@ -27,6 +28,7 @@ import useUserHasPermissions from 'hooks/useUserHasPermissions';
 import confirmationModal from 'utils/confirmationModalUtils';
 import createInboundWorkflowHeader from 'utils/createInboundWorkflowHeader';
 import dateWithoutTimeZone from 'utils/dateUtils';
+import filterDocumentsByStepNumber from 'utils/stockMovementUtils';
 
 const useInboundSendForm = ({ previous }) => {
   const {
@@ -69,13 +71,14 @@ const useInboundSendForm = ({ previous }) => {
     hasManageInventory: false,
     statusCode: '',
     shipped: false,
+    documents: [],
   }), [currentLocation?.id]);
 
   const {
     control,
     getValues,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isValid },
     trigger,
     reset,
   } = useForm({
@@ -83,7 +86,12 @@ const useInboundSendForm = ({ previous }) => {
     defaultValues,
     resolver: zodResolver(validationSchema()),
   });
-  const { statusCode, shipped, destination } = getValues();
+  const {
+    statusCode,
+    shipped,
+    destination,
+    documents,
+  } = getValues();
 
   // True when destination matches current location (valid case)
   // or when destination is not yet loaded from backend (to avoid showing incorrect UI state
@@ -91,7 +99,6 @@ const useInboundSendForm = ({ previous }) => {
   const matchesDestination = currentLocation?.id && destination?.id
     ? currentLocation.id === destination.id
     : true;
-  const hasErrors = Object.keys(errors).length > 0;
 
   const getShipmentPayload = () => {
     const {
@@ -158,6 +165,7 @@ const useInboundSendForm = ({ previous }) => {
         statusCode: data.statusCode ?? '',
         hasManageInventory: data.hasManageInventory ?? false,
         shipped: data.shipped ?? false,
+        documents: filterDocumentsByStepNumber(data.associations.documents, 5),
       });
 
       dispatch(
@@ -170,6 +178,49 @@ const useInboundSendForm = ({ previous }) => {
       spinner.hide();
     }
   };
+
+  /**
+   * Saves the whole stock movement
+   * @param {boolean} showSuccessNotification - Determines whether to show a success toast
+   * after saving.
+   */
+  const onSave = async ({ showSuccessNotification = true }) => {
+    if (!isValid) {
+      return;
+    }
+    try {
+      spinner.show();
+      await stockMovementApi.updateShipment(stockMovementId, getShipmentPayload());
+
+      if (statusCode === requisitionStatus.DISPATCHED) {
+        await fetchStockMovementData();
+      }
+
+      if (showSuccessNotification) {
+        notification(NotificationType.SUCCESS)({
+          message: translate(
+            'react.stockMovement.alert.saveSuccess.label',
+            'Changes saved successfully',
+          ),
+        });
+      }
+    } finally {
+      spinner.hide();
+    }
+  };
+
+  const {
+    files,
+    handleDownloadFiles,
+    handleRemoveFile,
+    sendFiles,
+    handleExportFile,
+  } = useFileActions({
+    entityId: stockMovementId,
+    onSave,
+    isValid,
+    uploadDocuments: stockMovementApi.uploadDocuments,
+  });
 
   // sends the whole stock movement
   const sendShipment = async (values) => {
@@ -185,6 +236,11 @@ const useInboundSendForm = ({ previous }) => {
         });
         return;
       }
+      // first we should send files if there are any uploaded by user
+      if (files.length > 0) {
+        await sendFiles();
+      }
+
       await stockMovementApi.updateShipment(stockMovementId, getShipmentPayload());
       await stockMovementApi.updateStatus(stockMovementId,
         { status: requisitionStatus.DISPATCHED });
@@ -217,31 +273,6 @@ const useInboundSendForm = ({ previous }) => {
 
       await stockMovementApi.updateStatus(stockMovementId, { rollback: true });
       await fetchStockMovementData();
-    } finally {
-      spinner.hide();
-    }
-  };
-
-  // save the whole stock movement
-  const onSave = async () => {
-    await trigger();
-    if (hasErrors) {
-      return;
-    }
-    try {
-      spinner.show();
-      await stockMovementApi.updateShipment(stockMovementId, getShipmentPayload());
-
-      if (statusCode === requisitionStatus.DISPATCHED) {
-        await fetchStockMovementData();
-      }
-
-      notification(NotificationType.SUCCESS)({
-        message: translate(
-          'react.stockMovement.alert.saveSuccess.label',
-          'Changes saved successfully',
-        ),
-      });
     } finally {
       spinner.hide();
     }
@@ -292,7 +323,7 @@ const useInboundSendForm = ({ previous }) => {
   // Saves changes made by user in this step and go back to previous page
   const previousPage = async () => {
     await trigger();
-    if (!hasErrors) {
+    if (isValid) {
       await stockMovementApi.updateShipment(stockMovementId, getShipmentPayload());
       return previous();
     }
@@ -325,20 +356,24 @@ const useInboundSendForm = ({ previous }) => {
   // Saves changes made by user in this step and redirects to the shipment view page
   const saveAndExit = async () => {
     await trigger();
-
-    if (!hasErrors) {
-      await stockMovementApi.updateShipment(stockMovementId, getShipmentPayload());
-      window.location = STOCK_MOVEMENT_URL.show(stockMovementId);
+    if (!isValid) {
+      confirmActionModal({
+        messageId: 'react.stockMovement.confirmExit.message',
+        messageDefault: 'Validation errors occurred. Are you sure you want to exit and lose unsaved data?',
+        onConfirm: () => {
+          window.location = STOCK_MOVEMENT_URL.show(stockMovementId);
+        },
+      });
       return;
     }
 
-    confirmActionModal({
-      messageId: 'react.stockMovement.confirmExit.message',
-      messageDefault: 'Validation errors occurred. Are you sure you want to exit and lose unsaved data?',
-      onConfirm: () => {
-        window.location = STOCK_MOVEMENT_URL.show(stockMovementId);
-      },
-    });
+    try {
+      spinner.show();
+      await stockMovementApi.updateShipment(stockMovementId, getShipmentPayload());
+      window.location = STOCK_MOVEMENT_URL.show(stockMovementId);
+    } finally {
+      spinner.hide();
+    }
   };
 
   useEffect(() => {
@@ -364,8 +399,13 @@ const useInboundSendForm = ({ previous }) => {
     statusCode,
     hasRoleAdmin,
     shipped,
-    hasErrors,
     matchesDestination,
+    documents,
+    handleExportFile,
+    handleDownloadFiles,
+    files,
+    handleRemoveFile,
+    isValid,
   };
 };
 
