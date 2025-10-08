@@ -53,6 +53,7 @@ const STOCK_MOVEMENT_URL = {
   importOutbound: () => `${STOCK_MOVEMENT_URL.base}/importOutboundStockMovement`,
   importCsv: (id) => `${STOCK_MOVEMENT_URL.base}/importCsv/${id}`,
   exportCsv: (id) => `${STOCK_MOVEMENT_URL.base}/exportCsv/${id}`,
+  uploadDocuments: (id) => `${STOCK_MOVEMENT_URL.base}/uploadDocuments/${id}`,
 };
 
 const INVOICE_URL = {

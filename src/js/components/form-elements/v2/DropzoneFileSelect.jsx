@@ -2,6 +2,7 @@ import React, { useCallback } from 'react';
 
 import PropTypes from 'prop-types';
 import { useDropzone } from 'react-dropzone';
+import { RiUpload2Line } from 'react-icons/ri';
 
 import Button from 'components/form-elements/Button';
 import useTranslate from 'hooks/useTranslate';
@@ -20,6 +21,7 @@ const DropzoneFileSelect = ({
   maxFiles,
   allowedExtensions,
   isFormDisabled,
+  showButtonOnly,
   ...fieldProps
 }) => {
   const onDrop = useCallback((acceptedFiles) => {
@@ -77,6 +79,22 @@ const DropzoneFileSelect = ({
       </li>
     );
   });
+
+  if (showButtonOnly) {
+    return (
+      <div {...getRootProps({ className })} {...fieldProps}>
+        <input {...getInputProps()} />
+        <Button
+          disabled={isFormDisabled}
+          StartIcon={<RiUpload2Line className="icon" />}
+          onClick={open}
+          variant={buttonVariant}
+          defaultLabel={buttonLabel.defaultMessage}
+          label={buttonLabel.id}
+        />
+      </div>
+    );
+  }
 
   return (
     <div style={{ width, height, minHeight }}>
@@ -139,6 +157,9 @@ DropzoneFileSelect.propTypes = {
   // allowed extensions for importing (disabled when set to empty array)
   allowedExtensions: PropTypes.arrayOf(PropTypes.string),
   isFormDisabled: PropTypes.bool,
+  // If true, hides the dropzone UI and shows only the upload button.
+  // Drag & drop is still available, even if the dropzone area is hidden.
+  showButtonOnly: PropTypes.bool,
 };
 
 DropzoneFileSelect.defaultProps = {
@@ -159,4 +180,5 @@ DropzoneFileSelect.defaultProps = {
   maxFiles: null,
   allowedExtensions: [],
   isFormDisabled: false,
+  showButtonOnly: false,
 };
