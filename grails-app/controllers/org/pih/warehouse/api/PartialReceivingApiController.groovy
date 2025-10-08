@@ -198,7 +198,7 @@ class PartialReceivingApiController {
                     partialReceiptContainer.partialReceiptItems.add(partialReceiptItem)
                 }
                 bindData(partialReceiptItem, shipmentItemMap)
-                partialReceiptItem.binLocation = partialReceiptItem.binLocation ?: Location.findByName(shipmentItemMap['binLocation.name'])
+                partialReceiptItem.binLocation = partialReceiptItem.binLocation ?: Location.findByNameAndParentLocation(shipmentItemMap['binLocation.name'], partialReceipt?.shipment?.destination)
                 partialReceiptItem.shouldSave = newLine || originalLine || partialReceiptItem.quantityReceiving != null || partialReceiptItem.receiptItem
             }
         }
