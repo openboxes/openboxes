@@ -19,8 +19,8 @@ import requisitionStatus from 'consts/requisitionStatus';
 import RoleType from 'consts/roleType';
 import { DateFormat } from 'consts/timeFormat';
 import { OutboundWorkflowState } from 'consts/WorkflowState';
-import useInboundFileActions from 'hooks/inboundV2/send/useInboundFileActions';
 import useInboundSendValidation from 'hooks/inboundV2/send/useInboundSendValidation';
+import useFileActions from 'hooks/useFileActions';
 import useQueryParams from 'hooks/useQueryParams';
 import useSpinner from 'hooks/useSpinner';
 import useTranslate from 'hooks/useTranslate';
@@ -28,7 +28,7 @@ import useUserHasPermissions from 'hooks/useUserHasPermissions';
 import confirmationModal from 'utils/confirmationModalUtils';
 import createInboundWorkflowHeader from 'utils/createInboundWorkflowHeader';
 import dateWithoutTimeZone from 'utils/dateUtils';
-import filterDocumentsByStepNumber from 'utils/filterDocumentsByStepNumber';
+import filterDocumentsByStepNumber from 'utils/stockMovementUtils';
 
 const useInboundSendForm = ({ previous }) => {
   const {
@@ -215,11 +215,11 @@ const useInboundSendForm = ({ previous }) => {
     handleRemoveFile,
     sendFiles,
     handleExportFile,
-  } = useInboundFileActions({
-    stockMovementId,
+  } = useFileActions({
+    entityId: stockMovementId,
     onSave,
-    spinner,
     isValid,
+    uploadDocuments: stockMovementApi.uploadDocuments,
   });
 
   // sends the whole stock movement

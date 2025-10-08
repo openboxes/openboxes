@@ -2,21 +2,32 @@ import { useState } from 'react';
 
 import _ from 'lodash';
 
-import stockMovementApi from 'api/services/StockMovementApi';
 import notification from 'components/Layout/notifications/notification';
 import NotificationType from 'consts/notificationTypes';
+import useSpinner from 'hooks/useSpinner';
 import useTranslate from 'hooks/useTranslate';
 import useWindowOpen from 'hooks/useWindowOpen';
 
-const useInboundFileActions = ({
-  stockMovementId,
+/**
+ * Custom hook that manages file upload, download, removal and export actions.
+ *
+ * @param {string} entityId - ID of the entity the files belong to.
+ * @param {Function} onSave - Function called before exporting a document.
+ * @param {boolean} isValid - React Hook Form's formState.isValid flag which determines
+ * if the form is valid before export.
+ * @param {Function} uploadDocuments - Async function for uploading documents.
+ *
+ */
+const useFileActions = ({
+  entityId,
   onSave,
-  spinner,
   isValid,
+  uploadDocuments,
 }) => {
-  // List of user selected File objects (documents to attach to the current stock movement).
+  // List of user selected File objects.
   // These files are stored locally until uploaded via 'sendFiles()'.
   const [files, setFiles] = useState([]);
+  const spinner = useSpinner();
   const translate = useTranslate();
   const { openWindow } = useWindowOpen();
 
@@ -35,11 +46,11 @@ const useInboundFileActions = ({
     files.forEach((file, idx) => {
       data.append(`filesContents[${idx}]`, file);
     });
-    await stockMovementApi.uploadDocuments(stockMovementId, data);
+    await uploadDocuments(entityId, data);
     if (files.length > 1) {
       notification(NotificationType.SUCCESS)({
         message: translate(
-          'react.stockMovement.alert.filesSuccess.label',
+          'react.default.alert.filesSuccess.label',
           'Files uploaded successfully!',
         ),
       });
@@ -47,7 +58,7 @@ const useInboundFileActions = ({
     }
     notification(NotificationType.SUCCESS)({
       message: translate(
-        'react.stockMovement.alert.fileSuccess.label',
+        'react.default.alert.fileSuccess.label',
         'File uploaded successfully!',
       ),
     });
@@ -77,4 +88,4 @@ const useInboundFileActions = ({
   };
 };
 
-export default useInboundFileActions;
+export default useFileActions;
