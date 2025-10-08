@@ -43,4 +43,8 @@ export default {
   updateShipment: (id, payload) => apiClient.post(
     STOCK_MOVEMENT_UPDATE_SHIPMENT(id), payload,
   ),
+  uploadDocuments: (id, formData) =>
+    apiClient.post(STOCK_MOVEMENT_URL.uploadDocuments(id), formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    }),
 };
