@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
 
+import { useWindowVirtualizer } from '@tanstack/react-virtual';
 import _ from 'lodash';
 import { useSelector } from 'react-redux';
 import { getCurrentLocation } from 'selectors';
@@ -25,7 +26,6 @@ const CountStep = () => {
     tableData,
     printCountForm,
     next,
-    save,
     resolveDiscrepancies,
     back,
     tableMeta,
@@ -33,13 +33,12 @@ const CountStep = () => {
     removeRow,
     assignCountedBy,
     getCountedDate,
-    setCountedDate,
+    updateDateCounted,
     validationErrors,
     isStepEditable,
     getCountedBy,
     getDefaultCountedBy,
     triggerValidation,
-    refreshFocusCounter,
     isSaveDisabled,
     setIsSaveDisabled,
     validateExistenceOfCycleCounts,
@@ -47,7 +46,19 @@ const CountStep = () => {
     sortByProductName,
     setSortByProductName,
     importErrors,
+    isAssignCountModalOpen,
+    closeAssignCountModal,
+    assignCountModalData,
+    forceRerender,
+    handleCountStepHeaderSave,
   } = useCountStep();
+
+  const tableVirtualizer = useWindowVirtualizer({
+    count: tableData.length,
+    // table with ~ 5 rows, average size of the count table
+    estimateSize: () => 518,
+    overscan: 10,
+  });
 
   return (
     <PageWrapper>
@@ -55,7 +66,7 @@ const CountStep = () => {
         <CountStepHeader
           printCountForm={printCountForm}
           next={() => validateExistenceOfCycleCounts(next)}
-          save={() => validateExistenceOfCycleCounts(save)}
+          save={handleCountStepHeaderSave}
           isFormDisabled={isFormDisabled}
           importItems={importItems}
           sortByProductName={sortByProductName}
@@ -74,28 +85,56 @@ const CountStep = () => {
           redirectDefaultMessage="Back to Cycle Count List"
         />
       )}
-      {tableData
-        .map(({ cycleCountItems, id }) => (
-          <CountStepTable
-            key={id}
-            id={id}
-            product={cycleCountItems[0]?.product}
-            dateCounted={getCountedDate(id)}
-            tableData={cycleCountItems}
-            tableMeta={tableMeta}
-            addEmptyRow={addEmptyRow}
-            removeRow={removeRow}
-            setCountedDate={setCountedDate(id)}
-            assignCountedBy={assignCountedBy}
-            validationErrors={validationErrors}
-            isStepEditable={isStepEditable}
-            countedBy={getCountedBy(id)}
-            defaultCountedBy={getDefaultCountedBy(id)}
-            triggerValidation={triggerValidation}
-            refreshFocusCounter={refreshFocusCounter}
-            isFormDisabled={isFormDisabled}
-          />
-        ))}
+      <div
+        style={{
+          height: `${tableVirtualizer.getTotalSize()}px`,
+          position: 'relative',
+        }}
+      >
+        {tableVirtualizer.getVirtualItems()
+          .map((virtualRow) => {
+            const {
+              cycleCountItems,
+              id,
+            } = tableData[virtualRow.index];
+
+            return (
+              <div
+                key={id}
+                data-index={virtualRow.index}
+                ref={tableVirtualizer.measureElement}
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  transform: `translateY(${virtualRow.start}px)`,
+                  width: '100%',
+                }}
+              >
+                <CountStepTable
+                  id={id}
+                  product={cycleCountItems[0]?.product}
+                  dateCounted={getCountedDate(id)}
+                  tableData={cycleCountItems}
+                  tableMeta={tableMeta}
+                  addEmptyRow={addEmptyRow}
+                  removeRow={removeRow}
+                  updateDateCounted={updateDateCounted(id)}
+                  assignCountedBy={assignCountedBy}
+                  validationErrors={validationErrors}
+                  isStepEditable={isStepEditable}
+                  countedBy={getCountedBy(id)}
+                  defaultCountedBy={getDefaultCountedBy(id)}
+                  triggerValidation={triggerValidation}
+                  isFormDisabled={isFormDisabled}
+                  isAssignCountModalOpen={isAssignCountModalOpen}
+                  closeAssignCountModal={closeAssignCountModal}
+                  assignCountModalData={assignCountModalData}
+                  forceRerender={forceRerender}
+                />
+              </div>
+            );
+          })}
+      </div>
     </PageWrapper>
   );
 };

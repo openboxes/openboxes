@@ -5,7 +5,7 @@
         <warehouse:message code="order.itemStatus.label" default="Item Status"/>
     </h2>
     <g:if test="${!isPutawayOrder}">
-        <input type="text" id="orderItemsStatusFilter" class="text large" placeholder="${g.message(code: 'order.filterByProduct.label', default: 'Filter by product name or code')}"/>
+        <input type="text" id="orderItemsStatusFilter" class="text large" placeholder="${g.message(code: 'order.filterByProductOrSupplier.label', default: 'Filter by product name, code, or supplier code')}"/>
     </g:if>
     <g:if test="${orderItems}">
         <table class="table table-bordered" id="order-items-status">
@@ -16,6 +16,7 @@
                 </th>
                 <th><warehouse:message code="product.productCode.label" /></th>
                 <th><warehouse:message code="product.label" /></th>
+                <th class="center">${warehouse.message(code: 'product.supplierCode.label')}</th>
                 <th class="center">${warehouse.message(code: 'product.unitOfMeasure.label')}</th>
                 <th class="right">${warehouse.message(code: 'orderItem.quantity.label')}</th>
                 <g:if test="${isPurchaseOrder}">
@@ -63,6 +64,9 @@
                     <g:else>
                         ${orderItem?.description }
                     </g:else>
+                </td>
+                <td class="center">
+                    ${orderItem?.productSupplier?.supplierCode}
                 </td>
                 <td class="center">
                     ${orderItem?.unitOfMeasure}
@@ -134,7 +138,7 @@
     setTimeout(fetchOrderItemsDerivedStatus, ${grailsApplication.config.openboxes.purchaseOrder.derivedStatusFetch.delay});
 
     $("#orderItemsStatusFilter").keyup(function(event){
-      const filterCells = [1, 2]; // filter by product code or name
+      const filterCells = [1, 2, 3]; // filter by product code, product name, or supplier code
       const filterValue = $("#orderItemsStatusFilter")
         .val()
         .toUpperCase();

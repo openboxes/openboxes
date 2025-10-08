@@ -437,6 +437,32 @@ class AvailableItem {
         ]
     }
 
+    @Override
+    boolean equals(Object other) {
+        if (this.is(other)) return true
+        if (!(other instanceof AvailableItem)) return false
+
+        AvailableItem that = (AvailableItem) other
+
+        if (binLocation != that.binLocation) return false
+        if (inventoryItem != that.inventoryItem) return false
+        if (pickedRequisitionNumbers != that.pickedRequisitionNumbers) return false
+        if (quantityAvailable != that.quantityAvailable) return false
+        if (quantityOnHand != that.quantityOnHand) return false
+
+        return true
+    }
+
+    @Override
+    int hashCode() {
+        int result
+        result = (inventoryItem != null ? inventoryItem.hashCode() : 0)
+        result = 31 * result + (binLocation != null ? binLocation.hashCode() : 0)
+        result = 31 * result + (quantityAvailable != null ? quantityAvailable.hashCode() : 0)
+        result = 31 * result + (quantityOnHand != null ? quantityOnHand.hashCode() : 0)
+        result = 31 * result + (pickedRequisitionNumbers != null ? pickedRequisitionNumbers.hashCode() : 0)
+        return result
+    }
 }
 
 enum AvailableItemStatus {

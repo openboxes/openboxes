@@ -2,6 +2,7 @@ import _ from 'lodash';
 import queryString from 'query-string';
 
 import glAccountApi from 'api/services/GlAccountApi';
+import indicatorsApi from 'api/services/IndicatorsApi';
 import locationApi from 'api/services/LocationApi';
 import organizationApi from 'api/services/OrganizationApi';
 import productApi from 'api/services/ProductApi';
@@ -61,6 +62,7 @@ export const debounceLocationsFetch = (
   withTypeDescription = true,
   isReturnOrder = false,
   direction,
+  withOrganization = false,
 ) =>
   _.debounce((searchTerm, callback) => {
     if (searchTerm && searchTerm.length >= minSearchLength) {
@@ -73,6 +75,7 @@ export const debounceLocationsFetch = (
           direction: fetchAll ? undefined : (direction || queryParams?.direction),
           isReturnOrder: isReturnOrder || undefined,
           activityCodes,
+          withOrganization: withOrganization || undefined,
         },
       }).then((result) => callback(_.map(result.data.data, (obj) => {
         const locationTypeData = withTypeDescription ? ` [${obj.locationType.description}]` : '';
@@ -308,6 +311,26 @@ export const fetchProduct = async (id) => {
 
 export const fetchOrganization = async (id) => {
   const { data } = await organizationApi.getOrganization(id);
+  return data.data;
+};
+
+export const fetchIndicatorProductsInventoried = async (params = {}) => {
+  const { data } = await indicatorsApi.getProductsInventoried(params);
+  return data.data;
+};
+
+export const fetchIndicatorInventoryShrinkage = async (params = {}) => {
+  const { data } = await indicatorsApi.getInventoryShrinkage(params);
+  return data.data;
+};
+
+export const fetchIndicatorInventoryAccuracy = async (params = {}) => {
+  const { data } = await indicatorsApi.getInventoryAccuracy(params);
+  return data.data;
+};
+
+export const getLotNumbersByProductIds = async (productIds) => {
+  const { data } = await productApi.getLotNumbersByProductIds(productIds);
   return data.data;
 };
 

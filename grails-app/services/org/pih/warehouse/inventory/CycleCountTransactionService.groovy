@@ -6,6 +6,7 @@ import java.time.Instant
 
 import org.pih.warehouse.DateUtil
 import org.pih.warehouse.core.Constants
+import org.pih.warehouse.inventory.product.availability.AvailableItemKey
 import org.pih.warehouse.product.Product
 
 /**
@@ -18,6 +19,7 @@ class CycleCountTransactionService {
     ProductAvailabilityService productAvailabilityService
     CycleCountProductInventoryTransactionService cycleCountProductInventoryTransactionService
     TransactionIdentifierService transactionIdentifierService
+    InventoryService inventoryService
 
     /**
      * Given a completed cycle count, will create and persist the resulting product inventory transaction,
@@ -50,8 +52,20 @@ class CycleCountTransactionService {
         return transactions
     }
 
+    private static String buildRecountComment(CycleCountItem cycleCountItem) {
+        if (cycleCountItem.comment) {
+            return "${cycleCountItem.discrepancyReasonCode ? "[${cycleCountItem.discrepancyReasonCode}]" : ''} ${cycleCountItem.comment}"
+        }
+        return null
+    }
+
     private Transaction createAdjustmentTransaction(
             CycleCount cycleCount, Date transactionDate, boolean itemQuantityOnHandIsUpToDate) {
+
+        // Reports and QoH calculations get messed up if two transactions for a product exist at the same exact time.
+        if (inventoryService.hasTransactionEntriesOnDate(cycleCount.facility, transactionDate, cycleCount.products)) {
+            throw new IllegalArgumentException("A transaction already exists at time ${transactionDate}")
+        }
 
         // We need to compare the quantity counted against the most up to date QoH in product availability.
         // However, if the cycle count items already have an up to date QoH (which will be the case if
@@ -87,6 +101,7 @@ class CycleCountTransactionService {
                     binLocation: cycleCountItem.location,
                     inventoryItem: cycleCountItem.inventoryItem,
                     product: cycleCountItem.product,
+                    comments: buildRecountComment(cycleCountItem)
             )
             entries.add(transactionEntry)
         }
@@ -118,7 +133,14 @@ class CycleCountTransactionService {
 
     private List<Transaction> createProductInventoryTransactions(CycleCount cycleCount, Date transactionDate) {
         List<Transaction> transactions = []
-
+        Map<AvailableItemKey, String> commentsPerCycleCountItem = new HashMap<>()
+        cycleCount.cycleCountItems.each {
+            // We want to add a comment to product inventory transaction if we know,
+            // that no adjustment transaction would be created afterwards, that would contain the comment
+            if (it.comment && !it.quantityVariance) {
+                commentsPerCycleCountItem.put(new AvailableItemKey(it.location, it.inventoryItem), buildRecountComment(it))
+            }
+        }
         // A cycle count can count multiple products. Each product needs their own product inventory transaction.
         for (Product product : cycleCount.products) {
             // Creates a "snapshot style" product inventory transaction. We do this because we want any changes in
@@ -129,7 +151,10 @@ class CycleCountTransactionService {
                     cycleCount.facility,
                     cycleCount,
                     [product],
-                    transactionDate)
+                    transactionDate,
+                    null,
+                    commentsPerCycleCountItem
+                    )
 
             transactions.add(transaction)
         }

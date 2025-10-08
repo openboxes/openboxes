@@ -4,6 +4,7 @@ import grails.converters.JSON
 import grails.orm.PagedResultList
 import grails.validation.ValidationException
 import org.apache.commons.csv.CSVPrinter
+import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.DocumentService
 import org.pih.warehouse.core.UploadService
@@ -21,6 +22,7 @@ import org.pih.warehouse.inventory.CycleCountItemCommand
 import org.pih.warehouse.inventory.CycleCountItemDto
 import org.pih.warehouse.inventory.CycleCountRequest
 import org.pih.warehouse.inventory.CycleCountRequestBatchCommand
+import org.pih.warehouse.inventory.CycleCountRequestUpdateBulkCommand
 import org.pih.warehouse.inventory.CycleCountService
 import org.pih.warehouse.inventory.CycleCountStartBatchCommand
 import org.pih.warehouse.inventory.CycleCountStartRecountBatchCommand
@@ -29,6 +31,7 @@ import org.pih.warehouse.inventory.CycleCountSubmitCountCommand
 import org.pih.warehouse.inventory.CycleCountSubmitRecountCommand
 import org.pih.warehouse.inventory.CycleCountUpdateItemBatchCommand
 import org.pih.warehouse.inventory.CycleCountUpdateItemCommand
+import org.pih.warehouse.inventory.InventoryTransactionsSummary
 import org.pih.warehouse.inventory.PendingCycleCountRequest
 import org.pih.warehouse.report.CycleCountReportCommand
 import org.springframework.web.multipart.MultipartFile
@@ -61,6 +64,12 @@ class CycleCountApiController {
     def createRequests(CycleCountRequestBatchCommand command) {
         BatchCommandUtils.validateBatch(command, "requests")
         List<CycleCountRequest> cycleCountRequests = cycleCountService.createRequests(command)
+        render([data: cycleCountRequests] as JSON)
+    }
+
+    def updateRequests(CycleCountRequestUpdateBulkCommand command) {
+        BatchCommandUtils.validateBatch(command)
+        List<CycleCountRequest> cycleCountRequests = cycleCountService.updateRequests(command)
         render([data: cycleCountRequests] as JSON)
     }
 
@@ -257,5 +266,14 @@ class CycleCountApiController {
                 offset    : command.offset,
                 totalCount: data.totalCount,
         ] as JSON)
+    }
+
+    def getInventoryTransactionsSummary(CycleCountReportCommand command) {
+        if (!command.validate()) {
+            throw new ValidationException("Invalid params", command.errors)
+        }
+        List<InventoryTransactionsSummary> inventoryTransactions = cycleCountService.getInventoryTransactionsSummary(command)
+
+        render([data: inventoryTransactions, totalCount: inventoryTransactions.totalCount] as JSON)
     }
 }

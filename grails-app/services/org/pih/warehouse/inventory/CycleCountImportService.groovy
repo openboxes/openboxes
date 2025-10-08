@@ -9,12 +9,63 @@ class CycleCountImportService {
 
     LocalizationService localizationService
 
+    /**
+     * Util function to normalize the default lot number - default lot number can be represented
+     * by either empty string or null. If we compare lot numbers where one of them is empty string
+     * and the other is null, we want them to be treated as equal.
+     * @param lotNumber
+     * @return
+     */
+    private static normalizeLotNumber(String lotNumber) {
+        return lotNumber ?: null
+    }
+
     void validateCountImport(ImportDataCommand command) {
         // Firstly clear the command's errors, as it might contain some additional errors related to the file itself
         // that we do not care about while validating the data, and we don't them to be visible for a user
         command.clearErrors()
         // Store items that should be ignored for an import - for some cases we want not only to display an error, but also to ignore such row
         List<Map> itemsToRemove = []
+        Map<String, Map<String, List<Map<String, Object>>>> cycleCountsWithInvalidAssignee =
+                command.data
+                        // Firstly group by cycle count to separate them
+                        .groupBy { it.cycleCountId }
+                        // Then build a map, where cycle count id is a key, and value is also a map with assignee as a key
+                        // and value is a list with rows with a particular assignee.
+                        // For a valid cycle count, the list should contain only one element (one assignee used for all rows for a cycle count)
+                        .collectEntries { [it.key, it.value.groupBy { val -> val.assignee }]}
+                        .findAll { it.value.size() > 1 }
+
+        cycleCountsWithInvalidAssignee.each {
+            // If at least one row is invalid, we want to clear the assignee for all rows
+            command.data.each { row ->
+                if (row.cycleCountId == it.key) {
+                    row.assignee = null
+                }
+            }
+            command.errors.reject("Product cycle count with id ${it.key} must have the same assignee set up for all rows")
+        }
+
+        Map<String, Map<String, List<Map<String, Object>>>> cycleCountsWithInvalidDateCounted =
+                command.data
+                // Firstly group by cycle count to separate them
+                        .groupBy { it.cycleCountId }
+                // Then build a map, where cycle count id is a key, and value is also a map with date counted as a key
+                // and value is a list with rows with a particular date counted.
+                // For a valid cycle count, the list should contain only one element (one date counted used for all rows for a cycle count)
+                        .collectEntries { [it.key, it.value.groupBy { val -> val.dateCounted }]}
+                        .findAll { it.value.size() > 1 }
+
+        cycleCountsWithInvalidDateCounted.each {
+            // If at least one row is invalid, we want to clear the dateCounted for all rows
+            command.data.each { row ->
+                if (row.cycleCountId == it.key) {
+                    row.dateCounted = null
+                }
+            }
+            command.errors.reject("Product cycle count with id ${it.key} must have the same date counted set up for all rows and it must not be empty")
+        }
+
         command.data.eachWithIndex { row, index ->
             CycleCountRequest cycleCountRequest = CycleCount.read(row.cycleCountId)?.cycleCountRequest
             // If a user provides an invalid cycle count id, skip that row and do not look for other errors, as they do not matter at this point
@@ -45,13 +96,17 @@ class CycleCountImportService {
             if (row.binLocation != null && !row.binLocation.id) {
                 command.errors.reject("Row ${index + 1}: Provided bin location does not exist in the system")
             }
+            if (row.assignee != null && !row.assignee.id) {
+                command.errors.reject("Row ${index + 1}: Provided assignee (user counted column) does not exist in the system")
+                row.assignee = null
+            }
             // Validation cases for an existing item (update)
             // We mustn't update bin location, lot number and expiration date via import for an existing item
             if (cycleCountItem) {
                 if (row.binLocation?.id != cycleCountItem.location?.id) {
                     command.errors.reject("Row ${index + 1}: You cannot update bin location for an existing item")
                 }
-                if (row.lotNumber != cycleCountItem.inventoryItem?.lotNumber) {
+                if (normalizeLotNumber(row.lotNumber) != normalizeLotNumber(cycleCountItem.inventoryItem?.lotNumber)) {
                     command.errors.reject("Row ${index + 1}: You cannot update lot number for an existing item")
                 }
                 if (row.expirationDate != cycleCountItem.inventoryItem.expirationDate) {

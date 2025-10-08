@@ -68,7 +68,13 @@ transaction_details AS (
             transaction.updated_by_id as updated_by_id,
             transaction.date_created,
             transaction.last_updated
-            from transaction
+            -- The FORCE INDEX is needed for MySQL to properly scan the transaction table (to make it have type="ref" when calling EXPLAIN on that view)
+            -- without it, MySQL assumes it's better to scan whole table (type="ALL") instead of using possible indexes as the key.
+            -- Since transaction table is very expensive to query against, scanning the whole table caused huge performances issues for MySQL users
+            -- that this query took ~2-5 minutes instead of ~200ms.
+            -- Note: This is not an issue in MariaDB - it uses the fk_transaction_cycle_count index automatically, and the performances issues don't appear there
+            -- Note 2: Whenever this view needs to be updated, please, remove the FORCE INDEX, call EXPLAIN and see, if this index is still the one, that should be the key.
+            from transaction FORCE INDEX(fk_transaction_cycle_count)
                 join transaction_type on transaction.transaction_type_id = transaction_type.id
                 join inventory on transaction.inventory_id = inventory.id
                 join location facility on facility.inventory_id = inventory.id

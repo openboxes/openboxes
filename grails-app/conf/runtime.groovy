@@ -82,19 +82,13 @@ openboxes.client.autosave.enabled = false
 // Backdata configuration (OBPIH-6332)
 openboxes.dashboard.backdatedShipments.daysOffset = 1
 openboxes.dashboard.backdatedShipments.monthsLimit = 6
+openboxes.report.backdatedTransactions.daysOffset = 1
 
 // Merge Products (OBPIH-5453)
 openboxes.products.merge.enabled = false
 
 // Cycle Count configuration (OBPIH-7033)
 openboxes.cycleCount.products.maxAmount = 50
-
-// Inventory baseline transaction configuration (OBPIH-7194, OBPIH-7195)
-openboxes.transactions.inventoryBaseline.recordStock.enabled = true
-openboxes.transactions.inventoryBaseline.inventoryImport.enabled = true
-
-// Inventory snapshot configuration (OBPIH-7254)
-openboxes.transactions.inventoryBaseline.loadDemoData.enabled = true
 
 openboxes.security.rbac.rules = [
     [controller: '*', actions: ['delete'], accessRules: [ minimumRequiredRole: RoleType.ROLE_SUPERUSER ]],
@@ -1396,3 +1390,9 @@ openboxes {
         }
     }
 }
+
+openboxes.inventoryCount.transactionTypes = [
+        Constants.ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID,
+        Constants.PRODUCT_INVENTORY_TRANSACTION_TYPE_ID,
+        Constants.INVENTORY_BASELINE_TRANSACTION_TYPE_ID
+]

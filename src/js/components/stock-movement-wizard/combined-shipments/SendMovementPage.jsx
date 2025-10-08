@@ -18,6 +18,7 @@ import DateField from 'components/form-elements/DateField';
 import LabelField from 'components/form-elements/LabelField';
 import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
+import activityCode from 'consts/activityCode';
 import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
 import apiClient from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
@@ -268,6 +269,13 @@ class SendMovementPage extends Component {
     this.debouncedLocationsFetch = debounceLocationsFetch(
       this.props.debounceTime,
       this.props.minSearchLength,
+      [activityCode.RECEIVE_STOCK], // activityCodes
+      true, // fetchAll
+      false, // withOrgCode
+      true, // withTypeDescription
+      false, // isReturnOrder
+      null, // direction
+      true, // withOrganization
     );
   }
 

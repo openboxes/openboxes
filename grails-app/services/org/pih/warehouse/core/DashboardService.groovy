@@ -12,10 +12,11 @@ package org.pih.warehouse.core
 import grails.gorm.transactions.Transactional
 import grails.plugins.csv.CSVWriter
 import org.hibernate.sql.JoinType
+
+import org.pih.warehouse.DateUtil
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.inventory.InventoryStatus
-import org.pih.warehouse.inventory.TransactionCode
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
@@ -28,6 +29,7 @@ import java.text.SimpleDateFormat
 @Transactional(readOnly=true)
 class DashboardService {
 
+    ConfigService configService
     def productAvailabilityService
 
     /**
@@ -163,11 +165,11 @@ class DashboardService {
             }
 
             if (command.startDate) {
-                ge("expirationDate", command.startDate + 1)
+                ge("expirationDate", DateUtil.asDate(command.startDate.plusDays(1)))
             }
 
             if (command.endDate) {
-                le("expirationDate", command.endDate)
+                le("expirationDate", DateUtil.asDate(command.endDate))
             }
 
             order("expirationDate", "desc")
@@ -206,11 +208,11 @@ class DashboardService {
             }
 
             if (command.startDate) {
-                ge("expirationDate", command.startDate + 1)
+                ge("expirationDate", DateUtil.asDate(command.startDate.plusDays(1)))
             }
 
             if (command.endDate) {
-                le("expirationDate", command.endDate)
+                le("expirationDate", DateUtil.asDate(command.endDate))
             }
 
             order("expirationDate", "asc")
@@ -333,17 +335,19 @@ class DashboardService {
         Map<Product, Object> inventoryItemsMap = getTotalStock(location).collectEntries { [it.product, it ] }
         Set<Product> products = inventoryItemsMap.keySet()
 
-        List<Object> latestInventoryDates = TransactionEntry.executeQuery("""
+        List<String> transactionTypes = configService.getProperty('openboxes.inventoryCount.transactionTypes', List) as List<String>
+
+        List<Object[]> latestInventoryDates = TransactionEntry.executeQuery("""
                 select ii.product.id, max(t.transactionDate)
                 from TransactionEntry as te
                 left join te.inventoryItem as ii
                 left join te.transaction as t
                 where t.inventory = :inventory
-                and t.transactionType.transactionCode in (:transactionCodes)
+                and t.transactionType.id in (:transactionTypeIds)
+                and (t.comment <> :commentToFilter or t.comment IS NULL)
                 group by ii.product
                 """,
-                [inventory: location.inventory, transactionCodes: [TransactionCode.PRODUCT_INVENTORY, TransactionCode.INVENTORY]])
-
+                [inventory: location.inventory, transactionTypeIds: transactionTypes, commentToFilter: Constants.INVENTORY_BASELINE_MIGRATION_TRANSACTION_COMMENT])
 
         // Convert to map
         Map<String, Timestamp> latestInventoryDateMap = latestInventoryDates.collectEntries { [it[0], it[1]] }

@@ -24,3 +24,10 @@ export const getBinLocations = (state) => state.cycleCount.binLocations;
 export const getDebounceTime = (state) => state.session.searchConfig.debounceTime;
 
 export const getMinSearchLength = (state) => state.session.searchConfig.minSearchLength;
+
+export const getCurrentUser = (state) => state.session.user;
+
+export const getCycleCountTranslations = (state) => state.session.fetchedTranslations.cycleCount;
+
+export const getLotNumbersByProductId = (state, productId) =>
+  state.lotNumbers?.lotNumbersWithExpiration?.[productId] || [];

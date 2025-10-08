@@ -30,6 +30,7 @@ import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.core.ApplicationExceptionEvent
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.inventory.product.availability.AvailableItemMap
 import org.pih.warehouse.jobs.RefreshProductAvailabilityJob
 import org.pih.warehouse.order.OrderStatus
 import org.pih.warehouse.product.Category
@@ -667,29 +668,22 @@ class ProductAvailabilityService {
     }
 
     /**
-     * Initializes a String comprising of [product code + bin location name + lot number], to be used to uniquely
-     * identify a product availability entry.
-     */
-    static String constructAvailableItemKey(Location binLocation, InventoryItem inventoryItem) {
-        return "${inventoryItem.product.productCode}-${binLocation?.name}-${inventoryItem?.lotNumber}"
-    }
-
-    /**
      * Fetches the stock of a list of products at a facility at a given moment in time.
      *
      * @param facility
      * @param products
      * @param at The moment in time to fetch stock for. If not provided, will fetch the current stock of each item.
-     * @return a map of AvailableItem keyed on [product code + bin location name + lot number]
+     * @return a map of AvailableItem keyed on ProductAvailabilityKey
      */
-    Map<String, AvailableItem> getAvailableItemsAtDateAsMap(Location facility, Collection<Product> products, Date at=null) {
+    AvailableItemMap getAvailableItemsAtDateAsMap(
+            Location facility,
+            Collection<Product> products,
+            Date at=null) {
+
         List<AvailableItem> availableItems = getAvailableItemsAtDate(facility, products, at)
 
-        Map<String, AvailableItem> availableItemsMap = [:]
-        for (AvailableItem availableItem : availableItems) {
-            String key = constructAvailableItemKey(availableItem.binLocation, availableItem.inventoryItem)
-            availableItemsMap.put(key, availableItem)
-        }
+        AvailableItemMap availableItemsMap = new AvailableItemMap()
+        availableItemsMap.putAll(availableItems)
         return availableItemsMap
     }
 
@@ -702,13 +696,11 @@ class ProductAvailabilityService {
      * @param at The moment in time to fetch stock for. If not provided, will fetch the current stock of each item.
      */
     List<AvailableItem> getAvailableItemsAtDate(Location facility, Collection<Product> products, Date at=null) {
-        if (at != null && at.after(new Date())) {
-            throw new IllegalArgumentException("Date cannot be in the future.")
-        }
-
-        // If no date is provided, we fetch the stock as it is currently (filtering out any items with no quantity).
-        // This means we're allowed to simply query product availability since it contains up to date stock.
-        if (at == null) {
+        // If date is not provided, or it is provided but it's now or in the future, we fetch the stock as it is
+        // currently (filtering out any items with no quantity). This means we're allowed to simply query product
+        // availability since it contains up to date stock.
+        Date now = new Date()
+        if (at == null || at == now || at.after(now)) {
             return getAvailableItems(facility, products.collect{ it.id }, false, true)
         }
 
@@ -915,6 +907,11 @@ class ProductAvailabilityService {
     }
 
     void updateProductAvailability(InventoryItem inventoryItem) {
+        // OBPIH-7506: Only use the default lot if the lot number is null because we have valid inventory items in our
+        //             system with blank string lot numbers (ie " "). Until we can fix our importers and migrate our
+        //             data to not allow blank lots, we have to continue to allow both null and " " lots to coexist.
+        String lotNumber = inventoryItem.lotNumber == null ? Constants.DEFAULT_LOT_NUMBER : inventoryItem.lotNumber
+
         def results = ProductAvailability.executeUpdate(
                 "update ProductAvailability a " +
                         "set a.lotNumber=:lotNumber " +
@@ -922,12 +919,11 @@ class ProductAvailabilityService {
                         "and a.lotNumber != :lotNumber",
                 [
                         inventoryItemId: inventoryItem.id,
-                        lotNumber      : inventoryItem.lotNumber?:Constants.DEFAULT_LOT_NUMBER
+                        lotNumber      : lotNumber
                 ]
         )
-        log.info "Updated ${results} product availability records for inventory item ${inventoryItem?.lotNumber?:Constants.DEFAULT_LOT_NUMBER}"
+        log.info "Updated ${results} product availability records for inventory item with lot number [${lotNumber}]"
     }
-
 
     void updateProductAvailability(Location location) {
         def isBinLocation = location?.isInternalLocation()
@@ -1066,16 +1062,22 @@ class ProductAvailabilityService {
         return new PaginatedList(items, products.totalCount)
     }
 
-    List<ProductAvailability> getStockTransferCandidates(Location location) {
+    List<ProductAvailability> getStockTransferCandidates(Location location, Boolean showExpiredItemsOnly = false) {
         return ProductAvailability.createCriteria().list {
             eq("location", location)
             gt("quantityOnHand", 0)
+
+            if (showExpiredItemsOnly) {
+                inventoryItem {
+                    lt('expirationDate', new Date())
+                }
+            }
         }
     }
 
-    List<ProductAvailability> getStockTransferCandidates(Location location, Map params) {
+    List<ProductAvailability> getStockTransferCandidates(Location location, Map params, Boolean showExpiredItemsOnly = false) {
         if (!params) {
-            return getStockTransferCandidates(location)
+            return getStockTransferCandidates(location, showExpiredItemsOnly)
         }
 
         Location bin = params.binLocationId ? Location.get(params.binLocationId) : null

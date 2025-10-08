@@ -8,7 +8,7 @@
   - head-branch: ['^feature/', '^feat/', '^ft/']
 
 "type: maintenance":
-  - head-branch: ['^maintenance/', '^techdebt/', '^chore/']
+  - head-branch: ['^maintenance/', '^techdebt/', '^td/', '^chore/']
 
 "type: release":
   - head-branch: ['^release/']

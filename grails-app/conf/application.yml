@@ -221,6 +221,9 @@ grails:
             # ISO-8601 formats. These are better than the old formats, but new APIs should still use Instant instead
             # of Date whenever possible. Note that a format without time and timezone is NOT allowed here because that
             # would be ambiguous and would lead to Date conversion weirdness. If you need a date only, use LocalDate.
+            - "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"
+            - "yyyy-MM-dd'T'HH:mm:ss.SSSXX"
+            - "yyyy-MM-dd'T'HH:mm:ss.SSSX"
             - "yyyy-MM-dd'T'HH:mm:ssXXX"
             - "yyyy-MM-dd'T'HH:mm:ssXX"
             - "yyyy-MM-dd'T'HH:mm:ssX"
@@ -304,7 +307,7 @@ environments:
             # Our integration tests run against a containerized database: https://java.testcontainers.org/modules/databases/jdbc/.
             # Note that testcontainers auto-disable SSL when connecting via jdbc: https://github.com/testcontainers/testcontainers-java/pull/561
             # For more information, see /src/integration-test/README.md
-            url: jdbc:tc:${TEST_DATABASE:mysql:5.7.44}:///openboxes?TC_MY_CNF=testcontainers
+            url: jdbc:tc:${TEST_DATABASE:mysql:8.0.36}:///openboxes?TC_MY_CNF=testcontainers
             driverClassName: org.testcontainers.jdbc.ContainerDatabaseDriver
         grails:
             plugin:
@@ -611,6 +614,24 @@ openboxes:
         pagination:
             enabled: true
             pageSize: 10
+
+    transactions:
+        inventoryBaseline:
+            # OBPIH-7194
+            recordStock:
+                enabled: true
+            # OBPIH-7195
+            inventoryImport:
+                enabled: true
+            # OBPIH-7254
+            loadDemoData:
+                enabled: true
+            # OBPIH-7198
+            migration:
+                enabled: true
+                batchSize: 5000
+                # this one is for testing and should be always set to true on production
+                cleanupAdjustment: true
 
 mail:
     error:

@@ -1,5 +1,6 @@
 package org.pih.warehouse.inventory
 
+import grails.converters.JSON
 import grails.gorm.PagedResultList
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
@@ -11,14 +12,18 @@ import org.grails.datastore.mapping.query.api.Criteria
 import org.hibernate.ObjectNotFoundException
 import org.hibernate.criterion.Order
 import org.hibernate.sql.JoinType
+import org.pih.warehouse.DateUtil
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.Person
 import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.product.Product
 import org.hibernate.criterion.CriteriaSpecification
 import org.pih.warehouse.report.CycleCountReportCommand
+
+import java.time.LocalDate
 
 @Transactional
 class CycleCountService {
@@ -93,6 +98,26 @@ class CycleCountService {
                 }
             }
 
+            if (command.countAssignees) {
+                createCycleCountRequestAlias(delegate, usedAliases)
+                "in"("ccr.countAssignee", command.countAssignees)
+            }
+
+            if (command.recountAssignees) {
+                createCycleCountRequestAlias(delegate, usedAliases)
+                "in"("ccr.recountAssignee", command.recountAssignees)
+            }
+
+            if (command.countDeadline) {
+                createCycleCountRequestAlias(delegate, usedAliases)
+                lte("ccr.countDeadline", command.countDeadline)
+            }
+
+            if (command.recountDeadline) {
+                createCycleCountRequestAlias(delegate, usedAliases)
+                lte("ccr.recountDeadline", command.recountDeadline)
+            }
+
             if (command.negativeQuantity) {
                 gt("negativeItemCount", 0)
             }
@@ -123,6 +148,17 @@ class CycleCountService {
         } as List<CycleCountCandidate>
     }
 
+    Integer getInventoryItemsCount(CycleCountRequest cycleCountRequest) {
+        if (!cycleCountRequest.cycleCount) {
+            return cycleCountProductAvailabilityService.getAvailableItems(
+                    cycleCountRequest.facility,
+                    cycleCountRequest.product
+            )?.size()
+        }
+
+        return cycleCountRequest.cycleCount.numberOfItemsOfMostRecentCount
+    }
+
     List<PendingCycleCountRequest> getPendingCycleCountRequests(CycleCountCandidateFilterCommand command, String facilityId) {
         if (command.hasErrors()) {
             throw new ValidationException("Invalid params", command.errors)
@@ -133,8 +169,11 @@ class CycleCountService {
         // Store added aliases to avoid duplicate alias exceptions for product
         // This could happen when params.searchTerm and e.g. sort by product is applied
         Set<String> usedAliases = new HashSet<>()
-        return PendingCycleCountRequest.createCriteria().list(max: max, offset: offset) {
+        List<PendingCycleCountRequest> pendingCycleCountRequests = PendingCycleCountRequest.createCriteria().list(max: max, offset: offset) {
             eq("facility", facility)
+            if(command.requestIds) {
+                "in"("cycleCountRequest.id", command.requestIds)
+            }
             if (command.searchTerm) {
                 createProductAlias(delegate, usedAliases)
                 or {
@@ -174,6 +213,26 @@ class CycleCountService {
                 inList("status", command.statuses)
             }
 
+            if (command.countAssignees) {
+                createCycleCountRequestAlias(delegate, usedAliases)
+                "in"("ccr.countAssignee", command.countAssignees)
+            }
+
+            if (command.recountAssignees) {
+                createCycleCountRequestAlias(delegate, usedAliases)
+                "in"("ccr.recountAssignee", command.recountAssignees)
+            }
+
+            if (command.countDeadline) {
+                createCycleCountRequestAlias(delegate, usedAliases)
+                lte("ccr.countDeadline", command.countDeadline)
+            }
+
+            if (command.recountDeadline) {
+                createCycleCountRequestAlias(delegate, usedAliases)
+                lte("ccr.recountDeadline", command.recountDeadline)
+            }
+
             if (command.negativeQuantity) {
                 gt("negativeItemCount", 0)
             }
@@ -181,6 +240,14 @@ class CycleCountService {
             applySortOrderForCandidates(command.sort, command.order, delegate, usedAliases)
 
         } as List<PendingCycleCountRequest>
+
+        // Access to the information about available cycle count items before creating the cycle count
+        pendingCycleCountRequests.each {
+            Integer inventoryItemsCount = getInventoryItemsCount(it.cycleCountRequest)
+            it.cycleCountRequest.setInventoryItemsCount(inventoryItemsCount)
+        }
+
+        return pendingCycleCountRequests
     }
 
     private static void applySortOrderForCandidates(String sortBy, String orderDirection, Criteria criteria, Set<String> usedAliases) {
@@ -237,6 +304,14 @@ class CycleCountService {
         }
     }
 
+    // Prevents duplicate alias 'ccr' creation, which can happen when filtering by assignees and deadlines simultaneously.
+    private static void createCycleCountRequestAlias(Criteria criteria, Set<String> usedAliases) {
+        if (!usedAliases.contains("ccr")) {
+            usedAliases.add("ccr")
+            criteria.createAlias("cycleCountRequest", "ccr", JoinType.INNER_JOIN)
+        }
+    }
+
     List<CycleCountRequest> createRequests(CycleCountRequestBatchCommand command) {
         List<CycleCountRequest> cycleCountsRequests = []
         command.requests.each { CycleCountRequestCommand request ->
@@ -258,6 +333,37 @@ class CycleCountService {
             cycleCountRequest.save()
         }
         return cycleCountsRequests
+    }
+
+    /**
+     * Bulk updates a given list of cycle count requests.
+     */
+    List<CycleCountRequest> updateRequests(CycleCountRequestUpdateBulkCommand command) {
+        List<CycleCountRequest> updatedRequests = []
+        for (CycleCountRequestUpdateCommand requestToUpdate in command.commands) {
+            CycleCountRequest updatedRequest = updateRequest(requestToUpdate)
+            updatedRequests.add(updatedRequest)
+        }
+        return updatedRequests
+    }
+
+    private CycleCountRequest updateRequest(CycleCountRequestUpdateCommand command) {
+        CycleCountRequest cycleCountRequest = command.cycleCountRequest
+        CycleCountAssignmentCommand countAssignment = command.getAssignmentByCountIndex(Constants.COUNT_INDEX)
+        if (countAssignment) {
+            cycleCountRequest.countAssignee = countAssignment.assignee
+            cycleCountRequest.countDeadline = countAssignment.deadline
+        }
+        CycleCountAssignmentCommand recountAssignment = command.getAssignmentByCountIndex(Constants.RECOUNT_INDEX)
+        if (recountAssignment) {
+            cycleCountRequest.recountAssignee = recountAssignment.assignee
+            cycleCountRequest.recountDeadline = recountAssignment.deadline
+        }
+
+        if (!cycleCountRequest.save()) {
+            throw new ValidationException("Invalid cycle count request", cycleCountRequest.errors)
+        }
+        return cycleCountRequest
     }
 
     CSVPrinter getCycleCountCsv(List<CycleCountCandidate> candidates) {
@@ -422,9 +528,31 @@ class CycleCountService {
             return createCycleCount(command, facility)
         }
 
+        updateCountAssigneeData(cycleCount)
+
         // Otherwise the count has already been started so simply return it as is. We allow this behaviour of
         // "starting" already started counts (instead of throwing an error) because it's simpler for the frontend.
         return CycleCountDto.toDto(cycleCount)
+    }
+
+    void updateCountAssigneeData(CycleCount cycleCount) {
+        Person assignee = cycleCount.cycleCountRequest.countAssignee
+        // We want to override assignee while starting the count
+        cycleCount.cycleCountItems.each {
+            if (it.countIndex == 0) {
+                it.assignee = assignee
+            }
+        }
+    }
+
+    void updateRecountAssigneeData(CycleCount cycleCount) {
+        Person assignee = cycleCount.cycleCountRequest.recountAssignee
+        // We want to override assignee while starting the recount
+        cycleCount.cycleCountItems.each {
+            if (it.countIndex > 0) {
+                it.assignee = assignee
+            }
+        }
     }
 
     /**
@@ -443,13 +571,16 @@ class CycleCountService {
         // 1:1 association between cycle count and cycle count request
         request.cycleCountRequest.cycleCount = newCycleCount
         request.cycleCountRequest.status = CycleCountRequestStatus.IN_PROGRESS
+        Person assignee = request.cycleCountRequest.countAssignee
         itemsToSave.each { AvailableItem availableItem ->
             CycleCountItem cycleCountItem = initCycleCountItem(
                     facility,
                     availableItem,
                     newCycleCount,
                     0,  // countIndex is always zero for the initial count
-                    CycleCountItemStatus.READY_TO_COUNT)
+                    CycleCountItemStatus.READY_TO_COUNT,
+                    assignee,
+            )
 
             newCycleCount.addToCycleCountItems(cycleCountItem)
         }
@@ -487,6 +618,7 @@ class CycleCountService {
         // If there are already items for the requested count index, simply return the count as it is since the recount
         // has already been started. We do this (instead of throwing an error) because it's convenient for the frontend.
         if (cycleCount.maxCountIndex >= countIndex) {
+            updateRecountAssigneeData(cycleCount)
             return CycleCountDto.toDto(cycleCount)
         }
 
@@ -496,13 +628,16 @@ class CycleCountService {
         // exist at the time of the initial count.
         List<AvailableItem> availableItemsToRecount = cycleCountProductAvailabilityService.getAvailableItems(
                 facility, product)
+        Person assignee = command.cycleCountRequest.recountAssignee
         for (AvailableItem availableItemToRecount : availableItemsToRecount) {
             CycleCountItem cycleCountItem = initCycleCountItem(
                     facility,
                     availableItemToRecount,
                     cycleCount,
                     countIndex,
-                    CycleCountItemStatus.INVESTIGATING)
+                    CycleCountItemStatus.INVESTIGATING,
+                    assignee,
+            )
 
             cycleCount.addToCycleCountItems(cycleCountItem)
         }
@@ -543,7 +678,9 @@ class CycleCountService {
             AvailableItem availableItem,
             CycleCount cycleCount,
             int countIndex,
-            CycleCountItemStatus status) {
+            CycleCountItemStatus status,
+            Person assignee = null
+    ) {
 
         return new CycleCountItem(
                 status: status,
@@ -558,6 +695,7 @@ class CycleCountService {
                 createdBy: AuthService.currentUser,
                 updatedBy: AuthService.currentUser,
                 dateCounted: new Date(),
+                assignee: assignee,
                 custom: false,
         )
     }
@@ -852,6 +990,4 @@ class CycleCountService {
             }
         }
     }
-
-
 }

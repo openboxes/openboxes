@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
 
+import { useWindowVirtualizer } from '@tanstack/react-virtual';
 import _ from 'lodash';
 import { useSelector } from 'react-redux';
 import { getCurrentLocation } from 'selectors';
@@ -33,25 +34,33 @@ const ResolveStep = () => {
     removeRow,
     assignRecountedBy,
     getRecountedDate,
-    setRecountedDate,
+    updateRecountedDate,
     shouldHaveRootCause,
     back,
     save,
     isStepEditable,
     getRecountedBy,
+    getDefaultRecountedBy,
     getCountedBy,
     submitRecount,
     getProduct,
     getDateCounted,
-    refreshFocusCounter,
     triggerValidation,
     isSaveDisabled,
     setIsSaveDisabled,
     cycleCountsWithItemsWithoutRecount,
     sortByProductName,
     setSortByProductName,
+    forceRerender,
   } = useResolveStep();
   useTranslation('cycleCount');
+
+  const tableVirtualizer = useWindowVirtualizer({
+    count: tableData.length,
+    // table with ~ 5 rows, average size of the recount table
+    estimateSize: () => 518,
+    overscan: 10,
+  });
 
   return (
     <PageWrapper>
@@ -60,7 +69,7 @@ const ResolveStep = () => {
           printRecountForm={printRecountForm}
           refreshCountItems={refreshCountItems}
           next={next}
-          save={save}
+          save={() => save({ shouldRefetchLotNumbers: true })}
           isFormDisabled={isFormDisabled}
           sortByProductName={sortByProductName}
           setSortByProductName={setSortByProductName}
@@ -77,33 +86,60 @@ const ResolveStep = () => {
           redirectDefaultMessage="Back to Resolve tab"
         />
       )}
-      {tableData
-        .map(({ cycleCountItems, id }) => (
-          <ResolveStepTable
-            key={id}
-            id={id}
-            product={getProduct(id)}
-            dateCounted={getDateCounted(id)}
-            dateRecounted={getRecountedDate(id)}
-            tableData={cycleCountItems}
-            tableMeta={tableMeta}
-            addEmptyRow={addEmptyRow}
-            removeRow={removeRow}
-            setRecountedDate={setRecountedDate(id)}
-            assignRecountedBy={assignRecountedBy}
-            validationErrors={validationErrors}
-            shouldHaveRootCause={shouldHaveRootCause}
-            isStepEditable={isStepEditable}
-            recountedBy={getRecountedBy(id)}
-            countedBy={getCountedBy(id)}
-            triggerValidation={triggerValidation}
-            refreshFocusCounter={refreshFocusCounter}
-            cycleCountWithItemsWithoutRecount={
-              cycleCountsWithItemsWithoutRecount.find((cycleCount) => cycleCount.id === id)
-            }
-            isFormDisabled={isFormDisabled}
-          />
-        ))}
+      <div
+        style={{
+          height: `${tableVirtualizer.getTotalSize()}px`,
+          position: 'relative',
+        }}
+      >
+        {tableVirtualizer.getVirtualItems()
+          .map((virtualRow) => {
+            const {
+              cycleCountItems,
+              id,
+            } = tableData[virtualRow.index];
+
+            return (
+              <div
+                key={id}
+                data-index={virtualRow.index}
+                ref={tableVirtualizer.measureElement}
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  transform: `translateY(${virtualRow.start}px)`,
+                  width: '100%',
+                }}
+              >
+                <ResolveStepTable
+                  key={id}
+                  id={id}
+                  product={getProduct(id)}
+                  dateCounted={getDateCounted(id)}
+                  dateRecounted={getRecountedDate(id)}
+                  tableData={cycleCountItems}
+                  tableMeta={tableMeta}
+                  addEmptyRow={addEmptyRow}
+                  removeRow={removeRow}
+                  updateRecountedDate={updateRecountedDate(id)}
+                  assignRecountedBy={assignRecountedBy}
+                  validationErrors={validationErrors}
+                  shouldHaveRootCause={shouldHaveRootCause}
+                  isStepEditable={isStepEditable}
+                  recountedBy={getRecountedBy(id)}
+                  defaultRecountedBy={getDefaultRecountedBy(id)}
+                  countedBy={getCountedBy(id)}
+                  triggerValidation={triggerValidation}
+                  cycleCountWithItemsWithoutRecount={
+                    cycleCountsWithItemsWithoutRecount.find((cycleCount) => cycleCount.id === id)
+                  }
+                  isFormDisabled={isFormDisabled}
+                  forceRerender={forceRerender}
+                />
+              </div>
+            );
+          })}
+      </div>
     </PageWrapper>
   );
 };

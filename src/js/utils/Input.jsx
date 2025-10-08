@@ -3,7 +3,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 const Input = ({
-  fieldRef, onChange, className = '', arrowLeft, arrowUp, arrowRight, arrowDown, copyDown, onTabPress, isFormElement, ...props
+  fieldRef, onChange, className = '', arrowLeft, arrowUp, arrowRight, arrowDown, copyDown, onTabPress, isFormElement, dataTestId, ...props
 }) => {
   const handleChange = (event) => {
     const { value } = event.target;
@@ -21,7 +21,7 @@ const Input = ({
 
   return (
     <input
-      data-testid="input"
+      data-testid={dataTestId || 'input'}
       type="text"
       ref={fieldRef}
       onKeyPress={(event) => {
@@ -93,6 +93,7 @@ Input.propTypes = {
   fieldRef: PropTypes.func,
   onTabPress: PropTypes.func,
   isFormElement: PropTypes.bool,
+  dataTestId: PropTypes.string,
 };
 
 Input.defaultProps = {
@@ -106,4 +107,5 @@ Input.defaultProps = {
   fieldRef: null,
   onTabPress: null,
   isFormElement: false,
+  dataTestId: null,
 };

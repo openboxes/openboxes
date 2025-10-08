@@ -109,7 +109,7 @@
                                         </td>
 
                                         <td>
-                                            <g:link controller="product" action="edit" id="${productAssociationInstance?.product?.id}">
+                                            <g:link controller="product" action="edit" id="${productAssociationInstance?.associatedProduct?.id ?: productAssociationInstance?.product?.id}">
                                                 ${fieldValue(bean: productAssociationInstance?.associatedProduct, field: "productCode")}
                                                 ${fieldValue(bean: productAssociationInstance?.associatedProduct, field: "name")}
                                             </g:link>
@@ -119,7 +119,7 @@
 
                                         <td>${fieldValue(bean: productAssociationInstance, field: "comments")}</td>
 
-                                        <td><format:date obj="${productAssociationInstance.dateCreated}" /></td>
+                                        <td><g:formatDate date="${productAssociationInstance.dateCreated}" /></td>
 
                                     </tr>
                                 </g:each>

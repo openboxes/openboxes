@@ -108,7 +108,7 @@ class UrlMappings {
 
         "/api/products"(parseRequest: true) {
             controller = { "productApi" }
-            action = [GET: "list"]
+            action = [GET: "list", POST: "save"]
         }
 
         "/api/products/search"(parseRequest: true) {
@@ -123,6 +123,21 @@ class UrlMappings {
         "/api/products/$productId/inventoryItems/$lotNumber"(parseRequest: true) {
             controller = { "productApi" }
             action = [GET: "getInventoryItem"]
+        }
+
+        "/api/products/getLatestInventoryCountDate" {
+            controller = { "productApi" }
+            action = [GET: "getLatestInventoryCountDate"]
+        }
+
+        "/api/products/import" {
+            controller = { "productApi" }
+            action = [POST: "importCsv"]
+        }
+
+        "/api/products/inventoryItems/lotNumbersWithExpirationDate" {
+            controller = { "productApi" }
+            action = [GET: "getLotNumbersWithExpirationDate"]
         }
 
         "/api/facilities/$facilityId/products/classifications" {
@@ -797,6 +812,15 @@ class UrlMappings {
         }
 
         /**
+         * Inventory API endpoints
+         */
+
+        "/api/facilities/$facilityId/inventories/import" {
+            controller = { "inventoryApi" }
+            action = "importCsv"
+        }
+
+        /**
         * Purchase Orders API endpoints
         */
 
@@ -959,7 +983,7 @@ class UrlMappings {
 
         "/api/facilities/$facilityId/cycle-counts/requests/batch" {
             controller = "cycleCountApi"
-            action = [POST: "createRequests", DELETE: "deleteRequests"]
+            action = [POST: "createRequests", PATCH: "updateRequests", DELETE: "deleteRequests"]
         }
 
         "/api/facilities/$facility/cycle-counts/start/batch" {
@@ -1007,6 +1031,11 @@ class UrlMappings {
             action = [POST: "createCycleCountItemBatch", PATCH: "updateCycleCountItemBatch"]
         }
 
+        "/api/facilities/$facility/cycle-counts/items/batch" {
+            controller = "cycleCountApi"
+            action = [POST: "createCycleCountItemBatch", PATCH: "updateCycleCountItemBatch"]
+        }
+
         "/api/facilities/$facility/cycle-counts/$cycleCountId/refresh" {
             controller = "cycleCountApi"
             action = [POST: "refreshCycleCount"]
@@ -1020,6 +1049,42 @@ class UrlMappings {
         "/api/reports/cycle-count-summary" {
             controller = "cycleCountApi"
             action = [POST: "getCycleCountSummary", GET: "getCycleCountSummary"]
+        }
+
+        "/api/reports/inventory-audit-details" {
+            controller = "inventoryAuditReport"
+            action = [POST: "getInventoryAuditDetails", GET: "getInventoryAuditDetails"]
+
+        }
+
+        "/api/reports/inventory-audit-summary(.$format)?" {
+            controller = "inventoryAuditReport"
+            action = [POST: "getInventoryAuditSummary", GET: "getInventoryAuditSummary"]
+        }
+
+        "/api/reports/inventory-transactions-summary" {
+            controller = "inventoryTransactionSummaryApi"
+            action = [GET: "getInventoryTransactionsSummary"]
+        }
+
+        "/api/reports/indicators/productsInventoried" {
+            controller = "indicatorApi"
+            action = [GET: "getProductsInventoried"]
+        }
+
+        "/api/reports/indicators/inventoryAccuracy" {
+            controller = "indicatorApi"
+            action = [GET: "getInventoryAccuracy"]
+        }
+
+        "/api/reports/indicators/inventoryShrinkage" {
+            controller = "indicatorApi"
+            action = [GET: "getInventoryShrinkage"]
+        }
+
+        "/api/facilities/$facility/inventory/record-stock/save" {
+            controller = "recordStockApi"
+            action = [POST: "saveRecordStock"]
         }
 
         // Error handling

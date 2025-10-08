@@ -110,7 +110,11 @@ class CycleCount {
      */
     Set<CycleCountItem> getItemsOfMostRecentCount() {
         Integer countIndex = maxCountIndex
-        return cycleCountItems.findAll{ it.countIndex == countIndex}
+        return cycleCountItems.findAll { it.countIndex == countIndex}
+    }
+
+    Integer getNumberOfItemsOfMostRecentCount() {
+        return getItemsOfMostRecentCount()?.size()
     }
 
     Set<CycleCountItem> getItemsOfSpecificCount(Integer countIndex) {

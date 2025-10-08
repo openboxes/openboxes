@@ -3,11 +3,13 @@ import queryString from 'query-string';
 import {
   CYCLE_COUNT, CYCLE_COUNT_ITEM,
   CYCLE_COUNT_ITEMS_BATCH,
+  CYCLE_COUNT_ITEMS_BATCH_ROOT,
   CYCLE_COUNT_ITEMS_IMPORT,
+  CYCLE_COUNT_PENDING_REQUESTS,
   CYCLE_COUNT_RECOUNT_START,
   CYCLE_COUNT_REFRESH_ITEMS,
-  CYCLE_COUNT_REQUEST,
   CYCLE_COUNT_REQUESTS,
+  CYCLE_COUNT_REQUESTS_BATCH,
   CYCLE_COUNT_START,
   CYCLE_COUNT_SUBMIT_COUNT,
   CYCLE_COUNT_SUBMIT_RECOUNT,
@@ -51,8 +53,14 @@ export default {
       removeOutOfStockItemsImplicitly), {}, { params: { countIndex } }),
   createCycleCountItems: (payload, locationId, cycleCountId) =>
     apiClient.post(CYCLE_COUNT_ITEMS_BATCH(locationId, cycleCountId), payload),
+  // Root endpoint doesn't require the cycleCountId - we can send items from multiple cycle counts
+  createCycleCountItemsBatch: (payload, locationId) =>
+    apiClient.post(CYCLE_COUNT_ITEMS_BATCH_ROOT(locationId), payload),
   updateCycleCountItems: (payload, locationId, cycleCountId) =>
     apiClient.patch(CYCLE_COUNT_ITEMS_BATCH(locationId, cycleCountId), payload),
+  // Root endpoint doesn't require the cycleCountId - we can send items from multiple cycle counts
+  updateCycleCountItemsBatch: (payload, locationId) =>
+    apiClient.patch(CYCLE_COUNT_ITEMS_BATCH_ROOT(locationId), payload),
   importCycleCountItems: (file, locationId) => {
     const formData = new FormData();
     formData.append('importFile', file);
@@ -63,8 +71,14 @@ export default {
     };
     return apiClient.post(CYCLE_COUNT_ITEMS_IMPORT(locationId), formData, config);
   },
-  updateCycleCountRequest(locationId, requestId, payload) {
-    // Currently, this URL is not working. It will be implemented in ticket OBPIH-7288
-    return apiClient.patch(CYCLE_COUNT_REQUEST(locationId, requestId), payload);
+  updateCycleCountRequests(locationId, payload) {
+    return apiClient.patch(CYCLE_COUNT_REQUESTS_BATCH(locationId), payload);
+  },
+  getPendingRequests: ({ locationId, requestIds, max }) => {
+    const queryParams = queryString.stringify({
+      requestIds,
+      max,
+    });
+    return apiClient.get(`${CYCLE_COUNT_PENDING_REQUESTS(locationId)}?${queryParams}`);
   },
 };

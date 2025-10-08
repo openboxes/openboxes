@@ -1,28 +1,38 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
+import _ from 'lodash';
+import moment from 'moment';
 import queryString from 'query-string';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
+import { getCurrentLocation } from 'selectors';
 
 import { setShouldRebuildFilterParams } from 'actions';
-import cycleCountReportingFilterFields from 'components/cycleCountReporting/CycleCountReportingFilterFields';
+import { INDICATORS_TAB } from 'consts/cycleCount';
 import useCommonFiltersCleaner from 'hooks/list-pages/useCommonFiltersCleaner';
+import useQueryParams from 'hooks/useQueryParams';
 import { transformFilterParams } from 'utils/list-utils';
 import { fetchProduct } from 'utils/option-utils';
 
-const useCycleCountReportingFilters = () => {
+const useCycleCountReportingFilters = ({ filterFields }) => {
   const [filterParams, setFilterParams] = useState({});
   const [defaultFilterValues, setDefaultFilterValues] = useState({});
   const [filtersInitialized, setFiltersInitialized] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [shouldFetch, setShouldFetch] = useState(false);
-
   const dispatch = useDispatch();
   const history = useHistory();
+  const { tab } = useQueryParams();
+  const {
+    currentLocation,
+  } = useSelector((state) => ({
+    currentLocation: getCurrentLocation(state),
+  }));
+  const previousLocation = useRef(currentLocation?.id);
 
   const clearFilterValues = () => {
     const queryProps = queryString.parse(history.location.search);
-    const defaultValues = Object.keys(cycleCountReportingFilterFields).reduce(
+    const defaultValues = Object.keys(filterFields).reduce(
       (acc, key) => ({ ...acc, [key]: '' }),
       { tab: queryProps.tab },
     );
@@ -33,6 +43,7 @@ const useCycleCountReportingFilters = () => {
     const { pathname } = history.location;
     history.push({ pathname, search: queryFilterParams });
     setShouldFetch(false);
+    setFiltersInitialized(false);
     setFilterParams(queryFilterParams);
   };
 
@@ -45,16 +56,22 @@ const useCycleCountReportingFilters = () => {
     setIsLoading(true);
     try {
       const queryProps = queryString.parse(history.location.search);
-      const defaultValues = Object.keys(cycleCountReportingFilterFields).reduce(
+      const defaultValues = Object.keys(filterFields).reduce(
         (acc, key) => ({ ...acc, [key]: '' }),
         { tab: queryProps.tab },
       );
 
-      if (queryProps.startDate) {
-        defaultValues.startDate = queryProps.startDate;
+      if (queryProps.startDate || (tab === INDICATORS_TAB && !filtersInitialized)) {
+        // If tab === INDICATORS_TAB and queryProps.startDate is not provided,
+        // we want to use data from the last 3 months as the default.
+        defaultValues.startDate = queryProps.startDate || moment()
+          .subtract(3, 'months');
       }
-      if (queryProps.endDate) {
-        defaultValues.endDate = queryProps.endDate;
+      if (queryProps.endDate || (tab === INDICATORS_TAB && !filtersInitialized)) {
+        // If tab === INDICATORS_TAB and queryProps.endDate is not provided,
+        // we want to use the current day as the default.
+        defaultValues.endDate = queryProps.endDate
+          || moment();
       }
 
       if (queryProps.products) {
@@ -72,13 +89,23 @@ const useCycleCountReportingFilters = () => {
           value: product.id,
         }));
       }
-
+      if (tab === INDICATORS_TAB) {
+        setFilterParams(defaultValues);
+      }
       setDefaultFilterValues(defaultValues);
       setFiltersInitialized(true);
     } finally {
       setIsLoading(false);
     }
   };
+
+  // Set that filters are initialized reactively,
+  // to avoid race condition while using useStates.
+  useEffect(() => {
+    if (!_.isEmpty(defaultFilterValues)) {
+      setFiltersInitialized(true);
+    }
+  }, [defaultFilterValues]);
 
   useCommonFiltersCleaner({
     filtersInitialized,
@@ -102,6 +129,13 @@ const useCycleCountReportingFilters = () => {
     setFilterParams(values);
   };
 
+  useEffect(() => {
+    if (previousLocation.current !== currentLocation?.id) {
+      resetForm();
+      previousLocation.current = currentLocation?.id;
+    }
+  }, [currentLocation?.id]);
+
   return {
     defaultFilterValues,
     setFilterValues,
@@ -110,6 +144,7 @@ const useCycleCountReportingFilters = () => {
     isLoading,
     shouldFetch,
     setShouldFetch,
+    filtersInitialized,
   };
 };
 

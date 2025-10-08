@@ -40,6 +40,7 @@ class Constants {
     static final String MONTH_DAY_YEAR_DATE_FORMAT = "MM/dd/yyyy"
     static final String DELIVERY_DATE_FORMAT = "MM/dd/yyyy HH:mm XXX"
     static final String EUROPEAN_DATE_FORMAT = "dd/MM/yyyy"
+    static final String ISO_DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
     // Display date using day of year format. This is used by the `openboxes.display.date.format` property.
     // It is using `DD` instead `dd` because it is later used on the frontend by the moment, which interprets
     // `dd` and `DD` differently(`DD` is day of month, and `dd` is day of week, see: OBPIH-7149 and OBPIH-5397).
@@ -88,13 +89,16 @@ class Constants {
 
     // these are direct references to transaction types by primary key
     static final String CONSUMPTION_TRANSACTION_TYPE_ID = "2"
+    // FIXME rename this to ADJUSTMENT_TRANSACTION_TYPE once we migrate old debit adjustments
     static final String ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID = "3"
     static final String EXPIRATION_TRANSACTION_TYPE_ID = "4"
     static final String DAMAGE_TRANSACTION_TYPE_ID = "5"
+    // Deprecated - This transaction type should not be used to create new transactions
     static final String INVENTORY_TRANSACTION_TYPE_ID = "7"
     static final String TRANSFER_IN_TRANSACTION_TYPE_ID = "8"
     static final String TRANSFER_OUT_TRANSACTION_TYPE_ID = "9"
     static final String ADJUSTMENT_DEBIT_TRANSACTION_TYPE_ID = "10"
+    // Deprecated - This transaction type should not be used to create new transactions
     static final String PRODUCT_INVENTORY_TRANSACTION_TYPE_ID = "11"
     static final String INVENTORY_BASELINE_TRANSACTION_TYPE_ID = "12"
 
@@ -182,4 +186,12 @@ class Constants {
     static final String FOUR_OR_MORE = "4+"
 
     static final String NONE = 'None'
+
+    // Cycle count indexes
+    static final String COUNT_INDEX = "0"
+    static final String RECOUNT_INDEX = "1"
+
+    static final String HS_CODE_PRODUCT_ATTRIBUTE_CODE = "HSCODE"
+    static final String INVENTORY_BASELINE_MIGRATION_TRANSACTION_COMMENT = "Inventory baseline created during old product inventory transactions migration for products that had stock " +
+            "but no inventory baseline transaction as a most recent transaction"
 }

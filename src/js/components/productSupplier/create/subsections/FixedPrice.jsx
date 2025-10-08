@@ -9,7 +9,11 @@ import TextInput from 'components/form-elements/v2/TextInput';
 import Subsection from 'components/Layout/v2/Subsection';
 import { FormErrorPropType } from 'utils/propTypes';
 
-const FixedPrice = ({ control, errors }) => (
+const FixedPrice = ({
+  control,
+  errors,
+  triggerValidation,
+}) => (
   <Subsection
     title={{
       label: 'react.productSupplier.form.subsection.fixedPrice',
@@ -52,6 +56,10 @@ const FixedPrice = ({ control, errors }) => (
               }}
               errorMessage={errors.contractPriceValidUntil?.message}
               {...field}
+              onBlur={() => {
+                field?.onBlur?.();
+                triggerValidation();
+              }}
             />
           )}
         />
@@ -90,6 +98,7 @@ export const fixedPriceFormErrors = PropTypes.shape({
 FixedPrice.propTypes = {
   control: PropTypes.shape({}).isRequired,
   errors: fixedPriceFormErrors,
+  triggerValidation: PropTypes.func.isRequired,
 };
 
 FixedPrice.defaultProps = {

@@ -14,6 +14,9 @@
       DROP VIEW IF EXISTS cycle_count_summary;
       DROP VIEW IF EXISTS edit_page_item;
       DROP VIEW IF EXISTS fill_rate;
+      DROP VIEW IF EXISTS inventory_audit_details;
+      DROP VIEW IF EXISTS inventory_audit_rollup;
+      DROP VIEW IF EXISTS inventory_audit_summary;
       DROP VIEW IF EXISTS invoice_item_candidate;
       DROP VIEW IF EXISTS invoice_list;
       DROP VIEW IF EXISTS on_order_order_item_summary;

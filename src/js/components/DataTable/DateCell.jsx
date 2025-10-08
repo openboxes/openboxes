@@ -1,11 +1,12 @@
 import React from 'react';
 
-import moment from 'moment';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 import TableCell from 'components/DataTable/TableCell';
 import DateFormat from 'consts/dateFormat';
+import { convertDateFormatToDateFns } from 'consts/timeFormat';
+import { formatISODate } from 'utils/dateUtils';
 import { formatDate } from 'utils/translation-utils';
 
 const DateCell = ({
@@ -26,7 +27,8 @@ const DateCell = ({
       return formatLocalizedDateToDisplay(row.value, formatLocalizedDate);
     }
 
-    return moment(row.value).format(displayDateFormat);
+    const dateFormat = convertDateFormatToDateFns(displayDateFormat);
+    return formatISODate(row.value, dateFormat);
   };
 
   return (
