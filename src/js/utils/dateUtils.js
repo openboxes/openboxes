@@ -153,11 +153,15 @@ export const formatISODate = (date, dateFormat) => format(parseISO(date), dateFo
 /**
  * Get timezone offset, defaulting to the user's timezone offset
  * @param {Number} timezoneOffset
- * @returns {`${string}${string}:${string}`}
+ * @returns {string}
  */
 export const displayTimezoneOffset = (timezoneOffset = new Date().getTimezoneOffset()) => {
   // timezoneOffset = difference in minutes comparing to utc (timezoneOffset is an argument for
   // testing purposes, because we can't force Date object to use different timezone that the user's)
+  if (timezoneOffset === 0) {
+    return 'Z';
+  }
+
   const offsetMinutes = -timezoneOffset;
   const sign = offsetMinutes >= 0 ? '+' : '-';
 
