@@ -11,14 +11,15 @@ package org.pih.warehouse.core
 
 import grails.core.GrailsApplication
 import org.grails.core.io.ResourceLocator
+
 import org.pih.warehouse.LocalizationUtil
-import org.pih.warehouse.core.localization.LocaleDeterminer
+import org.pih.warehouse.core.localization.LocaleManager
 
 class LocalizationService {
 
     GrailsApplication grailsApplication
     ResourceLocator grailsResourceLocator
-    LocaleDeterminer localeDeterminer
+    LocaleManager localeManager
 
     String formatMetadata(Object object) {
         def format = grailsApplication.mainContext.getBean('org.pih.warehouse.FormatTagLib')
@@ -50,14 +51,44 @@ class LocalizationService {
      * @return
      */
     Locale getLocale(String languageCode) {
-        return languageCode ? localeDeterminer.asLocale(languageCode) : currentLocale
+        return languageCode ? localeManager.asLocale(languageCode) : currentLocale
     }
 
     /**
-     * Gets the current locale or return default locale.
+     * Fetch the locale of the user/request associated with the current thread.
+     *
+     * Falls back to the user's default locale if the session doesn't have a locale yet,
+     * which in turn falls back to the global default locale if the user has no default configured.
      */
     Locale getCurrentLocale() {
-        return localeDeterminer.getCurrentLocale()
+        return localeManager.getCurrentLocale()
+    }
+
+    /**
+     * Sets the locale of the user associated with the current request.
+     *
+     * @param localeCode Should be a valid ISO 3166 string with an optional region code (ex: "es", or "es-MX")
+     * @param previousLocaleToUse Overrides the previous locale to set. If null, will use the session's current locale
+     */
+    Locale setLocale(String localeCode) {
+        return localeManager.setCurrentLocale(localeCode)
+    }
+
+    /**
+     * Put the user in localization mode by setting their local to the special Crowdin pseudo-language.
+     */
+    void enableLocalizationMode() {
+        localeManager.enableLocalizationMode()
+    }
+
+    /**
+     * Disables localization mode, restoring the session to the locale that it was in before entering the mode.
+     *
+     * @param localeCodeToSwitchTo the locale to switch the user to after disabling the mode. If null, will use the
+     *                             user's previous locale
+     */
+    void disableLocalizationMode(String localeCodeToSwitchTo) {
+        localeManager.disableLocalizationMode(localeCodeToSwitchTo)
     }
 
     /**

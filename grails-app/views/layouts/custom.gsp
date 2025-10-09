@@ -28,13 +28,7 @@
     <link rel="stylesheet" href="${resource(dir:'css',file:'footable.css')}" type="text/css" media="all" />
     <link href='https://fonts.googleapis.com/css?family=Inter' rel='stylesheet'>
 
-    <g:if test="${session.useDebugLocale}">
-        <script type="text/javascript">
-            var _jipt = [];
-            _jipt.push(['project', 'openboxes']);
-        </script>
-        <script type="text/javascript" src="//cdn.crowdin.com/jipt/jipt.js"></script>
-    </g:if>
+    <g:render template="/localization/crowdin"/>
 
     <!-- Include javascript files -->
     <g:javascript library="application"/>

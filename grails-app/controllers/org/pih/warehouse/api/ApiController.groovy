@@ -62,11 +62,7 @@ class ApiController {
     }
 
     def chooseLocale() {
-        Locale locale = localizationService.getLocale(params.id)
-        if (!locale) {
-            throw new ObjectNotFoundException(params.id, Locale.class.toString())
-        }
-        session.locale = locale
+        Locale locale = localizationService.setLocale(params.id as String)
         render([
             data: [
                 activeLanguage: locale.toString(),

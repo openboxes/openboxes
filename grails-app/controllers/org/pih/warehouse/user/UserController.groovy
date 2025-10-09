@@ -11,7 +11,8 @@ package org.pih.warehouse.user
 
 import grails.validation.ValidationException
 import org.apache.http.auth.AuthenticationException
-import org.pih.warehouse.LocalizationUtil
+
+import org.pih.warehouse.core.LocalizationService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationRole
 import org.pih.warehouse.core.LocationRoleDataService
@@ -35,7 +36,7 @@ class UserController {
     MailService mailService
     def userService
     def locationService
-    def localizationService
+    LocalizationService localizationService
     LocationRoleDataService locationRoleDataService
     UserDataService userGormService
 
@@ -298,11 +299,7 @@ class UserController {
     }
 
     def disableLocalizationMode() {
-        // If we are in localization mode and want to change the language through the footer on React side
-        // we want to make sure we set the language to the clicked one, not for the previous locale
-        // we want to set the prev locale only if we disable localization mode through "Disable localization mode" button
-        Locale locale = params?.locale ? LocalizationUtil.getLocale(params.locale) : session?.previousLocale
-        session.locale = locale
+        localizationService.disableLocalizationMode(params?.locale as String)
         def referer = request.getHeader("Referer")
         if (referer) {
             redirect(url: referer)
@@ -312,9 +309,7 @@ class UserController {
     }
 
     def enableLocalizationMode() {
-        // We want to store the previous locale, so we can go back to it when disabling localization mode through button
-        session.previousLocale = localizationService.getCurrentLocale()
-        session.locale = new Locale(grailsApplication.config.openboxes.locale.localizationModeLocale)
+        localizationService.enableLocalizationMode()
         def referer = request.getHeader("Referer")
         if (referer) {
             redirect(url: referer)
@@ -334,13 +329,11 @@ class UserController {
         log.info "update auth user locale " + params
 
         if (params.locale) {
-            // convert the passed locale parameter to an actual locale
-            Locale locale = LocalizationUtil.getLocale(params.locale)
-
-            // if this isn't a valid locale, do nothing
-            if (locale) {
-                // Change the locale
-                session.locale = locale
+            try {
+                localizationService.setLocale(params.locale as String)
+            }
+            catch (IllegalArgumentException ignored) {
+                // If the given locale is invalid, do nothing
             }
         }
         log.info "Redirecting to " + params?.targetUri

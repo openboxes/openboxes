@@ -13,7 +13,7 @@ import org.pih.warehouse.core.date.DateFormatterContext
 import org.pih.warehouse.core.date.DateFormatterManager
 import org.pih.warehouse.core.date.TemporalAccessorDateFormatter
 import org.pih.warehouse.core.date.TemporalAccessorDateTimeFormatter
-import org.pih.warehouse.core.localization.LocaleDeterminer
+import org.pih.warehouse.core.localization.LocaleManager
 import org.pih.warehouse.core.session.SessionManager
 
 /**
@@ -33,7 +33,7 @@ class DateFormatterManagerSpec extends Specification {
     SessionManager sessionManagerStub
 
     @Shared
-    LocaleDeterminer localeDeterminerStub
+    LocaleManager localeManagerStub
 
     void setup() {
         // Spy because we need to stub the formatter init methods.
@@ -53,14 +53,14 @@ class DateFormatterManagerSpec extends Specification {
         sessionManagerStub = Stub(SessionManager)
         dateFormatterManager.sessionManager = sessionManagerStub
 
-        localeDeterminerStub = Stub(LocaleDeterminer)
-        dateFormatterManager.localeDeterminer = localeDeterminerStub
+        localeManagerStub = Stub(LocaleManager)
+        dateFormatterManager.localeManager = localeManagerStub
     }
 
     void 'format does not error when given an Instant and no override'() {
         given:
         sessionManagerStub.timezone >> TimeZone.getTimeZone('UTC')
-        localeDeterminerStub.currentLocale >> Locale.ENGLISH
+        localeManagerStub.currentLocale >> Locale.ENGLISH
 
         and:
         Instant instant = Instant.now()
@@ -87,7 +87,7 @@ class DateFormatterManagerSpec extends Specification {
     void 'format does not error when given a ZonedDateTime and no override'() {
         given:
         sessionManagerStub.timezone >> TimeZone.getTimeZone('UTC')
-        localeDeterminerStub.currentLocale >> Locale.ENGLISH
+        localeManagerStub.currentLocale >> Locale.ENGLISH
 
         and:
         ZonedDateTime zdt = ZonedDateTime.now()
@@ -113,7 +113,7 @@ class DateFormatterManagerSpec extends Specification {
 
     void 'format does not error when given a LocalDate and no override'() {
         given:
-        localeDeterminerStub.currentLocale >> Locale.ENGLISH
+        localeManagerStub.currentLocale >> Locale.ENGLISH
 
         and:
         LocalDate localDate = LocalDate.now()

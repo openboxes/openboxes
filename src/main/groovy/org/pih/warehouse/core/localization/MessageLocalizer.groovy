@@ -19,7 +19,7 @@ class MessageLocalizer {
     MessageSource messageSource
 
     @Autowired
-    LocaleDeterminer localeDeterminer
+    LocaleManager localeManager
 
     @Autowired
     SessionManager sessionManager
@@ -44,7 +44,7 @@ class MessageLocalizer {
     String localize(String code, Object[] args=[], Locale localeOverride=null) {
         // It's rare, but we sometimes want to always display some string in the same locale, regardless of
         // the locale of the requesting user. For example, when displaying a language's name.
-        Locale localeToUse = localeOverride ?: localeDeterminer.currentLocale
+        Locale localeToUse = localeOverride ?: localeManager.getCurrentLocale()
 
         // We allow localization for individual codes to be overridden by data in the Localization database table so
         // check to see if an override is set. This allows individual implementations to modify translations

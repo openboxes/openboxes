@@ -1,5 +1,6 @@
 package org.pih.warehouse
 
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 
 /**
@@ -15,16 +16,15 @@ import org.pih.warehouse.core.User
 import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.web.servlet.support.RequestContextUtils
 
+import org.pih.warehouse.core.localization.LocaleManager
+
 /**
  * Hook-in for initializing a user session.
  */
 class InitializationInterceptor {
 
-    @Value('${openboxes.locale.defaultLocale}')
-    String defaultLocale
-
-    @Value('${openboxes.locale.localizationModeLocale}')
-    String localizationModeLocale
+    @Autowired
+    LocaleManager localeManager
 
     @Value('${server.session.timeout}')
     Integer sessionTimeoutInterval
@@ -68,9 +68,7 @@ class InitializationInterceptor {
     }
 
     void setLocale() {
-        // Figure out if we're in the special "localization mode" used when actively translating the app.
-        Locale locale = session?.locale ?: session.user?.locale ?: new Locale(defaultLocale ?: 'en')
-        session.useDebugLocale = locale == new Locale(localizationModeLocale)
+        Locale locale = localeManager.getCurrentLocale()
 
         // We want to set the locale for grails (equivalent to passing ?lang as param)
         // so grails' g:message "understands" current language so that is translatable with the crowdin
