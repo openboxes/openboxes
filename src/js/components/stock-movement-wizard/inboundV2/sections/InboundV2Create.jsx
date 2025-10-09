@@ -5,12 +5,12 @@ import { Controller, useWatch } from 'react-hook-form';
 import { useSelector } from 'react-redux';
 
 import Button from 'components/form-elements/Button';
-import DateField from 'components/form-elements/v2/DateField';
+import DateFieldDateFns from 'components/form-elements/v2/DateFieldDateFns';
 import SelectField from 'components/form-elements/v2/SelectField';
 import TextInput from 'components/form-elements/v2/TextInput';
 import Section from 'components/Layout/v2/Section';
 import StockMovementDirection from 'consts/StockMovementDirection';
-import { DateFormat } from 'consts/timeFormat';
+import { DateFormatDateFns } from 'consts/timeFormat';
 import { debounceLocationsFetch, debouncePeopleFetch } from 'utils/option-utils';
 import { FormErrorPropType } from 'utils/propTypes';
 
@@ -60,6 +60,7 @@ const InboundV2Create = ({
                   }}
                   errorMessage={errors.description?.message}
                   required
+                  customTooltip
                   {...field}
                 />
               )}
@@ -81,6 +82,7 @@ const InboundV2Create = ({
                   errorMessage={errors.origin?.message}
                   async
                   loadOptions={debouncedLocationsFetch}
+                  customTooltip
                   {...field}
                 />
               )}
@@ -97,6 +99,7 @@ const InboundV2Create = ({
                     id: 'react.stockMovement.destination.label',
                     defaultMessage: 'Destination',
                   }}
+                  customTooltip
                   {...field}
                 />
               )}
@@ -114,6 +117,7 @@ const InboundV2Create = ({
                     defaultMessage: 'Stocklist',
                   }}
                   options={stockLists}
+                  customTooltip
                   {...field}
                 />
               )}
@@ -134,6 +138,7 @@ const InboundV2Create = ({
                   errorMessage={errors.requestedBy?.message}
                   async
                   loadOptions={debouncePeopleFetch(debounceTime, minSearchLength)}
+                  customTooltip
                   {...field}
                 />
               )}
@@ -144,18 +149,16 @@ const InboundV2Create = ({
               name="dateRequested"
               control={control}
               render={({ field }) => (
-                <DateField
+                <DateFieldDateFns
                   title={{
                     id: 'react.stockMovement.dateRequested.label',
                     defaultMessage: 'Date Requested',
                   }}
                   errorMessage={errors.dateRequested?.message}
                   required
-                  onChangeRaw={(date) => {
-                    field.onChange(date.format());
-                    trigger();
-                  }}
-                  customDateFormat={DateFormat.DD_MMM_YYYY}
+                  customDateFormat={DateFormatDateFns.DD_MMM_YYYY}
+                  customTooltip
+                  triggerValidation={trigger}
                   {...field}
                 />
               )}

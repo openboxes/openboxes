@@ -5,14 +5,14 @@ import { Controller } from 'react-hook-form';
 import { RiArrowGoBackFill } from 'react-icons/ri';
 
 import Button from 'components/form-elements/Button';
-import DateField from 'components/form-elements/v2/DateField';
+import DateFieldDateFns from 'components/form-elements/v2/DateFieldDateFns';
 import SelectField from 'components/form-elements/v2/SelectField';
 import TextInput from 'components/form-elements/v2/TextInput';
 import Section from 'components/Layout/v2/Section';
 import InboundSendFormHeader
   from 'components/stock-movement-wizard/inboundV2/sections/InboundSendFormHeader';
 import requisitionStatus from 'consts/requisitionStatus';
-import { DateFormat } from 'consts/timeFormat';
+import { DateFormatDateFns } from 'consts/timeFormat';
 import useInboundSendForm from 'hooks/inboundV2/send/useInboundSendForm';
 
 const InboundSendForm = ({ previous }) => {
@@ -45,13 +45,13 @@ const InboundSendForm = ({ previous }) => {
   // button is disabled when there are form errors
   // or when the shipment status is not dispatched
   // or selected destination doesn't match current location
-  const shouldDisableRollbackButton =
-    !isValid || statusCode !== requisitionStatus.DISPATCHED || !matchesDestination;
+  const shouldDisableRollbackButton = !isValid
+    || statusCode !== requisitionStatus.DISPATCHED || !matchesDestination;
 
   // Disable navigation buttons if shipment is already dispatched
   // or selected destination doesn't match current location
-  const navigationButtonDisabled =
-    statusCode === requisitionStatus.DISPATCHED || !matchesDestination;
+  const navigationButtonDisabled = statusCode === requisitionStatus.DISPATCHED
+    || !matchesDestination;
 
   return (
     <>
@@ -82,6 +82,7 @@ const InboundSendForm = ({ previous }) => {
                       defaultMessage: 'Origin',
                     }}
                     errorMessage={errors.origin?.message}
+                    customTooltip
                     {...field}
                   />
                 )}
@@ -99,6 +100,7 @@ const InboundSendForm = ({ previous }) => {
                       defaultMessage: 'Destination',
                     }}
                     errorMessage={errors.destination?.message}
+                    customTooltip
                     {...field}
                   />
                 )}
@@ -110,18 +112,16 @@ const InboundSendForm = ({ previous }) => {
                 control={control}
                 disabled={!matchesDestination}
                 render={({ field }) => (
-                  <DateField
+                  <DateFieldDateFns
                     title={{
                       id: 'react.stockMovement.shipDate.label',
                       defaultMessage: 'Ship date',
                     }}
                     errorMessage={errors.shipDate?.message}
                     required
-                    onChangeRaw={async (date) => {
-                      field.onChange(date.format());
-                      await trigger();
-                    }}
-                    customDateFormat={DateFormat.DD_MMM_YYYY}
+                    customDateFormat={DateFormatDateFns.DD_MMM_YYYY}
+                    triggerValidation={trigger}
+                    customTooltip
                     {...field}
                   />
                 )}
@@ -146,6 +146,7 @@ const InboundSendForm = ({ previous }) => {
                       label: item.displayName,
                       value: item.id,
                     }))}
+                    customTooltip
                     {...field}
                   />
                 )}
@@ -163,6 +164,7 @@ const InboundSendForm = ({ previous }) => {
                       defaultMessage: 'Tracking Number',
                     }}
                     errorMessage={errors.trackingNumber?.message}
+                    customTooltip
                     {...field}
                   />
                 )}
@@ -180,6 +182,7 @@ const InboundSendForm = ({ previous }) => {
                       defaultMessage: 'Driver Name',
                     }}
                     errorMessage={errors.driverName?.message}
+                    customTooltip
                     {...field}
                   />
                 )}
@@ -197,6 +200,7 @@ const InboundSendForm = ({ previous }) => {
                       defaultMessage: 'Comments',
                     }}
                     errorMessage={errors.comments?.message}
+                    customTooltip
                     {...field}
                   />
                 )}
@@ -208,18 +212,16 @@ const InboundSendForm = ({ previous }) => {
                 control={control}
                 disabled={!matchesDestination}
                 render={({ field }) => (
-                  <DateField
+                  <DateFieldDateFns
                     title={{
                       id: 'react.stockMovement.expectedDeliveryDate.label',
                       defaultMessage: 'Expected Delivery Date',
                     }}
                     errorMessage={errors.expectedDeliveryDate?.message}
                     required
-                    onChangeRaw={async (date) => {
-                      field.onChange(date.format());
-                      await trigger();
-                    }}
-                    customDateFormat={DateFormat.DD_MMM_YYYY}
+                    customDateFormat={DateFormatDateFns.DD_MMM_YYYY}
+                    triggerValidation={trigger}
+                    customTooltip
                     {...field}
                   />
                 )}

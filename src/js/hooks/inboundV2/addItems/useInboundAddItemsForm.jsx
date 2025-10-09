@@ -23,7 +23,7 @@ import {
 import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
 import InboundV2Step from 'consts/InboundV2Step';
 import RequisitionStatus from 'consts/requisitionStatus';
-import { DateFormat } from 'consts/timeFormat';
+import { DateFormat, DateFormatDateFns } from 'consts/timeFormat';
 import useInboundAddItemsValidation from 'hooks/inboundV2/addItems/useInboundAddItemsValidation';
 import useQueryParams from 'hooks/useQueryParams';
 import useSpinner from 'hooks/useSpinner';
@@ -31,7 +31,7 @@ import useTranslate from 'hooks/useTranslate';
 import apiClient from 'utils/apiClient';
 import confirmationModal from 'utils/confirmationModalUtils';
 import createInboundWorkflowHeader from 'utils/createInboundWorkflowHeader';
-import dateWithoutTimeZone from 'utils/dateUtils';
+import dateWithoutTimeZone, { formatDateToString } from 'utils/dateUtils';
 
 const useInboundAddItemsForm = ({
   next,
@@ -266,6 +266,10 @@ const useInboundAddItemsForm = ({
         value: item.recipient.value || item.recipient.id,
       }
       : null,
+    expirationDate: formatDateToString({
+      date: item.expirationDate,
+      dateFormat: DateFormatDateFns.DD_MMM_YYYY,
+    }) ?? null,
   });
 
   const saveRequisitionItemsInCurrentStep = async (itemCandidatesToSave) => {
@@ -589,6 +593,7 @@ const useInboundAddItemsForm = ({
   };
 
   const fetchAddItemsPageData = async () => {
+    console.log('xd');
     if (queryParams.id) {
       const response = await apiClient.get(STOCK_MOVEMENT_BY_ID(queryParams.id));
       const {
@@ -600,7 +605,6 @@ const useInboundAddItemsForm = ({
         identifier: data.identifier,
         stockMovementId: data.id,
         lineItems: data.lineItems?.map(transformLineItem),
-
       };
       dispatch(
         updateWorkflowHeader(createInboundWorkflowHeader(data), data.displayStatus.name),

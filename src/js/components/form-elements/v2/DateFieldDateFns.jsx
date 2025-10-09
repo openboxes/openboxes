@@ -17,6 +17,7 @@ import RootPortalWrapper from 'wrappers/RootPortalWrapper';
 
 import 'components/form-elements/DateFilter/DateFilter.scss';
 import 'components/form-elements/v2/style.scss';
+import 'react-datepicker/dist/react-datepicker.css';
 
 const DateFieldDateFns = ({
   title,
@@ -36,10 +37,17 @@ const DateFieldDateFns = ({
   clearable,
   wrapperClassName,
   focusProps = {},
+  triggerValidation,
+  customTooltip,
   ...fieldProps
 }) => {
   const translate = useTranslate();
-  const onClear = () => onChange(null);
+  const onClear = async () => {
+    onChange(null);
+    if (triggerValidation) {
+      await triggerValidation();
+    }
+  };
 
   const { locale: currentLocale } = useSelector((state) => ({
     locale: getCurrentLocale(state),
@@ -79,14 +87,20 @@ const DateFieldDateFns = ({
 
   const datePickerRef = useRef(null);
 
-  const onChangeHandler = (date) => {
+  const onChangeHandler = async (date) => {
     if (!date) {
       onChange(null);
+      if (triggerValidation) {
+        await triggerValidation();
+      }
       return;
     }
 
     const formatted = format(date, getDateFormat());
     onChange(formatted);
+    if (triggerValidation) {
+      await triggerValidation();
+    }
   };
 
   const dateFnsLocale = () => {
@@ -114,6 +128,8 @@ const DateFieldDateFns = ({
       button={button}
       hideErrorMessageWrapper={hideErrorMessageWrapper}
       className={wrapperClassName}
+      customTooltip={customTooltip}
+      value={value}
     >
       <DatePicker
         {...fieldProps}
@@ -191,6 +207,8 @@ DateFieldDateFns.propTypes = {
   onChangeRaw: PropTypes.func,
   clearable: PropTypes.bool,
   wrapperClassName: PropTypes.string,
+  triggerValidation: PropTypes.func,
+  customTooltip: PropTypes.bool,
 };
 
 DateFieldDateFns.defaultProps = {
@@ -211,4 +229,6 @@ DateFieldDateFns.defaultProps = {
   focusProps: {},
   onChangeRaw: null,
   clearable: true,
+  triggerValidation: null,
+  customTooltip: false,
 };

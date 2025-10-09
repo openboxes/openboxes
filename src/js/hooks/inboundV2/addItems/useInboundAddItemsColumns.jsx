@@ -14,12 +14,12 @@ import { useSelector } from 'react-redux';
 
 import { TableCell } from 'components/DataTable';
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
-import DateField from 'components/form-elements/v2/DateField';
+import DateFieldDateFns from 'components/form-elements/v2/DateFieldDateFns';
 import SelectField from 'components/form-elements/v2/SelectField';
 import TextInput from 'components/form-elements/v2/TextInput';
 import inboundColumns from 'consts/inboundColumns';
 import StockMovementDirection from 'consts/StockMovementDirection';
-import { DateFormat } from 'consts/timeFormat';
+import { DateFormatDateFns } from 'consts/timeFormat';
 import useArrowsNavigation from 'hooks/useArrowsNavigation';
 import useTranslate from 'hooks/useTranslate';
 import { debouncePeopleFetch, debounceProductsFetch } from 'utils/option-utils';
@@ -383,7 +383,7 @@ const useInboundAddItemsColumns = ({
               name={`values.lineItems.${row.index}.expirationDate`}
               control={control}
               render={({ field }) => (
-                <DateField
+                <DateFieldDateFns
                   {...field}
                   className="input-xs"
                   hasErrors={hasErrors}
@@ -396,11 +396,9 @@ const useInboundAddItemsColumns = ({
                     rowIndex,
                     columnId,
                   }}
-                  onChangeRaw={(date) => {
-                    field.onChange(date.format());
-                    trigger(`values.lineItems.${row.index}.lotNumber`);
-                  }}
-                  customDateFormat={DateFormat.DD_MMM_YYYY}
+                  customDateFormat={DateFormatDateFns.DD_MMM_YYYY}
+                  customTooltip
+                  triggerValidation={trigger}
                 />
               )}
             />
