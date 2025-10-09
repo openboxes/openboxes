@@ -42,7 +42,7 @@ jobs:
       # running tests on PRs (see test-pull-request.yml), forks won't have access to GitHub secrets, so this step will
       # fail if we try to run it. As such, we have to skip publishing Codecov reports when running tests from forks.
       - name: Upload results to Codecov
-        if: ${{ strategy.job-index == 0 && secrets.CODECOV_TOKEN != '' && github.event.pull_request.head.repo.full_name == github.repository }}
+        if: ${{ strategy.job-index == 0 && github.event.pull_request.head.repo.full_name == github.repository }}
         uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
