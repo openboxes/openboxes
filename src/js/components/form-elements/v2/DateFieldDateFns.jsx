@@ -192,6 +192,9 @@ DateFieldDateFns.propTypes = {
   onChangeRaw: PropTypes.func,
   clearable: PropTypes.bool,
   wrapperClassName: PropTypes.string,
+  // Optional function to trigger validation for this field
+  triggerValidation: PropTypes.func,
+  customTooltip: PropTypes.bool,
 };
 
 DateFieldDateFns.defaultProps = {
@@ -212,4 +215,6 @@ DateFieldDateFns.defaultProps = {
   focusProps: {},
   onChangeRaw: null,
   clearable: true,
+  triggerValidation: null,
+  customTooltip: false,
 };
