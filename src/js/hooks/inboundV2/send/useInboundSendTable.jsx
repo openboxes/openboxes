@@ -8,7 +8,7 @@ import stockMovementApi from 'api/services/StockMovementApi';
 import { TableCell } from 'components/DataTable';
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
 import inboundColumns from 'consts/inboundColumns';
-import { DateFormat } from 'consts/timeFormat';
+import { DateFormatDateFns } from 'consts/timeFormat';
 import { OutboundWorkflowState } from 'consts/WorkflowState';
 import useQueryParams from 'hooks/useQueryParams';
 import useSpinner from 'hooks/useSpinner';
@@ -193,7 +193,7 @@ const useInboundSendTable = () => {
           customTooltip
           tooltipLabel={getValue()}
         >
-          {formatLocalizedDate(getValue(), DateFormat.DD_MMM_YYYY)}
+          {formatLocalizedDate(getValue(), DateFormatDateFns.DD_MMM_YYYY)}
         </TableCell>
       ),
       size: 100,

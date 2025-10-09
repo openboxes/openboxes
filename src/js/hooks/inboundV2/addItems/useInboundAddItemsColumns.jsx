@@ -14,12 +14,12 @@ import { useSelector } from 'react-redux';
 
 import { TableCell } from 'components/DataTable';
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
-import DateField from 'components/form-elements/v2/DateField';
+import DateFieldDateFns from 'components/form-elements/v2/DateFieldDateFns';
 import SelectField from 'components/form-elements/v2/SelectField';
 import TextInput from 'components/form-elements/v2/TextInput';
 import inboundColumns from 'consts/inboundColumns';
 import StockMovementDirection from 'consts/StockMovementDirection';
-import { DateFormat } from 'consts/timeFormat';
+import { DateFormatDateFns } from 'consts/timeFormat';
 import useArrowsNavigation from 'hooks/useArrowsNavigation';
 import useTranslate from 'hooks/useTranslate';
 import { debouncePeopleFetch, debounceProductsFetch } from 'utils/option-utils';
@@ -173,13 +173,13 @@ const useInboundAddItemsColumns = ({
           name: `values.lineItems.${row.index}.boxName`,
           control,
         });
-
+        const value = getValues(`values.lineItems.${row.index}.palletName`);
         return (
           <TableCell
             className="rt-td rt-td-xs rt-td-add-items"
-            tooltip={hasErrors}
+            customTooltip
             tooltipForm
-            tooltipLabel={hasErrors && errors[row.index].palletName.message}
+            tooltipLabel={errors?.[row.index]?.palletName?.message ?? value}
           >
             <Controller
               name={`values.lineItems.${row.index}.palletName`}
@@ -200,6 +200,7 @@ const useInboundAddItemsColumns = ({
                   onFocus={handleFocus}
                   onWheel={(event) => event.currentTarget.blur()}
                   autoComplete="off"
+                  hasErrors={hasErrors}
                 />
               )}
             />
@@ -222,12 +223,13 @@ const useInboundAddItemsColumns = ({
       ),
       cell: ({ row, column }) => {
         const hasErrors = !!errors?.[row.index]?.boxName?.message;
+        const value = getValues(`values.lineItems.${row.index}.boxName`);
         return (
           <TableCell
             className="rt-td rt-td-xs rt-td-add-items"
-            tooltip={hasErrors}
+            customTooltip
             tooltipForm
-            tooltipLabel={hasErrors && errors[row.index].boxName.message}
+            tooltipLabel={errors?.[row.index]?.boxName?.message ?? value}
           >
             <Controller
               name={`values.lineItems.${row.index}.boxName`}
@@ -272,12 +274,13 @@ const useInboundAddItemsColumns = ({
       ),
       cell: ({ row, column }) => {
         const hasErrors = !!errors?.[row.index]?.product?.message;
+        const value = getValues(`values.lineItems.${row.index}.product`);
         return (
           <TableCell
             className="rt-td rt-td-xs rt-td-add-items"
-            tooltip={getValues(`values.lineItems.${row.index}.product.label`) || hasErrors}
+            customTooltip
             tooltipForm
-            tooltipLabel={hasErrors ? errors[row.index].product.message : getValues(`values.lineItems.${row.index}.product.label`)}
+            tooltipLabel={errors?.[row.index]?.product?.message ?? value?.label}
           >
             <Controller
               name={`values.lineItems.${row.index}.product`}
@@ -323,12 +326,13 @@ const useInboundAddItemsColumns = ({
       ),
       cell: ({ row, column }) => {
         const hasErrors = !!errors?.[row.index]?.lotNumber?.message;
+        const value = getValues(`values.lineItems.${row.index}.lotNumber`);
         return (
           <TableCell
             className="rt-td rt-td-xs rt-td-add-items"
-            tooltip={hasErrors}
+            customTooltip
             tooltipForm
-            tooltipLabel={hasErrors && errors[row.index].lotNumber.message}
+            tooltipLabel={errors?.[row.index]?.lotNumber?.message ?? value}
           >
             <Controller
               name={`values.lineItems.${row.index}.lotNumber`}
@@ -372,18 +376,19 @@ const useInboundAddItemsColumns = ({
       ),
       cell: ({ row, column }) => {
         const hasErrors = !!errors?.[row.index]?.expirationDate?.message;
+        const value = getValues(`values.lineItems.${row.index}.expirationDate`);
         return (
           <TableCell
             className="rt-td rt-td-xs rt-td-add-items"
-            tooltip={hasErrors}
+            customTooltip
             tooltipForm
-            tooltipLabel={hasErrors && errors[row.index].expirationDate.message}
+            tooltipLabel={errors?.[row.index]?.expirationDate?.message ?? value}
           >
             <Controller
               name={`values.lineItems.${row.index}.expirationDate`}
               control={control}
               render={({ field }) => (
-                <DateField
+                <DateFieldDateFns
                   {...field}
                   className="input-xs"
                   hasErrors={hasErrors}
@@ -396,11 +401,9 @@ const useInboundAddItemsColumns = ({
                     rowIndex,
                     columnId,
                   }}
-                  onChangeRaw={(date) => {
-                    field.onChange(date.format());
-                    trigger(`values.lineItems.${row.index}.lotNumber`);
-                  }}
-                  customDateFormat={DateFormat.DD_MMM_YYYY}
+                  customDateFormat={DateFormatDateFns.DD_MMM_YYYY}
+                  triggerValidation={trigger}
+                  customTooltip
                 />
               )}
             />
@@ -424,12 +427,13 @@ const useInboundAddItemsColumns = ({
       ),
       cell: ({ row, column }) => {
         const hasErrors = !!errors?.[row.index]?.quantityRequested?.message;
+        const value = getValues(`values.lineItems.${row.index}.quantityRequested`);
         return (
           <TableCell
             className="rt-td rt-td-xs rt-td-add-items"
-            tooltip={hasErrors}
+            customTooltip
             tooltipForm
-            tooltipLabel={hasErrors && errors[row.index].quantityRequested.message}
+            tooltipLabel={errors?.[row.index]?.quantityRequested?.message ?? value}
           >
             <Controller
               name={`values.lineItems.${row.index}.quantityRequested`}
@@ -479,17 +483,19 @@ const useInboundAddItemsColumns = ({
             onChange={handleHeaderRecipientChange}
             value={headerRecipient}
             placeholder={translate('react.stockMovement.recipient.label', 'Recipient')}
+            customTooltip
           />
         </TableHeaderCell>
       ),
       cell: ({ row, column }) => {
         const hasErrors = !!errors?.[row.index]?.recipient?.message;
+        const value = getValues(`values.lineItems.${row.index}.recipient`);
         return (
           <TableCell
             className="rt-td rt-td-xs rt-td-add-items"
-            tooltip={hasErrors}
+            customTooltip
             tooltipForm
-            tooltipLabel={hasErrors && errors[row.index].recipient.message}
+            tooltipLabel={errors?.[row.index]?.recipient?.message ?? value?.label}
           >
             <Controller
               name={`values.lineItems.${row.index}.recipient`}

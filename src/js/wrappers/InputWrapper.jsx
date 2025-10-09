@@ -5,6 +5,7 @@ import { RiQuestionLine } from 'react-icons/ri';
 import { Tooltip } from 'react-tippy';
 
 import Translate from 'utils/Translate';
+import CustomTooltip from 'wrappers/CustomTooltip';
 
 import './style.scss';
 
@@ -19,6 +20,8 @@ const InputWrapper = ({
   inputId,
   labelPosition,
   hideErrorMessageWrapper,
+  customTooltip,
+  value,
 }) => (
   <div className={`input-wrapper-container ${className} input-wrapper-label-position-${labelPosition}`}>
     <div className="input-wrapper-title">
@@ -51,7 +54,12 @@ const InputWrapper = ({
       </div>
       )}
     </div>
-    {children}
+    <CustomTooltip
+      show={customTooltip}
+      content={value}
+    >
+      {children}
+    </CustomTooltip>
     {!hideErrorMessageWrapper && (
       <div className="input-wrapper-error-message">
         {errorMessage}
@@ -91,6 +99,10 @@ InputWrapper.propTypes = {
   // input label position
   labelPosition: PropTypes.oneOf(['top', 'bottom', 'left', 'right']),
   hideErrorMessageWrapper: PropTypes.bool,
+  // Display custom tooltip
+  customTooltip: PropTypes.bool,
+  // Value to be shown in the custom tooltip
+  value: PropTypes.string,
 };
 
 InputWrapper.defaultProps = {
@@ -103,4 +115,6 @@ InputWrapper.defaultProps = {
   inputId: undefined,
   labelPosition: 'top',
   hideErrorMessageWrapper: false,
+  customTooltip: false,
+  value: '',
 };
