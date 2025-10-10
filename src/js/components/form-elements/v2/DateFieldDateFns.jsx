@@ -12,6 +12,7 @@ import componentType from 'consts/componentType';
 import { DateFormatDateFns, TimeFormat } from 'consts/timeFormat';
 import useFocusOnMatch from 'hooks/useFocusOnMatch';
 import useTranslate from 'hooks/useTranslate';
+import { formatDateToString } from 'utils/dateUtils';
 import InputWrapper from 'wrappers/InputWrapper';
 import RootPortalWrapper from 'wrappers/RootPortalWrapper';
 
@@ -37,6 +38,7 @@ const DateFieldDateFns = ({
   clearable,
   wrapperClassName,
   focusProps = {},
+  customTooltip,
   ...fieldProps
 }) => {
   const translate = useTranslate();
@@ -115,6 +117,12 @@ const DateFieldDateFns = ({
       button={button}
       hideErrorMessageWrapper={hideErrorMessageWrapper}
       className={wrapperClassName}
+      customTooltip={customTooltip}
+      value={formatDateToString({
+        date: value,
+        dateFormat: DateFormatDateFns.DD_MMM_YYYY,
+        options: { locale: dateFnsLocale() },
+      })}
     >
       <DatePicker
         {...fieldProps}

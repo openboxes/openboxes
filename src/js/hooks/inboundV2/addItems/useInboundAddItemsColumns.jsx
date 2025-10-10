@@ -6,11 +6,18 @@ import React, {
 } from 'react';
 
 import { createColumnHelper } from '@tanstack/react-table';
+import * as locales from 'date-fns/locale';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { Controller, useController } from 'react-hook-form';
 import { RiDeleteBinLine } from 'react-icons/ri';
 import { useSelector } from 'react-redux';
+import {
+  getCurrentLocale,
+  getDebounceTime,
+  getMinSearchLength,
+  getUsers,
+} from 'selectors';
 
 import { TableCell } from 'components/DataTable';
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
@@ -22,6 +29,7 @@ import StockMovementDirection from 'consts/StockMovementDirection';
 import { DateFormatDateFns } from 'consts/timeFormat';
 import useArrowsNavigation from 'hooks/useArrowsNavigation';
 import useTranslate from 'hooks/useTranslate';
+import { formatDateToString } from 'utils/dateUtils';
 import { debouncePeopleFetch, debounceProductsFetch } from 'utils/option-utils';
 
 const useInboundAddItemsColumns = ({
@@ -58,12 +66,12 @@ const useInboundAddItemsColumns = ({
     debounceTime,
     minSearchLength,
     users,
-    locale,
+    currentLocale,
   } = useSelector((state) => ({
-    debounceTime: state.session.searchConfig.debounceTime,
-    minSearchLength: state.session.searchConfig.minSearchLength,
-    users: state.users.data,
-    locale: state.session.activeLanguage,
+    debounceTime: getDebounceTime(state),
+    minSearchLength: getMinSearchLength(state),
+    users: getUsers(state),
+    currentLocale: getCurrentLocale(state),
   }));
   const debouncedProductsFetch = useCallback(
     debounceProductsFetch(
@@ -377,7 +385,11 @@ const useInboundAddItemsColumns = ({
           <TableCell
             className="rt-td rt-td-xs rt-td-add-items"
             customTooltip
-            tooltipLabel={errors?.[row.index]?.expirationDate?.message ?? value}
+            tooltipLabel={errors?.[row.index]?.expirationDate?.message ?? formatDateToString({
+              date: value,
+              dateFormat: DateFormatDateFns.DD_MMM_YYYY,
+              options: { locale: locales[currentLocale] },
+            })}
           >
             <Controller
               name={`values.lineItems.${row.index}.expirationDate`}
@@ -401,7 +413,6 @@ const useInboundAddItemsColumns = ({
                     setValue(`values.lineItems.${row.index}.expirationDate`, newDate);
                     await trigger();
                   }}
-                  customTooltip
                 />
               )}
             />
@@ -553,7 +564,7 @@ const useInboundAddItemsColumns = ({
     debounceTime,
     minSearchLength,
     users,
-    locale,
+    currentLocale,
     headerRecipient,
     rowIndex,
     columnId,
