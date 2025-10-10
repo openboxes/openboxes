@@ -5,6 +5,7 @@ import queryString from 'query-string';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory, useLocation } from 'react-router-dom';
+import { getCurrentLocation } from 'selectors';
 
 import { fetchUsers, updateWorkflowHeader } from 'actions';
 import stockListApi from 'api/services/StockListApi';
@@ -22,7 +23,7 @@ import dateWithoutTimeZone, { formatDateToString } from 'utils/dateUtils';
 const useInboundCreateForm = ({ next }) => {
   const [stockLists, setStockLists] = useState([]);
   const { currentLocation } = useSelector((state) => ({
-    currentLocation: state.session.currentLocation,
+    currentLocation: getCurrentLocation(state),
   }));
   const spinner = useSpinner();
   const { validationSchema } = useInboundCreateValidation();
