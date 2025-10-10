@@ -152,7 +152,7 @@ const useInboundSendForm = ({ previous }) => {
         shipDate: formatDateToString({
           date: data.dateShipped,
           dateFormat: DateFormatDateFns.DD_MMM_YYYY,
-        }) ?? null,
+        }),
         shipmentType: data.shipmentType && data.shipmentType.name !== 'Default'
           ? {
             id: data.shipmentType.id,
@@ -167,7 +167,7 @@ const useInboundSendForm = ({ previous }) => {
         expectedDeliveryDate: formatDateToString({
           date: data.expectedDeliveryDate,
           dateFormat: DateFormatDateFns.DD_MMM_YYYY,
-        }) ?? null,
+        }),
         statusCode: data.statusCode ?? '',
         hasManageInventory: data.hasManageInventory ?? false,
         shipped: data.shipped ?? false,
