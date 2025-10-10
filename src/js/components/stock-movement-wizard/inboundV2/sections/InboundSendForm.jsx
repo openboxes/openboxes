@@ -42,11 +42,11 @@ const InboundSendForm = ({ previous }) => {
   // Rollback button is visible only for admins when shipment has been dispatched
   const rollbackButtonVisible = hasRoleAdmin && shipped;
 
-  // button is disabled when there are form errors
-  // or when the shipment status is not dispatched
-  // or selected destination doesn't match current location
-  const shouldDisableRollbackButton = !isValid
-    || statusCode !== requisitionStatus.DISPATCHED || !matchesDestination;
+  // Rollback is enabled only when form is valid, status is dispatched,
+  // and destination matches the current location
+  const isRollbackEnabled = isValid
+    && statusCode === requisitionStatus.DISPATCHED
+    && matchesDestination;
 
   // Disable navigation buttons if shipment is already dispatched
   // or selected destination doesn't match current location
@@ -245,7 +245,7 @@ const InboundSendForm = ({ previous }) => {
                 variant="primary-outline"
                 onClick={() => rollbackStockMovement()}
                 StartIcon={<RiArrowGoBackFill className="icon" />}
-                disabled={shouldDisableRollbackButton}
+                disabled={!isRollbackEnabled}
               />
             )}
             <Button

@@ -269,7 +269,7 @@ const useInboundAddItemsForm = ({
     expirationDate: formatDateToString({
       date: item.expirationDate,
       dateFormat: DateFormatDateFns.DD_MMM_YYYY,
-    }) ?? null,
+    }),
   });
 
   const saveRequisitionItemsInCurrentStep = async (itemCandidatesToSave) => {
