@@ -178,7 +178,6 @@ const useInboundAddItemsColumns = ({
           <TableCell
             className="rt-td rt-td-xs rt-td-add-items"
             customTooltip
-            tooltipForm
             tooltipLabel={errors?.[row.index]?.palletName?.message ?? value}
           >
             <Controller
@@ -228,7 +227,6 @@ const useInboundAddItemsColumns = ({
           <TableCell
             className="rt-td rt-td-xs rt-td-add-items"
             customTooltip
-            tooltipForm
             tooltipLabel={errors?.[row.index]?.boxName?.message ?? value}
           >
             <Controller
@@ -279,7 +277,6 @@ const useInboundAddItemsColumns = ({
           <TableCell
             className="rt-td rt-td-xs rt-td-add-items"
             customTooltip
-            tooltipForm
             tooltipLabel={errors?.[row.index]?.product?.message ?? value?.label}
           >
             <Controller
@@ -331,7 +328,6 @@ const useInboundAddItemsColumns = ({
           <TableCell
             className="rt-td rt-td-xs rt-td-add-items"
             customTooltip
-            tooltipForm
             tooltipLabel={errors?.[row.index]?.lotNumber?.message ?? value}
           >
             <Controller
@@ -381,7 +377,6 @@ const useInboundAddItemsColumns = ({
           <TableCell
             className="rt-td rt-td-xs rt-td-add-items"
             customTooltip
-            tooltipForm
             tooltipLabel={errors?.[row.index]?.expirationDate?.message ?? value}
           >
             <Controller
@@ -402,7 +397,10 @@ const useInboundAddItemsColumns = ({
                     columnId,
                   }}
                   customDateFormat={DateFormatDateFns.DD_MMM_YYYY}
-                  triggerValidation={trigger}
+                  onChange={async (newDate) => {
+                    setValue(`values.lineItems.${row.index}.expirationDate`, newDate);
+                    await trigger();
+                  }}
                   customTooltip
                 />
               )}
@@ -432,7 +430,6 @@ const useInboundAddItemsColumns = ({
           <TableCell
             className="rt-td rt-td-xs rt-td-add-items"
             customTooltip
-            tooltipForm
             tooltipLabel={errors?.[row.index]?.quantityRequested?.message ?? value}
           >
             <Controller
@@ -494,7 +491,6 @@ const useInboundAddItemsColumns = ({
           <TableCell
             className="rt-td rt-td-xs rt-td-add-items"
             customTooltip
-            tooltipForm
             tooltipLabel={errors?.[row.index]?.recipient?.message ?? value?.label}
           >
             <Controller

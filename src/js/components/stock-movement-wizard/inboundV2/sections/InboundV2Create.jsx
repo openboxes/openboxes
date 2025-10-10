@@ -19,6 +19,7 @@ const InboundV2Create = ({
   errors,
   stockLists,
   trigger,
+  setValue,
 }) => {
   const [origin, destination] = useWatch({
     name: ['origin', 'destination'],
@@ -150,6 +151,7 @@ const InboundV2Create = ({
               control={control}
               render={({ field }) => (
                 <DateFieldDateFns
+                  {...field}
                   title={{
                     id: 'react.stockMovement.dateRequested.label',
                     defaultMessage: 'Date Requested',
@@ -158,8 +160,10 @@ const InboundV2Create = ({
                   required
                   customDateFormat={DateFormatDateFns.DD_MMM_YYYY}
                   customTooltip
-                  triggerValidation={trigger}
-                  {...field}
+                  onChange={async (newDate) => {
+                    setValue('dateRequested', newDate);
+                    await trigger();
+                  }}
                 />
               )}
             />
@@ -198,4 +202,5 @@ InboundV2Create.propTypes = {
     value: PropTypes.string.isRequired,
     label: PropTypes.string.isRequired,
   })).isRequired,
+  setValue: PropTypes.func.isRequired,
 };

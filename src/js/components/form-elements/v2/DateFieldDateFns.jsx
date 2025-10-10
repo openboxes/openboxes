@@ -37,16 +37,12 @@ const DateFieldDateFns = ({
   clearable,
   wrapperClassName,
   focusProps = {},
-  triggerValidation,
   customTooltip,
   ...fieldProps
 }) => {
   const translate = useTranslate();
   const onClear = async () => {
     onChange(null);
-    if (triggerValidation) {
-      await triggerValidation();
-    }
   };
 
   const { locale: currentLocale } = useSelector((state) => ({
@@ -90,17 +86,11 @@ const DateFieldDateFns = ({
   const onChangeHandler = async (date) => {
     if (!date) {
       onChange(null);
-      if (triggerValidation) {
-        await triggerValidation();
-      }
       return;
     }
 
     const formatted = format(date, getDateFormat());
     onChange(formatted);
-    if (triggerValidation) {
-      await triggerValidation();
-    }
   };
 
   const dateFnsLocale = () => {
@@ -207,8 +197,6 @@ DateFieldDateFns.propTypes = {
   onChangeRaw: PropTypes.func,
   clearable: PropTypes.bool,
   wrapperClassName: PropTypes.string,
-  // Optional function to trigger validation for this field
-  triggerValidation: PropTypes.func,
   customTooltip: PropTypes.bool,
 };
 
@@ -230,6 +218,5 @@ DateFieldDateFns.defaultProps = {
   focusProps: {},
   onChangeRaw: null,
   clearable: true,
-  triggerValidation: null,
   customTooltip: false,
 };
