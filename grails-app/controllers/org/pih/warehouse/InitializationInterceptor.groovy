@@ -13,8 +13,6 @@ import org.springframework.beans.factory.annotation.Value
  * You must not remove this notice, or any other, from this software.
  **/
 import org.pih.warehouse.core.User
-import org.springframework.context.i18n.LocaleContextHolder
-import org.springframework.web.servlet.support.RequestContextUtils
 
 import org.pih.warehouse.core.localization.LocaleManager
 
@@ -68,14 +66,13 @@ class InitializationInterceptor {
     }
 
     void setLocale() {
+        // It might seem weird to get the current locale and then set it immediately after, but getCurrentLocale
+        // returns the user or system default locale when the session locale is not yet initialized (which it won't be
+        // at the time that auth is called). We then set that default into the session so that we don't need to lookup
+        // the defaults again next time we fetch the locale. Subsequent changes to the locale can be made via the ?lang
+        // query param (when making API requests), or via any locale-updating controller actions.
         Locale locale = localeManager.getCurrentLocale()
-
-        // We want to set the locale for grails (equivalent to passing ?lang as param)
-        // so grails' g:message "understands" current language so that is translatable with the crowdin
-        RequestContextUtils.getLocaleResolver(request).setLocale(request, response, locale)
-
-        // TODO (OBPIH-5452): If we get rid of our own logic to handle locale, this line or the RCU one might be removed
-        LocaleContextHolder.setLocale(locale)
+        localeManager.setCurrentLocale(locale)
     }
 
     void setCustomProperties() {

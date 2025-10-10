@@ -73,7 +73,15 @@ class LocaleManager {
      * @param previousLocaleToUse Overrides the previous locale to set. If null, will use the session's current locale
      */
     Locale setCurrentLocale(Locale locale, Locale previousLocaleToUse=null) {
-        sessionManager.setPreviousLocale(previousLocaleToUse ?: getCurrentLocale())
+        Locale currentLocale = sessionManager.getLocale()
+        if (locale == currentLocale) {
+            return locale
+        }
+
+        // Don't allow the previous locale to be the localization mode locale. We don't want to ever restore to it.
+        Locale previousLocale = previousLocaleToUse ?: getCurrentLocale()
+        sessionManager.setPreviousLocale(previousLocale == localizationModeLocale ? null : previousLocale)
+
         sessionManager.setLocale(locale)
         sessionManager.setIsInLocalizationMode(locale == localizationModeLocale)
 
