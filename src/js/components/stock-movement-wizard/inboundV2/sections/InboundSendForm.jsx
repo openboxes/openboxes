@@ -37,6 +37,7 @@ const InboundSendForm = ({ previous }) => {
     files,
     handleRemoveFile,
     isValid,
+    setValue,
   } = useInboundSendForm({ previous });
 
   // Rollback button is visible only for admins when shipment has been dispatched
@@ -112,6 +113,7 @@ const InboundSendForm = ({ previous }) => {
                 disabled={!matchesDestination}
                 render={({ field }) => (
                   <DateFieldDateFns
+                    {...field}
                     title={{
                       id: 'react.stockMovement.shipDate.label',
                       defaultMessage: 'Ship date',
@@ -119,9 +121,11 @@ const InboundSendForm = ({ previous }) => {
                     errorMessage={errors.shipDate?.message}
                     required
                     customDateFormat={DateFormatDateFns.DD_MMM_YYYY}
-                    triggerValidation={trigger}
                     customTooltip
-                    {...field}
+                    onChange={async (newDate) => {
+                      setValue('shipDate', newDate);
+                      await trigger();
+                    }}
                   />
                 )}
               />
@@ -212,6 +216,7 @@ const InboundSendForm = ({ previous }) => {
                 disabled={!matchesDestination}
                 render={({ field }) => (
                   <DateFieldDateFns
+                    {...field}
                     title={{
                       id: 'react.stockMovement.expectedDeliveryDate.label',
                       defaultMessage: 'Expected Delivery Date',
@@ -221,7 +226,10 @@ const InboundSendForm = ({ previous }) => {
                     customDateFormat={DateFormatDateFns.DD_MMM_YYYY}
                     triggerValidation={trigger}
                     customTooltip
-                    {...field}
+                    onChange={async (newDate) => {
+                      setValue('expectedDeliveryDate', newDate);
+                      await trigger();
+                    }}
                   />
                 )}
               />

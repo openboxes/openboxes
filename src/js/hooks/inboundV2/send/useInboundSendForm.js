@@ -81,6 +81,7 @@ const useInboundSendForm = ({ previous }) => {
     formState: { errors, isValid },
     trigger,
     reset,
+    setValue,
   } = useForm({
     mode: 'onBlur',
     defaultValues,
@@ -126,6 +127,11 @@ const useInboundSendForm = ({ previous }) => {
     };
   };
 
+  const formatDate = (date) => (formatDateToString({
+    date,
+    dateFormat: DateFormatDateFns.DD_MMM_YYYY,
+  }));
+
   const fetchStockMovementData = async () => {
     try {
       spinner.show();
@@ -149,10 +155,7 @@ const useInboundSendForm = ({ previous }) => {
             label: `${data.destination.name} [${data.destination.locationType?.description ?? ''}]`,
           }
           : null,
-        shipDate: formatDateToString({
-          date: data.dateShipped,
-          dateFormat: DateFormatDateFns.DD_MMM_YYYY,
-        }),
+        shipDate: formatDate(data.dateShipped),
         shipmentType: data.shipmentType && data.shipmentType.name !== 'Default'
           ? {
             id: data.shipmentType.id,
@@ -164,10 +167,7 @@ const useInboundSendForm = ({ previous }) => {
         trackingNumber: data.trackingNumber ?? '',
         driverName: data.driverName ?? '',
         comments: data.comments ?? '',
-        expectedDeliveryDate: formatDateToString({
-          date: data.expectedDeliveryDate,
-          dateFormat: DateFormatDateFns.DD_MMM_YYYY,
-        }),
+        expectedDeliveryDate: formatDate(data.expectedDeliveryDate),
         statusCode: data.statusCode ?? '',
         hasManageInventory: data.hasManageInventory ?? false,
         shipped: data.shipped ?? false,
@@ -412,6 +412,7 @@ const useInboundSendForm = ({ previous }) => {
     files,
     handleRemoveFile,
     isValid,
+    setValue,
   };
 };
 
