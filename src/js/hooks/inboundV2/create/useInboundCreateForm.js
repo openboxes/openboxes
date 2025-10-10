@@ -160,7 +160,7 @@ const useInboundCreateForm = ({ next }) => {
       setValue('dateRequested', formatDateToString({
         date: data.dateRequested,
         dateFormat: DateFormatDateFns.DD_MMM_YYYY,
-      }) ?? null);
+      }));
 
       // We set {} for headerStatus in the create step because we only want to display it on the
       // last step
