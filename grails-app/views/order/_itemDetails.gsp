@@ -27,7 +27,7 @@
         <input type="text" id="orderItemsDetailsFilter" class="text large" placeholder="${g.message(code: 'order.filterByProductOrSupplier.label', default: 'Filter by product name, code, or supplier code')}"/>
     </g:if>
     <g:if test="${orderInstance?.orderItems }">
-        <table class="table table-bordered" id="order-items-details">
+        <table data-testid="item-details-table" class="table table-bordered" id="order-items-details">
             <thead>
             <tr class="odd">
                 <th><warehouse:message code="product.productCode.label" /></th>
@@ -49,41 +49,41 @@
                 <g:set var="isItemCanceled" value="${orderItem.orderItemStatusCode == OrderItemStatusCode.CANCELED}"/>
                 <g:if test="${!isItemCanceled || orderInstance?.orderType==OrderType.findByCode(OrderTypeCode.PURCHASE_ORDER.name())}">
                     <tr class="order-item ${(i % 2) == 0 ? 'even' : 'odd'} dataRowItemDetails" style="${isItemCanceled ? 'background-color: #ffcccb;' : ''}">
-                        <td>
+                        <td data-testid="product-code">
                             ${orderItem?.product?.productCode?:""}
                         </td>
-                        <td class="order-item-product">
+                        <td data-testid="product-name" class="order-item-product">
                             <g:link controller="inventoryItem" action="showStockCard" params="['product.id':orderItem?.product?.id]">
                                 <format:displayName product="${orderItem?.product}" productSupplier="${orderItem?.productSupplier}" showTooltip="${true}" />
                                 <g:renderHandlingIcons product="${orderItem?.product}" />
                             </g:link>
                         </td>
                         <g:if test="${!isItemCanceled}">
-                            <td class="center">
+                            <td data-testid="supplier-code" class="center">
                                 ${orderItem?.productSupplier?.supplierCode}
                             </td>
-                            <td class="center">
+                            <td data-testid="manufacturer-name" class="center">
                                 ${orderItem?.productSupplier?.manufacturer?.name}
                             </td>
-                            <td class="center">
+                            <td data-testid="manufacturer-code" class="center">
                                 ${orderItem?.productSupplier?.manufacturerCode}
                             </td>
-                            <td class="center">
-                                ${orderItem?.quantity }
+                            <td data-testid="quantity" class="center">
+                                ${orderItem?.quantity}
                             </td>
-                            <td class="center">
+                            <td data-testid="unit-of-measure" class="center">
                                 ${orderItem?.unitOfMeasure}
                             </td>
-                            <td class="center">
+                            <td data-testid="recipient" class="center">
                                 ${orderItem?.recipient}
                             </td>
-                            <td class="center">
+                            <td data-testid="estimated-ready-date" class="center">
                                 <g:formatDate date="${orderItem?.estimatedReadyDate}" format="dd/MMM/yyyy"/>
                             </td>
-                            <td class="center">
+                            <td data-testid="actual-ready-date" class="center">
                                 <g:formatDate date="${orderItem?.actualReadyDate}" format="dd/MMM/yyyy"/>
                             </td>
-                            <td class="center">
+                            <td data-testid="budget-code" class="center">
                                 ${orderItem?.budgetCode?.code}
                             </td>
                         </g:if>
