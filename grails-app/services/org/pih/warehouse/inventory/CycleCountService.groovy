@@ -746,6 +746,10 @@ class CycleCountService {
     CycleCountDto submitCount(CycleCountSubmitCountCommand command) {
         CycleCount cycleCount = command.cycleCount
 
+        // OBPIH-7525. We need to take a snapshot of the counted products now because the refresh might remove some
+        // (if QoH has since become zero) but we still want to create a baseline transaction for all of them.
+        List<Product> countedProducts = cycleCount.products
+
         if (command.refreshQuantityOnHand) {
             CycleCountProductAvailabilityService.CycleCountItemsForRefresh refreshedItems =
                     cycleCountProductAvailabilityService.refreshProductAvailability(cycleCount)
@@ -763,7 +767,7 @@ class CycleCountService {
         cycleCount.status = cycleCount.recomputeStatus()
 
         if (cycleCount.status?.isClosed()) {
-            closeCycleCount(cycleCount, command.refreshQuantityOnHand)
+            closeCycleCount(cycleCount, countedProducts, command.refreshQuantityOnHand)
         }
 
         return CycleCountDto.toDto(cycleCount)
@@ -783,7 +787,7 @@ class CycleCountService {
      * Given a resolved cycle count, close it out by bringing it to the completion state and committing any
      * required quantity adjustments.
      */
-    private void closeCycleCount(CycleCount cycleCount, boolean refreshQuantityOnHand) {
+    private void closeCycleCount(CycleCount cycleCount, List<Product> countedProducts, boolean refreshQuantityOnHand) {
         // If the count was cancelled, there's nothing to do except also cancel the request
         if (cycleCount.status == CycleCountStatus.CANCELED) {
             cycleCount.cycleCountRequest.status = CycleCountRequestStatus.CANCELED
@@ -795,7 +799,7 @@ class CycleCountService {
         }
 
         // The count completed successfully, so commit the adjustments and close out the cycle count request.
-        cycleCountTransactionService.createTransactions(cycleCount, refreshQuantityOnHand)
+        cycleCountTransactionService.createTransactions(cycleCount, countedProducts, refreshQuantityOnHand)
         cycleCount.cycleCountRequest.status = CycleCountRequestStatus.COMPLETED
     }
 

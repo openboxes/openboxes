@@ -26,10 +26,13 @@ class CycleCountTransactionService {
      * as well as the credit/debit adjustment transaction if there are discrepancies.
      *
      * @param cycleCount the cycle count to create the transactions from
+     * @param countedProducts the products being counted (that we should create a baseline transaction for)
      * @param itemQuantityOnHandIsUpToDate true if the cycle count items already have accurate QoH (and so don't
      *                                     need to be refreshed).
      */
-    List<Transaction> createTransactions(CycleCount cycleCount, boolean itemQuantityOnHandIsUpToDate=false) {
+    List<Transaction> createTransactions(CycleCount cycleCount,
+                                         List<Product> countedProducts,
+                                         boolean itemQuantityOnHandIsUpToDate=false) {
         List<Transaction> transactions = []
 
         // Set the product inventory transaction date to be one second before any adjustment transactions. This
@@ -40,7 +43,7 @@ class CycleCountTransactionService {
         Date adjustmentTransactionDate = DateUtil.asDate(now)
 
         List<Transaction> productInventoryTransactions = createProductInventoryTransactions(
-                cycleCount, productInventoryTransactionDate)
+                cycleCount, countedProducts, productInventoryTransactionDate)
         transactions.addAll(productInventoryTransactions)
 
         Transaction adjustmentTransaction = createAdjustmentTransaction(
@@ -131,7 +134,9 @@ class CycleCountTransactionService {
         return transaction
     }
 
-    private List<Transaction> createProductInventoryTransactions(CycleCount cycleCount, Date transactionDate) {
+    private List<Transaction> createProductInventoryTransactions(CycleCount cycleCount,
+                                                                 List<Product> countedProducts,
+                                                                 Date transactionDate) {
         List<Transaction> transactions = []
         Map<AvailableItemKey, String> commentsPerCycleCountItem = new HashMap<>()
         cycleCount.cycleCountItems.each {
@@ -142,7 +147,13 @@ class CycleCountTransactionService {
             }
         }
         // A cycle count can count multiple products. Each product needs their own product inventory transaction.
-        for (Product product : cycleCount.products) {
+        // We don't loop cycleCount.products because the refresh that happens before a count is submitted will remove
+        // all cycle count items that have since had their QoH set to 0 (which can happen if transactions occur on
+        // a product while its still being counted). If that happens to all items of a product, the cycle count no
+        // longer holds an association to that product (cycle count item holds the relationship to  product). We still
+        // want to create a baseline for those products (to record that a count happened), hence the need to loop on
+        // the original list of counted products.
+        for (Product product : countedProducts) {
             // Creates a "snapshot style" product inventory transaction. We do this because we want any changes in
             // quantity to be represented by a separate adjustment transaction. It's important to note that the quantity
             // values for this transaction will be a pure copy of QoH in product availability, NOT the quantityOnHand of
