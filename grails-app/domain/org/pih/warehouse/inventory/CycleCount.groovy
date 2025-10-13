@@ -1,7 +1,5 @@
 package org.pih.warehouse.inventory
 
-import java.time.Instant
-
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
@@ -13,13 +11,13 @@ class CycleCount {
 
     Location facility
 
-    Instant dateLastRefreshed
+    Date dateLastRefreshed
 
     CycleCountStatus status
 
-    Instant dateCreated
+    Date dateCreated
 
-    Instant lastUpdated
+    Date lastUpdated
 
     User createdBy
 

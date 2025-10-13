@@ -22,7 +22,7 @@ class CycleCountCandidateFilterCommand extends PaginationCommand implements Vali
 
     List<String> internalLocations
 
-    LocalDate dateLastCount
+    Date dateLastCount
 
     List<Tag> tags
 

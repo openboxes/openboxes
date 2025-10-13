@@ -1,5 +1,6 @@
 package org.pih.warehouse.inventory
 
+import grails.converters.JSON
 import grails.gorm.PagedResultList
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
@@ -11,18 +12,18 @@ import org.grails.datastore.mapping.query.api.Criteria
 import org.hibernate.ObjectNotFoundException
 import org.hibernate.criterion.Order
 import org.hibernate.sql.JoinType
-import org.springframework.beans.factory.annotation.Autowired
-
+import org.pih.warehouse.DateUtil
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
-import org.pih.warehouse.core.date.DateFormatterManager
 import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.product.Product
 import org.hibernate.criterion.CriteriaSpecification
 import org.pih.warehouse.report.CycleCountReportCommand
+
+import java.time.LocalDate
 
 @Transactional
 class CycleCountService {
@@ -34,9 +35,6 @@ class CycleCountService {
 
     CycleCountTransactionService cycleCountTransactionService
     CycleCountProductAvailabilityService cycleCountProductAvailabilityService
-
-    @Autowired
-    DateFormatterManager dateFormatter
 
     List<CycleCountCandidate> getCandidates(CycleCountCandidateFilterCommand command, String facilityId) {
         if (command.hasErrors()) {
@@ -394,7 +392,7 @@ class CycleCountService {
                     StringEscapeUtils.escapeCsv(candidate?.abcClass),
                     StringEscapeUtils.escapeCsv(candidate?.internalLocations ?: ""),
                     StringEscapeUtils.escapeCsv(candidate?.product?.tags?.tag?.join(", ")),
-                    dateFormatter.formatForExport(candidate?.dateLastCount),
+                    candidate?.dateLastCount?.format(Constants.EUROPEAN_DATE_FORMAT) ?: "",
                     candidate?.quantityOnHand ?: 0,
             )
         }
@@ -418,7 +416,8 @@ class CycleCountService {
                         "Quantity Counted": item.quantityCounted != null ? item.quantityCounted : "",
                         "Comment": item.comment ?: "",
                         "User Counted": item.assignee?.name ?: "",
-                        "Date Counted": dateFormatter.formatForExport(item.dateCounted),
+                        "Date Counted": item.dateCounted
+                                ? Constants.MONTH_DAY_YEAR_DATE_FORMATTER.format(item.dateCounted) : "",
                 ]
             }
         }
@@ -492,14 +491,16 @@ class CycleCountService {
                 "Quantity Counted": countItem?.quantityCounted != null ? countItem.quantityCounted : "",
                 "Difference": countItem?.quantityVariance ?: "",
                 "Counted by": countItem?.assignee ?: "",
-                "Date Counted": dateFormatter.formatForExport(countItem?.dateCounted),
+                "Date Counted": countItem?.dateCounted
+                        ? Constants.MONTH_DAY_YEAR_DATE_FORMATTER.format(countItem.dateCounted) : "",
 
                 // Recount-specific fields
                 "Quantity Recounted": recountItem.quantityCounted != null ? recountItem.quantityCounted : "",
                 "Root Cause": recountItem.discrepancyReasonCode ?: "",
                 "Comment": recountItem.comment ?: "",
                 "Recounted By": recountItem.assignee ?: "",
-                "Date Recounted": dateFormatter.formatForExport(recountItem.dateCounted),
+                "Date Recounted": recountItem.dateCounted
+                        ? Constants.MONTH_DAY_YEAR_DATE_FORMATTER.format(recountItem.dateCounted) : "",
         ]
     }
 
