@@ -16,7 +16,7 @@ class RefreshInventoryCountEvent extends ApplicationEvent {
         this.productIds = source.associatedProducts
         this.transactionDate = source.transactionDate
         this.transactionId = source.id
-        this.transactionTypeId = source.transactionType.id
+        this.transactionTypeId = source.transactionType?.id
     }
 
     RefreshInventoryCountEvent(Transaction source, boolean isDelete) {

@@ -23,15 +23,15 @@ class RefreshInventoryTransactionsSummaryEvent extends ApplicationEvent {
         super(source)
         transactionId = source.id
         entriesByProduct = source.transactionEntries?.groupBy { it.inventoryItem?.product }
-        inventoryId = source.inventory.id
-        transactionTypeId = source.transactionType.id
+        inventoryId = source.inventory?.id
+        transactionTypeId = source.transactionType?.id
         transactionDate = source.transactionDate
     }
 
     RefreshInventoryTransactionsSummaryEvent(Transaction source, boolean isDelete) {
         super(source)
         transactionId = source.id
-        transactionTypeId = source.transactionType.id
+        transactionTypeId = source.transactionType?.id
         this.isDelete = isDelete
     }
 }
