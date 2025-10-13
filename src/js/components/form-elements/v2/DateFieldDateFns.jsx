@@ -42,9 +42,7 @@ const DateFieldDateFns = ({
   ...fieldProps
 }) => {
   const translate = useTranslate();
-  const onClear = async () => {
-    onChange(null);
-  };
+  const onClear = () => onChange(null);
 
   const { locale: currentLocale } = useSelector((state) => ({
     locale: getCurrentLocale(state),
@@ -84,7 +82,7 @@ const DateFieldDateFns = ({
 
   const datePickerRef = useRef(null);
 
-  const onChangeHandler = async (date) => {
+  const onChangeHandler = (date) => {
     if (!date) {
       onChange(null);
       return;
