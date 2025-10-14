@@ -1,4 +1,4 @@
-import trimLotNumberSpaces from 'utils/cycleCountUtils';
+import { trimLotNumberSpaces } from 'utils/cycleCountUtils';
 
 describe('trimLotNumberSpaces', () => {
   const mockCycleCountItem = {
