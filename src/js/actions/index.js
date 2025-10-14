@@ -3,6 +3,7 @@ import _ from 'lodash';
 import { addTranslationForLanguage } from 'react-localize-redux';
 
 import {
+  ADD_EMPTY_ROW,
   ADD_INFO_BAR,
   ADD_STOCK_MOVEMENT_DRAFT,
   CHANGE_CURRENT_LOCALE,
@@ -14,7 +15,7 @@ import {
   FETCH_BIN_LOCATIONS,
   FETCH_BUYERS,
   FETCH_CONFIG,
-  FETCH_CONFIG_AND_SET_ACTIVE,
+  FETCH_CONFIG_AND_SET_ACTIVE, FETCH_CYCLE_COUNTS,
   FETCH_GRAPHS,
   FETCH_INVOICE_STATUSES,
   FETCH_INVOICE_TYPE_CODES,
@@ -41,14 +42,14 @@ import {
   HIDE_INFO_BAR_MODAL,
   HIDE_SPINNER,
   REBUILD_FILTER_FORM_PARAMS,
-  REMOVE_FROM_INDICATORS,
+  REMOVE_FROM_INDICATORS, REMOVE_ROW,
   REMOVE_STOCK_MOVEMENT_DRAFT,
   REORDER_INDICATORS,
   RESET_INDICATORS,
   SET_ACTIVE_CONFIG,
   SET_OFFLINE,
   SET_ONLINE,
-  SET_SCROLL_TO_BOTTOM,
+  SET_SCROLL_TO_BOTTOM, SET_UPDATED,
   SHOW_INFO_BAR,
   SHOW_INFO_BAR_MODAL,
   SHOW_SPINNER,
@@ -56,7 +57,7 @@ import {
   START_FETCHING_TRANSLATIONS,
   START_RESOLUTION,
   TOGGLE_USER_ACTION_MENU,
-  TRANSLATIONS_FETCHED,
+  TRANSLATIONS_FETCHED, UPDATE_COUNTED_BY, UPDATE_DATE_COUNTED,
 } from 'actions/types';
 import cycleCountApi from 'api/services/CycleCountApi';
 import genericApi from 'api/services/GenericApi';
@@ -816,5 +817,72 @@ export const fetchLotNumbersByProductIds = (productIds) => async (dispatch) => {
   dispatch({
     type: FETCH_LOT_NUMBERS_BY_PRODUCT_IDS,
     payload: lotNumbersWithExpiration,
+  });
+};
+
+export const fetchCycleCounts = (
+  cycleCountIds,
+  currentLocationId,
+  sortByProductName,
+) => async (dispatch) => {
+  dispatch(showSpinner());
+  const cycleCounts = await cycleCountApi.getCycleCounts(
+    currentLocationId,
+    cycleCountIds,
+    sortByProductName && 'productName',
+  );
+  dispatch({
+    type: FETCH_CYCLE_COUNTS,
+    payload: cycleCounts?.data?.data,
+  });
+  dispatch(hideSpinner());
+};
+
+export const updateDateCounted = (cycleCountId, dateCounted) => (dispatch) => {
+  dispatch({
+    type: UPDATE_DATE_COUNTED,
+    payload: {
+      id: cycleCountId,
+      dateCounted,
+    },
+  });
+};
+
+export const updateCountedBy = (cycleCountId, countedBy) => (dispatch) => {
+  dispatch({
+    type: UPDATE_COUNTED_BY,
+    payload: {
+      id: cycleCountId,
+      countedBy,
+    },
+  });
+};
+
+export const addEmptyRow = (cycleCountId) => (dispatch) => {
+  dispatch({
+    type: ADD_EMPTY_ROW,
+    payload: {
+      id: cycleCountId,
+    },
+  });
+};
+
+export const removeRow = (cycleCountId, rowId) => (dispatch) => {
+  dispatch({
+    type: REMOVE_ROW,
+    payload: {
+      id: cycleCountId,
+      rowId,
+    },
+  });
+};
+
+export const setUpdated = (cycleCountId, updated) => (dispatch) => {
+  dispatch({
+    type: SET_UPDATED,
+    payload: {
+      id: cycleCountId,
+      updated,
+    },
   });
 };
