@@ -31,7 +31,6 @@ defaults.scale.ticks.beginAtZero = true;
 
 // TODO: OBPIH-4385 Refactor/Split this file into separate components
 
-// eslint-disable-next-line no-shadow
 const SortableCards = SortableContainer(({
   data, loadIndicator, allLocations, personalDashboardActive,
 }) => (
