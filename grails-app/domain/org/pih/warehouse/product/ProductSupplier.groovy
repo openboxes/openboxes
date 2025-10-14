@@ -10,11 +10,15 @@
 package org.pih.warehouse.product
 
 import grails.databinding.BindUsing
+
+import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.ProductPrice
 import org.pih.warehouse.core.RatingTypeCode
 
 import java.math.RoundingMode
+
+import org.pih.warehouse.core.User
 
 class ProductSupplier implements Serializable, Comparable<ProductSupplier> {
 
@@ -68,6 +72,8 @@ class ProductSupplier implements Serializable, Comparable<ProductSupplier> {
     // Auditing fields
     Date dateCreated
     Date lastUpdated
+    User createdBy
+    User updatedBy
 
     @BindUsing({ productSupplier, source -> source["active"] != null ? source["active"] : true })
     Boolean active = Boolean.TRUE
@@ -81,6 +87,15 @@ class ProductSupplier implements Serializable, Comparable<ProductSupplier> {
 
     static mapping = {
         description type: 'text'
+    }
+
+    def beforeInsert() {
+        createdBy = AuthService.currentUser
+        updatedBy = AuthService.currentUser
+    }
+
+    def beforeUpdate() {
+        updatedBy = AuthService.currentUser
     }
 
     static constraints = {
@@ -110,6 +125,10 @@ class ProductSupplier implements Serializable, Comparable<ProductSupplier> {
 
         contractPrice(nullable: true)
         active(nullable: true)
+
+        // These are nullable to support pre-existing data from before the columns were added.
+        createdBy(nullable: true)
+        updatedBy(nullable: true)
     }
 
     ProductPackage getDefaultProductPackageDerived() {
@@ -231,6 +250,8 @@ class ProductSupplier implements Serializable, Comparable<ProductSupplier> {
             unitPrice: unitPrice,
             dateCreated: dateCreated,
             lastUpdated: lastUpdated,
+            createdBy: createdBy,
+            updatedBy: updatedBy,
             active: active,
             ratingTypeCode: ratingTypeCode?.name,
             manufacturer: manufacturer ? [

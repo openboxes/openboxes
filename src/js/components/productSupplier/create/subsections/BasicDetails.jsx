@@ -150,7 +150,7 @@ const BasicDetails = ({ control, errors }) => {
             )}
           />
         </div>
-        <div className="col-lg-4 col-md-6 px-2 pt-2">
+        <div className="col-lg-2 col-md-3 px-2 pt-2">
           <Controller
             name="basicDetails.dateCreated"
             control={control}
@@ -164,7 +164,21 @@ const BasicDetails = ({ control, errors }) => {
             )}
           />
         </div>
-        <div className="col-lg-4 col-md-6 px-2 pt-2">
+        <div className="col-lg-2 col-md-3 px-2 pt-2">
+          <Controller
+            name="basicDetails.createdBy.name"
+            control={control}
+            disabled
+            render={({ field }) => (
+              <TextInput
+                {...field}
+                title={{ id: 'react.productSupplier.form.createdBy.title', defaultMessage: 'Created By' }}
+                errorMessage={errors.createdBy?.message}
+              />
+            )}
+          />
+        </div>
+        <div className="col-lg-2 col-md-3 px-2 pt-2">
           <Controller
             name="basicDetails.lastUpdated"
             control={control}
@@ -174,6 +188,20 @@ const BasicDetails = ({ control, errors }) => {
                 errorMessage={errors.lastUpdated?.message}
                 {...field}
                 disabled
+              />
+            )}
+          />
+        </div>
+        <div className="col-lg-2 col-md-3 px-2 pt-2">
+          <Controller
+            name="basicDetails.updatedBy.name"
+            control={control}
+            disabled
+            render={({ field }) => (
+              <TextInput
+                {...field}
+                title={{ id: 'react.productSupplier.form.updatedBy.title', defaultMessage: 'Last Updated By' }}
+                errorMessage={errors.updatedBy?.message}
               />
             )}
           />
@@ -217,6 +245,8 @@ export const basicDetailsFormErrors = PropTypes.shape({
   active: FormErrorPropType,
   dateCreated: FormErrorPropType,
   lastUpdated: FormErrorPropType,
+  createdBy: FormErrorPropType,
+  updatedBy: FormErrorPropType,
 });
 
 BasicDetails.propTypes = {
