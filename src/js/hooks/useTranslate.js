@@ -1,18 +1,10 @@
-import { getTranslate } from 'react-localize-redux';
 import { useSelector } from 'react-redux';
-
-import { translateWithDefaultMessage } from 'utils/Translate';
+import { getAppTranslate } from 'selectors';
 
 /**
  * Custom hook for accessing the translation function.
  * @returns {TranslationCallback} The translation function.
  */
-const useTranslate = () => {
-  const { translate } = useSelector((state) => ({
-    translate: translateWithDefaultMessage(getTranslate(state.localize)),
-  }));
-
-  return translate;
-};
+const useTranslate = () => useSelector(getAppTranslate);
 
 export default useTranslate;
