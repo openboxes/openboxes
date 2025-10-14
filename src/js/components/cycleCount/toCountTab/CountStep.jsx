@@ -1,13 +1,10 @@
-import React, { useRef } from 'react';
+import React, { useMemo, useRef } from 'react';
 
-import { useWindowVirtualizer } from '@tanstack/react-virtual';
 import _ from 'lodash';
-import { useSelector } from 'react-redux';
-import { getCurrentLocation } from 'selectors';
 
 import ConfirmStepHeader from 'components/cycleCount/ConfirmStepHeader';
 import CountStepHeader from 'components/cycleCount/toCountTab/CountStepHeader';
-import CountStepTable from 'components/cycleCount/toCountTab/CountStepTable';
+import VirtualizedTablesList from 'components/cycleCount/toCountTab/VirtualizedTablesList';
 import { TO_COUNT_TAB } from 'consts/cycleCount';
 import useCountStep from 'hooks/cycleCount/useCountStep';
 import PageWrapper from 'wrappers/PageWrapper';
@@ -16,29 +13,13 @@ import 'components/cycleCount/cycleCount.scss';
 
 const CountStep = () => {
   const {
-    currentLocation,
-  } = useSelector((state) => ({
-    currentLocation: getCurrentLocation(state),
-  }));
-  const initialCurrentLocation = useRef(currentLocation?.id);
-  const isFormDisabled = !_.isEqual(currentLocation?.id, initialCurrentLocation.current);
-  const {
-    tableData,
+    currentLocationId,
+    cycleCountIds,
     printCountForm,
     next,
     resolveDiscrepancies,
     back,
-    tableMeta,
-    addEmptyRow,
-    removeRow,
-    assignCountedBy,
-    getCountedDate,
-    updateDateCounted,
-    validationErrors,
     isStepEditable,
-    getCountedBy,
-    getDefaultCountedBy,
-    triggerValidation,
     isSaveDisabled,
     setIsSaveDisabled,
     validateExistenceOfCycleCounts,
@@ -49,16 +30,12 @@ const CountStep = () => {
     isAssignCountModalOpen,
     closeAssignCountModal,
     assignCountModalData,
-    forceRerender,
     handleCountStepHeaderSave,
   } = useCountStep();
 
-  const tableVirtualizer = useWindowVirtualizer({
-    count: tableData.length,
-    // table with ~ 5 rows, average size of the count table
-    estimateSize: () => 518,
-    overscan: 10,
-  });
+  const initialCurrentLocation = useRef(currentLocationId);
+  const isFormDisabled = useMemo(() =>
+    !_.isEqual(currentLocationId, initialCurrentLocation.current), [currentLocationId]);
 
   return (
     <PageWrapper>
@@ -85,56 +62,14 @@ const CountStep = () => {
           redirectDefaultMessage="Back to Cycle Count List"
         />
       )}
-      <div
-        style={{
-          height: `${tableVirtualizer.getTotalSize()}px`,
-          position: 'relative',
-        }}
-      >
-        {tableVirtualizer.getVirtualItems()
-          .map((virtualRow) => {
-            const {
-              cycleCountItems,
-              id,
-            } = tableData[virtualRow.index];
-
-            return (
-              <div
-                key={id}
-                data-index={virtualRow.index}
-                ref={tableVirtualizer.measureElement}
-                style={{
-                  position: 'absolute',
-                  top: 0,
-                  transform: `translateY(${virtualRow.start}px)`,
-                  width: '100%',
-                }}
-              >
-                <CountStepTable
-                  id={id}
-                  product={cycleCountItems[0]?.product}
-                  dateCounted={getCountedDate(id)}
-                  tableData={cycleCountItems}
-                  tableMeta={tableMeta}
-                  addEmptyRow={addEmptyRow}
-                  removeRow={removeRow}
-                  updateDateCounted={updateDateCounted(id)}
-                  assignCountedBy={assignCountedBy}
-                  validationErrors={validationErrors}
-                  isStepEditable={isStepEditable}
-                  countedBy={getCountedBy(id)}
-                  defaultCountedBy={getDefaultCountedBy(id)}
-                  triggerValidation={triggerValidation}
-                  isFormDisabled={isFormDisabled}
-                  isAssignCountModalOpen={isAssignCountModalOpen}
-                  closeAssignCountModal={closeAssignCountModal}
-                  assignCountModalData={assignCountModalData}
-                  forceRerender={forceRerender}
-                />
-              </div>
-            );
-          })}
-      </div>
+      <VirtualizedTablesList
+        cycleCountIds={cycleCountIds}
+        isStepEditable={isStepEditable}
+        isFormDisabled={isFormDisabled}
+        isAssignCountModalOpen={isAssignCountModalOpen}
+        closeAssignCountModal={closeAssignCountModal}
+        assignCountModalData={assignCountModalData}
+      />
     </PageWrapper>
   );
 };
