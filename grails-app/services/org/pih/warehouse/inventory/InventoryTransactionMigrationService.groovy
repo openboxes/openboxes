@@ -5,8 +5,7 @@ import grails.gorm.transactions.Transactional
 import org.pih.warehouse.importer.ImportDataCommand
 
 /**
- * Responsible for managing product inventory transactions for the old product inventory transaction migration
- * to the new Inventory Baseline and Adjustment pair
+ * Responsible for creating baseline transactions when migrating old INVENTORY transactions.
  */
 @Transactional
 class InventoryTransactionMigrationService extends ProductInventoryTransactionService<ImportDataCommand> {
