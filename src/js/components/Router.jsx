@@ -1,14 +1,18 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 
-import PropTypes from 'prop-types';
 import queryString from 'query-string';
 import Loadable from 'react-loadable';
-import { connect } from 'react-redux';
+import { useSelector } from 'react-redux';
 import {
   BrowserRouter, Redirect, Route, Switch,
 } from 'react-router-dom';
 import Alert from 'react-s-alert';
 import { ClimbingBoxLoader } from 'react-spinners';
+import {
+  getCurrentLocationSupportedActivities,
+  getNotificationAutohideDelay,
+  getSpinner,
+} from 'selectors';
 
 import CustomAlert from 'components/dashboard/CustomAlert';
 import MainLayoutRoute from 'components/Layout/MainLayoutRoute';
@@ -227,12 +231,18 @@ const AsyncStockTransferList = Loadable({
   loading: Loading,
 });
 
-const Router = (props) => {
+const Router = () => {
   useConnectionListener();
 
-  const Dashboard = !props.supportedActivities.includes('MANAGE_INVENTORY') && props.supportedActivities.includes('SUBMIT_REQUEST')
-    ? AsyncStockRequestDashboard
-    : AsyncDashboard;
+  const spinner = useSelector(getSpinner);
+  const supportedActivities = useSelector(getCurrentLocationSupportedActivities);
+  const notificationAutohideDelay = useSelector(getNotificationAutohideDelay);
+
+  const Dashboard = useMemo(
+    () => (!supportedActivities?.includes('MANAGE_INVENTORY') && supportedActivities?.includes('SUBMIT_REQUEST')
+      ? AsyncStockRequestDashboard
+      : AsyncDashboard), [supportedActivities],
+  );
 
   return (
     <div>
@@ -286,12 +296,12 @@ const Router = (props) => {
       <div className="spinner-container">
         <ClimbingBoxLoader
           color="#0c769e"
-          loading={props.spinner}
-          style={{ top: '40%', lefft: '50%' }}
+          loading={spinner}
+          style={{ top: '40%', left: '50%' }}
         />
       </div>
       <Alert
-        timeout={props.notificationAutohideDelay}
+        timeout={notificationAutohideDelay}
         stack={{ limit: 3 }}
         contentTemplate={CustomAlert}
         position="top-right"
@@ -302,16 +312,4 @@ const Router = (props) => {
   );
 };
 
-const mapStateToProps = (state) => ({
-  spinner: state.spinner.show,
-  supportedActivities: state.session.supportedActivities,
-  notificationAutohideDelay: state.session.notificationAutohideDelay,
-});
-
-export default connect(mapStateToProps, {})(Router);
-
-Router.propTypes = {
-  spinner: PropTypes.bool.isRequired,
-  supportedActivities: PropTypes.arrayOf(PropTypes.string).isRequired,
-  notificationAutohideDelay: PropTypes.number.isRequired,
-};
+export default Router;
