@@ -41,7 +41,6 @@ const useInboundAddItemsColumns = ({
   setValue,
   removeItem,
   updateTotalCount,
-  currentLineItems,
   append,
   refreshFocusCounter,
 }) => {
@@ -61,6 +60,8 @@ const useInboundAddItemsColumns = ({
 
   const columnHelper = createColumnHelper();
   const translate = useTranslate();
+
+  const currentLineItems = getValues('currentLineItems');
 
   const {
     debounceTime,
@@ -176,7 +177,7 @@ const useInboundAddItemsColumns = ({
         </TableHeaderCell>
       ),
       cell: ({ row, column }) => {
-        const hasErrors = !!errors?.[row.index]?.palletName?.message;
+        const hasErrors = !!errors?.values?.lineItems?.[row.index]?.palletName?.message;
         const { field: boxNameField } = useController({
           name: `values.lineItems.${row.index}.boxName`,
           control,
@@ -186,7 +187,7 @@ const useInboundAddItemsColumns = ({
           <TableCell
             className="rt-td rt-td-xs rt-td-add-items"
             customTooltip
-            tooltipLabel={errors?.[row.index]?.palletName?.message ?? value}
+            tooltipLabel={errors?.values?.lineItems?.[row.index]?.palletName?.message ?? value}
           >
             <Controller
               name={`values.lineItems.${row.index}.palletName`}
@@ -229,13 +230,13 @@ const useInboundAddItemsColumns = ({
         </TableHeaderCell>
       ),
       cell: ({ row, column }) => {
-        const hasErrors = !!errors?.[row.index]?.boxName?.message;
+        const hasErrors = !!errors?.values?.lineItems?.[row.index]?.boxName?.message;
         const value = getValues(`values.lineItems.${row.index}.boxName`);
         return (
           <TableCell
             className="rt-td rt-td-xs rt-td-add-items"
             customTooltip
-            tooltipLabel={errors?.[row.index]?.boxName?.message ?? value}
+            tooltipLabel={errors?.values?.lineItems?.[row.index]?.boxName?.message ?? value}
           >
             <Controller
               name={`values.lineItems.${row.index}.boxName`}
@@ -279,13 +280,13 @@ const useInboundAddItemsColumns = ({
         </TableHeaderCell>
       ),
       cell: ({ row, column }) => {
-        const hasErrors = !!errors?.[row.index]?.product?.message;
+        const hasErrors = !!errors?.values?.lineItems?.[row.index]?.product?.message;
         const value = getValues(`values.lineItems.${row.index}.product`);
         return (
           <TableCell
             className="rt-td rt-td-xs rt-td-add-items"
             customTooltip
-            tooltipLabel={errors?.[row.index]?.product?.message ?? value?.label}
+            tooltipLabel={errors?.values?.lineItems?.[row.index]?.product?.message ?? value?.label}
           >
             <Controller
               name={`values.lineItems.${row.index}.product`}
@@ -309,6 +310,12 @@ const useInboundAddItemsColumns = ({
                     columnId,
                   }}
                   hasErrors={hasErrors}
+                  productSelect
+                  // When using ProductSelect instead of Select, ProductSelect sets
+                  // showValueTooltip to true by default. This causes the old tooltip
+                  // to appear, which we don't want because we're using the new tooltip.
+                  // Therefore, we need to explicitly set it to false here.
+                  showValueTooltip={false}
                 />
               )}
             />
@@ -330,13 +337,13 @@ const useInboundAddItemsColumns = ({
         </TableHeaderCell>
       ),
       cell: ({ row, column }) => {
-        const hasErrors = !!errors?.[row.index]?.lotNumber?.message;
+        const hasErrors = !!errors?.values?.lineItems?.[row.index]?.lotNumber?.message;
         const value = getValues(`values.lineItems.${row.index}.lotNumber`);
         return (
           <TableCell
             className="rt-td rt-td-xs rt-td-add-items"
             customTooltip
-            tooltipLabel={errors?.[row.index]?.lotNumber?.message ?? value}
+            tooltipLabel={errors?.values?.lineItems?.[row.index]?.lotNumber?.message ?? value}
           >
             <Controller
               name={`values.lineItems.${row.index}.lotNumber`}
@@ -379,17 +386,18 @@ const useInboundAddItemsColumns = ({
         </TableHeaderCell>
       ),
       cell: ({ row, column }) => {
-        const hasErrors = !!errors?.[row.index]?.expirationDate?.message;
+        const hasErrors = !!errors?.values?.lineItems?.[row.index]?.expirationDate?.message;
         const value = getValues(`values.lineItems.${row.index}.expirationDate`);
         return (
           <TableCell
             className="rt-td rt-td-xs rt-td-add-items"
             customTooltip
-            tooltipLabel={errors?.[row.index]?.expirationDate?.message ?? formatDateToString({
-              date: value,
-              dateFormat: DateFormatDateFns.DD_MMM_YYYY,
-              options: { locale: locales[currentLocale] },
-            })}
+            tooltipLabel={errors?.values?.lineItems?.[row.index]?.expirationDate?.message
+              ?? formatDateToString({
+                date: value,
+                dateFormat: DateFormatDateFns.DD_MMM_YYYY,
+                options: { locale: locales[currentLocale] },
+              })}
           >
             <Controller
               name={`values.lineItems.${row.index}.expirationDate`}
@@ -435,13 +443,14 @@ const useInboundAddItemsColumns = ({
         </TableHeaderCell>
       ),
       cell: ({ row, column }) => {
-        const hasErrors = !!errors?.[row.index]?.quantityRequested?.message;
+        const hasErrors = !!errors?.values?.lineItems?.[row.index]?.quantityRequested?.message;
         const value = getValues(`values.lineItems.${row.index}.quantityRequested`);
         return (
           <TableCell
             className="rt-td rt-td-xs rt-td-add-items"
             customTooltip
-            tooltipLabel={errors?.[row.index]?.quantityRequested?.message ?? value}
+            tooltipLabel={errors?.values?.lineItems?.[row.index]?.quantityRequested?.message
+              ?? value}
           >
             <Controller
               name={`values.lineItems.${row.index}.quantityRequested`}
@@ -496,13 +505,14 @@ const useInboundAddItemsColumns = ({
         </TableHeaderCell>
       ),
       cell: ({ row, column }) => {
-        const hasErrors = !!errors?.[row.index]?.recipient?.message;
+        const hasErrors = !!errors?.values?.lineItems?.[row.index]?.recipient?.message;
         const value = getValues(`values.lineItems.${row.index}.recipient`);
         return (
           <TableCell
             className="rt-td rt-td-xs rt-td-add-items"
             customTooltip
-            tooltipLabel={errors?.[row.index]?.recipient?.message ?? value?.label}
+            tooltipLabel={errors?.values?.lineItems?.[row.index]?.recipient?.message
+              ?? value?.label}
           >
             <Controller
               name={`values.lineItems.${row.index}.recipient`}
@@ -584,8 +594,5 @@ useInboundAddItemsColumns.propTypes = {
   setValue: PropTypes.func.isRequired,
   removeItem: PropTypes.func.isRequired,
   updateTotalCount: PropTypes.func.isRequired,
-  currentLineItems: PropTypes.arrayOf(
-    PropTypes.shape({}),
-  ).isRequired,
   append: PropTypes.func.isRequired,
 };

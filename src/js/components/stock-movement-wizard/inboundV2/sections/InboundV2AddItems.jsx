@@ -1,7 +1,7 @@
 import React from 'react';
 
 import PropTypes from 'prop-types';
-import { useFieldArray, useWatch } from 'react-hook-form';
+import { useFieldArray } from 'react-hook-form';
 import {
   RiAddLine,
   RiCloseCircleLine,
@@ -16,29 +16,35 @@ import DataTable from 'components/DataTable/v2/DataTable';
 import Button from 'components/form-elements/Button';
 import Section from 'components/Layout/v2/Section';
 import useInboundAddItemsColumns from 'hooks/inboundV2/addItems/useInboundAddItemsColumns';
+import useInboundAddItemsForm from 'hooks/inboundV2/addItems/useInboundAddItemsForm';
 import useResetScrollbar from 'hooks/useResetScrollbar';
-import { FormErrorPropType } from 'utils/propTypes';
 
 const InboundV2AddItems = ({
-  control,
-  errors,
-  trigger,
-  getValues,
-  setValue,
-  loading,
-  save,
-  removeItem,
-  updateTotalCount,
-  removeAll,
-  saveAndExit,
-  previousPage,
-  refreshFocusCounter,
-  resetFocus,
-  refresh,
-  importTemplate,
-  exportTemplate,
-  nextPage,
+  next,
+  previous,
 }) => {
+  const {
+    control,
+    handleSubmit,
+    errors,
+    trigger,
+    getValues,
+    setValue,
+    loading,
+    nextPage,
+    save,
+    removeItem,
+    updateTotalCount,
+    removeAll,
+    saveAndExit,
+    previousPage,
+    refreshFocusCounter,
+    resetFocus,
+    refresh,
+    importTemplate,
+    exportTemplate,
+  } = useInboundAddItemsForm({ next, previous });
+
   const hasErrors = !!Object.keys(errors).length;
   const {
     fields,
@@ -48,15 +54,7 @@ const InboundV2AddItems = ({
     control,
     name: 'values.lineItems',
   });
-  const currentLineItems = useWatch({
-    control,
-    name: 'currentLineItems',
-  });
 
-  const updatedRows = useWatch({
-    name: 'values.lineItems',
-    control,
-  });
   const { resetScrollbar } = useResetScrollbar({
     selector: '.rt-table',
   });
@@ -71,7 +69,6 @@ const InboundV2AddItems = ({
     removeItem,
     updateTotalCount,
     removeAll,
-    currentLineItems,
     append,
     refreshFocusCounter,
   });
@@ -101,7 +98,7 @@ const InboundV2AddItems = ({
   };
 
   return (
-    <>
+    <form onSubmit={handleSubmit(nextPage)}>
       <Section>
         <div className="inbound-add-items">
           <div className="d-flex justify-content-between align-items-center mb-3">
@@ -199,36 +196,18 @@ const InboundV2AddItems = ({
           label="react.default.button.next.label"
           defaultLabel="Next"
           variant="primary"
-          onClick={nextPage}
-          disabled={!updatedRows.some(item =>
+          type="submit"
+          disabled={!getValues().values.lineItems.some(item =>
             item.product && parseInt(item.quantityRequested, 10))}
         />
       </div>
-    </>
+    </form>
   );
 };
 
 export default InboundV2AddItems;
 
 InboundV2AddItems.propTypes = {
-  control: PropTypes.shape({}).isRequired,
-  errors: PropTypes.shape({
-    lineItems: FormErrorPropType,
-  }).isRequired,
-  trigger: PropTypes.func.isRequired,
-  getValues: PropTypes.func.isRequired,
-  setValue: PropTypes.func.isRequired,
-  loading: PropTypes.bool.isRequired,
-  save: PropTypes.func.isRequired,
-  removeItem: PropTypes.func.isRequired,
-  updateTotalCount: PropTypes.func.isRequired,
-  removeAll: PropTypes.func.isRequired,
-  saveAndExit: PropTypes.func.isRequired,
-  previousPage: PropTypes.func.isRequired,
-  refresh: PropTypes.func.isRequired,
-  importTemplate: PropTypes.func.isRequired,
-  exportTemplate: PropTypes.func.isRequired,
-  refreshFocusCounter: PropTypes.number.isRequired,
-  resetFocus: PropTypes.func.isRequired,
-  nextPage: PropTypes.func.isRequired,
+  next: PropTypes.func.isRequired,
+  previous: PropTypes.func.isRequired,
 };

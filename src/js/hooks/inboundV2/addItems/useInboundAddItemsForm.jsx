@@ -87,6 +87,8 @@ const useInboundAddItemsForm = ({
     resolver: zodResolver(validationSchema),
   });
 
+  console.log('xd', getValues());
+
   const confirmAction = (onConfirm, messageId, defaultMessage) => {
     const modalLabels = {
       title: {
@@ -203,25 +205,33 @@ const useInboundAddItemsForm = ({
     setRefreshFocusCounter((prev) => prev + 1);
   };
 
-  const isItemUpdated = (item, oldItem) => !_.isEqual(_.omit(item, ['product']), _.omit(oldItem, ['product']));
-
   const shouldUpdateItem = (item, oldItem) => {
     const oldQty = Number(oldItem.quantityRequested) || 0;
     const newQty = Number(item.quantityRequested) || 0;
 
-    const expirationDateChanged = (item.expirationDate
-        && item.inventoryItem?.expirationDate !== item.expirationDate)
-      || (!item.expirationDate && oldItem.expirationDate);
+    // Format current and old expiration dates to make sure we compare them using the same format
+    const formattedCurrentExpirationDate = item.expirationDate
+      ? formatDateToString({
+        date: item.expirationDate,
+        dateFormat: DateFormatDateFns.DD_MMM_YYYY,
+      })
+      : null;
+
+    const formattedOldExpirationDate = oldItem.expirationDate
+      ? formatDateToString({
+        date: oldItem.expirationDate,
+        dateFormat: DateFormatDateFns.DD_MMM_YYYY,
+      })
+      : null;
 
     return (
-      !isItemUpdated(item, oldItem)
-      || item.palletName !== oldItem.palletName
+      item.palletName !== oldItem.palletName
       || item.boxName !== oldItem.boxName
       || item.product?.id !== oldItem.product.id
       || newQty !== oldQty
       || item.recipient?.id !== oldItem.recipient?.id
       || item.lotNumber !== oldItem.lotNumber
-      || expirationDateChanged
+      || formattedCurrentExpirationDate !== formattedOldExpirationDate
     );
   };
 
@@ -299,7 +309,6 @@ const useInboundAddItemsForm = ({
           lineItems: data.lineItems?.map(transformLineItem),
         };
         setValue('currentLineItems', transformedData.lineItems);
-        setValue('values.lineItems', transformedData.lineItems);
         setValue('values', transformedData);
         return resp;
       } finally {
@@ -416,29 +425,26 @@ const useInboundAddItemsForm = ({
     lineItems.some((item) => !item.quantityRequested || item.quantityRequested === '0');
 
   const nextPage = async () => {
-    await trigger();
-    if (isValid) {
-      const formValues = getValues();
-      const lineItems = formValues.values.lineItems
-        .filter((item) => item?.product)
-        .map((item) => ({
-          ...item,
-          expirationDate: item.expirationDate ? dateWithoutTimeZone({
-            date: item.expirationDate,
-            outputDateFormat: DateFormat.MM_DD_YYYY,
-          }) : null,
-        }));
-      const hasInvalidQuantity = checkInvalidQuantities(lineItems);
+    const formValues = getValues();
+    const lineItems = formValues.values.lineItems
+      .filter((item) => item?.product)
+      .map((item) => ({
+        ...item,
+        expirationDate: item.expirationDate ? dateWithoutTimeZone({
+          date: item.expirationDate,
+          outputDateFormat: DateFormat.MM_DD_YYYY,
+        }) : null,
+      }));
+    const hasInvalidQuantity = checkInvalidQuantities(lineItems);
 
-      if (hasInvalidQuantity) {
-        confirmAction(
-          () => checkDuplicatesSaveAndTransitionToNextStep(formValues, lineItems),
-          'react.stockMovement.confirmSave.message',
-          'Are you sure you want to save? There are some lines with empty or zero quantity, those lines will be deleted.',
-        );
-      } else {
-        await checkDuplicatesSaveAndTransitionToNextStep(formValues, lineItems);
-      }
+    if (hasInvalidQuantity) {
+      confirmAction(
+        () => checkDuplicatesSaveAndTransitionToNextStep(formValues, lineItems),
+        'react.stockMovement.confirmSave.message',
+        'Are you sure you want to save? There are some lines with empty or zero quantity, those lines will be deleted.',
+      );
+    } else {
+      await checkDuplicatesSaveAndTransitionToNextStep(formValues, lineItems);
     }
   };
 
