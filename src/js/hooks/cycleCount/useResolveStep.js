@@ -17,7 +17,7 @@ import {
   getCurrentLocale,
   getCurrentLocation,
   getCurrentUser,
-  getCycleCountsIds,
+  getCycleCountIds,
   getReasonCodes,
   getUsers,
 } from 'selectors';
@@ -40,7 +40,7 @@ import useResolveStepValidation from 'hooks/cycleCount/useResolveStepValidation'
 import useSpinner from 'hooks/useSpinner';
 import useTranslate from 'hooks/useTranslate';
 import confirmationModal from 'utils/confirmationModalUtils';
-import trimLotNumberSpaces from 'utils/cycleCountUtils';
+import { trimLotNumberSpaces } from 'utils/cycleCountUtils';
 import dateWithoutTimeZone from 'utils/dateUtils';
 import exportFileFromApi from 'utils/file-download-util';
 import { checkBinLocationSupport } from 'utils/supportedActivitiesUtils';
@@ -85,7 +85,7 @@ const useResolveStep = () => {
     locale,
   } = useSelector((state) => ({
     users: getUsers(state),
-    cycleCountIds: getCycleCountsIds(state),
+    cycleCountIds: getCycleCountIds(state),
     reasonCodes: getReasonCodes(state),
     currentLocation: getCurrentLocation(state),
     currentUser: getCurrentUser(state),
