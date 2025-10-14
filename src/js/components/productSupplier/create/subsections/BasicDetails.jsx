@@ -166,7 +166,7 @@ const BasicDetails = ({ control, errors }) => {
         </div>
         <div className="col-lg-2 col-md-3 px-2 pt-2">
           <Controller
-            name="basicDetails.createdBy.name"
+            name="basicDetails.createdBy"
             control={control}
             disabled
             render={({ field }) => (
@@ -194,7 +194,7 @@ const BasicDetails = ({ control, errors }) => {
         </div>
         <div className="col-lg-2 col-md-3 px-2 pt-2">
           <Controller
-            name="basicDetails.updatedBy.name"
+            name="basicDetails.updatedBy"
             control={control}
             disabled
             render={({ field }) => (

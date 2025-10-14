@@ -76,6 +76,8 @@ const useProductSupplierForm = () => {
         active: productSupplier?.active,
         dateCreated: productSupplier?.dateCreated ?? undefined,
         lastUpdated: productSupplier?.lastUpdated ?? undefined,
+        createdBy: productSupplier?.createdBy ?? undefined,
+        updatedBy: productSupplier?.updatedBy ?? undefined,
       },
       additionalDetails: {
         manufacturer: productSupplier?.manufacturer

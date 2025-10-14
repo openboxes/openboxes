@@ -250,8 +250,8 @@ class ProductSupplier implements Serializable, Comparable<ProductSupplier> {
             unitPrice: unitPrice,
             dateCreated: dateCreated,
             lastUpdated: lastUpdated,
-            createdBy: createdBy,
-            updatedBy: updatedBy,
+            createdBy: createdBy?.name,
+            updatedBy: updatedBy?.name,
             active: active,
             ratingTypeCode: ratingTypeCode?.name,
             manufacturer: manufacturer ? [
