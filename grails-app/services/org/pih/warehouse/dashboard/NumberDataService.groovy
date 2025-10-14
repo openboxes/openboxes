@@ -324,7 +324,7 @@ class NumberDataService {
         def webRequest = RequestContextHolder.requestAttributes
         def grailsParams = new GrailsParameterMap([:], webRequest.request)
         grailsParams.status = PutawayTaskStatus.PENDING
-        def tasks = putawayTaskService.search(location, null, null, null, grailsParams)
+        def tasks = putawayTaskService.search(location, null, null, null, null, grailsParams)
         String urlContextPath = ConfigHelper.contextPath
         return new NumberData(
                 tasks?.size() ?: 0,
