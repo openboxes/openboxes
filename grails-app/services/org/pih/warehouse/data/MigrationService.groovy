@@ -606,7 +606,8 @@ class MigrationService {
             Transaction baselineTransaction = productInventoryTransactionMigrationService.createInventoryBaselineTransactionForGivenStock(
                     location,
                     null,
-                    availableItems.values(),
+                    currentTransactionProducts,
+                    availableItems,
                     it.transactionDate,
                     newComment,
                     null,

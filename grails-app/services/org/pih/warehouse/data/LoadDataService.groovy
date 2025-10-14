@@ -262,6 +262,7 @@ class LoadDataService {
         Map<String, Product> productMap = Product.findAllByProductCodeInList(productCodes).collectEntries {
             [it.productCode, it]
         }
+        List<Product> products = productMap.values().toList()
 
         // Calculate dates for inventory baseline and adjustment transactions
         Date adjustmentTransactionDate = DateUtil.asDate(Instant.now())
@@ -270,7 +271,7 @@ class LoadDataService {
         // 1. Calculate the current available items from product availability - one snapshot transaction for all products
         AvailableItemMap availableItems = productAvailabilityService.getAvailableItemsAtDateAsMap(
                 targetWarehouse,
-                productMap.values().toList(),
+                products,
                 inventoryBaselineTransactionDate
         )
 
@@ -288,7 +289,8 @@ class LoadDataService {
             inventoryImportProductInventoryTransactionService.createInventoryBaselineTransactionForGivenStock(
                     targetWarehouse,
                     null,
-                    availableItems.values(),
+                    products,
+                    availableItems,
                     inventoryBaselineTransactionDate
             )
         }
