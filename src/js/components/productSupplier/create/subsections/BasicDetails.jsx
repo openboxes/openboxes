@@ -7,15 +7,14 @@ import {
   getFormatLocalizedDate,
 } from 'selectors';
 
-import DateField from 'components/form-elements/v2/DateField';
 import SelectField from 'components/form-elements/v2/SelectField';
 import Switch from 'components/form-elements/v2/Switch';
 import TextInput from 'components/form-elements/v2/TextInput';
 import Subsection from 'components/Layout/v2/Subsection';
 import { INVENTORY_ITEM_URL } from 'consts/applicationUrls';
+import { DateFormat } from 'consts/timeFormat';
 import { debounceOrganizationsFetch, debounceProductsFetch } from 'utils/option-utils';
 import { FormErrorPropType } from 'utils/propTypes';
-import {DateFormat} from "consts/timeFormat";
 
 const BasicDetails = ({ control, errors, getValues }) => {
   const {
@@ -34,13 +33,14 @@ const BasicDetails = ({ control, errors, getValues }) => {
 
   const { basicDetails } = getValues();
 
-  console.log(getValues())
-
-  const dateCreated = formatLocalizedDate(getValues()?.basicDetails?.dateCreated, DateFormat.MMM_DD_YYYY);
-
-  console.log(dateCreated);
-
-  const auditField = `${basicDetails?.createdBy ?? ''} ${dateCreated ?? ''}`
+  /**
+   * Formats a given user and date into a single string value for display.
+   */
+  const userDateFieldValue = (user, date) => {
+    const formattedDate = formatLocalizedDate(date, DateFormat.MMM_DD_YYYY);
+    const joinerString = formattedDate && user ? ', ' : '';
+    return `${formattedDate ?? ''}${joinerString}${user ? `by ${user}` : ''}`;
+  };
 
   return (
     <Subsection
@@ -149,12 +149,6 @@ const BasicDetails = ({ control, errors, getValues }) => {
           />
         </div>
         <div className="col-lg-4 col-md-6 px-2 pt-2">
-          <TextInput
-            value={auditField}
-            disabled
-          />
-        </div>
-        <div className="col-lg-4 col-md-6 px-2 pt-2">
           <Controller
             name="basicDetails.name"
             control={control}
@@ -172,60 +166,20 @@ const BasicDetails = ({ control, errors, getValues }) => {
             )}
           />
         </div>
-        <div className="col-lg-2 col-md-3 px-2 pt-2">
-          <Controller
-            name="basicDetails.dateCreated"
-            control={control}
-            render={({ field }) => (
-              <DateField
-                title={{ id: 'react.productSupplier.form.dateCreated.title', defaultMessage: 'Source Creation Date' }}
-                errorMessage={errors.dateCreated?.message}
-                {...field}
-                disabled
-              />
-            )}
-          />
-        </div>
-        <div className="col-lg-2 col-md-3 px-2 pt-2">
-          <Controller
-            name="basicDetails.createdBy"
-            control={control}
+        <div className="col-lg-4 col-md-6 px-2 pt-2">
+          <TextInput
+            name="basicDetails.created"
+            title={{ id: 'react.productSupplier.form.created.title', defaultMessage: 'Created' }}
+            value={userDateFieldValue(basicDetails?.createdBy, basicDetails?.dateCreated)}
             disabled
-            render={({ field }) => (
-              <TextInput
-                {...field}
-                title={{ id: 'react.productSupplier.form.createdBy.title', defaultMessage: 'Created By' }}
-                errorMessage={errors.createdBy?.message}
-              />
-            )}
           />
         </div>
-        <div className="col-lg-2 col-md-3 px-2 pt-2">
-          <Controller
-            name="basicDetails.lastUpdated"
-            control={control}
-            render={({ field }) => (
-              <DateField
-                title={{ id: 'react.productSupplier.form.lastUpdated.title', defaultMessage: 'Last Update' }}
-                errorMessage={errors.lastUpdated?.message}
-                {...field}
-                disabled
-              />
-            )}
-          />
-        </div>
-        <div className="col-lg-2 col-md-3 px-2 pt-2">
-          <Controller
-            name="basicDetails.updatedBy"
-            control={control}
+        <div className="col-lg-4 col-md-6 px-2 pt-2">
+          <TextInput
+            name="basicDetails.updated"
+            title={{ id: 'react.productSupplier.form.updated.title', defaultMessage: 'Updated' }}
+            value={userDateFieldValue(basicDetails?.updatedBy, basicDetails?.lastUpdated)}
             disabled
-            render={({ field }) => (
-              <TextInput
-                {...field}
-                title={{ id: 'react.productSupplier.form.updatedBy.title', defaultMessage: 'Last Updated By' }}
-                errorMessage={errors.updatedBy?.message}
-              />
-            )}
           />
         </div>
         <div className="col-lg-4 col-md-6 px-2 pt-2">
@@ -265,10 +219,6 @@ export const basicDetailsFormErrors = PropTypes.shape({
   supplierCode: FormErrorPropType,
   name: FormErrorPropType,
   active: FormErrorPropType,
-  dateCreated: FormErrorPropType,
-  lastUpdated: FormErrorPropType,
-  createdBy: FormErrorPropType,
-  updatedBy: FormErrorPropType,
 });
 
 BasicDetails.propTypes = {
