@@ -627,6 +627,19 @@ class ProductService {
 
     }
 
+    Boolean parseCsvBooleanField(String value, int rowCount) {
+        // If the value is empty we treat it as true
+        if (!value) {
+            return true
+        }
+        String parsedValue = value.toLowerCase()
+        Set<String> validValues = ['true', 'false', '1', '0']
+        if (!(parsedValue in validValues)) {
+            throw new RuntimeException("Active field has to be either empty or a boolean value (true/false/1/0) at row " + rowCount)
+        }
+        return parsedValue in ['true', '1']
+    }
+
 
     /**
      * Import products from csv
@@ -671,35 +684,36 @@ class ProductService {
             rowCount++
             println "Processing line: " + tokens
             def productId = tokens[0]
-            def productCode = tokens[1]
-            def productTypeName = tokens[2]
-            def productName = tokens[3]
-            def productFamilyName = tokens[4]
-            def categoryName = tokens[5]
-            def glAccountCode = tokens[6]
-            def description = tokens[7]
-            def unitOfMeasure = tokens[8]
-            def productTags = tokens[9]?.split(",")
+            def active = parseCsvBooleanField(tokens[1], rowCount)
+            def productCode = tokens[2]
+            def productTypeName = tokens[3]
+            def productName = tokens[4]
+            def productFamilyName = tokens[5]
+            def categoryName = tokens[6]
+            def glAccountCode = tokens[7]
+            def description = tokens[8]
+            def unitOfMeasure = tokens[9]
+            def productTags = tokens[10]?.split(",")
             def pricePerUnit
             try {
-                pricePerUnit = tokens[10] ? Float.valueOf(tokens[10]) : null
+                pricePerUnit = tokens[11] ? Float.valueOf(tokens[11]) : null
             } catch (NumberFormatException e) {
-                throw new RuntimeException("Unit price for product '${productCode}' at row ${rowCount} must be a valid decimal (value = '${tokens[9]}')", e)
+                throw new RuntimeException("Unit price for product '${productCode}' at row ${rowCount} must be a valid decimal (value = '${tokens[10]}')", e)
             }
-            def lotAndExpiryControl = Boolean.valueOf(tokens[11])
-            def coldChain = Boolean.valueOf(tokens[12])
-            def controlledSubstance = Boolean.valueOf(tokens[13])
-            def hazardousMaterial = Boolean.valueOf(tokens[14])
-            def reconditioned = Boolean.valueOf(tokens[15])
-            def manufacturer = tokens[16]
-            def brandName = tokens[17]
-            def manufacturerCode = tokens[18]
-            def manufacturerName = tokens[19]
-            def vendor = tokens[20]
-            def vendorCode = tokens[21]
-            def vendorName = tokens[22]
-            def upc = tokens[23]
-            def ndc = tokens[24]
+            def lotAndExpiryControl = Boolean.valueOf(tokens[12])
+            def coldChain = Boolean.valueOf(tokens[13])
+            def controlledSubstance = Boolean.valueOf(tokens[14])
+            def hazardousMaterial = Boolean.valueOf(tokens[15])
+            def reconditioned = Boolean.valueOf(tokens[16])
+            def manufacturer = tokens[17]
+            def brandName = tokens[18]
+            def manufacturerCode = tokens[19]
+            def manufacturerName = tokens[20]
+            def vendor = tokens[21]
+            def vendorCode = tokens[22]
+            def vendorName = tokens[23]
+            def upc = tokens[24]
+            def ndc = tokens[25]
 
             if (!productName) {
                 throw new RuntimeException("Product name cannot be empty at row " + rowCount)
@@ -734,6 +748,7 @@ class ProductService {
             // If the identifier is incorrect/missing we should display the ID of the product found using the product code instead of the missing/incorrect product identifier
             def productProperties = [
                 id                  : product?.id ?: productId,
+                active              : active,
                 name                : productName,
                 productType         : productType,
                 productFamily       : productFamily,
@@ -882,6 +897,7 @@ class ProductService {
             // FIXME make relation to Constants.EXPORT_PRODUCT_COLUMNS explicit
             def row = [
                 Id                  : product?.id,
+                Active              : product.active ?: Boolean.FALSE,
                 ProductCode         : product.productCode ?: '',
                 ProductType         : product.productType?.name ?: '',
                 Name                : product.name,
