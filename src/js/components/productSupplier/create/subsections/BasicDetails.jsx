@@ -168,7 +168,6 @@ const BasicDetails = ({ control, errors, getValues }) => {
         </div>
         <div className="col-lg-4 col-md-6 px-2 pt-2">
           <TextInput
-            name="basicDetails.created"
             title={{ id: 'react.productSupplier.form.created.title', defaultMessage: 'Created' }}
             value={userDateFieldValue(basicDetails?.createdBy?.name, basicDetails?.dateCreated)}
             disabled
@@ -176,7 +175,6 @@ const BasicDetails = ({ control, errors, getValues }) => {
         </div>
         <div className="col-lg-4 col-md-6 px-2 pt-2">
           <TextInput
-            name="basicDetails.updated"
             title={{ id: 'react.productSupplier.form.updated.title', defaultMessage: 'Updated' }}
             value={userDateFieldValue(basicDetails?.updatedBy?.name, basicDetails?.lastUpdated)}
             disabled
