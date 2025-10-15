@@ -170,7 +170,7 @@ const BasicDetails = ({ control, errors, getValues }) => {
           <TextInput
             name="basicDetails.created"
             title={{ id: 'react.productSupplier.form.created.title', defaultMessage: 'Created' }}
-            value={userDateFieldValue(basicDetails?.createdBy, basicDetails?.dateCreated)}
+            value={userDateFieldValue(basicDetails?.createdBy?.name, basicDetails?.dateCreated)}
             disabled
           />
         </div>
@@ -178,7 +178,7 @@ const BasicDetails = ({ control, errors, getValues }) => {
           <TextInput
             name="basicDetails.updated"
             title={{ id: 'react.productSupplier.form.updated.title', defaultMessage: 'Updated' }}
-            value={userDateFieldValue(basicDetails?.updatedBy, basicDetails?.lastUpdated)}
+            value={userDateFieldValue(basicDetails?.updatedBy?.name, basicDetails?.lastUpdated)}
             disabled
           />
         </div>
