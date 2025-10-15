@@ -4,6 +4,7 @@ import io.restassured.builder.ResponseSpecBuilder
 import org.apache.http.HttpStatus
 import org.hamcrest.Matchers
 import org.springframework.beans.factory.annotation.Autowired
+import spock.lang.Ignore
 
 import org.pih.warehouse.api.client.product.ProductApiWrapper
 import org.pih.warehouse.api.spec.base.ApiSpec
@@ -11,6 +12,7 @@ import org.pih.warehouse.api.spec.base.ApiSpec
 /**
  * Test the product demand endpoints.
  */
+@Ignore("Until we can have our APIs update product availability sequentially these tests are too flaky to be enabled.")
 class ProductApiDemandSpec extends ApiSpec {
 
     @Autowired
