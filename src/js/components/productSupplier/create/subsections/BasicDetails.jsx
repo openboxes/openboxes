@@ -3,6 +3,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Controller, useWatch } from 'react-hook-form';
 import { useSelector } from 'react-redux';
+import {
+  getFormatLocalizedDate,
+} from 'selectors';
 
 import DateField from 'components/form-elements/v2/DateField';
 import SelectField from 'components/form-elements/v2/SelectField';
@@ -12,19 +15,32 @@ import Subsection from 'components/Layout/v2/Subsection';
 import { INVENTORY_ITEM_URL } from 'consts/applicationUrls';
 import { debounceOrganizationsFetch, debounceProductsFetch } from 'utils/option-utils';
 import { FormErrorPropType } from 'utils/propTypes';
+import {DateFormat} from "consts/timeFormat";
 
-const BasicDetails = ({ control, errors }) => {
+const BasicDetails = ({ control, errors, getValues }) => {
   const {
     debounceTime,
     minSearchLength,
+    formatLocalizedDate,
   } = useSelector((state) => ({
     debounceTime: state.session.searchConfig.debounceTime,
     minSearchLength: state.session.searchConfig.minSearchLength,
+    formatLocalizedDate: getFormatLocalizedDate(state),
   }));
 
   // Watch product's input changes live, in order to display a "View Product" link
   // with a proper product id
   const product = useWatch({ control, name: 'basicDetails.product' });
+
+  const { basicDetails } = getValues();
+
+  console.log(getValues())
+
+  const dateCreated = formatLocalizedDate(getValues()?.basicDetails?.dateCreated, DateFormat.MMM_DD_YYYY);
+
+  console.log(dateCreated);
+
+  const auditField = `${basicDetails?.createdBy ?? ''} ${dateCreated ?? ''}`
 
   return (
     <Subsection
@@ -130,6 +146,12 @@ const BasicDetails = ({ control, errors }) => {
                 {...field}
               />
             )}
+          />
+        </div>
+        <div className="col-lg-4 col-md-6 px-2 pt-2">
+          <TextInput
+            value={auditField}
+            disabled
           />
         </div>
         <div className="col-lg-4 col-md-6 px-2 pt-2">
@@ -252,6 +274,7 @@ export const basicDetailsFormErrors = PropTypes.shape({
 BasicDetails.propTypes = {
   control: PropTypes.shape({}).isRequired,
   errors: basicDetailsFormErrors,
+  getValues: PropTypes.func.isRequired,
 };
 
 BasicDetails.defaultProps = {

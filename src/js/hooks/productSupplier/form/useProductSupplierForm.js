@@ -185,6 +185,7 @@ const useProductSupplierForm = () => {
     trigger,
     setValue,
     formState: { errors, isValid },
+    getValues,
   } = useForm({
     // We want the validation errors to occur onBlur of any field
     mode: 'onBlur',
@@ -358,6 +359,7 @@ const useProductSupplierForm = () => {
     onSubmit,
     setProductPackageQuantity,
     setValue,
+    getValues,
   };
 };
 
