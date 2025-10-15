@@ -43,4 +43,4 @@ jobs:
       - name: Update dbdocs project
         env:
           DBDOCS_TOKEN: ${{ secrets.DBDOCS_TOKEN }}
-        run: dbdocs build ./openboxes.dbml
+        run: dbdocs build ./openboxes.dbml --project=openboxes
