@@ -10,6 +10,7 @@
 package org.pih.warehouse.user
 
 import grails.core.GrailsApplication
+import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import org.pih.warehouse.auth.UserSignupEvent
 import org.pih.warehouse.core.MailService
@@ -167,6 +168,7 @@ class AuthController {
     /**
      * Handle account registration.
      */
+    @Transactional
     def handleSignup() {
         def userInstance = new User()
         if ("POST".equalsIgnoreCase(request.getMethod())) {
@@ -182,7 +184,7 @@ class AuthController {
             userInstance.username = params.email
 
             // Verify recaptcha challenge response if recaptcha is enabled
-            Boolean recaptchaEnabled = grailsApplication.config.openboxes.signup.enabled?:false
+            Boolean recaptchaEnabled = grailsApplication.config.openboxes.signup.recaptcha.enabled?:false
             if (recaptchaEnabled && !recaptchaService.validate(params["g-recaptcha-response"])) {
                 userInstance.errors.reject("signup.recaptcha.fail.message",
                         "Nice try, robot. But your feeble attempt has failed. If you're not a robot we apologize. Please try again.")
