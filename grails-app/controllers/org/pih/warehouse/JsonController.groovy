@@ -1816,6 +1816,4 @@ class TransactionReportCommand implements Validateable {
     Location location
     List<TransactionType> transactionTypes
     Category category
-    List<Tag> tags
-    List<Product> products
 }
