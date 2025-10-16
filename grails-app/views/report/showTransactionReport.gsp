@@ -105,6 +105,19 @@
 									</label>
 								</p>
 							</div>
+                            <div class="filter-list-item">
+                                <label><g:message code="product.label"/></label>
+                                <p>
+                                    <g:selectProduct
+                                        id="products"
+                                        name="products"
+                                        value="${params?.products}"
+                                        data-placeholder="${g.message(code: 'default.selectOptions.label', default: 'Select Options')}"
+                                        multiple="true"
+                                        class="chzn-select-deselect"
+                                    />
+                                </p>
+                            </div>
 							<div class="filter-list-item">
 								<label><warehouse:message code="tag.label"/></label>
 								<p>
@@ -250,6 +263,7 @@
 				data.push({ name: "startDate", value: $("#startDate").val() });
 				data.push({ name: "endDate", value: $("#endDate").val() });
 				data.push({ name: "category", value: $("#category").val() });
+                data.push({ name: "products", value: $("#products").val() });
 				data.push({ name: "tags", value: $("#tags").val() });
 				data.push({ name: "catalogs", value: $("#catalogs").val() });
 				if($('#includeCategoryChildren').is(':checked')) {
@@ -372,6 +386,7 @@
 				startDate: $("#startDate").val(),
 				endDate: $("#endDate").val(),
 				category: $("#category").val(),
+                products: $("#products").val(),
 				tags: $("#tags").val(),
 				catalogs: $("#catalogs").val(),
 				format: "text/csv"

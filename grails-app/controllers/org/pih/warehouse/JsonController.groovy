@@ -1440,7 +1440,9 @@ class JsonController {
         List<Category> categories = params.includeCategoryChildren
                 ? category.children + category
                 : [category]
-
+        List<Product> products = params.products
+                ? Product.findAllById(params.list('products'))
+                : []
         // FIXME Command validation not working so we're doing it manually
         if (!startDate || !endDate || !location) {
             throw new IllegalArgumentException("All parameter fields are required")
@@ -1455,7 +1457,15 @@ class JsonController {
         }
 
         Boolean isCsvReport = params.format == "text/csv"
-        List<Object> data = reportService.getTransactionReport(location, categories, tagList, catalogList, startDate, endDate, isCsvReport)
+        List<Object> data = reportService.getTransactionReport(
+                location,
+                categories,
+                tagList,
+                catalogList,
+                products,
+                startDate,
+                endDate,
+                isCsvReport)
 
         if (isCsvReport) {
             String csv = dataService.generateCsv(data)
@@ -1806,4 +1816,6 @@ class TransactionReportCommand implements Validateable {
     Location location
     List<TransactionType> transactionTypes
     Category category
+    List<Tag> tags
+    List<Product> products
 }
