@@ -18,7 +18,7 @@ const CustomTooltip = ({
         duration={250}
         hideDelay={50}
         className="w-100"
-        html={<div className="p-2 tooltip-dark-blue">{content}</div>}
+        html={<div className={`p-2 tooltip-dark-blue ${!content && 'd-none'}`}>{content}</div>}
       >
         <div className="flex items-center">
           {Icon && <Icon className="mr-2" />}

@@ -5,24 +5,25 @@ import queryString from 'query-string';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory, useLocation } from 'react-router-dom';
+import { getCurrentLocation } from 'selectors';
 
 import { fetchUsers, updateWorkflowHeader } from 'actions';
 import stockListApi from 'api/services/StockListApi';
 import stockMovementApi from 'api/services/StockMovementApi';
 import { STOCK_MOVEMENT_BY_ID } from 'api/urls';
 import InboundV2Step from 'consts/InboundV2Step';
-import { DateFormat } from 'consts/timeFormat';
+import { DateFormat, DateFormatDateFns } from 'consts/timeFormat';
 import useInboundCreateValidation from 'hooks/inboundV2/create/useInboundCreateValidation';
 import useQueryParams from 'hooks/useQueryParams';
 import useSpinner from 'hooks/useSpinner';
 import apiClient from 'utils/apiClient';
 import createInboundWorkflowHeader from 'utils/createInboundWorkflowHeader';
-import dateWithoutTimeZone from 'utils/dateUtils';
+import dateWithoutTimeZone, { formatDateToString } from 'utils/dateUtils';
 
 const useInboundCreateForm = ({ next }) => {
   const [stockLists, setStockLists] = useState([]);
   const { currentLocation } = useSelector((state) => ({
-    currentLocation: state.session.currentLocation,
+    currentLocation: getCurrentLocation(state),
   }));
   const spinner = useSpinner();
   const { validationSchema } = useInboundCreateValidation();
@@ -157,7 +158,10 @@ const useInboundCreateForm = ({ next }) => {
         name: data.requestedBy.name,
         label: data.requestedBy.name,
       });
-      setValue('dateRequested', data.dateRequested);
+      setValue('dateRequested', formatDateToString({
+        date: data.dateRequested,
+        dateFormat: DateFormatDateFns.DD_MMM_YYYY,
+      }));
 
       // We set {} for headerStatus in the create step because we only want to display it on the
       // last step
