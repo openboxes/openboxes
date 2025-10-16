@@ -20,6 +20,7 @@ const ProductSupplierForm = () => {
     onSubmit,
     setProductPackageQuantity,
     setValue,
+    getValues,
   } = useProductSupplierForm();
 
   return (
@@ -37,6 +38,7 @@ const ProductSupplierForm = () => {
             dirtyFields,
             setProductPackageQuantity,
             setValue,
+            getValues,
           }}
         />
       </form>
