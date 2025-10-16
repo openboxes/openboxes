@@ -57,17 +57,26 @@ export default (Component) => {
         rowIndex,
         className,
         style,
+        onClick,
+        onDoubleClick,
+        children,
+        onKeyDown,
       } = props;
 
       const testId = `cell-${rowIndex}-${name}`;
 
       return (
         <div
+          role="button"
+          tabIndex={0}
           data-testid={testId}
           className={`rt-td ${className}`}
           style={style}
+          onClick={onClick}
+          onDoubleClick={onDoubleClick}
+          onKeyDown={onKeyDown}
         >
-          {props.children}
+          {children}
         </div>
       );
     }
