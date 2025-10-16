@@ -17,6 +17,8 @@ import org.apache.commons.collections.list.LazyList
 import org.apache.commons.lang.NotImplementedException
 import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.pih.warehouse.EmptyStringsToNullBinder
+import org.pih.warehouse.api.Stocklist
+import org.pih.warehouse.api.StocklistItem
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Document
@@ -33,6 +35,7 @@ import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.inventory.InventorySnapshotEvent
 import org.pih.warehouse.inventory.TransactionCode
 import org.pih.warehouse.inventory.TransactionEntry
+import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.LocalizationUtil
 
@@ -298,7 +301,23 @@ class Product implements Comparable, Serializable {
         unitOfMeasure(nullable: true, maxSize: 255)
         category(nullable: false)
         productType(nullable: false)
-        active(nullable: true)
+        active(nullable: true, validator: { value, obj ->
+            if (value) {
+                return true
+            }
+            // Don't allow a product to be deactivated if it is in an active stocklist.
+            int numActiveStocklistsForProduct = RequisitionItem.createCriteria().count {
+                eq('product', obj)
+                requisition {
+                    eq('isTemplate', true)
+                    eq('isPublished', true)
+                }
+            }
+            if (numActiveStocklistsForProduct > 0) {
+                return ['invalid.inStocklist']
+            }
+            return true
+        })
         coldChain(nullable: true)
         reconditioned(nullable: true)
         controlledSubstance(nullable: true)
