@@ -17,8 +17,6 @@ import org.apache.commons.collections.list.LazyList
 import org.apache.commons.lang.NotImplementedException
 import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.pih.warehouse.EmptyStringsToNullBinder
-import org.pih.warehouse.api.Stocklist
-import org.pih.warehouse.api.StocklistItem
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Document
