@@ -114,6 +114,12 @@ input, .date-field-input {
   z-index: 999;
 }
 
+.react-datepicker__navigation {
+  width: 15px;
+  height: 15px;
+  top: 8px;
+}
+
 .react-datepicker__input-container {
   width: 100%;
 
