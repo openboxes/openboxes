@@ -1,33 +1,40 @@
 import React, { useEffect, useMemo, useState } from 'react';
 
 import { createColumnHelper } from '@tanstack/react-table';
+import * as locales from 'date-fns/locale';
 import { useSelector } from 'react-redux';
-import { getCurrentLocale, getFormatLocalizedDate } from 'selectors';
+import { getCurrentLocale } from 'selectors';
 
 import stockMovementApi from 'api/services/StockMovementApi';
 import { TableCell } from 'components/DataTable';
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
 import inboundColumns from 'consts/inboundColumns';
-import { DateFormat } from 'consts/timeFormat';
+import { DateFormatDateFns } from 'consts/timeFormat';
 import { OutboundWorkflowState } from 'consts/WorkflowState';
 import useQueryParams from 'hooks/useQueryParams';
 import useSpinner from 'hooks/useSpinner';
 import useTranslate from 'hooks/useTranslate';
+import { formatDateToString } from 'utils/dateUtils';
 
 const useInboundSendTable = () => {
   const [tableData, setTableData] = useState([]);
   const [loading, setLoading] = useState(true);
   const {
     currentLocale,
-    formatLocalizedDate,
   } = useSelector((state) => ({
     currentLocale: getCurrentLocale(state),
-    formatLocalizedDate: getFormatLocalizedDate(state),
   }));
   const spinner = useSpinner();
   const queryParams = useQueryParams();
   const translate = useTranslate();
   const columnHelper = createColumnHelper();
+
+  const formatDate = (date) =>
+    formatDateToString({
+      date,
+      dateFormat: DateFormatDateFns.DD_MMM_YYYY,
+      options: { locale: locales[currentLocale] },
+    });
 
   const fetchStockMovementItems = async () => {
     try {
@@ -191,9 +198,9 @@ const useInboundSendTable = () => {
         <TableCell
           className="rt-td-send-step"
           customTooltip
-          tooltipLabel={getValue()}
+          tooltipLabel={formatDate(getValue())}
         >
-          {formatLocalizedDate(getValue(), DateFormat.DD_MMM_YYYY)}
+          {formatDate(getValue())}
         </TableCell>
       ),
       size: 100,

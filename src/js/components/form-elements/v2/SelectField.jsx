@@ -32,6 +32,7 @@ const SelectField = ({
   onKeyDown,
   focusProps = {},
   creatable,
+  customTooltip,
   ...fieldProps
 }) => {
   const [value, setValue] = useState(defaultValue);
@@ -69,6 +70,8 @@ const SelectField = ({
       required={required}
       hideErrorMessageWrapper={hideErrorMessageWrapper}
       className="select-wrapper-container"
+      customTooltip={customTooltip}
+      value={fieldProps?.value?.label}
     >
       <SelectComponent
         className={`form-element-select ${className} ${errorMessage || hasErrors ? 'has-errors' : ''} ${warning ? 'has-warning' : ''}`}
@@ -141,6 +144,7 @@ SelectField.propTypes = {
   }),
   // boolean that enables creating new options in the dropdown
   creatable: PropTypes.bool,
+  customTooltip: PropTypes.bool,
 };
 
 SelectField.defaultProps = {
@@ -165,4 +169,5 @@ SelectField.defaultProps = {
   onKeyDown: null,
   focusProps: {},
   creatable: false,
+  customTooltip: false,
 };
