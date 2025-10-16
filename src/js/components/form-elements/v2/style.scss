@@ -80,7 +80,7 @@
   }
 
   &:disabled {
-    background-color: var(--gray-100);
+    background-color: var(--blue-100);
   }
 }
 
@@ -138,7 +138,7 @@ input, .date-field-input {
     }
 
     &.disabled {
-      background-color: var(--gray-100);
+      background-color: var(--blue-100);
     }
   }
 
@@ -168,7 +168,7 @@ input, .date-field-input {
   }
 
   .react-select--is-disabled .react-select__control {
-    background-color: var(--gray-100);
+    background-color: var(--blue-100);
   }
 
   .react-select__control {
