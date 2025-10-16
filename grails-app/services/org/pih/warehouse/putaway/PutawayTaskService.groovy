@@ -9,7 +9,7 @@ import org.pih.warehouse.api.PutawayItem
 import org.pih.warehouse.api.PutawayStatus
 import org.pih.warehouse.api.PutawayTaskAdapter
 import org.pih.warehouse.api.PutawayTaskStatus
-import org.pih.warehouse.api.StatusCategory
+import org.pih.warehouse.api.putaway.SearchPutawayTaskCommand
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
@@ -23,7 +23,6 @@ import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.OrderItemStatusCode
 import org.pih.warehouse.order.OrderStatus
-import org.pih.warehouse.product.Product
 import org.pih.warehouse.putaway.discrepancy.PutawayDiscrepancyEvent
 
 @Transactional
@@ -36,8 +35,9 @@ class PutawayTaskService {
 
 
     @Transactional(readOnly = true)
-    List search(Location facility, Product product, Location container, StatusCategory statusCategory, Order order, Map params) {
-        log.info "search putaway tasks " + params + " product=" + product?.toJson() + " facility " + facility
+    List search(SearchPutawayTaskCommand command, Map params = [:]) {
+        log.info "Searching putaway tasks with command=${command?.properties} and params=${params}"
+
         Integer max = Math.min((params.int('max') ?: 50), 100) as Integer
         Integer offset = params.int('offset') ?: 0 as Integer
         String sort = params.sort ?: 'dateCreated'
@@ -48,7 +48,7 @@ class PutawayTaskService {
 
         // Resolve the status category to a set of statuses and added to user-provided
         //StatusCategory statusCategory = params.statusCategory as StatusCategory
-        List<PutawayTaskStatus> statusesByStatusCategory = PutawayTaskStatus.toSet(statusCategory)
+        List<PutawayTaskStatus> statusesByStatusCategory = PutawayTaskStatus.toSet(command.statusCategory)
         statuses += statusesByStatusCategory
 
         // Search for putaway tasks based on user-provided search parameters
@@ -56,17 +56,17 @@ class PutawayTaskService {
             if (statuses) {
                 status in statuses
             }
-            if (product) {
-                product == product
+            if (command.product) {
+                product == command.product
             }
-            if (facility) {
-                facility == facility
+            if (command.facility) {
+                facility == command.facility
             }
-            if (container) {
-                container == container
+            if (command.container) {
+                container == command.container
             }
-            if (order) {
-                putawayOrder == order
+            if (command.order) {
+                putawayOrder == command.order
             }
 
         }.list(max: max, offset: offset, sort: sort, order: sortOrder)

@@ -5,10 +5,10 @@ import grails.plugin.cache.Cacheable
 import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.joda.time.LocalDate
 import org.pih.warehouse.api.PutawayTaskStatus
+import org.pih.warehouse.api.putaway.SearchPutawayTaskCommand
 import org.pih.warehouse.inventory.InventoryItemService
 import org.springframework.web.context.request.RequestContextHolder
 import grails.web.servlet.mvc.GrailsParameterMap
-import org.pih.warehouse.api.StatusCategory
 import org.pih.warehouse.api.StockMovementDirection
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
@@ -324,7 +324,8 @@ class NumberDataService {
         def webRequest = RequestContextHolder.requestAttributes
         def grailsParams = new GrailsParameterMap([:], webRequest.request)
         grailsParams.status = PutawayTaskStatus.PENDING
-        def tasks = putawayTaskService.search(location, null, null, null, null, grailsParams)
+        def command = new SearchPutawayTaskCommand(facility: location)
+        def tasks = putawayTaskService.search(command, grailsParams)
         String urlContextPath = ConfigHelper.contextPath
         return new NumberData(
                 tasks?.size() ?: 0,
