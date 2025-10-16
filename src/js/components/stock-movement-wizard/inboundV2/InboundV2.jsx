@@ -66,6 +66,7 @@ const InboundV2 = () => {
     handleSubmit,
     onSubmitStockMovementDetails,
     stockLists,
+    setValue,
   } = useInboundCreateForm({ next });
 
   const createComponentProps = {
@@ -74,6 +75,7 @@ const InboundV2 = () => {
     next,
     trigger,
     stockLists,
+    setValue,
   };
 
   const {
@@ -83,7 +85,7 @@ const InboundV2 = () => {
     isValid: addItemsIsValid,
     trigger: addItemsTrigger,
     getValues: addItemsGetValues,
-    setValue: addItemsValue,
+    setValue: addItemsSetValue,
     loading,
     nextPage,
     save,
@@ -106,7 +108,7 @@ const InboundV2 = () => {
     isValid: addItemsIsValid,
     trigger: addItemsTrigger,
     getValues: addItemsGetValues,
-    setValue: addItemsValue,
+    setValue: addItemsSetValue,
     loading,
     nextPage,
     save,

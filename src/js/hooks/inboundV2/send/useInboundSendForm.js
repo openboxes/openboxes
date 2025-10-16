@@ -17,7 +17,7 @@ import locationType from 'consts/locationType';
 import NotificationType from 'consts/notificationTypes';
 import requisitionStatus from 'consts/requisitionStatus';
 import RoleType from 'consts/roleType';
-import { DateFormat } from 'consts/timeFormat';
+import { DateFormat, DateFormatDateFns } from 'consts/timeFormat';
 import { OutboundWorkflowState } from 'consts/WorkflowState';
 import useInboundSendValidation from 'hooks/inboundV2/send/useInboundSendValidation';
 import useFileActions from 'hooks/useFileActions';
@@ -27,7 +27,7 @@ import useTranslate from 'hooks/useTranslate';
 import useUserHasPermissions from 'hooks/useUserHasPermissions';
 import confirmationModal from 'utils/confirmationModalUtils';
 import createInboundWorkflowHeader from 'utils/createInboundWorkflowHeader';
-import dateWithoutTimeZone from 'utils/dateUtils';
+import dateWithoutTimeZone, { formatDateToString } from 'utils/dateUtils';
 import filterDocumentsByStepNumber from 'utils/stockMovementUtils';
 
 const useInboundSendForm = ({ previous }) => {
@@ -81,6 +81,7 @@ const useInboundSendForm = ({ previous }) => {
     formState: { errors, isValid },
     trigger,
     reset,
+    setValue,
   } = useForm({
     mode: 'onBlur',
     defaultValues,
@@ -126,6 +127,11 @@ const useInboundSendForm = ({ previous }) => {
     };
   };
 
+  const formatDate = (date) => (formatDateToString({
+    date,
+    dateFormat: DateFormatDateFns.DD_MMM_YYYY,
+  }));
+
   const fetchStockMovementData = async () => {
     try {
       spinner.show();
@@ -149,7 +155,7 @@ const useInboundSendForm = ({ previous }) => {
             label: `${data.destination.name} [${data.destination.locationType?.description ?? ''}]`,
           }
           : null,
-        shipDate: data.dateShipped ?? null,
+        shipDate: formatDate(data.dateShipped),
         shipmentType: data.shipmentType && data.shipmentType.name !== 'Default'
           ? {
             id: data.shipmentType.id,
@@ -161,7 +167,7 @@ const useInboundSendForm = ({ previous }) => {
         trackingNumber: data.trackingNumber ?? '',
         driverName: data.driverName ?? '',
         comments: data.comments ?? '',
-        expectedDeliveryDate: data.expectedDeliveryDate ?? null,
+        expectedDeliveryDate: formatDate(data.expectedDeliveryDate),
         statusCode: data.statusCode ?? '',
         hasManageInventory: data.hasManageInventory ?? false,
         shipped: data.shipped ?? false,
@@ -406,6 +412,7 @@ const useInboundSendForm = ({ previous }) => {
     files,
     handleRemoveFile,
     isValid,
+    setValue,
   };
 };
 
