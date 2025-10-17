@@ -9,6 +9,17 @@ import org.pih.warehouse.shipping.Shipment
 
 import java.time.Instant
 
+/**
+ * Maps transactions to the source entity that created them. Serves multiple purposes:
+ *
+ * 1. Grouping together transactions. Transactions that were created from the same action will share the same
+ *    transaction source.
+ *
+ * 2. Logging the history of transaction-creating actions. Not all transaction actions will result in a transaction
+ *    being created (ex: a cycle count that has no discrepancies/adjustments and baseline transactions are disabled).
+ *    This table creates a historical record that maps the action to the source entity that triggered the action,
+ *    so that we know when a specific action occurred, even when no transaction was created.
+ */
 class TransactionSource {
 
     String id
