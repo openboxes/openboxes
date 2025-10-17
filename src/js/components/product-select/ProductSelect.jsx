@@ -41,6 +41,7 @@ const ProductSelect = ({
   locationId,
   fieldRef,
   includeUom,
+  enableProductSelectRef,
   ...props
 }) => {
   const selectRef = useRef(null);
@@ -106,7 +107,7 @@ const ProductSelect = ({
   return (
     <Select
       {...props}
-      fieldRef={(el) => {
+      fieldRef={enableProductSelectRef ? fieldRef : (el) => {
         selectRef.current = el;
         if (fieldRef) fieldRef(el);
       }}
@@ -135,6 +136,7 @@ ProductSelect.defaultProps = {
   fieldRef: undefined,
   loadOptions: undefined,
   includeUom: false,
+  enableProductSelectRef: false,
 };
 
 ProductSelect.propTypes = {
@@ -148,6 +150,7 @@ ProductSelect.propTypes = {
   fieldRef: PropTypes.func,
   loadOptions: PropTypes.func,
   includeUom: PropTypes.bool,
+  enableProductSelectRef: PropTypes.bool,
 };
 
 export default ProductSelect;

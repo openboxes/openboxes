@@ -203,25 +203,22 @@ const useInboundAddItemsForm = ({
     setRefreshFocusCounter((prev) => prev + 1);
   };
 
-  const isItemUpdated = (item, oldItem) => !_.isEqual(_.omit(item, ['product']), _.omit(oldItem, ['product']));
+  const formatDate = (date) => (formatDateToString({
+    date,
+    dateFormat: DateFormatDateFns.DD_MMM_YYYY,
+  }));
 
   const shouldUpdateItem = (item, oldItem) => {
     const oldQty = Number(oldItem.quantityRequested) || 0;
     const newQty = Number(item.quantityRequested) || 0;
-
-    const expirationDateChanged = (item.expirationDate
-        && item.inventoryItem?.expirationDate !== item.expirationDate)
-      || (!item.expirationDate && oldItem.expirationDate);
-
     return (
-      !isItemUpdated(item, oldItem)
-      || item.palletName !== oldItem.palletName
+      item.palletName !== oldItem.palletName
       || item.boxName !== oldItem.boxName
       || item.product?.id !== oldItem.product.id
       || newQty !== oldQty
       || item.recipient?.id !== oldItem.recipient?.id
       || item.lotNumber !== oldItem.lotNumber
-      || expirationDateChanged
+      || item.expirationDate !== oldItem.expirationDate
     );
   };
 
@@ -241,7 +238,10 @@ const useInboundAddItemsForm = ({
       palletName: item.palletName,
       boxName: item.boxName,
       lotNumber: item.lotNumber,
-      expirationDate: item.expirationDate,
+      expirationDate: dateWithoutTimeZone({
+        date: item.expirationDate,
+        outputDateFormat: DateFormat.MM_DD_YYYY,
+      }),
       recipient: { id: item.recipient?.id || '' },
       sortOrder: item.sortOrder,
     });
@@ -266,10 +266,7 @@ const useInboundAddItemsForm = ({
         value: item.recipient.value || item.recipient.id,
       }
       : null,
-    expirationDate: formatDateToString({
-      date: item.expirationDate,
-      dateFormat: DateFormatDateFns.DD_MMM_YYYY,
-    }),
+    expirationDate: formatDate(item.expirationDate),
   });
 
   const saveRequisitionItemsInCurrentStep = async (itemCandidatesToSave) => {
@@ -290,17 +287,12 @@ const useInboundAddItemsForm = ({
       };
       try {
         spinner.show();
+        // Update inventory items as part of the save process
+        await apiClient.post(STOCK_MOVEMENT_UPDATE_INVENTORY_ITEMS(queryParams.id), payload);
         const resp = await apiClient.post(STOCK_MOVEMENT_UPDATE_ITEMS(queryParams.id), payload);
         const { data } = resp.data;
-        const transformedData = {
-          ...data,
-          identifier: data.identifier,
-          stockMovementId: data.id,
-          lineItems: data.lineItems?.map(transformLineItem),
-        };
-        setValue('currentLineItems', transformedData.lineItems);
-        setValue('values.lineItems', transformedData.lineItems);
-        setValue('values', transformedData);
+        setValue('currentLineItems', data.lineItems?.map(transformLineItem));
+        setValue('values.lineItems', data.lineItems?.map(transformLineItem));
         return resp;
       } finally {
         spinner.hide();
@@ -353,7 +345,8 @@ const useInboundAddItemsForm = ({
     const updatedLineItems = updatedValues.lineItems;
 
     const hasExpirationDateMismatch = updatedLineItems?.some(
-      (item) => item.inventoryItem && item.expirationDate !== item.inventoryItem.expirationDate,
+      (item) => item.inventoryItem && item.expirationDate
+        !== formatDate(item.inventoryItem.expirationDate),
     );
 
     const hasNonZeroQuantity = updatedLineItems?.some(
@@ -417,29 +410,23 @@ const useInboundAddItemsForm = ({
 
   const nextPage = async () => {
     await trigger();
-    if (isValid) {
-      const formValues = getValues();
-      const lineItems = formValues.values.lineItems
-        .filter((item) => item?.product)
-        .map((item) => ({
-          ...item,
-          expirationDate: item.expirationDate ? dateWithoutTimeZone({
-            date: item.expirationDate,
-            outputDateFormat: DateFormat.MM_DD_YYYY,
-          }) : null,
-        }));
-      const hasInvalidQuantity = checkInvalidQuantities(lineItems);
-
-      if (hasInvalidQuantity) {
-        confirmAction(
-          () => checkDuplicatesSaveAndTransitionToNextStep(formValues, lineItems),
-          'react.stockMovement.confirmSave.message',
-          'Are you sure you want to save? There are some lines with empty or zero quantity, those lines will be deleted.',
-        );
-      } else {
-        await checkDuplicatesSaveAndTransitionToNextStep(formValues, lineItems);
-      }
+    if (!isValid) {
+      return;
     }
+    const formValues = getValues();
+    const lineItems = formValues.values.lineItems.filter((item) => item?.product);
+
+    const hasInvalidQuantity = checkInvalidQuantities(lineItems);
+
+    if (hasInvalidQuantity) {
+      confirmAction(
+        () => checkDuplicatesSaveAndTransitionToNextStep(formValues, lineItems),
+        'react.stockMovement.confirmSave.message',
+        'Are you sure you want to save? There are some lines with empty or zero quantity, those lines will be deleted.',
+      );
+      return;
+    }
+    await checkDuplicatesSaveAndTransitionToNextStep(formValues, lineItems);
   };
 
   const saveItems = async (lineItems) => {
@@ -530,18 +517,15 @@ const useInboundAddItemsForm = ({
 
   const setLineItems = (response, startIndex, showOnlyImportedItems) => {
     const { data } = response.data;
+    const transformedData = data.map(transformLineItem);
     const lineItemsData = !data.length && getValues('values.lineItems').length === 0
       ? [{ sortOrder: 100 }]
-      : data.map((val) => ({
-        ...transformLineItem(val),
-        itemId: val.id,
-        disabled: true,
-      }));
+      : transformedData;
     const newSortOrder = (lineItemsData.length > 0
       ? lineItemsData[lineItemsData.length - 1].sortOrder : 0) + 100;
 
     setValue('sortOrder', newSortOrder);
-    setValue('currentLineItems', getValues().isPaginated ? _.uniqBy(_.concat(data, ...getValues('currentLineItems')), 'id') : data);
+    setValue('currentLineItems', getValues().isPaginated ? _.uniqBy(_.concat(transformedData, ...getValues('currentLineItems')), 'id') : transformedData);
     setValue('values.lineItems', getValues().isPaginated && !showOnlyImportedItems ? _.uniqBy(_.concat(lineItemsData, ...getValues('values.lineItems')), 'id') : lineItemsData);
 
     if (startIndex !== null && getValues('values.lineItems').length !== getValues().totalCount) {
@@ -565,10 +549,7 @@ const useInboundAddItemsForm = ({
       await apiClient.delete(STOCK_MOVEMENT_REMOVE_ALL_ITEMS(queryParams.id));
       setValue('totalCount', 1);
       setValue('currentLineItems', []);
-      setValue('values', {
-        ...getValues().values,
-        lineItems: new Array(1).fill({ sortOrder: 100 }),
-      });
+      setValue('values.lineItems', new Array(1).fill({ sortOrder: 100 }));
       await fetchLineItems();
     } finally {
       resetFocus();
@@ -668,11 +649,7 @@ const useInboundAddItemsForm = ({
       const isLastProductNil = _.isNil(lastLineItem?.product);
 
       if (isLastProductNil) {
-        const updatedValues = {
-          ...getValues().values,
-          lineItems: [],
-        };
-        setValue('values', updatedValues);
+        setValue('values.lineItems', []);
       }
     } finally {
       spinner.hide();
