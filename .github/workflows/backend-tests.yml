@@ -5,7 +5,8 @@ on:
   workflow_call:
     secrets:
       CODECOV_TOKEN:
-        required: true
+        # If we're running tests for a PR from a fork, this will not be available.
+        required: false
 
 jobs:
   run-backend-tests:
@@ -37,8 +38,11 @@ jobs:
 
       # Tests are run for each database in the above matrix, but we only want to publish a code coverage report once.
       # "strategy.job-index" gives us the index of the current job in the matrix. Any index is fine. We use the first.
+      # Additionally, because we're using pull_request instead of pull_request_target (for security purposes) when
+      # running tests on PRs (see test-pull-request.yml), forks won't have access to GitHub secrets, so this step will
+      # fail if we try to run it. As such, we have to skip publishing Codecov reports when running tests from forks.
       - name: Upload results to Codecov
-        if: ${{ strategy.job-index == 0 }}
+        if: ${{ strategy.job-index == 0 && github.event.pull_request.head.repo.full_name == github.repository }}
         uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}

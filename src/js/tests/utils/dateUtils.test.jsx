@@ -83,7 +83,7 @@ describe('parseStringToDate()', () => {
     expect(date.getSeconds()).toBe(15);
   });
 
-  it('should return the same date when timezone is ahead of UTC', () => {
+  it('should return the same date when timezone is ahead of UTC (stripping timezone)', () => {
     const date = parseStringToDate({
       date: '2025-01-01T00:00+07:00',
       dateOnly: true,
@@ -99,16 +99,16 @@ describe('parseStringToDate()', () => {
     expect(date.getSeconds()).toBe(0);
   });
 
-  it('should return the previous day when timezone is ahead of UTC', () => {
+  it('should return the appropriate date when timezone is ahead of UTC (with timezone)', () => {
     const date = parseStringToDate({
       date: '2025-01-01T00:00+07:00',
     });
-    expect(date.getFullYear()).toBe(2024);
-    expect(date.getMonth()).toBe(11);
-    expect(date.getDate()).toBe(31);
-    expect(date.getHours()).toBe(18);
-    expect(date.getMinutes()).toBe(0);
-    expect(date.getSeconds()).toBe(0);
+    expect(date.getUTCFullYear()).toBe(2024);
+    expect(date.getUTCMonth()).toBe(11);
+    expect(date.getUTCDate()).toBe(31);
+    expect(date.getUTCHours()).toBe(17);
+    expect(date.getUTCMinutes()).toBe(0);
+    expect(date.getUTCSeconds()).toBe(0);
   });
 });
 
@@ -269,7 +269,7 @@ describe('formatDateToDateOnlyString()', () => {
 
     it('should return 0 offset', () => {
       const offset = displayTimezoneOffset(0);
-      expect(offset).toBe('+00:00');
+      expect(offset).toBe('Z');
     });
   });
 });

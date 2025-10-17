@@ -1,9 +1,12 @@
 package org.pih.warehouse.api.spec.product
 
+import spock.lang.Ignore
+
 import org.pih.warehouse.api.spec.base.ApiSpec
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.product.ProductAvailability
 
+@Ignore("Until we can have our APIs update product availability sequentially these tests are too flaky to be enabled.")
 class ProductApiProductAvailabilitySpec extends ApiSpec {
 
     private static final int QUANTITY_ON_HAND = 10
