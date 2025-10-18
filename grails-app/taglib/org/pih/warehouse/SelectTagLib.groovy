@@ -10,6 +10,8 @@
 package org.pih.warehouse
 
 import org.grails.core.artefact.DomainClassArtefactHandler
+import org.springframework.beans.factory.annotation.Value
+
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.BudgetCode
 import org.pih.warehouse.core.Constants
@@ -54,6 +56,99 @@ class SelectTagLib {
     def shipmentService
     def requisitionService
     def organizationService
+
+    /**
+     * The minimum number of characters input into the search field before a request will be sent.
+     */
+    @Value('${openboxes.typeahead.minLength}')
+    String minSearchValueLength
+
+    /**
+     * How long to wait after the user has stopped typing before sending the request.
+     */
+    @Value('${openboxes.typeahead.delay}')
+    String searchDelay
+
+    /**
+     * A search and select field. Searches via AJAX API request using the Select2 jQuery plugin.
+     *
+     * @attr className Required. A unique name for identifying the generated select element
+     * @attr url Required. The path of the API request
+     * @attr searchParameter The name of the query parameter to use when making the API request
+     * @attr multiple True if the select box should allow multiple items to be selected
+     */
+    def selectAjax = { attrs, body ->
+        if (!attrs.containsKey('className')) {
+            throwTagError("Attribute [className] is required.")
+        }
+        String className = "${attrs.className}-select"
+
+        if (!attrs.containsKey('url')) {
+            throwTagError("Attribute [url] is required.")
+        }
+        String url = attrs.url
+
+        String searchParameter = attrs.searchParameter ?: "name"
+        String multiple = attrs.multiple ?: "false"
+        String placeholder = "${g.message(code: 'default.selectOptions.label', default: 'Select Options')}"
+
+        def html = """
+            <select class="${className}"
+                    multiple="${multiple}"
+                    type="text">
+            </select>
+
+            <script type=\'text/javascript\'>
+
+                jQuery(document).ready(function() {
+
+                    jQuery('.${className}').select2({
+
+                        placeholder: "${placeholder}",
+                        minimumInputLength: "${minSearchValueLength ?: "3"}",
+                        width: "100%",
+                        allowClear: true,
+                        cache: true,
+
+                        ajax: {
+                            url: "${request.contextPath}${url}",
+                            dataType: "json",
+                            delay: "${searchDelay}",
+
+                            // Specify the query parameter to set when making the API request
+                            data: function (params) {
+                                return {
+                                    ${searchParameter}: params.term,
+                                };
+                            },
+
+                            // Process the API response. Expects a response formatted like: { data: [{}, ...]}
+                            processResults: function (data, params) {
+                                var results = data.data.map(function (item) {
+                                    return {
+                                        id: item.id,
+                                        name: item.name,
+                                      
+                                        // TODO: figure out which of these aren't needed
+                                        // TODO: allow this to be configured via attrs to make it reusable
+                                        label: item.name,
+                                        text: item.name,
+                                        value: item.id,
+                                        valueText: item.name,
+                                    };
+                                });
+                                return {
+                                    results: results,
+                                };
+                            },
+                        },
+                    });
+                });
+            </script>
+        """
+
+        out << html
+    }
 
     //@Cacheable("selectCategoryCache")
     def selectCategory = { attrs, body ->

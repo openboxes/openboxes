@@ -108,13 +108,10 @@
                             <div class="filter-list-item">
                                 <label><g:message code="product.label"/></label>
                                 <p>
-                                    <g:selectProduct
-                                        id="products"
-                                        name="products"
-                                        value="${params?.products}"
-                                        data-placeholder="${g.message(code: 'default.selectOptions.label', default: 'Select Options')}"
-                                        multiple="true"
-                                        class="chzn-select-deselect"
+                                    <g:selectAjax className="products"
+                                                  value="${params?.products}"
+                                                  url="/api/products/search"
+                                                  data-testid="product-select"
                                     />
                                 </p>
                             </div>

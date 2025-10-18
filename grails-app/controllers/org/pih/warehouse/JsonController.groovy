@@ -1440,9 +1440,6 @@ class JsonController {
         List<Category> categories = params.includeCategoryChildren
                 ? category.children + category
                 : [category]
-        List<Product> products = params.products
-                ? Product.findAllById(params.list('products'))
-                : []
         // FIXME Command validation not working so we're doing it manually
         if (!startDate || !endDate || !location) {
             throw new IllegalArgumentException("All parameter fields are required")
@@ -1462,7 +1459,7 @@ class JsonController {
                 categories,
                 tagList,
                 catalogList,
-                products,
+                command.products,
                 startDate,
                 endDate,
                 isCsvReport)
@@ -1816,4 +1813,5 @@ class TransactionReportCommand implements Validateable {
     Location location
     List<TransactionType> transactionTypes
     Category category
+    List<Product> products
 }
