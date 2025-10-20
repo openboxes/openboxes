@@ -85,7 +85,7 @@ const useInboundAddItemsColumns = ({
     ),
     [debounceTime, minSearchLength],
   );
-
+  const lineItems = getValues('values.lineItems');
   const debouncedPeopleFetch = useCallback(
     debouncePeopleFetch(debounceTime, minSearchLength),
     [debounceTime, minSearchLength],
@@ -147,8 +147,6 @@ const useInboundAddItemsColumns = ({
     if (!selectedRecipient) {
       return;
     }
-
-    const lineItems = getValues('values.lineItems');
 
     _.forEach(lineItems, (item, index) => {
       setValue(`values.lineItems.${index}.recipient`, selectedRecipient);
@@ -314,7 +312,6 @@ const useInboundAddItemsColumns = ({
                   // to appear, which we don't want because we're using the new tooltip.
                   // Therefore, we need to explicitly set it to false here.
                   showValueTooltip={false}
-                  enableProductSelectRef
                 />
               )}
             />
@@ -569,6 +566,7 @@ const useInboundAddItemsColumns = ({
     headerRecipient,
     rowIndex,
     columnId,
+    lineItems,
   ]);
 
   return { columns };

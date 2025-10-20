@@ -33,7 +33,6 @@ const SelectField = ({
   focusProps = {},
   creatable,
   customTooltip,
-  enableProductSelectRef,
   ...fieldProps
 }) => {
   const [value, setValue] = useState(defaultValue);
@@ -58,10 +57,6 @@ const SelectField = ({
 
   const fieldRef = useRef(null);
 
-  const refProps = productSelect && !enableProductSelectRef
-    ? {}
-    : { fieldRef, enableProductSelectRef };
-
   useFocusOnMatch({ ...focusProps, ref: fieldRef, type: componentType.SELECT_FIELD });
 
   return (
@@ -85,7 +80,7 @@ const SelectField = ({
         multi={multiple}
         onKeyDown={onKeyDown}
         creatable={creatable}
-        {...refProps}
+        fieldRef={fieldRef}
         {...asyncProps}
         {...fieldProps}
       />
@@ -148,9 +143,6 @@ SelectField.propTypes = {
   // boolean that enables creating new options in the dropdown
   creatable: PropTypes.bool,
   customTooltip: PropTypes.bool,
-  // When true, we want to pass the external ref directly to the ProductSelect component.
-  // Must be enabled when using ProductSelect with arrow navigation.
-  enableProductSelectRef: PropTypes.bool,
 };
 
 SelectField.defaultProps = {
@@ -176,5 +168,4 @@ SelectField.defaultProps = {
   focusProps: {},
   creatable: false,
   customTooltip: false,
-  enableProductSelectRef: false,
 };

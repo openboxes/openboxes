@@ -203,11 +203,6 @@ const useInboundAddItemsForm = ({
     setRefreshFocusCounter((prev) => prev + 1);
   };
 
-  const formatDate = (date) => (formatDateToString({
-    date,
-    dateFormat: DateFormatDateFns.DD_MMM_YYYY,
-  }));
-
   const shouldUpdateItem = (item, oldItem) => {
     const oldQty = Number(oldItem.quantityRequested) || 0;
     const newQty = Number(item.quantityRequested) || 0;
@@ -266,7 +261,10 @@ const useInboundAddItemsForm = ({
         value: item.recipient.value || item.recipient.id,
       }
       : null,
-    expirationDate: formatDate(item.expirationDate),
+    expirationDate: formatDateToString({
+      date: item.expirationDate,
+      dateFormat: DateFormatDateFns.DD_MMM_YYYY,
+    }),
   });
 
   const saveRequisitionItemsInCurrentStep = async (itemCandidatesToSave) => {
@@ -343,10 +341,9 @@ const useInboundAddItemsForm = ({
 
   const handleTransition = (updatedValues, lineItems) => {
     const updatedLineItems = updatedValues.lineItems;
-
     const hasExpirationDateMismatch = updatedLineItems?.some(
       (item) => item.inventoryItem && item.expirationDate
-        !== formatDate(item.inventoryItem.expirationDate),
+        !== item.inventoryItem.expirationDate,
     );
 
     const hasNonZeroQuantity = updatedLineItems?.some(
