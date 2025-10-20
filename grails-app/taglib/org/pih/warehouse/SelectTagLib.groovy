@@ -69,32 +69,42 @@ class SelectTagLib {
     @Value('${openboxes.typeahead.delay}')
     String searchDelay
 
+    def selectProductAjax = { attrs, body ->
+        attrs.id = attrs.id ?: "products-select"
+        attrs.url = "/api/products/search"
+        attrs.searchParameter = "name"
+        out << selectAjax(attrs, body)
+    }
+
     /**
      * A search and select field. Searches via AJAX API request using the Select2 jQuery plugin.
      *
-     * @attr className Required. A unique name for identifying the generated select element
+     * @attr id Required. A unique identifier (within the current page) for the generated select element
      * @attr url Required. The path of the API request
+     * @attr name The name of the select element. Defaults to the value of the id attr.
      * @attr searchParameter The name of the query parameter to use when making the API request
      * @attr multiple True if the select box should allow multiple items to be selected
      */
     def selectAjax = { attrs, body ->
-        if (!attrs.containsKey('className')) {
-            throwTagError("Attribute [className] is required.")
+        if (!attrs.containsKey('id')) {
+            throwTagError("Attribute [id] is required.")
         }
-        String className = "${attrs.className}-select"
-
         if (!attrs.containsKey('url')) {
             throwTagError("Attribute [url] is required.")
         }
-        String url = attrs.url
 
+        String id = attrs.id
+        String name = attrs.name ?: attrs.id
+        attrs.put('data-testid', attrs.get('data-testid') ?: attrs.id)
+        String url = attrs.url
         String searchParameter = attrs.searchParameter ?: "name"
-        String multiple = attrs.multiple ?: "false"
+        boolean multiple = attrs.multiple?.asBoolean() ?: false
         String placeholder = "${g.message(code: 'default.selectOptions.label', default: 'Select Options')}"
 
         def html = """
-            <select class="${className}"
-                    multiple="${multiple}"
+            <select id="${id}"
+                    name="${name}"
+                    ${multiple ? "multiple" : ""}
                     type="text">
             </select>
 
@@ -102,7 +112,7 @@ class SelectTagLib {
 
                 jQuery(document).ready(function() {
 
-                    jQuery('.${className}').select2({
+                    jQuery('#${id}').select2({
 
                         placeholder: "${placeholder}",
                         minimumInputLength: "${minSearchValueLength ?: "3"}",
@@ -113,9 +123,10 @@ class SelectTagLib {
                         ajax: {
                             url: "${request.contextPath}${url}",
                             dataType: "json",
-                            delay: "${searchDelay}",
+                            delay: "${searchDelay ?: "300"}",
 
-                            // Specify the query parameter to set when making the API request
+                            // 'term' is the field that Select2 uses as the user-typed search value, so re-map it
+                            // to the query parameter that the API accepts.
                             data: function (params) {
                                 return {
                                     ${searchParameter}: params.term,
@@ -127,14 +138,11 @@ class SelectTagLib {
                                 var results = data.data.map(function (item) {
                                     return {
                                         id: item.id,
-                                        name: item.name,
-                                      
-                                        // TODO: figure out which of these aren't needed
-                                        // TODO: allow this to be configured via attrs to make it reusable
-                                        label: item.name,
-                                        text: item.name,
+                                        ${searchParameter}: item.${searchParameter},
+                                        label: item.${searchParameter},
+                                        text: item.${searchParameter},
                                         value: item.id,
-                                        valueText: item.name,
+                                        valueText: item.${searchParameter},
                                     };
                                 });
                                 return {

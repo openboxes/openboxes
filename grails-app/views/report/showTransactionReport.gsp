@@ -108,10 +108,9 @@
                             <div class="filter-list-item">
                                 <label><g:message code="product.label"/></label>
                                 <p>
-                                    <g:selectAjax className="products"
-                                                  value="${params?.products}"
-                                                  url="/api/products/search"
-                                                  data-testid="product-select"
+                                    <g:selectProductAjax id="products-select"
+                                                         value="${params?.products}"
+                                                         multiple="true"
                                     />
                                 </p>
                             </div>
@@ -260,7 +259,7 @@
 				data.push({ name: "startDate", value: $("#startDate").val() });
 				data.push({ name: "endDate", value: $("#endDate").val() });
 				data.push({ name: "category", value: $("#category").val() });
-                data.push({ name: "products", value: $("#products").val() });
+                data.push({ name: "products", value: $("#products-select").val() });
 				data.push({ name: "tags", value: $("#tags").val() });
 				data.push({ name: "catalogs", value: $("#catalogs").val() });
 				if($('#includeCategoryChildren').is(':checked')) {
@@ -383,7 +382,7 @@
 				startDate: $("#startDate").val(),
 				endDate: $("#endDate").val(),
 				category: $("#category").val(),
-                products: $("#products").val(),
+                products: $("#products-select").val(),
 				tags: $("#tags").val(),
 				catalogs: $("#catalogs").val(),
 				format: "text/csv"
