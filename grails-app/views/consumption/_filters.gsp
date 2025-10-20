@@ -86,6 +86,19 @@
                             data-placeholder="${g.message(code: 'default.selectOptions.label', default: 'Select Options')}"
                         />
                     </div>
+                    <div class="filter-list-item">
+                        <label>
+                            <warehouse:message code="consumption.products.label" default="Products"/>
+                        </label>
+                        <g:selectAjax
+                            className="products"
+                            name="selectedProducts"
+                            value="${command?.selectedProducts}"
+                            url="/api/products/search"
+                            data-testid="product-select"
+                            multiple="true"
+                        />
+                    </div>
                     <g:if test="${!command?.toLocations}">
                         <div class="filter-list-item">
                             <label>
