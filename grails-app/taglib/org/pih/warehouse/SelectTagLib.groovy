@@ -100,12 +100,22 @@ class SelectTagLib {
         String searchParameter = attrs.searchParameter ?: "name"
         boolean multiple = attrs.multiple?.asBoolean() ?: false
         String placeholder = "${g.message(code: 'default.selectOptions.label', default: 'Select Options')}"
+        Object values = attrs.value
+        String selectedOptionsHtml = ""
+
+        if (values && values.any { it?.hasProperty('id') }) {
+            selectedOptionsHtml = values.collect { val ->
+                String text = val.name ?: val.toString()
+                "<option value='${val.id}' selected='true'>${text.encodeAsHTML()}</option>"
+            }.join("\n")
+        }
 
         def html = """
             <select id="${id}"
                     name="${name}"
                     ${multiple ? "multiple" : ""}
                     type="text">
+            ${selectedOptionsHtml}
             </select>
 
             <script type=\'text/javascript\'>
