@@ -5,7 +5,6 @@ import grails.rest.RestfulController
 import grails.validation.ValidationException
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inboundSortation.DemandService
-import org.pih.warehouse.product.Product
 import org.pih.warehouse.putaway.PutawayTask
 import org.pih.warehouse.putaway.PutawayTaskService
 import org.springframework.http.HttpStatus
@@ -37,8 +36,7 @@ class PutawayTaskApiController extends RestfulController<PutawayTask> {
             throw new ValidationException("validation errors", command.errors)
         }
 
-        def tasks =
-                putawayTaskService.search(command.facility, command.product, command.container, command.statusCategory, params)
+        def tasks = putawayTaskService.search(command, params)
 
         render ([data: tasks, totalCount: tasks.totalCount?:0] as JSON)
     }

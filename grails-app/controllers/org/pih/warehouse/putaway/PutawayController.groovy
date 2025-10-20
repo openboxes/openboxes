@@ -4,7 +4,7 @@ import grails.gorm.transactions.Transactional
 import org.grails.web.json.JSONObject
 import org.pih.warehouse.api.Putaway
 import org.pih.warehouse.api.PutawayItem
-import org.pih.warehouse.api.PutawayTaskAdapter
+import org.pih.warehouse.api.putaway.SearchPutawayTaskCommand
 import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.order.Order
 
@@ -46,9 +46,8 @@ class PutawayController {
             return
         }
 
-        List<PutawayTask> tasks = order.orderItems.collect { orderItem ->
-            PutawayTaskAdapter.toPutawayTask(orderItem)
-        }.findAll { it != null }
+        def command = new SearchPutawayTaskCommand(facility: order.destination, order: order)
+        List<PutawayTask> tasks = putawayTaskService.search(command, params)
 
         render(template: "putawayTasks", model: [orderInstance: order, putawayTasks: tasks])
     }
