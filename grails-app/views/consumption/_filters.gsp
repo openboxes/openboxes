@@ -90,13 +90,10 @@
                         <label>
                             <warehouse:message code="consumption.products.label" default="Products"/>
                         </label>
-                        <g:selectAjax
-                            className="products"
-                            name="selectedProducts"
-                            value="${command?.selectedProducts}"
-                            url="/api/products/search"
-                            data-testid="product-select"
-                            multiple="true"
+                        <g:selectProductAjax
+                                id="selectedProducts"
+                                value="${command?.selectedProducts}"
+                                multiple="true"
                         />
                     </div>
                     <g:if test="${!command?.toLocations}">
