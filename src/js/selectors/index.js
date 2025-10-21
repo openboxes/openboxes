@@ -33,3 +33,7 @@ export const getShipmentTypes = (state) => state.stockMovementCommon.shipmentTyp
 
 export const getLotNumbersByProductId = (state, productId) =>
   state.lotNumbers?.lotNumbersWithExpiration?.[productId] || [];
+
+export const getInboundHeaderInfo = (state) => state.inbound.headerInfo || [];
+
+export const getInboundHeaderStatus = (state) => state.inbound.headerStatus;
