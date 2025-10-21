@@ -154,7 +154,10 @@ ProductSelect.propTypes = {
   showValueTooltip: PropTypes.bool,
   locationId: PropTypes.string.isRequired,
   onExactProductSelected: PropTypes.func,
-  fieldRef: PropTypes.func,
+  fieldRef: PropTypes.oneOfType([
+    PropTypes.func,
+    PropTypes.shape({ current: PropTypes.instanceOf(Element) }),
+  ]),
   loadOptions: PropTypes.func,
   includeUom: PropTypes.bool,
 };
