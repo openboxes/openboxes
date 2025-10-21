@@ -60,4 +60,16 @@ class ProductAvailability {
     Boolean isPickable() {
         return (inventoryItem ? inventoryItem.pickable : true) && (binLocation ? binLocation.pickable : true)
     }
+
+    @Override
+    String toString() {
+        "productCode: ${productCode}, " +
+        "lotNumber: ${lotNumber}, " +
+        "binLocationName: ${binLocationName}, " +
+        "quantityOnHand: ${quantityOnHand}, " +
+        "quantityAllocated: ${quantityAllocated}, " +
+        "quantityOnHold: ${quantityOnHold}, " +
+        "quantityAvailableToPromise: ${quantityAvailableToPromise}, " +
+        "quantityNotPicked: ${quantityNotPicked}"
+    }
 }
