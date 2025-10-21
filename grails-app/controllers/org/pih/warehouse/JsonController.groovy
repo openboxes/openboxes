@@ -10,6 +10,7 @@
 package org.pih.warehouse
 
 import grails.converters.JSON
+import grails.databinding.BindUsing
 import groovy.sql.Sql
 import grails.gorm.transactions.Transactional
 import grails.validation.Validateable
@@ -1440,7 +1441,6 @@ class JsonController {
         List<Category> categories = params.includeCategoryChildren
                 ? category.children + category
                 : [category]
-
         // FIXME Command validation not working so we're doing it manually
         if (!startDate || !endDate || !location) {
             throw new IllegalArgumentException("All parameter fields are required")
@@ -1455,7 +1455,15 @@ class JsonController {
         }
 
         Boolean isCsvReport = params.format == "text/csv"
-        List<Object> data = reportService.getTransactionReport(location, categories, tagList, catalogList, startDate, endDate, isCsvReport)
+        List<Object> data = reportService.getTransactionReport(
+                location,
+                categories,
+                tagList,
+                catalogList,
+                command.products,
+                startDate,
+                endDate,
+                isCsvReport)
 
         if (isCsvReport) {
             String csv = dataService.generateCsv(data)
@@ -1806,4 +1814,13 @@ class TransactionReportCommand implements Validateable {
     Location location
     List<TransactionType> transactionTypes
     Category category
+
+    // TODO: The datatables plugin sends the ids as a single string (ex: products="1,2") so we need to split it up
+    //       ourselves. Better would be to modify the usage of datatables to send up each id as a separate field
+    //       (ex: products="1"&products="2") so that Grails can bind it normally. (see showTransactionReport.gsp)
+    @BindUsing({ obj, source ->
+        List<String> productIds = (source['products'] as String)?.split(',')
+        return productIds ? Product.findAllByIdInList(productIds) : null
+    })
+    List<Product> products
 }
