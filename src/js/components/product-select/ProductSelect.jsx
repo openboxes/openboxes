@@ -103,13 +103,24 @@ const ProductSelect = ({
       callback(resultOptions);
     });
 
+  /**
+   * Handles the reference to the Async Select component.
+   * Stores the component instance internally and updates any external ref provided.
+   *
+   * @param el - The Async Select component instance.
+   */
   const handleFieldRef = (el) => {
+    // Store the internal reference to the Async Select component instance
     selectRef.current = el;
 
     const ref = fieldRef;
+
+    // If the external ref is an object with a `current` property, update it
     if (ref?.current !== undefined) {
       ref.current = el;
     }
+
+    // If the external ref is a function, call it with the component instance
     if (typeof ref === 'function') {
       ref(el);
     }

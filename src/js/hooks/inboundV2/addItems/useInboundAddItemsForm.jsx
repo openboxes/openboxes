@@ -203,28 +203,14 @@ const useInboundAddItemsForm = ({
     setRefreshFocusCounter((prev) => prev + 1);
   };
 
-  const shouldUpdateItem = (item, oldItem) => {
-    const oldQty = Number(oldItem.quantityRequested) || 0;
-    const newQty = Number(item.quantityRequested) || 0;
-    return (
-      item.palletName !== oldItem.palletName
-      || item.boxName !== oldItem.boxName
-      || item.product?.id !== oldItem.product.id
-      || newQty !== oldQty
-      || item.recipient?.id !== oldItem.recipient?.id
-      || item.lotNumber !== oldItem.lotNumber
-      || item.expirationDate !== oldItem.expirationDate
-    );
-  };
-
   const getLineItemsToBeSaved = (lineItems) => {
     const lineItemsToBeAdded = lineItems.filter(
       (item) => !item.statusCode && item.quantityRequested && item.quantityRequested !== '0' && item.product,
     );
 
-    const lineItemsToBeUpdated = lineItems.filter((item) => item.statusCode
-      && getValues().currentLineItems.some((old) =>
-        old.id === item.id && shouldUpdateItem(item, old)));
+    const lineItemsToBeUpdated = lineItems.filter((item) =>
+      item.statusCode &&
+      getValues('currentLineItems').some((oldItem) => oldItem.id === item.id && !_.isEqual(item, oldItem)));
 
     const formatItem = (item) => ({
       id: item.id,
@@ -267,6 +253,9 @@ const useInboundAddItemsForm = ({
     }),
   });
 
+  const checkInvalidQuantities = (lineItems) =>
+    lineItems.some((item) => !item.quantityRequested || item.quantityRequested === '0');
+
   const saveRequisitionItemsInCurrentStep = async (itemCandidatesToSave) => {
     const itemsToSave = getLineItemsToBeSaved(itemCandidatesToSave)
       .map((item) => ({
@@ -279,15 +268,27 @@ const useInboundAddItemsForm = ({
           : null,
       }));
     if (itemsToSave.length) {
-      const payload = {
+      const updateInventoryItemsPayload = {
+        id: queryParams.id,
+        lineItems: itemsToSave.map((item) => ({
+          product: item.product,
+          lotNumber: item.lotNumber,
+          expirationDate: item.expirationDate,
+          quantityRequested: item.quantityRequested,
+        })),
+      };
+
+      const updateItemsPayload = {
         id: queryParams.id,
         lineItems: itemsToSave,
       };
       try {
         spinner.show();
         // Update inventory items as part of the save process
-        await apiClient.post(STOCK_MOVEMENT_UPDATE_INVENTORY_ITEMS(queryParams.id), payload);
-        const resp = await apiClient.post(STOCK_MOVEMENT_UPDATE_ITEMS(queryParams.id), payload);
+        await apiClient.post(STOCK_MOVEMENT_UPDATE_INVENTORY_ITEMS(queryParams.id),
+          updateInventoryItemsPayload);
+        const resp = await apiClient.post(STOCK_MOVEMENT_UPDATE_ITEMS(queryParams.id),
+          updateItemsPayload);
         const { data } = resp.data;
         setValue('currentLineItems', data.lineItems?.map(transformLineItem));
         setValue('values.lineItems', data.lineItems?.map(transformLineItem));
@@ -295,6 +296,13 @@ const useInboundAddItemsForm = ({
       } finally {
         spinner.hide();
       }
+    }
+
+    // If there are no items to save, clear the line items with zero or empty quantity
+    if (checkInvalidQuantities(itemCandidatesToSave)) {
+      setValue('values.lineItems', itemCandidatesToSave.filter(
+        (item) => item.quantityRequested && item.quantityRequested !== '0',
+      ));
     }
     return null;
   };
@@ -401,9 +409,6 @@ const useInboundAddItemsForm = ({
       saveAndTransitionToNextStep(formValues, lineItems);
     }
   };
-
-  const checkInvalidQuantities = (lineItems) =>
-    lineItems.some((item) => !item.quantityRequested || item.quantityRequested === '0');
 
   const nextPage = async () => {
     await trigger();
