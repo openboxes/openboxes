@@ -15,8 +15,10 @@ import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.shipping.Shipment
+import org.pih.warehouse.shipping.ShipmentException
 import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.shipping.ShipmentStatusCode
 
 class PartialReceivingApiController {
 
@@ -38,6 +40,11 @@ class PartialReceivingApiController {
         JSONObject jsonObject = request.JSON
 
         PartialReceipt partialReceipt = receiptService.getPartialReceipt(params.id, params.stepNumber)
+        Shipment shipment = partialReceipt.shipment
+        if (shipment.status.code == ShipmentStatusCode.RECEIVED) {
+            throw new ShipmentException(message: "Shipment has already been received", shipment: shipment)
+        }
+
 
         bindPartialReceiptData(partialReceipt, jsonObject)
 
