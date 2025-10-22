@@ -88,7 +88,7 @@
                     </div>
                     <div class="filter-list-item">
                         <label>
-                            <warehouse:message code="consumption.products.label" default="Products"/>
+                            <g:message code="consumption.products.label" default="Products"/>
                         </label>
                         <g:selectProductAjax
                                 id="selectedProducts"
