@@ -671,7 +671,7 @@ class ProductService {
             rowCount++
             println "Processing line: " + tokens
             def productId = tokens[0]
-            def active = CsvUtil.parseCsvBooleanField(tokens[1], rowCount)
+            def active = CsvUtil.parseCsvBooleanField(tokens[1], rowCount, true)
             def productCode = tokens[2]
             def productTypeName = tokens[3]
             def productName = tokens[4]
