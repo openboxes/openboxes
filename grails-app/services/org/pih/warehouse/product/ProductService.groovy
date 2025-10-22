@@ -13,6 +13,7 @@ import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import groovy.xml.Namespace
+import org.pih.warehouse.CsvUtil
 import java.sql.Timestamp
 import org.apache.commons.lang.StringUtils
 import org.hibernate.criterion.CriteriaSpecification
@@ -627,20 +628,6 @@ class ProductService {
 
     }
 
-    Boolean parseCsvBooleanField(String value, int rowCount) {
-        // If the value is empty we treat it as true
-        if (!value) {
-            return true
-        }
-        String parsedValue = value.toLowerCase()
-        Set<String> validValues = ['true', 'false', '1', '0']
-        if (!(parsedValue in validValues)) {
-            throw new RuntimeException("Active field has to be either empty or a boolean value (true/false/1/0) at row " + rowCount)
-        }
-        return parsedValue in ['true', '1']
-    }
-
-
     /**
      * Import products from csv
      *
@@ -684,7 +671,7 @@ class ProductService {
             rowCount++
             println "Processing line: " + tokens
             def productId = tokens[0]
-            def active = parseCsvBooleanField(tokens[1], rowCount)
+            def active = CsvUtil.parseCsvBooleanField(tokens[1], rowCount)
             def productCode = tokens[2]
             def productTypeName = tokens[3]
             def productName = tokens[4]
@@ -897,7 +884,7 @@ class ProductService {
             // FIXME make relation to Constants.EXPORT_PRODUCT_COLUMNS explicit
             def row = [
                 Id                  : product?.id,
-                Active              : product.active ?: Boolean.FALSE,
+                Active              : product.active ?: Boolean.TRUE,
                 ProductCode         : product.productCode ?: '',
                 ProductType         : product.productType?.name ?: '',
                 Name                : product.name,
