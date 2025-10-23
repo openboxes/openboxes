@@ -122,13 +122,32 @@ class SelectTagLib {
 
                 jQuery(document).ready(function() {
 
+                    // If we upgrade to select2 4.1 we can replace this with a "selectionCssClass: "some-class"
+                    // config option below and then style .some-class with {"white-space": normal}.
+                    function formatSelectedOptions (state) {
+                        if (!state.id) {
+                            return state.text;
+                        }
+
+                        var \$state = \$(
+                            "<span><span></span></span>"
+                        );
+
+                        \$state.find("span").text(state.text);
+                        \$state.find("span").css("white-space", "normal");
+
+                        return \$state;
+                    };
+
+                    // https://select2.org/configuration/options-api
                     jQuery('#${id}').select2({
 
                         placeholder: "${placeholder}",
                         minimumInputLength: "${minSearchValueLength ?: "3"}",
                         width: "100%",
-                        allowClear: true,
+                        allowClear: false,
                         cache: true,
+                        templateSelection: formatSelectedOptions,
 
                         ajax: {
                             url: "${request.contextPath}${url}",

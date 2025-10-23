@@ -30,6 +30,7 @@ import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.core.ApplicationExceptionEvent
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.db.GormUtil
 import org.pih.warehouse.inventory.product.availability.AvailableItemMap
 import org.pih.warehouse.jobs.RefreshProductAvailabilityJob
 import org.pih.warehouse.order.OrderStatus
@@ -715,38 +716,46 @@ class ProductAvailabilityService {
 
     List getAvailableItems(Location location, List<String> productsIds, boolean excludeNegativeQuantity = false, boolean excludeZeroQuantity = false) {
         log.info("getQuantityOnHandByBinLocation: location=${location} product=${productsIds}")
+
+        if (!location) {
+            return []
+        }
+
         String quantityCondition = ((excludeNegativeQuantity && excludeZeroQuantity) || excludeZeroQuantity) ? "and pa.quantityOnHand <> 0"
                 : (excludeNegativeQuantity) ? "and pa.quantityOnHand > 0" : ""
 
-        List<AvailableItem> data = []
-        if (location) {
-            def results = ProductAvailability.executeQuery("""
-						select 
-						    ii,
-						    pa.binLocation,
-						    pa.quantityOnHand,
-						    pa.quantityAvailableToPromise
-						from ProductAvailability pa
-						left outer join pa.inventoryItem ii
-						left outer join pa.binLocation bl
-						where pa.location = :location
-						""" +
-                        "${quantityCondition}" +
-                        "and pa.product.id in (:products)", [location: location, products: productsIds])
+        String sql = """
+                SELECT
+                    ii,
+                    pa.binLocation,
+                    pa.quantityOnHand,
+                    pa.quantityAvailableToPromise
+                FROM
+                    ProductAvailability pa
+                    LEFT OUTER JOIN pa.inventoryItem ii
+                    LEFT OUTER JOIN pa.binLocation bl
+                WHERE
+                    pa.location = :location
+                    ${quantityCondition}
+                    ${productsIds ? "AND pa.product.id IN (:products)" : ""}
+        """
+        def results = ProductAvailability.executeQuery(sql, GormUtil.sanitizeExecuteQueryArgs(sql, [
+                location: location,
+                products: productsIds,
+        ]))
 
-            data = results.collect {
-                InventoryItem inventoryItem = it[0]
-                Location binLocation = it[1]
-                Integer quantityOnHand = it[2]
-                Integer quantityAvailableToPromise = it[3]
+        List<AvailableItem> data = results.collect {
+            InventoryItem inventoryItem = it[0]
+            Location binLocation = it[1]
+            Integer quantityOnHand = it[2]
+            Integer quantityAvailableToPromise = it[3]
 
-                return new AvailableItem(
-                        inventoryItem               : inventoryItem,
-                        binLocation                 : binLocation,
-                        quantityOnHand              : quantityOnHand,
-                        quantityAvailable           : quantityAvailableToPromise
-                )
-            }
+            return new AvailableItem(
+                    inventoryItem     : inventoryItem,
+                    binLocation       : binLocation,
+                    quantityOnHand    : quantityOnHand,
+                    quantityAvailable : quantityAvailableToPromise
+            )
         }
         return data
     }
