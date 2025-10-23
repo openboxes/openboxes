@@ -13,7 +13,7 @@ import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import groovy.xml.Namespace
-import org.pih.warehouse.CsvUtil
+import org.pih.warehouse.importer.CSVUtils
 import java.sql.Timestamp
 import org.apache.commons.lang.StringUtils
 import org.hibernate.criterion.CriteriaSpecification
@@ -671,7 +671,7 @@ class ProductService {
             rowCount++
             println "Processing line: " + tokens
             def productId = tokens[0]
-            def active = CsvUtil.parseCsvBooleanField(tokens[1], rowCount, true)
+            def active = CSVUtils.parseCsvBooleanField(tokens[1], rowCount, true)
             def productCode = tokens[2]
             def productTypeName = tokens[3]
             def productName = tokens[4]
