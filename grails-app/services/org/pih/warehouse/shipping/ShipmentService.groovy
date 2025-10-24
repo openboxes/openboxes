@@ -1839,21 +1839,17 @@ class ShipmentService {
         }
     }
 
-
     void deleteEvent(Shipment shipmentInstance, Event eventInstance) {
-        if (shipmentInstance.currentEvent?.id == eventInstance.id) {
-            shipmentInstance.currentEvent = null;
-            shipmentInstance.currentStatus = null;
-        }
         shipmentInstance.removeFromEvents(eventInstance)
+        eventInstance.delete()
+        shipmentInstance.currentEvent = null
+        shipmentInstance.currentStatus = null
         if (shipmentInstance.isFromPurchaseOrder) {
             // Set disable refresh to false to refresh order summary
             shipmentInstance.disableRefresh = false
         }
-
-        shipmentInstance.save(flush: true, failOnError: true)
+        shipmentInstance.save()
     }
-
 
     void refreshCurrentStatus(String id) {
         def shipment = Shipment.get(id)

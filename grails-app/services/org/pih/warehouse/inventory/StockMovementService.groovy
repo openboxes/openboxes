@@ -3645,17 +3645,22 @@ class StockMovementService {
             throw new IllegalStateException("Stock Movement with ID ${stockMovementId} has no associated shipment.")
         }
 
-        receiptService.rollbackLastReceipt(shipment)
-
-        Location currentLocation = AuthService.currentLocation
-        if (stockMovement.isDeleteOrRollbackAuthorized(currentLocation) ||
-                (stockMovement.isFromOrder && currentLocation?.supports(ActivityCode.ENABLE_CENTRAL_PURCHASING))) {
-            rollbackStockMovement(stockMovement.id)
-        } else {
-            throw new SecurityException("User is not authorized to rollback this stock movement.")
+        Event event = shipment.mostRecentSystemEvent
+        while (event && event.eventType?.eventCode != EventCode.CREATED) {
+            shipmentService.rollbackLastEvent(shipment)
+            event = shipment.mostRecentSystemEvent
         }
 
-        deleteStockMovement(stockMovement)
+        if (!event || event.eventType.eventCode == EventCode.CREATED) {
+            shipmentService.deleteShipment(shipment)
+        }
+
+        Requisition requisition = stockMovement?.requisition
+        if (requisition) {
+            stockMovement?.shipment = null
+            stockMovement?.requisition = null
+            requisitionService.deleteRequisition(requisition)
+        }
 
         return stockMovement
     }

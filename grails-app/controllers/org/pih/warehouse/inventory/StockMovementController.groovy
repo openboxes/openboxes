@@ -204,7 +204,7 @@ class StockMovementController {
             redirect(action: "list", params: params << ["flash": flash as JSON])
         } catch (Exception e) {
             log.error("Failed to rollback and delete stock movement with ID ${params.id}: ${e.message}", e)
-            flash.error = "Operation failed: ${e.message}"
+            flash.error = "Failed to rollback and delete stock movement: ${e.message}"
             redirect(action: "show", id: params.id)
         }
     }
