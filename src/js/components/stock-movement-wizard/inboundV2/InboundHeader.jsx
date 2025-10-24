@@ -1,15 +1,20 @@
 import React from 'react';
 
+import * as locales from 'date-fns/locale';
 import PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
+import { getCurrentLocale, getInboundHeaderInfo, getInboundHeaderStatus } from 'selectors';
 
+import { DateFormatDateFns } from 'consts/timeFormat';
 import useTranslate from 'hooks/useTranslate';
+import { formatDateToString } from 'utils/dateUtils';
 import HeaderWrapper from 'wrappers/HeaderWrapper';
 
 const InboundHeader = ({ showHeaderStatus }) => {
-  const { headerInfo, headerStatus } = useSelector((state) => ({
-    headerInfo: state.inbound.headerInfo,
-    headerStatus: state.inbound.headerStatus,
+  const { headerInfo, headerStatus, currentLocale } = useSelector((state) => ({
+    headerInfo: getInboundHeaderInfo(state),
+    headerStatus: getInboundHeaderStatus(state),
+    currentLocale: getCurrentLocale(state),
   }));
   const translate = useTranslate();
 
@@ -23,7 +28,15 @@ const InboundHeader = ({ showHeaderStatus }) => {
               <span>{' | '}</span>
               {headerInfo.map((item) => (
                 <>
-                  <span style={{ color: item.color }}>{item.text}</span>
+                  <span style={{ color: item.color }}>
+                    {item.isDate
+                      ? formatDateToString({
+                        date: item.text,
+                        dateFormat: DateFormatDateFns.DD_MMM_YYYY,
+                        options: { locale: locales[currentLocale] },
+                      })
+                      : item.text}
+                  </span>
                   {item.delimeter && <span>{item.delimeter}</span>}
                 </>
               ))}

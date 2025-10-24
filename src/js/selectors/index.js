@@ -314,3 +314,10 @@ export const getSpinner = (state) => state.spinner.show;
  * CURRENCY
  */
 export const getCurrencyCode = (state) => state.session.currencyCode;
+
+/**
+ * INBOUND
+ */
+export const getInboundHeaderInfo = (state) => state.inbound.headerInfo || [];
+
+export const getInboundHeaderStatus = (state) => state.inbound.headerStatus;
