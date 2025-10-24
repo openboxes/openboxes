@@ -1010,15 +1010,10 @@ class AddItemsPage extends Component {
   confirmSave(onConfirm) {
     confirmAlert({
       title: this.props.translate('react.stockMovement.message.confirmSave.label', 'Confirm save'),
-      message: this.state.isRequestFromWard
-        ? this.props.translate(
-          'react.stockMovement.QOHWillNotBeSaved.message',
-          'If there are any empty or zero quantity lines, those lines will be deleted. Are you sure you want to proceed?',
-        )
-        : this.props.translate(
-          'react.stockMovement.confirmSave.message',
-          'Are you sure you want to save? There are some lines with empty or zero quantity, those lines will be deleted.',
-        ),
+      message: this.props.translate(
+        'react.stockMovement.QOHWillNotBeSaved.message',
+        'If there are any empty or zero quantity lines, those lines will be deleted. Are you sure you want to proceed?',
+      ),
       buttons: [
         {
           label: this.props.translate('react.default.yes.label', 'Yes'),
@@ -1218,7 +1213,7 @@ class AddItemsPage extends Component {
    */
   saveRequisitionItems(lineItems) {
     const itemsToSave = this.getLineItemsToBeSaved(lineItems);
-    const updateItemsUrl = `/api/stockMovements/${this.state.values.stockMovementId}/updateItems`;
+    const updateItemsUrl = `/api/stockMovements/${this.state.values.stockMovementId}/updateItems`; // !!!!!!!!!!!!!!
     const payload = {
       id: this.state.values.stockMovementId,
       lineItems: itemsToSave,
@@ -1278,8 +1273,7 @@ class AddItemsPage extends Component {
    */
   save(formValues) {
     const lineItems = _.filter(formValues.lineItems, (item) => !_.isEmpty(item));
-    const zeroedLines = _.some(lineItems, (item) => !item.quantityRequested || item.quantityRequested === '0');
-    if (zeroedLines || this.state.isRequestFromWard) {
+    if (this.state.isRequestFromWard) {
       this.confirmSave(() => this.saveItems(lineItems));
     } else {
       this.saveItems(lineItems);
@@ -1508,8 +1502,7 @@ class AddItemsPage extends Component {
     };
     if (!invalid) {
       const lineItems = _.filter(values.lineItems, (item) => !_.isEmpty(item));
-      const zeroedLines = _.some(lineItems, (item) => !item.quantityRequested || item.quantityRequested === '0');
-      if (zeroedLines || this.state.isRequestFromWard) {
+      if (this.state.isRequestFromWard) {
         this.confirmSave(() => {
           saveAndRedirect(lineItems);
         });
