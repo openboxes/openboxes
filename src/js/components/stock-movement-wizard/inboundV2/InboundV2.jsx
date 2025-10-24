@@ -8,8 +8,6 @@ import InboundV2Create from 'components/stock-movement-wizard/inboundV2/sections
 import InboundV2Send from 'components/stock-movement-wizard/inboundV2/sections/InboundV2Send';
 import WizardStepsV2 from 'components/wizard/v2/WizardStepsV2';
 import inboundV2Step from 'consts/InboundV2Step';
-import useInboundAddItemsForm from 'hooks/inboundV2/addItems/useInboundAddItemsForm';
-import useInboundCreateForm from 'hooks/inboundV2/create/useInboundCreateForm';
 import useTranslate from 'hooks/useTranslate';
 import useTranslation from 'hooks/useTranslation';
 import useWizard from 'hooks/useWizard';
@@ -59,80 +57,13 @@ const InboundV2 = () => {
     steps,
   });
 
-  const {
-    errors,
-    control,
-    trigger,
-    handleSubmit,
-    onSubmitStockMovementDetails,
-    stockLists,
-    setValue,
-  } = useInboundCreateForm({ next });
-
-  const createComponentProps = {
-    control,
-    errors,
-    next,
-    trigger,
-    stockLists,
-    setValue,
-  };
-
-  const {
-    control: addItemsControl,
-    handleSubmit: addItemsHandleSubmit,
-    errors: addItemsErrors,
-    isValid: addItemsIsValid,
-    trigger: addItemsTrigger,
-    getValues: addItemsGetValues,
-    setValue: addItemsSetValue,
-    loading,
-    nextPage,
-    save,
-    removeItem,
-    updateTotalCount,
-    removeAll,
-    saveAndExit,
-    previousPage,
-    refreshFocusCounter,
-    resetFocus,
-    refresh,
-    importTemplate,
-    exportTemplate,
-  } = useInboundAddItemsForm({ next, previous });
-
-  const addItemsComponentProps = {
-    control: addItemsControl,
-    handleSubmit: addItemsHandleSubmit,
-    errors: addItemsErrors?.values?.lineItems?.length ? addItemsErrors.values.lineItems : [],
-    isValid: addItemsIsValid,
-    trigger: addItemsTrigger,
-    getValues: addItemsGetValues,
-    setValue: addItemsSetValue,
-    loading,
-    nextPage,
-    save,
-    removeItem,
-    updateTotalCount,
-    removeAll,
-    saveAndExit,
-    previousPage,
-    refreshFocusCounter,
-    resetFocus,
-    refresh,
-    importTemplate,
-    exportTemplate,
-  };
-
   return (
     <PageWrapper>
       <WizardStepsV2 steps={stepsTitles} currentStepKey={Step.key} />
       <InboundHeader showHeaderStatus={is(inboundV2Step.SEND)} />
-      <form onSubmit={handleSubmit(onSubmitStockMovementDetails)}>
-        {is(inboundV2Step.CREATE) && (<Step.Component {...createComponentProps} />)}
-      </form>
+      {is(inboundV2Step.CREATE) && (<Step.Component next={next} />)}
 
-      {is(inboundV2Step.ADD_ITEMS) && (<Step.Component {...addItemsComponentProps} />)}
+      {is(inboundV2Step.ADD_ITEMS) && (<Step.Component previous={previous} next={next} />)}
 
       {is(inboundV2Step.SEND) && (<Step.Component previous={previous} />)}
     </PageWrapper>
