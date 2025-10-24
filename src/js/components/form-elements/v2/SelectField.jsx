@@ -57,8 +57,6 @@ const SelectField = ({
 
   const fieldRef = useRef(null);
 
-  const refProps = productSelect ? {} : { fieldRef };
-
   useFocusOnMatch({ ...focusProps, ref: fieldRef, type: componentType.SELECT_FIELD });
 
   return (
@@ -82,7 +80,7 @@ const SelectField = ({
         multi={multiple}
         onKeyDown={onKeyDown}
         creatable={creatable}
-        {...refProps}
+        fieldRef={fieldRef}
         {...asyncProps}
         {...fieldProps}
       />

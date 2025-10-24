@@ -11,18 +11,22 @@ import TextInput from 'components/form-elements/v2/TextInput';
 import Section from 'components/Layout/v2/Section';
 import StockMovementDirection from 'consts/StockMovementDirection';
 import { DateFormatDateFns } from 'consts/timeFormat';
+import useInboundCreateForm from 'hooks/inboundV2/create/useInboundCreateForm';
 import { debounceLocationsFetch, debouncePeopleFetch } from 'utils/option-utils';
-import { FormErrorPropType } from 'utils/propTypes';
 
-const InboundV2Create = ({
-  control,
-  errors,
-  stockLists,
-  trigger,
-  setValue,
-}) => {
-  const [origin, destination] = useWatch({
-    name: ['origin', 'destination'],
+const InboundV2Create = ({ next }) => {
+  const {
+    errors,
+    control,
+    trigger,
+    handleSubmit,
+    onSubmitStockMovementDetails,
+    stockLists,
+    setValue,
+  } = useInboundCreateForm({ next });
+
+  const origin = useWatch({
+    name: 'origin',
     control,
   });
 
@@ -46,7 +50,7 @@ const InboundV2Create = ({
   );
 
   return (
-    <>
+    <form onSubmit={handleSubmit(onSubmitStockMovementDetails)}>
       <Section title="Details">
         <div className="row">
           <div className="col-12 px-2 pt-2">
@@ -55,6 +59,7 @@ const InboundV2Create = ({
               control={control}
               render={({ field }) => (
                 <TextInput
+                  {...field}
                   title={{
                     id: 'react.stockMovement.description.label',
                     defaultMessage: 'Description',
@@ -62,7 +67,6 @@ const InboundV2Create = ({
                   errorMessage={errors.description?.message}
                   required
                   customTooltip
-                  {...field}
                 />
               )}
             />
@@ -73,6 +77,7 @@ const InboundV2Create = ({
               control={control}
               render={({ field }) => (
                 <SelectField
+                  {...field}
                   title={{
                     id: 'react.stockMovement.origin.label',
                     defaultMessage: 'Origin',
@@ -84,7 +89,6 @@ const InboundV2Create = ({
                   async
                   loadOptions={debouncedLocationsFetch}
                   customTooltip
-                  {...field}
                 />
               )}
             />
@@ -96,12 +100,12 @@ const InboundV2Create = ({
               disabled
               render={({ field }) => (
                 <SelectField
+                  {...field}
                   title={{
                     id: 'react.stockMovement.destination.label',
                     defaultMessage: 'Destination',
                   }}
                   customTooltip
-                  {...field}
                 />
               )}
             />
@@ -109,17 +113,17 @@ const InboundV2Create = ({
           <div className="col-lg-6 col-md-12 px-2 pt-2">
             <Controller
               name="stockList"
-              disabled={!origin || !destination}
+              disabled={!origin}
               control={control}
               render={({ field }) => (
                 <SelectField
+                  {...field}
                   title={{
                     id: 'react.stockMovement.stocklist.label',
                     defaultMessage: 'Stocklist',
                   }}
                   options={stockLists}
                   customTooltip
-                  {...field}
                 />
               )}
             />
@@ -130,6 +134,7 @@ const InboundV2Create = ({
               control={control}
               render={({ field }) => (
                 <SelectField
+                  {...field}
                   title={{
                     id: 'react.stockMovement.requestedBy.label',
                     defaultMessage: 'Requested By',
@@ -140,7 +145,6 @@ const InboundV2Create = ({
                   async
                   loadOptions={debouncePeopleFetch(debounceTime, minSearchLength)}
                   customTooltip
-                  {...field}
                 />
               )}
             />
@@ -179,28 +183,12 @@ const InboundV2Create = ({
           disabled={!!Object.keys(errors).length}
         />
       </div>
-    </>
+    </form>
   );
 };
 
 export default InboundV2Create;
 
 InboundV2Create.propTypes = {
-  errors: PropTypes.shape({
-    description: FormErrorPropType,
-    origin: FormErrorPropType,
-    destination: FormErrorPropType,
-    stocklist: FormErrorPropType,
-    requestedBy: FormErrorPropType,
-    dateRequested: FormErrorPropType,
-  }).isRequired,
-  control: PropTypes.shape({}).isRequired,
-  trigger: PropTypes.func.isRequired,
-  stockLists: PropTypes.arrayOf(PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired,
-    value: PropTypes.string.isRequired,
-    label: PropTypes.string.isRequired,
-  })).isRequired,
-  setValue: PropTypes.func.isRequired,
+  next: PropTypes.func.isRequired,
 };
