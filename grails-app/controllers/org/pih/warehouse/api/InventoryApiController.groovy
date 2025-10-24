@@ -1,13 +1,20 @@
 package org.pih.warehouse.api
 
+import grails.converters.JSON
+import grails.validation.ValidationException
+import org.pih.warehouse.auth.AuthService
+import org.pih.warehouse.core.DashboardService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.importer.InventoryImportDataService
+import org.pih.warehouse.inventory.ReorderReportFilterCommand
+import org.pih.warehouse.inventory.ReorderReportItemDto
 
 class InventoryApiController {
 
     InventoryImportDataService inventoryImportDataService
+    DashboardService dashboardService
 
     def importCsv() {
         String fileData = request.inputStream.text
@@ -30,5 +37,26 @@ class InventoryApiController {
         inventoryImportDataService.importData(command)
 
         render(status: 200)
+    }
+
+    def getReorderReport(ReorderReportFilterCommand command) {
+        if (command.hasErrors()) {
+            throw new ValidationException("Invalid filters", command.errors)
+        }
+        List<ReorderReportItemDto> reorderReport = dashboardService.getReorderReport(command)
+
+        withFormat {
+            "csv" {
+                String csv = dashboardService.getReorderReportCsv(reorderReport)
+                response.contentType = "text/csv"
+                String filename = "Reorder report - ${AuthService.currentLocation?.name}.csv"
+                response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
+                render(csv)
+                return
+            }
+            "*" {
+                render([data: reorderReport] as JSON)
+            }
+        }
     }
 }

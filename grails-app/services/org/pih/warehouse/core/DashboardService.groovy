@@ -11,13 +11,22 @@ package org.pih.warehouse.core
 
 import grails.gorm.transactions.Transactional
 import grails.plugins.csv.CSVWriter
+import grails.util.Holders
+import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.hibernate.sql.JoinType
 
 import org.pih.warehouse.DateUtil
+import org.pih.warehouse.auth.AuthService
+import org.pih.warehouse.forecasting.ForecastingService
+import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryLevel
+import org.pih.warehouse.inventory.InventoryLevelStatus
 import org.pih.warehouse.inventory.InventoryStatus
+import org.pih.warehouse.inventory.ReorderReportFilterCommand
+import org.pih.warehouse.inventory.ReorderReportItemDto
 import org.pih.warehouse.inventory.TransactionEntry
+import org.pih.warehouse.inventory.product.availability.InventoryByProduct
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.report.InventoryReportCommand
@@ -31,6 +40,8 @@ class DashboardService {
 
     ConfigService configService
     def productAvailabilityService
+    ForecastingService forecastingService
+    UserService userService
 
     /**
      * Get fast moving items based on requisition data.
@@ -573,6 +584,124 @@ class DashboardService {
         return reorderStock
     }
 
+    List<ReorderReportItemDto> getReorderReport(ReorderReportFilterCommand command) {
+        // Find inventory levels that don't have bin location set and have AT LEAST one of min/max qty set
+        List<InventoryLevel> inventoryLevels = InventoryLevel.createCriteria().list {
+            eq("inventory", AuthService.currentLocation.inventory)
+            isNull("internalLocation")
+            or {
+                and {
+                    isNotNull("minQuantity")
+                    gt("minQuantity", 0)
+                }
+                and {
+                    isNotNull("reorderQuantity")
+                    gt("reorderQuantity", 0)
+                }
+            }
+        }
+        List<InventoryByProduct> inventoriesByProduct = productAvailabilityService.getInventoriesByProduct(command)
+
+        // Build a map of inventory levels keyed on product to have O(1) read access in the .findResults below instead of O(n) if we were to do .find on List
+        Map<Product, List<InventoryLevel>> inventoryLevelByProduct = inventoryLevels.groupBy { it.product }
+
+        // .findResults is a shortened way of doing .findAll{...}.collect{...}
+        List<ReorderReportItemDto> reorderReportItems = inventoriesByProduct.findResults { InventoryByProduct item ->
+            InventoryLevel inventoryLevel = inventoryLevelByProduct[item.product]?.first()
+
+            // Depending on the provided inventory level status filter value, we have a different condition for filtering out the items
+            Map<InventoryLevelStatus, Closure<Boolean>> inventoryLevelStatusFilterCondition = [
+                    (InventoryLevelStatus.IN_STOCK): { item.quantityAvailableToPromise > 0 },
+                    (InventoryLevelStatus.ABOVE_MAXIMUM): { inventoryLevel?.maxQuantity && item.quantityAvailableToPromise > inventoryLevel?.maxQuantity },
+                    (InventoryLevelStatus.BELOW_REORDER): { inventoryLevel?.reorderQuantity && item.quantityAvailableToPromise <= inventoryLevel?.reorderQuantity },
+                    (InventoryLevelStatus.BELOW_MINIMUM): { inventoryLevel?.minQuantity && item.quantityAvailableToPromise <= inventoryLevel?.minQuantity }
+            ]
+
+            // If an item satisfies the predicate, call the buildReorderReportItem, otherwise return null so that .findResults filters out the record in the end
+            return inventoryLevelStatusFilterCondition[command.inventoryLevelStatus](item) ? buildReorderReportItem(item, inventoryLevel) : null
+        }
+
+        return reorderReportItems
+    }
+
+    private ReorderReportItemDto buildReorderReportItem(InventoryByProduct item, InventoryLevel inventoryLevel) {
+        Map<String, Number> monthlyDemand = forecastingService.getDemand(AuthService.currentLocation, null, item.product)
+        Integer quantityToOrder = inventoryLevel?.maxQuantity != null ? inventoryLevel.maxQuantity - item.quantityAvailableToPromise : null
+        Boolean hasRoleFinance = userService.hasRoleFinance(AuthService.currentUser)
+        BigDecimal unitCost = hasRoleFinance ? item.product.costPerUnit : null
+        BigDecimal expectedReorderCost = hasRoleFinance && quantityToOrder && item.product.costPerUnit != null
+                ? quantityToOrder * unitCost
+                : null
+        Closure determineInventoryStatus = { InventoryLevel inventoryLevel1, Integer quantityOnHand ->
+            if (inventoryLevel1) {
+                return inventoryLevel1.statusMessage(quantityOnHand)
+            }
+            return quantityOnHand > 0 ? "IN_STOCK" : "STOCK_OUT"
+        }
+        return new ReorderReportItemDto(
+                inventoryStatus: determineInventoryStatus(inventoryLevel, item.quantityOnHand),
+                product: item.product,
+                tags: item.product.tags,
+                inventoryLevel: inventoryLevel,
+                monthlyDemand: monthlyDemand?.monthlyDemand ?: 0,
+                quantityAvailableToPromise: item.quantityAvailableToPromise,
+                quantityToOrder: quantityToOrder,
+                unitCost: unitCost,
+                expectedReorderCost: expectedReorderCost
+        )
+    }
+
+    String getReorderReportCsv(List<ReorderReportItemDto> reorderReport) {
+        ApplicationTagLib g = applicationTagLib
+        StringWriter sw = new StringWriter()
+        Boolean hasRoleFinance = userService.hasRoleFinance(AuthService.currentUser)
+        CSVWriter csv = new CSVWriter(sw, {
+            "${g.message(code: "inventoryLevel.status.label", default: "Status")}" { it?.status }
+            "${g.message(code: "product.productCode.label", default: "Product Code")}" { it?.productCode }
+            "${g.message(code: "product.label", default: "Product")}" { it?.product }
+            "${g.message(code: "category.label", default: "Category")}" { it?.category }
+            "${g.message(code: "product.tags.label", default: "Tags")}" { it?.tags }
+            "${g.message(code: "product.unitOfMeasure.label", default: "Unit of measure")}" { it?.unitOfMeasure }
+            "${g.message(code: "product.vendor.label", default: "Vendor")}" { it?.vendor }
+            "${g.message(code: "product.vendorCode.label", default: "Vendor code")}" { it?.vendorCode }
+            "${g.message(code: "inventoryLevel.minQuantity.label", default: "Min quantity")}" { it?.minQuantity }
+            "${g.message(code: "inventoryLevel.reorderQuantity.label", default: "Reorder quantity")}" { it?.reorderQuantity }
+            "${g.message(code: "inventoryLevel.maxQuantity.label", default: "Max quantity")}" { it?.maxQuantity }
+            "${g.message(code: "inventory.averageMonthlyDemand.label", default: "Average Monthly Demand")}" { it?.averageMonthlyDemand }
+            "${g.message(code: "inventory.quantityAvailable.label", default: "Quantity Available")}" { it?.quantityAvailableToPromise }
+            "${g.message(code: "inventory.quantityToOrder.label", default: "Quantity to Order")}" { it?.quantityToOrder }
+
+            if (hasRoleFinance) {
+                "${g.message(code: "product.unitCost.label", default: "Unit Cost")}" { it?.unitCost }
+                "${g.message(code: "inventory.expectedReorderCost.label", default: "Expected Reorder Cost")}" { it?.expectedReorderCost }
+            }
+        })
+        Closure getQuantityToOrderDisplayValue = { Integer maxQuantity, Integer quantityToOrder ->
+            return maxQuantity == null ? "No Max qty set  - review based on monthly demand" : quantityToOrder
+        }
+        reorderReport.each { ReorderReportItemDto item ->
+            csv << [
+                    status: "${g.message(code: "enum.InventoryLevelStatusCsv." + item.inventoryStatus)}",
+                    productCode: item.product.productCode,
+                    product: item.product.displayNameOrDefaultName,
+                    category: item.product.category?.name ?: "",
+                    tags: item.product.tagsToString(),
+                    unitOfMeasure: item.product.unitOfMeasure ?: "",
+                    vendor: item.product.vendor ?: "",
+                    vendorCode: item.product.vendorCode ?: "",
+                    minQuantity: item.inventoryLevel?.minQuantity ?: "",
+                    reorderQuantity: item.inventoryLevel?.reorderQuantity ?: "",
+                    maxQuantity: item.inventoryLevel?.maxQuantity ?: "",
+                    averageMonthlyDemand: item.monthlyDemand ?: 0,
+                    quantityAvailableToPromise: item.quantityAvailableToPromise,
+                    quantityToOrder: getQuantityToOrderDisplayValue(item.inventoryLevel?.maxQuantity, item.quantityToOrder) ?: "",
+                    unitCost: item.unitCost ?: "",
+                    expectedReorderCost: item.expectedReorderCost ?: "",
+            ]
+        }
+        return CSVUtils.prependBomToCsvString(csv.writer.toString())
+    }
+
     def getReorderReport(Location location) {
         long startTime = System.currentTimeMillis()
         ArrayList<Map> inventoryItems = getInventoryItems(location)
@@ -641,5 +770,9 @@ class DashboardService {
             inventoryLevel?.status >= InventoryStatus.SUPPORTED && quantity > reorderQuantity && quantity <= maxQuantity
         }
         return healthyStock
+    }
+
+    ApplicationTagLib getApplicationTagLib() {
+        return Holders.grailsApplication.mainContext.getBean(ApplicationTagLib)
     }
 }

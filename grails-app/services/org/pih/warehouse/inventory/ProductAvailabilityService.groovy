@@ -18,20 +18,24 @@ import groovy.sql.Sql
 import org.apache.commons.lang.StringEscapeUtils
 import org.hibernate.Criteria
 import org.hibernate.criterion.CriteriaSpecification
+import org.hibernate.criterion.Criterion
 import org.hibernate.criterion.DetachedCriteria
 import org.hibernate.criterion.Projections
 import org.hibernate.criterion.Restrictions
 import org.hibernate.criterion.Subqueries
 import org.hibernate.SQLQuery
+import org.hibernate.sql.JoinType
 import org.hibernate.type.StandardBasicTypes
 import org.pih.warehouse.PaginatedList
 import org.pih.warehouse.api.AllocatedItem
 import org.pih.warehouse.api.AvailableItem
+import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.ApplicationExceptionEvent
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.db.GormUtil
 import org.pih.warehouse.inventory.product.availability.AvailableItemMap
+import org.pih.warehouse.inventory.product.availability.InventoryByProduct
 import org.pih.warehouse.jobs.RefreshProductAvailabilityJob
 import org.pih.warehouse.order.OrderStatus
 import org.pih.warehouse.product.Category
@@ -518,6 +522,58 @@ class ProductAvailabilityService {
         }
 
         return quantityMap
+    }
+
+    /**
+     * Find product availability record grouped by product that satisfy the filters which contain primarily:
+     * expiration (we can include/exclude inventory items that expire in 30/90/180/365 days),
+     * additionalLocations - locations to search (and sum) the stock in (other than current location)
+     */
+    List<InventoryByProduct> getInventoriesByProduct(ReorderReportFilterCommand command) {
+        List<Location> locations = [AuthService.currentLocation]
+        if (command.additionalLocations) {
+            locations.addAll(command.additionalLocations)
+        }
+        return ProductAvailability.createCriteria().list {
+            projections {
+                sum("quantityOnHand")
+                sum("quantityAvailableToPromise")
+                groupProperty("product")
+            }
+            inList("location", locations)
+
+            if (command.categories || command.tags) {
+                product {
+                    if (command.categories) {
+                        inList("category", command.categories)
+                    }
+                    if (command.tags) {
+                        tags {
+                            'in'("id", command.tags.id)
+                        }
+
+                    }
+                }
+            }
+
+            if (command.expiration != ExpirationFilter.INCLUDE_EXPIRED_STOCK) {
+                add(getExpirationCriteria(command.expiration, delegate))
+            }
+        }.collect { new InventoryByProduct(
+                quantityOnHand: it[0],
+                quantityAvailableToPromise: it[1],
+                product: it[2]
+        )}
+    }
+
+    private static Criterion getExpirationCriteria(ExpirationFilter expirationFilter, org.grails.datastore.mapping.query.api.Criteria criteria) {
+        criteria.createAlias("inventoryItem", "ii", JoinType.INNER_JOIN)
+        // We have to include the condition for qoh > 0, as we could potentially include items that are out of stock, but have "hidden" associated
+        // inventory item with product availability record that is not visible in the stock history at that time
+        if (expirationFilter == ExpirationFilter.REMOVE_EXPIRED_STOCK) {
+            return Restrictions.and(Restrictions.ge("ii.expirationDate", new Date()), Restrictions.gt("quantityOnHand", 0))
+        }
+        return Restrictions.and(Restrictions.between("ii.expirationDate", new Date(), new Date() + expirationFilter.days), Restrictions.gt("quantityOnHand", 0))
     }
 
     Map<Product, Integer> getQuantityOnHandByProduct(Location location) {
