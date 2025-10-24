@@ -125,7 +125,7 @@ const InboundV2 = () => {
   };
 
   return (
-    <PageWrapper className="inbound-wrapper">
+    <PageWrapper>
       <WizardStepsV2 steps={stepsTitles} currentStepKey={Step.key} />
       <InboundHeader showHeaderStatus={is(inboundV2Step.SEND)} />
       <form onSubmit={handleSubmit(onSubmitStockMovementDetails)}>

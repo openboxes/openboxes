@@ -17,6 +17,8 @@ import { DASHBOARD_URL } from 'consts/applicationUrls';
 import useConnectionListener from 'hooks/useConnectionListener';
 import FlashScopeListenerWrapper from 'wrappers/FlashScopeListenerWrapper';
 
+import MainLayoutRouteV2 from './Layout/v2/MainLayoutRouteV2';
+
 import 'react-s-alert/dist/s-alert-default.css';
 import 'react-s-alert/dist/s-alert-css-effects/bouncyflip.css';
 
@@ -249,7 +251,7 @@ const Router = (props) => {
             <MainLayoutRoute path="**/inventory/cycleCount/reporting" component={AsyncCycleCountReporting} />
             <MainLayoutRoute path="**/inventory/cycleCount" component={AsyncCycleCount} />
             <MainLayoutRoute path="**/stockMovement/createInbound/:stockMovementId?" component={AsyncStockMovementInbound} />
-            <MainLayoutRoute path="**/stockMovement/createInboundV2/:stockMovementId?" component={AsyncStockMovementInbound2} />
+            <MainLayoutRouteV2 path="**/stockMovement/createInboundV2/:stockMovementId?" component={AsyncStockMovementInbound2} />
             <MainLayoutRoute path="**/stockMovement/createCombinedShipments/:stockMovementId?" component={AsyncStockMovementCombinedShipments} />
             <MainLayoutRoute path="**/stockMovement/createRequest/:stockMovementId?" component={AsyncStockMovementRequest} />
             <MainLayoutRoute path="**/stockMovement/verifyRequest/:stockMovementId?" component={AsyncStockMovementVerifyRequest} />
