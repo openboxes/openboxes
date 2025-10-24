@@ -250,8 +250,11 @@ const FIELDS = {
           fieldValue, subfield, reasonCodes, updateRow, values, rowIndex,
         }) => {
           const isSubstituted = fieldValue && fieldValue.statusCode === 'SUBSTITUTED';
+          const selectedReasonCode = values?.editPageItems[rowIndex]?.reasonCode;
           return {
-            disabled: fieldValue === null || fieldValue === undefined || subfield || isSubstituted,
+            disabled: ((fieldValue === null || fieldValue === undefined) && !selectedReasonCode)
+              || subfield
+              || isSubstituted,
             options: reasonCodes,
             showValueTooltip: true,
             onBlur: () => updateRow(values, rowIndex),
