@@ -78,12 +78,13 @@ const InboundSendForm = ({ previous }) => {
                 disabled
                 render={({ field }) => (
                   <SelectField
+                    {...field}
                     title={{
                       id: 'react.stockMovement.origin.label',
                       defaultMessage: 'Origin',
                     }}
                     errorMessage={errors.origin?.message}
-                    {...field}
+                    customTooltip
                   />
                 )}
               />
@@ -95,13 +96,13 @@ const InboundSendForm = ({ previous }) => {
                 disabled
                 render={({ field }) => (
                   <SelectField
+                    {...field}
                     title={{
                       id: 'react.stockMovement.destination.label',
                       defaultMessage: 'Destination',
                     }}
                     errorMessage={errors.destination?.message}
                     customTooltip
-                    {...field}
                   />
                 )}
               />
@@ -137,6 +138,7 @@ const InboundSendForm = ({ previous }) => {
                 disabled={!matchesDestination}
                 render={({ field }) => (
                   <SelectField
+                    {...field}
                     title={{
                       id: 'react.stockMovement.shipmentType.label',
                       defaultMessage: 'ShipmentType',
@@ -150,7 +152,6 @@ const InboundSendForm = ({ previous }) => {
                       value: item.id,
                     }))}
                     customTooltip
-                    {...field}
                   />
                 )}
               />
@@ -162,13 +163,13 @@ const InboundSendForm = ({ previous }) => {
                 disabled={!matchesDestination}
                 render={({ field }) => (
                   <TextInput
+                    {...field}
                     title={{
                       id: 'react.stockMovement.trackingNumber.label',
                       defaultMessage: 'Tracking Number',
                     }}
                     errorMessage={errors.trackingNumber?.message}
                     customTooltip
-                    {...field}
                   />
                 )}
               />
@@ -180,13 +181,13 @@ const InboundSendForm = ({ previous }) => {
                 disabled={!matchesDestination}
                 render={({ field }) => (
                   <TextInput
+                    {...field}
                     title={{
                       id: 'react.stockMovement.driverName.label',
                       defaultMessage: 'Driver Name',
                     }}
                     errorMessage={errors.driverName?.message}
                     customTooltip
-                    {...field}
                   />
                 )}
               />
@@ -198,13 +199,13 @@ const InboundSendForm = ({ previous }) => {
                 disabled={!matchesDestination}
                 render={({ field }) => (
                   <TextInput
+                    {...field}
                     title={{
                       id: 'react.stockMovement.comments.label',
                       defaultMessage: 'Comments',
                     }}
                     errorMessage={errors.comments?.message}
                     customTooltip
-                    {...field}
                   />
                 )}
               />

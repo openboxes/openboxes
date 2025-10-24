@@ -103,13 +103,33 @@ const ProductSelect = ({
       callback(resultOptions);
     });
 
+  /**
+   * Handles the reference to the Async Select component.
+   * Stores the component instance internally and updates any external ref provided.
+   *
+   * @param el - The Async Select component instance.
+   */
+  const handleFieldRef = (el) => {
+    // Store the internal reference to the Async Select component instance
+    selectRef.current = el;
+
+    const ref = fieldRef;
+
+    // If the external ref is an object with a `current` property, update it
+    if (ref?.current !== undefined) {
+      ref.current = el;
+    }
+
+    // If the external ref is a function, call it with the component instance
+    if (typeof ref === 'function') {
+      ref(el);
+    }
+  };
+
   return (
     <Select
       {...props}
-      fieldRef={(el) => {
-        selectRef.current = el;
-        if (fieldRef) fieldRef(el);
-      }}
+      fieldRef={handleFieldRef}
       async
       options={[]}
       loadOptions={props.loadOptions || loadProductOptions}
@@ -145,7 +165,10 @@ ProductSelect.propTypes = {
   showValueTooltip: PropTypes.bool,
   locationId: PropTypes.string.isRequired,
   onExactProductSelected: PropTypes.func,
-  fieldRef: PropTypes.func,
+  fieldRef: PropTypes.oneOfType([
+    PropTypes.func,
+    PropTypes.shape({ current: PropTypes.instanceOf(Element) }),
+  ]),
   loadOptions: PropTypes.func,
   includeUom: PropTypes.bool,
 };
