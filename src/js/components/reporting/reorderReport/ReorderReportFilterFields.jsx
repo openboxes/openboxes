@@ -10,6 +10,8 @@ const reorderReportFilterFields = {
       openOnClick: false,
       cache: false,
       multi: true,
+      closeMenuOnSelect: false,
+      blurInputOnSelect: false,
       valueKey: 'id',
       labelKey: 'label',
       filterElement: true,

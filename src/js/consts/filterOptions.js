@@ -2,21 +2,21 @@ import translate from 'utils/Translate';
 
 export const getExpiredStockOptions = () => ([
   {
-    id: '0',
+    id: 'REMOVE_EXPIRED_STOCK',
     label: translate({
       id: 'react.report.reorder.removeExpiredStock.label',
       defaultMessage: 'Remove expired stock',
     }),
   },
   {
-    id: '1',
+    id: 'INCLUDE_EXPIRED_STOCK',
     label: translate({
       id: 'react.report.reorder.includeExpiredStock.label',
       defaultMessage: 'Include expired stock',
     }),
   },
   {
-    id: '2',
+    id: 'EXPIRING_WITHIN_MONTH',
     label: translate({
       id: 'react.report.reorder.removeExpiringWithin.label',
       defaultMessage: 'Remove expiring within 30 days',
@@ -26,7 +26,7 @@ export const getExpiredStockOptions = () => ([
     }),
   },
   {
-    id: '3',
+    id: 'EXPIRING_WITHIN_QUARTER',
     label: translate({
       id: 'react.report.reorder.removeExpiringWithin.label',
       defaultMessage: 'Remove expiring within 90 days',
@@ -36,7 +36,7 @@ export const getExpiredStockOptions = () => ([
     }),
   },
   {
-    id: '4',
+    id: 'EXPIRING_WITHIN_HALF_YEAR',
     label: translate({
       id: 'react.report.reorder.removeExpiringWithin.label',
       defaultMessage: 'Remove expiring within 180 days',
@@ -46,7 +46,7 @@ export const getExpiredStockOptions = () => ([
     }),
   },
   {
-    id: '5',
+    id: 'EXPIRING_WITHIN_YEAR',
     label: translate({
       id: 'react.report.reorder.removeExpiringWithin.label',
       defaultMessage: 'Remove expiring within 365 days',
@@ -59,28 +59,28 @@ export const getExpiredStockOptions = () => ([
 
 export const getFilterProductOptions = () => ([
   {
-    id: '0',
+    id: 'IN_STOCK',
     label: translate({
       id: 'react.report.reorder.showAllProducts.label',
       defaultMessage: 'Show all products',
     }),
   },
   {
-    id: '1',
+    id: 'BELOW_REORDER',
     label: translate({
       id: 'react.report.reorder.showProductsBelowReorder.label',
       defaultMessage: 'Show products below reorder',
     }),
   },
   {
-    id: '2',
+    id: 'BELOW_MAXIMUM',
     label: translate({
       id: 'react.report.reorder.showProductsBelowMaximum.label',
       defaultMessage: 'Show products below maximum',
     }),
   },
   {
-    id: '3',
+    id: 'BELOW_MINIMUM',
     label: translate({
       id: 'react.report.reorder.showProductsBelowMinimum.label',
       defaultMessage: 'Show products below minimum',

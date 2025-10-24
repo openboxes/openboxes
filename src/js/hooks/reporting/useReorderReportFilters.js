@@ -1,14 +1,17 @@
 import { useState } from 'react';
 
+import _ from 'lodash';
 import queryString from 'query-string';
 import { useHistory } from 'react-router-dom';
 
+import { REORDER_REPORT } from 'api/urls';
 import filterFields
   from 'components/reporting/reorderReport/ReorderReportFilterFields';
 import ActivityCode from 'consts/activityCode';
 import { getExpiredStockOptions, getFilterProductOptions } from 'consts/filterOptions';
 import useCommonFiltersCleaner from 'hooks/list-pages/useCommonFiltersCleaner';
 import useSpinner from 'hooks/useSpinner';
+import fileDownloadUtil from 'utils/file-download-util';
 import { getParamList, transformFilterParams } from 'utils/list-utils';
 import {
   fetchLocations,
@@ -145,6 +148,23 @@ const useReorderReportFilters = () => {
     setFilterParams(values);
   };
 
+  const getParams = (values) => _.omitBy({
+    expiration: values?.expiredStock?.id,
+    inventoryLevelStatus: values?.filterProducts?.id,
+    categories: values?.categories?.map?.(({ id }) => id),
+    tags: values?.tags?.map?.(({ id }) => id),
+    additionalLocations: values?.additionalInventoryLocations?.map?.(({ id }) => id),
+  }, _.isNil);
+
+  const downloadCsv = async (values) => {
+    spinner.show();
+    await fileDownloadUtil({
+      url: REORDER_REPORT,
+      params: getParams(values),
+    });
+    spinner.hide();
+  };
+
   return {
     defaultFilterValues,
     setFilterValues,
@@ -152,6 +172,7 @@ const useReorderReportFilters = () => {
     tags,
     locations,
     filterParams,
+    downloadCsv,
   };
 };
 

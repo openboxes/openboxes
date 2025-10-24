@@ -16,11 +16,8 @@ const ReorderReportFilters = () => {
     locations,
     defaultFilterValues,
     setFilterValues,
+    downloadCsv,
   } = useReorderReportFilters({ filterFields: reorderReportFilterFields });
-
-  const downloadCsv = (values) => {
-    console.log(values);
-  };
 
   return (
     <ListFilterFormWrapper>
