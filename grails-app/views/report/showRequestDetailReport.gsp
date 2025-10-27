@@ -22,6 +22,7 @@
                                                   name="origin.id"
                                                   noSelection="['':'']"
                                                   groupBy="locationType"
+                                                  multiple="multiple"
                                                   value="${params?.origin}"/>
                             </div>
                             <div class="filter-list-item">

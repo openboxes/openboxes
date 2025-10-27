@@ -13,7 +13,10 @@ import grails.core.GrailsApplication
 import grails.util.Holders
 import groovy.sql.Sql
 import groovy.time.TimeCategory
+import util.StringUtil
+
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.data.HibernateService
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.DateUtil
@@ -27,6 +30,7 @@ import org.pih.warehouse.core.SynonymTypeCode
 
 class ForecastingService {
 
+    HibernateService hibernateService
     def dataSource
     GrailsApplication grailsApplication
     def productAvailabilityService
@@ -248,6 +252,7 @@ class ForecastingService {
 
     def getRequestDetailReport(Map params) {
         List data = []
+        Map<String, Object> queryParams = [:]
         String query = """
             select 
                 request_number,
@@ -275,30 +280,41 @@ class ForecastingService {
             query += " LEFT JOIN product_catalog_item ON product_catalog_item.product_id = product_demand_details.product_id"
         }
 
-        query += " WHERE date_issued BETWEEN :startDate AND :endDate AND origin_id = :originId"
+        query += " WHERE date_issued BETWEEN :startDate AND :endDate"
+        queryParams.put("startDate", params.startDate)
+        queryParams.put("endDate", params.endDate)
+
+        query += " AND origin_id IN (:origins)"
+        queryParams.put("origins", StringUtil.split(params.originId))
 
         if (params.destinationId) {
             query += " AND destination_id = :destinationId"
+            queryParams.put("destinationId", params.destinationId)
         }
         if (params.productId) {
             query += " AND product_id = :productId"
+            queryParams.put("productId", params.productId)
         }
         if (params.reasonCode) {
             query += " AND reason_code_classification = :reasonCode"
+            queryParams.put("reasonCode", params.reasonCode)
         }
         if (params.category) {
             Category category = Category.get(params.category)
             if (category) {
-                def categories = category.children
+                List<Category> categories = category.children as List<Category>
                 categories << category
-                query += " AND product.category_id in (${categories.collect { "'$it.id'" }.join(',')})"
+                query += " AND product.category_id in (:categories)"
+                queryParams.put("categories", categories.id)
             }
         }
         if (params.tags && params.tags != "null") {
-            query += " AND product_tag.tag_id in (${params.tags.split(",").collect { "'$it'" }.join(',')})"
+            query += " AND product_tag.tag_id in (:tags)"
+            queryParams.put("tags", params.tags)
         }
         if (params.catalogs && params.catalogs != "null") {
-            query += " AND product_catalog_item.product_catalog_id in (${params.catalogs.split(",").collect { "'$it'" }.join(',')})"
+            query += " AND product_catalog_item.product_catalog_id in (:catalogs)"
+            queryParams.put("catalogs", params.catalogs)
         }
 
         if ((params.tags && params.tags != "null") || (params.catalogs && params.catalogs != "null")) {
@@ -307,9 +323,8 @@ class ForecastingService {
                     " quantity_requested, quantity_picked, reason_code_classification, quantity_demand"
         }
 
-        Sql sql = new Sql(dataSource)
         try {
-            data = sql.rows(query, params)
+            data = hibernateService.list(query, queryParams)
 
         } catch (Exception e) {
             log.error("Unable to execute query: " + e.message, e)
