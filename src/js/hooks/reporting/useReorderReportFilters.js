@@ -2,13 +2,15 @@ import { useState } from 'react';
 
 import _ from 'lodash';
 import queryString from 'query-string';
+import { useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
+import { getCurrentLocation } from 'selectors';
 
 import { REORDER_REPORT } from 'api/urls';
 import filterFields
   from 'components/reporting/reorderReport/ReorderReportFilterFields';
 import ActivityCode from 'consts/activityCode';
-import { getExpiredStockOptions, getFilterProductOptions } from 'consts/filterOptions';
+import { getExpiredStockOptions, getFilterProductOptions, OPTION_ID } from 'consts/filterOptions';
 import useCommonFiltersCleaner from 'hooks/list-pages/useCommonFiltersCleaner';
 import useSpinner from 'hooks/useSpinner';
 import fileDownloadUtil from 'utils/file-download-util';
@@ -32,6 +34,8 @@ const useReorderReportFilters = () => {
   const history = useHistory();
 
   const spinner = useSpinner();
+
+  const currentLocation = useSelector(getCurrentLocation);
 
   const clearFilterValues = () => {
     const { pathname } = history.location;
@@ -110,7 +114,7 @@ const useReorderReportFilters = () => {
     defaultValues.expiredStock = getSelectedOption(
       expiredStock,
       getExpiredStockOptions(),
-      '0',
+      OPTION_ID.REMOVE_EXPIRED_STOCK,
     );
     defaultValues.additionalInventoryLocations = setDefaultValue(
       additionalInventoryLocations,
@@ -159,7 +163,7 @@ const useReorderReportFilters = () => {
   const downloadCsv = async (values) => {
     spinner.show();
     await fileDownloadUtil({
-      url: REORDER_REPORT,
+      url: REORDER_REPORT(currentLocation?.id),
       params: getParams(values),
     });
     spinner.hide();
