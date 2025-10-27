@@ -46,7 +46,7 @@ class InventoryApiController {
         List<ReorderReportItemDto> reorderReport = dashboardService.getReorderReport(command)
 
         withFormat {
-            "*" {
+            "csv" {
                 String csv = dashboardService.getReorderReportCsv(reorderReport)
                 response.contentType = "text/csv"
                 String filename = "Reorder report - ${AuthService.currentLocation?.name}.csv"
@@ -54,7 +54,9 @@ class InventoryApiController {
                 render(csv)
                 return
             }
-
+            "*" {
+                render([data: reorderReport] as JSON)
+            }
         }
     }
 }
