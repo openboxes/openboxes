@@ -820,7 +820,7 @@ class UrlMappings {
             action = "importCsv"
         }
 
-        "/api/inventories/reorderReport" {
+        "/api/facilities/$facilityId/inventories/reorderReport" {
             controller = { "inventoryApi" }
             action = [GET: "getReorderReport"]
         }

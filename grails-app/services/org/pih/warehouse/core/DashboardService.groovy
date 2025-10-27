@@ -17,6 +17,7 @@ import org.hibernate.sql.JoinType
 
 import org.pih.warehouse.DateUtil
 import org.pih.warehouse.auth.AuthService
+import org.pih.warehouse.core.localization.MessageLocalizer
 import org.pih.warehouse.forecasting.ForecastingService
 import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.inventory.InventoryItem
@@ -42,6 +43,7 @@ class DashboardService {
     def productAvailabilityService
     ForecastingService forecastingService
     UserService userService
+    MessageLocalizer messageLocalizer
 
     /**
      * Get fast moving items based on requisition data.
@@ -600,14 +602,17 @@ class DashboardService {
                 }
             }
         }
-        List<InventoryByProduct> inventoriesByProduct = productAvailabilityService.getInventoriesByProduct(command)
+        List<InventoryByProduct> inventoriesByProduct = productAvailabilityService.getInventoriesByProduct(command.additionalLocations,
+                command.categories,
+                command.tags,
+                command.expiration)
 
         // Build a map of inventory levels keyed on product to have O(1) read access in the .findResults below instead of O(n) if we were to do .find on List
-        Map<Product, List<InventoryLevel>> inventoryLevelByProduct = inventoryLevels.groupBy { it.product }
+        Map<Product, InventoryLevel> inventoryLevelByProduct = inventoryLevels.collectEntries { [it.product, it] }
 
         // .findResults is a shortened way of doing .findAll{...}.collect{...}
         List<ReorderReportItemDto> reorderReportItems = inventoriesByProduct.findResults { InventoryByProduct item ->
-            InventoryLevel inventoryLevel = inventoryLevelByProduct[item.product]?.first()
+            InventoryLevel inventoryLevel = inventoryLevelByProduct[item.product]
 
             // Depending on the provided inventory level status filter value, we have a different condition for filtering out the items
             Map<InventoryLevelStatus, Closure<Boolean>> inventoryLevelStatusFilterCondition = [
@@ -652,36 +657,35 @@ class DashboardService {
     }
 
     String getReorderReportCsv(List<ReorderReportItemDto> reorderReport) {
-        ApplicationTagLib g = applicationTagLib
         StringWriter sw = new StringWriter()
         Boolean hasRoleFinance = userService.hasRoleFinance(AuthService.currentUser)
         CSVWriter csv = new CSVWriter(sw, {
-            "${g.message(code: "inventoryLevel.status.label", default: "Status")}" { it?.status }
-            "${g.message(code: "product.productCode.label", default: "Product Code")}" { it?.productCode }
-            "${g.message(code: "product.label", default: "Product")}" { it?.product }
-            "${g.message(code: "category.label", default: "Category")}" { it?.category }
-            "${g.message(code: "product.tags.label", default: "Tags")}" { it?.tags }
-            "${g.message(code: "product.unitOfMeasure.label", default: "Unit of measure")}" { it?.unitOfMeasure }
-            "${g.message(code: "product.vendor.label", default: "Vendor")}" { it?.vendor }
-            "${g.message(code: "product.vendorCode.label", default: "Vendor code")}" { it?.vendorCode }
-            "${g.message(code: "inventoryLevel.minQuantity.label", default: "Min quantity")}" { it?.minQuantity }
-            "${g.message(code: "inventoryLevel.reorderQuantity.label", default: "Reorder quantity")}" { it?.reorderQuantity }
-            "${g.message(code: "inventoryLevel.maxQuantity.label", default: "Max quantity")}" { it?.maxQuantity }
-            "${g.message(code: "inventory.averageMonthlyDemand.label", default: "Average Monthly Demand")}" { it?.averageMonthlyDemand }
-            "${g.message(code: "inventory.quantityAvailable.label", default: "Quantity Available")}" { it?.quantityAvailableToPromise }
-            "${g.message(code: "inventory.quantityToOrder.label", default: "Quantity to Order")}" { it?.quantityToOrder }
+            "${messageLocalizer.localize("inventoryLevel.status.label")}" { it?.status }
+            "${messageLocalizer.localize("product.productCode.label")}" { it?.productCode }
+            "${messageLocalizer.localize("product.label")}" { it?.product }
+            "${messageLocalizer.localize("category.label")}" { it?.category }
+            "${messageLocalizer.localize("product.tags.label", "Tags")}" { it?.tags }
+            "${messageLocalizer.localize("product.unitOfMeasure.label", "Unit of measure")}" { it?.unitOfMeasure }
+            "${messageLocalizer.localize("product.vendor.label", "Vendor")}" { it?.vendor }
+            "${messageLocalizer.localize("product.vendorCode.label", "Vendor code")}" { it?.vendorCode }
+            "${messageLocalizer.localize("inventoryLevel.minQuantity.label", "Min quantity")}" { it?.minQuantity }
+            "${messageLocalizer.localize("inventoryLevel.reorderQuantity.label", "Reorder quantity")}" { it?.reorderQuantity }
+            "${messageLocalizer.localize("inventoryLevel.maxQuantity.label", "Max quantity")}" { it?.maxQuantity }
+            "${messageLocalizer.localize("report.averageMonthlyDemand.label", "Average Monthly Demand")}" { it?.averageMonthlyDemand }
+            "${messageLocalizer.localize("product.quantityAvailableToPromise.label", "Quantity Available")}" { it?.quantityAvailableToPromise }
+            "${messageLocalizer.localize("inventory.quantityToOrder.message", "Quantity to Order")}" { it?.quantityToOrder }
 
             if (hasRoleFinance) {
-                "${g.message(code: "product.unitCost.label", default: "Unit Cost")}" { it?.unitCost }
-                "${g.message(code: "inventory.expectedReorderCost.label", default: "Expected Reorder Cost")}" { it?.expectedReorderCost }
+                "${messageLocalizer.localize("product.unitCost.label", "Unit Cost")}" { it?.unitCost }
+                "${messageLocalizer.localize("inventory.expectedReorderCost.label", "Expected Reorder Cost")}" { it?.expectedReorderCost }
             }
         })
         Closure getQuantityToOrderDisplayValue = { Integer maxQuantity, Integer quantityToOrder ->
-            return maxQuantity == null ? "No Max qty set  - review based on monthly demand" : quantityToOrder
+            return maxQuantity == null ? messageLocalizer.localize("reorderReport.noMaxQtySet.label") : quantityToOrder
         }
         reorderReport.each { ReorderReportItemDto item ->
             csv << [
-                    status: "${g.message(code: "enum.InventoryLevelStatusCsv." + item.inventoryStatus)}",
+                    status: "${messageLocalizer.localize("enum.InventoryLevelStatusCsv." + item.inventoryStatus)}",
                     productCode: item.product.productCode,
                     product: item.product.displayNameOrDefaultName,
                     category: item.product.category?.name ?: "",
@@ -770,9 +774,5 @@ class DashboardService {
             inventoryLevel?.status >= InventoryStatus.SUPPORTED && quantity > reorderQuantity && quantity <= maxQuantity
         }
         return healthyStock
-    }
-
-    ApplicationTagLib getApplicationTagLib() {
-        return Holders.grailsApplication.mainContext.getBean(ApplicationTagLib)
     }
 }

@@ -33,6 +33,7 @@ import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.ApplicationExceptionEvent
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.db.GormUtil
 import org.pih.warehouse.inventory.product.availability.AvailableItemMap
 import org.pih.warehouse.inventory.product.availability.InventoryByProduct
@@ -529,10 +530,13 @@ class ProductAvailabilityService {
      * expiration (we can include/exclude inventory items that expire in 30/90/180/365 days),
      * additionalLocations - locations to search (and sum) the stock in (other than current location)
      */
-    List<InventoryByProduct> getInventoriesByProduct(ReorderReportFilterCommand command) {
+    List<InventoryByProduct> getInventoriesByProduct(List<Location> additionalLocations,
+                                                     List<Category> categories,
+                                                     List<Tag> productTags,
+                                                     ExpirationFilter expiration) {
         List<Location> locations = [AuthService.currentLocation]
-        if (command.additionalLocations) {
-            locations.addAll(command.additionalLocations)
+        if (additionalLocations) {
+            locations.addAll(additionalLocations)
         }
         return ProductAvailability.createCriteria().list {
             projections {
@@ -542,22 +546,23 @@ class ProductAvailabilityService {
             }
             inList("location", locations)
 
-            if (command.categories || command.tags) {
+            // The additional if check is needed to avoid joining product twice in two separate ifs for categories/tags, as it could throw an error
+            // if both categories and tags were provided. Another possible solution would be to store "usedAliases" and check if categories already joined the product.
+            if (categories || productTags) {
                 product {
-                    if (command.categories) {
-                        inList("category", command.categories)
+                    if (categories) {
+                        inList("category", categories)
                     }
-                    if (command.tags) {
+                    if (productTags) {
                         tags {
-                            'in'("id", command.tags.id)
+                            'in'("id", productTags.id)
                         }
-
                     }
                 }
             }
 
-            if (command.expiration != ExpirationFilter.INCLUDE_EXPIRED_STOCK) {
-                add(getExpirationCriteria(command.expiration, delegate))
+            if (expiration != ExpirationFilter.INCLUDE_EXPIRED_STOCK) {
+                add(getExpirationCriteria(expiration, delegate))
             }
         }.collect { new InventoryByProduct(
                 quantityOnHand: it[0],
