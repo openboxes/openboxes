@@ -589,6 +589,9 @@ class DashboardService {
     List<ReorderReportItemDto> getReorderReport(ReorderReportFilterCommand command) {
         // Find inventory levels that don't have bin location set and have AT LEAST one of min/max qty set
         List<InventoryLevel> inventoryLevels = InventoryLevel.createCriteria().list {
+            // Current location is a "central" one, we want to get inventory level values (max/min qty) only from the current location
+            // additionaLocations are supposed to be used only for the quantity available to promise calculation,
+            // where we sum the QATP for currentLocation + additionalLocations
             eq("inventory", AuthService.currentLocation.inventory)
             isNull("internalLocation")
             or {
@@ -617,7 +620,7 @@ class DashboardService {
             // Depending on the provided inventory level status filter value, we have a different condition for filtering out the items
             Map<InventoryLevelStatus, Closure<Boolean>> inventoryLevelStatusFilterCondition = [
                     (InventoryLevelStatus.IN_STOCK): { item.quantityAvailableToPromise > 0 },
-                    (InventoryLevelStatus.ABOVE_MAXIMUM): { inventoryLevel?.maxQuantity && item.quantityAvailableToPromise > inventoryLevel?.maxQuantity },
+                    (InventoryLevelStatus.BELOW_MAXIMUM): { inventoryLevel?.maxQuantity && item.quantityAvailableToPromise <= inventoryLevel?.maxQuantity },
                     (InventoryLevelStatus.BELOW_REORDER): { inventoryLevel?.reorderQuantity && item.quantityAvailableToPromise <= inventoryLevel?.reorderQuantity },
                     (InventoryLevelStatus.BELOW_MINIMUM): { inventoryLevel?.minQuantity && item.quantityAvailableToPromise <= inventoryLevel?.minQuantity }
             ]
