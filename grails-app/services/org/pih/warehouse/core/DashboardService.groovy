@@ -636,8 +636,8 @@ class DashboardService {
         Map<String, Number> monthlyDemand = forecastingService.getDemand(AuthService.currentLocation, null, item.product)
         Integer quantityToOrder = inventoryLevel?.maxQuantity != null ? inventoryLevel.maxQuantity - item.quantityAvailableToPromise : null
         Boolean hasRoleFinance = userService.hasRoleFinance(AuthService.currentUser)
-        BigDecimal unitCost = hasRoleFinance ? item.product.costPerUnit : null
-        BigDecimal expectedReorderCost = hasRoleFinance && quantityToOrder && item.product.costPerUnit != null
+        BigDecimal unitCost = hasRoleFinance ? item.product.pricePerUnit : null
+        BigDecimal expectedReorderCost = hasRoleFinance && quantityToOrder && item.product.pricePerUnit != null
                 ? quantityToOrder * unitCost
                 : null
         Closure determineInventoryStatus = { InventoryLevel inventoryLevel1, Integer quantityOnHand ->
