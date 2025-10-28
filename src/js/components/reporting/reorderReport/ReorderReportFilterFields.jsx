@@ -1,6 +1,7 @@
 import FilterSelectField from 'components/form-elements/FilterSelectField';
 import {
-  getExpiredStockOptions, getFilterProductOptions,
+  getExpiredStockOptions,
+  getFilterProductOptions,
 } from 'consts/filterOptions';
 
 const reorderReportFilterFields = {

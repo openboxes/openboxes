@@ -10,7 +10,11 @@ import { REORDER_REPORT } from 'api/urls';
 import filterFields
   from 'components/reporting/reorderReport/ReorderReportFilterFields';
 import ActivityCode from 'consts/activityCode';
-import { getExpiredStockOptions, getFilterProductOptions, OPTION_ID } from 'consts/filterOptions';
+import {
+  EXPIRATION_FILTER,
+  getExpiredStockOptions,
+  getFilterProductOptions,
+} from 'consts/filterOptions';
 import useCommonFiltersCleaner from 'hooks/list-pages/useCommonFiltersCleaner';
 import useSpinner from 'hooks/useSpinner';
 import fileDownloadUtil from 'utils/file-download-util';
@@ -83,8 +87,8 @@ const useReorderReportFilters = () => {
       tags: selectedTags,
     } = queryProps;
 
-    // If there are no values for catalogs, tags, glAccounts, categories or product family
-    // then set default filters without waiting for those options to load
+    // If there are no values for categories, tags, filter products, expired stock or inventory
+    // locations, then set default filters without waiting for those options to load
     if (!selectedCategories
       && !selectedTags
       && !selectedFilterProducts
@@ -92,6 +96,7 @@ const useReorderReportFilters = () => {
       && !additionalInventoryLocations) {
       setDefaultFilterValues(defaultValues);
     }
+
     const [
       categoryList,
       tagList,
@@ -114,7 +119,7 @@ const useReorderReportFilters = () => {
     defaultValues.expiredStock = getSelectedOption(
       expiredStock,
       getExpiredStockOptions(),
-      OPTION_ID.REMOVE_EXPIRED_STOCK,
+      EXPIRATION_FILTER.REMOVE_EXPIRED_STOCK,
     );
     defaultValues.additionalInventoryLocations = setDefaultValue(
       additionalInventoryLocations,

@@ -1,12 +1,15 @@
 import translate from 'utils/Translate';
 
-export const OPTION_ID = {
+export const EXPIRATION_FILTER = {
   REMOVE_EXPIRED_STOCK: 'REMOVE_EXPIRED_STOCK',
   INCLUDE_EXPIRED_STOCK: 'INCLUDE_EXPIRED_STOCK',
   EXPIRING_WITHIN_MONTH: 'EXPIRING_WITHIN_MONTH',
   EXPIRING_WITHIN_QUARTER: 'EXPIRING_WITHIN_QUARTER',
   EXPIRING_WITHIN_HALF_YEAR: 'EXPIRING_WITHIN_HALF_YEAR',
   EXPIRING_WITHIN_YEAR: 'EXPIRING_WITHIN_YEAR',
+};
+
+export const INVENTORY_LEVEL_STATUS = {
   IN_STOCK: 'IN_STOCK',
   BELOW_REORDER: 'BELOW_REORDER',
   BELOW_MAXIMUM: 'BELOW_MAXIMUM',
@@ -15,21 +18,21 @@ export const OPTION_ID = {
 
 export const getExpiredStockOptions = () => ([
   {
-    id: OPTION_ID.REMOVE_EXPIRED_STOCK,
+    id: EXPIRATION_FILTER.REMOVE_EXPIRED_STOCK,
     label: translate({
       id: 'react.report.reorder.removeExpiredStock.label',
       defaultMessage: 'Remove expired stock',
     }),
   },
   {
-    id: OPTION_ID.INCLUDE_EXPIRED_STOCK,
+    id: EXPIRATION_FILTER.INCLUDE_EXPIRED_STOCK,
     label: translate({
       id: 'react.report.reorder.includeExpiredStock.label',
       defaultMessage: 'Include expired stock',
     }),
   },
   {
-    id: OPTION_ID.EXPIRING_WITHIN_MONTH,
+    id: EXPIRATION_FILTER.EXPIRING_WITHIN_MONTH,
     label: translate({
       id: 'react.report.reorder.removeExpiringWithin.label',
       defaultMessage: 'Remove expiring within 30 days',
@@ -39,7 +42,7 @@ export const getExpiredStockOptions = () => ([
     }),
   },
   {
-    id: OPTION_ID.EXPIRING_WITHIN_QUARTER,
+    id: EXPIRATION_FILTER.EXPIRING_WITHIN_QUARTER,
     label: translate({
       id: 'react.report.reorder.removeExpiringWithin.label',
       defaultMessage: 'Remove expiring within 90 days',
@@ -49,7 +52,7 @@ export const getExpiredStockOptions = () => ([
     }),
   },
   {
-    id: OPTION_ID.EXPIRING_WITHIN_HALF_YEAR,
+    id: EXPIRATION_FILTER.EXPIRING_WITHIN_HALF_YEAR,
     label: translate({
       id: 'react.report.reorder.removeExpiringWithin.label',
       defaultMessage: 'Remove expiring within 180 days',
@@ -59,7 +62,7 @@ export const getExpiredStockOptions = () => ([
     }),
   },
   {
-    id: OPTION_ID.EXPIRING_WITHIN_YEAR,
+    id: EXPIRATION_FILTER.EXPIRING_WITHIN_YEAR,
     label: translate({
       id: 'react.report.reorder.removeExpiringWithin.label',
       defaultMessage: 'Remove expiring within 365 days',
@@ -72,28 +75,28 @@ export const getExpiredStockOptions = () => ([
 
 export const getFilterProductOptions = () => ([
   {
-    id: OPTION_ID.IN_STOCK,
+    id: INVENTORY_LEVEL_STATUS.IN_STOCK,
     label: translate({
       id: 'react.report.reorder.showAllProducts.label',
       defaultMessage: 'Show all products',
     }),
   },
   {
-    id: OPTION_ID.BELOW_REORDER,
+    id: INVENTORY_LEVEL_STATUS.BELOW_REORDER,
     label: translate({
       id: 'react.report.reorder.showProductsBelowReorder.label',
       defaultMessage: 'Show products below reorder',
     }),
   },
   {
-    id: OPTION_ID.BELOW_MAXIMUM,
+    id: INVENTORY_LEVEL_STATUS.BELOW_MAXIMUM,
     label: translate({
       id: 'react.report.reorder.showProductsBelowMaximum.label',
       defaultMessage: 'Show products below maximum',
     }),
   },
   {
-    id: OPTION_ID.BELOW_MINIMUM,
+    id: INVENTORY_LEVEL_STATUS.BELOW_MINIMUM,
     label: translate({
       id: 'react.report.reorder.showProductsBelowMinimum.label',
       defaultMessage: 'Show products below minimum',

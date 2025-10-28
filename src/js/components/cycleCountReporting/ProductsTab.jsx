@@ -24,6 +24,7 @@ const ProductsTab = ({
     columns,
     tableData,
     loading,
+    emptyTableMessage,
   } = useProductsTab({
     paginationProps,
     filterParams,
@@ -45,6 +46,7 @@ const ProductsTab = ({
       <DataTable
         columns={columns}
         data={tableData.data}
+        emptyTableMessage={emptyTableMessage}
         loading={loading}
         totalCount={tableData.totalCount}
         filterParams={filterParams}
