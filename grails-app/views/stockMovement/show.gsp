@@ -120,7 +120,7 @@
                     <warehouse:message code="default.button.receive.label" />
                 </g:link>
 
-                <g:if test="${grailsApplication.config.openboxes.receiving.showAutoReceiveButton}">
+                <g:if test="${grailsApplication.config.openboxes.receiving.manualAutoReceiving.enabled}">
                     <g:link controller="partialReceiving" action="autoreceive" id="${stockMovement?.shipment?.id}" class="button">
                         <img src="${resource(dir: 'images/icons/', file: 'handtruck.png')}" />&nbsp;
                         <warehouse:message code="default.button.autoreceive.label" />
@@ -173,6 +173,17 @@
                             <warehouse:message code="default.button.delete.label" />
                         </g:link>
                     </g:if>
+
+                <g:if test="${grailsApplication.config.openboxes.stockMovement.rollbackAndDelete.enabled}">
+                    <g:isUserAdmin>
+                        <g:if test="${stockMovement?.hasBeenReceived() || stockMovement?.hasBeenPartiallyReceived()}">
+                            <g:link controller="stockMovement" action="rollbackAndDelete" id="${stockMovement?.shipment?.id}" class="button">
+                                <img src="${resource(dir: 'images/icons/silk', file: 'arrow_rotate_anticlockwise.png')}" />&nbsp;
+                                <warehouse:message code="stockMovement.rollbackAndDelete.label" />
+                            </g:link>
+                        </g:if>
+                    </g:isUserAdmin>
+                </g:if>
 
                 <g:isSuperuser>
                     <a href="javascript:void(0);" class="button btn-show-dialog"

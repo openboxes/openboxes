@@ -90,6 +90,12 @@
                     <img src="${resource(dir: 'images/icons/silk', file: 'arrow_undo.png')}" />&nbsp;
                     <g:message code="default.rollback.label" args="[g.message(code: 'order.label')]" default="Rollback Putaway"/>
                 </g:link>
+                <g:if test="${grailsApplication.config.openboxes.putaway.rollbackAndDelete.enabled}">
+                    <g:link controller="putaway" action="rollbackAndDelete" id="${orderInstance.id}" class="button">
+                        <img src="${resource(dir: 'images/icons/silk', file: 'arrow_undo.png')}" />&nbsp;
+                        <g:message code="putaway.rollbackAndDelete.label" args="[g.message(code: 'order.label')]" default="Rollback and Delete"/>
+                    </g:link>
+                </g:if>
             </div>
         </g:if>
     </div>
