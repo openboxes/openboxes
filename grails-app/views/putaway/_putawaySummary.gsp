@@ -86,15 +86,17 @@
                     <img src="${resource(dir: 'images/icons/silk', file: 'cart_edit.png')}" />&nbsp;
                     <warehouse:message code="default.edit.label" args="[warehouse.message(code:'putawayOrder.label')]"/>
                 </g:link>
-                <g:link controller="putaway" action="rollback" id="${orderInstance.id}" class="button">
-                    <img src="${resource(dir: 'images/icons/silk', file: 'arrow_undo.png')}" />&nbsp;
-                    <g:message code="default.rollback.label" args="[g.message(code: 'order.label')]" default="Rollback Putaway"/>
-                </g:link>
-                <g:if test="${grailsApplication.config.openboxes.putaway.rollbackAndDelete.enabled}">
-                    <g:link controller="putaway" action="rollbackAndDelete" id="${orderInstance.id}" class="button">
+                <g:if test="${orderInstance?.status != OrderStatus.PENDING}">
+                    <g:link controller="putaway" action="rollback" id="${orderInstance.id}" class="button">
                         <img src="${resource(dir: 'images/icons/silk', file: 'arrow_undo.png')}" />&nbsp;
-                        <g:message code="putaway.rollbackAndDelete.label" args="[g.message(code: 'order.label')]" default="Rollback and Delete"/>
+                        <g:message code="default.rollback.label" args="[g.message(code: 'order.label')]" default="Rollback Putaway"/>
                     </g:link>
+                    <g:if test="${grailsApplication.config.openboxes.putaway.rollbackAndDelete.enabled}">
+                        <g:link controller="putaway" action="rollbackAndDelete" id="${orderInstance.id}" class="button">
+                            <img src="${resource(dir: 'images/icons/silk', file: 'arrow_undo.png')}" />&nbsp;
+                            <g:message code="putaway.rollbackAndDelete.label" args="[g.message(code: 'order.label')]" default="Rollback and Delete"/>
+                        </g:link>
+                    </g:if>
                 </g:if>
             </div>
         </g:if>
