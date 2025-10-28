@@ -1839,7 +1839,6 @@ class ShipmentService {
         }
     }
 
-
     void deleteEvent(Shipment shipmentInstance, Event eventInstance) {
         shipmentInstance.removeFromEvents(eventInstance)
         eventInstance.delete()
@@ -1851,7 +1850,6 @@ class ShipmentService {
         }
         shipmentInstance.save()
     }
-
 
     void refreshCurrentStatus(String id) {
         def shipment = Shipment.get(id)

@@ -626,9 +626,16 @@ openboxes:
             enabled: true
         receivingLocation:
             prefix: "R"
-        showAutoReceiveButton: true
-        inboundSortation:
+        manualAutoReceiving:
             enabled: true
+
+    stockMovement:
+        rollbackAndDelete:
+            enabled: true
+
+    putaway:
+      rollbackAndDelete:
+          enabled: true
 
     # Indicates which activities are required for a location to allow logins
     chooseLocation:

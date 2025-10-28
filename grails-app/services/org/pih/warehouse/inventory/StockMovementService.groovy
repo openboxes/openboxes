@@ -62,6 +62,7 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductAssociationTypeCode
 import org.pih.warehouse.product.ProductService
 import org.pih.warehouse.receiving.ReceiptItem
+import org.pih.warehouse.receiving.ReceiptService
 import org.pih.warehouse.requisition.ReplenishmentTypeCode
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionDataService
@@ -104,6 +105,7 @@ class StockMovementService {
     UserService userService
     RequisitionDataService requisitionDataService
     GrailsApplication grailsApplication
+    ReceiptService receiptService
 
     def createStockMovement(StockMovement stockMovement) {
         if (!stockMovement.validate()) {
@@ -3630,5 +3632,36 @@ class StockMovementService {
 
             shipment.save()
         }
+    }
+
+    StockMovement rollbackAndDelete(String stockMovementId) {
+        StockMovement stockMovement = getStockMovement(stockMovementId)
+        if (!stockMovement) {
+            throw new IllegalArgumentException("Stock Movement with ID ${stockMovementId} not found.")
+        }
+
+        Shipment shipment = stockMovement.shipment
+        if (!shipment) {
+            throw new IllegalStateException("Stock Movement with ID ${stockMovementId} has no associated shipment.")
+        }
+
+        Event event = shipment.mostRecentSystemEvent
+        while (event && event.eventType?.eventCode != EventCode.CREATED) {
+            shipmentService.rollbackLastEvent(shipment)
+            event = shipment.mostRecentSystemEvent
+        }
+
+        if (!event || event.eventType.eventCode == EventCode.CREATED) {
+            shipmentService.deleteShipment(shipment)
+        }
+
+        Requisition requisition = stockMovement?.requisition
+        if (requisition) {
+            stockMovement?.shipment = null
+            stockMovement?.requisition = null
+            requisitionService.deleteRequisition(requisition)
+        }
+
+        return stockMovement
     }
 }
