@@ -2481,30 +2481,23 @@ class StockMovementService {
                     requisitionItem.quantityCounted = stockMovementItem.quantityCounted
                     removeShipmentAndPicklistItemsForModifiedRequisitionItem(requisitionItem)
 
-                    if (!stockMovementItem.quantityRequested) {
-                        log.info "Item deleted " + requisitionItem.id
+                    if (stockMovementItem.quantityRequested != requisitionItem.quantity) {
                         requisitionItem.undoChanges()
-                        requisition.removeFromRequisitionItems(requisitionItem)
-                        requisitionItem.delete(flush: true)
-                    } else {
-                        if (stockMovementItem.quantityRequested != requisitionItem.quantity) {
-                            requisitionItem.undoChanges()
-                        }
-
-                        requisitionItem.quantity = stockMovementItem.quantityRequested
-                        requisitionItem.quantityApproved = stockMovementItem.quantityRequested
-
-                        if (stockMovementItem.product) requisitionItem.product = stockMovementItem.product
-                        if (stockMovementItem.inventoryItem) requisitionItem.inventoryItem = stockMovementItem.inventoryItem
-                        if (stockMovementItem.sortOrder) requisitionItem.orderIndex = stockMovementItem.sortOrder
-
-                        requisitionItem.recipient = stockMovementItem.recipient
-                        requisitionItem.palletName = stockMovementItem.palletName
-                        requisitionItem.boxName = stockMovementItem.boxName
-                        requisitionItem.lotNumber = stockMovementItem.lotNumber
-                        requisitionItem.expirationDate = stockMovementItem.expirationDate
-                        requisitionItem.comment = stockMovementItem.comments
                     }
+
+                    requisitionItem.quantity = stockMovementItem.quantityRequested
+                    requisitionItem.quantityApproved = stockMovementItem.quantityRequested
+
+                    if (stockMovementItem.product) requisitionItem.product = stockMovementItem.product
+                    if (stockMovementItem.inventoryItem) requisitionItem.inventoryItem = stockMovementItem.inventoryItem
+                    if (stockMovementItem.sortOrder) requisitionItem.orderIndex = stockMovementItem.sortOrder
+
+                    requisitionItem.recipient = stockMovementItem.recipient
+                    requisitionItem.palletName = stockMovementItem.palletName
+                    requisitionItem.boxName = stockMovementItem.boxName
+                    requisitionItem.lotNumber = stockMovementItem.lotNumber
+                    requisitionItem.expirationDate = stockMovementItem.expirationDate
+                    requisitionItem.comment = stockMovementItem.comments
                 }
                 // Otherwise we create a new one
                 else {
