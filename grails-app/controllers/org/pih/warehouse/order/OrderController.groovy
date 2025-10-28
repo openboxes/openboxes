@@ -310,7 +310,7 @@ class OrderController {
                 try {
                     orderService.deleteOrder(orderInstance)
                     flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'order.label', default: 'Order'), orderInstance.orderNumber])}"
-                    redirect(controller: "order", action: "list", params: [orderType: Constants.PUTAWAY_ORDER, status: OrderStatus.PENDING])
+                    redirect(action: "list", params: [orderType: Constants.PUTAWAY_ORDER, status: OrderStatus.PENDING])
                     return
                 } catch (org.springframework.dao.DataIntegrityViolationException e) {
                     flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'order.label', default: 'Order'), orderInstance.orderNumber])}"
