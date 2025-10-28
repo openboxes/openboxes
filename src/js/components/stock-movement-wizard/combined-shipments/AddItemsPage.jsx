@@ -31,6 +31,7 @@ import LabelField from 'components/form-elements/LabelField';
 import ProductSelectField from 'components/form-elements/ProductSelectField';
 import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
+import ConfirmExpirationDateModal from 'components/modals/ConfirmExpirationDateModal';
 import CombinedShipmentItemsModal from 'components/stock-movement-wizard/modals/CombinedShipmentItemsModal';
 import { ORDER_URL, STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
 import AlertMessage from 'utils/AlertMessage';
@@ -321,6 +322,10 @@ class AddItemsPage extends Component {
       isFirstPageLoaded: false,
       showAlert: false,
       alertMessage: '',
+      isExpirationModalOpen: false,
+      // Resolve function for the expiration date confirmation modal promise.
+      resolveExpirationModal: null,
+      itemsWithMismatchedExpiry: [],
     };
 
     this.props.showSpinner();
@@ -666,7 +671,7 @@ class AddItemsPage extends Component {
     this.saveRequisitionItemsAndTransitionToNextStep(formValues, lineItems);
   }
 
-  async fetchInventoryItem(values, rowIndex) {
+  async fetchInventoryItem(values, rowIndex, shouldValidateExpirationDate = true) {
     this.debouncedInventoryItemFetch.cancel();
     const lotNumber = values?.lineItems[rowIndex]?.lotNumber;
     const productId = values?.lineItems[rowIndex]?.product?.id;
@@ -699,11 +704,29 @@ class AddItemsPage extends Component {
       if (!values.lineItems?.[rowIndex]?.expirationDate) {
         this.changeExpirationDate(mappedLineItems, rowIndex, data?.inventoryItem?.expirationDate);
       }
-      this.validateExpirationDate(mappedLineItems, rowIndex);
+      if (shouldValidateExpirationDate) {
+        this.validateExpirationDate(mappedLineItems, rowIndex);
+      }
     });
   }
 
-  validateExpirationDate(lineItems, rowIndex) {
+  /**
+   * Shows Inventory item expiration date update confirmation modal.
+   * @param {Array} itemsWithMismatchedExpiry - Array of elements with mismatched expiration dates.
+   * @returns {Promise} - Resolves to true if user confirms the update, false if not.
+   * @public
+   */
+  confirmExpirationDateSave(itemsWithMismatchedExpiry) {
+    return new Promise((resolve) => {
+      this.setState({
+        isExpirationModalOpen: true,
+        resolveExpirationModal: resolve,
+        itemsWithMismatchedExpiry,
+      });
+    });
+  }
+
+  async validateExpirationDate(lineItems, rowIndex) {
     const lineItem = lineItems?.[rowIndex];
     const inventoryItem = lineItem?.fetchedInventoryItem?.inventoryItem
       || lineItem?.inventoryItem;
@@ -716,12 +739,27 @@ class AddItemsPage extends Component {
       && quantity > 0;
 
     if (expirationDateHasChanged && !isModalOpen) {
-      isModalOpen = true;
-      this.confirmInventoryItemExpirationDateUpdate(
-        () => this.saveRequisitionItems(this.state.values.lineItems),
-        () => this.cancelSavingRequisitionItem(lineItems, rowIndex),
-      );
+      // Despite we have only one item here, we are place it in an array
+      // because the ConfirmExpirationDateModal expects an array
+      const itemsWithMismatchedExpiry = [{
+        code: lineItem?.product?.productCode,
+        product: lineItem?.product,
+        lotNumber: lineItem?.lotNumber,
+        previousExpiry: inventoryItem?.expirationDate,
+        newExpiry: lineItem?.expirationDate,
+      }];
+
+      const shouldUpdateLotExpirationDate =
+        await this.confirmExpirationDateSave(itemsWithMismatchedExpiry);
+      if (!shouldUpdateLotExpirationDate) {
+        this.cancelSavingRequisitionItem(lineItems, rowIndex);
+        return Promise.reject();
+      }
+
+      return this.saveRequisitionItems([lineItems[rowIndex]])
+        .then((response) => this.fetchInventoryItem(response.data.data, rowIndex, false));
     }
+    return null;
   }
 
   changeExpirationDate(lineItems, rowIndex, newDate) {
@@ -1071,9 +1109,27 @@ class AddItemsPage extends Component {
     }));
   }
 
+  /**
+   * Handles the response from the expiration date confirmation modal.
+   * @param {boolean} shouldUpdate - True if the user confirmed the update, false if not.
+   * @public
+   */
+  handleExpirationModalResponse(shouldUpdate) {
+    // Resolve the promise returned by confirmExpirationDateSave.
+    if (this.state.resolveExpirationModal) {
+      this.state.resolveExpirationModal(shouldUpdate);
+    }
+
+    // Close the modal and reset its state.
+    this.setState({
+      isExpirationModalOpen: false,
+      resolveExpirationModal: null,
+      itemsWithMismatchedExpiry: [],
+    });
+  }
+
   render() {
     const { showAlert, alertMessage } = this.state;
-
     return (
       <Form
         onSubmit={() => {}}
@@ -1238,6 +1294,12 @@ class AddItemsPage extends Component {
                 </button>
               </div>
             </form>
+            <ConfirmExpirationDateModal
+              isOpen={this.state.isExpirationModalOpen}
+              itemsWithMismatchedExpiry={this.state.itemsWithMismatchedExpiry}
+              onConfirm={() => this.handleExpirationModalResponse(true)}
+              onCancel={() => this.handleExpirationModalResponse(false)}
+            />
           </div>
         )}
       />
