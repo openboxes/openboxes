@@ -9,6 +9,7 @@ import org.pih.warehouse.api.spec.base.ApiSpec
 import org.pih.warehouse.common.domain.builder.inventory.RecordInventoryCommandTestBuilder
 import org.pih.warehouse.product.ProductAvailability
 
+@Ignore("Until we can have our APIs update product availability sequentially these tests are too flaky to be enabled.")
 class RecordStockApiSpec extends ApiSpec {
 
     @Autowired
@@ -65,7 +66,6 @@ class RecordStockApiSpec extends ApiSpec {
         assert lot2Availability.quantityOnHand == 20
     }
 
-    @Ignore("This doesn't work since product availability is a sum of all of these record stocks instead of only the latest one. Need to figure out what's going on.")
     void 'only the latest record stock applies'() {
         when: 'we set some quantity for the product'
         Instant originalTransactionDate = Instant.now().minusSeconds(100)

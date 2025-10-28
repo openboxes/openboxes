@@ -820,6 +820,11 @@ class UrlMappings {
             action = "importCsv"
         }
 
+        "/api/facilities/$facilityId/inventories/reorderReport" {
+            controller = { "inventoryApi" }
+            action = [GET: "getReorderReport"]
+        }
+
         /**
         * Purchase Orders API endpoints
         */

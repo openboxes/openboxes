@@ -18,18 +18,25 @@ import groovy.sql.Sql
 import org.apache.commons.lang.StringEscapeUtils
 import org.hibernate.Criteria
 import org.hibernate.criterion.CriteriaSpecification
+import org.hibernate.criterion.Criterion
 import org.hibernate.criterion.DetachedCriteria
 import org.hibernate.criterion.Projections
 import org.hibernate.criterion.Restrictions
 import org.hibernate.criterion.Subqueries
 import org.hibernate.SQLQuery
+import org.hibernate.sql.JoinType
 import org.hibernate.type.StandardBasicTypes
 import org.pih.warehouse.PaginatedList
 import org.pih.warehouse.api.AllocatedItem
 import org.pih.warehouse.api.AvailableItem
+import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.ApplicationExceptionEvent
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.Tag
+import org.pih.warehouse.core.db.GormUtil
+import org.pih.warehouse.inventory.product.availability.AvailableItemMap
+import org.pih.warehouse.inventory.product.availability.InventoryByProduct
 import org.pih.warehouse.jobs.RefreshProductAvailabilityJob
 import org.pih.warehouse.order.OrderStatus
 import org.pih.warehouse.product.Category
@@ -518,6 +525,62 @@ class ProductAvailabilityService {
         return quantityMap
     }
 
+    /**
+     * Find product availability record grouped by product that satisfy the filters which contain primarily:
+     * expiration (we can include/exclude inventory items that expire in 30/90/180/365 days),
+     * additionalLocations - locations to search (and sum) the stock in (other than current location)
+     */
+    List<InventoryByProduct> getInventoriesByProduct(List<Location> additionalLocations,
+                                                     List<Category> categories,
+                                                     List<Tag> productTags,
+                                                     ExpirationFilter expiration) {
+        List<Location> locations = [AuthService.currentLocation]
+        if (additionalLocations) {
+            locations.addAll(additionalLocations)
+        }
+        return ProductAvailability.createCriteria().list {
+            projections {
+                sum("quantityOnHand")
+                sum("quantityAvailableToPromise")
+                groupProperty("product")
+            }
+            inList("location", locations)
+
+            // The additional if check is needed to avoid joining product twice in two separate ifs for categories/tags, as it could throw an error
+            // if both categories and tags were provided. Another possible solution would be to store "usedAliases" and check if categories already joined the product.
+            if (categories || productTags) {
+                product {
+                    if (categories) {
+                        inList("category", categories)
+                    }
+                    if (productTags) {
+                        tags {
+                            'in'("id", productTags.id)
+                        }
+                    }
+                }
+            }
+
+            if (expiration != ExpirationFilter.INCLUDE_EXPIRED_STOCK) {
+                add(getExpirationCriteria(expiration, delegate))
+            }
+        }.collect { new InventoryByProduct(
+                quantityOnHand: it[0],
+                quantityAvailableToPromise: it[1],
+                product: it[2]
+        )}
+    }
+
+    private static Criterion getExpirationCriteria(ExpirationFilter expirationFilter, org.grails.datastore.mapping.query.api.Criteria criteria) {
+        criteria.createAlias("inventoryItem", "ii", JoinType.INNER_JOIN)
+        // We have to include the condition for qoh > 0, as we could potentially include items that are out of stock, but have "hidden" associated
+        // inventory item with product availability record that is not visible in the stock history at that time
+        if (expirationFilter == ExpirationFilter.REMOVE_EXPIRED_STOCK) {
+            return Restrictions.and(Restrictions.ge("ii.expirationDate", new Date()), Restrictions.gt("quantityOnHand", 0))
+        }
+        return Restrictions.and(Restrictions.between("ii.expirationDate", new Date(), new Date() + expirationFilter.days), Restrictions.gt("quantityOnHand", 0))
+    }
+
     Map<Product, Integer> getQuantityOnHandByProduct(Location location) {
         def quantityMap = [:]
         if (location) {
@@ -667,33 +730,22 @@ class ProductAvailabilityService {
     }
 
     /**
-     * Initializes a String comprising of [product code + bin location name + lot number], to be used to uniquely
-     * identify a product availability entry.
-     */
-    static String constructAvailableItemKey(Location binLocation, InventoryItem inventoryItem) {
-        return "${inventoryItem.product.productCode}-${binLocation?.name}-${inventoryItem?.lotNumber}"
-    }
-
-    static String constructAvailableItemKey(String binLocationName, String lotNumber, String productCode) {
-        return "${productCode}-${binLocationName}-${lotNumber}"
-    }
-
-    /**
      * Fetches the stock of a list of products at a facility at a given moment in time.
      *
      * @param facility
      * @param products
      * @param at The moment in time to fetch stock for. If not provided, will fetch the current stock of each item.
-     * @return a map of AvailableItem keyed on [product code + bin location name + lot number]
+     * @return a map of AvailableItem keyed on ProductAvailabilityKey
      */
-    Map<String, AvailableItem> getAvailableItemsAtDateAsMap(Location facility, Collection<Product> products, Date at=null) {
+    AvailableItemMap getAvailableItemsAtDateAsMap(
+            Location facility,
+            Collection<Product> products,
+            Date at=null) {
+
         List<AvailableItem> availableItems = getAvailableItemsAtDate(facility, products, at)
 
-        Map<String, AvailableItem> availableItemsMap = [:]
-        for (AvailableItem availableItem : availableItems) {
-            String key = constructAvailableItemKey(availableItem.binLocation, availableItem.inventoryItem)
-            availableItemsMap.put(key, availableItem)
-        }
+        AvailableItemMap availableItemsMap = new AvailableItemMap()
+        availableItemsMap.putAll(availableItems)
         return availableItemsMap
     }
 
@@ -725,38 +777,46 @@ class ProductAvailabilityService {
 
     List getAvailableItems(Location location, List<String> productsIds, boolean excludeNegativeQuantity = false, boolean excludeZeroQuantity = false) {
         log.info("getQuantityOnHandByBinLocation: location=${location} product=${productsIds}")
+
+        if (!location) {
+            return []
+        }
+
         String quantityCondition = ((excludeNegativeQuantity && excludeZeroQuantity) || excludeZeroQuantity) ? "and pa.quantityOnHand <> 0"
                 : (excludeNegativeQuantity) ? "and pa.quantityOnHand > 0" : ""
 
-        List<AvailableItem> data = []
-        if (location) {
-            def results = ProductAvailability.executeQuery("""
-						select 
-						    ii,
-						    pa.binLocation,
-						    pa.quantityOnHand,
-						    pa.quantityAvailableToPromise
-						from ProductAvailability pa
-						left outer join pa.inventoryItem ii
-						left outer join pa.binLocation bl
-						where pa.location = :location
-						""" +
-                        "${quantityCondition}" +
-                        "and pa.product.id in (:products)", [location: location, products: productsIds])
+        String sql = """
+                SELECT
+                    ii,
+                    pa.binLocation,
+                    pa.quantityOnHand,
+                    pa.quantityAvailableToPromise
+                FROM
+                    ProductAvailability pa
+                    LEFT OUTER JOIN pa.inventoryItem ii
+                    LEFT OUTER JOIN pa.binLocation bl
+                WHERE
+                    pa.location = :location
+                    ${quantityCondition}
+                    ${productsIds ? "AND pa.product.id IN (:products)" : ""}
+        """
+        def results = ProductAvailability.executeQuery(sql, GormUtil.sanitizeExecuteQueryArgs(sql, [
+                location: location,
+                products: productsIds,
+        ]))
 
-            data = results.collect {
-                InventoryItem inventoryItem = it[0]
-                Location binLocation = it[1]
-                Integer quantityOnHand = it[2]
-                Integer quantityAvailableToPromise = it[3]
+        List<AvailableItem> data = results.collect {
+            InventoryItem inventoryItem = it[0]
+            Location binLocation = it[1]
+            Integer quantityOnHand = it[2]
+            Integer quantityAvailableToPromise = it[3]
 
-                return new AvailableItem(
-                        inventoryItem               : inventoryItem,
-                        binLocation                 : binLocation,
-                        quantityOnHand              : quantityOnHand,
-                        quantityAvailable           : quantityAvailableToPromise
-                )
-            }
+            return new AvailableItem(
+                    inventoryItem     : inventoryItem,
+                    binLocation       : binLocation,
+                    quantityOnHand    : quantityOnHand,
+                    quantityAvailable : quantityAvailableToPromise
+            )
         }
         return data
     }
@@ -917,6 +977,11 @@ class ProductAvailabilityService {
     }
 
     void updateProductAvailability(InventoryItem inventoryItem) {
+        // OBPIH-7506: Only use the default lot if the lot number is null because we have valid inventory items in our
+        //             system with blank string lot numbers (ie " "). Until we can fix our importers and migrate our
+        //             data to not allow blank lots, we have to continue to allow both null and " " lots to coexist.
+        String lotNumber = inventoryItem.lotNumber == null ? Constants.DEFAULT_LOT_NUMBER : inventoryItem.lotNumber
+
         def results = ProductAvailability.executeUpdate(
                 "update ProductAvailability a " +
                         "set a.lotNumber=:lotNumber " +
@@ -924,12 +989,11 @@ class ProductAvailabilityService {
                         "and a.lotNumber != :lotNumber",
                 [
                         inventoryItemId: inventoryItem.id,
-                        lotNumber      : inventoryItem.lotNumber?:Constants.DEFAULT_LOT_NUMBER
+                        lotNumber      : lotNumber
                 ]
         )
-        log.info "Updated ${results} product availability records for inventory item ${inventoryItem?.lotNumber?:Constants.DEFAULT_LOT_NUMBER}"
+        log.info "Updated ${results} product availability records for inventory item with lot number [${lotNumber}]"
     }
-
 
     void updateProductAvailability(Location location) {
         def isBinLocation = location?.isInternalLocation()

@@ -150,7 +150,7 @@ const StockMovementInboundTable = ({
       accessor: 'identifier',
       headerClassName: 'header justify-content-center',
       fixed: 'left',
-      minWidth: 100,
+      minWidth: 130,
       Cell: (row) => {
         const {
           isReturn, id, order, shipmentType,

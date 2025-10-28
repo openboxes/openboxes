@@ -18,7 +18,6 @@ import org.apache.http.impl.client.BasicResponseHandler
 import org.apache.http.impl.client.DefaultHttpClient
 import org.pih.warehouse.DateUtil
 import org.pih.warehouse.PaginatedList
-import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.DashboardService
@@ -44,6 +43,7 @@ import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionCode
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.inventory.TransactionType
+import org.pih.warehouse.inventory.product.availability.AvailableItemMap
 import org.pih.warehouse.invoice.InvoiceType
 import org.pih.warehouse.invoice.InvoiceTypeCode
 import org.pih.warehouse.order.OrderAdjustment
@@ -1354,7 +1354,7 @@ class ReportService implements ApplicationContextAware {
         return transactionEntry.transaction.transactionType.transactionCode == TransactionCode.CREDIT && transactionEntry.quantity > 0
     }
 
-    List<TransactionEntry> getFilteredTransactionEntries(
+    private List<TransactionEntry> getFilteredTransactionEntries(
             List<TransactionCode> transactionCodes,
             Date startDate,
             Date endDate,
@@ -1362,17 +1362,16 @@ class ReportService implements ApplicationContextAware {
             List<Tag> tagsList,
             List<ProductCatalog> catalogsList,
             Location location,
-            Product productData,
+            List<Product> products,
             String orderBy,
             String sortOrder = "desc"
     ) {
         return TransactionEntry.createCriteria().list {
             inventoryItem {
+                if (products) {
+                    'in'('product', products)
+                }
                 product {
-                    if (productData) {
-                        eq('id', productData.id)
-                    }
-
                     if (categories) {
                         'in'('category', categories)
                     }
@@ -1420,8 +1419,9 @@ class ReportService implements ApplicationContextAware {
         } as List<TransactionEntry>
     }
 
-    List<TransactionEntry> getFilteredTransactionEntries(List<TransactionCode> transactionCodes, Date startDate, Date endDate, Location location, Product product, String orderBy, String sortOrder = "desc") {
-        return getFilteredTransactionEntries(transactionCodes, startDate, endDate, null, null, null, location, product, orderBy, sortOrder)
+    private List<TransactionEntry> getFilteredTransactionEntries(List<TransactionCode> transactionCodes, Date startDate, Date endDate, Location location, Product product, String orderBy, String sortOrder = "desc") {
+        List<Product> products = product ? [product] : null
+        return getFilteredTransactionEntries(transactionCodes, startDate, endDate, null, null, null, location, products, orderBy, sortOrder)
     }
 
     Map<Product, Map<String, Integer>> getDetailedTransactionReportData(Map<Product, List<TransactionEntry>> transactionEntries) {
@@ -1499,7 +1499,15 @@ class ReportService implements ApplicationContextAware {
         ]
     }
 
-    List<Object> getTransactionReport(Location location, List<Category> categories, List<Tag> tagsList, List<ProductCatalog> catalogsList, Date startDate, Date endDate, Boolean includeDetails) {
+    List<Object> getTransactionReport(Location location,
+                                      List<Category> categories,
+                                      List<Tag> tagsList,
+                                      List<ProductCatalog> catalogsList,
+                                      List<Product> productList,
+                                      Date startDate,
+                                      Date endDate,
+                                      Boolean includeDetails) {
+
         List<TransactionCode> adjustmentTransactionCodes = [
                 TransactionCode.CREDIT,
                 TransactionCode.DEBIT
@@ -1515,6 +1523,7 @@ class ReportService implements ApplicationContextAware {
                 tagsList,
                 catalogsList,
                 location,
+                productList,
                 null,
                 null
         )
@@ -1525,14 +1534,14 @@ class ReportService implements ApplicationContextAware {
         }
 
         // Calculate items available at the startDate to get quantity on hand for found products
-        Map<String, AvailableItem> availableItemStartDateMap = productAvailabilityService.getAvailableItemsAtDateAsMap(
+        AvailableItemMap availableItemStartDateMap = productAvailabilityService.getAvailableItemsAtDateAsMap(
                 location,
                 productsMap.keySet().toList(),
                 startDate
         )
 
         // Calculate items available at the startDate to get quantity on hand for found products
-        Map<String, AvailableItem> availableItemEndDateMap = productAvailabilityService.getAvailableItemsAtDateAsMap(
+        AvailableItemMap availableItemEndDateMap = productAvailabilityService.getAvailableItemsAtDateAsMap(
                 location,
                 productsMap.keySet().toList(),
                 endDate.before(new Date()) ? endDate : new Date()
@@ -1561,12 +1570,8 @@ class ReportService implements ApplicationContextAware {
         // 2. DEBITS = transaction entries in relation with transaction that are DEBIT type
         // and transaction that are CREDIT type, but with quantity lower than 0
         return productsMap.collect { key, value ->
-            Integer openingBalance = availableItemStartDateMap.findAll { entry ->
-                entry.key.startsWith(key.productCode)
-            }.values().quantityOnHand.sum() ?: 0
-            Integer closingBalance = availableItemEndDateMap.findAll { entry ->
-                entry.key.startsWith(key.productCode)
-            }.values().quantityOnHand.sum() ?: 0
+            Integer openingBalance = availableItemStartDateMap.getAllByProduct(key).quantityOnHand.sum() ?: 0
+            Integer closingBalance = availableItemEndDateMap.getAllByProduct(key).quantityOnHand.sum() ?: 0
             Integer credits = getCreditTransactionEntries(value).sum { it.quantity } as Integer ?: 0
             Integer debits = getDebitTransactionEntries(value).sum { Math.abs(it.quantity) } as Integer ?: 0
             // In the new version of the report, it's not based on the inventory snapshot.
@@ -1636,14 +1641,14 @@ class ReportService implements ApplicationContextAware {
         )
 
         // Calculate items available at the startDate to get quantity on hand for found products
-        Map<String, AvailableItem> availableItemStartDateMap = productAvailabilityService.getAvailableItemsAtDateAsMap(
+        AvailableItemMap availableItemStartDateMap = productAvailabilityService.getAvailableItemsAtDateAsMap(
                 location,
                 [product],
                 startDate
         )
 
         // Calculate items available at the endDate to get quantity on hand for found products
-        Map<String, AvailableItem> availableItemEndDateMap = productAvailabilityService.getAvailableItemsAtDateAsMap(
+        AvailableItemMap availableItemEndDateMap = productAvailabilityService.getAvailableItemsAtDateAsMap(
                 location,
                 [product],
                 // EndDate cannot be a date in the future, because of the validation
