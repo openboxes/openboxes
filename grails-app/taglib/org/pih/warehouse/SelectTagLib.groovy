@@ -73,6 +73,7 @@ class SelectTagLib {
         attrs.id = attrs.id ?: "products-select"
         attrs.url = "/api/products/search"
         attrs.searchParameter = "name"
+        attrs.displayValue = "'[' + item.productCode + '] ' + item.name"
         out << selectAjax(attrs, body)
     }
 
@@ -83,6 +84,8 @@ class SelectTagLib {
      * @attr url Required. The path of the API request
      * @attr name The name of the select element. Defaults to the value of the id attr.
      * @attr searchParameter The name of the query parameter to use when making the API request
+     * @attr displayValue Stringified Javascript for formatting the API response for display. The "item" key can be
+     *                    used to access response fields. Defaults to displaying the value of the searchParameter attr.
      * @attr multiple True if the select box should allow multiple items to be selected
      */
     def selectAjax = { attrs, body ->
@@ -101,6 +104,7 @@ class SelectTagLib {
         boolean multiple = attrs.multiple?.asBoolean() ?: false
         String placeholder = "${g.message(code: 'default.selectOptions.label', default: 'Select Options')}"
         Object values = attrs.value
+        String displayValue = attrs.displayValue ?: "item.${searchParameter}"
         String selectedOptionsHtml = ""
 
         if (values && values.any { it?.hasProperty('id') }) {
@@ -168,10 +172,8 @@ class SelectTagLib {
                                     return {
                                         id: item.id,
                                         ${searchParameter}: item.${searchParameter},
-                                        label: item.${searchParameter},
-                                        text: item.${searchParameter},
+                                        text: ${displayValue}, 
                                         value: item.id,
-                                        valueText: item.${searchParameter},
                                     };
                                 });
                                 return {
