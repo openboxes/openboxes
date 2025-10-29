@@ -156,7 +156,16 @@ class Select extends Component {
         .join(', ');
     }
 
-    return value.label ?? value.name;
+    const label = value.label ?? value.name;
+    if (label instanceof String) {
+      return label;
+    }
+
+    return this.props.translate(
+      value?.label?.props?.id,
+      value?.id,
+      value?.label?.props?.data,
+    );
   }
 
   getTooltipHtml() {

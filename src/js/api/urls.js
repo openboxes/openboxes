@@ -213,3 +213,7 @@ export const INDICATORS_REPORT = `${API}/reports/indicators`;
 export const INDICATORS_PRODUCTS_INVENTORIED = `${INDICATORS_REPORT}/productsInventoried`;
 export const INDICATORS_INVENTORY_SHRINKAGE = `${INDICATORS_REPORT}/inventoryShrinkage`;
 export const INDICATORS_INVENTORY_ACCURACY = `${INDICATORS_REPORT}/inventoryAccuracy`;
+
+// INVENTORY
+export const INVENTORY_API = (id) => `${API}/facilities/${id}/inventories`;
+export const REORDER_REPORT = (id) => `${INVENTORY_API(id)}/reorderReport`;
