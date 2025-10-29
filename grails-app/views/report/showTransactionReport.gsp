@@ -259,7 +259,14 @@
 				data.push({ name: "startDate", value: $("#startDate").val() });
 				data.push({ name: "endDate", value: $("#endDate").val() });
 				data.push({ name: "category", value: $("#category").val() });
-                data.push({ name: "products", value: $("#products-select").val() });
+
+                let selectedProducts = $("#products-select").val();
+                if (selectedProducts) {
+                  selectedProducts.forEach(productId => {
+                    data.push({ name: "products", value: productId });
+                  });
+                }
+
 				data.push({ name: "tags", value: $("#tags").val() });
 				data.push({ name: "catalogs", value: $("#catalogs").val() });
 				if($('#includeCategoryChildren').is(':checked')) {
