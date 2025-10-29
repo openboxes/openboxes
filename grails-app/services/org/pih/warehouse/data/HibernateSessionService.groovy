@@ -6,7 +6,8 @@ import org.hibernate.Session
 import org.hibernate.SessionFactory
 import org.hibernate.query.NativeQuery
 import org.hibernate.transform.AliasToEntityMapResultTransformer
-import org.springframework.context.annotation.Primary
+
+import org.pih.warehouse.core.PaginationParams
 
 /**
  * Execute database queries via the Hibernate session.
@@ -22,7 +23,6 @@ import org.springframework.context.annotation.Primary
  * If querying a domain object, use Spring Data's Repository pattern or GORM methods (provided by GormEntity) instead.
  * For example: Product.getByName(name) or Product.executeQuery(...).
  */
-@Primary
 @Transactional
 class HibernateSessionService implements PersistenceService {
 
@@ -43,12 +43,12 @@ class HibernateSessionService implements PersistenceService {
      */
     List<Map<String, Object>> list(String sql,
                                    Map<String, Object> params=[:],
-                                   Integer pageSize=null,
-                                   Integer offset=null) {
+                                   PaginationParams paginationParams=null) {
         NativeQuery query = createNativeQuery(sql, params)
 
-        if (pageSize != null && offset != null) {
-            query.setMaxResults(pageSize).setFirstResult(offset)
+        if (paginationParams) {
+            query.setMaxResults(paginationParams.max)
+                 .setFirstResult(paginationParams.offset)
         }
 
         // Transforms the returned rows into a list of maps, keyed on column name.

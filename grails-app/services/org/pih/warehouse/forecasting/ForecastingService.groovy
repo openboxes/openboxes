@@ -13,10 +13,11 @@ import grails.core.GrailsApplication
 import grails.util.Holders
 import groovy.sql.Sql
 import groovy.time.TimeCategory
+import org.springframework.beans.factory.annotation.Autowired
 import util.StringUtil
 
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.data.HibernateSessionService
+import org.pih.warehouse.data.PersistenceService
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.DateUtil
@@ -30,7 +31,9 @@ import org.pih.warehouse.core.SynonymTypeCode
 
 class ForecastingService {
 
-    HibernateSessionService hibernateSessionService
+    @Autowired
+    PersistenceService persistenceService
+
     def dataSource
     GrailsApplication grailsApplication
     def productAvailabilityService
@@ -324,7 +327,7 @@ class ForecastingService {
         }
 
         try {
-            data = hibernateSessionService.list(query, queryParams)
+            data = persistenceService.list(query, queryParams)
 
         } catch (Exception e) {
             log.error("Unable to execute query: " + e.message, e)

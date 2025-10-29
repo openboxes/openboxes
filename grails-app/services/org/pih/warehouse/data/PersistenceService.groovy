@@ -1,5 +1,7 @@
 package org.pih.warehouse.data
 
+import org.pih.warehouse.core.PaginationParams
+
 /**
  * For making queries to a persistence layer (ex: a database).
  *
@@ -13,14 +15,12 @@ interface PersistenceService {
      *
      * @param query the query string
      * @param params a map of variables to be bound to the query. (For SQL, these are represented as ":x" in the query)
-     * @param pageNumber the maximum number of results to retrieve
-     * @param offset the index of the first result, starts from 0
+     * @param paginationParams required parameters for when we want to paginate the request
      * @return List<Map<String, Object>> the rows, each containing a map of columns, keyed on column name
      */
     List<Map<String, Object>> list(String query,
                                    Map<String, Object> params,
-                                   Integer pageNumber,
-                                   Integer offset)
+                                   PaginationParams paginationParams)
 
     /**
      * Selects a list of rows from the persistence layer.
