@@ -1815,11 +1815,14 @@ class TransactionReportCommand implements Validateable {
     List<TransactionType> transactionTypes
     Category category
 
-    // TODO: The datatables plugin sends the ids as a single string (ex: products="1,2") so we need to split it up
-    //       ourselves. Better would be to modify the usage of datatables to send up each id as a separate field
-    //       (ex: products="1"&products="2") so that Grails can bind it normally. (see showTransactionReport.gsp)
+    // TODO: The datatables plugin sends the ids as a single string (ex: products=1,2) but when querying for CSV data
+    //       it sends the ids as separate params (ex: products=1&products=2) so we need to conditionally manually
+    //       bind the field. We should modify the usage of datatables to send up each id as a separate field (like the
+    //       CSV approach) then we could remove the whole @BindUsing. (see showTransactionReport.gsp)
     @BindUsing({ obj, source ->
-        List<String> productIds = (source['products'] as String)?.split(',')
+        List<String> productIds = (source['products'] instanceof String ?
+                (source['products'] as String)?.split(',') :
+                source['products']) as List<String>
         return productIds ? Product.findAllByIdInList(productIds) : null
     })
     List<Product> products
