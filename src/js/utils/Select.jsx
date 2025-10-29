@@ -161,11 +161,12 @@ class Select extends Component {
       return label;
     }
 
-    return this.props.translate(
-      value?.label?.props?.id,
-      value?.id,
-      value?.label?.props?.data,
-    );
+    return value?.label?.props?.id
+      ? this.props.translate(
+        value?.label?.props?.id,
+        value?.id,
+        value?.label?.props?.data,
+      ) : null;
   }
 
   getTooltipHtml() {
