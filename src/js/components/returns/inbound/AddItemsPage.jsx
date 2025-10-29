@@ -19,6 +19,7 @@ import ProductSelectField from 'components/form-elements/ProductSelectField';
 import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
 import notification from 'components/Layout/notifications/notification';
+import ConfirmExpirationDateModal from 'components/modals/ConfirmExpirationDateModal';
 import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
 import DateFormat from 'consts/dateFormat';
 import NotificationType from 'consts/notificationTypes';
@@ -27,8 +28,6 @@ import { flattenRequest, parseResponse } from 'utils/apiClient';
 import { renderFormField, setColumnValue } from 'utils/form-utils';
 import Select from 'utils/Select';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
-
-import ConfirmExpirationDateModal from '../../modals/ConfirmExpirationDateModal';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 

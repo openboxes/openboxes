@@ -1679,6 +1679,7 @@ div.search-input:focus-within {
     overflow-y: auto;
     max-height: 400px;
     margin-bottom: 15px;
+
     &::-webkit-scrollbar {
       width: 0.5em;
       height: 0.5em;

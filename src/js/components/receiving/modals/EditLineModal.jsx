@@ -12,10 +12,9 @@ import DateField from 'components/form-elements/DateField';
 import ModalWrapper from 'components/form-elements/ModalWrapper';
 import ProductSelectField from 'components/form-elements/ProductSelectField';
 import TextField from 'components/form-elements/TextField';
+import ConfirmExpirationDateModal from 'components/modals/ConfirmExpirationDateModal';
 import DateFormat from 'consts/dateFormat';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
-
-import ConfirmExpirationDateModal from '../../modals/ConfirmExpirationDateModal';
 
 const FIELDS = {
   lines: {

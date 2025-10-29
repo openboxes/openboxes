@@ -10,9 +10,8 @@ import TableHeaderCell from 'components/DataTable/TableHeaderCell';
 import { INVENTORY_ITEM_URL } from 'consts/applicationUrls';
 import confirmExpirationDateColumn from 'consts/confirmExpirationDateColumn';
 import { DateFormatDateFns } from 'consts/timeFormat';
+import useTranslate from 'hooks/useTranslate';
 import { formatDateToString } from 'utils/dateUtils';
-
-import useTranslate from './useTranslate';
 
 const useConfirmExpirationDateModal = () => {
   const translate = useTranslate();
