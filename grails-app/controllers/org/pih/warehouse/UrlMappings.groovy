@@ -825,6 +825,11 @@ class UrlMappings {
             action = [GET: "getReorderReport"]
         }
 
+        "/api/facilities/$facilityId/inventories/expirationHistoryReport" {
+            controller = { "inventoryApi" }
+            action = [GET: "getExpirationHistoryReport"]
+        }
+
         /**
         * Purchase Orders API endpoints
         */

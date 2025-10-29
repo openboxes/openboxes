@@ -2,19 +2,25 @@ package org.pih.warehouse.api
 
 import grails.converters.JSON
 import grails.validation.ValidationException
+import org.pih.warehouse.PaginatedList
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.DashboardService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.importer.InventoryImportDataService
+import org.pih.warehouse.inventory.ExpirationHistoryReportFilterCommand
+import org.pih.warehouse.inventory.ExpirationHistoryReportRow
+import org.pih.warehouse.inventory.InventoryService
 import org.pih.warehouse.inventory.ReorderReportFilterCommand
 import org.pih.warehouse.inventory.ReorderReportItemDto
+import org.pih.warehouse.inventory.TransactionEntry
 
 class InventoryApiController {
 
     InventoryImportDataService inventoryImportDataService
     DashboardService dashboardService
+    InventoryService inventoryService
 
     def importCsv() {
         String fileData = request.inputStream.text
@@ -56,6 +62,26 @@ class InventoryApiController {
             }
             "*" {
                 render([data: reorderReport] as JSON)
+            }
+        }
+    }
+
+    def getExpirationHistoryReport(ExpirationHistoryReportFilterCommand command) {
+        if (command.hasErrors()) {
+            throw new ValidationException("Invalid filters", command.errors)
+        }
+        withFormat {
+            "csv" {
+                String csv = inventoryService.getExpirationHistoryReportCsv(command)
+                response.contentType = "text/csv"
+                String filename = "Expiration history report - ${AuthService.currentLocation?.name}.csv"
+                response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
+                render(csv)
+                return
+            }
+            "*" {
+                PaginatedList<ExpirationHistoryReportRow> entries = inventoryService.getExpirationHistoryReport(command)
+                render([data: entries, totalCount: entries.totalCount] as JSON)
             }
         }
     }
