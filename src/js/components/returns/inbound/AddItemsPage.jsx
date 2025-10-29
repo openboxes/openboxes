@@ -164,7 +164,7 @@ class AddItemsPage extends Component {
       sortOrder: 0,
       formValues: { returnItems: [] },
       isExpirationModalOpen: false,
-      // Resolve function for the expiration date confirmation modal promise.
+      // Stores the resolve function for the ConfirmExpirationDateModal promise
       resolveExpirationModal: null,
       itemsWithMismatchedExpiry: [],
       // isFirstPageLoaded: false,

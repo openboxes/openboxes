@@ -295,11 +295,6 @@ const FIELDS = {
 
 const LOT_AND_EXPIRY_ERROR = 'react.stockMovement.error.lotAndExpiryControl.label';
 
-// It cannot be in the state, because updating state is not an atomic operation,
-// so the value of this can be changed after triggering the second modal
-// (when the modal is triggered onChange, onBlur triggers it second time)
-let isModalOpen = false;
-
 /* eslint class-methods-use-this: ["error",{ "exceptMethods": ["getLineItemsToBeSaved"] }] */
 /**
  * The second step of stock movement where user can add items to stock list.
@@ -323,7 +318,7 @@ class AddItemsPage extends Component {
       showAlert: false,
       alertMessage: '',
       isExpirationModalOpen: false,
-      // Resolve function for the expiration date confirmation modal promise.
+      // Stores the resolve function for the ConfirmExpirationDateModal promise
       resolveExpirationModal: null,
       itemsWithMismatchedExpiry: [],
     };
@@ -542,35 +537,6 @@ class AddItemsPage extends Component {
   }
 
   /**
-   * Shows Inventory item expiration date update confirmation dialog.
-   * @param {function} onConfirm
-   * @param {function} onReject
-   * @public
-   */
-  confirmInventoryItemExpirationDateUpdate(onConfirm, onReject) {
-    confirmAlert({
-      title: this.props.translate('react.stockMovement.message.confirmSave.label', 'Confirm save'),
-      message: this.props.translate(
-        'react.stockMovement.confirmExpiryDateUpdate.message',
-        'This will update the expiry date across all depots in the system. Are you sure you want to proceed?',
-      ),
-      buttons: [
-        {
-          label: this.props.translate('react.default.yes.label', 'Yes'),
-          onClick: onConfirm,
-        },
-        {
-          label: this.props.translate('react.default.no.label', 'No'),
-          onClick: onReject,
-        },
-      ],
-      afterClose: () => {
-        isModalOpen = false;
-      },
-    });
-  }
-
-  /**
    * Fetches all required data.
    * @public
    */
@@ -704,6 +670,8 @@ class AddItemsPage extends Component {
       if (!values.lineItems?.[rowIndex]?.expirationDate) {
         this.changeExpirationDate(mappedLineItems, rowIndex, data?.inventoryItem?.expirationDate);
       }
+
+      // Prevent an infinite loop between fetchInventoryItem() and validateExpirationDate()
       if (shouldValidateExpirationDate) {
         this.validateExpirationDate(mappedLineItems, rowIndex);
       }
@@ -738,7 +706,7 @@ class AddItemsPage extends Component {
       && lineItem?.expirationDate !== inventoryItem?.expirationDate
       && quantity > 0;
 
-    if (expirationDateHasChanged && !isModalOpen) {
+    if (expirationDateHasChanged) {
       // Despite we have only one item here, we are place it in an array
       // because the ConfirmExpirationDateModal expects an array
       const itemsWithMismatchedExpiry = [{

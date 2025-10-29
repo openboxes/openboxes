@@ -53,7 +53,7 @@ const useConfirmExpirationDateModal = () => {
           {getValue()}
         </TableCell>
       ),
-      size: 50,
+      size: 40,
     }),
     columnHelper.accessor(confirmExpirationDateColumn.PRODUCT, {
       header: () => (
@@ -74,7 +74,7 @@ const useConfirmExpirationDateModal = () => {
           </TableCell>
         );
       },
-      size: 150,
+      size: 170,
     }),
     columnHelper.accessor(confirmExpirationDateColumn.LOT_NUMBER, {
       header: () => (
@@ -86,9 +86,9 @@ const useConfirmExpirationDateModal = () => {
         <TableCell
           customTooltip
           tooltipLabel={getValue()}
-          className="rt-td"
+          className="rt-td multiline-cell"
         >
-          {getValue()}
+          <div className="limit-lines-2">{getValue()}</div>
         </TableCell>
       ),
       size: 100,
@@ -108,7 +108,7 @@ const useConfirmExpirationDateModal = () => {
           {formatDate(getValue())}
         </TableCell>
       ),
-      size: 100,
+      size: 70,
     }),
     columnHelper.accessor(confirmExpirationDateColumn.NEW_EXPIRY, {
       header: () => (
@@ -125,7 +125,7 @@ const useConfirmExpirationDateModal = () => {
           {formatDate(getValue())}
         </TableCell>
       ),
-      size: 100,
+      size: 70,
     }),
   ];
 

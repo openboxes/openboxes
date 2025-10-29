@@ -121,7 +121,7 @@ class EditLineModal extends Component {
       shipmentItemQuantityShippedSum: shipmentItemsQuantityMap[attr.fieldValue?.shipmentItemId],
       showMismatchQuantityShippedInfo: false,
       isExpirationModalOpen: false,
-      // Resolve function for the expiration date confirmation modal promise.
+      // Stores the resolve function for the ConfirmExpirationDateModal promise
       resolveExpirationModal: null,
       itemsWithMismatchedExpiry: [],
     };
@@ -195,7 +195,7 @@ class EditLineModal extends Component {
         line.lotNumber === item.lotNumber);
 
       if (oldItem && oldItem.quantityOnHand && oldItem.expirationDate !== line.expirationDate) {
-        itemsWithMismatchedExpiry.push({
+        return itemsWithMismatchedExpiry.push({
           code: line.product?.productCode,
           product: line.product,
           lotNumber: line.lotNumber,

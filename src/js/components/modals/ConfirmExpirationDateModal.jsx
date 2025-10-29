@@ -26,7 +26,7 @@ const ConfirmExpirationDateModal = ({
   }
 
   return (
-    <Modal isOpen={isOpen} className="modal-content">
+    <Modal isOpen={isOpen} className="modal-content min-width-1000">
       <div className="modal-content__header">
         <p className="modal-content__header__title">
           {translate('react.confirmExpirationDate.modal.title.label', 'Confirm save')}
@@ -39,7 +39,7 @@ const ConfirmExpirationDateModal = ({
         </p>
       </div>
 
-      <div className="modal-content__main mb-3">
+      <div className="modal-content__main">
         <DataTable
           data={itemsWithMismatchedExpiry}
           columns={columns}
