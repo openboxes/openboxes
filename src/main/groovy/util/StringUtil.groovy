@@ -46,14 +46,14 @@ class StringUtil {
     }
 
     /**
-     * Splits a given string int a list of strings separated by the given separator.
+     * Splits a given string into a list of strings separated by the given separator.
      * Ex: Given "x,y,z", returns ["x","y","z"]
      */
     static List<String> split(Object value, String delimiter=DEFAULT_DELIMITER) {
         if (!value) {
             return null
         }
-        if (!value instanceof String) {
+        if (!(value instanceof String)) {
             throw new IllegalArgumentException("Expected String but got ${value.class}")
         }
 

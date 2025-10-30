@@ -14,7 +14,7 @@ import grails.util.Holders
 import groovy.sql.Sql
 import groovy.time.TimeCategory
 import org.springframework.beans.factory.annotation.Autowired
-import util.StringUtil
+import util.RequestParamsUtil
 
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.data.PersistenceService
@@ -288,7 +288,7 @@ class ForecastingService {
         queryParams.put("endDate", params.endDate)
 
         query += " AND origin_id IN (:origins)"
-        queryParams.put("origins", StringUtil.split(params.originId))
+        queryParams.put("origins", RequestParamsUtil.asList(params.originId))
 
         if (params.destinationId) {
             query += " AND destination_id = :destinationId"
