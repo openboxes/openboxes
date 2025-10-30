@@ -11,7 +11,6 @@ import { fetchUsers, updateWorkflowHeader } from 'actions';
 import stockListApi from 'api/services/StockListApi';
 import stockMovementApi from 'api/services/StockMovementApi';
 import { STOCK_MOVEMENT_BY_ID } from 'api/urls';
-import InboundV2Step from 'consts/InboundV2Step';
 import { DateFormat, DateFormatDateFns } from 'consts/timeFormat';
 import useInboundCreateValidation from 'hooks/inboundV2/create/useInboundCreateValidation';
 import useQueryParams from 'hooks/useQueryParams';
@@ -183,12 +182,10 @@ const useInboundCreateForm = ({ next }) => {
   };
 
   useEffect(() => {
-    if (queryParams.step !== InboundV2Step.ADD_ITEMS && queryParams.step !== InboundV2Step.SEND) {
-      // Fetching data for "requested by" dropdown
-      dispatch(fetchUsers());
-      fetchData();
-    }
-  }, [queryParams.step]);
+    // Fetching data for "requested by" dropdown
+    dispatch(fetchUsers());
+    fetchData();
+  }, []);
   return {
     control,
     getValues,

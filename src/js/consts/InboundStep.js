@@ -1,7 +1,7 @@
-const InboundV2Step = {
+const InboundStep = {
   CREATE: 'CREATE',
   ADD_ITEMS: 'ADD_ITEMS',
   SEND: 'SEND',
 };
 
-export default InboundV2Step;
+export default InboundStep;

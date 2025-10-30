@@ -14,7 +14,7 @@ import { DateFormatDateFns } from 'consts/timeFormat';
 import useInboundCreateForm from 'hooks/inboundV2/create/useInboundCreateForm';
 import { debounceLocationsFetch, debouncePeopleFetch } from 'utils/option-utils';
 
-const InboundV2Create = ({ next }) => {
+const InboundCreate = ({ next }) => {
   const {
     errors,
     control,
@@ -187,8 +187,8 @@ const InboundV2Create = ({ next }) => {
   );
 };
 
-export default InboundV2Create;
+export default InboundCreate;
 
-InboundV2Create.propTypes = {
+InboundCreate.propTypes = {
   next: PropTypes.func.isRequired,
 };
