@@ -717,9 +717,9 @@ class AddItemsPage extends Component {
         newExpiry: lineItem?.expirationDate,
       }];
 
-      const shouldUpdateLotExpirationDate =
+      const shouldUpdateExpirationDate =
         await this.confirmExpirationDateSave(itemsWithMismatchedExpiry);
-      if (!shouldUpdateLotExpirationDate) {
+      if (!shouldUpdateExpirationDate) {
         this.cancelSavingRequisitionItem(lineItems, rowIndex);
         return Promise.reject();
       }

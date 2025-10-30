@@ -185,16 +185,21 @@ class EditLineModal extends Component {
    */
   async onSave(values) {
     const lines = eraseReceivingQuantity(values.lines);
-    const itemsWithMismatchedExpiry = [];
 
-    lines.map((line) => {
-      const oldItem = _.find(this.state.formValues.lines, (item) =>
-        line.product &&
-        line.product.id === item.product.id &&
-        line.lotNumber === item.lotNumber);
+    const oldItemsMap = new Map();
+    this.state.formValues.lines.forEach((item) => {
+      if (item.product) {
+        oldItemsMap.set(`${item.product.id}-${item.lotNumber}`, item);
+      }
+    });
+
+    const itemsWithMismatchedExpiry = [];
+    lines.forEach((line) => {
+      const key = `${line.product?.id}-${line.lotNumber}`;
+      const oldItem = oldItemsMap.get(key);
 
       if (oldItem && oldItem.quantityOnHand && oldItem.expirationDate !== line.expirationDate) {
-        return itemsWithMismatchedExpiry.push({
+        itemsWithMismatchedExpiry.push({
           code: line.product?.productCode,
           product: line.product,
           lotNumber: line.lotNumber,
@@ -202,15 +207,12 @@ class EditLineModal extends Component {
           newExpiry: line.expirationDate,
         });
       }
-
-      return null;
     });
 
     if (itemsWithMismatchedExpiry.length > 0) {
-      const shouldUpdateLotExpirationDate =
+      const shouldUpdateExpirationDate =
         await this.confirmExpirationDateSave(itemsWithMismatchedExpiry);
-
-      if (!shouldUpdateLotExpirationDate) {
+      if (!shouldUpdateExpirationDate) {
         return Promise.reject();
       }
     }
