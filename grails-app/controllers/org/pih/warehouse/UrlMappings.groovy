@@ -825,11 +825,6 @@ class UrlMappings {
             action = [GET: "getReorderReport"]
         }
 
-        "/api/facilities/$facilityId/inventories/expirationHistoryReport" {
-            controller = { "inventoryApi" }
-            action = [GET: "getExpirationHistoryReport"]
-        }
-
         /**
         * Purchase Orders API endpoints
         */
@@ -1095,6 +1090,15 @@ class UrlMappings {
         "/api/facilities/$facility/inventory/record-stock/save" {
             controller = "recordStockApi"
             action = [POST: "saveRecordStock"]
+        }
+
+        /**
+         * Inventory API endpoints
+         */
+
+        "/api/inventories/expirationHistoryReport" {
+            controller = { "inventoryApi" }
+            action = [GET: "getExpirationHistoryReport"]
         }
 
         // Error handling

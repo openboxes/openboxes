@@ -3456,16 +3456,16 @@ class InventoryService implements ApplicationContextAware {
     }
 
     PaginatedList<ExpirationHistoryReportRow> getExpirationHistoryReport(ExpirationHistoryReportFilterCommand command) {
-        List<TransactionEntry> entries = TransactionEntry.createCriteria().list(offset: command.offset, max: command.max) {
+        List<TransactionEntry> entries = TransactionEntry.createCriteria().list(offset: command.paginationParams.offset, max: command.paginationParams.max) {
             transaction {
                 // Expired transaction type is hardcoded with id = "4"
-                eq("transactionType", TransactionType.read("4"))
+                eq("transactionType", TransactionType.read(Constants.EXPIRATION_TRANSACTION_TYPE_ID))
                 eq("inventory", AuthService.currentLocation.inventory)
-                between("transactionDate", command.dateFrom, command.dateTo)
+                between("transactionDate", command.startDate, command.endDate)
                 order("transactionDate", "desc")
             }
         }
-        return new PaginatedList<ExpirationHistoryReportRow>(entries.collect { ExpirationHistoryReportRow.buildExpirationReportRow(it) }, entries.totalCount)
+        return new PaginatedList<ExpirationHistoryReportRow>(entries.collect { ExpirationHistoryReportRow.fromTransactionEntry(it) }, entries.totalCount)
     }
 
     String getExpirationHistoryReportCsv(ExpirationHistoryReportFilterCommand command) {
@@ -3483,7 +3483,7 @@ class InventoryService implements ApplicationContextAware {
             "${messageLocalizer.localize("product.unitPrice.label")}" { it?.unitPrice }
             "${messageLocalizer.localize("expirationHistoryReport.valueLostToExpiry.label")}" { it?.valueLostToExpiry }
         })
-        expirationHistoryReport.list.each { ExpirationReportRow row ->
+        expirationHistoryReport.list.each { ExpirationHistoryReportRow row ->
             csv << [
                     transactionNumber: row.transactionNumber,
                     transactionDate: row.transactionDate,

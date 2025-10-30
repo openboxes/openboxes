@@ -16,7 +16,7 @@ class ExpirationHistoryReportRow {
     BigDecimal unitPrice
     BigDecimal valueLostToExpiry
 
-    static buildExpirationReportRow(TransactionEntry transactionEntry) {
+    static fromTransactionEntry(TransactionEntry transactionEntry) {
         Product product = transactionEntry.inventoryItem.product
         return new ExpirationHistoryReportRow(
                 transactionNumber: transactionEntry.transaction.transactionNumber,
