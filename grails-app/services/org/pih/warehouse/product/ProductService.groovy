@@ -884,7 +884,10 @@ class ProductService {
             // FIXME make relation to Constants.EXPORT_PRODUCT_COLUMNS explicit
             def row = [
                 Id                  : product?.id,
-                Active              : product.active ?: Boolean.TRUE,
+                // When product is not active, we want to set it as the string 'false', because without that, when we export the file,
+                // the cell is blank, so if we import this file again, we will set this product as active, because in our import logic
+                // we treat a blank active field as true
+                Active              : product.active ?: 'false',
                 ProductCode         : product.productCode ?: '',
                 ProductType         : product.productType?.name ?: '',
                 Name                : product.name,
