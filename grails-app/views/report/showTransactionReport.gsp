@@ -260,7 +260,7 @@
 				data.push({ name: "endDate", value: $("#endDate").val() });
 				data.push({ name: "category", value: $("#category").val() });
 
-                let selectedProducts = $("#products-select").val();
+                const selectedProducts = $("#products-select").val();
                 if (selectedProducts) {
                   selectedProducts.forEach(productId => {
                     data.push({ name: "products", value: productId });
